@@ -123,6 +123,12 @@ anychart.ConsistencyState = {
   MAP_MARKER_PALETTE: 1 << 16,
   MAP_HATCH_FILL_PALETTE: 1 << 17,
   MAP_COLOR_RANGE: 1 << 18,
+  //---------------------------------- HEAT MAP STATES (CHART) ---------------------------------
+  HEATMAP_SCALES: 1 << 11,
+  HEATMAP_SERIES: 1 << 12,
+  HEATMAP_AXES: 1 << 13,
+  HEATMAP_GRIDS: 1 << 14,
+  HEATMAP_COLOR_SCALE: 1 << 15,
   //---------------------------------- SERIES STATES (VB) ---------------------------------
   // also combined, due to a very big prefix
   SERIES_HATCH_FILL: 1 << 5,
@@ -172,6 +178,7 @@ anychart.ConsistencyState = {
   //---------------------------------- LABELS FACTORY STATES (VB) ---------------------------------
   LABELS_FACTORY_BACKGROUND: 1 << 5,
   LABELS_FACTORY_HANDLERS: 1 << 6,
+  LABELS_FACTORY_CLIP: 1 << 7,
   //---------------------------------- LEGEND STATES (VB) ---------------------------------
   LEGEND_BACKGROUND: 1 << 5,
   LEGEND_TITLE: 1 << 6,

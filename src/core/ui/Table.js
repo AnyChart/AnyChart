@@ -151,7 +151,8 @@ anychart.core.ui.Table = function(opt_rowsCount, opt_colsCount) {
     'bottomPadding': 0,
     'leftPadding': 0,
     'hAlign': anychart.enums.HAlign.START,
-    'vAlign': anychart.enums.VAlign.TOP
+    'vAlign': anychart.enums.VAlign.TOP,
+    'enabled': true
   };
 
   if (anychart.DEFAULT_THEME != 'v6')

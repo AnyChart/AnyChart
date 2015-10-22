@@ -630,7 +630,8 @@ anychart.themes.merging.mergingMap_ = [
       'box',
       'column',
       'financial',
-      'line'
+      'line',
+      'heatMap'
     ]
   },
   {

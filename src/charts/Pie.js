@@ -1104,6 +1104,8 @@ anychart.charts.Pie.prototype.labels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.labels_.setup(opt_value);
     return this;
   }
@@ -1153,6 +1155,8 @@ anychart.charts.Pie.prototype.hoverLabels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.hoverLabels_.setup(opt_value);
     return this;
   }
@@ -4702,8 +4706,8 @@ anychart.charts.Pie.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   this.group(config['group']);
   this.data(config['data']);
-  this.labels(config['labels']);
-  this.hoverLabels(config['hoverLabels']);
+  this.labels().setup(config['labels']);
+  this.hoverLabels().setup(config['hoverLabels']);
   this.palette(config['palette']);
   this.hatchFillPalette(config['hatchFillPalette']);
   this.tooltip(config['tooltip']);

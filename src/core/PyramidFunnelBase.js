@@ -2180,6 +2180,8 @@ anychart.core.PyramidFunnelBase.prototype.labels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.labels_.setup(opt_value);
     return this;
   }
@@ -2199,6 +2201,8 @@ anychart.core.PyramidFunnelBase.prototype.hoverLabels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.hoverLabels_.setup(opt_value);
     return this;
   }
@@ -2218,6 +2222,8 @@ anychart.core.PyramidFunnelBase.prototype.selectLabels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.selectLabels_.setup(opt_value);
     return this;
   }
@@ -3249,6 +3255,8 @@ anychart.core.PyramidFunnelBase.prototype.markers = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.markers_.setup(opt_value);
     return this;
   }
@@ -3284,6 +3292,8 @@ anychart.core.PyramidFunnelBase.prototype.hoverMarkers = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.hoverMarkers_.setup(opt_value);
     return this;
   }
@@ -3305,6 +3315,8 @@ anychart.core.PyramidFunnelBase.prototype.selectMarkers = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.selectMarkers_.setup(opt_value);
     return this;
   }
@@ -4029,17 +4041,17 @@ anychart.core.PyramidFunnelBase.prototype.setupByJSON = function(config) {
   this.hoverHatchFill(config['hoverHatchFill']);
   this.selectHatchFill(config['selectHatchFill']);
 
-  this.labels(config['labels']);
-  this.hoverLabels(config['hoverLabels']);
-  this.selectLabels(config['selectLabels']);
+  this.labels().setup(config['labels']);
+  this.hoverLabels().setup(config['hoverLabels']);
+  this.selectLabels().setup(config['selectLabels']);
 
   this.stroke(config['stroke']);
   this.hoverStroke(config['hoverStroke']);
   this.selectStroke(config['selectStroke']);
 
-  this.markers(config['markers']);
-  this.hoverMarkers(config['hoverMarkers']);
-  this.selectMarkers(config['selectMarkers']);
+  this.markers().setup(config['markers']);
+  this.hoverMarkers().setup(config['hoverMarkers']);
+  this.selectMarkers().setup(config['selectMarkers']);
 
   this.overlapMode(config['overlapMode']);
   this.palette(config['palette']);

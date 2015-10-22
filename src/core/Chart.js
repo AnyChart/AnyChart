@@ -1321,9 +1321,9 @@ anychart.core.Chart.prototype.createEventSeriesStatus = function(seriesStatus, o
  * @param {string} event .
  * @param {boolean=} opt_empty .
  * @return {Object}
- * @private
+ * @protected
  */
-anychart.core.Chart.prototype.makeCurrentPoint_ = function(seriesStatus, event, opt_empty) {
+anychart.core.Chart.prototype.makeCurrentPoint = function(seriesStatus, event, opt_empty) {
   var series, pointIndex, pointStatus, minDistance = Infinity;
   for (var i = 0, len = seriesStatus.length; i < len; i++) {
     var status = seriesStatus[i];
@@ -1358,7 +1358,7 @@ anychart.core.Chart.prototype.makeCurrentPoint_ = function(seriesStatus, event, 
  * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
  */
 anychart.core.Chart.prototype.makeInteractivityPointEvent = function(type, event, seriesStatus, opt_empty) {
-  var currentPoint = this.makeCurrentPoint_(seriesStatus, type, opt_empty);
+  var currentPoint = this.makeCurrentPoint(seriesStatus, type, opt_empty);
   var wrappedPoints = [];
   /** @type {anychart.core.SeriesBase} */
   var series;
@@ -1430,8 +1430,13 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
     index = tag;
   } else if (event['target'] instanceof anychart.core.ui.Legend) {
     if (tag) {
-      series = tag.series;
-      index = tag.index;
+      if (tag.points) {
+        series = tag.points.series;
+        index = tag.points.points;
+      } else {
+        series = tag.series;
+        index = tag.index;
+      }
     }
   } else {
     series = tag && tag.series;
@@ -1443,7 +1448,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
     if (evt && ((anychart.utils.checkIfParent(/** @type {!goog.events.EventTarget} */(series), event['relatedTarget'])) || series.dispatchEvent(evt))) {
       if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
 
-        if (!series.state.hasPointStateByPointIndex(anychart.PointState.HOVER, index) && !isNaN(index)) {
+        if (goog.isArray(index) || (!series.state.hasPointStateByPointIndex(anychart.PointState.HOVER, index) && !isNaN(index))) {
           if (goog.isFunction(series.hoverPoint))
             series.hoverPoint(/** @type {number} */ (index), event);
 
@@ -1526,8 +1531,13 @@ anychart.core.Chart.prototype.handleMouseOut = function(event) {
     index = tag;
   } else if (event['target'] instanceof anychart.core.ui.Legend) {
     if (tag) {
-      series = tag.series;
-      index = tag.index;
+      if (tag.points) {
+        series = tag.points.series;
+        index = tag.points.points;
+      } else {
+        series = tag.series;
+        index = tag.index;
+      }
     }
   } else {
     series = tag && tag.series;
@@ -1543,7 +1553,7 @@ anychart.core.Chart.prototype.handleMouseOut = function(event) {
     var ifParent = anychart.utils.checkIfParent(/** @type {!goog.events.EventTarget} */(series), event['relatedTarget']);
 
     if ((!ifParent || (prevIndex != index)) && series.dispatchEvent(evt)) {
-      if (hoverMode == anychart.enums.HoverMode.SINGLE && !isNaN(index)) {
+      if (hoverMode == anychart.enums.HoverMode.SINGLE && (!isNaN(index) || goog.isArray(index))) {
         series.unhover();
         this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, [{
           series: series,
@@ -1588,8 +1598,13 @@ anychart.core.Chart.prototype.handleMouseDown = function(event) {
     index = tag;
   } else if (event['target'] instanceof anychart.core.ui.Legend) {
     if (tag) {
-      series = tag.series;
-      index = tag.index;
+      if (tag.points) {
+        series = tag.points.series;
+        index = tag.points.points;
+      } else {
+        series = tag.series;
+        index = tag.index;
+      }
     }
   } else {
     series = tag && tag.series;

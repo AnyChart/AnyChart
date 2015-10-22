@@ -1,9 +1,9 @@
 goog.provide('anychart.core.ui.ColorRange');
 
 goog.require('anychart.core.axes.Linear');
-goog.require('anychart.core.map.scale.LinearColor');
-goog.require('anychart.core.map.scale.OrdinalColor');
 goog.require('anychart.core.ui.ColorRangeTicks');
+goog.require('anychart.scales.LinearColor');
+goog.require('anychart.scales.OrdinalColor');
 
 
 
@@ -47,9 +47,9 @@ anychart.core.ui.ColorRange.prototype.createTicks = function() {
 /** @inheritDoc */
 anychart.core.ui.ColorRange.prototype.getLine = function() {
   if (!this.line) {
-    if (this.scale() instanceof anychart.core.map.scale.LinearColor) {
+    if (this.scale() instanceof anychart.scales.LinearColor) {
       this.line = acgraph.path();
-    } else if (this.scale() instanceof anychart.core.map.scale.OrdinalColor) {
+    } else if (this.scale() instanceof anychart.scales.OrdinalColor) {
       this.line = acgraph.layer();
       this.lines = [];
     }
@@ -187,7 +187,7 @@ anychart.core.ui.ColorRange.prototype.targetSeriesInvalidated_ = function(e) {
  */
 anychart.core.ui.ColorRange.prototype.calculateRangeRegions_ = function() {
   var scale = this.scale();
-  if (scale && scale instanceof anychart.core.map.scale.OrdinalColor) {
+  if (scale && scale instanceof anychart.scales.OrdinalColor) {
     this.rangeRegions_ = {};
     var iterator = this.targetSeries_.getResetIterator();
     while (iterator.advance()) {
@@ -208,10 +208,10 @@ anychart.core.ui.ColorRange.prototype.getLabelsFormatProvider = function(index, 
 
   var provider = {};
   var labelText, labelValue;
-  if (scale instanceof anychart.core.map.scale.LinearColor) {
+  if (scale instanceof anychart.scales.LinearColor) {
     labelText = parseFloat(value);
     labelValue = parseFloat(value);
-  } else if (scale instanceof anychart.core.map.scale.OrdinalColor) {
+  } else if (scale instanceof anychart.scales.OrdinalColor) {
     labelText = scale.ticks().names()[index];
     labelValue = value;
 
@@ -274,14 +274,14 @@ anychart.core.ui.ColorRange.prototype.drawTopLine = function(bounds, pixelShift,
   var y = bounds.top + bounds.height + lineThickness / 2 - offset;
 
   var scale = this.scale();
-  if (scale instanceof anychart.core.map.scale.LinearColor) {
+  if (scale instanceof anychart.scales.LinearColor) {
     this.line
         .moveTo(bounds.left + pixelShift, y)
         .lineTo(bounds.left - pixelShift + bounds.width, y)
         .lineTo(bounds.left - pixelShift + bounds.width, y - size)
         .lineTo(bounds.left + pixelShift, y - size)
         .close();
-  } else if (scale instanceof anychart.core.map.scale.OrdinalColor) {
+  } else if (scale instanceof anychart.scales.OrdinalColor) {
     var ranges = scale.getProcessedRanges();
     var colors = scale.colors();
 
@@ -311,14 +311,14 @@ anychart.core.ui.ColorRange.prototype.drawRightLine = function(bounds, pixelShif
   var x = bounds.left - lineThickness / 2 + offset;
 
   var scale = this.scale();
-  if (scale instanceof anychart.core.map.scale.LinearColor) {
+  if (scale instanceof anychart.scales.LinearColor) {
     this.line
         .moveTo(x, bounds.top + pixelShift)
         .lineTo(x, bounds.top - pixelShift + bounds.height)
         .lineTo(x + size, bounds.top - pixelShift + bounds.height)
         .lineTo(x + size, bounds.top + pixelShift)
         .close();
-  } else if (scale instanceof anychart.core.map.scale.OrdinalColor) {
+  } else if (scale instanceof anychart.scales.OrdinalColor) {
     var ranges = scale.getProcessedRanges();
     var colors = scale.colors();
 
@@ -348,14 +348,14 @@ anychart.core.ui.ColorRange.prototype.drawBottomLine = function(bounds, pixelShi
   var y = bounds.top - lineThickness / 2 + offset;
 
   var scale = this.scale();
-  if (scale instanceof anychart.core.map.scale.LinearColor) {
+  if (scale instanceof anychart.scales.LinearColor) {
     this.line
         .moveTo(bounds.left + pixelShift, y)
         .lineTo(bounds.left - pixelShift + bounds.width, y)
         .lineTo(bounds.left - pixelShift + bounds.width, y + size)
         .lineTo(bounds.left + pixelShift, y + size)
         .close();
-  } else if (scale instanceof anychart.core.map.scale.OrdinalColor) {
+  } else if (scale instanceof anychart.scales.OrdinalColor) {
     var ranges = scale.getProcessedRanges();
     var colors = scale.colors();
 
@@ -385,14 +385,14 @@ anychart.core.ui.ColorRange.prototype.drawLeftLine = function(bounds, pixelShift
   var x = bounds.left + bounds.width + lineThickness / 2 - offset;
 
   var scale = this.scale();
-  if (scale instanceof anychart.core.map.scale.LinearColor) {
+  if (scale instanceof anychart.scales.LinearColor) {
     this.line
         .moveTo(x, bounds.top + pixelShift)
         .lineTo(x, bounds.top - pixelShift + bounds.height)
         .lineTo(x - size, bounds.top - pixelShift + bounds.height)
         .lineTo(x - size, bounds.top + pixelShift)
         .close();
-  } else if (scale instanceof anychart.core.map.scale.OrdinalColor) {
+  } else if (scale instanceof anychart.scales.OrdinalColor) {
     var ranges = scale.getProcessedRanges();
     var colors = scale.colors();
 
@@ -423,9 +423,9 @@ anychart.core.ui.ColorRange.prototype.drawLine = function() {
   var scale = this.scale();
 
   if (!scale)
-    this.scale(new anychart.core.map.scale.LinearColor());
+    this.scale(new anychart.scales.LinearColor());
 
-  if (scale instanceof anychart.core.map.scale.LinearColor) {
+  if (scale instanceof anychart.scales.LinearColor) {
     line.clear();
     line.stroke(/** @type {acgraph.vector.Stroke} */(this.stroke()));
     var fill = acgraph.vector.normalizeFill(/** @type {!Array.<acgraph.vector.GradientKey>} */(scale.colors()));
@@ -434,7 +434,7 @@ anychart.core.ui.ColorRange.prototype.drawLine = function() {
     else
       fill['angle'] = 90;
     line.fill(fill);
-  } else if (scale instanceof anychart.core.map.scale.OrdinalColor) {
+  } else if (scale instanceof anychart.scales.OrdinalColor) {
     for (var i = 0, len = this.lines.length; i < len; i++)
       this.lines[i].clear();
   }
@@ -747,11 +747,11 @@ anychart.core.ui.ColorRange.prototype.scale = function(opt_value) {
 
 /**
  * Create/get temp scale. If color range doesn't have scale then creates temp scale.
- * @return {anychart.core.map.scale.LinearColor}
+ * @return {anychart.scales.LinearColor}
  */
 anychart.core.ui.ColorRange.prototype.getTempScale = function() {
   if (!this.getTempScale_) {
-    this.getTempScale_ = new anychart.core.map.scale.LinearColor();
+    this.getTempScale_ = new anychart.scales.LinearColor();
     this.getTempScale_.colors('#fff', '#000');
   }
   return this.getTempScale_;
@@ -814,11 +814,11 @@ anychart.core.ui.ColorRange.prototype.handleMouseClick = function(event) {
       series.map.unselect();
     }
     var iterator, pointValue;
-    if (scale instanceof anychart.core.map.scale.OrdinalColor) {
+    if (scale instanceof anychart.scales.OrdinalColor) {
       var range = scale.getRangeByValue(/** @type {number} */(value));
       if (series)
         series.selectPoint(this.rangeRegions_[range.sourceIndex], event);
-    } else if (scale instanceof anychart.core.map.scale.LinearColor) {
+    } else if (scale instanceof anychart.scales.LinearColor) {
       iterator = series.getResetIterator();
       var minLength = Infinity;
       var targetIndex = NaN;
@@ -867,11 +867,11 @@ anychart.core.ui.ColorRange.prototype.handleMouseOverAndMove = function(event) {
     var iterator, pointValue;
 
     value = /** @type {number} */(scale.inverseTransform(ratio));
-    if (scale instanceof anychart.core.map.scale.OrdinalColor) {
+    if (scale instanceof anychart.scales.OrdinalColor) {
       var range = scale.getRangeByValue(/** @type {number} */(value));
       if (series)
         series.hoverPoint(this.rangeRegions_[range.sourceIndex]);
-    } else if (scale instanceof anychart.core.map.scale.LinearColor && series) {
+    } else if (scale instanceof anychart.scales.LinearColor && series) {
       iterator = series.getResetIterator();
       var minLength = Infinity;
       var targetIndex = NaN;

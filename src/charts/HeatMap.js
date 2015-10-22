@@ -1,0 +1,2071 @@
+goog.provide('anychart.charts.HeatMap');
+
+goog.require('anychart'); // otherwise we can't use anychart.chartTypesMap object.
+goog.require('anychart.core.SeparateChart');
+goog.require('anychart.core.heatMap.series.Base');
+goog.require('anychart.core.utils.InteractivityState');
+goog.require('anychart.enums');
+goog.require('anychart.scales.OrdinalColor');
+
+
+
+/**
+ * AnyChart Hea tMap class.
+ * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @extends {anychart.core.SeparateChart}
+ * @constructor
+ */
+anychart.charts.HeatMap = function(opt_data, opt_csvSettings) {
+  goog.base(this);
+
+  /**
+   * @type {!anychart.scales.Ordinal}
+   * @private
+   */
+  this.xScale_ = new anychart.scales.Ordinal();
+  this.xScale_.listenSignals(this.scaleInvalidated_, this);
+
+  /**
+   * @type {!anychart.scales.Ordinal}
+   * @private
+   */
+  this.yScale_ = new anychart.scales.Ordinal();
+  this.yScale_.listenSignals(this.scaleInvalidated_, this);
+
+  /**
+   * @type {!Array<anychart.core.axes.Linear>}
+   * @private
+   */
+  this.xAxes_ = [];
+
+  /**
+   * @type {!Array<anychart.core.axes.Linear>}
+   * @private
+   */
+  this.yAxes_ = [];
+
+  /**
+   * @type {Array.<anychart.core.grids.Linear>}
+   * @private
+   */
+  this.grids_ = [];
+
+  /**
+   * Palette for series colors.
+   * @type {anychart.palettes.RangeColors|anychart.palettes.DistinctColors}
+   * @private
+   */
+  this.palette_ = null;
+
+  /**
+   * @type {anychart.palettes.Markers}
+   * @private
+   */
+  this.markerPalette_ = null;
+
+  /**
+   * @type {anychart.palettes.HatchFills}
+   * @private
+   */
+  this.hatchFillPalette_ = null;
+
+  /**
+   * Cache of chart data bounds.
+   * @type {acgraph.math.Rect}
+   * @private
+   */
+  this.dataBounds_ = null;
+
+  this.createSeries_(opt_data || null, opt_csvSettings);
+};
+goog.inherits(anychart.charts.HeatMap, anychart.core.SeparateChart);
+
+
+/**
+ * Default hatch fill type.
+ * @type {acgraph.vector.HatchFill.HatchFillType|string}
+ */
+anychart.charts.HeatMap.DEFAULT_HATCH_FILL_TYPE = acgraph.vector.HatchFill.HatchFillType.DIAGONAL_BRICK;
+
+
+/** @inheritDoc */
+anychart.charts.HeatMap.prototype.getType = function() {
+  return anychart.enums.ChartTypes.HEAT_MAP;
+};
+
+
+/**
+ * Maximal number of attempts to calculate axes length.
+ * @type {number}
+ * @private
+ */
+anychart.charts.HeatMap.MAX_ATTEMPTS_AXES_CALCULATION_ = 5;
+
+
+/**
+ * Supported consistency states.
+ * @type {number}
+ */
+anychart.charts.HeatMap.prototype.SUPPORTED_CONSISTENCY_STATES =
+    anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.ConsistencyState.HEATMAP_SCALES |
+    anychart.ConsistencyState.HEATMAP_SERIES |
+    anychart.ConsistencyState.HEATMAP_AXES |
+    anychart.ConsistencyState.HEATMAP_GRIDS |
+    anychart.ConsistencyState.HEATMAP_COLOR_SCALE;
+
+
+/**
+ * Series z-index in chart root layer.
+ * @type {number}
+ */
+anychart.charts.HeatMap.ZINDEX_SERIES = 30;
+
+
+/**
+ * Marker z-index in chart root layer.
+ * @type {number}
+ */
+anychart.charts.HeatMap.ZINDEX_MARKER = 40;
+
+
+/**
+ * Label z-index in chart root layer.
+ * @type {number}
+ */
+anychart.charts.HeatMap.ZINDEX_LABEL = 40;
+
+
+/**
+ * Z-index increment multiplier.
+ * @type {number}
+ */
+anychart.charts.HeatMap.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Methods to set defaults for multiple entities.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter/setter for x-axis default settings.
+ * @param {Object=} opt_value Object with x-axis settings.
+ * @return {Object}
+ */
+anychart.charts.HeatMap.prototype.defaultXAxisSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultXAxisSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultXAxisSettings_ || {};
+};
+
+
+/**
+ * Getter/setter for y-axis default settings.
+ * @param {Object=} opt_value Object with y-axis settings.
+ * @return {Object}
+ */
+anychart.charts.HeatMap.prototype.defaultYAxisSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultYAxisSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultYAxisSettings_ || {};
+};
+
+
+/**
+ * Getter/setter for grid default settings.
+ * @param {Object=} opt_value Object with grid settings.
+ * @return {Object}
+ */
+anychart.charts.HeatMap.prototype.defaultGridSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultGridSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultGridSettings_ || {};
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Scales.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter/setter for default chart X scale.
+ * @param {anychart.scales.Ordinal=} opt_value X Scale to set.
+ * @return {!(anychart.scales.Ordinal|anychart.charts.HeatMap)} Default chart scale value or itself for method chaining.
+ */
+anychart.charts.HeatMap.prototype.xScale = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (!(opt_value instanceof anychart.scales.Ordinal)) {
+      anychart.utils.warning(anychart.enums.WarningCode.SCALE_TYPE_NOT_SUPPORTED, null, [opt_value.getType(), 'Ordinal'], true);
+      return this;
+    }
+
+    if (this.xScale_ != opt_value) {
+      if (this.xScale_)
+        this.xScale_.unlistenSignals(this.scaleInvalidated_, this);
+
+      this.xScale_ = /** type {anychart.scales.Ordinal} */(opt_value);
+      this.xScale_.listenSignals(this.scaleInvalidated_, this);
+
+      this.invalidate(anychart.ConsistencyState.HEATMAP_SCALES, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  } else {
+    return /** type {anychart.scales.Ordinal} */(this.xScale_);
+  }
+};
+
+
+/**
+ * Chart xScale invalidation handler.
+ * @param {anychart.SignalEvent} event Event.
+ * @private
+ */
+anychart.charts.HeatMap.prototype.scaleInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
+    this.invalidate(anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+/**
+ * Getter/setter for default chart Y scale.
+ * @param {anychart.scales.Ordinal=} opt_value Y Scale to set.
+ * @return {!(anychart.scales.Ordinal|anychart.charts.HeatMap)} Default chart scale value or itself for method chaining.
+ */
+anychart.charts.HeatMap.prototype.yScale = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (!(opt_value instanceof anychart.scales.Ordinal)) {
+      anychart.utils.warning(anychart.enums.WarningCode.SCALE_TYPE_NOT_SUPPORTED, null, [opt_value.getType(), 'Ordinal'], true);
+      return this;
+    }
+
+    if (this.yScale_ != opt_value) {
+      if (this.yScale_)
+        this.yScale_.unlistenSignals(this.scaleInvalidated_, this);
+
+      this.yScale_ = opt_value;
+      this.yScale_.listenSignals(this.scaleInvalidated_, this);
+
+      this.invalidate(anychart.ConsistencyState.HEATMAP_SCALES, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  } else {
+    return /** type {anychart.scales.Ordinal} */(this.yScale_);
+  }
+};
+
+
+/**
+ * Sets default scale for layout based element depending on barChartMode.
+ * @param {anychart.core.axisMarkers.Line|anychart.core.axisMarkers.Range|anychart.core.axisMarkers.Text|anychart.core.grids.Linear} item Item to set scale.
+ * @private
+ */
+anychart.charts.HeatMap.prototype.setDefaultScaleForLayoutBasedElements_ = function(item) {
+  if (item.isHorizontal()) {
+    item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
+  } else {
+    item.scale(/** @type {anychart.scales.Base} */(this.xScale()));
+  }
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Grids.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter/setter for chart grid.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Grid settings.
+ * @param {(Object|boolean|null)=} opt_value Grid settings to set.
+ * @return {!(anychart.core.grids.Linear|anychart.charts.HeatMap)} Grid instance by index or itself for method chaining.
+ */
+anychart.charts.HeatMap.prototype.grid = function(opt_indexOrValue, opt_value) {
+  var index, value;
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
+    index = 0;
+    value = opt_indexOrValue;
+  } else {
+    index = opt_indexOrValue;
+    value = opt_value;
+  }
+  var grid = this.grids_[index];
+  if (!grid) {
+    grid = new anychart.core.grids.Linear();
+    grid.setup(this.defaultGridSettings());
+    this.grids_[index] = grid;
+    this.registerDisposable(grid);
+    grid.listenSignals(this.onGridSignal_, this);
+    this.invalidate(anychart.ConsistencyState.HEATMAP_GRIDS, anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(value)) {
+    grid.setup(value);
+    return this;
+  } else {
+    return grid;
+  }
+};
+
+
+/**
+ * Gats all created grids. Internal method.
+ * @return {Array.<anychart.core.grids.Linear>}
+ */
+anychart.charts.HeatMap.prototype.getGrids = function() {
+  return this.grids_;
+};
+
+
+/**
+ * Listener for grids invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
+ * @private
+ */
+anychart.charts.HeatMap.prototype.onGridSignal_ = function(event) {
+  this.series_.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
+  this.invalidate(anychart.ConsistencyState.HEATMAP_GRIDS | anychart.ConsistencyState.HEATMAP_SERIES,
+      anychart.Signal.NEEDS_REDRAW);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Axes.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter/setter for chart X-axis.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Chart axis settings to set.
+ * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.
+ * @return {!(anychart.core.axes.Linear|anychart.charts.HeatMap)} Axis instance by index or itself for method chaining.
+ */
+anychart.charts.HeatMap.prototype.xAxis = function(opt_indexOrValue, opt_value) {
+  var index, value;
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
+    index = 0;
+    value = opt_indexOrValue;
+  } else {
+    index = opt_indexOrValue;
+    value = opt_value;
+  }
+  var axis = this.xAxes_[index];
+  if (!axis) {
+    axis = new anychart.core.axes.Linear();
+    axis.setParentEventTarget(this);
+    axis.setup(this.defaultXAxisSettings());
+    this.xAxes_[index] = axis;
+    this.registerDisposable(axis);
+    axis.listenSignals(this.onAxisSignal_, this);
+    this.invalidate(anychart.ConsistencyState.HEATMAP_AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(value)) {
+    axis.setup(value);
+    return this;
+  } else {
+    return axis;
+  }
+};
+
+
+/**
+ * Getter/setter for chart Y-axis.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Chart axis settings to set.
+ * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.
+ * @return {!(anychart.core.axes.Linear|anychart.charts.HeatMap)} Axis instance by index or itself for method chaining.
+ */
+anychart.charts.HeatMap.prototype.yAxis = function(opt_indexOrValue, opt_value) {
+  var index, value;
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
+    index = 0;
+    value = opt_indexOrValue;
+  } else {
+    index = opt_indexOrValue;
+    value = opt_value;
+  }
+  var axis = this.yAxes_[index];
+  if (!axis) {
+    axis = new anychart.core.axes.Linear();
+    axis.setParentEventTarget(this);
+    axis.setup(this.defaultYAxisSettings());
+    this.yAxes_[index] = axis;
+    this.registerDisposable(axis);
+    axis.listenSignals(this.onAxisSignal_, this);
+    this.invalidate(anychart.ConsistencyState.HEATMAP_AXES | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(value)) {
+    axis.setup(value);
+    return this;
+  } else {
+    return axis;
+  }
+};
+
+
+/**
+ * Listener for axes invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
+ * @private
+ */
+anychart.charts.HeatMap.prototype.onAxisSignal_ = function(event) {
+  var state = 0;
+  var signal = 0;
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    state |= anychart.ConsistencyState.HEATMAP_AXES;
+    signal |= anychart.Signal.NEEDS_REDRAW;
+  }
+  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    state |= anychart.ConsistencyState.BOUNDS;
+  }
+  // if there are no signals, state == 0 and nothing happens.
+  this.invalidate(state, signal);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Color scale.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Color scale.
+ * @param {anychart.scales.OrdinalColor=} opt_value
+ * @return {anychart.charts.HeatMap|anychart.scales.OrdinalColor}
+ */
+anychart.charts.HeatMap.prototype.colorScale = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.colorScale_ != opt_value) {
+      if (this.colorScale_)
+        this.colorScale_.unlistenSignals(this.colorScaleInvalidated_, this);
+      this.colorScale_ = opt_value;
+      if (this.colorScale_)
+        this.colorScale_.listenSignals(this.colorScaleInvalidated_, this);
+
+      this.invalidate(anychart.ConsistencyState.HEATMAP_COLOR_SCALE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.colorScale_;
+};
+
+
+/**
+ * Chart scale invalidation handler.
+ * @param {anychart.SignalEvent} event Event.
+ * @private
+ */
+anychart.charts.HeatMap.prototype.colorScaleInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.invalidate(anychart.ConsistencyState.HEATMAP_COLOR_SCALE, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Legend.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.charts.HeatMap.prototype.createLegendItemsProvider = function(sourceMode, itemsTextFormatter) {
+  var i, count;
+  /**
+   * @type {!Array.<anychart.core.ui.Legend.LegendItemProvider>}
+   */
+  var data = [];
+  // we need to calculate statistics
+  this.calculate();
+  if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
+    var scale = this.colorScale();
+    if (scale) {
+      var series = this.series_;
+      var ranges = scale.getProcessedRanges();
+      for (i = 0, count = ranges.length; i < count; i++) {
+        var range = ranges[i];
+        data.push({
+          'text': range.name,
+          'iconEnabled': true,
+          'iconType': anychart.enums.LegendItemIconType.SQUARE,
+          'iconFill': range.color,
+          'disabled': !this.enabled(),
+          'sourceUid': goog.getUid(this),
+          'sourceKey': i,
+          'meta': {
+            series: series,
+            scale: scale,
+            range: range
+          }
+        });
+      }
+    }
+  }
+  return data;
+};
+
+
+/** @inheritDoc */
+anychart.charts.HeatMap.prototype.legendItemCanInteractInMode = function(mode) {
+  return (mode == anychart.enums.LegendItemsSourceMode.CATEGORIES);
+};
+
+
+/** @inheritDoc */
+anychart.charts.HeatMap.prototype.legendItemClick = function(item, event) {
+  var meta = /** @type {Object} */(item.meta());
+  var series;
+  var sourceMode = this.legend().itemsSourceMode();
+  if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
+    series = meta.series;
+    var scale = meta.scale;
+
+    if (scale && series) {
+      var points = [];
+      var range = meta.range;
+      var iterator = series.getResetIterator();
+
+      while (iterator.advance()) {
+        var pointValue = iterator.get('heat');
+        if (range == scale.getRangeByValue(pointValue)) {
+          points.push(iterator.getIndex());
+        }
+      }
+
+      var tag = anychart.utils.extractTag(event['domTarget']);
+      if (tag) {
+        if (this.interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
+          tag.points = {
+            series: series,
+            points: points
+          };
+        } else {
+          tag.points = [{
+            series: series,
+            points: points,
+            lastPoint: points[points.length - 1],
+            nearestPointToCursor: {index: points[points.length - 1], distance: 0}
+          }];
+        }
+      }
+    }
+  }
+};
+
+
+/** @inheritDoc */
+anychart.charts.HeatMap.prototype.legendItemOver = function(item, event) {
+  var meta = /** @type {Object} */(item.meta());
+  var series;
+
+  var sourceMode = this.legend().itemsSourceMode();
+  if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
+    series = /** @type {anychart.core.map.series.Base} */(meta.series);
+    var scale = meta.scale;
+    if (scale && series) {
+      var range = meta.range;
+      var iterator = series.getResetIterator();
+
+      var points = [];
+      while (iterator.advance()) {
+        var pointValue = iterator.get('heat');
+        if (range == scale.getRangeByValue(pointValue)) {
+          points.push(iterator.getIndex());
+        }
+      }
+
+      var tag = anychart.utils.extractTag(event['domTarget']);
+      if (tag) {
+        if (this.interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
+          tag.points = {
+            series: series,
+            points: points
+          };
+        } else {
+          tag.points = [{
+            series: series,
+            points: points,
+            lastPoint: points[points.length - 1],
+            nearestPointToCursor: {index: points[points.length - 1], distance: 0}
+          }];
+        }
+      }
+    }
+  }
+};
+
+
+/** @inheritDoc */
+anychart.charts.HeatMap.prototype.legendItemOut = function(item, event) {
+  var meta = /** @type {Object} */(item.meta());
+
+  var sourceMode = this.legend().itemsSourceMode();
+  if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
+    if (this.interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
+      var tag = anychart.utils.extractTag(event['domTarget']);
+      if (tag)
+        tag.series = meta.series;
+    }
+  }
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Interactivity.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.charts.HeatMap.prototype.createEventSeriesStatus = function(seriesStatus, opt_empty) {
+  var eventSeriesStatus = [];
+  for (var i = 0, len = seriesStatus.length; i < len; i++) {
+    var status = seriesStatus[i];
+    var nearestPointToCursor = status.nearestPointToCursor;
+    var nearestPointToCursor_;
+    if (nearestPointToCursor) {
+      nearestPointToCursor_ = {
+        'index': status.nearestPointToCursor.index,
+        'distance': status.nearestPointToCursor.distance
+      };
+    } else {
+      nearestPointToCursor_ = {
+        'index': NaN,
+        'distance': NaN
+      };
+    }
+    eventSeriesStatus.push({
+      'series': this,
+      'points': opt_empty ? [] : status.points ? goog.array.clone(status.points) : [],
+      'nearestPointToCursor': nearestPointToCursor_
+    });
+  }
+  return eventSeriesStatus;
+};
+
+
+/** @inheritDoc */
+anychart.charts.HeatMap.prototype.makeCurrentPoint = function(seriesStatus, event, opt_empty) {
+  var currentPoint = goog.base(this, 'makeCurrentPoint', seriesStatus, event, opt_empty);
+
+  currentPoint['series'] = this;
+
+  return currentPoint;
+};
+
+
+/** @inheritDoc */
+anychart.charts.HeatMap.prototype.getSeriesStatus = function(event) {
+  var bounds = this.dataBounds_ || anychart.math.rect(0, 0, 0, 0);
+
+  var clientX = event['clientX'];
+  var clientY = event['clientY'];
+  var value, index;
+
+  var containerOffset = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+
+  var x = clientX - containerOffset.x;
+  var y = clientY - containerOffset.y;
+
+  var minX = bounds.left;
+  var minY = bounds.top;
+  var rangeX = bounds.width;
+  var rangeY = bounds.height;
+
+  if (x < minX || x > minX + rangeX || y < minY || y > minY + rangeY)
+    return null;
+
+  var points = [];
+  var interactivity = this.interactivity();
+  var i, len, series;
+
+  if (interactivity.hoverMode() == anychart.enums.HoverMode.BY_SPOT) {
+    var spotRadius = interactivity.spotRadius();
+    var minRatio = (x - spotRadius - minX) / rangeX;
+    var maxRatio = (x + spotRadius - minX) / rangeX;
+
+    var minValue, maxValue;
+    series = this.series_;
+    if (series.enabled()) {
+      minValue = /** @type {number} */(series.xScale().inverseTransform(minRatio));
+      maxValue = /** @type {number} */(series.xScale().inverseTransform(maxRatio));
+
+      var indexes = series.data().findInRangeByX(minValue, maxValue, false, 'x');
+      var iterator = series.getIterator();
+      var ind = [];
+      var minLength = Infinity;
+      var minLengthIndex;
+      for (var j = 0; j < indexes.length; j++) {
+        index = indexes[j];
+        if (iterator.select(index)) {
+          var pixX = /** @type {number} */(iterator.meta('x'));
+          var pixY = /** @type {number} */(iterator.meta('y'));
+
+          var length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
+          if (length <= spotRadius) {
+            ind.push(index);
+            if (length < minLength) {
+              minLength = length;
+              minLengthIndex = index;
+            }
+          }
+        }
+      }
+      if (ind.length)
+        points.push({
+          series: series,
+          points: ind,
+          lastPoint: ind[ind.length - 1],
+          nearestPointToCursor: {index: minLengthIndex, distance: minLength}
+        });
+    }
+  } else if (this.interactivity().hoverMode() == anychart.enums.HoverMode.BY_X) {
+    var ratio = (x - minX) / rangeX;
+
+    series = this.series_;
+    value = /** @type {number} */(series.xScale().inverseTransform(ratio));
+    index = series.data().findInUnsortedDataByX(value, 'x');
+
+    iterator = series.getIterator();
+    minLength = Infinity;
+    if (index.length) {
+      for (j = 0; j < index.length; j++) {
+        if (iterator.select(index[j])) {
+          pixX = /** @type {number} */(iterator.meta('x'));
+          pixY = /** @type {number} */(iterator.meta('y'));
+
+          length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
+          if (length < minLength) {
+            minLength = length;
+            minLengthIndex = index[j];
+          }
+        }
+      }
+
+      points.push({
+        series: series,
+        points: index,
+        lastPoint: index[index.length - 1],
+        nearestPointToCursor: {index: minLengthIndex, distance: minLength}
+      });
+    }
+  }
+
+  return /** @type {Array.<Object>} */(points);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Series.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Create series.
+ * @param {anychart.data.View|anychart.data.Set|Array|string} data Data for the chart.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @return {anychart.core.heatMap.series.Base}
+ * @private
+ */
+anychart.charts.HeatMap.prototype.createSeries_ = function(data, opt_csvSettings) {
+  var instance = new anychart.core.heatMap.series.Base(this, data || null, opt_csvSettings);
+  instance.setParentEventTarget(this);
+  this.registerDisposable(instance);
+  this.series_ = instance;
+  var index = this.series_.length - 1;
+  instance.index(index);
+  var seriesZIndex = anychart.charts.HeatMap.ZINDEX_SERIES;
+  instance.setAutoZIndex(seriesZIndex);
+  instance.labels().setAutoZIndex(seriesZIndex + anychart.charts.HeatMap.ZINDEX_INCREMENT_MULTIPLIER / 2);
+  instance.clip(true);
+
+  var theme = anychart.getFullTheme();
+  instance.setAutoColor(theme['palette']['items'][0]);
+  instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(theme['markerPalette']['items'][0]));
+  instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(theme['hatchFillPalette']['items'][0]));
+
+  instance.markers().setAutoZIndex(seriesZIndex + anychart.charts.HeatMap.ZINDEX_INCREMENT_MULTIPLIER / 2);
+  instance.markers().setAutoFill((/** @type {anychart.core.heatMap.series.Base} */ (instance)).getMarkerFill());
+  instance.markers().setAutoStroke(/** @type {acgraph.vector.Stroke} */((/** @type {anychart.core.heatMap.series.Base} */ (instance)).getMarkerStroke()));
+
+  if (anychart.DEFAULT_THEME != 'v6')
+    instance.labels().setAutoColor(anychart.color.darken(/** @type {(acgraph.vector.Fill|acgraph.vector.Stroke)} */(instance.color())));
+
+  instance.listenSignals(this.seriesInvalidated_, this);
+
+  this.invalidate(
+      anychart.ConsistencyState.HEATMAP_SERIES |
+      anychart.ConsistencyState.CHART_LEGEND |
+      anychart.ConsistencyState.HEATMAP_SCALES,
+      anychart.Signal.NEEDS_REDRAW);
+
+  return instance;
+};
+
+
+/**
+ * Series signals handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.charts.HeatMap.prototype.seriesInvalidated_ = function(event) {
+  var state = 0;
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    state = anychart.ConsistencyState.HEATMAP_SERIES;
+  }
+  if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
+    state |= anychart.ConsistencyState.HEATMAP_SERIES;
+    this.invalidateSeries_();
+    if (this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
+      state |= anychart.ConsistencyState.CHART_LEGEND;
+    }
+  }
+  if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
+    state |= anychart.ConsistencyState.HEATMAP_SCALES;
+  }
+  if (event.hasSignal(anychart.Signal.NEED_UPDATE_LEGEND)) {
+    state |= anychart.ConsistencyState.CHART_LEGEND;
+    if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED))
+      state |= anychart.ConsistencyState.BOUNDS;
+  }
+  this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.charts.HeatMap.prototype.getAllSeries = function() {
+  return [this.series_];
+};
+
+
+/**
+ * Creates format provider.
+ * @param {boolean=} opt_force create context provider forcibly.
+ * @return {Object} Object with info for labels formatting.
+ * @protected
+ */
+anychart.charts.HeatMap.prototype.createFormatProvider = function(opt_force) {
+  return this.series_.createFormatProvider(opt_force);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Tooltip.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.charts.HeatMap.prototype.useUnionTooltipAsSingle = function() {
+  return true;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Calculation.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Calculate cartesian chart properties.
+ */
+anychart.charts.HeatMap.prototype.calculate = function() {
+  if (this.hasInvalidationState(anychart.ConsistencyState.HEATMAP_SCALES)) {
+    var iterator, value;
+
+    var yScale = this.yScale();
+    var xScale = this.xScale();
+
+    this.series_.xScale(xScale);
+    this.series_.yScale(yScale);
+
+    var xScaleNeedAutoCalc = xScale.needsAutoCalc();
+    var yScaleNeedAutoCalc = yScale.needsAutoCalc();
+
+    if (xScaleNeedAutoCalc || yScaleNeedAutoCalc) {
+      if (xScaleNeedAutoCalc) xScale.startAutoCalc();
+      if (yScaleNeedAutoCalc) yScale.startAutoCalc();
+
+      iterator = this.series_.getResetIterator();
+      while (iterator.advance()) {
+        if (xScaleNeedAutoCalc) {
+          value = iterator.get('x');
+          if (goog.isDef(value)) {
+            xScale.extendDataRange(value);
+          }
+        }
+
+        if (yScaleNeedAutoCalc) {
+          value = iterator.get('y');
+          if (goog.isDef(value)) {
+            yScale.extendDataRange(value);
+          }
+        }
+      }
+    }
+
+    var xFieldName, yFieldName, xAutoNames = null, yAutoNames = null, valueIndex, name;
+    var xScaleNamesField = xScale.getNamesField();
+    var yScaleNamesField = yScale.getNamesField();
+
+
+    if (xScaleNamesField || yScaleNamesField) {
+      if (xScaleNamesField) {
+        xFieldName = xScaleNamesField;
+        xAutoNames = [];
+      }
+
+      if (yScaleNamesField) {
+        yFieldName = yScaleNamesField;
+        yAutoNames = [];
+      }
+
+      iterator = this.series_.getResetIterator();
+      while (iterator.advance()) {
+        if (xScaleNamesField) {
+          valueIndex = xScale.getIndexByValue(iterator.get('x'));
+          name = iterator.get(xFieldName);
+          if (!goog.isDef(xAutoNames[valueIndex]))
+            xAutoNames[valueIndex] = name || iterator.get('x') || iterator.get('heat');
+        }
+
+
+        if (yScaleNamesField) {
+          valueIndex = yScale.getIndexByValue(iterator.get('y'));
+          name = iterator.get(yFieldName);
+          if (!goog.isDef(yAutoNames[valueIndex]))
+            yAutoNames[valueIndex] = name || iterator.get('y') || iterator.get('heat');
+        }
+      }
+
+      if (xScaleNamesField)
+        xScale.setAutoNames(xAutoNames);
+      if (yScaleNamesField)
+        yScale.setAutoNames(yAutoNames);
+    }
+
+    this.series_.calculateStatistics();
+
+    this.markConsistent(anychart.ConsistencyState.HEATMAP_SCALES);
+    this.scalesFinalization_ = true;
+  }
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Drawing.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Draw cartesian chart content items.
+ * @param {anychart.math.Rect} bounds Bounds of cartesian content area.
+ */
+anychart.charts.HeatMap.prototype.drawContent = function(bounds) {
+  var i, count;
+
+  this.calculate();
+  if (this.scalesFinalization_) {
+    var scalesChanged = false;
+
+    if (this.xScale().needsAutoCalc())
+      scalesChanged |= this.xScale().finishAutoCalc();
+
+    if (this.yScale().needsAutoCalc())
+      scalesChanged |= this.yScale().finishAutoCalc();
+
+    this.scalesFinalization_ = false;
+
+    if (scalesChanged) {
+      this.invalidateSeries_();
+    }
+  }
+
+  if (this.isConsistent())
+    return;
+
+  anychart.core.Base.suspendSignalsDispatching(this.series_, this.xAxes_, this.yAxes_);
+
+  var axes = goog.array.concat(this.xAxes_, this.yAxes_);
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.HEATMAP_COLOR_SCALE)) {
+    this.invalidate(anychart.ConsistencyState.HEATMAP_SERIES);
+    this.invalidateSeries_();
+    this.markConsistent(anychart.ConsistencyState.HEATMAP_COLOR_SCALE);
+  }
+
+  // set default scales for axis if they not set
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.HEATMAP_AXES)) {
+    var item;
+    for (i = 0, count = this.xAxes_.length; i < count; i++) {
+      item = this.xAxes_[i];
+      item.labels().dropCallsCache();
+      item.minorLabels().dropCallsCache();
+      if (item && !item.scale())
+        item.scale(/** @type {anychart.scales.Base} */(this.xScale()));
+    }
+
+    for (i = 0, count = this.yAxes_.length; i < count; i++) {
+      item = this.yAxes_[i];
+      item.labels().dropCallsCache();
+      item.minorLabels().dropCallsCache();
+      if (item && !item.scale())
+        item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
+    }
+  }
+
+  //calculate axes space first, the result is data bounds
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    //total bounds of content area
+    var contentAreaBounds = bounds.clone().round();
+    var attempt = 0;
+
+    do {
+      //axes local vars
+      var remainingBounds;
+      var axis;
+      var orientation;
+      var topOffset = 0;
+      var bottomOffset = 0;
+      var leftOffset = 0;
+      var rightOffset = 0;
+      var complete = true;
+      var boundsWithoutAxes = bounds.clone();
+      this.topAxisPadding_ = NaN;
+      this.bottomAxisPadding_ = NaN;
+      this.leftAxisPadding_ = NaN;
+      this.rightAxisPadding_ = NaN;
+      var axisStrokeThickness;
+
+      for (i = axes.length; i--;) {
+        axis = /** @type {anychart.core.axes.Linear} */(axes[i]);
+        if (axis && axis.enabled()) {
+          axis.suspendSignalsDispatching();
+          axis.parentBounds(contentAreaBounds);
+          orientation = axis.orientation();
+          axisStrokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(axis.stroke()));
+
+          if (orientation == anychart.enums.Orientation.TOP) {
+            axis.padding().top(topOffset);
+            axis.padding().bottom(0);
+            remainingBounds = axis.getRemainingBounds();
+            topOffset = contentAreaBounds.height - remainingBounds.height;
+            if (isNaN(this.topAxisPadding_))
+              this.topAxisPadding_ = axisStrokeThickness;
+          } else if (orientation == anychart.enums.Orientation.BOTTOM) {
+            axis.padding().bottom(bottomOffset);
+            axis.padding().top(0);
+            remainingBounds = axis.getRemainingBounds();
+            bottomOffset = contentAreaBounds.height - remainingBounds.height;
+            if (isNaN(this.bottomAxisPadding_))
+              this.bottomAxisPadding_ = axisStrokeThickness;
+          } else if (orientation == anychart.enums.Orientation.LEFT) {
+            axis.padding().left(leftOffset);
+            axis.padding().right(0);
+            remainingBounds = axis.getRemainingBounds();
+            leftOffset = contentAreaBounds.width - remainingBounds.width;
+            if (isNaN(this.leftAxisPadding_))
+              this.leftAxisPadding_ = axisStrokeThickness;
+          } else if (orientation == anychart.enums.Orientation.RIGHT) {
+            axis.padding().right(rightOffset);
+            axis.padding().left(0);
+            remainingBounds = axis.getRemainingBounds();
+            rightOffset = contentAreaBounds.width - remainingBounds.width;
+            if (isNaN(this.rightAxisPadding_))
+              this.rightAxisPadding_ = axisStrokeThickness;
+          }
+          axis.resumeSignalsDispatching(false);
+        }
+      }
+
+      boundsWithoutAxes.left += leftOffset;
+      boundsWithoutAxes.top += topOffset;
+      boundsWithoutAxes.width -= rightOffset + leftOffset;
+      boundsWithoutAxes.height -= bottomOffset + topOffset;
+
+      for (i = axes.length; i--;) {
+        axis = /** @type {anychart.core.axes.Linear} */(axes[i]);
+        if (axis && axis.enabled()) {
+          axis.suspendSignalsDispatching();
+          var remainingBoundsBeforeSetPadding = axis.getRemainingBounds();
+
+          if (axis.isHorizontal()) {
+            axis.padding().left(leftOffset);
+            axis.padding().right(rightOffset);
+            remainingBounds = axis.getRemainingBounds();
+            if (remainingBounds.height != remainingBoundsBeforeSetPadding.height) {
+              complete = false;
+            }
+          } else {
+            axis.padding().top(topOffset);
+            axis.padding().bottom(bottomOffset);
+            remainingBounds = axis.getRemainingBounds();
+            if (remainingBounds.width != remainingBoundsBeforeSetPadding.width) {
+              complete = false;
+            }
+          }
+          axis.resumeSignalsDispatching(false);
+        }
+      }
+      attempt++;
+    } while (!complete && attempt < anychart.charts.HeatMap.MAX_ATTEMPTS_AXES_CALCULATION_);
+
+    //bounds of data area
+    this.dataBounds_ = boundsWithoutAxes.clone().round();
+
+    this.invalidateSeries_();
+    this.invalidate(anychart.ConsistencyState.HEATMAP_AXES |
+        anychart.ConsistencyState.HEATMAP_GRIDS |
+        anychart.ConsistencyState.HEATMAP_SERIES);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.HEATMAP_GRIDS)) {
+    var grids = this.grids_;
+
+    for (i = 0, count = grids.length; i < count; i++) {
+      var grid = grids[i];
+      if (grid) {
+        grid.suspendSignalsDispatching();
+        if (!grid.scale())
+          this.setDefaultScaleForLayoutBasedElements_(grid);
+        grid.parentBounds(this.dataBounds_);
+        grid.container(this.rootElement);
+        grid.axesLinesSpace(this.topAxisPadding_, this.rightAxisPadding_, this.bottomAxisPadding_,
+            this.leftAxisPadding_);
+        grid.draw();
+        grid.resumeSignalsDispatching(false);
+      }
+    }
+    this.markConsistent(anychart.ConsistencyState.HEATMAP_GRIDS);
+  }
+
+  //draw axes outside of data bounds
+  //only inside axes ticks can intersect data bounds
+  if (this.hasInvalidationState(anychart.ConsistencyState.HEATMAP_AXES)) {
+    for (i = 0, count = axes.length; i < count; i++) {
+      axis = /** @type {anychart.core.axes.Linear} */(axes[i]);
+      if (axis) {
+        axis.suspendSignalsDispatching();
+        axis.container(this.rootElement);
+        axis.draw();
+        axis.resumeSignalsDispatching(false);
+      }
+    }
+    this.markConsistent(anychart.ConsistencyState.HEATMAP_AXES);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.HEATMAP_SERIES)) {
+    var series = this.series_;
+    series.container(this.rootElement);
+    series.axesLinesSpace(this.topAxisPadding_, this.rightAxisPadding_, this.bottomAxisPadding_, this.leftAxisPadding_);
+    series.parentBounds(this.dataBounds_);
+
+    this.drawSeries_();
+    this.markConsistent(anychart.ConsistencyState.HEATMAP_SERIES);
+  }
+
+  anychart.core.Base.resumeSignalsDispatchingFalse(this.series_, this.xAxes_, this.yAxes_);
+};
+
+
+/**
+ * Renders the chart.
+ * @private
+ */
+anychart.charts.HeatMap.prototype.drawSeries_ = function() {
+  var iterator;
+  var series;
+  var pointState;
+
+  series = this.series_;
+
+  series.startDrawing();
+
+  var labels, hoverLabels, selectLabels;
+  var adjustFontSize, hoverAdjustFontSize, selectAdjustFontSize;
+  var needAdjustFontSize, hoverNeedAdjustFontSize, selectNeedAdjustFontSize;
+
+  labels = this.labels();
+  hoverLabels = this.hoverLabels();
+  selectLabels = this.selectLabels();
+
+  adjustFontSize = labels.adjustFontSize();
+  hoverAdjustFontSize = hoverLabels.adjustFontSize();
+  selectAdjustFontSize = selectLabels.adjustFontSize();
+
+  var normalAdjustFontSizeSetting = (adjustFontSize['width'] || adjustFontSize['height']);
+  needAdjustFontSize = normalAdjustFontSizeSetting && labels.enabled();
+  hoverNeedAdjustFontSize = (normalAdjustFontSizeSetting || hoverAdjustFontSize['width'] || hoverAdjustFontSize['height']) && (labels.enabled() || hoverLabels.enabled());
+  selectNeedAdjustFontSize = (normalAdjustFontSizeSetting || selectAdjustFontSize['width'] || selectAdjustFontSize['height']) && (labels.enabled() || selectLabels.enabled());
+
+  iterator = series.getResetIterator();
+  var minFontSize, hoverMinFontSize, selectMinFontSize;
+  while (iterator.advance()) {
+    var index = iterator.getIndex();
+    if (iterator.get('selected'))
+      series.state.setPointState(anychart.PointState.SELECT, index);
+
+    pointState = series.state.getPointStateByIndex(index);
+
+    series.drawPoint(pointState);
+
+    if (needAdjustFontSize || hoverNeedAdjustFontSize || selectNeedAdjustFontSize) {
+      var shape = iterator.meta('shape');
+      var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(shape.stroke())) / 2;
+      var cellBounds = anychart.math.rect(
+          /** @type {number} */(iterator.meta('x')) + thickness,
+          /** @type {number} */(iterator.meta('y')) + thickness,
+          /** @type {number} */(iterator.meta('width')) - thickness * 2,
+          /** @type {number} */(iterator.meta('height')) - thickness * 2
+          );
+
+      if (needAdjustFontSize) {
+        var label = series.configureLabel(anychart.PointState.NORMAL, true);
+        if (label) {
+          var mergedSettings = label.getMergedSettings();
+          var padding = mergedSettings['padding'];
+
+          var width = cellBounds.width - padding.left() - padding.right();
+          var height = cellBounds.height - padding.top() - padding.bottom();
+
+          var needAdjust = (mergedSettings['adjustByHeight'] || mergedSettings['adjustByHeight']);
+          if (needAdjust && this.labels().adjustFontSizeMode() == anychart.enums.AdjustFontSizeMode.SAME) {
+            var fontSize = label.calculateFontSize(
+                width,
+                height,
+                mergedSettings['minFontSize'],
+                mergedSettings['maxFontSize'],
+                mergedSettings['adjustByWidth'],
+                mergedSettings['adjustByHeight']);
+
+            if (!goog.isDef(minFontSize)) {
+              minFontSize = fontSize;
+            } else if (fontSize < minFontSize) {
+              minFontSize = fontSize;
+            }
+          }
+        }
+      }
+
+      if (hoverNeedAdjustFontSize) {
+        var label = series.configureLabel(anychart.PointState.HOVER, true);
+        if (label) {
+          var mergedSettings = label.getMergedSettings();
+          var padding = mergedSettings['padding'];
+
+          var width = cellBounds.width - padding.left() - padding.right();
+          var height = cellBounds.height - padding.top() - padding.bottom();
+
+          var needAdjust = (mergedSettings['adjustByHeight'] || mergedSettings['adjustByHeight']);
+          if (needAdjust && this.labels().adjustFontSizeMode() == anychart.enums.AdjustFontSizeMode.SAME) {
+            var fontSize = label.calculateFontSize(
+                width,
+                height,
+                mergedSettings['minFontSize'],
+                mergedSettings['maxFontSize'],
+                mergedSettings['adjustByWidth'],
+                mergedSettings['adjustByHeight']);
+
+            if (!goog.isDef(hoverMinFontSize)) {
+              hoverMinFontSize = fontSize;
+            } else if (fontSize < hoverMinFontSize) {
+              hoverMinFontSize = fontSize;
+            }
+          }
+        }
+      }
+
+      if (selectNeedAdjustFontSize) {
+        var label = series.configureLabel(anychart.PointState.SELECT, true);
+        if (label) {
+          var mergedSettings = label.getMergedSettings();
+          var padding = mergedSettings['padding'];
+
+          var width = cellBounds.width - padding.left() - padding.right();
+          var height = cellBounds.height - padding.top() - padding.bottom();
+
+          var needAdjust = (mergedSettings['adjustByHeight'] || mergedSettings['adjustByHeight']);
+          if (needAdjust && this.labels().adjustFontSizeMode() == anychart.enums.AdjustFontSizeMode.SAME) {
+            var fontSize = label.calculateFontSize(
+                width,
+                height,
+                mergedSettings['minFontSize'],
+                mergedSettings['maxFontSize'],
+                mergedSettings['adjustByWidth'],
+                mergedSettings['adjustByHeight']);
+
+
+            if (!goog.isDef(selectMinFontSize)) {
+              selectMinFontSize = fontSize;
+            } else if (fontSize < selectMinFontSize) {
+              selectMinFontSize = fontSize;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (needAdjustFontSize) {
+    labels.setAdjustFontSize(minFontSize);
+  } else {
+    labels.setAdjustFontSize(null);
+  }
+
+  if (hoverNeedAdjustFontSize) {
+    hoverLabels.setAdjustFontSize(hoverMinFontSize);
+  } else {
+    hoverLabels.setAdjustFontSize(null);
+  }
+
+  if (selectNeedAdjustFontSize) {
+    selectLabels.setAdjustFontSize(selectMinFontSize);
+  } else {
+    selectLabels.setAdjustFontSize(null);
+  }
+
+  labels.clear();
+  series.drawLabels();
+
+  series.finalizeDrawing();
+};
+
+
+/**
+ * Invalidates APPEARANCE for all width-based series.
+ * @private
+ */
+anychart.charts.HeatMap.prototype.invalidateSeries_ = function() {
+  this.series_.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Setup
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * @inheritDoc
+ */
+anychart.charts.HeatMap.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+
+  if ('defaultXAxisSettings' in config)
+    this.defaultXAxisSettings(config['defaultXAxisSettings']);
+
+  if ('defaultYAxisSettings' in config)
+    this.defaultYAxisSettings(config['defaultYAxisSettings']);
+
+  if ('defaultGridSettings' in config)
+    this.defaultGridSettings(config['defaultGridSettings']);
+
+  var i, json, scale;
+  var grids = config['grids'];
+  var xAxes = config['xAxes'];
+  var yAxes = config['yAxes'];
+  var scales = config['scales'];
+
+  var scalesInstances = {};
+  if (goog.isObject(scales)) {
+    for (i in scales) {
+      if (!scales.hasOwnProperty(i)) continue;
+      json = scales[i];
+      if (goog.isString(json)) {
+        scale = anychart.scales.Base.fromString(json, false);
+      } else {
+        scale = anychart.scales.Base.fromString(json['type'], false);
+        scale.setup(json);
+      }
+      scalesInstances[i] = scale;
+    }
+  }
+
+  json = config['xScale'];
+  if (goog.isNumber(json)) {
+    scale = scalesInstances[json];
+  } else if (goog.isString(json)) {
+    scale = anychart.scales.Base.fromString(json, null);
+    if (!scale)
+      scale = scalesInstances[json];
+  } else if (goog.isObject(json)) {
+    scale = anychart.scales.Base.fromString(json['type'], true);
+    scale.setup(json);
+  } else {
+    scale = null;
+  }
+  if (scale)
+    this.xScale(scale);
+
+  json = config['yScale'];
+  if (goog.isNumber(json)) {
+    scale = scalesInstances[json];
+  } else if (goog.isString(json)) {
+    scale = anychart.scales.Base.fromString(json, null);
+    if (!scale)
+      scale = scalesInstances[json];
+  } else if (goog.isObject(json)) {
+    scale = anychart.scales.Base.fromString(json['type'], false);
+    scale.setup(json);
+  } else {
+    scale = null;
+  }
+  if (scale)
+    this.yScale(scale);
+
+  json = config['colorScale'];
+  if (goog.isNumber(json)) {
+    scale = scalesInstances[json];
+  } else if (goog.isString(json)) {
+    scale = anychart.scales.Base.fromString(json, null);
+    if (!scale)
+      scale = scalesInstances[json];
+  } else if (goog.isObject(json)) {
+    scale = anychart.scales.Base.fromString(json['type'], false);
+    scale.setup(json);
+  } else {
+    scale = null;
+  }
+  if (scale)
+    this.colorScale(scale);
+
+  if (goog.isArray(grids)) {
+    for (i = 0; i < grids.length; i++) {
+      json = grids[i];
+      this.grid(i, json);
+      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.grid(i).scale(scalesInstances[json['scale']]);
+    }
+  }
+
+  if (goog.isArray(xAxes)) {
+    for (i = 0; i < xAxes.length; i++) {
+      json = xAxes[i];
+      this.xAxis(i, json);
+      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.xAxis(i).scale(scalesInstances[json['scale']]);
+    }
+  }
+
+  if (goog.isArray(yAxes)) {
+    for (i = 0; i < yAxes.length; i++) {
+      json = yAxes[i];
+      this.yAxis(i, json);
+      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.yAxis(i).scale(scalesInstances[json['scale']]);
+    }
+  }
+
+  if (goog.isFunction(this['fill']))
+    this.fill(config['fill']);
+  if (goog.isFunction(this['hoverFill']))
+    this.hoverFill(config['hoverFill']);
+  if (goog.isFunction(this['selectFill']))
+    this.selectFill(config['selectFill']);
+
+  if (goog.isFunction(this['stroke']))
+    this.stroke(config['stroke']);
+  if (goog.isFunction(this['hoverStroke']))
+    this.hoverStroke(config['hoverStroke']);
+  if (goog.isFunction(this['selectStroke']))
+    this.selectStroke(config['selectStroke']);
+
+  if (goog.isFunction(this['hatchFill']))
+    this.hatchFill(config['hatchFill']);
+  if (goog.isFunction(this['hoverHatchFill']))
+    this.hoverHatchFill(config['hoverHatchFill']);
+  if (goog.isFunction(this['selectHatchFill']))
+    this.selectHatchFill(config['selectHatchFill']);
+
+  if ('data' in config)
+    this.data(config['data'] || null);
+
+  this.labels().setup(config['labels']);
+  this.hoverLabels().setup(config['hoverLabels']);
+  this.selectLabels().setup(config['selectLabels']);
+
+  this.markers().setup(config['markers']);
+  this.hoverMarkers().setup(config['hoverMarkers']);
+  this.selectMarkers().setup(config['selectMarkers']);
+
+  this.labelsDisplayMode(config['labelsDisplayMode']);
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.charts.HeatMap.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+  var i;
+  var scalesIds = {};
+  var scales = [];
+  var scale;
+  var config;
+  var objId;
+
+  if (this.colorScale()) {
+    scalesIds[goog.getUid(this.colorScale())] = this.colorScale().serialize();
+    scales.push(scalesIds[goog.getUid(this.colorScale())]);
+    json['colorScale'] = scales.length - 1;
+  }
+
+  scalesIds[goog.getUid(this.xScale())] = this.xScale().serialize();
+  scales.push(scalesIds[goog.getUid(this.xScale())]);
+  json['xScale'] = scales.length - 1;
+
+  if (this.xScale() != this.yScale()) {
+    scalesIds[goog.getUid(this.yScale())] = this.yScale().serialize();
+    scales.push(scalesIds[goog.getUid(this.yScale())]);
+  }
+  json['yScale'] = scales.length - 1;
+
+  json['type'] = this.getType();
+
+  var grids = [];
+  for (i = 0; i < this.grids_.length; i++) {
+    var grid = this.grids_[i];
+    config = grid.serialize();
+    scale = grid.scale();
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['scale'] = scales.length - 1;
+      } else {
+        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
+    }
+    grids.push(config);
+  }
+  if (grids.length)
+    json['grids'] = grids;
+
+  var xAxes = [];
+  for (i = 0; i < this.xAxes_.length; i++) {
+    var xAxis = this.xAxes_[i];
+    config = xAxis.serialize();
+    scale = xAxis.scale();
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['scale'] = scales.length - 1;
+      } else {
+        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
+    }
+    xAxes.push(config);
+  }
+  if (xAxes.length)
+    json['xAxes'] = xAxes;
+
+  var yAxes = [];
+  for (i = 0; i < this.yAxes_.length; i++) {
+    var yAxis = this.yAxes_[i];
+    config = yAxis.serialize();
+    scale = yAxis.scale();
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['scale'] = scales.length - 1;
+      } else {
+        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
+    }
+    yAxes.push(config);
+  }
+  if (yAxes.length)
+    json['yAxes'] = yAxes;
+
+  if (scales.length)
+    json['scales'] = scales;
+
+  if (goog.isFunction(this['fill'])) {
+    if (goog.isFunction(this.fill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series fill']
+      );
+    } else {
+      json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
+    }
+  }
+  if (goog.isFunction(this['hoverFill'])) {
+    if (goog.isFunction(this.hoverFill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series hoverFill']
+      );
+    } else {
+      json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFill()));
+    }
+  }
+  if (goog.isFunction(this['selectFill'])) {
+    if (goog.isFunction(this.selectFill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series selectFill']
+      );
+    } else {
+      json['selectFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.selectFill()));
+    }
+  }
+
+  if (goog.isFunction(this['stroke'])) {
+    if (goog.isFunction(this.stroke())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series stroke']
+      );
+    } else {
+      json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
+    }
+  }
+  if (goog.isFunction(this['hoverStroke'])) {
+    if (goog.isFunction(this.hoverStroke())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series hoverStroke']
+      );
+    } else {
+      json['hoverStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverStroke()));
+    }
+  }
+  if (goog.isFunction(this['selectStroke'])) {
+    if (goog.isFunction(this.selectStroke())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series selectStroke']
+      );
+    } else {
+      json['selectStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectStroke()));
+    }
+  }
+
+  if (goog.isFunction(this['hatchFill'])) {
+    if (goog.isFunction(this.hatchFill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series hatchFill']
+      );
+    } else {
+      json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
+    }
+  }
+  if (goog.isFunction(this['hoverHatchFill'])) {
+    if (goog.isFunction(this.hoverHatchFill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series hoverHatchFill']
+      );
+    } else {
+      json['hoverHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
+          (this.hoverHatchFill()));
+    }
+  }
+  if (goog.isFunction(this['selectHatchFill'])) {
+    if (goog.isFunction(this.selectHatchFill())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Series selectHatchFill']
+      );
+    } else {
+      json['selectHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
+          (this.selectHatchFill()));
+    }
+  }
+
+  json['data'] = this.data().serialize();
+
+  json['labels'] = this.labels().serialize();
+  json['hoverLabels'] = this.hoverLabels().serialize();
+  json['selectLabels'] = this.selectLabels().serialize();
+
+  json['markers'] = this.markers().serialize();
+  json['hoverMarkers'] = this.hoverMarkers().serialize();
+  json['selectMarkers'] = this.selectMarkers().serialize();
+
+  json['selectLabels'] = this.labelsDisplayMode();
+
+  return {'chart': json};
+};
+
+
+/**
+ * Labels display mode.
+ * @param {(string|anychart.enums.LabelsDisplayMode)=} opt_value Mode to set.
+ * @return {string|anychart.enums.LabelsDisplayMode|anychart.charts.HeatMap}
+ */
+anychart.charts.HeatMap.prototype.labelsDisplayMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeLabelsDisplayMode(opt_value);
+    if (this.labelDisplayMode_ != opt_value) {
+      this.labelDisplayMode_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.HEATMAP_SERIES, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.labelDisplayMode_;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Overwritten series methods. (for encapsulation series)
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter/setter for current fill color.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.charts.HeatMap|Function} .
+ */
+anychart.charts.HeatMap.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    this.series_.fill(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy);
+    return this;
+  }
+  return this.series_.fill();
+};
+
+
+/**
+ * Getter/setter for current hover fill color.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.charts.HeatMap|Function} .
+ */
+anychart.charts.HeatMap.prototype.hoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    this.series_.hoverFill(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy);
+    return this;
+  }
+  return this.series_.hoverFill();
+};
+
+
+/**
+ * Getter/setter for current select fill color.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.charts.HeatMap|Function} .
+ */
+anychart.charts.HeatMap.prototype.selectFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    this.series_.selectFill(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy);
+    return this;
+  }
+  return this.series_.selectFill();
+};
+
+
+/**
+ * Getter/setter for current stroke settings.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.charts.HeatMap|acgraph.vector.Stroke|Function} .
+ */
+anychart.charts.HeatMap.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    this.series_.stroke(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap);
+    return this;
+  }
+  return this.series_.stroke();
+};
+
+
+/**
+ * Getter/setter for current hover stroke settings.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.charts.HeatMap|acgraph.vector.Stroke|Function} .
+ */
+anychart.charts.HeatMap.prototype.hoverStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    this.series_.hoverStroke(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap);
+    return this;
+  }
+  return this.series_.hoverStroke();
+};
+
+
+/**
+ * Getter/setter for current select stroke settings.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.charts.HeatMap|acgraph.vector.Stroke|Function} .
+ */
+anychart.charts.HeatMap.prototype.selectStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    this.series_.selectStroke(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap);
+    return this;
+  }
+  return this.series_.selectStroke();
+};
+
+
+/**
+ * Getter/setter for current hatch fill settings.
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.charts.HeatMap|Function|boolean} Hatch fill.
+ */
+anychart.charts.HeatMap.prototype.hatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    this.series_.hatchFill(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size);
+    return this;
+  }
+  return this.series_.hatchFill();
+};
+
+
+/**
+ * Getter/setter for current hover hatch fill settings.
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.charts.HeatMap|Function|boolean} Hatch fill.
+ */
+anychart.charts.HeatMap.prototype.hoverHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    this.series_.hoverHatchFill(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size);
+    return this;
+  }
+  return this.series_.hoverHatchFill();
+};
+
+
+/**
+ * Getter/setter for selected hatch fill settings.
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
+ * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|anychart.charts.HeatMap|Function|boolean} Hatch fill.
+ */
+anychart.charts.HeatMap.prototype.selectHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    this.series_.selectHatchFill(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size);
+    return this;
+  }
+  return this.series_.selectHatchFill();
+};
+
+
+/**
+ * Getter/setter for current series data labels.
+ * @param {(Object|boolean|null)=} opt_value Series data labels settings.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.charts.HeatMap)} Labels instance or itself for chaining call.
+ */
+anychart.charts.HeatMap.prototype.labels = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.series_.labels(opt_value);
+    return this;
+  }
+  return this.series_.labels();
+};
+
+
+/**
+ * Gets or sets series hover data labels.
+ * @param {(Object|boolean|null)=} opt_value Series data labels settings.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.charts.HeatMap)} Labels instance or itself for chaining call.
+ */
+anychart.charts.HeatMap.prototype.hoverLabels = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.series_.hoverLabels(opt_value);
+    return this;
+  }
+  return this.series_.hoverLabels();
+};
+
+
+/**
+ * Gets or sets series select data labels.
+ * @param {(Object|boolean|null)=} opt_value Series data labels settings.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.charts.HeatMap)} Labels instance or itself for chaining call.
+ */
+anychart.charts.HeatMap.prototype.selectLabels = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.series_.selectLabels(opt_value);
+    return this;
+  }
+  return this.series_.selectLabels();
+};
+
+
+/**
+ * Getter/setter for current series markers.
+ * @param {(Object|boolean|null)=} opt_value Series data labels settings.
+ * @return {!(anychart.core.ui.MarkersFactory|anychart.charts.HeatMap)} Marker instance or itself for chaining call.
+ */
+anychart.charts.HeatMap.prototype.markers = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.series_.markers(opt_value);
+    return this;
+  }
+  return this.series_.markers();
+};
+
+
+/**
+ * Gets or sets series hover markers.
+ * @param {(Object|boolean|null)=} opt_value Series data labels settings.
+ * @return {!(anychart.core.ui.MarkersFactory|anychart.charts.HeatMap)} Marker instance or itself for chaining call.
+ */
+anychart.charts.HeatMap.prototype.hoverMarkers = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.series_.hoverMarkers(opt_value);
+    return this;
+  }
+  return this.series_.hoverMarkers();
+};
+
+
+/**
+ * Gets or sets series select markers.
+ * @param {(Object|boolean|null)=} opt_value Series data labels settings.
+ * @return {!(anychart.core.ui.MarkersFactory|anychart.charts.HeatMap)} Marker instance or itself for chaining call.
+ */
+anychart.charts.HeatMap.prototype.selectMarkers = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.series_.selectMarkers(opt_value);
+    return this;
+  }
+  return this.series_.selectMarkers();
+};
+
+
+/**
+ * Getter/setter for mapping.
+ * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @return {(!anychart.charts.HeatMap|!anychart.data.View)} Returns itself if used as a setter or the mapping if used as a getter.
+ */
+anychart.charts.HeatMap.prototype.data = function(opt_value, opt_csvSettings) {
+  if (goog.isDef(opt_value)) {
+    this.series_.data(opt_value, opt_csvSettings);
+    return this;
+  }
+  return this.series_.data();
+};
+
+
+/**
+ * If index is passed, hovers a point by its index, else hovers all points.
+ * @param {(number|Array<number>)=} opt_indexOrIndexes Point index or array of indexes.
+ * @return {!anychart.charts.HeatMap} instance for method chaining.
+ */
+anychart.charts.HeatMap.prototype.hover = function(opt_indexOrIndexes) {
+  this.series_.hover(opt_indexOrIndexes);
+  return this;
+};
+
+
+/**
+ * Imitates selects a point by its index.
+ * @param {(number|Array.<number>)=} opt_indexOrIndexes Index or array of indexes of the point to select.
+ * @return {!anychart.charts.HeatMap} instance for method chaining.
+ */
+anychart.charts.HeatMap.prototype.select = function(opt_indexOrIndexes) {
+  this.series_.select(opt_indexOrIndexes);
+  return this;
+};
+
+
+//exports
+anychart.charts.HeatMap.prototype['grid'] = anychart.charts.HeatMap.prototype.grid;
+
+anychart.charts.HeatMap.prototype['xAxis'] = anychart.charts.HeatMap.prototype.xAxis;
+anychart.charts.HeatMap.prototype['yAxis'] = anychart.charts.HeatMap.prototype.yAxis;
+
+anychart.charts.HeatMap.prototype['xScale'] = anychart.charts.HeatMap.prototype.xScale;
+anychart.charts.HeatMap.prototype['yScale'] = anychart.charts.HeatMap.prototype.yScale;
+
+anychart.charts.HeatMap.prototype['labelsDisplayMode'] = anychart.charts.HeatMap.prototype.labelsDisplayMode;
+
+anychart.charts.HeatMap.prototype['fill'] = anychart.charts.HeatMap.prototype.fill;
+anychart.charts.HeatMap.prototype['hoverFill'] = anychart.charts.HeatMap.prototype.hoverFill;
+anychart.charts.HeatMap.prototype['selectFill'] = anychart.charts.HeatMap.prototype.selectFill;
+
+anychart.charts.HeatMap.prototype['stroke'] = anychart.charts.HeatMap.prototype.stroke;
+anychart.charts.HeatMap.prototype['hoverStroke'] = anychart.charts.HeatMap.prototype.hoverStroke;
+anychart.charts.HeatMap.prototype['selectStroke'] = anychart.charts.HeatMap.prototype.selectStroke;
+
+anychart.charts.HeatMap.prototype['hatchFill'] = anychart.charts.HeatMap.prototype.hatchFill;
+anychart.charts.HeatMap.prototype['hoverHatchFill'] = anychart.charts.HeatMap.prototype.hoverHatchFill;
+anychart.charts.HeatMap.prototype['selectHatchFill'] = anychart.charts.HeatMap.prototype.selectHatchFill;
+
+anychart.charts.HeatMap.prototype['labels'] = anychart.charts.HeatMap.prototype.labels;
+anychart.charts.HeatMap.prototype['hoverLabels'] = anychart.charts.HeatMap.prototype.hoverLabels;
+anychart.charts.HeatMap.prototype['selectLabels'] = anychart.charts.HeatMap.prototype.selectLabels;
+
+anychart.charts.HeatMap.prototype['markers'] = anychart.charts.HeatMap.prototype.markers;
+anychart.charts.HeatMap.prototype['hoverMarkers'] = anychart.charts.HeatMap.prototype.hoverMarkers;
+anychart.charts.HeatMap.prototype['selectMarkers'] = anychart.charts.HeatMap.prototype.selectMarkers;
+
+anychart.charts.HeatMap.prototype['hover'] = anychart.charts.HeatMap.prototype.hover;
+anychart.charts.HeatMap.prototype['select'] = anychart.charts.HeatMap.prototype.select;
+
+anychart.charts.HeatMap.prototype['unhover'] = anychart.charts.HeatMap.prototype.unhover;
+anychart.charts.HeatMap.prototype['unselect'] = anychart.charts.HeatMap.prototype.unselect;
+
+anychart.charts.HeatMap.prototype['data'] = anychart.charts.HeatMap.prototype.data;
+
+anychart.charts.HeatMap.prototype['colorScale'] = anychart.charts.HeatMap.prototype.colorScale;

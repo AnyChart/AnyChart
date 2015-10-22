@@ -493,6 +493,10 @@ anychart.scales.Base.fromString = function(type, defaultIsOrdinal) {
     case 'ord':
     case 'discrete':
       return anychart.scales.ordinal();
+    case 'color':
+    case 'ordinalcolor':
+    case 'discretecolor':
+      return anychart.scales.ordinalColor();
     default:
       return goog.isNull(defaultIsOrdinal) ?
           null :

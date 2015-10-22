@@ -24,8 +24,7 @@ anychart.core.Text = function() {
    * @type {!Object.<boolean>}
    * @protected
    */
-  this.changedSettings = {
-  };
+  this.changedSettings = {};
 
   /**
    * The enumeration of the text settings that do not cause PIXEL_BOUNDS invalidation both with APPEARANCE.

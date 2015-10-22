@@ -501,7 +501,7 @@ anychart.charts.Map.prototype.colorRangeInvalidated_ = function(event) {
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data SVG|SVGString|GeoJSON|MapNameString.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {Node|string|Object} Passed geo data.
+ * @return {anychart.core.map.series.Base} Passed geo data.
  */
 anychart.charts.Map.prototype.choropleth = function(data, opt_csvSettings) {
   return this.createSeriesByType_(anychart.enums.MapSeriesType.CHOROPLETH, data, opt_csvSettings);
@@ -513,7 +513,7 @@ anychart.charts.Map.prototype.choropleth = function(data, opt_csvSettings) {
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data SVG|SVGString|GeoJSON|MapNameString.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {Node|string|Object} Passed geo data.
+ * @return {anychart.core.map.series.Base} Passed geo data.
  */
 anychart.charts.Map.prototype.bubble = function(data, opt_csvSettings) {
   return this.createSeriesByType_(anychart.enums.MapSeriesType.BUBBLE, data, opt_csvSettings);
@@ -527,7 +527,7 @@ anychart.charts.Map.prototype.bubble = function(data, opt_csvSettings) {
  *    here as a hash map.
  * @param {number=} opt_zIndex Optional series zIndex.
  * @private
- * @return {anychart.core.map.series.Choropleth}
+ * @return {anychart.core.map.series.Base}
  */
 anychart.charts.Map.prototype.createSeriesByType_ = function(type, data, opt_csvSettings, opt_zIndex) {
   var ctl;
@@ -1133,13 +1133,13 @@ anychart.charts.Map.prototype.createLegendItemsProvider = function(sourceMode, i
     }
   } else if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
     if (this.colorRange_ && this.colorRange_.enabled() && this.colorRange_.target() &&
-        this.colorRange_.scale() instanceof anychart.core.map.scale.OrdinalColor) {
+        this.colorRange_.scale() instanceof anychart.scales.OrdinalColor) {
       scale = this.colorRange_.scale();
       series = this.colorRange_.target();
     } else {
       for (i = 0, count = this.series_.length; i < count; i++) {
         series = this.series_[i];
-        if (series.colorScale() instanceof anychart.core.map.scale.OrdinalColor) {
+        if (series.colorScale() instanceof anychart.scales.OrdinalColor) {
           scale = series.colorScale();
           break;
         }
@@ -1514,13 +1514,13 @@ anychart.charts.Map.prototype.setupByJSON = function(config) {
       type = (type + '').toLowerCase();
       switch (type) {
         case 'ordinalcolor':
-          scale = new anychart.core.map.scale.OrdinalColor();
+          scale = new anychart.scales.OrdinalColor();
           break;
         case 'linearcolor':
-          scale = new anychart.core.map.scale.LinearColor();
+          scale = new anychart.scales.LinearColor();
           break;
         default:
-          scale = new anychart.core.map.scale.LinearColor();
+          scale = new anychart.scales.LinearColor();
       }
       if (goog.isObject(json))
         scale.setup(json);

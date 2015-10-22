@@ -84,6 +84,8 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.markers_.setup(opt_value);
     return this;
   }
@@ -118,6 +120,8 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.hoverMarkers = function
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.hoverMarkers_.setup(opt_value);
     return this;
   }
@@ -137,6 +141,8 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.selectMarkers = functio
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.selectMarkers_.setup(opt_value);
     return this;
   }
@@ -381,9 +387,9 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.serialize = function() 
  */
 anychart.core.cartesian.series.BaseWithMarkers.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  this.markers(config['markers']);
-  this.hoverMarkers(config['hoverMarkers']);
-  this.selectMarkers(config['selectMarkers']);
+  this.markers().setup(config['markers']);
+  this.hoverMarkers().setup(config['hoverMarkers']);
+  this.selectMarkers().setup(config['selectMarkers']);
 };
 
 

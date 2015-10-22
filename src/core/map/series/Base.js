@@ -135,8 +135,8 @@ anychart.core.map.series.Base.prototype.setAutoSizeScale = goog.nullFunction;
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Color scale.
- * @param {(anychart.core.map.scale.LinearColor|anychart.core.map.scale.OrdinalColor)=} opt_value Scale to set.
- * @return {anychart.core.map.scale.OrdinalColor|anychart.core.map.scale.LinearColor|anychart.core.map.series.Base} Default chart color scale value or itself for
+ * @param {(anychart.scales.LinearColor|anychart.scales.OrdinalColor)=} opt_value Scale to set.
+ * @return {anychart.scales.OrdinalColor|anychart.scales.LinearColor|anychart.core.map.series.Base} Default chart color scale value or itself for
  * method chaining.
  */
 anychart.core.map.series.Base.prototype.colorScale = function(opt_value) {

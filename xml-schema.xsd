@@ -100,6 +100,8 @@
             <!-- new Cartesian elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="x_zoom" type="core.CartesianXZoom"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="x_scroller" type="core.ChartScroller"/>
+            <!-- charts.HeatMap elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="color_scale" type="OrdinalColorScale"/>
         </xsd:all>
         <!-- core.Chart attrs -->
         <xsd:attributeGroup ref="attrs.VisualBase"/>
@@ -150,6 +152,7 @@
         <xsd:attribute name="outside_labels_space" type="simple.NumberOrPercent" default="30%"/>
         <xsd:attribute name="inside_labels_offset" type="simple.NumberOrPercent" default="50%"/>
         <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="noOverlap"/>
+        <xsd:attribute name="labels_display_mode" type="enums.LabelsDisplayMode" default="clip"/>
         <xsd:attribute name="connector_length" type="simple.NumberOrPercent" default="20%"/>
         <xsd:attribute name="outside_labels_critical_angle" type="xsd:double" default="60"/>
         <xsd:attribute name="connector_stroke" type="xsd:string" default="black 0.3"/>
@@ -1489,6 +1492,18 @@
         <xsd:attribute name="maximum_gap" type="xsd:double" default="0.1"/>
     </xsd:complexType>
 
+    <xsd:complexType name="OrdinalColorScale">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="ticks" type="ScaleTicks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="colors" type="OrdinalColorScaleColors"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="ranges" type="OrdinalColorScaleRanges"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="names" type="OrdinalScaleNames"/>
+        </xsd:all>
+        <xsd:attribute name="type" type="enums.ScaleTypes" default="ordinalColor"/>
+        <xsd:attribute name="inverted" type="simple.Bool" default="false"/>
+        <xsd:attribute name="names" type="xsd:string" default="name"/>
+    </xsd:complexType>
+
     <xsd:complexType name="LogOrLinScale">
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="ticks" type="ScaleTicks"/>
@@ -1536,6 +1551,26 @@
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="name" type="simple.Text"/>
         </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="OrdinalColorScaleColors">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="color" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="OrdinalColorScaleRanges">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="range" type="OrdinalColorRange"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="OrdinalColorRange">
+        <xsd:attribute name="less" type="xsd:unsignedInt"/>
+        <xsd:attribute name="greater" type="xsd:unsignedInt"/>
+        <xsd:attribute name="from" type="xsd:unsignedInt"/>
+        <xsd:attribute name="to" type="xsd:unsignedInt"/>
+        <xsd:attribute name="color" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:complexType name="ScaleTicksValues">
@@ -2141,6 +2176,14 @@
         </xsd:restriction>
     </xsd:simpleType>
 
+    <xsd:simpleType name="enums.LabelsDisplayMode">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="alwaysShow"/>
+            <xsd:enumeration value="clip"/>
+            <xsd:enumeration value="drop"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
     <xsd:simpleType name="enums.TooltipDisplayMode">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="union"/>
@@ -2279,6 +2322,7 @@
             <xsd:enumeration value="log"/>
             <xsd:enumeration value="dateTime"/>
             <xsd:enumeration value="ordinal"/>
+            <xsd:enumeration value="ordinalColor"/>
         </xsd:restriction>
     </xsd:simpleType>
 

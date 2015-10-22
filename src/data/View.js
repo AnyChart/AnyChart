@@ -431,11 +431,12 @@ anychart.data.View.prototype.find = function(fieldName, fieldValue) {
 
 
 /**
- * Search on unsorted data by field name - 'x'. Returns array of indexes of found points.
+ * Search on unsorted data by passed x field name [default 'x']. Returns array of indexes of found points.
  * @param {number} fieldValue Value to find.
+ * @param {string=} opt_fieldName Field name.
  * @return {Array.<number>} Point indexes.
  */
-anychart.data.View.prototype.findInUnsortedDataByX = function(fieldValue) {
+anychart.data.View.prototype.findInUnsortedDataByX = function(fieldValue, opt_fieldName) {
   this.ensureConsistent();
 
   if (!this.cachedScatterValues) this.cachedScatterValues = {};
@@ -453,11 +454,13 @@ anychart.data.View.prototype.findInUnsortedDataByX = function(fieldValue) {
     var lastNotNaNValueIndex = -1;
     var lastNotNaNValueX = -Infinity;
 
+    var fieldName = opt_fieldName || 'x';
+
     iterator.reset();
     while (iterator.advance()) {
       index = iterator.getIndex();
 
-      x = /** @type {number}*/(iterator.get('x'));
+      x = /** @type {number}*/(iterator.get(fieldName));
       value = iterator.get('value');
 
       if (!goog.isDef(this.cachedScatterValues.lastNotNaNValueIndex) && !isNaN(value) && x > lastNotNaNValueX)
@@ -484,13 +487,14 @@ anychart.data.View.prototype.findInUnsortedDataByX = function(fieldValue) {
 
 
 /**
- * Search in range of values by field name - 'x'. Returns array of indexes of found points.
+ * Search in range of values by passed x field name [default 'x']. Returns array of indexes of found points.
  * @param {number} minValue Minimum range limit.
  * @param {number} maxValue Maximum range limit.
  * @param {boolean=} opt_isOrdinal .
+ * @param {string=} opt_fieldName Field name.
  * @return {Array.<number>} indexes.
  */
-anychart.data.View.prototype.findInRangeByX = function(minValue, maxValue, opt_isOrdinal) {
+anychart.data.View.prototype.findInRangeByX = function(minValue, maxValue, opt_isOrdinal, opt_fieldName) {
   this.ensureConsistent();
   if (!goog.isDef(minValue) || !goog.isDef(maxValue))
     return null;
@@ -510,12 +514,13 @@ anychart.data.View.prototype.findInRangeByX = function(minValue, maxValue, opt_i
 
   var iterator = this.getIterator();
   var value, index;
+  var fieldName = opt_fieldName || 'x';
 
   var indexes = [];
   iterator.reset();
   while (iterator.advance()) {
     index = iterator.getIndex();
-    value = /** @type {number} */(opt_isOrdinal ? index : iterator.get('x'));
+    value = /** @type {number} */(opt_isOrdinal ? index : iterator.get(fieldName));
     if (value >= minValue && value <= maxValue) {
       indexes.push(index);
     }

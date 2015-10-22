@@ -321,6 +321,8 @@ anychart.core.axes.Linear.prototype.labels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.labels_.setup(opt_value);
     return this;
   }
@@ -377,6 +379,8 @@ anychart.core.axes.Linear.prototype.minorLabels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.minorLabels_.setup(opt_value);
     return this;
   }
@@ -2263,8 +2267,8 @@ anychart.core.axes.Linear.prototype.serialize = function() {
 anychart.core.axes.Linear.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   this.title(config['title']);
-  this.labels(config['labels']);
-  this.minorLabels(config['minorLabels']);
+  this.labels().setup(config['labels']);
+  this.minorLabels().setup(config['minorLabels']);
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
   this.staggerMode(config['staggerMode']);

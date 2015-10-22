@@ -162,6 +162,8 @@ anychart.core.axes.Radar.prototype.labels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.labels_.setup(opt_value);
     return this;
   }
@@ -843,7 +845,7 @@ anychart.core.axes.Radar.prototype.serialize = function() {
 anychart.core.axes.Radar.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   //this.startAngle(config['startAngle']);
-  this.labels(config['labels']);
+  this.labels().setup(config['labels']);
   this.ticks(config['ticks']);
   this.stroke(config['stroke']);
 };

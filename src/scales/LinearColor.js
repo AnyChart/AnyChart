@@ -1,4 +1,4 @@
-goog.provide('anychart.core.map.scale.LinearColor');
+goog.provide('anychart.scales.LinearColor');
 
 goog.require('anychart.enums');
 goog.require('anychart.scales.ScatterBase');
@@ -10,7 +10,7 @@ goog.require('anychart.scales.ScatterBase');
  * @constructor
  * @extends {anychart.scales.ScatterBase}
  */
-anychart.core.map.scale.LinearColor = function() {
+anychart.scales.LinearColor = function() {
   goog.base(this);
 
   /**
@@ -35,12 +35,12 @@ anychart.core.map.scale.LinearColor = function() {
 
   this.setupByJSON(anychart.getFullTheme()['map']['linearColor']);
 };
-goog.inherits(anychart.core.map.scale.LinearColor, anychart.scales.ScatterBase);
+goog.inherits(anychart.scales.LinearColor, anychart.scales.ScatterBase);
 
 
 /** @inheritDoc */
-anychart.core.map.scale.LinearColor.prototype.getType = function() {
-  return anychart.enums.MapsScaleTypes.LINEAR_COLOR;
+anychart.scales.LinearColor.prototype.getType = function() {
+  return anychart.enums.ScaleTypes.LINEAR_COLOR;
 };
 
 
@@ -51,7 +51,7 @@ anychart.core.map.scale.LinearColor.prototype.getType = function() {
  * @return {Array.<Object>}
  * @private
  */
-anychart.core.map.scale.LinearColor.prototype.extractKeys_ = function(var_args) {
+anychart.scales.LinearColor.prototype.extractKeys_ = function(var_args) {
   var i, len, key;
 
   var keys = [];
@@ -95,7 +95,7 @@ anychart.core.map.scale.LinearColor.prototype.extractKeys_ = function(var_args) 
  * @return {Array.<!Object>}
  * @private
  */
-anychart.core.map.scale.LinearColor.prototype.normalizeColors_ = function(var_args) {
+anychart.scales.LinearColor.prototype.normalizeColors_ = function(var_args) {
   var keys = this.extractKeys_.apply(this, arguments);
 
   for (var i = 0, len = keys.length; i < len; i++) {
@@ -122,9 +122,9 @@ anychart.core.map.scale.LinearColor.prototype.normalizeColors_ = function(var_ar
  * @param {...(string|acgraph.vector.SolidFill|acgraph.vector.LinearGradientFill |
       acgraph.vector.RadialGradientFill|Array.<string|acgraph.vector.SolidFill|acgraph.vector.LinearGradientFill |
       acgraph.vector.RadialGradientFill>)} var_args Colors set.
- * @return {!(Array.<Object>|anychart.core.map.scale.LinearColor)}
+ * @return {!(Array.<Object>|anychart.scales.LinearColor)}
  */
-anychart.core.map.scale.LinearColor.prototype.colors = function(var_args) {
+anychart.scales.LinearColor.prototype.colors = function(var_args) {
   if (arguments.length > 0) {
     var colors = this.normalizeColors_.apply(this, arguments);
     var equal = this.colors_ && colors.length == this.colors_.length;
@@ -155,7 +155,7 @@ anychart.core.map.scale.LinearColor.prototype.colors = function(var_args) {
  * @param {number} value Value to convert.
  * @return {string} Returns color in hex representation relative passed value.
  */
-anychart.core.map.scale.LinearColor.prototype.valueToColor = function(value) {
+anychart.scales.LinearColor.prototype.valueToColor = function(value) {
   var ratio = this.transform(value);
   var firstKey, lastKey;
   for (var i = 0, len = this.colors_.length; i < len; i++) {
@@ -192,7 +192,7 @@ anychart.core.map.scale.LinearColor.prototype.valueToColor = function(value) {
  * @param {string} value Color name or hex color representation.
  * @return {number} Returns value relative passed color.
  */
-anychart.core.map.scale.LinearColor.prototype.colorToValue = function(value) {
+anychart.scales.LinearColor.prototype.colorToValue = function(value) {
   this.calculate();
 
   var rgbValue = goog.color.hexToRgb(anychart.color.parseColor(value).hex);
@@ -237,9 +237,9 @@ anychart.core.map.scale.LinearColor.prototype.colorToValue = function(value) {
 /**
  * Gets or sets a set of scale ticks in terms of data values.
  * @param {(Object|Array)=} opt_value An array of ticks to set.
- * @return {!(anychart.core.map.scale.LinearColor|anychart.scales.ScatterTicks)} Ticks or itself for method chaining.
+ * @return {!(anychart.scales.LinearColor|anychart.scales.ScatterTicks)} Ticks or itself for method chaining.
  */
-anychart.core.map.scale.LinearColor.prototype.ticks = function(opt_value) {
+anychart.scales.LinearColor.prototype.ticks = function(opt_value) {
   if (!this.ticksObj) {
     this.ticksObj = this.createTicks();
   }
@@ -255,9 +255,9 @@ anychart.core.map.scale.LinearColor.prototype.ticks = function(opt_value) {
 /**
  * Gets or sets a set of scale ticks in terms of data values.
  * @param {(Object|Array)=} opt_value An array of ticks to set.
- * @return {!(anychart.core.map.scale.LinearColor|anychart.scales.ScatterTicks)} Ticks or itself for method chaining.
+ * @return {!(anychart.scales.LinearColor|anychart.scales.ScatterTicks)} Ticks or itself for method chaining.
  */
-anychart.core.map.scale.LinearColor.prototype.minorTicks = function(opt_value) {
+anychart.scales.LinearColor.prototype.minorTicks = function(opt_value) {
   if (!this.minorTicksObj) {
     this.minorTicksObj = this.createTicks();
     this.minorTicksObj.count(5);
@@ -272,7 +272,7 @@ anychart.core.map.scale.LinearColor.prototype.minorTicks = function(opt_value) {
 
 
 /** @inheritDoc */
-anychart.core.map.scale.LinearColor.prototype.calculate = function() {
+anychart.scales.LinearColor.prototype.calculate = function() {
   if (this.consistent) return;
 
   goog.base(this, 'calculate');
@@ -299,7 +299,7 @@ anychart.core.map.scale.LinearColor.prototype.calculate = function() {
  * @param {anychart.SignalEvent} event Event object.
  * @private
  */
-anychart.core.map.scale.LinearColor.prototype.ticksInvalidated_ = function(event) {
+anychart.scales.LinearColor.prototype.ticksInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     this.consistent = false;
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
@@ -312,7 +312,7 @@ anychart.core.map.scale.LinearColor.prototype.ticksInvalidated_ = function(event
  * @return {!anychart.scales.ScatterTicks}
  * @protected
  */
-anychart.core.map.scale.LinearColor.prototype.createTicks = function() {
+anychart.scales.LinearColor.prototype.createTicks = function() {
   var ticks = new anychart.scales.ScatterTicks(this);
   this.registerDisposable(ticks);
   ticks.listenSignals(this.ticksInvalidated_, this);
@@ -328,17 +328,17 @@ anychart.core.map.scale.LinearColor.prototype.createTicks = function() {
  * @param {...(string|acgraph.vector.SolidFill|acgraph.vector.LinearGradientFill |
       acgraph.vector.RadialGradientFill|Array.<string|acgraph.vector.SolidFill|acgraph.vector.LinearGradientFill |
       acgraph.vector.RadialGradientFill>)} var_args Colors set.
- * @return {anychart.core.map.scale.LinearColor}
+ * @return {anychart.scales.LinearColor}
  */
 anychart.scales.linearColor = function(var_args) {
-  var scale = new anychart.core.map.scale.LinearColor();
+  var scale = new anychart.scales.LinearColor();
   scale.colors.apply(scale, arguments);
   return scale;
 };
 
 
 /** @inheritDoc */
-anychart.core.map.scale.LinearColor.prototype.serialize = function() {
+anychart.scales.LinearColor.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['ticks'] = this.ticks().serialize();
   json['minorTicks'] = this.minorTicks().serialize();
@@ -348,7 +348,7 @@ anychart.core.map.scale.LinearColor.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.map.scale.LinearColor.prototype.setupByJSON = function(config) {
+anychart.scales.LinearColor.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
@@ -358,10 +358,10 @@ anychart.core.map.scale.LinearColor.prototype.setupByJSON = function(config) {
 
 //exports
 goog.exportSymbol('anychart.scales.linearColor', anychart.scales.linearColor);
-anychart.core.map.scale.LinearColor.prototype['colors'] = anychart.core.map.scale.LinearColor.prototype.colors;
-anychart.core.map.scale.LinearColor.prototype['valueToColor'] = anychart.core.map.scale.LinearColor.prototype.valueToColor;
-anychart.core.map.scale.LinearColor.prototype['colorToValue'] = anychart.core.map.scale.LinearColor.prototype.colorToValue;
-anychart.core.map.scale.LinearColor.prototype['ticks'] = anychart.core.map.scale.LinearColor.prototype.ticks;
-anychart.core.map.scale.LinearColor.prototype['minorTicks'] = anychart.core.map.scale.LinearColor.prototype.minorTicks;
+anychart.scales.LinearColor.prototype['colors'] = anychart.scales.LinearColor.prototype.colors;
+anychart.scales.LinearColor.prototype['valueToColor'] = anychart.scales.LinearColor.prototype.valueToColor;
+anychart.scales.LinearColor.prototype['colorToValue'] = anychart.scales.LinearColor.prototype.colorToValue;
+anychart.scales.LinearColor.prototype['ticks'] = anychart.scales.LinearColor.prototype.ticks;
+anychart.scales.LinearColor.prototype['minorTicks'] = anychart.scales.LinearColor.prototype.minorTicks;
 
 

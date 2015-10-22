@@ -186,7 +186,11 @@ anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt
     // maps
     'id': [0],
     'lat': [0],
-    'long': [1]
+    'long': [1],
+
+    // heat map
+    'y': [1],
+    'heat': [2]
   };
 
   /**
@@ -196,12 +200,18 @@ anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt
    */
   this.objectMapping_ = opt_objectMapping || {
     //'x': ['x'], // this mapping entry can be omitted cause of defaults
-    'value': ['value', 'y', 'close'], // 'value' here enforces checking order
+    'x': ['column', 'x'],
+    'value': ['value', 'y', 'close', 'heat'], // 'value' here enforces checking order
+
     'lowest': ['lowest', 'low'],
     'highest': ['highest', 'high'],
     //for maps
     'lat': ['lat', 'x'],
-    'long': ['long', 'y', 'value']
+    'long': ['long', 'y', 'value'],
+    //for heat map
+
+    'y': ['row', 'y'],
+    'heat': ['value', 'heat']
   };
 
   /**

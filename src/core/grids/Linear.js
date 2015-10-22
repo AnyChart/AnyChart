@@ -272,8 +272,16 @@ anychart.core.grids.Linear.prototype.stroke = function(opt_strokeOrFill, opt_thi
   if (goog.isDef(opt_strokeOrFill)) {
     var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (this.stroke_ != stroke) {
+      var oldThickness = this.stroke_ ? acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.stroke_)) : 0;
       this.stroke_ = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      var newThickness = this.stroke_ ? acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.stroke_)) : 0;
+      var state = anychart.ConsistencyState.APPEARANCE;
+      var signal = anychart.Signal.NEEDS_REDRAW;
+      if (oldThickness != newThickness) {
+        state |= anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.BOUNDS;
+        signal |= anychart.Signal.BOUNDS_CHANGED;
+      }
+      this.invalidate(state, signal);
     }
     return this;
   } else {

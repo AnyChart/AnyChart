@@ -142,6 +142,8 @@ anychart.core.axes.StockDateTime.prototype.labels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.labels_.setup(opt_value);
     return this;
   }
@@ -162,6 +164,8 @@ anychart.core.axes.StockDateTime.prototype.minorLabels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.minorLabels_.setup(opt_value);
     return this;
   }
@@ -745,8 +749,8 @@ anychart.core.axes.StockDateTime.prototype.serialize = function() {
 anychart.core.axes.StockDateTime.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   this.height(config['height']);
-  this.labels(config['labels']);
-  this.minorLabels(config['minorLabels']);
+  this.labels().setup(config['labels']);
+  this.minorLabels().setup(config['minorLabels']);
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
   this.background(config['background']);

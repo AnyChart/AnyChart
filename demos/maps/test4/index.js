@@ -69,8 +69,8 @@ anychart.onDocumentReady(function() {
   //map.geoData(Highcharts.maps["countries/us/us-all"]);
   map.legend()
       .itemsLayout(anychart.enums.Layout.VERTICAL)
-      //.itemsSourceMode(anychart.enums.LegendItemsSourceMode.CATEGORIES)
-      .itemsSourceMode(anychart.enums.LegendItemsSourceMode.DEFAULT)
+      .itemsSourceMode(anychart.enums.LegendItemsSourceMode.CATEGORIES)
+      //.itemsSourceMode(anychart.enums.LegendItemsSourceMode.DEFAULT)
       .enabled(true)
       .position('right')
       .align('bottom')
@@ -104,8 +104,8 @@ anychart.onDocumentReady(function() {
   s1.markers(true);
   s1.labels(false);
 
-  s2 = map.choropleth(dataSet2).geoIdField('iso_3166_2').markers(true).labels(false);
-  s3 = map.choropleth(dataSet3).geoIdField('iso_3166_2').markers(true).labels(false);
+  //s2 = map.choropleth(dataSet2).geoIdField('iso_3166_2').markers(true).labels(false);
+  //s3 = map.choropleth(dataSet3).geoIdField('iso_3166_2').markers(true).labels(false);
 
   //cs = anychart.scales.linearColor();
   //cs = anychart.scales.linearColor('#4d7f17', '#4d7f17', '#6bb120', '#8ae429', '#9afe2e', '#aefe57');

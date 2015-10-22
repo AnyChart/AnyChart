@@ -1245,6 +1245,8 @@ anychart.core.SeriesBase.prototype.labels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.labels_.setup(opt_value);
     return this;
   }
@@ -1264,6 +1266,8 @@ anychart.core.SeriesBase.prototype.hoverLabels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.hoverLabels_.setup(opt_value);
     return this;
   }
@@ -1283,6 +1287,8 @@ anychart.core.SeriesBase.prototype.selectLabels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.selectLabels_.setup(opt_value);
     return this;
   }
@@ -1969,9 +1975,9 @@ anychart.core.SeriesBase.prototype.setupByJSON = function(config) {
   this.meta(config['meta']);
   if ('data' in config)
     this.data(config['data'] || null);
-  this.labels(config['labels']);
-  this.hoverLabels(config['hoverLabels']);
-  this.selectLabels(config['selectLabels']);
+  this.labels().setup(config['labels']);
+  this.hoverLabels().setup(config['hoverLabels']);
+  this.selectLabels().setup(config['selectLabels']);
   this.tooltip(config['tooltip']);
   this.legendItem(config['legendItem']);
   if (goog.isDef(config['allowPointsSelect'])) {

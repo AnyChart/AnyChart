@@ -80,6 +80,8 @@ anychart.core.map.series.BaseWithMarkers.prototype.markers = function(opt_value)
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.markers_.setup(opt_value);
     return this;
   }
@@ -99,6 +101,8 @@ anychart.core.map.series.BaseWithMarkers.prototype.hoverMarkers = function(opt_v
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.hoverMarkers_.setup(opt_value);
     return this;
   }
@@ -118,6 +122,8 @@ anychart.core.map.series.BaseWithMarkers.prototype.selectMarkers = function(opt_
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.selectMarkers_.setup(opt_value);
     return this;
   }
@@ -330,11 +336,11 @@ anychart.core.map.series.BaseWithMarkers.prototype.serialize = function() {
 anychart.core.map.series.BaseWithMarkers.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   if (config['markers'])
-    this.markers(config['markers']);
+    this.markers().setup(config['markers']);
   if (config['hoverMarkers'])
-    this.hoverMarkers(config['hoverMarkers']);
+    this.hoverMarkers().setup(config['hoverMarkers']);
   if (config['selectMarkers'])
-    this.hoverMarkers(config['selectMarkers']);
+    this.hoverMarkers().setup(config['selectMarkers']);
 };
 
 

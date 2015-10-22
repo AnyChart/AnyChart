@@ -37,7 +37,8 @@ anychart.enums.ChartTypes = {
   PYRAMID: 'pyramid',
   RADAR: 'radar',
   SCATTER: 'scatter',
-  SPARKLINE: 'sparkline'
+  SPARKLINE: 'sparkline',
+  HEAT_MAP: 'heatmap'
 };
 
 
@@ -2141,7 +2142,9 @@ anychart.enums.ScaleTypes = {
   LINEAR: 'linear',
   LOG: 'log',
   DATE_TIME: 'dateTime',
-  ORDINAL: 'ordinal'
+  ORDINAL: 'ordinal',
+  ORDINAL_COLOR: 'ordinalColor',
+  LINEAR_COLOR: 'linearColor'
 };
 
 
@@ -2186,8 +2189,6 @@ anychart.enums.GaugeScaleTypes = {
  * @enum {string}
  */
 anychart.enums.MapsScaleTypes = {
-  ORDINAL_COLOR: 'ordinalColor',
-  LINEAR_COLOR: 'linearColor',
   GEO: 'geo'
 };
 
@@ -2286,6 +2287,8 @@ anychart.enums.WarningCode = {
   TOOLBAR_CONTAINER: 13,
   TOOLBAR_METHOD_IS_NOT_DEFINED: 14,
   TOOLBAR_CHART_IS_NOT_SET: 15,
+
+  SCALE_TYPE_NOT_SUPPORTED: 16,
 
   TABLE_ALREADY_IN_TRANSACTION: 101,
 
@@ -2972,6 +2975,77 @@ anychart.enums.normalizeCrosshairDisplayMode = function(value) {
 };
 
 
+/**
+ * @enum {string}
+ */
+anychart.enums.LabelsDisplayMode = {
+  ALWAYS_SHOW: 'alwaysShow',
+  CLIP: 'clip',
+  DROP: 'drop'
+};
+
+
+/**
+ * Normalizes labels display mode.
+ * @param {*} value Display mode to normalize.
+ * @param {anychart.enums.LabelsDisplayMode=} opt_default Custom default value (defaults to CLIP).
+ * @return {anychart.enums.LabelsDisplayMode}
+ */
+anychart.enums.normalizeLabelsDisplayMode = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'clip':
+    case 'c':
+      return anychart.enums.LabelsDisplayMode.CLIP;
+    case 'drop':
+    case 'd':
+      return anychart.enums.LabelsDisplayMode.DROP;
+    case 'alwaysshow':
+    case 'always':
+    case 'show':
+    case 'none':
+    case 'null':
+    case 'no':
+    case 'false':
+    case 'f':
+    case '0':
+    case 'n':
+      return anychart.enums.LabelsDisplayMode.ALWAYS_SHOW;
+  }
+  return opt_default || anychart.enums.LabelsDisplayMode.CLIP;
+};
+
+
+/**
+ * @enum {string}
+ */
+anychart.enums.AdjustFontSizeMode = {
+  SAME: 'same',
+  DIFFERENT: 'different'
+};
+
+
+/**
+ * Normalizes adjust font size mode.
+ * @param {*} value Mode mode to normalize.
+ * @param {anychart.enums.AdjustFontSizeMode=} opt_default Custom default value (defaults to DIFFERENT).
+ * @return {anychart.enums.AdjustFontSizeMode}
+ */
+anychart.enums.normalizeAdjustFontSizeMode = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'same':
+    case 's':
+      return anychart.enums.AdjustFontSizeMode.SAME;
+    case 'different':
+    case 'diff':
+    case 'd':
+      return anychart.enums.AdjustFontSizeMode.DIFFERENT;
+  }
+  return opt_default || anychart.enums.AdjustFontSizeMode.DIFFERENT;
+};
+
+
 //exports
 goog.exportSymbol('anychart.enums.RadialGridLayout.CIRCUIT', anychart.enums.RadialGridLayout.CIRCUIT);
 goog.exportSymbol('anychart.enums.RadialGridLayout.RADIAL', anychart.enums.RadialGridLayout.RADIAL);
@@ -3261,3 +3335,7 @@ goog.exportSymbol('anychart.enums.TableSearchMode.NEAREST', anychart.enums.Table
 
 goog.exportSymbol('anychart.enums.ChartScrollerPosition.AFTER_AXES', anychart.enums.ChartScrollerPosition.AFTER_AXES);
 goog.exportSymbol('anychart.enums.ChartScrollerPosition.BEFORE_AXES', anychart.enums.ChartScrollerPosition.BEFORE_AXES);
+
+goog.exportSymbol('anychart.enums.LabelsDisplayMode.ALWAYS_SHOW', anychart.enums.LabelsDisplayMode.ALWAYS_SHOW);
+goog.exportSymbol('anychart.enums.LabelsDisplayMode.DROP', anychart.enums.LabelsDisplayMode.DROP);
+goog.exportSymbol('anychart.enums.LabelsDisplayMode.CLIP', anychart.enums.LabelsDisplayMode.CLIP);

@@ -1,4 +1,4 @@
-goog.provide('anychart.core.map.scale.OrdinalColorTicks');
+goog.provide('anychart.scales.OrdinalColorTicks');
 
 goog.require('anychart.scales.OrdinalTicks');
 goog.require('goog.array');
@@ -7,18 +7,18 @@ goog.require('goog.array');
 
 /**
  * Scale ticks settings.
- * @param {!anychart.core.map.scale.OrdinalColor} scale Scale to ask for a setup.
+ * @param {!anychart.scales.OrdinalColor} scale Scale to ask for a setup.
  * @constructor
  * @extends {anychart.scales.OrdinalTicks}
  */
-anychart.core.map.scale.OrdinalColorTicks = function(scale) {
+anychart.scales.OrdinalColorTicks = function(scale) {
   goog.base(this, scale);
 };
-goog.inherits(anychart.core.map.scale.OrdinalColorTicks, anychart.scales.OrdinalTicks);
+goog.inherits(anychart.scales.OrdinalColorTicks, anychart.scales.OrdinalTicks);
 
 
 /** @inheritDoc */
-anychart.core.map.scale.OrdinalColorTicks.prototype.calcAutoTicks = function() {
+anychart.scales.OrdinalColorTicks.prototype.calcAutoTicks = function() {
   var res = [];
   var ranges = this.scale.ranges();
   if (ranges) {
@@ -31,7 +31,7 @@ anychart.core.map.scale.OrdinalColorTicks.prototype.calcAutoTicks = function() {
 
 
 /** @inheritDoc */
-anychart.core.map.scale.OrdinalColorTicks.prototype.makeValues = function(indexes) {
+anychart.scales.OrdinalColorTicks.prototype.makeValues = function(indexes) {
   var len = indexes.length || 0;
   var values = this.scale.getProcessedRanges();
   var valuesLen = values.length;

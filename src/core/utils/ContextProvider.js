@@ -291,8 +291,11 @@ anychart.core.utils.MapPointContextProvider.prototype.applyReferenceValues = fun
     this['seriesName'] = this.series_.name() || 'Series: ' + this.series_.index();
 
   var pointGeoProp = iterator.meta('regionProperties');
-  if (pointGeoProp)
+  if (pointGeoProp) {
     this['name'] = pointGeoProp['name'];
+    this['regionProperties'] = pointGeoProp;
+  }
+
 };
 
 

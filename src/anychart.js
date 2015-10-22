@@ -730,6 +730,14 @@ anychart.sparkline = anychart.sparkline || function() {
 /**
  * @ignoreDoc
  */
+anychart.heatMap = anychart.heatMap || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['HeatMap chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
 anychart.circularGauge = anychart.circularGauge || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Circular gauge']);
 };
@@ -827,6 +835,7 @@ goog.exportSymbol('anychart.pyramid', anychart.pyramid);//linkedFromModule
 goog.exportSymbol('anychart.radar', anychart.radar);
 goog.exportSymbol('anychart.polar', anychart.polar);
 goog.exportSymbol('anychart.sparkline', anychart.sparkline);
+goog.exportSymbol('anychart.heatMap', anychart.heatMap);
 goog.exportSymbol('anychart.scatter', anychart.scatter);
 goog.exportSymbol('anychart.map', anychart.map);
 goog.exportSymbol('anychart.choropleth', anychart.choropleth);

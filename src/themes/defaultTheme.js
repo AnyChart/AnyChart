@@ -39,6 +39,12 @@ window['anychart']['themes']['defaultTheme'] = {
     'items': ['circle', 'diamond', 'square', 'triangleDown', 'triangleUp', 'diagonalCross', 'pentagon', 'cross', 'line', 'star5', 'star4', 'trapezium', 'star7', 'star6', 'star10']
   },
 
+  'ordinalColor': {
+    'autoColors': function(rangesCount) {
+      return window['anychart']['color']['blendedHueProgression']('#ffd54f', '#ef6c00', rangesCount);
+    }
+  },
+
   // global background settings
   'defaultBackground': {
     'enabled': true,
@@ -2479,6 +2485,206 @@ window['anychart']['themes']['defaultTheme'] = {
   },
 
   // merge with chart
+  'heatMap': {
+    'scales': [
+      {
+        'type': 'ordinal',
+        'inverted': false,
+        'names': [],
+        'ticks': {
+          'interval': 1
+        }
+      },
+      {
+        'type': 'ordinal',
+        'inverted': false,
+        'names': [],
+        'ticks': {
+          'interval': 1
+        }
+      }
+    ],
+    'background': {
+      'enabled': true
+    },
+    'xAxes': [{}],
+    'yAxes': [{}],
+    'grids': [],
+    'padding': {
+      'top': 30,
+      'right': 20,
+      'bottom': 20,
+      'left': 20
+    },
+    'tooltip': {
+      'enabled': true,
+      'title': {
+        'enabled': true,
+        'fontSize': 13,
+        'fontWeight': 'normal'
+      },
+      'content': {'fontSize': 11},
+      'separator': {'enabled': true},
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'titleFormatter': function() {
+        return this['name'] || this['x'];
+      },
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'textFormatter': function() {
+        if (goog.isDef(this['heat'])) {
+          var value = 'Value: ' + this['valuePrefix'] + this['heat'] + this['valuePostfix'];
+          if (!isNaN(+this['heat']))
+            value += '\n' + 'Percent Value: ' + (this['heat'] * 100 / this['getStat']('sum')).toFixed(1) + '%';
+          return value;
+        } else {
+          return 'x: ' + this['x'] + ' y: ' + this['y'];
+        }
+      }
+    },
+    'legendItem': {
+      'iconStroke': null
+    },
+
+    /**
+     * @this {*}
+     * @return {*}
+     */
+    'fill': function() {
+      var color;
+      if (this['colorScale']) {
+        var value = this['iterator']['get']('heat');
+        color = this['colorScale']['valueToColor'](value);
+      } else {
+        color = window['anychart']['color']['setOpacity'](this['sourceColor'], 0.85, true);
+      }
+      return color;
+    },
+    /**
+     * @this {*}
+     * @return {*}
+     */
+    'hoverFill': function() {
+      return window['anychart']['color']['setOpacity'](this['sourceColor'], 0.6, true);
+    },
+    'selectFill': '#333333',
+    /**
+     * @this {*}
+     * @return {*}
+     */
+    'stroke': function() {
+      var color;
+      if (this['colorScale']) {
+        var value = this['iterator']['get']('heat');
+        color = this['colorScale']['valueToColor'](value);
+      } else {
+        color = this['sourceColor'];
+      }
+      return window['anychart']['color']['setThickness'](color, 1 , .85);
+    },
+    /**
+     * @this {*}
+     * @return {*}
+     */
+    'hoverStroke': function() {
+      return window['anychart']['color']['setThickness'](this['sourceColor'], 1, .85);
+    },
+    'selectStroke': null,
+
+    'labels': {
+      'enabled': false,
+      'fontSize': 11,
+      'adjustFontSize': true,
+      'minFontSize': 7,
+      'maxFontSize': 15,
+      'hAlign': 'center',
+      'vAlign': 'center',
+      'textWrap': 'noWrap',
+      'fontWeight': 'normal',
+      'fontColor': '#333',
+      'selectable': false,
+
+      'background': {
+        'enabled': false
+      },
+      'padding': {
+        'top': 2,
+        'right': 4,
+        'bottom': 2,
+        'left': 4
+      },
+      'position': 'center',
+      'anchor': 'center',
+      'offsetX': 0,
+      'offsetY': 0,
+      'rotation': 0,
+      'width': null,
+      'height': null,
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'textFormatter': function() {
+        return this['heat'];
+      },
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'positionFormatter': function() {
+        return this['value'];
+      }
+    },
+    'hoverLabels': {
+      'enabled': null
+    },
+    'selectLabels': {
+      'fontColor': '#f5f500',
+      'enabled': null
+    },
+
+    'markers': {
+      'enabled': false,
+      'disablePointerEvents': false,
+      'position': 'center',
+      'rotation': 0,
+      'anchor': 'center',
+      'offsetX': 0,
+      'offsetY': 0,
+      //'type': null,
+      'size': 4,
+      //'fill': '', // autoFill
+      //'stroke': '', // autoStroke
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'positionFormatter': function() {
+        return this['value'];
+      }
+    },
+    'hoverMarkers': {
+      'enabled': null,
+      'size': 6
+    },
+    'selectMarkers': {
+      'enabled': null,
+      'fill': '#f5f500'
+    },
+    'labelsDisplayMode': 'drop',
+
+    'hatchFill': false,
+    //'hoverHatchFill': null,
+
+    'clip': true
+  },
+
+  // merge with chart
   'scatter': {
     'legend': {
       'enabled': false
@@ -4521,11 +4727,6 @@ window['anychart']['themes']['defaultTheme'] = {
     },
     'unboundRegions': {'enabled': true, 'fill': '#F7F7F7', 'stroke': '#B9B9B9'},
     'linearColor': {'colors': ['#fff', '#ffd54f', '#ef6c00']},
-    'ordinalColor': {
-      'autoColors': function(rangesCount) {
-        return window['anychart']['color']['blendedHueProgression']('#ffd54f', '#ef6c00', rangesCount);
-      }
-    },
     'legend': {'enabled': false},
     'maxBubbleSize': '10%',
     'minBubbleSize': '3%',
@@ -5435,6 +5636,7 @@ window['anychart']['themes']['defaultTheme'] = {
       'zIndex': 0
     },
     'labelsFactory': {
+      'enabled': true,
       'zIndex': 0
     },
     'legend': {

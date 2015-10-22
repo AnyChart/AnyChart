@@ -1,6 +1,6 @@
 goog.provide('anychart.core.map.series.Choropleth');
-goog.require('anychart.core.map.scale.LinearColor');
 goog.require('anychart.core.map.series.BaseWithMarkers');
+goog.require('anychart.scales.LinearColor');
 
 
 
@@ -99,7 +99,7 @@ anychart.core.map.series.Choropleth.prototype.createFormatProvider = function(op
 
   if (this.colorScale_) {
     this.pointProvider['color'] = this.colorScale_.valueToColor(value);
-    if (this.colorScale_ instanceof anychart.core.map.scale.OrdinalColor) {
+    if (this.colorScale_ instanceof anychart.scales.OrdinalColor) {
       var range = this.colorScale_.getRangeByValue(/** @type {number} */(value));
       if (range) {
         this.pointProvider['colorRange'] = {
@@ -219,7 +219,7 @@ anychart.core.map.series.Choropleth.prototype.calculate = function() {
       }
 
       if (this.hasInvalidationState(anychart.ConsistencyState.MAP_COLOR_SCALE)) {
-        if (this.colorScale_ && this.colorScale_ instanceof anychart.core.map.scale.LinearColor) {
+        if (this.colorScale_ && this.colorScale_ instanceof anychart.scales.LinearColor) {
           var value = iterator.get(this.referenceValueNames[1]);
           this.colorScale_.extendDataRange(value);
         }

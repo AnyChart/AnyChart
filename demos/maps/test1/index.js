@@ -33,8 +33,15 @@ anychart.onDocumentReady(function() {
   chart.colorRange(true);
   chart.colorRange().marker().type("diamond");
 
+
+  series.tooltip().textFormatter(function() {
+    var count = this.getStat('pointsCount');
+    console.log(count);
+    return count  ;
+  });
+
   chart.container('container').draw();
 
   //chart.listen('pointsselect', function(e) {console.log(e.currentPoint, e.seriesStatus);});
-  chart.listen('pointshover', function(e) {console.log(e.currentPoint, e.seriesStatus);});
+  //chart.listen('pointshover', function(e) {console.log(e.currentPoint, e.seriesStatus);});
 });
