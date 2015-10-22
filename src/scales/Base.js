@@ -27,6 +27,20 @@ anychart.scales.Base = function() {
    */
   this.isInverted = false;
 
+  /**
+   * Zoom factor.
+   * @type {number}
+   * @private
+   */
+  this.zoomFactor_ = 1;
+
+  /**
+   * Zoom start.
+   * @type {number}
+   * @private
+   */
+  this.zoomStart_ = 0;
+
   this.applyStacking = anychart.scales.Base.prototype.applyModeNone_;
 };
 goog.inherits(anychart.scales.Base, anychart.core.Base);
@@ -54,6 +68,50 @@ anychart.scales.Base.prototype.transform = goog.abstractMethod;
  * @return {*} Value transformed to output scope.
  */
 anychart.scales.Base.prototype.inverseTransform = goog.abstractMethod;
+
+
+/**
+ * Sets scale zoom and requests scale reapplication.
+ * @param {number} factor
+ * @param {number} start
+ */
+anychart.scales.Base.prototype.setZoom = function(factor, start) {
+  if (this.zoomFactor_ == factor && this.zoomStart_ == start) return;
+  this.zoomFactor_ = factor;
+  this.zoomStart_ = start;
+  this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+};
+
+
+/**
+ * Getter for zoom factor.
+ * @return {number}
+ */
+anychart.scales.Base.prototype.getZoomFactor = function() {
+  return this.zoomFactor_;
+};
+
+
+/**
+ * Applies zoom settings to passed ratio.
+ * @param {number} ratio
+ * @return {number}
+ */
+anychart.scales.Base.prototype.applyZoomAndInverse = function(ratio) {
+  var result = (ratio - this.zoomStart_) * this.zoomFactor_;
+  return this.isInverted ? 1 - result : result;
+};
+
+
+/**
+ * Applies zoom settings in reversed direction.
+ * @param {number} ratio
+ * @return {number}
+ */
+anychart.scales.Base.prototype.reverseZoomAndInverse = function(ratio) {
+  if (this.isInverted) ratio = 1 - ratio;
+  return ratio / this.zoomFactor_ + this.zoomStart_;
+};
 
 
 /**

@@ -382,6 +382,46 @@ anychart.enums.normalizePosition = function(value, opt_default) {
 };
 
 
+/**
+ * ChartScroller possible positions.
+ * @enum {string}
+ */
+anychart.enums.ChartScrollerPosition = {
+  BEFORE_AXES: 'beforeAxes',
+  AFTER_AXES: 'afterAxes'
+};
+
+
+/**
+ * Normalizes chart scroller position value.
+ * @param {*} value
+ * @param {anychart.enums.ChartScrollerPosition=} opt_default Defaults to AFTER_AXES.
+ * @return {anychart.enums.ChartScrollerPosition}
+ */
+anychart.enums.normalizeChartScrollerPosition = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'beforeaxes':
+    case 'before':
+    case 'ba':
+    case 'b':
+    case 'inside':
+    case 'in':
+    case 'i':
+      return anychart.enums.ChartScrollerPosition.BEFORE_AXES;
+    case 'afteraxes':
+    case 'after':
+    case 'aa':
+    case 'a':
+    case 'outside':
+    case 'out':
+    case 'o':
+      return anychart.enums.ChartScrollerPosition.AFTER_AXES;
+  }
+  return opt_default || anychart.enums.ChartScrollerPosition.AFTER_AXES;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Align.
@@ -3218,3 +3258,6 @@ goog.exportSymbol('anychart.enums.TableSearchMode.EXACT_OR_PREV', anychart.enums
 goog.exportSymbol('anychart.enums.TableSearchMode.EXACT', anychart.enums.TableSearchMode.EXACT);
 goog.exportSymbol('anychart.enums.TableSearchMode.EXACT_OR_NEXT', anychart.enums.TableSearchMode.EXACT_OR_NEXT);
 goog.exportSymbol('anychart.enums.TableSearchMode.NEAREST', anychart.enums.TableSearchMode.NEAREST);
+
+goog.exportSymbol('anychart.enums.ChartScrollerPosition.AFTER_AXES', anychart.enums.ChartScrollerPosition.AFTER_AXES);
+goog.exportSymbol('anychart.enums.ChartScrollerPosition.BEFORE_AXES', anychart.enums.ChartScrollerPosition.BEFORE_AXES);

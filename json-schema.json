@@ -379,6 +379,19 @@
             {"$ref": "#/definitions/anychart.scales.Logarithmic"},
             {"$ref": "#/definitions/anychart.scales.DateTime"}
           ]
+        },
+        "xZoom": {
+          "oneOf": [
+            {"type": "number"},
+            {"type": "boolean"},
+            {"$ref": "#/definitions/anychart.core.CartesianXZoom"}
+          ]
+        },
+        "xScroller": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.ChartScroller"}
+          ]
         }
       },
       "required": ["type"]
@@ -2481,6 +2494,104 @@
       }
     },
 
+    "anychart.core.ui.ChartScroller": {
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.VisualBase"}
+      ],
+      "fill": {
+        "$ref": "#/definitions/fill"
+      },
+      "selectedFill": {
+        "$ref": "#/definitions/fill"
+      },
+      "outlineStroke": {
+        "$ref": "#/definitions/stroke"
+      },
+      "thumbs": {
+        "$ref": "#/definitions/anychart.core.ui.ScrollerThumbs"
+      },
+      "orientation": {
+        "$ref": "#/definitions/anychart.enums.Orientation"
+      },
+      "autoHide": {
+        "type": "boolean"
+      },
+      "allowRangeChange": {
+        "type": "boolean"
+      },
+      "height": {
+        "type": [
+          "number",
+          "string"
+        ]
+      },
+      "minHeight": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ]
+      },
+      "maxHeight": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ]
+      },
+      "position": {
+        "$ref": "#/definitions/anychart.enums.ChartScrollerPosition"
+      }
+    },
+
+    "anychart.core.ui.ScrollerThumbs": {
+      "enabled": {
+        "type": "boolean"
+      },
+      "fill": {
+        "$ref": "#/definitions/fill"
+      },
+      "hoverFill": {
+        "$ref": "#/definitions/fill"
+      },
+      "stroke": {
+        "$ref": "#/definitions/stroke"
+      },
+      "hoverStroke": {
+        "$ref": "#/definitions/stroke"
+      },
+      "autoHide": {
+        "type": "boolean"
+      }
+    },
+
+    "anychart.core.CartesianXZoom": {
+      "type": [
+        "object"
+      ],
+      "properties": {
+        "continuous": {
+          "type": "boolean"
+        },
+        "startRatio": {
+          "type": "number"
+        },
+        "endRatio": {
+          "type": "number"
+        },
+        "startValue": {
+        },
+        "endValue": {
+        },
+        "pointsCount": {
+          "type": "number"
+        },
+        "scale": {
+          "type": "number"
+        }
+      }
+    },
+
     "anychart.core.axes.Circular": {
       "type": "object",
       "allOf": [
@@ -4064,6 +4175,12 @@
         "left",
         "right",
         "bottom"
+      ]
+    },
+    "anychart.enums.ChartScrollerPosition": {
+      "enum": [
+        "afterAxes",
+        "beforeAxes"
       ]
     },
     "anychart.enums.Sort": {

@@ -1,18 +1,13 @@
-var scroller;
+var chart;
+
 anychart.onDocumentReady(function() {
-  var stage = anychart.graphics.create('container');
-
-  scroller = anychart.ui.scroller();
-  scroller.setRange(0.25, 0.75);
-  scroller.selectedFill('red');
-  scroller.fill('green');
-  scroller.container(stage).draw();
-
-  scroller.listen('scrollerchangestart', handle);
-  scroller.listen('scrollerchange', handle);
-  scroller.listen('scrollerchangefinish', handle);
+  chart = anychart.ui.scroller();
+  chart.height(100);
+  chart.padding(0, 10, 20, 30);
+  chart.container('container').draw();
+  var rect = chart.container().getStage().rect().stroke('green');
+  rect.setBounds(chart.getRemainingBounds());
+  chart.listen('signal', function() {
+    rect.setBounds(chart.getRemainingBounds());
+  });
 });
-
-function handle(e) {
-  console.log(e.source, e.type, e.startRatio, e.endRatio);
-}

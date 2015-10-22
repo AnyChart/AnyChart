@@ -346,9 +346,7 @@ anychart.core.cartesian.series.Marker.prototype.startDrawing = function() {
 
   this.marker_.suspendSignalsDispatching();
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA)) {
-    this.marker_.clear();
-  }
+  this.marker_.clear();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     /** @type {acgraph.vector.Element} */(this.rootLayer).zIndex(/** @type {number} */(this.zIndex()));

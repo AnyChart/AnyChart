@@ -97,6 +97,9 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="negative_labels" type="core.LabelsFactory"/>
             <!-- charts.Sparkline and charts.Funnel and charts.Pyramid elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
+            <!-- new Cartesian elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="x_zoom" type="core.CartesianXZoom"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="x_scroller" type="core.ChartScroller"/>
         </xsd:all>
         <!-- core.Chart attrs -->
         <xsd:attributeGroup ref="attrs.VisualBase"/>
@@ -185,6 +188,9 @@
         <xsd:attribute name="negative_markers" type="simple.MarkerType"/>
         <xsd:attribute name="negative_labels" type="simple.BoolOrNull" default="false"/>
         <xsd:attribute name="markers" type="simple.MarkerType"/>
+        <!-- new Cartesian attributes -->
+        <xsd:attribute name="x_zoom" type="simple.NumberOrBoolOrNull"/>
+        <xsd:attribute name="x_scroller" type="simple.BoolOrNull"/>
     </xsd:complexType>
 
     <xsd:complexType name="Gauge">
@@ -1682,6 +1688,62 @@
     </xsd:complexType>
 
 
+    <!-- Cartesian zoom -->
+    <xsd:complexType name="core.CartesianXZoom">
+        <xsd:attribute name="continuous" type="simple.Bool" default="true"/>
+        <xsd:attribute name="start_ratio" type="simple.Ratio" default="0"/>
+        <xsd:attribute name="end_ratio" type="simple.Ratio" default="1"/>
+        <xsd:attribute name="points_count" type="xsd:unsignedInt"/>
+        <xsd:attribute name="start_value" type="xsd:string"/>
+        <xsd:attribute name="end_value" type="xsd:string"/>
+        <xsd:attribute name="scale" type="simple.ScaleRef"/>
+    </xsd:complexType>
+
+    <!-- Chart scroller -->
+    <xsd:complexType name="core.ChartScroller">
+        <xsd:all>
+            <xsd:element name="fill" type="Fill" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="selected_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="outline_stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="thumbs" type="core.ScrollerThumbs" minOccurs="0" maxOccurs="1"/>
+        </xsd:all>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+        <xsd:attribute name="orientation" type="enums.Orientation"/>
+        <xsd:attribute name="auto_hide" type="simple.Bool" default="false"/>
+        <xsd:attribute name="allow_range_change" type="simple.Bool" default="true"/>
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="selected_fill" type="xsd:string"/>
+        <xsd:attribute name="outline_stroke" type="xsd:string"/>
+        <xsd:attribute name="height" type="simple.NumberOrPercent"/>
+        <xsd:attribute name="min_height" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="max_height" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="thumbs" type="simple.BoolOrNull"/>
+        <xsd:attribute name="position" type="enums.ChartScrollerPosition" default="afterAxes"/>
+    </xsd:complexType>
+
+    <xsd:simpleType name="enums.ChartScrollerPosition">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="beforeAxes"/>
+            <xsd:enumeration value="afterAxes"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="core.ScrollerThumbs">
+        <xsd:all>
+            <xsd:element name="fill" type="Fill" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="hover_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="hover_stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
+        </xsd:all>
+        <xsd:attribute name="enabled" type="simple.BoolOrNull"/>
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="hover_fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="hover_stroke" type="xsd:string"/>
+        <xsd:attribute name="auto_hide" type="simple.Bool" default="false"/>
+    </xsd:complexType>
+
+
     <!-- Simple types -->
 
     <xsd:simpleType name="simple.ChartScaleRef">
@@ -1746,6 +1808,21 @@
             </xsd:simpleType>
             <xsd:simpleType>
                 <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="simple.NumberOrBoolOrNull">
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="true"/>
+                    <xsd:enumeration value="false"/>
+                    <xsd:enumeration value="null"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:double"/>
             </xsd:simpleType>
         </xsd:union>
     </xsd:simpleType>

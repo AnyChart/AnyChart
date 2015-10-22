@@ -22,7 +22,7 @@ goog.inherits(anychart.core.cartesian.series.BarBase, anychart.core.cartesian.se
 /** @inheritDoc */
 anychart.core.cartesian.series.BarBase.prototype.getPointWidth = function() {
   // todo(Anton Saukh): fix for linear scale case.
-  var categoryWidth = (this.xScale().getPointWidthRatio() || (1 / this.getIterator().getRowsCount())) *
+  var categoryWidth = (this.xScale().getPointWidthRatio() || (this.xScale().getZoomFactor() / this.getIterator().getRowsCount())) *
       this.pixelBoundsCache.height;
   return anychart.utils.normalizeSize(/** @type {(number|string)} */(this.pointWidth()), categoryWidth);
 };

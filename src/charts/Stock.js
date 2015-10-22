@@ -346,7 +346,7 @@ anychart.charts.Stock.prototype.calculateScales_ = function() {
     }
   }
 
-  if (this.scroller_ && this.scroller_.enabled()) {
+  if (this.scroller_ && this.scroller_.isVisible()) {
     series = this.scroller_.getAllSeries();
     for (j = 0; j < series.length; j++) {
       aSeries = series[j];

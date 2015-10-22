@@ -374,8 +374,7 @@ anychart.scales.ScatterBase.prototype.needsAutoCalc = function() {
 anychart.scales.ScatterBase.prototype.transform = function(value, opt_subRangeRatio) {
   this.calculate();
   value = anychart.utils.toNumber(value);
-  var result = (+(/** @type {number} */(value)) - this.min) / this.range;
-  return this.isInverted ? 1 - result : result;
+  return this.applyZoomAndInverse((+(/** @type {number} */(value)) - this.min) / this.range);
 };
 
 
@@ -462,7 +461,7 @@ anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
  */
 anychart.scales.ScatterBase.prototype.inverseTransform = function(ratio) {
   this.calculate();
-  if (this.isInverted) ratio = 1 - ratio;
+  ratio = this.reverseZoomAndInverse(ratio);
   return ratio * this.range + this.min;
 };
 

@@ -71,6 +71,10 @@ anychart.ConsistencyState = {
   CARTESIAN_AXES_MARKERS: 1 << 17,
   CARTESIAN_GRIDS: 1 << 18,
   CARTESIAN_CROSSHAIR: 1 << 19,
+  CARTESIAN_ZOOM: 1 << 20,
+  CARTESIAN_SCALE_MAPS: 1 << 21,
+  CARTESIAN_Y_SCALES: 1 << 22,
+  CARTESIAN_X_SCROLLER: 1 << 23,
   //---------------------------------- PYRAMID/FUNNEL STATES (CHART) ---------------------------------
   PYRAMID_FUNNEL_LABELS: 1 << 11,
   PYRAMID_FUNNEL_MARKERS: 1 << 12,
@@ -208,6 +212,8 @@ anychart.ConsistencyState = {
   TABLE_STRUCTURE: 1 << 10,
   //---------------------------------- SCROLLER (VB) ---------------------------------------------
   SCROLLER_THUMBS_SHAPE: 1 << 5,
+  SCROLLER_ORIENTATION: 1 << 6,
+  SCROLLER_AUTO_HIDE: 1 << 7,
   //---------------------------------- STOCK CHART (CHART) -------------------------------------------
   STOCK_PLOTS_APPEARANCE: 1 << 11,
   STOCK_SCROLLER: 1 << 12,
@@ -228,8 +234,8 @@ anychart.ConsistencyState = {
   //---------------------------------- STOCK DATETIME AXIS (VB) ----------------------------------------
   STOCK_DTAXIS_BACKGROUND: 1 << 5,
   //---------------------------------- STOCK SCROLLER (SCROLLER) ----------------------------------------
-  STOCK_SCROLLER_SERIES: 1 << 6,
-  STOCK_SCROLLER_AXIS: 1 << 7,
+  STOCK_SCROLLER_SERIES: 1 << 7,
+  STOCK_SCROLLER_AXIS: 1 << 8,
   /**
    * Combination of all states.
    */

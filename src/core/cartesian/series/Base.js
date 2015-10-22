@@ -346,9 +346,16 @@ anychart.core.cartesian.series.Base.prototype.getReferenceCoords = function() {
 
     switch (this.referenceValueMeanings[i]) {
       case 'x':
-        pix = xScale.isMissing(val) ? NaN : this.applyRatioToBounds(
-            xScale.transform(val, /** @type {number} */(this.xPointPosition())),
-            true);
+        if (xScale.isMissing(val))
+          pix = NaN;
+        else {
+          var ratio0 = xScale.transform(val, 0);
+          var ratio1 = xScale.transform(val, 1);
+          if (ratio0 < 0 && ratio1 < 0 || ratio0 > 1 && ratio1 > 1) {
+            pix = NaN;
+          } else
+            pix = this.applyRatioToBounds(xScale.transform(val, /** @type {number} */(this.xPointPosition())), true);
+        }
         break;
       case 'y':
         iterator.meta('stackZero', yScale.getPrevVal(val));

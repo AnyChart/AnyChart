@@ -9,9 +9,12 @@ goog.require('anychart.core.axisMarkers.Range');
 goog.require('anychart.core.axisMarkers.Text');
 goog.require('anychart.core.cartesian.series.Base');
 goog.require('anychart.core.grids.Linear');
+goog.require('anychart.core.ui.ChartScroller');
 goog.require('anychart.core.ui.Crosshair');
 goog.require('anychart.core.utils.Error');
+goog.require('anychart.core.utils.IZoomableChart');
 goog.require('anychart.core.utils.OrdinalIterator');
+goog.require('anychart.core.utils.OrdinalZoom');
 goog.require('anychart.core.utils.ScatterIterator');
 goog.require('anychart.enums');
 goog.require('anychart.palettes.DistinctColors');
@@ -36,6 +39,7 @@ goog.require('anychart.scales');
  * Chart can contain any number of series.
  * Each series is interactive, you can customize click and hover behavior and other params.
  * @extends {anychart.core.SeparateChart}
+ * @implements {anychart.core.utils.IZoomableChart}
  * @constructor
  * @param {boolean=} opt_barChartMode If true, sets the chart to Bar Chart mode, swapping default chart elements
  *    behaviour to horizontal-oriented (setting default layout to VERTICAL, swapping axes, etc).
@@ -167,6 +171,13 @@ anychart.charts.Cartesian = function(opt_barChartMode) {
    */
   this.minBubbleSize_;
 
+  /**
+   * Zoom settings.
+   * @type {anychart.core.utils.OrdinalZoom}
+   * @private
+   */
+  this.xZoom_ = new anychart.core.utils.OrdinalZoom(this, true);
+
   this.defaultSeriesType(anychart.enums.CartesianSeriesType.LINE);
   this.setType(anychart.enums.ChartTypes.CARTESIAN);
 };
@@ -224,11 +235,15 @@ anychart.charts.Cartesian.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.CARTESIAN_MARKER_PALETTE |
     anychart.ConsistencyState.CARTESIAN_HATCH_FILL_PALETTE |
     anychart.ConsistencyState.CARTESIAN_SCALES |
+    anychart.ConsistencyState.CARTESIAN_SCALE_MAPS |
+    anychart.ConsistencyState.CARTESIAN_Y_SCALES |
     anychart.ConsistencyState.CARTESIAN_SERIES |
     anychart.ConsistencyState.CARTESIAN_AXES |
     anychart.ConsistencyState.CARTESIAN_AXES_MARKERS |
     anychart.ConsistencyState.CARTESIAN_GRIDS |
-    anychart.ConsistencyState.CARTESIAN_CROSSHAIR;
+    anychart.ConsistencyState.CARTESIAN_CROSSHAIR |
+    anychart.ConsistencyState.CARTESIAN_X_SCROLLER |
+    anychart.ConsistencyState.CARTESIAN_ZOOM;
 
 
 /**
@@ -264,6 +279,164 @@ anychart.charts.Cartesian.ZINDEX_LABEL = 40;
  * @type {number}
  */
 anychart.charts.Cartesian.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Zoom
+//
+//----------------------------------------------------------------------------------------------------------------------
+//region anychart.core.utils.IZoomableChart members
+/**
+ * Invalidates zoom.
+ * @param {boolean} forX
+ */
+anychart.charts.Cartesian.prototype.invalidateZoom = function(forX) {
+  // we do not distinguish between x and y zoom because we have only the x one
+  this.invalidate(anychart.ConsistencyState.CARTESIAN_ZOOM, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * Returns default scale for given dimension.
+ * @param {boolean} forX
+ * @return {anychart.scales.Base}
+ */
+anychart.charts.Cartesian.prototype.getDefaultScale = function(forX) {
+  return /** @type {anychart.scales.Base} */(forX ? this.xScale() : this.yScale());
+};
+
+
+/**
+ * Ensures that scales are ready for zooming.
+ */
+anychart.charts.Cartesian.prototype.ensureScalesReadyForZoom = function() {
+  this.makeScaleMaps_();
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_SCALES)) {
+    if (!!this.xZoom().getSetup())
+      this.calculate();
+  }
+};
+//endregion
+
+
+/**
+ * Zoom settings getter/setter.
+ * @param {(number|boolean|null|Object)=} opt_value
+ * @return {anychart.charts.Cartesian|anychart.core.utils.OrdinalZoom}
+ */
+anychart.charts.Cartesian.prototype.xZoom = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.suspendSignalsDispatching();
+    this.xZoom_.setup(opt_value);
+    this.resumeSignalsDispatching(true);
+    return this;
+  }
+  return this.xZoom_;
+};
+
+
+/**
+ * Scroller getter-setter.
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {anychart.core.ui.ChartScroller|anychart.charts.Cartesian}
+ */
+anychart.charts.Cartesian.prototype.xScroller = function(opt_value) {
+  if (!this.xScroller_) {
+    this.xScroller_ = new anychart.core.ui.ChartScroller();
+    this.xScroller_.setParentEventTarget(this);
+    this.xScroller_.listenSignals(this.scrollerInvalidated_, this);
+    this.eventsHandler.listen(this.xScroller_, anychart.enums.EventType.SCROLLER_CHANGE_START, this.scrollerChangeStartHandler_);
+    this.eventsHandler.listen(this.xScroller_, anychart.enums.EventType.SCROLLER_CHANGE, this.scrollerChangeHandler_);
+    this.eventsHandler.listen(this.xScroller_, anychart.enums.EventType.SCROLLER_CHANGE_FINISH, this.scrollerChangeFinishHandler_);
+    this.invalidate(
+        anychart.ConsistencyState.CARTESIAN_X_SCROLLER |
+        anychart.ConsistencyState.BOUNDS,
+        anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.xScroller_.setup(opt_value);
+    return this;
+  } else {
+    return this.xScroller_;
+  }
+};
+
+
+/**
+ * Scroller signals handler.
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.charts.Cartesian.prototype.scrollerInvalidated_ = function(e) {
+  var state = anychart.ConsistencyState.CARTESIAN_X_SCROLLER;
+  var signal = anychart.Signal.NEEDS_REDRAW;
+  if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    state |= anychart.ConsistencyState.BOUNDS;
+    signal |= anychart.Signal.BOUNDS_CHANGED;
+  }
+  this.invalidate(state, signal);
+};
+
+
+/**
+ * Scroller change start event handler.
+ * @param {anychart.core.ui.Scroller.ScrollerChangeEvent} e
+ * @private
+ */
+anychart.charts.Cartesian.prototype.scrollerChangeStartHandler_ = function(e) {
+  //if (this.dispatchRangeChange_(
+  //    anychart.enums.EventType.SELECTED_RANGE_CHANGE_START,
+  //    this.transformScrollerSource_(e['source'])))
+  //  this.preventHighlight_();
+  //else
+  //  e.preventDefault();
+};
+
+
+/**
+ * Scroller change start event handler.
+ * @param {anychart.core.ui.Scroller.ScrollerChangeEvent} e
+ * @private
+ */
+anychart.charts.Cartesian.prototype.scrollerChangeHandler_ = function(e) {
+  if (this.xZoom_.continuous()) {
+    e.preventDefault();
+    this.suspendSignalsDispatching();
+    this.xZoom_.setTo(e['startRatio'], e['endRatio']);
+    this.resumeSignalsDispatching(true);
+  }
+  //e.preventDefault();
+  //var first = e['startKey'];
+  //var last = e['endKey'];
+  //var source = this.transformScrollerSource_(e['source']);
+  //if (this.dispatchRangeChange_(
+  //    anychart.enums.EventType.SELECTED_RANGE_BEFORE_CHANGE,
+  //    source,
+  //    Math.min(first, last), Math.max(first, last))) {
+  //  this.selectRangeInternal(first, last);
+  //  this.dispatchRangeChange_(anychart.enums.EventType.SELECTED_RANGE_CHANGE, source);
+  //}
+};
+
+
+/**
+ * Scroller change start event handler.
+ * @param {anychart.core.ui.Scroller.ScrollerChangeEvent} e
+ * @private
+ */
+anychart.charts.Cartesian.prototype.scrollerChangeFinishHandler_ = function(e) {
+  if (!this.xZoom_.continuous()) {
+    this.suspendSignalsDispatching();
+    this.xZoom_.setTo(e['startRatio'], e['endRatio']);
+    this.resumeSignalsDispatching(true);
+  }
+  //this.dispatchRangeChange_(
+  //    anychart.enums.EventType.SELECTED_RANGE_CHANGE_FINISH,
+  //    this.transformScrollerSource_(e['source']));
+  //this.allowHighlight_();
+};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -428,7 +601,10 @@ anychart.charts.Cartesian.prototype.xScale = function(opt_value) {
       if (this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
         state = anychart.ConsistencyState.CHART_LEGEND;
       }
-      this.invalidate(anychart.ConsistencyState.CARTESIAN_SCALES | state, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.CARTESIAN_SCALES |
+          anychart.ConsistencyState.CARTESIAN_SCALE_MAPS |
+          state,
+          anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
@@ -488,7 +664,9 @@ anychart.charts.Cartesian.prototype.yScale = function(opt_value) {
     }
     if (this.yScale_ != opt_value) {
       this.yScale_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.CARTESIAN_SCALES, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.CARTESIAN_SCALES |
+          anychart.ConsistencyState.CARTESIAN_SCALE_MAPS,
+          anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
@@ -1627,7 +1805,8 @@ anychart.charts.Cartesian.prototype.createSeriesByType_ = function(type, data, o
     this.invalidate(
         anychart.ConsistencyState.CARTESIAN_SERIES |
         anychart.ConsistencyState.CHART_LEGEND |
-        anychart.ConsistencyState.CARTESIAN_SCALES,
+        anychart.ConsistencyState.CARTESIAN_SCALES |
+        anychart.ConsistencyState.CARTESIAN_SCALE_MAPS,
         anychart.Signal.NEEDS_REDRAW);
   } else {
     anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
@@ -1663,6 +1842,7 @@ anychart.charts.Cartesian.prototype.seriesInvalidated_ = function(event) {
   }
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
     state |= anychart.ConsistencyState.CARTESIAN_SCALES;
+    state |= anychart.ConsistencyState.CARTESIAN_SCALE_MAPS;
   }
   if (event.hasSignal(anychart.Signal.NEED_UPDATE_LEGEND)) {
     state |= anychart.ConsistencyState.CHART_LEGEND;
@@ -1809,6 +1989,15 @@ anychart.charts.Cartesian.prototype.minBubbleSize = function(opt_value) {
  * Calculate cartesian chart properties.
  */
 anychart.charts.Cartesian.prototype.calculate = function() {
+  if (!this.hasInvalidationState(
+      anychart.ConsistencyState.CARTESIAN_SCALES |
+      anychart.ConsistencyState.CARTESIAN_SCALE_MAPS |
+      anychart.ConsistencyState.CARTESIAN_Y_SCALES)) {
+    return;
+  }
+
+  this.invalidate(anychart.ConsistencyState.CARTESIAN_Y_SCALES);
+
   /** @type {number} */
   var i;
   /** @type {number} */
@@ -1841,23 +2030,24 @@ anychart.charts.Cartesian.prototype.calculate = function() {
   var value;
   /** @type {Array.<number, number>} */
   var errValues;
+  var ratio0, ratio1;
+
+  anychart.core.Base.suspendSignalsDispatching(this.series_);
+
+  this.makeScaleMaps_();
+
+  yScalesToCalc = [];
+  // parsing y scales map and getting lists of scales that need to be calculated and resetting them.
+  for (id in this.yScales_) {
+    scale = this.yScales_[id];
+    if (scale.needsAutoCalc()) {
+      scale.startAutoCalc(); // starting autocalc for stacked scales too.
+      if (scale.stackMode() != anychart.enums.ScaleStackMode.VALUE)
+        yScalesToCalc.push(scale);
+    }
+  }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_SCALES)) {
-    anychart.core.Base.suspendSignalsDispatching(this.series_);
-
-    this.makeScaleMaps_();
-
-    yScalesToCalc = [];
-
-    // parsing y scales map and getting lists of scales that need to be calculated and resetting them.
-    for (id in this.yScales_) {
-      scale = this.yScales_[id];
-      if (scale.needsAutoCalc()) {
-        scale.startAutoCalc(); // starting autocalc for stacked scales too.
-        if (scale.stackMode() != anychart.enums.ScaleStackMode.VALUE)
-          yScalesToCalc.push(scale);
-      }
-    }
     var isErrorAvailableForScale;
     // parsing x scales map and calculating them if needed as they cannot be stacked.
     for (id in this.xScales_) {
@@ -1892,7 +2082,9 @@ anychart.charts.Cartesian.prototype.calculate = function() {
       for (i = 0; i < series.length; i++)
         series[i].categoriseData(categories);
     }
+  }
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_Y_SCALES)) {
     // calculate non-stacked y scales.
     for (i = 0; i < yScalesToCalc.length; i++) {
       scale = yScalesToCalc[i];
@@ -1904,7 +2096,12 @@ anychart.charts.Cartesian.prototype.calculate = function() {
           aSeries = series[j];
           if (aSeries.enabled() && aSeries.supportsStack()) {
             iterator = aSeries.getResetIterator();
+            xScale = /** @type {anychart.scales.Base} */(aSeries.xScale());
             while (iterator.advance()) {
+              value = iterator.get('x');
+              ratio0 = xScale.transform(value, 0);
+              ratio1 = xScale.transform(value, 1);
+              if (ratio0 < 0 && ratio1 < 0 || ratio0 > 1 && ratio1 > 1) continue;
               values = aSeries.getReferenceScaleValues();
               if (values) {
                 for (var k = values.length; k--;) {
@@ -1927,7 +2124,12 @@ anychart.charts.Cartesian.prototype.calculate = function() {
           aSeries = series[j];
           if (!aSeries.enabled()) continue;
           iterator = aSeries.getResetIterator();
+          xScale = /** @type {anychart.scales.Base} */(aSeries.xScale());
           while (iterator.advance()) {
+            value = iterator.get('x');
+            ratio0 = xScale.transform(value, 0);
+            ratio1 = xScale.transform(value, 1);
+            if (ratio0 < 0 && ratio1 < 0 || ratio0 > 1 && ratio1 > 1) continue;
             values = aSeries.getReferenceScaleValues();
             if (values)
               scale.extendDataRange.apply(scale, values);
@@ -1982,25 +2184,6 @@ anychart.charts.Cartesian.prototype.calculate = function() {
       }
     }
 
-    // calculate auto names for scales with predefined names field.
-    for (id in this.ordinalScalesWithNamesField_) {
-      var ordScale = /** @type {anychart.scales.Ordinal} */ (this.ordinalScalesWithNamesField_[id]);
-      series = this.seriesOfOrdinalScalesWithNamesField_[goog.getUid(ordScale)];
-      var fieldName = ordScale.getNamesField();
-      var autoNames = [];
-      for (i = 0; i < series.length; i++) {
-        aSeries = series[i];
-        iterator = aSeries.getResetIterator();
-        while (iterator.advance()) {
-          var valueIndex = ordScale.getIndexByValue(iterator.get('x'));
-          var name = iterator.get(fieldName);
-          if (!goog.isDef(autoNames[valueIndex]))
-            autoNames[valueIndex] = name || iterator.get('x') || iterator.get('value');
-        }
-      }
-      ordScale.setAutoNames(autoNames);
-    }
-
     var max = -Infinity;
     var min = Infinity;
     var sum = 0;
@@ -2030,10 +2213,50 @@ anychart.charts.Cartesian.prototype.calculate = function() {
     }
     //----------------------------------end calc statistics for series
 
-    anychart.core.Base.resumeSignalsDispatchingTrue(this.series_);
+  }
 
-    this.markConsistent(anychart.ConsistencyState.CARTESIAN_SCALES);
-    this.scalesFinalization_ = true;
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_SCALES)) {
+    // calculate auto names for scales with predefined names field.
+    for (id in this.ordinalScalesWithNamesField_) {
+      var ordScale = /** @type {anychart.scales.Ordinal} */ (this.ordinalScalesWithNamesField_[id]);
+      series = this.seriesOfOrdinalScalesWithNamesField_[goog.getUid(ordScale)];
+      var fieldName = ordScale.getNamesField();
+      var autoNames = [];
+      for (i = 0; i < series.length; i++) {
+        aSeries = series[i];
+        iterator = aSeries.getResetIterator();
+        while (iterator.advance()) {
+          var valueIndex = ordScale.getIndexByValue(iterator.get('x'));
+          var name = iterator.get(fieldName);
+          if (!goog.isDef(autoNames[valueIndex]))
+            autoNames[valueIndex] = name || iterator.get('x') || iterator.get('value');
+        }
+      }
+      ordScale.setAutoNames(autoNames);
+    }
+  }
+
+  this.markConsistent(anychart.ConsistencyState.CARTESIAN_SCALES);
+  this.markConsistent(anychart.ConsistencyState.CARTESIAN_Y_SCALES);
+  this.scalesFinalization_ = true;
+  anychart.core.Base.resumeSignalsDispatchingTrue(this.series_);
+
+  if (this.scalesFinalization_) {
+    var scalesChanged = false;
+    for (i in this.xScales_) {
+      scale = this.xScales_[i];
+      if (scale.needsAutoCalc())
+        scalesChanged |= scale.finishAutoCalc();
+    }
+    for (i in this.yScales_) {
+      scale = this.yScales_[i];
+      if (scale.needsAutoCalc())
+        scalesChanged |= scale.finishAutoCalc();
+    }
+    this.scalesFinalization_ = false;
+    if (scalesChanged) {
+      this.invalidateSeries_();
+    }
   }
 };
 
@@ -2043,6 +2266,7 @@ anychart.charts.Cartesian.prototype.calculate = function() {
  * @private
  */
 anychart.charts.Cartesian.prototype.makeScaleMaps_ = function() {
+  if (!this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_SCALE_MAPS)) return;
   var i;
   var id;
   var count;
@@ -2123,6 +2347,8 @@ anychart.charts.Cartesian.prototype.makeScaleMaps_ = function() {
   this.seriesOfYScaleMap_ = seriesOfYScaleMap;
   this.ordinalScalesWithNamesField_ = ordinalScalesWithNamesField;
   this.seriesOfOrdinalScalesWithNamesField_ = seriesOfOrdinalScalesWithNamesField;
+
+  this.markConsistent(anychart.ConsistencyState.CARTESIAN_SCALE_MAPS);
 };
 
 
@@ -2468,27 +2694,23 @@ anychart.charts.Cartesian.prototype.beforeDraw = function() {
  * @param {anychart.math.Rect} bounds Bounds of cartesian content area.
  */
 anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
-  var i, count;
+  var i, count, scale;
+
+  this.xScroller().suspendSignalsDispatching();
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_ZOOM)) {
+    this.ensureScalesReadyForZoom();
+    for (i in this.xScales_) {
+      var start = this.xZoom().getStartRatio();
+      var factor = 1 / (this.xZoom().getEndRatio() - start);
+      (/** @type {anychart.scales.Base} */(this.xScales_[i])).setZoom(factor, start);
+    }
+    this.xScroller().setRangeInternal(this.xZoom().getStartRatio(), this.xZoom().getEndRatio());
+    this.markConsistent(anychart.ConsistencyState.CARTESIAN_ZOOM);
+    this.invalidate(anychart.ConsistencyState.CARTESIAN_Y_SCALES | anychart.ConsistencyState.CARTESIAN_X_SCROLLER);
+  }
 
   this.calculate();
-  if (this.scalesFinalization_) {
-    var scale;
-    var scalesChanged = false;
-    for (i in this.xScales_) {
-      scale = this.xScales_[i];
-      if (scale.needsAutoCalc())
-        scalesChanged |= scale.finishAutoCalc();
-    }
-    for (i in this.yScales_) {
-      scale = this.yScales_[i];
-      if (scale.needsAutoCalc())
-        scalesChanged |= scale.finishAutoCalc();
-    }
-    this.scalesFinalization_ = false;
-    if (scalesChanged) {
-      this.invalidateSeries_();
-    }
-  }
 
   if (this.isConsistent())
     return;
@@ -2522,7 +2744,33 @@ anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
     //total bounds of content area
     var contentAreaBounds = bounds.clone().round();
     var attempt = 0;
+    var scroller = this.xScroller();
+    var scrollerBeforeAxes = scroller.position() == anychart.enums.ChartScrollerPosition.BEFORE_AXES;
+    scroller.padding(0);
+    scroller.parentBounds(contentAreaBounds);
+    var scrollerHorizontal = scroller.isHorizontal();
+    var scrollerSize;
+    if (scrollerBeforeAxes) {
+      if (scrollerHorizontal) {
+        scrollerSize = contentAreaBounds.height - scroller.getRemainingBounds().height;
+      } else {
+        scrollerSize = contentAreaBounds.width - scroller.getRemainingBounds().width;
+      }
+    } else {
+      contentAreaBounds = scroller.getRemainingBounds();
+    }
 
+    for (i = 0, count = this.xAxes_.length; i < count; i++) {
+      this.xAxes_[i].suspendSignalsDispatching();
+      this.xAxes_[i].padding(0);
+    }
+
+    for (i = 0, count = this.yAxes_.length; i < count; i++) {
+      this.yAxes_[i].suspendSignalsDispatching();
+      this.yAxes_[i].padding(0);
+    }
+
+    var boundsWithoutAxes;
     do {
       //axes local vars
       var remainingBounds;
@@ -2533,7 +2781,7 @@ anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
       var leftOffset = 0;
       var rightOffset = 0;
       var complete = true;
-      var boundsWithoutAxes = bounds.clone();
+      boundsWithoutAxes = contentAreaBounds.clone();
       this.topAxisPadding_ = NaN;
       this.bottomAxisPadding_ = NaN;
       this.leftAxisPadding_ = NaN;
@@ -2543,7 +2791,6 @@ anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
       for (i = axes.length; i--;) {
         axis = /** @type {anychart.core.axes.Linear} */(axes[i]);
         if (axis && axis.enabled()) {
-          axis.suspendSignalsDispatching();
           axis.parentBounds(contentAreaBounds);
           orientation = axis.orientation();
           axisStrokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(axis.stroke()));
@@ -2577,8 +2824,40 @@ anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
             if (isNaN(this.rightAxisPadding_))
               this.rightAxisPadding_ = axisStrokeThickness;
           }
-          axis.resumeSignalsDispatching(false);
         }
+      }
+
+      if (scrollerBeforeAxes) {
+        switch (scroller.orientation()) {
+          case anychart.enums.Orientation.TOP:
+            scroller.padding().top(topOffset + (this.topAxisPadding_ || 0));
+            scroller.padding().bottom(0);
+            topOffset += scrollerSize;
+            break;
+          case anychart.enums.Orientation.BOTTOM:
+            scroller.padding().top(0);
+            scroller.padding().bottom(bottomOffset + (this.bottomAxisPadding_ || 0));
+            bottomOffset += scrollerSize;
+            break;
+          case anychart.enums.Orientation.LEFT:
+            scroller.padding().left(leftOffset + (this.leftAxisPadding_ || 0));
+            scroller.padding().right(0);
+            leftOffset += scrollerSize;
+            break;
+          case anychart.enums.Orientation.RIGHT:
+            scroller.padding().left(0);
+            scroller.padding().right(rightOffset + (this.rightAxisPadding_ || 0));
+            rightOffset += scrollerSize;
+            break;
+        }
+      }
+
+      if (scrollerHorizontal) {
+        scroller.padding().left(leftOffset);
+        scroller.padding().right(rightOffset);
+      } else {
+        scroller.padding().top(topOffset);
+        scroller.padding().bottom(bottomOffset);
       }
 
       boundsWithoutAxes.left += leftOffset;
@@ -2589,7 +2868,6 @@ anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
       for (i = axes.length; i--;) {
         axis = /** @type {anychart.core.axes.Linear} */(axes[i]);
         if (axis && axis.enabled()) {
-          axis.suspendSignalsDispatching();
           var remainingBoundsBeforeSetPadding = axis.getRemainingBounds();
 
           if (axis.isHorizontal()) {
@@ -2607,11 +2885,18 @@ anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
               complete = false;
             }
           }
-          axis.resumeSignalsDispatching(false);
         }
       }
       attempt++;
     } while (!complete && attempt < anychart.charts.Cartesian.MAX_ATTEMPTS_AXES_CALCULATION_);
+
+    for (i = 0, count = this.xAxes_.length; i < count; i++) {
+      this.xAxes_[i].resumeSignalsDispatching(false);
+    }
+
+    for (i = 0, count = this.yAxes_.length; i < count; i++) {
+      this.yAxes_[i].resumeSignalsDispatching(false);
+    }
 
     //bounds of data area
     this.dataBounds_ = boundsWithoutAxes.clone().round();
@@ -2621,7 +2906,14 @@ anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
         anychart.ConsistencyState.CARTESIAN_GRIDS |
         anychart.ConsistencyState.CARTESIAN_AXES_MARKERS |
         anychart.ConsistencyState.CARTESIAN_SERIES |
+        anychart.ConsistencyState.CARTESIAN_X_SCROLLER |
         anychart.ConsistencyState.CARTESIAN_CROSSHAIR);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_X_SCROLLER)) {
+    this.xScroller().container(this.rootElement);
+    this.xScroller().draw();
+    this.markConsistent(anychart.ConsistencyState.CARTESIAN_X_SCROLLER);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_GRIDS)) {
@@ -2714,6 +3006,7 @@ anychart.charts.Cartesian.prototype.drawContent = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.CARTESIAN_CROSSHAIR);
   }
 
+  this.xScroller().resumeSignalsDispatching(false);
   anychart.core.Base.resumeSignalsDispatchingFalse(this.series_, this.xAxes_, this.yAxes_);
 };
 
@@ -3133,6 +3426,7 @@ anychart.charts.Cartesian.prototype.setupByJSON = function(config) {
   this.barsPadding(config['barsPadding']);
   this.minBubbleSize(config['minBubbleSize']);
   this.maxBubbleSize(config['maxBubbleSize']);
+  this.xScroller(config['xScroller']);
 
   if ('defaultSeriesSettings' in config)
     this.defaultSeriesSettings(config['defaultSeriesSettings']);
@@ -3292,6 +3586,16 @@ anychart.charts.Cartesian.prototype.setupByJSON = function(config) {
     }
   }
 
+  var xZoom = json['xZoom'];
+  if (goog.isObject(xZoom) && (goog.isNumber(xZoom['scale']) || goog.isString(xZoom['scale']))) {
+    var tmp = xZoom['scale'];
+    xZoom['scale'] = scalesInstances[xZoom['scale']];
+    this.xZoom(xZoom);
+    xZoom['scale'] = tmp;
+  } else {
+    this.xZoom(xZoom);
+  }
+
   if (config['crosshair']) {
     this.crosshair(config['crosshair']);
   }
@@ -3329,6 +3633,8 @@ anychart.charts.Cartesian.prototype.serialize = function() {
   json['minBubbleSize'] = this.minBubbleSize();
   json['maxBubbleSize'] = this.maxBubbleSize();
   json['crosshair'] = this.crosshair().serialize();
+  json['xScroller'] = this.xScroller().serialize();
+  json['xZoom'] = this.xZoom().serialize();
 
   var grids = [];
   for (i = 0; i < this.grids_.length; i++) {
@@ -3549,3 +3855,5 @@ anychart.charts.Cartesian.prototype['markerPalette'] = anychart.charts.Cartesian
 anychart.charts.Cartesian.prototype['hatchFillPalette'] = anychart.charts.Cartesian.prototype.hatchFillPalette;
 anychart.charts.Cartesian.prototype['getType'] = anychart.charts.Cartesian.prototype.getType;
 anychart.charts.Cartesian.prototype['getPlotBounds'] = anychart.charts.Cartesian.prototype.getPlotBounds;
+anychart.charts.Cartesian.prototype['xZoom'] = anychart.charts.Cartesian.prototype.xZoom;
+anychart.charts.Cartesian.prototype['xScroller'] = anychart.charts.Cartesian.prototype.xScroller;

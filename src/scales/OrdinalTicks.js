@@ -174,12 +174,13 @@ anychart.scales.OrdinalTicks.prototype.names = function(opt_values) {
     }
     return this;
   }
-  var values = this.get();
+  var values = this.getInternal();
+  var i, val;
   if ((this.names_ && this.names_.length < values.length) || !this.autoNames_) {
     var scaleNames = /** @type {anychart.scales.Ordinal} */(this.scale).names();
     this.autoNames_ = [];
-    for (var i = 0; i < values.length; i++) {
-      var val = goog.isArray(values[i]) ? values[i][0] : values[i];
+    for (i = 0; i < values.length; i++) {
+      val = goog.isArray(values[i]) ? values[i][0] : values[i];
       var index = /** @type {anychart.scales.Ordinal} */(this.scale).getIndexByValue(val);
       if (!isNaN(index)) this.autoNames_.push(scaleNames[index]);
       else this.autoNames_.push(val);
@@ -190,7 +191,22 @@ anychart.scales.OrdinalTicks.prototype.names = function(opt_values) {
       this.names_.push(this.autoNames_[this.names_.length]);
     }
   }
-  return /** @type {!Array} */(this.names_ || this.autoNames_);
+  var names =  /** @type {!Array} */(this.names_ || this.autoNames_);
+  var val2;
+  var len = Math.min(names.length, values.length);
+  var res = [];
+  for (i = 0; i < len; i++) {
+    if (goog.isArray(values[i])) {
+      val = values[i][0];
+      val2 = values[i][1];
+    } else {
+      val = val2 = values[i];
+    }
+    var ratio = (this.scale.transform(val, 0) + this.scale.transform(val2, 1)) / 2;
+    if (ratio >= 0 && ratio <= 1)
+      res.push(names[i]);
+  }
+  return res;
 };
 
 
@@ -214,13 +230,26 @@ anychart.scales.OrdinalTicks.prototype.names = function(opt_values) {
  * @return {!Array} Array of ticks.
  */
 anychart.scales.OrdinalTicks.prototype.get = function() {
+  return goog.array.filter(this.getInternal(), function(el) {
+    var val = this.transform(el, 0);
+    var val1 = this.transform(el, 1);
+    return val >= 0 && val <= 1 || val1 >= 0 && val1 <= 1;
+  }, this.scale);
+};
+
+
+/**
+ * Returns unfiltered ticks.
+ * @return {!Array}
+ */
+anychart.scales.OrdinalTicks.prototype.getInternal = function() {
   if (this.explicit_)
     return this.explicit_;
   if (this.explicitIndexes_)
     return this.explicit_ = this.makeValues(this.explicitIndexes_);
   if (!this.autoTicks_)
     this.autoTicks_ = this.makeValues(this.calcAutoTicks());
-  return /** @type {!Array} */(this.autoTicks_);
+  return this.autoTicks_ || [];
 };
 
 

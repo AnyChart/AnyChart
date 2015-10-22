@@ -2156,6 +2156,33 @@ window['anychart']['themes']['defaultTheme'] = {
         'rotation': 0
       },
       'zIndex': 41
+    },
+    'xZoom': {
+      'continuous': true,
+      'startRatio': 0,
+      'endRatio': 1
+    },
+    'xScroller': {
+      'enabled': false,
+      'fill': '#fff',
+      'selectedFill': '#1976d2 0.2',
+      'outlineStroke': 'none',
+      'height': 10,
+      'minHeight': null,
+      'maxHeight': null,
+      'autoHide': false,
+      'orientation': 'bottom',
+      'position': 'afterAxes',
+      'allowRangeChange': true,
+      'thumbs': {
+        'enabled': true,
+        'autoHide': false,
+        'fill': '#f7f7f7',
+        'stroke': '#7c868e',
+        'hoverFill': '#ffffff',
+        'hoverStroke': '#545f69'
+      },
+      'zIndex': 35
     }
   },
 
@@ -2288,6 +2315,9 @@ window['anychart']['themes']['defaultTheme'] = {
       'anchor': 'left',
       'offsetX': 10,
       'offsetY': 0
+    },
+    'xScroller': {
+      'orientation': 'left'
     }
   },
   'box': {

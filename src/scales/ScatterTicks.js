@@ -240,13 +240,27 @@ anychart.scales.ScatterTicks.prototype.set = function(ticks) {
  * @return {!Array} Array of ticks.
  */
 anychart.scales.ScatterTicks.prototype.get = function() {
+  var ticks = this.getInternal();
+  return goog.array.filter(/** @type {!Array} */(ticks), function(el) {
+    var val = this.transform(el);
+    return val >= 0 && val <= 1;
+  }, this.scale_);
+};
+
+
+/**
+ * Unfiltered ticks getter.
+ * @return {!Array}
+ */
+anychart.scales.ScatterTicks.prototype.getInternal = function() {
+  var ticks;
   if (this.explicit_) {
-    return goog.array.filter(this.explicit_, function(el) {
-      return !(el < this.scale_.minimum() || el > this.scale_.maximum());
-    }, this);
+    ticks = this.explicit_;
+  } else {
+    this.scale_.calculate();
+    ticks = this.autoTicks_;
   }
-  this.scale_.calculate();
-  return /** @type {!Array} */(this.autoTicks_);
+  return ticks || [];
 };
 
 

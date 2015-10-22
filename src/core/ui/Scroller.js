@@ -1,6 +1,7 @@
 goog.provide('anychart.core.ui.Scroller');
 goog.require('acgraph');
 goog.require('anychart.core.VisualBase');
+goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
 goog.require('goog.events.EventType');
 goog.require('goog.fx.Dragger');
@@ -12,9 +13,17 @@ goog.require('goog.style');
  * Scroller ui element
  * @constructor
  * @extends {anychart.core.VisualBase}
+ * @param {boolean=} opt_usesAbsolutePadding
  */
-anychart.core.ui.Scroller = function() {
+anychart.core.ui.Scroller = function(opt_usesAbsolutePadding) {
   goog.base(this);
+
+  /**
+   * If the scroller should be automatically hidden if it cannot be changed and shows the full range.
+   * @type {boolean}
+   * @private
+   */
+  this.autoHide_ = false;
 
   /**
    * If thumbs are shown. Cache to avoid children search.
@@ -87,11 +96,18 @@ anychart.core.ui.Scroller = function() {
   this.endRatio_ = anychart.core.ui.Scroller.MAX_RATIO;
 
   /**
-   * Cache of pixel bounds. Updated in draw().
+   * Cache of pixel bounds, where the scroller is drawn (without paddings). Updated in updateBounds_().
    * @type {!anychart.math.Rect}
    * @protected
    */
   this.pixelBoundsCache = new anychart.math.Rect(0, 0, 0, 0);
+
+  /**
+   * Cache of pixel bounds with paddings. Updated in updateBounds_().
+   * @type {!anychart.math.Rect}
+   * @protected
+   */
+  this.fullPixelBoundsCache = new anychart.math.Rect(0, 0, 0, 0);
 
   /**
    * Left thumb dragger.
@@ -149,6 +165,34 @@ anychart.core.ui.Scroller = function() {
    * @private
    */
   this.thumbs_ = null;
+
+  /**
+   * Padding.
+   * @type {anychart.core.utils.Padding}
+   * @private
+   */
+  this.padding_ = null;
+
+  /**
+   * Orientation.
+   * @type {anychart.enums.Orientation}
+   * @private
+   */
+  this.orientation_ = anychart.enums.Orientation.BOTTOM;
+
+  /**
+   * If the range changing interactivity is allowed.
+   * @type {boolean}
+   * @private
+   */
+  this.allowRangeChange_ = true;
+
+  /**
+   * If the padding should be applied without accordance to orientation.
+   * @type {boolean}
+   * @private
+   */
+  this.absolutePadding_ = !!opt_usesAbsolutePadding;
 };
 goog.inherits(anychart.core.ui.Scroller, anychart.core.VisualBase);
 
@@ -185,6 +229,8 @@ anychart.core.ui.Scroller.prototype.SUPPORTED_SIGNALS = anychart.core.VisualBase
 anychart.core.ui.Scroller.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
+    anychart.ConsistencyState.SCROLLER_ORIENTATION |
+    anychart.ConsistencyState.SCROLLER_AUTO_HIDE |
     anychart.ConsistencyState.SCROLLER_THUMBS_SHAPE;
 
 
@@ -234,6 +280,26 @@ anychart.core.ui.Scroller.prototype.selectedFill_;
  * @private
  */
 anychart.core.ui.Scroller.prototype.selectedRangeOutlineStroke_;
+
+
+/**
+ * Getter and setter for scroller auto hide setting - If the scroller should be automatically hidden if it cannot be
+ * changed (allowRangeChange(false)) and shows the full range (startRatio(0), endRatio(1)).
+ * @param {boolean=} opt_value
+ * @return {anychart.core.ui.Scroller|boolean}
+ */
+anychart.core.ui.Scroller.prototype.autoHide = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = !!opt_value;
+    if (this.autoHide_ != opt_value) {
+      this.autoHide_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.SCROLLER_AUTO_HIDE,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.autoHide_;
+};
 
 
 /**
@@ -382,6 +448,116 @@ anychart.core.ui.Scroller.prototype.maxHeight = function(opt_value) {
 
 
 /**
+ * Padding getter/setter.
+ * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
+ * @param {(string|number)=} opt_rightOrRightAndLeft .
+ * @param {(string|number)=} opt_bottom .
+ * @param {(string|number)=} opt_left .
+ * @return {!(anychart.core.ui.Scroller|anychart.core.utils.Padding)} .
+ */
+anychart.core.ui.Scroller.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom,
+    opt_left) {
+  if (!this.padding_) {
+    this.padding_ = new anychart.core.utils.Padding();
+    this.padding_.listenSignals(this.paddingInvalidated_, this);
+  }
+
+  if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
+    this.padding_.setup.apply(this.padding_, arguments);
+    return this;
+  } else {
+    return this.padding_;
+  }
+};
+
+
+/**
+ * Internal padding invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.core.ui.Scroller.prototype.paddingInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION))
+    this.invalidate(anychart.ConsistencyState.BOUNDS,
+        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+};
+
+
+/**
+ * Orientation getter/setter.
+ * @param {anychart.enums.Orientation=} opt_value Axis orientation.
+ * @return {anychart.enums.Orientation|anychart.core.ui.Scroller} Axis orientation or itself for method chaining.
+ */
+anychart.core.ui.Scroller.prototype.orientation = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var orientation = anychart.enums.normalizeOrientation(opt_value);
+    if (this.orientation_ != orientation) {
+      this.orientation_ = orientation;
+      this.invalidate(
+          anychart.ConsistencyState.BOUNDS |
+          anychart.ConsistencyState.SCROLLER_ORIENTATION |
+          anychart.ConsistencyState.SCROLLER_THUMBS_SHAPE,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  } else {
+    return this.orientation_;
+  }
+};
+
+
+/**
+ * If the scroller orientation is horizontal.
+ * @return {boolean}
+ */
+anychart.core.ui.Scroller.prototype.isHorizontal = function() {
+  return this.orientation_ == anychart.enums.Orientation.BOTTOM ||
+      this.orientation_ == anychart.enums.Orientation.TOP;
+};
+
+
+/**
+ * Cursor getter.
+ * @return {acgraph.vector.Cursor}
+ * @private
+ */
+anychart.core.ui.Scroller.prototype.getCursor_ = function() {
+  return this.isHorizontal() ? acgraph.vector.Cursor.EW_RESIZE : acgraph.vector.Cursor.NS_RESIZE;
+};
+
+
+/**
+ * Applies cursor to static entities.
+ * @private
+ */
+anychart.core.ui.Scroller.prototype.applyStaticCursor_ = function() {
+  this.leftThumb_.cursor(this.getCursor_());
+  this.rightThumb_.cursor(this.getCursor_());
+  this.selectedBackground_.cursor(this.getCursor_());
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.Scroller.prototype.remove = function() {
+  if (this.rootLayer)
+    this.rootLayer.remove();
+};
+
+
+/**
+ * Returns true if the scroller is visible.
+ * @return {boolean}
+ */
+anychart.core.ui.Scroller.prototype.isVisible = function() {
+  return /** @type {boolean} */(this.enabled()) &&
+      (!this.autoHide_ ||
+      this.allowRangeChange_ ||
+      this.startRatio_ != 0 ||
+      this.endRatio_ != anychart.core.ui.Scroller.MAX_RATIO);
+};
+
+
+/**
  * Draws the scroller.
  * @return {anychart.core.ui.Scroller}
  */
@@ -389,23 +565,29 @@ anychart.core.ui.Scroller.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
     return this;
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.SCROLLER_AUTO_HIDE)) {
+    this.markConsistent(anychart.ConsistencyState.SCROLLER_AUTO_HIDE);
+    if (!this.isVisible()) {
+      this.remove();
+      this.invalidate(anychart.ConsistencyState.CONTAINER);
+      return this;
+    }
+  }
+
   if (!this.rootLayer) {
     this.rootLayer = acgraph.layer();
 
     this.leftThumb_ = acgraph.path();
     this.leftThumb_.zIndex(100);
-    this.leftThumb_.cursor(acgraph.vector.Cursor.EW_RESIZE);
 
     this.rightThumb_ = acgraph.path();
     this.rightThumb_.zIndex(100);
-    this.rightThumb_.cursor(acgraph.vector.Cursor.EW_RESIZE);
 
     this.nonSelectedBackground_ = this.rootLayer.rect();
     this.nonSelectedBackground_.zIndex(0);
 
     this.selectedBackground_ = this.rootLayer.rect();
     this.selectedBackground_.zIndex(50);
-    this.selectedBackground_.cursor(acgraph.vector.Cursor.EW_RESIZE);
 
     this.selectedClipRect = acgraph.clip();
     this.selectedBackground_.clip(this.selectedClipRect);
@@ -443,6 +625,15 @@ anychart.core.ui.Scroller.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.SCROLLER_ORIENTATION)) {
+    this.applyStaticCursor_();
+    this.invalidate(
+        anychart.ConsistencyState.BOUNDS |
+        anychart.ConsistencyState.SCROLLER_THUMBS_SHAPE |
+        anychart.ConsistencyState.APPEARANCE);
+    this.markConsistent(anychart.ConsistencyState.SCROLLER_ORIENTATION);
+  }
+
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.updateBoundsCache();
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
@@ -465,26 +656,23 @@ anychart.core.ui.Scroller.prototype.draw = function() {
         anychart.color.TRANSPARENT_HANDLER : this.selectedFill_).stroke(null);
     this.selectedRangeOutline_.stroke(this.selectedRangeOutlineStroke_).fill(null);
 
-    var bounds = this.pixelBoundsCache;
-    var leftX = bounds.left + bounds.width * this.startRatio_ / anychart.core.ui.Scroller.MAX_RATIO;
-    var rightX = bounds.left + bounds.width * this.endRatio_ / anychart.core.ui.Scroller.MAX_RATIO;
-
-    this.leftThumb_.setTransformationMatrix(1, 0, 0, 1, leftX, 0);
-    this.rightThumb_.setTransformationMatrix(1, 0, 0, 1, rightX, 0);
-
-    this.selectedClipRect.bounds(leftX, bounds.top, rightX - leftX, bounds.height);
-
-    this.selectedRangeOutline_
-        .clear()
-        .moveTo(bounds.left, bounds.top)
-        .lineTo(leftX, bounds.top)
-        .lineTo(leftX, bounds.top + bounds.height)
-        .lineTo(rightX, bounds.top + bounds.height)
-        .lineTo(rightX, bounds.top)
-        .lineTo(bounds.left + bounds.width, bounds.top);
-
     this.colorizeThumb_(this.leftThumb_, this.leftThumbHovered_);
     this.colorizeThumb_(this.rightThumb_, this.rightThumbHovered_);
+
+    switch (this.orientation_) {
+      case anychart.enums.Orientation.TOP:
+        this.drawTop_();
+        break;
+      case anychart.enums.Orientation.RIGHT:
+        this.drawRight_();
+        break;
+      case anychart.enums.Orientation.BOTTOM:
+        this.drawBottom_();
+        break;
+      case anychart.enums.Orientation.LEFT:
+        this.drawLeft_();
+        break;
+    }
 
     if (!this.thumbs().autoHide())
       this.showThumbs_();
@@ -493,6 +681,107 @@ anychart.core.ui.Scroller.prototype.draw = function() {
   }
 
   return this;
+};
+
+
+/**
+ * Draws bottom orientation.
+ * @private
+ */
+anychart.core.ui.Scroller.prototype.drawBottom_ = function() {
+  var bounds = this.pixelBoundsCache;
+  var leftX = bounds.left + bounds.width * this.startRatio_ / anychart.core.ui.Scroller.MAX_RATIO;
+  var rightX = bounds.left + bounds.width * this.endRatio_ / anychart.core.ui.Scroller.MAX_RATIO;
+
+  this.leftThumb_.setTransformationMatrix(1, 0, 0, 1, leftX, 0);
+  this.rightThumb_.setTransformationMatrix(1, 0, 0, 1, rightX, 0);
+
+  this.selectedClipRect.bounds(leftX, bounds.top, rightX - leftX, bounds.height);
+
+  this.selectedRangeOutline_
+      .clear()
+      .moveTo(bounds.left, bounds.top)
+      .lineTo(leftX, bounds.top)
+      .lineTo(leftX, bounds.top + bounds.height)
+      .lineTo(rightX, bounds.top + bounds.height)
+      .lineTo(rightX, bounds.top)
+      .lineTo(bounds.left + bounds.width, bounds.top);
+};
+
+
+/**
+ * Draws left orientation.
+ * @private
+ */
+anychart.core.ui.Scroller.prototype.drawLeft_ = function() {
+  var bounds = this.pixelBoundsCache;
+  var topX = bounds.top + bounds.height * this.startRatio_ / anychart.core.ui.Scroller.MAX_RATIO;
+  var bottomX = bounds.top + bounds.height * this.endRatio_ / anychart.core.ui.Scroller.MAX_RATIO;
+
+  this.leftThumb_.setTransformationMatrix(1, 0, 0, 1, 0, topX);
+  this.rightThumb_.setTransformationMatrix(1, 0, 0, 1, 0, bottomX);
+
+  this.selectedClipRect.bounds(bounds.left, topX, bounds.width, bottomX - topX);
+
+  this.selectedRangeOutline_
+      .clear()
+      .moveTo(bounds.left + bounds.width, bounds.top)
+      .lineTo(bounds.left + bounds.width, topX)
+      .lineTo(bounds.left, topX)
+      .lineTo(bounds.left, bottomX)
+      .lineTo(bounds.left + bounds.width, bottomX)
+      .lineTo(bounds.left + bounds.width, bounds.top + bounds.height);
+};
+
+
+/**
+ * Draws top orientation.
+ * @private
+ */
+anychart.core.ui.Scroller.prototype.drawTop_ = function() {
+  var bounds = this.pixelBoundsCache;
+  var leftX = bounds.left + bounds.width * this.startRatio_ / anychart.core.ui.Scroller.MAX_RATIO;
+  var rightX = bounds.left + bounds.width * this.endRatio_ / anychart.core.ui.Scroller.MAX_RATIO;
+
+  this.leftThumb_.setTransformationMatrix(1, 0, 0, 1, leftX, 0);
+  this.rightThumb_.setTransformationMatrix(1, 0, 0, 1, rightX, 0);
+
+  this.selectedClipRect.bounds(leftX, bounds.top, rightX - leftX, bounds.height);
+
+  this.selectedRangeOutline_
+      .clear()
+      .moveTo(bounds.left, bounds.top + bounds.height)
+      .lineTo(leftX, bounds.top + bounds.height)
+      .lineTo(leftX, bounds.top)
+      .lineTo(rightX, bounds.top)
+      .lineTo(rightX, bounds.top + bounds.height)
+      .lineTo(bounds.left + bounds.width, bounds.top + bounds.height);
+};
+
+
+/**
+ * Draws right orientation.
+ * @private
+ */
+anychart.core.ui.Scroller.prototype.drawRight_ = function() {
+  var bounds = this.pixelBoundsCache;
+  // left one is at bottom
+  var topX = bounds.top + bounds.height * (anychart.core.ui.Scroller.MAX_RATIO - this.endRatio_) / anychart.core.ui.Scroller.MAX_RATIO;
+  var bottomX = bounds.top + bounds.height * (anychart.core.ui.Scroller.MAX_RATIO - this.startRatio_) / anychart.core.ui.Scroller.MAX_RATIO;
+
+  this.leftThumb_.setTransformationMatrix(1, 0, 0, 1, 0, bottomX);
+  this.rightThumb_.setTransformationMatrix(1, 0, 0, 1, 0, topX);
+
+  this.selectedClipRect.bounds(bounds.left, topX, bounds.width, bottomX - topX);
+
+  this.selectedRangeOutline_
+      .clear()
+      .moveTo(bounds.left, bounds.top)
+      .lineTo(bounds.left, topX)
+      .lineTo(bounds.left + bounds.width, topX)
+      .lineTo(bounds.left + bounds.width, bottomX)
+      .lineTo(bounds.left, bottomX)
+      .lineTo(bounds.left, bounds.top + bounds.height);
 };
 
 
@@ -534,6 +823,21 @@ anychart.core.ui.Scroller.prototype.getEndRatio = function() {
 
 
 /**
+ * If the range changing is allowed.
+ * @param {boolean=} opt_value
+ * @return {anychart.core.ui.Scroller|boolean}
+ */
+anychart.core.ui.Scroller.prototype.allowRangeChange = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.allowRangeChange_ = !!opt_value;
+    // mb we should cancel
+    return this;
+  }
+  return this.allowRangeChange_;
+};
+
+
+/**
  * Returns new rect with bounds remaining after scroller placement.
  * @return {anychart.math.Rect}
  */
@@ -544,12 +848,20 @@ anychart.core.ui.Scroller.prototype.getRemainingBounds = function() {
   else
     parentBounds = anychart.math.rect(0, 0, 0, 0);
 
-  if (this.enabled()) {
+  if (this.isVisible()) {
     if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
       this.updateBoundsCache();
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
     }
-    parentBounds.height -= this.pixelBoundsCache.height;
+    if (this.isHorizontal()) {
+      parentBounds.height -= this.fullPixelBoundsCache.height;
+      if (this.orientation_ == anychart.enums.Orientation.TOP)
+        parentBounds.top += this.fullPixelBoundsCache.height;
+    } else {
+      parentBounds.width -= this.fullPixelBoundsCache.width;
+      if (this.orientation_ == anychart.enums.Orientation.LEFT)
+        parentBounds.left += this.fullPixelBoundsCache.width;
+    }
   }
   return parentBounds;
 };
@@ -561,15 +873,55 @@ anychart.core.ui.Scroller.prototype.getRemainingBounds = function() {
  */
 anychart.core.ui.Scroller.prototype.updateBoundsCache = function() {
   var parentBounds = this.parentBounds();
-  var height = anychart.utils.normalizeSize(this.height_, parentBounds.height);
+  var parentSize = this.isHorizontal() ? parentBounds.height : parentBounds.width;
+  var size = anychart.utils.normalizeSize(this.height_, parentSize);
   if (!goog.isNull(this.minHeight_))
-    height = Math.max(height, anychart.utils.normalizeSize(this.minHeight_, parentBounds.height));
+    size = Math.max(size, anychart.utils.normalizeSize(this.minHeight_, parentSize));
   if (!goog.isNull(this.maxHeight_))
-    height = Math.min(height, anychart.utils.normalizeSize(this.maxHeight_, parentBounds.height));
-  this.pixelBoundsCache.left = parentBounds.left;
-  this.pixelBoundsCache.width = parentBounds.width;
-  this.pixelBoundsCache.top = parentBounds.top + parentBounds.height - height;
-  this.pixelBoundsCache.height = height;
+    size = Math.min(size, anychart.utils.normalizeSize(this.maxHeight_, parentSize));
+  if (this.isHorizontal()) {
+    size = this.padding().widenHeight(size);
+  } else {
+    size = this.padding().widenWidth(size);
+  }
+  this.fullPixelBoundsCache.left = parentBounds.left;
+  this.fullPixelBoundsCache.top = parentBounds.top;
+  if (this.isHorizontal()) {
+    this.fullPixelBoundsCache.width = parentBounds.width;
+    this.fullPixelBoundsCache.height = size;
+    if (this.orientation_ == anychart.enums.Orientation.BOTTOM) {
+      this.fullPixelBoundsCache.top += parentBounds.height - size;
+    }
+  } else {
+    this.fullPixelBoundsCache.width = size;
+    this.fullPixelBoundsCache.height = parentBounds.height;
+    if (this.orientation_ == anychart.enums.Orientation.RIGHT) {
+      this.fullPixelBoundsCache.left += parentBounds.width - size;
+    }
+  }
+
+  var left, right, top, bottom;
+  if (this.absolutePadding_ || this.isHorizontal()) {
+    this.pixelBoundsCache = this.padding().tightenBounds(this.fullPixelBoundsCache);
+  } else {
+    if (this.orientation_ == anychart.enums.Orientation.LEFT) {
+      top = anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().left()), this.fullPixelBoundsCache.width);
+      right = anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().top()), this.fullPixelBoundsCache.height);
+      bottom = anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().right()), this.fullPixelBoundsCache.width);
+      left = anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().bottom()), this.fullPixelBoundsCache.height);
+    } else {
+      top = anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().right()), this.fullPixelBoundsCache.width);
+      right = anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().bottom()), this.fullPixelBoundsCache.height);
+      bottom = anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().left()), this.fullPixelBoundsCache.width);
+      left = anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().top()), this.fullPixelBoundsCache.height);
+
+    }
+    this.pixelBoundsCache.left = this.fullPixelBoundsCache.left + left;
+    this.pixelBoundsCache.top = this.fullPixelBoundsCache.top + top;
+    this.pixelBoundsCache.width = this.fullPixelBoundsCache.width - left - right;
+    this.pixelBoundsCache.height = this.fullPixelBoundsCache.height - top - bottom;
+  }
+
   this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SCROLLER_THUMBS_SHAPE);
 };
 
@@ -670,10 +1022,15 @@ anychart.core.ui.Scroller.prototype.thumbOrRangeMouseDown_ = function(e) {
  */
 anychart.core.ui.Scroller.prototype.nonSelectedRangeClick_ = function(e) {
   // assume we have a stage here
-  var x = e['clientX'] - goog.style.getClientPosition(/** @type {Element} */(this.rootLayer.getStage().container())).x;
+  var root = goog.style.getClientPosition(/** @type {Element} */(this.rootLayer.getStage().container()));
+  var position;
+  if (this.isHorizontal())
+    position = e['clientX'] - root.x;
+  else
+    position = e['clientY'] - root.y;
   if (this.dispatchRangeChange_(anychart.enums.ScrollerRangeChangeSource.BACKGROUND_CLICK,
       anychart.enums.EventType.SCROLLER_CHANGE_START)) {
-    this.moveHandleTo_(false, x);
+    this.moveHandleTo_(false, position);
     this.dispatchRangeChange_(anychart.enums.ScrollerRangeChangeSource.BACKGROUND_CLICK,
         anychart.enums.EventType.SCROLLER_CHANGE_FINISH);
   }
@@ -688,11 +1045,11 @@ anychart.core.ui.Scroller.prototype.nonSelectedRangeClick_ = function(e) {
  */
 anychart.core.ui.Scroller.prototype.dragStartHandler_ = function(e) {
   var cursor, source;
-  if (e.dragger == this.selectedRangeDragger_) {
-    cursor = acgraph.vector.Cursor.EW_RESIZE;
+  if (!this.allowRangeChange_ || e.dragger == this.selectedRangeDragger_) {
+    cursor = this.getCursor_();
     source = anychart.enums.ScrollerRangeChangeSource.SELECTED_RANGE_DRAG;
   } else {
-    cursor = acgraph.vector.Cursor.EW_RESIZE;
+    cursor = this.getCursor_();
     source = anychart.enums.ScrollerRangeChangeSource.THUMB_DRAG;
   }
   var res = this.dispatchRangeChange_(source, anychart.enums.EventType.SCROLLER_CHANGE_START);
@@ -715,12 +1072,12 @@ anychart.core.ui.Scroller.prototype.dragStartHandler_ = function(e) {
 anychart.core.ui.Scroller.prototype.dragEndHandler_ = function(e) {
   this.isDragging_ = Math.max(this.isDragging_ - 1, 0);
   this.maybeHideThumbs_();
-  this.leftThumb_.cursor(acgraph.vector.Cursor.EW_RESIZE);
-  this.rightThumb_.cursor(acgraph.vector.Cursor.EW_RESIZE);
-  this.selectedBackground_.cursor(acgraph.vector.Cursor.EW_RESIZE);
+  this.leftThumb_.cursor(this.getCursor_());
+  this.rightThumb_.cursor(this.getCursor_());
+  this.selectedBackground_.cursor(this.getCursor_());
   goog.style.setStyle(document['body'], 'cursor', '');
   var source;
-  if (e.dragger == this.selectedRangeDragger_) {
+  if (!this.allowRangeChange_ || e.dragger == this.selectedRangeDragger_) {
     source = anychart.enums.ScrollerRangeChangeSource.SELECTED_RANGE_DRAG;
   } else {
     source = anychart.enums.ScrollerRangeChangeSource.THUMB_DRAG;
@@ -760,52 +1117,101 @@ anychart.core.ui.Scroller.prototype.maybeHideThumbs_ = function() {
  * @private
  */
 anychart.core.ui.Scroller.prototype.prepareThumbs_ = function() {
-  var top = this.pixelBoundsCache.top;
-  if (this.thumbs().enabled()) {
-    var y = top + this.pixelBoundsCache.height / 2;
-    this.leftThumb_.clear()
-        .moveTo(-4, y - 6)
-        .lineTo(-2, y - 8)
-        .lineTo(2, y - 8)
-        .lineTo(4, y - 6)
-        .lineTo(4, y + 6)
-        .lineTo(2, y + 8)
-        .lineTo(-2, y + 8)
-        .lineTo(-4, y + 6)
-        .close()
-        .moveTo(-1, y - 5)
-        .lineTo(-1, y + 5)
-        .moveTo(1, y - 5)
-        .lineTo(1, y + 5);
-    this.rightThumb_.clear()
-        .moveTo(-4, y - 6)
-        .lineTo(-2, y - 8)
-        .lineTo(2, y - 8)
-        .lineTo(4, y - 6)
-        .lineTo(4, y + 6)
-        .lineTo(2, y + 8)
-        .lineTo(-2, y + 8)
-        .lineTo(-4, y + 6)
-        .close()
-        .moveTo(-1, y - 5)
-        .lineTo(-1, y + 5)
-        .moveTo(1, y - 5)
-        .lineTo(1, y + 5);
+  var thicknessHalf = (Math.max(acgraph.vector.getThickness(this.selectedRangeOutlineStroke_), 5) - 1) / 2;
+  if (this.isHorizontal()) {
+    var top = this.pixelBoundsCache.top;
+    if (this.thumbs().enabled()) {
+      var y = top + this.pixelBoundsCache.height / 2;
+      this.leftThumb_.clear()
+          .moveTo(-4, y - 6)
+          .lineTo(-2, y - 8)
+          .lineTo(2, y - 8)
+          .lineTo(4, y - 6)
+          .lineTo(4, y + 6)
+          .lineTo(2, y + 8)
+          .lineTo(-2, y + 8)
+          .lineTo(-4, y + 6)
+          .close()
+          .moveTo(-1, y - 5)
+          .lineTo(-1, y + 5)
+          .moveTo(1, y - 5)
+          .lineTo(1, y + 5);
+      this.rightThumb_.clear()
+          .moveTo(-4, y - 6)
+          .lineTo(-2, y - 8)
+          .lineTo(2, y - 8)
+          .lineTo(4, y - 6)
+          .lineTo(4, y + 6)
+          .lineTo(2, y + 8)
+          .lineTo(-2, y + 8)
+          .lineTo(-4, y + 6)
+          .close()
+          .moveTo(-1, y - 5)
+          .lineTo(-1, y + 5)
+          .moveTo(1, y - 5)
+          .lineTo(1, y + 5);
+    } else {
+      var bottom = top + this.pixelBoundsCache.height;
+      this.leftThumb_.clear()
+          .moveTo(-thicknessHalf, top)
+          .lineTo(thicknessHalf, top)
+          .lineTo(thicknessHalf, bottom)
+          .lineTo(-thicknessHalf, bottom)
+          .close();
+      this.rightThumb_.clear()
+          .moveTo(-thicknessHalf, top)
+          .lineTo(thicknessHalf, top)
+          .lineTo(thicknessHalf, bottom)
+          .lineTo(-thicknessHalf, bottom)
+          .close();
+    }
   } else {
-    var bottom = top + this.pixelBoundsCache.height;
-    var thicknessHalf = (Math.max(acgraph.vector.getThickness(this.selectedRangeOutlineStroke_), 5) - 1) / 2;
-    this.leftThumb_.clear()
-        .moveTo(-thicknessHalf, top)
-        .lineTo(thicknessHalf, top)
-        .lineTo(thicknessHalf, bottom)
-        .lineTo(-thicknessHalf, bottom)
-        .close();
-    this.rightThumb_.clear()
-        .moveTo(-thicknessHalf, top)
-        .lineTo(thicknessHalf, top)
-        .lineTo(thicknessHalf, bottom)
-        .lineTo(-thicknessHalf, bottom)
-        .close();
+    var left = this.pixelBoundsCache.left;
+    if (this.thumbs().enabled()) {
+      var x = left + this.pixelBoundsCache.width / 2;
+      this.leftThumb_.clear()
+          .moveTo(x - 6, -4)
+          .lineTo(x - 8, -2)
+          .lineTo(x - 8, 2)
+          .lineTo(x - 6, 4)
+          .lineTo(x + 6, 4)
+          .lineTo(x + 8, 2)
+          .lineTo(x + 8, -2)
+          .lineTo(x + 6, -4)
+          .close()
+          .moveTo(x - 5, -1)
+          .lineTo(x + 5, -1)
+          .moveTo(x - 5, 1)
+          .lineTo(x + 5, 1);
+      this.rightThumb_.clear()
+          .moveTo(x - 6, -4)
+          .lineTo(x - 8, -2)
+          .lineTo(x - 8, 2)
+          .lineTo(x - 6, 4)
+          .lineTo(x + 6, 4)
+          .lineTo(x + 8, 2)
+          .lineTo(x + 8, -2)
+          .lineTo(x + 6, -4)
+          .close()
+          .moveTo(x - 5, -1)
+          .lineTo(x + 5, -1)
+          .moveTo(x - 5, 1)
+          .lineTo(x + 5, 1);
+    } else {
+      var right = left + this.pixelBoundsCache.height;
+      this.leftThumb_.clear()
+          .moveTo(left, -thicknessHalf)
+          .lineTo(left, thicknessHalf)
+          .lineTo(right, thicknessHalf)
+          .lineTo(right, -thicknessHalf)
+          .close();
+      this.rightThumb_.clear()
+          .moveTo(left, -thicknessHalf)
+          .lineTo(left, thicknessHalf)
+          .lineTo(right, thicknessHalf)
+          .lineTo(right, -thicknessHalf)
+          .close();
+    }
   }
 };
 
@@ -819,12 +1225,17 @@ anychart.core.ui.Scroller.prototype.prepareThumbs_ = function() {
 anychart.core.ui.Scroller.prototype.colorizeThumb_ = function(thumb, isHovered) {
   var thumbs = this.thumbs();
   var fill, stroke;
-  if (isHovered) {
-    fill = /** @type {acgraph.vector.Fill} */(thumbs.hoverFill());
-    stroke = /** @type {acgraph.vector.Stroke} */(thumbs.hoverStroke());
+  if (thumbs.enabled()) {
+    if (isHovered) {
+      fill = /** @type {acgraph.vector.Fill} */(thumbs.hoverFill());
+      stroke = /** @type {acgraph.vector.Stroke} */(thumbs.hoverStroke());
+    } else {
+      fill = /** @type {acgraph.vector.Fill} */(thumbs.fill());
+      stroke = /** @type {acgraph.vector.Stroke} */(thumbs.stroke());
+    }
   } else {
-    fill = /** @type {acgraph.vector.Fill} */(thumbs.fill());
-    stroke = /** @type {acgraph.vector.Stroke} */(thumbs.stroke());
+    fill = anychart.color.TRANSPARENT_HANDLER;
+    stroke = 'none';
   }
   thumb.fill(fill);
   thumb.stroke(stroke);
@@ -878,14 +1289,14 @@ anychart.core.ui.Scroller.prototype.makeRangeChangeEvent = function(type, startR
  * Dispatches SCROLLER_CHANGE event.
  * @param {string} source
  * @param {anychart.enums.EventType} type
- * @param {number=} opt_start
- * @param {number=} opt_end
+ * @param {number=} opt_start IN INTERNAL RATIO TERMS.
+ * @param {number=} opt_end IN INTERNAL RATIO TERMS.
  * @return {boolean}
  * @private
  */
 anychart.core.ui.Scroller.prototype.dispatchRangeChange_ = function(source, type, opt_start, opt_end) {
-  var start = goog.isDef(opt_start) ? opt_start : this.fromInternalRatio_(this.startRatio_);
-  var end = goog.isDef(opt_end) ? opt_end : this.fromInternalRatio_(this.endRatio_);
+  var start = this.fromInternalRatio_(goog.isDef(opt_start) ? opt_start : this.startRatio_);
+  var end = this.fromInternalRatio_(goog.isDef(opt_end) ? opt_end : this.endRatio_);
   return this.dispatchEvent(this.makeRangeChangeEvent(type, start, end, source));
 };
 
@@ -893,19 +1304,36 @@ anychart.core.ui.Scroller.prototype.dispatchRangeChange_ = function(source, type
 /**
  * Moves the thumb. Considered internal.
  * @param {acgraph.vector.Element|boolean} handle true - selectedRange, false - background, element - corresponding thumb.
- * @param {number} x
+ * @param {number} position
  * @private
  */
-anychart.core.ui.Scroller.prototype.moveHandleTo_ = function(handle, x) {
-  x = this.limitX_(handle, x);
+anychart.core.ui.Scroller.prototype.moveHandleTo_ = function(handle, position) {
+  position = this.limitPosition_(handle, position);
   var bounds = this.pixelBoundsCache;
-  var ratio = (x - bounds.left) / bounds.width;
-  var startRatio, endRatio, source;
-  if (handle == this.leftThumb_) {
+  var ratio;
+  switch (this.orientation_) {
+    case anychart.enums.Orientation.RIGHT:
+      ratio = (bounds.top + bounds.height - position) / bounds.height;
+      break;
+    case anychart.enums.Orientation.LEFT:
+      ratio = (position - bounds.top) / bounds.height;
+      break;
+    case anychart.enums.Orientation.TOP:
+    case anychart.enums.Orientation.BOTTOM:
+    default:
+      ratio = (position - bounds.left) / bounds.width;
+      break;
+  }
+  /** @type {number} */
+  var startRatio;
+  /** @type {number} */
+  var endRatio;
+  var source;
+  if (this.allowRangeChange_ && handle == this.leftThumb_) {
     startRatio = ratio;
     endRatio = this.fromInternalRatio_(this.endRatio_);
     source = anychart.enums.ScrollerRangeChangeSource.THUMB_DRAG;
-  } else if (handle == this.rightThumb_) {
+  } else if (this.allowRangeChange_ && handle == this.rightThumb_) {
     startRatio = this.fromInternalRatio_(this.startRatio_);
     endRatio = ratio;
     source = anychart.enums.ScrollerRangeChangeSource.THUMB_DRAG;
@@ -917,6 +1345,8 @@ anychart.core.ui.Scroller.prototype.moveHandleTo_ = function(handle, x) {
         anychart.enums.ScrollerRangeChangeSource.SELECTED_RANGE_DRAG :
         anychart.enums.ScrollerRangeChangeSource.BACKGROUND_CLICK;
   }
+  startRatio = this.toInternalRatio_(startRatio);
+  endRatio = this.toInternalRatio_(endRatio);
   if (startRatio > endRatio) {
     var tmp = this.leftThumb_;
     this.leftThumb_ = this.rightThumb_;
@@ -925,11 +1355,14 @@ anychart.core.ui.Scroller.prototype.moveHandleTo_ = function(handle, x) {
     tmp = this.leftThumbDragger_;
     this.leftThumbDragger_ = this.rightThumbDragger_;
     this.rightThumbDragger_ = tmp;
+    tmp = startRatio;
+    startRatio = endRatio;
+    endRatio = tmp;
   }
   if ((startRatio != this.startRatio_ || endRatio != this.endRatio_) &&
       this.dispatchRangeChange_(source, anychart.enums.EventType.SCROLLER_CHANGE, startRatio, endRatio)) {
-    this.startRatio_ = this.toInternalRatio_(startRatio);
-    this.endRatio_ = this.toInternalRatio_(endRatio);
+    this.startRatio_ = startRatio;
+    this.endRatio_ = endRatio;
     this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
   }
 };
@@ -939,19 +1372,23 @@ anychart.core.ui.Scroller.prototype.moveHandleTo_ = function(handle, x) {
  * Limits possible X position of the handle. Handle may be scroller.leftThumb_ path, scroller.rightThumb_ path or true
  * for selected range center. It is supposed to be false for nonSelectedBackground.
  * @param {acgraph.vector.Element|boolean} handle
- * @param {number} x
+ * @param {number} position
  * @return {number}
  * @private
  */
-anychart.core.ui.Scroller.prototype.limitX_ = function(handle, x) {
+anychart.core.ui.Scroller.prototype.limitPosition_ = function(handle, position) {
   var bounds = this.pixelBoundsCache;
   var diff;
-  if (goog.isBoolean(handle)) {
-    diff = this.fromInternalRatio_(this.endRatio_ - this.startRatio_) * bounds.width / 2;
+  var horz = this.isHorizontal();
+  if (goog.isBoolean(handle) || !this.allowRangeChange_) {
+    diff = this.fromInternalRatio_(this.endRatio_ - this.startRatio_) * (horz ? bounds.width : bounds.height) / 2;
   } else {
     diff = 0;
   }
-  return goog.math.clamp(x, bounds.left + diff, bounds.left + bounds.width - diff);
+  if (horz)
+    return goog.math.clamp(position, bounds.left + diff, bounds.left + bounds.width - diff);
+  else
+    return goog.math.clamp(position, bounds.top + diff, bounds.top + bounds.height - diff);
 };
 
 
@@ -964,16 +1401,21 @@ anychart.core.ui.Scroller.prototype.limitX_ = function(handle, x) {
  */
 anychart.core.ui.Scroller.prototype.getCurrentPosition_ = function(handle) {
   var ratio;
-  if (handle == this.leftThumb_) {
+  if (this.allowRangeChange_ && handle == this.leftThumb_) {
     ratio = this.startRatio_;
-  } else if (handle == this.rightThumb_) {
+  } else if (this.allowRangeChange_ && handle == this.rightThumb_) {
     ratio = this.endRatio_;
   } else {
     ratio = (this.startRatio_ + this.endRatio_) / 2;
   }
   ratio = this.fromInternalRatio_(ratio);
   var bounds = this.pixelBoundsCache;
-  return bounds.left + bounds.width * ratio;
+  if (this.isHorizontal())
+    return bounds.left + bounds.width * ratio;
+  else if (this.orientation_ == anychart.enums.Orientation.LEFT)
+    return bounds.top + bounds.height * ratio;
+  else
+    return bounds.top + bounds.height * (1 - ratio);
 };
 
 
@@ -997,6 +1439,9 @@ anychart.core.ui.Scroller.prototype.disposeInternal = function() {
   goog.dispose(this.thumbs_);
   this.thumbs_ = null;
 
+  goog.dispose(this.padding_);
+  this.padding_ = null;
+
   goog.base(this, 'disposeInternal');
 };
 
@@ -1010,6 +1455,9 @@ anychart.core.ui.Scroller.prototype.serialize = function() {
   json['height'] = this.height();
   json['minHeight'] = this.minHeight();
   json['maxHeight'] = this.maxHeight();
+  json['orientation'] = this.orientation();
+  json['autoHide'] = this.autoHide();
+  json['allowRangeChange'] = this.allowRangeChange();
   json['thumbs'] = this.thumbs().serialize();
   return json;
 };
@@ -1018,6 +1466,9 @@ anychart.core.ui.Scroller.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.ui.Scroller.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
+  this.orientation(config['orientation']);
+  this.autoHide(config['autoHide']);
+  this.allowRangeChange(config['allowRangeChange']);
   this.fill(config['fill']);
   this.selectedFill(config['selectedFill']);
   this.outlineStroke(config['outlineStroke']);
@@ -1059,26 +1510,33 @@ goog.inherits(anychart.core.ui.Scroller.Dragger, goog.fx.Dragger);
 
 /** @inheritDoc */
 anychart.core.ui.Scroller.Dragger.prototype.computeInitialPosition = function() {
-  this.deltaX = this.scroller_.getCurrentPosition_(this.targetThumb_);
-  this.deltaY = 0;
+  if (this.scroller_.isHorizontal()) {
+    this.deltaX = this.scroller_.getCurrentPosition_(this.targetThumb_);
+    this.deltaY = 0;
+  } else {
+    this.deltaX = 0;
+    this.deltaY = this.scroller_.getCurrentPosition_(this.targetThumb_);
+  }
 };
 
 
 /** @inheritDoc */
 anychart.core.ui.Scroller.Dragger.prototype.defaultAction = function(x, y) {
-  this.scroller_.moveHandleTo_(this.targetThumb_ || true, x);
+  this.scroller_.moveHandleTo_(
+      this.targetThumb_ || true,
+      this.scroller_.isHorizontal() ? x : y);
 };
 
 
 /** @inheritDoc */
 anychart.core.ui.Scroller.Dragger.prototype.limitX = function(x) {
-  return this.scroller_.limitX_(this.targetThumb_, x);
+  return this.scroller_.isHorizontal() ? this.scroller_.limitPosition_(this.targetThumb_, x) : 0;
 };
 
 
 /** @inheritDoc */
 anychart.core.ui.Scroller.Dragger.prototype.limitY = function(y) {
-  return 0;
+  return this.scroller_.isHorizontal() ? 0 : this.scroller_.limitPosition_(this.targetThumb_, y);
 };
 
 
@@ -1346,6 +1804,9 @@ anychart.core.ui.Scroller.prototype['height'] = anychart.core.ui.Scroller.protot
 anychart.core.ui.Scroller.prototype['minHeight'] = anychart.core.ui.Scroller.prototype.minHeight;
 anychart.core.ui.Scroller.prototype['maxHeight'] = anychart.core.ui.Scroller.prototype.maxHeight;
 anychart.core.ui.Scroller.prototype['thumbs'] = anychart.core.ui.Scroller.prototype.thumbs;
+anychart.core.ui.Scroller.prototype['orientation'] = anychart.core.ui.Scroller.prototype.orientation;
+anychart.core.ui.Scroller.prototype['allowRangeChange'] = anychart.core.ui.Scroller.prototype.allowRangeChange;
+anychart.core.ui.Scroller.prototype['autoHide'] = anychart.core.ui.Scroller.prototype.autoHide;
 
 anychart.core.ui.Scroller.Thumbs.prototype['enabled'] = anychart.core.ui.Scroller.Thumbs.prototype.enabled;
 anychart.core.ui.Scroller.Thumbs.prototype['autoHide'] = anychart.core.ui.Scroller.Thumbs.prototype.autoHide;

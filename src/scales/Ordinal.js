@@ -353,7 +353,7 @@ anychart.scales.Ordinal.prototype.getCategorisation = function() {
 
 /** @inheritDoc */
 anychart.scales.Ordinal.prototype.getPointWidthRatio = function() {
-  return 1 / this.values_.length;
+  return 1 / this.values_.length * this.getZoomFactor();
 };
 
 
@@ -383,7 +383,7 @@ anychart.scales.Ordinal.prototype.transform = function(value, opt_subRangeRatio)
     return NaN;
   var result = this.valuesMap_[index].value / this.values_.length +
       (opt_subRangeRatio || 0) / this.values_.length; // sub scale part
-  return this.isInverted ? 1 - result : result;
+  return this.applyZoomAndInverse(result);
 };
 
 
@@ -406,7 +406,7 @@ anychart.scales.Ordinal.prototype.transform = function(value, opt_subRangeRatio)
  * @return {*} Value transformed to output scope.
  */
 anychart.scales.Ordinal.prototype.inverseTransform = function(ratio) {
-  if (this.isInverted) ratio = 1 - ratio;
+  ratio = this.reverseZoomAndInverse(ratio);
   //todo(Anton Saukh): needs improvement.
   var index = goog.math.clamp(Math.ceil(ratio * this.values_.length) - 1, 0, this.values_.length - 1);
   return this.values_[index];

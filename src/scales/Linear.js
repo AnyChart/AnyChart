@@ -148,7 +148,7 @@ anychart.scales.Linear.prototype.calculate = function() {
   if (this.maximumModeAuto)
     this.max = setupResult[1]; // new max
 
-  this.minorTicks().setupAsMinor(this.ticks().get(), this.logBaseVal, setupResult[2], setupResult[3]);
+  this.minorTicks().setupAsMinor(this.ticks().getInternal(), this.logBaseVal, setupResult[2], setupResult[3]);
 
   this.range = this.max - this.min;
 };

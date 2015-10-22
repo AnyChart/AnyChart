@@ -60,14 +60,14 @@ anychart.scales.Logarithmic.prototype.transform = function(value, opt_subRangeRa
   this.calculate();
   value = anychart.utils.toNumber(value);
   var result = (anychart.math.log(/** @type {number} */(value), this.logBaseVal) - this.transformedMin_) / this.range;
-  return this.isInverted ? 1 - result : result;
+  return this.applyZoomAndInverse(result);
 };
 
 
 /** @inheritDoc */
 anychart.scales.Logarithmic.prototype.inverseTransform = function(ratio) {
   this.calculate();
-  if (this.isInverted) ratio = 1 - ratio;
+  ratio = this.reverseZoomAndInverse(ratio);
   var x = (ratio * this.range + this.transformedMin_);
   return anychart.math.pow(this.logBaseVal, x);
 };

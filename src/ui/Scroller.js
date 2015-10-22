@@ -85,4 +85,5 @@ anychart.ui.Scroller.prototype['endRatio'] = anychart.ui.Scroller.prototype.endR
 anychart.ui.Scroller.prototype['parentBounds'] = anychart.ui.Scroller.prototype.parentBounds;
 anychart.ui.Scroller.prototype['getRemainingBounds'] = anychart.ui.Scroller.prototype.getRemainingBounds;
 anychart.ui.Scroller.prototype['container'] = anychart.ui.Scroller.prototype.container;
+anychart.ui.Scroller.prototype['padding'] = anychart.ui.Scroller.prototype.padding;
 anychart.ui.Scroller.prototype['draw'] = anychart.ui.Scroller.prototype.draw;
