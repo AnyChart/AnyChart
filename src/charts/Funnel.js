@@ -101,3 +101,4 @@ anychart.charts.Funnel.prototype['hover'] = anychart.charts.Funnel.prototype.hov
 
 anychart.charts.Funnel.prototype['unselect'] = anychart.charts.Funnel.prototype.unselect;
 anychart.charts.Funnel.prototype['select'] = anychart.charts.Funnel.prototype.select;
+anychart.charts.Funnel.prototype['getPoint'] = anychart.charts.Funnel.prototype.getPoint;

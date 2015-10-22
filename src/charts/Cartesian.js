@@ -1598,6 +1598,7 @@ anychart.charts.Cartesian.prototype.createSeriesByType_ = function(type, data, o
 
   if (ctl) {
     instance = new ctl(data, opt_csvSettings);
+    instance.setChart(this);
     instance.setParentEventTarget(this);
     this.registerDisposable(instance);
     this.series_.push(instance);
@@ -2885,6 +2886,15 @@ anychart.charts.Cartesian.prototype.createLegendItemsProvider = function(sourceM
 };
 
 
+/**
+ * Getter for data bounds of the chart.
+ * @return {anychart.math.Rect}
+ */
+anychart.charts.Cartesian.prototype.getPlotBounds = function() {
+  return this.dataBounds_;
+};
+
+
 /** @inheritDoc */
 anychart.charts.Cartesian.prototype.getSeriesStatus = function(event) {
   var bounds = this.dataBounds_ || anychart.math.rect(0, 0, 0, 0);
@@ -3538,3 +3548,4 @@ anychart.charts.Cartesian.prototype['palette'] = anychart.charts.Cartesian.proto
 anychart.charts.Cartesian.prototype['markerPalette'] = anychart.charts.Cartesian.prototype.markerPalette;
 anychart.charts.Cartesian.prototype['hatchFillPalette'] = anychart.charts.Cartesian.prototype.hatchFillPalette;
 anychart.charts.Cartesian.prototype['getType'] = anychart.charts.Cartesian.prototype.getType;
+anychart.charts.Cartesian.prototype['getPlotBounds'] = anychart.charts.Cartesian.prototype.getPlotBounds;

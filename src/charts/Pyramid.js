@@ -88,3 +88,4 @@ anychart.charts.Pyramid.prototype['unhover'] = anychart.charts.Pyramid.prototype
 
 anychart.charts.Pyramid.prototype['select'] = anychart.charts.Pyramid.prototype.select;
 anychart.charts.Pyramid.prototype['unselect'] = anychart.charts.Pyramid.prototype.unselect;
+anychart.charts.Pyramid.prototype['getPoint'] = anychart.charts.Pyramid.prototype.getPoint;

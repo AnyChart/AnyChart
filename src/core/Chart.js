@@ -1351,41 +1351,43 @@ anychart.core.Chart.prototype.makeCurrentPoint_ = function(seriesStatus, event, 
 /**
  * This method also has a side effect - it patches the original source event to maintain seriesStatus support for
  * browser events.
+ * @param {string} type Type of the interactivity point event.
  * @param {Object} event Event object.
  * @param {Array.<Object>} seriesStatus Array of series statuses.
  * @param {boolean=} opt_empty .
  * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
  */
-anychart.core.Chart.prototype.makeHoverPointEvent = function(event, seriesStatus, opt_empty) {
+anychart.core.Chart.prototype.makeInteractivityPointEvent = function(type, event, seriesStatus, opt_empty) {
+  var currentPoint = this.makeCurrentPoint_(seriesStatus, type, opt_empty);
+  var wrappedPoints = [];
+  /** @type {anychart.core.SeriesBase} */
+  var series;
+  for (var i = 0; i < seriesStatus.length; i++) {
+    var status = seriesStatus[i];
+    series = status.series;
+    for (var j = 0; j < status.points.length; j++)
+      wrappedPoints.push(series.getPoint(status.points[j]));
+  }
+  series = currentPoint['series'];
   return {
-    'type': anychart.enums.EventType.POINTS_HOVER,
+    'type': (type == 'hovered') ? anychart.enums.EventType.POINTS_HOVER : anychart.enums.EventType.POINTS_SELECT,
     'seriesStatus': this.createEventSeriesStatus(seriesStatus, opt_empty),
-    'currentPoint': this.makeCurrentPoint_(seriesStatus, 'hovered', opt_empty),
+    'currentPoint': currentPoint,
     'actualTarget': event['target'],
     'target': this,
-    'originalEvent': event
+    'originalEvent': event,
+    'point': series.getPoint(currentPoint['index']),
+    'points': wrappedPoints
   };
 };
 
 
 /**
- * This method also has a side effect - it patches the original source event to maintain seriesStatus support for
- * browser events.
- * @param {Object} event Event object.
- * @param {Array.<Object>} seriesStatus Array of series statuses.
- * @param {boolean=} opt_empty .
- * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
+ * Gets chart point by index.
+ * @param {number} index Point index.
+ * @return {anychart.core.Point} Chart point.
  */
-anychart.core.Chart.prototype.makeSelectPointEvent = function(event, seriesStatus, opt_empty) {
-  return {
-    'type': anychart.enums.EventType.POINTS_SELECT,
-    'seriesStatus': this.createEventSeriesStatus(seriesStatus, opt_empty),
-    'currentPoint': this.makeCurrentPoint_(seriesStatus, 'selected', opt_empty),
-    'actualTarget': event['target'],
-    'target': this,
-    'originalEvent': event
-  };
-};
+anychart.core.Chart.prototype.getPoint = goog.abstractMethod;
 
 
 /**
@@ -1456,7 +1458,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
               nearestPointToCursor: {index: index, distance: 0}
             });
 
-          this.dispatchEvent(this.makeHoverPointEvent(event, eventSeriesStatus));
+          this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, eventSeriesStatus));
         }
       }
     }
@@ -1492,14 +1494,14 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
         }
       }
       if (dispatchEvent) {
-        this.dispatchEvent(this.makeHoverPointEvent(event, seriesStatus));
+        this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, seriesStatus));
         this.prevHoverSeriesStatus = seriesStatus.length ? seriesStatus : null;
       }
     } else {
       if (!(event['target'] instanceof anychart.core.ui.Legend)) {
         this.unhover();
         if (this.prevHoverSeriesStatus)
-          this.dispatchEvent(this.makeHoverPointEvent(event, this.prevHoverSeriesStatus, true));
+          this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, this.prevHoverSeriesStatus, true));
         this.prevHoverSeriesStatus = null;
       }
     }
@@ -1543,7 +1545,7 @@ anychart.core.Chart.prototype.handleMouseOut = function(event) {
     if ((!ifParent || (prevIndex != index)) && series.dispatchEvent(evt)) {
       if (hoverMode == anychart.enums.HoverMode.SINGLE && !isNaN(index)) {
         series.unhover();
-        this.dispatchEvent(this.makeHoverPointEvent(event, [{
+        this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, [{
           series: series,
           points: [],
           nearestPointToCursor: {index: index, distance: 0}
@@ -1557,7 +1559,7 @@ anychart.core.Chart.prototype.handleMouseOut = function(event) {
       this.unhover();
       this.doAdditionActionsOnMouseOut();
       if (this.prevHoverSeriesStatus)
-        this.dispatchEvent(this.makeHoverPointEvent(event, this.prevHoverSeriesStatus, true));
+        this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, this.prevHoverSeriesStatus, true));
       this.prevHoverSeriesStatus = null;
     }
   }
@@ -1615,10 +1617,10 @@ anychart.core.Chart.prototype.handleMouseDown = function(event) {
         if (unselect) {
           this.unselect();
           if (this.prevSelectSeriesStatus)
-            this.dispatchEvent(this.makeSelectPointEvent(event, this.prevSelectSeriesStatus, true));
+            this.dispatchEvent(this.makeInteractivityPointEvent('selected', event, this.prevSelectSeriesStatus, true));
         } else if (series.selectionMode() == anychart.enums.SelectionMode.SINGLE_SELECT) {
           if (this.prevSelectSeriesStatus)
-            this.dispatchEvent(this.makeSelectPointEvent(event, this.prevSelectSeriesStatus, true));
+            this.dispatchEvent(this.makeInteractivityPointEvent('selected', event, this.prevSelectSeriesStatus, true));
           series.unselect();
           if (goog.isArray(index))
             index = index[index.length - 1];
@@ -1650,7 +1652,7 @@ anychart.core.Chart.prototype.handleMouseDown = function(event) {
           });
         }
 
-        this.dispatchEvent(this.makeSelectPointEvent(evt, eventSeriesStatus));
+        this.dispatchEvent(this.makeInteractivityPointEvent('selected', evt, eventSeriesStatus));
 
         if (equalsSelectedPoints)
           this.prevSelectSeriesStatus = null;
@@ -1661,7 +1663,7 @@ anychart.core.Chart.prototype.handleMouseDown = function(event) {
   } else if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
     this.unselect();
     if (this.prevSelectSeriesStatus)
-      this.dispatchEvent(this.makeSelectPointEvent(event, this.prevSelectSeriesStatus, true));
+      this.dispatchEvent(this.makeInteractivityPointEvent('selected', event, this.prevSelectSeriesStatus, true));
     this.prevSelectSeriesStatus = null;
   }
 
@@ -1810,13 +1812,13 @@ anychart.core.Chart.prototype.handleMouseDown = function(event) {
       }
 
       if (dispatchEvent) {
-        this.dispatchEvent(this.makeSelectPointEvent(event, eventSeriesStatus));
+        this.dispatchEvent(this.makeInteractivityPointEvent('selected', event, eventSeriesStatus));
         this.prevSelectSeriesStatus = eventSeriesStatus.length ? eventSeriesStatus : null;
       }
     } else {
       this.unselect();
       if (this.prevSelectSeriesStatus)
-        this.dispatchEvent(this.makeSelectPointEvent(event, this.prevSelectSeriesStatus, true));
+        this.dispatchEvent(this.makeInteractivityPointEvent('selected', event, this.prevSelectSeriesStatus, true));
       this.prevSelectSeriesStatus = null;
     }
   }
@@ -1825,24 +1827,26 @@ anychart.core.Chart.prototype.handleMouseDown = function(event) {
 
 /**
  * Deselects all series. It doesn't matter what series it belongs to.
+ * @param {(number|Array<number>)=} opt_indexOrIndexes Point index or array of indexes.
  */
-anychart.core.Chart.prototype.unselect = function() {
+anychart.core.Chart.prototype.unselect = function(opt_indexOrIndexes) {
   var i, len;
   var series = this.getAllSeries();
   for (i = 0, len = series.length; i < len; i++) {
-    if (series[i]) series[i].unselect();
+    if (series[i]) series[i].unselect(opt_indexOrIndexes);
   }
 };
 
 
 /**
  * Make unhover to all series. It doesn't matter what series it belongs to.
+ * @param {(number|Array<number>)=} opt_indexOrIndexes Point index or array of indexes.
  */
-anychart.core.Chart.prototype.unhover = function() {
+anychart.core.Chart.prototype.unhover = function(opt_indexOrIndexes) {
   var i, len;
   var series = this.getAllSeries();
   for (i = 0, len = series.length; i < len; i++) {
-    if (series[i]) series[i].unhover();
+    if (series[i]) series[i].unhover(opt_indexOrIndexes);
   }
 };
 

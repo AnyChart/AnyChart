@@ -540,6 +540,7 @@ anychart.charts.Map.prototype.createSeriesByType_ = function(type, data, opt_csv
 
   if (ctl) {
     instance = new ctl(data, opt_csvSettings);
+    instance.setChart(this);
     instance.setParentEventTarget(this);
     this.series_.push(instance);
 
@@ -1299,6 +1300,15 @@ anychart.charts.Map.prototype.legendItemOut = function(item, event) {
 };
 
 
+/**
+ * Getter for data bounds of the chart.
+ * @return {anychart.math.Rect}
+ */
+anychart.charts.Map.prototype.getPlotBounds = function() {
+  return this.dataBounds_;
+};
+
+
 /** @inheritDoc */
 anychart.charts.Map.prototype.getSeriesStatus = function(event) {
   if (event['target'] instanceof anychart.core.ui.Legend) {
@@ -1595,3 +1605,4 @@ anychart.charts.Map.prototype['allowPointsSelect'] = anychart.charts.Map.prototy
 anychart.charts.Map.prototype['minBubbleSize'] = anychart.charts.Map.prototype.minBubbleSize;
 anychart.charts.Map.prototype['maxBubbleSize'] = anychart.charts.Map.prototype.maxBubbleSize;
 anychart.charts.Map.prototype['geoIdField'] = anychart.charts.Map.prototype.geoIdField;
+anychart.charts.Map.prototype['getPlotBounds'] = anychart.charts.Map.prototype.getPlotBounds;

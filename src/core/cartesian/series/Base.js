@@ -351,10 +351,12 @@ anychart.core.cartesian.series.Base.prototype.getReferenceCoords = function() {
             true);
         break;
       case 'y':
+        iterator.meta('stackZero', yScale.getPrevVal(val));
         if (this.referenceValuesSupportStack)
           val = yScale.applyStacking(val);
         else if (yScale.isMissing(val))
           val = NaN;
+        iterator.meta('stackValue', val);
         pix = this.applyRatioToBounds(yScale.transform(val, 0.5), false);
         break;
       case 'z':
@@ -378,6 +380,40 @@ anychart.core.cartesian.series.Base.prototype.getReferenceCoords = function() {
     res.push(pix);
   }
   return fail ? null : res;
+};
+
+
+/**
+ * Transforms x to pix coords.
+ * @param {*} value
+ * @param {number=} opt_subRangeRatio
+ * @return {number} Pix value.
+ */
+anychart.core.cartesian.series.Base.prototype.transformX = function(value, opt_subRangeRatio) {
+  return this.applyRatioToBounds(this.xScale().transform(value, opt_subRangeRatio), true);
+};
+
+
+/**
+ * Transforms y to pix coords.
+ * @param {*} value
+ * @param {number=} opt_subRangeRatio
+ * @return {number} Pix value.
+ */
+anychart.core.cartesian.series.Base.prototype.transformY = function(value, opt_subRangeRatio) {
+  return this.applyRatioToBounds(this.yScale().transform(value, opt_subRangeRatio), false);
+};
+
+
+/**
+ * Get point width in case of width-based series.
+ * @return {number} Point width.
+ */
+anychart.core.cartesian.series.Base.prototype.getPixelPointWidth = function() {
+  if ((this.isWidthBased() || this.isBarBased()) && goog.isFunction(this.getPointWidth))
+    return this.getPointWidth();
+  else
+    return 0;
 };
 
 
@@ -478,15 +514,6 @@ anychart.core.cartesian.series.Base.prototype.isWidthBased = function() {
  * @return {boolean}
  */
 anychart.core.cartesian.series.Base.prototype.isBarBased = function() {
-  return false;
-};
-
-
-/**
- * Tester if the series is size based (bubble).
- * @return {boolean}
- */
-anychart.core.cartesian.series.Base.prototype.isSizeBased = function() {
   return false;
 };
 
@@ -1200,3 +1227,6 @@ anychart.core.cartesian.series.Base.prototype['xPointPosition'] = anychart.core.
 anychart.core.cartesian.series.Base.prototype['xScale'] = anychart.core.cartesian.series.Base.prototype.xScale;//doc|ex
 anychart.core.cartesian.series.Base.prototype['yScale'] = anychart.core.cartesian.series.Base.prototype.yScale;//doc|ex
 anychart.core.cartesian.series.Base.prototype['error'] = anychart.core.cartesian.series.Base.prototype.error;
+anychart.core.cartesian.series.Base.prototype['transformX'] = anychart.core.cartesian.series.Base.prototype.transformX;
+anychart.core.cartesian.series.Base.prototype['transformY'] = anychart.core.cartesian.series.Base.prototype.transformY;
+anychart.core.cartesian.series.Base.prototype['getPixelPointWidth'] = anychart.core.cartesian.series.Base.prototype.getPixelPointWidth;

@@ -1,4 +1,5 @@
 goog.provide('anychart.core.utils.InteractivityState');
+goog.provide('anychart.core.utils.PieInteractivityState');
 
 
 
@@ -54,7 +55,7 @@ anychart.core.utils.InteractivityState.prototype.setPointState_ = function(state
     //if state by index doesn't found then adds it
     //else updates state.
     var updatePoint = true;
-    var updateSeries = this.updateRules_(state, NaN);
+    var updateSeries = this.updateRules(state, NaN);
 
     if (arrIndex < 0) {
       goog.array.insertAt(this.stateIndex, index, ~arrIndex);
@@ -72,7 +73,7 @@ anychart.core.utils.InteractivityState.prototype.setPointState_ = function(state
       if (!this.target.isDiscreteBased() && this.target.hoverMode() == anychart.enums.HoverMode.SINGLE) {
         if (updateSeries) {
           this.target.applyAppearanceToSeries(state);
-        } else if (goog.isDef(opt_stateToChange) && !updateSeries && this.updateRules_(state, NaN)) {
+        } else if (goog.isDef(opt_stateToChange) && !updateSeries && this.updateRules(state, NaN)) {
           this.target.applyAppearanceToSeries(opt_stateToChange);
         }
       }
@@ -91,9 +92,8 @@ anychart.core.utils.InteractivityState.prototype.setPointState_ = function(state
  * @param {anychart.PointState|number} state .
  * @param {number=} opt_index .
  * @return {boolean}
- * @private
  */
-anychart.core.utils.InteractivityState.prototype.updateRules_ = function(state, opt_index) {
+anychart.core.utils.InteractivityState.prototype.updateRules = function(state, opt_index) {
   var stateToCheck;
   if (goog.isDef(opt_index)) {
     if (isNaN(opt_index)) {
@@ -161,7 +161,7 @@ anychart.core.utils.InteractivityState.prototype.setPointState = function(state,
       }
     }
 
-    if (this.updateRules_(state)) {
+    if (this.updateRules(state)) {
       if (this.target.isDiscreteBased()) {
         iterator = this.target.getResetIterator();
         while (iterator.advance()) {
@@ -171,7 +171,7 @@ anychart.core.utils.InteractivityState.prototype.setPointState = function(state,
           }
         }
       } else {
-        if (this.updateRules_(state, NaN))
+        if (this.updateRules(state, NaN))
           this.target.applyAppearanceToSeries(state);
       }
       this.seriesState = /** @type {anychart.PointState|number}*/(state);
@@ -183,9 +183,9 @@ anychart.core.utils.InteractivityState.prototype.setPointState = function(state,
 /**
  * @param {anychart.PointState|number} state .
  * @param {number} index .
- * @private
+ * @protected
  */
-anychart.core.utils.InteractivityState.prototype.addPointState_ = function(state, index) {
+anychart.core.utils.InteractivityState.prototype.addPointStateInternal = function(state, index) {
   if (!this.target.getIterator().select(index))
     return;
 
@@ -201,7 +201,7 @@ anychart.core.utils.InteractivityState.prototype.addPointState_ = function(state
       if (this.seriesState == anychart.PointState.NORMAL)
         this.target.applyAppearanceToPoint(state);
 
-      var updateSeries = this.updateRules_(state, NaN);
+      var updateSeries = this.updateRules(state, NaN);
       if (updateSeries && !this.target.isDiscreteBased() && this.target.hoverMode() == anychart.enums.HoverMode.SINGLE)
         this.target.applyAppearanceToSeries(state);
     } else
@@ -221,9 +221,9 @@ anychart.core.utils.InteractivityState.prototype.addPointState = function(state,
     if (goog.isArray(opt_index)) {
       goog.array.sort(opt_index);
       for (i = opt_index.length; i--;)
-        this.addPointState_(state, +opt_index[i]);
+        this.addPointStateInternal(state, +opt_index[i]);
     } else
-      this.addPointState_(state, +opt_index);
+      this.addPointStateInternal(state, +opt_index);
   } else {
     if (!this.isStateContains(this.seriesState, state)) {
       for (i = this.stateValue.length; i--;) {
@@ -447,4 +447,47 @@ anychart.core.utils.InteractivityState.prototype.getSeriesState = function() {
  */
 anychart.core.utils.InteractivityState.prototype.isStateContains = function(state, stateToCheck) {
   return !!(state & stateToCheck);
+};
+
+
+
+/**
+ * Interactivity state class for pie. See #addPointStateInternal method.
+ * @param {anychart.charts.Pie} target Pie chart.
+ * @constructor
+ * @extends {anychart.core.utils.InteractivityState}
+ */
+anychart.core.utils.PieInteractivityState = function(target) {
+  goog.base(this, target);
+};
+goog.inherits(anychart.core.utils.PieInteractivityState, anychart.core.utils.InteractivityState);
+
+
+/** @inheritDoc */
+anychart.core.utils.PieInteractivityState.prototype.addPointStateInternal = function(state, index) {
+  if (!this.target.getIterator().select(index))
+    return;
+
+  var arrIndex = goog.array.binarySearch(this.stateIndex, index);
+  //if state is normal - do nothing.
+  if (state != anychart.PointState.NORMAL) {
+    //if state by index doesn't found then adds it
+    //else updates state.
+    if (arrIndex < 0) {
+      goog.array.insertAt(this.stateIndex, index, ~arrIndex);
+      goog.array.insertAt(this.stateValue, state, ~arrIndex);
+
+      if (this.seriesState == anychart.PointState.NORMAL)
+        this.target.applyAppearanceToPoint(state);
+
+      var updateSeries = this.updateRules(state, NaN);
+      if (updateSeries && !this.target.isDiscreteBased() && this.target.hoverMode() == anychart.enums.HoverMode.SINGLE)
+        this.target.applyAppearanceToSeries(state);
+    } else {
+      // here we upgrading logic for pie
+      // when state adds - update point appearance.
+      this.stateValue[arrIndex] |= state;
+      this.target.applyAppearanceToPoint(this.stateValue[arrIndex]);
+    }
+  }
 };

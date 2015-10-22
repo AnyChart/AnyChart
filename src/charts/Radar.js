@@ -718,6 +718,7 @@ anychart.charts.Radar.prototype.createSeriesByType_ = function(type, data, opt_c
 
   if (ctl) {
     instance = new ctl(data, opt_csvSettings);
+    instance.setChart(this);
     instance.setParentEventTarget(this);
     this.registerDisposable(instance);
     this.series_.push(instance);
@@ -1570,6 +1571,15 @@ anychart.charts.Radar.prototype.createLegendItemsProvider = function(sourceMode,
 };
 
 
+/**
+ * Getter for data bounds of the plot.
+ * @return {anychart.math.Rect}
+ */
+anychart.charts.Radar.prototype.getPlotBounds = function() {
+  return this.dataBounds_;
+};
+
+
 /** @inheritDoc */
 anychart.charts.Radar.prototype.getSeriesStatus = function(event) {
   var clientX = event['clientX'];
@@ -2001,3 +2011,4 @@ anychart.charts.Radar.prototype['palette'] = anychart.charts.Radar.prototype.pal
 anychart.charts.Radar.prototype['markerPalette'] = anychart.charts.Radar.prototype.markerPalette;//doc|ex
 anychart.charts.Radar.prototype['startAngle'] = anychart.charts.Radar.prototype.startAngle;//doc|ex
 anychart.charts.Radar.prototype['getType'] = anychart.charts.Radar.prototype.getType;
+anychart.charts.Radar.prototype['getPlotBounds'] = anychart.charts.Radar.prototype.getPlotBounds;

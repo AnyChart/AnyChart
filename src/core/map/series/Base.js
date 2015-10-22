@@ -232,15 +232,6 @@ anychart.core.map.series.Base.prototype.hasMarkers = function() {
  * Tester if the series is size based (bubble).
  * @return {boolean}
  */
-anychart.core.map.series.Base.prototype.isSizeBased = function() {
-  return false;
-};
-
-
-/**
- * Tester if the series is size based (bubble).
- * @return {boolean}
- */
 anychart.core.map.series.Base.prototype.isChoropleth = function() {
   return false;
 };
@@ -452,6 +443,18 @@ anychart.core.map.series.Base.prototype.getReferenceScaleValues = function() {
 
 
 /**
+ * Transform coords to pix values.
+ * @param {number} xCoord X coordinate.
+ * @param {number} yCoord Y coordinate.
+ * @return {Object.<string, number>} Object with pix values.
+ */
+anychart.core.map.series.Base.prototype.transformXY = function(xCoord, yCoord) {
+  var values = this.getChart().scale().transform(xCoord, yCoord);
+  return {'x': values[0], 'y': values[1]};
+};
+
+
+/**
  * Create base series format provider.
  * @param {boolean=} opt_force create context provider forcibly.
  * @return {Object} Object with info for labels formatting.
@@ -651,3 +654,4 @@ anychart.core.map.series.Base.prototype['hoverHatchFill'] = anychart.core.map.se
 anychart.core.map.series.Base.prototype['hatchFill'] = anychart.core.map.series.Base.prototype.hatchFill;
 
 anychart.core.map.series.Base.prototype['geoIdField'] = anychart.core.map.series.Base.prototype.geoIdField;
+anychart.core.map.series.Base.prototype['transformXY'] = anychart.core.map.series.Base.prototype.transformXY;

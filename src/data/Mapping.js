@@ -84,41 +84,39 @@ anychart.data.Mapping.prototype.getInternal = function(row, rowIndex, fieldName)
  * @return {*} The row with new value set (because in some cases the total row need to be changed and reset to data.Set).
  */
 anychart.data.Mapping.prototype.setInternal = function(row, fieldName, value) {
-  if (goog.isDefAndNotNull(row)) {
-    /** @type {string} */
-    var rowType = goog.typeOf(row);
-    if (rowType == 'array') {
-      /** @type {Array.<number>} */
-      var indexes = this.arrayMapping_[fieldName];
-      if (indexes) {
-        var minIndex = indexes[0];
-        for (var i = 0; i < indexes.length; i++) {
-          if (indexes[i] < row.length) {
-            row[indexes[i]] = value;
-            return row;
+  /** @type {string} */
+  var rowType = goog.typeOf(row);
+  if (rowType == 'array') {
+    /** @type {Array.<number>} */
+    var indexes = this.arrayMapping_[fieldName];
+    if (indexes) {
+      var minIndex = indexes[0];
+      for (var i = 0; i < indexes.length; i++) {
+        if (indexes[i] < row.length) {
+          row[indexes[i]] = value;
+          return row;
 
-          // select min index
-          } else if (indexes[i] < minIndex) {
-            minIndex = indexes[i];
-          }
+        // select min index
+        } else if (indexes[i] < minIndex) {
+          minIndex = indexes[i];
         }
-
-        // DVF-1357 set value by min index
-        row[minIndex] = value;
-        return row;
-
       }
-      anychart.utils.warning(anychart.enums.WarningCode.NOT_MAPPED_FIELD, null, [fieldName]);
-    } else if (rowType == 'object') {
-      anychart.utils.mapObject(/** @type {!Object} */(row), fieldName, this.objectMapping_[fieldName], value,
-          this.writeToFirstFieldByMapping_);
-    } else if (goog.array.indexOf(this.defaultProps_, fieldName) > -1) {
-      if (anychart.DEVELOP && (goog.isArray(value) || goog.isObject(value)))
-        anychart.utils.warning(anychart.enums.WarningCode.COMPLEX_VALUE_TO_DEFAULT_FIELD, null, [fieldName]);
-      row = value;
-    } else {
-      anychart.utils.warning(anychart.enums.WarningCode.NOT_OBJECT_OR_ARRAY, null, [fieldName]);
+
+      // DVF-1357 set value by min index
+      row[minIndex] = value;
+      return row;
+
     }
+    anychart.utils.warning(anychart.enums.WarningCode.NOT_MAPPED_FIELD, null, [fieldName]);
+  } else if (rowType == 'object') {
+    anychart.utils.mapObject(/** @type {!Object} */(row), fieldName, this.objectMapping_[fieldName], value,
+        this.writeToFirstFieldByMapping_);
+  } else if (goog.array.indexOf(this.defaultProps_, fieldName) > -1) {
+    if (anychart.DEVELOP && (goog.isArray(value) || goog.isObject(value)))
+      anychart.utils.warning(anychart.enums.WarningCode.COMPLEX_VALUE_TO_DEFAULT_FIELD, null, [fieldName]);
+    row = value;
+  } else {
+    anychart.utils.warning(anychart.enums.WarningCode.NOT_OBJECT_OR_ARRAY, null, [fieldName]);
   }
   return row;
 };

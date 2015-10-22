@@ -571,7 +571,9 @@ anychart.data.View.prototype.get = function(rowIndex, fieldName) {
  * @return {!anychart.data.View} Itself for chaining.
  */
 anychart.data.View.prototype.set = function(rowIndex, fieldName, value) {
-  this.row(rowIndex, this.getRowMapping(rowIndex).setInternal(this.row(rowIndex), fieldName, value));
+  var row = this.row(rowIndex);
+  if (goog.isDef(row))
+    this.row(rowIndex, this.getRowMapping(rowIndex).setInternal(row, fieldName, value));
   return this;
 };
 

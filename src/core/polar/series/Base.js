@@ -434,6 +434,31 @@ anychart.core.polar.series.Base.prototype.getValuePointCoords = function() {
 };
 
 
+/**
+ * Transforms values to pix coords.
+ * @param {*} xVal
+ * @param {*} yVal
+ * @return {Object.<string, number>} Pix values.
+ */
+anychart.core.polar.series.Base.prototype.transformXY = function(xVal, yVal) {
+  var xScale = /** @type {anychart.scales.Base} */(this.xScale());
+  var yScale = /** @type {anychart.scales.Base} */(this.yScale());
+
+  //x coord, y coord, angle, raduis
+  var pixX, pixY, angle, radius;
+
+  var xRatio = xScale.transform(xVal, 0);
+  var yRatio = yScale.transform(yVal, .5);
+
+  angle = goog.math.modulo(goog.math.toRadians(this.startAngle_ - 90 + 360 * xRatio), Math.PI * 2);
+  radius = this.radius * yRatio;
+  pixX = xScale.isMissing(xVal) ? NaN : this.cx + radius * Math.cos(angle);
+  pixY = this.cy + radius * Math.sin(angle);
+
+  return {'x': pixX, 'y': pixY};
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Sufficient properties
@@ -785,3 +810,4 @@ anychart.core.polar.series.Base.prototype.setupByJSON = function(config) {
 //exports
 anychart.core.polar.series.Base.prototype['xScale'] = anychart.core.polar.series.Base.prototype.xScale;//need-ex
 anychart.core.polar.series.Base.prototype['yScale'] = anychart.core.polar.series.Base.prototype.yScale;//need-ex
+anychart.core.polar.series.Base.prototype['transformXY'] = anychart.core.polar.series.Base.prototype.transformXY;

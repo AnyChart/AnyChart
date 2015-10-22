@@ -660,6 +660,7 @@ anychart.charts.Polar.prototype.createSeriesByType_ = function(type, data, opt_c
 
   if (ctl) {
     instance = new ctl(data, opt_csvSettings);
+    instance.setChart(this);
     instance.setParentEventTarget(this);
     this.registerDisposable(instance);
     this.series_.push(instance);
@@ -1279,6 +1280,15 @@ anychart.charts.Polar.prototype.legendItemCanInteractInMode = function(mode) {
 };
 
 
+/**
+ * Getter for data bounds of the chart.
+ * @return {anychart.math.Rect}
+ */
+anychart.charts.Polar.prototype.getPlotBounds = function() {
+  return this.dataBounds_;
+};
+
+
 /** @inheritDoc */
 anychart.charts.Polar.prototype.getSeriesStatus = function(event) {
   var clientX = event['clientX'];
@@ -1715,3 +1725,4 @@ anychart.charts.Polar.prototype['markerPalette'] = anychart.charts.Polar.prototy
 anychart.charts.Polar.prototype['hatchFillPalette'] = anychart.charts.Polar.prototype.hatchFillPalette;
 anychart.charts.Polar.prototype['startAngle'] = anychart.charts.Polar.prototype.startAngle;//doc|ex
 anychart.charts.Polar.prototype['getType'] = anychart.charts.Polar.prototype.getType;
+anychart.charts.Polar.prototype['getPlotBounds'] = anychart.charts.Polar.prototype.getPlotBounds;

@@ -1,6 +1,8 @@
 goog.provide('anychart.core.SeriesBase');
 goog.require('acgraph');
 goog.require('anychart.color');
+goog.require('anychart.core.BubblePoint');
+goog.require('anychart.core.SeriesPoint');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.SeriesTooltip');
@@ -280,6 +282,33 @@ anychart.core.SeriesBase.prototype.isSeries = function() {
  */
 anychart.core.SeriesBase.prototype.isChart = function() {
   return false;
+};
+
+
+/**
+ * Tester if the series is size based (bubble).
+ * @return {boolean}
+ */
+anychart.core.SeriesBase.prototype.isSizeBased = function() {
+  return false;
+};
+
+
+/**
+ * Sets the chart series belongs to.
+ * @param {anychart.core.SeparateChart} chart Chart instance.
+ */
+anychart.core.SeriesBase.prototype.setChart = function(chart) {
+  this.chart_ = chart;
+};
+
+
+/**
+ * Get the chart series belongs to.
+ * @return {anychart.core.SeparateChart}
+ */
+anychart.core.SeriesBase.prototype.getChart = function() {
+  return this.chart_;
 };
 
 
@@ -1485,8 +1514,23 @@ anychart.core.SeriesBase.prototype.makePointEvent = function(event) {
     'iterator': iter,
     'pointIndex': pointIndex,
     'target': this,
-    'originalEvent': event
+    'originalEvent': event,
+    'point': this.getPoint(pointIndex)
   };
+};
+
+
+/**
+ * Gets wrapped point by index.
+ * @param {number} index Point index.
+ * @return {anychart.core.SeriesPoint} Wrapped point.
+ */
+anychart.core.SeriesBase.prototype.getPoint = function(index) {
+  if (this.isSizeBased()) {
+    return new anychart.core.BubblePoint(this, index);
+  } else {
+    return new anychart.core.SeriesPoint(this, index);
+  }
 };
 
 
@@ -1547,16 +1591,22 @@ anychart.core.SeriesBase.prototype.hover = function(opt_indexOrIndexes) {
 
 
 /**
- * Removes hover from the series.
+ * Removes hover from the series or point by index.
+ * @param {(number|Array<number>)=} opt_indexOrIndexes Point index or array of indexes.
  * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
  */
-anychart.core.SeriesBase.prototype.unhover = function() {
+anychart.core.SeriesBase.prototype.unhover = function(opt_indexOrIndexes) {
   if (!(this.state.hasPointState(anychart.PointState.HOVER) ||
       this.state.isStateContains(this.state.getSeriesState(), anychart.PointState.HOVER)) ||
       !this.enabled())
     return this;
 
-  this.state.removePointState(anychart.PointState.HOVER, this.state.seriesState == anychart.PointState.NORMAL ? NaN : undefined);
+  var index;
+  if (goog.isDef(opt_indexOrIndexes))
+    index = opt_indexOrIndexes;
+  else
+    index = (this.state.seriesState == anychart.PointState.NORMAL ? NaN : undefined);
+  this.state.removePointState(anychart.PointState.HOVER, index);
 
   return this;
 };
@@ -1663,24 +1713,33 @@ anychart.core.SeriesBase.prototype.selectPoint = function(indexOrIndexes, opt_ev
 };
 
 
-/**
- * Deselects all points.
- * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
- */
-anychart.core.SeriesBase.prototype.unselect = function() {
-  if (!this.enabled())
-    return this;
-
-  this.state.removePointState(anychart.PointState.SELECT, this.state.seriesState == anychart.PointState.NORMAL ? NaN : undefined);
-  return this;
-};
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Interactivity modes.
 //
 //----------------------------------------------------------------------------------------------------------------------
+
+
+/**
+ * Deselects all points or points by index.
+ * @param {(number|Array.<number>)=} opt_indexOrIndexes Index or array of indexes of the point to select.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ */
+anychart.core.SeriesBase.prototype.unselect = function(opt_indexOrIndexes) {
+  if (!this.enabled())
+    return this;
+
+  var index;
+  if (goog.isDef(opt_indexOrIndexes))
+    index = opt_indexOrIndexes;
+  else
+    index = (this.state.seriesState == anychart.PointState.NORMAL ? NaN : undefined);
+  this.state.removePointState(anychart.PointState.SELECT, index);
+
+  return this;
+};
+
+
 /**
  * Selection mode.
  * @type {?anychart.enums.SelectionMode}
@@ -1946,3 +2005,5 @@ anychart.core.SeriesBase.prototype['selectionMode'] = anychart.core.SeriesBase.p
 anychart.core.SeriesBase.prototype['allowPointsSelect'] = anychart.core.SeriesBase.prototype.allowPointsSelect;
 
 anychart.core.SeriesBase.prototype['legendItem'] = anychart.core.SeriesBase.prototype.legendItem;
+anychart.core.SeriesBase.prototype['getPixelBounds'] = anychart.core.SeriesBase.prototype.getPixelBounds;
+anychart.core.SeriesBase.prototype['getPoint'] = anychart.core.SeriesBase.prototype.getPoint;

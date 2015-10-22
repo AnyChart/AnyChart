@@ -1487,6 +1487,7 @@ anychart.charts.Scatter.prototype.createSeriesByType_ = function(type, data, opt
 
   if (ctl) {
     instance = new ctl(data, opt_csvSettings);
+    instance.setChart(this);
     instance.setParentEventTarget(this);
     this.registerDisposable(instance);
     this.series_.push(instance);
@@ -1609,6 +1610,15 @@ anychart.charts.Scatter.prototype.createLegendItemsProvider = function(sourceMod
 /** @inheritDoc */
 anychart.charts.Scatter.prototype.legendItemCanInteractInMode = function(mode) {
   return true;
+};
+
+
+/**
+ * Getter for data bounds of the chart.
+ * @return {anychart.math.Rect}
+ */
+anychart.charts.Scatter.prototype.getPlotBounds = function() {
+  return this.dataBounds_;
 };
 
 
@@ -2561,3 +2571,4 @@ anychart.charts.Scatter.prototype['hatchFillPalette'] = anychart.charts.Scatter.
 anychart.charts.Scatter.prototype['getType'] = anychart.charts.Scatter.prototype.getType;
 anychart.charts.Scatter.prototype['maxBubbleSize'] = anychart.charts.Scatter.prototype.maxBubbleSize;
 anychart.charts.Scatter.prototype['minBubbleSize'] = anychart.charts.Scatter.prototype.minBubbleSize;
+anychart.charts.Scatter.prototype['getPlotBounds'] = anychart.charts.Scatter.prototype.getPlotBounds;
