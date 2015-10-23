@@ -1,4 +1,7 @@
+goog.provide('anychart.core.ui.SimpleSplitter');
 goog.provide('anychart.core.ui.Splitter');
+
+
 goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.VisualBaseWithBounds');
@@ -800,12 +803,10 @@ anychart.core.ui.Splitter.prototype.drawVisualSplitter_ = function() {
 
   if (this.considerSplitterWidth_) {
     splitterX = isVertical ?
-        b.getLeft() + this.position_ * (b.getWidth() - this.splitterWidth_) :
-        b.getLeft();
+        (b.getLeft() + this.position_ * (b.getWidth() - this.splitterWidth_)) :
+        (b.getLeft());
 
-    splitterY = isVertical ?
-        b.getTop() :
-        b.getTop() + this.position_ * (b.getHeight() - this.splitterWidth_);
+    splitterY = isVertical ? b.getTop() : b.getTop() + this.position_ * (b.getHeight() - this.splitterWidth_);
 
     dragX = isVertical ? b.getLeft() + this.startLimitSize_ - this.dragAreaLength_ : b.getLeft();
     dragY = isVertical ? b.getTop() : b.getTop() + this.startLimitSize_ - this.dragAreaLength_;
@@ -813,13 +814,9 @@ anychart.core.ui.Splitter.prototype.drawVisualSplitter_ = function() {
     dragHeight = isVertical ? b.getHeight() : b.getHeight() - this.startLimitSize_ - this.endLimitSize_ + 2 * this.dragAreaLength_;
 
   } else {
-    splitterX = isVertical ?
-        b.getLeft() + this.position_ * b.getWidth() - this.splitterWidth_ / 2 :
-        b.getLeft();
+    splitterX = isVertical ? b.getLeft() + this.position_ * b.getWidth() - this.splitterWidth_ / 2 : b.getLeft();
 
-    splitterY = isVertical ?
-        b.getTop() :
-        b.getTop() + this.position_ * b.getHeight() - this.splitterWidth_ / 2;
+    splitterY = isVertical ? b.getTop() : b.getTop() + this.position_ * b.getHeight() - this.splitterWidth_ / 2;
 
     dragX = isVertical ? b.getLeft() + this.startLimitSize_ - this.dragAreaLength_ - this.splitterWidth_ / 2 : b.getLeft();
     dragY = isVertical ? b.getTop() : b.getTop() + this.startLimitSize_ - this.dragAreaLength_ - this.splitterWidth_ / 2;
@@ -909,12 +906,12 @@ anychart.core.ui.Splitter.prototype.dragHandler_ = function() {
   this.globalCursor_(isVertical);
 
   var oldPos = isVertical ?
-      this.position_ * this.pixelBoundsCache_.getWidth() + this.pixelBoundsCache_.getLeft() :
-      this.position_ * this.pixelBoundsCache_.getHeight() + this.pixelBoundsCache_.getTop();
+      (this.position_ * this.pixelBoundsCache_.getWidth() + this.pixelBoundsCache_.getLeft()) :
+      (this.position_ * this.pixelBoundsCache_.getHeight() + this.pixelBoundsCache_.getTop());
 
   var newPos = isVertical ?
-      currentBounds.getLeft() + currentBounds.getWidth() / 2 : //X axis for vertical.
-      currentBounds.getTop() + currentBounds.getHeight() / 2;  //Y axis for horizontal.
+      (currentBounds.getLeft() + currentBounds.getWidth() / 2) : //X axis for vertical.
+      (currentBounds.getTop() + currentBounds.getHeight() / 2);  //Y axis for horizontal.
 
   if (isVertical) {
     this.dragPreview_
@@ -947,21 +944,19 @@ anychart.core.ui.Splitter.prototype.dragEndHandler_ = function() {
 
   if (this.considerSplitterWidth_) {
     newPos = isVertical ?
-        currentBounds.left + this.dragAreaLength_ - this.pixelBoundsCache_.left :
-        currentBounds.top + this.dragAreaLength_ - this.pixelBoundsCache_.top;
+        (currentBounds.left + this.dragAreaLength_ - this.pixelBoundsCache_.left) :
+        (currentBounds.top + this.dragAreaLength_ - this.pixelBoundsCache_.top);
 
     newRatio = isVertical ?
-        newPos / (this.pixelBoundsCache_.width - this.splitterWidth_) :
-        newPos / (this.pixelBoundsCache_.height - this.splitterWidth_);
+        (newPos / (this.pixelBoundsCache_.width - this.splitterWidth_)) :
+        (newPos / (this.pixelBoundsCache_.height - this.splitterWidth_));
 
   } else {
     newPos = isVertical ?
-        currentBounds.left + currentBounds.width / 2 - this.pixelBoundsCache_.left : //X axis for vertical.
-        currentBounds.top + currentBounds.height / 2 - this.pixelBoundsCache_.top;  //Y axis for horizontal.
+        (currentBounds.left + currentBounds.width / 2 - this.pixelBoundsCache_.left) :
+        (currentBounds.top + currentBounds.height / 2 - this.pixelBoundsCache_.top);
 
-    newRatio = isVertical ?
-        newPos / this.pixelBoundsCache_.width :
-        newPos / this.pixelBoundsCache_.height;
+    newRatio = isVertical ? newPos / this.pixelBoundsCache_.width : newPos / this.pixelBoundsCache_.height;
   }
 
   this.position(anychart.math.round(newRatio, 4));
@@ -1145,6 +1140,567 @@ anychart.core.ui.Splitter.prototype.remove = function() {
   //this.base_ is actually a layer. All the other elements are children of this.base_.
   if (this.base_) this.base_.parent(null);
 };
+
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Simple gantt splitter implementation.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Simple gantt splitter implementation.
+ *
+ * - Can be vertical only.
+ * - Doesn't have limits.
+ * - Split line is a simple line path.
+ * - Always considers splitter width.
+ * - Drag preview doesn't have stroke.
+ * - Draw area is always transparent and doesn't have a stroke.
+ * - Position is always a left pixel offset.
+ *
+ * @constructor
+ * @extends {anychart.core.VisualBaseWithBounds}
+ */
+anychart.core.ui.SimpleSplitter = function() {
+  goog.base(this);
+
+  /**
+   * Layer that contains all visual elements.
+   * @type {acgraph.vector.Layer}
+   * @private
+   */
+  this.base_ = null;
+
+  /**
+   * Center single line.
+   * @type {acgraph.vector.Path}
+   * @private
+   */
+  this.centerLine_ = null;
+
+  /**
+   * Area that simplifies drag pointer navigation.
+   * Actually it is a transparent rectangle that can be dragged.
+   * @type {acgraph.vector.Path}
+   * @private
+   */
+  this.dragArea_ = null;
+
+  /**
+   * Area (rectangle) that appears while dragging a resizer.
+   * @type {acgraph.vector.Path}
+   * @private
+   */
+  this.dragPreview_ = null;
+
+  /**
+   * Position ratio of resizer line.
+   * @type {number}
+   * @private
+   */
+  this.position_ = NaN;
+
+  /**
+   * Size of drag area before and after center line.
+   * @type {number}
+   * @private
+   */
+  this.dragAreaLength_ = 3;
+
+  /**
+   * Pixel bounds cache. Allows to avoid re-calculation of pixel bounds.
+   * @type {acgraph.math.Rect}
+   * @private
+   */
+  this.pixelBoundsCache_;
+
+  /**
+   * Flag if splitter is currently in a dragging process.
+   * @type {boolean}
+   * @private
+   */
+  this.dragging_ = false;
+
+  /**
+   * Whether mouse is over.
+   * @type {boolean}
+   * @private
+   */
+  this.mouseOver_ = false;
+
+  /**
+   * Current cursor (before dragging).
+   * @type {string}
+   * @private
+   */
+  this.cursorBackup_ = goog.style.getStyle(goog.global['document']['body'], 'cursor');
+
+  /**
+   * Center line stroke.
+   * @type {acgraph.vector.Stroke}
+   * @private
+   */
+  this.stroke_ = acgraph.vector.normalizeStroke('1 #acbece');
+
+  /**
+   * Thickness of row stroke.
+   * It is used to avoid multiple thickness extraction from rowStroke_.
+   * @type {number}
+   * @private
+   */
+  this.strokeThickness_ = 1;
+
+  /**
+   * Drag preview fill.
+   * @type {acgraph.vector.Fill}
+   * @private
+   */
+  this.dragPreviewFill_ = acgraph.vector.normalizeFill('#ccd7e1 0.3');
+
+  /**
+   * Drag area fill.
+   * @type {acgraph.vector.Fill}
+   * @private
+   */
+  this.dragAreaFill_ = acgraph.vector.normalizeFill('#fff 0.00001');
+
+  /**
+   * Flag if changing of splitter position must be handled.
+   * @type {boolean}
+   * @private
+   */
+  this.handlePositionChange_ = true;
+
+};
+goog.inherits(anychart.core.ui.SimpleSplitter, anychart.core.VisualBaseWithBounds);
+
+
+/**
+ * Supported signals.
+ * @type {number}
+ */
+anychart.core.ui.SimpleSplitter.prototype.SUPPORTED_SIGNALS = anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS;
+
+
+/**
+ * Supported consistence states.
+ * @type {number}
+ */
+anychart.core.ui.SimpleSplitter.prototype.SUPPORTED_CONSISTENCY_STATES =
+    anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.ConsistencyState.APPEARANCE |
+    anychart.ConsistencyState.SPLITTER_POSITION;
+
+
+/** @inheritDoc */
+anychart.core.ui.SimpleSplitter.prototype.remove = function() {
+  //this.base_ is actually a layer. All the other elements are children of this.base_.
+  if (this.base_) this.base_.parent(null);
+};
+
+
+/**
+ * Sets a position of splitter in its bounds and returns itself or returns a current value.
+ * NOTE: Takes not the same parameters as anychart.core.ui.Splitter!!!
+ *
+ * @param {number=} opt_value - Value to be set. Must be a number (left px offset) or a percent value ("57.3%").
+ * @return {number|anychart.core.ui.SimpleSplitter} - Current value or itself for method chaining.
+ */
+anychart.core.ui.SimpleSplitter.prototype.position = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.position_ != opt_value) {
+      this.position_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.SPLITTER_POSITION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.position_;
+};
+
+
+/**
+ * Gets/sets a drag area length.
+ * Drag area is actually an invisible area around visible splitter's line to simplify mouse targeting.
+ * @param {number=} opt_value - Value to be set.
+ * @return {number|anychart.core.ui.SimpleSplitter} - Current value or itself for method chaining.
+ */
+anychart.core.ui.SimpleSplitter.prototype.dragAreaLength = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = +opt_value;
+    if (!isNaN(opt_value)) {
+      opt_value = Math.abs(opt_value);
+      if (this.dragAreaLength_ != opt_value) {
+        this.dragAreaLength_ = opt_value;
+        this.invalidate(anychart.ConsistencyState.SPLITTER_POSITION, anychart.Signal.NEEDS_REDRAW);
+      }
+    }
+    return this;
+  }
+  return this.dragAreaLength_;
+};
+
+
+/**
+ * Gets/sets a center line stroke.
+ *
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
+ * @param {number=} opt_thickness .
+ * @param {string=} opt_dashpattern .
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
+ * @return {acgraph.vector.Stroke|anychart.core.ui.SimpleSplitter|string} - Current value or itself for chaining.
+ */
+anychart.core.ui.SimpleSplitter.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
+    var newThickness = anychart.utils.extractThickness(val);
+
+    if (!anychart.color.equals(this.stroke_, val) || newThickness != this.strokeThickness_) {
+      this.stroke_ = val;
+      this.strokeThickness_ = newThickness;
+      //Invalidates a position because changed line thickness affects a changes in drag area and line's positioning.
+      this.invalidate(anychart.ConsistencyState.SPLITTER_POSITION | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.stroke_ || 'none';
+};
+
+
+/**
+ * Gets/sets a drag preview fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.ui.SimpleSplitter|string} - Current value or itself for method chaining.
+ */
+anychart.core.ui.SimpleSplitter.prototype.dragPreviewFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(this.dragPreviewFill_, val)) {
+      this.dragPreviewFill_ = val;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.dragPreviewFill_ || 'none';
+};
+
+
+/**
+ * Gets/sets a flag if splitter position change must be handled.
+ * @param {boolean=} opt_value - Value to be set.
+ * @return {boolean|anychart.core.ui.SimpleSplitter} - Current value or itself for method chaining.
+ */
+anychart.core.ui.SimpleSplitter.prototype.handlePositionChange = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (goog.isBoolean(opt_value)) this.handlePositionChange_ = opt_value;
+    return this;
+  }
+  return this.handlePositionChange_;
+};
+
+
+/**
+ * Calculates a current left bounds.
+ * @return {acgraph.math.Rect} - Start bounds rect.
+ */
+anychart.core.ui.SimpleSplitter.prototype.getLeftBounds = function() {
+  if (!this.pixelBoundsCache_) this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.getPixelBounds());
+  return new acgraph.math.Rect(
+      anychart.math.round(this.pixelBoundsCache_.left, 1),
+      anychart.math.round(this.pixelBoundsCache_.top, 1),
+      anychart.math.round(Math.min(this.position_, this.pixelBoundsCache_.width - this.strokeThickness_), 1),
+      anychart.math.round(this.pixelBoundsCache_.height, 1)
+  );
+};
+
+
+/**
+ * Calculates a currents right bounds.
+ * @return {acgraph.math.Rect} - End bounds rect.
+ */
+anychart.core.ui.SimpleSplitter.prototype.getRightBounds = function() {
+  if (!this.pixelBoundsCache_) this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.getPixelBounds());
+  return new acgraph.math.Rect(
+      anychart.math.round(this.pixelBoundsCache_.left + this.position_ + this.strokeThickness_, 1),
+      anychart.math.round(this.pixelBoundsCache_.top, 1),
+      anychart.math.round(Math.max(this.pixelBoundsCache_.width - this.strokeThickness_ - this.position_, 0), 1),
+      anychart.math.round(this.pixelBoundsCache_.height, 1)
+  );
+};
+
+
+/**
+ * Sets and resets a cursor.
+ * @param {boolean=} opt_clear - Whether the cursor state must be restored.
+ * @private
+ */
+anychart.core.ui.SimpleSplitter.prototype.globalCursor_ = function(opt_clear) {
+  goog.style.setStyle(goog.global['document']['body'], 'cursor',
+      opt_clear ? this.cursorBackup_ : acgraph.vector.Cursor.E_RESIZE);
+
+  //TODO (A.Kudryavtsev): Check: Some old browsers don't change cursor over the stage if cursor was changed globally.
+  //TODO (A.Kudryavtsev): In this case something like this can be used: this.base_.parent().cursor(opt_clear ? acgraph.vector.Cursor.DEFAULT : cursor);
+};
+
+
+/**
+ * Inner getter for this.base_.
+ * @return {acgraph.vector.Layer}
+ * @private
+ */
+anychart.core.ui.SimpleSplitter.prototype.getBase_ = function() {
+  if (!this.base_) {
+    this.base_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    this.registerDisposable(this.base_);
+  }
+  return this.base_;
+};
+
+
+/**
+ * Drag start handler.
+ * @private
+ */
+anychart.core.ui.SimpleSplitter.prototype.dragStartHandler_ = function() {
+  this.dragging_ = true;
+  this.cursorBackup_ = goog.style.getStyle(goog.global['document']['body'], 'cursor');
+  this.getDragPreview_().clear();
+};
+
+
+/**
+ * Drag handler.
+ * @private
+ */
+anychart.core.ui.SimpleSplitter.prototype.dragHandler_ = function() {
+  var currentBounds = this.dragArea_.getBounds();
+  this.globalCursor_();
+
+  var oldLeft = this.pixelBoundsCache_.left + this.position_ + this.strokeThickness_ / 2;
+  var newLeft = currentBounds.getLeft() + currentBounds.getWidth() / 2;
+
+  this.dragPreview_
+      .clear()
+      .moveTo(oldLeft, this.pixelBoundsCache_.top)
+      .lineTo(newLeft, this.pixelBoundsCache_.top)
+      .lineTo(newLeft, this.pixelBoundsCache_.top + this.pixelBoundsCache_.height)
+      .lineTo(oldLeft, this.pixelBoundsCache_.top + this.pixelBoundsCache_.height)
+      .close();
+
+  this.centerLine_
+      .clear()
+      .moveTo(newLeft, this.pixelBoundsCache_.top)
+      .lineTo(newLeft, this.pixelBoundsCache_.top + this.pixelBoundsCache_.height);
+};
+
+
+/**
+ * Drag end handler.
+ * @private
+ */
+anychart.core.ui.SimpleSplitter.prototype.dragEndHandler_ = function() {
+  this.dragging_ = false;
+  this.dragPreview_.clear();
+
+  var currentBounds = this.dragArea_.getBounds();
+
+  if (!this.mouseOver_) this.globalCursor_(true);
+
+  this.position(currentBounds.left + this.dragAreaLength_ - this.pixelBoundsCache_.left);
+};
+
+
+/**
+ * Mouse up handler.
+ * @param {acgraph.events.BrowserEvent} event - Event.
+ * @private
+ */
+anychart.core.ui.SimpleSplitter.prototype.mouseUpHandler_ = function(event) {
+  event.preventDefault();
+  this.handleBrowserEvent(event);
+};
+
+
+/**
+ * Draws a visual appearance of splitter.
+ * @private
+ */
+anychart.core.ui.SimpleSplitter.prototype.drawVisualSplitter_ = function() {
+  this.base_.cursor(acgraph.vector.Cursor.E_RESIZE);
+  var left = this.pixelBoundsCache_.left + this.position_ + this.strokeThickness_ / 2;
+
+  var drag = new acgraph.math.Rect(this.pixelBoundsCache_.left - this.dragAreaLength_,
+      this.pixelBoundsCache_.top,
+      this.pixelBoundsCache_.width + 2 * this.dragAreaLength_,
+      this.pixelBoundsCache_.height);
+
+  this.centerLine_
+      .clear()
+      .moveTo(left, this.pixelBoundsCache_.top)
+      .lineTo(left, this.pixelBoundsCache_.top + this.pixelBoundsCache_.height);
+
+  var dragAreaLeft = this.pixelBoundsCache_.left + this.position_ - this.dragAreaLength_;
+  var dragAreaRight = this.pixelBoundsCache_.left + this.position_ + this.strokeThickness_ + this.dragAreaLength_;
+
+  this.dragArea_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+
+  this.dragArea_
+      .clear()
+      .moveTo(dragAreaLeft, this.pixelBoundsCache_.top)
+      .lineTo(dragAreaRight, this.pixelBoundsCache_.top)
+      .lineTo(dragAreaRight, this.pixelBoundsCache_.top + this.pixelBoundsCache_.height)
+      .lineTo(dragAreaLeft, this.pixelBoundsCache_.top + this.pixelBoundsCache_.height)
+      .close()
+      .drag(drag);
+};
+
+
+/**
+ * Default mouse move handler.
+ * @private
+ */
+anychart.core.ui.SimpleSplitter.prototype.mouseMoveHandler_ = function() {
+  this.mouseOver_ = true;
+};
+
+
+/**
+ * Default mouse out handler.
+ * @private
+ */
+anychart.core.ui.SimpleSplitter.prototype.mouseOutHandler_ = function() {
+  this.mouseOver_ = false;
+  if (!this.dragging_) this.globalCursor_(true);
+};
+
+
+/**
+ * Inner getter for this.dragArea_.
+ * @return {acgraph.vector.Path}
+ * @private
+ */
+anychart.core.ui.SimpleSplitter.prototype.getDragArea_ = function() {
+  if (!this.dragArea_) {
+    this.dragArea_ = /** @type {acgraph.vector.Path} */ (acgraph.path()
+        .fill(this.dragAreaFill_).stroke(null));
+
+    acgraph.events.listen(this.dragArea_, acgraph.events.EventType.DRAG_START, this.dragStartHandler_, false, this);
+    acgraph.events.listen(this.dragArea_, acgraph.events.EventType.DRAG, this.dragHandler_, false, this);
+    acgraph.events.listen(this.dragArea_, acgraph.events.EventType.DRAG_END, this.dragEndHandler_, false, this);
+
+    this.bindHandlersToGraphics(this.dragArea_, null, this.mouseOutHandler_, null, this.mouseMoveHandler_, null, this.mouseUpHandler_);
+
+    this.registerDisposable(this.dragArea_);
+  }
+  return this.dragArea_;
+};
+
+
+/**
+ * Inner getter for this.dragPreview_.
+ * @return {acgraph.vector.Path}
+ * @private
+ */
+anychart.core.ui.SimpleSplitter.prototype.getDragPreview_ = function() {
+  if (!this.dragPreview_) {
+    this.dragPreview_ = /** @type {acgraph.vector.Path} */ (acgraph.path());
+    this.dragPreview_.fill(this.dragPreviewFill_).stroke(null);
+    this.registerDisposable(this.dragPreview_);
+  }
+  return this.dragPreview_;
+};
+
+
+/**
+ * Inner getter for this.centerLine_.
+ * @return {acgraph.vector.Path}
+ * @private
+ */
+anychart.core.ui.SimpleSplitter.prototype.getCenterLine_ = function() {
+  if (!this.centerLine_) {
+    this.centerLine_ = /** @type {acgraph.vector.Path} */ (acgraph.path()
+        .disablePointerEvents(true)
+        .stroke(this.stroke_));
+
+    this.registerDisposable(this.centerLine_);
+  }
+  return this.centerLine_;
+};
+
+
+/**
+ * Draws splitter.
+ *
+ * @return {anychart.core.ui.SimpleSplitter} - Itself for chaining.
+ */
+anychart.core.ui.SimpleSplitter.prototype.draw = function() {
+  if (this.checkDrawingNeeded()) {
+    var container = /** @type {acgraph.vector.ILayer} */(this.container());
+    var stage = container ? container.getStage() : null;
+    var manualSuspend = stage && !stage.isSuspended();
+    if (manualSuspend) stage.suspend();
+
+    //Ensure DOM structure is created.
+    if (!this.getBase_().numChildren()) {
+      this.getBase_()
+          .addChild(/** @type {!acgraph.vector.Element} */ (this.getDragPreview_()))
+          .addChild(/** @type {!acgraph.vector.Element} */ (this.getDragArea_()))
+          .addChild(/** @type {!acgraph.vector.Element} */ (this.getCenterLine_()));
+    }
+
+    if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
+      this.getBase_().parent(container);
+      this.markConsistent(anychart.ConsistencyState.CONTAINER);
+    }
+
+
+    if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+      this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.getPixelBounds());
+      if (this.handlePositionChange_) this.dispatchEvent(anychart.enums.EventType.SPLITTER_CHANGE); //Trigger user defined event if offset is not zero.
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SPLITTER_POSITION);
+      this.markConsistent(anychart.ConsistencyState.BOUNDS);
+    }
+
+    if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
+      this.centerLine_
+          .stroke(this.stroke_);
+
+      this.dragPreview_
+          .fill(this.dragPreviewFill_);
+
+      this.dragArea_
+          .fill(this.dragAreaFill_);
+      this.markConsistent(anychart.ConsistencyState.APPEARANCE);
+    }
+
+    if (this.hasInvalidationState(anychart.ConsistencyState.SPLITTER_POSITION)) {
+      if (isNaN(this.position_)) this.position_ = Math.round((this.pixelBoundsCache_.width - this.strokeThickness_) / 2);
+      if (this.handlePositionChange_) {
+        this.dispatchEvent(anychart.enums.EventType.SPLITTER_CHANGE);
+      } //Trigger user defined event if offset is not zero.
+      this.drawVisualSplitter_();
+      this.markConsistent(anychart.ConsistencyState.SPLITTER_POSITION);
+    }
+
+    if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
+      this.getBase_().zIndex(/** @type {number} */ (this.zIndex()));
+      this.drawVisualSplitter_();
+      this.markConsistent(anychart.ConsistencyState.Z_INDEX);
+    }
+
+    if (manualSuspend) stage.resume();
+  }
+
+  return this;
+};
+
 
 
 //anychart.core.ui.Splitter.prototype['layout'] = anychart.core.ui.Splitter.prototype.layout;

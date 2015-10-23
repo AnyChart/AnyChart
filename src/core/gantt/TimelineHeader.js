@@ -2,6 +2,7 @@ goog.provide('anychart.core.gantt.TimelineHeader');
 
 goog.require('acgraph');
 goog.require('anychart.core.VisualBaseWithBounds');
+goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.scales.GanttDateTime');
 
 
@@ -47,7 +48,7 @@ anychart.core.gantt.TimelineHeader = function() {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.backgroundFill_ = acgraph.vector.normalizeFill('#ccd7e1');
+  this.backgroundFill_ = acgraph.vector.normalizeFill('#cecece');
 
   /**
    * Levels of header.
@@ -347,7 +348,8 @@ anychart.core.gantt.TimelineHeader.Level = function(header) {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.backgroundFill_ = acgraph.vector.normalizeFill(['#f8f8f8', '#fff'], 90);
+  //this.backgroundFill_ = acgraph.vector.normalizeFill(['#f8f8f8', '#fff'], 90);
+  this.backgroundFill_ = '#f7f7f7';
 
   /**
    * Ticks cache.
@@ -487,7 +489,7 @@ anychart.core.gantt.TimelineHeader.Level.prototype.getTicks = function() {
  */
 anychart.core.gantt.TimelineHeader.Level.prototype.getLabelsFactory_ = function() {
   if (!this.labelsFactory_) {
-    this.labelsFactory_ = anychart.ui.labelsFactory();
+    this.labelsFactory_ = new anychart.core.ui.LabelsFactory();
     var theme = anychart.getFullTheme();
     var lfGlobalConfig = theme['gantt']['base']['timeline']['header']['labelsFactory'];
     this.labelsFactory_.setup(lfGlobalConfig);

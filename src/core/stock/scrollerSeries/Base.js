@@ -5,6 +5,13 @@ goog.require('anychart.core.dataDrawers.Base');
 goog.require('anychart.data.Table');
 
 
+/**
+ * Namespace anychart.core.stock.scrollerSeries
+ * @namespace
+ * @name anychart.core.stock.scrollerSeries
+ */
+
+
 
 /**
  *

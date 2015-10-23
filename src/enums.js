@@ -1746,7 +1746,14 @@ anychart.enums.EventType = {
   ROW_MOUSE_OUT: 'rowMouseOut',
   ROW_MOUSE_MOVE: 'rowMouseMove',
   ROW_MOUSE_DOWN: 'rowMouseDown',
-  ROW_MOUSE_UP: 'rowMouseUp'
+  ROW_MOUSE_UP: 'rowMouseUp',
+  BEFORE_CREATE_CONNECTOR: 'beforeCreateConnector',
+
+  //Data tree CRUD events.
+  TREE_ITEM_MOVE: 'treeItemMove',
+  TREE_ITEM_UPDATE: 'treeItemUpdate',
+  TREE_ITEM_CREATE: 'treeItemCreate',
+  TREE_ITEM_REMOVE: 'treeItemRemove'
 };
 
 
@@ -2080,6 +2087,22 @@ anychart.enums.GanttDataFields = {
 };
 
 
+/**
+ * Timeline visual element types.
+ * In current time (21 Jul 2015) doesn't need to be exported.
+ * @enum {number}
+ */
+anychart.enums.TLElementTypes = {
+  PARENT: 0,
+  BASE: 1,
+  PROGRESS: 2,
+  BASELINE: 3,
+  MILESTONE: 4,
+  PERIOD: 5,
+  CONNECTOR: 6
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Gantt timeline connector types.
@@ -2387,6 +2410,8 @@ anychart.enums.WarningCode = {
   TOOLBAR_CHART_IS_NOT_SET: 15,
 
   SCALE_TYPE_NOT_SUPPORTED: 16,
+
+  DATA_ITEM_SET_PATH: 17,
 
   TABLE_ALREADY_IN_TRANSACTION: 101,
 
@@ -3312,6 +3337,11 @@ goog.exportSymbol('anychart.enums.EventType.ROW_MOUSE_OUT', anychart.enums.Event
 goog.exportSymbol('anychart.enums.EventType.ROW_MOUSE_MOVE', anychart.enums.EventType.ROW_MOUSE_MOVE);
 goog.exportSymbol('anychart.enums.EventType.ROW_MOUSE_DOWN', anychart.enums.EventType.ROW_MOUSE_DOWN);
 goog.exportSymbol('anychart.enums.EventType.ROW_MOUSE_UP', anychart.enums.EventType.ROW_MOUSE_UP);
+goog.exportSymbol('anychart.enums.EventType.BEFORE_CREATE_CONNECTOR', anychart.enums.EventType.BEFORE_CREATE_CONNECTOR);
+goog.exportSymbol('anychart.enums.EventType.TREE_ITEM_CREATE', anychart.enums.EventType.TREE_ITEM_CREATE);
+goog.exportSymbol('anychart.enums.EventType.TREE_ITEM_MOVE', anychart.enums.EventType.TREE_ITEM_MOVE);
+goog.exportSymbol('anychart.enums.EventType.TREE_ITEM_REMOVE', anychart.enums.EventType.TREE_ITEM_REMOVE);
+goog.exportSymbol('anychart.enums.EventType.TREE_ITEM_UPDATE', anychart.enums.EventType.TREE_ITEM_UPDATE);
 
 goog.exportSymbol('anychart.enums.ScaleStackMode.NONE', anychart.enums.ScaleStackMode.NONE);
 goog.exportSymbol('anychart.enums.ScaleStackMode.VALUE', anychart.enums.ScaleStackMode.VALUE);
@@ -3352,6 +3382,11 @@ goog.exportSymbol('anychart.enums.GanttDataFields.CONNECTOR_TYPE', anychart.enum
 goog.exportSymbol('anychart.enums.GanttDataFields.START_MARKER', anychart.enums.GanttDataFields.START_MARKER);
 goog.exportSymbol('anychart.enums.GanttDataFields.END_MARKER', anychart.enums.GanttDataFields.END_MARKER);
 goog.exportSymbol('anychart.enums.GanttDataFields.LABEL', anychart.enums.GanttDataFields.LABEL);
+
+goog.exportSymbol('anychart.enums.ConnectorType.FINISH_START', anychart.enums.ConnectorType.FINISH_START);
+goog.exportSymbol('anychart.enums.ConnectorType.FINISH_FINISH', anychart.enums.ConnectorType.FINISH_FINISH);
+goog.exportSymbol('anychart.enums.ConnectorType.START_FINISH', anychart.enums.ConnectorType.START_FINISH);
+goog.exportSymbol('anychart.enums.ConnectorType.START_START', anychart.enums.ConnectorType.START_START);
 
 goog.exportSymbol('anychart.enums.ColumnFormats.DIRECT_NUMBERING', anychart.enums.ColumnFormats.DIRECT_NUMBERING);
 goog.exportSymbol('anychart.enums.ColumnFormats.TEXT', anychart.enums.ColumnFormats.TEXT);

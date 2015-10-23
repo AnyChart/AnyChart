@@ -151,9 +151,7 @@ anychart.ConsistencyState = {
   CONTROLLER_VISIBILITY: 1 << 6,
   CONTROLLER_POSITION: 1 << 7,
   //---------------------------------- GANTT TIMELINE STATES (VB) ---------------------------------
-  TIMELINE_SCALES: 1 << 5,
-  TIMELINE_POSITION: 1 << 6,
-  TIMELINE_HOVER: 1 << 7,
+  TIMELINE_SCALES: 1 << 8,
   //---------------------------------- GANTT TIMELINE HEADER STATES (VB) ---------------------------------
   TIMELINE_HEADER_SCALES: 1 << 5,
   //---------------------------------- GANTT TIMELINE HEADER LEVEL STATES (VB) ---------------------------------
@@ -162,15 +160,15 @@ anychart.ConsistencyState = {
   //---------------------------------- GRIDS STATES (VB) ---------------------------------
   // also combined
   GRIDS_POSITION: 1 << 5,
+  //---------------------------------- BASE GRIDS STATES (VB) ---------------------------------
+  BASE_GRID_CLICK: 1 << 6,
+  BASE_GRID_HOVER: 1 << 7,
   //---------------------------------- BUTTON STATES (VB) ---------------------------------
   BUTTON_BACKGROUND: 1 << 5,
   //---------------------------------- CREDITS STATES (VB) ---------------------------------
   CREDITS_POSITION: 1 << 5,
   //---------------------------------- DATA GRID STATES (VB) ---------------------------------
-  DATA_GRID_GRIDS: 1 << 5,
-  DATA_GRID_POSITION: 1 << 6,
-  DATA_GRID_HOVER: 1 << 7,
-  DATA_GRID_CLICK: 1 << 8,
+  DATA_GRID_GRIDS: 1 << 8,
   //---------------------------------- DATA GRID COLUMN STATES (VB) ---------------------------------
   DATA_GRID_COLUMN_TITLE: 1 << 5,
   DATA_GRID_COLUMN_POSITION: 1 << 6,

@@ -4371,6 +4371,18 @@ window['anychart']['themes']['v6'] = {
       'keys': ['#f8f8f8', '#fff'],
       'angle': 90
     },
+    'editStructurePreviewFill': {
+      'color': '#4285F4',
+      'opacity': 0.2
+    },
+    'editStructurePreviewStroke': {
+      'color': '#4285F4',
+      'thickness': 2
+    },
+    'editStructurePreviewDashStroke': {
+      'color': '#4285F4',
+      'dash': '4 4'
+    },
     'tooltip': {
       'anchor': 'leftTop',
       'content': {
@@ -4400,7 +4412,8 @@ window['anychart']['themes']['v6'] = {
         'height': null,
         'fontSize': 11,
         'minFontSize': 8,
-        'maxFontSize': 72
+        'maxFontSize': 72,
+        'disablePointerEvents': true
       },
       'depthPaddingMultiplier': 0,
       'collapseExpandButtons': false,
@@ -4490,6 +4503,23 @@ window['anychart']['themes']['v6'] = {
         'hoverFill': '#edf8ff',
         'rowSelectedFill': '#d2eafa',
         'zIndex': 5,
+        'headerHeight': 70,
+        'editing': false,
+        'connectorPreviewStroke': {
+          'color': '#0000ff',
+          'dash': '3 3',
+          'opacity': .6
+        },
+        'editPreviewFill': {
+          'color': '#fff',
+          'opacity': 0.00001
+        },
+        'editProgressFill': '#fff',
+        'editProgressStroke': '#000',
+        'editIntervalThumbFill': '#fff',
+        'editIntervalThumbStroke': '#000',
+        'editConnectorThumbFill': '#fff',
+        'editConnectorThumbStroke': '#000',
         'baseFill': {
           'keys': ['#3CA0DE', '#3085BC'],
           'angle': -90
@@ -4548,7 +4578,8 @@ window['anychart']['themes']['v6'] = {
           'fontSize': 11,
           'minFontSize': 8,
           'maxFontSize': 72,
-          'zIndex': 40
+          'zIndex': 40,
+          'disablePointerEvents': true
         },
         'markersFactory': {
           'anchor': 'centerTop',
@@ -4559,15 +4590,22 @@ window['anychart']['themes']['v6'] = {
         'header': {
           'labelsFactory': {
             'anchor': 'leftTop',
+            'vAlign': 'middle',
             'padding': {
               'top': 0,
-              'right': 2,
+              'right': 5,
               'bottom': 0,
-              'left': 2
+              'left': 5
             },
-            'vAlign': 'middle',
             'textWrap': 'noWrap',
-            'textOverflow': '...'
+            'background': null,
+            'rotation': 0,
+            'width': null,
+            'height': null,
+            'fontSize': 11,
+            'minFontSize': 8,
+            'maxFontSize': 72,
+            'disablePointerEvents': true
           }
 
         }

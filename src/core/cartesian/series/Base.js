@@ -12,6 +12,13 @@ goog.require('anychart.enums');
 goog.require('anychart.utils');
 
 
+/**
+ * Namespace anychart.core.cartesian
+ * @namespace
+ * @name anychart.core.cartesian
+ */
+
+
 
 /**
  * Base class for all cartesian series.<br/>

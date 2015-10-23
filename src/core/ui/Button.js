@@ -839,31 +839,22 @@ anychart.core.ui.Button.prototype.stateSettings = function(opt_value) {
 anychart.core.ui.Button.prototype.initStateSettings = function() {
   this.stateSettings_ = {
     'normal': {
-      'stroke': '1 #666 1',
-      'fill': {
-        'keys': ['0 #ffffff', '0.5 #e7e7e7', '1 #d0d0d0'],
-        'angle': '-90'
-      },
+      'stroke': '#dedede',
+      'fill': '#e7e7e7',
       'text': {
-        'fontColor': '#000'
+        'fontColor': '#7c868e'
       }
     },
     'hover': {
-      'stroke': '1 #aaa 1',
-      'fill': {
-        'keys': ['0 #ffffff', '0.5 #e7e7e7', '1 #d0d0d0'],
-        'angle': '-90'
-      },
+      'stroke': '#cecece',
+      'fill': '#eee',
       'text': {
-        'fontColor': '#000'
+        'fontColor': '#7c868e'
       }
     },
     'pushed': {
-      'stroke': '1 #888 1',
-      'fill': {
-        'keys': ['0 #ffffff', '0.5 #e7e7e7', '1 #d0d0d0'],
-        'angle': '90'
-      },
+      'stroke': '#d0d0d0',
+      'fill': '#d9d9d9',
       'text': {
         'fontColor': '#333'
       }

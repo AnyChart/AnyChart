@@ -851,9 +851,7 @@ anychart.core.ui.ScrollBar.prototype.getBase_ = function() {
   if (!this.base_) {
     this.base_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
 
-    acgraph.events.listen(this.base_, acgraph.events.EventType.MOUSEOVER, this.baseMouseOverHandler_, false, this);
-    acgraph.events.listen(this.base_, acgraph.events.EventType.MOUSEOUT, this.baseMouseOutHandler_, false, this);
-
+    this.bindHandlersToGraphics(this.base_, this.baseMouseOverHandler_, this.baseMouseOutHandler_, this.baseClickHandler_);
 
     this.registerDisposable(this.base_);
   }
@@ -889,19 +887,50 @@ anychart.core.ui.ScrollBar.prototype.setOpacity_ = function(value) {
 
 /**
  * Mouse over handler.
+ * @param {acgraph.events.BrowserEvent} event - Event.
  * @private
  */
-anychart.core.ui.ScrollBar.prototype.baseMouseOverHandler_ = function() {
+anychart.core.ui.ScrollBar.prototype.baseMouseOverHandler_ = function(event) {
+  event.preventDefault();
   this.setOpacity_(this.mouseOverOpacity_);
+  this.handleBrowserEvent(event);
 };
 
 
 /**
  * Mouse out handler.
+ * @param {acgraph.events.BrowserEvent} event - Event.
  * @private
  */
-anychart.core.ui.ScrollBar.prototype.baseMouseOutHandler_ = function() {
+anychart.core.ui.ScrollBar.prototype.baseMouseOutHandler_ = function(event) {
+  event.preventDefault();
   this.setOpacity_(this.mouseOutOpacity_);
+  this.handleBrowserEvent(event);
+};
+
+
+/**
+ * Background click handler.
+ * @param {acgraph.events.BrowserEvent} event - Event.
+ * @private
+ */
+anychart.core.ui.ScrollBar.prototype.baseClickHandler_ = function(event) {
+  event.preventDefault();
+  var isVertical = this.isVertical_();
+  var sliderBounds = this.slider_.getBounds();
+  var dragBounds = this.slider_.drag();
+
+  var mouseCoord = isVertical ? event['offsetY'] : event['offsetX'];
+  var backward = isVertical ? (mouseCoord <= sliderBounds.top) : (mouseCoord <= sliderBounds.left);
+  var newRatio = isVertical ?
+      anychart.math.round((mouseCoord - dragBounds.top) / dragBounds.height, 4) :
+      anychart.math.round((mouseCoord - dragBounds.left) / dragBounds.width, 4);
+
+  backward ?
+      this.scrollStartTo(newRatio, 'user_action') :
+      this.scrollEndTo(newRatio, 'user_action');
+
+  this.handleBrowserEvent(event);
 };
 
 
@@ -913,7 +942,7 @@ anychart.core.ui.ScrollBar.prototype.baseMouseOutHandler_ = function() {
 anychart.core.ui.ScrollBar.prototype.getBg_ = function() {
   if (!this.bg_) {
     this.bg_ = /** @type {acgraph.vector.Rect} */ (acgraph.rect());
-    acgraph.events.listen(this.bg_, acgraph.events.EventType.CLICK, this.bgClickHandler_, false, this);
+    //acgraph.events.listen(this.bg_, acgraph.events.EventType.CLICK, this.bgClickHandler_, false, this);
 
     this.registerDisposable(this.bg_);
   }
@@ -988,12 +1017,26 @@ anychart.core.ui.ScrollBar.prototype.getSlider_ = function() {
   if (!this.slider_) {
     this.slider_ = /** @type {acgraph.vector.Rect} */ (acgraph.rect());
 
+    this.slider_.setParentEventTarget(this.getBase_());
+
     acgraph.events.listen(this.slider_, acgraph.events.EventType.DRAG, this.dragHandler_, false, this);
     acgraph.events.listen(this.slider_, acgraph.events.EventType.DRAG_END, this.dragEndHandler_, false, this);
+    this.bindHandlersToGraphics(this.slider_, this.baseMouseOverHandler_, this.baseMouseOutHandler_, null, null, null, this.sliderMouseUpHandler_);
 
     this.registerDisposable(this.slider_);
   }
   return this.slider_;
+};
+
+
+/**
+ * Mouse up handler for slider.
+ * @param {acgraph.events.BrowserEvent} event - Event.
+ * @private
+ */
+anychart.core.ui.ScrollBar.prototype.sliderMouseUpHandler_ = function(event) {
+  event.preventDefault();
+  this.handleBrowserEvent(event);
 };
 
 
@@ -1014,28 +1057,6 @@ anychart.core.ui.ScrollBar.prototype.dragHandler_ = function(e) {
  */
 anychart.core.ui.ScrollBar.prototype.dragEndHandler_ = function(e) {
   this.drawWrapper_(false);
-};
-
-
-/**
- * Background click handler.
- * @param {Event} e - Event.
- * @private
- */
-anychart.core.ui.ScrollBar.prototype.bgClickHandler_ = function(e) {
-  var isVertical = this.isVertical_();
-  var sliderBounds = this.slider_.getBounds();
-  var dragBounds = this.slider_.drag();
-
-  var mouseCoord = isVertical ? e['offsetY'] : e['offsetX'];
-  var backward = isVertical ? (mouseCoord <= sliderBounds.top) : (mouseCoord <= sliderBounds.left);
-  var newRatio = isVertical ?
-      anychart.math.round((mouseCoord - dragBounds.top) / dragBounds.height, 4) :
-      anychart.math.round((mouseCoord - dragBounds.left) / dragBounds.width, 4);
-
-  backward ?
-      this.scrollStartTo(newRatio, 'user_action') :
-      this.scrollEndTo(newRatio, 'user_action');
 };
 
 
@@ -1428,12 +1449,14 @@ anychart.core.ui.ScrollBar.prototype.dispatchScrollEvent_ = function(opt_source)
       clearTimeout(this.tid_);
       this.tid_ = -1;
     }
+
+    var event = new anychart.core.ui.ScrollBar.ScrollEvent(ths);
+    event['startRatio'] = this.startRatio_;
+    event['endRatio'] = this.endRatio_;
+    event['visibleBounds'] = this.visibleBounds_;
+    event['source'] = opt_source || 'user_action';
+
     this.tid_ = setTimeout(function() {
-      var event = new anychart.core.ui.ScrollBar.ScrollEvent(ths);
-      event['startRatio'] = ths.startRatio_;
-      event['endRatio'] = ths.endRatio_;
-      event['visibleBounds'] = ths.visibleBounds_;
-      event['source'] = opt_source || 'user_action';
       ths.dispatchEvent(event);
       ths.tid_ = -1;
     }, 0);

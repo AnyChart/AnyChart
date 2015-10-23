@@ -1,10 +1,14 @@
 var dataGrid;
 
 anychart.onDocumentReady(function() {
+
+  var stage = acgraph.create('container');
+  stage.suspend();
+
   var treeData = anychart.data.tree(getData(), anychart.enums.TreeFillingMethod.AS_TABLE);
 
   dataGrid = anychart.ui.dataGrid();
-  dataGrid.container('container');
+  dataGrid.container(stage);
   dataGrid.data(treeData);
 
   var commonLogColumn = dataGrid.column(2);
@@ -54,6 +58,8 @@ anychart.onDocumentReady(function() {
 
   dataGrid.draw();
   dataGrid.listen('signal', dataGrid.draw, false, dataGrid);
+
+  stage.resume();
 });
 
 

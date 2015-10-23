@@ -7,6 +7,13 @@ goog.require('goog.ui.Toolbar');
 goog.require('goog.ui.ToolbarRenderer');
 
 
+/**
+ * Namespace anychart.core.ui.toolbar
+ * @namespace
+ * @name anychart.core.ui.toolbar
+ */
+
+
 
 /**
  * Anychart toolbar implementation.

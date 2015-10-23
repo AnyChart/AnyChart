@@ -68,6 +68,13 @@ anychart.data.Tree = function(opt_data, opt_fillMethodOrCsvMapping, opt_csvSetti
    */
   this.traverserToArrayCache_ = null;
 
+  /**
+   * Flag whether to dispatch CRUD events.
+   * @type {boolean}
+   * @private
+   */
+  this.dispatchEvents_ = true;
+
   this.createIndexOn(anychart.enums.GanttDataFields.ID); //Silent ID indexing.
 
   //Filling with data.
@@ -142,6 +149,33 @@ anychart.data.Tree.SerializedDataItem;
  * @type {number}
  */
 anychart.data.Tree.prototype.SUPPORTED_SIGNALS = anychart.Signal.DATA_CHANGED | anychart.Signal.META_CHANGED;
+
+
+/**
+ * Checks if potentialChild has potentialPrent in upper hierarchy.
+ * @param {anychart.data.Tree.DataItem} potentialChild - Potential child.
+ * @param {anychart.data.Tree.DataItem} potentialParent - Potential parent.
+ * @return {boolean} - Result.
+ */
+anychart.data.Tree.isDescendant = function(potentialChild, potentialParent) {
+  if (!potentialChild.getParent()) return false;
+  if (potentialChild.getParent() == potentialParent) return true;
+  return anychart.data.Tree.isDescendant(potentialChild.getParent(), potentialParent);
+};
+
+
+/**
+ * Starts/stops tree CRUD events dispatching.
+ * @param {boolean=} opt_val - Value to be set.
+ * @return {boolean|anychart.data.Tree} - Current value or itself for method chaining.
+ */
+anychart.data.Tree.prototype.dispatchEvents = function(opt_val) {
+  if (goog.isDef(opt_val)) {
+    this.dispatchEvents_ = opt_val;
+    return this;
+  }
+  return this.dispatchEvents_;
+};
 
 
 /** @inheritDoc */
@@ -223,7 +257,7 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
     tdis.push(dataItem);
 
     if (goog.isDefAndNotNull(id)) {
-      index = goog.array.binarySearch(uids, id);
+      index = goog.array.binarySearch(uids, id, anychart.utils.compareAsc);
       if (index < 0) {
         var pos = ~index;
         goog.array.insertAt(uids, id, pos);
@@ -248,7 +282,7 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
     tdi = tdis[i]; //Tree data item.
     parentId = data[i][anychart.enums.GanttDataFields.PARENT];
     if (goog.isDefAndNotNull(parentId)) {
-      index = goog.array.binarySearch(uids, parentId);
+      index = goog.array.binarySearch(uids, parentId, anychart.utils.compareAsc);
       if (index < 0) {
         searchResult = this.search(anychart.enums.GanttDataFields.ID, parentId);
         if (searchResult) {
@@ -446,10 +480,12 @@ anychart.data.Tree.prototype.removeFromIndex = function(item, opt_field, opt_sub
     //Looking in index array of key-value pairs for unique key.
     var index = goog.array.binarySearch(indexArr, {key: item.get(opt_field)}, this.comparisonFunction_); //index here really can't be negative (value must exist). If not found - here's a bug.
     var found = indexArr[index]; //found {key:'', value:(TreeDataItem|Array)}-object. Value can be a tree data item or array.
-    if (goog.isArray(found.value) && found.value.length > 1) {
-      goog.array.remove(found.value, item);
-    } else {
-      goog.array.removeAt(this.index_[opt_field], index);
+    if (found) {
+      if (goog.isArray(found.value) && found.value.length > 1) {
+        goog.array.remove(found.value, item);
+      } else {
+        goog.array.removeAt(this.index_[opt_field], index);
+      }
     }
   }
 
@@ -611,12 +647,24 @@ anychart.data.Tree.prototype.addChild = function(child) {
 anychart.data.Tree.prototype.addChildAt = function(child, index) {
   this.suspendSignalsDispatching();
 
+  var source = null;
+  var sourceIndex = -1;
+  var sourceTree = null;
+
+  var dispatchMove = true;
+
   var oldTree = null;
   if (child instanceof anychart.data.Tree.DataItem) {
     oldTree = child.tree();
-    if (oldTree && oldTree != this) oldTree.suspendSignalsDispatching();
+    if (oldTree && oldTree != this) {
+      sourceTree = oldTree;
+      oldTree.suspendSignalsDispatching();
+    }
+    source = child.getParent();
+    sourceIndex = source ? source.indexOfChild(child) : oldTree.indexOfChild(child);
     child.remove();
   } else {
+    dispatchMove = false; //We don't move existing item, we create the new one. In this case we dispatch 'create' instead of 'move'.
     child = this.createRoot(child);
   }
 
@@ -630,6 +678,22 @@ anychart.data.Tree.prototype.addChildAt = function(child, index) {
 
   this.resumeSignalsDispatching(true); //Signals must be sent.
   if (oldTree) oldTree.resumeSignalsDispatching(true); //As well as here.
+
+  if (this.dispatchEvents_) {
+    var event = {
+      'type': dispatchMove ? anychart.enums.EventType.TREE_ITEM_MOVE : anychart.enums.EventType.TREE_ITEM_CREATE,
+      'target': null,
+      'targetIndex': index,
+      'item': child
+    };
+
+    if (sourceTree) event['sourceTree'] = sourceTree;
+    if (dispatchMove) {
+      event['sourceIndex'] = sourceIndex;
+      event['source'] = source;
+    }
+    this.dispatchEvent(event);
+  }
 
   return child;
 };
@@ -704,6 +768,17 @@ anychart.data.Tree.prototype.removeChildAt = function(index) {
     result = goog.array.splice(this.roots_, index, 1)[0];
     this.removeFromIndex(result, void 0, true);
     this.dispatchSignal(anychart.Signal.DATA_CHANGED);
+
+    if (this.dispatchEvents_) {
+      var event = {
+        'type': anychart.enums.EventType.TREE_ITEM_REMOVE,
+        'source': null,
+        'sourceIndex': index,
+        'item': result
+      };
+
+      this.dispatchEvent(event);
+    }
   }
   return result;
 };
@@ -876,19 +951,157 @@ anychart.data.Tree.DataItem.prototype.get = function(key) {
 
 /**
  * Sets key-value pair to the data.
- * @param {string} key - Key.
- * @param {*} value - Value.
+ * @param {...*} var_args - Arguments.
+ *  Note:
+ *  1) Can take arguments like this:
+ *    <code>
+ *      item.set(['a', 'b', 0, true]);
+ *    </code>
+ *    It means that will be created structure like this:
+ *    <code>
+ *      {
+ *        'a': {
+ *          'b': [true]
+ *        }
+ *      }
+ *    </code>
+ *    First element of array ('a') becomes key.
+ *    Last value (true) becomes a value for complex object.
+ *    If one of parameters is number, previous value should be an array, otherwise nothing will happen.
+ *
+ *  2) The same behaviour is for this case:
+ *    <code>
+ *      item.set(['a', 'b', 0], true);
+ *    </code>
+ *
+ *  3) The same behaviour is for this case as well:
+ *    <code>
+ *      item.set('a', 'b', 0, true);
+ *    </code>
+ *
  * @return {anychart.data.Tree.DataItem} - Itself for method chaining.
  */
-anychart.data.Tree.DataItem.prototype.set = function(key, value) {
-  if (this.data_[key] != value) {
-    this.tree_.removeFromIndex(this, key);
-    this.data_[key] = value;
-    this.tree_.addToIndex(this, key);
-    this.tree_.dispatchSignal(anychart.Signal.DATA_CHANGED);
+anychart.data.Tree.DataItem.prototype.set = function(var_args) {
+  if (arguments.length) {
+    var keyOrPath = arguments[0];
+    var iter, key, i, value, curr, item, prevItem, parent;
+    var reduce = 0;
+    var path = [];
+
+    if (goog.isArray(keyOrPath)) {
+      iter = keyOrPath;
+      key = iter[0];
+      if (iter.length > 1 && goog.isString(key)) {
+        if (arguments.length > 1) { //got item.set(['a', 'b', 0], true);
+          value = arguments[1];
+        } else { //got item.set(['a', 'b', 0, true]);
+          value = iter[iter.length - 1];
+          reduce = 1;
+        }
+      }
+    } else if (goog.isString(keyOrPath) && arguments.length > 1) { //got item.set('a', 'b', 0, true);
+      key = keyOrPath;
+      iter = arguments;
+      value = iter[iter.length - 1];
+      reduce = 1;
+    }
+
+    if (goog.isDef(iter)) {
+      parent = this.data_;
+      prevItem = iter[0];
+      path.push(prevItem);
+      curr = parent[prevItem];
+
+      //pre-check
+      for (i = 1; i < iter.length - reduce; i++) {
+        item = iter[i];
+        if (!goog.isNumber(item) && !goog.isString(item)) {
+          anychart.utils.warning(anychart.enums.WarningCode.DATA_ITEM_SET_PATH);
+          return this;
+        }
+      }
+
+      for (i = 1; i < iter.length - reduce; i++) {
+        item = iter[i];
+        path.push(item);
+        if (goog.isNumber(item)) {
+          if (goog.isDef(curr)) {
+            if (goog.isArray(curr)) {
+              parent = curr;
+              curr = parent[item];
+              prevItem = item;
+            } else {
+              anychart.utils.warning(anychart.enums.WarningCode.DATA_ITEM_SET_PATH);
+              return this; //Incorrect input.
+            }
+          } else {
+            parent[prevItem] = [];
+            curr = parent[item];
+            parent = parent[prevItem];
+            prevItem = item;
+          }
+        } else if (goog.isString(item)) {
+          if (goog.isDef(curr)) {
+            if (goog.isObject(curr)) {
+              parent = curr;
+              curr = parent[item];
+              prevItem = item;
+            } else {
+              anychart.utils.warning(anychart.enums.WarningCode.DATA_ITEM_SET_PATH);
+              return this; //Incorrect input.
+            }
+          } else {
+            parent[prevItem] = {};
+            curr = parent[item];
+            parent = parent[prevItem];
+            prevItem = item;
+          }
+        } else {
+          anychart.utils.warning(anychart.enums.WarningCode.DATA_ITEM_SET_PATH);
+          return this; //Incorrect input.
+        }
+      }
+
+
+      if (parent[prevItem] != value) {
+        parent[prevItem] = value;
+
+        this.tree_.removeFromIndex(this, key);
+        this.tree_.addToIndex(this, key);
+        this.tree_.dispatchSignal(anychart.Signal.DATA_CHANGED);
+
+        if (this.tree_.dispatchEvents()) {
+          var event = {
+            'type': anychart.enums.EventType.TREE_ITEM_UPDATE,
+            'item': this,
+            'path': path,
+            'field': path[0],
+            'value': value
+          };
+
+          this.tree_.dispatchEvent(event);
+        }
+      }
+
+    } else {
+      anychart.utils.warning(anychart.enums.WarningCode.DATA_ITEM_SET_PATH);
+    }
+
   }
 
   return this;
+};
+
+
+/**
+ * Gets index of data item in parent.
+ * NOTE: If parent is null (tree data item is root), index of root in tree will be returned.
+ * TODO (A.Kudryavtsev): Do we need to export this?
+ * @return {number} - Index of current data item in it's parent (tree or another data item).
+ */
+anychart.data.Tree.DataItem.prototype.getIndexInParent = function() {
+  var parent = this.parent_ || this.tree_;
+  return parent.indexOfChild(this);
 };
 
 
@@ -967,11 +1180,23 @@ anychart.data.Tree.DataItem.prototype.addChildAt = function(child, index) {
   this.tree_.suspendSignalsDispatching();
 
   var oldTree = null;
+  var source = null;
+  var sourceIndex = -1;
+  var sourceTree = null;
+
+  var dispatchMove = true;
+
   if (child instanceof anychart.data.Tree.DataItem) {
     oldTree = child.tree();
-    if (oldTree && oldTree != this.tree_) oldTree.suspendSignalsDispatching();
+    if (oldTree && oldTree != this.tree_) {
+      sourceTree = oldTree;
+      oldTree.suspendSignalsDispatching();
+    }
+    source = child.getParent();
+    sourceIndex = source ? source.indexOfChild(child) : oldTree.indexOfChild(child);
     child.remove();
   } else {
+    dispatchMove = false; //We don't move existing item, we create the new one. In this case we dispatch 'create' instead of 'move'.
     child = this.tree_.createRoot(child);
   }
 
@@ -987,6 +1212,22 @@ anychart.data.Tree.DataItem.prototype.addChildAt = function(child, index) {
 
   this.tree_.resumeSignalsDispatching(true); //Signals must be sent.
   if (oldTree) oldTree.resumeSignalsDispatching(true); //As well as here.
+
+  if (this.tree_.dispatchEvents()) {
+    var event = {
+      'type': dispatchMove ? anychart.enums.EventType.TREE_ITEM_MOVE : anychart.enums.EventType.TREE_ITEM_CREATE,
+      'target': this,
+      'targetIndex': index,
+      'item': child
+    };
+
+    if (sourceTree) event['sourceTree'] = sourceTree;
+    if (dispatchMove) {
+      event['sourceIndex'] = sourceIndex;
+      event['source'] = source;
+    }
+    this.tree_.dispatchEvent(event);
+  }
 
   return child;
 };
@@ -1065,6 +1306,17 @@ anychart.data.Tree.DataItem.prototype.removeChildAt = function(index) {
     result = goog.array.splice(this.children_, index, 1)[0];
     this.tree_.removeFromIndex(result, void 0, true);
     result.setParent_(null);
+
+    if (this.tree_.dispatchEvents()) {
+      var event = {
+        'type': anychart.enums.EventType.TREE_ITEM_REMOVE,
+        'source': this,
+        'sourceIndex': index,
+        'item': result
+      };
+
+      this.tree_.dispatchEvent(event);
+    }
   }
   return result;
 };
@@ -1169,6 +1421,17 @@ anychart.data.Tree.DataItem.prototype.clone = function(tree) {
 
 
 /**
+ * DNA test.
+ * TODO (A.Kudryavtsev): Add description on exporting this method.
+ * @param {anychart.data.Tree.DataItem} potentialParent - Suspicious data item.
+ * @return {boolean} - Whether current data item is child of set in parameter.
+ */
+anychart.data.Tree.DataItem.prototype.isChildOf = function(potentialParent) {
+  return anychart.data.Tree.isDescendant(this, potentialParent); //Just sugar.
+};
+
+
+/**
  * Serializes tree data item with its children.
  * @return {anychart.data.Tree.SerializedDataItem} - Serialized tree data item.
  */
@@ -1218,6 +1481,7 @@ anychart.data.tree = function(opt_data, opt_fillMethodOrCsvMapping, opt_csvSetti
 //exports
 goog.exportSymbol('anychart.data.tree', anychart.data.tree);
 anychart.data.Tree.prototype['getTraverser'] = anychart.data.Tree.prototype.getTraverser;
+anychart.data.Tree.prototype['dispatchEvents'] = anychart.data.Tree.prototype.dispatchEvents;
 anychart.data.Tree.prototype['addData'] = anychart.data.Tree.prototype.addData;
 anychart.data.Tree.prototype['createIndexOn'] = anychart.data.Tree.prototype.createIndexOn;
 anychart.data.Tree.prototype['removeIndexOn'] = anychart.data.Tree.prototype.removeIndexOn;

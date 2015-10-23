@@ -14,12 +14,12 @@ goog.require('goog.math');
 /**
  * Gantt controller implementation.
  * TODO (A.Kudryavtsev): Describe.
- * @param {boolean=} opt_isResourceChart - Flag if controller must work in resource chart mode.
+ * @param {boolean=} opt_isResources - Flag if controller must work in resource chart mode.
  *
  * @constructor
  * @extends {anychart.core.Base}
  */
-anychart.core.gantt.Controller = function(opt_isResourceChart) {
+anychart.core.gantt.Controller = function(opt_isResources) {
   goog.base(this);
 
   /**
@@ -34,7 +34,7 @@ anychart.core.gantt.Controller = function(opt_isResourceChart) {
    * @type {boolean}
    * @private
    */
-  this.isResourceChart_ = !!opt_isResourceChart;
+  this.isResources_ = !!opt_isResources;
 
   /**
    * The map of periods.
@@ -73,7 +73,7 @@ anychart.core.gantt.Controller = function(opt_isResourceChart) {
    * @type {Array.<anychart.data.Tree.DataItem>}
    * @private
    */
-  this.visibleData_ = [];
+  this.visibleItems_ = [];
 
   /**
    * Array that contains a row height differences.
@@ -92,7 +92,7 @@ anychart.core.gantt.Controller = function(opt_isResourceChart) {
 
   /**
    * Related timeline.
-   * @type {anychart.core.gantt.Timeline}
+   * @type {anychart.core.ui.Timeline}
    * @private
    */
   this.timeline_ = null;
@@ -186,7 +186,7 @@ goog.inherits(anychart.core.gantt.Controller, anychart.core.Base);
  * @return {number} - Data item height.
  */
 anychart.core.gantt.Controller.getItemHeight = function(item) {
-  return anychart.utils.toNumber(item.get(anychart.enums.GanttDataFields.ROW_HEIGHT)) || anychart.core.ui.DataGrid.DEFAULT_ROW_HEIGHT;
+  return anychart.utils.toNumber(item.get(anychart.enums.GanttDataFields.ROW_HEIGHT)) || anychart.core.gantt.Controller.DEFAULT_ROW_HEIGHT;
 };
 
 
@@ -223,6 +223,13 @@ anychart.core.gantt.Controller.GANTT_BIRTH_DATE = Date.UTC(1861, 4, 20);
  * @type {number}
  */
 anychart.core.gantt.Controller.GANTT_DEATH_DATE = Date.UTC(1919, 10, 23);
+
+
+/**
+ * Default cell height.
+ * @type {number}
+ */
+anychart.core.gantt.Controller.DEFAULT_ROW_HEIGHT = 20;
 
 
 /**
@@ -283,10 +290,10 @@ anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentD
       .meta('depth', currentDepth)
       .meta('index', this.linearIndex_++);
 
-  this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.ACTUAL_START))));
-  this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.ACTUAL_END))));
-  this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.BASELINE_START))));
-  this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.BASELINE_END))));
+  this.checkDate_(item.get(anychart.enums.GanttDataFields.ACTUAL_START));
+  this.checkDate_(item.get(anychart.enums.GanttDataFields.ACTUAL_END));
+  this.checkDate_(item.get(anychart.enums.GanttDataFields.BASELINE_START));
+  this.checkDate_(item.get(anychart.enums.GanttDataFields.BASELINE_END));
 
   var resultStart = anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.ACTUAL_START));
   var resultEnd = anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.ACTUAL_END));
@@ -304,7 +311,7 @@ anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentD
           .meta('index', this.linearIndex_++);
     }
 
-    if (!this.isResourceChart_) {
+    if (!this.isResources_) {
       var childStart = goog.isDef(child.get(anychart.enums.GanttDataFields.ACTUAL_START)) ?
           anychart.utils.normalizeTimestamp(child.get(anychart.enums.GanttDataFields.ACTUAL_START)) :
           child.meta('autoStart');
@@ -317,22 +324,22 @@ anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentD
           anychart.utils.normalizeSize(/** @type {number} */(child.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)), 1) :
           (child.meta('autoProgress') || 0);
 
-      if (goog.isDef(resultStart) && !isNaN(resultStart)) {
-        resultStart = Math.min(resultStart, childStart, childEnd);
-      } else {
+      if (isNaN(resultStart)) {
         resultStart = childStart;
-      }
-
-      if (goog.isDef(resultEnd) && !isNaN(resultEnd)) {
-        resultEnd = Math.max(resultEnd, childStart, childEnd);
       } else {
-        resultEnd = childEnd;
+        resultStart = Math.min(resultStart, childStart, childEnd);
       }
 
-      this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(child.get(anychart.enums.GanttDataFields.ACTUAL_START))));
-      this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(child.get(anychart.enums.GanttDataFields.ACTUAL_END))));
-      this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(child.get(anychart.enums.GanttDataFields.BASELINE_START))));
-      this.checkDate_(/** @type {number} */ (anychart.utils.normalizeTimestamp(child.get(anychart.enums.GanttDataFields.BASELINE_END))));
+      if (isNaN(resultEnd)) {
+        resultEnd = childEnd;
+      } else {
+        resultEnd = Math.max(resultEnd, childStart, childEnd);
+      }
+
+      this.checkDate_(child.get(anychart.enums.GanttDataFields.ACTUAL_START));
+      this.checkDate_(child.get(anychart.enums.GanttDataFields.ACTUAL_END));
+      this.checkDate_(child.get(anychart.enums.GanttDataFields.BASELINE_START));
+      this.checkDate_(child.get(anychart.enums.GanttDataFields.BASELINE_END));
 
       var delta = (/** @type {number} */(childEnd) - /** @type {number} */(childStart));
       progressLength += /** @type {number} */(childProgress) * delta;
@@ -340,7 +347,7 @@ anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentD
     }
   }
 
-  if (item.numChildren() && !this.isResourceChart_) {
+  if (item.numChildren() && !this.isResources_) {
     item.meta('autoProgress', progressLength / totalLength);
     item.meta('autoStart', resultStart);
     item.meta('autoEnd', resultEnd);
@@ -372,29 +379,30 @@ anychart.core.gantt.Controller.prototype.linearizeData_ = function() {
 
 /**
  * Checks data item to get it's date fields and extend current min-max range.
- * @param {number} date - Timestamp.
+ * @param {*} date - Timestamp.
  * @private
  */
 anychart.core.gantt.Controller.prototype.checkDate_ = function(date) {
-  if (goog.isNumber(date) && !isNaN(date)) {
+  date = anychart.utils.normalizeTimestamp(date);
+  if (!isNaN(date)) {
     if (isNaN(this.minDate_)) { //If one of dates is NaN - the second one is NaN as well.
       this.minDate_ = date;
       this.maxDate_ = date;
     }
 
-    if (date < this.minDate_) this.minDate_ = date;
-    if (date > this.maxDate_) this.maxDate_ = date;
+    this.minDate_ = Math.min(date, this.minDate_);
+    this.maxDate_ = Math.max(date, this.maxDate_);
   }
 };
 
 
 /**
- * Fills this.visibleData_ and this.heightCache with data.
+ * Fills this.visibleItems_ and this.heightCache with data.
  * @return {anychart.core.gantt.Controller} - Itself for method chaining.
  * @private
  */
 anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
-  this.visibleData_.length = 0;
+  this.visibleItems_.length = 0;
   this.heightCache_.length = 0;
   this.connectorsData_.length = 0; //Resetting connectors map.
   this.periodsMap_ = {};
@@ -405,7 +413,7 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
   this.expandedItemsTraverser_.reset();
   while (this.expandedItemsTraverser_.advance()) {
     item = /** @type {anychart.data.Tree.DataItem} */ (this.expandedItemsTraverser_.current());
-    this.visibleData_.push(item);
+    this.visibleItems_.push(item);
     height += (anychart.core.gantt.Controller.getItemHeight(item) + this.rowStrokeThickness_);
     this.heightCache_.push(height);
 
@@ -413,7 +421,7 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
     var visItem = {'item': item, 'index': this.heightCache_.length - 1};
     if (goog.isDef(itemId) && !this.visibleItemsMap_[itemId]) this.visibleItemsMap_[itemId] = visItem;
 
-    if (this.isResourceChart_) {
+    if (this.isResources_) {
       var periods = item.get(anychart.enums.GanttDataFields.PERIODS);
       var minPeriodDate = NaN;
       var maxPeriodDate = NaN;
@@ -422,7 +430,7 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
         for (var i = 0, l = periods.length; i < l; i++) {
           var period = periods[i];
           var periodId = period[anychart.enums.GanttDataFields.ID];
-          var periodItem = {'period': period, 'index': this.heightCache_.length - 1};
+          var periodItem = {'period': period, 'index': this.heightCache_.length - 1, 'periodIndex': i};
 
           /*
             We must store an index of data item to determine the vertical coordinate of connector.
@@ -430,20 +438,34 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
            */
           if (!this.periodsMap_[periodId]) this.periodsMap_[periodId] = periodItem;
 
-          //Building connectors map for resource chart.
-          if (period[anychart.enums.GanttDataFields.CONNECT_TO]) {
+          ////Building connectors map for resource chart.
+          var to, type, connectorsMapItem;
+          if (goog.isArray(period[anychart.enums.GanttDataFields.CONNECTOR])) { //New behaviour.
+            var connectors = period[anychart.enums.GanttDataFields.CONNECTOR];
+            for (var j = 0; j < connectors.length; j++) {
+              var connector = connectors[j];
+              //We put here a link to the period if it is already in the map or ID of destination period.
+              to = this.periodsMap_[connector[anychart.enums.GanttDataFields.CONNECT_TO]] || connector[anychart.enums.GanttDataFields.CONNECT_TO];
+              type = connector[anychart.enums.GanttDataFields.CONNECTOR_TYPE];
+              connectorsMapItem = {'from': periodItem, 'to': to};
+              if (type) connectorsMapItem['type'] = type;
+              connectorsMapItem['connSettings'] = connector;
+              this.connectorsData_.push(connectorsMapItem);
+            }
+          } else if (period[anychart.enums.GanttDataFields.CONNECT_TO]) { //Deprecated behaviour.
             //We put here a link to the period if it is already in the map or ID of destination period.
-            var to = this.periodsMap_[period[anychart.enums.GanttDataFields.CONNECT_TO]] || period[anychart.enums.GanttDataFields.CONNECT_TO];
-            var type = period[anychart.enums.GanttDataFields.CONNECTOR_TYPE];
-            var connectorsMapItem = {'from': periodItem, 'to': to};
+            to = this.periodsMap_[period[anychart.enums.GanttDataFields.CONNECT_TO]] || period[anychart.enums.GanttDataFields.CONNECT_TO];
+            type = period[anychart.enums.GanttDataFields.CONNECTOR_TYPE];
+            connectorsMapItem = {'from': periodItem, 'to': to};
             if (type) connectorsMapItem['type'] = type;
+            if (period[anychart.enums.GanttDataFields.CONNECTOR]) connectorsMapItem['connSettings'] = period[anychart.enums.GanttDataFields.CONNECTOR];
             this.connectorsData_.push(connectorsMapItem);
           }
 
           var periodStart = anychart.utils.normalizeTimestamp(period[anychart.enums.GanttDataFields.START]);
           var periodEnd = anychart.utils.normalizeTimestamp(period[anychart.enums.GanttDataFields.END]);
 
-          if (periodStart && periodEnd) {
+          if (!isNaN(periodStart) && !isNaN(periodEnd)) {
             minPeriodDate = isNaN(minPeriodDate) ? Math.min(periodStart, periodEnd) : Math.min(minPeriodDate, periodStart, periodEnd);
             maxPeriodDate = isNaN(maxPeriodDate) ? Math.max(periodStart, periodEnd) : Math.max(maxPeriodDate, periodStart, periodEnd);
 
@@ -462,20 +484,44 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
         }
 
       }
-    } else {
+    }
+    else {
       //Building connectors map for project chart.
-      var connectTo = item.get(anychart.enums.GanttDataFields.CONNECT_TO);
-      if (connectTo) {
-        var itemConnectTo = this.visibleItemsMap_[connectTo] || connectTo;
-        var connType = item.get(anychart.enums.GanttDataFields.CONNECTOR_TYPE);
-        var taskMapItem = {'from': visItem, 'to': itemConnectTo};
+      var connectTo, itemConnectTo, connType, taskMapItem;
+      if (goog.isArray(item.get(anychart.enums.GanttDataFields.CONNECTOR))) {//New behaviour.
+        var projConnectors = item.get(anychart.enums.GanttDataFields.CONNECTOR);
+        for (var k = 0; k < projConnectors.length; k++) {
+          var conn = projConnectors[k];
+          connectTo = conn[anychart.enums.GanttDataFields.CONNECT_TO];
+          itemConnectTo = this.visibleItemsMap_[connectTo] || connectTo;
+          connType = conn[anychart.enums.GanttDataFields.CONNECTOR_TYPE];
+          taskMapItem = {'from': visItem, 'to': itemConnectTo};
+          if (connType) taskMapItem['type'] = connType;
+          taskMapItem['connSettings'] = conn;
+          this.connectorsData_.push(taskMapItem);
+        }
+      } else if (item.get(anychart.enums.GanttDataFields.CONNECT_TO)) {
+        connectTo = item.get(anychart.enums.GanttDataFields.CONNECT_TO);
+        itemConnectTo = this.visibleItemsMap_[connectTo] || connectTo;
+        connType = item.get(anychart.enums.GanttDataFields.CONNECTOR_TYPE);
+        taskMapItem = {'from': visItem, 'to': itemConnectTo};
         if (connType) taskMapItem['type'] = connType;
+        if (item.get(anychart.enums.GanttDataFields.CONNECTOR)) taskMapItem['connSettings'] = item.get(anychart.enums.GanttDataFields.CONNECTOR);
         this.connectorsData_.push(taskMapItem);
       }
     }
   }
 
   return this;
+};
+
+
+/**
+ * Whether controller works in resources mode.
+ * @return {boolean}
+ */
+anychart.core.gantt.Controller.prototype.isResources = function() {
+  return this.isResources_;
 };
 
 
@@ -519,21 +565,21 @@ anychart.core.gantt.Controller.prototype.getIndexByHeight = function(height) {
 
 
 /**
- * Sets values for this.startIndex_, this.endIndex_ and this.verticalOffset_ if needed based on this.visibleData_ and
+ * Sets values for this.startIndex_, this.endIndex_ and this.verticalOffset_ if needed based on this.visibleItems_ and
  *  this.availableHeight_.
  * Clears POSITION consistency state.
  */
 anychart.core.gantt.Controller.prototype.recalculate = function() {
-  if (this.visibleData_.length) {
-    if (!isNaN(this.startIndex_)) this.startIndex_ = goog.math.clamp(this.startIndex_, 0, this.visibleData_.length - 1);
-    if (!isNaN(this.endIndex_)) this.endIndex_ = goog.math.clamp(this.endIndex_, 0, this.visibleData_.length - 1);
+  if (this.visibleItems_.length) {
+    if (!isNaN(this.startIndex_)) this.startIndex_ = goog.math.clamp(this.startIndex_, 0, this.visibleItems_.length - 1);
+    if (!isNaN(this.endIndex_)) this.endIndex_ = goog.math.clamp(this.endIndex_, 0, this.visibleItems_.length - 1);
 
     var totalHeight = this.getHeightByIndexes(0, this.heightCache_.length - 1);
 
     if (this.availableHeight_ >= totalHeight) {
       this.startIndex_ = 0;
       this.verticalOffset_ = 0;
-      this.endIndex_ = this.visibleData_.length - 1;
+      this.endIndex_ = this.visibleItems_.length - 1;
     } else {
       if (isNaN(this.startIndex_) && isNaN(this.endIndex_)) this.startIndex_ = 0;
 
@@ -621,7 +667,7 @@ anychart.core.gantt.Controller.prototype.getPeriodsMap = function() {
 
 /**
  * Gets visible items map.
- * @return {Object} - Map that contains related tree dta items by its id.
+ * @return {Object} - Map that contains related tree data items by its id.
  */
 anychart.core.gantt.Controller.prototype.getVisibleItemsMap = function() {
   return this.visibleItemsMap_;
@@ -643,6 +689,33 @@ anychart.core.gantt.Controller.prototype.getConnectorsData = function() {
  */
 anychart.core.gantt.Controller.prototype.getHeightCache = function() {
   return this.heightCache_;
+};
+
+
+/**
+ * Gets visible items.
+ * @return {Array.<anychart.data.Tree.DataItem>} - Height cache.
+ */
+anychart.core.gantt.Controller.prototype.getVisibleItems = function() {
+  return this.visibleItems_;
+};
+
+
+/**
+ * Gets min date.
+ * @return {number} - Min date.
+ */
+anychart.core.gantt.Controller.prototype.getMinDate = function() {
+  return this.minDate_;
+};
+
+
+/**
+ * Gets max date.
+ * @return {number} - Height cache.
+ */
+anychart.core.gantt.Controller.prototype.getMaxDate = function() {
+  return this.maxDate_;
 };
 
 
@@ -671,6 +744,7 @@ anychart.core.gantt.Controller.prototype.data = function(opt_value) {
 
 /**
  * Gets/sets vertical offset.
+ * NOTE: setting start index resets verticalOffset to 0. That's why set vertical offset AFTER you set the start index.
  * @param {number=} opt_value - Value to be set.
  * @return {(anychart.core.gantt.Controller|number)} - Current value or itself for method chaining.
  */
@@ -779,8 +853,8 @@ anychart.core.gantt.Controller.prototype.dataGrid = function(opt_value) {
 
 /**
  * Gets/sets timeline.
- * @param {anychart.core.gantt.Timeline=} opt_value - Value to be set.
- * @return {(anychart.core.gantt.Timeline|anychart.core.gantt.Controller)} - Current value or itself for method chaining.
+ * @param {anychart.core.ui.Timeline=} opt_value - Value to be set.
+ * @return {(anychart.core.ui.Timeline|anychart.core.gantt.Controller)} - Current value or itself for method chaining.
  */
 anychart.core.gantt.Controller.prototype.timeline = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -825,11 +899,10 @@ anychart.core.gantt.Controller.prototype.run = function() {
 
   //This must be called anyway. Clears consistency states of data grid not related to controller.
   if (this.dataGrid_)
-    this.dataGrid_.drawInternal(this.visibleData_, this.startIndex_, this.endIndex_, this.verticalOffset_, this.availableHeight_, this.positionRecalculated_);
+    this.dataGrid_.drawInternal(this.positionRecalculated_);
 
   if (this.timeline_)
-    this.timeline_.drawInternal(this.visibleData_, this.startIndex_, this.endIndex_, this.verticalOffset_, this.availableHeight_,
-        this.minDate_, this.maxDate_, this.positionRecalculated_);
+    this.timeline_.drawInternal(this.positionRecalculated_);
 
   if (this.verticalScrollBar_) {
     this.verticalScrollBar_.suspendSignalsDispatching();
@@ -905,8 +978,8 @@ anychart.core.gantt.Controller.prototype.getScrollBar = function() {
             .verticalOffset(verticalOffset);
       }
 
-      controller.resumeSignalsDispatching(false);
-      controller.run();
+      controller.resumeSignalsDispatching(true);
+      //controller.run();
     });
   }
   return this.verticalScrollBar_;
@@ -920,22 +993,23 @@ anychart.core.gantt.Controller.prototype.getScrollBar = function() {
  * @return {anychart.core.gantt.Controller} - Itself for method chaining.
  */
 anychart.core.gantt.Controller.prototype.scrollTo = function(pxOffset) {
-  pxOffset = Math.max(pxOffset, 0);
-  var totalHeight = this.heightCache_[this.heightCache_.length - 1];
-  this.suspendSignalsDispatching();
+  if (this.heightCache_.length) { //TODO (A.Kudryavtsev): Provide an availability to set this before draw()?
+    pxOffset = Math.max(pxOffset, 0);
+    var totalHeight = this.heightCache_[this.heightCache_.length - 1];
+    this.suspendSignalsDispatching();
 
-  if (pxOffset > totalHeight - this.availableHeight_) { //auto scroll to end
-    this.endIndex(this.heightCache_.length - 1);
-  } else {
-    var itemIndex = this.getIndexByHeight(pxOffset);
-    var previousHeight = itemIndex ? this.heightCache_[itemIndex - 1] : 0;
-    var verticalOffset = pxOffset - previousHeight;
-    this
-        .startIndex(itemIndex)
-        .verticalOffset(verticalOffset);
+    if (pxOffset > totalHeight - this.availableHeight_) { //auto scroll to end
+      this.endIndex(this.heightCache_.length - 1);
+    } else {
+      var itemIndex = this.getIndexByHeight(pxOffset);
+      var previousHeight = itemIndex ? this.heightCache_[itemIndex - 1] : 0;
+      var verticalOffset = pxOffset - previousHeight;
+      this
+          .startIndex(itemIndex)
+          .verticalOffset(verticalOffset);
+    }
+    this.resumeSignalsDispatching(true);
   }
-  this.resumeSignalsDispatching(false);
-  this.run();
 
   return this;
 };
@@ -948,13 +1022,11 @@ anychart.core.gantt.Controller.prototype.scrollTo = function(pxOffset) {
  * @return {anychart.core.gantt.Controller} - Itself for method chaining.
  */
 anychart.core.gantt.Controller.prototype.scrollToRow = function(rowIndex) {
-  rowIndex = goog.math.clamp(rowIndex, 0, this.heightCache_.length - 1);
   this
       .suspendSignalsDispatching()
       .startIndex(rowIndex)
       .verticalOffset(0)
-      .resumeSignalsDispatching(false)
-      .run();
+      .resumeSignalsDispatching(true);
   return this;
 };
 
@@ -1012,15 +1084,13 @@ anychart.core.gantt.Controller.prototype.collapseAll = function() {
 anychart.core.gantt.Controller.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
-  json['isResourceChart'] = this.isResourceChart_;
+  json['isResourceChart'] = this.isResources_;
   json['treeData'] = this.data().serialize();
   json['verticalOffset'] = this.verticalOffset();
   if (!isNaN(this.startIndex()))
     json['startIndex'] = this.startIndex();
   else if (!isNaN(this.endIndex()))
     json['endIndex'] = this.endIndex();
-
-  //NOTE: We do not save available height because it must be set from outside depending on size of restored element.
 
   return json;
 };
@@ -1030,13 +1100,11 @@ anychart.core.gantt.Controller.prototype.serialize = function() {
 anychart.core.gantt.Controller.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
 
-  this.isResourceChart_ = config['isResourceChart']; //Direct setup. I don't want to believe that it is kind of hack.
+  this.isResources_ = config['isResourceChart']; //Direct setup. I don't want to believe that it is kind of hack.
   if ('treeData' in config) this.data(anychart.data.Tree.fromJson(config['treeData']));
   this.verticalOffset(config['verticalOffset']);
   if ('startIndex' in config)
     this.startIndex(config['startIndex']);
   else if ('endIndex' in config)
     this.endIndex(config['endIndex']);
-
-  //NOTE: Available height must be set from outside depending on size of restored element.
 };

@@ -297,7 +297,6 @@ anychart.core.cartesian.series.OHLC.prototype.hoverRisingStroke = function(opt_s
 
 /**
  * Getter/setter for select stroke settings.
- * @ignoreDoc
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
