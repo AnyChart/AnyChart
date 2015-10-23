@@ -1420,7 +1420,7 @@ anychart.core.heatMap.series.Base.prototype.configureMarker = function(pointStat
 
     return marker;
   } else if (marker) {
-    marker.clear();
+    this.markers().clear(marker.getIndex());
   }
   return null;
 };
