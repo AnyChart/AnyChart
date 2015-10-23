@@ -237,7 +237,7 @@ anychart.core.stock.Controller.prototype.deregisterSource = function(selectable)
     var tablesChanged = false;
     for (guid in this.tables_) {
       if (!(guid in newTables)) {
-        this.tables_.unlistenSignals(this.tableInvalidated_, this);
+        this.tables_[guid].unlistenSignals(this.tableInvalidated_, this);
         tablesChanged = true;
         break;
       }

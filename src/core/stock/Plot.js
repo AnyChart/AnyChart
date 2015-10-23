@@ -93,6 +93,8 @@ anychart.core.stock.Plot = function(chart) {
    * @private
    */
   this.eventsInterceptor_ = null;
+
+  this.defaultSeriesType(anychart.enums.StockSeriesType.LINE);
 };
 goog.inherits(anychart.core.stock.Plot, anychart.core.VisualBaseWithBounds);
 
@@ -160,6 +162,21 @@ anychart.core.stock.Plot.ZINDEX_AXIS = 35;
 anychart.core.stock.Plot.ZINDEX_BACKGROUND = 1;
 
 
+/**
+ * Getter/setter for stock plot defaultSeriesType.
+ * @param {(string|anychart.enums.StockSeriesType)=} opt_value Default series type.
+ * @return {anychart.core.stock.Plot|anychart.enums.StockSeriesType} Default series type or self for chaining.
+ */
+anychart.core.stock.Plot.prototype.defaultSeriesType = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeStockSeriesType(opt_value);
+    this.defaultSeriesType_ = opt_value;
+    return this;
+  }
+  return this.defaultSeriesType_;
+};
+
+
 //region Series-related methods
 /**
  * Creates and returns a new column series.
@@ -217,12 +234,117 @@ anychart.core.stock.Plot.prototype.ohlc = function(opt_data, opt_mappingSettings
 
 
 /**
- * Gets series by index.
- * @param {number} index
- * @return {anychart.core.stock.series.Base}
+ * Add series to chart.
+ * @param {...anychart.data.TableMapping} var_args Chart series data.
+ * @return {Array.<anychart.core.stock.series.Base>} Array of created series.
  */
-anychart.core.stock.Plot.prototype.getSeries = function(index) {
+anychart.core.stock.Plot.prototype.addSeries = function(var_args) {
+  var zIndex;
+  var rv = [];
+  var type = /** @type {string} */ (this.defaultSeriesType());
+  if (type == anychart.enums.StockSeriesType.LINE)
+    zIndex = anychart.core.stock.Plot.ZINDEX_LINE_SERIES;
+  var count = arguments.length;
+  this.suspendSignalsDispatching();
+  if (!count)
+    rv.push(this.createSeriesByType_(type, null, undefined, undefined, zIndex));
+  else {
+    for (var i = 0; i < count; i++) {
+      rv.push(this.createSeriesByType_(type, arguments[i], undefined, undefined, zIndex));
+    }
+  }
+  this.resumeSignalsDispatching(true);
+  return rv;
+};
+
+
+/**
+ * Find series index by its id.
+ * @param {number|string} id Series id.
+ * @return {number} Series index or -1 if didn't find.
+ */
+anychart.core.stock.Plot.prototype.getSeriesIndexBySeriesId = function(id) {
+  return goog.array.findIndex(this.series_, function(item) {
+    return item.id() == id;
+  });
+};
+
+
+/**
+ * Gets series by its id.
+ * @param {number|string} id Id of the series.
+ * @return {anychart.core.stock.series.Base} Series instance.
+ */
+anychart.core.stock.Plot.prototype.getSeries = function(id) {
+  return this.getSeriesAt(this.getSeriesIndexBySeriesId(id));
+};
+
+
+/**
+ * Gets series by its index.
+ * @param {number} index Index of the series.
+ * @return {?anychart.core.stock.series.Base} Series instance.
+ */
+anychart.core.stock.Plot.prototype.getSeriesAt = function(index) {
   return this.series_[index] || null;
+};
+
+
+/**
+ * Returns series count.
+ * @return {number} Number of series.
+ */
+anychart.core.stock.Plot.prototype.getSeriesCount = function() {
+  return this.series_.length;
+};
+
+
+/**
+ * Removes one of series from chart by its id.
+ * @param {number|string} id Series id.
+ * @return {anychart.core.stock.Plot}
+ */
+anychart.core.stock.Plot.prototype.removeSeries = function(id) {
+  return this.removeSeriesAt(this.getSeriesIndexBySeriesId(id));
+};
+
+
+/**
+ * Removes one of series from chart by its index.
+ * @param {number} index Series index.
+ * @return {anychart.core.stock.Plot}
+ */
+anychart.core.stock.Plot.prototype.removeSeriesAt = function(index) {
+  var series = this.series_[index];
+  if (series) {
+    anychart.globalLock.lock();
+    goog.array.splice(this.series_, index, 1);
+    goog.dispose(series);
+    this.invalidate(anychart.ConsistencyState.STOCK_PLOT_SERIES |
+        anychart.ConsistencyState.STOCK_PLOT_LEGEND,
+        anychart.Signal.NEEDS_REDRAW);
+    anychart.globalLock.unlock();
+  }
+  return this;
+};
+
+
+/**
+ * Removes all series from chart.
+ * @return {anychart.core.stock.Plot} Self for method chaining.
+ */
+anychart.core.stock.Plot.prototype.removeAllSeries = function() {
+  if (this.series_.length) {
+    anychart.globalLock.lock();
+    var series = this.series_;
+    this.series_ = [];
+    goog.disposeAll(series);
+    this.invalidate(anychart.ConsistencyState.STOCK_PLOT_SERIES |
+        anychart.ConsistencyState.STOCK_PLOT_LEGEND,
+        anychart.Signal.NEEDS_REDRAW);
+    anychart.globalLock.unlock();
+  }
+  return this;
 };
 
 
@@ -274,16 +396,19 @@ anychart.core.stock.Plot.prototype.createSeriesByType_ = function(type, opt_data
     instance = new ctr(this.chart_, this);
     instance.data(opt_data, opt_mappingSettings, opt_csvSettings);
     instance.setParentEventTarget(this);
+    var lastSeries = this.series_[this.series_.length - 1];
+    var index = lastSeries ? /** @type {number} */ (lastSeries.index()) + 1 : 0;
     this.series_.push(instance);
-    var index = this.series_.length - 1;
     var inc = index * anychart.core.stock.Plot.ZINDEX_INCREMENT_MULTIPLIER;
-    instance.setIndex(index);
+    instance.index(index).id(index);
     instance.setAutoZIndex((goog.isDef(opt_zIndex) ? opt_zIndex : anychart.core.stock.Plot.ZINDEX_SERIES) + inc);
     instance.clip(true);
     //instance.setAutoColor(this.palette().colorAt(this.series_.length - 1));
     instance.setup(this.defaultSeriesSettings_[type]);
     instance.listenSignals(this.seriesInvalidated_, this);
-    this.invalidate(anychart.ConsistencyState.STOCK_PLOT_SERIES,
+    this.invalidate(
+        anychart.ConsistencyState.STOCK_PLOT_SERIES |
+        anychart.ConsistencyState.STOCK_PLOT_LEGEND,
         anychart.Signal.NEEDS_REDRAW);
   } else {
     anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
@@ -818,7 +943,7 @@ anychart.core.stock.Plot.prototype.createLegendItemsProvider = function(sourceMo
     if (series) {
       var itemData = series.getLegendItemData(itemsTextFormatter);
       itemData['sourceUid'] = goog.getUid(this);
-      itemData['sourceKey'] = series.getIndex();
+      itemData['sourceKey'] = series.index();
       data.push(itemData);
     }
   }
@@ -1151,6 +1276,7 @@ anychart.core.stock.Plot.prototype.serialize = function() {
   scales.push(scalesIds[goog.getUid(this.yScale())]);
   json['yScale'] = scales.length - 1;
 
+  json['defaultSeriesType'] = this.defaultSeriesType();
   json['background'] = this.background().serialize();
   json['xAxis'] = this.xAxis().serialize();
   json['dateTimeHighlighter'] = anychart.color.serialize(this.dateTimeHighlighterStroke_);
@@ -1246,6 +1372,7 @@ anychart.core.stock.Plot.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   var i, json, scale;
 
+  this.defaultSeriesType(config['defaultSeriesType']);
   this.background(config['background']);
   this.xAxis(config['xAxis']);
   this.dateTimeHighlighter(config['dateTimeHighlighter']);
@@ -1326,7 +1453,7 @@ anychart.core.stock.Plot.prototype.setupByJSON = function(config) {
   if (goog.isArray(series)) {
     for (i = 0; i < series.length; i++) {
       json = series[i];
-      var seriesType = (json['seriesType'] || 'line').toLowerCase();
+      var seriesType = (json['seriesType'] || this.defaultSeriesType()).toLowerCase();
       var data = json['data'];
       var seriesInst = this.createSeriesByType_(seriesType, data);
       if (seriesInst) {
@@ -1437,3 +1564,10 @@ anychart.core.stock.Plot.prototype['xAxis'] = anychart.core.stock.Plot.prototype
 anychart.core.stock.Plot.prototype['grid'] = anychart.core.stock.Plot.prototype.grid;
 anychart.core.stock.Plot.prototype['minorGrid'] = anychart.core.stock.Plot.prototype.minorGrid;
 anychart.core.stock.Plot.prototype['dateTimeHighlighter'] = anychart.core.stock.Plot.prototype.dateTimeHighlighter;
+anychart.core.stock.Plot.prototype['defaultSeriesType'] = anychart.core.stock.Plot.prototype.defaultSeriesType;
+anychart.core.stock.Plot.prototype['addSeries'] = anychart.core.stock.Plot.prototype.addSeries;
+anychart.core.stock.Plot.prototype['getSeriesAt'] = anychart.core.stock.Plot.prototype.getSeriesAt;
+anychart.core.stock.Plot.prototype['getSeriesCount'] = anychart.core.stock.Plot.prototype.getSeriesCount;
+anychart.core.stock.Plot.prototype['removeSeries'] = anychart.core.stock.Plot.prototype.removeSeries;
+anychart.core.stock.Plot.prototype['removeSeriesAt'] = anychart.core.stock.Plot.prototype.removeSeriesAt;
+anychart.core.stock.Plot.prototype['removeAllSeries'] = anychart.core.stock.Plot.prototype.removeAllSeries;

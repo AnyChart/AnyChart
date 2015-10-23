@@ -64,7 +64,7 @@ anychart.core.scatter.series.Marker = function(opt_data, opt_csvSettings) {
   this.hoverSize_ = NaN;
 };
 goog.inherits(anychart.core.scatter.series.Marker, anychart.core.scatter.series.Base);
-anychart.core.scatter.series.Base.SeriesTypesMap[anychart.enums.ScatterSeriesTypes.MARKER] = anychart.core.scatter.series.Marker;
+anychart.core.scatter.series.Base.SeriesTypesMap[anychart.enums.ScatterSeriesType.MARKER] = anychart.core.scatter.series.Marker;
 
 
 /**
@@ -612,7 +612,7 @@ anychart.core.scatter.series.Marker.prototype.applyHatchFill = function(pointSta
  * @inheritDoc
  */
 anychart.core.scatter.series.Marker.prototype.getType = function() {
-  return anychart.enums.ScatterSeriesTypes.MARKER;
+  return anychart.enums.ScatterSeriesType.MARKER;
 };
 
 

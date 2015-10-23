@@ -25,6 +25,9 @@
       "properties": {
         "container": {
           "type": "string"
+        },
+        "defaultSeriesType": {
+          "type": "string"
         }
       }
     },

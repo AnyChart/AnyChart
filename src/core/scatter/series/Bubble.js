@@ -40,7 +40,7 @@ anychart.core.scatter.series.Bubble = function(opt_data, opt_csvSettings) {
   this.displayNegative_ = false;
 };
 goog.inherits(anychart.core.scatter.series.Bubble, anychart.core.scatter.series.BaseWithMarkers);
-anychart.core.scatter.series.Base.SeriesTypesMap[anychart.enums.ScatterSeriesTypes.BUBBLE] = anychart.core.scatter.series.Bubble;
+anychart.core.scatter.series.Base.SeriesTypesMap[anychart.enums.ScatterSeriesType.BUBBLE] = anychart.core.scatter.series.Bubble;
 
 
 // --- DiscreteBase ---
@@ -1244,7 +1244,7 @@ anychart.core.scatter.series.Bubble.prototype.applyAppearanceToSeries = function
  * @inheritDoc
  */
 anychart.core.scatter.series.Bubble.prototype.getType = function() {
-  return anychart.enums.ScatterSeriesTypes.BUBBLE;
+  return anychart.enums.ScatterSeriesType.BUBBLE;
 };
 
 

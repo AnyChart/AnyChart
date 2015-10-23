@@ -89,8 +89,25 @@ anychart.charts.Radar = function() {
    * @private
    */
   this.dataBounds_ = null;
+
+  this.defaultSeriesType(anychart.enums.RadarSeriesType.LINE);
 };
 goog.inherits(anychart.charts.Radar, anychart.core.SeparateChart);
+
+
+/**
+ * Getter/setter for radar defaultSeriesType.
+ * @param {(string|anychart.enums.RadarSeriesType)=} opt_value Default series type.
+ * @return {anychart.charts.Radar|anychart.enums.RadarSeriesType} Default series type or self for chaining.
+ */
+anychart.charts.Radar.prototype.defaultSeriesType = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeRadarSeriesType(opt_value);
+    this.defaultSeriesType_ = opt_value;
+    return this;
+  }
+  return this.defaultSeriesType_;
+};
 
 
 /** @inheritDoc */
@@ -700,7 +717,7 @@ anychart.charts.Radar.prototype.marker = function(data, opt_csvSettings) {
 
 /**
  * @param {string} type Series type.
- * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {?(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
  * @param {number=} opt_zIndex Optional series zIndex.
@@ -721,16 +738,17 @@ anychart.charts.Radar.prototype.createSeriesByType_ = function(type, data, opt_c
     instance.setChart(this);
     instance.setParentEventTarget(this);
     this.registerDisposable(instance);
+    var lastSeries = this.series_[this.series_.length - 1];
+    var index = lastSeries ? /** @type {number} */ (lastSeries.index()) + 1 : 0;
     this.series_.push(instance);
-    var index = this.series_.length - 1;
     var inc = index * anychart.charts.Radar.ZINDEX_INCREMENT_MULTIPLIER;
-    instance.index(index);
+    instance.index(index).id(index);
     var seriesZIndex = (goog.isDef(opt_zIndex) ? opt_zIndex : anychart.charts.Radar.ZINDEX_SERIES) + inc;
     instance.setAutoZIndex(seriesZIndex);
     instance.labels().setAutoZIndex(seriesZIndex + anychart.charts.Radar.ZINDEX_INCREMENT_MULTIPLIER / 2);
-    instance.setAutoColor(this.palette().itemAt(this.series_.length - 1));
-    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(this.series_.length - 1)));
-    var markerType = /** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(this.series_.length - 1));
+    instance.setAutoColor(this.palette().itemAt(index));
+    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
+    var markerType = /** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(index));
     instance.setAutoMarkerType(markerType);
     if (instance.hasMarkers()) {
       instance.markers().setAutoZIndex(seriesZIndex + anychart.charts.Radar.ZINDEX_INCREMENT_MULTIPLIER / 2);
@@ -759,9 +777,117 @@ anychart.charts.Radar.prototype.createSeriesByType_ = function(type, data, opt_c
 };
 
 
-/** @inheritDoc */
-anychart.charts.Radar.prototype.getSeries = function(index) {
+/**
+ * Add series to chart.
+ * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Chart series data.
+ * @return {Array.<anychart.core.radar.series.Base>} Array of created series.
+ */
+anychart.charts.Radar.prototype.addSeries = function(var_args) {
+  var zIndex;
+  var rv = [];
+  var type = /** @type {string} */ (this.defaultSeriesType());
+  if (type == anychart.enums.RadarSeriesType.LINE)
+    zIndex = anychart.charts.Radar.ZINDEX_LINE_SERIES;
+  var count = arguments.length;
+  this.suspendSignalsDispatching();
+  if (!count)
+    rv.push(this.createSeriesByType_(type, null, undefined, zIndex));
+  else {
+    for (var i = 0; i < count; i++) {
+      rv.push(this.createSeriesByType_(type, arguments[i], undefined, zIndex));
+    }
+  }
+  this.resumeSignalsDispatching(true);
+  return rv;
+};
+
+
+/**
+ * Find series index by its id.
+ * @param {number|string} id Series id.
+ * @return {number} Series index or -1 if didn't find.
+ */
+anychart.charts.Radar.prototype.getSeriesIndexBySeriesId = function(id) {
+  return goog.array.findIndex(this.series_, function(item) {
+    return item.id() == id;
+  });
+};
+
+
+/**
+ * Gets series by its id.
+ * @param {number|string} id Id of the series.
+ * @return {anychart.core.radar.series.Base} Series instance.
+ */
+anychart.charts.Radar.prototype.getSeries = function(id) {
+  return this.getSeriesAt(this.getSeriesIndexBySeriesId(id));
+};
+
+
+/**
+ * Gets series by its index.
+ * @param {number} index Index of the series.
+ * @return {?anychart.core.radar.series.Base} Series instance.
+ */
+anychart.charts.Radar.prototype.getSeriesAt = function(index) {
   return this.series_[index] || null;
+};
+
+
+/**
+ * Returns series count.
+ * @return {number} Number of series.
+ */
+anychart.charts.Radar.prototype.getSeriesCount = function() {
+  return this.series_.length;
+};
+
+
+/**
+ * Removes one of series from chart by its id.
+ * @param {number|string} id Series id.
+ * @return {anychart.charts.Radar}
+ */
+anychart.charts.Radar.prototype.removeSeries = function(id) {
+  return this.removeSeriesAt(this.getSeriesIndexBySeriesId(id));
+};
+
+
+/**
+ * Removes one of series from chart by its index.
+ * @param {number} index Series index.
+ * @return {anychart.charts.Radar}
+ */
+anychart.charts.Radar.prototype.removeSeriesAt = function(index) {
+  var series = this.series_[index];
+  if (series) {
+    goog.dispose(series);
+    goog.array.splice(this.series_, index, 1);
+    this.invalidate(
+        anychart.ConsistencyState.RADAR_SERIES |
+        anychart.ConsistencyState.CHART_LEGEND |
+        anychart.ConsistencyState.RADAR_SCALES,
+        anychart.Signal.NEEDS_REDRAW);
+  }
+  return this;
+};
+
+
+/**
+ * Removes all series from chart.
+ * @return {anychart.charts.Radar} Self for method chaining.
+ */
+anychart.charts.Radar.prototype.removeAllSeries = function() {
+  if (this.series_.length) {
+    goog.disposeAll(this.series_);
+    this.series_.length = 0;
+    this.invalidate(
+        anychart.ConsistencyState.RADAR_SERIES |
+        anychart.ConsistencyState.CHART_LEGEND |
+        anychart.ConsistencyState.RADAR_SCALES,
+        anychart.Signal.NEEDS_REDRAW);
+  }
+  return this;
 };
 
 
@@ -1751,6 +1877,7 @@ anychart.charts.Radar.prototype.serialize = function() {
   json['yScale'] = scales.length - 1;
 
   json['type'] = anychart.enums.ChartTypes.RADAR;
+  json['defaultSeriesType'] = this.defaultSeriesType();
   json['palette'] = this.palette().serialize();
   json['markerPalette'] = this.markerPalette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
@@ -1892,6 +2019,7 @@ anychart.charts.Radar.prototype.setupByJSON = function(config) {
   if ('defaultMinorGridSettings' in config)
     this.defaultMinorGridSettings(config['defaultMinorGridSettings']);
 
+  this.defaultSeriesType(config['defaultSeriesType']);
   this.palette(config['palette']);
   this.markerPalette(config['markerPalette']);
   this.hatchFillPalette(config['hatchFillPalette']);
@@ -1979,7 +2107,7 @@ anychart.charts.Radar.prototype.setupByJSON = function(config) {
   if (goog.isArray(series)) {
     for (i = 0; i < series.length; i++) {
       json = series[i];
-      var seriesType = (json['seriesType'] || anychart.enums.RadarSeriesType.LINE).toLowerCase();
+      var seriesType = (json['seriesType'] || this.defaultSeriesType()).toLowerCase();
       var data = json['data'];
       var seriesInst = this.createSeriesByType_(seriesType, data);
       if (seriesInst) {
@@ -2011,4 +2139,11 @@ anychart.charts.Radar.prototype['palette'] = anychart.charts.Radar.prototype.pal
 anychart.charts.Radar.prototype['markerPalette'] = anychart.charts.Radar.prototype.markerPalette;//doc|ex
 anychart.charts.Radar.prototype['startAngle'] = anychart.charts.Radar.prototype.startAngle;//doc|ex
 anychart.charts.Radar.prototype['getType'] = anychart.charts.Radar.prototype.getType;
+anychart.charts.Radar.prototype['defaultSeriesType'] = anychart.charts.Radar.prototype.defaultSeriesType;
+anychart.charts.Radar.prototype['addSeries'] = anychart.charts.Radar.prototype.addSeries;
+anychart.charts.Radar.prototype['getSeriesAt'] = anychart.charts.Radar.prototype.getSeriesAt;
+anychart.charts.Radar.prototype['getSeriesCount'] = anychart.charts.Radar.prototype.getSeriesCount;
+anychart.charts.Radar.prototype['removeSeries'] = anychart.charts.Radar.prototype.removeSeries;
+anychart.charts.Radar.prototype['removeSeriesAt'] = anychart.charts.Radar.prototype.removeSeriesAt;
+anychart.charts.Radar.prototype['removeAllSeries'] = anychart.charts.Radar.prototype.removeAllSeries;
 anychart.charts.Radar.prototype['getPlotBounds'] = anychart.charts.Radar.prototype.getPlotBounds;

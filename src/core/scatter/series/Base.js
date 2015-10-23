@@ -850,7 +850,7 @@ anychart.core.scatter.series.Base.prototype.drawError = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Returns type of current series.
- * @return {anychart.enums.ScatterSeriesTypes} Series type.
+ * @return {anychart.enums.ScatterSeriesType} Series type.
  */
 anychart.core.scatter.series.Base.prototype.getType = goog.abstractMethod;
 

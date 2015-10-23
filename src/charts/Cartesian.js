@@ -185,12 +185,13 @@ goog.inherits(anychart.charts.Cartesian, anychart.core.SeparateChart);
 
 
 /**
- * Internal cartesian getter/setter.
- * @param {anychart.enums.CartesianSeriesType=} opt_value
- * @return {anychart.charts.Cartesian|anychart.enums.CartesianSeriesType}
+ * Getter/setter for cartesian defaultSeriesType.
+ * @param {(string|anychart.enums.CartesianSeriesType)=} opt_value Default series type.
+ * @return {anychart.charts.Cartesian|anychart.enums.CartesianSeriesType} Default series type or self for chaining.
  */
 anychart.charts.Cartesian.prototype.defaultSeriesType = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeCartesianSeriesType(opt_value);
     this.defaultSeriesType_ = opt_value;
     return this;
   }
@@ -1762,7 +1763,7 @@ anychart.charts.Cartesian.prototype.stepArea = function(data, opt_csvSettings) {
 
 /**
  * @param {string} type Series type.
- * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {?(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
  * @param {number=} opt_zIndex Optional series zIndex.
@@ -1779,17 +1780,18 @@ anychart.charts.Cartesian.prototype.createSeriesByType_ = function(type, data, o
     instance.setChart(this);
     instance.setParentEventTarget(this);
     this.registerDisposable(instance);
+    var lastSeries = this.series_[this.series_.length - 1];
+    var index = lastSeries ? /** @type {number} */ (lastSeries.index()) + 1 : 0;
     this.series_.push(instance);
-    var index = this.series_.length - 1;
     var inc = index * anychart.charts.Cartesian.ZINDEX_INCREMENT_MULTIPLIER;
-    instance.index(index);
+    instance.index(index).id(index);
     var seriesZIndex = (goog.isDef(opt_zIndex) ? opt_zIndex : anychart.charts.Cartesian.ZINDEX_SERIES) + inc;
     instance.setAutoZIndex(seriesZIndex);
     instance.labels().setAutoZIndex(seriesZIndex + anychart.charts.Cartesian.ZINDEX_INCREMENT_MULTIPLIER / 2);
     instance.clip(true);
-    instance.setAutoColor(this.palette().itemAt(this.series_.length - 1));
-    instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(this.series_.length - 1)));
-    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(this.series_.length - 1)));
+    instance.setAutoColor(this.palette().itemAt(index));
+    instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(index)));
+    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
     if (instance.hasMarkers()) {
       instance.markers().setAutoZIndex(seriesZIndex + anychart.charts.Cartesian.ZINDEX_INCREMENT_MULTIPLIER / 2);
       instance.markers().setAutoFill((/** @type {anychart.core.cartesian.series.BaseWithMarkers} */ (instance)).getMarkerFill());
@@ -1817,9 +1819,119 @@ anychart.charts.Cartesian.prototype.createSeriesByType_ = function(type, data, o
 };
 
 
-/** @inheritDoc */
-anychart.charts.Cartesian.prototype.getSeries = function(index) {
+/**
+ * Add series to chart.
+ * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Chart series data.
+ * @return {Array.<anychart.core.cartesian.series.Base>} Array of created series.
+ */
+anychart.charts.Cartesian.prototype.addSeries = function(var_args) {
+  var zIndex;
+  var rv = [];
+  var type = /** @type {string} */ (this.defaultSeriesType());
+  if (type == anychart.enums.CartesianSeriesType.LINE ||
+      type == anychart.enums.CartesianSeriesType.SPLINE ||
+      type == anychart.enums.CartesianSeriesType.STEP_LINE.toLowerCase())
+    zIndex = anychart.charts.Cartesian.ZINDEX_LINE_SERIES;
+  var count = arguments.length;
+  this.suspendSignalsDispatching();
+  if (!count)
+    rv.push(this.createSeriesByType_(type, null, undefined, zIndex));
+  else {
+    for (var i = 0; i < count; i++) {
+      rv.push(this.createSeriesByType_(type, arguments[i], undefined, zIndex));
+    }
+  }
+  this.resumeSignalsDispatching(true);
+  return rv;
+};
+
+
+/**
+ * Find series index by its id.
+ * @param {number|string} id Series id.
+ * @return {number} Series index or -1 if didn't find.
+ */
+anychart.charts.Cartesian.prototype.getSeriesIndexBySeriesId = function(id) {
+  return goog.array.findIndex(this.series_, function(item) {
+    return item.id() == id;
+  });
+};
+
+
+/**
+ * Gets series by its id.
+ * @param {number|string} id Id of the series.
+ * @return {anychart.core.cartesian.series.Base} Series instance.
+ */
+anychart.charts.Cartesian.prototype.getSeries = function(id) {
+  return this.getSeriesAt(this.getSeriesIndexBySeriesId(id));
+};
+
+
+/**
+ * Gets series by its index.
+ * @param {number} index Index of the series.
+ * @return {?anychart.core.cartesian.series.Base} Series instance.
+ */
+anychart.charts.Cartesian.prototype.getSeriesAt = function(index) {
   return this.series_[index] || null;
+};
+
+
+/**
+ * Returns series count.
+ * @return {number} Number of series.
+ */
+anychart.charts.Cartesian.prototype.getSeriesCount = function() {
+  return this.series_.length;
+};
+
+
+/**
+ * Removes one of series from chart by its id.
+ * @param {number|string} id Series id.
+ * @return {anychart.charts.Cartesian}
+ */
+anychart.charts.Cartesian.prototype.removeSeries = function(id) {
+  return this.removeSeriesAt(this.getSeriesIndexBySeriesId(id));
+};
+
+
+/**
+ * Removes one of series from chart by its index.
+ * @param {number} index Series index.
+ * @return {anychart.charts.Cartesian}
+ */
+anychart.charts.Cartesian.prototype.removeSeriesAt = function(index) {
+  var series = this.series_[index];
+  if (series) {
+    goog.dispose(series);
+    goog.array.splice(this.series_, index, 1);
+    this.invalidate(
+        anychart.ConsistencyState.CARTESIAN_SERIES |
+        anychart.ConsistencyState.CHART_LEGEND |
+        anychart.ConsistencyState.CARTESIAN_SCALES,
+        anychart.Signal.NEEDS_REDRAW);
+  }
+  return this;
+};
+
+
+/**
+ * Removes all series from chart.
+ * @return {anychart.charts.Cartesian} Self for method chaining.
+ */
+anychart.charts.Cartesian.prototype.removeAllSeries = function() {
+  if (this.series_.length) {
+    goog.disposeAll(this.series_);
+    this.series_.length = 0;
+    this.invalidate(
+        anychart.ConsistencyState.CARTESIAN_SERIES |
+        anychart.ConsistencyState.CHART_LEGEND |
+        anychart.ConsistencyState.CARTESIAN_SCALES,
+        anychart.Signal.NEEDS_REDRAW);
+  }
+  return this;
 };
 
 
@@ -3419,6 +3531,7 @@ anychart.charts.Cartesian.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
 
   this.barChartMode = ('barChartMode' in config) ? config['barChartMode'] : this.barChartMode;
+  this.defaultSeriesType(config['defaultSeriesType']);
   this.palette(config['palette']);
   this.markerPalette(config['markerPalette']);
   this.hatchFillPalette(config['hatchFillPalette']);
@@ -3624,6 +3737,7 @@ anychart.charts.Cartesian.prototype.serialize = function() {
   json['yScale'] = scales.length - 1;
 
   json['type'] = this.type_;
+  json['defaultSeriesType'] = this.defaultSeriesType();
   json['barChartMode'] = this.barChartMode;
   json['palette'] = this.palette().serialize();
   json['markerPalette'] = this.markerPalette().serialize();
@@ -3854,6 +3968,13 @@ anychart.charts.Cartesian.prototype['palette'] = anychart.charts.Cartesian.proto
 anychart.charts.Cartesian.prototype['markerPalette'] = anychart.charts.Cartesian.prototype.markerPalette;
 anychart.charts.Cartesian.prototype['hatchFillPalette'] = anychart.charts.Cartesian.prototype.hatchFillPalette;
 anychart.charts.Cartesian.prototype['getType'] = anychart.charts.Cartesian.prototype.getType;
+anychart.charts.Cartesian.prototype['defaultSeriesType'] = anychart.charts.Cartesian.prototype.defaultSeriesType;
+anychart.charts.Cartesian.prototype['addSeries'] = anychart.charts.Cartesian.prototype.addSeries;
+anychart.charts.Cartesian.prototype['getSeriesAt'] = anychart.charts.Cartesian.prototype.getSeriesAt;
+anychart.charts.Cartesian.prototype['getSeriesCount'] = anychart.charts.Cartesian.prototype.getSeriesCount;
+anychart.charts.Cartesian.prototype['removeSeries'] = anychart.charts.Cartesian.prototype.removeSeries;
+anychart.charts.Cartesian.prototype['removeSeriesAt'] = anychart.charts.Cartesian.prototype.removeSeriesAt;
+anychart.charts.Cartesian.prototype['removeAllSeries'] = anychart.charts.Cartesian.prototype.removeAllSeries;
 anychart.charts.Cartesian.prototype['getPlotBounds'] = anychart.charts.Cartesian.prototype.getPlotBounds;
 anychart.charts.Cartesian.prototype['xZoom'] = anychart.charts.Cartesian.prototype.xZoom;
 anychart.charts.Cartesian.prototype['xScroller'] = anychart.charts.Cartesian.prototype.xScroller;

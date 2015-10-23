@@ -89,8 +89,25 @@ anychart.charts.Polar = function() {
    * @private
    */
   this.dataBounds_ = null;
+
+  this.defaultSeriesType(anychart.enums.PolarSeriesType.MARKER);
 };
 goog.inherits(anychart.charts.Polar, anychart.core.SeparateChart);
+
+
+/**
+ * Getter/setter for polar defaultSeriesType.
+ * @param {(string|anychart.enums.PolarSeriesType)=} opt_value Default series type.
+ * @return {anychart.charts.Polar|anychart.enums.PolarSeriesType} Default series type or self for chaining.
+ */
+anychart.charts.Polar.prototype.defaultSeriesType = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizePolarSeriesType(opt_value);
+    this.defaultSeriesType_ = opt_value;
+    return this;
+  }
+  return this.defaultSeriesType_;
+};
 
 
 /** @inheritDoc */
@@ -481,7 +498,7 @@ anychart.charts.Polar.prototype.onGridSignal_ = function(event) {
  * chart.line([1, 4, 5, 7, 2]);
  * chart.xAxis().stroke('green');
  * chart.container(stage).draw();
- * @return {!anychart.core.axes.Radar} Axis instance by index.
+ * @return {!anychart.core.axes.Polar} Axis instance by index.
  *//**
  * Setter for chart X-axis by index.
  * @example
@@ -490,7 +507,7 @@ anychart.charts.Polar.prototype.onGridSignal_ = function(event) {
  * chart.xAxis(null);
  * chart.container(stage).draw();
  * @param {(Object|string|null)=} opt_value Chart axis settings to set.<br/>
- * @return {!anychart.charts.Radar} {@link anychart.charts.Radar} instance for method chaining.
+ * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} instance for method chaining.
  *//**
  * @ignoreDoc
  * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.
@@ -642,7 +659,7 @@ anychart.charts.Polar.prototype.marker = function(data, opt_csvSettings) {
 
 /**
  * @param {string} type Series type.
- * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {?(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
  * @param {number=} opt_zIndex Optional series zIndex.
@@ -663,16 +680,17 @@ anychart.charts.Polar.prototype.createSeriesByType_ = function(type, data, opt_c
     instance.setChart(this);
     instance.setParentEventTarget(this);
     this.registerDisposable(instance);
+    var lastSeries = this.series_[this.series_.length - 1];
+    var index = lastSeries ? /** @type {number} */ (lastSeries.index()) + 1 : 0;
     this.series_.push(instance);
-    var index = this.series_.length - 1;
     var inc = index * anychart.charts.Polar.ZINDEX_INCREMENT_MULTIPLIER;
-    instance.index(index);
+    instance.index(index).id(index);
     var seriesZIndex = (goog.isDef(opt_zIndex) ? opt_zIndex : anychart.charts.Polar.ZINDEX_SERIES) + inc;
     instance.setAutoZIndex(seriesZIndex);
     instance.labels().setAutoZIndex(seriesZIndex + anychart.charts.Polar.ZINDEX_INCREMENT_MULTIPLIER / 2);
-    instance.setAutoColor(this.palette().itemAt(this.series_.length - 1));
-    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(this.series_.length - 1)));
-    var markerType = /** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(this.series_.length - 1));
+    instance.setAutoColor(this.palette().itemAt(index));
+    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
+    var markerType = /** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(index));
     instance.setAutoMarkerType(markerType);
     if (instance.hasMarkers()) {
       instance.markers().setAutoZIndex(seriesZIndex + anychart.charts.Polar.ZINDEX_INCREMENT_MULTIPLIER / 2);
@@ -701,9 +719,117 @@ anychart.charts.Polar.prototype.createSeriesByType_ = function(type, data, opt_c
 };
 
 
-/** @inheritDoc */
-anychart.charts.Polar.prototype.getSeries = function(index) {
+/**
+ * Add series to chart.
+ * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Chart series data.
+ * @return {Array.<anychart.core.polar.series.Base>} Array of created series.
+ */
+anychart.charts.Polar.prototype.addSeries = function(var_args) {
+  var zIndex;
+  var rv = [];
+  var type = /** @type {string} */ (this.defaultSeriesType());
+  if (type == anychart.enums.PolarSeriesType.LINE)
+    zIndex = anychart.charts.Polar.ZINDEX_LINE_SERIES;
+  var count = arguments.length;
+  this.suspendSignalsDispatching();
+  if (!count)
+    rv.push(this.createSeriesByType_(type, null, undefined, zIndex));
+  else {
+    for (var i = 0; i < count; i++) {
+      rv.push(this.createSeriesByType_(type, arguments[i], undefined, zIndex));
+    }
+  }
+  this.resumeSignalsDispatching(true);
+  return rv;
+};
+
+
+/**
+ * Find series index by its id.
+ * @param {number|string} id Series id.
+ * @return {number} Series index or -1 if didn't find.
+ */
+anychart.charts.Polar.prototype.getSeriesIndexBySeriesId = function(id) {
+  return goog.array.findIndex(this.series_, function(item) {
+    return item.id() == id;
+  });
+};
+
+
+/**
+ * Gets series by its id.
+ * @param {number|string} id Id of the series.
+ * @return {anychart.core.polar.series.Base} Series instance.
+ */
+anychart.charts.Polar.prototype.getSeries = function(id) {
+  return this.getSeriesAt(this.getSeriesIndexBySeriesId(id));
+};
+
+
+/**
+ * Gets series by its index.
+ * @param {number} index Index of the series.
+ * @return {?anychart.core.polar.series.Base} Series instance.
+ */
+anychart.charts.Polar.prototype.getSeriesAt = function(index) {
   return this.series_[index] || null;
+};
+
+
+/**
+ * Returns series count.
+ * @return {number} Number of series.
+ */
+anychart.charts.Polar.prototype.getSeriesCount = function() {
+  return this.series_.length;
+};
+
+
+/**
+ * Removes one of series from chart by its id.
+ * @param {number|string} id Series id.
+ * @return {anychart.charts.Polar}
+ */
+anychart.charts.Polar.prototype.removeSeries = function(id) {
+  return this.removeSeriesAt(this.getSeriesIndexBySeriesId(id));
+};
+
+
+/**
+ * Removes one of series from chart by its index.
+ * @param {number} index Series index.
+ * @return {anychart.charts.Polar}
+ */
+anychart.charts.Polar.prototype.removeSeriesAt = function(index) {
+  var series = this.series_[index];
+  if (series) {
+    goog.dispose(series);
+    goog.array.splice(this.series_, index, 1);
+    this.invalidate(
+        anychart.ConsistencyState.POLAR_SERIES |
+        anychart.ConsistencyState.CHART_LEGEND |
+        anychart.ConsistencyState.POLAR_SCALES,
+        anychart.Signal.NEEDS_REDRAW);
+  }
+  return this;
+};
+
+
+/**
+ * Removes all series from chart.
+ * @return {anychart.charts.Polar} Self for method chaining.
+ */
+anychart.charts.Polar.prototype.removeAllSeries = function() {
+  if (this.series_.length) {
+    goog.disposeAll(this.series_);
+    this.series_.length = 0;
+    this.invalidate(
+        anychart.ConsistencyState.POLAR_SERIES |
+        anychart.ConsistencyState.CHART_LEGEND |
+        anychart.ConsistencyState.POLAR_SCALES,
+        anychart.Signal.NEEDS_REDRAW);
+  }
+  return this;
 };
 
 
@@ -1466,6 +1592,7 @@ anychart.charts.Polar.prototype.serialize = function() {
   json['yScale'] = scales.length - 1;
 
   json['type'] = anychart.enums.ChartTypes.POLAR;
+  json['defaultSeriesType'] = this.defaultSeriesType();
   json['palette'] = this.palette().serialize();
   json['markerPalette'] = this.markerPalette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
@@ -1605,6 +1732,7 @@ anychart.charts.Polar.prototype.setupByJSON = function(config) {
   this.markerPalette(config['markerPalette']);
   this.hatchFillPalette(config['hatchFillPalette']);
   this.startAngle(config['startAngle']);
+  this.defaultSeriesType(config['defaultSeriesType']);
 
   var i, json, scale;
   var grids = config['grids'];
@@ -1692,7 +1820,7 @@ anychart.charts.Polar.prototype.setupByJSON = function(config) {
   if (goog.isArray(series)) {
     for (i = 0; i < series.length; i++) {
       json = series[i];
-      var seriesType = (json['seriesType'] || anychart.enums.PolarSeriesType.MARKER).toLowerCase();
+      var seriesType = (json['seriesType'] || this.defaultSeriesType()).toLowerCase();
       var data = json['data'];
       var seriesInst = this.createSeriesByType_(seriesType, data);
       if (seriesInst) {
@@ -1725,4 +1853,11 @@ anychart.charts.Polar.prototype['markerPalette'] = anychart.charts.Polar.prototy
 anychart.charts.Polar.prototype['hatchFillPalette'] = anychart.charts.Polar.prototype.hatchFillPalette;
 anychart.charts.Polar.prototype['startAngle'] = anychart.charts.Polar.prototype.startAngle;//doc|ex
 anychart.charts.Polar.prototype['getType'] = anychart.charts.Polar.prototype.getType;
+anychart.charts.Polar.prototype['defaultSeriesType'] = anychart.charts.Polar.prototype.defaultSeriesType;
+anychart.charts.Polar.prototype['addSeries'] = anychart.charts.Polar.prototype.addSeries;
+anychart.charts.Polar.prototype['getSeriesAt'] = anychart.charts.Polar.prototype.getSeriesAt;
+anychart.charts.Polar.prototype['getSeriesCount'] = anychart.charts.Polar.prototype.getSeriesCount;
+anychart.charts.Polar.prototype['removeSeries'] = anychart.charts.Polar.prototype.removeSeries;
+anychart.charts.Polar.prototype['removeSeriesAt'] = anychart.charts.Polar.prototype.removeSeriesAt;
+anychart.charts.Polar.prototype['removeAllSeries'] = anychart.charts.Polar.prototype.removeAllSeries;
 anychart.charts.Polar.prototype['getPlotBounds'] = anychart.charts.Polar.prototype.getPlotBounds;

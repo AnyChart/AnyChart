@@ -33,7 +33,7 @@ anychart.core.scatter.series.Line = function(opt_data, opt_csvSettings) {
   // --- end ContinuousBase ---
 };
 goog.inherits(anychart.core.scatter.series.Line, anychart.core.scatter.series.BaseWithMarkers);
-anychart.core.scatter.series.Base.SeriesTypesMap[anychart.enums.ScatterSeriesTypes.LINE] = anychart.core.scatter.series.Line;
+anychart.core.scatter.series.Base.SeriesTypesMap[anychart.enums.ScatterSeriesType.LINE] = anychart.core.scatter.series.Line;
 
 
 /** @inheritDoc */
@@ -225,7 +225,7 @@ anychart.core.scatter.series.Line.prototype.getFinalHatchFill = function(usePoin
 
 /** @inheritDoc */
 anychart.core.scatter.series.Line.prototype.getType = function() {
-  return anychart.enums.ScatterSeriesTypes.LINE;
+  return anychart.enums.ScatterSeriesType.LINE;
 };
 
 

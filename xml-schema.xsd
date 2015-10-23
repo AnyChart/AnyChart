@@ -107,6 +107,7 @@
         <xsd:attributeGroup ref="attrs.VisualBase"/>
         <xsd:attributeGroup ref="attrs.Bounds"/>
         <xsd:attribute name="type" type="enums.ChartTypes" use="required"/>
+        <xsd:attribute name="default_series_type" type="xsd:string"/>
         <xsd:attribute name="container" type="xsd:string"/>
         <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="true"/>
         <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>

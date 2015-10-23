@@ -124,8 +124,25 @@ anychart.charts.Scatter = function() {
    * @private
    */
   this.minBubbleSize_;
+
+  this.defaultSeriesType(anychart.enums.ScatterSeriesType.MARKER);
 };
 goog.inherits(anychart.charts.Scatter, anychart.core.SeparateChart);
+
+
+/**
+ * Getter/setter for scatter defaultSeriesType.
+ * @param {(string|anychart.enums.ScatterSeriesType)=} opt_value Default series type.
+ * @return {anychart.charts.Scatter|anychart.enums.ScatterSeriesType} Default series type or self for chaining.
+ */
+anychart.charts.Scatter.prototype.defaultSeriesType = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeScatterSeriesType(opt_value);
+    this.defaultSeriesType_ = opt_value;
+    return this;
+  }
+  return this.defaultSeriesType_;
+};
 
 
 /** @inheritDoc */
@@ -1409,7 +1426,7 @@ anychart.charts.Scatter.prototype.minBubbleSize = function(opt_value) {
  */
 anychart.charts.Scatter.prototype.bubble = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.enums.ScatterSeriesTypes.BUBBLE,
+      anychart.enums.ScatterSeriesType.BUBBLE,
       data,
       opt_csvSettings
   );
@@ -1434,7 +1451,7 @@ anychart.charts.Scatter.prototype.bubble = function(data, opt_csvSettings) {
  */
 anychart.charts.Scatter.prototype.line = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.enums.ScatterSeriesTypes.LINE,
+      anychart.enums.ScatterSeriesType.LINE,
       data,
       opt_csvSettings,
       anychart.charts.Scatter.ZINDEX_LINE_SERIES
@@ -1460,7 +1477,7 @@ anychart.charts.Scatter.prototype.line = function(data, opt_csvSettings) {
  */
 anychart.charts.Scatter.prototype.marker = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
-      anychart.enums.ScatterSeriesTypes.MARKER,
+      anychart.enums.ScatterSeriesType.MARKER,
       data,
       opt_csvSettings
   );
@@ -1469,7 +1486,7 @@ anychart.charts.Scatter.prototype.marker = function(data, opt_csvSettings) {
 
 /**
  * @param {string} type Series type.
- * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
+ * @param {?(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
  * @param {number=} opt_zIndex Optional series zIndex.
@@ -1490,17 +1507,18 @@ anychart.charts.Scatter.prototype.createSeriesByType_ = function(type, data, opt
     instance.setChart(this);
     instance.setParentEventTarget(this);
     this.registerDisposable(instance);
+    var lastSeries = this.series_[this.series_.length - 1];
+    var index = lastSeries ? /** @type {number} */ (lastSeries.index()) + 1 : 0;
     this.series_.push(instance);
-    var index = this.series_.length - 1;
     var inc = index * anychart.charts.Scatter.ZINDEX_INCREMENT_MULTIPLIER;
-    instance.index(index);
+    instance.index(index).id(index);
     var seriesZIndex = (goog.isDef(opt_zIndex) ? opt_zIndex : anychart.charts.Scatter.ZINDEX_SERIES) + inc;
     instance.setAutoZIndex(seriesZIndex);
     instance.labels().setAutoZIndex(seriesZIndex + anychart.charts.Scatter.ZINDEX_INCREMENT_MULTIPLIER / 2);
     instance.clip(true);
-    instance.setAutoColor(this.palette().itemAt(this.series_.length - 1));
-    instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(this.series_.length - 1)));
-    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(this.series_.length - 1)));
+    instance.setAutoColor(this.palette().itemAt(index));
+    instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(index)));
+    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
     if (instance.hasMarkers()) {
       instance.markers().setAutoZIndex(seriesZIndex + anychart.charts.Scatter.ZINDEX_INCREMENT_MULTIPLIER / 2);
       instance.markers().setAutoFill(instance.getMarkerFill());
@@ -1572,9 +1590,117 @@ anychart.charts.Scatter.prototype.invalidateSeries_ = function() {
 };
 
 
-/** @inheritDoc */
-anychart.charts.Scatter.prototype.getSeries = function(index) {
+/**
+ * Add series to chart.
+ * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Chart series data.
+ * @return {Array.<anychart.core.scatter.series.Base>} Array of created series.
+ */
+anychart.charts.Scatter.prototype.addSeries = function(var_args) {
+  var zIndex;
+  var rv = [];
+  var type = /** @type {string} */ (this.defaultSeriesType());
+  if (type == anychart.enums.ScatterSeriesType.LINE)
+    zIndex = anychart.charts.Scatter.ZINDEX_LINE_SERIES;
+  var count = arguments.length;
+  this.suspendSignalsDispatching();
+  if (!count)
+    rv.push(this.createSeriesByType_(type, null, undefined, zIndex));
+  else {
+    for (var i = 0; i < count; i++) {
+      rv.push(this.createSeriesByType_(type, arguments[i], undefined, zIndex));
+    }
+  }
+  this.resumeSignalsDispatching(true);
+  return rv;
+};
+
+
+/**
+ * Find series index by its id.
+ * @param {number|string} id Series id.
+ * @return {number} Series index or -1 if didn't find.
+ */
+anychart.charts.Scatter.prototype.getSeriesIndexBySeriesId = function(id) {
+  return goog.array.findIndex(this.series_, function(item) {
+    return item.id() == id;
+  });
+};
+
+
+/**
+ * Gets series by its id.
+ * @param {number|string} id Id of the series.
+ * @return {anychart.core.scatter.series.Base} Series instance.
+ */
+anychart.charts.Scatter.prototype.getSeries = function(id) {
+  return this.getSeriesAt(this.getSeriesIndexBySeriesId(id));
+};
+
+
+/**
+ * Gets series by its index.
+ * @param {number} index Index of the series.
+ * @return {?anychart.core.scatter.series.Base} Series instance.
+ */
+anychart.charts.Scatter.prototype.getSeriesAt = function(index) {
   return this.series_[index] || null;
+};
+
+
+/**
+ * Returns series count.
+ * @return {number} Number of series.
+ */
+anychart.charts.Scatter.prototype.getSeriesCount = function() {
+  return this.series_.length;
+};
+
+
+/**
+ * Removes one of series from chart by its id.
+ * @param {number|string} id Series id.
+ * @return {anychart.charts.Scatter}
+ */
+anychart.charts.Scatter.prototype.removeSeries = function(id) {
+  return this.removeSeriesAt(this.getSeriesIndexBySeriesId(id));
+};
+
+
+/**
+ * Removes one of series from chart by its index.
+ * @param {number} index Series index.
+ * @return {anychart.charts.Scatter}
+ */
+anychart.charts.Scatter.prototype.removeSeriesAt = function(index) {
+  var series = this.series_[index];
+  if (series) {
+    goog.dispose(series);
+    goog.array.splice(this.series_, index, 1);
+    this.invalidate(
+        anychart.ConsistencyState.SCATTER_SERIES |
+        anychart.ConsistencyState.CHART_LEGEND |
+        anychart.ConsistencyState.SCATTER_SCALES,
+        anychart.Signal.NEEDS_REDRAW);
+  }
+  return this;
+};
+
+
+/**
+ * Removes all series from chart.
+ * @return {anychart.charts.Scatter} Self for method chaining.
+ */
+anychart.charts.Scatter.prototype.removeAllSeries = function() {
+  if (this.series_.length) {
+    goog.disposeAll(this.series_);
+    this.series_.length = 0;
+    this.invalidate(
+        anychart.ConsistencyState.SCATTER_SERIES |
+        anychart.ConsistencyState.CHART_LEGEND |
+        anychart.ConsistencyState.SCATTER_SCALES,
+        anychart.Signal.NEEDS_REDRAW);
+  }
+  return this;
 };
 
 
@@ -2210,6 +2336,7 @@ anychart.charts.Scatter.prototype.serialize = function() {
   json['yScale'] = scales.length - 1;
 
   json['type'] = anychart.enums.ChartTypes.SCATTER;
+  json['defaultSeriesType'] = this.defaultSeriesType();
   json['palette'] = this.palette().serialize();
   json['markerPalette'] = this.markerPalette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
@@ -2382,6 +2509,8 @@ anychart.charts.Scatter.prototype.serialize = function() {
 anychart.charts.Scatter.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
 
+  this.defaultSeriesType(config['defaultSeriesType']);
+
   if ('defaultSeriesSettings' in config)
     this.defaultSeriesSettings(config['defaultSeriesSettings']);
 
@@ -2529,11 +2658,11 @@ anychart.charts.Scatter.prototype.setupByJSON = function(config) {
   if (goog.isArray(series)) {
     for (i = 0; i < series.length; i++) {
       json = series[i];
-      var seriesType = (json['seriesType'] || anychart.enums.ScatterSeriesTypes.MARKER).toLowerCase();
+      var seriesType = (json['seriesType'] || this.defaultSeriesType()).toLowerCase();
       var data = json['data'];
       var seriesInst = this.createSeriesByType_(seriesType, data);
       if (seriesInst) {
-        if (seriesType == anychart.enums.ScatterSeriesTypes.LINE)
+        if (seriesType == anychart.enums.ScatterSeriesType.LINE)
           seriesInst.zIndex(anychart.charts.Scatter.ZINDEX_LINE_SERIES);
         seriesInst.setup(json);
         if (goog.isObject(json)) {
@@ -2571,4 +2700,11 @@ anychart.charts.Scatter.prototype['hatchFillPalette'] = anychart.charts.Scatter.
 anychart.charts.Scatter.prototype['getType'] = anychart.charts.Scatter.prototype.getType;
 anychart.charts.Scatter.prototype['maxBubbleSize'] = anychart.charts.Scatter.prototype.maxBubbleSize;
 anychart.charts.Scatter.prototype['minBubbleSize'] = anychart.charts.Scatter.prototype.minBubbleSize;
+anychart.charts.Scatter.prototype['defaultSeriesType'] = anychart.charts.Scatter.prototype.defaultSeriesType;
+anychart.charts.Scatter.prototype['addSeries'] = anychart.charts.Scatter.prototype.addSeries;
+anychart.charts.Scatter.prototype['getSeriesAt'] = anychart.charts.Scatter.prototype.getSeriesAt;
+anychart.charts.Scatter.prototype['getSeriesCount'] = anychart.charts.Scatter.prototype.getSeriesCount;
+anychart.charts.Scatter.prototype['removeSeries'] = anychart.charts.Scatter.prototype.removeSeries;
+anychart.charts.Scatter.prototype['removeSeriesAt'] = anychart.charts.Scatter.prototype.removeSeriesAt;
+anychart.charts.Scatter.prototype['removeAllSeries'] = anychart.charts.Scatter.prototype.removeAllSeries;
 anychart.charts.Scatter.prototype['getPlotBounds'] = anychart.charts.Scatter.prototype.getPlotBounds;

@@ -62,6 +62,7 @@ anychart.core.map.series.DiscreteBase.prototype.startDrawing = function() {
         this.rootTypedLayerInitializer,
         goog.nullFunction);
     this.rootElement.zIndex(anychart.core.map.series.Base.ZINDEX_SERIES);
+    this.registerDisposable(this.rootElement);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {

@@ -448,6 +448,23 @@ anychart.core.SeriesBase.prototype.index = function(opt_value) {
 };
 
 
+/**
+ * Getter/setter for series id.
+ * @param {(string|number)=} opt_value Id of the series.
+ * @return {string|number|anychart.core.SeriesBase} Id or self for chaining.
+ */
+anychart.core.SeriesBase.prototype.id = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.id_ != opt_value) {
+      this.id_ = opt_value;
+    }
+    return this;
+  } else {
+    return this.id_;
+  }
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Statistics
@@ -2000,6 +2017,7 @@ anychart.core.SeriesBase.prototype.setupByJSON = function(config) {
 //exports
 anychart.core.SeriesBase.prototype['color'] = anychart.core.SeriesBase.prototype.color;//doc|ex
 anychart.core.SeriesBase.prototype['name'] = anychart.core.SeriesBase.prototype.name;//doc|ex
+anychart.core.SeriesBase.prototype['id'] = anychart.core.SeriesBase.prototype.id;
 anychart.core.SeriesBase.prototype['meta'] = anychart.core.SeriesBase.prototype.meta;//doc|ex
 anychart.core.SeriesBase.prototype['data'] = anychart.core.SeriesBase.prototype.data;//doc|ex
 anychart.core.SeriesBase.prototype['tooltip'] = anychart.core.SeriesBase.prototype.tooltip;

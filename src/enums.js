@@ -1826,7 +1826,7 @@ anychart.enums.ScatterTicksMode = {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  CartesianSeriesTypes
+//  MapSeriesTypes
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
@@ -1836,6 +1836,24 @@ anychart.enums.ScatterTicksMode = {
 anychart.enums.MapSeriesType = {
   CHOROPLETH: 'choropleth',
   BUBBLE: 'bubble'
+};
+
+
+/**
+ * Normalizes map series type.
+ * @param {*} value Series type to normalize.
+ * @param {anychart.enums.MapSeriesType=} opt_default Custom default value (defaults to CHOROPLETH).
+ * @return {anychart.enums.MapSeriesType}
+ */
+anychart.enums.normalizeMapSeriesType = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'choropleth':
+      return anychart.enums.MapSeriesType.CHOROPLETH;
+    case 'bubble':
+      return anychart.enums.MapSeriesType.BUBBLE;
+  }
+  return opt_default || anychart.enums.MapSeriesType.CHOROPLETH;
 };
 
 
@@ -1948,6 +1966,26 @@ anychart.enums.StockSeriesType = {
   //SPLINE_AREA: 'splineArea',
   //STEP_AREA: 'stepArea',
   //STEP_LINE: 'stepLine'
+};
+
+
+/**
+ * Normalizes stock series type.
+ * @param {*} value Series type to normalize.
+ * @param {anychart.enums.StockSeriesType=} opt_default Custom default value (defaults to LINE).
+ * @return {anychart.enums.StockSeriesType}
+ */
+anychart.enums.normalizeStockSeriesType = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'column':
+      return anychart.enums.StockSeriesType.COLUMN;
+    case 'line':
+      return anychart.enums.StockSeriesType.LINE;
+    case 'ohlc':
+      return anychart.enums.StockSeriesType.OHLC;
+  }
+  return opt_default || anychart.enums.StockSeriesType.LINE;
 };
 
 
@@ -2097,6 +2135,26 @@ anychart.enums.RadarSeriesType = {
 };
 
 
+/**
+ * Normalizes radar series type.
+ * @param {*} value Series type to normalize.
+ * @param {anychart.enums.RadarSeriesType=} opt_default Custom default value (defaults to LINE).
+ * @return {anychart.enums.RadarSeriesType}
+ */
+anychart.enums.normalizeRadarSeriesType = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'area':
+      return anychart.enums.RadarSeriesType.AREA;
+    case 'line':
+      return anychart.enums.RadarSeriesType.LINE;
+    case 'marker':
+      return anychart.enums.RadarSeriesType.MARKER;
+  }
+  return opt_default || anychart.enums.RadarSeriesType.LINE;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  PolarSeriesTypes
@@ -2113,19 +2171,59 @@ anychart.enums.PolarSeriesType = {
 };
 
 
+/**
+ * Normalizes polar series type.
+ * @param {*} value Series type to normalize.
+ * @param {anychart.enums.PolarSeriesType=} opt_default Custom default value (defaults to LINE).
+ * @return {anychart.enums.PolarSeriesType}
+ */
+anychart.enums.normalizePolarSeriesType = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'area':
+      return anychart.enums.PolarSeriesType.AREA;
+    case 'line':
+      return anychart.enums.PolarSeriesType.LINE;
+    case 'marker':
+      return anychart.enums.PolarSeriesType.MARKER;
+  }
+  return opt_default || anychart.enums.PolarSeriesType.LINE;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  ScatterSeriesTypes
+//  ScatterSeriesType
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * List of all series types.
  * @enum {string}
  */
-anychart.enums.ScatterSeriesTypes = {
+anychart.enums.ScatterSeriesType = {
   BUBBLE: 'bubble',
   LINE: 'line',
   MARKER: 'marker'
+};
+
+
+/**
+ * Normalizes scatter series type.
+ * @param {*} value Series type to normalize.
+ * @param {anychart.enums.ScatterSeriesType=} opt_default Custom default value (defaults to LINE).
+ * @return {anychart.enums.ScatterSeriesType}
+ */
+anychart.enums.normalizeScatterSeriesType = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'bubble':
+      return anychart.enums.ScatterSeriesType.BUBBLE;
+    case 'line':
+      return anychart.enums.ScatterSeriesType.LINE;
+    case 'marker':
+      return anychart.enums.ScatterSeriesType.MARKER;
+  }
+  return opt_default || anychart.enums.ScatterSeriesType.LINE;
 };
 
 

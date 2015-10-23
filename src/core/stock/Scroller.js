@@ -60,6 +60,8 @@ anychart.core.stock.Scroller = function(chart) {
    * @private
    */
   this.selectedSeriesContainer_ = null;
+
+  this.defaultSeriesType(anychart.enums.StockSeriesType.LINE);
 };
 goog.inherits(anychart.core.stock.Scroller, anychart.core.ui.Scroller);
 
@@ -72,6 +74,21 @@ anychart.core.stock.Scroller.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.ui.Scroller.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.STOCK_SCROLLER_SERIES |
     anychart.ConsistencyState.STOCK_SCROLLER_AXIS;
+
+
+/**
+ * Getter/setter for stock scroller plot defaultSeriesType.
+ * @param {(string|anychart.enums.StockSeriesType)=} opt_value Default series type.
+ * @return {anychart.core.stock.Scroller|anychart.enums.StockSeriesType} Default series type or self for chaining.
+ */
+anychart.core.stock.Scroller.prototype.defaultSeriesType = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeStockSeriesType(opt_value);
+    this.defaultSeriesType_ = opt_value;
+    return this;
+  }
+  return this.defaultSeriesType_;
+};
 
 
 /**
@@ -184,12 +201,115 @@ anychart.core.stock.Scroller.prototype.ohlc = function(opt_data, opt_mappingSett
 
 
 /**
- * Gets series by index.
- * @param {number} index
- * @return {anychart.core.stock.scrollerSeries.Base}
+ * Add series to chart.
+ * @param {...(anychart.data.TableMapping)} var_args Chart series data.
+ * @return {Array.<anychart.core.stock.scrollerSeries.Base>} Array of created series.
  */
-anychart.core.stock.Scroller.prototype.getSeries = function(index) {
+anychart.core.stock.Scroller.prototype.addSeries = function(var_args) {
+  var zIndex;
+  var rv = [];
+  var type = /** @type {string} */ (this.defaultSeriesType());
+  if (type == anychart.enums.StockSeriesType.LINE)
+    zIndex = anychart.core.stock.Plot.ZINDEX_LINE_SERIES;
+  var count = arguments.length;
+  this.suspendSignalsDispatching();
+  if (!count)
+    rv.push(this.createSeriesByType_(type, null, undefined, undefined, zIndex));
+  else {
+    for (var i = 0; i < count; i++) {
+      rv.push(this.createSeriesByType_(type, arguments[i], undefined, undefined, zIndex));
+    }
+  }
+  this.resumeSignalsDispatching(true);
+  return rv;
+};
+
+
+/**
+ * Find series index by its id.
+ * @param {number|string} id Series id.
+ * @return {number} Series index or -1 if didn't find.
+ */
+anychart.core.stock.Scroller.prototype.getSeriesIndexBySeriesId = function(id) {
+  return goog.array.findIndex(this.series_, function(item) {
+    return item.id() == id;
+  });
+};
+
+
+/**
+ * Gets series by its id.
+ * @param {number|string} id Id of the series.
+ * @return {anychart.core.stock.scrollerSeries.Base} Series instance.
+ */
+anychart.core.stock.Scroller.prototype.getSeries = function(id) {
+  return this.getSeriesAt(this.getSeriesIndexBySeriesId(id));
+};
+
+
+/**
+ * Gets series by its index.
+ * @param {number} index Index of the series.
+ * @return {?anychart.core.stock.scrollerSeries.Base} Series instance.
+ */
+anychart.core.stock.Scroller.prototype.getSeriesAt = function(index) {
   return this.series_[index] || null;
+};
+
+
+/**
+ * Returns series count.
+ * @return {number} Number of series.
+ */
+anychart.core.stock.Scroller.prototype.getSeriesCount = function() {
+  return this.series_.length;
+};
+
+
+/**
+ * Removes one of series from chart by its id.
+ * @param {number|string} id Series id.
+ * @return {anychart.core.stock.Scroller}
+ */
+anychart.core.stock.Scroller.prototype.removeSeries = function(id) {
+  return this.removeSeriesAt(this.getSeriesIndexBySeriesId(id));
+};
+
+
+/**
+ * Removes one of series from chart by its index.
+ * @param {number} index Series index.
+ * @return {anychart.core.stock.Scroller}
+ */
+anychart.core.stock.Scroller.prototype.removeSeriesAt = function(index) {
+  var series = this.series_[index];
+  if (series) {
+    anychart.globalLock.lock();
+    goog.array.splice(this.series_, index, 1);
+    goog.dispose(series);
+    this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_SERIES,
+        anychart.Signal.NEEDS_REDRAW);
+    anychart.globalLock.unlock();
+  }
+  return this;
+};
+
+
+/**
+ * Removes all series from chart.
+ * @return {anychart.core.stock.Scroller} Self for method chaining.
+ */
+anychart.core.stock.Scroller.prototype.removeAllSeries = function() {
+  if (this.series_.length) {
+    var series = this.series_;
+    anychart.globalLock.lock();
+    this.series_ = [];
+    goog.disposeAll(series);
+    this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_SERIES,
+        anychart.Signal.NEEDS_REDRAW);
+    anychart.globalLock.unlock();
+  }
+  return this;
 };
 
 
@@ -241,10 +361,11 @@ anychart.core.stock.Scroller.prototype.createSeriesByType_ = function(type, opt_
     instance = new ctr(this);
     instance.data(opt_data, opt_mappingSettings, opt_csvSettings);
     instance.setParentEventTarget(this);
+    var lastSeries = this.series_[this.series_.length - 1];
+    var index = lastSeries ? /** @type {number} */ (lastSeries.getIndex()) + 1 : 0;
     this.series_.push(instance);
-    var index = this.series_.length - 1;
     var inc = index * anychart.core.stock.Plot.ZINDEX_INCREMENT_MULTIPLIER;
-    instance.setIndex(index);
+    instance.id(index).index(index);
     instance.setAutoZIndex((goog.isDef(opt_zIndex) ? opt_zIndex : anychart.core.stock.Plot.ZINDEX_SERIES) + inc);
     instance.setup(this.defaultSeriesSettings_[type]);
     instance.listenSignals(this.seriesInvalidated_, this);
@@ -466,6 +587,8 @@ anychart.core.stock.Scroller.prototype.disposeInternal = function() {
 anychart.core.stock.Scroller.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
+  json['defaultSeriesType'] = this.defaultSeriesType();
+
   return json;
 };
 
@@ -477,6 +600,7 @@ anychart.core.stock.Scroller.prototype.setupByJSON = function(config) {
   var i, json, scale;
 
   this.xAxis(config['xAxis']);
+  this.defaultSeriesType(config['defaultSeriesType']);
 
   var scales = config['scales'];
   var scalesInstances = {};
@@ -517,7 +641,7 @@ anychart.core.stock.Scroller.prototype.setupByJSON = function(config) {
   if (goog.isArray(series)) {
     for (i = 0; i < series.length; i++) {
       json = series[i];
-      var seriesType = (json['seriesType'] || 'line').toLowerCase();
+      var seriesType = (json['seriesType'] || this.defaultSeriesType()).toLowerCase();
       var data = json['data'];
       var seriesInst = this.createSeriesByType_(seriesType, data);
       if (seriesInst) {
@@ -538,3 +662,10 @@ anychart.core.stock.Scroller.prototype['column'] = anychart.core.stock.Scroller.
 anychart.core.stock.Scroller.prototype['getSeries'] = anychart.core.stock.Scroller.prototype.getSeries;
 anychart.core.stock.Scroller.prototype['yScale'] = anychart.core.stock.Scroller.prototype.yScale;
 anychart.core.stock.Scroller.prototype['xAxis'] = anychart.core.stock.Scroller.prototype.xAxis;
+anychart.core.stock.Scroller.prototype['defaultSeriesType'] = anychart.core.stock.Scroller.prototype.defaultSeriesType;
+anychart.core.stock.Scroller.prototype['addSeries'] = anychart.core.stock.Scroller.prototype.addSeries;
+anychart.core.stock.Scroller.prototype['getSeriesAt'] = anychart.core.stock.Scroller.prototype.getSeriesAt;
+anychart.core.stock.Scroller.prototype['getSeriesCount'] = anychart.core.stock.Scroller.prototype.getSeriesCount;
+anychart.core.stock.Scroller.prototype['removeSeries'] = anychart.core.stock.Scroller.prototype.removeSeries;
+anychart.core.stock.Scroller.prototype['removeSeriesAt'] = anychart.core.stock.Scroller.prototype.removeSeriesAt;
+anychart.core.stock.Scroller.prototype['removeAllSeries'] = anychart.core.stock.Scroller.prototype.removeAllSeries;
