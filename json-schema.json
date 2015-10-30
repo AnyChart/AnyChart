@@ -1756,7 +1756,8 @@
         },
         "controller": {"$ref": "#/definitions/anychart.core.gantt.Controller"},
         "dataGrid": {"$ref": "#/definitions/anychart.core.ui.DataGrid"},
-        "timeline": {"$ref": "#/definitions/anychart.core.gantt.Timeline"}
+        "timeline": {"$ref": "#/definitions/anychart.core.ui.Timeline"},
+        "editing": {"type": "boolean"}
       },
       "required": ["type"]
     },
@@ -1777,7 +1778,8 @@
         },
         "controller": {"$ref": "#/definitions/anychart.core.gantt.Controller"},
         "dataGrid": {"$ref": "#/definitions/anychart.core.ui.DataGrid"},
-        "timeline": {"$ref": "#/definitions/anychart.core.gantt.Timeline"}
+        "timeline": {"$ref": "#/definitions/anychart.core.ui.Timeline"},
+        "editing": {"type": "boolean"}
       },
       "required": ["type"]
     },
@@ -3030,7 +3032,7 @@
         "startIndex": {"type": "number"}
       }
     },
-    "anychart.core.gantt.Timeline": {
+    "anychart.core.ui.Timeline": {
       "type": "object",
       "allOf": [{"$ref": "#/definitions/anychart.core.VisualBase"}],
       "properties": {
@@ -3058,7 +3060,19 @@
         "connectorStroke": {"$ref": "#/definitions/stroke"},
         "selectedElementFill": {"$ref": "#/definitions/fill"},
         "selectedElementStroke": {"$ref": "#/definitions/stroke"},
-        "labelsFactory": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+        "labelsFactory": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"},
+        "connectorPreviewStroke": {"$ref": "#/definitions/stroke"},
+        "editPreviewFill":  {"$ref": "#/definitions/fill"},
+        "editPreviewStroke": {"$ref": "#/definitions/stroke"},
+        "editProgressFill":  {"$ref": "#/definitions/fill"},
+        "editProgressStroke": {"$ref": "#/definitions/stroke"},
+        "editIntervalThumbFill":  {"$ref": "#/definitions/fill"},
+        "editIntervalThumbStroke": {"$ref": "#/definitions/stroke"},
+        "editConnectorThumbFill":  {"$ref": "#/definitions/fill"},
+        "editConnectorThumbStroke": {"$ref": "#/definitions/stroke"},
+        "editing": {"type": "boolean"},
+        "baselineAbove": {"type": "boolean"},
+        "headerHeight": {"type": "number"}
       }
     },
 
@@ -3913,14 +3927,18 @@
           "items": {"$ref": "#/definitions/anychart.core.ui.DataGrid.Column"}
         },
         "isStandalone": {"type": "boolean"},
-        "titleHeight": {"type": "number"},
+        "headerHeight": {"type": "number"},
         "horizontalOffset": {"type": "number"},
         "backgroundFill": {"$ref": "#/definitions/fill"},
         "rowOddFill": {"$ref": "#/definitions/fill"},
         "rowEvenFill": {"$ref": "#/definitions/fill"},
         "rowFill": {"$ref": "#/definitions/fill"},
         "hoverFill": {"$ref": "#/definitions/fill"},
-        "rowSelectedFill": {"$ref": "#/definitions/fill"}
+        "rowSelectedFill": {"$ref": "#/definitions/fill"},
+        "editStructurePreviewFill": {"$ref": "#/definitions/fill"},
+        "editStructurePreviewStroke": {"$ref": "#/definitions/stroke"},
+        "editStructurePreviewDashStroke": {"$ref": "#/definitions/stroke"},
+        "editing": {"type": "boolean"}
       }
     },
     "anychart.core.ui.DataGrid.Column": {

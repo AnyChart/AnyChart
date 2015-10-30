@@ -4802,21 +4802,41 @@ window['anychart']['themes']['defaultTheme'] = {
 
   'defaultDataGrid': {
     'isStandalone': true,
-    'titleHeight': 25,
+    'headerHeight': 25,
     'backgroundFill': '#fff',
-    'columnStroke': '#ccd7e1',
-    'rowStroke': '#ccd7e1',
+    'columnStroke': '#cecece',
+    'rowStroke': '#cecece',
     'rowOddFill': '#fff',
-    'rowEvenFill': '#fafafa',
+    'rowEvenFill': '#fff',
     'rowFill': '#fff',
-    'hoverFill': '#edf8ff',
-    'rowSelectedFill': '#d2eafa',
+    'hoverFill': '#F8FAFB',
+    'rowSelectedFill': '#ebf1f4',
     'zIndex': 5,
-    'titleFill': {
-      'keys': ['#f8f8f8', '#fff'],
-      'angle': 90
+    'editing': false,
+    'editStructurePreviewFill': {
+      'color': '#4285F4',
+      'opacity': 0.2
     },
+    'editStructurePreviewStroke': {
+      'color': '#4285F4',
+      'thickness': 2
+    },
+    'editStructurePreviewDashStroke': {
+      'color': '#4285F4',
+      'dash': '4 4'
+    },
+    'headerFill': '#f7f7f7',
     'tooltip': {
+      'padding': {'top': 5, 'right': 5, 'bottom': 5, 'left': 5},
+      'title': {
+        'enabled': true,
+        'fontSize': '14px',
+        'fontWeight': 'normal',
+        'fontColor': '#e5e5e5'
+      },
+      'separator': {
+        'enabled': true
+      },
       'anchor': 'leftTop',
       'content': {
         'hAlign': 'left'
@@ -4845,7 +4865,8 @@ window['anychart']['themes']['defaultTheme'] = {
         'height': null,
         'fontSize': 11,
         'minFontSize': 8,
-        'maxFontSize': 72
+        'maxFontSize': 72,
+        'disablePointerEvents': true
       },
       'depthPaddingMultiplier': 0,
       'collapseExpandButtons': false,
@@ -4898,11 +4919,14 @@ window['anychart']['themes']['defaultTheme'] = {
     'base': {
       'splitterPosition': '30%',
       'headerHeight': 70,
-      'hoverFill': '#edf8ff',
-      'rowSelectedFill': '#d2eafa',
-      'columnStroke': '#ccd7e1',
-      'rowStroke': '#ccd7e1',
+      'hoverFill': '#F8FAFB',
+      'rowSelectedFill': '#ebf1f4',
+      'rowStroke': '#cecece',
+      'editing': false,
       'title': {
+        'enabled': false
+      },
+      'legend': {
         'enabled': false
       },
       'credits': {
@@ -4928,50 +4952,72 @@ window['anychart']['themes']['defaultTheme'] = {
         'backgroundFill': 'none'
       },
       'timeline': {
-        'columnStroke': '#ccd7e1',
-        'rowStroke': '#ccd7e1',
+        'columnStroke': '#cecece',
+        'rowStroke': '#cecece',
         'backgroundFill': 'none',
         'rowOddFill': '#fff',
-        'rowEvenFill': '#fafafa',
+        'rowEvenFill': '#fff',
         'rowFill': '#fff',
-        'hoverFill': '#edf8ff',
-        'rowSelectedFill': '#d2eafa',
+
+        'hoverFill': '#F8FAFB',
+        'rowSelectedFill': '#ebf1f4',
+
         'zIndex': 5,
-        'baseFill': {
-          'keys': ['#3CA0DE', '#3085BC'],
-          'angle': -90
+        'headerHeight': 70,
+        'editing': false,
+
+        'connectorPreviewStroke': {
+          'color': '#545f69',
+          'dash': '3 3'
         },
-        'baseStroke': '#0C3F5F',
-        'baselineFill': {
-          'keys': ['#E1E1E1', '#A1A1A1'],
-          'angle': -90
+        'editPreviewFill': {
+          'color': '#fff',
+          'opacity': 0.00001
         },
-        'baselineStroke': '#0C3F5F',
-        'progressFill': {
-          'keys': ['#63FF78', '#3DC351', '#188E2D'],
-          'angle': -90
+        'editPreviewStroke': {
+          'color': '#aaa',
+          'dash': '3 3'
         },
-        'progressStroke': '#006616',
-        'milestoneFill': {
-          'keys': ['#FAE096', '#EB8344'],
-          'angle': -90
+
+        'editProgressFill': '#EAEAEA',
+        'editProgressStroke': '#545f69',
+        'editIntervalThumbFill': '#EAEAEA',
+        'editIntervalThumbStroke': '#545f69',
+        'editConnectorThumbFill': '#EAEAEA',
+        'editConnectorThumbStroke': '#545f69',
+
+        'baseFill': '#7ec1f5',
+        'baseStroke': '#74b2e2',
+        'progressFill': '#1976d2',
+        'progressStroke': {
+          'color': '#fff',
+          'opacity': 0.00001
         },
-        'milestoneStroke': '#000',
-        'parentFill': {
-          'keys': ['#646464', '#282828'],
-          'angle': -90
-        },
-        'parentStroke': '#000',
-        'selectedElementFill': {
-          'keys': ['#f1b8b9', '#f07578'],
-          'angle': -90
-        },
-        'connectorFill': '#000090',
-        'connectorStroke': '#000090',
+
+        'baselineFill': '#d5ebfc',
+        'baselineStroke': '#bfd1e0',
+        'parentFill': '#455a64',
+        'parentStroke': '#2f3f46',
+        'milestoneFill': '#ffa000',
+        'milestoneStroke': '#d26104',
+        'connectorFill': '#545f69',
+        'connectorStroke': '#545f69',
+        'selectedElementFill': '#ef6c00',
+        'selectedElementStroke': '#bc5704',
         'minimumGap': 0.1,
         'maximumGap': 0.1,
         'baselineAbove': false,
         'tooltip': {
+          'padding': {'top': 5, 'right': 5, 'bottom': 5, 'left': 5},
+          'title': {
+            'enabled': true,
+            'fontSize': '14px',
+            'fontWeight': 'normal',
+            'fontColor': '#e5e5e5'
+          },
+          'separator': {
+            'enabled': true
+          },
           'anchor': 'leftTop',
           'content': {
             'hAlign': 'left'
@@ -4995,7 +5041,8 @@ window['anychart']['themes']['defaultTheme'] = {
           'fontSize': 11,
           'minFontSize': 8,
           'maxFontSize': 72,
-          'zIndex': 40
+          'zIndex': 40,
+          'disablePointerEvents': true
         },
         'markersFactory': {
           'anchor': 'centerTop',
@@ -5006,15 +5053,22 @@ window['anychart']['themes']['defaultTheme'] = {
         'header': {
           'labelsFactory': {
             'anchor': 'leftTop',
+            'vAlign': 'middle',
             'padding': {
               'top': 0,
-              'right': 2,
+              'right': 5,
               'bottom': 0,
-              'left': 2
+              'left': 5
             },
-            'vAlign': 'middle',
             'textWrap': 'noWrap',
-            'textOverflow': '...'
+            'background': null,
+            'rotation': 0,
+            'width': null,
+            'height': null,
+            'fontSize': 11,
+            'minFontSize': 8,
+            'maxFontSize': 72,
+            'disablePointerEvents': true
           }
 
         }
@@ -5023,30 +5077,34 @@ window['anychart']['themes']['defaultTheme'] = {
     'ganttResource': {
       'dataGrid': {
         'tooltip': {
+          'titleFormatter': function(data) {
+            var item = data['item'];
+            return item ? item['get']('name') : '';
+          },
           'textFormatter': function(data) {
             var item = data['item'];
             if (!item) return '';
-            var name = item['get']('name');
+            //var name = item['get']('name');
             var startDate = item['meta']('minPeriodDate');
             var endDate = item['meta']('maxPeriodDate');
-            return (name ? name : '') +
-                (startDate ? '\nStart Date: ' + window['anychart']['utils']['defaultDateFormatter'](startDate) : '') +
+            return (startDate ? 'Start Date: ' + window['anychart']['utils']['defaultDateFormatter'](startDate) : '') +
                 (endDate ? '\nEnd Date: ' + window['anychart']['utils']['defaultDateFormatter'](endDate) : '');
           }
         }
       },
       'timeline': {
-        'selectedElementStroke': 'none',
         'tooltip': {
+          'titleFormatter': function(data) {
+            var item = data['item'];
+            return item ? item['get']('name') : '';
+          },
           'textFormatter': function(data) {
             var item = data['item'];
             var period = data['period'];
-            var name = item['get']('name');
-            var startDate = period ? period['start'] : (item['get']('actualStart') || item['meta']('autoStart'));
-            var endDate = period ? period['end'] : (item['get']('actualEnd') || item['meta']('autoEnd'));
+            var startDate = period ? period['start'] : item['meta']('minPeriodDate');
+            var endDate = period ? period['end'] : item['meta']('maxPeriodDate');
 
-            return (name ? name : '') +
-                (startDate ? '\nStart Date: ' + window['anychart']['utils']['defaultDateFormatter'](startDate) : '') +
+            return (startDate ? 'Start Date: ' + window['anychart']['utils']['defaultDateFormatter'](startDate) : '') +
                 (endDate ? '\nEnd Date: ' + window['anychart']['utils']['defaultDateFormatter'](endDate) : '');
           }
         }
@@ -5055,10 +5113,13 @@ window['anychart']['themes']['defaultTheme'] = {
     'ganttProject': {
       'dataGrid': {
         'tooltip': {
+          'titleFormatter': function(data) {
+            var item = data['item'];
+            return item ? item['get']('name') : '';
+          },
           'textFormatter': function(data) {
             var item = data['item'];
             if (!item) return '';
-            var name = item['get']('name');
             var startDate = item['get']('actualStart') || item['meta']('autoStart');
             var endDate = item['get']('actualEnd') || item['meta']('autoEnd');
             var progress = item['get']('progressValue');
@@ -5068,19 +5129,20 @@ window['anychart']['themes']['defaultTheme'] = {
               progress = (Math.round(auto * 100) / 100 || 0) + '%';
             }
 
-            return (name ? name : '') +
-                (startDate ? '\nStart Date: ' + window['anychart']['utils']['defaultDateFormatter'](startDate) : '') +
+            return (startDate ? 'Start Date: ' + window['anychart']['utils']['defaultDateFormatter'](startDate) : '') +
                 (endDate ? '\nEnd Date: ' + window['anychart']['utils']['defaultDateFormatter'](endDate) : '') +
                 (progress ? '\nComplete: ' + progress : '');
           }
         }
       },
       'timeline': {
-        'selectedElementStroke': '#000',
         'tooltip': {
+          'titleFormatter': function(data) {
+            var item = data['item'];
+            return item ? item['get']('name') : '';
+          },
           'textFormatter': function(data) {
             var item = data['item'];
-            var name = item['get']('name');
             var startDate = item['get']('actualStart') || item['meta']('autoStart');
             var endDate = item['get']('actualEnd') || item['meta']('autoEnd');
             var progress = item['get']('progressValue');
@@ -5090,8 +5152,7 @@ window['anychart']['themes']['defaultTheme'] = {
               progress = (Math.round(auto * 100) / 100 || 0) + '%';
             }
 
-            return (name ? name : '') +
-                (startDate ? '\nStart Date: ' + window['anychart']['utils']['defaultDateFormatter'](startDate) : '') +
+            return (startDate ? 'Start Date: ' + window['anychart']['utils']['defaultDateFormatter'](startDate) : '') +
                 (endDate ? '\nEnd Date: ' + window['anychart']['utils']['defaultDateFormatter'](endDate) : '') +
                 (progress ? '\nComplete: ' + progress : '');
 

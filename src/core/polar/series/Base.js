@@ -10,6 +10,13 @@ goog.require('anychart.data');
 goog.require('anychart.enums');
 
 
+/**
+ * Namespace anychart.core.polar
+ * @namespace
+ * @name anychart.core.polar
+ */
+
+
 
 /**
  * Base class for all polar series.<br/>

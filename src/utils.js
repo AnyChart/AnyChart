@@ -633,7 +633,9 @@ anychart.utils.isNone = function(value) {
  */
 anychart.utils.extractThickness = function(stroke) {
   var normalized = acgraph.vector.normalizeStroke(stroke);
-  return goog.isDef(normalized['thickness']) ? normalized['thickness'] : 1;
+  return anychart.utils.isNone(normalized) ? 0 :
+      goog.isObject(normalized) ?
+          acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */ (normalized)) : 1;
 };
 
 
@@ -1415,6 +1417,12 @@ anychart.utils.getWarningDescription = function(code, opt_arguments) {
 
     case anychart.enums.WarningCode.DEPRECATED:
       return 'Method ' + opt_arguments[0] + ' is deprecated. Use ' + opt_arguments[1] + ' instead.';
+
+    case anychart.enums.WarningCode.DATA_ITEM_SET_PATH:
+      return 'Incorrect arguments passed to treeDataItem.set() method. You try to set a value by path in complex structure, ' +
+          'but path contains errors (It can be not string and not numeric values, or invalid path in existing structure, ' +
+          'or incorrect number of path\'s elements etc). Please, see the documentation for treeDataItem.set() method and ' +
+          'carefully check your data.';
 
     case anychart.enums.WarningCode.TABLE_ALREADY_IN_TRANSACTION:
       return 'Table is already in transaction mode. Calling startTransaction() multiple times does nothing.';

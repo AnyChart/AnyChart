@@ -1,165 +1,18 @@
-var toolbar;
+var timeline;
+
 anychart.onDocumentReady(function() {
-  var newData = getNewData();
+  timeline = anychart.ui.resourceTimeline();
+  timeline.container('container');
 
-  //create data tree on our data
-  var treeData = anychart.data.tree(newData, anychart.enums.TreeFillingMethod.AS_TABLE);
+  var tree = anychart.data.tree(getData(), anychart.enums.TreeFillingMethod.AS_TABLE);
+  timeline.data(tree);
 
-  //create project gantt chart
-  chart = anychart.ganttResource();
-
-  toolbar = anychart.ganttToolbar();
-  toolbar.container('container');
-  toolbar.target(chart);
-  toolbar.draw();
-
-  //set container id for the chart
-  chart.container('container');
-
-  //set data for the chart
-  chart.data(treeData);
-
-  //set start splitter position settings
-  chart.splitterPosition(320);
-
-  //Toolbar is rendered in the same container as chart. Toolbar displaces chart and it hides the bottom of chart.
-  //Adding a bottom margin makes the bottom of chart visible again.
-  chart.margin(28, 0, 0, 0);
-
-  //get chart data grid link to set column settings
-  var dataGrid = chart.dataGrid();
-
-  dataGrid.column(0).enabled(false);
-
-  //set first column settings
-  var firstColumn = dataGrid.column(1);
-  firstColumn.title('Server');
-  firstColumn.width(140);
-  firstColumn.cellTextSettings().hAlign('left');
-  firstColumn.textFormatter(function(item) {
-    return item.get('name');
-  });
-  firstColumn.cellTextSettingsOverrider(labelTextSettingsOverrider);
-
-  //set first column settings
-  var secondColumn = dataGrid.column(2);
-  secondColumn.title('Online');
-  secondColumn.width(60);
-  secondColumn.cellTextSettings().hAlign('right');
-  secondColumn.textFormatter(function(item) {
-    return item.get('online') || '';
-  });
-  secondColumn.cellTextSettingsOverrider(labelTextSettingsOverrider);
-
-
-  //set first column settings
-  var thirdColumn = dataGrid.column(3);
-  thirdColumn.title('Maintenance');
-  thirdColumn.width(60);
-  thirdColumn.cellTextSettings().hAlign('right');
-  thirdColumn.textFormatter(function(item) {
-    return item.get('maintenance') || '';
-  });
-  thirdColumn.cellTextSettingsOverrider(labelTextSettingsOverrider);
-
-
-  //set first column settings
-  var fourthColumn = dataGrid.column(4);
-  fourthColumn.title('Offline');
-  fourthColumn.width(60);
-  fourthColumn.cellTextSettings().hAlign('right');
-  fourthColumn.textFormatter(function(item) {
-    return item.get('offline') || '';
-  });
-  fourthColumn.cellTextSettingsOverrider(labelTextSettingsOverrider);
-
-  var timeline = chart.getTimeline();
-  timeline.selectedElementStroke(null);
-  timeline.selectedElementFill('#c2f');
-
-
-  //initiate chart drawing
-  chart.draw();
-
-  chart.zoomTo(Date.UTC(2008, 0, 31, 1, 36), Date.UTC(2008, 1, 15, 10, 3));
-
-  //--------------------------------------------------
-  // External events
-  //--------------------------------------------------
-  //chart.listen(anychart.enums.EventType.ROW_CLICK, function(e) {
-  //  //e.preventDefault();
-  //  console.log('Clicked:', e['item'].get('name'));
-  //  if (e['period']) console.log('Period: ' + e['period']['id']);
-  //  console.log('');
-  //});
-  //
-  //chart.listen(anychart.enums.EventType.ROW_SELECT, function(e) {
-  //  console.log('Selected:', e['item'].get('name'));
-  //  if (e['period']) console.log('Period: ' + e['period']['id']);
-  //  console.log('');
-  //});
-  //
-  //chart.listen(anychart.enums.EventType.ROW_DBL_CLICK, function(e) {
-  //  //e.preventDefault();
-  //  console.log('Double clicked:', e['item'].get('name'));
-  //  if (e['period']) console.log('Period: ' + e['period']['id']);
-  //  console.log('');
-  //});
-  //
-  //chart.listen(anychart.enums.EventType.ROW_MOUSE_OVER, function(e) {
-  //  //e.preventDefault();
-  //  console.log('Mouse over:', e['item'].get('name'));
-  //  if (e['period']) console.log('Period: ' + e['period']['id']);
-  //  console.log('');
-  //});
-  //
-  //chart.listen(anychart.enums.EventType.ROW_MOUSE_MOVE, function(e) {
-  //  //e.preventDefault();
-  //  console.log('Mouse move:', e['item'].get('name'));
-  //  if (e['period']) console.log('Period: ' + e['period']['id']);
-  //  console.log('');
-  //});
-
-  chart.listen(anychart.enums.EventType.ROW_MOUSE_OUT, function(e) {
-    //e.preventDefault();
-    console.log('Mouse out:', e['item'].get('name'));
-    if (e['period']) console.log('Period: ' + e['period']['id']);
-    console.log('');
-  });
-
-  //chart.listen(anychart.enums.EventType.ROW_MOUSE_UP, function(e) {
-  //  //e.preventDefault();
-  //  console.log('Mouse up:', e['item'].get('name'));
-  //  if (e['period']) console.log('Period: ' + e['period']['id']);
-  //  console.log('');
-  //});
-  //
-  //chart.listen(anychart.enums.EventType.ROW_MOUSE_DOWN, function(e) {
-  //  //e.preventDefault();
-  //  console.log('Mouse down:', e['item'].get('name'));
-  //  if (e['period']) console.log('Period: ' + e['period']['id']);
-  //  console.log('');
-  //});
-
+  timeline.draw();
+  timeline.listen('signal', timeline.draw, false, timeline);
 });
 
 
-function labelTextSettingsOverrider(label, item) {
-  switch (item.get('type')) {
-    case 'online':
-      label.fontColor('green').fontWeight('bold');
-      break;
-    case 'offline':
-      label.fontColor('red').fontWeight('bold');
-      break;
-    case 'maintenance':
-      label.fontColor('orange').fontWeight('bold');
-      break;
-  }
-}
-
-
-function getNewData() {
+function getData() {
   return [
     {
       'id': '1',
@@ -172,14 +25,14 @@ function getNewData() {
       'periods': [
         {
           'id': '1_1',
-          'stroke': 'red',
+          'stroke': 'none',
           'fill': 'green',
           'start': Date.UTC(2008, 0, 31, 16, 0),
           'end': Date.UTC(2008, 1, 2, 6, 44)
         },
         {
           'id': '1_2',
-          'stroke': 'black',
+          'stroke': 'none',
           'fill': 'orange',
           'start': Date.UTC(2008, 1, 2, 6, 44),
           'end': Date.UTC(2008, 1, 3, 0, 6)

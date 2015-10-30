@@ -245,7 +245,7 @@ anychart.scales.GanttDateTime.prototype.setRange = function(min, max) {
   min = anychart.utils.normalizeTimestamp(min);
   max = anychart.utils.normalizeTimestamp(max);
   var needsRecalculation = false;
-  if (this.min_ != min || this.max_ != max) {
+  if ((this.min_ != min || this.max_ != max) && !isNaN(max) && !isNaN(min)) {
     if (isNaN(this.min_)) this.min_ = min;
     if (isNaN(this.max_)) this.max_ = max;
     if (isNaN(this.totalMin_)) this.totalMin_ = min;
@@ -488,6 +488,20 @@ anychart.scales.GanttDateTime.prototype.timestampToRatio = function(value) {
 
 
 /**
+ * Transforms a passed ratio value into a timestamp depending on current scale date range.
+ * @param {number} value - Ratio.
+ * @return {number} - Timestamp.
+ */
+anychart.scales.GanttDateTime.prototype.ratioToTimestamp = function(value) {
+  if (isNaN(this.min_) || isNaN(this.max_))
+    this.setRange(anychart.core.gantt.Controller.GANTT_BIRTH_DATE, anychart.core.gantt.Controller.GANTT_DEATH_DATE);
+
+  //You will get this return expression if you draw a time axis and mark a values there.
+  return Math.round(value * (this.max_ - this.min_) + this.min_);
+};
+
+
+/**
  * Aligns passed timestamp to the left according to the passed interval.
  * @param {number} date - Date to align.
  * @param {goog.date.Interval} interval - Interval to align by.
@@ -711,7 +725,32 @@ anychart.scales.GanttDateTime.prototype.ratioScroll = function(ratio) {
     this.setRange(this.min_ + interval, this.max_ + interval);
   }
   return this;
+};
 
+
+/**
+ * Performs force scroll by ratio passed. Extends total range.
+ * @param {number} ratio - Ratio.
+ * @return {anychart.scales.GanttDateTime} - Itself for method chaining.
+ */
+anychart.scales.GanttDateTime.prototype.ratioForceScroll = function(ratio) {
+  if (ratio) {
+    if (isNaN(this.min_) || isNaN(this.max_))
+      this.setRange(anychart.core.gantt.Controller.GANTT_BIRTH_DATE, anychart.core.gantt.Controller.GANTT_DEATH_DATE);
+
+    var msInterval = Math.round((this.max_ - this.min_) * ratio);
+
+    var newMin = this.min_ + msInterval;
+    var newMax = this.max_ + msInterval;
+
+    this.totalMin_ = Math.min(this.totalMin_, newMin);
+    this.min_ = newMin;
+    this.totalMax_ = Math.max(this.totalMax_, newMax);
+    this.max_ = newMax;
+
+    this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+  }
+  return this;
 };
 
 

@@ -29,6 +29,13 @@ anychart.core.ui.Credits = function() {
    */
   this.domElement_ = null;
 
+  /**
+   * Flag whether credits must be placed right in chart.
+   * @type {boolean}
+   * @private
+   */
+  this.inChart_ = false;
+
   //disable by default at anychart related domains
   this.enabled(!anychart.core.ui.Credits.DOMAIN_REGEXP.test(goog.dom.getWindow().location.hostname));
 };

@@ -10,6 +10,13 @@ goog.require('anychart.data');
 goog.require('anychart.enums');
 
 
+/**
+ * Namespace anychart.core.radar
+ * @namespace
+ * @name anychart.core.radar
+ */
+
+
 
 /**
  * Base class for all radar series.<br/>

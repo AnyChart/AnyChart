@@ -274,6 +274,7 @@
         <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
         <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="animation" type="simple.Bool" default="false"/>
+        <xsd:attribute name="editing" type="simple.Bool" default="false"/>
         <!-- Gantt attributes -->
 
         <xsd:attribute name="header_height" type="xsd:double"/>
@@ -1122,7 +1123,7 @@
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="column_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="title_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="header_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.Tooltip"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="columns" type="Columns_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="background_fill" type="Fill"/>
@@ -1131,19 +1132,27 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="row_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_selected_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_dash_stroke" type="Stroke"/>
         </xsd:all>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
         <xsd:attribute name="is_standalone" type="simple.Bool"/>
-        <xsd:attribute name="title_height" type="xsd:double"/>
+        <xsd:attribute name="editing" type="simple.Bool"/>
+        <xsd:attribute name="header_height" type="xsd:double"/>
         <xsd:attribute name="row_stroke" type="xsd:string"/>
         <xsd:attribute name="column_stroke" type="xsd:string"/>
         <xsd:attribute name="background_fill" type="xsd:string"/>
+        <xsd:attribute name="header_fill" type="xsd:string"/>
         <xsd:attribute name="row_odd_fill" type="xsd:string"/>
         <xsd:attribute name="row_even_fill" type="xsd:string"/>
         <xsd:attribute name="row_fill" type="xsd:string"/>
         <xsd:attribute name="hover_fill" type="xsd:string"/>
         <xsd:attribute name="row_selected_fill" type="xsd:string"/>
         <xsd:attribute name="horizontal_offset" type="xsd:double" default="0"/>
+        <xsd:attribute name="edit_structure_preview_fill" type="xsd:string"/>
+        <xsd:attribute name="edit_structure_preview_stroke" type="xsd:string"/>
+        <xsd:attribute name="edit_structure_preview_dash_stroke" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:complexType name="Columns_list">
@@ -1192,9 +1201,21 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="selected_element_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="selected_element_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="labels_factory" type="core.LabelsFactory"/>
-
+            <xsd:element minOccurs="0" maxOccurs="1" name="connector_preview_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit_preview_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit_preview_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit_progress_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit_progress_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit_interval_thumb_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit_interval_thumb_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit_connector_thumb_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit_connector_thumb_stroke" type="Stroke"/>
         </xsd:all>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
+        <xsd:attribute name="is_standalone" type="simple.Bool"/>
+        <xsd:attribute name="header_height" type="xsd:double"/>
+        <xsd:attribute name="baseline_above" type="simple.Bool"/>
+        <xsd:attribute name="editing" type="simple.Bool"/>
         <xsd:attribute name="row_stroke" type="xsd:string"/>
         <xsd:attribute name="column_stroke" type="xsd:string"/>
         <xsd:attribute name="background_fill" type="xsd:string"/>
@@ -1218,6 +1239,15 @@
         <xsd:attribute name="selected_element_fill" type="xsd:string"/>
         <xsd:attribute name="selected_element_stroke" type="xsd:string"/>
         <xsd:attribute name="labels_factory" type="simple.BoolOrNull"/>
+        <xsd:attribute name="connector_preview_stroke" type="xsd:string"/>
+        <xsd:attribute name="edit_preview_fill" type="xsd:string"/>
+        <xsd:attribute name="edit_preview_stroke" type="xsd:string"/>
+        <xsd:attribute name="edit_progress_fill" type="xsd:string"/>
+        <xsd:attribute name="edit_progress_stroke" type="xsd:string"/>
+        <xsd:attribute name="edit_interval_thumb_fill" type="xsd:string"/>
+        <xsd:attribute name="edit_interval_thumb_stroke" type="xsd:string"/>
+        <xsd:attribute name="edit_connector_thumb_fill" type="xsd:string"/>
+        <xsd:attribute name="edit_connector_thumb_stroke" type="xsd:string"/>
     </xsd:complexType>
 
 

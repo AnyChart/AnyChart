@@ -13,6 +13,13 @@ goog.require('anychart.enums');
 goog.require('anychart.utils');
 
 
+/**
+ * Namespace anychart.core.scatter
+ * @namespace
+ * @name anychart.core.scatter
+ */
+
+
 
 /**
  * Base class for all scatter series.<br/>

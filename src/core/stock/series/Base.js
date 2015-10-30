@@ -7,6 +7,13 @@ goog.require('anychart.data.Table');
 goog.require('goog.object');
 
 
+/**
+ * Namespace anychart.core.stock.series
+ * @namespace
+ * @name anychart.core.stock.series
+ */
+
+
 
 /**
  *

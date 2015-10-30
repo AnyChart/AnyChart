@@ -1,0 +1,2116 @@
+goog.provide('anychart.core.ui.BaseGrid');
+
+goog.require('anychart.core.VisualBaseWithBounds');
+goog.require('anychart.core.gantt.Controller');
+goog.require('anychart.core.ui.IInteractiveGrid');
+goog.require('anychart.core.ui.ScrollBar');
+goog.require('anychart.core.ui.Tooltip');
+goog.require('anychart.core.utils.TypedLayer');
+goog.require('goog.dom');
+goog.require('goog.events.KeyHandler');
+goog.require('goog.events.MouseWheelHandler');
+goog.require('goog.fx.Dragger');
+
+
+
+/**
+ * Base class for grid-like classes like DataGrid and Timeline.
+ * Has a header area and interactive grid area.
+ * @param {anychart.core.gantt.Controller=} opt_controller - Controller to be set. Setting this parameter has a key
+ *  meaning:
+ *  - If controller is set, in means that this grid (DG or TL) is not standalone (it is part of higher entity
+ *    with its own controller like Gantt Chart). It means that controller must be already created before this grid.
+ *  - If controller is not set, the grid becomes standalone and creates its own controller.
+ * @param {boolean=} opt_isResource - If opt_controller is not set, this flag says what kind of controller to create.
+ * @constructor
+ * @extends {anychart.core.VisualBaseWithBounds}
+ * @implements {anychart.core.ui.IInteractiveGrid}
+ */
+anychart.core.ui.BaseGrid = function(opt_controller, opt_isResource) {
+  goog.base(this);
+
+  /**
+   * Mouse wheel handler object.
+   * @type {goog.events.MouseWheelHandler}
+   * @private
+   */
+  this.mwh_ = null;
+
+  /**
+   * Current dragger.
+   * @type {anychart.core.ui.BaseGrid.Dragger}
+   */
+  this.scrollDragger = null;
+
+  /**
+   * Interactivity handler.
+   * @type {!anychart.core.ui.IInteractiveGrid}
+   */
+  this.interactivityHandler = /** @type {!anychart.core.ui.IInteractiveGrid} */ (this);
+
+  /**
+   * Flag whether grid is standalone.
+   * @type {boolean}
+   */
+  this.isStandalone = true;
+
+  /**
+   * Gantt controller.
+   * @type {anychart.core.gantt.Controller}
+   * @protected
+   */
+  this.controller = null;
+
+  if (opt_controller && opt_controller instanceof anychart.core.gantt.Controller) {
+    this.controller = opt_controller;
+    this.isStandalone = false;
+  } else {
+    this.createController(opt_isResource);
+  }
+
+  /**
+   * Pixel bounds cache.
+   * @type {anychart.math.Rect}
+   */
+  this.pixelBoundsCache = null;
+
+  /**
+   * Row vertical line separation path.
+   * @type {acgraph.vector.Stroke}
+   * @private
+   */
+  this.rowStroke_;
+
+  /**
+   * Thickness of row stroke.
+   * It is used to avoid multiple thickness extraction from rowStroke_.
+   * @type {number}
+   */
+  this.rowStrokeThickness = 1;
+
+  /**
+   * Row stroke path.
+   * @type {acgraph.vector.Path}
+   * @private
+   */
+  this.rowStrokePath_ = null;
+
+  /**
+   * Base layer.
+   * @type {acgraph.vector.Layer}
+   * @private
+   */
+  this.base_ = null;
+
+  /**
+   * Background rect.
+   * @type {acgraph.vector.Rect}
+   * @private
+   */
+  this.bgRect_ = null;
+
+  /**
+   * Invisible background rect to handle mouse events when visible bg id disabled.
+   * @type {acgraph.vector.Rect}
+   * @private
+   */
+  this.eventsRect_ = null;
+
+  /**
+   * Background fill.
+   * @type {acgraph.vector.Fill}
+   * @private
+   */
+  this.backgroundFill_;
+
+  /**
+   * Cells layer. Contains a grid itself.
+   * @type {acgraph.vector.Layer}
+   * @private
+   */
+  this.cellsLayer_ = null;
+
+  /**
+   * Content layer. Contains main content.
+   * @type {acgraph.vector.Layer}
+   * @private
+   */
+  this.contentLayer_ = null;
+
+  /**
+   * Edit layer. Contains edit elements.
+   * @type {acgraph.vector.Layer}
+   * @private
+   */
+  this.editLayer_ = null;
+
+  /**
+   * Layer that contains elements to be drawn with paths.
+   * @type {anychart.core.utils.TypedLayer}
+   * @private
+   */
+  this.drawLayer_ = null;
+
+  /**
+   * Layer that will be clipped by height. Use it for something that
+   * must have the height of currently visible rows.
+   * @type {acgraph.vector.Layer}
+   * @private
+   */
+  this.clipLayer_ = null;
+
+  /**
+   * Scrolls layer. Contains scroll bars.
+   * @type {acgraph.vector.Layer}
+   * @private
+   */
+  this.scrollsLayer_ = null;
+
+  /**
+   * Header height.
+   * @type {number}
+   * @private
+   */
+  this.headerHeight_ = 45;
+
+  /**
+   * Width of grids.
+   * Used for case when rows do not take all available width.
+   * Use case: calculation of ratios of horizontal scroll in DG.
+   * @type {number}
+   */
+  this.totalGridsWidth = 0;
+
+  /**
+   * Odd cells path.
+   * @type {acgraph.vector.Path}
+   * @private
+   */
+  this.oddPath_ = null;
+
+  /**
+   * Even cells path.
+   * @type {acgraph.vector.Path}
+   * @private
+   */
+  this.evenPath_ = null;
+
+  /**
+   * Hover path.
+   * @type {acgraph.vector.Path}
+   * @private
+   */
+  this.hoverPath_ = null;
+
+  /**
+   * Selected row path.
+   * @type {acgraph.vector.Path}
+   * @private
+   */
+  this.selectedPath_ = null;
+
+  /**
+   * Odd fill.
+   * @type {?acgraph.vector.Fill}
+   * @private
+   */
+  this.rowOddFill_;
+
+  /**
+   * Even fill.
+   * @type {?acgraph.vector.Fill}
+   * @private
+   */
+  this.rowEvenFill_;
+
+  /**
+   * Default rows fill.
+   * @type {acgraph.vector.Fill}
+   * @private
+   */
+  this.rowFill_;
+
+  /**
+   * Default hover fill.
+   * @type {acgraph.vector.Fill}
+   * @private
+   */
+  this.hoverFill_;
+
+  /**
+   * Default row selected fill.
+   * @type {acgraph.vector.Fill}
+   * @private
+   */
+  this.rowSelectedFill_;
+
+  /**
+   * Contains the sequence of heights of grid. Used to quickly calculate this.hoveredIndex on mouse over event
+   * for row highlighting purposes.
+   * @type {Array.<number>}
+   * @private
+   */
+  this.gridHeightCache_ = [];
+
+  /**
+   * Index of currently hovered row.
+   * @type {number|undefined}
+   */
+  this.hoveredIndex = -1;
+
+  /**
+   * Currently selected data item.
+   * @type {anychart.data.Tree.DataItem}
+   * @protected
+   */
+  this.selectedItem = null;
+
+  /**
+   * Vertical upper coordinate (top) of highlighted row.
+   * @type {number|undefined}
+   * @private
+   */
+  this.hoverStartY_ = 0;
+
+  /**
+   * Vertical lower coordinate (top + height) of highlighted row.
+   * @type {number|undefined}
+   * @private
+   */
+  this.hoverEndY_ = 0;
+
+  /**
+   * Flag whether the position must be redrawn.
+   * @type {boolean}
+   * @protected
+   */
+  this.redrawPosition = false;
+
+  /**
+   * Flag whether grid is in dragging progress.
+   * NOTE: this flag indicates any dragging progress to avoid triggering rowSelect action on drag end.
+   * @type {boolean}
+   */
+  this.dragging = false;
+
+  /**
+   * Flag whether alt is pressed.
+   * @type {boolean}
+   */
+  this.altKey = false;
+
+  /**
+   * Current scroll interval.
+   * @type {?number}
+   */
+  this.scrollInterval = null;
+
+  /**
+   * Scroll offset X.
+   * @type {number}
+   */
+  this.scrollOffsetX = 0;
+
+  /**
+   * Scroll offset Y.
+   * @type {number}
+   */
+  this.scrollOffsetY = 0;
+
+
+  /**
+   * Whether chart is interactive.
+   * @type {boolean}
+   */
+  this.interactive = true;
+
+
+  /**
+   * Whether grid is editable.
+   * @type {boolean}
+   */
+  this.editable = false;
+
+
+  /**
+   * Tooltip.
+   * @type {anychart.core.ui.Tooltip}
+   * @private
+   */
+  this.tooltip_ = null;
+
+  this.bindHandlersToComponent(this, this.handleMouseOverAndMove_, this.handleMouseOut_, this.handleMouseClick_,
+      this.handleMouseOverAndMove_, this.handleAll_);
+
+};
+goog.inherits(anychart.core.ui.BaseGrid, anychart.core.VisualBaseWithBounds);
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  General.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Supported signals.
+ * @type {number}
+ */
+anychart.core.ui.BaseGrid.SUPPORTED_SIGNALS = anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS;
+
+
+/**
+ * Supported consistence states.
+ * @type {number}
+ */
+anychart.core.ui.BaseGrid.prototype.SUPPORTED_CONSISTENCY_STATES =
+    anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.ConsistencyState.APPEARANCE | //Coloring.
+    anychart.ConsistencyState.GRIDS_POSITION | //Any vertical grid position change.
+    anychart.ConsistencyState.BASE_GRID_CLICK | //Click selects row. We use this state to highlight a row without redrawing all.
+    anychart.ConsistencyState.BASE_GRID_HOVER; //The same.
+
+
+/**
+ * Background rect z-index.
+ * @type {number}
+ */
+anychart.core.ui.BaseGrid.BG_RECT_Z_INDEX = 10;
+
+
+/**
+ * Events rect z-index.
+ * @type {number}
+ */
+anychart.core.ui.BaseGrid.EVENTS_RECT_Z_INDEX = 20;
+
+
+/**
+ * Cells layer z-index.
+ * @type {number}
+ */
+anychart.core.ui.BaseGrid.CELLS_Z_INDEX = 30;
+
+
+/**
+ * Draw layer z-index.
+ * @type {number}
+ */
+anychart.core.ui.BaseGrid.DRAW_Z_INDEX = 35;
+
+
+/**
+ * Content layer z-index.
+ * @type {number}
+ */
+anychart.core.ui.BaseGrid.CONTENT_Z_INDEX = 40;
+
+
+/**
+ * Edit layer z-index.
+ * @type {number}
+ */
+anychart.core.ui.BaseGrid.EDIT_Z_INDEX = 45;
+
+
+/**
+ * Additional layer z-index.
+ * @type {number}
+ */
+anychart.core.ui.BaseGrid.CLIP_Z_INDEX = 50;
+
+
+/**
+ * Scrolls layer z-index.
+ * @type {number}
+ */
+anychart.core.ui.BaseGrid.SCROLLS_Z_INDEX = 60;
+
+
+/**
+ * The scroll timer step in ms.
+ * @type {number}
+ */
+anychart.core.ui.BaseGrid.TIMER_STEP = 100;
+
+
+/**
+ * The scroll step in px.
+ * @type {number}
+ */
+anychart.core.ui.BaseGrid.SCROLL_STEP = 30;
+
+
+/**
+ * The suggested scrolling margin.
+ * @type {number}
+ */
+anychart.core.ui.BaseGrid.MARGIN = 32;
+
+
+/**
+ * Checks whether tree data item is actually a milestone.
+ * @param {anychart.data.Tree.DataItem} treeDataItem - Tree data item.
+ * @return {boolean} - Whether tree data item is milestone.
+ */
+anychart.core.ui.BaseGrid.isMilestone = function(treeDataItem) {
+  var actualStart = anychart.utils.normalizeTimestamp(treeDataItem.get(anychart.enums.GanttDataFields.ACTUAL_START));
+  var actualEnd = anychart.utils.normalizeTimestamp(treeDataItem.get(anychart.enums.GanttDataFields.ACTUAL_END));
+  return (!isNaN(actualStart) && isNaN(actualEnd)) || (actualStart == actualEnd);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Interactivity.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Mouse click internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.core.ui.BaseGrid.prototype.handleMouseClick_ = function(event) {
+  if (this.interactive) {
+    var click = this.getInteractivityEvent(event);
+
+    if (click && !this.interactivityHandler.altKey) {
+      var mouseUp = goog.object.clone(click);
+      mouseUp['type'] = anychart.enums.EventType.ROW_MOUSE_UP;
+      var upDispatched = this.interactivityHandler.dispatchEvent(mouseUp);
+      var clickDispatched = this.interactivityHandler.dispatchEvent(click);
+      if (upDispatched && clickDispatched) {
+        this.interactivityHandler.rowClick(click);
+      }
+    } else {
+      this.interactivityHandler.unselect();
+    }
+  } else {
+    this.interactive = true;
+  }
+};
+
+
+/**
+ * Additional actions for inherited classes on mouse move while dragging.
+ * @param {Object} evt - Event object.
+ */
+anychart.core.ui.BaseGrid.prototype.addDragMouseMove = goog.nullFunction;
+
+
+/**
+ * Additional actions for inherited classes on mouse up after dragging.
+ * @param {Object} evt - Event object.
+ */
+anychart.core.ui.BaseGrid.prototype.addDragMouseUp = goog.nullFunction;
+
+
+/**
+ * Additional actions for inherited classes on mouse move and over.
+ * @param {?Object} evt - Event object.
+ */
+anychart.core.ui.BaseGrid.prototype.addMouseMoveAndOver = goog.nullFunction;
+
+
+/**
+ * Additional actions for inherited classes on mouse up.
+ * @param {?Object} evt - Event object.
+ */
+anychart.core.ui.BaseGrid.prototype.addMouseUp = goog.nullFunction;
+
+
+/**
+ * Mouse over and move internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.core.ui.BaseGrid.prototype.handleMouseOverAndMove_ = function(event) {
+  var evt = this.getInteractivityEvent(event);
+  this.addMouseMoveAndOver(evt);
+  if (evt && this.interactive && this.interactivityHandler.dispatchEvent(evt)) {
+    this.interactivityHandler.rowMouseMove(evt);
+  }
+};
+
+
+/**
+ * "All" internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.core.ui.BaseGrid.prototype.handleAll_ = function(event) {
+  if (event['type'] == acgraph.events.EventType.DBLCLICK) this.handleDblMouseClick_(event);
+  if (event['type'] == acgraph.events.EventType.MOUSEDOWN) this.handleMouseDown_(event);
+  if (event['type'] == acgraph.events.EventType.MOUSEUP) this.handleMouseUp_(event);
+};
+
+
+/**
+ * Mouse double click internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.core.ui.BaseGrid.prototype.handleDblMouseClick_ = function(event) {
+  if (this.interactive) {
+    var evt = this.getInteractivityEvent(event);
+    if (evt && this.interactivityHandler.dispatchEvent(evt)) {
+      this.interactivityHandler.rowDblClick(evt);
+    }
+  } else {
+    this.interactive = true;
+  }
+};
+
+
+/**
+ * Mouse out internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.core.ui.BaseGrid.prototype.handleMouseOut_ = function(event) {
+  if (this.interactive) {
+    var evt = this.getInteractivityEvent(event);
+    if (evt && this.interactivityHandler.dispatchEvent(evt)) {
+      this.interactivityHandler.rowMouseOut(evt);
+    }
+  }
+};
+
+
+/**
+ * Mouse down internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.core.ui.BaseGrid.prototype.handleMouseDown_ = function(event) {
+  if (this.interactive) {
+    event.preventDefault();
+    var evt = this.getInteractivityEvent(event);
+    if (evt && this.interactivityHandler.dispatchEvent(evt)) {
+      this.interactivityHandler.rowMouseDown(evt);
+    }
+  }
+};
+
+
+/**
+ * Mouse up internal handler.
+ * @param {anychart.core.MouseEvent} event - Event object.
+ * @private
+ */
+anychart.core.ui.BaseGrid.prototype.handleMouseUp_ = function(event) {
+  var evt = this.getInteractivityEvent(event);
+  this.addMouseUp(evt);
+  if (this.interactive) {
+    if (evt && this.interactivityHandler.dispatchEvent(evt)) {
+      this.interactivityHandler.rowMouseUp(evt);
+    }
+  }
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Interface.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.core.ui.BaseGrid.prototype.rowClick = function(event) {
+  this.rowSelect(event);
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.BaseGrid.prototype.rowDblClick = function(event) {
+  var item = event['item'];
+  if (item && item.numChildren())
+    item.meta(anychart.enums.GanttDataFields.COLLAPSED, !item.meta(anychart.enums.GanttDataFields.COLLAPSED));
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.BaseGrid.prototype.rowMouseMove = function(event) {
+  this.interactivityHandler.highlight(event['hoveredIndex'], event['startY'], event['endY']);
+
+  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
+  var position = tooltip.isFloating() ?
+      new acgraph.math.Coordinate(event['originalEvent']['clientX'], event['originalEvent']['clientY']) :
+      new acgraph.math.Coordinate(0, 0);
+  tooltip.show(event['item'], position);
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.BaseGrid.prototype.rowMouseOver = goog.nullFunction;
+
+
+/** @inheritDoc */
+anychart.core.ui.BaseGrid.prototype.rowMouseOut = function(event) {
+  this.interactivityHandler.highlight();
+  this.tooltip().hide();
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.BaseGrid.prototype.rowMouseUp = goog.nullFunction;
+
+
+/** @inheritDoc */
+anychart.core.ui.BaseGrid.prototype.rowMouseDown = goog.nullFunction;
+
+
+/**
+ * Calls this method when we move the mouse out of grid. That's why both offsetX and offsetY can't equal 0.
+ * @param {goog.fx.DragEvent=} opt_event - Event.
+ */
+/*
+  Illustration for this method:
+  (Grid is rectangle in center)
+
+    offsetX < 0  |  offsetX == 0  |  offsetX > 0
+    offsetY < 0  |  offsetY < 0   |  offsetY < 0
+
+    ------------ +----------------+ --------------
+                 |                |
+    offsetX < 0  |  offsetX == 0  |  offsetX > 0
+    offsetY == 0 |  offsetX == 0  |  offsetY == 0
+                 |                |
+    ------------ +----------------+ --------------
+
+    offsetX < 0  |  offsetX == 0  |  offsetX > 0
+    offsetY > 0  |  offsetY > 0   |  offsetY > 0
+
+ */
+anychart.core.ui.BaseGrid.prototype.mouseOutMove = goog.nullFunction;
+
+
+/** @inheritDoc */
+anychart.core.ui.BaseGrid.prototype.rowSelect = function(event) {
+  if (this.interactive) {
+    var item = event['item'];
+    if (this.selectRow(item)) {
+      var eventObj = goog.object.clone(event);
+      eventObj['type'] = anychart.enums.EventType.ROW_SELECT;
+      this.interactivityHandler.dispatchEvent(eventObj);
+    }
+  }
+};
+
+
+/**
+ * Creates new event object to be dispatched.
+ * @param {anychart.core.MouseEvent|goog.fx.DragEvent} event - Incoming event.
+ * @return {?Object} - New event object to be dispatched.
+ */
+anychart.core.ui.BaseGrid.prototype.getInteractivityEvent = function(event) {
+  if (this.gridHeightCache_.length) {
+    var visibleItems = this.controller.getVisibleItems();
+    var startIndex = this.controller.startIndex();
+    var item;
+    var type = event['type'];
+    switch (type) {
+      case acgraph.events.EventType.MOUSEOUT:
+        type = anychart.enums.EventType.ROW_MOUSE_OUT;
+        if (this.hoveredIndex >= 0) item = visibleItems[startIndex + this.hoveredIndex];
+        break;
+      case acgraph.events.EventType.MOUSEOVER:
+        type = anychart.enums.EventType.ROW_MOUSE_OVER;
+        break;
+      case acgraph.events.EventType.MOUSEMOVE:
+        type = anychart.enums.EventType.ROW_MOUSE_MOVE;
+        break;
+      case acgraph.events.EventType.MOUSEDOWN:
+        type = anychart.enums.EventType.ROW_MOUSE_DOWN;
+        break;
+      case acgraph.events.EventType.MOUSEUP:
+        type = anychart.enums.EventType.ROW_MOUSE_UP;
+        break;
+      case acgraph.events.EventType.CLICK:
+        type = anychart.enums.EventType.ROW_CLICK;
+        break;
+      case acgraph.events.EventType.DBLCLICK:
+        type = anychart.enums.EventType.ROW_DBL_CLICK;
+        break;
+    }
+
+    var newEvent = {
+      'type': type,
+      'actualTarget': event['target'],
+      'target': this,
+      'originalEvent': event
+    };
+
+    var initialTop = /** @type {number} */ (this.pixelBoundsCache.top + this.headerHeight_ + 1);
+
+    var min = this.pixelBoundsCache.top +
+        goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).y +
+        this.headerHeight_;
+
+    var mouseHeight = event['clientY'] - min;
+
+    var totalHeight = this.gridHeightCache_.length ? this.gridHeightCache_[this.gridHeightCache_.length - 1] : 0;
+
+    if (item) {
+      newEvent['item'] = item;
+    } else if (mouseHeight < 0 || mouseHeight > totalHeight) {
+      return null;
+    } else {
+      var index = goog.array.binarySearch(this.gridHeightCache_, mouseHeight);
+      index = index >= 0 ? index : ~index; //Index of row under mouse.
+      this.hoveredIndex = index;
+
+      var startHeight = index ? this.gridHeightCache_[index - 1] : 0;
+      var startY = initialTop + startHeight;
+      var endY = startY + (this.gridHeightCache_[index] - startHeight - this.rowStrokeThickness);
+
+      newEvent['item'] = visibleItems[startIndex + index];
+      newEvent['startY'] = startY;
+      newEvent['endY'] = endY;
+      newEvent['hoveredIndex'] = this.hoveredIndex;
+      newEvent['index'] = startIndex + index;
+      newEvent['itemHeightMouseRatio'] = (mouseHeight - startHeight) / (this.gridHeightCache_[index] - startHeight);
+    }
+    return newEvent;
+  }
+  return null;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.core.ui.BaseGrid.prototype.editing = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.editable = opt_value;
+    return this;
+  }
+  return this.editable;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  DOM init.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Inner getter for this.base_.
+ * Initializes and returns base layer.
+ * @return {acgraph.vector.Layer}
+ */
+anychart.core.ui.BaseGrid.prototype.getBase = function() {
+  if (!this.base_) {
+    this.base_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    //We handle mouseDown here to prevent double click selection.
+    this.bindHandlersToGraphics(this.base_, null, null, null, null, /** @type {Function} */ (this.handleMouseDown_));
+
+    this.registerDisposable(this.base_);
+  }
+  return this.base_;
+};
+
+
+/**
+ * Inner getter for this.cellsLayer_.
+ * @return {acgraph.vector.Layer}
+ */
+anychart.core.ui.BaseGrid.prototype.getCellsLayer = function() {
+  if (!this.cellsLayer_) {
+    this.cellsLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    this.cellsLayer_.zIndex(anychart.core.ui.BaseGrid.CELLS_Z_INDEX);
+    this.registerDisposable(this.cellsLayer_);
+  }
+  return this.cellsLayer_;
+};
+
+
+/**
+ * Inner getter for this.drawLayer_.
+ * @return {anychart.core.utils.TypedLayer}
+ */
+anychart.core.ui.BaseGrid.prototype.getDrawLayer = function() {
+  if (!this.drawLayer_) {
+    var ths = this;
+    this.drawLayer_ = new anychart.core.utils.TypedLayer(function() {
+      var el = new anychart.core.ui.BaseGrid.Element();
+      el.setParentEventTarget(ths);
+      return el;
+    }, function(child) {
+      (/** @type {anychart.core.ui.BaseGrid.Element} */ (child)).fill(null).stroke(null).clear();
+      child.currBounds = null;
+      child.type = void 0;
+    });
+    this.drawLayer_.zIndex(anychart.core.ui.BaseGrid.DRAW_Z_INDEX);
+    this.registerDisposable(this.drawLayer_);
+  }
+  return this.drawLayer_;
+};
+
+
+/**
+ * Inner getter for this.contentLayer_.
+ * @return {acgraph.vector.Layer}
+ */
+anychart.core.ui.BaseGrid.prototype.getContentLayer = function() {
+  if (!this.contentLayer_) {
+    this.contentLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    this.contentLayer_.zIndex(anychart.core.ui.BaseGrid.CONTENT_Z_INDEX);
+    this.registerDisposable(this.contentLayer_);
+  }
+  return this.contentLayer_;
+};
+
+
+/**
+ * Inner getter for this.editLayer_.
+ * @return {acgraph.vector.Layer}
+ */
+anychart.core.ui.BaseGrid.prototype.getEditLayer = function() {
+  if (!this.editLayer_) {
+    this.editLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    this.editLayer_.zIndex(anychart.core.ui.BaseGrid.EDIT_Z_INDEX);
+    this.registerDisposable(this.editLayer_);
+  }
+  return this.editLayer_;
+};
+
+
+/**
+ * Inner getter for this.clipLayer_.
+ * @return {acgraph.vector.Layer}
+ */
+anychart.core.ui.BaseGrid.prototype.getClipLayer = function() {
+  if (!this.clipLayer_) {
+    this.clipLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    this.clipLayer_.zIndex(anychart.core.ui.BaseGrid.CLIP_Z_INDEX);
+    this.registerDisposable(this.clipLayer_);
+  }
+  return this.clipLayer_;
+};
+
+
+/**
+ * Inner getter for this.scrollsLayer_.
+ * @return {acgraph.vector.Layer}
+ */
+anychart.core.ui.BaseGrid.prototype.getScrollsLayer = function() {
+  if (!this.scrollsLayer_) {
+    this.scrollsLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
+    this.scrollsLayer_.zIndex(anychart.core.ui.BaseGrid.SCROLLS_Z_INDEX);
+    this.registerDisposable(this.scrollsLayer_);
+  }
+  return this.scrollsLayer_;
+};
+
+
+/**
+ * Getter for this.oddPath_.
+ * @return {acgraph.vector.Path}
+ */
+anychart.core.ui.BaseGrid.prototype.getOddPath = function() {
+  if (!this.oddPath_) {
+    this.oddPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
+    this.oddPath_.stroke(null).zIndex(1);
+    this.registerDisposable(this.oddPath_);
+  }
+  return this.oddPath_;
+};
+
+
+/**
+ * Getter for this.evenPath_.
+ * @return {acgraph.vector.Path}
+ */
+anychart.core.ui.BaseGrid.prototype.getEvenPath = function() {
+  if (!this.evenPath_) {
+    this.evenPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
+    this.evenPath_.stroke(null).zIndex(1);
+    this.registerDisposable(this.evenPath_);
+  }
+  return this.evenPath_;
+};
+
+
+/**
+ * Getter for this.hoverPath_.
+ * @return {acgraph.vector.Path}
+ */
+anychart.core.ui.BaseGrid.prototype.getHoverPath = function() {
+  if (!this.hoverPath_) {
+    this.hoverPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
+    this.hoverPath_.stroke(null).fill(this.hoverFill_).zIndex(10);
+    this.registerDisposable(this.hoverPath_);
+  }
+  return this.hoverPath_;
+};
+
+
+/**
+ * Getter for this.hoverPath_.
+ * @return {acgraph.vector.Path}
+ */
+anychart.core.ui.BaseGrid.prototype.getSelectedPath = function() {
+  if (!this.selectedPath_) {
+    this.selectedPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
+    this.selectedPath_.stroke(null).fill(this.rowSelectedFill_).zIndex(20);
+    this.registerDisposable(this.selectedPath_);
+  }
+  return this.selectedPath_;
+};
+
+
+/**
+ * Getter for this.rowStrokePath_.
+ * @return {acgraph.vector.Path}
+ */
+anychart.core.ui.BaseGrid.prototype.getRowStrokePath = function() {
+  if (!this.rowStrokePath_) {
+    this.rowStrokePath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
+    this.rowStrokePath_.stroke(this.rowStroke_).zIndex(30);
+    this.registerDisposable(this.rowStrokePath_);
+  }
+  return this.rowStrokePath_;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Decoration.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Gets/sets a default rows fill. Resets odd fill and even fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.ui.BaseGrid|string} - Current value or itself for method chaining.
+ */
+anychart.core.ui.BaseGrid.prototype.rowFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.rowFill_), val)) {
+      this.rowFill_ = val;
+      this.rowOddFill_ = null;
+      this.rowEvenFill_ = null;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.rowFill_;
+};
+
+
+/**
+ * Gets/sets a default rows fill. Resets odd fill and even fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.ui.BaseGrid|string} - Current value or itself for method chaining.
+ * @deprecated - Use {@link rowFill} instead.
+ */
+anychart.core.ui.BaseGrid.prototype.cellFill = anychart.core.ui.BaseGrid.prototype.rowFill;
+
+
+/**
+ * Gets/sets row odd fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.ui.BaseGrid|string} - Current value or itself for method chaining.
+ */
+anychart.core.ui.BaseGrid.prototype.rowOddFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.rowOddFill_), val)) {
+      this.rowOddFill_ = val;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.rowOddFill_;
+};
+
+
+/**
+ * Gets/sets row odd fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.ui.BaseGrid|string} - Current value or itself for method chaining.
+ * @deprecated - Use {@link rowOddFill} instead.
+ */
+anychart.core.ui.BaseGrid.prototype.cellOddFill = anychart.core.ui.BaseGrid.prototype.rowOddFill;
+
+
+/**
+ * Gets/sets row even fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.ui.BaseGrid|string} - Current value or itself for method chaining.
+ */
+anychart.core.ui.BaseGrid.prototype.rowEvenFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.rowEvenFill_), val)) {
+      this.rowEvenFill_ = val;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.rowEvenFill_;
+};
+
+
+/**
+ * Gets/sets row even fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.ui.BaseGrid|string} - Current value or itself for method chaining.
+ * @deprecated - Use {@link rowEvenFill} instead.
+ */
+anychart.core.ui.BaseGrid.prototype.cellEvenFill = anychart.core.ui.BaseGrid.prototype.rowEvenFill;
+
+
+/**
+ * Gets/sets row hover fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.ui.BaseGrid|string} - Current value or itself for method chaining.
+ */
+anychart.core.ui.BaseGrid.prototype.rowHoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.hoverFill_), val)) {
+      //NOTE: this value will be applied on mouse event. That's why we do not invalidate anything.
+      this.hoverFill_ = val;
+    }
+    return this;
+  }
+  return this.hoverFill_;
+};
+
+
+/**
+ * Gets/sets row selected fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.ui.BaseGrid|string} - Current value or itself for method chaining.
+ */
+anychart.core.ui.BaseGrid.prototype.rowSelectedFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.rowSelectedFill_), val)) {
+      this.rowSelectedFill_ = val;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.rowSelectedFill_;
+};
+
+
+/**
+ * Gets/sets background fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.ui.BaseGrid|string} - Current value or itself for method chaining.
+ */
+anychart.core.ui.BaseGrid.prototype.backgroundFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.backgroundFill_), val)) {
+      this.backgroundFill_ = val;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.backgroundFill_;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Private.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Events rect mouse down handler.
+ * @param {acgraph.events.BrowserEvent} e
+ * @private
+ */
+anychart.core.ui.BaseGrid.prototype.dragMouseDown_ = function(e) {
+  if (e['currentTarget'] instanceof acgraph.vector.Element) {
+    this.scrollDragger = new anychart.core.ui.BaseGrid.Dragger(this.base_, this);
+    this.registerDisposable(this.scrollDragger);
+    //this.scrollDragger.listen(goog.fx.Dragger.EventType.START, this.dragStartHandler_, false, this);
+
+    this.scrollDragger.listen(goog.fx.Dragger.EventType.DRAG, this.dragHandler_, false, this);
+
+    this.scrollDragger.listen(goog.fx.Dragger.EventType.END, this.dragEndHandler_, false, this);
+    this.scrollDragger.startDrag(e.getOriginalEvent());
+  }
+};
+
+
+/**
+ * Drag start handler.
+ * @param {goog.fx.DragEvent} e
+ * @private
+ */
+anychart.core.ui.BaseGrid.prototype.dragStartHandler_ = function(e) {
+  this.scrollDragger.reset();
+};
+
+
+/**
+ * Drag handler.
+ * @param {goog.fx.DragEvent} e
+ * @private
+ */
+anychart.core.ui.BaseGrid.prototype.dragHandler_ = function(e) {
+  if (this.editable) {
+    this.dragging = true;
+    this.interactive = false;
+    this.interactivityHandler.highlight();
+    this.tooltip().hide();
+    var evt = this.getInteractivityEvent(e);
+    if (evt) this.addDragMouseMove(evt);
+  }
+};
+
+
+/**
+ * Drag end handler.
+ * @param {goog.fx.DragEvent} e
+ * @private
+ */
+anychart.core.ui.BaseGrid.prototype.dragEndHandler_ = function(e) {
+  if (this.editable) {
+    var end = this.getInteractivityEvent(e);
+    this.addDragMouseUp(end);
+  }
+  this.scrollDragger.reset();
+  this.dragging = false;
+  clearInterval(this.scrollInterval);
+  this.scrollInterval = null;
+};
+
+
+/**
+ * Draws cells depending on data.
+ * @private
+ */
+anychart.core.ui.BaseGrid.prototype.drawRowFills_ = function() {
+  var header = this.pixelBoundsCache.top + this.headerHeight_ + 1; //1px line always separates header from content
+
+  var verticalOffset = this.controller.verticalOffset();
+  var startIndex = this.controller.startIndex();
+  var endIndex = this.controller.endIndex();
+  var visibleItems = this.controller.getVisibleItems();
+
+  var totalTop = (header - verticalOffset);
+  this.interactivityHandler.highlight();
+  this.gridHeightCache_.length = 0;
+
+  this.getEvenPath().clear();
+  this.getOddPath().clear();
+  this.getSelectedPath().clear();
+  this.getRowStrokePath().clear();
+
+  var pixelShift = (this.rowStrokeThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
+
+  for (var i = startIndex; i <= endIndex; i++) {
+    var item = visibleItems[i];
+    if (!item) break;
+
+    var firstCell = (i == startIndex);
+
+    var top = firstCell ? header : totalTop;
+
+    var height = anychart.core.gantt.Controller.getItemHeight(item);
+    height = firstCell ? height - verticalOffset + 1 : height;
+
+    /*
+      Note: Straight indexing starts with 0 (this.visibleItems_[0], this.visibleItems_[1], this.visibleItems_[2]...).
+      But for user numeration starts with 1 and looks like
+        1. Item0
+        2. Item1
+        3. Item2
+
+      That's why evenPath highlights odd value of i, and oddPath highlights even value of i.
+     */
+    var path = i % 2 ? this.evenPath_ : this.oddPath_;
+
+    var newTop = /** @type {number} */ (top + height);
+    path
+        .moveTo(this.pixelBoundsCache.left, top)
+        .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, top)
+        .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, newTop)
+        .lineTo(this.pixelBoundsCache.left, newTop)
+        .close();
+
+    if (item.meta('selected')) {
+      this.selectedItem_ = item; //In case of restoration from XML/JSON, this allows to save selected item state.
+      this.selectedPath_
+          .moveTo(this.pixelBoundsCache.left, top)
+          .lineTo(this.pixelBoundsCache.left + this.pixelBoundsCache.width, top)
+          .lineTo(this.pixelBoundsCache.left + this.pixelBoundsCache.width, newTop)
+          .lineTo(this.pixelBoundsCache.left, newTop)
+          .close();
+    }
+
+    var headSepTop = header - 1 + pixelShift;
+
+    this.rowStrokePath_
+        .moveTo(this.pixelBoundsCache.left, headSepTop)
+        .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, headSepTop);
+
+    totalTop = (newTop + this.rowStrokeThickness);
+
+    var strokePathTop = Math.floor(totalTop - this.rowStrokeThickness / 2) + pixelShift;
+    this.rowStrokePath_
+        .moveTo(this.pixelBoundsCache.left, strokePathTop)
+        .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, strokePathTop);
+
+    this.gridHeightCache_.push(totalTop - header);
+  }
+
+  this.getClipLayer().clip(new acgraph.math.Rect(this.pixelBoundsCache.left, this.pixelBoundsCache.top,
+      this.pixelBoundsCache.width, totalTop - this.pixelBoundsCache.top));
+
+};
+
+
+/**
+ * Mouse wheel default handler.
+ * TODO (A.Kudryavtsev): Test it carefully on Windows OS!
+ * @param {goog.events.MouseWheelEvent} e - Mouse wheel event.
+ * @private
+ */
+anychart.core.ui.BaseGrid.prototype.mouseWheelHandler_ = function(e) {
+  //TODO (A.Kudryavtsev): add check goog.dom.getDocumentScroll().x here
+
+  var dx = e.deltaX;
+  var dy = e.deltaY;
+
+  var scrollsVertically = Math.abs(dy) > 15;
+  var scrollsHorizontally = Math.abs(dx) > 15;
+
+  if (goog.userAgent.WINDOWS) {
+    dx = dx * 15;
+    dy = dy * 15;
+  }
+
+  var preventDefault = true;
+  var bodyScrollLeft = goog.global['document']['body']['scrollLeft'];
+  var horizontalScroll = this.getHorizontalScrollBar();
+  var verticalScroll = this.controller.getScrollBar();
+
+  if (scrollsVertically && !scrollsHorizontally) {
+    preventDefault = verticalScroll.startRatio() > 0 &&
+        verticalScroll.endRatio() < 1;
+  }
+
+  if (scrollsHorizontally && !scrollsVertically) {
+    preventDefault = !bodyScrollLeft || (horizontalScroll.startRatio() > 0 &&
+        horizontalScroll.endRatio() < 1);
+  }
+
+  if (scrollsHorizontally && scrollsVertically) {
+    preventDefault = !bodyScrollLeft || (verticalScroll.startRatio() > 0 &&
+        verticalScroll.endRatio() < 1 &&
+        horizontalScroll.startRatio() > 0 &&
+        horizontalScroll.endRatio() < 1);
+  }
+
+  this.scroll(dx, dy);
+  if (preventDefault) e.preventDefault();
+};
+
+
+/**
+ * 'Needs reapplication' handler.
+ * @param {anychart.SignalEvent} event - Incoming event.
+ * @private
+ */
+anychart.core.ui.BaseGrid.prototype.needsReapplicationHandler_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+/**
+ * Tooltip invalidation handler.
+ * @param {anychart.SignalEvent} event - Event object.
+ * @private
+ */
+anychart.core.ui.BaseGrid.prototype.onTooltipSignal_ = function(event) {
+  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
+  tooltip.redraw();
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Public.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Additional actions on appearance invalidation.
+ */
+anychart.core.ui.BaseGrid.prototype.appearanceInvalidated = goog.nullFunction;
+
+
+/**
+ * Additional actions on bounds invalidation.
+ */
+anychart.core.ui.BaseGrid.prototype.boundsInvalidated = goog.nullFunction;
+
+
+/**
+ * Creates new controller.
+ * @param {boolean=} opt_isResources - Whether controller must work in resources chart mode.
+ * @protected
+ */
+anychart.core.ui.BaseGrid.prototype.createController = function(opt_isResources) {
+  this.controller = new anychart.core.gantt.Controller(opt_isResources);
+  this.registerDisposable(this.controller);
+  this.controller.listenSignals(this.needsReapplicationHandler_, this);
+};
+
+
+/**
+ * This method actually draws a grid by this scheme:
+ * grid.draw() --calls--> controller.run() --calls--> grid.drawInternal();
+ *
+ * NOTE: Inherited classes don't have drawInternal method, but the have an empty
+ * methods to be overridden, included into base grid's drawInternal:
+ * 1) initDom()
+ * 2) boundsInvalidated()
+ * 3) positionInvalidated()
+ * 4) appearanceInvalidated()
+ * 5) specialInvalidated()
+ * 6) positionFinal()
+ *
+ * @param {boolean} positionRecalculated - If the vertical position was really recalculated.
+ * @return {anychart.core.ui.BaseGrid} - Itself for method chaining.
+ */
+anychart.core.ui.BaseGrid.prototype.drawInternal = function(positionRecalculated) {
+  if (positionRecalculated) this.invalidate(anychart.ConsistencyState.GRIDS_POSITION);
+
+  if (!this.checkDrawingNeeded()) return this;
+
+  var container = /** @type {acgraph.vector.ILayer} */(this.container());
+  var stage = container ? container.getStage() : null;
+  var manualSuspend = stage && !stage.isSuspended();
+  if (manualSuspend) stage.suspend();
+
+  var verticalScrollBar, horizontalScrollBar;
+
+  //---------- Creating DOM structure ---------------
+  if (!this.getBase().numChildren()) {
+    this.bgRect_ = this.base_.rect();
+    this.registerDisposable(this.bgRect_);
+    this.bgRect_
+        .fill(this.backgroundFill_)
+        .stroke(null)
+        .zIndex(anychart.core.ui.BaseGrid.BG_RECT_Z_INDEX);
+
+    this.eventsRect_ = this.base_.rect();
+    this.registerDisposable(this.eventsRect_);
+    this.eventsRect_
+        .fill('#fff 0.00001')
+        .stroke(null)
+        .zIndex(anychart.core.ui.BaseGrid.EVENTS_RECT_Z_INDEX);
+
+    this.base_
+        .addChild(/** @type {!acgraph.vector.Layer} */ (this.getCellsLayer()))
+        .addChild(/** @type {!acgraph.vector.Layer} */ (this.getDrawLayer()))
+        .addChild(/** @type {!acgraph.vector.Layer} */ (this.getContentLayer()))
+        .addChild(/** @type {!acgraph.vector.Layer} */ (this.getEditLayer()))
+        .addChild(/** @type {!acgraph.vector.Layer} */ (this.getClipLayer()))
+        .addChild(/** @type {!acgraph.vector.Layer} */ (this.getScrollsLayer()));
+
+    if (this.isStandalone) {
+      /*
+        NOTE: For standalone mode only!
+              Not standalone scrolls are controlled by chart.
+       */
+      verticalScrollBar = this.controller.getScrollBar();
+      verticalScrollBar
+          .container(this.getScrollsLayer())
+          .listenSignals(function(event) {
+            if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) verticalScrollBar.draw();
+          }, verticalScrollBar);
+      this.registerDisposable(verticalScrollBar);
+    }
+
+    horizontalScrollBar = this.getHorizontalScrollBar();
+    horizontalScrollBar
+        .container(this.getScrollsLayer())
+        .listenSignals(function(event) {
+          if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) horizontalScrollBar.draw();
+        }, horizontalScrollBar);
+    this.registerDisposable(horizontalScrollBar);
+
+    this.base_.listenOnce(acgraph.events.EventType.MOUSEDOWN, this.dragMouseDown_, false, this);
+
+    this.initDom();
+  }
+
+
+  //---------- Consistency ---------------
+  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
+    this.base_.parent(container);
+    this.markConsistent(anychart.ConsistencyState.CONTAINER);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    this.pixelBoundsCache = /** @type {acgraph.math.Rect} */ (this.getPixelBounds());
+    this.base_.clip(/** @type {acgraph.math.Rect} */ (this.pixelBoundsCache));
+    this.bgRect_.setBounds(/** @type {acgraph.math.Rect} */ (this.pixelBoundsCache));
+    this.eventsRect_.setBounds(/** @type {acgraph.math.Rect} */ (this.pixelBoundsCache));
+    this.totalGridsWidth = this.pixelBoundsCache.width;
+
+    if (this.isStandalone) {
+      /*
+        NOTE: For standalone mode only!
+              Not standalone scrolls are controlled by chart.
+       */
+      verticalScrollBar = this.controller.getScrollBar();
+
+      verticalScrollBar.bounds(
+          (this.pixelBoundsCache.left + this.pixelBoundsCache.width - anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 1),
+          (this.pixelBoundsCache.top + this.headerHeight() + anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE + 1),
+          anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE,
+          (this.pixelBoundsCache.height - this.headerHeight() - 2 * anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 2)
+      );
+    }
+
+    horizontalScrollBar = this.getHorizontalScrollBar();
+    horizontalScrollBar.bounds(
+        (this.pixelBoundsCache.left + anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE),
+        (this.pixelBoundsCache.top + this.pixelBoundsCache.height - anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 1),
+        (this.pixelBoundsCache.width - 2 * anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE),
+        anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE
+    );
+
+    this.redrawPosition = true;
+
+    this.boundsInvalidated();
+
+    this.markConsistent(anychart.ConsistencyState.BOUNDS);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.GRIDS_POSITION)) {
+    this.tooltip().hide();
+    this.redrawPosition = true;
+    this.positionInvalidated();
+    this.markConsistent(anychart.ConsistencyState.GRIDS_POSITION);
+  }
+
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
+    this.bgRect_.fill(this.backgroundFill_);
+    this.getOddPath().fill(this.rowOddFill_ || this.rowFill_);
+    this.getEvenPath().fill(this.rowEvenFill_ || this.rowFill_);
+    this.getSelectedPath().fill(this.rowSelectedFill_);
+    this.getRowStrokePath().stroke(this.rowStroke_);
+
+    this.appearanceInvalidated();
+
+    this.markConsistent(anychart.ConsistencyState.APPEARANCE);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.BASE_GRID_HOVER)) {
+    if (this.hoveredIndex >= 0 &&
+        goog.isDef(this.hoverStartY_) &&
+        goog.isDef(this.hoverEndY_) &&
+        goog.isDef(this.hoveredIndex)) {
+      this.getHoverPath()
+          .clear()
+          .fill(this.hoverFill_)
+          .moveTo(this.pixelBoundsCache.left, this.hoverStartY_)
+          .lineTo(this.pixelBoundsCache.left + this.pixelBoundsCache.width, this.hoverStartY_)
+          .lineTo(this.pixelBoundsCache.left + this.pixelBoundsCache.width, this.hoverEndY_)
+          .lineTo(this.pixelBoundsCache.left, this.hoverEndY_)
+          .close();
+    } else {
+      this.getHoverPath().clear();
+    }
+    this.markConsistent(anychart.ConsistencyState.BASE_GRID_HOVER);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
+    this.getBase().zIndex(/** @type {number} */ (this.zIndex()));
+    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.BASE_GRID_CLICK)) {
+    this.redrawPosition = true;
+    this.markConsistent(anychart.ConsistencyState.BASE_GRID_CLICK);
+  }
+
+  this.specialInvalidated();
+
+  if (this.redrawPosition) {
+    this.drawRowFills_();
+    this.positionFinal();
+    this.redrawPosition = false;
+  }
+  if (manualSuspend) stage.resume();
+  if (this.isStandalone) {
+    this.initMouseFeatures();
+    this.initKeysFeatures();
+  }
+
+  return this;
+};
+
+
+/**
+ * Additional actions while DOM initialization.
+ */
+anychart.core.ui.BaseGrid.prototype.initDom = goog.nullFunction;
+
+
+/**
+ * Generates horizontal scroll bar.
+ * @return {anychart.core.ui.ScrollBar} - Scroll bar.
+ */
+anychart.core.ui.BaseGrid.prototype.getHorizontalScrollBar = goog.abstractMethod;
+
+
+/** @inheritDoc */
+anychart.core.ui.BaseGrid.prototype.highlight = function(opt_index, opt_startY, opt_endY) {
+  var definedValues = goog.isDef(opt_index) && goog.isDef(opt_startY) && goog.isDef(opt_endY);
+  if (definedValues) {
+    if (this.hoverStartY_ != opt_startY || this.hoverEndY_ != opt_endY) {
+      this.hoveredIndex = opt_index;
+      this.hoverStartY_ = opt_startY;
+      this.hoverEndY_ = opt_endY;
+      this.invalidate(anychart.ConsistencyState.BASE_GRID_HOVER, anychart.Signal.NEEDS_REDRAW);
+    }
+  } else {
+    if (this.hoveredIndex >= 0) {
+      this.hoveredIndex = -1;
+      this.hoverStartY_ = NaN;
+      this.hoverEndY_ = NaN;
+      this.invalidate(anychart.ConsistencyState.BASE_GRID_HOVER, anychart.Signal.NEEDS_REDRAW);
+    }
+  }
+};
+
+
+/**
+ * Initializes mouse wheel scrolling and mouse drag scrolling.
+ * TODO (A.Kudryavtsev): In current implementation (04 Dec 2014) mouse drag scrolling is not available.
+ */
+anychart.core.ui.BaseGrid.prototype.initMouseFeatures = function() {
+  if (!this.mwh_) {
+    var element = this.getBase().domElement();
+    var ths = this;
+
+    if (element) {
+      this.mwh_ = new goog.events.MouseWheelHandler(element);
+      var mouseWheelEvent = goog.events.MouseWheelHandler.EventType.MOUSEWHEEL;
+      goog.events.listen(this.mwh_, mouseWheelEvent, this.mouseWheelHandler_, false, this);
+
+      goog.events.listen(window, 'unload', function(e) {
+        goog.events.unlisten(ths.mwh_, mouseWheelEvent, ths.mouseWheelHandler_, false, this);
+      });
+    }
+
+
+    goog.events.listen(document, goog.events.EventType.MOUSEMOVE, function(e) {
+      var containerPosition = goog.style.getClientPosition(/** @type {Element} */(ths.container().getStage().container()));
+      var top = ths.pixelBoundsCache.top + containerPosition.y + ths.headerHeight_;
+      var bottom = containerPosition.y + ths.pixelBoundsCache.height;
+      var left = containerPosition.x + ths.pixelBoundsCache.left;
+      var right = left + ths.pixelBoundsCache.width;
+
+      var mouseX = e['clientX'];
+      var mouseY = e['clientY'];
+
+      ths.scrollOffsetX = 0;
+      ths.scrollOffsetY = 0;
+      if (mouseX < left || mouseX > right) ths.scrollOffsetX = mouseX - left;
+      if (mouseY < top || mouseY > bottom) ths.scrollOffsetY = mouseY - top;
+
+      if (ths.dragging && !ths.scrollInterval) {
+        ths.scrollInterval = setInterval(function() {
+          ths.mouseOutMove(e);
+        }, anychart.core.ui.BaseGrid.TIMER_STEP);
+      }
+    });
+  }
+};
+
+
+/**
+ * Initializes keys listening.
+ */
+anychart.core.ui.BaseGrid.prototype.initKeysFeatures = function() {
+  if (!this.interactivityHandler.altKeyHandler) {
+    this.interactivityHandler.altKeyHandler = new anychart.core.ui.BaseGrid.KeyHandler(this.interactivityHandler, document);
+    this.registerDisposable(this.interactivityHandler.altKeyHandler);
+
+    acgraph.events.listen(this.interactivityHandler.altKeyHandler, 'key', function(e) {
+      if (e.keyCode == 18) {
+        this.altKey = true;
+      }
+    }, false, this.interactivityHandler);
+  }
+};
+
+
+/**
+ * Additional actions on position invalidation.
+ */
+anychart.core.ui.BaseGrid.prototype.positionInvalidated = goog.nullFunction;
+
+
+/**
+ * Additional actions on position. Differs from positionInvalidated:
+ * this method is called at the very last when this.redrawPosition is set to true.
+ */
+anychart.core.ui.BaseGrid.prototype.positionFinal = goog.nullFunction;
+
+
+/**
+ * @inheritDoc
+ */
+anychart.core.ui.BaseGrid.prototype.remove = function() {
+  if (this.base_) this.base_.parent(null);
+};
+
+
+/**
+ * Gets/sets row stroke.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
+ * @param {number=} opt_thickness .
+ * @param {string=} opt_dashpattern .
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
+ * @return {(string|acgraph.vector.Stroke|anychart.core.ui.BaseGrid)} - Current value or itself for method chaining.
+ */
+anychart.core.ui.BaseGrid.prototype.rowStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
+    var newThickness = anychart.utils.extractThickness(val);
+
+    //TODO (A.Kudryavtsev): In current moment (15 June 2015) method anychart.color.equals works pretty bad.
+    //TODO (A.Kudryavtsev): That's why here I check thickness as well.
+    if (!anychart.color.equals(this.rowStroke_, val) || newThickness != this.rowStrokeThickness) {
+      this.rowStroke_ = val;
+      this.rowStrokeThickness = newThickness;
+      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+
+    return this;
+  }
+  return this.rowStroke_ || 'none';
+};
+
+
+/**
+ * Performs scrolling.
+ * @param {number} horizontalPixelOffset - Horizontal pixel offset.
+ * @param {number} verticalPixelOffset - Vertical pixel offset.
+ */
+anychart.core.ui.BaseGrid.prototype.scroll = goog.abstractMethod;
+
+
+/**
+ * Method to select row from outside.
+ * @param {anychart.data.Tree.DataItem} item - New selected data item.
+ * @return {boolean} - Whether has been selected.
+ */
+anychart.core.ui.BaseGrid.prototype.selectRow = function(item) {
+  if (item && item != this.selectedItem) {
+    item.tree().suspendSignalsDispatching();
+    item.meta('selected', true);
+    if (this.selectedItem) this.selectedItem.meta('selected', false); //selectedItem has the same tree as item.
+    this.selectedItem = item;
+    item.tree().resumeSignalsDispatching(false);
+    this.invalidate(anychart.ConsistencyState.BASE_GRID_CLICK, anychart.Signal.NEEDS_REDRAW);
+    return true;
+  }
+  return false;
+};
+
+
+/**
+ * Special invalidation. Used by child classes to preform own invalidation.
+ */
+anychart.core.ui.BaseGrid.prototype.specialInvalidated = goog.nullFunction;
+
+
+/**
+ * Unselects currently selected item.
+ */
+anychart.core.ui.BaseGrid.prototype.unselect = function() {
+  if (this.selectedItem && this.controller.data()) {
+    this.controller.data().suspendSignalsDispatching();
+    this.selectedItem.meta('selected', false);
+    this.selectedItem = null;
+    this.controller.data().resumeSignalsDispatching(false);
+    this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Exported (without Decoration).
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Sets new data.
+ * @param {anychart.data.Tree=} opt_value - New data tree.
+ * @return {?(anychart.core.ui.BaseGrid|anychart.data.Tree)} - Current data tree or itself for method chaining.
+ */
+anychart.core.ui.BaseGrid.prototype.data = function(opt_value) {
+  var data = /** @type {?anychart.data.Tree} */ (this.controller.data());
+  if (goog.isDef(opt_value)) {
+    if ((opt_value != data) && (opt_value instanceof anychart.data.Tree)) {
+      this.controller.data(opt_value); //This will invalidate position.
+    }
+    return this;
+  }
+  return data;
+};
+
+
+/**
+ * Draws grid.
+ * @return {anychart.core.ui.BaseGrid}
+ */
+anychart.core.ui.BaseGrid.prototype.draw = function() {
+  if (!this.pixelBoundsCache || this.pixelBoundsCache.height || !this.pixelBoundsCache.height)
+    this.pixelBoundsCache = /** @type {acgraph.math.Rect} */ (this.getPixelBounds());
+  this.controller
+      .availableHeight(this.pixelBoundsCache.height - this.headerHeight_ - 1)
+      .rowStrokeThickness(this.rowStrokeThickness)
+      .run();
+  return this;
+};
+
+
+/**
+ * Gets/sets end index.
+ * @param {number=} opt_value - Value to be set.
+ * @return {(anychart.core.ui.BaseGrid|number)} - Current value or itself for method chaining.
+ */
+anychart.core.ui.BaseGrid.prototype.endIndex = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.controller.endIndex(opt_value);
+    return this;
+  }
+  return /** @type {number} */ (this.controller.endIndex());
+};
+
+
+/**
+ * Getter for the set of visible (not collapsed) data items.
+ * @return {Array.<anychart.data.Tree.DataItem>}
+ */
+anychart.core.ui.BaseGrid.prototype.getVisibleItems = function() {
+  return this.controller.getVisibleItems();
+};
+
+
+/**
+ * Gets/sets start index.
+ * @param {number=} opt_value - Value to be set.
+ * @return {(anychart.core.ui.BaseGrid|number)} - Current value or itself for method chaining.
+ */
+anychart.core.ui.BaseGrid.prototype.startIndex = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.controller.startIndex(opt_value);
+    return this;
+  }
+  return /** @type {number} */ (this.controller.startIndex());
+};
+
+
+/**
+ * Gets/sets header height.
+ * @param {number=} opt_value - Value to be set.
+ * @return {(number|anychart.core.ui.BaseGrid)} - Current value or itself for method chaining.
+ */
+anychart.core.ui.BaseGrid.prototype.headerHeight = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.headerHeight_ != opt_value) {
+      this.headerHeight_ = opt_value;
+      if (!this.pixelBoundsCache) this.pixelBoundsCache = /** @type {acgraph.math.Rect} */ (this.getPixelBounds());
+
+      if (this.isStandalone) {
+        this.controller
+            .suspendSignalsDispatching()
+            .availableHeight(this.pixelBoundsCache.height - opt_value - 1)
+            .resumeSignalsDispatching(false);
+      }
+
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.headerHeight_;
+};
+
+
+/**
+ * Gets/sets header height.
+ * @param {number=} opt_value - Value to be set.
+ * @deprecated - Use headerHeight instead.
+ * @return {(number|anychart.core.ui.BaseGrid)} - Current value or itself for method chaining.
+ */
+anychart.core.ui.BaseGrid.prototype.titleHeight = anychart.core.ui.BaseGrid.prototype.headerHeight;
+
+
+/**
+ * Getter for tooltip settings.
+ * @param {(Object|boolean|null)=} opt_value - Tooltip settings.
+ * @return {!(anychart.core.ui.BaseGrid|anychart.core.ui.Tooltip)} - Tooltip instance or self for method chaining.
+ */
+anychart.core.ui.BaseGrid.prototype.tooltip = function(opt_value) {
+  if (!this.tooltip_) {
+    this.tooltip_ = new anychart.core.ui.Tooltip();
+    this.registerDisposable(this.tooltip_);
+    this.tooltip_.listenSignals(this.onTooltipSignal_, this);
+  }
+  if (goog.isDef(opt_value)) {
+    this.tooltip_.setup(opt_value);
+    return this;
+  } else {
+    return this.tooltip_;
+  }
+};
+
+
+/**
+ * Gets/sets vertical offset.
+ * @param {number=} opt_value - Value to be set.
+ * @return {(anychart.core.ui.BaseGrid|number)} - Current value or itself for method chaining.
+ */
+anychart.core.ui.BaseGrid.prototype.verticalOffset = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.controller.verticalOffset(opt_value);
+    return this;
+  }
+  return /** @type {number} */ (this.controller.verticalOffset());
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.BaseGrid.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+
+  json['isStandalone'] = this.isStandalone;
+
+  /*
+    Note: not standalone grid is controlled by some higher entity (e.g. gantt chart).
+    It means that controller must be serialized and restored by this entity, but not by base grid.
+   */
+  if (this.isStandalone) json['controller'] = this.controller.serialize();
+
+  json['backgroundFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.backgroundFill_));
+  json['rowStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.rowStroke_));
+  json['headerHeight'] = this.headerHeight_;
+  json['rowOddFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.rowOddFill_));
+  json['rowEvenFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.rowEvenFill_));
+  json['rowFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.rowFill_));
+  json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.hoverFill_));
+  json['rowSelectedFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.rowSelectedFill_));
+  json['editing'] = this.editable;
+  json['tooltip'] = this.tooltip().serialize();
+
+  return json;
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.BaseGrid.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+
+  this.isStandalone = ('isStandalone' in config) ? config['isStandalone'] : ('controller' in config);
+
+  if (this.isStandalone && 'controller' in config) {
+    this.createController();
+    this.controller.setup(config['controller']);
+  }
+
+  this.backgroundFill(config['backgroundFill']);
+  this.rowStroke(config['rowStroke']);
+  this.rowFill(config['rowFill']);
+  this.rowOddFill(config['rowOddFill']);
+  this.rowEvenFill(config['rowEvenFill']);
+  this.rowHoverFill(config['hoverFill']);
+  this.rowSelectedFill(config['rowSelectedFill']);
+  this.tooltip(config['tooltip']);
+  this.headerHeight(config['headerHeight']);
+  this.editing(config['editing']);
+};
+
+
+
+/**
+ * Dragger.
+ * @param {acgraph.vector.Element} target - Target element.
+ * @param {anychart.core.ui.BaseGrid} grid - Current grid to be scrolled.
+ * @constructor
+ * @extends {goog.fx.Dragger}
+ */
+anychart.core.ui.BaseGrid.Dragger = function(target, grid) {
+  goog.base(this, target.domElement());
+
+  this.grid = grid;
+
+  /**
+   * X.
+   * @type {number}
+   */
+  this.x = 0;
+
+  /**
+   * Y.
+   * @type {number}
+   */
+  this.y = 0;
+};
+goog.inherits(anychart.core.ui.BaseGrid.Dragger, goog.fx.Dragger);
+
+
+/**
+ * @override
+ */
+anychart.core.ui.BaseGrid.Dragger.prototype.computeInitialPosition = function() {
+  //TODO (A.Kudryavtsev): We don't actually need to override it right here, but
+  //TODO (A.Kudryavtsev): default method dies in IE.
+  this.deltaX = 0;
+  this.deltaY = 0;
+};
+
+
+/**
+ * @override
+ */
+anychart.core.ui.BaseGrid.Dragger.prototype.defaultAction = function(x, y) {
+  if (this.grid.interactivityHandler.altKey) {
+    var dX = this.x - x;
+    var dY = this.y - y;
+
+    this.x = x;
+    this.y = y;
+
+    this.grid.scroll(dX, dY);
+  }
+};
+
+
+/**
+ * Resets dragger.
+ */
+anychart.core.ui.BaseGrid.Dragger.prototype.reset = function() {
+  this.x = 0;
+  this.y = 0;
+};
+
+
+
+/**
+ * Key handler.
+ * @param {anychart.core.ui.IInteractiveGrid} grid - Base grid itself.
+ * @param {Element|Document=} opt_element - The element or document to listen on.
+ * @param {boolean=} opt_capture - Whether to listen for browser events in
+ *     capture phase (defaults to false).
+ * @constructor
+ * @extends {goog.events.KeyHandler}
+ * @suppress {accessControls} - TODO Add another mechanism (fix this inheritance).
+ */
+anychart.core.ui.BaseGrid.KeyHandler = function(grid, opt_element, opt_capture) {
+  goog.base(this, opt_element, opt_capture);
+
+  /**
+   * @type {anychart.core.ui.IInteractiveGrid}
+   */
+  this.grid = grid;
+};
+goog.inherits(anychart.core.ui.BaseGrid.KeyHandler, goog.events.KeyHandler);
+
+
+/** @inheritDoc */
+anychart.core.ui.BaseGrid.KeyHandler.prototype.resetState = function() {
+  goog.base(this, 'resetState');
+  this.grid.altKey = false;
+};
+
+
+
+/**
+ * Actually is a path to be drawn on drawLayer.
+ * Used to draw some elements as Timeline's bars with additional data.
+ * @constructor
+ * @extends {acgraph.vector.Path}
+ */
+anychart.core.ui.BaseGrid.Element = function() {
+  goog.base(this);
+};
+goog.inherits(anychart.core.ui.BaseGrid.Element, acgraph.vector.Path);
+
+
+/**
+ * Type of element. In current implementation (21 Jul 2015) can be one of timeline's bars type.
+ * @type {anychart.enums.TLElementTypes}
+ */
+anychart.core.ui.BaseGrid.Element.prototype.type;
+
+
+/**
+ * Current bounds cache. Used to avoid unnecessary bounds calculation.
+ * @type {?anychart.math.Rect}
+ */
+anychart.core.ui.BaseGrid.Element.prototype.currBounds = null;
+

@@ -15,6 +15,13 @@ goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.scales');
 
 
+/**
+ * Namespace anychart.gauges
+ * @namespace
+ * @name anychart.gauges
+ */
+
+
 
 /**
  * Circular gauge class.<br/>

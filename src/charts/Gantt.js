@@ -1,10 +1,10 @@
 goog.provide('anychart.charts.Gantt');
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.gantt.Controller');
-goog.require('anychart.core.gantt.Timeline');
 goog.require('anychart.core.ui.DataGrid');
 goog.require('anychart.core.ui.ScrollBar');
 goog.require('anychart.core.ui.Splitter');
+goog.require('anychart.core.ui.Timeline');
 goog.require('anychart.core.utils.InteractivityState');
 goog.require('goog.i18n.DateTimeFormat');
 
@@ -18,6 +18,7 @@ goog.require('goog.i18n.DateTimeFormat');
  * @param {boolean=} opt_isResourcesChart - Flag if chart should be interpreted as resource chart.
  * @constructor
  * @extends {anychart.core.SeparateChart}
+ * @implements {anychart.core.ui.IInteractiveGrid}
  */
 anychart.charts.Gantt = function(opt_isResourcesChart) {
   goog.base(this);
@@ -64,7 +65,7 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
 
   /**
    * Timeline of gantt chart.
-   * @type {anychart.core.gantt.Timeline}
+   * @type {anychart.core.ui.Timeline}
    * @private
    */
   this.tl_ = null;
@@ -87,7 +88,7 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
 
   /**
    * Default header height.
-   * @type {(number|string)}
+   * @type {number}
    * @private
    */
   this.headerHeight_ = NaN;
@@ -106,6 +107,7 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
    */
   this.rowSelectedFill_;
 
+
   /**
    * Cell border settings.
    * @type {acgraph.vector.Stroke}
@@ -121,6 +123,12 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
   this.rowStroke_;
 
   /**
+   * Whether is editable.
+   * @type {boolean}
+   */
+  this.editable = false;
+
+  /**
    * Vertical scroll bar.
    * @type {anychart.core.ui.ScrollBar}
    * @private
@@ -130,30 +138,13 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
   this.verticalScrollBar_.listenSignals(this.scrollInvalidated_, this.verticalScrollBar_);
   this.registerDisposable(this.verticalScrollBar_);
 
-  /**
-   * Timeline horizontal scroll bar.
-   * @type {anychart.core.ui.ScrollBar}
-   * @private
-   */
-  this.timelineHorizontalScrollBar_ = this.getTimeline().getHorizontalScrollBar();
-  this.timelineHorizontalScrollBar_.zIndex(anychart.charts.Gantt.Z_INDEX_SCROLL);
-  this.timelineHorizontalScrollBar_.listenSignals(this.scrollInvalidated_, this.timelineHorizontalScrollBar_);
-  this.registerDisposable(this.timelineHorizontalScrollBar_);
 
-
-  /**
-   * Data grid horizontal scroll bar.
-   * @type {anychart.core.ui.ScrollBar}
-   * @private
-   */
-  this.dataGridHorizontalScrollBar_ = this.dataGrid().getHorizontalScrollBar();
-  this.dataGridHorizontalScrollBar_.zIndex(anychart.charts.Gantt.Z_INDEX_SCROLL);
-  this.dataGridHorizontalScrollBar_.listenSignals(this.scrollInvalidated_, this.dataGridHorizontalScrollBar_);
-  this.registerDisposable(this.dataGridHorizontalScrollBar_);
 
   this.listenOnce(anychart.enums.EventType.CHART_DRAW, function() {
     this.dataGrid().initMouseFeatures();
     this.getTimeline().initMouseFeatures();
+    this.dataGrid().initKeysFeatures();
+    this.getTimeline().initKeysFeatures();
   }, false, this);
 
   /**
@@ -325,8 +316,8 @@ anychart.charts.Gantt.prototype.data = function(opt_data, opt_fillMethod) {
 
 /**
  * Gets/sets header height.
- * @param {(number|string)=} opt_value - Value to be set.
- * @return {(anychart.charts.Gantt|number|string)} - Current value or itself for method chaining.
+ * @param {number=} opt_value - Value to be set.
+ * @return {(anychart.charts.Gantt|number)} - Current value or itself for method chaining.
  */
 anychart.charts.Gantt.prototype.headerHeight = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -347,11 +338,10 @@ anychart.charts.Gantt.prototype.headerHeight = function(opt_value) {
  */
 anychart.charts.Gantt.prototype.getDataGrid_ = function() {
   if (!this.dg_) {
-    this.dg_ = new anychart.core.ui.DataGrid();
-    this.dg_.controller(this.controller_);
+    this.dg_ = new anychart.core.ui.DataGrid(this.controller_);
     this.dg_.backgroundFill(null);
     this.dg_.zIndex(anychart.charts.Gantt.Z_INDEX_DG_TL);
-    this.dg_.interactivityHandler(this);
+    this.dg_.interactivityHandler = this;
     this.registerDisposable(this.dg_);
     var ths = this;
     this.dg_.listenSignals(function() {
@@ -372,11 +362,10 @@ anychart.charts.Gantt.prototype.getDataGrid_ = function() {
 anychart.charts.Gantt.prototype.dataGrid = function(opt_enabled) {
   if (goog.isDef(opt_enabled)) {
     if (this.getDataGrid_().enabled() != opt_enabled) {
-      anychart.core.Base.suspendSignalsDispatching(this.getDataGrid_(), this.splitter(), this.dataGridHorizontalScrollBar_);
+      anychart.core.Base.suspendSignalsDispatching(this.getDataGrid_(), this.splitter());
       this.getDataGrid_().enabled(opt_enabled);
       this.splitter().enabled(opt_enabled);
-      this.dataGridHorizontalScrollBar_.enabled(opt_enabled);
-      anychart.core.Base.resumeSignalsDispatchingFalse(this.getDataGrid_(), this.splitter(), this.dataGridHorizontalScrollBar_); //We don't need to send any signal.
+      anychart.core.Base.resumeSignalsDispatchingFalse(this.getDataGrid_(), this.splitter()); //We don't need to send any signal.
 
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW); //Invalidate a whole chart.
     }
@@ -388,14 +377,14 @@ anychart.charts.Gantt.prototype.dataGrid = function(opt_enabled) {
 
 /**
  * Getter for timeline.
- * @return {anychart.core.gantt.Timeline} - Chart's timeline.
+ * @return {anychart.core.ui.Timeline} - Chart's timeline.
  */
 anychart.charts.Gantt.prototype.getTimeline = function() {
   if (!this.tl_) {
-    this.tl_ = new anychart.core.gantt.Timeline(this.controller_, this.isResourcesChart_);
+    this.tl_ = new anychart.core.ui.Timeline(this.controller_, this.isResourcesChart_);
     this.tl_.backgroundFill(null);
     this.tl_.zIndex(anychart.charts.Gantt.Z_INDEX_DG_TL);
-    this.tl_.interactivityHandler(this);
+    this.tl_.interactivityHandler = this;
     this.registerDisposable(this.tl_);
     var ths = this;
     this.tl_.listenSignals(function() {
@@ -697,16 +686,14 @@ anychart.charts.Gantt.prototype.splitter = function(opt_value) {
       ths.splitter_.draw();
     }, this.splitter_);
 
-    this.splitter_
+    this.splitter_//TODO (A.Kudryavtsev): Move this settings to theme.
         .suspendSignalsDispatching()
         .layout(anychart.enums.Layout.VERTICAL)
         .position(this.splitterPosition_)
         .dragPreviewFill('#000 0.3')
-        .fill({
-          'keys': ['0 #9ccae3', '0.5 #a9dbf6', '1 #e3f4fc'],
-          'angle': -90,
-          'opacity': .5
-        })
+        .stroke('none')
+        .splitterWidth(2)
+        .fill('#cecece')
         .considerSplitterWidth(true)
         .resumeSignalsDispatching(false);
 
@@ -759,13 +746,19 @@ anychart.charts.Gantt.prototype.rowDblClick = function(event) {
 };
 
 
+/** @inheritDoc */
+anychart.charts.Gantt.prototype.highlight = function(opt_index, opt_startY, opt_endY) {
+  this.dg_.highlight(opt_index, opt_startY, opt_endY);
+  this.tl_.highlight(opt_index, opt_startY, opt_endY);
+};
+
+
 /**
  * Row mouse move interactivity handler.
  * @param {Object} event - Dispatched event object.
  */
 anychart.charts.Gantt.prototype.rowMouseMove = function(event) {
-  this.dg_.highlight(event['hoveredIndex'], event['startY'], event['endY']);
-  this.tl_.highlight(event['hoveredIndex'], event['startY'], event['endY']);
+  this.highlight(event['hoveredIndex'], event['startY'], event['endY']);
 
   var tooltip;
 
@@ -795,8 +788,7 @@ anychart.charts.Gantt.prototype.rowMouseOver = function(event) {
  * @param {Object} event - Dispatched event object.
  */
 anychart.charts.Gantt.prototype.rowMouseOut = function(event) {
-  this.dg_.highlight();
-  this.tl_.highlight();
+  this.highlight();
   this.dg_.tooltip().hide();
   this.tl_.tooltip().hide();
 };
@@ -810,7 +802,7 @@ anychart.charts.Gantt.prototype.rowSelect = function(event) {
   var item = event['item'];
   var period = event['period'];
   var periodId = period ? period[anychart.enums.GanttDataFields.ID] : void 0;
-  if (item && ((!item.meta('selected') && this.dg_.selectRow(item)) | this.tl_.selectRow(item, periodId))) {
+  if (item && ((!item.meta('selected') && this.dg_.selectRow(item)) | this.tl_.selectTimelineRow(item, periodId))) {
     var eventObj = {
       'type': anychart.enums.EventType.ROW_SELECT,
       'item': item
@@ -818,6 +810,15 @@ anychart.charts.Gantt.prototype.rowSelect = function(event) {
     if (goog.isDef(period)) eventObj['period'] = period;
     this.dispatchEvent(eventObj);
   }
+};
+
+
+/**
+ * Row mouse down interactivity handler.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.charts.Gantt.prototype.rowMouseDown = function(event) {
+  event['target'].rowMouseDown(event);
 };
 
 
@@ -831,6 +832,24 @@ anychart.charts.Gantt.prototype.unselect = function() {
 };
 
 
+/** @inheritDoc */
+anychart.charts.Gantt.prototype.rowMouseUp = function(event) {
+  event['target'].rowMouseUp(event);
+};
+
+
+/** @inheritDoc */
+anychart.charts.Gantt.prototype.editing = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.editable = opt_value;
+    this.getDataGrid_().editing(opt_value);
+    this.getTimeline().editing(opt_value);
+    return this;
+  }
+  return this.editable;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Draw.
@@ -841,119 +860,73 @@ anychart.charts.Gantt.prototype.unselect = function() {
  * @param {anychart.math.Rect} bounds - Bounds of gantt chart content area.
  */
 anychart.charts.Gantt.prototype.drawContent = function(bounds) {
+  if (bounds.width) {
 
-  anychart.core.Base.suspendSignalsDispatching(this.dg_, this.tl_, this.splitter_, this.controller_);
+    anychart.core.Base.suspendSignalsDispatching(this.getDataGrid_(), this.getTimeline(), this.splitter_, this.controller_);
 
-  var boundsChanged = false;
-
-  if (!this.splitter().container()) {
-    this.getDataGrid_().container(this.rootElement);
-    this.getTimeline().container(this.rootElement);
-    this.splitter().container(this.rootElement);
-    this.verticalScrollBar_.container(this.rootElement);
-    this.dataGridHorizontalScrollBar_.container(this.rootElement);
-    this.timelineHorizontalScrollBar_.container(this.rootElement);
-  }
-
-  if (!this.controller_.dataGrid()) this.controller_.dataGrid(/** @type {anychart.core.ui.DataGrid} */ (this.getDataGrid_()));
-  if (!this.controller_.timeline()) this.controller_.timeline(/** @type {anychart.core.gantt.Timeline} */ (this.getTimeline()));
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.GANTT_SPLITTER_POSITION)) {
-    var dgWidth = anychart.utils.normalizeSize(this.splitterPosition_, bounds.width);
-    var dgRatio = goog.math.clamp(dgWidth / bounds.width, 0, 1);
-    this.splitter().position(dgRatio);
-    this.markConsistent(anychart.ConsistencyState.GANTT_SPLITTER_POSITION);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    if (this.getDataGrid_().enabled()) {
-      this.splitter().bounds(bounds);
-    } else {
-      this.tl_.bounds().set(bounds);
+    if (!this.splitter().container()) {
+      this.dg_.container(this.rootElement);
+      this.tl_.container(this.rootElement);
+      this.splitter().container(this.rootElement);
+      this.verticalScrollBar_.container(this.rootElement);
     }
 
-    var newAvailableHeight = bounds.height - this.headerHeight_ - 1;
-    if (this.controller_.availableHeight() != newAvailableHeight) {
-      this.controller_.availableHeight(newAvailableHeight);
-      //This will apply changes in title height.
-      this.tl_.invalidate(anychart.ConsistencyState.BOUNDS);
-      this.dg_.invalidate(anychart.ConsistencyState.BOUNDS);
+    if (!this.controller_.dataGrid()) this.controller_.dataGrid(/** @type {anychart.core.ui.DataGrid} */ (this.getDataGrid_()));
+    if (!this.controller_.timeline()) this.controller_.timeline(/** @type {anychart.core.ui.Timeline} */ (this.getTimeline()));
+
+    if (this.hasInvalidationState(anychart.ConsistencyState.GANTT_SPLITTER_POSITION)) {
+      var dgWidth = anychart.utils.normalizeSize(this.splitterPosition_, bounds.width);
+      var dgRatio = goog.math.clamp(dgWidth / bounds.width, 0, 1);
+      this.splitter().position(dgRatio);
+      this.markConsistent(anychart.ConsistencyState.GANTT_SPLITTER_POSITION);
     }
 
-    boundsChanged = true;
-  }
+    if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+      if (this.dg_.enabled()) {
+        this.splitter().bounds(bounds).draw();
+      } else {
+        this.tl_.bounds().set(bounds);
+      }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.GANTT_DATA)) {
-    this.controller_.data(this.data_);
-    this.invalidate(anychart.ConsistencyState.GANTT_POSITION);
-    this.markConsistent(anychart.ConsistencyState.GANTT_DATA);
-  }
+      var newAvailableHeight = bounds.height - this.headerHeight_ - 1;
+      if (this.controller_.availableHeight() != newAvailableHeight) {
+        this.tl_.headerHeight(this.headerHeight_);
+        this.dg_.headerHeight(this.headerHeight_);
+        this.controller_.availableHeight(newAvailableHeight);
+      }
 
-  anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_, this.splitter_, this.controller_);
-  this.controller_.run(); //This must redraw DG and TL.
-  this.splitter().draw();
+      if (this.dg_.enabled()) {
+        var b1 = this.splitter().getLeftBounds();
+        var b2 = this.splitter().getRightBounds();
+        this.dg_.bounds().set(b1);
+        this.tl_.bounds().set(b2);
+      }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.GANTT_POSITION)) {
-    //This consistency state is used to set 'checkDrawingNeeded()' to TRUE. Controller must be run anyway.
-    this.markConsistent(anychart.ConsistencyState.GANTT_POSITION);
-  }
+      var tlBounds = this.tl_.getPixelBounds();
 
-  if (boundsChanged) {
-    if (this.dg_.enabled()) {
-      var b1 = this.splitter().getLeftBounds();
-      var b2 = this.splitter().getRightBounds();
-      this.getDataGrid_().bounds().set(b1);
-      this.getTimeline().bounds().set(b2);
-
-      var dgBounds = this.dg_.getPixelBounds();
-
-      this.dataGridHorizontalScrollBar_.bounds(
-          (dgBounds.left + anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE),
-          (dgBounds.top + dgBounds.height - anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 1),
-          (dgBounds.width - 2 * anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE),
-          anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE
+      this.verticalScrollBar_.bounds(
+          (bounds.left + bounds.width - anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 1),
+          (tlBounds.top + this.headerHeight_ + anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE + 1),
+          anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE,
+          (tlBounds.height - this.headerHeight_ - 2 * anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 2)
       );
     }
 
-    var tlBounds = this.tl_.getPixelBounds();
+    if (this.hasInvalidationState(anychart.ConsistencyState.GANTT_DATA)) {
+      this.controller_.data(this.data_);
+      this.invalidate(anychart.ConsistencyState.GANTT_POSITION);
+      this.markConsistent(anychart.ConsistencyState.GANTT_DATA);
+    }
 
-    this.verticalScrollBar_.bounds(
-        (bounds.left + bounds.width - anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 1),
-        (tlBounds.top + this.headerHeight_ + anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE + 1),
-        anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE,
-        (tlBounds.height - this.headerHeight_ - 2 * anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 2)
-    );
+    anychart.core.Base.resumeSignalsDispatchingTrue(this.dg_, this.tl_, this.splitter_, this.controller_);
+    this.controller_.run(); //This must redraw DG and TL.
+    this.splitter().draw();
 
-    this.timelineHorizontalScrollBar_.bounds(
-        (tlBounds.left + anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE),
-        (tlBounds.top + tlBounds.height - anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 1),
-        (tlBounds.width - 2 * anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE),
-        anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE
-    );
-
-    //This line hides dataGridHorizontalScrollBar_ if is disabled and does nothing otherwise.
-    this.dataGridHorizontalScrollBar_.draw();
+    if (this.hasInvalidationState(anychart.ConsistencyState.GANTT_POSITION)) {
+      //This consistency state is used to set 'checkDrawingNeeded()' to TRUE. Controller must be run anyway.
+      this.markConsistent(anychart.ConsistencyState.GANTT_POSITION);
+    }
   }
-};
-
-
-/** @inheritDoc */
-anychart.charts.Gantt.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
-
-  if ('controller' in config) {
-    config['controller']['isResourceChart'] = this.isResourcesChart_;
-    this.controller_.setup(config['controller']);
-    this.data(/** @type {anychart.data.Tree} */ (this.controller_.data()));
-  }
-
-  this.headerHeight(config['headerHeight']);
-  this.rowHoverFill(config['rowHoverFill']);
-  this.rowSelectedFill(config['rowSelectedFill']);
-  this.splitterPosition(config['splitterPosition']);
-
-  if ('dataGrid' in config) this.dataGrid().setup(config['dataGrid']);
-  if ('timeline' in config) this.getTimeline().setup(config['timeline']);
 
 };
 
@@ -975,6 +948,27 @@ anychart.charts.Gantt.prototype.serialize = function() {
 
   return {'gantt': json};
 };
+
+
+/** @inheritDoc */
+anychart.charts.Gantt.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+
+  if ('controller' in config) this.controller_.setupByJSON(config['controller']);
+
+  this.data(/** @type {anychart.data.Tree} */ (this.controller_.data()));
+
+  this.headerHeight(config['headerHeight']);
+  this.rowHoverFill(config['rowHoverFill']);
+  this.rowSelectedFill(config['rowSelectedFill']);
+  this.splitterPosition(config['splitterPosition']);
+  this.editing(config['editing']);
+
+  if ('dataGrid' in config) this.dataGrid().setupByJSON(config['dataGrid']);
+  if ('timeline' in config) this.getTimeline().setupByJSON(config['timeline']);
+
+};
+
 
 
 //exports
@@ -1001,3 +995,4 @@ anychart.charts.Gantt.prototype['expandTask'] = anychart.charts.Gantt.prototype.
 anychart.charts.Gantt.prototype['collapseTask'] = anychart.charts.Gantt.prototype.collapseTask;
 anychart.charts.Gantt.prototype['splitterPosition'] = anychart.charts.Gantt.prototype.splitterPosition;
 anychart.charts.Gantt.prototype['getType'] = anychart.charts.Gantt.prototype.getType;
+anychart.charts.Gantt.prototype['editing'] = anychart.charts.Gantt.prototype.editing;

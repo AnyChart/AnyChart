@@ -8,6 +8,13 @@ goog.require('anychart.utils');
 goog.require('goog.Disposable');
 
 
+/**
+ * Namespace anychart.core.ui.table
+ * @namespace
+ * @name anychart.core.ui.table
+ */
+
+
 
 /**
  * @interface

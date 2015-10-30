@@ -12,6 +12,13 @@ goog.require('anychart.enums');
 goog.require('anychart.utils');
 
 
+/**
+ * Namespace anychart.core.stock
+ * @namespace
+ * @name anychart.core.stock
+ */
+
+
 
 /**
  * Stock Plot class.

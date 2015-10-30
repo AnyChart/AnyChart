@@ -1,7 +1,7 @@
 var stage;
 var dataGrid;
 
-var ROOTS_COUNT = 5, CHILDREN_COUNT = 3;
+var ROOTS_COUNT = 3, CHILDREN_COUNT = 3;
 
 var labelTextSettingsOverrider = function(label, dataItem) {
   if (!dataItem.getParent()) {
@@ -71,8 +71,7 @@ anychart.onDocumentReady(function() {
   dataGrid
       .data(tree)
       .startIndex(0)
-      .verticalOffset(0)
-      .titleHeight(25);
+      .verticalOffset(0);
 
   var valueColumn = dataGrid.column(10);
   valueColumn.title().text('Value');
@@ -97,10 +96,11 @@ anychart.onDocumentReady(function() {
 
   dataGrid.listen('signal', dataGridRedraw, false, dataGrid);
 
-  //dataGrid.listen(anychart.enums.EventType.ROW_CLICK, function(e) {
-  //  //e.preventDefault();
-  //  console.log('Clicked:', e['item'].get('name'));
-  //});
+  dataGrid.listen(anychart.enums.EventType.ROW_CLICK, function(e) {
+    //e.preventDefault();
+    console.log('Clicked:', e['item'].get('name'));
+    console.log(e);
+  });
   //
   //dataGrid.listen(anychart.enums.EventType.ROW_SELECT, function(e) {
   //  console.log('Selected:', e['item'].get('name'));
