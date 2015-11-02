@@ -332,6 +332,22 @@ anychart.gauges.Circular.prototype.getResetIterator = function() {
 };
 
 
+/** @inheritDoc */
+anychart.gauges.Circular.prototype.makeInteractivityPointEvent = function(type, event, seriesStatus, opt_empty, opt_forbidTooltip) {
+  var res = {
+    'type': (type == 'hovered') ? anychart.enums.EventType.POINTS_HOVER : anychart.enums.EventType.POINTS_SELECT,
+    'seriesStatus': this.createEventSeriesStatus(seriesStatus, opt_empty),
+    'currentPoint': this.makeCurrentPoint(seriesStatus, type, opt_empty),
+    'actualTarget': event['target'],
+    'target': this,
+    'originalEvent': event
+  };
+  if (opt_forbidTooltip)
+    res.forbidTooltip = true;
+  return res;
+};
+
+
 /**
  * Gauge cap.
  * @param {(Object|boolean)=} opt_value .

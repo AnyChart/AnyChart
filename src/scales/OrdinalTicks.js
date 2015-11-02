@@ -192,18 +192,20 @@ anychart.scales.OrdinalTicks.prototype.names = function(opt_values) {
     }
   }
   var names =  /** @type {!Array} */(this.names_ || this.autoNames_);
-  var val2;
   var len = Math.min(names.length, values.length);
   var res = [];
   for (i = 0; i < len; i++) {
-    if (goog.isArray(values[i])) {
-      val = values[i][0];
-      val2 = values[i][1];
+    var left, right;
+    var el = values[i];
+    if (goog.isArray(el)) {
+      left = el[0];
+      right = el[1];
     } else {
-      val = val2 = values[i];
+      left = right = el;
     }
-    var ratio = (this.scale.transform(val, 0) + this.scale.transform(val2, 1)) / 2;
-    if (ratio >= 0 && ratio <= 1)
+    var val1 = this.scale.transform(left, 0);
+    var val2 = this.scale.transform(right, 1);
+    if (!(val1 < 0 && val2 < 0 || val1 > 1 && val2 > 1))
       res.push(names[i]);
   }
   return res;
@@ -231,9 +233,16 @@ anychart.scales.OrdinalTicks.prototype.names = function(opt_values) {
  */
 anychart.scales.OrdinalTicks.prototype.get = function() {
   return goog.array.filter(this.getInternal(), function(el) {
-    var val = this.transform(el, 0);
-    var val1 = this.transform(el, 1);
-    return val >= 0 && val <= 1 || val1 >= 0 && val1 <= 1;
+    var left, right;
+    if (goog.isArray(el)) {
+      left = el[0];
+      right = el[1];
+    } else {
+      left = right = el;
+    }
+    var val = this.transform(left, 0);
+    var val1 = this.transform(right, 1);
+    return !(val < 0 && val1 < 0 || val > 1 && val1 > 1);
   }, this.scale);
 };
 

@@ -489,7 +489,7 @@ anychart.core.axisMarkers.CircularRange.prototype.serialize = function() {
   if (goog.isDef(this.to())) json['to'] = this.to();
   if (goog.isDef(this.startSize())) json['startSize'] = this.startSize();
   if (goog.isDef(this.endSize())) json['endSize'] = this.endSize();
-  if (goog.isDef(this.radius())) json['endSize'] = this.radius();
+  if (goog.isDef(this.radius())) json['radius'] = this.radius();
 
   return json;
 };

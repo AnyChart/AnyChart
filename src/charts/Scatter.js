@@ -1453,8 +1453,7 @@ anychart.charts.Scatter.prototype.line = function(data, opt_csvSettings) {
   return this.createSeriesByType_(
       anychart.enums.ScatterSeriesType.LINE,
       data,
-      opt_csvSettings,
-      anychart.charts.Scatter.ZINDEX_LINE_SERIES
+      opt_csvSettings
   );
 };
 
@@ -1489,17 +1488,12 @@ anychart.charts.Scatter.prototype.marker = function(data, opt_csvSettings) {
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @param {number=} opt_zIndex Optional series zIndex.
  * @private
  * @return {anychart.core.scatter.series.Base}
  */
-anychart.charts.Scatter.prototype.createSeriesByType_ = function(type, data, opt_csvSettings, opt_zIndex) {
-  var ctl;
-  type = ('' + type).toLowerCase();
-  for (var i in anychart.core.scatter.series.Base.SeriesTypesMap) {
-    if (i.toLowerCase() == type)
-      ctl = anychart.core.scatter.series.Base.SeriesTypesMap[i];
-  }
+anychart.charts.Scatter.prototype.createSeriesByType_ = function(type, data, opt_csvSettings) {
+  type = anychart.enums.normalizeScatterSeriesType(type);
+  var ctl = anychart.core.scatter.series.Base.SeriesTypesMap[type];
   var instance;
 
   if (ctl) {
@@ -1512,7 +1506,9 @@ anychart.charts.Scatter.prototype.createSeriesByType_ = function(type, data, opt
     this.series_.push(instance);
     var inc = index * anychart.charts.Scatter.ZINDEX_INCREMENT_MULTIPLIER;
     instance.index(index).id(index);
-    var seriesZIndex = (goog.isDef(opt_zIndex) ? opt_zIndex : anychart.charts.Scatter.ZINDEX_SERIES) + inc;
+    var seriesZIndex = ((type == anychart.enums.ScatterSeriesType.LINE) ?
+            anychart.charts.Scatter.ZINDEX_LINE_SERIES :
+            anychart.charts.Scatter.ZINDEX_SERIES) + inc;
     instance.setAutoZIndex(seriesZIndex);
     instance.labels().setAutoZIndex(seriesZIndex + anychart.charts.Scatter.ZINDEX_INCREMENT_MULTIPLIER / 2);
     instance.clip(true);
@@ -1596,18 +1592,15 @@ anychart.charts.Scatter.prototype.invalidateSeries_ = function() {
  * @return {Array.<anychart.core.scatter.series.Base>} Array of created series.
  */
 anychart.charts.Scatter.prototype.addSeries = function(var_args) {
-  var zIndex;
   var rv = [];
   var type = /** @type {string} */ (this.defaultSeriesType());
-  if (type == anychart.enums.ScatterSeriesType.LINE)
-    zIndex = anychart.charts.Scatter.ZINDEX_LINE_SERIES;
   var count = arguments.length;
   this.suspendSignalsDispatching();
   if (!count)
-    rv.push(this.createSeriesByType_(type, null, undefined, zIndex));
+    rv.push(this.createSeriesByType_(type, null));
   else {
     for (var i = 0; i < count; i++) {
-      rv.push(this.createSeriesByType_(type, arguments[i], undefined, zIndex));
+      rv.push(this.createSeriesByType_(type, arguments[i]));
     }
   }
   this.resumeSignalsDispatching(true);
@@ -1674,13 +1667,15 @@ anychart.charts.Scatter.prototype.removeSeries = function(id) {
 anychart.charts.Scatter.prototype.removeSeriesAt = function(index) {
   var series = this.series_[index];
   if (series) {
-    goog.dispose(series);
+    anychart.globalLock.lock();
     goog.array.splice(this.series_, index, 1);
+    goog.dispose(series);
     this.invalidate(
         anychart.ConsistencyState.SCATTER_SERIES |
         anychart.ConsistencyState.CHART_LEGEND |
         anychart.ConsistencyState.SCATTER_SCALES,
         anychart.Signal.NEEDS_REDRAW);
+    anychart.globalLock.unlock();
   }
   return this;
 };
@@ -1692,13 +1687,16 @@ anychart.charts.Scatter.prototype.removeSeriesAt = function(index) {
  */
 anychart.charts.Scatter.prototype.removeAllSeries = function() {
   if (this.series_.length) {
-    goog.disposeAll(this.series_);
-    this.series_.length = 0;
+    anychart.globalLock.lock();
+    var series = this.series_;
+    this.series_ = [];
+    goog.disposeAll(series);
     this.invalidate(
         anychart.ConsistencyState.SCATTER_SERIES |
         anychart.ConsistencyState.CHART_LEGEND |
         anychart.ConsistencyState.SCATTER_SCALES,
         anychart.Signal.NEEDS_REDRAW);
+    anychart.globalLock.unlock();
   }
   return this;
 };
@@ -2658,12 +2656,10 @@ anychart.charts.Scatter.prototype.setupByJSON = function(config) {
   if (goog.isArray(series)) {
     for (i = 0; i < series.length; i++) {
       json = series[i];
-      var seriesType = (json['seriesType'] || this.defaultSeriesType()).toLowerCase();
+      var seriesType = json['seriesType'] || this.defaultSeriesType();
       var data = json['data'];
       var seriesInst = this.createSeriesByType_(seriesType, data);
       if (seriesInst) {
-        if (seriesType == anychart.enums.ScatterSeriesType.LINE)
-          seriesInst.zIndex(anychart.charts.Scatter.ZINDEX_LINE_SERIES);
         seriesInst.setup(json);
         if (goog.isObject(json)) {
           if ('xScale' in json && json['xScale'] > 1) seriesInst.xScale(scalesInstances[json['xScale']]);

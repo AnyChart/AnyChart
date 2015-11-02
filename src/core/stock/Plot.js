@@ -217,8 +217,7 @@ anychart.core.stock.Plot.prototype.column = function(opt_data, opt_mappingSettin
  * @return {anychart.core.stock.series.Base}
  */
 anychart.core.stock.Plot.prototype.line = function(opt_data, opt_mappingSettings, opt_csvSettings) {
-  return this.createSeriesByType_(anychart.enums.StockSeriesType.LINE, opt_data, opt_mappingSettings, opt_csvSettings,
-      anychart.core.stock.Plot.ZINDEX_LINE_SERIES);
+  return this.createSeriesByType_(anychart.enums.StockSeriesType.LINE, opt_data, opt_mappingSettings, opt_csvSettings);
 };
 
 
@@ -246,18 +245,15 @@ anychart.core.stock.Plot.prototype.ohlc = function(opt_data, opt_mappingSettings
  * @return {Array.<anychart.core.stock.series.Base>} Array of created series.
  */
 anychart.core.stock.Plot.prototype.addSeries = function(var_args) {
-  var zIndex;
   var rv = [];
   var type = /** @type {string} */ (this.defaultSeriesType());
-  if (type == anychart.enums.StockSeriesType.LINE)
-    zIndex = anychart.core.stock.Plot.ZINDEX_LINE_SERIES;
   var count = arguments.length;
   this.suspendSignalsDispatching();
   if (!count)
-    rv.push(this.createSeriesByType_(type, null, undefined, undefined, zIndex));
+    rv.push(this.createSeriesByType_(type, null, undefined, undefined));
   else {
     for (var i = 0; i < count; i++) {
-      rv.push(this.createSeriesByType_(type, arguments[i], undefined, undefined, zIndex));
+      rv.push(this.createSeriesByType_(type, arguments[i], undefined, undefined));
     }
   }
   this.resumeSignalsDispatching(true);
@@ -384,23 +380,16 @@ anychart.core.stock.Plot.prototype.setDefaultSeriesSettings = function(value) {
  *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
  *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
  * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
- * @param {number=} opt_zIndex Optional series zIndex.
  * @private
  * @return {anychart.core.stock.series.Base}
  */
-anychart.core.stock.Plot.prototype.createSeriesByType_ = function(type, opt_data, opt_mappingSettings,
-    opt_csvSettings, opt_zIndex) {
-
-  var ctr;
-  type = ('' + type).toLowerCase();
-  for (var i in anychart.core.stock.series.Base.SeriesTypesMap) {
-    if (i.toLowerCase() == type)
-      ctr = anychart.core.stock.series.Base.SeriesTypesMap[i];
-  }
+anychart.core.stock.Plot.prototype.createSeriesByType_ = function(type, opt_data, opt_mappingSettings, opt_csvSettings) {
+  type = anychart.enums.normalizeStockSeriesType(type);
+  var ctl = anychart.core.stock.series.Base.SeriesTypesMap[type];
   var instance;
 
-  if (ctr) {
-    instance = new ctr(this.chart_, this);
+  if (ctl) {
+    instance = new ctl(this.chart_, this);
     instance.data(opt_data, opt_mappingSettings, opt_csvSettings);
     instance.setParentEventTarget(this);
     var lastSeries = this.series_[this.series_.length - 1];
@@ -408,7 +397,10 @@ anychart.core.stock.Plot.prototype.createSeriesByType_ = function(type, opt_data
     this.series_.push(instance);
     var inc = index * anychart.core.stock.Plot.ZINDEX_INCREMENT_MULTIPLIER;
     instance.index(index).id(index);
-    instance.setAutoZIndex((goog.isDef(opt_zIndex) ? opt_zIndex : anychart.core.stock.Plot.ZINDEX_SERIES) + inc);
+    var seriesZIndex = ((type == anychart.enums.StockSeriesType.LINE) ?
+            anychart.core.stock.Plot.ZINDEX_LINE_SERIES :
+            anychart.core.stock.Plot.ZINDEX_SERIES) + inc;
+    instance.setAutoZIndex(seriesZIndex);
     instance.clip(true);
     //instance.setAutoColor(this.palette().colorAt(this.series_.length - 1));
     instance.setup(this.defaultSeriesSettings_[type]);
@@ -760,8 +752,8 @@ anychart.core.stock.Plot.prototype.draw = function() {
     var rightPadding = 0;
     for (i = 0; i < this.yAxes_.length; i++) {
       axis = this.yAxes_[i];
-      axis.suspendSignalsDispatching();
       if (axis) {
+        axis.suspendSignalsDispatching();
         var width = axis.width();
         if (axis.orientation() == anychart.enums.Orientation.LEFT) {
           axis.parentBounds(/** @type {number} */(bounds.left - width - leftPadding),
@@ -772,8 +764,8 @@ anychart.core.stock.Plot.prototype.draw = function() {
               bounds.top, bounds.width - rightPadding, bounds.height);
           rightPadding += width;
         }
+        axis.resumeSignalsDispatching(false);
       }
-      axis.resumeSignalsDispatching(false);
     }
 
     if (this.xAxis_) {
@@ -1212,25 +1204,30 @@ anychart.core.stock.Plot.prototype.invalidateRedrawable = function(doInvalidateB
   var state = anychart.ConsistencyState.STOCK_SERIES_POINTS;
   if (doInvalidateBounds) state |= anychart.ConsistencyState.BOUNDS;
   for (i = 0; i < this.series_.length; i++) {
-    this.series_[i].invalidate(state);
+    if (this.series_[i])
+      this.series_[i].invalidate(state);
   }
 
   for (i = 0; i < this.yAxes_.length; i++) {
     var axis = this.yAxes_[i];
-    axis.suspendSignalsDispatching();
-    // effectively invalidates all what's needed
-    axis.invalidateParentBounds();
-    axis.resumeSignalsDispatching(false);
+    if (axis) {
+      axis.suspendSignalsDispatching();
+      // effectively invalidates all what's needed
+      axis.invalidateParentBounds();
+      axis.resumeSignalsDispatching(false);
+    }
   }
 
   var grid;
   for (i = 0; i < this.grids_.length; i++) {
     grid = this.grids_[i];
-    grid.invalidate(anychart.ConsistencyState.GRIDS_POSITION);
+    if (grid)
+      grid.invalidate(anychart.ConsistencyState.GRIDS_POSITION);
   }
   for (i = 0; i < this.minorGrids_.length; i++) {
     grid = this.minorGrids_[i];
-    grid.invalidate(anychart.ConsistencyState.GRIDS_POSITION);
+    if (grid)
+      grid.invalidate(anychart.ConsistencyState.GRIDS_POSITION);
   }
 
   state = anychart.ConsistencyState.APPEARANCE;
@@ -1464,10 +1461,6 @@ anychart.core.stock.Plot.prototype.setupByJSON = function(config) {
       var data = json['data'];
       var seriesInst = this.createSeriesByType_(seriesType, data);
       if (seriesInst) {
-        //if (seriesType == anychart.enums.CartesianSeriesType.LINE ||
-        //    seriesType == anychart.enums.CartesianSeriesType.SPLINE ||
-        //    seriesType == anychart.enums.CartesianSeriesType.STEP_LINE.toLowerCase())
-        //  seriesInst.zIndex(anychart.charts.Cartesian.ZINDEX_LINE_SERIES);
         seriesInst.setup(json);
         if (goog.isObject(json)) {
           if ('yScale' in json && json['yScale'] > 1) seriesInst.yScale(scalesInstances[json['yScale']]);

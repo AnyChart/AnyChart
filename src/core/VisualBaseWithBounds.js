@@ -306,6 +306,16 @@ anychart.core.VisualBaseWithBounds.prototype.boundsInvalidated_ = function(event
 };
 
 
+/** @inheritDoc */
+anychart.core.VisualBaseWithBounds.prototype.disposeInternal = function() {
+  goog.dispose(this.bounds_);
+  this.bounds_ = null;
+  this.pixelBounds_ = null;
+
+  goog.base(this, 'disposeInternal');
+};
+
+
 //exports
 anychart.core.VisualBaseWithBounds.prototype['bounds'] = anychart.core.VisualBaseWithBounds.prototype.bounds;//doc|ex
 anychart.core.VisualBaseWithBounds.prototype['top'] = anychart.core.VisualBaseWithBounds.prototype.top;//doc|ex

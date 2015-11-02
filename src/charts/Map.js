@@ -526,11 +526,10 @@ anychart.charts.Map.prototype.bubble = function(data, opt_csvSettings) {
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @param {number=} opt_zIndex Optional series zIndex.
  * @private
  * @return {anychart.core.map.series.Base}
  */
-anychart.charts.Map.prototype.createSeriesByType_ = function(type, data, opt_csvSettings, opt_zIndex) {
+anychart.charts.Map.prototype.createSeriesByType_ = function(type, data, opt_csvSettings) {
   var ctl;
   type = ('' + type).toLowerCase();
   for (var i in anychart.core.map.series.Base.SeriesTypesMap) {
@@ -550,7 +549,7 @@ anychart.charts.Map.prototype.createSeriesByType_ = function(type, data, opt_csv
     var inc = index * anychart.charts.Map.ZINDEX_INCREMENT_MULTIPLIER;
     instance.index(index).id(index);
 
-    instance.setAutoZIndex((goog.isDef(opt_zIndex) ? opt_zIndex : anychart.charts.Map.ZINDEX_SERIES) + inc);
+    instance.setAutoZIndex(anychart.charts.Map.ZINDEX_SERIES + inc);
     instance.labels().setAutoZIndex(anychart.charts.Map.ZINDEX_LABEL + inc + anychart.charts.Map.ZINDEX_INCREMENT_MULTIPLIER / 2);
 
     instance.setAutoGeoIdField(this.geoIdField());
@@ -642,10 +641,10 @@ anychart.charts.Map.prototype.addSeries = function(var_args) {
   var count = arguments.length;
   this.suspendSignalsDispatching();
   if (!count)
-    rv.push(this.createSeriesByType_(type, null, undefined, zIndex));
+    rv.push(this.createSeriesByType_(type, null, undefined));
   else {
     for (var i = 0; i < count; i++) {
-      rv.push(this.createSeriesByType_(type, arguments[i], undefined, zIndex));
+      rv.push(this.createSeriesByType_(type, arguments[i], undefined));
     }
   }
   this.resumeSignalsDispatching(true);
@@ -712,12 +711,14 @@ anychart.charts.Map.prototype.removeSeries = function(id) {
 anychart.charts.Map.prototype.removeSeriesAt = function(index) {
   var series = this.series_[index];
   if (series) {
-    goog.dispose(series);
+    anychart.globalLock.lock();
     goog.array.splice(this.series_, index, 1);
+    goog.dispose(series);
     this.invalidate(
         anychart.ConsistencyState.APPEARANCE |
         anychart.ConsistencyState.CHART_LEGEND,
         anychart.Signal.NEEDS_REDRAW);
+    anychart.globalLock.unlock();
   }
   return this;
 };
@@ -729,12 +730,15 @@ anychart.charts.Map.prototype.removeSeriesAt = function(index) {
  */
 anychart.charts.Map.prototype.removeAllSeries = function() {
   if (this.series_.length) {
-    goog.disposeAll(this.series_);
-    this.series_.length = 0;
+    anychart.globalLock.lock();
+    var series = this.series_;
+    this.series_ = [];
+    goog.disposeAll(series);
     this.invalidate(
         anychart.ConsistencyState.APPEARANCE |
         anychart.ConsistencyState.CHART_LEGEND,
         anychart.Signal.NEEDS_REDRAW);
+    anychart.globalLock.unlock();
   }
   return this;
 };
@@ -1056,6 +1060,9 @@ anychart.charts.Map.prototype.iterateGeometry_ = function(geom, callBack) {
 /** @inheritDoc */
 anychart.charts.Map.prototype.drawContent = function(bounds) {
   var i, series;
+
+  this.calculate();
+
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_COLOR_RANGE)) {
     if (this.colorRange_) {
       var targetSeries;
@@ -1072,8 +1079,6 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
       }
     }
   }
-
-  this.calculate();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     var scale = this.scale();
@@ -1361,8 +1366,10 @@ anychart.charts.Map.prototype.legendItemOver = function(item, event) {
       var tag = anychart.utils.extractTag(event['domTarget']);
       if (tag) {
         if (this.interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
-          tag.series = series;
-          tag.index = points;
+          tag.points = {
+            series: series,
+            points: points
+          };
         } else {
           tag.points = [{
             series: series,

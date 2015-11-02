@@ -46,6 +46,7 @@ anychart.core.ui.ChartScroller.prototype.position = function(opt_value) {
 anychart.core.ui.ChartScroller.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['position'] = this.position();
+  json['inverted'] = this.inverted();
   return json;
 };
 
@@ -54,8 +55,10 @@ anychart.core.ui.ChartScroller.prototype.serialize = function() {
 anychart.core.ui.ChartScroller.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   this.position(config['position']);
+  this.inverted(config['inverted']);
 };
 
 
 //exports
 anychart.core.ui.ChartScroller.prototype['position'] = anychart.core.ui.ChartScroller.prototype.position;
+anychart.core.ui.ChartScroller.prototype['inverted'] = anychart.core.ui.ChartScroller.prototype.inverted;

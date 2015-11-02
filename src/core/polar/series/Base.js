@@ -797,6 +797,7 @@ anychart.core.polar.series.Base.prototype.getEnableChangeSignals = function() {
  */
 anychart.core.polar.series.Base.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
+  json['seriesType'] = this.getType();
   return json;
 };
 

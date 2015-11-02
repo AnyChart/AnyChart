@@ -635,6 +635,7 @@ anychart.core.Chart.prototype.createTooltip = function() {
  * @private
  */
 anychart.core.Chart.prototype.showTooltip_ = function(event) {
+  if (event.forbidTooltip) return;
   // summary
   // Tooltip Mode   | Interactivity mode
   // Single + Single - draw one tooltip.
@@ -1355,9 +1356,10 @@ anychart.core.Chart.prototype.makeCurrentPoint = function(seriesStatus, event, o
  * @param {Object} event Event object.
  * @param {Array.<Object>} seriesStatus Array of series statuses.
  * @param {boolean=} opt_empty .
+ * @param {boolean=} opt_forbidTooltip
  * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
  */
-anychart.core.Chart.prototype.makeInteractivityPointEvent = function(type, event, seriesStatus, opt_empty) {
+anychart.core.Chart.prototype.makeInteractivityPointEvent = function(type, event, seriesStatus, opt_empty, opt_forbidTooltip) {
   var currentPoint = this.makeCurrentPoint(seriesStatus, type, opt_empty);
   var wrappedPoints = [];
   /** @type {anychart.core.SeriesBase} */
@@ -1369,7 +1371,7 @@ anychart.core.Chart.prototype.makeInteractivityPointEvent = function(type, event
       wrappedPoints.push(series.getPoint(status.points[j]));
   }
   series = currentPoint['series'];
-  return {
+  var res = {
     'type': (type == 'hovered') ? anychart.enums.EventType.POINTS_HOVER : anychart.enums.EventType.POINTS_SELECT,
     'seriesStatus': this.createEventSeriesStatus(seriesStatus, opt_empty),
     'currentPoint': currentPoint,
@@ -1379,6 +1381,9 @@ anychart.core.Chart.prototype.makeInteractivityPointEvent = function(type, event
     'point': series.getPoint(currentPoint['index']),
     'points': wrappedPoints
   };
+  if (opt_forbidTooltip)
+    res.forbidTooltip = true;
+  return res;
 };
 
 
@@ -1422,6 +1427,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
 
   var tag = anychart.utils.extractTag(event['domTarget']);
   var index;
+  var forbidTooltip = false;
 
   if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
     var parent = event['target'].getParentEventTarget();
@@ -1437,6 +1443,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
         series = tag.series;
         index = tag.index;
       }
+      forbidTooltip = true;
     }
   } else {
     series = tag && tag.series;
@@ -1463,7 +1470,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
               nearestPointToCursor: {index: index, distance: 0}
             });
 
-          this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, eventSeriesStatus));
+          this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, eventSeriesStatus, false, forbidTooltip));
         }
       }
     }
@@ -1499,7 +1506,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
         }
       }
       if (dispatchEvent) {
-        this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, seriesStatus));
+        this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, seriesStatus, false, forbidTooltip));
         this.prevHoverSeriesStatus = seriesStatus.length ? seriesStatus : null;
       }
     } else {
@@ -1522,6 +1529,7 @@ anychart.core.Chart.prototype.handleMouseOut = function(event) {
   var hoverMode = this.interactivity().hoverMode();
 
   var tag = anychart.utils.extractTag(event['domTarget']);
+  var forbidTooltip = false;
 
   var series, index;
   if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
@@ -1539,6 +1547,7 @@ anychart.core.Chart.prototype.handleMouseOut = function(event) {
         index = tag.index;
       }
     }
+    forbidTooltip = true;
   } else {
     series = tag && tag.series;
     index = goog.isNumber(tag.index) ? tag.index : event['pointIndex'];
@@ -1559,7 +1568,7 @@ anychart.core.Chart.prototype.handleMouseOut = function(event) {
           series: series,
           points: [],
           nearestPointToCursor: {index: index, distance: 0}
-        }]));
+        }], false, forbidTooltip));
       }
     }
   }
@@ -1569,7 +1578,7 @@ anychart.core.Chart.prototype.handleMouseOut = function(event) {
       this.unhover();
       this.doAdditionActionsOnMouseOut();
       if (this.prevHoverSeriesStatus)
-        this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, this.prevHoverSeriesStatus, true));
+        this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, this.prevHoverSeriesStatus, true, forbidTooltip));
       this.prevHoverSeriesStatus = null;
     }
   }

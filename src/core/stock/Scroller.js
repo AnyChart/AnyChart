@@ -177,8 +177,7 @@ anychart.core.stock.Scroller.prototype.column = function(opt_data, opt_mappingSe
  * @return {anychart.core.stock.scrollerSeries.Base}
  */
 anychart.core.stock.Scroller.prototype.line = function(opt_data, opt_mappingSettings, opt_csvSettings) {
-  return this.createSeriesByType_(anychart.enums.StockSeriesType.LINE, opt_data, opt_mappingSettings, opt_csvSettings,
-      anychart.core.stock.Plot.ZINDEX_LINE_SERIES);
+  return this.createSeriesByType_(anychart.enums.StockSeriesType.LINE, opt_data, opt_mappingSettings, opt_csvSettings);
 };
 
 
@@ -209,15 +208,13 @@ anychart.core.stock.Scroller.prototype.addSeries = function(var_args) {
   var zIndex;
   var rv = [];
   var type = /** @type {string} */ (this.defaultSeriesType());
-  if (type == anychart.enums.StockSeriesType.LINE)
-    zIndex = anychart.core.stock.Plot.ZINDEX_LINE_SERIES;
   var count = arguments.length;
   this.suspendSignalsDispatching();
   if (!count)
-    rv.push(this.createSeriesByType_(type, null, undefined, undefined, zIndex));
+    rv.push(this.createSeriesByType_(type, null, undefined, undefined));
   else {
     for (var i = 0; i < count; i++) {
-      rv.push(this.createSeriesByType_(type, arguments[i], undefined, undefined, zIndex));
+      rv.push(this.createSeriesByType_(type, arguments[i], undefined, undefined));
     }
   }
   this.resumeSignalsDispatching(true);
@@ -342,23 +339,17 @@ anychart.core.stock.Scroller.prototype.setDefaultSeriesSettings = function(value
  *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
  *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
  * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
- * @param {number=} opt_zIndex Optional series zIndex.
  * @private
  * @return {anychart.core.stock.scrollerSeries.Base}
  */
 anychart.core.stock.Scroller.prototype.createSeriesByType_ = function(type, opt_data, opt_mappingSettings,
-    opt_csvSettings, opt_zIndex) {
+    opt_csvSettings) {
+  type = anychart.enums.normalizeStockSeriesType(type);
+  var ctl = anychart.core.stock.scrollerSeries.Base.SeriesTypesMap[type];
 
-  var ctr;
-  type = ('' + type).toLowerCase();
-  for (var i in anychart.core.stock.scrollerSeries.Base.SeriesTypesMap) {
-    if (i.toLowerCase() == type)
-      ctr = anychart.core.stock.scrollerSeries.Base.SeriesTypesMap[i];
-  }
   var instance;
-
-  if (ctr) {
-    instance = new ctr(this);
+  if (ctl) {
+    instance = new ctl(this);
     instance.data(opt_data, opt_mappingSettings, opt_csvSettings);
     instance.setParentEventTarget(this);
     var lastSeries = this.series_[this.series_.length - 1];
@@ -366,7 +357,10 @@ anychart.core.stock.Scroller.prototype.createSeriesByType_ = function(type, opt_
     this.series_.push(instance);
     var inc = index * anychart.core.stock.Plot.ZINDEX_INCREMENT_MULTIPLIER;
     instance.id(index).index(index);
-    instance.setAutoZIndex((goog.isDef(opt_zIndex) ? opt_zIndex : anychart.core.stock.Plot.ZINDEX_SERIES) + inc);
+    var seriesZIndex = ((type == anychart.enums.StockSeriesType.LINE) ?
+            anychart.core.stock.Plot.ZINDEX_LINE_SERIES :
+            anychart.core.stock.Plot.ZINDEX_SERIES) + inc;
+    instance.setAutoZIndex(seriesZIndex);
     instance.setup(this.defaultSeriesSettings_[type]);
     instance.listenSignals(this.seriesInvalidated_, this);
     this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_SERIES,

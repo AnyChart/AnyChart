@@ -99,6 +99,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
             <!-- charts.HeatMap elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="color_scale" type="OrdinalColorScale"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="y_zoom" type="core.CartesianXZoom"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="y_scroller" type="core.ChartScroller"/>
             <!-- new Cartesian elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="x_zoom" type="core.CartesianXZoom"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="x_scroller" type="core.ChartScroller"/>
@@ -192,6 +194,10 @@
         <xsd:attribute name="negative_markers" type="simple.MarkerType"/>
         <xsd:attribute name="negative_labels" type="simple.BoolOrNull" default="false"/>
         <xsd:attribute name="markers" type="simple.MarkerType"/>
+        <!-- charts.HeatMap elements -->
+        <xsd:attribute name="color_scale" type="simple.ChartScaleRef"/>
+        <xsd:attribute name="y_zoom" type="simple.NumberOrBoolOrNull"/>
+        <xsd:attribute name="y_scroller" type="simple.BoolOrNull"/>
         <!-- new Cartesian attributes -->
         <xsd:attribute name="x_zoom" type="simple.NumberOrBoolOrNull"/>
         <xsd:attribute name="x_scroller" type="simple.BoolOrNull"/>
@@ -219,10 +225,10 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="cap" type="core.gauge.Cap"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="axes" type="core.axes.Circular_list"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="bars" type="core.gauge.pointers.Bar_list"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.gauge.pointers.Marker_list"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="needles" type="core.gauge.pointers.Needle_list"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="knobs" type="core.gauge.pointers.Knob_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="bar_pointers" type="core.gauge.pointers.Bar_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="marker_pointers" type="core.gauge.pointers.Marker_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="needle_pointers" type="core.gauge.pointers.Needle_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="knob_pointers" type="core.gauge.pointers.Knob_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="ranges" type="core.axisMarkers.CircularRange_list"/>
         </xsd:all>
         <!-- core.Chart attrs -->
@@ -1654,7 +1660,7 @@
 
     <xsd:complexType name="core.gauge.pointers.Bar_list">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-            <xsd:element name="bar" type="core.gauge.pointers.Bar"/>
+            <xsd:element name="pointer" type="core.gauge.pointers.Bar"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -1683,7 +1689,7 @@
 
     <xsd:complexType name="core.gauge.pointers.Knob_list">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-            <xsd:element name="knob" type="core.gauge.pointers.Knob"/>
+            <xsd:element name="pointer" type="core.gauge.pointers.Knob"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -1710,7 +1716,7 @@
 
     <xsd:complexType name="core.gauge.pointers.Marker_list">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-            <xsd:element name="marker" type="core.gauge.pointers.Marker"/>
+            <xsd:element name="pointer" type="core.gauge.pointers.Marker"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -1739,7 +1745,7 @@
 
     <xsd:complexType name="core.gauge.pointers.Needle_list">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-            <xsd:element name="needle" type="core.gauge.pointers.Needle"/>
+            <xsd:element name="pointer" type="core.gauge.pointers.Needle"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -1775,6 +1781,7 @@
         </xsd:all>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
         <xsd:attribute name="orientation" type="enums.Orientation"/>
+        <xsd:attribute name="inverted" type="simple.Bool"/>
         <xsd:attribute name="auto_hide" type="simple.Bool" default="false"/>
         <xsd:attribute name="allow_range_change" type="simple.Bool" default="true"/>
         <xsd:attribute name="fill" type="xsd:string"/>
@@ -2071,8 +2078,10 @@
             <xsd:enumeration value="bullet"/>
             <xsd:enumeration value="cartesian"/>
             <xsd:enumeration value="column"/>
+            <xsd:enumeration value="heatmap"/>
             <xsd:enumeration value="financial"/>
             <xsd:enumeration value="funnel"/>
+            <xsd:enumeration value="heatmap"/>
             <xsd:enumeration value="line"/>
             <xsd:enumeration value="marker"/>
             <xsd:enumeration value="pie"/>

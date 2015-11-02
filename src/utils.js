@@ -343,7 +343,7 @@ anychart.utils.defaultDateFormatter = function(timestamp) {
 /**
  * Gets anchor coordinates by bounds.
  * @param {anychart.math.Rect} bounds Bounds rectangle.
- * @param {anychart.enums.Anchor|string} anchor Anchor.
+ * @param {?(anychart.enums.Anchor|string)} anchor Anchor.
  * @return {{x: number, y: number}} Anchor coordinates as {x:number, y:number}.
  */
 anychart.utils.getCoordinateByAnchor = function(bounds, anchor) {
@@ -551,7 +551,7 @@ anychart.utils.applyPixelShift = function(value, thickness) {
 /**
  * Apply offset to the position depending on an anchor.
  * @param {anychart.math.Coordinate} position Position to be modified.
- * @param {anychart.enums.Anchor} anchor Anchor.
+ * @param {?anychart.enums.Anchor} anchor Anchor.
  * @param {number} offsetX X offset.
  * @param {number} offsetY Y offset.
  * @return {anychart.math.Coordinate} Modified position.
@@ -808,8 +808,12 @@ anychart.utils.xml2json = function(xml) {
           name = anychart.utils.toCamelCase(subNodeName);
           if (names = anychart.utils.getArrayPropName_(name)) {
             var element = subnode[names[1]];
-            if (!goog.isArray(element))
-              element = [element];
+            if (!goog.isArray(element)) {
+              if (goog.isDef(element))
+                element = [element];
+              else
+                element = [];
+            }
             result[names[0]] = element;
           } else if (name in result) {
             if (multiProp[name]) {
@@ -848,7 +852,7 @@ anychart.utils.xml2json = function(xml) {
         }
       }
 
-      return onlyText ? (textValue.length > 0 ? anychart.utils.unescapeString(textValue) : null) : result;
+      return onlyText ? (textValue.length > 0 ? anychart.utils.unescapeString(textValue) : {}) : result;
     case anychart.utils.XmlNodeType_.TEXT_NODE:
       var value = anychart.utils.trim(node.nodeValue);
       return (value == '') ? null : value;
@@ -1023,13 +1027,13 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
     case 'axes':
       return ['axes', 'axis'];
     case 'bars':
-      return ['bars', 'bar'];
+      return ['bar_pointers', 'pointer'];
     case 'markers':
-      return ['markers', 'marker'];
+      return ['marker_pointers', 'pointer'];
     case 'needles':
-      return ['needles', 'needle'];
+      return ['needle_pointers', 'pointer'];
     case 'knobs':
-      return ['knobs', 'knob'];
+      return ['knob_pointers', 'pointer'];
     case 'scales':
       return ['scales', 'scale'];
     case 'explicit':
@@ -1050,6 +1054,8 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
       return ['children', 'data_item'];
     case 'index':
       return ['index', 'key'];
+    case 'outliers':
+      return ['outliers', 'outlier'];
   }
   return null;
 };
@@ -1085,14 +1091,14 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
       return ['yAxes', 'axis'];
     case 'axes':
       return ['axes', 'axis'];
-    case 'bars':
-      return ['bars', 'bar'];
-    case 'markers':
-      return ['markers', 'marker'];
-    case 'needles':
-      return ['needles', 'needle'];
-    case 'knobs':
-      return ['knobs', 'knob'];
+    case 'barPointers':
+      return ['bars', 'pointer'];
+    case 'markerPointers':
+      return ['markers', 'pointer'];
+    case 'needlePointers':
+      return ['needles', 'pointer'];
+    case 'knobPointers':
+      return ['knobs', 'pointer'];
     case 'scales':
       return ['scales', 'scale'];
     case 'explicit':
@@ -1113,6 +1119,8 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
       return ['children', 'dataItem'];
     case 'index':
       return ['index', 'key'];
+    case 'outliers':
+      return ['outliers', 'outlier'];
   }
   return null;
 };

@@ -242,6 +242,7 @@ anychart.core.stock.Controller.prototype.deregisterSource = function(selectable)
         break;
       }
     }
+    this.tables_ = newTables;
     this.mainRegistry_.setDirty();
     for (var hash in this.registryMap_) {
       this.registryMap_[hash].setDirty();

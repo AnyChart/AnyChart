@@ -291,7 +291,18 @@ anychart.scales.StockScatterDateTime.prototype.alignByIndex = function(key) {
 anychart.scales.StockScatterDateTime.prototype.calculate = function() {
   if (this.consistent) return;
 
+  this.ensureTicksIteratorCreated();
+
   var range = Math.abs(this.maxKey - this.minKey) / 6;
+  if (isNaN(range)) {
+    this.ticksIterator.setup(
+        NaN,
+        NaN,
+        anychart.utils.getIntervalFromInfo(anychart.enums.Interval.YEAR, 1),
+        anychart.utils.getIntervalFromInfo(anychart.enums.Interval.YEAR, 1),
+        NaN);
+  }
+
   var len = this.RANGES.length;
   var minorInterval, majorInterval;
   for (var i = 0; i < len; i++) {
@@ -309,7 +320,6 @@ anychart.scales.StockScatterDateTime.prototype.calculate = function() {
     minorInterval = [anychart.enums.Interval.YEAR, count / 2];
   }
 
-  this.ensureTicksIteratorCreated();
   this.ticksIterator.setup(
       this.minKey,
       this.maxKey,
@@ -386,8 +396,13 @@ anychart.scales.StockScatterDateTime.prototype.setAutoFullRange = function(minKe
  */
 anychart.scales.StockScatterDateTime.prototype.setCurrentRange = function(minKey, maxKey, minIndex, maxIndex, unit,
     count) {
-  this.minKey = minKey;
-  this.maxKey = maxKey;
+  if (isNaN(minIndex) || isNaN(maxIndex)) {
+    this.minKey = NaN;
+    this.maxKey = NaN;
+  } else {
+    this.minKey = minKey;
+    this.maxKey = maxKey;
+  }
   this.minIndex = minIndex;
   this.maxIndex = maxIndex;
   this.unit = unit;

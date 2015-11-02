@@ -4,7 +4,6 @@ anychart.onDocumentReady(function() {
   dataSet = anychart.data.set([45,0.75,42]);
 
   gauge = anychart.circularGauge();
-  gauge.container('container').draw();
 
   gauge.data(dataSet)
       .padding('4%')
@@ -12,6 +11,7 @@ anychart.onDocumentReady(function() {
       .startAngle(270)
       .sweepAngle(360)
       .stroke('#A9A9A9');
+
   gauge.background()
       .enabled(true)
       .fill({
@@ -29,11 +29,15 @@ anychart.onDocumentReady(function() {
       .fill('rgb(117, 183, 225)')
       .radius(95)
       .width(4)
+      .startAngle(100)
+      .sweepAngle(160);
+
+  axis1.labels().autoRotate(true);
+
+  axis1.scale()
       .minimum(0)
       .maximum(100)
-      .startAngle(100)
-      .sweepAngle(160)
-      .ticksInterval(20);
+      .ticks().interval(20);
 
   axis1.ticks()
       .fill('rgb(73, 73, 73)')
@@ -49,59 +53,63 @@ anychart.onDocumentReady(function() {
       .position('i')
       .fontColor('black');
 
-  var axis2 = gauge.axis(1)
-      .width(4)
-      .radius(93)
-      .minimum(0)
-      .maximum(1)
-      .startAngle(280)
-      .sweepAngle(160)
-      .inverted(true)
-      .fill('#70DD71')
-      .ticksInterval(.2);
-
-  axis2.ticks()
-      .fill('rgb(73, 73, 73)')
-      .type('line');
-
-  axis2.minorTicks()
-      .enabled(true)
-      .fill('rgb(73, 73, 73)')
-      .type('line')
-      .length(2);
-
-  axis2.labels()
-      .textFormatter(function() {
-        return parseInt(this['tickValue']) == this['tickValue'] ? this['tickValue'] + '.0' : this['tickValue'];
-      })
-      .position('i')
-      .fontColor('black');
-
-  var axis3 = gauge.axis(2)
-      .width('0.1%')
-      .radius(70)
-      .minimum(0)
-      .maximum(60)
-      .startAngle(105)
-      .sweepAngle(330)
-      .inverted(true)
-      .fill('#494949')
-      .ticksInterval(5);
-
-  axis3.ticks()
-      .fill('#494949')
-      .type('circle')
-      .length(4);
-
-  axis3.minorTicks()
-      .enabled(true)
-      .fill('#494949')
-      .type('circle')
-      .length(2);
-
-  axis3.labels()
-      .position('i')
-      .fontColor('black');
+  //var axis2 = gauge.axis(1)
+  //    .width(4)
+  //    .radius(93)
+  //    .startAngle(280)
+  //    .sweepAngle(160)
+  //    .fill('#70DD71');
+  //
+  //axis2.scale()
+  //    .inverted(true)
+  //    .minimum(0)
+  //    .maximum(1)
+  //    .ticks().interval(.1);
+  //
+  //axis2.ticks()
+  //    .fill('rgb(73, 73, 73)')
+  //    .type('line');
+  //
+  //axis2.minorTicks()
+  //    .enabled(true)
+  //    .fill('rgb(73, 73, 73)')
+  //    .type('line')
+  //    .length(2);
+  //
+  //axis2.labels()
+  //    .textFormatter(function() {
+  //      return parseInt(this['tickValue']) == this['tickValue'] ? this['tickValue'] + '.0' : this['tickValue'];
+  //    })
+  //    .position('i')
+  //    .fontColor('black');
+  //
+  //var axis3 = gauge.axis(2)
+  //    .width('0.1%')
+  //    .radius(70)
+  //    .startAngle(105)
+  //    .sweepAngle(330)
+  //    .fill('#494949');
+  //
+  //axis3.scale()
+  //    .inverted(true)
+  //    .minimum(0)
+  //    .maximum(60)
+  //    .ticks().interval(5);
+  //
+  //axis3.ticks()
+  //    .fill('#494949')
+  //    .type('circle')
+  //    .length(4);
+  //
+  //axis3.minorTicks()
+  //    .enabled(true)
+  //    .fill('#494949')
+  //    .type('circle')
+  //    .length(2);
+  //
+  //axis3.labels()
+  //    .position('i')
+  //    .fontColor('black');
 
   gauge.needle(0)
       .fill('rgb(240, 103, 59)')
@@ -131,4 +139,6 @@ anychart.onDocumentReady(function() {
       .startRadius(0)
       .middleWidth(3)
       .startWidth(3);
+
+  gauge.container('container').draw();
 });

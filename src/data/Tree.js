@@ -53,6 +53,13 @@ anychart.data.Tree = function(opt_data, opt_fillMethodOrCsvMapping, opt_csvSetti
    */
   this.index_ = {};
 
+  /**
+   *
+   * @type {Object.<string, boolean>}
+   * @private
+   */
+  this.isStringIndex_ = {};
+
 
   /**
    * Default traverser.
@@ -75,7 +82,7 @@ anychart.data.Tree = function(opt_data, opt_fillMethodOrCsvMapping, opt_csvSetti
    */
   this.dispatchEvents_ = true;
 
-  this.createIndexOn(anychart.enums.GanttDataFields.ID); //Silent ID indexing.
+  this.createIndexOn(anychart.enums.GanttDataFields.ID, true); //Silent ID indexing.
 
   //Filling with data.
   if (opt_data) this.addData(opt_data, opt_fillMethodOrCsvMapping, opt_csvSettings);
@@ -257,6 +264,7 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
     tdis.push(dataItem);
 
     if (goog.isDefAndNotNull(id)) {
+      id = id + ''; //Treat ID value as string anyway.
       index = goog.array.binarySearch(uids, id, anychart.utils.compareAsc);
       if (index < 0) {
         var pos = ~index;
@@ -282,6 +290,7 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
     tdi = tdis[i]; //Tree data item.
     parentId = data[i][anychart.enums.GanttDataFields.PARENT];
     if (goog.isDefAndNotNull(parentId)) {
+      parentId = parentId + ''; //Treat ID value as string anyway.
       index = goog.array.binarySearch(uids, parentId, anychart.utils.compareAsc);
       if (index < 0) {
         searchResult = this.search(anychart.enums.GanttDataFields.ID, parentId);
@@ -439,6 +448,8 @@ anychart.data.Tree.prototype.addToIndex = function(item, opt_field, opt_subTree)
      * @type {anychart.data.Tree.IndexKeyValue}
      */
     var indexKeyValue = {key: item.get(/** @type {string} */ (opt_field)), value: item};
+    if (this.isStringIndex_[/** @type {string} */ (opt_field)])
+      indexKeyValue.key = '' + indexKeyValue.key;
     var index = goog.array.binarySearch(indexArr, indexKeyValue, this.comparisonFunction_);
 
     if (index < 0) { //Not found.
@@ -497,10 +508,12 @@ anychart.data.Tree.prototype.removeFromIndex = function(item, opt_field, opt_sub
  * Creates an index on a specified field.
  * It can't be indexed by 'parent' or 'children' fields because these fields are not available by treeItem.get(field); (@see createComparisonFunction).
  * @param {string} field - Field name.
+ * @param {boolean=} opt_asString - If the value should be treated as string always.
  * @return {anychart.data.Tree} - Itself for method chaining.
  */
-anychart.data.Tree.prototype.createIndexOn = function(field) {
+anychart.data.Tree.prototype.createIndexOn = function(field, opt_asString) {
   if (!this.index_[field]) { //Index can be created.
+    this.isStringIndex_[field] = !!opt_asString;
     this.defaultTraverser_.reset();
     this.index_[field] = [];
 
@@ -521,6 +534,7 @@ anychart.data.Tree.prototype.createIndexOn = function(field) {
  */
 anychart.data.Tree.prototype.removeIndexOn = function(field) {
   delete this.index_[field];
+  delete this.isStringIndex_[field];
   return this;
 };
 
@@ -563,12 +577,13 @@ anychart.data.Tree.prototype.indexBranch_ = function(root) {
 anychart.data.Tree.prototype.search = function(soughtField, valueOrEvaluator, opt_comparisonFnOrEvaluatorContext) {
   var isEvaluator = goog.isFunction(valueOrEvaluator); //Actually means if binary select must be used.
   var i, result;
+  var isStringIndex = this.isStringIndex_[soughtField];
   if (this.index_[soughtField]) { //Fast search: index exists.
     var resultIndex = isEvaluator ?
         goog.array.binarySelect(this.index_[soughtField],
             /** @type {!Function} */ (valueOrEvaluator),
             /** @type {Object} */ (opt_comparisonFnOrEvaluatorContext)) :
-        goog.array.binarySearch(this.index_[soughtField], {key: valueOrEvaluator},
+        goog.array.binarySearch(this.index_[soughtField], {key: isStringIndex ? '' + valueOrEvaluator : valueOrEvaluator},
             /** @type {!Function} */ (opt_comparisonFnOrEvaluatorContext) || /** @type {!Function} */ (this.comparisonFunction_));
 
     result = resultIndex >= 0 ? this.index_[soughtField][resultIndex].value : null;

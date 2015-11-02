@@ -61,10 +61,10 @@ anychart.core.ui.LabelBase = function() {
 
   /**
    * Label anchor settings.
-   * @type {anychart.enums.Anchor}
-   * @private
+   * @type {?anychart.enums.Anchor}
+   * @protected
    */
-  this.anchor_;
+  this.anchorInternal;
 
   /**
    * Offset by X coordinate from Label position.
@@ -378,57 +378,50 @@ anychart.core.ui.LabelBase.prototype.rotation = function(opt_value) {
 
 
 /**
- * Getter for label anchor settings.
- * @return {anychart.enums.Anchor} Current label anchor settings.
- *//**
- * Setter for label anchor settings.<br/>
- * <b>Note:</b> merges label positioning point ({@link anychart.core.ui.LabelBase#position}) with an anchor.
- * @example <t>simple-h100</t>
- * // to the left
- * var parentBounds = stage.rect(5, 5, 100, 70).stroke('rgba(0,0,200,.4)');
- * var label = anychart.ui.label()
- *     .padding(5)
- *     .position(anychart.enums.Position.RIGHT_BOTTOM)
- *     .parentBounds(parentBounds.getBounds())
- *     .anchor(anychart.enums.Anchor.RIGHT_BOTTOM);
- * label.background().enabled(true).fill('none').stroke('1 #aaa');
- * label.container(stage).draw();
- * stage.circle(105, 75, 2).stroke('3 red');
- * // to the right
- * parentBounds = stage.rect(120, 5, 100, 70).stroke('rgba(0,0,200,.4)');
- * label = anychart.ui.label()
- *     .padding(5)
- *     .position(anychart.enums.Anchor.RIGHT_BOTTOM)
- *     .parentBounds(parentBounds.getBounds())
- *     .anchor(anychart.enums.Anchor.CENTER);
- * label.background().enabled(true).fill('none').stroke('1 #aaa');
- * label.container(stage).draw();
- * stage.circle(220, 75, 2).stroke('3 red');
- * @illustrationDesc
- * parentBounds are markerd with blue<br/>
- * Label position in Bottom Right.<br/>
- * Anchor is marked with red.<br/>
- * Left: anchor is Bottom Right<br/>
- * Right: anchor in Center<br/>
- * @param {(anychart.enums.Anchor|string)=} opt_value [{@link anychart.enums.Anchor}.LEFT_TOP] Value to set.
- * @return {!anychart.core.ui.LabelBase} {@link anychart.core.ui.LabelBase} instance for method chaining.
- *//**
- * @ignoreDoc
- * @param {(anychart.enums.Anchor|string)=} opt_value .
- * @return {!anychart.core.ui.LabelBase|anychart.enums.Anchor} .
+ * Getter/setter for label anchor settings.
+ * @param {?(anychart.enums.Anchor|string)=} opt_value .
+ * @return {anychart.core.ui.LabelBase|anychart.enums.Anchor} .
  */
 anychart.core.ui.LabelBase.prototype.anchor = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeAnchor(opt_value);
-    if (this.anchor_ != opt_value) {
-      this.anchor_ = opt_value;
+    opt_value = goog.isNull(opt_value) ? null : anychart.enums.normalizeAnchor(opt_value);
+    if (this.anchorInternal != opt_value) {
+      this.anchorInternal = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   } else {
-    return this.anchor_;
+    return this.anchorInternal;
   }
+};
+
+
+/**
+ * Is anchor should be set automatically.
+ * @param {anychart.enums.Anchor=} opt_value Anchor auto mode.
+ * @return {anychart.enums.Anchor|anychart.core.ui.LabelBase} Is anchor in auto mode or self for chaining.
+ */
+anychart.core.ui.LabelBase.prototype.autoAnchor = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.autoAnchor_ != opt_value) {
+      this.autoAnchor_ = opt_value;
+      if (!this.anchor())
+        this.invalidate(anychart.ConsistencyState.BOUNDS,
+            anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.autoAnchor_;
+};
+
+
+/**
+ * Returns final anchor.
+ * @return {?anychart.enums.Anchor}
+ */
+anychart.core.ui.LabelBase.prototype.getFinalAnchor = function() {
+  return /** @type {?anychart.enums.Anchor} */(this.anchor() || this.autoAnchor());
 };
 
 
@@ -633,7 +626,7 @@ anychart.core.ui.LabelBase.prototype.adjustEnabled_ = function() {
  * @return {number|anychart.core.ui.LabelBase}
  */
 anychart.core.ui.LabelBase.prototype.minFontSize = function(opt_value) {
-  if (goog.isDef(opt_value) && !isNaN(+opt_value)) {
+  if (goog.isDef(opt_value)) {
     if (this.minFontSize_ != +opt_value) {
       this.minFontSize_ = +opt_value;
       // we don't need to invalidate bounds if adjusting is not enabled
@@ -660,7 +653,7 @@ anychart.core.ui.LabelBase.prototype.minFontSize = function(opt_value) {
  * @return {number|anychart.core.ui.LabelBase}
  */
 anychart.core.ui.LabelBase.prototype.maxFontSize = function(opt_value) {
-  if (goog.isDef(opt_value) && !isNaN(+opt_value)) {
+  if (goog.isDef(opt_value)) {
     if (this.maxFontSize_ != +opt_value) {
       this.maxFontSize_ = +opt_value;
       // we don't need to invalidate bounds if adjusting is not enabled
@@ -1084,14 +1077,14 @@ anychart.core.ui.LabelBase.prototype.drawLabel = function() {
 
   var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
       new acgraph.math.Rect(0, 0, this.backgroundWidth, this.backgroundHeight),
-      this.anchor_);
+      this.getFinalAnchor());
 
   position.x -= anchorCoordinate.x;
   position.y -= anchorCoordinate.y;
 
   var offsetX = goog.isDef(this.offsetX_) ? anychart.utils.normalizeSize(this.offsetX_, parentWidth) : 0;
   var offsetY = goog.isDef(this.offsetY_) ? anychart.utils.normalizeSize(this.offsetY_, parentHeight) : 0;
-  anychart.utils.applyOffsetByAnchor(position, this.anchor_, offsetX, offsetY);
+  anychart.utils.applyOffsetByAnchor(position, this.getFinalAnchor(), offsetX, offsetY);
 
   this.textX += position.x;
   this.textY += position.y;

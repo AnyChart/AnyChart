@@ -432,7 +432,7 @@ anychart.core.VisualBase.prototype.resumeSignalsDispatching = function(doDispatc
  * @return {boolean} True - if we should continue drawing, false otherwise.
  */
 anychart.core.VisualBase.prototype.checkDrawingNeeded = function() {
-  if (this.isConsistent())
+  if (this.isConsistent() || this.isDisposed())
     return false;
 
   if (!this.enabled()) {
@@ -743,6 +743,8 @@ anychart.core.VisualBase.prototype.setupByJSON = function(config) {
 anychart.core.VisualBase.prototype.disposeInternal = function() {
   goog.dispose(this.eventsHandler);
   this.eventsHandler = null;
+
+  this.parentBounds_ = null;
 
   goog.base(this, 'disposeInternal');
 };

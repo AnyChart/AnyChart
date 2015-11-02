@@ -1478,12 +1478,10 @@ anychart.core.ui.MarkersFactory.Marker.prototype.clear = function() {
  * Reset settings.
  */
 anychart.core.ui.MarkersFactory.Marker.prototype.resetSettings = function() {
-  var padding = this.settingsObj['padding'];
-  this.settingsObj = {};
-  if (padding) {
-    padding.setup(anychart.getFullTheme()['standalones']['labelsFactory']['padding']);
-    this.settingsObj['padding'] = padding;
+  if (this.settingsObj['padding']) {
+    goog.dispose(this.settingsObj['padding']);
   }
+  this.settingsObj = {};
   this.superSettingsObj = {};
 };
 

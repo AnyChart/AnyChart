@@ -2,8 +2,10 @@
 <html>
 <head>
   <script src="../out/anychart-bundle.min.js"></script>
+  <script src="http://cdn.anychart.com/geodata/countries/aus/australia.js"></script>
+  <script src="./stock/data/dji.js"></script>
+  <script src="./stock/data/ixic.js"></script>
 
-  <title>Donut Chart</title>
   <style>
     html, body, #container {
       width: 100%;
@@ -12,122 +14,9 @@
       padding: 0;
     }
   </style>
+  <script src="index.js"></script>
 </head>
 <body>
-<div id="container"></div>
-<script type="text/javascript">
-  anychart.onDocumentReady(function() {
-    //define sample data
-    var data = [
-      {name: 'Point 1', value: 10, group: 'stock'},
-      {name: 'Point 2', value: 30, group: 'stock'},
-      {name: 'Point 3', value: 60, group: 'stock'},
-      {name: 'Point 4', value: 30, group: 'stock'},
-      {name: 'Point 5', value: 80, group: 'stock'},
-      {name: 'Point 6', value: 40, group: 'stock'},
-      {name: 'Point 7', value: 10, group: 'stock'},
-      {name: 'Point 8', value: 90, group: 'bonds'},
-      {name: 'Point 9', value: 60, group: 'bonds'},
-      {name: 'Point 10', value: 40, group: 'bonds'},
-      {name: 'Point 11', value: 10, group: 'bonds'},
-      {name: 'Point 12', value: 40, group: 'bonds'}
-    ];
-
-    //pre process data points, to define indexes groups and set color from palette
-    var groupsPalette = ['#ff2b06', '#003268'];
-    var dataPointsCount = data.length;
-    var groupsMap = {};
-    var groupsIndex = 0;
-
-    for (var i = 0; i < dataPointsCount; i++) {
-      var point = data[i];
-      var groupName = point['group'];
-      var group = groupsMap[groupName];
-
-      if (!group) {
-        group = {};
-        group['index'] = groupsIndex;
-        group['palette'] = anychart.palettes.distinctColors().colors(anychart.color.singleHueProgression(groupsPalette[groupsIndex], dataPointsCount));
-        group['lastPointIndex'] = -1;
-        group['indexes'] = [];
-        groupsMap[groupName] = group;
-        groupsIndex++;
-      }
-      group['lastPointIndex']++;
-      var groupPalette = group['palette'];
-      var lastPointIndex = group['lastPointIndex'];
-      var groupIndexes = group['indexes'];
-      groupIndexes.push(i);
-      point['fill'] = groupPalette.colorAt(lastPointIndex);
-    }
-
-    // create pie chart with passed data
-    chart = anychart.pie(data);
-
-    // set chart title text settings
-    chart.title('Pie charts with grouped points');
-
-    chart.interactivity('single');
-
-    chart.listen('pointMouseOver', function(evt) {
-      var pointIndex = evt.pointIndex;
-      var groupName = chart.data().get(pointIndex, 'group');
-      var group = groupsMap[groupName];
-      var groupIndexes = group['indexes'];
-
-      chart.unhover();
-      chart.hover(groupIndexes);
-    });
-//
-    chart.listen('pointMouseOut', function(evt) {
-      chart.unhover();
-    });
-
-    chart.hoverFill('red');
-
-    //disable chart legend
-    chart.legend(false);
-
-    createChartLabel(chart, 0, 'STOCK\n40', 'topright', 'stock');
-    createChartLabel(chart, 1, 'BONDS\n60', 'topleft', 'bonds');
-
-    //set chart radius
-    chart.radius('43%');
-
-    chart.labels(false);
-
-    // create empty area in pie chart
-    chart.innerRadius('80%');
-
-    // set container id for the chart
-    chart.container('container');
-
-    // initiate chart drawing
-    chart.draw();
-
-    function createChartLabel(chart, index, text, anchor, groupName) {
-      var label = chart.label(index);
-      label.text(text);
-      label.position('center');
-      label.anchor(anchor);
-      label.offsetY(0);
-      label.offsetX(10);
-      label.hAlign('center');
-
-      label.listen('mouseOver', function() {
-        var group = groupsMap[groupName];
-        var groupIndexes = group['indexes'];
-
-        chart.unhover();
-        chart.hover(groupIndexes);
-      });
-
-      label.listen('mouseOut', function() {
-        chart.unhover();
-      });
-    }
-  });
-
-</script>
+  <div id="container"></div>
 </body>
 </html>

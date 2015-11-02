@@ -775,12 +775,6 @@ anychart.core.axes.Linear.prototype.getOverlappedLabels_ = function(opt_bounds) 
         var prevDrawableMinorLabel = -1;
 
         var scaleTicksArr = scale.ticks().get();
-        if (scale instanceof anychart.scales.Ordinal) {
-          scaleTicksArr = goog.array.filter(scaleTicksArr, function(el) {
-            var val = this.transform(el, 0.5);
-            return val >= 0 && val <= 1;
-          }, scale);
-        }
         var ticksArrLen = scaleTicksArr.length;
         var tickVal, ratio, bounds1, bounds2, bounds3, bounds4;
         var tempRatio;
@@ -969,12 +963,6 @@ anychart.core.axes.Linear.prototype.applyStaggerMode_ = function(opt_bounds) {
     this.currentStageLines_ = 1;
     var labels;
     var scaleTicksArr = scale.ticks().get();
-    if (scale instanceof anychart.scales.Ordinal) {
-      scaleTicksArr = goog.array.filter(scaleTicksArr, function(el) {
-        var val = this.transform(el, 0.5);
-        return val >= 0 && val <= 1;
-      }, scale);
-    }
     var ticksArrLen = scaleTicksArr.length;
     var i, j, k, bounds1, bounds2, bounds3, states;
 
@@ -1219,12 +1207,6 @@ anychart.core.axes.Linear.prototype.getSize = function(parentBounds, length) {
 
   if (isLabels && scale) {
     ticksArr = scale.ticks().get();
-    if (scale instanceof anychart.scales.Ordinal) {
-      ticksArr = goog.array.filter(ticksArr, function(el) {
-        var val = this.transform(el, 0.5);
-        return val >= 0 && val <= 1;
-      }, scale);
-    }
     var drawLabels = goog.isObject(overlappedLabels) ? overlappedLabels.labels : !overlappedLabels;
     if (this.staggerMode()) {
       for (i = 0; i < this.linesSize_.length; i++) {
@@ -1444,6 +1426,8 @@ anychart.core.axes.Linear.prototype.getLabelBounds_ = function(index, isMajor, t
   } else {
     ratio = scale.transform(value, .5);
   }
+
+  if (ratio < 0 || ratio > 1) return [0, 0];
 
   var isEnabled = ticks.enabled();
   var position = ticks.position();
@@ -2166,13 +2150,6 @@ anychart.core.axes.Linear.prototype.draw = function() {
 
     } else {
       var labelsStates = this.calcLabels_();
-      if (scale instanceof anychart.scales.Ordinal) {
-        scaleTicksArr = goog.array.filter(scaleTicksArr, function(el) {
-          var val = this.transform(el, 0.5);
-          return val >= 0 && val <= 1;
-        }, scale);
-        ticksArrLen = scaleTicksArr.length;
-      }
       needDrawLabels = goog.isObject(labelsStates) ? labelsStates.labels : !labelsStates;
       pixelShift = tickThickness % 2 == 0 ? 0 : -.5;
 
@@ -2213,7 +2190,7 @@ anychart.core.axes.Linear.prototype.draw = function() {
         }
 
         drawLabel = goog.isArray(needDrawLabels) ? needDrawLabels[i] : needDrawLabels;
-        if (drawLabel)
+        if (drawLabel && labelPosition >= 0 && labelPosition <= 1)
           this.drawLabel_(leftTick, labelPosition, i, pixelShift, true, scaleTicksArr);
       }
     }

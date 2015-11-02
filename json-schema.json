@@ -65,6 +65,26 @@
           "type": "string"
         }
       }
+    },
+    "map": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.VisualBase"},
+        {"$ref": "#/definitions/anychart.core.VisualBaseWithBounds"},
+        {"$ref": "#/definitions/anychart.core.Chart"},
+        {"$ref": "#/definitions/anychart.core.SeparateChart"}
+      ],
+      "oneOf": [
+        {"$ref": "#/definitions/anychart.charts.Map"}
+      ],
+      "properties": {
+        "container": {
+          "type": "string"
+        },
+        "defaultSeriesType": {
+          "type": "string"
+        }
+      }
     }
   },
   "definitions": {
@@ -1725,17 +1745,38 @@
 
         "labelsDisplayMode": {"$ref": "#/definitions/anychart.enums.LabelsDisplayMode"},
 
-        "colorScale": [
-          {
-            "type": [
-              "string",
-              "number"
-            ]
-          },
-          {
-            "$ref": "#/definitions/anychart.scales.Ordinal"
-          }
-        ]
+        "colorScale": {
+          "oneOf": [
+            {"type": ["string", "number"]},
+            {"$ref": "#/definitions/anychart.scales.OrdinalColor"}
+          ]
+        },
+        "xZoom": {
+          "oneOf": [
+            {"type": "number"},
+            {"type": "boolean"},
+            {"$ref": "#/definitions/anychart.core.CartesianXZoom"}
+          ]
+        },
+        "xScroller": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.ChartScroller"}
+          ]
+        },
+        "yZoom": {
+          "oneOf": [
+            {"type": "number"},
+            {"type": "boolean"},
+            {"$ref": "#/definitions/anychart.core.CartesianXZoom"}
+          ]
+        },
+        "yScroller": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.ChartScroller"}
+          ]
+        }
       },
       "required": ["type"]
     },
@@ -1750,8 +1791,8 @@
         "rowSelectedFill": {"$ref": "#/definitions/fill"},
         "splitterPosition": {
           "type":[
-          "number",
-          "string"
+            "number",
+            "string"
           ]
         },
         "controller": {"$ref": "#/definitions/anychart.core.gantt.Controller"},
@@ -1865,6 +1906,115 @@
         },
         "encloseWithStraightLine": {
           "type": "boolean"
+        }
+      },
+      "required": ["type"]
+    },
+
+    "anychart.charts.Map": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.Chart"}
+      ],
+      "properties": {
+        "type": {"enum": ["map"]},
+        "data": {"$ref": "#/definitions/data"},
+
+        "markerPalette": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/anychart.enums.MarkerType"}
+            }
+          },
+          "items": {"$ref": "#/definitions/anychart.enums.MarkerType"}
+        },
+        "hatchFillPalette": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/hatchFillSet"}
+            }
+          },
+          "items": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"}
+        },
+        "palette": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "distinct",
+                "range"
+              ]
+            },
+            "items": {
+              "type": ["array"],
+              "items": {"$ref": "#/definitions/fill"}
+            },
+            "count": {
+              "type": "number"
+            }
+          },
+          "items": {
+            "type": "string"
+          }
+        },
+
+        "unboundRegions": {"$ref": "#/definitions/anychart.core.utils.UnboundRegionsSettings"},
+        "colorRange": {"$ref": "#/definitions/anychart.core.ui.ColorRange"},
+        "geoScale": {"$ref": "#/definitions/anychart.core.map.scale.Geo"},
+
+        "minBubbleSize": {
+          "type": ["string", "number"]
+        },
+        "maxBubbleSize": {
+          "type": ["string", "number"]
+        },
+
+        "geoIdField": {
+          "type": "string"
+        },
+        "series": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.map.series.Choropleth"},
+              {"$ref": "#/definitions/anychart.core.map.series.Bubble"}
+            ]
+          }
+        },
+        "colorScales": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "items": {
+            "anyOf": [
+              {"$ref": "#/definitions/anychart.scales.OrdinalColor"},
+              {"$ref": "#/definitions/anychart.scales.LinearColor"}
+            ]
+          },
+          "patternProperties": {
+            ".*": {
+              "anyOf": [
+                {"$ref": "#/definitions/anychart.scales.OrdinalColor"},
+                {"$ref": "#/definitions/anychart.scales.LinearColor"}
+              ]
+            }
+          },
+          "additionalProperties": false
         }
       },
       "required": ["type"]
@@ -2489,6 +2639,7 @@
       ],
       "properties": {
         "seriesType": {"enum": ["bubble"]},
+
         "minimumSize": {
           "type": [
             "string",
@@ -2501,6 +2652,7 @@
             "number"
           ]
         },
+
         "displayNegative": {
           "type": ["boolean"]
         },
@@ -2647,74 +2799,166 @@
       }
     },
 
+    "anychart.core.map.series.Base": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.SeriesBase"}
+      ],
+      "properties": {
+        "geoIdField": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "anychart.core.map.series.BaseWithMarkers": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.map.series.Base"}
+      ],
+      "properties": {
+        "markers": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
+          ]
+        },
+        "hoverMarkers": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
+          ]
+        },
+        "selectMarkers": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
+          ]
+        }
+      }
+    },
+    "anychart.core.map.series.Choropleth": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.map.series.BaseWithMarkers"}
+      ],
+      "properties": {
+        "seriesType": {"enum": ["choropleth"]},
+        "colorScale": {
+          "anyOf": [
+            {
+              "type": [
+                "string",
+                "number"
+              ]
+            },
+            {"$ref": "#/definitions/anychart.scales.LinearColor"},
+            {"$ref": "#/definitions/anychart.scales.OrdinalColor"},
+          ]
+        }
+      }
+    },
+    "anychart.core.map.series.Bubble": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.map.series.BaseWithMarkers"}
+      ],
+      "properties": {
+        "seriesType": {"enum": ["bubble"]},
+
+        "displayNegative": {
+          "type": ["boolean"]
+        },
+        "negativeFill": {"$ref": "#/definitions/fill"},
+        "hoverNegativeFill": {"$ref": "#/definitions/fill"},
+        "selectNegativeFill": {"$ref": "#/definitions/fill"},
+
+        "negativeStroke": {"$ref": "#/definitions/stroke"},
+        "hoverNegativeStroke": {"$ref": "#/definitions/stroke"},
+        "selectNegativeStroke": {"$ref": "#/definitions/stroke"},
+
+        "negativeHatchFill": {"$ref": "#/definitions/hatchFillSet"},
+        "hoverNegativeHatchFill": {"$ref": "#/definitions/hatchFillSet"},
+        "selectNegativeHatchFill": {"$ref": "#/definitions/hatchFillSet"}
+      }
+    },
+
     "anychart.core.ui.ChartScroller": {
+      "type": "object",
       "allOf": [
         {"$ref": "#/definitions/anychart.core.VisualBase"}
       ],
-      "fill": {
-        "$ref": "#/definitions/fill"
-      },
-      "selectedFill": {
-        "$ref": "#/definitions/fill"
-      },
-      "outlineStroke": {
-        "$ref": "#/definitions/stroke"
-      },
-      "thumbs": {
-        "$ref": "#/definitions/anychart.core.ui.ScrollerThumbs"
-      },
-      "orientation": {
-        "$ref": "#/definitions/anychart.enums.Orientation"
-      },
-      "autoHide": {
-        "type": "boolean"
-      },
-      "allowRangeChange": {
-        "type": "boolean"
-      },
-      "height": {
-        "type": [
-          "number",
-          "string"
-        ]
-      },
-      "minHeight": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ]
-      },
-      "maxHeight": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ]
-      },
-      "position": {
-        "$ref": "#/definitions/anychart.enums.ChartScrollerPosition"
+      "properties": {
+        "fill": {
+          "$ref": "#/definitions/fill"
+        },
+        "selectedFill": {
+          "$ref": "#/definitions/fill"
+        },
+        "outlineStroke": {
+          "$ref": "#/definitions/stroke"
+        },
+        "thumbs": {
+          "$ref": "#/definitions/anychart.core.ui.ScrollerThumbs"
+        },
+        "orientation": {
+          "$ref": "#/definitions/anychart.enums.Orientation"
+        },
+        "inverted": {
+          "type": "boolean"
+        },
+        "autoHide": {
+          "type": "boolean"
+        },
+        "allowRangeChange": {
+          "type": "boolean"
+        },
+        "height": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "minHeight": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "maxHeight": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "position": {
+          "$ref": "#/definitions/anychart.enums.ChartScrollerPosition"
+        }
       }
     },
 
     "anychart.core.ui.ScrollerThumbs": {
-      "enabled": {
-        "type": "boolean"
-      },
-      "fill": {
-        "$ref": "#/definitions/fill"
-      },
-      "hoverFill": {
-        "$ref": "#/definitions/fill"
-      },
-      "stroke": {
-        "$ref": "#/definitions/stroke"
-      },
-      "hoverStroke": {
-        "$ref": "#/definitions/stroke"
-      },
-      "autoHide": {
-        "type": "boolean"
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "fill": {
+          "$ref": "#/definitions/fill"
+        },
+        "hoverFill": {
+          "$ref": "#/definitions/fill"
+        },
+        "stroke": {
+          "$ref": "#/definitions/stroke"
+        },
+        "hoverStroke": {
+          "$ref": "#/definitions/stroke"
+        },
+        "autoHide": {
+          "type": "boolean"
+        }
       }
     },
 
@@ -3175,7 +3419,7 @@
         {"$ref": "#/definitions/anychart.scales.Base"}
       ],
       "properties": {
-        "type": {"enum": ["ordinal"]},
+        "type": {"enum": ["ordinalColor"]},
         "ticks": {"$ref": "#/definitions/anychart.scales.OrdinalTicks"},
         "colors": {
           "type": [
@@ -3317,6 +3561,31 @@
         }
       }
     },
+    "anychart.core.map.scale.Geo": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.scales.Base"}
+      ],
+      "properties": {
+        "type": {"enum": ["geo"]},
+        "inverted": {
+          "type": "boolean"
+        },
+        "minimumX": {
+          "type": ["number", "string", "null"]
+        },
+        "maximumX": {
+          "type": ["number", "string", "null"]
+        },
+        "minimumY": {
+          "type": ["number", "string", "null"]
+        },
+        "maximumY": {
+          "type": ["number", "string", "null"]
+        },
+        "bounds": {"$ref": "#/definitions/anychart.math.Rect"}
+      }
+    },
 
     "anychart.core.grids.Linear": {
       "type": "object",
@@ -3376,6 +3645,22 @@
       }
     },
 
+    "anychart.core.ui.ColorRange": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.axes.Linear"}
+      ],
+      "properties": {
+        "align": {"$ref": "#/definitions/anychart.enums.Align"},
+        "length": {
+          "type": ["string", "number"]
+        },
+        "colorLineSize": {
+          "type": ["string", "number"]
+        },
+        "marker": {"$ref": "#/definitions/anychart.core.ui.MarkersFactory.Marker"}
+      }
+    },
     "anychart.core.ui.Background": {
       "type": "object",
       "allOf": [
@@ -4257,80 +4542,6 @@
         "multiSelect"
       ]
     },
-    "anychart.core.utils.Bounds": {
-      "properties": {
-        "left": {
-          "type": [
-            "number",
-            "string",
-            "null"
-          ]
-        },
-        "top": {
-          "type": [
-            "number",
-            "string",
-            "null"
-          ]
-        },
-        "right": {
-          "type": [
-            "number",
-            "string",
-            "null"
-          ]
-        },
-        "bottom": {
-          "type": [
-            "number",
-            "string",
-            "null"
-          ]
-        },
-        "width": {
-          "type": [
-            "number",
-            "string",
-            "null"
-          ]
-        },
-        "height": {
-          "type": [
-            "number",
-            "string",
-            "null"
-          ]
-        },
-        "minWidth": {
-          "type": [
-            "number",
-            "string",
-            "null"
-          ]
-        },
-        "minHeight": {
-          "type": [
-            "number",
-            "string",
-            "null"
-          ]
-        },
-        "maxWidth": {
-          "type": [
-            "number",
-            "string",
-            "null"
-          ]
-        },
-        "maxHeight": {
-          "type": [
-            "number",
-            "string",
-            "null"
-          ]
-        }
-      }
-    },
     "anychart.enums.Align": {
       "enum": [
         "center",
@@ -4498,6 +4709,7 @@
     "anychart.enums.CrosshairDisplayMode": {
       "enum": ["float", "sticky"]
     },
+
     "acgraph.vector.HatchFill.HatchFillType": {
       "enum": [
         "backwardDiagonal",
@@ -4533,6 +4745,81 @@
         "percent80",
         "percent90"
       ]
+    },
+
+    "anychart.core.utils.Bounds": {
+      "properties": {
+        "left": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "top": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "right": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "bottom": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "width": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "height": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "minWidth": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "minHeight": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "maxWidth": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "maxHeight": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        }
+      }
     },
     "anychart.core.utils.Animation": {
       "properties": {
@@ -4618,7 +4905,16 @@
         "valueErrorStroke": {"$ref": "#/definitions/stroke"}
       }
     },
-
+    "anychart.core.utils.UnboundRegionsSettings": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "stroke": {"$ref": "#/definitions/stroke"},
+        "fill": {"$ref": "#/definitions/fill"}
+      }
+    },
     "anychart.core.utils.LegendItemSettings": {
       "type": "object",
       "allOf": [
@@ -4667,6 +4963,7 @@
         }
       }
     },
+
     "data": {
       "type": "array"
     },

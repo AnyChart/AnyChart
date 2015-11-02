@@ -102,7 +102,7 @@ anychart.core.utils.SeriesPointContextProvider = function(series, referenceValue
    * @type {(anychart.core.SeriesBase|anychart.core.sparkline.series.Base|anychart.core.gauge.pointers.Base)}
    * @private
    */
-  this.series_ = series;
+  this['series'] = series;
 
   /**
    * @type {boolean}
@@ -120,18 +120,18 @@ anychart.core.utils.SeriesPointContextProvider = function(series, referenceValue
 
 /** @inheritDoc */
 anychart.core.utils.SeriesPointContextProvider.prototype.applyReferenceValues = function() {
-  var iterator = this.series_.getIterator();
+  var iterator = this['series'].getIterator();
   var value;
   this['index'] = iterator.getIndex();
   for (var i = 0; i < this.referenceValueNames_.length; i++) {
     value = this.referenceValueNames_[i];
     this[value] = iterator.get(value);
   }
-  if (this.series_.name)
-    this['seriesName'] = this.series_.name() || 'Series: ' + this.series_.index();
+  if (this['series'].name)
+    this['seriesName'] = this['series'].name() || 'Series: ' + this['series'].index();
   if (this.errorAvailable_) {
     /** @type {anychart.core.utils.ISeriesWithError} */
-    var series = /** @type {anychart.core.utils.ISeriesWithError} */(this.series_);
+    var series = /** @type {anychart.core.utils.ISeriesWithError} */(this['series']);
     /** @type {anychart.enums.ErrorMode} */
     var mode = /** @type {anychart.enums.ErrorMode} */(series.error().mode());
     var error;
@@ -151,13 +151,13 @@ anychart.core.utils.SeriesPointContextProvider.prototype.applyReferenceValues = 
 
 /** @inheritDoc */
 anychart.core.utils.SeriesPointContextProvider.prototype.getStat = function(opt_key) {
-  return this.series_.statistics(opt_key);
+  return this['series'].statistics(opt_key);
 };
 
 
 /** @inheritDoc */
 anychart.core.utils.SeriesPointContextProvider.prototype.getDataValue = function(key) {
-  return this.series_.getIterator().get(key);
+  return this['series'].getIterator().get(key);
 };
 
 
@@ -167,7 +167,7 @@ anychart.core.utils.SeriesPointContextProvider.prototype.getDataValue = function
  * @return {*} Meta value by key, or meta object.
  */
 anychart.core.utils.SeriesPointContextProvider.prototype.getSeriesMeta = function(opt_key) {
-  return this.series_.meta(opt_key);
+  return this['series'].meta(opt_key);
 };
 
 
@@ -263,7 +263,7 @@ anychart.core.utils.MapPointContextProvider = function(series, referenceValueNam
    * @type {(anychart.core.SeriesBase|anychart.core.sparkline.series.Base)}
    * @private
    */
-  this.series_ = series;
+  this['series'] = series;
 
   /**
    * @type {Array.<string>}
@@ -275,7 +275,7 @@ anychart.core.utils.MapPointContextProvider = function(series, referenceValueNam
 
 /** @inheritDoc */
 anychart.core.utils.MapPointContextProvider.prototype.applyReferenceValues = function() {
-  var iterator = this.series_.getIterator();
+  var iterator = this['series'].getIterator();
   var value;
   this['index'] = iterator.getIndex();
   for (var i = 0; i < this.referenceValueNames_.length; i++) {
@@ -287,8 +287,8 @@ anychart.core.utils.MapPointContextProvider.prototype.applyReferenceValues = fun
   if (regionId)
     this['id'] = regionId;
 
-  if (this.series_.name)
-    this['seriesName'] = this.series_.name() || 'Series: ' + this.series_.index();
+  if (this['series'].name)
+    this['seriesName'] = this['series'].name() || 'Series: ' + this['series'].index();
 
   var pointGeoProp = iterator.meta('regionProperties');
   if (pointGeoProp) {
@@ -301,13 +301,13 @@ anychart.core.utils.MapPointContextProvider.prototype.applyReferenceValues = fun
 
 /** @inheritDoc */
 anychart.core.utils.MapPointContextProvider.prototype.getDataValue = function(key) {
-  return this.series_.getIterator().get(key);
+  return this['series'].getIterator().get(key);
 };
 
 
 /** @inheritDoc */
 anychart.core.utils.MapPointContextProvider.prototype.getStat = function(opt_key) {
-  return this.series_.statistics(opt_key);
+  return this['series'].statistics(opt_key);
 };
 
 
@@ -317,7 +317,7 @@ anychart.core.utils.MapPointContextProvider.prototype.getStat = function(opt_key
  * @return {*} Meta value by key, or meta object.
  */
 anychart.core.utils.MapPointContextProvider.prototype.getSeriesMeta = function(opt_key) {
-  return this.series_.meta(opt_key);
+  return this['series'].meta(opt_key);
 };
 
 

@@ -1854,7 +1854,8 @@ anychart.core.SeriesBase.prototype.allowPointsSelect = function(opt_value) {
  */
 anychart.core.SeriesBase.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['color'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.color()));
+  if (this.color_)
+    json['color'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.color_));
   if (goog.isDef(this.name()))
     json['name'] = this.name();
   json['data'] = this.data().serialize();
@@ -1937,7 +1938,8 @@ anychart.core.SeriesBase.prototype.serialize = function() {
           ['Series hatchFill']
       );
     } else {
-      json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
+      if (this.hatchFill())
+        json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
     }
   }
   if (goog.isFunction(this['hoverHatchFill'])) {
@@ -1948,8 +1950,9 @@ anychart.core.SeriesBase.prototype.serialize = function() {
           ['Series hoverHatchFill']
       );
     } else {
-      json['hoverHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
-          (this.hoverHatchFill()));
+      if (this.hoverHatchFill())
+        json['hoverHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
+            (this.hoverHatchFill()));
     }
   }
   if (goog.isFunction(this['selectHatchFill'])) {
@@ -1960,8 +1963,9 @@ anychart.core.SeriesBase.prototype.serialize = function() {
           ['Series selectHatchFill']
       );
     } else {
-      json['selectHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
-          (this.selectHatchFill()));
+      if (this.selectHatchFill())
+        json['selectHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
+            (this.selectHatchFill()));
     }
   }
   if (goog.isDef(this.selectionMode()))

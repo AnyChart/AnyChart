@@ -1740,11 +1740,19 @@ anychart.core.ui.BaseGrid.prototype.rowStroke = function(opt_strokeOrFill, opt_t
     var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     var newThickness = anychart.utils.extractThickness(val);
 
-    //TODO (A.Kudryavtsev): In current moment (15 June 2015) method anychart.color.equals works pretty bad.
+    //TODO (A.Kudryavtsev): In current implementation (15 June 2015) method anychart.color.equals works pretty bad.
     //TODO (A.Kudryavtsev): That's why here I check thickness as well.
     if (!anychart.color.equals(this.rowStroke_, val) || newThickness != this.rowStrokeThickness) {
       this.rowStroke_ = val;
       this.rowStrokeThickness = newThickness;
+
+      /*
+        Standalone grid sets controller.rowStrokeThickness value in own draw() method.
+        Not standalone grid does the same excepting one case: restoration from XML od JSON.
+        It means that for not standalone case we have to set controller's rowStrokeThickness from here because rowStroke
+        method is not available for not standalone instances.
+       */
+      if (!this.isStandalone) this.controller.rowStrokeThickness(newThickness);
       this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
 

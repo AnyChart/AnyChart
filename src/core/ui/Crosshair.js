@@ -165,6 +165,7 @@ anychart.core.ui.Crosshair.prototype.displayMode = function(opt_value) {
 anychart.core.ui.Crosshair.prototype.xAxis = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.xAxis_ != opt_value) {
+      this.suspendSignalsDispatching();
       // set textFormatter
       if (!this.xLabel_.textFormatter() ||
           (this.xAxis_ && this.xLabel_.textFormatter() == this.xAxis_.labels().textFormatter())) {
@@ -173,13 +174,10 @@ anychart.core.ui.Crosshair.prototype.xAxis = function(opt_value) {
       }
 
       // set anchor
-      if (this.xLabel_.autoAnchor() ||
-          (this.xAxis_ && this.xLabel_.anchor() == this.getAnchorByAxis_(this.xAxis_))) {
-
-        this.xLabel_.anchor(this.getAnchorByAxis_(opt_value));
-      }
+      this.xLabel_.autoAnchor(this.getAnchorByAxis_(opt_value));
 
       this.xAxis_ = opt_value;
+      this.resumeSignalsDispatching(true);
     }
     return this;
   } else {
@@ -196,6 +194,7 @@ anychart.core.ui.Crosshair.prototype.xAxis = function(opt_value) {
 anychart.core.ui.Crosshair.prototype.yAxis = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.yAxis_ != opt_value) {
+      this.suspendSignalsDispatching();
       // set textFormatter
       if (!this.yLabel_.textFormatter() ||
           (this.yAxis_ && this.yLabel_.textFormatter() == this.yAxis_.labels().textFormatter())) {
@@ -204,13 +203,10 @@ anychart.core.ui.Crosshair.prototype.yAxis = function(opt_value) {
       }
 
       // set anchor
-      if (this.yLabel_.autoAnchor() ||
-          (this.yAxis_ && this.yLabel_.anchor() == this.getAnchorByAxis_(this.yAxis_))) {
-
-        this.yLabel_.anchor(this.getAnchorByAxis_(opt_value));
-      }
+      this.yLabel_.autoAnchor(this.getAnchorByAxis_(opt_value));
 
       this.yAxis_ = opt_value;
+      this.resumeSignalsDispatching(true);
     }
     return this;
   } else {
@@ -672,7 +668,7 @@ anychart.core.ui.Crosshair.prototype.getLabelPosition_ = function(axis, label, m
  * @return {boolean}
  */
 anychart.core.ui.Crosshair.prototype.isLabelAnchorLeft = function(label) {
-  var anchor = label.anchor();
+  var anchor = label.getFinalAnchor();
   return anchor == anychart.enums.Anchor.LEFT_TOP ||
       anchor == anychart.enums.Anchor.LEFT_CENTER ||
       anchor == anychart.enums.Anchor.LEFT_BOTTOM;
@@ -685,7 +681,7 @@ anychart.core.ui.Crosshair.prototype.isLabelAnchorLeft = function(label) {
  * @return {boolean}
  */
 anychart.core.ui.Crosshair.prototype.isLabelAnchorTop = function(label) {
-  var anchor = label.anchor();
+  var anchor = label.getFinalAnchor();
   return anchor == anychart.enums.Anchor.LEFT_TOP ||
       anchor == anychart.enums.Anchor.CENTER_TOP ||
       anchor == anychart.enums.Anchor.RIGHT_TOP;

@@ -168,7 +168,37 @@ anychart.themes.merging.merge = function(target, defaultObj) {
  */
 anychart.themes.merging.demerge = function(target, defaultObj) {
   target = anychart.themes.merging.demerge_(target, defaultObj);
-  return anychart.themes.merging.demergeMultiple_(target, defaultObj);
+  target = anychart.themes.merging.demergeMultiple_(target, defaultObj);
+  return anychart.themes.merging.demergeTyped_(target, defaultObj);
+};
+
+
+/**
+ * Demerges series entities.
+ * @param {*} target
+ * @param {*} defaultObj
+ * @return {*}
+ * @private
+ */
+anychart.themes.merging.demergeTyped_ = function(target, defaultObj) {
+  var i, len;
+  for (var name in anychart.themes.merging.typedEntities_) {
+    var descriptor = anychart.themes.merging.typedEntities_[name];
+    var namePath = name.split('.');
+    var targetPart = anychart.themes.merging.getThemePart_(target, namePath);
+    var itemsDefaults = anychart.themes.merging.getThemePart_(defaultObj, descriptor.defaults.split('.'));
+    if (goog.isArray(targetPart) && goog.isDef(itemsDefaults)) { // if we have no itemsDefaults we do not demerge anything
+      len = targetPart.length;
+      for (i = 0; i < len; i++) {
+        var type = anychart.themes.merging.getThemePart_(targetPart, [i, descriptor.typeDescriptor]);
+        if (goog.isDef(type)) {
+          var itemDefault = anychart.themes.merging.getThemePart_(itemsDefaults, [type]);
+          targetPart[i] = anychart.themes.merging.demerge_(targetPart[i], itemDefault) || {};
+        }
+      }
+    }
+  }
+  return target;
 };
 
 
@@ -184,7 +214,7 @@ anychart.themes.merging.demergeMultiple_ = function(target, defaultObj) {
   for (var name in anychart.themes.merging.multipleEntities_) {
     var namePath = name.split('.');
     var targetPart = anychart.themes.merging.getThemePart_(target, namePath);
-    if (goog.isDef(targetPart) && goog.isArray(targetPart)) {
+    if (goog.isArray(targetPart)) {
       len = targetPart.length;
       var defaultArray = anychart.themes.merging.getThemePart_(defaultObj, namePath);
       var itemDefault = anychart.themes.merging.getThemePart_(defaultObj,
@@ -237,22 +267,31 @@ anychart.themes.merging.demerge_ = function(target, defaultObj, opt_nonMergableE
           nonMergableEntityType = anychart.themes.merging.nonMergableEntities_[key];
           switch (nonMergableEntityType) {
             case anychart.themes.merging.NonMergableEntityTypes_.FILL:
-              defVal = acgraph.vector.normalizeFill(defVal);
+              defVal = goog.isFunction(defVal) ? undefined : acgraph.vector.normalizeFill(defVal);
               break;
             case anychart.themes.merging.NonMergableEntityTypes_.HATCH_FILL:
-              defVal = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(acgraph.vector.normalizeHatchFill(defVal)));
+              defVal = goog.isFunction(defVal) ?
+                  undefined :
+                  anychart.color.serialize(/** @type {acgraph.vector.Fill} */(acgraph.vector.normalizeHatchFill(defVal)));
               break;
             case anychart.themes.merging.NonMergableEntityTypes_.STROKE:
-              defVal = acgraph.vector.normalizeStroke(defVal);
+              defVal = goog.isFunction(defVal) ? undefined : acgraph.vector.normalizeStroke(defVal);
               break;
           }
         }
-        val = anychart.themes.merging.demerge_(target[key], defVal,
-            nonMergableEntityType || opt_nonMergableEntityType);
+        if (nonMergableEntityType == anychart.themes.merging.NonMergableEntityTypes_.SCALE) {
+          val = anychart.themes.merging.checkEquality_(target[key], defVal, nonMergableEntityType) ?
+              undefined : target[key];
+        } else {
+          val = anychart.themes.merging.demerge_(target[key], defVal,
+              nonMergableEntityType || opt_nonMergableEntityType);
+        }
         if (goog.isDef(val)) {
           target[key] = val;
           empty = false;
-        } else {
+        } else if (key == 'xScale' || key == 'yScale') {
+          empty = false;
+        } else if (key != 'enabled') {
           delete target[key];
         }
       } else if (goog.isDef(target[key])) {
@@ -291,13 +330,15 @@ anychart.themes.merging.checkEquality_ = function(target, defaultObj, opt_arrayT
         if (key in anychart.themes.merging.nonMergableEntities_) {
           switch (anychart.themes.merging.nonMergableEntities_[key]) {
             case anychart.themes.merging.NonMergableEntityTypes_.FILL:
-              defVal = acgraph.vector.normalizeFill(defVal);
+              defVal = goog.isFunction(defVal) ? undefined : acgraph.vector.normalizeFill(defVal);
               break;
             case anychart.themes.merging.NonMergableEntityTypes_.HATCH_FILL:
-              defVal = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(acgraph.vector.normalizeHatchFill(defVal)));
+              defVal = goog.isFunction(defVal) ?
+                  undefined :
+                  anychart.color.serialize(/** @type {acgraph.vector.Fill} */(acgraph.vector.normalizeHatchFill(defVal)));
               break;
             case anychart.themes.merging.NonMergableEntityTypes_.STROKE:
-              defVal = acgraph.vector.normalizeStroke(defVal);
+              defVal = goog.isFunction(defVal) ? undefined : acgraph.vector.normalizeStroke(defVal);
               break;
           }
         }
@@ -343,11 +384,13 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'defaultTitle',
       'defaultLabelFactory',
+      'defaultCrosshairLabel',
+      'defaultTooltip',
       'defaultTooltip.content',
       'defaultLegend',
       'defaultLegend.paginator',
       'chart.defaultLabelSettings',
-      'cartesian.defaultTextMarkerSettings',
+      'cartesianBase.defaultTextMarkerSettings',
       'scatter.defaultTextMarkerSettings',
       'standalones.label',
       'standalones.table',
@@ -362,6 +405,7 @@ anychart.themes.merging.mergingMap_ = [
       'defaultTooltip.background',
       'defaultTooltip.content.background',
       'defaultLabelFactory.background',
+      'defaultCrosshairLabel.background',
       'chart.background',
       'defaultLegend.background',
       'defaultLegend.paginator.background',
@@ -383,14 +427,15 @@ anychart.themes.merging.mergingMap_ = [
       'defaultDataGrid.defaultColumnSettings.cellTextSettings',
       'gantt.base.timeline.header.labelsFactory',
       'standalones.labelsFactory',
+      'heatMap.labels',
       'map.defaultSeriesSettings.base.labels'
     ]
   },
   {
     defaultObj: 'defaultCrosshairLabel',
     targets: [
-      'cartesian.crosshair.xLabel',
-      'cartesian.crosshair.yLabel',
+      'cartesianBase.crosshair.xLabel',
+      'cartesianBase.crosshair.yLabel',
       'scatter.crosshair.xLabel',
       'scatter.crosshair.yLabel'
     ]
@@ -398,14 +443,11 @@ anychart.themes.merging.mergingMap_ = [
   {
     defaultObj: 'defaultMarkerFactory',
     targets: [
-      'cartesian.defaultSeriesSettings.base.markers',
-      'scatter.defaultSeriesSettings.base.markers',
+      'chart.defaultSeriesSettings.base.markers',
       'pieFunnelPyramidBase.markers',
-      'radar.defaultSeriesSettings.base.markers',
-      'polar.defaultSeriesSettings.base.markers',
-      'sparkline.defaultSeriesSettings.base.markers',
       'gantt.base.timeline.markersFactory',
       'standalones.markersFactory',
+      'heatMap.markers',
       'map.defaultSeriesSettings.base.markers'
     ]
   },
@@ -467,10 +509,11 @@ anychart.themes.merging.mergingMap_ = [
     defaultObj: 'defaultGridSettings',
     targets: [
       'defaultMinorGridSettings',
-      'cartesian.defaultGridSettings',
+      'cartesianBase.defaultGridSettings',
       'scatter.defaultGridSettings',
       'polar.defaultGridSettings',
       'radar.defaultGridSettings',
+      'heatMap.defaultGridSettings',
       'stock.defaultPlotSettings.defaultGridSettings',
       'standalones.linearGrid',
       'standalones.radarGrid',
@@ -480,7 +523,7 @@ anychart.themes.merging.mergingMap_ = [
   {
     defaultObj: 'defaultMinorGridSettings',
     targets: [
-      'cartesian.defaultMinorGridSettings',
+      'cartesianBase.defaultMinorGridSettings',
       'scatter.defaultMinorGridSettings',
       'polar.defaultMinorGridSettings',
       'radar.defaultMinorGridSettings',
@@ -490,7 +533,7 @@ anychart.themes.merging.mergingMap_ = [
   {
     defaultObj: 'defaultLineMarkerSettings',
     targets: [
-      'cartesian.defaultLineMarkerSettings',
+      'cartesianBase.defaultLineMarkerSettings',
       'scatter.defaultLineMarkerSettings',
       'sparkline.defaultLineMarkerSettings',
       'standalones.lineAxisMarker'
@@ -499,7 +542,7 @@ anychart.themes.merging.mergingMap_ = [
   {
     defaultObj: 'defaultTextMarkerSettings',
     targets: [
-      'cartesian.defaultTextMarkerSettings',
+      'cartesianBase.defaultTextMarkerSettings',
       'scatter.defaultTextMarkerSettings',
       'sparkline.defaultTextMarkerSettings',
       'standalones.textAxisMarker'
@@ -508,7 +551,7 @@ anychart.themes.merging.mergingMap_ = [
   {
     defaultObj: 'defaultRangeMarkerSettings',
     targets: [
-      'cartesian.defaultRangeMarkerSettings',
+      'cartesianBase.defaultRangeMarkerSettings',
       'scatter.defaultRangeMarkerSettings',
       'sparkline.defaultRangeMarkerSettings',
       'standalones.rangeAxisMarker'
@@ -517,8 +560,10 @@ anychart.themes.merging.mergingMap_ = [
   {
     defaultObj: 'defaultAxis',
     targets: [
-      'cartesian.defaultXAxisSettings',
-      'cartesian.defaultYAxisSettings',
+      'cartesianBase.defaultXAxisSettings',
+      'cartesianBase.defaultYAxisSettings',
+      'heatMap.defaultXAxisSettings',
+      'heatMap.defaultYAxisSettings',
       'scatter.defaultXAxisSettings',
       'scatter.defaultYAxisSettings',
       'bullet.axis',
@@ -540,12 +585,12 @@ anychart.themes.merging.mergingMap_ = [
   {
     defaultObj: 'chart',
     targets: [
-      'cartesian',
+      'cartesianBase',
       'pieFunnelPyramidBase',
       'scatter',
       'radar',
       'polar',
-
+      'heatMap',
       'bullet',
       'circularGauge',
       'map',
@@ -581,65 +626,79 @@ anychart.themes.merging.mergingMap_ = [
   },
 
   {
-    defaultObj: 'cartesian.defaultSeriesSettings.base',
+    defaultObj: 'cartesianBase.defaultSeriesSettings.base',
     targets: [
-      'cartesian.defaultSeriesSettings.areaLike',
-      'cartesian.defaultSeriesSettings.barLike',
-      'cartesian.defaultSeriesSettings.lineLike',
-      'cartesian.defaultSeriesSettings.pieLike',
-      'cartesian.defaultSeriesSettings.marker',
-      'cartesian.defaultSeriesSettings.bubble'
+      'cartesianBase.defaultSeriesSettings.areaLike',
+      'cartesianBase.defaultSeriesSettings.barLike',
+      'cartesianBase.defaultSeriesSettings.lineLike',
+      'cartesianBase.defaultSeriesSettings.pieLike',
+      'cartesianBase.defaultSeriesSettings.marker',
+      'cartesianBase.defaultSeriesSettings.bubble'
     ]
   },
   {
-    defaultObj: 'cartesian.defaultSeriesSettings.areaLike',
+    defaultObj: 'cartesianBase.defaultSeriesSettings.areaLike',
     targets: [
-      'cartesian.defaultSeriesSettings.area',
-      'cartesian.defaultSeriesSettings.splineArea',
-      'cartesian.defaultSeriesSettings.stepArea',
-      'cartesian.defaultSeriesSettings.rangeArea',
-      'cartesian.defaultSeriesSettings.rangeSplineArea',
-      'cartesian.defaultSeriesSettings.rangeStepArea'
+      'cartesianBase.defaultSeriesSettings.area',
+      'cartesianBase.defaultSeriesSettings.splineArea',
+      'cartesianBase.defaultSeriesSettings.stepArea',
+      'cartesianBase.defaultSeriesSettings.rangeArea',
+      'cartesianBase.defaultSeriesSettings.rangeSplineArea',
+      'cartesianBase.defaultSeriesSettings.rangeStepArea'
     ]
   },
   {
-    defaultObj: 'cartesian.defaultSeriesSettings.barLike',
+    defaultObj: 'cartesianBase.defaultSeriesSettings.barLike',
     targets: [
-      'cartesian.defaultSeriesSettings.bar',
-      'cartesian.defaultSeriesSettings.column',
-      'cartesian.defaultSeriesSettings.box',
-      'cartesian.defaultSeriesSettings.rangeBar',
-      'cartesian.defaultSeriesSettings.rangeColumn',
-      'cartesian.defaultSeriesSettings.candlestick'
+      'cartesianBase.defaultSeriesSettings.bar',
+      'cartesianBase.defaultSeriesSettings.column',
+      'cartesianBase.defaultSeriesSettings.box',
+      'cartesianBase.defaultSeriesSettings.rangeBar',
+      'cartesianBase.defaultSeriesSettings.rangeColumn',
+      'cartesianBase.defaultSeriesSettings.candlestick'
     ]
   },
   {
-    defaultObj: 'cartesian.defaultSeriesSettings.lineLike',
+    defaultObj: 'cartesianBase.defaultSeriesSettings.lineLike',
     targets: [
-      'cartesian.defaultSeriesSettings.line',
-      'cartesian.defaultSeriesSettings.spline',
-      'cartesian.defaultSeriesSettings.stepLine',
-      'cartesian.defaultSeriesSettings.ohlc'
+      'cartesianBase.defaultSeriesSettings.line',
+      'cartesianBase.defaultSeriesSettings.spline',
+      'cartesianBase.defaultSeriesSettings.stepLine',
+      'cartesianBase.defaultSeriesSettings.ohlc'
     ]
   },
   {
-    defaultObj: 'cartesian',
+    defaultObj: 'cartesianBase',
     targets: [
+      'cartesian',
       'area',
       'bar',
       'box',
       'column',
       'financial',
-      'line',
-      'heatMap'
+      'line'
     ]
   },
   {
     defaultObj: 'scatter.defaultSeriesSettings.base',
     targets: [
       'scatter.defaultSeriesSettings.bubble',
-      'scatter.defaultSeriesSettings.line',
+      'scatter.defaultSeriesSettings.lineLike',
       'scatter.defaultSeriesSettings.marker'
+    ]
+  },
+  {
+    defaultObj: 'scatter.defaultSeriesSettings.base',
+    targets: [
+      'scatter.defaultSeriesSettings.areaLike',
+      'scatter.defaultSeriesSettings.lineLike',
+      'scatter.defaultSeriesSettings.marker'
+    ]
+  },
+  {
+    defaultObj: 'scatter.defaultSeriesSettings.lineLike',
+    targets: [
+      'scatter.defaultSeriesSettings.line'
     ]
   },
   {
@@ -812,6 +871,7 @@ anychart.themes.merging.nonMergableEntities_ = {
   'dragPreviewFill': anychart.themes.merging.NonMergableEntityTypes_.FILL,
   'dragAreaFill': anychart.themes.merging.NonMergableEntityTypes_.FILL,
   'cellFill': anychart.themes.merging.NonMergableEntityTypes_.FILL,
+  'selectedFill': anychart.themes.merging.NonMergableEntityTypes_.FILL,
 
   'hatchFill': anychart.themes.merging.NonMergableEntityTypes_.HATCH_FILL,
   'hoverHatchFill': anychart.themes.merging.NonMergableEntityTypes_.HATCH_FILL,
@@ -873,6 +933,7 @@ anychart.themes.merging.nonMergableEntities_ = {
  * @private
  */
 anychart.themes.merging.multipleEntities_ = {
+  'chart.scales': '__none__',
   'chart.chartLabels': 'chart.defaultLabelSettings',
   'chart.grids': 'chart.defaultGridSettings',
   'chart.minorGrids': 'chart.defaultMinorGridSettings',
@@ -888,4 +949,17 @@ anychart.themes.merging.multipleEntities_ = {
   'gauge.needles': 'gauge.defaultPointerSettings',
   'gauge.knobs': 'gauge.defaultPointerSettings',
   'gauge.ranges': 'gauge.defaultRangeSettings'
+};
+
+
+/**
+ * Defaults nodes for typed array entities.
+ * @type {Object.<string, {defaults: string, typeDescriptor: string}>}
+ * @private
+ */
+anychart.themes.merging.typedEntities_ = {
+  'chart.series': {
+    defaults: 'chart.defaultSeriesSettings',
+    typeDescriptor: 'seriesType'
+  }
 };

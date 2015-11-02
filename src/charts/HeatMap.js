@@ -1312,14 +1312,10 @@ anychart.charts.HeatMap.prototype.drawContent = function(bounds) {
     xScroller.parentBounds(contentAreaBounds);
     var xScrollerHorizontal = xScroller.isHorizontal();
     var xScrollerSize;
-    if (xScrollerBeforeAxes) {
-      if (xScrollerHorizontal) {
-        xScrollerSize = contentAreaBounds.height - xScroller.getRemainingBounds().height;
-      } else {
-        xScrollerSize = contentAreaBounds.width - xScroller.getRemainingBounds().width;
-      }
+    if (xScrollerHorizontal) {
+      xScrollerSize = contentAreaBounds.height - xScroller.getRemainingBounds().height;
     } else {
-      contentAreaBounds = xScroller.getRemainingBounds();
+      xScrollerSize = contentAreaBounds.width - xScroller.getRemainingBounds().width;
     }
 
     var yScroller = this.yScroller();
@@ -1328,14 +1324,10 @@ anychart.charts.HeatMap.prototype.drawContent = function(bounds) {
     yScroller.parentBounds(contentAreaBounds);
     var yScrollerHorizontal = yScroller.isHorizontal();
     var yScrollerSize;
-    if (yScrollerBeforeAxes) {
-      if (yScrollerHorizontal) {
-        yScrollerSize = contentAreaBounds.height - yScroller.getRemainingBounds().height;
-      } else {
-        yScrollerSize = contentAreaBounds.width - yScroller.getRemainingBounds().width;
-      }
+    if (yScrollerHorizontal) {
+      yScrollerSize = contentAreaBounds.height - yScroller.getRemainingBounds().height;
     } else {
-      contentAreaBounds = yScroller.getRemainingBounds();
+      yScrollerSize = contentAreaBounds.width - yScroller.getRemainingBounds().width;
     }
 
     for (i = 0, count = this.xAxes_.length; i < count; i++) {
@@ -1365,6 +1357,56 @@ anychart.charts.HeatMap.prototype.drawContent = function(bounds) {
       this.leftAxisPadding_ = NaN;
       this.rightAxisPadding_ = NaN;
       var axisStrokeThickness;
+
+      if (!xScrollerBeforeAxes) {
+        switch (xScroller.orientation()) {
+          case anychart.enums.Orientation.TOP:
+            xScroller.padding().top(topOffset + (this.topAxisPadding_ || 0));
+            xScroller.padding().bottom(0);
+            topOffset += xScrollerSize;
+            break;
+          case anychart.enums.Orientation.BOTTOM:
+            xScroller.padding().top(0);
+            xScroller.padding().bottom(bottomOffset + (this.bottomAxisPadding_ || 0));
+            bottomOffset += xScrollerSize;
+            break;
+          case anychart.enums.Orientation.LEFT:
+            xScroller.padding().left(leftOffset + (this.leftAxisPadding_ || 0));
+            xScroller.padding().right(0);
+            leftOffset += xScrollerSize;
+            break;
+          case anychart.enums.Orientation.RIGHT:
+            xScroller.padding().left(0);
+            xScroller.padding().right(rightOffset + (this.rightAxisPadding_ || 0));
+            rightOffset += xScrollerSize;
+            break;
+        }
+      }
+
+      if (!yScrollerBeforeAxes) {
+        switch (yScroller.orientation()) {
+          case anychart.enums.Orientation.TOP:
+            yScroller.padding().top(topOffset + (this.topAxisPadding_ || 0));
+            yScroller.padding().bottom(0);
+            topOffset += yScrollerSize;
+            break;
+          case anychart.enums.Orientation.BOTTOM:
+            yScroller.padding().top(0);
+            yScroller.padding().bottom(bottomOffset + (this.bottomAxisPadding_ || 0));
+            bottomOffset += yScrollerSize;
+            break;
+          case anychart.enums.Orientation.LEFT:
+            yScroller.padding().left(leftOffset + (this.leftAxisPadding_ || 0));
+            yScroller.padding().right(0);
+            leftOffset += yScrollerSize;
+            break;
+          case anychart.enums.Orientation.RIGHT:
+            yScroller.padding().left(0);
+            yScroller.padding().right(rightOffset + (this.rightAxisPadding_ || 0));
+            rightOffset += yScrollerSize;
+            break;
+        }
+      }
 
       for (i = axes.length; i--;) {
         axis = /** @type {anychart.core.axes.Linear} */(axes[i]);
@@ -1907,7 +1949,7 @@ anychart.charts.HeatMap.prototype.setupByJSON = function(config) {
   this.xScroller(config['xScroller']);
   this.yScroller(config['yScroller']);
 
-  var xZoom = json['xZoom'];
+  var xZoom = config['xZoom'];
   var tmp;
   if (goog.isObject(xZoom) && (goog.isNumber(xZoom['scale']) || goog.isString(xZoom['scale']))) {
     tmp = xZoom['scale'];
@@ -1918,7 +1960,7 @@ anychart.charts.HeatMap.prototype.setupByJSON = function(config) {
     this.xZoom(xZoom);
   }
 
-  var yZoom = json['yZoom'];
+  var yZoom = config['yZoom'];
   if (goog.isObject(yZoom) && (goog.isNumber(yZoom['scale']) || goog.isString(yZoom['scale']))) {
     tmp = yZoom['scale'];
     yZoom['scale'] = scalesInstances[yZoom['scale']];
@@ -2137,7 +2179,7 @@ anychart.charts.HeatMap.prototype.serialize = function() {
   json['hoverMarkers'] = this.hoverMarkers().serialize();
   json['selectMarkers'] = this.selectMarkers().serialize();
 
-  json['selectLabels'] = this.labelsDisplayMode();
+  json['labelsDisplayMode'] = this.labelsDisplayMode();
 
   json['xScroller'] = this.xScroller().serialize();
   json['yScroller'] = this.yScroller().serialize();

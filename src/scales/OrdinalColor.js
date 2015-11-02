@@ -170,12 +170,18 @@ anychart.scales.OrdinalColor.prototype.names = function(opt_value) {
       for (var i = 0, len = this.internalRanges_.length; i < len; i++) {
         var range = this.internalRanges_[i];
         var name;
-        if (isFinite(range.start + range.end)) {
-          name = range.start + ' - ' + range.end;
+        if (goog.isDef(range.equal)) {
+          name = range.equal;
+        } else if (isFinite(range.start + range.end)) {
+          if (range.start === range.end) {
+            name = range.start;
+          } else {
+            name = range.start + ' - ' + range.end;
+          }
         } else if (isFinite(range.start)) {
-          name = 'More ' + range.start;
+          name = '> ' + range.start;
         } else {
-          name = 'Less ' + range.end;
+          name = '< ' + range.end;
         }
 
         if (!range.name) range.name = name;
@@ -209,6 +215,24 @@ anychart.scales.OrdinalColor.prototype.ranges = function(opt_value) {
 
 
 /**
+ * Sets/gets data field name for which calculates ranges.
+ * @param {string=} opt_value .
+ * @return {string} .
+ */
+anychart.scales.OrdinalColor.prototype.rangesBy = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.rangesBy_ != opt_value) {
+      this.rangesBy_ = opt_value;
+      this.resetDataRange();
+      this.ticks().markInvalid();
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    }
+  }
+  return this.rangesBy_;
+};
+
+
+/**
  * Returns processed ranges.
  * @return {Array.<Object>} processed ranges.
  */
@@ -234,8 +258,9 @@ anychart.scales.OrdinalColor.prototype.getRangeByValue = function(value) {
   if (this.internalRanges_) {
     for (var i = this.internalRanges_.length; i--;) {
       var r = this.internalRanges_[i];
-      if (value >= r.start && value <= r.end && r.sourceIndex > rangeSourceIndex)
+      if ((goog.isDef(r.equal) && r.equal === value) || (value >= r.start && value <= r.end && r.sourceIndex > rangeSourceIndex)) {
         range = r;
+      }
     }
   }
 
@@ -416,8 +441,8 @@ anychart.scales.OrdinalColor.prototype.resetDataRange = function() {
  */
 anychart.scales.OrdinalColor.prototype.extendDataRange = function(var_args) {
   for (var i = 0; i < arguments.length; i++) {
-    var value = +arguments[i];
-    if (!isNaN(value)) this.data_.push(value);
+    var value = arguments[i];
+    this.data_.push(value);
   }
   return this;
 };
@@ -433,15 +458,27 @@ anychart.scales.OrdinalColor.prototype.calculate = function() {
 
     if (!this.ranges_.length) {
       this.autoRanges_ = [];
-      goog.array.sort(this.data_);
       goog.array.removeDuplicates(this.data_);
 
+      var eqRanges = [];
+      var numRanges = [];
+      goog.array.forEach(this.data_, function(elem) {
+        var elem_ = anychart.utils.toNumber(elem);
+        if (!isNaN(elem)) {
+          numRanges.push(elem_);
+        } else {
+          eqRanges.push({'equal': elem});
+        }
+      });
+
+      goog.array.sort(numRanges);
+
       //calculating intervals count by Sturges formula
-      var k = Math.round(1 + 3.32 * Math.log(this.data_.length) / Math.log(10));
+      var k = Math.round(1 + 3.32 * Math.log(numRanges.length) / Math.log(10));
       //min value
-      var maxValue = this.data_[this.data_.length - 1];
+      var maxValue = numRanges[numRanges.length - 1];
       //max value
-      var minValue = this.data_[0];
+      var minValue = numRanges[0];
       //intervals width
       var h = (maxValue - minValue) / k;
       //left limit of first interval
@@ -456,7 +493,8 @@ anychart.scales.OrdinalColor.prototype.calculate = function() {
         rightLimit = Math.ceil(leftLimit + h);
       }
 
-      this.autoColors_ = anychart.getFullTheme()['ordinalColor']['autoColors'](k);
+      this.autoRanges_ = this.autoRanges_.concat(eqRanges);
+      this.autoColors_ = anychart.getFullTheme()['ordinalColor']['autoColors'](this.autoRanges_.length);
     }
 
     var ranges = this.ranges_.length ? this.ranges_ : this.autoRanges_;
@@ -470,13 +508,22 @@ anychart.scales.OrdinalColor.prototype.calculate = function() {
 
       var enabled = true;
       var sourceIndex = i;
+      var equal = range['equal'];
       var from = anychart.utils.toNumber(range['from']);
       var to = anychart.utils.toNumber(range['to']);
       var less = anychart.utils.toNumber(range['less']);
       var greater = anychart.utils.toNumber(range['greater']);
 
-      var start, end;
-      if (!isNaN(from) && !isNaN(to)) {
+      var start, end, eq = undefined;
+      if (goog.isDef(equal)) {
+        var equal_ = anychart.utils.toNumber(equal);
+        if (!isNaN(equal_)) {
+          start = equal_;
+          end = equal_;
+        } else {
+          eq = equal;
+        }
+      } else if (!isNaN(from) && !isNaN(to)) {
         start = Math.min(from, to);
         end = Math.max(from, to);
       } else if (!isNaN(greater)) {
@@ -489,8 +536,9 @@ anychart.scales.OrdinalColor.prototype.calculate = function() {
         enabled = false;
       }
 
-      if (enabled)
+      if (enabled) {
         tempArr.push({
+          equal: eq,
           start: start,
           end: end,
           sourceIndex: sourceIndex,
@@ -498,6 +546,7 @@ anychart.scales.OrdinalColor.prototype.calculate = function() {
           color: range['color'] || color,
           name: range['name'] || name
         });
+      }
     }
 
     goog.array.sort(tempArr, function(a, b) {
@@ -569,7 +618,8 @@ anychart.scales.ordinalColor = function(opt_value) {
 anychart.scales.OrdinalColor.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['ticks'] = this.ticks().serialize();
-  json['ranges'] = this.ranges();
+  if (this.ranges_ && this.ranges_.length)
+    json['ranges'] = this.ranges_;
   if (this.names_)
     json['names'] = this.names_;
   if (this.colors_)

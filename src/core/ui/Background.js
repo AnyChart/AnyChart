@@ -645,6 +645,24 @@ anychart.core.ui.Background.prototype.setupByJSON = function(config) {
 };
 
 
+/** @inheritDoc */
+anychart.core.ui.Background.prototype.disposeInternal = function() {
+  if (this.rect_) {
+    this.rect_.parent(null);
+    goog.dispose(this.rect_);
+    this.rect_ = null;
+  }
+
+  delete this.fill_;
+  delete this.stroke_;
+  delete this.cornerType_;
+  this.corners_.length = 0;
+  delete this.corners_;
+
+  goog.base(this, 'disposeInternal');
+};
+
+
 //exports
 anychart.core.ui.Background.prototype['fill'] = anychart.core.ui.Background.prototype.fill;//in docs/final
 anychart.core.ui.Background.prototype['stroke'] = anychart.core.ui.Background.prototype.stroke;//in docs/final

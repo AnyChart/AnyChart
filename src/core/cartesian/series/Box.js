@@ -914,6 +914,8 @@ anychart.core.cartesian.series.Box.prototype.outlierMarkers = function(opt_value
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.outlierMarkers_.setup(opt_value);
     return this;
   }
@@ -940,6 +942,8 @@ anychart.core.cartesian.series.Box.prototype.hoverOutlierMarkers = function(opt_
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.hoverOutlierMarkers_.setup(opt_value);
     return this;
   }
@@ -959,6 +963,8 @@ anychart.core.cartesian.series.Box.prototype.selectOutlierMarkers = function(opt
   }
 
   if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.selectOutlierMarkers_.setup(opt_value);
     return this;
   }
@@ -1122,9 +1128,9 @@ anychart.core.cartesian.series.Box.prototype.serialize = function() {
     json['selectWhiskerStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectWhiskerStroke()));
   }
 
-  json['whiskerWidth'] = this.whiskerWidth_ || null;
-  json['hoverWhiskerWidth'] = this.hoverWhiskerWidth_ || null;
-  json['selectWhiskerWidth'] = this.selectWhiskerWidth_ || null;
+  json['whiskerWidth'] = goog.isDef(this.whiskerWidth_) ? this.whiskerWidth_ : null;
+  json['hoverWhiskerWidth'] = goog.isDef(this.hoverWhiskerWidth_) ? this.hoverWhiskerWidth_ : null;
+  json['selectWhiskerWidth'] = goog.isDef(this.selectWhiskerWidth_) ? this.selectWhiskerWidth_ : null;
 
   json['outlierMarkers'] = this.outlierMarkers().serialize();
   json['hoverOutlierMarkers'] = this.hoverOutlierMarkers().serialize();
@@ -1156,9 +1162,9 @@ anychart.core.cartesian.series.Box.prototype.setupByJSON = function(config) {
   this.hoverWhiskerWidth(config['hoverWhiskerWidth']);
   this.selectWhiskerWidth(config['selectWhiskerWidth']);
 
-  this.outlierMarkers(config['outlierMarkers']);
-  this.hoverOutlierMarkers(config['hoverOutlierMarkers']);
-  this.selectOutlierMarkers(config['selectOutlierMarkers']);
+  this.outlierMarkers().setup(config['outlierMarkers']);
+  this.hoverOutlierMarkers().setup(config['hoverOutlierMarkers']);
+  this.selectOutlierMarkers().setup(config['selectOutlierMarkers']);
 };
 
 
