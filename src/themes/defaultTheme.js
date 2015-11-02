@@ -3032,6 +3032,9 @@ window['anychart']['themes']['defaultTheme'] = {
         },
         'height': 25,
         'scale': 0,
+        'ticks': {
+          'enabled': false
+        },
         'labels': {
           'enabled': true,
           'fontSize': '11px',
