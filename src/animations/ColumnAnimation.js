@@ -1,6 +1,5 @@
 goog.provide('anychart.animations.ColumnAnimation');
 goog.require('anychart.animations.Animation');
-goog.require('anychart.core.cartesian.series.DiscreteBase');
 
 
 
@@ -44,6 +43,7 @@ anychart.animations.ColumnAnimation.prototype.onBegin = function() {
 anychart.animations.ColumnAnimation.prototype.cycle = function(now) {
   this.startPoint = [];
   this.endPoint = [];
+  /** @type {Array} */
   this.zero = [];
   var iterator = this.series_.getResetIterator();
   var columnHeight = this.series_.getPointWidth();

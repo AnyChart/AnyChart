@@ -1,23 +1,21 @@
 goog.provide('anychart.core.ui.DataGrid');
 
 goog.require('acgraph');
-goog.require('anychart.core.VisualBaseWithBounds');
+goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.gantt.Controller');
 goog.require('anychart.core.ui.BaseGrid');
 goog.require('anychart.core.ui.Button');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.ScrollBar');
 goog.require('anychart.core.ui.SimpleSplitter');
-goog.require('anychart.core.ui.Tooltip');
+goog.require('anychart.core.ui.Title');
 goog.require('anychart.data.Tree');
 goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
 
 goog.require('goog.date.UtcDateTime');
 goog.require('goog.events');
-goog.require('goog.events.MouseWheelHandler');
 goog.require('goog.i18n.DateTimeFormat');
-goog.require('goog.object');
 
 
 
@@ -360,8 +358,8 @@ anychart.core.ui.DataGrid.prototype.defaultColumnSettings = function(opt_val) {
  * Gets/sets a default title fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -384,8 +382,8 @@ anychart.core.ui.DataGrid.prototype.headerFill = function(opt_fillOrColorOrKeys,
  * Gets/sets a default editStructurePreviewFill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -865,8 +863,8 @@ anychart.core.ui.DataGrid.prototype.specialInvalidated = function() {
     }
 
     if (this.horizontalScrollBar_) {
-      var contentBoundsSimulation = new acgraph.math.Rect(this.pixelBoundsCache.left - this.horizontalOffset_, 0, this.totalGridsWidth, 0);
-      var visibleBoundsSimulation = new acgraph.math.Rect(this.pixelBoundsCache.left, 0, this.pixelBoundsCache.width, 0);
+      var contentBoundsSimulation = new anychart.math.Rect(this.pixelBoundsCache.left - this.horizontalOffset_, 0, this.totalGridsWidth, 0);
+      var visibleBoundsSimulation = new anychart.math.Rect(this.pixelBoundsCache.left, 0, this.pixelBoundsCache.width, 0);
 
       this.horizontalScrollBar_
           .suspendSignalsDispatching()

@@ -1,5 +1,6 @@
 goog.provide('anychart.core.ui.toolbar.ToolbarSeparatorRenderer');
 
+goog.require('goog.ui.Separator');
 goog.require('goog.ui.ToolbarSeparatorRenderer');
 goog.require('goog.ui.registry');
 

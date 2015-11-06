@@ -1,6 +1,6 @@
 goog.provide('anychart.core.ui.TooltipItem');
-goog.require('acgraph');
-goog.require('anychart.core.VisualBaseWithBounds');
+goog.require('acgraph.math.Coordinate');
+goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.Label');
 goog.require('anychart.core.ui.Separator');

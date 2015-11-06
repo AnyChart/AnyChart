@@ -178,8 +178,8 @@ anychart.core.gantt.TimelineHeader.prototype.scale = function(opt_value) {
  * Gets/sets background fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -217,8 +217,8 @@ anychart.core.gantt.TimelineHeader.prototype.draw = function() {
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-      this.pixelBoundsCache_ = /** @type {acgraph.math.Rect} */ (this.getPixelBounds());
-      this.bgRect_.setBounds(/** @type {acgraph.math.Rect} */ (this.pixelBoundsCache_));
+      this.pixelBoundsCache_ = /** @type {anychart.math.Rect} */ (this.getPixelBounds());
+      this.bgRect_.setBounds(/** @type {anychart.math.Rect} */ (this.pixelBoundsCache_));
 
       for (i = 0, l = this.levels_.length; i < l; i++) {
         if (this.levels_[i].enabled()) counter++;
@@ -505,8 +505,8 @@ anychart.core.gantt.TimelineHeader.Level.prototype.getLabelsFactory_ = function(
  * Gets/sets background fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -565,7 +565,7 @@ anychart.core.gantt.TimelineHeader.Level.prototype.draw = function() {
 
     if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
       this.pixelBoundsCache_ = this.getPixelBounds();
-      this.getBase_().clip(/** @type {acgraph.math.Rect} */ (this.pixelBoundsCache_));
+      this.getBase_().clip(/** @type {anychart.math.Rect} */ (this.pixelBoundsCache_));
       this.markConsistent(anychart.ConsistencyState.BOUNDS);
     }
 

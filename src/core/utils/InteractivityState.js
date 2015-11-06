@@ -5,14 +5,14 @@ goog.provide('anychart.core.utils.PieInteractivityState');
 
 /**
  * Interactivity state class.
- * @param {anychart.core.SeriesBase|anychart.core.Chart|anychart.core.gauge.pointers.Base} target Target for integrate interactivity states.
+ * @param {anychart.core.utils.IInteractiveSeries} target Target for integrate interactivity states.
  * Series of chart or series like chart (pie, PyramidFunnelBase charts and e.g.).
  * @constructor
  */
 anychart.core.utils.InteractivityState = function(target) {
   /**
    * Link to series for appearance manipulation.
-   * @type {anychart.core.SeriesBase|anychart.core.Chart|anychart.core.gauge.pointers.Base}
+   * @type {anychart.core.utils.IInteractiveSeries}
    */
   this.target = target;
 

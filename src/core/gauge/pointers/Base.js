@@ -1,6 +1,8 @@
 goog.provide('anychart.core.gauge.pointers.Base');
 goog.require('acgraph');
 goog.require('anychart.core.VisualBase');
+goog.require('anychart.core.utils.IInteractiveSeries');
+goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.SeriesPointContextProvider');
 
 
@@ -9,6 +11,7 @@ goog.require('anychart.core.utils.SeriesPointContextProvider');
  * Bar pointer class.<br/>
  * @constructor
  * @extends {anychart.core.VisualBase}
+ * @implements {anychart.core.utils.IInteractiveSeries}
  */
 anychart.core.gauge.pointers.Base = function() {
   goog.base(this);
@@ -150,8 +153,8 @@ anychart.core.gauge.pointers.Base.prototype.stroke = function(opt_strokeOrFill, 
  * Pointer fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .

@@ -1,10 +1,6 @@
 goog.provide('anychart.core.polar.series.Base');
 goog.require('acgraph');
-goog.require('anychart.color');
 goog.require('anychart.core.SeriesBase');
-goog.require('anychart.core.ui.LabelsFactory');
-goog.require('anychart.core.utils.LegendContextProvider');
-goog.require('anychart.core.utils.LegendItemSettings');
 goog.require('anychart.core.utils.SeriesPointContextProvider');
 goog.require('anychart.data');
 goog.require('anychart.enums');
@@ -540,7 +536,7 @@ anychart.core.polar.series.Base.prototype.startDrawing = function() {
   this.pixelBoundsCache = this.getPixelBounds();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var bounds = /** @type {acgraph.math.Rect} */(this.pixelBoundsCache);
+    var bounds = /** @type {anychart.math.Rect} */(this.pixelBoundsCache);
     this.radius = Math.min(bounds.width, bounds.height) / 2;
     this.cx = Math.round(bounds.left + bounds.width / 2);
     this.cy = Math.round(bounds.top + bounds.height / 2);

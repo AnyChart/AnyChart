@@ -2,9 +2,6 @@ goog.provide('anychart.core.radar.series.Base');
 goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.SeriesBase');
-goog.require('anychart.core.ui.LabelsFactory');
-goog.require('anychart.core.utils.LegendContextProvider');
-goog.require('anychart.core.utils.LegendItemSettings');
 goog.require('anychart.core.utils.SeriesPointContextProvider');
 goog.require('anychart.data');
 goog.require('anychart.enums');
@@ -381,7 +378,7 @@ anychart.core.radar.series.Base.prototype.getZeroPointCoords = function() {
  * @protected
  */
 anychart.core.radar.series.Base.prototype.applyRatioToBounds = function(ratio, horizontal) {
-  /** @type {acgraph.math.Rect} */
+  /** @type {anychart.math.Rect} */
   var bounds = this.pixelBoundsCache;
   var min, range;
   if (horizontal) {

@@ -2,7 +2,6 @@ goog.provide('anychart.color');
 goog.require('acgraph');
 goog.require('goog.color');
 goog.require('goog.math');
-goog.require('goog.string');
 
 
 

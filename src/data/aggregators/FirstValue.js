@@ -1,6 +1,5 @@
 goog.provide('anychart.data.aggregators.FirstValue');
 goog.require('anychart.data.aggregators.Base');
-goog.require('anychart.utils');
 
 
 

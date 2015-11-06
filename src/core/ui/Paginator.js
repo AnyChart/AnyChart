@@ -1,7 +1,6 @@
 goog.provide('anychart.core.ui.Paginator');
 goog.require('acgraph');
 goog.require('anychart.core.Text');
-goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.PaginatorButton');
 goog.require('anychart.core.utils.Margin');

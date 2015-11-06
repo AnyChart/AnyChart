@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.core.Chart file.
+ * @suppress {extraRequire}
+ * todo: anychart.core.utils.InteractivityState should be excluded from requires
+ */
 goog.provide('anychart.core.Chart');
 goog.require('acgraph');
 goog.require('anychart.core.VisualBaseWithBounds');
@@ -9,6 +14,7 @@ goog.require('anychart.core.ui.Legend');
 goog.require('anychart.core.ui.Title');
 goog.require('anychart.core.utils.Animation');
 goog.require('anychart.core.utils.Interactivity');
+goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.Margin');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.themes.merging');
@@ -990,7 +996,7 @@ anychart.core.Chart.prototype.beforeDraw = goog.nullFunction;
 
 /**
  * Extension point do draw chart content.
- * @param {acgraph.math.Rect} bounds Chart content area bounds.
+ * @param {anychart.math.Rect} bounds Chart content area bounds.
  */
 anychart.core.Chart.prototype.drawContent = goog.nullFunction;
 

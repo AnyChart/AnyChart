@@ -1,9 +1,10 @@
 goog.provide('anychart.core.ui.MarkersFactory');
 goog.provide('anychart.core.ui.MarkersFactory.Marker');
-goog.require('acgraph');
+goog.require('acgraph.math.Coordinate');
 goog.require('anychart.color');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.enums');
+goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
 
 
@@ -678,8 +679,8 @@ anychart.core.ui.MarkersFactory.prototype.offsetY = function(opt_value) {
  * @ignoreDoc
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -855,7 +856,7 @@ anychart.core.ui.MarkersFactory.prototype.measure = function(positionProvider) {
   var formattedPosition = goog.object.clone(this.positionFormatter_.call(positionProvider, positionProvider));
   var position = new acgraph.math.Coordinate(formattedPosition['x'], formattedPosition['y']);
   var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
-      new acgraph.math.Rect(0, 0, markerBounds.width, markerBounds.height),
+      new anychart.math.Rect(0, 0, markerBounds.width, markerBounds.height),
       anchor);
 
   position.x -= anchorCoordinate.x;
@@ -1399,8 +1400,8 @@ anychart.core.ui.MarkersFactory.Marker.prototype.offsetY = function(opt_value) {
  * Getter for current fill settings of all markers.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -1636,7 +1637,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.draw = function() {
     var formattedPosition = goog.object.clone(settings['positionFormatter'].call(positionProvider, positionProvider));
     var position = new acgraph.math.Coordinate(formattedPosition['x'], formattedPosition['y']);
     var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
-        new acgraph.math.Rect(0, 0, markerBounds.width, markerBounds.height),
+        new anychart.math.Rect(0, 0, markerBounds.width, markerBounds.height),
         /** @type {anychart.enums.Anchor} */(settings['anchor']));
 
     position.x -= anchorCoordinate.x;

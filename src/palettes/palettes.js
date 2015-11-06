@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.palettes namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.palettes');
 goog.require('anychart.palettes.DistinctColors');
 goog.require('anychart.palettes.HatchFills');

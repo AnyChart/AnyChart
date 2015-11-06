@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.modules.sparkline namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.modules.sparkline');
 
 goog.require('anychart.charts.Sparkline');

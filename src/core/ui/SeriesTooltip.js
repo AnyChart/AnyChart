@@ -1,6 +1,14 @@
 goog.provide('anychart.core.ui.SeriesTooltip');
+goog.require('acgraph.math.Coordinate');
 goog.require('anychart.core.VisualBase');
+goog.require('anychart.core.ui.Background');
+goog.require('anychart.core.ui.Label');
+goog.require('anychart.core.ui.Separator');
+goog.require('anychart.core.ui.Title');
+goog.require('anychart.core.utils.Padding');
 goog.require('anychart.core.utils.TooltipsContainer');
+goog.require('anychart.math.Rect');
+goog.require('goog.async.Delay');
 
 
 
@@ -1367,7 +1375,7 @@ anychart.core.ui.SeriesTooltip.prototype.hide = function(event) {
     var clientX = event['originalEvent']['clientX'];
     var clientY = event['originalEvent']['clientY'];
     var pixelBounds = this.getPixelBounds();
-    var distance = pixelBounds.distance(new goog.math.Coordinate(clientX, clientY));
+    var distance = pixelBounds.distance(new acgraph.math.Coordinate(clientX, clientY));
 
     // cursor inside the tooltip
     if (!distance) {

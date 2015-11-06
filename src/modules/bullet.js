@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.modules.bullet namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.modules.bullet');
 
 goog.require('anychart.charts.Bullet');

@@ -1,6 +1,9 @@
 goog.provide('anychart.data.TableAggregatedStorage');
 goog.provide('anychart.data.TableMainStorage');
 goog.provide('anychart.data.TableStorage');
+goog.require('anychart.data.TableRow');
+goog.require('anychart.data.csv.Parser');
+goog.require('anychart.data.csv.TableItemsProcessor');
 goog.require('goog.array');
 
 

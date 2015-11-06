@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.modules.scatter namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.modules.scatter');
 
 goog.require('anychart.charts.Scatter');

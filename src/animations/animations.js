@@ -1,3 +1,7 @@
+/**
+ * @fileoverview anychart.animations namespace file.
+ * @suppress {extraRequire}
+ */
 goog.provide('anychart.animations');
 goog.require('anychart.animations.AnimationParallelQueue');
 goog.require('anychart.animations.BarAnimation');

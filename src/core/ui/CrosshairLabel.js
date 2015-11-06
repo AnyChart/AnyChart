@@ -1,5 +1,7 @@
 goog.provide('anychart.core.ui.CrosshairLabel');
+goog.require('acgraph.math.Coordinate');
 goog.require('anychart.core.ui.LabelBase');
+goog.require('anychart.math.Rect');
 
 
 
@@ -155,7 +157,7 @@ anychart.core.ui.CrosshairLabel.prototype.drawLabel = function() {
   var anchor = /** @type {anychart.enums.Anchor} */(this.getFinalAnchor());
 
   var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
-      new acgraph.math.Rect(0, 0, this.backgroundWidth, this.backgroundHeight),
+      new anychart.math.Rect(0, 0, this.backgroundWidth, this.backgroundHeight),
       anchor);
 
   position.x -= anchorCoordinate.x;
@@ -178,7 +180,7 @@ anychart.core.ui.CrosshairLabel.prototype.drawLabel = function() {
   if (clip) {
     clip.bounds(this.textX, this.textY, this.textWidth, this.textHeight);
   } else {
-    clip = new acgraph.vector.Clip(null, this.textX, this.textY, this.textWidth, this.textHeight);
+    clip = acgraph.clip(this.textX, this.textY, this.textWidth, this.textHeight);
     this.textElement.clip(clip);
   }
 

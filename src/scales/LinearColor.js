@@ -2,6 +2,7 @@ goog.provide('anychart.scales.LinearColor');
 
 goog.require('anychart.enums');
 goog.require('anychart.scales.ScatterBase');
+goog.require('anychart.scales.ScatterTicks');
 
 
 

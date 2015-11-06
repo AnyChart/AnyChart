@@ -1,7 +1,6 @@
 goog.provide('anychart.core.utils.TooltipsContainer');
 goog.require('acgraph');
 goog.require('goog.Disposable');
-goog.require('goog.array');
 goog.require('goog.dom');
 goog.require('goog.userAgent');
 

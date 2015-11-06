@@ -2,7 +2,6 @@ goog.provide('anychart.data.ConcatView');
 
 goog.require('anychart.data.View');
 goog.require('anychart.enums');
-goog.require('goog.array');
 
 
 

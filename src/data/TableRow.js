@@ -1,5 +1,4 @@
 goog.provide('anychart.data.TableRow');
-goog.require('anychart.utils');
 
 
 

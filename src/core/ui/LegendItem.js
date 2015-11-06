@@ -4,7 +4,6 @@ goog.require('anychart.core.Text');
 goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
-goog.require('goog.events.BrowserEvent');
 
 
 
@@ -541,8 +540,8 @@ anychart.core.ui.LegendItem.prototype.iconType = function(opt_value) {
  * Getter/setter for legend item icon fill setting.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -644,8 +643,8 @@ anychart.core.ui.LegendItem.prototype.iconMarkerType = function(opt_value) {
  * Getter/setter for icon marker fill setting.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -911,7 +910,7 @@ anychart.core.ui.LegendItem.prototype.calculateBounds_ = function() {
   if (legendItemMaxHeight)
     this.textElement_.height(legendItemMaxHeight);
 
-  /** @type {acgraph.math.Rect} */
+  /** @type {anychart.math.Rect} */
   var textBounds = this.textElement_.getBounds();
   var width = (this.iconEnabled_ ? this.iconSize_ + this.iconTextSpacing_ : 0) + textBounds.width;
   var height = textBounds.height;

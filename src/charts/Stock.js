@@ -1,8 +1,9 @@
 goog.provide('anychart.charts.Stock');
 goog.require('anychart.core.Chart');
+goog.require('anychart.core.stock.Controller');
 goog.require('anychart.core.stock.Plot');
 goog.require('anychart.core.stock.Scroller');
-goog.require('anychart.core.utils.InteractivityState');
+goog.require('anychart.core.ui.ChartTooltip');
 goog.require('anychart.enums');
 goog.require('anychart.scales.StockOrdinalDateTime');
 goog.require('anychart.scales.StockScatterDateTime');
@@ -84,12 +85,6 @@ anychart.charts.Stock = function() {
    * @private
    */
   this.highlightedClientY_ = NaN;
-
-  /**
-   * Interactivity state.
-   * @type {anychart.core.utils.InteractivityState}
-   */
-  this.state = new anychart.core.utils.InteractivityState(this);
 };
 goog.inherits(anychart.charts.Stock, anychart.core.Chart);
 
@@ -942,7 +937,16 @@ anychart.charts.Stock.prototype.createTooltip = function() {
 
 /**
  * Returns current first selected.
- * @return {Object}
+ * @return {{
+ *    firstKey: number,
+ *    lastKey: number,
+ *    firstIndex: number,
+ *    lastIndex: number,
+ *    minIndex: number,
+ *    maxIndex: number,
+ *    minKey: number,
+ *    maxKey: number
+ * }}
  */
 anychart.charts.Stock.prototype.getDragAnchor = function() {
   var controller = this.dataController_;

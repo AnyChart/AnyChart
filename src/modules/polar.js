@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.modules.polar namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.modules.polar');
 
 goog.require('anychart.charts.Polar');

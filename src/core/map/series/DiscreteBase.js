@@ -1,6 +1,7 @@
 goog.provide('anychart.core.map.series.DiscreteBase');
 goog.require('acgraph');
 goog.require('anychart.core.map.series.BaseWithMarkers');
+goog.require('anychart.core.utils.TypedLayer');
 
 
 

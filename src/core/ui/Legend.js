@@ -1,5 +1,5 @@
 goog.provide('anychart.core.ui.Legend');
-goog.require('acgraph');
+goog.require('acgraph.math.Coordinate');
 goog.require('anychart.core.Text');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.LegendItem');

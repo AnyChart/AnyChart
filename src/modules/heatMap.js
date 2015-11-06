@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.modules.heatMap namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.modules.heatMap');
 
 goog.require('anychart.charts.HeatMap');

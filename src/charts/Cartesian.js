@@ -140,7 +140,7 @@ anychart.charts.Cartesian = function(opt_barChartMode) {
 
   /**
    * Cache of chart data bounds.
-   * @type {acgraph.math.Rect}
+   * @type {anychart.math.Rect}
    * @private
    */
   this.dataBounds_ = null;

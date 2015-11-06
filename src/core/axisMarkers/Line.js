@@ -2,6 +2,7 @@ goog.provide('anychart.core.axisMarkers.Line');
 goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.VisualBase');
+goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
 goog.require('goog.math');

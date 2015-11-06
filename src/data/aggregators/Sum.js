@@ -1,6 +1,5 @@
 goog.provide('anychart.data.aggregators.Sum');
 goog.require('anychart.data.aggregators.Base');
-goog.require('anychart.math');
 goog.require('anychart.utils');
 
 

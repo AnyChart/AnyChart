@@ -1,7 +1,6 @@
 goog.provide('anychart.core.gauge.pointers.Needle');
 goog.require('acgraph');
 goog.require('anychart.core.gauge.pointers.Base');
-goog.require('anychart.enums');
 goog.require('anychart.utils');
 
 

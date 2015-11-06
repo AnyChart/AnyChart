@@ -1,6 +1,11 @@
+/**
+ * @fileoverview anychart.data.View namespace file.
+ * @suppress {missingRequire}
+ */
 goog.provide('anychart.data.View');
 
 goog.require('anychart.core.Base');
+goog.require('anychart.data.IView');
 goog.require('anychart.data.Iterator');
 goog.require('anychart.enums');
 

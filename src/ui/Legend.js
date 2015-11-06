@@ -1,4 +1,5 @@
 goog.provide('anychart.ui.Legend');
+goog.provide('anychart.ui.LegendItem');
 goog.require('anychart.core.ui.Legend');
 goog.require('anychart.core.ui.LegendItem');
 

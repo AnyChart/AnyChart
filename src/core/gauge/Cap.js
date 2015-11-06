@@ -2,9 +2,6 @@ goog.provide('anychart.core.gauge.Cap');
 goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.VisualBase');
-goog.require('anychart.core.ui.MarkersFactory');
-goog.require('anychart.core.utils.Bounds');
-goog.require('anychart.enums');
 goog.require('anychart.utils');
 
 
@@ -120,8 +117,8 @@ anychart.core.gauge.Cap.prototype.stroke = function(opt_strokeOrFill, opt_thickn
  * Cap fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .

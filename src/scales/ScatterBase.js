@@ -374,7 +374,7 @@ anychart.scales.ScatterBase.prototype.needsAutoCalc = function() {
 anychart.scales.ScatterBase.prototype.transform = function(value, opt_subRangeRatio) {
   this.calculate();
   value = anychart.utils.toNumber(value);
-  return this.applyZoomAndInverse((+(/** @type {number} */(value)) - this.min) / this.range);
+  return this.applyZoomAndInverse((value - this.min) / this.range);
 };
 
 

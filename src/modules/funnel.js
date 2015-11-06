@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.modules.funnel namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.modules.funnel');
 
 goog.require('anychart.charts.Funnel');

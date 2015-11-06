@@ -10,9 +10,8 @@ goog.require('anychart.core.gauge.pointers.Knob');
 goog.require('anychart.core.gauge.pointers.Marker');
 goog.require('anychart.core.gauge.pointers.Needle');
 goog.require('anychart.core.ui.CircularLabel');
-goog.require('anychart.core.utils.InteractivityState');
-
-goog.require('anychart.scales');
+goog.require('anychart.data.Set');
+goog.require('anychart.math.Rect');
 
 
 /**
@@ -782,8 +781,8 @@ anychart.gauges.Circular.prototype.sweepAngle = function(opt_value) {
  * Gauge frame fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .

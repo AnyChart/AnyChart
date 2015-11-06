@@ -1,6 +1,5 @@
 goog.provide('anychart.core.stock.series.DiscreteBase');
 goog.require('anychart.core.stock.series.Base');
-goog.require('anychart.enums');
 
 
 

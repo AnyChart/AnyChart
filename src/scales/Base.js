@@ -442,8 +442,8 @@ anychart.scales.Base.prototype.applyModeValue_ = function(value) {
  */
 anychart.scales.Base.prototype.applyModePercent_ = function(value) {
   value = anychart.utils.toNumber(value);
-  var max = /** @type {number} */(value) < 0 ? -this.stackMin_ : this.stackMax_;
-  return this.applyModeValue_(goog.math.clamp(/** @type {number} */(value) * 100 / max, -100, 100));
+  var max = value < 0 ? -this.stackMin_ : this.stackMax_;
+  return this.applyModeValue_(goog.math.clamp(value * 100 / max, -100, 100));
 };
 //endregion
 

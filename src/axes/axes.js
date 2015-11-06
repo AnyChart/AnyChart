@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.axes namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.axes');
 goog.require('anychart.axes.Linear');
 goog.require('anychart.axes.Polar');

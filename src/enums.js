@@ -1,5 +1,6 @@
 goog.provide('anychart.enums');
 goog.require('acgraph');
+goog.require('acgraph.vector.primitives');
 
 
 /**

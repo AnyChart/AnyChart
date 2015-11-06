@@ -1,5 +1,5 @@
 goog.provide('anychart.core.ui.LabelBase');
-goog.require('acgraph');
+goog.require('acgraph.math.Coordinate');
 goog.require('anychart.core.Text');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.utils.Padding');
@@ -1076,7 +1076,7 @@ anychart.core.ui.LabelBase.prototype.drawLabel = function() {
   }
 
   var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
-      new acgraph.math.Rect(0, 0, this.backgroundWidth, this.backgroundHeight),
+      new anychart.math.Rect(0, 0, this.backgroundWidth, this.backgroundHeight),
       this.getFinalAnchor());
 
   position.x -= anchorCoordinate.x;

@@ -1,4 +1,5 @@
 goog.provide('anychart.core.stock.series.Line');
+goog.require('anychart.core.dataDrawers.Line');
 goog.require('anychart.core.stock.series.Base');
 goog.require('anychart.enums');
 

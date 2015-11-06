@@ -1,7 +1,6 @@
 goog.provide('anychart.data.FilterView');
 
 goog.require('anychart.data.View');
-goog.require('goog.array');
 
 
 

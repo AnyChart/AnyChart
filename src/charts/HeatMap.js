@@ -2,12 +2,14 @@ goog.provide('anychart.charts.HeatMap');
 
 goog.require('anychart'); // otherwise we can't use anychart.chartTypesMap object.
 goog.require('anychart.core.SeparateChart');
+goog.require('anychart.core.axes.Linear');
+goog.require('anychart.core.grids.Linear');
 goog.require('anychart.core.heatMap.series.Base');
 goog.require('anychart.core.ui.ChartScroller');
 goog.require('anychart.core.utils.IZoomableChart');
-goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.OrdinalZoom');
 goog.require('anychart.enums');
+goog.require('anychart.scales.Ordinal');
 goog.require('anychart.scales.OrdinalColor');
 
 
@@ -76,7 +78,7 @@ anychart.charts.HeatMap = function(opt_data, opt_csvSettings) {
 
   /**
    * Cache of chart data bounds.
-   * @type {acgraph.math.Rect}
+   * @type {anychart.math.Rect}
    * @private
    */
   this.dataBounds_ = null;
@@ -2217,8 +2219,8 @@ anychart.charts.HeatMap.prototype.labelsDisplayMode = function(opt_value) {
  * Getter/setter for current fill color.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -2237,8 +2239,8 @@ anychart.charts.HeatMap.prototype.fill = function(opt_fillOrColorOrKeys, opt_opa
  * Getter/setter for current hover fill color.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -2257,8 +2259,8 @@ anychart.charts.HeatMap.prototype.hoverFill = function(opt_fillOrColorOrKeys, op
  * Getter/setter for current select fill color.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .

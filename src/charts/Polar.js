@@ -6,7 +6,6 @@ goog.require('anychart.core.axes.Polar');
 goog.require('anychart.core.axes.Radial');
 goog.require('anychart.core.grids.Polar');
 goog.require('anychart.core.polar.series.Base');
-goog.require('anychart.core.utils.OrdinalIterator');
 goog.require('anychart.enums');
 goog.require('anychart.palettes.DistinctColors');
 goog.require('anychart.palettes.HatchFills');

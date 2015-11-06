@@ -4,8 +4,7 @@ goog.require('anychart.color');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.ui.Button');
 goog.require('anychart.enums');
-goog.require('anychart.math');
-goog.require('anychart.utils');
+goog.require('anychart.math.Rect');
 goog.require('goog.events.Event');
 goog.require('goog.math');
 
@@ -147,7 +146,7 @@ anychart.core.ui.ScrollBar = function() {
    * Content bounds. Here it is actually a reflection of some real content bounds. Used to calculate a correct positions.
    * NOTE: startRatio_ with endRatio_ and contentBounds_ with visibleBounds_ depend on each other.
    *
-   * @type {acgraph.math.Rect}
+   * @type {anychart.math.Rect}
    * @private
    */
   this.contentBounds_ = null;
@@ -157,7 +156,7 @@ anychart.core.ui.ScrollBar = function() {
    * Visible bounds in a content bounds. Actually is 'what we can see'. Used to calculate a correct positions.
    * NOTE: startRatio_ with endRatio_ and contentBounds_ with visibleBounds_ depend on each other.
    *
-   * @type {acgraph.math.Rect}
+   * @type {anychart.math.Rect}
    * @private
    */
   this.visibleBounds_ = null;
@@ -303,8 +302,8 @@ anychart.core.ui.ScrollBar.prototype.backgroundStroke = function(opt_strokeOrFil
  * Gets/sets a background fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -350,8 +349,8 @@ anychart.core.ui.ScrollBar.prototype.sliderStroke = function(opt_strokeOrFill, o
  * Gets/sets a slider fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -388,14 +387,14 @@ anychart.core.ui.ScrollBar.prototype.handlePositionChange = function(opt_value) 
  * Gets/sets a content bounds.
  * Content bounds in this case is a reflection of some real bounds that express a real content's sizes.
  *
- * @param {acgraph.math.Rect=} opt_value - Value to be set.
+ * @param {anychart.math.Rect=} opt_value - Value to be set.
  * @param {string=} opt_eventSource - Scroll event source. Additional information to be attached to event object. Used
  *  for advanced events manipulations.
- * @return {anychart.core.ui.ScrollBar|acgraph.math.Rect} - Current value or itself for chaining.
+ * @return {anychart.core.ui.ScrollBar|anychart.math.Rect} - Current value or itself for chaining.
  */
 anychart.core.ui.ScrollBar.prototype.contentBounds = function(opt_value, opt_eventSource) {
   if (goog.isDef(opt_value)) {
-    if (!acgraph.math.Rect.equals(this.contentBounds_, opt_value)) {
+    if (!anychart.math.Rect.equals(this.contentBounds_, opt_value)) {
       this.contentBounds_ = opt_value.clone();
       if (!this.visibleBounds_) {
         this.visibleBounds_ = this.contentBounds_.clone();
@@ -416,14 +415,14 @@ anychart.core.ui.ScrollBar.prototype.contentBounds = function(opt_value, opt_eve
  * Gets/sets a visible bounds.
  * Visible bounds in this case is a reflection of some real bounds visible in a real content's bounds.
  *
- * @param {acgraph.math.Rect=} opt_value - Value to be set.
+ * @param {anychart.math.Rect=} opt_value - Value to be set.
  * @param {string=} opt_eventSource - Scroll event source. Additional information to be attached to event object. Used
  *  for advanced events manipulations.
- * @return {anychart.core.ui.ScrollBar|acgraph.math.Rect} - Current value or itself for chaining.
+ * @return {anychart.core.ui.ScrollBar|anychart.math.Rect} - Current value or itself for chaining.
  */
 anychart.core.ui.ScrollBar.prototype.visibleBounds = function(opt_value, opt_eventSource) {
   if (goog.isDef(opt_value)) {
-    if (!acgraph.math.Rect.equals(this.visibleBounds_, opt_value)) {
+    if (!anychart.math.Rect.equals(this.visibleBounds_, opt_value)) {
       this.visibleBounds_ = opt_value.clone();
       if (!this.contentBounds_) {
         this.contentBounds_ = this.visibleBounds_.clone();
@@ -1116,7 +1115,7 @@ anychart.core.ui.ScrollBar.prototype.drawWrapper_ = function(opt_dragging) {
  * 4) What if the scroll bar is shortened much more? For example, if we've got a square scroll bar itself? In this case,
  * the buttons become rectangles and take 1/3 part of available length.
  *
- * @param {acgraph.math.Rect} pixelBounds - Scroll bar's pixel bounds.
+ * @param {anychart.math.Rect} pixelBounds - Scroll bar's pixel bounds.
  * @param {boolean} isVertical - If current layout is vertical.
  * @private
  * @return {boolean} - If the buttons' sizes must be reduced.
@@ -1266,14 +1265,16 @@ anychart.core.ui.ScrollBar.prototype.placeButtons_ = function() {
     forwardButtonTop = isVertical ? b.top + b.height - buttonHeight : b.top;
 
     this.forwardButton_
-        .parentBounds(b) //TODO (A.Kudryavtsev): parent bounds from VisualBaseWithBounds are not implemented yet.
+        .parentBounds(b); //TODO (A.Kudryavtsev): parent bounds from VisualBaseWithBounds are not implemented yet.
+    this.forwardButton_
         .position({'x': forwardButtonLeft, 'y': forwardButtonTop})
         .width(buttonWidth)
         .height(buttonHeight)
         .draw();
 
     this.backwardButton_
-        .parentBounds(b) //TODO TODO (A.Kudryavtsev): parent bounds from VisualBaseWithBounds are not implemented yet.
+        .parentBounds(b); //TODO TODO (A.Kudryavtsev): parent bounds from VisualBaseWithBounds are not implemented yet.
+    this.backwardButton_
         .position({'x': backwardButtonLeft, 'y': backwardButtonTop})
         .width(buttonWidth)
         .height(buttonHeight)
@@ -1310,7 +1311,7 @@ anychart.core.ui.ScrollBar.prototype.drawInternal_ = function() {
     dragTop = isVertical ? b.top + buttonHeight + 1 : b.top;
     dragWidth = isVertical ? b.width : b.width - 2 * (buttonWidth + 1);
     dragHeight = isVertical ? b.height - 2 * (buttonHeight + 1) : b.height;
-    drag = new acgraph.math.Rect(/** @type {number} */ (dragLeft), /** @type {number} */ (dragTop), dragWidth, dragHeight);
+    drag = new anychart.math.Rect(/** @type {number} */ (dragLeft), /** @type {number} */ (dragTop), dragWidth, dragHeight);
   } else {
     drag = b.clone();
   }
@@ -1493,7 +1494,7 @@ anychart.core.ui.ScrollBar.ScrollEvent.prototype['endRatio'] = 0;
 
 /**
  * Visible bounds.
- * @type {?acgraph.math.Rect}
+ * @type {?anychart.math.Rect}
  */
 anychart.core.ui.ScrollBar.ScrollEvent.prototype['visibleBounds'] = null;
 

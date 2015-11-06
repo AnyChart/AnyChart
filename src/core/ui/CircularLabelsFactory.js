@@ -1,5 +1,6 @@
 goog.provide('anychart.core.ui.CircularLabelsFactory');
 goog.require('anychart.core.ui.LabelsFactory');
+goog.require('anychart.math.Rect');
 
 
 

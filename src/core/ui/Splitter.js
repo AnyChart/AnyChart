@@ -6,7 +6,7 @@ goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.enums');
-goog.require('anychart.math');
+goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
 goog.require('goog.math');
 
@@ -81,7 +81,7 @@ anychart.core.ui.Splitter = function() {
 
   /**
    * Pixel bounds cache. Allows to avoid re-calculation of pixel bounds.
-   * @type {acgraph.math.Rect}
+   * @type {anychart.math.Rect}
    * @private
    */
   this.pixelBoundsCache_;
@@ -359,8 +359,8 @@ anychart.core.ui.Splitter.prototype.stroke = function(opt_strokeOrFill, opt_thic
  *
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -406,8 +406,8 @@ anychart.core.ui.Splitter.prototype.dragPreviewStroke = function(opt_strokeOrFil
  * Gets/sets a drag preview fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -453,8 +453,8 @@ anychart.core.ui.Splitter.prototype.dragAreaStroke = function(opt_strokeOrFill, 
  * Gets/sets a drag area fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -656,21 +656,21 @@ anychart.core.ui.Splitter.prototype.bottomLimitSize = function(opt_value) {
  * Calculates a currents start bounds.
  * Start bounds is lefter rectangle for vertical splitting and an upper rectangle for horizontal splitting.
  *
- * @return {acgraph.math.Rect} - Start bounds rect.
+ * @return {anychart.math.Rect} - Start bounds rect.
  * @private
  */
 anychart.core.ui.Splitter.prototype.getStartBounds_ = function() {
   if (!this.pixelBoundsCache_) this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.getPixelBounds());
   var add = this.considerSplitterWidth_ ? this.splitterWidth_ : 0;
   if (this.isVertical_()) {
-    return new acgraph.math.Rect(
+    return new anychart.math.Rect(
         anychart.math.round(this.pixelBoundsCache_.getLeft(), 1),
         anychart.math.round(this.pixelBoundsCache_.getTop(), 1),
         anychart.math.round((this.pixelBoundsCache_.getWidth() - add) * this.position_, 1),
         anychart.math.round(this.pixelBoundsCache_.getHeight(), 1)
     );
   } else {
-    return new acgraph.math.Rect(
+    return new anychart.math.Rect(
         anychart.math.round(this.pixelBoundsCache_.getLeft(), 1),
         anychart.math.round(this.pixelBoundsCache_.getTop(), 1),
         anychart.math.round(this.pixelBoundsCache_.getWidth(), 1),
@@ -685,7 +685,7 @@ anychart.core.ui.Splitter.prototype.getStartBounds_ = function() {
  * Calculates a currents end bounds.
  * End bounds is righter rectangle for vertical splitting and an lower rectangle for horizontal splitting.
  *
- * @return {acgraph.math.Rect} - End bounds rect.
+ * @return {anychart.math.Rect} - End bounds rect.
  * @private
  */
 anychart.core.ui.Splitter.prototype.getEndBounds_ = function() {
@@ -697,7 +697,7 @@ anychart.core.ui.Splitter.prototype.getEndBounds_ = function() {
 
     if (this.isVertical_()) {
       w += this.splitterWidth_;
-      return new acgraph.math.Rect(
+      return new anychart.math.Rect(
           anychart.math.round(this.pixelBoundsCache_.getLeft() + w, 1),
           anychart.math.round(this.pixelBoundsCache_.getTop(), 1),
           anychart.math.round(this.pixelBoundsCache_.getWidth() - w, 1),
@@ -705,7 +705,7 @@ anychart.core.ui.Splitter.prototype.getEndBounds_ = function() {
       );
     } else {
       h += this.splitterWidth_;
-      return new acgraph.math.Rect(
+      return new anychart.math.Rect(
           anychart.math.round(this.pixelBoundsCache_.getLeft(), 1),
           anychart.math.round(this.pixelBoundsCache_.getTop() + h, 1),
           anychart.math.round(this.pixelBoundsCache_.getWidth(), 1),
@@ -716,7 +716,7 @@ anychart.core.ui.Splitter.prototype.getEndBounds_ = function() {
   } else {
     if (this.isVertical_()) {
       w = this.pixelBoundsCache_.getWidth() * this.position_;
-      return new acgraph.math.Rect(
+      return new anychart.math.Rect(
           anychart.math.round(this.pixelBoundsCache_.getLeft() + w, 1),
           anychart.math.round(this.pixelBoundsCache_.getTop(), 1),
           anychart.math.round(this.pixelBoundsCache_.getWidth() - w, 1),
@@ -724,7 +724,7 @@ anychart.core.ui.Splitter.prototype.getEndBounds_ = function() {
       );
     } else {
       h = this.pixelBoundsCache_.getHeight() * this.position_;
-      return new acgraph.math.Rect(
+      return new anychart.math.Rect(
           anychart.math.round(this.pixelBoundsCache_.getLeft(), 1),
           anychart.math.round(this.pixelBoundsCache_.getTop() + h, 1),
           anychart.math.round(this.pixelBoundsCache_.getWidth(), 1),
@@ -739,7 +739,7 @@ anychart.core.ui.Splitter.prototype.getEndBounds_ = function() {
 
 /**
  * Calculates a bounds of rectangle placed by the left side of vertical splitter.
- * @return {acgraph.math.Rect} - Bounds rect.
+ * @return {anychart.math.Rect} - Bounds rect.
  */
 anychart.core.ui.Splitter.prototype.getLeftBounds = function() {
   return this.getStartBounds_();
@@ -748,7 +748,7 @@ anychart.core.ui.Splitter.prototype.getLeftBounds = function() {
 
 /**
  * Calculates a bounds of rectangle placed by the upper side of horizontal splitter.
- * @return {acgraph.math.Rect} - Bounds rect.
+ * @return {anychart.math.Rect} - Bounds rect.
  */
 anychart.core.ui.Splitter.prototype.getTopBounds = function() {
   return this.getStartBounds_();
@@ -757,7 +757,7 @@ anychart.core.ui.Splitter.prototype.getTopBounds = function() {
 
 /**
  * Calculates a bounds of rectangle placed by the right side of vertical splitter.
- * @return {acgraph.math.Rect} - Bounds rect.
+ * @return {anychart.math.Rect} - Bounds rect.
  */
 anychart.core.ui.Splitter.prototype.getRightBounds = function() {
   return this.getEndBounds_();
@@ -766,7 +766,7 @@ anychart.core.ui.Splitter.prototype.getRightBounds = function() {
 
 /**
  * Calculates a bounds of rectangle placed by the lower side of horizontal splitter.
- * @return {acgraph.math.Rect} - Bounds rect.
+ * @return {anychart.math.Rect} - Bounds rect.
  */
 anychart.core.ui.Splitter.prototype.getBottomBounds = function() {
   return this.getEndBounds_();
@@ -833,7 +833,7 @@ anychart.core.ui.Splitter.prototype.drawVisualSplitter_ = function() {
   dragAreaWidth = isVertical ? this.splitterWidth_ + 2 * this.dragAreaLength_ : b.getWidth();
   dragAreaHeight = isVertical ? b.getHeight() : this.splitterWidth_ + 2 * this.dragAreaLength_;
 
-  var drag = new acgraph.math.Rect(dragX, dragY, dragWidth, dragHeight);
+  var drag = new anychart.math.Rect(dragX, dragY, dragWidth, dragHeight);
 
 
   this.centerLine_
@@ -1210,7 +1210,7 @@ anychart.core.ui.SimpleSplitter = function() {
 
   /**
    * Pixel bounds cache. Allows to avoid re-calculation of pixel bounds.
-   * @type {acgraph.math.Rect}
+   * @type {anychart.math.Rect}
    * @private
    */
   this.pixelBoundsCache_;
@@ -1372,8 +1372,8 @@ anychart.core.ui.SimpleSplitter.prototype.stroke = function(opt_strokeOrFill, op
  * Gets/sets a drag preview fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -1408,11 +1408,11 @@ anychart.core.ui.SimpleSplitter.prototype.handlePositionChange = function(opt_va
 
 /**
  * Calculates a current left bounds.
- * @return {acgraph.math.Rect} - Start bounds rect.
+ * @return {anychart.math.Rect} - Start bounds rect.
  */
 anychart.core.ui.SimpleSplitter.prototype.getLeftBounds = function() {
   if (!this.pixelBoundsCache_) this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.getPixelBounds());
-  return new acgraph.math.Rect(
+  return new anychart.math.Rect(
       anychart.math.round(this.pixelBoundsCache_.left, 1),
       anychart.math.round(this.pixelBoundsCache_.top, 1),
       anychart.math.round(Math.min(this.position_, this.pixelBoundsCache_.width - this.strokeThickness_), 1),
@@ -1423,11 +1423,11 @@ anychart.core.ui.SimpleSplitter.prototype.getLeftBounds = function() {
 
 /**
  * Calculates a currents right bounds.
- * @return {acgraph.math.Rect} - End bounds rect.
+ * @return {anychart.math.Rect} - End bounds rect.
  */
 anychart.core.ui.SimpleSplitter.prototype.getRightBounds = function() {
   if (!this.pixelBoundsCache_) this.pixelBoundsCache_ = /** @type {goog.math.Rect} */ (this.getPixelBounds());
-  return new acgraph.math.Rect(
+  return new anychart.math.Rect(
       anychart.math.round(this.pixelBoundsCache_.left + this.position_ + this.strokeThickness_, 1),
       anychart.math.round(this.pixelBoundsCache_.top, 1),
       anychart.math.round(Math.max(this.pixelBoundsCache_.width - this.strokeThickness_ - this.position_, 0), 1),
@@ -1536,7 +1536,7 @@ anychart.core.ui.SimpleSplitter.prototype.drawVisualSplitter_ = function() {
   this.base_.cursor(acgraph.vector.Cursor.E_RESIZE);
   var left = this.pixelBoundsCache_.left + this.position_ + this.strokeThickness_ / 2;
 
-  var drag = new acgraph.math.Rect(this.pixelBoundsCache_.left - this.dragAreaLength_,
+  var drag = new anychart.math.Rect(this.pixelBoundsCache_.left - this.dragAreaLength_,
       this.pixelBoundsCache_.top,
       this.pixelBoundsCache_.width + 2 * this.dragAreaLength_,
       this.pixelBoundsCache_.height);

@@ -1,7 +1,7 @@
 goog.provide('anychart.core.axisMarkers.Text');
-goog.require('acgraph');
-goog.require('anychart.color');
+goog.require('acgraph.math.Coordinate');
 goog.require('anychart.core.Text');
+goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
 goog.require('goog.math');
@@ -435,7 +435,7 @@ anychart.core.axisMarkers.Text.prototype.draw = function() {
 
     var shift = -.5;
 
-    var parentBounds = /** @type {acgraph.math.Rect} */(this.parentBounds());
+    var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
     parentBounds = parentBounds.clone().round();
     var anchor = /** @type {anychart.enums.Anchor} */(this.anchor());
 

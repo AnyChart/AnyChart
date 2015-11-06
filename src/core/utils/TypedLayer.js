@@ -1,5 +1,5 @@
 goog.provide('anychart.core.utils.TypedLayer');
-goog.require('acgraph');
+goog.require('acgraph.vector.Layer');
 
 
 

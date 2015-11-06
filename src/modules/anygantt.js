@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.modules.anygantt namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.modules.anygantt');
 
 goog.require('anychart.charts.Gantt');

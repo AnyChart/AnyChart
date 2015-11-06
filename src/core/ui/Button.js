@@ -408,7 +408,7 @@ anychart.core.ui.Button.prototype.drawText = function(textSettings) {
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calculateButtonBounds_();
 
-    var clipRect = new acgraph.math.Rect(0, 0, this.buttonBounds.width, this.buttonBounds.height);
+    var clipRect = new anychart.math.Rect(0, 0, this.buttonBounds.width, this.buttonBounds.height);
 
     this.textElement.x(/** @type {number} */(this.textX));
     this.textElement.y(/** @type {number} */(this.textY));

@@ -1,17 +1,11 @@
 goog.provide('anychart.data.Table');
 goog.require('anychart.core.Base');
-goog.require('anychart.core.utils.DateTimeIntervalGenerator');
 goog.require('anychart.core.utils.IIntervalGenerator');
 goog.require('anychart.data.TableAggregatedStorage');
 goog.require('anychart.data.TableMainStorage');
 goog.require('anychart.data.TableMapping');
-goog.require('anychart.data.TableRow');
 goog.require('anychart.data.aggregators');
-goog.require('anychart.data.csv.Parser');
-goog.require('anychart.data.csv.TableItemsProcessor');
 goog.require('anychart.enums');
-goog.require('anychart.utils');
-goog.require('goog.array');
 
 
 

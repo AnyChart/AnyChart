@@ -26,7 +26,7 @@ anychart.core.VisualBaseWithBounds.prototype.bounds_;
 
 /**
  * Stores normalized bounds.
- * @type {acgraph.math.Rect}
+ * @type {anychart.math.Rect}
  * @private
  */
 anychart.core.VisualBaseWithBounds.prototype.pixelBounds_;

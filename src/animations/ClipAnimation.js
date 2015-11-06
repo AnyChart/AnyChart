@@ -27,6 +27,12 @@ anychart.animations.ClipAnimation = function(stage, series, duration, opt_acc) {
    */
   this.series_ = series;
 
+  /**
+   * @type {acgraph.vector.Clip}
+   * @private
+   */
+  this.clip_;
+
   goog.base(this, [0, 0, 0, 0], [0, 0, 0, 0], duration, opt_acc);
 };
 goog.inherits(anychart.animations.ClipAnimation, anychart.animations.Animation);

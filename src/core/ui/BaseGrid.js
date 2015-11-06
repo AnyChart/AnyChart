@@ -1,12 +1,14 @@
 goog.provide('anychart.core.ui.BaseGrid');
 
+goog.require('acgraph.math.Coordinate');
+goog.require('acgraph.vector.Path');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.gantt.Controller');
 goog.require('anychart.core.ui.IInteractiveGrid');
 goog.require('anychart.core.ui.ScrollBar');
 goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.core.utils.TypedLayer');
-goog.require('goog.dom');
+goog.require('anychart.math.Rect');
 goog.require('goog.events.KeyHandler');
 goog.require('goog.events.MouseWheelHandler');
 goog.require('goog.fx.Dragger');
@@ -706,7 +708,7 @@ anychart.core.ui.BaseGrid.prototype.getInteractivityEvent = function(event) {
     var visibleItems = this.controller.getVisibleItems();
     var startIndex = this.controller.startIndex();
     var item;
-    var type = event['type'];
+    var type = event.type;
     switch (type) {
       case acgraph.events.EventType.MOUSEOUT:
         type = anychart.enums.EventType.ROW_MOUSE_OUT;
@@ -734,7 +736,7 @@ anychart.core.ui.BaseGrid.prototype.getInteractivityEvent = function(event) {
 
     var newEvent = {
       'type': type,
-      'actualTarget': event['target'],
+      'actualTarget': event.target,
       'target': this,
       'originalEvent': event
     };
@@ -745,7 +747,7 @@ anychart.core.ui.BaseGrid.prototype.getInteractivityEvent = function(event) {
         goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).y +
         this.headerHeight_;
 
-    var mouseHeight = event['clientY'] - min;
+    var mouseHeight = event.clientY - min;
 
     var totalHeight = this.gridHeightCache_.length ? this.gridHeightCache_[this.gridHeightCache_.length - 1] : 0;
 
@@ -981,8 +983,8 @@ anychart.core.ui.BaseGrid.prototype.getRowStrokePath = function() {
  * Gets/sets a default rows fill. Resets odd fill and even fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -1007,8 +1009,8 @@ anychart.core.ui.BaseGrid.prototype.rowFill = function(opt_fillOrColorOrKeys, op
  * Gets/sets a default rows fill. Resets odd fill and even fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -1022,8 +1024,8 @@ anychart.core.ui.BaseGrid.prototype.cellFill = anychart.core.ui.BaseGrid.prototy
  * Gets/sets row odd fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -1046,8 +1048,8 @@ anychart.core.ui.BaseGrid.prototype.rowOddFill = function(opt_fillOrColorOrKeys,
  * Gets/sets row odd fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -1061,8 +1063,8 @@ anychart.core.ui.BaseGrid.prototype.cellOddFill = anychart.core.ui.BaseGrid.prot
  * Gets/sets row even fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -1085,8 +1087,8 @@ anychart.core.ui.BaseGrid.prototype.rowEvenFill = function(opt_fillOrColorOrKeys
  * Gets/sets row even fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -1100,8 +1102,8 @@ anychart.core.ui.BaseGrid.prototype.cellEvenFill = anychart.core.ui.BaseGrid.pro
  * Gets/sets row hover fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -1124,8 +1126,8 @@ anychart.core.ui.BaseGrid.prototype.rowHoverFill = function(opt_fillOrColorOrKey
  * Gets/sets row selected fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -1148,8 +1150,8 @@ anychart.core.ui.BaseGrid.prototype.rowSelectedFill = function(opt_fillOrColorOr
  * Gets/sets background fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -1179,7 +1181,7 @@ anychart.core.ui.BaseGrid.prototype.backgroundFill = function(opt_fillOrColorOrK
  * @private
  */
 anychart.core.ui.BaseGrid.prototype.dragMouseDown_ = function(e) {
-  if (e['currentTarget'] instanceof acgraph.vector.Element) {
+  if (e.currentTarget instanceof acgraph.vector.Element) {
     this.scrollDragger = new anychart.core.ui.BaseGrid.Dragger(this.base_, this);
     this.registerDisposable(this.scrollDragger);
     //this.scrollDragger.listen(goog.fx.Dragger.EventType.START, this.dragStartHandler_, false, this);
@@ -1315,7 +1317,7 @@ anychart.core.ui.BaseGrid.prototype.drawRowFills_ = function() {
     this.gridHeightCache_.push(totalTop - header);
   }
 
-  this.getClipLayer().clip(new acgraph.math.Rect(this.pixelBoundsCache.left, this.pixelBoundsCache.top,
+  this.getClipLayer().clip(new anychart.math.Rect(this.pixelBoundsCache.left, this.pixelBoundsCache.top,
       this.pixelBoundsCache.width, totalTop - this.pixelBoundsCache.top));
 
 };
@@ -1507,10 +1509,10 @@ anychart.core.ui.BaseGrid.prototype.drawInternal = function(positionRecalculated
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    this.pixelBoundsCache = /** @type {acgraph.math.Rect} */ (this.getPixelBounds());
-    this.base_.clip(/** @type {acgraph.math.Rect} */ (this.pixelBoundsCache));
-    this.bgRect_.setBounds(/** @type {acgraph.math.Rect} */ (this.pixelBoundsCache));
-    this.eventsRect_.setBounds(/** @type {acgraph.math.Rect} */ (this.pixelBoundsCache));
+    this.pixelBoundsCache = /** @type {anychart.math.Rect} */ (this.getPixelBounds());
+    this.base_.clip(/** @type {anychart.math.Rect} */ (this.pixelBoundsCache));
+    this.bgRect_.setBounds(/** @type {anychart.math.Rect} */ (this.pixelBoundsCache));
+    this.eventsRect_.setBounds(/** @type {anychart.math.Rect} */ (this.pixelBoundsCache));
     this.totalGridsWidth = this.pixelBoundsCache.width;
 
     if (this.isStandalone) {
@@ -1837,7 +1839,7 @@ anychart.core.ui.BaseGrid.prototype.data = function(opt_value) {
  */
 anychart.core.ui.BaseGrid.prototype.draw = function() {
   if (!this.pixelBoundsCache || this.pixelBoundsCache.height || !this.pixelBoundsCache.height)
-    this.pixelBoundsCache = /** @type {acgraph.math.Rect} */ (this.getPixelBounds());
+    this.pixelBoundsCache = /** @type {anychart.math.Rect} */ (this.getPixelBounds());
   this.controller
       .availableHeight(this.pixelBoundsCache.height - this.headerHeight_ - 1)
       .rowStrokeThickness(this.rowStrokeThickness)
@@ -1892,7 +1894,7 @@ anychart.core.ui.BaseGrid.prototype.headerHeight = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.headerHeight_ != opt_value) {
       this.headerHeight_ = opt_value;
-      if (!this.pixelBoundsCache) this.pixelBoundsCache = /** @type {acgraph.math.Rect} */ (this.getPixelBounds());
+      if (!this.pixelBoundsCache) this.pixelBoundsCache = /** @type {anychart.math.Rect} */ (this.getPixelBounds());
 
       if (this.isStandalone) {
         this.controller

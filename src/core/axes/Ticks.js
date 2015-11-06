@@ -2,7 +2,6 @@ goog.provide('anychart.core.axes.Ticks');
 goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.VisualBase');
-goog.require('anychart.core.utils.Bounds');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
 

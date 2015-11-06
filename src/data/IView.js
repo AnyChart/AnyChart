@@ -1,4 +1,5 @@
 goog.provide('anychart.data.IView');
+goog.require('goog.events.Listenable');
 
 
 

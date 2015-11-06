@@ -73,7 +73,7 @@ def __sync_contrib():
     if not os.path.exists(COMPILER_PATH):
         print 'Download closure compiler'
         __download_and_unzip_from_http(
-            'http://dl.google.com/closure-compiler/compiler-20141023.zip',
+            'http://dl.google.com/closure-compiler/compiler-20151015.zip',
             'compiler'
         )
 
@@ -210,19 +210,23 @@ def __get_optimized_compiler_args():
         '--warning_level VERBOSE',
         '--jscomp_warning accessControls',
         '--jscomp_warning ambiguousFunctionDecl',
+        '--jscomp_warning checkDebuggerStatement',
         '--jscomp_warning checkEventfulObjectDisposal',
         '--jscomp_warning checkRegExp',
-        '--jscomp_warning checkStructDictInheritance',
         '--jscomp_warning checkTypes',
         '--jscomp_warning checkVars',
+        '--jscomp_warning closureDepMethodUsageChecks',
         '--jscomp_warning conformanceViolations',
         '--jscomp_warning const',
         '--jscomp_warning constantProperty',
         '--jscomp_warning deprecated',
+        '--jscomp_warning deprecatedAnnotations',
+        '--jscomp_warning duplicate',
         '--jscomp_warning duplicateMessage',
         '--jscomp_warning es3',
         '--jscomp_warning es5Strict',
         '--jscomp_warning externsValidation',
+        '--jscomp_warning extraRequire',
         '--jscomp_warning fileoverviewTags',
         '--jscomp_warning globalThis',
         '--jscomp_warning inferredConstCheck',
@@ -235,39 +239,21 @@ def __get_optimized_compiler_args():
         '--jscomp_warning missingRequire',
         '--jscomp_warning missingReturn',
         '--jscomp_warning newCheckTypes',
+        #'--jscomp_warning msgDescriptionsNewCheckTypes',
         '--jscomp_warning nonStandardJsDocs',
         #'--jscomp_warning reportUnknownTypes',
         '--jscomp_warning suspiciousCode',
         '--jscomp_warning strictModuleDepCheck',
+        '--jscomp_warning tweakValidation',
         '--jscomp_warning typeInvalidation',
         '--jscomp_warning undefinedNames',
         '--jscomp_warning undefinedVars',
         '--jscomp_warning unknownDefines',
+        #+'--jscomp_warning unnecessaryCasts',
         '--jscomp_warning uselessCode',
-        #'--jscomp_warning useOfGoogdefaultTheme',
+        #+'--jscomp_warning useOfGoogBase',
+        '--jscomp_warning violatedModuleDep',
         '--jscomp_warning visibility',
-        '--generate_exports'
-        #'--jscomp_warning deprecated',
-        #'--jscomp_warning checkTypes',
-        #'--jscomp_warning nonStandardJsDocs',
-        #'--jscomp_warning checkRegExp',
-        #'--jscomp_warning checkVars',
-        #'--jscomp_warning invalidCasts',
-        #'--jscomp_warning missingProperties',
-        #'--jscomp_warning undefinedVars',
-        #'--jscomp_warning duplicateMessage',
-        #'--jscomp_warning globalThis',
-        #'--jscomp_warning internetExplorerChecks',
-        #'--jscomp_warning misplacedTypeAnnotation',
-        #'--jscomp_warning suspiciousCode',
-        #'--jscomp_warning strictModuleDepCheck',
-        #'--jscomp_warning typeInvalidation',
-        #'--jscomp_warning undefinedNames',
-        #'--jscomp_warning unknownDefines',
-        #'--jscomp_warning uselessCode',
-        #'--jscomp_warning visibility',
-        # uncomment to have some fun ;)
-        #'--jscomp_warning reportUnknownTypes',
     ]
     __set_optimization_level(compiler_args, OptimizationLevel.ADVANCED)
     return compiler_args
@@ -413,13 +399,16 @@ def __build_project(modules):
                __get_name_spaces(modules) + \
                __get_roots() + \
                __get_output_file_arg(output_file) + \
-               ['--output_wrapper "' + copyright + '(function(){%output%})()"']
+               ['--output_wrapper "' + copyright + '(function(){%output%})()' + '%s"' % (('//# sourceMappingURL=%s.map' % file_name) if __should_gen_debug_files() else '')]
 
     #debug info
     if __should_gen_debug_files():
+        path = PROJECT_PATH.replace('\\', '/')
+        print path
         commands += ['--property_renaming_report %s' % output_file + '_prop_out.txt',
                      '--variable_renaming_report %s' % output_file + '_var_out.txt',
-                     '--create_source_map %s' % output_file + '_sourcemap.json']
+                     '--create_source_map %s' % output_file + '.map',
+                     '--source_map_location_mapping \"%s|http://localhost:63341/ACDVF\"' % path]
 
     __call_console_commands(commands)
 

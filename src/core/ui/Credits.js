@@ -1,5 +1,6 @@
 goog.provide('anychart.core.ui.Credits');
 goog.require('anychart.core.VisualBase');
+goog.require('anychart.math.Rect');
 goog.require('goog.dom');
 goog.require('goog.net.ImageLoader');
 goog.require('goog.userAgent');

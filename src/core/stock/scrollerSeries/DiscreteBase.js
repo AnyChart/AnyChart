@@ -1,6 +1,5 @@
 goog.provide('anychart.core.stock.scrollerSeries.DiscreteBase');
 goog.require('anychart.core.stock.scrollerSeries.Base');
-goog.require('anychart.enums');
 
 
 

@@ -3,9 +3,10 @@ goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.SeriesBase');
 goog.require('anychart.core.ui.LabelsFactory');
-goog.require('anychart.core.utils.LegendContextProvider');
-goog.require('anychart.core.utils.LegendItemSettings');
+goog.require('anychart.core.ui.MarkersFactory');
+goog.require('anychart.core.utils.Padding');
 goog.require('anychart.core.utils.SeriesPointContextProvider');
+goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.data');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
@@ -1060,10 +1061,10 @@ anychart.core.heatMap.series.Base.prototype.doClip = function() {
     this.rootLayer.clip(clip);
 
     var labelDOM = this.labels().getDomElement();
-    if (labelDOM) labelDOM.clip(/** @type {acgraph.math.Rect} */(bounds));
+    if (labelDOM) labelDOM.clip(/** @type {anychart.math.Rect} */(bounds));
 
     var markerDOM = this.markers().getDomElement();
-    if (markerDOM) markerDOM.clip(/** @type {acgraph.math.Rect} */(bounds));
+    if (markerDOM) markerDOM.clip(/** @type {anychart.math.Rect} */(bounds));
   }
 };
 

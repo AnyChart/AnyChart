@@ -1,7 +1,6 @@
 goog.provide('anychart.core.cartesian.series.OHLC');
 goog.require('acgraph');
 goog.require('anychart.core.cartesian.series.WidthBased');
-goog.require('anychart.core.utils.TypedLayer');
 
 
 

@@ -7,6 +7,10 @@ goog.require('anychart.core.map.scale.Geo');
 goog.require('anychart.core.map.series.Base');
 goog.require('anychart.core.ui.ColorRange');
 goog.require('anychart.core.utils.UnboundRegionsSettings');
+goog.require('anychart.palettes.HatchFills');
+goog.require('anychart.palettes.Markers');
+goog.require('anychart.scales.LinearColor');
+goog.require('anychart.scales.OrdinalColor');
 goog.require('anychart.utils.GeoJSONParser');
 goog.require('goog.dom');
 

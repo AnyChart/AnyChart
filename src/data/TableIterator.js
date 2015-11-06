@@ -1,5 +1,6 @@
 goog.provide('anychart.data.TableIterator');
 goog.provide('anychart.data.TableIterator.ICoIterator');
+goog.require('anychart.data.TableRow');
 
 
 

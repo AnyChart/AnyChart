@@ -1,6 +1,7 @@
 goog.provide('anychart.math');
 goog.provide('anychart.math.Rect');
 goog.require('acgraph');
+goog.require('acgraph.math.Coordinate');
 
 
 
@@ -335,6 +336,16 @@ anychart.math.checkForPointIsOutOfCircleBounds = function(x1, y1, cx, cy, r) {
  * @includeDoc
  */
 anychart.math.Rect = acgraph.math.Rect;
+
+
+/**
+ * Compares rectangles for equality.
+ * @param {anychart.math.Rect} a A Rectangle.
+ * @param {anychart.math.Rect} b A Rectangle.
+ * @return {boolean} True iff the rectangles have the same left, top, width,
+ *     and height, or if both are null.
+ */
+anychart.math.Rect.equals = goog.math.Rect.equals;
 
 
 //region --- Declarations for IDEA ---

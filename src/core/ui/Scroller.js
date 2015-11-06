@@ -3,7 +3,7 @@ goog.require('acgraph');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
-goog.require('goog.events.EventType');
+goog.require('anychart.math.Rect');
 goog.require('goog.fx.Dragger');
 goog.require('goog.style');
 
@@ -330,8 +330,8 @@ anychart.core.ui.Scroller.prototype.thumbs = function(opt_value) {
  * Scroller background fill settings. Used to fill the background of non-selected part of the scroller.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -355,8 +355,8 @@ anychart.core.ui.Scroller.prototype.fill = function(opt_fillOrColorOrKeys, opt_o
  * Scroller background fill settings for the selected area. Used to fill the background of selected part of the scroller.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -1058,8 +1058,8 @@ anychart.core.ui.Scroller.prototype.thumbMouseOut_ = function(e) {
  * @private
  */
 anychart.core.ui.Scroller.prototype.thumbOrRangeMouseDown_ = function(e) {
-  if (e['currentTarget'] instanceof acgraph.vector.Element) {
-    var target = (/** @type {acgraph.vector.Element} */(e['currentTarget']));
+  if (e.currentTarget instanceof acgraph.vector.Element) {
+    var target = (/** @type {acgraph.vector.Element} */(e.currentTarget));
     var dragger;
     if (target == this.startThumb_ && !this.startThumbDragger_) {
       this.startThumbDragger_ = dragger = new anychart.core.ui.Scroller.Dragger(this, this.startThumb_, true);
@@ -1706,8 +1706,8 @@ anychart.core.ui.Scroller.Thumbs.prototype.autoHide = function(opt_value) {
 /**
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -1753,8 +1753,8 @@ anychart.core.ui.Scroller.Thumbs.prototype.stroke = function(opt_strokeOrFill, o
 /**
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .

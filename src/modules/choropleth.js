@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.modules.choropleth namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.modules.choropleth');
 
 goog.require('anychart.charts.Map');

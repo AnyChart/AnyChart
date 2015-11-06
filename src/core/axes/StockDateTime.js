@@ -4,6 +4,7 @@ goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.axes.StockTicks');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.LabelsFactory');
+goog.require('anychart.math.Rect');
 
 
 

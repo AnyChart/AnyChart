@@ -1,4 +1,5 @@
 goog.provide('anychart.core.stock.series.OHLC');
+goog.require('anychart.core.dataDrawers.OHLC');
 goog.require('anychart.core.stock.series.DiscreteBase');
 goog.require('anychart.enums');
 

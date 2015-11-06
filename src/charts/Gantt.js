@@ -1,12 +1,13 @@
 goog.provide('anychart.charts.Gantt');
+goog.require('acgraph.math.Coordinate');
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.gantt.Controller');
 goog.require('anychart.core.ui.DataGrid');
+goog.require('anychart.core.ui.IInteractiveGrid');
 goog.require('anychart.core.ui.ScrollBar');
 goog.require('anychart.core.ui.Splitter');
 goog.require('anychart.core.ui.Timeline');
-goog.require('anychart.core.utils.InteractivityState');
-goog.require('goog.i18n.DateTimeFormat');
+goog.require('anychart.data.Tree');
 
 
 
@@ -146,12 +147,6 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
     this.dataGrid().initKeysFeatures();
     this.getTimeline().initKeysFeatures();
   }, false, this);
-
-  /**
-   * Interactivity state.
-   * @type {anychart.core.utils.InteractivityState}
-   */
-  this.state = new anychart.core.utils.InteractivityState(this);
 };
 goog.inherits(anychart.charts.Gantt, anychart.core.SeparateChart);
 
@@ -400,8 +395,8 @@ anychart.charts.Gantt.prototype.getTimeline = function() {
  * Gets/sets row hover fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -423,8 +418,8 @@ anychart.charts.Gantt.prototype.rowHoverFill = function(opt_fillOrColorOrKeys, o
  * Gets/sets row selected fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .

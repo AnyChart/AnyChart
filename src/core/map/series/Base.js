@@ -1,8 +1,7 @@
 goog.provide('anychart.core.map.series.Base');
 goog.require('anychart.core.SeriesBase');
 goog.require('anychart.core.map.geom');
-goog.require('anychart.core.utils.LegendContextProvider');
-goog.require('anychart.core.utils.LegendItemSettings');
+goog.require('anychart.core.utils.MapPointContextProvider');
 goog.require('anychart.enums');
 
 
@@ -410,7 +409,7 @@ anychart.core.map.series.Base.prototype.finalizeDrawing = function() {
   //if (this.clip()) {
   //  var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBoundsCache : this.clip());
   //  var labelDOM = this.labels().getDomElement();
-  //  if (labelDOM) labelDOM.clip(/** @type {acgraph.math.Rect} */(bounds));
+  //  if (labelDOM) labelDOM.clip(/** @type {anychart.math.Rect} */(bounds));
   //}
 
   // This check need to prevent finalizeDrawing to mark CONTAINER consistency state in case when series was disabled by

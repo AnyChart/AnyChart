@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.modules.base namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.modules.base');
 
 goog.require('anychart');

@@ -1,6 +1,7 @@
 goog.provide('anychart.core.polar.series.Line');
 
 goog.require('anychart.core.polar.series.ContinuousBase');
+goog.require('anychart.core.utils.TypedLayer');
 
 
 

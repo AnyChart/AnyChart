@@ -1,7 +1,6 @@
 goog.provide('anychart.scales.OrdinalColorTicks');
 
 goog.require('anychart.scales.OrdinalTicks');
-goog.require('goog.array');
 
 
 

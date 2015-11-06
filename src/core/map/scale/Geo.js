@@ -130,7 +130,7 @@ anychart.core.map.scale.Geo = function() {
 
   /**
    * Scale bounds.
-   * @type {acgraph.math.Rect}
+   * @type {anychart.math.Rect}
    * @private
    */
   this.bounds_ = null;

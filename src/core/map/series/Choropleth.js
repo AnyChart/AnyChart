@@ -1,6 +1,6 @@
 goog.provide('anychart.core.map.series.Choropleth');
 goog.require('anychart.core.map.series.BaseWithMarkers');
-goog.require('anychart.scales.LinearColor');
+goog.require('anychart.core.utils.TypedLayer');
 
 
 

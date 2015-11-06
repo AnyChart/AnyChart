@@ -1,3 +1,4 @@
+goog.provide('anychart.SignalEvent');
 goog.provide('anychart.core.Base');
 
 goog.require('anychart');
@@ -836,4 +837,3 @@ anychart.SignalEvent.prototype['targetDataChanged'] = anychart.SignalEvent.proto
 anychart.SignalEvent.prototype['targetMetaChanged'] = anychart.SignalEvent.prototype.targetMetaChanged;//doc
 anychart.SignalEvent.prototype['targetNeedsReapplication'] = anychart.SignalEvent.prototype.targetNeedsReapplication;//doc
 anychart.SignalEvent.prototype['targetNeedsRecalculation'] = anychart.SignalEvent.prototype.targetNeedsRecalculation;//doc
-anychart.SignalEvent.prototype['dispose'] = anychart.SignalEvent.prototype.dispose;

@@ -1,6 +1,5 @@
 goog.provide('anychart.palettes.HatchFills');
 goog.require('anychart.core.Base');
-goog.require('anychart.enums');
 goog.require('goog.array');
 
 

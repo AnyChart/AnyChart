@@ -1,14 +1,14 @@
 goog.provide('anychart.core.cartesian.series.Base');
 goog.require('acgraph');
-goog.require('anychart.color');
 goog.require('anychart.core.SeriesBase');
-goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.utils.Error');
-goog.require('anychart.core.utils.LegendContextProvider');
-goog.require('anychart.core.utils.LegendItemSettings');
+goog.require('anychart.core.utils.ISeriesWithError');
+goog.require('anychart.core.utils.Padding');
 goog.require('anychart.core.utils.SeriesPointContextProvider');
 goog.require('anychart.data');
 goog.require('anychart.enums');
+goog.require('anychart.scales.Linear');
+goog.require('anychart.scales.Ordinal');
 goog.require('anychart.utils');
 
 
@@ -880,7 +880,7 @@ anychart.core.cartesian.series.Base.prototype.doClip = function() {
     }
     this.rootLayer.clip(/** @type {anychart.math.Rect} */ (clip || null));
     var labelDOM = this.labels().getDomElement();
-    if (labelDOM) labelDOM.clip(/** @type {acgraph.math.Rect} */(clip || null));
+    if (labelDOM) labelDOM.clip(/** @type {anychart.math.Rect} */(clip || null));
   }
 };
 

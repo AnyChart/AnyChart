@@ -3,7 +3,7 @@ goog.provide('anychart.core.VisualBase');
 goog.require('acgraph');
 goog.require('anychart.core.Base');
 goog.require('goog.dom');
-goog.require('goog.json.hybrid');
+goog.require('goog.events.EventHandler');
 
 
 /**

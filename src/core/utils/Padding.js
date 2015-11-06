@@ -1,6 +1,7 @@
 goog.provide('anychart.core.utils.Padding');
 
 goog.require('anychart.core.utils.Space');
+goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
 
 

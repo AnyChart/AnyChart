@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.modules.column namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.modules.column');
 
 goog.require('anychart.charts.Cartesian');

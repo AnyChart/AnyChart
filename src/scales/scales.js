@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.scales namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.scales');
 
 goog.require('anychart.scales.DateTime');

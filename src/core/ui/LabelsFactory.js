@@ -1,9 +1,11 @@
 goog.provide('anychart.core.ui.LabelsFactory');
 goog.provide('anychart.core.ui.LabelsFactory.Label');
-goog.require('acgraph');
+goog.require('acgraph.math.Coordinate');
 goog.require('anychart.core.Text');
 goog.require('anychart.core.ui.Background');
+goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
+goog.require('anychart.math.Rect');
 
 
 

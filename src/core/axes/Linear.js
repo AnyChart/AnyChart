@@ -5,6 +5,7 @@ goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.axes.Ticks');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.Title');
+goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 goog.require('anychart.scales.Base');

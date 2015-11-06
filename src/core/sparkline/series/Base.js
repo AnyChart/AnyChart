@@ -2,9 +2,6 @@ goog.provide('anychart.core.sparkline.series.Base');
 goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.VisualBaseWithBounds');
-goog.require('anychart.core.ui.LabelsFactory');
-goog.require('anychart.core.ui.MarkersFactory');
-goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.core.utils.SeriesPointContextProvider');
 goog.require('anychart.data');
 goog.require('anychart.enums');
@@ -292,7 +289,7 @@ anychart.core.sparkline.series.Base.prototype.finalizeDrawing = function() {
       this.chart.clip());
 
   var markerDOM = markers.getDomElement();
-  if (markerDOM) markerDOM.clip(/** @type {acgraph.math.Rect} */(clip));
+  if (markerDOM) markerDOM.clip(/** @type {anychart.math.Rect} */(clip));
 
   markers.resumeSignalsDispatching(false);
   markers.markConsistent(anychart.ConsistencyState.ALL);
@@ -301,7 +298,7 @@ anychart.core.sparkline.series.Base.prototype.finalizeDrawing = function() {
   labels.draw();
 
   var labelDOM = labels.getDomElement();
-  if (labelDOM) labelDOM.clip(/** @type {acgraph.math.Rect} */(clip));
+  if (labelDOM) labelDOM.clip(/** @type {anychart.math.Rect} */(clip));
 
   labels.resumeSignalsDispatching(false);
 

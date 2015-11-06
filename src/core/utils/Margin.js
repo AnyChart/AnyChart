@@ -1,6 +1,7 @@
 goog.provide('anychart.core.utils.Margin');
 
 goog.require('anychart.core.utils.Space');
+goog.require('anychart.math.Rect');
 
 
 

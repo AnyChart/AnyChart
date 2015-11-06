@@ -1,8 +1,6 @@
 goog.provide('anychart.core.stock.Scroller');
-goog.require('anychart.core.stock.scrollerSeries.Base');
-goog.require('anychart.core.stock.scrollerSeries.Column');
-goog.require('anychart.core.stock.scrollerSeries.Line');
-goog.require('anychart.core.stock.scrollerSeries.OHLC');
+goog.require('anychart.core.axes.StockDateTime');
+goog.require('anychart.core.stock.scrollerSeries');
 goog.require('anychart.core.ui.Scroller');
 goog.require('anychart.scales');
 goog.require('anychart.scales.StockOrdinalDateTime');

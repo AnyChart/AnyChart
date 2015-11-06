@@ -1,4 +1,5 @@
 goog.provide('anychart.data.TableSelectable');
+goog.require('anychart.core.utils.DateTimeIntervalGenerator');
 goog.require('anychart.data.TableIterator');
 
 

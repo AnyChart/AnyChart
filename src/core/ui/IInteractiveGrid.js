@@ -1,4 +1,5 @@
 goog.provide('anychart.core.ui.IInteractiveGrid');
+goog.require('goog.events.Listenable');
 
 
 

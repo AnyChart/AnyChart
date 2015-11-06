@@ -1,6 +1,7 @@
 goog.provide('anychart.core.utils.Space');
 
 goog.require('anychart.core.Base');
+goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
 
 

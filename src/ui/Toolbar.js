@@ -1,7 +1,6 @@
 goog.provide('anychart.ui.GanttToolbar');
 goog.provide('anychart.ui.Toolbar');
 
-goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.ui.toolbar.MenuItemRenderer');
 goog.require('anychart.core.ui.toolbar.SubMenu');
 goog.require('anychart.core.ui.toolbar.Toolbar');
@@ -12,7 +11,6 @@ goog.require('anychart.utils');
 
 goog.require('goog.events');
 goog.require('goog.positioning.Corner');
-goog.require('goog.string');
 
 goog.require('goog.ui.ContainerRenderer');
 goog.require('goog.ui.MenuItem');
@@ -231,7 +229,7 @@ anychart.ui.Toolbar.prototype.createToolbarActionHandler = function() {
   return function(e) {
     var item = e['target'];
     var id = item.getId(); //Got string like 'anychart_saveAsPdf_a3' or 'anychart_switchLayout'
-    var menu = e['currentTarget'];
+    var menu = e.currentTarget;
 
     if (id == 'anychart_switchLayout') {
       var isLandscape = item.getValue();

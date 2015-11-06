@@ -1,13 +1,15 @@
 goog.provide('anychart.charts.Pie');
-goog.require('acgraph');
+goog.require('acgraph.math.Coordinate');
 goog.require('anychart.color');
 goog.require('anychart.core.PiePoint');
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.ui.CircularLabelsFactory');
 goog.require('anychart.core.ui.Tooltip');
+goog.require('anychart.core.utils.IInteractiveSeries');
 goog.require('anychart.core.utils.PieInteractivityState');
 goog.require('anychart.core.utils.PointContextProvider');
 goog.require('anychart.core.utils.TypedLayer');
+goog.require('anychart.data.Set');
 goog.require('anychart.enums');
 goog.require('anychart.math');
 goog.require('anychart.palettes');
@@ -20,6 +22,7 @@ goog.require('anychart.palettes');
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @extends {anychart.core.SeparateChart}
+ * @implements {anychart.core.utils.IInteractiveSeries}
  * @constructor
  */
 anychart.charts.Pie = function(opt_data, opt_csvSettings) {
@@ -697,8 +700,8 @@ anychart.charts.Pie.prototype.hatchFillPalette = function(opt_value) {
  * @ignoreDoc
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -734,8 +737,8 @@ anychart.charts.Pie.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacity
  * Getter/setter for the pie slices fill in the hover state.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -4797,7 +4800,7 @@ anychart.charts.Pie.PieOutsideLabelsDomain = function(isRight, pie, domains) {
 
   /**
    * Bounds cache.
-   * @type {acgraph.math.Rect}
+   * @type {anychart.math.Rect}
    */
   this.boundsCache = null;
 };
@@ -4868,13 +4871,13 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.dropLabel = function(label,
 
 /**
  * Get label bounds.
- * @return {acgraph.math.Rect} Label bounds.
+ * @return {anychart.math.Rect} Label bounds.
  */
 anychart.charts.Pie.PieOutsideLabelsDomain.prototype.getBounds = function() {
   if (!this.boundsCache) {
     var firstLabelHeight = this.labels[0] ? this.pie.getLabelBounds(this.labels[0]).height : 0;
     var domainY = this.y + firstLabelHeight / 2;
-    this.boundsCache = new acgraph.math.Rect(this.x, domainY, this.width, this.height);
+    this.boundsCache = new anychart.math.Rect(this.x, domainY, this.width, this.height);
   }
 
   return this.boundsCache;

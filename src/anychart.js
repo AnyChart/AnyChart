@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart');
 goog.provide('anychart.globalLock');
 goog.require('acgraphexport');

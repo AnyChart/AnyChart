@@ -1,6 +1,5 @@
 goog.provide('anychart.animations.BarAnimation');
 goog.require('anychart.animations.Animation');
-goog.require('anychart.core.cartesian.series.DiscreteBase');
 
 
 
@@ -16,6 +15,10 @@ anychart.animations.BarAnimation = function(series, duration, opt_acc) {
   this.series_ = series;
   this.labels_ = this.series_.labels();
   this.markers_ = this.series_.markers();
+  /**
+   * @type {Array}
+   */
+  this.zero;
 
   goog.base(this, [], [], duration, opt_acc);
 };

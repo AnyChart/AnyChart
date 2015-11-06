@@ -1,5 +1,6 @@
 goog.provide('anychart.scales.StockOrdinalTicksIterator');
 goog.require('anychart.scales.StockScatterTicksIterator');
+goog.require('goog.date.UtcDateTime');
 
 
 

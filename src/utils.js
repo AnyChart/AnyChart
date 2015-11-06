@@ -3,7 +3,7 @@ goog.provide('anychart.utils');
 goog.require('anychart.enums');
 goog.require('anychart.math');
 goog.require('goog.array');
-goog.require('goog.color');
+goog.require('goog.date.Interval');
 goog.require('goog.date.UtcDateTime');
 goog.require('goog.dom.xml');
 goog.require('goog.i18n.DateTimeFormat');
@@ -297,9 +297,9 @@ anychart.utils.normalizeToNaturalNumber = function(value, opt_default, opt_allow
   // value > 0 also checks for NaN, because NaN > 0 == false.
   opt_default = goog.isDef(opt_default) ? opt_default : opt_allowZero ? 0 : 1;
   if (opt_allowZero)
-    return /** @type {number} */(value >= 0 ? value : opt_default);
+    return value >= 0 ? value : opt_default;
   else
-    return /** @type {number} */(value > 0 ? value : opt_default);
+    return value > 0 ? value : opt_default;
 };
 
 
@@ -635,7 +635,7 @@ anychart.utils.extractThickness = function(stroke) {
   var normalized = acgraph.vector.normalizeStroke(stroke);
   return anychart.utils.isNone(normalized) ? 0 :
       goog.isObject(normalized) ?
-          acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */ (normalized)) : 1;
+          acgraph.vector.getThickness(normalized) : 1;
 };
 
 

@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.modules.pie3d namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.modules.pie3d');
 
 goog.require('anychart.charts.Pie');

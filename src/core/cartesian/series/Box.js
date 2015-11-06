@@ -1,5 +1,6 @@
 goog.provide('anychart.core.cartesian.series.Box');
 goog.require('anychart.core.cartesian.series.WidthBased');
+goog.require('anychart.core.ui.MarkersFactory');
 goog.require('anychart.math');
 goog.require('anychart.utils');
 
@@ -362,7 +363,7 @@ anychart.core.cartesian.series.Box.prototype.doClip = function() {
   if (this.clip()) {
     var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBoundsCache : this.clip());
     var markerDOM = this.outlierMarkers().getDomElement();
-    if (markerDOM) markerDOM.clip(/** @type {acgraph.math.Rect} */(bounds));
+    if (markerDOM) markerDOM.clip(/** @type {anychart.math.Rect} */(bounds));
   }
 };
 

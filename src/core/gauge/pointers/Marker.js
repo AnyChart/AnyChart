@@ -1,6 +1,7 @@
 goog.provide('anychart.core.gauge.pointers.Marker');
 goog.require('acgraph');
 goog.require('anychart.core.gauge.pointers.Base');
+goog.require('anychart.core.ui.MarkersFactory');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
 

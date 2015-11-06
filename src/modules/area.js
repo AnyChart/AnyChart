@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.modules.area namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.modules.area');
 
 goog.require('anychart.charts.Cartesian');

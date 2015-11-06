@@ -1,17 +1,16 @@
 goog.provide('anychart.core.ui.Timeline');
 
+
 goog.require('anychart.core.gantt.TimelineHeader');
 goog.require('anychart.core.ui.BaseGrid');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.MarkersFactory');
 goog.require('anychart.core.ui.ScrollBar');
-goog.require('anychart.core.ui.Tooltip');
-goog.require('anychart.core.utils.TypedLayer');
+goog.require('anychart.math.Rect');
 goog.require('anychart.scales.GanttDateTime');
 
 goog.require('goog.array');
-goog.require('goog.events');
-goog.require('goog.events.MouseWheelHandler');
+goog.require('goog.fx.Dragger');
 
 
 
@@ -629,8 +628,8 @@ anychart.core.ui.Timeline.prototype.connectorPreviewStroke = function(opt_stroke
  * Gets/sets edit preview fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -676,8 +675,8 @@ anychart.core.ui.Timeline.prototype.editPreviewStroke = function(opt_strokeOrFil
  * Gets/sets edit progress fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -723,8 +722,8 @@ anychart.core.ui.Timeline.prototype.editProgressStroke = function(opt_strokeOrFi
  * Gets/sets edit interval thumb fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -770,8 +769,8 @@ anychart.core.ui.Timeline.prototype.editIntervalThumbStroke = function(opt_strok
  * Gets/sets edit connector thumb fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -818,8 +817,8 @@ anychart.core.ui.Timeline.prototype.editConnectorThumbStroke = function(opt_stro
  * Base fill is a fill of simple time bar on timeline.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -866,8 +865,8 @@ anychart.core.ui.Timeline.prototype.baseStroke = function(opt_strokeOrFill, opt_
  * Baseline fill is a fill of baseline bar on timeline.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -914,8 +913,8 @@ anychart.core.ui.Timeline.prototype.baselineStroke = function(opt_strokeOrFill, 
  * Progress fill is a fill of progress bar on timeline.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -962,8 +961,8 @@ anychart.core.ui.Timeline.prototype.progressStroke = function(opt_strokeOrFill, 
  * Milestone fill is a fill of milestone on timeline.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -1010,8 +1009,8 @@ anychart.core.ui.Timeline.prototype.milestoneStroke = function(opt_strokeOrFill,
  * Parent fill is a fill of summary (parent) task bar on timeline.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -1058,8 +1057,8 @@ anychart.core.ui.Timeline.prototype.parentStroke = function(opt_strokeOrFill, op
  * Connector fill is a fill of arrow of connector on timeline.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -1106,8 +1105,8 @@ anychart.core.ui.Timeline.prototype.connectorStroke = function(opt_strokeOrFill,
  * Selected element fill is fill of selected element (whole data item or period) on timeline.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
@@ -1818,7 +1817,7 @@ anychart.core.ui.Timeline.prototype.drawThumbPreview_ = function(event, opt_scro
     if (opt_scrolling) {
       mouseLeft = opt_scrolling < 0 ? this.pixelBoundsCache.left : this.pixelBoundsCache.left + this.pixelBoundsCache.width;
     } else {
-      mouseLeft = event['clientX'] - left;
+      mouseLeft = event.clientX - left;
     }
 
     var ratio = this.scale_.timestampToRatio(time);
@@ -1860,8 +1859,8 @@ anychart.core.ui.Timeline.prototype.drawConnectorPreview_ = function(event, opt_
       mouseLeft = this.currentConnectorDragger_.lastTrackedMouseX - containerLeft;
       mouseTop = this.currentConnectorDragger_.lastTrackedMouseY - containerTop;
     } else {
-      mouseLeft = event['clientX'] - containerLeft;
-      mouseTop = event['clientY'] - containerTop;
+      mouseLeft = event.clientX - containerLeft;
+      mouseTop = event.clientY - containerTop;
     }
 
     var initItemsBounds = this.getItemBounds_(index, period);
@@ -1973,8 +1972,8 @@ anychart.core.ui.Timeline.prototype.editConnectorDrag_ = function(e) {
   this.dragging = true;
   this.draggingConnector = true;
   this.interactive = false;
-  this.currentConnectorDragger_.lastTrackedMouseX = e['clientX'];
-  this.currentConnectorDragger_.lastTrackedMouseY = e['clientY'];
+  this.currentConnectorDragger_.lastTrackedMouseX = e.clientX;
+  this.currentConnectorDragger_.lastTrackedMouseY = e.clientY;
 };
 
 
@@ -2435,7 +2434,7 @@ anychart.core.ui.Timeline.prototype.getInteractivityEvent = function(event) {
   var evt = goog.base(this, 'getInteractivityEvent', event);
 
   if (evt) {
-    var domTarget = event['domTarget'];
+    var domTarget = event.domTarget;
     if (this.controller.isResources() && (domTarget instanceof acgraph.vector.Path)) { //Process timeline bars
       var id = domTarget.tag;
       if (goog.isDef(id)) {
@@ -3656,8 +3655,8 @@ anychart.core.ui.Timeline.prototype.specialInvalidated = function() {
     var visibleMax = this.scale_.timestampToRatio(visibleRange['max']) * this.pixelBoundsCache.width;
 
     if (this.horizontalScrollBar_) {
-      var contentBoundsSimulation = new acgraph.math.Rect(totMin, 0, totMax - totMin, 0);
-      var visibleBoundsSimulation = new acgraph.math.Rect(visibleMin, 0, visibleMax - visibleMin, 0);
+      var contentBoundsSimulation = new anychart.math.Rect(totMin, 0, totMax - totMin, 0);
+      var visibleBoundsSimulation = new anychart.math.Rect(visibleMin, 0, visibleMax - visibleMin, 0);
 
       this.horizontalScrollBar_
           .suspendSignalsDispatching()

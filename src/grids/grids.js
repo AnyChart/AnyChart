@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.grids namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.grids');
 goog.require('anychart.grids.Linear');
 goog.require('anychart.grids.Polar');

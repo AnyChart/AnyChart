@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.modules.toolbar namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.modules.toolbar');
 
 goog.require('anychart');

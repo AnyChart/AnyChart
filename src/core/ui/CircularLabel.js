@@ -1,5 +1,5 @@
 goog.provide('anychart.core.ui.CircularLabel');
-goog.require('acgraph');
+goog.require('acgraph.math.Coordinate');
 goog.require('anychart.core.ui.Label');
 goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
@@ -199,7 +199,7 @@ anychart.core.ui.CircularLabel.prototype.drawLabel = function() {
 
   this.textElement.setTransformationMatrix(1, 0, 0, 1, 0, 0);
   this.textElement.translate(/** @type {number} */(this.textX), /** @type {number} */(this.textY));
-  var clipRect = new acgraph.math.Rect(0, 0, this.textWidth, this.textHeight);
+  var clipRect = new anychart.math.Rect(0, 0, this.textWidth, this.textHeight);
   this.textElement.clip(clipRect);
 
   return backgroundBounds;

@@ -2,6 +2,8 @@ goog.provide('anychart.core.ui.ColorRange');
 
 goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.ui.ColorRangeTicks');
+goog.require('anychart.core.ui.MarkersFactory');
+goog.require('anychart.math.Rect');
 goog.require('anychart.scales.LinearColor');
 goog.require('anychart.scales.OrdinalColor');
 

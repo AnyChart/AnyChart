@@ -1,12 +1,9 @@
 goog.provide('anychart.core.scatter.series.Base');
 goog.require('acgraph');
-goog.require('anychart.color');
 goog.require('anychart.core.SeriesBase');
-goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.utils.Error');
 goog.require('anychart.core.utils.ISeriesWithError');
-goog.require('anychart.core.utils.LegendContextProvider');
-goog.require('anychart.core.utils.LegendItemSettings');
+goog.require('anychart.core.utils.Padding');
 goog.require('anychart.core.utils.SeriesPointContextProvider');
 goog.require('anychart.data');
 goog.require('anychart.enums');
@@ -471,7 +468,7 @@ anychart.core.scatter.series.Base.prototype.finalizeDrawing = function() {
   if (this.clip()) {
     var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBoundsCache : this.clip());
     var labelDOM = this.labels().getDomElement();
-    if (labelDOM) labelDOM.clip(/** @type {acgraph.math.Rect} */(bounds));
+    if (labelDOM) labelDOM.clip(/** @type {anychart.math.Rect} */(bounds));
   }
 
   this.labels().resumeSignalsDispatching(false);
@@ -544,7 +541,7 @@ anychart.core.scatter.series.Base.prototype.drawSeriesPoint = goog.abstractMetho
  * @protected
  */
 anychart.core.scatter.series.Base.prototype.applyRatioToBounds = function(ratio, horizontal) {
-  /** @type {acgraph.math.Rect} */
+  /** @type {anychart.math.Rect} */
   var bounds = this.pixelBoundsCache;
   var min, range;
   if (horizontal) {

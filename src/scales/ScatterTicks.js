@@ -241,7 +241,7 @@ anychart.scales.ScatterTicks.prototype.set = function(ticks) {
  */
 anychart.scales.ScatterTicks.prototype.get = function() {
   var ticks = this.getInternal();
-  return goog.array.filter(/** @type {!Array} */(ticks), function(el) {
+  return goog.array.filter(ticks, function(el) {
     var val = this.transform(el);
     return val >= 0 && val <= 1;
   }, this.scale_);

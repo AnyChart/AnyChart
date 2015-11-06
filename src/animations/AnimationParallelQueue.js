@@ -20,6 +20,6 @@ goog.inherits(anychart.animations.AnimationParallelQueue, goog.fx.AnimationParal
  */
 anychart.animations.AnimationParallelQueue.prototype.setDuration = function(duration) {
   goog.array.forEach(this.queue, function(animation) {
-    animation.setDuration(duration);
+    (/** @type {anychart.animations.Animation} */(animation)).setDuration(duration);
   });
 };

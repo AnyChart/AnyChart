@@ -1,9 +1,9 @@
 goog.provide('anychart.core.gantt.Controller');
 
-goog.require('acgraph');
 goog.require('anychart.core.Base');
 goog.require('anychart.core.ui.ScrollBar');
 goog.require('anychart.data.Tree');
+goog.require('anychart.math.Rect');
 goog.require('anychart.scales.GanttDateTime');
 
 goog.require('goog.array');
@@ -920,7 +920,7 @@ anychart.core.gantt.Controller.prototype.run = function() {
 
       var totalEnd = this.heightCache_[this.heightCache_.length - 1];
 
-      var contentBoundsSimulation = new acgraph.math.Rect(0, 0, 0, totalEnd);
+      var contentBoundsSimulation = new anychart.math.Rect(0, 0, 0, totalEnd);
 
       startRatio = anychart.math.round(start / totalEnd, 4);
       endRatio = anychart.math.round(end / totalEnd, 4);

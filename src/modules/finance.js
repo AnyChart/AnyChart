@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.modules.finance namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.modules.finance');
 
 goog.require('anychart.charts.Cartesian');

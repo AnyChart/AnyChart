@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.modules.circularGauge namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.modules.circularGauge');
 
 goog.require('anychart.gauges.Circular');

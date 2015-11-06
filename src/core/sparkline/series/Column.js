@@ -1,6 +1,7 @@
 goog.provide('anychart.core.sparkline.series.Column');
 goog.require('acgraph');
 goog.require('anychart.core.sparkline.series.Base');
+goog.require('anychart.core.utils.TypedLayer');
 
 
 

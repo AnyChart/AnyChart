@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.ui namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.ui');
 goog.require('anychart.ui.Background');
 goog.require('anychart.ui.DataGrid');

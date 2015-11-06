@@ -191,7 +191,7 @@ anychart.scales.OrdinalTicks.prototype.names = function(opt_values) {
       this.names_.push(this.autoNames_[this.names_.length]);
     }
   }
-  var names =  /** @type {!Array} */(this.names_ || this.autoNames_);
+  var names = this.names_ || this.autoNames_;
   var len = Math.min(names.length, values.length);
   var res = [];
   for (i = 0; i < len; i++) {

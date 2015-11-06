@@ -269,7 +269,7 @@ anychart.core.ui.Background.prototype.cornerType = function(opt_value) {
  * If false is passed - that's ObjectBoundingBox no angle preservation. In this case default
  * behaviour comes up - gradient vector is calculated for a shape with 1:1 side proportions.</p>
  * <p><b>UserSpaceOnUse</b><br/>
- * If acgraph.math.Rect is passed - that'sUserSpaceOnUse mode.
+ * If anychart.math.Rect is passed - that'sUserSpaceOnUse mode.
  * In this mode gradient gets its own size and coordinates. Shapes with such gradient will be colored
  * only in those parts, which are covered by this custom gradient. Read more about this mode at
  * <a href='http://www.w3.org/TR/SVG/pservers.html#LinearGradientElementGradientUnitsAttribute'>
@@ -326,7 +326,7 @@ anychart.core.ui.Background.prototype.cornerType = function(opt_value) {
  * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
  * @param {number} cx X ratio of center radial gradient.
  * @param {number} cy Y ratio of center radial gradient.
- * @param {acgraph.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
+ * @param {anychart.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
  * @param {number=} opt_opacity Opacity of the gradient.
  * @param {number=} opt_fx X ratio of focal point.
  * @param {number=} opt_fy Y ratio of focal point.
@@ -335,8 +335,8 @@ anychart.core.ui.Background.prototype.cornerType = function(opt_value) {
  * @ignoreDoc
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!acgraph.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .

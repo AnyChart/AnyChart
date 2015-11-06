@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.data namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.data');
 
 goog.require('anychart.data.ConcatView');
@@ -9,7 +14,6 @@ goog.require('anychart.data.Set');
 goog.require('anychart.data.SortView');
 goog.require('anychart.data.Table');
 goog.require('anychart.data.Tree');
-goog.require('anychart.data.csv.Parser');
 goog.require('anychart.enums');
 
 /**

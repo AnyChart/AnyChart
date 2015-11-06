@@ -4,11 +4,9 @@ goog.require('anychart.core.Chart');
 goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.axisMarkers.Range');
 goog.require('anychart.core.bullet.Marker');
-goog.require('anychart.core.utils.InteractivityState');
+goog.require('anychart.data.Set');
 goog.require('anychart.enums');
-goog.require('anychart.palettes.DistinctColors');
-goog.require('anychart.palettes.Markers');
-goog.require('anychart.palettes.RangeColors');
+goog.require('anychart.palettes');
 goog.require('anychart.scales');
 goog.require('anychart.utils');
 
@@ -47,12 +45,6 @@ anychart.charts.Bullet = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.layout_;
-
-  /**
-   * Interactivity state.
-   * @type {anychart.core.utils.InteractivityState}
-   */
-  this.state = new anychart.core.utils.InteractivityState(this);
 
   this.data(opt_data || null, opt_csvSettings);
 };

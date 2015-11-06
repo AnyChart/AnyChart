@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.modules.bubbleMap namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.modules.bubbleMap');
 
 goog.require('anychart.charts.Map');

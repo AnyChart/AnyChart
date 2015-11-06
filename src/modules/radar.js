@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.modules.radar namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.modules.radar');
 
 goog.require('anychart.charts.Radar');

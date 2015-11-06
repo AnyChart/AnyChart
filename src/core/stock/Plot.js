@@ -3,13 +3,13 @@ goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.axes.StockDateTime');
 goog.require('anychart.core.grids.Stock');
-goog.require('anychart.core.stock.series.Base');
-goog.require('anychart.core.stock.series.Column');
-goog.require('anychart.core.stock.series.Line');
-goog.require('anychart.core.stock.series.OHLC');
+goog.require('anychart.core.stock.series');
 goog.require('anychart.core.ui.Background');
+goog.require('anychart.core.ui.Legend');
 goog.require('anychart.enums');
+goog.require('anychart.scales.Linear');
 goog.require('anychart.utils');
+goog.require('goog.fx.Dragger');
 
 
 /**
@@ -1473,7 +1473,16 @@ anychart.core.stock.Plot.prototype.setupByJSON = function(config) {
 
 /**
  * Returns current pixel position of 0.5 ratio.
- * @return {Object}
+ * @return {{
+ *    firstKey: number,
+ *    lastKey: number,
+ *    firstIndex: number,
+ *    lastIndex: number,
+ *    minIndex: number,
+ *    maxIndex: number,
+ *    minKey: number,
+ *    maxKey: number
+ * }}
  */
 anychart.core.stock.Plot.prototype.getDragAnchor = function() {
   return this.chart_.getDragAnchor();
@@ -1527,6 +1536,19 @@ goog.inherits(anychart.core.stock.Plot.Dragger, goog.fx.Dragger);
 
 /** @inheritDoc */
 anychart.core.stock.Plot.Dragger.prototype.computeInitialPosition = function() {
+  /**
+   * @type {{
+   *    firstKey: number,
+   *    lastKey: number,
+   *    firstIndex: number,
+   *    lastIndex: number,
+   *    minIndex: number,
+   *    maxIndex: number,
+   *    minKey: number,
+   *    maxKey: number
+   * }}
+   * @private
+   */
   this.anchor_ = this.plot_.getDragAnchor();
   this.deltaX = 0;
   this.deltaY = 0;

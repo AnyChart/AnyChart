@@ -1,6 +1,5 @@
 goog.provide('anychart.utils.GeoJSONParser');
 goog.require('anychart.core.map.geom');
-goog.require('goog.math.Coordinate');
 
 
 

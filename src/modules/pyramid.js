@@ -1,3 +1,8 @@
+/**
+ * @fileoverview anychart.modules.pyramid namespace file.
+ * @suppress {extraRequire}
+ */
+
 goog.provide('anychart.modules.pyramid');
 
 goog.require('anychart.charts.Pyramid');
