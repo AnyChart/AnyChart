@@ -79,7 +79,7 @@ def __sync_contrib():
 
     #Install closure linter
     global arguments
-    if 'linter' in arguments:
+    if 'linter' in arguments and arguments['linter']:
         __install_closure_linter()
 
     print 'All contributions installed'
