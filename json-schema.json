@@ -2852,7 +2852,7 @@
               ]
             },
             {"$ref": "#/definitions/anychart.scales.LinearColor"},
-            {"$ref": "#/definitions/anychart.scales.OrdinalColor"},
+            {"$ref": "#/definitions/anychart.scales.OrdinalColor"}
           ]
         }
       }
