@@ -2035,6 +2035,7 @@ anychart.core.SeriesBase.prototype['unhover'] = anychart.core.SeriesBase.prototy
 anychart.core.SeriesBase.prototype['unselect'] = anychart.core.SeriesBase.prototype.unselect;
 
 anychart.core.SeriesBase.prototype['hover'] = anychart.core.SeriesBase.prototype.hover;
+anychart.core.SeriesBase.prototype['hoverMode'] = anychart.core.SeriesBase.prototype.hoverMode;
 anychart.core.SeriesBase.prototype['select'] = anychart.core.SeriesBase.prototype.select;
 anychart.core.SeriesBase.prototype['selectionMode'] = anychart.core.SeriesBase.prototype.selectionMode;
 anychart.core.SeriesBase.prototype['allowPointsSelect'] = anychart.core.SeriesBase.prototype.allowPointsSelect;
