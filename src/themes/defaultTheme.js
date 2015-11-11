@@ -2860,8 +2860,8 @@ window['anychart']['themes']['defaultTheme'] = {
             //var name = item['get']('name');
             var startDate = item['meta']('minPeriodDate');
             var endDate = item['meta']('maxPeriodDate');
-            return (startDate ? 'Start Date: ' + window['anychart']['utils']['defaultDateFormatter'](startDate) : '') +
-                (endDate ? '\nEnd Date: ' + window['anychart']['utils']['defaultDateFormatter'](endDate) : '');
+            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '');
           }
         }
       },
@@ -2877,8 +2877,8 @@ window['anychart']['themes']['defaultTheme'] = {
             var startDate = period ? period['start'] : item['meta']('minPeriodDate');
             var endDate = period ? period['end'] : item['meta']('maxPeriodDate');
 
-            return (startDate ? 'Start Date: ' + window['anychart']['utils']['defaultDateFormatter'](startDate) : '') +
-                (endDate ? '\nEnd Date: ' + window['anychart']['utils']['defaultDateFormatter'](endDate) : '');
+            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '');
           }
         }
       }
@@ -2902,8 +2902,8 @@ window['anychart']['themes']['defaultTheme'] = {
               progress = (Math.round(auto * 100) / 100 || 0) + '%';
             }
 
-            return (startDate ? 'Start Date: ' + window['anychart']['utils']['defaultDateFormatter'](startDate) : '') +
-                (endDate ? '\nEnd Date: ' + window['anychart']['utils']['defaultDateFormatter'](endDate) : '') +
+            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '') +
                 (progress ? '\nComplete: ' + progress : '');
           }
         }
@@ -2925,8 +2925,8 @@ window['anychart']['themes']['defaultTheme'] = {
               progress = (Math.round(auto * 100) / 100 || 0) + '%';
             }
 
-            return (startDate ? 'Start Date: ' + window['anychart']['utils']['defaultDateFormatter'](startDate) : '') +
-                (endDate ? '\nEnd Date: ' + window['anychart']['utils']['defaultDateFormatter'](endDate) : '') +
+            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '') +
                 (progress ? '\nComplete: ' + progress : '');
 
           }
@@ -3053,25 +3053,25 @@ window['anychart']['themes']['defaultTheme'] = {
             var date = this['tickValue'];
             switch (this['majorIntervalUnit']) {
               case 'year':
-                return window['anychart']['utils']['formatDateTime'](date, 'yyyy');
+                return window['anychart']['format']['dateTime'](date, 'yyyy');
               case 'semester':
               case 'quarter':
               case 'month':
-                return window['anychart']['utils']['formatDateTime'](date, 'yyyy MMM');
+                return window['anychart']['format']['dateTime'](date, 'yyyy MMM');
               case 'thirdOfMonth':
               case 'week':
               case 'day':
-                return window['anychart']['utils']['formatDateTime'](date, 'MMM dd');
+                return window['anychart']['format']['dateTime'](date, 'MMM dd');
               case 'hour':
-                return window['anychart']['utils']['formatDateTime'](date, 'MMM-dd HH');
+                return window['anychart']['format']['dateTime'](date, 'MMM-dd HH');
               case 'minute':
-                return window['anychart']['utils']['formatDateTime'](date, 'dd HH:mm');
+                return window['anychart']['format']['dateTime'](date, 'dd HH:mm');
               case 'second':
-                return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss');
+                return window['anychart']['format']['dateTime'](date, 'HH:mm:ss');
               case 'millisecond':
-                return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss.SSS');
+                return window['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
             }
-            return window['anychart']['utils']['formatDateTime'](date, 'yyyy MMM dd');
+            return window['anychart']['format']['dateTime'](date, 'yyyy MMM dd');
           }
         },
         'minorLabels': {
@@ -3092,25 +3092,25 @@ window['anychart']['themes']['defaultTheme'] = {
             var date = this['tickValue'];
             switch (this['majorIntervalUnit']) {
               case 'year':
-                return window['anychart']['utils']['formatDateTime'](date, 'yyyy');
+                return window['anychart']['format']['dateTime'](date, 'yyyy');
               case 'semester':
               case 'quarter':
               case 'month':
-                return window['anychart']['utils']['formatDateTime'](date, 'MMM');
+                return window['anychart']['format']['dateTime'](date, 'MMM');
               case 'thirdOfMonth':
               case 'week':
               case 'day':
-                return window['anychart']['utils']['formatDateTime'](date, 'dd');
+                return window['anychart']['format']['dateTime'](date, 'dd');
               case 'hour':
-                return window['anychart']['utils']['formatDateTime'](date, 'HH');
+                return window['anychart']['format']['dateTime'](date, 'HH');
               case 'minute':
-                return window['anychart']['utils']['formatDateTime'](date, 'HH:mm');
+                return window['anychart']['format']['dateTime'](date, 'HH:mm');
               case 'second':
-                return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss');
+                return window['anychart']['format']['dateTime'](date, 'HH:mm:ss');
               case 'millisecond':
-                return window['anychart']['utils']['formatDateTime'](date, 'SSS');
+                return window['anychart']['format']['dateTime'](date, 'SSS');
             }
-            return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss.SSS');
+            return window['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
           }
         }
       },
@@ -3140,24 +3140,24 @@ window['anychart']['themes']['defaultTheme'] = {
           var date = /** @type {number} */(this['value']);
           switch (this['groupingIntervalUnit']) {
             case 'year':
-              return window['anychart']['utils']['formatDateTime'](date, 'yyyy');
+              return window['anychart']['format']['dateTime'](date, 'yyyy');
             case 'semester':
             case 'quarter':
             case 'month':
-              return window['anychart']['utils']['formatDateTime'](date, 'MMM yyyy');
+              return window['anychart']['format']['dateTime'](date, 'MMM yyyy');
             case 'thirdofmonth':
             case 'week':
             case 'day':
-              return window['anychart']['utils']['formatDateTime'](date, 'dd MMM yyyy');
+              return window['anychart']['format']['dateTime'](date, 'dd MMM yyyy');
             case 'hour':
             case 'minute':
-              return window['anychart']['utils']['formatDateTime'](date, 'HH:mm, dd MMM');
+              return window['anychart']['format']['dateTime'](date, 'HH:mm, dd MMM');
             case 'second':
-              return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss');
+              return window['anychart']['format']['dateTime'](date, 'HH:mm:ss');
             case 'millisecond':
-              return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss.SSS');
+              return window['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
           }
-          return window['anychart']['utils']['formatDateTime'](date, 'dd MMM yyyy');
+          return window['anychart']['format']['dateTime'](date, 'dd MMM yyyy');
         },
         'align': 'center',
         'margin': {
@@ -3386,25 +3386,25 @@ window['anychart']['themes']['defaultTheme'] = {
             var date = this['tickValue'];
             switch (this['majorIntervalUnit']) {
               case 'year':
-                return window['anychart']['utils']['formatDateTime'](date, 'yyyy');
+                return window['anychart']['format']['dateTime'](date, 'yyyy');
               case 'semester':
               case 'quarter':
               case 'month':
-                return window['anychart']['utils']['formatDateTime'](date, 'yyyy MMM');
+                return window['anychart']['format']['dateTime'](date, 'yyyy MMM');
               case 'thirdOfMonth':
               case 'week':
               case 'day':
-                return window['anychart']['utils']['formatDateTime'](date, 'MMM dd');
+                return window['anychart']['format']['dateTime'](date, 'MMM dd');
               case 'hour':
-                return window['anychart']['utils']['formatDateTime'](date, 'MMM-dd HH');
+                return window['anychart']['format']['dateTime'](date, 'MMM-dd HH');
               case 'minute':
-                return window['anychart']['utils']['formatDateTime'](date, 'dd HH:mm');
+                return window['anychart']['format']['dateTime'](date, 'dd HH:mm');
               case 'second':
-                return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss');
+                return window['anychart']['format']['dateTime'](date, 'HH:mm:ss');
               case 'millisecond':
-                return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss.SSS');
+                return window['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
             }
-            return window['anychart']['utils']['formatDateTime'](date, 'yyyy MMM dd');
+            return window['anychart']['format']['dateTime'](date, 'yyyy MMM dd');
           }
         },
         'minorLabels': {
@@ -3425,25 +3425,25 @@ window['anychart']['themes']['defaultTheme'] = {
             var date = this['tickValue'];
             switch (this['majorIntervalUnit']) {
               case 'year':
-                return window['anychart']['utils']['formatDateTime'](date, 'yyyy');
+                return window['anychart']['format']['dateTime'](date, 'yyyy');
               case 'semester':
               case 'quarter':
               case 'month':
-                return window['anychart']['utils']['formatDateTime'](date, 'MMM');
+                return window['anychart']['format']['dateTime'](date, 'MMM');
               case 'thirdOfMonth':
               case 'week':
               case 'day':
-                return window['anychart']['utils']['formatDateTime'](date, 'dd');
+                return window['anychart']['format']['dateTime'](date, 'dd');
               case 'hour':
-                return window['anychart']['utils']['formatDateTime'](date, 'HH');
+                return window['anychart']['format']['dateTime'](date, 'HH');
               case 'minute':
-                return window['anychart']['utils']['formatDateTime'](date, 'HH:mm');
+                return window['anychart']['format']['dateTime'](date, 'HH:mm');
               case 'second':
-                return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss');
+                return window['anychart']['format']['dateTime'](date, 'HH:mm:ss');
               case 'millisecond':
-                return window['anychart']['utils']['formatDateTime'](date, 'SSS');
+                return window['anychart']['format']['dateTime'](date, 'SSS');
             }
-            return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss.SSS');
+            return window['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
           }
         },
         'zIndex': 75
@@ -3467,24 +3467,24 @@ window['anychart']['themes']['defaultTheme'] = {
         var date = /** @type {number} */(this['hoveredDate']);
         switch (this['groupingIntervalUnit']) {
           case 'year':
-            return window['anychart']['utils']['formatDateTime'](date, 'yyyy');
+            return window['anychart']['format']['dateTime'](date, 'yyyy');
           case 'semester':
           case 'quarter':
           case 'month':
-            return window['anychart']['utils']['formatDateTime'](date, 'MMM yyyy');
+            return window['anychart']['format']['dateTime'](date, 'MMM yyyy');
           case 'thirdofmonth':
           case 'week':
           case 'day':
-            return window['anychart']['utils']['formatDateTime'](date, 'dd MMM yyyy');
+            return window['anychart']['format']['dateTime'](date, 'dd MMM yyyy');
           case 'hour':
           case 'minute':
-            return window['anychart']['utils']['formatDateTime'](date, 'HH:mm, dd MMM');
+            return window['anychart']['format']['dateTime'](date, 'HH:mm, dd MMM');
           case 'second':
-            return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss');
+            return window['anychart']['format']['dateTime'](date, 'HH:mm:ss');
           case 'millisecond':
-            return window['anychart']['utils']['formatDateTime'](date, 'HH:mm:ss.SSS');
+            return window['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
         }
-        return window['anychart']['utils']['formatDateTime'](date, 'dd MMM yyyy');
+        return window['anychart']['format']['dateTime'](date, 'dd MMM yyyy');
       },
       /**
        * @this {*}

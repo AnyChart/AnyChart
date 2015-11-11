@@ -41,7 +41,7 @@ anychart.format.UTCTimeZoneCache_ = {};
 /**
  * Formats date by pattern.
  * @param {number|Date} date UTC timestamp or Date object.
- * @param {string=} opt_pattern
+ * @param {string=} opt_pattern ['yyyy.MM.dd'].
  * @param {number=} opt_timeZone Adjust with time zone. Indicate
  * minutes WEST of UTC to be used as a constant time zone offset.
  * @return {string}
