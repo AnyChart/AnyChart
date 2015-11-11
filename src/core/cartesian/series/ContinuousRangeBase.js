@@ -119,48 +119,7 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.createPositionProvi
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for current stroke settings.
- * @return {acgraph.vector.Stroke|Function} Current stroke settings.
- *//**
- * Setter for series stroke by function.
- * @example
- * chart = anychart.cartesian();
- * chart.rangeArea([
- *     [0, 2, 3],
- *     [1, 3, 6],
- *     [2, 2, 4]
- *   ])
- *   .lowStroke('4 orange');
- * chart.container(stage).draw();
- * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
- *  return anychart.color.darken(this.sourceColor);
- * }] Function that looks like <code>function(){
- *    // this.sourceColor -  color returned by fill() getter.
- *    return fillValue; // type acgraph.vector.Fill
- * }</code>.
- * @return {!anychart.core.cartesian.series.ContinuousRangeBase} {@link anychart.core.cartesian.series.ContinuousRangeBase} instance for method chaining.
- *//**
- * Setter for stroke settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
- * @example
- * chart = anychart.cartesian();
- * chart.rangeArea([
- *     [0, 2, 3],
- *     [1, 3, 6],
- *     [2, 2, 4]
- *   ])
- *   .lowStroke('orange', 3, '5 2', 'round');
- * chart.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.cartesian.series.ContinuousRangeBase} {@link anychart.core.cartesian.series.ContinuousRangeBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for highStroke.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -186,48 +145,7 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.highStroke = functi
 
 
 /**
- * Getter for current stroke settings.
- * @return {acgraph.vector.Stroke|Function} Current stroke settings.
- *//**
- * Setter for series stroke by function.
- * @example
- * chart = anychart.cartesian();
- * chart.rangeArea([
- *     [0, 2, 3],
- *     [1, 3, 6],
- *     [2, 2, 4]
- *   ])
- *   .hoverHighStroke('4 orange');
- * chart.container(stage).draw();
- * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
- *  return anychart.color.darken(this.sourceColor);
- * }] Function that looks like <code>function(){
- *    // this.sourceColor -  color returned by fill() getter.
- *    return fillValue; // type acgraph.vector.Fill
- * }</code>.
- * @return {!anychart.core.cartesian.series.ContinuousRangeBase} {@link anychart.core.cartesian.series.ContinuousRangeBase} instance for method chaining.
- *//**
- * Setter for stroke settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
- * @example
- * chart = anychart.cartesian();
- * chart.rangeArea([
- *     [0, 2, 3],
- *     [1, 3, 6],
- *     [2, 2, 4]
- *   ])
- *   .hoverHighStroke('orange', 3, '5 2', 'round');
- * chart.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.cartesian.series.ContinuousRangeBase} {@link anychart.core.cartesian.series.ContinuousRangeBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hoverHighStroke.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -302,48 +220,7 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.getFinalHighStroke 
 
 
 /**
- * Getter for current stroke settings.
- * @return {acgraph.vector.Stroke|Function} Current stroke settings.
- *//**
- * Setter for series stroke by function.
- * @example
- * chart = anychart.cartesian();
- * chart.rangeArea([
- *     [0, 2, 3],
- *     [1, 3, 6],
- *     [2, 2, 4]
- *   ])
- *   .lowStroke('4 orange');
- * chart.container(stage).draw();
- * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
- *  return anychart.color.darken(this.sourceColor);
- * }] Function that looks like <code>function(){
- *    // this.sourceColor -  color returned by fill() getter.
- *    return fillValue; // type acgraph.vector.Fill
- * }</code>.
- * @return {!anychart.core.cartesian.series.ContinuousRangeBase} {@link anychart.core.cartesian.series.ContinuousRangeBase} instance for method chaining.
- *//**
- * Setter for stroke settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
- * @example
- * chart = anychart.cartesian();
- * chart.rangeArea([
- *     [0, 2, 3],
- *     [1, 3, 6],
- *     [2, 2, 4]
- *   ])
- *   .lowStroke('orange', 3, '5 2', 'round');
- * chart.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.cartesian.series.ContinuousRangeBase} {@link anychart.core.cartesian.series.ContinuousRangeBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for lowStroke.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -369,48 +246,7 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.lowStroke = functio
 
 
 /**
- * Getter for current stroke settings.
- * @return {acgraph.vector.Stroke|Function} Current stroke settings.
- *//**
- * Setter for series stroke by function.
- * @example
- * chart = anychart.cartesian();
- * chart.rangeArea([
- *     [0, 2, 3],
- *     [1, 3, 6],
- *     [2, 2, 4]
- *   ])
- *   .hoverLowStroke('4 orange');
- * chart.container(stage).draw();
- * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
- *  return anychart.color.darken(this.sourceColor);
- * }] Function that looks like <code>function(){
- *    // this.sourceColor -  color returned by fill() getter.
- *    return fillValue; // type acgraph.vector.Fill
- * }</code>.
- * @return {!anychart.core.cartesian.series.ContinuousRangeBase} {@link anychart.core.cartesian.series.ContinuousRangeBase} instance for method chaining.
- *//**
- * Setter for stroke settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
- * @example
- * chart = anychart.cartesian();
- * chart.rangeArea([
- *     [0, 2, 3],
- *     [1, 3, 6],
- *     [2, 2, 4]
- *   ])
- *   .hoverLowStroke('orange', 3, '5 2', 'round');
- * chart.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.cartesian.series.ContinuousRangeBase} {@link anychart.core.cartesian.series.ContinuousRangeBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hoverLowStroke.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.

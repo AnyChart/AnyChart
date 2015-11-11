@@ -563,27 +563,7 @@ anychart.charts.Cartesian.prototype.defaultRangeMarkerSettings = function(opt_va
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for default chart X scale.
- * @return {!anychart.scales.Base} Default chart scale value.
- *//**
- * Setter for default chart X scale.<br/>
- * <b>Note:</b> This scale will be passed to all scale dependent chart elements if they don't have their own scales.
- * @example
- * var chart = anychart.cartesian();
- * chart.line([
- *   {x: "10-Dec-2004", y: 20},
- *   {x: "11-Dec-2004", y: 40},
- *   {x: "12-Dec-2004", y: 30}
- * ]);
- * chart.xScale('dateTime');
- * chart.xAxis().labels()
- *     .textFormatter(function(point){ return new Date(point.value).toDateString();});
- * chart.yAxis();
- * chart.container(stage).draw();
- * @param {(anychart.enums.ScaleTypes|anychart.scales.Base)=} opt_value X Scale to set.
- * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for xScale.
  * @param {(anychart.enums.ScaleTypes|anychart.scales.Base)=} opt_value X Scale to set.
  * @return {!(anychart.scales.Base|anychart.charts.Cartesian)} Default chart scale value or itself for method chaining.
  */
@@ -631,30 +611,7 @@ anychart.charts.Cartesian.prototype.xScaleInvalidated_ = function(event) {
 
 
 /**
- * Getter for default chart Y scale.
- * @example
- * var chart = anychart.cartesian();
- * chart.line([ 10, 12, 14, 11]);
- * chart.yScale().minimum(9).maximum(13);
- * chart.xAxis().labels()
- *     .textFormatter(function(point){ return new Date(point.value).toDateString();});
- * chart.yAxis();
- * chart.container(stage).draw();
- * @return {!anychart.scales.Base} Default chart scale value.
- *//**
- * Setter for chart Y scale.<br/>
- * <b>Note:</b> This scale will be passed to all scale dependent chart elements if they don't have their own scales.
- * @example
- * var chart = anychart.cartesian();
- * chart.line([0.07, 0.9, 14, 2, 89]);
- * chart.yScale('log');
- * chart.xAxis();
- * chart.yAxis();
- * chart.container(stage).draw();
- * @param {(anychart.enums.ScaleTypes|anychart.scales.Base)=} opt_value Y Scale to set.
- * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for yScale.
  * @param {(anychart.enums.ScaleTypes|anychart.scales.Base)=} opt_value Y Scale to set.
  * @return {!(anychart.scales.Base|anychart.charts.Cartesian)} Default chart scale value or itself for method chaining.
  */
@@ -739,42 +696,7 @@ anychart.charts.Cartesian.prototype.setDefaultScaleForLayoutBasedElements_ = fun
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for chart grid.
- * @example
- * var chart = anychart.cartesian();
- * chart.column([1, 4, 5, 7, 2]);
- * chart.grid()
- *     .layout(anychart.enums.Layout.HORIZONTAL);
- * chart.grid(1)
- *     .oddFill('none')
- *     .evenFill('none')
- *     .layout(anychart.enums.Layout.VERTICAL);
- * chart.container(stage).draw();
- * @param {number=} opt_index Chart grid index. If not set - creates a new instance and adds it to the end of array.
- * @return {!anychart.core.grids.Linear} Axis instance by index.
- *//**
- * Setter for chart grid.
- * @example
- * var chart = anychart.cartesian();
- * chart.column([1, 4, 5, 7, 2]);
- * chart.grid(true);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null)=} opt_value Chart grid settings to set.
- * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
- *//**
- * Setter for chart grid by index.
- * @example
- * var chart = anychart.cartesian();
- * chart.column([1, 4, 5, 7, 2]);
- * chart.grid(0, {layout: 'vertical'});
- * chart.grid(1, {layout: 'horizontal', evenFill: 'none'});
- * chart.container(stage).draw();
- * @param {number=} opt_index Chart grid index.
- * @param {(Object|boolean|null)=} opt_value Chart grid settings to set.<br/>
- * <b>Note:</b> pass <b>null</b> or <b>'none'</b> to disable the grid.
- * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for grid.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Grid settings.
  * @param {(Object|boolean|null)=} opt_value Grid settings to set.
  * @return {!(anychart.core.grids.Linear|anychart.charts.Cartesian)} Grid instance by index or itself for method chaining.
@@ -809,55 +731,7 @@ anychart.charts.Cartesian.prototype.grid = function(opt_indexOrValue, opt_value)
 
 
 /**
- * Getter for chart minor grid.
- * @example
- * var chart = anychart.cartesian();
- * chart.column([1, 4, 5, 7, 2]);
- * chart.grid(0)
- *     .layout(anychart.enums.Layout.HORIZONTAL);
- * chart.grid(1)
- *     .oddFill('none')
- *     .evenFill('none')
- *     .layout(anychart.enums.Layout.VERTICAL);
- * chart.minorGrid(0)
- *    .oddFill('none')
- *    .evenFill('none')
- *    .layout(anychart.enums.Layout.HORIZONTAL);
- * chart.container(stage).draw();
- * @param {number=} opt_index Chart minor grid index. If not set - creates a new instance and adds it to the end of array.
- * @return {!anychart.core.grids.Linear} Axis instance by index.
- *//**
- * Setter for chart minor grid.
- * @example
- * var chart = anychart.cartesian();
- * chart.column([1, 4, 5, 7, 2]);
- * chart.minorGrid(true);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null)=} opt_value Chart minor grid settings to set.
- * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
- *//**
- * Setter for chart minor grid by index.
- * @example
- * var chart = anychart.cartesian();
- * chart.column([1, 4, 5, 7, 2]);
- * chart.grid(0)
- *     .layout(anychart.enums.Layout.HORIZONTAL);
- * chart.minorGrid(0)
- *     .oddFill('none')
- *     .evenFill('red')
- *     .layout(anychart.enums.Layout.VERTICAL);
- * chart.minorGrid(1)
- *    .oddFill('none')
- *    .evenFill('none')
- *    .layout(anychart.enums.Layout.HORIZONTAL);
- * chart.minorGrid(0, null);
- * chart.container(stage).draw();
- * @param {number=} opt_index Chart minor grid index.
- * @param {(Object|boolean|null)=} opt_value Chart minor grid settings to set.<br/>
- * <b>Note:</b> pass <b>null</b> or <b>'none'</b> to disable the grid.
- * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for minorGrid.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Minor grid settings.
  * @param {(Object|boolean|null)=} opt_value Minor grid settings to set.
  * @return {!(anychart.core.grids.Linear|anychart.charts.Cartesian)} Minor grid instance by index or itself for method chaining.
@@ -907,54 +781,7 @@ anychart.charts.Cartesian.prototype.onGridSignal_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for chart X-axis.
- * @example
- * var chart = anychart.cartesian();
- * chart.column([1, 4, 5, 7, 2]);
- * chart.xAxis(0)
- *    .orientation('top')
- *    .title(null);
- * chart.xAxis(1)
- *    .orientation('bottom')
- *    .title('X-Axis');
- * chart.xAxis(2)
- *    .orientation('right')
- *    .title(null);
- * chart.container(stage).draw();
- * @param {number=} opt_index Chart axis index. If not set - creates a new instance and adds it to the end of array.
- * @return {!anychart.core.axes.Linear} Axis instance by index.
- *//**
- * Setter for chart X-axis.
- * @example
- * var chart = anychart.cartesian();
- * chart.bar([1, 4, 5, 7, 2]);
- * chart.xAxis({ orientation: 'right'});
- * chart.container(stage).draw();
- * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.
- * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
- *//**
- * Setter for chart X-axis by index.
- * @example
- * var chart = anychart.cartesian();
- * chart.column([1, 4, 5, 7, 2]);
- * chart.xAxis(0)
- *    .orientation('top')
- *    .title(null);
- * chart.xAxis(1)
- *    .orientation('bottom')
- *    .title('X-Axis');
- * chart.xAxis(2)
- *    .orientation('right')
- *    .title(null);
- * chart.xAxis(1, null);
- * chart.xAxis(2, 'None');
- * chart.container(stage).draw();
- * @param {number=} opt_index Chart axis index.
- * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.<br/>
- * <b>Note:</b> pass <b>null</b> or <b>'none'</b> to disable the grid.
- * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for xAxis.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Chart axis settings to set.
  * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.
  * @return {!(anychart.core.axes.Linear|anychart.charts.Cartesian)} Axis instance by index or itself for method chaining.
@@ -990,55 +817,7 @@ anychart.charts.Cartesian.prototype.xAxis = function(opt_indexOrValue, opt_value
 
 
 /**
- * Getter for chart Y-axis.
- * @example
- * var chart = anychart.cartesian();
- * chart.column([1, 4, 5, 7, 2]);
- * chart.yAxis(0)
- *    .orientation('right')
- *    .title(null);
- * chart.yAxis(1)
- *    .orientation('right')
- *    .stroke('blue')
- *    .title('Y-Axis');
- * chart.yAxis(2)
- *    .orientation('bottom')
- *    .title(null);
- * chart.container(stage).draw();
- * @param {number=} opt_index Chart axis index. If not set - creates a new instance and adds it to the end of array.
- * @return {!anychart.core.axes.Linear} Axis instance by index.
- *//**
- * Setter for chart Y-axis.
- * @example
- * var chart = anychart.cartesian();
- * chart.bar([1, 4, 5, 7, 2]);
- * chart.yAxis({orientation: 'left'});
- * chart.container(stage).draw();
- * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.
- * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} class for method chaining.
- *//**
- * Setter for chart Y-axis by index.
- * @example
- * var chart = anychart.cartesian();
- * chart.column([1, 4, 5, 7, 2]);
- * chart.yAxis(0)
- *    .orientation('right')
- *    .title(null);
- * chart.yAxis(1)
- *    .orientation('right')
- *    .stroke('blue')
- *    .title('Y-Axis');
- * chart.yAxis(2)
- *    .orientation('bottom')
- *    .title(null);
- * chart.yAxis(2, 'None');
- * chart.container(stage).draw();
- * @param {number=} opt_index Chart axis index.
- * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.<br/>
- * <b>Note:</b> pass <b>null</b> or <b>'none'</b> to disable the grid.
- * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for yAxis.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Chart axis settings to set.
  * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.
  * @return {!(anychart.core.axes.Linear|anychart.charts.Cartesian)} Axis instance by index or itself for method chaining.
@@ -1099,36 +878,7 @@ anychart.charts.Cartesian.prototype.onAxisSignal_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for chart line marker.
- * @example <t>lineChart</t>
- * chart.line([1, -4, 5, 7, 7]);
- * chart.lineMarker(0)
- *     .value(5.5)
- *     .stroke('2 red')
- *     .layout('horizontal');
- * @param {number=} opt_index Chart line marker index. If not set - creates a new instance and adds it to the end of array.
- * @return {!anychart.core.axisMarkers.Line} Line marker instance by index.
- *//**
- * Setter for chart line marker.
- * @example <t>lineChart</t>
- * chart.line([1, -4, 5, 7, 7]);
- * chart.lineMarker({value: 5.5});
- * @param {(Object|boolean|null)=} opt_value Chart line marker settings to set.
- * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
- *//**
- * Setter for chart line marker by index.
- * @example <t>lineChart</t>
- * chart.spline([1, -4, 5, 7, 7]);
- * chart.lineMarker();
- * chart.lineMarker(1).value(2).stroke('green');
- * //turn off first marker
- * chart.lineMarker(0, null);
- * @param {number=} opt_index Chart line marker index.
- * @param {(Object|boolean|null)=} opt_value Chart line marker settings to set.<br/>
- * <b>Note:</b> pass <b>null</b> or <b>'none' to disable marker</b>.
- * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for lineMarker.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Chart line marker settings to set.
  * @param {(Object|boolean|null)=} opt_value Chart line marker settings to set.
  * @return {!(anychart.core.axisMarkers.Line|anychart.charts.Cartesian)} Line marker instance by index or itself for method chaining.
@@ -1163,40 +913,7 @@ anychart.charts.Cartesian.prototype.lineMarker = function(opt_indexOrValue, opt_
 
 
 /**
- * Getter for chart range marker.
- * @example <t>lineChart</t>
- * chart.line([1, -4, 5, 7, 7]);
- * chart.rangeMarker()
- *     .from(2.5)
- *     .to(5.5)
- *     .fill('blue .1');
- * @param {number=} opt_index Chart range marker index. If not set - creates a new instance and adds it to the end of array.
- * @return {!anychart.core.axisMarkers.Range} Range marker instance by index.
- *//**
- * Setter for chart range marker.
- * @example <t>lineChart</t>
- * chart.line([1, -4, 5, 7, 7]);
- * chart.rangeMarker({
- *   from: 2.5,
- *   to: 5.5,
- *   fill: 'blue .1'
- * });
- * @param {(anychart.core.axisMarkers.Range|Object)=} opt_value Chart range marker settings to set.
- * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
- *//**
- * Setter for chart range marker by index.
- * @example <t>lineChart</t>
- * chart.column([1, -4, 5, 7, 7]);
- * chart.rangeMarker(0).from(5).to(10).fill('orange 0.2');
- * chart.rangeMarker(1).from(-5).to(2).fill('green 0.2');
- * // turn off red marker.
- * chart.rangeMarker(0, null);
- * @param {number=} opt_index Chart range marker index.
- * @param {(Object|boolean|null)=} opt_value Chart range marker settings to set.<br/>
- * <b>Note:</b> pass <b>null</b> or <b>'none' to disable to disable marker.
- * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for rangeMarker.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Chart range marker settings to set.
  * @param {(Object|boolean|null)=} opt_value Chart range marker settings to set.
  * @return {!(anychart.core.axisMarkers.Range|anychart.charts.Cartesian)} Range marker instance by index or itself for chaining call.
@@ -1231,39 +948,7 @@ anychart.charts.Cartesian.prototype.rangeMarker = function(opt_indexOrValue, opt
 
 
 /**
- * Getter for chart text marker.
- * @example <t>lineChart</t>
- * chart.line([1, -4, 5, 7, 7]);
- * chart.textMarker()
- *     .text('Marker')
- *     .value(3.3)
- *     .align(anychart.enums.Align.LEFT)
- *     .anchor(anychart.enums.Anchor.LEFT_BOTTOM);
- * chart.lineMarker().value(3.3);
- * @param {number=} opt_index Chart text marker index. If not set - creates a new instance and adds it to the end of array.
- * @return {!anychart.core.axisMarkers.Text} Text marker instance by index.
- *//**
- * Setter for chart text marker.
- * @example <t>lineChart</t>
- * chart.line([1, -4, 5, 7, 7]);
- * chart.textMarker({text: 'Marker', value: 3.3});
- * chart.lineMarker().value(3.3);
- * @param {(Object|boolean|null)=} opt_value Chart text marker settings to set.
- * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
- *//**
- * Setter for chart text marker by index.
- * @example <t>lineChart</t>
- * chart.spline([1, -4, 5, 7, 7]);
- * chart.textMarker(0).value(6).text('Marker 0');
- * chart.textMarker(1).value(2).text('Marker 1');
- * // turn off first marker
- * chart.textMarker(0, null);
- * @param {number=} opt_index Chart text marker index.
- * @param {(Object|boolean|null)=} opt_value Chart text marker settings to set.<br/>
- * <b>Note:</b> pass <b>null</b> or <b>'none' to disable marker.
- * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for textMarker.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Chart line marker settings to set.
  * @param {(Object|boolean|null)=} opt_value Chart line marker settings to set.
  * @return {!(anychart.core.axisMarkers.Text|anychart.charts.Cartesian)} Line marker instance by index or itself for chaining call.
@@ -1981,19 +1666,7 @@ anychart.charts.Cartesian.prototype.getAllSeries = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for space between bar groups on the ordinal scale by ratio of bars width.
- * @return {number} Current bar groups padding.
- *//**
- * Setter for space between bar groups on the ordinal scale by ratio of bars width.<br/>
- * See illustration at {@link anychart.charts.Cartesian#barsPadding}.
- * @example
- * chart = anychart.bar([4, 2, 8], [4, 2, 8]);
- * chart.barGroupsPadding(.1);
- * chart.container(stage).draw();
- * @param {number=} opt_value [0.1] Value to set.
- * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for barGroupsPadding.
  * @param {number=} opt_value .
  * @return {number|anychart.charts.Cartesian} .
  */
@@ -2011,36 +1684,7 @@ anychart.charts.Cartesian.prototype.barGroupsPadding = function(opt_value) {
 
 
 /**
- * Getter for space between bars on the ordinal scale by ratio of bars width.
- * @return {number} Current bars padding.
- *//**
- * Setter for space between bars on the ordinal scale by ratio of bars width.
- * @illustration <t>illustration</t>
- * chart = anychart.cartesian();
- * chart.bar([1, 4, 5]);
- * chart.bar([1, 4, 5]);
- * chart.barsPadding(.6);
- * chart.barGroupsPadding(.6);
- * chart.container(stage).draw();
- * var rect = layer.rect(1, 5, 325, 89).fill('none').stroke('grey', 2, '3 5');
- * layer.text(335, 72, 'bars group');
- * layer.path()
- *     .moveTo(325, 68).lineTo(335, 68).stroke(rect.stroke());
- * layer.text(330, 145, 'barsPadding');
- * layer.circle(200, 150, 6);
- * layer.path()
- *     .moveTo(208, 150).lineTo(325, 150).stroke(rect.stroke());
- * layer.text(300, 195, 'barGroupsPadding');
- * layer.circle(70, 200, 6);
- * layer.path()
- *     .moveTo(76, 200).lineTo(295, 200).stroke(rect.stroke());
- * @example
- * chart = anychart.bar([4, 2, 8], [4, 2, 8]);
- * chart.barsPadding(.8);
- * chart.container(stage).draw();
- * @param {number=} opt_value [0.1] Value to set.
- * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
- *//**
+ * Getter/setter for barsPadding.
  * @ignoreDoc
  * @param {number=} opt_value .
  * @return {number|anychart.charts.Cartesian} .
@@ -2614,20 +2258,7 @@ anychart.charts.Cartesian.prototype.calcBubbleSizes_ = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for series colors palette.
- * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} Current palette.
- *//**
- * Setter for series colors palette.
- * @example <t>lineChart</t>
- * chart = anychart.line();
- * chart.palette(['red', 'green', 'blue']);
- * chart.line([1, -4, 5, 7]);
- * chart.line([11, 0, 15, 4]);
- * chart.line([21, -4, 9, 0]);
- * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value Value to set.
- * @return {!anychart.charts.Cartesian} {@link anychart.charts.Cartesian} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for palette.
  * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value .
  * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.charts.Cartesian)} .
  */

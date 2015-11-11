@@ -319,24 +319,7 @@ anychart.core.scatter.series.Base.prototype.isErrorAvailable = function() {
 
 
 /**
- * Getter for series clip settings.
- * @return {boolean|anychart.math.Rect} Current clip settings.
- *//**
- * Setter for series clip settings. Clips visible part of a series by a rectangle (or chart).
- * @example
- * chart = anychart.scatterChart();
- * chart.marker([
- *    [4.1, 10],
- *    [2.3, 6],
- *    [3.4, 17],
- *    [1.2, 20]
- * ]).clip(false);
- * chart.yScale().minimum(11);
- * chart.container(stage).draw();
- * @param {(boolean|anychart.math.Rect)=} opt_value [False, if series is created manually.<br/>True, if created via chart] Enable/disable series clip.
- * @return {anychart.core.scatter.series.Base} {@link anychart.core.scatter.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for clip.
  * @param {(boolean|anychart.math.Rect)=} opt_value [False, if series is created manually.<br/>True, if created via chart] Enable/disable series clip.
  * @return {anychart.core.scatter.series.Base|boolean|anychart.math.Rect} .
  */
@@ -561,36 +544,7 @@ anychart.core.scatter.series.Base.prototype.applyRatioToBounds = function(ratio,
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for current series X scale.
- * @return {anychart.scales.ScatterBase} Current series X Scale.
- *//**
- * Setter for series X scale.
- * @example
- * chart = anychart.scatterChart();
- * chart.marker([
- *    [4.1, 10],
- *    [2.3, 6],
- *    [3.4, 17],
- *    [1.2, 20]
- * ]);
- * var secondScale = anychart.scales.log();
- * chart.xAxis(1)
- *     .scale(secondScale)
- *     .stroke('red')
- *     .orientation('top')
- *     .title('Log axis');
- * chart.xAxis(0).stroke('blue');
- * chart.marker([
- *    [4.1, 12],
- *    [32.3, 14],
- *    [163.4, 6],
- *    [761.2, 12]
- * ]).xScale(secondScale);
- * chart.container(stage).draw();
- * @param {anychart.scales.Base=} opt_value Value to set.
- * @return {!anychart.core.scatter.series.Base}  {@link anychart.core.scatter.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for xScale.
  * @param {anychart.scales.ScatterBase=} opt_value Value to set.
  * @return {(anychart.scales.ScatterBase|!anychart.core.scatter.series.Base)} Series X Scale or itself for chaining call.
  */
@@ -616,33 +570,7 @@ anychart.core.scatter.series.Base.prototype.xScale = function(opt_value) {
 
 
 /**
- * Getter for current series Y scale.
- * @return {anychart.scales.ScatterBase} Current series Y Scale.
- *//**
- * Setter for series Y scale.
- * @example
- * chart = anychart.scatterChart();
- * chart.marker([
- *    [4.1, 10],
- *    [2.3, 6],
- *    [3.4, 17],
- *    [1.2, 20]
- * ]);
- * var secondScale = anychart.scales.log();
- * chart.yAxis(1).scale(secondScale);
- * chart.yAxis(1).orientation('right').stroke('red');
- * chart.yAxis(0).stroke('blue');
- * chart.marker([
- *    [4.4, 30],
- *    [2.8, 6],
- *    [3.0, 127],
- *    [1.5, 620]
- * ]).yScale(secondScale);
- * chart.container(stage).draw();
- * @param {anychart.scales.ScatterBase=} opt_value Value to set.
- * @return {!anychart.core.scatter.series.Base}  {@link anychart.core.scatter.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for yScale.
  * @param {anychart.scales.ScatterBase=} opt_value Value to set.
  * @return {(anychart.scales.ScatterBase|!anychart.core.scatter.series.Base)} Series Y Scale or itself for chaining call.
  */

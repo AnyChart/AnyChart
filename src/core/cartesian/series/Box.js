@@ -895,14 +895,7 @@ anychart.core.cartesian.series.Box.prototype.getWhiskerWidth = function(pointSta
 
 
 /**
- * Getter for series outlier markers.
- * @return {!anychart.core.ui.MarkersFactory} Markers instance.
- *//**
- * Setter for series outlier markers.<br/>
- * @param {(Object|boolean|null|string)=} opt_value Series outlier markers settings.
- * @return {!anychart.core.cartesian.series.Box} {@link anychart.core.cartesian.series.Box} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for outlierMarkers.
  * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!(anychart.core.ui.MarkersFactory|anychart.core.cartesian.series.Box)} Markers instance or itself for chaining call.
  */
@@ -925,14 +918,7 @@ anychart.core.cartesian.series.Box.prototype.outlierMarkers = function(opt_value
 
 
 /**
- * Getter for series outlier markers on hover.
- * @return {!anychart.core.ui.MarkersFactory} Markers instance.
- *//**
- * Setter for series data markers on hover.<br/>
- * @param {(Object|boolean|null|string)=} opt_value Series outlier hover markers settings.
- * @return {!anychart.core.cartesian.series.Box} {@link anychart.core.cartesian.series.Box} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hoverOutlierMarkers.
  * @param {(Object|boolean|null|string)=} opt_value Series outliers hover markers settings.
  * @return {!(anychart.core.ui.MarkersFactory|anychart.core.cartesian.series.Box)} Markers instance or itself for chaining call.
  */

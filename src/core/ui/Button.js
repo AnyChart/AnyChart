@@ -145,16 +145,7 @@ anychart.core.ui.Button.prototype.state = function(state, opt_enable) {
 
 
 /**
- * Getter for a supported state.
- * @param {anychart.core.ui.Button.State} state State to work with.
- * @return {(anychart.core.ui.Button|boolean)} Is state supported.
- *//**
- * Setter for state.
- * @param {anychart.core.ui.Button.State} state State to work with.
- * @param {boolean=} opt_enable Enable or disable support of the state.
- * @return {!anychart.core.ui.Button} An instance of the {@link anychart.core.ui.Button} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for supportedStates.
  * Method to check supported states.
  * As a setter tells a button which state is supported (opt_enable=true) or not supported (opt_enable=false).
  * @param {anychart.core.ui.Button.State} state State to work with.
@@ -180,14 +171,7 @@ anychart.core.ui.Button.prototype.supportedStates = function(state, opt_enable) 
 
 
 /**
- * Getter for enabled normal state.
- * @return {boolean} Is state enabled.
- *//**
- * Setter for enabled normal state.
- * @param {boolean=} opt_enable Value to set.
- * @return {!anychart.core.ui.Button} An instance of the {@link anychart.core.ui.Button} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for normal.
  * @param {boolean=} opt_enable Value to set.
  * @return {(anychart.core.ui.Button|boolean)} Is state enabled or self for method chaining.
  */
@@ -197,14 +181,7 @@ anychart.core.ui.Button.prototype.normal = function(opt_enable) {
 
 
 /**
- * Getter for enabled hover state.
- * @return {boolean} Is state enabled.
- *//**
- * Setter for enabled hover state.
- * @param {boolean=} opt_enable Value to set.
- * @return {!anychart.core.ui.Button} An instance of the {@link anychart.core.ui.Button} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hover.
  * @param {boolean=} opt_enable Value to set.
  * @return {(anychart.core.ui.Button|boolean)} Is state enabled or self for method chaining.
  */
@@ -214,14 +191,7 @@ anychart.core.ui.Button.prototype.hover = function(opt_enable) {
 
 
 /**
- * Getter for enabled pushed state.
- * @return {boolean} Is state enabled.
- *//**
- * Setter for enabled pushed state.
- * @param {boolean=} opt_enable Value to set.
- * @return {!anychart.core.ui.Button} An instance of the {@link anychart.core.ui.Button} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for pushed.
  * @param {boolean=} opt_enable Value to set.
  * @return {(anychart.core.ui.Button|boolean)} Is state enabled or self for method chaining.
  */
@@ -231,14 +201,7 @@ anychart.core.ui.Button.prototype.pushed = function(opt_enable) {
 
 
 /**
- * Getter for enabled checked state.
- * @return {boolean} Is state enabled.
- *//**
- * Setter for enabled checked state.
- * @param {boolean=} opt_enable Value to set.
- * @return {!anychart.core.ui.Button} An instance of the {@link anychart.core.ui.Button} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for checked.
  * @param {boolean=} opt_enable Value to set.
  * @return {(anychart.core.ui.Button|boolean)} Is state enabled or self for method chaining.
  */
@@ -248,14 +211,7 @@ anychart.core.ui.Button.prototype.checked = function(opt_enable) {
 
 
 /**
- * Getter for enabled disabled state.
- * @return {boolean} Is state enabled.
- *//**
- * Setter for enabled disabled state.
- * @param {boolean=} opt_enable Value to set.
- * @return {!anychart.core.ui.Button} An instance of the {@link anychart.core.ui.Button} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for disabled.
  * @param {boolean=} opt_enable Value to set.
  * @return {(anychart.core.ui.Button|boolean)} Is state enabled or self for method chaining.
  */
@@ -324,14 +280,7 @@ anychart.core.ui.Button.prototype.applyTextSettings = function(textElement, isIn
 
 
 /**
- * Getter for button position.
- * @return {anychart.math.Coordinate} Current button position.
- *//**
- * Setter for button position.
- * @param {anychart.math.Coordinate=} opt_value Value to set.
- * @return {!anychart.core.ui.Button} An instance of the {@link anychart.core.ui.Button} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for position.
  * @param {anychart.math.Coordinate=} opt_value Button position.
  * @return {(anychart.math.Coordinate|anychart.core.ui.Button)} Button position or self for method chaining.
  */
@@ -805,14 +754,7 @@ anychart.core.ui.Button.prototype.setOnClickListener = function(opt_value) {
 
 
 /**
- * Getter for state settings.
- * @return {Object} Current state settings.
- *//**
- * Setter for state settings.
- * @param {Object=} opt_value Value to set.
- * @return {!anychart.core.ui.Button} An instance of the {@link anychart.core.ui.Button} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for stateSettings.
  * @param {Object=} opt_value State settings.
  * @return {Object|anychart.core.ui.Button} State settings or self for method chaining.
  */

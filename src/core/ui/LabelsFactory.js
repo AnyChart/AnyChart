@@ -248,25 +248,7 @@ anychart.core.ui.LabelsFactory.HANDLED_EVENT_TYPES_CAPTURE_SHIFT_ = 12;
 
 
 /**
- * Getter for the current element state.
- *
- * True, false and null states.
- *
- * True and false are self-explanatory. null state means that element is enabled,
- * but if it depends on other entities (like, for example, labels() and hoverLabels() in series),
- * then factory works in auto mode. For example, if series normal labels are enable,
- * and hover labels are in null state, then upon hover hoverLabels become enabled because of normal.
- * But if you disable normal labels – hoverLabels are disabled too.
- * @return {?boolean} The current element state.
- *//**
- * Setter for the element enabled state.
- * @example <t>listingOnly</t>
- * if (!element.enabled())
- *    element.enabled(true);
- * @param {(null|boolean)=} opt_value Value to set.
- * @return {!anychart.LabelsFactory} An instance of {@link anychart.core.VisualBase} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for enabled.
  * @param {?boolean=} opt_value Value to set.
  * @return {!anychart.core.ui.LabelsFactory|boolean|null} .
  */

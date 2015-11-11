@@ -80,22 +80,7 @@ anychart.scales.OrdinalTicks.prototype.autoNames_ = null;
 
 
 /**
- * Getter for ticks interval value.
- * @return {number} Current interval value.
- *//**
- * Setter for ticks interval value. Passed value as rounded and defaults to 1 in case of incorrect settings.
- * @example <t>lineChart</t>
- * chart.line([
- *   ['A1', 1.1],
- *   ['A2', 1.4],
- *   ['A3', 1.2],
- *   ['A4', 1.9]
- * ]);
- * chart.xScale().ticks().interval(2);
- * @param {number=} opt_value Value to set.
- * @return {anychart.scales.OrdinalTicks} An instance of {@link anychart.scales.OrdinalTicks} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for interval.
  * Gets or sets ticks interval value.
  * @param {number=} opt_value Ticks interval value if used as a getter.
  * @return {(number|anychart.scales.OrdinalTicks)} Interval value or itself for chaining.
@@ -151,17 +136,7 @@ anychart.scales.OrdinalTicks.prototype.set = function(ticks) {
 
 
 /**
- * Getter for tick names.
- * @return {Array} Current ticks names.
- *//**
- * Setter for tick names.
- * @example <t>lineChart</t>
- * chart.line([1.1, 1.4, 1.2, 1.9]);
- * chart.xScale().ticks().names(['C1', 'C2', 'C3', 'C4']);
- * @param {Array=} opt_values An array of tick aliases.
- * @return {anychart.scales.OrdinalTicks} An instance of {@link anychart.scales.OrdinalTicks} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for names.
  * Getter and setter for tick names.
  * @param {Array=} opt_values An array of tick aliases.
  * @return {!(anychart.scales.OrdinalTicks|Array)} Names or this for chaining.

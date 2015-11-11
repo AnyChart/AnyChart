@@ -401,50 +401,7 @@ anychart.charts.Pie.prototype.isSeries = function() {
 
 
 /**
- * Gets current chart data.
- * @return {anychart.data.View} Current data view.
- *//**
- * Sets data for the current chart.
- * Learn more about mapping at {@link anychart.data.Mapping}.
- * @example <c>Set data using simple array</c>
- *  var data = [20, 7, 10, 14];
- *  anychart.pie(data).container(stage).draw();
- * @example <c>Set data using {@link anychart.data.Set}</c>
- *  var dataSet = anychart.data.set([
- *    {name: 'Point 1', value: 10},
- *    {name: 'Point 2', value: 7},
- *    {name: 'Point 3', value: 20},
- *    {name: 'Point 4', value: 14}
- *  ]);
- *  anychart.pie(dataSet).container(stage).draw();
- * @example <c>Set data using {@link anychart.data.Mapping}</c>
- *  var dataSet = anychart.data.set([
- *    {name: 'Point 1', value: 10},
- *    {name: 'Point 2', value: 7},
- *    {name: 'Point 3', value: 20},
- *    {name: 'Point 4', value: 14}
- *  ]);
- *  anychart.pie(dataSet).container(stage).draw();
- * @example <c>Set data using a complex {@link anychart.data.Mapping}</c>
- *  var dataSet = anychart.data.set([
- *    [1, 22, 13],
- *    [13, 22, 23],
- *    [17, 22, 33],
- *    [21, 22, 43]
- *  ]);
- *  anychart.pie(dataSet.mapAs({'value': [1]}))
- *      .container(stage)
- *      .bounds(0,0,'50%', '100%')
- *      .draw();
- *  anychart.pie(dataSet.mapAs({'value': [2]}))
- *      .container(stage)
- *      .bounds('50%',0,'50%', '100%')
- *      .draw();
- * @param {(anychart.data.View|anychart.data.Mapping|anychart.data.Set|Array)=} opt_value Data for the chart.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed by first param, you can pass CSV parser settings here as a hash map.
- * @return {anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for data.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_value .
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {(anychart.data.View|anychart.charts.Pie)} .
@@ -559,40 +516,7 @@ anychart.charts.Pie.prototype.prepareData_ = function(data) {
 
 
 /**
- * Getter for the current pie palette.
- * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} Color palette instance.
- *//**
- * Setter for a pie palette.
- * @example
- *  var data = [7, 7, 7, 7, 7, 7, 7];
- *  anychart.pie(data)
- *     .labels(null)
- *     .legend(null)
- *     .container(stage)
- *     .bounds(0,0,'33%', '100%')
- *     .draw();
- *  anychart.pie(data)
- *     .labels(null)
- *     .legend(null)
- *     .container(stage)
- *     .bounds('33%',0,'33%', '100%')
- *     .palette(['#00F', '#00E', '#00D', '#00C', '#00B', '#00A', '#009', '#008'])
- *     .draw();
- *  anychart.pie(data)
- *     .labels(null)
- *     .legend(null)
- *     .container(stage)
- *     .bounds('66%',0,'33%', '100%')
- *     .palette(
- *          anychart.palettes.rangeColors()
- *              .colors(['red', 'yellow'])
- *              .count(data.length)
- *      )
- *     .draw();
- * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value Color palette instance.
- * @return {!anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for palette.
  * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value .
  * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.charts.Pie)} .
  */
@@ -670,34 +594,7 @@ anychart.charts.Pie.prototype.hatchFillPalette = function(opt_value) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for the pie slices fill in normal state.
- * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill)} Current fill in the normal state.
- *//**
- * Setter for the pie slices fill in the normal state.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- *  var data = [10, 1, 7, 10];
- *  var chart = anychart.pie(data);
- *  chart.fill(function(){
- *     return 'rgba(210,' + (50 * (this.index + 1) - 10) + ',100,1)';
- *  });
- *  chart.legend(null);
- *  chart.stroke('none');
- *  chart.container(stage).draw();
- * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value [// return the fill from the default pallete.
- * function() {
- *   return this.sourceColor;
- * };] or Fill, or fill-function, which should look like this:<code>function() {
- *  //  this: {
- *  //  index : number  - the index of the current point
- *  //  sourceColor : acgraph.vector.Fill - fill of the current point
- *  // }
- *  return myFill; //acgraph.vector.Fill
- * };</code>.
- * @return {!anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -790,30 +687,7 @@ anychart.charts.Pie.prototype.getFinalFill = function(usePointSettings, pointSta
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for the pie slices stroke in the normal state.
- * @return {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)} Current stroke in the normal state.
- *//**
- * Setter for the pie slices stroke in the normal state.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
- * @example
- *  var data = [10, 1, 7, 10];
- *  var chart = anychart.pie(data);
- *  chart.stroke('2 white');
- *  chart.container(stage).draw();
- * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value [// return stroke from the default pallete.
- * function() {
- *   return anychart.color.darken(this.sourceColor);
- * };] or Stroke, or stroke-function, which should look like:<code>function() {
- *  //  this: {
- *  //  index : number  - the index of the current point
- *  //  sourceColor : acgraph.vector.Stroke - stroke of the current point
- *  // }
- *  return myStroke; //acgraph.vector.Stroke
- * };</code>.
- * @return {!anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for stroke.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -838,30 +712,7 @@ anychart.charts.Pie.prototype.stroke = function(opt_strokeOrFill, opt_thickness,
 
 
 /**
- * Getter for the pie slices stroke in the hover state.
- * @return {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)} Current stroke in the hover state.
- *//**
- * Setter for the pie slices stroke in the hover state.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
- * @example
- *  var data = [10, 1, 7, 10];
- *  var chart = anychart.pie(data);
- *  chart.hoverStroke('2 #CC0088');
- *  chart.container(stage).draw();
- * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value [// return stroke from the default pallete.
- * function() {
- *   return anychart.color.darken(this.sourceColor);
- * };] or Stroke, or stroke-function, which should look like:<code>function() {
- *  //  this: {
- *  //  index : number  - the index of the current point
- *  //  sourceColor : acgraph.vector.Stroke - stroke of the current point
- *  // }
- *  return myStroke; //acgraph.vector.Stroke
- * };</code>.
- * @return {!anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hoverStroke.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -916,23 +767,7 @@ anychart.charts.Pie.prototype.getFinalStroke = function(usePointSettings, pointS
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for current hatch fill settings.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
- *//**
- * Setter for hatch fill settings.
- * @example
- *  var data = [10, 1, 7, 10];
- *  var chart = anychart.pie(data);
- *  chart.hatchFill('diagonalbrick');
- *  chart.container(stage).draw();
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {!anychart.charts.Pie} {@link anychart.charts.Pie} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hatchFill.
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
@@ -957,23 +792,7 @@ anychart.charts.Pie.prototype.hatchFill = function(opt_patternFillOrTypeOrState,
 
 
 /**
- * Getter for current hover hatch fill settings.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hover hatch fill.
- *//**
- * Setter for hover hatch fill settings.
- * @example
- *  var data = [10, 1, 7, 10];
- *  var chart = anychart.pie(data);
- *  chart.hoverHatchFill('diagonalbrick');
- *  chart.container(stage).draw();
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {!anychart.charts.Pie} {@link anychart.charts.Pie} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hoverHatchFill.
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
@@ -1052,41 +871,7 @@ anychart.charts.Pie.prototype.overlapMode = function(opt_value) {
 
 
 /**
- * Getter for the current pie labels.<br/>
- * It is used to access to the current (default too) settings of the labels.<br>
- * <b>Note:</b> Default labels will appear when this getter is called for the first time.
- * @example
- *  var data = [
- *    {name: 'Point 1', value: 10},
- *    {name: 'Point 2', value: 7},
- *    {name: 'Point 3', value: 20},
- *    {name: 'Point 4', value: 14}
- *  ];
- *  var chart = anychart.pie(data);
- *  chart.labels()
- *      .position('outside')
- *      .fontSize(10)
- *      .fontColor('red');
- *  chart.container(stage).draw();
- * @return {!anychart.core.ui.CircularLabelsFactory} An instance of {@link anychart.core.ui.CircularLabelsFactory} class for method chaining.
- *//**
- * Setter for the pie labels.<br/>
- * <b>Note:</b> positioing is done using {@link anychart.core.ui.CircularLabelsFactory#positionFormatter} method
- * and text is formatted using {@link anychart.core.ui.CircularLabelsFactory#textFormatter} method.
- * @example
- *  var data = [
- *    {name: 'Point 1', value: 10},
- *    {name: 'Point 2', value: 7},
- *    {name: 'Point 3', value: 20},
- *    {name: 'Point 4', value: 14}
- *  ];
- *  var chart = anychart.pie(data);
- *  chart.labels(true);
- *  chart.container(stage).draw();
- * @param {(Object|boolean|null)=} opt_value [] LabelsFactory instance.
- * @return {!anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for labels.
  * @param {(Object|boolean|null)=} opt_value .
  * @return {!(anychart.core.ui.CircularLabelsFactory|anychart.charts.Pie)} .
  */
@@ -1117,37 +902,7 @@ anychart.charts.Pie.prototype.labels = function(opt_value) {
 
 
 /**
- * Getter for series hover data labels.
- * @example
- *  var data = [
- *    {name: 'Point 1', value: 10},
- *    {name: 'Point 2', value: 7},
- *    {name: 'Point 3', value: 20},
- *    {name: 'Point 4', value: 14}
- *  ];
- *  var chart = anychart.pie(data);
- *  chart.hoverLabels()
- *      .fontSize(10)
- *      .fontStyle('italic')
- *      .fontColor('red');
- *  chart.container(stage).draw();
- * @return {!anychart.core.ui.CircularLabelsFactory} Current labels instance.
- *//**
- * Setter for series hover data labels.
- * @example
- *  var data = [
- *    {name: 'Point 1', value: 10},
- *    {name: 'Point 2', value: 7},
- *    {name: 'Point 3', value: 20},
- *    {name: 'Point 4', value: 14}
- *  ];
- *  var chart = anychart.pie(data);
- *  chart.hoverLabels(false);
- *  chart.container(stage).draw();
- * @param {(Object|boolean|null)=} opt_value pie hover data labels settings.
- * @return {!anychart.charts.Pie} {@link anychart.charts.Pie} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hoverLabels.
  * @param {(Object|boolean|null)=} opt_value pie hover data labels settings.
  * @return {!(anychart.core.ui.CircularLabelsFactory|anychart.charts.Pie)} Labels instance or itself for chaining call.
  */
@@ -1168,22 +923,7 @@ anychart.charts.Pie.prototype.hoverLabels = function(opt_value) {
 
 
 /**
- * Getter for outside labels space settings.
- * @return {number|string|null} Current outside labels space.
- *//**
- * Setter for outside labels space settings.<br/>
- * <b>Note: </b> Works only with outside labels mode.
- * @example
- * var chart = anychart.pie([5, 2, 1, 3, 1, 3]);
- * chart.labels()
- *   .fontColor('black')
- *   .position('outside');
- * chart.outsideLabelsSpace('15%');
- * chart.container(stage).draw();
- * @param {(number|string)=} opt_value [30%] Value to set.
- * @return {anychart.charts.Pie} {@link anychart.charts.Pie} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for outsideLabelsSpace.
  * @param {(number|string)=} opt_value [30%] Value to set.
  * @return {!anychart.charts.Pie|number|string|null} Outside labels space or self for chaining call.
  */
@@ -1201,21 +941,7 @@ anychart.charts.Pie.prototype.outsideLabelsSpace = function(opt_value) {
 
 
 /**
- * Getter for inside labels offset settings.
- * @return {number|string|null} Current inside labels offset.
- *//**
- * Setter for inside labels space settings.<br/>
- * <b>Note: </b> Works only with inside labels mode.
- * @example
- * var chart = anychart.pie([5, 2, 1, 3, 1, 3]);
- * chart.labels()
- *   .fontColor('black');
- * chart.insideLabelsOffset('15%');
- * chart.container(stage).draw();
- * @param {(number|string)=} opt_value [50%] Value to set.
- * @return {anychart.charts.Pie} {@link anychart.charts.Pie} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for insideLabelsOffset.
  * @param {(number|string)=} opt_value [50%] Value to set.
  * @return {!anychart.charts.Pie|number|string|null} Inside labels offset or self for chaining call.
  */
@@ -1233,22 +959,7 @@ anychart.charts.Pie.prototype.insideLabelsOffset = function(opt_value) {
 
 
 /**
- * Getter for outside labels connector length.
- * @return {number|string|null} Outside labels connector length.
- *//**
- * Setter for outside labels connector length.<br/>
- * <b>Note: </b> Works only with outside labels mode.
- * @example
- * var chart = anychart.pie([5, 2, 1, 3, 1, 3]);
- * chart.labels()
- *   .fontColor('black')
- *   .position('outside');
- * chart.connectorLength(20);
- * chart.container(stage).draw();
- * @param {(number|string)=} opt_value [30%] Value to set.
- * @return {anychart.charts.Pie} {@link anychart.charts.Pie} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for connectorLength.
  * @param {(number|string)=} opt_value [30%] Value to set.
  * @return {!anychart.charts.Pie|number|string|null} Outside labels margin or self for chaining call.
  */
@@ -1266,23 +977,7 @@ anychart.charts.Pie.prototype.connectorLength = function(opt_value) {
 
 
 /**
- * Getter for outside labels connector critical angle settings.
- * @return {number|string|null} Outside labels critical angle.
- *//**
- * Setter for outside labels connector critical angle settings.<br/>
- * Labels with the connector angle greater than critical are not displayed.<br/>
- * <b>Note: </b> Works only with outside labels mode.
- * @example
- * var chart = anychart.pie([50, 2, 1, 3, 1, 3]);
- * chart.labels()
- *   .fontColor('black')
- *   .position('outside');
- * chart.outsideLabelsCriticalAngle(20);
- * chart.container(stage).draw();
- * @param {(number|string)=} opt_value [60] Value to set.
- * @return {anychart.charts.Pie} {@link anychart.charts.Pie} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for outsideLabelsCriticalAngle.
  * @param {(number|string)=} opt_value [60] Value to set.
  * @return {!anychart.charts.Pie|number|string|null} Outside labels critical angle or self for chaining call.
  */
@@ -1300,50 +995,7 @@ anychart.charts.Pie.prototype.outsideLabelsCriticalAngle = function(opt_value) {
 
 
 /**
- * Getter for outside labels connectors stroke settings.
- * @return {acgraph.vector.Stroke|Function} Current stroke settings.
- *//**
- * Setter for outside labels connectors stroke settings by function.<br/>
- * <b>Note: </b> Works only with outside labels mode.
- * @example
- * var chart = anychart.pie([5, 2, 1, 3, 1, 3]);
- * chart.labels()
- *   .fontColor('black')
- *   .position('outside');
- * chart.connectorStroke(
- *      function(){
- *        return '3 '+ this.sourceColor;
- *      }
- *   );
- * chart.container(stage).draw();
- * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
- *  return anychart.color.darken(this.sourceColor);
- * }] Function that looks like <code>function(){
- *    // this.sourceColor -  color returned by fill() getter.
- *    return fillValue; // type acgraph.vector.Fill
- * }</code>.
- * @return {!anychart.charts.Pie} {@link anychart.charts.Pie} instance for method chaining.
- *//**
- * Setter for outside labels connectors stroke settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note: </b> Works only with outside labels mode.
- * @example
- * var chart = anychart.pie([5, 2, 1, 3, 1, 3]);
- * chart.labels()
- *   .fontColor('black')
- *   .position('outside');
- * chart.connectorStroke('orange', 3, '5 2', 'round');
- * chart.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.charts.Pie} {@link anychart.charts.Pie} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for connectorStroke.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -1366,20 +1018,7 @@ anychart.charts.Pie.prototype.connectorStroke = function(opt_strokeOrFill, opt_t
 
 
 /**
- * Gets the last values set by grouping function or null.
- * @return {(null|function(*):boolean)} Current grouping function.
- *//**
- * Setter for points grouping function.<br/>
- * Groups point and adds final point to the end.
- * <b>Note:</b> To disable filter function pass <b>null</b> or <b>'none'</b>.
- * @example
- * anychart.pie([5, 2, 1, 3, 1, 3])
- *   .group(function(val){ return val > 2; })
- *   .container(stage).draw();
- * @param {(string|null|function(*):boolean)=} opt_value Filter function or disablt value (null, 'none').
- * @return {anychart.charts.Pie} {@link anychart.charts.Pie} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for grouping.
  * @param {(string|null|function(*):boolean)=} opt_value Filter function or disablt value (null, 'none').
  * @return {(anychart.charts.Pie|function(*):boolean|null)} Current grouping function or self for method chaining.
  */
@@ -1400,28 +1039,7 @@ anychart.charts.Pie.prototype.group = function(opt_value) {
 
 
 /**
- * Getter for the current pie outer radius.
- * @return {(string|number)} Outer radius.
- *//**
- * Setter for the outer pie radius.<br/>
- * Radius can be set as a number (considered as number of pixels),
- * or as a string, e.g.'42%' or '152px'.
- * @example
- *  var data = [10, 7, 4];
- *  anychart.pie(data)
- *     .container(stage)
- *     .radius(100)
- *     .bounds(0,0,'50%', '100%')
- *     .draw();
- *  anychart.pie(data)
- *     .container(stage)
- *     .radius('52%')
- *     .bounds('50%',0,'50%', '100%')
- *     .draw();
- * @param {(string|number)=} opt_value ['45%'] Value of the outer radius.
- * @return {anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for radius.
  * @param {(string|number)=} opt_value ['45%'] Value of the outer radius.
  * @return {(string|number|anychart.charts.Pie)} An instance of {@link anychart.charts.Pie} class for method chaining.
  */
@@ -1437,34 +1055,7 @@ anychart.charts.Pie.prototype.radius = function(opt_value) {
 
 
 /**
- * Getter for the inner radius in case of a Donut chart.
- * @return {(string|number|function(number):number)} Current inner radius of a pie/donut chart.
- *//**
- * Setter for the inner radius in case of a Donut chart.
- * @example
- *  var data = [10, 7, 4, 5];
- *  anychart.pie(data)
- *      .innerRadius('25%')
- *      .bounds(0,0,'50%', '100%')
- *      .container(stage)
- *      .draw();
- *  anychart.pie(data)
- *      .innerRadius(function(outerRadius){
- *          return parseFloat(outerRadius)/2;
- *        })
- *      .bounds('50%',0,'50%', '100%')
- *      .container(stage)
- *      .draw();
- * @param {(string|number|function(number):number)=} opt_value [0] The value of the inner radius in pixels, percents or
- * function. In general the function should look like this:
- * <code>function(outerRadius){
- *   ...
- *   return NUMBER;
- * }
- * </code>.
- * @return {anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for innerRadius.
  * @param {(string|number|function(number):number)=} opt_value .
  * @return {(string|number|function(number):number|anychart.charts.Pie)} .
  */
@@ -1559,34 +1150,7 @@ anychart.charts.Pie.prototype.getPixelExplode = function() {
 
 
 /**
- * Getter for the angle from which the first slice is drawn clockwise.
- * @return {(number)} Current start angle.
- *//**
- * Setter for the angle from which the first slice is drawn clockwise.
- * @illustration <t>stageOnly</t>
- * var data = [3.4, 0, 6.6, 6.6, 3.4];
- * chart = anychart.pie(data)
- *   .startAngle(0)
- *   .container(stage)
- *   .draw();
- * var center = chart.getCenterPoint();
- * layer.circle(center.x + chart.getPixelRadius(), center.y, 4).fill('red .5').stroke('red');
- * layer.text(center.x + chart.getPixelRadius()+7, center.y - 8, '0\u00B0');
- * layer.circle(center.x + Math.cos(Math.PI/3)*chart.getPixelRadius(), center.y - Math.sin(Math.PI/3)*chart.getPixelRadius(), 4).fill('red .5').stroke('red');
- * layer.text(center.x + Math.cos(Math.PI/3)*chart.getPixelRadius()+7, center.y - Math.sin(Math.PI/3)*chart.getPixelRadius() -10, '-60\u00B0');
- * layer.circle(center.x + Math.cos(Math.PI/3)*chart.getPixelRadius(), center.y + Math.sin(Math.PI/3)*chart.getPixelRadius(), 4).fill('red .5').stroke('red');
- * layer.text(center.x + Math.cos(Math.PI/3)*chart.getPixelRadius()+7, center.y + Math.sin(Math.PI/3)*chart.getPixelRadius() -6, '60\u00B0');
- * layer.circle(center.x - chart.getPixelRadius(), center.y, 4).fill('red .5').stroke('red');
- * layer.text(center.x - chart.getPixelRadius()-30, center.y -8, '180\u00B0');
- * @example
- * anychart.pie([3, 3, 5, 1])
- *   .startAngle(-40)
- *   .container(stage)
- *   .draw();
- * @param {(string|number)=} opt_value [-90] Value of the start angle.
- * @return {anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for startAngle.
  * @param {(string|number)=} opt_value .
  * @return {(number|anychart.charts.Pie)} .
  */
@@ -1615,24 +1179,7 @@ anychart.charts.Pie.prototype.getStartAngle = function() {
 
 
 /**
- * Getter for the value of pie slice exploding.
- * @return {(string|number)} Exploding value.
- *//**
- * Sets the value of exploding in pixels.
- * @example
- *  var data = anychart.data.set([
- *       {name: 'Point 1', value: 50},
- *       {name: 'Point 2', value: 13, exploded: true},
- *       {name: 'Point 3', value: 14, exploded: true}
- *     ]);
- *  chart = anychart.pie(data);
- *  chart.container(stage)
- *      .explode(15)
- *      .draw();
- * @param {(string|number)=} opt_value [15] Value of the expansion/exploding.
- * @return {anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for explode.
  * @param {(string|number)=} opt_value .
  * @return {(string|number|anychart.charts.Pie)} .
  */
@@ -1700,26 +1247,7 @@ anychart.charts.Pie.prototype.explodeSlices = function(value) {
 
 
 /**
- * Getter for the current sort setting.
- * @return {anychart.enums.Sort} Sort setting.
- *//**
- * Setter for the sort setting.<br/>
- * Ascending, Descending and No sorting is supported.
- * @example
- *  var data = [3.4, 10, 6.6, 7, 3.4];
- *  anychart.pie(data)
- *      .container(stage)
- *      .bounds(0,0,'50%', '100%')
- *      .draw();
- *  anychart.pie(data)
- *      .container(stage)
- *      .bounds('50%',0,'50%', '100%')
- *      .sort(anychart.enums.Sort.DESC)
- *      .draw();
- * @param {(anychart.enums.Sort|string)=} opt_value [{@link anychart.enums.Sort}.NONE] Value of the sort setting.
- * @return {anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for sort.
  * @param {(anychart.enums.Sort|string)=} opt_value .
  * @return {(anychart.enums.Sort|anychart.charts.Pie)} .
  */
@@ -3857,27 +3385,7 @@ anychart.charts.Pie.prototype.applyAppearanceToSeries = function(pointState) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for tolltip settings.
- * @example
- * var chart = anychart.pie([10, 14, 8, 12]);
- * chart.tooltip()
- *     .titleFormatter(function(){
- *         return 'title [' + this.index + ']';
- *     })
- *     .title()
- *         .enabled(true);
- * chart.container(stage).draw();
- * @return {!anychart.core.ui.Tooltip} An instance of {@link anychart.core.ui.Tooltip} class for method chaining.
- *//**
- * Setter for tolltip settings.
- * @example
- * var chart = anychart.pie([10, 14, 8, 12]);
- * chart.tooltip(false);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null)=} opt_value Tooltip settings.
- * @return {!anychart.charts.Pie} An instance of {@link anychart.charts.Pie} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for tooltip.
  * @param {(Object|boolean|null)=} opt_value Tooltip settings.
  * @return {!(anychart.charts.Pie|anychart.core.ui.Tooltip)} Tooltip instance or self for method chaining.
  */

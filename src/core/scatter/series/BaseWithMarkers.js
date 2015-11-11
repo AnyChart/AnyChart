@@ -50,35 +50,7 @@ anychart.core.scatter.series.BaseWithMarkers.prototype.hasMarkers = function() {
 
 
 /**
- * Getter for series data markers.
- * @example
- * chart = anychart.scatterChart();
- * var series = chart.line([
- *    [4.1, 10],
- *    [2.3, 6],
- *    [3.4, 17],
- *    [1.2, 20]
- * ]);
- * series.markers().size(10);
- * chart.container(stage).draw();
- * @return {!anychart.core.ui.MarkersFactory} Markers instance.
- *//**
- * Setter for series data markers.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off markers.
- * @example
- * chart = anychart.scatterChart();
- * var series = chart.line([
- *    [4.1, 10],
- *    [2.3, 6],
- *    [3.4, 17],
- *    [1.2, 20]
- * ]);
- * series.markers(null);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
- * @return {!anychart.core.scatter.series.BaseWithMarkers} {@link anychart.core.scatter.series.BaseWithMarkers} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for markers.
  * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!(anychart.core.ui.MarkersFactory|anychart.core.scatter.series.BaseWithMarkers)} Markers instance or itself for chaining call.
  */
@@ -101,35 +73,7 @@ anychart.core.scatter.series.BaseWithMarkers.prototype.markers = function(opt_va
 
 
 /**
- * Getter for series data markers on hover.
- * @example
- * chart = anychart.scatterChart();
- * var series = chart.line([
- *    [4.1, 10],
- *    [2.3, 6],
- *    [3.4, 17],
- *    [1.2, 20]
- * ]);
- * series.hoverMarkers().size(10);
- * chart.container(stage).draw();
- * @return {!anychart.core.ui.MarkersFactory} Markers instance.
- *//**
- * Setter for series data markers on hover.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn of markers.
- * @example
- * chart = anychart.scatterChart();
- * var series = chart.line([
- *    [4.1, 10],
- *    [2.3, 6],
- *    [3.4, 17],
- *    [1.2, 20]
- * ]);
- * series.hoverMarkers(null);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
- * @return {!anychart.core.scatter.series.BaseWithMarkers} {@link anychart.core.scatter.series.BaseWithMarkers} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hoverMarkers.
  * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!(anychart.core.ui.MarkersFactory|anychart.core.scatter.series.BaseWithMarkers)} Markers instance or itself for chaining call.
  */

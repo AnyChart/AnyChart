@@ -437,51 +437,7 @@ anychart.core.cartesian.series.Base.prototype.getPixelPointWidth = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Returns current position of the point on an ordinal scale.
- * @return {number} Current x-point position.
- *//**
- * Sets position of the point on an oridnal scale.
- * @illustration <t>simple-h100</t>
- * stage.path()
- *     .moveTo(20, 50)
- *     .lineTo(380, 50)
- *     .moveTo(20, 55)
- *     .lineTo(20,45)
- *     .moveTo(100, 55)
- *     .lineTo(100,45)
- *     .moveTo(180, 55)
- *     .lineTo(180,45)
- *     .moveTo(260, 55)
- *     .lineTo(260,45)
- *     .stroke('2px black');
- * stage.text(40, 60, 'Point 1');
- * stage.text(118, 60, 'Point 2');
- * stage.text(200, 60, 'Point 3');
- * stage.text(350, 60, 'X-Axis');
- * stage.path()
- *     .moveTo(20, 20)
- *     .lineTo(100, 20)
- *     .stroke('blue');
- * stage.text(12, 13, '0').color('blue');
- * stage.text(102, 13, '1').color('blue');
- * stage.text(142, 30, '0.7').color('blue');
- * stage.circle(150, 47, 4).fill('lightblue');
- * stage.text(182, 30, '0.1').color('blue');
- * stage.circle(190, 47, 4).fill('lightblue');
- * @illustrationDesc
- * Points get a place on ordinal scale, the size of the place can be set manually.<br/>
- * If there are more than one seties, place size is calculated to fit all.
- * @example
- * var chart = anychart.column();
- * chart.column([1, 3, 3]).xPointPosition(0.3);
- * chart.column([1.2, 2.3, 2.3]).xPointPosition(0.5);
- * chart.column([1, 2.5, 1]).xPointPosition(0.7);
- * chart.container(stage).draw();
- * @param {number=} opt_position [0.5] Point position (in 0 to 1 range). <br/>
- *   For bars, columns and ohlc series it's autocalculated if chart contains more than one series.
- * @return {!anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for xPointPosition.
  * @param {number=} opt_position [0.5] Point position (in 0 to 1 range).
  * @return {number|anychart.core.cartesian.series.Base} .
  */
@@ -886,17 +842,7 @@ anychart.core.cartesian.series.Base.prototype.doClip = function() {
 
 
 /**
- * Getter for series clip settings.
- * @return {boolean|anychart.math.Rect} Current clip settings.
- *//**
- * Setter for series clip settings. Clips visible part of a series by a rectangle (or chart).
- * @example <t>lineChart</t>
- * chart.yScale().minimum(2);
- * chart.line([1, 4, 7, 1]).clip(false);
- * @param {(boolean|anychart.math.Rect)=} opt_value [False, if series is created manually.<br/>True, if created via chart] Enable/disable series clip.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for clip.
  * @param {(boolean|anychart.math.Rect)=} opt_value [False, if series is created manually.<br/>True, if created via chart] Enable/disable series clip.
  * @return {anychart.core.cartesian.series.Base|boolean|anychart.math.Rect} .
  */
@@ -921,30 +867,7 @@ anychart.core.cartesian.series.Base.prototype.clip = function(opt_value) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for current series X scale.
- * @return {anychart.scales.Base} Current series X Scale.
- *//**
- * Setter for series X scale.
- * @example <t>lineChart</t>
- * var secondScale = anychart.scales.ordinal();
- * chart.xAxis(1)
- *     .scale(secondScale)
- *     .orientation('top')
- *     .title('DateTime axis');
- * chart.line([
- *    ['A1', 2],
- *    ['A2', 2.4],
- *    ['A3', 1]
- * ]);
- * chart.line([
- *    ['2014-01-01', 1],
- *    ['2014-01-02', 2],
- *    ['2014-01-03', 3]
- * ]).xScale(secondScale);
- * @param {anychart.scales.Base=} opt_value Value to set.
- * @return {!anychart.core.cartesian.series.Base}  {@link anychart.core.cartesian.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for xScale.
  * @param {anychart.scales.Base=} opt_value Value to set.
  * @return {(anychart.scales.Base|!anychart.core.cartesian.series.Base)} Series X Scale or itself for chaining call.
  */
@@ -966,20 +889,7 @@ anychart.core.cartesian.series.Base.prototype.xScale = function(opt_value) {
 
 
 /**
- * Getter for current series Y scale.
- * @return {anychart.scales.Base} Current series Y Scale.
- *//**
- * Setter for series Y scale.
- * @example <t>lineChart</t>
- * var secondScale = anychart.scales.linear();
- * chart.yAxis(1).scale(secondScale);
- * chart.yAxis(1).orientation('right');
- * chart.line([2, 3, 4]);
- * chart.line([200, 213, 321]).yScale(secondScale);
- * @param {anychart.scales.Base=} opt_value Value to set.
- * @return {!anychart.core.cartesian.series.Base}  {@link anychart.core.cartesian.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for yScale.
  * @param {anychart.scales.Base=} opt_value Value to set.
  * @return {(anychart.scales.Base|!anychart.core.cartesian.series.Base)} Series Y Scale or itself for chaining call.
  */

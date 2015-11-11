@@ -215,45 +215,7 @@ anychart.data.Iterator.prototype.getRowsCount = function() {
 
 
 /**
- * Gets the metadata value by the field name.<br/>
- * <b>Note:</b> Metadata is separated from user data,
- * it exists separately, but corresponds to it.
- * @example <t>listingOnly</t>
- * // Data                                              Metadata
- * [                                                     [
- *    {name: 'Kate', age: 27, contact: 6597439},            {},
- *    {name: 'Billy', age: 31, contact: 6597789},           {},
- *    {name: 'Margaret', age: 24, contact: 6597522},        {},
- *    {name: 'John', age: 39, contact: 6597001},            {}
- * ]                                                     ]
- * iterator.select(2);
- * iterator.meta('name'); // will return undefined.
- * @param {string} name The name of a metadata field.
- * @return {*} Current metadata field value.
- *//**
- * Sets metadata value by the field name.<br/>
- * <b>Note:</b> Metadata is separated from user data,
- * it exists separately, but corresponds to it.
- * @example <t>listingOnly</t>
- * iterator.select(2);
- * iterator.meta('name', 'SampleText');
- * // After this call sample data set looks like this:
- * // Data                                              Metadata
- * [                                                     [
- *    {name: 'Kate', age: 27, contact: 6597439},            {},
- *    {name: 'Billy', age: 31, contact: 6597789},           {},
- *    {name: 'Margaret', age: 24, contact: 6597522},        {'name': 'SampleText'},
- *    {name: 'John', age: 39, contact: 6597001},            {}
- * ]                                                     ]
- * // Note! Setter sets any passed values "as is", e.g.:
- * iterator.meta('smth', null);                             {'smth': null}
- * iterator.meta('smth', undefined);                        {'smth': undefined}
- * iterator.meta('smth', function(){ do_smth; });           {'smth': function(){ do_smth; }}
- * @param {string} name The name of a metadata field.
- * @param {*=} opt_value The value to be set.
- * @return {!anychart.data.Iterator} {@link anychart.data.Iterator} class instance for the method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for meta.
  * @param {string} name .
  * @param {*=} opt_value .
  * @return {!anychart.data.Iterator|*} .

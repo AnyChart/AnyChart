@@ -100,21 +100,7 @@ anychart.core.ui.Credits.prototype.addProtocol_ = function(url) {
 
 
 /**
- * Getter for credits text value.
- * @return {string} Current credits text.
- *//**
- * Setter for credits text value.<br/>
- * <b>Note:</b> You can't customize credits without <u>your licence key</u>. To buy licence key go to
- * <a href="http://www.anychart.com/buy/">Buy page</a>.
- * @example
- * var chart = anychart.line([10, 1, 7, 10]);
- * chart.credits(true);
- * chart.credits().text('Changed credits');
- * chart.container(stage).draw();
- * @param {string=} opt_value Text value.
- * @return {anychart.core.ui.Credits} {@link anychart.core.ui.Credits} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for text.
  * @param {string=} opt_value Text value.
  * @return {anychart.core.ui.Credits|string} Credits text or itself for chaining call.
  */
@@ -132,21 +118,7 @@ anychart.core.ui.Credits.prototype.text = function(opt_value) {
 
 
 /**
- * Getter for credits url.
- * @return {string} Current credits url.
- *//**
- * Setter for credits url.<br/>
- * <b>Note:</b> You can't customize credits without <u>your licence key</u>. To buy licence key go to
- * <a href="http://www.anychart.com/buy/">Buy page</a>.
- * @example
- * var chart = anychart.line([10, 1, 7, 10]);
- * chart.credits(true);
- * chart.credits().url('http://www.anychart.com/buy/');
- * chart.container(stage).draw();
- * @param {string=} opt_value Url value.
- * @return {anychart.core.ui.Credits} {@link anychart.core.ui.Credits} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for url.
  * @param {string=} opt_value Url value.
  * @return {anychart.core.ui.Credits|string} Credits url or itself for chaining call.
  */
@@ -164,21 +136,7 @@ anychart.core.ui.Credits.prototype.url = function(opt_value) {
 
 
 /**
- * Getter for credits alt.
- * @return {string} Current credits alternative text.
- *//**
- * Setter for credits alt.<br/>
- * <b>Note:</b> You can't customize credits without <u>your licence key</u>. To buy licence key go to
- * <a href="http://www.anychart.com/buy/">Buy page</a>.
- * @example
- * var chart = anychart.line([10, 1, 7, 10]);
- * chart.credits(true);
- * chart.credits().alt('Custom alternative text.');
- * chart.container(stage).draw();
- * @param {string=} opt_value Title value.
- * @return {anychart.core.ui.Credits} {@link anychart.core.ui.Credits} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for alt.
  * @param {string=} opt_value Title value.
  * @return {anychart.core.ui.Credits|string} Credits alt or itself for chaining call.
  */
@@ -196,21 +154,7 @@ anychart.core.ui.Credits.prototype.alt = function(opt_value) {
 
 
 /**
- * Getter for credits logo src value.
- * @return {string} Current credits logo source.
- *//**
- * Setter for credits logo src value.<br/>
- * <b>Note:</b> You can't customize credits without <u>your licence key</u>. To buy licence key go to
- * <a href="http://www.anychart.com/buy/">Buy page</a>.
- * @example
- * var chart = anychart.line([10, 1, 7, 10]);
- * chart.credits(true);
- * chart.credits().logoSrc(null);
- * chart.container(stage).draw();
- * @param {string=} opt_value Logo source value.
- * @return {anychart.core.ui.Credits} {@link anychart.core.ui.Credits} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for logoSrc.
  * @param {string=} opt_value Logo src value.
  * @return {anychart.core.ui.Credits|string} Credits logo src or itself for chaining call.
  */

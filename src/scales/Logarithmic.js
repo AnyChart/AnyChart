@@ -19,18 +19,6 @@ goog.inherits(anychart.scales.Logarithmic, anychart.scales.Linear);
 
 
 /**
- * Getter for Log base value.
- * @return {number} Current Log base.
- *//**
- * Setter for Log base value.<br/>
- * <b>Note:</b> Affects tick values auto calculation.
- * @example <t>lineChart</t>
- * chart.line([2, 16, 4, 64]);
- * chart.yScale(anychart.scales.log().logBase(2));
- * @param {number=} opt_value [10] Log base to set. Takes any number greater than 1.
- * @return {anychart.scales.Logarithmic} An instance of {@link anychart.scales.Logarithmic} class for method chaining.
- *//**
- * @ignoreDoc
  * Log base value. Affects tick values auto calculation.
  * @param {number=} opt_value Log base to set.
  * @return {anychart.scales.Logarithmic|number}

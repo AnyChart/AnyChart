@@ -155,71 +155,7 @@ anychart.core.Chart.prototype.defaultLabelSettings = function(opt_value) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for the current chart margin.
- * @illustration <t>simple</t>
- * var margins = 20;
- * stage.rect(0, 0, stage.width(), stage.height()).fill('orange 0.1');
- * stage.text(stage.width() / 3, 0, 'margins');
- * //arrows
- * stage.path()
- *     .moveTo(stage.width() / 2, 0)
- *     .lineTo(stage.width() / 2, margins);
- * stage.triangleUp(stage.width() / 2, 3, 3);
- * stage.triangleDown(stage.width() / 2, margins - 3, 3);
- * stage.path()
- *     .moveTo(stage.width() / 2, stage.height() - margins)
- *     .lineTo(stage.width() / 2, stage.height());
- * stage.triangleUp(stage.width() / 2, stage.height() - margins + 3, 3);
- * stage.triangleDown(stage.width() / 2, stage.height() - 3, 3);
- * stage.path()
- *     .moveTo(0, stage.height() / 2)
- *     .lineTo(margins, stage.height() / 2);
- * stage.triangleUp(3, stage.height() / 2 + 5.5, 3).rotateByAnchor(-90, 'center');
- * stage.triangleDown(margins - 3, stage.height() / 2 + 4, 3).rotateByAnchor(-90, 'center');
- * stage.path()
- *     .moveTo(stage.width(), stage.height() / 2)
- *     .lineTo(stage.width() - margins, stage.height() / 2);
- * stage.triangleUp(stage.width() - margins + 3, stage.height() / 2 + 5.5, 3).rotateByAnchor(-90, 'center');
- * stage.triangleDown(stage.width() - 3, stage.height() / 2 + 4, 3).rotateByAnchor(-90, 'center');
- * //content area
- * stage.rect(margins, margins, stage.width() - 2 * margins, stage.height() - 2 * margins).fill('white 1');
- * stage.text(stage.width() / 4, stage.height() / 2 - margins, 'Chart Content Area').fontSize(21);
- * @return {!anychart.core.utils.Margin} The current chart margin.
- *//**
- * Setter for the chart margin in pixels using a single complex object.<br/>
- * @example <t>listingOnly</t>
- * // all margins 15px
- * chart.margin(15);
- * // all margins 15px
- * chart.margin('15px');
- * // top and bottom 5px ,right and left 15px
- * chart.margin(anychart.utils.space(5,15) );
- * @example <t>lineChart</t>
- * chart.margin(35);
- * chart.line([6, 2, 12]);
- * @param {(Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_value Value to set.
- * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
- *//**
- * Setter for the chart margin in pixels using several simple values.<br/>
- * @example <t>listingOnly</t>
- * // 1) all 10px
- * chart.margin(10);
- * // 2) top and bottom 10px, left and right 15px
- * chart.margin(10, '15px');
- * // 3) top 10px, left and right 15px, bottom 5px
- * chart.margin(10, '15px', 5);
- * // 4) top 10px, right 15px, bottom 5px, left 12px
- * chart.margin(10, '15px', '5px', 12);
- * @example <t>lineChart</t>
- * chart.margin(10, '15px', '5px', 12);
- * chart.spline([6, 2, 12]);
- * @param {(string|number)=} opt_value1 Top or top-bottom space.
- * @param {(string|number)=} opt_value2 Right or right-left space.
- * @param {(string|number)=} opt_value3 Bottom space.
- * @param {(string|number)=} opt_value4 Left space.
- * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for margin.
  * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .
@@ -262,94 +198,7 @@ anychart.core.Chart.prototype.marginInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for the current chart padding.
- * @illustration <t>simple</t>
- * //margins
- * var margins = 20;
- * stage.rect(0, 0, stage.width(), stage.height()).fill('orange 0.1');
- * stage.text(stage.width() / 3, 0, 'margins');
- * //arrows
- * stage.path()
- *     .moveTo(stage.width() / 2, 0)
- *     .lineTo(stage.width() / 2, margins);
- * stage.triangleUp(stage.width() / 2, 3, 3);
- * stage.triangleDown(stage.width() / 2, margins - 3, 3);
- * stage.path()
- *     .moveTo(stage.width() / 2, stage.height() - margins)
- *     .lineTo(stage.width() / 2, stage.height());
- * stage.triangleUp(stage.width() / 2, stage.height() - margins + 3, 3);
- * stage.triangleDown(stage.width() / 2, stage.height() - 3, 3);
- * stage.path()
- *     .moveTo(0, stage.height() / 2)
- *     .lineTo(margins, stage.height() / 2);
- * stage.triangleUp(3, stage.height() / 2 + 5.5, 3).rotateByAnchor(-90, 'center');
- * stage.triangleDown(margins - 3, stage.height() / 2 + 4, 3).rotateByAnchor(-90, 'center');
- * stage.path()
- *     .moveTo(stage.width(), stage.height() / 2)
- *     .lineTo(stage.width() - margins, stage.height() / 2);
- * stage.triangleUp(stage.width() - margins + 3, stage.height() / 2 + 5.5, 3).rotateByAnchor(-90, 'center');
- * stage.triangleDown(stage.width() - 3, stage.height() / 2 + 4, 3).rotateByAnchor(-90, 'center');
- * //paddings
- * var paddings = 20;
- * stage.rect(margins, margins, stage.width() - 2 * margins, stage.height() - 2 * margins).fill('blue 0.1');
- * stage.text(stage.width() / 3, margins, 'paddings');
- * //arrows
- * stage.path()
- *     .moveTo(stage.width() / 2, 0 + margins)
- *     .lineTo(stage.width() / 2, paddings + margins);
- * stage.triangleUp(stage.width() / 2, 3 + margins, 3);
- * stage.triangleDown(stage.width() / 2, paddings - 3 + margins, 3);
- * stage.path()
- *     .moveTo(stage.width() / 2, stage.height() - paddings - margins)
- *     .lineTo(stage.width() / 2, stage.height() - margins);
- * stage.triangleUp(stage.width() / 2, stage.height() - paddings + 3 - margins, 3);
- * stage.triangleDown(stage.width() / 2, stage.height() - 3 - margins, 3);
- * stage.path()
- *     .moveTo(margins, stage.height() / 2)
- *     .lineTo(margins + paddings, stage.height() / 2);
- * stage.triangleUp(margins + 3, stage.height() / 2 + 5.5, 3).rotateByAnchor(-90, 'center');
- * stage.triangleDown(margins + paddings - 3, stage.height() / 2 + 4, 3).rotateByAnchor(-90, 'center');
- * stage.path()
- *     .moveTo(stage.width() - margins, stage.height() / 2)
- *     .lineTo(stage.width() - margins - paddings, stage.height() / 2);
- * stage.triangleUp(stage.width() - margins - paddings + 3, stage.height() / 2 + 5.5, 3).rotateByAnchor(-90, 'center');
- * stage.triangleDown(stage.width() - margins - 3, stage.height() / 2 + 4, 3).rotateByAnchor(-90, 'center');
- * //content area
- * stage.rect(paddings + margins, paddings + margins, stage.width() - 2 * (paddings + margins), stage.height() - 2 * (paddings + margins)).fill('white 1');
- * stage.text(stage.width() / 4, stage.height() / 2 - paddings, 'Chart Content Area').fontSize(21);
- * @return {!anychart.core.utils.Padding} Current chart padding.
- *//**
- * Setter for the chart paddings in pixels using a single value.<br/>
- * @example <t>listingOnly</t>
- * chart.padding([5, 15]);
- * @example <t>listingOnly</t>
- * chart.padding({left: 10, top: 20, bottom: 30, right: '40%'}});
- * @example <t>lineChart</t>
- * chart.padding(20);
- * chart.line([6, 2, 12]);
- * @param {(Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_value Value to set.
- * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
- *//**
- * Setter for the chart paddings in pixels using several numbers.<br/>
- * @example <t>listingOnly</t>
- * // 1) all 10px
- * chart.padding(10);
- * // 2) top and bottom 10px, left and right 15px
- * chart.padding(10, '15px');
- * // 3) top 10px, left and right 15px, bottom 5px
- * chart.padding(10, '15px', 5);
- * // 4) top 10px, right 15%, bottom 5px, left 12px
- * chart.padding(10, '15%', '5px', 12);
- * @example <t>lineChart</t>
- * chart.padding(10, '15px', '5px', 12);
- * chart.spline([6, 2, 12]);
- * @param {(string|number)=} opt_value1 Top or top-bottom space.
- * @param {(string|number)=} opt_value2 Right or right-left space.
- * @param {(string|number)=} opt_value3 Bottom space.
- * @param {(string|number)=} opt_value4 Left space.
- * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for padding.
  * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .
@@ -392,30 +241,7 @@ anychart.core.Chart.prototype.paddingInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for the current chart background.
- * @example <t>lineChart</t>
- * chart.line([1.1, 1.4, 1.2, 1.6]);
- * chart.background()
- *    .stroke('2 rgb(36,102,177)')
- *    .corners(10)
- *    .fill({
- *           keys: [
- *             "rgb(255,255,255) 1",
- *             "rgb(233,133,233) 1",
- *             "rgb(255,255,255) 1"
- *           ],
- *           angle: -90
- *         });
- * @return {!anychart.core.ui.Background} The current chart background.
- *//**
- * Setter for the chart background.
- * @example <t>lineChart</t>
- * chart.line([1.1, 1.4, 1.2, 1.6]);
- * chart.background(null);
- * @param {Object=} opt_value Background object to set.
- * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for background.
  * @param {(string|Object|null|boolean)=} opt_value .
  * @return {anychart.core.Chart|anychart.core.ui.Background} .
  */
@@ -454,24 +280,7 @@ anychart.core.Chart.prototype.backgroundInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for chart title.
- * @example <c>Title instance</c><t>lineChart</t>
- * chart.title()
- *      .fontColor('red')
- *      .text('Red Chart title');
- * @return {!anychart.core.ui.Title} The current chart title.
- *//**
- * Setter for the chart title.
- * @example <c>Simple string</c><t>lineChart</t>
- * chart.line([1.1, 1.4, 1.2, 1.6]);
- * chart.title().text('Conqueror of Naxxramas');
- * @example <c>Disabling title</c><t>lineChart</t>
- * chart.line([1.1, 1.4, 1.2, 1.6]);
- * chart.title(false);
- * @param {(null|boolean|Object|string)=} opt_value Chart title text or title instance for copy settings from.
- * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for title.
  * @param {(null|boolean|Object|string)=} opt_value .
  * @return {!(anychart.core.ui.Title|anychart.core.Chart)} .
  */
@@ -519,31 +328,7 @@ anychart.core.Chart.prototype.onTitleSignal_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for chart label.
- * @example <t>lineChart</t>
- * chart.line([1, 2, 1.3, 2.9]);
- * chart.label().text('custom text');
- * @param {(string|number)=} opt_index [0] Index of instance.
- * @return {!anychart.core.ui.Label} An instance of {@link anychart.core.ui.Label} for method chaining.
- *//**
- * Setter for chart label.
- * @example <t>lineChart</t>
- * chart.line([1, 2, 1.3, 2.9]);
- * chart.label({text: 'custom text'});
- * @param {(null|boolean|Object|string)=} opt_value Chart label instance to add by index 0.
- * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} for method chaining.
- *//**
- * Setter for chart label.
- * @example <t>lineChart</t>
- * chart.line([1, 2, 1.3, 2.9]);
- * chart.label(0, {text: 'text'});
- * chart.label(1, {position: 'righttop', text: 'another text'});
- * chart.container(stage).draw();
- * @param {(string|number)=} opt_index Index of instance.
- * @param {(null|boolean|Object|string)=} opt_value  Chart label instance.
- * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for label.
  * @param {(null|boolean|Object|string|number)=} opt_indexOrValue Chart label instance to add.
  * @param {(null|boolean|Object|string)=} opt_value Chart label instance.
  * @return {!(anychart.core.ui.Label|anychart.core.Chart)} Chart label instance or itself for chaining call.

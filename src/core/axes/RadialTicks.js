@@ -60,41 +60,7 @@ anychart.core.axes.RadialTicks.prototype.SUPPORTED_CONSISTENCY_STATES = anychart
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for current ticks length.
- * @return {number} Length of ticks.
- *//**
- * Setter for ticks length.
- * @illustration <t>simple-h100</t>
- * stage.text(10,0, 'axis');
- * stage.text(10,40, 'tick');
- * stage.path()
- *     .moveTo(0, 15)
- *     .lineTo(stage.width(), 15)
- *     .stroke('5 black');
- * stage.path()
- *     .moveTo(stage.width()/5-stage.width()/10, 15)
- *     .lineTo(stage.width()/5-stage.width()/10, 55)
- *     .moveTo(2*stage.width()/5-stage.width()/10, 15)
- *     .lineTo(2*stage.width()/5-stage.width()/10, 55)
- *     .moveTo(3*stage.width()/5-stage.width()/10, 15)
- *     .lineTo(3*stage.width()/5-stage.width()/10, 55)
- *     .moveTo(4*stage.width()/5-stage.width()/10, 15)
- *     .lineTo(4*stage.width()/5-stage.width()/10, 55)
- *     .moveTo(5*stage.width()/5-stage.width()/10, 15)
- *     .lineTo(5*stage.width()/5-stage.width()/10, 55);
- * stage.path()
- *     .moveTo(stage.width()/5, 15)
- *     .lineTo(stage.width()/5, 55)
- *     .lineTo(stage.width()/5-5, 55)
- *     .lineTo(stage.width()/5+5, 55)
- *     .stroke('1 grey 1');
- * stage.triangleUp(stage.width()/5, 20, 3).stroke('1 grey 1');
- * stage.triangleDown(stage.width()/5, 50, 3).stroke('1 grey 1');
- * stage.text(stage.width()/5, 57, 'length');
- * @param {number=} opt_value Value to set.
- * @return {anychart.core.axes.RadialTicks} An instance of the {@link anychart.core.axes.RadialTicks} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for length.
  * @param {number=} opt_value .
  * @return {(number|!anychart.core.axes.RadialTicks)} .
  */
@@ -111,51 +77,7 @@ anychart.core.axes.RadialTicks.prototype.length = function(opt_value) {
 
 
 /**
- * Returns a current stroke settings.
- * @return {acgraph.vector.Stroke} Returns the current stroke settings.
- *//**
- * Sets stroke settings via single parameter.<br/>
- * The following options are acceptable:
- * <ul>
- *  <li>String formatted as '[thickness ]color[ opacity]':
- *    <ol>
- *      <li><b>'color'</b> - {@link http://www.w3schools.com/html/html_colors.asp}.</li>
- *      <li><b>'thickness color'</b> - like a css border, e.g. '3 red' or '3px red'</li>
- *      <li><b>'color opacity'</b> - as a fill string, e.g. '#fff 0.5'</li>
- *      <li><b>'thickness color opacity'</b> - as a complex string, e.g. '3px #00ff00 0.5'</li>
- *    </ol>
- *  </li>
- *  <li>{@link acgraph.vector.Stroke} object</li>
- *  <li>Keys array {@link acgraph.vector.GradientKey}</li>
- *  <li><b>null</b> - reset current stroke settings.</li>
- * </ul>
- * <b>Note:</b> String parts order is significant and '3px red' is not the same as 'red 3px'.
- * @shortDescription Sets stroke settings.
- * @illustration <t>simple-h100</t>
- * stage.text(10,0, 'axis');
- * stage.text(10,40, 'tick');
- * stage.path()
- *     .moveTo(0, 15)
- *     .lineTo(stage.width(), 15)
- *     .stroke('5 black');
- * stage.path()
- *     .moveTo(stage.width()/5-stage.width()/10, 15)
- *     .lineTo(stage.width()/5-stage.width()/10, 55)
- *     .moveTo(2*stage.width()/5-stage.width()/10, 15)
- *     .lineTo(2*stage.width()/5-stage.width()/10, 55)
- *     .moveTo(3*stage.width()/5-stage.width()/10, 15)
- *     .lineTo(3*stage.width()/5-stage.width()/10, 55)
- *     .moveTo(4*stage.width()/5-stage.width()/10, 15)
- *     .lineTo(4*stage.width()/5-stage.width()/10, 55)
- *     .moveTo(5*stage.width()/5-stage.width()/10, 15)
- *     .lineTo(5*stage.width()/5-stage.width()/10, 55)
- *     .stroke('2 blue .7');
- * @example <t>listingOnly</t>
- *  ticks.stroke('2 blue .7');
- * @param {(acgraph.vector.Stroke)=} opt_value ['black'] Fill style as '[thickness ]color[ opacity]'.
- * @return {anychart.core.axes.RadialTicks} {@link anychart.core.axes.RadialTicks} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for stroke.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.

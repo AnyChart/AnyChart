@@ -38,24 +38,7 @@ anychart.core.ui.table.Border.cellPropNames = ['cellTopBorder', 'cellRightBorder
 
 
 /**
- * Getter for current top border settings.
- * @return {!acgraph.vector.Stroke} Current stroke settings.
- *//**
- * Setter for top border settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note:</b> Pass <b>null</b> to reset to default settings.<br/>
- * <b>Note:</b> <u>lineJoin</u> settings do not work here.
- * @shortDescription Setter for cell top border settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.ui.table.Border} {@link anychart.core.ui.table.Border} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for top.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -73,24 +56,7 @@ anychart.core.ui.table.Border.prototype.top = function(opt_strokeOrFill, opt_thi
 
 
 /**
- * Getter for current right border settings.
- * @return {!acgraph.vector.Stroke} Current stroke settings.
- *//**
- * Setter for right border settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note:</b> Pass <b>null</b> to reset to default settings.<br/>
- * <b>Note:</b> <u>lineJoin</u> settings do not work here.
- * @shortDescription Setter for cell right border settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.ui.table.Border} {@link anychart.core.ui.table.Border} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for right.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -108,24 +74,7 @@ anychart.core.ui.table.Border.prototype.right = function(opt_strokeOrFill, opt_t
 
 
 /**
- * Getter for current bottom border settings.
- * @return {!acgraph.vector.Stroke} Current stroke settings.
- *//**
- * Setter for bottom border settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note:</b> Pass <b>null</b> to reset to default settings.<br/>
- * <b>Note:</b> <u>lineJoin</u> settings do not work here.
- * @shortDescription Setter for cell bottom border settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.ui.table.Border} {@link anychart.core.ui.table.Border} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for bottom.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -143,24 +92,7 @@ anychart.core.ui.table.Border.prototype.bottom = function(opt_strokeOrFill, opt_
 
 
 /**
- * Getter for current left border settings.
- * @return {!acgraph.vector.Stroke} Current stroke settings.
- *//**
- * Setter for left border settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note:</b> Pass <b>null</b> to reset to default settings.<br/>
- * <b>Note:</b> <u>lineJoin</u> settings do not work here.
- * @shortDescription Setter for cell left border settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.ui.table.Border} {@link anychart.core.ui.table.Border} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for left.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.

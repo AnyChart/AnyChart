@@ -131,14 +131,7 @@ anychart.core.axisMarkers.Range.prototype.setDefaultLayout = function(value) {
 //  Scale.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for the axis scale.
- * @return {anychart.scales.Base} Axis scale.
- *//**
- * Setter for axis scale.
- * @param {anychart.scales.Base=} opt_value Value to set.
- * @return {!anychart.core.axisMarkers.Range} An instance of the {@link anychart.core.axisMarkers.Range} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for scale.
  * @param {anychart.scales.Base=} opt_value Scale.
  * @return {anychart.scales.Base|!anychart.core.axisMarkers.Range} Axis scale or itself for method chaining.
  */

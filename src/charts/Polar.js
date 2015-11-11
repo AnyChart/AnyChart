@@ -241,25 +241,7 @@ anychart.charts.Polar.prototype.startAngle = function(opt_value) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for default chart X scale.
- * @example
- * var chart = anychart.polar();
- * chart.line([10, 12, 1, 4, 14, 5]);
- * chart.xScale().inverted(true);
- * chart.container(stage).draw();
- * @return {!anychart.scales.ScatterBase} Default chart scale value.
- *//**
- * Setter for default chart X scale.<br/>
- * <b>Note:</b> This scale will be passed to all scale dependent chart elements if they don't have their own scales.
- * @example
- * var chart = anychart.polar();
- * chart.line([{x: 12, y: 12}, {x: 92, y: 92}]);
- * chart.xScale('log');
- * chart.container(stage).draw();
- * @param {(anychart.enums.ScatterScaleTypes|anychart.scales.ScatterBase)=} opt_value X Scale to set.
- * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for xScale.
  * @param {(anychart.enums.ScatterScaleTypes|anychart.scales.ScatterBase)=} opt_value X Scale to set.
  * @return {!(anychart.scales.ScatterBase|anychart.charts.Polar)} Default chart scale value or itself for method chaining.
  */
@@ -283,25 +265,7 @@ anychart.charts.Polar.prototype.xScale = function(opt_value) {
 
 
 /**
- * Getter for default chart Y scale.
- * @example
- * var chart = anychart.polar();
- * chart.line([10, 12, 1, 4, 14, 5]);
- * chart.yScale().inverted(true);
- * chart.container(stage).draw();
- * @return {!anychart.scales.ScatterBase} Default chart scale value.
- *//**
- * Setter for default chart Y scale.<br/>
- * <b>Note:</b> This scale will be passed to all scale dependent chart elements if they don't have their own scales.
- * @example
- * var chart = anychart.polar();
- * chart.line([100, 12, 1, 44, 14, 95]);
- * chart.yScale().inverted(true);
- * chart.container(stage).draw();
- * @param {(anychart.enums.ScatterScaleTypes|anychart.scales.ScatterBase)=} opt_value Y Scale to set.
- * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for yScale.
  * @param {(anychart.enums.ScaleTypes|anychart.scales.Base)=} opt_value Y Scale to set.
  * @return {!(anychart.scales.Base|anychart.charts.Polar)} Default chart scale value or itself for method chaining.
  */
@@ -345,37 +309,7 @@ anychart.charts.Polar.prototype.setDefaultScaleForLayoutBasedElements_ = functio
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for chart grid.
- * @example
- * var chart = anychart.polar();
- * chart.area([1, 4, 5, 7, 2]);
- * chart.grid()
- *     .stroke('2 grey');
- * chart.grid(1)
- *     .oddFill('none')
- *     .evenFill('none')
- *     .stroke('2 blue .5');
- * chart.container(stage).draw();
- * @param {number=} opt_index Chart grid index. If not set - creates a new instance and adds it to the end of array.
- * @return {!anychart.core.grids.Polar} Axis instance by index.
- *//**
- * Setter for first chart grid.
- * @param {(Object|boolean|null)=} opt_value Chart grid settings to set.
- * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} instance for method chaining.
- *//**
- * Setter for chart grid by index.
- * @example
- * var chart = anychart.polar();
- * chart.area([1, 4, 5, 7, 2]);
- * chart.grid(false);
- * chart.grid(1, false);
- * chart.container(stage).draw();
- * @param {number=} opt_index Chart grid index.
- * @param {(Object|boolean|null)=} opt_value Chart grid settings to set.<br/>
- * <b>Note:</b> pass <b>null</b> or <b>'none'</b> to disable the grid.
- * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for grid.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Grid settings.
  * @param {(Object|boolean|null)=} opt_value Grid settings to set.
  * @return {!(anychart.core.grids.Polar|anychart.charts.Polar)} Grid instance by index or itself for method chaining.
@@ -410,38 +344,7 @@ anychart.charts.Polar.prototype.grid = function(opt_indexOrValue, opt_value) {
 
 
 /**
- * Getter for chart minor grid.
- * @example
- * var chart = anychart.polar();
- * chart.area([1, 4, 5, 7, 2]);
- * chart.minorGrid()
- *     .enabled(true)
- *     .stroke('2 grey');
- * chart.minorGrid(1)
- *     .enabled(true)
- *     .oddFill('none')
- *     .evenFill('none')
- *     .stroke('2 blue .5');
- * chart.container(stage).draw();
- * @param {number=} opt_index Chart grid index. If not set - creates a new instance and adds it to the end of array.
- * @return {!anychart.core.grids.Polar} Axis instance by index.
- *//**
- * Setter for chart minor grid.
- * @example
- * var chart = anychart.polar();
- * chart.area([1, 4, 5, 7, 2]);
- * chart.minorGrid(true);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null)=} opt_value Chart grid settings to set.
- * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} instance for method chaining.
- *//**
- * Setter for chart minor grid by index.
- * @param {number=} opt_index Chart grid index.
- * @param {(Object|boolean|null)=} opt_value Chart grid settings to set.<br/>
- * <b>Note:</b> pass <b>null</b> or <b>'none'</b> to disable the grid.
- * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for minorGrid.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Grid settings.
  * @param {(Object|boolean|null)=} opt_value Grid settings to set.
  * @return {!(anychart.core.grids.Polar|anychart.charts.Polar)} Grid instance by index or itself for method chaining.
@@ -491,24 +394,7 @@ anychart.charts.Polar.prototype.onGridSignal_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for chart X-axis.
- * @example
- * var chart = anychart.polar();
- * chart.line([1, 4, 5, 7, 2]);
- * chart.xAxis().stroke('green');
- * chart.container(stage).draw();
- * @return {!anychart.core.axes.Polar} Axis instance by index.
- *//**
- * Setter for chart X-axis by index.
- * @example
- * var chart = anychart.polar();
- * chart.line([1, 4, 5, 7, 2]);
- * chart.xAxis(null);
- * chart.container(stage).draw();
- * @param {(Object|string|null)=} opt_value Chart axis settings to set.<br/>
- * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for xAxis.
  * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.
  * @return {!(anychart.core.axes.Polar|anychart.charts.Polar)} Axis instance by index or itself for method chaining.
  */
@@ -531,24 +417,7 @@ anychart.charts.Polar.prototype.xAxis = function(opt_value) {
 
 
 /**
- * Getter for chart Y-axis.
- * @example
- * var chart = anychart.polar();
- * chart.line([1, 4, 5, 7, 2]);
- * chart.yAxis().stroke('green');
- * chart.container(stage).draw();
- * @return {!anychart.core.axes.Radial} Axis instance by index.
- *//**
- * Setter for chart Y-axis by index.
- * @example
- * var chart = anychart.polar();
- * chart.line([1, 4, 5, 7, 2]);
- * chart.yAxis(null);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.<br/>
- * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for yAxis.
  * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.
  * @return {!(anychart.core.axes.Radial|anychart.charts.Polar)} Axis instance by index or itself for method chaining.
  */
@@ -870,20 +739,7 @@ anychart.charts.Polar.prototype.seriesInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for series colors palette.
- * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} Current palette.
- *//**
- * Setter for series colors palette.
- * @example
- * chart = anychart.polar();
- * chart.palette(['red', 'green', 'blue']);
- * chart.line([1, -4, 5, 7]);
- * chart.line([11, 0, 15, 4]);
- * chart.line([21, -4, 9, 0]);
- * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value Value to set.
- * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for palette.
  * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value .
  * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.charts.Polar)} .
  */
@@ -908,22 +764,7 @@ anychart.charts.Polar.prototype.palette = function(opt_value) {
 
 
 /**
- * Getter markers palette settings.
- * @return {!anychart.palettes.Markers} Current palette.
- *//**
- * Setter for markers palette settings.
- * @example
- * chart = anychart.polar();
- * chart.markerPalette(['star4', 'star5', 'star10']);
- * chart.line([1, -4, 5, 7]);
- * chart.line([11, 0, 15, 4]);
- * chart.line([21, -4, 9, 0]);
- * chart.container(stage).draw();
- * @param {(anychart.palettes.Markers|Object|Array.<anychart.enums.MarkerType>)=} opt_value Value to set.
- * @return {!anychart.charts.Polar} {@link anychart.charts.Polar} instance for method chaining.
- *//**
- * @ignoreDoc
- * Chart markers palette settings.
+ * Getter/setter for chart markerPalette.
  * @param {(anychart.palettes.Markers|Object|Array.<anychart.enums.MarkerType>)=} opt_value Chart marker palette settings to set.
  * @return {!(anychart.palettes.Markers|anychart.charts.Polar)} Return current chart markers palette or itself for chaining call.
  */

@@ -95,64 +95,7 @@ anychart.scales.DateTimeTicks.prototype.bigRangeMultiplier = 4;
 
 
 /**
- * Getter for ticks interval value.<br/>
- * <b>Note:</b> you can get interval value only if it was set explicitly, otherwise its returns NaN.
- * @return {string} Current interval value in  ISO 8601 interval string.
- *//**
- * Setter for ticks interval value by string representing date part or ISO 8601 interval string.
- * @example
- * var chart = anychart.financial();
- * chart.ohlc([
- *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
- *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
- *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
- *   [new Date('31-Aug-07'), 513.10, 516.50, 511.47, 515.25],
- *   [new Date('01-Sep-07'), 515.02, 528.00, 514.62, 525.15]
- * ]);
- * chart.xScale().ticks().interval('P2D');
- * chart.container(stage).draw();
- * @param {string=} opt_isodate Value to set.
- * @return {!anychart.scales.DateTimeTicks} An instance of {@link anychart.scales.DateTimeTicks} class for method chaining.
- *//**
- * Setter for ticks interval value by unit.
- * @example
- * chart = anychart.financial();
- * chart.ohlc([
- *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
- *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
- *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
- *   [new Date('31-Aug-07'), 513.10, 516.50, 511.47, 515.25],
- *   [new Date('01-Sep-07'), 515.02, 528.00, 514.62, 525.15]
- * ]);
- * chart.xScale().ticks().interval('d', 2);
- * chart.container(stage).draw();
- * @param {anychart.enums.Interval=} opt_unit Set unit by first letter. 'year' is 'y', 'month' is 'm' etc.<br/>
- * <b>Note:</b> 'minutes' is 'n'.
- * @param {number=} opt_count Any positive value.
- * @return {!anychart.scales.DateTimeTicks} An instance of {@link anychart.scales.DateTimeTicks} class for method chaining.
- *//**
- * Setter for ticks interval value.<br/>
- * <b>Note:</b> If any passed value is defined but is not a number or less than 0, it defaults to NaN and count() resets to 5.
- * @example
- * chart = anychart.financial();
- * chart.ohlc([
- *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
- *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
- *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
- *   [new Date('31-Aug-07'), 513.10, 516.50, 511.47, 515.25],
- *   [new Date('01-Sep-07'), 515.02, 528.00, 514.62, 525.15]
- * ]);
- * chart.xScale().ticks().interval(0,0,0,12);
- * chart.container(stage).draw();
- * @param {number=} opt_years Any positive value.
- * @param {number=} opt_months Any positive value.
- * @param {number=} opt_days Any positive value.
- * @param {number=} opt_hours Any positive value.
- * @param {number=} opt_minutes Any positive value.
- * @param {number=} opt_seconds Any positive value.
- * @return {!anychart.scales.DateTimeTicks} An instance of {@link anychart.scales.DateTimeTicks} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for interval.
  * @param {(number|string|anychart.enums.Interval)=} opt_years Years or string representing date part or ISO 8601 interval string.
  * @param {number=} opt_months Months or number of whatever date part specified
  *     by first parameter.
@@ -236,25 +179,7 @@ anychart.scales.DateTimeTicks.prototype.interval = function(opt_years, opt_month
 
 
 /**
- * Getter for ticks count value.
- * @return {number} Current ticks count value.
- *//**
- * Setter for ticks count value.
- * @example
- * var chart = anychart.financial([
- *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
- *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
- *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
- *   [new Date('31-Aug-07'), 513.10, 516.50, 511.47, 515.25],
- *   [new Date('01-Sep-07'), 515.02, 528.00, 514.62, 525.15]
- * ]);
- * chart.xScale().ticks().count(3);
- * chart.container(stage).draw();
- * @param {number=} opt_value Ticks count value.<br/>
- * <b>Note:</b> If value is defined, but not a number or less than 2, it defaults to 5.
- * @return {!anychart.scales.DateTimeTicks} An instance of {@link anychart.scales.DateTimeTicks} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for count.
  * @param {number=} opt_value Ticks interval value if used as a getter.
  * @return {(number|anychart.scales.DateTimeTicks)} Interval value or itself for method chaining.
  */

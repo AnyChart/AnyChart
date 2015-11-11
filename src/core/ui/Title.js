@@ -215,19 +215,7 @@ anychart.core.ui.Title.prototype.transformation_ = null;
 
 
 /**
- * Gets the text content for the current title.
- * @return {string} The current text content of the title.
- *//**
- * Sets the text content for the title.
- * @example <t>simple-h100</t>
- * var title = anychart.ui.title();
- * title.text('My custom Text');
- * title.container(stage)
- *      .draw();
- * @param {string=} opt_value ['Title text'] Value to set.
- * @return {!anychart.core.ui.Title} An instance of {@link anychart.core.ui.Title} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for text.
  * @param {string=} opt_value .
  * @return {!anychart.core.ui.Title|string} .
  */
@@ -250,40 +238,7 @@ anychart.core.ui.Title.prototype.autoText = function(opt_value) {
 
 
 /**
- * Getter for the title background.
- * @example <t>simple-h100</t>
- * var title = anychart.ui.title();
- * title.text('\' Simple text \'')
- *      .background()
- *          .stroke('1 rgb(36,102,177) 0.4')
- *          .corners(2);
- * title.container(stage)
- *      .draw()
- * @return {!anychart.core.ui.Background} Returns the current background.
- *//**
- * Setter for the title background.
- * @example <t>simple-h100</t>
- * anychart.ui.title()
- *     .text('Title text')
- *     .padding(5)
- *     .background({
- *        fill: {
- *           keys: [
- *             "rgb(255,255,255) 1",
- *             "rgb(223,223,223) 1",
- *             "rgb(255,255,255) 1"
- *           ],
- *           angle: -90
- *         },
- *         corners: 2,
- *         stroke: '1 rgb(36,102,177) 0.4'
- *     })
- *     .container(stage)
- *     .draw();
- * @param {(string|Object|null|boolean)=} opt_value [null] Value to set.
- * @return {!anychart.core.ui.Title} An instance of {@link anychart.core.ui.Title} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for background.
  * @param {(string|Object|null|boolean)=} opt_value .
  * @return {!(anychart.core.ui.Title|anychart.core.ui.Background)} .
  */
@@ -303,17 +258,7 @@ anychart.core.ui.Title.prototype.background = function(opt_value) {
 
 
 /**
- * Getter for the title width.
- * @return {number|string|null} The current title width.
- *//**
- * Setter for the title width.<br/>
- * <b>Note:</b> If <b>null</b> is passed the width is calcualted automatically.
- * @example <t>listingOnly</t>
- * title.width('200px');
- * @param {(number|string|null)=} opt_value [null] Value to set.
- * @return {!anychart.core.ui.Title} An instance of {@link anychart.core.ui.Title} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for width.
  * @param {(number|string|null)=} opt_value .
  * @return {!anychart.core.ui.Title|number|string|null} .
  */
@@ -331,17 +276,7 @@ anychart.core.ui.Title.prototype.width = function(opt_value) {
 
 
 /**
- * Getter for the title height.
- * @return {number|string|null} The current title width.
- *//**
- * Setter for the title height.<br/>
- * <b>Note:</b> If <b>null</b> is passed the height is calcualted automatically.
- * @example <t>listingOnly</t>
- * title.height('200px');
- * @param {(number|string|null)=} opt_value [null] Value to set.
- * @return {!anychart.core.ui.Title} An instance of {@link anychart.core.ui.Title} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for height.
  * @param {(number|string|null)=} opt_value .
  * @return {!anychart.core.ui.Title|number|string|null} .
  */
@@ -367,31 +302,7 @@ anychart.core.ui.Title.prototype.setAutoWidth = function(width) {
 
 
 /**
- * Getter for the current title margin.<br/>
- * Learn more about margins at {@link anychart.core.Chart#margin}.
- * @return {!anychart.core.utils.Margin} The current title margin.
- *//**
- * Setter for the title margin in pixels using one complex value.<br/>
- * @param {(Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_allValues Value to set.
- * @return {!anychart.core.ui.Title} An instance of {@link anychart.core.ui.Title} class for method chaining.
- *//**
- * Setter for the title margin in pixels using several numbers.<br/>
- * @example <t>listingOnly</t>
- * // 1) all 10px
- * title.margin(10);
- * // 2) top and bottom 10px, left and right 15px
- * title.margin(10, '15px');
- * // 3) top 10px, left and right 15px, bottom 5px
- * title.margin(10, '15px', 5);
- * // 4) top 10px, right 15px, bottom 5px, left 12px
- * title.margin(10, '15px', '5px', 12);
- * @param {(string|number)=} opt_value1 [0] Top or top-bottom space.
- * @param {(string|number)=} opt_value2 [0] Right or right-left space.
- * @param {(string|number)=} opt_value3 [10] Bottom space.
- * @param {(string|number)=} opt_value4 [0] Left space.
- * @return {!anychart.core.ui.Title} An instance of {@link anychart.core.ui.Title} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for margin.
  * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .
@@ -413,29 +324,7 @@ anychart.core.ui.Title.prototype.margin = function(opt_spaceOrTopOrTopAndBottom,
 
 
 /**
- * Getter for the current title padding.<br/>
- * Learn more about paddings at {@link anychart.core.Chart#padding}.
- * @return {!anychart.core.utils.Padding} The current title padding.
- *//**
- * Setter for the title padding in pixels using single value.<br/>
- * @param {(string|number|anychart.core.utils.Space)=} opt_value [null] Value to set.
- * @return {!anychart.core.ui.Title} An instance of {@link anychart.core.ui.Title} class for method chaining.
- *//**
- * Setter for the title padding in pixels using several numbers.<br/>
- * @example <t>listingOnly</t>
- * // 1) top and bottom 10px, left and right 15px
- * title.padding(10, '15px');
- * // 2) top 10px, left and right 15px, bottom 5px
- * title.padding(10, '15px', 5);
- * // 3) top 10px, right 15px, bottom 5px, left 12px
- * title.padding(10, '15px', '5px', 12);
- * @param {(string|number)=} opt_value1 Top or top-bottom space.
- * @param {(string|number)=} opt_value2 Right or right-left space.
- * @param {(string|number)=} opt_value3 Bottom space.
- * @param {(string|number)=} opt_value4 Left space.
- * @return {anychart.core.ui.Title} An instance of {@link anychart.core.ui.Title} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for padding.
  * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .
@@ -457,26 +346,7 @@ anychart.core.ui.Title.prototype.padding = function(opt_spaceOrTopOrTopAndBottom
 
 
 /**
- * Getter for the title align.
- * @return {anychart.enums.Align} The current title align.
- *//**
- * Setter for the title align.
- * @example <t>simple-h100</t>
- * stage.rect(1, 1, stage.width()-2, stage.height()-10).stroke('1 blue');
- * anychart.ui.title()
- *     .text('Left align')
- *     .align('left')
- *     .container(stage)
- *     .draw();
- * anychart.ui.title()
- *     .text('Right align')
- *     .align('right')
- *     .container(stage)
- *     .draw();
- * @param {(anychart.enums.Align|string)=} opt_value [{@link anychart.enums.Align}.CENTER] Value to set.
- * @return {!anychart.core.ui.Title} An instance of {@link anychart.core.ui.Title} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for align.
  * @param {(anychart.enums.Align|string)=} opt_value .
  * @return {!anychart.core.ui.Title|anychart.enums.Align} .
  */
@@ -495,26 +365,7 @@ anychart.core.ui.Title.prototype.align = function(opt_value) {
 
 
 /**
- * Getter for the title orientation.
- * @return {anychart.enums.Orientation} The orientation or the title for method chaining.
- *//**
- * Setter for the title orientation.
- * @example
- * stage.rect(1, 1, stage.width()-2, stage.height()-10).stroke('1 blue');
- * anychart.ui.title()
- *     .text('Left title orientation')
- *     .orientation('left')
- *     .container(stage)
- *     .draw();
- * anychart.ui.title()
- *     .text('Right title orientation')
- *     .orientation('right')
- *     .container(stage)
- *     .draw();
- * @param {(anychart.enums.Orientation|string)=} opt_value [{@link anychart.enums.Orientation}.TOP] Value to set.
- * @return {!anychart.core.ui.Title} An instance of {@link anychart.core.ui.Title} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for orientation.
  * @param {(anychart.enums.Orientation|string)=} opt_value .
  * @return {!anychart.core.ui.Title|anychart.enums.Orientation} .
  */

@@ -134,14 +134,7 @@ anychart.core.grids.Linear.prototype.layout = function(opt_value) {
 //  Scale.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for axis scale.
- * @return {anychart.scales.Base} Axis scale.
- *//**
- * Setter for axis scale.
- * @param {anychart.scales.Base=} opt_value Value to set.
- * @return {!anychart.core.grids.Linear} {@link anychart.core.grids.Linear} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for scale.
  * @param {anychart.scales.Base=} opt_value Scale.
  * @return {anychart.scales.Base|!anychart.core.grids.Linear} Axis scale or itself for method chaining.
  */

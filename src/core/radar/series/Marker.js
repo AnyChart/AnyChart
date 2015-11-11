@@ -79,44 +79,7 @@ anychart.core.radar.series.Marker.prototype.isDiscreteBased = function() {
 
 
 /**
- * Getter for current marker type settings.
- * @return {string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path}
- *  Markers type settings.
- *//**
- * Setter for marker type settings.
- * @example <c>By Enum value.</c>
- * chart = anychart.radar();
- * chart.marker([10, 11, 17, 7, 21])
- *    .type('star4')
- *    .hoverType('star6');
- * chart.container(stage).draw();
- * @example <c>By custom function.</c>
- * chart = anychart.radar();
- * chart.marker([10, 11, 17, 7, 21])
- *    .type(function(path, x, y, size) {
- *      var point1 = {x: x + 1.2 * size, y: y - 0.4 * size};
- *      var point2 = {x: x - 0.5*size, y: y -0.5*size};
- *      path.moveTo(point1.x, point1.y)
- *          .arcToByEndPoint(point2.x, point2.y, size, size, true, true)
- *          .arcToByEndPoint(point1.x, point1.y, size / 3, size / 3, false, false)
- *          .moveTo(point1.x, point1.y)
- *          .close();
- *      return path;
- *    });
- * chart.container(stage).draw();
- * @param {(string|anychart.enums.MarkerType|
- *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
- *  [{@link anychart.enums.MarkerType}.STAR5] Type or custom drawer. Function for a custom
- *  marker should look like this: <code>function(path, x, y, size){
- *    // path - acgraph.vector.Path
- *    // x, y - marker position
- *    // size - marker size
- *    ... //do something
- *    return path;
- *  }</code>.
- * @return {!anychart.core.radar.series.Marker} {@link anychart.core.radar.series.Marker} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for type.
  * @param {(string|anychart.enums.MarkerType|
  *          function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
  * @return {!anychart.core.radar.series.Marker|anychart.enums.MarkerType|string|
@@ -137,44 +100,7 @@ anychart.core.radar.series.Marker.prototype.type = function(opt_value) {
 
 
 /**
- * Getter for current hovered marker type settings.
- * @return {string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path}
- *  Markers type settings.
- *//**
- * Setter for hovered marker type settings.
- * @example <c>By Enum value.</c>
- * chart = anychart.radar();
- * chart.marker([10, 11, 17, 7, 21])
- *    .type('star4')
- *    .hoverType('star6');
- * chart.container(stage).draw();
- * @example <c>By custom function.</c>
- * chart = anychart.radar();
- * chart.marker([10, 11, 17, 7, 21])
- *    .hoverType(function(path, x, y, size) {
- *      var point1 = {x: x + 1.2 * size, y: y - 0.4 * size};
- *      var point2 = {x: x - 0.5*size, y: y -0.5*size};
- *      path.moveTo(point1.x, point1.y)
- *          .arcToByEndPoint(point2.x, point2.y, size, size, true, true)
- *          .arcToByEndPoint(point1.x, point1.y, size / 3, size / 3, false, false)
- *          .moveTo(point1.x, point1.y)
- *          .close();
- *      return path;
- *    });
- * chart.container(stage).draw();
- * @param {(string|anychart.enums.MarkerType|
- *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
- *  [{@link anychart.enums.MarkerType}.STAR5] Type or custom drawer. Function for a custom
- *  marker should look like this: <code>function(path, x, y, size){
- *    // path - acgraph.vector.Path
- *    // x, y - marker position
- *    // size - marker size
- *    ... //do something
- *    return path;
- *  }</code>.
- * @return {!anychart.core.radar.series.Marker} {@link anychart.core.radar.series.Marker} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hoverType.
  * @param {(string|anychart.enums.MarkerType|
  *          function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
  * @return {!anychart.core.radar.series.Marker|anychart.enums.MarkerType|string|
@@ -216,18 +142,7 @@ anychart.core.radar.series.Marker.prototype.selectType = function(opt_value) {
 
 
 /**
- * Getter for marker size
- * @return {number} Current marker size.
- *//**
- * Setter for marker size.
- * @example
- * chart = anychart.radar();
- * chart.marker([10, 11, 17, 7, 21]).size(14);
- * chart.container(stage).draw();
- * @param {number=} opt_value [10] Value to set.
- * @return {anychart.core.radar.series.Marker} {@link anychart.core.radar.series.Marker} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for size.
  * @param {number=} opt_value .
  * @return {anychart.core.radar.series.Marker|number} .
  */
@@ -245,18 +160,7 @@ anychart.core.radar.series.Marker.prototype.size = function(opt_value) {
 
 
 /**
- * Getter for hovered marker size
- * @return {number} Current hovered marker size.
- *//**
- * Setter for hovered marker size.
- * @example
- * chart = anychart.radar();
- * chart.marker([10, 11, 17, 7, 21]).hoverSize(14);
- * chart.container(stage).draw();
- * @param {number=} opt_value [12] Value to set.
- * @return {anychart.core.radar.series.Marker} {@link anychart.core.radar.series.Marker} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hoverSize.
  * @param {number=} opt_value .
  * @return {anychart.core.radar.series.Marker|number} .
  */

@@ -157,14 +157,7 @@ anychart.core.ui.table.Base.prototype.settings = function(opt_name, opt_value, o
 
 
 /**
- * Getter for text font size.
- * @return {string|number} Current font size.
- *//**
- * Setter for text font size.
- * @param {string|number=} opt_value ['16px'] Value to set.
- * @return {!anychart.core.ui.table.Base} An instance of {@link anychart.core.ui.table.Base} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for fontSize.
  * @param {string|number=} opt_value .
  * @return {!anychart.core.ui.table.Base|string|number} .
  */
@@ -175,14 +168,7 @@ anychart.core.ui.table.Base.prototype.fontSize = function(opt_value) {
 
 
 /**
- * Getter for the font family.
- * @return {string} The current font family.
- *//**
- * Setter for font family.
- * @param {string=} opt_value ['Arial'] Value to set.
- * @return {!anychart.core.ui.table.Base} An instance of {@link anychart.core.ui.table.Base} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for fontFamily.
  * @param {string=} opt_value .
  * @return {!anychart.core.ui.table.Base|string} .
  */
@@ -193,15 +179,7 @@ anychart.core.ui.table.Base.prototype.fontFamily = function(opt_value) {
 
 
 /**
- * Getter for the text font color.
- * @return {string} The current font color.
- *//**
- * Setter for the text font color.<br/>
- * {@link http://www.w3schools.com/html/html_colors.asp}
- * @param {string=} opt_value ['#000'] Value to set.
- * @return {!anychart.core.ui.table.Base} An instance of {@link anychart.core.ui.table.Base} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for fontColor.
  * @param {string=} opt_value .
  * @return {!anychart.core.ui.table.Base|string} .
  */
@@ -212,15 +190,7 @@ anychart.core.ui.table.Base.prototype.fontColor = function(opt_value) {
 
 
 /**
- * Getter for the text font opacity.
- * @return {number} The current font opacity.
- *//**
- * Setter for the text font opacity.<br/>
- * Double value from 0 to 1.
- * @param {number=} opt_value [1] Value to set.
- * @return {!anychart.core.ui.table.Base} An instance of {@link anychart.core.ui.table.Base} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for fontOpacity.
  * @param {number=} opt_value .
  * @return {!anychart.core.ui.table.Base|number} .
  */
@@ -231,14 +201,7 @@ anychart.core.ui.table.Base.prototype.fontOpacity = function(opt_value) {
 
 
 /**
- * Getter for the text font decoration.
- * @return {acgraph.vector.Text.Decoration|string} The current font decoration.
- *//**
- * Setter for the text font decoration.
- * @param {(acgraph.vector.Text.Decoration|string)=} opt_value [{@link acgraph.vector.Text.Decoration}.NONE] Value to set.
- * @return {!anychart.core.ui.table.Base} An instance of {@link anychart.core.ui.table.Base} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for fontDecoration.
  * @param {(acgraph.vector.Text.Decoration|string)=} opt_value .
  * @return {!anychart.core.ui.table.Base|acgraph.vector.Text.Decoration} .
  */
@@ -251,14 +214,7 @@ anychart.core.ui.table.Base.prototype.fontDecoration = function(opt_value) {
 
 
 /**
- * Getter for the text font style.
- * @return {acgraph.vector.Text.FontStyle|string} The current font style.
- *//**
- * Setter for the text font style.
- * @param {(acgraph.vector.Text.FontStyle|string)=} opt_value [{@link acgraph.vector.Text.FontStyle}.NORMAL] Value to set.
- * @return {!anychart.core.ui.table.Base} An instance of {@link anychart.core.ui.table.Base} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for fontStyle.
  * @param {acgraph.vector.Text.FontStyle|string=} opt_value .
  * @return {!anychart.core.ui.table.Base|acgraph.vector.Text.FontStyle} .
  */
@@ -271,14 +227,7 @@ anychart.core.ui.table.Base.prototype.fontStyle = function(opt_value) {
 
 
 /**
- * Getter for the text font variant.
- * @return {acgraph.vector.Text.FontVariant|string} The current font variant.
- *//**
- * Setter for the text font variant.
- * @param {(acgraph.vector.Text.FontVariant|string)=} opt_value [{@link acgraph.vector.Text.FontVariant}.NORMAL] Value to set.
- * @return {!anychart.core.ui.table.Base} An instance of {@link anychart.core.ui.table.Base} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for fontVariant.
  * @param {acgraph.vector.Text.FontVariant|string=} opt_value .
  * @return {!anychart.core.ui.table.Base|acgraph.vector.Text.FontVariant} .
  */
@@ -291,15 +240,7 @@ anychart.core.ui.table.Base.prototype.fontVariant = function(opt_value) {
 
 
 /**
- * Getter for the text font weight.
- * @return {string|number} The current font weight.
- *//**
- * Setter for the text font weight.<br/>
- * {@link http://www.w3schools.com/cssref/pr_font_weight.asp}
- * @param {(string|number)=} opt_value ['normal'] Value to set.
- * @return {!anychart.core.ui.table.Base} An instance of {@link anychart.core.ui.table.Base} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for fontWeight.
  * @param {(string|number)=} opt_value .
  * @return {!anychart.core.ui.table.Base|string|number} .
  */
@@ -310,15 +251,7 @@ anychart.core.ui.table.Base.prototype.fontWeight = function(opt_value) {
 
 
 /**
- * Getter for the text letter spacing.
- * @return {string|number} The current letter spacing.
- *//**
- * Setter for the text letter spacing.<br/>
- * {@link http://www.w3schools.com/cssref/pr_text_letter-spacing.asp}
- * @param {(string|number)=} opt_value ['normal'] Value to set.
- * @return {!anychart.core.ui.table.Base} An instance of {@link anychart.core.ui.table.Base} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for letterSpacing.
  * @param {(number|string)=} opt_value .
  * @return {!anychart.core.ui.table.Base|number|string} .
  */
@@ -329,14 +262,7 @@ anychart.core.ui.table.Base.prototype.letterSpacing = function(opt_value) {
 
 
 /**
- * Getter for the text direction.
- * @return {acgraph.vector.Text.Direction|string} Current text direction.
- *//**
- * Setter for the text direction.
- * @param {(acgraph.vector.Text.Direction|string)=} opt_value [{@link acgraph.vector.Text.Direction}.LTR] Value to set.
- * @return {!anychart.core.ui.table.Base} An instance of {@link anychart.core.ui.table.Base} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for textDirection.
  * @param {acgraph.vector.Text.Direction|string=} opt_value .
  * @return {!anychart.core.ui.table.Base|acgraph.vector.Text.Direction} .
  */
@@ -349,15 +275,7 @@ anychart.core.ui.table.Base.prototype.textDirection = function(opt_value) {
 
 
 /**
- * Getter for the text line height.
- * @return {string|number} The current text line height.
- *//**
- * Setter for the text line height.<br/>
- * {@link http://www.w3schools.com/cssref/pr_text_letter-spacing.asp}
- * @param {(string|number)=} opt_value ['normal'] Value to set.
- * @return {!anychart.core.ui.table.Base} An instance of {@link anychart.core.ui.table.Base} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for lineHeight.
  * @param {(number|string)=} opt_value .
  * @return {!anychart.core.ui.table.Base|number|string} .
  */
@@ -368,14 +286,7 @@ anychart.core.ui.table.Base.prototype.lineHeight = function(opt_value) {
 
 
 /**
- * Getter for the text indent.
- * @return {number} The current text indent.
- *//**
- * Setter for the text indent.
- * @param {number=} opt_value [0] Value to set.
- * @return {!anychart.core.ui.table.Base} An instance of {@link anychart.core.ui.table.Base} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for textIndent.
  * @param {number=} opt_value .
  * @return {!anychart.core.ui.table.Base|number} .
  */
@@ -386,14 +297,7 @@ anychart.core.ui.table.Base.prototype.textIndent = function(opt_value) {
 
 
 /**
- * Getter for the text vertical align.
- * @return {acgraph.vector.Text.VAlign|string} The current text vertical align.
- *//**
- * Setter for the text vertical align.
- * @param {(acgraph.vector.Text.VAlign|string)=} opt_value [{@link acgraph.vector.Text.VAlign}.TOP] Value to set.
- * @return {!anychart.core.ui.table.Base} An instance of {@link anychart.core.ui.table.Base} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for vAlign.
  * @param {acgraph.vector.Text.VAlign|string=} opt_value .
  * @return {!anychart.core.ui.table.Base|acgraph.vector.Text.VAlign} .
  */
@@ -406,14 +310,7 @@ anychart.core.ui.table.Base.prototype.vAlign = function(opt_value) {
 
 
 /**
- * Getter for the text horizontal align.
- * @return {acgraph.vector.Text.HAlign|string} Th current text horizontal align.
- *//**
- * Setter for the text horizontal align.
- * @param {(acgraph.vector.Text.HAlign|string)=} opt_value [{@link acgraph.vector.Text.HAlign}.START] Value to set.
- * @return {!anychart.core.ui.table.Base} An instance of {@link anychart.core.ui.table.Base} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hAlign.
  * @param {acgraph.vector.Text.HAlign|string=} opt_value .
  * @return {!anychart.core.ui.table.Base|acgraph.vector.Text.HAlign} .
  */
@@ -426,14 +323,7 @@ anychart.core.ui.table.Base.prototype.hAlign = function(opt_value) {
 
 
 /**
- * Getter for the text wrap settings.
- * @return {acgraph.vector.Text.TextWrap|string} Th current text wrap settings.
- *//**
- * Setter for the text wrap settings.
- * @param {(acgraph.vector.Text.TextWrap|string)=} opt_value [{@link acgraph.vector.Text.TextWrap}.BY_LETTER] Value to set.
- * @return {!anychart.core.ui.table.Base} An instance of {@link anychart.core.ui.table.Base} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for textWrap.
  * @param {acgraph.vector.Text.TextWrap|string=} opt_value .
  * @return {!anychart.core.ui.table.Base|acgraph.vector.Text.TextWrap} .
  */
@@ -446,14 +336,7 @@ anychart.core.ui.table.Base.prototype.textWrap = function(opt_value) {
 
 
 /**
- * Getter for the text overflow settings.
- * @return {acgraph.vector.Text.TextOverflow|string} The current text overflow settings.
- *//**
- * Setter for the text overflow settings.
- * @param {(acgraph.vector.Text.TextOverflow|string)=} opt_value [{@link acgraph.vector.Text.TextOverflow}.CLIP] Value to set.
- * @return {!anychart.core.ui.table.Base} An instance of {@link anychart.core.ui.table.Base} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for textOverflow.
  * @param {acgraph.vector.Text.TextOverflow|string=} opt_value .
  * @return {!anychart.core.ui.table.Base|acgraph.vector.Text.TextOverflow} .
  */
@@ -464,15 +347,7 @@ anychart.core.ui.table.Base.prototype.textOverflow = function(opt_value) {
 
 
 /**
- * Getter for the text selectable option.
- * @return {boolean} The current text selectable option.
- *//**
- * Setter for the text selectable.<br/>
- * This options defines whether the text can be selected. If set to <b>false</b> one can't select the text.
- * @param {boolean=} opt_value [false] Value to set.
- * @return {!anychart.core.ui.table.Base} An instance of {@link anychart.core.ui.table.Base} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for selectable.
  * @param {boolean=} opt_value .
  * @return {!anychart.core.ui.table.Base|boolean} .
  */
@@ -483,15 +358,7 @@ anychart.core.ui.table.Base.prototype.selectable = function(opt_value) {
 
 
 /**
- * Gets current state of disablePointerEvents option.
- * @return {boolean} If pointer events are disabled.
- *//**
- * Setter for the text disablePointerEvents option.<br/>
- * This options defines whether the text should pass mouse events through.
- * @param {boolean=} opt_value [false] Value to set.
- * @return {!anychart.core.ui.table.Base} An instance of {@link anychart.core.ui.table.Base} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for disablePointerEvents.
  * @param {boolean=} opt_value .
  * @return {!anychart.core.ui.table.Base|boolean} .
  */
@@ -502,15 +369,7 @@ anychart.core.ui.table.Base.prototype.disablePointerEvents = function(opt_value)
 
 
 /**
- * Getter for the useHtml flag.
- * @return {boolean} The current value of useHTML flag.
- *//**
- * Setter for flag useHtml.<br/>
- * This property defines whether HTML text should be parsed.
- * @param {boolean=} opt_value [false] Value to set.
- * @return {!anychart.core.ui.table.Base} An instance of {@link anychart.core.ui.table.Base} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for useHtml.
  * @param {boolean=} opt_value .
  * @return {!anychart.core.ui.table.Base|boolean} .
  */
@@ -521,29 +380,7 @@ anychart.core.ui.table.Base.prototype.useHtml = function(opt_value) {
 
 
 /**
- * Getter for border settings object.
- * @return {!anychart.core.ui.table.Border} Current bor settings.
- *//**
- * Setter for cell border settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note:</b> Pass <b>null</b> to reset to default settings.<br/>
- * <b>Note:</b> <u>lineJoin</u> settings not working here.
- * @shortDescription Setter for cell border settings.
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.getCell(1,1).border('orange', 3, '5 2', 'round');
- * table.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.ui.table.Base} {@link anychart.core.ui.table.Base} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for border.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.

@@ -113,26 +113,6 @@ anychart.scales.Ordinal.prototype.isMissing = function(value) {
 
 
 /**
- * Getter for set of scale ticks in terms of data values.
- * @return {!anychart.scales.OrdinalTicks} An instance of {@link anychart.scales.OrdinalTicks} class for method chaining.
- *//**
- * Setter for set of scale ticks in terms of data values.
- * @example <t>lineChart</t>
- * chart.line([
- *  ['A1', 1.1],
- *  ['A2', 1.4],
- *  ['A3', 1.2],
- *  ['A4', 1.9],
- *  ['B1', 1.1],
- *  ['B2', 1.4],
- *  ['B3', 1.2],
- *  ['B4', 1.9]
- * ]);
- * chart.xScale().ticks([0,2,4,6]);
- * @param {(Object|Array)=} opt_value An array of indexes of ticks values.
- * @return {!anychart.scales.Ordinal} An instance of {@link anychart.scales.Ordinal} class for method chaining.
- *//**
- * @ignoreDoc
  * Gets or sets a set of scale ticks in terms of data values.
  * @param {(Object|Array)=} opt_value An array of ticks to set.
  * @return {!(anychart.scales.Ordinal|anychart.scales.OrdinalTicks)} Ticks or itself for chaining.
@@ -152,25 +132,7 @@ anychart.scales.Ordinal.prototype.ticks = function(opt_value) {
 
 
 /**
- * Getter for scale input domain.
- * @return {Array.<number|string>} Current input domain.
- *//**
- * Setter for scale input domain.
- * @example <t>lineChart</t>
- * chart.line([
- *    ['A1', 1.1],
- *    ['A2', 1.4],
- *    ['A3', 1.2],
- *    ['A4', 1.9]
- * ]);
- * chart.xScale().values(['A1', 'A2', 'B1', 'B2']);
- * //the same that
- * //chart.xScale().values('A1', 'A2', 'B1', 'B2');
- * @param {(Array.<*>|*|null)=} opt_values Array of values, or values, or null for autocalc.
- * @param {...*} var_args Other values, that should be contained in input domain.
- * @return {!anychart.scales.Ordinal} An instance of {@link anychart.scales.Ordinal} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for values.
  * @param {(Array.<*>|*|null)=} opt_values Array of values, or values, or null for autocalc.
  * @param {...*} var_args Other values, that should be contained in input domain.
  * @return {!(anychart.scales.Ordinal|Array.<number|string>)} This or input domain.
@@ -198,26 +160,7 @@ anychart.scales.Ordinal.prototype.values = function(opt_values, var_args) {
 
 
 /**
- * Getter for scale ticks names.
- * @return {Array.<*>} Current scale ticks names.
- *//**
- * Setter for scale ticks names.
- * @example <t>lineChart</t>
- * var data = [
- *   {x:10, myName: 'Q1', value: 1.1},
- *   {x:11, myName: 'Q2', value: 1.4},
- *   {x:12, myName: 'Q3', value: 1.2},
- *   {x:13, myName: 'Q4', value: 1.9}
- * ];
- * chart.line(data);
- * chart.xScale().names('myName');
- * @example <t>lineChart</t>
- * chart.line([1.1, 1.4, 1.2, 1.9]);
- * chart.xScale().names(['C1', 'C2', 'C3', 'C4']);
- * @param {(Array.<*>|string)=} opt_value Array of names or attribute name for data set.
- * @return {anychart.scales.Ordinal} An instance of {@link anychart.scales.Ordinal} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for names.
  * @param {(Array.<*>|string)=} opt_value Array of names or attribute name for data set.
  * @return {(Array.<*>|anychart.scales.Ordinal)} Scale names or self for chaining.
  */

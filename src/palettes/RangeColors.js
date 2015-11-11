@@ -109,15 +109,7 @@ anychart.palettes.RangeColors.prototype.items = function(opt_value, var_args) {
 
 
 /**
- * Getter for color palette colors counts.
- * @return {number} Current color palette colors count.
- *//**
- * Setter for color palette's colors counts.<br/>
- * <b>Note:</b> Defines how many steps we need in gradient.
- * @param {number=} opt_value [NaN] Color palette colors counts.
- * @return {!anychart.palettes.RangeColors} An instance of the {@link anychart.palettes.RangeColors} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for count.
  * @param {number=} opt_value .
  * @return {number|anychart.palettes.RangeColors} .
  */

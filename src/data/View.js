@@ -297,49 +297,7 @@ anychart.data.View.prototype.concat = function(otherView) {
 
 
 /**
- * Gets a full row of the set by an index.<br/>
- * <b>Note:</b> If there is no row with the given index, methods returns <b>undefined</b>.<br/>
- * See sample at {@link anychart.data.Set#row}
- * @example <t>listingOnly</t>
- * // Data
- *  [
- *    [1, 2, 4, 7],
- *    [11, 12, 14, 17],
- *    [21, 22, 24, 27]
- *  ]
- *  view.row(2); // returns [21, 22, 24, 27]
- *  view.row(3); // returns undefined
- * @see anychart.data.Set#row
- * @param {number} rowIndex An index of the row to fetch.
- * @return {*} The row.
- *//**
- * Sets a row of the set by an index.<br/>
- * <b>Note:</b> Previous value of a row is returned but it is lost completely after that!.<br/>
- * @example <t>listingOnly</t>
- * // Data
- *  [
- *    [1, 2, 4, 7],
- *    [11, 12, 14, 17],
- *    [21, 22, 24, 27]
- *  ]
- *  view.row(2, [2, 2, 2, 2]); // returns [21, 22, 24, 27]
- *  view.row(3, {'low': 4, 'high': 11}); // returns undefined
- * @example <t>lineChart</t>
- * var dataSet = anychart.data.set([
- *     ['Point A', 231],
- *     ['Point B', 131],
- *     ['Point C', 212],
- *     ['Point D', 94]
- * ]);
- * var view = dataSet.mapAs();
- * view.row(2, ['Point E', 10]);
- * chart.line(view);
- * @see anychart.data.Set#row
- * @param {number} rowIndex An index of the row to fetch.
- * @param {*=} opt_value A value to set.
- * @return {*} Previous value of the row.
- *//**
- * @ignoreDoc
+ * Getter/setter for row.
  * @param {number} rowIndex .
  * @param {*=} opt_value .
  * @return {*} .
@@ -638,28 +596,7 @@ anychart.data.View.prototype.parentViewChangedHandler = function(event) {
 
 
 /**
- * Getter for a metadata value.<br/>
- * Learn how it works at {@link anychart.data.Iterator#meta}.
- * @example <t>listingOnly</t>
- * // Select 'name' field in the fourth row:
- * view.meta(4, 'name');
- * @param {number} index Row index.
- * @param {string} name Name of the metadata field.
- * @return {*} Current value.
- * @see anychart.data.Iterator#meta
- *//**
- * Setter for a metadata value.
- * Learn how it works at {@link anychart.data.Iterator#meta}.
- * @example <t>listingOnly</t>
- * // Set value to the 'name' field in the fourth row:
- * view.meta(4, 'name', 'Jules Winnfield');
- * @param {number} index Row index.
- * @param {string} name Name of the metadata field.
- * @param {*=} opt_value Value to set.
- * @return {anychart.data.View} The instance of {@link anychart.data.View} class for method chaining.
- * @see anychart.data.Iterator#meta
- *//**
- * @ignoreDoc
+ * Getter/setter for meta.
  * @param {number} index .
  * @param {string} name .
  * @param {*=} opt_value .

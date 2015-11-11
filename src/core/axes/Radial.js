@@ -167,14 +167,7 @@ anychart.core.axes.Radial.prototype.minorLabelsBounds_ = null;
 
 
 /**
- * Getter for axis labels.
- * @return {!anychart.core.ui.LabelsFactory} Axis labels of itself for method chaining.
- *//**
- * Setter for axis labels.
- * @param {(Object|boolean|null)=} opt_value Value to set.
- * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for labels.
  * @param {(Object|boolean|null)=} opt_value Axis labels.
  * @return {!(anychart.core.ui.LabelsFactory|anychart.core.axes.Radial)} Axis labels of itself for method chaining.
  */
@@ -217,14 +210,7 @@ anychart.core.axes.Radial.prototype.labelsInvalidated_ = function(event) {
 
 
 /**
- * Getter for axis minor labels.
- * @return {!anychart.core.ui.LabelsFactory} Axis labels.
- *//**
- * Setter for axis minor labels.
- * @param {(Object|boolean|null)=} opt_value Value to set.
- * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for minorLabels.
  * @param {(Object|boolean|null)=} opt_value Axis labels.
  * @return {!(anychart.core.ui.LabelsFactory|anychart.core.axes.Radial)} Axis labels of itself for method chaining.
  */
@@ -267,14 +253,7 @@ anychart.core.axes.Radial.prototype.minorLabelsInvalidated_ = function(event) {
 
 
 /**
- * Getter for axis ticks.
- * @return {!anychart.core.axes.RadialTicks} Axis ticks.
- *//**
- * Setter for axis ticks.
- * @param {(Object|boolean|null)=} opt_value Value to set.
- * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for ticks.
  * @param {(Object|boolean|null)=} opt_value Axis ticks.
  * @return {!(anychart.core.axes.RadialTicks|anychart.core.axes.Radial)} Axis ticks or itself for method chaining.
  */
@@ -315,14 +294,7 @@ anychart.core.axes.Radial.prototype.ticksInvalidated_ = function(event) {
 
 
 /**
- * Getter for minor axis ticks.
- * @return {!anychart.core.axes.RadialTicks} Axis ticks.
- *//**
- * Setter for minor axis ticks.
- * @param {(Object|boolean|null)=} opt_value Value to set.
- * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for minorTicks.
  * @param {(Object|boolean|null)=} opt_value Axis ticks.
  * @return {!(anychart.core.axes.RadialTicks|anychart.core.axes.Radial)} Axis ticks or itself for method chaining.
  */
@@ -363,16 +335,7 @@ anychart.core.axes.Radial.prototype.minorTicksInvalidated_ = function(event) {
 
 
 /**
- * Getter for axis line stroke.
- * @return {acgraph.vector.Stroke} Axis line stroke settings.
- *//**
- * Setter for axis line stroke by one value.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
- * @param {(acgraph.vector.Stroke)=} opt_value Value to set.
- * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for stroke.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -403,19 +366,7 @@ anychart.core.axes.Radial.prototype.stroke = function(opt_strokeOrFill, opt_thic
 
 
 /**
- * Getter for axis scale.
- * @return {anychart.scales.Base} Axis scale.
- *//**
- * Setter for axis scale.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * var scale = anychart.scales.ordinal();
- * scale.values(['A1', 'A2', 'A3', 'B1', 'B2']);
- * chart.yAxis(1).orientation('right').scale(scale);
- * @param {anychart.scales.Base=} opt_value Value to set.
- * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for scale.
  * @param {anychart.scales.Base=} opt_value Scale.
  * @return {anychart.scales.Base|!anychart.core.axes.Radial} Axis scale or itself for method chaining.
  */
@@ -834,17 +785,7 @@ anychart.core.axes.Radial.prototype.getLabelPositionOffsetForAngle_ = function(a
 
 
 /**
- * Getter for the first label drawing flag.
- * @return {boolean} Drawing flag.
- *//**
- * Setter for the first label drawing flag.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.4, 1.6, 1.9]);
- * chart.yAxis().drawFirstLabel(false);
- * @param {boolean=} opt_value [true] Value to set.
- * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for drawFirstLabel.
  * @param {boolean=} opt_value Drawing flag.
  * @return {boolean|anychart.core.axes.Radial} Drawing flag or itself for method chaining.
  */
@@ -861,17 +802,7 @@ anychart.core.axes.Radial.prototype.drawFirstLabel = function(opt_value) {
 
 
 /**
- * Getter for the last label drawing flag.
- * @return {boolean} Drawing flag.
- *//**
- * Setter for the last label drawing flag.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.4, 1.6, 1.9]);
- * chart.yAxis().drawFirstLabel(false);
- * @param {boolean=} opt_value [true] Value to set.
- * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for drawLastLabel.
  * @param {boolean=} opt_value Drawing flag.
  * @return {boolean|anychart.core.axes.Radial} Drawing flag or itself for method chaining.
  */
@@ -888,14 +819,7 @@ anychart.core.axes.Radial.prototype.drawLastLabel = function(opt_value) {
 
 
 /**
- * Getter for overlap mode for labels.
- * @return {anychart.enums.LabelsOverlapMode|string} OverlapMode flag.
- *//**
- * Setter for overlap mode for labels.
- * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value [anychart.enums.LabelsOverlapMode.NO_OVERLAP] Value to set.
- * @return {!anychart.core.axes.Radial} {@link anychart.core.axes.Radial} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for overlapMode.
  * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value Value to set.
  * @return {anychart.enums.LabelsOverlapMode|string|anychart.core.axes.Radial} Drawing flag or itself for method chaining.
  */

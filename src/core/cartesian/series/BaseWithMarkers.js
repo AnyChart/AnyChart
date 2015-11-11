@@ -59,19 +59,7 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.hasMarkers = function()
 
 
 /**
- * Getter for series data markers.
- * @example <t>listingOnly</t>
- * series.markers().size(10);
- * @return {!anychart.core.ui.MarkersFactory} Markers instance.
- *//**
- * Setter for series data markers.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off markers.
- * @example <t>lineChart</t>
- * chart.spline([1, 1.4, 1.2, 2]).markers(null);
- * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
- * @return {!anychart.core.cartesian.series.BaseWithMarkers} {@link anychart.core.cartesian.series.BaseWithMarkers} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for markers.
  * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!(anychart.core.ui.MarkersFactory|anychart.core.cartesian.series.BaseWithMarkers)} Markers instance or itself for chaining call.
  */
@@ -94,21 +82,7 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.markers = function(opt_
 
 
 /**
- * Getter for series data markers on hover.
- * @example <t>listingOnly</t>
- * series.hoverMarkers().size(20);
- * @return {!anychart.core.ui.MarkersFactory} Markers instance.
- *//**
- * Setter for series data markers on hover.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn of markers.
- * @example <t>listingOnly</t>
- * series.hoverMarkers(null);
- * @example <t>lineChart</t>
- * chart.spline([1, 1.4, 1.2, 2]).hoverMarkers({size: 10, type: 'star5'});
- * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
- * @return {!anychart.core.cartesian.series.BaseWithMarkers} {@link anychart.core.cartesian.series.BaseWithMarkers} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hoverMarkers.
  * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!(anychart.core.ui.MarkersFactory|anychart.core.cartesian.series.BaseWithMarkers)} Markers instance or itself for chaining call.
  */

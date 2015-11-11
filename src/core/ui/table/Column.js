@@ -51,21 +51,7 @@ anychart.core.ui.table.Column.prototype.getCell = function(row) {
 
 
 /**
- * Getter for column width settings.
- * @param {number} col Column number.
- * @return {string|number|null} Current column width.
- *//**
- * Setter for column width settings. <br/>
- * <b>Note:</b> Pass <b>null</b> to set the default value.
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11]]);
- * table.getCol(0).width(200);
- * table.container(stage).draw();
- * @param {(string|number|null)=} opt_value Value to set.
- * @return {anychart.core.ui.table.Column} {@link anychart.core.ui.table.Column} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for width.
  * Getter and setter for column height settings. Null sets column width to default value.
  * @param {(string|number|null)=} opt_value Value to set.
  * @return {string|number|null|anychart.core.ui.table.Column}
@@ -108,84 +94,7 @@ anychart.core.ui.table.Column.prototype.maxWidth = function(opt_value) {
 
 
 /**
- * Getter for current fill color override.
- * @return {!acgraph.vector.Fill} Current fill color.
- *//**
- * Sets fill settings using an object or a string.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <c>Solid fill</c><t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.getCell(1,1).fill('green 0.2');
- * table.container(stage).draw();
- * @example <c>Linear gradient fill</c><t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.getCell(1,1).fill(['green 0.2', 'yellow 0.2']);
- * table.container(stage).draw();
- * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
- * @return {!anychart.core.ui.table.Base} {@link anychart.core.ui.table.Base} instance for method chaining.
- *//**
- * Fill color with opacity.<br/>
- * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
- * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
- * @shortDescription Fill as a string or an object.
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.getCell(1,1).fill('green', 0.3);
- * table.container(stage).draw();
- * @param {string} color Color as a string.
- * @param {number=} opt_opacity Color opacity.
- * @return {!anychart.core.ui.table.Base} {@link anychart.core.ui.table.Base} instance for method chaining.
- *//**
- * Linear gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.getCell(1,1).fill(['black', 'yellow'], 45, true, 0.5);
- * table.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
- * @param {number=} opt_angle Gradient angle.
- * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
- * @param {number=} opt_opacity Gradient opacity.
- * @return {!anychart.core.ui.table.Base} {@link anychart.core.ui.table.Base} instance for method chaining.
- *//**
- * Radial gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.getCell(1,1).fill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81);
- * table.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
- * @param {number} cx X ratio of center radial gradient.
- * @param {number} cy Y ratio of center radial gradient.
- * @param {anychart.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
- * @param {number=} opt_opacity Opacity of the gradient.
- * @param {number=} opt_fx X ratio of focal point.
- * @param {number=} opt_fy Y ratio of focal point.
- * @return {!anychart.core.ui.table.Base} {@link anychart.core.ui.table.Base} instance for method chaining.
- *//**
- * Image fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.getCell(1,1).fill({
- *    src: 'http://static.anychart.com/underwater.jpg',
- *    mode: acgraph.vector.ImageFillMode.STRETCH
- * });
- * table.container(stage).draw();
- * @param {!acgraph.vector.Fill} imageSettings Object with settings.
- * @return {!anychart.core.ui.table.Base} {@link anychart.core.ui.table.Base} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for cellFill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -204,29 +113,7 @@ anychart.core.ui.table.Column.prototype.cellFill = function(opt_fillOrColorOrKey
 
 
 /**
- * Getter for border settings object.
- * @return {!anychart.core.ui.table.Border} Current bor settings.
- *//**
- * Setter for cell border settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note:</b> Pass <b>null</b> to reset to default settings.<br/>
- * <b>Note:</b> <u>lineJoin</u> settings not working here.
- * @shortDescription Setter for cell border settings.
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
- * table.getCell(1,1).border('orange', 3, '5 2', 'round');
- * table.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.ui.table.Base} {@link anychart.core.ui.table.Base} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for cellBorder.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -253,47 +140,7 @@ anychart.core.ui.table.Column.prototype.cellBorder = function(opt_strokeOrFill, 
 
 
 /**
- * Getter for padding settings object.
- * @return {!anychart.core.ui.table.Padding} Padding settings object.
- *//**
- * Setter for current cell paddings in pixels using a single value.<br/>
- * @example <t>listingOnly</t>
- * // all paddings 15px
- * cell.padding(15);
- * // all paddings 15px
- * cell.padding('15px');
- * // top and bottom 5px ,right and left 15px
- * cell.padding(anychart.utils.space(5,15));
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]);
- * table.cellTextFactory().background().enabled(true);
- * table.getCell(0,0).padding(0);
- * table.container(stage).draw();
- * @param {(null|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_value Value to set.
- * @return {!anychart.core.ui.table.Base} {@link anychart.core.ui.table.Base} instance for method chaining.
- *//**
- * Setter for current cell paddings in pixels using several numbers.<br/>
- * @example <t>listingOnly</t>
- * // 1) top and bottom 10px, left and right 15px
- * table.cellPadding(10, '15px');
- * // 2) top 10px, left and right 15px, bottom 5px
- * table.cellPadding(10, '15px', 5);
- * // 3) top 10px, right 15px, bottom 5px, left 12px
- * table.cellPadding(10, '15px', '5px', 12);
- * @example <t>simple-h100</t>
- * var table = anychart.ui.table();
- * table.contents([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]);
- * table.cellTextFactory().background().enabled(true);
- * table.getCell(0,0).padding(-5, 0, 0, -15);
- * table.container(stage).draw();
- * @param {(string|number)=} opt_value1 Top or top-bottom space.
- * @param {(string|number)=} opt_value2 Right or right-left space.
- * @param {(string|number)=} opt_value3 Bottom space.
- * @param {(string|number)=} opt_value4 Left space.
- * @return {!anychart.core.ui.table.Base} {@link anychart.core.ui.table.Base} instance for method chaining.
- *//**
- * Cell padding settings.
+ * Getter/setter for cellPadding.
  * @param {(null|string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .

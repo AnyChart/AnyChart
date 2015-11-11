@@ -586,18 +586,7 @@ anychart.core.ui.LegendItem.prototype.iconStroke = function(opt_strokeOrFill, op
 
 
 /**
- * Getter for icon hatch fill settings.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill} Current hatch fill.
- *//**
- * Setter for icon hatch fill settings.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {!anychart.core.ui.LegendItem} {@link anychart.core.ui.LegendItem} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for iconHatchFill.
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|
  * string)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.

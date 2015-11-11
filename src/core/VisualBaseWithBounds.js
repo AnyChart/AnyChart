@@ -48,27 +48,7 @@ anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Getter for the element bounds settings.
- * @return {!anychart.core.utils.Bounds} Current bounds of the element.
- *//**
- * Sets bounds of the element using one parameter.<br/>
- * @example <t>lineChart</t>
- * chart.line([1, 1.8, 1.2, 2.8]);
- * chart.bounds( anychart.math.rect(10, 10, 350, 250) );
- * @param {(anychart.utils.RectObj|anychart.math.Rect|anychart.core.utils.Bounds)=} opt_value Bounds of element.
- * @return {!anychart.core.VisualBase} An instance of {@link anychart.core.VisualBase} class for method chaining.
- *//**
- * Setter for the element bounds settings.
- * @example <t>lineChart</t>
- * chart.spline([1, 1.8, 1.2, 2.8]);
- * chart.bounds(0, 50, '50%', '250px');
- * @param {(number|string)=} opt_x X-coordinate.
- * @param {(number|string)=} opt_y Y-coordinate.
- * @param {(number|string)=} opt_width Width.
- * @param {(number|string)=} opt_height Height.
- * @return {!anychart.core.VisualBase} An instance of {@link anychart.core.VisualBase} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for bounds.
  * @param {(number|string|null|Array.<number|string>|anychart.utils.RectObj|anychart.math.Rect|anychart.core.utils.Bounds)=} opt_boundsOrX .
  * @param {(number|string|null)=} opt_y .
  * @param {(number|string|null)=} opt_width .
@@ -90,17 +70,7 @@ anychart.core.VisualBaseWithBounds.prototype.bounds = function(opt_boundsOrX, op
 
 
 /**
- * Getter for element left bound settings.
- * @return {number|string|undefined} Current element's left bound settings.
- *//**
- * Sets element left.
- * @example <t>lineChart</t>
- * chart.spline([1, 1.8, 1.2, 2.8]);
- * chart.left('20%');
- * @param {(number|string|null)=} opt_value Left bound settings for the element.
- * @return {!anychart.core.VisualBaseWithBounds} Returns self for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for left.
  * @param {(number|string|null)=} opt_value .
  * @return {(!anychart.core.VisualBase|number|string|null)} .
  */
@@ -114,17 +84,7 @@ anychart.core.VisualBaseWithBounds.prototype.left = function(opt_value) {
 
 
 /**
- * Getter for element right bound settings.
- * @return {number|string|undefined} Current element's right bound settings.
- *//**
- * Sets element right.
- * @example <t>lineChart</t>
- * chart.spline([1, 1.8, 1.2, 2.8]);
- * chart.right('20%');
- * @param {(number|string|null)=} opt_value Right bound settings for the element.
- * @return {!anychart.core.VisualBaseWithBounds} Returns self for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for right.
  * @param {(number|string|null)=} opt_value .
  * @return {(!anychart.core.VisualBase|number|string|null)} .
  */
@@ -138,17 +98,7 @@ anychart.core.VisualBaseWithBounds.prototype.right = function(opt_value) {
 
 
 /**
- * Getter for element top bound settings.
- * @return {number|string|undefined} Current element's top bound settings.
- *//**
- * Sets element top.
- * @example <t>lineChart</t>
- * chart.spline([1, 1.8, 1.2, 2.8]);
- * chart.top('20%');
- * @param {(number|string|null)=} opt_value Top bound settings for the element.
- * @return {!anychart.core.VisualBaseWithBounds} Returns self for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for top.
  * @param {(number|string|null)=} opt_value .
  * @return {(!anychart.core.VisualBase|number|string|null)} .
  */
@@ -162,17 +112,7 @@ anychart.core.VisualBaseWithBounds.prototype.top = function(opt_value) {
 
 
 /**
- * Getter for element bottom bound settings.
- * @return {number|string|undefined} Current element's bottom bound settings.
- *//**
- * Sets element bottom.
- * @example <t>lineChart</t>
- * chart.spline([1, 1.8, 1.2, 2.8]);
- * chart.bottom('20%');
- * @param {(number|string|null)=} opt_value Bottom bound settings for the element.
- * @return {!anychart.core.VisualBaseWithBounds} Returns self for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for bottom.
  * @param {(number|string|null)=} opt_value .
  * @return {(!anychart.core.VisualBase|number|string|null)} .
  */
@@ -186,17 +126,7 @@ anychart.core.VisualBaseWithBounds.prototype.bottom = function(opt_value) {
 
 
 /**
- * Getter for element width settings.
- * @return {number|string|undefined} Current element's width settings.
- *//**
- * Sets element width.
- * @example <t>lineChart</t>
- * chart.spline([1, 1.8, 1.2, 2.8]);
- * chart.width('80%');
- * @param {(number|string|null)=} opt_value Width settings for the element.
- * @return {!anychart.core.VisualBaseWithBounds} Returns self for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for width.
  * @param {(number|string|null)=} opt_value .
  * @return {(!anychart.core.VisualBase|number|string|null)} .
  */
@@ -210,17 +140,7 @@ anychart.core.VisualBaseWithBounds.prototype.width = function(opt_value) {
 
 
 /**
- * Getter for element height settings.
- * @return {number|string|undefined} Current element's height settings.
- *//**
- * Sets element height.
- * @example <t>lineChart</t>
- * chart.spline([1, 1.8, 1.2, 2.8]);
- * chart.height('80%');
- * @param {(number|string|null)=} opt_value Height settings for the element.
- * @return {!anychart.core.VisualBaseWithBounds} Returns self for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for height.
  * @param {(number|string|null)=} opt_value .
  * @return {(!anychart.core.VisualBase|number|string|null)} .
  */

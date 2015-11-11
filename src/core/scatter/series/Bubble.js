@@ -161,26 +161,7 @@ anychart.core.scatter.series.Bubble.prototype.hoverNegativeStroke_ = (function()
 
 
 /**
- * Getter for current minimum bubble size.
- * @deprecated Use chart.minBubbleSize() instead.
- * @return {(string|number)} Minimum size of the bubble.
- *//**
- * Setter for minimum bubble size.
- * @deprecated Use chart.minBubbleSize() instead.
- * @example
- * chart = anychart.scatter();
- * chart.bubble([
- *      [4, 2, 1],
- *      [1, 2, 3],
- *      [2, 2, 2],
- *      [3, 2, 1],
- *      ])
- *    .minimumSize(20);
- * chart.container(stage).draw();
- * @param {(string|number)=} opt_value ['10%'] Minimum size of the bubble.
- * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for minimumSize.
  * @deprecated Use chart.minBubbleSize() instead.
  * @param {(string|number)=} opt_value Minimum size of the bubble.
  * @return {(string|number|anychart.core.scatter.series.Bubble)} Minimum size of the bubble or self for method chaining.
@@ -195,26 +176,7 @@ anychart.core.scatter.series.Bubble.prototype.minimumSize = function(opt_value) 
 
 
 /**
- * Getter for current maximum bubble size.
- * @deprecated Use chart.maxBubbleSize() instead.
- * @return {(string|number)} Maximum size of the bubble.
- *//**
- * Setter for maximum bubble size.
- * @deprecated Use chart.maxBubbleSize() instead.
- * @example
- * chart = anychart.scatter();
- * chart.bubble([
- *      [4, 2, 1],
- *      [1, 2, 3],
- *      [2, 2, 2],
- *      [3, 2, 1],
- *      ])
- *    .maximumSize(80);
- * chart.container(stage).draw();
- * @param {(string|number)=} opt_value ['95%'] Maximum size of the bubble.
- * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for maximumSize.
  * @deprecated Use chart.maxBubbleSize() instead.
  * @param {(string|number)=} opt_value maximum size of the bubble.
  * @return {(string|number|anychart.core.scatter.series.Bubble)} maximum size of the bubble or self for method chaining.
@@ -229,27 +191,7 @@ anychart.core.scatter.series.Bubble.prototype.maximumSize = function(opt_value) 
 
 
 /**
- * Getter for current negative value option.
- * @return {boolean} Display negaitve setting .
- *//**
- * Setter for negative value option.<br/>
- * <b>Note:</b> Negative values are sized basing on absolute value, but shown in a different color.
- * See {@link anychart.core.scatter.series.Bubble#negativeFill}, {@link anychart.core.scatter.series.Bubble#negativeStroke},
- *   {@link anychart.core.scatter.series.Bubble#negativeHatchFill}
- * @example
- * chart = anychart.scatter();
- * chart.bubble([
- *      [4, 2, -1],
- *      [1, 2, 3],
- *      [2, 2, 2],
- *      [3, 2, 1],
- *      ])
- *     .displayNegative(true)
- * chart.container(stage).draw();
- * @param {boolean=} opt_value Whether to display negative value.
- * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for displayNegative.
  * @param {boolean=} opt_value Whether to display negative value.
  * @return {(boolean|anychart.core.scatter.series.Bubble)} Display negaitve setting or self for method chaining.
  */
@@ -542,58 +484,7 @@ anychart.core.scatter.series.Bubble.prototype.applyHatchFill = function(pointSta
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for current stroke settings.
- * @return {acgraph.vector.Stroke|Function} Current stroke settings.
- *//**
- * Setter for series stroke by function.<br/>
- * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
- * @example
- * chart = anychart.scatter();
- * chart.bubble([
- *   [1, 1.0, 2],
- *   [2, 1.6, -7],
- *   [3, 1.2, -4],
- *   [4, 1.9, 3]
- * ])
- *  .displayNegative(true)
- *  .negativeStroke(
- *      function(){
- *        return '3 '+ this.sourceColor;
- *      }
- *   );
- * chart.container(stage).draw();
- * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
- *  return anychart.color.darken(this.sourceColor);
- * }] Function that looks like <code>function(){
- *    // this.sourceColor -  color returned by fill() getter.
- *    return fillValue; // type acgraph.vector.Fill
- * }</code>.
- * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
- *//**
- * Setter for stroke settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
- * @example
- * chart = anychart.scatter();
- * chart.bubble([
- *      [4, 2, 1],
- *      [1, 2, -3],
- *      [2, 2, 2],
- *      [3, 2, 1],
- *      ])
- *  .displayNegative(true)
- *  .negativeStroke('orange', 3, '5 2', 'round')
- * chart.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for negativeStroke.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -619,58 +510,7 @@ anychart.core.scatter.series.Bubble.prototype.negativeStroke = function(opt_stro
 
 
 /**
- * Getter for current stroke settings.
- * @return {acgraph.vector.Stroke|Function} Current stroke settings.
- *//**
- * Setter for series stroke by function.<br/>
- * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
- * @example
- * chart = anychart.scatter();
- * chart.bubble([
- *      [4, 2, 1],
- *      [1, 2, -3],
- *      [2, 2, 2],
- *      [3, 2, 1],
- *      ])
- *  .displayNegative(true)
- *  .hoverNegativeStroke(
- *      function(){
- *        return '3 '+ this.sourceColor;
- *      }
- *   );
- * chart.container(stage).draw();
- * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
- *  return anychart.color.darken(this.sourceColor);
- * }] Function that looks like <code>function(){
- *    // this.sourceColor -  color returned by fill() getter.
- *    return fillValue; // type acgraph.vector.Fill
- * }</code>.
- * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
- *//**
- * Setter for stroke settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
- * @example
- * chart = anychart.scatter();
- * chart.bubble([
- *      [4, 2, 1],
- *      [1, 2, -3],
- *      [2, 2, 2],
- *      [3, 2, 1],
- *      ])
- *  .displayNegative(true)
- *  .hoverNegativeStroke('orange', 3, '5 2', 'round');
- * chart.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hoverNegativeStroke.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -744,114 +584,7 @@ anychart.core.scatter.series.Bubble.prototype.getFinalNegativeStroke = function(
 
 
 /**
- * Getter for current series negative fill color.
- * @return {!acgraph.vector.Fill} Current fill color.
- *//**
- * Sets fill settings using an object or a string.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}<br/>
- * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
- * @example
- * chart = anychart.scatter();
- * chart.bubble([
- *      [4, 2, 1],
- *      [1, 2, -3],
- *      [2, 2, 2],
- *      [3, 2, 1],
- *      ])
- *  .displayNegative(true)
- *  .negativeFill(['red', 'orange']);
- * chart.container(stage).draw();
- * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
- * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
- *//**
- * Fill color with opacity.<br/>
- * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
- * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.<br/>
- * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
- * @shortDescription Fill as a string or an object.
- * @example
- * chart = anychart.scatter();
- * chart.bubble([
- *      [4, 2, 1],
- *      [1, 2, -3],
- *      [2, 2, 2],
- *      [3, 2, 1],
- *      ])
- *  .displayNegative(true)
- *  .negativeFill('green', 0.3);
- * chart.container(stage).draw();
- * @param {string} color Color as a string.
- * @param {number=} opt_opacity Color opacity.
- * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
- *//**
- * Linear gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}<br/>
- * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
- * @example
- * chart = anychart.scatter();
- * chart.bubble([
- *      [4, 2, 1],
- *      [1, 2, -3],
- *      [2, 2, 2],
- *      [3, 2, 1],
- *      ])
- *  .displayNegative(true)
- *  .negativeFill(['black', 'yellow'], 45, true, 0.5);
- * chart.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
- * @param {number=} opt_angle Gradient angle.
- * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
- * @param {number=} opt_opacity Gradient opacity.
- * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
- *//**
- * Radial gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}<br/>
- * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
- * @example
- * chart = anychart.scatter();
- * chart.bubble([
- *      [4, 2, 1],
- *      [1, 2, -3],
- *      [2, 2, 2],
- *      [3, 2, 1],
- *      ])
- *  .displayNegative(true)
- *  .negativeFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81);
- * chart.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
- * @param {number} cx X ratio of center radial gradient.
- * @param {number} cy Y ratio of center radial gradient.
- * @param {anychart.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
- * @param {number=} opt_opacity Opacity of the gradient.
- * @param {number=} opt_fx X ratio of focal point.
- * @param {number=} opt_fy Y ratio of focal point.
- * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
- *//**
- * Image fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}<br/>
- * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
- * @example
- * chart = anychart.scatter();
- * chart.bubble([
- *      [4, 2, 1],
- *      [1, 2, -3],
- *      [2, 2, 2],
- *      [3, 2, 1],
- *      ])
- *  .displayNegative(true)
- *  .negativeFill({
- *    src: 'http://static.anychart.com/underwater.jpg',
- *    mode: acgraph.vector.ImageFillMode.STRETCH
- *   });
- * chart.container(stage).draw();
- * @param {!acgraph.vector.Fill} imageSettings Object with settings.
- * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for negativeFill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -878,114 +611,7 @@ anychart.core.scatter.series.Bubble.prototype.negativeFill = function(opt_fillOr
 
 
 /**
- * Getter for current series negative hover fill color.
- * @return {!acgraph.vector.Fill} Current fill color.
- *//**
- * Sets fill settings using an object or a string.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}<br/>
- * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
- * @example
- * chart = anychart.scatter();
- * chart.bubble([
- *      [4, 2, 1],
- *      [1, 2, -3],
- *      [2, 2, 2],
- *      [3, 2, 1],
- *      ])
- *  .displayNegative(true)
- *  .hoverNegativeFill(['red', 'orange']);
- * chart.container(stage).draw();
- * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
- * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
- *//**
- * Fill color with opacity.<br/>
- * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
- * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.<br/>
- * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
- * @shortDescription Fill as a string or an object.
- * @example
- * chart = anychart.scatter();
- * chart.bubble([
- *      [4, 2, 1],
- *      [1, 2, -3],
- *      [2, 2, 2],
- *      [3, 2, 1],
- *      ])
- *  .displayNegative(true)
- *  .hoverNegativeFill('green', 0.3);
- * chart.container(stage).draw();
- * @param {string} color Color as a string.
- * @param {number=} opt_opacity Color opacity.
- * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
- *//**
- * Linear gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}<br/>
- * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
- * @example
- * chart = anychart.scatter();
- * chart.bubble([
- *      [4, 2, 1],
- *      [1, 2, -3],
- *      [2, 2, 2],
- *      [3, 2, 1],
- *      ])
- *  .displayNegative(true)
- *  .hoverNegativeFill(['black', 'yellow'], 45, true, 0.5);
- * chart.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
- * @param {number=} opt_angle Gradient angle.
- * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
- * @param {number=} opt_opacity Gradient opacity.
- * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
- *//**
- * Radial gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}<br/>
- * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
- * @example
- * chart = anychart.scatter();
- * chart.bubble([
- *   [1, 1.0, 2],
- *   [2, 1.6, -7],
- *   [3, 1.2, -4],
- *   [4, 1.9, 3]
- * ])
- *  .displayNegative(true)
- *  .hoverNegativeFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81);
- * chart.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
- * @param {number} cx X ratio of center radial gradient.
- * @param {number} cy Y ratio of center radial gradient.
- * @param {anychart.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
- * @param {number=} opt_opacity Opacity of the gradient.
- * @param {number=} opt_fx X ratio of focal point.
- * @param {number=} opt_fy Y ratio of focal point.
- * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
- *//**
- * Image fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}<br/>
- * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
- * @example
- * chart = anychart.scatter();
- * chart.bubble([
- *      [4, 2, 1],
- *      [1, 2, -3],
- *      [2, 2, 2],
- *      [3, 2, 1],
- *      ])
- *  .displayNegative(true)
- *  .hoverNegativeFill({
- *    src: 'http://static.anychart.com/underwater.jpg',
- *    mode: acgraph.vector.ImageFillMode.STRETCH
- *   });
- * chart.container(stage).draw();
- * @param {!acgraph.vector.Fill} imageSettings Object with settings.
- * @return {!anychart.core.scatter.series.Bubble} {@link anychart.core.scatter.series.Bubble} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hoverNegativeFill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -1061,32 +687,7 @@ anychart.core.scatter.series.Bubble.prototype.getFinalNegativeFill = function(po
 
 
 /**
- * Getter for current hatch fill settings.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
- *//**
- * Setter for hatch fill settings.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}<br/>
- * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
- * @example
- * chart = anychart.scatter();
- * chart.bubble([
- *      [4, 2, 1],
- *      [1, 2, -3],
- *      [2, 2, 2],
- *      [3, 2, 1],
- *      ])
- *  .displayNegative(true)
- *  .negativeHatchFill('diamiond', 'grey', 5, 5);
- * chart.container(stage).draw();
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {!anychart.core.scatter.series.Base} {@link anychart.core.scatter.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for negativeHatchFill.
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
@@ -1111,32 +712,7 @@ anychart.core.scatter.series.Bubble.prototype.negativeHatchFill = function(opt_p
 
 
 /**
- * Getter for current hatch fill settings.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
- *//**
- * Setter for hatch fill settings.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}<br/>
- * <b>Note:</b> Works only with {@link anychart.core.scatter.series.Bubble#displayNegative}.
- * @example
- * chart = anychart.scatter();
- * chart.bubble([
- *      [4, 2, 1],
- *      [1, 2, -3],
- *      [2, 2, 2],
- *      [3, 2, 1],
- *      ])
- *  .displayNegative(true)
- *  .hoverNegativeHatchFill('diamiond', 'grey', 5, 5);
- * chart.container(stage).draw();
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {!anychart.core.scatter.series.Base} {@link anychart.core.scatter.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hoverNegativeHatchFill.
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.

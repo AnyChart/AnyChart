@@ -245,18 +245,7 @@ anychart.core.axes.Linear.prototype.minorLabelsBounds_ = null;
 
 
 /**
- * Getter for the axis title.
- * @return {!anychart.core.ui.Title} Axis title.
- *//**
- * Setter for the axis title.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.xAxis().title('New title for my axis');
- * chart.yAxis().title(null);
- * @param {(null|boolean|Object|string)=} opt_value Value to set.
- * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for title.
  * @param {(null|boolean|Object|string)=} opt_value Axis title.
  * @return {!(anychart.core.ui.Title|anychart.core.axes.Linear)} Axis title or itself for method chaining.
  */
@@ -296,20 +285,7 @@ anychart.core.axes.Linear.prototype.titleInvalidated_ = function(event) {
 
 
 /**
- * Getter for axis labels.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.xAxis().labels().fontSize(14).rotation(-90);
- * @return {!anychart.core.ui.LabelsFactory} Axis labels of itself for method chaining.
- *//**
- * Setter for axis labels.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.xAxis().labels(false);
- * @param {(Object|boolean|null)=} opt_value Value to set.
- * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for labels.
  * @param {(Object|boolean|null)=} opt_value Axis labels.
  * @return {!(anychart.core.ui.LabelsFactory|anychart.core.axes.Linear)} Axis labels of itself for method chaining.
  */
@@ -353,20 +329,7 @@ anychart.core.axes.Linear.prototype.labelsInvalidated_ = function(event) {
 
 
 /**
- * Getter for axis minor labels.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.xAxis().minorLabels().fontSize(14).rotation(-90);
- * @return {!anychart.core.ui.LabelsFactory} Axis labels.
- *//**
- * Setter for axis minor labels.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.xAxis().minorLabels(null);
- * @param {(Object|boolean|null)=} opt_value Value to set.
- * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for minorLabels.
  * @param {(Object|boolean|null)=} opt_value Axis labels.
  * @return {!(anychart.core.ui.LabelsFactory|anychart.core.axes.Linear)} Axis labels of itself for method chaining.
  */
@@ -430,20 +393,7 @@ anychart.core.axes.Linear.prototype.getLine = function() {
 
 
 /**
- * Getter for axis ticks.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.yAxis().ticks().stroke('5 blue').length(5);
- * @return {!anychart.core.axes.Ticks} Axis ticks.
- *//**
- * Setter for axis ticks.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.xAxis().ticks(false);
- * @param {(Object|boolean|null)=} opt_value Value to set.
- * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for ticks.
  * @param {(Object|boolean|null)=} opt_value Axis ticks.
  * @return {!(anychart.core.axes.Ticks|anychart.core.axes.Linear)} Axis ticks or itself for method chaining.
  */
@@ -464,20 +414,7 @@ anychart.core.axes.Linear.prototype.ticks = function(opt_value) {
 
 
 /**
- * Getter for minor axis ticks.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.yAxis().minorTicks().enabled(true).stroke('5 blue').length(5);
- * @return {!anychart.core.axes.Ticks} Axis ticks.
- *//**
- * Setter for minor axis ticks.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.yAxis().minorTicks(false);
- * @param {(Object|boolean|null)=} opt_value Value to set.
- * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for minorTicks.
  * @param {(Object|boolean|null)=} opt_value Axis ticks.
  * @return {!(anychart.core.axes.Ticks|anychart.core.axes.Linear)} Axis ticks or itself for method chaining.
  */
@@ -517,40 +454,7 @@ anychart.core.axes.Linear.prototype.ticksInvalidated = function(event) {
 
 
 /**
- * Getter for axis line stroke settings.
- * @return {!acgraph.vector.Stroke} Axis line stroke settings.
- *//**
- * Setter for series stroke by function.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.yAxis().stroke(
- *      function(){
- *        return '3 '+ this.sourceColor;
- *      }
- * );
- * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
- *  return anychart.color.darken(this.sourceColor);
- * }] Function that looks like <code>function(){
- *    // this.sourceColor -  color returned by fill() getter.
- *    return fillValue; // type acgraph.vector.Fill
- * }</code>.
- * @return {!anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Base} instance for method chaining.
- *//**
- * Setter for stroke settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.yAxis().stroke('orange', 3, '5 2', 'round');
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for stroke.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -579,17 +483,7 @@ anychart.core.axes.Linear.prototype.stroke = function(opt_strokeOrFill, opt_thic
 
 
 /**
- * Getter for axis orientation.
- * @return {anychart.enums.Orientation} Axis orientation.
- *//**
- * Setter for axis orientation.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.6, 1.4, 1.9]);
- * chart.yAxis().orientation('right');
- * @param {(string|anychart.enums.Orientation|null)=} opt_value ['top'] Value to set.
- * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for orientation.
  * @param {(string|anychart.enums.Orientation|null)=} opt_value Axis orientation.
  * @return {anychart.enums.Orientation|!anychart.core.axes.Linear} Axis orientation or itself for method chaining.
  */
@@ -621,14 +515,7 @@ anychart.core.axes.Linear.prototype.setDefaultOrientation = function(value) {
 
 
 /**
- * Getter for axis scale.
- * @return {anychart.scales.Base} Axis scale.
- *//**
- * Setter for axis scale.
- * @param {anychart.scales.Base=} opt_value Value to set.
- * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for scale.
  * @param {anychart.scales.Base=} opt_value Scale.
  * @return {anychart.scales.Base|!anychart.core.axes.Linear} Axis scale or itself for method chaining.
  */
@@ -1493,17 +1380,7 @@ anychart.core.axes.Linear.prototype.getLabelBounds_ = function(index, isMajor, t
 
 
 /**
- * Getter for the first label drawing flag.
- * @return {boolean} Drawing flag.
- *//**
- * Setter for the first label drawing flag.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.4, 1.6, 1.9]);
- * chart.yAxis().drawFirstLabel(false);
- * @param {boolean=} opt_value [true] Value to set.
- * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for drawFirstLabel.
  * @param {boolean=} opt_value Drawing flag.
  * @return {boolean|!anychart.core.axes.Linear} Drawing flag or itself for method chaining.
  */
@@ -1521,17 +1398,7 @@ anychart.core.axes.Linear.prototype.drawFirstLabel = function(opt_value) {
 
 
 /**
- * Getter for the last label drawing flag.
- * @return {boolean} Drawing flag.
- *//**
- * Setter for the last label drawing flag.
- * @example <t>lineChart</t>
- * chart.spline([1.1, 1.4, 1.6, 1.9]);
- * chart.yAxis().drawFirstLabel(false);
- * @param {boolean=} opt_value [true] Value to set.
- * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for drawLastLabel.
  * @param {boolean=} opt_value Drawing flag.
  * @return {boolean|!anychart.core.axes.Linear} Drawing flag or itself for method chaining.
  */
@@ -1549,27 +1416,7 @@ anychart.core.axes.Linear.prototype.drawLastLabel = function(opt_value) {
 
 
 /**
- * Getter for overlap mode for labels.
- * @return {anychart.enums.LabelsOverlapMode} OverlapMode flag.
- *//**
- * Setter for overlap mode for labels.
- * @example <t>lineChart</t>
- * var data = [
- *     ['2002 January', 1],
- *     ['2002 Febrary', 2],
- *     ['2002 March', 4],
- *     ['2002 April', 3],
- *     ['2002 May', 2],
- *     ['2002 June', 4],
- *     ['2002 Jule', 5],
- *     ['2002 August', 1]
- * ];
- * chart.xAxis().staggerMode(false).overlapMode(true);
- * chart.line(data);
- * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value [anychart.enums.LabelsOverlapMode.NO_OVERLAP] Value to set.
- * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for overlapMode.
  * @param {(anychart.enums.LabelsOverlapMode|string)=} opt_value Value to set.
  * @return {anychart.enums.LabelsOverlapMode|!anychart.core.axes.Linear} Drawing flag or itself for method chaining.
  */
@@ -1587,27 +1434,7 @@ anychart.core.axes.Linear.prototype.overlapMode = function(opt_value) {
 
 
 /**
- * Getter for stagger mode state.
- * @return {boolean} Current stagger mode state.
- *//**
- * Setter for stagger mode state.
- * @example <t>lineChart</t>
- * var data = [
- *     ['January', 1],
- *     ['Febrary', 2],
- *     ['March', 4],
- *     ['April', 3],
- *     ['May', 2],
- *     ['June', 4],
- *     ['Jule', 5],
- *     ['August', 1]
- * ];
- * chart.xAxis().staggerMode(true);
- * chart.line(data);
- * @param {boolean=} opt_value [true] On/off stagger mode.
- * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for staggerMode.
  * @param {boolean=} opt_value On/off.
  * @return {boolean|!anychart.core.axes.Linear} .
  */
@@ -1624,28 +1451,7 @@ anychart.core.axes.Linear.prototype.staggerMode = function(opt_value) {
 
 
 /**
- * Getter for stagger lines.
- * @return {?number} Current stagger line settings.
- *//**
- * Setter for stagger lines.<br/>
- * <b>Note:</b> pass <b>null</b> to enable autocalculation.
- * @example <t>lineChart</t>
- * var data = [
- *     ['January', 1],
- *     ['Febrary', 2],
- *     ['March', 4],
- *     ['April', 3],
- *     ['May', 2],
- *     ['June', 4],
- *     ['Jule', 5],
- *     ['August', 1]
- * ];
- * chart.xAxis().staggerLines(4);
- * chart.line(data);
- * @param {?number=} opt_value [null] Count of stager lines.
- * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for staggerLines.
  * @param {(number|null)=} opt_value Fixed/auto.
  * @return {null|number|!anychart.core.axes.Linear} .
  */
@@ -1665,45 +1471,7 @@ anychart.core.axes.Linear.prototype.staggerLines = function(opt_value) {
 
 
 /**
- * Getter for maximum stagger lines.
- * @return {?number} Current stagger line settings.
- *//**
- * Setter for maximum stagger lines in autocalculation mode (if {@link anychart.core.axes.Linear#staggerLines} passed null).<br/>
- * @example
- * var leftChart = anychart.cartesian();
- * var data = [
- *     ['January', 1],
- *     ['Febrary', 2],
- *     ['March', 4],
- *     ['April', 3],
- *     ['May', 2],
- *     ['June', 4],
- *     ['Jule', 5],
- *     ['August', 1]
- * ];
- * leftChart.xAxis().staggerLines(4);
- * leftChart.line(data);
- * leftChart.bounds(anychart.math.rect(0,0,'49%','100%'));
- * leftChart.container(stage).draw();
- * var rightChart = anychart.cartesian();
- * var data = [
- *     ['January', 1],
- *     ['Febrary', 2],
- *     ['March', 4],
- *     ['April', 3],
- *     ['May', 2],
- *     ['June', 4],
- *     ['Jule', 5],
- *     ['August', 1]
- * ];
- * rightChart.xAxis().staggerMaxLines(2);
- * rightChart.line(data);
- * rightChart.bounds(anychart.math.rect('51%',0,'50%','100%'));
- * rightChart.container(stage).draw();
- * @param {(number|null)=} opt_value [2] Limits the number of lines to be used when drawing labels. If we need less – we use less, but never – more.
- * @return {!anychart.core.axes.Linear} {@link anychart.core.axes.Linear} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for staggerMaxLines.
  * @param {(number|null)=} opt_value .
  * @return {null|number|!anychart.core.axes.Linear} .
  */

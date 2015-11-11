@@ -148,20 +148,7 @@ anychart.core.ui.LabelBase.prototype.SUPPORTED_CONSISTENCY_STATES =
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Gets text content for a current label.
- * @return {string} Current text content of a label.
- *//**
- * Sets text content for a label.
- * @example <t>simple-h100</t>
- * anychart.ui.label()
- *      .text('My custom label Text')
- *      .container(stage)
- *      .background(null)
- *      .draw();
- * @param {string=} opt_value ['Label text'] Value to set.
- * @return {!anychart.core.ui.LabelBase} {@link anychart.core.ui.LabelBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for text.
  * @param {string=} opt_value .
  * @return {!anychart.core.ui.LabelBase|string} .
  */
@@ -177,26 +164,7 @@ anychart.core.ui.LabelBase.prototype.text = function(opt_value) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for the Label background settings.<br/>
- * <b>Note:</b> By default background is disabled. Set <b>enabled(true)</b> to start working with it.
- * @return {!anychart.core.ui.Background} Returns the background settings.
- *//**
- * Setter for Label background settings.
- * @example <t>simple-h100</t>
- * var label = anychart.ui.label()
- *      .text('Label backgruond sample')
- *      .fontSize(12)
- *      .padding(10);
- * label.background()
- *          .fill(['rgb(255,250,250)', 'rgb(205,250,250)', 'rgb(255,250,250)'])
- *          .stroke('1 lightgrey')
- *          .cornerType('round')
- *          .corners(10);
- * label.container(stage).draw();
- * @param {(string|Object|null|boolean)=} opt_value Value to set.
- * @return {!anychart.core.ui.LabelBase} {@link anychart.core.ui.LabelBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for background.
  * @param {(string|Object|null|boolean)=} opt_value Background object to set.
  * @return {!(anychart.core.ui.LabelBase|anychart.core.ui.Background)} Returns the background or itself for method chaining.
  */
@@ -229,29 +197,7 @@ anychart.core.ui.LabelBase.prototype.backgroundInvalidated_ = function(event) {
 
 
 /**
- * Getter for current label padding.<br/>
- * See how paddings work at {@link anychart.core.Chart#padding}.
- * @return {!anychart.core.utils.Padding} Current label padding.
- *//**
- * Setter for label padding in pixels by one value.<br/>
- * @param {(Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_value [null] Value to set.
- * @return {!anychart.core.ui.LabelBase} {@link anychart.core.ui.LabelBase} instance for method chaining.
- *//**
- * Setter for label padding in pixels.<br/>
- * @example <t>listingOnly</t>
- * // 1) top and bottom 10px, left and right 15px
- * label.padding(10, '15px');
- * // 2) top 10px, left and right 15px, bottom 5px
- * label.padding(10, '15px', 5);
- * // 3) top 10px, right 15px, bottom 5px, left 12px
- * label.padding(10, '15px', '5px', 12);
- * @param {(string|number)=} opt_value1 Top or top-bottom space.
- * @param {(string|number)=} opt_value2 Right or right-left space.
- * @param {(string|number)=} opt_value3 Bottom space.
- * @param {(string|number)=} opt_value4 Left space.
- * @return {!anychart.core.ui.LabelBase} {@link anychart.core.ui.LabelBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for padding.
  * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
  * @param {(string|number)=} opt_rightOrRightAndLeft .
  * @param {(string|number)=} opt_bottom .
@@ -291,21 +237,7 @@ anychart.core.ui.LabelBase.prototype.boundsInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for label width.
- * @return {number|string|null} Current label width.
- *//**
- * Setter for label width.<br/>
- * <b>Note:</b> if <b>null</b> is passed, width is calculated automatically.
- * @example <t>simple-h100</t>
- * label = anychart.ui.label()
- *      .width(200);
- * // mark the area occupied by the label with a blue frame
- * label.background().enabled(true).fill('none').stroke('1 #00F');
- * label.container(stage).draw();
- * @param {(number|string|null)=} opt_value [null] Value to set.
- * @return {!anychart.core.ui.LabelBase} {@link anychart.core.ui.LabelBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for width.
  * @param {(number|string|null)=} opt_value .
  * @return {!anychart.core.ui.LabelBase|number|string|null} .
  */
@@ -323,21 +255,7 @@ anychart.core.ui.LabelBase.prototype.width = function(opt_value) {
 
 
 /**
- * Getter for label height.
- * @return {number|string|null} Current label width.
- *//**
- * Setter for label height.<br/>
- * <b>Note:</b> if <b>null</b> is passed, height is calculated automatically.
- * @example <t>simple-h100</t>
- * label = anychart.ui.label()
- *      .height(90);
- * // mark the area occupied by the label with a blue frame
- * label.background().enabled(true).fill('none').stroke('1 #00F');
- * label.container(stage).draw();
- * @param {(number|string|null)=} opt_value [null] Value to set.
- * @return {!anychart.core.ui.LabelBase} {@link anychart.core.ui.LabelBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for height.
  * @param {(number|string|null)=} opt_value .
  * @return {!anychart.core.ui.LabelBase|number|string|null} .
  */
@@ -426,93 +344,7 @@ anychart.core.ui.LabelBase.prototype.getFinalAnchor = function() {
 
 
 /**
- * Getter for current label offsetX settings.
- * @return {number|string} Label offsetX value.
- *//**
- * Setter for label offsetX settings.
- * @illustration <t>simple</t>
- * var pathBounds = {
- *   left: stage.width() / 3,
- *   top: stage.height() / 8,
- *   width: 3 * stage.height() / 7,
- *   height: 3 * stage.height() / 7
- * };
- * stage.path().fill('none').stroke('1 grey .2')
- *     .moveTo(pathBounds.left, pathBounds.top)
- *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top)
- *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height)
- *     .lineTo(pathBounds.left, pathBounds.top + pathBounds.height)
- *     .close();
- * stage.text(pathBounds.left - 55, pathBounds.top - 15, 'LEFT_TOP');
- * stage.circle(pathBounds.left, pathBounds.top, 3).fill('blue');
- * stage.triangleUp(pathBounds.left + 15, pathBounds.top + 15, 5)
- *     .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
- * stage.path().moveTo(pathBounds.left + 15, pathBounds.top + 15)
- *     .lineTo(pathBounds.left, pathBounds.top);
- * stage.text(pathBounds.left - 78, pathBounds.top + pathBounds.height / 2 - 8, 'LEFT_CENTER');
- * stage.circle(pathBounds.left, pathBounds.top + pathBounds.height / 2, 3).fill('blue');
- * stage.triangleUp(pathBounds.left + 15, pathBounds.top + pathBounds.height / 2 + 15, 5)
- *     .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
- * stage.path().moveTo(pathBounds.left + 15, pathBounds.top + pathBounds.height / 2 + 15)
- *     .lineTo(pathBounds.left, pathBounds.top + pathBounds.height / 2);
- * stage.text(pathBounds.left - 80, pathBounds.top + pathBounds.height, 'LEFT_BOTTOM');
- * stage.circle(pathBounds.left, pathBounds.top + pathBounds.height, 3).fill('blue');
- * stage.triangleUp(pathBounds.left + 15, pathBounds.top + pathBounds.height - 15, 5)
- *     .rotateByAnchor(35, acgraph.vector.Anchor.CENTER).fill('green');
- * stage.path().moveTo(pathBounds.left + 15, pathBounds.top + pathBounds.height - 15)
- *     .lineTo(pathBounds.left, pathBounds.top + pathBounds.height);
- * stage.text(pathBounds.left + pathBounds.width / 2 - 10, pathBounds.top - 18, 'TOP');
- * stage.circle(pathBounds.left + pathBounds.width / 2, pathBounds.top, 3).fill('blue');
- * stage.triangleUp(pathBounds.left + pathBounds.width / 2 + 15, pathBounds.top + 15, 5)
- *     .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
- * stage.path().moveTo(pathBounds.left + pathBounds.width / 2 + 15, pathBounds.top + 15)
- *     .lineTo(pathBounds.left + pathBounds.width / 2, pathBounds.top);
- * stage.text(pathBounds.left + pathBounds.width / 2 - 20, pathBounds.top + pathBounds.height / 2 - 15, 'CENTER');
- * stage.circle(pathBounds.left + pathBounds.width / 2, pathBounds.top + pathBounds.height / 2, 3).fill('blue');
- * stage.triangleUp(pathBounds.left + pathBounds.width / 2 + 15, pathBounds.top + pathBounds.height / 2 + 15, 5)
- *     .rotateByAnchor(25, acgraph.vector.Anchor.CENTER).fill('green');
- * stage.path().moveTo(pathBounds.left + pathBounds.width / 2 + 15, pathBounds.top + pathBounds.height / 2 + 15)
- *     .lineTo(pathBounds.left + pathBounds.width / 2, pathBounds.top + pathBounds.height / 2);
- * stage.text(pathBounds.left + pathBounds.width / 2 - 23, pathBounds.top + pathBounds.height + 2, 'BOTTOM');
- * stage.circle(pathBounds.left + pathBounds.width / 2, pathBounds.top + pathBounds.height, 3).fill('blue');
- * stage.triangleUp(pathBounds.left + pathBounds.width / 2 + 15, pathBounds.top + pathBounds.height - 15, 5)
- *     .rotateByAnchor(35, acgraph.vector.Anchor.CENTER).fill('green');
- * stage.path().moveTo(pathBounds.left + pathBounds.width / 2 + 15, pathBounds.top + pathBounds.height - 15)
- *     .lineTo(pathBounds.left + pathBounds.width / 2, pathBounds.top + pathBounds.height);
- * stage.text(pathBounds.left + pathBounds.width + 5, pathBounds.top - 15, 'RIGHT_TOP');
- * stage.circle(pathBounds.left + pathBounds.width, pathBounds.top, 3).fill('blue');
- * stage.triangleUp(pathBounds.left + pathBounds.width - 15, pathBounds.top + 15, 5)
- *     .rotateByAnchor(-25, acgraph.vector.Anchor.CENTER).fill('green');
- * stage.path().moveTo(pathBounds.left + pathBounds.width - 15, pathBounds.top + 15)
- *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top);
- * stage.text(pathBounds.left + pathBounds.width + 5, pathBounds.top + pathBounds.height / 2 - 8, 'RIGHT_CENTER');
- * stage.circle(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height / 2, 3).fill('blue');
- * stage.triangleUp(pathBounds.left + pathBounds.width - 15, pathBounds.top + pathBounds.height / 2 + 15, 5)
- *     .rotateByAnchor(-25, acgraph.vector.Anchor.CENTER).fill('green');
- * stage.path().moveTo(pathBounds.left + pathBounds.width - 15, pathBounds.top + pathBounds.height / 2 + 15)
- *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height / 2);
- * stage.text(pathBounds.left + pathBounds.width + 5, pathBounds.top + pathBounds.height, 'RIGHT_BOTTOM');
- * stage.circle(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height, 3).fill('blue');
- * stage.triangleUp(pathBounds.left + pathBounds.width - 15, pathBounds.top + pathBounds.height - 15, 5)
- *     .rotateByAnchor(85, acgraph.vector.Anchor.CENTER).fill('green');
- * stage.path().moveTo(pathBounds.left + pathBounds.width - 15, pathBounds.top + pathBounds.height - 15)
- *     .lineTo(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height);
- * @illustrationDesc
- * Arrows show offsets layout.
- * @example <t>simple-h100</t>
- * var parentBounds = stage.rect(5, 5, 100, 70).stroke('rgba(0,0,200,.4)');
- * var label = anychart.ui.label()
- *     .padding(5)
- *     .parentBounds(parentBounds.getBounds())
- *     .offsetX(10)
- *     .offsetY(5);
- * label.background().enabled(true).fill('none').stroke('1 #aaa');
- * label.container(stage).draw();
- * stage.circle(5, 5, 2).stroke('3 red');
- * @param {(number|string)=} opt_value [0] Value to set.
- * @return {!anychart.core.ui.LabelBase} {@link anychart.core.ui.LabelBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for offsetX.
  * @param {(number|string)=} opt_value .
  * @return {number|string|anychart.core.ui.LabelBase} .
  */
@@ -529,25 +361,7 @@ anychart.core.ui.LabelBase.prototype.offsetX = function(opt_value) {
 
 
 /**
- * Getter for current label offsetY settings.
- * @return {number|string} Label offsetY value.
- *//**
- * Setter for label offsetY settings.
- * See illustration in {@link anychart.core.ui.LabelBase#offsetX}.
- * @example <t>simple-h100</t>
- * var parentBounds = stage.rect(5, 5, 100, 70).stroke('rgba(0,0,200,.4)');
- * var label = anychart.ui.label()
- *     .padding(5)
- *     .parentBounds(parentBounds.getBounds())
- *     .offsetX(10)
- *     .offsetY(5);
- * label.background().enabled(true).fill('none').stroke('1 #aaa');
- * label.container(stage).draw();
- * stage.circle(5, 5, 2).stroke('3 red');
- * @param {(number|string)=} opt_value [0] Value to set.
- * @return {!anychart.core.ui.LabelBase} {@link anychart.core.ui.LabelBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for offsetY.
  * @param {(number|string)=} opt_value .
  * @return {number|string|anychart.core.ui.LabelBase} .
  */
@@ -564,26 +378,7 @@ anychart.core.ui.LabelBase.prototype.offsetY = function(opt_value) {
 
 
 /**
- * Getter for current label position settings.
- * @return {anychart.enums.Position} Current label position settings.
- *//**
- * Setter for label position settings.<br/>
- * <b>Note:</b> works only if {@link anychart.core.ui.LabelBase#container} or {@link anychart.core.ui.LabelBase#parentBounds} are explicitly set.
- * @illustration <t>simple-h100</t>
- * var rect = stage.rect(5, 5, 90, 90).stroke('1 blue');
- * var rectBounds = rect.getBounds();
- * var label = anychart.ui.label();
- * label.position(anychart.enums.Position.CENTER);
- * label.parentBounds(rectBounds);
- * label.container(stage).draw();
- * stage.circle(rectBounds.left + rectBounds.width / 2, rectBounds.top + rectBounds.height / 2, 2).stroke('3 red');
- * @illustrationDesc
- * Blue area is an area set in {@link anychart.core.ui.LabelBase#parentBounds}.<br/>
- * Red dot marks the <i>CENTER</i> of this area.
- * @param {(anychart.enums.Position|string)=} opt_value [{@link anychart.enums.Position}.LEFT_TOP] Value to set.
- * @return {!anychart.core.ui.LabelBase} {@link anychart.core.ui.LabelBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for position.
  * @param {(anychart.enums.Position|string)=} opt_value .
  * @return {!anychart.core.ui.LabelBase|anychart.enums.Position} .
  */
@@ -613,15 +408,7 @@ anychart.core.ui.LabelBase.prototype.adjustEnabled_ = function() {
 
 
 /**
- * Gets font size setting for adjust text from.
- * @return {number} Current value.
- *//**
- * Sets font size setting for adjust text from.<br/>
- * <b>Note:</b> works only when adjusting is enabled. Look {@link anychart.core.ui.LabelBase#adjustFontSize}.
- * @param {(number|string)=} opt_value Value to set.
- * @return {anychart.core.ui.LabelBase} {@link anychart.core.ui.LabelBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for minFontSize.
  * @param {(number|string)=} opt_value
  * @return {number|anychart.core.ui.LabelBase}
  */
@@ -640,15 +427,7 @@ anychart.core.ui.LabelBase.prototype.minFontSize = function(opt_value) {
 
 
 /**
- * Gets font size setting for adjust text to.
- * @return {number} Current value.
- *//**
- * Sets font size setting for adjust text to.<br/>
- * <b>Note:</b> works only when adjusting is enabled. Look {@link anychart.core.ui.LabelBase#adjustFontSize}.
- * @param {(number|string)=} opt_value Value to set.
- * @return {anychart.core.ui.LabelBase} {@link anychart.core.ui.LabelBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for maxFontSize.
  * @param {(number|string)=} opt_value
  * @return {number|anychart.core.ui.LabelBase}
  */
@@ -667,51 +446,7 @@ anychart.core.ui.LabelBase.prototype.maxFontSize = function(opt_value) {
 
 
 /**
- * Returns an array of two elements <b>[isAdjustByWidth, isAdjustByHeight]</b>.
- * <pre>
- *    [false, false] - do not adjust (adjust is off )
- *    [true, false] - adjust width
- *    [false, true] - adjust height
- *    [true, true] - adjust the first suitable value.
- * </pre>
- * @shortDescription Getter for current adjust font settings.
- * @return {Array.<boolean, boolean>} adjustFontSite setting or self for method chaining.
- *//**
- * Sets adjusting settings.<br/>
- * Minimal and maximal font sizes can be configured using:
- *  {@link anychart.core.ui.LabelBase#minFontSize} and {@link anychart.core.ui.LabelBase#maxFontSize}.<br/>
- * <b>Note:</b> Works only when {@link anychart.core.ui.LabelBase#width} and {@link anychart.core.ui.LabelBase#height} are set.<br/>
- * <b>Note: </b> {@link anychart.core.ui.LabelBase#fontSize} does not work when adjusting is enabled.
- * @shortDescription Setter for the adjust font settings.
- * @example <t>listingOnly</t>
- * label.adjustFontSize(false);
- * // the same
- * label.adjustFontSize(false, false);
- * // the same
- * label.adjustFontSize([false, false]);
- * @example <t>simple-h100</t>
- * // to the right
- * var rect;
- * rect = stage.rect(5, 5, 190, 90).fill('none').stroke('1 grey');
- * anychart.ui.label()
- *     .text('Not adjusted text')
- *     .parentBounds(rect.getBounds())
- *     .container(stage).draw();
- * // to the right
- * rect = stage.rect(205, 5, 190, 90).fill('none').stroke('1 grey');
- * anychart.ui.label()
- *     .text('Adjusted text')
- *     .adjustFontSize(true, false)
- *     .width('100%')
- *     .height('100%')
- *     .parentBounds(rect.getBounds())
- *     .container(stage).draw();
- * @param {(boolean|Array.<boolean, boolean>|{width:boolean,height:boolean})=} opt_bothOrByWidth If only one param is set,
- *   its value goes for another too (see source code).
- * @param {boolean=} opt_byHeight Is font needs to be adjusted by height.
- * @return {!anychart.core.ui.LabelBase} {@link anychart.core.ui.LabelBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for adjustFontSize.
  * @param {(boolean|Array.<boolean, boolean>|{width:boolean,height:boolean})=} opt_adjustOrAdjustByWidth Is font needs to be adjusted in case of 1 argument and adjusted by width in case of 2 arguments.
  * @param {boolean=} opt_adjustByHeight Is font needs to be adjusted by height.
  * @return {({width:boolean,height:boolean}|anychart.core.ui.LabelBase)} adjustFontSite setting or self for method chaining.

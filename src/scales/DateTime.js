@@ -46,25 +46,7 @@ anychart.scales.DateTime.prototype.getType = function() {
 
 
 /**
- * Getter for set of scale ticks in terms of data values.
- * @return {!anychart.scales.DateTimeTicks} An instance of {@link anychart.scales.DateTimeTicks} class for method chaining.
- *//**
- * Setter for set of scale ticks in terms of data values.
- * @example
- * var chart = anychart.financial();
- * chart.ohlc([
- *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
- *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
- *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
- *   [new Date('31-Aug-07'), 513.10, 516.50, 511.47, 515.25],
- *   [new Date('01-Sep-07'), 515.02, 528.00, 514.62, 525.15]
- * ]);
- * chart.xScale().ticks([1188172800000, 1188432000000, 1188604800000]);
- * chart.container(stage).draw();
- * @param {Array=} opt_value An array of ticks to set.
- * @return {!anychart.scales.DateTime} An instance of {@link anychart.scales.DateTime} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for ticks.
  * Gets or sets a set of scale ticks in terms of data values.
  * @param {(Object|Array)=} opt_value An array of ticks to set.
  * @return {!(anychart.scales.DateTime|anychart.scales.DateTimeTicks)} Ticks or itself for chaining.
@@ -84,26 +66,7 @@ anychart.scales.DateTime.prototype.ticks = function(opt_value) {
 
 
 /**
- * Getter for set of scale ticks in terms of data values.
- * @return {!anychart.scales.DateTimeTicks} An instance of {@link anychart.scales.DateTimeTicks} class for method chaining.
- *//**
- * Setter for set of scale ticks in terms of data values.
- * @example
- * var chart = anychart.financial();
- * chart.ohlc([
- *   [new Date('28-Aug-07'), 511.53, 514.98, 505.79, 506.40],
- *   [new Date('29-Aug-07'), 507.84, 513.30, 507.23, 512.88],
- *   [new Date('30-Aug-07'), 512.36, 515.40, 510.58, 511.40],
- *   [new Date('31-Aug-07'), 513.10, 516.50, 511.47, 515.25],
- *   [new Date('01-Sep-07'), 515.02, 528.00, 514.62, 525.15]
- * ]);
- * chart.xScale().ticks().interval('P3D');
- * chart.xScale().minorTicks([1188172800000, 1188432000000, 1188604800000]);
- * chart.container(stage).draw();
- * @param {(Object|Array)=} opt_value An array of ticks to set.
- * @return {!anychart.scales.DateTime} An instance of {@link anychart.scales.DateTime} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for minorTicks.
  * Gets or sets a set of scale ticks in terms of data values.
  * @param {(Object|Array)=} opt_value An array of ticks to set.
  * @return {!(anychart.scales.DateTime|anychart.scales.DateTimeTicks)} Ticks or itself for chaining.

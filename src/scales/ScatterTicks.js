@@ -88,19 +88,7 @@ anychart.scales.ScatterTicks.prototype.mode_ = anychart.enums.ScatterTicksMode.L
 
 
 /**
- * Getter for ticks interval value.<br/>
- * <b>Note:</b> you can get interval value only if it was set explicitly, otherwise its returns NaN.
- * @return {number} Current interval value.
- *//**
- * Setter for ticks interval value.
- * @example <t>lineChart</t>
- * chart.line([-2, 11, 2, 4]);
- * chart.yScale().ticks().interval(3);
- * @param {number=} opt_value Ticks interval value.<br/>
- * <b>Note:</b> If value is defined but is not a number or less than 0, it defaults to NaN and count() resets to 5.
- * @return {!anychart.scales.ScatterTicks} An instance of {@link anychart.scales.ScatterTicks} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for interval.
  * @param {number=} opt_value Ticks interval value if used as a getter.
  * @return {(number|anychart.scales.ScatterTicks)} Interval value or itself for chaining.
  */
@@ -128,28 +116,7 @@ anychart.scales.ScatterTicks.prototype.interval = function(opt_value) {
 
 
 /**
- * Getter for ticks count.
- * @return {number} Current count value.
- *//**
- * Setter for ticks count value.<br/>
- * <b>Note:</b> Final number of ticks can be greater (one more tick can be added).
- * @example <t>lineChart</t>
- * chart.line([-2, 11, 2, 4]);
- * chart.yScale().ticks().count(3);
- * @param {number=} opt_value Ticks count value.<br/>
- * <b>Note:</b> If value is defined, but not a number or less than 2, it defaults to 5.
- * @return {!anychart.scales.ScatterTicks} {@link anychart.scales.ScatterTicks} instance for method chaining.
- *//**
- * Setter for ticks count value.<br/>
- * <b>Note:</b> Final number of ticks can be greater than maximum (one more tick can be added).
- * @example <t>lineChart</t>
- * chart.line([-2, 11, 2, 4]);
- * chart.yScale().ticks().count(3, 5);
- * @param {number=} opt_minimumCount [4] Value to set.
- * @param {number=} opt_maximumCount [6] Value to set.
- * @return {!anychart.scales.ScatterTicks} {@link anychart.scales.ScatterTicks} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for count.
  * @param {number=} opt_valueOrMinValue Ticks count value if used as a setter.
  * @param {number=} opt_maxValue Ticks count value if used as a setter.
  * @return {(Array.<number>|anychart.scales.ScatterTicks)} Interval value or itself for method chaining.
@@ -174,20 +141,7 @@ anychart.scales.ScatterTicks.prototype.count = function(opt_valueOrMinValue, opt
 
 
 /**
- * Getter for ticks base value.
- * @return {number} Current base value.
- *//**
- * Setter for ticks base value.<br/>
- * <b>Note:</b> it is a number that is guaranteed to set a tick if the number is located between minimum and maximum values of the scale.
- * @example <t>lineChart</t>
- * chart.line([-2, 11, 2, 4]);
- * chart.yScale().ticks()
- *   .base(-1)
- *   .interval(5);
- * @param {number=} opt_value Base value for ticks.
- * @return {anychart.scales.ScatterTicks} An instance of {@link anychart.scales.ScatterTicks} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for base.
  * @param {number=} opt_value Base value for ticks.
  * @return {(number|anychart.scales.ScatterTicks)} Base value or itself for chaining.
  */
@@ -265,20 +219,7 @@ anychart.scales.ScatterTicks.prototype.getInternal = function() {
 
 
 /**
- * Getter for ticks mode.
- * @return {anychart.enums.ScatterTicksMode} Current ticks mode.
- *//**
- * Setter for ticks mode.<br/>
- * <b>Note:</b> Use only with logarithmic scales.
- * @example <t>lineChart</t>
- * chart.line([0.1, 11, 2, 40]);
- * chart.yScale(anychart.scales.log());
- * chart.yScale().ticks().mode('log');
- * chart.yScale().minorTicks().mode('linear');
- * @param {(anychart.enums.ScatterTicksMode|string)=} opt_value Value to set.
- * @return {anychart.scales.ScatterTicks} An instance of {@link anychart.scales.ScatterTicks} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for mode.
  * @param {(anychart.enums.ScatterTicksMode|string)=} opt_value Value to set.
  * @return {anychart.enums.ScatterTicksMode|anychart.scales.ScatterTicks} Value or itself.
  */

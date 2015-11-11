@@ -100,17 +100,7 @@ goog.inherits(anychart.scales.ScatterBase, anychart.scales.Base);
 
 
 /**
- * Getter for scale minimum.
- * @return {number} Current scale minimum.
- *//**
- * Setter for scale minimum.
- * @example <t>lineChart</t>
- * chart.line([1.1, 1.4, 1.2, 1.95]);
- * chart.yScale().minimum(1.3);
- * @param {number=} opt_value Value to set.
- * @return {!anychart.scales.ScatterBase} An instance of {@link anychart.scales.ScatterBase} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for minimum.
  * @param {number=} opt_value Value to set.
  * @return {number|anychart.scales.ScatterBase} Scale minimum.
  */
@@ -136,17 +126,7 @@ anychart.scales.ScatterBase.prototype.minimum = function(opt_value) {
 
 
 /**
- * Getter for scale maximum.
- * @return {number} Current scale maximum.
- *//**
- * Setter for scale maximum.
- * @example <t>lineChart</t>
- * chart.line([1.1, 1.4, 1.2, 1.95]);
- * chart.yScale().maximum(1.6);
- * @param {number=} opt_value Value to set.
- * @return {!anychart.scales.ScatterBase} An instance of {@link anychart.scales.ScatterBase} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for maximum.
  * @param {number=} opt_value Value to set.
  * @return {number|anychart.scales.ScatterBase} Scale maximum.
  */
@@ -216,19 +196,7 @@ anychart.scales.ScatterBase.prototype.softMaximum = function(opt_value) {
 
 
 /**
- * Getter for scale minimum gap.
- * @return {number} Current scale minimum gap.
- *//**
- * Scale minimum gap.<br/>
- * <b>Note:</b> Gap works only if scale minimum is not set explicitly using {@link anychart.scales.ScatterBase#minimum}.
- * @shortDescription Setter for scale minimum gap.
- * @example <t>lineChart</t>
- * chart.line([1.1, 1.4, 1.2, 1.95]);
- * chart.yScale().minimumGap(0.6);
- * @param {number=} opt_value Value from 0 to 1.
- * @return {!anychart.scales.ScatterBase} {@link anychart.scales.ScatterBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for minimumGap.
  * @param {number=} opt_value Value to set.
  * @return {number|anychart.scales.ScatterBase} .
  */
@@ -249,19 +217,7 @@ anychart.scales.ScatterBase.prototype.minimumGap = function(opt_value) {
 
 
 /**
- * Getter for scale maximum gap.
- * @return {number} Current scale maximum gap.
- *//**
- * Scale maximum gap.<br/>
- * <b>Note:</b> Gap works only if scale minimum is not set explicitly using {@link anychart.scales.ScatterBase#maximum}.
- * @shortDescription Setter for scale maximum gap.
- * @example <t>lineChart</t>
- * chart.line([1.1, 1.4, 1.2, 1.95]);
- * chart.yScale().maximumGap(0.6);
- * @param {number=} opt_value Value from 0 to 1.
- * @return {!anychart.scales.ScatterBase} {@link anychart.scales.ScatterBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for maximumGap.
  * @param {number=} opt_value Value to set.
  * @return {number|anychart.scales.ScatterBase} .
  */
@@ -354,19 +310,7 @@ anychart.scales.ScatterBase.prototype.needsAutoCalc = function() {
 
 /**
  * Returns tick position ratio by its name.<br/>
- * <b>Note:</b> returns correct values only after {@link anychart.scales.Base#finishAutoCalc} or <b>chart.draw()</b>.
- * @example
- * var chart = anychart.line();
- * chart.line([1.1, 1.4, 1.2, 1.9]);
- * chart.container(stage).draw();
- * // Trying to get to '1.25' tick position.
- * var position = chart.yScale().transform(1.25);
- * // Returns 0.25
- * @param {*} value Value to transform in input scope.
- * @return {number} Value transformed to scope [0, 1].
- *//**
  * Interface requires us to have opt_subRangeRatio, but it is not used.
- * @ignoreDoc
  * @param {*} value Value to transform in input scope.
  * @param {number=} opt_subRangeRatio Sub range ratio.
  * @return {number} Value transformed to scope [0, 1].

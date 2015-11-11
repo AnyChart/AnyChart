@@ -146,45 +146,7 @@ anychart.data.Set.prototype.storage_;
 
 
 /**
- * Getter for the data in the Set.
- * @return {!Array} Data array of the Set.
- *//**
- * Setter for Set data.
- * @example <t>listingOnly</t>
- * // as simple arrray
- * dataSet.data([20, 7, 10, 14]);
- * // as multiple arrays
- * dataSet.data([
- *    [1, 22, 13],
- *    [13, 22, 23],
- *    [17, 22, 33],
- *    [21, 22, 43]
- *  ]);
- * // as Objects
- * dataSet.data([
- *    {name: 'Point 1', value: 10},
- *    {name: 'Point 2', value: 7},
- *    {name: 'Point 3', value: 20},
- *    {name: 'Point 4', value: 14}
- *  ]);
- * // as CSV string
- * dataSet.data(
- *      'Point 1, 10; Point 2, 14; Point 3, 16',
- *      {rowsSeparator: ';', columnsSeparator: ','}
- * );
- * @example <t>lineChart</t>
- * var dataSet = anychart.data.set();
- * dataSet.data([
- *    {name: 'Point 1', value: 10},
- *    {name: 'Point 2', value: 7, fill: 'red 0.3'},
- *    {name: 'Point 3', value: 20},
- *    {name: 'Point 4', value: 14}
- * ]);
- * chart.line(dataSet);
- * @param {Array=} opt_value A value to set.
- * @return {!anychart.data.Set} The instance of {@link anychart.data.Set} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for data.
  * @param {(Array|string)=} opt_value .
  * @param {Object.<string, (string|boolean|undefined)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
@@ -323,54 +285,7 @@ anychart.data.Set.prototype.mapAs = function(opt_arrayMapping, opt_objectMapping
 
 
 /**
- * Gets the full row of the set by the index.<br/>
- * <b>Note:</b> If there is no row for the index - returns <b>undefined</b>.
- * @example <t>listingOnly</t>
- * // Data
- *  [
- *    [1, 2, 4, 7],
- *    {'high': 14, 'low': 3},
- *    7
- *  ]
- *  dataSet.row(0); // returns [1, 2, 4, 7]
- *  dataSet.row(1); // returns {'high': 14, 'low': 3}
- *  dataSet.row(2); // returns 7
- *  dataSet.row(3); // returns undefined
- * @param {number} rowIndex The index of the row to fetch.
- * @return {*} The current row.
- *//**
- * Sets the row in the set by the index.<br/>
- * <b>Note:</b> Replaces the current value, previous values is returned but it is lost completely after that!
- * @example <t>listingOnly</t>
- * // Data
- *  [
- *    [1, 2, 4, 7],
- *    {'high': 14, 'low': 3},
- *    7
- *  ]
- *  dataSet.row(2, [2, 2, 2, 2]); // returns 7
- *  dataSet.row(3, {'low': 4, 'high': 11}); // returns undefined
- * // Data after the changes
- *  [
- *    [1, 2, 4, 7],
- *    {'high': 14, 'low': 3},
- *    [2, 2, 2, 2],
- *    {'low': 4, 'high': 11}
- *  ]
- * @example <t>lineChart</t>
- * var dataSet = anychart.data.set([
- *     ['Point A', 231],
- *     ['Point B', 131],
- *     ['Point C', 212],
- *     ['Point D', 94]
- * ]);
- * dataSet.row(2, ['Point E', 10]);
- * chart.line(dataSet);
- * @param {number} rowIndex The index of the row to fetch.
- * @param {*=} opt_value The value to set.
- * @return {*} The previous value of the row.
- *//**
- * @ignoreDoc
+ * Getter/setter for row.
  * @param {number} rowIndex The index of the row to fetch.
  * @param {*=} opt_value If set, the method is treated as a setter.
  * @return {*} Current or previous value of the row. Can be anything, including undefined.

@@ -131,14 +131,7 @@ anychart.core.grids.Stock.prototype.layout = function(opt_value) {
 //  Scale.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for axis scale.
- * @return {anychart.scales.Base|anychart.scales.StockScatterDateTime} Axis scale.
- *//**
- * Setter for axis scale.
- * @param {(anychart.scales.Base|anychart.scales.StockScatterDateTime)=} opt_value Value to set.
- * @return {!anychart.core.grids.Stock} {@link anychart.core.grids.Stock} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for scale.
  * @param {(anychart.scales.Base|anychart.scales.StockScatterDateTime)=} opt_value Scale.
  * @return {anychart.scales.Base|anychart.scales.StockScatterDateTime|anychart.core.grids.Stock} Axis scale or itself for method chaining.
  */

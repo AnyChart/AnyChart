@@ -144,14 +144,7 @@ anychart.core.ui.Separator.prototype.invalidateParentBounds = function() {
 
 
 /**
- * Getter for separator width.
- * @return {number|string|null} Current width.
- *//**
- * Setter for separator width.
- * @param {(number|string|null)=} opt_value Value to set.
- * @return {!anychart.core.ui.Separator} An instance of the {@link anychart.core.ui.Separator} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for width.
  * @param {(number|string|null)=} opt_value .
  * @return {!anychart.core.ui.Separator|number|string|null} .
  */
@@ -169,14 +162,7 @@ anychart.core.ui.Separator.prototype.width = function(opt_value) {
 
 
 /**
- * Getter for separator height.
- * @return {number|string|null} Current height.
- *//**
- * Setter for separator height.
- * @param {(number|string|null)=} opt_value Value to set.
- * @return {!anychart.core.ui.Separator} An instance of the {@link anychart.core.ui.Separator} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for height.
  * @param {(number|string|null)=} opt_value .
  * @return {!anychart.core.ui.Separator|number|string|null} .
  */
@@ -283,14 +269,7 @@ anychart.core.ui.Separator.prototype.stroke = function(opt_strokeOrFill, opt_thi
 
 
 /**
- * Getter for function drawing separator.
- * @return {function(acgraph.vector.Path, anychart.math.Rect)} Drawer function.
- *//**
- * Setter for function drawing separator.
- * @param {function(acgraph.vector.Path, anychart.math.Rect)=} opt_value Drawer function.
- * @return {!anychart.core.ui.Separator} An instance of the {@link anychart.core.ui.Separator} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for drawer.
  * @param {function(acgraph.vector.Path, anychart.math.Rect)=} opt_value Drawer function.
  * @return {(function(acgraph.vector.Path, anychart.math.Rect)|anychart.core.ui.Separator)} Drawer function or self for method chaining.
  */

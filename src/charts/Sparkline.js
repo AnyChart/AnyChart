@@ -580,24 +580,7 @@ anychart.charts.Sparkline.prototype.iterator_;
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for default chart X scale.
- * @return {!anychart.scales.Base} Default chart scale value.
- *//**
- * Setter for default chart X scale.<br/>
- * <b>Note:</b> This scale will be passed to all scale dependent chart elements if they don't have their own scales.
- * @example
- * var chart = anychart.sparkline();
- * chart.line([
- *   {x: "10-Dec-2004", y: 20},
- *   {x: "11-Dec-2004", y: 40},
- *   {x: "12-Dec-2004", y: 30}
- * ]);
- * chart.xScale('dateTime');
- * chart.container(stage).draw();
- * @param {(anychart.enums.ScaleTypes|anychart.scales.Base)=} opt_value X Scale to set.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for xScale.
  * @param {(anychart.enums.ScaleTypes|anychart.scales.Base)=} opt_value X Scale to set.
  * @return {!(anychart.scales.Base|anychart.charts.Sparkline)} Default chart scale value or itself for method chaining.
  */
@@ -621,30 +604,7 @@ anychart.charts.Sparkline.prototype.xScale = function(opt_value) {
 
 
 /**
- * Getter for default chart Y scale.
- * @example
- * var chart = anychart.sparkline();
- * chart.line([ 10, 12, 14, 11]);
- * chart.yScale().minimum(9).maximum(13);
- * chart.xAxis().labels()
- *     .textFormatter(function(point){ return new Date(point.value).toDateString();});
- * chart.yAxis();
- * chart.container(stage).draw();
- * @return {!anychart.scales.Base} Default chart scale value.
- *//**
- * Setter for chart Y scale.<br/>
- * <b>Note:</b> This scale will be passed to all scale dependent chart elements if they don't have their own scales.
- * @example
- * var chart = anychart.sparkline();
- * chart.line([0.07, 0.9, 14, 2, 89]);
- * chart.yScale('log');
- * chart.xAxis();
- * chart.yAxis();
- * chart.container(stage).draw();
- * @param {(anychart.enums.ScaleTypes|anychart.scales.Base)=} opt_value Y Scale to set.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for yScale.
  * @param {(anychart.enums.ScaleTypes|anychart.scales.Base)=} opt_value Y Scale to set.
  * @return {!(anychart.scales.Base|anychart.charts.Sparkline)} Default chart scale value or itself for method chaining.
  */
@@ -673,36 +633,7 @@ anychart.charts.Sparkline.prototype.yScale = function(opt_value) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for chart line marker.
- * @example <t>lineChart</t>
- * chart.line([1, -4, 5, 7, 7]);
- * chart.lineMarker(0)
- *     .value(5.5)
- *     .stroke('2 red')
- *     .layout('horizontal');
- * @param {number=} opt_index Chart line marker index. If not set - creates a new instance and adds it to the end of array.
- * @return {!anychart.core.axisMarkers.Line} Line marker instance by index.
- *//**
- * Setter for chart line marker.
- * @example <t>lineChart</t>
- * chart.line([1, -4, 5, 7, 7]);
- * chart.lineMarker({value: 5.5});
- * @param {(Object|boolean|null)=} opt_value Chart line marker settings to set.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Setter for chart line marker by index.
- * @example <t>lineChart</t>
- * chart.spline([1, -4, 5, 7, 7]);
- * chart.lineMarker();
- * chart.lineMarker(1).value(2).stroke('green');
- * //turn off first marker
- * chart.lineMarker(0, null);
- * @param {number=} opt_index Chart line marker index.
- * @param {(Object|boolean|null)=} opt_value Chart line marker settings to set.<br/>
- * <b>Note:</b> pass <b>null</b> or <b>'none' to disable marker</b>.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for lineMarker.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Chart line marker settings to set.
  * @param {(Object|boolean|null)=} opt_value Chart line marker settings to set.
  * @return {!(anychart.core.axisMarkers.Line|anychart.charts.Sparkline)} Line marker instance by index or itself for method chaining.
@@ -737,40 +668,7 @@ anychart.charts.Sparkline.prototype.lineMarker = function(opt_indexOrValue, opt_
 
 
 /**
- * Getter for chart range marker.
- * @example <t>lineChart</t>
- * chart.line([1, -4, 5, 7, 7]);
- * chart.rangeMarker()
- *     .from(2.5)
- *     .to(5.5)
- *     .fill('blue .1');
- * @param {number=} opt_index Chart range marker index. If not set - creates a new instance and adds it to the end of array.
- * @return {!anychart.core.axisMarkers.Range} Range marker instance by index.
- *//**
- * Setter for chart range marker.
- * @example <t>lineChart</t>
- * chart.line([1, -4, 5, 7, 7]);
- * chart.rangeMarker({
- *   from: 2.5,
- *   to: 5.5,
- *   fill: 'blue .1'
- * });
- * @param {(anychart.core.axisMarkers.Range|Object)=} opt_value Chart range marker settings to set.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Setter for chart range marker by index.
- * @example <t>lineChart</t>
- * chart.column([1, -4, 5, 7, 7]);
- * chart.rangeMarker(0).from(5).to(10).fill('orange 0.2');
- * chart.rangeMarker(1).from(-5).to(2).fill('green 0.2');
- * // turn off red marker.
- * chart.rangeMarker(0, null);
- * @param {number=} opt_index Chart range marker index.
- * @param {(Object|boolean|null)=} opt_value Chart range marker settings to set.<br/>
- * <b>Note:</b> pass <b>null</b> or <b>'none' to disable to disable marker.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for rangeMarker.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Chart range marker settings to set.
  * @param {(Object|boolean|null)=} opt_value Chart range marker settings to set.
  * @return {!(anychart.core.axisMarkers.Range|anychart.charts.Sparkline)} Range marker instance by index or itself for chaining call.
@@ -805,39 +703,7 @@ anychart.charts.Sparkline.prototype.rangeMarker = function(opt_indexOrValue, opt
 
 
 /**
- * Getter for chart text marker.
- * @example <t>lineChart</t>
- * chart.line([1, -4, 5, 7, 7]);
- * chart.textMarker()
- *     .text('Marker')
- *     .value(3.3)
- *     .align(anychart.enums.Align.LEFT)
- *     .anchor(anychart.enums.Anchor.LEFT_BOTTOM);
- * chart.lineMarker().value(3.3);
- * @param {number=} opt_index Chart text marker index. If not set - creates a new instance and adds it to the end of array.
- * @return {!anychart.core.axisMarkers.Text} Text marker instance by index.
- *//**
- * Setter for chart text marker.
- * @example <t>lineChart</t>
- * chart.line([1, -4, 5, 7, 7]);
- * chart.textMarker({text: 'Marker', value: 3.3});
- * chart.lineMarker().value(3.3);
- * @param {(Object|boolean|null)=} opt_value Chart text marker settings to set.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Setter for chart text marker by index.
- * @example <t>lineChart</t>
- * chart.spline([1, -4, 5, 7, 7]);
- * chart.textMarker(0).value(6).text('Marker 0');
- * chart.textMarker(1).value(2).text('Marker 1');
- * // turn off first marker
- * chart.textMarker(0, null);
- * @param {number=} opt_index Chart text marker index.
- * @param {(Object|boolean|null)=} opt_value Chart text marker settings to set.<br/>
- * <b>Note:</b> pass <b>null</b> or <b>'none' to disable marker.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for textMarker.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Chart line marker settings to set.
  * @param {(Object|boolean|null)=} opt_value Chart line marker settings to set.
  * @return {!(anychart.core.axisMarkers.Text|anychart.charts.Sparkline)} Line marker instance by index or itself for chaining call.
@@ -907,40 +773,7 @@ anychart.charts.Sparkline.prototype.statistics = function(opt_name, opt_value) {
 
 
 /**
- * Getter for series mapping.
- * @return {!anychart.data.View} Returns current mapping.
- *//**
- * Setter for series mapping.
- * @example <t>listingOnly</t>
- * series.data([20, 7, 10, 14]);
- *  // or
- * series.data([
- *    [1, 22, 13],
- *    [13, 22, 23],
- *    [17, 22, 33],
- *    [21, 22, 43]
- *  ]);
- *  // or
- * series.data([
- *    {name: 'Point 1', value: 10},
- *    {name: 'Point 2', value: 7},
- *    {name: 'Point 3', value: 20},
- *    {name: 'Point 4', value: 14}
- *  ]);
- *   // or
- *  series.data(
- *    '17;21;11.1;4\n'+
- *    '11;11;0.21;0\n'+
- *    '21;17;23.1;1\n'+
- *    '10;.4;14;4.4\n',
- *    {'rowsSeparator': '\n', columnsSeparator: ';'})
- * @example <t>lineChart</t>
- * chart.line().data([1,2,3]);
- * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed by first param, you can pass CSV parser settings here as a hash map.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for data.
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {(!anychart.charts.Sparkline|!anychart.data.View)} Returns itself if used as a setter or the mapping if used as a getter.
@@ -1120,17 +953,7 @@ anychart.charts.Sparkline.prototype.type = function(opt_type) {
 
 
 /**
- * Getter for series clip settings.
- * @return {boolean|anychart.math.Rect} Current clip settings.
- *//**
- * Setter for series clip settings. Clips visible part of a series by a rectangle (or chart).
- * @example <t>lineChart</t>
- * chart.yScale().minimum(2);
- * chart.line([1, 4, 7, 1]).clip(false);
- * @param {(boolean|anychart.math.Rect)=} opt_value [False, if series is created manually.<br/>True, if created via chart] Enable/disable series clip.
- * @return {anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for clip.
  * @param {(boolean|anychart.math.Rect)=} opt_value [False, if series is created manually.<br/>True, if created via chart] Enable/disable series clip.
  * @return {anychart.charts.Sparkline|boolean|anychart.math.Rect} .
  */
@@ -1151,18 +974,7 @@ anychart.charts.Sparkline.prototype.clip = function(opt_value) {
 
 
 /**
- * Getter for current point width settings.
- * @return {string|number} Point width pixel value.
- *//**
- * Setter for point width settings.
- * @example
- * chart = anychart.sparkline();
- * chart.column([0.3, 1.6, 1.2, 1.9]).pointWidth(35);
- * chart.container(stage).draw();
- * @param {(number|string)=} opt_value Point width pixel value.
- * @return {anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for pointWidth.
  * @param {(number|string|null)=} opt_value Point width pixel value.
  * @return {string|number|anychart.charts.Sparkline} Bar width pixel value or Bar instance for chaining call.
  */
@@ -1182,30 +994,7 @@ anychart.charts.Sparkline.prototype.pointWidth = function(opt_value) {
 
 
 /**
- * Getter for connect missing points setting.
- * @return {boolean} Current setting.
- *//**
- * Setter for connect missing points setting.
- * @example <t>lineChart</t>
- * var blueLine = chart.sparkline([
- *    ['A1', 1],
- *    ['A2', 1.6],
- *    ['A3', 'missing'],
- *    ['A4', 1.1],
- *    ['A5', 1.9]
- * ]).connectMissingPoints(false);
- * var redLine = chart.sparkline([
- *    ['A1', 2],
- *    ['A2', 2.6],
- *    ['A3', 'missing'],
- *    ['A4', 2.1],
- *    ['A5', 2.9]
- * ]).connectMissingPoints(true);
- * @param {boolean=} opt_value [false] If set to <b>true</b>, the series will not be interrupted on missing points.<br/>
- *   Defaults to <b>false</b>. Markers will not be drawn for missing points in both cases.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for connectMissingPoints.
  * @param {boolean=} opt_value The value to be set.
  * @return {!anychart.charts.Sparkline|boolean} The setting, or itself for method chaining.
  */
@@ -1254,84 +1043,7 @@ anychart.charts.Sparkline.prototype.normalizeColor = function(color, var_args) {
 
 
 /**
- * Getter for current fill color.
- * @return {!acgraph.vector.Fill} Current fill color.
- *//**
- * Sets fill settings using an object or a string.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <c>Solid fill</c>
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.fill('green');
- * chart.container(stage).draw();
- * @example <c>Linear gradient fill</c>
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.fill(['green', 'yellow']);
- * chart.container(stage).draw();
- * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Fill color with opacity.<br/>
- * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
- * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
- * @shortDescription Fill as a string or an object.
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.fill('green', 0.4);
- * chart.container(stage).draw();
- * @param {string} color Color as a string.
- * @param {number=} opt_opacity Color opacity.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Linear gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.fill(['black', 'yellow'], 45, true, 0.5);
- * chart.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
- * @param {number=} opt_angle Gradient angle.
- * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
- * @param {number=} opt_opacity Gradient opacity.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Radial gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.fill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
- * chart.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
- * @param {number} cx X ratio of center radial gradient.
- * @param {number} cy Y ratio of center radial gradient.
- * @param {anychart.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
- * @param {number=} opt_opacity Opacity of the gradient.
- * @param {number=} opt_fx X ratio of focal point.
- * @param {number=} opt_fy Y ratio of focal point.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Image fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.fill({
- *  src: 'http://static.anychart.com/underwater.jpg',
- *  mode: acgraph.vector.ImageFillMode.STRETCH
- * });
- * chart.container(stage).draw();
- * @param {!acgraph.vector.Fill} imageSettings Object with settings.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -1358,84 +1070,7 @@ anychart.charts.Sparkline.prototype.fill = function(opt_fillOrColorOrKeys, opt_o
 
 
 /**
- * Getter for current negative fill color.
- * @return {!acgraph.vector.Fill} Current negativeFill color.
- *//**
- * Sets negative fill settings using an object or a string.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <c>Solid fill</c>
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.negativeFill('green');
- * chart.container(stage).draw();
- * @example <c>Linear gradient fill</c>
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.negativeFill(['green', 'yellow']);
- * chart.container(stage).draw();
- * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Fill color with opacity.<br/>
- * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
- * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
- * @shortDescription Fill as a string or an object.
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.negativeFill('green', 0.4);
- * chart.container(stage).draw();
- * @param {string} color Color as a string.
- * @param {number=} opt_opacity Color opacity.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Linear gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.negativeFill(['black', 'yellow'], 45, true, 0.5);
- * chart.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
- * @param {number=} opt_angle Gradient angle.
- * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
- * @param {number=} opt_opacity Gradient opacity.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Radial gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.negativeFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
- * chart.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
- * @param {number} cx X ratio of center radial gradient.
- * @param {number} cy Y ratio of center radial gradient.
- * @param {anychart.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
- * @param {number=} opt_opacity Opacity of the gradient.
- * @param {number=} opt_fx X ratio of focal point.
- * @param {number=} opt_fy Y ratio of focal point.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Image fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.negativeFill({
- *  src: 'http://static.anychart.com/underwater.jpg',
- *  mode: acgraph.vector.ImageFillMode.STRETCH
- * });
- * chart.container(stage).draw();
- * @param {!acgraph.vector.Fill} imageSettings Object with settings.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for negativeFill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -1462,84 +1097,7 @@ anychart.charts.Sparkline.prototype.negativeFill = function(opt_fillOrColorOrKey
 
 
 /**
- * Getter for current first fill color.
- * @return {!acgraph.vector.Fill} Current first fill color.
- *//**
- * Sets first fill settings using an object or a string.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <c>Solid fill</c>
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.firstFill('green');
- * chart.container(stage).draw();
- * @example <c>Linear gradient fill</c>
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.firstFill(['green', 'yellow']);
- * chart.container(stage).draw();
- * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Fill color with opacity.<br/>
- * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
- * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
- * @shortDescription Fill as a string or an object.
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.firstFill('green', 0.4);
- * chart.container(stage).draw();
- * @param {string} color Color as a string.
- * @param {number=} opt_opacity Color opacity.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Linear gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.firstFill(['black', 'yellow'], 45, true, 0.5);
- * chart.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
- * @param {number=} opt_angle Gradient angle.
- * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
- * @param {number=} opt_opacity Gradient opacity.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Radial gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.firstFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
- * chart.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
- * @param {number} cx X ratio of center radial gradient.
- * @param {number} cy Y ratio of center radial gradient.
- * @param {anychart.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
- * @param {number=} opt_opacity Opacity of the gradient.
- * @param {number=} opt_fx X ratio of focal point.
- * @param {number=} opt_fy Y ratio of focal point.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Image fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.firstFill({
- *  src: 'http://static.anychart.com/underwater.jpg',
- *  mode: acgraph.vector.ImageFillMode.STRETCH
- * });
- * chart.container(stage).draw();
- * @param {!acgraph.vector.Fill} imageSettings Object with settings.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for firstFill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -1566,84 +1124,7 @@ anychart.charts.Sparkline.prototype.firstFill = function(opt_fillOrColorOrKeys, 
 
 
 /**
- * Getter for current last fill color.
- * @return {!acgraph.vector.Fill} Current last fill color.
- *//**
- * Sets last fill settings using an object or a string.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <c>Solid fill</c>
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.lastFill('green');
- * chart.container(stage).draw();
- * @example <c>Linear gradient fill</c>
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.lastFill(['green', 'yellow']);
- * chart.container(stage).draw();
- * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Fill color with opacity.<br/>
- * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
- * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
- * @shortDescription Fill as a string or an object.
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.lastFill('green', 0.4);
- * chart.container(stage).draw();
- * @param {string} color Color as a string.
- * @param {number=} opt_opacity Color opacity.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Linear gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.lastFill(['black', 'yellow'], 45, true, 0.5);
- * chart.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
- * @param {number=} opt_angle Gradient angle.
- * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
- * @param {number=} opt_opacity Gradient opacity.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Radial gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.lastFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
- * chart.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
- * @param {number} cx X ratio of center radial gradient.
- * @param {number} cy Y ratio of center radial gradient.
- * @param {anychart.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
- * @param {number=} opt_opacity Opacity of the gradient.
- * @param {number=} opt_fx X ratio of focal point.
- * @param {number=} opt_fy Y ratio of focal point.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Image fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.lastFill({
- *  src: 'http://static.anychart.com/underwater.jpg',
- *  mode: acgraph.vector.ImageFillMode.STRETCH
- * });
- * chart.container(stage).draw();
- * @param {!acgraph.vector.Fill} imageSettings Object with settings.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for lastFill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -1670,84 +1151,7 @@ anychart.charts.Sparkline.prototype.lastFill = function(opt_fillOrColorOrKeys, o
 
 
 /**
- * Getter for current fill color of maximum point value.
- * @return {!acgraph.vector.Fill} Current maximum fill color.
- *//**
- * Sets maximum fill settings using an object or a string.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <c>Solid fill</c>
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.maxFill('green');
- * chart.container(stage).draw();
- * @example <c>Linear gradient fill</c>
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.maxFill(['green', 'yellow']);
- * chart.container(stage).draw();
- * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Fill color with opacity.<br/>
- * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
- * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
- * @shortDescription Fill as a string or an object.
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.maxFill('green', 0.4);
- * chart.container(stage).draw();
- * @param {string} color Color as a string.
- * @param {number=} opt_opacity Color opacity.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Linear gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.maxFill(['black', 'yellow'], 45, true, 0.5);
- * chart.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
- * @param {number=} opt_angle Gradient angle.
- * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
- * @param {number=} opt_opacity Gradient opacity.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Radial gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.maxFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
- * chart.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
- * @param {number} cx X ratio of center radial gradient.
- * @param {number} cy Y ratio of center radial gradient.
- * @param {anychart.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
- * @param {number=} opt_opacity Opacity of the gradient.
- * @param {number=} opt_fx X ratio of focal point.
- * @param {number=} opt_fy Y ratio of focal point.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Image fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.maxFill({
- *  src: 'http://static.anychart.com/underwater.jpg',
- *  mode: acgraph.vector.ImageFillMode.STRETCH
- * });
- * chart.container(stage).draw();
- * @param {!acgraph.vector.Fill} imageSettings Object with settings.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for maxFill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -1774,84 +1178,7 @@ anychart.charts.Sparkline.prototype.maxFill = function(opt_fillOrColorOrKeys, op
 
 
 /**
- * Getter for current fill color of minimum point value.
- * @return {!acgraph.vector.Fill} Current min fill color.
- *//**
- * Sets min fill settings using an object or a string.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <c>Solid fill</c>
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.minFill('green');
- * chart.container(stage).draw();
- * @example <c>Linear gradient fill</c>
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.minFill(['green', 'yellow']);
- * chart.container(stage).draw();
- * @param {acgraph.vector.Fill} value [null] Color as an object or a string.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Fill color with opacity.<br/>
- * <b>Note:</b> If color is set as a string (e.g. 'red .5') it has a priority over opt_opacity, which
- * means: <b>color</b> set like this <b>rect.fill('red 0.3', 0.7)</b> will have 0.3 opacity.
- * @shortDescription Fill as a string or an object.
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.minFill('green', 0.4);
- * chart.container(stage).draw();
- * @param {string} color Color as a string.
- * @param {number=} opt_opacity Color opacity.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Linear gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.minFill(['black', 'yellow'], 45, true, 0.5);
- * chart.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Gradient keys.
- * @param {number=} opt_angle Gradient angle.
- * @param {(boolean|!acgraph.vector.Rect|!{left:number,top:number,width:number,height:number})=} opt_mode Gradient mode.
- * @param {number=} opt_opacity Gradient opacity.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Radial gradient fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.minFill(['black', 'yellow'], .5, .5, null, .9, 0.3, 0.81)
- * chart.container(stage).draw();
- * @param {!Array.<(acgraph.vector.GradientKey|string)>} keys Color-stop gradient keys.
- * @param {number} cx X ratio of center radial gradient.
- * @param {number} cy Y ratio of center radial gradient.
- * @param {anychart.math.Rect=} opt_mode If defined then userSpaceOnUse mode, else objectBoundingBox.
- * @param {number=} opt_opacity Opacity of the gradient.
- * @param {number=} opt_fx X ratio of focal point.
- * @param {number=} opt_fy Y ratio of focal point.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Image fill.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('column');
- * chart.minFill({
- *  src: 'http://static.anychart.com/underwater.jpg',
- *  mode: acgraph.vector.ImageFillMode.STRETCH
- * });
- * chart.container(stage).draw();
- * @param {!acgraph.vector.Fill} imageSettings Object with settings.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for minFill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -1917,44 +1244,7 @@ anychart.charts.Sparkline.prototype.getFinalFill = function(usePointSettings) {
 
 
 /**
- * Getter for current stroke settings.
- * @return {!acgraph.vector.Stroke} Current stroke settings.
- *//**
- * Setter for chart stroke by function.
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('line');
- * chart.stroke(
- *      function(){
- *        return '3 '+ this.sourceColor;
- *      }
- * );
- * chart.container(stage).draw();
- * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
- *  return anychart.color.darken(this.sourceColor);
- * }] Function that looks like <code>function(){
- *    // this.sourceColor -  color returned by fill() getter.
- *    return fillValue; // type acgraph.vector.Fill
- * }</code>.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * Setter for stroke settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
- * @example
- * var chart = anychart.sparkLine([1, 4, 7, 1]);
- * chart.type('line');
- * chart.stroke('orange', 3, '5 2', 'round');
- * chart.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for stroke.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -2014,24 +1304,7 @@ anychart.charts.Sparkline.prototype.normalizeHatchFill = function(hatchFill) {
 
 
 /**
- * Getter for current hatch fill settings.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
- *//**
- * Setter for hatch fill settings.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}
- * @example
- * var chart = anychart.column();
- * chart.column([0.3, 3, 2.2, 1.7]).hatchFill('diamiond', 'grey', 5, 5);
- * chart.container(stage).draw();
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hatchFill.
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
  * @param {string=} opt_color Color.
@@ -2057,24 +1330,7 @@ anychart.charts.Sparkline.prototype.hatchFill = function(opt_patternFillOrTypeOr
 
 
 /**
- * Getter for current hatch fill settings.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
- *//**
- * Setter for hatch fill settings.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}
- * @example
- * var chart = anychart.column();
- * chart.column([0.3, 3, 2.2, 1.7]).hatchFill('diamiond', 'grey', 5, 5);
- * chart.container(stage).draw();
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for negativeHatchFill.
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
  * @param {string=} opt_color Color.
@@ -2100,24 +1356,7 @@ anychart.charts.Sparkline.prototype.negativeHatchFill = function(opt_patternFill
 
 
 /**
- * Getter for current hatch fill settings.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
- *//**
- * Setter for hatch fill settings.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}
- * @example
- * var chart = anychart.column();
- * chart.column([0.3, 3, 2.2, 1.7]).hatchFill('diamiond', 'grey', 5, 5);
- * chart.container(stage).draw();
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for firstHatchFill.
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
  * @param {string=} opt_color Color.
@@ -2143,24 +1382,7 @@ anychart.charts.Sparkline.prototype.firstHatchFill = function(opt_patternFillOrT
 
 
 /**
- * Getter for current hatch fill settings.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
- *//**
- * Setter for hatch fill settings.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}
- * @example
- * var chart = anychart.column();
- * chart.column([0.3, 3, 2.2, 1.7]).hatchFill('diamiond', 'grey', 5, 5);
- * chart.container(stage).draw();
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for lastHatchFill.
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
  * @param {string=} opt_color Color.
@@ -2186,24 +1408,7 @@ anychart.charts.Sparkline.prototype.lastHatchFill = function(opt_patternFillOrTy
 
 
 /**
- * Getter for current hatch fill settings.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
- *//**
- * Setter for hatch fill settings.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}
- * @example
- * var chart = anychart.column();
- * chart.column([0.3, 3, 2.2, 1.7]).hatchFill('diamiond', 'grey', 5, 5);
- * chart.container(stage).draw();
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for maxHatchFill.
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
  * @param {string=} opt_color Color.
@@ -2229,24 +1434,7 @@ anychart.charts.Sparkline.prototype.maxHatchFill = function(opt_patternFillOrTyp
 
 
 /**
- * Getter for current hatch fill settings.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
- *//**
- * Setter for hatch fill settings.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_HatchFill}
- * @example
- * var chart = anychart.column();
- * chart.column([0.3, 3, 2.2, 1.7]).hatchFill('diamiond', 'grey', 5, 5);
- * chart.container(stage).draw();
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for minHatchFill.
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type or state of hatch fill.
  * @param {string=} opt_color Color.
@@ -2378,23 +1566,7 @@ anychart.charts.Sparkline.prototype.mergeFactorySettingsEasy_ = function(setting
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for data markers.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.markers().size(10);
- * chart.container(stage).draw();
- * @return {!anychart.core.ui.MarkersFactory.Marker} Markers instance.
- *//**
- * Setter for series data markers.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off markers.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.markers(null);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for markers.
  * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!(anychart.core.ui.MarkersFactory.Marker|anychart.charts.Sparkline)} Markers instance or itself for chaining call.
  */
@@ -2416,23 +1588,7 @@ anychart.charts.Sparkline.prototype.markers = function(opt_value) {
 
 
 /**
- * Getter for data negative markers.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.negativeMarkers().enabled(true).size(10);
- * chart.container(stage).draw();
- * @return {!anychart.core.ui.MarkersFactory.Marker} Marker instance.
- *//**
- * Setter for data negative markers.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off markers.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.negativeMarkers(null);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null|string)=} opt_value Data negative markers settings.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for negativeMarkers.
  * @param {(Object|boolean|null|string)=} opt_value Data negative markers settings.
  * @return {!(anychart.core.ui.MarkersFactory.Marker|anychart.charts.Sparkline)} Markers instance or itself for chaining call.
  */
@@ -2454,23 +1610,7 @@ anychart.charts.Sparkline.prototype.negativeMarkers = function(opt_value) {
 
 
 /**
- * Getter for data first markers.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.firstMarkers().enabled(true).size(10);
- * chart.container(stage).draw();
- * @return {!anychart.core.ui.MarkersFactory.Marker} Marker instance.
- *//**
- * Setter for data first markers.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off markers.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.firstMarkers(null);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null|string)=} opt_value Data first markers settings.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for firstMarkers.
  * @param {(Object|boolean|null|string)=} opt_value Data first markers settings.
  * @return {!(anychart.core.ui.MarkersFactory.Marker|anychart.charts.Sparkline)} Markers instance or itself for chaining call.
  */
@@ -2492,23 +1632,7 @@ anychart.charts.Sparkline.prototype.firstMarkers = function(opt_value) {
 
 
 /**
- * Getter for data last markers.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.lastMarkers().enabled(true).size(10);
- * chart.container(stage).draw();
- * @return {!anychart.core.ui.MarkersFactory.Marker} Marker instance.
- *//**
- * Setter for data last markers.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off markers.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.lastMarkers(null);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null|string)=} opt_value Data last markers settings.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for lastMarkers.
  * @param {(Object|boolean|null|string)=} opt_value Data last markers settings.
  * @return {!(anychart.core.ui.MarkersFactory.Marker|anychart.charts.Sparkline)} Markers instance or itself for chaining call.
  */
@@ -2530,23 +1654,7 @@ anychart.charts.Sparkline.prototype.lastMarkers = function(opt_value) {
 
 
 /**
- * Getter for data max markers.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.maxMarkers().enabled(true).size(10);
- * chart.container(stage).draw();
- * @return {!anychart.core.ui.MarkersFactory.Marker} Marker instance.
- *//**
- * Setter for data max markers.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off markers.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.maxMarkers(null);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null|string)=} opt_value Data max markers settings.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for maxMarkers.
  * @param {(Object|boolean|null|string)=} opt_value Data max markers settings.
  * @return {!(anychart.core.ui.MarkersFactory.Marker|anychart.charts.Sparkline)} Markers instance or itself for chaining call.
  */
@@ -2568,23 +1676,7 @@ anychart.charts.Sparkline.prototype.maxMarkers = function(opt_value) {
 
 
 /**
- * Getter for data min markers.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.minMarkers().enabled(true).size(10);
- * chart.container(stage).draw();
- * @return {!anychart.core.ui.MarkersFactory.Marker} Marker instance.
- *//**
- * Setter for data min markers.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off markers.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.minMarkers(null);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null|string)=} opt_value Data min markers settings.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for minMarkers.
  * @param {(Object|boolean|null|string)=} opt_value Data min markers settings.
  * @return {!(anychart.core.ui.MarkersFactory.Marker|anychart.charts.Sparkline)} Markers instance or itself for chaining call.
  */
@@ -2721,23 +1813,7 @@ anychart.charts.Sparkline.prototype.markersInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for data markers.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.markers().size(10);
- * chart.container(stage).draw();
- * @return {!anychart.core.ui.LabelsFactory.Label} Markers instance.
- *//**
- * Setter for series data markers.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off markers.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.markers(null);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for labels.
  * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!(anychart.core.ui.LabelsFactory.Label|anychart.charts.Sparkline)} Markers instance or itself for chaining call.
  */
@@ -2759,23 +1835,7 @@ anychart.charts.Sparkline.prototype.labels = function(opt_value) {
 
 
 /**
- * Getter for data negative labels.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.negativeLabels().enabled(true).size(10);
- * chart.container(stage).draw();
- * @return {!anychart.core.ui.LabelsFactory.Label} Marker instance.
- *//**
- * Setter for data negative labels.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off labels.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.negativeMarkers(null);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null|string)=} opt_value Data negative labels settings.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for negativeLabels.
  * @param {(Object|boolean|null|string)=} opt_value Data negative labels settings.
  * @return {!(anychart.core.ui.LabelsFactory.Label|anychart.charts.Sparkline)} Markers instance or itself for chaining call.
  */
@@ -2797,23 +1857,7 @@ anychart.charts.Sparkline.prototype.negativeLabels = function(opt_value) {
 
 
 /**
- * Getter for data first labels.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.firstLabels().enabled(true).size(10);
- * chart.container(stage).draw();
- * @return {!anychart.core.ui.LabelsFactory.Label} Marker instance.
- *//**
- * Setter for data first labels.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off labels.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.firstMarkers(null);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null|string)=} opt_value Data first labels settings.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for firstLabels.
  * @param {(Object|boolean|null|string)=} opt_value Data first labels settings.
  * @return {!(anychart.core.ui.LabelsFactory.Label|anychart.charts.Sparkline)} Markers instance or itself for chaining call.
  */
@@ -2835,23 +1879,7 @@ anychart.charts.Sparkline.prototype.firstLabels = function(opt_value) {
 
 
 /**
- * Getter for data last labels.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.lastLabels().enabled(true).size(10);
- * chart.container(stage).draw();
- * @return {!anychart.core.ui.LabelsFactory.Label} Marker instance.
- *//**
- * Setter for data last labels.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off labels.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.lastMarkers(null);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null|string)=} opt_value Data last labels settings.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for lastLabels.
  * @param {(Object|boolean|null|string)=} opt_value Data last labels settings.
  * @return {!(anychart.core.ui.LabelsFactory.Label|anychart.charts.Sparkline)} Markers instance or itself for chaining call.
  */
@@ -2873,23 +1901,7 @@ anychart.charts.Sparkline.prototype.lastLabels = function(opt_value) {
 
 
 /**
- * Getter for data max labels.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.maxLabels().enabled(true).size(10);
- * chart.container(stage).draw();
- * @return {!anychart.core.ui.LabelsFactory.Label} Marker instance.
- *//**
- * Setter for data max labels.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off labels.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.maxMarkers(null);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null|string)=} opt_value Data max labels settings.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for maxLabels.
  * @param {(Object|boolean|null|string)=} opt_value Data max labels settings.
  * @return {!(anychart.core.ui.LabelsFactory.Label|anychart.charts.Sparkline)} Markers instance or itself for chaining call.
  */
@@ -2911,23 +1923,7 @@ anychart.charts.Sparkline.prototype.maxLabels = function(opt_value) {
 
 
 /**
- * Getter for data min labels.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.minLabels().enabled(true).size(10);
- * chart.container(stage).draw();
- * @return {!anychart.core.ui.LabelsFactory.Label} Marker instance.
- *//**
- * Setter for data min labels.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off labels.
- * @example
- * var chart = anychart.sparkLine([1, 1.4, 1.2, 2]);
- * chart.minMarkers(null);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null|string)=} opt_value Data min labels settings.
- * @return {!anychart.charts.Sparkline} {@link anychart.charts.Sparkline} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for minLabels.
  * @param {(Object|boolean|null|string)=} opt_value Data min labels settings.
  * @return {!(anychart.core.ui.LabelsFactory.Label|anychart.charts.Sparkline)} Markers instance or itself for chaining call.
  */

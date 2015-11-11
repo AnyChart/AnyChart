@@ -56,26 +56,7 @@ anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES =
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for current chart legend.
- * @example <t>lineChart</t>
- * chart.line([-2, 11, 2, 4]);
- * chart.line([7, 10, 2, 0]);
- * chart.legend()
- *         .position('right')
- *         .title(null)
- *         .itemsLayout('vertical')
- *         .align('left');
- * @return {!anychart.core.ui.Legend} An instance of {@link anychart.core.ui.Legend} for method chaining.
- *//**
- * Setter for chart legend setting.
- * @example <t>lineChart</t>
- * chart.line([-2, 11, 2, 4]);
- * chart.line([7, 10, 2, 0]);
- * chart.legend(true);
- * @param {(Object|boolean|null)=} opt_value Legend settings.
- * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for legend.
  * @param {(Object|boolean|null)=} opt_value Legend settings.
  * @return {!(anychart.core.Chart|anychart.core.ui.Legend)} Chart legend instance of itself for chaining call.
  */
@@ -193,20 +174,7 @@ anychart.core.SeparateChart.prototype.legendItemOut = function(item, event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for current chart credits settings.
- * @example <t>lineChart</t>
- * chart.line([1, 4, 2, 9]);
- * chart.credits().text('Click me!');
- * @return {!anychart.core.ui.Credits} An instance of {@link anychart.core.ui.Credits} class for method chaining.
- *//**
- * Setter for chart credits settings.
- * @example <t>lineChart</t>
- * chart.line([1, 4, 2, 9]);
- * chart.credits(null);
- * @param {(Object|boolean|null)=} opt_value
- * @return {!anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for credits.
  * @param {(Object|boolean|null)=} opt_value
  * @return {!(anychart.core.Chart|anychart.core.ui.Credits)} Chart credits or itself for chaining call.
  */

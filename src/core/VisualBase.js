@@ -249,28 +249,7 @@ anychart.core.VisualBase.prototype.getOwnerElement = function(target) {
 
 
 /**
- * Getter for the element current container.
- * @return {acgraph.vector.ILayer} The current container.
- *//**
- * Setter for the element container.<br/>
- * Each element appends all its content to this container.<br/>
- * The order of adding is not defined, but usually it will be the order in which elements are drawn for the first time.
- * If you need to specify the order use {@link anychart.core.VisualBase#zIndex}.
- * @example <t>listingOnly</t>
- * // string
- *  element.container('containerIdentifier');
- * // DOM-element
- *  var domElement = document.getElementById('containerIdentifier');
- *  element.container(domElement);
- * // Framework-element
- *  var fwElement = anychart.ui.title();
- *  element.container( fwElement.container() );
- * @example <t>lineChart</t>
- * chart.line([4, 2, 8]);
- * @param {(acgraph.vector.ILayer|string|Element)=} opt_value The value to set.
- * @return {!anychart.core.VisualBase} An instance of {@link anychart.core.VisualBase} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for container.
  * @param {(acgraph.vector.ILayer|string|Element)=} opt_value .
  * @return {(acgraph.vector.ILayer|!anychart.core.VisualBase)} .
  */
@@ -310,24 +289,7 @@ anychart.core.VisualBase.prototype.container = function(opt_value) {
 
 
 /**
- * Getter for the current Z-index of the element.
- * @return {number} The current zIndex.
- *//**
- * Setter for the Z-index of the element.<br/>
- * @illustration <t>stageOnly</t>
- *  var stroke = '1 black 1';
- *  layer.ellipse(75, 105, 55, 35).fill('#cc6622', 1).stroke(stroke)
- *  layer.ellipse(95, 75, 55, 35).fill('#ccaa22', 1).stroke(stroke)
- *  layer.ellipse(115, 45, 55, 35).fill('#ccee22', 1).stroke(stroke);
- *  layer.text(195, 100, 'index = 0');
- *  layer.text(195, 70, 'index = 1');
- *  layer.text(195, 40, 'index = 2');
- * @illustrationDesc
- * The bigger the index - the higher the element position is.
- * @param {number=} opt_value Value to set.
- * @return {!anychart.core.VisualBase} An instance of {@link anychart.core.VisualBase} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for zIndex.
  * @param {number=} opt_value .
  * @return {(number|!anychart.core.VisualBase)} .
  */
@@ -354,23 +316,7 @@ anychart.core.VisualBase.prototype.setAutoZIndex = function(value) {
 
 
 /**
- * Getter for the current element state (enabled or disabled).
- * @return {boolean} The current element state.
- *//**
- * Setter for the element enabled state.
- * @example <t>listingOnly</t>
- * if (!element.enabled())
- *    element.enabled(true);
- * @example <t>lineChart</t>
- * var blueLine = chart.line([1, 1.6, 1.2, 2.1]).enabled(true);
- * // there are no second series.
- * var redLine = chart.line([11, 11.6, 11.2, 12.1]).enabled(false);
- * @param {boolean=} opt_value Value to set.
- * @return {!anychart.core.VisualBase} An instance of {@link anychart.core.VisualBase} class for method chaining.
- *//**
- * We should not add possible null value of the param and result to the public doc. It is needed for compiler because
- * of overrides.
- * @ignoreDoc
+ * Getter/setter for enabled.
  * @param {?boolean=} opt_value Value to set.
  * @return {!anychart.core.VisualBase|boolean|null} .
  */

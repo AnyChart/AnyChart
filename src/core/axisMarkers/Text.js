@@ -110,14 +110,7 @@ anychart.core.axisMarkers.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
 //  Scale.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for the axis scale.
- * @return {anychart.scales.Base} Axis scale.
- *//**
- * Setter for axis scale.
- * @param {anychart.scales.Base=} opt_value Value to set.
- * @return {!anychart.core.axisMarkers.Text} An instance of the {@link anychart.core.axisMarkers.Text} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for scale.
  * @param {anychart.scales.Base=} opt_value Scale.
  * @return {anychart.scales.Base|!anychart.core.axisMarkers.Text} Axis scale or itself for method chaining.
  */
@@ -335,14 +328,7 @@ anychart.core.axisMarkers.Text.prototype.offsetY = function(opt_newValue) {
 
 
 /**
- * Getter for separator width.
- * @return {number|string|null} Current width.
- *//**
- * Setter for separator width.
- * @param {(number|string|null)=} opt_value Value to set.
- * @return {!anychart.core.axisMarkers.Text} An instance of the {@link anychart.core.axisMarkers.Text} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for width.
  * @param {(number|string|null)=} opt_value .
  * @return {!anychart.core.axisMarkers.Text|number|string|null} .
  */
@@ -360,14 +346,7 @@ anychart.core.axisMarkers.Text.prototype.width = function(opt_value) {
 
 
 /**
- * Getter for separator height.
- * @return {number|string|null} Current height.
- *//**
- * Setter for separator height.
- * @param {(number|string|null)=} opt_value Value to set.
- * @return {!anychart.core.axisMarkers.Text} An instance of the {@link anychart.core.axisMarkers.Text} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for height.
  * @param {(number|string|null)=} opt_value .
  * @return {!anychart.core.axisMarkers.Text|number|string|null} .
  */

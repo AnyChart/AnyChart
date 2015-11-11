@@ -98,14 +98,7 @@ anychart.core.axisMarkers.Line.prototype.layout = function(opt_value) {
 //  Scale.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for the axis scale.
- * @return {anychart.scales.Base} Axis scale.
- *//**
- * Setter for axis scale.
- * @param {anychart.scales.Base=} opt_value Value to set.
- * @return {!anychart.core.axisMarkers.Line} {@link anychart.core.axisMarkers.Line} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for scale.
  * @param {anychart.scales.Base=} opt_value Scale.
  * @return {anychart.scales.Base|!anychart.core.axisMarkers.Line} Axis scale or itself for method chaining.
  */

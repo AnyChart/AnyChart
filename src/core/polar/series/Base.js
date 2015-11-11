@@ -639,14 +639,7 @@ anychart.core.polar.series.Base.prototype.drawSubsequentPoint = goog.abstractMet
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for current series X scale.
- * @return {anychart.scales.Base} Current series X Scale.
- *//**
- * Setter for series X scale.
- * @param {anychart.scales.Base=} opt_value Value to set.
- * @return {!anychart.core.polar.series.Base}  {@link anychart.core.polar.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for xScale.
  * @param {anychart.scales.Base=} opt_value Value to set.
  * @return {(anychart.scales.Base|!anychart.core.polar.series.Base)} Series X Scale or itself for chaining call.
  */
@@ -668,14 +661,7 @@ anychart.core.polar.series.Base.prototype.xScale = function(opt_value) {
 
 
 /**
- * Getter for current series Y scale.
- * @return {anychart.scales.Base} Current series Y Scale.
- *//**
- * Setter for series Y scale.
- * @param {anychart.scales.Base=} opt_value Value to set.
- * @return {!anychart.core.polar.series.Base}  {@link anychart.core.polar.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for yScale.
  * @param {anychart.scales.Base=} opt_value Value to set.
  * @return {(anychart.scales.Base|!anychart.core.polar.series.Base)} Series Y Scale or itself for chaining call.
  */

@@ -117,47 +117,7 @@ anychart.core.scatter.series.Line.prototype.createPositionProvider = function() 
 
 
 /**
- * Getter for connect missing points setting.
- * @return {boolean} Current setting.
- *//**
- * Setter for connect missing points setting.
- * @example
- * chart = anychart.scatter();
- * chart.line([
- *   [4.1, 12],
- *   [2.3, 'missing'],
- *   [3.4, 19],
- *   [1.2, 22]
- * ])
- *     .name('Not connect missing')
- *     .connectMissingPoints(false);
- * chart.line([
- *   [4.1, 10],
- *   [2.3, 'missing'],
- *   [3.4, 17],
- *   [1.2, 20]
- * ])
- *     .name('Connect missing')
- *     .connectMissingPoints(true);
- * chart.line([
- *   [4.1, 8],
- *   [2.3, 6],
- *   [3.4, 15],
- *   [1.2, 18]
- * ])
- *     .name('Without missing')
- *     .connectMissingPoints(true);
- *
- * chart.xAxis().title(null);
- * chart.yAxis().title(null);
- * chart.title(null);
- * chart.legend().enabled(true).itemsLayout('vertical');
- * chart.container(stage).draw();
- * @param {boolean=} opt_value [false] If set to <b>true</b>, the series will not be interrupted on missing points.<br/>
- *   Defaults to <b>false</b>. Markers will not be drawn for missing points in both cases.
- * @return {!anychart.core.scatter.series.Base} {@link anychart.core.scatter.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for connectMissingPoints.
  * @param {boolean=} opt_value The value to be set.
  * @return {anychart.core.scatter.series.Line|boolean} The setting, or itself for method chaining.
  */

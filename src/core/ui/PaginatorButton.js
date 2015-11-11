@@ -25,14 +25,7 @@ goog.inherits(anychart.core.ui.PaginatorButton, anychart.core.ui.Button);
 
 
 /**
- * Getter for a button drawer.
- * @return {function(acgraph.vector.Path, anychart.math.Rect)} Current drawer function.
- *//**
- * Setter for button drawer.
- * @param {function(acgraph.vector.Path, anychart.math.Rect)=} opt_value Value to set.
- * @return {!anychart.core.ui.PaginatorButton} An instance of the {@link anychart.core.ui.PaginatorButton} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for buttonDrawer.
  * @param {function(acgraph.vector.Path, anychart.math.Rect)=} opt_value Drawer function.
  * @return {(anychart.core.ui.PaginatorButton|function(acgraph.vector.Path, anychart.math.Rect))} Current drawer function or self for chaining.
  */

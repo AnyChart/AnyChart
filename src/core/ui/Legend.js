@@ -302,14 +302,7 @@ anychart.core.ui.Legend.prototype.itemsTextFormatter = function(opt_value) {
 
 
 /**
- * Getter for items spacing setting.
- * @return {(string|number)} Items spacing setting.
- *//**
- * Setter for items spacing setting.
- * @param {(string|number)=} opt_value Value to set.
- * @return {!anychart.core.ui.Legend} An instance of the {@link anychart.core.ui.Legend} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for itemsSpacing.
  * @param {(string|number)=} opt_value Value of spacing between legend items.
  * @return {(string|number|anychart.core.ui.Legend)} Items spacing setting or self for method chaining.
  */
@@ -327,14 +320,7 @@ anychart.core.ui.Legend.prototype.itemsSpacing = function(opt_value) {
 
 
 /**
- * Getter for spacing between icon and text in legend item.
- * @return {number} Spacing setting.
- *//**
- * Setter for spacing between icon and text in legend item.
- * @param {(string|number)=} opt_value Spacing setting.
- * @return {!anychart.core.ui.Legend} An instance of the {@link anychart.core.ui.Legend} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for iconTextSpacing.
  * @param {(string|number)=} opt_value Spacing setting.
  * @return {(number|anychart.core.ui.Legend)} Spacing setting or self for method chaining.
  */
@@ -439,14 +425,7 @@ anychart.core.ui.Legend.prototype.padding = function(opt_spaceOrTopOrTopAndBotto
 
 
 /**
- * Getter for legend background.
- * @return {!anychart.core.ui.Background} Background or self for method chaining.
- *//**
- * Setter for legend background.
- * @param {(string|Object|null|boolean)=} opt_value Background setting.
- * @return {!anychart.core.ui.Legend} An instance of the {@link anychart.core.ui.Legend} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for background.
  * @param {(string|Object|null|boolean)=} opt_value Background setting.
  * @return {!(anychart.core.ui.Legend|anychart.core.ui.Background)} Background or self for method chaining.
  */
@@ -479,15 +458,7 @@ anychart.core.ui.Legend.prototype.backgroundInvalidated_ = function(event) {
 
 
 /**
- * Getter for legend title.
- * @return {!anychart.core.ui.Title} Title settings.
- *//**
- * Setter for legend title.<br/>
- * <b>Note:</b> to turn title off you have to send null or 'none'.
- * @param {(null|boolean|Object|string)=} opt_value Value to set.
- * @return {!anychart.core.ui.Legend} An instance of the {@link anychart.core.ui.Legend} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for title.
  * @param {(null|boolean|Object|string)=} opt_value Title to set.
  * @return {!(anychart.core.ui.Title|anychart.core.ui.Legend)} Title or self for method chaining.
  */
@@ -547,16 +518,7 @@ anychart.core.ui.Legend.prototype.titleFormatter = function(opt_value) {
 };
 
 
-/**
- * Getter for title separator setting.
- * @return {!anychart.core.ui.Separator} Current settings.
- *//**
- * Setter for title separator setting.<br/>
- * <b>Note:</b> To turn off titleSeparatoryou have to send null or 'none'.
- * @param {(Object|boolean|null)=} opt_value Value to set.
- * @return {!anychart.core.ui.Legend} An instance of the {@link anychart.core.ui.Legend} class for method chaining.
- *//**
- * @ignoreDoc
+/**Getter/setter for titleSeparator.
  * @param {(Object|boolean|null)=} opt_value Separator setting.
  * @return {!(anychart.core.ui.Separator|anychart.core.ui.Legend)} Separator setting or self for method chaining.
  */
@@ -598,15 +560,7 @@ anychart.core.ui.Legend.prototype.titleSeparatorInvalidated_ = function(event) {
 
 
 /**
- * Getter for paginator setting.
- * @return {!anychart.core.ui.Paginator} Current settings.
- *//**
- * Setter for paginator setting.<br/>
- * <b>Note:</b> To turn Paginator off you need to send null or 'none'.
- * @param {(Object|boolean|null)=} opt_value Value to set.
- * @return {!anychart.core.ui.Legend} An instance of the {@link anychart.core.ui.Legend} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for paginator.
  * @param {(Object|boolean|null)=} opt_value Paginator to set.
  * @return {!(anychart.core.ui.Paginator|anychart.core.ui.Legend)} Paginator or self for method chaining.
  */
@@ -723,14 +677,7 @@ anychart.core.ui.Legend.prototype.hideTooltip = function() {
 
 
 /**
- * Getter for legend width.
- * @return {number|string|null} Current width.
- *//**
- * Setter for legend width.
- * @param {(number|string|null)=} opt_value Value to set.
- * @return {!anychart.core.ui.Legend} An instance of the {@link anychart.core.ui.Legend} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for width.
  * @param {(number|string|null)=} opt_value .
  * @return {!anychart.core.ui.Legend|number|string|null} .
  */
@@ -748,14 +695,7 @@ anychart.core.ui.Legend.prototype.width = function(opt_value) {
 
 
 /**
- * Getter for legend height.
- * @return {number|string|null} Current height.
- *//**
- * Setter for legend height.
- * @param {(number|string|null)=} opt_value Value to set.
- * @return {!anychart.core.ui.Legend} An instance of the {@link anychart.core.ui.Legend} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for height.
  * @param {(number|string|null)=} opt_value .
  * @return {!anychart.core.ui.Legend|number|string|null} .
  */
@@ -774,14 +714,7 @@ anychart.core.ui.Legend.prototype.height = function(opt_value) {
 
 //todo Need rename. Orientation or Position (blackart)
 /**
- * Getter for legend position setting.
- * @return {anychart.enums.Orientation} Legend position.
- *//**
- * Setter for legend position setting.
- * @param {(anychart.enums.Orientation|string)=} opt_value Legend position.
- * @return {!anychart.core.ui.Legend} An instance of the {@link anychart.core.ui.Legend} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for position.
  * @param {(anychart.enums.Orientation|string)=} opt_value Legend position.
  * @return {(anychart.enums.Orientation|anychart.core.ui.Legend)} Legend position or self for method chaining.
  */
@@ -801,14 +734,7 @@ anychart.core.ui.Legend.prototype.position = function(opt_value) {
 
 
 /**
- * Getter for legend align setting.
- * @return {anychart.enums.Align} Legend align.
- *//**
- * Setter for legend align setting.
- * @param {(anychart.enums.Align|string)=} opt_value Value to set.
- * @return {!anychart.core.ui.Legend} An instance of the {@link anychart.core.ui.Legend} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for align.
  * @param {(anychart.enums.Align|string)=} opt_value Legend align.
  * @return {(anychart.enums.Align|anychart.core.ui.Legend)} Legend align or self for chaining.
  */

@@ -263,14 +263,7 @@ anychart.core.ui.Paginator.prototype.backgroundInvalidated_ = function(event) {
 
 
 /**
- * Getter for paginator layout.
- * @return {anychart.enums.Layout} Current layout or self for chaining.
- *//**
- * Setter for paginator layout.
- * @param {(string|anychart.enums.Layout)=} opt_value Value to set.
- * @return {!anychart.core.ui.Paginator} An instance of the {@link anychart.core.ui.Paginator} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for layout.
  * TODO(AntonKagakin): create customDrawers flag, to avoid custom layout drawing bug.
  * @param {(string|anychart.enums.Layout)=} opt_value Layout value.
  * @return {(anychart.core.ui.Paginator|anychart.enums.Layout)} Current layout or self for chaining.
@@ -297,14 +290,7 @@ anychart.core.ui.Paginator.prototype.layout = function(opt_value) {
 
 
 /**
- * Getter for page count.
- * @return {number} Current page count.
- *//**
- * Setter for page count.
- * @param {(number|string)=} opt_value Value to set.
- * @return {!anychart.core.ui.Paginator} An instance of the {@link anychart.core.ui.Paginator} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for pageCount.
  * @param {(number|string)=} opt_value Paginator page count to set.
  * @return {(number|anychart.core.ui.Paginator)} Current page count or self for chaining.
  */
@@ -335,14 +321,7 @@ anychart.core.ui.Paginator.prototype.pageCount = function(opt_value) {
 
 
 /**
- * Getter for active page.
- * @return {number} Current page.
- *//**
- * Setter for active page.
- * @param {(number|string)=} opt_value Value to set.
- * @return {!anychart.core.ui.Paginator} An instance of the {@link anychart.core.ui.Paginator} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for currentPage.
  * @param {(number|string)=} opt_value Paginator page count to set.
  * @return {(number|anychart.core.ui.Paginator)} Current page or self for chaining.
  */

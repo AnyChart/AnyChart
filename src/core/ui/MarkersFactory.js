@@ -220,25 +220,7 @@ anychart.core.ui.MarkersFactory.HANDLED_EVENT_TYPES_CAPTURE_SHIFT_ = 12;
 
 
 /**
- * Getter for the current element state.
- *
-  * True, false and null states.
- *
- * True and false are self-explanatory. null state means that element is enabled,
- * but if it depends on other entities (like, for example, markers() and hoverMarkers() in series),
- * then factory works in auto mode. For example, if series normal markers are enabled,
- * and hover markers are in null state, then upon hover hoverMarkers become enabled because of normal.
- * But if you disable normal markers – hoverMarkers are disabled too.
- * @return {?boolean} The current element state.
- *//**
- * Setter for the element enabled state.
- * @example <t>listingOnly</t>
- * if (!element.enabled())
- *    element.enabled(true);
- * @param {(null|boolean)=} opt_value Value to set.
- * @return {!anychart.MarkersFactory} {@link anychart.core.VisualBase} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for enabled.
  * @param {(null|boolean)=} opt_value Value to set.
  * @return {!anychart.core.ui.MarkersFactory|boolean|null} .
  */
@@ -265,36 +247,7 @@ anychart.core.ui.MarkersFactory.prototype.enabled = function(opt_value) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for current position formatter function of all markers.
- * @return {Function} Marker position formatter function.
- *//**
- * Setter for position formatter function of all markers.<br/>
- * <b>Note:</b> you can pass anything to positionProvider using
- * {@link anychart.core.ui.MarkersFactory#draw}, this extends positioning options
- * @param {function(*,number):anychart.math.CoordinateObject=} opt_value [function(positionProvider, index) {
- *  return {x: 80 * index, y: 0};
- * }] Function to position marker depending on index and context, it should look like this:
- * <code>function(positionProvider, index) {
- *    ... //do something
- *    return {x: smth, y: smth};
- * }</code>
- * Parameters:<br/>
- * <b>positionProvider</b> - object with information about current (by index) marker position,
- *  this object must contain <b>x</b> and <b>y</b> field (with no offsets taken in account).<br/>
- * <b>index</b> - current marker index.
- * @example
- * var marker = anychart.ui.markersFactory()
- *     .container(stage)
- *     .size(25)
- *     .positionFormatter(function(positionProvider, index) {
- *       return {x: 60 * (1 + index), y: 100 * Math.random() + 60};
- *     })
- *     .anchor('center');
- * for (var i = 0; i < 5; i++)
- *   marker.draw();
- * @return {anychart.core.ui.MarkersFactory} {@link anychart.core.ui.MarkersFactory} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for positionFormatter.
  * @param {Function=} opt_value .
  * @return {Function|anychart.core.ui.MarkersFactory} .
  */
@@ -311,14 +264,7 @@ anychart.core.ui.MarkersFactory.prototype.positionFormatter = function(opt_value
 
 
 /**
- * Getter for current position settings of all markers.
- * @return {string} Markers position settings.
- *//**
- * Setter for position settings of all markers.
- * @param {string=} opt_value [{@link anychart.enums.Position}.CENTER] Value to set.
- * @return {anychart.core.ui.MarkersFactory} {@link anychart.core.ui.MarkersFactory} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for position.
  * @param {string=} opt_value Markers position settings.
  * @return {anychart.core.ui.MarkersFactory|string} Markers position settings or itself for method chaining.
  */
@@ -338,40 +284,7 @@ anychart.core.ui.MarkersFactory.prototype.position = function(opt_value) {
 
 
 /**
- * Getter for anchor settings of all markers.
- * @return {anychart.enums.Anchor} Current marker anchor settings.
- *//**
- * Setter for anchor settings of all markers.
- * @example <t>simple-h100</t>
- * // create objects for markers factory
- * var bars = [];
- * bars.push(
- *     stage.rect(10, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(110, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(210, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(310, 30, 75, 125).stroke('1 #aaa').fill('#eee')
- * );
- * // sets global settings
- * var MMarker = anychart.ui.markersFactory()
- *     .type('star4')
- *     .fill('blue')
- *     .anchor(anychart.enums.Anchor.RIGHT_BOTTOM)
- *     .container(stage);
- * // connecting markers and objects
- * for (i in bars) {
- *   var barBounds = bars[i].getBounds();
- *   var positionProvider = {
- *     x: barBounds.left,
- *     y: barBounds.top
- *   };
- *   // mark label position with red
- *   stage.circle(positionProvider.x, positionProvider.y, 2).stroke('3 red');
- *   MMarker.draw(positionProvider);
- * }
- * @param {(anychart.enums.Anchor|string)=} opt_value [{@link anychart.enums.Anchor}.CENTER] Value to set.
- * @return {!anychart.core.ui.MarkersFactory} {@link anychart.core.ui.MarkersFactory} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for anchor.
  * @param {(anychart.enums.Anchor|string)=} opt_value .
  * @return {!(anychart.core.ui.MarkersFactory|anychart.enums.Anchor|string)} .
  */
@@ -412,46 +325,7 @@ anychart.core.ui.MarkersFactory.prototype.rotation = function(opt_value) {
 
 
 /**
- * Getter for current type settings of all markers.
- * @return {anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path}
- *  Markers type settings.
- *//**
- * Setter for type settings of all markers.
- * @example <t>simple-h100</t>
- * // create objects for markers factory
- * var bars = [];
- * bars.push(
- *     stage.rect(10, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(110, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(210, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(310, 30, 75, 125).stroke('1 #aaa').fill('#eee')
- * );
- * // sets global settings
- * var MMarker = anychart.ui.markersFactory()
- *     .type('star4')
- *     .container(stage);
- * // connecting markers and objects
- * for (i in bars) {
- *   var barBounds = bars[i].getBounds();
- *   var positionProvider = {
- *     x: barBounds.left,
- *     y: barBounds.top
- *   };
- *   MMarker.draw(positionProvider);
- * }
- * @param {(anychart.enums.MarkerType|
- *  function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value
- *  [{@link anychart.enums.MarkerType}.DIAGONAL_CROSS] Type or custom drawer. Function for a custom marker
- *  must look like this: <code>function(path, x, y, size){
- *    // path - acgraph.vector.Path
- *    // x, y - current marker position
- *    // size - marker size
- *    ... //do something
- *    return path;
- *  }</code>.
- * @return {!anychart.core.ui.MarkersFactory} {@link anychart.core.ui.MarkersFactory} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for type.
  * @param {(string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
  * @return {!anychart.core.ui.MarkersFactory|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path|string} .
  */
@@ -491,36 +365,7 @@ anychart.core.ui.MarkersFactory.prototype.setAutoType = function(value) {
 
 
 /**
- * Getter for current size settings of all markers.
- * @return {number} Markeres size settings.
- *//**
- * Setter for size settings of all markers.
- * @example
- * // create objects for markers factory
- * var bars = [];
- * bars.push(
- *     stage.rect(10, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(110, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(210, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(310, 30, 75, 125).stroke('1 #aaa').fill('#eee')
- * );
- * // sets global settings
- * var MMarker = anychart.ui.markersFactory()
- *     .size(15)
- *     .container(stage);
- * // connecting markers and objects
- * for (i in bars) {
- *   var barBounds = bars[i].getBounds();
- *   var positionProvider = {
- *     x: barBounds.left,
- *     y: barBounds.top
- *   };
- *   MMarker.draw(positionProvider);
- * }
- * @param {number=} opt_value [10] Value to set.
- * @return {anychart.core.ui.MarkersFactory} {@link anychart.core.ui.MarkersFactory} for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for size.
  * @param {number=} opt_value .
  * @return {anychart.core.ui.MarkersFactory|number} .
  */
@@ -539,40 +384,7 @@ anychart.core.ui.MarkersFactory.prototype.size = function(opt_value) {
 
 
 /**
- * Getter for current offsetX settings of all markers.
- * @return {number|string} Marker offsetX settings.
- *//**
- * Setter for offsetX settings of all markers.
- * @example <t>simple-h100</t>
- * // create objects for markers factory
- * var bars = [];
- * bars.push(
- *     stage.rect(10, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(110, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(210, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(310, 30, 75, 125).stroke('1 #aaa').fill('#eee')
- * );
- * // sets global settings
- * var MMarker = anychart.ui.markersFactory()
- *     .type('star4')
- *     .fill('blue')
- *     .offsetX(15)
- *     .container(stage);
- * // connecting markers and objects
- * for (i in bars) {
- *   var barBounds = bars[i].getBounds();
- *   var positionProvider = {
- *     x: barBounds.left+barBounds.width/2,
- *     y: barBounds.top
- *   };
- *   // mark marker position with red
- *   stage.circle(positionProvider.x, positionProvider.y, 2).stroke('3 red');
- *   MMarker.draw(positionProvider);
- * }
- * @param {(number|string)=} opt_value [0] Value to set.
- * @return {!anychart.core.ui.MarkersFactory} {@link anychart.core.ui.MarkersFactory} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for offsetX.
  * @param {(number|string)=} opt_value .
  * @return {number|string|anychart.core.ui.MarkersFactory} .
  */
@@ -591,40 +403,7 @@ anychart.core.ui.MarkersFactory.prototype.offsetX = function(opt_value) {
 
 
 /**
- * Getter for current offsetY settings of all markers.
- * @return {number|string} Markers offsetY settings.
- *//**
- * Setter for offsetY settings of all markers.
- * @example <t>simple-h100</t>
- * // create objects for markers factory
- * var bars = [];
- * bars.push(
- *     stage.rect(10, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(110, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(210, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(310, 30, 75, 125).stroke('1 #aaa').fill('#eee')
- * );
- * // sets global settings
- * var MMarker = anychart.ui.markersFactory()
- *     .type('star4')
- *     .fill('blue')
- *     .offsetY(15)
- *     .container(stage);
- * // connecting markers and objects
- * for (i in bars) {
- *   var barBounds = bars[i].getBounds();
- *   var positionProvider = {
- *     x: barBounds.left+barBounds.width/2,
- *     y: barBounds.top
- *   };
- *   // mark position point with red
- *   stage.circle(positionProvider.x, positionProvider.y, 2).stroke('3 red');
- *   MMarker.draw(positionProvider);
- * }
- * @param {(number|string)=} opt_value [0] Value to set.
- * @return {!anychart.core.ui.MarkersFactory} {@link anychart.core.ui.MarkersFactory} for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for offsetY.
  * @param {(number|string)=} opt_value .
  * @return {number|string|anychart.core.ui.MarkersFactory} .
  */
@@ -643,40 +422,7 @@ anychart.core.ui.MarkersFactory.prototype.offsetY = function(opt_value) {
 
 
 /**
- * Getter for current fill settings of all markers.
- * @return {acgraph.vector.Fill|string} Markeres fill settings.
- *//**
- * Setter for fill settings of all markers.<br/>
- * <b>Note:</b> fill is described at
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example <t>simple-h100</t>
- * // create objects for markers factory
- * var bars = [];
- * bars.push(
- *     stage.rect(10, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(110, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(210, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(310, 30, 75, 125).stroke('1 #aaa').fill('#eee')
- * );
- * // sets global settings
- * var MMarker = anychart.ui.markersFactory()
- *     .type('star4')
- *     .fill('green')
- *     .size('14')
- *     .container(stage);
- * // connecting markers and objects
- * for (i in bars) {
- *   var barBounds = bars[i].getBounds();
- *   var positionProvider = {
- *     x: barBounds.left+barBounds.width/2,
- *     y: barBounds.top
- *   };
- *   MMarker.draw(positionProvider);
- * }
- * @param {(acgraph.vector.Fill|string)=} opt_value ['black'] Value to set.
- * @return {!anychart.core.ui.MarkersFactory} {@link anychart.core.ui.MarkersFactory} for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -720,41 +466,7 @@ anychart.core.ui.MarkersFactory.prototype.setAutoFill = function(value) {
 
 
 /**
- * Getter for current stroke settings of all markers.
- * @return {acgraph.vector.Stroke|string} Markers fill settings.
- *//**
- * Setter for stroke settings of all markers.<br/>
- * <b>Note:</b> stroke is described at
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
- * @example <t>simple-h100</t>
- * // create objects for markers factory
- * var bars = [];
- * bars.push(
- *     stage.rect(10, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(110, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(210, 30, 75, 125).stroke('1 #aaa').fill('#eee'),
- *     stage.rect(310, 30, 75, 125).stroke('1 #aaa').fill('#eee')
- * );
- * // sets global settings
- * var MMarker = anychart.ui.markersFactory()
- *     .type('star4')
- *     .fill('none')
- *     .stroke('4px green .5')
- *     .size('14')
- *     .container(stage);
- * // connecting markers and objects
- * for (i in bars) {
- *   var barBounds = bars[i].getBounds();
- *   var positionProvider = {
- *     x: barBounds.left+barBounds.width/2,
- *     y: barBounds.top
- *   };
- *   MMarker.draw(positionProvider);
- * }
- * @param {(acgraph.vector.Stroke|string)=} opt_value ['black'] Value to set.
- * @return {!anychart.core.ui.MarkersFactory} {@link anychart.core.ui.MarkersFactory} for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for stroke.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke settings,
  *    if used as a setter.
  * @param {number=} opt_thickness Line thickness. If empty - set to 1.

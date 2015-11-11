@@ -89,26 +89,7 @@ anychart.core.radar.series.ContinuousBase.prototype.hasMarkers = function() {
 
 
 /**
- * Getter for series data markers.
- * @example
- * chart = anychart.radar();
- * chart.area([1, 4, 7, 1, 4])
- *  .markers()
- *    .size(10)
- *    .type('star5');
- * chart.container(stage).draw();
- * @return {!anychart.core.ui.MarkersFactory} Markers instance.
- *//**
- * Setter for series data markers.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off markers.
- * @example
- * chart = anychart.radar();
- * chart.area([1, 4, 7, 1, 4]).markers(null);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
- * @return {!anychart.core.radar.series.ContinuousBase} {@link anychart.core.radar.series.ContinuousBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for markers.
  * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!(anychart.core.ui.MarkersFactory|anychart.core.radar.series.ContinuousBase)} Markers instance or itself for chaining call.
  */
@@ -131,23 +112,7 @@ anychart.core.radar.series.ContinuousBase.prototype.markers = function(opt_value
 
 
 /**
- * Getter for series data markers on hover.
- * @example
- * chart = anychart.radar();
- * chart.area([1, 4, 7, 1, 4]).hoverMarkers().size(20);
- * chart.container(stage).draw();
- * @return {!anychart.core.ui.MarkersFactory} Markers instance.
- *//**
- * Setter for series data markers on hover.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn of markers.
- * @example
- * chart = anychart.radar();
- * chart.area([1, 4, 7, 1, 4]).hoverMarkers(null);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
- * @return {!anychart.core.radar.series.ContinuousBase} {@link anychart.core.radar.series.ContinuousBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hoverMarkers.
  * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!(anychart.core.ui.MarkersFactory|anychart.core.radar.series.ContinuousBase)} Markers instance or itself for chaining call.
  */
@@ -351,32 +316,7 @@ anychart.core.radar.series.ContinuousBase.prototype.finalizeHatchFill = goog.nul
 
 
 /**
- * Getter for connect missing points setting.
- * @return {boolean} Current setting.
- *//**
- * Setter for connect missing points setting.
- * @example
- * chart = anychart.radar();
- * var blueLine = chart.line([
- *    ['A1', 1],
- *    ['A2', 1.6],
- *    ['A3', 'missing'],
- *    ['A4', 1.1],
- *    ['A5', 1.9]
- * ]).connectMissingPoints(false);
- * var redLine = chart.line([
- *    ['A1', 2],
- *    ['A2', 2.6],
- *    ['A3', 'missing'],
- *    ['A4', 2.1],
- *    ['A5', 2.9]
- * ]).connectMissingPoints(true);
- * chart.container(stage).draw();
- * @param {boolean=} opt_value [false] If set to <b>true</b>, the series will not be interrupted on missing points.<br/>
- *   Defaults to <b>false</b>. Markers will not be drawn for missing points in both cases.
- * @return {!anychart.core.radar.series.Base} {@link anychart.core.radar.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for connectMissingPoints.
  * @param {boolean=} opt_value The value to be set.
  * @return {!anychart.core.radar.series.Base|boolean} The setting, or itself for method chaining.
  */

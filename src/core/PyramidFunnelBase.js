@@ -340,13 +340,7 @@ anychart.core.PyramidFunnelBase.prototype.isSeries = function() {
 
 
 /**
- * Gets current chart data.
- *
- * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed by first param, you can pass CSV parser settings here as a hash map.
- * @return {!anychart.data.View|!anychart.core.PyramidFunnelBase} {@link anychart.core.cartesian.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for data.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {(!anychart.data.View|!anychart.core.PyramidFunnelBase)} Returns itself if used as a setter or the mapping if used as a getter.
@@ -496,40 +490,7 @@ anychart.core.PyramidFunnelBase.prototype.colorizePoint_ = function(pointState) 
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for the current chart palette.
- * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} Color palette instance.
- *//**
- * Setter for a chart palette.
- * @example
- *  var data = [7, 7, 7, 7, 7, 7, 7];
- *  anychart.pyramid(data)
- *     .labels(null)
- *     .legend(null)
- *     .container(stage)
- *     .bounds(0,0,'33%', '100%')
- *     .draw();
- *  anychart.pyramid(data)
- *     .labels(null)
- *     .legend(null)
- *     .container(stage)
- *     .bounds('33%',0,'33%', '100%')
- *     .palette(['#00F', '#00E', '#00D', '#00C', '#00B', '#00A', '#009', '#008'])
- *     .draw();
- *  anychart.pyramid(data)
- *     .labels(null)
- *     .legend(null)
- *     .container(stage)
- *     .bounds('66%',0,'33%', '100%')
- *     .palette(
- *          anychart.palettes.rangeColors()
- *              .colors(['red', 'yellow'])
- *              .count(data.length)
- *      )
- *     .draw();
- * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value Color palette instance.
- * @return {!anychart.core.PyramidFunnelBase} An instance of {@link anychart.core.PyramidFunnelBase} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for palette.
  * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value .
  * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.core.PyramidFunnelBase)} .
  */
@@ -672,34 +633,7 @@ anychart.core.PyramidFunnelBase.prototype.hatchFillPaletteInvalidated_ = functio
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for the chart points fill in normal state.
- * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill)} Current fill in the normal state.
- *//**
- * Setter for the chart points fill in the normal state.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- *  var data = [10, 1, 7, 10];
- *  var chart = anychart.pyramid(data);
- *  chart.fill(function(){
- *     return 'rgba(210,' + (50 * (this.index + 1) - 10) + ',100,1)';
- *  });
- *  chart.legend(null);
- *  chart.stroke('none');
- *  chart.container(stage).draw();
- * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value [// return the fill from the default pallete.
- * function() {
- *   return this.sourceColor;
- * };] or Fill, or fill-function, which should look like this:<code>function() {
- *  //  this: {
- *  //  index : number  - the index of the current point
- *  //  sourceColor : acgraph.vector.Fill - fill of the current point
- *  // }
- *  return myFill; //acgraph.vector.Fill
- * };</code>.
- * @return {!anychart.core.PyramidFunnelBase} An instance of {@link anychart.core.PyramidFunnelBase} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for fill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -726,30 +660,7 @@ anychart.core.PyramidFunnelBase.prototype.fill = function(opt_fillOrColorOrKeys,
 
 
 /**
- * Getter for the chart points fill in the hover state.
- * @return {(acgraph.vector.Fill|function():acgraph.vector.Fill)} Current fill in the hover state.
- *//**
- * Setter for the chart points fill in the hover state.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Fill}
- * @example
- *  var data = [10, 1, 7, 10];
- *  var chart = anychart.pyramid(data);
- *  chart.hoverFill(['red', 'blue']);
- *  chart.container(stage).draw();
- * @param {(acgraph.vector.Fill|function():acgraph.vector.Fill)=} opt_value [// return lighter fill of the default pallete.
- * function() {
- *   return anychart.color.lighten(this.sourceColor);
- * };] or Fill, or fill-function, which should look like:<code>function() {
- *  //  this: {
- *  //  index : number  - the index of the current point
- *  //  sourceColor : acgraph.vector.Fill - fill of the current point
- *  // }
- *  return myFill; //acgraph.vector.Fill
- * };</code>.
- * @return {!anychart.core.PyramidFunnelBase} An instance of {@link anychart.core.PyramidFunnelBase} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hoverFill.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -836,23 +747,7 @@ anychart.core.PyramidFunnelBase.prototype.getFinalFill = function(usePointSettin
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for current hatch fill settings.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hatch fill.
- *//**
- * Setter for hatch fill settings.
- * @example
- *  var data = [10, 1, 7, 10];
- *  var chart = anychart.pyramid(data);
- *  chart.hatchFill('diagonalbrick');
- *  chart.container(stage).draw();
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {!anychart.core.PyramidFunnelBase} {@link anychart.core.PyramidFunnelBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hatchFill.
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
@@ -878,23 +773,7 @@ anychart.core.PyramidFunnelBase.prototype.hatchFill = function(opt_patternFillOr
 
 
 /**
- * Getter for current hover hatch fill settings.
- * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function} Current hover hatch fill.
- *//**
- * Setter for hover hatch fill settings.
- * @example
- *  var data = [10, 1, 7, 10];
- *  var chart = anychart.pyramid(data);
- *  chart.hoverHatchFill('diagonalbrick');
- *  chart.container(stage).draw();
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
- * string|boolean)=} opt_patternFillOrType PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {!anychart.core.PyramidFunnelBase} {@link anychart.core.PyramidFunnelBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hoverHatchFill.
  * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|Function|acgraph.vector.HatchFill.HatchFillType|
  * string|boolean)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
  * @param {string=} opt_color Color.
@@ -1033,30 +912,7 @@ anychart.core.PyramidFunnelBase.prototype.applyHatchFill = function(pointState) 
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for the chart points stroke in the normal state.
- * @return {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)} Current stroke in the normal state.
- *//**
- * Setter for the chart points stroke in the normal state.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
- * @example
- *  var data = [10, 1, 7, 10];
- *  var chart = anychart.pyramid(data);
- *  chart.stroke('2 white');
- *  chart.container(stage).draw();
- * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value [// return stroke from the default pallete.
- * function() {
- *   return anychart.color.darken(this.sourceColor);
- * };] or Stroke, or stroke-function, which should look like:<code>function() {
- *  //  this: {
- *  //  index : number  - the index of the current point
- *  //  sourceColor : acgraph.vector.Stroke - stroke of the current point
- *  // }
- *  return myStroke; //acgraph.vector.Stroke
- * };</code>.
- * @return {!anychart.core.PyramidFunnelBase} An instance of {@link anychart.core.PyramidFunnelBase} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for stroke.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -1081,30 +937,7 @@ anychart.core.PyramidFunnelBase.prototype.stroke = function(opt_strokeOrFill, op
 
 
 /**
- * Getter for the chart points stroke in the hover state.
- * @return {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)} Current stroke in the hover state.
- *//**
- * Setter for the chart points stroke in the hover state.<br/>
- * Learn more about coloring at:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}
- * @example
- *  var data = [10, 1, 7, 10];
- *  var chart = anychart.pyramid(data);
- *  chart.hoverStroke('2 #CC0088');
- *  chart.container(stage).draw();
- * @param {(acgraph.vector.Stroke|function():acgraph.vector.Stroke)=} opt_value [// return stroke from the default pallete.
- * function() {
- *   return anychart.color.darken(this.sourceColor);
- * };] or Stroke, or stroke-function, which should look like:<code>function() {
- *  //  this: {
- *  //  index : number  - the index of the current point
- *  //  sourceColor : acgraph.vector.Stroke - stroke of the current point
- *  // }
- *  return myStroke; //acgraph.vector.Stroke
- * };</code>.
- * @return {!anychart.core.PyramidFunnelBase} An instance of {@link anychart.core.PyramidFunnelBase} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hoverStroke.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -2140,41 +1973,7 @@ anychart.core.PyramidFunnelBase.prototype.reversed = function(opt_value) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for the current chart labels.<br/>
- * It is used to access to the current (default too) settings of the labels.<br>
- * <b>Note:</b> Default labels will appear when this getter is called for the first time.
- * @example
- *  var data = [
- *    {name: 'Point 1', value: 10},
- *    {name: 'Point 2', value: 7},
- *    {name: 'Point 3', value: 20},
- *    {name: 'Point 4', value: 14}
- *  ];
- *  var chart = anychart.pyramid(data);
- *  chart.labels()
- *      .position('outside')
- *      .fontSize(10)
- *      .fontColor('red');
- *  chart.container(stage).draw();
- * @return {!anychart.core.ui.LabelsFactory} An instance of {@link anychart.core.ui.LabelsFactory} class for method chaining.
- *//**
- * Setter for the chart labels.<br/>
- * <b>Note:</b> positioning is done using {@link anychart.core.ui.LabelsFactory#positionFormatter} method
- * and text is formatted using {@link anychart.core.ui.LabelsFactory#textFormatter} method.
- * @example
- *  var data = [
- *    {name: 'Point 1', value: 10},
- *    {name: 'Point 2', value: 7},
- *    {name: 'Point 3', value: 20},
- *    {name: 'Point 4', value: 14}
- *  ];
- *  var chart = anychart.pyramid(data);
- *  chart.labels(true);
- *  chart.container(stage).draw();
- * @param {(Object|boolean|null)=} opt_value [] LabelsFactory instance.
- * @return {!anychart.core.PyramidFunnelBase} An instance of {@link anychart.core.PyramidFunnelBase} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for labels.
  * @param {(Object|boolean|null)=} opt_value .
  * @return {!(anychart.core.ui.LabelsFactory|anychart.core.PyramidFunnelBase)} .
  */
@@ -2280,22 +2079,7 @@ anychart.core.PyramidFunnelBase.prototype.overlapMode = function(opt_value) {
 
 
 /**
- * Getter for outside labels connector length.
- * @return {number|string|null} Outside labels connector length.
- *//**
- * Setter for outside labels connector length.<br/>
- * <b>Note: </b> Works only with outside labels mode.
- * @example
- * var chart = anychart.pyramid([5, 2, 1, 3, 1, 3]);
- * chart.labels()
- *   .fontColor('black')
- *   .position('outside');
- * chart.connectorLength(20);
- * chart.container(stage).draw();
- * @param {(number|string)=} opt_value [30%] Value to set.
- * @return {anychart.core.PyramidFunnelBase} {@link anychart.core.PyramidFunnelBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for connectorLength.
  * @param {(number|string)=} opt_value [30%] Value to set.
  * @return {!anychart.core.PyramidFunnelBase|number|string|null} Outside labels margin or self for chaining call.
  */
@@ -2313,50 +2097,7 @@ anychart.core.PyramidFunnelBase.prototype.connectorLength = function(opt_value) 
 
 
 /**
- * Getter for outside labels connectors stroke settings.
- * @return {acgraph.vector.Stroke|Function} Current stroke settings.
- *//**
- * Setter for outside labels connectors stroke settings by function.<br/>
- * <b>Note: </b> Works only with outside labels mode.
- * @example
- * var chart = anychart.pyramid([5, 2, 1, 3, 1, 3]);
- * chart.labels()
- *   .fontColor('black')
- *   .position('outside');
- * chart.connectorStroke(
- *      function(){
- *        return '3 '+ this.sourceColor;
- *      }
- *   );
- * chart.container(stage).draw();
- * @param {function():(acgraph.vector.ColoredFill|acgraph.vector.Stroke)=} opt_fillFunction [function() {
- *  return anychart.color.darken(this.sourceColor);
- * }] Function that looks like <code>function(){
- *    // this.sourceColor -  color returned by fill() getter.
- *    return fillValue; // type acgraph.vector.Fill
- * }</code>.
- * @return {!anychart.core.PyramidFunnelBase} {@link anychart.core.PyramidFunnelBase} instance for method chaining.
- *//**
- * Setter for outside labels connectors stroke settings.<br/>
- * Learn more about stroke settings:
- * {@link http://docs.anychart.com/__VERSION__/General_settings/Elements_Stroke}<br/>
- * <b>Note: </b> Works only with outside labels mode.
- * @example
- * var chart = anychart.pyramid([5, 2, 1, 3, 1, 3]);
- * chart.labels()
- *   .fontColor('black')
- *   .position('outside');
- * chart.connectorStroke('orange', 3, '5 2', 'round');
- * chart.container(stage).draw();
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {!anychart.core.PyramidFunnelBase} {@link anychart.core.PyramidFunnelBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for connectorStroke.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
@@ -3238,19 +2979,7 @@ anychart.core.PyramidFunnelBase.prototype.updateConnector = function(label, poin
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for data markers.
- * @example <t>listingOnly</t>
- * chart.markers().size(10);
- * @return {!anychart.core.ui.MarkersFactory} Markers instance.
- *//**
- * Setter for data markers.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn off markers.
- * @example <t>pyramidChart</t>
- * chart.markers(null);
- * @param {(Object|boolean|null|string)=} opt_value Data markers settings.
- * @return {!anychart.core.PyramidFunnelBase} {@link anychart.core.PyramidFunnelBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for markers.
  * @param {(Object|boolean|null|string)=} opt_value Data markers settings.
  * @return {!(anychart.core.ui.MarkersFactory|anychart.core.PyramidFunnelBase)} Markers instance or itself for chaining call.
  */
@@ -3274,21 +3003,7 @@ anychart.core.PyramidFunnelBase.prototype.markers = function(opt_value) {
 
 
 /**
- * Getter for series data markers on hover.
- * @example <t>listingOnly</t>
- * series.hoverMarkers().size(20);
- * @return {!anychart.core.ui.MarkersFactory} Markers instance.
- *//**
- * Setter for series data markers on hover.<br/>
- * <b>Note:</b> pass <b>'none'</b> or <b>null</b> to turn of markers.
- * @example <t>listingOnly</t>
- * series.hoverMarkers(null);
- * @example <t>lineChart</t>
- * chart.spline([1, 1.4, 1.2, 2]).hoverMarkers({size: 10, type: 'star5'});
- * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
- * @return {!anychart.core.PyramidFunnelBase} {@link anychart.core.PyramidFunnelBase} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for hoverMarkers.
  * @param {(Object|boolean|null|string)=} opt_value Series data markers settings.
  * @return {!(anychart.core.ui.MarkersFactory|anychart.core.PyramidFunnelBase)} Markers instance or itself for chaining call.
  */
@@ -3597,26 +3312,7 @@ anychart.core.PyramidFunnelBase.prototype.drawMarker = function(pointState) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for tolltip settings.
- * @example
- * chart.tooltip()
- *     .titleFormatter(function(){
- *         return 'title [' + this.index + ']';
- *     })
- *     .title()
- *         .enabled(true);
- * chart.container(stage).draw();
- * @return {!anychart.core.ui.Tooltip} An instance of {@link anychart.core.ui.Tooltip} class for method chaining.
- *//**
- * Setter for tolltip settings.
- * @example
- * var chart = anychart.pyramid([10, 14, 8, 12]);
- * chart.tooltip(false);
- * chart.container(stage).draw();
- * @param {(Object|boolean|null)=} opt_value Tooltip settings.
- * @return {!anychart.core.PyramidFunnelBase} An instance of {@link anychart.core.PyramidFunnelBase} class for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for tooltip.
  * @param {(Object|boolean|null)=} opt_value Tooltip settings.
  * @return {!(anychart.core.PyramidFunnelBase|anychart.core.ui.Tooltip)} Tooltip instance or self for method chaining.
  */

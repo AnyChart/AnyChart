@@ -147,30 +147,7 @@ anychart.core.cartesian.series.ContinuousBase.prototype.finalizeHatchFill = goog
 
 
 /**
- * Getter for connect missing points setting.
- * @return {boolean} Current setting.
- *//**
- * Setter for connect missing points setting.
- * @example <t>lineChart</t>
- * var blueLine = chart.line([
- *    ['A1', 1],
- *    ['A2', 1.6],
- *    ['A3', 'missing'],
- *    ['A4', 1.1],
- *    ['A5', 1.9]
- * ]).connectMissingPoints(false);
- * var redLine = chart.line([
- *    ['A1', 2],
- *    ['A2', 2.6],
- *    ['A3', 'missing'],
- *    ['A4', 2.1],
- *    ['A5', 2.9]
- * ]).connectMissingPoints(true);
- * @param {boolean=} opt_value [false] If set to <b>true</b>, the series will not be interrupted on missing points.<br/>
- *   Defaults to <b>false</b>. Markers will not be drawn for missing points in both cases.
- * @return {!anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Base} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for connectMissingPoints.
  * @param {boolean=} opt_value The value to be set.
  * @return {!anychart.core.cartesian.series.Base|boolean} The setting, or itself for method chaining.
  */

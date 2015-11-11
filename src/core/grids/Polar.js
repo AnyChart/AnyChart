@@ -140,14 +140,7 @@ anychart.core.grids.Polar.prototype.layout = function(opt_value) {
 //  Scale.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter for axis yScale.
- * @return {anychart.scales.Base} Axis yScale.
- *//**
- * Setter for axis yScale.
- * @param {anychart.scales.Base=} opt_value Value to set.
- * @return {!anychart.core.grids.Polar} {@link anychart.core.grids.Polar} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for yScale.
  * @param {anychart.scales.Base=} opt_value Scale.
  * @return {anychart.scales.Base|!anychart.core.grids.Polar} Axis yScale or itself for method chaining.
  */
@@ -188,14 +181,7 @@ anychart.core.grids.Polar.prototype.yScaleInvalidated_ = function(event) {
 
 
 /**
- * Getter for axis xScale.
- * @return {anychart.scales.Base} Axis xScale.
- *//**
- * Setter for axis xScale.
- * @param {anychart.scales.Base=} opt_value Value to set.
- * @return {!anychart.core.grids.Polar} {@link anychart.core.grids.Polar} instance for method chaining.
- *//**
- * @ignoreDoc
+ * Getter/setter for xScale.
  * @param {anychart.scales.Base=} opt_value Scale.
  * @return {anychart.scales.Base|!anychart.core.grids.Polar} Axis xScale or itself for method chaining.
  */
