@@ -335,7 +335,7 @@ anychart.scales.Base.prototype.stackMode = function(opt_value) {
     if (this.stackMode_ != res) {
       this.stackMode_ = res;
       this.applyStacking = fn;
-      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION | anychart.Signal.NEEDS_RECALCULATION);
     }
     return this;
   }
