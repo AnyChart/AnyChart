@@ -458,6 +458,7 @@ anychart.core.ui.TooltipItem.prototype.y = function(opt_value) {
  */
 anychart.core.ui.TooltipItem.prototype.offsetX = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.toNumber(opt_value) || 0;
     if (this.offsetX_ != opt_value) {
       this.offsetX_ = opt_value;
       this.position_ = null;
@@ -478,6 +479,7 @@ anychart.core.ui.TooltipItem.prototype.offsetX = function(opt_value) {
  */
 anychart.core.ui.TooltipItem.prototype.offsetY = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.toNumber(opt_value) || 0;
     if (this.offsetY_ != opt_value) {
       this.offsetY_ = opt_value;
       this.invalidate(anychart.ConsistencyState.TOOLTIP_POSITION,

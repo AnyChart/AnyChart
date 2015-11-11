@@ -542,8 +542,9 @@ anychart.core.ui.SeriesTooltip.prototype.anchor = function(opt_value) {
  */
 anychart.core.ui.SeriesTooltip.prototype.offsetX = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.toNumber(opt_value) || 0;
     if (this.offsetX_ != opt_value) {
-      this.offsetX_ = anychart.utils.toNumber(opt_value);
+      this.offsetX_ = opt_value;
       this.instantPosition_ = null;
       this.invalidate(anychart.ConsistencyState.TOOLTIP_POSITION, anychart.Signal.NEEDS_REDRAW);
     }
@@ -561,8 +562,9 @@ anychart.core.ui.SeriesTooltip.prototype.offsetX = function(opt_value) {
  */
 anychart.core.ui.SeriesTooltip.prototype.offsetY = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.toNumber(opt_value) || 0;
     if (this.offsetY_ != opt_value) {
-      this.offsetY_ = anychart.utils.toNumber(opt_value);
+      this.offsetY_ = opt_value;
       this.instantPosition_ = null;
       this.invalidate(anychart.ConsistencyState.TOOLTIP_POSITION, anychart.Signal.NEEDS_REDRAW);
     }
