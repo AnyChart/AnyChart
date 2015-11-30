@@ -1048,6 +1048,10 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS);
   }
 
+  if (!this.tooltip().container()) {
+    this.tooltip().container(/** @type {acgraph.vector.ILayer} */(this.container()));
+  }
+
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     if (this.dataLayer_) {
       this.dataLayer_.clear();

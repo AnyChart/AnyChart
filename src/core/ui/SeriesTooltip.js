@@ -1,5 +1,6 @@
 goog.provide('anychart.core.ui.SeriesTooltip');
 goog.require('acgraph.math.Coordinate');
+goog.require('anychart.compatibility');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.Label');
@@ -88,8 +89,6 @@ anychart.core.ui.SeriesTooltip = function() {
   this.rootLayer_ = acgraph.layer();
   this.registerDisposable(this.rootLayer_);
   this.bindHandlersToGraphics(this.rootLayer_);
-
-  anychart.core.utils.TooltipsContainer.getInstance().allocTooltip(this);
 };
 goog.inherits(anychart.core.ui.SeriesTooltip, anychart.core.VisualBase);
 
@@ -1308,7 +1307,10 @@ anychart.core.ui.SeriesTooltip.prototype.createTriangle_ = function(x3, y3) {
  */
 anychart.core.ui.SeriesTooltip.prototype.movementOutsideThePoint_ = function(event) {
   if (this.isInTriangle_(event['clientX'], event['clientY'])) {
-    anychart.core.utils.TooltipsContainer.getInstance().selectable(true);
+
+    if (anychart.compatibility.ALLOW_GLOBAL_TOOLTIP_CONTAINER) {
+      anychart.core.utils.TooltipsContainer.getInstance().selectable(true);
+    }
 
   } else {
     goog.events.unlisten(goog.dom.getDocument(), goog.events.EventType.MOUSEMOVE, this.movementOutsideThePoint_, false, this);
@@ -1421,7 +1423,10 @@ anychart.core.ui.SeriesTooltip.prototype.hideSelectable_ = function(event) {
     return true;
   }
 
-  anychart.core.utils.TooltipsContainer.getInstance().selectable(false);
+  if (anychart.compatibility.ALLOW_GLOBAL_TOOLTIP_CONTAINER) {
+    anychart.core.utils.TooltipsContainer.getInstance().selectable(false);
+  }
+
   goog.events.unlisten(this.rootLayer_.domElement(), goog.events.EventType.MOUSELEAVE, this.hideSelectable_, false, this);
   this.triangle_ = null;
 
@@ -1483,7 +1488,9 @@ anychart.core.ui.SeriesTooltip.prototype.isFloatingInternal = anychart.core.ui.S
 
 /** @inheritDoc */
 anychart.core.ui.SeriesTooltip.prototype.disposeInternal = function() {
-  anychart.core.utils.TooltipsContainer.getInstance().release(this);
+  if (anychart.compatibility.ALLOW_GLOBAL_TOOLTIP_CONTAINER) {
+    anychart.core.utils.TooltipsContainer.getInstance().release(this);
+  }
   goog.base(this, 'disposeInternal');
 };
 

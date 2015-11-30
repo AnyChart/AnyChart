@@ -1,4 +1,5 @@
 goog.provide('anychart.core.ui.Tooltip');
+goog.require('anychart.compatibility');
 goog.require('anychart.core.Base');
 goog.require('anychart.core.ui.TooltipItem');
 goog.require('anychart.core.utils.TooltipsContainer');
@@ -175,12 +176,12 @@ anychart.core.ui.Tooltip.prototype.valuePostfix = function(opt_value) {
 anychart.core.ui.Tooltip.prototype.allowLeaveScreen = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.allowLeaveScreen_ != opt_value) {
-      this.allowLeaveScreen_ = opt_value;
+      this.allowLeaveScreen_ = anychart.compatibility.ALLOW_GLOBAL_TOOLTIP_CONTAINER && opt_value;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
-    return this.allowLeaveScreen_;
+    return anychart.compatibility.ALLOW_GLOBAL_TOOLTIP_CONTAINER && this.allowLeaveScreen_;
   }
 };
 
@@ -392,11 +393,31 @@ anychart.core.ui.Tooltip.prototype.enabled = function(opt_value) {
 anychart.core.ui.Tooltip.prototype.maybeCreateTooltipItem_ = function() {
   if (!this.item_) {
     this.item_ = new anychart.core.ui.TooltipItem();
-    anychart.core.utils.TooltipsContainer.getInstance().allocTooltip(this.item_);
     this.item_.suspendSignalsDispatching();
     this.item_.visible(false);
     this.registerDisposable(this.item_);
     this.item_.resumeSignalsDispatching(true);
+  }
+};
+
+
+/**
+ * Get/set container to tooltip.
+ * @param {(acgraph.vector.ILayer|string|Element)=} opt_value
+ * @return {acgraph.vector.ILayer|anychart.core.ui.Tooltip}
+ */
+anychart.core.ui.Tooltip.prototype.container = function(opt_value) {
+  this.maybeCreateTooltipItem_();
+
+  if (goog.isDef(opt_value)) {
+    if (anychart.compatibility.ALLOW_GLOBAL_TOOLTIP_CONTAINER) {
+      anychart.core.utils.TooltipsContainer.getInstance().allocTooltip(this.item_);
+    } else {
+      this.item_.container(opt_value);
+    }
+    return this;
+  } else {
+    return /** @type {acgraph.vector.ILayer} */(this.item_.container());
   }
 };
 
@@ -481,12 +502,23 @@ anychart.core.ui.Tooltip.prototype.redraw = function() {
  * @return {acgraph.math.Coordinate} Processed tooltip position.
  */
 anychart.core.ui.Tooltip.prototype.processPosition_ = function(position) {
-  if (this.allowLeaveScreen_) {
+  if (this.allowLeaveScreen()) {
     return position;
+
   } else {
-    //we need this to get actual pixel bounds
-    this.item_.x(position.x);
-    this.item_.y(position.y);
+    var chartOffset = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+    if (anychart.compatibility.ALLOW_GLOBAL_TOOLTIP_CONTAINER) {
+      // we need this to get actual pixel bounds
+      this.item_.x(position.x);
+      this.item_.y(position.y);
+    } else {
+      this.item_.x(position.x - chartOffset.x);
+      this.item_.y(position.y - chartOffset.y);
+
+      position.x -= chartOffset.x;
+      position.y -= chartOffset.y;
+    }
+
     var pixelBounds = this.item_.getPixelBounds();
     var windowBox = goog.dom.getViewportSize(goog.dom.getWindow());
 
@@ -527,7 +559,9 @@ anychart.core.ui.Tooltip.prototype.processPosition_ = function(position) {
 
 /** @inheritDoc */
 anychart.core.ui.Tooltip.prototype.disposeInternal = function() {
-  anychart.core.utils.TooltipsContainer.getInstance().release(this.item_);
+  if (anychart.compatibility.ALLOW_GLOBAL_TOOLTIP_CONTAINER) {
+    anychart.core.utils.TooltipsContainer.getInstance().release(this.item_);
+  }
   goog.base(this, 'disposeInternal');
 };
 

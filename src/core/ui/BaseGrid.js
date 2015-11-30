@@ -1448,6 +1448,10 @@ anychart.core.ui.BaseGrid.prototype.drawInternal = function(positionRecalculated
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
 
+  if (!this.tooltip().container()) {
+    this.tooltip().container(/** @type {acgraph.vector.ILayer} */(this.container()));
+  }
+
   var verticalScrollBar, horizontalScrollBar;
 
   //---------- Creating DOM structure ---------------

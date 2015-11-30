@@ -1347,6 +1347,10 @@ anychart.core.ui.Legend.prototype.draw = function() {
     }
   }
 
+  if (!this.tooltip().container()) {
+    this.tooltip().container(/** @type {acgraph.vector.ILayer} */(this.container()));
+  }
+
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     this.rootElement.zIndex(/** @type {number} */ (this.zIndex()));
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);

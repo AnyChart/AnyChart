@@ -1437,6 +1437,10 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
     this.palette_.count(iterator.getRowsCount());
   }
 
+  if (!this.tooltip().container()) {
+    this.tooltip().container(/** @type {acgraph.vector.ILayer} */(this.container()));
+  }
+
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calculate_(bounds);
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PIE_LABELS);
