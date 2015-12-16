@@ -3,13 +3,20 @@ sudo: false
 jdk:
   - oraclejdk8
 
-before_script: ./build contrib
-script: ./build compile
+before_script: 
+- git submodule update
+- ./build contrib
+script: 
+- ./build compile
+- ls -lah /home/travis/build/AnyChart/ACDVF/out/
+- if [ `wc -c /home/travis/build/AnyChart/ACDVF/out/anychart-bundle.min.js |  awk '{print $1}'` -eq 0]
+- then exit -1
+- fi
 
 after_success:
 - echo -e "Host static.anychart.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 - ssh root@static.anychart.com "mkdir -p /apps/static/js/$TRAVIS_BRANCH"
-- scp out/anychart-bundle.min.js root@static.anychart.com:/apps/static/js/$TRAVIS_BRANCH/anychart-bundle.min.js
+- scp /home/travis/build/AnyChart/ACDVF/out/anychart-bundle.min.js root@static.anychart.com:/apps/static/js/$TRAVIS_BRANCH/anychart-bundle.min.js
 
 notifications:
   slack: anychart-team:sJRPhNn8Ur8yVdhvhgp6EbDM
