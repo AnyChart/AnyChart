@@ -9,7 +9,7 @@ before_script:
 script: 
 - ./build compile
 - ls -lah /home/travis/build/AnyChart/ACDVF/out/
-- if [ `wc -c /home/travis/build/AnyChart/ACDVF/out/anychart-bundle.min.js |  awk '{print $1}'` -eq 0] then exit -1 fi
+- if [ `wc -c /home/travis/build/AnyChart/ACDVF/out/anychart-bundle.min.js |  awk '{print $1}'` ]; then exit -1; fi
 
 after_success:
 - echo -e "Host static.anychart.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
