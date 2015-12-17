@@ -161,14 +161,15 @@ anychart.ConsistencyState = {
   //---------------------------------- GRIDS STATES (VB) ---------------------------------
   // also combined
   GRIDS_POSITION: 1 << 5,
-  //---------------------------------- BASE GRIDS STATES (VB) ---------------------------------
+  //---------------------------------- BASE GRID STATES (GRIDS) ---------------------------------
   BASE_GRID_CLICK: 1 << 6,
   BASE_GRID_HOVER: 1 << 7,
   //---------------------------------- BUTTON STATES (VB) ---------------------------------
   BUTTON_BACKGROUND: 1 << 5,
   //---------------------------------- CREDITS STATES (VB) ---------------------------------
   CREDITS_POSITION: 1 << 5,
-  //---------------------------------- DATA GRID STATES (VB) ---------------------------------
+  CREDITS_REDRAW_IMAGE: 1 << 6,
+  //---------------------------------- DATA GRID STATES (BASE GRID) ---------------------------------
   DATA_GRID_GRIDS: 1 << 8,
   //---------------------------------- DATA GRID COLUMN STATES (VB) ---------------------------------
   DATA_GRID_COLUMN_TITLE: 1 << 5,

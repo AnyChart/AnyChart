@@ -37,6 +37,20 @@ anychart.core.ui.Credits = function() {
    */
   this.inChart_ = false;
 
+  /**
+   * Whether logo image is loading.
+   * @type {boolean}
+   * @private
+   */
+  this.isLoading_ = false;
+
+  /**
+   * Logo image loader.
+   * @type {goog.net.ImageLoader}
+   * @private
+   */
+  this.imageLoader_ = null;
+
   //disable by default at anychart related domains
   this.enabled(!anychart.core.ui.Credits.DOMAIN_REGEXP.test(goog.dom.getWindow().location.hostname));
 };
@@ -85,7 +99,8 @@ anychart.core.ui.Credits.CssClass_ = {
 anychart.core.ui.Credits.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.CREDITS_POSITION;
+    anychart.ConsistencyState.CREDITS_POSITION |
+    anychart.ConsistencyState.CREDITS_REDRAW_IMAGE;
 
 
 /**
@@ -162,8 +177,8 @@ anychart.core.ui.Credits.prototype.logoSrc = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.logoSrc_ != opt_value) {
       this.logoSrc_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.CREDITS_REDRAW_IMAGE, anychart.Signal.NEEDS_REDRAW);
     }
-    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     return this;
   } else {
     return this.logoSrc_;
@@ -292,26 +307,42 @@ anychart.core.ui.Credits.prototype.draw = function() {
     // create span with text
     this.domElement_.innerHTML = this.getHTMLString_(valid, false);
 
-    var imageLoader = new goog.net.ImageLoader();
-    goog.events.listen(imageLoader, goog.events.EventType.LOAD, function() {
-      // append image
-      if (!this.isDisposed())
+    if (this.hasInvalidationState(anychart.ConsistencyState.CREDITS_REDRAW_IMAGE)) {
+      if (this.isLoading_) {
+        this.imageLoader_.removeImage('logo');
+        this.isLoading_ = false;
+      }
+
+      if (!this.imageLoader_ || this.imageLoader_.isDisposed())
+        this.imageLoader_ = new goog.net.ImageLoader();
+
+      goog.events.listen(this.imageLoader_, goog.events.EventType.LOAD, function() {
+        // append image
+        if (!this.isDisposed())
+          this.domElement_.innerHTML += this.getHTMLString_(valid, true);
+      }, false, this);
+
+      // image not loaded - should draw logo by framework
+      goog.events.listen(this.imageLoader_, goog.net.EventType.ERROR, function() {
+        if (this.enabled() && !this.isDisposed())
+          this.drawLogo_();
+      }, false, this);
+
+      // all work is done
+      goog.events.listen(this.imageLoader_, goog.net.EventType.COMPLETE, function() {
+        goog.dispose(this.imageLoader_);
+        this.isLoading_ = false;
+      }, false, this);
+
+      this.imageLoader_.addImage('logo', this.addProtocol_('static.anychart.com/logo.png'));
+      this.imageLoader_.start();
+      this.isLoading_ = true;
+      this.markConsistent(anychart.ConsistencyState.CREDITS_REDRAW_IMAGE);
+    } else {
+      // if we have marked state and have changed appearance but loading still in progress
+      if (!this.isLoading_)
         this.domElement_.innerHTML += this.getHTMLString_(valid, true);
-    }, false, this);
-
-    // image not loaded - should draw logo by framework
-    goog.events.listen(imageLoader, goog.net.EventType.ERROR, function() {
-      if (this.enabled() && !this.isDisposed())
-        this.drawLogo_();
-    }, false, this);
-
-    // all work is done
-    goog.events.listen(imageLoader, goog.net.EventType.COMPLETE, function() {
-      goog.dispose(imageLoader);
-    }, false, this);
-
-    imageLoader.addImage('logo', this.addProtocol_('static.anychart.com/logo.png'));
-    imageLoader.start();
+    }
 
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
