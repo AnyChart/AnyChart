@@ -80,8 +80,13 @@ anychart.onDocumentReady(function() {
   });
 
   chart.listen(anychart.enums.EventType.ROW_SELECT, function(e) {
-    var msg = e['item'].get('name');
-    if (e['period']) msg += '\nPeriod: ' + e['period']['id'];
+    var msg = '';
+    if (e['item']) {
+      msg = e['item'].get('name');
+      if (e['period']) msg += '\nPeriod: ' + e['period']['id'];
+    } else {
+      msg = '-- Unselect';
+    }
     log(anychart.enums.EventType.ROW_SELECT, msg);
   });
 

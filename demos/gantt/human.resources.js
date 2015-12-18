@@ -72,7 +72,7 @@ function getData() {
       "id": "1",
       "name": "Alex Exler",
       "periods": [
-        {"id": "1_1", "start": 1171468800000, "end": 1171987200000, "stroke": moccasin_border, "fill": {"angle": 90, "keys": [{"color": moccasin_bottom, "position": 0}, {"color": moccasin_middle, "position": 0.38}, {"color": moccasin_top, "position": 1}]}},
+        {"id": "1_1", "start": '1171468800000', "end": 1171987200000, "stroke": moccasin_border, "fill": {"angle": 90, "keys": [{"color": moccasin_bottom, "position": 0}, {"color": moccasin_middle, "position": 0.38}, {"color": moccasin_top, "position": 1}]}},
         {"id": "1_2", "start": 1174921200000, "end": 1175612400000, "stroke": moccasin_border, "fill": {"angle": 90, "keys": [{"color": moccasin_bottom, "position": 0}, {"color": moccasin_middle, "position": 0.38}, {"color": moccasin_top, "position": 1}]}},
         {"id": "1_3", "start": 1177599600000, "end": 1178550000000, "stroke": moccasin_border, "fill": {"angle": 90, "keys": [{"color": moccasin_bottom, "position": 0}, {"color": moccasin_middle, "position": 0.38}, {"color": moccasin_top, "position": 1}]}},
         {"id": "1_4", "start": 1182092400000, "end": 1182697200000, "stroke": moccasin_border, "fill": {"angle": 90, "keys": [{"color": moccasin_bottom, "position": 0}, {"color": moccasin_middle, "position": 0.38}, {"color": moccasin_top, "position": 1}]}},

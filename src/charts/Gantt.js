@@ -7,6 +7,7 @@ goog.require('anychart.core.ui.IInteractiveGrid');
 goog.require('anychart.core.ui.ScrollBar');
 goog.require('anychart.core.ui.Splitter');
 goog.require('anychart.core.ui.Timeline');
+goog.require('anychart.core.utils.GanttContextProvider');
 goog.require('anychart.data.Tree');
 
 
@@ -130,6 +131,13 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
   this.editable = false;
 
   /**
+   * Context provider.
+   * @type {anychart.core.utils.GanttContextProvider}
+   * @private
+   */
+  this.formatProvider_ = null;
+
+  /**
    * Vertical scroll bar.
    * @type {anychart.core.ui.ScrollBar}
    * @private
@@ -138,8 +146,6 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
   this.verticalScrollBar_.zIndex(anychart.charts.Gantt.Z_INDEX_SCROLL);
   this.verticalScrollBar_.listenSignals(this.scrollInvalidated_, this.verticalScrollBar_);
   this.registerDisposable(this.verticalScrollBar_);
-
-
 
   this.listenOnce(anychart.enums.EventType.CHART_DRAW, function() {
     this.dataGrid().initMouseFeatures();
@@ -210,7 +216,18 @@ anychart.charts.Gantt.Z_INDEX_SCROLL = 20;
  * @inheritDoc
  */
 anychart.charts.Gantt.prototype.getAllSeries = function() {
-  return [this];
+  return [];
+};
+
+
+/** @inheritDoc */
+anychart.charts.Gantt.prototype.createFormatProvider = function(item, opt_period) {
+  if (!this.formatProvider_)
+    this.formatProvider_ = new anychart.core.utils.GanttContextProvider(this.controller_.isResources());
+  this.formatProvider_.currentItem = item;
+  this.formatProvider_.currentPeriod = opt_period;
+  this.formatProvider_.applyReferenceValues();
+  return this.formatProvider_;
 };
 
 
@@ -766,7 +783,8 @@ anychart.charts.Gantt.prototype.rowMouseMove = function(event) {
       new acgraph.math.Coordinate(event['originalEvent']['clientX'], event['originalEvent']['clientY']) :
       new acgraph.math.Coordinate(0, 0);
 
-  tooltip.show(event, position);
+  var formatProvider = this.createFormatProvider(event['item'], event['period']);
+  tooltip.show(formatProvider, position);
 };
 
 
@@ -818,12 +836,23 @@ anychart.charts.Gantt.prototype.rowMouseDown = function(event) {
 
 
 /**
- * Unselects currently selected item.
- * TODO (A.Kudryavtsev): Do we need to export this method?
+ * @inheritDoc
  */
-anychart.charts.Gantt.prototype.unselect = function() {
-  this.dg_.unselect();
-  this.tl_.unselect();
+anychart.charts.Gantt.prototype.rowUnselect = function(event) {
+  if (this.dg_.selectedItem || this.tl_.selectedItem) {
+    this.dg_.rowUnselect(event);
+    this.tl_.rowUnselect(event);
+
+    //NOTE: this event will not be dispatched by dg_ or tl_ because their interactivity handler is chart but not they are.
+    var newEvent = {
+      'type': anychart.enums.EventType.ROW_SELECT,
+      'actualTarget': event ? event.target : this,
+      'target': this,
+      'originalEvent': event,
+      'item': null //This is a real difference between 'select' and 'unselect' events.
+    };
+    this.dispatchEvent(newEvent);
+  }
 };
 
 

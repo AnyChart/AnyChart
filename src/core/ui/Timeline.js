@@ -1,6 +1,7 @@
 goog.provide('anychart.core.ui.Timeline');
 
 
+goog.require('acgraph.vector.Path');
 goog.require('anychart.core.gantt.TimelineHeader');
 goog.require('anychart.core.ui.BaseGrid');
 goog.require('anychart.core.ui.LabelsFactory');
@@ -56,42 +57,42 @@ anychart.core.ui.Timeline = function(opt_controller, opt_isResources) {
 
   /**
    * Edit preview path.
-   * @type {acgraph.vector.Path}
+   * @type {anychart.core.ui.Timeline.LiveEditControl}
    * @private
    */
   this.editPreviewPath_ = null;
 
   /**
-   * Ediе progress path.
-   * @type {acgraph.vector.Path}
+   * Edit progress path.
+   * @type {anychart.core.ui.Timeline.LiveEditControl}
    * @private
    */
   this.editProgressPath_ = null;
 
   /**
    * Edit left thumb path.
-   * @type {acgraph.vector.Path}
+   * @type {anychart.core.ui.Timeline.LiveEditControl}
    * @private
    */
   this.editLeftThumbPath_ = null;
 
   /**
    * Edit right thumb path.
-   * @type {acgraph.vector.Path}
+   * @type {anychart.core.ui.Timeline.LiveEditControl}
    * @private
    */
   this.editRightThumbPath_ = null;
 
   /**
    * Edit start connector path.
-   * @type {acgraph.vector.Circle}
+   * @type {anychart.core.ui.Timeline.LiveEditControl}
    * @private
    */
   this.editStartConnectorPath_ = null;
 
   /**
    * Edit finish connector path.
-   * @type {acgraph.vector.Circle}
+   * @type {anychart.core.ui.Timeline.LiveEditControl}
    * @private
    */
   this.editFinishConnectorPath_ = null;
@@ -1276,12 +1277,12 @@ anychart.core.ui.Timeline.prototype.getSeparationPath_ = function() {
 
 /**
  * Getter for this.editPreviewPath_.
- * @return {acgraph.vector.Path}
+ * @return {anychart.core.ui.Timeline.LiveEditControl}
  * @private
  */
 anychart.core.ui.Timeline.prototype.getEditPreviewPath_ = function() {
   if (!this.editPreviewPath_) {
-    this.editPreviewPath_ = /** @type {acgraph.vector.Path} */ (this.getEditLayer().path());
+    this.editPreviewPath_ = new anychart.core.ui.Timeline.LiveEditControl(this.getEditLayer());
     this.editPreviewPath_
         .zIndex(anychart.core.ui.Timeline.EDIT_PREVIEW_Z_INDEX)
         .cursor(acgraph.vector.Cursor.EW_RESIZE);
@@ -1300,12 +1301,12 @@ anychart.core.ui.Timeline.prototype.getEditPreviewPath_ = function() {
 
 /**
  * Getter for this.editProgressPath_.
- * @return {acgraph.vector.Path}
+ * @return {anychart.core.ui.Timeline.LiveEditControl}
  * @private
  */
 anychart.core.ui.Timeline.prototype.getEditProgressPath_ = function() {
   if (!this.editProgressPath_) {
-    this.editProgressPath_ = /** @type {acgraph.vector.Path} */ (this.getEditLayer().path());
+    this.editProgressPath_ = new anychart.core.ui.Timeline.LiveEditControl(this.getEditLayer());
     this.editProgressPath_
         .zIndex(anychart.core.ui.Timeline.EDIT_PROGRESS_Z_INDEX);
 
@@ -1323,17 +1324,17 @@ anychart.core.ui.Timeline.prototype.getEditProgressPath_ = function() {
 
 /**
  * Getter for this.editLeftThumbPath_.
- * @return {acgraph.vector.Path}
+ * @return {anychart.core.ui.Timeline.LiveEditControl}
  * @private
  */
 anychart.core.ui.Timeline.prototype.getEditLeftThumbPath_ = function() {
   if (!this.editLeftThumbPath_) {
-    this.editLeftThumbPath_ = /** @type {acgraph.vector.Path} */ (this.getEditLayer().path());
+    this.editLeftThumbPath_ = new anychart.core.ui.Timeline.LiveEditControl(this.getEditLayer());
     this.editLeftThumbPath_
         .zIndex(anychart.core.ui.Timeline.EDIT_LEFT_THUMB_Z_INDEX)
         .cursor(/** @type {acgraph.vector.Cursor} */ ('col-resize')); //TODO (A.Kudryavtsev): Kind of crossbrowser issue?
 
-    this.editLeftThumbPath_['preview__'] = this.getEditPreviewPath_();
+    this.editLeftThumbPath_.preview = this.getEditPreviewPath_();
 
     this.eventsHandler.listen(this.editLeftThumbPath_, acgraph.events.EventType.MOUSEDOWN, function(e) {
       e.stopPropagation();
@@ -1349,17 +1350,17 @@ anychart.core.ui.Timeline.prototype.getEditLeftThumbPath_ = function() {
 
 /**
  * Getter for this.editLeftThumbPath_.
- * @return {acgraph.vector.Path}
+ * @return {anychart.core.ui.Timeline.LiveEditControl}
  * @private
  */
 anychart.core.ui.Timeline.prototype.getEditRightThumbPath_ = function() {
   if (!this.editRightThumbPath_) {
-    this.editRightThumbPath_ = /** @type {acgraph.vector.Path} */ (this.getEditLayer().path());
+    this.editRightThumbPath_ = new anychart.core.ui.Timeline.LiveEditControl(this.getEditLayer());
     this.editRightThumbPath_
         .zIndex(anychart.core.ui.Timeline.EDIT_RIGHT_THUMB_Z_INDEX)
         .cursor(/** @type {acgraph.vector.Cursor} */ ('col-resize')); //TODO (A.Kudryavtsev): Kind of crossbrowser issue?
 
-    this.editRightThumbPath_['preview__'] = this.getEditPreviewPath_();
+    this.editRightThumbPath_.preview = this.getEditPreviewPath_();
 
     this.eventsHandler.listen(this.editRightThumbPath_, acgraph.events.EventType.MOUSEDOWN, function(e) {
       e.stopPropagation();
@@ -1375,12 +1376,12 @@ anychart.core.ui.Timeline.prototype.getEditRightThumbPath_ = function() {
 
 /**
  * Getter for this.editStartConnectorPath_.
- * @return {acgraph.vector.Circle}
+ * @return {anychart.core.ui.Timeline.LiveEditControl}
  * @private
  */
 anychart.core.ui.Timeline.prototype.getEditStartConnectorPath_ = function() {
   if (!this.editStartConnectorPath_) {
-    this.editStartConnectorPath_ = /** @type {acgraph.vector.Circle} */ (this.getEditLayer().circle());
+    this.editStartConnectorPath_ = new anychart.core.ui.Timeline.LiveEditControl(this.getEditLayer());
     this.editStartConnectorPath_
         .zIndex(anychart.core.ui.Timeline.EDIT_START_CONNECTOR_Z_INDEX)
         .cursor(acgraph.vector.Cursor.MOVE);
@@ -1399,12 +1400,12 @@ anychart.core.ui.Timeline.prototype.getEditStartConnectorPath_ = function() {
 
 /**
  * Getter for this.editLeftThumbPath_.
- * @return {acgraph.vector.Circle}
+ * @return {anychart.core.ui.Timeline.LiveEditControl}
  * @private
  */
 anychart.core.ui.Timeline.prototype.getEditFinishConnectorPath_ = function() {
   if (!this.editFinishConnectorPath_) {
-    this.editFinishConnectorPath_ = /** @type {acgraph.vector.Circle} */ (this.getEditLayer().circle());
+    this.editFinishConnectorPath_ = new anychart.core.ui.Timeline.LiveEditControl(this.getEditLayer());
     this.editFinishConnectorPath_
         .zIndex(anychart.core.ui.Timeline.EDIT_FINISH_CONNECTOR_Z_INDEX)
         .cursor(acgraph.vector.Cursor.MOVE);
@@ -1448,8 +1449,9 @@ anychart.core.ui.Timeline.prototype.clearEdit_ = function() {
   this.getEditProgressPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
   this.getEditRightThumbPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
   this.getEditLeftThumbPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
-  this.getEditFinishConnectorPath_().radius(0).setTransformationMatrix(1, 0, 0, 1, 0, 0);
-  this.getEditStartConnectorPath_().radius(0).setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  this.getEditFinishConnectorPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  this.getEditStartConnectorPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  this.getEditConnectorPreviewPath_().clear();
 };
 
 
@@ -1563,13 +1565,12 @@ anychart.core.ui.Timeline.prototype.editFinishConnectorMouseDown_ = function(e) 
 anychart.core.ui.Timeline.prototype.editPreviewDragStart_ = function(e) {
   if (this.scrollDragger) this.scrollDragger.setEnabled(false);
   this.tooltip().hide().enabled(false);
-  this.interactive = false;
   this.interactivityHandler.highlight();
   this.getEditProgressPath_().clear();
   this.getEditLeftThumbPath_().clear();
   this.getEditRightThumbPath_().clear();
-  this.getEditStartConnectorPath_().radius(0);
-  this.getEditFinishConnectorPath_().radius(0);
+  this.getEditStartConnectorPath_().clear();
+  this.getEditFinishConnectorPath_().clear();
 
   goog.style.setStyle(goog.global['document']['body'], 'cursor', acgraph.vector.Cursor.EW_RESIZE);
 };
@@ -1600,13 +1601,13 @@ anychart.core.ui.Timeline.prototype.editPreviewEnd_ = function(e) {
     this.clearEdit_();
 
     var dragger = e.target;
-    var el = dragger.element;
-    var dataItem = el['item__'];
+    var el = /** @type {anychart.core.ui.Timeline.LiveEditControl} */ (dragger.element);
+    var dataItem = el.item;
     var tree = dataItem.tree();
 
     tree.suspendSignalsDispatching();
 
-    var newActualStartRatio = (el['type__'] == anychart.enums.TLElementTypes.MILESTONE) ?
+    var newActualStartRatio = (el.type == anychart.enums.TLElementTypes.MILESTONE) ?
         ((draggedBounds.left + draggedBounds.width / 2 - this.pixelBoundsCache.left) / (this.pixelBoundsCache.width)) :
         ((draggedBounds.left - this.pixelBoundsCache.left) / (this.pixelBoundsCache.width));
     var newActualStart = this.scale_.ratioToTimestamp(newActualStartRatio);
@@ -1619,15 +1620,15 @@ anychart.core.ui.Timeline.prototype.editPreviewEnd_ = function(e) {
     if (!isNaN(newActualStart)) {
       var delta = 0;
 
-      switch (el['type__']) {
+      switch (el.type) {
         case anychart.enums.TLElementTypes.MILESTONE:
           dataItem.set(anychart.enums.GanttDataFields.ACTUAL_START, newActualStart);
           if (goog.isDef(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END)))
             dataItem.set(anychart.enums.GanttDataFields.ACTUAL_END, newActualStart);
           break;
         case anychart.enums.TLElementTypes.PERIOD:
-          var period = el['period__'];
-          var periodIndex = el['periodIndex__'];
+          var period = el.period;
+          var periodIndex = el.periodIndex;
           var periodStart = anychart.utils.normalizeTimestamp(period[anychart.enums.GanttDataFields.START]);
           var periodEnd = anychart.utils.normalizeTimestamp(period[anychart.enums.GanttDataFields.END]);
           delta = newActualStart - periodStart;
@@ -1647,9 +1648,9 @@ anychart.core.ui.Timeline.prototype.editPreviewEnd_ = function(e) {
           dataItem.set(anychart.enums.GanttDataFields.BASELINE_END, baselineEnd + delta);
           break;
         default:
-          var actualStart = goog.isDef(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START)) ?
+          var actualStart = /** @type {number} */ (goog.isDef(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START)) ?
               anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START)) :
-              dataItem.meta('autoStart');
+              dataItem.meta('autoStart'));
 
           var actualEnd = goog.isDef(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END)) ?
               anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END)) :
@@ -1687,8 +1688,8 @@ anychart.core.ui.Timeline.prototype.editProgressDragStart_ = function(e) {
   this.tooltip().hide().enabled(false);
   this.getEditLeftThumbPath_().clear();
   this.getEditRightThumbPath_().clear();
-  this.getEditStartConnectorPath_().radius(0);
-  this.getEditFinishConnectorPath_().radius(0);
+  this.getEditStartConnectorPath_().clear();
+  this.getEditFinishConnectorPath_().clear();
   this.getEditPreviewPath_().clear();
 };
 
@@ -1720,7 +1721,7 @@ anychart.core.ui.Timeline.prototype.editProgressDragEnd_ = function(e) {
     var el = dragger.element;
     if (!isNaN(dragger.progress)) {
       var prog = anychart.math.round(dragger.progress * 100, 2) + '%';
-      el['item__'].set(anychart.enums.GanttDataFields.PROGRESS_VALUE, prog);
+      el.item.set(anychart.enums.GanttDataFields.PROGRESS_VALUE, prog);
     }
     this.dragging = false;
     clearInterval(this.scrollInterval);
@@ -1741,8 +1742,8 @@ anychart.core.ui.Timeline.prototype.editRightThumbDragStart_ = function(e) {
   this.getEditProgressPath_().clear();
   this.getEditLeftThumbPath_().clear();
   this.getEditRightThumbPath_().clear();
-  this.getEditStartConnectorPath_().radius(0);
-  this.getEditFinishConnectorPath_().radius(0);
+  this.getEditStartConnectorPath_().clear();
+  this.getEditFinishConnectorPath_().clear();
 
   goog.style.setStyle(goog.global['document']['body'], 'cursor', 'col-resize');
   this.editPreviewPath_.cursor(/** @type {acgraph.vector.Cursor} */ ('col-resize'));
@@ -1760,8 +1761,8 @@ anychart.core.ui.Timeline.prototype.editLeftThumbDragStart_ = function(e) {
   this.getEditProgressPath_().clear();
   this.getEditLeftThumbPath_().clear();
   this.getEditRightThumbPath_().clear();
-  this.getEditStartConnectorPath_().radius(0);
-  this.getEditFinishConnectorPath_().radius(0);
+  this.getEditStartConnectorPath_().clear();
+  this.getEditFinishConnectorPath_().clear();
 
   goog.style.setStyle(goog.global['document']['body'], 'cursor', 'col-resize');
   this.editPreviewPath_.cursor(/** @type {acgraph.vector.Cursor} */ ('col-resize'));
@@ -1779,12 +1780,10 @@ anychart.core.ui.Timeline.prototype.drawThumbPreview_ = function(event, opt_scro
   if (this.currentThumbDragger_) {
     var path = this.currentThumbDragger_.isLeft ? this.editLeftThumbPath_ : this.editRightThumbPath_;
 
-    var item = path['item__'];
-    var type = path['type__'];
-    var period = path['period__'];
-    var periodIndex = path['periodIndex__'];
-
-    var bounds = this.currentThumbDragger_.isLeft ? path['bounds__'] : path['bounds__'];
+    var item = path.item;
+    var type = path.type;
+    var period = path.period;
+    var bounds = path.bounds;
 
     var time;
 
@@ -1845,10 +1844,8 @@ anychart.core.ui.Timeline.prototype.drawConnectorPreview_ = function(event, opt_
   if (this.currentConnectorDragger_) {
     var circle = this.currentConnectorDragger_.isStart ? this.editStartConnectorPath_ : this.editFinishConnectorPath_;
 
-    var item = circle['item__'];
-    var index = circle['index__'];
-    var type = circle['type__'];
-    var period = circle['period__'];
+    var index = circle.index;
+    var period = circle.period;
 
     var containerLeft = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x;
     var containerTop = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).y;
@@ -1907,9 +1904,8 @@ anychart.core.ui.Timeline.prototype.editThumbDragEnd_ = function(e) {
 
     var dragger = e.target;
     var el = dragger.element;
-    var dataItem = el['item__'];
-    var period = el['period__'];
-    var periodIndex = el['periodIndex__'];
+    var dataItem = el.item;
+    var periodIndex = el.periodIndex;
     var tree = dataItem.tree();
 
     tree.suspendSignalsDispatching();
@@ -1922,7 +1918,7 @@ anychart.core.ui.Timeline.prototype.editThumbDragEnd_ = function(e) {
     var newEnd = this.scale_.ratioToTimestamp(rightRatio);
 
     if (!isNaN(newStart) && !isNaN(newEnd)) {
-      switch (el['type__']) {
+      switch (el.type) {
         case anychart.enums.TLElementTypes.PERIOD:
           dataItem.set(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.START, newStart);
           dataItem.set(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.END, newEnd);
@@ -2017,12 +2013,12 @@ anychart.core.ui.Timeline.prototype.addMouseMoveAndOver = function(evt) {
             .lineTo(b.left, b.top + b.height)
             .close();
 
-        this.editPreviewPath_['item__'] = dataItem;
-        this.editPreviewPath_['type__'] = el.type;
+        this.editPreviewPath_.item = dataItem;
+        this.editPreviewPath_.type = el.type;
 
-        if (period) this.editPreviewPath_['period__'] = period;
+        if (period) this.editPreviewPath_.period = period;
 
-        if (goog.isDef(periodIndex)) this.editPreviewPath_['periodIndex__'] = periodIndex;
+        if (goog.isDef(periodIndex)) this.editPreviewPath_.periodIndex = periodIndex;
 
         // ------ Drawing progress ------
         if (dataItem && (el.type == anychart.enums.TLElementTypes.BASE || el.type == anychart.enums.TLElementTypes.PARENT ||
@@ -2044,8 +2040,8 @@ anychart.core.ui.Timeline.prototype.addMouseMoveAndOver = function(evt) {
               .lineTo(progressLeft - anychart.core.ui.Timeline.EDIT_CORNER_HEIGHT, top)
               .close();
 
-          this.editProgressPath_['bounds__'] = b;//TODO (A.Kudryavtsev): kind of hack. Replace.
-          this.editProgressPath_['item__'] = dataItem;//TODO (A.Kudryavtsev): kind of hack. Replace.
+          this.editProgressPath_.bounds = b;
+          this.editProgressPath_.item = dataItem;
 
         } else {
           this.getEditProgressPath_().clear();
@@ -2071,21 +2067,21 @@ anychart.core.ui.Timeline.prototype.addMouseMoveAndOver = function(evt) {
               .lineTo(b.left - 1, b.top + b.height)
               .close();
 
-          this.editRightThumbPath_['bounds__'] = b; //TODO (A.Kudryavtsev): kind of hack. Replace.
-          this.editRightThumbPath_['item__'] = dataItem; //TODO (A.Kudryavtsev): kind of hack. Replace.
-          this.editRightThumbPath_['type__'] = el.type; //TODO (A.Kudryavtsev): kind of hack. Replace.
-          this.editLeftThumbPath_['bounds__'] = b; //TODO (A.Kudryavtsev): kind of hack. Replace.
-          this.editLeftThumbPath_['item__'] = dataItem; //TODO (A.Kudryavtsev): kind of hack. Replace.
-          this.editLeftThumbPath_['type__'] = el.type; //TODO (A.Kudryavtsev): kind of hack. Replace.
+          this.editRightThumbPath_.bounds = b;
+          this.editRightThumbPath_.item = dataItem;
+          this.editRightThumbPath_.type = el.type;
+          this.editLeftThumbPath_.bounds = b;
+          this.editLeftThumbPath_.item = dataItem;
+          this.editLeftThumbPath_.type = el.type;
 
           if (period) {
-            this.editRightThumbPath_['period__'] = period;
-            this.editLeftThumbPath_['period__'] = period;
+            this.editRightThumbPath_.period = period;
+            this.editLeftThumbPath_.period = period;
           }
 
           if (goog.isDef(periodIndex)) {
-            this.editRightThumbPath_['periodIndex__'] = periodIndex;
-            this.editLeftThumbPath_['periodIndex__'] = periodIndex;
+            this.editRightThumbPath_.periodIndex = periodIndex;
+            this.editLeftThumbPath_.periodIndex = periodIndex;
           }
 
         } else {
@@ -2096,40 +2092,36 @@ anychart.core.ui.Timeline.prototype.addMouseMoveAndOver = function(evt) {
         if (dataItem && el.type != anychart.enums.TLElementTypes.BASELINE) {
           var rTop = b.top + b.height / 2;
           this.getEditFinishConnectorPath_()
-              .centerX(right + anychart.core.ui.Timeline.EDIT_CONNECTOR_RADIUS)
-              .centerY(rTop)
-              .radius(anychart.core.ui.Timeline.EDIT_CONNECTOR_RADIUS);
+              .drawAsCircle(right + anychart.core.ui.Timeline.EDIT_CONNECTOR_RADIUS, rTop, anychart.core.ui.Timeline.EDIT_CONNECTOR_RADIUS);
 
           this.getEditStartConnectorPath_()
-              .centerX(b.left - anychart.core.ui.Timeline.EDIT_CONNECTOR_RADIUS)
-              .centerY(rTop)
-              .radius(anychart.core.ui.Timeline.EDIT_CONNECTOR_RADIUS);
+              .drawAsCircle(b.left - anychart.core.ui.Timeline.EDIT_CONNECTOR_RADIUS, rTop, anychart.core.ui.Timeline.EDIT_CONNECTOR_RADIUS);
 
-          this.editFinishConnectorPath_['item__'] = dataItem;
-          this.editFinishConnectorPath_['type__'] = el.type;
-          this.editFinishConnectorPath_['index__'] = evt['hoveredIndex'] + this.controller.startIndex();
-          this.editStartConnectorPath_['item__'] = dataItem;
-          this.editStartConnectorPath_['type__'] = el.type;
-          this.editStartConnectorPath_['index__'] = evt['hoveredIndex'] + this.controller.startIndex();
+          this.editFinishConnectorPath_.item = dataItem;
+          this.editFinishConnectorPath_.type = el.type;
+          this.editFinishConnectorPath_.index = evt['hoveredIndex'] + this.controller.startIndex();
+          this.editStartConnectorPath_.item = dataItem;
+          this.editStartConnectorPath_.type = el.type;
+          this.editStartConnectorPath_.index = evt['hoveredIndex'] + this.controller.startIndex();
 
           if (period) {
-            this.editStartConnectorPath_['period__'] = period;
-            this.editFinishConnectorPath_['period__'] = period;
+            this.editStartConnectorPath_.period = period;
+            this.editFinishConnectorPath_.period = period;
           }
 
           if (goog.isDef(periodIndex)) {
-            this.editStartConnectorPath_['periodIndex__'] = periodIndex;
-            this.editFinishConnectorPath_['periodIndex__'] = periodIndex;
+            this.editStartConnectorPath_.periodIndex = periodIndex;
+            this.editFinishConnectorPath_.periodIndex = periodIndex;
           }
         } else {
-          this.getEditFinishConnectorPath_().radius(0);
-          this.getEditStartConnectorPath_().radius(0);
+          this.getEditFinishConnectorPath_().clear();
+          this.getEditStartConnectorPath_().clear();
         }
       } else if (this.draggingConnector && dataItem) {//dataItem here is destination item.
         var path = this.currentConnectorDragger_.isStart ? this.editStartConnectorPath_ : this.editFinishConnectorPath_;
 
-        var startItem = path['item__'];
-        var startIndex = path['index__'];
+        var startItem = path.item;
+        var startIndex = path.index;
 
         if (el.type != anychart.enums.TLElementTypes.BASELINE &&
             el.type != anychart.enums.TLElementTypes.CONNECTOR) {
@@ -2137,8 +2129,8 @@ anychart.core.ui.Timeline.prototype.addMouseMoveAndOver = function(evt) {
           var from, to;
 
           if (period) {
-            var startPeriod = path['period__'];
-            var startPeriodIndex = path['periodIndex__'];
+            var startPeriod = path.period;
+            var startPeriodIndex = path.periodIndex;
             from = {'period': startPeriod, 'index': startIndex, 'periodIndex': startPeriodIndex};
             to = {
               'period': period,
@@ -2359,8 +2351,8 @@ anychart.core.ui.Timeline.prototype.addMouseUp = function(evt) {
 
       var circle = this.currentConnectorDragger_.isStart ? this.editStartConnectorPath_ : this.editFinishConnectorPath_;
 
-      var startItem = circle['item__'];
-      var startPeriodIndex = circle['periodIndex__'];
+      var startItem = circle.item;
+      var startPeriodIndex = circle.periodIndex;
 
       var startStart = this.currentConnectorDragger_.isStart;
       var dropStart = dropRatio < .5;
@@ -2417,12 +2409,12 @@ anychart.core.ui.Timeline.prototype.rowSelect = function(event) {
 
 
 /**
- * @override
+ * @inheritDoc
  */
-anychart.core.ui.Timeline.prototype.unselect = function() {
+anychart.core.ui.Timeline.prototype.rowUnselect = function(event) {
   if (this.selectedItem || goog.isDefAndNotNull(this.selectedPeriodId_)) {
     this.selectedPeriodId_ = void 0;
-    goog.base(this, 'unselect');
+    goog.base(this, 'rowUnselect', event);
   }
 };
 
@@ -2432,12 +2424,15 @@ anychart.core.ui.Timeline.prototype.unselect = function() {
  */
 anychart.core.ui.Timeline.prototype.getInteractivityEvent = function(event) {
   var evt = goog.base(this, 'getInteractivityEvent', event);
+  var target = (evt && evt['originalEvent']) ? evt['originalEvent']['domTarget'] : null;
 
-  if (evt) {
-    var domTarget = event.domTarget;
-    if (this.controller.isResources() && (domTarget instanceof acgraph.vector.Path)) { //Process timeline bars
-      var id = domTarget.tag;
-      if (goog.isDef(id)) {
+  if (evt && target && this.controller.isResources()) {
+    if (goog.isObject(target.period) && goog.isDef(target.periodIndex)) { //Usually this is Live Edit case.
+      evt['period'] = target.period;
+      evt['periodIndex'] = target.periodIndex;
+    } else { //Otherwise.
+      var id = target.tag;
+      if (goog.isDefAndNotNull(target.tag)) {
         var periodData = this.controller.getPeriodsMap()[id];
         if (periodData) {
           evt['period'] = periodData['period'];
@@ -2446,7 +2441,6 @@ anychart.core.ui.Timeline.prototype.getInteractivityEvent = function(event) {
       }
     }
   }
-
   return evt;
 };
 
@@ -2470,7 +2464,7 @@ anychart.core.ui.Timeline.prototype.selectTimelineRow = function(item, opt_perio
     itemSelected = true;
   }
 
-  if ((goog.isDef(opt_periodId) && this.selectedPeriodId_ != opt_periodId)) {
+  if (this.selectedPeriodId_ !== opt_periodId) {
     this.selectedPeriodId_ = opt_periodId;
     periodSelected = true;
   }
@@ -3826,6 +3820,79 @@ anychart.core.ui.Timeline.prototype.setupByJSON = function(config) {
 
 
 /**
+ * Live edit control. Extends path to add some data to be stored in usage process.
+ * @param {acgraph.vector.Layer} parent - Parent layer.
+ * @constructor
+ * @extends {acgraph.vector.Path}
+ */
+anychart.core.ui.Timeline.LiveEditControl = function(parent) {
+  goog.base(this);
+
+  this.parent(parent);
+};
+goog.inherits(anychart.core.ui.Timeline.LiveEditControl, acgraph.vector.Path);
+
+
+/**
+ * @type {anychart.data.Tree.DataItem}
+ */
+anychart.core.ui.Timeline.LiveEditControl.prototype.item;
+
+
+/**
+ * @type {number}
+ */
+anychart.core.ui.Timeline.LiveEditControl.prototype.index = -1;
+
+
+/**
+ * @type {anychart.enums.TLElementTypes}
+ */
+anychart.core.ui.Timeline.LiveEditControl.prototype.type;
+
+
+/**
+ * @type {Object}
+ */
+anychart.core.ui.Timeline.LiveEditControl.prototype.period;
+
+
+/**
+ * @type {number}
+ */
+anychart.core.ui.Timeline.LiveEditControl.prototype.periodIndex = -1;
+
+
+/**
+ * @type {anychart.math.Rect}
+ */
+anychart.core.ui.Timeline.LiveEditControl.prototype.bounds;
+
+
+/**
+ * @type {anychart.core.ui.Timeline.LiveEditControl}
+ */
+anychart.core.ui.Timeline.LiveEditControl.prototype.preview;
+
+
+/**
+ * Draws path as circle.
+ * @param {number} cx - Center X.
+ * @param {number} cy - Center Y.
+ * @param {number} radius - Radius.
+ * @return {anychart.core.ui.Timeline.LiveEditControl} - Itself for method chaining.
+ */
+anychart.core.ui.Timeline.LiveEditControl.prototype.drawAsCircle = function(cx, cy, radius) {
+  this
+      .moveTo(cx + radius, cy)
+      .arcTo(radius, radius, 0, 360);
+
+  return this;
+};
+
+
+
+/**
  * Bar dragger.
  * @param {acgraph.vector.Element} target - Target element.
  * @constructor
@@ -3879,7 +3946,7 @@ anychart.core.ui.Timeline.BarDragger.prototype.limitY = function(y) {
 
 /**
  * Progress dragger.
- * @param {acgraph.vector.Element} target - Target element.
+ * @param {anychart.core.ui.Timeline.LiveEditControl} target - Target element.
  * @constructor
  * @extends {goog.fx.Dragger}
  */
@@ -3888,7 +3955,7 @@ anychart.core.ui.Timeline.ProgressDragger = function(target) {
 
   /**
    * Element.
-   * @type {acgraph.vector.Element}
+   * @type {anychart.core.ui.Timeline.LiveEditControl}
    */
   this.element = target;
 
@@ -3924,8 +3991,8 @@ anychart.core.ui.Timeline.ProgressDragger.prototype.defaultAction = function(x, 
  * @override
  */
 anychart.core.ui.Timeline.ProgressDragger.prototype.limitX = function(x) {
-  var b = this.element['bounds__'];
-  var dataItem = this.element['item__'];
+  var b = this.element.bounds;
+  var dataItem = this.element.item;
 
   var progressValue = goog.isDef(dataItem.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)) ?
       (parseFloat(dataItem.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)) / 100) :

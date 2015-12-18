@@ -1,9 +1,13 @@
+goog.provide('anychart.core.utils.GanttContextProvider');
 goog.provide('anychart.core.utils.IContextProvider');
 goog.provide('anychart.core.utils.LegendContextProvider');
 goog.provide('anychart.core.utils.MapPointContextProvider');
 goog.provide('anychart.core.utils.PointContextProvider');
 goog.provide('anychart.core.utils.SeriesPointContextProvider');
 goog.provide('anychart.core.utils.StockSeriesContextProvider');
+
+goog.require('anychart.enums');
+goog.require('anychart.utils');
 
 
 
@@ -321,6 +325,90 @@ anychart.core.utils.MapPointContextProvider.prototype.getSeriesMeta = function(o
 };
 
 
+
+/**
+ * Gantt context provider.
+ * @implements {anychart.core.utils.IContextProvider}
+ * @param {boolean=} opt_isResources - Whether gantt chart is resources chart.
+ * @constructor
+ */
+anychart.core.utils.GanttContextProvider = function(opt_isResources) {
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this['isResources'] = !!opt_isResources;
+
+  /**
+   * Current tree data item.
+   * TODO (A.Kudryavtsev): Make kind of analogue with another context providers (kind of series.getIterator())?
+   * @type {anychart.data.Tree.DataItem}
+   */
+  this.currentItem = null;
+
+  /**
+   * Current period (in use for resources chart).
+   * @type {Object|undefined}
+   */
+  this.currentPeriod;
+};
+
+
+/** @inheritDoc */
+anychart.core.utils.GanttContextProvider.prototype.applyReferenceValues = function() {
+
+  //TODO (A.Kudryavtsev): NOTE!!! All work with dates will be redone after i18n is implemented!!!
+  if (this.currentItem) {
+    this['item'] = this.currentItem;
+    this['name'] = this.currentItem.get(anychart.enums.GanttDataFields.NAME);
+    this['id'] = this.currentItem.get(anychart.enums.GanttDataFields.ID);
+
+    if (this['isResources']) {
+      this['minPeriodDate'] = this.currentItem.meta('minPeriodDate');
+      this['maxPeriodDate'] = this.currentItem.meta('maxPeriodDate');
+      this['period'] = this.currentPeriod || void 0;
+      this['periodStart'] = this.currentPeriod ?
+          anychart.utils.normalizeTimestamp(this.currentPeriod[anychart.enums.GanttDataFields.START]) :
+          void 0;
+      this['periodEnd'] = this.currentPeriod ?
+          anychart.utils.normalizeTimestamp(this.currentPeriod[anychart.enums.GanttDataFields.END]) :
+          void 0;
+    } else {
+      this['actualStart'] = anychart.utils.normalizeTimestamp(this.currentItem.get(anychart.enums.GanttDataFields.ACTUAL_START));
+      this['actualEnd'] = anychart.utils.normalizeTimestamp(this.currentItem.get(anychart.enums.GanttDataFields.ACTUAL_END));
+      this['progressValue'] = this.currentItem.get(anychart.enums.GanttDataFields.PROGRESS_VALUE);
+
+      var isParent = !!this.currentItem.numChildren();
+      this['autoStart'] = isParent ? this.currentItem.meta('autoStart') : void 0;
+      this['actualEnd'] = isParent ? this.currentItem.meta('actualEnd') : void 0;
+      this['autoProgress'] = isParent ? this.currentItem.meta('autoProgress') : void 0;
+    }
+  }
+};
+
+
+/** @inheritDoc */
+anychart.core.utils.GanttContextProvider.prototype.getDataValue = function(key) {
+  return this.currentItem ? this.currentItem.get(key) : void 0;
+};
+
+
+/** @inheritDoc */
+anychart.core.utils.GanttContextProvider.prototype.getStat = function(opt_key) {
+  return void 0; //TODO (A.Kudryavtsev): TBA on gantt statistics implementation.
+};
+
+
+/**
+ * Gets series meta by key.
+ * @param {string} key - Key.
+ * @return {*} Meta value by key.
+ */
+anychart.core.utils.GanttContextProvider.prototype.getMetaValue = function(key) {
+  return this.currentItem ? this.currentItem.meta(key) : void 0;
+};
+
+
 //exports
 anychart.core.utils.PointContextProvider.prototype['getStat'] = anychart.core.utils.PointContextProvider.prototype.getStat;
 anychart.core.utils.PointContextProvider.prototype['getDataValue'] = anychart.core.utils.PointContextProvider.prototype.getDataValue;
@@ -332,3 +420,6 @@ anychart.core.utils.LegendContextProvider.prototype['getMeta'] = anychart.core.u
 anychart.core.utils.MapPointContextProvider.prototype['getDataValue'] = anychart.core.utils.MapPointContextProvider.prototype.getDataValue;
 anychart.core.utils.MapPointContextProvider.prototype['getStat'] = anychart.core.utils.MapPointContextProvider.prototype.getStat;
 anychart.core.utils.MapPointContextProvider.prototype['getSeriesMeta'] = anychart.core.utils.MapPointContextProvider.prototype.getSeriesMeta;
+anychart.core.utils.GanttContextProvider.prototype['getDataValue'] = anychart.core.utils.GanttContextProvider.prototype.getDataValue;
+anychart.core.utils.GanttContextProvider.prototype['getStat'] = anychart.core.utils.GanttContextProvider.prototype.getStat;
+anychart.core.utils.GanttContextProvider.prototype['getMetaValue'] = anychart.core.utils.GanttContextProvider.prototype.getMetaValue;

@@ -4740,14 +4740,21 @@ window['anychart']['themes']['v6'] = {
     'ganttResource': {
       'dataGrid': {
         'tooltip': {
-          'textFormatter': function(data) {
-            var item = data['item'];
-            if (!item) return '';
-            var name = item['get']('name');
-            var startDate = item['meta']('minPeriodDate');
-            var endDate = item['meta']('maxPeriodDate');
-            return (name ? name : '') +
-                (startDate ? '\nStart Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'titleFormatter': function() {
+            return this['name'] || '';
+          },
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'textFormatter': function() {
+            var startDate = this['minPeriodDate'];
+            var endDate = this['maxPeriodDate'];
+            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
                 (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '');
           }
         }
@@ -4755,15 +4762,21 @@ window['anychart']['themes']['v6'] = {
       'timeline': {
         'selectedElementStroke': 'none',
         'tooltip': {
-          'textFormatter': function(data) {
-            var item = data['item'];
-            var period = data['period'];
-            var name = item['get']('name');
-            var startDate = period ? period['start'] : (item['get']('actualStart') || item['meta']('autoStart'));
-            var endDate = period ? period['end'] : (item['get']('actualEnd') || item['meta']('autoEnd'));
-
-            return (name ? name : '') +
-                (startDate ? '\nStart Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'titleFormatter': function() {
+            return this['name'] || '';
+          },
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'textFormatter': function() {
+            var startDate = this['periodStart'] || this['minPeriodDate'];
+            var endDate = this['periodEnd'] || this['maxPeriodDate'];
+            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
                 (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '');
           }
         }
@@ -4772,21 +4785,28 @@ window['anychart']['themes']['v6'] = {
     'ganttProject': {
       'dataGrid': {
         'tooltip': {
-          'textFormatter': function(data) {
-            var item = data['item'];
-            if (!item) return '';
-            var name = item['get']('name');
-            var startDate = item['get']('actualStart') || item['meta']('autoStart');
-            var endDate = item['get']('actualEnd') || item['meta']('autoEnd');
-            var progress = item['get']('progressValue');
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'titleFormatter': function() {
+            return this['name'] || '';
+          },
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'textFormatter': function() {
+            var startDate = this['actualStart'] || this['autoStart'];
+            var endDate = this['actualEnd'] || this['autoEnd'];
+            var progress = this['progressValue'];
 
             if (progress === void 0) {
-              var auto = item['meta']('autoProgress') * 100;
+              var auto = this['autoProgress'] * 100;
               progress = (Math.round(auto * 100) / 100 || 0) + '%';
             }
 
-            return (name ? name : '') +
-                (startDate ? '\nStart Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
+            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
                 (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '') +
                 (progress ? '\nComplete: ' + progress : '');
           }
@@ -4795,20 +4815,28 @@ window['anychart']['themes']['v6'] = {
       'timeline': {
         'selectedElementStroke': '#000',
         'tooltip': {
-          'textFormatter': function(data) {
-            var item = data['item'];
-            var name = item['get']('name');
-            var startDate = item['get']('actualStart') || item['meta']('autoStart');
-            var endDate = item['get']('actualEnd') || item['meta']('autoEnd');
-            var progress = item['get']('progressValue');
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'titleFormatter': function() {
+            return this['name'] || '';
+          },
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'textFormatter': function() {
+            var startDate = this['actualStart'] || this['autoStart'];
+            var endDate = this['actualEnd'] || this['autoEnd'];
+            var progress = this['progressValue'];
 
             if (progress === void 0) {
-              var auto = item['meta']('autoProgress') * 100;
+              var auto = this['autoProgress'] * 100;
               progress = (Math.round(auto * 100) / 100 || 0) + '%';
             }
 
-            return (name ? name : '') +
-                (startDate ? '\nStart Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
+            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
                 (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '') +
                 (progress ? '\nComplete: ' + progress : '');
 

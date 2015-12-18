@@ -7,6 +7,7 @@ goog.require('anychart.core.gantt.Controller');
 goog.require('anychart.core.ui.IInteractiveGrid');
 goog.require('anychart.core.ui.ScrollBar');
 goog.require('anychart.core.ui.Tooltip');
+goog.require('anychart.core.utils.GanttContextProvider');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.math.Rect');
 goog.require('goog.events.KeyHandler');
@@ -263,7 +264,6 @@ anychart.core.ui.BaseGrid = function(opt_controller, opt_isResource) {
   /**
    * Currently selected data item.
    * @type {anychart.data.Tree.DataItem}
-   * @protected
    */
   this.selectedItem = null;
 
@@ -333,6 +333,12 @@ anychart.core.ui.BaseGrid = function(opt_controller, opt_isResource) {
    */
   this.editable = false;
 
+  /**
+   * Context provider.
+   * @type {anychart.core.utils.GanttContextProvider}
+   * @private
+   */
+  this.formatProvider_ = null;
 
   /**
    * Tooltip.
@@ -450,6 +456,14 @@ anychart.core.ui.BaseGrid.MARGIN = 32;
 
 
 /**
+ * We start scrolling on mouse move event when mouse leaves container's bounds.
+ * This value is a border inside of bounds when scrolling starts.
+ * @type {number}
+ */
+anychart.core.ui.BaseGrid.SCROLL_MOUSE_OUT_INSIDE_LENGTH = 10;
+
+
+/**
  * Checks whether tree data item is actually a milestone.
  * @param {anychart.data.Tree.DataItem} treeDataItem - Tree data item.
  * @return {boolean} - Whether tree data item is milestone.
@@ -458,6 +472,17 @@ anychart.core.ui.BaseGrid.isMilestone = function(treeDataItem) {
   var actualStart = anychart.utils.normalizeTimestamp(treeDataItem.get(anychart.enums.GanttDataFields.ACTUAL_START));
   var actualEnd = anychart.utils.normalizeTimestamp(treeDataItem.get(anychart.enums.GanttDataFields.ACTUAL_END));
   return (!isNaN(actualStart) && isNaN(actualEnd)) || (actualStart == actualEnd);
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.BaseGrid.prototype.createFormatProvider = function(item, opt_period) {
+  if (!this.formatProvider_)
+    this.formatProvider_ = new anychart.core.utils.GanttContextProvider(this.controller.isResources());
+  this.formatProvider_.currentItem = item;
+  this.formatProvider_.currentPeriod = opt_period;
+  this.formatProvider_.applyReferenceValues();
+  return this.formatProvider_;
 };
 
 
@@ -484,7 +509,7 @@ anychart.core.ui.BaseGrid.prototype.handleMouseClick_ = function(event) {
         this.interactivityHandler.rowClick(click);
       }
     } else {
-      this.interactivityHandler.unselect();
+      this.interactivityHandler.rowUnselect(click);
     }
   } else {
     this.interactive = true;
@@ -637,7 +662,9 @@ anychart.core.ui.BaseGrid.prototype.rowMouseMove = function(event) {
   var position = tooltip.isFloating() ?
       new acgraph.math.Coordinate(event['originalEvent']['clientX'], event['originalEvent']['clientY']) :
       new acgraph.math.Coordinate(0, 0);
-  tooltip.show(event['item'], position);
+
+  var formatProvider = this.interactivityHandler.createFormatProvider(event['item'], event['period']);
+  tooltip.show(formatProvider, position);
 };
 
 
@@ -1670,11 +1697,12 @@ anychart.core.ui.BaseGrid.prototype.initMouseFeatures = function() {
 
 
     goog.events.listen(document, goog.events.EventType.MOUSEMOVE, function(e) {
+      var l = anychart.core.ui.BaseGrid.SCROLL_MOUSE_OUT_INSIDE_LENGTH;
       var containerPosition = goog.style.getClientPosition(/** @type {Element} */(ths.container().getStage().container()));
-      var top = ths.pixelBoundsCache.top + containerPosition.y + ths.headerHeight_;
-      var bottom = containerPosition.y + ths.pixelBoundsCache.height;
-      var left = containerPosition.x + ths.pixelBoundsCache.left;
-      var right = left + ths.pixelBoundsCache.width;
+      var top = ths.pixelBoundsCache.top + containerPosition.y + ths.headerHeight_ + l;
+      var bottom = containerPosition.y + ths.pixelBoundsCache.height - l - l;
+      var left = containerPosition.x + ths.pixelBoundsCache.left + l;
+      var right = left + ths.pixelBoundsCache.width - l - l;
 
       var mouseX = e['clientX'];
       var mouseY = e['clientY'];
@@ -1802,14 +1830,26 @@ anychart.core.ui.BaseGrid.prototype.specialInvalidated = goog.nullFunction;
 
 
 /**
- * Unselects currently selected item.
+ * @inheritDoc
  */
-anychart.core.ui.BaseGrid.prototype.unselect = function() {
+anychart.core.ui.BaseGrid.prototype.rowUnselect = function(event) {
   if (this.selectedItem && this.controller.data()) {
     this.controller.data().suspendSignalsDispatching();
     this.selectedItem.meta('selected', false);
     this.selectedItem = null;
     this.controller.data().resumeSignalsDispatching(false);
+
+    if (this.interactivityHandler == this) { //Should dispatch 'unselect-event' by itself.
+      var newEvent = {
+        'type': anychart.enums.EventType.ROW_SELECT,
+        'actualTarget': event ? event.target : this,
+        'target': this,
+        'originalEvent': event,
+        'item': null //This is a real difference between 'select' and 'unselect' events.
+      };
+      this.dispatchEvent(newEvent);
+    }
+
     this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
   }
 };

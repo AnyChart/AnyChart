@@ -35,6 +35,10 @@ anychart.onDocumentReady(function() {
   chart.listen('rowClick', function(e){
     console.log(e['currentTarget']);
   });
+
+  chart.listen('rowSelect', function(e){
+    console.log('select');
+  });
 });
 var data = [
   {"id": "1", "name": "Phase 1 - Strategic Plan", "progressValue": "14%", "actualStart": 951350400000, "actualEnd": 954201600000},

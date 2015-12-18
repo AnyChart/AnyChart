@@ -62,10 +62,17 @@ anychart.core.ui.IInteractiveGrid.prototype.rowMouseUp = function(event) {};
 
 
 /**
- * Row mouse up handler.
+ * Row select handler.
  * @param {Object} event - Dispatched event object.
  */
 anychart.core.ui.IInteractiveGrid.prototype.rowSelect = function(event) {};
+
+
+/**
+ * Row unselect handler.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.core.ui.IInteractiveGrid.prototype.rowUnselect = function(event) {};
 
 
 /**
@@ -84,3 +91,12 @@ anychart.core.ui.IInteractiveGrid.prototype.editing = function(opt_value) {};
  * @param {number=} opt_endY - End Y to be highlighted.
  */
 anychart.core.ui.IInteractiveGrid.prototype.highlight = function(opt_index, opt_startY, opt_endY) {};
+
+
+/**
+ * Creates gantt format provider.
+ * @param {anychart.data.Tree.DataItem} dataItem - Data item.
+ * @param {Object=} opt_period - Optional current period.
+ * @return {!anychart.core.utils.GanttContextProvider} - Gantt context provider.
+ */
+anychart.core.ui.IInteractiveGrid.prototype.createFormatProvider = function(dataItem, opt_period) {};
