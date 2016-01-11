@@ -254,23 +254,36 @@ anychart.scales.DateTimeTicks.prototype.set = function(ticks) {
  * @return {!Array} Array of ticks.
  */
 anychart.scales.DateTimeTicks.prototype.get = function() {
-  if (this.explicit_) {
-    return goog.array.filter(this.explicit_, this.filterFunction, this);
-  }
-  this.scale.calculate();
-  return /** @type {!Array} */(this.autoTicks_);
+  var ticks = this.getInternal();
+  return goog.array.filter(ticks, this.filterFunction, this);
 };
 
 
 /**
- * Filter function to filter out invisible explicit ticks.
+ * Unfiltered ticks getter.
+ * @return {!Array}
+ */
+anychart.scales.DateTimeTicks.prototype.getInternal = function() {
+  var ticks;
+  if (this.explicit_) {
+    ticks = this.explicit_;
+  } else {
+    this.scale.calculate();
+    ticks = this.autoTicks_;
+  }
+  return ticks || [];
+};
+
+
+/**
+ * Filter function to filter out invisible ticks.
  * @param {number} el
  * @return {boolean}
  * @protected
  */
 anychart.scales.DateTimeTicks.prototype.filterFunction = function(el) {
-  var scale = /** @type {anychart.scales.DateTime} */(this.scale);
-  return !(el < scale.minimum() || el > scale.maximum());
+  var val = this.scale.transform(el);
+  return !(val < 0 || val > 1);
 };
 
 
