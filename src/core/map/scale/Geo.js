@@ -173,6 +173,28 @@ anychart.core.map.scale.Geo.prototype.setBounds = function(value) {
  */
 anychart.core.map.scale.Geo.prototype.setTxMap = function(value) {
   this.tx = value;
+  this.consistent = false;
+};
+
+
+/**
+ * Sets transformation map
+ * @param {number} value tx map.
+ */
+anychart.core.map.scale.Geo.prototype.setMapZoom = function(value) {
+  this.zoom = value;
+  this.consistent = false;
+};
+
+
+/**
+ * @param {number} dx tx map.
+ * @param {number} dy tx map.
+ */
+anychart.core.map.scale.Geo.prototype.setOffsetFocusPoint = function(dx, dy) {
+  this.dx_ = dx;
+  this.dy_ = dy;
+  this.consistent = false;
 };
 
 
@@ -554,7 +576,7 @@ anychart.core.map.scale.Geo.prototype.transform = function(lon, lat) {
       this.bounds_.top + this.centerOffsetY + transformY :
       this.bounds_.getBottom() - this.centerOffsetY - transformY;
 
-  return [resultX, resultY];
+  return [(resultX + this.dx_) * this.zoom, (resultY + this.dy_) * this.zoom];
 };
 
 
@@ -572,6 +594,9 @@ anychart.core.map.scale.Geo.prototype.inverseTransform = function(x, y) {
 
   x = anychart.utils.toNumber(x);
   y = anychart.utils.toNumber(y);
+
+  x = (x - this.dx_) / this.zoom;
+  y = (y - this.dy_) / this.zoom;
 
   var transformX = this.isInvertedX ?
       this.bounds_.getRight() - this.centerOffsetX - x :

@@ -124,6 +124,8 @@ anychart.ConsistencyState = {
   MAP_MARKER_PALETTE: 1 << 16,
   MAP_HATCH_FILL_PALETTE: 1 << 17,
   MAP_COLOR_RANGE: 1 << 18,
+  MAP_MOVE: 1 << 19,
+  MAP_ZOOM: 1 << 20,
   //---------------------------------- HEAT MAP STATES (CHART) ---------------------------------
   HEATMAP_SCALES: 1 << 11,
   HEATMAP_SERIES: 1 << 12,

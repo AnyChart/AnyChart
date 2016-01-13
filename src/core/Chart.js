@@ -767,7 +767,7 @@ anychart.core.Chart.prototype.draw = function() {
 
 
   if (this.supportsBaseHighlight)
-    this.onInteractivitySignal_();
+    this.onInteractivitySignal();
 
   return this;
 };
@@ -1674,7 +1674,7 @@ anychart.core.Chart.prototype.unhover = function(opt_indexOrIndexes) {
 anychart.core.Chart.prototype.interactivity = function(opt_value) {
   if (!this.interactivity_) {
     this.interactivity_ = new anychart.core.utils.Interactivity(this);
-    this.interactivity_.listenSignals(this.onInteractivitySignal_, this);
+    this.interactivity_.listenSignals(this.onInteractivitySignal, this);
   }
 
   if (goog.isDef(opt_value)) {
@@ -1690,9 +1690,9 @@ anychart.core.Chart.prototype.interactivity = function(opt_value) {
 
 /**
  * Animation enabled change handler.
- * @private
+ * @protected
  */
-anychart.core.Chart.prototype.onInteractivitySignal_ = function() {
+anychart.core.Chart.prototype.onInteractivitySignal = function() {
   var series = this.getAllSeries();
   for (var i = series.length; i--;) {
     if (series[i])

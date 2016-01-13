@@ -1,11 +1,13 @@
 goog.provide('anychart.charts.Map');
 
+goog.require('acgraph.events.MouseWheelHandler');
 goog.require('anychart'); // otherwise we can't use anychart.chartTypesMap object.
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.map.geom');
 goog.require('anychart.core.map.scale.Geo');
 goog.require('anychart.core.map.series.Base');
 goog.require('anychart.core.ui.ColorRange');
+goog.require('anychart.core.utils.MapInteractivity');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.core.utils.UnboundRegionsSettings');
 goog.require('anychart.palettes.HatchFills');
@@ -14,6 +16,7 @@ goog.require('anychart.scales.LinearColor');
 goog.require('anychart.scales.OrdinalColor');
 goog.require('anychart.utils.GeoJSONParser');
 goog.require('goog.dom');
+goog.require('goog.ui.KeyboardShortcutHandler');
 
 
 
@@ -23,7 +26,7 @@ goog.require('goog.dom');
  * @constructor
  */
 anychart.charts.Map = function() {
-  goog.base(this);
+  anychart.charts.Map.base(this, 'constructor');
 
   /**
    * Internal represent of geo data.
@@ -84,6 +87,111 @@ anychart.charts.Map = function() {
    */
   this.minBubbleSize_;
 
+  /**
+   * Wherer animations in progress.
+   * @type {boolean}
+   * @private
+   */
+  this.zooming_ = false;
+
+  /**
+   * Array of animations timers.
+   * @type {Array.<number>}
+   */
+  this.timers = [];
+
+  /**
+   * function for smooth zoom.
+   * @type {!Function}
+   * @private
+   */
+  this.smoothZoom_ = goog.bind(function() {
+    var tx = this.mapLayer_.getSelfTransformation();
+
+    if ((tx.getScaleX() * this.tempZoom_ > anychart.charts.Map.ZOOM_MIN_RATIO) &&
+        (this.zoomDest_ > 1 ? this.zoomProgress_ <= this.zoomDest_ : this.zoomProgress_ >= this.zoomDest_)) {
+
+      var boundsWithoutTx = this.mapLayer_.getBoundsWithoutTransform();
+      var boundsWithTx = this.mapLayer_.getBounds();
+
+      this.calcCx_ = this.cx_;
+      this.calcCy_ = this.cy_;
+
+      if (this.zoomDest_ < 1 && !boundsWithTx.contains(boundsWithoutTx)) {
+        if (boundsWithTx.left >= boundsWithoutTx.left) {
+          this.calcCx_ = boundsWithoutTx.left;
+        } else if (boundsWithTx.getRight() <= boundsWithoutTx.getRight()) {
+          this.calcCx_ = boundsWithoutTx.getRight();
+        } else {
+          this.calcCx_ = boundsWithoutTx.left - boundsWithTx.left > boundsWithTx.getRight() - boundsWithoutTx.getRight() ?
+              boundsWithoutTx.left : boundsWithoutTx.getRight();
+        }
+
+        if (boundsWithTx.top >= boundsWithoutTx.top) {
+          this.calcCy_ = boundsWithoutTx.top;
+        } else if (boundsWithTx.getBottom() <= boundsWithoutTx.getBottom()) {
+          this.calcCy_ = boundsWithoutTx.getBottom();
+        } else {
+          this.calcCy_ = boundsWithoutTx.top - boundsWithTx.top > boundsWithTx.getBottom() - boundsWithoutTx.getBottom() ?
+              boundsWithoutTx.top : boundsWithoutTx.getBottom();
+        }
+      }
+
+      this.mapLayer_.scale(this.tempZoom_, this.tempZoom_, this.calcCx_, this.calcCy_);
+
+      this.zoomProgress_ *= this.tempZoom_;
+      this.fullZoom_ *= this.tempZoom_;
+
+      this.zooming_ = true;
+
+      tx = this.mapLayer_.getSelfTransformation();
+      this.scale().setMapZoom(tx.getScaleX());
+      this.scale().setOffsetFocusPoint(tx.getTranslateX(), tx.getTranslateY());
+
+      this.invalidateSeries_();
+      this.invalidate(anychart.ConsistencyState.MAP_SERIES, anychart.Signal.NEEDS_REDRAW);
+
+      this.timers.push(setTimeout(this.smoothZoom_, anychart.charts.Map.ZOOM_ANIMATION_DELAY));
+    } else {
+      if (tx.getScaleX() * this.tempZoom_ <= anychart.charts.Map.ZOOM_MIN_RATIO && !tx.isIdentity()) {
+        this.mapLayer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+
+        this.fullZoom_ = 1;
+        this.stopTimers();
+
+        this.scale().setMapZoom(1);
+        this.scale().setOffsetFocusPoint(0, 0);
+
+        this.invalidateSeries_();
+        this.invalidate(anychart.ConsistencyState.MAP_SERIES, anychart.Signal.NEEDS_REDRAW);
+      } else {
+        this.prevTxMatrix_.preScale(this.zoomDest_, this.zoomDest_);
+        this.prevTxMatrix_.preTranslate(this.calcCx_ * (1 - this.zoomDest_), this.calcCy_ * (1 - this.zoomDest_));
+
+        this.mapLayer_.setTransformationMatrix(
+            anychart.math.specialRound(this.prevTxMatrix_.getScaleX()),
+            0,
+            0,
+            anychart.math.specialRound(this.prevTxMatrix_.getScaleY()),
+            this.prevTxMatrix_.getTranslateX(),
+            this.prevTxMatrix_.getTranslateY()
+        );
+
+        this.fullZoom_ = this.prevTxMatrix_.getScaleX();
+
+        this.scale().setMapZoom(this.prevTxMatrix_.getScaleX());
+        this.scale().setOffsetFocusPoint(this.prevTxMatrix_.getTranslateX(), this.prevTxMatrix_.getTranslateY());
+
+        this.invalidateSeries_();
+        this.invalidate(anychart.ConsistencyState.MAP_SERIES, anychart.Signal.NEEDS_REDRAW);
+      }
+      this.stopTimers();
+
+      this.zooming_ = false;
+      this.goingToHome_ = false;
+    }
+  }, this);
+
   this.unboundRegions(true);
   this.defaultSeriesType(anychart.enums.MapSeriesType.CHOROPLETH);
 };
@@ -103,7 +211,9 @@ anychart.charts.Map.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.MAP_PALETTE |
     anychart.ConsistencyState.MAP_COLOR_RANGE |
     anychart.ConsistencyState.MAP_MARKER_PALETTE |
-    anychart.ConsistencyState.MAP_HATCH_FILL_PALETTE;
+    anychart.ConsistencyState.MAP_HATCH_FILL_PALETTE |
+    anychart.ConsistencyState.MAP_MOVE |
+    anychart.ConsistencyState.MAP_ZOOM;
 
 
 /**
@@ -188,6 +298,34 @@ anychart.charts.Map.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
 
 
 /**
+ * Maximum zoom ratio.
+ * @type {number}
+ */
+anychart.charts.Map.ZOOM_MAX_RATIO = 10;
+
+
+/**
+ * Minimum zoom ratio.
+ * @type {number}
+ */
+anychart.charts.Map.ZOOM_MIN_RATIO = 1;
+
+
+/**
+ * Delay between animation frames.
+ * @type {number}
+ */
+anychart.charts.Map.ZOOM_ANIMATION_DELAY = 4;
+
+
+/**
+ * Count of animation frames per one full animation.
+ * @type {number}
+ */
+anychart.charts.Map.ZOOM_ANIMATION_FRAMES = 5;
+
+
+/**
  * Map layer.
  * @type {acgraph.vector.Layer}
  * @private
@@ -196,11 +334,91 @@ anychart.charts.Map.prototype.mapLayer_;
 
 
 /**
+ * Data layer.
+ * @type {acgraph.vector.Layer}
+ * @private
+ */
+anychart.charts.Map.prototype.dataLayer_;
+
+
+/**
  * Geo scale.
  * @type {anychart.core.map.scale.Geo}
  * @private
  */
 anychart.charts.Map.prototype.scale_;
+
+
+/**
+ * Offset focus point x coordinate.
+ * @type {number}
+ * @private
+ */
+anychart.charts.Map.prototype.offsetX_ = 0;
+
+
+/**
+ * Offset focus point y coordinate.
+ * @type {number}
+ * @private
+ */
+anychart.charts.Map.prototype.offsetY_ = 0;
+
+
+/**
+ * Full map offset focus point x coordinate.
+ * @type {number}
+ * @private
+ */
+anychart.charts.Map.prototype.fullOffsetX_ = 0;
+
+
+/**
+ * Full map offset focus point y coordinate.
+ * @type {number}
+ * @private
+ */
+anychart.charts.Map.prototype.fullOffsetY_ = 0;
+
+
+/**
+ * Origin x coordinate.
+ * @type {number}
+ * @private
+ */
+anychart.charts.Map.prototype.cx_ = 0;
+
+
+/**
+ * Origin y coordinate.
+ * @type {number}
+ * @private
+ */
+anychart.charts.Map.prototype.cy_ = 0;
+
+
+/**
+ * Zoom factor.
+ * @type {number}
+ * @private
+ */
+anychart.charts.Map.prototype.zoom_ = 1;
+
+
+/**
+ * Full zoom.
+ * @type {number}
+ * @private
+ */
+anychart.charts.Map.prototype.fullZoom_ = 1;
+
+
+/**
+ * Zooming status.
+ * @type {boolean}
+ * @private
+ */
+anychart.charts.Map.prototype.zooming_ = false;
 
 
 /**
@@ -807,14 +1025,14 @@ anychart.charts.Map.prototype.geoData = function(opt_data) {
   if (goog.isDef(opt_data)) {
     if (this.geoData_ != opt_data) {
       this.geoData_ = opt_data;
-    }
 
-    this.invalidate(anychart.ConsistencyState.MAP_SCALE |
-        anychart.ConsistencyState.MAP_GEO_DATA |
-        anychart.ConsistencyState.MAP_SERIES |
-        anychart.ConsistencyState.MAP_COLOR_RANGE |
-        anychart.ConsistencyState.MAP_HATCH_FILL_PALETTE |
-        anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.MAP_SCALE |
+          anychart.ConsistencyState.MAP_GEO_DATA |
+          anychart.ConsistencyState.MAP_SERIES |
+          anychart.ConsistencyState.MAP_COLOR_RANGE |
+          anychart.ConsistencyState.MAP_HATCH_FILL_PALETTE |
+          anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
     return this;
   }
   return this.geoData_;
@@ -836,6 +1054,18 @@ anychart.charts.Map.prototype.getPlotBounds = function() {
 anychart.charts.Map.prototype.clear = function() {
   if (this.mapLayer_) this.mapLayer_.clear();
   this.mapPaths.length = 0;
+};
+
+
+/**
+ * Stops all animation timers. And stops animation.
+ */
+anychart.charts.Map.prototype.stopTimers = function() {
+  for (var i = 0, len = this.timers.length; i < len; i++) {
+    clearTimeout(this.timers[i]);
+  }
+  this.timers.length = 0;
+  this.zooming_ = false;
 };
 
 
@@ -871,9 +1101,16 @@ anychart.charts.Map.prototype.processGeoData = function() {
         this.mapTX['default'] = anychart.charts.Map.DEFAULT_TX['default'];
 
 
+      if (!this.dataLayer_) {
+        this.dataLayer_ = this.rootElement.layer();
+        this.dataLayer_.zIndex(anychart.charts.Map.ZINDEX_MAP);
+      }
+
       if (!this.mapLayer_) {
         this.mapLayer_ = new anychart.core.utils.TypedLayer(function() {
-          return acgraph.path();
+          var path = acgraph.path();
+          path.vectorEffect('non-scaling-stroke');
+          return path;
         }, function(path) {
           if (path) {
             path.clear();
@@ -883,8 +1120,169 @@ anychart.charts.Map.prototype.processGeoData = function() {
             delete path.tag;
           }
         });
-        this.mapLayer_.parent(/** @type {acgraph.vector.ILayer} */(this.rootElement));
-        this.mapLayer_.zIndex(anychart.charts.Map.ZINDEX_MAP);
+        this.mapLayer_.parent(/** @type {acgraph.vector.ILayer} */(this.dataLayer_));
+
+        this.mapLayer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+
+        var container = goog.dom.getParentElement(/** @type {Element} */(this.container().container()));
+        this.mapTextarea = goog.dom.createDom('textarea');
+
+        this.mapTextarea.setAttribute('readonly', 'readonly');
+        goog.style.setStyle(this.mapTextarea, {
+          'border': 0,
+          'clip': 'rect(0 0 0 0)',
+          'height': '1px',
+          'margin': '-1px',
+          'overflow': 'hidden',
+          'padding': '0',
+          'position': 'absolute',
+          'width': '1px'
+        });
+        goog.dom.appendChild(container, this.mapTextarea);
+
+        this.listen('pointsselect', function(e) {
+          this.mapTextarea.innerHTML = this.interactivity().copyFormatter().call(e, e);
+          this.mapTextarea.select();
+        }, false, this);
+
+        this.shortcutHandler = new goog.ui.KeyboardShortcutHandler(this.mapTextarea);
+        var META = goog.ui.KeyboardShortcutHandler.Modifiers.META;
+        var CTRL = goog.ui.KeyboardShortcutHandler.Modifiers.CTRL;
+
+        this.shortcutHandler.setAlwaysPreventDefault(true);
+        this.shortcutHandler.setAlwaysStopPropagation(true);
+        this.shortcutHandler.setAllShortcutsAreGlobal(true);
+        this.shortcutHandler.setModifierShortcutsAreGlobal(true);
+
+        this.shortcutHandler.registerShortcut('zoom_in', goog.events.KeyCodes.EQUALS, META);
+        this.shortcutHandler.registerShortcut('zoom_out', goog.events.KeyCodes.DASH, META);
+        this.shortcutHandler.registerShortcut('zoom_full_out', goog.events.KeyCodes.ZERO, META);
+
+        this.shortcutHandler.registerShortcut('zoom_in', goog.events.KeyCodes.EQUALS, CTRL);
+        this.shortcutHandler.registerShortcut('zoom_out', goog.events.KeyCodes.DASH, CTRL);
+        this.shortcutHandler.registerShortcut('zoom_full_out', goog.events.KeyCodes.ZERO, CTRL);
+
+        this.shortcutHandler.registerShortcut('move_left', goog.events.KeyCodes.LEFT);
+        this.shortcutHandler.registerShortcut('move_right', goog.events.KeyCodes.RIGHT);
+        this.shortcutHandler.registerShortcut('move_up', goog.events.KeyCodes.UP);
+        this.shortcutHandler.registerShortcut('move_down', goog.events.KeyCodes.DOWN);
+
+        this.shortcutHandler.listen(goog.ui.KeyboardShortcutHandler.EventType.SHORTCUT_TRIGGERED, function(e) {
+          var bounds = goog.style.getBounds(this.container().domElement());
+          var cx = bounds.width / 2;
+          var cy = bounds.height / 2;
+          var dx = 0, dy = 0;
+
+          var zoomRatio = 1.3;
+          var zoomFactor = 1;
+          switch (e.identifier) {
+            case 'zoom_in':
+              zoomFactor = zoomRatio;
+              break;
+            case 'zoom_out':
+              zoomFactor = 1 / zoomRatio;
+              break;
+            case 'zoom_full_out':
+              zoomFactor = 1 / this.fullZoom_;
+              if (this.fullZoom_ != 1) {
+                this.goingToHome_ = true;
+                this.stopTimers();
+              }
+              break;
+            case 'move_up':
+              dx = 0;
+              dy = 10 * this.fullZoom_;
+              break;
+            case 'move_left':
+              dx = 10 * this.fullZoom_;
+              dy = 0;
+              break;
+            case 'move_down':
+              dx = 0;
+              dy = -10 * this.fullZoom_;
+              break;
+            case 'move_right':
+              dx = -10 * this.fullZoom_;
+              dy = 0;
+              break;
+          }
+
+          if (zoomFactor != 1)
+            this.zoom(zoomFactor, cx, cy);
+          if (dx || dy)
+            this.move(dx, dy);
+        }, false, this);
+
+        this.mouseWheelHandler = new acgraph.events.MouseWheelHandler(/** @type {Element} */(this.container().container()));
+        this.mouseWheelHandler.listen('mousewheel', function(e) {
+          if (this.interactivity_.mouseWheel()) {
+            var zoomRatio = 1.3;
+            var zoomFactor = e.detail <= 0 ? e.detail == 0 ? 1 : zoomRatio : 1 / zoomRatio;
+            if (this.goingToHome_) zoomFactor = 1 / this.fullZoom_;
+
+            this.prevZoomState_ = this.zoomState_;
+            this.zoomState_ = zoomFactor > 1 ? true : zoomFactor == 1 ? !this.prevZoomState_ : false;
+
+            if (this.prevZoomState_ != this.zoomState_)
+              this.stopTimers();
+
+            if (zoomFactor < 1 && anychart.math.round(this.fullZoom_, 2) == anychart.charts.Map.ZOOM_MIN_RATIO && !this.mapLayer_.getSelfTransformation().isIdentity()) {
+              this.mapLayer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+              this.fullZoom_ = 1;
+              this.goingToHome_ = false;
+              this.stopTimers();
+
+              this.scale().setMapZoom(1);
+              this.scale().setOffsetFocusPoint(0, 0);
+
+              this.invalidateSeries_();
+              this.invalidate(anychart.ConsistencyState.MAP_SERIES, anychart.Signal.NEEDS_REDRAW);
+            } else {
+              var bounds = goog.style.getBounds(this.container().domElement());
+              var x = e.clientX - bounds.left;
+              var y = e.clientY - bounds.top;
+
+              this.zoom(zoomFactor, x, y);
+            }
+          }
+        }, false, this);
+
+        goog.events.listen(this.container().domElement(), goog.events.EventType.CLICK, function(e) {
+          this.mapTextarea.focus();
+        }, false, this);
+
+        var startX, startY, drag;
+        this.rootElement.listen(goog.events.EventType.DBLCLICK, function(e) {
+          var zoomFactor = 1.3;
+          var bounds = goog.style.getBounds(this.container().domElement());
+          var cx = e.clientX - bounds.left;
+          var cy = e.clientY - bounds.top;
+
+          this.zoom(zoomFactor, cx, cy);
+        }, false, this);
+
+        this.rootElement.listen(goog.events.EventType.MOUSEMOVE, function(e) {
+          if (drag && this.interactivity_.drag()) {
+            goog.style.setStyle(document['body'], 'cursor', acgraph.vector.Cursor.MOVE);
+            this.move(e.clientX - startX, e.clientY - startY);
+
+            startX = e.clientX;
+            startY = e.clientY;
+          } else {
+            goog.style.setStyle(document['body'], 'cursor', '');
+          }
+        }, false, this);
+
+        this.rootElement.listen(goog.events.EventType.MOUSEDOWN, function(e) {
+          startX = e.clientX;
+          startY = e.clientY;
+          drag = true;
+        }, false, this);
+
+        goog.events.listen(document, goog.events.EventType.MOUSEUP, function(e) {
+          goog.style.setStyle(document['body'], 'cursor', '');
+          drag = false;
+        }, false, this);
       } else {
         this.clear();
       }
@@ -908,6 +1306,8 @@ anychart.charts.Map.prototype.calculate = function() {
     var scale = this.scale();
     scale.startAutoCalc();
     scale.setTxMap(this.mapTX);
+    scale.setMapZoom(this.zoom_);
+    this.scale().setOffsetFocusPoint(this.offsetX_, this.offsetY_);
     var j, len;
     for (i = 0, len = this.internalGeoData_.length; i < len; i++) {
       var geom = this.internalGeoData_[i];
@@ -949,6 +1349,8 @@ anychart.charts.Map.prototype.calculate = function() {
 
     //----------------------------------calc statistics for series
     //todo (Roman Lubushikin): to avoid this loop on series we can store this info in the chart instance and provide it to all series
+
+    this.maxStrokeThickness_ = 0;
     var average = sum / pointsCount;
     for (i = 0; i < this.series_.length; i++) {
       series = this.series_[i];
@@ -957,6 +1359,10 @@ anychart.charts.Map.prototype.calculate = function() {
       series.statistics('sum', sum);
       series.statistics('average', average);
       series.statistics('pointsCount', pointsCount);
+      var seriesStrokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(series.stroke()));
+      if (seriesStrokeThickness > this.maxStrokeThickness_) {
+        this.maxStrokeThickness_ = seriesStrokeThickness;
+      }
     }
     //----------------------------------end calc statistics for series
 
@@ -966,7 +1372,7 @@ anychart.charts.Map.prototype.calculate = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_SERIES)) {
     for (i = this.series_.length; i--;) {
       series = this.series_[i];
-      series.container(this.rootElement);
+      series.container(this.dataLayer_);
     }
   }
 };
@@ -1103,7 +1509,10 @@ anychart.charts.Map.prototype.iterateGeometry_ = function(geom, callBack) {
 
 /** @inheritDoc */
 anychart.charts.Map.prototype.drawContent = function(bounds) {
-  var i, series;
+  var i, series, tx;
+  var maxRatio = anychart.charts.Map.ZOOM_MAX_RATIO;
+  var minRatio = anychart.charts.Map.ZOOM_MIN_RATIO;
+  var boundsWithoutTx, boundsWithTx;
 
   this.calculate();
 
@@ -1125,7 +1534,6 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-
     var scale = this.scale();
     var contentAreaBounds;
     if (this.colorRange_) {
@@ -1134,8 +1542,22 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     } else {
       contentAreaBounds = bounds.clone();
     }
-    scale.setBounds(contentAreaBounds);
-    this.dataBounds_ = contentAreaBounds;
+
+    var unboundRegionsStrokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.unboundRegionsSettings_.stroke()));
+    if (unboundRegionsStrokeThickness > this.maxStrokeThickness_)
+      this.maxStrokeThickness_ = unboundRegionsStrokeThickness;
+
+    var dataBounds = contentAreaBounds.clone();
+    dataBounds.left = contentAreaBounds.left + this.maxStrokeThickness_ / 2;
+    dataBounds.top = contentAreaBounds.top + this.maxStrokeThickness_ / 2;
+    dataBounds.width = contentAreaBounds.width - this.maxStrokeThickness_;
+    dataBounds.height = contentAreaBounds.height - this.maxStrokeThickness_;
+
+    scale.setBounds(dataBounds);
+    this.dataBounds_ = dataBounds;
+
+    if (this.dataLayer_)
+      this.dataLayer_.clip(contentAreaBounds);
 
     this.clear();
 
@@ -1166,6 +1588,92 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     }
   }
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_ZOOM)) {
+    if (!((this.fullZoom_ == minRatio && this.zoom_ * this.fullZoom_ < minRatio) ||
+        (this.fullZoom_ == maxRatio && this.fullZoom_ * this.zoom_ > maxRatio)) && this.mapLayer_) {
+
+      boundsWithoutTx = this.mapLayer_.getBoundsWithoutTransform();
+      boundsWithTx = this.mapLayer_.getBounds();
+
+      if (isNaN(this.cx_) || isNaN(this.cy_)) {
+        var defaultCx = boundsWithoutTx.left + boundsWithoutTx.width / 2;
+        var defaultCy = boundsWithoutTx.top + boundsWithoutTx.height / 2;
+
+        if (isNaN(this.cx_)) this.cx_ = defaultCx;
+        if (isNaN(this.cy_)) this.cy_ = defaultCy;
+      }
+
+      var minSide = Math.min(boundsWithoutTx.width, boundsWithoutTx.height);
+
+      if (minSide * this.fullZoom_ * this.zoom_ / minSide > maxRatio)
+        this.zoom_ = maxRatio / this.fullZoom_;
+
+      if (this.fullZoom_ * this.zoom_ < minRatio)
+        this.zoom_ = minRatio / this.fullZoom_;
+
+      if (this.zooming_)
+        this.stopTimers();
+
+      if (this.zoom_ != 1) {
+        this.prevTxMatrix_ = this.mapLayer_.getSelfTransformation().clone();
+        this.tempZoom_ = Math.pow(this.zoom_, 1 / anychart.charts.Map.ZOOM_ANIMATION_FRAMES);
+        this.zoomProgress_ = this.tempZoom_;
+        this.zoomDest_ = this.zoom_;
+
+        this.smoothZoom_();
+      }
+      this.zoom_ = 1;
+    }
+    this.markConsistent(anychart.ConsistencyState.MAP_ZOOM);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_MOVE)) {
+    this.scale().setOffsetFocusPoint(this.offsetX_, this.offsetY_);
+
+    if (this.fullZoom_ != minRatio && this.mapLayer_) {
+      boundsWithoutTx = this.mapLayer_.getBoundsWithoutTransform();
+      boundsWithTx = this.mapLayer_.getBounds();
+
+      var dx, dy;
+
+      if (boundsWithTx.left + this.offsetX_ >= boundsWithoutTx.left) {
+        dx = boundsWithoutTx.left - boundsWithTx.left;
+      } else if (boundsWithTx.getRight() + this.offsetX_ <= boundsWithoutTx.getRight()) {
+        dx = boundsWithoutTx.getRight() - boundsWithTx.getRight();
+      } else {
+        dx = this.offsetX_;
+      }
+
+      if (boundsWithTx.top + this.offsetY_ >= boundsWithoutTx.top) {
+        dy = boundsWithoutTx.top - boundsWithTx.top;
+      } else if (boundsWithTx.getBottom() + this.offsetY_ <= boundsWithoutTx.getBottom()) {
+        dy = boundsWithoutTx.getBottom() - boundsWithTx.getBottom();
+      } else {
+        dy = this.offsetY_;
+      }
+
+      dx = dx / this.fullZoom_;
+      dy = dy / this.fullZoom_;
+
+      this.fullOffsetX_ += this.offsetX_;
+      this.fullOffsetY_ += this.offsetY_;
+
+      this.offsetX_ = 0;
+      this.offsetY_ = 0;
+
+      if (dx || dy) {
+        this.mapLayer_.appendTransformationMatrix(1, 0, 0, 1, dx, dy);
+
+        tx = this.mapLayer_.getSelfTransformation();
+        this.scale().setOffsetFocusPoint(tx.getTranslateX(), tx.getTranslateY());
+      }
+    }
+
+    this.invalidateSeries_();
+    this.invalidate(anychart.ConsistencyState.MAP_SERIES);
+    this.markConsistent(anychart.ConsistencyState.MAP_MOVE);
+  }
+
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     if (this.unboundRegionsSettings_ && this.unboundRegionsSettings_.enabled()) {
       for (i = 0, len = this.mapPaths.length; i < len; i++) {
@@ -1180,6 +1688,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     }
     this.invalidateSeries_();
     this.invalidate(anychart.ConsistencyState.MAP_SERIES);
+
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
@@ -1191,6 +1700,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     this.calcBubbleSizes_();
     for (i = this.series_.length; i--;) {
       series = this.series_[i];
+      series.suspendSignalsDispatching();
       series.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
       series.setAutoGeoIdField(/** @type {string} */(this.geoIdField()));
       var seriesIndex = /** @type {number} */ (series.index());
@@ -1198,6 +1708,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
       series.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(seriesIndex)));
       series.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(seriesIndex)));
       series.draw();
+      series.resumeSignalsDispatching(false);
     }
     this.markConsistent(anychart.ConsistencyState.MAP_PALETTE | anychart.ConsistencyState.MAP_MARKER_PALETTE |
         anychart.ConsistencyState.MAP_HATCH_FILL_PALETTE | anychart.ConsistencyState.MAP_SERIES);
@@ -1632,6 +2143,24 @@ anychart.charts.Map.prototype.resizeHandler = function(evt) {
 };
 
 
+/** @inheritDoc */
+anychart.charts.Map.prototype.interactivity = function(opt_value) {
+  if (!this.interactivity_) {
+    this.interactivity_ = new anychart.core.utils.MapInteractivity(this);
+    this.interactivity_.listenSignals(this.onInteractivitySignal, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value))
+      this.interactivity_.setup(opt_value);
+    else
+      this.interactivity_.hoverMode(opt_value);
+    return this;
+  }
+  return this.interactivity_;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Map editing.
@@ -1669,9 +2198,10 @@ anychart.charts.Map.prototype.translateFeature = function(id, dx, dy) {
     latLon = this.scale().inverseTransform(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
     current_tx = this.scale().pickTx(latLon[0], latLon[1]);
     featureTx = current_tx == this.mapTX['default'] ? (this.mapTX[id] = {}) : current_tx;
-  }
 
-  if (feature) {
+    dx = dx / this.fullZoom_;
+    dy = dy / this.fullZoom_;
+
     var startCoords_ = this.scale().pxToScale(bounds.left, bounds.top);
     var endCoords_ = this.scale().pxToScale(bounds.left + dx, bounds.top + dy);
 
@@ -1739,11 +2269,11 @@ anychart.charts.Map.prototype.featureTranslation = function(id, opt_dx, opt_dy) 
       opt_dx = goog.isDef(opt_dx) ? opt_dx : offsetX_px;
       opt_dy = goog.isDef(opt_dy) ? opt_dy : offsetY_px;
 
-      var startCoords_ = this.scale().pxToScale(bounds.left, bounds.top);
-      var endCoords_ = this.scale().pxToScale(bounds.left + offsetX_px, bounds.top + opt_dy - offsetY_px);
+      opt_dx = opt_dx / this.fullZoom_;
+      opt_dy = opt_dy / this.fullZoom_;
 
-      var dx_ = endCoords_[0] - startCoords_[0];
-      var dy_ = endCoords_[1] - startCoords_[1];
+      var dx_ = (opt_dx - offsetX_px) / this.scale().ratio;
+      var dy_ = (opt_dy - offsetY_px) / this.scale().ratio;
 
       for (var i = 0, len = feature['polygones'].length; i < len; i++) {
         var polygon = feature['polygones'][i];
@@ -2011,6 +2541,83 @@ anychart.charts.Map.prototype.crs = function(opt_value) {
 
 
 /**
+ * It increases map zoom on passed value.
+ * @param {number} value Zoom value.
+ * @param {number=} opt_cx Center X value.
+ * @param {number=} opt_cy Center Y value.
+ * @return {anychart.charts.Map} Returns itself for chaining.
+ */
+anychart.charts.Map.prototype.zoom = function(value, opt_cx, opt_cy) {
+  if (goog.isDef(value)) {
+    var state = 0;
+    var signal = 0;
+
+    value = anychart.utils.toNumber(value);
+    if ((this.fullZoom_ == anychart.charts.Map.ZOOM_MIN_RATIO && value < 1) ||
+        (this.fullZoom_ == anychart.charts.Map.ZOOM_MAX_RATIO && value > 1)) {
+      return this;
+    }
+
+    if (value != 1) {
+      this.zoom_ = value;
+      state = anychart.ConsistencyState.MAP_ZOOM;
+      signal = anychart.Signal.NEEDS_REDRAW;
+    }
+
+    opt_cx = anychart.utils.toNumber(opt_cx);
+    opt_cy = anychart.utils.toNumber(opt_cy);
+
+    if (this.cx_ != opt_cx || this.cy_ != opt_cy) {
+      this.cx_ = opt_cx;
+      this.cy_ = opt_cy;
+      state = anychart.ConsistencyState.MAP_ZOOM;
+      signal = anychart.Signal.NEEDS_REDRAW;
+    }
+    this.invalidate(state, signal);
+  }
+  return this;
+};
+
+
+/**
+* It moves focus point for map. By default focus point is [0,0].
+* @param {number} dx Offset x coordinate.
+* @param {number} dy Offset y coordinate.
+* @return {anychart.charts.Map} Returns itself for chaining.
+*/
+anychart.charts.Map.prototype.move = function(dx, dy) {
+  if (goog.isDef(dx) || goog.isDef(dy)) {
+    var state = 0;
+    var signal = 0;
+
+    if (goog.isDef(dx)) {
+      dx = anychart.utils.toNumber(dx);
+      if (!isNaN(dx)) {
+        this.offsetX_ = dx;
+
+        state = anychart.ConsistencyState.MAP_MOVE;
+        signal = anychart.Signal.NEEDS_REDRAW;
+      }
+    }
+
+    if (goog.isDef(dy)) {
+      dy = anychart.utils.toNumber(dy);
+      if (!isNaN(dy)) {
+        this.offsetY_ = dy;
+
+        state = anychart.ConsistencyState.MAP_MOVE;
+        signal = anychart.Signal.NEEDS_REDRAW;
+      }
+    }
+
+    this.invalidate(state, signal);
+  }
+
+  return this;
+};
+
+
+/**
  * Exports map to GeoJSON format.
  * @return {Object}
  */
@@ -2026,7 +2633,7 @@ anychart.charts.Map.prototype.toGeoJSON = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.charts.Map.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+  anychart.charts.Map.base(this, 'setupByJSON', config);
 
   if ('defaultSeriesSettings' in config)
     this.defaultSeriesSettings(config['defaultSeriesSettings']);
@@ -2097,7 +2704,7 @@ anychart.charts.Map.prototype.setupByJSON = function(config) {
 
 /** @inheritDoc */
 anychart.charts.Map.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.charts.Map.base(this, 'serialize');
 
   json['type'] = this.getType();
   json['defaultSeriesType'] = this.defaultSeriesType();
@@ -2141,6 +2748,23 @@ anychart.charts.Map.prototype.serialize = function() {
 };
 
 
+/** @inheritDoc */
+anychart.charts.Map.prototype.disposeInternal = function() {
+  goog.dispose(this.shortcutHandler);
+  this.shortcutHandler = null;
+
+  goog.dispose(this.mouseWheelHandler);
+  this.mouseWheelHandler = null;
+
+  if (this.mapTextarea) {
+    goog.dom.removeNode(this.mapTextarea);
+    this.mapTextarea = null;
+  }
+
+  anychart.charts.Map.base(this, 'disposeInternal');
+};
+
+
 //exports
 goog.exportSymbol('anychart.charts.Map.DEFAULT_TX', anychart.charts.Map.DEFAULT_TX);
 anychart.charts.Map.prototype['getType'] = anychart.charts.Map.prototype.getType;
@@ -2165,6 +2789,7 @@ anychart.charts.Map.prototype['removeSeries'] = anychart.charts.Map.prototype.re
 anychart.charts.Map.prototype['removeSeriesAt'] = anychart.charts.Map.prototype.removeSeriesAt;
 anychart.charts.Map.prototype['removeAllSeries'] = anychart.charts.Map.prototype.removeAllSeries;
 anychart.charts.Map.prototype['getPlotBounds'] = anychart.charts.Map.prototype.getPlotBounds;
+anychart.charts.Map.prototype['interactivity'] = anychart.charts.Map.prototype.interactivity;
 
 anychart.charts.Map.prototype['toGeoJSON'] = anychart.charts.Map.prototype.toGeoJSON;
 anychart.charts.Map.prototype['featureTranslation'] = anychart.charts.Map.prototype.featureTranslation;
@@ -2172,3 +2797,6 @@ anychart.charts.Map.prototype['translateFeature'] = anychart.charts.Map.prototyp
 anychart.charts.Map.prototype['featureScaleFactor'] = anychart.charts.Map.prototype.featureScaleFactor;
 anychart.charts.Map.prototype['featureCrs'] = anychart.charts.Map.prototype.featureCrs;
 anychart.charts.Map.prototype['crs'] = anychart.charts.Map.prototype.crs;
+
+anychart.charts.Map.prototype['zoom'] = anychart.charts.Map.prototype.zoom;
+anychart.charts.Map.prototype['move'] = anychart.charts.Map.prototype.move;

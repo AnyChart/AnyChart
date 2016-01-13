@@ -150,9 +150,8 @@ anychart.core.utils.Interactivity.prototype.serialize = function() {
 };
 
 
-//anychart.core.utils.Interactivity.prototype['allowMultiSeriesSelection'] = anychart.core.utils.Interactivity.prototype.allowMultiSeriesSelection;
-
 //exports
+//anychart.core.utils.Interactivity.prototype['allowMultiSeriesSelection'] = anychart.core.utils.Interactivity.prototype.allowMultiSeriesSelection;
 anychart.core.utils.Interactivity.prototype['hoverMode'] = anychart.core.utils.Interactivity.prototype.hoverMode;
 anychart.core.utils.Interactivity.prototype['selectionMode'] = anychart.core.utils.Interactivity.prototype.selectionMode;
 anychart.core.utils.Interactivity.prototype['spotRadius'] = anychart.core.utils.Interactivity.prototype.spotRadius;

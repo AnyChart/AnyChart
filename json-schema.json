@@ -2015,7 +2015,9 @@
             }
           },
           "additionalProperties": false
-        }
+        },
+
+        "interactivity": {"$ref": "#/definitions/anychart.core.utils.MapInteractivity"}
       },
       "required": ["type"]
     },
@@ -3374,6 +3376,26 @@
         "stickToZero": {"type": "boolean"}
       }
     },
+    "anychart.scales.LinearColor": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.scales.Base"}
+      ],
+      "properties": {
+        "type": {"enum": ["linearColor"]},
+        "ticks": {"$ref": "#/definitions/anychart.scales.ScatterTicks"},
+        "minorTicks": {"$ref": "#/definitions/anychart.scales.ScatterTicks"},
+        "colors": {
+          "type": [
+            "null",
+            "array"
+          ],
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
     "anychart.scales.Logarithmic": {
       "type": "object",
       "allOf": [
@@ -3563,13 +3585,13 @@
     },
     "anychart.core.map.scale.Geo": {
       "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.scales.Base"}
-      ],
       "properties": {
         "type": {"enum": ["geo"]},
         "inverted": {
-          "type": "boolean"
+          "type": "array",
+          "items": {
+            "type": "boolean"
+          }
         },
         "minimumX": {
           "type": ["number", "string", "null"]
@@ -4959,6 +4981,20 @@
           "type": "number"
         },
         "allowMultiSeriesSelection": {
+          "type": "boolean"
+        }
+      }
+    },
+    "anychart.core.utils.MapInteractivity": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.utils.Interactivity"}
+      ],
+      "properties": {
+        "mouseWheel": {
+          "type": "boolean"
+        },
+        "drag": {
           "type": "boolean"
         }
       }

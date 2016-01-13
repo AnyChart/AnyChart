@@ -40,7 +40,8 @@ $(document).ready(function() {
   stage = anychart.graphics.create('container');
 
   chart = anychart.map();
-  chart.geoData(anychart.maps.france);
+  chart.geoData(anychart.maps.australia);
+  chart.interactivity().drag(false);
 
   var dataSet = anychart.data.set([]);
 
@@ -58,7 +59,7 @@ $(document).ready(function() {
     var feature = features[i];
     if (feature['properties']) {
       var id = feature['properties'][chart.geoIdField()];
-      data.push({'id': id, 'title': feature['properties']['nom_cl'], 'value': randomExt(100, 1000)});
+      data.push({'id': id, 'title': feature['properties']['code_hasc'], 'value': randomExt(100, 1000)});
     }
   }
   dataSet.data(data);
@@ -83,11 +84,13 @@ $(document).ready(function() {
       $('#scaleInp').val(defaultScale);
       $('#select_crs').val(defaultCrs);
     } else {
-      var scale = e.point.scale();
+      var scaleFactor = e.point.scaleFactor();
       var crs = e.point.crs();
 
-      $('#scale').val(scale);
-      $('#scaleInp').val(scale);
+      //console.log(e.point.getFeatureProp());
+
+      $('#scale').val(scaleFactor);
+      $('#scaleInp').val(scaleFactor);
       $('#select_crs').val(crs);
     }
   });
@@ -95,6 +98,7 @@ $(document).ready(function() {
   chart.listen(anychart.enums.EventType.CHART_DRAW, function(e) {
     var iterator = series.data().getIterator();
 
+    var startX, startY, drag;
     while (iterator.advance()) {
       var el = iterator.meta('regionShape');
       var prop = iterator.meta('regionProperties');
@@ -110,18 +114,20 @@ $(document).ready(function() {
         var dx = e.clientX - startX;
         var dy = e.clientY - startY;
 
-        chart.featureTranslation(this[chart.geoIdField()], dx, dy);
+        chart.translateFeature(this[chart.geoIdField()], dx, dy);
       }, false, prop);
     }
   });
 
   $(document).mousemove(function(e) {
+    var scaled = chart.scale().pxToScale(e.clientX, e.clientY);
     var latLon = chart.scale().inverseTransform(e.clientX, e.clientY);
 
     $('#tooltip').css({'left': e.clientX + 15, 'top': e.clientY + 15})
         .show()
         .html(
           'Client coords: ' + e.clientX + ' , ' + e.clientY + '<br>' +
+          'Scaled: ' + scaled[0] + ' , ' + scaled[1] + '<br>' +
           'Lat: ' + latLon[1].toFixed(4) + ' , ' + 'Lon: ' + latLon[0].toFixed(4)
         );
   });
@@ -144,18 +150,18 @@ $(document).ready(function() {
   scale = function(value) {
     $('#scaleInp').val(value);
 
-    chart.featureScale(selectedRegions[0].properties[chart.geoIdField()], value);
+    chart.featureScaleFactor(selectedRegions[0].properties[chart.geoIdField()], value);
   };
 
   scaleEnd = function(value) {
     $('#scale').val(value);
 
-    chart.featureScale(selectedRegions[0].properties[chart.geoIdField()], value);
+    chart.featureScaleFactor(selectedRegions[0].properties[chart.geoIdField()], value);
   };
 
   scaleInp = function(value) {
     $('#scale').val(value);
 
-    chart.featureScale(selectedRegions[0].properties[chart.geoIdField()], value);
+    chart.featureScaleFactor(selectedRegions[0].properties[chart.geoIdField()], value);
   };
 });

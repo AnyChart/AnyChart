@@ -4478,7 +4478,28 @@ window['anychart']['themes']['v6'] = {
     'linearColor': {'colors': ['#fff', '#ffd54f', '#ef6c00']},
     'maxBubbleSize': '20%',
     'minBubbleSize': '5%',
-    'geoIdField': 'id'
+    'geoIdField': 'id',
+    'interactivity': {
+      'copyFormatter': function() {
+        var ths = arguments[0];
+        var seriesStatus = ths['seriesStatus'];
+        var result = '';
+        for (var i = 0, len = seriesStatus.length; i < len; i++) {
+          var status = seriesStatus[i];
+          if (status['points'].length == 0) continue;
+          result += 'Series ' + status['series'].index() + ':\n';
+          for (var j = 0, len_ = status['points'].length; j < len_; j++) {
+            var point = status['points'][j];
+            result += 'id: ' + point['id'] + ' index: ' + point['index'];
+            if (j != len_ - 1) result += '\n';
+          }
+          if (i != len - 1) result += '\n';
+        }
+        return result || 'no selected points';
+      },
+      'drag': true,
+      'mouseWheel': true
+    }
   },
 
   'defaultDataGrid': {

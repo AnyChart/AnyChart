@@ -1685,7 +1685,6 @@ anychart.charts.Cartesian.prototype.barGroupsPadding = function(opt_value) {
 
 /**
  * Getter/setter for barsPadding.
- * @ignoreDoc
  * @param {number=} opt_value .
  * @return {number|anychart.charts.Cartesian} .
  */

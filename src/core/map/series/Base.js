@@ -177,7 +177,7 @@ anychart.core.map.series.Base.prototype.geoIdField = function(opt_value) {
     }
     return this;
   }
-  return this.geoIdField_;
+  return this.geoIdField_ || this.geoAutoGeoIdField_;
 };
 
 
@@ -484,7 +484,7 @@ anychart.core.map.series.Base.prototype.getPositionByRegion = function() {
   var shape = iterator.meta('regionShape');
   var positionProvider;
   if (shape) {
-    var bounds = shape.getBounds();
+    var bounds = shape.getAbsoluteBounds();
     positionProvider = {'value': {'x': bounds.left + bounds.width * middleX, 'y': bounds.top + bounds.height * middleY}};
   } else {
     positionProvider = {'value': {'x': 0, 'y': 0}};
@@ -617,8 +617,8 @@ anychart.core.map.series.Base.prototype.serialize = function() {
 
   json['seriesType'] = this.getType();
 
-  if (goog.isDef(this.geoIdField()))
-    json['geoIdField'] = this.geoIdField();
+  if (goog.isDef(this.geoIdField_))
+    json['geoIdField'] = this.geoIdField_;
 
   return json;
 };

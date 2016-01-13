@@ -12,6 +12,7 @@
             <xsd:element name="chart" type="Chart"/>
             <xsd:element name="gauge" type="Gauge"/>
             <xsd:element name="gantt" type="Gantt"/>
+            <xsd:element name="map" type="Map"/>
         </xsd:choice>
     </xsd:complexType>
 
@@ -289,6 +290,48 @@
         <xsd:attribute name="splitter_position" type="simple.NumberOrPercent"/>
     </xsd:complexType>
 
+    <xsd:complexType name="Map">
+        <xsd:all>
+            <!-- VisualBaseWithBounds elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="bounds" type="utils.Bounds"/>
+            <!-- core.Chart elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="title" type="core.Title"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="margin" type="utils.Space"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="legend" type="core.Legend"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="credits" type="core.Credits"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="chart_labels" type="core.Label_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="animation" type="utils.Animation"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="interactivity" type="utils.MapInteractivity"/>
+            <!-- Common elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="data" type="Data"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="palette" type="palettes.Colors"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill_palette" type="palettes.HatchFills"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="marker_palette" type="palettes.Markers"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.TooltipOrChartTooltip"/>
+            <!-- Map elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="unbound_regions" type="utils.UnboundRegionsSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="color_range" type="core.ColorRange"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="geo_scale" type="GeoScale"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="series_list" type="Map_series_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="color_scales" type="ColorScale_list"/>
+        </xsd:all>
+        <!-- core.Chart attrs -->
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+        <xsd:attributeGroup ref="attrs.Bounds"/>
+        <xsd:attribute name="type" type="enums.ChartTypes" use="required"/>
+        <xsd:attribute name="default_series_type" type="xsd:string"/>
+        <xsd:attribute name="container" type="xsd:string"/>
+        <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="true"/>
+        <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
+        <xsd:attribute name="animation" type="simple.Bool" default="false"/>
+        <!-- Map attrs -->
+        <xsd:attribute name="min_bubble_size" type="simple.NumberOrPercent" default="5%"/>
+        <xsd:attribute name="max_bubble_size" type="simple.NumberOrPercent" default="20%"/>
+        <xsd:attribute name="geo_id_field" type="xsd:string"/>
+    </xsd:complexType>
+
     <xsd:complexType name="Series">
         <xsd:all>
             <!-- Base series -->
@@ -469,6 +512,103 @@
     <xsd:complexType name="Series_list">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="series" type="Series"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="Map_series">
+        <xsd:all>
+            <!-- Base series -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hover_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="select_fill" type="Fill"/>
+
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hover_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="select_stroke" type="Stroke"/>
+
+            <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill" type="HatchFill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hover_hatch_fill" type="HatchFill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="select_hatch_fill" type="HatchFill"/>
+
+            <xsd:element minOccurs="0" maxOccurs="1" name="color" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="meta" type="Meta"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="data" type="Data"/>
+
+            <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hover_labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="select_labels" type="core.LabelsFactory"/>
+
+            <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.SeriesTooltip"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="legend_item" type="utils.LegendItemSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="name" type="xsd:string"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="selectionMode" type="enums.SelectionMode"/>
+            <!-- BaseWithMarkers series -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hover_markers" type="core.MarkersFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="select_markers" type="core.MarkersFactory"/>
+            <!-- Bubble series -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="negative_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hover_negative_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="select_negative_fill" type="Fill"/>
+
+            <xsd:element minOccurs="0" maxOccurs="1" name="negative_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hover_negative_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="select_negative_stroke" type="Stroke"/>
+
+            <xsd:element minOccurs="0" maxOccurs="1" name="negative_hatch_fill" type="HatchFill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hover_negative_hatch_fill" type="HatchFill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="select_negative_hatch_fill" type="HatchFill"/>
+            <!-- Choropleth series -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="color_scale" type="ColorScale"/>
+        </xsd:all>
+        <!-- Base series -->
+        <xsd:attribute name="series_type" type="enums.MapSeriesTypes"/>
+
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="hover_fill" type="xsd:string"/>
+        <xsd:attribute name="select_fill" type="xsd:string"/>
+
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="hover_stroke" type="xsd:string"/>
+        <xsd:attribute name="select_stroke" type="xsd:string"/>
+
+        <xsd:attribute name="hatch_fill" type="simple.HatchFill"/>
+        <xsd:attribute name="hover_hatch_fill" type="simple.HatchFill"/>
+        <xsd:attribute name="select_hatch_fill" type="simple.HatchFill"/>
+
+        <xsd:attribute name="color" type="xsd:string"/>
+        <xsd:attribute name="name" type="xsd:string"/>
+
+        <xsd:attribute name="labels" type="simple.BoolOrNull" default="false"/>
+        <xsd:attribute name="hover_labels" type="simple.BoolOrNull" default="false"/>
+        <xsd:attribute name="select_labels" type="simple.BoolOrNull" default="false"/>
+
+        <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
+        <!-- BaseWithMarkers series -->
+        <xsd:attribute name="markers" type="simple.MarkerType"/>
+        <xsd:attribute name="hover_markers" type="simple.MarkerType"/>
+        <xsd:attribute name="select_markers" type="simple.MarkerType"/>
+        <!-- Bubble series -->
+        <xsd:attribute name="minimum_size" type="simple.NumberOrPercent" default="10%"/>
+        <xsd:attribute name="maximum_size" type="simple.NumberOrPercent" default="95%"/>
+        <xsd:attribute name="display_negative" type="simple.Bool" default="true"/>
+        <xsd:attribute name="negative_fill" type="xsd:string"/>
+        <xsd:attribute name="hover_negative_fill" type="xsd:string"/>
+        <xsd:attribute name="select_negative_fill" type="xsd:string"/>
+        <xsd:attribute name="negative_stroke" type="xsd:string"/>
+        <xsd:attribute name="hover_negative_stroke" type="xsd:string"/>
+        <xsd:attribute name="select_negative_stroke" type="xsd:string"/>
+        <xsd:attribute name="negative_hatch_fill" type="simple.HatchFill"/>
+        <xsd:attribute name="hover_negative_hatch_fill" type="simple.HatchFill"/>
+        <xsd:attribute name="select_negative_hatch_fill" type="simple.HatchFill"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+        <!-- Choropleth series -->
+        <xsd:attribute name="color_scale" type="simple.ScaleRef"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Map_series_list">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="series" type="Map_series"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -872,7 +1012,6 @@
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 
-
     <xsd:complexType name="core.LabelsFactory">
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
@@ -1256,6 +1395,40 @@
         <xsd:attribute name="edit_connector_thumb_stroke" type="xsd:string"/>
     </xsd:complexType>
 
+    <xsd:complexType name="core.ColorRange">
+        <xsd:all>
+            <!-- Linear Axis -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="title" type="core.Title"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="minor_labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="ticks" type="core.axes.Ticks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="minor_ticks" type="core.axes.Ticks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+            <!-- Color range-->
+            <xsd:element minOccurs="0" maxOccurs="1" name="marker" type="core.MarkersFactory"/>
+        </xsd:all>
+        <!-- Linear Axis -->
+        <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="true"/>
+        <xsd:attribute name="labels" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="minor_labels" type="simple.BoolOrNull"/>
+        <xsd:attribute name="ticks" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="minor_ticks" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="stagger_mode" type="simple.Bool" default="false"/>
+        <xsd:attribute name="stagger_lines" type="simple.IntOrNull" default="null"/>
+        <xsd:attribute name="stagger_max_lines" type="xsd:unsignedInt" default="2"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="width" type="simple.NumberOrPercentOrNull" default="null"/>
+        <xsd:attribute name="orientation" type="enums.Orientation"/>
+        <xsd:attribute name="draw_first_label" type="simple.Bool" default="true"/>
+        <xsd:attribute name="draw_last_label" type="simple.Bool" default="true"/>
+        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="noOverlap"/>
+        <xsd:attribute name="scale" type="simple.ScaleRef"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+        <!-- Color range-->
+        <xsd:attribute name="align" type="enums.Align"/>
+        <xsd:attribute name="length" type="simple.NumberOrPercent"/>
+        <xsd:attribute name="color_line_size" type="simple.NumberOrPercent"/>
+    </xsd:complexType>
 
     <!-- palettes complex types -->
 
@@ -1335,6 +1508,15 @@
         <xsd:attribute name="allow_multi_series_selection" type="xsd:boolean"/>
     </xsd:complexType>
 
+    <xsd:complexType name="utils.MapInteractivity">
+        <xsd:attribute name="hover_mode" type="enums.HoverMode"/>
+        <xsd:attribute name="selection_mode" type="enums.SelectionMode"/>
+        <xsd:attribute name="spot_radius" type="xsd:integer"/>
+        <xsd:attribute name="allow_multi_series_selection" type="xsd:boolean"/>
+        <xsd:attribute name="mouse_wheel" type="xsd:boolean"/>
+        <xsd:attribute name="drag" type="xsd:boolean"/>
+    </xsd:complexType>
+
     <xsd:complexType name="utils.Rect">
         <xsd:attribute name="left" type="xsd:double"/>
         <xsd:attribute name="top" type="xsd:double"/>
@@ -1395,6 +1577,16 @@
         <xsd:attribute name="disabled" type="simple.Bool" default="false"/>
         <xsd:attributeGroup ref="attrs.TextSettings"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="utils.UnboundRegionsSettings">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+        </xsd:all>
+        <xsd:attribute name="enabled" type="xsd:boolean"/>
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
     </xsd:complexType>
 
     <!-- Colors -->
@@ -1529,6 +1721,19 @@
         <xsd:attribute name="maximum_gap" type="xsd:double" default="0.1"/>
     </xsd:complexType>
 
+    <xsd:complexType name="ColorScale">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="ticks" type="ScaleTicks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="minor_ticks" type="ScaleTicks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="colors" type="OrdinalColorScaleColors"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="ranges" type="OrdinalColorScaleRanges"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="names" type="OrdinalScaleNames"/>
+        </xsd:all>
+        <xsd:attribute name="type" type="enums.ScaleTypes" default="ordinalColor"/>
+        <xsd:attribute name="inverted" type="simple.Bool" default="false"/>
+        <xsd:attribute name="names" type="xsd:string" default="name"/>
+    </xsd:complexType>
+
     <xsd:complexType name="OrdinalColorScale">
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="ticks" type="ScaleTicks"/>
@@ -1539,6 +1744,18 @@
         <xsd:attribute name="type" type="enums.ScaleTypes" default="ordinalColor"/>
         <xsd:attribute name="inverted" type="simple.Bool" default="false"/>
         <xsd:attribute name="names" type="xsd:string" default="name"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="GeoScale">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="bounds" type="utils.Rect"/>
+            <xsd:element name="inverted_list" type="Inverted_list"/>
+        </xsd:all>
+        <xsd:attribute name="type" type="enums.ScaleTypes" default="geo"/>
+        <xsd:attribute name="minimum_x" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="minimum_y" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="maximum_x" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="maximum_y" type="simple.NumberOrPercentOrNull"/>
     </xsd:complexType>
 
     <xsd:complexType name="LogOrLinScale">
@@ -1564,6 +1781,13 @@
             <xsd:element name="scale" type="Scale"/>
         </xsd:sequence>
     </xsd:complexType>
+
+    <xsd:complexType name="ColorScale_list">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="scale" type="ColorScale"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
 
     <xsd:complexType name="ScaleTicks">
         <xsd:all>
@@ -1963,6 +2187,13 @@
         <xsd:attribute name="max" type="xsd:double"/>
     </xsd:complexType>
 
+    <xsd:complexType name="Inverted_list">
+        <xsd:sequence minOccurs="2" maxOccurs="2">
+            <xsd:element name="inverted" type="simple.Bool"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+
 
     <xsd:simpleType name="simple.MarkerType">
         <xsd:restriction base="xsd:string">
@@ -2093,6 +2324,7 @@
             <xsd:enumeration value="sparkline"/>
             <xsd:enumeration value="ganttResource"/>
             <xsd:enumeration value="ganttProject"/>
+            <xsd:enumeration value="map"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -2310,6 +2542,13 @@
         </xsd:restriction>
     </xsd:simpleType>
 
+    <xsd:simpleType name="enums.MapSeriesTypes">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="bubble"/>
+            <xsd:enumeration value="choropleth"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
     <xsd:simpleType name="enums.SparkSeriesTypes">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="area"/>
@@ -2359,10 +2598,12 @@
     <xsd:simpleType name="enums.ScaleTypes">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="linear"/>
+            <xsd:enumeration value="linearColor"/>
             <xsd:enumeration value="log"/>
             <xsd:enumeration value="dateTime"/>
             <xsd:enumeration value="ordinal"/>
             <xsd:enumeration value="ordinalColor"/>
+            <xsd:enumeration value="geo"/>
         </xsd:restriction>
     </xsd:simpleType>
 

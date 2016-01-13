@@ -469,8 +469,8 @@ anychart.utils.GeoJSONParser.prototype.transformProp_ = function(properties, don
     var donorName = donor[i][hcFieldName];
 
     if (name == donorName) {
-      properties['data-middle-x'] = donor[i]['data-middle-x'];
-      properties['data-middle-y'] = donor[i]['data-middle-y'];
+      properties['middle-x'] = donor[i]['data-middle-x'];
+      properties['middle-y'] = donor[i]['data-middle-y'];
       break;
     }
   }

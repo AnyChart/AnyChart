@@ -1,8 +1,11 @@
-var parser, map;
-
+var parser, map, transform, transform_, scale;
+var scale_min_x;
+var scale_max_x;
+var scale_min_y;
+var scale_max_y;
+var geoData, properties, dictionary, sortBy, props, acGeoDataFromQGIS, transformedGeoData;
 
 anychart.onDocumentReady(function() {
-  var geoData, properties, dictionary, sortBy, props, transform, acGeoDataFromQGIS, transformedGeoData;
   parser = anychart.utils.GeoJSONParser.getInstance();
   map = anychart.map();
 
@@ -62,7 +65,17 @@ anychart.onDocumentReady(function() {
   //
   //Australia map mainland
   if (anychart.maps.australia && Highcharts.maps["countries/au/au-all"]) {
-    var transform_ = {
+    geoData = Highcharts.maps["countries/au/au-all"];
+    properties = ['woe-id', 'hc-middle-x', 'hc-middle-y'];
+    dictionary = {
+      'woe-id': 'woe-id',
+      'hc-middle-x': 'data-middle-x',
+      'hc-middle-y': 'data-middle-y'
+    };
+    sortBy = 'woe-id';
+    props = parser.getProperties(geoData, properties, dictionary, sortBy);
+
+    transform_ = {
       "crs": "+proj=lcc +lat_1=-18 +lat_2=-36 +lat_0=0 +lon_0=134 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
       "src-name": "GDA94 / Geoscience Australia Lambert",
       "src-code": "urn:ogc:def:crs:EPSG:3112",
@@ -70,21 +83,19 @@ anychart.onDocumentReady(function() {
     };
     acGeoDataFromQGIS = anychart.maps.australia;
 
-    transformedGeoData = parser.convert(acGeoDataFromQGIS, transform_);
+    transformedGeoData = parser.convert(acGeoDataFromQGIS, transform_, props, 'woe_id', 'woe-id');
 
     map.geoData(transformedGeoData);
     map.container('container').draw();
 
 
 
-    var scale_min_x = Math.abs(9999 / map.scale().minimumX());
-    var scale_max_x = Math.abs(9999 / map.scale().maximumX());
-    var scale_min_y = Math.abs(9999 / map.scale().minimumY());
-    var scale_max_y = Math.abs(9999 / map.scale().maximumY());
+    scale_min_x = Math.abs(9999 / map.scale().minimumX());
+    scale_max_x = Math.abs(9999 / map.scale().maximumX());
+    scale_min_y = Math.abs(9999 / map.scale().minimumY());
+    scale_max_y = Math.abs(9999 / map.scale().maximumY());
 
-    console.log(scale_min_x, scale_max_x, scale_min_y, scale_max_y);
-
-    var scale = Math.min(scale_min_x, scale_max_x, scale_min_y, scale_max_y);
+    scale = Math.min(scale_min_x, scale_max_x, scale_min_y, scale_max_y);
 
 
 
@@ -143,7 +154,7 @@ anychart.onDocumentReady(function() {
     //sortBy = 'woe-id';
     //props = parser.getProperties(geoData, properties, dictionary, sortBy);
 
-    var transform_ = {
+    transform_ = {
       "crs": "+proj=lcc +lat_1=46.8 +lat_0=46.8 +lon_0=2.337229166666667 +k_0=0.99987742 +x_0=600000 +y_0=2200000 +ellps=intl +towgs84=-87,-98,-121,0,0,0,0 +units=m +no_defs",
       "src-name": "ED50 / France EuroLambert",
       "src-code": "urn:ogc:def:crs:EPSG:2192",
@@ -175,7 +186,7 @@ anychart.onDocumentReady(function() {
 
     console.log(scale_min_x, scale_max_x, scale_min_y, scale_max_y);
 
-    var scale = Math.min(scale_min_x, scale_max_x, scale_min_y, scale_max_y);
+    scale = Math.min(scale_min_x, scale_max_x, scale_min_y, scale_max_y);
 
     transform = {
       //"crs": "+proj=lcc +lat_1=46.8 +lat_0=46.8 +lon_0=2.337229166666667 +k_0=0.99987742 +x_0=600000 +y_0=2200000 +ellps=intl +towgs84=-87,-98,-121,0,0,0,0 +units=m +no_defs",
