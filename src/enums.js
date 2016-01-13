@@ -38,6 +38,7 @@ anychart.enums.ChartTypes = {
   PYRAMID: 'pyramid',
   RADAR: 'radar',
   SCATTER: 'scatter',
+  STOCK: 'stock',
   SPARKLINE: 'sparkline',
   HEAT_MAP: 'heatmap'
 };
@@ -2362,6 +2363,8 @@ anychart.enums.ErrorCode = {
   NO_CREDITS_IN_CHART: 9,
 
   INVALID_GEO_JSON_OBJECT: 10,
+
+  NO_LEGEND_IN_STOCK: 51,
 
   CSV_DOUBLE_QUOTE_IN_SEPARATOR: 100,
 

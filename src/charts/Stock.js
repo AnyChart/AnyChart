@@ -109,6 +109,24 @@ anychart.charts.Stock.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.STOCK_FULL_RANGE_PARAMS;
 
 
+/** @inheritDoc */
+anychart.charts.Stock.prototype.getType = function() {
+  return anychart.enums.ChartTypes.STOCK;
+};
+
+
+/**
+ * ALSO A DUMMY. Redeclared to show another error text.
+ * @ignoreDoc
+ * @param {(Object|boolean|null)=} opt_value Legend settings.
+ * @return {anychart.core.Chart|anychart.core.ui.Legend} Chart legend instance of itself for chaining call.
+ */
+anychart.charts.Stock.prototype.legend = function(opt_value) {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_LEGEND_IN_STOCK);
+  return goog.isDef(opt_value) ? this : null;
+};
+
+
 /**
  * Setter for plot default settings.
  * @param {Object} value Object with default series settings.
@@ -327,7 +345,7 @@ anychart.charts.Stock.prototype.calculateScales_ = function() {
   var scales = [];
   for (i = 0; i < this.plots_.length; i++) {
     var plot = this.plots_[i];
-    if (plot) {
+    if (plot && plot.enabled()) {
       series = plot.getAllSeries();
       for (j = 0; j < series.length; j++) {
         aSeries = series[j];
@@ -638,8 +656,11 @@ anychart.charts.Stock.prototype.dataControllerInvalidated_ = function(e) {
  * Initiates series redraw.
  */
 anychart.charts.Stock.prototype.invalidateRedrawable = function() {
-  for (var i = 0; i < this.plots_.length; i++)
-    this.plots_[i].invalidateRedrawable(false);
+  for (var i = 0; i < this.plots_.length; i++) {
+    var plot = this.plots_[i];
+    if (plot)
+      plot.invalidateRedrawable(false);
+  }
   this.invalidate(anychart.ConsistencyState.STOCK_SCALES |
       anychart.ConsistencyState.STOCK_PLOTS_APPEARANCE |
       anychart.ConsistencyState.STOCK_SCROLLER,
@@ -667,11 +688,13 @@ anychart.charts.Stock.prototype.deregisterSource = function(source) {
   var isUsed = false;
   for (var i = 0; i < this.plots_.length; i++) {
     var plot = this.plots_[i];
-    var series = plot.getAllSeries();
-    for (var j = 0; j < series.length; j++) {
-      if (series[j].getSelectableData() == source) {
-        isUsed = true;
-        break;
+    if (plot) {
+      var series = plot.getAllSeries();
+      for (var j = 0; j < series.length; j++) {
+        if (series[j].getSelectableData() == source) {
+          isUsed = true;
+          break;
+        }
       }
     }
   }
@@ -883,7 +906,8 @@ anychart.charts.Stock.prototype.highlightAtRatio_ = function(ratio, clientX, cli
   };
   //if (this.dispatchEvent(eventInfo)) {
   for (i = 0; i < this.plots_.length; i++) {
-    this.plots_[i].highlight(value);
+    if (this.plots_[i])
+      this.plots_[i].highlight(value);
   }
   this.highlighted_ = true;
 
@@ -896,12 +920,14 @@ anychart.charts.Stock.prototype.highlightAtRatio_ = function(ratio, clientX, cli
     var points = [];
     var info = eventInfo['infoByPlots'];
     for (i = 0; i < info.length; i++) {
-      var seriesInfo = info[i]['infoBySeries'];
-      if (seriesInfo) {
-        for (var j = 0; j < seriesInfo.length; j++) {
-          var series = seriesInfo[j]['series'];
-          if (series)
-            points.push({'series': series});
+      if (info[i]) {
+        var seriesInfo = info[i]['infoBySeries'];
+        if (seriesInfo) {
+          for (var j = 0; j < seriesInfo.length; j++) {
+            var series = seriesInfo[j]['series'];
+            if (series)
+              points.push({'series': series});
+          }
         }
       }
     }
@@ -918,7 +944,8 @@ anychart.charts.Stock.prototype.unhighlight_ = function() {
   if (this.highlighted_/* && this.dispatchEvent(anychart.enums.EventType.UNHIGHLIGHT)*/) {
     this.highlighted_ = false;
     for (var i = 0; i < this.plots_.length; i++) {
-      this.plots_[i].unhighlight();
+      if (this.plots_[i])
+        this.plots_[i].unhighlight();
     }
     this.tooltip().hide(null);
   }
@@ -1122,3 +1149,5 @@ anychart.charts.Stock.prototype['plot'] = anychart.charts.Stock.prototype.plot;
 anychart.charts.Stock.prototype['scroller'] = anychart.charts.Stock.prototype.scroller;
 anychart.charts.Stock.prototype['xScale'] = anychart.charts.Stock.prototype.xScale;
 anychart.charts.Stock.prototype['selectRange'] = anychart.charts.Stock.prototype.selectRange;
+anychart.charts.Stock.prototype['getType'] = anychart.charts.Stock.prototype.getType;
+anychart.charts.Stock.prototype['legend'] = anychart.charts.Stock.prototype.legend;

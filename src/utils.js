@@ -1284,6 +1284,9 @@ anychart.utils.getErrorDescription = function(code, opt_arguments) {
     case anychart.enums.ErrorCode.NO_LEGEND_IN_CHART:
       return 'Bullet and Sparkline charts do not support Legend. Please use anychart.ui.Legend component for a group of charts instead.';
 
+    case anychart.enums.ErrorCode.NO_LEGEND_IN_STOCK:
+      return 'Stock chart itself doesn\'t support legend - stock plots do. So use stock.plot().legend() instead.';
+
     case anychart.enums.ErrorCode.NO_CREDITS_IN_CHART:
       return 'Bullet and Sparkline charts do not support Credits.';
 

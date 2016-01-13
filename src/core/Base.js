@@ -244,8 +244,8 @@ anychart.ConsistencyState = {
   //---------------------------------- STOCK DATETIME AXIS (VB) ----------------------------------------
   STOCK_DTAXIS_BACKGROUND: 1 << 5,
   //---------------------------------- STOCK SCROLLER (SCROLLER) ----------------------------------------
-  STOCK_SCROLLER_SERIES: 1 << 7,
-  STOCK_SCROLLER_AXIS: 1 << 8,
+  STOCK_SCROLLER_SERIES: 1 << 8,
+  STOCK_SCROLLER_AXIS: 1 << 9,
   /**
    * Combination of all states.
    */
