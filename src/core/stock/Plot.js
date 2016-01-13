@@ -760,9 +760,8 @@ anychart.core.stock.Plot.prototype.draw = function() {
               bounds.top, 0, bounds.height);
           leftPadding += width;
         } else if (axis.orientation() == anychart.enums.Orientation.RIGHT) {
-          axis.parentBounds(/** @type {number} */(bounds.left),
-              bounds.top, bounds.width - rightPadding, bounds.height);
           rightPadding += width;
+          axis.parentBounds(bounds.left, bounds.top, /** @type {number} */(bounds.width + rightPadding), bounds.height);
         }
         axis.resumeSignalsDispatching(false);
       }
