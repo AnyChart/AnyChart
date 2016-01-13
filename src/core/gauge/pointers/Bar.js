@@ -175,8 +175,18 @@ anychart.core.gauge.pointers.Bar.prototype.draw = function() {
     var zeroRatio = goog.math.clamp(scale.transform(0), 0, 1);
     var valueRatio = goog.math.clamp(scale.transform(value), 0, 1);
 
-    var startAngle = goog.math.standardAngle(axisStartAngle + zeroRatio * axisSweepAngle);
-    var endAngle = goog.math.standardAngle(axisStartAngle + valueRatio * axisSweepAngle);
+    var fromRatio;
+    var toRatio;
+    if ((axisSweepAngle >= 0) ^ (valueRatio >= zeroRatio)) {
+      fromRatio = valueRatio;
+      toRatio = zeroRatio;
+    } else {
+      fromRatio = zeroRatio;
+      toRatio = valueRatio;
+    }
+
+    var startAngle = goog.math.standardAngle(axisStartAngle + fromRatio * axisSweepAngle);
+    var endAngle = goog.math.standardAngle(axisStartAngle + toRatio * axisSweepAngle);
     var sweepAngle = goog.math.standardAngle(endAngle - startAngle);
     if (sweepAngle == 0) sweepAngle = valueRatio == zeroRatio ? 0 : 360;
 
