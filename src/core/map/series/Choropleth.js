@@ -1,4 +1,5 @@
 goog.provide('anychart.core.map.series.Choropleth');
+goog.require('anychart.core.ChoroplethPoint');
 goog.require('anychart.core.map.series.BaseWithMarkers');
 goog.require('anychart.core.utils.TypedLayer');
 
@@ -328,4 +329,11 @@ anychart.core.map.series.Choropleth.prototype.applyAppearanceToSeries = function
 };
 
 
+/** @inheritDoc */
+anychart.core.map.series.Choropleth.prototype.getPoint = function(index) {
+  return new anychart.core.ChoroplethPoint(this, index);
+};
+
+
 anychart.core.map.series.Choropleth.prototype['colorScale'] = anychart.core.map.series.Choropleth.prototype.colorScale;
+anychart.core.map.series.Choropleth.prototype['getPoint'] = anychart.core.map.series.Choropleth.prototype.getPoint;

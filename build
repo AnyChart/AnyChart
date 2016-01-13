@@ -387,7 +387,6 @@ def __build_project(modules):
     file_name = "%s%s%s" % ('_'.join(modules), dev_postfix, '.min.js')
     file_name = __apply_specific_file_name_rule(file_name, modules)
     output_file = os.path.join(OUT_PATH, file_name)
-    print output_file
     print "Compile binary file for modules: %s\nOutput: %s\nVersion: %s\nDevelopers edition: %s\nDebug files: %s\nGzip: %s \nTheme: %s" % (
         ', '.join(modules), output_file, __get_version(True), str(arguments['develop']), str(arguments['debug_files']),
         str(arguments['gzip']), str(arguments['theme']))
@@ -410,7 +409,24 @@ def __build_project(modules):
                      '--create_source_map %s' % output_file + '.map',
                      '--source_map_location_mapping \"%s|http://localhost:63341/ACDVF\"' % path]
 
+    #include proj4js for maps and bundle
+    inclute_proj4js = 'anymap' in modules or 'anychart_bundle' in modules
+    print "Proj4js included: %s" % str(inclute_proj4js)
+
     __call_console_commands(commands)
+
+    if inclute_proj4js:
+        f = open(output_file, 'r')
+        ac_binaries = f.read()
+        f.close()
+
+        f = open(os.path.join(SRC_PATH, '..', 'proj4.js'), 'r')
+        proj4js_binaries = f.read()
+        f.close()
+
+        f = open(output_file, 'w')
+        f.write(ac_binaries + proj4js_binaries)
+        f.close()
 
     if __should_gen_gzip():
         __gzip(output_file)

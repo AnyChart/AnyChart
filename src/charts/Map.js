@@ -6,6 +6,7 @@ goog.require('anychart.core.map.geom');
 goog.require('anychart.core.map.scale.Geo');
 goog.require('anychart.core.map.series.Base');
 goog.require('anychart.core.ui.ColorRange');
+goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.core.utils.UnboundRegionsSettings');
 goog.require('anychart.palettes.HatchFills');
 goog.require('anychart.palettes.Markers');
@@ -36,12 +37,6 @@ anychart.charts.Map = function() {
    * @type {Array.<acgraph.vector.Element>}
    */
   this.mapPaths = [];
-
-  /**
-   *
-   * @type {Array.<acgraph.vector.Element>}
-   */
-  this.mapPathsPool = [];
 
   /**
    * Palette for series colors.
@@ -109,6 +104,17 @@ anychart.charts.Map.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.MAP_COLOR_RANGE |
     anychart.ConsistencyState.MAP_MARKER_PALETTE |
     anychart.ConsistencyState.MAP_HATCH_FILL_PALETTE;
+
+
+/**
+ * @type {Object}
+ */
+anychart.charts.Map.DEFAULT_TX = {
+  'default': {
+    'crs': '+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs',
+    'scale': 1
+  }
+};
 
 
 /**
@@ -195,6 +201,13 @@ anychart.charts.Map.prototype.mapLayer_;
  * @private
  */
 anychart.charts.Map.prototype.scale_;
+
+
+/**
+ * Map transformations object.
+ * @type {Object.<string, Object.<{scale: number, src: string, xoffset: number, yoffset: number, heatZone: Object.<{left: number, top: number, width: number, height: number}>}>>}
+ */
+anychart.charts.Map.prototype.mapTX = null;
 
 
 /**
@@ -794,14 +807,14 @@ anychart.charts.Map.prototype.geoData = function(opt_data) {
   if (goog.isDef(opt_data)) {
     if (this.geoData_ != opt_data) {
       this.geoData_ = opt_data;
-
-      this.invalidate(anychart.ConsistencyState.MAP_SCALE |
-          anychart.ConsistencyState.MAP_GEO_DATA |
-          anychart.ConsistencyState.MAP_SERIES |
-          anychart.ConsistencyState.MAP_COLOR_RANGE |
-          anychart.ConsistencyState.MAP_HATCH_FILL_PALETTE |
-          anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
+
+    this.invalidate(anychart.ConsistencyState.MAP_SCALE |
+        anychart.ConsistencyState.MAP_GEO_DATA |
+        anychart.ConsistencyState.MAP_SERIES |
+        anychart.ConsistencyState.MAP_COLOR_RANGE |
+        anychart.ConsistencyState.MAP_HATCH_FILL_PALETTE |
+        anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
   return this.geoData_;
@@ -809,20 +822,19 @@ anychart.charts.Map.prototype.geoData = function(opt_data) {
 
 
 /**
+ * Getter for data bounds of the chart.
+ * @return {anychart.math.Rect}
+ */
+anychart.charts.Map.prototype.getPlotBounds = function() {
+  return this.dataBounds_;
+};
+
+
+/**
  * Clear map paths.
  */
 anychart.charts.Map.prototype.clear = function() {
-  for (var i = 0, len = this.mapPaths.length; i < len; i++) {
-    var path = this.mapPaths[i];
-    if (path) {
-      path.clear();
-      path.parent(null);
-      path.removeAllListeners();
-      delete path.tag;
-
-      this.mapPathsPool.push(path);
-    }
-  }
+  if (this.mapLayer_) this.mapLayer_.clear();
   this.mapPaths.length = 0;
 };
 
@@ -842,8 +854,36 @@ anychart.charts.Map.prototype.processGeoData = function() {
       if (geoIdFromGeoData)
         this.geoIdField(geoIdFromGeoData);
 
+      this.mapTX = {};
+      goog.object.forEach(geoData['ac-tx'] || anychart.charts.Map.DEFAULT_TX, function(value, key) {
+        var tx_ = {};
+
+        if (goog.isDef(value['crs'])) tx_.crs = value['crs'];
+        if (goog.isDef(value['scale'])) tx_.scale = value['scale'];
+        if (goog.isDef(value['xoffset'])) tx_.xoffset = value['xoffset'];
+        if (goog.isDef(value['yoffset'])) tx_.yoffset = value['yoffset'];
+        if (goog.isDef(value['heatZone'])) tx_.heatZone = anychart.math.Rect.fromJSON(value['heatZone']);
+
+        this.mapTX[key] = tx_;
+      }, this);
+
+      if (!this.mapTX['default'])
+        this.mapTX['default'] = anychart.charts.Map.DEFAULT_TX['default'];
+
+
       if (!this.mapLayer_) {
-        this.mapLayer_ = this.rootElement.layer();
+        this.mapLayer_ = new anychart.core.utils.TypedLayer(function() {
+          return acgraph.path();
+        }, function(path) {
+          if (path) {
+            path.clear();
+            path.parent(null);
+            path.removeAllListeners();
+            path.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+            delete path.tag;
+          }
+        });
+        this.mapLayer_.parent(/** @type {acgraph.vector.ILayer} */(this.rootElement));
         this.mapLayer_.zIndex(anychart.charts.Map.ZINDEX_MAP);
       } else {
         this.clear();
@@ -867,7 +907,7 @@ anychart.charts.Map.prototype.calculate = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_SCALE)) {
     var scale = this.scale();
     scale.startAutoCalc();
-
+    scale.setTxMap(this.mapTX);
     var j, len;
     for (i = 0, len = this.internalGeoData_.length; i < len; i++) {
       var geom = this.internalGeoData_[i];
@@ -981,7 +1021,7 @@ anychart.charts.Map.prototype.invalidateSizeBasedSeries_ = function() {
  */
 anychart.charts.Map.prototype.drawGeom_ = function(coords, index, geom) {
   var x, y;
-  var xy = this.scale().transform(coords[index], coords[index + 1]);
+  var xy = this.scale().scaleToPx(coords[index], coords[index + 1]);
   x = xy[0];
   y = xy[1];
 
@@ -1085,6 +1125,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+
     var scale = this.scale();
     var contentAreaBounds;
     if (this.colorRange_) {
@@ -1097,18 +1138,13 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     this.dataBounds_ = contentAreaBounds;
 
     this.clear();
+
     var j, len;
     for (i = 0, len = this.internalGeoData_.length; i < len; i++) {
       var geom = this.internalGeoData_[i];
       if (!geom) continue;
 
-      var domElement;
-      if (this.mapPathsPool.length > 0) {
-        domElement = this.mapPathsPool.pop().parent(this.mapLayer_);
-      } else {
-        domElement = this.mapLayer_.path();
-      }
-
+      var domElement = this.mapLayer_.genNextChild();
       geom.domElement = domElement;
       this.mapPaths.push(domElement);
 
@@ -1418,15 +1454,11 @@ anychart.charts.Map.prototype.legendItemOut = function(item, event) {
 };
 
 
-/**
- * Getter for data bounds of the chart.
- * @return {anychart.math.Rect}
- */
-anychart.charts.Map.prototype.getPlotBounds = function() {
-  return this.dataBounds_;
-};
-
-
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Events.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.charts.Map.prototype.getSeriesStatus = function(event) {
   if (event['target'] instanceof anychart.core.ui.Legend) {
@@ -1588,6 +1620,405 @@ anychart.charts.Map.prototype.doAdditionActionsOnMouseOut = function() {
 };
 
 
+/**
+ * @param {goog.events.Event} evt
+ * @protected
+ */
+anychart.charts.Map.prototype.resizeHandler = function(evt) {
+  if (this.bounds().dependsOnContainerSize()) {
+    this.invalidate(anychart.ConsistencyState.ALL & ~(anychart.ConsistencyState.CHART_ANIMATION | anychart.ConsistencyState.MAP_GEO_DATA),
+        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+  }
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Map editing.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * It returns feature by its id.
+ * @param {string} id
+ * @return {Object}
+ * @private
+ */
+anychart.charts.Map.prototype.getFeatureById_ = function(id) {
+  for (var i = 0, len = this.internalGeoData_.length; i < len; i++) {
+    var feature_ = this.internalGeoData_[i];
+    if (feature_['properties'][this.geoIdField_] == id) {
+      return feature_;
+    }
+  }
+  return null;
+};
+
+
+/**
+ * Translate feature on passed dx and dy.
+ * @param {string} id Feature id.
+ * @param {number} dx Offset x coordinate.
+ * @param {number} dy Offset y coordinate.
+ * @return {anychart.charts.Map}
+ */
+anychart.charts.Map.prototype.translateFeature = function(id, dx, dy) {
+  var feature = this.getFeatureById_(id);
+  var bounds, latLon, current_tx, featureTx;
+  if (feature) {
+    bounds = feature.domElement.getBoundsWithoutTransform();
+    latLon = this.scale().inverseTransform(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+    current_tx = this.scale().pickTx(latLon[0], latLon[1]);
+    featureTx = current_tx == this.mapTX['default'] ? (this.mapTX[id] = {}) : current_tx;
+  }
+
+  if (feature) {
+    var startCoords_ = this.scale().pxToScale(bounds.left, bounds.top);
+    var endCoords_ = this.scale().pxToScale(bounds.left + dx, bounds.top + dy);
+
+    var dx_ = endCoords_[0] - startCoords_[0];
+    var dy_ = endCoords_[1] - startCoords_[1];
+
+    for (var i = 0, len = feature['polygones'].length; i < len; i++) {
+      var polygon = feature['polygones'][i];
+      var outerPath = polygon['outerPath'];
+      for (var j = 0; j < outerPath.length - 1; j += 2) {
+        outerPath[j] += dx_;
+        outerPath[j + 1] += dy_;
+      }
+
+      var holes = polygon['holes'];
+      for (j = 0; j < holes.length - 1; j += 2) {
+        holes[j] += dx_;
+        holes[j + 1] += dy_;
+      }
+    }
+
+    featureTx.xoffset = featureTx.xoffset ? featureTx.xoffset + dx_ : dx_;
+    featureTx.yoffset = featureTx.yoffset ? featureTx.yoffset + dy_ : dy_;
+
+    bounds.left += dx;
+    bounds.top += dy;
+
+    var leftTop = this.scale().pxToScale(bounds.left, bounds.top);
+    var widthHeight = this.scale().pxToScale(bounds.left + bounds.width, bounds.top + bounds.height);
+
+    featureTx.heatZone = anychart.math.rect(
+        leftTop[0], leftTop[1], Math.abs(widthHeight[0] - leftTop[0]), Math.abs(widthHeight[1] - leftTop[1]));
+
+    this.invalidate(anychart.ConsistencyState.MAP_SCALE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+  }
+  return this;
+};
+
+
+/**
+ * Translating feature.
+ * @param {string} id Feature id.
+ * @param {number=} opt_dx Offset x coordinate.
+ * @param {number=} opt_dy Offset y coordinate.
+ * @return {anychart.charts.Map|Array.<number>}
+ */
+anychart.charts.Map.prototype.featureTranslation = function(id, opt_dx, opt_dy) {
+  var feature = this.getFeatureById_(id);
+  var bounds, latLon, current_tx, featureTx;
+  if (feature) {
+    bounds = feature.domElement.getBoundsWithoutTransform();
+    latLon = this.scale().inverseTransform(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+    current_tx = this.scale().pickTx(latLon[0], latLon[1]);
+    featureTx = current_tx == this.mapTX['default'] ? (this.mapTX[id] = {}) : current_tx;
+  }
+
+  if (goog.isDef(opt_dx) || goog.isDef(opt_dy)) {
+    if (feature) {
+      var offsetX = featureTx.xoffset || 0;
+      var offsetY = featureTx.yoffset || 0;
+
+      var offsetX_px = offsetX * this.scale().ratio;
+      var offsetY_px = offsetY * this.scale().ratio;
+
+      opt_dx = goog.isDef(opt_dx) ? opt_dx : offsetX_px;
+      opt_dy = goog.isDef(opt_dy) ? opt_dy : offsetY_px;
+
+      var startCoords_ = this.scale().pxToScale(bounds.left, bounds.top);
+      var endCoords_ = this.scale().pxToScale(bounds.left + offsetX_px, bounds.top + opt_dy - offsetY_px);
+
+      var dx_ = endCoords_[0] - startCoords_[0];
+      var dy_ = endCoords_[1] - startCoords_[1];
+
+      for (var i = 0, len = feature['polygones'].length; i < len; i++) {
+        var polygon = feature['polygones'][i];
+        var outerPath = polygon['outerPath'];
+        for (var j = 0; j < outerPath.length - 1; j += 2) {
+          outerPath[j] += dx_;
+          outerPath[j + 1] += dy_;
+        }
+
+        var holes = polygon['holes'];
+        for (j = 0; j < holes.length - 1; j += 2) {
+          holes[j] += dx_;
+          holes[j + 1] += dy_;
+        }
+      }
+
+      featureTx.xoffset = featureTx.xoffset ? featureTx.xoffset + dx_ : dx_;
+      featureTx.yoffset = featureTx.yoffset ? featureTx.yoffset + dy_ : dy_;
+
+      bounds.left += opt_dx - offsetX_px;
+      bounds.top += opt_dy - offsetY_px;
+
+      var leftTop = this.scale().pxToScale(bounds.left, bounds.top);
+      var widthHeight = this.scale().pxToScale(bounds.left + bounds.width, bounds.top + bounds.height);
+
+      featureTx.heatZone = anychart.math.rect(
+          leftTop[0], leftTop[1], Math.abs(widthHeight[0] - leftTop[0]), Math.abs(widthHeight[1] - leftTop[1]));
+
+      this.invalidate(anychart.ConsistencyState.MAP_SCALE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+
+  return feature ? [(featureTx.xoffset * this.scale().ratio) || 0, (featureTx.yoffset * this.scale().ratio) || 0] : [NaN, NaN];
+};
+
+
+/**
+ * Gets/sets feature scale factor.
+ * @param {string} id Feature id.
+ * @param {number=} opt_ratio Scale ratio.
+ * @return {anychart.charts.Map|number}
+ */
+anychart.charts.Map.prototype.featureScaleFactor = function(id, opt_ratio) {
+  var feature = this.getFeatureById_(id);
+  var scale, bounds, latLon, current_tx, featureTx;
+  if (feature) {
+    scale = this.scale();
+    bounds = feature.domElement.getBounds();
+    latLon = scale.inverseTransform(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+    current_tx = scale.pickTx(latLon[0], latLon[1]);
+    featureTx = current_tx == this.mapTX['default'] ? (this.mapTX[id] = {}) : current_tx;
+  }
+
+  if (goog.isDef(opt_ratio)) {
+    if (feature) {
+      var ratio = anychart.utils.toNumber(opt_ratio) || 1;
+
+      var xoffset = featureTx.xoffset || 0;
+      var yoffset = featureTx.yoffset || 0;
+
+      var defaultScale = this.mapTX['default'].scale || anychart.charts.Map.DEFAULT_TX['default']['scale'];
+      var scale_ = (featureTx.scale ? featureTx.scale : defaultScale);
+
+      var leftTop = scale.pxToScale(bounds.left, bounds.top);
+      var rightBottom = scale.pxToScale(bounds.left + bounds.width, bounds.top + bounds.height);
+
+      var left = ((leftTop[0] - xoffset) / scale_ * ratio) + xoffset;
+      var top = ((leftTop[1] - yoffset) / scale_ * ratio) + yoffset;
+      var right = ((rightBottom[0] - xoffset) / scale_ * ratio) + xoffset;
+      var bottom = ((rightBottom[1] - yoffset) / scale_ * ratio) + yoffset;
+
+      leftTop = scale.scaleToPx(left, top);
+      rightBottom = scale.scaleToPx(right, bottom);
+
+      var bounds_ = anychart.math.rect(leftTop[0], leftTop[1], Math.abs(rightBottom[0] - leftTop[0]), Math.abs(rightBottom[1] - leftTop[1]));
+
+      var startCoords = scale.pxToScale(bounds_.left + bounds_.width / 2, bounds_.top + bounds_.height / 2);
+      var endCoords = scale.pxToScale(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+
+      var dx = endCoords[0] - startCoords[0];
+      var dy = endCoords[1] - startCoords[1];
+
+      leftTop = scale.pxToScale(bounds_.left, bounds_.top);
+      rightBottom = scale.pxToScale(bounds_.left + bounds_.width, bounds_.top + bounds_.height);
+
+      leftTop[0] += dx;
+      leftTop[1] += dy;
+      rightBottom[0] += dx;
+      rightBottom[1] += dy;
+
+      for (var i = 0, len = feature['polygones'].length; i < len; i++) {
+        var polygon = feature['polygones'][i];
+        var outerPath = polygon['outerPath'];
+        for (var j = 0; j < outerPath.length - 1; j += 2) {
+          outerPath[j] = (outerPath[j] - xoffset) / scale_ * ratio + xoffset + dx;
+          outerPath[j + 1] = (outerPath[j + 1] - yoffset) / scale_ * ratio + yoffset + dy;
+        }
+        var holes = polygon['holes'];
+        for (j = 0; j < holes.length - 1; j += 2) {
+          holes[j] = (holes[j] - xoffset) / scale_ * ratio + xoffset + dx;
+          holes[j + 1] = (holes[j + 1] - yoffset) / scale_ * ratio + yoffset + dy;
+        }
+      }
+
+      featureTx.heatZone = anychart.math.rect(
+          leftTop[0], leftTop[1], Math.abs(rightBottom[0] - leftTop[0]), Math.abs(rightBottom[1] - leftTop[1]));
+
+      featureTx.xoffset = featureTx.xoffset ? featureTx.xoffset + dx : dx;
+      featureTx.yoffset = featureTx.yoffset ? featureTx.yoffset + dy : dy;
+      featureTx.scale = ratio;
+
+      this.invalidate(anychart.ConsistencyState.MAP_SCALE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+
+  return feature ? featureTx.scale || 1 : NaN;
+};
+
+
+/**
+ * @param {Object} feature Feature.
+ * @param {string=} opt_crs Crs.
+ * @return {anychart.charts.Map|string}
+ * @private
+ */
+anychart.charts.Map.prototype.featureCrs_ = function(feature, opt_crs) {
+  var scale = this.scale();
+  var bounds = feature.domElement.getBounds();
+  var latLon = scale.inverseTransform(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+  var current_tx = scale.pickTx(latLon[0], latLon[1]);
+
+  if (!goog.isDef(opt_crs)) {
+    return current_tx.crs;
+  } else {
+    var x, y, scaledCoord, x_, y_;
+
+    var projected;
+
+    feature.domElement.clear();
+
+    var id = feature['properties'][this.geoIdField_];
+    var featureTx = current_tx == this.mapTX['default'] ? (this.mapTX[id] = {}) : current_tx;
+    var old_crs = featureTx.crs || this.mapTX['default'].crs || anychart.charts.Map.DEFAULT_TX['default']['crs'];
+    var new_crs = opt_crs;
+    var xoffset = featureTx.xoffset || 0;
+    var yoffset = featureTx.yoffset || 0;
+    var featureScale = featureTx.scale || this.mapTX['default'].scale || anychart.charts.Map.DEFAULT_TX['default']['scale'];
+
+    for (var i = 0, len = feature['polygones'].length; i < len; i++) {
+      var polygon = feature['polygones'][i];
+      var outerPath = polygon['outerPath'];
+      for (var j = 0; j < outerPath.length - 1; j += 2) {
+        x_ = ((outerPath[j] - xoffset) / featureScale);
+        y_ = ((outerPath[j + 1] - yoffset) / featureScale);
+
+        projected = window['proj4'](old_crs, new_crs).forward([x_, y_]);
+
+        outerPath[j] = projected[0] * featureScale + xoffset;
+        outerPath[j + 1] = projected[1] * featureScale + yoffset;
+
+        scaledCoord = scale.scaleToPx(outerPath[j], outerPath[j + 1]);
+
+        x = scaledCoord[0];
+        y = scaledCoord[1];
+
+        if (j == 0)
+          feature.domElement.moveTo(x, y);
+        else
+          feature.domElement.lineTo(x, y);
+      }
+      var holes = polygon['holes'];
+      for (j = 0; j < holes.length - 1; j += 2) {
+        x_ = ((holes[j] - xoffset) / featureScale);
+        y_ = ((holes[j + 1] - yoffset) / featureScale);
+
+        projected = window['proj4'](old_crs, new_crs).forward([x_, y_]);
+
+        holes[j] = projected[0] * featureScale + xoffset;
+        holes[j + 1] = projected[1] * featureScale + yoffset;
+
+        scaledCoord = scale.scaleToPx(holes[j], holes[j + 1]);
+
+        x = scaledCoord[0];
+        y = scaledCoord[1];
+
+        if (j == 0)
+          feature.domElement.moveTo(x, y);
+        else
+          feature.domElement.lineTo(x, y);
+      }
+    }
+
+    var bounds_ = feature.domElement.getBoundsWithoutTransform();
+    var startCoords = scale.pxToScale(bounds_.left + bounds_.width / 2, bounds_.top + bounds_.height / 2);
+    var endCoords = scale.pxToScale(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+
+    var dx = endCoords[0] - startCoords[0];
+    var dy = endCoords[1] - startCoords[1];
+
+    for (i = 0, len = feature['polygones'].length; i < len; i++) {
+      polygon = feature['polygones'][i];
+      outerPath = polygon['outerPath'];
+      for (j = 0; j < outerPath.length - 1; j += 2) {
+        outerPath[j] += dx;
+        outerPath[j + 1] += dy;
+      }
+
+      holes = polygon['holes'];
+      for (j = 0; j < holes.length - 1; j += 2) {
+        holes[j] += dx;
+        holes[j + 1] += dy;
+      }
+    }
+
+    feature.domElement.setPosition(bounds.left + bounds.width / 2 - bounds_.width / 2, bounds.top + bounds.height / 2 - bounds_.height / 2);
+
+    bounds_ = feature.domElement.getBounds();
+
+    var leftTop = scale.pxToScale(bounds_.left, bounds_.top);
+    var widthHeight = scale.pxToScale(bounds_.left + bounds_.width, bounds_.top + bounds_.height);
+
+    featureTx.heatZone = anychart.math.rect(
+        leftTop[0], leftTop[1], Math.abs(widthHeight[0] - leftTop[0]), Math.abs(widthHeight[1] - leftTop[1]));
+    featureTx.xoffset = featureTx.xoffset ? featureTx.xoffset + dx : dx;
+    featureTx.yoffset = featureTx.yoffset ? featureTx.yoffset + dy : dy;
+    featureTx.crs = new_crs;
+
+    this.invalidate(anychart.ConsistencyState.MAP_SCALE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+  }
+  return this;
+};
+
+
+/**
+ * Sets crs to feature.
+ * @param {string} id Feature id.
+ * @param {string=} opt_crs String crs representation.
+ * @return {anychart.charts.Map|string}
+ */
+anychart.charts.Map.prototype.featureCrs = function(id, opt_crs) {
+  var feature = this.getFeatureById_(id);
+  if (!feature) return null;
+
+  return this.featureCrs_(feature, opt_crs);
+};
+
+
+/**
+ * Sets crs to map.
+ * @param {string=} opt_value String crs representation.
+ * @return {string|anychart.charts.Map}
+ */
+anychart.charts.Map.prototype.crs = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    for (var i = 0, len = this.internalGeoData_.length; i < len; i++) {
+      this.featureCrs_(this.internalGeoData_[i], opt_value);
+    }
+    this.mapTX['default'].crs = opt_value;
+    return this;
+  }
+  return this.mapTX['default'].crs;
+};
+
+
+/**
+ * Exports map to GeoJSON format.
+ * @return {Object}
+ */
+anychart.charts.Map.prototype.toGeoJSON = function() {
+  return anychart.utils.GeoJSONParser.getInstance().exportToGeoJSON(this.internalGeoData_, this.mapTX);
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Setup.
@@ -1711,6 +2142,7 @@ anychart.charts.Map.prototype.serialize = function() {
 
 
 //exports
+goog.exportSymbol('anychart.charts.Map.DEFAULT_TX', anychart.charts.Map.DEFAULT_TX);
 anychart.charts.Map.prototype['getType'] = anychart.charts.Map.prototype.getType;
 anychart.charts.Map.prototype['geoData'] = anychart.charts.Map.prototype.geoData;
 anychart.charts.Map.prototype['choropleth'] = anychart.charts.Map.prototype.choropleth;
@@ -1733,3 +2165,10 @@ anychart.charts.Map.prototype['removeSeries'] = anychart.charts.Map.prototype.re
 anychart.charts.Map.prototype['removeSeriesAt'] = anychart.charts.Map.prototype.removeSeriesAt;
 anychart.charts.Map.prototype['removeAllSeries'] = anychart.charts.Map.prototype.removeAllSeries;
 anychart.charts.Map.prototype['getPlotBounds'] = anychart.charts.Map.prototype.getPlotBounds;
+
+anychart.charts.Map.prototype['toGeoJSON'] = anychart.charts.Map.prototype.toGeoJSON;
+anychart.charts.Map.prototype['featureTranslation'] = anychart.charts.Map.prototype.featureTranslation;
+anychart.charts.Map.prototype['translateFeature'] = anychart.charts.Map.prototype.translateFeature;
+anychart.charts.Map.prototype['featureScaleFactor'] = anychart.charts.Map.prototype.featureScaleFactor;
+anychart.charts.Map.prototype['featureCrs'] = anychart.charts.Map.prototype.featureCrs;
+anychart.charts.Map.prototype['crs'] = anychart.charts.Map.prototype.crs;

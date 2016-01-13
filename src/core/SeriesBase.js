@@ -1370,7 +1370,7 @@ anychart.core.SeriesBase.prototype.makePointEvent = function(event) {
 /**
  * Gets wrapped point by index.
  * @param {number} index Point index.
- * @return {anychart.core.SeriesPoint} Wrapped point.
+ * @return {anychart.core.Point} Wrapped point.
  */
 anychart.core.SeriesBase.prototype.getPoint = function(index) {
   if (this.isSizeBased()) {

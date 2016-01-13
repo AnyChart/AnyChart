@@ -14,7 +14,7 @@ anychart.core.map.series.Bubble = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
 
   // Define reference fields for a series
-  this.referenceValueNames = ['id', 'lat', 'long', 'size'];
+  this.referenceValueNames = ['id', 'long', 'lat', 'size'];
   this.referenceValueMeanings = ['id', 'x', 'y', 'n'];
 
   /**

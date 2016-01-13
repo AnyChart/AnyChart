@@ -168,6 +168,15 @@ anychart.core.map.scale.Geo.prototype.setBounds = function(value) {
 
 
 /**
+ * Sets transformation map
+ * @param {Object} value tx map.
+ */
+anychart.core.map.scale.Geo.prototype.setTxMap = function(value) {
+  this.tx = value;
+};
+
+
+/**
  * Returns scale type.
  * @return {string}
  */
@@ -418,11 +427,11 @@ anychart.core.map.scale.Geo.prototype.determineScaleMinMax = function() {
 
 
 /**
- * @param {*} x X value to transform in input scope.
- * @param {*} y Y value to transform in input scope.
+ * @param {number} x X value to transform in input scope.
+ * @param {number} y Y value to transform in input scope.
  * @return {Array.<number>} Transformed value adjust bounds.
  */
-anychart.core.map.scale.Geo.prototype.transform = function(x, y) {
+anychart.core.map.scale.Geo.prototype.scaleToPx = function(x, y) {
   this.calculate();
 
   if (!this.bounds_)
@@ -451,7 +460,7 @@ anychart.core.map.scale.Geo.prototype.transform = function(x, y) {
  * @param {*} y Y value to transform in input scope.
  * @return {Array.<number>} Transformed value adjust bounds.
  */
-anychart.core.map.scale.Geo.prototype.inverseTransform = function(x, y) {
+anychart.core.map.scale.Geo.prototype.pxToScale = function(x, y) {
   this.calculate();
 
   if (!this.bounds_)
@@ -472,6 +481,134 @@ anychart.core.map.scale.Geo.prototype.inverseTransform = function(x, y) {
   var resultY = +(/** @type {number} */(transformY)) / this.ratio + this.minY;
 
   return [resultX, resultY];
+};
+
+
+/**
+ * Returns tx object for passed coords.
+ * @param {number} lon Longitude in degrees.
+ * @param {number} lat Latitude in degrees.
+ * @return {Object}
+ */
+anychart.core.map.scale.Geo.prototype.pickTx = function(lon, lat) {
+  var defaultTx = this.tx['default'];
+
+  var txName = goog.object.findKey(this.tx, function(value, key) {
+    if (key != 'default' && value.heatZone) {
+      var projected = window['proj4'](value.crs || defaultTx.crs).forward([lon, lat]);
+
+      var x = projected[0] * (value.scale || defaultTx.scale);
+      var y = projected[1] * (value.scale || defaultTx.scale);
+
+      x += value.xoffset || 0;
+      y += value.yoffset || 0;
+
+      var heatZone = value.heatZone;
+
+      return x >= heatZone.left &&
+          x <= heatZone.left + heatZone.width &&
+          y <= heatZone.top &&
+          y >= heatZone.top - heatZone.height;
+    }
+
+    return false;
+  }) || 'default';
+
+  return this.tx[txName];
+};
+
+
+/**
+ * Transform coords in lat/lon to pixel values.
+ * @param {number} lon Longitude in degrees.
+ * @param {number} lat Latitude in degrees.
+ * @return {Array.<number>} Transformed value adjust bounds [x, y].
+ */
+anychart.core.map.scale.Geo.prototype.transform = function(lon, lat) {
+  this.calculate();
+
+  if (!this.bounds_)
+    return [NaN, NaN];
+
+  lat = anychart.utils.toNumber(lat);
+  lon = anychart.utils.toNumber(lon);
+
+  var tx = this.pickTx(lat, lon);
+  var projected = window['proj4'](tx.crs).forward([lon, lat]);
+  var scale = tx.scale;
+
+  lat = projected[0] * scale;
+  lon = projected[1] * scale;
+
+  lat += tx.xoffset || 0;
+  lon += tx.yoffset || 0;
+
+  var transformX = (+(/** @type {number} */(lat)) - this.minX) * this.ratio;
+  var transformY = (+(/** @type {number} */(lon)) - this.minY) * this.ratio;
+
+  var resultX = this.isInvertedX ?
+      this.bounds_.getRight() - this.centerOffsetX - transformX :
+      this.bounds_.left + this.centerOffsetX + transformX;
+
+  var resultY = this.isInverted ?
+      this.bounds_.top + this.centerOffsetY + transformY :
+      this.bounds_.getBottom() - this.centerOffsetY - transformY;
+
+  return [resultX, resultY];
+};
+
+
+/**
+ * Transform coords in pixel value to degrees values (lon/lat).
+ * @param {number} x X value to transform.
+ * @param {number} y Y value to transform.
+ * @return {Array.<number>} Transformed value adjust bounds.
+ */
+anychart.core.map.scale.Geo.prototype.inverseTransform = function(x, y) {
+  this.calculate();
+
+  if (!this.bounds_)
+    return [NaN, NaN];
+
+  x = anychart.utils.toNumber(x);
+  y = anychart.utils.toNumber(y);
+
+  var transformX = this.isInvertedX ?
+      this.bounds_.getRight() - this.centerOffsetX - x :
+      x - this.bounds_.left - this.centerOffsetX;
+
+  var transformY = this.isInverted ?
+      x - this.bounds_.top - this.centerOffsetY :
+      this.bounds_.getBottom() - this.centerOffsetY - y;
+
+  var resultX = +(/** @type {number} */(transformX)) / this.ratio + this.minX;
+  var resultY = +(/** @type {number} */(transformY)) / this.ratio + this.minY;
+
+  var defaultTx = this.tx['default'];
+
+  var txName = goog.object.findKey(this.tx, function(value, key) {
+    if (key != 'default' && value.heatZone) {
+      var heatZone = value.heatZone;
+
+      return resultX >= heatZone.left &&
+          resultX <= heatZone.left + heatZone.width &&
+              resultY <= heatZone.top &&
+              resultY >= heatZone.top - heatZone.height;
+    }
+    return false;
+  }) || 'default';
+
+  var tx = this.tx[txName];
+
+  resultX -= tx.xoffset || defaultTx.xoffset || 0;
+  resultY -= tx.yoffset || defaultTx.yoffset || 0;
+
+  var scale = tx.scale || defaultTx.scale;
+  var crs = tx.crs || defaultTx.crs;
+
+  var projected = window['proj4'](crs).inverse([resultX / scale, resultY / scale]);
+
+  return [projected[0], projected[1]];
 };
 
 
@@ -580,6 +717,7 @@ anychart.core.map.scale.Geo.prototype.setupByJSON = function(config) {
 };
 
 
+//exports
 //todo (blackart) Don't export yet.
 //anychart.core.map.scale.Geo.prototype['setBounds'] = anychart.core.map.scale.Geo.prototype.setBounds;
 anychart.core.map.scale.Geo.prototype['transform'] = anychart.core.map.scale.Geo.prototype.transform;
@@ -593,4 +731,3 @@ anychart.core.map.scale.Geo.prototype['inverseTransform'] = anychart.core.map.sc
 //anychart.core.map.scale.Geo.prototype['inverted'] = anychart.core.map.scale.Geo.prototype.inverted;
 //anychart.core.map.scale.Geo.prototype['startAutoCalc'] = anychart.core.map.scale.Geo.prototype.startAutoCalc;
 //anychart.core.map.scale.Geo.prototype['finishAutoCalc'] = anychart.core.map.scale.Geo.prototype.finishAutoCalc;
-//exports
