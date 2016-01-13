@@ -1,5 +1,5 @@
 goog.provide('anychart.charts.Stock');
-goog.require('anychart.core.Chart');
+goog.require('anychart.core.ChartWithCredits');
 goog.require('anychart.core.stock.Controller');
 goog.require('anychart.core.stock.Plot');
 goog.require('anychart.core.stock.Scroller');
@@ -14,13 +14,13 @@ goog.require('anychart.utils');
 /**
  * Stock chart class.
  * @constructor
- * @extends {anychart.core.Chart}
+ * @extends {anychart.core.ChartWithCredits}
  */
 anychart.charts.Stock = function() {
   // See SeparateChart
   this.supportsBaseHighlight = false;
 
-  goog.base(this);
+  anychart.charts.Stock.base(this, 'constructor');
 
   /**
    * Chart plots array.
@@ -86,7 +86,7 @@ anychart.charts.Stock = function() {
    */
   this.highlightedClientY_ = NaN;
 };
-goog.inherits(anychart.charts.Stock, anychart.core.Chart);
+goog.inherits(anychart.charts.Stock, anychart.core.ChartWithCredits);
 
 
 /**
