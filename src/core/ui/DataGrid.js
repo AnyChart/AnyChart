@@ -57,6 +57,14 @@ anychart.core.ui.DataGrid = function(opt_controller) {
    */
   this.headerFill_;
 
+
+  /**
+   * Header path filled by header fill.
+   * @type {acgraph.vector.Path}
+   * @private
+   */
+  this.headerPath_ = null;
+
   /**
    * Horizontal offset of data grid.
    * Used to perform horizontal scrolling of DG.
@@ -375,6 +383,22 @@ anychart.core.ui.DataGrid.prototype.headerFill = function(opt_fillOrColorOrKeys,
     return this;
   }
   return this.headerFill_;
+};
+
+
+/**
+ * Getter for this.headerPath_.
+ * @return {acgraph.vector.Path}
+ * @private
+ */
+anychart.core.ui.DataGrid.prototype.getHeaderPath_ = function() {
+  if (!this.headerPath_) {
+    this.headerPath_ = acgraph.path();
+    this.getCellsLayer().addChildAt(this.headerPath_, 0);
+    this.headerPath_.stroke(null);
+    this.registerDisposable(this.headerPath_);
+  }
+  return this.headerPath_;
 };
 
 
@@ -731,6 +755,17 @@ anychart.core.ui.DataGrid.prototype.scroll = function(horizontalPixelOffset, ver
  * @override
  */
 anychart.core.ui.DataGrid.prototype.boundsInvalidated = function() {
+  var headerPath = this.getHeaderPath_();
+
+  var headerHeight = /** @type {number} */ (this.pixelBoundsCache.top + this.headerHeight());
+  headerPath
+      .clear()
+      .moveTo(this.pixelBoundsCache.left, this.pixelBoundsCache.top)
+      .lineTo(this.pixelBoundsCache.left + this.pixelBoundsCache.width, this.pixelBoundsCache.top)
+      .lineTo(this.pixelBoundsCache.left + this.pixelBoundsCache.width, headerHeight)
+      .lineTo(this.pixelBoundsCache.left, headerHeight)
+      .close();
+
   var splitterWidth = anychart.utils.extractThickness(/** @type {acgraph.vector.Stroke|string} */ (this.columnStroke_));
 
   var totalWidth = 0;
@@ -753,6 +788,8 @@ anychart.core.ui.DataGrid.prototype.boundsInvalidated = function() {
  * @override
  */
 anychart.core.ui.DataGrid.prototype.appearanceInvalidated = function() {
+  this.getHeaderPath_().fill(this.headerFill_);
+
   this.getEditStructurePreviewPath_()
       .fill(this.editStructurePreviewFill_)
       .stroke(this.editStructurePreviewStroke_);
@@ -1161,6 +1198,12 @@ anychart.core.ui.DataGrid.Column = function(dataGrid) {
 
   /**
    * Title path.
+   * NOTE:
+   *  This path is added here despite we already have headerPath in data grid.
+   *  It will be filled with the same fill as DG's header path.
+   *  These paths have different purposes:
+   *  - this title path covers labels during the scrolling.
+   *  - data grid's headerPath just lingers a header in data grid's width to fill a visible gap in gantt diagram.
    * @type {acgraph.vector.Path}
    * @private
    */

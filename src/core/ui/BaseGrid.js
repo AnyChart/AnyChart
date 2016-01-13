@@ -98,6 +98,15 @@ anychart.core.ui.BaseGrid = function(opt_controller, opt_isResource) {
    */
   this.rowStrokePath_ = null;
 
+
+  /**
+   * Path that separates header of grid's body.
+   * Takes color from this.rowStroke_.
+   * @type {acgraph.vector.Path}
+   * @private
+   */
+  this.headerSeparationPath_ = null;
+
   /**
    * Base layer.
    * @type {acgraph.vector.Layer}
@@ -1001,6 +1010,20 @@ anychart.core.ui.BaseGrid.prototype.getRowStrokePath = function() {
 };
 
 
+/**
+ * Getter for this.headerSeparationPath_.
+ * @return {acgraph.vector.Path}
+ */
+anychart.core.ui.BaseGrid.prototype.getHeaderSeparationPath = function() {
+  if (!this.headerSeparationPath_) {
+    this.headerSeparationPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
+    this.headerSeparationPath_.zIndex(40);
+    this.registerDisposable(this.headerSeparationPath_);
+  }
+  return this.headerSeparationPath_;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Decoration.
@@ -1328,12 +1351,6 @@ anychart.core.ui.BaseGrid.prototype.drawRowFills_ = function() {
           .close();
     }
 
-    var headSepTop = header - 1 + pixelShift;
-
-    this.rowStrokePath_
-        .moveTo(this.pixelBoundsCache.left, headSepTop)
-        .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, headSepTop);
-
     totalTop = (newTop + this.rowStrokeThickness);
 
     var strokePathTop = Math.floor(totalTop - this.rowStrokeThickness / 2) + pixelShift;
@@ -1546,6 +1563,14 @@ anychart.core.ui.BaseGrid.prototype.drawInternal = function(positionRecalculated
     this.eventsRect_.setBounds(/** @type {anychart.math.Rect} */ (this.pixelBoundsCache));
     this.totalGridsWidth = this.pixelBoundsCache.width;
 
+    var header = this.pixelBoundsCache.top + this.headerHeight_;
+    var headSepTop = header + .5;
+
+    this.getHeaderSeparationPath()
+        .clear()
+        .moveTo(this.pixelBoundsCache.left, headSepTop)
+        .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, headSepTop);
+
     if (this.isStandalone) {
       /*
         NOTE: For standalone mode only!
@@ -1589,6 +1614,16 @@ anychart.core.ui.BaseGrid.prototype.drawInternal = function(positionRecalculated
     this.getOddPath().fill(this.rowOddFill_ || this.rowFill_);
     this.getEvenPath().fill(this.rowEvenFill_ || this.rowFill_);
     this.getSelectedPath().fill(this.rowSelectedFill_);
+
+    var rowStrokeColor;
+    if (goog.isString(this.rowStroke_)) {
+      rowStrokeColor = this.rowStroke_;
+    } else if (goog.isObject(this.rowStroke_) && this.rowStroke_['color']) {
+      rowStrokeColor = this.rowStroke_['color'];
+    }
+
+    if (rowStrokeColor) this.getHeaderSeparationPath().stroke(rowStrokeColor);
+
     this.getRowStrokePath().stroke(this.rowStroke_);
 
     this.appearanceInvalidated();
