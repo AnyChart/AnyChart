@@ -88,10 +88,11 @@ anychart.format.DEFAULT_SCALE_ = {
  * @param {({factors:Array.<number>,suffixes:Array.<string>}|boolean)=} opt_scale
  * @param {boolean=} opt_zeroFillDecimals
  * @param {string=} opt_scaleSuffixSeparator
+ * @param {boolean=} opt_useBracketsForNegative
  * @return {string}
  */
 anychart.format.number = function(number, opt_decimalsCountOrSettings, opt_decimalPoint, opt_groupsSeparator,
-    opt_scale, opt_zeroFillDecimals, opt_scaleSuffixSeparator) {
+    opt_scale, opt_zeroFillDecimals, opt_scaleSuffixSeparator, opt_useBracketsForNegative) {
   var obj = goog.isObject(opt_decimalsCountOrSettings) ? opt_decimalsCountOrSettings : null;
   var decimalsCount = goog.isNumber(opt_decimalsCountOrSettings) ?
       opt_decimalsCountOrSettings :
@@ -123,15 +124,20 @@ anychart.format.number = function(number, opt_decimalsCountOrSettings, opt_decim
       (obj && goog.isString(obj['scaleSuffixSeparator'])) ?
           obj['scaleSuffixSeparator'] :
           '';
+  var useBracketsForNegative = goog.isBoolean(opt_useBracketsForNegative) ?
+      opt_useBracketsForNegative :
+      (obj && goog.isBoolean(obj['useBracketsForNegative'])) ?
+          obj['useBracketsForNegative'] :
+          false;
   if (scale === true)
     scale = anychart.format.DEFAULT_SCALE_;
 
-  var originalNumber = number;
-  var negative = number < 0;
-  if (negative)
-    number = -number;
   var suffix = '';
+  var negative = number < 0;
   if (goog.isObject(scale) && goog.isArray(scale['factors']) && goog.isArray(scale['suffixes'])) {
+    var originalNumber = number;
+    if (negative)
+      number = -number;
     var factor = 1;
     var factors = scale['factors'];
     var suffixes = scale['suffixes'];
@@ -178,7 +184,10 @@ anychart.format.number = function(number, opt_decimalsCountOrSettings, opt_decim
     // newParts.length always at least will be non-zero (min = 1)
     parts[0] = newParts.join(groupsSeparator);
   }
-  return parts.join(decimalPoint) + eString + suffix;
+  var result = parts.join(decimalPoint) + eString + suffix;
+  if (negative && useBracketsForNegative)
+    result = ['(', result.substr(1), ')'].join('');
+  return result;
 };
 
 

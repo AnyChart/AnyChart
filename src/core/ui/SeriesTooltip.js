@@ -36,13 +36,13 @@ anychart.core.ui.SeriesTooltip = function() {
   this.y_ = 0;
 
   /**
-   * @type {Function}
+   * @type {Function|string}
    * @private
    */
   this.titleFormatter_ = anychart.utils.DEFAULT_FORMATTER;
 
   /**
-   * @type {Function}
+   * @type {Function|string}
    * @private
    */
   this.textFormatter_ = anychart.utils.DEFAULT_FORMATTER;
@@ -108,8 +108,8 @@ anychart.core.ui.SeriesTooltip.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 /**
  * Function to format title.
- * @param {Function=} opt_value Function to format title text.
- * @return {Function|anychart.core.ui.SeriesTooltip} Function to format title text or itself for method chaining.
+ * @param {(Function|string)=} opt_value Function to format title text.
+ * @return {Function|string|anychart.core.ui.SeriesTooltip} Function to format title text or itself for method chaining.
  */
 anychart.core.ui.SeriesTooltip.prototype.titleFormatter = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -125,8 +125,8 @@ anychart.core.ui.SeriesTooltip.prototype.titleFormatter = function(opt_value) {
 
 /**
  * Function to format content text.
- * @param {Function=} opt_value Function to format content text.
- * @return {Function|anychart.core.ui.SeriesTooltip} Function to format content text or itself for method chaining.
+ * @param {(Function|string)=} opt_value Function to format content text.
+ * @return {Function|string|anychart.core.ui.SeriesTooltip} Function to format content text or itself for method chaining.
  */
 anychart.core.ui.SeriesTooltip.prototype.textFormatter = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -148,7 +148,7 @@ anychart.core.ui.SeriesTooltip.prototype.textFormatter = function(opt_value) {
  */
 anychart.core.ui.SeriesTooltip.prototype.contentFormatter = function(opt_value) {
   anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.contentFormatter()', '.textFormatter()'], true);
-  return this.textFormatter(opt_value);
+  return /** @type {Function} */ (this.textFormatter(opt_value));
 };
 
 
@@ -194,8 +194,11 @@ anychart.core.ui.SeriesTooltip.prototype.valuePostfix = function(opt_value) {
 anychart.core.ui.SeriesTooltip.prototype.getFormattedTitle = function(contextProvider) {
   contextProvider = goog.object.clone(contextProvider);
   contextProvider['titleText'] = this.title_.text();
+  var formatter = this.titleFormatter();
+  if (goog.isString(formatter))
+    formatter = anychart.core.utils.TokenParser.getInstance().getTextFormatter(formatter);
 
-  return this.titleFormatter().call(contextProvider, contextProvider);
+  return formatter.call(contextProvider, contextProvider);
 };
 
 
@@ -208,8 +211,11 @@ anychart.core.ui.SeriesTooltip.prototype.getFormattedContent = function(contextP
   contextProvider = goog.object.clone(contextProvider);
   contextProvider['valuePrefix'] = this.valuePrefix_ ? this.valuePrefix_ : '';
   contextProvider['valuePostfix'] = this.valuePostfix_ ? this.valuePostfix_ : '';
+  var formatter = this.textFormatter();
+  if (goog.isString(formatter))
+    formatter = anychart.core.utils.TokenParser.getInstance().getTextFormatter(formatter);
 
-  return this.textFormatter().call(contextProvider, contextProvider) || contextProvider['seriesName'];
+  return formatter.call(contextProvider, contextProvider) || contextProvider['seriesName'];
 };
 
 

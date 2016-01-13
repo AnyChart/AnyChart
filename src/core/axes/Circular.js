@@ -4,6 +4,7 @@ goog.require('anychart.color');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.axes.CircularTicks');
 goog.require('anychart.core.ui.CircularLabelsFactory');
+goog.require('anychart.core.utils.AxisLabelsContextProvider');
 goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 goog.require('anychart.scales.Base');
@@ -853,27 +854,7 @@ anychart.core.axes.Circular.prototype.getLabelBounds_ = function(index, isMajor)
  * @private
  */
 anychart.core.axes.Circular.prototype.getLabelsFormatProvider_ = function(index, value) {
-  var scale = this.scale_;
-
-  var labelText, labelValue;
-  if (scale instanceof anychart.scales.Linear) {
-    labelText = parseFloat(value);
-    labelValue = parseFloat(value);
-  }
-
-  return {
-    'index': index,
-    'value': labelText,
-    'tickValue': labelValue,
-    'max': scale.max ? scale.max : null,
-    'min': scale.min ? scale.min : null,
-    'scale': scale
-    //TODO as soon as it is possible:
-    //sum -- the sum data values from series bound to this axis (depends on orientation)
-    //average -- the sum divided by the number of points
-    //median -- axis median
-    //mode -- axis mode
-  };
+  return new anychart.core.utils.AxisLabelsContextProvider(this, index, value);
 };
 
 

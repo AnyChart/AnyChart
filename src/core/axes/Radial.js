@@ -4,6 +4,7 @@ goog.require('anychart.color');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.axes.RadialTicks');
 goog.require('anychart.core.ui.LabelsFactory');
+goog.require('anychart.core.utils.AxisLabelsContextProvider');
 goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 goog.require('anychart.scales.Base');
@@ -981,41 +982,7 @@ anychart.core.axes.Radial.prototype.drawLabel_ = function(index, isMajor) {
  * @private
  */
 anychart.core.axes.Radial.prototype.getLabelsFormatProvider_ = function(index, value) {
-  var scale = this.scale();
-
-  var labelText, labelValue;
-  if (scale instanceof anychart.scales.Linear) {
-    labelText = parseFloat(value);
-    labelValue = parseFloat(value);
-  } else if (scale instanceof anychart.scales.Ordinal) {
-    labelText = scale.ticks().names()[index];
-    labelValue = value;
-  } else if (scale instanceof anychart.scales.DateTime) {
-    var date = new Date(value);
-    var mm = date.getMonth() + 1;
-    var dd = date.getDate();
-    var yy = date.getFullYear();
-
-    mm = mm < 10 ? '0' + mm : '' + mm;
-    dd = dd < 10 ? '0' + dd : '' + dd;
-
-    labelText = mm + '-' + dd;
-    labelValue = value;
-  }
-
-  return {
-    'index': index,
-    'value': labelText,
-    'tickValue': labelValue,
-    'max': scale.max ? scale.max : null,
-    'min': scale.min ? scale.min : null,
-    'scale': scale
-    //TODO as soon as it is possible:
-    //sum -- the sum data values from series bound to this axis (depends on orientation)
-    //average -- the sum divided by the number of points
-    //median -- axis median
-    //mode -- axis mode
-  };
+  return new anychart.core.utils.AxisLabelsContextProvider(this, index, value);
 };
 
 

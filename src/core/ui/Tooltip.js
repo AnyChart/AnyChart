@@ -23,13 +23,13 @@ anychart.core.ui.Tooltip = function() {
   this.item_ = null;
 
   /**
-   * @type {Function}
+   * @type {Function|string}
    * @private
    */
   this.titleFormatter_ = anychart.utils.DEFAULT_FORMATTER;
 
   /**
-   * @type {Function}
+   * @type {Function|string}
    * @private
    */
   this.textFormatter_ = anychart.utils.DEFAULT_FORMATTER;
@@ -91,8 +91,8 @@ anychart.core.ui.Tooltip.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_RED
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Function to format title text.
- * @param {Function=} opt_value Function to format title text.
- * @return {Function|anychart.core.ui.Tooltip} Function to format title text or itself for method chaining.
+ * @param {(Function|string)=} opt_value Function to format title text.
+ * @return {Function|string|anychart.core.ui.Tooltip} Function to format title text or itself for method chaining.
  */
 anychart.core.ui.Tooltip.prototype.titleFormatter = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -109,8 +109,8 @@ anychart.core.ui.Tooltip.prototype.titleFormatter = function(opt_value) {
 
 /**
  * Function to format content text.
- * @param {Function=} opt_value Function to format content text.
- * @return {Function|anychart.core.ui.Tooltip} Function to format content text or itself for method chaining.
+ * @param {(Function|string)=} opt_value Function to format content text.
+ * @return {Function|string|anychart.core.ui.Tooltip} Function to format content text or itself for method chaining.
  */
 anychart.core.ui.Tooltip.prototype.textFormatter = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -131,7 +131,10 @@ anychart.core.ui.Tooltip.prototype.textFormatter = function(opt_value) {
  * @return {Function|anychart.core.ui.Tooltip} Function to format content text or itself for method chaining.
  * @deprecated It shouldn't be used ever.
  */
-anychart.core.ui.Tooltip.prototype.contentFormatter = anychart.core.ui.Tooltip.prototype.textFormatter;
+anychart.core.ui.Tooltip.prototype.contentFormatter = function(opt_value) {
+  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.contentFormatter()', '.textFormatter()'], true);
+  return /** @type {Function} */ (this.textFormatter(opt_value));
+};
 
 
 /**
@@ -442,8 +445,15 @@ anychart.core.ui.Tooltip.prototype.show = function(textInfo, position) {
   this.textInfoCache_['valuePrefix'] = this.valuePrefix_ ? this.valuePrefix_ : '';
   this.textInfoCache_['valuePostfix'] = this.valuePostfix_ ? this.valuePostfix_ : '';
 
-  var titleText = this.titleFormatter_.call(textInfo, textInfo);
-  var contentText = this.textFormatter_.call(textInfo, textInfo);
+  var formatter = this.titleFormatter_;
+  if (goog.isString(formatter))
+    formatter = anychart.core.utils.TokenParser.getInstance().getTextFormatter(formatter);
+  var titleText = formatter.call(textInfo, textInfo);
+
+  formatter = this.textFormatter_;
+  if (goog.isString(formatter))
+    formatter = anychart.core.utils.TokenParser.getInstance().getTextFormatter(formatter);
+  var contentText = formatter.call(textInfo, textInfo);
 
   this.item_.suspendSignalsDispatching();
   this.item_.content().text(contentText);
@@ -482,8 +492,17 @@ anychart.core.ui.Tooltip.prototype.hide = function() {
 anychart.core.ui.Tooltip.prototype.redraw = function() {
   if (this.item_ && this.item_.visible() && this.item_.enabled()) {
     this.item_.suspendSignalsDispatching();
-    var titleText = this.titleFormatter_.call(this.textInfoCache_, this.textInfoCache_);
-    var contentText = this.textFormatter_.call(this.textInfoCache_, this.textInfoCache_);
+
+    var formatter = this.titleFormatter_;
+    if (goog.isString(formatter))
+      formatter = anychart.core.utils.TokenParser.getInstance().getTextFormatter(formatter);
+    var titleText = formatter.call(this.textInfoCache_, this.textInfoCache_);
+
+    formatter = this.textFormatter_;
+    if (goog.isString(formatter))
+      formatter = anychart.core.utils.TokenParser.getInstance().getTextFormatter(formatter);
+    var contentText = formatter.call(this.textInfoCache_, this.textInfoCache_);
+
     var realPosition = this.processPosition_(this.positionCache_);
 
     this.item_.x(realPosition.x);

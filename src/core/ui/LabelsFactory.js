@@ -4,6 +4,7 @@ goog.require('acgraph.math.Coordinate');
 goog.require('anychart.core.Text');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.utils.Padding');
+goog.require('anychart.core.utils.TokenParser');
 goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 
@@ -91,7 +92,7 @@ anychart.core.ui.LabelsFactory = function() {
 
   /**
    * Label text formatting function, by default we use value field of the format provider.
-   * @type {Function}
+   * @type {Function|string}
    * @private
    */
   this.textFormatter_;
@@ -352,8 +353,8 @@ anychart.core.ui.LabelsFactory.prototype.paddingInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Gets or sets labels text formatter function.
- * @param {Function=} opt_value Labels text formatter function.
- * @return {Function|anychart.core.ui.LabelsFactory} Labels text formatter function or Labels instance for chaining call.
+ * @param {(Function|string)=} opt_value Labels text formatter function.
+ * @return {Function|string|anychart.core.ui.LabelsFactory} Labels text formatter function or Labels instance for chaining call.
  */
 anychart.core.ui.LabelsFactory.prototype.textFormatter = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1116,12 +1117,14 @@ anychart.core.ui.LabelsFactory.prototype.measureWithTransform = function(formatP
 
 /**
  * Calls text formatter in scope of provider, or returns value from cache.
- * @param {Function} formatter Text formatter function.
+ * @param {Function|string} formatter Text formatter function.
  * @param {*} provider Provider for text formatter.
  * @param {number=} opt_cacheIndex Label index.
  * @return {*}
  */
 anychart.core.ui.LabelsFactory.prototype.callTextFormatter = function(formatter, provider, opt_cacheIndex) {
+  if (goog.isString(formatter))
+    formatter = anychart.core.utils.TokenParser.getInstance().getTextFormatter(formatter);
   if (!this.textFormatterCallsCache_)
     this.textFormatterCallsCache_ = {};
   if (goog.isDefAndNotNull(opt_cacheIndex)) {

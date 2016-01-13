@@ -7,6 +7,7 @@ goog.require('anychart.core.ui.Paginator');
 goog.require('anychart.core.ui.Separator');
 goog.require('anychart.core.ui.Title');
 goog.require('anychart.core.ui.Tooltip');
+goog.require('anychart.core.utils.ITokenProvider');
 goog.require('anychart.core.utils.Margin');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
@@ -20,6 +21,7 @@ goog.require('goog.object');
 /**
  * Legend element.
  * @constructor
+ * @implements {anychart.core.utils.ITokenProvider}
  * @extends {anychart.core.Text}
  */
 anychart.core.ui.Legend = function() {
@@ -633,6 +635,36 @@ anychart.core.ui.Legend.prototype.onTooltipSignal_ = function(event) {
 
 
 /**
+ * TODO(AntonKagakin): need to rewrite legend tooltip provider!.
+ * Stub.
+ * @override
+ */
+anychart.core.ui.Legend.prototype.getTokenType = function(name) {
+  switch (name) {
+    case '%Value':
+      return anychart.enums.TokenType.STRING;
+    default:
+      return anychart.enums.TokenType.UNKNOWN;
+  }
+};
+
+
+/**
+ * TODO(AntonKagakin): need to rewrite legend tooltip provider!.
+ * Stub.
+ * @override
+ */
+anychart.core.ui.Legend.prototype.getTokenValue = function(name) {
+  switch (name) {
+    case '%Value':
+      return this['value'];
+    default:
+      return void 0;
+  }
+};
+
+
+/**
  * Show data point tooltip.
  * @protected
  * @param {anychart.core.MouseEvent} event Event that initiates tooltip display.
@@ -651,7 +683,9 @@ anychart.core.ui.Legend.prototype.showTooltip = function(event) {
       'iconMarkerType': item.iconMarkerType(),
       'iconMarkerStroke': item.iconMarkerStroke(),
       'iconMarkerFill': item.iconMarkerFill(),
-      'meta': this.legendItemsMeta_[index]
+      'meta': this.legendItemsMeta_[index],
+      'getTokenValue': this.getTokenValue,
+      'getTokenType': this.getTokenType
     };
     if (tooltip.isFloating() && event) {
       tooltip.show(

@@ -3173,6 +3173,18 @@ anychart.enums.normalizeAdjustFontSizeMode = function(value, opt_default) {
 };
 
 
+/**
+ * Token types enum.
+ * @enum {string}
+ */
+anychart.enums.TokenType = {
+  UNKNOWN: '',
+  NUMBER: 'number',
+  STRING: 'string',
+  DATE_TIME: 'datetime'
+};
+
+
 //exports
 goog.exportSymbol('anychart.enums.RadialGridLayout.CIRCUIT', anychart.enums.RadialGridLayout.CIRCUIT);
 goog.exportSymbol('anychart.enums.RadialGridLayout.RADIAL', anychart.enums.RadialGridLayout.RADIAL);
@@ -3476,3 +3488,8 @@ goog.exportSymbol('anychart.enums.ChartScrollerPosition.BEFORE_AXES', anychart.e
 goog.exportSymbol('anychart.enums.LabelsDisplayMode.ALWAYS_SHOW', anychart.enums.LabelsDisplayMode.ALWAYS_SHOW);
 goog.exportSymbol('anychart.enums.LabelsDisplayMode.DROP', anychart.enums.LabelsDisplayMode.DROP);
 goog.exportSymbol('anychart.enums.LabelsDisplayMode.CLIP', anychart.enums.LabelsDisplayMode.CLIP);
+
+goog.exportSymbol('anychart.enums.TokenType.UNKNOWN', anychart.enums.TokenType.UNKNOWN);
+goog.exportSymbol('anychart.enums.TokenType.NUMBER', anychart.enums.TokenType.NUMBER);
+goog.exportSymbol('anychart.enums.TokenType.STRING', anychart.enums.TokenType.STRING);
+goog.exportSymbol('anychart.enums.TokenType.DATE_TIME', anychart.enums.TokenType.DATE_TIME);
