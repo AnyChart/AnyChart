@@ -2513,7 +2513,16 @@ window['anychart']['themes']['defaultTheme'] = {
       'choropleth': {},
       'bubble': {
         'hoverFill': '#545f69',
-        'selectFill': '#333'
+        'selectFill': '#333',
+        'tooltip': {
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'textFormatter': function() {
+            return 'Id: ' + this['id'] + '\nValue: ' + this['valuePrefix'] + this['size'] + this['valuePostfix'];
+          }
+        }
       }
     },
     'colorRange': {

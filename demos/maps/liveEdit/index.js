@@ -9,17 +9,22 @@ var randomExt = function(a, b) {
 };
 
 var crs = [
-  {"value": "default", "text": "+proj=lcc +lat_1=46.8 +lat_0=46.8 +lon_0=2.337229166666667 +k_0=0.99987742 +x_0=600000 +y_0=2200000 +ellps=intl +towgs84=-87,-98,-121,0,0,0,0 +units=m +no_defs"},
-  {"value": "reunion", "text": "+proj=utm +zone=40 +south +datum=WGS84 +units=m +no_defs"},
-  {"value": "mayotte", "text": "+proj=utm +zone=38 +south +datum=WGS84 +units=m +no_defs"},
-  {"value": "guyana", "text": "+proj=utm +zone=22 +datum=WGS84 +units=m +no_defs"},
-  {"value": "martinique", "text": "+proj=utm +zone=20 +datum=WGS84 +units=m +no_defs"},
-  {"value": "guadeloupe", "text": "+proj=utm +zone=20 +datum=WGS84 +units=m +no_defs"}
+  //france default
+  //{"id": "default", "value": "default", "text": "+proj=lcc +lat_1=46.8 +lat_0=46.8 +lon_0=2.337229166666667 +k_0=0.99987742 +x_0=600000 +y_0=2200000 +ellps=intl +towgs84=-87,-98,-121,0,0,0,0 +units=m +no_defs"},
+  //usa default
+  {"id": "default", "value": "default", "text": "+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"},
+  {"id": "FR.RE", "value": "reunion", "text": "+proj=utm +zone=40 +south +datum=WGS84 +units=m +no_defs"},
+  {"id": "FR.YT", "value": "mayotte", "text": "+proj=utm +zone=38 +south +datum=WGS84 +units=m +no_defs"},
+  {"id": "FR.GF", "value": "guyana", "text": "+proj=utm +zone=22 +datum=WGS84 +units=m +no_defs"},
+  {"id": "FR.MQ", "value": "martinique", "text": "+proj=utm +zone=20 +datum=WGS84 +units=m +no_defs"},
+  {"id": "FR.GP", "value": "guadeloupe", "text": "+proj=utm +zone=20 +datum=WGS84 +units=m +no_defs"},
+  {"id": "US.HI", "value": "hawaii", "text": "+proj=aea +lat_1=8 +lat_2=18 +lat_0=13 +lon_0=-157 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"},
+  {"id": "US.AK", "value": "alaska", "text": "+proj=tmerc +lat_0=54 +lon_0=-142 +k=0.9999 +x_0=500000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"}
 ];
 
 $(document).ready(function() {
   $(crs).each(function() {
-    $('#select_crs').append($("<option>").attr('value', this.text).text(this.text));
+    $('#select_crs').append($("<option>").attr('value', this.text).text(this.id));
   });
 
   $('body').append('<div id="tooltip"></div>');
@@ -40,15 +45,15 @@ $(document).ready(function() {
   stage = anychart.graphics.create('container');
 
   chart = anychart.map();
-  chart.geoData(anychart.maps.australia);
+  chart.geoData(anychart.maps.united_states_of_america);
   chart.interactivity().drag(false);
 
   var dataSet = anychart.data.set([]);
 
   var series = chart.choropleth(dataSet);
   series.labels().textFormatter(function() {
-    return this.getDataValue('title');
-  });
+    return this.getDataValue('id');
+  }).enabled(false);
   series.tooltip(false);
 
   chart.container(stage).draw();
@@ -79,6 +84,7 @@ $(document).ready(function() {
     chart.geoData()['ac-tx']['default']['scale'] || anychart.charts.Map.DEFAULT_TX['default']['scale'] :
         anychart.charts.Map.DEFAULT_TX['default']['scale'];
 
+    var featureName = '';
     if (!selectedRegions.length) {
       $('#scale').val(defaultScale);
       $('#scaleInp').val(defaultScale);
@@ -87,12 +93,15 @@ $(document).ready(function() {
       var scaleFactor = e.point.scaleFactor();
       var crs = e.point.crs();
 
-      //console.log(e.point.getFeatureProp());
+      var prop = e.point.getFeatureProp();
+      featureName = prop[chart.geoIdField()];
 
       $('#scale').val(scaleFactor);
       $('#scaleInp').val(scaleFactor);
       $('#select_crs').val(crs);
     }
+
+    $('#featureId').text(featureName);
   });
 
   chart.listen(anychart.enums.EventType.CHART_DRAW, function(e) {
@@ -137,7 +146,7 @@ $(document).ready(function() {
   });
 
   $('#select_crs').change(function(e) {
-    var crs = $('#select_crs option:selected').text();
+    var crs = $('#select_crs option:selected').val();
     var id = selectedRegions[0].properties[chart.geoIdField()];
 
     chart.featureCrs(id, crs);

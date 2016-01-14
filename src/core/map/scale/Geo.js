@@ -576,7 +576,7 @@ anychart.core.map.scale.Geo.prototype.transform = function(lon, lat) {
       this.bounds_.top + this.centerOffsetY + transformY :
       this.bounds_.getBottom() - this.centerOffsetY - transformY;
 
-  return [(resultX + this.dx_) * this.zoom, (resultY + this.dy_) * this.zoom];
+  return [resultX * this.zoom + this.dx_, resultY * this.zoom + this.dy_];
 };
 
 

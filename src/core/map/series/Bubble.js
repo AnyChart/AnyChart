@@ -603,7 +603,10 @@ anychart.core.map.series.Bubble.prototype.getReferenceCoords = function() {
   x = anychart.utils.toNumber(x);
   y = anychart.utils.toNumber(y);
 
+  console.log(x, y);
   var txCoords = scale.transform(x, y);
+  console.log(txCoords);
+
   if (!isNaN(x))
     x = txCoords[0];
   if (!isNaN(y) && !arrayMappingWithRegion)

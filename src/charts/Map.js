@@ -179,7 +179,7 @@ anychart.charts.Map = function() {
 
         this.fullZoom_ = this.prevTxMatrix_.getScaleX();
 
-        this.scale().setMapZoom(this.prevTxMatrix_.getScaleX());
+        this.scale().setMapZoom(this.fullZoom_);
         this.scale().setOffsetFocusPoint(this.prevTxMatrix_.getTranslateX(), this.prevTxMatrix_.getTranslateY());
 
         this.invalidateSeries_();
