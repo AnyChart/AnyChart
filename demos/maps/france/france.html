@@ -1,0 +1,78 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <!--<script src="../../../out/anychart-bundle.min.js"></script>-->
+
+    <script src="../../../contrib/closure-library/closure/goog/base.js"></script>
+    <script src="../../../src/deps.js"></script>
+    <script>
+        goog.require('anychart.modules.anychart_bundle');
+        goog.require('anychart.themes.defaultTheme');
+    </script>
+    <script src="../../../proj4.js"></script>
+
+
+    <script src="https://cdn.anychart.com/geodata/1.1.0/countries/france/france.js" data-export="true"></script>
+    <script x-export="map">
+        anychart.onDocumentReady(function() {
+            // create data set
+            var dataSet = anychart.data.set([
+                {name: "Normandy", lat: 49.706571, long: -1.889096, 'size': 51, desc: "This region can reserve good suprises.\nWest and NorthWest during the winter. Sometines North-NorthEast (Good for the North coast)"},
+                {name: "Brittanny North", lat: 48.579248, long: -4.632797, 'size': 51, desc: "It's a beautiful region, full of secret spots!\nW/SW all the year... Sometimes North."},
+                {name: "Brittany South", lat: 48.094592, long: -4.306641, 'size': 48, desc: "A unknown region with hidden treasures. \"cold\" but nor far from heaven...\nDominant Swell: West to Southwest"},
+                {name: "Vendee", lat: 46.394542, long: -1.51165, 'size': 24, desc: "This region is underated even by most of the french surfers. It has everything you want: beach breaks, point breaks, reefs, outer reefs. The most famous wave is La Sauzaie but it's just overcrowded."},
+                {name: "Charente Maritime", lat: 46.131999, long: -1.14879, 'size': 24, desc: "Underated region."},
+                {name: "Gironde", lat: 44.495893, long: -1.249952, 'size': 34, desc: "It's a beautiful region for surfing.Spots are only Beach-Breaks.\nSW to W all the year. Sometimes NW but the surf isn't perfect in this case."},
+                {name: "Landes", lat: 43.626275, long: -1.45689, 'size': 28, desc: "La gravière, la piste, la nord, les estagnots... All very and great waves of les landes !!!\nWest, SW and NW..."},
+                {name: "Basque Country", lat: 43.378166, long: -1.762962, 'size': 32, desc: "The most famous region of surf in France."},
+                {name: "Mediterranean", lat: 43.132842, long: 5.747952, 'size': 65, desc: "We can even have VERY GOOD waves but the main problem is the very low frequency...You have to be at the right spot on the right moment...On-shore winds are a problem too..."},
+                {name: "Corsica", lat: 42.641378, long: 9.015806, 'size': 22, desc: ""}
+            ]);
+
+            // create map chart
+            map = anychart.map();
+
+            // set geodata using http://cdn.anychart.com/geodata/1.1.0/countries/france/france.js
+            map.geoData(anychart.maps.france);
+
+            // create map title
+            map.title("France Surf Areas by Lat/Long\nAll coordinates were taken from Google Maps");
+
+            // set chart bubble settings
+            map.maxBubbleSize(50);
+            map.minBubbleSize(15);
+
+            //create choropleth series
+            var series = map.bubble(dataSet);
+            series.labels(true);
+            series.labels().textFormatter(function() {
+                return this.getDataValue('size');
+            });
+
+            // set series tooltip settings
+            var tootlip = series.tooltip();
+            tootlip.title().width(270);
+            tootlip.titleFormatter(function() {
+                return this.getDataValue('name');
+            });
+            tootlip.textFormatter(function() {
+                return anychart.format.subs(
+                        "Spots count: %s\nDescription: %s",
+                        this.getDataValue('size'),
+                        this.getDataValue('desc')
+                );
+            });
+
+            // set container id for the chart
+            map.container('container');
+
+            // initiate chart drawing
+            map.draw();
+
+        });
+    </script>
+</head>
+<body>
+    <div id="container"></div>
+</body>
+</html>

@@ -192,6 +192,211 @@ anychart.charts.Map = function() {
     }
   }, this);
 
+  /**
+   * Aaync init mouse and keyboard interactivity for cases when map have no stage on draw moment.
+   * @type {!Function}
+   * @private
+   */
+  this.initControlsInteractivity_ = goog.bind(function() {
+    if (this.container().getStage()) {
+      var container = /** @type {Node} */(this.container().getStage().container());
+
+      this.mapTextarea = goog.dom.createDom('textarea');
+
+      this.mapTextarea.setAttribute('readonly', 'readonly');
+      goog.style.setStyle(this.mapTextarea, {
+        'border': 0,
+        'clip': 'rect(0 0 0 0)',
+        'height': '1px',
+        'margin': '-1px',
+        'overflow': 'hidden',
+        'padding': '0',
+        'position': 'absolute',
+        'width': '1px'
+      });
+      goog.dom.appendChild(container, this.mapTextarea);
+
+
+      this.listen('pointsselect', function(e) {
+        this.mapTextarea.innerHTML = this.interactivity().copyFormatter().call(e, e);
+        this.mapTextarea.select();
+      }, false, this);
+
+      this.shortcutHandler = new goog.ui.KeyboardShortcutHandler(this.mapTextarea);
+      var META = goog.ui.KeyboardShortcutHandler.Modifiers.META;
+      var CTRL = goog.ui.KeyboardShortcutHandler.Modifiers.CTRL;
+
+      this.shortcutHandler.setAlwaysPreventDefault(true);
+      this.shortcutHandler.setAlwaysStopPropagation(true);
+      this.shortcutHandler.setAllShortcutsAreGlobal(true);
+      this.shortcutHandler.setModifierShortcutsAreGlobal(true);
+
+      this.shortcutHandler.registerShortcut('zoom_in', goog.events.KeyCodes.EQUALS, META);
+      this.shortcutHandler.registerShortcut('zoom_out', goog.events.KeyCodes.DASH, META);
+      this.shortcutHandler.registerShortcut('zoom_full_out', goog.events.KeyCodes.ZERO, META);
+
+      this.shortcutHandler.registerShortcut('zoom_in', goog.events.KeyCodes.EQUALS, CTRL);
+      this.shortcutHandler.registerShortcut('zoom_out', goog.events.KeyCodes.DASH, CTRL);
+      this.shortcutHandler.registerShortcut('zoom_full_out', goog.events.KeyCodes.ZERO, CTRL);
+
+      this.shortcutHandler.registerShortcut('move_left', goog.events.KeyCodes.LEFT);
+      this.shortcutHandler.registerShortcut('move_right', goog.events.KeyCodes.RIGHT);
+      this.shortcutHandler.registerShortcut('move_up', goog.events.KeyCodes.UP);
+      this.shortcutHandler.registerShortcut('move_down', goog.events.KeyCodes.DOWN);
+
+      this.shortcutHandler.listen(goog.ui.KeyboardShortcutHandler.EventType.SHORTCUT_TRIGGERED, function(e) {
+        //var bounds = goog.style.getBounds(this.container().domElement());
+        var bounds = this.mapLayer_.getBoundsWithoutTransform();
+        var cx = bounds.left + bounds.width / 2;
+        var cy = bounds.top + bounds.height / 2;
+        var dx = 0, dy = 0;
+
+        var zoomRatio = 1.3;
+        var zoomFactor = 1;
+        switch (e.identifier) {
+          case 'zoom_in':
+            zoomFactor = zoomRatio;
+            break;
+          case 'zoom_out':
+            zoomFactor = 1 / zoomRatio;
+            break;
+          case 'zoom_full_out':
+            zoomFactor = 1 / this.fullZoom_;
+            if (this.fullZoom_ != 1) {
+              this.goingToHome_ = true;
+              this.stopTimers();
+            }
+            break;
+          case 'move_up':
+            dx = 0;
+            dy = 10 * this.fullZoom_;
+            break;
+          case 'move_left':
+            dx = 10 * this.fullZoom_;
+            dy = 0;
+            break;
+          case 'move_down':
+            dx = 0;
+            dy = -10 * this.fullZoom_;
+            break;
+          case 'move_right':
+            dx = -10 * this.fullZoom_;
+            dy = 0;
+            break;
+        }
+
+        if (zoomFactor != 1)
+          this.zoom(zoomFactor, cx, cy);
+        if (dx || dy)
+          this.move(dx, dy);
+      }, false, this);
+
+
+      this.mouseWheelHandler = new acgraph.events.MouseWheelHandler(/** @type {Element} */(this.container().getStage().container()));
+      this.mouseWheelHandler.listen('mousewheel', function(e) {
+        var bounds = this.getPlotBounds();
+        var insideBounds = bounds && e.clientX >= bounds.left &&
+            e.clientX <= bounds.left + bounds.width &&
+            e.clientY >= bounds.top &&
+            e.clientY <= bounds.top + bounds.height;
+
+        if (this.interactivity_.mouseWheel() && insideBounds) {
+          var zoomRatio = 1.3;
+          var zoomFactor = e.detail <= 0 ? e.detail == 0 ? 1 : zoomRatio : 1 / zoomRatio;
+          if (this.goingToHome_) zoomFactor = 1 / this.fullZoom_;
+
+          this.prevZoomState_ = this.zoomState_;
+          this.zoomState_ = zoomFactor > 1 ? true : zoomFactor == 1 ? !this.prevZoomState_ : false;
+
+          if (this.prevZoomState_ != this.zoomState_)
+            this.stopTimers();
+
+          if (zoomFactor < 1 && anychart.math.round(this.fullZoom_, 2) == anychart.charts.Map.ZOOM_MIN_RATIO && !this.mapLayer_.getSelfTransformation().isIdentity()) {
+            this.mapLayer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+            this.fullZoom_ = 1;
+            this.goingToHome_ = false;
+            this.stopTimers();
+
+            this.scale().setMapZoom(1);
+            this.scale().setOffsetFocusPoint(0, 0);
+
+            this.invalidateSeries_();
+            this.invalidate(anychart.ConsistencyState.MAP_SERIES, anychart.Signal.NEEDS_REDRAW);
+          } else {
+            var x = e.clientX;
+            var y = e.clientY;
+
+            this.zoom(zoomFactor, x, y);
+          }
+        }
+      }, false, this);
+
+
+      goog.events.listen(this.container().domElement(), goog.events.EventType.CLICK, function(e) {
+        var bounds = this.getPixelBounds();
+        var insideBounds = bounds && e.clientX >= bounds.left &&
+            e.clientX <= bounds.left + bounds.width &&
+            e.clientY >= bounds.top &&
+            e.clientY <= bounds.top + bounds.height;
+
+        if (insideBounds) {
+          this.mapTextarea.focus();
+        }
+      }, false, this);
+
+
+      var startX, startY, drag;
+      this.rootElement.listen(goog.events.EventType.DBLCLICK, function(e) {
+        var bounds = this.getPlotBounds();
+        var insideBounds = bounds && e.clientX >= bounds.left &&
+            e.clientX <= bounds.left + bounds.width &&
+            e.clientY >= bounds.top &&
+            e.clientY <= bounds.top + bounds.height;
+
+        if (insideBounds) {
+          var zoomFactor = 1.3;
+          var cx = e.clientX;
+          var cy = e.clientY;
+
+          this.zoom(zoomFactor, cx, cy);
+        }
+      }, false, this);
+
+      goog.events.listen(document, goog.events.EventType.MOUSEMOVE, function(e) {
+        if (drag && this.interactivity_.drag() && this.fullZoom_ != 1) {
+          goog.style.setStyle(document['body'], 'cursor', acgraph.vector.Cursor.MOVE);
+          this.move(e.clientX - startX, e.clientY - startY);
+
+          startX = e.clientX;
+          startY = e.clientY;
+        } else {
+          goog.style.setStyle(document['body'], 'cursor', '');
+        }
+      }, false, this);
+
+      this.rootElement.listen(goog.events.EventType.MOUSEDOWN, function(e) {
+        var bounds = this.getPlotBounds();
+        var insideBounds = bounds && e.clientX >= bounds.left &&
+            e.clientX <= bounds.left + bounds.width &&
+            e.clientY >= bounds.top &&
+            e.clientY <= bounds.top + bounds.height;
+
+        if (insideBounds) {
+          startX = e.clientX;
+          startY = e.clientY;
+          drag = true;
+        }
+      }, false, this);
+
+      goog.events.listen(document, goog.events.EventType.MOUSEUP, function(e) {
+        goog.style.setStyle(document['body'], 'cursor', '');
+        drag = false;
+      }, false, this);
+    } else {
+      setTimeout(this.initControlsInteractivity_, 100);
+    }
+  }, this);
+
   this.unboundRegions(true);
   this.defaultSeriesType(anychart.enums.MapSeriesType.CHOROPLETH);
 };
@@ -1124,165 +1329,7 @@ anychart.charts.Map.prototype.processGeoData = function() {
 
         this.mapLayer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
 
-        var container = goog.dom.getParentElement(/** @type {Element} */(this.container().container()));
-        this.mapTextarea = goog.dom.createDom('textarea');
-
-        this.mapTextarea.setAttribute('readonly', 'readonly');
-        goog.style.setStyle(this.mapTextarea, {
-          'border': 0,
-          'clip': 'rect(0 0 0 0)',
-          'height': '1px',
-          'margin': '-1px',
-          'overflow': 'hidden',
-          'padding': '0',
-          'position': 'absolute',
-          'width': '1px'
-        });
-        goog.dom.appendChild(container, this.mapTextarea);
-
-        this.listen('pointsselect', function(e) {
-          this.mapTextarea.innerHTML = this.interactivity().copyFormatter().call(e, e);
-          this.mapTextarea.select();
-        }, false, this);
-
-        this.shortcutHandler = new goog.ui.KeyboardShortcutHandler(this.mapTextarea);
-        var META = goog.ui.KeyboardShortcutHandler.Modifiers.META;
-        var CTRL = goog.ui.KeyboardShortcutHandler.Modifiers.CTRL;
-
-        this.shortcutHandler.setAlwaysPreventDefault(true);
-        this.shortcutHandler.setAlwaysStopPropagation(true);
-        this.shortcutHandler.setAllShortcutsAreGlobal(true);
-        this.shortcutHandler.setModifierShortcutsAreGlobal(true);
-
-        this.shortcutHandler.registerShortcut('zoom_in', goog.events.KeyCodes.EQUALS, META);
-        this.shortcutHandler.registerShortcut('zoom_out', goog.events.KeyCodes.DASH, META);
-        this.shortcutHandler.registerShortcut('zoom_full_out', goog.events.KeyCodes.ZERO, META);
-
-        this.shortcutHandler.registerShortcut('zoom_in', goog.events.KeyCodes.EQUALS, CTRL);
-        this.shortcutHandler.registerShortcut('zoom_out', goog.events.KeyCodes.DASH, CTRL);
-        this.shortcutHandler.registerShortcut('zoom_full_out', goog.events.KeyCodes.ZERO, CTRL);
-
-        this.shortcutHandler.registerShortcut('move_left', goog.events.KeyCodes.LEFT);
-        this.shortcutHandler.registerShortcut('move_right', goog.events.KeyCodes.RIGHT);
-        this.shortcutHandler.registerShortcut('move_up', goog.events.KeyCodes.UP);
-        this.shortcutHandler.registerShortcut('move_down', goog.events.KeyCodes.DOWN);
-
-        this.shortcutHandler.listen(goog.ui.KeyboardShortcutHandler.EventType.SHORTCUT_TRIGGERED, function(e) {
-          var bounds = goog.style.getBounds(this.container().domElement());
-          var cx = bounds.width / 2;
-          var cy = bounds.height / 2;
-          var dx = 0, dy = 0;
-
-          var zoomRatio = 1.3;
-          var zoomFactor = 1;
-          switch (e.identifier) {
-            case 'zoom_in':
-              zoomFactor = zoomRatio;
-              break;
-            case 'zoom_out':
-              zoomFactor = 1 / zoomRatio;
-              break;
-            case 'zoom_full_out':
-              zoomFactor = 1 / this.fullZoom_;
-              if (this.fullZoom_ != 1) {
-                this.goingToHome_ = true;
-                this.stopTimers();
-              }
-              break;
-            case 'move_up':
-              dx = 0;
-              dy = 10 * this.fullZoom_;
-              break;
-            case 'move_left':
-              dx = 10 * this.fullZoom_;
-              dy = 0;
-              break;
-            case 'move_down':
-              dx = 0;
-              dy = -10 * this.fullZoom_;
-              break;
-            case 'move_right':
-              dx = -10 * this.fullZoom_;
-              dy = 0;
-              break;
-          }
-
-          if (zoomFactor != 1)
-            this.zoom(zoomFactor, cx, cy);
-          if (dx || dy)
-            this.move(dx, dy);
-        }, false, this);
-
-        this.mouseWheelHandler = new acgraph.events.MouseWheelHandler(/** @type {Element} */(this.container().container()));
-        this.mouseWheelHandler.listen('mousewheel', function(e) {
-          if (this.interactivity_.mouseWheel()) {
-            var zoomRatio = 1.3;
-            var zoomFactor = e.detail <= 0 ? e.detail == 0 ? 1 : zoomRatio : 1 / zoomRatio;
-            if (this.goingToHome_) zoomFactor = 1 / this.fullZoom_;
-
-            this.prevZoomState_ = this.zoomState_;
-            this.zoomState_ = zoomFactor > 1 ? true : zoomFactor == 1 ? !this.prevZoomState_ : false;
-
-            if (this.prevZoomState_ != this.zoomState_)
-              this.stopTimers();
-
-            if (zoomFactor < 1 && anychart.math.round(this.fullZoom_, 2) == anychart.charts.Map.ZOOM_MIN_RATIO && !this.mapLayer_.getSelfTransformation().isIdentity()) {
-              this.mapLayer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
-              this.fullZoom_ = 1;
-              this.goingToHome_ = false;
-              this.stopTimers();
-
-              this.scale().setMapZoom(1);
-              this.scale().setOffsetFocusPoint(0, 0);
-
-              this.invalidateSeries_();
-              this.invalidate(anychart.ConsistencyState.MAP_SERIES, anychart.Signal.NEEDS_REDRAW);
-            } else {
-              var bounds = goog.style.getBounds(this.container().domElement());
-              var x = e.clientX - bounds.left;
-              var y = e.clientY - bounds.top;
-
-              this.zoom(zoomFactor, x, y);
-            }
-          }
-        }, false, this);
-
-        goog.events.listen(this.container().domElement(), goog.events.EventType.CLICK, function(e) {
-          this.mapTextarea.focus();
-        }, false, this);
-
-        var startX, startY, drag;
-        this.rootElement.listen(goog.events.EventType.DBLCLICK, function(e) {
-          var zoomFactor = 1.3;
-          var bounds = goog.style.getBounds(this.container().domElement());
-          var cx = e.clientX - bounds.left;
-          var cy = e.clientY - bounds.top;
-
-          this.zoom(zoomFactor, cx, cy);
-        }, false, this);
-
-        this.rootElement.listen(goog.events.EventType.MOUSEMOVE, function(e) {
-          if (drag && this.interactivity_.drag()) {
-            goog.style.setStyle(document['body'], 'cursor', acgraph.vector.Cursor.MOVE);
-            this.move(e.clientX - startX, e.clientY - startY);
-
-            startX = e.clientX;
-            startY = e.clientY;
-          } else {
-            goog.style.setStyle(document['body'], 'cursor', '');
-          }
-        }, false, this);
-
-        this.rootElement.listen(goog.events.EventType.MOUSEDOWN, function(e) {
-          startX = e.clientX;
-          startY = e.clientY;
-          drag = true;
-        }, false, this);
-
-        goog.events.listen(document, goog.events.EventType.MOUSEUP, function(e) {
-          goog.style.setStyle(document['body'], 'cursor', '');
-          drag = false;
-        }, false, this);
+        this.initControlsInteractivity_();
       } else {
         this.clear();
       }
@@ -1655,8 +1702,8 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
       dx = dx / this.fullZoom_;
       dy = dy / this.fullZoom_;
 
-      this.fullOffsetX_ += this.offsetX_;
-      this.fullOffsetY_ += this.offsetY_;
+      //this.fullOffsetX_ += this.offsetX_;
+      //this.fullOffsetY_ += this.offsetY_;
 
       this.offsetX_ = 0;
       this.offsetY_ = 0;
@@ -1666,11 +1713,12 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
 
         tx = this.mapLayer_.getSelfTransformation();
         this.scale().setOffsetFocusPoint(tx.getTranslateX(), tx.getTranslateY());
+
+        this.invalidateSeries_();
+        this.invalidate(anychart.ConsistencyState.MAP_SERIES);
       }
     }
 
-    this.invalidateSeries_();
-    this.invalidate(anychart.ConsistencyState.MAP_SERIES);
     this.markConsistent(anychart.ConsistencyState.MAP_MOVE);
   }
 
