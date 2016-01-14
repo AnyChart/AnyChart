@@ -731,6 +731,8 @@ anychart.core.ui.ChartTooltip.prototype.show = function(points, clientX, clientY
     }
 
     var contextProvider = firstSeries.createFormatProvider();
+    contextProvider['clientX'] = clientX;
+    contextProvider['clientY'] = clientY;
     this.singleTooltip_.title().autoText(this.singleTooltip_.getFormattedTitle(contextProvider));
     this.singleTooltip_.contentInternal().text(this.singleTooltip_.getFormattedContent(contextProvider));
 
@@ -747,6 +749,8 @@ anychart.core.ui.ChartTooltip.prototype.show = function(points, clientX, clientY
     }
 
     var unionContextProvider = {
+      'clientX' : clientX,
+      'clientY': clientY,
       'formattedValues': [],
       'points': []
     };
@@ -819,6 +823,8 @@ anychart.core.ui.ChartTooltip.prototype.show = function(points, clientX, clientY
       }
 
       var contextProvider = series.createFormatProvider();
+      contextProvider['clientX'] = clientX;
+      contextProvider['clientY'] = clientY;
       tooltip.title().autoText(tooltip.getFormattedTitle(contextProvider));
       tooltip.contentInternal().text(tooltip.getFormattedContent(contextProvider));
 
