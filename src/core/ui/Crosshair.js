@@ -482,11 +482,38 @@ anychart.core.ui.Crosshair.prototype.show_ = function(event) {
  * @private
  */
 anychart.core.ui.Crosshair.prototype.hide_ = function() {
-  this.xLine_.clear();
-  this.yLine_.clear();
+  this.hideX_();
+  this.hideY_();
+};
 
+
+/**
+ * Removes x-part of crosshair.
+ * @private
+ */
+anychart.core.ui.Crosshair.prototype.hideX_ = function() {
+  this.xLine_.clear();
   this.xLabel_.container(null).remove();
+};
+
+
+/**
+ * Removes y-part of crosshair.
+ * @private
+ */
+anychart.core.ui.Crosshair.prototype.hideY_ = function() {
+  this.yLine_.clear();
   this.yLabel_.container(null).remove();
+};
+
+
+/**
+ * Checks whether scale for axis can return a value.
+ * @param {anychart.core.axes.Linear} axis Axis.
+ * @return {boolean} Is scale of axis can resolve defined ratio.
+ */
+anychart.core.ui.Crosshair.prototype.canDrawForAxis = function(axis) {
+  return goog.isDef(axis.scale().inverseTransform(0));
 };
 
 
@@ -525,7 +552,7 @@ anychart.core.ui.Crosshair.prototype.handleMouseOverAndMove_ = function(e) {
       yRatio = (height - dataPlotOffsetY) / height;
     }
 
-    if (this.xAxis_ && this.xAxis_.enabled()) {
+    if (this.xAxis_ && this.canDrawForAxis(this.xAxis_)) {
       if (this.xStroke_ && this.xStroke_ != 'none') {
         var xLineCoord;
         this.xLine_.clear();
@@ -552,9 +579,11 @@ anychart.core.ui.Crosshair.prototype.handleMouseOverAndMove_ = function(e) {
         this.xLabel_.x(/** @type {number}*/(xLabelPosition.x)).y(/** @type {number}*/(xLabelPosition.y));
         this.xLabel_.container(container).draw();
       }
+    } else {
+      this.hideX_();
     }
 
-    if (this.yAxis_ && this.yAxis_.enabled()) {
+    if (this.yAxis_ && this.canDrawForAxis(this.yAxis_)) {
       if (this.yStroke_ && this.yStroke_ != 'none') {
         var yLineCoord;
         this.yLine_.clear();
@@ -580,6 +609,8 @@ anychart.core.ui.Crosshair.prototype.handleMouseOverAndMove_ = function(e) {
         this.yLabel_.x(/** @type {number}*/(yLabelPosition.x)).y(/** @type {number}*/(yLabelPosition.y));
         this.yLabel_.container(container).draw();
       }
+    } else {
+      this.hideY_();
     }
 
   } else {
