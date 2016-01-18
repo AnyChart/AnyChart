@@ -198,7 +198,7 @@ anychart.charts.Map = function() {
    * @private
    */
   this.initControlsInteractivity_ = goog.bind(function() {
-    if (this.container().getStage()) {
+    if (this.container().getStage() && this.container().getStage().container()) {
       var container = /** @type {Node} */(this.container().getStage().container());
 
       this.mapTextarea = goog.dom.createDom('textarea');
