@@ -245,7 +245,6 @@ anychart.charts.Map = function() {
       this.shortcutHandler.registerShortcut('move_down', goog.events.KeyCodes.DOWN);
 
       this.shortcutHandler.listen(goog.ui.KeyboardShortcutHandler.EventType.SHORTCUT_TRIGGERED, function(e) {
-        //var bounds = goog.style.getBounds(this.container().domElement());
         var bounds = this.mapLayer_.getBoundsWithoutTransform();
         var cx = bounds.left + bounds.width / 2;
         var cy = bounds.top + bounds.height / 2;
@@ -1198,6 +1197,8 @@ anychart.charts.Map.prototype.seriesInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
     state |= anychart.ConsistencyState.MAP_SERIES | anychart.ConsistencyState.CHART_LEGEND;
     this.invalidateSeries_();
+    for (var i = this.series_.length; i--;)
+      this.series_[i].invalidate(anychart.ConsistencyState.SERIES_DATA);
   }
   if (event.hasSignal(anychart.Signal.NEED_UPDATE_LEGEND)) {
     state |= anychart.ConsistencyState.CHART_LEGEND;

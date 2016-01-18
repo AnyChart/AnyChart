@@ -1,8 +1,9 @@
-var stage, map, chart, s1, s2, s3, s, axis, cs, cr, series;
+var stage, map, chart, s1, s2, s3, s, axis, cs, cr;
 var selectedRegions;
 var scale, scaleInp, scaleEnd;
 var min = 0, max = 350;
 var startX, startY;
+var series, series2;
 
 var randomExt = function(a, b) {
   return Math.round(Math.random() * (b - a + 1) + a);
@@ -48,10 +49,10 @@ $(document).ready(function() {
 
   var dataSet = anychart.data.set([]);
 
-  //var series = chart.choropleth(dataSet);
+  //series = chart.choropleth(dataSet);
   //series.labels().enabled(true).textFormatter(function() {return this.regionProperties.name});
 
-  var series2 = chart.bubble(dataSet);
+  series2 = chart.bubble(dataSet);
   series2.labels().enabled(true).textFormatter(function() {return this['size']});
 
 
@@ -76,7 +77,7 @@ $(document).ready(function() {
     {"id": "AU.SA", "value": 69, "size": 525},
     {"id": "AU.VI", "value": 110, "size": 178},
     {"id": "AU.QL", "value": -53, "size": 621, 'lat': -25.6, 'lon': 141.6},
-    {"id": "AU.TS", "value": 168, "size": 959}
+    {"id": "AU.TS", "value": 168, "size": 359}
   ];
 
   //var data = [];
@@ -88,6 +89,7 @@ $(document).ready(function() {
   //    data.push({'id': id, 'value': randomExt(-300, 300), 'size': randomExt(0, 1000)});
   //  }
   //}
+
   dataSet.data(data);
 
 
