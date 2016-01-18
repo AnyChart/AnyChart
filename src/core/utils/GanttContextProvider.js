@@ -1,7 +1,7 @@
 goog.provide('anychart.core.utils.GanttContextProvider');
 goog.require('anychart.core.utils.IContextProvider');
-goog.require('anychart.utils');
 goog.require('anychart.enums');
+goog.require('anychart.utils');
 
 
 
