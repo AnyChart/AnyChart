@@ -2824,7 +2824,7 @@ window['anychart']['themes']['defaultTheme'] = {
             'hAlign': 'left'
           }
         },
-        'labelsFactory': {
+        'labels': {
           'enabled': true,
           'anchor': 'leftCenter',
           'position': 'rightCenter',
@@ -2846,11 +2846,12 @@ window['anychart']['themes']['defaultTheme'] = {
           'zIndex': 40,
           'disablePointerEvents': true
         },
-        'markersFactory': {
+        'markers': {
           'anchor': 'centerTop',
           'zIndex': 50,
-          'enabled': true,
-          'type': 'star4'
+          'type': 'star5',
+          'fill': '#ff0',
+          'stroke': '2 red'
         },
         'header': {
           'labelsFactory': {

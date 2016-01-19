@@ -2085,7 +2085,8 @@ anychart.enums.GanttDataFields = {
   CONNECTOR_TYPE: 'connectorType',
   START_MARKER: 'startMarker',
   END_MARKER: 'endMarker',
-  LABEL: 'label'
+  LABEL: 'label',
+  MARKERS: 'markers'
 };
 
 

@@ -4731,8 +4731,9 @@ window['anychart']['themes']['v6'] = {
         'markersFactory': {
           'anchor': 'centerTop',
           'zIndex': 50,
-          'enabled': true,
-          'type': 'star4'
+          'type': 'star4',
+          'fill': '#ff0',
+          'stroke': '#000'
         },
         'header': {
           'labelsFactory': {

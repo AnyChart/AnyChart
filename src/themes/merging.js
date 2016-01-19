@@ -423,7 +423,7 @@ anychart.themes.merging.mergingMap_ = [
       'defaultAxis.minorLabels',
       'chart.defaultSeriesSettings.base.labels',
       'pieFunnelPyramidBase.labels',
-      'gantt.base.timeline.labelsFactory',
+      'gantt.base.timeline.labels',
       'defaultDataGrid.defaultColumnSettings.cellTextSettings',
       'gantt.base.timeline.header.labelsFactory',
       'standalones.labelsFactory',
@@ -445,7 +445,7 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'chart.defaultSeriesSettings.base.markers',
       'pieFunnelPyramidBase.markers',
-      'gantt.base.timeline.markersFactory',
+      'gantt.base.timeline.markers',
       'standalones.markersFactory',
       'heatMap.markers',
       'map.defaultSeriesSettings.base.markers'

@@ -290,6 +290,12 @@ anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentD
       .meta('depth', currentDepth)
       .meta('index', this.linearIndex_++);
 
+  var itemMarkers = item.get(anychart.enums.GanttDataFields.MARKERS);
+  for (var m = 0; itemMarkers && m < itemMarkers.length; m++) {
+    var marker = itemMarkers[m];
+    this.checkDate_(marker['value']);
+  }
+
   this.checkDate_(item.get(anychart.enums.GanttDataFields.ACTUAL_START));
   this.checkDate_(item.get(anychart.enums.GanttDataFields.ACTUAL_END));
   this.checkDate_(item.get(anychart.enums.GanttDataFields.BASELINE_START));
@@ -314,7 +320,7 @@ anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentD
     if (!this.isResources_) {
       var childStart = goog.isDef(child.get(anychart.enums.GanttDataFields.ACTUAL_START)) ?
           anychart.utils.normalizeTimestamp(child.get(anychart.enums.GanttDataFields.ACTUAL_START)) :
-          child.meta('autoStart');
+          (child.meta('autoStart') || NaN);
 
       var childEnd = goog.isDef(child.get(anychart.enums.GanttDataFields.ACTUAL_END)) ?
           anychart.utils.normalizeTimestamp(child.get(anychart.enums.GanttDataFields.ACTUAL_END)) :
@@ -326,13 +332,13 @@ anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentD
 
       if (isNaN(resultStart)) {
         resultStart = childStart;
-      } else {
+      } else if (!isNaN(childStart) && !isNaN(childEnd)) {
         resultStart = Math.min(resultStart, childStart, childEnd);
       }
 
       if (isNaN(resultEnd)) {
         resultEnd = childEnd;
-      } else {
+      } else if (!isNaN(childStart) && !isNaN(childEnd)) {
         resultEnd = Math.max(resultEnd, childStart, childEnd);
       }
 
@@ -341,16 +347,18 @@ anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentD
       this.checkDate_(child.get(anychart.enums.GanttDataFields.BASELINE_START));
       this.checkDate_(child.get(anychart.enums.GanttDataFields.BASELINE_END));
 
-      var delta = (/** @type {number} */(childEnd) - /** @type {number} */(childStart));
-      progressLength += /** @type {number} */(childProgress) * delta;
-      totalLength += delta;
+      if (!isNaN(childStart) && !isNaN(childEnd)) {
+        var delta = (/** @type {number} */(childEnd) - /** @type {number} */(childStart));
+        progressLength += /** @type {number} */(childProgress) * delta;
+        totalLength += delta;
+      }
     }
   }
 
   if (item.numChildren() && !this.isResources_) {
-    item.meta('autoProgress', progressLength / totalLength);
-    item.meta('autoStart', resultStart);
-    item.meta('autoEnd', resultEnd);
+    if (totalLength != 0) item.meta('autoProgress', progressLength / totalLength);
+    if (goog.isDef(resultStart) && !isNaN(resultStart)) item.meta('autoStart', resultStart);
+    if (goog.isDef(resultEnd) && !isNaN(resultEnd)) item.meta('autoEnd', resultEnd);
   }
 
 };

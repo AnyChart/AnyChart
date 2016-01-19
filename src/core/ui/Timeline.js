@@ -1210,11 +1210,11 @@ anychart.core.ui.Timeline.prototype.maximumGap = function(opt_value) {
 
 
 /**
- * Inner labels factory getter.
+ * Labels factory getter/setter.
  * @param {Object=} opt_value - Value to be set.
  * @return {anychart.core.ui.Timeline|anychart.core.ui.LabelsFactory} - Current value or itself for method chaining.
  */
-anychart.core.ui.Timeline.prototype.labelsFactory = function(opt_value) {
+anychart.core.ui.Timeline.prototype.labels = function(opt_value) {
   if (!this.labelsFactory_) {
     this.labelsFactory_ = new anychart.core.ui.LabelsFactory();
     this.labelsFactory_.setParentEventTarget(this);
@@ -1232,13 +1232,44 @@ anychart.core.ui.Timeline.prototype.labelsFactory = function(opt_value) {
       redraw = false;
     }
     if (redraw) {
-
       this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
 
   return this.labelsFactory_;
+};
+
+
+/**
+ * Markers factory getter/setter.
+ * @param {Object=} opt_value - Value to be set.
+ * @return {anychart.core.ui.Timeline|anychart.core.ui.MarkersFactory} - Current value or itself for method chaining.
+ */
+anychart.core.ui.Timeline.prototype.markers = function(opt_value) {
+  if (!this.markersFactory_) {
+    this.markersFactory_ = new anychart.core.ui.MarkersFactory();
+    this.markersFactory_.setParentEventTarget(this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    var redraw = true;
+    if (opt_value instanceof anychart.core.ui.MarkersFactory) {
+      this.markersFactory_.setup(opt_value.serialize());
+    } else if (goog.isObject(opt_value)) {
+      this.markersFactory_.setup(opt_value);
+    } else if (anychart.utils.isNone(opt_value)) {
+      this.markersFactory_.enabled(false);
+    } else {
+      redraw = false;
+    }
+    if (redraw) {
+      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+
+  return this.markersFactory_;
 };
 
 
@@ -2478,54 +2509,13 @@ anychart.core.ui.Timeline.prototype.selectTimelineRow = function(item, opt_perio
 
 
 /**
- * Inner labels factory getter.
- * @return {anychart.core.ui.LabelsFactory}
- * @private
- */
-anychart.core.ui.Timeline.prototype.getLabelsFactory_ = function() {
-  if (!this.labelsFactory_) {
-    this.labelsFactory_ = new anychart.core.ui.LabelsFactory();
-    this.labelsFactory_
-        .zIndex(anychart.core.ui.Timeline.LABEL_Z_INDEX)
-        .anchor(anychart.enums.Anchor.LEFT_CENTER)
-        .position(anychart.enums.Position.RIGHT_CENTER)
-        .padding(3, anychart.core.ui.Timeline.ARROW_MARGIN);
-
-    this.labelsFactory_.setParentEventTarget(this);
-
-  }
-  return this.labelsFactory_;
-};
-
-
-/**
- * Inner getter for markers factory.
- * @return {anychart.core.ui.MarkersFactory}
- * @private
- */
-anychart.core.ui.Timeline.prototype.getMarkersFactory_ = function() {
-  if (!this.markersFactory_) {
-    this.markersFactory_ = new anychart.core.ui.MarkersFactory();
-    this.markersFactory_
-        .anchor(anychart.enums.Anchor.CENTER_TOP)
-        .zIndex(anychart.core.ui.Timeline.MARKER_Z_INDEX)
-        .enabled(true)
-        .type(anychart.enums.MarkerType.STAR4);
-
-    this.markersFactory_.setParentEventTarget(this);
-  }
-  return this.markersFactory_;
-};
-
-
-/**
  * Draws timeline bars.
  * @private
  */
 anychart.core.ui.Timeline.prototype.drawTimelineElements_ = function() {
   this.getDrawLayer().clear();
-  this.getLabelsFactory_().clear();
-  this.getMarkersFactory_().clear();
+  this.labels().clear();
+  this.markers().clear();
 
   if (this.controller.isResources()) {
     this.drawResourceTimeline_();
@@ -2533,8 +2523,8 @@ anychart.core.ui.Timeline.prototype.drawTimelineElements_ = function() {
     this.drawProjectTimeline_();
   }
 
-  this.getLabelsFactory_().draw();
-  this.getMarkersFactory_().draw();
+  this.labels().draw();
+  this.markers().draw();
 
   this.drawConnectors_();
 };
@@ -2622,7 +2612,7 @@ anychart.core.ui.Timeline.prototype.drawBar_ = function(bounds, item, type, opt_
     if (rawLabel && rawLabel['position']) {
       position = rawLabel['position'];
     } else {
-      position = this.getLabelsFactory_().position();
+      position = this.labels().position();
       if (isActualBaseline) {
         position = anychart.enums.Position.CENTER;
       } else if (isParent) {
@@ -2633,7 +2623,7 @@ anychart.core.ui.Timeline.prototype.drawBar_ = function(bounds, item, type, opt_
     position = anychart.enums.normalizeAnchor(position);
     var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
     var formatProvider = {'value': textValue};
-    var label = this.getLabelsFactory_().add(formatProvider, positionProvider);
+    var label = this.labels().add(formatProvider, positionProvider);
     if (isActualBaseline) {
       label.fontColor('#fff');
       label.anchor(anychart.enums.Anchor.CENTER);
@@ -2679,7 +2669,7 @@ anychart.core.ui.Timeline.prototype.drawBar_ = function(bounds, item, type, opt_
   if (settings) {
     var rawStartMarker = settings[anychart.enums.GanttDataFields.START_MARKER];
     if (rawStartMarker) {
-      var startMarker = this.getMarkersFactory_().add({value: {x: bounds.left, y: bounds.top}});
+      var startMarker = this.markers().add({value: {x: bounds.left, y: bounds.top}});
       startMarker
           .size(bounds.height / 2)
           .setup(rawStartMarker);
@@ -2687,7 +2677,7 @@ anychart.core.ui.Timeline.prototype.drawBar_ = function(bounds, item, type, opt_
 
     var rawEndMarker = settings[anychart.enums.GanttDataFields.END_MARKER];
     if (rawEndMarker) {
-      var endMarker = this.getMarkersFactory_().add({value: {x: bounds.left + bounds.width, y: bounds.top}});
+      var endMarker = this.markers().add({value: {x: bounds.left + bounds.width, y: bounds.top}});
       endMarker
           .size(bounds.height / 2)
           .setup(rawEndMarker);
@@ -2715,6 +2705,40 @@ anychart.core.ui.Timeline.prototype.drawBar_ = function(bounds, item, type, opt_
 
 
 /**
+ * Draws data item's time markers.
+ * @param {anychart.data.Tree.DataItem} dataItem - Current tree data item.
+ * @param {number} totalTop - Pixel value of total top. Is needed to place item correctly.
+ * @param {number} itemHeight - Height of row.
+ * @private
+ */
+anychart.core.ui.Timeline.prototype.drawMarkers_ = function(dataItem, totalTop, itemHeight) {
+  var markers = dataItem.get(anychart.enums.GanttDataFields.MARKERS);
+  if (markers) {
+    for (var i = 0; i < markers.length; i++) {
+      var marker = markers[i];
+      if (marker) {
+        var val = anychart.utils.normalizeTimestamp(marker['value']);
+        if (!isNaN(val)) {
+          var ratio = this.scale_.timestampToRatio(val);
+          if (ratio >= 0 && ratio <= 1) { //Marker is visible
+            var height = itemHeight * anychart.core.ui.Timeline.DEFAULT_HEIGHT_REDUCTION;
+
+            var left = Math.round(this.pixelBoundsCache.left + this.pixelBoundsCache.width * ratio);
+            var top = Math.round(totalTop + (itemHeight - height) / 2);
+
+            var markerEl = this.markers().add({value: {x: left, y: top}});
+            markerEl
+                .size(height / 2)
+                .setup(marker);
+          }
+        }
+      }
+    }
+  }
+};
+
+
+/**
  * Internal resource timeline drawer.
  * @private
  */
@@ -2729,6 +2753,7 @@ anychart.core.ui.Timeline.prototype.drawResourceTimeline_ = function() {
     var newTop = /** @type {number} */ (totalTop + itemHeight);
 
     this.drawAsPeriods_(item, totalTop, itemHeight);
+    this.drawMarkers_(item, totalTop, itemHeight);
 
     totalTop = (newTop + this.rowStrokeThickness);
   }
@@ -2766,6 +2791,8 @@ anychart.core.ui.Timeline.prototype.drawProjectTimeline_ = function() {
         }
       }
     }
+
+    this.drawMarkers_(item, totalTop, itemHeight);
 
     totalTop = (newTop + this.rowStrokeThickness);
   }
@@ -3015,11 +3042,11 @@ anychart.core.ui.Timeline.prototype.drawAsMilestone_ = function(dataItem, totalT
     }
 
     if (textValue) {
-      var position = (rawLabel && rawLabel['position']) ? rawLabel['position'] : this.getLabelsFactory_().position();
+      var position = (rawLabel && rawLabel['position']) ? rawLabel['position'] : this.labels().position();
       position = anychart.enums.normalizeAnchor(position);
       var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
       var formatProvider = {'value': textValue};
-      var label = this.getLabelsFactory_().add(formatProvider, positionProvider);
+      var label = this.labels().add(formatProvider, positionProvider);
       if (rawLabel) label.setup(rawLabel);
     }
 
@@ -3570,8 +3597,8 @@ anychart.core.ui.Timeline.prototype.initScale_ = function() {
  */
 anychart.core.ui.Timeline.prototype.initDom = function() {
   this.getClipLayer().zIndex(anychart.core.ui.BaseGrid.DRAW_Z_INDEX - 1); //Put it under draw layer.
-  this.getMarkersFactory_().container(this.getContentLayer());
-  this.getLabelsFactory_().container(this.getContentLayer());
+  this.markers().container(this.getContentLayer());
+  this.labels().container(this.getContentLayer());
   this.header_.container(this.getBase());
   this.initScale_();
 };
@@ -3584,7 +3611,7 @@ anychart.core.ui.Timeline.prototype.boundsInvalidated = function() {
   this.header_
       .bounds()
       .set(this.pixelBoundsCache.left, this.pixelBoundsCache.top,
-      this.pixelBoundsCache.width, /** @type {number} */ (this.headerHeight()));
+          this.pixelBoundsCache.width, /** @type {number} */ (this.headerHeight()));
   this.redrawHeader = true;
 };
 
@@ -3746,6 +3773,8 @@ anychart.core.ui.Timeline.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
   json['scale'] = this.scale_.serialize();
+  json['labels'] = this.labels().serialize();
+  json['markers'] = this.markers().serialize();
 
   json['columnStroke'] = anychart.color.serialize(this.columnStroke_);
 
@@ -3785,7 +3814,8 @@ anychart.core.ui.Timeline.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
 
   if ('scale' in config) this.scale_.setup(config['scale']);
-  if ('labelsFactory' in config) this.labelsFactory(config['labelsFactory']);
+  if ('labels' in config) this.labels(config['labels']);
+  if ('markers' in config) this.markers(config['markers']);
 
   this.columnStroke(config['columnStroke']);
   this.baselineAbove(config['baselineAbove']);
@@ -4138,6 +4168,8 @@ anychart.core.ui.Timeline.prototype['selectedElementStroke'] = anychart.core.ui.
 anychart.core.ui.Timeline.prototype['tooltip'] = anychart.core.ui.Timeline.prototype.tooltip;
 anychart.core.ui.Timeline.prototype['minimumGap'] = anychart.core.ui.Timeline.prototype.minimumGap;
 anychart.core.ui.Timeline.prototype['maximumGap'] = anychart.core.ui.Timeline.prototype.maximumGap;
+anychart.core.ui.Timeline.prototype['labels'] = anychart.core.ui.Timeline.prototype.labels;
+anychart.core.ui.Timeline.prototype['markers'] = anychart.core.ui.Timeline.prototype.markers;
 
 anychart.core.ui.Timeline.prototype['connectorPreviewStroke'] = anychart.core.ui.Timeline.prototype.connectorPreviewStroke;
 anychart.core.ui.Timeline.prototype['editPreviewFill'] = anychart.core.ui.Timeline.prototype.editPreviewFill;
