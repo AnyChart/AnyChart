@@ -127,6 +127,9 @@
         <xsd:attribute name="max_bubble_size" type="simple.NumberOrPercent" default="20%"/>
         <xsd:attribute name="x_scale" type="simple.ChartScaleRef"/>
         <xsd:attribute name="y_scale" type="simple.ChartScaleRef"/>
+        <!-- charts.Cartesian3d attrs -->
+        <xsd:attribute name="z_angle" type="xsd:double" default="45"/>
+        <xsd:attribute name="z_depth" type="xsd:double" default="20"/>
         <!-- charts.Funnel attrs -->
         <xsd:attribute name="neck_height" type="simple.NumberOrPercent" default="25%"/>
         <xsd:attribute name="neck_width" type="simple.NumberOrPercent" default="25%"/>
@@ -2305,12 +2308,16 @@
     <xsd:simpleType name="enums.ChartTypes">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="area"/>
+            <xsd:enumeration value="area3d"/>
             <xsd:enumeration value="bar"/>
+            <xsd:enumeration value="bar3d"/>
             <xsd:enumeration value="box"/>
             <xsd:enumeration value="bubble"/>
             <xsd:enumeration value="bullet"/>
             <xsd:enumeration value="cartesian"/>
+            <xsd:enumeration value="cartesian3d"/>
             <xsd:enumeration value="column"/>
+            <xsd:enumeration value="column3d"/>
             <xsd:enumeration value="heatmap"/>
             <xsd:enumeration value="financial"/>
             <xsd:enumeration value="funnel"/>

@@ -14,25 +14,25 @@ goog.require('anychart.utils');
  * @extends {anychart.core.VisualBase}
  */
 anychart.core.grids.Linear = function() {
-  goog.base(this);
+  anychart.core.grids.Linear.base(this, 'constructor');
 
   /**
    * @type {acgraph.vector.Path}
    * @private
    */
-  this.oddFillElement_;
+  this.oddFillElement_ = null;
 
   /**
    * @type {acgraph.vector.Path}
    * @private
    */
-  this.evenFillElement_;
+  this.evenFillElement_ = null;
 
   /**
    * @type {acgraph.vector.Path}
-   * @private
+   * @protected
    */
-  this.lineElement_;
+  this.lineElementInternal = null;
 
   /**
    * @type {string|acgraph.vector.Fill}
@@ -56,7 +56,7 @@ anychart.core.grids.Linear = function() {
    * @type {anychart.scales.Base}
    * @private
    */
-  this.scale_;
+  this.scale_ = null;
 
   /**
    * @type {boolean}
@@ -105,6 +105,24 @@ anychart.core.grids.Linear.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
         anychart.ConsistencyState.APPEARANCE |
         anychart.ConsistencyState.GRIDS_POSITION;
+
+
+/**
+ * Sets the chart series belongs to.
+ * @param {anychart.core.SeparateChart} chart Chart instance.
+ */
+anychart.core.grids.Linear.prototype.setChart = function(chart) {
+  this.chart_ = chart;
+};
+
+
+/**
+ * Get the chart series belongs to.
+ * @return {anychart.core.SeparateChart}
+ */
+anychart.core.grids.Linear.prototype.getChart = function() {
+  return this.chart_;
+};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -357,8 +375,8 @@ anychart.core.grids.Linear.prototype.drawLineHorizontal = function(ratio, shift)
   /** @type {number}*/
   var y = Math.round(parentBounds.getBottom() - ratio * parentBounds.height);
   ratio == 1 ? y -= shift : y += shift;
-  this.lineElement_.moveTo(parentBounds.getLeft(), y);
-  this.lineElement_.lineTo(parentBounds.getRight(), y);
+  this.lineElementInternal.moveTo(parentBounds.getLeft(), y);
+  this.lineElementInternal.lineTo(parentBounds.getRight(), y);
 };
 
 
@@ -373,8 +391,8 @@ anychart.core.grids.Linear.prototype.drawLineVertical = function(ratio, shift) {
   /** @type {number}*/
   var x = Math.round(parentBounds.getLeft() + ratio * parentBounds.width);
   ratio == 1 ? x += shift : x -= shift;
-  this.lineElement_.moveTo(x, parentBounds.getBottom());
-  this.lineElement_.lineTo(x, parentBounds.getTop());
+  this.lineElementInternal.moveTo(x, parentBounds.getBottom());
+  this.lineElementInternal.lineTo(x, parentBounds.getTop());
 };
 
 
@@ -504,6 +522,14 @@ anychart.core.grids.Linear.prototype.draw = function() {
     this.lineElement().clear();
 
     var bounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
+    if (this.getChart() && this.getChart().isMode3d) {
+      this.x3dShift = this.getChart().x3dShift;
+      this.y3dShift = this.getChart().y3dShift;
+
+      bounds.top -= this.y3dShift;
+      bounds.height += this.y3dShift;
+      bounds.width += this.x3dShift;
+    }
     var axesLinesSpace = this.axesLinesSpace();
     var clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
 
@@ -515,6 +541,11 @@ anychart.core.grids.Linear.prototype.draw = function() {
     var drawLine = layout[0];
 
     var pixelShift = -this.lineElement().strokeThickness() % 2 / 2;
+
+    // zeroTick
+    if (this.getChart() && this.getChart().isMode3d && this.isHorizontal()) {
+      drawLine.call(this, 0, pixelShift);
+    }
 
     for (var i = 0, count = ticksArray.length; i < count; i++) {
       var tickVal = ticksArray[i];
@@ -595,9 +626,9 @@ anychart.core.grids.Linear.prototype.remove = function() {
  * @return {!acgraph.vector.Path} Grid line element.
  */
 anychart.core.grids.Linear.prototype.lineElement = function() {
-  this.lineElement_ = this.lineElement_ ? this.lineElement_ : acgraph.path();
-  this.registerDisposable(this.lineElement_);
-  return this.lineElement_;
+  this.lineElementInternal = this.lineElementInternal ? this.lineElementInternal : acgraph.path();
+  this.registerDisposable(this.lineElementInternal);
+  return this.lineElementInternal;
 };
 
 

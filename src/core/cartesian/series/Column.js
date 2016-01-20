@@ -97,14 +97,14 @@ anychart.core.cartesian.series.Column.prototype.getType = function() {
 
 
 //exports
-anychart.core.cartesian.series.Column.prototype['fill'] = anychart.core.cartesian.series.Column.prototype.fill;//inherited
-anychart.core.cartesian.series.Column.prototype['hoverFill'] = anychart.core.cartesian.series.Column.prototype.hoverFill;//inherited
-anychart.core.cartesian.series.Column.prototype['selectFill'] = anychart.core.cartesian.series.Column.prototype.selectFill;//inherited
+anychart.core.cartesian.series.Column.prototype['fill'] = anychart.core.cartesian.series.Column.prototype.fill;
+anychart.core.cartesian.series.Column.prototype['hoverFill'] = anychart.core.cartesian.series.Column.prototype.hoverFill;
+anychart.core.cartesian.series.Column.prototype['selectFill'] = anychart.core.cartesian.series.Column.prototype.selectFill;
 
-anychart.core.cartesian.series.Column.prototype['stroke'] = anychart.core.cartesian.series.Column.prototype.stroke;//inherited
-anychart.core.cartesian.series.Column.prototype['hoverStroke'] = anychart.core.cartesian.series.Column.prototype.hoverStroke;//inherited
-anychart.core.cartesian.series.Column.prototype['selectStroke'] = anychart.core.cartesian.series.Column.prototype.selectStroke;//inherited
+anychart.core.cartesian.series.Column.prototype['stroke'] = anychart.core.cartesian.series.Column.prototype.stroke;
+anychart.core.cartesian.series.Column.prototype['hoverStroke'] = anychart.core.cartesian.series.Column.prototype.hoverStroke;
+anychart.core.cartesian.series.Column.prototype['selectStroke'] = anychart.core.cartesian.series.Column.prototype.selectStroke;
 
-anychart.core.cartesian.series.Column.prototype['hatchFill'] = anychart.core.cartesian.series.Column.prototype.hatchFill;//inherited
-anychart.core.cartesian.series.Column.prototype['hoverHatchFill'] = anychart.core.cartesian.series.Column.prototype.hoverHatchFill;//inherited
-anychart.core.cartesian.series.Column.prototype['selectHatchFill'] = anychart.core.cartesian.series.Column.prototype.selectHatchFill;//inherited
+anychart.core.cartesian.series.Column.prototype['hatchFill'] = anychart.core.cartesian.series.Column.prototype.hatchFill;
+anychart.core.cartesian.series.Column.prototype['hoverHatchFill'] = anychart.core.cartesian.series.Column.prototype.hoverHatchFill;
+anychart.core.cartesian.series.Column.prototype['selectHatchFill'] = anychart.core.cartesian.series.Column.prototype.selectHatchFill;

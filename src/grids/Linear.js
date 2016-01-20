@@ -25,7 +25,7 @@ anychart.grids.linear = function() {
 
 
 //exports
-goog.exportSymbol('anychart.grids.linear', anychart.grids.linear);//doc|ex
+goog.exportSymbol('anychart.grids.linear', anychart.grids.linear);
 anychart.grids.Linear.prototype['draw'] = anychart.grids.Linear.prototype.draw;
 anychart.grids.Linear.prototype['parentBounds'] = anychart.grids.Linear.prototype.parentBounds;
 anychart.grids.Linear.prototype['container'] = anychart.grids.Linear.prototype.container;

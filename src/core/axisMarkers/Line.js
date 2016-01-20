@@ -15,7 +15,8 @@ goog.require('goog.math');
  * @extends {anychart.core.VisualBase}
  */
 anychart.core.axisMarkers.Line = function() {
-  goog.base(this);
+  anychart.core.axisMarkers.Line.base(this, 'constructor');
+
   /**
    * @type {acgraph.vector.Path}
    * @private
@@ -255,31 +256,40 @@ anychart.core.axisMarkers.Line.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var ratio = goog.math.clamp(scale.transform(this.value_, 0.5), 0, 1);
-    if (isNaN(ratio)) return this;
-
-    var shift = this.markerElement().strokeThickness() % 2 == 0 ? 0 : -.5;
-    var bounds = this.parentBounds();
-    var axesLinesSpace = this.axesLinesSpace();
-    this.markerElement().clear();
-
-    if (this.layout_ == anychart.enums.Layout.HORIZONTAL) {
-      var y = Math.round(bounds.getTop() + bounds.height - ratio * bounds.height);
-      ratio == 1 ? y -= shift : y += shift;
-      this.markerElement().moveTo(bounds.getLeft(), y);
-      this.markerElement().lineTo(bounds.getRight(), y);
-    } else if (this.layout_ == anychart.enums.Layout.VERTICAL) {
-      var x = Math.round(bounds.getLeft() + ratio * bounds.width);
-      ratio == 1 ? x += shift : x -= shift;
-      this.markerElement().moveTo(x, bounds.getTop());
-      this.markerElement().lineTo(x, bounds.getBottom());
-    }
-
-    this.markerElement().clip(axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds)));
-    this.markConsistent(anychart.ConsistencyState.BOUNDS);
+    this.drawAxisMarker();
   }
 
   return this;
+};
+
+
+/**
+ * Draw axis marker.
+ * @protected
+ */
+anychart.core.axisMarkers.Line.prototype.drawAxisMarker = function() {
+  var ratio = goog.math.clamp(this.scale().transform(this.value_, 0.5), 0, 1);
+  if (isNaN(ratio)) return;
+
+  var shift = this.markerElement().strokeThickness() % 2 == 0 ? 0 : -.5;
+  var bounds = this.parentBounds();
+  var axesLinesSpace = this.axesLinesSpace();
+  this.markerElement().clear();
+
+  if (this.layout_ == anychart.enums.Layout.HORIZONTAL) {
+    var y = Math.round(bounds.getTop() + bounds.height - ratio * bounds.height);
+    ratio == 1 ? y -= shift : y += shift;
+    this.markerElement().moveTo(bounds.getLeft(), y);
+    this.markerElement().lineTo(bounds.getRight(), y);
+  } else if (this.layout_ == anychart.enums.Layout.VERTICAL) {
+    var x = Math.round(bounds.getLeft() + ratio * bounds.width);
+    ratio == 1 ? x += shift : x -= shift;
+    this.markerElement().moveTo(x, bounds.getTop());
+    this.markerElement().lineTo(x, bounds.getBottom());
+  }
+
+  this.markerElement().clip(axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds)));
+  this.markConsistent(anychart.ConsistencyState.BOUNDS);
 };
 
 

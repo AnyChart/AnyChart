@@ -2022,20 +2022,20 @@ anychart.core.axes.Linear.prototype.disposeInternal = function() {
 
 
 //exports
-anychart.core.axes.Linear.prototype['staggerMode'] = anychart.core.axes.Linear.prototype.staggerMode;//doc|ex
-anychart.core.axes.Linear.prototype['staggerLines'] = anychart.core.axes.Linear.prototype.staggerLines;//doc|ex
-anychart.core.axes.Linear.prototype['staggerMaxLines'] = anychart.core.axes.Linear.prototype.staggerMaxLines;//doc|ex
-anychart.core.axes.Linear.prototype['title'] = anychart.core.axes.Linear.prototype.title;//doc|ex
-anychart.core.axes.Linear.prototype['labels'] = anychart.core.axes.Linear.prototype.labels;//doc|ex
-anychart.core.axes.Linear.prototype['minorLabels'] = anychart.core.axes.Linear.prototype.minorLabels;//doc|ex
-anychart.core.axes.Linear.prototype['ticks'] = anychart.core.axes.Linear.prototype.ticks;//doc|ex
-anychart.core.axes.Linear.prototype['minorTicks'] = anychart.core.axes.Linear.prototype.minorTicks;//doc|ex
-anychart.core.axes.Linear.prototype['stroke'] = anychart.core.axes.Linear.prototype.stroke;//doc|ex
-anychart.core.axes.Linear.prototype['orientation'] = anychart.core.axes.Linear.prototype.orientation;//doc|ex
-anychart.core.axes.Linear.prototype['scale'] = anychart.core.axes.Linear.prototype.scale;//doc|ex
+anychart.core.axes.Linear.prototype['staggerMode'] = anychart.core.axes.Linear.prototype.staggerMode;
+anychart.core.axes.Linear.prototype['staggerLines'] = anychart.core.axes.Linear.prototype.staggerLines;
+anychart.core.axes.Linear.prototype['staggerMaxLines'] = anychart.core.axes.Linear.prototype.staggerMaxLines;
+anychart.core.axes.Linear.prototype['title'] = anychart.core.axes.Linear.prototype.title;
+anychart.core.axes.Linear.prototype['labels'] = anychart.core.axes.Linear.prototype.labels;
+anychart.core.axes.Linear.prototype['minorLabels'] = anychart.core.axes.Linear.prototype.minorLabels;
+anychart.core.axes.Linear.prototype['ticks'] = anychart.core.axes.Linear.prototype.ticks;
+anychart.core.axes.Linear.prototype['minorTicks'] = anychart.core.axes.Linear.prototype.minorTicks;
+anychart.core.axes.Linear.prototype['stroke'] = anychart.core.axes.Linear.prototype.stroke;
+anychart.core.axes.Linear.prototype['orientation'] = anychart.core.axes.Linear.prototype.orientation;
+anychart.core.axes.Linear.prototype['scale'] = anychart.core.axes.Linear.prototype.scale;
 anychart.core.axes.Linear.prototype['width'] = anychart.core.axes.Linear.prototype.width;
-anychart.core.axes.Linear.prototype['getRemainingBounds'] = anychart.core.axes.Linear.prototype.getRemainingBounds;//doc|ex
-anychart.core.axes.Linear.prototype['drawFirstLabel'] = anychart.core.axes.Linear.prototype.drawFirstLabel;//doc|ex
-anychart.core.axes.Linear.prototype['drawLastLabel'] = anychart.core.axes.Linear.prototype.drawLastLabel;//doc|ex
-anychart.core.axes.Linear.prototype['overlapMode'] = anychart.core.axes.Linear.prototype.overlapMode;//doc|ex
-anychart.core.axes.Linear.prototype['isHorizontal'] = anychart.core.axes.Linear.prototype.isHorizontal;//doc
+anychart.core.axes.Linear.prototype['getRemainingBounds'] = anychart.core.axes.Linear.prototype.getRemainingBounds;
+anychart.core.axes.Linear.prototype['drawFirstLabel'] = anychart.core.axes.Linear.prototype.drawFirstLabel;
+anychart.core.axes.Linear.prototype['drawLastLabel'] = anychart.core.axes.Linear.prototype.drawLastLabel;
+anychart.core.axes.Linear.prototype['overlapMode'] = anychart.core.axes.Linear.prototype.overlapMode;
+anychart.core.axes.Linear.prototype['isHorizontal'] = anychart.core.axes.Linear.prototype.isHorizontal;

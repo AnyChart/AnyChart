@@ -20,12 +20,16 @@ goog.require('acgraph.vector.primitives');
  */
 anychart.enums.ChartTypes = {
   AREA: 'area',
+  AREA_3D: 'area3d',
   BAR: 'bar',
+  BAR_3D: 'bar3d',
   BOX: 'box',
   BUBBLE: 'bubble',
   BULLET: 'bullet',
   CARTESIAN: 'cartesian',
+  CARTESIAN_3D: 'cartesian3d',
   COLUMN: 'column',
+  COLUMN_3D: 'column3d',
   FINANCIAL: 'financial',
   FUNNEL: 'funnel',
   GANTT_RESOURCE: 'resource',
@@ -1944,6 +1948,42 @@ anychart.enums.normalizeCartesianSeriesType = function(value, opt_default) {
       return anychart.enums.CartesianSeriesType.STEP_LINE;
   }
   return opt_default || anychart.enums.CartesianSeriesType.LINE;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Cartesian3dSeriesTypes
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all series types.
+ * @enum {string}
+ */
+anychart.enums.Cartesian3dSeriesType = {
+  AREA: 'area',
+  BAR: 'bar',
+  COLUMN: 'column'
+};
+
+
+/**
+ * Normalizes cartesian 3D series type.
+ * @param {*} value Series type to normalize.
+ * @param {anychart.enums.Cartesian3dSeriesType=} opt_default Custom default value (defaults to COLUMN).
+ * @return {anychart.enums.Cartesian3dSeriesType}
+ */
+anychart.enums.normalizeCartesian3dSeriesType = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'area':
+      return anychart.enums.Cartesian3dSeriesType.AREA;
+    case 'bar':
+      return anychart.enums.Cartesian3dSeriesType.BAR;
+    case 'column':
+      return anychart.enums.Cartesian3dSeriesType.COLUMN;
+  }
+  return opt_default || anychart.enums.Cartesian3dSeriesType.COLUMN;
 };
 
 

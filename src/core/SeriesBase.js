@@ -32,7 +32,7 @@ goog.require('anychart.utils');
  * @implements {anychart.core.utils.IInteractiveSeries}
  */
 anychart.core.SeriesBase = function(opt_data, opt_csvSettings) {
-  goog.base(this);
+  anychart.core.SeriesBase.base(this, 'constructor');
   this.data(opt_data || null, opt_csvSettings);
 
   this.statistics_ = {};
@@ -1185,7 +1185,7 @@ anychart.core.SeriesBase.prototype.getLabelsPosition = function(pointState) {
 
 
 /**
- * Draws marker for a point.
+ * Draws label for a point.
  * @param {anychart.PointState|number} pointState Point state - normal, hover or select.
  * @protected
  */
@@ -1238,7 +1238,7 @@ anychart.core.SeriesBase.prototype.drawLabel = function(pointState) {
   if (isDraw) {
     var position = this.getLabelsPosition(pointState);
 
-    var positionProvider = this.createPositionProvider(/** @type {anychart.enums.Position|string} */(position));
+    var positionProvider = this.createLabelsPositionProvider(/** @type {anychart.enums.Position|string} */(position));
     var formatProvider = this.createFormatProvider();
     if (label) {
       label.formatProvider(formatProvider);
@@ -1254,6 +1254,17 @@ anychart.core.SeriesBase.prototype.drawLabel = function(pointState) {
   } else if (label) {
     label.clear();
   }
+};
+
+
+/**
+ * Create label position provider.
+ * @param {string} position Understands anychart.enums.Position and some additional values.
+ * @return {Object} Object with info for labels formatting.
+ * @protected
+ */
+anychart.core.SeriesBase.prototype.createLabelsPositionProvider = function(position) {
+  return this.createPositionProvider(position);
 };
 
 

@@ -53,5 +53,5 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.BAR] = anychart.bar;
 anychart.barChart = anychart.bar;
 
 //exports
-goog.exportSymbol('anychart.bar', anychart.bar);//doc|ex
-goog.exportSymbol('anychart.barChart', anychart.barChart);//doc|ex
+goog.exportSymbol('anychart.bar', anychart.bar);
+goog.exportSymbol('anychart.barChart', anychart.barChart);

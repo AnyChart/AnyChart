@@ -44,6 +44,12 @@ anychart.core.cartesian.series.AreaBase.prototype.lastDrawnX;
 anychart.core.cartesian.series.AreaBase.prototype.zeroesStack;
 
 
+/** @inheritDoc */
+anychart.core.cartesian.series.AreaBase.prototype.isAreaBased = function() {
+  return true;
+};
+
+
 /**
  * @inheritDoc
  */
@@ -76,7 +82,3 @@ anychart.core.cartesian.series.AreaBase.prototype.finalizeHatchFill = function()
     }
   }
 };
-
-
-//anychart.core.cartesian.series.AreaBase.prototype['startDrawing'] = anychart.core.cartesian.series.AreaBase.prototype.startDrawing;//inherited
-//exports

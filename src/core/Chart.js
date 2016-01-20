@@ -49,7 +49,7 @@ anychart.core.Chart = function() {
    * @type {acgraph.vector.Rect}
    * @private
    */
-  this.shadowRect_;
+  this.shadowRect_ = null;
 
   /**
    * @type {anychart.core.utils.Margin}
@@ -94,6 +94,20 @@ anychart.core.Chart = function() {
    */
   this.autoRedrawIsSet_ = false;
 
+
+  /**
+   * X shift (in pixels) for 3D mode. Calculated in anychart.charts.Cartesian3d.
+   * @type {number}
+   */
+  this.x3dShift = 0;
+
+
+  /**
+   * Y shift (in pixels) for 3D mode. Calculated in anychart.charts.Cartesian3d.
+   * @type {number}
+   */
+  this.y3dShift = 0;
+
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
 };
@@ -125,6 +139,13 @@ anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @type {boolean}
  */
 anychart.core.Chart.prototype.supportsBaseHighlight = true;
+
+
+/**
+ * 3D mode flag.
+ * @type {boolean}
+ */
+anychart.core.Chart.prototype.isMode3d = false;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -467,10 +488,10 @@ anychart.core.Chart.prototype.showTooltip_ = function(event) {
         // improve maps support (separated & point modes)
         if (goog.isDef(pointIndex['index'])) pointIndex = pointIndex['index'];
 
-        // condition for compile_each
-        if (this.series_) {
+        // check isDef series for compile_each (for gantt, etc.)
+        if (goog.isDef(this.getAllSeries())) {
           // get points from all series by point index
-          points = goog.array.map(this.series_, function(series) {
+          points = goog.array.map(this.getAllSeries(), function(series) {
             series.getIterator().select(pointIndex);
             return {
               'series': series,

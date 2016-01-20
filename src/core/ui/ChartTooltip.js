@@ -888,9 +888,8 @@ anychart.core.ui.ChartTooltip.prototype.setPositionToTooltip_ = function(tooltip
 
   } else if (this.positionMode_ == anychart.enums.TooltipPositionMode.POINT) {
     var iterator = opt_series.getIterator();
-    if (iterator.meta('shape')) {
-      var shape = iterator.meta('shape');
-      var shapeBounds = shape.getBounds();
+    if (iterator.meta('shape') || iterator.meta('bounds3d')) {
+      var shapeBounds = iterator.meta('bounds3d') || iterator.meta('shape').getBounds();
       position = this.displayMode_ == anychart.enums.TooltipDisplayMode.UNION ? this.position() : tooltip.position();
       anchoredPositionCoordinate = anychart.utils.getCoordinateByAnchor(shapeBounds, /** @type {anychart.enums.Position} */(position));
       x = anchoredPositionCoordinate.x +

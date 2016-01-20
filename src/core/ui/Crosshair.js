@@ -13,7 +13,7 @@ anychart.core.ui.Crosshair = function() {
   goog.base(this);
 
   /**
-   * @type {anychart.charts.Cartesian|anychart.charts.Scatter}
+   * @type {anychart.core.CartesianBase|anychart.charts.Scatter}
    * @private
    */
   this.chart_ = null;
@@ -365,7 +365,7 @@ anychart.core.ui.Crosshair.prototype.draw = function() {
 
 /**
  *
- * @param {(anychart.charts.Cartesian|anychart.charts.Scatter)=} opt_chart
+ * @param {(anychart.core.CartesianBase|anychart.charts.Scatter)=} opt_chart
  */
 anychart.core.ui.Crosshair.prototype.bindHandlers = function(opt_chart) {
   if (opt_chart) {

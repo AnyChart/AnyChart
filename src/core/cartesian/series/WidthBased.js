@@ -90,4 +90,4 @@ anychart.core.cartesian.series.WidthBased.prototype.setupByJSON = function(confi
 
 
 //exports
-anychart.core.cartesian.series.WidthBased.prototype['pointWidth'] = anychart.core.cartesian.series.WidthBased.prototype.pointWidth;//doc|ex
+anychart.core.cartesian.series.WidthBased.prototype['pointWidth'] = anychart.core.cartesian.series.WidthBased.prototype.pointWidth;

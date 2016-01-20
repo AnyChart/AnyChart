@@ -134,6 +134,24 @@ var returnLightenSourceColor = function() {
  * @this {*}
  * @return {*}
  */
+var returnLightenSourceColor20 = function() {
+  return window['anychart']['color']['lighten'](this['sourceColor'], 0.2);
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+var returnLightenSourceColor30 = function() {
+  return window['anychart']['color']['lighten'](this['sourceColor'], 0.3);
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
 var returnStrokeSourceColor = function() {
   return window['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
 };
@@ -1364,6 +1382,47 @@ window['anychart']['themes']['defaultTheme'] = {
         'stickToZero': true
       }
     ]
+  },
+
+  // merge with cartesian
+  'cartesian3d': {
+    'zDepth': 10,
+    'zAngle': 45,
+    'defaultSeriesType': 'column',
+    'zPadding': false,
+    'defaultSeriesSettings': {
+      'base': {
+        'stroke': 'none',
+        'hoverStroke': returnSourceColor,
+        'selectStroke': returnSourceColor,
+        'fill': returnSourceColor,
+        'hoverFill': returnLightenSourceColor20,
+        'selectFill': returnLightenSourceColor30
+      }
+    },
+    'xAxes': [{}],
+    'yAxes': [{}]
+  },
+
+  // merge with area
+  'bar3d': {
+    'zDepth': 10,
+    'zAngle': 45,
+    'zPadding': false
+  },
+
+  // merge with column
+  'column3d': {
+    'zDepth': 20,
+    'zAngle': 45,
+    'zPadding': false
+  },
+
+  // merge with area
+  'area3d': {
+    'zDepth': 10,
+    'zAngle': 45,
+    'zPadding': false
   },
 
   // merge with chart

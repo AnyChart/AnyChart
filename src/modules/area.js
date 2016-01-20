@@ -57,5 +57,5 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.AREA] = anychart.area;
 anychart.areaChart = anychart.area;
 
 //exports
-goog.exportSymbol('anychart.area', anychart.area);//doc|ex
-goog.exportSymbol('anychart.areaChart', anychart.areaChart);//doc|ex
+goog.exportSymbol('anychart.area', anychart.area);
+goog.exportSymbol('anychart.areaChart', anychart.areaChart);

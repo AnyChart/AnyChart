@@ -78,6 +78,13 @@ anychart.core.cartesian.series.Base.SeriesTypesMap = {};
 
 
 /**
+ * Map of 3d series constructors by type.
+ * @type {Object.<string, Function>}
+ */
+anychart.core.cartesian.series.Base.Series3dTypesMap = {};
+
+
+/**
  * For internal use.
  * @param {number} value Calculated bar width ratio.
  */
@@ -484,6 +491,15 @@ anychart.core.cartesian.series.Base.prototype.isWidthBased = function() {
  * @return {boolean}
  */
 anychart.core.cartesian.series.Base.prototype.isBarBased = function() {
+  return false;
+};
+
+
+/**
+ * Tester if the series is area based (area, area3d).
+ * @return {boolean}
+ */
+anychart.core.cartesian.series.Base.prototype.isAreaBased = function() {
   return false;
 };
 
@@ -976,7 +992,7 @@ anychart.core.cartesian.series.Base.prototype.getEnableChangeSignals = function(
 
 /**
  * Returns type of current series.
- * @return {anychart.enums.CartesianSeriesType} Series type.
+ * @return {anychart.enums.CartesianSeriesType|anychart.enums.Cartesian3dSeriesType} Series type.
  */
 anychart.core.cartesian.series.Base.prototype.getType = goog.abstractMethod;
 
@@ -1146,10 +1162,10 @@ anychart.core.cartesian.series.Base.prototype.setupByJSON = function(config) {
 //anychart.core.cartesian.series.Base.prototype['getIterator'] = anychart.core.cartesian.series.Base.prototype.getIterator;//doc|need-ex
 //anychart.core.cartesian.series.Base.prototype['getResetIterator'] = anychart.core.cartesian.series.Base.prototype.getResetIterator;//doc|need-ex
 //exports
-anychart.core.cartesian.series.Base.prototype['clip'] = anychart.core.cartesian.series.Base.prototype.clip;//doc|ex
-anychart.core.cartesian.series.Base.prototype['xPointPosition'] = anychart.core.cartesian.series.Base.prototype.xPointPosition;//doc|ex
-anychart.core.cartesian.series.Base.prototype['xScale'] = anychart.core.cartesian.series.Base.prototype.xScale;//doc|ex
-anychart.core.cartesian.series.Base.prototype['yScale'] = anychart.core.cartesian.series.Base.prototype.yScale;//doc|ex
+anychart.core.cartesian.series.Base.prototype['clip'] = anychart.core.cartesian.series.Base.prototype.clip;
+anychart.core.cartesian.series.Base.prototype['xPointPosition'] = anychart.core.cartesian.series.Base.prototype.xPointPosition;
+anychart.core.cartesian.series.Base.prototype['xScale'] = anychart.core.cartesian.series.Base.prototype.xScale;
+anychart.core.cartesian.series.Base.prototype['yScale'] = anychart.core.cartesian.series.Base.prototype.yScale;
 anychart.core.cartesian.series.Base.prototype['error'] = anychart.core.cartesian.series.Base.prototype.error;
 anychart.core.cartesian.series.Base.prototype['transformX'] = anychart.core.cartesian.series.Base.prototype.transformX;
 anychart.core.cartesian.series.Base.prototype['transformY'] = anychart.core.cartesian.series.Base.prototype.transformY;

@@ -184,7 +184,7 @@
         {"$ref": "#/definitions/anychart.core.SeparateChart"}
       ],
       "properties": {
-        "type": {"enum": ["cartesian", "area", "bar", "box", "bubble", "column", "financial", "line", "marker"]},
+        "type": {"enum": ["cartesian", "cartesian3d", "area", "area3d", "bar", "bar3d", "box", "bubble", "column", "column3d", "financial", "line", "marker"]},
         "grids": {
           "type": "array",
           "items": {
@@ -415,7 +415,9 @@
             {"$ref": "#/definitions/disable"},
             {"$ref": "#/definitions/anychart.core.ui.ChartScroller"}
           ]
-        }
+        },
+        "zAngle": {"type": ["number"]},
+        "zDepth": {"type": ["number"]}
       },
       "required": ["type"]
     },

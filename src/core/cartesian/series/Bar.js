@@ -98,14 +98,14 @@ anychart.core.cartesian.series.Bar.prototype.getType = function() {
 
 
 //exports
-anychart.core.cartesian.series.Bar.prototype['fill'] = anychart.core.cartesian.series.Bar.prototype.fill;//inherited
-anychart.core.cartesian.series.Bar.prototype['hoverFill'] = anychart.core.cartesian.series.Bar.prototype.hoverFill;//inherited
-anychart.core.cartesian.series.Bar.prototype['selectFill'] = anychart.core.cartesian.series.Bar.prototype.selectFill;//inherited
+anychart.core.cartesian.series.Bar.prototype['fill'] = anychart.core.cartesian.series.Bar.prototype.fill;
+anychart.core.cartesian.series.Bar.prototype['hoverFill'] = anychart.core.cartesian.series.Bar.prototype.hoverFill;
+anychart.core.cartesian.series.Bar.prototype['selectFill'] = anychart.core.cartesian.series.Bar.prototype.selectFill;
 
-anychart.core.cartesian.series.Bar.prototype['stroke'] = anychart.core.cartesian.series.Bar.prototype.stroke;//inherited
-anychart.core.cartesian.series.Bar.prototype['hoverStroke'] = anychart.core.cartesian.series.Bar.prototype.hoverStroke;//inherited
-anychart.core.cartesian.series.Bar.prototype['selectStroke'] = anychart.core.cartesian.series.Bar.prototype.selectStroke;//inherited
+anychart.core.cartesian.series.Bar.prototype['stroke'] = anychart.core.cartesian.series.Bar.prototype.stroke;
+anychart.core.cartesian.series.Bar.prototype['hoverStroke'] = anychart.core.cartesian.series.Bar.prototype.hoverStroke;
+anychart.core.cartesian.series.Bar.prototype['selectStroke'] = anychart.core.cartesian.series.Bar.prototype.selectStroke;
 
-anychart.core.cartesian.series.Bar.prototype['hatchFill'] = anychart.core.cartesian.series.Bar.prototype.hatchFill;//inherited
-anychart.core.cartesian.series.Bar.prototype['hoverHatchFill'] = anychart.core.cartesian.series.Bar.prototype.hoverHatchFill;//inherited
-anychart.core.cartesian.series.Bar.prototype['selectHatchFill'] = anychart.core.cartesian.series.Bar.prototype.selectHatchFill;//inherited
+anychart.core.cartesian.series.Bar.prototype['hatchFill'] = anychart.core.cartesian.series.Bar.prototype.hatchFill;
+anychart.core.cartesian.series.Bar.prototype['hoverHatchFill'] = anychart.core.cartesian.series.Bar.prototype.hoverHatchFill;
+anychart.core.cartesian.series.Bar.prototype['selectHatchFill'] = anychart.core.cartesian.series.Bar.prototype.selectHatchFill;

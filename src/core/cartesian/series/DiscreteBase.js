@@ -71,8 +71,9 @@ anychart.core.cartesian.series.DiscreteBase.prototype.startDrawing = function() 
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE))
+  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     this.rootElement.clear();
+  }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     if (!this.hatchFillRootElement) {

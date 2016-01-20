@@ -15,7 +15,7 @@ goog.require('goog.math');
  * @extends {anychart.core.VisualBase}
  */
 anychart.core.axisMarkers.Range = function() {
-  goog.base(this);
+  anychart.core.axisMarkers.Range.base(this, 'constructor');
 
   /**
    * @type {acgraph.vector.Path}
@@ -318,53 +318,62 @@ anychart.core.axisMarkers.Range.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var layout = this.layout();
-    var minValue = this.from_, maxValue = this.to_;
-    if (this.from_ > this.to_) {
-      minValue = this.from_;
-      maxValue = this.to_;
-    }
-    // clamping to prevent range marker go out from the bounds. Ratio should be between 0 and 1.
-    var ratioMinValue = goog.math.clamp(this.scale().transform(minValue, 0), 0, 1);
-    var ratioMaxValue = goog.math.clamp(this.scale().transform(maxValue, 1), 0, 1);
-
-    if (isNaN(ratioMinValue) || isNaN(ratioMaxValue)) return this;
-
-    var bounds = this.parentBounds();
-    var axesLinesSpace = this.axesLinesSpace();
-    this.markerElement().clear();
-
-    if (layout == anychart.enums.Layout.HORIZONTAL) {
-      var y_max = Math.floor(bounds.getBottom() - bounds.height * ratioMaxValue);
-      var y_min = Math.ceil(bounds.getBottom() - bounds.height * ratioMinValue);
-      var x_start = bounds.getLeft();
-      var x_end = bounds.getRight();
-
-      this.markerElement()
-          .moveTo(x_start, y_max)
-          .lineTo(x_end, y_max)
-          .lineTo(x_end, y_min)
-          .lineTo(x_start, y_min)
-          .close();
-    } else if (layout == anychart.enums.Layout.VERTICAL) {
-      var y_start = bounds.getBottom();
-      var y_end = bounds.getTop();
-      var x_min = Math.floor(bounds.getLeft() + (bounds.width * ratioMinValue));
-      var x_max = Math.ceil(bounds.getLeft() + (bounds.width * ratioMaxValue));
-
-      this.markerElement()
-          .moveTo(x_min, y_start)
-          .lineTo(x_min, y_end)
-          .lineTo(x_max, y_end)
-          .lineTo(x_max, y_start)
-          .close();
-
-    }
-    this.markerElement().clip(axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds)));
-    this.markConsistent(anychart.ConsistencyState.BOUNDS);
+    this.drawAxisMarker();
   }
 
   return this;
+};
+
+
+/**
+ * Draw axis marker.
+ * @protected
+ */
+anychart.core.axisMarkers.Range.prototype.drawAxisMarker = function() {
+  var layout = this.layout();
+  var minValue = this.from_, maxValue = this.to_;
+  if (this.from_ > this.to_) {
+    minValue = this.from_;
+    maxValue = this.to_;
+  }
+  // clamping to prevent range marker go out from the bounds. Ratio should be between 0 and 1.
+  var ratioMinValue = goog.math.clamp(this.scale().transform(minValue, 0), 0, 1);
+  var ratioMaxValue = goog.math.clamp(this.scale().transform(maxValue, 1), 0, 1);
+
+  if (isNaN(ratioMinValue) || isNaN(ratioMaxValue)) return;
+
+  var bounds = this.parentBounds();
+  var axesLinesSpace = this.axesLinesSpace();
+  this.markerElement().clear();
+
+  if (layout == anychart.enums.Layout.HORIZONTAL) {
+    var y_max = Math.floor(bounds.getBottom() - bounds.height * ratioMaxValue);
+    var y_min = Math.ceil(bounds.getBottom() - bounds.height * ratioMinValue);
+    var x_start = bounds.getLeft();
+    var x_end = bounds.getRight();
+
+    this.markerElement()
+        .moveTo(x_start, y_max)
+        .lineTo(x_end, y_max)
+        .lineTo(x_end, y_min)
+        .lineTo(x_start, y_min)
+        .close();
+  } else if (layout == anychart.enums.Layout.VERTICAL) {
+    var y_start = bounds.getBottom();
+    var y_end = bounds.getTop();
+    var x_min = Math.floor(bounds.getLeft() + (bounds.width * ratioMinValue));
+    var x_max = Math.ceil(bounds.getLeft() + (bounds.width * ratioMaxValue));
+
+    this.markerElement()
+        .moveTo(x_min, y_start)
+        .lineTo(x_min, y_end)
+        .lineTo(x_max, y_end)
+        .lineTo(x_max, y_start)
+        .close();
+
+  }
+  this.markerElement().clip(axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds)));
+  this.markConsistent(anychart.ConsistencyState.BOUNDS);
 };
 
 

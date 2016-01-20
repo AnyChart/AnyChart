@@ -599,8 +599,24 @@ anychart.area = anychart.area || function() {
 /**
  * @ignoreDoc
  */
+anychart.area3d = anychart.area3d || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Area chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
 anychart.bar = anychart.bar || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Bar chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.bar3d = anychart.bar3d || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Bar chart']);
 };
 
 
@@ -631,6 +647,14 @@ anychart.cartesian = anychart.cartesian || function() {
 /**
  * @ignoreDoc
  */
+anychart.cartesian3d = anychart.cartesian3d || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Cartesian chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
 anychart.scatter = anychart.scatter || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Scatter chart']);
 };
@@ -641,6 +665,14 @@ anychart.scatter = anychart.scatter || function() {
  */
 anychart.column = anychart.column || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Column chart']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.column3d = anychart.column3d || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Column chart']);
 };
 
 
@@ -824,12 +856,16 @@ goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);//doc|need
 goog.exportSymbol('anychart.onDocumentReady', anychart.onDocumentReady);//doc|ex
 goog.exportSymbol('anychart.licenseKey', anychart.licenseKey);//doc|ex
 goog.exportSymbol('anychart.area', anychart.area);//linkedFromModule
+goog.exportSymbol('anychart.area3d', anychart.area3d);
 goog.exportSymbol('anychart.bar', anychart.bar);//linkedFromModule
+goog.exportSymbol('anychart.bar3d', anychart.bar3d);
 goog.exportSymbol('anychart.box', anychart.box);
 goog.exportSymbol('anychart.bubble', anychart.bubble);//linkedFromModule
 goog.exportSymbol('anychart.bullet', anychart.bullet);//linkedFromModule
 goog.exportSymbol('anychart.cartesian', anychart.cartesian);//linkedFromModule
+goog.exportSymbol('anychart.cartesian3d', anychart.cartesian3d);
 goog.exportSymbol('anychart.column', anychart.column);//linkedFromModule
+goog.exportSymbol('anychart.column3d', anychart.column3d);
 goog.exportSymbol('anychart.financial', anychart.financial);//linkedFromModule
 goog.exportSymbol('anychart.funnel', anychart.funnel);//linkedFromModule
 goog.exportSymbol('anychart.line', anychart.line);//linkedFromModule
