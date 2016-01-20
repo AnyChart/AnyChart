@@ -135,6 +135,9 @@ anychart.core.utils.InteractivityState.prototype.getSeriesStateForUpdate = funct
 anychart.core.utils.InteractivityState.prototype.setPointState = function(state, opt_index, opt_stateToChange) {
   var i;
   if (goog.isDef(opt_index)) {
+    //If passed index out of index data, then do nothing
+    if (opt_index >= this.target.getIterator().getRowsCount())
+      return;
     if (goog.isArray(opt_index)) {
       goog.array.sort(opt_index);
       for (i = opt_index.length; i--;)
@@ -220,6 +223,9 @@ anychart.core.utils.InteractivityState.prototype.addPointStateInternal = functio
 anychart.core.utils.InteractivityState.prototype.addPointState = function(state, opt_index) {
   var i;
   if (goog.isDef(opt_index)) {
+    //If passed index out of index data, then do nothing
+    if (opt_index >= this.target.getIterator().getRowsCount())
+      return;
     if (goog.isArray(opt_index)) {
       goog.array.sort(opt_index);
       for (i = opt_index.length; i--;)

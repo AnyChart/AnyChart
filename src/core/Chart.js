@@ -1246,14 +1246,14 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
     if (parent.isSeries && parent.isSeries())
       series = parent;
     index = tag;
-  } else if (event['target'] instanceof anychart.core.ui.Legend) {
+  } else if (event['target'] instanceof anychart.core.ui.Legend || event['target'] instanceof anychart.core.ui.ColorRange) {
     if (tag) {
-      if (tag.points) {
-        series = tag.points.series;
-        index = tag.points.points;
+      if (tag.points_) {
+        series = tag.points_.series;
+        index = tag.points_.points;
       } else {
-        series = tag.series;
-        index = tag.index;
+        series = tag.series_;
+        index = tag.index_;
       }
       forbidTooltip = true;
     }
@@ -1267,7 +1267,11 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
     if (evt && ((anychart.utils.checkIfParent(/** @type {!goog.events.EventTarget} */(series), event['relatedTarget'])) || series.dispatchEvent(evt))) {
       if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
 
-        if (goog.isArray(index) || (!series.state.hasPointStateByPointIndex(anychart.PointState.HOVER, index) && !isNaN(index))) {
+        var whetherNeedHoverIndex = goog.isArray(index) && !goog.array.every(index, function(el) {
+          return series.state.hasPointStateByPointIndex(anychart.PointState.HOVER, el);
+        }, this);
+
+        if (whetherNeedHoverIndex || (!series.state.hasPointStateByPointIndex(anychart.PointState.HOVER, index) && !isNaN(index))) {
           if (goog.isFunction(series.hoverPoint))
             series.hoverPoint(/** @type {number} */ (index), event);
 
@@ -1279,7 +1283,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
             eventSeriesStatus.push({
               series: series,
               points: alreadyHoveredPoints,
-              nearestPointToCursor: {index: index, distance: 0}
+              nearestPointToCursor: {index: (goog.isArray(index) ? index[0] : index), distance: 0}
             });
 
           this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, eventSeriesStatus, false, forbidTooltip));
@@ -1349,14 +1353,14 @@ anychart.core.Chart.prototype.handleMouseOut = function(event) {
     if (parent.isSeries && parent.isSeries())
       series = parent;
     index = tag;
-  } else if (event['target'] instanceof anychart.core.ui.Legend) {
+  } else if (event['target'] instanceof anychart.core.ui.Legend || event['target'] instanceof anychart.core.ui.ColorRange) {
     if (tag) {
-      if (tag.points) {
-        series = tag.points.series;
-        index = tag.points.points;
+      if (tag.points_) {
+        series = tag.points_.series;
+        index = tag.points_.points;
       } else {
-        series = tag.series;
-        index = tag.index;
+        series = tag.series_;
+        index = tag.index_;
       }
     }
     forbidTooltip = true;
@@ -1376,10 +1380,11 @@ anychart.core.Chart.prototype.handleMouseOut = function(event) {
     if ((!ifParent || (prevIndex != index)) && series.dispatchEvent(evt)) {
       if (hoverMode == anychart.enums.HoverMode.SINGLE && (!isNaN(index) || goog.isArray(index))) {
         series.unhover();
+        this.doAdditionActionsOnMouseOut();
         this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, [{
           series: series,
           points: [],
-          nearestPointToCursor: {index: index, distance: 0}
+          nearestPointToCursor: {index: (goog.isArray(index) ? index[0] : index), distance: 0}
         }], false, forbidTooltip));
       }
     }
@@ -1417,14 +1422,14 @@ anychart.core.Chart.prototype.handleMouseDown = function(event) {
     if (parent.isSeries && parent.isSeries())
       series = parent;
     index = tag;
-  } else if (event['target'] instanceof anychart.core.ui.Legend) {
+  } else if (event['target'] instanceof anychart.core.ui.Legend || event['target'] instanceof anychart.core.ui.ColorRange) {
     if (tag) {
-      if (tag.points) {
-        series = tag.points.series;
-        index = tag.points.points;
+      if (tag.points_) {
+        series = tag.points_.series;
+        index = tag.points_.points;
       } else {
-        series = tag.series;
-        index = tag.index;
+        series = tag.series_;
+        index = tag.index_;
       }
     }
   } else {

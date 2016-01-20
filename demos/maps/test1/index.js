@@ -11,7 +11,7 @@ anychart.onDocumentReady(function() {
     {id: "AU.CT", value: 15, title: "Australian Capital Territory"},
     {id: "AU.VI", value: 23, title: "Victoria"},
     {id: "AU.WA", value: 86, title: "Western Australia"},
-    {id: "AU.QL", value: 16, title: "Queensland"},
+    {id: "AU.QL", value: 15, title: "Queensland"},
     {id: "AU.NS", value: 32, title: "New South Wales"},
     {id: "AU.NT", value: 64, title: "Northern Territory"},
     {id: "AU.TS", value: 28, title: "Tasmania"},
@@ -21,8 +21,12 @@ anychart.onDocumentReady(function() {
 
   chart = anychart.map();
   chart.geoData(anychart.maps.australia);
+  chart.legend().enabled(true);
+  chart.legend().itemsSourceMode('categories');
 
-  var currentColorScale = anychart.scales.linearColor("orange", "yellow");
+  //var currentColorScale = anychart.scales.linearColor("orange", "yellow");
+  var currentColorScale = anychart.scales.ordinalColor();
+  currentColorScale.ranges([{less: 30}, {greater: 30}]);
 
   var series = chart.choropleth(dataSetForSeries);
   series
@@ -35,13 +39,12 @@ anychart.onDocumentReady(function() {
 
 
   series.tooltip().textFormatter(function() {
-    var count = this.getStat('pointsCount');
-    console.log(count);
-    return count  ;
+    return this.getStat('pointsCount');
   });
+  chart.interactivity().hoverMode(anychart.enums.HoverMode.SINGLE);
 
   chart.container('container').draw();
 
   //chart.listen('pointsselect', function(e) {console.log(e.currentPoint, e.seriesStatus);});
-  //chart.listen('pointshover', function(e) {console.log(e.currentPoint, e.seriesStatus);});
+  chart.listen('pointshover', function(e) {console.log(e.currentPoint, e.seriesStatus);});
 });

@@ -894,6 +894,7 @@ anychart.charts.Map.prototype.hatchFillPaletteInvalidated_ = function(event) {
 anychart.charts.Map.prototype.colorRange = function(opt_value) {
   if (!this.colorRange_) {
     this.colorRange_ = new anychart.core.ui.ColorRange();
+    this.colorRange_.setParentEventTarget(this);
     this.colorRange_.listenSignals(this.colorRangeInvalidated_, this);
     this.invalidate(anychart.ConsistencyState.MAP_COLOR_RANGE | anychart.ConsistencyState.BOUNDS,
         anychart.Signal.NEEDS_REDRAW);
@@ -1920,10 +1921,12 @@ anychart.charts.Map.prototype.legendItemClick = function(item, event) {
       }
 
       if (this.interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
-        event.series = series;
-        event.index = points;
+        event.points_ = {
+          series: series,
+          points: points
+        };
       } else {
-        event.points = [{
+        event.points_ = [{
           series: series,
           points: points,
           lastPoint: points[points.length - 1],
@@ -1966,12 +1969,12 @@ anychart.charts.Map.prototype.legendItemOver = function(item, event) {
       var tag = anychart.utils.extractTag(event['domTarget']);
       if (tag) {
         if (this.interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
-          tag.points = {
+          tag.points_ = {
             series: series,
             points: points
           };
         } else {
-          tag.points = [{
+          tag.points_ = [{
             series: series,
             points: points,
             lastPoint: points[points.length - 1],
