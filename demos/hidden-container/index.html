@@ -1,0 +1,56 @@
+<html>
+<head>
+  <!--<link type="text/css" href="../css/anychart.css" rel="stylesheet">-->
+  <!--<script src="../../contrib/closure-library/closure/goog/base.js"></script>-->
+  <!--<script src="../../src/deps.js"></script>-->
+
+  <!--<meta charset="utf-8">-->
+
+  <!--<script>-->
+    <!--goog.require('anychart.modules.anychart_bundle');-->
+    <!--goog.require('anychart.themes.defaultTheme');-->
+  <!--</script>-->
+
+  <script src="../../out/anychart-bundle.min.js"></script>
+  <style>
+    #container {
+      width: 400px;
+      height: 300px;
+    }
+    body {
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+<div id="container"></div>
+</body>
+<script>
+  var chart, stage;
+  anychart.onDocumentReady(function () {
+    var el = document.getElementById('container');
+
+    //* // сейчас падает
+    stage = acgraph.create('container');
+    el.style.display = 'none';
+    /*/ // а если убрать первый символ в 33-й строке, то падать не будет
+    el.style.display = 'none';
+    stage = acgraph.create('container');
+    //*/
+
+    create();
+    el.style.display = '';
+
+    el.style.display = 'none';
+    create();
+    el.style.display = '';
+  });
+
+  function create() {
+    if (chart) chart.dispose();
+    chart = anychart.pie([7, 10, 2, 0]);
+    chart.container(stage);
+    chart.draw();
+  }
+</script>
+</html>
