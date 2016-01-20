@@ -683,7 +683,7 @@ anychart.core.ui.ColorRange.prototype.showMarker = function(value) {
   var isSeries = series && series.enabled() && series.colorScale() == scale;
   if (this.enabled() && isMarker && scale && isSeries) {
     var lineBounds = this.line.getBounds();
-    var ratio = this.scale().transform(value, .5);
+    var ratio = goog.math.clamp(this.scale().transform(value, .5), 0, 1);
 
     if (isNaN(ratio)) return;
 
@@ -839,23 +839,25 @@ anychart.core.ui.ColorRange.prototype.handleMouseClick = function(event) {
     } else if (scale instanceof anychart.scales.LinearColor) {
       iterator = series.getResetIterator();
       var minLength = Infinity;
-      var targetIndex = NaN;
+      var targetValue = NaN;
+      var scaleMin = /** @type {number} */(scale.minimum());
+      var scaleMax = /** @type {number} */(scale.maximum());
       while (iterator.advance()) {
         pointValue = /** @type {number} */(iterator.get(series.referenceValueNames[1]));
+        pointValue = goog.math.clamp(pointValue, scaleMin, scaleMax);
         var currLength = Math.abs(value - pointValue);
         if (minLength > currLength) {
           minLength = currLength;
-          targetIndex = iterator.getIndex();
+          targetValue = pointValue;
         }
       }
-      iterator.select(targetIndex);
-      value = iterator.get(series.referenceValueNames[1]);
 
       points = [];
 
       iterator = series.getResetIterator();
       while (iterator.advance()) {
-        pointValue = iterator.get(series.referenceValueNames[1]);
+        pointValue = /** @type {number} */(iterator.get(series.referenceValueNames[1]));
+        pointValue = goog.math.clamp(pointValue, scaleMin, scaleMax);
         if (pointValue == value)
           points.push(iterator.getIndex());
       }
@@ -920,24 +922,26 @@ anychart.core.ui.ColorRange.prototype.handleMouseOverAndMove = function(event) {
     } else if (scale instanceof anychart.scales.LinearColor && series) {
       iterator = series.getResetIterator();
       var minLength = Infinity;
-      var targetIndex = NaN;
+      var targetValue = NaN;
+      var scaleMin = /** @type {number} */(scale.minimum());
+      var scaleMax = /** @type {number} */(scale.maximum());
 
       while (iterator.advance()) {
         pointValue = /** @type {number} */(iterator.get(series.referenceValueNames[1]));
+        pointValue = goog.math.clamp(pointValue, scaleMin, scaleMax);
         var currLength = Math.abs(value - pointValue);
         if (minLength > currLength) {
           minLength = currLength;
-          targetIndex = iterator.getIndex();
+          targetValue = pointValue;
         }
       }
 
-      iterator.select(targetIndex);
-      value = iterator.get(series.referenceValueNames[1]);
-
       points = [];
       iterator = series.getResetIterator();
+      value = targetValue;
       while (iterator.advance()) {
-        pointValue = iterator.get(series.referenceValueNames[1]);
+        pointValue = /** @type {number} */(iterator.get(series.referenceValueNames[1]));
+        pointValue = goog.math.clamp(pointValue, scaleMin, scaleMax);
         if (pointValue == value)
           points.push(iterator.getIndex());
       }
@@ -974,7 +978,7 @@ anychart.core.ui.ColorRange.prototype.handleMouseOverAndMove = function(event) {
       }
 
     }
-    this.showMarker(/** @type {number} */(value));
+    this.showMarker(value);
   }
 };
 
