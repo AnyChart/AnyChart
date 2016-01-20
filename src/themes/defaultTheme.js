@@ -2255,6 +2255,25 @@ window['anychart']['themes']['defaultTheme'] = {
     'connectMissingPoints': false,
     'pointWidth': '95%',
 
+    'tooltip': {
+      'title': false,
+      'separator': false,
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'titleFormatter': function() {
+        return this['x'];
+      },
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'textFormatter': function() {
+        return 'x: ' + this['x'] + '\ny: ' + this['value'];
+      }
+    },
+
     'defaultSeriesSettings': {
       'base': {
         'markers': {

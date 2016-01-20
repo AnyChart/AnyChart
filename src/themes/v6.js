@@ -4089,7 +4089,26 @@ window['anychart']['themes']['v6'] = {
     'clip': true,
     'seriesType': 'line',
     'connectMissingPoints': false,
-    'pointWidth': '95%'
+    'pointWidth': '95%',
+
+    'tooltip': {
+      'title': false,
+      'separator': false,
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'titleFormatter': function() {
+        return this['x'];
+      },
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'textFormatter': function() {
+        return 'x: ' + this['x'] + '\ny: ' + this['value'];
+      }
+    }
   },
 
   // merge with chart

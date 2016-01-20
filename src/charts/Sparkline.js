@@ -8,6 +8,8 @@ goog.require('anychart.core.axisMarkers.Text');
 goog.require('anychart.core.sparkline.series.Base');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.MarkersFactory');
+goog.require('anychart.core.utils.IInteractiveSeries');
+goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.PointContextProvider');
 goog.require('anychart.data.Set');
 goog.require('anychart.enums');
@@ -20,10 +22,17 @@ goog.require('anychart.scales');
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Value to set.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @extends {anychart.core.Chart}
+ * @implements {anychart.core.utils.IInteractiveSeries}
  * @constructor
  */
 anychart.charts.Sparkline = function(opt_data, opt_csvSettings) {
   goog.base(this);
+
+  /**
+   * Interactivity state.
+   * @type {anychart.core.utils.InteractivityState}
+   */
+  this.state = new anychart.core.utils.InteractivityState(this);
 
   /**
    * @type {anychart.scales.Base}
@@ -416,6 +425,30 @@ anychart.charts.Sparkline.prototype.hoverMode = function(opt_value) {
   }
   return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
 };
+
+
+/** @inheritDoc */
+anychart.charts.Sparkline.prototype.getPoint = function(index) {
+  return null;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Sparkline.prototype.isDiscreteBased = function() {
+  return false;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Sparkline.prototype.applyAppearanceToSeries = goog.nullFunction;
+
+
+/** @inheritDoc */
+anychart.charts.Sparkline.prototype.applyAppearanceToPoint = goog.nullFunction;
+
+
+/** @inheritDoc */
+anychart.charts.Sparkline.prototype.finalizePointAppearance = goog.nullFunction;
 
 
 /**
