@@ -210,6 +210,7 @@ anychart.core.stock.series.Base.SeriesTypesMap = {};
  */
 anychart.core.stock.series.Base.prototype.data = function(opt_value, opt_mappingSettings, opt_csvSettings) {
   if (goog.isDef(opt_value)) {
+    this.chart.suspendSignalsDispatching();
     var data;
     // deregistering data source
     if (this.data_) {
@@ -258,6 +259,7 @@ anychart.core.stock.series.Base.prototype.data = function(opt_value, opt_mapping
     } else {
       this.dataSource_ = null;
     }
+    this.chart.resumeSignalsDispatching(true);
     return this;
   }
   return this.dataSource_;
@@ -803,7 +805,7 @@ anychart.core.stock.series.Base.prototype.getLegendItemData = function(itemsText
     itemText = itemsTextFormatter.call(format, format);
   }
   if (!goog.isString(itemText)) {
-    itemText = /** @type {string} */(this.name()) + ': ' + this.getLegendValue(format);
+    itemText = /** @type {string} */(this.name()) + this.getLegendValue(format);
   }
 
   var ret = {
@@ -842,7 +844,7 @@ anychart.core.stock.series.Base.prototype.name = function(opt_value) {
  * @return {string}
  */
 anychart.core.stock.series.Base.prototype.getLegendValue = function(format) {
-  return anychart.utils.toNumber(format['value']).toFixed(2);
+  return isNaN(format['value']) ? '' : (': ' + anychart.utils.toNumber(format['value']).toFixed(2));
 };
 
 

@@ -2,10 +2,12 @@ goog.provide('anychart.data.Table');
 goog.require('anychart.core.Base');
 goog.require('anychart.core.utils.IIntervalGenerator');
 goog.require('anychart.data.TableAggregatedStorage');
+goog.require('anychart.data.TableComputer');
 goog.require('anychart.data.TableMainStorage');
 goog.require('anychart.data.TableMapping');
 goog.require('anychart.data.aggregators');
 goog.require('anychart.enums');
+goog.require('goog.array');
 
 
 
@@ -35,10 +37,31 @@ anychart.data.Table = function(opt_keyColumn) {
 
   /**
    * Map of column indexes by column definition hash.
-   * @type {Object.<string, number>}
+   * @type {!Object.<string, number>}
    * @private
    */
   this.columnsMap_ = {};
+
+  /**
+   * Map of computed column aliases.
+   * @type {!Object.<string, number>}
+   * @private
+   */
+  this.computedColumnsAliases_ = {};
+
+  /**
+   * Count of registered computed columns.
+   * @type {number}
+   * @private
+   */
+  this.computedColumnsCount_ = 0;
+
+  /**
+   * Array of computed column indexes that can be reused.
+   * @type {!Array.<number>}
+   * @private
+   */
+  this.reusableComputedColumns_ = [];
 
   /**
    * Aggregators by column.
@@ -46,6 +69,20 @@ anychart.data.Table = function(opt_keyColumn) {
    * @private
    */
   this.aggregators_ = [];
+
+  /**
+   * An array of registered computers.
+   * @type {!Array.<!anychart.data.TableComputer>}
+   * @private
+   */
+  this.computers_ = [];
+
+  /**
+   * For each computer designates the right-most calculated column it writes to.
+   * @type {Array}
+   * @private
+   */
+  this.computerRightMostFields_ = [];
 };
 goog.inherits(anychart.data.Table, anychart.core.Base);
 
@@ -146,6 +183,67 @@ anychart.data.Table.prototype.mapAs = function(opt_fields) {
 
 
 /**
+ * Creates new computer with given input fields.
+ * @param {(anychart.data.TableMapping|Object.<
+ *    ({column:(number|string),type:anychart.enums.AggregationType,weights:(number|string)}|number|string)
+ *    >)=} opt_mappingSettingsOrMapping Input mapping settings for the computer.
+ * @return {?anychart.data.TableComputer}
+ */
+anychart.data.Table.prototype.createComputer = function(opt_mappingSettingsOrMapping) {
+  var mapping;
+  if (opt_mappingSettingsOrMapping instanceof anychart.data.TableMapping) {
+    mapping = /** @type {anychart.data.TableMapping} */(opt_mappingSettingsOrMapping);
+    if (mapping.getTable() != this) {
+      anychart.utils.error(anychart.enums.ErrorCode.TABLE_MAPPING_DIFFERENT_TABLE);
+      return null;
+    }
+  } else {
+    mapping = this.mapAs(opt_mappingSettingsOrMapping);
+  }
+  var res = new anychart.data.TableComputer(mapping, this.computers_.length);
+  this.computers_.push(res);
+  this.computerRightMostFields_.push(-1); // means that no field is written by this computer
+  return res;
+};
+
+
+/**
+ * Deregisters passed computer.
+ * @param {anychart.data.TableComputer} computer
+ */
+anychart.data.Table.prototype.deregisterComputer = function(computer) {
+  var index = computer.getIndex();
+  this.computers_.splice(index, 1);
+  this.computerRightMostFields_.splice(index, 1);
+  var fields = computer.getOutputFields();
+  if (fields.length) {
+    goog.array.sort(this.reusableComputedColumns_);
+    // todo(Anton Saukh): maybe do something here to avoid quadratic performance
+    var itemsToRemove = [];
+    var minField = Number.POSITIVE_INFINITY;
+    for (var i = 0; i < fields.length; i++) {
+      var field = ~fields[i];
+      minField = Math.min(minField, field);
+      this.reusableComputedColumns_.push(field);
+      for (var j in this.computedColumnsAliases_) {
+        if (this.computedColumnsAliases_[j] == fields[i]) {
+          itemsToRemove.push(j);
+          break;
+        }
+      }
+    }
+    this.reusableComputedColumns_.sort();
+    for (i = 0; i < itemsToRemove.length; i++)
+      delete this.computedColumnsAliases_[itemsToRemove[i]];
+
+    this.storage_.lastComputedColumn = Math.min(this.storage_.lastComputedColumn, minField);
+    for (var hash in this.aggregates_)
+      this.aggregates_[hash].lastComputedColumn = Math.min(this.aggregates_[hash].lastComputedColumn, minField);
+  }
+};
+
+
+/**
  * Registers a combination of aggregation type and source column and returns a number of column, where it will be placed.
  * If this combination was already registered - returns reused column index.
  * @param {number|string} sourceColumn
@@ -170,26 +268,69 @@ anychart.data.Table.prototype.registerField = function(sourceColumn, opt_aggrega
 
 
 /**
+ * Returns computed column index by alias. If the alias doesn't exist - returns NaN.
+ * @param {string} alias
+ * @return {number}
+ */
+anychart.data.Table.prototype.getComputedColumnIndexByAlias = function(alias) {
+  return this.computedColumnsAliases_[alias] || NaN;
+};
+
+
+/**
+ * Registers new computed column. An alias name for the column can be passed. The alias should be unique for the table.
+ * Returns an index of the new column or NaN in case of errors. The index is a negative integer, starting from -1 and
+ * growing downwards.
+ * @param {anychart.data.TableComputer} computer
+ * @param {string=} opt_name
+ * @return {number}
+ */
+anychart.data.Table.prototype.registerComputedField = function(computer, opt_name) {
+  if (computer.getTable() != this) return NaN;
+  var nextIndex;
+  var indexReused = this.reusableComputedColumns_.length;
+  if (indexReused) {
+    nextIndex = ~this.reusableComputedColumns_[0];
+  } else {
+    nextIndex = ~this.computedColumnsCount_;
+  }
+  if (goog.isString(opt_name)) {
+    if (opt_name in this.computedColumnsAliases_) {
+      anychart.utils.error(anychart.enums.ErrorCode.TABLE_FIELD_NAME_DUPLICATE, undefined, [opt_name]);
+      return NaN;
+    }
+    this.computedColumnsAliases_[opt_name] = nextIndex;
+  }
+  this.computerRightMostFields_[computer.getIndex()] = Math.max(this.computerRightMostFields_[computer.getIndex()], nextIndex);
+  if (indexReused)
+    this.reusableComputedColumns_.shift();
+  else
+    this.computedColumnsCount_++;
+  return nextIndex;
+};
+
+
+/**
  * Returns requested aggregate over the table storage.
  * @param {anychart.core.utils.IIntervalGenerator=} opt_interval
  * @return {!anychart.data.TableStorage}
  */
 anychart.data.Table.prototype.getStorage = function(opt_interval) {
+  /** @type {!anychart.data.TableStorage} */
+  var result;
   if (opt_interval) {
     var intervalHash = opt_interval.getHash();
-    /** @type {!anychart.data.TableAggregatedStorage} */
-    var result;
     if (intervalHash in this.aggregates_) {
       result = this.aggregates_[intervalHash];
     } else {
       result = new anychart.data.TableAggregatedStorage(this, opt_interval);
       this.aggregates_[intervalHash] = result;
     }
-    result.update();
-    return result;
   } else {
-    return this.storage_;
+    result = this.storage_;
   }
+  result.update();
+  return result;
 };
 
 
@@ -219,11 +360,43 @@ anychart.data.Table.prototype.getAggregators = function() {
 };
 
 
+/**
+ * Returns computers array.
+ * @return {!Array.<!anychart.data.TableComputer>}
+ */
+anychart.data.Table.prototype.getComputers = function() {
+  return this.computers_;
+};
+
+
+/**
+ * Returns the number of computed columns.
+ * @return {number}
+ */
+anychart.data.Table.prototype.getComputedColumnsCount = function() {
+  return this.computedColumnsCount_;
+};
+
+
+/**
+ * Returns what it says.
+ * @param {number} index
+ * @return {number}
+ */
+anychart.data.Table.prototype.getRightMostFieldByComputerIndex = function(index) {
+  return this.computerRightMostFields_[index];
+};
+
+
 /** @inheritDoc */
 anychart.data.Table.prototype.disposeInternal = function() {
+  this.suspendSignalsDispatching();
   delete this.storage_;
   delete this.aggregators_;
   delete this.aggregates_;
+  goog.disposeAll(this.computers_);
+  delete this.computers_;
+  this.resumeSignalsDispatching(false);
 
   goog.base(this, 'disposeInternal');
 };
@@ -249,3 +422,4 @@ anychart.data.Table.prototype['addData'] = anychart.data.Table.prototype.addData
 anychart.data.Table.prototype['remove'] = anychart.data.Table.prototype.remove;
 anychart.data.Table.prototype['removeFirst'] = anychart.data.Table.prototype.removeFirst;
 anychart.data.Table.prototype['mapAs'] = anychart.data.Table.prototype.mapAs;
+anychart.data.Table.prototype['createComputer'] = anychart.data.Table.prototype.createComputer;

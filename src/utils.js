@@ -1307,6 +1307,15 @@ anychart.utils.getErrorDescription = function(code, opt_arguments) {
     case anychart.enums.ErrorCode.CSV_PARSING_FAILED:
       return 'CSV parsing failed.';
 
+    case anychart.enums.ErrorCode.TABLE_MAPPING_DIFFERENT_TABLE:
+      return 'Cannot create a computer on the table with the mapping of another table.';
+
+    case anychart.enums.ErrorCode.TABLE_FIELD_NAME_DUPLICATE:
+      return 'Cannot create computed field "' + opt_arguments[0] + '" - field name should be unique for the table';
+
+    case anychart.enums.ErrorCode.TABLE_COMPUTER_OUTPUT_FIELD_DUPLICATE:
+      return 'Cannot create output field "' + opt_arguments[0] + '" on the computer - field with this name already exists';
+
     default:
       return 'Unknown error occurred. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report.';

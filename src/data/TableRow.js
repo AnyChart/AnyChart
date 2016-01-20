@@ -48,6 +48,13 @@ anychart.data.TableRow = function(key, values) {
 
 
 /**
+ * Calculated values array.
+ * @type {?Array}
+ */
+anychart.data.TableRow.prototype.computedValues = null;
+
+
+/**
  * Number of instances. Used to maintain order on items - the item created later replaces item created earlier.
  * @type {number}
  * @private

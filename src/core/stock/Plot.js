@@ -3,6 +3,7 @@ goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.axes.StockDateTime');
 goog.require('anychart.core.grids.Stock');
+goog.require('anychart.core.stock.indicators');
 goog.require('anychart.core.stock.series');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.Legend');
@@ -22,7 +23,7 @@ goog.require('goog.fx.Dragger');
 
 /**
  * Stock Plot class.
- * @param {anychart.charts.Stock} chart Stock chart reference.
+ * @param {!anychart.charts.Stock} chart Stock chart reference.
  * @constructor
  * @extends {anychart.core.VisualBaseWithBounds}
  */
@@ -31,7 +32,7 @@ anychart.core.stock.Plot = function(chart) {
 
   /**
    * Parent chart reference.
-   * @type {anychart.charts.Stock}
+   * @type {!anychart.charts.Stock}
    * @private
    */
   this.chart_ = chart;
@@ -49,6 +50,13 @@ anychart.core.stock.Plot = function(chart) {
    * @private
    */
   this.series_ = [];
+
+  /**
+   * Indicators list.
+   * @type {!Array.<!goog.Disposable>}
+   * @private
+   */
+  this.indicators_ = [];
 
   /**
    * Default plot Y scale.
@@ -184,6 +192,15 @@ anychart.core.stock.Plot.prototype.defaultSeriesType = function(opt_value) {
 };
 
 
+/**
+ * Returns stock chart.
+ * @return {!anychart.charts.Stock}
+ */
+anychart.core.stock.Plot.prototype.getChart = function() {
+  return this.chart_;
+};
+
+
 //region Series-related methods
 /**
  * Creates and returns a new column series.
@@ -199,7 +216,7 @@ anychart.core.stock.Plot.prototype.defaultSeriesType = function(opt_value) {
  * @return {anychart.core.stock.series.Base}
  */
 anychart.core.stock.Plot.prototype.column = function(opt_data, opt_mappingSettings, opt_csvSettings) {
-  return this.createSeriesByType_(anychart.enums.StockSeriesType.COLUMN, opt_data, opt_mappingSettings, opt_csvSettings);
+  return this.createSeriesByType(anychart.enums.StockSeriesType.COLUMN, opt_data, opt_mappingSettings, opt_csvSettings);
 };
 
 
@@ -217,7 +234,7 @@ anychart.core.stock.Plot.prototype.column = function(opt_data, opt_mappingSettin
  * @return {anychart.core.stock.series.Base}
  */
 anychart.core.stock.Plot.prototype.line = function(opt_data, opt_mappingSettings, opt_csvSettings) {
-  return this.createSeriesByType_(anychart.enums.StockSeriesType.LINE, opt_data, opt_mappingSettings, opt_csvSettings);
+  return this.createSeriesByType(anychart.enums.StockSeriesType.LINE, opt_data, opt_mappingSettings, opt_csvSettings);
 };
 
 
@@ -235,7 +252,7 @@ anychart.core.stock.Plot.prototype.line = function(opt_data, opt_mappingSettings
  * @return {anychart.core.stock.series.Base}
  */
 anychart.core.stock.Plot.prototype.ohlc = function(opt_data, opt_mappingSettings, opt_csvSettings) {
-  return this.createSeriesByType_(anychart.enums.StockSeriesType.OHLC, opt_data, opt_mappingSettings, opt_csvSettings);
+  return this.createSeriesByType(anychart.enums.StockSeriesType.OHLC, opt_data, opt_mappingSettings, opt_csvSettings);
 };
 
 
@@ -249,12 +266,12 @@ anychart.core.stock.Plot.prototype.addSeries = function(var_args) {
   var type = /** @type {string} */ (this.defaultSeriesType());
   var count = arguments.length;
   this.suspendSignalsDispatching();
-  if (!count)
-    rv.push(this.createSeriesByType_(type, null, undefined, undefined));
-  else {
+  if (count) {
     for (var i = 0; i < count; i++) {
-      rv.push(this.createSeriesByType_(type, arguments[i], undefined, undefined));
+      rv.push(this.createSeriesByType(type, arguments[i]));
     }
+  } else {
+    rv.push(this.createSeriesByType(type, null));
   }
   this.resumeSignalsDispatching(true);
   return rv;
@@ -361,6 +378,82 @@ anychart.core.stock.Plot.prototype.getAllSeries = function() {
 
 
 /**
+ * Creates EMA indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.EMA}
+ */
+anychart.core.stock.Plot.prototype.ema = function(mapping, opt_period, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.EMA(this, mapping, opt_period, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates MACD indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_fastPeriod
+ * @param {number=} opt_slowPeriod
+ * @param {number=} opt_signalPeriod
+ * @param {anychart.enums.StockSeriesType=} opt_macdSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_signalSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_histogramSeriesType
+ * @return {anychart.core.stock.indicators.MACD}
+ */
+anychart.core.stock.Plot.prototype.macd = function(mapping, opt_fastPeriod, opt_slowPeriod, opt_signalPeriod,
+    opt_macdSeriesType, opt_signalSeriesType, opt_histogramSeriesType) {
+  var result = new anychart.core.stock.indicators.MACD(this, mapping, opt_fastPeriod, opt_slowPeriod, opt_signalPeriod,
+      opt_macdSeriesType, opt_signalSeriesType, opt_histogramSeriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates RoC indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.RoC}
+ */
+anychart.core.stock.Plot.prototype.roc = function(mapping, opt_period, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.RoC(this, mapping, opt_period, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates RSI indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.RSI}
+ */
+anychart.core.stock.Plot.prototype.rsi = function(mapping, opt_period, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.RSI(this, mapping, opt_period, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates SMA indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.SMA}
+ */
+anychart.core.stock.Plot.prototype.sma = function(mapping, opt_period, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.SMA(this, mapping, opt_period, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
  * Getter/setter for series default settings.
  * @param {Object} value Object with default series settings.
  */
@@ -380,10 +473,9 @@ anychart.core.stock.Plot.prototype.setDefaultSeriesSettings = function(value) {
  *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
  *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
  * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
- * @private
  * @return {anychart.core.stock.series.Base}
  */
-anychart.core.stock.Plot.prototype.createSeriesByType_ = function(type, opt_data, opt_mappingSettings, opt_csvSettings) {
+anychart.core.stock.Plot.prototype.createSeriesByType = function(type, opt_data, opt_mappingSettings, opt_csvSettings) {
   type = anychart.enums.normalizeStockSeriesType(type);
   var ctl = anychart.core.stock.series.Base.SeriesTypesMap[type];
   var instance;
@@ -1027,7 +1119,7 @@ anychart.core.stock.Plot.prototype.highlight = function(value) {
     this.dateTimeHighlighter_.lineTo(x, this.seriesBounds_.getBottom());
     if (!this.dateTimeHighlighter_.parent())
       this.rootLayer_.addChild(this.dateTimeHighlighter_);
-  } else {
+  } else if (this.dateTimeHighlighter_) {
     this.dateTimeHighlighter_.remove();
   }
 
@@ -1250,6 +1342,9 @@ anychart.core.stock.Plot.prototype.disposeInternal = function() {
   goog.dispose(this.background_);
   this.background_ = null;
 
+  goog.disposeAll(this.indicators_);
+  delete this.indicators_;
+
   goog.disposeAll(this.series_);
   delete this.series_;
 
@@ -1259,7 +1354,7 @@ anychart.core.stock.Plot.prototype.disposeInternal = function() {
   goog.disposeAll(this.xAxis_);
   this.xAxis_ = null;
 
-  this.chart_ = null;
+  delete this.chart_;
 
   goog.base(this, 'disposeInternal');
 };
@@ -1458,7 +1553,7 @@ anychart.core.stock.Plot.prototype.setupByJSON = function(config) {
       json = series[i];
       var seriesType = (json['seriesType'] || this.defaultSeriesType()).toLowerCase();
       var data = json['data'];
-      var seriesInst = this.createSeriesByType_(seriesType, data);
+      var seriesInst = this.createSeriesByType(seriesType, data);
       if (seriesInst) {
         seriesInst.setup(json);
         if (goog.isObject(json)) {
@@ -1592,3 +1687,8 @@ anychart.core.stock.Plot.prototype['getSeriesCount'] = anychart.core.stock.Plot.
 anychart.core.stock.Plot.prototype['removeSeries'] = anychart.core.stock.Plot.prototype.removeSeries;
 anychart.core.stock.Plot.prototype['removeSeriesAt'] = anychart.core.stock.Plot.prototype.removeSeriesAt;
 anychart.core.stock.Plot.prototype['removeAllSeries'] = anychart.core.stock.Plot.prototype.removeAllSeries;
+anychart.core.stock.Plot.prototype['ema'] = anychart.core.stock.Plot.prototype.ema;
+anychart.core.stock.Plot.prototype['macd'] = anychart.core.stock.Plot.prototype.macd;
+anychart.core.stock.Plot.prototype['roc'] = anychart.core.stock.Plot.prototype.roc;
+anychart.core.stock.Plot.prototype['rsi'] = anychart.core.stock.Plot.prototype.rsi;
+anychart.core.stock.Plot.prototype['sma'] = anychart.core.stock.Plot.prototype.sma;

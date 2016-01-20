@@ -3018,7 +3018,7 @@ window['anychart']['themes']['defaultTheme'] = {
               var val = this['value'];
               if (val === undefined) val = this['close'];
               val = parseFloat(val).toFixed(4);
-              return this['seriesName'] + ': ' + this['valuePrefix'] + val + this['valuePostfix'];
+              return this['seriesName'] + (isNaN(val) ? '' : (': ' + this['valuePrefix'] + val + this['valuePostfix']));
             }
           },
           'legendItem': {'iconStroke': 'none'}

@@ -178,6 +178,7 @@ anychart.core.stock.scrollerSeries.Base.SeriesTypesMap = {};
  */
 anychart.core.stock.scrollerSeries.Base.prototype.data = function(opt_value, opt_mappingSettings, opt_csvSettings) {
   if (goog.isDef(opt_value)) {
+    this.scroller.getChart().suspendSignalsDispatching();
     var data;
     // deregistering data source
     if (this.data_) {
@@ -226,6 +227,7 @@ anychart.core.stock.scrollerSeries.Base.prototype.data = function(opt_value, opt
     } else {
       this.dataSource_ = null;
     }
+    this.scroller.getChart().resumeSignalsDispatching(true);
     return this;
   }
   return this.dataSource_;

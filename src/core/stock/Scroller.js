@@ -1,5 +1,6 @@
 goog.provide('anychart.core.stock.Scroller');
 goog.require('anychart.core.axes.StockDateTime');
+goog.require('anychart.core.stock.indicators');
 goog.require('anychart.core.stock.scrollerSeries');
 goog.require('anychart.core.ui.Scroller');
 goog.require('anychart.scales');
@@ -30,6 +31,13 @@ anychart.core.stock.Scroller = function(chart) {
    * @private
    */
   this.series_ = [];
+
+  /**
+   * Indicators list.
+   * @type {!Array.<!goog.Disposable>}
+   * @private
+   */
+  this.indicators_ = [];
 
   /**
    * Default scroller Y scale.
@@ -157,7 +165,7 @@ anychart.core.stock.Scroller.prototype.xAxis = function(opt_value) {
  * @return {anychart.core.stock.scrollerSeries.Base}
  */
 anychart.core.stock.Scroller.prototype.column = function(opt_data, opt_mappingSettings, opt_csvSettings) {
-  return this.createSeriesByType_(anychart.enums.StockSeriesType.COLUMN, opt_data, opt_mappingSettings, opt_csvSettings);
+  return this.createSeriesByType(anychart.enums.StockSeriesType.COLUMN, opt_data, opt_mappingSettings, opt_csvSettings);
 };
 
 
@@ -175,7 +183,7 @@ anychart.core.stock.Scroller.prototype.column = function(opt_data, opt_mappingSe
  * @return {anychart.core.stock.scrollerSeries.Base}
  */
 anychart.core.stock.Scroller.prototype.line = function(opt_data, opt_mappingSettings, opt_csvSettings) {
-  return this.createSeriesByType_(anychart.enums.StockSeriesType.LINE, opt_data, opt_mappingSettings, opt_csvSettings);
+  return this.createSeriesByType(anychart.enums.StockSeriesType.LINE, opt_data, opt_mappingSettings, opt_csvSettings);
 };
 
 
@@ -193,7 +201,7 @@ anychart.core.stock.Scroller.prototype.line = function(opt_data, opt_mappingSett
  * @return {anychart.core.stock.scrollerSeries.Base}
  */
 anychart.core.stock.Scroller.prototype.ohlc = function(opt_data, opt_mappingSettings, opt_csvSettings) {
-  return this.createSeriesByType_(anychart.enums.StockSeriesType.OHLC, opt_data, opt_mappingSettings, opt_csvSettings);
+  return this.createSeriesByType(anychart.enums.StockSeriesType.OHLC, opt_data, opt_mappingSettings, opt_csvSettings);
 };
 
 
@@ -203,18 +211,15 @@ anychart.core.stock.Scroller.prototype.ohlc = function(opt_data, opt_mappingSett
  * @return {Array.<anychart.core.stock.scrollerSeries.Base>} Array of created series.
  */
 anychart.core.stock.Scroller.prototype.addSeries = function(var_args) {
-  var zIndex;
   var rv = [];
   var type = /** @type {string} */ (this.defaultSeriesType());
   var count = arguments.length;
   this.suspendSignalsDispatching();
-  if (!count)
-    rv.push(this.createSeriesByType_(type, null, undefined, undefined));
-  else {
+  if (count) {
     for (var i = 0; i < count; i++) {
-      rv.push(this.createSeriesByType_(type, arguments[i], undefined, undefined));
+      rv.push(this.createSeriesByType(type, arguments[i]));
     }
-  }
+  } else rv.push(this.createSeriesByType(type, null));
   this.resumeSignalsDispatching(true);
   return rv;
 };
@@ -318,6 +323,82 @@ anychart.core.stock.Scroller.prototype.getAllSeries = function() {
 
 
 /**
+ * Creates EMA indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.EMA}
+ */
+anychart.core.stock.Scroller.prototype.ema = function(mapping, opt_period, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.EMA(this, mapping, opt_period, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates MACD indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_fastPeriod
+ * @param {number=} opt_slowPeriod
+ * @param {number=} opt_signalPeriod
+ * @param {anychart.enums.StockSeriesType=} opt_macdSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_signalSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_histogramSeriesType
+ * @return {anychart.core.stock.indicators.MACD}
+ */
+anychart.core.stock.Scroller.prototype.macd = function(mapping, opt_fastPeriod, opt_slowPeriod, opt_signalPeriod,
+    opt_macdSeriesType, opt_signalSeriesType, opt_histogramSeriesType) {
+  var result = new anychart.core.stock.indicators.MACD(this, mapping, opt_fastPeriod, opt_slowPeriod, opt_signalPeriod,
+      opt_macdSeriesType, opt_signalSeriesType, opt_histogramSeriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates RoC indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.RoC}
+ */
+anychart.core.stock.Scroller.prototype.roc = function(mapping, opt_period, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.RoC(this, mapping, opt_period, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates RSI indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.RSI}
+ */
+anychart.core.stock.Scroller.prototype.rsi = function(mapping, opt_period, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.RSI(this, mapping, opt_period, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates SMA indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.SMA}
+ */
+anychart.core.stock.Scroller.prototype.sma = function(mapping, opt_period, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.SMA(this, mapping, opt_period, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
  * Getter/setter for series default settings.
  * @param {Object} value Object with default series settings.
  */
@@ -337,10 +418,9 @@ anychart.core.stock.Scroller.prototype.setDefaultSeriesSettings = function(value
  *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
  *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
  * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
- * @private
  * @return {anychart.core.stock.scrollerSeries.Base}
  */
-anychart.core.stock.Scroller.prototype.createSeriesByType_ = function(type, opt_data, opt_mappingSettings,
+anychart.core.stock.Scroller.prototype.createSeriesByType = function(type, opt_data, opt_mappingSettings,
     opt_csvSettings) {
   type = anychart.enums.normalizeStockSeriesType(type);
   var ctl = anychart.core.stock.scrollerSeries.Base.SeriesTypesMap[type];
@@ -557,8 +637,11 @@ anychart.core.stock.Scroller.prototype.updateBoundsCache = function() {
 anychart.core.stock.Scroller.prototype.disposeInternal = function() {
   delete this.chart_;
 
+  goog.disposeAll(this.indicators_);
+  delete this.indicators_;
+
   goog.disposeAll(this.series_);
-  this.series_.length = 0;
+  delete this.series_;
 
   goog.dispose(this.seriesContainer_);
   goog.dispose(this.selectedSeriesContainer_);
@@ -635,7 +718,7 @@ anychart.core.stock.Scroller.prototype.setupByJSON = function(config) {
       json = series[i];
       var seriesType = (json['seriesType'] || this.defaultSeriesType()).toLowerCase();
       var data = json['data'];
-      var seriesInst = this.createSeriesByType_(seriesType, data);
+      var seriesInst = this.createSeriesByType(seriesType, data);
       if (seriesInst) {
         seriesInst.setup(json);
         if (goog.isObject(json)) {
@@ -661,3 +744,8 @@ anychart.core.stock.Scroller.prototype['getSeriesCount'] = anychart.core.stock.S
 anychart.core.stock.Scroller.prototype['removeSeries'] = anychart.core.stock.Scroller.prototype.removeSeries;
 anychart.core.stock.Scroller.prototype['removeSeriesAt'] = anychart.core.stock.Scroller.prototype.removeSeriesAt;
 anychart.core.stock.Scroller.prototype['removeAllSeries'] = anychart.core.stock.Scroller.prototype.removeAllSeries;
+anychart.core.stock.Scroller.prototype['ema'] = anychart.core.stock.Scroller.prototype.ema;
+anychart.core.stock.Scroller.prototype['macd'] = anychart.core.stock.Scroller.prototype.macd;
+anychart.core.stock.Scroller.prototype['roc'] = anychart.core.stock.Scroller.prototype.roc;
+anychart.core.stock.Scroller.prototype['rsi'] = anychart.core.stock.Scroller.prototype.rsi;
+anychart.core.stock.Scroller.prototype['sma'] = anychart.core.stock.Scroller.prototype.sma;

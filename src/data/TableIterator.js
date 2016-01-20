@@ -149,7 +149,16 @@ anychart.data.TableIterator.prototype.get = function(field) {
  * @return {*}
  */
 anychart.data.TableIterator.prototype.getColumn = function(column) {
-  return this.currentExists_ ? this.current_.values[column] : undefined;
+  var result;
+  if (this.currentExists_) {
+    if (goog.isNumber(column) && column < 0) {
+      if (this.current_.computedValues)
+        result = this.current_.computedValues[~column];
+    } else {
+      result = this.current_.values[column];
+    }
+  }
+  return result; // may by undefined
 };
 
 

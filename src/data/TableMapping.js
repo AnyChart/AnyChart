@@ -56,11 +56,8 @@ goog.inherits(anychart.data.TableMapping, anychart.core.Base);
 /**
  * Internal descriptor of the field
  * @typedef {{
- *   aggregationType: anychart.enums.AggregationType,
  *   sourceColumn: (number|string),
- *   weightsColumn: (number|string),
- *   resultColumn: number,
- *   artificial: boolean
+ *   resultColumn: number
  * }}
  */
 anychart.data.TableMapping.Field;
@@ -85,24 +82,45 @@ anychart.data.TableMapping.prototype.createSelectable = function() {
  * @return {anychart.data.TableMapping} This for chaining.
  */
 anychart.data.TableMapping.prototype.addField = function(name, column, opt_type, opt_weightsColumn) {
-  var sourceColumn = goog.isString(column) ?
-      column :
-      anychart.utils.normalizeToNaturalNumber(column, NaN, true);
-  var weightsColumn = goog.isString(opt_weightsColumn) ?
-      opt_weightsColumn :
-      anychart.utils.normalizeToNaturalNumber(opt_weightsColumn, NaN, true);
-  var type = anychart.enums.normalizeAggregationType(goog.isDef(opt_type) ? opt_type : name);
-  if (type == anychart.enums.AggregationType.WEIGHTED_AVERAGE && goog.isNumber(weightsColumn) && isNaN(weightsColumn))
-    type = anychart.enums.AggregationType.AVERAGE;
-  if (goog.isString(sourceColumn) || !isNaN(sourceColumn)) {
-    this.table_.suspendSignalsDispatching();
-    var resultColumn = this.table_.registerField(sourceColumn, opt_type, weightsColumn);
+  var sourceColumn;
+  if (goog.isNumber(column)) {
+    sourceColumn = Math.round(anychart.utils.toNumber(column));
+  } else if (goog.isString(column)) {
+    sourceColumn = this.table_.getComputedColumnIndexByAlias(column);
+    if (isNaN(sourceColumn)) { // column is not known to be a computed field alias - that's probably a source field name
+      sourceColumn = column;
+    }
+  } else {
+    return this; // invalid mapping, ignoring.
+  }
+  if (goog.isNumber(sourceColumn) && sourceColumn < 0) { // that's a computed field - no need to notify table
+    // if it is a computed field - it has the same index in both aggregated and non-aggregated storages.
     this.fields_[name] = {
-      aggregationType: type,
       sourceColumn: sourceColumn,
-      weightsColumn: weightsColumn,
-      resultColumn: resultColumn,
-      artificial: false
+      resultColumn: sourceColumn
+    };
+  } else if (goog.isString(sourceColumn) || !isNaN(sourceColumn)) {
+    var type = anychart.enums.normalizeAggregationType(goog.isDef(opt_type) ? opt_type : name);
+    var weightsColumn;
+    if (type == anychart.enums.AggregationType.WEIGHTED_AVERAGE) {
+      if (goog.isNumber(opt_weightsColumn)) {
+        weightsColumn = Math.round(anychart.utils.toNumber(opt_weightsColumn));
+      } else if (goog.isString(opt_weightsColumn)) {
+        weightsColumn = this.table_.getComputedColumnIndexByAlias(opt_weightsColumn);
+        if (isNaN(weightsColumn)) { // column is not known to be a computed field alias - that's probably a source field name
+          weightsColumn = opt_weightsColumn;
+        }
+      } else {
+        weightsColumn = NaN;
+      }
+      if (goog.isNumber(weightsColumn) && isNaN(weightsColumn)) // it can be only a string or a number or NaN
+        type = anychart.enums.AggregationType.AVERAGE;
+    } // else weightsColumn remains undefined
+    this.table_.suspendSignalsDispatching();
+    var resultColumn = this.table_.registerField(sourceColumn, type, weightsColumn);
+    this.fields_[name] = {
+      sourceColumn: sourceColumn,
+      resultColumn: resultColumn
     };
     this.table_.resumeSignalsDispatching(true);
   }

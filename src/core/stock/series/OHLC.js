@@ -161,7 +161,7 @@ anychart.core.stock.series.OHLC.prototype.colorizePoints = function() {
 
 /** @inheritDoc */
 anychart.core.stock.series.OHLC.prototype.getLegendValue = function(format) {
-  return anychart.utils.toNumber(format['close']).toFixed(2);
+  return isNaN(format['close']) ? '' : (': ' + anychart.utils.toNumber(format['close']).toFixed(2));
 };
 
 

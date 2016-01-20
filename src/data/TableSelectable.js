@@ -1,4 +1,5 @@
 goog.provide('anychart.data.TableSelectable');
+goog.provide('anychart.data.TableSelectable.RowProxy');
 goog.require('anychart.core.utils.DateTimeIntervalGenerator');
 goog.require('anychart.data.TableIterator');
 
@@ -240,7 +241,9 @@ anychart.data.TableSelectable.prototype.getMapping = function() {
  * @return {number}
  */
 anychart.data.TableSelectable.prototype.getColumnMin = function(column) {
-  var res = this.currentSelection_.mins[column];
+  var res = (goog.isNumber(column) && column < 0) ?
+      this.currentSelection_.calcMins[~column] :
+      this.currentSelection_.mins[column];
   return goog.isDef(res) ? res : NaN;
 };
 
@@ -251,7 +254,9 @@ anychart.data.TableSelectable.prototype.getColumnMin = function(column) {
  * @return {number}
  */
 anychart.data.TableSelectable.prototype.getColumnMax = function(column) {
-  var res = this.currentSelection_.maxs[column];
+  var res = (goog.isNumber(column) && column < 0) ?
+      this.currentSelection_.calcMaxs[~column] :
+      this.currentSelection_.maxs[column];
   return goog.isDef(res) ? res : NaN;
 };
 
@@ -336,9 +341,9 @@ anychart.data.TableSelectable.IController.prototype.getCoIterator;
 anychart.data.TableSelectable.RowProxy = function(row, mapping, aggregated) {
   /**
    * @type {!anychart.data.TableRow}
-   * @private
+   * @protected
    */
-  this.row_ = row;
+  this.row = row;
 
   /**
    * @type {!anychart.data.TableMapping}
@@ -370,7 +375,14 @@ anychart.data.TableSelectable.RowProxy.prototype.get = function(field) {
  * @return {*}
  */
 anychart.data.TableSelectable.RowProxy.prototype.getColumn = function(column) {
-  return this.row_.values[column];
+  var result;
+  if (goog.isNumber(column) && column < 0) {
+    if (this.row.computedValues)
+      result = this.row.computedValues[~column];
+  } else {
+    result = this.row.values[column];
+  }
+  return result; // may by undefined
 };
 
 
@@ -379,7 +391,7 @@ anychart.data.TableSelectable.RowProxy.prototype.getColumn = function(column) {
  * @return {number}
  */
 anychart.data.TableSelectable.RowProxy.prototype.getKey = function() {
-  return this.row_.key;
+  return this.row.key;
 };
 
 
