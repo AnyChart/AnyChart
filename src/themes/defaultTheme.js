@@ -1543,7 +1543,7 @@ window['anychart']['themes']['defaultTheme'] = {
       } else {
         color = this['sourceColor'];
       }
-      return window['anychart']['color']['setThickness'](color, 1 , .85);
+      return window['anychart']['color']['setThickness'](color, 1, .85);
     },
     /**
      * @this {*}
@@ -2849,10 +2849,12 @@ window['anychart']['themes']['defaultTheme'] = {
           'color': '#545f69',
           'dash': '3 3'
         },
+
         'editPreviewFill': {
           'color': '#fff',
           'opacity': 0.00001
         },
+
         'editPreviewStroke': {
           'color': '#aaa',
           'dash': '3 3'
@@ -2864,6 +2866,21 @@ window['anychart']['themes']['defaultTheme'] = {
         'editIntervalThumbStroke': '#545f69',
         'editConnectorThumbFill': '#EAEAEA',
         'editConnectorThumbStroke': '#545f69',
+
+        'editStructurePreviewFill': {
+          'color': '#4285F4',
+          'opacity': 0.2
+        },
+
+        'editStructurePreviewStroke': {
+          'color': '#4285F4',
+          'thickness': 2
+        },
+
+        'editStructurePreviewDashStroke': {
+          'color': '#4285F4',
+          'dash': '4 4'
+        },
 
         'baseFill': '#7ec1f5',
         'baseStroke': '#74b2e2',
@@ -2883,6 +2900,7 @@ window['anychart']['themes']['defaultTheme'] = {
         'connectorStroke': '#545f69',
         'selectedElementFill': '#ef6c00',
         'selectedElementStroke': '#bc5704',
+        'selectedConnectorStroke': '2 #bc5704',
         'minimumGap': 0.1,
         'maximumGap': 0.1,
         'baselineAbove': false,

@@ -965,7 +965,7 @@ anychart.data.Tree.DataItem.prototype.get = function(key) {
 
 
 /**
- * Sets key-value pair to the data.
+ * Sets value to the data by path.
  * @param {...*} var_args - Arguments.
  *  Note:
  *  1) Can take arguments like this:
@@ -1102,6 +1102,141 @@ anychart.data.Tree.DataItem.prototype.set = function(var_args) {
       anychart.utils.warning(anychart.enums.WarningCode.DATA_ITEM_SET_PATH);
     }
 
+  }
+
+  return this;
+};
+
+
+/**
+ * Removes from data by path specified.
+ * @param {...*} var_args - Arguments.
+ *
+ * Note:
+ * For example we have such a structure of object in item.get('a'):
+ *  <code>
+ *    'a': {          //Object 'a' - root object in data of tree data item
+ *      'b': {        //Object 'b' - Object item.get('a')['b']
+ *        'c': [      //Array 'c' as field of object 'c'
+ *          {         //0-element of array 'c'. Actually is an Object.
+ *            'd': [  //field 'd' of parent Object. Actually is array ['v1', 'v2', 'v3']
+ *              'v1',
+ *              'v2',
+ *              'v3'
+ *            ]
+ *          }
+ *        ]
+ *      }
+ *    }
+ *  </code>
+ *
+ *  1) Can take arguments like this:
+ *    <code>
+ *      item.delete(['a', 'b', 'c', 0, 'd', 1]);
+ *    </code>
+ *
+ *    It means that element with index 1 in destination array 'd' will be completely removed and
+ *    array 'd' will become ['v1', 'v3'].
+ *    In this case dispatched event will have the following structure:
+ *
+ *    <code>
+ *      {
+ *        type: 'treeItemUpdate',
+ *        item: treeDataItem,
+ *        field: 'a',
+ *        path: ['a', 'b', 'c', 0, 'd', 1],
+ *        value: 'v2'
+ *      }
+ *    </code>
+ *
+ *  2) The same behaviour is for this case:
+ *    <code>
+ *      item.delete('a', 'b', 'c', 0, 'd', 1);
+ *    </code>
+ *
+ *  3) This method deletes all the complex structure if path is set:
+ *    <code>
+ *       item.delete('a');
+ *       item.get('a'); //Will return 'undefined'.
+ *    </code>
+ *
+ *  4) Note: If path to be deleted caontains some errors, nothing will happen.
+ *  Sample of wrong data for the same sample object 'a':
+ *    <code>
+ *      item.delete('a', 'b', 'e', 0, 'd', 1);    //Incorrect name 'e' in path.
+ *      item.delete('a', 'b', 'c', 2, 'd', 1);    //Incorrect index 2 in path.
+ *      item.delete(['a', true, 'c', 0, 'd', 1]); //Incorrect (boolean) value in path
+ *      //... etc.
+ *    </code>
+ * @return {anychart.data.Tree.DataItem} - Itself for method chaining.
+ */
+anychart.data.Tree.DataItem.prototype.del = function(var_args) {
+  if (arguments.length) {
+    var keyOrPath = arguments[0];
+
+    var iter, key, item;
+
+    if (goog.isArray(keyOrPath)) { //got item.delete(['a', 'b', 0 ]);
+      iter = keyOrPath;
+      key = iter[0];
+    } else if (goog.isString(keyOrPath)) { //got item.delete('a', 'b', 0);
+      iter = arguments;
+      key = keyOrPath;
+    }
+
+    if (goog.isDef(iter)) {
+      var path = [];
+      var parent = this.data_;
+      var i;
+
+      //pre-check
+      for (i = 1; i < iter.length; i++) {
+        item = iter[i];
+        if (!goog.isNumber(item) && !goog.isString(item)) {
+          return this;
+        }
+      }
+
+      for (i = 0; i < iter.length; i++) {
+        item = iter[i];
+        path.push(item);
+
+        if (goog.isObject(parent) || goog.isArray(parent)) {
+          if (i == iter.length - 1) { //Exactly this should be deleted.
+            if (item in parent) {
+              var itemToBeDeleted = parent[item];
+              if (goog.isArray(parent)) {
+                goog.array.removeAt(parent, item);
+              } else { //is object.
+                delete parent[item];
+              }
+
+              this.tree_.removeFromIndex(this, key);
+              this.tree_.addToIndex(this, key);
+              this.tree_.dispatchSignal(anychart.Signal.DATA_CHANGED);
+
+              if (this.tree_.dispatchEvents()) {
+                var event = {
+                  'type': anychart.enums.EventType.TREE_ITEM_UPDATE,
+                  'item': this,
+                  'path': path,
+                  'field': path[0],
+                  'value': itemToBeDeleted
+                };
+
+                this.tree_.dispatchEvent(event);
+              }
+            } else {
+              return this;
+            }
+          } else {
+            parent = parent[item];
+          }
+        } else {
+          return this;
+        }
+      }
+    }
   }
 
   return this;
@@ -1520,6 +1655,7 @@ anychart.data.Tree.prototype['indexOfChild'] = anychart.data.Tree.prototype.inde
 anychart.data.Tree.DataItem.prototype['get'] = anychart.data.Tree.DataItem.prototype.get;
 anychart.data.Tree.DataItem.prototype['set'] = anychart.data.Tree.DataItem.prototype.set;
 anychart.data.Tree.DataItem.prototype['meta'] = anychart.data.Tree.DataItem.prototype.meta;
+anychart.data.Tree.DataItem.prototype['del'] = anychart.data.Tree.DataItem.prototype.del;
 anychart.data.Tree.DataItem.prototype['getParent'] = anychart.data.Tree.DataItem.prototype.getParent;
 anychart.data.Tree.DataItem.prototype['addChild'] = anychart.data.Tree.DataItem.prototype.addChild;
 anychart.data.Tree.DataItem.prototype['addChildAt'] = anychart.data.Tree.DataItem.prototype.addChildAt;

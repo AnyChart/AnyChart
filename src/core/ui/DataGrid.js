@@ -80,42 +80,6 @@ anychart.core.ui.DataGrid = function(opt_controller) {
    */
   this.formatsCache_ = {};
 
-  //TODO (A.Kudryavtsev): Move coloring to themes.
-  /**
-   * Edit structure preview fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.editStructurePreviewFill_;
-
-  /**
-   * Edit structure preview stroke.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.editStructurePreviewStroke_;
-
-
-  /**
-   * Edit structure preview stroke.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.editStructurePreviewDashStroke_;
-
-  /**
-   * Edit structure preview path.
-   * @type {acgraph.vector.Path}
-   * @private
-   */
-  this.editStructurePreviewPath_ = null;
-
-  /**
-   * Item that is currently under dragging.
-   * @type {anychart.data.Tree.DataItem}
-   */
-  this.draggingItem = null;
-
   this.controller.dataGrid(this);
 };
 goog.inherits(anychart.core.ui.DataGrid, anychart.core.ui.BaseGrid);
@@ -190,22 +154,6 @@ anychart.core.ui.DataGrid.NAME_COLUMN_WIDTH = 170;
  * @type {number}
  */
 anychart.core.ui.DataGrid.DEFAULT_COLUMN_WIDTH = 90;
-
-
-/**
- * Lower drag edit ratio.
- * TODO (A.Kudryavtsev): Describe.
- * @type {number}
- */
-anychart.core.ui.DataGrid.LOWER_DRAG_EDIT_RATIO = .2;
-
-
-/**
- * Higher drag edit ratio.
- * TODO (A.Kudryavtsev): Describe.
- * @type {number}
- */
-anychart.core.ui.DataGrid.HIGHER_DRAG_EDIT_RATIO = 1 - anychart.core.ui.DataGrid.LOWER_DRAG_EDIT_RATIO;
 
 
 /**
@@ -399,68 +347,6 @@ anychart.core.ui.DataGrid.prototype.getHeaderPath_ = function() {
     this.registerDisposable(this.headerPath_);
   }
   return this.headerPath_;
-};
-
-
-/**
- * Gets/sets a default editStructurePreviewFill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.ui.DataGrid|string} - Current value or itself for method chaining.
- */
-anychart.core.ui.DataGrid.prototype.editStructurePreviewFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.editStructurePreviewFill_), val)) {
-      this.editStructurePreviewFill_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.editStructurePreviewFill_;
-};
-
-
-/**
- * Gets/sets editStructurePreviewStroke.
- * @param {(acgraph.vector.Stroke|string)=} opt_value - Value to be set.
- * @return {(string|acgraph.vector.Stroke|anychart.core.ui.BaseGrid)} - Current value or itself for method chaining.
- */
-anychart.core.ui.DataGrid.prototype.editStructurePreviewStroke = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Stroke} */ (this.editStructurePreviewStroke_), val)) {
-      this.editStructurePreviewStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-
-    return this;
-  }
-  return this.editStructurePreviewStroke_;
-};
-
-
-/**
- * Gets/sets editStructurePreviewDashStroke.
- * @param {(acgraph.vector.Stroke|string)=} opt_value - Value to be set.
- * @return {(string|acgraph.vector.Stroke|anychart.core.ui.BaseGrid)} - Current value or itself for method chaining.
- */
-anychart.core.ui.DataGrid.prototype.editStructurePreviewDashStroke = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Stroke} */ (this.editStructurePreviewDashStroke_), val)) {
-      this.editStructurePreviewDashStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-
-    return this;
-  }
-  return this.editStructurePreviewDashStroke_;
 };
 
 
@@ -790,10 +676,6 @@ anychart.core.ui.DataGrid.prototype.boundsInvalidated = function() {
 anychart.core.ui.DataGrid.prototype.appearanceInvalidated = function() {
   this.getHeaderPath_().fill(this.headerFill_);
 
-  this.getEditStructurePreviewPath_()
-      .fill(this.editStructurePreviewFill_)
-      .stroke(this.editStructurePreviewStroke_);
-
   this.forEachVisibleColumn_(function(col) {
     col.invalidate(anychart.ConsistencyState.APPEARANCE);
     col.draw();
@@ -920,137 +802,6 @@ anychart.core.ui.DataGrid.prototype.specialInvalidated = function() {
 };
 
 
-/**
- * Inner getter for this.editStructurePreviewPath_.
- * @return {acgraph.vector.Path}
- * @private
- */
-anychart.core.ui.DataGrid.prototype.getEditStructurePreviewPath_ = function() {
-  if (!this.editStructurePreviewPath_) {
-    this.editStructurePreviewPath_ = this.getEditLayer().path();
-    this.registerDisposable(this.editStructurePreviewPath_);
-  }
-  return this.editStructurePreviewPath_;
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.DataGrid.prototype.addDragMouseMove = function(evt) {
-  var destinationItem = evt['item'];
-  var hoveredIndex = evt['hoveredIndex'];
-
-  var itemHeightMouseRatio = evt['itemHeightMouseRatio'];
-  var previewPath = this.getEditStructurePreviewPath_();
-  var startY = evt['startY'];
-  var endY = evt['endY'];
-
-  if (this.draggingItem && destinationItem && destinationItem != this.draggingItem && !destinationItem.isChildOf(this.draggingItem)) {
-    goog.style.setStyle(goog.global['document']['body'], 'cursor', 'auto');
-
-    if (itemHeightMouseRatio < anychart.core.ui.DataGrid.LOWER_DRAG_EDIT_RATIO ||
-        itemHeightMouseRatio > anychart.core.ui.DataGrid.HIGHER_DRAG_EDIT_RATIO) {
-      var top = itemHeightMouseRatio < anychart.core.ui.DataGrid.LOWER_DRAG_EDIT_RATIO ? startY : endY;
-      previewPath
-          .clear()
-          .moveTo(this.pixelBoundsCache.left, top)
-          .lineTo(this.totalGridsWidth, top)
-          .stroke(this.editStructurePreviewDashStroke_);
-
-    } else {
-      if (!anychart.core.ui.BaseGrid.isMilestone(destinationItem)) {
-        previewPath
-            .clear()
-            .moveTo(this.pixelBoundsCache.left, startY)
-            .lineTo(this.totalGridsWidth, startY)
-            .lineTo(this.totalGridsWidth, endY)
-            .lineTo(this.pixelBoundsCache.left, endY)
-            .close()
-            .stroke(this.editStructurePreviewStroke_);
-      } else {
-        previewPath.clear();
-        goog.style.setStyle(goog.global['document']['body'], 'cursor', 'not-allowed');
-      }
-    }
-  } else {
-    previewPath.clear();
-    goog.style.setStyle(goog.global['document']['body'], 'cursor', 'not-allowed');
-  }
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.DataGrid.prototype.addDragMouseUp = function(evt) {
-  var destinationItem = evt['item'];
-  var hoveredIndex = evt['hoveredIndex'];
-  var totalIndex = this.controller.startIndex() + hoveredIndex;
-
-  var visibleItems = this.controller.getVisibleItems();
-
-
-  var itemHeightMouseRatio = evt['itemHeightMouseRatio'];
-  var firstItem, secondItem; //We drop item between these two.
-
-  if (this.draggingItem && destinationItem && destinationItem != this.draggingItem && !anychart.core.ui.BaseGrid.isMilestone(destinationItem) &&
-      !destinationItem.isChildOf(this.draggingItem)) {
-    if (itemHeightMouseRatio < anychart.core.ui.DataGrid.LOWER_DRAG_EDIT_RATIO || itemHeightMouseRatio > anychart.core.ui.DataGrid.HIGHER_DRAG_EDIT_RATIO) {
-      if (itemHeightMouseRatio < anychart.core.ui.DataGrid.LOWER_DRAG_EDIT_RATIO) {
-        firstItem = visibleItems[totalIndex - 1];
-        secondItem = destinationItem;
-      } else {
-        firstItem = destinationItem;
-        secondItem = visibleItems[totalIndex + 1];
-      }
-
-      if (firstItem && secondItem) {
-        var firstDepth = firstItem.meta('depth');
-        var secondDepth = secondItem.meta('depth');
-        var destIndex, tree;
-
-        if (firstDepth == secondDepth) {
-          var secondParent = secondItem.getParent() || secondItem.tree();
-          destIndex = secondParent.indexOfChild(secondItem);
-
-          var dragParent = this.draggingItem.getParent() || this.draggingItem.tree();
-          if (dragParent == secondParent) {
-            var dragIndex = dragParent.indexOfChild(this.draggingItem);
-            if (dragIndex < destIndex) destIndex = Math.max(0, destIndex - 1);
-          }
-
-          //if firstDepth equals secondDepth, then the firstParent is the secondParent in this case.
-          secondParent.addChildAt(this.draggingItem, destIndex);
-        } else {
-          if (firstDepth < secondDepth) { //Here firstItem is parent of secondItem.
-            firstItem.addChildAt(this.draggingItem, 0); //The only case if firstItem is neighbour of secondItem.
-          } else {
-            var firstParent = firstItem.getParent() || firstItem.tree();
-            destIndex = firstParent.indexOfChild(firstItem) + 1;
-            firstParent.addChildAt(this.draggingItem, destIndex);
-          }
-        }
-      } else if (secondItem) { //First item is undefined.
-        //The only case - is when we drop between very first item and header of data grid.
-        tree = secondItem.tree();
-        tree.addChildAt(this.draggingItem, 0);
-      } else if (firstItem) { //Second item is undefined.
-        //The only case - is when we drop in the end of very last item of DG.
-        tree = firstItem.getParent() || firstItem.tree();
-        destIndex = tree.indexOfChild(firstItem) + 1;
-        tree.addChildAt(this.draggingItem, destIndex);
-      }
-    } else {
-      //Dropping data item inside. Setting dragged data item as child of destinationItem.
-      destinationItem.addChild(this.draggingItem);
-    }
-  }
-
-  this.getEditStructurePreviewPath_().clear();
-
-  this.draggingItem = null;
-  goog.style.setStyle(goog.global['document']['body'], 'cursor', 'auto');
-
-};
-
-
 /** @inheritDoc */
 anychart.core.ui.DataGrid.prototype.rowMouseDown = function(evt) {
   this.mouseDown(evt);
@@ -1092,10 +843,6 @@ anychart.core.ui.DataGrid.prototype.serialize = function() {
   json['headerFill'] = anychart.color.serialize(this.headerFill_);
   json['horizontalOffset'] = this.horizontalOffset();
 
-  json['editStructurePreviewFill'] = anychart.color.serialize(this.editStructurePreviewFill_);
-  json['editStructurePreviewStroke'] = anychart.color.serialize(this.editStructurePreviewStroke_);
-  json['editStructurePreviewDashStroke'] = anychart.color.serialize(this.editStructurePreviewDashStroke_);
-
   json['columns'] = [];
 
   for (var i = 0; i < this.columns_.length; i++) {
@@ -1114,11 +861,6 @@ anychart.core.ui.DataGrid.prototype.setupByJSON = function(config) {
   this.columnStroke(config['columnStroke']);
   this.headerFill(config['headerFill']);
   this.horizontalOffset(config['horizontalOffset']);
-
-  this.editing(config['editing']);
-  this.editStructurePreviewFill(config['editStructurePreviewFill']);
-  this.editStructurePreviewStroke(config['editStructurePreviewStroke']);
-  this.editStructurePreviewDashStroke(config['editStructurePreviewDashStroke']);
 
   if ('defaultColumnSettings' in config)
     this.defaultColumnSettings(config['defaultColumnSettings']);

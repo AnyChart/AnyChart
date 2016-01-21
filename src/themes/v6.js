@@ -4755,6 +4755,20 @@ window['anychart']['themes']['v6'] = {
         'editIntervalThumbStroke': '#000',
         'editConnectorThumbFill': '#fff',
         'editConnectorThumbStroke': '#000',
+        'editStructurePreviewFill': {
+          'color': '#4285F4',
+          'opacity': 0.2
+        },
+
+        'editStructurePreviewStroke': {
+          'color': '#4285F4',
+          'thickness': 2
+        },
+
+        'editStructurePreviewDashStroke': {
+          'color': '#4285F4',
+          'dash': '4 4'
+        },
         'baseFill': {
           'keys': ['#3CA0DE', '#3085BC'],
           'angle': -90

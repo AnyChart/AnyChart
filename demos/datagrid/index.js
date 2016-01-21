@@ -61,12 +61,12 @@ function dataGridRedraw(event) {
 anychart.onDocumentReady(function() {
   var tree = generateTree();
 
-  stage = acgraph.create('container', '100%', '100%');
+  stage = acgraph.create('container');
   dataGrid = anychart.ui.dataGrid();
 
   dataGrid.container(stage);
 
-  dataGrid.bounds(10, 10, 450, 300);
+  //dataGrid.bounds(10, 10, 450, 300);
 
   dataGrid
       .data(tree)

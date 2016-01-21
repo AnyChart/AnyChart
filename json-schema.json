@@ -3308,6 +3308,7 @@
         "connectorStroke": {"$ref": "#/definitions/stroke"},
         "selectedElementFill": {"$ref": "#/definitions/fill"},
         "selectedElementStroke": {"$ref": "#/definitions/stroke"},
+        "selectedConnectorStroke": {"$ref": "#/definitions/stroke"},
         "labels": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"},
         "markers": {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"},
         "connectorPreviewStroke": {"$ref": "#/definitions/stroke"},
@@ -3319,6 +3320,9 @@
         "editIntervalThumbStroke": {"$ref": "#/definitions/stroke"},
         "editConnectorThumbFill":  {"$ref": "#/definitions/fill"},
         "editConnectorThumbStroke": {"$ref": "#/definitions/stroke"},
+        "editStructurePreviewFill": {"$ref": "#/definitions/fill"},
+        "editStructurePreviewStroke": {"$ref": "#/definitions/stroke"},
+        "editStructurePreviewDashStroke": {"$ref": "#/definitions/stroke"},
         "editing": {"type": "boolean"},
         "baselineAbove": {"type": "boolean"},
         "headerHeight": {"type": "number"}

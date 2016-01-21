@@ -452,13 +452,15 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
             var connectors = period[anychart.enums.GanttDataFields.CONNECTOR];
             for (var j = 0; j < connectors.length; j++) {
               var connector = connectors[j];
-              //We put here a link to the period if it is already in the map or ID of destination period.
-              to = this.periodsMap_[connector[anychart.enums.GanttDataFields.CONNECT_TO]] || connector[anychart.enums.GanttDataFields.CONNECT_TO];
-              type = connector[anychart.enums.GanttDataFields.CONNECTOR_TYPE];
-              connectorsMapItem = {'from': periodItem, 'to': to};
-              if (type) connectorsMapItem['type'] = type;
-              connectorsMapItem['connSettings'] = connector;
-              this.connectorsData_.push(connectorsMapItem);
+              if (connector) {
+                //We put here a link to the period if it is already in the map or ID of destination period.
+                to = this.periodsMap_[connector[anychart.enums.GanttDataFields.CONNECT_TO]] || connector[anychart.enums.GanttDataFields.CONNECT_TO];
+                type = connector[anychart.enums.GanttDataFields.CONNECTOR_TYPE];
+                connectorsMapItem = {'from': periodItem, 'to': to};
+                if (type) connectorsMapItem['type'] = type;
+                connectorsMapItem['connSettings'] = connector;
+                this.connectorsData_.push(connectorsMapItem);
+              }
             }
           } else if (period[anychart.enums.GanttDataFields.CONNECT_TO]) { //Deprecated behaviour.
             //We put here a link to the period if it is already in the map or ID of destination period.
@@ -500,13 +502,15 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
         var projConnectors = item.get(anychart.enums.GanttDataFields.CONNECTOR);
         for (var k = 0; k < projConnectors.length; k++) {
           var conn = projConnectors[k];
-          connectTo = conn[anychart.enums.GanttDataFields.CONNECT_TO];
-          itemConnectTo = this.visibleItemsMap_[connectTo] || connectTo;
-          connType = conn[anychart.enums.GanttDataFields.CONNECTOR_TYPE];
-          taskMapItem = {'from': visItem, 'to': itemConnectTo};
-          if (connType) taskMapItem['type'] = connType;
-          taskMapItem['connSettings'] = conn;
-          this.connectorsData_.push(taskMapItem);
+          if (conn) {
+            connectTo = conn[anychart.enums.GanttDataFields.CONNECT_TO];
+            itemConnectTo = this.visibleItemsMap_[connectTo] || connectTo;
+            connType = conn[anychart.enums.GanttDataFields.CONNECTOR_TYPE];
+            taskMapItem = {'from': visItem, 'to': itemConnectTo};
+            if (connType) taskMapItem['type'] = connType;
+            taskMapItem['connSettings'] = conn;
+            this.connectorsData_.push(taskMapItem);
+          }
         }
       } else if (item.get(anychart.enums.GanttDataFields.CONNECT_TO)) {
         connectTo = item.get(anychart.enums.GanttDataFields.CONNECT_TO);

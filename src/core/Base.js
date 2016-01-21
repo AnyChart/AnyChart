@@ -163,8 +163,8 @@ anychart.ConsistencyState = {
   //---------------------------------- GRIDS STATES (VB) ---------------------------------
   // also combined
   GRIDS_POSITION: 1 << 5,
-  //---------------------------------- BASE GRID STATES (GRIDS) ---------------------------------
-  BASE_GRID_CLICK: 1 << 6,
+  //---------------------------------- BASE GRIDS STATES (VB) ---------------------------------
+  BASE_GRID_REDRAW: 1 << 6,
   BASE_GRID_HOVER: 1 << 7,
   //---------------------------------- BUTTON STATES (VB) ---------------------------------
   BUTTON_BACKGROUND: 1 << 5,

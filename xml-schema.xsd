@@ -1348,6 +1348,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="connector_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="selected_element_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="selected_element_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="selected_connector_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="connector_preview_stroke" type="Stroke"/>
@@ -1359,6 +1360,9 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="edit_interval_thumb_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="edit_connector_thumb_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="edit_connector_thumb_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_dash_stroke" type="Stroke"/>
         </xsd:all>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
         <xsd:attribute name="is_standalone" type="simple.Bool"/>
@@ -1387,6 +1391,7 @@
         <xsd:attribute name="connector_stroke" type="xsd:string"/>
         <xsd:attribute name="selected_element_fill" type="xsd:string"/>
         <xsd:attribute name="selected_element_stroke" type="xsd:string"/>
+        <xsd:attribute name="selected_connector_stroke" type="xsd:string"/>
         <xsd:attribute name="labels" type="simple.BoolOrNull"/>
         <xsd:attribute name="markers" type="simple.BoolOrNull"/>
         <xsd:attribute name="connector_preview_stroke" type="xsd:string"/>
@@ -1398,6 +1403,9 @@
         <xsd:attribute name="edit_interval_thumb_stroke" type="xsd:string"/>
         <xsd:attribute name="edit_connector_thumb_fill" type="xsd:string"/>
         <xsd:attribute name="edit_connector_thumb_stroke" type="xsd:string"/>
+        <xsd:attribute name="edit_structure_preview_fill" type="xsd:string"/>
+        <xsd:attribute name="edit_structure_preview_stroke" type="xsd:string"/>
+        <xsd:attribute name="edit_structure_preview_dash_stroke" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:complexType name="core.ColorRange">

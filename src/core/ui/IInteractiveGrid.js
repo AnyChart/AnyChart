@@ -94,6 +94,23 @@ anychart.core.ui.IInteractiveGrid.prototype.highlight = function(opt_index, opt_
 
 
 /**
+ * Highlights vertical range on editing structure.
+ * Must remove highlightling if no arguments passed.
+ * @param {number=} opt_startY - Start Y to be highlighted.
+ * @param {number=} opt_endY - End Y to be highlighted.
+ * @param {(acgraph.vector.Cursor|string)=} opt_cursor - Cursor to be set.
+ */
+anychart.core.ui.IInteractiveGrid.prototype.editStructureHighlight = function(opt_startY, opt_endY, opt_cursor) {};
+
+
+/**
+ * Handler for delete key.
+ * @param {goog.events.KeyEvent} e - Key event.
+ */
+anychart.core.ui.IInteractiveGrid.prototype.deleteKeyHandler = function(e) {};
+
+
+/**
  * Creates gantt format provider.
  * @param {anychart.data.Tree.DataItem} dataItem - Data item.
  * @param {Object=} opt_period - Optional current period.

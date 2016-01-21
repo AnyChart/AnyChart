@@ -259,6 +259,14 @@ anychart.core.ui.Timeline = function(opt_controller, opt_isResources) {
 
 
   /**
+   * Selected element stroke.
+   * @type {!acgraph.vector.Stroke}
+   * @private
+   */
+  this.selectedConnectorStroke_;
+
+
+  /**
    * Connector arrow fill.
    * @type {acgraph.vector.Fill}
    * @private
@@ -279,6 +287,14 @@ anychart.core.ui.Timeline = function(opt_controller, opt_isResources) {
    * @private
    */
   this.selectedPeriodId_ = void 0;
+
+  /**
+   * Information about currently selected connector.
+   * Connector can't be characterized by it's path, but can be defined by elements that it connects.
+   * @type {Object}
+   * @private
+   */
+  this.selectedConnectorData_ = null;
 
   /**
    * Minimum gap.
@@ -664,7 +680,7 @@ anychart.core.ui.Timeline.prototype.editPreviewStroke = function(opt_strokeOrFil
     var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(this.editPreviewStroke_, val)) {
       this.editPreviewStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -711,7 +727,7 @@ anychart.core.ui.Timeline.prototype.editProgressStroke = function(opt_strokeOrFi
     var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(this.editProgressStroke_, val)) {
       this.editProgressStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -758,7 +774,7 @@ anychart.core.ui.Timeline.prototype.editIntervalThumbStroke = function(opt_strok
     var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(this.editIntervalThumbStroke_, val)) {
       this.editIntervalThumbStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -805,7 +821,7 @@ anychart.core.ui.Timeline.prototype.editConnectorThumbStroke = function(opt_stro
     var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(this.editConnectorThumbStroke_, val)) {
       this.editConnectorThumbStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -830,7 +846,7 @@ anychart.core.ui.Timeline.prototype.baseFill = function(opt_fillOrColorOrKeys, o
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.baseFill_), val)) {
       this.baseFill_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -853,7 +869,7 @@ anychart.core.ui.Timeline.prototype.baseStroke = function(opt_strokeOrFill, opt_
     var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(this.baseStroke_, val)) {
       this.baseStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -878,7 +894,7 @@ anychart.core.ui.Timeline.prototype.baselineFill = function(opt_fillOrColorOrKey
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.baselineFill_), val)) {
       this.baselineFill_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -901,7 +917,7 @@ anychart.core.ui.Timeline.prototype.baselineStroke = function(opt_strokeOrFill, 
     var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(this.baselineStroke_, val)) {
       this.baselineStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -926,7 +942,7 @@ anychart.core.ui.Timeline.prototype.progressFill = function(opt_fillOrColorOrKey
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.progressFill_), val)) {
       this.progressFill_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -949,7 +965,7 @@ anychart.core.ui.Timeline.prototype.progressStroke = function(opt_strokeOrFill, 
     var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(this.progressStroke_, val)) {
       this.progressStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -974,7 +990,7 @@ anychart.core.ui.Timeline.prototype.milestoneFill = function(opt_fillOrColorOrKe
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.milestoneFill_), val)) {
       this.milestoneFill_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -997,7 +1013,7 @@ anychart.core.ui.Timeline.prototype.milestoneStroke = function(opt_strokeOrFill,
     var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(this.milestoneStroke_, val)) {
       this.milestoneStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -1022,7 +1038,7 @@ anychart.core.ui.Timeline.prototype.parentFill = function(opt_fillOrColorOrKeys,
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.parentFill_), val)) {
       this.parentFill_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -1045,7 +1061,7 @@ anychart.core.ui.Timeline.prototype.parentStroke = function(opt_strokeOrFill, op
     var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(this.parentStroke_, val)) {
       this.parentStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -1070,7 +1086,7 @@ anychart.core.ui.Timeline.prototype.connectorFill = function(opt_fillOrColorOrKe
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.connectorFill_), val)) {
       this.connectorFill_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -1118,7 +1134,7 @@ anychart.core.ui.Timeline.prototype.selectedElementFill = function(opt_fillOrCol
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.selectedElementFill_), val)) {
       this.selectedElementFill_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -1141,11 +1157,33 @@ anychart.core.ui.Timeline.prototype.selectedElementStroke = function(opt_strokeO
     var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(this.selectedElementStroke_, val)) {
       this.selectedElementStroke_ = val;
-      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
   return this.selectedElementStroke_ || 'none';
+};
+
+
+/**
+ * Gets/sets selected connector stroke.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
+ * @param {number=} opt_thickness .
+ * @param {string=} opt_dashpattern .
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
+ * @return {acgraph.vector.Stroke|anychart.core.ui.Timeline|string} - Current value or itself for chaining.
+ */
+anychart.core.ui.Timeline.prototype.selectedConnectorStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (!anychart.color.equals(this.selectedConnectorStroke_, val)) {
+      this.selectedConnectorStroke_ = val;
+      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.selectedConnectorStroke_ || 'none';
 };
 
 
@@ -1872,7 +1910,8 @@ anychart.core.ui.Timeline.prototype.drawThumbPreview_ = function(event, opt_scro
  * @private
  */
 anychart.core.ui.Timeline.prototype.drawConnectorPreview_ = function(event, opt_scrollOffsetX, opt_scrollOffsetY) {
-  if (this.currentConnectorDragger_) {
+  //TODO (A.Kudryavtsev): In DVF-1809 case this.currentConnectorDragger_ can remain not null. Check it carefully!
+  if (this.currentConnectorDragger_ && this.dragging) {
     var circle = this.currentConnectorDragger_.isStart ? this.editStartConnectorPath_ : this.editFinishConnectorPath_;
 
     var index = circle.index;
@@ -2399,6 +2438,7 @@ anychart.core.ui.Timeline.prototype.addMouseUp = function(evt) {
     this.draggingConnector = false;
   }
   this.currentConnectorDragger_ = null;
+  this.interactive = true;
 };
 
 
@@ -2427,15 +2467,38 @@ anychart.core.ui.Timeline.prototype.mouseOutMove = function(e) {
  * @override
  */
 anychart.core.ui.Timeline.prototype.rowSelect = function(event) {
-  var item = event['item'];
-  var period = event['period'];
-  var periodId = period ? period[anychart.enums.GanttDataFields.ID] : void 0;
-
-  if (this.selectTimelineRow(item, periodId)) {
-    var eventObj = goog.object.clone(event);
-    eventObj['type'] = anychart.enums.EventType.ROW_SELECT;
-    (/** @type {anychart.core.ui.IInteractiveGrid} */ (this.interactivityHandler)).dispatchEvent(eventObj);
+  if (!this.checkRowSelection(event)) {
+    var item = event['item'];
+    var period = event['period'];
+    var periodId = period ? period[anychart.enums.GanttDataFields.ID] : void 0;
+    if (this.selectTimelineRow(item, periodId)) {
+      var eventObj = goog.object.clone(event);
+      eventObj['type'] = anychart.enums.EventType.ROW_SELECT;
+      (/** @type {anychart.core.ui.IInteractiveGrid} */ (this.interactivityHandler)).dispatchEvent(eventObj);
+    }
   }
+};
+
+
+/**
+ * Additional action on row selection.
+ * Used to select the connector instead the row.
+ * @param {Object} event - Dispatched event object.
+ * @return {boolean} - Whether to dispatch event.
+ */
+anychart.core.ui.Timeline.prototype.checkRowSelection = function(event) {
+  var domTarget = (event && event['originalEvent']) ? event['originalEvent']['domTarget'] : null;
+  if (domTarget && domTarget.type == anychart.enums.TLElementTypes.CONNECTOR) {
+    this.clearEdit_();
+    //Pretty light comparison (8 or less iterations).
+    if (!this.selectedConnectorData_ || (goog.isObject(this.selectedConnectorData_) && !goog.object.equals(this.selectedConnectorData_, domTarget.meta))) {
+      this.interactivityHandler.rowUnselect(event['originalEvent']);
+      this.selectedConnectorData_ = goog.object.clone(domTarget.meta); //Pretty light operation (copying 4 or less primitive values).
+      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
+    }
+    return true;
+  }
+  return false;
 };
 
 
@@ -2501,7 +2564,8 @@ anychart.core.ui.Timeline.prototype.selectTimelineRow = function(item, opt_perio
   }
 
   if (itemSelected || periodSelected) {
-    this.invalidate(anychart.ConsistencyState.BASE_GRID_CLICK, anychart.Signal.NEEDS_REDRAW);
+    this.selectedConnectorData_ = null;
+    this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
     return true;
   }
   return false;
@@ -3168,10 +3232,25 @@ anychart.core.ui.Timeline.prototype.getItemBounds_ = function(index, opt_period)
 anychart.core.ui.Timeline.prototype.connectItems_ = function(from, to, opt_connType, opt_connSettings, opt_path) {
   opt_connType = opt_connType || anychart.enums.ConnectorType.FINISH_START;
 
-  //Here 'to' is {'item':period, 'index':index} or {'period':period, 'index':index}. 'from' is as well.
+  //Here 'to' is {'item':item, 'index':index} or {'period':period, 'index':index, 'periodIndex':index}. 'from' is as well.
   var fromIndex = from['index'];
   var toIndex = to['index'];
+  var fromPeriodIndex = from['periodIndex'];
+  var toPeriodIndex = to['periodIndex'];
 
+  /*
+      Bounds in this case are not bounds of bar.
+      Bounds are an area of whole row to simplify the calculations of connectors:
+
+      +--------------------------------------+
+      | This is an area in row above the bar |
+      +--------------------------------------+
+      |\\\\\\\\\ This is a bar itself \\\\\\\|        <- this is an incoming bounds.
+      +--------------------------------------+
+      | This is an area in row below the bar |
+      +--------------------------------------+
+
+  */
   var fromBounds = this.getItemBounds_(fromIndex, from['period']);
   var toBounds = this.getItemBounds_(toIndex, to['period']);
 
@@ -3186,8 +3265,171 @@ anychart.core.ui.Timeline.prototype.connectItems_ = function(from, to, opt_connT
         acgraph.vector.normalizeStroke(opt_connSettings[anychart.enums.GanttDataFields.STROKE]) :
         this.connectorStroke_;
 
-    this.drawConnector_(fromBounds, toBounds, opt_connType, /** @type {acgraph.vector.Fill} */ (fill),
-        /** @type {acgraph.vector.Stroke} */ (stroke), opt_path);
+    var drawPreview = goog.isDefAndNotNull(opt_path);
+
+    var fromLeft, fromTop, toLeft, toTop, orientation;
+    var am = anychart.core.ui.Timeline.ARROW_MARGIN;
+    var size = anychart.core.ui.Timeline.ARROW_SIZE;
+    var path = /** @type {?acgraph.vector.Path} */ (opt_path || null);
+    var arrow = drawPreview ? path : null;
+
+    var segmentLeft0, segmentLeft1; //Util variables, temporary segment X-coordinate storage.
+    var segmentTop0; //Util variable, temporary segment Y-coordinate storage.
+    var aboveSequence = true; //If 'from' bar is above the 'to' bar.
+
+    var lineThickness = anychart.utils.extractThickness(stroke);
+
+    var pixelShift = (lineThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
+
+    switch ((opt_connType + '').toLowerCase()) {
+      case anychart.enums.ConnectorType.FINISH_FINISH:
+        fromLeft = Math.round(fromBounds.left + fromBounds.width) + pixelShift;
+        fromTop = Math.round(fromBounds.top + fromBounds.height / 2) + pixelShift;
+        toLeft = Math.round(toBounds.left + toBounds.width) + pixelShift;
+        toTop = Math.round(toBounds.top + toBounds.height / 2) + pixelShift;
+        orientation = anychart.enums.Orientation.LEFT;
+
+        if (fromBounds.top == toBounds.top) { //Same line
+          path = this.drawSegment_(fromLeft, fromTop, toLeft, toTop, path);
+          if (fromLeft > toLeft) orientation = anychart.enums.Orientation.RIGHT;
+        } else {
+          segmentLeft0 = Math.max(fromLeft + size + am, toLeft + size + am);
+          path = this.drawSegment_(fromLeft, fromTop, segmentLeft0, fromTop, path);
+          path = this.drawSegment_(segmentLeft0, fromTop, segmentLeft0, toTop, path);
+          path = this.drawSegment_(segmentLeft0, toTop, toLeft, toTop, path);
+        }
+        arrow = this.drawArrow_(toLeft, toTop, orientation, arrow);
+        break;
+
+      case anychart.enums.ConnectorType.START_FINISH:
+        fromLeft = Math.round(fromBounds.left) + pixelShift;
+        fromTop = Math.round(fromBounds.top + fromBounds.height / 2) + pixelShift;
+        toLeft = Math.round(toBounds.left + toBounds.width) + pixelShift;
+        toTop = Math.round(toBounds.top + toBounds.height / 2) + pixelShift;
+        orientation = anychart.enums.Orientation.LEFT;
+
+        if (fromLeft - am - am - size > toLeft) {
+          segmentLeft0 = toLeft + am + size;
+          path = this.drawSegment_(fromLeft, fromTop, segmentLeft0, fromTop, path);
+          path = this.drawSegment_(segmentLeft0, fromTop, segmentLeft0, toTop, path);
+          path = this.drawSegment_(segmentLeft0, toTop, toLeft, toTop, path);
+        } else {
+          aboveSequence = toBounds.top >= fromBounds.top;
+
+          segmentLeft0 = fromLeft - am;
+          segmentLeft1 = toLeft + am + size;
+          segmentTop0 = Math.round(aboveSequence ? toBounds.top : toBounds.top + toBounds.height) + pixelShift;
+
+          path = this.drawSegment_(fromLeft, fromTop, segmentLeft0, fromTop, path);
+          path = this.drawSegment_(segmentLeft0, fromTop, segmentLeft0, segmentTop0, path);
+          path = this.drawSegment_(segmentLeft0, segmentTop0, segmentLeft1, segmentTop0, path);
+          path = this.drawSegment_(segmentLeft1, segmentTop0, segmentLeft1, toTop, path);
+          path = this.drawSegment_(segmentLeft1, toTop, toLeft, toTop, path);
+
+        }
+
+        arrow = this.drawArrow_(toLeft, toTop, orientation, arrow);
+
+        break;
+
+      case anychart.enums.ConnectorType.START_START:
+        fromLeft = Math.round(fromBounds.left) + pixelShift;
+        fromTop = Math.round(fromBounds.top + fromBounds.height / 2) + pixelShift;
+        toLeft = Math.round(toBounds.left) + pixelShift;
+        toTop = Math.round(toBounds.top + toBounds.height / 2) + pixelShift;
+        orientation = anychart.enums.Orientation.RIGHT;
+
+        if (fromBounds.top == toBounds.top) { //Same line
+          path = this.drawSegment_(fromLeft, fromTop, toLeft, toTop, path);
+          if (fromLeft > toLeft) orientation = anychart.enums.Orientation.LEFT;
+        } else {
+          segmentLeft0 = Math.min(fromLeft - size - am, toLeft - size - am);
+          path = this.drawSegment_(fromLeft, fromTop, segmentLeft0, fromTop, path);
+          path = this.drawSegment_(segmentLeft0, fromTop, segmentLeft0, toTop, path);
+          path = this.drawSegment_(segmentLeft0, toTop, toLeft, toTop, path);
+        }
+        arrow = this.drawArrow_(toLeft, toTop, orientation, arrow);
+        break;
+
+      default: //anychart.enums.ConnectorType.FINISH_START:
+        fromLeft = Math.round(fromBounds.left + fromBounds.width) + pixelShift;
+        fromTop = Math.round(fromBounds.top + fromBounds.height / 2) + pixelShift;
+        toLeft = Math.round(toBounds.left) + pixelShift;
+        var extraEndY;
+
+        if (toLeft >= fromLeft) {
+          toLeft = Math.min(toLeft + am, Math.round(toBounds.left + toBounds.width / 2) + pixelShift);
+          if (toBounds.top > fromBounds.top) {
+            extraEndY = Math.round(toBounds.top) + pixelShift;
+            path = this.drawSegment_(fromLeft, fromTop, toLeft, fromTop, path);
+            path = this.drawSegment_(toLeft, fromTop, toLeft, extraEndY, path);
+            arrow = this.drawArrow_(toLeft, extraEndY, anychart.enums.Orientation.BOTTOM, arrow);
+          } else if (toBounds.top < fromBounds.top) {
+            extraEndY = Math.round(toBounds.top + toBounds.height) + pixelShift;
+            path = this.drawSegment_(fromLeft, fromTop, toLeft, fromTop, path);
+            path = this.drawSegment_(toLeft, fromTop, toLeft, extraEndY, path);
+            arrow = this.drawArrow_(toLeft, extraEndY, anychart.enums.Orientation.TOP, arrow);
+          } else { //Same line
+            toLeft = Math.round(toBounds.left) + pixelShift;
+            toTop = Math.round(toBounds.top + toBounds.height / 2) + pixelShift;
+            path = this.drawSegment_(fromLeft, fromTop, toLeft, toTop, path);
+            arrow = this.drawArrow_(toLeft, toTop, anychart.enums.Orientation.RIGHT, arrow);
+          }
+
+        } else { //if toLeft < fromLeft
+          extraEndY = Math.round(toBounds.top + toBounds.height / 2) + pixelShift;
+          segmentTop0 = Math.round((toBounds.top > fromBounds.top) ? toBounds.top : (toBounds.top + toBounds.height)) + pixelShift;
+          segmentLeft0 = fromLeft + am;
+          segmentLeft1 = toLeft - am - size;
+
+          path = this.drawSegment_(fromLeft, fromTop, segmentLeft0, fromTop, path);
+          path = this.drawSegment_(segmentLeft0, fromTop, segmentLeft0, segmentTop0, path);
+          path = this.drawSegment_(segmentLeft0, segmentTop0, segmentLeft1, segmentTop0, path);
+          path = this.drawSegment_(segmentLeft1, segmentTop0, segmentLeft1, extraEndY, path);
+          path = this.drawSegment_(segmentLeft1, extraEndY, toLeft, extraEndY, path);
+
+          arrow = this.drawArrow_(toLeft, extraEndY, anychart.enums.Orientation.RIGHT, arrow);
+        }
+    }
+
+    var editConnectorHighlight = false;
+    var meta;
+    if (this.editable) {
+      meta = {
+        'fromItemIndex': fromIndex,
+        'toItemIndex': toIndex,
+        'connType': opt_connType
+      };
+
+      if (this.controller.isResources()) {
+        meta['fromPeriodIndex'] = fromPeriodIndex;
+        meta['toPeriodIndex'] = toPeriodIndex;
+        if (opt_connType) meta['connType'] = opt_connType;
+      }
+
+      editConnectorHighlight = (goog.isObject(this.selectedConnectorData_) && goog.object.equals(this.selectedConnectorData_, meta));
+    }
+
+    if (path && !drawPreview) {
+      path.stroke(/** @type {acgraph.vector.Stroke} */ (stroke));
+      path.tag = void 0; //Tooltip will not appear on connector mouse over.
+      path.type = anychart.enums.TLElementTypes.CONNECTOR;
+      path.currBounds = null;
+      path.cursor(this.editable ? acgraph.vector.Cursor.POINTER : acgraph.vector.Cursor.DEFAULT);
+
+      path.meta = meta; //Yes, it cam become void 0.
+      path.stroke(editConnectorHighlight ? this.selectedConnectorStroke_ : /** @type {acgraph.vector.Stroke} */ (stroke));
+    }
+    if (arrow && !drawPreview) {
+      arrow.fill(/** @type {acgraph.vector.Fill} */ (fill)).stroke(/** @type {acgraph.vector.Stroke} */ (stroke));
+      arrow.tag = void 0; //Tooltip will not appear on connector arrow mouse over.
+      arrow.type = anychart.enums.TLElementTypes.CONNECTOR;
+      arrow.currBounds = null;
+      arrow.cursor(this.editable ? acgraph.vector.Cursor.POINTER : acgraph.vector.Cursor.DEFAULT);
+
+      arrow.meta = meta; //Yes, it cam become void 0.
+      arrow.stroke(editConnectorHighlight ? this.selectedConnectorStroke_ : /** @type {acgraph.vector.Stroke} */ (stroke));
+    }
   }
 };
 
@@ -3223,173 +3465,6 @@ anychart.core.ui.Timeline.prototype.drawConnectors_ = function() {
       */
       goog.array.splice(connectorsData, l, 1);
     }
-  }
-};
-
-
-/**
- * Draws a single connector.
- * @param {anychart.math.Rect} fromBounds - Bounds of start item (see illustration).
- * @param {anychart.math.Rect} toBounds - Bounds of end item (see illustration).
- * @param {anychart.enums.ConnectorType} connType - Connection type.
- * @param {acgraph.vector.Fill} fill - Fill settings.
- * @param {acgraph.vector.Stroke} stroke - Stroke settings.
- * @param {acgraph.vector.Path=} opt_path - Path to be used to draw connector.
- * @private
- */
-anychart.core.ui.Timeline.prototype.drawConnector_ = function(fromBounds, toBounds, connType, fill, stroke, opt_path) {
-  /*
-    Bounds in this case are not bounds of bar.
-    Bounds are an area of whole row to simplify the calculations of connectors:
-
-    +--------------------------------------+
-    | This is an area in row above the bar |
-    +--------------------------------------+
-    |\\\\\\\\\ This is a bar itself \\\\\\\|        <- this is an incoming bounds.
-    +--------------------------------------+
-    | This is an area in row below the bar |
-    +--------------------------------------+
-
-   */
-
-  var drawPreview = goog.isDefAndNotNull(opt_path);
-
-  var fromLeft, fromTop, toLeft, toTop, orientation;
-  var am = anychart.core.ui.Timeline.ARROW_MARGIN;
-  var size = anychart.core.ui.Timeline.ARROW_SIZE;
-  var path = /** @type {?acgraph.vector.Path} */ (opt_path || null);
-  var arrow = drawPreview ? path : null;
-  //var arrow = null;
-  var segmentLeft0, segmentLeft1; //Util variables, temporary segment X-coordinate storage.
-  var segmentTop0; //Util variable, temporary segment Y-coordinate storage.
-  var aboveSequence = true; //If 'from' bar is above the 'to' bar.
-
-  var lineThickness = anychart.utils.extractThickness(stroke);
-
-  var pixelShift = (lineThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
-
-  switch ((connType + '').toLowerCase()) {
-    case anychart.enums.ConnectorType.FINISH_FINISH:
-      fromLeft = Math.round(fromBounds.left + fromBounds.width) + pixelShift;
-      fromTop = Math.round(fromBounds.top + fromBounds.height / 2) + pixelShift;
-      toLeft = Math.round(toBounds.left + toBounds.width) + pixelShift;
-      toTop = Math.round(toBounds.top + toBounds.height / 2) + pixelShift;
-      orientation = anychart.enums.Orientation.LEFT;
-
-      if (fromBounds.top == toBounds.top) { //Same line
-        path = this.drawSegment_(fromLeft, fromTop, toLeft, toTop, path);
-        if (fromLeft > toLeft) orientation = anychart.enums.Orientation.RIGHT;
-      } else {
-        segmentLeft0 = Math.max(fromLeft + size + am, toLeft + size + am);
-        path = this.drawSegment_(fromLeft, fromTop, segmentLeft0, fromTop, path);
-        path = this.drawSegment_(segmentLeft0, fromTop, segmentLeft0, toTop, path);
-        path = this.drawSegment_(segmentLeft0, toTop, toLeft, toTop, path);
-      }
-      arrow = this.drawArrow_(toLeft, toTop, orientation, arrow);
-      break;
-
-    case anychart.enums.ConnectorType.START_FINISH:
-      fromLeft = Math.round(fromBounds.left) + pixelShift;
-      fromTop = Math.round(fromBounds.top + fromBounds.height / 2) + pixelShift;
-      toLeft = Math.round(toBounds.left + toBounds.width) + pixelShift;
-      toTop = Math.round(toBounds.top + toBounds.height / 2) + pixelShift;
-      orientation = anychart.enums.Orientation.LEFT;
-
-      if (fromLeft - am - am - size > toLeft) {
-        segmentLeft0 = toLeft + am + size;
-        path = this.drawSegment_(fromLeft, fromTop, segmentLeft0, fromTop, path);
-        path = this.drawSegment_(segmentLeft0, fromTop, segmentLeft0, toTop, path);
-        path = this.drawSegment_(segmentLeft0, toTop, toLeft, toTop, path);
-      } else {
-        aboveSequence = toBounds.top >= fromBounds.top;
-
-        segmentLeft0 = fromLeft - am;
-        segmentLeft1 = toLeft + am + size;
-        segmentTop0 = Math.round(aboveSequence ? toBounds.top : toBounds.top + toBounds.height) + pixelShift;
-
-        path = this.drawSegment_(fromLeft, fromTop, segmentLeft0, fromTop, path);
-        path = this.drawSegment_(segmentLeft0, fromTop, segmentLeft0, segmentTop0, path);
-        path = this.drawSegment_(segmentLeft0, segmentTop0, segmentLeft1, segmentTop0, path);
-        path = this.drawSegment_(segmentLeft1, segmentTop0, segmentLeft1, toTop, path);
-        path = this.drawSegment_(segmentLeft1, toTop, toLeft, toTop, path);
-
-      }
-
-      arrow = this.drawArrow_(toLeft, toTop, orientation, arrow);
-
-      break;
-
-    case anychart.enums.ConnectorType.START_START:
-      fromLeft = Math.round(fromBounds.left) + pixelShift;
-      fromTop = Math.round(fromBounds.top + fromBounds.height / 2) + pixelShift;
-      toLeft = Math.round(toBounds.left) + pixelShift;
-      toTop = Math.round(toBounds.top + toBounds.height / 2) + pixelShift;
-      orientation = anychart.enums.Orientation.RIGHT;
-
-      if (fromBounds.top == toBounds.top) { //Same line
-        path = this.drawSegment_(fromLeft, fromTop, toLeft, toTop, path);
-        if (fromLeft > toLeft) orientation = anychart.enums.Orientation.LEFT;
-      } else {
-        segmentLeft0 = Math.min(fromLeft - size - am, toLeft - size - am);
-        path = this.drawSegment_(fromLeft, fromTop, segmentLeft0, fromTop, path);
-        path = this.drawSegment_(segmentLeft0, fromTop, segmentLeft0, toTop, path);
-        path = this.drawSegment_(segmentLeft0, toTop, toLeft, toTop, path);
-      }
-      arrow = this.drawArrow_(toLeft, toTop, orientation, arrow);
-      break;
-
-    default: //anychart.enums.ConnectorType.FINISH_START:
-      fromLeft = Math.round(fromBounds.left + fromBounds.width) + pixelShift;
-      fromTop = Math.round(fromBounds.top + fromBounds.height / 2) + pixelShift;
-      toLeft = Math.round(toBounds.left) + pixelShift;
-      var extraEndY;
-
-      if (toLeft >= fromLeft) {
-        toLeft = Math.min(toLeft + am, Math.round(toBounds.left + toBounds.width / 2) + pixelShift);
-        if (toBounds.top > fromBounds.top) {
-          extraEndY = Math.round(toBounds.top) + pixelShift;
-          path = this.drawSegment_(fromLeft, fromTop, toLeft, fromTop, path);
-          path = this.drawSegment_(toLeft, fromTop, toLeft, extraEndY, path);
-          arrow = this.drawArrow_(toLeft, extraEndY, anychart.enums.Orientation.BOTTOM, arrow);
-        } else if (toBounds.top < fromBounds.top) {
-          extraEndY = Math.round(toBounds.top + toBounds.height) + pixelShift;
-          path = this.drawSegment_(fromLeft, fromTop, toLeft, fromTop, path);
-          path = this.drawSegment_(toLeft, fromTop, toLeft, extraEndY, path);
-          arrow = this.drawArrow_(toLeft, extraEndY, anychart.enums.Orientation.TOP, arrow);
-        } else { //Same line
-          toLeft = Math.round(toBounds.left) + pixelShift;
-          toTop = Math.round(toBounds.top + toBounds.height / 2) + pixelShift;
-          path = this.drawSegment_(fromLeft, fromTop, toLeft, toTop, path);
-          arrow = this.drawArrow_(toLeft, toTop, anychart.enums.Orientation.RIGHT, arrow);
-        }
-
-      } else { //if toLeft < fromLeft
-        extraEndY = Math.round(toBounds.top + toBounds.height / 2) + pixelShift;
-        segmentTop0 = Math.round((toBounds.top > fromBounds.top) ? toBounds.top : (toBounds.top + toBounds.height)) + pixelShift;
-        segmentLeft0 = fromLeft + am;
-        segmentLeft1 = toLeft - am - size;
-
-        path = this.drawSegment_(fromLeft, fromTop, segmentLeft0, fromTop, path);
-        path = this.drawSegment_(segmentLeft0, fromTop, segmentLeft0, segmentTop0, path);
-        path = this.drawSegment_(segmentLeft0, segmentTop0, segmentLeft1, segmentTop0, path);
-        path = this.drawSegment_(segmentLeft1, segmentTop0, segmentLeft1, extraEndY, path);
-        path = this.drawSegment_(segmentLeft1, extraEndY, toLeft, extraEndY, path);
-
-        arrow = this.drawArrow_(toLeft, extraEndY, anychart.enums.Orientation.RIGHT, arrow);
-      }
-  }
-
-  if (path && !drawPreview) {
-    path.stroke(/** @type {acgraph.vector.Stroke} */ (stroke));
-    path.tag = void 0; //Tooltip will not appear on connector mouse over.
-    path.type = anychart.enums.TLElementTypes.CONNECTOR;
-    path.currBounds = null; //TODO (A.Kudryavtsev): Maybe make connector editable somehow?
-  }
-  if (arrow && !drawPreview) {
-    arrow.fill(/** @type {acgraph.vector.Fill} */ (fill)).stroke(/** @type {acgraph.vector.Stroke} */ (stroke));
-    arrow.tag = void 0; //Tooltip will not appear on connector arrow mouse over.
-    arrow.type = anychart.enums.TLElementTypes.CONNECTOR;
-    arrow.currBounds = null; //TODO (A.Kudryavtsev): Maybe make connector editable somehow?
   }
 };
 
@@ -3706,6 +3781,72 @@ anychart.core.ui.Timeline.prototype.positionFinal = function() {
 
 
 /**
+ * @inheritDoc
+ */
+anychart.core.ui.Timeline.prototype.deleteKeyHandler = function(e) {
+  if (this.selectedConnectorData_) {
+    var fromItemIndex = this.selectedConnectorData_['fromItemIndex'];
+    var toItemIndex = this.selectedConnectorData_['toItemIndex'];
+    var connType = this.selectedConnectorData_['connType'];
+    var visibleItems = this.controller.getVisibleItems();
+    var fromItem = visibleItems[fromItemIndex];
+    var toItem = visibleItems[toItemIndex];
+    var i = 0;
+
+    if (this.controller.isResources()) {
+      var fromPeriodIndex = this.selectedConnectorData_['fromPeriodIndex'];
+      var fromPeriods = fromItem.get(anychart.enums.GanttDataFields.PERIODS);
+      var fromPeriod = fromPeriods[fromPeriodIndex];
+      var fromPeriodConnectors = fromPeriod[anychart.enums.GanttDataFields.CONNECTOR];
+
+      var toPeriods = toItem.get(anychart.enums.GanttDataFields.PERIODS);
+      var toPeriod = toPeriods[this.selectedConnectorData_['toPeriodIndex']];
+      var toPeriodId = toPeriod[anychart.enums.GanttDataFields.ID];
+
+      if (goog.isArray(fromPeriodConnectors)) {
+        for (i = 0; i < fromPeriodConnectors.length; i++) {//New behaviour.
+          var perConn = fromPeriodConnectors[i];
+          if (perConn) {
+            var perId = perConn[anychart.enums.GanttDataFields.CONNECT_TO];
+            var perConnType = perConn[anychart.enums.GanttDataFields.CONNECTOR_TYPE] ||
+                anychart.enums.ConnectorType.FINISH_START;
+            if (perId == toPeriodId && perConnType == connType) {
+              fromItem.del(anychart.enums.GanttDataFields.PERIODS, fromPeriodIndex, anychart.enums.GanttDataFields.CONNECTOR, i);
+            }
+          }
+        }
+      } else { //Old behaviour.
+        fromItem.del(anychart.enums.GanttDataFields.PERIODS, fromPeriodIndex, anychart.enums.GanttDataFields.CONNECTOR);
+        fromItem.del(anychart.enums.GanttDataFields.PERIODS, fromPeriodIndex, anychart.enums.GanttDataFields.CONNECTOR_TYPE);
+        fromItem.del(anychart.enums.GanttDataFields.PERIODS, fromPeriodIndex, anychart.enums.GanttDataFields.CONNECT_TO);
+      }
+    } else {
+      var toItemId = toItem.get(anychart.enums.GanttDataFields.ID);
+      var connectors = fromItem.get(anychart.enums.GanttDataFields.CONNECTOR);
+      if (goog.isArray(connectors)) { //New behaviour.
+        for (i = 0; i < connectors.length; i++) {
+          var connector = connectors[i];
+          if (connector) {
+            var currentConnType = connector[anychart.enums.GanttDataFields.CONNECTOR_TYPE] ||
+                anychart.enums.ConnectorType.FINISH_START;
+            if (toItemId == connector[anychart.enums.GanttDataFields.CONNECT_TO] && currentConnType == connType) {
+              fromItem.del(anychart.enums.GanttDataFields.CONNECTOR, i);
+            }
+          }
+        }
+      } else { //Old behaviour.
+        fromItem.del(anychart.enums.GanttDataFields.CONNECTOR);
+        fromItem.del(anychart.enums.GanttDataFields.CONNECTOR_TYPE);
+        fromItem.del(anychart.enums.GanttDataFields.CONNECT_TO);
+      }
+    }
+
+    this.selectedConnectorData_ = null;
+  }
+};
+
+
+/**
  * Generates horizontal scroll bar.
  * @return {anychart.core.ui.ScrollBar} - Scroll bar.
  */
@@ -3794,6 +3935,7 @@ anychart.core.ui.Timeline.prototype.serialize = function() {
   json['connectorStroke'] = anychart.color.serialize(this.connectorStroke_);
   json['selectedElementFill'] = anychart.color.serialize(this.selectedElementFill_);
   json['selectedElementStroke'] = anychart.color.serialize(this.selectedElementStroke_);
+  json['selectedConnectorStroke'] = anychart.color.serialize(this.selectedConnectorStroke_);
 
   json['connectorPreviewStroke'] = anychart.color.serialize(this.connectorPreviewStroke_);
   json['editPreviewFill'] = anychart.color.serialize(this.editPreviewFill_);
@@ -3834,6 +3976,7 @@ anychart.core.ui.Timeline.prototype.setupByJSON = function(config) {
   this.connectorStroke(config['connectorStroke']);
   this.selectedElementFill(config['selectedElementFill']);
   this.selectedElementStroke(config['selectedElementStroke']);
+  this.selectedConnectorStroke(config['selectedConnectorStroke']);
 
   this.connectorPreviewStroke(config['connectorPreviewStroke']);
   this.editPreviewFill(config['editPreviewFill']);
@@ -4180,3 +4323,6 @@ anychart.core.ui.Timeline.prototype['editIntervalThumbFill'] = anychart.core.ui.
 anychart.core.ui.Timeline.prototype['editIntervalThumbStroke'] = anychart.core.ui.Timeline.prototype.editIntervalThumbStroke;
 anychart.core.ui.Timeline.prototype['editConnectorThumbFill'] = anychart.core.ui.Timeline.prototype.editConnectorThumbFill;
 anychart.core.ui.Timeline.prototype['editConnectorThumbStroke'] = anychart.core.ui.Timeline.prototype.editConnectorThumbStroke;
+anychart.core.ui.Timeline.prototype['editStructurePreviewFill'] = anychart.core.ui.Timeline.prototype.editStructurePreviewFill;
+anychart.core.ui.Timeline.prototype['editStructurePreviewStroke'] = anychart.core.ui.Timeline.prototype.editStructurePreviewStroke;
+anychart.core.ui.Timeline.prototype['editStructurePreviewDashStroke'] = anychart.core.ui.Timeline.prototype.editStructurePreviewDashStroke;

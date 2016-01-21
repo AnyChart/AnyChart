@@ -765,6 +765,13 @@ anychart.charts.Gantt.prototype.highlight = function(opt_index, opt_startY, opt_
 };
 
 
+/** @inheritDoc */
+anychart.charts.Gantt.prototype.editStructureHighlight = function(opt_index, opt_startY, opt_endY) {
+  this.dg_.editStructureHighlight(opt_index, opt_startY, opt_endY);
+  this.tl_.editStructureHighlight(opt_index, opt_startY, opt_endY);
+};
+
+
 /**
  * Row mouse move interactivity handler.
  * @param {Object} event - Dispatched event object.
@@ -812,16 +819,18 @@ anychart.charts.Gantt.prototype.rowMouseOut = function(event) {
  * @param {Object} event - Dispatched event object.
  */
 anychart.charts.Gantt.prototype.rowSelect = function(event) {
-  var item = event['item'];
-  var period = event['period'];
-  var periodId = period ? period[anychart.enums.GanttDataFields.ID] : void 0;
-  if (item && ((!item.meta('selected') && this.dg_.selectRow(item)) | this.tl_.selectTimelineRow(item, periodId))) {
-    var eventObj = {
-      'type': anychart.enums.EventType.ROW_SELECT,
-      'item': item
-    };
-    if (goog.isDef(period)) eventObj['period'] = period;
-    this.dispatchEvent(eventObj);
+  if (!this.tl_.checkRowSelection(event)) {
+    var item = event['item'];
+    var period = event['period'];
+    var periodId = period ? period[anychart.enums.GanttDataFields.ID] : void 0;
+    if (item && ((!item.meta('selected') && this.dg_.selectRow(item)) | this.tl_.selectTimelineRow(item, periodId))) {
+      var eventObj = {
+        'type': anychart.enums.EventType.ROW_SELECT,
+        'item': item
+      };
+      if (goog.isDef(period)) eventObj['period'] = period;
+      this.dispatchEvent(eventObj);
+    }
   }
 };
 
@@ -871,6 +880,13 @@ anychart.charts.Gantt.prototype.editing = function(opt_value) {
     return this;
   }
   return this.editable;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Gantt.prototype.deleteKeyHandler = function(e) {
+  this.dg_.deleteKeyHandler(e);
+  this.tl_.deleteKeyHandler(e);
 };
 
 

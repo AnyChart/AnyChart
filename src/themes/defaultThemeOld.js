@@ -4992,6 +4992,21 @@ window['anychart']['themes']['defaultThemeOld'] = {
         'editConnectorThumbFill': '#EAEAEA',
         'editConnectorThumbStroke': '#545f69',
 
+        'editStructurePreviewFill': {
+          'color': '#4285F4',
+          'opacity': 0.2
+        },
+
+        'editStructurePreviewStroke': {
+          'color': '#4285F4',
+          'thickness': 2
+        },
+
+        'editStructurePreviewDashStroke': {
+          'color': '#4285F4',
+          'dash': '4 4'
+        },
+
         'baseFill': '#7ec1f5',
         'baseStroke': '#74b2e2',
         'progressFill': '#1976d2',

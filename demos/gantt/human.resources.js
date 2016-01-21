@@ -43,6 +43,8 @@ anychart.onDocumentReady(function () {
     return item.get('name');
   });
 
+  chart.editing(true);
+
   // initiate chart drawing
   chart.draw();
 
