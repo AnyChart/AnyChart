@@ -136,7 +136,7 @@ anychart.core.cartesian.series.Candlestick.prototype.drawSubsequentPoint = funct
     if (goog.isDef(shape) && hatchFillShape) {
       hatchFillShape.deserialize(shape.serialize());
     }
-    this.applyHatchFill(anychart.PointState.NORMAL);
+    this.applyHatchFill(pointState);
   }
 
   return true;

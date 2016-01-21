@@ -59,3 +59,10 @@ anychart.core.utils.IInteractiveSeries.prototype.applyAppearanceToPoint;
  * Finalization point appearance. For drawing labels and markers.
  */
 anychart.core.utils.IInteractiveSeries.prototype.finalizePointAppearance;
+
+
+/**
+ * Checks if an element has any consistency state set.
+ * @return {boolean} True if it has it.
+ */
+anychart.core.utils.IInteractiveSeries.prototype.isConsistent;
