@@ -20,9 +20,10 @@ anychart.core.cartesian.series.Box = function(opt_data, opt_csvSettings) {
   this.outlierMarkers().anchor(anychart.enums.Position.CENTER);
 
   // Define reference fields for a series
-  this.referenceValueNames = ['x', 'lowest', 'q1', 'median', 'q3', 'highest', 'outliers'];
-  this.referenceValueMeanings = ['x', 'y', 'y', 'y', 'y', 'y', 'a'];
-  this.referenceValuesSupportStack = false;
+  this.yValueNames = ['lowest', 'q1', 'median', 'q3', 'highest'];
+  this.additionalNames.push('outliers');
+  this.seriesSupportsStack = false;
+  this.seriesSupportsError = false;
 
   /**
    * Dictionary of outlier markers indexes by point index.
@@ -57,103 +58,37 @@ anychart.core.cartesian.series.Box.prototype.rootTypedLayerInitializer = functio
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Box.prototype.getReferenceScaleValues = function() {
-  if (!this.enabled()) return null;
-  var res = [];
-  var iterator = this.getIterator();
-  var yScale = this.yScale();
-  var val;
-  for (var i = 0, len = this.referenceValueNames.length; i < len; i++) {
-    var meaning = this.referenceValueMeanings[i];
+anychart.core.cartesian.series.Box.prototype.calcSeriesCoords = function() {
+  var res = anychart.core.cartesian.series.Box.base(this, 'calcSeriesCoords');
 
-    if (meaning == 'a') {
-      val = iterator.get(this.referenceValueNames[i]);
-      if (goog.isDefAndNotNull(val) && goog.isArray(val)) {
-        for (var j = 0; j < val.length; j++) {
-          if (!yScale.isMissing(val[j]))
-            res.push(val[j]);
+  if (this.outlierMarkers().enabled()) {
+    var outliers = [];
+    if (res) {
+      var outliersSource = this.iterator.get('outliers');
+      var yScale = this.yScale();
+      if (goog.isArray(outliersSource)) {
+        for (var i = 0; i < outliersSource.length; i++) {
+          if (!yScale.isMissing(outliersSource[i]))
+            outliers.push(this.applyRatioToBounds(yScale.transform(outliersSource[i], 0.5), false));
         }
       }
     }
-
-    if (meaning != 'y') continue;
-    val = iterator.get(this.referenceValueNames[i]);
-    if (yScale.isMissing(val)) return null;
-    res.push(val);
+    this.iterator.meta('outliers', outliers);
   }
+
   return res;
 };
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.Box.prototype.getReferenceCoords = function() {
-  if (!this.enabled()) return null;
-  var res = [];
-  var xScale = /** @type {anychart.scales.Base} */(this.xScale());
-  var yScale = /** @type {anychart.scales.Base} */(this.yScale());
-  var iterator = this.getIterator();
-  var fail = false;
-
-  for (var i = 0, len = this.referenceValueNames.length; i < len; i++) {
-    var meaning = this.referenceValueMeanings[i];
-    var val = iterator.get(this.referenceValueNames[i]);
-
-    if (!goog.isDef(val) && meaning != 'a') {
-      return null;
-    }
-
-    var pix;
-
-    switch (meaning) {
-      case 'a':
-        var values = [];
-        if (goog.isDefAndNotNull(val) && goog.isArray(val)) {
-          for (var j = 0; j < val.length; j++) {
-            if (!yScale.isMissing(val[j])) {
-              pix = this.applyRatioToBounds(yScale.transform(val[j], 0.5), false);
-              if (!isNaN(pix))
-                values.push(pix);
-            }
-          }
-        }
-        res.push(values);
-        break;
-      case 'x':
-        pix = xScale.isMissing(val) ? NaN : this.applyRatioToBounds(
-            xScale.transform(val, /** @type {number} */(this.xPointPosition())),
-            true);
-        if (isNaN(pix)) fail = true;
-        res.push(pix);
-        break;
-      case 'y':
-        if (yScale.isMissing(val))
-          val = NaN;
-        pix = this.applyRatioToBounds(yScale.transform(val, 0.5), false);
-        if (isNaN(pix)) fail = true;
-        res.push(pix);
-        break;
-    }
-  }
-  return fail ? null : res;
-};
-
-
-/** @inheritDoc */
 anychart.core.cartesian.series.Box.prototype.drawSubsequentPoint = function(pointState) {
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues)
-    return false;
-
-  var iterator = this.getIterator();
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var x = referenceValues[0];
-    var low = referenceValues[1];
-    var q1 = referenceValues[2];
-    var median = referenceValues[3];
-    var q3 = referenceValues[4];
-    var high = referenceValues[5];
-    var outliers = referenceValues[6];
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var low = /** @type {number} */(this.iterator.meta('lowest'));
+    var q1 = /** @type {number} */(this.iterator.meta('q1'));
+    var median = /** @type {number} */(this.iterator.meta('median'));
+    var q3 = /** @type {number} */(this.iterator.meta('q3'));
+    var high = /** @type {number} */(this.iterator.meta('highest'));
 
     /** @type {!acgraph.vector.Path} */
     var path = /** @type {!acgraph.vector.Path} */(this.rootElement.genNextChild());
@@ -161,14 +96,7 @@ anychart.core.cartesian.series.Box.prototype.drawSubsequentPoint = function(poin
     var stemPath = /** @type {!acgraph.vector.Path} */(this.rootElement.genNextChild());
     var whiskerPath = /** @type {!acgraph.vector.Path} */(this.rootElement.genNextChild());
 
-    iterator
-        .meta('x', x)
-        .meta('lowest', low)
-        .meta('q1', q1)
-        .meta('median', median)
-        .meta('q3', q3)
-        .meta('highest', high)
-        .meta('outliers', outliers)
+    this.iterator
         .meta('shape', path)
         .meta('medianPath', medianPath)
         .meta('stemPath', stemPath)
@@ -197,8 +125,8 @@ anychart.core.cartesian.series.Box.prototype.drawSubsequentPoint = function(poin
     var hatchFillShape = this.hatchFillRootElement ?
         /** @type {!acgraph.vector.Rect} */(this.hatchFillRootElement.genNextChild()) :
         null;
-    iterator.meta('hatchFillShape', hatchFillShape);
-    var shape = /** @type {acgraph.vector.Shape} */(iterator.meta('shape'));
+    this.iterator.meta('hatchFillShape', hatchFillShape);
+    var shape = /** @type {acgraph.vector.Shape} */(this.iterator.meta('shape'));
     if (goog.isDef(shape) && hatchFillShape) {
       hatchFillShape.deserialize(shape.serialize());
     }
@@ -406,7 +334,8 @@ anychart.core.cartesian.series.Box.prototype.createPositionProvider = function(p
   if (shape) {
     var shapeBounds = shape.getBounds();
     shapeBounds.top = iterator.meta('highest');
-    shapeBounds.height = Math.abs(/** @type {number} */ (iterator.meta('highest')) - /** @type {number} */ (iterator.meta('lowest')));
+    shapeBounds.height = Math.abs(/** @type {number} */
+        (iterator.meta('highest')) - /** @type {number} */ (iterator.meta('lowest')));
     position = anychart.enums.normalizeAnchor(position);
     return {'value': anychart.utils.getCoordinateByAnchor(shapeBounds, position)};
   } else {
@@ -534,12 +463,6 @@ anychart.core.cartesian.series.Box.prototype.getType = function() {
 /** @inheritDoc */
 anychart.core.cartesian.series.Box.prototype.hasOutlierMarkers = function() {
   return true;
-};
-
-
-/** @inheritDoc */
-anychart.core.cartesian.series.Box.prototype.isErrorAvailable = function() {
-  return false;
 };
 
 

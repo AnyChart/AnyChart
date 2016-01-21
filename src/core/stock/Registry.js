@@ -342,7 +342,7 @@ anychart.core.stock.Registry.prototype.update = function() {
     }
 
     // step two - we merge i-th source and the merge result of the previous arrays.
-    for (var i = 0; i < this.sources_.length; i++) {
+    for (var i = 2; i < this.sources_.length; i++) {
       source = this.sources_[i].getStorageInternal();
       /** @type {anychart.data.TableRow} */
       var currentInSource = source.length ? source[0] : null;

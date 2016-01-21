@@ -64,10 +64,7 @@ anychart.core.cartesian.series.Marker = function(opt_data, opt_csvSettings) {
    */
   this.hoverSize_ = 12;
 
-  // Define reference points for a series
-  this.referenceValueNames = ['x', 'value'];
-  this.referenceValueMeanings = ['x', 'y'];
-  this.referenceValuesSupportStack = false;
+  this.seriesSupportsStack = false;
 };
 goog.inherits(anychart.core.cartesian.series.Marker, anychart.core.cartesian.series.Base);
 anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.MARKER] = anychart.core.cartesian.series.Marker;
@@ -211,24 +208,13 @@ anychart.core.cartesian.series.Marker.prototype.selectSize = function(opt_value)
 /** @inheritDoc */
 anychart.core.cartesian.series.Marker.prototype.drawSubsequentPoint = function(pointState) {
   pointState = this.state.getSeriesState() | pointState;
-
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues)
-    return false;
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var x = referenceValues[0];
-    var y = referenceValues[1];
-
-    this.getIterator().meta('x', x).meta('value', y);
-
     this.drawMarker_(pointState);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     this.applyHatchFill(pointState);
   }
-  return true;
 };
 
 

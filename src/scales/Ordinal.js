@@ -27,10 +27,10 @@ anychart.scales.Ordinal = function() {
   this.names_ = [];
 
   /**
-   * @type {!Array.<anychart.scales.Ordinal.ValuesMapNode>}
+   * @type {!Object.<number>}
    * @private
    */
-  this.valuesMap_ = [];
+  this.valuesMap_ = {};
 
   /**
    * Prev values set cache.
@@ -46,20 +46,6 @@ anychart.scales.Ordinal = function() {
   this.autoDomain_ = true;
 
   /**
-   * Values comparator for discrete input domain.
-   * @type {!Function}
-   * @private
-   */
-  this.comparator_ = anychart.scales.Ordinal.DEFAULT_COMPARATOR_;
-
-  /**
-   * An object to store a node to not to create a new node every time we need a comparison.
-   * @type {anychart.scales.Ordinal.ValuesMapNode}
-   * @private
-   */
-  this.aNode_ = {key: 0, value: 0};
-
-  /**
    * Ticks for the scale.
    * @type {anychart.scales.OrdinalTicks}
    * @private
@@ -71,38 +57,9 @@ anychart.scales.Ordinal = function() {
 goog.inherits(anychart.scales.Ordinal, anychart.scales.Base);
 
 
-/**
- * @typedef {{key: *, value: number}}
- */
-anychart.scales.Ordinal.ValuesMapNode;
-
-
 /** @inheritDoc */
 anychart.scales.Ordinal.prototype.getType = function() {
   return anychart.enums.ScaleTypes.ORDINAL;
-};
-
-
-/**
- * Default comparator for discrete values searcher.
- * @param {anychart.scales.Ordinal.ValuesMapNode} a First value.
- * @param {anychart.scales.Ordinal.ValuesMapNode} b Second value.
- * @return {number} Comparison result.
- * @private
- */
-anychart.scales.Ordinal.DEFAULT_COMPARATOR_ = function(a, b) {
-  return anychart.utils.compareAsc(a.key, b.key);
-};
-
-
-/**
- * @param {*} key Node key.
- * @param {number} value Node value.
- * @return {anychart.scales.Ordinal.ValuesMapNode} Created node.
- * @private
- */
-anychart.scales.Ordinal.createInputDomainMapNode_ = function(key, value) {
-  return {key: key, value: value};
 };
 
 
@@ -228,11 +185,30 @@ anychart.scales.Ordinal.prototype.setAutoNames = function(value) {
  * @return {number} Index of value or NaN.
  */
 anychart.scales.Ordinal.prototype.getIndexByValue = function(value) {
-  this.aNode_.key = value;
-  var index = goog.array.binarySearch(this.valuesMap_, this.aNode_, this.comparator_);
-  if (index < 0)
+  var index = +this.valuesMap_[anychart.utils.hash(value)];
+  if (isNaN(index))
     return NaN;
-  return this.valuesMap_[index].value;
+  return index;
+};
+
+
+/**
+ * Returns values map.
+ * @return {!Object.<string, number>}
+ */
+anychart.scales.Ordinal.prototype.getValuesMapInternal = function() {
+  return this.valuesMap_;
+};
+
+
+/**
+ * Sets pre-calculated values map and array.
+ * @param {!Object.<string, number>} valuesMap
+ * @param {!Array.<*>} valuesArray
+ */
+anychart.scales.Ordinal.prototype.setAutoValues = function(valuesMap, valuesArray) {
+  this.valuesMap_ = valuesMap;
+  this.values_ = valuesArray;
 };
 
 
@@ -242,7 +218,7 @@ anychart.scales.Ordinal.prototype.getIndexByValue = function(value) {
 anychart.scales.Ordinal.prototype.resetDataRange = function() {
   this.oldValues_ = this.values_;
   this.values_ = [];
-  this.valuesMap_.length = 0;
+  this.valuesMap_ = {};
   this.autoNames_ = null;
   this.resultNames_ = null;
   return this;
@@ -270,10 +246,12 @@ anychart.scales.Ordinal.prototype.checkScaleChanged = function(silently) {
  */
 anychart.scales.Ordinal.prototype.extendDataRange = function(var_args) {
   for (var i = 0; i < arguments.length; i++) {
-    if (goog.array.binaryInsert(this.valuesMap_,
-        anychart.scales.Ordinal.createInputDomainMapNode_(arguments[i], this.values_.length),
-        this.comparator_)) {
-      this.values_.push(arguments[i]);
+    var value = arguments[i];
+    var hash = anychart.utils.hash(value);
+    var index = this.valuesMap_[hash];
+    if (!goog.isDef(index)) {
+      this.valuesMap_[hash] = this.values_.length;
+      this.values_.push(value);
     }
   }
   return this;
@@ -320,11 +298,9 @@ anychart.scales.Ordinal.prototype.getPointWidthRatio = function() {
  * @return {number} Value transformed to output scope.
  */
 anychart.scales.Ordinal.prototype.transform = function(value, opt_subRangeRatio) {
-  this.aNode_.key = value;
-  var index = goog.array.binarySearch(this.valuesMap_, this.aNode_, this.comparator_);
-  if (index < 0)
-    return NaN;
-  var result = this.valuesMap_[index].value / this.values_.length +
+  var index = this.getIndexByValue(value);
+  if (isNaN(index)) return NaN;
+  var result = index / this.values_.length +
       (opt_subRangeRatio || 0) / this.values_.length; // sub scale part
   return this.applyZoomAndInverse(result);
 };

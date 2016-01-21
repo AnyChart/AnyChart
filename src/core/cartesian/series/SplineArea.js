@@ -17,10 +17,7 @@ goog.require('anychart.core.cartesian.series.SplineDrawer');
 anychart.core.cartesian.series.SplineArea = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
 
-  // Define reference fields for a series
-  this.referenceValueNames = ['x', 'value', 'value'];
-  this.referenceValueMeanings = ['x', 'z', 'y'];
-  this.referenceValuesSupportStack = true;
+  this.needsZero = true;
 
   /**
    * Spline drawer.
@@ -42,16 +39,10 @@ anychart.core.cartesian.series.SplineArea.prototype.startDrawing = function() {
 
 /** @inheritDoc */
 anychart.core.cartesian.series.SplineArea.prototype.drawFirstPoint = function(pointState) {
-  var zeroMissing = this.yScale().isStackValMissing();
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues) {
-    return false;
-  }
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var x = referenceValues[0];
-    var zero = referenceValues[1];
-    var y = referenceValues[2];
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var y = /** @type {number} */(this.iterator.meta('value'));
+    var zero = /** @type {number} */(this.iterator.meta('zero'));
 
     this.finalizeSegment();
     this.queue_.resetDrawer(false);
@@ -63,42 +54,30 @@ anychart.core.cartesian.series.SplineArea.prototype.drawFirstPoint = function(po
         .moveTo(x, y);
     this.queue_.processPoint(x, y);
 
-    if (this.yScale().stackMode() == anychart.enums.ScaleStackMode.NONE)
+    if (this.drawingPlan.stacked) {
+      this.zeroesStack = [x, zero, this.iterator.meta('zeroMissing')];
+    } else {
       this.lastDrawnX = x;
-    else
-      this.zeroesStack = [x, zero, zeroMissing];
-
-    this.getIterator().meta('x', x).meta('zero', zero).meta('value', y);
+    }
   }
-
-  return true;
 };
 
 
 /** @inheritDoc */
 anychart.core.cartesian.series.SplineArea.prototype.drawSubsequentPoint = function(pointState) {
-  var zeroMissing = this.yScale().isStackValMissing();
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues) {
-    return false;
-  }
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var x = referenceValues[0];
-    var zero = referenceValues[1];
-    var y = referenceValues[2];
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var y = /** @type {number} */(this.iterator.meta('value'));
+    var zero = /** @type {number} */(this.iterator.meta('zero'));
 
     this.queue_.processPoint(x, y);
 
-    if (this.yScale().stackMode() == anychart.enums.ScaleStackMode.NONE)
+    if (this.drawingPlan.stacked) {
+      this.zeroesStack = [x, zero, this.iterator.meta('zeroMissing')];
+    } else {
       this.lastDrawnX = x;
-    else
-      this.zeroesStack.push(x, zero, zeroMissing);
-
-    this.getIterator().meta('x', x).meta('zero', zero).meta('value', y);
+    }
   }
-
-  return true;
 };
 
 
@@ -125,7 +104,7 @@ anychart.core.cartesian.series.SplineArea.prototype.finalizeSegment = function()
       /** @type {number} */
       var y = /** @type {number} */(this.zeroesStack[i - 1]);
       /** @type {boolean} */
-      var isMissing = /** @type {boolean} */(this.zeroesStack[i - 0]);
+      var isMissing = /** @type {boolean} */(this.zeroesStack[i]);
       if (firstPoint) {
         this.queue_.resetDrawer(true);
         this.path.lineTo(x, y);

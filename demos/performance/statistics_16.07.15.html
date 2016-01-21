@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="../../contrib/closure-library/closure/goog/base.js"></script>
+  <!--<script src="../../out/../../out/anychart-bundle.min.js"></script>-->
+  <script src="../../src/deps.js"></script>
+  <script>goog.require('anychart.modules.anychart');</script>
+  <script>goog.require('anychart.themes.defaultTheme');</script>
+  <style>
+    html, body, #container {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 500px;
+    }
+  </style>
+</head>
+<body>
+<button id="run">RUN!</button>
+<div id="container"></div>
+Drill-Down is Needed!
+</body>
+<script>
+  var runButton = document.getElementById('run');
+  runButton.addEventListener('click', run);
+
+  var chart;
+  var dataSet;
+  function run() {
+    console.time('all');
+
+    // create data set on our data
+    dataSet = anychart.data.set([
+      ['1k', 80, 52, 25, 794],
+      ['10k', 80, 50, 26, 4800],
+      ['50k', 80, 65, 25, 22000],
+      ['100k', 80, 51, 26, 45000],
+      ['this chart', 55, 25, 25, 500]
+    ]);
+
+    var seriesData_1 = dataSet.mapAs({x: [0], value: [1]});
+    var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
+    var seriesData_3 = dataSet.mapAs({x: [0], value: [3]});
+    var seriesData_4 = dataSet.mapAs({x: [0], value: [4]});
+
+    chart = anychart.column();
+    chart.yScale().stackMode('percent');
+
+    // set container id for the chart
+    chart.container('container');
+    chart.title().text('Chart performance');
+    chart.yAxis(0).labels().textFormatter(function(info) {
+      return info.value + '%';
+    });
+    chart.yAxis().title().text('Time (ms)');
+    chart.xAxis().title().text('The number of points');
+    chart.legend(true);
+
+    // helper function to setup label settings for all series
+    var setupSeriesLabels = function(series) {
+      var seriesLabels = series.labels();
+      seriesLabels.enabled(true);
+      seriesLabels.position('center');
+      seriesLabels.anchor('center');
+      seriesLabels.fontColor('white');
+      seriesLabels.fontWeight('bold');
+    };
+
+    // temp variable to store series instance
+    var series;
+
+    // create first series with mapped data
+    series = chart.column(seriesData_1).name('ctor');
+    setupSeriesLabels(series);
+
+    series = chart.column(seriesData_2).name('create series');
+    setupSeriesLabels(series);
+
+    series = chart.column(seriesData_3).name('set container');
+    setupSeriesLabels(series);
+
+    series = chart.column(seriesData_4).name('draw');
+    setupSeriesLabels(series);
+
+    // initiate chart drawing
+    chart.draw();
+
+    console.timeEnd('all');
+  }
+</script>
+</html>

@@ -1488,17 +1488,6 @@ anychart.utils.callLog_ = function(name, message, opt_exception) {
 
 
 /**
- * Returns the number of milliseconds passed since an event in past. Returns fractional milliseconds, if possible.
- * Consequent calls return non-decreasing numeric sequences.
- * @return {number}
- */
-anychart.utils.relativeNow = (
-    goog.global['performance'] && goog.isFunction(goog.global['performance']['now']) ?
-        goog.bind(goog.global['performance']['now'], goog.global['performance']) :
-        goog.now);
-
-
-/**
  * Caches of static datetime formatter.
  * @type {Object.<string, goog.i18n.DateTimeFormat>}
  * @private

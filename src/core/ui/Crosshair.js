@@ -742,7 +742,7 @@ anychart.core.ui.Crosshair.prototype.getLabelsFormatProvider_ = function(axis, r
       labelText = +scaleValue.toFixed(1);
       break;
     case anychart.enums.ScaleTypes.ORDINAL:
-      labelText = scaleValue.toString();
+      labelText = String(scaleValue);
       break;
     case anychart.enums.ScaleTypes.DATE_TIME:
       var date = new Date(scaleValue);

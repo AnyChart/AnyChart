@@ -16,6 +16,10 @@ goog.require('anychart.core.utils.TypedLayer');
  */
 anychart.core.polar.series.Line = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
+  // legacy
+  this.stroke(function() {
+    return this['sourceColor'];
+  });
   this.hoverStroke(function() {
     return anychart.color.lighten(this['sourceColor']);
   });
@@ -173,12 +177,6 @@ anychart.core.polar.series.Line.prototype.colorizeShape = function(pintState) {
     path.fill(null);
   }, this);
 };
-
-
-/** @inheritDoc */
-anychart.core.polar.series.Line.prototype.strokeInternal = (function() {
-  return this['sourceColor'];
-});
 
 
 /** @inheritDoc */

@@ -18,9 +18,8 @@ anychart.core.cartesian.series.RangeSplineArea = function(opt_data, opt_csvSetti
   goog.base(this, opt_data, opt_csvSettings);
 
   // Define reference points for a series
-  this.referenceValueNames = ['x', 'low', 'high'];
-  this.referenceValueMeanings = ['x', 'y', 'y'];
-  this.referenceValuesSupportStack = false;
+  this.yValueNames = ['low', 'high'];
+  this.seriesSupportsStack = false;
 
   /**
    * Spline drawer.
@@ -42,17 +41,11 @@ anychart.core.cartesian.series.RangeSplineArea.prototype.startDrawing = function
 
 /** @inheritDoc */
 anychart.core.cartesian.series.RangeSplineArea.prototype.drawFirstPoint = function(pointState) {
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues) {
-    return false;
-  }
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var x = referenceValues[0];
-    var low = referenceValues[1];
-    var high = referenceValues[2];
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var high = /** @type {number} */(this.iterator.meta('high'));
+    var low = /** @type {number} */(this.iterator.meta('low'));
 
-    this.finalizeSegment();
     this.queue_.resetDrawer(false);
     this.queue_.setStrokePath(this.highPath);
     this.path
@@ -63,34 +56,21 @@ anychart.core.cartesian.series.RangeSplineArea.prototype.drawFirstPoint = functi
     this.queue_.processPoint(x, high);
 
     this.lowsStack = [x, low];
-
-    this.getIterator().meta('x', x).meta('low', low).meta('high', high);
   }
-
-  return true;
 };
 
 
 /** @inheritDoc */
 anychart.core.cartesian.series.RangeSplineArea.prototype.drawSubsequentPoint = function(pointState) {
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues) {
-    return false;
-  }
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var x = referenceValues[0];
-    var low = referenceValues[1];
-    var high = referenceValues[2];
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var high = /** @type {number} */(this.iterator.meta('high'));
+    var low = /** @type {number} */(this.iterator.meta('low'));
 
     this.queue_.processPoint(x, high);
 
     this.lowsStack.push(x, low);
-
-    this.getIterator().meta('x', x).meta('low', low).meta('high', high);
   }
-
-  return true;
 };
 
 

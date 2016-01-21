@@ -30,10 +30,7 @@ anychart.core.cartesian.series.Bar3d = function(opt_data, opt_csvSettings) {
    */
   this.clearedPathsPool_ = [];
 
-  // Define reference fields for a series
-  this.referenceValueNames = ['x', 'value', 'value'];
-  this.referenceValueMeanings = ['x', 'z', 'y'];
-  this.referenceValuesSupportStack = true;
+  this.needsZero = true;
 
   this.isAnimation_ = false;
 };
@@ -112,16 +109,12 @@ anychart.core.cartesian.series.Bar3d.prototype.startDrawing = function() {
 
 /** @inheritDoc */
 anychart.core.cartesian.series.Bar3d.prototype.drawSubsequentPoint = function(pointState) {
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues)
-    return false;
-
   var iter = this.getIterator();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var x = referenceValues[0];
-    var zero = referenceValues[1];
-    var y = referenceValues[2];
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var y = /** @type {number} */(this.iterator.meta('value'));
+    var zero = /** @type {number} */(this.iterator.meta('zero'));
 
     var bottomSide = this.genNextPath_();
     var backSide = this.genNextPath_();
@@ -139,7 +132,7 @@ anychart.core.cartesian.series.Bar3d.prototype.drawSubsequentPoint = function(po
     frontSide.zIndex(zIndex - inc);
     topSide.zIndex(zIndex - inc);
 
-    iter.meta('x', x).meta('zero', zero).meta('value', y)
+    iter
         .meta('shape', frontSide)
         .meta('frontSide', frontSide)
         .meta('backSide', backSide)

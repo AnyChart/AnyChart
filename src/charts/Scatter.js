@@ -1530,7 +1530,9 @@ anychart.charts.Scatter.prototype.drawContent = function(bounds) {
   var i;
   var count;
 
+  anychart.performance.start('Calulation');
   this.calculate();
+  anychart.performance.end('Calulation');
 
   if (this.isConsistent())
     return;
@@ -1733,7 +1735,9 @@ anychart.charts.Scatter.prototype.drawContent = function(bounds) {
     }
 
     this.calcBubbleSizes_();
+    anychart.performance.start('Series drawing');
     this.drawSeries_();
+    anychart.performance.end('Series drawing');
     this.markConsistent(anychart.ConsistencyState.SCATTER_SERIES);
   }
 

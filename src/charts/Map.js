@@ -2678,6 +2678,12 @@ anychart.charts.Map.prototype.toGeoJSON = function() {
 };
 
 
+/** @inheritDoc */
+anychart.charts.Map.prototype.checkIfColorRange = function(target) {
+  return target instanceof anychart.core.ui.ColorRange;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Setup.

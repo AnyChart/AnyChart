@@ -6,6 +6,7 @@
 goog.provide('anychart');
 goog.provide('anychart.globalLock');
 goog.require('acgraphexport');
+goog.require('anychart.performance');
 goog.require('anychart.themes.merging');
 goog.require('anychart.utils');
 goog.require('goog.dom');
@@ -40,6 +41,13 @@ anychart.VERSION = '';
  * @define {boolean} Replaced on compile time.
  */
 anychart.DEVELOP = true;
+
+
+/**
+ *
+ * @define {boolean} Replaced on compile time.
+ */
+anychart.PERFORMANCE_MONITORING = true;
 
 
 /**
@@ -572,6 +580,7 @@ anychart.theme = function(opt_value) {
  */
 anychart.getFullTheme = function() {
   if (!anychart.compiledTheme_) {
+    anychart.performance.start('Theme compilation');
     if (!anychart.defaultThemeCompiled_) {
       anychart.defaultThemeCompiled_ = anychart.themes.merging.compileTheme(
           goog.global['anychart']['themes'][anychart.DEFAULT_THEME]);
@@ -583,9 +592,14 @@ anychart.getFullTheme = function() {
     } else {
       anychart.compiledTheme_ = anychart.defaultThemeCompiled_;
     }
+    anychart.performance.end('Theme compilation');
   }
   return anychart.compiledTheme_;
 };
+
+
+// we execute it here to move load from first chart drawing to library initialization phase.
+anychart.getFullTheme();
 
 
 /**
@@ -848,6 +862,7 @@ anychart.ganttToolbar = anychart.ganttToolbar || function() {
 goog.exportSymbol('anychart.VERSION', anychart.VERSION);//doc|ex
 goog.exportSymbol('anychart.DEVELOP', anychart.DEVELOP);//doc|ex
 goog.exportSymbol('anychart.DEFAULT_THEME', anychart.DEFAULT_THEME);
+goog.exportSymbol('anychart.PERFORMANCE_MONITORING', anychart.PERFORMANCE_MONITORING);
 goog.exportSymbol('anychart.graphics', anychart.graphics);//import
 goog.exportSymbol('anychart.server', anychart.server);
 goog.exportSymbol('anychart.fromJson', anychart.fromJson);//doc|ex

@@ -17,9 +17,9 @@ anychart.core.cartesian.series.RangeColumn = function(opt_data, opt_csvSettings)
   goog.base(this, opt_data, opt_csvSettings);
 
   // Define reference points for a series
-  this.referenceValueNames = ['x', 'low', 'high'];
-  this.referenceValueMeanings = ['x', 'y', 'y'];
-  this.referenceValuesSupportStack = false;
+  this.yValueNames = ['low', 'high'];
+  this.seriesSupportsStack = false;
+  this.seriesSupportsError = false;
 };
 goog.inherits(anychart.core.cartesian.series.RangeColumn, anychart.core.cartesian.series.WidthBased);
 anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.RANGE_COLUMN] = anychart.core.cartesian.series.RangeColumn;
@@ -27,21 +27,16 @@ anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSerie
 
 /** @inheritDoc */
 anychart.core.cartesian.series.RangeColumn.prototype.drawSubsequentPoint = function(pointState) {
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues)
-    return false;
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-
-    var x = referenceValues[0];
-    var low = referenceValues[1];
-    var high = referenceValues[2];
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var high = /** @type {number} */(this.iterator.meta('high'));
+    var low = /** @type {number} */(this.iterator.meta('low'));
 
     /** @type {!acgraph.vector.Rect} */
     var rect = /** @type {!acgraph.vector.Rect} */(this.rootElement.genNextChild());
     var barWidth = this.getPointWidth();
 
-    this.getIterator().meta('x', x).meta('low', low).meta('high', high).meta('shape', rect);
+    this.iterator.meta('shape', rect);
 
     rect.setX(x - barWidth / 2).setY(Math.min(low, high)).setWidth(barWidth).setHeight(Math.abs(low - high));
 
@@ -62,8 +57,6 @@ anychart.core.cartesian.series.RangeColumn.prototype.drawSubsequentPoint = funct
     }
     this.applyHatchFill(pointState);
   }
-
-  return true;
 };
 
 
@@ -78,29 +71,6 @@ anychart.core.cartesian.series.RangeColumn.prototype.createPositionProvider = fu
   } else {
     return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('high')}};
   }
-};
-
-
-/**
- * @inheritDoc
- */
-anychart.core.cartesian.series.RangeColumn.prototype.isErrorAvailable = function() {
-  return false;
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Statistics
-//
-//----------------------------------------------------------------------------------------------------------------------
-/** @inheritDoc */
-anychart.core.cartesian.series.RangeColumn.prototype.calculateStatistics = function() {
-  this.statistics('seriesMax', -Infinity);
-  this.statistics('seriesMin', Infinity);
-  this.statistics('seriesSum', 0);
-  this.statistics('seriesAverage', 0);
-  this.statistics('seriesPointsCount', this.getIterator().getRowsCount());
 };
 
 

@@ -852,6 +852,5 @@ anychart.core.radar.series.Base.prototype['labels'] = anychart.core.radar.series
 anychart.core.radar.series.Base.prototype['hoverLabels'] = anychart.core.radar.series.Base.prototype.hoverLabels;
 anychart.core.radar.series.Base.prototype['xScale'] = anychart.core.radar.series.Base.prototype.xScale;//need-ex
 anychart.core.radar.series.Base.prototype['yScale'] = anychart.core.radar.series.Base.prototype.yScale;//need-ex
-anychart.core.radar.series.Base.prototype['legendItem'] = anychart.core.radar.series.Base.prototype.legendItem;
 anychart.core.radar.series.Base.prototype['hover'] = anychart.core.radar.series.Base.prototype.hover;
 anychart.core.radar.series.Base.prototype['transformXY'] = anychart.core.radar.series.Base.prototype.transformXY;

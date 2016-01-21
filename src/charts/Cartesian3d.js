@@ -209,12 +209,12 @@ anychart.charts.Cartesian3d.prototype.setSeriesPointZIndex_ = function(series) {
 
 
 /** @inheritDoc */
-anychart.charts.Cartesian3d.prototype.calculate = function() {
-  anychart.charts.Cartesian3d.base(this, 'calculate');
+anychart.charts.Cartesian3d.prototype.calculateYScales = function() {
+  anychart.charts.Cartesian3d.base(this, 'calculateYScales');
 
   this.lastEnabledAreaSeriesMap = {};
   goog.object.forEach(this.getAllSeries(), function(series) {
-    if (series.enabled()) {
+    if (series && series.enabled()) {
       var iterator = series.getResetIterator();
       while (iterator.advance()) {
         this.setSeriesPointZIndex_(/** @type {anychart.core.cartesian.series.Base} */(series));

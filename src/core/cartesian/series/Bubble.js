@@ -40,9 +40,10 @@ anychart.core.cartesian.series.Bubble = function(opt_data, opt_csvSettings) {
   this.displayNegative_ = false;
 
   // Define reference fields for a series
-  this.referenceValueNames = ['x', 'value', 'size'];
-  this.referenceValueMeanings = ['x', 'y', 'n'];
-  this.referenceValuesSupportStack = false;
+  this.additionalNames.push('size');
+  this.seriesSupportsStack = false;
+  this.seriesSupportsError = false;
+  this.checkSize = true;
 
   this.markers().position(anychart.enums.Position.CENTER);
   this.labels().position(anychart.enums.Position.CENTER);
@@ -206,14 +207,6 @@ anychart.core.cartesian.series.Bubble.prototype.isSizeBased = function() {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.cartesian.series.Bubble.prototype.isErrorAvailable = function() {
-  return false;
-};
-
-
 /** @inheritDoc */
 anychart.core.cartesian.series.Bubble.prototype.rootTypedLayerInitializer = function() {
   return acgraph.circle();
@@ -225,8 +218,6 @@ anychart.core.cartesian.series.Bubble.prototype.rootTypedLayerInitializer = func
  */
 anychart.core.cartesian.series.Bubble.prototype.startDrawing = function() {
   goog.base(this, 'startDrawing');
-
-  this.calculateSizeScale();
 
   var size = Math.min(this.pixelBoundsCache.height, this.pixelBoundsCache.width);
 
@@ -253,7 +244,7 @@ anychart.core.cartesian.series.Bubble.prototype.calculateSizeScale = function(op
     this.selfMaximumBubbleValue_ = Number.NEGATIVE_INFINITY;
 
     var size;
-    var iter = this.data().getIterator();
+    var iter = this.getResetIterator();
     while (iter.advance()) {
       size = +/** @type {number} */(iter.get('size'));
       if (size > 0 || this.displayNegative_) {
@@ -321,22 +312,17 @@ anychart.core.cartesian.series.Bubble.prototype.setAnimation = function(value) {
 
 /** @inheritDoc */
 anychart.core.cartesian.series.Bubble.prototype.drawSubsequentPoint = function(pointState) {
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues)
-    return false;
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-
-    var x = referenceValues[0];
-    var y = referenceValues[1];
-    var size = this.calculateSize_(referenceValues[2]);
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var y = /** @type {number} */(this.iterator.meta('value'));
+    var size = this.calculateSize_(/** @type {number} */(this.iterator.get('size')));
 
     if (size < 0 && !this.displayNegative_) return false;
 
     /** @type {!acgraph.vector.Circle} */
     var circle = /** @type {!acgraph.vector.Circle} */(this.rootElement.genNextChild());
 
-    this.getIterator().meta('x', x).meta('value', y).meta('size', size).meta('shape', circle);
+    this.iterator.meta('shape', circle).meta('size', size);
 
     if (!this.isAnimation_)
       circle
@@ -353,19 +339,16 @@ anychart.core.cartesian.series.Bubble.prototype.drawSubsequentPoint = function(p
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
-    var iterator = this.getIterator();
     var hatchFillShape = this.hatchFillRootElement ?
         /** @type {!acgraph.vector.Rect} */(this.hatchFillRootElement.genNextChild()) :
         null;
-    iterator.meta('hatchFillShape', hatchFillShape);
-    var shape = /** @type {acgraph.vector.Shape} */(iterator.meta('shape'));
+    this.iterator.meta('hatchFillShape', hatchFillShape);
+    var shape = /** @type {acgraph.vector.Shape} */(this.iterator.meta('shape'));
     if (goog.isDef(shape) && hatchFillShape) {
       hatchFillShape.deserialize(shape.serialize());
     }
     this.applyHatchFill(pointState);
   }
-
-  return true;
 };
 
 
@@ -414,13 +397,6 @@ anychart.core.cartesian.series.Bubble.prototype.applyHatchFill = function(pointS
         .stroke(null)
         .fill(fill);
   }
-};
-
-
-/** @inheritDoc */
-anychart.core.cartesian.series.Bubble.prototype.categoriseData = function(categories) {
-  goog.base(this, 'categoriseData', categories);
-  this.invalidate(anychart.ConsistencyState.SERIES_DATA);
 };
 
 

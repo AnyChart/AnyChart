@@ -30,10 +30,7 @@ anychart.core.cartesian.series.Column3d = function(opt_data, opt_csvSettings) {
    */
   this.clearedPathsPool_ = [];
 
-  // Define reference fields for a series
-  this.referenceValueNames = ['x', 'value', 'value'];
-  this.referenceValueMeanings = ['x', 'z', 'y'];
-  this.referenceValuesSupportStack = true;
+  this.needsZero = true;
 
   this.isAnimation_ = false;
 };
@@ -112,16 +109,10 @@ anychart.core.cartesian.series.Column3d.prototype.startDrawing = function() {
 
 /** @inheritDoc */
 anychart.core.cartesian.series.Column3d.prototype.drawSubsequentPoint = function(pointState) {
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues)
-    return false;
-
-  var iter = this.getIterator();
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var x = referenceValues[0];
-    var zero = referenceValues[1];
-    var y = referenceValues[2];
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var y = /** @type {number} */(this.iterator.meta('value'));
+    var zero = /** @type {number} */(this.iterator.meta('zero'));
 
     var bottomSide = this.genNextPath_();
     var backSide = this.genNextPath_();
@@ -130,8 +121,8 @@ anychart.core.cartesian.series.Column3d.prototype.drawSubsequentPoint = function
     var frontSide = this.genNextPath_();
     var topSide = this.genNextPath_();
 
-    var inc = iter.getIndex() * 1e-4;
-    var zIndex = /** @type {number} */(iter.meta('zIndex'));
+    var inc = this.iterator.getIndex() * 1e-4;
+    var zIndex = /** @type {number} */(this.iterator.meta('zIndex'));
     bottomSide.zIndex(zIndex + inc);
     backSide.zIndex(zIndex + inc);
     leftSide.zIndex(zIndex + inc);
@@ -139,7 +130,7 @@ anychart.core.cartesian.series.Column3d.prototype.drawSubsequentPoint = function
     frontSide.zIndex(zIndex + inc);
     topSide.zIndex(zIndex + inc);
 
-    iter.meta('x', x).meta('zero', zero).meta('value', y)
+    this.iterator
         .meta('shape', frontSide)
         .meta('frontSide', frontSide)
         .meta('backSide', backSide)
@@ -158,7 +149,7 @@ anychart.core.cartesian.series.Column3d.prototype.drawSubsequentPoint = function
       var height = Math.abs(zero - y);
 
       var bounds3d = new anychart.math.Rect(x_, y_ - y3dShift, width + x3dShift, height + y3dShift);
-      iter.meta('bounds3d', bounds3d);
+      this.iterator.meta('bounds3d', bounds3d);
       var pixelShift = this.getFinalStroke(true, pointState)['thickness'] % 2 / 2;
       if (isNaN(pixelShift)) pixelShift = 0;
 
@@ -227,8 +218,8 @@ anychart.core.cartesian.series.Column3d.prototype.drawSubsequentPoint = function
   //  var hatchFillShape = this.hatchFillRootElement ?
   //      /** @type {!acgraph.vector.Path} */(this.hatchFillRootElement.genNextChild()) :
   //      null;
-  //  iter.meta('hatchFillShape', hatchFillShape);
-  //  var shape = /** @type {acgraph.vector.Shape} */(iter.meta('shape'));
+  //  this.iterator.meta('hatchFillShape', hatchFillShape);
+  //  var shape = /** @type {acgraph.vector.Shape} */(this.iterator.meta('shape'));
   //  if (goog.isDef(shape) && hatchFillShape) {
   //    hatchFillShape.deserialize(shape.serialize());
   //  }

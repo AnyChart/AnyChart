@@ -186,6 +186,13 @@ def __get_developers_edition_compiler_args():
     ]
 
 
+def __get_performance_monitoring_compiler_args():
+    flag = 'true' if __is_performance_monitoring() else 'false'
+    return [
+        '--define "anychart.PERFORMANCE_MONITORING=%s"' % flag,
+    ]
+
+
 def __get_toolbar_css_compiler_args(modules):
     if ('anychart' in modules) or ('toolbar' in modules) or ('anygantt' in modules) or ('anychart_bundle' in modules):
         with open(CSS_PATH, 'r') as css_file:
@@ -321,14 +328,16 @@ def __compile_project():
 
 def __build_project_sources(modules):
     dev_postfix = '.dev' if __is_develop() else ''
-    file_name = "%s%s%s" % ('_'.join(modules), dev_postfix, '.js')
+    perf_postfix = '.perf' if __is_performance_monitoring() else ''
+    file_name = "%s%s%s%s" % ('_'.join(modules), dev_postfix, perf_postfix, '.js')
     file_name = __apply_specific_file_name_rule(file_name, modules)
     output_file = os.path.join(OUT_PATH, file_name)
-    print "Compile source file for modules: %s\nOutput: %s\nVersion: %s\nDevelopers edition: %s" % (
-        ', '.join(modules), output_file, __get_version(True), str(arguments['develop']))
+    print "Compile source file for modules: %s\nOutput: %s\nVersion: %s\nDevelopers edition: %s\nPerformance monitoring: %s" % (
+        ', '.join(modules), output_file, __get_version(True), str(arguments['develop']), str(arguments['performance_monitoring']))
     commands = __get_default_compiler_args() + \
                __get_not_optimized_compiler_args() + \
                __get_developers_edition_compiler_args() + \
+               __get_performance_monitoring_compiler_args() + \
                __get_toolbar_css_compiler_args(modules) + \
                __get_name_spaces(modules) + \
                __get_roots() + \
@@ -382,23 +391,39 @@ def __get_copyrigth(modules):
     return copyright
 
 
+def __get_wrapper(file_name):
+    performanceStart = ''
+    performanceEnd = ''
+    if __is_performance_monitoring():
+        performanceStart = 'window.anychart_init_start=(typeof window.performance==\'object\')' + \
+            '&&(typeof window.performance.now==\'function\')?window.performance.now():+new Date();'
+        performanceEnd = ';if(console&&(typeof console.log!=\'object\'))console.log(\'AnyChart library initialized in:\',' + \
+            '(window.anychart_init_start=(typeof window.performance==\'object\')' + \
+            '&&(typeof window.performance.now==\'function\')?window.performance.now():+new Date()-window.anychart_init_start).toFixed(5),\'ms\');delete window.anychart_init_start'
+    sourceMapping = ('//# sourceMappingURL=%s.map' % file_name) if __should_gen_debug_files() else ''
+    return '(function(){%s%s%s})()%s' % (performanceStart, '%output%', performanceEnd, sourceMapping)
+
+
 def __build_project(modules):
     dev_postfix = '.dev' if __is_develop() else ''
-    file_name = "%s%s%s" % ('_'.join(modules), dev_postfix, '.min.js')
+    perf_postfix = '.perf' if __is_performance_monitoring() else ''
+    file_name = "%s%s%s%s" % ('_'.join(modules), dev_postfix, perf_postfix, '.min.js')
     file_name = __apply_specific_file_name_rule(file_name, modules)
     output_file = os.path.join(OUT_PATH, file_name)
-    print "Compile binary file for modules: %s\nOutput: %s\nVersion: %s\nDevelopers edition: %s\nDebug files: %s\nGzip: %s \nTheme: %s" % (
+    print "Compile binary file for modules: %s\nOutput: %s\nVersion: %s\nDevelopers edition: %s\nDebug files: %s\nGzip: %s \nTheme: %s\nPerformance monitoring: %s" % (
         ', '.join(modules), output_file, __get_version(True), str(arguments['develop']), str(arguments['debug_files']),
-        str(arguments['gzip']), str(arguments['theme']))
+        str(arguments['gzip']), str(arguments['theme']), str(arguments['performance_monitoring']))
     copyright = __get_copyrigth(modules)
+    wrapper = __get_wrapper(file_name)
     commands = __get_default_compiler_args() + \
                __get_optimized_compiler_args() + \
                __get_developers_edition_compiler_args() + \
+               __get_performance_monitoring_compiler_args() + \
                __get_toolbar_css_compiler_args(modules) + \
                __get_name_spaces(modules) + \
                __get_roots() + \
                __get_output_file_arg(output_file) + \
-               ['--output_wrapper "' + copyright + '(function(){%output%})()' + '%s"' % (('//# sourceMappingURL=%s.map' % file_name) if __should_gen_debug_files() else '')]
+               ['--output_wrapper "' + copyright + wrapper + '"']
 
     #debug info
     if __should_gen_debug_files():
@@ -692,6 +717,11 @@ def __is_develop():
     return 'develop' in arguments and str(arguments['develop']) == 'True'
 
 
+def __is_performance_monitoring():
+    global arguments
+    return 'performance_monitoring' in arguments and str(arguments['performance_monitoring']) == 'True'
+
+
 def __should_gen_debug_files():
     global arguments
     return 'debug_files' in arguments and str(arguments['debug_files']) == 'True'
@@ -721,6 +751,7 @@ def __exec_main_script():
     compile_parser.add_argument('-s', '--sources', action='store_true',
                                 help='Build project sources file (not minimized).')
     compile_parser.add_argument('-d', '--develop', action='store_true', help='Include developers tools into build.')
+    compile_parser.add_argument('-pm', '--performance_monitoring', action='store_true', help='Include performance monitoring tools into build.')
     compile_parser.add_argument('-gz', '--gzip', action='store_true', help='Create gzip copy of output file.')
     compile_parser.add_argument('-df', '--debug_files', action='store_true',
                                 help='Create files with debug info (prop_out, var_out, sourcemap).')
@@ -732,6 +763,8 @@ def __exec_main_script():
     compile_each_parser = subparsers.add_parser('compile_each', help='Compile each project available module')
     compile_each_parser.add_argument('-d', '--develop', action='store_true',
                                      help='Include developers tools flag in each module compilation.')
+    compile_each_parser.add_argument('-pm', '--performance_monitoring', action='store_true',
+                                    help='Include performance monitoring tools into build.')
     compile_each_parser.add_argument('-df', '--debug_files', action='store_true',
                                      help='Create files with debug info (prop_out, var_out, sourcemap).')
     compile_each_parser.add_argument('-gz', '--gzip', action='store_true', help='Create gzip copy of output file.')

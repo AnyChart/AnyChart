@@ -17,6 +17,8 @@ goog.require('anychart.enums');
 anychart.core.cartesian.series.BaseWithMarkers = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
 
+  this.additionalNames.push('marker');
+
   this.markers().position(anychart.enums.Position.CENTER);
 };
 goog.inherits(anychart.core.cartesian.series.BaseWithMarkers, anychart.core.cartesian.series.Base);
@@ -172,11 +174,10 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.startDrawing = function
 
 
 /** @inheritDoc */
-anychart.core.cartesian.series.BaseWithMarkers.prototype.drawPoint = function(pointState) {
-  goog.base(this, 'drawPoint', pointState);
-  if (this.enabled() && this.firstPointDrawn) {
+anychart.core.cartesian.series.BaseWithMarkers.prototype.drawPointElements = function(pointState) {
+  anychart.core.cartesian.series.BaseWithMarkers.base(this, 'drawPointElements', pointState);
+  if (this.shouldDrawMarkers)
     this.drawMarker(pointState);
-  }
 };
 
 
@@ -238,49 +239,41 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.getMarkersPosition = fu
  */
 anychart.core.cartesian.series.BaseWithMarkers.prototype.drawMarker = function(pointState) {
   var iterator = this.getIterator();
+  var index = iterator.getIndex();
+  var marker = this.markers().getMarker(index);
 
   var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
   var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
+  var isDraw, markersFactory, pointMarker, stateMarker, markerEnabledState, stateMarkerEnabledState;
 
-  var pointMarker = iterator.get('marker');
-  var hoverPointMarker = iterator.get('hoverMarker');
-  var selectPointMarker = iterator.get('selectMarker');
-
-  var index = iterator.getIndex();
-  var markersFactory;
+  pointMarker = iterator.get('marker');
+  markerEnabledState = pointMarker && goog.isDef(pointMarker['enabled']) ? pointMarker['enabled'] : null;
   if (selected) {
+    stateMarker = iterator.get('selectMarker');
+    stateMarkerEnabledState = stateMarker && goog.isDef(stateMarker['enabled']) ? stateMarker['enabled'] : null;
     markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.selectMarkers());
   } else if (hovered) {
+    stateMarker = iterator.get('hoverMarker');
+    stateMarkerEnabledState = stateMarker && goog.isDef(stateMarker['enabled']) ? stateMarker['enabled'] : null;
     markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.hoverMarkers());
   } else {
-    markersFactory = /** @type {anychart.core.ui.MarkersFactory} */(this.markers());
+    stateMarker = undefined;
+    markersFactory = this.markers_;
   }
 
-  var marker = this.markers().getMarker(index);
-
-  var markerEnabledState = pointMarker && goog.isDef(pointMarker['enabled']) ? pointMarker['enabled'] : null;
-  var markerHoverEnabledState = hoverPointMarker && goog.isDef(hoverPointMarker['enabled']) ? hoverPointMarker['enabled'] : null;
-  var markerSelectEnabledState = selectPointMarker && goog.isDef(selectPointMarker['enabled']) ? selectPointMarker['enabled'] : null;
-
-  var isDraw = hovered || selected ?
-      hovered ?
-          goog.isNull(markerHoverEnabledState) ?
-              this.hoverMarkers_ && goog.isNull(this.hoverMarkers_.enabled()) ?
-                  goog.isNull(markerEnabledState) ?
-                      this.markers_.enabled() :
-                      markerEnabledState :
-                  this.hoverMarkers_.enabled() :
-              markerHoverEnabledState :
-          goog.isNull(markerSelectEnabledState) ?
-              this.selectMarkers_ && goog.isNull(this.selectMarkers_.enabled()) ?
-                  goog.isNull(markerEnabledState) ?
-                      this.markers_.enabled() :
-                      markerEnabledState :
-                  this.selectMarkers_.enabled() :
-              markerSelectEnabledState :
-      goog.isNull(markerEnabledState) ?
-          this.markers_.enabled() :
-          markerEnabledState;
+  if (selected || hovered) {
+    isDraw = goog.isNull(stateMarkerEnabledState) ?
+        goog.isNull(markersFactory.enabled()) ?
+            goog.isNull(markerEnabledState) ?
+                this.markers_.enabled() :
+                markerEnabledState :
+            markersFactory.enabled() :
+        stateMarkerEnabledState;
+  } else {
+    isDraw = goog.isNull(markerEnabledState) ?
+        this.markers_.enabled() :
+        markerEnabledState;
+  }
 
   if (isDraw) {
     var position = this.getMarkersPosition(pointState);
@@ -294,7 +287,7 @@ anychart.core.cartesian.series.BaseWithMarkers.prototype.drawMarker = function(p
 
     marker.resetSettings();
     marker.currentMarkersFactory(markersFactory);
-    marker.setSettings(/** @type {Object} */(pointMarker), /** @type {Object} */(hovered ? hoverPointMarker : selectPointMarker));
+    marker.setSettings(/** @type {Object} */(pointMarker), /** @type {Object} */(stateMarker));
     marker.draw();
   } else if (marker) {
     marker.clear();

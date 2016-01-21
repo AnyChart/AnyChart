@@ -111,9 +111,9 @@ anychart.core.SeriesBase.prototype.parentViewToDispose;
 /**
  *
  * @type {!anychart.data.Iterator}
- * @private
+ * @protected
  */
-anychart.core.SeriesBase.prototype.iterator_;
+anychart.core.SeriesBase.prototype.iterator;
 
 
 /**
@@ -194,7 +194,7 @@ anychart.core.SeriesBase.prototype.selectFill_;
  * @type {(acgraph.vector.Stroke|Function|null)}
  * @protected
  */
-anychart.core.SeriesBase.prototype.strokeInternal;
+anychart.core.SeriesBase.prototype.stroke_;
 
 
 /**
@@ -366,7 +366,7 @@ anychart.core.SeriesBase.prototype.dataInvalidated_ = function(e) {
  * @return {!anychart.data.Iterator} Current series iterator.
  */
 anychart.core.SeriesBase.prototype.getIterator = function() {
-  return this.iterator_ || this.getResetIterator();
+  return this.iterator || this.getResetIterator();
 };
 
 
@@ -375,7 +375,27 @@ anychart.core.SeriesBase.prototype.getIterator = function() {
  * @return {!anychart.data.Iterator} New iterator.
  */
 anychart.core.SeriesBase.prototype.getResetIterator = function() {
-  return this.iterator_ = this.data().getIterator();
+  return this.iterator = this.data().getIterator();
+};
+
+
+/**
+ * Gets stacked zero from data by index. Stab for SeriesPoint class where direct index reference needed.
+ * @param {number} index
+ * @return {*}
+ */
+anychart.core.SeriesBase.prototype.getStackedZero = function(index) {
+  return this.data().meta(index, 'zero');
+};
+
+
+/**
+ * Gets stacked value from data by index. Stab for SeriesPoint class where direct index reference needed.
+ * @param {number} index
+ * @return {*}
+ */
+anychart.core.SeriesBase.prototype.getStackedValue = function(index) {
+  return this.data().meta(index, 'value');
 };
 
 
@@ -478,8 +498,6 @@ anychart.core.SeriesBase.prototype.id = function(opt_value) {
  * @return {anychart.core.SeriesBase|Object.<number>|number}
  */
 anychart.core.SeriesBase.prototype.statistics = function(opt_name, opt_value) {
-  if (!this.statistics_)
-    this.calculateStatistics();
   if (goog.isDef(opt_name)) {
     if (goog.isDef(opt_value)) {
       this.statistics_[opt_name] = opt_value;
@@ -952,13 +970,13 @@ anychart.core.SeriesBase.prototype.stroke = function(opt_strokeOrFill, opt_thick
     var stroke = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
         acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.strokeInternal) {
-      this.strokeInternal = stroke;
+    if (stroke != this.stroke_) {
+      this.stroke_ = stroke;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
     }
     return this;
   }
-  return this.strokeInternal;
+  return this.stroke_;
 };
 
 
@@ -1191,49 +1209,41 @@ anychart.core.SeriesBase.prototype.getLabelsPosition = function(pointState) {
  */
 anychart.core.SeriesBase.prototype.drawLabel = function(pointState) {
   var iterator = this.getIterator();
+  var index = iterator.getIndex();
+  var label = this.labels().getLabel(index);
 
   var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
   var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
+  var isDraw, labelsFactory, pointLabel, stateLabel, labelEnabledState, stateLabelEnabledState;
 
-  var pointLabel = iterator.get('label');
-  var hoverPointLabel = hovered ? iterator.get('hoverLabel') : null;
-  var selectPointLabel = selected ? iterator.get('selectLabel') : null;
-
-  var index = iterator.getIndex();
-  var labelsFactory;
+  pointLabel = iterator.get('label');
+  labelEnabledState = pointLabel && goog.isDef(pointLabel['enabled']) ? pointLabel['enabled'] : null;
   if (selected) {
+    stateLabel = iterator.get('selectLabel');
+    stateLabelEnabledState = stateLabel && goog.isDef(stateLabel['enabled']) ? stateLabel['enabled'] : null;
     labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels());
   } else if (hovered) {
+    stateLabel = iterator.get('hoverLabel');
+    stateLabelEnabledState = stateLabel && goog.isDef(stateLabel['enabled']) ? stateLabel['enabled'] : null;
     labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels());
   } else {
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
+    stateLabel = null;
+    labelsFactory = this.labels_;
   }
 
-  var label = this.labels().getLabel(index);
-
-  var labelEnabledState = pointLabel && goog.isDef(pointLabel['enabled']) ? pointLabel['enabled'] : null;
-  var labelSelectEnabledState = selectPointLabel && goog.isDef(selectPointLabel['enabled']) ? selectPointLabel['enabled'] : null;
-  var labelHoverEnabledState = hoverPointLabel && goog.isDef(hoverPointLabel['enabled']) ? hoverPointLabel['enabled'] : null;
-
-  var isDraw = hovered || selected ?
-      hovered ?
-          goog.isNull(labelHoverEnabledState) ?
-              goog.isNull(this.hoverLabels().enabled()) ?
-                  goog.isNull(labelEnabledState) ?
-                      this.labels().enabled() :
-                      labelEnabledState :
-                  this.hoverLabels().enabled() :
-              labelHoverEnabledState :
-          goog.isNull(labelSelectEnabledState) ?
-              goog.isNull(this.selectLabels().enabled()) ?
-                  goog.isNull(labelEnabledState) ?
-                      this.labels().enabled() :
-                      labelEnabledState :
-                  this.selectLabels().enabled() :
-              labelSelectEnabledState :
-      goog.isNull(labelEnabledState) ?
-          this.labels().enabled() :
-          labelEnabledState;
+  if (selected || hovered) {
+    isDraw = goog.isNull(stateLabelEnabledState) ?
+        goog.isNull(labelsFactory.enabled()) ?
+            goog.isNull(labelEnabledState) ?
+                this.labels_.enabled() :
+                labelEnabledState :
+            labelsFactory.enabled() :
+        stateLabelEnabledState;
+  } else {
+    isDraw = goog.isNull(labelEnabledState) ?
+        this.labels_.enabled() :
+        labelEnabledState;
+  }
 
   if (isDraw) {
     var position = this.getLabelsPosition(pointState);
@@ -1249,7 +1259,7 @@ anychart.core.SeriesBase.prototype.drawLabel = function(pointState) {
 
     label.resetSettings();
     label.currentLabelsFactory(labelsFactory);
-    label.setSettings(/** @type {Object} */(pointLabel), /** @type {Object} */(hovered ? hoverPointLabel : selectPointLabel));
+    label.setSettings(/** @type {Object} */(pointLabel), /** @type {Object} */(stateLabel));
     label.draw();
   } else if (label) {
     label.clear();
@@ -1533,14 +1543,20 @@ anychart.core.SeriesBase.prototype.select = function(opt_indexOrIndexes) {
 
 
 /**
- * Selects all points of the series. Use <b>unselect</b> method for unselect series.
- * @return {!anychart.core.SeriesBase} An instance of the {@link anychart.core.SeriesBase} class for method chaining.
+ * Deselects all points or points by index.
+ * @param {(number|Array.<number>)=} opt_indexOrIndexes Index or array of indexes of the point to select.
+ * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
  */
-anychart.core.SeriesBase.prototype.selectSeries = function() {
+anychart.core.SeriesBase.prototype.unselect = function(opt_indexOrIndexes) {
   if (!this.enabled())
     return this;
 
-  this.state.setPointState(anychart.PointState.SELECT);
+  var index;
+  if (goog.isDef(opt_indexOrIndexes))
+    index = opt_indexOrIndexes;
+  else
+    index = (this.state.seriesState == anychart.PointState.NORMAL ? NaN : undefined);
+  this.state.removePointState(anychart.PointState.SELECT, index);
 
   return this;
 };
@@ -1571,33 +1587,25 @@ anychart.core.SeriesBase.prototype.selectPoint = function(indexOrIndexes, opt_ev
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Interactivity modes.
-//
-//----------------------------------------------------------------------------------------------------------------------
-
-
 /**
- * Deselects all points or points by index.
- * @param {(number|Array.<number>)=} opt_indexOrIndexes Index or array of indexes of the point to select.
- * @return {!anychart.core.SeriesBase} {@link anychart.core.SeriesBase} instance for method chaining.
+ * Selects all points of the series. Use <b>unselect</b> method for unselect series.
+ * @return {!anychart.core.SeriesBase} An instance of the {@link anychart.core.SeriesBase} class for method chaining.
  */
-anychart.core.SeriesBase.prototype.unselect = function(opt_indexOrIndexes) {
+anychart.core.SeriesBase.prototype.selectSeries = function() {
   if (!this.enabled())
     return this;
 
-  var index;
-  if (goog.isDef(opt_indexOrIndexes))
-    index = opt_indexOrIndexes;
-  else
-    index = (this.state.seriesState == anychart.PointState.NORMAL ? NaN : undefined);
-  this.state.removePointState(anychart.PointState.SELECT, index);
+  this.state.setPointState(anychart.PointState.SELECT);
 
   return this;
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Interactivity modes.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Selection mode.
  * @type {?anychart.enums.SelectionMode}
@@ -1677,6 +1685,16 @@ anychart.core.SeriesBase.prototype.allowPointsSelect = function(opt_value) {
 //  Serialize
 //
 //------------------------------------------- ---------------------------------------------------------------------------
+/**
+ * Serializes and returns data. Extracted for overridabillity.
+ * @return {!Object}
+ * @protected
+ */
+anychart.core.SeriesBase.prototype.serializeData = function() {
+  return this.data().serialize();
+};
+
+
 // Fill and stroke settings are located here, but you should export them ONLY in series themselves.
 /**
  * @inheritDoc
@@ -1687,7 +1705,7 @@ anychart.core.SeriesBase.prototype.serialize = function() {
     json['color'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.color_));
   if (goog.isDef(this.name()))
     json['name'] = this.name();
-  json['data'] = this.data().serialize();
+  json['data'] = this.serializeData();
   json['labels'] = this.labels().serialize();
   json['hoverLabels'] = this.hoverLabels().serialize();
   json['selectLabels'] = this.selectLabels().serialize();

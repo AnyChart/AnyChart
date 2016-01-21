@@ -16,11 +16,13 @@ goog.require('anychart.core.cartesian.series.ContinuousBase');
 anychart.core.cartesian.series.StepLine = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
 
-  // Define reference fields of a series
-  this.referenceValueNames = ['x', 'value'];
-  this.referenceValueMeanings = ['x', 'y'];
-  this.referenceValuesSupportStack = false;
+  // Define reference fields for a series
+  this.seriesSupportsStack = false;
 
+  // legacy
+  this.stroke(function() {
+    return this['sourceColor'];
+  });
   this.hoverStroke(function() {
     return anychart.color.lighten(this['sourceColor']);
   });
@@ -45,35 +47,23 @@ anychart.core.cartesian.series.StepLine.prototype.prevY_;
 
 /** @inheritDoc */
 anychart.core.cartesian.series.StepLine.prototype.drawFirstPoint = function(pointState) {
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues)
-    return false;
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var x = referenceValues[0];
-    var y = referenceValues[1];
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var y = /** @type {number} */(this.iterator.meta('value'));
 
     this.path.moveTo(x, y);
 
     this.prevX_ = x;
     this.prevY_ = y;
-
-    this.getIterator().meta('x', x).meta('value', y);
   }
-
-  return true;
 };
 
 
 /** @inheritDoc */
 anychart.core.cartesian.series.StepLine.prototype.drawSubsequentPoint = function(pointState) {
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues)
-    return false;
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var x = referenceValues[0];
-    var y = referenceValues[1];
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var y = /** @type {number} */(this.iterator.meta('value'));
 
     var midX = (x + this.prevX_) / 2;
     this.path
@@ -83,18 +73,8 @@ anychart.core.cartesian.series.StepLine.prototype.drawSubsequentPoint = function
 
     this.prevX_ = x;
     this.prevY_ = y;
-
-    this.getIterator().meta('x', x).meta('value', y);
   }
-
-  return true;
 };
-
-
-/** @inheritDoc */
-anychart.core.cartesian.series.StepLine.prototype.strokeInternal = (function() {
-  return this['sourceColor'];
-});
 
 
 /** @inheritDoc */

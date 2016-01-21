@@ -3514,8 +3514,22 @@ window['anychart']['themes']['v6'] = {
          * @this {*}
          * @return {*}
          */
+        'stroke': function() {
+          return this['sourceColor'];
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
         'hoverStroke': function() {
           return window['anychart']['color']['lighten'](this['sourceColor']);
+        },
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'selectStroke': function() {
+          return window['anychart']['color']['darken'](this['sourceColor']);
         }
       },
       'marker': {
@@ -3760,6 +3774,13 @@ window['anychart']['themes']['v6'] = {
       'area': {},
       'line': {
         'markers': {'enabled': true},
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'stroke': function() {
+          return this['sourceColor'];
+        },
         /**
          * @this {*}
          * @return {*}

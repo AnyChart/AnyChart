@@ -15,6 +15,8 @@ goog.require('anychart.core.cartesian.series.ContinuousBase');
 anychart.core.cartesian.series.ContinuousRangeBase = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
 
+  this.seriesSupportsError = false;
+
   /**
    * @type {!acgraph.vector.Path}
    * @protected
@@ -330,29 +332,6 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.finalizeHatchFill =
       this.applyHatchFill(seriesState);
     }
   }
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Statistics
-//
-//----------------------------------------------------------------------------------------------------------------------
-/** @inheritDoc */
-anychart.core.cartesian.series.ContinuousRangeBase.prototype.calculateStatistics = function() {
-  this.statistics('seriesMax', -Infinity);
-  this.statistics('seriesMin', Infinity);
-  this.statistics('seriesSum', 0);
-  this.statistics('seriesAverage', 0);
-  this.statistics('seriesPointsCount', this.getIterator().getRowsCount());
-};
-
-
-/**
- * @inheritDoc
- */
-anychart.core.cartesian.series.ContinuousRangeBase.prototype.isErrorAvailable = function() {
-  return false;
 };
 
 

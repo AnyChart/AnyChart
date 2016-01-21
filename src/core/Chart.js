@@ -17,6 +17,7 @@ goog.require('anychart.core.utils.Interactivity');
 goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.Margin');
 goog.require('anychart.core.utils.Padding');
+goog.require('anychart.performance');
 goog.require('anychart.themes.merging');
 goog.require('anychart.utils');
 goog.require('goog.json.hybrid');
@@ -682,9 +683,10 @@ anychart.core.Chart.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
     return this;
 
+  anychart.performance.start('Chart.draw()');
   var startTime;
   if (anychart.DEVELOP) {
-    startTime = anychart.utils.relativeNow();
+    startTime = anychart.performance.relativeNow();
   }
 
   this.suspendSignalsDispatching();
@@ -717,12 +719,18 @@ anychart.core.Chart.prototype.draw = function() {
   //end clear container consistency states
 
   // DVF-1648
+  anychart.performance.start('Chart.beforeDraw()');
   this.beforeDraw();
+  anychart.performance.end('Chart.beforeDraw()');
 
   //total chart area bounds, do not override, it can be useful later
+  anychart.performance.start('Chart.calculateBounds()');
   var totalBounds = /** @type {!anychart.math.Rect} */(this.getPixelBounds());
   var contentBounds = this.calculateContentAreaSpace(totalBounds);
+  anychart.performance.end('Chart.calculateBounds()');
+  anychart.performance.start('Chart.drawContent()');
   this.drawContent(contentBounds);
+  anychart.performance.end('Chart.drawContent()');
 
   // used for crosshair
   var background = this.background();
@@ -774,7 +782,11 @@ anychart.core.Chart.prototype.draw = function() {
 
   this.resumeSignalsDispatching(false);
 
-  if (manualSuspend) stage.resume();
+  if (manualSuspend) {
+    anychart.performance.start('Stage resume');
+    stage.resume();
+    anychart.performance.end('Stage resume');
+  }
 
   this.dispatchDetachedEvent({
     'type': anychart.enums.EventType.CHART_DRAW,
@@ -782,13 +794,15 @@ anychart.core.Chart.prototype.draw = function() {
   });
 
   if (anychart.DEVELOP) {
-    var msg = 'Chart rendering time: ' + anychart.math.round((anychart.utils.relativeNow() - startTime), 4);
+    var msg = 'Chart rendering time: ' + anychart.math.round((anychart.performance.relativeNow() - startTime), 4);
     anychart.utils.info(msg);
   }
 
 
   if (this.supportsBaseHighlight)
     this.onInteractivitySignal();
+
+  anychart.performance.end('Chart.draw()');
 
   return this;
 };
@@ -1246,14 +1260,17 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
     if (parent.isSeries && parent.isSeries())
       series = parent;
     index = tag;
-  } else if (event['target'] instanceof anychart.core.ui.Legend || event['target'] instanceof anychart.core.ui.ColorRange) {
+  } else if (event['target'] instanceof anychart.core.ui.Legend || this.checkIfColorRange(event['target'])) {
     if (tag) {
       if (tag.points_) {
         series = tag.points_.series;
         index = tag.points_.points;
       } else {
-        series = tag.series_;
-        index = tag.index_;
+        // I don't understand, why it is like this here.
+        //series = tag.series_;
+        //index = tag.index_;
+        series = tag.series;
+        index = tag.index;
       }
       forbidTooltip = true;
     }
@@ -1355,14 +1372,17 @@ anychart.core.Chart.prototype.handleMouseOut = function(event) {
     if (parent.isSeries && parent.isSeries())
       series = parent;
     index = tag;
-  } else if (event['target'] instanceof anychart.core.ui.Legend || event['target'] instanceof anychart.core.ui.ColorRange) {
+  } else if (event['target'] instanceof anychart.core.ui.Legend || this.checkIfColorRange(event['target'])) {
     if (tag) {
       if (tag.points_) {
         series = tag.points_.series;
         index = tag.points_.points;
       } else {
-        series = tag.series_;
-        index = tag.index_;
+        // I don't understand, why it is like this here.
+        //series = tag.series_;
+        //index = tag.index_;
+        series = tag.series;
+        index = tag.index;
       }
     }
     forbidTooltip = true;
@@ -1406,6 +1426,16 @@ anychart.core.Chart.prototype.handleMouseOut = function(event) {
 
 
 /**
+ * Checks if the target is a color range.
+ * @param {*} target
+ * @return {boolean}
+ */
+anychart.core.Chart.prototype.checkIfColorRange = function(target) {
+  return false;
+};
+
+
+/**
  * Handler for mouseClick event.
  * @param {anychart.core.MouseEvent} event Event object.
  */
@@ -1424,14 +1454,17 @@ anychart.core.Chart.prototype.handleMouseDown = function(event) {
     if (parent.isSeries && parent.isSeries())
       series = parent;
     index = tag;
-  } else if (event['target'] instanceof anychart.core.ui.Legend || event['target'] instanceof anychart.core.ui.ColorRange) {
+  } else if (event['target'] instanceof anychart.core.ui.Legend || this.checkIfColorRange(event['target'])) {
     if (tag) {
       if (tag.points_) {
         series = tag.points_.series;
         index = tag.points_.points;
       } else {
-        series = tag.series_;
-        index = tag.index_;
+        // I don't understand, why it is like this here.
+        //series = tag.series_;
+        //index = tag.index_;
+        series = tag.series;
+        index = tag.index;
       }
     }
   } else {

@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>AnyChart Framework</title>
-  <script src='../out/anychart.min.js' type="text/javascript"></script>
+  <script src='../../out/anychart-bundle.min.js'></script>
   <script>
     var areaChart, barChart;
 
@@ -67,87 +67,87 @@
         }
       }
 
-      areaChart = new anychart.charts.Cartesian();
+      areaChart = anychart.cartesian();
       drawChart(areaChart, 'area');
       areaChart.bounds(0, 0, 500, 400);
       areaChart.draw();
 
-      barChart = new anychart.charts.Cartesian();
+      barChart = anychart.cartesian();
       drawChart(barChart, 'bar');
       barChart.bounds(510, 0, 500, 400);
       barChart.draw();
 
-      var bubbleChart = new anychart.charts.Cartesian();
+      var bubbleChart = anychart.cartesian();
       drawChart(bubbleChart, 'bubble');
       bubbleChart.bounds(0, 410, 500, 400);
       bubbleChart.draw();
 
-      var candlestick = new anychart.charts.Cartesian();
+      var candlestick = anychart.cartesian();
       drawChart(candlestick, 'candlestick');
       candlestick.bounds(510, 410, 500, 400);
       candlestick.draw();
 
-      var column = new anychart.charts.Cartesian();
+      var column = anychart.cartesian();
       drawChart(column, 'column');
       column.bounds(0, 820, 500, 400);
       column.draw();
 
-      var line = new anychart.charts.Cartesian();
+      var line = anychart.cartesian();
       drawChart(line, 'line');
       line.bounds(510, 820, 500, 400);
       line.draw();
 
-      var ohlc = new anychart.charts.Cartesian();
+      var ohlc = anychart.cartesian();
       drawChart(ohlc, 'ohlc');
       ohlc.bounds(0, 1230, 500, 400);
       ohlc.draw();
 
-      var rangeArea = new anychart.charts.Cartesian();
+      var rangeArea = anychart.cartesian();
       drawChart(rangeArea, 'rangeArea');
       rangeArea.bounds(510, 1230, 500, 400);
       rangeArea.draw();
 
-      var rangeBar = new anychart.charts.Cartesian();
+      var rangeBar = anychart.cartesian();
       drawChart(rangeBar, 'rangeBar');
       rangeBar.bounds(0, 1640, 500, 400);
       rangeBar.draw();
 
-      var rangeColumn = new anychart.charts.Cartesian();
+      var rangeColumn = anychart.cartesian();
       drawChart(rangeColumn, 'rangeColumn');
       rangeColumn.bounds(510, 1640, 500, 400);
       rangeColumn.draw();
 
-      var rangeSplineArea = new anychart.charts.Cartesian();
+      var rangeSplineArea = anychart.cartesian();
       drawChart(rangeSplineArea, 'rangeSplineArea');
       rangeSplineArea.bounds(0, 2050, 500, 400);
       rangeSplineArea.draw();
 
-      var rangeStepArea = new anychart.charts.Cartesian();
+      var rangeStepArea = anychart.cartesian();
       drawChart(rangeStepArea, 'rangeStepArea');
       rangeStepArea.bounds(510, 2050, 500, 400);
       rangeStepArea.draw();
 
-      var spline = new anychart.charts.Cartesian();
+      var spline = anychart.cartesian();
       drawChart(spline, 'spline');
       spline.bounds(0, 2460, 500, 400);
       spline.draw();
 
-      var splineArea = new anychart.charts.Cartesian();
+      var splineArea = anychart.cartesian();
       drawChart(splineArea, 'splineArea');
       splineArea.bounds(510, 2460, 500, 400);
       splineArea.draw();
 
-      var stepLine = new anychart.charts.Cartesian();
+      var stepLine = anychart.cartesian();
       drawChart(stepLine, 'stepLine');
       stepLine.bounds(0, 2870, 500, 400);
       stepLine.draw();
 
-      var stepArea = new anychart.charts.Cartesian();
+      var stepArea = anychart.cartesian();
       drawChart(stepArea, 'stepArea');
       stepArea.bounds(510, 2870, 500, 400);
       stepArea.draw();
 
-      var markerChart = new anychart.charts.Cartesian();
+      var markerChart = anychart.cartesian();
       drawChart(markerChart, 'marker');
       markerChart.bounds(0, 3280, 500, 400);
       markerChart.draw();

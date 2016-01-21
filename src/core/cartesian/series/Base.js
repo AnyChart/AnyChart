@@ -1,14 +1,13 @@
 goog.provide('anychart.core.cartesian.series.Base');
 goog.require('acgraph');
 goog.require('anychart.core.SeriesBase');
+goog.require('anychart.core.utils.DrawingPlanIterator');
 goog.require('anychart.core.utils.Error');
 goog.require('anychart.core.utils.ISeriesWithError');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.core.utils.SeriesPointContextProvider');
 goog.require('anychart.data');
 goog.require('anychart.enums');
-goog.require('anychart.scales.Linear');
-goog.require('anychart.scales.Ordinal');
 goog.require('anychart.utils');
 
 
@@ -56,8 +55,101 @@ anychart.core.cartesian.series.Base = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.pathsPool_ = null;
+
+  // series fields definition
+  /**
+   * Whether the series should ignore missing points.
+   * @type {boolean}
+   * @protected
+   */
+  this.connectMissing = false;
+
+  /**
+   * Whether the series needs zero value support.
+   * @type {boolean}
+   * @protected
+   */
+  this.needsZero = false;
+
+  /**
+   * Whether the series supports stacking.
+   * @type {boolean}
+   * @protected
+   */
+  this.seriesSupportsStack = true;
+
+  /**
+   * Whether the series supports errors.
+   * @type {boolean}
+   * @protected
+   */
+  this.seriesSupportsError = true;
+
+  /**
+   * Names of Y scale fields, used by the series.
+   * @type {!Array.<string>}
+   */
+  this.yValueNames = ['value'];
+
+  /**
+   * If we should check "outliers" field.
+   * @type {boolean}
+   */
+  this.checkOutliers = false;
+
+  /**
+   * If we should check size field.
+   * @type {boolean}
+   */
+  this.checkSize = false;
+
+  /**
+   * Additional names to be pre-fetched to the plan.
+   * @type {!Array.<string>}
+   */
+  this.additionalNames = ['label'];
+
+  /**
+   * Error names to be fetched.
+   * @type {!Array.<string>}
+   */
+  this.xErrorNames = ['xError', 'xLowerError', 'xUpperError'];
+
+  /**
+   * Error names to be fetched.
+   * @type {!Array.<string>}
+   */
+  this.yErrorNames = ['valueError', 'valueLowerError', 'valueUpperError'];
 };
 goog.inherits(anychart.core.cartesian.series.Base, anychart.core.SeriesBase);
+
+
+/**
+ * @typedef {{
+ *   series: anychart.core.cartesian.series.Base,
+ *   data: Array.<Object>,
+ *   stacked: (boolean|undefined),
+ *   firstIndex: (number|undefined),
+ *   lastIndex: (number|undefined),
+ *   hasPointMarkers: (boolean|undefined),
+ *   hasPointLabels: (boolean|undefined),
+ *   hasPointErrors: (boolean|undefined),
+ *   xHashMap: (Object.<number>|undefined),
+ *   xArray: (Array|undefined)
+ * }}
+ */
+anychart.core.cartesian.series.Base.DrawingPlan;
+
+
+/**
+ * Compares points from drawing plan, assuming their X'es are numeric.
+ * @param {Object} a
+ * @param {Object} b
+ * @return {number}
+ */
+anychart.core.cartesian.series.Base.comparePointsXNumericAsc = function(a, b) {
+  return anychart.utils.compareNumericAsc(a['x'], b['x']);
+};
 
 
 /**
@@ -194,7 +286,7 @@ anychart.core.cartesian.series.Base.prototype.axesLinesSpace_;
  * @type {boolean}
  * @protected
  */
-anychart.core.cartesian.series.Base.prototype.firstPointDrawn = false;
+anychart.core.cartesian.series.Base.prototype.prevPointDrawn = false;
 
 
 /**
@@ -233,174 +325,306 @@ anychart.core.cartesian.series.Base.prototype.autoPointPosition_ = 0.5;
 anychart.core.cartesian.series.Base.prototype.zeroY = 0;
 
 
-/**
- * Field names certain type of series needs from data set.
- * For example ['x', 'value']. Must be created in constructor. getReferenceCoords() doesn't work without this.
- * @type {!Array.<string>}
- */
-anychart.core.cartesian.series.Base.prototype.referenceValueNames;
-
-
-/**
- * Attributes names list from referenceValueNames. Must be the same length as referenceValueNames.
- * For example ['x', 'y']. Must be created in constructor. getReferenceCoords() doesn't work without this.
- * Possible values:
- *    'x' - transforms through xScale,
- *    'y' - transforms through yScale,
- *    'z' - gets as zero Y.
- * NOTE: if we need zeroY, you need to ask for it prior toall 'y' values.
- * @type {!Array.<string>}
- */
-anychart.core.cartesian.series.Base.prototype.referenceValueMeanings;
-
-
-/**
- * Whether getReferenceCoords() must support stacking.
- * @type {boolean}
- * @protected
- */
-anychart.core.cartesian.series.Base.prototype.referenceValuesSupportStack = true;
-
-
-/**
- * Whether series can be stacked.
- * @return {boolean} .
- */
-anychart.core.cartesian.series.Base.prototype.supportsStack = function() {
-  return this.referenceValuesSupportStack;
-};
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Data
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * DO NOT PUBLISH.
- */
-anychart.core.cartesian.series.Base.prototype.resetCategorisation = function() {
-  if (this.dataInternal != this.parentView)
-    goog.dispose(this.dataInternal);
-  this.dataInternal = /** @type {!anychart.data.View} */(this.parentView);
+/** @inheritDoc */
+anychart.core.cartesian.series.Base.prototype.getResetIterator = function() {
+  if (this.drawingPlan)
+    this.iterator = new anychart.core.utils.DrawingPlanIterator(this.drawingPlan, /** @type {!anychart.data.View} */(this.data()));
+  else
+    this.iterator = this.data().getIterator();
+  return this.iterator;
+};
+
+
+/** @inheritDoc */
+anychart.core.cartesian.series.Base.prototype.getStackedZero = function(index) {
+  if (this.drawingPlan) {
+    var point = this.drawingPlan.data[index];
+    if (point) {
+      return this.drawingPlan.stacked ? point['stackedZero'] : point['zero'];
+    } else {
+      return undefined;
+    }
+  }
+  return anychart.core.cartesian.series.Base.base(this, 'getStackedZero', index);
+};
+
+
+/** @inheritDoc */
+anychart.core.cartesian.series.Base.prototype.getStackedValue = function(index) {
+  if (this.drawingPlan) {
+    var point = this.drawingPlan.data[index];
+    if (point) {
+      return this.drawingPlan.stacked ? point['stackedValue'] : point['value'];
+    } else {
+      return undefined;
+    }
+  }
+  return anychart.core.cartesian.series.Base.base(this, 'getStackedValue', index);
 };
 
 
 /**
- * DO NOT PUBLISH.
- * @param {!Array.<*>|boolean} categories If Array - ordinal scale, if false - scatter scale with numbers,
- *    true - datetime scale.
+ * @param {Array} data
+ * @param {Function} dataPusher
+ * @param {Function} xNormalizer
+ * @param {Function} xMissingChecker
+ * @param {Array.<string>=} opt_additionalFields
+ * @return {anychart.core.cartesian.series.Base.DrawingPlan}
+ * @private
  */
-anychart.core.cartesian.series.Base.prototype.categoriseData = function(categories) {
-  this.dataInternal = this.parentView.prepare('x', categories);
-};
-
-
-/**
- * Gets an array of reference 'y' fields from the row iterator points to.
- * Reference fields are defined using referenceValueNames and referenceValueMeanings.
- * If there is only one field - a value is returned.
- * If there are several - array.
- * If any of the two is undefined - returns null.
- *
- * @return {Array.<*>|null} Fetches significant scale values from current data row.
- */
-anychart.core.cartesian.series.Base.prototype.getReferenceScaleValues = function() {
-  if (!this.enabled()) return null;
-  var res = [];
-  var iterator = this.getIterator();
+anychart.core.cartesian.series.Base.prototype.getDrawingData_ = function(data, dataPusher, xNormalizer, xMissingChecker, opt_additionalFields) {
+  anychart.performance.start('Drawing plan calc');
+  this.drawingPlan = null;
+  var iterator = this.getResetIterator();
   var yScale = /** @type {anychart.scales.Base} */ (this.yScale());
-  for (var i = 0, len = this.referenceValueNames.length; i < len; i++) {
-    if (this.referenceValueMeanings[i] != 'y') continue;
-    var val = iterator.get(this.referenceValueNames[i]);
-    if (yScale.isMissing(val)) return null;
-    res.push(val);
-  }
+  var seriesMin = Infinity;
+  var seriesMax = -Infinity;
+  var seriesSum = 0;
+  var pointLabelsCount = 0;
+  var pointMarkersCount = 0;
+  var hasXErrors = false;
+  var hasYErrors = false;
+  var hasSelectedPoints = false;
+  while (iterator.advance()) {
+    var xValue = xNormalizer(iterator.get('x'));
+    if (xMissingChecker(xValue)) // we do not add missings for points that have undefined X
+      continue;
+    var point = {
+      'x': xValue
+    };
+    var i, len, name, val, missing = false;
+    for (i = 0, len = this.yValueNames.length; i < len; i++) {
+      name = this.yValueNames[i];
+      val = iterator.get(name);
+      missing = missing || yScale.isMissing(val);
+      point[name] = val;
+    }
+    for (i = 0, len = this.additionalNames.length; i < len; i++) {
+      name = this.additionalNames[i];
+      val = iterator.get(name);
+      point[name] = val;
+    }
+    if (this.checkSize)
+      missing = missing || isNaN(point['size']);
+    if (this.seriesSupportsError) {
+      if (anychart.core.utils.Error.isErrorAvailableForScale(/** @type {anychart.scales.Base} */(this.xScale()))) {
+        for (i = 0, len = this.xErrorNames.length; i < len; i++) {
+          name = this.xErrorNames[i];
+          val = iterator.get(name);
+          if (goog.isDef(val))
+            hasXErrors = true;
+          point[name] = val;
+        }
+      }
+      if (anychart.core.utils.Error.isErrorAvailableForScale(/** @type {anychart.scales.Base} */(this.yScale()))) {
+        for (i = 0, len = this.yErrorNames.length; i < len; i++) {
+          name = this.yErrorNames[i];
+          val = iterator.get(name);
+          if (goog.isDef(val))
+            hasYErrors = true;
+          point[name] = val;
+        }
+      }
+    }
+    if (opt_additionalFields && opt_additionalFields.length) {
+      for (i = 0, len = opt_additionalFields.length; i < len; i++) {
+        name = opt_additionalFields[i];
+        val = iterator.get(name);
+        point[name] = val;
+      }
+    }
+    point['missing'] = missing;
+    point['rawIndex'] = iterator.getIndex();
 
-  if (anychart.core.utils.Error.isErrorAvailableForScale(yScale) && this.isErrorAvailable()) {
-    var errValues = this.getErrorValues(false);
-    errValues[0] = +res[0] - errValues[0];
-    errValues[1] = +res[0] + errValues[1];
-    res = res.concat(errValues);
+    if (!missing) {
+      val = point['value'];
+      seriesSum += val;
+      if (seriesMax < val)
+        seriesMax = val;
+      if (seriesMin > val)
+        seriesMin = val;
+      // we count marker point settings
+      if (point['marker'])
+        pointMarkersCount++;
+      // we count label point settings
+      if (point['label'])
+        pointLabelsCount++;
+      if (!!iterator.get('selected')) {
+        point['selected'] = hasSelectedPoints = true;
+      }
+    }
+    point = dataPusher(data, point);
+    // if the new point replaced a point, we should decrease labels and markers counters
+    if (point) {
+      if (!point['missing']) {
+        if (point['marker'])
+          pointMarkersCount--;
+        if (point['label'])
+          pointLabelsCount--;
+      }
+    }
   }
-  return res;
+  this.statistics('seriesMax', seriesMax);
+  this.statistics('seriesMin', seriesMin);
+  this.statistics('seriesSum', seriesSum);
+  anychart.performance.end('Drawing plan calc');
+  return this.drawingPlan = {
+    data: data,
+    series: this,
+    hasPointLabels: pointLabelsCount > 0,
+    hasPointMarkers: pointMarkersCount > 0,
+    hasPointXErrors: hasXErrors,
+    hasPointYErrors: hasYErrors,
+    hasPointErrors: hasXErrors || hasYErrors,
+    hasSelectedPoints: hasSelectedPoints
+  };
 };
 
 
 /**
- * Gets an array of reference 'y' fields from the row iterator point to
- * and gets pixel values. Reference fields are defined using referenceValueNames and referenceValueMeanings.
- * If there is only one field - a value is returned.
- * If there are several - array.
- * If any of the two is undefined - returns null.
- *
- * @return {Array.<number>|null} Array with values or null, any of the two is undefined.
- *    (we do so to avoid reiterating to check on missing).
- * @protected
+ * @param {boolean} sorted
+ * @param {boolean} dateTimeMode
+ * @return {anychart.core.cartesian.series.Base.DrawingPlan}
  */
-anychart.core.cartesian.series.Base.prototype.getReferenceCoords = function() {
-  if (!this.enabled()) return null;
-  var res = [];
-  var yScale = /** @type {anychart.scales.Base} */(this.yScale());
-  var xScale = /** @type {anychart.scales.Base} */(this.xScale());
-  var iterator = this.getIterator();
-  var fail = false;
-  var stacked = yScale.stackMode() != anychart.enums.ScaleStackMode.NONE;
-  for (var i = 0, len = this.referenceValueNames.length; i < len; i++) {
-    var val = iterator.get(this.referenceValueNames[i]);
-
-    if (!goog.isDef(val)) {
-      if (stacked && this.referenceValuesSupportStack)
-        fail = true;
-      else
-        return null;
-    }
-
-    var pix;
-
-    switch (this.referenceValueMeanings[i]) {
-      case 'x':
-        if (xScale.isMissing(val))
-          pix = NaN;
-        else {
-          var ratio0 = xScale.transform(val, 0);
-          var ratio1 = xScale.transform(val, 1);
-          if (ratio0 < 0 && ratio1 < 0 || ratio0 > 1 && ratio1 > 1) {
-            pix = NaN;
-          } else
-            pix = this.applyRatioToBounds(xScale.transform(val, /** @type {number} */(this.xPointPosition())), true);
-        }
-        break;
-      case 'y':
-        iterator.meta('stackZero', yScale.getPrevVal(val));
-        if (this.referenceValuesSupportStack)
-          val = yScale.applyStacking(val);
-        else if (yScale.isMissing(val))
-          val = NaN;
-        iterator.meta('stackValue', val);
-        pix = this.applyRatioToBounds(yScale.transform(val, 0.5), false);
-        break;
-      case 'z':
-        if (stacked) {
-          if (this.referenceValuesSupportStack)
-            val = yScale.getPrevVal(val);
-          else if (yScale.isMissing(val))
-            val = NaN;
-          pix = this.applyRatioToBounds(goog.math.clamp(yScale.transform(val, 0.5), 0, 1), false);
-        } else {
-          pix = this.zeroY;
-        }
-        break;
-      case 'n':
-        pix = /** @type {number} */(+val);
-        break;
-    }
-
-    if (isNaN(pix)) fail = true;
-
-    res.push(pix);
+anychart.core.cartesian.series.Base.prototype.getScatterDrawingPlan = function(sorted, dateTimeMode) {
+  var dataPusher;
+  if (sorted) {
+    var xMap = {};
+    var prevX = -Infinity;
+    // dataPusher must return a point that was replaced by the point pushed (if any)
+    dataPusher = function(data, point) {
+      var result;
+      var xValue = point['x'];
+      if (xValue in xMap) {
+        result = data[xMap[xValue]];
+        data[xMap[xValue]] = point;
+      } else {
+        xMap[xValue] = data.length;
+        data.push(point);
+        if (xValue < prevX)
+          needsSorting = true;
+        prevX = xValue;
+      }
+      return result || null;
+    };
+  } else {
+    dataPusher = function(data, point) {
+      data.push(point);
+      return null;
+    };
   }
-  return fail ? null : res;
+  var needsSorting = false;
+  var xNormalizer = dateTimeMode ? anychart.utils.normalizeTimestamp : function(a) { return a; };
+  var xMissingChecker = isNaN;
+
+  var result = this.getDrawingData_([], dataPusher, xNormalizer, xMissingChecker);
+  if (needsSorting)
+    goog.array.sort(result.data, anychart.core.cartesian.series.Base.comparePointsXNumericAsc);
+  return result;
+};
+
+
+/**
+ * @param {Object.<string, number>} xHashMap
+ * @param {Array.<*>} xArray
+ * @param {boolean} restrictX
+ * @param {string=} opt_namesField
+ * @return {anychart.core.cartesian.series.Base.DrawingPlan}
+ */
+anychart.core.cartesian.series.Base.prototype.getOrdinalDrawingPlan = function(xHashMap, xArray, restrictX, opt_namesField) {
+  var dataPusher;
+  if (restrictX) {
+    // dataPusher must return a point that was replaced by the point pushed (if any)
+    dataPusher = function(data, point) {
+      var result;
+      var xHash = anychart.utils.hash(point['x']);
+      if (xHash in xHashMap) {
+        result = data[xHashMap[xHash]];
+        data[xHashMap[xHash]] = point;
+      }
+      return result || null;
+    };
+  } else {
+    dataPusher = function(data, point) {
+      var result;
+      var xValue = point['x'];
+      var xHash = anychart.utils.hash(xValue);
+      if (xHash in xHashMap) {
+        result = data[xHashMap[xHash]];
+        data[xHashMap[xHash]] = point;
+      } else {
+        xHashMap[xHash] = xArray.length;
+        xArray.push(xValue);
+        data.push(point);
+      }
+      return result || null;
+    };
+  }
+  var xNormalizer = function(a) { return a; };
+  var xMissingChecker = function(a) { return a === undefined; };
+
+  var result = this.getDrawingData_(new Array(xArray.length), dataPusher, xNormalizer, xMissingChecker, opt_namesField ? [opt_namesField] : []);
+  var data = result.data;
+  for (var i = 0; i < data.length; i++) {
+    if (!data[i])
+      data[i] = {
+        'x': xArray[i],
+        'missing': true,
+        'rawIndex': NaN
+      };
+  }
+  result.xHashMap = xHashMap;
+  result.xArray = xArray;
+  return result;
+};
+
+
+/**
+ * Calculates and puts all needed coords to meta.
+ * @return {boolean} If the point is not missing.
+ */
+anychart.core.cartesian.series.Base.prototype.calcSeriesCoords = function() {
+  var i;
+  var iterator = this.iterator;
+  if (iterator.get('missing') ||
+      iterator.getIndex() < this.drawingPlan.firstIndex ||
+      iterator.getIndex() > this.drawingPlan.lastIndex) {
+    iterator.meta('x', undefined);
+    for (i = 0; i < this.yValueNames.length; i++) {
+      iterator.meta(this.yValueNames[i], undefined);
+    }
+    return false;
+  }
+
+  var xScale = /** @type {anychart.scales.Base} */(this.xScale());
+  var yScale = /** @type {anychart.scales.Base} */(this.yScale());
+
+  iterator.meta('x',
+      this.applyRatioToBounds(
+          xScale.transform(
+              iterator.get('x'),
+              /** @type {number} */(this.xPointPosition())), true));
+
+  if (this.drawingPlan.stacked) {
+    iterator.meta('value', this.applyRatioToBounds(yScale.transform(iterator.get('stackedValue')), false));
+    iterator.meta('zero', this.applyRatioToBounds(yScale.transform(iterator.get('stackedZero')), false));
+    iterator.meta('zeroMissing', iterator.get('stackedMissing'));
+  } else {
+    if (this.needsZero) {
+      iterator.meta('zero', this.zeroY);
+      iterator.meta('zeroMissing', false);
+    }
+    for (i = 0; i < this.yValueNames.length; i++) {
+      var name = this.yValueNames[i];
+      iterator.meta(name, this.applyRatioToBounds(yScale.transform(iterator.get(name)), false));
+    }
+  }
+  return true;
 };
 
 
@@ -435,6 +659,40 @@ anychart.core.cartesian.series.Base.prototype.getPixelPointWidth = function() {
     return this.getPointWidth();
   else
     return 0;
+};
+
+
+/**
+ * @param {*} fieldValue
+ * @return {number}
+ */
+anychart.core.cartesian.series.Base.prototype.findX = function(fieldValue) {
+  var res;
+  if (this.drawingPlan) { // no plan yet - strange situation, falling back to data view search
+    if (this.drawingPlan.xHashMap) { // ordinal plan
+      res = this.drawingPlan.xHashMap[anychart.utils.hash(fieldValue)];
+      return isNaN(res) ? -1 : res;
+    } else { // scatter case - plan.data should be sorted by X field
+      res = goog.array.binarySelect(this.drawingPlan.data, function(val) { return /** @type {number} */(fieldValue) - val['x']; });
+      if (res < 0) {
+        res = ~res;
+        if (res > 0) {
+          if (res == this.drawingPlan.data.length) {
+            res--;
+          } else {
+            var right = this.drawingPlan.data[res];
+            var left = this.drawingPlan.data[res - 1];
+            if (right['x'] - /** @type {number} */(fieldValue) > /** @type {number} */(fieldValue) - left['x']) {
+              res--;
+            }
+          }
+        }
+      }
+      return res;
+    }
+  } else {
+    return this.dataInternal.find('x', fieldValue);
+  }
 };
 
 
@@ -523,11 +781,20 @@ anychart.core.cartesian.series.Base.prototype.hasOutlierMarkers = function() {
 
 
 /**
+ * Whether series can be stacked.
+ * @return {boolean} .
+ */
+anychart.core.cartesian.series.Base.prototype.supportsStack = function() {
+  return this.seriesSupportsStack;
+};
+
+
+/**
  * Tester if the series can have an error. (All except range series, OHLC, Bubble).
  * @return {boolean}
  */
 anychart.core.cartesian.series.Base.prototype.isErrorAvailable = function() {
-  return true;
+  return this.seriesSupportsError;
 };
 
 
@@ -575,92 +842,86 @@ anychart.core.cartesian.series.Base.prototype.axesLinesSpace = function(opt_spac
  * Draws series into the current container. If series has no scales - creates them.
  * @return {anychart.core.cartesian.series.Base} An instance of {@link anychart.core.cartesian.series.Base} class for method chaining.
  */
-anychart.core.cartesian.series.Base.prototype.draw = function() {
+anychart.core.cartesian.series.Base.prototype.drawPlan = function() {
   this.suspendSignalsDispatching();
-  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
-  var iterator;
-  var value;
-  var scale;
-  if (!(scale = this.xScale()))
-    this.xScale(scale = new anychart.scales.Ordinal());
-  if (scale.needsAutoCalc()) {
-    scale.startAutoCalc();
-    iterator = this.getResetIterator();
-    while (iterator.advance()) {
-      value = iterator.get('x');
-      if (goog.isDef(value))
-        scale.extendDataRange(value);
-    }
-    scale.finishAutoCalc();
-  }
-  this.categoriseData(scale.getCategorisation());
-  if (!(scale = this.yScale()))
-    this.yScale(scale = new anychart.scales.Linear());
-  if (scale.needsAutoCalc()) {
-    scale.startAutoCalc();
-    iterator = this.getResetIterator();
-    while (iterator.advance()) {
-      value = this.getReferenceScaleValues();
-      if (value)
-        scale.extendDataRange.apply(/** @type {anychart.scales.Base} */(scale), value);
-    }
-    scale.finishAutoCalc();
-  }
 
-  iterator = this.getResetIterator();
   this.startDrawing();
+  if (this.enabled()) {
+    var iterator = this.getResetIterator();
 
-  while (iterator.advance()) {
-    var index = iterator.getIndex();
-    if (iterator.get('selected'))
-      this.state.setPointState(anychart.PointState.SELECT, index);
+    /**
+     * @type {boolean}
+     * @protected
+     */
+    this.shouldDrawLabels = (this.labels().enabled() !== false) || this.drawingPlan.hasPointLabels;
+    /**
+     * @type {boolean}
+     * @protected
+     */
+    this.shouldDrawMarkers = !this.hasMarkers() || (this.markers().enabled() !== false) || this.drawingPlan.hasPointMarkers;
+    /**
+     * @type {boolean}
+     * @protected
+     */
+    this.shouldDrawErrors = this.seriesSupportsError && (this.drawingPlan.hasPointErrors || this.error().hasGlobalErrorValues());
 
-    this.drawPoint(this.state.getPointStateByIndex(index));
+    if (this.drawingPlan.hasSelectedPoints) {
+      while (iterator.advance()) {
+        if (iterator.get('selected'))
+          this.state.setPointState(anychart.PointState.SELECT, iterator.getIndex());
+      }
+      iterator.reset();
+    }
+
+    while (iterator.advance()) {
+      this.drawPoint(this.state.getPointStateByIndex(iterator.getIndex()));
+    }
   }
   this.finalizeDrawing();
 
   this.resumeSignalsDispatching(false);
-  this.markConsistent(anychart.ConsistencyState.ALL);
+  this.markConsistent(anychart.ConsistencyState.ALL & ~anychart.ConsistencyState.CONTAINER);
 
   return this;
 };
 
 
 /**
- * Draws a pint iterator points to.<br/>
- * Closes polygon in a correct way if missing occured;
+ * Draws the point currently selected by the iterator. This is the ONLY entry point to the drawing of the point.
  * @param {anychart.PointState|number} pointState Point state.
+ * @final
  */
 anychart.core.cartesian.series.Base.prototype.drawPoint = function(pointState) {
-  if (this.enabled()) {
-    if (this.firstPointDrawn)
-      this.firstPointDrawn = this.drawSubsequentPoint(pointState | this.state.getSeriesState());
+  if (this.calcSeriesCoords()) {
+    if (this.prevPointDrawn)
+      this.drawSubsequentPoint(pointState | this.state.getSeriesState());
     else
-      this.firstPointDrawn = this.drawFirstPoint(pointState | this.state.getSeriesState());
-    if (this.firstPointDrawn) {
-      this.drawLabel(pointState);
-      if (this.isErrorAvailable())
-        this.drawError();
-    }
+      this.drawFirstPoint(pointState | this.state.getSeriesState());
+    this.drawPointElements(pointState);
+    this.prevPointDrawn = true;
+  } else {
+    this.drawMissing();
+    this.prevPointDrawn = this.connectMissing;
   }
 };
 
 
 /**
- * This method is used by a parallel iterator in case series needs to
- * draw a missing point (given series has no such X, and other
- * series has it).
+ * Draws additional point elements like label, marker or error.
+ * @param {anychart.PointState|number} pointState
  */
-anychart.core.cartesian.series.Base.prototype.drawMissing = function() {
-  this.firstPointDrawn = false;
-  if (this.yScale().stackMode() != anychart.enums.ScaleStackMode.NONE && this.referenceValuesSupportStack) {
-    for (var i = 0, len = this.referenceValueNames.length; i < len; i++) {
-      if (this.referenceValueMeanings[i] == 'y')
-        this.yScale().applyStacking(NaN);
-    }
-  }
+anychart.core.cartesian.series.Base.prototype.drawPointElements = function(pointState) {
+  if (this.shouldDrawLabels)
+    this.drawLabel(pointState);
+  if (this.shouldDrawErrors && this.error().hasAnyErrorValues())
+    this.drawError();
 };
+
+
+/**
+ * This method is used to handle a missing point. Used only in continuous series.
+ */
+anychart.core.cartesian.series.Base.prototype.drawMissing = goog.nullFunction;
 
 
 /** @inheritDoc */
@@ -679,7 +940,7 @@ anychart.core.cartesian.series.Base.prototype.remove = function() {
  * If scale is not explicitly set - creates a default one.
  */
 anychart.core.cartesian.series.Base.prototype.startDrawing = function() {
-  this.firstPointDrawn = false;
+  this.prevPointDrawn = false;
   this.pixelBoundsCache = this.getPixelBounds();
 
   if (!this.rootLayer) {
@@ -690,12 +951,21 @@ anychart.core.cartesian.series.Base.prototype.startDrawing = function() {
 
   /** @type {anychart.scales.Base} */
   var scale = /** @type {anychart.scales.Base} */(this.yScale());
-  var res = scale.transform(0);
-  if (isNaN(res))
+  var res;
+  if (scale) {
+    res = scale.transform(0);
+    if (isNaN(res))
+      res = 0;
+  } else {
     res = 0;
-
+  }
   this.zeroY = this.applyAxesLinesSpace(this.applyRatioToBounds(goog.math.clamp(res, 0, 1), false));
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.ENABLED))
+    this.invalidate(
+        anychart.ConsistencyState.APPEARANCE |
+        anychart.ConsistencyState.SERIES_HATCH_FILL |
+        anychart.ConsistencyState.SERIES_LABELS);
   this.checkDrawingNeeded();
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE))
     this.resetErrorPaths();
@@ -704,7 +974,6 @@ anychart.core.cartesian.series.Base.prototype.startDrawing = function() {
   this.hoverLabels().suspendSignalsDispatching();
   this.selectLabels().suspendSignalsDispatching();
   this.labels().clear();
-  this.labels().container(/** @type {acgraph.vector.ILayer} */(this.container()));
   this.labels().parentBounds(/** @type {anychart.math.Rect} */(this.getPixelBounds()));
 };
 
@@ -733,6 +1002,7 @@ anychart.core.cartesian.series.Base.prototype.applyAxesLinesSpace = function(val
  * series.finalizeDrawing();
  */
 anychart.core.cartesian.series.Base.prototype.finalizeDrawing = function() {
+  this.labels().container(/** @type {acgraph.vector.ILayer} */(this.container()));
   this.labels().draw();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
@@ -747,13 +1017,6 @@ anychart.core.cartesian.series.Base.prototype.finalizeDrawing = function() {
   this.labels().markConsistent(anychart.ConsistencyState.ALL);
   this.hoverLabels().markConsistent(anychart.ConsistencyState.ALL);
   this.selectLabels().markConsistent(anychart.ConsistencyState.ALL);
-  // This check need to prevent finalizeDrawing to mark CONTAINER consistency state in case when series was disabled by
-  // series.enabled(false).
-  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    this.markConsistent(anychart.ConsistencyState.ALL & !anychart.ConsistencyState.CONTAINER);
-  } else {
-    this.markConsistent(anychart.ConsistencyState.ALL);
-  }
 };
 
 
@@ -765,8 +1028,7 @@ anychart.core.cartesian.series.Base.prototype.finalizeDrawing = function() {
  */
 anychart.core.cartesian.series.Base.prototype.createFormatProvider = function(opt_force) {
   if (!this.pointProvider_ || opt_force)
-    this.pointProvider_ = new anychart.core.utils.SeriesPointContextProvider(this, this.referenceValueNames,
-        this.isErrorAvailable() && anychart.core.utils.Error.isErrorAvailableForScale(this.xScale_));
+    this.pointProvider_ = new anychart.core.utils.SeriesPointContextProvider(this, this.yValueNames, this.seriesSupportsError);
   this.pointProvider_.applyReferenceValues();
   return this.pointProvider_;
 };
@@ -794,18 +1056,16 @@ anychart.core.cartesian.series.Base.prototype.createPositionProvider = function(
 /**
  * Draws first point in continuous series.
  * @param {anychart.PointState|number} pointState Point state.
- * @return {boolean} Returns true if point was successfully drawn.
  * @protected
  */
 anychart.core.cartesian.series.Base.prototype.drawFirstPoint = function(pointState) {
-  return this.drawSubsequentPoint(pointState);
+  this.drawSubsequentPoint(pointState);
 };
 
 
 /**
  * Draws subsequent point in continuous series.
  * @param {anychart.PointState|number} pointState Point state.
- * @return {boolean} Returns true if point was successfully drawn.
  * @protected
  */
 anychart.core.cartesian.series.Base.prototype.drawSubsequentPoint = goog.abstractMethod;
@@ -940,42 +1200,6 @@ anychart.core.cartesian.series.Base.prototype.scaleInvalidated_ = function(event
   else
     this.dispatchSignal(signal);
   this.invalidate(anychart.ConsistencyState.APPEARANCE, signal);
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Statistics
-//
-//----------------------------------------------------------------------------------------------------------------------
-/** @inheritDoc */
-anychart.core.cartesian.series.Base.prototype.calculateStatistics = function() {
-  var seriesMax = -Infinity;
-  var seriesMin = Infinity;
-  var seriesSum = 0;
-  var seriesPointsCount = 0;
-
-  var iterator = this.getResetIterator();
-
-  while (iterator.advance()) {
-    var values = this.getReferenceScaleValues();
-    if (values) {
-      var y = anychart.utils.toNumber(values[0]);
-      if (!isNaN(y)) {
-        seriesMax = Math.max(seriesMax, y);
-        seriesMin = Math.min(seriesMin, y);
-        seriesSum += y;
-      }
-    }
-    seriesPointsCount++;
-  }
-  var seriesAverage = seriesSum / seriesPointsCount;
-
-  this.statistics('seriesMax', seriesMax);
-  this.statistics('seriesMin', seriesMin);
-  this.statistics('seriesSum', seriesSum);
-  this.statistics('seriesAverage', seriesAverage);
-  this.statistics('seriesPointsCount', seriesPointsCount);
 };
 
 
@@ -1126,6 +1350,27 @@ anychart.core.cartesian.series.Base.prototype.drawError = function() {
 //  Serialize
 //
 //----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.core.cartesian.series.Base.prototype.serializeData = function() {
+  if (this.drawingPlan) {
+    var arr = [];
+    var view = /** @type {!anychart.data.View} */(this.data());
+    var iterator = new anychart.core.utils.DrawingPlanIterator(this.drawingPlan, view);
+    while (iterator.advance()) {
+      var index = iterator.getRawDataIndex();
+      if (isNaN(index)) { // not a best solution
+        arr.push({'x': iterator.get('x')});
+      } else {
+        arr.push(view.serializeRow(index));
+      }
+    }
+    return arr;
+  } else {
+    return anychart.core.cartesian.series.Base.base(this, 'serializeData');
+  }
+};
+
+
 // Fill and stroke settings are located here, but you should export them ONLY in series themselves.
 /**
  * @inheritDoc

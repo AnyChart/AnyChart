@@ -37,7 +37,7 @@ anychart.core.SeparateChart.prototype.SUPPORTED_SIGNALS = anychart.core.Chart.pr
  * @type {number}
  */
 anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.core.ChartWithCredits.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.CHART_LEGEND;
 
 

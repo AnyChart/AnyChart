@@ -42,6 +42,7 @@ anychart.core.utils.SeriesPointContextProvider.prototype.applyReferenceValues = 
   var iterator = this['series'].getIterator();
   var value;
   this['index'] = iterator.getIndex();
+  this['x'] = iterator.get('x'); // redundant for all series except Cartesian
   for (var i = 0; i < this.referenceValueNames.length; i++) {
     value = this.referenceValueNames[i];
     this[value] = iterator.get(value);

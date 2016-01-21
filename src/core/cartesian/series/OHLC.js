@@ -17,9 +17,9 @@ anychart.core.cartesian.series.OHLC = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
 
   // Define reference fields for a series
-  this.referenceValueNames = ['x', 'open', 'high', 'low', 'close'];
-  this.referenceValueMeanings = ['x', 'y', 'y', 'y', 'y'];
-  this.referenceValuesSupportStack = false;
+  this.yValueNames = ['open', 'high', 'low', 'close'];
+  this.seriesSupportsStack = false;
+  this.seriesSupportsError = false;
 };
 goog.inherits(anychart.core.cartesian.series.OHLC, anychart.core.cartesian.series.WidthBased);
 anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.OHLC] = anychart.core.cartesian.series.OHLC;
@@ -75,32 +75,20 @@ anychart.core.cartesian.series.OHLC.prototype.rootTypedLayerInitializer = functi
 
 /** @inheritDoc */
 anychart.core.cartesian.series.OHLC.prototype.drawSubsequentPoint = function(pointState) {
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues)
-    return false;
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var open = /** @type {number} */(this.iterator.meta('open'));
+    var high = /** @type {number} */(this.iterator.meta('high'));
+    var low = /** @type {number} */(this.iterator.meta('low'));
+    var close = /** @type {number} */(this.iterator.meta('close'));
 
-    var x = referenceValues[0];
-    var open = referenceValues[1];
-    var high = referenceValues[2];
-    var low = referenceValues[3];
-    var close = referenceValues[4];
-
-    var iterator = this.getIterator();
-
-    var rising = Number(iterator.get('open')) < Number(iterator.get('close'));
+    var rising = Number(this.iterator.get('open')) < Number(this.iterator.get('close'));
 
     /** @type {!acgraph.vector.Path} */
     var path = /** @type {!acgraph.vector.Path} */(this.rootElement.genNextChild());
     var widthHalf = this.getPointWidth() / 2;
 
-    iterator
-        .meta('x', x)
-        .meta('open', open)
-        .meta('high', high)
-        .meta('low', low)
-        .meta('close', close)
+    this.iterator
         .meta('rising', rising)
         .meta('shape', path);
 
@@ -116,8 +104,6 @@ anychart.core.cartesian.series.OHLC.prototype.drawSubsequentPoint = function(poi
 
     this.makeInteractive(path);
   }
-
-  return true;
 };
 
 
@@ -361,34 +347,11 @@ anychart.core.cartesian.series.OHLC.prototype.getFinalHatchFill = function(usePo
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Statistics
-//
-//----------------------------------------------------------------------------------------------------------------------
-/** @inheritDoc */
-anychart.core.cartesian.series.OHLC.prototype.calculateStatistics = function() {
-  this.statistics('seriesMax', -Infinity);
-  this.statistics('seriesMin', Infinity);
-  this.statistics('seriesSum', 0);
-  this.statistics('seriesAverage', 0);
-  this.statistics('seriesPointsCount', this.getIterator().getRowsCount());
-};
-
-
 /**
  * @inheritDoc
  */
 anychart.core.cartesian.series.OHLC.prototype.getType = function() {
   return anychart.enums.CartesianSeriesType.OHLC;
-};
-
-
-/**
- * @inheritDoc
- */
-anychart.core.cartesian.series.OHLC.prototype.isErrorAvailable = function() {
-  return false;
 };
 
 

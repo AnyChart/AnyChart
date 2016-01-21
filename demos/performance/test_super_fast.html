@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="../../contrib/closure-library/closure/goog/base.js"></script>
+  <!--<script src="../../out/../../out/anychart-bundle.min.js"></script>-->
+  <script src="../../src/deps.js"></script>
+  <script>goog.require('anychart.modules.anychart');</script>
+  <script>goog.require('anychart.themes.defaultTheme');</script>
+  <script>goog.require('goog.debug.Trace');</script>
+  <script>goog.require('goog.userAgent');</script>
+  <style>
+    html, body, #container {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 500px;
+    }
+  </style>
+</head>
+<body>
+<button id="run">RUN!</button>
+<div id="container"></div>
+</body>
+<script>
+  var runButton = document.getElementById('run');
+  runButton.addEventListener('click', run);
+
+  function random(a, b) {
+    return Math.round(Math.random() * (b - a + 1) + a);
+  }
+
+  var colorAxisLines = '#CECECE';
+  var colorAxisFont = '#7c868e';
+  var strokeSeriesColor = '#1581B4';
+  var darkAccentColor = '#545f69';
+  var fontColor = '#212121';
+  var tooltipContourColor = '#c1c1c1';
+
+  var palette = anychart.palettes.distinctColors().colors(['#1f73b4', '#545f69', '#dd2c00', '#ffd54f', '#505558']);
+  var paletteForMarkers = ['circle', 'diamond', 'square', 'triangleDown', 'triangleUp'];
+
+
+  var getRandom = function(min, max) {
+    return Math.random() * (max - min) + min;
+  };
+  var getRandomInteger = function(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  };
+
+  var getData = function (length, k1, k2, k3) {
+//    console.log(length * 5 + ' points, ', k1, k2, k3);
+    var array = [];
+    var step = 10 / length + getRandom(0.001, 0.01);
+    var current = 0;
+    for (var i = 0; i < length; i++) {
+      array.push([
+        i,
+        Math.sin(current),
+        Math.sin(current) * Math.cos(current),
+        Math.sin(current) + Math.sin(k1 * current),
+        Math.sin(current) * 5 * Math.pow(Math.cos(current), 2),
+        Math.cos(k2 * current)/k3,
+        Math.cos(current) - Math.sin(k3 * current)
+      ]);
+      current = current + step;
+    }
+    return array;
+  };
+
+
+
+  var setupSeriesForLine = function (dataIndex) {
+    var series = chart.spline(dataSet.mapAs({value: [dataIndex], index: [0], line1: [1], line2: [2], line3: [3], line4: [4], line5: [5]}));
+    series.stroke(function () {
+      return '2 ' + series.color()
+    });
+    series.tooltip(false);
+    series.markers(false);
+    //series.error().valueError(1);
+  };
+
+  var lineChart = function () {
+    var lChart = anychart.line();
+    lChart.palette(palette);
+    lChart.padding([30, 0, 20, 20]);
+    lChart.background(null);
+    lChart.title().enabled(false);
+    var paletteMarkers = anychart.palettes.markers();
+    paletteMarkers.markers(paletteForMarkers);
+    lChart.markerPalette(paletteMarkers);
+    lChart.xAxis(false);
+    lChart.yAxis(false);
+    lChart.grid().stroke('#ffffff 0.2').oddFill(null).evenFill(null).zIndex(11);
+    lChart.grid(1).enabled(false);
+    lChart.minorGrid(1).enabled(false);
+    lChart.minorGrid().enabled(false);
+
+    return lChart;
+  };
+
+  var pointsPerSeries = 200; // 1k
+  //var pointsPerSeries = 2000; // 10k
+  //var pointsPerSeries = 10000; // 50k
+  //var pointsPerSeries = 20000; // 100k
+
+  var chart;
+  var dataSet = null;
+  function run() {
+    console.time('all');
+
+    chart = lineChart();
+    dataSet = anychart.data.set();
+    setupSeriesForLine(1);
+    setupSeriesForLine(2);
+    setupSeriesForLine(3);
+    setupSeriesForLine(4);
+    setupSeriesForLine(5);
+    dataSet.data(getData(pointsPerSeries, getRandomInteger(1, 7),getRandomInteger(1, 7),getRandomInteger(1, 7)));
+
+    chart.container('container');
+    chart.draw();
+
+    console.timeEnd('all');
+  }
+</script>
+</html>

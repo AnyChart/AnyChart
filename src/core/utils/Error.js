@@ -537,6 +537,46 @@ anychart.core.utils.Error.prototype.getErrorValues = function(horizontal) {
 
 
 /**
+ * Returns true if there is even one mistake. (Used for performance optimization).
+ * @return {boolean}
+ */
+anychart.core.utils.Error.prototype.hasAnyErrorValues = function() {
+  var iterator = this.series_.getIterator();
+
+  var xError = iterator.get('xError') || this.xError();
+  var xLowerError = iterator.get('xLowerError') || this.xLowerError();
+  var xUpperError = iterator.get('xUpperError') || this.xUpperError();
+  var valueError = iterator.get('valueError') || this.valueError();
+  var valueLowerError = iterator.get('valueLowerError') || this.valueLowerError();
+  var valueUpperError = iterator.get('valueUpperError') || this.valueUpperError();
+
+  var hasXError = goog.isDef(xLowerError) || goog.isDef(xUpperError) || (anychart.utils.isPercent(xError) || !anychart.utils.isNaN(xError));
+  var hasValueError = goog.isDef(valueLowerError) || goog.isDef(valueUpperError) || (anychart.utils.isPercent(valueError) || !anychart.utils.isNaN(valueError));
+
+  return hasXError || hasValueError;
+};
+
+
+/**
+ * Returns true if there is even one mistake. (Used for performance optimization).
+ * @return {boolean}
+ */
+anychart.core.utils.Error.prototype.hasGlobalErrorValues = function() {
+  var xError = this.xError();
+  var xLowerError = this.xLowerError();
+  var xUpperError = this.xUpperError();
+  var valueError = this.valueError();
+  var valueLowerError = this.valueLowerError();
+  var valueUpperError = this.valueUpperError();
+
+  var hasXError = goog.isDef(xLowerError) || goog.isDef(xUpperError) || (anychart.utils.isPercent(xError) || !anychart.utils.isNaN(xError));
+  var hasValueError = goog.isDef(valueLowerError) || goog.isDef(valueUpperError) || (anychart.utils.isPercent(valueError) || !anychart.utils.isNaN(valueError));
+
+  return hasXError || hasValueError;
+};
+
+
+/**
  * @inheritDoc
  */
 anychart.core.utils.Error.prototype.serialize = function() {

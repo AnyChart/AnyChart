@@ -376,7 +376,7 @@ anychart.core.scatter.series.Base.prototype.drawPoint = function(pointState) {
   if (this.enabled()) {
     if (this.pointDrawn = this.drawSeriesPoint(pointState | this.state.getSeriesState())) {
       this.drawLabel(pointState);
-      if (this.isErrorAvailable())
+      if (this.isErrorAvailable() && this.error().hasAnyErrorValues())
         this.drawError();
     }
   }

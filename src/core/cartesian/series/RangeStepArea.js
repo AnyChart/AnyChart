@@ -17,9 +17,9 @@ anychart.core.cartesian.series.RangeStepArea = function(opt_data, opt_csvSetting
   goog.base(this, opt_data, opt_csvSettings);
 
   // Define reference points for a series
-  this.referenceValueNames = ['x', 'low', 'high'];
-  this.referenceValueMeanings = ['x', 'y', 'y'];
-  this.referenceValuesSupportStack = false;
+  this.yValueNames = ['low', 'high'];
+  this.seriesSupportsStack = false;
+  this.seriesSupportsError = false;
 };
 goog.inherits(anychart.core.cartesian.series.RangeStepArea, anychart.core.cartesian.series.ContinuousRangeBase);
 anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.RANGE_STEP_AREA] = anychart.core.cartesian.series.RangeStepArea;
@@ -27,16 +27,10 @@ anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSerie
 
 /** @inheritDoc */
 anychart.core.cartesian.series.RangeStepArea.prototype.drawFirstPoint = function(pointState) {
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues)
-    return false;
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var x = referenceValues[0];
-    var low = referenceValues[1];
-    var high = referenceValues[2];
-
-    this.finalizeSegment();
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var high = /** @type {number} */(this.iterator.meta('high'));
+    var low = /** @type {number} */(this.iterator.meta('low'));
 
     this.path
         .moveTo(x, low)
@@ -48,24 +42,16 @@ anychart.core.cartesian.series.RangeStepArea.prototype.drawFirstPoint = function
     this.prevY_ = high;
 
     this.lowsStack = [x, low];
-
-    this.getIterator().meta('x', x).meta('low', low).meta('high', high);
   }
-
-  return true;
 };
 
 
 /** @inheritDoc */
 anychart.core.cartesian.series.RangeStepArea.prototype.drawSubsequentPoint = function(pointState) {
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues)
-    return false;
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var x = referenceValues[0];
-    var low = referenceValues[1];
-    var high = referenceValues[2];
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var high = /** @type {number} */(this.iterator.meta('high'));
+    var low = /** @type {number} */(this.iterator.meta('low'));
 
     var midX = (x + this.prevX_) / 2;
     this.path
@@ -81,11 +67,7 @@ anychart.core.cartesian.series.RangeStepArea.prototype.drawSubsequentPoint = fun
     this.prevY_ = high;
 
     this.lowsStack.push(x, low);
-
-    this.getIterator().meta('x', x).meta('low', low).meta('high', high);
   }
-
-  return true;
 };
 
 

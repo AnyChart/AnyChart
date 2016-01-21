@@ -5,21 +5,14 @@ goog.require('anychart.animations');
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.axisMarkers.Line');
-goog.require('anychart.core.axisMarkers.Line3d');
 goog.require('anychart.core.axisMarkers.Range');
-goog.require('anychart.core.axisMarkers.Range3d');
 goog.require('anychart.core.axisMarkers.Text');
-goog.require('anychart.core.axisMarkers.Text3d');
 goog.require('anychart.core.cartesian.series.Base');
 goog.require('anychart.core.grids.Linear');
-goog.require('anychart.core.grids.Linear3d');
 goog.require('anychart.core.ui.ChartScroller');
 goog.require('anychart.core.ui.Crosshair');
-goog.require('anychart.core.utils.Error');
 goog.require('anychart.core.utils.IZoomableChart');
-goog.require('anychart.core.utils.OrdinalIterator');
 goog.require('anychart.core.utils.OrdinalZoom');
-goog.require('anychart.core.utils.ScatterIterator');
 goog.require('anychart.enums');
 goog.require('anychart.palettes.DistinctColors');
 goog.require('anychart.palettes.HatchFills');
@@ -305,10 +298,10 @@ anychart.core.CartesianBase.prototype.getDefaultScale = function(forX) {
  * Ensures that scales are ready for zooming.
  */
 anychart.core.CartesianBase.prototype.ensureScalesReadyForZoom = function() {
-  this.makeScaleMaps_();
+  this.makeScaleMaps();
   if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_SCALES)) {
     if (!!this.xZoom().getSetup())
-      this.calculate();
+      this.calculateXScales();
   }
 };
 //endregion
@@ -576,6 +569,7 @@ anychart.core.CartesianBase.prototype.xScale = function(opt_value) {
         state = anychart.ConsistencyState.CHART_LEGEND;
       }
       this.invalidate(anychart.ConsistencyState.CARTESIAN_SCALES |
+          anychart.ConsistencyState.CARTESIAN_Y_SCALES |
           anychart.ConsistencyState.CARTESIAN_SCALE_MAPS |
           state,
           anychart.Signal.NEEDS_REDRAW);
@@ -616,6 +610,7 @@ anychart.core.CartesianBase.prototype.yScale = function(opt_value) {
     if (this.yScale_ != opt_value) {
       this.yScale_ = opt_value;
       this.invalidate(anychart.ConsistencyState.CARTESIAN_SCALES |
+          anychart.ConsistencyState.CARTESIAN_Y_SCALES |
           anychart.ConsistencyState.CARTESIAN_SCALE_MAPS,
           anychart.Signal.NEEDS_REDRAW);
     }
@@ -1551,6 +1546,7 @@ anychart.core.CartesianBase.prototype.createSeriesByType = function(type, data, 
         anychart.ConsistencyState.CARTESIAN_SERIES |
         anychart.ConsistencyState.CHART_LEGEND |
         anychart.ConsistencyState.CARTESIAN_SCALES |
+        anychart.ConsistencyState.CARTESIAN_Y_SCALES |
         anychart.ConsistencyState.CARTESIAN_SCALE_MAPS,
         anychart.Signal.NEEDS_REDRAW);
   } else {
@@ -1650,6 +1646,7 @@ anychart.core.CartesianBase.prototype.removeSeriesAt = function(index) {
         anychart.ConsistencyState.CARTESIAN_SERIES |
         anychart.ConsistencyState.CHART_LEGEND |
         anychart.ConsistencyState.CARTESIAN_SCALES |
+        anychart.ConsistencyState.CARTESIAN_Y_SCALES |
         anychart.ConsistencyState.CARTESIAN_SCALE_MAPS,
         anychart.Signal.NEEDS_REDRAW);
     anychart.globalLock.unlock();
@@ -1672,6 +1669,7 @@ anychart.core.CartesianBase.prototype.removeAllSeries = function() {
         anychart.ConsistencyState.CARTESIAN_SERIES |
         anychart.ConsistencyState.CHART_LEGEND |
         anychart.ConsistencyState.CARTESIAN_SCALES |
+        anychart.ConsistencyState.CARTESIAN_Y_SCALES |
         anychart.ConsistencyState.CARTESIAN_SCALE_MAPS,
         anychart.Signal.NEEDS_REDRAW);
     anychart.globalLock.unlock();
@@ -1698,8 +1696,9 @@ anychart.core.CartesianBase.prototype.seriesInvalidated = function(event) {
     }
   }
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
-    state |= anychart.ConsistencyState.CARTESIAN_SCALES;
-    state |= anychart.ConsistencyState.CARTESIAN_SCALE_MAPS;
+    state |= anychart.ConsistencyState.CARTESIAN_SCALES |
+        anychart.ConsistencyState.CARTESIAN_Y_SCALES |
+        anychart.ConsistencyState.CARTESIAN_SCALE_MAPS;
   }
   if (event.hasSignal(anychart.Signal.NEED_UPDATE_LEGEND)) {
     state |= anychart.ConsistencyState.CHART_LEGEND;
@@ -1801,392 +1800,512 @@ anychart.core.CartesianBase.prototype.minBubbleSize = function(opt_value) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Calculate cartesian chart properties.
+ * @protected
  */
-anychart.core.CartesianBase.prototype.calculate = function() {
-  if (!this.hasInvalidationState(
-      anychart.ConsistencyState.CARTESIAN_SCALES |
-      anychart.ConsistencyState.CARTESIAN_SCALE_MAPS |
-      anychart.ConsistencyState.CARTESIAN_Y_SCALES)) {
-    return;
-  }
+anychart.core.CartesianBase.prototype.makeScaleMaps = function() {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_SCALE_MAPS)) {
+    anychart.core.Base.suspendSignalsDispatching(this.series_);
+    var i, j, series;
+    var xScale = /** @type {anychart.scales.Base} */(this.xScale());
+    var yScale = /** @type {anychart.scales.Base} */(this.yScale());
+    var seriesCount = this.series_.length;
+    var changed = false;
+    /**
+     * Y scales hash map by uid.
+     * @type {Object.<string, anychart.scales.Base>}
+     * @protected
+     */
+    this.yScales = {};
+    /**
+     * Y scales hash map by uid.
+     * @type {Object.<string, anychart.scales.Base>}
+     * @protected
+     */
+    this.xScales = {};
+    for (i = 0; i < seriesCount; i++) {
+      series = this.series_[i];
+      if (!series) continue;
 
-  this.invalidate(anychart.ConsistencyState.CARTESIAN_Y_SCALES);
+      //series X scale
+      if (!series.xScale()) {
+        series.xScale(xScale);
+        changed = true;
+      }
+      this.xScales[goog.getUid(series.xScale())] = series.xScale();
 
-  /** @type {number} */
-  var i;
-  /** @type {number} */
-  var j;
-  /** @type {anychart.scales.Base} */
-  var scale;
-  /** @type {!Array.<anychart.core.cartesian.series.Base>} */
-  var series;
-  /** @type {anychart.core.cartesian.series.Base} */
-  var aSeries;
-  /** @type {!Array.<*>|boolean} */
-  var categories;
-  /** @type {anychart.data.Iterator} */
-  var iterator;
-  /** @type {anychart.scales.Base} */
-  var xScale;
-  /** @type {number} */
-  var id;
-  /** @type {number} */
-  var xId;
-  /** @type {Array.<anychart.scales.Base>} */
-  var yScalesToCalc;
-  /** @type {Object.<!Array.<anychart.core.cartesian.series.Base>>} */
-  var xScales;
-  /** @type {anychart.core.utils.ScatterIterator} */
-  var syncIterator;
-  /** @type {Array.<*>} */
-  var values;
-  /** @type {*} */
-  var value;
-  /** @type {Array.<number, number>} */
-  var errValues;
-  var ratio0, ratio1;
-
-  anychart.core.Base.suspendSignalsDispatching(this.series_);
-
-  this.makeScaleMaps_();
-
-  yScalesToCalc = [];
-  // parsing y scales map and getting lists of scales that need to be calculated and resetting them.
-  for (id in this.yScales) {
-    scale = this.yScales[id];
-    if (scale.needsAutoCalc()) {
-      scale.startAutoCalc(); // starting autocalc for stacked scales too.
-      if (scale.stackMode() != anychart.enums.ScaleStackMode.VALUE)
-        yScalesToCalc.push(scale);
+      //series Y scale
+      if (!series.yScale()) {
+        series.yScale(yScale);
+        changed = true;
+      }
+      this.yScales[goog.getUid(series.yScale())] = series.yScale();
     }
+    if (changed) {
+      this.invalidateSeries();
+      this.invalidate(
+          anychart.ConsistencyState.CARTESIAN_SERIES |
+          anychart.ConsistencyState.CARTESIAN_SCALES |
+          anychart.ConsistencyState.CARTESIAN_Y_SCALES);
+    }
+    anychart.core.Base.resumeSignalsDispatchingFalse(this.series_);
+    this.markConsistent(anychart.ConsistencyState.CARTESIAN_SCALE_MAPS);
   }
+};
 
+
+/**
+ * @protected
+ */
+anychart.core.CartesianBase.prototype.calculateXScales = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_SCALES)) {
-    var isErrorAvailableForScale;
-    // parsing x scales map and calculating them if needed as they cannot be stacked.
-    for (id in this.xScales) {
-      scale = this.xScales[id];
-      series = this.seriesOfXScaleMap_[goog.getUid(scale)];
-      for (i = 0; i < series.length; i++)
-        series[i].resetCategorisation();
-      // we can crash or warn user here if the scale is stacked, if we want.
-      if (scale.needsAutoCalc()) {
-        scale.startAutoCalc();
-        isErrorAvailableForScale = anychart.core.utils.Error.isErrorAvailableForScale(scale);
-        for (i = 0; i < series.length; i++) {
-          aSeries = series[i];
-          if (!aSeries.enabled()) continue;
-          iterator = aSeries.getResetIterator();
-          while (iterator.advance()) {
-            value = iterator.get('x');
-            if (goog.isDef(value)) {
-              if (isErrorAvailableForScale && aSeries.isErrorAvailable()) {
-                errValues = aSeries.getErrorValues(true);
-                value = anychart.utils.toNumber(value);
-                scale.extendDataRange(value - errValues[0], value + errValues[1]);
-              } else {
-                scale.extendDataRange(value);
-              }
-            }
-          }
-        }
-      }
-      // categorise series data if needed.
-      categories = scale.getCategorisation();
-      for (i = 0; i < series.length; i++)
-        series[i].categoriseData(categories);
+    anychart.performance.start('x scales calculation');
+    var i, j, series;
+    var xScale;
+    var seriesCount = this.series_.length;
+    var drawingPlan, drawingPlans, drawingPlansByYScale, uid, point, val;
+    /**
+     * Drawing plans for each series.
+     * @type {Array.<Object>}
+     * @private
+     */
+    this.drawingPlans_ = [];
+    /**
+     * Drawing plans categorised by X scale.
+     * @type {Object.<string, Array.<Object>>}
+     * @private
+     */
+    this.drawingPlansByXScale_ = {};
+    /**
+     * Drawing plans categorised by Y and X scale (Y scale uid is outer index, X scale uid - inner).
+     * @type {Object.<string, Object.<string, Array.<Object>>>}
+     * @private
+     */
+    this.drawingPlansByYAndXScale_ = {};
+    for (uid in this.xScales) {
+      xScale = this.xScales[uid];
+      if (xScale.needsAutoCalc())
+        xScale.startAutoCalc();
     }
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_Y_SCALES)) {
-    // calculate non-stacked y scales.
-    for (i = 0; i < yScalesToCalc.length; i++) {
-      scale = yScalesToCalc[i];
-      series = this.seriesOfYScaleMap_[goog.getUid(scale)];
-      if (scale.stackMode() == anychart.enums.ScaleStackMode.PERCENT) {
-        var hasPositive = false;
-        var hasNegative = false;
-        for (j = 0; j < series.length; j++) {
-          aSeries = series[j];
-          if (aSeries.enabled() && aSeries.supportsStack()) {
-            iterator = aSeries.getResetIterator();
-            xScale = /** @type {anychart.scales.Base} */(aSeries.xScale());
-            while (iterator.advance()) {
-              value = iterator.get('x');
-              ratio0 = xScale.transform(value, 0);
-              ratio1 = xScale.transform(value, 1);
-              if (ratio0 < 0 && ratio1 < 0 || ratio0 > 1 && ratio1 > 1) continue;
-              values = aSeries.getReferenceScaleValues();
-              if (values) {
-                for (var k = values.length; k--;) {
-                  if ((/** @type {number} */(values[k])) > 0)
-                    hasPositive = true;
-                  else if ((/** @type {number} */(values[k])) < 0)
-                    hasNegative = true;
-                }
-              }
-            }
+    for (i = 0; i < seriesCount; i++) {
+      series = /** @type {anychart.core.cartesian.series.Base} */(this.series_[i]);
+      if (!series || !series.enabled()) continue;
+      xScale = /** @type {anychart.scales.Base} */(series.xScale());
+      uid = goog.getUid(xScale);
+      drawingPlans = this.drawingPlansByXScale_[uid];
+      if (!drawingPlans)
+        this.drawingPlansByXScale_[uid] = drawingPlans = [];
+      if (xScale instanceof anychart.scales.Ordinal) {
+        var xHashMap, xArray;
+        var restricted = !xScale.needsAutoCalc();
+        if (drawingPlans.length) {
+          drawingPlan = drawingPlans[drawingPlans.length - 1];
+          xHashMap = drawingPlan.xHashMap;
+          xArray = drawingPlan.xArray;
+        } else {
+          if (restricted) {
+            xArray = xScale.values();
+            xHashMap = xScale.getValuesMapInternal();
+          } else {
+            xArray = [];
+            xHashMap = {};
           }
         }
-        scale.extendDataRange(0);
-        if (hasPositive || (!hasPositive && !hasNegative))
-          scale.extendDataRange(100);
-        if (hasNegative)
-          scale.extendDataRange(-100);
+        drawingPlan = series.getOrdinalDrawingPlan(xHashMap, xArray, restricted, xScale.getNamesField() || undefined);
       } else {
-        for (j = 0; j < series.length; j++) {
-          aSeries = series[j];
-          if (!aSeries.enabled()) continue;
-          iterator = aSeries.getResetIterator();
-          xScale = /** @type {anychart.scales.Base} */(aSeries.xScale());
-          while (iterator.advance()) {
-            value = iterator.get('x');
-            ratio0 = xScale.transform(value, 0);
-            ratio1 = xScale.transform(value, 1);
-            if (ratio0 < 0 && ratio1 < 0 || ratio0 > 1 && ratio1 > 1) continue;
-            values = aSeries.getReferenceScaleValues();
-            if (values) {
-              scale.extendDataRange.apply(scale, values);
+        drawingPlan = series.getScatterDrawingPlan(true, xScale instanceof anychart.scales.DateTime);
+      }
+      drawingPlans.push(drawingPlan);
+      this.drawingPlans_.push(drawingPlan);
+      drawingPlansByYScale = this.drawingPlansByYAndXScale_[uid];
+      if (!drawingPlansByYScale)
+        this.drawingPlansByYAndXScale_[uid] = drawingPlansByYScale = {};
+      uid = goog.getUid(series.yScale());
+      drawingPlans = drawingPlansByYScale[uid];
+      if (!drawingPlans)
+        drawingPlansByYScale[uid] = drawingPlans = [];
+      drawingPlans.push(drawingPlan);
+    }
+    for (uid in this.drawingPlansByXScale_) {
+      drawingPlans = this.drawingPlansByXScale_[uid];
+      xScale = /** @type {anychart.scales.Base} */(drawingPlans[0].series.xScale());
+      // equalizing drawing plans and populating them with missing points
+      if (drawingPlans.length > 1) {
+        drawingPlan = drawingPlans[drawingPlans.length - 1];
+        if (xScale instanceof anychart.scales.Ordinal) {
+          var lastPlanXArray = drawingPlan.xArray;
+          // we need to populate other series data with missing points to the length of the last array
+          for (i = 0; i < drawingPlans.length - 1; i++) {
+            drawingPlan = drawingPlans[i];
+            for (j = drawingPlan.data.length; j < lastPlanXArray.length; j++) {
+              drawingPlan.data.push({
+                'x': lastPlanXArray[j],
+                'missing': true
+              });
+            }
+          }
+        } else {
+          var registry = [];
+          var data0, data1, dataLength0, dataLength1, current0, current1, val0, val1, inc0, inc1;
+          // step one - we merge first two plans to prevent first light-loaded run on the first source with empty res array
+          data0 = drawingPlans[0].data;
+          data1 = drawingPlans[1].data;
+          dataLength0 = data0.length;
+          dataLength1 = data1.length;
+          current0 = 0;
+          current1 = 0;
+          val0 = current0 < dataLength0 ? data0[current0]['x'] : NaN;
+          val1 = current1 < dataLength1 ? data0[current1]['x'] : NaN;
+          while (!isNaN(val0) && !isNaN(val1)) {
+            inc0 = val0 <= val1;
+            inc1 = val0 >= val1;
+            registry.push(inc0 ? val0 : val1);
+            if (inc0) {
+              current0++;
+              val0 = current0 < dataLength0 ? data0[current0]['x'] : NaN;
+            }
+            if (inc1) {
+              current1++;
+              val1 = current1 < dataLength1 ? data1[current1]['x'] : NaN;
+            }
+          }
+          while (!isNaN(val0)) {
+            registry.push(val0);
+            current0++;
+            val0 = current0 < dataLength0 ? data0[current0]['x'] : NaN;
+          }
+          while (!isNaN(val1)) {
+            registry.push(val1);
+            current1++;
+            val1 = current1 < dataLength1 ? data1[current1]['x'] : NaN;
+          }
+
+          // step two - we merge i-th source and the merge result of the previous arrays.
+          for (i = 2; i < drawingPlans.length; i++) {
+            var res = [];
+            data0 = registry;
+            data1 = drawingPlans[i].data;
+            dataLength0 = data0.length;
+            dataLength1 = data1.length;
+            current0 = 0;
+            current1 = 0;
+            val0 = current0 < dataLength0 ? data0[current0] : NaN;
+            val1 = current1 < dataLength1 ? data1[current1]['x'] : NaN;
+            while (!isNaN(val0) && !isNaN(val1)) {
+              inc0 = val0 <= val1;
+              inc1 = val0 >= val1;
+              res.push(inc0 ? val0 : val1);
+              if (inc0) {
+                current0++;
+                val0 = current0 < dataLength0 ? data0[current0] : NaN;
+              }
+              if (inc1) {
+                current1++;
+                val1 = current1 < dataLength1 ? data1[current1]['x'] : NaN;
+              }
+            }
+            while (!isNaN(val0)) {
+              res.push(val0);
+              current0++;
+              val0 = current0 < dataLength0 ? data0[current0] : NaN;
+            }
+            while (!isNaN(val1)) {
+              res.push(val1);
+              current1++;
+              val1 = current1 < dataLength1 ? data1[current1]['x'] : NaN;
+            }
+            registry = res;
+          }
+
+          // now we've got the registry of unique X'es
+          // we should ensure, that all drawing plans have the same length
+          for (i = 0; i < drawingPlans.length; i++) {
+            drawingPlan = drawingPlans[i];
+            data0 = drawingPlan.data;
+            dataLength0 = data0.length;
+            if (dataLength0 < registry.length) {
+              var resultingData = [];
+              current0 = 0;
+              point = data0[current0];
+              val0 = point ? point['x'] : NaN;
+              for (j = 0; j < registry.length; j++) {
+                val1 = registry[j];
+                if (val0 <= val1) { // false for val0 == NaN
+                  resultingData.push(point);
+                  current0++;
+                  point = data0[current0];
+                  val0 = point ? point['x'] : NaN;
+                } else {
+                  resultingData.push({
+                    'x': val1,
+                    'missing': true
+                  });
+                }
+              }
+              drawingPlan.data = resultingData;
+            }
+          }
+        }
+      }
+      drawingPlan = drawingPlans[0];
+      if (xScale.needsAutoCalc()) {
+        if (xScale instanceof anychart.scales.Ordinal) {
+          xScale.setAutoValues(drawingPlan.xHashMap, drawingPlan.xArray);
+        } else if (drawingPlan.data.length) {
+          xScale.extendDataRange(drawingPlan.data[0]['x'], drawingPlan.data[drawingPlan.data.length - 1]['x']);
+          if (drawingPlan.series.isErrorAvailable()) {
+            var iterator;
+            var error;
+            if (drawingPlan.hasPointXErrors) {
+              iterator = drawingPlan.series.getResetIterator();
+              while (iterator.advance()) { // we need iterator to make error work :(
+                if (!iterator.get('missing')) {
+                  error = drawingPlan.series.error().getErrorValues(true);
+                  val = iterator.get('x');
+                  xScale.extendDataRange(val - error[0], val + error[1]);
+                }
+              }
+            } else if (drawingPlan.series.error().hasGlobalErrorValues()) {
+              iterator = drawingPlan.series.getResetIterator();
+              iterator.select(0);
+              error = drawingPlan.series.error().getErrorValues(true);
+              val = iterator.get('x');
+              xScale.extendDataRange(val - error[0], val + error[1]);
+              iterator.select(drawingPlan.data.length - 1);
+              error = drawingPlan.series.error().getErrorValues(true);
+              val = iterator.get('x');
+              xScale.extendDataRange(val - error[0], val + error[1]);
+            }
+          }
+        }
+        // we started autocalc before
+        xScale.finishAutoCalc();
+      }
+      if (xScale instanceof anychart.scales.Ordinal) {
+        var namesField = xScale.getNamesField();
+        // retrieving names
+        if (namesField != null) {
+          var remainingNames = drawingPlans[0].xArray.length;
+          var autoNames = new Array(remainingNames);
+          for (i = 0; i < drawingPlans.length; i++) {
+            var drawingPlanData = drawingPlans[i].data;
+            if (remainingNames > 0) {
+              for (j = 0; j < drawingPlanData.length; j++) {
+                if (!goog.isDef(autoNames[j]) && goog.isDef(val = drawingPlanData[j][namesField])) {
+                  autoNames[j] = val;
+                  remainingNames--;
+                }
+              }
+            }
+          }
+          xScale.setAutoNames(autoNames);
+        }
+      }
+    }
+    this.markConsistent(anychart.ConsistencyState.CARTESIAN_SCALES);
+    anychart.performance.end('x scales calculation');
+  }
+};
+
+
+/**
+ * @protected
+ */
+anychart.core.CartesianBase.prototype.calculateYScales = function() {
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_Y_SCALES)) {
+    anychart.performance.start('y scales calculation');
+    var i, j, series;
+    var yScale;
+    var drawingPlan, drawingPlans, drawingPlansByYScale, uid, point;
+    var data, val;
+    for (uid in this.yScales) {
+      yScale = this.yScales[uid];
+      if (yScale.needsAutoCalc())
+        yScale.startAutoCalc();
+    }
+    for (uid in this.drawingPlansByYAndXScale_) {
+      // calculating zoomed indexes
+      var dataLength = this.drawingPlansByXScale_[uid][0].data.length;
+      var firstIndex, lastIndex;
+      if (dataLength) {
+        firstIndex = goog.math.clamp(Math.floor(this.xZoom_.getStartRatio() * dataLength - 1), 0, dataLength - 1);
+        lastIndex = goog.math.clamp(Math.ceil(this.xZoom_.getEndRatio() * dataLength + 1), 0, dataLength - 1);
+      } else {
+        firstIndex = NaN;
+        lastIndex = NaN;
+      }
+      drawingPlansByYScale = this.drawingPlansByYAndXScale_[uid];
+      for (var yUid in drawingPlansByYScale) {
+        drawingPlans = drawingPlansByYScale[yUid];
+        yScale = this.yScales[yUid];
+        var yScaleStacked = yScale.stackMode() != anychart.enums.ScaleStackMode.NONE;
+        var yScalePercentStacked = yScale.stackMode() == anychart.enums.ScaleStackMode.PERCENT;
+        var stack, stackVal;
+        if (yScaleStacked) {
+          stack = [];
+          for (j = firstIndex; j <= lastIndex; j++) {
+            stack.push({
+              positive: 0,
+              positiveMissing: false,
+              negative: 0,
+              negativeMissing: false
+            });
+          }
+        }
+        for (i = 0; i < drawingPlans.length; i++) {
+          drawingPlan = drawingPlans[i];
+          series = /** @type {anychart.core.cartesian.series.Base} */(drawingPlan.series);
+          drawingPlan.firstIndex = firstIndex;
+          drawingPlan.lastIndex = lastIndex;
+          drawingPlan.stacked = yScaleStacked && series.supportsStack();
+          data = drawingPlan.data;
+          if (drawingPlan.stacked || yScalePercentStacked) {
+            for (j = firstIndex; j <= lastIndex; j++) {
+              point = data[j];
+              stackVal = stack[j - firstIndex];
+              point['stackedMissing'] = stackVal.missing;
+              if (point['missing']) {
+                point['stackedPositiveZero'] = stackVal.positive;
+                point['stackedNegativeZero'] = stackVal.negative;
+                stackVal.missing = true;
+              } else {
+                val = point['value'];
+                if (val >= 0) {
+                  point['stackedZero'] = stackVal.positive;
+                  stackVal.positive += val;
+                  point['stackedValue'] = stackVal.positive;
+                } else {
+                  point['stackedZero'] = stackVal.negative;
+                  stackVal.negative += val;
+                  point['stackedValue'] = stackVal.negative;
+                }
+                if (!yScalePercentStacked)
+                  yScale.extendDataRange(point['stackedValue']);
+                stackVal.missing = false;
+              }
+            }
+          } else {
+            var names = series.yValueNames;
+            var k;
+            for (j = firstIndex; j <= lastIndex; j++) {
+              point = data[j];
+              if (!point['missing']) {
+                for (k = 0; k < names.length; k++) {
+                  yScale.extendDataRange(point[names[k]]);
+                }
+              }
+            }
+            if (drawingPlan.series.hasOutlierMarkers()) {
+              for (j = firstIndex; j <= lastIndex; j++) {
+                point = data[j];
+                var outliers = point['outliers'];
+                if (!point['missing'] && goog.isArray(outliers)) {
+                  for (k = 0; k < outliers.length; k++) {
+                    yScale.extendDataRange(outliers[k]);
+                  }
+                }
+              }
+            }
+            if (drawingPlan.series.isErrorAvailable() &&
+                (drawingPlan.series.error().hasGlobalErrorValues() ||
+                drawingPlan.hasPointYErrors)) {
+              var iterator = drawingPlan.series.getResetIterator();
+              while (iterator.advance()) { // we need iterator to make error work :(
+                if (!iterator.get('missing')) {
+                  var error = drawingPlan.series.error().getErrorValues(false);
+                  val = anychart.utils.toNumber(iterator.get('value'));
+                  yScale.extendDataRange(val - error[0], val + error[1]);
+                }
+              }
+            }
+          }
+        }
+        if (yScalePercentStacked) {
+          yScale.extendDataRange(0);
+          for (i = 0; i < drawingPlans.length; i++) {
+            drawingPlan = drawingPlans[i];
+            data = drawingPlan.data;
+            for (j = firstIndex; j <= lastIndex; j++) {
+              point = data[j];
+              stackVal = stack[j - firstIndex];
+              point['stackedMissing'] = stackVal.missing;
+              if (point['missing']) {
+                point['stackedPositiveZero'] = (point['stackedPositiveZero'] / stackVal.positive * 100) || 0;
+                point['stackedNegativeZero'] = (point['stackedNegativeZero'] / stackVal.negative * 100) || 0;
+              } else {
+                val = point['stackedValue'];
+                var sum;
+                if (val >= 0) {
+                  sum = stackVal.positive;
+                  yScale.extendDataRange(100);
+                } else {
+                  sum = -stackVal.negative;
+                  yScale.extendDataRange(-100);
+                }
+                point['stackedZero'] = (point['stackedZero'] / sum * 100) || 0;
+                point['stackedValue'] = (point['stackedValue'] / sum * 100) || 0;
+              }
             }
           }
         }
       }
     }
-
-    // calculate stacked y scales.
-    for (id in this.seriesOfStackedScaleMap_) {
-      series = this.seriesOfStackedScaleMap_[id];
-      scale = this.yScales[id];
-      xScales = {};
-      for (i = 0; i < series.length; i++) {
-        if (!series[i].enabled()) continue;
-        xId = goog.getUid(series[i].xScale());
-        if (xId in xScales) {
-          xScales[xId].push(series[i]);
-        } else {
-          xScales[xId] = [series[i]];
-        }
-      }
-      for (xId in xScales) {
-        xScale = this.xScales[xId];
-        var cats = xScale.getCategorisation();
-        var pointCallback = goog.bind(
-            function(series) {
-              var values = series.getReferenceScaleValues();
-              var i;
-              if (values) {
-                if (series.supportsStack()) {
-                  for (i = values.length; i--;) {
-                    this.extendDataRange(this.applyStacking(values[i]));
-                  }
-                } else {
-                  for (i = values.length; i--;) {
-                    this.extendDataRange(values[i]);
-                  }
-                }
-              }
-            }, scale);
-        var beforePointCallback = goog.bind(
-            function() {
-              this.resetStack();
-            }, scale);
-        if (goog.isArray(cats)) {
-          syncIterator = new anychart.core.utils.OrdinalIterator(xScales[xId], /** @type {!Array} */(cats),
-              pointCallback, null, beforePointCallback);
-        } else {
-          syncIterator = new anychart.core.utils.ScatterIterator(xScales[xId], /** @type {boolean} */(cats),
-              pointCallback, null, beforePointCallback);
-        }
-        while (syncIterator.advance()) {
-        }
-      }
+    for (uid in this.yScales) {
+      yScale = this.yScales[uid];
+      if (yScale.needsAutoCalc())
+        yScale.finishAutoCalc();
     }
 
+    anychart.performance.end('y scales calculation');
+
+
+    anychart.performance.start('statistics calculation');
     var max = -Infinity;
     var min = Infinity;
-    var sum = 0;
+    sum = 0;
     var pointsCount = 0;
 
-    for (i = 0; i < this.series_.length; i++) {
+    for (i = 0; i < this.drawingPlans_.length; i++) {
       //----------------------------------calc statistics for series
-      aSeries = this.series_[i];
-      aSeries.calculateStatistics();
-      max = Math.max(max, /** @type {number} */(aSeries.statistics('seriesMax')));
-      min = Math.min(min, /** @type {number} */ (aSeries.statistics('seriesMin')));
-      sum += /** @type {number} */(aSeries.statistics('seriesSum'));
-      pointsCount += /** @type {number} */(aSeries.statistics('seriesPointsCount'));
+      series = this.drawingPlans_[i].series;
+      series.statistics('seriesPointsCount', this.drawingPlans_[i].data.length);
+      series.statistics('seriesAverage', series.statistics('seriesSum') / this.drawingPlans_[i].data.length);
+      max = Math.max(max, /** @type {number} */(series.statistics('seriesMax')));
+      min = Math.min(min, /** @type {number} */ (series.statistics('seriesMin')));
+      sum += /** @type {number} */(series.statistics('seriesSum'));
+      pointsCount += /** @type {number} */(series.statistics('seriesPointsCount'));
       //----------------------------------end calc statistics for series
     }
 
     //----------------------------------calc statistics for series
     //todo (Roman Lubushikin): to avoid this loop on series we can store this info in the chart instance and provide it to all series
     var average = sum / pointsCount;
-    for (i = 0; i < this.series_.length; i++) {
-      aSeries = this.series_[i];
-      aSeries.statistics('max', max);
-      aSeries.statistics('min', min);
-      aSeries.statistics('sum', sum);
-      aSeries.statistics('average', average);
-      aSeries.statistics('pointsCount', pointsCount);
+    for (i = 0; i < this.drawingPlans_.length; i++) {
+      series = this.drawingPlans_[i].series;
+      if (!series || !series.enabled()) continue;
+      series.statistics('max', max);
+      series.statistics('min', min);
+      series.statistics('sum', sum);
+      series.statistics('average', average);
+      series.statistics('pointsCount', pointsCount);
     }
     //----------------------------------end calc statistics for series
+    anychart.performance.end('statistics calculation');
 
+    this.markConsistent(anychart.ConsistencyState.CARTESIAN_Y_SCALES);
   }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_SCALES)) {
-    // calculate auto names for scales with predefined names field.
-    for (id in this.ordinalScalesWithNamesField_) {
-      var ordScale = /** @type {anychart.scales.Ordinal} */ (this.ordinalScalesWithNamesField_[id]);
-      series = this.seriesOfOrdinalScalesWithNamesField_[goog.getUid(ordScale)];
-      var fieldName = ordScale.getNamesField();
-      var autoNames = [];
-      for (i = 0; i < series.length; i++) {
-        aSeries = series[i];
-        iterator = aSeries.getResetIterator();
-        while (iterator.advance()) {
-          var valueIndex = ordScale.getIndexByValue(iterator.get('x'));
-          var name = iterator.get(fieldName);
-          if (!goog.isDef(autoNames[valueIndex]))
-            autoNames[valueIndex] = name || iterator.get('x') || iterator.get('value');
-        }
-      }
-      ordScale.setAutoNames(autoNames);
-    }
-  }
-
-  this.markConsistent(anychart.ConsistencyState.CARTESIAN_SCALES);
-  this.markConsistent(anychart.ConsistencyState.CARTESIAN_Y_SCALES);
-  this.scalesFinalization_ = true;
-  anychart.core.Base.resumeSignalsDispatchingTrue(this.series_);
-
-  if (this.scalesFinalization_) {
-    var scalesChanged = false;
-    for (i in this.xScales) {
-      scale = this.xScales[i];
-      if (scale.needsAutoCalc())
-        scalesChanged |= scale.finishAutoCalc();
-    }
-    for (i in this.yScales) {
-      scale = this.yScales[i];
-      if (scale.needsAutoCalc())
-        scalesChanged |= scale.finishAutoCalc();
-    }
-    this.scalesFinalization_ = false;
-    if (scalesChanged) {
-      this.invalidateSeries();
-    }
-  }
-};
-
-
-/**
- * Prepares scale maps.
- * @private
- */
-anychart.core.CartesianBase.prototype.makeScaleMaps_ = function() {
-  if (!this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_SCALE_MAPS)) return;
-  var i;
-  var id;
-  var count;
-  var xScales = {};
-  var yScales = {};
-  var ordinalScalesWithNamesField = {};
-  var seriesOfOrdinalScalesWithNamesField = {};
-  var seriesOfStackedScaleMap = {};
-  var seriesOfXScaleMap = {};
-  var seriesOfYScaleMap = {};
-  var scale;
-  var series;
-
-  //search for scales in series
-  for (i = 0, count = this.series_.length; i < count; i++) {
-    series = this.series_[i];
-
-    //series X scale
-    if (!series.xScale()) {
-      series.xScale(/** @type {anychart.scales.Base} */(this.xScale()));
-      this.invalidateSeries();
-      this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES);
-    }
-    scale = series.xScale();
-
-    id = goog.getUid(scale);
-    xScales[id] = scale;
-    if (id in seriesOfXScaleMap)
-      seriesOfXScaleMap[id].push(series);
-    else
-      seriesOfXScaleMap[id] = [series];
-
-    // series ordinal scales with predefined field name for scale names.
-    if (scale instanceof anychart.scales.Ordinal && scale.getNamesField()) {
-      ordinalScalesWithNamesField[id] = scale;
-      if (id in seriesOfOrdinalScalesWithNamesField)
-        seriesOfOrdinalScalesWithNamesField[id].push(series);
-      else
-        seriesOfOrdinalScalesWithNamesField[id] = [series];
-    }
-
-    //series Y scale
-    if (!series.yScale()) {
-      series.yScale(/** @type {anychart.scales.Base} */(this.yScale()));
-      this.invalidateSeries();
-      this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES);
-    }
-    scale = series.yScale();
-
-    id = goog.getUid(scale);
-    if (scale.stackMode() == anychart.enums.ScaleStackMode.VALUE) {
-      if (id in seriesOfStackedScaleMap)
-        seriesOfStackedScaleMap[id].push(series);
-      else
-        seriesOfStackedScaleMap[id] = [series];
-    }
-    yScales[id] = scale;
-    if (id in seriesOfYScaleMap)
-      seriesOfYScaleMap[id].push(series);
-    else
-      seriesOfYScaleMap[id] = [series];
-
-    // series ordinal scales with predefined field name for scale names.
-    if (scale instanceof anychart.scales.Ordinal && scale.getNamesField()) {
-      ordinalScalesWithNamesField[id] = scale;
-      if (id in seriesOfOrdinalScalesWithNamesField)
-        seriesOfOrdinalScalesWithNamesField[id].push(series);
-      else
-        seriesOfOrdinalScalesWithNamesField[id] = [series];
-    }
-
-  }
-
-  this.seriesOfStackedScaleMap_ = seriesOfStackedScaleMap;
-  this.yScales = yScales;
-  this.xScales = xScales;
-  this.seriesOfXScaleMap_ = seriesOfXScaleMap;
-  this.seriesOfYScaleMap_ = seriesOfYScaleMap;
-  this.ordinalScalesWithNamesField_ = ordinalScalesWithNamesField;
-  this.seriesOfOrdinalScalesWithNamesField_ = seriesOfOrdinalScalesWithNamesField;
-
-  this.markConsistent(anychart.ConsistencyState.CARTESIAN_SCALE_MAPS);
 };
 
 
 /**
  * Spread Column and Bar series to categories width
- * @protected
+ * @private
  */
-anychart.core.CartesianBase.prototype.distributeSeries = function() {
-  /** @type {number} */
+anychart.core.CartesianBase.prototype.distributeSeries_ = function() {
   var i;
-  /** @type {anychart.scales.Base} */
   var scale;
-  /** @type {!Array.<anychart.core.cartesian.series.Base>} */
-  var series;
-  /** @type {anychart.core.cartesian.series.Base} */
+  var drawingPlansOfScale;
   var aSeries;
-  /** @type {number} */
   var id;
-  /** @type {number} */
   var xId;
   var wSeries;
   var seenScales;
@@ -2196,13 +2315,12 @@ anychart.core.CartesianBase.prototype.distributeSeries = function() {
   var numBarClusters;
   var seenScalesWithColumns;
   var seenScalesWithBars;
-
   // spreading column and bar series to the total width of X categories
-  for (xId in this.seriesOfXScaleMap_) {
-    // no ned to do this if the scale is not ordinal
-    if (!this.xScales[xId].getCategorisation())
+  for (xId in this.drawingPlansByXScale_) {
+    // no need to do this if the scale is not ordinal
+    if (!(this.xScales[xId] instanceof anychart.scales.Ordinal || this.xScales[xId] instanceof anychart.scales.DateTime))
       continue;
-    series = this.seriesOfXScaleMap_[xId];
+    drawingPlansOfScale = this.drawingPlansByXScale_[xId];
     // Our task is to calculate the number of column and bar clusters.
     // One column cluster is a column series, if axis is not stacked,
     // or all series of stacked axis, if there is at least one column.
@@ -2212,8 +2330,8 @@ anychart.core.CartesianBase.prototype.distributeSeries = function() {
     numBarClusters = 0;
     seenScalesWithColumns = {};
     seenScalesWithBars = {};
-    for (i = 0; i < series.length; i++) {
-      aSeries = series[i];
+    for (i = 0; i < drawingPlansOfScale.length; i++) {
+      aSeries = drawingPlansOfScale[i].series;
       scale = /** @type {anychart.scales.Base} */(aSeries.yScale());
       id = goog.getUid(scale);
       if (aSeries.isBarBased()) {
@@ -2241,8 +2359,8 @@ anychart.core.CartesianBase.prototype.distributeSeries = function() {
       barWidthRatio = 1 / numColumnClusters;
       currPosition = barWidthRatio * this.barGroupsPadding_ / 2;
       seenScales = {};
-      for (i = 0; i < series.length; i++) {
-        wSeries = series[i];
+      for (i = 0; i < drawingPlansOfScale.length; i++) {
+        wSeries = drawingPlansOfScale[i].series;
         if (wSeries.isWidthBased() && !wSeries.isBarBased()) {
           scale = /** @type {anychart.scales.Base} */(wSeries.yScale());
           if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
@@ -2269,8 +2387,8 @@ anychart.core.CartesianBase.prototype.distributeSeries = function() {
       barWidthRatio = 1 / numBarClusters;
       currPosition = barWidthRatio * this.barGroupsPadding_ / 2;
       seenScales = {};
-      for (i = 0; i < series.length; i++) {
-        wSeries = series[i];
+      for (i = 0; i < drawingPlansOfScale.length; i++) {
+        wSeries = drawingPlansOfScale[i].series;
         if (wSeries.isBarBased()) {
           scale = /** @type {anychart.scales.Base} */(wSeries.yScale());
           if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
@@ -2520,12 +2638,15 @@ anychart.core.CartesianBase.prototype.setParentBoundsTo3dAxis = goog.abstractMet
  * @param {anychart.math.Rect} bounds Bounds of cartesian content area.
  */
 anychart.core.CartesianBase.prototype.drawContent = function(bounds) {
-  var i, count;
+  var i, count, scale;
 
   this.xScroller().suspendSignalsDispatching();
 
+  anychart.performance.start('Cartesian.calculate()');
+
+  this.makeScaleMaps();
+  this.calculateXScales();
   if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_ZOOM)) {
-    this.ensureScalesReadyForZoom();
     for (i in this.xScales) {
       var start = this.xZoom().getStartRatio();
       var factor = 1 / (this.xZoom().getEndRatio() - start);
@@ -2535,8 +2656,8 @@ anychart.core.CartesianBase.prototype.drawContent = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.CARTESIAN_ZOOM);
     this.invalidate(anychart.ConsistencyState.CARTESIAN_Y_SCALES | anychart.ConsistencyState.CARTESIAN_X_SCROLLER);
   }
-
-  this.calculate();
+  this.calculateYScales();
+  anychart.performance.end('Cartesian.calculate()');
 
   if (this.isConsistent())
     return;
@@ -2545,6 +2666,7 @@ anychart.core.CartesianBase.prototype.drawContent = function(bounds) {
 
   var axes = goog.array.concat(this.xAxes_, this.yAxes_);
 
+  anychart.performance.start('Cartesian bounds calc');
   // set default scales for axis if they not set
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.CARTESIAN_AXES)) {
     var item;
@@ -2738,6 +2860,9 @@ anychart.core.CartesianBase.prototype.drawContent = function(bounds) {
         anychart.ConsistencyState.CARTESIAN_CROSSHAIR);
   }
 
+  anychart.performance.end('Cartesian bounds calc');
+
+  anychart.performance.start('Cartesian elements drawing');
   if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_X_SCROLLER)) {
     this.xScroller().container(this.rootElement);
     this.xScroller().draw();
@@ -2801,8 +2926,11 @@ anychart.core.CartesianBase.prototype.drawContent = function(bounds) {
     }
     this.markConsistent(anychart.ConsistencyState.CARTESIAN_AXES_MARKERS);
   }
+  anychart.performance.end('Cartesian elements drawing');
 
+  anychart.performance.start('Cartesian series drawing');
   if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_SERIES)) {
+    anychart.performance.start('Preparation');
     for (i = 0, count = this.series_.length; i < count; i++) {
       var series = this.series_[i];
       series.container(this.rootElement);
@@ -2811,11 +2939,19 @@ anychart.core.CartesianBase.prototype.drawContent = function(bounds) {
       series.parentBounds(this.dataBounds);
     }
 
-    this.distributeSeries();
+    this.distributeSeries_();
     this.calcBubbleSizes();
-    this.drawSeries();
+    anychart.performance.end('Preparation');
+
+    anychart.performance.start('Series drawing');
+    for (i = 0; i < this.series_.length; i++) {
+      this.series_[i].drawPlan();
+    }
+    anychart.performance.end('Series drawing');
+
     this.markConsistent(anychart.ConsistencyState.CARTESIAN_SERIES);
   }
+  anychart.performance.end('Cartesian series drawing');
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_CROSSHAIR)) {
     if (this.crosshair_) {
@@ -2836,80 +2972,6 @@ anychart.core.CartesianBase.prototype.drawContent = function(bounds) {
 
   this.xScroller().resumeSignalsDispatching(false);
   anychart.core.Base.resumeSignalsDispatchingFalse(this.series_, this.xAxes_, this.yAxes_);
-};
-
-
-/**
- * Renders the chart.
- * @protected
- */
-anychart.core.CartesianBase.prototype.drawSeries = function() {
-  var i;
-  var iterator;
-  for (var id in this.xScales) {
-    var scale = this.xScales[id];
-    var yScales = {};
-    var yScalePositiveSumms = {};
-    var yScaleNegativeSumms = {};
-    var series = this.seriesOfXScaleMap_[goog.getUid(scale)];
-    for (i = 0; i < series.length; i++) {
-      var yUid = goog.getUid(series[i].yScale());
-      yScales[yUid] = series[i].yScale();
-      yScalePositiveSumms[yUid] = 0;
-      yScaleNegativeSumms[yUid] = 0;
-    }
-    var categories = scale.getCategorisation();
-    var pointClb = function(series) {
-      var iterator = series.getIterator();
-      var index = iterator.getIndex();
-      if (iterator.get('selected'))
-        series.state.setPointState(anychart.PointState.SELECT, index);
-
-      series.drawPoint(series.state.getPointStateByIndex(index));
-    };
-    var missingClb = function(series) {
-      series.drawMissing();
-    };
-    var beforeClb = function(activeSeries) {
-      var i;
-      for (i = activeSeries.length; i--;) {
-        var values = activeSeries[i].getReferenceScaleValues();
-        if (activeSeries[i].supportsStack() && values) {
-          for (var j = values.length; j--;) {
-            var value = anychart.utils.toNumber(values[j]);
-            if (value >= 0)
-              yScalePositiveSumms[goog.getUid(activeSeries[i].yScale())] += value;
-            else if (value < 0)
-              yScaleNegativeSumms[goog.getUid(activeSeries[i].yScale())] += value;
-          }
-        }
-      }
-      for (i in yScales) {
-        yScales[i].resetStack();
-        yScales[i].setStackRange(yScaleNegativeSumms[i], yScalePositiveSumms[i]);
-      }
-    };
-    var afterClb = function() {
-      for (var i in yScales) {
-        yScalePositiveSumms[i] = 0;
-        yScaleNegativeSumms[i] = 0;
-      }
-    };
-    if (goog.isArray(categories)) {
-      iterator = new anychart.core.utils.OrdinalIterator(series, /** @type {!Array} */(categories), pointClb, missingClb,
-          beforeClb, afterClb);
-    } else {
-      iterator = new anychart.core.utils.ScatterIterator(series, !!categories, pointClb, missingClb, beforeClb,
-          afterClb);
-    }
-    for (i = 0; i < series.length; i++) {
-      series[i].startDrawing();
-    }
-    while (iterator.advance()) {
-    }
-    for (i = 0; i < series.length; i++)
-      series[i].finalizeDrawing();
-  }
 };
 
 
@@ -2960,7 +3022,9 @@ anychart.core.CartesianBase.prototype.createLegendItemsProvider = function(sourc
    */
   var data = [];
   // we need to calculate statistics
-  this.calculate();
+  this.makeScaleMaps();
+  this.calculateXScales();
+  this.calculateYScales();
   if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES && (this.xScale() instanceof anychart.scales.Ordinal)) {
     var names = this.xScale().names();
 
@@ -3062,7 +3126,7 @@ anychart.core.CartesianBase.prototype.getSeriesStatus = function(event) {
     var minValue, maxValue;
     for (i = 0, len = this.series_.length; i < len; i++) {
       series = this.series_[i];
-      if (series.enabled()) {
+      if (series && series.enabled()) {
         minValue =  /** @type {number} */(series.xScale().inverseTransform(minRatio));
         maxValue = /** @type {number} */(series.xScale().inverseTransform(maxRatio));
 
@@ -3082,16 +3146,14 @@ anychart.core.CartesianBase.prototype.getSeriesStatus = function(event) {
           if (iterator.select(index)) {
             var pixX = /** @type {number} */(iterator.meta('x'));
             var pickValue = false;
-            for (var k = 0; k < series.referenceValueMeanings.length; k++) {
-              if (series.referenceValueMeanings[k] == 'y') {
-                var pixY = /** @type {number} */(iterator.meta(series.referenceValueNames[k]));
+            for (var k = 0; k < series.yValueNames.length; k++) {
+              var pixY = /** @type {number} */(iterator.meta(series.yValueNames[k]));
 
-                var length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
-                pickValue = pickValue || length <= spotRadius;
-                if (length < minLength) {
-                  minLength = length;
-                  minLengthIndex = index;
-                }
+              var length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
+              pickValue = pickValue || length <= spotRadius;
+              if (length < minLength) {
+                minLength = length;
+                minLengthIndex = index;
               }
             }
             if (pickValue) {
@@ -3114,34 +3176,31 @@ anychart.core.CartesianBase.prototype.getSeriesStatus = function(event) {
 
     for (i = 0, len = this.series_.length; i < len; i++) {
       series = this.series_[i];
-      value = series.xScale().inverseTransform(ratio);
-      index = series.data().find('x', value);
-      if (index < 0) index = NaN;
+      if (series && series.enabled()) {
+        value = series.xScale().inverseTransform(ratio);
+        index = series.findX(value);
+        if (index < 0) index = NaN;
 
-      iterator = series.getIterator();
-      minLength = Infinity;
+        iterator = series.getIterator();
+        minLength = Infinity;
 
-      if (iterator.select(index)) {
-        var missing = false;
-        pixX = /** @type {number} */(iterator.meta('x'));
-        for (k = 0; k < series.referenceValueMeanings.length; k++) {
-          if (series.referenceValueMeanings[k] == 'y') {
-            missing = missing || anychart.utils.isNaN(iterator.get(series.referenceValueNames[k]));
-            pixY = /** @type {number} */(iterator.meta(series.referenceValueNames[k]));
-            length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
-            if (length < minLength) {
-              minLength = length;
+        if (iterator.select(index)) {
+          if (!iterator.get('missing')) {
+            pixX = /** @type {number} */(iterator.meta('x'));
+            for (k = 0; k < series.yValueNames.length; k++) {
+              pixY = /** @type {number} */(iterator.meta(series.yValueNames[k]));
+              length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
+              if (length < minLength) {
+                minLength = length;
+              }
             }
+            points.push({
+              series: series,
+              points: [index],
+              lastPoint: index,
+              nearestPointToCursor: {index: index, distance: minLength}
+            });
           }
-        }
-
-        if (!missing) {
-          points.push({
-            series: series,
-            points: [index],
-            lastPoint: index,
-            nearestPointToCursor: {index: index, distance: minLength}
-          });
         }
       }
     }

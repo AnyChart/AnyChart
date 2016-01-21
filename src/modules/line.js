@@ -22,6 +22,7 @@ goog.require('anychart.modules.base');
  * @return {anychart.charts.Cartesian} Chart with defaults for line series.
  */
 anychart.line = function(var_args) {
+  anychart.performance.start('anychart.line()');
   var chart = new anychart.charts.Cartesian();
   var theme = anychart.getFullTheme();
 
@@ -33,7 +34,7 @@ anychart.line = function(var_args) {
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.line(arguments[i]);
   }
-
+  anychart.performance.end('anychart.line()');
   return chart;
 };
 

@@ -50,7 +50,7 @@ anychart.core.SeriesPoint.prototype.set = function(field, value) {
  * @return {number}
  */
 anychart.core.SeriesPoint.prototype.getStackValue = function() {
-  return /** @type {number} */ (this.series.data().meta(this.index, 'stackValue'));
+  return /** @type {number} */ (this.series.getStackedValue(this.index));
 };
 
 
@@ -59,7 +59,7 @@ anychart.core.SeriesPoint.prototype.getStackValue = function() {
  * @return {number}
  */
 anychart.core.SeriesPoint.prototype.getStackZero = function() {
-  return /** @type {number} */ (this.series.data().meta(this.index, 'stackZero'));
+  return /** @type {number} */ (this.series.getStackedZero(this.index));
 };
 
 

@@ -78,34 +78,21 @@ anychart.core.cartesian.series.Candlestick.prototype.hoverFallingHatchFill_;
 
 /** @inheritDoc */
 anychart.core.cartesian.series.Candlestick.prototype.drawSubsequentPoint = function(pointState) {
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues)
-    return false;
-
-  var iterator;
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
 
-    var x = referenceValues[0];
-    var open = referenceValues[1];
-    var high = referenceValues[2];
-    var low = referenceValues[3];
-    var close = referenceValues[4];
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var open = /** @type {number} */(this.iterator.meta('open'));
+    var high = /** @type {number} */(this.iterator.meta('high'));
+    var low = /** @type {number} */(this.iterator.meta('low'));
+    var close = /** @type {number} */(this.iterator.meta('close'));
 
-    iterator = this.getIterator();
-
-    var rising = Number(iterator.get('open')) < Number(iterator.get('close'));
+    var rising = Number(this.iterator.get('open')) < Number(this.iterator.get('close'));
 
     /** @type {!acgraph.vector.Path} */
     var path = /** @type {!acgraph.vector.Path} */(this.rootElement.genNextChild());
     var widthHalf = this.getPointWidth() / 2;
 
-    iterator
-        .meta('x', x)
-        .meta('open', open)
-        .meta('high', high)
-        .meta('low', low)
-        .meta('close', close)
+    this.iterator
         .meta('rising', rising)
         .meta('shape', path);
 
@@ -127,19 +114,16 @@ anychart.core.cartesian.series.Candlestick.prototype.drawSubsequentPoint = funct
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
-    iterator = this.getIterator();
     var hatchFillShape = this.hatchFillRootElement ?
         /** @type {!acgraph.vector.Rect} */(this.hatchFillRootElement.genNextChild()) :
         null;
-    iterator.meta('hatchFillShape', hatchFillShape);
-    var shape = /** @type {acgraph.vector.Shape} */(iterator.meta('shape'));
+    this.iterator.meta('hatchFillShape', hatchFillShape);
+    var shape = /** @type {acgraph.vector.Shape} */(this.iterator.meta('shape'));
     if (goog.isDef(shape) && hatchFillShape) {
       hatchFillShape.deserialize(shape.serialize());
     }
     this.applyHatchFill(pointState);
   }
-
-  return true;
 };
 
 

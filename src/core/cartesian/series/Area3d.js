@@ -34,10 +34,7 @@ anychart.core.cartesian.series.Area3d = function(opt_data, opt_csvSettings) {
   this.rightSide.zIndex(anychart.core.cartesian.series.Base.ZINDEX_SERIES);
   this.topSide.zIndex(anychart.core.cartesian.series.Base.ZINDEX_SERIES - 0.1);
 
-  // Define reference fields for a series
-  this.referenceValueNames = ['x', 'value', 'value'];
-  this.referenceValueMeanings = ['x', 'z', 'y'];
-  this.referenceValuesSupportStack = true;
+  this.needsZero = true;
 };
 goog.inherits(anychart.core.cartesian.series.Area3d, anychart.core.cartesian.series.AreaBase);
 anychart.core.cartesian.series.Base.Series3dTypesMap[anychart.enums.Cartesian3dSeriesType.AREA] = anychart.core.cartesian.series.Area3d;
@@ -74,82 +71,64 @@ anychart.core.cartesian.series.Area3d.prototype.startDrawing = function() {
      * @type {boolean}
      * @private
      */
-    this.isNeedDrawTopSide_ = this.yScale().stackMode() == anychart.enums.ScaleStackMode.NONE ||
+    this.isNeedDrawTopSide_ = !this.drawingPlan.stacked ||
         this.index() == this.getChart().lastEnabledAreaSeriesMap[goog.getUid(this.xScale()) + '_' + goog.getUid(this.yScale())];
+
+    this.x3dShift_ = this.getChart().x3dShift;
+    this.y3dShift_ = this.getChart().y3dShift;
   }
 };
 
 
 /** @inheritDoc */
 anychart.core.cartesian.series.Area3d.prototype.drawFirstPoint = function(pointState) {
-  var zeroMissing = this.yScale().isStackValMissing();
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues)
-    return false;
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var x = referenceValues[0];
-    var zero = referenceValues[1];
-    var y = referenceValues[2];
-    var x3dShift = this.getChart().x3dShift;
-    var y3dShift = this.getChart().y3dShift;
-
-    this.finalizeSegment();
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var y = /** @type {number} */(this.iterator.meta('value'));
+    var zero = /** @type {number} */(this.iterator.meta('zero'));
 
     this.path
         .moveTo(x, zero)
         .lineTo(x, y);
 
-    if (this.yScale().stackMode() == anychart.enums.ScaleStackMode.NONE) {
+    if (this.drawingPlan.stacked) {
+      this.zeroesStack = [x, zero, this.iterator.meta('zeroMissing')];
+    } else {
       this.backSide
-          .moveTo(x + x3dShift, zero - y3dShift)
-          .lineTo(x + x3dShift, y - y3dShift);
+          .moveTo(x + this.x3dShift_, zero - this.y3dShift_)
+          .lineTo(x + this.x3dShift_, y - this.y3dShift_);
 
       this.bottomSide
           .moveTo(x, zero)
-          .lineTo(x + x3dShift, zero - y3dShift);
+          .lineTo(x + this.x3dShift_, zero - this.y3dShift_);
 
       this.leftSide
           .moveTo(x, zero)
           .lineTo(x, y)
-          .lineTo(x + x3dShift, y - y3dShift)
-          .lineTo(x + x3dShift, zero - y3dShift)
+          .lineTo(x + this.x3dShift_, y - this.y3dShift_)
+          .lineTo(x + this.x3dShift_, zero - this.y3dShift_)
           .close();
 
-    } else {
-      this.zeroesStack = [x, zero, zeroMissing];
     }
 
     this.lastDrawnX = x;
     this.lastDrawnZero = zero;
-
-    this.getIterator().meta('x', x).meta('zero', zero).meta('value', y);
   }
-
-  return true;
 };
 
 
 /** @inheritDoc */
 anychart.core.cartesian.series.Area3d.prototype.drawSubsequentPoint = function(pointState) {
-  var zeroMissing = this.yScale().isStackValMissing();
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues)
-    return false;
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var x = referenceValues[0];
-    var zero = referenceValues[1];
-    var y = referenceValues[2];
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var y = /** @type {number} */(this.iterator.meta('value'));
+    var zero = /** @type {number} */(this.iterator.meta('zero'));
 
-    var x3dShift = this.getChart().x3dShift;
-    var y3dShift = this.getChart().y3dShift;
-
-    if (this.yScale().stackMode() == anychart.enums.ScaleStackMode.NONE) {
-      this.bottomSide.lineTo(x + x3dShift, zero - y3dShift);
-      this.backSide.lineTo(x + x3dShift, y - y3dShift);
+    if (this.drawingPlan.stacked) {
+      this.zeroesStack.push(x, zero, this.iterator.meta('zeroMissing'));
     } else {
-      this.zeroesStack.push(x, zero, zeroMissing);
+      this.bottomSide.lineTo(x + this.x3dShift_, zero - this.y3dShift_);
+      this.backSide.lineTo(x + this.x3dShift_, y - this.y3dShift_);
     }
 
     if (this.isNeedDrawTopSide_) {
@@ -157,8 +136,8 @@ anychart.core.cartesian.series.Area3d.prototype.drawSubsequentPoint = function(p
       if (this.evenTopSide_) {
         this.topSide
             .moveTo(currentPoint.x, currentPoint.y)
-            .lineTo(currentPoint.x + x3dShift, currentPoint.y - y3dShift)
-            .lineTo(x + x3dShift, y - y3dShift)
+            .lineTo(currentPoint.x + this.x3dShift_, currentPoint.y - this.y3dShift_)
+            .lineTo(x + this.x3dShift_, y - this.y3dShift_)
             .lineTo(x, y)
             .close();
       } else {
@@ -166,8 +145,8 @@ anychart.core.cartesian.series.Area3d.prototype.drawSubsequentPoint = function(p
         this.topSide
             .moveTo(currentPoint.x, currentPoint.y)
             .lineTo(x, y)
-            .lineTo(x + x3dShift, y - y3dShift)
-            .lineTo(currentPoint.x + x3dShift, currentPoint.y - y3dShift)
+            .lineTo(x + this.x3dShift_, y - this.y3dShift_)
+            .lineTo(currentPoint.x + this.x3dShift_, currentPoint.y - this.y3dShift_)
             .close();
       }
 
@@ -179,19 +158,12 @@ anychart.core.cartesian.series.Area3d.prototype.drawSubsequentPoint = function(p
     this.lastDrawnX = x;
     this.lastDrawnY = y;
     this.lastDrawnZero = zero;
-
-    this.getIterator().meta('x', x).meta('zero', zero).meta('value', y);
   }
-
-  return true;
 };
 
 
 /** @inheritDoc */
 anychart.core.cartesian.series.Area3d.prototype.finalizeSegment = function() {
-  var x3dShift = this.getChart().x3dShift;
-  var y3dShift = this.getChart().y3dShift;
-
   if (this.zeroesStack) {
     /** @type {number} */
     var prevX = NaN;
@@ -224,7 +196,7 @@ anychart.core.cartesian.series.Area3d.prototype.finalizeSegment = function() {
         .close();
 
     this.backSide
-        .lineTo(this.lastDrawnX + x3dShift, this.zeroY - y3dShift)
+        .lineTo(this.lastDrawnX + this.x3dShift_, this.zeroY - this.y3dShift_)
         .close();
 
     this.bottomSide
@@ -236,8 +208,8 @@ anychart.core.cartesian.series.Area3d.prototype.finalizeSegment = function() {
     this.rightSide
         .moveTo(this.lastDrawnX, this.lastDrawnZero)
         .lineTo(this.lastDrawnX, this.lastDrawnY)
-        .lineTo(this.lastDrawnX + x3dShift, this.lastDrawnY - y3dShift)
-        .lineTo(this.lastDrawnX + x3dShift, this.lastDrawnZero - y3dShift)
+        .lineTo(this.lastDrawnX + this.x3dShift_, this.lastDrawnY - this.y3dShift_)
+        .lineTo(this.lastDrawnX + this.x3dShift_, this.lastDrawnZero - this.y3dShift_)
         .close();
     this.rightSide.parent(this.rootLayer);
   }
@@ -311,8 +283,6 @@ anychart.core.cartesian.series.Area3d.prototype.colorizeShape = function(pointSt
 /** @inheritDoc */
 anychart.core.cartesian.series.Area3d.prototype.doClip = function() {
   var clip, bounds, axesLinesSpace;
-  var x3dShift = this.getChart().x3dShift;
-  var y3dShift = this.getChart().y3dShift;
 
   if (!(this.rootLayer.clip() instanceof acgraph.vector.Clip)) {
     clip = /** @type {!anychart.math.Rect|boolean} */ (this.clip());
@@ -321,9 +291,9 @@ anychart.core.cartesian.series.Area3d.prototype.doClip = function() {
         bounds = this.pixelBoundsCache;
         axesLinesSpace = this.axesLinesSpace();
         clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
-        clip.top -= y3dShift;
-        clip.height += y3dShift;
-        clip.width += x3dShift;
+        clip.top -= this.y3dShift_;
+        clip.height += this.y3dShift_;
+        clip.width += this.x3dShift_;
       }
     }
     this.rootLayer.clip(/** @type {anychart.math.Rect} */ (clip || null));
@@ -339,9 +309,7 @@ anychart.core.cartesian.series.Area3d.prototype.doClip = function() {
 /** @inheritDoc */
 anychart.core.cartesian.series.Area3d.prototype.createLabelsPositionProvider = function(position) {
   var iterator = this.getIterator();
-  var x3dShift = this.getChart().x3dShift;
-  var y3dShift = this.getChart().y3dShift;
-  return {'value': {'x': iterator.meta('x') + x3dShift, 'y': /** @type {number} */(iterator.meta('value')) - y3dShift}};
+  return {'value': {'x': iterator.meta('x') + this.x3dShift_, 'y': /** @type {number} */(iterator.meta('value')) - this.y3dShift_}};
 };
 
 

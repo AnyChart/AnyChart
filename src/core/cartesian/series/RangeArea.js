@@ -17,9 +17,8 @@ anychart.core.cartesian.series.RangeArea = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
 
   // Define reference points for a series
-  this.referenceValueNames = ['x', 'low', 'high'];
-  this.referenceValueMeanings = ['x', 'y', 'y'];
-  this.referenceValuesSupportStack = false;
+  this.yValueNames = ['low', 'high'];
+  this.seriesSupportsStack = false;
 };
 goog.inherits(anychart.core.cartesian.series.RangeArea, anychart.core.cartesian.series.ContinuousRangeBase);
 anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSeriesType.RANGE_AREA] = anychart.core.cartesian.series.RangeArea;
@@ -27,16 +26,10 @@ anychart.core.cartesian.series.Base.SeriesTypesMap[anychart.enums.CartesianSerie
 
 /** @inheritDoc */
 anychart.core.cartesian.series.RangeArea.prototype.drawFirstPoint = function(pointState) {
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues)
-    return false;
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var x = referenceValues[0];
-    var low = referenceValues[1];
-    var high = referenceValues[2];
-
-    this.finalizeSegment();
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var high = /** @type {number} */(this.iterator.meta('high'));
+    var low = /** @type {number} */(this.iterator.meta('low'));
 
     this.path
         .moveTo(x, low)
@@ -45,34 +38,22 @@ anychart.core.cartesian.series.RangeArea.prototype.drawFirstPoint = function(poi
         .moveTo(x, high);
 
     this.lowsStack = [x, low];
-
-    this.getIterator().meta('x', x).meta('low', low).meta('high', high);
   }
-
-  return true;
 };
 
 
 /** @inheritDoc */
 anychart.core.cartesian.series.RangeArea.prototype.drawSubsequentPoint = function(pointState) {
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues)
-    return false;
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var x = referenceValues[0];
-    var low = referenceValues[1];
-    var high = referenceValues[2];
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var high = /** @type {number} */(this.iterator.meta('high'));
+    var low = /** @type {number} */(this.iterator.meta('low'));
 
     this.path.lineTo(x, high);
     this.highPath.lineTo(x, high);
 
     this.lowsStack.push(x, low);
-
-    this.getIterator().meta('x', x).meta('low', low).meta('high', high);
   }
-
-  return true;
 };
 
 
@@ -85,7 +66,7 @@ anychart.core.cartesian.series.RangeArea.prototype.finalizeSegment = function() 
       /** @type {number} */
       var x = /** @type {number} */(this.lowsStack[i - 1]);
       /** @type {number} */
-      var y = /** @type {number} */(this.lowsStack[i - 0]);
+      var y = /** @type {number} */(this.lowsStack[i]);
       this.path.lineTo(x, y);
       if (first) {
         this.lowPath.moveTo(x, y);

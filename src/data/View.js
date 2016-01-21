@@ -653,75 +653,84 @@ anychart.data.View.prototype.transitionMeta = function(on) {
 
 
 /**
- * @inheritDoc
+ * Serializes and returns one particular row.
+ * @param {number} index
+ * @return {*}
  */
-anychart.data.View.prototype.serialize = function() {
-  var arr = [];
-  var iterator = this.getIterator();
-  var index;
+anychart.data.View.prototype.serializeRow = function(index) {
+  var rowObject;
   var row;
   var mapping, map;
   var key;
-  var rowObject;
   var i;
   var val;
-  while (iterator.advance()) {
-    index = iterator.getIndex();
-    row = this.row(index);
-    // if row represented by array - convert it to object with help of array mapping.
-    if (goog.isArray(row)) {
-      // get array mapping for the row
-      mapping = this.getRowMapping(index).getArrayMapping();
-      rowObject = {};
-      for (key in mapping) {
-        map = mapping[key];
-        for (i = 0; i < map.length; i++) {
-          if (map[i] in row) {
-            val = row[map[i]];
-            if (val instanceof Date)
-              val = val.getTime();
-            if (!goog.isDef(val) || (goog.isNumber(val) && isNaN(val)))
-              val = null;
-            rowObject[key] = val;
-            break;
-          }
-        }
-      }
-    } else if (goog.isObject(row)) {
-      // if row is presented by object - normalize it to default mapping, because we cannot provide
-      // mapping info to the resulting JSON now
-      mapping = this.getRowMapping(index).getObjectMapping();
-      rowObject = {};
-      for (key in mapping) {
-        map = mapping[key];
-        for (i = 0; i < map.length; i++) {
-          if (map[i] in row) {
-            val = row[map[i]];
-            if (val instanceof Date)
-              val = val.getTime();
-            if (!goog.isDef(val) || (goog.isNumber(val) && isNaN(val)))
-              val = null;
-            rowObject[key] = val;
-            break;
-          }
-        }
-      }
-      for (key in row) {
-        if (row.hasOwnProperty(key) && !(key in mapping)) {
-          val = row[key];
+  row = this.row(index);
+  // if row represented by array - convert it to object with help of array mapping.
+  if (goog.isArray(row)) {
+    // get array mapping for the row
+    mapping = this.getRowMapping(index).getArrayMapping();
+    rowObject = {};
+    for (key in mapping) {
+      map = mapping[key];
+      for (i = 0; i < map.length; i++) {
+        if (map[i] in row) {
+          val = row[map[i]];
           if (val instanceof Date)
             val = val.getTime();
           if (!goog.isDef(val) || (goog.isNumber(val) && isNaN(val)))
             val = null;
           rowObject[key] = val;
+          break;
         }
       }
-    } else {
-      if (!goog.isDef(row) || (goog.isNumber(row) && isNaN(row)))
-        row = null;
-      rowObject = row;
     }
-    arr.push(rowObject);
+  } else if (goog.isObject(row)) {
+    // if row is presented by object - normalize it to default mapping, because we cannot provide
+    // mapping info to the resulting JSON now
+    mapping = this.getRowMapping(index).getObjectMapping();
+    rowObject = {};
+    for (key in mapping) {
+      map = mapping[key];
+      for (i = 0; i < map.length; i++) {
+        if (map[i] in row) {
+          val = row[map[i]];
+          if (val instanceof Date)
+            val = val.getTime();
+          if (!goog.isDef(val) || (goog.isNumber(val) && isNaN(val)))
+            val = null;
+          rowObject[key] = val;
+          break;
+        }
+      }
+    }
+    for (key in row) {
+      if (row.hasOwnProperty(key) && !(key in mapping)) {
+        val = row[key];
+        if (val instanceof Date)
+          val = val.getTime();
+        if (!goog.isDef(val) || (goog.isNumber(val) && isNaN(val)))
+          val = null;
+        rowObject[key] = val;
+      }
+    }
+  } else {
+    if (!goog.isDef(row) || (goog.isNumber(row) && isNaN(row)))
+      row = null;
+    rowObject = row;
+  }
+  return rowObject;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.data.View.prototype.serialize = function() {
+  var arr = [];
+
+  var iterator = this.getIterator();
+  while (iterator.advance()) {
+    arr.push(this.serializeRow(iterator.getIndex()));
   }
 
   return arr;

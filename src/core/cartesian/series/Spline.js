@@ -17,10 +17,8 @@ goog.require('anychart.core.cartesian.series.SplineDrawer');
 anychart.core.cartesian.series.Spline = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
 
-  // Define reference points for a series
-  this.referenceValueNames = ['x', 'value'];
-  this.referenceValueMeanings = ['x', 'y'];
-  this.referenceValuesSupportStack = false;
+  // Define reference fields for a series
+  this.seriesSupportsStack = false;
 
   /**
    * Spline drawer.
@@ -29,6 +27,10 @@ anychart.core.cartesian.series.Spline = function(opt_data, opt_csvSettings) {
    */
   this.queue_ = new anychart.core.cartesian.series.SplineDrawer(this.path);
 
+  // legacy
+  this.stroke(function() {
+    return this['sourceColor'];
+  });
   this.hoverStroke(function() {
     return anychart.color.lighten(this['sourceColor']);
   });
@@ -46,49 +48,27 @@ anychart.core.cartesian.series.Spline.prototype.startDrawing = function() {
 
 /** @inheritDoc */
 anychart.core.cartesian.series.Spline.prototype.drawFirstPoint = function(pointState) {
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues)
-    return false;
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var x = referenceValues[0];
-    var y = referenceValues[1];
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var y = /** @type {number} */(this.iterator.meta('value'));
 
     this.finalizeSegment();
     this.queue_.resetDrawer(false);
     this.path.moveTo(x, y);
     this.queue_.processPoint(x, y);
-
-    this.getIterator().meta('x', x).meta('value', y);
   }
-
-  return true;
 };
 
 
 /** @inheritDoc */
 anychart.core.cartesian.series.Spline.prototype.drawSubsequentPoint = function(pointState) {
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues)
-    return false;
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var x = referenceValues[0];
-    var y = referenceValues[1];
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var y = /** @type {number} */(this.iterator.meta('value'));
 
     this.queue_.processPoint(x, y);
-
-    this.getIterator().meta('x', x).meta('value', y);
   }
-
-  return true;
 };
-
-
-/** @inheritDoc */
-anychart.core.cartesian.series.Spline.prototype.strokeInternal = (function() {
-  return this['sourceColor'];
-});
 
 
 /** @inheritDoc */

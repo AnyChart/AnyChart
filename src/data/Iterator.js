@@ -13,9 +13,9 @@ goog.provide('anychart.data.Iterator');
 anychart.data.Iterator = function(view) {
   /**
    * @type {anychart.data.View}
-   * @private
+   * @protected
    */
-  this.view_ = view;
+  this.view = view;
 
   this.reset();
 };
@@ -24,17 +24,17 @@ anychart.data.Iterator = function(view) {
 /**
  * Current item index in iteration.
  * @type {number}
- * @private
+ * @protected
  */
-anychart.data.Iterator.prototype.currentIndex_;
+anychart.data.Iterator.prototype.currentIndex;
 
 
 /**
  * Current item in iteration.
  * @type {*}
- * @private
+ * @protected
  */
-anychart.data.Iterator.prototype.currentRow_;
+anychart.data.Iterator.prototype.currentRow;
 
 
 /**
@@ -64,7 +64,7 @@ anychart.data.Iterator.prototype.currentRow_;
  * is within a possible range, otherwise returns <b>False</b>.
  */
 anychart.data.Iterator.prototype.select = function(index) {
-  this.currentIndex_ = index - 1;
+  this.currentIndex = index - 1;
   return this.advance();
 };
 
@@ -95,8 +95,8 @@ anychart.data.Iterator.prototype.select = function(index) {
  * @return {anychart.data.Iterator} {@link anychart.data.Iterator} class instance for method chaining.
  */
 anychart.data.Iterator.prototype.reset = function() {
-  this.currentIndex_ = -1;
-  this.currentRow_ = undefined;
+  this.currentIndex = -1;
+  this.currentRow = undefined;
   return this;
 };
 
@@ -128,8 +128,8 @@ anychart.data.Iterator.prototype.reset = function() {
  * @return {boolean} <b>True</b> Returns <b>True</b> if moved to the next item, otherwise returns <b>False</b>.
  */
 anychart.data.Iterator.prototype.advance = function() {
-  this.currentRow_ = this.view_.row(++this.currentIndex_);
-  return this.currentIndex_ < this.getRowsCount();
+  this.currentRow = this.view.row(++this.currentIndex);
+  return this.currentIndex < this.getRowsCount();
 };
 
 
@@ -165,9 +165,9 @@ anychart.data.Iterator.prototype.advance = function() {
  * @return {*} The field value or undefined, if not found.
  */
 anychart.data.Iterator.prototype.get = function(fieldName) {
-  // iterator does not use this.view_.get(), because of more light currentRow_ cache usage through direct getInternal call.
-  if (this.currentIndex_ >= this.getRowsCount()) return undefined;
-  return this.view_.getRowMapping(this.currentIndex_).getInternal(this.currentRow_, this.currentIndex_, fieldName);
+  // iterator does not use this.view.get(), because of more light currentRow cache usage through direct getInternal call.
+  if (this.currentIndex >= this.getRowsCount()) return undefined;
+  return this.view.getRowMapping(this.currentIndex).getInternal(this.currentRow, this.currentIndex, fieldName);
 };
 
 
@@ -181,7 +181,7 @@ anychart.data.Iterator.prototype.get = function(fieldName) {
  * @return {number} The index of an iterator position.
  */
 anychart.data.Iterator.prototype.getIndex = function() {
-  return this.currentIndex_;
+  return this.currentIndex;
 };
 
 
@@ -210,7 +210,7 @@ anychart.data.Iterator.prototype.getIndex = function() {
  * @return {number} The number of rows in the set.
  */
 anychart.data.Iterator.prototype.getRowsCount = function() {
-  return this.view_.getRowsCount();
+  return this.view.getRowsCount();
 };
 
 
@@ -222,10 +222,10 @@ anychart.data.Iterator.prototype.getRowsCount = function() {
  */
 anychart.data.Iterator.prototype.meta = function(name, opt_value) {
   if (arguments.length > 1) {
-    this.view_.meta(this.currentIndex_, name, opt_value);
+    this.view.meta(this.currentIndex, name, opt_value);
     return this;
   } else
-    return this.view_.meta(this.currentIndex_, name);
+    return this.view.meta(this.currentIndex, name);
 };
 
 

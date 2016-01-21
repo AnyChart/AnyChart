@@ -14,10 +14,7 @@ goog.require('anychart.core.cartesian.series.WidthBased');
 anychart.core.cartesian.series.Column = function(opt_data, opt_csvSettings) {
   goog.base(this, opt_data, opt_csvSettings);
 
-  // Define reference fields for a series
-  this.referenceValueNames = ['x', 'value', 'value'];
-  this.referenceValueMeanings = ['x', 'z', 'y'];
-  this.referenceValuesSupportStack = true;
+  this.needsZero = true;
 
   this.isAnimation_ = false;
 };
@@ -40,21 +37,14 @@ anychart.core.cartesian.series.Column.prototype.setAnimation = function(value) {
 
 /** @inheritDoc */
 anychart.core.cartesian.series.Column.prototype.drawSubsequentPoint = function(pointState) {
-  var referenceValues = this.getReferenceCoords();
-  if (!referenceValues)
-    return false;
-
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-
-    var x = referenceValues[0];
-    var zero = referenceValues[1];
-    var y = referenceValues[2];
-
-    /** @type {!acgraph.vector.Rect} */
+    var x = /** @type {number} */(this.iterator.meta('x'));
+    var y = /** @type {number} */(this.iterator.meta('value'));
+    var zero = /** @type {number} */(this.iterator.meta('zero'));
     var rect = /** @type {!acgraph.vector.Rect} */(this.rootElement.genNextChild());
     var barWidth = this.getPointWidth();
 
-    this.getIterator().meta('x', x).meta('zero', zero).meta('value', y).meta('shape', rect);
+    this.iterator.meta('shape', rect);
     if (!this.isAnimation_)
       rect
         .setX(x - barWidth / 2)
@@ -72,19 +62,16 @@ anychart.core.cartesian.series.Column.prototype.drawSubsequentPoint = function(p
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
-    var iterator = this.getIterator();
     var hatchFillShape = this.hatchFillRootElement ?
         /** @type {!acgraph.vector.Rect} */(this.hatchFillRootElement.genNextChild()) :
         null;
-    iterator.meta('hatchFillShape', hatchFillShape);
-    var shape = /** @type {acgraph.vector.Shape} */(iterator.meta('shape'));
+    this.iterator.meta('hatchFillShape', hatchFillShape);
+    var shape = /** @type {acgraph.vector.Shape} */(this.iterator.meta('shape'));
     if (goog.isDef(shape) && hatchFillShape) {
       hatchFillShape.deserialize(shape.serialize());
     }
     this.applyHatchFill(pointState);
   }
-
-  return true;
 };
 
 

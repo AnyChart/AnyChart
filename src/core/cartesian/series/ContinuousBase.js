@@ -33,34 +33,8 @@ anychart.core.cartesian.series.ContinuousBase = function(opt_data, opt_csvSettin
    * @protected
    */
   this.paths = [this.path];
-
-  /**
-   * @type {boolean}
-   * @protected
-   */
-  this.connectMissing = false;
 };
 goog.inherits(anychart.core.cartesian.series.ContinuousBase, anychart.core.cartesian.series.BaseWithMarkers);
-
-
-/** @inheritDoc */
-anychart.core.cartesian.series.ContinuousBase.prototype.drawPoint = function(pointState) {
-  if (this.enabled()) {
-    var pointDrawn;
-    if (this.firstPointDrawn)
-      pointDrawn = this.drawSubsequentPoint(pointState);
-    else
-      pointDrawn = this.drawFirstPoint(pointState);
-    if (pointDrawn) {
-      this.drawMarker(pointState);
-      this.drawLabel(pointState);
-      if (this.isErrorAvailable())
-        this.drawError();
-    }
-    // if connectMissing == true, firstPointDrawn will never be false when drawing.
-    this.firstPointDrawn = (this.connectMissing && this.firstPointDrawn) || pointDrawn;
-  }
-};
 
 
 /** @inheritDoc */
@@ -111,7 +85,6 @@ anychart.core.cartesian.series.ContinuousBase.prototype.startDrawing = function(
 /** @inheritDoc */
 anychart.core.cartesian.series.ContinuousBase.prototype.drawMissing = function() {
   if (!this.connectMissing) {
-    goog.base(this, 'drawMissing');
     this.finalizeSegment();
   }
 };
