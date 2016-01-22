@@ -644,7 +644,8 @@ anychart.core.ui.Table.prototype.contents = function(opt_tableValues, opt_demerg
         rowArr = opt_tableValues[row];
         for (col = 0; col < colsCount; col++) {
           cell = this.getCell(row, col);
-          cell.content(rowArr[col] || null);
+          var tmp = rowArr[col];
+          cell.content(goog.isDef(tmp) ? tmp : null);
         }
       }
       this.resumeSignalsDispatching(true);
@@ -735,6 +736,12 @@ anychart.core.ui.Table.prototype.draw = function() {
   //end mess
 
   return this;
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.Table.prototype.remove = function() {
+  if (this.layer_) this.layer_.parent(null);
 };
 //endregion
 
@@ -1340,7 +1347,7 @@ anychart.core.ui.Table.prototype.checkBorders_ = function() {
  * @private
  */
 anychart.core.ui.Table.prototype.checkContent_ = function() {
-  var content, bounds, label, marker, position, positionProvider;
+  var content, bounds, label, marker, chart, position, positionProvider, cell;
   if (this.hasInvalidationState(anychart.ConsistencyState.TABLE_CONTENT)) {
     if (this.contentToClear_) {
       while (this.contentToClear_.length) {
@@ -1355,13 +1362,32 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
           if (marker.parentMarkersFactory())
             marker.parentMarkersFactory().clear(marker.getIndex());
         } else if (content instanceof anychart.core.VisualBase) {
-          if (content instanceof anychart.core.Chart)
-            (/** @type {anychart.core.Chart} */(content)).autoRedraw(true);
+          if (content instanceof anychart.core.Chart) {
+            chart = /** @type {anychart.core.Chart} */(content);
+            chart.autoRedraw(chart.originalAutoRedraw);
+          }
           content.container(null);
           content.remove();
           // no draw here to avoid drawing in to a null container
         }
         content.unlistenSignals(this.handleContentInvalidation_);
+        content.resumeSignalsDispatching(false);
+      }
+    }
+
+    var cellsCount = this.rowsCount_ * this.colsCount_;
+    for (var i = 0; i < cellsCount; i++) {
+      cell = this.cells_[i];
+      if (!isNaN(cell.overlapper) && (content = cell.realContent)) {
+        content.suspendSignalsDispatching();
+        content.unlistenSignals(this.handleContentInvalidation_);
+        if (content instanceof anychart.core.Chart) {
+          chart = /** @type {anychart.core.Chart} */(content);
+          chart.autoRedraw(chart.originalAutoRedraw);
+        }
+        content.container(null);
+        content.remove();
+        // no draw here to avoid drawing in to a null container
         content.resumeSignalsDispatching(false);
       }
     }
@@ -1372,7 +1398,7 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
 
     for (var row = 0; row < this.rowsCount_; row++) {
       for (var col = 0; col < this.colsCount_; col++) {
-        var cell = this.cells_[row * this.colsCount_ + col];
+        cell = this.cells_[row * this.colsCount_ + col];
         content = cell.realContent;
         if (content) {
           var rowObj = this.rows_ && this.rows_[row];
@@ -1425,20 +1451,19 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
               marker.positionProvider(positionProvider);
               marker.draw();
             } else if (content instanceof anychart.core.VisualBase) {
-              if (content instanceof anychart.core.Chart)
-                (/** @type {anychart.core.Chart} */(content)).autoRedraw(false);
+              if (content instanceof anychart.core.Chart) {
+                chart = /** @type {anychart.core.Chart} */(content);
+                chart.originalAutoRedraw = /** @type {boolean} */(chart.autoRedraw());
+                chart.autoRedraw(false);
+              }
               var element = /** @type {anychart.core.VisualBase} */(content);
               element.parentBounds(bounds);
               if (element.draw)
                 element.draw();
             }
-          } else {
-            content.enabled(false);
-            if (content.draw)
-              content.draw();
-          }
+            content.listenSignals(this.handleContentInvalidation_);
+          } // we suppose that we have fixed overlapped content above.
           content.resumeSignalsDispatching(false);
-          content.listenSignals(this.handleContentInvalidation_);
         }
       }
     }

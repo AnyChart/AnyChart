@@ -83,6 +83,12 @@ anychart.core.Chart = function() {
   this.autoRedraw_ = true;
 
   /**
+   * Public property for the Table to allow restoring the autoRedraw state.
+   * @type {boolean}
+   */
+  this.originalAutoRedraw;
+
+  /**
    * @type {anychart.core.utils.Animation}
    * @private
    */
