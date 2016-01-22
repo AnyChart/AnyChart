@@ -528,18 +528,19 @@ anychart.core.ui.BaseGrid.HIGHER_DRAG_EDIT_RATIO = 1 - anychart.core.ui.BaseGrid
  * @return {boolean} - Whether tree data item is milestone.
  */
 anychart.core.ui.BaseGrid.isMilestone = function(treeDataItem) {
-  var actualStart = anychart.utils.normalizeTimestamp(treeDataItem.get(anychart.enums.GanttDataFields.ACTUAL_START));
-  var actualEnd = anychart.utils.normalizeTimestamp(treeDataItem.get(anychart.enums.GanttDataFields.ACTUAL_END));
-  return !isNaN(actualStart) && (isNaN(actualEnd) || (actualStart == actualEnd));
+  var actualStart = treeDataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START);
+  var actualEnd = treeDataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END);
+  return (!isNaN(actualStart) && !goog.isDef(actualEnd)) || (actualStart == actualEnd);
 };
 
 
 /** @inheritDoc */
-anychart.core.ui.BaseGrid.prototype.createFormatProvider = function(item, opt_period) {
+anychart.core.ui.BaseGrid.prototype.createFormatProvider = function(item, opt_period, opt_periodIndex) {
   if (!this.formatProvider_)
     this.formatProvider_ = new anychart.core.utils.GanttContextProvider(this.controller.isResources());
   this.formatProvider_.currentItem = item;
   this.formatProvider_.currentPeriod = opt_period;
+  this.formatProvider_.currentPeriodIndex = opt_periodIndex;
   this.formatProvider_.applyReferenceValues();
   return this.formatProvider_;
 };
@@ -722,7 +723,7 @@ anychart.core.ui.BaseGrid.prototype.rowMouseMove = function(event) {
       new acgraph.math.Coordinate(event['originalEvent']['clientX'], event['originalEvent']['clientY']) :
       new acgraph.math.Coordinate(0, 0);
 
-  var formatProvider = this.interactivityHandler.createFormatProvider(event['item'], event['period']);
+  var formatProvider = this.interactivityHandler.createFormatProvider(event['item'], event['period'], event['periodIndex']);
   tooltip.show(formatProvider, position);
 };
 
@@ -1977,30 +1978,39 @@ anychart.core.ui.BaseGrid.prototype.initMouseFeatures = function() {
       });
     }
 
-
-    goog.events.listen(document, goog.events.EventType.MOUSEMOVE, function(e) {
-      var l = anychart.core.ui.BaseGrid.SCROLL_MOUSE_OUT_INSIDE_LENGTH;
-      var containerPosition = goog.style.getClientPosition(/** @type {Element} */(ths.container().getStage().container()));
-      var top = ths.pixelBoundsCache.top + containerPosition.y + ths.headerHeight_ + l;
-      var bottom = containerPosition.y + ths.pixelBoundsCache.height - l - l;
-      var left = containerPosition.x + ths.pixelBoundsCache.left + l;
-      var right = left + ths.pixelBoundsCache.width - l - l;
-
-      var mouseX = e['clientX'];
-      var mouseY = e['clientY'];
-
-      ths.scrollOffsetX = 0;
-      ths.scrollOffsetY = 0;
-      if (mouseX < left || mouseX > right) ths.scrollOffsetX = mouseX - left;
-      if (mouseY < top || mouseY > bottom) ths.scrollOffsetY = mouseY - top;
-
-      if (ths.dragging && !ths.scrollInterval) {
-        ths.scrollInterval = setInterval(function() {
-          ths.mouseOutMove(e);
-        }, anychart.core.ui.BaseGrid.TIMER_STEP);
-      }
-    });
+    goog.events.listen(document, goog.events.EventType.MOUSEMOVE, this.docMouseMoveListener_, false, this);
   }
+};
+
+
+/**
+ * Document mouse move listener.
+ * @param {goog.fx.DragEvent} e - Event.
+ * @private
+ */
+anychart.core.ui.BaseGrid.prototype.docMouseMoveListener_ = function(e) {
+  var l = anychart.core.ui.BaseGrid.SCROLL_MOUSE_OUT_INSIDE_LENGTH;
+  var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+  var top = this.pixelBoundsCache.top + containerPosition.y + this.headerHeight_ + l;
+  var bottom = containerPosition.y + this.pixelBoundsCache.height - l - l;
+  var left = containerPosition.x + this.pixelBoundsCache.left + l;
+  var right = left + this.pixelBoundsCache.width - l - l;
+
+  var mouseX = e.clientX;
+  var mouseY = e.clientY;
+
+  this.scrollOffsetX = 0;
+  this.scrollOffsetY = 0;
+  if (mouseX < left || mouseX > right) this.scrollOffsetX = mouseX - left;
+  if (mouseY < top || mouseY > bottom) this.scrollOffsetY = mouseY - top;
+
+  var ths = this;
+  if (this.dragging && !this.scrollInterval) {
+    this.scrollInterval = setInterval(function() {
+      ths.mouseOutMove(e);
+    }, anychart.core.ui.BaseGrid.TIMER_STEP);
+  }
+
 };
 
 
@@ -2287,6 +2297,15 @@ anychart.core.ui.BaseGrid.prototype.verticalOffset = function(opt_value) {
     return this;
   }
   return /** @type {number} */ (this.controller.verticalOffset());
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.core.ui.BaseGrid.prototype.disposeInternal = function() {
+  goog.base(this, 'disposeInternal');
+  goog.events.unlisten(document, goog.events.EventType.MOUSEMOVE, this.docMouseMoveListener_, false, this);
 };
 
 

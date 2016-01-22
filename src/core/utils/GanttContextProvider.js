@@ -1,7 +1,7 @@
 goog.provide('anychart.core.utils.GanttContextProvider');
+
 goog.require('anychart.core.utils.IContextProvider');
 goog.require('anychart.enums');
-goog.require('anychart.utils');
 
 
 
@@ -30,12 +30,17 @@ anychart.core.utils.GanttContextProvider = function(opt_isResources) {
    * @type {Object|undefined}
    */
   this.currentPeriod;
+
+  /**
+   * Current period index (in use for resources chart).
+   * @type {number|undefined}
+   */
+  this.currentPeriodIndex = -1;
 };
 
 
 /** @inheritDoc */
 anychart.core.utils.GanttContextProvider.prototype.applyReferenceValues = function() {
-
   //TODO (A.Kudryavtsev): NOTE!!! All work with dates will be redone after i18n is implemented!!!
   if (this.currentItem) {
     this['item'] = this.currentItem;
@@ -46,20 +51,21 @@ anychart.core.utils.GanttContextProvider.prototype.applyReferenceValues = functi
       this['minPeriodDate'] = this.currentItem.meta('minPeriodDate');
       this['maxPeriodDate'] = this.currentItem.meta('maxPeriodDate');
       this['period'] = this.currentPeriod || void 0;
+      this['periodIndex'] = (goog.isDefAndNotNull(this.currentPeriodIndex) && this.currentPeriodIndex > 0) ? this.currentPeriodIndex : void 0;
       this['periodStart'] = this.currentPeriod ?
-          anychart.utils.normalizeTimestamp(this.currentPeriod[anychart.enums.GanttDataFields.START]) :
+          this.currentItem.getMeta(anychart.enums.GanttDataFields.PERIODS, this.currentPeriodIndex, anychart.enums.GanttDataFields.START) :
           void 0;
       this['periodEnd'] = this.currentPeriod ?
-          anychart.utils.normalizeTimestamp(this.currentPeriod[anychart.enums.GanttDataFields.END]) :
+          this.currentItem.getMeta(anychart.enums.GanttDataFields.PERIODS, this.currentPeriodIndex, anychart.enums.GanttDataFields.END) :
           void 0;
     } else {
-      this['actualStart'] = anychart.utils.normalizeTimestamp(this.currentItem.get(anychart.enums.GanttDataFields.ACTUAL_START));
-      this['actualEnd'] = anychart.utils.normalizeTimestamp(this.currentItem.get(anychart.enums.GanttDataFields.ACTUAL_END));
+      this['actualStart'] = this.currentItem.meta(anychart.enums.GanttDataFields.ACTUAL_START);
+      this['actualEnd'] = this.currentItem.meta(anychart.enums.GanttDataFields.ACTUAL_END);
       this['progressValue'] = this.currentItem.get(anychart.enums.GanttDataFields.PROGRESS_VALUE);
 
       var isParent = !!this.currentItem.numChildren();
       this['autoStart'] = isParent ? this.currentItem.meta('autoStart') : void 0;
-      this['actualEnd'] = isParent ? this.currentItem.meta('actualEnd') : void 0;
+      this['autoEnd'] = isParent ? this.currentItem.meta('autoEnd') : void 0;
       this['autoProgress'] = isParent ? this.currentItem.meta('autoProgress') : void 0;
     }
   }

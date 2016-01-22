@@ -955,12 +955,81 @@ anychart.data.Tree.DataItem.prototype.resumeSignals_ = function(doDispatchSuspen
 
 
 /**
- * Gets a value from data by key.
- * @param {string} key - Key.
- * @return {*} - Value.
+ * Gets value from data by path specified.
+ * @param {...*} var_args - Arguments.
+ *
+ * Note:
+ * For example we have such a structure of object in item:
+ *  <code>
+ *    'a': {          //Object 'a' - root object in data of tree data item
+ *      'b': {        //Object 'b' - Object item.get('a')['b']
+ *        'c': [      //Array 'c' as field of object 'c'
+ *          {         //0-element of array 'c'. Actually is an Object.
+ *            'd': [  //field 'd' of parent Object. Actually is array ['v1', 'v2', 'v3']
+ *              'v1',
+ *              'v2',
+ *              'v3'
+ *            ]
+ *          }
+ *        ]
+ *      }
+ *    }
+ *  </code>
+ *
+ *  1) Can take arguments like this:
+ *    <code>
+ *      item.get(['a', 'b', 'c', 0, 'd', 1]);
+ *    </code>
+ *
+ *    It means that element with index 1 in destination array 'd' will be returned as value.
+ *
+ *  2) The same behaviour is for this case:
+ *    <code>
+ *      item.get('a', 'b', 'c', 0, 'd', 1);
+ *    </code>
+ *
+ *  4) Note: If path contains some errors, nothing will happen.
+ *  Sample of wrong data for the same sample object 'a':
+ *    <code>
+ *      item.get('a', 'b', 'e', 0, 'd', 1);    //Incorrect name 'e' in path.
+ *      item.get('a', 'b', 'c', 2, 'd', 1);    //Incorrect index 2 in path.
+ *      item.get(['a', true, 'c', 0, 'd', 1]); //Incorrect (boolean) value in path
+ *      //... etc.
+ *    </code>
+ * @return {*} - Value or undefined if path is invalid.
  */
-anychart.data.Tree.DataItem.prototype.get = function(key) {
-  return this.data_[key];
+anychart.data.Tree.DataItem.prototype.get = function(var_args) {
+  if (arguments.length) {
+    var keyOrPath = arguments[0];
+
+    var iter, item;
+
+    if (goog.isArray(keyOrPath)) { //got item.get(['a', 'b', 0 ]);
+      iter = keyOrPath;
+    } else if (goog.isString(keyOrPath)) { //got item.get('a', 'b', 0);
+      iter = arguments;
+    }
+
+    if (goog.isDef(iter)) {
+      var parent = this.data_;
+      var i;
+
+      for (i = 0; i < iter.length; i++) {
+        item = iter[i];
+        if (goog.isObject(parent) || goog.isArray(parent)) {
+          if (i == iter.length - 1) { //Exactly this should be returned.
+            return parent[item];
+          } else {
+            parent = parent[item];
+          }
+        } else {
+          return void 0;
+        }
+      }
+    }
+  }
+
+  return void 0;
 };
 
 
@@ -1077,10 +1146,8 @@ anychart.data.Tree.DataItem.prototype.set = function(var_args) {
         }
       }
 
-
       if (parent[prevItem] != value) {
         parent[prevItem] = value;
-
         this.tree_.removeFromIndex(this, key);
         this.tree_.addToIndex(this, key);
         this.tree_.dispatchSignal(anychart.Signal.DATA_CHANGED);
@@ -1097,7 +1164,6 @@ anychart.data.Tree.DataItem.prototype.set = function(var_args) {
           this.tree_.dispatchEvent(event);
         }
       }
-
     } else {
       anychart.utils.warning(anychart.enums.WarningCode.DATA_ITEM_SET_PATH);
     }
@@ -1263,13 +1329,145 @@ anychart.data.Tree.DataItem.prototype.getIndexInParent = function() {
  */
 anychart.data.Tree.DataItem.prototype.meta = function(key, opt_value) {
   if (arguments.length > 1) {
-    if (this.meta_[key] != opt_value) {
-      this.meta_[key] = opt_value;
-      this.tree_.dispatchSignal(anychart.Signal.META_CHANGED);
-    }
-    return this;
+    return this.setMeta(key, opt_value);
   }
-  return this.meta_[key];
+  return this.getMeta(key);
+};
+
+
+/**
+ * Gets value from meta by path specified.
+ * Works totally the same way as item.get().
+ * TODO (A.Kudryavtsev): NOTE: Not exported for a while.
+ * @param {...*} var_args - Arguments.
+ * @return {*} - Value or undefined if path is invalid.
+ */
+anychart.data.Tree.DataItem.prototype.getMeta = function(var_args) {
+  if (arguments.length) {
+    var keyOrPath = arguments[0];
+
+    var iter, item;
+
+    if (goog.isArray(keyOrPath)) { //got item.met(['a', 'b', 0 ]);
+      iter = keyOrPath;
+    } else if (goog.isString(keyOrPath)) { //got item.get('a', 'b', 0);
+      iter = arguments;
+    }
+
+    if (goog.isDef(iter)) {
+      var parent = this.meta_;
+      var i;
+
+      for (i = 0; i < iter.length; i++) {
+        item = iter[i];
+        if (goog.isObject(parent) || goog.isArray(parent)) {
+          if (i == iter.length - 1) { //Exactly this should be returned.
+            return parent[item];
+          } else {
+            parent = parent[item];
+          }
+        } else {
+          return void 0;
+        }
+      }
+    }
+  }
+
+  return void 0;
+};
+
+
+/**
+ * Internal public method to set complex object in item's meta by path. (As set() method woks).
+ * TODO (A.Kudryavtsev): NOTE: Not exported for a while.
+ * @param {...*} var_args - Path.
+ * @return {anychart.data.Tree.DataItem} - Itself for method chaining.
+ */
+anychart.data.Tree.DataItem.prototype.setMeta = function(var_args) {
+  if (arguments.length) {
+    var keyOrPath = arguments[0];
+    var iter, key, i, value, curr, item, prevItem, parent;
+    var reduce = 0;
+    var path = [];
+
+    if (goog.isArray(keyOrPath)) {
+      iter = keyOrPath;
+      key = iter[0];
+      if (iter.length > 1 && goog.isString(key)) {
+        if (arguments.length > 1) { //got item.setMeta(['a', 'b', 0], true);
+          value = arguments[1];
+        } else { //got item.setMeta(['a', 'b', 0, true]);
+          value = iter[iter.length - 1];
+          reduce = 1;
+        }
+      }
+    } else if (goog.isString(keyOrPath) && arguments.length > 1) { //got item.setMeta('a', 'b', 0, true);
+      key = keyOrPath;
+      iter = arguments;
+      value = iter[iter.length - 1];
+      reduce = 1;
+    }
+
+    if (goog.isDef(iter)) {
+      parent = this.meta_;
+      prevItem = iter[0];
+      path.push(prevItem);
+      curr = parent[prevItem];
+
+      //pre-check
+      for (i = 1; i < iter.length - reduce; i++) {
+        item = iter[i];
+        if (!goog.isNumber(item) && !goog.isString(item)) {
+          return this;
+        }
+      }
+
+      for (i = 1; i < iter.length - reduce; i++) {
+        item = iter[i];
+        path.push(item);
+        if (goog.isNumber(item)) {
+          if (goog.isDef(curr)) {
+            if (goog.isArray(curr)) {
+              parent = curr;
+              curr = parent[item];
+              prevItem = item;
+            } else {
+              return this; //Incorrect input.
+            }
+          } else {
+            parent[prevItem] = [];
+            curr = parent[item];
+            parent = parent[prevItem];
+            prevItem = item;
+          }
+        } else if (goog.isString(item)) {
+          if (goog.isDef(curr)) {
+            if (goog.isObject(curr)) {
+              parent = curr;
+              curr = parent[item];
+              prevItem = item;
+            } else {
+              return this; //Incorrect input.
+            }
+          } else {
+            parent[prevItem] = {};
+            curr = parent[item];
+            parent = parent[prevItem];
+            prevItem = item;
+          }
+        } else {
+          return this; //Incorrect input.
+        }
+      }
+
+      if (parent[prevItem] != value) {
+        parent[prevItem] = value;
+        this.tree_.dispatchSignal(anychart.Signal.META_CHANGED);
+      }
+    }
+  }
+
+  return this;
 };
 
 

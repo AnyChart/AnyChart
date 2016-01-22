@@ -2,11 +2,11 @@ goog.provide('anychart.scales.GanttDateTime');
 
 goog.require('anychart.core.Base');
 goog.require('anychart.enums');
+goog.require('anychart.format');
 
 goog.require('goog.array');
 goog.require('goog.date.Interval');
 goog.require('goog.date.UtcDateTime');
-goog.require('goog.i18n.DateTimeFormat');
 goog.require('goog.string.format');
 
 
@@ -126,7 +126,7 @@ anychart.scales.GanttDateTime.DEFAULT_ZOOM_FACTOR = 1.25;
 /**
  * Creates function that returns formatted string by pattern.
  * @param {string} pattern - Pattern.
- * @param {string=} opt_template - Template to create a resulting string. Uses default goog.string.format and goog.i18n.DateTimeFormat.
+ * @param {string=} opt_template - Template to create a resulting string.
  *  Note: Template must be used to express date ranges, so it MUST contain two '%s' expressions. First one means
  *  formatted start date, second one means formatted end date.
  * @return {Function} - Formatter function.
@@ -135,17 +135,15 @@ anychart.scales.GanttDateTime.DEFAULT_ZOOM_FACTOR = 1.25;
 anychart.scales.GanttDateTime.createTextFormatter_ = function(pattern, opt_template) {
   if (opt_template) {
     return function(startDate, endDate) {
-      var dateTimeFormat = new goog.i18n.DateTimeFormat(pattern);
       return goog.string.format(
           /** @type {string} */ (opt_template),
-          dateTimeFormat.format(new goog.date.UtcDateTime(new Date(startDate))),
-          dateTimeFormat.format(new goog.date.UtcDateTime(new Date(endDate)))
+          anychart.format.dateTime(startDate, pattern),
+          anychart.format.dateTime(endDate, pattern)
       );
     }
   } else {
     return function(startDate) {
-      var dateTimeFormat = new goog.i18n.DateTimeFormat(pattern);
-      return dateTimeFormat.format(new goog.date.UtcDateTime(new Date(startDate)));
+      return anychart.format.dateTime(startDate, pattern);
     }
   }
 };
@@ -211,7 +209,7 @@ anychart.scales.GanttDateTime.LOW_INTERVALS = [
  */
 anychart.scales.GanttDateTime.TOP_TEXT_FORMATTERS = [
   anychart.scales.GanttDateTime.createTextFormatter_('EE, MM/dd/yyyy'), //'Tue, 06/13/2001'
-  anychart.scales.GanttDateTime.createTextFormatter_('MM/dd/yyyy', 'Week %s - %s'), //'Week 06/31/2014 - 07/-6/2014'
+  anychart.scales.GanttDateTime.createTextFormatter_('MM/dd/yyyy', '%s - %s'), //'Week 06/31/2014 - 07/-6/2014'
   anychart.scales.GanttDateTime.createTextFormatter_('MMMM, yyyy'), //'January, 2014'
   anychart.scales.GanttDateTime.createTextFormatter_('yyyy'), //'2014'
   anychart.scales.GanttDateTime.createTextFormatter_('yyyy', '%s - %s') //'2014 - 2024'
@@ -225,7 +223,7 @@ anychart.scales.GanttDateTime.TOP_TEXT_FORMATTERS = [
 anychart.scales.GanttDateTime.MID_TEXT_FORMATTERS = [
   anychart.scales.GanttDateTime.createTextFormatter_('KKa'), //'10AM'
   anychart.scales.GanttDateTime.createTextFormatter_('EEEE, MM/dd'), //'Monday, 01/31'
-  anychart.scales.GanttDateTime.createTextFormatter_('MM/dd/yy', 'Week %s - %s'), //'Week 06/31/2014 - 07/-6/2014'
+  anychart.scales.GanttDateTime.createTextFormatter_('MM/dd/yy', '%s - %s'), //'Week 06/31/2014 - 07/-6/2014'
   anychart.scales.GanttDateTime.createTextFormatter_('QQQQ'), //'1st quarter'
   anychart.scales.GanttDateTime.createTextFormatter_('yyyy') //'2014'
 ];
@@ -236,8 +234,8 @@ anychart.scales.GanttDateTime.MID_TEXT_FORMATTERS = [
  * @type {Array.<function(number):string>}
  */
 anychart.scales.GanttDateTime.LOW_TEXT_FORMATTERS = [
-  anychart.scales.GanttDateTime.createTextFormatter_('mm \'min\''), //'15 min'
-  anychart.scales.GanttDateTime.createTextFormatter_('KKa'), //'7:30PM'
+  anychart.scales.GanttDateTime.createTextFormatter_('mm'), //'15' - minutes
+  anychart.scales.GanttDateTime.createTextFormatter_('KKa'), //'07PM'
   anychart.scales.GanttDateTime.createTextFormatter_('EE, d'), //'Mon, 2'
   anychart.scales.GanttDateTime.createTextFormatter_('d MMM'), //'3 Jan'
   anychart.scales.GanttDateTime.createTextFormatter_('Q') //'Q1'
@@ -425,15 +423,18 @@ anychart.scales.GanttDateTime.prototype.getTicks = function(anchorDate, interval
  * @private
  */
 anychart.scales.GanttDateTime.prototype.seek_ = function(startDate, interval, opt_inverted, opt_ignoreFirstFoundValue) {
-  if (goog.isNumber(startDate)) startDate = new goog.date.UtcDateTime(new Date(startDate));
-  if (startDate instanceof Date) startDate = new goog.date.UtcDateTime(startDate);
+  //if (goog.isNumber(startDate)) startDate = new goog.date.UtcDateTime(new Date(startDate));
+  //if (startDate instanceof Date) startDate = new goog.date.UtcDateTime(startDate);
+
+  //startDate = new goog.date.UtcDateTime(anychart.format.parseDateTime(startDate));
+  startDate = new goog.date.UtcDateTime(anychart.format.parseDateTime(startDate));
 
   var result = [];
 
   var firstFound = false;
   var secondFound = false;
 
-  var anchorDate = startDate.clone();
+  var anchorDate = startDate;
 
   var anchorMs, newAnchorMs, newAnchorDate;
   if (opt_inverted) {
@@ -500,7 +501,7 @@ anychart.scales.GanttDateTime.prototype.seek_ = function(startDate, interval, op
 anychart.scales.GanttDateTime.prototype.timestampToRatio = function(value) {
   var val;
   if (goog.isString(value)) {
-    switch (value.toLowerCase()) {
+    switch (value.toLowerCase()) { //Got string like 'current'.
       case anychart.enums.GanttDateTimeMarkers.CURRENT:
         if (isNaN(this.currentDate))
           this.currentDate = goog.now();
@@ -512,9 +513,13 @@ anychart.scales.GanttDateTime.prototype.timestampToRatio = function(value) {
       case anychart.enums.GanttDateTimeMarkers.END:
         val = this.trackedTotalMax;
     }
+
+    if (!goog.isDef(val)) { //Got string representation of date.
+      val = anychart.format.parseDateTime(value);
+    }
   }
 
-  val = goog.isDef(val) ? val : anychart.utils.normalizeTimestamp(value);
+  val = goog.isDefAndNotNull(val) ? val : anychart.utils.normalizeTimestamp(value);
 
   if (isNaN(this.min_) || isNaN(this.max_))
     this.setRange(anychart.core.gantt.Controller.GANTT_BIRTH_DATE, anychart.core.gantt.Controller.GANTT_DEATH_DATE);

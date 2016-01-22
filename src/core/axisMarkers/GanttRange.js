@@ -13,7 +13,7 @@ goog.require('anychart.enums');
  * @extends {anychart.core.axisMarkers.PathBase}
  */
 anychart.core.axisMarkers.GanttRange = function(scale) {
-  goog.base(this);
+  anychart.core.axisMarkers.GanttRange.base(this, 'constructor');
 
   this.scaleInternal(scale);
 

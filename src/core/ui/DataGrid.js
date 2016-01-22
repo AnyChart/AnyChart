@@ -489,7 +489,7 @@ anychart.core.ui.DataGrid.prototype.column = function(opt_indexOrValue, opt_valu
     if (newColumn) {
       var columnWidth = index ?
           (index == 1 ? anychart.core.ui.DataGrid.NAME_COLUMN_WIDTH : anychart.core.ui.DataGrid.DEFAULT_COLUMN_WIDTH) :
-          anychart.core.ui.DataGrid.NUMBER_COLUMN_WIDTH;
+          anychart.core.ui.DataGrid.DEFAULT_COLUMN_WIDTH;
 
       var columnTitle = index ? (index == 1 ? 'Name' : ('Column #' + index)) : '#';
       column.suspendSignalsDispatching();
@@ -988,7 +988,7 @@ anychart.core.ui.DataGrid.Column = function(dataGrid) {
 
   /**
    * Function that returns a text value for the cell by data item.
-   * @type {function(anychart.data.Tree.DataItem):string}
+   * @type {function(anychart.data.Tree.DataItem=):string}
    * @private
    */
   this.textFormatter_ = this.defaultTextFormatter_;
@@ -1082,8 +1082,9 @@ anychart.core.ui.DataGrid.Column.prototype.setColumnFormat = function(fieldName,
     var width = settings['width'];
     var textStyle = settings['textStyle'];
 
-    if (goog.isDef(formatter)) this.textFormatter(function(dataItem) {
-      return formatter(dataItem.get(fieldName));
+    if (goog.isDef(formatter)) this.textFormatter(function() {
+      var item = this['item'];
+      return formatter(item.get(fieldName));
     });
 
     if (goog.isDef(width)) this.width(width).defaultWidth(width);
@@ -1098,11 +1099,11 @@ anychart.core.ui.DataGrid.Column.prototype.setColumnFormat = function(fieldName,
 
 /**
  * Default function that returns a text value for the cell by data item.
- * @param {anychart.data.Tree.DataItem} treeDataItem - Incoming tree data item.
+ * @param {anychart.data.Tree.DataItem=} opt_item - Context.
  * @return {string} - Text value.
  * @private
  */
-anychart.core.ui.DataGrid.Column.prototype.defaultTextFormatter_ = function(treeDataItem) {
+anychart.core.ui.DataGrid.Column.prototype.defaultTextFormatter_ = function(opt_item) {
   return '';
 };
 
@@ -1137,8 +1138,8 @@ anychart.core.ui.DataGrid.Column.prototype.defaultCellTextSettingsOverrider_ = g
 
 /**
  * Sets cell text value formatter.
- * @param {(function(anychart.data.Tree.DataItem):string)=} opt_value - Function to be set.
- * @return {(function(anychart.data.Tree.DataItem):string|anychart.core.ui.DataGrid.Column)} - Current function or itself
+ * @param {(function(anychart.data.Tree.DataItem=):string)=} opt_value - Function to be set.
+ * @return {(function(anychart.data.Tree.DataItem=):string|anychart.core.ui.DataGrid.Column)} - Current function or itself
  *  for method chaining.
  */
 anychart.core.ui.DataGrid.Column.prototype.textFormatter = function(opt_value) {
@@ -1562,7 +1563,11 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
 
         var newTop = totalTop + height;
 
-        var label = this.cellTextSettings().add({'value': this.textFormatter_(item)},
+        var textFormatter = this.dataGrid_.createFormatProvider(item);
+
+        var labelText = this.textFormatter_.call(textFormatter, item);
+
+        var label = this.cellTextSettings().add({'value': labelText},
             {'value': {'x': this.pixelBoundsCache_.left, 'y': totalTop}});
 
         label.suspendSignalsDispatching();

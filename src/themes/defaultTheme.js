@@ -2718,8 +2718,12 @@ window['anychart']['themes']['defaultTheme'] = {
       'content': {
         'hAlign': 'left'
       },
-      'textFormatter': function(data) {
-        var name = data['get']('name');
+      /**
+       * @this {*}
+       * @return {string}
+       */
+      'textFormatter': function() {
+        var name = this['name'];
         return (name !== void 0) ? name + '' : '';
       }
     },
@@ -2763,15 +2767,23 @@ window['anychart']['themes']['defaultTheme'] = {
           'enabled': false
         }
       },
-      'textFormatter': function(item) {
+      /**
+       * @this {*}
+       * @return {string}
+       */
+      'textFormatter': function() {
         return '';
       }
     },
     'columns': [
       {
         'width': 50,
-        'textFormatter': function(item) {
-          var val = item['meta']('index');
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'textFormatter': function() {
+          var val = this['item']['meta']('index');
           return (val != null) ? (val + 1) + '' : '';
         },
         'title': {
@@ -2782,8 +2794,12 @@ window['anychart']['themes']['defaultTheme'] = {
         'width': 170,
         'collapseExpandButtons': true,
         'depthPaddingMultiplier': 15,
-        'textFormatter': function(item) {
-          var val = item['get']('name');
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'textFormatter': function() {
+          var val = this['name'];
           return (val != null) ? (val + '') : '';
         },
         'title': {

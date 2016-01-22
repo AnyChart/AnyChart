@@ -114,6 +114,7 @@ anychart.core.ui.IInteractiveGrid.prototype.deleteKeyHandler = function(e) {};
  * Creates gantt format provider.
  * @param {anychart.data.Tree.DataItem} dataItem - Data item.
  * @param {Object=} opt_period - Optional current period.
+ * @param {number=} opt_periodIndex - Period index. Required is opt_period is set.
  * @return {!anychart.core.utils.GanttContextProvider} - Gantt context provider.
  */
-anychart.core.ui.IInteractiveGrid.prototype.createFormatProvider = function(dataItem, opt_period) {};
+anychart.core.ui.IInteractiveGrid.prototype.createFormatProvider = function(dataItem, opt_period, opt_periodIndex) {};

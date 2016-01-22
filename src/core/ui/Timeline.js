@@ -1720,6 +1720,7 @@ anychart.core.ui.Timeline.prototype.clearEdit_ = function() {
   this.getEditFinishConnectorPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
   this.getEditStartConnectorPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
   this.getEditConnectorPreviewPath_().clear();
+  this.tooltip().enabled(true);
 };
 
 
@@ -1863,7 +1864,6 @@ anychart.core.ui.Timeline.prototype.editPreviewDrag_ = function(e) {
 anychart.core.ui.Timeline.prototype.editPreviewEnd_ = function(e) {
   if (this.dragging) {
     if (this.scrollDragger) this.scrollDragger.setEnabled(true);
-    this.tooltip().enabled(true);
     var draggedBounds = this.getEditPreviewPath_().getBounds();
 
     this.clearEdit_();
@@ -1891,43 +1891,52 @@ anychart.core.ui.Timeline.prototype.editPreviewEnd_ = function(e) {
       switch (el.type) {
         case anychart.enums.TLElementTypes.MILESTONE:
           dataItem.set(anychart.enums.GanttDataFields.ACTUAL_START, newActualStart);
-          if (goog.isDef(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END)))
+          dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START, newActualStart);
+          if (goog.isDef(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END))) {
             dataItem.set(anychart.enums.GanttDataFields.ACTUAL_END, newActualStart);
+            dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END, newActualStart);
+          }
           break;
         case anychart.enums.TLElementTypes.PERIOD:
-          var period = el.period;
           var periodIndex = el.periodIndex;
-          var periodStart = anychart.utils.normalizeTimestamp(period[anychart.enums.GanttDataFields.START]);
-          var periodEnd = anychart.utils.normalizeTimestamp(period[anychart.enums.GanttDataFields.END]);
+          var periodStart = /** @type {number} */ (dataItem.getMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.START));
+          var periodEnd = dataItem.getMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.END);
           delta = newActualStart - periodStart;
           var newPeriodEnd = periodEnd + delta;
           if (!isNaN(newPeriodEnd)) {
             dataItem.set(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.START, newActualStart);
+            dataItem.setMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.START, newActualStart);
             dataItem.set(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.END, newPeriodEnd);
+            dataItem.setMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.END, newPeriodEnd);
           }
           break;
         case anychart.enums.TLElementTypes.BASELINE:
-          var baselineStart = anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.BASELINE_START));
-          var baselineEnd = anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.BASELINE_END));
+          var baselineStart = /** @type {number} */ (dataItem.meta(anychart.enums.GanttDataFields.BASELINE_START));
+          var baselineEnd = dataItem.meta(anychart.enums.GanttDataFields.BASELINE_END);
           delta = newActualStart - baselineStart;
           var newBaselineEnd = baselineEnd + delta;
-          if (!isNaN(newBaselineEnd))
+          if (!isNaN(newBaselineEnd)) {
             dataItem.set(anychart.enums.GanttDataFields.BASELINE_START, newActualStart);
+            dataItem.meta(anychart.enums.GanttDataFields.BASELINE_START, newActualStart);
+          }
           dataItem.set(anychart.enums.GanttDataFields.BASELINE_END, baselineEnd + delta);
+          dataItem.meta(anychart.enums.GanttDataFields.BASELINE_END, baselineEnd + delta);
           break;
         default:
-          var actualStart = /** @type {number} */ (goog.isDef(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START)) ?
-              anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START)) :
-              dataItem.meta('autoStart'));
+          var actualStart = /** @type {number} */ ((goog.isNumber(dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START)) ?
+              dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START) :
+              dataItem.meta('autoStart')));
 
-          var actualEnd = goog.isDef(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END)) ?
-              anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END)) :
+          var actualEnd = goog.isNumber(dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END)) ?
+              dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END) :
               dataItem.meta('autoEnd');
           delta = newActualStart - actualStart;
           var newActualEnd = actualEnd + delta;
           if (!isNaN(newActualEnd)) {
             dataItem.set(anychart.enums.GanttDataFields.ACTUAL_START, newActualStart);
+            dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START, newActualStart);
             dataItem.set(anychart.enums.GanttDataFields.ACTUAL_END, newActualEnd);
+            dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END, newActualEnd);
           }
       }
     }
@@ -1981,7 +1990,6 @@ anychart.core.ui.Timeline.prototype.editProgressDrag_ = function(e) {
 anychart.core.ui.Timeline.prototype.editProgressDragEnd_ = function(e) {
   if (this.dragging) {
     if (this.scrollDragger) this.scrollDragger.setEnabled(true);
-    this.tooltip().enabled(true);
 
     this.clearEdit_();
 
@@ -2050,7 +2058,7 @@ anychart.core.ui.Timeline.prototype.drawThumbPreview_ = function(event, opt_scro
 
     var item = path.item;
     var type = path.type;
-    var period = path.period;
+    var periodIndex = path.periodIndex;
     var bounds = path.bounds;
 
     var time;
@@ -2058,22 +2066,22 @@ anychart.core.ui.Timeline.prototype.drawThumbPreview_ = function(event, opt_scro
     switch (type) {
       case anychart.enums.TLElementTypes.BASELINE:
         time = this.currentThumbDragger_.isLeft ?
-            anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.BASELINE_END)) :
-            anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.BASELINE_START));
+            item.meta(anychart.enums.GanttDataFields.BASELINE_END) :
+            item.meta(anychart.enums.GanttDataFields.BASELINE_START);
         break;
       case anychart.enums.TLElementTypes.PERIOD:
         time = this.currentThumbDragger_.isLeft ?
-            anychart.utils.normalizeTimestamp(period[anychart.enums.GanttDataFields.END]) :
-            anychart.utils.normalizeTimestamp(period[anychart.enums.GanttDataFields.START]);
+            item.getMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.END) :
+            item.getMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.START);
         break;
       default:
         if (this.currentThumbDragger_.isLeft) {
-          time = goog.isDef(item.get(anychart.enums.GanttDataFields.ACTUAL_END)) ?
-              anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.ACTUAL_END)) :
+          time = goog.isNumber(item.meta(anychart.enums.GanttDataFields.ACTUAL_END)) ?
+              item.meta(anychart.enums.GanttDataFields.ACTUAL_END) :
               item.meta('autoEnd');
         } else {
-          time = goog.isDef(item.get(anychart.enums.GanttDataFields.ACTUAL_START)) ?
-              anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.ACTUAL_START)) :
+          time = goog.isNumber(item.meta(anychart.enums.GanttDataFields.ACTUAL_START)) ?
+              item.meta(anychart.enums.GanttDataFields.ACTUAL_START) :
               item.meta('autoStart');
         }
     }
@@ -2115,6 +2123,7 @@ anychart.core.ui.Timeline.prototype.drawConnectorPreview_ = function(event, opt_
 
     var index = circle.index;
     var period = circle.period;
+    var periodIndex = circle.periodIndex;
 
     var containerLeft = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x;
     var containerTop = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).y;
@@ -2129,7 +2138,7 @@ anychart.core.ui.Timeline.prototype.drawConnectorPreview_ = function(event, opt_
       mouseTop = event.clientY - containerTop;
     }
 
-    var initItemsBounds = this.getItemBounds_(index, period);
+    var initItemsBounds = this.getItemBounds_(index, period, periodIndex);
 
     var previewThickness = anychart.utils.extractThickness(this.connectorPreviewStroke_);
     var pixelShift = (previewThickness % 2 && acgraph.type() === acgraph.StageType.SVG) ? 0.5 : 0;
@@ -2166,7 +2175,6 @@ anychart.core.ui.Timeline.prototype.editThumbDrag_ = function(e) {
 anychart.core.ui.Timeline.prototype.editThumbDragEnd_ = function(e) {
   if (this.dragging) {
     if (this.scrollDragger) this.scrollDragger.setEnabled(true);
-    this.tooltip().enabled(true);
     var dragPreviewBounds = this.editPreviewPath_.getBounds();
 
     this.clearEdit_();
@@ -2190,15 +2198,21 @@ anychart.core.ui.Timeline.prototype.editThumbDragEnd_ = function(e) {
       switch (el.type) {
         case anychart.enums.TLElementTypes.PERIOD:
           dataItem.set(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.START, newStart);
+          dataItem.setMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.START, newStart);
           dataItem.set(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.END, newEnd);
+          dataItem.setMeta(anychart.enums.GanttDataFields.PERIODS, periodIndex, anychart.enums.GanttDataFields.END, newEnd);
           break;
         case anychart.enums.TLElementTypes.BASELINE:
           dataItem.set(anychart.enums.GanttDataFields.BASELINE_START, newStart);
+          dataItem.meta(anychart.enums.GanttDataFields.BASELINE_START, newStart);
           dataItem.set(anychart.enums.GanttDataFields.BASELINE_END, newEnd);
+          dataItem.meta(anychart.enums.GanttDataFields.BASELINE_END, newEnd);
           break;
         default:
           dataItem.set(anychart.enums.GanttDataFields.ACTUAL_START, newStart);
+          dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START, newStart);
           dataItem.set(anychart.enums.GanttDataFields.ACTUAL_END, newEnd);
+          dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END, newEnd);
       }
     }
 
@@ -3034,8 +3048,8 @@ anychart.core.ui.Timeline.prototype.drawMarkers_ = function(dataItem, totalTop, 
     for (var i = 0; i < markers.length; i++) {
       var marker = markers[i];
       if (marker) {
-        var val = anychart.utils.normalizeTimestamp(marker['value']);
-        if (!isNaN(val)) {
+        var val = dataItem.getMeta(anychart.enums.GanttDataFields.MARKERS, i, 'value');
+        if (!goog.isNull(val)) {
           var ratio = this.scale_.timestampToRatio(val);
           if (ratio >= 0 && ratio <= 1) { //Marker is visible
             var height = itemHeight * anychart.core.ui.Timeline.DEFAULT_HEIGHT_REDUCTION;
@@ -3128,10 +3142,10 @@ anychart.core.ui.Timeline.prototype.drawAsPeriods_ = function(dataItem, totalTop
   if (periods) {
     for (var j = 0; j < periods.length; j++) {
       var period = periods[j];
-      var start = anychart.utils.normalizeTimestamp(period[anychart.enums.GanttDataFields.START]);
-      var end = anychart.utils.normalizeTimestamp(period[anychart.enums.GanttDataFields.END]);
+      var start = dataItem.getMeta(anychart.enums.GanttDataFields.PERIODS, j, anychart.enums.GanttDataFields.START);
+      var end = dataItem.getMeta(anychart.enums.GanttDataFields.PERIODS, j, anychart.enums.GanttDataFields.END);
 
-      if (!isNaN(start) && !isNaN(end)) {
+      if (goog.isNumber(start) && goog.isNumber(end)) {
         var startRatio = this.scale_.timestampToRatio(start);
         var endRatio = this.scale_.timestampToRatio(end);
 
@@ -3156,14 +3170,14 @@ anychart.core.ui.Timeline.prototype.drawAsPeriods_ = function(dataItem, totalTop
  * @private
  */
 anychart.core.ui.Timeline.prototype.drawAsBaseline_ = function(dataItem, totalTop, itemHeight) {
-  var actualStart = goog.isDef(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START)) ?
-      anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START)) :
+  var actualStart = goog.isNumber(dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START)) ?
+      dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START) :
       dataItem.meta('autoStart');
-  var actualEnd = goog.isDef(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END)) ?
-      anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END)) :
+  var actualEnd = goog.isNumber(dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END)) ?
+      dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END) :
       dataItem.meta('autoEnd');
-  var baselineStart = anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.BASELINE_START));
-  var baselineEnd = anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.BASELINE_END));
+  var baselineStart = dataItem.meta(anychart.enums.GanttDataFields.BASELINE_START);
+  var baselineEnd = dataItem.meta(anychart.enums.GanttDataFields.BASELINE_END);
 
   var actualStartRatio = this.scale_.timestampToRatio(actualStart);
   var actualEndRatio = this.scale_.timestampToRatio(actualEnd);
@@ -3222,11 +3236,11 @@ anychart.core.ui.Timeline.prototype.drawAsBaseline_ = function(dataItem, totalTo
  * @private
  */
 anychart.core.ui.Timeline.prototype.drawAsParent_ = function(dataItem, totalTop, itemHeight) {
-  var actualStart = goog.isDef(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START)) ?
-      anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START)) :
+  var actualStart = goog.isNumber(dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START)) ?
+      dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START) :
       dataItem.meta('autoStart');
-  var actualEnd = goog.isDef(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END)) ?
-      anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END)) :
+  var actualEnd = goog.isNumber(dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END)) ?
+      dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END) :
       dataItem.meta('autoEnd');
   var startRatio = this.scale_.timestampToRatio(actualStart);
   var endRatio = this.scale_.timestampToRatio(actualEnd);
@@ -3267,11 +3281,11 @@ anychart.core.ui.Timeline.prototype.drawAsParent_ = function(dataItem, totalTop,
  * @private
  */
 anychart.core.ui.Timeline.prototype.drawAsProgress_ = function(dataItem, totalTop, itemHeight) {
-  var actualStart = goog.isDef(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START)) ?
-      anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_START)) :
+  var actualStart = goog.isNumber(dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START)) ?
+      dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START) :
       dataItem.meta('autoStart');
-  var actualEnd = goog.isDef(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END)) ?
-      anychart.utils.normalizeTimestamp(dataItem.get(anychart.enums.GanttDataFields.ACTUAL_END)) :
+  var actualEnd = goog.isNumber(dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END)) ?
+      dataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END) :
       dataItem.meta('autoEnd');
 
   var startRatio = this.scale_.timestampToRatio(actualStart);
@@ -3400,11 +3414,11 @@ anychart.core.ui.Timeline.prototype.drawAsMilestone_ = function(dataItem, totalT
  * @param {number} index - Linear index of item in controller's visible items. If is period, index
  *  is linear index of treeDataItem that period belongs to.
  * @param {Object=} opt_period - Period object. Required if chart is resources chart.
-
+ * @param {number=} opt_periodIndex - Period index.
  * @return {?anychart.math.Rect} - Bounds in current scale's state or null if data object contains some wrong data.
  * @private
  */
-anychart.core.ui.Timeline.prototype.getItemBounds_ = function(index, opt_period) {
+anychart.core.ui.Timeline.prototype.getItemBounds_ = function(index, opt_period, opt_periodIndex) {
   var totalTop = /** @type {number} */ (this.pixelBoundsCache.top + this.headerHeight() + 1);
   var heightCache = this.controller.getHeightCache();
   var startIndex = this.controller.startIndex();
@@ -3423,20 +3437,20 @@ anychart.core.ui.Timeline.prototype.getItemBounds_ = function(index, opt_period)
   var actualTop = (relativeTop - relativeHeight) + totalTop;
   var rowHeight = anychart.core.gantt.Controller.getItemHeight(item);
 
-  var actStart = goog.isDef(item.get(anychart.enums.GanttDataFields.ACTUAL_START)) ?
-      anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.ACTUAL_START)) :
+  var actStart = goog.isNumber(item.meta(anychart.enums.GanttDataFields.ACTUAL_START)) ?
+      item.meta(anychart.enums.GanttDataFields.ACTUAL_START) :
       item.meta('autoStart');
 
-  var actEnd = goog.isDef(item.get(anychart.enums.GanttDataFields.ACTUAL_END)) ?
-      anychart.utils.normalizeTimestamp(item.get(anychart.enums.GanttDataFields.ACTUAL_END)) :
+  var actEnd = goog.isNumber(item.meta(anychart.enums.GanttDataFields.ACTUAL_END)) ?
+      item.meta(anychart.enums.GanttDataFields.ACTUAL_END) :
       item.meta('autoEnd');
 
   var startTimestamp = this.controller.isResources() ?
-      anychart.utils.normalizeTimestamp(opt_period[anychart.enums.GanttDataFields.START]) :
+      item.getMeta(anychart.enums.GanttDataFields.PERIODS, opt_periodIndex, anychart.enums.GanttDataFields.START) :
       actStart;
 
   var endTimestamp = this.controller.isResources() ?
-      anychart.utils.normalizeTimestamp(opt_period[anychart.enums.GanttDataFields.END]) :
+      item.getMeta(anychart.enums.GanttDataFields.PERIODS, opt_periodIndex, anychart.enums.GanttDataFields.END) :
       actEnd;
 
   var milestoneHalfWidth = 0;
@@ -3493,21 +3507,8 @@ anychart.core.ui.Timeline.prototype.connectItems_ = function(from, to, opt_connT
   var fromPeriodIndex = from['periodIndex'];
   var toPeriodIndex = to['periodIndex'];
 
-  /*
-      Bounds in this case are not bounds of bar.
-      Bounds are an area of whole row to simplify the calculations of connectors:
-
-      +--------------------------------------+
-      | This is an area in row above the bar |
-      +--------------------------------------+
-      |\\\\\\\\\ This is a bar itself \\\\\\\|        <- this is an incoming bounds.
-      +--------------------------------------+
-      | This is an area in row below the bar |
-      +--------------------------------------+
-
-  */
-  var fromBounds = this.getItemBounds_(fromIndex, from['period']);
-  var toBounds = this.getItemBounds_(toIndex, to['period']);
+  var fromBounds = this.getItemBounds_(fromIndex, from['period'], from['periodIndex']);
+  var toBounds = this.getItemBounds_(toIndex, to['period'], to['periodIndex']);
 
   if (fromBounds && toBounds) {
     var fill, stroke;

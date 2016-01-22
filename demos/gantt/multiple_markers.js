@@ -18,7 +18,8 @@ var data = [
     'rowHeight': 40,
     'markers': [
       {
-        'value': Date.UTC(2014, 3, 27),
+        //'value': Date.UTC(2014, 3, 27),
+        'value': '2014.04.27',
         'type': 'triangleDown',
         'fill': '#f00',
         'stroke': 'black'

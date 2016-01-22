@@ -13,7 +13,7 @@ goog.require('anychart.utils');
  * @extends {anychart.core.VisualBase}
  */
 anychart.core.axisMarkers.PathBase = function() {
-  goog.base(this);
+  anychart.core.axisMarkers.PathBase.base(this, 'constructor');
 
   /**
    * Current value.

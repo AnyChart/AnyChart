@@ -11,7 +11,7 @@ goog.require('anychart.enums');
  * @extends {anychart.core.axisMarkers.TextBase}
  */
 anychart.core.axisMarkers.GanttText = function(scale) {
-  goog.base(this);
+  anychart.core.axisMarkers.GanttText.base(this, 'constructor');
 
   this.scaleInternal(scale);
 

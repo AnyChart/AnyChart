@@ -14,7 +14,7 @@ goog.require('anychart.enums');
  * @extends {anychart.core.axisMarkers.PathBase}
  */
 anychart.core.axisMarkers.GanttLine = function(scale) {
-  goog.base(this);
+  anychart.core.axisMarkers.GanttLine.base(this, 'constructor');
 
   this.scaleInternal(scale);
 

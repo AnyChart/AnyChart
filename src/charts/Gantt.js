@@ -221,11 +221,12 @@ anychart.charts.Gantt.prototype.getAllSeries = function() {
 
 
 /** @inheritDoc */
-anychart.charts.Gantt.prototype.createFormatProvider = function(item, opt_period) {
+anychart.charts.Gantt.prototype.createFormatProvider = function(item, opt_period, opt_periodIndex) {
   if (!this.formatProvider_)
     this.formatProvider_ = new anychart.core.utils.GanttContextProvider(this.controller_.isResources());
   this.formatProvider_.currentItem = item;
   this.formatProvider_.currentPeriod = opt_period;
+  this.formatProvider_.currentPeriodIndex = opt_periodIndex;
   this.formatProvider_.applyReferenceValues();
   return this.formatProvider_;
 };
@@ -555,9 +556,9 @@ anychart.charts.Gantt.prototype.fitToTask = function(taskId) {
   var foundTasks = this.data_.searchItems(anychart.enums.GanttDataFields.ID, taskId);
   if (foundTasks.length) {
     var task = foundTasks[0];
-    var actualStart = anychart.utils.normalizeTimestamp(task.get(anychart.enums.GanttDataFields.ACTUAL_START));
-    var actualEnd = anychart.utils.normalizeTimestamp(task.get(anychart.enums.GanttDataFields.ACTUAL_END));
-    if (actualStart && actualEnd) { //no range for milestone.
+    var actualStart = task.meta(anychart.enums.GanttDataFields.ACTUAL_START);
+    var actualEnd = task.meta(anychart.enums.GanttDataFields.ACTUAL_END);
+    if (goog.isNumber(actualStart) && goog.isNumber(actualEnd)) { //no range for milestone.
       this.getTimeline().getScale().setRange(actualStart, actualEnd);
     } else {
       anychart.utils.warning(anychart.enums.WarningCode.GANTT_FIT_TO_TASK, null, [taskId]);
@@ -790,7 +791,7 @@ anychart.charts.Gantt.prototype.rowMouseMove = function(event) {
       new acgraph.math.Coordinate(event['originalEvent']['clientX'], event['originalEvent']['clientY']) :
       new acgraph.math.Coordinate(0, 0);
 
-  var formatProvider = this.createFormatProvider(event['item'], event['period']);
+  var formatProvider = this.createFormatProvider(event['item'], event['period'], event['periodIndex']);
   tooltip.show(formatProvider, position);
 };
 

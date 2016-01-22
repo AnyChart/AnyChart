@@ -1430,7 +1430,7 @@ anychart.utils.getWarningDescription = function(code, opt_arguments) {
     case anychart.enums.WarningCode.GANTT_FIT_TO_TASK:
       return 'Can not fit gantt chart timeline to task with id \'' + opt_arguments[0] + '\' because both fields \'' +
           anychart.enums.GanttDataFields.ACTUAL_START + '\' and \'' + anychart.enums.GanttDataFields.ACTUAL_END +
-          '\' must be specified in data item.';
+          '\' must be correctly specified in data item.';
 
     case anychart.enums.WarningCode.SERIES_DOESNT_SUPPORT_ERROR:
       return 'Series type "' + opt_arguments[0] + '" does not support error settings - ' +
@@ -1462,6 +1462,10 @@ anychart.utils.getWarningDescription = function(code, opt_arguments) {
 
     case anychart.enums.WarningCode.SCALE_TYPE_NOT_SUPPORTED:
       return 'Scale type "' + opt_arguments[0] + '" is not supported - only ' + opt_arguments[1] + ' is.';
+
+    case anychart.enums.WarningCode.PARSE_DATETIME:
+      return 'Could not parse date time value "' + opt_arguments[0] + '".' + (!!opt_arguments[1] ?
+              ('Symbols parsed: ' + opt_arguments[1]) : '');
 
     case anychart.enums.WarningCode.IMMUTABLE_MARKER_SCALE:
       return 'Scale is immutable for this type of axis marker and scale will not be set.';
