@@ -716,6 +716,20 @@ anychart.core.Chart.prototype.draw = function() {
 
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    //can be null if you add chart to tooltip container on hover (Vitalya :) )
+    if (stage) {
+      //listen resize event
+      stage.resize(stage.originalWidth, stage.originalHeight);
+      stage.listen(
+          acgraph.vector.Stage.EventType.STAGE_RESIZE,
+          this.resizeHandler,
+          false,
+          this
+      );
+    }
+  }
   //end clear container consistency states
 
   // DVF-1648
@@ -755,21 +769,6 @@ anychart.core.Chart.prototype.draw = function() {
       }
     }
     this.markConsistent(anychart.ConsistencyState.CHART_LABELS);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    //can be null if you add chart to tooltip container on hover (Vitalya :) )
-    if (this.container() && this.container().getStage()) {
-      //listen resize event
-      stage = this.container().getStage();
-      stage.resize(stage.originalWidth, stage.originalHeight);
-      this.container().getStage().listen(
-          acgraph.vector.Stage.EventType.STAGE_RESIZE,
-          this.resizeHandler,
-          false,
-          this
-      );
-    }
   }
 
   //after all chart items drawn, we can clear other states
