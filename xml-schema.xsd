@@ -1363,6 +1363,9 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_dash_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="line_axes_markers" type="core.axisMarkers.Line_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="range_axes_markers" type="core.axisMarkers.Range_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="text_axes_markers" type="core.axisMarkers.Text_list"/>
         </xsd:all>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
         <xsd:attribute name="is_standalone" type="simple.Bool"/>

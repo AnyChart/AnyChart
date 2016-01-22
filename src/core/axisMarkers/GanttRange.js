@@ -1,4 +1,4 @@
-goog.provide('anychart.core.axisMarkers.Range');
+goog.provide('anychart.core.axisMarkers.GanttRange');
 goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.axisMarkers.PathBase');
@@ -7,24 +7,15 @@ goog.require('anychart.enums');
 
 
 /**
- * Range marker.
+ * Gantt range marker.
+ * @param {anychart.scales.GanttDateTime} scale - Gantt date times cale.
  * @constructor
  * @extends {anychart.core.axisMarkers.PathBase}
  */
-anychart.core.axisMarkers.Range = function() {
-  anychart.core.axisMarkers.Range.base(this, 'constructor');
+anychart.core.axisMarkers.GanttRange = function(scale) {
+  goog.base(this);
 
-  /**
-   * @type {anychart.enums.Layout}
-   * @private
-   */
-  this.layout_;
-
-  /**
-   * @type {anychart.enums.Layout}
-   * @private
-   */
-  this.defaultLayout_;
+  this.scaleInternal(scale);
 
   /**
    * @type {anychart.core.axisMarkers.PathBase.Range}
@@ -37,16 +28,8 @@ anychart.core.axisMarkers.Range = function() {
    */
   this.fill_;
 
-  /**
-   * @type {string|acgraph.vector.Fill}
-   * @private
-   */
-  this.defaultFill_ = 'black';
-
-  this.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
-  this.setDefaultFill('#c1c1c1 0.4');
 };
-goog.inherits(anychart.core.axisMarkers.Range, anychart.core.axisMarkers.PathBase);
+goog.inherits(anychart.core.axisMarkers.GanttRange, anychart.core.axisMarkers.PathBase);
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -56,7 +39,7 @@ goog.inherits(anychart.core.axisMarkers.Range, anychart.core.axisMarkers.PathBas
  * Supported signals.
  * @type {number}
  */
-anychart.core.axisMarkers.Range.prototype.SUPPORTED_SIGNALS =
+anychart.core.axisMarkers.GanttRange.prototype.SUPPORTED_SIGNALS =
     anychart.core.axisMarkers.PathBase.prototype.SUPPORTED_SIGNALS;
 
 
@@ -64,7 +47,7 @@ anychart.core.axisMarkers.Range.prototype.SUPPORTED_SIGNALS =
  * Supported consistency states.
  * @type {number}
  */
-anychart.core.axisMarkers.Range.prototype.SUPPORTED_CONSISTENCY_STATES =
+anychart.core.axisMarkers.GanttRange.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.axisMarkers.PathBase.prototype.SUPPORTED_CONSISTENCY_STATES;
 
 
@@ -74,44 +57,39 @@ anychart.core.axisMarkers.Range.prototype.SUPPORTED_CONSISTENCY_STATES =
 /**
  * Get/set layout.
  * @param {anychart.enums.Layout=} opt_value - RangeMarker layout.
- * @return {anychart.enums.Layout|anychart.core.axisMarkers.Range} - Layout or this.
+ * @return {anychart.enums.Layout|anychart.core.axisMarkers.GanttRange} - Layout or this.
  */
-anychart.core.axisMarkers.Range.prototype.layout = function(opt_value) {
+anychart.core.axisMarkers.GanttRange.prototype.layout = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var layout = anychart.enums.normalizeLayout(opt_value);
-    if (this.layout_ != layout) {
-      this.layout_ = layout;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
+    if (opt_value == anychart.enums.Layout.HORIZONTAL)
+      anychart.utils.warning(anychart.enums.WarningCode.IMMUTABLE_MARKER_LAYOUT);
     return this;
-  } else {
-    return this.layout_ || this.defaultLayout_;
   }
+  return /** @type {anychart.enums.Layout} */ (anychart.enums.Layout.VERTICAL);
 };
 
 
 /**
- * Set Default layout.
- * @param {anychart.enums.Layout} value Layout value.
+ * Does nothing.
+ * @param {anychart.enums.Layout} value - Layout value.
  */
-anychart.core.axisMarkers.Range.prototype.setDefaultLayout = function(value) {
-  var needInvalidate = !this.layout_ && this.defaultLayout_ != value;
-  this.defaultLayout_ = value;
-  if (needInvalidate)
-    this.invalidate(anychart.ConsistencyState.BOUNDS);
-};
+anychart.core.axisMarkers.GanttRange.prototype.setDefaultLayout = function(value) {};
 
 
 //----------------------------------------------------------------------------------------------------------------------
 //  Scale.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter/setter for scale.
- * @param {anychart.scales.Base=} opt_value Scale.
- * @return {anychart.scales.Base|!anychart.core.axisMarkers.Range} Axis scale or itself for method chaining.
+ * Getter for scale.
+ * @param {anychart.scales.GanttDateTime=} opt_value Scale.
+ * @return {anychart.scales.GanttDateTime|!anychart.core.axisMarkers.GanttRange} - Scale or itself for method chaining.
  */
-anychart.core.axisMarkers.Range.prototype.scale = function(opt_value) {
-  return /** @type {anychart.scales.Base|!anychart.core.axisMarkers.Range} */ (this.scaleInternal(opt_value));
+anychart.core.axisMarkers.GanttRange.prototype.scale = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    anychart.utils.warning(anychart.enums.WarningCode.IMMUTABLE_MARKER_SCALE);
+    return this;
+  }
+  return /** @type {anychart.scales.GanttDateTime} */ (this.scaleInternal());
 };
 
 
@@ -127,9 +105,9 @@ anychart.core.axisMarkers.Range.prototype.scale = function(opt_value) {
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
- * @return {!(acgraph.vector.Fill|anychart.core.axisMarkers.Range)} .
+ * @return {!(acgraph.vector.Fill|anychart.core.axisMarkers.GanttRange)} .
  */
-anychart.core.axisMarkers.Range.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+anychart.core.axisMarkers.GanttRange.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var fill = acgraph.vector.normalizeFill.apply(null, arguments);
     if (fill != this.fill_) {
@@ -138,27 +116,24 @@ anychart.core.axisMarkers.Range.prototype.fill = function(opt_fillOrColorOrKeys,
     }
     return this;
   }
-  return this.fill_ || this.defaultFill_;
+  return this.fill_ || 'none';
 };
 
 
 /**
- * @param {acgraph.vector.Fill} value Default fill value.
+ * Deos nothing.
+ * @param {acgraph.vector.Fill} value - Default fill value.
  */
-anychart.core.axisMarkers.Range.prototype.setDefaultFill = function(value) {
-  var needInvalidate = !this.fill_ && this.defaultFill_ != value;
-  this.defaultFill_ = value;
-  if (needInvalidate)
-    this.invalidate(anychart.ConsistencyState.APPEARANCE);
-};
+anychart.core.axisMarkers.GanttRange.prototype.setDefaultFill = function(value) {};
 
 
 /**
  * Get/set starting marker value.
- * @param {number=} opt_newValue RangeMarker value settings.
- * @return {number|anychart.core.axisMarkers.Range} RangeMarker value settings or RangeMarker instance for method chaining.
+ * @param {(number|anychart.enums.GanttDateTimeMarkers)=} opt_newValue - RangeMarker value settings.
+ * @return {number|anychart.enums.GanttDateTimeMarkers|anychart.core.axisMarkers.GanttRange} - RangeMarker value
+ *  settings or RangeMarker instance for method chaining.
  */
-anychart.core.axisMarkers.Range.prototype.from = function(opt_newValue) {
+anychart.core.axisMarkers.GanttRange.prototype.from = function(opt_newValue) {
   if (goog.isDef(opt_newValue)) {
     if (this.val.from != opt_newValue) {
       this.val.from = opt_newValue;
@@ -168,16 +143,17 @@ anychart.core.axisMarkers.Range.prototype.from = function(opt_newValue) {
     return this;
   }
 
-  return /** @type {number} */ (this.val.from);
+  return /** @type {number|anychart.enums.GanttDateTimeMarkers} */ (this.val.from);
 };
 
 
 /**
  * Get/set ending marker value.
- * @param {number=} opt_newValue RangeMarker value settings.
- * @return {number|anychart.core.axisMarkers.Range} RangeMarker value settings or RangeMarker instance for method chaining.
+ * @param {(number|anychart.enums.GanttDateTimeMarkers)=} opt_newValue RangeMarker value settings.
+ * @return {number|anychart.enums.GanttDateTimeMarkers|anychart.core.axisMarkers.GanttRange} RangeMarker value settings or
+ *  RangeMarker instance for method chaining.
  */
-anychart.core.axisMarkers.Range.prototype.to = function(opt_newValue) {
+anychart.core.axisMarkers.GanttRange.prototype.to = function(opt_newValue) {
   if (goog.isDef(opt_newValue)) {
     if (this.val.to != opt_newValue) {
       this.val.to = opt_newValue;
@@ -187,7 +163,7 @@ anychart.core.axisMarkers.Range.prototype.to = function(opt_newValue) {
     return this;
   }
 
-  return /** @type {number} */ (this.val.to);
+  return /** @type {number|anychart.enums.GanttDateTimeMarkers} */ (this.val.to);
 };
 
 
@@ -197,7 +173,7 @@ anychart.core.axisMarkers.Range.prototype.to = function(opt_newValue) {
 /**
  * @inheritDoc
  */
-anychart.core.axisMarkers.Range.prototype.boundsInvalidated = function() {
+anychart.core.axisMarkers.GanttRange.prototype.boundsInvalidated = function() {
   this.drawRange();
 };
 
@@ -205,7 +181,7 @@ anychart.core.axisMarkers.Range.prototype.boundsInvalidated = function() {
 /**
  * @inheritDoc
  */
-anychart.core.axisMarkers.Range.prototype.appearanceInvalidated = function() {
+anychart.core.axisMarkers.GanttRange.prototype.appearanceInvalidated = function() {
   this.markerElement().stroke(null).fill(/** @type {acgraph.vector.Fill} */(this.fill()));
 };
 
@@ -214,14 +190,14 @@ anychart.core.axisMarkers.Range.prototype.appearanceInvalidated = function() {
 //  Disposing.
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.core.axisMarkers.Range.prototype.disposeInternal = function() {
+anychart.core.axisMarkers.GanttRange.prototype.disposeInternal = function() {
   delete this.fill_;
   goog.base(this, 'disposeInternal');
 };
 
 
 /** @inheritDoc */
-anychart.core.axisMarkers.Range.prototype.serialize = function() {
+anychart.core.axisMarkers.GanttRange.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['from'] = this.from();
   json['to'] = this.to();
@@ -231,7 +207,7 @@ anychart.core.axisMarkers.Range.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.axisMarkers.Range.prototype.setupByJSON = function(config) {
+anychart.core.axisMarkers.GanttRange.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   this.from(config['from']);
   this.to(config['to']);
@@ -240,9 +216,9 @@ anychart.core.axisMarkers.Range.prototype.setupByJSON = function(config) {
 
 
 //exports
-anychart.core.axisMarkers.Range.prototype['from'] = anychart.core.axisMarkers.Range.prototype.from;
-anychart.core.axisMarkers.Range.prototype['to'] = anychart.core.axisMarkers.Range.prototype.to;
-anychart.core.axisMarkers.Range.prototype['scale'] = anychart.core.axisMarkers.Range.prototype.scale;
-anychart.core.axisMarkers.Range.prototype['layout'] = anychart.core.axisMarkers.Range.prototype.layout;
-anychart.core.axisMarkers.Range.prototype['fill'] = anychart.core.axisMarkers.Range.prototype.fill;
-anychart.core.axisMarkers.Range.prototype['isHorizontal'] = anychart.core.axisMarkers.Range.prototype.isHorizontal;
+anychart.core.axisMarkers.GanttRange.prototype['from'] = anychart.core.axisMarkers.GanttRange.prototype.from;
+anychart.core.axisMarkers.GanttRange.prototype['to'] = anychart.core.axisMarkers.GanttRange.prototype.to;
+anychart.core.axisMarkers.GanttRange.prototype['scale'] = anychart.core.axisMarkers.GanttRange.prototype.scale;
+anychart.core.axisMarkers.GanttRange.prototype['layout'] = anychart.core.axisMarkers.GanttRange.prototype.layout;
+anychart.core.axisMarkers.GanttRange.prototype['fill'] = anychart.core.axisMarkers.GanttRange.prototype.fill;
+anychart.core.axisMarkers.GanttRange.prototype['isHorizontal'] = anychart.core.axisMarkers.GanttRange.prototype.isHorizontal;

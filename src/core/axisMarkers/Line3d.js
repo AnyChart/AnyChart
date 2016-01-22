@@ -33,37 +33,6 @@ anychart.core.axisMarkers.Line3d.prototype.getChart = function() {
 
 
 /** @inheritDoc */
-anychart.core.axisMarkers.Line3d.prototype.drawAxisMarker = function() {
-  var ratio = goog.math.clamp(this.scale().transform(this.value(), 0.5), 0, 1);
-  if (isNaN(ratio)) return;
-
-  var shift = this.markerElement().strokeThickness() % 2 == 0 ? 0 : -.5;
-  var bounds = this.parentBounds();
-  var axesLinesSpace = this.axesLinesSpace();
-  this.markerElement().clear();
-
-  var x3dShift = this.getChart().x3dShift;
-  var y3dShift = this.getChart().y3dShift;
-
-  if (this.layout() == anychart.enums.Layout.HORIZONTAL) {
-    var y = Math.round(bounds.getTop() + bounds.height - ratio * bounds.height);
-    ratio == 1 ? y -= shift : y += shift;
-    this.markerElement()
-        .moveTo(bounds.getLeft(), y)
-        .lineTo(bounds.getRight() + x3dShift, y);
-
-  } else if (this.layout() == anychart.enums.Layout.VERTICAL) {
-    var x = Math.round(bounds.getLeft() + ratio * bounds.width);
-    ratio == 1 ? x += shift : x -= shift;
-    this.markerElement()
-        .moveTo(x, bounds.getTop() - y3dShift)
-        .lineTo(x, bounds.getBottom());
-  }
-
-  bounds.top -= y3dShift;
-  bounds.height += y3dShift;
-  bounds.width += x3dShift;
-
-  this.markerElement().clip(axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds)));
-  this.markConsistent(anychart.ConsistencyState.BOUNDS);
+anychart.core.axisMarkers.Line3d.prototype.boundsInvalidated = function() {
+  this.drawLine3D();
 };

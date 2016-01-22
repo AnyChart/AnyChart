@@ -2187,6 +2187,22 @@ anychart.enums.ColumnFormats = {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Gantt Date Time scale markers.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Gantt Date Time scale markers.
+ * @enum {string}
+ */
+anychart.enums.GanttDateTimeMarkers = {
+  START: 'start',
+  END: 'end',
+  CURRENT: 'current'
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  RadarSeriesTypes
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -2467,7 +2483,10 @@ anychart.enums.WarningCode = {
   STOCK_WRONG_MAPPING: 201,
 
   NOT_FOUND: 404,
-  DEPRECATED: 405
+  DEPRECATED: 405,
+
+  IMMUTABLE_MARKER_SCALE: 500,
+  IMMUTABLE_MARKER_LAYOUT: 501
 
 };
 
@@ -3458,6 +3477,10 @@ goog.exportSymbol('anychart.enums.ColumnFormats.DATE_ISO_8601', anychart.enums.C
 goog.exportSymbol('anychart.enums.ColumnFormats.DATE_US_SHORT', anychart.enums.ColumnFormats.DATE_US_SHORT);
 goog.exportSymbol('anychart.enums.ColumnFormats.DATE_DMY_DOTS', anychart.enums.ColumnFormats.DATE_DMY_DOTS);
 goog.exportSymbol('anychart.enums.ColumnFormats.FINANCIAL', anychart.enums.ColumnFormats.FINANCIAL);
+
+goog.exportSymbol('anychart.enums.GanttDateTimeMarkers.START', anychart.enums.GanttDateTimeMarkers.START);
+goog.exportSymbol('anychart.enums.GanttDateTimeMarkers.END', anychart.enums.GanttDateTimeMarkers.END);
+goog.exportSymbol('anychart.enums.GanttDateTimeMarkers.CURRENT', anychart.enums.GanttDateTimeMarkers.CURRENT);
 
 goog.exportSymbol('anychart.enums.Interval.YEARS', anychart.enums.Interval.YEAR);//deprecated since >7.6.0
 goog.exportSymbol('anychart.enums.Interval.MONTHS', anychart.enums.Interval.MONTH);//deprecated since >7.6.0

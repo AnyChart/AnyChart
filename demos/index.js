@@ -1,40 +1,61 @@
-var chart;
 anychart.onDocumentReady(function() {
-  chart = anychart.line();
 
-  var dataset = [
-    [
-      '2592',
-      new Date('2004-04-01T00:00:00')
-    ],
-    [
-      '2485',
-      new Date('2004-04-02T00:15:00')
-    ],
-    [
-      '2379',
-      new Date('2004-04-03T00:30:00')
-    ],
-    [
-      '2379',
-      new Date('2004-04-04T00:30:00')
-    ],
-    [
-      '2166',
-      new Date('2004-04-05T01:00:00')
-    ]];
+// create column chart
+  chart = anychart.column();
 
+// turn on chart animation
+  chart.animation(true);
 
-  var dataSet = anychart.data.set(dataset);
-  var seriesData_a = dataSet.mapAs({x: [1], value: [0]});
-  chart.line(seriesData_a).markers(true);
+// set container id for the chart
+  chart.container('container');
 
-  var scale = anychart.scales.dateTime();
-  chart.xScale(scale);
-  chart.xAxis(0).labels().textFormatter(function() {
-    return this['tickValue'];
+// set chart title text settings
+  chart.title('Top 10 Cosmetic Products by Revenue');
+
+// create area series with passed data
+  var series = chart.column([
+    ['Rouge', '80540'],
+    ['Foundation', '94190'],
+    ['Mascara', '102610'],
+    ['Lip gloss', '110430'],
+    ['Pomade', '128000'],
+    ['Nail polish', '143760'],
+    ['Eyebrow pencil', '170670'],
+    ['Eyeliner', '213210'],
+    ['Eyeshadows', '249980']
+  ]);
+
+// set series tooltip settings
+  series.tooltip().titleFormatter(function() {
+    return this.x
   });
-  chart.xScroller(true);
+  series.tooltip().textFormatter(function() {
+    return '$' + parseInt(this.value).toLocaleString()
+  });
+  series.tooltip().position('top').anchor('bottom').offsetX(0).offsetY(5);
 
-  chart.container('container').draw();
+// set scale minimum
+  chart.yScale().minimum(0);
+
+// set yAxis labels formatter
+  chart.yAxis().labels().textFormatter(function(){
+    return this.value.toLocaleString();
+  });
+
+  chart.tooltip().positionMode('point');
+  chart.interactivity().hoverMode('byX');
+
+  chart.xAxis().title('Products by Revenue');
+  chart.yAxis().title('Revenue in Dollars');
+
+  chart.rangeMarker(0)
+      .from('Rouge')
+      .to('Mascara')
+      .layout('vertical');
+
+// initiate chart drawing
+  chart.draw();
+
+
 });
+

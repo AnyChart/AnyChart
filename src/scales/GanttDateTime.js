@@ -1,6 +1,7 @@
 goog.provide('anychart.scales.GanttDateTime');
 
 goog.require('anychart.core.Base');
+goog.require('anychart.enums');
 
 goog.require('goog.array');
 goog.require('goog.date.Interval');
@@ -54,6 +55,25 @@ anychart.scales.GanttDateTime = function() {
    * @private
    */
   this.totalMax_ = NaN;
+
+
+  /**
+   * Contains total min date without a timeline's gap value.
+   * @type {number}
+   */
+  this.trackedTotalMin = NaN;
+
+  /**
+   * Contains total max date without a timeline's gap value.
+   * @type {number}
+   */
+  this.trackedTotalMax = NaN;
+
+  /**
+   * Current date. Used for this.timestampToRatio('current') to make this method return the same on different calls.
+   * @type {number}
+   */
+  this.currentDate = NaN;
 
 };
 goog.inherits(anychart.scales.GanttDateTime, anychart.core.Base);
@@ -478,12 +498,42 @@ anychart.scales.GanttDateTime.prototype.seek_ = function(startDate, interval, op
  * @return {number} - Value transformed to ratio scope. Returns NaN if scale range is not set.
  */
 anychart.scales.GanttDateTime.prototype.timestampToRatio = function(value) {
-  var val = anychart.utils.normalizeTimestamp(value);
+  var val;
+  if (goog.isString(value)) {
+    switch (value.toLowerCase()) {
+      case anychart.enums.GanttDateTimeMarkers.CURRENT:
+        if (isNaN(this.currentDate))
+          this.currentDate = goog.now();
+        val = this.currentDate;
+        break;
+      case anychart.enums.GanttDateTimeMarkers.START:
+        val = this.trackedTotalMin;
+        break;
+      case anychart.enums.GanttDateTimeMarkers.END:
+        val = this.trackedTotalMax;
+    }
+  }
+
+  val = goog.isDef(val) ? val : anychart.utils.normalizeTimestamp(value);
+
   if (isNaN(this.min_) || isNaN(this.max_))
     this.setRange(anychart.core.gantt.Controller.GANTT_BIRTH_DATE, anychart.core.gantt.Controller.GANTT_DEATH_DATE);
 
   //You will get this return expression if you draw a time axis and mark a values there.
   return (val - this.min_) / (this.max_ - this.min_);
+};
+
+
+/**
+ * This method is added only for compatibility with line/range/text markers of gantt chart's timeline.
+ * NOTE: Use timestampToRatio method instead.
+ * TODO (A.Kudryavtsev): For reviewer: we have a method timestampToRatio because we also have ratioToTimestamp.
+ * @param {*} value - Value to transform.
+ * @param {number=} opt_subRangeRatio - This parameter will be completely ignored.
+ * @return {number} - Value transformed to ratio scope. Returns NaN if scale range is not set.
+ */
+anychart.scales.GanttDateTime.prototype.transform = function(value, opt_subRangeRatio) {
+  return this.timestampToRatio(value);
 };
 
 

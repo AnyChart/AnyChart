@@ -1,45 +1,28 @@
 goog.provide('anychart.core.axisMarkers.Line');
+
 goog.require('acgraph');
 goog.require('anychart.color');
-goog.require('anychart.core.VisualBase');
-goog.require('anychart.core.utils.Padding');
+goog.require('anychart.core.axisMarkers.PathBase');
 goog.require('anychart.enums');
-goog.require('anychart.utils');
-goog.require('goog.math');
 
 
 
 /**
  * Line marker.
  * @constructor
- * @extends {anychart.core.VisualBase}
+ * @extends {anychart.core.axisMarkers.PathBase}
  */
 anychart.core.axisMarkers.Line = function() {
   anychart.core.axisMarkers.Line.base(this, 'constructor');
 
-  /**
-   * @type {acgraph.vector.Path}
-   * @private
-   */
-  this.markerElement_;
-
-  /**
-   * @type {anychart.scales.Base}
-   * @private
-   */
-  this.scale_;
 
   /**
    * @type {anychart.enums.Layout}
    * @private
    */
-  this.layout_ = anychart.enums.Layout.HORIZONTAL;
+  this.layout_;
 
-  /**
-   * @type {number}
-   * @private
-   */
-  this.value_ = 0;
+  this.val = 0;
 
   /**
    * @type {acgraph.vector.Stroke}
@@ -47,7 +30,7 @@ anychart.core.axisMarkers.Line = function() {
    */
   this.stroke_;
 };
-goog.inherits(anychart.core.axisMarkers.Line, anychart.core.VisualBase);
+goog.inherits(anychart.core.axisMarkers.Line, anychart.core.axisMarkers.PathBase);
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -58,8 +41,7 @@ goog.inherits(anychart.core.axisMarkers.Line, anychart.core.VisualBase);
  * @type {number}
  */
 anychart.core.axisMarkers.Line.prototype.SUPPORTED_SIGNALS =
-    anychart.core.VisualBase.prototype.SUPPORTED_SIGNALS |
-        anychart.Signal.BOUNDS_CHANGED;
+    anychart.core.axisMarkers.PathBase.prototype.SUPPORTED_SIGNALS;
 
 
 /**
@@ -67,9 +49,7 @@ anychart.core.axisMarkers.Line.prototype.SUPPORTED_SIGNALS =
  * @type {number}
  */
 anychart.core.axisMarkers.Line.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.ConsistencyState.BOUNDS |
-        anychart.ConsistencyState.APPEARANCE;
+    anychart.core.axisMarkers.PathBase.prototype.SUPPORTED_CONSISTENCY_STATES;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -77,8 +57,8 @@ anychart.core.axisMarkers.Line.prototype.SUPPORTED_CONSISTENCY_STATES =
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Get/set line marker layout.
- * @param {anychart.enums.Layout=} opt_value LineMarker layout.
- * @return {anychart.enums.Layout|anychart.core.axisMarkers.Line} Layout or this.
+ * @param {anychart.enums.Layout=} opt_value - LineMarker layout.
+ * @return {anychart.enums.Layout|anychart.core.axisMarkers.Line} - Layout or this.
  */
 anychart.core.axisMarkers.Line.prototype.layout = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -104,64 +84,7 @@ anychart.core.axisMarkers.Line.prototype.layout = function(opt_value) {
  * @return {anychart.scales.Base|!anychart.core.axisMarkers.Line} Axis scale or itself for method chaining.
  */
 anychart.core.axisMarkers.Line.prototype.scale = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.scale_ != opt_value) {
-      this.scale_ = opt_value;
-      this.scale_.listenSignals(this.scaleInvalidated_, this);
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.scale_;
-  }
-};
-
-
-/**
- * Internal ticks invalidation handler.
- * @param {anychart.SignalEvent} event Event object.
- * @private
- */
-anychart.core.axisMarkers.Line.prototype.scaleInvalidated_ = function(event) {
-  var signal = 0;
-  if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION))
-    signal |= anychart.Signal.NEEDS_RECALCULATION;
-  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION))
-    signal |= anychart.Signal.NEEDS_REDRAW;
-
-  signal |= anychart.Signal.BOUNDS_CHANGED;
-
-  var state = anychart.ConsistencyState.BOUNDS;
-
-  this.invalidate(state, signal);
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//  Bounds.
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Axes lines space.
- * @param {(string|number|anychart.core.utils.Space)=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
- *    space.
- * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
- * @param {(string|number)=} opt_bottom Bottom space.
- * @param {(string|number)=} opt_left Left space.
- * @return {!(anychart.core.VisualBase|anychart.core.utils.Padding)} .
- */
-anychart.core.axisMarkers.Line.prototype.axesLinesSpace = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
-  if (!this.axesLinesSpace_) {
-    this.axesLinesSpace_ = new anychart.core.utils.Padding();
-    this.registerDisposable(this.axesLinesSpace_);
-  }
-
-  if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
-    this.axesLinesSpace_.setup.apply(this.axesLinesSpace_, arguments);
-    return this;
-  } else {
-    return this.axesLinesSpace_;
-  }
+  return /** @type {anychart.scales.Base|!anychart.core.axisMarkers.Line} */ (this.scaleInternal(opt_value));
 };
 
 
@@ -195,28 +118,10 @@ anychart.core.axisMarkers.Line.prototype.stroke = function(opt_strokeOrFill, opt
 /**
  * Get/set value.
  * @param {number=} opt_newValue LineMarker value settings.
- * @return {number|anychart.core.axisMarkers.Line} LineMarker value settings or LineMarker instance for method chaining.
+ * @return {number|anychart.core.axisMarkers.Line} - LineMarker value settings or LineMarker instance for method chaining.
  */
 anychart.core.axisMarkers.Line.prototype.value = function(opt_newValue) {
-  if (goog.isDef(opt_newValue)) {
-    if (this.value_ != opt_newValue) {
-      this.value_ = opt_newValue;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.value_;
-  }
-};
-
-
-/**
- * Whether marker is horizontal
- * @return {boolean} If the marker is horizontal.
- */
-anychart.core.axisMarkers.Line.prototype.isHorizontal = function() {
-  return this.layout_ == anychart.enums.Layout.HORIZONTAL;
+  return /** @type {number|anychart.core.axisMarkers.Line} */ (this.valueInternal(opt_newValue));
 };
 
 
@@ -224,98 +129,18 @@ anychart.core.axisMarkers.Line.prototype.isHorizontal = function() {
 //  Drawing.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Drawing.
- * @return {anychart.core.axisMarkers.Line} An instance of {@link anychart.core.axisMarkers.Line} class for method chaining.
+ * @inheritDoc
  */
-anychart.core.axisMarkers.Line.prototype.draw = function() {
-  var scale = /** @type {anychart.scales.Linear|anychart.scales.Ordinal} */(this.scale());
-
-  if (!scale) {
-    anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
-    return this;
-  }
-
-  if (!this.checkDrawingNeeded())
-    return this;
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    var zIndex = /** @type {number} */(this.zIndex());
-    this.markerElement().zIndex(zIndex);
-    this.markConsistent(anychart.ConsistencyState.Z_INDEX);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    var container = /** @type {acgraph.vector.ILayer} */(this.container());
-    this.markerElement().parent(container);
-    this.markConsistent(anychart.ConsistencyState.CONTAINER);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.markerElement().stroke(/** @type {acgraph.vector.Stroke} */(this.stroke_));
-    this.markConsistent(anychart.ConsistencyState.APPEARANCE);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    this.drawAxisMarker();
-  }
-
-  return this;
+anychart.core.axisMarkers.Line.prototype.boundsInvalidated = function() {
+  this.drawLine();
 };
 
 
 /**
- * Draw axis marker.
- * @protected
+ * @inheritDoc
  */
-anychart.core.axisMarkers.Line.prototype.drawAxisMarker = function() {
-  var ratio = goog.math.clamp(this.scale().transform(this.value_, 0.5), 0, 1);
-  if (isNaN(ratio)) return;
-
-  var shift = this.markerElement().strokeThickness() % 2 == 0 ? 0 : -.5;
-  var bounds = this.parentBounds();
-  var axesLinesSpace = this.axesLinesSpace();
-  this.markerElement().clear();
-
-  if (this.layout_ == anychart.enums.Layout.HORIZONTAL) {
-    var y = Math.round(bounds.getTop() + bounds.height - ratio * bounds.height);
-    ratio == 1 ? y -= shift : y += shift;
-    this.markerElement().moveTo(bounds.getLeft(), y);
-    this.markerElement().lineTo(bounds.getRight(), y);
-  } else if (this.layout_ == anychart.enums.Layout.VERTICAL) {
-    var x = Math.round(bounds.getLeft() + ratio * bounds.width);
-    ratio == 1 ? x += shift : x -= shift;
-    this.markerElement().moveTo(x, bounds.getTop());
-    this.markerElement().lineTo(x, bounds.getBottom());
-  }
-
-  this.markerElement().clip(axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds)));
-  this.markConsistent(anychart.ConsistencyState.BOUNDS);
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//  Disabling & enabling.
-//----------------------------------------------------------------------------------------------------------------------
-/** @inheritDoc */
-anychart.core.axisMarkers.Line.prototype.remove = function() {
-  this.markerElement().parent(null);
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//  Elements creation.
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Create marker element.
- * @return {!acgraph.vector.Path} AxisMarker line element.
- * @protected
- */
-anychart.core.axisMarkers.Line.prototype.markerElement = function() {
-  if (!this.markerElement_) {
-    this.markerElement_ = acgraph.path();
-    this.registerDisposable(this.markerElement_);
-  }
-  return this.markerElement_;
+anychart.core.axisMarkers.Line.prototype.appearanceInvalidated = function() {
+  this.markerElement().stroke(/** @type {acgraph.vector.Stroke} */(this.stroke_));
 };
 
 
@@ -333,7 +158,6 @@ anychart.core.axisMarkers.Line.prototype.disposeInternal = function() {
 anychart.core.axisMarkers.Line.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['value'] = this.value();
-  json['layout'] = this.layout();
   json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
   return json;
 };
@@ -343,7 +167,6 @@ anychart.core.axisMarkers.Line.prototype.serialize = function() {
 anychart.core.axisMarkers.Line.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   this.value(config['value']);
-  this.layout(config['layout']);
   this.stroke(config['stroke']);
 };
 

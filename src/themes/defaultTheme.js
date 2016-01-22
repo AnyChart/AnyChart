@@ -2949,6 +2949,18 @@ window['anychart']['themes']['defaultTheme'] = {
           'fill': '#ff0',
           'stroke': '2 red'
         },
+        'defaultLineMarkerSettings': {
+          'layout': 'vertical',
+          'zIndex': 1.5
+        },
+        'defaultRangeMarkerSettings': {
+          'layout': 'vertical',
+          'zIndex': 1
+        },
+        'defaultTextMarkerSettings': {
+          'layout': 'vertical',
+          'zIndex': 2
+        },
         'header': {
           'labelsFactory': {
             'enabled': true,

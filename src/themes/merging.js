@@ -536,7 +536,8 @@ anychart.themes.merging.mergingMap_ = [
       'cartesianBase.defaultLineMarkerSettings',
       'scatter.defaultLineMarkerSettings',
       'sparkline.defaultLineMarkerSettings',
-      'standalones.lineAxisMarker'
+      'standalones.lineAxisMarker',
+      'gantt.base.timeline.defaultLineMarkerSettings'
     ]
   },
   {
@@ -545,7 +546,8 @@ anychart.themes.merging.mergingMap_ = [
       'cartesianBase.defaultTextMarkerSettings',
       'scatter.defaultTextMarkerSettings',
       'sparkline.defaultTextMarkerSettings',
-      'standalones.textAxisMarker'
+      'standalones.textAxisMarker',
+      'gantt.base.timeline.defaultTextMarkerSettings'
     ]
   },
   {
@@ -554,7 +556,8 @@ anychart.themes.merging.mergingMap_ = [
       'cartesianBase.defaultRangeMarkerSettings',
       'scatter.defaultRangeMarkerSettings',
       'sparkline.defaultRangeMarkerSettings',
-      'standalones.rangeAxisMarker'
+      'standalones.rangeAxisMarker',
+      'gantt.base.timeline.defaultRangeMarkerSettings'
     ]
   },
   {

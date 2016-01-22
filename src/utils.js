@@ -1463,6 +1463,12 @@ anychart.utils.getWarningDescription = function(code, opt_arguments) {
     case anychart.enums.WarningCode.SCALE_TYPE_NOT_SUPPORTED:
       return 'Scale type "' + opt_arguments[0] + '" is not supported - only ' + opt_arguments[1] + ' is.';
 
+    case anychart.enums.WarningCode.IMMUTABLE_MARKER_SCALE:
+      return 'Scale is immutable for this type of axis marker and scale will not be set.';
+
+    case anychart.enums.WarningCode.IMMUTABLE_MARKER_LAYOUT:
+      return 'Layout is immutable for this type of axis marker and layout will not be set.';
+
     default:
       return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report!';

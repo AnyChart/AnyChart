@@ -8,7 +8,6 @@ goog.require('anychart.core.ui.IInteractiveGrid');
 goog.require('anychart.core.ui.ScrollBar');
 goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.core.utils.GanttContextProvider');
-goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.math.Rect');
 goog.require('goog.events.KeyHandler');
 goog.require('goog.events.MouseWheelHandler');
@@ -158,7 +157,7 @@ anychart.core.ui.BaseGrid = function(opt_controller, opt_isResource) {
 
   /**
    * Layer that contains elements to be drawn with paths.
-   * @type {anychart.core.utils.TypedLayer}
+   * @type {acgraph.vector.Layer}
    * @private
    */
   this.drawLayer_ = null;
@@ -919,20 +918,11 @@ anychart.core.ui.BaseGrid.prototype.getCellsLayer = function() {
 
 /**
  * Inner getter for this.drawLayer_.
- * @return {anychart.core.utils.TypedLayer}
+ * @return {acgraph.vector.Layer}
  */
 anychart.core.ui.BaseGrid.prototype.getDrawLayer = function() {
   if (!this.drawLayer_) {
-    var ths = this;
-    this.drawLayer_ = new anychart.core.utils.TypedLayer(function() {
-      var el = new anychart.core.ui.BaseGrid.Element();
-      el.setParentEventTarget(ths);
-      return el;
-    }, function(child) {
-      (/** @type {anychart.core.ui.BaseGrid.Element} */ (child)).fill(null).stroke(null).clear();
-      child.currBounds = null;
-      child.type = void 0;
-    });
+    this.drawLayer_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
     this.drawLayer_.zIndex(anychart.core.ui.BaseGrid.DRAW_Z_INDEX);
     this.registerDisposable(this.drawLayer_);
   }
@@ -1031,7 +1021,7 @@ anychart.core.ui.BaseGrid.prototype.getEvenPath = function() {
 anychart.core.ui.BaseGrid.prototype.getHoverPath = function() {
   if (!this.hoverPath_) {
     this.hoverPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
-    this.hoverPath_.stroke(null).fill(this.hoverFill_).zIndex(10);
+    this.hoverPath_.stroke(null).fill(this.hoverFill_).zIndex(2);
     this.registerDisposable(this.hoverPath_);
   }
   return this.hoverPath_;
@@ -1045,7 +1035,7 @@ anychart.core.ui.BaseGrid.prototype.getHoverPath = function() {
 anychart.core.ui.BaseGrid.prototype.getSelectedPath = function() {
   if (!this.selectedPath_) {
     this.selectedPath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
-    this.selectedPath_.stroke(null).fill(this.rowSelectedFill_).zIndex(20);
+    this.selectedPath_.stroke(null).fill(this.rowSelectedFill_).zIndex(3);
     this.registerDisposable(this.selectedPath_);
   }
   return this.selectedPath_;
@@ -1059,7 +1049,7 @@ anychart.core.ui.BaseGrid.prototype.getSelectedPath = function() {
 anychart.core.ui.BaseGrid.prototype.getRowStrokePath = function() {
   if (!this.rowStrokePath_) {
     this.rowStrokePath_ = /** @type {acgraph.vector.Path} */ (this.getCellsLayer().path());
-    this.rowStrokePath_.stroke(this.rowStroke_).zIndex(30);
+    this.rowStrokePath_.stroke(this.rowStroke_).zIndex(4);
     this.registerDisposable(this.rowStrokePath_);
   }
   return this.rowStrokePath_;
@@ -1584,8 +1574,11 @@ anychart.core.ui.BaseGrid.prototype.drawRowFills_ = function() {
     this.gridHeightCache_.push(totalTop - header);
   }
 
-  this.getClipLayer().clip(new anychart.math.Rect(this.pixelBoundsCache.left, this.pixelBoundsCache.top,
-      this.pixelBoundsCache.width, totalTop - this.pixelBoundsCache.top));
+  var clipRect = new anychart.math.Rect(this.pixelBoundsCache.left, this.pixelBoundsCache.top - 1,
+      this.pixelBoundsCache.width, totalTop - this.pixelBoundsCache.top + 1);
+  this.getClipLayer().clip(clipRect);
+  this.getCellsLayer().clip(clipRect);
+  this.getDrawLayer().clip(clipRect);
 
 };
 
@@ -1597,8 +1590,6 @@ anychart.core.ui.BaseGrid.prototype.drawRowFills_ = function() {
  * @private
  */
 anychart.core.ui.BaseGrid.prototype.mouseWheelHandler_ = function(e) {
-  //TODO (A.Kudryavtsev): add check goog.dom.getDocumentScroll().x here
-
   var dx = e.deltaX;
   var dy = e.deltaY;
 
@@ -2471,7 +2462,7 @@ goog.inherits(anychart.core.ui.BaseGrid.Element, acgraph.vector.Path);
 
 /**
  * Type of element. In current implementation (21 Jul 2015) can be one of timeline's bars type.
- * @type {anychart.enums.TLElementTypes}
+ * @type {anychart.enums.TLElementTypes|undefined}
  */
 anychart.core.ui.BaseGrid.Element.prototype.type;
 

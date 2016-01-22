@@ -3325,7 +3325,34 @@
         "editStructurePreviewDashStroke": {"$ref": "#/definitions/stroke"},
         "editing": {"type": "boolean"},
         "baselineAbove": {"type": "boolean"},
-        "headerHeight": {"type": "number"}
+        "headerHeight": {"type": "number"},
+        "lineAxesMarkers": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.axisMarkers.Line"}
+            ]
+          }
+        },
+        "rangeAxesMarkers": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.axisMarkers.Range"}
+            ]
+          }
+        },
+        "textAxesMarkers": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.axisMarkers.Text"}
+            ]
+          }
+        }
       }
     },
 
@@ -4444,6 +4471,19 @@
         "layout": {"$ref": "#/definitions/anychart.enums.Layout"}
       }
     },
+    "anychart.core.axisMarkers.GanttLine": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.VisualBase"}
+      ],
+      "properties": {
+        "stroke": {"$ref": "#/definitions/stroke"},
+        "value": {
+          "type": ["number", "string"]
+        },
+        "layout": {"$ref": "#/definitions/anychart.enums.Layout"}
+      }
+    },
     "anychart.core.axisMarkers.Range": {
       "type": "object",
       "allOf": [
@@ -4456,6 +4496,22 @@
         },
         "to": {
           "type": "number"
+        },
+        "layout": {"$ref": "#/definitions/anychart.enums.Layout"}
+      }
+    },
+    "anychart.core.axisMarkers.GanttRange": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.VisualBase"}
+      ],
+      "properties": {
+        "fill": {"$ref": "#/definitions/fill"},
+        "from": {
+          "type": ["number", "string"]
+        },
+        "to": {
+          "type": ["number", "string"]
         },
         "layout": {"$ref": "#/definitions/anychart.enums.Layout"}
       }
@@ -4497,6 +4553,56 @@
       "properties": {
         "value": {
           "type": ["number"]
+        },
+        "text": {
+          "type": ["string"]
+        },
+        "width": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "height": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "offsetX": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "offsetY": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "rotation": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "layout": {"$ref": "#/definitions/anychart.enums.Layout"},
+        "align": {"$ref": "#/definitions/anychart.enums.Align"},
+        "anchor": {"$ref": "#/definitions/anychart.enums.Anchor"}
+      }
+    },
+    "anychart.core.axisMarkers.GanttText": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.VisualBase"},
+        {"$ref": "#/definitions/anychart.core.Text"}
+      ],
+      "properties": {
+        "value": {
+          "type": ["number", "string"]
         },
         "text": {
           "type": ["string"]

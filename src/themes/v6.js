@@ -4858,6 +4858,15 @@ window['anychart']['themes']['v6'] = {
           'fill': '#ff0',
           'stroke': '#000'
         },
+        'defaultLineMarkerSettings': {
+          'layout': 'vertical'
+        },
+        'defaultRangeMarkerSettings': {
+          'layout': 'vertical'
+        },
+        'defaultTextMarkerSettings': {
+          'layout': 'vertical'
+        },
         'header': {
           'labelsFactory': {
             'anchor': 'leftTop',
