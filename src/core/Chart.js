@@ -1253,13 +1253,14 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
   var tag = anychart.utils.extractTag(event['domTarget']);
   var index;
   var forbidTooltip = false;
+  var isTargetLegendOrColorRange = event['target'] instanceof anychart.core.ui.Legend || this.checkIfColorRange(event['target']);
 
   if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
     var parent = event['target'].getParentEventTarget();
     if (parent.isSeries && parent.isSeries())
       series = parent;
     index = tag;
-  } else if (event['target'] instanceof anychart.core.ui.Legend || this.checkIfColorRange(event['target'])) {
+  } else if (isTargetLegendOrColorRange) {
     if (tag) {
       if (tag.points_) {
         series = tag.points_.series;
@@ -1280,6 +1281,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
 
   if (series && !series.isDisposed() && series.enabled() && goog.isFunction(series.makePointEvent)) {
     var evt = series.makePointEvent(event);
+
     if (series.hasOutlierMarkers && series.hasOutlierMarkers() && goog.isNumber(evt['pointIndex']))
       index = evt['pointIndex'];
     if (evt && ((anychart.utils.checkIfParent(/** @type {!goog.events.EventTarget} */(series), event['relatedTarget'])) || series.dispatchEvent(evt))) {
@@ -1439,6 +1441,16 @@ anychart.core.Chart.prototype.checkIfColorRange = function(target) {
  * @param {anychart.core.MouseEvent} event Event object.
  */
 anychart.core.Chart.prototype.handleMouseDown = function(event) {
+  this.onMouseDown(event);
+};
+
+
+/**
+ * Logic for mouse down. It needs for inherited classes.
+ * @protected
+ * @param {anychart.core.MouseEvent} event Event object.
+ */
+anychart.core.Chart.prototype.onMouseDown = function(event) {
   var interactivity = this.interactivity();
 
   var seriesStatus, eventSeriesStatus, allSeries, alreadySelectedPoints, i;

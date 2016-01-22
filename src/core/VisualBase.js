@@ -143,9 +143,11 @@ anychart.core.VisualBase.prototype.bindHandlersToGraphics = function(element, op
   this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEOUT, opt_outHandler || this.handleBrowserEvent);
   this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEDOWN, opt_downHandler || this.handleBrowserEvent);
   this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEUP, opt_upHandler || this.handleBrowserEvent);
+  this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEMOVE, opt_moveHandler || this.handleBrowserEvent);
   this.eventsHandler.listen(element, acgraph.events.EventType.TOUCHSTART, this.handleBrowserEvent);
   this.eventsHandler.listen(element, acgraph.events.EventType.TOUCHEND, this.handleBrowserEvent);
-  this.eventsHandler.listen(element, acgraph.events.EventType.MOUSEMOVE, opt_moveHandler || this.handleBrowserEvent);
+  this.eventsHandler.listen(element, acgraph.events.EventType.TOUCHCANCEL, this.handleBrowserEvent);
+  this.eventsHandler.listen(element, acgraph.events.EventType.TOUCHMOVE, this.handleBrowserEvent);
 };
 
 
@@ -169,9 +171,11 @@ anychart.core.VisualBase.prototype.bindHandlersToComponent = function(target, op
   this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEOUT, opt_outHandler || opt_allHandler || this.handleMouseEvent);
   this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEDOWN, opt_downHandler || opt_allHandler || this.handleMouseEvent);
   this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEUP, opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEMOVE, opt_moveHandler || opt_allHandler || this.handleMouseEvent);
   this.eventsHandler.listen(target, acgraph.events.EventType.TOUCHSTART, opt_allHandler || this.handleMouseEvent);
   this.eventsHandler.listen(target, acgraph.events.EventType.TOUCHEND, opt_allHandler || this.handleMouseEvent);
-  this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEMOVE, opt_moveHandler || opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler.listen(target, acgraph.events.EventType.TOUCHCANCEL, opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler.listen(target, acgraph.events.EventType.TOUCHMOVE, opt_allHandler || this.handleMouseEvent);
 };
 
 
@@ -186,7 +190,9 @@ anychart.core.VisualBase.prototype.handleBrowserEvent = function(e) {
   // we stop wrapper propagation to prevent parent elements hearing this event from their layer.
   // we stop only wrapper propagation to continue DOM event propagation through DOM elements under the Stage.
   e.stopWrapperPropagation();
-  return this.dispatchEvent(this.makeBrowserEvent(e));
+  var wrappedEvent = this.makeBrowserEvent(e);
+  wrappedEvent.originalEvent = e;
+  return this.dispatchEvent(wrappedEvent);
 };
 
 

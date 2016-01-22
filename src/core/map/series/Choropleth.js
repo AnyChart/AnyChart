@@ -213,6 +213,7 @@ anychart.core.map.series.Choropleth.prototype.calculate = function() {
           var prop = geom['properties'];
           if (prop[this.getFinalGeoIdField()] == name) {
             this.points_.push(geom);
+            //todo (blackart) Don't remove it for the time.
             if (geom.domElement) this.bindHandlersToGraphics(geom.domElement);
             iterator.meta('regionShape', geom.domElement).meta('regionProperties', prop);
             break;

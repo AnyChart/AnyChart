@@ -1351,6 +1351,7 @@ anychart.core.SeriesBase.prototype.makePointEvent = function(event) {
       type = anychart.enums.EventType.POINT_MOUSE_UP;
       break;
     case acgraph.events.EventType.CLICK:
+    case acgraph.events.EventType.TOUCHSTART:
       type = anychart.enums.EventType.POINT_CLICK;
       break;
     case acgraph.events.EventType.DBLCLICK:

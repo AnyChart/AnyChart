@@ -445,8 +445,10 @@ anychart.utils.GeoJSONParser.prototype.transform_ = function(coord) {
   x = projected[0] * this.txObj_.scale;
   y = projected[1] * this.txObj_.scale;
 
-  x = Math.round(x);
-  y = Math.round(y);
+  if (this.txObj_.scale != 1) {
+    x = Math.round(x);
+    y = Math.round(y);
+  }
 
   coord[0] = x;
   coord[1] = y;

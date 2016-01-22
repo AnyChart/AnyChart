@@ -315,6 +315,34 @@ anychart.core.map.series.Base.prototype.calculate = function() {
 
 
 /**
+ * Update series elements on zoom or move map interactivity.
+ * p.s. There is should be logic for series that does some manipulation with series elements. Now it is just series redrawing.
+ * @return {anychart.core.map.series.Base}
+ */
+anychart.core.map.series.Base.prototype.updateOnZoomOrMove = function() {
+  this.suspendSignalsDispatching();
+  this.calculate();
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
+
+  var iterator = this.getResetIterator();
+
+  this.startDrawing();
+  while (iterator.advance() && this.enabled()) {
+    var index = iterator.getIndex();
+    this.drawPoint(this.state.getPointStateByIndex(index));
+  }
+  this.finalizeDrawing();
+
+  this.resumeSignalsDispatching(false);
+  this.markConsistent(anychart.ConsistencyState.ALL);
+
+  return this;
+};
+
+
+/**
  * Draws series into the current container.
  * @return {anychart.core.map.series.Base} An instance of {@link anychart.core.map.series.Base} class for method chaining.
  */
