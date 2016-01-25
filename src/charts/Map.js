@@ -206,14 +206,16 @@ anychart.charts.Map = function() {
    * @private
    */
   this.initControlsInteractivity_ = goog.bind(function() {
-    if (this.container().getStage() && this.container().getStage().container()) {
+    if (this.container().getStage() && this.container().getStage().container() && this.getPlotBounds()) {
       var container = /** @type {Node} */(this.container().getStage().container());
 
       if (goog.userAgent.IE)
         container.style['-ms-touch-action'] = 'none';
 
-      this.mapTextarea = goog.dom.createDom('textarea');
+      var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+      var bounds = this.getPixelBounds();
 
+      this.mapTextarea = goog.dom.createDom('textarea');
       this.mapTextarea.setAttribute('readonly', 'readonly');
       goog.style.setStyle(this.mapTextarea, {
         'border': 0,
@@ -223,6 +225,8 @@ anychart.charts.Map = function() {
         'overflow': 'hidden',
         'padding': '0',
         'position': 'absolute',
+        'left': bounds.left + containerPosition.x,
+        'top': bounds.top + containerPosition.y,
         'width': '1px'
       });
       goog.dom.appendChild(container, this.mapTextarea);
@@ -302,8 +306,7 @@ anychart.charts.Map = function() {
           this.move(dx, dy);
       }, false, this);
 
-
-      this.mouseWheelHandler = new acgraph.events.MouseWheelHandler(/** @type {Element} */(this.container().getStage().container()));
+      this.mouseWheelHandler = new acgraph.events.MouseWheelHandler(/** @type {Element} */(this.container().getStage().container()), false, /** @type {acgraph.math.Rect}*/(this.getPlotBounds()));
       this.mouseWheelHandler.listen('mousewheel', function(e) {
         this.isDesktop_ = true;
         var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
@@ -362,7 +365,7 @@ anychart.charts.Map = function() {
       }, false, this);
 
       this.touchDist = 0;
-      goog.events.listen(this.rootElement,[goog.events.EventType.POINTERUP, goog.events.EventType.TOUCHEND], function(e) {
+      goog.events.listen(this.rootElement, [goog.events.EventType.POINTERUP, goog.events.EventType.TOUCHEND], function(e) {
         goog.style.setStyle(document['body'], 'cursor', '');
         this.touchDist = 0;
         this.drag_ = false;
@@ -1857,6 +1860,8 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
 
     scale.setBounds(dataBounds);
     this.dataBounds_ = dataBounds;
+    if (this.mouseWheelHandler)
+      this.mouseWheelHandler.setBounds(/** @type {acgraph.math.Rect}*/(this.getPlotBounds()));
 
     if (this.mapContentLayer_)
       this.mapContentLayer_.clip(contentAreaBounds);
