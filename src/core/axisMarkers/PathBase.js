@@ -314,6 +314,10 @@ anychart.core.axisMarkers.PathBase.prototype.drawRange = function() {
   el.clear();
 
   if (ratioMaxValue >= 0 && ratioMinValue <= 1) { //range or part of it is visible.
+    // clamping to prevent range marker go out from the bounds. Ratio should be between 0 and 1.
+    ratioMinValue = goog.math.clamp(ratioMinValue, 0, 1);
+    ratioMaxValue = goog.math.clamp(ratioMaxValue, 0, 1);
+
     var bounds = this.parentBounds();
     var axesLinesSpace = this.axesLinesSpace();
 
@@ -340,110 +344,6 @@ anychart.core.axisMarkers.PathBase.prototype.drawRange = function() {
     }
     el.clip(axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds)));
   }
-  return this;
-};
-
-
-/**
- * For case of 3D range marker.
- * @return {anychart.core.axisMarkers.PathBase} - Itself for method chaining.
- */
-anychart.core.axisMarkers.PathBase.prototype.drawRange3D = function() {
-  var layout = this.layout();
-  var minValue = this.from(), maxValue = this.to();
-  if (this.from() > this.to()) {
-    minValue = this.from();
-    maxValue = this.to();
-  }
-  // clamping to prevent range marker go out from the bounds. Ratio should be between 0 and 1.
-  var ratioMinValue = goog.math.clamp(this.scale().transform(minValue, 0), 0, 1);
-  var ratioMaxValue = goog.math.clamp(this.scale().transform(maxValue, 1), 0, 1);
-
-  if (isNaN(ratioMinValue) || isNaN(ratioMaxValue)) return this;
-
-  var bounds = this.parentBounds();
-  var axesLinesSpace = this.axesLinesSpace();
-  this.markerElement().clear();
-
-  var x3dShift = this.getChart().x3dShift;
-  var y3dShift = this.getChart().y3dShift;
-
-  if (layout == anychart.enums.Layout.HORIZONTAL) {
-    var y_max = Math.floor(bounds.getBottom() - bounds.height * ratioMaxValue);
-    var y_min = Math.ceil(bounds.getBottom() - bounds.height * ratioMinValue);
-    var x_start = bounds.getLeft();
-    var x_end = bounds.getRight();
-
-    this.markerElement()
-        .moveTo(x_start, y_max)
-        .lineTo(x_start + x3dShift, y_max - y3dShift)
-        .lineTo(x_end + x3dShift, y_max - y3dShift)
-        .lineTo(x_end + x3dShift, y_min - y3dShift)
-        .lineTo(x_start + x3dShift, y_min - y3dShift)
-        .lineTo(x_start, y_min)
-        .close();
-  } else if (layout == anychart.enums.Layout.VERTICAL) {
-    var y_start = bounds.getBottom();
-    var y_end = bounds.getTop();
-    var x_min = Math.floor(bounds.getLeft() + (bounds.width * ratioMinValue));
-    var x_max = Math.ceil(bounds.getLeft() + (bounds.width * ratioMaxValue));
-
-    this.markerElement()
-        .moveTo(x_min, y_start)
-        .lineTo(x_min + x3dShift, y_start - y3dShift)
-        .lineTo(x_min + x3dShift, y_end - y3dShift)
-        .lineTo(x_max + x3dShift, y_end - y3dShift)
-        .lineTo(x_max + x3dShift, y_start - y3dShift)
-        .lineTo(x_max, y_start)
-        .close();
-
-  }
-
-  bounds.top -= y3dShift;
-  bounds.height += y3dShift;
-  bounds.width += x3dShift;
-
-  this.markerElement().clip(axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds)));
-  return this;
-};
-
-
-/**
- * For case of 3D line.
- * @return {anychart.core.axisMarkers.PathBase} - Itself for method chaining.
- */
-anychart.core.axisMarkers.PathBase.prototype.drawLine3D = function() {
-  var ratio = goog.math.clamp(this.scale().transform(this.value(), 0.5), 0, 1);
-  if (isNaN(ratio)) return this;
-
-  var shift = this.markerElement().strokeThickness() % 2 == 0 ? 0 : -.5;
-  var bounds = this.parentBounds();
-  var axesLinesSpace = this.axesLinesSpace();
-  this.markerElement().clear();
-
-  var x3dShift = this.getChart().x3dShift;
-  var y3dShift = this.getChart().y3dShift;
-
-  if (this.layout() == anychart.enums.Layout.HORIZONTAL) {
-    var y = Math.round(bounds.getTop() + bounds.height - ratio * bounds.height);
-    ratio == 1 ? y -= shift : y += shift;
-    this.markerElement()
-        .moveTo(bounds.getLeft(), y)
-        .lineTo(bounds.getRight() + x3dShift, y);
-
-  } else if (this.layout() == anychart.enums.Layout.VERTICAL) {
-    var x = Math.round(bounds.getLeft() + ratio * bounds.width);
-    ratio == 1 ? x += shift : x -= shift;
-    this.markerElement()
-        .moveTo(x, bounds.getTop() - y3dShift)
-        .lineTo(x, bounds.getBottom());
-  }
-
-  bounds.top -= y3dShift;
-  bounds.height += y3dShift;
-  bounds.width += x3dShift;
-
-  this.markerElement().clip(axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds)));
   return this;
 };
 

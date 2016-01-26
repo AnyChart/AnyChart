@@ -225,8 +225,10 @@ anychart.charts.Map = function() {
         'overflow': 'hidden',
         'padding': '0',
         'position': 'absolute',
-        'left': bounds.left + containerPosition.x,
-        'top': bounds.top + containerPosition.y,
+        //'left': bounds.left + containerPosition.x,
+        //'top': bounds.top + containerPosition.y,
+        'left': 0,
+        'top': 0,
         'width': '1px'
       });
       goog.dom.appendChild(container, this.mapTextarea);
@@ -360,7 +362,10 @@ anychart.charts.Map = function() {
             e.clientY <= bounds.top + containerPosition.y + bounds.height;
 
         if (insideBounds) {
+          var scrollX = window.scrollX;
+          var scrollY = window.scrollY;
           this.mapTextarea.focus();
+          window.scrollTo(scrollX, scrollY);
         }
       }, false, this);
 

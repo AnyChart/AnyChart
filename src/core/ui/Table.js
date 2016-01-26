@@ -1381,7 +1381,10 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
       if (!isNaN(cell.overlapper) && (content = cell.realContent)) {
         content.suspendSignalsDispatching();
         content.unlistenSignals(this.handleContentInvalidation_);
-        if (content instanceof anychart.core.Chart) {
+        if (content instanceof anychart.core.ui.LabelsFactory.Label ||
+            content instanceof anychart.core.ui.MarkersFactory.Marker) {
+          content.enabled(false);
+        } else if (content instanceof anychart.core.Chart) {
           chart = /** @type {anychart.core.Chart} */(content);
           chart.autoRedraw(chart.originalAutoRedraw);
         }

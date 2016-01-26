@@ -2145,9 +2145,8 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
           for (j = firstIndex; j <= lastIndex; j++) {
             stack.push({
               positive: 0,
-              positiveMissing: false,
               negative: 0,
-              negativeMissing: false
+              missing: false
             });
           }
         }

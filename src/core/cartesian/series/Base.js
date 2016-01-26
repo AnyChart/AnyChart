@@ -611,8 +611,8 @@ anychart.core.cartesian.series.Base.prototype.calcSeriesCoords = function() {
               /** @type {number} */(this.xPointPosition())), true));
 
   if (this.drawingPlan.stacked) {
-    iterator.meta('value', this.applyRatioToBounds(yScale.transform(iterator.get('stackedValue')), false));
-    iterator.meta('zero', this.applyRatioToBounds(yScale.transform(iterator.get('stackedZero')), false));
+    iterator.meta('value', this.applyRatioToBounds(yScale.transform(iterator.get('stackedValue'), 0.5), false));
+    iterator.meta('zero', this.applyRatioToBounds(yScale.transform(iterator.get('stackedZero'), 0.5), false));
     iterator.meta('zeroMissing', iterator.get('stackedMissing'));
   } else {
     if (this.needsZero) {
@@ -621,7 +621,7 @@ anychart.core.cartesian.series.Base.prototype.calcSeriesCoords = function() {
     }
     for (i = 0; i < this.yValueNames.length; i++) {
       var name = this.yValueNames[i];
-      iterator.meta(name, this.applyRatioToBounds(yScale.transform(iterator.get(name)), false));
+      iterator.meta(name, this.applyRatioToBounds(yScale.transform(iterator.get(name), 0.5), false));
     }
   }
   return true;

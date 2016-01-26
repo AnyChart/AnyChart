@@ -82,7 +82,7 @@ anychart.core.cartesian.series.StepArea.prototype.drawSubsequentPoint = function
     this.prevY_ = y;
 
     if (this.drawingPlan.stacked) {
-      this.zeroesStack = [x, zero, this.iterator.meta('zeroMissing')];
+      this.zeroesStack.push(x, zero, this.iterator.meta('zeroMissing'));
     } else {
       this.lastDrawnX = x;
     }

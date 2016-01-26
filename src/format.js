@@ -1,5 +1,6 @@
 goog.provide('anychart.format');
 goog.require('anychart.math');
+goog.require('anychart.utils');
 goog.require('goog.i18n.DateTimeFormat');
 goog.require('goog.i18n.DateTimeParse');
 goog.require('goog.i18n.TimeZone');
@@ -79,7 +80,9 @@ anychart.format.SCALED_NUMERIC_RE_ = /^([-]?\d+\.?\d*)(.*?)?$/;
  * Locales map.
  * @type {Object.<string, anychart.format.Locale>}
  */
-anychart.format.locales = {
+goog.global['anychart'] = goog.global['anychart'] || {};
+goog.global['anychart']['format'] = goog.global['anychart']['format'] || {};
+goog.global['anychart']['format']['locales'] = {
   'default': {
     'dateTimeLocale': {
       'eras': ['BC', 'AD'],
@@ -129,36 +132,110 @@ anychart.format.locales = {
 /**
  * Input format setting to be used.
  * @type {string|anychart.format.Locale}
+ * @private
  */
-anychart.format.inputLocale = 'default';
+anychart.format.inputLocale_ = 'default';
 
 
 /**
  * Input date time format.
  * @type {string}
+ * @private
  */
-anychart.format.inputDateTimeFormat = 'yyyy.MM.dd';
+anychart.format.inputDateTimeFormat_ = 'yyyy.MM.dd';
 
 
 /**
  * Output format setting to be used.
  * @type {string|anychart.format.Locale}
+ * @private
  */
-anychart.format.outputLocale = 'default';
+anychart.format.outputLocale_ = 'default';
 
 
 /**
  * Output date time format.
  * @type {string}
+ * @private
  */
-anychart.format.outputDateTimeFormat = 'yyyy.MM.dd';
+anychart.format.outputDateTimeFormat_ = 'yyyy.MM.dd';
 
 
 /**
  * Actually is output offset in minutes.
  * @type {number}
+ * @private
  */
-anychart.format.outputTimestamp = 0;
+anychart.format.outputTimezone_ = 0;
+
+
+/**
+ * Input format setting to be used.
+ * @param {(string|anychart.format.Locale)=} opt_value
+ * @return {string|anychart.format.Locale}
+ */
+anychart.format.inputLocale = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (goog.isString(opt_value) || goog.isObject(opt_value)) {
+      anychart.format.inputLocale_ = opt_value;
+    }
+  }
+  return anychart.format.inputLocale_;
+};
+
+
+/**
+ * Input date time format.
+ * @param {string=} opt_value
+ * @return {string}
+ */
+anychart.format.inputDateTimeFormat = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    anychart.format.inputDateTimeFormat_ = String(opt_value);
+  }
+  return anychart.format.inputDateTimeFormat_;
+};
+
+
+/**
+ * Output format setting to be used.
+ * @param {(string|anychart.format.Locale)=} opt_value
+ * @return {string|anychart.format.Locale}
+ */
+anychart.format.outputLocale = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (goog.isString(opt_value) || goog.isObject(opt_value)) {
+      anychart.format.outputLocale_ = opt_value;
+    }
+  }
+  return anychart.format.outputLocale_;
+};
+
+
+/**
+ * Output date time format.
+ * @param {string=} opt_value
+ * @return {string}
+ */
+anychart.format.outputDateTimeFormat = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    anychart.format.outputDateTimeFormat_ = String(opt_value);
+  }
+  return anychart.format.outputDateTimeFormat_;
+};
+
+
+/**
+ * Actually is output offset in minutes.
+ * @param {number=} opt_value
+ * @return {number}
+ */
+anychart.format.outputTimezone = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    anychart.format.outputTimezone_ = anychart.utils.toNumber(opt_value) || 0;
+  }
+  return anychart.format.outputTimezone_;
+};
 
 
 /**
@@ -168,7 +245,7 @@ anychart.format.outputTimestamp = 0;
  * @return {!Object} - Date time symbols.
  */
 anychart.format.localeToDateTimeSymbols_ = function(opt_locale) {
-  var def = anychart.format.locales['default']['dateTimeLocale'];
+  var def = goog.global['anychart']['format']['locales']['default']['dateTimeLocale'];
   opt_locale = opt_locale || def;
   return {
     ERAS: opt_locale['eras'] || def['eras'],
@@ -200,38 +277,17 @@ anychart.format.localeToDateTimeSymbols_ = function(opt_locale) {
 
 /**
  * Gets locale object.
- * @param {*=} opt_locale - Locale settings or name of preset.
- * @param {boolean=} opt_isNumberLocale - Whether number locale must be used. If false: date time locale will be used.
- * @param {boolean=} opt_isOutputLocale - Whether output must be used. If false: input locale will be used.
+ * @param {*} locale - Locale settings or name of preset.
  * @private
  * @return {?Object} - Locale object or null if something's wrong.
  */
-anychart.format.getLocaleObject_ = function(opt_locale, opt_isNumberLocale, opt_isOutputLocale) {
-  var f = goog.global['anychart']['format'];
-  if (goog.isString(opt_locale)) {
-    var loc = f['locales'][opt_locale] || f['locales']['default'];
-    if (opt_isNumberLocale) {
-      return (loc && loc['numberLocale']) ? loc['numberLocale'] : null;
-    } else {
-      return (loc && loc['dateTimeLocale']) ? loc['dateTimeLocale'] : null;
-    }
-  } else if (goog.isObject(opt_locale)) {
-    return opt_locale;
-  } else {
-    var inOut = opt_isOutputLocale ?
-        f['outputLocale'] :
-        f['inputLocale'];
-
-    if (inOut && goog.isString(inOut)) { //Not empty string.
-      inOut = f['locales'][inOut] || f['locales']['default'];
-    }
-
-    if (opt_isNumberLocale) {
-      return (inOut && inOut['numberLocale']) ? inOut['numberLocale'] : null;
-    } else {
-      return (inOut && inOut['dateTimeLocale']) ? inOut['dateTimeLocale'] : null;
-    }
+anychart.format.normalizeNumberLocale_ = function(locale) {
+  var locales = goog.global['anychart']['format']['locales'];
+  if (goog.isString(locale)) {
+    var loc = locales[locale] || locales['default'];
+    locale = (loc && loc['numberLocale']) ? loc['numberLocale'] : null;
   }
+  return goog.isObject(locale) ? locale : null;
 };
 
 
@@ -280,30 +336,30 @@ anychart.format.UTCTimeZoneCache_ = {};
  * @return {string}
  */
 anychart.format.dateTime = function(date, opt_format, opt_timeZone, opt_locale) {
-  var f = goog.global['anychart']['format'];
-  var locale = opt_locale || f['outputLocale'];
+  var locale = opt_locale || anychart.format.outputLocale_;
 
   if (goog.isString(locale)) {
     //Here locale MUST become an object.
-    locale = f['locales'][locale] || f['locales']['default'];
+    var locales = goog.global['anychart']['format']['locales'];
+    locale = locales[locale] || locales['default'];
+    locale = locale && locale['dateTimeLocale'];
   }
 
   var localeHash = goog.getUid(locale);
-  var symbols = anychart.format.localeToDateTimeSymbols_(locale['dateTimeLocale']);
 
-  opt_timeZone = opt_timeZone || f['outputTimestamp'];
   /** @type {goog.i18n.DateTimeFormat} */
   var formatter;
-  var pattern = opt_format || f['outputDateTimeFormat'];
-
+  var pattern = opt_format || anychart.format.outputDateTimeFormat_;
   var formatterCacheKey = pattern + localeHash;
-
-  if (formatterCacheKey in anychart.format.formatDateTimeCache_)
+  if (formatterCacheKey in anychart.format.formatDateTimeCache_) {
     formatter = anychart.format.formatDateTimeCache_[formatterCacheKey];
-  else
+  } else {
+    var symbols = anychart.format.localeToDateTimeSymbols_(locale);
     formatter = anychart.format.formatDateTimeCache_[formatterCacheKey] = new goog.i18n.DateTimeFormat(pattern, symbols);
+  }
 
   var timeZone;
+  opt_timeZone = opt_timeZone || anychart.format.outputTimezone_;
   if (opt_timeZone in anychart.format.UTCTimeZoneCache_)
     timeZone = anychart.format.UTCTimeZoneCache_[opt_timeZone];
   else
@@ -328,7 +384,7 @@ anychart.format.dateTime = function(date, opt_format, opt_timeZone, opt_locale) 
  * @return {?Date} - Parsed date or null if got wrong input value.
  */
 anychart.format.parseDateTime = function(value, opt_format, opt_dateHolder, opt_locale) {
-  var f = goog.global['anychart']['format'];
+  var locales = goog.global['anychart']['format']['locales'];
   if (goog.isDateLike(value)) {
     return /** @type {Date} */ (value);
   } else if (goog.isNumber(value)) {
@@ -341,26 +397,28 @@ anychart.format.parseDateTime = function(value, opt_format, opt_dateHolder, opt_
   } else if (goog.isString(value)) {
     var numValue = +value;
     if (isNaN(numValue)) {
-      var locale = opt_locale || f['inputLocale'];
+      var locale = opt_locale || anychart.format.inputLocale_;
 
       if (goog.isString(locale)) {
         //Here locale MUST become an object.
-        locale = f['locales'][locale] || f['locales']['default'];
+        locale = locales[locale] || locales['default'];
+        locale = locale && locale['dateTimeLocale'];
       }
 
       var localeHash = goog.getUid(locale);
-      var symbols = anychart.format.localeToDateTimeSymbols_(locale);
 
       /** @type {goog.i18n.DateTimeParse} */
       var parser;
-      var pattern = opt_format || f['inputDateTimeFormat'];
+      var pattern = opt_format || anychart.format.inputDateTimeFormat_;
 
       var parserCacheKey = pattern + localeHash;
 
-      if (parserCacheKey in anychart.format.formatDateTimeCache_)
+      if (parserCacheKey in anychart.format.formatDateTimeCache_) {
         parser = anychart.format.parseDateTimeCache_[parserCacheKey];
-      else
+      } else {
+        var symbols = anychart.format.localeToDateTimeSymbols_(locale);
         parser = anychart.format.parseDateTimeCache_[parserCacheKey] = new goog.i18n.DateTimeParse(pattern, symbols);
+      }
 
       /** @type {Date} */
       var date;
@@ -417,8 +475,8 @@ anychart.format.DEFAULT_SCALE_ = {
  */
 anychart.format.number = function(number, opt_decimalsCountOrLocale, opt_decimalPoint, opt_groupsSeparator,
     opt_scale, opt_zeroFillDecimals, opt_scaleSuffixSeparator, opt_useBracketsForNegative) {
-  var obj = anychart.format.getLocaleObject_(opt_decimalsCountOrLocale, true, true);
-  var locale = anychart.format.getLocaleObject_(void 0, true, true); //Guaranteed default number output locale.
+  var obj = anychart.format.normalizeNumberLocale_(opt_decimalsCountOrLocale);
+  var locale = anychart.format.normalizeNumberLocale_(anychart.format.outputLocale_); //Guaranteed default number output locale.
 
   var decimalsCount = goog.isNumber(opt_decimalsCountOrLocale) ?
       opt_decimalsCountOrLocale :
@@ -429,7 +487,7 @@ anychart.format.number = function(number, opt_decimalsCountOrLocale, opt_decimal
       opt_decimalPoint :
       (obj && goog.isString(obj['decimalPoint'])) ?
           obj['decimalPoint'] :
-          locale['decimalsPoint'];
+          locale['decimalPoint'];
   var groupsSeparator = goog.isString(opt_groupsSeparator) ?
       opt_groupsSeparator :
       (obj && goog.isString(obj['groupsSeparator'])) ?
@@ -481,7 +539,7 @@ anychart.format.number = function(number, opt_decimalsCountOrLocale, opt_decimal
     } else {
       factor = 1;
     }
-    number = number / factor;
+    number /= factor;
   }
 
   var stringNumber = zeroFillDecimals ?
@@ -528,8 +586,8 @@ anychart.format.number = function(number, opt_decimalsCountOrLocale, opt_decimal
  * @return {number} - Parsed value. NaN if value could not be parsed.
  */
 anychart.format.parseNumber = function(value, opt_locale) {
-  var locale = anychart.format.getLocaleObject_(opt_locale, true);
-  var defLoc = anychart.format.getLocaleObject_(void 0, true); //Guaranteed default locale.
+  var locale = anychart.format.normalizeNumberLocale_(opt_locale);
+  var defLoc = anychart.format.normalizeNumberLocale_(anychart.format.inputLocale_); //Guaranteed default locale.
 
   var decimalsCount = (locale && goog.isNumber(locale['decimalsCount'])) ?
       locale['decimalsCount'] :
@@ -594,7 +652,6 @@ anychart.format.parseNumber = function(value, opt_locale) {
 
 
 //exports
-goog.exportSymbol('anychart.format.locales', anychart.format.locales);
 goog.exportSymbol('anychart.format.subs', anychart.format.subs);
 goog.exportSymbol('anychart.format.dateTime', anychart.format.dateTime);
 goog.exportSymbol('anychart.format.parseDateTime', anychart.format.parseDateTime);
@@ -604,4 +661,4 @@ goog.exportSymbol('anychart.format.inputLocale', anychart.format.inputLocale);
 goog.exportSymbol('anychart.format.outputLocale', anychart.format.outputLocale);
 goog.exportSymbol('anychart.format.inputDateTimeFormat', anychart.format.inputDateTimeFormat);
 goog.exportSymbol('anychart.format.outputDateTimeFormat', anychart.format.outputDateTimeFormat);
-goog.exportSymbol('anychart.format.outputTimestamp', anychart.format.outputTimestamp);
+goog.exportSymbol('anychart.format.outputTimezone', anychart.format.outputTimezone);

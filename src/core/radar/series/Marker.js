@@ -285,7 +285,7 @@ anychart.core.radar.series.Marker.prototype.createHatchFill_ = function(value) {
   if (!this.hatchFillElement_ && value) {
     this.hatchFillElement_ = new anychart.core.ui.MarkersFactory();
     this.hatchFillElement_.container(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
-    this.hatchFillElement_.zIndex(anychart.core.cartesian.series.Base.ZINDEX_HATCH_FILL);
+    this.hatchFillElement_.zIndex(anychart.core.radar.series.Base.ZINDEX_HATCH_FILL);
     this.hatchFillElement_.disablePointerEvents(true);
   }
 };

@@ -293,9 +293,8 @@ anychart.core.gantt.Controller.prototype.datesToMeta_ = function(item) {
     var field = dateFields[i];
 
     var actValue = item.get(field);
-    var existingMeta = item.meta(field);
 
-    if (goog.isDef(actValue) && !goog.isDefAndNotNull(existingMeta)) {
+    if (goog.isDef(actValue)) {
       var parsedDate = anychart.format.parseDateTime(actValue);
       var parsedVal = goog.isNull(parsedDate) ? null : +parsedDate;
       item.meta(field, parsedVal);
@@ -932,6 +931,10 @@ anychart.core.gantt.Controller.prototype.run = function() {
     if (this.hasInvalidationState(anychart.ConsistencyState.CONTROLLER_DATA)) {
       this.linearizeData_();
       this.markConsistent(anychart.ConsistencyState.CONTROLLER_DATA);
+
+      if (this.timeline_)
+        this.timeline_.initScale();
+
       this.invalidate(anychart.ConsistencyState.CONTROLLER_VISIBILITY);
     }
 

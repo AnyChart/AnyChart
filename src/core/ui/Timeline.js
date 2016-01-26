@@ -1944,7 +1944,7 @@ anychart.core.ui.Timeline.prototype.editPreviewEnd_ = function(e) {
 
     tree.resumeSignalsDispatching(true);
 
-    this.initScale_();
+    this.initScale();
 
     this.dragging = false;
     clearInterval(this.scrollInterval);
@@ -2217,7 +2217,7 @@ anychart.core.ui.Timeline.prototype.editThumbDragEnd_ = function(e) {
     }
 
     tree.resumeSignalsDispatching(true);
-    this.initScale_();
+    this.initScale();
 
     this.currentThumbDragger_ = null;
     this.dragging = false;
@@ -3890,9 +3890,8 @@ anychart.core.ui.Timeline.prototype.drawLowTicks_ = function(ticks) {
 
 /**
  * Recalculates scale depending on current controller's state.
- * @private
  */
-anychart.core.ui.Timeline.prototype.initScale_ = function() {
+anychart.core.ui.Timeline.prototype.initScale = function() {
   var totalMin = this.controller.getMinDate();
   var totalMax = this.controller.getMaxDate();
 
@@ -3939,7 +3938,7 @@ anychart.core.ui.Timeline.prototype.initDom = function() {
   this.markers().container(this.getContentLayer());
   this.labels().container(this.getContentLayer());
   this.header_.container(this.getBase());
-  this.initScale_();
+  this.initScale();
 };
 
 
