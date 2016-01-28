@@ -92,7 +92,7 @@ anychart.core.stock.series.Line.prototype.colorizePoints = function() {
 
 /** @inheritDoc */
 anychart.core.stock.series.Line.prototype.getLegendIconFill = function(context) {
-  return anychart.color.lighten(this.stroke_);
+  return this.stroke_;
 };
 
 
