@@ -306,6 +306,55 @@ anychart.core.gantt.Controller.prototype.datesToMeta_ = function(item) {
 
 
 /**
+ * Writes item's periods to meta as timestamp.
+ * @param {anychart.data.Tree.DataItem} item - Tree data item.
+ * @private
+ */
+anychart.core.gantt.Controller.prototype.periodsToMeta_ = function(item) {
+  var periods = item.get(anychart.enums.GanttDataFields.PERIODS);
+
+  if (this.isResources_ && goog.isArray(periods)) {
+    var minPeriodDate = NaN;
+    var maxPeriodDate = NaN;
+
+    for (var i = 0, l = periods.length; i < l; i++) {
+      var period = periods[i];
+      var periodStart = item.getMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.START);
+      var periodStartVal = anychart.format.parseDateTime(period[anychart.enums.GanttDataFields.START]);
+      if (!goog.isNull(periodStartVal)) {
+        periodStartVal = +periodStartVal;
+        item.setMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.START, periodStartVal);
+        periodStart = periodStartVal;
+      }
+
+      var periodEnd = item.getMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.END);
+      var periodEndVal = anychart.format.parseDateTime(period[anychart.enums.GanttDataFields.END]);
+      if (!goog.isNull(periodEndVal)) {
+        periodEndVal = +periodEndVal;
+        item.setMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.END, +periodEndVal);
+        periodEnd = periodEndVal;
+      }
+
+      if (!isNaN(periodStart) && !isNaN(periodEnd)) {
+        minPeriodDate = isNaN(minPeriodDate) ? Math.min(periodStart, periodEnd) : Math.min(minPeriodDate, periodStart, periodEnd);
+        maxPeriodDate = isNaN(maxPeriodDate) ? Math.max(periodStart, periodEnd) : Math.max(maxPeriodDate, periodStart, periodEnd);
+
+        //This extends dates range.
+        this.checkDate_(periodStart);
+        this.checkDate_(periodEnd);
+      }
+    }
+
+    if (!isNaN(minPeriodDate) && !isNaN(maxPeriodDate)) {
+      item.meta('minPeriodDate', minPeriodDate);
+      item.meta('maxPeriodDate', maxPeriodDate);
+    }
+
+  }
+};
+
+
+/**
  * Item's values auto calculation.
  * @param {anychart.data.Tree.DataItem} item - Current tree data item.
  * @param {number} currentDepth - Current depth.
@@ -317,6 +366,7 @@ anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentD
       .meta('index', this.linearIndex_++);
 
   this.datesToMeta_(item);
+  this.periodsToMeta_(item);
 
   var itemMarkers = item.get(anychart.enums.GanttDataFields.MARKERS);
   for (var m = 0; itemMarkers && m < itemMarkers.length; m++) {
@@ -344,6 +394,7 @@ anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentD
           .meta('index', this.linearIndex_++);
 
       this.datesToMeta_(child);
+      this.periodsToMeta_(child);
     }
 
     if (!this.isResources_) {
@@ -456,10 +507,7 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
 
     if (this.isResources_) {
       var periods = item.get(anychart.enums.GanttDataFields.PERIODS);
-      var minPeriodDate = NaN;
-      var maxPeriodDate = NaN;
       if (goog.isArray(periods)) {
-        item.tree().suspendSignalsDispatching();
         //Working with raw array.
         for (var i = 0, l = periods.length; i < l; i++) {
           var period = periods[i];
@@ -497,44 +545,7 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
             if (period[anychart.enums.GanttDataFields.CONNECTOR]) connectorsMapItem['connSettings'] = period[anychart.enums.GanttDataFields.CONNECTOR];
             this.connectorsData_.push(connectorsMapItem);
           }
-
-          var periodStart = item.getMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.START);
-          if (!goog.isDef(periodStart)) {
-            var periodStartVal = anychart.format.parseDateTime(period[anychart.enums.GanttDataFields.START]);
-            if (!goog.isNull(periodStartVal)) {
-              periodStartVal = +periodStartVal;
-              item.setMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.START, periodStartVal);
-              periodStart = periodStartVal;
-            }
-          }
-
-          var periodEnd = item.getMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.END);
-          if (!goog.isDef(periodEnd)) {
-            var periodEndVal = anychart.format.parseDateTime(period[anychart.enums.GanttDataFields.END]);
-            if (!goog.isNull(periodEndVal)) {
-              periodEndVal = +periodEndVal;
-              item.setMeta(anychart.enums.GanttDataFields.PERIODS, i, anychart.enums.GanttDataFields.END, +periodEndVal);
-              periodEnd = periodEndVal;
-            }
-          }
-
-          if (!isNaN(periodStart) && !isNaN(periodEnd)) {
-            minPeriodDate = isNaN(minPeriodDate) ? Math.min(periodStart, periodEnd) : Math.min(minPeriodDate, periodStart, periodEnd);
-            maxPeriodDate = isNaN(maxPeriodDate) ? Math.max(periodStart, periodEnd) : Math.max(maxPeriodDate, periodStart, periodEnd);
-
-            //This extends dates range.
-            this.checkDate_(periodStart);
-            this.checkDate_(periodEnd);
-          }
-
         }
-
-        if (!isNaN(minPeriodDate) && !isNaN(maxPeriodDate)) {
-          item.meta('minPeriodDate', minPeriodDate);
-          item.meta('maxPeriodDate', maxPeriodDate);
-        }
-
-        item.tree().resumeSignalsDispatching(false);
       }
     } else {
       //Building connectors map for project chart.
