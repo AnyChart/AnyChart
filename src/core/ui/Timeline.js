@@ -4040,11 +4040,15 @@ anychart.core.ui.Timeline.prototype.positionFinal = function() {
     this.drawTimelineElements_();
     this.redrawHeader = false;
 
-    var clip = /** @type {goog.math.Rect} */ (this.getCellsLayer().clip());
+    var dataBounds = new anychart.math.Rect(this.pixelBoundsCache.left,
+        (this.pixelBoundsCache.top + /** @type {number} */ (this.headerHeight()) + 1),
+        this.pixelBoundsCache.width,
+        this.totalGridsHeight);
+
     for (var i = 0; i < this.textMarkers_.length; i++) {
       var textMarker = this.textMarkers_[i];
       textMarker.suspendSignalsDispatching();
-      textMarker.parentBounds(clip);
+      textMarker.parentBounds(dataBounds);
       textMarker.resumeSignalsDispatching(false);
       textMarker.draw();
     }

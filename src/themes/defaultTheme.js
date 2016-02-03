@@ -2975,7 +2975,8 @@ window['anychart']['themes']['defaultTheme'] = {
         },
         'defaultTextMarkerSettings': {
           'layout': 'vertical',
-          'zIndex': 2
+          'zIndex': 2,
+          'textWrap': 'byLetter'
         },
         'header': {
           'labelsFactory': {

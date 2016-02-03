@@ -4830,7 +4830,8 @@ window['anychart']['themes']['v6'] = {
             'hAlign': 'left'
           }
         },
-        'labelsFactory': {
+        'labels': {
+          'enabled': true,
           'anchor': 'leftCenter',
           'position': 'rightCenter',
           'padding': {
@@ -4851,21 +4852,25 @@ window['anychart']['themes']['v6'] = {
           'zIndex': 40,
           'disablePointerEvents': true
         },
-        'markersFactory': {
+        'markers': {
           'anchor': 'centerTop',
           'zIndex': 50,
-          'type': 'star4',
+          'type': 'star5',
           'fill': '#ff0',
-          'stroke': '#000'
+          'stroke': '2 red'
         },
         'defaultLineMarkerSettings': {
-          'layout': 'vertical'
+          'layout': 'vertical',
+          'zIndex': 1.5
         },
         'defaultRangeMarkerSettings': {
-          'layout': 'vertical'
+          'layout': 'vertical',
+          'zIndex': 1
         },
         'defaultTextMarkerSettings': {
-          'layout': 'vertical'
+          'layout': 'vertical',
+          'zIndex': 2,
+          'textWrap': 'byLetter'
         },
         'header': {
           'labelsFactory': {

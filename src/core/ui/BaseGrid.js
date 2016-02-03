@@ -222,6 +222,12 @@ anychart.core.ui.BaseGrid = function(opt_controller, opt_isResource) {
   this.totalGridsWidth = 0;
 
   /**
+   * Height of grids.
+   * @type {number}
+   */
+  this.totalGridsHeight = 0;
+
+  /**
    * Odd cells path.
    * @type {acgraph.vector.Path}
    * @private
@@ -1572,7 +1578,9 @@ anychart.core.ui.BaseGrid.prototype.drawRowFills_ = function() {
         .moveTo(this.pixelBoundsCache.left, strokePathTop)
         .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, strokePathTop);
 
-    this.gridHeightCache_.push(totalTop - header);
+    var h = totalTop - header;
+    this.gridHeightCache_.push(h);
+    this.totalGridsHeight = h;
   }
 
   var clipRect = new anychart.math.Rect(this.pixelBoundsCache.left, this.pixelBoundsCache.top - 1,
