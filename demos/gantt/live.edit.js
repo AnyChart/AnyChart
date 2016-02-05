@@ -2,7 +2,7 @@ var projChart, resChart;
 var projTree, resTree;
 
 anychart.onDocumentReady(function() {
-  //createProject();
+  createProject();
   createResources();
 });
 

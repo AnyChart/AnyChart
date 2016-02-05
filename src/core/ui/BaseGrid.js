@@ -1435,65 +1435,67 @@ anychart.core.ui.BaseGrid.prototype.dragEndHandler_ = function(e) {
 
     this.addDragMouseUp(evt);
 
-    var destinationItem = evt['item'];
-    var hoveredIndex = evt['hoveredIndex'];
-    var totalIndex = this.controller.startIndex() + hoveredIndex;
+    if (evt) {
+      var destinationItem = evt['item'];
+      var hoveredIndex = evt['hoveredIndex'];
+      var totalIndex = this.controller.startIndex() + hoveredIndex;
 
-    var visibleItems = this.controller.getVisibleItems();
+      var visibleItems = this.controller.getVisibleItems();
 
 
-    var itemHeightMouseRatio = evt['itemHeightMouseRatio'];
-    var firstItem, secondItem; //We drop item between these two.
+      var itemHeightMouseRatio = evt['itemHeightMouseRatio'];
+      var firstItem, secondItem; //We drop item between these two.
 
-    if (this.draggingItem && destinationItem && destinationItem != this.draggingItem && !anychart.core.ui.BaseGrid.isMilestone(destinationItem) && !destinationItem.isChildOf(this.draggingItem)) {
-      if (itemHeightMouseRatio < anychart.core.ui.BaseGrid.LOWER_DRAG_EDIT_RATIO || itemHeightMouseRatio > anychart.core.ui.BaseGrid.HIGHER_DRAG_EDIT_RATIO) {
-        if (itemHeightMouseRatio < anychart.core.ui.BaseGrid.LOWER_DRAG_EDIT_RATIO) {
-          firstItem = visibleItems[totalIndex - 1];
-          secondItem = destinationItem;
-        } else {
-          firstItem = destinationItem;
-          secondItem = visibleItems[totalIndex + 1];
-        }
-
-        if (firstItem && secondItem) {
-          var firstDepth = firstItem.meta('depth');
-          var secondDepth = secondItem.meta('depth');
-          var destIndex, tree;
-
-          if (firstDepth == secondDepth) {
-            var secondParent = secondItem.getParent() || secondItem.tree();
-            destIndex = secondParent.indexOfChild(secondItem);
-
-            var dragParent = this.draggingItem.getParent() || this.draggingItem.tree();
-            if (dragParent == secondParent) {
-              var dragIndex = dragParent.indexOfChild(this.draggingItem);
-              if (dragIndex < destIndex) destIndex = Math.max(0, destIndex - 1);
-            }
-
-            //if firstDepth equals secondDepth, then the firstParent is the secondParent in this case.
-            secondParent.addChildAt(this.draggingItem, destIndex);
+      if (this.draggingItem && destinationItem && destinationItem != this.draggingItem && !anychart.core.ui.BaseGrid.isMilestone(destinationItem) && !destinationItem.isChildOf(this.draggingItem)) {
+        if (itemHeightMouseRatio < anychart.core.ui.BaseGrid.LOWER_DRAG_EDIT_RATIO || itemHeightMouseRatio > anychart.core.ui.BaseGrid.HIGHER_DRAG_EDIT_RATIO) {
+          if (itemHeightMouseRatio < anychart.core.ui.BaseGrid.LOWER_DRAG_EDIT_RATIO) {
+            firstItem = visibleItems[totalIndex - 1];
+            secondItem = destinationItem;
           } else {
-            if (firstDepth < secondDepth) { //Here firstItem is parent of secondItem.
-              firstItem.addChildAt(this.draggingItem, 0); //The only case if firstItem is neighbour of secondItem.
-            } else {
-              var firstParent = firstItem.getParent() || firstItem.tree();
-              destIndex = firstParent.indexOfChild(firstItem) + 1;
-              firstParent.addChildAt(this.draggingItem, destIndex);
-            }
+            firstItem = destinationItem;
+            secondItem = visibleItems[totalIndex + 1];
           }
-        } else if (secondItem) { //First item is undefined.
-          //The only case - is when we drop between very first item and header of data grid.
-          tree = secondItem.tree();
-          tree.addChildAt(this.draggingItem, 0);
-        } else if (firstItem) { //Second item is undefined.
-          //The only case - is when we drop in the end of very last item of DG.
-          tree = firstItem.getParent() || firstItem.tree();
-          destIndex = tree.indexOfChild(firstItem) + 1;
-          tree.addChildAt(this.draggingItem, destIndex);
+
+          if (firstItem && secondItem) {
+            var firstDepth = firstItem.meta('depth');
+            var secondDepth = secondItem.meta('depth');
+            var destIndex, tree;
+
+            if (firstDepth == secondDepth) {
+              var secondParent = secondItem.getParent() || secondItem.tree();
+              destIndex = secondParent.indexOfChild(secondItem);
+
+              var dragParent = this.draggingItem.getParent() || this.draggingItem.tree();
+              if (dragParent == secondParent) {
+                var dragIndex = dragParent.indexOfChild(this.draggingItem);
+                if (dragIndex < destIndex) destIndex = Math.max(0, destIndex - 1);
+              }
+
+              //if firstDepth equals secondDepth, then the firstParent is the secondParent in this case.
+              secondParent.addChildAt(this.draggingItem, destIndex);
+            } else {
+              if (firstDepth < secondDepth) { //Here firstItem is parent of secondItem.
+                firstItem.addChildAt(this.draggingItem, 0); //The only case if firstItem is neighbour of secondItem.
+              } else {
+                var firstParent = firstItem.getParent() || firstItem.tree();
+                destIndex = firstParent.indexOfChild(firstItem) + 1;
+                firstParent.addChildAt(this.draggingItem, destIndex);
+              }
+            }
+          } else if (secondItem) { //First item is undefined.
+            //The only case - is when we drop between very first item and header of data grid.
+            tree = secondItem.tree();
+            tree.addChildAt(this.draggingItem, 0);
+          } else if (firstItem) { //Second item is undefined.
+            //The only case - is when we drop in the end of very last item of DG.
+            tree = firstItem.getParent() || firstItem.tree();
+            destIndex = tree.indexOfChild(firstItem) + 1;
+            tree.addChildAt(this.draggingItem, destIndex);
+          }
+        } else {
+          //Dropping data item inside. Setting dragged data item as child of destinationItem.
+          destinationItem.addChild(this.draggingItem);
         }
-      } else {
-        //Dropping data item inside. Setting dragged data item as child of destinationItem.
-        destinationItem.addChild(this.draggingItem);
       }
     }
 

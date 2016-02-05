@@ -31,6 +31,8 @@ anychart.onDocumentReady(function() {
 
   chart.draw();
 
+  chart.editing(true);
+
   var timeLine = chart.getTimeline();
   timeLine.textMarker(0)
       .anchor('top')

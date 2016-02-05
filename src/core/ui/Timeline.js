@@ -381,6 +381,12 @@ anychart.core.ui.Timeline = function(opt_controller, opt_isResources) {
   this.draggingProgress = false;
 
   /**
+   * Whether we are dragging the preview.
+   * @type {boolean}
+   */
+  this.draggingPreview = false;
+
+  /**
    * Whether we are dragging the thumb.
    * @type {anychart.core.ui.Timeline.ThumbDragger}
    * @private
@@ -1853,6 +1859,7 @@ anychart.core.ui.Timeline.prototype.editPreviewDragStart_ = function(e) {
 anychart.core.ui.Timeline.prototype.editPreviewDrag_ = function(e) {
   this.dragging = true;
   this.interactive = false;
+  this.draggingPreview = true;
 };
 
 
@@ -1947,6 +1954,7 @@ anychart.core.ui.Timeline.prototype.editPreviewEnd_ = function(e) {
     this.initScale();
 
     this.dragging = false;
+    this.draggingPreview = false;
     clearInterval(this.scrollInterval);
     this.scrollInterval = null;
   }
@@ -2623,30 +2631,32 @@ anychart.core.ui.Timeline.prototype.addConnector = function(startItem, targetIte
  */
 anychart.core.ui.Timeline.prototype.addMouseUp = function(evt) {
   if (this.editable && this.draggingConnector) {
-    var destinationItem = evt['item'];
-    var destinationPeriodIndex = evt['periodIndex'];
-    var originalEvent = evt['originalEvent'];
-    var domTarget = originalEvent['domTarget'];
-    if (domTarget instanceof anychart.core.ui.BaseGrid.Element && domTarget.type != anychart.enums.TLElementTypes.BASELINE) {
-      var left = originalEvent.clientX - goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x;
-      var elBounds = domTarget.currBounds;
-      var dropRatio = (left - elBounds.left) / elBounds.width;
+    if (evt) {
+      var destinationItem = evt['item'];
+      var destinationPeriodIndex = evt['periodIndex'];
+      var originalEvent = evt['originalEvent'];
+      var domTarget = originalEvent['domTarget'];
+      if (domTarget instanceof anychart.core.ui.BaseGrid.Element && domTarget.type != anychart.enums.TLElementTypes.BASELINE) {
+        var left = originalEvent.clientX - goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x;
+        var elBounds = domTarget.currBounds;
+        var dropRatio = (left - elBounds.left) / elBounds.width;
 
-      var circle = this.currentConnectorDragger_.isStart ? this.editStartConnectorPath_ : this.editFinishConnectorPath_;
+        var circle = this.currentConnectorDragger_.isStart ? this.editStartConnectorPath_ : this.editFinishConnectorPath_;
 
-      var startItem = circle.item;
-      var startPeriodIndex = circle.periodIndex;
+        var startItem = circle.item;
+        var startPeriodIndex = circle.periodIndex;
 
-      var startStart = this.currentConnectorDragger_.isStart;
-      var dropStart = dropRatio < .5;
-      var connType;
-      if (startStart) {
-        connType = dropStart ? anychart.enums.ConnectorType.START_START : anychart.enums.ConnectorType.START_FINISH;
-      } else {
-        connType = dropStart ? anychart.enums.ConnectorType.FINISH_START : anychart.enums.ConnectorType.FINISH_FINISH;
+        var startStart = this.currentConnectorDragger_.isStart;
+        var dropStart = dropRatio < .5;
+        var connType;
+        if (startStart) {
+          connType = dropStart ? anychart.enums.ConnectorType.START_START : anychart.enums.ConnectorType.START_FINISH;
+        } else {
+          connType = dropStart ? anychart.enums.ConnectorType.FINISH_START : anychart.enums.ConnectorType.FINISH_FINISH;
+        }
+
+        this.addConnector(startItem, destinationItem, connType, startPeriodIndex, destinationPeriodIndex);
       }
-
-      this.addConnector(startItem, destinationItem, connType, startPeriodIndex, destinationPeriodIndex);
     }
     this.draggingConnector = false;
   }
@@ -2663,7 +2673,7 @@ anychart.core.ui.Timeline.prototype.mouseOutMove = function(e) {
     if (this.scrollOffsetX)
       scrollX = this.scrollOffsetX > 0 ? anychart.core.ui.BaseGrid.SCROLL_STEP : -anychart.core.ui.BaseGrid.SCROLL_STEP;
 
-    if (this.draggingConnector && this.scrollOffsetY) {
+    if ((this.draggingConnector || this.draggingItem) && this.scrollOffsetY) {
       scrollY = this.scrollOffsetY > 0 ? anychart.core.ui.BaseGrid.SCROLL_STEP : -anychart.core.ui.BaseGrid.SCROLL_STEP;
     }
 
@@ -4169,15 +4179,18 @@ anychart.core.ui.Timeline.prototype.scroll = function(horizontalPixelOffset, ver
     this.clearEdit_();
   }
 
+  var startIndex = this.controller.startIndex();
   var heightCache = this.controller.getHeightCache();
-  var totalVerticalStartOffset = this.controller.startIndex() ? heightCache[this.controller.startIndex() - 1] : 0;
-  totalVerticalStartOffset += (this.controller.verticalOffset() + verticalPixelOffset);
+  var verticalOffset = this.controller.verticalOffset();
+
+  var totalVerticalStartOffset = startIndex ? heightCache[startIndex - 1] : 0;
+  totalVerticalStartOffset += (verticalOffset + verticalPixelOffset);
   this.controller.scrollTo(/** @type {number} */ (totalVerticalStartOffset));
 
   var ratio = horizontalPixelOffset / this.pixelBoundsCache.width;
-  if (opt_dragScrolling && !this.draggingConnector) {
+  if (opt_dragScrolling && !this.draggingConnector && (this.currentThumbDragger_ || this.draggingPreview)) {
     this.scale_.ratioForceScroll(ratio);
-  } else {
+  } else if (this.draggingConnector || (this.dragging && this.draggingItem) || (!this.dragging)) {
     this.scale_.ratioScroll(ratio);
   }
 
