@@ -302,8 +302,7 @@ def __get_default_compiler_args():
 def __compile_project_each():
     global arguments
     arguments['sources'] = False
-    # modules = __get_modules_list()
-    modules = ['anychart', 'anychart_bundle', 'anygantt', 'anymap', 'anystock']
+    modules = __get_modules_list()
     for module in modules:
         arguments['modules'] = [str(module)]
         __compile_project()
