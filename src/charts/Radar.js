@@ -1535,10 +1535,7 @@ anychart.charts.Radar.prototype.createLegendItemsProvider = function(sourceMode,
 };
 
 
-/**
- * Getter for data bounds of the plot.
- * @return {anychart.math.Rect}
- */
+/** @inheritDoc */
 anychart.charts.Radar.prototype.getPlotBounds = function() {
   return this.dataBounds_;
 };

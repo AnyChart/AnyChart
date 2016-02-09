@@ -1484,10 +1484,7 @@ anychart.charts.Map.prototype.geoData = function(opt_data) {
 };
 
 
-/**
- * Getter for data bounds of the chart.
- * @return {anychart.math.Rect}
- */
+/** @inheritDoc */
 anychart.charts.Map.prototype.getPlotBounds = function() {
   return this.dataBounds_;
 };
@@ -1534,9 +1531,9 @@ anychart.charts.Map.prototype.processGeoData = function() {
         var tx_ = {};
 
         if (goog.isDef(value['crs'])) tx_.crs = value['crs'];
-        if (goog.isDef(value['scale'])) tx_.scale = value['scale'];
-        if (goog.isDef(value['xoffset'])) tx_.xoffset = value['xoffset'];
-        if (goog.isDef(value['yoffset'])) tx_.yoffset = value['yoffset'];
+        if (goog.isDef(value['scale'])) tx_.scale = parseFloat(value['scale']);
+        if (goog.isDef(value['xoffset'])) tx_.xoffset = parseFloat(value['xoffset']);
+        if (goog.isDef(value['yoffset'])) tx_.yoffset = parseFloat(value['yoffset']);
         if (goog.isDef(value['heatZone'])) tx_.heatZone = anychart.math.Rect.fromJSON(value['heatZone']);
 
         this.mapTX[key] = tx_;
@@ -2931,6 +2928,32 @@ anychart.charts.Map.prototype.move = function(dx, dy) {
 
 
 /**
+ * Transform coords in lat/lon to pixel values relative map data bounds.
+ * Use map.localToGlobal(x, y) for convert returned coordinates to global coords (relative document)
+ * @param {number} xLong Longitude in degrees.
+ * @param {number} yLat Latitude in degrees.
+ * @return {Object.<string, number>} Transformed value adjust local map data bounds.
+ */
+anychart.charts.Map.prototype.transform = function(xLong, yLat) {
+  var pixCoords = this.scale().transform(xLong, yLat);
+  return {'x': pixCoords[0], 'y': pixCoords[1]};
+};
+
+
+/**
+ * Transform coords in pixel value in coordinate system relative map data bounds to degrees values (lon/lat).
+ * Use map.globalToLocal(x, y) for convert global coordinates to coordinates relative map data bounds.
+ * @param {number} x X pixel value to transform.
+ * @param {number} y Y pixel value to transform.
+ * @return {Object.<string, number>} Object with ton/lat coordinates.
+ */
+anychart.charts.Map.prototype.inverseTransform = function(x, y) {
+  var lonLat = this.scale().inverseTransform(x, y);
+  return {'x': lonLat[0], 'long': lonLat[0], 'y': lonLat[1] , 'lat': lonLat[1]};
+};
+
+
+/**
  * Exports map to GeoJSON format.
  * @return {Object}
  */
@@ -3119,3 +3142,6 @@ anychart.charts.Map.prototype['crs'] = anychart.charts.Map.prototype.crs;
 
 anychart.charts.Map.prototype['zoom'] = anychart.charts.Map.prototype.zoom;
 anychart.charts.Map.prototype['move'] = anychart.charts.Map.prototype.move;
+
+anychart.charts.Map.prototype['transform'] = anychart.charts.Map.prototype.transform;
+anychart.charts.Map.prototype['inverseTransform'] = anychart.charts.Map.prototype.inverseTransform;

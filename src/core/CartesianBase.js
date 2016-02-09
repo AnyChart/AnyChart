@@ -3070,10 +3070,7 @@ anychart.core.CartesianBase.prototype.createLegendItemsProvider = function(sourc
 };
 
 
-/**
- * Getter for data bounds of the chart.
- * @return {anychart.math.Rect}
- */
+/** @inheritDoc */
 anychart.core.CartesianBase.prototype.getPlotBounds = function() {
   return this.dataBounds;
 };

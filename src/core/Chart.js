@@ -155,6 +155,14 @@ anychart.core.Chart.prototype.supportsBaseHighlight = true;
 anychart.core.Chart.prototype.isMode3d = false;
 
 
+/**
+ * Chart content bounds.
+ * @type {anychart.math.Rect}
+ * @protected
+ */
+anychart.core.Chart.prototype.contentBounds;
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Methods to set defaults for multiple entities.
@@ -746,10 +754,10 @@ anychart.core.Chart.prototype.draw = function() {
   //total chart area bounds, do not override, it can be useful later
   anychart.performance.start('Chart.calculateBounds()');
   var totalBounds = /** @type {!anychart.math.Rect} */(this.getPixelBounds());
-  var contentBounds = this.calculateContentAreaSpace(totalBounds);
+  this.contentBounds = this.calculateContentAreaSpace(totalBounds);
   anychart.performance.end('Chart.calculateBounds()');
   anychart.performance.start('Chart.drawContent()');
-  this.drawContent(contentBounds);
+  this.drawContent(this.contentBounds);
   anychart.performance.end('Chart.drawContent()');
 
   // used for crosshair
@@ -760,7 +768,7 @@ anychart.core.Chart.prototype.draw = function() {
       this.shadowRect_ = this.rootElement.rect();
       this.shadowRect_.fill(anychart.color.TRANSPARENT_HANDLER).stroke(null);
     }
-    this.shadowRect_.setBounds(contentBounds);
+    this.shadowRect_.setBounds(this.contentBounds);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LABELS | anychart.ConsistencyState.BOUNDS)) {
@@ -860,6 +868,59 @@ anychart.core.Chart.prototype.resizeHandler = function(evt) {
     this.invalidate(anychart.ConsistencyState.ALL & ~anychart.ConsistencyState.CHART_ANIMATION,
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   }
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Bounds/coordinates.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter for plot bounds of the chart.
+ * @return {anychart.math.Rect}
+ */
+anychart.core.Chart.prototype.getPlotBounds = function() {
+  return this.contentBounds;
+};
+
+
+/**
+ * Convert coordinates relative local container (plot or data) to global coordinates relative global document.
+ * @param {number} xCoord .
+ * @param {number} yCoord .
+ * @return {Object.<string, number>} .
+ */
+anychart.core.Chart.prototype.localToGlobal = function(xCoord, yCoord) {
+  var containerPosition, bounds;
+  if (this.container() && this.container().getStage() && this.container().getStage().container()) {
+    containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+    bounds = this.getPlotBounds();
+  }
+
+  return bounds ?
+      {'x': xCoord + bounds.left + containerPosition.x, 'y': yCoord + bounds.top + containerPosition.y} :
+      {'x': xCoord + containerPosition.x, 'y': yCoord + containerPosition.y};
+
+};
+
+
+/**
+ * Convert global coordinates relative global document to coordinates relative local container (plot or data).
+ * @param {number} xCoord .
+ * @param {number} yCoord .
+ * @return {Object.<string, number>} .
+ */
+anychart.core.Chart.prototype.globalToLocal = function(xCoord, yCoord) {
+  var containerPosition, bounds;
+  if (this.container() && this.container().getStage() && this.container().getStage().container()) {
+    containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+    bounds = this.getPlotBounds();
+  }
+
+  return bounds ?
+      {'x': xCoord - (bounds.left + containerPosition.x), 'y': yCoord - (bounds.top + containerPosition.y)} :
+      {'x': xCoord, 'y': yCoord};
 };
 
 
@@ -1811,3 +1872,5 @@ anychart.core.Chart.prototype['saveAsJpg'] = anychart.core.Chart.prototype.saveA
 anychart.core.Chart.prototype['saveAsPdf'] = anychart.core.Chart.prototype.saveAsPdf;//inherited
 anychart.core.Chart.prototype['saveAsSvg'] = anychart.core.Chart.prototype.saveAsSvg;//inherited
 anychart.core.Chart.prototype['toSvg'] = anychart.core.Chart.prototype.toSvg;//inherited
+anychart.core.Chart.prototype['localToGlobal'] = anychart.core.Chart.prototype.localToGlobal;
+anychart.core.Chart.prototype['globalToLocal'] = anychart.core.Chart.prototype.globalToLocal;

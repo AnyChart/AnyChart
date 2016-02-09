@@ -1244,10 +1244,7 @@ anychart.charts.Polar.prototype.legendItemCanInteractInMode = function(mode) {
 };
 
 
-/**
- * Getter for data bounds of the chart.
- * @return {anychart.math.Rect}
- */
+/** @inheritDoc */
 anychart.charts.Polar.prototype.getPlotBounds = function() {
   return this.dataBounds_;
 };
