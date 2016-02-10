@@ -2505,7 +2505,9 @@ anychart.charts.Map.prototype.translateFeature = function(id, dx, dy) {
   var bounds, latLon, current_tx, featureTx;
   if (feature) {
     bounds = feature.domElement.getBoundsWithoutTransform();
-    latLon = this.scale().inverseTransform(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+    latLon = this.scale().inverseTransform(
+        bounds.left + bounds.width / 2 - this.getPlotBounds().left,
+        bounds.top + bounds.height / 2 - this.getPlotBounds().top);
     current_tx = this.scale().pickTx(latLon[0], latLon[1]);
     featureTx = current_tx == this.mapTX['default'] ? (this.mapTX[id] = {}) : current_tx;
 
@@ -2563,7 +2565,9 @@ anychart.charts.Map.prototype.featureTranslation = function(id, opt_dx, opt_dy) 
   var bounds, latLon, current_tx, featureTx;
   if (feature) {
     bounds = feature.domElement.getBoundsWithoutTransform();
-    latLon = this.scale().inverseTransform(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+    latLon = this.scale().inverseTransform(
+        bounds.left + bounds.width / 2 - this.getPlotBounds().left,
+        bounds.top + bounds.height / 2 - this.getPlotBounds().top);
     current_tx = this.scale().pickTx(latLon[0], latLon[1]);
     featureTx = current_tx == this.mapTX['default'] ? (this.mapTX[id] = {}) : current_tx;
   }
@@ -2633,7 +2637,9 @@ anychart.charts.Map.prototype.featureScaleFactor = function(id, opt_ratio) {
   if (feature) {
     scale = this.scale();
     bounds = feature.domElement.getBounds();
-    latLon = scale.inverseTransform(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+    latLon = scale.inverseTransform(
+        bounds.left + bounds.width / 2 - this.getPlotBounds().left,
+        bounds.top + bounds.height / 2 - this.getPlotBounds().top);
     current_tx = scale.pickTx(latLon[0], latLon[1]);
     featureTx = current_tx == this.mapTX['default'] ? (this.mapTX[id] = {}) : current_tx;
   }
@@ -2714,7 +2720,9 @@ anychart.charts.Map.prototype.featureScaleFactor = function(id, opt_ratio) {
 anychart.charts.Map.prototype.featureCrs_ = function(feature, opt_crs) {
   var scale = this.scale();
   var bounds = feature.domElement.getBounds();
-  var latLon = scale.inverseTransform(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+  var latLon = scale.inverseTransform(
+      bounds.left + bounds.width / 2 - this.getPlotBounds().left,
+      bounds.top + bounds.height / 2 - this.getPlotBounds().top);
   var current_tx = scale.pickTx(latLon[0], latLon[1]);
 
   if (!goog.isDef(opt_crs)) {
