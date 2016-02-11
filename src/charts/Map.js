@@ -2961,6 +2961,35 @@ anychart.charts.Map.prototype.inverseTransform = function(x, y) {
 };
 
 
+/** @inheritDoc */
+anychart.charts.Map.prototype.localToGlobal = function(xCoord, yCoord) {
+  var containerPosition, bounds;
+  if (this.container() && this.container().getStage() && this.container().getStage().container()) {
+    containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+    bounds = this.getPlotBounds();
+  }
+
+  return bounds ?
+  {'x': xCoord + bounds.left * this.fullZoom_ + containerPosition.x, 'y': yCoord + bounds.top  * this.fullZoom_ + containerPosition.y} :
+  {'x': xCoord + containerPosition.x, 'y': yCoord + containerPosition.y};
+
+};
+
+
+/** @inheritDoc */
+anychart.charts.Map.prototype.globalToLocal = function(xCoord, yCoord) {
+  var containerPosition, bounds;
+  if (this.container() && this.container().getStage() && this.container().getStage().container()) {
+    containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+    bounds = this.getPlotBounds();
+  }
+
+  return bounds ?
+  {'x': xCoord - (bounds.left * this.fullZoom_ + containerPosition.x), 'y': yCoord - (bounds.top  * this.fullZoom_ + containerPosition.y)} :
+  {'x': xCoord, 'y': yCoord};
+};
+
+
 /**
  * Exports map to GeoJSON format.
  * @return {Object}
@@ -3153,3 +3182,6 @@ anychart.charts.Map.prototype['move'] = anychart.charts.Map.prototype.move;
 
 anychart.charts.Map.prototype['transform'] = anychart.charts.Map.prototype.transform;
 anychart.charts.Map.prototype['inverseTransform'] = anychart.charts.Map.prototype.inverseTransform;
+
+anychart.charts.Map.prototype['localToGlobal'] = anychart.charts.Map.prototype.localToGlobal//inherited;
+anychart.charts.Map.prototype['globalToLocal'] = anychart.charts.Map.prototype.globalToLocal//inherited;
