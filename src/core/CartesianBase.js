@@ -2124,14 +2124,41 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
     }
     for (uid in this.drawingPlansByYAndXScale_) {
       // calculating zoomed indexes
-      var dataLength = this.drawingPlansByXScale_[uid][0].data.length;
       var firstIndex, lastIndex;
-      if (dataLength) {
-        firstIndex = goog.math.clamp(Math.floor(this.xZoom_.getStartRatio() * dataLength - 1), 0, dataLength - 1);
-        lastIndex = goog.math.clamp(Math.ceil(this.xZoom_.getEndRatio() * dataLength + 1), 0, dataLength - 1);
+      data = this.drawingPlansByXScale_[uid][0].data;
+      var dataLength = data.length;
+      var xScale = this.xScales[uid];
+      if (xScale instanceof anychart.scales.Ordinal) {
+        if (dataLength) {
+          firstIndex = goog.math.clamp(Math.floor(this.xZoom_.getStartRatio() * dataLength - 1), 0, dataLength - 1);
+          lastIndex = goog.math.clamp(Math.ceil(this.xZoom_.getEndRatio() * dataLength + 1), 0, dataLength - 1);
+        } else {
+          firstIndex = NaN;
+          lastIndex = NaN;
+        }
       } else {
-        firstIndex = NaN;
-        lastIndex = NaN;
+        var firstVal = /** @type {number} */(xScale.inverseTransform(0));
+        var lastVal = /** @type {number} */(xScale.inverseTransform(1));
+        if (dataLength) {
+          /**
+           * Comparator function.
+           * @param {number} target
+           * @param {{x:number}} item
+           * @return {number}
+           */
+          var searcher = function(target, item) {
+            return target - item.x;
+          };
+          firstIndex = goog.array.binarySearch(data, firstVal, searcher);
+          if (firstIndex < 0) firstIndex = ~firstIndex - 1;
+          firstIndex = goog.math.clamp(firstIndex, 0, dataLength - 1);
+          lastIndex = goog.array.binarySearch(data, lastVal, searcher);
+          if (lastIndex < 0) lastIndex = ~lastIndex;
+          lastIndex = goog.math.clamp(lastIndex, 0, dataLength - 1);
+        } else {
+          firstIndex = NaN;
+          lastIndex = NaN;
+        }
       }
       drawingPlansByYScale = this.drawingPlansByYAndXScale_[uid];
       for (var yUid in drawingPlansByYScale) {
