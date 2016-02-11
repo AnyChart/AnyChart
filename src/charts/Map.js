@@ -2970,8 +2970,8 @@ anychart.charts.Map.prototype.localToGlobal = function(xCoord, yCoord) {
   }
 
   return bounds ?
-  {'x': xCoord + bounds.left * this.fullZoom_ + containerPosition.x, 'y': yCoord + bounds.top  * this.fullZoom_ + containerPosition.y} :
-  {'x': xCoord + containerPosition.x, 'y': yCoord + containerPosition.y};
+      {'x': xCoord + bounds.left * this.fullZoom_ + containerPosition.x, 'y': yCoord + bounds.top * this.fullZoom_ + containerPosition.y} :
+      {'x': xCoord + containerPosition.x, 'y': yCoord + containerPosition.y};
 
 };
 
@@ -2985,8 +2985,8 @@ anychart.charts.Map.prototype.globalToLocal = function(xCoord, yCoord) {
   }
 
   return bounds ?
-  {'x': xCoord - (bounds.left * this.fullZoom_ + containerPosition.x), 'y': yCoord - (bounds.top  * this.fullZoom_ + containerPosition.y)} :
-  {'x': xCoord, 'y': yCoord};
+      {'x': xCoord - (bounds.left * this.fullZoom_ + containerPosition.x), 'y': yCoord - (bounds.top * this.fullZoom_ + containerPosition.y)} :
+      {'x': xCoord, 'y': yCoord};
 };
 
 
@@ -3183,5 +3183,5 @@ anychart.charts.Map.prototype['move'] = anychart.charts.Map.prototype.move;
 anychart.charts.Map.prototype['transform'] = anychart.charts.Map.prototype.transform;
 anychart.charts.Map.prototype['inverseTransform'] = anychart.charts.Map.prototype.inverseTransform;
 
-anychart.charts.Map.prototype['localToGlobal'] = anychart.charts.Map.prototype.localToGlobal//inherited;
-anychart.charts.Map.prototype['globalToLocal'] = anychart.charts.Map.prototype.globalToLocal//inherited;
+anychart.charts.Map.prototype['localToGlobal'] = anychart.charts.Map.prototype.localToGlobal;
+anychart.charts.Map.prototype['globalToLocal'] = anychart.charts.Map.prototype.globalToLocal;
