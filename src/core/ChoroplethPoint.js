@@ -35,7 +35,11 @@ anychart.core.ChoroplethPoint.prototype.getFeatureBounds = function() {
   var iterator = this.series.getIterator();
   iterator.select(this.index);
   var featureElement = iterator.meta('regionShape');
-  return /** @type {anychart.math.Rect} */(featureElement.getBounds());
+  var bounds = /** @type {anychart.math.Rect} */(featureElement.getBoundsWithTransform(featureElement.getFullTransformation()));
+  bounds.left -= this.chart.getPlotBounds().left;
+  bounds.top -= this.chart.getPlotBounds().top;
+
+  return bounds;
 };
 
 

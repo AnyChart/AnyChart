@@ -34,22 +34,10 @@ $(document).ready(function() {
 
 
 
-
-
-
-
   stage = anychart.graphics.create('container');
-
   chart = anychart.map();
-
-
-
-  //chart.bounds('50%', '50%', '50%', '50%');
   chart.geoData(anychart.maps.france);
 
-  var dataSet = anychart.data.set([]);
-
-  ////
   //series.colorScale(anychart.scales.ordinalColor([
   //  {less: -100},
   //  {from: -100, to: 100},
@@ -57,34 +45,11 @@ $(document).ready(function() {
   //]));
   //chart.colorRange().enabled(true);
 
-
-
-  //series2 = chart.bubble(dataSet);
-  //series2.tooltip(false).labels().enabled(true).textFormatter(function() {return this['size']});
-
-
-
   chart.container(stage).draw();
 
-  var data = [
-  //  {"id": "AU.NT", "value": 136, "size": 185, selected: true},
-  //  {"id": "AU.WA", "value": -146, "size": 471},
-  //  {"id": "AU.CT", "value": -242, "size": 339},
-  //  {"id": "AU.NS", "value": 30, "size": 137},
-  //  {"id": "AU.SA", "value": 69, "size": 525},
-  //  {"id": "AU.VI", "value": 110, "size": 178},
-  //  {"id": "AU.QL", "value": -53, "size": 621, 'lat': -25.6, 'lon': 141.6},
-  //  {"id": "AU.TS", "value": 168, "size": 359, 'lat': -27.1, 'lon': 123.6}
-    {"value": 168, "size": 359, 'lat': 16.2489, 'lon': -61.5811}
-  ];
 
-  dataSet.data(data);
-
-
-  //chart.interactivity().selectionMode('none');
-  //chart.interactivity().hoverMode('none');
-
-
+  chart.interactivity().selectionMode('none');
+  chart.interactivity().hoverMode('none');
 
   var choroplethData = [];
   var features = chart.geoData()['features'];
@@ -103,16 +68,18 @@ $(document).ready(function() {
   var point = series.getPoint(10);
   point.middleX();
   point.middleY();
-  point.getFeatureBounds();
+  var pointBounds = point.getFeatureBounds();
 
-  chart.listen(anychart.enums.EventType.POINTS_SELECT, function(e) {
-    selectedRegions = e.seriesStatus[0].points;
-    //var iterator = this.series.getIterator().select(this.index);
+  var x = pointBounds.left + pointBounds.width * point.middleX();
+  var y = pointBounds.top + pointBounds.height * point.middleY();
 
-    console.log(selectedRegions);
-      //var prop = e.point.getFeatureProp();
-      //var featureName = prop[chart.geoIdField()];
-  });
+  var latlon = chart.inverseTransform(x, y);
+
+  var data = [
+    {"value": 168, "size": 359, 'lat': latlon.lat, 'lon': latlon.long}
+  ];
+
+  series2 = chart.bubble(data);
 
 
 
