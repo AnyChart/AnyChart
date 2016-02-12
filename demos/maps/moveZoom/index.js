@@ -85,21 +85,18 @@ $(document).ready(function() {
 
   $('#container').bind('mousemove drag', function(e) {
     var localCoords = chart.globalToLocal(e.clientX, e.clientY);
-
     var latLon = chart.inverseTransform(localCoords.x, localCoords.y);
     var pix = chart.transform(latLon.long, latLon.lat);
-
-    var clacClientCoords = chart.localToGlobal(pix.x, pix.y);
+    var calcClientCoords = chart.localToGlobal(pix.x, pix.y);
 
     $('#tooltip').css({'left': e.clientX + 15, 'top': e.clientY + 15})
         .show()
         .html(
-          'Client coords: ' + e.clientX + ' , ' + e.clientY + '<br>' +
-          'Relative data bounds_2: ' + pix.x + ' , ' + pix.y + '<br>' +
-          'Relative data bounds: ' + localCoords.x + ' , ' + localCoords.y + '<br>' +
-          //'Scaled: ' + scaled[0] + ' , ' + scaled[1] + '<br>' +
-          'Lat: ' + latLon.lat.toFixed(4) + ' , ' + 'Lon: ' + latLon.long.toFixed(4) + '<br>' +
-          'CalcClientCoords: ' + clacClientCoords.x + ' , ' + clacClientCoords.y
+          'Global: ' + e.clientX + ' , ' + e.clientY + ' (source)<br>' +
+          'Global: ' + calcClientCoords.x.toFixed(3) + ' , ' + calcClientCoords.y.toFixed(3) + ' (source -> globalToLocal -> invTrans - > trans -> localToGlobal)<br>' +
+          'Local: ' + pix.x.toFixed(3) + ' , ' + pix.y.toFixed(3) + ' (source -> globalToLocal -> invTrans - > trans)<br>' +
+          'Local: ' + localCoords.x.toFixed(3) + ' , ' + localCoords.y.toFixed(3) + ' (source -> globalToLocal)<br>' +
+          'Lat: ' + latLon.lat.toFixed(3) + ' , ' + 'Lon: ' + latLon.long.toFixed(3) + ' (source -> globalToLocal -> invTrans)<br>'
         );
   });
 

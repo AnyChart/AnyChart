@@ -2506,8 +2506,8 @@ anychart.charts.Map.prototype.translateFeature = function(id, dx, dy) {
   if (feature) {
     bounds = feature.domElement.getBoundsWithoutTransform();
     latLon = this.scale().inverseTransform(
-        bounds.left + bounds.width / 2 - this.getPlotBounds().left,
-        bounds.top + bounds.height / 2 - this.getPlotBounds().top);
+        bounds.left + bounds.width / 2,
+        bounds.top + bounds.height / 2);
     current_tx = this.scale().pickTx(latLon[0], latLon[1]);
     featureTx = current_tx == this.mapTX['default'] ? (this.mapTX[id] = {}) : current_tx;
 
@@ -2566,8 +2566,8 @@ anychart.charts.Map.prototype.featureTranslation = function(id, opt_dx, opt_dy) 
   if (feature) {
     bounds = feature.domElement.getBoundsWithoutTransform();
     latLon = this.scale().inverseTransform(
-        bounds.left + bounds.width / 2 - this.getPlotBounds().left,
-        bounds.top + bounds.height / 2 - this.getPlotBounds().top);
+        bounds.left + bounds.width / 2,
+        bounds.top + bounds.height / 2);
     current_tx = this.scale().pickTx(latLon[0], latLon[1]);
     featureTx = current_tx == this.mapTX['default'] ? (this.mapTX[id] = {}) : current_tx;
   }
@@ -2638,8 +2638,8 @@ anychart.charts.Map.prototype.featureScaleFactor = function(id, opt_ratio) {
     scale = this.scale();
     bounds = feature.domElement.getBounds();
     latLon = scale.inverseTransform(
-        bounds.left + bounds.width / 2 - this.getPlotBounds().left,
-        bounds.top + bounds.height / 2 - this.getPlotBounds().top);
+        bounds.left + bounds.width / 2,
+        bounds.top + bounds.height / 2);
     current_tx = scale.pickTx(latLon[0], latLon[1]);
     featureTx = current_tx == this.mapTX['default'] ? (this.mapTX[id] = {}) : current_tx;
   }
@@ -2721,8 +2721,8 @@ anychart.charts.Map.prototype.featureCrs_ = function(feature, opt_crs) {
   var scale = this.scale();
   var bounds = feature.domElement.getBounds();
   var latLon = scale.inverseTransform(
-      bounds.left + bounds.width / 2 - this.getPlotBounds().left,
-      bounds.top + bounds.height / 2 - this.getPlotBounds().top);
+      bounds.left + bounds.width / 2,
+      bounds.top + bounds.height / 2);
   var current_tx = scale.pickTx(latLon[0], latLon[1]);
 
   if (!goog.isDef(opt_crs)) {
@@ -2963,29 +2963,26 @@ anychart.charts.Map.prototype.inverseTransform = function(x, y) {
 
 /** @inheritDoc */
 anychart.charts.Map.prototype.localToGlobal = function(xCoord, yCoord) {
-  var containerPosition, bounds;
+  var containerPosition;
   if (this.container() && this.container().getStage() && this.container().getStage().container()) {
     containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
-    bounds = this.getPlotBounds();
   }
 
-  return bounds ?
-      {'x': xCoord + bounds.left * this.fullZoom_ + containerPosition.x, 'y': yCoord + bounds.top * this.fullZoom_ + containerPosition.y} :
-      {'x': xCoord + containerPosition.x, 'y': yCoord + containerPosition.y};
-
+  return containerPosition ?
+      {'x': xCoord + containerPosition.x, 'y': yCoord + containerPosition.y} :
+      {'x': xCoord, 'y': yCoord};
 };
 
 
 /** @inheritDoc */
 anychart.charts.Map.prototype.globalToLocal = function(xCoord, yCoord) {
-  var containerPosition, bounds;
+  var containerPosition;
   if (this.container() && this.container().getStage() && this.container().getStage().container()) {
     containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
-    bounds = this.getPlotBounds();
   }
 
-  return bounds ?
-      {'x': xCoord - (bounds.left * this.fullZoom_ + containerPosition.x), 'y': yCoord - (bounds.top * this.fullZoom_ + containerPosition.y)} :
+  return containerPosition ?
+      {'x': xCoord - containerPosition.x, 'y': yCoord - containerPosition.y} :
       {'x': xCoord, 'y': yCoord};
 };
 
