@@ -49,8 +49,6 @@ $(document).ready(function() {
 
   var dataSet = anychart.data.set([]);
 
-  //series = chart.choropleth(dataSet);
-  //series.tooltip(false).labels().enabled(true).textFormatter(function() {return this.regionProperties.name});
   ////
   //series.colorScale(anychart.scales.ordinalColor([
   //  {less: -100},
@@ -61,8 +59,8 @@ $(document).ready(function() {
 
 
 
-  series2 = chart.bubble(dataSet);
-  series2.tooltip(false).labels().enabled(true).textFormatter(function() {return this['size']});
+  //series2 = chart.bubble(dataSet);
+  //series2.tooltip(false).labels().enabled(true).textFormatter(function() {return this['size']});
 
 
 
@@ -80,24 +78,41 @@ $(document).ready(function() {
     {"value": 168, "size": 359, 'lat': 16.2489, 'lon': -61.5811}
   ];
 
-  //var data = [];
-  //var features = chart.geoData()['features'];
-  //for (var i = 0, len = features.length; i < len; i++) {
-  //  var feature = features[i];
-  //  if (feature['properties']) {
-  //    var id = feature['properties'][chart.geoIdField()];
-  //    data.push({'id': id, 'value': randomExt(-300, 300), 'size': randomExt(0, 1000)});
-  //  }
-  //}
-
   dataSet.data(data);
 
 
-  chart.interactivity().selectionMode('none');
-  chart.interactivity().hoverMode('none');
+  //chart.interactivity().selectionMode('none');
+  //chart.interactivity().hoverMode('none');
 
 
 
+  var choroplethData = [];
+  var features = chart.geoData()['features'];
+  for (var i = 0, len = features.length; i < len; i++) {
+    var feature = features[i];
+    if (feature['properties']) {
+      var id = feature['properties'][chart.geoIdField()];
+      choroplethData.push({'id': id, 'value': randomExt(-300, 300), 'size': randomExt(0, 1000)});
+    }
+  }
+
+  series = chart.choropleth(choroplethData);
+  series.tooltip(false).labels().enabled(false);
+
+
+  var point = series.getPoint(10);
+  point.middleX();
+  point.middleY();
+  point.getFeatureBounds();
+
+  chart.listen(anychart.enums.EventType.POINTS_SELECT, function(e) {
+    selectedRegions = e.seriesStatus[0].points;
+    //var iterator = this.series.getIterator().select(this.index);
+
+    console.log(selectedRegions);
+      //var prop = e.point.getFeatureProp();
+      //var featureName = prop[chart.geoIdField()];
+  });
 
 
 
@@ -107,6 +122,8 @@ $(document).ready(function() {
     var latLon = chart.inverseTransform(localCoords.x, localCoords.y);
     var pix = chart.transform(latLon.long, latLon.lat);
 
+    var clacClientCoords = chart.localToGlobal(pix.x, pix.y);
+
     $('#tooltip').css({'left': e.clientX + 15, 'top': e.clientY + 15})
         .show()
         .html(
@@ -114,7 +131,8 @@ $(document).ready(function() {
           'Relative data bounds_2: ' + pix.x + ' , ' + pix.y + '<br>' +
           'Relative data bounds: ' + localCoords.x + ' , ' + localCoords.y + '<br>' +
           //'Scaled: ' + scaled[0] + ' , ' + scaled[1] + '<br>' +
-          'Lat: ' + latLon.lat.toFixed(4) + ' , ' + 'Lon: ' + latLon.long.toFixed(4)
+          'Lat: ' + latLon.lat.toFixed(4) + ' , ' + 'Lon: ' + latLon.long.toFixed(4) + '<br>' +
+          'CalcClientCoords: ' + clacClientCoords.x + ' , ' + clacClientCoords.y
         );
   });
 
