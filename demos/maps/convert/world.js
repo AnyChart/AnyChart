@@ -21,7 +21,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "South Asia",
       "iso_a3": "AFG",
       "iso_a2": "AF",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.37,
+      "middle-y": 0.52
     }
   }, {
     "geometry": {
@@ -41,7 +43,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "AGO",
       "iso_a2": "AO",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.5,
+      "middle-y": 0.67
     }
   }, {
     "geometry": {
@@ -61,7 +65,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "ALB",
       "iso_a2": "AL",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.39,
+      "middle-y": 0.49
     }
   }, {
     "geometry": {
@@ -81,7 +87,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Middle East & North Africa",
       "iso_a3": "ARE",
       "iso_a2": "AE",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.59,
+      "middle-y": 0.65
     }
   }, {
     "geometry": {
@@ -101,7 +109,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "ARG",
       "iso_a2": "AR",
-      "continent": "South America"
+      "continent": "South America",
+      "middle-x": 0.46,
+      "middle-y": 0.27
     }
   }, {
     "geometry": {
@@ -121,7 +131,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "ARM",
       "iso_a2": "AM",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.1,
+      "middle-y": 0.12
     }
   }, {
     "geometry": {
@@ -161,7 +173,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "AUS",
       "iso_a2": "AU",
-      "continent": "Oceania"
+      "continent": "Oceania",
+      "middle-x": 0.53,
+      "middle-y": 0.39
     }
   }, {
     "geometry": {
@@ -181,7 +195,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "AUT",
       "iso_a2": "AT",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.52,
+      "middle-y": 0.62
     }
   }, {
     "geometry": {
@@ -201,7 +217,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "AZE",
       "iso_a2": "AZ",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.83,
+      "middle-y": 0.51
     }
   }, {
     "geometry": {
@@ -221,7 +239,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "BDI",
       "iso_a2": "BI",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.57,
+      "middle-y": 0.47
     }
   }, {
     "geometry": {
@@ -241,7 +261,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "BEL",
       "iso_a2": "BE",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.54,
+      "middle-y": 0.4
     }
   }, {
     "geometry": {
@@ -261,7 +283,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "BEN",
       "iso_a2": "BJ",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.57,
+      "middle-y": 0.49
     }
   }, {
     "geometry": {
@@ -281,7 +305,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "BFA",
       "iso_a2": "BF",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.45,
+      "middle-y": 0.54
     }
   }, {
     "geometry": {
@@ -301,7 +327,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "South Asia",
       "iso_a3": "BGD",
       "iso_a2": "BD",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.85,
+      "middle-y": 0.61
     }
   }, {
     "geometry": {
@@ -321,7 +349,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "BGR",
       "iso_a2": "BG",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.76,
+      "middle-y": 0.51
     }
   }, {
     "geometry": {
@@ -341,7 +371,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "BIH",
       "iso_a2": "BA",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.45,
+      "middle-y": 0.48
     }
   }, {
     "geometry": {
@@ -361,7 +393,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "BLR",
       "iso_a2": "BY",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.5,
+      "middle-y": 0.5
     }
   }, {
     "geometry": {
@@ -381,7 +415,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "BLZ",
       "iso_a2": "BZ",
-      "continent": "North America"
+      "continent": "North America",
+      "middle-x": 0.53,
+      "middle-y": 0.5
     }
   }, {
     "geometry": {
@@ -401,7 +437,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "BOL",
       "iso_a2": "BO",
-      "continent": "South America"
+      "continent": "South America",
+      "middle-x": 0.48,
+      "middle-y": 0.59
     }
   }, {
     "geometry": {
@@ -421,7 +459,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "BRA",
       "iso_a2": "BR",
-      "continent": "South America"
+      "continent": "South America",
+      "middle-x": 0.54,
+      "middle-y": 0.34
     }
   }, {
     "geometry": {"type": "Polygon", "coordinates": [[[5744, 240], [5799, 256], [5777, 207], [5744, 240]]]},
@@ -438,7 +478,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "BRN",
       "iso_a2": "BN",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.32,
+      "middle-y": 0.34
     }
   }, {
     "geometry": {
@@ -458,7 +500,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "South Asia",
       "iso_a3": "BTN",
       "iso_a2": "BT",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.48,
+      "middle-y": 0.48
     }
   }, {
     "geometry": {
@@ -478,7 +522,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "BWA",
       "iso_a2": "BW",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.49,
+      "middle-y": 0.6
     }
   }, {
     "geometry": {
@@ -498,7 +544,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "CAF",
       "iso_a2": "CF",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.47,
+      "middle-y": 0.46
     }
   }, {
     "geometry": {
@@ -518,7 +566,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "North America",
       "iso_a3": "CAN",
       "iso_a2": "CA",
-      "continent": "North America"
+      "continent": "North America",
+      "middle-x": 0.29,
+      "middle-y": 0.64
     }
   }, {
     "geometry": {
@@ -538,7 +588,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "CHE",
       "iso_a2": "CH",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.12,
+      "middle-y": 0.55
     }
   }, {
     "geometry": {
@@ -558,7 +610,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "CHL",
       "iso_a2": "CL",
-      "continent": "South America"
+      "continent": "South America",
+      "middle-x": 0.51,
+      "middle-y": 0.9
     }
   }, {
     "geometry": {
@@ -578,7 +632,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "CHN",
       "iso_a2": "CN",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.41,
+      "middle-y": 0.56
     }
   }, {
     "geometry": {
@@ -598,7 +654,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "CIV",
       "iso_a2": "CI",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.5,
+      "middle-y": 0.48
     }
   }, {
     "geometry": {
@@ -618,7 +676,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "CMR",
       "iso_a2": "CM",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.5,
+      "middle-y": 0.81
     }
   }, {
     "geometry": {
@@ -658,7 +718,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "COD",
       "iso_a2": "CD",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.58,
+      "middle-y": 0.42
     }
   }, {
     "geometry": {
@@ -678,7 +740,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "COG",
       "iso_a2": "CG",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.15,
+      "middle-y": 0.78
     }
   }, {
     "geometry": {
@@ -698,7 +762,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "COL",
       "iso_a2": "CO",
-      "continent": "South America"
+      "continent": "South America",
+      "middle-x": 0.5,
+      "middle-y": 0.54
     }
   }, {
     "geometry": {
@@ -718,7 +784,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "CRI",
       "iso_a2": "CR",
-      "continent": "North America"
+      "continent": "North America",
+      "middle-x": 0.55,
+      "middle-y": 0.31
     }
   }, {
     "geometry": {
@@ -738,7 +806,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "CUB",
       "iso_a2": "CU",
-      "continent": "North America"
+      "continent": "North America",
+      "middle-x": 0.67,
+      "middle-y": 0.64
     }
   }, {
     "geometry": {
@@ -778,7 +848,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "CYP",
       "iso_a2": "CY",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.39,
+      "middle-y": 0.51
     }
   }, {
     "geometry": {
@@ -798,7 +870,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "CZE",
       "iso_a2": "CZ",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.49,
+      "middle-y": 0.56
     }
   }, {
     "geometry": {
@@ -818,7 +892,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "DEU",
       "iso_a2": "DE",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.52,
+      "middle-y": 0.34
     }
   }, {
     "geometry": {
@@ -838,7 +914,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Middle East & North Africa",
       "iso_a3": "DJI",
       "iso_a2": "DJ",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.56,
+      "middle-y": 0.55
     }
   }, {
     "geometry": {
@@ -858,7 +936,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "DNK",
       "iso_a2": "DK",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.35,
+      "middle-y": 0.49
     }
   }, {
     "geometry": {
@@ -878,7 +958,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "DOM",
       "iso_a2": "DO",
-      "continent": "North America"
+      "continent": "North America",
+      "middle-x": 0.46,
+      "middle-y": 0.38
     }
   }, {
     "geometry": {
@@ -898,7 +980,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Middle East & North Africa",
       "iso_a3": "DZA",
       "iso_a2": "DZ",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.63,
+      "middle-y": 0.5
     }
   }, {
     "geometry": {
@@ -918,7 +1002,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "ECU",
       "iso_a2": "EC",
-      "continent": "South America"
+      "continent": "South America",
+      "middle-x": 0.16,
+      "middle-y": 0.37
     }
   }, {
     "geometry": {
@@ -938,7 +1024,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Middle East & North Africa",
       "iso_a3": "EGY",
       "iso_a2": "EG",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.5,
+      "middle-y": 0.66
     }
   }, {
     "geometry": {
@@ -958,7 +1046,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "ERI",
       "iso_a2": "ER",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.29,
+      "middle-y": 0.05
     }
   }, {
     "geometry": {
@@ -978,7 +1068,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "ESP",
       "iso_a2": "ES",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.76,
+      "middle-y": 0.27
     }
   }, {
     "geometry": {
@@ -998,7 +1090,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "EST",
       "iso_a2": "EE",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.35,
+      "middle-y": 0.41
     }
   }, {
     "geometry": {
@@ -1018,7 +1112,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "ETH",
       "iso_a2": "ET",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.45,
+      "middle-y": 0.58
     }
   }, {
     "geometry": {
@@ -1038,7 +1134,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "FIN",
       "iso_a2": "FI",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.63,
+      "middle-y": 0.54
     }
   }, {
     "geometry": {
@@ -1058,7 +1156,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "FJI",
       "iso_a2": "FJ",
-      "continent": "Oceania"
+      "continent": "Oceania",
+      "middle-x": 0.44,
+      "middle-y": 0.33
     }
   }, {
     "geometry": {
@@ -1078,7 +1178,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "FRA",
       "iso_a2": "FR",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.28,
+      "middle-y": 0.04
     }
   }, {
     "geometry": {
@@ -1098,7 +1200,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "GAB",
       "iso_a2": "GA",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.36,
+      "middle-y": 0.65
     }
   }, {
     "geometry": {
@@ -1118,7 +1222,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "GBR",
       "iso_a2": "GB",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.69,
+      "middle-y": 0.09
     }
   }, {
     "geometry": {
@@ -1138,7 +1244,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "GEO",
       "iso_a2": "GE",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.99,
+      "middle-y": 0.82
     }
   }, {
     "geometry": {
@@ -1158,7 +1266,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "GHA",
       "iso_a2": "GH",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.13,
+      "middle-y": 0.77
     }
   }, {
     "geometry": {
@@ -1178,7 +1288,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "GIN",
       "iso_a2": "GN",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.24,
+      "middle-y": 0.51
     }
   }, {
     "geometry": {
@@ -1198,7 +1310,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "GNB",
       "iso_a2": "GW",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.55,
+      "middle-y": 0.49
     }
   }, {
     "geometry": {
@@ -1218,7 +1332,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "GNQ",
       "iso_a2": "GQ",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.53,
+      "middle-y": 0.55
     }
   }, {
     "geometry": {
@@ -1238,7 +1354,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "GRC",
       "iso_a2": "GR",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.3,
+      "middle-y": 0.43
     }
   }, {
     "geometry": {
@@ -1258,7 +1376,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "GRL",
       "iso_a2": "GL",
-      "continent": "North America"
+      "continent": "North America",
+      "middle-x": 0.55,
+      "middle-y": 0.43
     }
   }, {
     "geometry": {
@@ -1278,7 +1398,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "GTM",
       "iso_a2": "GT",
-      "continent": "North America"
+      "continent": "North America",
+      "middle-x": 0.44,
+      "middle-y": 0.87
     }
   }, {
     "geometry": {
@@ -1298,7 +1420,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "GUY",
       "iso_a2": "GY",
-      "continent": "South America"
+      "continent": "South America",
+      "middle-x": 0.26,
+      "middle-y": 0.07
     }
   }, {
     "geometry": {
@@ -1318,7 +1442,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "HND",
       "iso_a2": "HN",
-      "continent": "North America"
+      "continent": "North America",
+      "middle-x": 0.71,
+      "middle-y": 0.09
     }
   }, {
     "geometry": {
@@ -1338,7 +1464,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "HRV",
       "iso_a2": "HR",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.35,
+      "middle-y": 0.59
     }
   }, {
     "geometry": {
@@ -1358,7 +1486,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "HTI",
       "iso_a2": "HT",
-      "continent": "North America"
+      "continent": "North America",
+      "middle-x": 0.82,
+      "middle-y": 0.96
     }
   }, {
     "geometry": {
@@ -1378,7 +1508,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "HUN",
       "iso_a2": "HU",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.27,
+      "middle-y": 0.61
     }
   }, {
     "geometry": {
@@ -1398,7 +1530,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "IDN",
       "iso_a2": "ID",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.38,
+      "middle-y": 0.41
     }
   }, {
     "geometry": {
@@ -1418,7 +1552,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "South Asia",
       "iso_a3": "IND",
       "iso_a2": "IN",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.34,
+      "middle-y": 0.43
     }
   }, {
     "geometry": {
@@ -1438,7 +1574,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "IRL",
       "iso_a2": "IE",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.45,
+      "middle-y": 0.48
     }
   }, {
     "geometry": {
@@ -1458,7 +1596,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Middle East & North Africa",
       "iso_a3": "IRN",
       "iso_a2": "IR",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.58,
+      "middle-y": 0.51
     }
   }, {
     "geometry": {
@@ -1478,7 +1618,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Middle East & North Africa",
       "iso_a3": "IRQ",
       "iso_a2": "IQ",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.46,
+      "middle-y": 0.44
     }
   }, {
     "geometry": {
@@ -1498,7 +1640,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "ISL",
       "iso_a2": "IS",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.5,
+      "middle-y": 0.5
     }
   }, {
     "geometry": {
@@ -1518,7 +1662,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Middle East & North Africa",
       "iso_a3": "ISR",
       "iso_a2": "IL",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.68,
+      "middle-y": 0.1
     }
   }, {
     "geometry": {
@@ -1538,7 +1684,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "ITA",
       "iso_a2": "IT",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.79,
+      "middle-y": 0.71
     }
   }, {
     "geometry": {
@@ -1558,7 +1706,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Middle East & North Africa",
       "iso_a3": "JOR",
       "iso_a2": "JO",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.45,
+      "middle-y": 0.85
     }
   }, {
     "geometry": {
@@ -1578,7 +1728,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "JPN",
       "iso_a2": "JP",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.52,
+      "middle-y": 0.66
     }
   }, {
     "geometry": {
@@ -1598,7 +1750,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "KAZ",
       "iso_a2": "KZ",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.57,
+      "middle-y": 0.46
     }
   }, {
     "geometry": {
@@ -1618,7 +1772,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "KEN",
       "iso_a2": "KE",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.87,
+      "middle-y": 0.7
     }
   }, {
     "geometry": {
@@ -1638,7 +1794,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "KGZ",
       "iso_a2": "KG",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.48,
+      "middle-y": 0.43
     }
   }, {
     "geometry": {
@@ -1658,7 +1816,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "KHM",
       "iso_a2": "KH",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.84,
+      "middle-y": 0.49
     }
   }, {
     "geometry": {
@@ -1678,7 +1838,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "KOR",
       "iso_a2": "KR",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.54,
+      "middle-y": 0.5
     }
   }, {
     "geometry": {
@@ -1718,7 +1880,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Middle East & North Africa",
       "iso_a3": "KWT",
       "iso_a2": "KW",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.61,
+      "middle-y": 0.4
     }
   }, {
     "geometry": {
@@ -1738,7 +1902,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "LAO",
       "iso_a2": "LA",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.88,
+      "middle-y": 0.79
     }
   }, {
     "geometry": {
@@ -1758,7 +1924,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Middle East & North Africa",
       "iso_a3": "LBN",
       "iso_a2": "LB",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.39,
+      "middle-y": 0.57
     }
   }, {
     "geometry": {
@@ -1778,7 +1946,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "LBR",
       "iso_a2": "LR",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.96,
+      "middle-y": 0.75
     }
   }, {
     "geometry": {
@@ -1798,7 +1968,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Middle East & North Africa",
       "iso_a3": "LBY",
       "iso_a2": "LY",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.51,
+      "middle-y": 0.38
     }
   }, {
     "geometry": {
@@ -1818,7 +1990,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "South Asia",
       "iso_a3": "LKA",
       "iso_a2": "LK",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.62,
+      "middle-y": 0.91
     }
   }, {
     "geometry": {
@@ -1838,7 +2012,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "LSO",
       "iso_a2": "LS",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.52,
+      "middle-y": 0.45
     }
   }, {
     "geometry": {
@@ -1858,7 +2034,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "LTU",
       "iso_a2": "LT",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.27,
+      "middle-y": 0.06
     }
   }, {
     "geometry": {
@@ -1878,7 +2056,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "LVA",
       "iso_a2": "LV",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.05,
+      "middle-y": 0.36
     }
   }, {
     "geometry": {
@@ -1898,7 +2078,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Middle East & North Africa",
       "iso_a3": "MAR",
       "iso_a2": "MA",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.6,
+      "middle-y": 0.21
     }
   }, {
     "geometry": {
@@ -1918,7 +2100,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "MDA",
       "iso_a2": "MD",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.52,
+      "middle-y": 0.42
     }
   }, {
     "geometry": {
@@ -1938,7 +2122,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "MDG",
       "iso_a2": "MG",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.45,
+      "middle-y": 0.48
     }
   }, {
     "geometry": {
@@ -1958,7 +2144,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "MEX",
       "iso_a2": "MX",
-      "continent": "North America"
+      "continent": "North America",
+      "middle-x": 0.51,
+      "middle-y": 0.49
     }
   }, {
     "geometry": {
@@ -1978,7 +2166,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "MKD",
       "iso_a2": "MK",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.49,
+      "middle-y": 0.44
     }
   }, {
     "geometry": {
@@ -1998,7 +2188,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "MLI",
       "iso_a2": "ML",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.59,
+      "middle-y": 0.38
     }
   }, {
     "geometry": {
@@ -2018,7 +2210,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "MMR",
       "iso_a2": "MM",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.17,
+      "middle-y": 0.49
     }
   }, {
     "geometry": {
@@ -2038,7 +2232,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "MNE",
       "iso_a2": "ME",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.42,
+      "middle-y": 0.47
     }
   }, {
     "geometry": {
@@ -2058,7 +2254,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "MNG",
       "iso_a2": "MN",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.49,
+      "middle-y": 0.53
     }
   }, {
     "geometry": {
@@ -2078,7 +2276,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "MOZ",
       "iso_a2": "MZ",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.83,
+      "middle-y": 0.28
     }
   }, {
     "geometry": {
@@ -2098,7 +2298,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "MRT",
       "iso_a2": "MR",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.61,
+      "middle-y": 0.63
     }
   }, {
     "geometry": {
@@ -2118,7 +2320,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "MWI",
       "iso_a2": "MW",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.16,
+      "middle-y": 0.29
     }
   }, {
     "geometry": {
@@ -2138,7 +2342,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "MYS",
       "iso_a2": "MY",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.9,
+      "middle-y": 0.26
     }
   }, {
     "geometry": {
@@ -2158,7 +2364,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "NAM",
       "iso_a2": "NA",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.33,
+      "middle-y": 0.37
     }
   }, {
     "geometry": {
@@ -2178,7 +2386,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "NCL",
       "iso_a2": "NC",
-      "continent": "Oceania"
+      "continent": "Oceania",
+      "middle-x": 0.56,
+      "middle-y": 0.71
     }
   }, {
     "geometry": {
@@ -2198,7 +2408,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "NER",
       "iso_a2": "NE",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.64,
+      "middle-y": 0.53
     }
   }, {
     "geometry": {
@@ -2218,7 +2430,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "NGA",
       "iso_a2": "NG",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.36,
+      "middle-y": 0.33
     }
   }, {
     "geometry": {
@@ -2238,7 +2452,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "NIC",
       "iso_a2": "NI",
-      "continent": "North America"
+      "continent": "North America",
+      "middle-x": 0.84,
+      "middle-y": 0.5
     }
   }, {
     "geometry": {
@@ -2258,7 +2474,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "NLD",
       "iso_a2": "NL",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.99,
+      "middle-y": 0.01
     }
   }, {
     "geometry": {
@@ -2278,7 +2496,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "NOR",
       "iso_a2": "NO",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.1,
+      "middle-y": 0.93
     }
   }, {
     "geometry": {
@@ -2298,7 +2518,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "South Asia",
       "iso_a3": "NPL",
       "iso_a2": "NP",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.52,
+      "middle-y": 0.54
     }
   }, {
     "geometry": {
@@ -2318,7 +2540,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "NZL",
       "iso_a2": "NZ",
-      "continent": "Oceania"
+      "continent": "Oceania",
+      "middle-x": 0.25,
+      "middle-y": 0.81
     }
   }, {
     "geometry": {
@@ -2338,7 +2562,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Middle East & North Africa",
       "iso_a3": "OMN",
       "iso_a2": "OM",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.88,
+      "middle-y": 0.44
     }
   }, {
     "geometry": {
@@ -2358,7 +2584,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "South Asia",
       "iso_a3": "PAK",
       "iso_a2": "PK",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.34,
+      "middle-y": 0.64
     }
   }, {
     "geometry": {
@@ -2378,7 +2606,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "PAN",
       "iso_a2": "PA",
-      "continent": "North America"
+      "continent": "North America",
+      "middle-x": 0.22,
+      "middle-y": 0.5
     }
   }, {
     "geometry": {
@@ -2398,7 +2628,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "PER",
       "iso_a2": "PE",
-      "continent": "South America"
+      "continent": "South America",
+      "middle-x": 0.69,
+      "middle-y": 0.71
     }
   }, {
     "geometry": {
@@ -2418,7 +2650,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "PHL",
       "iso_a2": "PH",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.4,
+      "middle-y": 0.19
     }
   }, {
     "geometry": {
@@ -2438,7 +2672,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "PNG",
       "iso_a2": "PG",
-      "continent": "Oceania"
+      "continent": "Oceania",
+      "middle-x": 0.14,
+      "middle-y": 0.5
     }
   }, {
     "geometry": {
@@ -2458,7 +2694,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "POL",
       "iso_a2": "PL",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.5,
+      "middle-y": 0.48
     }
   }, {
     "geometry": {
@@ -2478,7 +2716,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "PRI",
       "iso_a2": "PR",
-      "continent": "North America"
+      "continent": "North America",
+      "middle-x": 0.48,
+      "middle-y": 0.65
     }
   }, {
     "geometry": {
@@ -2498,7 +2738,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "PRK",
       "iso_a2": "KP",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.32,
+      "middle-y": 0.63
     }
   }, {
     "geometry": {
@@ -2518,7 +2760,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "PRT",
       "iso_a2": "PT",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.46,
+      "middle-y": 0.5
     }
   }, {
     "geometry": {
@@ -2538,7 +2782,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "PRY",
       "iso_a2": "PY",
-      "continent": "South America"
+      "continent": "South America",
+      "middle-x": 0.35,
+      "middle-y": 0.36
     }
   }, {
     "geometry": {
@@ -2578,7 +2824,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Middle East & North Africa",
       "iso_a3": "QAT",
       "iso_a2": "QA",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.36,
+      "middle-y": 0.46
     }
   }, {
     "geometry": {
@@ -2598,7 +2846,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "ROU",
       "iso_a2": "RO",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.67,
+      "middle-y": 0.5
     }
   }, {
     "geometry": {
@@ -2618,7 +2868,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "RWA",
       "iso_a2": "RW",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.48,
+      "middle-y": 0.56
     }
   }, {
     "geometry": {
@@ -2638,7 +2890,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Middle East & North Africa",
       "iso_a3": "ESH",
       "iso_a2": "EH",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.41,
+      "middle-y": 0.71
     }
   }, {
     "geometry": {
@@ -2658,7 +2912,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Middle East & North Africa",
       "iso_a3": "SAU",
       "iso_a2": "SA",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.45,
+      "middle-y": 0.53
     }
   }, {
     "geometry": {
@@ -2678,7 +2934,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "SDN",
       "iso_a2": "SD",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.5,
+      "middle-y": 0.38
     }
   }, {
     "geometry": {
@@ -2698,7 +2956,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "SSD",
       "iso_a2": "SS",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.49,
+      "middle-y": 0.58
     }
   }, {
     "geometry": {
@@ -2718,7 +2978,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "SEN",
       "iso_a2": "SN",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.2,
+      "middle-y": 0.55
     }
   }, {
     "geometry": {
@@ -2738,7 +3000,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "SLE",
       "iso_a2": "SL",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.48,
+      "middle-y": 0.48
     }
   }, {
     "geometry": {
@@ -2758,7 +3022,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "SLV",
       "iso_a2": "SV",
-      "continent": "North America"
+      "continent": "North America",
+      "middle-x": 0.5,
+      "middle-y": 0.55
     }
   }, {
     "geometry": {
@@ -2798,7 +3064,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "SOM",
       "iso_a2": "SO",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.39,
+      "middle-y": 0.74
     }
   }, {
     "geometry": {
@@ -2818,7 +3086,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "SRB",
       "iso_a2": "RS",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.42,
+      "middle-y": 0.52
     }
   }, {
     "geometry": {
@@ -2838,7 +3108,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "SUR",
       "iso_a2": "SR",
-      "continent": "South America"
+      "continent": "South America",
+      "middle-x": 0.91,
+      "middle-y": 0.09
     }
   }, {
     "geometry": {
@@ -2858,7 +3130,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "SVK",
       "iso_a2": "SK",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.21,
+      "middle-y": 0.52
     }
   }, {
     "geometry": {
@@ -2878,7 +3152,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "SVN",
       "iso_a2": "SI",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.52,
+      "middle-y": 0.57
     }
   }, {
     "geometry": {
@@ -2898,7 +3174,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "SWE",
       "iso_a2": "SE",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.4,
+      "middle-y": 0.48
     }
   }, {
     "geometry": {
@@ -2918,7 +3196,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "SWZ",
       "iso_a2": "SZ",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.51,
+      "middle-y": 0.45
     }
   }, {
     "geometry": {
@@ -2938,7 +3218,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Middle East & North Africa",
       "iso_a3": "SYR",
       "iso_a2": "SY",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.25,
+      "middle-y": 0.54
     }
   }, {
     "geometry": {
@@ -2958,7 +3240,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "TCD",
       "iso_a2": "TD",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.47,
+      "middle-y": 0.63
     }
   }, {
     "geometry": {
@@ -2978,7 +3262,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "TGO",
       "iso_a2": "TG",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.76,
+      "middle-y": 0.81
     }
   }, {
     "geometry": {
@@ -2998,7 +3284,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "THA",
       "iso_a2": "TH",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.25,
+      "middle-y": 0.49
     }
   }, {
     "geometry": {
@@ -3018,7 +3306,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "TJK",
       "iso_a2": "TJ",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.28,
+      "middle-y": 0.56
     }
   }, {
     "geometry": {
@@ -3038,7 +3328,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "TKM",
       "iso_a2": "TM",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.4,
+      "middle-y": 0.42
     }
   }, {
     "geometry": {
@@ -3058,7 +3350,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "TLS",
       "iso_a2": "TL",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.65,
+      "middle-y": 0.36
     }
   }, {
     "geometry": {
@@ -3078,7 +3372,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Middle East & North Africa",
       "iso_a3": "TUN",
       "iso_a2": "TN",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.53,
+      "middle-y": 0.03
     }
   }, {
     "geometry": {
@@ -3098,7 +3394,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "TUR",
       "iso_a2": "TR",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.34,
+      "middle-y": 0.49
     }
   }, {
     "geometry": {
@@ -3118,7 +3416,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "TWN",
       "iso_a2": "TW",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.49,
+      "middle-y": 0.41
     }
   }, {
     "geometry": {
@@ -3138,7 +3438,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "TZA",
       "iso_a2": "TZ",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.5,
+      "middle-y": 0.5
     }
   }, {
     "geometry": {
@@ -3158,7 +3460,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "UGA",
       "iso_a2": "UG",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.16,
+      "middle-y": 0.56
     }
   }, {
     "geometry": {
@@ -3178,7 +3482,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "UKR",
       "iso_a2": "UA",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.7,
+      "middle-y": 0.46
     }
   }, {
     "geometry": {
@@ -3198,7 +3504,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "URY",
       "iso_a2": "UY",
-      "continent": "South America"
+      "continent": "South America",
+      "middle-x": 0.81,
+      "middle-y": 0.63
     }
   }, {
     "geometry": {
@@ -3218,7 +3526,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "North America",
       "iso_a3": "USA",
       "iso_a2": "US",
-      "continent": "North America"
+      "continent": "North America",
+      "middle-x": 0.68,
+      "middle-y": 0.68
     }
   }, {
     "geometry": {
@@ -3238,7 +3548,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "UZB",
       "iso_a2": "UZ",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.46,
+      "middle-y": 0.53
     }
   }, {
     "geometry": {
@@ -3258,7 +3570,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Latin America & Caribbean",
       "iso_a3": "VEN",
       "iso_a2": "VE",
-      "continent": "South America"
+      "continent": "South America",
+      "middle-x": 0.5,
+      "middle-y": 0.33
     }
   }, {
     "geometry": {
@@ -3278,7 +3592,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "East Asia & Pacific",
       "iso_a3": "VNM",
       "iso_a2": "VN",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.59,
+      "middle-y": 0.89
     }
   }, {
     "geometry": {
@@ -3298,7 +3614,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Middle East & North Africa",
       "iso_a3": "YEM",
       "iso_a2": "YE",
-      "continent": "Asia"
+      "continent": "Asia",
+      "middle-x": 0.39,
+      "middle-y": 0.75
     }
   }, {
     "geometry": {
@@ -3318,7 +3636,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "ZAF",
       "iso_a2": "ZA",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.36,
+      "middle-y": 0.7
     }
   }, {
     "geometry": {
@@ -3338,7 +3658,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "ZMB",
       "iso_a2": "ZM",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.36,
+      "middle-y": 0.58
     }
   }, {
     "geometry": {
@@ -3358,7 +3680,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Sub-Saharan Africa",
       "iso_a3": "ZWE",
       "iso_a2": "ZW",
-      "continent": "Africa"
+      "continent": "Africa",
+      "middle-x": 0.81,
+      "middle-y": 0.42
     }
   }, {
     "geometry": {
@@ -3378,7 +3702,9 @@ window['anychart']['maps']['world'] = {
       "region_wb": "Europe & Central Asia",
       "iso_a3": "RUS",
       "iso_a2": "RU",
-      "continent": "Europe"
+      "continent": "Europe",
+      "middle-x": 0.57,
+      "middle-y": 0.56
     }
   }],
   "ac-tx": {
@@ -3389,4 +3715,4 @@ window['anychart']['maps']['world'] = {
       "yoffset": 0
     }
   }
-}
+};

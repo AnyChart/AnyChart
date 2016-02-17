@@ -562,6 +562,22 @@ anychart.core.map.series.Bubble.prototype.rootTypedLayerInitializer = function()
 
 
 /** @inheritDoc */
+anychart.core.map.series.Bubble.prototype.createPositionProvider = function(position) {
+  var referenceValues = this.getReferenceCoords();
+
+  var x, y;
+  if (referenceValues) {
+    x = referenceValues[0];
+    y = referenceValues[1];
+  } else {
+    x = 0;
+    y = 0;
+  }
+  return {'value': {'x': x, 'y': y}};
+};
+
+
+/** @inheritDoc */
 anychart.core.map.series.Bubble.prototype.getReferenceScaleValues = function() {
   if (!this.enabled()) return null;
   var res = [];
@@ -589,6 +605,7 @@ anychart.core.map.series.Bubble.prototype.getReferenceScaleValues = function() {
  */
 anychart.core.map.series.Bubble.prototype.getReferenceCoords = function() {
   if (!this.enabled()) return null;
+
   var scale = this.map.scale();
   var iterator = this.getIterator();
   var fail = false;
@@ -656,6 +673,37 @@ anychart.core.map.series.Bubble.prototype.startDrawing = function() {
    * @private
    */
   this.maximumSizeValue_ = anychart.utils.normalizeSize(this.maximumSizeSetting_, size);
+};
+
+
+/** @inheritDoc */
+anychart.core.map.series.Bubble.prototype.applyZoomMoveTransform = function(positionProvider) {
+  var domElement, trX, trY, selfTx;
+  var iterator = this.getIterator();
+  var referenceValues = this.getReferenceCoords();
+
+  if (referenceValues) {
+    var xPrev = /** @type {number} */(this.getIterator().meta('x'));
+    var yPrev = /** @type {number} */(this.getIterator().meta('value'));
+
+    var xNew = referenceValues[0];
+    var yNew = referenceValues[1];
+
+    domElement = iterator.meta('shape');
+    selfTx = domElement.getSelfTransformation();
+
+    trX = (selfTx ? -selfTx.getTranslateX() : 0) + xNew - xPrev;
+    trY = (selfTx ? -selfTx.getTranslateY() : 0) + yNew - yPrev;
+
+    domElement.translate(trX, trY);
+
+
+    var hatchFillShape = /** @type {acgraph.vector.Shape} */(this.getIterator().meta('hatchFillShape'));
+    if (goog.isDefAndNotNull(hatchFillShape)) {
+      hatchFillShape.translate(trX, trY);
+    }
+  }
+  anychart.core.map.series.Bubble.base(this, 'applyZoomMoveTransform', positionProvider);
 };
 
 

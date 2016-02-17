@@ -800,14 +800,16 @@ anychart.themes.merging.mergingMap_ = [
     defaultObj: 'map.defaultSeriesSettings.base',
     targets: [
       'map.defaultSeriesSettings.choropleth',
-      'map.defaultSeriesSettings.bubble'
+      'map.defaultSeriesSettings.bubble',
+      'map.defaultSeriesSettings.marker'
     ]
   },
   {
     defaultObj: 'map',
     targets: [
       'choropleth',
-      'bubbleMap'
+      'bubbleMap',
+      'markerMap'
     ]
   },
   {

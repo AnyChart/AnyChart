@@ -212,9 +212,6 @@ anychart.charts.Map = function() {
       if (goog.userAgent.IE)
         container.style['-ms-touch-action'] = 'none';
 
-      var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
-      var bounds = this.getPixelBounds();
-
       this.mapTextarea = goog.dom.createDom('textarea');
       this.mapTextarea.setAttribute('readonly', 'readonly');
       goog.style.setStyle(this.mapTextarea, {
@@ -225,8 +222,6 @@ anychart.charts.Map = function() {
         'overflow': 'hidden',
         'padding': '0',
         'position': 'absolute',
-        //'left': bounds.left + containerPosition.x,
-        //'top': bounds.top + containerPosition.y,
         'left': 0,
         'top': 0,
         'width': '1px'
@@ -1200,6 +1195,18 @@ anychart.charts.Map.prototype.bubble = function(data, opt_csvSettings) {
 
 
 /**
+ * Creates marker series.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data SVG|SVGString|GeoJSON|MapNameString.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {anychart.core.map.series.Base} Passed geo data.
+ */
+anychart.charts.Map.prototype.marker = function(data, opt_csvSettings) {
+  return this.createSeriesByType_(anychart.enums.MapSeriesType.MARKER, data, opt_csvSettings);
+};
+
+
+/**
  * @param {string} type Series type.
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
@@ -1971,7 +1978,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
         tx = this.mapLayer_.getSelfTransformation();
         this.scale().setOffsetFocusPoint(tx.getTranslateX(), tx.getTranslateY());
 
-        if (this.isDesktop_ == true) {
+        if (this.isDesktop_) {
           this.updateSeriesOnZoomOrMove_();
         } else {
           this.dataLayer_.appendTransformationMatrix(1, 0, 0, 1, dx * this.fullZoom_, dy * this.fullZoom_);
@@ -3113,6 +3120,7 @@ anychart.charts.Map.prototype['getType'] = anychart.charts.Map.prototype.getType
 anychart.charts.Map.prototype['geoData'] = anychart.charts.Map.prototype.geoData;
 anychart.charts.Map.prototype['choropleth'] = anychart.charts.Map.prototype.choropleth;
 anychart.charts.Map.prototype['bubble'] = anychart.charts.Map.prototype.bubble;
+anychart.charts.Map.prototype['marker'] = anychart.charts.Map.prototype.marker;
 anychart.charts.Map.prototype['unboundRegions'] = anychart.charts.Map.prototype.unboundRegions;
 anychart.charts.Map.prototype['colorRange'] = anychart.charts.Map.prototype.colorRange;
 anychart.charts.Map.prototype['palette'] = anychart.charts.Map.prototype.palette;

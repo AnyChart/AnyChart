@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <!--<script src="../../contrib/closure-library/closure/goog/base.js"></script>-->
+    <script src="../../../out/anychart-bundle.min.js"></script>
+    <!--<script src="../../src/deps.js"></script>-->
+    <!--<script>goog.require('anychart.modules.anychart');</script>-->
+    <!--<script>goog.require('anychart.themes.defaultTheme');</script>-->
+    <!--<script>goog.require('goog.debug.Trace');</script>-->
+    <!--<script>goog.require('goog.userAgent');</script>-->
+    <style>
+        html, body, #container {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+</body>
+<script>
+    var randomExt = function(a, b) {
+        return Math.round(Math.random() * (b - a + 1) + a);
+    };
+
+    var stage;
+    anychart.onDocumentReady(function () {
+        var start = window.performance.now();
+
+        var container = document.getElementById('container');
+        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('width', '500');
+        svg.setAttribute('height', '500');
+        var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        container.appendChild(svg);
+        svg.appendChild(defs);
+
+//        var grpup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        var pathInDefs = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+
+//        pathInDefs.setAttribute('d', 'M 1 0 A 1 1 0 0 1 -1 1.2246467991473532e-16 A 1 1 0 0 1 1 -2.4492935982947064e-16');
+        pathInDefs.setAttribute('r', '1');
+        pathInDefs.setAttribute('id', 'cir1');
+        pathInDefs.setAttribute('fill', 'black');
+//        grpup.appendChild(pathInDefs);
+        defs.appendChild(pathInDefs);
+
+
+
+        var pointsCount = 100000;
+        for (var i = 0, len = pointsCount; i < len; i++) {
+            var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+            use.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#cir1');
+            use.setAttribute('x', randomExt(0, 500));
+            use.setAttribute('y', randomExt(0, 500));
+            svg.appendChild(use);
+        }
+        var end = window.performance.now();
+        console.log(end - start);
+    });
+</script>
+</html>

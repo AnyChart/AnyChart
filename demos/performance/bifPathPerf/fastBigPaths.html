@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <!--<script src="../../contrib/closure-library/closure/goog/base.js"></script>-->
+    <script src="../../../out/anychart-bundle.min.js"></script>
+    <!--<script src="../../src/deps.js"></script>-->
+    <!--<script>goog.require('anychart.modules.anychart');</script>-->
+    <!--<script>goog.require('anychart.themes.defaultTheme');</script>-->
+    <!--<script>goog.require('goog.debug.Trace');</script>-->
+    <!--<script>goog.require('goog.userAgent');</script>-->
+    <style>
+        html, body, #container {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+</body>
+<script>
+    var randomExt = function(a, b) {
+        return Math.round(Math.random() * (b - a + 1) + a);
+    };
+
+    var stage;
+    anychart.onDocumentReady(function () {
+        var start = window.performance.now();
+
+        stage = anychart.graphics.create('container');
+        stage.suspend();
+        var path = stage.path();
+        var pointsCount = 100000;
+        var pathCount = 100;
+        var pathCounter = 1;
+        for (var i = 0, len = pointsCount; i < len; i++) {
+            if (i >= pathCounter * pointsCount / pathCount) {
+                path = stage.path();
+                pathCounter++;
+            }
+            acgraph.vector.primitives.pie(path, randomExt(0, 500), randomExt(0, 500), 1, 0, 360);
+//            acgraph.vector.primitives.pie(path, 0, 0, 1, 0, 360);
+        }
+        stage.resume();
+        var end = window.performance.now();
+        console.log(end - start);
+    });
+</script>
+</html>

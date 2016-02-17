@@ -377,7 +377,8 @@ anychart.utils.GeoJSONParser.prototype.convert = function(data, txObj, donor, ac
         var features = data['features'];
         for (i = 0, len = features.length; i < len; i++) {
           var feature = features[i];
-          this.transformCoords_(feature['geometry']);
+          if (txObj)
+            this.transformCoords_(feature['geometry']);
           this.transformProp_(feature['properties'], donor, acFieldName, hcFieldName);
         }
       }
@@ -389,7 +390,8 @@ anychart.utils.GeoJSONParser.prototype.convert = function(data, txObj, donor, ac
       } else {
         var geometries = data['geometries'];
         for (i = 0, len = geometries.length; i < len; i++) {
-          this.transformCoords_(geometries[i]);
+          if (txObj)
+            this.transformCoords_(geometries[i]);
         }
       }
       break;
@@ -398,7 +400,8 @@ anychart.utils.GeoJSONParser.prototype.convert = function(data, txObj, donor, ac
       if (!(data['properties'] && data['geometry'])) {
         anychart.utils.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'Feature object missing \'properties\' or \'geometry\' member.');
       } else {
-        this.transformCoords_(data['geometry']);
+        if (txObj)
+          this.transformCoords_(data['geometry']);
         this.transformProp_(data['properties'], donor, acFieldName, hcFieldName);
       }
       break;
@@ -410,7 +413,8 @@ anychart.utils.GeoJSONParser.prototype.convert = function(data, txObj, donor, ac
     case 'Polygon':
     case 'MultiPolygon':
       if (data['coordinates']) {
-        this.transformCoords_(data);
+        if (txObj)
+          this.transformCoords_(data);
       } else {
         anychart.utils.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'Geometry object missing \'coordinates\' member.');
       }

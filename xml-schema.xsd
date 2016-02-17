@@ -607,6 +607,13 @@
         <xsd:attributeGroup ref="attrs.VisualBase"/>
         <!-- Choropleth series -->
         <xsd:attribute name="color_scale" type="simple.ScaleRef"/>
+        <!-- Marker series -->
+        <xsd:attribute name="size" type="xsd:double"/>
+        <xsd:attribute name="hover_size" type="xsd:double"/>
+        <xsd:attribute name="select_size" type="xsd:double"/>
+        <xsd:attribute name="type" type="enums.MarkerType"/>
+        <xsd:attribute name="hover_type" type="enums.MarkerType"/>
+        <xsd:attribute name="select_type" type="enums.MarkerType"/>
     </xsd:complexType>
 
     <xsd:complexType name="Map_series_list">

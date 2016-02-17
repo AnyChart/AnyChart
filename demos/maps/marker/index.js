@@ -19,9 +19,9 @@ var crs = [
 ];
 
 $(document).ready(function() {
-  $(crs).each(function() {
-    $('#select_crs').append($("<option>").attr('value', this.text).text(this.text));
-  });
+  //$(crs).each(function() {
+  //  $('#select_crs').append($("<option>").attr('value', this.text).text(this.text));
+  //});
 
   $('body').append('<div id="tooltip"></div>');
   $('#tooltip')
@@ -39,19 +39,17 @@ $(document).ready(function() {
 
 
   stage = anychart.graphics.create('container');
-
   chart = anychart.map();
-
+  chart.container(stage).draw();
 
 
   //chart.bounds('50%', '50%', '50%', '50%');
   chart.geoData(anychart.maps.france);
-
   var dataSet = anychart.data.set([]);
 
   //series = chart.choropleth(dataSet);
   //series.tooltip(false).labels().enabled(true).textFormatter(function() {return this.regionProperties.name});
-  ////
+  //
   //series.colorScale(anychart.scales.ordinalColor([
   //  {less: -100},
   //  {from: -100, to: 100},
@@ -61,23 +59,24 @@ $(document).ready(function() {
 
 
 
-  series2 = chart.bubble(dataSet);
-  series2.tooltip(false).labels().enabled(true).textFormatter(function() {return this['size']});
+  series2 = chart.marker(dataSet);
+  series2.tooltip(false).labels().enabled(true);
 
 
 
-  chart.container(stage).draw();
+
 
   var data = [
-    //  {"id": "AU.NT", "value": 136, "size": 185, selected: true},
-    //  {"id": "AU.WA", "value": -146, "size": 471},
-    //  {"id": "AU.CT", "value": -242, "size": 339},
-    //  {"id": "AU.NS", "value": 30, "size": 137},
-    //  {"id": "AU.SA", "value": 69, "size": 525},
-    //  {"id": "AU.VI", "value": 110, "size": 178},
-    //  {"id": "AU.QL", "value": -53, "size": 621, 'lat': -25.6, 'lon': 141.6},
-    //  {"id": "AU.TS", "value": 168, "size": 359, 'lat': -27.1, 'lon': 123.6}
-    {"value": 168, "size": 359, 'lat': 16.2489, 'lon': -61.5811}
+    //{"id": "AU.NT", "value": 136, "size": 185, selected: true},
+    //{"id": "AU.WA", "value": -146, "size": 471},
+    //{"id": "AU.CT", "value": -242, "size": 339},
+    //{"id": "AU.NS", "value": 30, "size": 137},
+    //{"id": "AU.SA", "value": 69, "size": 525},
+    //{"id": "AU.VI", "value": 110, "size": 178},
+    //{"id": "AU.QL", "value": -53, "size": 621, 'lat': -25.6, 'lon': 141.6},
+    //{"id": "AU.TS", "value": 168, "size": 359, 'lat': -27.1, 'lon': 123.6}
+    {'lat': 42.12, 'lon': 9.17},
+    {'lat': 16.3, 'lon': -61.5}
   ];
 
   //var data = [];
@@ -93,8 +92,8 @@ $(document).ready(function() {
   dataSet.data(data);
 
 
-  chart.interactivity().selectionMode('none');
-  chart.interactivity().hoverMode('none');
+  //chart.interactivity().selectionMode('none');
+  //chart.interactivity().hoverMode('none');
 
 
 
@@ -102,19 +101,27 @@ $(document).ready(function() {
 
 
   $('#container').bind('mousemove drag', function(e) {
-    var localCoords = chart.globalToLocal(e.clientX, e.clientY);
+    var container = $('#container');
+    var containerOffset = container.offset();
+    var scrollLeft = $(document).scrollLeft();
+    var scrollTop = $(document).scrollTop();
 
-    var latLon = chart.inverseTransform(localCoords.x, localCoords.y);
-    var pix = chart.transform(latLon.long, latLon.lat);
+    var x = e.clientX - (containerOffset.left - scrollLeft);
+    var y = e.clientY - (containerOffset.top - scrollTop);
+
+    var latLon = chart.scale().inverseTransform(x, y);
+    var tx = chart.scale().pickTx(latLon[0], latLon[1]);
+    var pxpy = chart.scale().transform(latLon[0], latLon[1]);
 
     $('#tooltip').css({'left': e.clientX + 15, 'top': e.clientY + 15})
         .show()
         .html(
-            'Client coords: ' + e.clientX + ' , ' + e.clientY + '<br>' +
-            'Relative data bounds_2: ' + pix.x + ' , ' + pix.y + '<br>' +
-            'Relative data bounds: ' + localCoords.x + ' , ' + localCoords.y + '<br>' +
-              //'Scaled: ' + scaled[0] + ' , ' + scaled[1] + '<br>' +
-            'Lat: ' + latLon.lat.toFixed(4) + ' , ' + 'Lon: ' + latLon.long.toFixed(4)
+            tx.crs + '<br>' +
+          //'Client coords: ' + e.clientX + ' , ' + e.clientY + '<br>' +
+          'Client coords_: ' + pxpy[0] + ' , ' + pxpy[1] + '<br>' +
+          'Relative cont coords: ' + x + ' , ' + y + '<br>' +
+          //'Scaled: ' + scaled[0] + ' , ' + scaled[1] + '<br>' +
+          'Lat: ' + latLon[1].toFixed(4) + ' , ' + 'Lon: ' + latLon[0].toFixed(4)
         );
   });
 

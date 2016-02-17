@@ -185,6 +185,30 @@ anychart.core.map.series.BaseWithMarkers.prototype.startDrawing = function() {
 
 
 /** @inheritDoc */
+anychart.core.map.series.BaseWithMarkers.prototype.applyZoomMoveTransform = function(positionProvider) {
+  var domElement, prevPos, newPos, trX, trY, selfTx;
+  if (this.markers_ && this.markers_.enabled()) {
+    var iterator = this.getIterator();
+    var index = iterator.getIndex();
+    var marker = this.markers_.getMarker(index);
+    if (marker && marker.getDomElement() && marker.positionProvider()) {
+      prevPos = marker.positionProvider()['value'];
+      newPos = positionProvider['value'];
+
+      domElement = marker.getDomElement();
+      selfTx = domElement.getSelfTransformation();
+
+      trX = -selfTx.getTranslateX() + newPos['x'] - prevPos['x'];
+      trY = -selfTx.getTranslateY() + newPos['y'] - prevPos['y'];
+
+      domElement.translate(trX, trY);
+    }
+  }
+  anychart.core.map.series.BaseWithMarkers.base(this, 'applyZoomMoveTransform', positionProvider);
+};
+
+
+/** @inheritDoc */
 anychart.core.map.series.BaseWithMarkers.prototype.drawPoint = function(pointState) {
   goog.base(this, 'drawPoint', pointState);
   this.drawMarker(pointState);

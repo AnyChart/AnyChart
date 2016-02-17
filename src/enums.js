@@ -74,7 +74,8 @@ anychart.enums.GaugeTypes = {
 anychart.enums.MapTypes = {
   MAP: 'map',
   CHOROPLETH: 'choropleth',
-  BUBBLE: 'bubble'
+  BUBBLE: 'bubble',
+  MARKER: 'marker'
 };
 
 
@@ -1848,7 +1849,8 @@ anychart.enums.ScatterTicksMode = {
  */
 anychart.enums.MapSeriesType = {
   CHOROPLETH: 'choropleth',
-  BUBBLE: 'bubble'
+  BUBBLE: 'bubble',
+  MARKER: 'marker'
 };
 
 
@@ -1865,6 +1867,8 @@ anychart.enums.normalizeMapSeriesType = function(value, opt_default) {
       return anychart.enums.MapSeriesType.CHOROPLETH;
     case 'bubble':
       return anychart.enums.MapSeriesType.BUBBLE;
+    case 'marker':
+      return anychart.enums.MapSeriesType.MARKER;
   }
   return opt_default || anychart.enums.MapSeriesType.CHOROPLETH;
 };

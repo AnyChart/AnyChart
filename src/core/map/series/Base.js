@@ -320,25 +320,49 @@ anychart.core.map.series.Base.prototype.calculate = function() {
  * @return {anychart.core.map.series.Base}
  */
 anychart.core.map.series.Base.prototype.updateOnZoomOrMove = function() {
-  this.suspendSignalsDispatching();
-  this.calculate();
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
-
   var iterator = this.getResetIterator();
 
-  this.startDrawing();
-  while (iterator.advance() && this.enabled()) {
-    var index = iterator.getIndex();
-    this.drawPoint(this.state.getPointStateByIndex(index));
-  }
-  this.finalizeDrawing();
+  var stage = this.container() ? this.container().getStage() : null;
+  var manualSuspend = stage && !stage.isSuspended();
+  if (manualSuspend) stage.suspend();
 
-  this.resumeSignalsDispatching(false);
-  this.markConsistent(anychart.ConsistencyState.ALL);
+  while (iterator.advance() && this.enabled()) {
+    var positionProvider = this.createPositionProvider(anychart.enums.Position.CENTER);
+    this.applyZoomMoveTransform(positionProvider);
+  }
+
+  if (manualSuspend)
+    stage.resume();
+
+  this.markConsistent(anychart .ConsistencyState.ALL);
 
   return this;
+};
+
+
+/**
+ * Applying zoom and move transformations to series elements for improve performans.
+ * @param {Object} positionProvider .
+ */
+anychart.core.map.series.Base.prototype.applyZoomMoveTransform = function(positionProvider) {
+  var domElement, prevPos, newPos, trX, trY, selfTx;
+  if (this.labels() && this.labels().enabled()) {
+    var iterator = this.getIterator();
+    var index = iterator.getIndex();
+    var label = this.labels().getLabel(index);
+    if (label && label.getDomElement() && label.positionProvider()) {
+      prevPos = label.positionProvider()['value'];
+      newPos = positionProvider['value'];
+
+      domElement = label.getDomElement();
+      selfTx = domElement.getSelfTransformation();
+
+      trX = -selfTx.getTranslateX() + newPos['x'] - prevPos['x'];
+      trY = -selfTx.getTranslateY() + newPos['y'] - prevPos['y'];
+
+      domElement.translate(trX, trY);
+    }
+  }
 };
 
 

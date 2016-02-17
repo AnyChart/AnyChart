@@ -4541,6 +4541,26 @@ window['anychart']['themes']['v6'] = {
             return 'Value: ' + this['valuePrefix'] + this['size'] + this['valuePostfix'];
           }
         }
+      },
+      'marker': {
+        'hoverFill': '#545f69',
+        'selectFill': '#333',
+        'tooltip': {
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'textFormatter': function() {
+            if (this['id']) {
+              return 'Id: ' + this['id'] + '\nValue: ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
+            } else {
+              var result = 'lat: ' + this['lat'] + '\nlong: ' + this['long'];
+              if (this['value'])
+                result += '\nValue: ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
+              return result;
+            }
+          }
+        }
       }
     },
     'colorRange': {

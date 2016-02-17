@@ -2885,6 +2885,28 @@
         "selectNegativeHatchFill": {"$ref": "#/definitions/hatchFillSet"}
       }
     },
+    "anychart.core.map.series.Marker": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.map.series.Base"}
+      ],
+      "properties": {
+        "seriesType": {"enum": ["marker"]},
+        "type": {"$ref": "#/definitions/anychart.enums.MarkerType"},
+        "hoverType": {"$ref": "#/definitions/anychart.enums.MarkerType"},
+        "selectType": {"$ref": "#/definitions/anychart.enums.MarkerType"},
+
+        "size": {
+          "type": "number"
+        },
+        "hoverSize": {
+          "type": "number"
+        },
+        "selectSize": {
+          "type": "number"
+        }
+      }
+    },
 
     "anychart.core.ui.ChartScroller": {
       "type": "object",
