@@ -2175,6 +2175,30 @@ window['anychart']['themes']['v6'] = {
 
   // merge with chart
   'heatMap': {
+    'defaultGridSettings': {
+      'enabled': true,
+      'isMinor': false,
+      //'layout': null, //depends on barChartMode
+      'drawFirstLine': true,
+      'drawLastLine': true,
+      'oddFill': '#fff',
+      'evenFill': '#f5f5f5',
+      'stroke': '#c1c1c1',
+      'scale': 1,
+      'zIndex': 10
+    },
+    'defaultMinorGridSettings': {
+      'enabled': true,
+      'isMinor': true,
+      //'layout': null, //depends on barChartMode
+      'drawFirstLine': true,
+      'drawLastLine': true,
+      'oddFill': '#fff',
+      'evenFill': '#f5f5f5',
+      'stroke': '#c1c1c1',
+      'scale': 1,
+      'zIndex': 10
+    },
     'scales': [
       {
         'type': 'ordinal',
@@ -2204,7 +2228,25 @@ window['anychart']['themes']['v6'] = {
     },
     'xAxes': [{}],
     'yAxes': [{}],
-    'grids': [],
+    'grids': [
+      {
+        'layout': 'horizontal'
+      },
+      {
+        'layout': 'vertical',
+        'evenFill': 'none',
+        'oddFill': 'none',
+        'scale': 0
+      }
+    ],
+    'minorGrids': [
+      {
+        'evenFill': 'none',
+        'oddFill': 'none',
+        'stroke': '#000 0.075',
+        'layout': 'horizontal'
+      }
+    ],
     'padding': {
       'top': 30,
       'right': 20,
