@@ -23,6 +23,7 @@ anychart.onDocumentReady(function() {
   var choroplethData = dataSet.mapAs({id: [0], value: [1], title: [2]});
   var bubbleData = dataSet.mapAs({id: [0], size: [1], title: [2]});
 
+  var stage = anychart.graphics.create('container');
   map = anychart.map();
   //map = anychart.choropleth(choroplethData);
   //map = anychart.bubbleMap(bubbleData);
@@ -46,21 +47,34 @@ anychart.onDocumentReady(function() {
   series.labels().fontColor('black');
   series.labels(true);
 
+  //series
+  //    .displayNegative(true)
+  //
+  //    .selectNegativeFill('purple')
+  //    .hoverNegativeFill('yellow')
+  //    .negativeFill('red .5')
+  //
+  //    .selectNegativeStroke('red .9')
+  //    .hoverNegativeStroke({color: 'green', thickness: 6, dash: '5 4 5'})
+  //    .negativeStroke('green .9')
+  //
+  //    .selectNegativeHatchFill('DIAGONAL_CROSS')
+  //    .hoverNegativeHatchFill('horizontal')
+  //    .negativeHatchFill('vertical');
+
   series
       .displayNegative(true)
-
-      .selectNegativeFill('purple')
       .hoverNegativeFill('yellow')
-      .negativeFill('red .5')
-
-      .selectNegativeStroke('red .9')
       .hoverNegativeStroke({color: 'green', thickness: 6, dash: '5 4 5'})
+      .negativeFill('red .5')
       .negativeStroke('green .9')
-
-      .selectNegativeHatchFill('DIAGONAL_CROSS')
+      .selectNegativeStroke('red .9')
+      .selectNegativeFill('purple')
       .hoverNegativeHatchFill('horizontal')
-      .negativeHatchFill('vertical');
+      .negativeHatchFill('DIAGONAL_CROSS')
+      .selectNegativeHatchFill('DIAGONAL_CROSS');
 
 
-  map.container('container').draw();
+
+  map.container(stage).draw();
 });

@@ -892,15 +892,14 @@ anychart.core.Chart.prototype.getPlotBounds = function() {
  * @return {Object.<string, number>} .
  */
 anychart.core.Chart.prototype.localToGlobal = function(xCoord, yCoord) {
-  var containerPosition, bounds;
+  var containerPosition;
   if (this.container() && this.container().getStage() && this.container().getStage().container()) {
     containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
-    bounds = this.getPlotBounds();
   }
 
-  return bounds ?
-      {'x': xCoord + bounds.left + containerPosition.x, 'y': yCoord + bounds.top + containerPosition.y} :
-      {'x': xCoord + containerPosition.x, 'y': yCoord + containerPosition.y};
+  return containerPosition ?
+      {'x': xCoord + containerPosition.x, 'y': yCoord + containerPosition.y} :
+      {'x': xCoord, 'y': yCoord};
 
 };
 
@@ -912,14 +911,13 @@ anychart.core.Chart.prototype.localToGlobal = function(xCoord, yCoord) {
  * @return {Object.<string, number>} .
  */
 anychart.core.Chart.prototype.globalToLocal = function(xCoord, yCoord) {
-  var containerPosition, bounds;
+  var containerPosition;
   if (this.container() && this.container().getStage() && this.container().getStage().container()) {
     containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
-    bounds = this.getPlotBounds();
   }
 
-  return bounds ?
-      {'x': xCoord - (bounds.left + containerPosition.x), 'y': yCoord - (bounds.top + containerPosition.y)} :
+  return containerPosition ?
+      {'x': xCoord - containerPosition.x, 'y': yCoord - containerPosition.y} :
       {'x': xCoord, 'y': yCoord};
 };
 

@@ -569,10 +569,10 @@ anychart.core.map.scale.Geo.prototype.transform = function(lon, lat) {
   var transformY = (+(/** @type {number} */(lat)) - this.minY) * this.ratio;
 
   var resultX = (this.isInvertedX ?
-      this.bounds_.width - this.centerOffsetX - transformX :
-      this.centerOffsetX + transformX);
+      this.bounds_.getRight() - this.centerOffsetX - transformX :
+      this.bounds_.left + this.centerOffsetX + transformX);
 
-  var minPx = this.centerOffsetX;
+  var minPx = this.bounds_.left + this.centerOffsetX;
   var maxPx = minPx + this.rangeX * this.ratio;
 
   if (resultX < minPx) {
@@ -582,8 +582,8 @@ anychart.core.map.scale.Geo.prototype.transform = function(lon, lat) {
   }
 
   var resultY = this.isInverted ?
-      this.centerOffsetY + transformY :
-      this.bounds_.height - this.centerOffsetY - transformY;
+      this.bounds_.top + this.centerOffsetY + transformY :
+      this.bounds_.getBottom() - this.centerOffsetY - transformY;
 
   return [resultX * this.zoom + this.dx_, resultY * this.zoom + this.dy_];
 };
@@ -608,12 +608,12 @@ anychart.core.map.scale.Geo.prototype.inverseTransform = function(x, y) {
   y = (y - this.dy_) / this.zoom;
 
   var transformX = this.isInvertedX ?
-      this.bounds_.height - this.centerOffsetX - x :
-      x - this.centerOffsetX;
+      this.bounds_.getRight() - this.centerOffsetX - x :
+      x - this.bounds_.left - this.centerOffsetX;
 
   var transformY = this.isInverted ?
-      x - this.centerOffsetY :
-      this.bounds_.height - this.centerOffsetY - y;
+      x - this.bounds_.top - this.centerOffsetY :
+      this.bounds_.getBottom() - this.centerOffsetY - y;
 
   var resultX = +(/** @type {number} */(transformX)) / this.ratio + this.minX;
   var resultY = +(/** @type {number} */(transformY)) / this.ratio + this.minY;
