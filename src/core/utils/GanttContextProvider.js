@@ -41,7 +41,6 @@ anychart.core.utils.GanttContextProvider = function(opt_isResources) {
 
 /** @inheritDoc */
 anychart.core.utils.GanttContextProvider.prototype.applyReferenceValues = function() {
-  //TODO (A.Kudryavtsev): NOTE!!! All work with dates will be redone after i18n is implemented!!!
   if (this.currentItem) {
     this['item'] = this.currentItem;
     this['name'] = this.currentItem.get(anychart.enums.GanttDataFields.NAME);
@@ -51,7 +50,7 @@ anychart.core.utils.GanttContextProvider.prototype.applyReferenceValues = functi
       this['minPeriodDate'] = this.currentItem.meta('minPeriodDate');
       this['maxPeriodDate'] = this.currentItem.meta('maxPeriodDate');
       this['period'] = this.currentPeriod || void 0;
-      this['periodIndex'] = (goog.isDefAndNotNull(this.currentPeriodIndex) && this.currentPeriodIndex > 0) ? this.currentPeriodIndex : void 0;
+      this['periodIndex'] = (goog.isDefAndNotNull(this.currentPeriodIndex) && this.currentPeriodIndex >= 0) ? this.currentPeriodIndex : void 0;
       this['periodStart'] = this.currentPeriod ?
           this.currentItem.getMeta(anychart.enums.GanttDataFields.PERIODS, this.currentPeriodIndex, anychart.enums.GanttDataFields.START) :
           void 0;
