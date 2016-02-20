@@ -390,7 +390,7 @@ anychart.core.map.series.Base.prototype.draw = function() {
   this.finalizeDrawing();
 
   this.resumeSignalsDispatching(false);
-  this.markConsistent(anychart.ConsistencyState.ALL);
+  this.markConsistent(anychart.ConsistencyState.ALL & ~anychart.ConsistencyState.CONTAINER);
 
   return this;
 };
@@ -417,7 +417,7 @@ anychart.core.map.series.Base.prototype.startDrawing = function() {
   this.selectLabels().suspendSignalsDispatching();
 
   this.labels().clear();
-  this.labels().container(/** @type {acgraph.vector.ILayer} */(this.container()));
+
   this.labels().parentBounds(/** @type {anychart.math.Rect} */(this.container().getBounds()));
 };
 
@@ -448,6 +448,7 @@ anychart.core.map.series.Base.prototype.drawPoint = function(pointState) {
  * series.finalizeDrawing();
  */
 anychart.core.map.series.Base.prototype.finalizeDrawing = function() {
+  this.labels().container(/** @type {acgraph.vector.ILayer} */(this.container()));
   this.labels().draw();
 
   this.labels().resumeSignalsDispatching(false);
@@ -457,16 +458,6 @@ anychart.core.map.series.Base.prototype.finalizeDrawing = function() {
   this.labels().markConsistent(anychart.ConsistencyState.ALL);
   this.hoverLabels().markConsistent(anychart.ConsistencyState.ALL);
   this.selectLabels().markConsistent(anychart.ConsistencyState.ALL);
-
-  //if (this.clip()) {
-  //  var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBoundsCache : this.clip());
-  //  var labelDOM = this.labels().getDomElement();
-  //  if (labelDOM) labelDOM.clip(/** @type {anychart.math.Rect} */(bounds));
-  //}
-
-  // This check need to prevent finalizeDrawing to mark CONTAINER consistency state in case when series was disabled by
-  // series.enabled(false).
-  this.markConsistent(anychart.ConsistencyState.ALL);
 };
 
 
@@ -566,6 +557,9 @@ anychart.core.map.series.Base.prototype.createPositionProvider = function(positi
 
 /** @inheritDoc */
 anychart.core.map.series.Base.prototype.remove = function() {
+  if (this.rootLayer && this.needSelfLayer)
+    this.rootLayer.remove();
+
   this.labels().container(null);
 
   goog.base(this, 'remove');

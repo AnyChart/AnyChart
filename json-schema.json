@@ -3661,6 +3661,9 @@
         "maximumY": {
           "type": ["number", "string", "null"]
         },
+        "gap": {
+          "type": ["number", "string"]
+        },
         "bounds": {"$ref": "#/definitions/anychart.math.Rect"}
       }
     },

@@ -1779,6 +1779,7 @@
         <xsd:attribute name="minimum_y" type="simple.NumberOrPercentOrNull"/>
         <xsd:attribute name="maximum_x" type="simple.NumberOrPercentOrNull"/>
         <xsd:attribute name="maximum_y" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="gap" type="xsd:double"/>
     </xsd:complexType>
 
     <xsd:complexType name="LogOrLinScale">

@@ -233,12 +233,6 @@ anychart.core.map.series.BaseWithMarkers.prototype.finalizeDrawing = function() 
     this.selectMarkers_.markConsistent(anychart.ConsistencyState.ALL);
   }
 
-  //if (this.clip()) {
-  //  var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBoundsCache : this.clip());
-  //  var markerDOM = this.markers().getDomElement();
-  //  if (markerDOM) markerDOM.clip(/** @type {anychart.math.Rect} */(bounds));
-  //}
-
   goog.base(this, 'finalizeDrawing');
 };
 

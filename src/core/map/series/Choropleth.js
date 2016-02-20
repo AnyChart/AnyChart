@@ -298,6 +298,14 @@ anychart.core.map.series.Choropleth.prototype.drawPoint = function(pointState) {
 
 
 /** @inheritDoc */
+anychart.core.map.series.Choropleth.prototype.draw = function() {
+  anychart.core.map.series.Choropleth.base(this, 'draw');
+
+  this.markConsistent(anychart.ConsistencyState.CONTAINER);
+};
+
+
+/** @inheritDoc */
 anychart.core.map.series.Choropleth.prototype.isDiscreteBased = function() {
   return true;
 };

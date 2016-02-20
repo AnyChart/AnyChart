@@ -45,11 +45,13 @@ $(document).ready(function() {
   //]));
   //chart.colorRange().enabled(true);
 
+  chart.legend(true);
+
   chart.container(stage).draw();
 
 
   chart.interactivity().selectionMode('none');
-  chart.interactivity().hoverMode('none');
+  //chart.interactivity().hoverMode('none');
 
   var choroplethData = [];
   var features = chart.geoData()['features'];

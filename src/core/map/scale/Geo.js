@@ -55,13 +55,7 @@ anychart.core.map.scale.Geo = function() {
    * @type {number}
    * @protected
    */
-  this.minimumRangeBasedGap = 0;
-
-  /**
-   * @type {number}
-   * @protected
-   */
-  this.maximumRangeBasedGap = 0;
+  this.rangeBasedGap = 0;
 
   /**
    * @type {number}
@@ -204,6 +198,27 @@ anychart.core.map.scale.Geo.prototype.setOffsetFocusPoint = function(dx, dy) {
  */
 anychart.core.map.scale.Geo.prototype.getType = function() {
   return anychart.enums.MapsScaleTypes.GEO;
+};
+
+
+/**
+ * Getter/setter for gap.
+ * @param {number=} opt_value Value to set.
+ * @return {number|anychart.core.map.scale.Geo} .
+ */
+anychart.core.map.scale.Geo.prototype.gap = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = +opt_value || 0;
+    if (this.rangeBasedGap != opt_value) {
+      this.rangeBasedGap = opt_value;
+      if (this.minimumModeAuto) {
+        this.consistent = false;
+        this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+      }
+    }
+    return this;
+  }
+  return this.rangeBasedGap;
 };
 
 
@@ -437,13 +452,13 @@ anychart.core.map.scale.Geo.prototype.determineScaleMinMax = function() {
   }
 
   if (this.minimumModeAuto) {
-    this.minX = this.dataRangeMinX - rangeX * this.minimumRangeBasedGap;
-    this.minY = this.dataRangeMinY - rangeY * this.minimumRangeBasedGap;
+    this.minX = this.dataRangeMinX - rangeX * this.rangeBasedGap;
+    this.minY = this.dataRangeMinY - rangeY * this.rangeBasedGap;
   }
 
   if (this.maximumModeAuto) {
-    this.maxX = this.dataRangeMaxX + rangeX * this.maximumRangeBasedGap;
-    this.maxY = this.dataRangeMaxY + rangeY * this.maximumRangeBasedGap;
+    this.maxX = this.dataRangeMaxX + rangeX * this.rangeBasedGap;
+    this.maxY = this.dataRangeMaxY + rangeY * this.rangeBasedGap;
   }
 };
 
@@ -732,6 +747,7 @@ anychart.core.map.scale.Geo.prototype.serialize = function() {
   json['maximumY'] = this.maximumModeAuto ? null : this.maxY;
   json['minimumX'] = this.minimumModeAuto ? null : this.minX;
   json['minimumY'] = this.minimumModeAuto ? null : this.minY;
+  json['minimumGap'] = this.gap();
   if (this.bounds_)
     json['bounds'] = this.bounds_;
   return json;
@@ -746,6 +762,7 @@ anychart.core.map.scale.Geo.prototype.setupByJSON = function(config) {
   this.minimumY(config['minimumY']);
   this.maximumX(config['maximumX']);
   this.maximumY(config['maximumY']);
+  this.gap(config['gap']);
   if ('bounds' in config)
     this.setBounds(config['bounds']);
 };
@@ -765,3 +782,4 @@ anychart.core.map.scale.Geo.prototype.setupByJSON = function(config) {
 //anychart.core.map.scale.Geo.prototype['inverted'] = anychart.core.map.scale.Geo.prototype.inverted;
 //anychart.core.map.scale.Geo.prototype['startAutoCalc'] = anychart.core.map.scale.Geo.prototype.startAutoCalc;
 //anychart.core.map.scale.Geo.prototype['finishAutoCalc'] = anychart.core.map.scale.Geo.prototype.finishAutoCalc;
+anychart.core.map.scale.Geo.prototype['gap'] = anychart.core.map.scale.Geo.prototype.gap;

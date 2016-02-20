@@ -949,7 +949,7 @@ anychart.charts.Map.prototype.scale = function(opt_value) {
  */
 anychart.charts.Map.prototype.geoScaleInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.MAP_SCALE, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.MAP_SCALE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
