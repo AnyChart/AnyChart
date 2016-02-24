@@ -302,6 +302,8 @@ anychart.core.map.series.Choropleth.prototype.draw = function() {
   anychart.core.map.series.Choropleth.base(this, 'draw');
 
   this.markConsistent(anychart.ConsistencyState.CONTAINER);
+
+  return this;
 };
 
 
