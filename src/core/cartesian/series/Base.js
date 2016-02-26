@@ -341,6 +341,41 @@ anychart.core.cartesian.series.Base.prototype.getResetIterator = function() {
 
 
 /** @inheritDoc */
+anychart.core.cartesian.series.Base.prototype.getValueInternal = function(index, name) {
+  if (this.drawingPlan) {
+    var res = undefined;
+    var point = this.drawingPlan.data[index];
+    if (point) {
+      if (name in point) {
+        res = point[name];
+      } else {
+        var rawIndex = point['rawIndex'];
+        var row;
+        var view = /** @type {anychart.data.View} */(this.data());
+        if (goog.isDef(rawIndex))
+          row = view.row(rawIndex);
+        else
+          return res;//undefined
+        res = view.getRowMapping(rawIndex).getInternal(row, rawIndex, name);
+      }
+    }
+    return res;
+  }
+  return anychart.core.cartesian.series.Base.base(this, 'getValueInternal', index, name);
+};
+
+
+/** @inheritDoc */
+anychart.core.cartesian.series.Base.prototype.setValueInternal = function(index, name, value) {
+  if (this.drawingPlan) {
+    var point = this.drawingPlan.data[index];
+    index = point && point['rawIndex'];
+  }
+  anychart.core.cartesian.series.Base.base(this, 'setValueInternal', index, name, value);
+};
+
+
+/** @inheritDoc */
 anychart.core.cartesian.series.Base.prototype.getStackedZero = function(index) {
   if (this.drawingPlan) {
     var point = this.drawingPlan.data[index];

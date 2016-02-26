@@ -49,14 +49,14 @@ anychart.core.utils.DrawingPlanIterator.prototype.get = function(fieldName) {
       res = this.currentPoint_[fieldName];
     } else {
       //anychart.core.utils.DrawingPlanIterator.misses[fieldName] = true;
+      var rawIndex = this.currentPoint_['rawIndex'];
       if (!this.currentRow) {
-        var rawIndex = this.currentPoint_['rawIndex'];
         if (goog.isDef(rawIndex))
           this.currentRow = this.view.row(rawIndex);
         else
           return res;//undefined
       }
-      res = this.view.getRowMapping(this.currentIndex).getInternal(this.currentRow, this.currentIndex, fieldName);
+      res = this.view.getRowMapping(rawIndex).getInternal(this.currentRow, rawIndex, fieldName);
     }
   }
   return res;

@@ -380,6 +380,28 @@ anychart.core.SeriesBase.prototype.getResetIterator = function() {
 
 
 /**
+ * Gets asked value from data. Stab for SeriesPoint class where direct index reference needed.
+ * @param {number} index
+ * @param {string} name
+ * @return {*}
+ */
+anychart.core.SeriesBase.prototype.getValueInternal = function(index, name) {
+  return this.data().get(index, name);
+};
+
+
+/**
+ * Sets asked value to data. Stab for SeriesPoint class where direct index reference needed.
+ * @param {number} index
+ * @param {string} name
+ * @param {*} value
+ */
+anychart.core.SeriesBase.prototype.setValueInternal = function(index, name, value) {
+  this.data().set(index, name, value);
+};
+
+
+/**
  * Gets stacked zero from data by index. Stab for SeriesPoint class where direct index reference needed.
  * @param {number} index
  * @return {*}

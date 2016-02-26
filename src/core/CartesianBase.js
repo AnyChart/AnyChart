@@ -564,15 +564,8 @@ anychart.core.CartesianBase.prototype.xScale = function(opt_value) {
       this.xScale_ = opt_value;
       if (this.xScale_ instanceof anychart.scales.Ordinal)
         this.xScale_.listenSignals(this.xScaleInvalidated_, this);
-      var state = 0;
-      if (this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
-        state = anychart.ConsistencyState.CHART_LEGEND;
-      }
-      this.invalidate(anychart.ConsistencyState.CARTESIAN_SCALES |
-          anychart.ConsistencyState.CARTESIAN_Y_SCALES |
-          anychart.ConsistencyState.CARTESIAN_SCALE_MAPS |
-          state,
-          anychart.Signal.NEEDS_REDRAW);
+      if (this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES)
+        this.invalidate(anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
@@ -591,7 +584,8 @@ anychart.core.CartesianBase.prototype.xScale = function(opt_value) {
  * @private
  */
 anychart.core.CartesianBase.prototype.xScaleInvalidated_ = function(event) {
-  if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
+  if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION) &&
+      this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
     this.invalidate(anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
   }
 };
@@ -3160,7 +3154,7 @@ anychart.core.CartesianBase.prototype.getSeriesStatus = function(event) {
 
         var indexes = series.data().findInRangeByX(minValue, maxValue, isOrdinal);
 
-        iterator = series.getIterator();
+        iterator = series.getResetIterator();
         var ind = [];
         var minLength = Infinity;
         var minLengthIndex;
@@ -3204,7 +3198,7 @@ anychart.core.CartesianBase.prototype.getSeriesStatus = function(event) {
         index = series.findX(value);
         if (index < 0) index = NaN;
 
-        iterator = series.getIterator();
+        iterator = series.getResetIterator();
         minLength = Infinity;
 
         if (iterator.select(index)) {
