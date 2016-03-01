@@ -2612,14 +2612,15 @@ window['anychart']['themes']['defaultTheme'] = {
            * @return {*}
            */
           'textFormatter': function() {
+            var result;
             if (this['id']) {
-              return 'Id: ' + this['id'] + '\nValue: ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
+              result = 'Id: ' + this['id'];
             } else {
-              var result = 'lat: ' + this['lat'] + '\nlong: ' + this['long'];
-              if (this['value'])
-                result += '\nValue: ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
-              return result;
+              result = 'lat: ' + this['lat'] + '\nlong: ' + this['long'];
             }
+            if (this['value'])
+              result += '\nValue: ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
+            return result;
           }
         }
       }

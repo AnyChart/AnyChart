@@ -4750,6 +4750,27 @@ window['anychart']['themes']['defaultThemeOld'] = {
             return 'Value: ' + this['valuePrefix'] + this['size'] + this['valuePostfix'];
           }
         }
+      },
+      'marker': {
+        'hoverFill': '#545f69',
+        'selectFill': '#333',
+        'tooltip': {
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'textFormatter': function() {
+            var result;
+            if (this['id']) {
+              result = 'Id: ' + this['id'];
+            } else {
+              result = 'lat: ' + this['lat'] + '\nlong: ' + this['long'];
+            }
+            if (this['value'])
+              result += '\nValue: ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
+            return result;
+          }
+        }
       }
     },
     'colorRange': {
@@ -4802,9 +4823,10 @@ window['anychart']['themes']['defaultThemeOld'] = {
 
   // merge with map
   'choropleth': {},
-
   // merge with map
   'bubbleMap': {},
+  // merge with map
+  'markerMap': {},
 
   'defaultDataGrid': {
     'isStandalone': true,
