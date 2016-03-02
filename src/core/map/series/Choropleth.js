@@ -227,7 +227,6 @@ anychart.core.map.series.Choropleth.prototype.calculate = function() {
           this.colorScale_.extendDataRange(value);
       }
     }
-    this.markConsistent(anychart.ConsistencyState.SERIES_DATA);
     this.markConsistent(anychart.ConsistencyState.MAP_COLOR_SCALE);
   }
 };

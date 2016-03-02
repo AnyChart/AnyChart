@@ -1207,6 +1207,18 @@ anychart.charts.Map.prototype.marker = function(data, opt_csvSettings) {
 
 
 /**
+ * Creates bubble series.
+ * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data SVG|SVGString|GeoJSON|MapNameString.
+ * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ *    here as a hash map.
+ * @return {anychart.core.map.series.Base} Passed geo data.
+ */
+anychart.charts.Map.prototype.connector = function(data, opt_csvSettings) {
+  return this.createSeriesByType_(anychart.enums.MapSeriesType.CONNECTOR, data, opt_csvSettings);
+};
+
+
+/**
  * @param {string} type Series type.
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
@@ -1634,7 +1646,7 @@ anychart.charts.Map.prototype.calculate = function() {
     for (i = this.series_.length; i--;) {
       series = this.series_[i];
       series.setGeoData(this, this.internalGeoData_);
-      series.invalidate(anychart.ConsistencyState.SERIES_DATA, anychart.Signal.NEEDS_REDRAW);
+      series.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
 
       //----------------------------------calc statistics for series
       series.calculateStatistics();
@@ -1900,7 +1912,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     }
 
     for (i = this.series_.length; i--;) {
-      this.series_[i].invalidate(anychart.ConsistencyState.SERIES_DATA, anychart.Signal.NEEDS_REDRAW);
+      this.series_[i].invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
     }
   }
 
@@ -3155,6 +3167,7 @@ anychart.charts.Map.prototype['geoData'] = anychart.charts.Map.prototype.geoData
 anychart.charts.Map.prototype['choropleth'] = anychart.charts.Map.prototype.choropleth;
 anychart.charts.Map.prototype['bubble'] = anychart.charts.Map.prototype.bubble;
 anychart.charts.Map.prototype['marker'] = anychart.charts.Map.prototype.marker;
+anychart.charts.Map.prototype['connector'] = anychart.charts.Map.prototype.connector;
 anychart.charts.Map.prototype['unboundRegions'] = anychart.charts.Map.prototype.unboundRegions;
 anychart.charts.Map.prototype['colorRange'] = anychart.charts.Map.prototype.colorRange;
 anychart.charts.Map.prototype['palette'] = anychart.charts.Map.prototype.palette;

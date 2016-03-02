@@ -2590,6 +2590,36 @@ window['anychart']['themes']['defaultTheme'] = {
         'yScale': null
       },
       'choropleth': {},
+      'connector': {
+        'startSize': 1,
+        'endSize': 1,
+        'curvature': .3,
+        'markers': {
+          'position': 'middle',
+          'rotation': null,
+          'type': 'arrowhead'
+        },
+        'labels': {
+          'enabled': false,
+          'position': 'middle',
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'textFormatter': function() {
+            return 'from: ' + this['startPoint']['lat'] + ',' + this['startPoint']['long'] + '\nto: ' + this['endPoint']['lat'] + ',' + this['endPoint']['long'];
+          }
+        },
+        'tooltip': {
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'textFormatter': function() {
+            return 'from: ' + this['startPoint']['lat'] + ',' + this['startPoint']['long'] + '\nto: ' + this['endPoint']['lat'] + ',' + this['endPoint']['long'];
+          }
+        }
+      },
       'bubble': {
         'hoverFill': '#545f69',
         'selectFill': '#333',
@@ -2699,6 +2729,9 @@ window['anychart']['themes']['defaultTheme'] = {
   'bubbleMap': {},
   // merge with map
   'markerMap': {},
+
+  // merge with map
+  'connector': {},
 
   'defaultDataGrid': {
     'isStandalone': true,

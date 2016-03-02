@@ -821,6 +821,14 @@ anychart.bubbleMap = anychart.bubbleMap || function() {
 /**
  * @ignoreDoc
  */
+anychart.connector = anychart.connector || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Connector map']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
 anychart.markerMap = anychart.markerMap || function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Marker map']);
 };
@@ -905,6 +913,7 @@ goog.exportSymbol('anychart.map', anychart.map);
 goog.exportSymbol('anychart.choropleth', anychart.choropleth);
 goog.exportSymbol('anychart.bubbleMap', anychart.bubbleMap);
 goog.exportSymbol('anychart.markerMap', anychart.markerMap);
+goog.exportSymbol('anychart.connector', anychart.connector);
 goog.exportSymbol('anychart.areaChart', anychart.area);
 goog.exportSymbol('anychart.barChart', anychart.bar);
 goog.exportSymbol('anychart.bubbleChart', anychart.bubble);

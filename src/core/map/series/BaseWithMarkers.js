@@ -211,7 +211,7 @@ anychart.core.map.series.BaseWithMarkers.prototype.applyZoomMoveTransform = func
 /** @inheritDoc */
 anychart.core.map.series.BaseWithMarkers.prototype.drawPoint = function(pointState) {
   goog.base(this, 'drawPoint', pointState);
-  this.drawMarker(pointState);
+  this.configureMarker(pointState, true);
 };
 
 
@@ -240,7 +240,7 @@ anychart.core.map.series.BaseWithMarkers.prototype.finalizeDrawing = function() 
 /**
  * Gets marker position.
  * @param {anychart.PointState|number} pointState If it is a hovered oe selected marker drawing.
- * @return {string} Position settings.
+ * @return {string|number} Position settings.
  */
 anychart.core.map.series.BaseWithMarkers.prototype.getMarkersPosition = function(pointState) {
   var iterator = this.getIterator();
@@ -252,23 +252,34 @@ anychart.core.map.series.BaseWithMarkers.prototype.getMarkersPosition = function
   var hoverPointMarker = iterator.get('hoverMarker');
   var selectPointMarker = iterator.get('selectMarker');
 
-  var markerPosition = pointMarker && pointMarker['position'] ? pointMarker['position'] : null;
-  var markerHoverPosition = hoverPointMarker && hoverPointMarker['position'] ? hoverPointMarker['position'] : null;
-  var markerSelectPosition = selectPointMarker && selectPointMarker['position'] ? selectPointMarker['position'] : null;
+  var markerPosition = pointMarker && goog.isDef(pointMarker['position']) ? pointMarker['position'] : this.markers().position();
+  var markerHoverPosition = hoverPointMarker && goog.isDef(hoverPointMarker['position']) ? hoverPointMarker['position'] : goog.isDef(this.hoverMarkers().position()) ? this.hoverMarkers().position() : markerPosition;
+  var markerSelectPosition = selectPointMarker && goog.isDef(selectPointMarker['position']) ? selectPointMarker['position'] : goog.isDef(this.selectMarkers().position()) ? this.hoverMarkers().position() : markerPosition;
 
-  return (hovered && (markerHoverPosition || this.hoverMarkers().position())) ||
-      (selected && (markerSelectPosition || this.selectMarkers().position())) ||
-      markerPosition || this.markers().position();
+  return hovered ? markerHoverPosition : selected ? markerSelectPosition : markerPosition;
+};
+
+
+/**
+ * Draws marker for the point.
+ * @param {anychart.PointState|number} pointState Point state.
+ * @protected
+ */
+anychart.core.map.series.BaseWithMarkers.prototype.drawMarker = function(pointState) {
+  var marker = this.configureMarker(pointState, true);
+  if (marker)
+    marker.draw();
 };
 
 
 /**
  * Draws marker for the point.
  * @param {anychart.PointState|number} pointState If it is a hovered oe selected marker drawing.
- * @protected
+ * @param {boolean=} opt_reset Whether reset marker settings.
+ * @return {?anychart.core.ui.MarkersFactory.Marker}
  */
-anychart.core.map.series.BaseWithMarkers.prototype.drawMarker = function(pointState) {
-  if (!this.markers_) return;
+anychart.core.map.series.BaseWithMarkers.prototype.configureMarker = function(pointState, opt_reset) {
+  if (!this.markers_) return null;
   var iterator = this.getIterator();
 
   var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
@@ -323,13 +334,16 @@ anychart.core.map.series.BaseWithMarkers.prototype.drawMarker = function(pointSt
       marker = this.markers_.add(positionProvider, index);
     }
 
-    marker.resetSettings();
-    marker.currentMarkersFactory(markersFactory);
-    marker.setSettings(/** @type {Object} */(pointMarker), /** @type {Object} */(hovered ? hoverPointMarker : selectPointMarker));
-    marker.draw();
+    if (opt_reset) {
+      marker.resetSettings();
+      marker.currentMarkersFactory(markersFactory);
+      marker.setSettings(/** @type {Object} */(pointMarker), /** @type {Object} */(hovered ? hoverPointMarker : selectPointMarker));
+    }
+    return marker;
   } else if (marker) {
-    marker.clear();
+    this.markers_.clear(marker.getIndex());
   }
+  return null;
 };
 
 
@@ -400,6 +414,12 @@ anychart.core.map.series.BaseWithMarkers.prototype.getLegendItemData = function(
   return data;
 };
 
+
+/** @inheritDoc */
+anychart.core.map.series.BaseWithMarkers.prototype.finalizePointAppearance = function() {
+  anychart.core.map.series.BaseWithMarkers.base(this, 'finalizePointAppearance');
+  this.markers().draw();
+};
 
 
 //anychart.core.map.series.BaseWithMarkers.prototype['startDrawing'] = anychart.core.map.series.BaseWithMarkers.prototype.startDrawing;//inherited

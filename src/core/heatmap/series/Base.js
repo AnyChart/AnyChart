@@ -1354,7 +1354,7 @@ anychart.core.heatMap.series.Base.prototype.drawMarker = function(pointState) {
 /**
  * Creates and configures marker.
  * @param {anychart.PointState|number} pointState Point state.
- * @param {boolean=} opt_reset Whether reset labels settings.
+ * @param {boolean=} opt_reset Whether reset marker settings.
  * @return {?anychart.core.ui.MarkersFactory.Marker}
  */
 anychart.core.heatMap.series.Base.prototype.configureMarker = function(pointState, opt_reset) {

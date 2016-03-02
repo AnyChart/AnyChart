@@ -641,8 +641,8 @@ anychart.core.map.scale.Geo.prototype.inverseTransform = function(x, y) {
 
       return resultX >= heatZone.left &&
           resultX <= heatZone.left + heatZone.width &&
-              resultY <= heatZone.top &&
-              resultY >= heatZone.top - heatZone.height;
+          resultY <= heatZone.top &&
+          resultY >= heatZone.top - heatZone.height;
     }
     return false;
   }) || 'default';

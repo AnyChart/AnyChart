@@ -75,7 +75,8 @@ anychart.enums.MapTypes = {
   MAP: 'map',
   CHOROPLETH: 'choropleth',
   BUBBLE: 'bubble',
-  MARKER: 'marker'
+  MARKER: 'marker',
+  CONNECTOR: 'connector'
 };
 
 
@@ -798,7 +799,8 @@ anychart.enums.MarkerType = {
   STAR10: 'star10',
   PENTAGON: 'pentagon',
   TRAPEZIUM: 'trapezium',
-  LINE: 'line'
+  LINE: 'line',
+  ARROWHEAD: 'arrowhead'
 };
 
 
@@ -842,6 +844,9 @@ anychart.enums.normalizeMarkerType = function(type, opt_default) {
       return anychart.enums.MarkerType.TRAPEZIUM;
     case 'pentagon':
       return anychart.enums.MarkerType.PENTAGON;
+    case 'arrow':
+    case 'arrowhead':
+      return anychart.enums.MarkerType.ARROWHEAD;
   }
   return opt_default || anychart.enums.MarkerType.STAR5;
 };
@@ -892,6 +897,9 @@ anychart.enums.normalizeAnyMarkerType = function(type) {
       return anychart.enums.MarkerType.TRAPEZIUM;
     case 'pentagon':
       return anychart.enums.MarkerType.PENTAGON;
+    case 'arrow':
+    case 'arrowhead':
+      return anychart.enums.MarkerType.ARROWHEAD;
   }
   return null;
 };
@@ -927,6 +935,23 @@ anychart.enums.PENTAGON_SIN = [
 anychart.enums.getMarkerDrawer = function(type) {
   type = (String(type)).toLowerCase();
   switch (type) {
+    case 'arrowhead':
+      return function(path, x, y, radius) {
+        var p1x = x + radius / 2;
+        var p1y = y;
+        var p2x = x - radius / 2;
+        var p2y = y - radius / 3;
+        var p3x = x - radius / 2;
+        var p3y = y + radius / 3;
+
+        path
+            .moveTo(p1x, p1y)
+            .lineTo(p2x, p2y)
+            .lineTo(p3x, p3y)
+            .close();
+
+        return path;
+      };
     case 'star4':
       return acgraph.vector.primitives.star4;
     case 'star6':
@@ -1850,7 +1875,8 @@ anychart.enums.ScatterTicksMode = {
 anychart.enums.MapSeriesType = {
   CHOROPLETH: 'choropleth',
   BUBBLE: 'bubble',
-  MARKER: 'marker'
+  MARKER: 'marker',
+  CONNECTOR: 'connector'
 };
 
 
@@ -1869,6 +1895,8 @@ anychart.enums.normalizeMapSeriesType = function(value, opt_default) {
       return anychart.enums.MapSeriesType.BUBBLE;
     case 'marker':
       return anychart.enums.MapSeriesType.MARKER;
+    case 'connector':
+      return anychart.enums.MapSeriesType.CONNECTOR;
   }
   return opt_default || anychart.enums.MapSeriesType.CHOROPLETH;
 };

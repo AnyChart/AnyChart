@@ -311,7 +311,7 @@ anychart.core.ui.MarkersFactory.prototype.anchor = function(opt_value) {
  */
 anychart.core.ui.MarkersFactory.prototype.rotation = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = +opt_value;
+    opt_value = anychart.utils.toNumber(opt_value);
     if (this.rotation_ != opt_value) {
       this.rotation_ = opt_value;
       this.changedSettings['rotation'] = true;
@@ -1024,7 +1024,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.anchor = function(opt_value) {
  */
 anychart.core.ui.MarkersFactory.Marker.prototype.rotation = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = +opt_value;
+    opt_value = anychart.utils.toNumber(opt_value);
     if (this.settingsObj['rotation'] !== opt_value) {
       this.settingsObj['rotation'] = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
@@ -1251,6 +1251,40 @@ anychart.core.ui.MarkersFactory.Marker.prototype.getFinalSettings_ = function(
 
 
 /**
+ * Returns final value of settings with passed name.
+ * @param {string} value Name of settings.
+ * @return {*} settings value.
+ */
+anychart.core.ui.MarkersFactory.Marker.prototype.getFinalSettings = function(value) {
+  var parentMarkersFactory = this.parentMarkersFactory();
+  var currentMarkersFactory = this.currentMarkersFactory() ? this.currentMarkersFactory() : parentMarkersFactory;
+  var isSingleMarker = !(parentMarkersFactory && currentMarkersFactory);
+  var settingsChangedStates;
+  var notSelfSettings = currentMarkersFactory != parentMarkersFactory;
+  if (notSelfSettings)
+    settingsChangedStates = currentMarkersFactory.getSettingsChangedStatesObj();
+
+  var result;
+  if (value == 'enabled') {
+    result = this.getFinalSettings_(
+        this.enabled(),
+        this.superSettingsObj['enabled'],
+        !isSingleMarker && parentMarkersFactory.enabled(),
+        !isSingleMarker && currentMarkersFactory.enabled(),
+        !goog.isNull(isSingleMarker ? null : currentMarkersFactory.enabled()));
+  } else {
+    result = this.getFinalSettings_(
+        this[value](),
+        this.superSettingsObj[value],
+        isSingleMarker ? undefined : parentMarkersFactory[value](),
+        isSingleMarker ? undefined : currentMarkersFactory[value](),
+        !!(settingsChangedStates && settingsChangedStates[value]));
+  }
+  return result;
+};
+
+
+/**
  * Marker drawing.
  * @return {anychart.core.ui.MarkersFactory.Marker}
  */
@@ -1374,7 +1408,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.draw = function() {
     //clear all transform of element
     this.markerElement_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
     //Sets rotation.
-    this.markerElement_.setRotation(/** @type {number} */(settings['rotation']),
+    this.markerElement_.setRotation(/** @type {number} */(settings['rotation'] || 0),
         position.x + anchorCoordinate.x, position.y + anchorCoordinate.y);
 
     this.markerElement_.tag = this.getIndex();
@@ -1408,6 +1442,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.applyDefaultsForSingle_ = funct
 anychart.core.ui.MarkersFactory.Marker.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   if (goog.isDef(this.position())) json['position'] = this.position();
+  if (goog.isDef(this.rotation())) json['position'] = this.rotation();
   if (goog.isDef(this.anchor())) json['anchor'] = this.anchor();
   if (goog.isDef(this.offsetX())) json['offsetX'] = this.offsetX();
   if (goog.isDef(this.offsetY())) json['offsetY'] = this.offsetY();
@@ -1425,6 +1460,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.serialize = function() {
 anychart.core.ui.MarkersFactory.Marker.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   this.position(config['position']);
+  this.rotation(config['rotation']);
   this.anchor(config['anchor']);
   this.offsetX(config['offsetX']);
   this.offsetY(config['offsetY']);

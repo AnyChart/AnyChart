@@ -614,6 +614,10 @@
         <xsd:attribute name="type" type="enums.MarkerType"/>
         <xsd:attribute name="hover_type" type="enums.MarkerType"/>
         <xsd:attribute name="select_type" type="enums.MarkerType"/>
+        <!-- Connector series -->
+        <xsd:attribute name="end_size" type="xsd:double"/>
+        <xsd:attribute name="start_size" type="xsd:double"/>
+        <xsd:attribute name="curvature" type="xsd:double"/>
     </xsd:complexType>
 
     <xsd:complexType name="Map_series_list">
@@ -2574,6 +2578,7 @@
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="bubble"/>
             <xsd:enumeration value="choropleth"/>
+            <xsd:enumeration value="connector"/>
         </xsd:restriction>
     </xsd:simpleType>
 

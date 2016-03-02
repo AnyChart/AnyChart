@@ -6,11 +6,10 @@
 goog.provide('anychart.modules.anymap');
 
 goog.require('anychart.charts.Map');
-goog.require('anychart.core.map.series.Bubble');
-goog.require('anychart.core.map.series.Choropleth');
 goog.require('anychart.modules.base');
 goog.require('anychart.modules.bubbleMap');
 goog.require('anychart.modules.choropleth');
+goog.require('anychart.modules.connector');
 goog.require('anychart.modules.markerMap');
 
 

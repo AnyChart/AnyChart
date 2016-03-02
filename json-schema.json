@@ -1993,7 +1993,8 @@
             "anyOf": [
               {"$ref": "#/definitions/disable"},
               {"$ref": "#/definitions/anychart.core.map.series.Choropleth"},
-              {"$ref": "#/definitions/anychart.core.map.series.Bubble"}
+              {"$ref": "#/definitions/anychart.core.map.series.Bubble"},
+              {"$ref": "#/definitions/anychart.core.map.series.Connector"}
             ]
           }
         },
@@ -2883,6 +2884,19 @@
         "negativeHatchFill": {"$ref": "#/definitions/hatchFillSet"},
         "hoverNegativeHatchFill": {"$ref": "#/definitions/hatchFillSet"},
         "selectNegativeHatchFill": {"$ref": "#/definitions/hatchFillSet"}
+      }
+    },
+    "anychart.core.map.series.Connector": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.map.series.BaseWithMarkers"}
+      ],
+      "properties": {
+        "seriesType": {"enum": ["connector"]},
+
+        "endSize": {"type": [ "number", "string"] },
+        "startSize": {"type": [ "number", "string"] },
+        "curvature": {"type": [ "number", "string"] }
       }
     },
     "anychart.core.map.series.Marker": {

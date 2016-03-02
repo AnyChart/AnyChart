@@ -4603,6 +4603,34 @@ window['anychart']['themes']['v6'] = {
             }
           }
         }
+      },
+      'connector': {
+        'startSize': 1,
+        'endSize': 1,
+        'curvature': .3,
+        'markers': {
+          'position': 'middle'
+        },
+        'labels': {
+          'enabled': false,
+          'position': 'middle',
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'textFormatter': function() {
+            return 'from: ' + this['startPoint']['lat'] + ',' + this['startPoint']['long'] + '\nto: ' + this['endPoint']['lat'] + ',' + this['endPoint']['long'];
+          }
+        },
+        'tooltip': {
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'textFormatter': function() {
+            return 'from: ' + this['startPoint']['lat'] + ',' + this['startPoint']['long'] + '\nto: ' + this['endPoint']['lat'] + ',' + this['endPoint']['long'];
+          }
+        }
       }
     },
     'colorRange': {

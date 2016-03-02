@@ -1184,6 +1184,16 @@ anychart.core.SeriesBase.prototype.labelsInvalidated_ = function(event) {
 
 
 /**
+ * Draws label for a point.
+ * @param {anychart.PointState|number} pointState Point state - normal, hover or select.
+ * @protected
+ */
+anychart.core.SeriesBase.prototype.drawLabel = function(pointState) {
+  this.configureLabel(pointState, true);
+};
+
+
+/**
  * Gets label position.
  * @param {anychart.PointState|number} pointState Point state - normal, hover or select.
  * @return {string} Position settings.
@@ -1225,11 +1235,13 @@ anychart.core.SeriesBase.prototype.getLabelsPosition = function(pointState) {
 
 
 /**
- * Draws label for a point.
+ * Creates and configures labels.
  * @param {anychart.PointState|number} pointState Point state - normal, hover or select.
+ * @param {boolean=} opt_reset Whether reset labels settings.
+ * @return {?anychart.core.ui.LabelsFactory.Label}
  * @protected
  */
-anychart.core.SeriesBase.prototype.drawLabel = function(pointState) {
+anychart.core.SeriesBase.prototype.configureLabel = function(pointState, opt_reset) {
   var iterator = this.getIterator();
   var index = iterator.getIndex();
   var label = this.labels().getLabel(index);
@@ -1271,7 +1283,7 @@ anychart.core.SeriesBase.prototype.drawLabel = function(pointState) {
     var position = this.getLabelsPosition(pointState);
 
     var positionProvider = this.createLabelsPositionProvider(/** @type {anychart.enums.Position|string} */(position));
-    var formatProvider = this.createFormatProvider();
+    var formatProvider = this.createFormatProvider(true);
     if (label) {
       label.formatProvider(formatProvider);
       label.positionProvider(positionProvider);
@@ -1279,13 +1291,17 @@ anychart.core.SeriesBase.prototype.drawLabel = function(pointState) {
       label = this.labels().add(formatProvider, positionProvider, index);
     }
 
-    label.resetSettings();
-    label.currentLabelsFactory(labelsFactory);
-    label.setSettings(/** @type {Object} */(pointLabel), /** @type {Object} */(stateLabel));
-    label.draw();
+    if (opt_reset) {
+      label.resetSettings();
+      label.currentLabelsFactory(labelsFactory);
+      label.setSettings(/** @type {Object} */(pointLabel), /** @type {Object} */(stateLabel));
+    }
+
+    return label;
   } else if (label) {
-    label.clear();
+    this.labels_.clear(label.getIndex());
   }
+  return null;
 };
 
 
@@ -1324,7 +1340,9 @@ anychart.core.SeriesBase.prototype.applyAppearanceToPoint = goog.nullFunction;
 /**
  * Finalization point appearance. For drawing labels and markers.
  */
-anychart.core.SeriesBase.prototype.finalizePointAppearance = goog.nullFunction;
+anychart.core.SeriesBase.prototype.finalizePointAppearance = function() {
+  this.labels().draw();
+};
 
 
 /**

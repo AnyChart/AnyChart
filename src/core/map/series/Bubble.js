@@ -16,12 +16,6 @@ anychart.core.map.series.Bubble = function(opt_data, opt_csvSettings) {
   // Define reference fields for a series
   this.referenceValueNames = ['id', 'long', 'lat', 'size'];
   this.referenceValueMeanings = ['id', 'x', 'y', 'n'];
-
-  /**
-   * @type {Array}
-   * @private
-   */
-  this.points_ = [];
 };
 goog.inherits(anychart.core.map.series.Bubble, anychart.core.map.series.DiscreteBase);
 anychart.core.map.series.Base.SeriesTypesMap[anychart.enums.MapSeriesType.BUBBLE] = anychart.core.map.series.Bubble;

@@ -801,7 +801,8 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'map.defaultSeriesSettings.choropleth',
       'map.defaultSeriesSettings.bubble',
-      'map.defaultSeriesSettings.marker'
+      'map.defaultSeriesSettings.marker',
+      'map.defaultSeriesSettings.connector'
     ]
   },
   {
@@ -809,6 +810,7 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'choropleth',
       'bubbleMap',
+      'connector',
       'markerMap'
     ]
   },

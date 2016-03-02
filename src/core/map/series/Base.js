@@ -186,9 +186,11 @@ anychart.core.map.series.Base.prototype.geoIdField = function(opt_value) {
  * @param {string} value
  */
 anychart.core.map.series.Base.prototype.setAutoGeoIdField = function(value) {
-  this.geoAutoGeoIdField_ = value;
-  if (!this.geoIdField_)
-    this.invalidate(anychart.ConsistencyState.SERIES_DATA, anychart.Signal.NEEDS_REDRAW);
+  if (this.geoAutoGeoIdField_ != value) {
+    this.geoAutoGeoIdField_ = value;
+    if (!this.geoIdField_)
+      this.invalidate(anychart.ConsistencyState.SERIES_DATA, anychart.Signal.NEEDS_REDRAW);
+  }
 };
 
 
@@ -209,7 +211,7 @@ anychart.core.map.series.Base.prototype.getFinalGeoIdField = function() {
 anychart.core.map.series.Base.prototype.setGeoData = function(map, geoData) {
   this.map = map;
   this.geoData = geoData;
-  this.invalidate(anychart.ConsistencyState.SERIES_DATA, anychart.Signal.NEEDS_REDRAW);
+  this.calculate();
 };
 
 
@@ -309,7 +311,6 @@ anychart.core.map.series.Base.prototype.calculate = function() {
         }
       }
     }
-    this.markConsistent(anychart.ConsistencyState.SERIES_DATA);
   }
 };
 
@@ -334,7 +335,7 @@ anychart.core.map.series.Base.prototype.updateOnZoomOrMove = function() {
   if (manualSuspend)
     stage.resume();
 
-  this.markConsistent(anychart .ConsistencyState.ALL);
+  this.markConsistent(anychart.ConsistencyState.ALL);
 
   return this;
 };
@@ -382,7 +383,7 @@ anychart.core.map.series.Base.prototype.draw = function() {
   this.startDrawing();
   while (iterator.advance() && this.enabled()) {
     var index = iterator.getIndex();
-    if (iterator.get('selected'))
+    if (iterator.get('selected') && this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA))
       this.state.setPointState(anychart.PointState.SELECT, index);
 
     this.drawPoint(this.state.getPointStateByIndex(index));
@@ -503,7 +504,7 @@ anychart.core.map.series.Base.prototype.transformXY = function(xCoord, yCoord) {
  * @protected
  */
 anychart.core.map.series.Base.prototype.createFormatProvider = function(opt_force) {
-  if (!this.pointProvider)
+  if (!this.pointProvider || opt_force)
     this.pointProvider = new anychart.core.utils.MapPointContextProvider(this, this.referenceValueNames);
   this.pointProvider.applyReferenceValues();
 
