@@ -64,24 +64,28 @@ $(document).ready(function() {
   }
 
   series = chart.choropleth(choroplethData);
-  series.tooltip(false).labels().enabled(false);
+  series
+      .tooltip(false)
+      .labels().enabled(true);
+  series
+      .markers()
+      .enabled(true);
 
-
-  var point = series.getPoint(10);
-  point.middleX();
-  point.middleY();
-  var pointBounds = point.getFeatureBounds();
-
-  var x = pointBounds.left + pointBounds.width * point.middleX();
-  var y = pointBounds.top + pointBounds.height * point.middleY();
-
-  var latlon = chart.inverseTransform(x, y);
-
-  var data = [
-    {"value": 168, "size": 359, 'lat': latlon.lat, 'lon': latlon.long}
-  ];
-
-  series2 = chart.bubble(data);
+  //var point = series.getPoint(10);
+  //point.middleX();
+  //point.middleY();
+  //var pointBounds = point.getFeatureBounds();
+  //
+  //var x = pointBounds.left + pointBounds.width * point.middleX();
+  //var y = pointBounds.top + pointBounds.height * point.middleY();
+  //
+  //var latlon = chart.inverseTransform(x, y);
+  //
+  //var data = [
+  //  {"value": 168, "size": 359, 'lat': latlon.lat, 'lon': latlon.long}
+  //];
+  //
+  //series2 = chart.bubble(data);
 
 
 

@@ -347,9 +347,45 @@ anychart.core.map.series.Base.prototype.updateOnZoomOrMove = function() {
  */
 anychart.core.map.series.Base.prototype.applyZoomMoveTransform = function(positionProvider) {
   var domElement, prevPos, newPos, trX, trY, selfTx;
-  if (this.labels() && this.labels().enabled()) {
-    var iterator = this.getIterator();
-    var index = iterator.getIndex();
+
+  var iterator = this.getIterator();
+  var index = iterator.getIndex();
+  var pointState = this.state.getPointStateByIndex(index);
+  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
+
+  var isDraw, labelsFactory, pointLabel, stateLabel, labelEnabledState, stateLabelEnabledState;
+
+  pointLabel = iterator.get('label');
+  labelEnabledState = pointLabel && goog.isDef(pointLabel['enabled']) ? pointLabel['enabled'] : null;
+  if (selected) {
+    stateLabel = iterator.get('selectLabel');
+    stateLabelEnabledState = stateLabel && goog.isDef(stateLabel['enabled']) ? stateLabel['enabled'] : null;
+    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels());
+  } else if (hovered) {
+    stateLabel = iterator.get('hoverLabel');
+    stateLabelEnabledState = stateLabel && goog.isDef(stateLabel['enabled']) ? stateLabel['enabled'] : null;
+    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels());
+  } else {
+    stateLabel = null;
+    labelsFactory = this.labels();
+  }
+
+  if (selected || hovered) {
+    isDraw = goog.isNull(stateLabelEnabledState) ?
+        goog.isNull(labelsFactory.enabled()) ?
+            goog.isNull(labelEnabledState) ?
+                this.labels().enabled() :
+                labelEnabledState :
+            labelsFactory.enabled() :
+        stateLabelEnabledState;
+  } else {
+    isDraw = goog.isNull(labelEnabledState) ?
+        this.labels().enabled() :
+        labelEnabledState;
+  }
+
+  if (isDraw) {
     var label = this.labels().getLabel(index);
     if (label && label.getDomElement() && label.positionProvider()) {
       prevPos = label.positionProvider()['value'];

@@ -187,10 +187,45 @@ anychart.core.map.series.BaseWithMarkers.prototype.startDrawing = function() {
 /** @inheritDoc */
 anychart.core.map.series.BaseWithMarkers.prototype.applyZoomMoveTransform = function(positionProvider) {
   var domElement, prevPos, newPos, trX, trY, selfTx;
-  if (this.markers_ && this.markers_.enabled()) {
-    var iterator = this.getIterator();
-    var index = iterator.getIndex();
-    var marker = this.markers_.getMarker(index);
+
+  var iterator = this.getIterator();
+  var index = iterator.getIndex();
+  var pointState = this.state.getPointStateByIndex(index);
+
+  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
+
+  var pointMarker = iterator.get('marker');
+  var hoverPointMarker = iterator.get('hoverMarker');
+  var selectPointMarker = iterator.get('selectMarker');
+
+  var marker = this.markers_.getMarker(index);
+
+  var markerEnabledState = pointMarker && goog.isDef(pointMarker['enabled']) ? pointMarker['enabled'] : null;
+  var markerHoverEnabledState = hoverPointMarker && goog.isDef(hoverPointMarker['enabled']) ? hoverPointMarker['enabled'] : null;
+  var markerSelectEnabledState = selectPointMarker && goog.isDef(selectPointMarker['enabled']) ? selectPointMarker['enabled'] : null;
+
+  var isDraw = hovered || selected ?
+      hovered ?
+          goog.isNull(markerHoverEnabledState) ?
+              this.hoverMarkers_ && goog.isNull(this.hoverMarkers_.enabled()) ?
+                  goog.isNull(markerEnabledState) ?
+                      this.markers_.enabled() :
+                      markerEnabledState :
+                  this.hoverMarkers_.enabled() :
+              markerHoverEnabledState :
+          goog.isNull(markerSelectEnabledState) ?
+              this.selectMarkers_ && goog.isNull(this.selectMarkers_.enabled()) ?
+                  goog.isNull(markerEnabledState) ?
+                      this.markers_.enabled() :
+                      markerEnabledState :
+                  this.selectMarkers_.enabled() :
+              markerSelectEnabledState :
+      goog.isNull(markerEnabledState) ?
+          this.markers_.enabled() :
+          markerEnabledState;
+
+  if (isDraw) {
     if (marker && marker.getDomElement() && marker.positionProvider()) {
       prevPos = marker.positionProvider()['value'];
       newPos = positionProvider['value'];
