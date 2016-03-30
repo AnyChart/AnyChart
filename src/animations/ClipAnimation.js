@@ -53,6 +53,14 @@ anychart.animations.ClipAnimation.prototype.onBegin = function() {
 anychart.animations.ClipAnimation.prototype.cycle = function(now) {
   var bounds = this.series_.getPixelBounds();
 
+  if (this.series_.is3d) {
+    var x3dShift = this.series_.getChart().x3dShift;
+    var y3dShift = this.series_.getChart().y3dShift;
+    bounds.top -= y3dShift;
+    bounds.height += y3dShift;
+    bounds.width += x3dShift;
+  }
+
   this.startPoint[0] = bounds.left;
   this.startPoint[1] = bounds.top;
   this.startPoint[2] = 0;

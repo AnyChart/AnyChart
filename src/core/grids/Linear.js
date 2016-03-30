@@ -526,8 +526,9 @@ anychart.core.grids.Linear.prototype.draw = function() {
       this.x3dShift = this.getChart().x3dShift;
       this.y3dShift = this.getChart().y3dShift;
 
-      bounds.top -= this.y3dShift;
-      bounds.height += this.y3dShift;
+      var strokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.stroke())) / 2;
+      bounds.top -= this.y3dShift + strokeThickness;
+      bounds.height += this.y3dShift + strokeThickness;
       bounds.width += this.x3dShift;
     }
     var axesLinesSpace = this.axesLinesSpace();

@@ -26,6 +26,7 @@ anychart.onDocumentReady(function() {
   // create line chart
   var chart = anychart.area3d();
   window.chart = chart;
+  chart.animation(true);
 
   // adding dollar symbols to yAxis labels
   chart.yAxis().labels().textFormatter(function(){
@@ -45,6 +46,7 @@ anychart.onDocumentReady(function() {
   // create first series with mapped data
   var seriesArea = chart.area(seriesData);
   seriesArea.name("ACME Share Price").hoverMarkers().enabled(true).type('circle').size(4);
+  //seriesArea.hatchFill(true);
 
   // set chart tooltip settings
   chart.tooltip().position('top').anchor('bottomLeft').offsetX(5).offsetY(5);
@@ -114,7 +116,7 @@ anychart.onDocumentReady(function() {
   // turn on the crosshair
   chart.crosshair().enabled(true).yLabel().enabled(false);
   chart.crosshair().enabled(true).xLabel().enabled(false);
-  chart.crosshair().yStroke(null).xStroke('#fff').zIndex(99);
+  chart.crosshair().yStroke(null).xStroke('#fff').zIndex(39);
 
   // set chart title text settings
   chart.title('Regional ratio of cosmetic products sales');
@@ -131,9 +133,9 @@ anychart.onDocumentReady(function() {
     //series.fill(function(){return this.sourceColor + ' 0.3'});
     series.name(name);
     series.hoverMarkers().enabled(true).type('circle').size(4).stroke('1.5 #fff');
-    series.markers().zIndex(100);
     series.clip(false);
     series.hoverStroke('3 #fff 1');
+    //series.hatchFill(true);
   };
 
   grid3 = chart.grid(0);
@@ -184,27 +186,50 @@ anychart.onDocumentReady(function() {
 
 anychart.onDocumentReady(function() {
   // create data set on our data
+  //var dataSet = anychart.data.set([
+  //  ['1996', 162 , 242, 322],
+  //  ['1997', 90  , 254, 324],
+  //  ['1998', 50  , 226, 329],
+  //  ['1999', 77  , 232, 342],
+  //  ['2000', 35  , 268, 348],
+  //  ['2001', -45 , 254, 334],
+  //  ['2002', -88 , 235, 325],
+  //  ['2003', -120, 266, 316],
+  //  ['2004', -156, 288, 318],
+  //  ['2005', -123, 220, 330],
+  //  ['2006', -88 , 215, 355],
+  //  ['2007', -66 , 236, 366],
+  //  ['2008', -45 , 247, 337],
+  //  ['2009', -29 , 172, 352],
+  //  ['2010', -45 , 37,  377],
+  //  ['2011', -88 , 23,  383],
+  //  ['2012', -132, 34,  344],
+  //  ['2013', -146, 46,  366],
+  //  ['2014', -169, 59,  389],
+  //  ['2015', -184, 44,  334]
+  //]);
+
   var dataSet = anychart.data.set([
-    ['1996' , 322, 242, 162],
-    ['1997' , 324, 254, 90],
-    ['1998' , 329, 226, 50],
-    ['1999' , 342, 232, 77],
-    ['2000' , 348, 268, 35],
-    ['2001' , 334, 254, -45],
-    ['2002' , 325, 235, -88],
-    ['2003' , 316, 266, -120],
-    ['2004' , 318, 288, -156],
-    ['2005', 330, 220, -123],
-    ['2006', 355, 215, -88],
-    ['2007', 366, 236, -66],
-    ['2008', 337, 247, -45],
-    ['2009', 352, 172, -29],
-    ['2010', 377, 37, -45],
-    ['2011', 383, 23, -88],
-    ['2012', 344, 34, -132],
-    ['2013', 366, 46, -146],
-    ['2014', 389, 59, -169],
-    ['2015', 334, 44, -184]
+    ['1996', 300, 162, 242],
+    ['1997', 300, 90 , 254],
+    ['1998', 330, 50 , 226],
+    ['1999', 342, 77 , 232],
+    ['2000', 348, 35 , 268],
+    ['2001', 334, 45 , 254],
+    ['2002', 325, 88 , 235],
+    ['2003', 316, 120, 266],
+    ['2004', 318, 156, 288],
+    ['2005', 330, 123, 220],
+    ['2006', 355, 88 , 215],
+    ['2007', 366, 66 , 236],
+    ['2008', 337, 45 , 247],
+    ['2009', 352, 29 , 172],
+    ['2010', 377, 45 , 37 ],
+    ['2011', 383, 88 , 23 ],
+    ['2012', 344, 132, 34 ],
+    ['2013', 366, 146, 46 ],
+    ['2014', 389, 169, 59 ],
+    ['2015', 334, 184, 44 ]
   ]);
 
   // map data for the first series, take x from the zero area and value from the first area of data set
@@ -238,8 +263,7 @@ anychart.onDocumentReady(function() {
   chart.interactivity().hoverMode('byX');
   chart.tooltip().displayMode('union');
 
-
-  chart.xAxis().stroke(null);
+  //chart.xAxis().stroke(null);
   chart.yAxis().title('Profit in Dollars');
   chart.yAxis().labels().textFormatter(function(){
     if (this.value == 0) return this.value;
@@ -247,7 +271,7 @@ anychart.onDocumentReady(function() {
   });
 
   // create additional xAxis
-  chart.xAxis(1).stroke(null).orientation('top');
+  chart.xAxis(1).orientation('top');
 
   // create zero line
   var zeroLine = chart.lineMarker(0);
@@ -258,7 +282,8 @@ anychart.onDocumentReady(function() {
   // helper function to setup label settings for all series
   var setupSeries = function(series, name) {
     series.name(name);
-    series.markers().zIndex(100);
+    //series.hatchFill(true);
+    //series.markers().zIndex(100);
     series.hoverMarkers().enabled(true).type('circle').size(4).stroke('1.5 #fff');
     //series.fill(function(){return this.sourceColor + ' .5'});
   };
@@ -283,8 +308,14 @@ anychart.onDocumentReady(function() {
 
   var grid = chart.grid();
   grid.enabled(true).stroke("#ddd");
-  grid.drawLastLine(false);
-  grid.layout("vertical");
+
+  var grid2 = chart.grid(1);
+  grid2.layout('vertical');
+  grid2.stroke({
+    color: "#f0f0f0"
+  });
+
+  //chart.zDepth(50);
 
   // initiate chart drawing
   chart.draw();
@@ -410,6 +441,7 @@ anychart.onDocumentReady(function() {
     series.stroke('3 #fff 1');
     //series.fill(function(){return this.sourceColor + ' 0.8'});
     series.name(name);
+    //series.hatchFill(true);
     series.hoverMarkers().enabled(true).type('circle').size(4).stroke('1.5 #fff');
     series.clip(false);
     series.hoverStroke('3 #fff 1');

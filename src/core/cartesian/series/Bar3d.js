@@ -24,6 +24,13 @@ anychart.core.cartesian.series.Bar3d = function(opt_data, opt_csvSettings) {
   this.paths_ = [];
 
   /**
+   * Used paths for hatchFill.
+   * @type {Array.<acgraph.vector.Path>}
+   * @private
+   */
+  this.hatchFillPaths_ = [];
+
+  /**
    * Cleared paths.
    * @type {Array.<acgraph.vector.Path>}
    * @private
@@ -38,31 +45,38 @@ goog.inherits(anychart.core.cartesian.series.Bar3d, anychart.core.cartesian.seri
 anychart.core.cartesian.series.Base.Series3dTypesMap[anychart.enums.Cartesian3dSeriesType.BAR] = anychart.core.cartesian.series.Bar3d;
 
 
+/** @inheritDoc */
+anychart.core.cartesian.series.Bar3d.prototype.is3d = true;
+
+
 /**
  * Get paths.
+ * @param {boolean} isHatchFill Path is hatchFill.
  * @private
  * @return {!acgraph.vector.Path}
  */
-anychart.core.cartesian.series.Bar3d.prototype.genNextPath_ = function() {
+anychart.core.cartesian.series.Bar3d.prototype.genNextPath_ = function(isHatchFill) {
   var child = this.clearedPathsPool_.pop();
   if (!child) {
     var rootElement = this.container();
     child = rootElement.path();
   }
-  this.paths_.push(child);
+  isHatchFill ? this.hatchFillPaths_.push(child) : this.paths_.push(child);
   return child;
 };
 
 
 /**
  * Clear paths.
+ * @param {boolean} isHatchFill Path is hatchFill.
  * @private
  * @return {anychart.core.cartesian.series.Bar3d}
  */
-anychart.core.cartesian.series.Bar3d.prototype.clearPaths_ = function() {
-  while (this.paths_.length) {
+anychart.core.cartesian.series.Bar3d.prototype.clearPaths_ = function(isHatchFill) {
+  var paths = isHatchFill ? this.hatchFillPaths_ : this.paths_;
+  while (paths.length) {
     // clear paths immediately because this methods uses for remove series.
-    this.clearedPathsPool_.push(this.paths_.pop().clear());
+    this.clearedPathsPool_.push(paths.pop().clear());
   }
 
   return this;
@@ -70,14 +84,15 @@ anychart.core.cartesian.series.Bar3d.prototype.clearPaths_ = function() {
 
 
 /**
- * Remove paths.
+ * Remove all paths.
  * @private
  * @return {anychart.core.cartesian.series.Bar3d}
  */
 anychart.core.cartesian.series.Bar3d.prototype.removePaths_ = function() {
-  for (var i = 0; i < this.paths_.length; i++)
-    this.paths_[i].remove();
-  this.paths_.length = 0;
+  var paths = goog.array.concat(this.paths_, this.hatchFillPaths_);
+  for (var i = 0; i < paths.length; i++)
+    paths[i].remove();
+  paths.length = 0;
 
   return this;
 };
@@ -102,29 +117,32 @@ anychart.core.cartesian.series.Bar3d.prototype.startDrawing = function() {
   if (this.isConsistent() || !this.enabled()) return;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.clearPaths_();
+    this.clearPaths_(false);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
+    this.clearPaths_(true);
   }
 };
 
 
 /** @inheritDoc */
 anychart.core.cartesian.series.Bar3d.prototype.drawSubsequentPoint = function(pointState) {
-  var iter = this.getIterator();
+  var inc = this.iterator.getIndex() * 1e-4;
+  var zIndex = /** @type {number} */(this.iterator.meta('zIndex'));
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     var x = /** @type {number} */(this.iterator.meta('x'));
     var y = /** @type {number} */(this.iterator.meta('value'));
     var zero = /** @type {number} */(this.iterator.meta('zero'));
 
-    var bottomSide = this.genNextPath_();
-    var backSide = this.genNextPath_();
-    var leftSide = this.genNextPath_();
-    var rightSide = this.genNextPath_();
-    var frontSide = this.genNextPath_();
-    var topSide = this.genNextPath_();
+    var bottomSide = this.genNextPath_(false);
+    var backSide = this.genNextPath_(false);
+    var leftSide = this.genNextPath_(false);
+    var rightSide = this.genNextPath_(false);
+    var frontSide = this.genNextPath_(false);
+    var topSide = this.genNextPath_(false);
 
-    var inc = iter.getIndex() * 1e-4;
-    var zIndex = /** @type {number} */(iter.meta('zIndex'));
     bottomSide.zIndex(zIndex - inc);
     backSide.zIndex(zIndex - inc);
     leftSide.zIndex(zIndex - inc);
@@ -132,7 +150,7 @@ anychart.core.cartesian.series.Bar3d.prototype.drawSubsequentPoint = function(po
     frontSide.zIndex(zIndex - inc);
     topSide.zIndex(zIndex - inc);
 
-    iter
+    this.iterator
         .meta('shape', frontSide)
         .meta('frontSide', frontSide)
         .meta('backSide', backSide)
@@ -141,20 +159,55 @@ anychart.core.cartesian.series.Bar3d.prototype.drawSubsequentPoint = function(po
         .meta('leftSide', leftSide)
         .meta('rightSide', rightSide);
 
+    var chart = /** @type {anychart.charts.Cartesian3d} */(this.getChart());
+    var seriesIndex = this.index();
+    var seriesCount = chart.getSeriesCount();
+    var drawIndex = seriesCount - 1 - seriesIndex;
+    var zPaddingXShift = chart.zPaddingXShift;
+    var zPaddingYShift = chart.zPaddingYShift;
+    var x3dShift = chart.x3dShift;
+    var y3dShift = chart.y3dShift;
+
+    // width in barMode is height
+    var height = this.getPointWidth();
+    var x_ = Math.min(zero, y);
+    var y_ = x - height / 2;
+    var width = Math.abs(zero - y);
+    var zero3d = zero;
+
+    if (!this.drawingPlan.stacked && chart.zDistribution()) {
+      x3dShift = x3dShift / seriesCount - zPaddingXShift * (seriesCount - 1) / seriesCount;
+      y3dShift = y3dShift / seriesCount - zPaddingYShift * (seriesCount - 1) / seriesCount;
+
+      x3dShift = Math.max(x3dShift, 0);
+      y3dShift = Math.max(y3dShift, 0);
+
+      x_ += x3dShift * drawIndex + zPaddingXShift * drawIndex;
+      y_ -= y3dShift * drawIndex + zPaddingYShift * drawIndex;
+
+      zero3d += x3dShift * drawIndex + zPaddingXShift * drawIndex;
+    }
+
+    this.iterator
+        .meta('x3d', x_) // for animation (marker)
+        .meta('y3d', y_) // for animation
+        .meta('zero3d', zero3d) // for animation
+        .meta('x3dShift', x3dShift)
+        .meta('y3dShift', y3dShift);
+
+    var bounds3d = new anychart.math.Rect(x_, y_ - y3dShift, width + x3dShift, height + y3dShift);
+    this.iterator.meta('bounds3d', bounds3d);
+    var pixelShift = this.getFinalStroke(true, pointState)['thickness'] % 2 / 2;
+    if (isNaN(pixelShift)) pixelShift = 0;
+    this.iterator.meta('pixelShift', pixelShift);
+
     if (!this.isAnimation_) {
-      var x3dShift = this.getChart().x3dShift;
-      var y3dShift = this.getChart().y3dShift;
-
-      // width in barMode is height
-      var height = this.getPointWidth();
-      var x_ = Math.min(zero, y);
-      var y_ = x - height / 2;
-      var width = Math.abs(zero - y);
-
-      var bounds3d = new anychart.math.Rect(x_, y_ - y3dShift, width + x3dShift, height + y3dShift);
-      iter.meta('bounds3d', bounds3d);
-      var pixelShift = this.getFinalStroke(true, pointState)['thickness'] % 2 / 2;
-      if (isNaN(pixelShift)) pixelShift = 0;
+      leftSide
+          .moveTo(x_, y_)
+          .lineTo(x_ + x3dShift + pixelShift, y_ - y3dShift + pixelShift)
+          .lineTo(x_ + x3dShift, y_ + height - y3dShift)
+          .lineTo(x_, y_ + height - pixelShift)
+          .close();
 
       bottomSide
           .moveTo(x_ + pixelShift, y_ + height)
@@ -168,13 +221,6 @@ anychart.core.cartesian.series.Bar3d.prototype.drawSubsequentPoint = function(po
           .lineTo(x_ + x3dShift + width, y_ - y3dShift)
           .lineTo(x_ + x3dShift + width, y_ - y3dShift + height)
           .lineTo(x_ + x3dShift, y_ - y3dShift + height)
-          .close();
-
-      leftSide
-          .moveTo(x_, y_)
-          .lineTo(x_ + x3dShift + pixelShift, y_ - y3dShift + pixelShift)
-          .lineTo(x_ + x3dShift, y_ + height - y3dShift)
-          .lineTo(x_, y_ + height - pixelShift)
           .close();
 
       rightSide
@@ -197,12 +243,6 @@ anychart.core.cartesian.series.Bar3d.prototype.drawSubsequentPoint = function(po
           .lineTo(x_ + width + x3dShift - pixelShift, y_ - y3dShift + pixelShift)
           .lineTo(x_ + x3dShift, y_ - y3dShift)
           .close();
-
-    } else {
-      //todo: animation
-      //rect
-      //    .setY(x - barWidth / 2)
-      //    .setHeight(barWidth);
     }
 
     this.colorizeShape(pointState);
@@ -216,20 +256,76 @@ anychart.core.cartesian.series.Bar3d.prototype.drawSubsequentPoint = function(po
     this.makeInteractive(topSide);
   }
 
-  //todo: hatchFill
-  //if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
-  //  var hatchFillShape = this.hatchFillRootElement ?
-  //      /** @type {!acgraph.vector.Path} */(this.hatchFillRootElement.genNextChild()) :
-  //      null;
-  //  iter.meta('hatchFillShape', hatchFillShape);
-  //  var shape = /** @type {acgraph.vector.Shape} */(iter.meta('shape'));
-  //  if (goog.isDef(shape) && hatchFillShape) {
-  //    hatchFillShape.deserialize(shape.serialize());
-  //  }
-  //  this.applyHatchFill(pointState);
-  //}
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
+    var hatchFillBottomSide = this.genNextPath_(true);
+    var hatchFillBackSide = this.genNextPath_(true);
+    var hatchFillLeftSide = this.genNextPath_(true);
+    var hatchFillRightSide = this.genNextPath_(true);
+    var hatchFillFrontSide = this.genNextPath_(true);
+    var hatchFillTopSide = this.genNextPath_(true);
+
+    this.iterator.meta('hatchFillBottomSide', hatchFillBottomSide);
+    this.iterator.meta('hatchFillBackSide', hatchFillBackSide);
+    this.iterator.meta('hatchFillLeftSide', hatchFillLeftSide);
+    this.iterator.meta('hatchFillRightSide', hatchFillRightSide);
+    this.iterator.meta('hatchFillFrontSide', hatchFillFrontSide);
+    this.iterator.meta('hatchFillTopSide', hatchFillTopSide);
+
+    bottomSide = /** @type {acgraph.vector.Path} */(this.iterator.meta('bottomSide'));
+    backSide = /** @type {acgraph.vector.Path} */(this.iterator.meta('backSide'));
+    leftSide = /** @type {acgraph.vector.Path} */(this.iterator.meta('leftSide'));
+    rightSide = /** @type {acgraph.vector.Path} */(this.iterator.meta('rightSide'));
+    frontSide = /** @type {acgraph.vector.Path} */(this.iterator.meta('frontSide'));
+    topSide = /** @type {acgraph.vector.Path} */(this.iterator.meta('topSide'));
+
+    if (goog.isDef(frontSide) && hatchFillFrontSide) {
+      hatchFillBottomSide.deserialize(bottomSide.serialize());
+      hatchFillBackSide.deserialize(backSide.serialize());
+      hatchFillLeftSide.deserialize(leftSide.serialize());
+      hatchFillRightSide.deserialize(rightSide.serialize());
+      hatchFillFrontSide.deserialize(frontSide.serialize());
+      hatchFillTopSide.deserialize(topSide.serialize());
+
+      var hatchFillFactor = 1e-8;
+      hatchFillBottomSide.zIndex(zIndex - inc - hatchFillFactor);
+      hatchFillBackSide.zIndex(zIndex - inc - hatchFillFactor);
+      hatchFillLeftSide.zIndex(zIndex - inc - hatchFillFactor);
+      hatchFillRightSide.zIndex(zIndex - inc + hatchFillFactor);
+      hatchFillFrontSide.zIndex(zIndex - inc + hatchFillFactor);
+      hatchFillTopSide.zIndex(zIndex - inc + hatchFillFactor);
+
+      this.makeInteractive(hatchFillBottomSide);
+      this.makeInteractive(hatchFillBackSide);
+      this.makeInteractive(hatchFillLeftSide);
+      this.makeInteractive(hatchFillRightSide);
+      this.makeInteractive(hatchFillFrontSide);
+      this.makeInteractive(hatchFillTopSide);
+    }
+    this.applyHatchFill(pointState);
+  }
 
   return true;
+};
+
+
+/** @inheritDoc */
+anychart.core.cartesian.series.Bar3d.prototype.applyHatchFill = function(pointState) {
+  var iter = this.getIterator();
+  var hatchFillBottomSide = /** @type {acgraph.vector.Path} */(iter.meta('hatchFillBottomSide'));
+  var hatchFillBackSide = /** @type {acgraph.vector.Path} */(iter.meta('hatchFillBackSide'));
+  var hatchFillLeftSide = /** @type {acgraph.vector.Path} */(iter.meta('hatchFillLeftSide'));
+  var hatchFillRightSide = /** @type {acgraph.vector.Path} */(iter.meta('hatchFillRightSide'));
+  var hatchFillFrontSide = /** @type {acgraph.vector.Path} */(iter.meta('hatchFillFrontSide'));
+  var hatchFillTopSide = /** @type {acgraph.vector.Path} */(iter.meta('hatchFillTopSide'));
+  if (goog.isDefAndNotNull(hatchFillFrontSide)) {
+    var finalHatchFill = this.getFinalHatchFill(true, pointState);
+    hatchFillBottomSide.stroke(null).fill(finalHatchFill);
+    hatchFillBackSide.stroke(null).fill(finalHatchFill);
+    hatchFillLeftSide.stroke(null).fill(finalHatchFill);
+    hatchFillRightSide.stroke(null).fill(finalHatchFill);
+    hatchFillFrontSide.stroke(null).fill(finalHatchFill);
+    hatchFillTopSide.stroke(null).fill(finalHatchFill);
+  }
 };
 
 
@@ -397,7 +493,8 @@ anychart.core.cartesian.series.Bar3d.prototype.disposeInternal = function() {
 
 /** @inheritDoc */
 anychart.core.cartesian.series.Bar3d.prototype.remove = function() {
-  this.clearPaths_();
+  this.clearPaths_(true);
+  this.clearPaths_(false);
   anychart.core.cartesian.series.Bar3d.base(this, 'remove');
 };
 

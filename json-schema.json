@@ -417,7 +417,10 @@
           ]
         },
         "zAngle": {"type": ["number"]},
-        "zDepth": {"type": ["number"]}
+        "zDepth": {"type": ["number", "null"]},
+        "zAspect": {"type": ["number", "string"]},
+        "zPadding": {"type": ["number"]},
+        "zDistribution": {"type": ["boolean"]}
       },
       "required": ["type"]
     },

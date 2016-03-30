@@ -1,6 +1,236 @@
 anychart.onDocumentReady(function() {
+  // create data set on our data
+  var dataSet = anychart.data.set([
+    ['Nail polish', 6814, 3054, 4376, 4229],
+    ['Eyebrow pencil', 7012, 5067, 8987, 3932],
+    ['Pomade', 8814, 9054, 4376, 9256]
+  ]);
+
+  // map data for the first series, take x from the zero column and value from the first column of data set
+  var seriesData_1 = dataSet.mapAs({x: [0], value: [1]});
+
+  // map data for the second series, take x from the zero column and value from the second column of data set
+  var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
+
+  // map data for the third series, take x from the zero column and value from the third column of data set
+  var seriesData_3 = dataSet.mapAs({x: [0], value: [3]});
+
+  // map data for the fourth series, take x from the zero column and value from the fourth column of data set
+  var seriesData_4 = dataSet.mapAs({x: [0], value: [4]});
+
+  // create bar chart
   var chart = anychart.bar3d();
   window.chart = chart;
+
+  // turn on chart animation
+  chart.animation(true);
+
+  // set container id for the chart
+  chart.container('container');
+  chart.padding([10,40,5,20]);
+
+  // set chart title text settings
+  chart.title('Top 3 Products with Region Sales Data');
+  chart.title().padding([0,0,10,0]);
+
+  // set scale minimum
+  chart.yScale().minimum(0);
+
+  chart.xAxis().labels().rotation(-90).padding([0,0,20,0]);
+
+  chart.yAxis().labels().textFormatter(function(){
+    return this.value.toLocaleString();
+  });
+
+  // set titles for Y-axis
+  chart.yAxis().title('Revenue in Dollars');
+
+  // helper function to setup settings for series
+  var setupSeries = function(series, name) {
+    var seriesLabels = series.labels();
+    series.hoverLabels().enabled(false);
+    seriesLabels.enabled(true);
+    seriesLabels.position('right');
+    seriesLabels.textFormatter(function(){
+      return '$' + this.value.toLocaleString();
+    });
+    seriesLabels.anchor('left');
+    series.markers(true);
+    //series.hatchFill(true);
+    series.name(name);
+    series.tooltip().titleFormatter(function () {
+      return this.x;
+    });
+    series.tooltip().textFormatter(function () {
+      return this.seriesName + ': $' + parseInt(this.value).toLocaleString();
+    });
+    series.tooltip().position('right').anchor('left').offsetX(5).offsetY(0);
+  };
+
+  chart.grid();
+  chart.grid(1).layout('h');
+
+  // temp variable to store series instance
+  var series;
+
+  // create first series with mapped data
+  series = chart.bar(seriesData_1);
+  setupSeries(series, 'Florida');
+
+  // create second series with mapped data
+  series = chart.bar(seriesData_2);
+  setupSeries(series, 'Texas');
+
+  // create third series with mapped data
+  series = chart.bar(seriesData_3);
+  setupSeries(series, 'Arizona');
+
+  // create fourth series with mapped data
+  series = chart.bar(seriesData_4);
+  setupSeries(series, 'Nevada');
+
+  // turn on legend
+  chart.legend().enabled(true).fontSize(13).padding([0,0,20,0]);
+
+  chart.interactivity().hoverMode('single');
+  chart.tooltip().positionMode('point');
+
+  // create line marker
+  firstMarker = chart.lineMarker(0);
+  // set line color
+  firstMarker.stroke("#090");
+  // bind marker to scale
+  firstMarker.scale(chart.yScale());
+  // set markers position on plot
+  firstMarker.value(9500);
+
+  // create second marker
+  secondMarker = chart.lineMarker(1);
+  // line visual settings
+  secondMarker.stroke({
+    // set line color
+    color: "#dd2c00",
+    // set dashes
+    dash: 7,
+    // set stroke opacity
+    opacity: 1});
+  // bind marker to scale
+  secondMarker.scale(chart.yScale());
+  // set markers position
+  secondMarker.value(8200);
+
+  //----
+
+  var textMarker = chart.textMarker();
+  textMarker.scale(chart.yScale());
+  textMarker.value(18000);
+  textMarker.align("left");
+  textMarker.anchor("rightcenter");
+  textMarker.fontSize(12);
+  textMarker.fontColor("#212121");
+  textMarker.offsetX(0);
+  textMarker.text("Historical Maximum");
+
+  chart.zPadding(10);
+  //chart.zDepth(100);
+
+  // initiate chart drawing
+  chart.draw();
+});
+
+// -------------------------------------------------------------------------------------------------------------------
+
+anychart.onDocumentReady(function() {
+
+  // create data set on our data
+  var dataSet = anychart.data.set([
+    ['Nail polish', 12814, 3054, 4376, 4229],
+    ['Eyebrow pencil', 13012, 5067, 3987, 3932],
+    ['Rouge', 11624, 7004, 3574, 5221],
+    ['Pomade', 8814, 9054, 4376, 9256],
+    ['Eyeshadows', 12998, 12043, 4572, 3308],
+    ['Eyeliner', 12321, 15067, 3417, 5432],
+    ['Foundation', 10342, 10119, 5231, 13701],
+    ['Lip gloss', 22998, 12043, 4572, 4008],
+    ['Mascara', 11261, 10419, 6134, 18712]
+  ]);
+
+  // map data for the first series, take x from the zero column and value from the first column of data set
+  var seriesData_1 = dataSet.mapAs({x: [0], value: [1]});
+
+  // map data for the second series, take x from the zero column and value from the second column of data set
+  var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
+
+  // map data for the second series, take x from the zero column and value from the third column of data set
+  var seriesData_3 = dataSet.mapAs({x: [0], value: [3]});
+
+  // map data for the fourth series, take x from the zero column and value from the fourth column of data set
+  var seriesData_4 = dataSet.mapAs({x: [0], value: [4]});
+
+  // create bar chart
+  var chart2 = anychart.bar3d();
+  window.chart2 = chart2;
+
+  // turn on chart animation
+  //chart2.animation(true);
+
+  // force chart to stack values by Y scale.
+  chart2.yScale().stackMode('percent');
+
+  // set container id for the chart
+  chart2.container('container2');
+
+  // set chart title text settings
+  chart2.title('Regional ratio of cosmetic products sales');
+  chart2.title().padding([0, 0, 5, 0]);
+
+  // set yAxis labels formatting, force it to add % to values
+  chart2.yAxis(0).labels().textFormatter(function(info) {
+    return info.value + '%';
+  });
+
+  // helper function to setup label settings for all series
+  var setupSeriesLabels = function(series, name) {
+    series.markers(true);
+    series.name(name);
+    series.tooltip().valuePrefix('$');
+    //series.stroke('3 #fff 1');
+    //series.hoverStroke('3 #fff 1');
+  };
+
+  // temp variable to store series instance
+  var series;
+
+  // create first series with mapped data
+  series = chart2.bar(seriesData_1);
+  setupSeriesLabels(series, 'Florida');
+
+  // create second series with mapped data
+  series = chart2.bar(seriesData_2);
+  setupSeriesLabels(series, 'Texas');
+
+  // create third series with mapped data
+  series = chart2.bar(seriesData_3);
+  setupSeriesLabels(series, 'Arizona');
+
+  // create fourth series with mapped data
+  series = chart2.bar(seriesData_4);
+  setupSeriesLabels(series, 'Nevada');
+
+  // turn on legend
+  chart2.legend().enabled(true).fontSize(14).padding([0, 0, 15, 0]);
+  chart2.interactivity().hoverMode('byX');
+  chart2.tooltip().displayMode('union');
+  // initiate chart drawing
+  chart2.draw();
+
+});
+
+// -------------------------------------------------------------------------------------------------------------------
+
+anychart.onDocumentReady(function() {
+  var chart = anychart.bar3d();
+  window.chart3 = chart;
 
   // set chart title text settings
   chart.title('Top 10 Cosmetic Products by Revenue');
@@ -26,6 +256,8 @@ anychart.onDocumentReady(function() {
     return '$' + parseInt(this.value).toLocaleString();
   });
   series.tooltip().position('right').anchor('left').offsetX(5).offsetY(0);
+
+  series.markers(true);
 
   // set yAxis labels formatter
   chart.yAxis().labels().textFormatter(function() {
@@ -89,231 +321,7 @@ anychart.onDocumentReady(function() {
   chart.xScroller(true);
 
   //chart.crosshair().enabled(true);
-  chart.container('container').draw();
-});
-
-// -------------------------------------------------------------------------------------------------------------------
-
-anychart.onDocumentReady(function() {
-
-  // create data set on our data
-  var dataSet = anychart.data.set([
-    ['Nail polish', 12814, 3054, 4376, 4229],
-    ['Eyebrow pencil', 13012, 5067, 3987, 3932],
-    ['Rouge', 11624, 7004, 3574, 5221],
-    ['Pomade', 8814, 9054, 4376, 9256],
-    ['Eyeshadows', 12998, 12043, 4572, 3308],
-    ['Eyeliner', 12321, 15067, 3417, 5432],
-    ['Foundation', 10342, 10119, 5231, 13701],
-    ['Lip gloss', 22998, 12043, 4572, 4008],
-    ['Mascara', 11261, 10419, 6134, 18712]
-  ]);
-
-  // map data for the first series, take x from the zero column and value from the first column of data set
-  var seriesData_1 = dataSet.mapAs({x: [0], value: [1]});
-
-  // map data for the second series, take x from the zero column and value from the second column of data set
-  var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
-
-  // map data for the second series, take x from the zero column and value from the third column of data set
-  var seriesData_3 = dataSet.mapAs({x: [0], value: [3]});
-
-  // map data for the fourth series, take x from the zero column and value from the fourth column of data set
-  var seriesData_4 = dataSet.mapAs({x: [0], value: [4]});
-
-  // create bar chart
-  var chart2 = anychart.bar3d();
-  window.chart2 = chart2;
-
-  // turn on chart animation
-  //chart2.animation(true);
-
-  // force chart to stack values by Y scale.
-  chart2.yScale().stackMode('percent');
-
-  // set container id for the chart
-  chart2.container('container2');
-
-  // set chart title text settings
-  chart2.title('Regional ratio of cosmetic products sales');
-  chart2.title().padding([0, 0, 5, 0]);
-
-  // set yAxis labels formatting, force it to add % to values
-  chart2.yAxis(0).labels().textFormatter(function(info) {
-    return info.value + '%';
-  });
-
-  // helper function to setup label settings for all series
-  var setupSeriesLabels = function(series, name) {
-    series.name(name);
-    series.tooltip().valuePrefix('$');
-    //series.stroke('3 #fff 1');
-    //series.hoverStroke('3 #fff 1');
-  };
-
-  // temp variable to store series instance
-  var series;
-
-  // create first series with mapped data
-  series = chart2.bar(seriesData_1);
-  setupSeriesLabels(series, 'Florida');
-
-  // create second series with mapped data
-  series = chart2.bar(seriesData_2);
-  setupSeriesLabels(series, 'Texas');
-
-  // create third series with mapped data
-  series = chart2.bar(seriesData_3);
-  setupSeriesLabels(series, 'Arizona');
-
-  // create fourth series with mapped data
-  series = chart2.bar(seriesData_4);
-  setupSeriesLabels(series, 'Nevada');
-
-  // turn on legend
-  chart2.legend().enabled(true).fontSize(14).padding([0, 0, 15, 0]);
-  chart2.interactivity().hoverMode('byX');
-  chart2.tooltip().displayMode('union');
-  // initiate chart drawing
-  chart2.draw();
-
-});
-
-// -------------------------------------------------------------------------------------------------------------------
-
-anychart.onDocumentReady(function() {
-  // create data set on our data
-  var dataSet = anychart.data.set([
-    ['Nail polish', 6814, 3054, 4376, 4229],
-    ['Eyebrow pencil', 7012, 5067, 8987, 3932],
-    ['Pomade', 8814, 9054, 4376, 9256]
-  ]);
-
-  // map data for the first series, take x from the zero column and value from the first column of data set
-  var seriesData_1 = dataSet.mapAs({x: [0], value: [1]});
-
-  // map data for the second series, take x from the zero column and value from the second column of data set
-  var seriesData_2 = dataSet.mapAs({x: [0], value: [2]});
-
-  // map data for the third series, take x from the zero column and value from the third column of data set
-  var seriesData_3 = dataSet.mapAs({x: [0], value: [3]});
-
-  // map data for the fourth series, take x from the zero column and value from the fourth column of data set
-  var seriesData_4 = dataSet.mapAs({x: [0], value: [4]});
-
-  // create bar chart
-  var chart = anychart.bar3d();
-  window.chart3 = chart;
-
-  // turn on chart animation
-  //chart.animation(true);
-
-  // set container id for the chart
-  chart.container('container3');
-  chart.padding([10,40,5,20]);
-
-  // set chart title text settings
-  chart.title('Top 3 Products with Region Sales Data');
-  chart.title().padding([0,0,10,0]);
-
-  // set scale minimum
-  chart.yScale().minimum(0);
-
-  chart.xAxis().labels().rotation(-90).padding([0,0,20,0]);
-
-  chart.yAxis().labels().textFormatter(function(){
-    return this.value.toLocaleString();
-  });
-
-  // set titles for Y-axis
-  chart.yAxis().title('Revenue in Dollars');
-
-  // helper function to setup settings for series
-  var setupSeries = function(series, name) {
-    var seriesLabels = series.labels();
-    series.hoverLabels().enabled(false);
-    seriesLabels.enabled(true);
-    seriesLabels.position('right');
-    seriesLabels.textFormatter(function(){
-      return '$' + this.value.toLocaleString();
-    });
-    series.name(name);
-    seriesLabels.anchor('left');
-    series.tooltip().titleFormatter(function () {
-      return this.x;
-    });
-    series.tooltip().textFormatter(function () {
-      return this.seriesName + ': $' + parseInt(this.value).toLocaleString();
-    });
-    series.tooltip().position('right').anchor('left').offsetX(5).offsetY(0);
-  };
-
-  chart.grid();
-  chart.grid(1).layout('h');
-
-  // temp variable to store series instance
-  var series;
-
-  // create first series with mapped data
-  series = chart.bar(seriesData_1);
-  setupSeries(series, 'Florida');
-
-  // create second series with mapped data
-  series = chart.bar(seriesData_2);
-  setupSeries(series, 'Texas');
-
-  // create third series with mapped data
-  series = chart.bar(seriesData_3);
-  setupSeries(series, 'Arizona');
-
-  // create fourth series with mapped data
-  series = chart.bar(seriesData_4);
-  setupSeries(series, 'Nevada');
-
-  // turn on legend
-  chart.legend().enabled(true).fontSize(13).padding([0,0,20,0]);
-
-  chart.interactivity().hoverMode('single');
-  chart.tooltip().positionMode('point');
-
-  // create line marker
-  var firstMarker = chart.lineMarker(0);
-  // set line color
-  firstMarker.stroke("#090");
-  // bind marker to scale
-  firstMarker.scale(chart.yScale());
-  // set markers position on plot
-  firstMarker.value(9500);
-
-  // create second marker
-  var secondMarker = chart.lineMarker(1);
-  // line visual settings
-  secondMarker.stroke({
-    // set line color
-    color: "#dd2c00",
-    // set dashes
-    dash: 7,
-    // set stroke opacity
-    opacity: 1});
-  // bind marker to scale
-  secondMarker.scale(chart.yScale());
-  // set markers position
-  secondMarker.value(8200);
-
-  //----
-
-  var textMarker = chart.textMarker();
-  textMarker.scale(chart.yScale());
-  textMarker.value(18000);
-  textMarker.align("left");
-  textMarker.anchor("rightcenter");
-  textMarker.fontSize(12);
-  textMarker.fontColor("#212121");
-  textMarker.offsetX(0);
-  textMarker.text("Historical Maximum");
-
-  // initiate chart drawing
-  chart.draw();
+  chart.container('container3').draw();
 });
 
 
@@ -379,6 +387,7 @@ anychart.onDocumentReady(function() {
 
   // helper function to setup label settings for all series
   var setupSeriesLabels = function(series, name) {
+    series.markers(true);
     series.name(name);
     series.tooltip().valuePrefix('$');
     series.fill(function() {
@@ -495,6 +504,7 @@ anychart.onDocumentReady(function() {
 
   // helper function to setup label settings for all series
   var setupSeriesLabels = function(series, name) {
+    series.markers(true);
     series.name(name);
     series.tooltip().titleFormatter(function () {
       return this.x;
@@ -571,9 +581,11 @@ anychart.onDocumentReady(function() {
   // set series data and adjust series position
   var shiftedSeries = chart.bar(Sales2003);
   shiftedSeries.xPointPosition(0.5);
+  shiftedSeries.markers(true);
 
   // second series data
-  chart.bar(Sales2004);
+  var secondSeries = chart.bar(Sales2004);
+  secondSeries.markers(true);
 
   // draw
   chart.container("container6");

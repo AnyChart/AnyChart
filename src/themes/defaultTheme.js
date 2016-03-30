@@ -1170,7 +1170,7 @@ window['anychart']['themes']['defaultTheme'] = {
     }
   },
 
-  // merge with defaultCartesian
+  // merge with cartesianBase
   'cartesian': {
     'defaultSeriesType': 'line',
     'xAxes': [],
@@ -1386,10 +1386,11 @@ window['anychart']['themes']['defaultTheme'] = {
 
   // merge with cartesian
   'cartesian3d': {
-    'zDepth': 10,
-    'zAngle': 45,
     'defaultSeriesType': 'column',
-    'zPadding': false,
+    'zAngle': 45,
+    'zAspect': '50%',
+    'zDistribution': true,
+    'zPadding': 10,
     'defaultSeriesSettings': {
       'base': {
         'stroke': 'none',
@@ -1399,30 +1400,52 @@ window['anychart']['themes']['defaultTheme'] = {
         'hoverFill': returnLightenSourceColor20,
         'selectFill': returnLightenSourceColor30
       }
-    },
-    'xAxes': [{}],
-    'yAxes': [{}]
+    }
   },
 
   // merge with area
   'bar3d': {
-    'zDepth': 10,
+    'defaultSeriesType': 'bar',
     'zAngle': 45,
-    'zPadding': false
+    'zAspect': '50%',
+    'zDistribution': false,
+    'zPadding': 10,
+    'grids': [{}, {
+      'enabled': true,
+      'layout': 'horizontal',
+      'scale': 0
+    }]
   },
 
   // merge with column
   'column3d': {
-    'zDepth': 20,
+    'defaultSeriesType': 'column',
     'zAngle': 45,
-    'zPadding': false
+    'zAspect': '50%',
+    'zDistribution': false,
+    'zPadding': 10,
+    'grids': [{}, {
+      'enabled': true,
+      'layout': 'vertical',
+      'scale': 0
+    }]
   },
 
   // merge with area
   'area3d': {
-    'zDepth': 10,
+    'defaultSeriesType': 'area',
     'zAngle': 45,
-    'zPadding': false
+    'zAspect': '50%',
+    'zDistribution': true,
+    'zPadding': 5,
+    'grids': [{}, {
+      'enabled': true,
+      'layout': 'vertical',
+      'scale': 0
+    }],
+    'hatchFillPalette': {
+      'items': ['backwardDiagonal', 'forwardDiagonal', 'dashedBackwardDiagonal', 'grid', 'dashedForwardDiagonal', 'dashedHorizontal', 'dashedVertical', 'diagonalCross', 'diagonalBrick', 'divot', 'horizontalBrick', 'verticalBrick', 'checkerBoard', 'confetti', 'plaid', 'solidDiamond', 'zigZag', 'weave', 'percent05', 'percent10', 'percent20', 'percent25', 'percent30', 'percent40', 'percent50', 'percent60', 'percent70', 'percent75', 'percent80', 'percent90', 'horizontal', 'vertical']
+    }
   },
 
   // merge with chart

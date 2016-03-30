@@ -177,6 +177,13 @@ anychart.core.cartesian.series.Base.Series3dTypesMap = {};
 
 
 /**
+ * Series is 3D series.
+ * @type {boolean}
+ */
+anychart.core.cartesian.series.Base.prototype.is3d = false;
+
+
+/**
  * For internal use.
  * @param {number} value Calculated bar width ratio.
  */

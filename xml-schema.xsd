@@ -129,7 +129,10 @@
         <xsd:attribute name="y_scale" type="simple.ChartScaleRef"/>
         <!-- charts.Cartesian3d attrs -->
         <xsd:attribute name="z_angle" type="xsd:double" default="45"/>
-        <xsd:attribute name="z_depth" type="xsd:double" default="20"/>
+        <xsd:attribute name="z_aspect" type="simple.NumberOrPercent" default="50%"/>
+        <xsd:attribute name="z_depth" type="simple.NumberOrNull"/>
+        <xsd:attribute name="z_padding" type="xsd:double" default="10"/>
+        <xsd:attribute name="z_distribution" type="xsd:boolean" default="false"/>
         <!-- charts.Funnel attrs -->
         <xsd:attribute name="neck_height" type="simple.NumberOrPercent" default="25%"/>
         <xsd:attribute name="neck_width" type="simple.NumberOrPercent" default="25%"/>
@@ -2137,6 +2140,19 @@
         </xsd:union>
     </xsd:simpleType>
 
+    <xsd:simpleType name="simple.NumberOrNull">
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="null"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:double"/>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
     <xsd:simpleType name="simple.NumberOrBoolOrNull">
         <xsd:union>
             <xsd:simpleType>
@@ -2144,6 +2160,20 @@
                     <xsd:enumeration value="true"/>
                     <xsd:enumeration value="false"/>
                     <xsd:enumeration value="null"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:double"/>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="simple.NumberOrBool">
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="true"/>
+                    <xsd:enumeration value="false"/>
                 </xsd:restriction>
             </xsd:simpleType>
             <xsd:simpleType>

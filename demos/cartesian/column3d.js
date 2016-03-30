@@ -1,9 +1,28 @@
+// super demo (z distr)
+//anychart.onDocumentReady(function() {
+//  var dataSet = anychart.data.set([
+//    [18],
+//    [15],
+//    [16],
+//    [21]
+//  ]);
+//  seriesData = dataSet.mapAs({'value': [0]});
+//
+//  chart = anychart.cartesian3d();
+//  chart.area([4, 4, 9, 7]);
+//  chart.legend(true);
+//  chart.container('container').draw();
+//  chart.addSeries(seriesData, [10, 20, 4]);
+//});
+
 anychart.onDocumentReady(function() {
   // create data set on our data
   var dataSet = anychart.data.set([
-    ['Nail polish', 6814, 3054, 4376, 4229],
-    ['Eyebrow pencil', 7012, 5067, 8987, 3932],
-    ['Pomade', 8814, 9054, 4376, 9256]
+    ['Nail polish',    22, 23, 25, 63],
+    ['Eyebrow pencil', 34, 45, 56, 29],
+    ['Pomade',         16, 46, 67, 56],
+    ['P1',             32, 86, 32, 49],
+    ['P2',             68, 45, 27, 97]
   ]);
 
   // map data for the first series, take x from the zero column and value from the first column of data set
@@ -19,8 +38,11 @@ anychart.onDocumentReady(function() {
   var seriesData_4 = dataSet.mapAs({x: [0], value: [4]});
 
   // create column chart
-  var chart = anychart.cartesian3d();
+  var chart = anychart.column3d();
   window.chart = chart;
+
+  // turn on chart animation
+  //chart.animation(true);
 
   // set chart title text settings
   chart.title('Top 3 Products with Region Sales Data');
@@ -31,18 +53,21 @@ anychart.onDocumentReady(function() {
 
   // set titles for Y-axis
   chart.yAxis().title('Revenue in Dollars');
+  //chart.yScale().stackMode('value');
 
   // helper function to setup label settings for all series
   var setupSeriesLabels = function(series, name) {
-    var seriesLabels = series.labels();
-    series.hoverLabels().enabled(false);
-    seriesLabels.enabled(true);
-    seriesLabels.position('top');
-    seriesLabels.textFormatter(function(){
-      return '$' + this.value.toLocaleString();
-    });
+    //var seriesLabels = series.labels();
+    //series.hoverLabels().enabled(false);
+    //seriesLabels.enabled(true);
+    //seriesLabels.position('top');
+    //seriesLabels.textFormatter(function(){
+    //  return '$' + this.value.toLocaleString();
+    //});
+    //seriesLabels.anchor('bottom');
+    //series.markers(true);
+    //series.hatchFill(true);
     series.name(name);
-    seriesLabels.anchor('bottom');
     series.tooltip().titleFormatter(function () {
       return this.x;
     });
@@ -70,6 +95,15 @@ anychart.onDocumentReady(function() {
   // create fourth series with mapped data
   series = chart.column(seriesData_4);
   setupSeriesLabels(series, 'Nevada');
+  // add second yScale
+  //var yAxis2 = chart.yAxis(1);
+  //yAxis2.orientation("right");
+  //yAxis2.title("First additional axis");
+  //var extraYScale = anychart.scales.linear();
+  //extraYScale.minimum(0);
+  //extraYScale.maximum(10000);
+  //yAxis2.scale(extraYScale);
+  //series.yScale(extraYScale);
 
   // turn on legend
   chart.legend().enabled(true).fontSize(13).padding([0,0,20,0]);
@@ -77,29 +111,17 @@ anychart.onDocumentReady(function() {
   chart.interactivity().hoverMode('single');
   chart.tooltip().positionMode('point');
 
-
-  var grid = chart.grid(0);
-  grid.stroke({
-    color: "#f0f0f0"
-  });
-
-  var grid2 = chart.grid(1);
-  grid2.layout('vertical');
-  grid2.stroke({
-    color: "#f0f0f0"
-  });
-
   // create line marker
-  var firstMarker = chart.lineMarker(0);
+  firstMarker = chart.lineMarker(0);
   // set line color
   firstMarker.stroke("#090");
   // bind marker to scale
   firstMarker.scale(chart.yScale());
   // set markers position on plot
-  firstMarker.value(9500);
+  firstMarker.value(70);
 
   // create second marker
-  var secondMarker = chart.lineMarker(1);
+  secondMarker = chart.lineMarker(1);
   // line visual settings
   secondMarker.stroke({
     // set line color
@@ -111,11 +133,15 @@ anychart.onDocumentReady(function() {
   // bind marker to scale
   secondMarker.scale(chart.yScale());
   // set markers position
-  secondMarker.value(8200);
+  secondMarker.value(40);
 
 
   chart.xScroller(true);
-  chart.zPadding(5);
+  //chart.zAspect(10);
+  chart.zAspect('50%');
+  //chart.zPadding(10);
+  //chart.zDistribution(false);
+  //chart.zDepth(100);
 
   chart.container('container').draw();
 });
@@ -175,6 +201,7 @@ anychart.onDocumentReady(function() {
 
   // helper function to setup label settings for all series
   var setupSeries = function(series, name) {
+    series.markers(true);
     //series.stroke('2 #fff 1');
     series.name(name);
     //series.hoverStroke('2 #fff 1');
@@ -218,20 +245,20 @@ anychart.onDocumentReady(function() {
 
 anychart.onDocumentReady(function() {
 
-// create column chart
+  // create column chart
   var chart = anychart.column3d();
   window.chart3 = chart;
 
-// turn on chart animation
+  // turn on chart animation
   //chart.animation(true);
 
-// set container id for the chart
+  // set container id for the chart
   chart.container('container3');
 
-// set chart title text settings
+  // set chart title text settings
   chart.title('Top 10 Cosmetic Products by Revenue');
 
-// create area series with passed data
+  // create area series with passed data
   var series = chart.column([
     ['Rouge', '80540'],
     ['Foundation', '94190'],
@@ -244,7 +271,7 @@ anychart.onDocumentReady(function() {
     ['Eyeshadows', '249980']
   ]);
 
-// set series tooltip settings
+  // set series tooltip settings
   series.tooltip().titleFormatter(function() {
     return this.x
   });
@@ -253,10 +280,12 @@ anychart.onDocumentReady(function() {
   });
   series.tooltip().position('top').anchor('bottom').offsetX(0).offsetY(5);
 
-// set scale minimum
+  series.markers(true);
+
+  // set scale minimum
   chart.yScale().minimum(0);
 
-// set yAxis labels formatter
+  // set yAxis labels formatter
   chart.yAxis().labels().textFormatter(function(){
     return this.value.toLocaleString();
   });
@@ -267,7 +296,7 @@ anychart.onDocumentReady(function() {
   chart.xAxis().title('Products by Revenue');
   chart.yAxis().title('Revenue in Dollars');
 
-// initiate chart drawing
+  // initiate chart drawing
   chart.draw();
 
 
@@ -317,6 +346,7 @@ anychart.onDocumentReady(function() {
 
   // helper function to setup label settings for all series
   var setupSeries = function(series, name) {
+    series.markers(true);
     series.name(name);
     series.tooltip().valuePrefix('$');
     series.selectFill('#f48fb1 0.8').selectStroke('1.5 #c2185b');
@@ -404,8 +434,9 @@ anychart.onDocumentReady(function() {
 
   // helper function to setup label settings for all series
   var setupSeries = function(series, name) {
+    series.markers(true);
     series.name(name);
-    series.labels().enabled(true)
+    series.labels().enabled(true);
     series.tooltip().titleFormatter(function(){return this.x});
     series.tooltip().textFormatter(function () {
       return this.seriesName + ': ' + parseInt(this.value).toLocaleString() + 'k.';
@@ -436,8 +467,8 @@ anychart.onDocumentReady(function() {
 
   var grid = chart.grid();
   grid.enabled(true).stroke("#ddd");
-  grid.drawLastLine(false);
-  grid.layout("vertical");
+  //grid.drawLastLine(false);
+  grid.layout("horizontal");
 
   chart.barsPadding(0.1);
   chart.barGroupsPadding(0.9);
@@ -495,6 +526,7 @@ anychart.onDocumentReady(function() {
 
   // helper function to setup label settings for all series
   var setupSeriesLabels = function(series, name) {
+    series.markers(true);
     series.name(name);
     series.stroke('3 #fff 1');
     series.hoverStroke('3 #fff 1');
@@ -602,6 +634,7 @@ anychart.onDocumentReady(function() {
 
   // helper function to setup label settings for all series
   var setupSeries = function(series, name) {
+    series.markers(true);
     series.name(name);
     series.stroke(null);
     series.hoverStroke(null);
@@ -628,7 +661,7 @@ anychart.onDocumentReady(function() {
 
   var grid = chart.grid();
   grid.enabled(true).stroke("#ddd");
-  grid.drawLastLine(false);
+  //grid.drawLastLine(false);
   grid.layout("vertical");
 
   chart.grid(1).layout('h');

@@ -164,6 +164,13 @@ anychart.core.CartesianBase = function(opt_barChartMode) {
    */
   this.xZoom_ = new anychart.core.utils.OrdinalZoom(this, true);
 
+  /**
+   * Chart has stacked series.
+   * @type {boolean}
+   * @protected
+   */
+  this.hasStackedSeries = false;
+
   this.defaultSeriesType(anychart.enums.CartesianSeriesType.LINE);
   this.setType(anychart.enums.ChartTypes.CARTESIAN);
 };
@@ -1479,22 +1486,6 @@ anychart.core.CartesianBase.prototype.getSeriesCtor = function(type) {
 
 
 /**
- * Get series zIndex.
- * @param {string} type
- * @param {number} inc
- * @protected
- * @return {number}
- */
-anychart.core.CartesianBase.prototype.getSeriesZIndex = function(type, inc) {
-  return ((type == anychart.enums.CartesianSeriesType.LINE ||
-      type == anychart.enums.CartesianSeriesType.SPLINE ||
-      type == anychart.enums.CartesianSeriesType.STEP_LINE) ?
-          anychart.core.CartesianBase.ZINDEX_LINE_SERIES :
-          anychart.core.CartesianBase.ZINDEX_SERIES) + inc;
-};
-
-
-/**
  * @param {string} type Series type.
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
@@ -1517,7 +1508,11 @@ anychart.core.CartesianBase.prototype.createSeriesByType = function(type, data, 
     this.series_.push(instance);
     var inc = index * anychart.core.CartesianBase.ZINDEX_INCREMENT_MULTIPLIER;
     instance.index(index).id(index);
-    var seriesZIndex = this.getSeriesZIndex(type, inc);
+    var seriesZIndex = ((type == anychart.enums.CartesianSeriesType.LINE ||
+        type == anychart.enums.CartesianSeriesType.SPLINE ||
+        type == anychart.enums.CartesianSeriesType.STEP_LINE) ?
+            anychart.core.CartesianBase.ZINDEX_LINE_SERIES :
+            anychart.core.CartesianBase.ZINDEX_SERIES) + inc;
     instance.setAutoZIndex(seriesZIndex);
     instance.labels().setAutoZIndex(seriesZIndex + anychart.core.CartesianBase.ZINDEX_INCREMENT_MULTIPLIER / 2);
     instance.clip(true);
@@ -2111,6 +2106,7 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
     var yScale;
     var drawingPlan, drawingPlans, drawingPlansByYScale, uid, point;
     var data, val;
+    this.hasStackedSeries = false;
     for (uid in this.yScales) {
       yScale = this.yScales[uid];
       if (yScale.needsAutoCalc())
@@ -2177,6 +2173,7 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
           drawingPlan.firstIndex = firstIndex;
           drawingPlan.lastIndex = lastIndex;
           drawingPlan.stacked = yScaleStacked && series.supportsStack();
+          this.hasStackedSeries = this.hasStackedSeries || drawingPlan.stacked;
           data = drawingPlan.data;
           if (drawingPlan.stacked || yScalePercentStacked) {
             for (j = firstIndex; j <= lastIndex; j++) {
@@ -2374,58 +2371,95 @@ anychart.core.CartesianBase.prototype.distributeSeries_ = function() {
         }
       }
     }
-    if (numColumnClusters > 0) {
-      numColumnClusters = numColumnClusters + (numColumnClusters - 1) * this.barsPadding_ + this.barGroupsPadding_;
-      barWidthRatio = 1 / numColumnClusters;
-      currPosition = barWidthRatio * this.barGroupsPadding_ / 2;
-      seenScales = {};
-      for (i = 0; i < drawingPlansOfScale.length; i++) {
-        wSeries = drawingPlansOfScale[i].series;
-        if (wSeries.isWidthBased() && !wSeries.isBarBased()) {
-          scale = /** @type {anychart.scales.Base} */(wSeries.yScale());
-          if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
+
+    this.distributeColumnClusters(numColumnClusters, drawingPlansOfScale);
+    this.distributeBarClusters(numBarClusters, drawingPlansOfScale);
+  }
+};
+
+
+/**
+ * Distribute column clusters.
+ * @param {number} numColumnClusters
+ * @param {Array.<Object>} drawingPlansOfScale
+ * @protected
+ */
+anychart.core.CartesianBase.prototype.distributeColumnClusters = function(numColumnClusters, drawingPlansOfScale) {
+  var scale;
+  var id;
+  var wSeries;
+  var seenScales;
+  var currPosition;
+  var barWidthRatio;
+
+  if (numColumnClusters > 0) {
+    numColumnClusters = numColumnClusters + (numColumnClusters - 1) * this.barsPadding_ + this.barGroupsPadding_;
+    barWidthRatio = 1 / numColumnClusters;
+    currPosition = barWidthRatio * this.barGroupsPadding_ / 2;
+    seenScales = {};
+    for (var i = 0; i < drawingPlansOfScale.length; i++) {
+      wSeries = drawingPlansOfScale[i].series;
+      if (wSeries.isWidthBased() && !wSeries.isBarBased()) {
+        scale = /** @type {anychart.scales.Base} */(wSeries.yScale());
+        if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
+          wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
+          wSeries.setAutoBarWidth(barWidthRatio);
+          currPosition += barWidthRatio * (1 + this.barsPadding_);
+        } else {
+          id = goog.getUid(scale);
+          if (id in seenScales) {
+            wSeries.setAutoXPointPosition(seenScales[id] + barWidthRatio / 2);
+            wSeries.setAutoBarWidth(barWidthRatio);
+          } else {
             wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
             wSeries.setAutoBarWidth(barWidthRatio);
+            seenScales[id] = currPosition;
             currPosition += barWidthRatio * (1 + this.barsPadding_);
-          } else {
-            id = goog.getUid(scale);
-            if (id in seenScales) {
-              wSeries.setAutoXPointPosition(seenScales[id] + barWidthRatio / 2);
-              wSeries.setAutoBarWidth(barWidthRatio);
-            } else {
-              wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
-              wSeries.setAutoBarWidth(barWidthRatio);
-              seenScales[id] = currPosition;
-              currPosition += barWidthRatio * (1 + this.barsPadding_);
-            }
           }
         }
       }
     }
-    if (numBarClusters > 0) {
-      numBarClusters = numBarClusters + (numBarClusters - 1) * this.barsPadding_ + this.barGroupsPadding_;
-      barWidthRatio = 1 / numBarClusters;
-      currPosition = barWidthRatio * this.barGroupsPadding_ / 2;
-      seenScales = {};
-      for (i = 0; i < drawingPlansOfScale.length; i++) {
-        wSeries = drawingPlansOfScale[i].series;
-        if (wSeries.isBarBased()) {
-          scale = /** @type {anychart.scales.Base} */(wSeries.yScale());
-          if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
+  }
+};
+
+
+/**
+ * Distribute bar clusters.
+ * @param {number} numBarClusters
+ * @param {Array.<Object>} drawingPlansOfScale
+ * @protected
+ */
+anychart.core.CartesianBase.prototype.distributeBarClusters = function(numBarClusters, drawingPlansOfScale) {
+  var scale;
+  var id;
+  var wSeries;
+  var seenScales;
+  var currPosition;
+  var barWidthRatio;
+
+  if (numBarClusters > 0) {
+    numBarClusters = numBarClusters + (numBarClusters - 1) * this.barsPadding_ + this.barGroupsPadding_;
+    barWidthRatio = 1 / numBarClusters;
+    currPosition = barWidthRatio * this.barGroupsPadding_ / 2;
+    seenScales = {};
+    for (var i = 0; i < drawingPlansOfScale.length; i++) {
+      wSeries = drawingPlansOfScale[i].series;
+      if (wSeries.isBarBased()) {
+        scale = /** @type {anychart.scales.Base} */(wSeries.yScale());
+        if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
+          wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
+          wSeries.setAutoBarWidth(barWidthRatio);
+          currPosition += barWidthRatio * (1 + this.barsPadding_);
+        } else {
+          id = goog.getUid(scale);
+          if (id in seenScales) {
+            wSeries.setAutoXPointPosition(seenScales[id] + barWidthRatio / 2);
+            wSeries.setAutoBarWidth(barWidthRatio);
+          } else {
             wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
             wSeries.setAutoBarWidth(barWidthRatio);
+            seenScales[id] = currPosition;
             currPosition += barWidthRatio * (1 + this.barsPadding_);
-          } else {
-            id = goog.getUid(scale);
-            if (id in seenScales) {
-              wSeries.setAutoXPointPosition(seenScales[id] + barWidthRatio / 2);
-              wSeries.setAutoBarWidth(barWidthRatio);
-            } else {
-              wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
-              wSeries.setAutoBarWidth(barWidthRatio);
-              seenScales[id] = currPosition;
-              currPosition += barWidthRatio * (1 + this.barsPadding_);
-            }
           }
         }
       }
@@ -2646,11 +2680,177 @@ anychart.core.CartesianBase.prototype.getContentAreaBounds = function(bounds) {
 
 
 /**
- * Set bounds to axis (in mode3d).
- * @param {anychart.core.axes.Linear} axis
- * @param {anychart.math.Rect} bounds
+ * Get bounds without axes and scrollers.
+ * @param {anychart.math.Rect} contentAreaBounds Total bounds of content area.
+ * @return {anychart.math.Rect}
  */
-anychart.core.CartesianBase.prototype.setParentBoundsTo3dAxis = goog.abstractMethod;
+anychart.core.CartesianBase.prototype.getBoundsWithoutAxes = function(contentAreaBounds) {
+  var i, count;
+  var axes = goog.array.concat(this.xAxes_, this.yAxes_);
+  var attempt = 0;
+  var scroller = this.xScroller();
+  var scrollerBeforeAxes = scroller.position() == anychart.enums.ChartScrollerPosition.BEFORE_AXES;
+  scroller.padding(0);
+  scroller.parentBounds(contentAreaBounds);
+  var scrollerHorizontal = scroller.isHorizontal();
+  var scrollerSize;
+  if (scrollerBeforeAxes) {
+    if (scrollerHorizontal) {
+      scrollerSize = contentAreaBounds.height - scroller.getRemainingBounds().height;
+    } else {
+      scrollerSize = contentAreaBounds.width - scroller.getRemainingBounds().width;
+    }
+  } else {
+    contentAreaBounds = scroller.getRemainingBounds();
+  }
+
+  for (i = 0, count = this.xAxes_.length; i < count; i++) {
+    this.xAxes_[i].suspendSignalsDispatching();
+    this.xAxes_[i].padding(0);
+  }
+
+  for (i = 0, count = this.yAxes_.length; i < count; i++) {
+    this.yAxes_[i].suspendSignalsDispatching();
+    this.yAxes_[i].padding(0);
+  }
+
+  var boundsWithoutAxes;
+  do {
+    // axes local vars
+    var remainingBounds;
+    var axis;
+    var orientation;
+    var topOffset = 0;
+    var bottomOffset = 0;
+    var leftOffset = 0;
+    var rightOffset = 0;
+    var complete = true;
+    boundsWithoutAxes = contentAreaBounds.clone();
+    this.topAxisPadding_ = NaN;
+    this.bottomAxisPadding_ = NaN;
+    this.leftAxisPadding_ = NaN;
+    this.rightAxisPadding_ = NaN;
+    var axisStrokeThickness;
+
+    for (i = axes.length; i--;) {
+      axis = /** @type {anychart.core.axes.Linear} */(axes[i]);
+      if (axis && axis.enabled()) {
+        axis.parentBounds(contentAreaBounds);
+        orientation = axis.orientation();
+        axisStrokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(axis.stroke()));
+
+        if (orientation == anychart.enums.Orientation.TOP) {
+          axis.padding().top(topOffset);
+          axis.padding().bottom(0);
+          remainingBounds = axis.getRemainingBounds();
+          topOffset = contentAreaBounds.height - remainingBounds.height;
+          if (isNaN(this.topAxisPadding_))
+            this.topAxisPadding_ = axisStrokeThickness;
+        } else if (orientation == anychart.enums.Orientation.BOTTOM) {
+          axis.padding().bottom(bottomOffset);
+          axis.padding().top(0);
+          remainingBounds = axis.getRemainingBounds();
+          bottomOffset = contentAreaBounds.height - remainingBounds.height;
+          if (isNaN(this.bottomAxisPadding_))
+            this.bottomAxisPadding_ = axisStrokeThickness;
+        } else if (orientation == anychart.enums.Orientation.LEFT) {
+          axis.padding().left(leftOffset);
+          axis.padding().right(0);
+          remainingBounds = axis.getRemainingBounds();
+          leftOffset = contentAreaBounds.width - remainingBounds.width;
+          if (isNaN(this.leftAxisPadding_))
+            this.leftAxisPadding_ = axisStrokeThickness;
+        } else if (orientation == anychart.enums.Orientation.RIGHT) {
+          axis.padding().right(rightOffset);
+          axis.padding().left(0);
+          remainingBounds = axis.getRemainingBounds();
+          rightOffset = contentAreaBounds.width - remainingBounds.width;
+          if (isNaN(this.rightAxisPadding_))
+            this.rightAxisPadding_ = axisStrokeThickness;
+        }
+      }
+    }
+
+    if (scrollerBeforeAxes) {
+      switch (scroller.orientation()) {
+        case anychart.enums.Orientation.TOP:
+          scroller.padding().top(topOffset + (this.topAxisPadding_ || 0));
+          scroller.padding().bottom(0);
+          topOffset += scrollerSize;
+          break;
+        case anychart.enums.Orientation.BOTTOM:
+          scroller.padding().top(0);
+          scroller.padding().bottom(bottomOffset + (this.bottomAxisPadding_ || 0));
+          bottomOffset += scrollerSize;
+          break;
+        case anychart.enums.Orientation.LEFT:
+          scroller.padding().left(leftOffset + (this.leftAxisPadding_ || 0));
+          scroller.padding().right(0);
+          leftOffset += scrollerSize;
+          break;
+        case anychart.enums.Orientation.RIGHT:
+          scroller.padding().left(0);
+          scroller.padding().right(rightOffset + (this.rightAxisPadding_ || 0));
+          rightOffset += scrollerSize;
+          break;
+      }
+    }
+
+    if (scrollerHorizontal) {
+      scroller.padding().left(leftOffset);
+      scroller.padding().right(rightOffset);
+    } else {
+      scroller.padding().top(topOffset);
+      scroller.padding().bottom(bottomOffset);
+    }
+
+    boundsWithoutAxes.left += leftOffset;
+    boundsWithoutAxes.top += topOffset;
+    boundsWithoutAxes.width -= rightOffset + leftOffset;
+    boundsWithoutAxes.height -= bottomOffset + topOffset;
+
+    for (i = axes.length; i--;) {
+      axis = /** @type {anychart.core.axes.Linear} */(axes[i]);
+      if (axis && axis.enabled()) {
+        var remainingBoundsBeforeSetPadding = axis.getRemainingBounds();
+
+        if (axis.isHorizontal()) {
+          axis.padding().left(leftOffset);
+          axis.padding().right(rightOffset);
+          remainingBounds = axis.getRemainingBounds();
+          if (remainingBounds.height != remainingBoundsBeforeSetPadding.height) {
+            complete = false;
+          }
+        } else {
+          axis.padding().top(topOffset);
+          axis.padding().bottom(bottomOffset);
+          remainingBounds = axis.getRemainingBounds();
+          if (remainingBounds.width != remainingBoundsBeforeSetPadding.width) {
+            complete = false;
+          }
+        }
+      }
+    }
+    attempt++;
+  } while (!complete && attempt < anychart.core.CartesianBase.MAX_ATTEMPTS_AXES_CALCULATION);
+
+  for (i = 0, count = this.xAxes_.length; i < count; i++) {
+    this.xAxes_[i].resumeSignalsDispatching(false);
+  }
+
+  for (i = 0, count = this.yAxes_.length; i < count; i++) {
+    this.yAxes_[i].resumeSignalsDispatching(false);
+  }
+
+  return boundsWithoutAxes.clone().round();
+};
+
+
+/**
+ * Calculate for 3d.
+ * @protected
+ */
+anychart.core.CartesianBase.prototype.prepare3d = goog.nullFunction;
 
 
 /**
@@ -2658,7 +2858,7 @@ anychart.core.CartesianBase.prototype.setParentBoundsTo3dAxis = goog.abstractMet
  * @param {anychart.math.Rect} bounds Bounds of cartesian content area.
  */
 anychart.core.CartesianBase.prototype.drawContent = function(bounds) {
-  var i, count, scale;
+  var i, count;
 
   this.xScroller().suspendSignalsDispatching();
 
@@ -2707,169 +2907,10 @@ anychart.core.CartesianBase.prototype.drawContent = function(bounds) {
     }
   }
 
-  //calculate axes space first, the result is data bounds
+  // calculate axes space first, the result is data bounds
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    //total bounds of content area
-    var contentAreaBounds = this.getContentAreaBounds(bounds);
-    var attempt = 0;
-    var scroller = this.xScroller();
-    var scrollerBeforeAxes = scroller.position() == anychart.enums.ChartScrollerPosition.BEFORE_AXES;
-    scroller.padding(0);
-    scroller.parentBounds(contentAreaBounds);
-    var scrollerHorizontal = scroller.isHorizontal();
-    var scrollerSize;
-    if (scrollerBeforeAxes) {
-      if (scrollerHorizontal) {
-        scrollerSize = contentAreaBounds.height - scroller.getRemainingBounds().height;
-      } else {
-        scrollerSize = contentAreaBounds.width - scroller.getRemainingBounds().width;
-      }
-    } else {
-      contentAreaBounds = scroller.getRemainingBounds();
-    }
-
-    for (i = 0, count = this.xAxes_.length; i < count; i++) {
-      this.xAxes_[i].suspendSignalsDispatching();
-      this.xAxes_[i].padding(0);
-    }
-
-    for (i = 0, count = this.yAxes_.length; i < count; i++) {
-      this.yAxes_[i].suspendSignalsDispatching();
-      this.yAxes_[i].padding(0);
-    }
-
-    var boundsWithoutAxes;
-    do {
-      //axes local vars
-      var remainingBounds;
-      var axis;
-      var orientation;
-      var topOffset = 0;
-      var bottomOffset = 0;
-      var leftOffset = 0;
-      var rightOffset = 0;
-      var complete = true;
-      boundsWithoutAxes = contentAreaBounds.clone();
-      this.topAxisPadding_ = NaN;
-      this.bottomAxisPadding_ = NaN;
-      this.leftAxisPadding_ = NaN;
-      this.rightAxisPadding_ = NaN;
-      var axisStrokeThickness;
-
-      for (i = axes.length; i--;) {
-        axis = /** @type {anychart.core.axes.Linear} */(axes[i]);
-        if (axis && axis.enabled()) {
-          axis.parentBounds(contentAreaBounds);
-          orientation = axis.orientation();
-          axisStrokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(axis.stroke()));
-
-          if (orientation == anychart.enums.Orientation.TOP) {
-            this.setParentBoundsTo3dAxis(axis, contentAreaBounds);
-            axis.padding().top(topOffset);
-            axis.padding().bottom(0);
-            remainingBounds = axis.getRemainingBounds();
-            topOffset = contentAreaBounds.height - remainingBounds.height;
-            if (isNaN(this.topAxisPadding_))
-              this.topAxisPadding_ = axisStrokeThickness;
-          } else if (orientation == anychart.enums.Orientation.BOTTOM) {
-            axis.padding().bottom(bottomOffset);
-            axis.padding().top(0);
-            remainingBounds = axis.getRemainingBounds();
-            bottomOffset = contentAreaBounds.height - remainingBounds.height;
-            if (isNaN(this.bottomAxisPadding_))
-              this.bottomAxisPadding_ = axisStrokeThickness;
-          } else if (orientation == anychart.enums.Orientation.LEFT) {
-            axis.padding().left(leftOffset);
-            axis.padding().right(0);
-            remainingBounds = axis.getRemainingBounds();
-            leftOffset = contentAreaBounds.width - remainingBounds.width;
-            if (isNaN(this.leftAxisPadding_))
-              this.leftAxisPadding_ = axisStrokeThickness;
-          } else if (orientation == anychart.enums.Orientation.RIGHT) {
-            this.setParentBoundsTo3dAxis(axis, contentAreaBounds);
-            axis.padding().right(rightOffset);
-            axis.padding().left(0);
-            remainingBounds = axis.getRemainingBounds();
-            rightOffset = contentAreaBounds.width - remainingBounds.width;
-            if (isNaN(this.rightAxisPadding_))
-              this.rightAxisPadding_ = axisStrokeThickness;
-          }
-        }
-      }
-
-      if (scrollerBeforeAxes) {
-        switch (scroller.orientation()) {
-          case anychart.enums.Orientation.TOP:
-            scroller.padding().top(topOffset + (this.topAxisPadding_ || 0));
-            scroller.padding().bottom(0);
-            topOffset += scrollerSize;
-            break;
-          case anychart.enums.Orientation.BOTTOM:
-            scroller.padding().top(0);
-            scroller.padding().bottom(bottomOffset + (this.bottomAxisPadding_ || 0));
-            bottomOffset += scrollerSize;
-            break;
-          case anychart.enums.Orientation.LEFT:
-            scroller.padding().left(leftOffset + (this.leftAxisPadding_ || 0));
-            scroller.padding().right(0);
-            leftOffset += scrollerSize;
-            break;
-          case anychart.enums.Orientation.RIGHT:
-            scroller.padding().left(0);
-            scroller.padding().right(rightOffset + (this.rightAxisPadding_ || 0));
-            rightOffset += scrollerSize;
-            break;
-        }
-      }
-
-      if (scrollerHorizontal) {
-        scroller.padding().left(leftOffset);
-        scroller.padding().right(rightOffset);
-      } else {
-        scroller.padding().top(topOffset);
-        scroller.padding().bottom(bottomOffset);
-      }
-
-      boundsWithoutAxes.left += leftOffset;
-      boundsWithoutAxes.top += topOffset;
-      boundsWithoutAxes.width -= rightOffset + leftOffset;
-      boundsWithoutAxes.height -= bottomOffset + topOffset;
-
-      for (i = axes.length; i--;) {
-        axis = /** @type {anychart.core.axes.Linear} */(axes[i]);
-        if (axis && axis.enabled()) {
-          var remainingBoundsBeforeSetPadding = axis.getRemainingBounds();
-
-          if (axis.isHorizontal()) {
-            axis.padding().left(leftOffset);
-            axis.padding().right(rightOffset);
-            remainingBounds = axis.getRemainingBounds();
-            if (remainingBounds.height != remainingBoundsBeforeSetPadding.height) {
-              complete = false;
-            }
-          } else {
-            axis.padding().top(topOffset);
-            axis.padding().bottom(bottomOffset);
-            remainingBounds = axis.getRemainingBounds();
-            if (remainingBounds.width != remainingBoundsBeforeSetPadding.width) {
-              complete = false;
-            }
-          }
-        }
-      }
-      attempt++;
-    } while (!complete && attempt < anychart.core.CartesianBase.MAX_ATTEMPTS_AXES_CALCULATION);
-
-    for (i = 0, count = this.xAxes_.length; i < count; i++) {
-      this.xAxes_[i].resumeSignalsDispatching(false);
-    }
-
-    for (i = 0, count = this.yAxes_.length; i < count; i++) {
-      this.yAxes_[i].resumeSignalsDispatching(false);
-    }
-
-    //bounds of data area
-    this.dataBounds = boundsWithoutAxes.clone().round();
+    // bounds of data area
+    this.dataBounds = this.getBoundsWithoutAxes(this.getContentAreaBounds(bounds));
 
     this.invalidateSeries();
     this.invalidate(anychart.ConsistencyState.CARTESIAN_AXES |
@@ -2909,9 +2950,10 @@ anychart.core.CartesianBase.prototype.drawContent = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.CARTESIAN_GRIDS);
   }
 
-  //draw axes outside of data bounds
-  //only inside axes ticks can intersect data bounds
+  // draw axes outside of data bounds
+  // only inside axes ticks can intersect data bounds
   if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_AXES)) {
+    var axis;
     for (i = 0, count = axes.length; i < count; i++) {
       axis = /** @type {anychart.core.axes.Linear} */(axes[i]);
       if (axis) {
@@ -2959,6 +3001,7 @@ anychart.core.CartesianBase.prototype.drawContent = function(bounds) {
       series.parentBounds(this.dataBounds);
     }
 
+    this.prepare3d();
     this.distributeSeries_();
     this.calcBubbleSizes();
     anychart.performance.end('Preparation');

@@ -50,13 +50,15 @@ anychart.core.axisMarkers.Line3d.prototype.boundsInvalidated = function() {
     ratio == 1 ? y -= shift : y += shift;
     this.markerElement()
         .moveTo(bounds.getLeft(), y)
-        .lineTo(bounds.getRight() + x3dShift, y);
+        .lineTo(bounds.getLeft() + x3dShift, y - y3dShift)
+        .lineTo(bounds.getRight() + x3dShift, y - y3dShift);
 
   } else if (this.layout() == anychart.enums.Layout.VERTICAL) {
     var x = Math.round(bounds.getLeft() + ratio * bounds.width);
     ratio == 1 ? x += shift : x -= shift;
     this.markerElement()
-        .moveTo(x, bounds.getTop() - y3dShift)
+        .moveTo(x + x3dShift, bounds.getTop() - y3dShift)
+        .lineTo(x + x3dShift, bounds.getBottom() - y3dShift)
         .lineTo(x, bounds.getBottom());
   }
 
