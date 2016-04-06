@@ -1363,8 +1363,8 @@ anychart.charts.Scatter.prototype.calculate = function() {
   /** @type {anychart.scales.ScatterBase} */
   var yScale;
 
-  /** @type {!Array.<anychart.scales.ScatterBase>} */
-  var scales = [];
+  /** @type {!Object.<anychart.scales.ScatterBase>} */
+  var scales = {};
 
   /** @type {*} */
   var x;

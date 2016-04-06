@@ -1143,7 +1143,8 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
 
     if (this.drawnConnectors_) {
       for (var i in this.drawnConnectors_) {
-        this.drawnConnectors_[i].stroke(this.connectorStroke_);
+        if (this.drawnConnectors_.hasOwnProperty(i))
+          this.drawnConnectors_[i].stroke(this.connectorStroke_);
       }
     }
 
