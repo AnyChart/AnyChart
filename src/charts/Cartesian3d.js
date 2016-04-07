@@ -324,7 +324,8 @@ anychart.charts.Cartesian3d.prototype.getContentAreaBounds = function(bounds) {
     for (var i = 0; i < allSeries.length; i++) {
       series = allSeries[i];
       if (series && series.enabled()) {
-        var catCount = series.xScale().getCategorisation().length;
+        var xScale = series.xScale();
+        var catCount = xScale.getType() == anychart.enums.ScaleTypes.ORDINAL ? xScale.values().length : series.getIterator().getRowsCount();
         var catWidthRatio = 1 / catCount;
         var barWidthRatio;
         var barWidthRatioOfTotalWidth;

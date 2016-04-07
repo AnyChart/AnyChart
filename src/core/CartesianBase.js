@@ -1532,6 +1532,8 @@ anychart.core.CartesianBase.prototype.createSeriesByType = function(type, data, 
     instance.setup(this.defaultSeriesSettings()[type]);
     instance.listenSignals(this.seriesInvalidated, this);
     this.invalidate(
+        // When you add 3D series, bounds may change (eg. afterDraw case).
+        (instance.is3d ? anychart.ConsistencyState.BOUNDS : 0) |
         anychart.ConsistencyState.CARTESIAN_SERIES |
         anychart.ConsistencyState.CHART_LEGEND |
         anychart.ConsistencyState.CARTESIAN_SCALES |
