@@ -27,14 +27,23 @@ anychart.core.utils.TooltipsContainer = function() {
   } else {
     this.root_ = goog.dom.createDom('div', {'style': 'position:absolute; z-index: 9999; left: -10000px; top: -10000px'});
   }
-  var aw = goog.dom.getWindow().screen.availWidth;
-  var ah = goog.dom.getWindow().screen.availHeight;
+
+  var viewportSize, width, height;
+  if (goog.userAgent.IPHONE || goog.userAgent.IPAD || goog.userAgent.ANDROID) {
+    viewportSize = goog.dom.getViewportSize();
+    width = viewportSize.width;
+    height = viewportSize.height;
+  } else {
+    viewportSize = goog.dom.getWindow().screen;
+    width = viewportSize.availWidth;
+    height = viewportSize.availHeight;
+  }
 
   if (goog.userAgent.IE && !goog.userAgent.isVersionOrHigher('9')) {
     // hack like `pointer-events: none`
     this.stage_ = acgraph.create(this.root_, 1, 1);
   } else {
-    this.stage_ = acgraph.create(this.root_, aw, ah);
+    this.stage_ = acgraph.create(this.root_, width, height);
   }
 
   this.stage_.domElement()['style']['cssText'] = 'position:fixed; left:0; top:0; opacity:1; pointer-events: none';
