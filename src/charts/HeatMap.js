@@ -793,12 +793,12 @@ anychart.charts.HeatMap.prototype.legendItemClick = function(item, event) {
       var tag = anychart.utils.extractTag(event['domTarget']);
       if (tag) {
         if (this.interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
-          tag.points = {
+          tag.points_ = {
             series: series,
             points: points
           };
         } else {
-          tag.points = [{
+          tag.points_ = [{
             series: series,
             points: points,
             lastPoint: points[points.length - 1],
@@ -835,12 +835,12 @@ anychart.charts.HeatMap.prototype.legendItemOver = function(item, event) {
       var tag = anychart.utils.extractTag(event['domTarget']);
       if (tag) {
         if (this.interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
-          tag.points = {
+          tag.points_ = {
             series: series,
             points: points
           };
         } else {
-          tag.points = [{
+          tag.points_ = [{
             series: series,
             points: points,
             lastPoint: points[points.length - 1],
