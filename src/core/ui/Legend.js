@@ -125,6 +125,12 @@ anychart.core.ui.Legend = function() {
    */
   this.hoverCursor_;
 
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.inverted_ = false;
+
   this.invalidate(anychart.ConsistencyState.ALL);
 
   this.bindHandlersToComponent(this, this.handleMouseOver_, this.handleMouseOut_, null, this.handleMouseMove_);
@@ -907,7 +913,7 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function(items) {
         if ((goog.isDef(itemSourceUid) && goog.isDef(itemSourceKey) && itemSourceUid == items[i]['sourceUid'] && itemSourceKey == items[i]['sourceKey'])) {
           item.setup(items[i]);
           item.applyTextSettings(item.getTextElement(), false);
-          item.setItemIndexToLayer(i);
+          item.setItemIndexToLayer(this.inverted_ ? items.length - 1 - i : i);
           break;
         }
       }
@@ -934,7 +940,7 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function(items) {
       items[i]['enabled'] = false;
       item.setup(items[i]);
       item.applyTextSettings(item.getTextElement(), true);
-      item.setItemIndexToLayer(i);
+      item.setItemIndexToLayer(this.inverted_ ? items.length - 1 - i : i);
 
       this.items_.push(item);
       this.legendItemsMeta_.push(items[i]['meta'] ? items[i]['meta'] : {});
@@ -1800,6 +1806,8 @@ anychart.core.ui.Legend.prototype.makePointEvent_ = function(event) {
     default:
       return null;
   }
+
+  itemIndex = this.inverted_ ? this.items_.length - 1 - itemIndex : itemIndex;
 
   var itemSource = null;
   var itemIndexInSource = NaN;
