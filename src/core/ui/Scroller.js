@@ -732,7 +732,7 @@ anychart.core.ui.Scroller.prototype.drawBottom_ = function() {
   var leftX = Math.min(startX, endX);
   var rightX = Math.max(startX, endX);
 
-  this.selectedClipRect.bounds(leftX, bounds.top, rightX - leftX, bounds.height);
+  this.selectedClipRect.shape(leftX, bounds.top, rightX - leftX, bounds.height);
 
   this.selectedRangeOutline_
       .clear()
@@ -766,7 +766,7 @@ anychart.core.ui.Scroller.prototype.drawLeft_ = function() {
   var topX = Math.min(startX, endX);
   var bottomX = Math.max(startX, endX);
 
-  this.selectedClipRect.bounds(bounds.left, topX, bounds.width, bottomX - topX);
+  this.selectedClipRect.shape(bounds.left, topX, bounds.width, bottomX - topX);
 
   this.selectedRangeOutline_
       .clear()
@@ -800,7 +800,7 @@ anychart.core.ui.Scroller.prototype.drawTop_ = function() {
   var leftX = Math.min(startX, endX);
   var rightX = Math.max(startX, endX);
 
-  this.selectedClipRect.bounds(leftX, bounds.top, rightX - leftX, bounds.height);
+  this.selectedClipRect.shape(leftX, bounds.top, rightX - leftX, bounds.height);
 
   this.selectedRangeOutline_
       .clear()
@@ -834,7 +834,7 @@ anychart.core.ui.Scroller.prototype.drawRight_ = function() {
   var topX = Math.min(startX, endX);
   var bottomX = Math.max(startX, endX);
 
-  this.selectedClipRect.bounds(bounds.left, topX, bounds.width, bottomX - topX);
+  this.selectedClipRect.shape(bounds.left, topX, bounds.width, bottomX - topX);
 
   this.selectedRangeOutline_
       .clear()

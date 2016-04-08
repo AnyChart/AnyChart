@@ -1569,7 +1569,7 @@ anychart.charts.Map.prototype.processGeoData = function() {
       if (!this.mapLayer_) {
         this.mapLayer_ = new anychart.core.utils.TypedLayer(function() {
           var path = acgraph.path();
-          path.vectorEffect('non-scaling-stroke');
+          path.disableStrokeScaling(true);
           return path;
         }, function(path) {
           if (path) {

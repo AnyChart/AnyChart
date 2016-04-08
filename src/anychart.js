@@ -5,7 +5,7 @@
 
 goog.provide('anychart');
 goog.provide('anychart.globalLock');
-goog.require('acgraphexport');
+goog.require('acgraph');
 goog.require('anychart.performance');
 goog.require('anychart.themes.merging');
 goog.require('anychart.utils');

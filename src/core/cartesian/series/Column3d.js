@@ -407,25 +407,23 @@ anychart.core.cartesian.series.Column3d.prototype.doClip = function() {
   var x3dShift = this.getChart().x3dShift;
   var y3dShift = this.getChart().y3dShift;
 
-  if (!(this.rootLayer.clip() instanceof acgraph.vector.Clip)) {
-    clip = /** @type {!anychart.math.Rect|boolean} */ (this.clip());
-    if (goog.isBoolean(clip)) {
-      if (clip) {
-        bounds = this.pixelBoundsCache;
-        axesLinesSpace = this.axesLinesSpace();
-        clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
-        clip.top -= y3dShift;
-        clip.height += y3dShift;
-        clip.width += x3dShift;
-      }
+  clip = /** @type {!anychart.math.Rect|boolean} */ (this.clip());
+  if (goog.isBoolean(clip)) {
+    if (clip) {
+      bounds = this.pixelBoundsCache;
+      axesLinesSpace = this.axesLinesSpace();
+      clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
+      clip.top -= y3dShift;
+      clip.height += y3dShift;
+      clip.width += x3dShift;
     }
-    this.rootLayer.clip(/** @type {anychart.math.Rect} */ (clip || null));
-    var labelDOM = this.labels().getDomElement();
-    if (labelDOM) labelDOM.clip(/** @type {anychart.math.Rect} */(clip || null));
-
-    var markerDOM = this.markers().getDomElement();
-    if (markerDOM) markerDOM.clip(/** @type {anychart.math.Rect} */(clip || null));
   }
+  this.rootLayer.clip(/** @type {anychart.math.Rect} */ (clip || null));
+  var labelDOM = this.labels().getDomElement();
+  if (labelDOM) labelDOM.clip(/** @type {anychart.math.Rect} */(clip || null));
+
+  var markerDOM = this.markers().getDomElement();
+  if (markerDOM) markerDOM.clip(/** @type {anychart.math.Rect} */(clip || null));
 };
 
 
@@ -447,26 +445,24 @@ anychart.core.cartesian.series.Column3d.prototype.doClipShape_ = function() {
   var leftSide = iter.meta('leftSide');
   var rightSide = iter.meta('rightSide');
 
-  if (!(frontSide.clip() instanceof acgraph.vector.Clip)) {
-    clip = /** @type {!anychart.math.Rect|boolean} */ (this.clip());
-    if (goog.isBoolean(clip)) {
-      if (clip) {
-        bounds = this.pixelBoundsCache;
-        axesLinesSpace = this.axesLinesSpace();
-        clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
-        clip.top -= y3dShift;
-        clip.height += y3dShift;
-        clip.width += x3dShift;
-      }
+  clip = /** @type {!anychart.math.Rect|boolean} */ (this.clip());
+  if (goog.isBoolean(clip)) {
+    if (clip) {
+      bounds = this.pixelBoundsCache;
+      axesLinesSpace = this.axesLinesSpace();
+      clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
+      clip.top -= y3dShift;
+      clip.height += y3dShift;
+      clip.width += x3dShift;
     }
-
-    frontSide.clip(/** @type {anychart.math.Rect} */ (clip || null));
-    backSide.clip(/** @type {anychart.math.Rect} */ (clip || null));
-    topSide.clip(/** @type {anychart.math.Rect} */ (clip || null));
-    bottomSide.clip(/** @type {anychart.math.Rect} */ (clip || null));
-    leftSide.clip(/** @type {anychart.math.Rect} */ (clip || null));
-    rightSide.clip(/** @type {anychart.math.Rect} */ (clip || null));
   }
+
+  frontSide.clip(/** @type {anychart.math.Rect} */ (clip || null));
+  backSide.clip(/** @type {anychart.math.Rect} */ (clip || null));
+  topSide.clip(/** @type {anychart.math.Rect} */ (clip || null));
+  bottomSide.clip(/** @type {anychart.math.Rect} */ (clip || null));
+  leftSide.clip(/** @type {anychart.math.Rect} */ (clip || null));
+  rightSide.clip(/** @type {anychart.math.Rect} */ (clip || null));
 };
 
 

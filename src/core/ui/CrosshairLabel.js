@@ -178,7 +178,7 @@ anychart.core.ui.CrosshairLabel.prototype.drawLabel = function() {
   this.textElement.x(/** @type {number} */(this.textX)).y(/** @type {number} */(this.textY));
   var clip = this.textElement.clip();
   if (clip) {
-    clip.bounds(this.textX, this.textY, this.textWidth, this.textHeight);
+    clip.shape(this.textX, this.textY, this.textWidth, this.textHeight);
   } else {
     clip = acgraph.clip(this.textX, this.textY, this.textWidth, this.textHeight);
     this.textElement.clip(clip);

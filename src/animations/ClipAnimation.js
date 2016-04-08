@@ -76,7 +76,7 @@ anychart.animations.ClipAnimation.prototype.cycle = function(now) {
 
 /** @inheritDoc */
 anychart.animations.ClipAnimation.prototype.onAnimate = function() {
-  this.clip_.bounds.apply(this.clip_, this.coords);
+  this.clip_.shape.apply(this.clip_, this.coords);
 };
 
 

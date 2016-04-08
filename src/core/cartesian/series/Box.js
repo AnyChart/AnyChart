@@ -288,11 +288,18 @@ anychart.core.cartesian.series.Box.prototype.startDrawing = function() {
 anychart.core.cartesian.series.Box.prototype.doClip = function() {
   goog.base(this, 'doClip');
 
-  if (this.clip()) {
-    var bounds = /** @type {!anychart.math.Rect} */(goog.isBoolean(this.clip()) ? this.pixelBoundsCache : this.clip());
-    var markerDOM = this.outlierMarkers().getDomElement();
-    if (markerDOM) markerDOM.clip(/** @type {anychart.math.Rect} */(bounds));
+  var clip, bounds, axesLinesSpace;
+  clip = /** @type {!anychart.math.Rect|boolean} */ (this.clip());
+  if (goog.isBoolean(clip)) {
+    if (clip) {
+      bounds = this.pixelBoundsCache;
+      axesLinesSpace = this.axesLinesSpace();
+      clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
+    }
   }
+
+  var markerDOM = this.outlierMarkers().getDomElement();
+  if (markerDOM) markerDOM.clip(/** @type {anychart.math.Rect} */(clip || null));
 };
 
 

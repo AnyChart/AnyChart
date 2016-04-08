@@ -1143,19 +1143,18 @@ anychart.core.cartesian.series.Base.prototype.applyRatioToBounds = function(rati
  */
 anychart.core.cartesian.series.Base.prototype.doClip = function() {
   var clip, bounds, axesLinesSpace;
-  if (!(this.rootLayer.clip() instanceof acgraph.vector.Clip)) {
-    clip = /** @type {!anychart.math.Rect|boolean} */ (this.clip());
-    if (goog.isBoolean(clip)) {
-      if (clip) {
-        bounds = this.pixelBoundsCache;
-        axesLinesSpace = this.axesLinesSpace();
-        clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
-      }
+  clip = /** @type {!anychart.math.Rect|boolean} */ (this.clip());
+  if (goog.isBoolean(clip)) {
+    if (clip) {
+      bounds = this.pixelBoundsCache;
+      axesLinesSpace = this.axesLinesSpace();
+      clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
     }
-    this.rootLayer.clip(/** @type {anychart.math.Rect} */ (clip || null));
-    var labelDOM = this.labels().getDomElement();
-    if (labelDOM) labelDOM.clip(/** @type {anychart.math.Rect} */(clip || null));
   }
+
+  this.rootLayer.clip(/** @type {anychart.math.Rect} */ (clip || null));
+  var labelDOM = this.labels().getDomElement();
+  if (labelDOM) labelDOM.clip(/** @type {anychart.math.Rect} */(clip || null));
 };
 
 

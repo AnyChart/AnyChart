@@ -1050,22 +1050,18 @@ anychart.core.heatMap.series.Base.prototype.applyAppearanceToSeries = function(p
  */
 anychart.core.heatMap.series.Base.prototype.doClip = function() {
   var clip, bounds, axesLinesSpace;
-  if (this.clip() && !(this.rootLayer.clip() instanceof acgraph.vector.Clip)) {
-    if (goog.isBoolean(this.clip())) {
-      bounds = this.pixelBoundsCache;
-      axesLinesSpace = this.axesLinesSpace();
-      clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
-    } else {
-      clip = /** @type {!anychart.math.Rect} */(this.clip());
-    }
-    this.rootLayer.clip(clip);
-
-    var labelDOM = this.labels().getDomElement();
-    if (labelDOM) labelDOM.clip(/** @type {anychart.math.Rect} */(bounds));
-
-    var markerDOM = this.markers().getDomElement();
-    if (markerDOM) markerDOM.clip(/** @type {anychart.math.Rect} */(bounds));
+  clip = /** @type {!anychart.math.Rect|boolean} */ (this.clip());
+  if (goog.isBoolean(clip)) {
+    bounds = this.pixelBoundsCache;
+    axesLinesSpace = this.axesLinesSpace();
+    clip = axesLinesSpace.tightenBounds(/** @type {!anychart.math.Rect} */(bounds));
   }
+
+  this.rootLayer.clip(/** @type {anychart.math.Rect} */ (clip || null));
+  var labelDOM = this.labels().getDomElement();
+  if (labelDOM) labelDOM.clip(/** @type {anychart.math.Rect} */(clip || null));
+  var markerDOM = this.markers().getDomElement();
+  if (markerDOM) markerDOM.clip(/** @type {anychart.math.Rect} */(clip || null));
 };
 
 
