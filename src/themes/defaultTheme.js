@@ -2716,7 +2716,8 @@ window['anychart']['themes']['defaultTheme'] = {
       'labels': {'offsetX': 0},
       'ticks': {
         'stroke': {'thickness': 3, 'color': '#fff', 'position': 'center', 'length': 20}
-      }
+      },
+      'zIndex': 50
     },
     'unboundRegions': {'enabled': true, 'fill': '#F7F7F7', 'stroke': '#B9B9B9'},
     'linearColor': {'colors': ['#fff', '#ffd54f', '#ef6c00']},

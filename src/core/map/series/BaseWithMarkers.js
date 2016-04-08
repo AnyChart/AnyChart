@@ -185,7 +185,7 @@ anychart.core.map.series.BaseWithMarkers.prototype.startDrawing = function() {
 
 
 /** @inheritDoc */
-anychart.core.map.series.BaseWithMarkers.prototype.applyZoomMoveTransform = function(positionProvider) {
+anychart.core.map.series.BaseWithMarkers.prototype.applyZoomMoveTransform = function() {
   var domElement, prevPos, newPos, trX, trY, selfTx;
 
   var iterator = this.getIterator();
@@ -228,18 +228,29 @@ anychart.core.map.series.BaseWithMarkers.prototype.applyZoomMoveTransform = func
   if (isDraw) {
     if (marker && marker.getDomElement() && marker.positionProvider()) {
       prevPos = marker.positionProvider()['value'];
+
+      var position = this.getMarkersPosition(pointState);
+      var positionProvider = this.createPositionProvider(/** @type {string} */(position));
+
       newPos = positionProvider['value'];
 
       domElement = marker.getDomElement();
       selfTx = domElement.getSelfTransformation();
 
+      var markerRotation = iterator.meta('markerRotation');
+      if (goog.isDef(markerRotation))
+        domElement.rotateByAnchor(-markerRotation);
+
       trX = -selfTx.getTranslateX() + newPos['x'] - prevPos['x'];
       trY = -selfTx.getTranslateY() + newPos['y'] - prevPos['y'];
 
       domElement.translate(trX, trY);
+
+      if (goog.isDef(markerRotation))
+        domElement.rotateByAnchor(/** @type {number}*/(markerRotation));
     }
   }
-  anychart.core.map.series.BaseWithMarkers.base(this, 'applyZoomMoveTransform', positionProvider);
+  anychart.core.map.series.BaseWithMarkers.base(this, 'applyZoomMoveTransform');
 };
 
 

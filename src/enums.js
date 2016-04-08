@@ -122,7 +122,8 @@ anychart.enums.normalizeHoverMode = function(value, opt_default) {
 anychart.enums.SelectionMode = {
   NONE: 'none',
   SINGLE_SELECT: 'singleSelect',
-  MULTI_SELECT: 'multiSelect'
+  MULTI_SELECT: 'multiSelect',
+  DRILL_DOWN: 'drillDown'
 };
 
 
@@ -153,6 +154,11 @@ anychart.enums.normalizeSelectMode = function(value, opt_default) {
     case 'm':
     case 'ms':
       return anychart.enums.SelectionMode.MULTI_SELECT;
+    case 'drill':
+    case 'drilldown':
+    case 'drill_down':
+    case 'd':
+      return anychart.enums.SelectionMode.DRILL_DOWN;
   }
   return opt_default || anychart.enums.SelectionMode.NONE;
 };
@@ -1743,6 +1749,7 @@ anychart.enums.EventType = {
   CHART_DRAW: 'chartdraw',
   ANIMATION_START: 'animationstart',
   ANIMATION_END: 'animationend',
+  DRILL_CHANGE: 'drillchange',
 
   LEGEND_ITEM_MOUSE_OUT: 'legenditemmouseout',
   LEGEND_ITEM_MOUSE_OVER: 'legenditemmouseover',
@@ -2513,6 +2520,8 @@ anychart.enums.WarningCode = {
   TABLE_ALREADY_IN_TRANSACTION: 101,
 
   STOCK_WRONG_MAPPING: 201,
+
+  FEATURE_ID_NOT_FOUND: 301,
 
   NOT_FOUND: 404,
   DEPRECATED: 405,
@@ -3292,6 +3301,7 @@ goog.exportSymbol('anychart.enums.HoverMode.BY_X', anychart.enums.HoverMode.BY_X
 goog.exportSymbol('anychart.enums.SelectionMode.NONE', anychart.enums.SelectionMode.NONE);
 goog.exportSymbol('anychart.enums.SelectionMode.SINGLE_SELECT', anychart.enums.SelectionMode.SINGLE_SELECT);
 goog.exportSymbol('anychart.enums.SelectionMode.MULTI_SELECT', anychart.enums.SelectionMode.MULTI_SELECT);
+goog.exportSymbol('anychart.enums.SelectionMode.DRILL_DOWN', anychart.enums.SelectionMode.DRILL_DOWN);
 
 goog.exportSymbol('anychart.enums.Anchor.LEFT_TOP', anychart.enums.Anchor.LEFT_TOP);
 goog.exportSymbol('anychart.enums.Anchor.LEFT_CENTER', anychart.enums.Anchor.LEFT_CENTER);
@@ -3429,6 +3439,7 @@ goog.exportSymbol('anychart.enums.EventType.POINT_DBLCLICK', anychart.enums.Even
 goog.exportSymbol('anychart.enums.EventType.POINT_HOVER', anychart.enums.EventType.POINT_HOVER);
 goog.exportSymbol('anychart.enums.EventType.POINTS_SELECT', anychart.enums.EventType.POINTS_SELECT);
 goog.exportSymbol('anychart.enums.EventType.POINTS_HOVER', anychart.enums.EventType.POINTS_HOVER);
+goog.exportSymbol('anychart.enums.EventType.DRILL_CHANGE', anychart.enums.EventType.DRILL_CHANGE);
 goog.exportSymbol('anychart.enums.EventType.CHART_DRAW', anychart.enums.EventType.CHART_DRAW);
 goog.exportSymbol('anychart.enums.EventType.ANIMATION_START', anychart.enums.EventType.ANIMATION_START);
 goog.exportSymbol('anychart.enums.EventType.ANIMATION_END', anychart.enums.EventType.ANIMATION_END);

@@ -95,7 +95,9 @@ anychart.core.map.series.Connector.prototype.curvature = function(opt_value) {
 
 /** @inheritDoc */
 anychart.core.map.series.Connector.prototype.rootTypedLayerInitializer = function() {
-  return acgraph.path();
+  var path = acgraph.path();
+  path.vectorEffect('non-scaling-stroke');
+  return path;
 };
 
 
@@ -343,7 +345,13 @@ anychart.core.map.series.Connector.prototype.createPositionProvider = function(p
       }
       accumDist += currPathDist;
     }
-    return {'value': {'x': bx, 'y': by}};
+
+
+    var tx = this.map.getMapLayer().getFullTransformation();
+    var scale = tx.getScaleX();
+    var dx = tx.getTranslateX();
+    var dy = tx.getTranslateY();
+    return {'value': {'x': bx * scale + dx, 'y': by * scale + dy}};
   }
   return {'value': {'x': 0, 'y': 0}};
 };
@@ -360,15 +368,29 @@ anychart.core.map.series.Connector.prototype.startDrawing = function() {
 
 
 /** @inheritDoc */
-anychart.core.map.series.Connector.prototype.applyZoomMoveTransform = function(positionProvider) {
-  var iterator = this.getResetIterator();
+anychart.core.map.series.Connector.prototype.applyZoomMoveTransform = function() {
+  var iterator = this.getIterator();
 
-  this.startDrawing();
-  while (iterator.advance() && this.enabled()) {
-    var index = iterator.getIndex();
-    this.drawPoint(this.state.getPointStateByIndex(index));
+  var paths = iterator.meta('shape');
+  var tx = this.map.getMapLayer().getFullTransformation();
+  var scale = tx.getScaleX();
+  var dx = tx.getTranslateX();
+  var dy = tx.getTranslateY();
+
+  for (var i = 0, len = paths.length; i < len; i++) {
+    var path = paths[i];
+    path.setTransformationMatrix(scale, 0, 0, scale, dx, dy);
   }
-  this.finalizeDrawing();
+
+  var hatchFill = this.hatchFillRootElement;
+  var hatchFillShapes = iterator.meta('hatchFillShape');
+  if (hatchFill && hatchFillShapes) {
+    for (i = 0, len = hatchFillShapes.length; i < len; i++) {
+      hatchFillShapes[i].setTransformationMatrix(scale, 0, 0, scale, dx, dy);
+    }
+  }
+
+  anychart.core.map.series.Connector.base(this, 'applyZoomMoveTransform');
 };
 
 

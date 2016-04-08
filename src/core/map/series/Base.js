@@ -328,8 +328,7 @@ anychart.core.map.series.Base.prototype.updateOnZoomOrMove = function() {
   if (manualSuspend) stage.suspend();
 
   while (iterator.advance() && this.enabled()) {
-    var positionProvider = this.createPositionProvider(anychart.enums.Position.CENTER);
-    this.applyZoomMoveTransform(positionProvider);
+    this.applyZoomMoveTransform();
   }
 
   if (manualSuspend)
@@ -343,9 +342,8 @@ anychart.core.map.series.Base.prototype.updateOnZoomOrMove = function() {
 
 /**
  * Applying zoom and move transformations to series elements for improve performans.
- * @param {Object} positionProvider .
  */
-anychart.core.map.series.Base.prototype.applyZoomMoveTransform = function(positionProvider) {
+anychart.core.map.series.Base.prototype.applyZoomMoveTransform = function() {
   var domElement, prevPos, newPos, trX, trY, selfTx;
 
   var iterator = this.getIterator();
@@ -388,6 +386,10 @@ anychart.core.map.series.Base.prototype.applyZoomMoveTransform = function(positi
   if (isDraw) {
     var label = this.labels().getLabel(index);
     if (label && label.getDomElement() && label.positionProvider()) {
+
+      var position = this.getLabelsPosition(pointState);
+      var positionProvider = this.createPositionProvider(position);
+
       prevPos = label.positionProvider()['value'];
       newPos = positionProvider['value'];
 

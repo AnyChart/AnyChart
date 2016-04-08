@@ -599,8 +599,8 @@ anychart.core.map.series.Bubble.prototype.getReferenceScaleValues = function() {
  */
 anychart.core.map.series.Bubble.prototype.getReferenceCoords = function() {
   if (!this.enabled()) return null;
+
   var scale = /** @type {anychart.core.map.scale.Geo} */(this.map.scale());
-  var zoom = /** @type {number} */(scale.zoom);
   var iterator = this.getIterator();
   var fail = false;
 
@@ -671,7 +671,7 @@ anychart.core.map.series.Bubble.prototype.startDrawing = function() {
 
 
 /** @inheritDoc */
-anychart.core.map.series.Bubble.prototype.applyZoomMoveTransform = function(positionProvider) {
+anychart.core.map.series.Bubble.prototype.applyZoomMoveTransform = function() {
   var domElement, trX, trY, selfTx;
   var iterator = this.getIterator();
   var referenceValues = this.getReferenceCoords();
@@ -697,7 +697,7 @@ anychart.core.map.series.Bubble.prototype.applyZoomMoveTransform = function(posi
       hatchFillShape.translate(trX, trY);
     }
   }
-  anychart.core.map.series.Bubble.base(this, 'applyZoomMoveTransform', positionProvider);
+  anychart.core.map.series.Bubble.base(this, 'applyZoomMoveTransform');
 };
 
 

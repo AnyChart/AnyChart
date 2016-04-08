@@ -452,7 +452,7 @@ anychart.core.Chart.prototype.createTooltip = function() {
   this.registerDisposable(tooltip);
   tooltip.chart(this);
 
-  this.listen(anychart.enums.EventType.POINTS_HOVER, this.showTooltip_);
+  this.listen(anychart.enums.EventType.POINTS_HOVER, this.showTooltip_, true);
   return tooltip;
 };
 
@@ -463,6 +463,7 @@ anychart.core.Chart.prototype.createTooltip = function() {
  */
 anychart.core.Chart.prototype.showTooltip_ = function(event) {
   if (event.forbidTooltip) return;
+
   // summary
   // Tooltip Mode   | Interactivity mode
   // Single + Single - draw one tooltip.
@@ -479,7 +480,7 @@ anychart.core.Chart.prototype.showTooltip_ = function(event) {
   goog.array.forEach(event['seriesStatus'], function(status) {
     if (goog.array.isEmpty(status['points'])) {
       if (this.tooltip_.positionMode() == anychart.enums.TooltipPositionMode.FLOAT) {
-        this.unlisten(goog.events.EventType.MOUSEMOVE, this.updateTooltip_);
+        this.unlisten(goog.events.EventType.MOUSEMOVE, this.updateTooltip);
       }
       this.tooltip_.hide(event);
 
@@ -490,7 +491,7 @@ anychart.core.Chart.prototype.showTooltip_ = function(event) {
 
   if (!goog.array.isEmpty(toShowSeriesStatus)) {
     if (this.tooltip_.positionMode() == anychart.enums.TooltipPositionMode.FLOAT) {
-      this.listen(goog.events.EventType.MOUSEMOVE, this.updateTooltip_);
+      this.listen(goog.events.EventType.MOUSEMOVE, this.updateTooltip);
     }
 
     var interactivity = this.interactivity();
@@ -574,9 +575,9 @@ anychart.core.Chart.prototype.useUnionTooltipAsSingle = function() {
 /**
  * Update tooltip position. (for float)
  * @param {anychart.core.MouseEvent} event
- * @private
+ * @protected
  */
-anychart.core.Chart.prototype.updateTooltip_ = function(event) {
+anychart.core.Chart.prototype.updateTooltip = function(event) {
   this.tooltip_.updatePosition(event['clientX'], event['clientY']);
 };
 
@@ -1371,7 +1372,10 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
               nearestPointToCursor: {index: (goog.isArray(index) ? index[0] : index), distance: 0}
             });
 
-          this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, eventSeriesStatus, false, forbidTooltip));
+          if (eventSeriesStatus.length) {
+            this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, eventSeriesStatus, false, forbidTooltip));
+            this.prevHoverSeriesStatus = eventSeriesStatus.length ? eventSeriesStatus : null;
+          }
         }
       }
     }
@@ -1389,7 +1393,10 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
           contains = contains || series[i] == seriesStatus[j].series;
         }
         if (!contains && series[i].state.getIndexByPointState(anychart.PointState.HOVER).length) {
-          seriesStatus.push({series: series[i], points: []});
+          seriesStatus.push({
+            series: series[i],
+            points: []
+          });
           series[i].unhover();
           dispatchEvent = true;
         }

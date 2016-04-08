@@ -263,14 +263,18 @@ anychart.core.map.series.Marker.prototype.startDrawing = function() {
 
 
 /** @inheritDoc */
-anychart.core.map.series.Marker.prototype.applyZoomMoveTransform = function(positionProvider) {
+anychart.core.map.series.Marker.prototype.applyZoomMoveTransform = function() {
   var domElement, prevPos, newPos, trX, trY, selfTx;
   var iterator = this.getIterator();
   var index = iterator.getIndex();
+  var pointState = this.state.getPointStateByIndex(index);
+  var position, positionProvider;
 
   var marker = this.marker_.getMarker(index);
   if (marker && marker.getDomElement() && marker.positionProvider()) {
     prevPos = marker.positionProvider()['value'];
+
+    positionProvider = this.createPositionProvider(anychart.enums.Position.CENTER);
     newPos = positionProvider['value'];
 
     domElement = marker.getDomElement();
@@ -286,6 +290,8 @@ anychart.core.map.series.Marker.prototype.applyZoomMoveTransform = function(posi
   var hatchFill = this.hatchFillElement_ && this.hatchFillElement_.getMarker(index);
   if (hatchFill && hatchFill.getDomElement() && hatchFill.positionProvider()) {
     prevPos = hatchFill.positionProvider()['value'];
+
+    positionProvider = this.createPositionProvider(anychart.enums.Position.CENTER);
     newPos = positionProvider['value'];
 
     domElement = hatchFill.getDomElement();
@@ -297,7 +303,7 @@ anychart.core.map.series.Marker.prototype.applyZoomMoveTransform = function(posi
     domElement.translate(trX, trY);
   }
 
-  anychart.core.map.series.Marker.base(this, 'applyZoomMoveTransform', positionProvider);
+  anychart.core.map.series.Marker.base(this, 'applyZoomMoveTransform');
 };
 
 

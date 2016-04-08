@@ -1473,6 +1473,9 @@ anychart.utils.getWarningDescription = function(code, opt_arguments) {
     case anychart.enums.WarningCode.IMMUTABLE_MARKER_LAYOUT:
       return 'Layout is immutable for this type of axis marker and layout will not be set.';
 
+    case anychart.enums.WarningCode.FEATURE_ID_NOT_FOUND:
+      return 'Feature with id "' + opt_arguments[0] + '" not found';
+
     default:
       return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report!';

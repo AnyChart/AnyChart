@@ -2023,7 +2023,22 @@
           "additionalProperties": false
         },
 
-        "interactivity": {"$ref": "#/definitions/anychart.core.utils.MapInteractivity"}
+        "interactivity": {"$ref": "#/definitions/anychart.core.utils.MapInteractivity"},
+
+        "drillDownMap": {
+          "type": "object",
+          "patternProperties": {
+            ".*": {
+              "type": "object",
+              "properties": {
+                "map": {"$ref": "#/definitions/anychart.charts.Map"}
+              }
+            }
+          }
+        },
+        "geoData": {
+          "type": ["string", "object"]
+        }
       },
       "required": ["type"]
     },
@@ -4716,7 +4731,8 @@
       "enum": [
         "none",
         "singleSelect",
-        "multiSelect"
+        "multiSelect",
+        "drillDown"
       ]
     },
     "anychart.enums.Align": {
@@ -4830,6 +4846,7 @@
     "anychart.enums.SidePosition": {
       "enum": [
         "inside",
+        "center",
         "outside"
       ]
     },

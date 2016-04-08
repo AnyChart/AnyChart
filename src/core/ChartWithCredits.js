@@ -84,6 +84,26 @@ anychart.core.ChartWithCredits.prototype.onCreditsSignal_ = function(event) {
 };
 
 
+/**
+ * Draw credits.
+ * @param {anychart.math.Rect} parentBounds Parent bounds.
+ * @return {!anychart.math.Rect} Bounds without credits bounds.
+ */
+anychart.core.ChartWithCredits.prototype.drawCredits = function(parentBounds) {
+  var credits = this.credits();
+  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_CREDITS | anychart.ConsistencyState.BOUNDS)) {
+    credits.suspendSignalsDispatching();
+    if (!credits.container())
+      credits.container(/** @type {acgraph.vector.ILayer} */(this.container()));
+    credits.parentBounds(/** @type {anychart.math.Rect} */ (parentBounds));
+    credits.resumeSignalsDispatching(false);
+    credits.draw();
+    this.markConsistent(anychart.ConsistencyState.CHART_CREDITS);
+  }
+  return this.credits().getRemainingBounds();
+};
+
+
 /** @inheritDoc */
 anychart.core.ChartWithCredits.prototype.calculateContentAreaSpace = function(totalBounds) {
   //chart area bounds with applied margin and copped by credits
@@ -108,19 +128,9 @@ anychart.core.ChartWithCredits.prototype.calculateContentAreaSpace = function(to
     background.draw();
     this.markConsistent(anychart.ConsistencyState.CHART_BACKGROUND);
   }
-  boundsWithoutBackgroundThickness = background.enabled() ? background.getRemainingBounds() : boundsWithoutMargin;
 
-  var credits = this.credits();
-  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_CREDITS | anychart.ConsistencyState.BOUNDS)) {
-    credits.suspendSignalsDispatching();
-    if (!credits.container())
-      credits.container(/** @type {acgraph.vector.ILayer} */(this.container()));
-    credits.parentBounds(/** @type {anychart.math.Rect} */ (boundsWithoutBackgroundThickness));
-    credits.resumeSignalsDispatching(false);
-    credits.draw();
-    this.markConsistent(anychart.ConsistencyState.CHART_CREDITS);
-  }
-  boundsWithoutCredits = this.credits().getRemainingBounds();
+  boundsWithoutBackgroundThickness = background.enabled() ? background.getRemainingBounds() : boundsWithoutMargin;
+  boundsWithoutCredits = this.drawCredits(boundsWithoutBackgroundThickness);
   boundsWithoutPadding = this.padding().tightenBounds(boundsWithoutCredits);
 
   var title = this.title();
@@ -132,6 +142,7 @@ anychart.core.ChartWithCredits.prototype.calculateContentAreaSpace = function(to
     title.draw();
     this.markConsistent(anychart.ConsistencyState.CHART_TITLE);
   }
+
   boundsWithoutTitle = title.enabled() ? title.getRemainingBounds() : boundsWithoutPadding;
 
   return boundsWithoutTitle.clone();

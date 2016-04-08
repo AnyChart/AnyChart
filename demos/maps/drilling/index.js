@@ -8,18 +8,22 @@ var mapCache = {};
 var showPreload = true;
 var breadcrumbs;
 
+var customMap;
+
 var randomExt = function(a, b) {
   return Math.round(Math.random() * (b - a + 1) + a);
 };
 
-var generateData = function(map) {
+var generateData = function(map, opt_min, opt_max) {
   var auChoroplethData = [];
   features = map.geoData()['features'];
+  var min = opt_min !== void 0 ? opt_min : 1900;
+  var max = opt_max !== void 0 ? opt_max : 2000;
   for (var i = 0, len = features.length; i < len; i++) {
     var feature = features[i];
     if (feature['properties']) {
       id = feature['properties'][map.geoIdField()];
-      auChoroplethData.push({'id': id, 'value': randomExt(1900, 2000), 'size': randomExt(0, 10)});
+      auChoroplethData.push({'id': id, 'value': randomExt(min, max), 'size': randomExt(0, 10)});
     }
   }
   return auChoroplethData;
@@ -38,12 +42,19 @@ function hidePreloader() {
 
 
 var createMap = function(name, id, callback) {
-  var dir = 'countries';
-  if (name == 'world')
-    dir = 'custom';
+  var dir, url, geoData;
 
-  var url = 'http://cdn.anychart.com/geodata/1.1.0/' + dir + '/' + name + '/' + name + '.js';
-  var geoData = 'anychart.maps.' + name;
+  if (id.search(/US[.].+/g) != -1) {
+    dir = 'usa_states';
+    url = dir + '/' + name + '/' + name + '.js';
+    geoData = 'anychart.maps.' + name;
+  } else {
+    dir = 'countries';
+    if (name == 'world')
+      dir = 'custom';
+    url = 'http://cdn.anychart.com/geodata/1.1.0/' + dir + '/' + name + '/' + name + '.js';
+    geoData = 'anychart.maps.' + name;
+  }
 
   $.ajax({
     type: "GET",
@@ -54,9 +65,22 @@ var createMap = function(name, id, callback) {
     },
     success: function() {
       var map;
-      if (id == 'AU') {
+      if (id == 'KZ') {
         map = anychart.map();
         map.geoData(geoData);
+        var series = map.choropleth(generateData(map, 20, 100));
+        series.colorScale(anychart.scales.linearColor('red', 'white'));
+        callback.call(chart, id, map);
+      } else if (id == 'AU') {
+        map = anychart.map();
+        // map.listen(anychart.enums.EventType.ANIMATION_START, function(e) {
+        //   console.log('AU ' + e.type);
+        // });
+        //
+        // map.listen(anychart.enums.EventType.ANIMATION_END, function(e) {
+        //   console.log('AU ' + e.type);
+        // });
+        map.geoData(au);
         map.choropleth(generateData(map));
         map.colorRange().enabled(true);
         var scale = anychart.scales.linearColor(anychart.color.blendedHueProgression('red', 'green', 10));
@@ -99,17 +123,26 @@ var drilldown = function(e) {
 
   var map = mapCache[pointId];
   if (map === void 0) {
-    //if (featureProp.iso_a3) {
+    if (featureProp.iso_a3) {
       var name = featureProp.admin.toLowerCase().replace(/\s/g, '_');
       createMap(name, pointId, function(id, map) {
         mapCache[id] = map;
         chart.drillTo(id, map);
       });
-    //} else {
-    //  map = mapCache[featureProp.iso_a2];
-    //  if (map)
-    //    map.zoomToFeature(pointId);
-    //}
+    } else {
+      if (pointId.search(/US[.].+/g) != -1) {
+        console.log(featureProp);
+        var name = featureProp.name.toLowerCase().replace(/\s/g, '_');
+        createMap(name, pointId, function(id, map) {
+          mapCache[id] = map;
+          chart.drillTo(id, map);
+        });
+      } else {
+        map = mapCache[featureProp.iso_a2];
+        if (map)
+          map.zoomToFeature(pointId);
+      }
+    }
   } else if (map == null) {
     chart.zoomToFeature(pointId);
   } else {
@@ -122,10 +155,47 @@ $(document).ready(function() {
   breadcrumbs = $('#breadcrumbs');
   stage = anychart.graphics.create('container');
 
+  // var drillDownMap = {};
+  // createMap('australia', 'KZ', function(pointId, map) {
+  //   drillDownMap[pointId] = map;
+  // });
+  // createMap('australia', 'AU', function(pointId, map) {
+  //   drillDownMap[pointId] = map.toJson();
+  // });
+  // createMap('france', 'FR', function(pointId, map) {
+  //   drillDownMap[pointId] = map;
+  // });
+  // createMap('china', 'CN', function(pointId, map) {
+  //   drillDownMap[pointId] = map.toJson();
+  // });
+  // createMap('united_states_of_america', 'US', function(pointId, map) {
+  //   drillDownMap[pointId] = map;
+  //   map.drillDownMap({'US.NV': drillDownMap['AU']})
+  // });
 
   createMap('world', 'world', function(pointId, map) {
-    chart = map.container(stage).draw();
+    chart = map;
+
     chart.listen('pointClick', drilldown);
+
+    // chart.listen('pointClick', function(e) {
+    //   var pointId = e.point.get('id');
+    //   var featureProp = e.point.getFeatureProp();
+    //   var name = featureProp.admin.toLowerCase().replace(/\s/g, '_');
+    //
+    //   console.log(name, pointId);
+    // });
+
+    chart.interactivity().selectionMode(anychart.enums.SelectionMode.DRILL_DOWN);
+    // chart.drillDownMap(drillDownMap);
+
+    // chart.listen(anychart.enums.EventType.ANIMATION_START, function(e) {
+    //   console.log(e);
+    // });
+    //
+    // chart.listen(anychart.enums.EventType.ANIMATION_END, function(e) {
+    //   console.log(e);
+    // });
 
     var a = $('<a>World Map</a>');
     a.attr({'id': 'null', 'href': '#'});
@@ -145,7 +215,10 @@ $(document).ready(function() {
         breadcrumbs.append('<span> - </span>');
 
       for (var i = 0; i < e.path.length; i++) {
-        a = $('<a>' + e.path[i].getProperties().name + '</a>');
+        var label = e.path[i].getProperties().name || e.path[i].getId();
+        
+        // if (i != e.path.length - 1)
+        a = $('<a>' + label + '</a>');
         a.attr({'id': e.path[i].getId(), 'href': '#'});
         a.bind('click', function() {chart.drillTo(this.id)});
         breadcrumbs.append(a);
@@ -201,8 +274,8 @@ $(document).ready(function() {
         .itemsSourceMode(anychart.enums.LegendItemsSourceMode.CATEGORIES)
         .enabled(true);
 
+    // chart.interactivity().selectionMode('none');
 
-
-    chart.interactivity().selectionMode('none');
+    chart.container(stage).draw()
   });
 });

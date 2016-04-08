@@ -322,6 +322,9 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="geo_scale" type="GeoScale"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="series_list" type="Map_series_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="color_scales" type="ColorScale_list"/>
+
+            <xsd:element minOccurs="0" maxOccurs="1" name="geo_data" type="GeoData"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="drill_down_map" type="DrillDownMap"/>
         </xsd:all>
         <!-- core.Chart attrs -->
         <xsd:attributeGroup ref="attrs.VisualBase"/>
@@ -336,6 +339,7 @@
         <xsd:attribute name="min_bubble_size" type="simple.NumberOrPercent" default="5%"/>
         <xsd:attribute name="max_bubble_size" type="simple.NumberOrPercent" default="20%"/>
         <xsd:attribute name="geo_id_field" type="xsd:string"/>
+        <xsd:attribute name="geo_data" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:complexType name="Series">
@@ -519,6 +523,20 @@
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="series" type="Series"/>
         </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="DrillDownMap">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:any processContents="skip"/>
+        </xsd:sequence>
+        <xsd:anyAttribute processContents="skip"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="GeoData">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:any processContents="skip"/>
+        </xsd:sequence>
+        <xsd:anyAttribute processContents="skip"/>
     </xsd:complexType>
 
     <xsd:complexType name="Map_series">
@@ -2553,6 +2571,7 @@
     <xsd:simpleType name="enums.SidePosition">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="inside"/>
+            <xsd:enumeration value="center"/>
             <xsd:enumeration value="outside"/>
         </xsd:restriction>
     </xsd:simpleType>
@@ -2780,6 +2799,7 @@
             <xsd:enumeration value="none"/>
             <xsd:enumeration value="singleSelect"/>
             <xsd:enumeration value="multiSelect"/>
+            <xsd:enumeration value="drillDown"/>
         </xsd:restriction>
     </xsd:simpleType>
 
