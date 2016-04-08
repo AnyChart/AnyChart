@@ -3277,7 +3277,7 @@ anychart.charts.Map.prototype.drillTo = function(id, opt_map) {
  */
 anychart.charts.Map.prototype.drillDown_ = function(id, target) {
   if (!this.container())
-      return;
+    return;
 
   var root = this.getRootScene();
   var scene = this.getCurrentScene();
@@ -3352,7 +3352,7 @@ anychart.charts.Map.prototype.drillDown_ = function(id, target) {
 
   this.doAfterAnimation(newScene, function(newScene, scene, root, featureBounds, featureProperties) {
     if (!root.drillingInAction)
-        return;
+      return;
 
     scene.tooltip().hide(null);
     scene.hide();
