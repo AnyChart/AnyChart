@@ -96,7 +96,7 @@ anychart.core.map.series.Connector.prototype.curvature = function(opt_value) {
 /** @inheritDoc */
 anychart.core.map.series.Connector.prototype.rootTypedLayerInitializer = function() {
   var path = acgraph.path();
-  path.vectorEffect('non-scaling-stroke');
+  path.disableStrokeScaling(true);
   return path;
 };
 
