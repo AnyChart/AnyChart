@@ -588,6 +588,8 @@
         <!-- Base series -->
         <xsd:attribute name="series_type" type="enums.MapSeriesTypes"/>
 
+        <xsd:attribute name="geo_id_field" type="xsd:string"/>
+
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="hover_fill" type="xsd:string"/>
         <xsd:attribute name="select_fill" type="xsd:string"/>
@@ -839,6 +841,7 @@
     <xsd:complexType name="core.axisMarkers.Line">
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="value" type="simple.Text"/>
         </xsd:all>
         <xsd:attribute name="value" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
@@ -856,6 +859,8 @@
     <xsd:complexType name="core.axisMarkers.Range">
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="from" type="simple.Text"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="to" type="simple.Text"/>
         </xsd:all>
         <xsd:attribute name="from" type="xsd:string"/>
         <xsd:attribute name="to" type="xsd:string"/>
@@ -880,6 +885,7 @@
     <xsd:complexType name="core.axisMarkers.Text">
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="text" type="simple.Text"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="value" type="simple.Text"/>
         </xsd:all>
         <xsd:attribute name="value" type="xsd:string"/>
         <xsd:attribute name="anchor" type="enums.AnchorAndPosition" default="center"/>
@@ -992,8 +998,8 @@
         <xsd:attribute name="width" type="simple.NumberOrPercentOrNull" default="null"/>
         <xsd:attribute name="height" type="simple.NumberOrPercentOrNull" default="null"/>
         <xsd:attribute name="anchor" type="enums.AnchorAndPosition" default="center"/>
-        <xsd:attribute name="offset_x" type="xsd:double" default="0"/>
-        <xsd:attribute name="offset_y" type="xsd:double" default="0"/>
+        <xsd:attribute name="offset_x" type="simple.NumberOrPercent" default="0"/>
+        <xsd:attribute name="offset_y" type="simple.NumberOrPercent" default="0"/>
         <xsd:attribute name="position" type="enums.AnchorAndPosition" default="center"/>
         <xsd:attribute name="text" type="xsd:string"/>
         <xsd:attribute name="min_font_size" type="xsd:string"/>
@@ -1052,6 +1058,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="adjust_font_size" type="utils.AdjustFontSizeObj"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="text_formatter" type="simple.Text"/>
         </xsd:all>
         <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
         <xsd:attribute name="position" type="xsd:string"/>
@@ -1064,6 +1071,8 @@
         <xsd:attribute name="min_font_size" type="xsd:string"/>
         <xsd:attribute name="max_font_size" type="xsd:string"/>
         <xsd:attribute name="adjust_font_size" type="simple.Bool" default="false"/>
+        <!-- Because Pie uses circular labels factory, but described as Funnel and Pyramid. -->
+        <xsd:attribute name="auto_rotate" type="xsd:boolean" use="optional"/>
         <xsd:attributeGroup ref="attrs.TextSettings"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
@@ -1226,6 +1235,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="adjust_font_size" type="utils.AdjustFontSizeObj"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="value_prefix" type="simple.Text"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="value_postfix" type="simple.Text"/>
         </xsd:all>
         <xsd:attribute name="value_prefix" type="xsd:string" default=""/>
         <xsd:attribute name="value_postfix" type="xsd:string" default=""/>
@@ -1251,6 +1262,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="content" type="core.Label"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="value_prefix" type="simple.Text"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="value_postfix" type="simple.Text"/>
         </xsd:all>
         <xsd:attribute name="value_prefix" type="xsd:string" default=""/>
         <xsd:attribute name="value_postfix" type="xsd:string" default=""/>
@@ -1274,6 +1287,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="adjust_font_size" type="utils.AdjustFontSizeObj"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="value_prefix" type="simple.Text"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="value_postfix" type="simple.Text"/>
         </xsd:all>
         <xsd:attribute name="value_prefix" type="xsd:string" default=""/>
         <xsd:attribute name="value_postfix" type="xsd:string" default=""/>
@@ -1754,6 +1769,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="minor_ticks" type="ScaleTicks"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="values" type="OrdinalScaleValues"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="names" type="OrdinalScaleNames"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="ranges" type="OrdinalColorScaleRanges"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="colors" type="OrdinalOrLinearScaleColors"/>
         </xsd:all>
         <xsd:attribute name="type" type="enums.ScaleTypes" default="linear"/>
         <xsd:attribute name="inverted" type="simple.Bool" default="false"/>
@@ -1797,13 +1814,14 @@
     <xsd:complexType name="GeoScale">
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="bounds" type="utils.Rect"/>
-            <xsd:element name="inverted_list" type="Inverted_list"/>
         </xsd:all>
         <xsd:attribute name="type" type="enums.ScaleTypes" default="geo"/>
         <xsd:attribute name="minimum_x" type="simple.NumberOrPercentOrNull"/>
         <xsd:attribute name="minimum_y" type="simple.NumberOrPercentOrNull"/>
         <xsd:attribute name="maximum_x" type="simple.NumberOrPercentOrNull"/>
         <xsd:attribute name="maximum_y" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="inverted_x" type="simple.Bool"/>
+        <xsd:attribute name="inverted_y" type="simple.Bool"/>
         <xsd:attribute name="gap" type="xsd:double"/>
     </xsd:complexType>
 
@@ -1869,6 +1887,12 @@
         </xsd:sequence>
     </xsd:complexType>
 
+    <xsd:complexType name="OrdinalOrLinearScaleColors">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="color" type="LinearColors"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
     <xsd:complexType name="OrdinalColorScaleRanges">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="range" type="OrdinalColorRange"/>
@@ -1881,6 +1905,14 @@
         <xsd:attribute name="from" type="xsd:unsignedInt"/>
         <xsd:attribute name="to" type="xsd:unsignedInt"/>
         <xsd:attribute name="color" type="xsd:string"/>
+        <xsd:attribute name="name" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="LinearColors">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="color" type="simple.Text"/>
+        </xsd:sequence>
+        <xsd:attribute name="offset" type="xsd:double"/>
     </xsd:complexType>
 
     <xsd:complexType name="ScaleTicksValues">
@@ -2224,7 +2256,7 @@
         <xsd:union>
             <xsd:simpleType>
                 <xsd:restriction base="xsd:string">
-                    <xsd:pattern value="[0-9]*\.?[0-9]+%"/>
+                    <xsd:pattern value="-?[0-9]*\.?[0-9]+%"/>
                 </xsd:restriction>
             </xsd:simpleType>
             <xsd:simpleType>
@@ -2245,7 +2277,7 @@
             </xsd:simpleType>
             <xsd:simpleType>
                 <xsd:restriction base="xsd:string">
-                    <xsd:pattern value="[0-9]*\.?[0-9]+%"/>
+                    <xsd:pattern value="-?[0-9]*\.?[0-9]+%"/>
                 </xsd:restriction>
             </xsd:simpleType>
             <xsd:simpleType>
@@ -2262,14 +2294,6 @@
         <xsd:attribute name="min" type="xsd:double"/>
         <xsd:attribute name="max" type="xsd:double"/>
     </xsd:complexType>
-
-    <xsd:complexType name="Inverted_list">
-        <xsd:sequence minOccurs="2" maxOccurs="2">
-            <xsd:element name="inverted" type="simple.Bool"/>
-        </xsd:sequence>
-    </xsd:complexType>
-
-
 
     <xsd:simpleType name="simple.MarkerType">
         <xsd:restriction base="xsd:string">
@@ -2389,10 +2413,9 @@
             <xsd:enumeration value="cartesian3d"/>
             <xsd:enumeration value="column"/>
             <xsd:enumeration value="column3d"/>
-            <xsd:enumeration value="heatmap"/>
             <xsd:enumeration value="financial"/>
             <xsd:enumeration value="funnel"/>
-            <xsd:enumeration value="heatmap"/>
+            <xsd:enumeration value="heatMap"/>
             <xsd:enumeration value="line"/>
             <xsd:enumeration value="marker"/>
             <xsd:enumeration value="pie"/>
@@ -2416,8 +2439,8 @@
 
     <xsd:simpleType name="enums.GanttTypes">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="resource"/>
-            <xsd:enumeration value="project"/>
+            <xsd:enumeration value="ganttResource"/>
+            <xsd:enumeration value="ganttProject"/>
         </xsd:restriction>
     </xsd:simpleType>
 

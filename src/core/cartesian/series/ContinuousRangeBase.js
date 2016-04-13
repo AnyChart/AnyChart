@@ -131,7 +131,7 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.createPositionProvi
  * @return {anychart.core.cartesian.series.ContinuousRangeBase|acgraph.vector.Stroke|Function} .
  */
 anychart.core.cartesian.series.ContinuousRangeBase.prototype.highStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
-    opt_lineCap) {
+                                                                                   opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
     var stroke = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
@@ -157,7 +157,7 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.highStroke = functi
  * @return {anychart.core.cartesian.series.ContinuousRangeBase|acgraph.vector.Stroke|Function} .
  */
 anychart.core.cartesian.series.ContinuousRangeBase.prototype.hoverHighStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
-    opt_lineCap) {
+                                                                                        opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
     this.hoverHighStroke_ = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
@@ -180,7 +180,7 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.hoverHighStroke = f
  * @return {anychart.core.cartesian.series.ContinuousRangeBase|acgraph.vector.Stroke|Function} .
  */
 anychart.core.cartesian.series.ContinuousRangeBase.prototype.selectHighStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
-                                                                                        opt_lineCap) {
+                                                                                         opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
     this.selectHighStroke_ = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
@@ -232,7 +232,7 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.getFinalHighStroke 
  * @return {anychart.core.cartesian.series.ContinuousRangeBase|acgraph.vector.Stroke|Function} .
  */
 anychart.core.cartesian.series.ContinuousRangeBase.prototype.lowStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
-    opt_lineCap) {
+                                                                                  opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
     var stroke = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
@@ -258,7 +258,7 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.lowStroke = functio
  * @return {anychart.core.cartesian.series.ContinuousRangeBase|acgraph.vector.Stroke|Function} .
  */
 anychart.core.cartesian.series.ContinuousRangeBase.prototype.hoverLowStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
-    opt_lineCap) {
+                                                                                       opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
     this.hoverLowStroke_ = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
@@ -281,7 +281,7 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.hoverLowStroke = fu
  * @return {anychart.core.cartesian.series.ContinuousRangeBase|acgraph.vector.Stroke|Function} .
  */
 anychart.core.cartesian.series.ContinuousRangeBase.prototype.selectLowStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin,
-                                                                                       opt_lineCap) {
+                                                                                        opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
     this.selectLowStroke_ = goog.isFunction(opt_strokeOrFill) ?
         opt_strokeOrFill :
@@ -368,7 +368,9 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.serialize = functio
         ['Series selectHighStroke']
     );
   } else {
-    json['selectHighStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectHighStroke()));
+    if (goog.isDef(this.selectHighStroke_)) {
+      json['selectHighStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectHighStroke()));
+    }
   }
 
   if (goog.isFunction(this.lowStroke())) {
@@ -398,7 +400,9 @@ anychart.core.cartesian.series.ContinuousRangeBase.prototype.serialize = functio
         ['Series selectLowStroke']
     );
   } else {
-    json['selectLowStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectLowStroke()));
+    if (goog.isDef(this.selectLowStroke_)) {
+      json['selectLowStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectLowStroke()));
+    }
   }
   return json;
 };

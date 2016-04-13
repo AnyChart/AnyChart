@@ -484,7 +484,7 @@ anychart.core.map.scale.Geo.prototype.scaleToPx = function(x, y) {
       this.bounds_.getRight() - this.centerOffsetX - transformX :
       this.bounds_.left + this.centerOffsetX + transformX;
 
-  var resultY = this.isInverted ?
+  var resultY = this.isInvertedY ?
       this.bounds_.top + this.centerOffsetY + transformY :
       this.bounds_.getBottom() - this.centerOffsetY - transformY;
 
@@ -510,7 +510,7 @@ anychart.core.map.scale.Geo.prototype.pxToScale = function(x, y) {
       this.bounds_.getRight() - this.centerOffsetX - x :
       x - this.bounds_.left - this.centerOffsetX;
 
-  var transformY = this.isInverted ?
+  var transformY = this.isInvertedY ?
       x - this.bounds_.top - this.centerOffsetY :
       this.bounds_.getBottom() - this.centerOffsetY - y;
 
@@ -596,7 +596,7 @@ anychart.core.map.scale.Geo.prototype.transform = function(lon, lat) {
     resultX = minPx + (resultX - maxPx);
   }
 
-  var resultY = this.isInverted ?
+  var resultY = this.isInvertedY ?
       this.bounds_.top + this.centerOffsetY + transformY :
       this.bounds_.getBottom() - this.centerOffsetY - transformY;
 
@@ -626,7 +626,7 @@ anychart.core.map.scale.Geo.prototype.inverseTransform = function(x, y) {
       this.bounds_.getRight() - this.centerOffsetX - x :
       x - this.bounds_.left - this.centerOffsetX;
 
-  var transformY = this.isInverted ?
+  var transformY = this.isInvertedY ?
       x - this.bounds_.top - this.centerOffsetY :
       this.bounds_.getBottom() - this.centerOffsetY - y;
 
@@ -742,12 +742,14 @@ anychart.core.map.scale.Geo.prototype.checkScaleChanged = function(silently) {
 anychart.core.map.scale.Geo.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['type'] = this.getType();
-  json['inverted'] = this.inverted();
+  var inv = this.inverted();
+  json['invertedX'] = inv[0];
+  json['invertedY'] = inv[1];
   json['maximumX'] = this.maximumModeAuto ? null : this.maxX;
   json['maximumY'] = this.maximumModeAuto ? null : this.maxY;
   json['minimumX'] = this.minimumModeAuto ? null : this.minX;
   json['minimumY'] = this.minimumModeAuto ? null : this.minY;
-  json['minimumGap'] = this.gap();
+  json['gap'] = this.gap();
   if (this.bounds_)
     json['bounds'] = this.bounds_;
   return json;
@@ -757,7 +759,7 @@ anychart.core.map.scale.Geo.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.map.scale.Geo.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  this.inverted.apply(this, config['inverted']);
+  this.inverted(config['invertedX'], config['invertedY']);
   this.minimumX(config['minimumX']);
   this.minimumY(config['minimumY']);
   this.maximumX(config['maximumX']);

@@ -1721,31 +1721,33 @@ anychart.charts.Radar.prototype.serialize = function() {
   var grids = [];
   for (i = 0; i < this.grids_.length; i++) {
     var grid = this.grids_[i];
-    config = grid.serialize();
-    scale = grid.xScale();
-    if (scale) {
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['xScale'] = scales.length - 1;
-      } else {
-        config['xScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (grid) {
+      config = grid.serialize();
+      scale = grid.xScale();
+      if (scale) {
+        objId = goog.getUid(scale);
+        if (!scalesIds[objId]) {
+          scalesIds[objId] = scale.serialize();
+          scales.push(scalesIds[objId]);
+          config['xScale'] = scales.length - 1;
+        } else {
+          config['xScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
       }
-    }
 
-    scale = grid.yScale();
-    if (scale) {
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['yScale'] = scales.length - 1;
-      } else {
-        config['yScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      scale = grid.yScale();
+      if (scale) {
+        objId = goog.getUid(scale);
+        if (!scalesIds[objId]) {
+          scalesIds[objId] = scale.serialize();
+          scales.push(scalesIds[objId]);
+          config['yScale'] = scales.length - 1;
+        } else {
+          config['yScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
       }
+      grids.push(config);
     }
-    grids.push(config);
   }
   if (grids.length)
     json['grids'] = grids;
@@ -1753,31 +1755,33 @@ anychart.charts.Radar.prototype.serialize = function() {
   var minorGrids = [];
   for (i = 0; i < this.minorGrids_.length; i++) {
     var minorGrid = this.minorGrids_[i];
-    config = minorGrid.serialize();
-    scale = minorGrid.xScale();
-    if (scale) {
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['xScale'] = scales.length - 1;
-      } else {
-        config['xScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (minorGrid) {
+      config = minorGrid.serialize();
+      scale = minorGrid.xScale();
+      if (scale) {
+        objId = goog.getUid(scale);
+        if (!scalesIds[objId]) {
+          scalesIds[objId] = scale.serialize();
+          scales.push(scalesIds[objId]);
+          config['xScale'] = scales.length - 1;
+        } else {
+          config['xScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
       }
-    }
 
-    scale = minorGrid.yScale();
-    if (scale) {
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['yScale'] = scales.length - 1;
-      } else {
-        config['yScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      scale = minorGrid.yScale();
+      if (scale) {
+        objId = goog.getUid(scale);
+        if (!scalesIds[objId]) {
+          scalesIds[objId] = scale.serialize();
+          scales.push(scalesIds[objId]);
+          config['yScale'] = scales.length - 1;
+        } else {
+          config['yScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
       }
+      minorGrids.push(config);
     }
-    minorGrids.push(config);
   }
   if (minorGrids.length)
     json['minorGrids'] = minorGrids;
@@ -1865,18 +1869,30 @@ anychart.charts.Radar.prototype.setupByJSON = function(config) {
   var minorGrids = config['minorGrids'];
   var series = config['series'];
   var scales = config['scales'];
+  var type = this.getType();
 
   var scalesInstances = {};
   if (goog.isArray(scales)) {
+    for (i = 0; i < scales.length; i++) {
+      json = scales[i];
+      if (goog.isString(json)) {
+        json = {'type': json};
+      }
+      json = anychart.themes.merging.mergeScale(json, i, type);
+      scale = anychart.scales.Base.fromString(json['type'], false);
+      scale.setup(json);
+      scalesInstances[i] = scale;
+    }
+  } else if (goog.isObject(scales)) {
     for (i in scales) {
       if (!scales.hasOwnProperty(i)) continue;
       json = scales[i];
       if (goog.isString(json)) {
-        scale = anychart.scales.Base.fromString(json, false);
-      } else {
-        scale = anychart.scales.Base.fromString(json['type'], false);
-        scale.setup(json);
+        json = {'type': json};
       }
+      json = anychart.themes.merging.mergeScale(json, i, type);
+      scale = anychart.scales.Base.fromString(json['type'], false);
+      scale.setup(json);
       scalesInstances[i] = scale;
     }
   }

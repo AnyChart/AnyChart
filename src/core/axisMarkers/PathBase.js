@@ -375,14 +375,6 @@ anychart.core.axisMarkers.PathBase.prototype.markerElement = function() {
 
 
 /** @inheritDoc */
-anychart.core.axisMarkers.PathBase.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
-  json['layout'] = this.layout();
-  return json;
-};
-
-
-/** @inheritDoc */
 anychart.core.axisMarkers.PathBase.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   this.layout(config['layout']);

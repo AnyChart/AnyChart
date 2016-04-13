@@ -676,19 +676,31 @@ anychart.core.stock.Scroller.prototype.setupByJSON = function(config) {
 
   this.xAxis(config['xAxis']);
   this.defaultSeriesType(config['defaultSeriesType']);
+  var type = this.getChart().getType();
 
   var scales = config['scales'];
   var scalesInstances = {};
-  if (goog.isObject(scales)) {
+  if (goog.isArray(scales)) {
+    for (i = 0; i < scales.length; i++) {
+      json = scales[i];
+      if (goog.isString(json)) {
+        json = {'type': json};
+      }
+      json = anychart.themes.merging.mergeScale(json, i, type);
+      scale = anychart.scales.ScatterBase.fromString(json['type'], false);
+      scale.setup(json);
+      scalesInstances[i] = scale;
+    }
+  } else if (goog.isObject(scales)) {
     for (i in scales) {
       if (!scales.hasOwnProperty(i)) continue;
       json = scales[i];
       if (goog.isString(json)) {
-        scale = anychart.scales.ScatterBase.fromString(json, false);
-      } else {
-        scale = anychart.scales.ScatterBase.fromString(json['type'], false);
-        scale.setup(json);
+        json = {'type': json};
       }
+      json = anychart.themes.merging.mergeScale(json, i, type);
+      scale = anychart.scales.ScatterBase.fromString(json['type'], false);
+      scale.setup(json);
       scalesInstances[i] = scale;
     }
   }

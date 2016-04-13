@@ -4239,19 +4239,22 @@ anychart.core.ui.Timeline.prototype.serialize = function() {
   var i = 0;
   var lineMarkers = [];
   for (i = 0; i < this.lineMarkers_.length; i++) {
-    lineMarkers.push(this.lineMarkers_[i].serialize());
+    var lineMarker = this.lineMarkers_[i];
+    if (lineMarker) lineMarkers.push(lineMarker.serialize());
   }
   if (lineMarkers.length) json['lineAxesMarkers'] = lineMarkers;
 
   var rangeMarkers = [];
   for (i = 0; i < this.rangeMarkers_.length; i++) {
-    rangeMarkers.push(this.rangeMarkers_[i].serialize());
+    var rangeMarker = this.rangeMarkers_[i];
+    if (rangeMarker) rangeMarkers.push(rangeMarker.serialize());
   }
   if (rangeMarkers.length) json['rangeAxesMarkers'] = rangeMarkers;
 
   var textMarkers = [];
   for (i = 0; i < this.textMarkers_.length; i++) {
-    textMarkers.push(this.textMarkers_[i].serialize());
+    var textMarker = this.textMarkers_[i];
+    if (textMarker) textMarkers.push(textMarker.serialize());
   }
   if (textMarkers.length) json['textAxesMarkers'] = textMarkers;
 

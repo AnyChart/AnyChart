@@ -350,7 +350,7 @@ anychart.core.ui.LabelBase.prototype.getFinalAnchor = function() {
  */
 anychart.core.ui.LabelBase.prototype.offsetX = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    this.offsetX_ = opt_value;
+    this.offsetX_ = /** @type {number|string} */ (anychart.utils.normalizeNumberOrPercent(opt_value));
     this.invalidate(anychart.ConsistencyState.BOUNDS,
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     return this;
@@ -367,7 +367,7 @@ anychart.core.ui.LabelBase.prototype.offsetX = function(opt_value) {
  */
 anychart.core.ui.LabelBase.prototype.offsetY = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    this.offsetY_ = opt_value;
+    this.offsetY_ = /** @type {number|string} */ (anychart.utils.normalizeNumberOrPercent(opt_value));
     this.invalidate(anychart.ConsistencyState.BOUNDS,
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     return this;
@@ -957,7 +957,7 @@ anychart.core.ui.LabelBase.prototype.serialize = function() {
   json['padding'] = this.padding().serialize();
   json['width'] = this.width();
   json['height'] = this.height();
-  json['anchor'] = this.anchor();
+  if (goog.isDef(this.anchorInternal)) json['anchor'] = this.anchorInternal;
   json['offsetX'] = this.offsetX();
   json['offsetY'] = this.offsetY();
   json['text'] = this.text();

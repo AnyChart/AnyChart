@@ -711,9 +711,6 @@ anychart.charts.Map.prototype.allowPointsSelect_;
  * @param {anychart.core.MouseEvent} event Event object.
  */
 anychart.charts.Map.prototype.tapHandler = function(event) {
-  if (event.type == goog.events.EventType.POINTERDOWN || event.type == goog.events.EventType.POINTERUP)
-    console.log(event);
-
   this.isDesktop = false;
   var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
   var bounds = this.getPlotBounds();

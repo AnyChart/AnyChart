@@ -989,11 +989,34 @@ anychart.core.Chart.prototype.toXml = function(opt_asXmlNode, opt_includeTheme) 
 
 
 /**
+ * Returns chart type for JSON.
+ * @return {string}
+ * @private
+ */
+anychart.core.Chart.prototype.getNormalizedType_ = function() {
+  var type = this.getType();
+  switch (type.toLowerCase()) {
+    case 'map':
+      return 'map';
+    case 'ganttresource':
+    case 'ganttproject':
+      return 'gantt';
+    case 'gauge':
+      return 'gauge';
+    default:
+      return 'chart';
+  }
+};
+
+
+/**
  * Returns default theme object.
  * @return {Object}
  */
 anychart.core.Chart.prototype.getDefaultThemeObj = function() {
-  return {'chart': anychart.getFullTheme()[this.getType()]};
+  var result = {};
+  result[this.getNormalizedType_()] = anychart.getFullTheme()[this.getType()];
+  return result;
 };
 
 

@@ -1835,18 +1835,30 @@ anychart.charts.HeatMap.prototype.setupByJSON = function(config) {
   var xAxes = config['xAxes'];
   var yAxes = config['yAxes'];
   var scales = config['scales'];
+  var type = this.getType();
 
   var scalesInstances = {};
-  if (goog.isObject(scales)) {
+  if (goog.isArray(scales)) {
+    for (i = 0; i < scales.length; i++) {
+      json = scales[i];
+      if (goog.isString(json)) {
+        json = {'type': json};
+      }
+      json = anychart.themes.merging.mergeScale(json, i, type);
+      scale = anychart.scales.Base.fromString(json['type'], false);
+      scale.setup(json);
+      scalesInstances[i] = scale;
+    }
+  } else if (goog.isObject(scales)) {
     for (i in scales) {
       if (!scales.hasOwnProperty(i)) continue;
       json = scales[i];
       if (goog.isString(json)) {
-        scale = anychart.scales.Base.fromString(json, false);
-      } else {
-        scale = anychart.scales.Base.fromString(json['type'], false);
-        scale.setup(json);
+        json = {'type': json};
       }
+      json = anychart.themes.merging.mergeScale(json, i, type);
+      scale = anychart.scales.Base.fromString(json['type'], false);
+      scale.setup(json);
       scalesInstances[i] = scale;
     }
   }
@@ -1995,12 +2007,6 @@ anychart.charts.HeatMap.prototype.serialize = function() {
   var config;
   var objId;
 
-  if (this.colorScale()) {
-    scalesIds[goog.getUid(this.colorScale())] = this.colorScale().serialize();
-    scales.push(scalesIds[goog.getUid(this.colorScale())]);
-    json['colorScale'] = scales.length - 1;
-  }
-
   scalesIds[goog.getUid(this.xScale())] = this.xScale().serialize();
   scales.push(scalesIds[goog.getUid(this.xScale())]);
   json['xScale'] = scales.length - 1;
@@ -2011,24 +2017,32 @@ anychart.charts.HeatMap.prototype.serialize = function() {
   }
   json['yScale'] = scales.length - 1;
 
+  if (this.colorScale()) {
+    scalesIds[goog.getUid(this.colorScale())] = this.colorScale().serialize();
+    scales.push(scalesIds[goog.getUid(this.colorScale())]);
+    json['colorScale'] = scales.length - 1;
+  }
+
   json['type'] = this.getType();
 
   var grids = [];
   for (i = 0; i < this.grids_.length; i++) {
     var grid = this.grids_[i];
-    config = grid.serialize();
-    scale = grid.scale();
-    if (scale) {
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['scale'] = scales.length - 1;
-      } else {
-        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (grid) {
+      config = grid.serialize();
+      scale = grid.scale();
+      if (scale) {
+        objId = goog.getUid(scale);
+        if (!scalesIds[objId]) {
+          scalesIds[objId] = scale.serialize();
+          scales.push(scalesIds[objId]);
+          config['scale'] = scales.length - 1;
+        } else {
+          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
       }
+      grids.push(config);
     }
-    grids.push(config);
   }
   if (grids.length)
     json['grids'] = grids;
@@ -2036,19 +2050,21 @@ anychart.charts.HeatMap.prototype.serialize = function() {
   var xAxes = [];
   for (i = 0; i < this.xAxes_.length; i++) {
     var xAxis = this.xAxes_[i];
-    config = xAxis.serialize();
-    scale = xAxis.scale();
-    if (scale) {
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['scale'] = scales.length - 1;
-      } else {
-        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (xAxis) {
+      config = xAxis.serialize();
+      scale = xAxis.scale();
+      if (scale) {
+        objId = goog.getUid(scale);
+        if (!scalesIds[objId]) {
+          scalesIds[objId] = scale.serialize();
+          scales.push(scalesIds[objId]);
+          config['scale'] = scales.length - 1;
+        } else {
+          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
       }
+      xAxes.push(config);
     }
-    xAxes.push(config);
   }
   if (xAxes.length)
     json['xAxes'] = xAxes;
@@ -2056,19 +2072,21 @@ anychart.charts.HeatMap.prototype.serialize = function() {
   var yAxes = [];
   for (i = 0; i < this.yAxes_.length; i++) {
     var yAxis = this.yAxes_[i];
-    config = yAxis.serialize();
-    scale = yAxis.scale();
-    if (scale) {
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['scale'] = scales.length - 1;
-      } else {
-        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (yAxis) {
+      config = yAxis.serialize();
+      scale = yAxis.scale();
+      if (scale) {
+        objId = goog.getUid(scale);
+        if (!scalesIds[objId]) {
+          scalesIds[objId] = scale.serialize();
+          scales.push(scalesIds[objId]);
+          config['scale'] = scales.length - 1;
+        } else {
+          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
       }
+      yAxes.push(config);
     }
-    yAxes.push(config);
   }
   if (yAxes.length)
     json['yAxes'] = yAxes;
@@ -2163,8 +2181,10 @@ anychart.charts.HeatMap.prototype.serialize = function() {
           ['Series hoverHatchFill']
       );
     } else {
-      json['hoverHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
-          (this.hoverHatchFill()));
+      var hoverHatchFill = this.hoverHatchFill();
+      if (goog.isDef(hoverHatchFill)) {
+        json['hoverHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(hoverHatchFill));
+      }
     }
   }
   if (goog.isFunction(this['selectHatchFill'])) {

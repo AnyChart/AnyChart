@@ -41,6 +41,55 @@ anychart.themes.merging.getThemePart_ = function(theme, path) {
 
 
 /**
+ * Merges scale. Actually sets scale's type if is not set.
+ * @param {Object} scaleObj - Scale object.
+ * @param {number|string} index - Index or part of path.
+ * @param {string} chartType - Chart type.
+ * @return {Object} - Clone of original scale json object with type.
+ */
+anychart.themes.merging.mergeScale = function(scaleObj, index, chartType) {
+  var theme = anychart.getFullTheme();
+  var themeScale = anychart.themes.merging.getThemePart_(theme, [chartType, 'scales', index]);
+
+  if (themeScale) {
+    var scaleType = scaleObj['type'];
+    var themeScaleType = themeScale['type'];
+
+    if (goog.isDef(scaleType) && goog.isDef(themeScaleType) && ((themeScaleType == 'ordinal') ^ (scaleType == 'ordinal'))) {
+      return scaleObj;
+    } else {
+      var deepClone = anychart.themes.merging.deepClone_(scaleObj);
+      return /** @type {Object} */ (anychart.themes.merging.merge(deepClone, themeScale));
+    }
+  }
+
+  return scaleObj;
+};
+
+
+/**
+ * Does a recursive clone of the object.
+ * NOTE:Clones only objects and sub-objects. Arrays and another fields leaves as is.
+ *
+ * @param {*} obj - Object to clone.
+ * @return {*} - Clone of the input object.
+ * @private
+ */
+anychart.themes.merging.deepClone_ = function(obj) {
+  if (goog.typeOf(obj) == 'object') {
+    var res = {};
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key))
+        res[key] = anychart.themes.merging.deepClone_(obj[key]);
+    }
+    return res;
+  } else {
+    return obj;
+  }
+};
+
+
+/**
  * Brutally puts value to the specified path in theme. If any intermediate steps are not objects, they will be forced
  * to become. If passed value is undefined - does nothing.
  * @param {*} theme
@@ -169,6 +218,7 @@ anychart.themes.merging.merge = function(target, defaultObj) {
 anychart.themes.merging.demerge = function(target, defaultObj) {
   target = anychart.themes.merging.demerge_(target, defaultObj);
   target = anychart.themes.merging.demergeMultiple_(target, defaultObj);
+  target = anychart.themes.merging.demergeScales_(target, defaultObj);
   return anychart.themes.merging.demergeTyped_(target, defaultObj);
 };
 
@@ -246,6 +296,45 @@ anychart.themes.merging.demergeMultiple_ = function(target, defaultObj) {
 
 
 /**
+ * Demerges scale arrays.
+ * @param {*} target
+ * @param {*} defaultObj
+ * @return {*}
+ * @private
+ */
+anychart.themes.merging.demergeScales_ = function(target, defaultObj) {
+  var i, len;
+  for (var j = 0; j < anychart.themes.merging.scaleEntities_.length; j++) {
+    var namePath = anychart.themes.merging.scaleEntities_[j].split('.');
+    var targetPart = anychart.themes.merging.getThemePart_(target, namePath);
+    if (goog.isArray(targetPart)) {
+      len = targetPart.length;
+      var defaultArray = anychart.themes.merging.getThemePart_(defaultObj, namePath);
+      var success = true;
+      if (goog.isArray(defaultArray) && defaultArray.length == len) {
+        for (i = 0; i < len; i++) {
+          if (!anychart.themes.merging.checkEquality_(targetPart[i], defaultArray[i])) {
+            success = false;
+            break;
+          }
+        }
+      } else {
+        success = false;
+      }
+      if (success) {
+        target = anychart.themes.merging.removeThemePart_(target, namePath);
+      } else {
+        for (i = 0; i < len; i++) {
+          targetPart[i] = anychart.themes.merging.demerge_(targetPart[i], defaultArray[i]) || {};
+        }
+      }
+    }
+  }
+  return target;
+};
+
+
+/**
  * Makes passed target unmerged by removing all properties that are the same in defaultObj.
  * @param {*} target
  * @param {*} defaultObj
@@ -277,9 +366,13 @@ anychart.themes.merging.demerge_ = function(target, defaultObj, opt_nonMergableE
             case anychart.themes.merging.NonMergableEntityTypes_.STROKE:
               defVal = goog.isFunction(defVal) ? undefined : acgraph.vector.normalizeStroke(defVal);
               break;
+            case anychart.themes.merging.NonMergableEntityTypes_.PADDING:
+              defVal = anychart.core.utils.Space.normalizeSpace(defVal);
+              break;
           }
         }
-        if (nonMergableEntityType == anychart.themes.merging.NonMergableEntityTypes_.SCALE) {
+        if (nonMergableEntityType == anychart.themes.merging.NonMergableEntityTypes_.SCALE ||
+            nonMergableEntityType == anychart.themes.merging.NonMergableEntityTypes_.PADDING) {
           val = anychart.themes.merging.checkEquality_(target[key], defVal, nonMergableEntityType) ?
               undefined : target[key];
         } else {
@@ -289,7 +382,7 @@ anychart.themes.merging.demerge_ = function(target, defaultObj, opt_nonMergableE
         if (goog.isDef(val)) {
           target[key] = val;
           empty = false;
-        } else if (key == 'xScale' || key == 'yScale') {
+        } else if (key == 'xScale' || key == 'yScale' || key == 'colorScale') {
           empty = false;
         } else if (key != 'enabled') {
           delete target[key];
@@ -423,9 +516,9 @@ anychart.themes.merging.mergingMap_ = [
       'defaultAxis.minorLabels',
       'chart.defaultSeriesSettings.base.labels',
       'pieFunnelPyramidBase.labels',
-      'gantt.base.timeline.labels',
+      'ganttBase.timeline.labels',
       'defaultDataGrid.defaultColumnSettings.cellTextSettings',
-      'gantt.base.timeline.header.labelsFactory',
+      'ganttBase.timeline.header.labelsFactory',
       'standalones.labelsFactory',
       'heatMap.labels',
       'map.defaultSeriesSettings.base.labels'
@@ -445,7 +538,7 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'chart.defaultSeriesSettings.base.markers',
       'pieFunnelPyramidBase.markers',
-      'gantt.base.timeline.markers',
+      'ganttBase.timeline.markers',
       'standalones.markersFactory',
       'heatMap.markers',
       'map.defaultSeriesSettings.base.markers'
@@ -477,7 +570,7 @@ anychart.themes.merging.mergingMap_ = [
       'chart.defaultSeriesSettings.base.tooltip',
       'pieFunnelPyramidBase.tooltip',
       'defaultDataGrid.tooltip',
-      'gantt.base.timeline.tooltip'
+      'ganttBase.timeline.tooltip'
     ]
   },
   {
@@ -537,7 +630,7 @@ anychart.themes.merging.mergingMap_ = [
       'scatter.defaultLineMarkerSettings',
       'sparkline.defaultLineMarkerSettings',
       'standalones.lineAxisMarker',
-      'gantt.base.timeline.defaultLineMarkerSettings'
+      'ganttBase.timeline.defaultLineMarkerSettings'
     ]
   },
   {
@@ -547,7 +640,7 @@ anychart.themes.merging.mergingMap_ = [
       'scatter.defaultTextMarkerSettings',
       'sparkline.defaultTextMarkerSettings',
       'standalones.textAxisMarker',
-      'gantt.base.timeline.defaultTextMarkerSettings'
+      'ganttBase.timeline.defaultTextMarkerSettings'
     ]
   },
   {
@@ -557,7 +650,7 @@ anychart.themes.merging.mergingMap_ = [
       'scatter.defaultRangeMarkerSettings',
       'sparkline.defaultRangeMarkerSettings',
       'standalones.rangeAxisMarker',
-      'gantt.base.timeline.defaultRangeMarkerSettings'
+      'ganttBase.timeline.defaultRangeMarkerSettings'
     ]
   },
   {
@@ -598,7 +691,7 @@ anychart.themes.merging.mergingMap_ = [
       'circularGauge',
       'map',
       'sparkline',
-      'gantt.base',
+      'ganttBase',
       'stock',
       'stock.defaultPlotSettings'
     ]
@@ -825,15 +918,15 @@ anychart.themes.merging.mergingMap_ = [
   {
     defaultObj: 'defaultDataGrid',
     targets: [
-      'gantt.base.dataGrid',
+      'ganttBase.dataGrid',
       'standalones.dataGrid'
     ]
   },
   {
-    defaultObj: 'gantt.base',
+    defaultObj: 'ganttBase',
     targets: [
-      'gantt.ganttResource',
-      'gantt.ganttProject'
+      'ganttResource',
+      'ganttProject'
     ]
   }
 ];
@@ -851,7 +944,8 @@ anychart.themes.merging.NonMergableEntityTypes_ = {
   PALETTE: 4,
   HATCH_PALETTE: 5,
   MARKER_PALETTE: 6,
-  SCALE: 7
+  SCALE: 7,
+  PADDING: 8
 };
 
 
@@ -861,9 +955,12 @@ anychart.themes.merging.NonMergableEntityTypes_ = {
  * @private
  */
 anychart.themes.merging.nonMergableEntities_ = {
+  'padding': anychart.themes.merging.NonMergableEntityTypes_.PADDING,
+
   'scale': anychart.themes.merging.NonMergableEntityTypes_.SCALE,
   'xScale': anychart.themes.merging.NonMergableEntityTypes_.SCALE,
   'yScale': anychart.themes.merging.NonMergableEntityTypes_.SCALE,
+  'colorScale': anychart.themes.merging.NonMergableEntityTypes_.SCALE,
 
   'palette': anychart.themes.merging.NonMergableEntityTypes_.PALETTE,
   'rangePalette': anychart.themes.merging.NonMergableEntityTypes_.PALETTE,
@@ -967,7 +1064,6 @@ anychart.themes.merging.nonMergableEntities_ = {
  * @private
  */
 anychart.themes.merging.multipleEntities_ = {
-  'chart.scales': '__none__',
   'chart.chartLabels': 'chart.defaultLabelSettings',
   'chart.grids': 'chart.defaultGridSettings',
   'chart.minorGrids': 'chart.defaultMinorGridSettings',
@@ -984,6 +1080,16 @@ anychart.themes.merging.multipleEntities_ = {
   'gauge.knobs': 'gauge.defaultPointerSettings',
   'gauge.ranges': 'gauge.defaultRangeSettings'
 };
+
+
+/**
+ * Defaults nodes for array entities.
+ * @type {Array.<string>}
+ * @private
+ */
+anychart.themes.merging.scaleEntities_ = [
+  'chart.scales'
+];
 
 
 /**

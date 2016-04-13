@@ -2890,143 +2890,184 @@ window['anychart']['themes']['defaultTheme'] = {
   },
 
   // merge with chart
-  'gantt': {
-    'base': {
-      'splitterPosition': '30%',
-      'headerHeight': 70,
+  'ganttBase': {
+    'splitterPosition': '30%',
+    'headerHeight': 70,
+    'hoverFill': '#F8FAFB',
+    'rowSelectedFill': '#ebf1f4',
+    'rowStroke': '#cecece',
+    'editing': false,
+    'title': {
+      'enabled': false
+    },
+    'legend': {
+      'enabled': false
+    },
+    'credits': {
+      'inChart': true
+    },
+    'background': {
+      'fill': '#fff'
+    },
+    'margin': {
+      'top': 0,
+      'right': 0,
+      'bottom': 0,
+      'left': 0
+    },
+    'padding': {
+      'top': 0,
+      'right': 0,
+      'bottom': 0,
+      'left': 0
+    },
+    'dataGrid': {
+      'isStandalone': false,
+      'backgroundFill': 'none'
+    },
+    'timeline': {
+      'columnStroke': '#cecece',
+      'rowStroke': '#cecece',
+      'backgroundFill': 'none',
+      'rowOddFill': '#fff',
+      'rowEvenFill': '#fff',
+      'rowFill': '#fff',
+
       'hoverFill': '#F8FAFB',
       'rowSelectedFill': '#ebf1f4',
-      'rowStroke': '#cecece',
+
+      'zIndex': 5,
+      'headerHeight': 70,
       'editing': false,
-      'title': {
-        'enabled': false
+
+      'connectorPreviewStroke': {
+        'color': '#545f69',
+        'dash': '3 3'
       },
-      'legend': {
-        'enabled': false
+
+      'editPreviewFill': {
+        'color': '#fff',
+        'opacity': 0.00001
       },
-      'credits': {
-        'inChart': true
+
+      'editPreviewStroke': {
+        'color': '#aaa',
+        'dash': '3 3'
       },
-      'background': {
-        'fill': '#fff'
+
+      'editProgressFill': '#EAEAEA',
+      'editProgressStroke': '#545f69',
+      'editIntervalThumbFill': '#EAEAEA',
+      'editIntervalThumbStroke': '#545f69',
+      'editConnectorThumbFill': '#EAEAEA',
+      'editConnectorThumbStroke': '#545f69',
+
+      'editStructurePreviewFill': {
+        'color': '#4285F4',
+        'opacity': 0.2
       },
-      'margin': {
-        'top': 0,
-        'right': 0,
-        'bottom': 0,
-        'left': 0
+
+      'editStructurePreviewStroke': {
+        'color': '#4285F4',
+        'thickness': 2
       },
-      'padding': {
-        'top': 0,
-        'right': 0,
-        'bottom': 0,
-        'left': 0
+
+      'editStructurePreviewDashStroke': {
+        'color': '#4285F4',
+        'dash': '4 4'
       },
-      'dataGrid': {
-        'isStandalone': false,
-        'backgroundFill': 'none'
+
+      'baseFill': '#7ec1f5',
+      'baseStroke': '#74b2e2',
+      'progressFill': '#1976d2',
+      'progressStroke': {
+        'color': '#fff',
+        'opacity': 0.00001
       },
-      'timeline': {
-        'columnStroke': '#cecece',
-        'rowStroke': '#cecece',
-        'backgroundFill': 'none',
-        'rowOddFill': '#fff',
-        'rowEvenFill': '#fff',
-        'rowFill': '#fff',
 
-        'hoverFill': '#F8FAFB',
-        'rowSelectedFill': '#ebf1f4',
-
-        'zIndex': 5,
-        'headerHeight': 70,
-        'editing': false,
-
-        'connectorPreviewStroke': {
-          'color': '#545f69',
-          'dash': '3 3'
-        },
-
-        'editPreviewFill': {
-          'color': '#fff',
-          'opacity': 0.00001
-        },
-
-        'editPreviewStroke': {
-          'color': '#aaa',
-          'dash': '3 3'
-        },
-
-        'editProgressFill': '#EAEAEA',
-        'editProgressStroke': '#545f69',
-        'editIntervalThumbFill': '#EAEAEA',
-        'editIntervalThumbStroke': '#545f69',
-        'editConnectorThumbFill': '#EAEAEA',
-        'editConnectorThumbStroke': '#545f69',
-
-        'editStructurePreviewFill': {
-          'color': '#4285F4',
-          'opacity': 0.2
-        },
-
-        'editStructurePreviewStroke': {
-          'color': '#4285F4',
-          'thickness': 2
-        },
-
-        'editStructurePreviewDashStroke': {
-          'color': '#4285F4',
-          'dash': '4 4'
-        },
-
-        'baseFill': '#7ec1f5',
-        'baseStroke': '#74b2e2',
-        'progressFill': '#1976d2',
-        'progressStroke': {
-          'color': '#fff',
-          'opacity': 0.00001
-        },
-
-        'baselineFill': '#d5ebfc',
-        'baselineStroke': '#bfd1e0',
-        'parentFill': '#455a64',
-        'parentStroke': '#2f3f46',
-        'milestoneFill': '#ffa000',
-        'milestoneStroke': '#d26104',
-        'connectorFill': '#545f69',
-        'connectorStroke': '#545f69',
-        'selectedElementFill': '#ef6c00',
-        'selectedElementStroke': '#bc5704',
-        'selectedConnectorStroke': '2 #bc5704',
-        'minimumGap': 0.1,
-        'maximumGap': 0.1,
-        'baselineAbove': false,
-        'tooltip': {
-          'padding': {'top': 5, 'right': 5, 'bottom': 5, 'left': 5},
-          'title': {
-            'enabled': true,
-            'fontSize': '14px',
-            'fontWeight': 'normal',
-            'fontColor': '#e5e5e5'
-          },
-          'separator': {
-            'enabled': true
-          },
-          'anchor': 'leftTop',
-          'content': {
-            'hAlign': 'left'
-          }
-        },
-        'labels': {
+      'baselineFill': '#d5ebfc',
+      'baselineStroke': '#bfd1e0',
+      'parentFill': '#455a64',
+      'parentStroke': '#2f3f46',
+      'milestoneFill': '#ffa000',
+      'milestoneStroke': '#d26104',
+      'connectorFill': '#545f69',
+      'connectorStroke': '#545f69',
+      'selectedElementFill': '#ef6c00',
+      'selectedElementStroke': '#bc5704',
+      'selectedConnectorStroke': '2 #bc5704',
+      'minimumGap': 0.1,
+      'maximumGap': 0.1,
+      'baselineAbove': false,
+      'tooltip': {
+        'padding': {'top': 5, 'right': 5, 'bottom': 5, 'left': 5},
+        'title': {
           'enabled': true,
-          'anchor': 'leftCenter',
-          'position': 'rightCenter',
+          'fontSize': '14px',
+          'fontWeight': 'normal',
+          'fontColor': '#e5e5e5'
+        },
+        'separator': {
+          'enabled': true
+        },
+        'anchor': 'leftTop',
+        'content': {
+          'hAlign': 'left'
+        }
+      },
+      'labels': {
+        'enabled': true,
+        'anchor': 'leftCenter',
+        'position': 'rightCenter',
+        'padding': {
+          'top': 3,
+          'right': 5,
+          'bottom': 3,
+          'left': 5
+        },
+        'vAlign': 'middle',
+        'textWrap': 'noWrap',
+        'background': null,
+        'rotation': 0,
+        'width': null,
+        'height': null,
+        'fontSize': 11,
+        'minFontSize': 8,
+        'maxFontSize': 72,
+        'zIndex': 40,
+        'disablePointerEvents': true
+      },
+      'markers': {
+        'anchor': 'centerTop',
+        'zIndex': 50,
+        'type': 'star5',
+        'fill': '#ff0',
+        'stroke': '2 red'
+      },
+      'defaultLineMarkerSettings': {
+        'layout': 'vertical',
+        'zIndex': 1.5
+      },
+      'defaultRangeMarkerSettings': {
+        'layout': 'vertical',
+        'zIndex': 1
+      },
+      'defaultTextMarkerSettings': {
+        'layout': 'vertical',
+        'zIndex': 2,
+        'textWrap': 'byLetter'
+      },
+      'header': {
+        'labelsFactory': {
+          'enabled': true,
+          'anchor': 'leftTop',
+          'vAlign': 'middle',
           'padding': {
-            'top': 3,
+            'top': 0,
             'right': 5,
-            'bottom': 3,
+            'bottom': 0,
             'left': 5
           },
-          'vAlign': 'middle',
           'textWrap': 'noWrap',
           'background': null,
           'rotation': 0,
@@ -3035,156 +3076,114 @@ window['anychart']['themes']['defaultTheme'] = {
           'fontSize': 11,
           'minFontSize': 8,
           'maxFontSize': 72,
-          'zIndex': 40,
           'disablePointerEvents': true
-        },
-        'markers': {
-          'anchor': 'centerTop',
-          'zIndex': 50,
-          'type': 'star5',
-          'fill': '#ff0',
-          'stroke': '2 red'
-        },
-        'defaultLineMarkerSettings': {
-          'layout': 'vertical',
-          'zIndex': 1.5
-        },
-        'defaultRangeMarkerSettings': {
-          'layout': 'vertical',
-          'zIndex': 1
-        },
-        'defaultTextMarkerSettings': {
-          'layout': 'vertical',
-          'zIndex': 2,
-          'textWrap': 'byLetter'
-        },
-        'header': {
-          'labelsFactory': {
-            'enabled': true,
-            'anchor': 'leftTop',
-            'vAlign': 'middle',
-            'padding': {
-              'top': 0,
-              'right': 5,
-              'bottom': 0,
-              'left': 5
-            },
-            'textWrap': 'noWrap',
-            'background': null,
-            'rotation': 0,
-            'width': null,
-            'height': null,
-            'fontSize': 11,
-            'minFontSize': 8,
-            'maxFontSize': 72,
-            'disablePointerEvents': true
-          }
+        }
 
+      }
+    }
+  },
+
+  'ganttResource': {
+    'dataGrid': {
+      'tooltip': {
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'titleFormatter': function() {
+          return this['name'] || '';
+        },
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'textFormatter': function() {
+          var startDate = this['minPeriodDate'];
+          var endDate = this['maxPeriodDate'];
+          return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
+              (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '');
         }
       }
     },
-    'ganttResource': {
-      'dataGrid': {
-        'tooltip': {
-          /**
-           * @this {*}
-           * @return {string}
-           */
-          'titleFormatter': function() {
-            return this['name'] || '';
-          },
-          /**
-           * @this {*}
-           * @return {string}
-           */
-          'textFormatter': function() {
-            var startDate = this['minPeriodDate'];
-            var endDate = this['maxPeriodDate'];
-            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
-                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '');
-          }
+    'timeline': {
+      'tooltip': {
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'titleFormatter': function() {
+          return this['name'] || '';
+        },
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'textFormatter': function() {
+          var startDate = this['periodStart'] || this['minPeriodDate'];
+          var endDate = this['periodEnd'] || this['maxPeriodDate'];
+          return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
+              (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '');
         }
-      },
-      'timeline': {
-        'tooltip': {
-          /**
-           * @this {*}
-           * @return {string}
-           */
-          'titleFormatter': function() {
-            return this['name'] || '';
-          },
-          /**
-           * @this {*}
-           * @return {string}
-           */
-          'textFormatter': function() {
-            var startDate = this['periodStart'] || this['minPeriodDate'];
-            var endDate = this['periodEnd'] || this['maxPeriodDate'];
-            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
-                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '');
+      }
+    }
+  },
+  'ganttProject': {
+    'dataGrid': {
+      'tooltip': {
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'titleFormatter': function() {
+          return this['name'] || '';
+        },
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'textFormatter': function() {
+          var startDate = this['actualStart'] || this['autoStart'];
+          var endDate = this['actualEnd'] || this['autoEnd'];
+          var progress = this['progressValue'];
+
+          if (progress === void 0) {
+            var auto = this['autoProgress'] * 100;
+            progress = (Math.round(auto * 100) / 100 || 0) + '%';
           }
+
+          return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
+              (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '') +
+              (progress ? '\nComplete: ' + progress : '');
         }
       }
     },
-    'ganttProject': {
-      'dataGrid': {
-        'tooltip': {
-          /**
-           * @this {*}
-           * @return {string}
-           */
-          'titleFormatter': function() {
-            return this['name'] || '';
-          },
-          /**
-           * @this {*}
-           * @return {string}
-           */
-          'textFormatter': function() {
-            var startDate = this['actualStart'] || this['autoStart'];
-            var endDate = this['actualEnd'] || this['autoEnd'];
-            var progress = this['progressValue'];
+    'timeline': {
+      'tooltip': {
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'titleFormatter': function() {
+          return this['name'] || '';
+        },
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'textFormatter': function() {
+          var startDate = this['actualStart'] || this['autoStart'];
+          var endDate = this['actualEnd'] || this['autoEnd'];
+          var progress = this['progressValue'];
 
-            if (progress === void 0) {
-              var auto = this['autoProgress'] * 100;
-              progress = (Math.round(auto * 100) / 100 || 0) + '%';
-            }
-
-            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
-                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '') +
-                (progress ? '\nComplete: ' + progress : '');
+          if (progress === void 0) {
+            var auto = this['autoProgress'] * 100;
+            progress = (Math.round(auto * 100) / 100 || 0) + '%';
           }
-        }
-      },
-      'timeline': {
-        'tooltip': {
-          /**
-           * @this {*}
-           * @return {string}
-           */
-          'titleFormatter': function() {
-            return this['name'] || '';
-          },
-          /**
-           * @this {*}
-           * @return {string}
-           */
-          'textFormatter': function() {
-            var startDate = this['actualStart'] || this['autoStart'];
-            var endDate = this['actualEnd'] || this['autoEnd'];
-            var progress = this['progressValue'];
 
-            if (progress === void 0) {
-              var auto = this['autoProgress'] * 100;
-              progress = (Math.round(auto * 100) / 100 || 0) + '%';
-            }
+          return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
+              (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '') +
+              (progress ? '\nComplete: ' + progress : '');
 
-            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
-                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '') +
-                (progress ? '\nComplete: ' + progress : '');
-
-          }
         }
       }
     }

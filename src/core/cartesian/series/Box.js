@@ -759,6 +759,7 @@ anychart.core.cartesian.series.Box.prototype.getFinalWhiskerStroke_ = function(p
  */
 anychart.core.cartesian.series.Box.prototype.whiskerWidth = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = /** @type {number|string} */ (anychart.utils.normalizeNumberOrPercent(opt_value));
     if (this.whiskerWidth_ != opt_value) {
       this.whiskerWidth_ = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -776,9 +777,7 @@ anychart.core.cartesian.series.Box.prototype.whiskerWidth = function(opt_value) 
  */
 anychart.core.cartesian.series.Box.prototype.hoverWhiskerWidth = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.hoverWhiskerWidth_ != opt_value) {
-      this.hoverWhiskerWidth_ = opt_value;
-    }
+    this.hoverWhiskerWidth_ = /** @type {number|string} */ (anychart.utils.normalizeNumberOrPercent(opt_value));
     return this;
   }
   return this.hoverWhiskerWidth_;
@@ -792,9 +791,7 @@ anychart.core.cartesian.series.Box.prototype.hoverWhiskerWidth = function(opt_va
  */
 anychart.core.cartesian.series.Box.prototype.selectWhiskerWidth = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.selectWhiskerWidth_ != opt_value) {
-      this.selectWhiskerWidth_ = opt_value;
-    }
+    this.selectWhiskerWidth_ = /** @type {number|string} */ (anychart.utils.normalizeNumberOrPercent(opt_value));
     return this;
   }
   return this.selectWhiskerWidth_;

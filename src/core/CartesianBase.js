@@ -2187,7 +2187,7 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
                 point['stackedNegativeZero'] = stackVal.negative;
                 stackVal.missing = true;
               } else {
-                val = point['value'];
+                val = +point['value'];
                 if (val >= 0) {
                   point['stackedZero'] = stackVal.positive;
                   stackVal.positive += val;
@@ -3364,18 +3364,30 @@ anychart.core.CartesianBase.prototype.setupByJSON = function(config) {
   var textAxesMarkers = config['textAxesMarkers'];
   var series = config['series'];
   var scales = config['scales'];
+  var type = this.getType();
 
   var scalesInstances = {};
-  if (goog.isObject(scales)) {
+  if (goog.isArray(scales)) {
+    for (i = 0; i < scales.length; i++) {
+      json = scales[i];
+      if (goog.isString(json)) {
+        json = {'type': json};
+      }
+      json = anychart.themes.merging.mergeScale(json, i, type);
+      scale = anychart.scales.Base.fromString(json['type'], false);
+      scale.setup(json);
+      scalesInstances[i] = scale;
+    }
+  } else if (goog.isObject(scales)) {
     for (i in scales) {
       if (!scales.hasOwnProperty(i)) continue;
       json = scales[i];
       if (goog.isString(json)) {
-        scale = anychart.scales.Base.fromString(json, false);
-      } else {
-        scale = anychart.scales.Base.fromString(json['type'], false);
-        scale.setup(json);
+        json = {'type': json};
       }
+      json = anychart.themes.merging.mergeScale(json, i, type);
+      scale = anychart.scales.Base.fromString(json['type'], false);
+      scale.setup(json);
       scalesInstances[i] = scale;
     }
   }
@@ -3538,19 +3550,21 @@ anychart.core.CartesianBase.prototype.serialize = function() {
   var grids = [];
   for (i = 0; i < this.grids_.length; i++) {
     var grid = this.grids_[i];
-    config = grid.serialize();
-    scale = grid.scale();
-    if (scale) {
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['scale'] = scales.length - 1;
-      } else {
-        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (grid) {
+      config = grid.serialize();
+      scale = grid.scale();
+      if (scale) {
+        objId = goog.getUid(scale);
+        if (!scalesIds[objId]) {
+          scalesIds[objId] = scale.serialize();
+          scales.push(scalesIds[objId]);
+          config['scale'] = scales.length - 1;
+        } else {
+          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
       }
+      grids.push(config);
     }
-    grids.push(config);
   }
   if (grids.length)
     json['grids'] = grids;
@@ -3558,19 +3572,21 @@ anychart.core.CartesianBase.prototype.serialize = function() {
   var minorGrids = [];
   for (i = 0; i < this.minorGrids_.length; i++) {
     var minorGrid = this.minorGrids_[i];
-    config = minorGrid.serialize();
-    scale = minorGrid.scale();
-    if (scale) {
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['scale'] = scales.length - 1;
-      } else {
-        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (minorGrid) {
+      config = minorGrid.serialize();
+      scale = minorGrid.scale();
+      if (scale) {
+        objId = goog.getUid(scale);
+        if (!scalesIds[objId]) {
+          scalesIds[objId] = scale.serialize();
+          scales.push(scalesIds[objId]);
+          config['scale'] = scales.length - 1;
+        } else {
+          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
       }
+      minorGrids.push(config);
     }
-    minorGrids.push(config);
   }
   if (minorGrids.length)
     json['minorGrids'] = minorGrids;
@@ -3578,19 +3594,21 @@ anychart.core.CartesianBase.prototype.serialize = function() {
   var xAxes = [];
   for (i = 0; i < this.xAxes_.length; i++) {
     var xAxis = this.xAxes_[i];
-    config = xAxis.serialize();
-    scale = xAxis.scale();
-    if (scale) {
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['scale'] = scales.length - 1;
-      } else {
-        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (xAxis) {
+      config = xAxis.serialize();
+      scale = xAxis.scale();
+      if (scale) {
+        objId = goog.getUid(scale);
+        if (!scalesIds[objId]) {
+          scalesIds[objId] = scale.serialize();
+          scales.push(scalesIds[objId]);
+          config['scale'] = scales.length - 1;
+        } else {
+          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
       }
+      xAxes.push(config);
     }
-    xAxes.push(config);
   }
   if (xAxes.length)
     json['xAxes'] = xAxes;
@@ -3598,19 +3616,21 @@ anychart.core.CartesianBase.prototype.serialize = function() {
   var yAxes = [];
   for (i = 0; i < this.yAxes_.length; i++) {
     var yAxis = this.yAxes_[i];
-    config = yAxis.serialize();
-    scale = yAxis.scale();
-    if (scale) {
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['scale'] = scales.length - 1;
-      } else {
-        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (yAxis) {
+      config = yAxis.serialize();
+      scale = yAxis.scale();
+      if (scale) {
+        objId = goog.getUid(scale);
+        if (!scalesIds[objId]) {
+          scalesIds[objId] = scale.serialize();
+          scales.push(scalesIds[objId]);
+          config['scale'] = scales.length - 1;
+        } else {
+          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
       }
+      yAxes.push(config);
     }
-    yAxes.push(config);
   }
   if (yAxes.length)
     json['yAxes'] = yAxes;
@@ -3618,19 +3638,21 @@ anychart.core.CartesianBase.prototype.serialize = function() {
   var lineAxesMarkers = [];
   for (i = 0; i < this.lineAxesMarkers_.length; i++) {
     var lineAxesMarker = this.lineAxesMarkers_[i];
-    config = lineAxesMarker.serialize();
-    scale = lineAxesMarker.scale();
-    if (scale) {
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['scale'] = scales.length - 1;
-      } else {
-        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (lineAxesMarker) {
+      config = lineAxesMarker.serialize();
+      scale = lineAxesMarker.scale();
+      if (scale) {
+        objId = goog.getUid(scale);
+        if (!scalesIds[objId]) {
+          scalesIds[objId] = scale.serialize();
+          scales.push(scalesIds[objId]);
+          config['scale'] = scales.length - 1;
+        } else {
+          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
       }
+      lineAxesMarkers.push(config);
     }
-    lineAxesMarkers.push(config);
   }
   if (lineAxesMarkers.length)
     json['lineAxesMarkers'] = lineAxesMarkers;
@@ -3638,19 +3660,21 @@ anychart.core.CartesianBase.prototype.serialize = function() {
   var rangeAxesMarkers = [];
   for (i = 0; i < this.rangeAxesMarkers_.length; i++) {
     var rangeAxesMarker = this.rangeAxesMarkers_[i];
-    config = rangeAxesMarker.serialize();
-    scale = rangeAxesMarker.scale();
-    if (scale) {
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['scale'] = scales.length - 1;
-      } else {
-        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (rangeAxesMarker) {
+      config = rangeAxesMarker.serialize();
+      scale = rangeAxesMarker.scale();
+      if (scale) {
+        objId = goog.getUid(scale);
+        if (!scalesIds[objId]) {
+          scalesIds[objId] = scale.serialize();
+          scales.push(scalesIds[objId]);
+          config['scale'] = scales.length - 1;
+        } else {
+          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
       }
+      rangeAxesMarkers.push(config);
     }
-    rangeAxesMarkers.push(config);
   }
   if (rangeAxesMarkers.length)
     json['rangeAxesMarkers'] = rangeAxesMarkers;
@@ -3658,19 +3682,21 @@ anychart.core.CartesianBase.prototype.serialize = function() {
   var textAxesMarkers = [];
   for (i = 0; i < this.textAxesMarkers_.length; i++) {
     var textAxesMarker = this.textAxesMarkers_[i];
-    config = textAxesMarker.serialize();
-    scale = textAxesMarker.scale();
-    if (scale) {
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['scale'] = scales.length - 1;
-      } else {
-        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (textAxesMarker) {
+      config = textAxesMarker.serialize();
+      scale = textAxesMarker.scale();
+      if (scale) {
+        objId = goog.getUid(scale);
+        if (!scalesIds[objId]) {
+          scalesIds[objId] = scale.serialize();
+          scales.push(scalesIds[objId]);
+          config['scale'] = scales.length - 1;
+        } else {
+          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
       }
+      textAxesMarkers.push(config);
     }
-    textAxesMarkers.push(config);
   }
   if (textAxesMarkers.length)
     json['textAxesMarkers'] = textAxesMarkers;

@@ -772,19 +772,19 @@ anychart.core.cartesian.series.Candlestick.prototype.setupByJSON = function(conf
   goog.base(this, 'setupByJSON', config);
   this.risingFill(config['risingFill']);
   this.hoverRisingFill(config['hoverRisingFill']);
-  this.selectRisingFill(config['hoverRisingFill']);
+  this.selectRisingFill(config['selectRisingFill']);
 
   this.fallingFill(config['fallingFill']);
   this.hoverFallingFill(config['hoverFallingFill']);
-  this.selectFallingFill(config['hoverFallingFill']);
+  this.selectFallingFill(config['selectFallingFill']);
 
   this.risingHatchFill(config['risingHatchFill']);
   this.hoverRisingHatchFill(config['hoverRisingHatchFill']);
-  this.selectRisingHatchFill(config['hoverRisingHatchFill']);
+  this.selectRisingHatchFill(config['selectRisingHatchFill']);
 
   this.fallingHatchFill(config['fallingHatchFill']);
   this.hoverFallingHatchFill(config['hoverFallingHatchFill']);
-  this.selectFallingHatchFill(config['hoverFallingHatchFill']);
+  this.selectFallingHatchFill(config['selectFallingHatchFill']);
 };
 
 

@@ -162,6 +162,7 @@ anychart.core.utils.Error.prototype.mode = function(opt_value) {
  */
 anychart.core.utils.Error.prototype.xError = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = /** @type {number|string} */ (anychart.utils.normalizeNumberOrPercent(opt_value));
     if (this.xError_ != opt_value) {
       this.xError_ = opt_value;
       this.xUpperError_ = this.xLowerError_ = undefined;
@@ -180,6 +181,7 @@ anychart.core.utils.Error.prototype.xError = function(opt_value) {
  */
 anychart.core.utils.Error.prototype.xUpperError = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = /** @type {number|string} */ (anychart.utils.normalizeNumberOrPercent(opt_value));
     if (this.xUpperError_ != opt_value) {
       this.xUpperError_ = opt_value;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_RECALCULATION);
@@ -197,6 +199,7 @@ anychart.core.utils.Error.prototype.xUpperError = function(opt_value) {
  */
 anychart.core.utils.Error.prototype.xLowerError = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = /** @type {number|string} */ (anychart.utils.normalizeNumberOrPercent(opt_value));
     if (this.xLowerError_ != opt_value) {
       this.xLowerError_ = opt_value;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_RECALCULATION);
@@ -214,6 +217,7 @@ anychart.core.utils.Error.prototype.xLowerError = function(opt_value) {
  */
 anychart.core.utils.Error.prototype.valueError = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = /** @type {number|string} */ (anychart.utils.normalizeNumberOrPercent(opt_value));
     if (this.valueError_ != opt_value) {
       this.valueError_ = opt_value;
       this.valueUpperError_ = this.valueLowerError_ = undefined;
@@ -232,6 +236,7 @@ anychart.core.utils.Error.prototype.valueError = function(opt_value) {
  */
 anychart.core.utils.Error.prototype.valueUpperError = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = /** @type {number|string} */ (anychart.utils.normalizeNumberOrPercent(opt_value));
     if (this.valueUpperError_ != opt_value) {
       this.valueUpperError_ = opt_value;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_RECALCULATION);
@@ -249,6 +254,7 @@ anychart.core.utils.Error.prototype.valueUpperError = function(opt_value) {
  */
 anychart.core.utils.Error.prototype.valueLowerError = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = /** @type {number|string} */ (anychart.utils.normalizeNumberOrPercent(opt_value));
     if (this.valueLowerError_ != opt_value) {
       this.valueLowerError_ = opt_value;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_RECALCULATION);

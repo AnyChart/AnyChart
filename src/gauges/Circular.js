@@ -1353,45 +1353,45 @@ anychart.gauges.Circular.prototype.serialize = function() {
   var i, len;
   var axes = [];
   for (i = 0, len = this.axes_.length; i < len; i++) {
-    if (this.axes_[i])
-      axes[i] = this.axes_[i].serialize();
+    var axis = this.axes_[i];
+    if (axis) axes.push(axis.serialize());
   }
-  json['axes'] = axes;
+  if (axes.length) json['axes'] = axes;
 
   var bars = [];
   for (i = 0, len = this.bars_.length; i < len; i++) {
-    if (this.bars_[i])
-      bars[i] = this.bars_[i].serialize();
+    var bar = this.bars_[i];
+    if (bar) bars.push(bar.serialize());
   }
-  json['bars'] = bars;
+  if (bars.length) json['bars'] = bars;
 
   var markers = [];
   for (i = 0, len = this.markers_.length; i < len; i++) {
-    if (this.markers_[i])
-      markers[i] = this.markers_[i].serialize();
+    var marker = this.markers_[i];
+    if (marker) markers.push(marker.serialize());
   }
-  json['markers'] = markers;
+  if (markers.length) json['markers'] = markers;
 
   var needles = [];
   for (i = 0, len = this.needles_.length; i < len; i++) {
-    if (this.needles_[i])
-      needles[i] = this.needles_[i].serialize();
+    var needle = this.needles_[i];
+    if (needle) needles.push(needle.serialize());
   }
-  json['needles'] = needles;
+  if (needles.length) json['needles'] = needles;
 
   var knobs = [];
   for (i = 0, len = this.knobs_.length; i < len; i++) {
-    if (this.knobs_[i])
-      knobs[i] = this.knobs_[i].serialize();
+    var knob = this.knobs_[i];
+    if (knob) knobs.push(knob.serialize());
   }
-  json['knobs'] = knobs;
+  if (knobs.length) json['knobs'] = knobs;
 
   var ranges = [];
   for (i = 0, len = this.ranges_.length; i < len; i++) {
-    if (this.ranges_[i])
-      ranges[i] = this.ranges_[i].serialize();
+    var range = this.ranges_[i];
+    if (range) ranges.push(range.serialize());
   }
-  json['ranges'] = ranges;
+  if (ranges.length) json['ranges'] = ranges;
 
 
   return {'gauge': json};

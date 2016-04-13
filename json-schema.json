@@ -1622,7 +1622,7 @@
         {"$ref": "#/definitions/anychart.core.Chart"}
       ],
       "properties": {
-        "type": {"enum": ["heatmap"]},
+        "type": {"enum": ["heatMap"]},
         "data": {"$ref": "#/definitions/data"},
         "grids": {
           "type": "array",
@@ -1790,7 +1790,7 @@
       "type": "object",
       "allOf": [{"$ref": "#/definitions/anychart.core.SeparateChart"}],
       "properties": {
-        "type": {"enum": ["resource"]},
+        "type": {"enum": ["ganttResource"]},
         "headerHeight": {"type": "number"},
         "rowHoverFill": {"$ref": "#/definitions/fill"},
         "rowSelectedFill": {"$ref": "#/definitions/fill"},
@@ -1812,7 +1812,7 @@
       "type": "object",
       "allOf": [{"$ref": "#/definitions/anychart.core.SeparateChart"}],
       "properties": {
-        "type": {"enum": ["project"]},
+        "type": {"enum": ["ganttProject"]},
         "headerHeight": {"type": "number"},
         "rowHoverFill": {"$ref": "#/definitions/fill"},
         "rowSelectedFill": {"$ref": "#/definitions/fill"},
@@ -2050,7 +2050,7 @@
       ],
       "properties": {
         "color": {
-          "type": "string"
+          "type": ["string", "object"]
         },
         "name": {
           "type": "string"
@@ -3507,7 +3507,7 @@
         "type": {"enum": ["ordinal"]},
         "ticks": {"$ref": "#/definitions/anychart.scales.OrdinalTicks"},
         "names": {
-          "type": "array"
+          "type": ["array", "string"]
         },
         "values": {
           "type": [
@@ -3547,7 +3547,7 @@
           }
         },
         "names": {
-          "type": "array"
+          "type": ["array", "string"]
         }
       }
     },
@@ -3647,7 +3647,8 @@
         "interval": {
           "type": [
             "number",
-            "null"
+            "null",
+            "string"
           ]
         }
       }
@@ -4032,6 +4033,9 @@
             "number",
             "string"
           ]
+        },
+        "textFormatter": {
+          "type": "string"
         }
       }
     },
@@ -4066,7 +4070,7 @@
         "anchor": {"$ref": "#/definitions/anychart.enums.Anchor"},
         "type": {"$ref": "#/definitions/anychart.enums.MarkerType"},
         "rotation": {
-          "type": "number"
+          "type": ["number", "null"]
         },
         "size": {
           "type": "number"
@@ -4523,7 +4527,7 @@
       "properties": {
         "stroke": {"$ref": "#/definitions/stroke"},
         "value": {
-          "type": "number"
+          "type": ["number", "string"]
         },
         "layout": {"$ref": "#/definitions/anychart.enums.Layout"}
       }
@@ -4549,10 +4553,10 @@
       "properties": {
         "fill": {"$ref": "#/definitions/fill"},
         "from": {
-          "type": "number"
+          "type": ["number", "string"]
         },
         "to": {
-          "type": "number"
+          "type": ["number", "string"]
         },
         "layout": {"$ref": "#/definitions/anychart.enums.Layout"}
       }
@@ -4609,7 +4613,7 @@
       ],
       "properties": {
         "value": {
-          "type": ["number"]
+          "type": ["number", "string"]
         },
         "text": {
           "type": ["string"]
@@ -4815,7 +4819,13 @@
         "square",
         "trapezium",
         "pentagon",
-        "line"
+        "line",
+        "x",
+        "ellipse",
+        "bar",
+        "trapezoid",
+        "arrow",
+        "arrowhead"
       ]
     },
     "anychart.enums.Layout": {
@@ -5028,16 +5038,16 @@
     "anychart.core.utils.Space": {
       "properties": {
         "top": {
-          "type": "number"
+          "type": ["number", "string"]
         },
         "left": {
-          "type": "number"
+          "type": ["number", "string"]
         },
         "right": {
-          "type": "number"
+          "type": ["number", "string"]
         },
         "bottom": {
-          "type": "number"
+          "type": ["number", "string"]
         }
       }
     },

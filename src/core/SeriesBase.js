@@ -1869,22 +1869,31 @@ anychart.core.SeriesBase.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   if (goog.isFunction(this['fill']))
     this.fill(config['fill']);
+
   if (goog.isFunction(this['hoverFill']))
     this.hoverFill(config['hoverFill']);
+
   if (goog.isFunction(this['selectFill']))
     this.selectFill(config['selectFill']);
+
   if (goog.isFunction(this['stroke']))
     this.stroke(config['stroke']);
+
   if (goog.isFunction(this['hoverStroke']))
     this.hoverStroke(config['hoverStroke']);
+
   if (goog.isFunction(this['selectStroke']))
     this.selectStroke(config['selectStroke']);
+
   if (goog.isFunction(this['hatchFill']))
     this.hatchFill(config['hatchFill']);
+
   if (goog.isFunction(this['hoverHatchFill']))
     this.hoverHatchFill(config['hoverHatchFill']);
+
   if (goog.isFunction(this['selectHatchFill']))
     this.selectHatchFill(config['selectHatchFill']);
+
   this.color(config['color']);
   this.name(config['name']);
   this.meta(config['meta']);

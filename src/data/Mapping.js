@@ -231,7 +231,7 @@ anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt
     //for heat map
 
     'y': ['row', 'y'],
-    'heat': ['value', 'heat']
+    'heat': ['heat', 'value']
   };
 
   /**

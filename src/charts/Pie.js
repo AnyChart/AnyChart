@@ -929,6 +929,7 @@ anychart.charts.Pie.prototype.hoverLabels = function(opt_value) {
  */
 anychart.charts.Pie.prototype.outsideLabelsSpace = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = /** @type {number|string} */ (anychart.utils.normalizeNumberOrPercent(opt_value, '30%'));
     if (this.outsideLabelsSpace_ != opt_value) {
       this.outsideLabelsSpace_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
@@ -947,6 +948,7 @@ anychart.charts.Pie.prototype.outsideLabelsSpace = function(opt_value) {
  */
 anychart.charts.Pie.prototype.insideLabelsOffset = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = /** @type {number|string} */ (anychart.utils.normalizeNumberOrPercent(opt_value));
     if (this.insideLabelsOffset_ != opt_value) {
       this.insideLabelsOffset_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
@@ -965,6 +967,7 @@ anychart.charts.Pie.prototype.insideLabelsOffset = function(opt_value) {
  */
 anychart.charts.Pie.prototype.connectorLength = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = /** @type {number|string} */ (anychart.utils.normalizeNumberOrPercent(opt_value, '20%'));
     if (this.connectorLength_ != opt_value) {
       this.connectorLength_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.PIE_LABELS,
@@ -1045,8 +1048,11 @@ anychart.charts.Pie.prototype.group = function(opt_value) {
  */
 anychart.charts.Pie.prototype.radius = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    this.radius_ = opt_value;
-    this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    opt_value = /** @type {number|string} */ (anychart.utils.normalizeNumberOrPercent(opt_value, '100%'));
+    if (this.radius_ != opt_value) {
+      this.radius_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    }
     return this;
   } else {
     return this.radius_;
@@ -1061,8 +1067,11 @@ anychart.charts.Pie.prototype.radius = function(opt_value) {
  */
 anychart.charts.Pie.prototype.innerRadius = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    this.innerRadius_ = opt_value;
-    this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    if (!goog.isFunction(opt_value)) opt_value = /** @type {number|string} */ (anychart.utils.normalizeNumberOrPercent(opt_value));
+    if (this.innerRadius_ != opt_value) {
+      this.innerRadius_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    }
     return this;
   } else {
     return this.innerRadius_;
@@ -1185,8 +1194,7 @@ anychart.charts.Pie.prototype.getStartAngle = function() {
  */
 anychart.charts.Pie.prototype.explode = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    // TODO(Anton Saukh): that's an inline of ex normalizeNumberOrStringPercentValue - we should do something about it.
-    this.explode_ = isNaN(parseFloat(opt_value)) ? 15 : opt_value;
+    this.explode_ = /** @type {number|string} */ (anychart.utils.normalizeNumberOrPercent(opt_value, 15));
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS |
         anychart.ConsistencyState.PIE_LABELS, anychart.Signal.NEEDS_REDRAW);
     return this;
@@ -1419,6 +1427,16 @@ anychart.charts.Pie.prototype.remove = function() {
 
 
 /**
+ * @inheritDoc
+ */
+anychart.charts.Pie.prototype.beforeDraw = function() {
+  if (this.palette_ && this.palette_ instanceof anychart.palettes.RangeColors) {
+    this.palette_.count(this.getIterator().getRowsCount());
+  }
+};
+
+
+/**
  * Drawing content.
  * @param {anychart.math.Rect} bounds Bounds of content area.
  */
@@ -1431,10 +1449,6 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
 
   if (rowsCount > 7) {
     anychart.utils.info(anychart.enums.InfoCode.PIE_TOO_MUCH_POINTS, [rowsCount]);
-  }
-
-  if (this.palette_ && this.palette_ instanceof anychart.palettes.RangeColors) {
-    this.palette_.count(iterator.getRowsCount());
   }
 
   if (!this.tooltip().container()) {
@@ -4118,7 +4132,6 @@ anychart.charts.Pie.prototype.serialize = function() {
 
   json['sort'] = this.sort();
   json['radius'] = this.radius();
-  json['innerRadius'] = this.innerRadius();
   json['startAngle'] = this.startAngle();
   json['explode'] = this.explode();
   json['outsideLabelsSpace'] = this.outsideLabelsSpace();
@@ -4141,6 +4154,17 @@ anychart.charts.Pie.prototype.serialize = function() {
   //    json['group'] = this.group();
   //  }
   //}
+  if (goog.isFunction(this['innerRadius'])) {
+    if (goog.isFunction(this.innerRadius())) {
+      anychart.utils.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Pie innerRadius']
+      );
+    } else {
+      json['innerRadius'] = this.innerRadius();
+    }
+  }
   if (goog.isFunction(this['connectorStroke'])) {
     if (goog.isFunction(this.connectorStroke())) {
       anychart.utils.warning(

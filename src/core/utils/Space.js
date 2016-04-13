@@ -26,6 +26,17 @@ goog.inherits(anychart.core.utils.Space, anychart.core.Base);
 
 
 /**
+ * @typedef {{
+ *  top: (number|string),
+ *  left: (number|string),
+ *  bottom: (number|string),
+ *  right: (number|string)
+ * }}
+ */
+anychart.core.utils.Space.NormalizedSpace;
+
+
+/**
  * Signals mask.
  * @type {number}
  */
@@ -65,6 +76,64 @@ anychart.core.utils.Space.prototype.left_ = 0;
 
 
 /**
+ * Normalizes space.
+ * @param {...(string|number)} var_args - Arguments.
+ *  Can actually take the following:
+ *    1) Four {string|number} values that are top, right, bottom and left respectively.
+ *    2) Two {string|number} values that are top-bottom and right-left values.
+ *    3) Single {string|number} value that sets top-right-bottom-left.
+ *    4) Single Array.<string|number> with top, right, bottom and left values.
+ *    4) Single Object.<string, {string|number}> with top, right, bottom and left values.
+ * @return {anychart.core.utils.Space.NormalizedSpace}
+ */
+anychart.core.utils.Space.normalizeSpace = function(var_args) {
+  var top, right, bottom, left;
+  var argsLen;
+  var spaceOrTopOrTopAndBottom = arguments[0], rightOrRightAndLeft = arguments[1],
+      bottomVal = arguments[2], leftVal = arguments[3];
+  if (goog.isArray(spaceOrTopOrTopAndBottom)) {
+    var tmp = spaceOrTopOrTopAndBottom;
+    spaceOrTopOrTopAndBottom = tmp[0];
+    rightOrRightAndLeft = tmp[1];
+    bottomVal = tmp[2];
+    leftVal = tmp[3];
+    argsLen = tmp.length;
+  } else
+    argsLen = arguments.length;
+  // else if branches sorted a bit like by usage frequency
+  if (argsLen == 0) {
+    left = bottom = right = top = 0;
+  } else if (goog.isObject(spaceOrTopOrTopAndBottom)) {
+    top = spaceOrTopOrTopAndBottom['top'] || 0;
+    right = spaceOrTopOrTopAndBottom['right'] || 0;
+    bottom = spaceOrTopOrTopAndBottom['bottom'] || 0;
+    left = spaceOrTopOrTopAndBottom['left'] || 0;
+  } else if (argsLen == 1) {
+    left = bottom = right = top = spaceOrTopOrTopAndBottom || 0;
+  } else if (argsLen == 2) {
+    bottom = top = spaceOrTopOrTopAndBottom || 0;
+    left = right = rightOrRightAndLeft || 0;
+  } else if (argsLen == 3) {
+    top = spaceOrTopOrTopAndBottom || 0;
+    left = right = rightOrRightAndLeft || 0;
+    bottom = bottomVal || 0;
+  } else if (argsLen >= 4) {
+    top = spaceOrTopOrTopAndBottom || 0;
+    right = rightOrRightAndLeft || 0;
+    bottom = bottomVal || 0;
+    left = leftVal || 0;
+  }
+
+  return /** @type {anychart.core.utils.Space.NormalizedSpace} */ ({
+    top: top,
+    left: left,
+    bottom: bottom,
+    right: right
+  });
+};
+
+
+/**
  * Resets all offsets using values passed.
  * Can accept other Space object or from 0 to 4 values (numbers or percent strings).
  * Space values are applied just as in CSS:
@@ -95,45 +164,10 @@ anychart.core.utils.Space.prototype.left_ = 0;
  * @return {!anychart.core.utils.Space} Returns itself for chaining.
  */
 anychart.core.utils.Space.prototype.set = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
-  var top, right, bottom, left;
-  var argsLen;
-  if (goog.isArray(opt_spaceOrTopOrTopAndBottom)) {
-    var tmp = opt_spaceOrTopOrTopAndBottom;
-    opt_spaceOrTopOrTopAndBottom = tmp[0];
-    opt_rightOrRightAndLeft = tmp[1];
-    opt_bottom = tmp[2];
-    opt_left = tmp[3];
-    argsLen = tmp.length;
-  } else
-    argsLen = arguments.length;
-  // else if branches sorted a bit like by usage frequency
-  if (argsLen == 0) {
-    left = bottom = right = top = 0;
-  } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
-    top = opt_spaceOrTopOrTopAndBottom['top'] || 0;
-    right = opt_spaceOrTopOrTopAndBottom['right'] || 0;
-    bottom = opt_spaceOrTopOrTopAndBottom['bottom'] || 0;
-    left = opt_spaceOrTopOrTopAndBottom['left'] || 0;
-  } else if (argsLen == 1) {
-    left = bottom = right = top = opt_spaceOrTopOrTopAndBottom || 0;
-  } else if (argsLen == 2) {
-    bottom = top = opt_spaceOrTopOrTopAndBottom || 0;
-    left = right = opt_rightOrRightAndLeft || 0;
-  } else if (argsLen == 3) {
-    top = opt_spaceOrTopOrTopAndBottom || 0;
-    left = right = opt_rightOrRightAndLeft || 0;
-    bottom = opt_bottom || 0;
-  } else if (argsLen >= 4) {
-    top = opt_spaceOrTopOrTopAndBottom || 0;
-    right = opt_rightOrRightAndLeft || 0;
-    bottom = opt_bottom || 0;
-    left = opt_left || 0;
-  }
-
+  var normalizedSpace = /** @type {anychart.core.utils.Space.NormalizedSpace} */ (anychart.core.utils.Space.normalizeSpace.apply(this, arguments));
   this.suspendSignalsDispatching();
-  this.left(left).top(top).right(right).bottom(bottom);
+  this.left(normalizedSpace.left).top(normalizedSpace.top).right(normalizedSpace.right).bottom(normalizedSpace.bottom);
   this.resumeSignalsDispatching(true);
-
   return this;
 };
 

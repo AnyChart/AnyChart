@@ -727,6 +727,16 @@ anychart.core.ui.LabelsFactory.prototype.serialize = function() {
   if (goog.isDef(this.minFontSize())) json['minFontSize'] = this.minFontSize();
   if (goog.isDef(this.maxFontSize())) json['maxFontSize'] = this.maxFontSize();
 
+  if (goog.isFunction(this.textFormatter_)) {
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Labels textFormatter']
+    );
+  } else {
+    if (goog.isDef(this.textFormatter_)) json['textFormatter'] = this.textFormatter_;
+  }
+
   return json;
 };
 
@@ -748,8 +758,7 @@ anychart.core.ui.LabelsFactory.prototype.setupByJSON = function(config) {
   this.maxFontSize(config['maxFontSize']);
   this.textFormatter(config['textFormatter']);
   this.positionFormatter(config['positionFormatter']);
-  if ('enabled' in config)
-    this.enabled(config['enabled']);
+  this.enabled(('enabled' in config) ? config['enabled'] : null);
 };
 
 

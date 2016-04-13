@@ -154,6 +154,7 @@ anychart.core.axisMarkers.GanttLine.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['value'] = this.value();
   json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+  if (this.layout_) json['layout'] = this.layout_;
   return json;
 };
 

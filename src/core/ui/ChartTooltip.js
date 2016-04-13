@@ -918,7 +918,7 @@ anychart.core.ui.ChartTooltip.prototype.setPositionToTooltip_ = function(tooltip
     tooltip.x(x);
     tooltip.y(y);
     pixelBounds = tooltip.getPixelBounds();
-    var windowBox = goog.dom.getViewportSize(goog.dom.getWindow());
+    var windowBox = goog.dom.getViewportSize();
 
     if (pixelBounds.left < 0) {
       x -= pixelBounds.left;
@@ -935,6 +935,7 @@ anychart.core.ui.ChartTooltip.prototype.setPositionToTooltip_ = function(tooltip
     if (pixelBounds.getBottom() > windowBox.height) {
       y -= pixelBounds.getBottom() - windowBox.height;
     }
+
   }
 
   if (!this.allowLeaveChart()) {

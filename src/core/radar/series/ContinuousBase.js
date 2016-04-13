@@ -553,6 +553,7 @@ anychart.core.radar.series.ContinuousBase.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['markers'] = this.markers().serialize();
   json['hoverMarkers'] = this.hoverMarkers().serialize();
+  json['selectMarkers'] = this.selectMarkers().serialize();
   json['connectMissingPoints'] = this.connectMissingPoints();
   return json;
 };

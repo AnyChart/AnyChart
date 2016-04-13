@@ -1,0 +1,44 @@
+<html>
+<head>
+    <script src="../../contrib/closure-library/closure/goog/base.js"></script>
+    <script src="../../src/deps.js"></script>
+
+    <meta charset="utf-8">
+
+    <script>
+        goog.require('anychart.themes.defaultTheme');
+        goog.require('anychart.modules.anychart_bundle');
+    </script>
+
+    <style>
+        html, body, #container, #container_restore,#container_restore2 {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <!--<script src="http://cdn.anychart.com/geodata/countries/aus/australia.js"></script>-->
+
+    <script src="index.js"></script>
+</head>
+<body>
+<table>
+    <tr>
+        <td style="width: 600px; height: 600px">
+            <div id="container" style="border: 1px solid red"></div>
+        </td>
+        <td style="width: 600px; height: 600px" >
+            <div id="container_restore" style="border: 1px solid blue"></div>
+        </td>
+        <td style="width: 600px; height: 600px" >
+            <div id="container_restore2" style="border: 1px solid green"></div>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
+
+
+
+

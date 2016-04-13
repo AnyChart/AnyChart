@@ -2367,23 +2367,19 @@ anychart.core.PyramidFunnelBase.prototype.getTrueLabelBounds = function(label, p
 
   var normalPointLabel = /** @type {Object} */ (this.data().get(label.getIndex(), 'label'));
   var hoverPointLabel = hovered ? /** @type {Object} */ (this.data().get(label.getIndex(), 'hoverLabel')) : null;
-  var selectPointLabel = selected ? /** @type {Object} */ (this.data().get(label.getIndex(), 'hoverLabel')) : null;
+  var selectPointLabel = selected ? /** @type {Object} */ (this.data().get(label.getIndex(), 'selectLabel')) : null;
 
   var labelSettings = selectPointLabel || hoverPointLabel || normalPointLabel || {};
 
-  // labelWidthForced
-  var savedWidth = labelSettings.width;
   if (this.data().meta(label.getIndex(), 'labelWidthForced')) {
+    labelSettings = goog.object.clone(labelSettings);
     labelSettings.width = label.width();
   }
 
   var iterator = this.getIterator();
   iterator.select(label.getIndex());
   label.formatProvider(this.createFormatProvider());
-  var labelBounds = this.labels_.measureWithTransform(label.formatProvider(), label.positionProvider(), /** @type {Object|null|undefined} */(labelSettings));
-
-  // restore width in data
-  labelSettings.width = savedWidth;
+  var labelBounds = this.labels_.measureWithTransform(label.formatProvider(), label.positionProvider(), /** @type {Object} */(labelSettings));
 
   return anychart.math.Rect.fromCoordinateBox(labelBounds);
 };
@@ -4018,19 +4014,15 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.getLabelBounds_ = functio
 
   var labelSettings = selectPointLabel || hoverPointLabel || normalPointLabel || {};
 
-  // labelWidthForced
-  var savedWidth = labelSettings.width;
   if (this.chart.data().meta(label.getIndex(), 'labelWidthForced')) {
+    labelSettings = goog.object.clone(labelSettings);
     labelSettings.width = label.width();
   }
 
   var iterator = this.chart.getIterator();
   iterator.select(label.getIndex());
   label.formatProvider(this.chart.createFormatProvider());
-  var labelBounds = this.chart.labels_.measureWithTransform(label.formatProvider(), label.positionProvider(), /** @type {Object|null|undefined} */(labelSettings));
-
-  // restore width in data
-  labelSettings.width = savedWidth;
+  var labelBounds = this.chart.labels_.measureWithTransform(label.formatProvider(), label.positionProvider(), /** @type {Object} */(labelSettings));
 
   return anychart.math.Rect.fromCoordinateBox(labelBounds);
 };

@@ -90,15 +90,17 @@ anychart.palettes.RangeColors.prototype.colors = function(opt_value, var_args) {
  */
 anychart.palettes.RangeColors.prototype.items = function(opt_value, var_args) {
   if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && opt_value.keys)
-      this.colors_ = /** @type {acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill} */ (opt_value);
-    else if (!goog.isArray(opt_value)) {
-      opt_value = goog.array.slice(arguments, 0);
-    }
-    if (goog.isArray(opt_value))
-      this.colors_ = goog.array.map(opt_value, function(element) {
+    if (goog.isObject(opt_value) && goog.isArray(opt_value.keys)) {
+      this.colors_ = acgraph.vector.normalizeFill(opt_value).keys;
+    } else {
+      if (!goog.isArray(opt_value)) {
+        opt_value = goog.array.slice(arguments, 0);
+      }
+      this.colors_ = goog.array.map(/** @type {Array} */ (opt_value), function(element) {
         return acgraph.vector.normalizeFill(element);
       });
+    }
+
     this.processColorRange_();
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
     return this;

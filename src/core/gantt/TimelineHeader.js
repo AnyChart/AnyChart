@@ -491,7 +491,7 @@ anychart.core.gantt.TimelineHeader.Level.prototype.getLabelsFactory_ = function(
   if (!this.labelsFactory_) {
     this.labelsFactory_ = new anychart.core.ui.LabelsFactory();
     var theme = anychart.getFullTheme();
-    var lfGlobalConfig = theme['gantt']['base']['timeline']['header']['labelsFactory'];
+    var lfGlobalConfig = theme['ganttBase']['timeline']['header']['labelsFactory'];
     this.labelsFactory_.setup(lfGlobalConfig);
 
     this.labelsFactory_.container(this.getBase_());

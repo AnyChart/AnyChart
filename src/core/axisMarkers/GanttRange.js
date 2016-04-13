@@ -202,6 +202,7 @@ anychart.core.axisMarkers.GanttRange.prototype.serialize = function() {
   json['from'] = this.from();
   json['to'] = this.to();
   json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
+  if (this.layout_) json['layout'] = this.layout_;
   return json;
 };
 

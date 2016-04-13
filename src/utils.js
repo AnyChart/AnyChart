@@ -196,6 +196,22 @@ anychart.utils.isPercent = function(value) {
 
 
 /**
+ * Tries to convert incoming value to valid numeric or percent value.
+ * @param {(number|string|null)=} opt_value - Value.
+ * @param {(number|string|null)=} opt_default - Default value to be set.
+ * @return {number|string|null} - Converted value.
+ */
+anychart.utils.normalizeNumberOrPercent = function(opt_value, opt_default) {
+  if (goog.isNull(opt_value)) return null;
+  opt_value = goog.isDef(opt_value) ? opt_value : 0;
+  opt_default = goog.isDef(opt_default) ? opt_default : 0;
+  var isPercent = anychart.utils.isPercent(opt_value);
+  var parsed = parseFloat(opt_value);
+  return isNaN(parsed) ? opt_default : (isPercent ? opt_value : parsed);
+};
+
+
+/**
  * Normalizes passed value to a percent format string.
  * @param {*} value Value to normalize.
  * @return {string} Normalized to percent format value. If source value doesn't like percent format then trying to
@@ -836,6 +852,15 @@ anychart.utils.xml2json = function(xml) {
         /** @type {Attr} */
         var attr = node.attributes[i];
         name = anychart.utils.toCamelCase(attr.nodeName);
+
+        /*
+          This condition fixes the following case:
+          If some text contains characters like '\n', it turns to xml node with CDATA, not attribute.
+          Safari adds in every node empty attribute 'xmlns'.
+          It means that node 'text' becomes an object after restoration, not just a text value, and title becomes '[object Object]'
+         */
+        if (name == 'xmlns') continue;
+
         if (!(name in result)) {
           var val = attr.value;
           if (val == '')
@@ -896,7 +921,7 @@ anychart.utils.json2xml = function(json, opt_rootNodeName, opt_returnAsXmlNode) 
  * @type {RegExp}
  * @private
  */
-anychart.utils.ACCEPTED_BY_ATTRIBUTE_ = /^[A-Za-z0-9#:%_(),. -]*$/;
+anychart.utils.ACCEPTED_BY_ATTRIBUTE_ = /^[^<&"\n\r]*$/;
 
 
 /**
@@ -1054,6 +1079,8 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
       return ['items', 'item'];
     case 'columns':
       return ['columns', 'column'];
+    case 'colors':
+      return ['colors', 'color'];
     case 'children':
       return ['children', 'data_item'];
     case 'index':
@@ -1121,6 +1148,8 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
       return ['items', 'item'];
     case 'columns':
       return ['columns', 'column'];
+    case 'colors':
+      return ['colors', 'color'];
     case 'children':
       return ['children', 'dataItem'];
     case 'index':

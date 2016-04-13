@@ -225,7 +225,8 @@ anychart.core.axisMarkers.Range.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['from'] = this.from();
   json['to'] = this.to();
-  json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
+  if (this.fill_) json['fill'] = anychart.color.serialize(this.fill_);
+  if (this.layout_) json['layout'] = this.layout_;
   return json;
 };
 

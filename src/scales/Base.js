@@ -472,7 +472,7 @@ anychart.scales.Base.fromString = function(type, defaultIsOrdinal) {
     case 'ordinalcolor':
     case 'discretecolor':
       return anychart.scales.ordinalColor();
-    case 'linearColor':
+    case 'linearcolor':
       return anychart.scales.linearColor();
     default:
       return goog.isNull(defaultIsOrdinal) ?

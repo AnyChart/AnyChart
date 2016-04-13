@@ -832,7 +832,6 @@ anychart.core.radar.series.Base.prototype.setupByJSON = function(config) {
   if ('data' in config)
     this.data(config['data'] || null);
   this.labels(config['labels']);
-  this.hoverLabels(config['hoverLabels']);
   this.legendItem(config['legendItem']);
 };
 

@@ -1013,6 +1013,7 @@ anychart.charts.Sparkline.prototype.clip = function(opt_value) {
  */
 anychart.charts.Sparkline.prototype.pointWidth = function(opt_value) {
   if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.normalizeNumberOrPercent(opt_value, '95%');
     if (this.barWidth_ != opt_value) {
       this.barWidth_ = opt_value;
       if (this.series_ && this.series_.isWidthBased())
@@ -2306,17 +2307,30 @@ anychart.charts.Sparkline.prototype.setupByJSON = function(config) {
   this.connectMissingPoints(config['connectMissingPoints']);
   this.pointWidth(config['pointWidth']);
 
+  var type = this.getType();
+
   var scalesInstances = {};
-  if (goog.isObject(scales)) {
+  if (goog.isArray(scales)) {
+    for (i = 0; i < scales.length; i++) {
+      json = scales[i];
+      if (goog.isString(json)) {
+        json = {'type': json};
+      }
+      json = anychart.themes.merging.mergeScale(json, i, type);
+      scale = anychart.scales.Base.fromString(json['type'], false);
+      scale.setup(json);
+      scalesInstances[i] = scale;
+    }
+  } else if (goog.isObject(scales)) {
     for (i in scales) {
       if (!scales.hasOwnProperty(i)) continue;
       json = scales[i];
       if (goog.isString(json)) {
-        scale = anychart.scales.Base.fromString(json, false);
-      } else {
-        scale = anychart.scales.Base.fromString(json['type'], false);
-        scale.setup(json);
+        json = {'type': json};
       }
+      json = anychart.themes.merging.mergeScale(json, i, type);
+      scale = anychart.scales.Base.fromString(json['type'], false);
+      scale.setup(json);
       scalesInstances[i] = scale;
     }
   }
@@ -2542,59 +2556,65 @@ anychart.charts.Sparkline.prototype.serialize = function() {
   var lineAxesMarkers = [];
   for (i = 0; i < this.lineAxesMarkers_.length; i++) {
     var lineAxesMarker = this.lineAxesMarkers_[i];
-    config = lineAxesMarker.serialize();
-    scale = lineAxesMarker.scale();
-    if (scale) {
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['scale'] = scales.length - 1;
-      } else {
-        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (lineAxesMarker) {
+      config = lineAxesMarker.serialize();
+      scale = lineAxesMarker.scale();
+      if (scale) {
+        objId = goog.getUid(scale);
+        if (!scalesIds[objId]) {
+          scalesIds[objId] = scale.serialize();
+          scales.push(scalesIds[objId]);
+          config['scale'] = scales.length - 1;
+        } else {
+          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
       }
+      lineAxesMarkers.push(config);
     }
-    lineAxesMarkers.push(config);
   }
-  json['lineAxesMarkers'] = lineAxesMarkers;
+  if (lineAxesMarkers.length) json['lineAxesMarkers'] = lineAxesMarkers;
 
   var rangeAxesMarkers = [];
   for (i = 0; i < this.rangeAxesMarkers_.length; i++) {
     var rangeAxesMarker = this.rangeAxesMarkers_[i];
-    config = rangeAxesMarker.serialize();
-    scale = rangeAxesMarker.scale();
-    if (scale) {
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['scale'] = scales.length - 1;
-      } else {
-        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (rangeAxesMarker) {
+      config = rangeAxesMarker.serialize();
+      scale = rangeAxesMarker.scale();
+      if (scale) {
+        objId = goog.getUid(scale);
+        if (!scalesIds[objId]) {
+          scalesIds[objId] = scale.serialize();
+          scales.push(scalesIds[objId]);
+          config['scale'] = scales.length - 1;
+        } else {
+          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
       }
+      rangeAxesMarkers.push(config);
     }
-    rangeAxesMarkers.push(config);
   }
-  json['rangeAxesMarkers'] = rangeAxesMarkers;
+  if (rangeAxesMarkers.length) json['rangeAxesMarkers'] = rangeAxesMarkers;
 
   var textAxesMarkers = [];
   for (i = 0; i < this.textAxesMarkers_.length; i++) {
     var textAxesMarker = this.textAxesMarkers_[i];
-    config = textAxesMarker.serialize();
-    scale = textAxesMarker.scale();
-    if (scale) {
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['scale'] = scales.length - 1;
-      } else {
-        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (textAxesMarker) {
+      config = textAxesMarker.serialize();
+      scale = textAxesMarker.scale();
+      if (scale) {
+        objId = goog.getUid(scale);
+        if (!scalesIds[objId]) {
+          scalesIds[objId] = scale.serialize();
+          scales.push(scalesIds[objId]);
+          config['scale'] = scales.length - 1;
+        } else {
+          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
       }
+      textAxesMarkers.push(config);
     }
-    textAxesMarkers.push(config);
   }
-  json['textAxesMarkers'] = textAxesMarkers;
+  if (textAxesMarkers.length) json['textAxesMarkers'] = textAxesMarkers;
 
   json['scales'] = scales;
   return {'chart': json};
