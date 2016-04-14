@@ -131,6 +131,12 @@ anychart.onDocumentReady(function() {
     log(anychart.enums.EventType.ROW_MOUSE_DOWN, msg);
   });
 
+  chart.listen(anychart.enums.EventType.ROW_COLLAPSE_EXPAND, function(e) {
+    var msg = e['item'].get('name');
+    msg += '\nCollapsed: ' + e['collapsed'];
+    log(anychart.enums.EventType.ROW_COLLAPSE_EXPAND, msg);
+  });
+
 });
 
 

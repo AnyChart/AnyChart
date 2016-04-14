@@ -380,7 +380,17 @@ anychart.core.ui.DataGrid.prototype.forEachVisibleColumn_ = function(fn, opt_obj
  * @return {anychart.core.ui.DataGrid} - Itself for method chaining.
  */
 anychart.core.ui.DataGrid.prototype.collapseExpandItem = function(itemIndex, state) {
-  this.controller.getVisibleItems()[itemIndex].meta('collapsed', state); //Will send signal.
+  var item = this.controller.getVisibleItems()[itemIndex];
+  if (item && item.numChildren()) {
+    var evtObj = {
+      'type': anychart.enums.EventType.ROW_COLLAPSE_EXPAND,
+      'item': item,
+      'collapsed': state
+    };
+
+    if (this.interactivityHandler.dispatchEvent(evtObj))
+      item.meta(anychart.enums.GanttDataFields.COLLAPSED, state);
+  }
   return this;
 };
 

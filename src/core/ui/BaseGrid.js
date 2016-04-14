@@ -715,8 +715,17 @@ anychart.core.ui.BaseGrid.prototype.rowClick = function(event) {
 /** @inheritDoc */
 anychart.core.ui.BaseGrid.prototype.rowDblClick = function(event) {
   var item = event['item'];
-  if (item && item.numChildren())
-    item.meta(anychart.enums.GanttDataFields.COLLAPSED, !item.meta(anychart.enums.GanttDataFields.COLLAPSED));
+  if (item && item.numChildren()) {
+    var value = !item.meta(anychart.enums.GanttDataFields.COLLAPSED);
+    var evtObj = {
+      'type': anychart.enums.EventType.ROW_COLLAPSE_EXPAND,
+      'item': item,
+      'collapsed': value
+    };
+
+    if (this.interactivityHandler.dispatchEvent(evtObj))
+      item.meta(anychart.enums.GanttDataFields.COLLAPSED, value);
+  }
 };
 
 

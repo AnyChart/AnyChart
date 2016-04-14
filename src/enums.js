@@ -1787,6 +1787,7 @@ anychart.enums.EventType = {
   ROW_MOUSE_DOWN: 'rowMouseDown',
   ROW_MOUSE_UP: 'rowMouseUp',
   BEFORE_CREATE_CONNECTOR: 'beforeCreateConnector',
+  ROW_COLLAPSE_EXPAND: 'rowcollapseexpand',
 
   //Data tree CRUD events.
   TREE_ITEM_MOVE: 'treeItemMove',
@@ -3499,6 +3500,7 @@ goog.exportSymbol('anychart.enums.EventType.ROW_MOUSE_OUT', anychart.enums.Event
 goog.exportSymbol('anychart.enums.EventType.ROW_MOUSE_MOVE', anychart.enums.EventType.ROW_MOUSE_MOVE);
 goog.exportSymbol('anychart.enums.EventType.ROW_MOUSE_DOWN', anychart.enums.EventType.ROW_MOUSE_DOWN);
 goog.exportSymbol('anychart.enums.EventType.ROW_MOUSE_UP', anychart.enums.EventType.ROW_MOUSE_UP);
+goog.exportSymbol('anychart.enums.EventType.ROW_COLLAPSE_EXPAND', anychart.enums.EventType.ROW_COLLAPSE_EXPAND);
 goog.exportSymbol('anychart.enums.EventType.BEFORE_CREATE_CONNECTOR', anychart.enums.EventType.BEFORE_CREATE_CONNECTOR);
 goog.exportSymbol('anychart.enums.EventType.TREE_ITEM_CREATE', anychart.enums.EventType.TREE_ITEM_CREATE);
 goog.exportSymbol('anychart.enums.EventType.TREE_ITEM_MOVE', anychart.enums.EventType.TREE_ITEM_MOVE);

@@ -637,7 +637,15 @@ anychart.charts.Gantt.prototype.collapseTask_ = function(taskId, value) {
   var foundTasks = this.data_.searchItems(anychart.enums.GanttDataFields.ID, taskId);
   if (foundTasks.length) {
     var task = foundTasks[0];
-    task.meta(anychart.enums.GanttDataFields.COLLAPSED, value);
+    var evtObj = {
+      'type': anychart.enums.EventType.ROW_COLLAPSE_EXPAND,
+      'item': task,
+      'collapsed': value
+    };
+
+    if (this.dispatchEvent(evtObj))
+      task.meta(anychart.enums.GanttDataFields.COLLAPSED, value);
+
   } else {
     anychart.utils.warning(anychart.enums.WarningCode.NOT_FOUND, null, ['Task', taskId]);
   }
@@ -754,8 +762,17 @@ anychart.charts.Gantt.prototype.rowClick = function(event) {
  */
 anychart.charts.Gantt.prototype.rowDblClick = function(event) {
   var item = event['item'];
-  if (item && item.numChildren())
-    item.meta(anychart.enums.GanttDataFields.COLLAPSED, !item.meta(anychart.enums.GanttDataFields.COLLAPSED));
+  if (item && item.numChildren()) {
+    var value = !item.meta(anychart.enums.GanttDataFields.COLLAPSED);
+    var evtObj = {
+      'type': anychart.enums.EventType.ROW_COLLAPSE_EXPAND,
+      'item': item,
+      'collapsed': value
+    };
+
+    if (this.dispatchEvent(evtObj))
+      item.meta(anychart.enums.GanttDataFields.COLLAPSED, value);
+  }
 };
 
 
