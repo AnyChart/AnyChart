@@ -1467,7 +1467,7 @@ anychart.data.TableMainStorage.MergingIterator.prototype.nextAppendsDesc_ = func
  */
 anychart.data.TableMainStorage.MergingIterator.prototype.checkingNext_ = function() {
   var item = this.next_();
-  if (item.key > this.lastKey_) {
+  if (goog.isNull(item) || item.key > this.lastKey_) {
     this.next = this.nextNull_;
     return null;
   }

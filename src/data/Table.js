@@ -142,12 +142,13 @@ anychart.data.Table.prototype.addData = function(rawData, opt_removeFromStart, o
 
 /**
  * Removes all items between start and end keys.
- * @param {number} startKey
- * @param {number} endKey
+ * @param {(number|string|Date|null)=} opt_start
+ * @param {(number|string|Date|null)=} opt_end
  * @return {!anychart.data.Table} Returns itself for chaining.
  */
-anychart.data.Table.prototype.remove = function(startKey, endKey) {
-  this.storage_.remove(startKey, endKey);
+anychart.data.Table.prototype.remove = function(opt_start, opt_end) {
+  // normalizeTimestamp(undefined) === NaN
+  this.storage_.remove(anychart.utils.normalizeTimestamp(opt_start), anychart.utils.normalizeTimestamp(opt_end));
   return this;
 };
 
