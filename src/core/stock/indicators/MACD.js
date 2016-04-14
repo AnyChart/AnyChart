@@ -1,5 +1,5 @@
 goog.provide('anychart.core.stock.indicators.MACD');
-goog.require('anychart.calculations.macd');
+goog.require('anychart.core.calculations.macd');
 goog.require('anychart.core.stock.indicators.Base');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
@@ -54,7 +54,7 @@ goog.inherits(anychart.core.stock.indicators.MACD, anychart.core.stock.indicator
 
 /** @inheritDoc */
 anychart.core.stock.indicators.MACD.prototype.createComputer = function(mapping) {
-  return anychart.calculations.macd.createComputer(mapping, this.fastPeriod_,
+  return anychart.core.calculations.macd.createComputer(mapping, this.fastPeriod_,
       this.slowPeriod_, this.signalPeriod_);
 };
 

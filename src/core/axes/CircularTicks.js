@@ -207,7 +207,7 @@ anychart.core.axes.CircularTicks.prototype.hatchFill = function(opt_patternFillO
   if (goog.isDef(opt_patternFillOrTypeOrState)) {
     if (goog.isBoolean(opt_patternFillOrTypeOrState))
       opt_patternFillOrTypeOrState = opt_patternFillOrTypeOrState ?
-          anychart.gauges.Circular.DEFAULT_HATCH_FILL_TYPE : 'none';
+          anychart.charts.CircularGauge.DEFAULT_HATCH_FILL_TYPE : 'none';
 
     var hatchFill = acgraph.vector.normalizeHatchFill.apply(null, arguments);
 
@@ -371,7 +371,7 @@ anychart.core.axes.CircularTicks.prototype.finalizeDrawing = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     var zIndex = /** @type {number} */(this.zIndex());
 
-    var multiplier = anychart.gauges.Circular.ZINDEX_MULTIPLIER * 0.1;
+    var multiplier = anychart.charts.CircularGauge.ZINDEX_MULTIPLIER * 0.1;
     this.ticks_.zIndex(zIndex + anychart.core.axes.Circular.ZINDEX_TICK * multiplier);
     if (this.hatchFillElement_)
       this.hatchFillElement_.zIndex(zIndex + anychart.core.axes.Circular.ZINDEX_TICK_HATCH_FILL * multiplier);

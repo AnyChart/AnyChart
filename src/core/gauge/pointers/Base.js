@@ -209,7 +209,7 @@ anychart.core.gauge.pointers.Base.prototype.hatchFill = function(opt_patternFill
   if (goog.isDef(opt_patternFillOrTypeOrState)) {
     if (goog.isBoolean(opt_patternFillOrTypeOrState))
       opt_patternFillOrTypeOrState = opt_patternFillOrTypeOrState ?
-          anychart.gauges.Circular.DEFAULT_HATCH_FILL_TYPE : 'none';
+          anychart.charts.CircularGauge.DEFAULT_HATCH_FILL_TYPE : 'none';
 
     var hatchFill = acgraph.vector.normalizeHatchFill.apply(null, arguments);
 
@@ -268,8 +268,8 @@ anychart.core.gauge.pointers.Base.prototype.dataIndex = function(opt_index) {
 
 /**
  * Set/get link to gauge.
- * @param {anychart.gauges.Circular=} opt_gauge Gauge inst for set.
- * @return {anychart.core.gauge.pointers.Base|anychart.gauges.Circular}
+ * @param {anychart.charts.CircularGauge=} opt_gauge Gauge inst for set.
+ * @return {anychart.core.gauge.pointers.Base|anychart.charts.CircularGauge}
  */
 anychart.core.gauge.pointers.Base.prototype.gauge = function(opt_gauge) {
   if (goog.isDef(opt_gauge)) {
@@ -335,7 +335,7 @@ anychart.core.gauge.pointers.Base.prototype.draw = function() {
     this.domElement.zIndex(/** @type {number} */(this.zIndex()));
 
     if (this.hatchFillElement)
-      this.hatchFillElement.zIndex(/** @type {number} */(this.zIndex() + anychart.gauges.Circular.ZINDEX_MULTIPLIER * 0.1));
+      this.hatchFillElement.zIndex(/** @type {number} */(this.zIndex() + anychart.charts.CircularGauge.ZINDEX_MULTIPLIER * 0.1));
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 

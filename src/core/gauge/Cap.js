@@ -150,7 +150,7 @@ anychart.core.gauge.Cap.prototype.hatchFill = function(opt_patternFillOrTypeOrSt
   if (goog.isDef(opt_patternFillOrTypeOrState)) {
     if (goog.isBoolean(opt_patternFillOrTypeOrState))
       opt_patternFillOrTypeOrState = opt_patternFillOrTypeOrState ?
-          anychart.gauges.Circular.DEFAULT_HATCH_FILL_TYPE : 'none';
+          anychart.charts.CircularGauge.DEFAULT_HATCH_FILL_TYPE : 'none';
 
     var hatchFill = acgraph.vector.normalizeHatchFill.apply(null, arguments);
 
@@ -173,7 +173,7 @@ anychart.core.gauge.Cap.prototype.remove = function() {
 
 /**
  * Set/get link to gauge.
- * @param {anychart.gauges.Circular=} opt_gauge Gauge inst for set.
+ * @param {anychart.charts.CircularGauge=} opt_gauge Gauge inst for set.
  * @return {anychart.core.gauge.Cap}
  */
 anychart.core.gauge.Cap.prototype.gauge = function(opt_gauge) {

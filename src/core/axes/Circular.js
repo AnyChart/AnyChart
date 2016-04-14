@@ -512,7 +512,7 @@ anychart.core.axes.Circular.prototype.getPixRadius = function() {
  */
 anychart.core.axes.Circular.prototype.getStartAngle = function() {
   return goog.isDefAndNotNull(this.startAngle_) ?
-      this.startAngle_ + anychart.gauges.Circular.DEFAULT_START_ANGLE :
+      this.startAngle_ + anychart.charts.CircularGauge.DEFAULT_START_ANGLE :
       this.gauge_.getStartAngle();
 };
 
@@ -943,8 +943,8 @@ anychart.core.axes.Circular.prototype.drawLabel_ = function(index, angle, isMajo
 
 /**
  * Set/get link to gauge.
- * @param {anychart.gauges.Circular=} opt_gauge Gauge inst for set.
- * @return {anychart.core.axes.Circular|anychart.gauges.Circular}
+ * @param {anychart.charts.CircularGauge=} opt_gauge Gauge inst for set.
+ * @return {anychart.core.axes.Circular|anychart.charts.CircularGauge}
  */
 anychart.core.axes.Circular.prototype.gauge = function(opt_gauge) {
   if (goog.isDef(opt_gauge)) {
@@ -1072,7 +1072,7 @@ anychart.core.axes.Circular.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     var zIndex = /** @type {number} */(this.zIndex());
-    var multiplier = anychart.gauges.Circular.ZINDEX_MULTIPLIER * 0.1;
+    var multiplier = anychart.charts.CircularGauge.ZINDEX_MULTIPLIER * 0.1;
     this.line_.zIndex(zIndex + anychart.core.axes.Circular.ZINDEX_AXIS_LINE * multiplier);
     this.ticks().zIndex(zIndex);
     this.minorTicks().zIndex(zIndex);

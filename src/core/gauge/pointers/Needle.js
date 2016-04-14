@@ -305,7 +305,7 @@ anychart.core.gauge.pointers.Needle.prototype.draw = function() {
     this.contextProvider['endRadius'] = pixEndRadius;
     this.contextProvider['endWidth'] = pixEndWidth;
     //we shouldn't opening secret for mere mortals
-    this.contextProvider['angle'] = goog.math.standardAngle(angle - anychart.gauges.Circular.DEFAULT_START_ANGLE);
+    this.contextProvider['angle'] = goog.math.standardAngle(angle - anychart.charts.CircularGauge.DEFAULT_START_ANGLE);
 
 
     this.domElement

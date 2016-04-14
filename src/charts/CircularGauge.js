@@ -1,4 +1,4 @@
-goog.provide('anychart.gauges.Circular');
+goog.provide('anychart.charts.CircularGauge');
 
 goog.require('anychart'); // otherwise we can't use anychart.chartTypesMap object.
 goog.require('anychart.core.Chart');
@@ -29,7 +29,7 @@ goog.require('anychart.math.Rect');
  * @extends {anychart.core.Chart}
  * @constructor
  */
-anychart.gauges.Circular = function(opt_data, opt_csvSettings) {
+anychart.charts.CircularGauge = function(opt_data, opt_csvSettings) {
   this.suspendSignalsDispatching();
   goog.base(this);
 
@@ -94,14 +94,14 @@ anychart.gauges.Circular = function(opt_data, opt_csvSettings) {
 
   this.resumeSignalsDispatching(true);
 };
-goog.inherits(anychart.gauges.Circular, anychart.core.Chart);
+goog.inherits(anychart.charts.CircularGauge, anychart.core.Chart);
 
 
 /**
  * Supported consistency states. Adds AXES, AXES_MARKERS, GRIDS to anychart.core.SeparateChart states.
  * @type {number}
  */
-anychart.gauges.Circular.prototype.SUPPORTED_CONSISTENCY_STATES =
+anychart.charts.CircularGauge.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.GAUGE_POINTERS |
@@ -118,7 +118,7 @@ anychart.gauges.Circular.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @type {?(anychart.data.View|anychart.data.Set|Array|string)}
  * @private
  */
-anychart.gauges.Circular.prototype.rawData_;
+anychart.charts.CircularGauge.prototype.rawData_;
 
 
 /**
@@ -126,11 +126,11 @@ anychart.gauges.Circular.prototype.rawData_;
  * @type {!anychart.data.Iterator}
  * @private
  */
-anychart.gauges.Circular.prototype.iterator_;
+anychart.charts.CircularGauge.prototype.iterator_;
 
 
 /** @inheritDoc */
-anychart.gauges.Circular.prototype.getType = function() {
+anychart.charts.CircularGauge.prototype.getType = function() {
   return anychart.enums.GaugeTypes.CIRCULAR;
 };
 
@@ -139,55 +139,55 @@ anychart.gauges.Circular.prototype.getType = function() {
  * Default hatch fill type.
  * @type {acgraph.vector.HatchFill.HatchFillType|string}
  */
-anychart.gauges.Circular.DEFAULT_HATCH_FILL_TYPE = acgraph.vector.HatchFill.HatchFillType.DIAGONAL_BRICK;
+anychart.charts.CircularGauge.DEFAULT_HATCH_FILL_TYPE = acgraph.vector.HatchFill.HatchFillType.DIAGONAL_BRICK;
 
 
 /**
  * Default start angle.
  * @type {number}
  */
-anychart.gauges.Circular.DEFAULT_START_ANGLE = -90;
+anychart.charts.CircularGauge.DEFAULT_START_ANGLE = -90;
 
 
 /**
  * Z-index frame.
  * @type {number}
  */
-anychart.gauges.Circular.ZINDEX_FRAME = 1;
+anychart.charts.CircularGauge.ZINDEX_FRAME = 1;
 
 
 /**
  * Z-index knob.
  * @type {number}
  */
-anychart.gauges.Circular.ZINDEX_KNOB = 20;
+anychart.charts.CircularGauge.ZINDEX_KNOB = 20;
 
 
 /**
  * Z-index circular range.
  * @type {number}
  */
-anychart.gauges.Circular.ZINDEX_CIRCULAR_RANGE = 30;
+anychart.charts.CircularGauge.ZINDEX_CIRCULAR_RANGE = 30;
 
 
 /**
  * Z-index pointer.
  * @type {number}
  */
-anychart.gauges.Circular.ZINDEX_POINTER = 40;
+anychart.charts.CircularGauge.ZINDEX_POINTER = 40;
 
 
 /**
  * Z-index multiplier.
  * @type {number}
  */
-anychart.gauges.Circular.ZINDEX_MULTIPLIER = 0.0001;
+anychart.charts.CircularGauge.ZINDEX_MULTIPLIER = 0.0001;
 
 
 /**
  * @inheritDoc
  */
-anychart.gauges.Circular.prototype.getAllSeries = function() {
+anychart.charts.CircularGauge.prototype.getAllSeries = function() {
   return goog.array.concat(this.bars_, this.markers_, this.needles_, this.knobs_);
 };
 
@@ -195,7 +195,7 @@ anychart.gauges.Circular.prototype.getAllSeries = function() {
 /**
  * @inheritDoc
  */
-anychart.gauges.Circular.prototype.getSeriesStatus = function() {
+anychart.charts.CircularGauge.prototype.getSeriesStatus = function() {
   return [];
 };
 
@@ -203,7 +203,7 @@ anychart.gauges.Circular.prototype.getSeriesStatus = function() {
 /**
  * @inheritDoc
  */
-anychart.gauges.Circular.prototype.useUnionTooltipAsSingle = function() {
+anychart.charts.CircularGauge.prototype.useUnionTooltipAsSingle = function() {
   return true;
 };
 
@@ -218,7 +218,7 @@ anychart.gauges.Circular.prototype.useUnionTooltipAsSingle = function() {
  * @param {Object=} opt_value Object with x-axis settings.
  * @return {Object}
  */
-anychart.gauges.Circular.prototype.defaultAxisSettings = function(opt_value) {
+anychart.charts.CircularGauge.prototype.defaultAxisSettings = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.defaultAxisSettings_ = opt_value;
     return this;
@@ -232,7 +232,7 @@ anychart.gauges.Circular.prototype.defaultAxisSettings = function(opt_value) {
  * @param {Object=} opt_value Object with bar pointer settings.
  * @return {Object}
  */
-anychart.gauges.Circular.prototype.defaultPointerSettings = function(opt_value) {
+anychart.charts.CircularGauge.prototype.defaultPointerSettings = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.defaultPointerSettings_ = opt_value;
     return this;
@@ -246,7 +246,7 @@ anychart.gauges.Circular.prototype.defaultPointerSettings = function(opt_value) 
  * @param {Object=} opt_value Object with range marker settings.
  * @return {Object}
  */
-anychart.gauges.Circular.prototype.defaultRangeSettings = function(opt_value) {
+anychart.charts.CircularGauge.prototype.defaultRangeSettings = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.defaultRangeSettings_ = opt_value;
     return this;
@@ -256,7 +256,7 @@ anychart.gauges.Circular.prototype.defaultRangeSettings = function(opt_value) {
 
 
 /** @inheritDoc */
-anychart.gauges.Circular.prototype.createChartLabel = function() {
+anychart.charts.CircularGauge.prototype.createChartLabel = function() {
   return new anychart.core.ui.CircularLabel();
 };
 
@@ -265,9 +265,9 @@ anychart.gauges.Circular.prototype.createChartLabel = function() {
  * Data for gauge.
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
- * @return {(!anychart.gauges.Circular|!anychart.data.View)} Returns itself if used as a setter or the mapping if used as a getter.
+ * @return {(!anychart.charts.CircularGauge|!anychart.data.View)} Returns itself if used as a setter or the mapping if used as a getter.
  */
-anychart.gauges.Circular.prototype.data = function(opt_value, opt_csvSettings) {
+anychart.charts.CircularGauge.prototype.data = function(opt_value, opt_csvSettings) {
   if (goog.isDef(opt_value)) {
     if (this.rawData_ !== opt_value) {
       this.rawData_ = opt_value;
@@ -301,7 +301,7 @@ anychart.gauges.Circular.prototype.data = function(opt_value, opt_csvSettings) {
  * @param {anychart.SignalEvent} e
  * @private
  */
-anychart.gauges.Circular.prototype.dataInvalidated_ = function(e) {
+anychart.charts.CircularGauge.prototype.dataInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
     this.invalidatePointerBounds();
     this.invalidate(
@@ -317,7 +317,7 @@ anychart.gauges.Circular.prototype.dataInvalidated_ = function(e) {
  * Returns current mapping iterator.
  * @return {!anychart.data.Iterator} Current series iterator.
  */
-anychart.gauges.Circular.prototype.getIterator = function() {
+anychart.charts.CircularGauge.prototype.getIterator = function() {
   return this.iterator_ || this.getResetIterator();
 };
 
@@ -326,13 +326,13 @@ anychart.gauges.Circular.prototype.getIterator = function() {
  * Returns new default iterator for the current mapping.
  * @return {!anychart.data.Iterator} New iterator.
  */
-anychart.gauges.Circular.prototype.getResetIterator = function() {
+anychart.charts.CircularGauge.prototype.getResetIterator = function() {
   return this.iterator_ = this.data().getIterator();
 };
 
 
 /** @inheritDoc */
-anychart.gauges.Circular.prototype.makeInteractivityPointEvent = function(type, event, seriesStatus, opt_empty, opt_forbidTooltip) {
+anychart.charts.CircularGauge.prototype.makeInteractivityPointEvent = function(type, event, seriesStatus, opt_empty, opt_forbidTooltip) {
   var res = {
     'type': (type == 'hovered') ? anychart.enums.EventType.POINTS_HOVER : anychart.enums.EventType.POINTS_SELECT,
     'seriesStatus': this.createEventSeriesStatus(seriesStatus, opt_empty),
@@ -350,9 +350,9 @@ anychart.gauges.Circular.prototype.makeInteractivityPointEvent = function(type, 
 /**
  * Gauge cap.
  * @param {(Object|boolean)=} opt_value .
- * @return {anychart.gauges.Circular|!anychart.core.gauge.Cap} .
+ * @return {anychart.charts.CircularGauge|!anychart.core.gauge.Cap} .
  */
-anychart.gauges.Circular.prototype.cap = function(opt_value) {
+anychart.charts.CircularGauge.prototype.cap = function(opt_value) {
   if (!this.cap_) {
     this.cap_ = new anychart.core.gauge.Cap();
     this.cap_.gauge(this);
@@ -375,7 +375,7 @@ anychart.gauges.Circular.prototype.cap = function(opt_value) {
  * @param {anychart.SignalEvent} event Invalidation event.
  * @private
  */
-anychart.gauges.Circular.prototype.onCapSignal_ = function(event) {
+anychart.charts.CircularGauge.prototype.onCapSignal_ = function(event) {
   var state = 0;
   var signal = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
@@ -394,9 +394,9 @@ anychart.gauges.Circular.prototype.onCapSignal_ = function(event) {
  * Circular range..
  * @param {?(boolean|number|Object)=} opt_indexOrValue .
  * @param {?(boolean|Object)=} opt_value .
- * @return {!anychart.core.axisMarkers.CircularRange|anychart.gauges.Circular} .
+ * @return {!anychart.core.axisMarkers.CircularRange|anychart.charts.CircularGauge} .
  */
-anychart.gauges.Circular.prototype.range = function(opt_indexOrValue, opt_value) {
+anychart.charts.CircularGauge.prototype.range = function(opt_indexOrValue, opt_value) {
   var index, value;
   index = anychart.utils.toNumber(opt_indexOrValue);
   if (isNaN(index)) {
@@ -410,7 +410,7 @@ anychart.gauges.Circular.prototype.range = function(opt_indexOrValue, opt_value)
   if (!circularRange) {
     circularRange = new anychart.core.axisMarkers.CircularRange();
     this.ranges_[index] = circularRange;
-    circularRange.zIndex(anychart.gauges.Circular.ZINDEX_CIRCULAR_RANGE + anychart.gauges.Circular.ZINDEX_MULTIPLIER * this.circularRangeCounter_);
+    circularRange.zIndex(anychart.charts.CircularGauge.ZINDEX_CIRCULAR_RANGE + anychart.charts.CircularGauge.ZINDEX_MULTIPLIER * this.circularRangeCounter_);
     this.circularRangeCounter_++;
     circularRange.gauge(this);
     circularRange.axisIndex(0);
@@ -436,7 +436,7 @@ anychart.gauges.Circular.prototype.range = function(opt_indexOrValue, opt_value)
  * @param {anychart.SignalEvent} event Invalidation event.
  * @private
  */
-anychart.gauges.Circular.prototype.onCircularRangeSignal_ = function(event) {
+anychart.charts.CircularGauge.prototype.onCircularRangeSignal_ = function(event) {
   this.invalidate(anychart.ConsistencyState.GAUGE_AXIS_MARKERS, anychart.Signal.NEEDS_REDRAW);
 };
 
@@ -445,9 +445,9 @@ anychart.gauges.Circular.prototype.onCircularRangeSignal_ = function(event) {
  * Bar pointer.
  * @param {?(boolean|number|Object)=} opt_indexOrValue .
  * @param {?(boolean|Object)=} opt_value .
- * @return {!anychart.core.gauge.pointers.Bar|anychart.gauges.Circular} .
+ * @return {!anychart.core.gauge.pointers.Bar|anychart.charts.CircularGauge} .
  */
-anychart.gauges.Circular.prototype.bar = function(opt_indexOrValue, opt_value) {
+anychart.charts.CircularGauge.prototype.bar = function(opt_indexOrValue, opt_value) {
   var index, value;
   index = anychart.utils.toNumber(opt_indexOrValue);
   if (isNaN(index)) {
@@ -461,7 +461,7 @@ anychart.gauges.Circular.prototype.bar = function(opt_indexOrValue, opt_value) {
   if (!bar) {
     bar = new anychart.core.gauge.pointers.Bar();
     this.bars_[index] = bar;
-    bar.zIndex(anychart.gauges.Circular.ZINDEX_POINTER + anychart.gauges.Circular.ZINDEX_MULTIPLIER * this.pointerCounter_);
+    bar.zIndex(anychart.charts.CircularGauge.ZINDEX_POINTER + anychart.charts.CircularGauge.ZINDEX_MULTIPLIER * this.pointerCounter_);
     bar.dataIndex(this.pointerCounter_++);
     bar.axisIndex(0);
     bar.gauge(this);
@@ -487,9 +487,9 @@ anychart.gauges.Circular.prototype.bar = function(opt_indexOrValue, opt_value) {
  * Marker pointer.
  * @param {?(boolean|number|Object)=} opt_indexOrValue .
  * @param {?(boolean|Object)=} opt_value .
- * @return {!anychart.core.gauge.pointers.Marker|anychart.gauges.Circular} .
+ * @return {!anychart.core.gauge.pointers.Marker|anychart.charts.CircularGauge} .
  */
-anychart.gauges.Circular.prototype.marker = function(opt_indexOrValue, opt_value) {
+anychart.charts.CircularGauge.prototype.marker = function(opt_indexOrValue, opt_value) {
   var index, value;
   index = anychart.utils.toNumber(opt_indexOrValue);
   if (isNaN(index)) {
@@ -503,7 +503,7 @@ anychart.gauges.Circular.prototype.marker = function(opt_indexOrValue, opt_value
   if (!marker) {
     marker = new anychart.core.gauge.pointers.Marker();
     this.markers_[index] = marker;
-    marker.zIndex(anychart.gauges.Circular.ZINDEX_POINTER + anychart.gauges.Circular.ZINDEX_MULTIPLIER * this.pointerCounter_);
+    marker.zIndex(anychart.charts.CircularGauge.ZINDEX_POINTER + anychart.charts.CircularGauge.ZINDEX_MULTIPLIER * this.pointerCounter_);
     marker.dataIndex(this.pointerCounter_++);
     marker.axisIndex(0);
     marker.gauge(this);
@@ -528,9 +528,9 @@ anychart.gauges.Circular.prototype.marker = function(opt_indexOrValue, opt_value
  * Needle pointer.
  * @param {?(boolean|number|Object)=} opt_indexOrValue .
  * @param {?(boolean|Object)=} opt_value .
- * @return {!anychart.core.gauge.pointers.Needle|anychart.gauges.Circular} .
+ * @return {!anychart.core.gauge.pointers.Needle|anychart.charts.CircularGauge} .
  */
-anychart.gauges.Circular.prototype.needle = function(opt_indexOrValue, opt_value) {
+anychart.charts.CircularGauge.prototype.needle = function(opt_indexOrValue, opt_value) {
   var index, value;
   index = anychart.utils.toNumber(opt_indexOrValue);
   if (isNaN(index)) {
@@ -544,7 +544,7 @@ anychart.gauges.Circular.prototype.needle = function(opt_indexOrValue, opt_value
   if (!needle) {
     needle = new anychart.core.gauge.pointers.Needle();
     this.needles_[index] = needle;
-    needle.zIndex(anychart.gauges.Circular.ZINDEX_POINTER + anychart.gauges.Circular.ZINDEX_MULTIPLIER * this.pointerCounter_);
+    needle.zIndex(anychart.charts.CircularGauge.ZINDEX_POINTER + anychart.charts.CircularGauge.ZINDEX_MULTIPLIER * this.pointerCounter_);
     needle.dataIndex(this.pointerCounter_++);
     needle.axisIndex(0);
     needle.gauge(this);
@@ -569,9 +569,9 @@ anychart.gauges.Circular.prototype.needle = function(opt_indexOrValue, opt_value
  * Knob pointer.
  * @param {?(boolean|number|Object)=} opt_indexOrValue .
  * @param {?(boolean|Object)=} opt_value .
- * @return {!anychart.core.gauge.pointers.Knob|anychart.gauges.Circular} .
+ * @return {!anychart.core.gauge.pointers.Knob|anychart.charts.CircularGauge} .
  */
-anychart.gauges.Circular.prototype.knob = function(opt_indexOrValue, opt_value) {
+anychart.charts.CircularGauge.prototype.knob = function(opt_indexOrValue, opt_value) {
   var index, value;
   index = anychart.utils.toNumber(opt_indexOrValue);
   if (isNaN(index)) {
@@ -585,7 +585,7 @@ anychart.gauges.Circular.prototype.knob = function(opt_indexOrValue, opt_value) 
   if (!knob) {
     knob = new anychart.core.gauge.pointers.Knob();
     this.knobs_[index] = knob;
-    knob.zIndex(anychart.gauges.Circular.ZINDEX_KNOB + anychart.gauges.Circular.ZINDEX_MULTIPLIER * this.knobCounter_);
+    knob.zIndex(anychart.charts.CircularGauge.ZINDEX_KNOB + anychart.charts.CircularGauge.ZINDEX_MULTIPLIER * this.knobCounter_);
     knob.dataIndex(this.knobCounter_++);
     knob.axisIndex(0);
     knob.gauge(this);
@@ -607,7 +607,7 @@ anychart.gauges.Circular.prototype.knob = function(opt_indexOrValue, opt_value) 
 
 
 /** invalidates pointers */
-anychart.gauges.Circular.prototype.invalidatePointerBounds = function() {
+anychart.charts.CircularGauge.prototype.invalidatePointerBounds = function() {
   var pointers = goog.array.concat(this.bars_, this.markers_, this.needles_, this.knobs_);
 
   for (var i = 0, len = pointers.length; i < len; i++) {
@@ -622,7 +622,7 @@ anychart.gauges.Circular.prototype.invalidatePointerBounds = function() {
  * @param {anychart.SignalEvent} event Invalidation event.
  * @private
  */
-anychart.gauges.Circular.prototype.onPointersSignal_ = function(event) {
+anychart.charts.CircularGauge.prototype.onPointersSignal_ = function(event) {
   var state = 0;
   var signal = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
@@ -645,9 +645,9 @@ anychart.gauges.Circular.prototype.onPointersSignal_ = function(event) {
  * Axis.
  * @param {?(boolean|number|Object)=} opt_indexOrValue .
  * @param {?(boolean|Object)=} opt_value .
- * @return {!anychart.core.axes.Circular|anychart.gauges.Circular} .
+ * @return {!anychart.core.axes.Circular|anychart.charts.CircularGauge} .
  */
-anychart.gauges.Circular.prototype.axis = function(opt_indexOrValue, opt_value) {
+anychart.charts.CircularGauge.prototype.axis = function(opt_indexOrValue, opt_value) {
   var index, value;
   index = anychart.utils.toNumber(opt_indexOrValue);
   if (isNaN(index)) {
@@ -682,7 +682,7 @@ anychart.gauges.Circular.prototype.axis = function(opt_indexOrValue, opt_value) 
  * @param {anychart.SignalEvent} event Invalidation event.
  * @private
  */
-anychart.gauges.Circular.prototype.onAxisSignal_ = function(event) {
+anychart.charts.CircularGauge.prototype.onAxisSignal_ = function(event) {
   var state = 0;
   var signal = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
@@ -707,7 +707,7 @@ anychart.gauges.Circular.prototype.onAxisSignal_ = function(event) {
  * @param {number} index Axis index.
  * @return {anychart.core.axes.Circular}
  */
-anychart.gauges.Circular.prototype.getAxis = function(index) {
+anychart.charts.CircularGauge.prototype.getAxis = function(index) {
   return this.axes_[index];
 };
 
@@ -715,9 +715,9 @@ anychart.gauges.Circular.prototype.getAxis = function(index) {
 /**
  * Enclose frame path with straight line.
  * @param {boolean=} opt_value [false] Boolean flag.
- * @return {anychart.gauges.Circular|boolean}
+ * @return {anychart.charts.CircularGauge|boolean}
  */
-anychart.gauges.Circular.prototype.encloseWithStraightLine = function(opt_value) {
+anychart.charts.CircularGauge.prototype.encloseWithStraightLine = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.encloseWithStraightLine_ != opt_value) {
       this.encloseWithStraightLine_ = opt_value;
@@ -738,9 +738,9 @@ anychart.gauges.Circular.prototype.encloseWithStraightLine = function(opt_value)
  * gauge.startAngle(45);
  * gauge.container(stage).draw();
  * @param {(string|number)=} opt_value .
- * @return {(number|anychart.gauges.Circular)} .
+ * @return {(number|anychart.charts.CircularGauge)} .
  */
-anychart.gauges.Circular.prototype.startAngle = function(opt_value) {
+anychart.charts.CircularGauge.prototype.startAngle = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = goog.math.standardAngle(anychart.utils.toNumber(opt_value) || 0);
     if (this.startAngle_ != opt_value) {
@@ -761,9 +761,9 @@ anychart.gauges.Circular.prototype.startAngle = function(opt_value) {
  * gauge.sweepAngle(45);
  * gauge.container(stage).draw();
  * @param {(string|number)=} opt_value .
- * @return {(number|anychart.gauges.Circular)} .
+ * @return {(number|anychart.charts.CircularGauge)} .
  */
-anychart.gauges.Circular.prototype.sweepAngle = function(opt_value) {
+anychart.charts.CircularGauge.prototype.sweepAngle = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = goog.math.clamp(anychart.utils.toNumber(opt_value) || 0, -360, 360);
     if (this.sweepAngle_ != opt_value) {
@@ -786,9 +786,9 @@ anychart.gauges.Circular.prototype.sweepAngle = function(opt_value) {
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.gauges.Circular} .
+ * @return {acgraph.vector.Fill|anychart.charts.CircularGauge} .
  */
-anychart.gauges.Circular.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+anychart.charts.CircularGauge.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var fill = acgraph.vector.normalizeFill.apply(null, arguments);
     if (fill != this.fill_) {
@@ -809,9 +809,9 @@ anychart.gauges.Circular.prototype.fill = function(opt_fillOrColorOrKeys, opt_op
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.gauges.Circular|acgraph.vector.Stroke} .
+ * @return {anychart.charts.CircularGauge|acgraph.vector.Stroke} .
  */
-anychart.gauges.Circular.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+anychart.charts.CircularGauge.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
     var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (stroke != this.stroke_) {
@@ -828,7 +828,7 @@ anychart.gauges.Circular.prototype.stroke = function(opt_strokeOrFill, opt_thick
  * Gauge radius in pixels.
  * @return {number} .
  */
-anychart.gauges.Circular.prototype.getPixRadius = function() {
+anychart.charts.CircularGauge.prototype.getPixRadius = function() {
   return this.gaugeRadius_;
 };
 
@@ -837,8 +837,8 @@ anychart.gauges.Circular.prototype.getPixRadius = function() {
  * Internal getter for fixed gauge start angle. All for human comfort.
  * @return {number}
  */
-anychart.gauges.Circular.prototype.getStartAngle = function() {
-  return this.startAngle_ + anychart.gauges.Circular.DEFAULT_START_ANGLE;
+anychart.charts.CircularGauge.prototype.getStartAngle = function() {
+  return this.startAngle_ + anychart.charts.CircularGauge.DEFAULT_START_ANGLE;
 };
 
 
@@ -846,7 +846,7 @@ anychart.gauges.Circular.prototype.getStartAngle = function() {
  * Gets X coordinate of gauge center point.
  * @return {number}
  */
-anychart.gauges.Circular.prototype.getCx = function() {
+anychart.charts.CircularGauge.prototype.getCx = function() {
   return this.cx_;
 };
 
@@ -855,7 +855,7 @@ anychart.gauges.Circular.prototype.getCx = function() {
  * Gets Y coordinate of gauge center point.
  * @return {number}
  */
-anychart.gauges.Circular.prototype.getCy = function() {
+anychart.charts.CircularGauge.prototype.getCy = function() {
   return this.cy_;
 };
 
@@ -863,9 +863,9 @@ anychart.gauges.Circular.prototype.getCy = function() {
 /**
  * Circular space around gauge.
  * @param {(number|string)=} opt_value .
- * @return {string|anychart.gauges.Circular} .
+ * @return {string|anychart.charts.CircularGauge} .
  */
-anychart.gauges.Circular.prototype.circularPadding = function(opt_value) {
+anychart.charts.CircularGauge.prototype.circularPadding = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = anychart.utils.normalizeToPercent(opt_value);
     if (this.circularPadding_ != opt_value) {
@@ -892,7 +892,7 @@ anychart.gauges.Circular.prototype.circularPadding = function(opt_value) {
  * @param {number} radius .
  * @private
  */
-anychart.gauges.Circular.prototype.createFrame_ = function(path, cx, cy, radius) {
+anychart.charts.CircularGauge.prototype.createFrame_ = function(path, cx, cy, radius) {
   var sweepAngle = this.sweepAngle_;
   var startAngle = this.getStartAngle();
 
@@ -1038,7 +1038,7 @@ anychart.gauges.Circular.prototype.createFrame_ = function(path, cx, cy, radius)
  * @param {anychart.math.Rect} bounds Bounds of the content area.
  * @private
  */
-anychart.gauges.Circular.prototype.calculate_ = function(bounds) {
+anychart.charts.CircularGauge.prototype.calculate_ = function(bounds) {
   if (!this.framePath) this.framePath = this.rootElement.path();
   else this.framePath.clear();
 
@@ -1097,7 +1097,7 @@ anychart.gauges.Circular.prototype.calculate_ = function(bounds) {
  * Bounds of gauge without circular padding.
  * @return {anychart.math.Rect}
  */
-anychart.gauges.Circular.prototype.getContentBounds = function() {
+anychart.charts.CircularGauge.prototype.getContentBounds = function() {
   return this.gaugeBounds_ ? this.gaugeBounds_.clone() : anychart.math.rect(0, 0, 0, 0);
 };
 
@@ -1106,13 +1106,13 @@ anychart.gauges.Circular.prototype.getContentBounds = function() {
  * Bounds of gauge without circular padding.
  * @return {anychart.math.Rect}
  */
-anychart.gauges.Circular.prototype.getGaugeBounds = function() {
+anychart.charts.CircularGauge.prototype.getGaugeBounds = function() {
   return this.outerGaugeBounds_ ? this.outerGaugeBounds_.clone() : anychart.math.rect(0, 0, 0, 0);
 };
 
 
 /** @inheritDoc */
-anychart.gauges.Circular.prototype.setLabelSettings = function(label, bounds) {
+anychart.charts.CircularGauge.prototype.setLabelSettings = function(label, bounds) {
   label.parentBounds(this.getGaugeBounds());
   label.parentRadius(this.getPixRadius());
   label.cx(this.getCx());
@@ -1126,7 +1126,7 @@ anychart.gauges.Circular.prototype.setLabelSettings = function(label, bounds) {
  * Draw circular gauge content items.
  * @param {anychart.math.Rect} bounds Bounds of gauge content area.
  */
-anychart.gauges.Circular.prototype.drawContent = function(bounds) {
+anychart.charts.CircularGauge.prototype.drawContent = function(bounds) {
   var i, len, axis, pointer, range;
 
   var pointers = goog.array.concat(this.bars_, this.markers_, this.needles_, this.knobs_);
@@ -1171,7 +1171,7 @@ anychart.gauges.Circular.prototype.drawContent = function(bounds) {
 
     this.framePath.clear();
     this.createFrame_(this.framePath, this.cx_, this.cy_, this.gaugeRadius_);
-    this.framePath.zIndex(anychart.gauges.Circular.ZINDEX_FRAME);
+    this.framePath.zIndex(anychart.charts.CircularGauge.ZINDEX_FRAME);
     this.framePath.parent(this.rootElement);
 
     if (this.cap_) this.cap_.invalidate(anychart.ConsistencyState.BOUNDS);
@@ -1259,7 +1259,7 @@ anychart.gauges.Circular.prototype.drawContent = function(bounds) {
 
 
 /** @inheritDoc */
-anychart.gauges.Circular.prototype.setupByJSON = function(config) {
+anychart.charts.CircularGauge.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
 
   if ('defaultAxisSettings' in config)
@@ -1334,7 +1334,7 @@ anychart.gauges.Circular.prototype.setupByJSON = function(config) {
 
 
 /** @inheritDoc */
-anychart.gauges.Circular.prototype.serialize = function() {
+anychart.charts.CircularGauge.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
   json['type'] = anychart.enums.GaugeTypes.CIRCULAR;
@@ -1402,30 +1402,30 @@ anychart.gauges.Circular.prototype.serialize = function() {
  * Returns default theme object.
  * @return {Object}
  */
-anychart.gauges.Circular.prototype.getDefaultThemeObj = function() {
+anychart.charts.CircularGauge.prototype.getDefaultThemeObj = function() {
   return {'gauge': anychart.getFullTheme()['circularGauge']};
 };
 
 
 //exports
-anychart.gauges.Circular.prototype['stroke'] = anychart.gauges.Circular.prototype.stroke;
-anychart.gauges.Circular.prototype['fill'] = anychart.gauges.Circular.prototype.fill;
+anychart.charts.CircularGauge.prototype['stroke'] = anychart.charts.CircularGauge.prototype.stroke;
+anychart.charts.CircularGauge.prototype['fill'] = anychart.charts.CircularGauge.prototype.fill;
 
-anychart.gauges.Circular.prototype['startAngle'] = anychart.gauges.Circular.prototype.startAngle;
-anychart.gauges.Circular.prototype['sweepAngle'] = anychart.gauges.Circular.prototype.sweepAngle;
+anychart.charts.CircularGauge.prototype['startAngle'] = anychart.charts.CircularGauge.prototype.startAngle;
+anychart.charts.CircularGauge.prototype['sweepAngle'] = anychart.charts.CircularGauge.prototype.sweepAngle;
 
-anychart.gauges.Circular.prototype['data'] = anychart.gauges.Circular.prototype.data;
+anychart.charts.CircularGauge.prototype['data'] = anychart.charts.CircularGauge.prototype.data;
 
-anychart.gauges.Circular.prototype['cap'] = anychart.gauges.Circular.prototype.cap;
-anychart.gauges.Circular.prototype['axis'] = anychart.gauges.Circular.prototype.axis;
+anychart.charts.CircularGauge.prototype['cap'] = anychart.charts.CircularGauge.prototype.cap;
+anychart.charts.CircularGauge.prototype['axis'] = anychart.charts.CircularGauge.prototype.axis;
 
-anychart.gauges.Circular.prototype['bar'] = anychart.gauges.Circular.prototype.bar;
-anychart.gauges.Circular.prototype['marker'] = anychart.gauges.Circular.prototype.marker;
-anychart.gauges.Circular.prototype['needle'] = anychart.gauges.Circular.prototype.needle;
-anychart.gauges.Circular.prototype['knob'] = anychart.gauges.Circular.prototype.knob;
+anychart.charts.CircularGauge.prototype['bar'] = anychart.charts.CircularGauge.prototype.bar;
+anychart.charts.CircularGauge.prototype['marker'] = anychart.charts.CircularGauge.prototype.marker;
+anychart.charts.CircularGauge.prototype['needle'] = anychart.charts.CircularGauge.prototype.needle;
+anychart.charts.CircularGauge.prototype['knob'] = anychart.charts.CircularGauge.prototype.knob;
 
-anychart.gauges.Circular.prototype['range'] = anychart.gauges.Circular.prototype.range;
+anychart.charts.CircularGauge.prototype['range'] = anychart.charts.CircularGauge.prototype.range;
 
-anychart.gauges.Circular.prototype['circularPadding'] = anychart.gauges.Circular.prototype.circularPadding;
-anychart.gauges.Circular.prototype['encloseWithStraightLine'] = anychart.gauges.Circular.prototype.encloseWithStraightLine;
-anychart.gauges.Circular.prototype['getType'] = anychart.gauges.Circular.prototype.getType;
+anychart.charts.CircularGauge.prototype['circularPadding'] = anychart.charts.CircularGauge.prototype.circularPadding;
+anychart.charts.CircularGauge.prototype['encloseWithStraightLine'] = anychart.charts.CircularGauge.prototype.encloseWithStraightLine;
+anychart.charts.CircularGauge.prototype['getType'] = anychart.charts.CircularGauge.prototype.getType;

@@ -194,7 +194,7 @@ anychart.core.gauge.pointers.Bar.prototype.draw = function() {
     this.contextProvider['cy'] = cy;
     this.contextProvider['radius'] = pixRadius;
     //we shouldn't opening secret for mere mortals
-    this.contextProvider['startAngle'] = goog.math.standardAngle(startAngle - anychart.gauges.Circular.DEFAULT_START_ANGLE);
+    this.contextProvider['startAngle'] = goog.math.standardAngle(startAngle - anychart.charts.CircularGauge.DEFAULT_START_ANGLE);
     this.contextProvider['sweepAngle'] = sweepAngle;
     this.contextProvider['width'] = pixWidth;
 

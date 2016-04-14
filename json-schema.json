@@ -40,7 +40,7 @@
         {"$ref": "#/definitions/anychart.core.SeparateChart"}
       ],
       "oneOf": [
-        {"$ref": "#/definitions/anychart.gauges.Circular"}
+        {"$ref": "#/definitions/anychart.charts.CircularGauge"}
       ],
       "properties": {
         "container": {
@@ -1830,7 +1830,7 @@
       "required": ["type"]
     },
 
-    "anychart.gauges.Circular": {
+    "anychart.charts.CircularGauge": {
       "type": "object",
       "allOf": [
         {"$ref": "#/definitions/anychart.core.Chart"}

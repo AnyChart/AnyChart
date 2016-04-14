@@ -1,17 +1,17 @@
-goog.provide('anychart.calculations.macd');
-goog.require('anychart.calculations.CycledQueue');
+goog.provide('anychart.core.calculations.macd');
+goog.require('anychart.core.calculations.CycledQueue');
 goog.require('anychart.utils');
 
 /**
- * @namespace {anychart.calculations}
+ * @namespace {anychart.core.calculations}
  */
 
 
 /**
  * @typedef {{
- *    fastQueue: !anychart.calculations.CycledQueue,
- *    slowQueue: !anychart.calculations.CycledQueue,
- *    signalQueue: !anychart.calculations.CycledQueue,
+ *    fastQueue: !anychart.core.calculations.CycledQueue,
+ *    slowQueue: !anychart.core.calculations.CycledQueue,
+ *    signalQueue: !anychart.core.calculations.CycledQueue,
  *    fastPeriod: number,
  *    slowPeriod: number,
  *    signalPeriod: number,
@@ -21,7 +21,7 @@ goog.require('anychart.utils');
  *    dispose: Function
  * }}
  */
-anychart.calculations.macd.Context;
+anychart.core.calculations.macd.Context;
 
 
 /**
@@ -29,9 +29,9 @@ anychart.calculations.macd.Context;
  * @param {number=} opt_fastPeriod Defaults to 12.
  * @param {number=} opt_slowPeriod Defaults to 26.
  * @param {number=} opt_signalPeriod Defaults to 9.
- * @return {anychart.calculations.macd.Context}
+ * @return {anychart.core.calculations.macd.Context}
  */
-anychart.calculations.macd.initContext = function(opt_fastPeriod, opt_slowPeriod, opt_signalPeriod) {
+anychart.core.calculations.macd.initContext = function(opt_fastPeriod, opt_slowPeriod, opt_signalPeriod) {
   var fastPeriod = anychart.utils.normalizeToNaturalNumber(opt_fastPeriod, 12, false);
   var slowPeriod = anychart.utils.normalizeToNaturalNumber(opt_slowPeriod, 26, false);
   if (fastPeriod > slowPeriod) {
@@ -41,9 +41,9 @@ anychart.calculations.macd.initContext = function(opt_fastPeriod, opt_slowPeriod
   }
   var signalPeriod = anychart.utils.normalizeToNaturalNumber(opt_signalPeriod, 9, false);
   return {
-    fastQueue: anychart.calculations.cycledQueue(fastPeriod),
-    slowQueue: anychart.calculations.cycledQueue(slowPeriod),
-    signalQueue: anychart.calculations.cycledQueue(signalPeriod),
+    fastQueue: anychart.core.calculations.cycledQueue(fastPeriod),
+    slowQueue: anychart.core.calculations.cycledQueue(slowPeriod),
+    signalQueue: anychart.core.calculations.cycledQueue(signalPeriod),
     fastPeriod: fastPeriod,
     slowPeriod: slowPeriod,
     signalPeriod: signalPeriod,
@@ -51,7 +51,7 @@ anychart.calculations.macd.initContext = function(opt_fastPeriod, opt_slowPeriod
     slowResult: NaN,
     signalResult: NaN,
     /**
-     * @this {anychart.calculations.macd.Context}
+     * @this {anychart.core.calculations.macd.Context}
      */
     'dispose': function() {
       this.fastQueue.clear();
@@ -64,10 +64,10 @@ anychart.calculations.macd.initContext = function(opt_fastPeriod, opt_slowPeriod
 
 /**
  * Start calculation function for MACD indicator calculation.
- * @param {anychart.calculations.macd.Context} context
- * @this {anychart.calculations.macd.Context}
+ * @param {anychart.core.calculations.macd.Context} context
+ * @this {anychart.core.calculations.macd.Context}
  */
-anychart.calculations.macd.startFunction = function(context) {
+anychart.core.calculations.macd.startFunction = function(context) {
   context.fastQueue.clear();
   context.slowQueue.clear();
   context.signalQueue.clear();
@@ -80,10 +80,10 @@ anychart.calculations.macd.startFunction = function(context) {
 /**
  * Calculates MACD.
  * @param {anychart.data.TableComputer.RowProxy} row
- * @param {anychart.calculations.macd.Context} context
- * @this {anychart.calculations.macd.Context}
+ * @param {anychart.core.calculations.macd.Context} context
+ * @this {anychart.core.calculations.macd.Context}
  */
-anychart.calculations.macd.calculationFunction = function(row, context) {
+anychart.core.calculations.macd.calculationFunction = function(row, context) {
   var currValue = anychart.utils.toNumber(row.get('value'));
   var missing = isNaN(currValue);
   if (!missing) {
@@ -91,13 +91,13 @@ anychart.calculations.macd.calculationFunction = function(row, context) {
     context.slowQueue.enqueue(currValue);
 
     if (context.fastQueue.getLength() == context.fastPeriod) {
-      context.fastResult = anychart.calculations.macd.calcEMA_(
+      context.fastResult = anychart.core.calculations.macd.calcEMA_(
           context.fastResult,
           context.fastQueue,
           context.fastPeriod);
     }
     if (context.slowQueue.getLength() == context.slowPeriod) {
-      context.slowResult = anychart.calculations.macd.calcEMA_(
+      context.slowResult = anychart.core.calculations.macd.calcEMA_(
           context.slowResult,
           context.slowQueue,
           context.slowPeriod);
@@ -106,7 +106,7 @@ anychart.calculations.macd.calculationFunction = function(row, context) {
       context.signalQueue.enqueue(context.fastResult - context.slowResult);
     }
     if (context.signalQueue.getLength() == context.signalPeriod) {
-      context.signalResult = anychart.calculations.macd.calcEMA_(
+      context.signalResult = anychart.core.calculations.macd.calcEMA_(
           context.signalResult,
           context.signalQueue,
           context.signalPeriod);
@@ -125,12 +125,12 @@ anychart.calculations.macd.calculationFunction = function(row, context) {
 /**
  * Calculates EMA on given values.
  * @param {number} prevVal
- * @param {!anychart.calculations.CycledQueue} queue
+ * @param {!anychart.core.calculations.CycledQueue} queue
  * @param {number} period
  * @return {number}
  * @private
  */
-anychart.calculations.macd.calcEMA_ = function(prevVal, queue, period) {
+anychart.core.calculations.macd.calcEMA_ = function(prevVal, queue, period) {
   var result;
   if (isNaN(prevVal)) {
     result = 0;
@@ -155,11 +155,11 @@ anychart.calculations.macd.calcEMA_ = function(prevVal, queue, period) {
  * @param {number=} opt_signalPeriod
  * @return {anychart.data.TableComputer}
  */
-anychart.calculations.macd.createComputer = function(mapping, opt_fastPeriod, opt_slowPeriod, opt_signalPeriod) {
+anychart.core.calculations.macd.createComputer = function(mapping, opt_fastPeriod, opt_slowPeriod, opt_signalPeriod) {
   var result = mapping.getTable().createComputer(mapping);
-  result.setContext(anychart.calculations.macd.initContext(opt_fastPeriod, opt_slowPeriod, opt_signalPeriod));
-  result.setStartFunction(anychart.calculations.macd.startFunction);
-  result.setCalculationFunction(anychart.calculations.macd.calculationFunction);
+  result.setContext(anychart.core.calculations.macd.initContext(opt_fastPeriod, opt_slowPeriod, opt_signalPeriod));
+  result.setStartFunction(anychart.core.calculations.macd.startFunction);
+  result.setCalculationFunction(anychart.core.calculations.macd.calculationFunction);
   result.addOutputField('macdResult');
   result.addOutputField('signalResult');
   result.addOutputField('histogramResult');
@@ -168,7 +168,7 @@ anychart.calculations.macd.createComputer = function(mapping, opt_fastPeriod, op
 
 
 //exports
-goog.exportSymbol('anychart.calculations.macd.initContext', anychart.calculations.macd.initContext);
-goog.exportSymbol('anychart.calculations.macd.startFunction', anychart.calculations.macd.startFunction);
-goog.exportSymbol('anychart.calculations.macd.calculationFunction', anychart.calculations.macd.calculationFunction);
-goog.exportSymbol('anychart.calculations.macd.createComputer', anychart.calculations.macd.createComputer);
+goog.exportSymbol('anychart.core.calculations.macd.initContext', anychart.core.calculations.macd.initContext);
+goog.exportSymbol('anychart.core.calculations.macd.startFunction', anychart.core.calculations.macd.startFunction);
+goog.exportSymbol('anychart.core.calculations.macd.calculationFunction', anychart.core.calculations.macd.calculationFunction);
+goog.exportSymbol('anychart.core.calculations.macd.createComputer', anychart.core.calculations.macd.createComputer);

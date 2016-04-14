@@ -1,4 +1,4 @@
-goog.provide('anychart.calculations.CycledQueue');
+goog.provide('anychart.core.calculations.CycledQueue');
 goog.require('anychart.utils');
 goog.require('goog.math');
 
@@ -10,7 +10,7 @@ goog.require('goog.math');
  * @param {number=} opt_lengthLimit The maximum length of the queue. Defaults to 256.
  * @constructor
  */
-anychart.calculations.CycledQueue = function(opt_lengthLimit) {
+anychart.core.calculations.CycledQueue = function(opt_lengthLimit) {
   /**
    * The length limit of the queue.
    * @type {number}
@@ -46,7 +46,7 @@ anychart.calculations.CycledQueue = function(opt_lengthLimit) {
  * @param {*} item
  * @return {*}
  */
-anychart.calculations.CycledQueue.prototype.enqueue = function(item) {
+anychart.core.calculations.CycledQueue.prototype.enqueue = function(item) {
   var dequeuedItem = undefined;
   if (this.storage_.length < this.lengthLimit_) { // under limit => no cycling
     this.storage_.push(item);
@@ -70,7 +70,7 @@ anychart.calculations.CycledQueue.prototype.enqueue = function(item) {
  * Removes the first item from the queue and returns it.
  * @return {*}
  */
-anychart.calculations.CycledQueue.prototype.dequeue = function() {
+anychart.core.calculations.CycledQueue.prototype.dequeue = function() {
   var item;
   if (this.currentLength_) {
     item = this.storage_[this.startIndex_];
@@ -87,7 +87,7 @@ anychart.calculations.CycledQueue.prototype.dequeue = function() {
  * @param {number} index
  * @return {*}
  */
-anychart.calculations.CycledQueue.prototype.get = function(index) {
+anychart.core.calculations.CycledQueue.prototype.get = function(index) {
   var storageIndex = (goog.math.modulo(+index, this.currentLength_) + this.startIndex_) % this.storage_.length;
   // if there were any problems with the length of the array - it would be NaN and we return nothing.
   return !isNaN(storageIndex) ? this.storage_[storageIndex] : undefined;
@@ -98,7 +98,7 @@ anychart.calculations.CycledQueue.prototype.get = function(index) {
  * Returns current queue length.
  * @return {number}
  */
-anychart.calculations.CycledQueue.prototype.getLength = function() {
+anychart.core.calculations.CycledQueue.prototype.getLength = function() {
   return this.currentLength_;
 };
 
@@ -107,7 +107,7 @@ anychart.calculations.CycledQueue.prototype.getLength = function() {
  * Clears the queue. You can optionally reset the queue length limit.
  * @param {number=} opt_newLengthLimit
  */
-anychart.calculations.CycledQueue.prototype.clear = function(opt_newLengthLimit) {
+anychart.core.calculations.CycledQueue.prototype.clear = function(opt_newLengthLimit) {
   this.storage_.length = 0;
   this.currentLength_ = 0;
   this.startIndex_ = 0;
@@ -119,7 +119,7 @@ anychart.calculations.CycledQueue.prototype.clear = function(opt_newLengthLimit)
  * Increments start pointer.
  * @private
  */
-anychart.calculations.CycledQueue.prototype.incStart_ = function() {
+anychart.core.calculations.CycledQueue.prototype.incStart_ = function() {
   this.startIndex_ = (this.startIndex_ + 1) % this.storage_.length;
 };
 
@@ -128,17 +128,17 @@ anychart.calculations.CycledQueue.prototype.incStart_ = function() {
  * Returns a queue with random access by indexes. Default maximum queue length is 256. It dequeues automatically when
  * the length of the queue reaches that limit. So if you need larger queue - set the length limit explicitly.
  * @param {number=} opt_lengthLimit The maximum length of the queue. Defaults to 256.
- * @return {!anychart.calculations.CycledQueue}
+ * @return {!anychart.core.calculations.CycledQueue}
  */
-anychart.calculations.cycledQueue = function(opt_lengthLimit) {
-  return new anychart.calculations.CycledQueue(opt_lengthLimit);
+anychart.core.calculations.cycledQueue = function(opt_lengthLimit) {
+  return new anychart.core.calculations.CycledQueue(opt_lengthLimit);
 };
 
 
 //exports
-goog.exportSymbol('anychart.calculations.cycledQueue', anychart.calculations.cycledQueue);
-anychart.calculations.CycledQueue.prototype['enqueue'] = anychart.calculations.CycledQueue.prototype.enqueue;
-anychart.calculations.CycledQueue.prototype['dequeue'] = anychart.calculations.CycledQueue.prototype.dequeue;
-anychart.calculations.CycledQueue.prototype['get'] = anychart.calculations.CycledQueue.prototype.get;
-anychart.calculations.CycledQueue.prototype['getLength'] = anychart.calculations.CycledQueue.prototype.getLength;
-anychart.calculations.CycledQueue.prototype['clear'] = anychart.calculations.CycledQueue.prototype.clear;
+goog.exportSymbol('anychart.core.calculations.cycledQueue', anychart.core.calculations.cycledQueue);
+anychart.core.calculations.CycledQueue.prototype['enqueue'] = anychart.core.calculations.CycledQueue.prototype.enqueue;
+anychart.core.calculations.CycledQueue.prototype['dequeue'] = anychart.core.calculations.CycledQueue.prototype.dequeue;
+anychart.core.calculations.CycledQueue.prototype['get'] = anychart.core.calculations.CycledQueue.prototype.get;
+anychart.core.calculations.CycledQueue.prototype['getLength'] = anychart.core.calculations.CycledQueue.prototype.getLength;
+anychart.core.calculations.CycledQueue.prototype['clear'] = anychart.core.calculations.CycledQueue.prototype.clear;
