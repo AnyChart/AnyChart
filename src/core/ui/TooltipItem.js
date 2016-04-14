@@ -583,9 +583,10 @@ anychart.core.ui.TooltipItem.prototype.createTimerObject_ = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Draw tooltip item.
+ * @param {boolean=} opt_hideForce Ignore tooltips hide delay.
  * @return {anychart.core.ui.TooltipItem} Return itself for method chaining.
  */
-anychart.core.ui.TooltipItem.prototype.draw = function() {
+anychart.core.ui.TooltipItem.prototype.draw = function(opt_hideForce) {
   if (!this.checkDrawingNeeded())
     return this;
 
@@ -613,7 +614,7 @@ anychart.core.ui.TooltipItem.prototype.draw = function() {
       this.layer_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
       this.timer_.stop();
     } else {
-      if (this.hideDelay_ <= 0) {
+      if (opt_hideForce || this.hideDelay_ <= 0) {
         this.remove();
       } else if (!this.timer_.isActive()) {
         this.timer_.start();
@@ -696,6 +697,23 @@ anychart.core.ui.TooltipItem.prototype.draw = function() {
   }
 
   if (manualSuspend) stage.resume();
+
+  return this;
+};
+
+
+/**
+ * Hide tooltip.
+ * @param {boolean=} opt_force Ignore tooltips hide delay.
+ * @return {!anychart.core.ui.TooltipItem} Itself for method chaining.
+ */
+anychart.core.ui.TooltipItem.prototype.hide = function(opt_force) {
+  if (this.visible()) {
+    this.suspendSignalsDispatching();
+    this.visible(false);
+    this.draw(opt_force);
+    this.resumeSignalsDispatching(false);
+  }
 
   return this;
 };

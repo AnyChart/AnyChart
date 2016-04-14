@@ -947,7 +947,7 @@ anychart.charts.Stock.prototype.unhighlight_ = function() {
       if (this.plots_[i])
         this.plots_[i].unhighlight();
     }
-    this.tooltip().hide(null);
+    this.tooltip().hide();
   }
 };
 

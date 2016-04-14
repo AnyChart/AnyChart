@@ -1376,14 +1376,21 @@ anychart.core.ui.SeriesTooltip.prototype.tooltipLeave_ = function(event) {
 
 
 /**
- * Hide the tooltip with delay.
- * @param {anychart.core.MouseEvent} event
+ * Hide the tooltip with delay (if specified).
+ * @param {boolean=} opt_force Ignore tooltips hide delay.
+ * @param {anychart.core.MouseEvent=} opt_event
  * @return {boolean} Returns true if the tooltip was hidden.
  */
-anychart.core.ui.SeriesTooltip.prototype.hide = function(event) {
-  if (this.selectable_ && event) {
-    var clientX = event['originalEvent']['clientX'];
-    var clientY = event['originalEvent']['clientY'];
+anychart.core.ui.SeriesTooltip.prototype.hide = function(opt_force, opt_event) {
+  if (opt_force) {
+    if (this.delay_) this.delay_.stop();
+    this.remove();
+    return true;
+  }
+
+  if (this.selectable_ && opt_event) {
+    var clientX = opt_event['originalEvent']['clientX'];
+    var clientY = opt_event['originalEvent']['clientY'];
     var pixelBounds = this.getPixelBounds();
     var distance = pixelBounds.distance(new acgraph.math.Coordinate(clientX, clientY));
 
@@ -1417,7 +1424,7 @@ anychart.core.ui.SeriesTooltip.prototype.hide = function(event) {
 
 
 /**
- * Hide the tooltip with delay. Used for selectable mode.
+ * Hide the tooltip with delay (if specified). Used for selectable mode.
  * @param {goog.events.BrowserEvent} event
  * @return {boolean|undefined}
  * @private
@@ -1437,20 +1444,11 @@ anychart.core.ui.SeriesTooltip.prototype.hideSelectable_ = function(event) {
   this.triangle_ = null;
 
   if (!this.hideDelay_) {
-    this.hideForce();
+    this.hide(true);
 
   } else {
     if (!this.delay_.isActive()) this.delay_.start();
   }
-};
-
-
-/**
- * Hide the tooltip ignoring delay.
- */
-anychart.core.ui.SeriesTooltip.prototype.hideForce = function() {
-  if (this.delay_) this.delay_.stop();
-  this.remove();
 };
 
 
@@ -1613,6 +1611,7 @@ anychart.core.ui.SeriesTooltip.prototype['title'] = anychart.core.ui.SeriesToolt
 anychart.core.ui.SeriesTooltip.prototype['separator'] = anychart.core.ui.SeriesTooltip.prototype.separator;
 anychart.core.ui.SeriesTooltip.prototype['background'] = anychart.core.ui.SeriesTooltip.prototype.background;
 anychart.core.ui.SeriesTooltip.prototype['padding'] = anychart.core.ui.SeriesTooltip.prototype.padding;
+anychart.core.ui.SeriesTooltip.prototype['hide'] = anychart.core.ui.SeriesTooltip.prototype.hide;
 anychart.core.ui.SeriesTooltip.prototype['hideDelay'] = anychart.core.ui.SeriesTooltip.prototype.hideDelay;
 
 // text API

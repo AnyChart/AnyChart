@@ -482,7 +482,7 @@ anychart.core.Chart.prototype.showTooltip_ = function(event) {
       if (this.tooltip_.positionMode() == anychart.enums.TooltipPositionMode.FLOAT) {
         this.unlisten(goog.events.EventType.MOUSEMOVE, this.updateTooltip);
       }
-      this.tooltip_.hide(event);
+      this.tooltip_.hide(false, event);
 
     } else if (status['series'].enabled()) {
       toShowSeriesStatus.push(status);

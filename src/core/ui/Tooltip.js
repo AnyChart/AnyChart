@@ -472,16 +472,12 @@ anychart.core.ui.Tooltip.prototype.show = function(textInfo, position) {
 
 
 /**
- * Show tooltip using textInfo and position info objects.
+ * Hide tooltip.
+ * @param {boolean=} opt_force Ignore tooltips hide delay.
  * @return {!anychart.core.ui.Tooltip} Itself for method chaining.
  */
-anychart.core.ui.Tooltip.prototype.hide = function() {
-  if (this.item_ && this.item_.visible()) {
-    this.item_.suspendSignalsDispatching();
-    this.item_.visible(false);
-    this.item_.draw();
-    this.item_.resumeSignalsDispatching(false);
-  }
+anychart.core.ui.Tooltip.prototype.hide = function(opt_force) {
+  this.item_.hide(opt_force);
   return this;
 };
 
@@ -642,9 +638,6 @@ anychart.core.ui.Tooltip.prototype.setupByJSON = function(config) {
 };
 
 
-//anychart.core.ui.Tooltip.prototype['show'] = anychart.core.ui.Tooltip.prototype.show;
-//anychart.core.ui.Tooltip.prototype['hide'] = anychart.core.ui.Tooltip.prototype.hide;
-//anychart.core.ui.Tooltip.prototype['redraw'] = anychart.core.ui.Tooltip.prototype.redraw;
 //exports
 anychart.core.ui.Tooltip.prototype['valuePrefix'] = anychart.core.ui.Tooltip.prototype.valuePrefix;
 anychart.core.ui.Tooltip.prototype['valuePostfix'] = anychart.core.ui.Tooltip.prototype.valuePostfix;
@@ -661,5 +654,6 @@ anychart.core.ui.Tooltip.prototype['padding'] = anychart.core.ui.Tooltip.prototy
 anychart.core.ui.Tooltip.prototype['offsetX'] = anychart.core.ui.Tooltip.prototype.offsetX;
 anychart.core.ui.Tooltip.prototype['offsetY'] = anychart.core.ui.Tooltip.prototype.offsetY;
 anychart.core.ui.Tooltip.prototype['anchor'] = anychart.core.ui.Tooltip.prototype.anchor;
+anychart.core.ui.Tooltip.prototype['hide'] = anychart.core.ui.Tooltip.prototype.hide;
 anychart.core.ui.Tooltip.prototype['hideDelay'] = anychart.core.ui.Tooltip.prototype.hideDelay;
 anychart.core.ui.Tooltip.prototype['enabled'] = anychart.core.ui.Tooltip.prototype.enabled;

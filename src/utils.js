@@ -1568,8 +1568,18 @@ anychart.utils.formatDateTime = function(date, pattern) {
 };
 
 
+/**
+ * Hide all tooltips.
+ * @param {boolean=} opt_force Ignore tooltips hide delay.
+ */
+anychart.utils.hideTooltips = function(opt_force) {
+  anychart.core.utils.TooltipsContainer.getInstance().hideTooltips(opt_force);
+};
+
+
 //exports
 goog.exportSymbol('anychart.utils.xml2json', anychart.utils.xml2json);
 goog.exportSymbol('anychart.utils.json2xml', anychart.utils.json2xml);
 goog.exportSymbol('anychart.utils.defaultDateFormatter', anychart.utils.defaultDateFormatter);
 goog.exportSymbol('anychart.utils.formatDateTime', anychart.utils.formatDateTime);
+goog.exportSymbol('anychart.utils.hideTooltips', anychart.utils.hideTooltips);

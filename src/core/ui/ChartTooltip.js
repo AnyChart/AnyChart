@@ -42,7 +42,7 @@ anychart.core.ui.ChartTooltip = function() {
   this.allowLeaveScreen_ = false;
 
   /**
-   * @type {!Object.<!number, !anychart.core.ui.SeriesTooltip>}
+   * @type {!Object.<!string, !anychart.core.ui.SeriesTooltip>}
    * @private
    */
   this.tooltipsMap_ = {};
@@ -737,7 +737,7 @@ anychart.core.ui.ChartTooltip.prototype.show = function(points, clientX, clientY
     this.singleTooltip_.contentInternal().text(this.singleTooltip_.getFormattedContent(contextProvider));
 
     this.hideOtherTooltips_([this.singleTooltip_]);
-    this.tooltipsMap_[goog.getUid(this.singleTooltip_)] = this.singleTooltip_;
+    this.tooltipsMap_[goog.getUid(this.singleTooltip_).toString()] = this.singleTooltip_;
 
     this.setPositionToTooltip_(this.singleTooltip_, clientX, clientY, firstSeries);
     this.setContainerToTooltip_(this.singleTooltip_);
@@ -797,7 +797,7 @@ anychart.core.ui.ChartTooltip.prototype.show = function(points, clientX, clientY
     this.unionTooltip_.title().autoText(this.unionTooltip_.getFormattedTitle(unionContextProvider));
 
     this.hideOtherTooltips_([this.unionTooltip_]);
-    this.tooltipsMap_[goog.getUid(this.unionTooltip_)] = this.unionTooltip_;
+    this.tooltipsMap_[goog.getUid(this.unionTooltip_).toString()] = this.unionTooltip_;
 
     this.setPositionToTooltip_(this.unionTooltip_, clientX, clientY, hoveredSeries);
     this.setContainerToTooltip_(this.unionTooltip_);
@@ -828,7 +828,7 @@ anychart.core.ui.ChartTooltip.prototype.show = function(points, clientX, clientY
       tooltip.title().autoText(tooltip.getFormattedTitle(contextProvider));
       tooltip.contentInternal().text(tooltip.getFormattedContent(contextProvider));
 
-      self.tooltipsMap_[goog.getUid(tooltip)] = tooltip;
+      self.tooltipsMap_[goog.getUid(tooltip).toString()] = tooltip;
 
       self.setPositionToTooltip_(tooltip, clientX, clientY, series);
       self.setContainerToTooltip_(tooltip);
@@ -971,24 +971,25 @@ anychart.core.ui.ChartTooltip.prototype.setPositionToTooltip_ = function(tooltip
 
 
 /**
- * Hide tooltips.
- * @param {anychart.core.MouseEvent} event
+ * Hide tooltips with delay (if specified {@see #hideDelay}).
+ * @param {boolean=} opt_force Ignore tooltips hide delay.
+ * @param {anychart.core.MouseEvent=} opt_event
  */
-anychart.core.ui.ChartTooltip.prototype.hide = function(event) {
+anychart.core.ui.ChartTooltip.prototype.hide = function(opt_force, opt_event) {
   if (this.displayMode_ == anychart.enums.TooltipDisplayMode.SINGLE) {
-    if (this.singleTooltip_ && this.singleTooltip_.hide(event)) {
-      delete this.tooltipsMap_[goog.getUid(this.singleTooltip_)];
+    if (this.singleTooltip_ && this.singleTooltip_.hide(opt_force, opt_event)) {
+      delete this.tooltipsMap_[goog.getUid(this.singleTooltip_).toString()];
     }
 
   } else if (this.displayMode_ == anychart.enums.TooltipDisplayMode.UNION) {
-    if (this.unionTooltip_.hide(event)) {
-      delete this.tooltipsMap_[goog.getUid(this.unionTooltip_)];
+    if (this.unionTooltip_.hide(opt_force, opt_event)) {
+      delete this.tooltipsMap_[goog.getUid(this.unionTooltip_).toString()];
     }
 
   } else if (this.displayMode_ == anychart.enums.TooltipDisplayMode.SEPARATED) {
     goog.array.forEach(this.separatedTooltips_, function(tooltip) {
-      if (tooltip.hide(event)) {
-        delete this.tooltipsMap_[goog.getUid(tooltip)];
+      if (tooltip.hide(opt_force, opt_event)) {
+        delete this.tooltipsMap_[goog.getUid(tooltip).toString()];
       }
     }, this);
     goog.array.clear(this.separatedTooltips_);
@@ -997,19 +998,19 @@ anychart.core.ui.ChartTooltip.prototype.hide = function(event) {
 
 
 /**
- * Hide other tooltips.
- * @param {!Array.<anychart.core.ui.SeriesTooltip>} tooltips
+ * Hide tooltips except passed array of tooltips. Hide delay will be ignored.
+ * @param {!Array.<anychart.core.ui.SeriesTooltip>} ignoreTooltips
  * @private
  */
-anychart.core.ui.ChartTooltip.prototype.hideOtherTooltips_ = function(tooltips) {
+anychart.core.ui.ChartTooltip.prototype.hideOtherTooltips_ = function(ignoreTooltips) {
   // DVF-1444 - remove all previously shown tooltips.
   goog.object.forEach(this.tooltipsMap_, function(otherTooltip, uid) {
-    var exclude = goog.array.some(tooltips, function(tooltip) {
+    var exclude = goog.array.some(ignoreTooltips, function(tooltip) {
       return goog.getUid(tooltip) == uid;
     });
     if (exclude) return;
 
-    otherTooltip.hideForce();
+    otherTooltip.hide(true);
     delete this.tooltipsMap_[uid];
   }, this);
 };
@@ -1218,6 +1219,7 @@ anychart.core.ui.ChartTooltip.prototype['separator'] = anychart.core.ui.ChartToo
 anychart.core.ui.ChartTooltip.prototype['background'] = anychart.core.ui.ChartTooltip.prototype.background;
 anychart.core.ui.ChartTooltip.prototype['padding'] = anychart.core.ui.ChartTooltip.prototype.padding;
 anychart.core.ui.ChartTooltip.prototype['enabled'] = anychart.core.ui.ChartTooltip.prototype.enabled;
+anychart.core.ui.ChartTooltip.prototype['hide'] = anychart.core.ui.ChartTooltip.prototype.hide;
 anychart.core.ui.ChartTooltip.prototype['hideDelay'] = anychart.core.ui.ChartTooltip.prototype.hideDelay;
 
 // text API
