@@ -1,5 +1,5 @@
 goog.provide('anychart.core.stock.indicators.EMA');
-goog.require('anychart.calculations.ema');
+goog.require('anychart.core.calculations.ema');
 goog.require('anychart.core.stock.indicators.Base');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
@@ -33,7 +33,7 @@ goog.inherits(anychart.core.stock.indicators.EMA, anychart.core.stock.indicators
 
 /** @inheritDoc */
 anychart.core.stock.indicators.EMA.prototype.createComputer = function(mapping) {
-  return anychart.calculations.ema.createComputer(mapping, this.period_);
+  return anychart.core.calculations.ema.createComputer(mapping, this.period_);
 };
 
 

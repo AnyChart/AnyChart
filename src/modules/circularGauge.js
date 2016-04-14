@@ -5,7 +5,7 @@
 
 goog.provide('anychart.modules.circularGauge');
 
-goog.require('anychart.gauges.Circular');
+goog.require('anychart.charts.CircularGauge');
 goog.require('anychart.modules.base');
 
 
@@ -14,10 +14,10 @@ goog.require('anychart.modules.base');
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Value to set.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser
  * settings here as a hash map.
- * @return {anychart.gauges.Circular} Circular gauge with defaults.
+ * @return {anychart.charts.CircularGauge} Circular gauge with defaults.
  */
 anychart.circularGauge = function(opt_data, opt_csvSettings) {
-  var gauge = new anychart.gauges.Circular(opt_data, opt_csvSettings);
+  var gauge = new anychart.charts.CircularGauge(opt_data, opt_csvSettings);
   var theme = anychart.getFullTheme();
 
   gauge.setup(theme['circularGauge']);

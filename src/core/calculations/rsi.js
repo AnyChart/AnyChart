@@ -1,38 +1,38 @@
-goog.provide('anychart.calculations.rsi');
-goog.require('anychart.calculations.CycledQueue');
+goog.provide('anychart.core.calculations.rsi');
+goog.require('anychart.core.calculations.CycledQueue');
 goog.require('anychart.utils');
 
 /**
- * @namespace {anychart.calculations}
+ * @namespace {anychart.core.calculations}
  */
 
 
 /**
  * @typedef {{
- *    queue: !anychart.calculations.CycledQueue,
+ *    queue: !anychart.core.calculations.CycledQueue,
  *    period: number,
  *    upwardChange: number,
  *    downwardChange: number,
  *    dispose: Function
  * }}
  */
-anychart.calculations.rsi.Context;
+anychart.core.calculations.rsi.Context;
 
 
 /**
  * Creates context for RSI indicator calculation.
  * @param {number=} opt_period Defaults to 10.
- * @return {anychart.calculations.rsi.Context}
+ * @return {anychart.core.calculations.rsi.Context}
  */
-anychart.calculations.rsi.initContext = function(opt_period) {
+anychart.core.calculations.rsi.initContext = function(opt_period) {
   var period = anychart.utils.normalizeToNaturalNumber(opt_period, 14, false);
   return {
-    queue: anychart.calculations.cycledQueue(period),
+    queue: anychart.core.calculations.cycledQueue(period),
     period: period,
     upwardChange: NaN,
     downwardChange: NaN,
     /**
-     * @this {anychart.calculations.rsi.Context}
+     * @this {anychart.core.calculations.rsi.Context}
      */
     'dispose': function() {
       this.queue.clear();
@@ -43,10 +43,10 @@ anychart.calculations.rsi.initContext = function(opt_period) {
 
 /**
  * Start calculation function for RSI indicator calculation.
- * @param {anychart.calculations.rsi.Context} context
- * @this {anychart.calculations.rsi.Context}
+ * @param {anychart.core.calculations.rsi.Context} context
+ * @this {anychart.core.calculations.rsi.Context}
  */
-anychart.calculations.rsi.startFunction = function(context) {
+anychart.core.calculations.rsi.startFunction = function(context) {
   context.queue.clear();
   context.upwardChange = NaN;
   context.downwardChange = NaN;
@@ -56,10 +56,10 @@ anychart.calculations.rsi.startFunction = function(context) {
 /**
  * Calculates RSI.
  * @param {anychart.data.TableComputer.RowProxy} row
- * @param {anychart.calculations.rsi.Context} context
- * @this {anychart.calculations.rsi.Context}
+ * @param {anychart.core.calculations.rsi.Context} context
+ * @this {anychart.core.calculations.rsi.Context}
  */
-anychart.calculations.rsi.calculationFunction = function(row, context) {
+anychart.core.calculations.rsi.calculationFunction = function(row, context) {
   var currValue = anychart.utils.toNumber(row.get('value'));
   var missing = isNaN(currValue);
   if (!missing)
@@ -112,18 +112,18 @@ anychart.calculations.rsi.calculationFunction = function(row, context) {
  * @param {number=} opt_period
  * @return {anychart.data.TableComputer}
  */
-anychart.calculations.rsi.createComputer = function(mapping, opt_period) {
+anychart.core.calculations.rsi.createComputer = function(mapping, opt_period) {
   var result = mapping.getTable().createComputer(mapping);
-  result.setContext(anychart.calculations.rsi.initContext(opt_period));
-  result.setStartFunction(anychart.calculations.rsi.startFunction);
-  result.setCalculationFunction(anychart.calculations.rsi.calculationFunction);
+  result.setContext(anychart.core.calculations.rsi.initContext(opt_period));
+  result.setStartFunction(anychart.core.calculations.rsi.startFunction);
+  result.setCalculationFunction(anychart.core.calculations.rsi.calculationFunction);
   result.addOutputField('result');
   return result;
 };
 
 
 //exports
-goog.exportSymbol('anychart.calculations.rsi.initContext', anychart.calculations.rsi.initContext);
-goog.exportSymbol('anychart.calculations.rsi.startFunction', anychart.calculations.rsi.startFunction);
-goog.exportSymbol('anychart.calculations.rsi.calculationFunction', anychart.calculations.rsi.calculationFunction);
-goog.exportSymbol('anychart.calculations.rsi.createComputer', anychart.calculations.rsi.createComputer);
+goog.exportSymbol('anychart.core.calculations.rsi.initContext', anychart.core.calculations.rsi.initContext);
+goog.exportSymbol('anychart.core.calculations.rsi.startFunction', anychart.core.calculations.rsi.startFunction);
+goog.exportSymbol('anychart.core.calculations.rsi.calculationFunction', anychart.core.calculations.rsi.calculationFunction);
+goog.exportSymbol('anychart.core.calculations.rsi.createComputer', anychart.core.calculations.rsi.createComputer);

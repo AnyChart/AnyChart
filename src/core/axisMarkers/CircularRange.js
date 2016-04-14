@@ -154,7 +154,7 @@ anychart.core.axisMarkers.CircularRange.prototype.axisIndex = function(opt_index
 
 /**
  * Set/get link to gauge.
- * @param {anychart.gauges.Circular=} opt_gauge Gauge inst for set.
+ * @param {anychart.charts.CircularGauge=} opt_gauge Gauge inst for set.
  * @return {anychart.core.axisMarkers.CircularRange}
  */
 anychart.core.axisMarkers.CircularRange.prototype.gauge = function(opt_gauge) {

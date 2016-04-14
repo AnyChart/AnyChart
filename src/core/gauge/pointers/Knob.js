@@ -342,7 +342,7 @@ anychart.core.gauge.pointers.Knob.prototype.draw = function() {
     this.contextProvider['topRadius'] = pixTopRadius;
     this.contextProvider['bottomRadius'] = pixBottomRadius;
     //we shouldn't opening secret for mere mortals
-    this.contextProvider['angle'] = goog.math.standardAngle(startAngle - anychart.gauges.Circular.DEFAULT_START_ANGLE);
+    this.contextProvider['angle'] = goog.math.standardAngle(startAngle - anychart.charts.CircularGauge.DEFAULT_START_ANGLE);
 
     //difference between knob radius.
     var dr = Math.abs(pixTopRadius - pixBottomRadius);

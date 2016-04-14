@@ -227,7 +227,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="interactivity" type="utils.Interactivity"/>
             <!-- Common elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="data" type="Data"/>
-            <!-- anychart.gauges.Circular elements -->
+            <!-- anychart.charts.CircularGauge elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="cap" type="core.gauge.Cap"/>
@@ -247,7 +247,7 @@
         <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
         <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="animation" type="simple.Bool" default="false"/>
-        <!-- anychart.gauges.Circular common attrs -->
+        <!-- anychart.charts.CircularGauge common attrs -->
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
         <xsd:attribute name="start_angle" type="xsd:double"/>
