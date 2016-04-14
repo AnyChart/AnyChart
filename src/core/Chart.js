@@ -1881,6 +1881,313 @@ anychart.core.Chart.prototype.getType = goog.abstractMethod;
 anychart.core.Chart.DrawEvent;
 
 
+/**
+ * Extract headers from chart data set or stock storage.
+ * @param {anychart.data.Set|anychart.data.TableStorage} dataSet
+ * @param {Object} headers Object with headers.
+ * @param {number} headersLength Headers length.
+ * @return {number} headers length.
+ */
+anychart.core.Chart.prototype.extractHeaders = function(dataSet, headers, headersLength) {
+  var column;
+  for (var i = 0, len = dataSet.getRowsCount(); i < len; i++) {
+    var row = dataSet.row(i);
+
+    if (goog.isArray(row)) {
+      for (column = 0; column < row.length; column++)
+        if (!(column in headers))
+          headers[column] = headersLength++;
+    } else if (goog.isObject(row)) {
+      for (column in row)
+        if (!(column in headers))
+          headers[column] = headersLength++;
+    } else {
+      if (!('*' in headers))
+        headers['*'] = headersLength++;
+    }
+  }
+  return headersLength;
+};
+
+
+/**
+ * Checks whether separator is valid.
+ * Throws an error if invalid.
+ * @param {string} separator
+ */
+anychart.core.Chart.prototype.checkSeparator = function(separator) {
+  if (separator.indexOf('\"') != -1) {
+    anychart.utils.error(anychart.enums.ErrorCode.CSV_DOUBLE_QUOTE_IN_SEPARATOR);
+    throw new Error('Double quotes in separator are not allowed');
+  }
+};
+
+
+/**
+ * Escapes values.
+ * @param {Array} row Array of values.
+ * @param {string} colSep Columns separator.
+ * @param {string} rowSep Rows separator.
+ */
+anychart.core.Chart.prototype.escapeValuesInRow = function(row, colSep, rowSep) {
+  var i;
+  var value;
+  var len = row.length;
+  for (i = 0; i < len; i++) {
+    if (!goog.isDef(value = row[i]))
+      continue;
+    if (!goog.isString(value))
+      value = String(value);
+    if (value.indexOf(colSep) != -1) {
+      value = value.split('"').join('""');
+      value = '"' + value + '"';
+    } else if (value.indexOf(rowSep) != -1) {
+      value = value.split('"').join('""');
+      value = '"' + value + '"';
+    }
+    row[i] = value;
+  }
+};
+
+
+/**
+ * Returns CSV string with series data.
+ * @param {(string|anychart.enums.CsvMode)=} opt_csvMode CSV mode.
+ * @param {Object.<string, (string|boolean|undefined)>=} opt_csvSettings CSV settings.
+ * @return {string} CSV string.
+ */
+anychart.core.Chart.prototype.toCsv = function(opt_csvMode, opt_csvSettings) {
+  opt_csvMode = anychart.enums.normalizeCsvMode(opt_csvMode);
+  var rawData = (opt_csvMode == anychart.enums.CsvMode.RAW);
+  var type = this.getType();
+  var scatterPolar = (type == anychart.enums.ChartTypes.SCATTER || type == anychart.enums.ChartTypes.POLAR);
+  var settings = goog.isObject(opt_csvSettings) ? opt_csvSettings : {};
+  var rowsSeparator = settings['rowsSeparator'] || '\n';
+  this.checkSeparator(rowsSeparator);
+  var columnsSeparator = settings['columnsSeparator'] || ',';
+  this.checkSeparator(columnsSeparator);
+  var ignoreFirstRow = settings['ignoreFirstRow'] || false;
+
+  var isGauge = this.getType() == anychart.enums.GaugeTypes.CIRCULAR;
+  var seriesList = isGauge ? [this] : this.getAllSeries();
+  var seriesListLength = seriesList.length;
+  var series;
+  var seriesData;
+  var seriesDataSets;
+  var i, j, len, uid;
+  var dataSet = null;
+  var dataSets = {};
+  var csvHeaders = [];
+  var dataSetsCount = 0;
+
+  for (i = 0; i < seriesListLength; i++) {
+    series = /** @type {anychart.core.SeriesBase} */ (seriesList[i]);
+    seriesData = /** @type {anychart.data.View} */ (series.data());
+    seriesDataSets = seriesData.getDataSets();
+    for (j = 0, len = seriesDataSets.length; j < len; j++) {
+      dataSet = seriesDataSets[j];
+      uid = goog.getUid(dataSet);
+      if (!(uid in dataSets)) {
+        dataSets[uid] = dataSet;
+        dataSetsCount++;
+      }
+    }
+  }
+  var needCountDataSets = dataSetsCount > 1;
+  var csvStrings;
+  var headers, header;
+  var headersLength = 0;
+  var finalValue;
+
+  if (rawData) {
+    headers = {};
+    if (needCountDataSets) {
+      headers['#'] = headersLength++;
+    }
+    for (uid in dataSets) {
+      dataSet = dataSets[uid];
+      headersLength = this.extractHeaders(dataSet, headers, headersLength);
+    }
+
+    var dataSetNumber = 0;
+    csvStrings = [];
+    if (!ignoreFirstRow) {
+      csvHeaders = [];
+      for (header in headers)
+        csvHeaders[headers[header]] = header;
+      csvStrings.push(csvHeaders.join(columnsSeparator));
+    }
+    for (uid in dataSets) {
+      dataSet = dataSets[uid];
+      var column;
+      var columnIndex;
+
+      for (i = 0, len = dataSet.getRowsCount(); i < len; i++) {
+        var csvRow = new Array(headersLength);
+        var row = dataSet.row(i);
+        if (goog.isArray(row)) {
+          for (column = 0; column < row.length; column++) {
+            columnIndex = headers[column];
+            finalValue = goog.isObject(row[column]) ? goog.json.serialize(row[column]) : row[column];
+            csvRow[columnIndex] = finalValue;
+          }
+        } else if (goog.isObject(row)) {
+          for (column in row) {
+            columnIndex = headers[column];
+            finalValue = goog.isObject(row[column]) ? goog.json.serialize(row[column]) : row[column];
+            csvRow[columnIndex] = finalValue;
+          }
+        } else {
+          columnIndex = headers['*'];
+          csvRow[columnIndex] = row;
+        }
+
+        if (needCountDataSets)
+          csvRow[0] = dataSetNumber;
+        this.escapeValuesInRow(csvRow, columnsSeparator, rowsSeparator);
+        csvStrings.push(csvRow.join(columnsSeparator));
+      }
+      dataSetNumber++;
+    }
+    return csvStrings.join(rowsSeparator);
+  } else {
+    //x, 0_0, 0_1, 0_2, 1_0, 1_1
+    //p1, 1, p1, 10, p1, 20'
+    headers = {};
+    if (!scatterPolar) {
+      headers['x'] = headersLength++;
+    }
+    var seriesPrefix;
+    var csvRows = {};
+    var iterator;
+    var x, k;
+    var prefixed;
+    var groupingField;
+    for (i = 0; i < seriesListLength; i++) {
+      series = seriesList[i];
+      seriesPrefix = seriesListLength > 1 ? goog.isFunction(series.id) ? series.id() + '_' : ('series_' + i + '_') : '';
+      seriesData = series.data();
+      iterator = seriesData.getIterator();
+      while (iterator.advance()) {
+        k = iterator.getIndex();
+        groupingField = scatterPolar ? k : iterator.get('x');
+        if (!csvRows[groupingField]) {
+          csvRows[groupingField] = [];
+          if (!scatterPolar)
+            csvRows[groupingField][0] = groupingField;
+        }
+
+        row = seriesData.row(k);
+
+        if (goog.isArray(row)) {
+          for (column = 0; column < row.length; column++) {
+            prefixed = seriesPrefix + column;
+            if (!(prefixed in headers)) {
+              headers[prefixed] = headersLength++;
+            }
+            columnIndex = headers[prefixed];
+            finalValue = goog.isObject(row[column]) ? goog.json.serialize(row[column]) : row[column];
+            csvRows[groupingField][columnIndex] = finalValue;
+          }
+        } else if (goog.isObject(row)) {
+          for (column in row) {
+            prefixed = seriesPrefix + column;
+            if (!(prefixed in headers)) {
+              headers[prefixed] = headersLength++;
+            }
+            columnIndex = headers[prefixed];
+            finalValue = goog.isObject(row[column]) ? goog.json.serialize(row[column]) : row[column];
+            csvRows[groupingField][columnIndex] = finalValue;
+          }
+        } else {
+          prefixed = seriesPrefix + '*';
+          if (!(prefixed in headers)) {
+            headers[prefixed] = headersLength++;
+          }
+          columnIndex = headers[prefixed];
+          csvRows[groupingField][columnIndex] = row;
+        }
+      }
+    }
+    csvStrings = [];
+    for (header in headers) {
+      csvHeaders[headers[header]] = header;
+    }
+    if (!ignoreFirstRow)
+      csvStrings.push(csvHeaders.join(columnsSeparator));
+    for (row in csvRows) {
+      this.escapeValuesInRow(csvRows[row], columnsSeparator, rowsSeparator);
+      csvStrings.push(csvRows[row].join(columnsSeparator));
+    }
+    return csvStrings.join(rowsSeparator);
+  }
+};
+
+
+/**
+ * Saves chart config as XML document.
+ * @param {boolean=} opt_includeTheme If the current theme properties should be included into the result.
+ * @param {string=} opt_filename file name to save.
+ */
+anychart.core.Chart.prototype.saveAsXml = function(opt_includeTheme, opt_filename) {
+  var stage = this.container() ? this.container().getStage() : null;
+  if (stage) {
+    var xml = /** @type {string} */(this.toXml(false, opt_includeTheme));
+    var option = {};
+    if (goog.isString(opt_filename)) option['file-name'] = opt_filename;
+    stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/xml', xml, 'xml', 'file', option);
+  }
+};
+
+
+/**
+ * Saves chart config as XML document.
+ * @param {boolean=} opt_includeTheme If the current theme properties should be included into the result.
+ * @param {string=} opt_filename file name to save.
+ */
+anychart.core.Chart.prototype.saveAsJson = function(opt_includeTheme, opt_filename) {
+  var stage = this.container() ? this.container().getStage() : null;
+  if (stage) {
+    var json = /** @type {string} */(this.toJson(true, opt_includeTheme));
+    var option = {};
+    if (goog.isString(opt_filename)) option['file-name'] = opt_filename;
+    stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/json', json, 'json', 'file', option);
+  }
+};
+
+
+/**
+ * Saves chart data as csv.
+ * @param {(string|anychart.enums.CsvMode)=} opt_csvMode CSV mode.
+ * @param {Object.<string, (string|boolean|undefined)>=} opt_csvSettings CSV settings.
+ * @param {string=} opt_filename file name to save.
+ */
+anychart.core.Chart.prototype.saveAsCsv = function(opt_csvMode, opt_csvSettings, opt_filename) {
+  var stage = this.container() ? this.container().getStage() : null;
+  if (stage) {
+    var csv = this.toCsv(opt_csvMode, opt_csvSettings);
+    var option = {};
+    if (goog.isString(opt_filename)) option['file-name'] = opt_filename;
+    stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/csv', csv, 'csv', 'file', option);
+  }
+};
+
+
+/**
+ * Saves chart data as excel document.
+ * @param {(string|anychart.enums.CsvMode)=} opt_csvMode CSV mode.
+ * @param {string=} opt_filename file name to save.
+ */
+anychart.core.Chart.prototype.saveAsXlsx = function(opt_csvMode, opt_filename) {
+  var stage = this.container() ? this.container().getStage() : null;
+  if (stage) {
+    var csv = this.toCsv(opt_csvMode, {'rowsSeparator': '\n', 'columnsSeparator': ',', 'ignoreFirstRow': false});
+    var option = {};
+    if (goog.isString(opt_filename)) option['file-name'] = opt_filename;
+    stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/xlsx', csv, 'xlsx', 'file', option);
+  }
+};
+
 //exports
 anychart.core.Chart.prototype['animation'] = anychart.core.Chart.prototype.animation;
 anychart.core.Chart.prototype['title'] = anychart.core.Chart.prototype.title;//doc|ex
@@ -1900,5 +2207,10 @@ anychart.core.Chart.prototype['saveAsJpg'] = anychart.core.Chart.prototype.saveA
 anychart.core.Chart.prototype['saveAsPdf'] = anychart.core.Chart.prototype.saveAsPdf;//inherited
 anychart.core.Chart.prototype['saveAsSvg'] = anychart.core.Chart.prototype.saveAsSvg;//inherited
 anychart.core.Chart.prototype['toSvg'] = anychart.core.Chart.prototype.toSvg;//inherited
+anychart.core.Chart.prototype['saveAsCsv'] = anychart.core.Chart.prototype.saveAsCsv;
+anychart.core.Chart.prototype['saveAsXlsx'] = anychart.core.Chart.prototype.saveAsXlsx;
+anychart.core.Chart.prototype['saveAsXml'] = anychart.core.Chart.prototype.saveAsXml;
+anychart.core.Chart.prototype['saveAsJson'] = anychart.core.Chart.prototype.saveAsJson;
+anychart.core.Chart.prototype['toCsv'] = anychart.core.Chart.prototype.toCsv;
 anychart.core.Chart.prototype['localToGlobal'] = anychart.core.Chart.prototype.localToGlobal;
 anychart.core.Chart.prototype['globalToLocal'] = anychart.core.Chart.prototype.globalToLocal;

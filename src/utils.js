@@ -1577,6 +1577,23 @@ anychart.utils.hideTooltips = function(opt_force) {
 };
 
 
+/**
+ * Returns the keys of the object/map/hash.
+ *
+ * @param {*} obj The object from which to get the keys.
+ * @return {!Array<string>} Array of property keys.
+ */
+anychart.utils.getKeys = function(obj) {
+  var res = [];
+  var i = 0;
+  for (var key in obj) {
+    if (obj.hasOwnProperty(key))
+      res[i++] = key;
+  }
+  return res;
+};
+
+
 //exports
 goog.exportSymbol('anychart.utils.xml2json', anychart.utils.xml2json);
 goog.exportSymbol('anychart.utils.json2xml', anychart.utils.json2xml);

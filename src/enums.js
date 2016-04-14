@@ -2435,6 +2435,44 @@ anychart.enums.normalizeGaugeScaleTypes = function(value) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  CSV mode enum
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Csv mode enum.
+ * @enum {string}
+ */
+anychart.enums.CsvMode = {
+  RAW: 'raw',
+  SPECIFIC: 'specific',
+  GROUPED: 'grouped'
+};
+
+
+/**
+ * Normalizes csv mode.
+ * By default normalizes as SPECIFIC.
+ * @param {string=} opt_value
+ * @return {anychart.enums.CsvMode} Normalized csv mode.
+ */
+anychart.enums.normalizeCsvMode = function(opt_value) {
+  opt_value = (String(opt_value)).toLowerCase();
+
+  switch (opt_value) {
+    case 'raw':
+      return anychart.enums.CsvMode.RAW;
+    case 'specific':
+      return anychart.enums.CsvMode.SPECIFIC;
+    case 'grouped':
+      return anychart.enums.CsvMode.GROUPED;
+  }
+
+  return anychart.enums.CsvMode.SPECIFIC;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Errors, Warnings, Info
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -3605,3 +3643,7 @@ goog.exportSymbol('anychart.enums.TokenType.UNKNOWN', anychart.enums.TokenType.U
 goog.exportSymbol('anychart.enums.TokenType.NUMBER', anychart.enums.TokenType.NUMBER);
 goog.exportSymbol('anychart.enums.TokenType.STRING', anychart.enums.TokenType.STRING);
 goog.exportSymbol('anychart.enums.TokenType.DATE_TIME', anychart.enums.TokenType.DATE_TIME);
+
+goog.exportSymbol('anychart.enums.CsvMode.RAW', anychart.enums.CsvMode.RAW);
+goog.exportSymbol('anychart.enums.CsvMode.SPECIFIC', anychart.enums.CsvMode.SPECIFIC);
+goog.exportSymbol('anychart.enums.CsvMode.GROUPED', anychart.enums.CsvMode.GROUPED);

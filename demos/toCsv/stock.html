@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+<head>
+    <!--<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.min.js"></script>-->
+    <script src="../stock/data/ixic.js"></script>
+    <link type="text/css" href="../../css/anychart.css" rel="stylesheet">
+    <script src="../../contrib/closure-library/closure/goog/base.js"></script>
+    <script src="../../src/deps.js"></script>
+
+    <meta charset="utf-8">
+
+    <script>
+        goog.require('anychart.themes.defaultTheme');
+        goog.require('anychart.modules.anychart_bundle');
+    </script>
+
+    <style>
+        html, body, #container {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<script>
+    anychart.onDocumentReady(function() {
+// The data that have been used for this sample can be taken from the CDN
+// http://cdn.anychart.com/csv-data/ixic-daily-short.js
+
+// create data table on loaded data
+        var dataTable = anychart.data.table();
+        dataTable.addData(get_ixic_daily_short_data());
+
+// map loaded data
+        var mapping = dataTable.mapAs({'value': 4});
+
+// create stock chart
+        chart = anychart.stock();
+
+// create first plot on the chart with column series
+        var firstPlot = chart.plot(0);
+        firstPlot.column(mapping);
+
+// create second plot on the chart
+        var secondPlot = chart.plot(1);
+
+// turn on second plot grids
+        secondPlot.grid().enabled(true);
+        secondPlot.grid(1).enabled(true).layout('vertical');
+
+// create column series on the second plot
+        var secondSeries = secondPlot.column(mapping);
+
+// set width for columns in percent
+        secondSeries.pointWidth('50%');
+
+// create third plot
+        var thirdPlot = chart.plot(2);
+
+// turn on third plot grids and minor grids
+        thirdPlot.grid().enabled(true);
+        thirdPlot.grid(1).enabled(true).layout('vertical');
+        thirdPlot.minorGrid().enabled(true);
+        thirdPlot.minorGrid(1).enabled(true).layout('vertical');
+
+// create column series on the third plot
+        var thirdSeries = thirdPlot.column(mapping);
+
+//set gradient fill for the series
+        thirdSeries.fill(['#dd2c00', "#ffd54f", "#ef6c00"], 0, true, 0.8);
+
+// create scroller series with mapped data
+        chart.scroller().column(mapping);
+
+// set chart selected date/time range
+        chart.selectRange('2005-01-03', '2005-05-20');
+
+// set container id for the chart
+        chart.container('container');
+
+// initiate chart drawing
+        chart.draw();
+        console.log(chart.toCsv(anychart.enums.CsvMode.GROUPED));
+    });
+
+</script>
+</body>
+</html>

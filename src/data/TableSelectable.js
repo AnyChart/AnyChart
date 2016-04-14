@@ -275,6 +275,35 @@ anychart.data.TableSelectable.prototype.getIteratorInternal = function(opt_passC
 
 
 /**
+ * Returns exporting iterator.
+ * Always on full range data.
+ * Used in csv grouped data generation.
+ * @return {!anychart.data.TableIterator}
+ */
+anychart.data.TableSelectable.prototype.getExportingIterator = function() {
+  var coIterator = this.controller_ ? this.controller_.getCoIterator(false, true) : null;
+  var storage = this.currentStorage_.getStorageInternal();
+  var firstRow = storage.length ? storage[0] : null;
+  var lastRow = storage.length ? storage[storage.length - 1] : null;
+  var selection = {
+    startKey: NaN,
+    endKey: NaN,
+    firstIndex: 0,
+    firstRow: firstRow,
+    lastRow: lastRow,
+    preFirstRow: null,
+    postLastRow: null,
+    mins: {},
+    maxs: {},
+    calcMaxs: [],
+    calcMins: [],
+    minDistance: NaN
+  };
+  return new anychart.data.TableIterator(this.mapping_, selection, !this.currentStorageIsMain_, coIterator);
+};
+
+
+/**
  * Sets controller reference.
  * @param {anychart.data.TableSelectable.IController} value
  */
@@ -325,6 +354,7 @@ anychart.data.TableSelectable.IController = function() {};
 
 /**
  * @param {boolean} fullRange
+ * @param {boolean=} opt_exportingData
  * @return {anychart.data.TableIterator.ICoIterator}
  */
 anychart.data.TableSelectable.IController.prototype.getCoIterator;

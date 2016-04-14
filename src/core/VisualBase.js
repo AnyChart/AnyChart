@@ -164,7 +164,7 @@ anychart.core.VisualBase.prototype.bindHandlersToGraphics = function(element, op
  * @protected
  */
 anychart.core.VisualBase.prototype.bindHandlersToComponent = function(target, opt_overHandler, opt_outHandler,
-    opt_clickHandler, opt_moveHandler, opt_allHandler, opt_downHandler) {
+                                                                      opt_clickHandler, opt_moveHandler, opt_allHandler, opt_downHandler) {
   this.eventsHandler.listen(target, acgraph.events.EventType.CLICK, opt_clickHandler || opt_allHandler || this.handleMouseEvent);
   this.eventsHandler.listen(target, acgraph.events.EventType.DBLCLICK, opt_allHandler || this.handleMouseEvent);
   this.eventsHandler.listen(target, acgraph.events.EventType.MOUSEOVER, opt_overHandler || opt_allHandler || this.handleMouseEvent);
@@ -506,10 +506,11 @@ anychart.core.VisualBase.prototype.invalidateParentBounds = function() {
  * @param {number=} opt_width Image width.
  * @param {number=} opt_height Image height.
  * @param {number=} opt_quality Image quality in ratio 0-1.
+ * @param {string=} opt_filename file name to save.
  */
-anychart.core.VisualBase.prototype.saveAsPng = function(opt_width, opt_height, opt_quality) {
+anychart.core.VisualBase.prototype.saveAsPng = function(opt_width, opt_height, opt_quality, opt_filename) {
   var stage = this.container() ? this.container().getStage() : null;
-  if (stage) stage.saveAsPng(opt_width, opt_height, opt_quality);
+  if (stage) stage.saveAsPng(opt_width, opt_height, opt_quality, opt_filename);
 };
 
 
@@ -530,10 +531,11 @@ anychart.core.VisualBase.prototype.saveAsPng = function(opt_width, opt_height, o
  * @param {number=} opt_height Image height.
  * @param {number=} opt_quality Image quality in ratio 0-1.
  * @param {boolean=} opt_forceTransparentWhite Define, should we force transparent to white background.
+ * @param {string=} opt_filename file name to save.
  */
-anychart.core.VisualBase.prototype.saveAsJpg = function(opt_width, opt_height, opt_quality, opt_forceTransparentWhite) {
+anychart.core.VisualBase.prototype.saveAsJpg = function(opt_width, opt_height, opt_quality, opt_forceTransparentWhite, opt_filename) {
   var stage = this.container() ? this.container().getStage() : null;
-  if (stage) stage.saveAsJpg(opt_width, opt_height, opt_quality, opt_forceTransparentWhite);
+  if (stage) stage.saveAsJpg(opt_width, opt_height, opt_quality, opt_forceTransparentWhite, opt_filename);
 };
 
 
@@ -550,14 +552,15 @@ anychart.core.VisualBase.prototype.saveAsJpg = function(opt_width, opt_height, o
  *   .listen('click', function(){
  *      chart.saveAsPdf();
  *   });
- * @param {string=} opt_paperSize Any paper format like 'a0', 'tabloid', 'b4', etc.
- * @param {boolean=} opt_landscape Define, is landscape.
+ * @param {(number|string)=} opt_paperSizeOrWidth Any paper format like 'a0', 'tabloid', 'b4', etc or width.
+ * @param {(number|boolean)=} opt_landscapeOrHeight Define, is landscape or pdf height.
  * @param {number=} opt_x Offset X.
  * @param {number=} opt_y Offset Y.
+ * @param {string=} opt_filename file name to save.
  */
-anychart.core.VisualBase.prototype.saveAsPdf = function(opt_paperSize, opt_landscape, opt_x, opt_y) {
+anychart.core.VisualBase.prototype.saveAsPdf = function(opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_x, opt_y, opt_filename) {
   var stage = this.container() ? this.container().getStage() : null;
-  if (stage) stage.saveAsPdf(opt_paperSize, opt_landscape, opt_x, opt_y);
+  if (stage) stage.saveAsPdf(opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_x, opt_y, opt_filename);
 };
 
 
@@ -576,10 +579,11 @@ anychart.core.VisualBase.prototype.saveAsPdf = function(opt_paperSize, opt_lands
  *   });
  * @param {(string|number)=} opt_paperSizeOrWidth Paper Size or width.
  * @param {(boolean|string)=} opt_landscapeOrHeight Landscape or height.
+ * @param {string=} opt_filename file name to save.
  */
-anychart.core.VisualBase.prototype.saveAsSvg = function(opt_paperSizeOrWidth, opt_landscapeOrHeight) {
+anychart.core.VisualBase.prototype.saveAsSvg = function(opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_filename) {
   var stage = this.container() ? this.container().getStage() : null;
-  if (stage) stage.saveAsSvg(opt_paperSizeOrWidth, opt_landscapeOrHeight);
+  if (stage) stage.saveAsSvg(opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_filename);
 };
 
 

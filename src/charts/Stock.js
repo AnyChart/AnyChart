@@ -1143,6 +1143,265 @@ anychart.stock = function() {
 };
 
 
+/** @inheritDoc */
+anychart.charts.Stock.prototype.extractHeaders = function(storage, headers, headersLength) {
+  var i;
+  var knownFields = storage.getKnownFields();
+  if (goog.isNumber(knownFields)) {
+    for (i = 0; i < knownFields; i++)
+      if (!(i in headers))
+        headers[i] = headersLength++;
+  } else {
+    for (i in knownFields)
+      if (!(i in headers))
+        headers[i] = headersLength++;
+  }
+  return headersLength;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Stock.prototype.toCsv = function(opt_csvMode, opt_csvSettings) {
+  opt_csvMode = anychart.enums.normalizeCsvMode(opt_csvMode);
+  var rawData = (opt_csvMode == anychart.enums.CsvMode.RAW);
+  var groupedData = (opt_csvMode == anychart.enums.CsvMode.GROUPED);
+  var settings = goog.isObject(opt_csvSettings) ? opt_csvSettings : {};
+  var rowsSeparator = settings['rowsSeparator'] || '\n';
+  this.checkSeparator(rowsSeparator);
+  var columnsSeparator = settings['columnsSeparator'] || ',';
+  this.checkSeparator(columnsSeparator);
+  var ignoreFirstRow = settings['ignoreFirstRow'] || false;
+
+  var plot;
+  var i, j, k;
+  var len;
+  var series;
+  var seriesList;
+  var seriesListLength;
+  var seriesData;
+  var seriesDataTable;
+  var uid;
+  var storage;
+  var storages;
+
+  storages = {};
+  var storagesCount = 0;
+  for (k = 0, len = this.plots_.length; k < len; k++) {
+    plot = this.plots_[k];
+    seriesList = plot.getAllSeries();
+    seriesListLength = seriesList.length;
+
+    for (i = 0; i < seriesListLength; i++) {
+      series = seriesList[i];
+      seriesData = series.getSelectableData();
+      seriesDataTable = seriesData.getMapping().getTable();
+      storage = seriesDataTable.getStorage();
+      uid = goog.getUid(storage);
+      if (!(uid in storages)) {
+        storages[uid] = storage;
+        storagesCount++;
+      }
+    }
+  }
+
+  var csvHeaders;
+  var header;
+  var headers;
+  var headersLength = 0;
+  var columnToIndex;
+  var csvStrings;
+  var finalValue;
+  var value;
+
+  if (rawData) {
+    var needCountStorages = storagesCount > 1;
+    headers = {};
+    if (needCountStorages) {
+      headers['#'] = headersLength++;
+    }
+
+    for (uid in storages) {
+      storage = storages[uid];
+      headersLength = this.extractHeaders(storage, headers, headersLength);
+    }
+
+    csvStrings = [];
+
+    if (!ignoreFirstRow) {
+      csvHeaders = [];
+      for (header in headers)
+        csvHeaders[headers[header]] = header;
+      csvStrings.push(csvHeaders.join(columnsSeparator));
+    }
+
+    var storageNumber = 0;
+    var column, columnIndex;
+    for (uid in storages) {
+      storage = storages[uid];
+
+      for (i = 0, len = storage.getRowsCount(); i < len; i++) {
+        var csvRow = new Array(headersLength);
+        var row = storage.getRow(i).values;
+        for (column in row) {
+          columnIndex = headers[column];
+          finalValue = goog.isObject(row[column]) ? goog.json.serialize(row[column]) : row[column];
+          csvRow[columnIndex] = finalValue;
+        }
+        if (needCountStorages)
+          csvRow[0] = storageNumber;
+        this.escapeValuesInRow(csvRow, columnsSeparator, rowsSeparator);
+        csvStrings.push(csvRow.join(columnsSeparator));
+      }
+      storageNumber++;
+    }
+    return csvStrings.join(rowsSeparator);
+  } else {
+    var plotPrefix;
+    var seriesPrefix;
+    var x;
+    var fields, field;
+    var csvRows = {};
+    csvHeaders = [];
+    headers = [];
+    var prefixed;
+    if (groupedData) {
+      csvHeaders.push('x');
+      for (k = 0, len = this.plots_.length; k < len; k++) {
+        plotPrefix = this.plots_.length > 1 ? ('plot_' + k + '_') : '';
+        plot = this.plots_[k];
+        seriesList = plot.getAllSeries();
+        seriesListLength = seriesList.length;
+
+        for (i = 0; i < seriesListLength; i++) {
+          seriesPrefix = seriesListLength > 1 ? ('series_' + i + '_') : '';
+          series = seriesList[i];
+          seriesData = series.getSelectableData();
+          headers = [];
+          fields = seriesData.getMapping().getFieldsInternal();
+          for (field in fields) {
+            headers.push(plotPrefix + seriesPrefix + field);
+          }
+          csvHeaders = goog.array.concat(csvHeaders, headers);
+        }
+      }
+
+      columnToIndex = {};
+      for (i = 0, len = csvHeaders.length; i < len; i++) {
+        columnToIndex[csvHeaders[i]] = i;
+      }
+
+      var mapping;
+      csvRows = {};
+      for (k = 0, len = this.plots_.length; k < len; k++) {
+        plotPrefix = this.plots_.length > 1 ? ('plot_' + k + '_') : '';
+        plot = this.plots_[k];
+        seriesList = plot.getAllSeries();
+        seriesListLength = seriesList.length;
+        seriesPrefix = seriesListLength > 1 ? 'series_' : '';
+
+        for (i = 0; i < seriesListLength; i++) {
+          seriesPrefix = seriesListLength > 1 ? ('series_' + i + '_') : '';
+          series = seriesList[i];
+          seriesData = series.getSelectableData();
+          mapping = seriesData.getMapping();
+          fields = mapping.getFieldsInternal();
+
+          var iterator = seriesData.getExportingIterator();
+          while (iterator.advance()) {
+            x = iterator.getKey();
+
+            if (!csvRows[x]) {
+              csvRows[x] = new Array(csvHeaders.length);
+              csvRows[x][0] = x;
+            }
+            for (field in fields) {
+              prefixed = plotPrefix + seriesPrefix + field;
+              columnIndex = columnToIndex[prefixed];
+              value = iterator.get(field);
+              finalValue = goog.isObject(value) ? goog.json.serialize(value) : value;
+              csvRows[x][columnIndex] = finalValue;
+            }
+          }
+        }
+      }
+      // show grouped data
+      // join by X
+      // all columns in mapping
+    } else {
+      csvHeaders.push('x');
+      headers = {};
+      headersLength = 1;
+      for (k = 0, len = this.plots_.length; k < len; k++) {
+        plotPrefix = this.plots_.length > 1 ? ('plot_' + k + '_') : '';
+        plot = this.plots_[k];
+        seriesList = plot.getAllSeries();
+        seriesListLength = seriesList.length;
+
+        for (i = 0; i < seriesListLength; i++) {
+          seriesPrefix = seriesListLength > 1 ? ('series_' + i + '_') : '';
+          series = seriesList[i];
+          seriesData = series.getSelectableData();
+          storage = seriesData.getMapping().getTable().getStorage();
+          headersLength = this.extractHeaders(storage, headers, headersLength);
+          for (header in headers) {
+            csvHeaders[headers[header]] = plotPrefix + seriesPrefix + header;
+          }
+          headers = {};
+        }
+      }
+
+      var values;
+      for (k = 0, len = this.plots_.length; k < len; k++) {
+        plotPrefix = this.plots_.length > 1 ? ('plot_' + k + '_') : '';
+        plot = this.plots_[k];
+        seriesList = plot.getAllSeries();
+        seriesListLength = seriesList.length;
+
+        for (i = 0; i < seriesListLength; i++) {
+          seriesPrefix = seriesListLength > 1 ? ('series_' + i + '_') : '';
+          series = seriesList[i];
+          seriesData = series.getSelectableData();
+          storage = seriesData.getMapping().getTable().getStorage();
+          for (j = 0; j < storage.getRowsCount(); j++) {
+            row = storage.getRow(j);
+            values = row.values;
+            x = row.key;
+            if (!csvRows[x]) {
+              csvRows[x] = new Array(csvHeaders.length);
+              csvRows[x][0] = x;
+            }
+            for (column in values) {
+              prefixed = plotPrefix + seriesPrefix + column;
+              columnIndex = goog.array.indexOf(csvHeaders, prefixed);
+              finalValue = goog.isObject(values[column]) ? goog.json.serialize(values[column]) : values[column];
+              csvRows[x][columnIndex] = finalValue;
+            }
+          }
+        }
+      }
+      // show all data
+      // join by X
+      // all columns in tables
+    }
+    csvStrings = [];
+    if (!ignoreFirstRow)
+      csvStrings.push(csvHeaders.join(columnsSeparator));
+    if (goog.isArray(csvRows)) {
+      for (i = 0; i < csvRows.length; i++) {
+        this.escapeValuesInRow(csvRows[i], columnsSeparator, rowsSeparator);
+        csvStrings.push(csvRows[i].join(columnsSeparator));
+      }
+    } else {
+      for (row in csvRows) {
+        this.escapeValuesInRow(csvRows[row], columnsSeparator, rowsSeparator);
+        csvStrings.push(csvRows[row].join(columnsSeparator));
+      }
+    }
+    return csvStrings.join(rowsSeparator);
+  }
+};
+
+
 //exports
 goog.exportSymbol('anychart.stock', anychart.stock);
 anychart.charts.Stock.prototype['plot'] = anychart.charts.Stock.prototype.plot;
@@ -1151,3 +1410,4 @@ anychart.charts.Stock.prototype['xScale'] = anychart.charts.Stock.prototype.xSca
 anychart.charts.Stock.prototype['selectRange'] = anychart.charts.Stock.prototype.selectRange;
 anychart.charts.Stock.prototype['getType'] = anychart.charts.Stock.prototype.getType;
 anychart.charts.Stock.prototype['legend'] = anychart.charts.Stock.prototype.legend;
+anychart.charts.Stock.prototype['toCsv'] = anychart.charts.Stock.prototype.toCsv;

@@ -412,6 +412,15 @@ anychart.data.Set.prototype.getRowMapping = function(rowIndex) {
 
 
 /**
+ * Returns self.
+ * @return {Array.<anychart.data.Set>}
+ */
+anychart.data.Set.prototype.getDataSets = function() {
+  return [this];
+};
+
+
+/**
  * Return instance of class {@link anychart.data.Set}.
  * @example <t>lineChart</t>
  * var data = anychart.data.set([

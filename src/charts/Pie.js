@@ -4700,3 +4700,4 @@ anychart.charts.Pie.prototype['hover'] = anychart.charts.Pie.prototype.hover;
 anychart.charts.Pie.prototype['unhover'] = anychart.charts.Pie.prototype.unhover;
 anychart.charts.Pie.prototype['forceHoverLabels'] = anychart.charts.Pie.prototype.forceHoverLabels;
 anychart.charts.Pie.prototype['getPoint'] = anychart.charts.Pie.prototype.getPoint;
+anychart.charts.Pie.prototype['toCsv'] = anychart.charts.Pie.prototype.toCsv;

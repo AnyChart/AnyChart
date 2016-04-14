@@ -345,6 +345,15 @@ anychart.data.View.prototype.getRowMapping = function(rowIndex) {
 
 
 /**
+ * Returns parent dataset.
+ * @return {Array.<anychart.data.Set>} Parent data set.
+ */
+anychart.data.View.prototype.getDataSets = function() {
+  return this.parentView.getDataSets();
+};
+
+
+/**
  * Searches fieldName by fieldValue and returns it index (or the first match).
  * @example
  * var chart = anychart.column();

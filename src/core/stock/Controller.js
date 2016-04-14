@@ -408,14 +408,20 @@ anychart.core.stock.Controller.prototype.refreshFullRangeSources = function(poin
 /**
  * Returns registry iterator if registry is not in sync mode. Internal method.
  * @param {boolean} fullRange
+ * @param {boolean=} opt_exportingData
  * @return {anychart.core.stock.Registry.Iterator}
  */
-anychart.core.stock.Controller.prototype.getCoIterator = function(fullRange) {
+anychart.core.stock.Controller.prototype.getCoIterator = function(fullRange, opt_exportingData) {
   var registry = fullRange ? this.fullRangeRegistry_ : this.currentRegistry_;
-  var selection = fullRange ? this.fullRangeSelection_ : this.currentSelection_;
-  return registry.isInSyncMode() ?
-      null :
-      registry.getIteratorFast(selection.firstIndex, selection.lastIndex);
+  if (registry.isInSyncMode())
+    return null;
+  var selection;
+  if (opt_exportingData) {
+    return registry.getIteratorFast(registry.getFirstIndex(), registry.getLastIndex());
+  } else {
+    selection = fullRange ? this.fullRangeSelection_ : this.currentSelection_;
+    return registry.getIteratorFast(selection.firstIndex, selection.lastIndex);
+  }
 };
 
 

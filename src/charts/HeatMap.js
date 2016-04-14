@@ -1036,7 +1036,7 @@ anychart.charts.HeatMap.prototype.createSeries_ = function(data, opt_csvSettings
   this.registerDisposable(instance);
   this.series_ = instance;
   instance.setChart(this);
-  instance.index(0);
+  instance.index(0).id(0);
   var seriesZIndex = anychart.charts.HeatMap.ZINDEX_SERIES;
   instance.setAutoZIndex(seriesZIndex);
   instance.labels().setAutoZIndex(seriesZIndex + anychart.charts.HeatMap.ZINDEX_INCREMENT_MULTIPLIER / 2);

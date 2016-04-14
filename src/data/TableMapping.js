@@ -64,6 +64,16 @@ anychart.data.TableMapping.Field;
 
 
 /**
+ * Gets field descriptors hash map.
+ * Internal use only.
+ * @return {!Object.<string, !anychart.data.TableMapping.Field>}
+ */
+anychart.data.TableMapping.prototype.getFieldsInternal = function() {
+  return this.fields_;
+};
+
+
+/**
  * Returns new selectable object for the mapping.
  * @return {!anychart.data.TableSelectable}
  */

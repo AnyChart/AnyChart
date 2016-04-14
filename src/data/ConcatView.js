@@ -45,6 +45,14 @@ anychart.data.ConcatView.prototype.getRowMapping = function(rowIndex) {
 
 
 /** @inheritDoc */
+anychart.data.ConcatView.prototype.getDataSets = function() {
+  var dataSet1 = this.parentView.getDataSets();
+  var dataSet2 = this.secondView_.getDataSets();
+  return goog.array.concat(dataSet1, dataSet2);
+};
+
+
+/** @inheritDoc */
 anychart.data.ConcatView.prototype.row = function(rowIndex, opt_value) {
   var count = this.parentView.getRowsCount();
   if (rowIndex < count)

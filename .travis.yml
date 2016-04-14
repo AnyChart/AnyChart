@@ -17,5 +17,4 @@ after_success:
 notifications:
   slack: anychart-team:sJRPhNn8Ur8yVdhvhgp6EbDM
   webhooks:
-  - https://integram.org/hkwgksh3usqogp7j4
-
+    - https://integram.org/hkwgksh3usqogp7j4
