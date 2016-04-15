@@ -1,36 +1,32 @@
-goog.provide('anychart.core.calculations.ema');
-goog.require('anychart.core.calculations.CycledQueue');
+goog.provide('anychart.math.ema');
+goog.require('anychart.math.CycledQueue');
 goog.require('anychart.utils');
-
-/**
- * @namespace {anychart.core.calculations}
- */
 
 
 /**
  * @typedef {{
- *    queue: !anychart.core.calculations.CycledQueue,
+ *    queue: !anychart.math.CycledQueue,
  *    period: number,
  *    prevResult: number,
  *    dispose: Function
  * }}
  */
-anychart.core.calculations.ema.Context;
+anychart.math.ema.Context;
 
 
 /**
  * Creates context for EMA indicator calculation.
  * @param {number=} opt_period Defaults to 20.
- * @return {anychart.core.calculations.ema.Context}
+ * @return {anychart.math.ema.Context}
  */
-anychart.core.calculations.ema.initContext = function(opt_period) {
+anychart.math.ema.initContext = function(opt_period) {
   var period = anychart.utils.normalizeToNaturalNumber(opt_period, 20, false);
   return {
-    queue: anychart.core.calculations.cycledQueue(period),
+    queue: anychart.math.cycledQueue(period),
     period: period,
     prevResult: NaN,
     /**
-     * @this {anychart.core.calculations.ema.Context}
+     * @this {anychart.math.ema.Context}
      */
     'dispose': function() {
       this.queue.clear();
@@ -41,10 +37,10 @@ anychart.core.calculations.ema.initContext = function(opt_period) {
 
 /**
  * Start calculation function for EMA indicator calculation.
- * @param {anychart.core.calculations.ema.Context} context
- * @this {anychart.core.calculations.ema.Context}
+ * @param {anychart.math.ema.Context} context
+ * @this {anychart.math.ema.Context}
  */
-anychart.core.calculations.ema.startFunction = function(context) {
+anychart.math.ema.startFunction = function(context) {
   context.queue.clear();
   context.prevResult = NaN;
 };
@@ -53,10 +49,10 @@ anychart.core.calculations.ema.startFunction = function(context) {
 /**
  * Calculates EMA.
  * @param {anychart.data.TableComputer.RowProxy} row
- * @param {anychart.core.calculations.ema.Context} context
- * @this {anychart.core.calculations.ema.Context}
+ * @param {anychart.math.ema.Context} context
+ * @this {anychart.math.ema.Context}
  */
-anychart.core.calculations.ema.calculationFunction = function(row, context) {
+anychart.math.ema.calculationFunction = function(row, context) {
   var currValue = anychart.utils.toNumber(row.get('value'));
   var missing = isNaN(currValue);
   if (!missing)
@@ -87,18 +83,18 @@ anychart.core.calculations.ema.calculationFunction = function(row, context) {
  * @param {number=} opt_period
  * @return {anychart.data.TableComputer}
  */
-anychart.core.calculations.ema.createComputer = function(mapping, opt_period) {
+anychart.math.ema.createComputer = function(mapping, opt_period) {
   var result = mapping.getTable().createComputer(mapping);
-  result.setContext(anychart.core.calculations.ema.initContext(opt_period));
-  result.setStartFunction(anychart.core.calculations.ema.startFunction);
-  result.setCalculationFunction(anychart.core.calculations.ema.calculationFunction);
+  result.setContext(anychart.math.ema.initContext(opt_period));
+  result.setStartFunction(anychart.math.ema.startFunction);
+  result.setCalculationFunction(anychart.math.ema.calculationFunction);
   result.addOutputField('result');
   return result;
 };
 
 
 //exports
-goog.exportSymbol('anychart.core.calculations.ema.initContext', anychart.core.calculations.ema.initContext);
-goog.exportSymbol('anychart.core.calculations.ema.startFunction', anychart.core.calculations.ema.startFunction);
-goog.exportSymbol('anychart.core.calculations.ema.calculationFunction', anychart.core.calculations.ema.calculationFunction);
-goog.exportSymbol('anychart.core.calculations.ema.createComputer', anychart.core.calculations.ema.createComputer);
+goog.exportSymbol('anychart.math.ema.initContext', anychart.math.ema.initContext);
+goog.exportSymbol('anychart.math.ema.startFunction', anychart.math.ema.startFunction);
+goog.exportSymbol('anychart.math.ema.calculationFunction', anychart.math.ema.calculationFunction);
+goog.exportSymbol('anychart.math.ema.createComputer', anychart.math.ema.createComputer);
