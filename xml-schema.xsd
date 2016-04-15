@@ -309,6 +309,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="credits" type="core.Credits"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="chart_labels" type="core.Label_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="animation" type="utils.Animation"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="crs_animation" type="utils.Animation"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="interactivity" type="utils.MapInteractivity"/>
             <!-- Common elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="data" type="Data"/>
@@ -340,6 +341,7 @@
         <xsd:attribute name="max_bubble_size" type="simple.NumberOrPercent" default="20%"/>
         <xsd:attribute name="geo_id_field" type="xsd:string"/>
         <xsd:attribute name="geo_data" type="xsd:string"/>
+        <xsd:attribute name="crs" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:complexType name="Series">

@@ -48,3 +48,11 @@ anychart.animations.MapAnimation.prototype.onEnd = function() {
     this.map.mapAnimationController.updateStatus(anychart.animations.MapAnimationController.Status.FINISH);
   anychart.animations.MapAnimation.base(this, 'onEnd');
 };
+
+
+/** @inheritDoc */
+anychart.animations.MapAnimation.prototype.disposeInternal = function() {
+  anychart.animations.MapAnimation.base(this, 'disposeInternal');
+
+  this.map = null;
+};

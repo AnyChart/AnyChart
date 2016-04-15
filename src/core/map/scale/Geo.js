@@ -351,6 +351,7 @@ anychart.core.map.scale.Geo.prototype.extendDataRangeY = function(var_args) {
   for (var i = 0; i < arguments.length; i++) {
     var value = +arguments[i];
     if (isNaN(value)) value = parseFloat(arguments[i]);
+
     if (value < this.dataRangeMinY) {
       this.dataRangeMinY = value;
       this.consistent = false;
@@ -397,6 +398,7 @@ anychart.core.map.scale.Geo.prototype.needsAutoCalc = function() {
  */
 anychart.core.map.scale.Geo.prototype.calculate = function() {
   if (this.consistent || !this.bounds_) return;
+
   this.consistent = true;
   this.determineScaleMinMax();
 
@@ -532,7 +534,9 @@ anychart.core.map.scale.Geo.prototype.pickTx = function(lon, lat) {
 
   var txName = goog.object.findKey(this.tx, function(value, key) {
     if (key != 'default' && value.heatZone) {
-      var projected = window['proj4'](value.crs || defaultTx.crs).forward([lon, lat]);
+
+      var proj = value.curProj || defaultTx.curProj;
+      var projected = proj.forward(lon, lat);
 
       var x = projected[0] * (value.scale || defaultTx.scale);
       var y = projected[1] * (value.scale || defaultTx.scale);
@@ -564,28 +568,29 @@ anychart.core.map.scale.Geo.prototype.pickTx = function(lon, lat) {
 anychart.core.map.scale.Geo.prototype.transform = function(lon, lat) {
   this.calculate();
 
-  if (!this.bounds_)
+  if (!this.bounds_ || isNaN(lon) || isNaN(lat))
     return [NaN, NaN];
 
   lat = anychart.utils.toNumber(lat);
   lon = anychart.utils.toNumber(lon) % 180;
 
   var tx = this.pickTx(lon, lat);
-  var projected = window['proj4'](tx.crs).forward([lon, lat]);
+
+  var defaultTx = this.tx['default'];
+  var proj = tx.curProj || defaultTx.curProj;
+  var projected = proj.forward(lon, lat);
   var scale = tx.scale;
 
-  lon = projected[0] * scale;
-  lat = projected[1] * scale;
+  lon = projected[0] * scale + (tx.xoffset || 0);
+  lat = projected[1] * scale + (tx.yoffset || 0);
 
-  lon += tx.xoffset || 0;
-  lat += tx.yoffset || 0;
 
   var transformX = (+(/** @type {number} */(lon)) - this.minX) * this.ratio;
   var transformY = (+(/** @type {number} */(lat)) - this.minY) * this.ratio;
 
-  var resultX = (this.isInvertedX ?
+  var resultX = this.isInvertedX ?
       this.bounds_.getRight() - this.centerOffsetX - transformX :
-      this.bounds_.left + this.centerOffsetX + transformX);
+      this.bounds_.left + this.centerOffsetX + transformX;
 
   var minPx = this.bounds_.left + this.centerOffsetX;
   var maxPx = minPx + this.rangeX * this.ratio;
@@ -613,7 +618,7 @@ anychart.core.map.scale.Geo.prototype.transform = function(lon, lat) {
 anychart.core.map.scale.Geo.prototype.inverseTransform = function(x, y) {
   this.calculate();
 
-  if (!this.bounds_)
+  if (!this.bounds_ || isNaN(x) || isNaN(y))
     return [NaN, NaN];
 
   x = anychart.utils.toNumber(x);
@@ -654,8 +659,11 @@ anychart.core.map.scale.Geo.prototype.inverseTransform = function(x, y) {
 
   var scale = tx.scale || defaultTx.scale;
   var crs = tx.crs || defaultTx.crs;
+  var proj = tx.curProj || defaultTx.curProj;
 
-  var projected = window['proj4'](crs).inverse([resultX / scale, resultY / scale]);
+  var projected = crs ?
+      proj.invert(resultX / scale, resultY / scale) :
+      [resultX / scale, resultY / scale];
 
   return [projected[0], projected[1]];
 };

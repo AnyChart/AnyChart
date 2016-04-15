@@ -2745,6 +2745,10 @@ window['anychart']['themes']['defaultTheme'] = {
       },
       'drag': true,
       'mouseWheel': true
+    },
+    'crsAnimation': {
+      'enabled': true,
+      'duration': 300
     }
   },
   // merge with map

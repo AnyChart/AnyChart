@@ -1,0 +1,43 @@
+<html>
+<head>
+    <title>source</title>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+
+    <script src="../../../contrib/closure-library/closure/goog/base.js"></script>
+    <script src="../../../src/deps.js"></script>
+    <script>
+        goog.require('anychart.themes.defaultTheme');
+        goog.require('anychart.modules.anymap');
+    </script>
+    <script src="proj4.src.js"></script>
+
+    <script src="world.js"></script>
+    <!--<script src="australia.js"></script>-->
+
+    <script src="http://cdn.anychart.com/geodata/1.1.0/countries/france/france.js"></script>
+    <script src="http://cdn.anychart.com/geodata/1.1.0/countries/australia/australia.js"></script>
+    <!--<script src="http://cdn.anychart.com/geodata/1.1.0/custom/world/world.js"></script>-->
+    <script src="http://cdn.anychart.com/geodata/1.1.0/countries/united_states_of_america/united_states_of_america.js"></script>
+
+    <script src="//d3js.org/d3.v3.min.js"></script>
+    <script src="//d3js.org/d3.geo.projection.v0.min.js"></script>
+
+    <script src="index.js"></script>
+    <style>
+        html, body, #container {
+            width: 100%;
+            height: 98%;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="projections"></div>
+<div id="container"></div>
+</body>
+</html>
+
+
+
+

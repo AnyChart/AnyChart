@@ -19,12 +19,6 @@ anychart.core.map.series.Choropleth = function(opt_data, opt_csvSettings) {
   this.referenceValueNames = ['id', 'value'];
   this.referenceValueMeanings = ['x', 'y'];
   this.needSelfLayer = false;
-
-  /**
-   * @type {Array}
-   * @private
-   */
-  this.points_ = [];
 };
 goog.inherits(anychart.core.map.series.Choropleth, anychart.core.map.series.BaseWithMarkers);
 anychart.core.map.series.Base.SeriesTypesMap[anychart.enums.MapSeriesType.CHOROPLETH] = anychart.core.map.series.Choropleth;
@@ -212,7 +206,6 @@ anychart.core.map.series.Choropleth.prototype.calculate = function() {
           if (!geom) continue;
           var prop = geom['properties'];
           if (prop[this.getFinalGeoIdField()] == name) {
-            this.points_.push(geom);
             //todo (blackart) Don't remove it for the time.
             if (geom.domElement) this.bindHandlersToGraphics(geom.domElement);
             iterator.meta('regionShape', geom.domElement).meta('regionProperties', prop);
@@ -248,10 +241,6 @@ anychart.core.map.series.Choropleth.prototype.startDrawing = function() {
       this.hatchFillRootElement.disablePointerEvents(true);
     }
     if (this.hatchFillRootElement) this.hatchFillRootElement.clear();
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.points_.length = 0;
   }
 };
 

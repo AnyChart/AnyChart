@@ -1910,6 +1910,85 @@ anychart.enums.normalizeMapSeriesType = function(value, opt_default) {
 };
 
 
+/**
+ * List of names of common map projections.
+ * @enum {string}
+ */
+anychart.enums.MapProjections = {
+  BONNE: 'bonne',
+  ECKERT1: 'eckert1',
+  ECKERT3: 'eckert3',
+  FAHEY: 'fahey',
+  HAMMER: 'hammer',
+  AITOFF: 'aitoff',
+  MERCATOR: 'mercator',
+  ORTHOGRAPHIC: 'orthographic',
+  ROBINSON: 'robinson',
+  WAGNER6: 'wagner6',
+  WSG84: 'wsg84',
+  EQUIRECTANGULAR: 'equirectangular',
+  AUGUST: 'august'
+};
+
+
+/**
+ * Normalizes map projections names.
+ * @param {*} value Projection name to normalize.
+ * @return {Object|Function|anychart.enums.MapProjections|string}
+ */
+anychart.enums.normalizeMapProjections = function(value) {
+  switch (String(value).toLowerCase()) {
+    case 'bonne':
+      return anychart.enums.MapProjections.BONNE;
+      break;
+    case 'eckert1':
+      return anychart.enums.MapProjections.ECKERT1;
+      break;
+    case 'eckert3':
+      return anychart.enums.MapProjections.ECKERT3;
+      break;
+    case 'fahey':
+      return anychart.enums.MapProjections.FAHEY;
+      break;
+    case 'hammeraitoff':
+    case 'hammer-aitoff':
+    case 'hammer':
+      return anychart.enums.MapProjections.HAMMER;
+      break;
+    case 'aitoff':
+      return anychart.enums.MapProjections.AITOFF;
+      break;
+    case 'mercator':
+      return anychart.enums.MapProjections.MERCATOR;
+      break;
+    case 'orthographic':
+      return anychart.enums.MapProjections.ORTHOGRAPHIC;
+      break;
+    case 'robinson':
+      return anychart.enums.MapProjections.ROBINSON;
+      break;
+    case 'wagner':
+    case 'wagner6':
+      return anychart.enums.MapProjections.WAGNER6;
+      break;
+    case 'undefined':
+    case 'null':
+    case 'none':
+    case 'wsg84':
+    case 'base':
+      return anychart.enums.MapProjections.WSG84;
+      break;
+    case 'equirectangular':
+      return anychart.enums.MapProjections.EQUIRECTANGULAR;
+      break;
+    case 'august':
+      return anychart.enums.MapProjections.AUGUST;
+      break;
+  }
+  return /** @type {Object|Function|anychart.enums.MapProjections|string} */(value);
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  CartesianSeriesTypes
@@ -3420,6 +3499,20 @@ goog.exportSymbol('anychart.enums.MarkerType.LINE', anychart.enums.MarkerType.LI
 goog.exportSymbol('anychart.enums.MapAsTableMode.VALUE', anychart.enums.MapAsTableMode.VALUE);//doc
 goog.exportSymbol('anychart.enums.MapAsTableMode.RANGE', anychart.enums.MapAsTableMode.RANGE);//doc
 goog.exportSymbol('anychart.enums.MapAsTableMode.OHLC', anychart.enums.MapAsTableMode.OHLC);//doc
+
+goog.exportSymbol('anychart.enums.MapProjections.BONNE', anychart.enums.MapProjections.BONNE);
+goog.exportSymbol('anychart.enums.MapProjections.AITOFF', anychart.enums.MapProjections.AITOFF);
+goog.exportSymbol('anychart.enums.MapProjections.AUGUST', anychart.enums.MapProjections.AUGUST);
+goog.exportSymbol('anychart.enums.MapProjections.ECKERT1', anychart.enums.MapProjections.ECKERT1);
+goog.exportSymbol('anychart.enums.MapProjections.ECKERT3', anychart.enums.MapProjections.ECKERT3);
+goog.exportSymbol('anychart.enums.MapProjections.EQUIRECTANGULAR', anychart.enums.MapProjections.EQUIRECTANGULAR);
+goog.exportSymbol('anychart.enums.MapProjections.FAHEY', anychart.enums.MapProjections.FAHEY);
+goog.exportSymbol('anychart.enums.MapProjections.HAMMER', anychart.enums.MapProjections.HAMMER);
+goog.exportSymbol('anychart.enums.MapProjections.MERCATOR', anychart.enums.MapProjections.MERCATOR);
+goog.exportSymbol('anychart.enums.MapProjections.ORTHOGRAPHIC', anychart.enums.MapProjections.ORTHOGRAPHIC);
+goog.exportSymbol('anychart.enums.MapProjections.ROBINSON', anychart.enums.MapProjections.ROBINSON);
+goog.exportSymbol('anychart.enums.MapProjections.WAGNER6', anychart.enums.MapProjections.WAGNER6);
+goog.exportSymbol('anychart.enums.MapProjections.WSG84', anychart.enums.MapProjections.WSG84);
 
 goog.exportSymbol('anychart.enums.TreeFillingMethod.AS_TREE', anychart.enums.TreeFillingMethod.AS_TREE);
 goog.exportSymbol('anychart.enums.TreeFillingMethod.AS_TABLE', anychart.enums.TreeFillingMethod.AS_TABLE);

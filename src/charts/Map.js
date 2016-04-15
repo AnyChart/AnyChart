@@ -3,14 +3,18 @@ goog.provide('anychart.charts.Map');
 goog.require('acgraph.events.MouseWheelHandler');
 goog.require('anychart'); // otherwise we can't use anychart.chartTypesMap object.
 goog.require('anychart.animations.MapAnimationController');
+goog.require('anychart.animations.MapCrsAnimation');
 goog.require('anychart.animations.MapMoveAnimation');
 goog.require('anychart.animations.MapZoomAnimation');
 goog.require('anychart.core.MapPoint');
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.map.geom');
+goog.require('anychart.core.map.projections');
+goog.require('anychart.core.map.projections.TwinProjection');
 goog.require('anychart.core.map.scale.Geo');
 goog.require('anychart.core.map.series.Base');
 goog.require('anychart.core.ui.ColorRange');
+goog.require('anychart.core.utils.Animation');
 goog.require('anychart.core.utils.MapInteractivity');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.core.utils.UnboundRegionsSettings');
@@ -34,10 +38,30 @@ anychart.charts.Map = function() {
   anychart.charts.Map.base(this, 'constructor');
 
   /**
-   * Internal represent of geo data.
+   * Custom crs passed to crs() method.
+   * @type {Object|Function|anychart.enums.MapProjections|string}
+   * @private
+   */
+  this.crs_ = null;
+
+  /**
+   * Current crs of current view.
+   * @type {?string}
+   * @private
+   */
+  this.currentCrs_ = null;
+
+  /**
+   * Source geo data.
    * @type {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>}
    */
-  this.internalGeoData = [];
+  this.internalSourceGeoData = [];
+
+  /**
+   * Internal represent of geo data.
+   * @type {?Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>}
+   */
+  this.internalGeoData = null;
 
   /**
    *
@@ -383,14 +407,9 @@ anychart.charts.Map = function() {
         goog.events.unlisten(document, [goog.events.EventType.POINTERMOVE, goog.events.EventType.TOUCHMOVE], this.touchMoveHandler, false, this);
         this.updateSeriesOnZoomOrMove();
       };
-      this.mapMouseEnterHandler_ = function(e) {
-        this.mouseOverChart = true;
-        goog.events.listen(document, goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, false, this);
-        goog.events.listen(document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, false, this);
-      };
+
       this.mapMouseLeaveHandler_ = function(e) {
         if (!this.drag_) {
-          this.mouseOverChart = false;
           goog.events.unlisten(document, goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, false, this);
           goog.events.unlisten(document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, false, this);
         }
@@ -403,7 +422,7 @@ anychart.charts.Map = function() {
       this.touchDist = 0;
       goog.events.listen(this.container().getStage().container(), [goog.events.EventType.POINTERUP, goog.events.EventType.TOUCHEND], this.mapTouchEndHandler_, false, this);
 
-
+      var startX, startY;
       this.listen(goog.events.EventType.MOUSEDOWN, function(e) {
         var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
         var bounds = this.getPlotBounds();
@@ -419,6 +438,9 @@ anychart.charts.Map = function() {
           startX = e.clientX;
           startY = e.clientY;
           this.drag_ = true;
+
+          goog.events.listen(document, goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, true, this);
+          goog.events.listen(document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, true, this);
         }
       }, false, this);
       this.mouseMoveHandler = function(e) {
@@ -438,15 +460,9 @@ anychart.charts.Map = function() {
         goog.style.setStyle(document['body'], 'cursor', '');
         this.drag_ = false;
 
-        if (!this.mouseOverChart) {
-          goog.events.unlisten(document, goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, false, this);
-          goog.events.unlisten(document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, false, this);
-        }
+        goog.events.unlisten(document, goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, true, this);
+        goog.events.unlisten(document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, true, this);
       };
-
-      var startX, startY;
-      goog.events.listen(this.container().getStage().container(), goog.events.EventType.MOUSEENTER, this.mapMouseEnterHandler_, false, this);
-
 
       goog.events.listen(this.container().getStage().container(), goog.events.EventType.MOUSELEAVE, this.mapMouseLeaveHandler_, false, this);
     } else {
@@ -546,7 +562,7 @@ anychart.charts.Map.TIMINGS = {
  */
 anychart.charts.Map.DEFAULT_TX = {
   'default': {
-    'crs': '+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs',
+    'crs': '+proj=longlat +datum=WGS84 +no_defs',
     'scale': 1
   }
 };
@@ -851,22 +867,6 @@ anychart.charts.Map.prototype.onMouseDown = function(event) {
     }
   } else {
     anychart.charts.Map.base(this, 'onMouseDown', event);
-  }
-};
-
-
-/** @inheritDoc */
-anychart.charts.Map.prototype.handleMouseOverAndMove = function(event) {
-  if (!this.drag_) {
-    anychart.charts.Map.base(this, 'handleMouseOverAndMove', event);
-  }
-};
-
-
-/** @inheritDoc */
-anychart.charts.Map.prototype.handleMouseOut = function(event) {
-  if (!this.drag_) {
-    anychart.charts.Map.base(this, 'handleMouseOut', event);
   }
 };
 
@@ -1328,7 +1328,8 @@ anychart.charts.Map.prototype.createSeriesByType_ = function(type, data, opt_csv
     instance.labels().setAutoZIndex(anychart.charts.Map.ZINDEX_LABEL + inc + anychart.charts.Map.ZINDEX_INCREMENT_MULTIPLIER / 2);
 
     instance.setAutoGeoIdField(this.geoIdField());
-    instance.setGeoData(this, this.internalGeoData);
+    if (this.internalGeoData)
+      instance.setGeoData(this, this.internalGeoData);
     instance.setAutoColor(this.palette().itemAt(index));
     instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(index)));
     instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
@@ -1715,35 +1716,78 @@ anychart.charts.Map.prototype.drawGeom_ = function(coords, index, geom) {
  * @param {Array.<number>} coords Array of coords.
  * @param {number} index Current index.
  * @param {anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon} geom Geom object.
+ * @this {{
+ *    tx: Object,
+ *    projection1: anychart.core.map.projections.Base,
+ *    projection2: anychart.core.map.projections.Base,
+ *    geoScale: anychart.core.map.scale.Geo
+ * }}
  * @private
  */
 anychart.charts.Map.prototype.calcGeom_ = function(coords, index, geom) {
-  this.scale().extendDataRangeX(coords[index]);
-  this.scale().extendDataRangeY(coords[index + 1]);
+  var x, y, projected;
+
+  if (this.projection2) {
+    x = ((coords[index] - this.tx.xoffset) / this.tx.scale);
+    y = ((coords[index + 1] - this.tx.yoffset) / this.tx.scale);
+
+    if (this.projection1) {
+      projected = this.projection1.invert(x, y);
+      x = projected[0];
+      y = projected[1];
+    }
+
+    projected = this.projection2.forward(x, y);
+
+    coords[index] = projected[0] * this.tx.scale + this.tx.xoffset;
+    coords[index + 1] = projected[1] * this.tx.scale + this.tx.yoffset;
+  }
+
+  var geoScale = this.geoScale;
+
+  geoScale.extendDataRangeX(coords[index]);
+  geoScale.extendDataRangeY(coords[index + 1]);
 };
 
 
 /**
  * Draw geometry.
  * @param {anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon} geom Geometry.
- * @param {function(
- *            this: anychart.charts.Map,
- *            Array.<number>,
- *            number,
- *            (anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon)
- *         )} callBack DOM element.
+ * @param {Function} callBack DOM element.
+ * @param {anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon=} opt_output Output object for clone geometry.
+ * @param {boolean=} opt_initGeoData .
  * @private
  */
-anychart.charts.Map.prototype.iterateGeometry_ = function(geom, callBack) {
+anychart.charts.Map.prototype.iterateGeometry_ = function(geom, callBack, opt_output, opt_initGeoData) {
   var j, k, m, geomsLen, pointsLen;
+  var polygones_, polygone_, holes_;
+
   if (!geom) return;
   if (goog.object.containsKey(geom, 'polygones')) {
     var polygones = geom['polygones'];
     geomsLen = polygones.length;
+    if (opt_initGeoData)
+      polygones_ = [];
+    else if (opt_output)
+      polygones_ = opt_output['polygones'];
+
     for (j = 0; j < geomsLen; j++) {
       var polygone = polygones[j];
       var outerPath = polygone['outerPath'];
       var holes = polygone['holes'];
+
+      if (opt_initGeoData) {
+        outerPath = goog.array.clone(outerPath);
+        polygone_ = {
+          'outerPath': outerPath,
+          'holes': []
+        };
+      } else if (opt_output) {
+        polygone_ = polygones_[j];
+        outerPath = polygone_['outerPath'] = goog.array.clone(outerPath);
+        holes_ = polygone_['holes'];
+      }
+
       pointsLen = outerPath.length;
       for (k = 0; k < pointsLen - 1; k += 2) {
         callBack.call(this, outerPath, k, geom);
@@ -1752,26 +1796,106 @@ anychart.charts.Map.prototype.iterateGeometry_ = function(geom, callBack) {
       pointsLen = holes.length;
       for (k = 0; k < pointsLen; k++) {
         var hole = holes[k];
+        if (opt_initGeoData) {
+          hole = goog.array.clone(hole);
+          polygone_['holes'].push(hole);
+        } else if (opt_output) {
+          hole = holes_[k] = goog.array.clone(hole);
+        }
+
         for (m = 0; m < hole.length - 1; m += 2) {
           callBack.call(this, hole, m, geom);
         }
       }
+
+      if (opt_initGeoData)
+        polygones_.push(polygone_);
     }
+    if (opt_initGeoData)
+      opt_output['polygones'] = polygones_;
   } else if (goog.object.containsKey(geom, 'paths')) {
     var paths = geom['paths'];
+    var paths_;
     geomsLen = paths.length;
+    if (opt_initGeoData)
+      paths_ = [];
+    else if (opt_output)
+      paths_ = opt_output['paths'];
+
     for (j = 0; j < geomsLen; j++) {
       var path = paths[j];
+
+      if (opt_initGeoData) {
+        path = goog.array.clone(path);
+        paths_.push(path);
+      } else if (opt_output) {
+        path = paths_[j] = goog.array.clone(path);
+      }
+
       pointsLen = path.length;
       for (k = 0; k < pointsLen - 1; k += 2) {
         callBack.call(this, path, k, geom);
       }
     }
+    if (opt_initGeoData)
+      opt_output['paths'] = paths_;
   } else if (goog.object.containsKey(geom, 'coordinates')) {
     var coords = geom['coordinates'];
     pointsLen = coords.length;
+    if (opt_initGeoData) {
+      coords = goog.array.clone(coords);
+      opt_output['coordinates'] = coords;
+    } else if (opt_output) {
+      coords = opt_output['coordinates'] = goog.array.clone(coords);
+    }
     for (k = 0; k < pointsLen - 1; k += 2) {
       callBack.call(this, coords, k, geom);
+    }
+  }
+};
+
+
+/**
+ * Geo data post processing: calc geo scale and change crs if need.
+ * @param {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>} geoData .
+ * @param {Function} callback .
+ * @param {boolean} isInit .
+ * @param {boolean} isChangeCrs .
+ */
+anychart.charts.Map.prototype.postProcessGeoData = function(geoData, callback, isInit, isChangeCrs) {
+  var i, j, len, geom_, geometries_;
+  for (i = 0, len = geoData.length; i < len; i++) {
+    var geom = geoData[i];
+    if (geom) {
+      if (isInit) {
+        geom_ = {};
+        if (goog.object.containsKey(geom, 'properties')) {
+          geom_['properties'] = goog.object.clone(geom['properties']);
+        }
+      } else if (isChangeCrs) {
+        geom_ = this.internalGeoData[i];
+      }
+      if (goog.object.containsKey(geom, 'geometries')) {
+        var geometries = geom['geometries'];
+        if (isInit)
+          geometries_ = [];
+        else if (isChangeCrs)
+          geometries_ = geom_['geometries'];
+        var geomsLen = geometries.length;
+        for (j = 0; j < geomsLen; j++) {
+          var output = isInit ? geometries_[j] = {} : isChangeCrs ? geometries_[j] : null;
+          this.iterateGeometry_(geometries[j], callback, output, isInit);
+        }
+      } else {
+        this.iterateGeometry_(
+            /** @type {anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon} */(geom),
+            /** @type {Function} */(callback),
+            /** @type {anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon} */(geom_),
+            isInit
+        );
+      }
+      if (isInit)
+        this.internalGeoData[i] = /** @type {anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection} */(geom_);
     }
   }
 };
@@ -1785,38 +1909,47 @@ anychart.charts.Map.prototype.drawCredits = function(parentBounds) {
 
 
 /**
- * Geo data processing.
+ * Calculate geo scale.
  */
-anychart.charts.Map.prototype.processGeoData = function() {
+anychart.charts.Map.prototype.calculate = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_GEO_DATA)) {
+
     var geoData = this.geoData();
     if (goog.isDefAndNotNull(geoData)) {
       if ((goog.isString(geoData) && goog.string.startsWith(geoData, '<')) || goog.dom.isNodeLike(geoData)) {
         //todo (blackart): Here will be svg parsing. coming soon ...
       }
-      this.internalGeoData = anychart.utils.GeoJSONParser.getInstance().parse(/** @type {Object} */(geoData));
+      geoData = goog.isString(this.geoData_) ? goog.dom.getWindow()['anychart']['maps'][this.geoData_] : this.geoData_;
+
+      this.internalSourceGeoData = anychart.utils.GeoJSONParser.getInstance().parse(/** @type {Object} */(geoData));
+      goog.dispose(this.internalGeoData);
+      this.internalGeoData = null;
 
       var geoIdFromGeoData = geoData['ac-geoFieldId'];
       if (geoIdFromGeoData)
         this.geoIdField(geoIdFromGeoData);
 
-
       this.mapTX = {};
-      goog.object.forEach(geoData['ac-tx'] || anychart.charts.Map.DEFAULT_TX, function(value, key) {
+
+      var mapTx = geoData['ac-tx'] || {};
+      var defaultTx = mapTx['default'];
+      if (!defaultTx)
+        defaultTx = mapTx['default'] = goog.object.clone(anychart.charts.Map.DEFAULT_TX['default']);
+
+      goog.object.forEach(mapTx || anychart.charts.Map.DEFAULT_TX, function(value, key) {
         var tx_ = {};
 
-        if (goog.isDef(value['crs'])) tx_.crs = value['crs'];
-        if (goog.isDef(value['scale'])) tx_.scale = parseFloat(value['scale']);
-        if (goog.isDef(value['xoffset'])) tx_.xoffset = parseFloat(value['xoffset']);
-        if (goog.isDef(value['yoffset'])) tx_.yoffset = parseFloat(value['yoffset']);
+        tx_.crs = goog.isDef(value['crs']) ? anychart.enums.normalizeMapProjections(value['crs']) : defaultTx.crs;
+        tx_.srcCrs = tx_.crs;
+        tx_.curProj = anychart.core.map.projections.getProjection(tx_.crs);
+        tx_.srcProj = anychart.core.map.projections.getProjection(tx_.srcCrs);
+        tx_.scale = goog.isDef(value['scale']) ? parseFloat(value['scale']) : 1;
+        tx_.xoffset = goog.isDef(value['xoffset']) ? parseFloat(value['xoffset']) : 0;
+        tx_.yoffset = goog.isDef(value['yoffset']) ? parseFloat(value['yoffset']) : 0;
         if (goog.isDef(value['heatZone'])) tx_.heatZone = anychart.math.Rect.fromJSON(value['heatZone']);
 
         this.mapTX[key] = tx_;
       }, this);
-
-      if (!this.mapTX['default'])
-        this.mapTX['default'] = anychart.charts.Map.DEFAULT_TX['default'];
-
 
       if (!this.mapContentLayer_) {
         this.mapContentLayer_ = this.rootElement.layer();
@@ -1851,94 +1984,157 @@ anychart.charts.Map.prototype.processGeoData = function() {
         this.dataLayer_ = this.mapContentLayer_.layer();
       }
 
-      this.invalidate(anychart.ConsistencyState.BOUNDS);
+      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.MAP_SCALE);
     }
 
     this.markConsistent(anychart.ConsistencyState.MAP_GEO_DATA);
   }
-};
-
-
-/**
- * Calculate geo scale.
- */
-anychart.charts.Map.prototype.calculate = function() {
-  this.processGeoData();
 
   var i, series;
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_SCALE)) {
-    var scale = this.scale();
-    scale.startAutoCalc();
-    scale.setTxMap(this.mapTX);
+    if (this.mapTX) {
+      var scale = this.scale();
+      scale.setTxMap(this.mapTX);
 
-    if (this.mapLayer_) {
-      var tx = this.mapLayer_.getSelfTransformation();
-      scale.setMapZoom(tx.getScaleX());
-      scale.setOffsetFocusPoint(tx.getTranslateX(), tx.getTranslateY());
+      if (this.mapLayer_) {
+        var tx = this.mapLayer_.getSelfTransformation();
+        scale.setMapZoom(tx.getScaleX());
+        scale.setOffsetFocusPoint(tx.getTranslateX(), tx.getTranslateY());
 
-      //if (this.zoomLevel() != anychart.charts.Map.ZOOM_MIN_FACTOR) {
-      //scene.zoomInc = anychart.charts.Map.ZOOM_MIN_FACTOR;
-      //}
-    }
+        //if (this.zoomLevel() != anychart.charts.Map.ZOOM_MIN_FACTOR) {
+        //scene.zoomInc = anychart.charts.Map.ZOOM_MIN_FACTOR;
+        //}
+      }
 
-    var j, len;
-    for (i = 0, len = this.internalGeoData.length; i < len; i++) {
-      var geom = this.internalGeoData[i];
-      if (geom) {
-        if (goog.object.containsKey(geom, 'geometries')) {
-          var geometries = geom['geometries'];
-          var geomsLen = geometries.length;
-          for (j = 0; j < geomsLen; j++) {
-            this.iterateGeometry_(geometries[j], this.calcGeom_);
-          }
-        } else {
-          this.iterateGeometry_(
-              /** @type {anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon} */(geom),
-              this.calcGeom_);
+      tx = this.mapTX ? this.mapTX['default'] : null;
+
+      var firstDrawing = !this.currentCrs_;
+      var crs = goog.isNull(this.crs_) ? tx.srcCrs : this.crs_;
+      var initInternalGeoData = !this.internalGeoData;
+
+      this.newCrs_ = null;
+      if (firstDrawing && this.crs_) {
+        this.newCrs_ = this.crs_;
+      } else if ((this.currentCrs_ != tx.crs || this.currentCrs_ != crs) && !firstDrawing) {
+        this.newCrs_ = crs;
+      }
+
+      var changeProjection = !!this.newCrs_;
+
+      var destinationProjection, currentProjection, sourceProjection;
+
+      if ((tx.crs != this.newCrs_ && tx.srcCrs != this.newCrs_) || this.crsAnimation_.enabled()) {
+        if (!anychart.core.map.projections.isBaseProjection(tx.srcCrs)) {
+          sourceProjection = tx.srcProj;
+        }
+        if (changeProjection) {
+          destinationProjection = anychart.core.map.projections.getProjection(this.newCrs_);
         }
       }
-    }
-    scale.finishAutoCalc();
+      currentProjection = tx.curProj;
 
-    var max = -Infinity;
-    var min = Infinity;
-    var sum = 0;
-    var pointsCount = 0;
+      if (firstDrawing) {
+        this.currentCrs_ = crs;
+      }
+      if (changeProjection) {
+        if (this.crsMapAnimation && this.crsMapAnimation.isPlaying()) {
+          this.crsMapAnimation.stop();
+          this.crsMapAnimation.dispose();
+          this.crsMapAnimation = null;
+        }
+        this.currentCrs_ = this.newCrs_;
+        tx.crs = this.currentCrs_;
+        tx.curProj = anychart.core.map.projections.getProjection(tx.crs);
+      }
 
-    for (i = this.series_.length; i--;) {
-      series = this.series_[i];
-      series.setGeoData(this, this.internalGeoData);
-      series.invalidate(anychart.ConsistencyState.SERIES_DATA, anychart.Signal.NEEDS_REDRAW);
+      if (initInternalGeoData) {
+        geoData = this.internalSourceGeoData;
+        this.internalGeoData = [];
+      } else if (changeProjection) {
+        geoData = this.internalSourceGeoData;
+      } else {
+        geoData = this.internalGeoData;
+      }
+
+      if ((this.crsMapAnimation && this.crsMapAnimation.isStopped()) || !this.crsMapAnimation) {
+        var isAnimate = this.crsAnimation_.enabled() && this.crsAnimation_.duration() > 0 && !initInternalGeoData && changeProjection;
+        if (isAnimate) {
+          tx.curProj = new anychart.core.map.projections.TwinProjection(
+              /** @type {anychart.core.map.projections.Base} */(currentProjection),
+              /** @type {anychart.core.map.projections.Base} */(destinationProjection));
+          this.crsMapAnimation = new anychart.animations.MapCrsAnimation(
+              this,
+              /** @type {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>} */(geoData),
+              sourceProjection,
+              tx,
+              /** @type {number} */(this.crsAnimation_.duration()),
+              this != this.getCurrentScene());
+          this.crsMapAnimation.listenOnce(goog.fx.Transition.EventType.END, function(e) {
+            this.crsMapAnimation.stop();
+            this.crsMapAnimation.dispose();
+            tx.curProj = tx.curProj.destProjection;
+          }, true, this);
+          this.crsMapAnimation.play();
+
+        } else {
+          var callback = goog.bind(this.calcGeom_, {
+            tx: tx,
+            projection1: sourceProjection,
+            projection2: destinationProjection,
+            geoScale: this.scale()
+          });
+
+          scale.startAutoCalc();
+
+          this.postProcessGeoData(
+              /** @type {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>} */(geoData),
+              callback,
+              initInternalGeoData,
+              changeProjection);
+
+          scale.finishAutoCalc();
+        }
+      }
+
+      var max = -Infinity;
+      var min = Infinity;
+      var sum = 0;
+      var pointsCount = 0;
+
+      for (i = this.series_.length; i--;) {
+        series = this.series_[i];
+        series.setGeoData(this, /** @type {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>} */(this.internalGeoData));
+        series.invalidate(anychart.ConsistencyState.SERIES_DATA, anychart.Signal.NEEDS_REDRAW);
+
+        //----------------------------------calc statistics for series
+        series.calculateStatistics();
+        max = Math.max(max, /** @type {number} */(series.statistics('seriesMax')));
+        min = Math.min(min, /** @type {number} */ (series.statistics('seriesMin')));
+        sum += /** @type {number} */(series.statistics('seriesSum'));
+        pointsCount += /** @type {number} */(series.statistics('seriesPointsCount'));
+        //----------------------------------end calc statistics for series
+        series.calculate();
+      }
 
       //----------------------------------calc statistics for series
-      series.calculateStatistics();
-      max = Math.max(max, /** @type {number} */(series.statistics('seriesMax')));
-      min = Math.min(min, /** @type {number} */ (series.statistics('seriesMin')));
-      sum += /** @type {number} */(series.statistics('seriesSum'));
-      pointsCount += /** @type {number} */(series.statistics('seriesPointsCount'));
-      //----------------------------------end calc statistics for series
-      series.calculate();
-    }
+      //todo (Roman Lubushikin): to avoid this loop on series we can store this info in the chart instance and provide it to all series
 
-    //----------------------------------calc statistics for series
-    //todo (Roman Lubushikin): to avoid this loop on series we can store this info in the chart instance and provide it to all series
-
-    this.maxStrokeThickness_ = 0;
-    var average = sum / pointsCount;
-    for (i = 0; i < this.series_.length; i++) {
-      series = this.series_[i];
-      series.statistics('max', max);
-      series.statistics('min', min);
-      series.statistics('sum', sum);
-      series.statistics('average', average);
-      series.statistics('pointsCount', pointsCount);
-      var seriesStrokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(series.stroke()));
-      if (seriesStrokeThickness > this.maxStrokeThickness_) {
-        this.maxStrokeThickness_ = seriesStrokeThickness;
+      this.maxStrokeThickness_ = 0;
+      var average = sum / pointsCount;
+      for (i = 0; i < this.series_.length; i++) {
+        series = this.series_[i];
+        series.statistics('max', max);
+        series.statistics('min', min);
+        series.statistics('sum', sum);
+        series.statistics('average', average);
+        series.statistics('pointsCount', pointsCount);
+        var seriesStrokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(series.stroke()));
+        if (seriesStrokeThickness > this.maxStrokeThickness_) {
+          this.maxStrokeThickness_ = seriesStrokeThickness;
+        }
       }
+      //----------------------------------end calc statistics for series
     }
-    //----------------------------------end calc statistics for series
-
     this.markConsistent(anychart.ConsistencyState.MAP_SCALE);
   }
 
@@ -1960,10 +2156,6 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
   var minZoomFactor = anychart.charts.Map.ZOOM_MIN_FACTOR;
   var boundsWithoutTx, boundsWithTx;
 
-  this.calculate();
-
-  var mapLayer = this.getMapLayer();
-
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_COLOR_RANGE)) {
     if (this.colorRange_) {
       var targetSeries;
@@ -1981,6 +2173,10 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
       }
     }
   }
+
+  this.calculate();
+
+  var mapLayer = this.getMapLayer();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     var scale = this.scale();
@@ -2012,25 +2208,27 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
 
     this.clear();
 
-    var j, len;
-    for (i = 0, len = this.internalGeoData.length; i < len; i++) {
-      var geom = this.internalGeoData[i];
-      if (!geom) continue;
+    if (this.internalGeoData) {
+      var j, len;
+      for (i = 0, len = this.internalGeoData.length; i < len; i++) {
+        var geom = this.internalGeoData[i];
+        if (!geom) continue;
 
-      var domElement = this.mapLayer_.genNextChild();
-      geom.domElement = domElement;
-      this.mapPaths.push(domElement);
+        var domElement = this.mapLayer_.genNextChild();
+        geom.domElement = domElement;
+        this.mapPaths.push(domElement);
 
-      if (goog.object.containsKey(geom, 'geometries')) {
-        var geometries = geom['geometries'];
-        var geomsLen = geometries.length;
-        for (j = 0; j < geomsLen; j++) {
-          this.iterateGeometry_(geometries[j], this.drawGeom_);
+        if (goog.object.containsKey(geom, 'geometries')) {
+          var geometries = geom['geometries'];
+          var geomsLen = geometries.length;
+          for (j = 0; j < geomsLen; j++) {
+            this.iterateGeometry_(geometries[j], this.drawGeom_);
+          }
+        } else {
+          this.iterateGeometry_(
+              /** @type {anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon} */(geom),
+              this.drawGeom_);
         }
-      } else {
-        this.iterateGeometry_(
-            /** @type {anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon} */(geom),
-            this.drawGeom_);
       }
     }
 
@@ -2167,10 +2365,9 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_PALETTE |
-      anychart.ConsistencyState.MAP_MARKER_PALETTE |
-      anychart.ConsistencyState.MAP_HATCH_FILL_PALETTE |
-      anychart.ConsistencyState.MAP_SERIES))
-  {
+          anychart.ConsistencyState.MAP_MARKER_PALETTE |
+          anychart.ConsistencyState.MAP_HATCH_FILL_PALETTE |
+          anychart.ConsistencyState.MAP_SERIES)) {
     this.calcBubbleSizes_();
     for (i = this.series_.length; i--;) {
       series = this.series_[i];
@@ -2642,6 +2839,40 @@ anychart.charts.Map.prototype.interactivity = function(opt_value) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Animations.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Setter/getter for animation setting.
+ * @param {(boolean|Object)=} opt_enabledOrJson Whether to enable animation.
+ * @param {number=} opt_duration A Duration in milliseconds.
+ * @return {anychart.core.utils.Animation|anychart.core.Chart} Animations settings object or self for chaining.
+ */
+anychart.core.Chart.prototype.crsAnimation = function(opt_enabledOrJson, opt_duration) {
+  if (!this.crsAnimation_) {
+    this.crsAnimation_ = new anychart.core.utils.Animation();
+    this.crsAnimation_.listenSignals(this.onCrsAnimationSignal_, this);
+  }
+  if (goog.isDef(opt_enabledOrJson)) {
+    this.crsAnimation_.setup.apply(this.crsAnimation_, arguments);
+    return this;
+  } else {
+    return this.crsAnimation_;
+  }
+};
+
+
+/**
+ * Animation enabled change handler.
+ * @private
+ */
+anychart.core.Chart.prototype.onCrsAnimationSignal_ = function() {
+  // this.invalidate(anychart.ConsistencyState.CHART_ANIMATION, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Map editing.
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -2651,6 +2882,8 @@ anychart.charts.Map.prototype.interactivity = function(opt_value) {
  * @return {Object}
  */
 anychart.charts.Map.prototype.getFeatureById = function(id) {
+  if (!this.internalGeoData)
+    return null;
   for (var i = 0, len = this.internalGeoData.length; i < len; i++) {
     var feature_ = this.internalGeoData[i];
     if (feature_['properties'][this.geoIdField()] == id) {
@@ -2899,7 +3132,7 @@ anychart.charts.Map.prototype.featureCrs_ = function(feature, opt_crs) {
   } else {
     var x, y, scaledCoord, x_, y_;
 
-    var projected;
+    var projected, oldProjection, newProjection;
 
     feature.domElement.clear();
 
@@ -2907,6 +3140,10 @@ anychart.charts.Map.prototype.featureCrs_ = function(feature, opt_crs) {
     var featureTx = current_tx == this.mapTX['default'] ? (this.mapTX[id] = {}) : current_tx;
     var old_crs = featureTx.crs || this.mapTX['default'].crs || anychart.charts.Map.DEFAULT_TX['default']['crs'];
     var new_crs = opt_crs;
+
+    oldProjection = anychart.core.map.projections.getProjection(old_crs);
+    newProjection = anychart.core.map.projections.getProjection(new_crs);
+
     var xoffset = featureTx.xoffset || 0;
     var yoffset = featureTx.yoffset || 0;
     var featureScale = featureTx.scale || this.mapTX['default'].scale || anychart.charts.Map.DEFAULT_TX['default']['scale'];
@@ -2918,7 +3155,8 @@ anychart.charts.Map.prototype.featureCrs_ = function(feature, opt_crs) {
         x_ = ((outerPath[j] - xoffset) / featureScale);
         y_ = ((outerPath[j + 1] - yoffset) / featureScale);
 
-        projected = window['proj4'](old_crs, new_crs).forward([x_, y_]);
+        projected = oldProjection.invert(x_, y_);
+        projected = newProjection.forward(projected[0], projected[1]);
 
         outerPath[j] = projected[0] * featureScale + xoffset;
         outerPath[j + 1] = projected[1] * featureScale + yoffset;
@@ -2938,7 +3176,8 @@ anychart.charts.Map.prototype.featureCrs_ = function(feature, opt_crs) {
         x_ = ((holes[j] - xoffset) / featureScale);
         y_ = ((holes[j + 1] - yoffset) / featureScale);
 
-        projected = window['proj4'](old_crs, new_crs).forward([x_, y_]);
+        projected = oldProjection.invert(x_, y_);
+        projected = newProjection.forward(projected[0], projected[1]);
 
         holes[j] = projected[0] * featureScale + xoffset;
         holes[j + 1] = projected[1] * featureScale + yoffset;
@@ -2989,6 +3228,9 @@ anychart.charts.Map.prototype.featureCrs_ = function(feature, opt_crs) {
     featureTx.xoffset = featureTx.xoffset ? featureTx.xoffset + dx : dx;
     featureTx.yoffset = featureTx.yoffset ? featureTx.yoffset + dy : dy;
     featureTx.crs = new_crs;
+    featureTx.curProj = newProjection;
+    featureTx.srcCrs = old_crs;
+    featureTx.srcProj = oldProjection;
 
     this.invalidate(anychart.ConsistencyState.MAP_SCALE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
@@ -3012,110 +3254,21 @@ anychart.charts.Map.prototype.featureCrs = function(id, opt_crs) {
 
 /**
  * Sets crs to map.
- * @param {string=} opt_value String crs representation.
- * @return {string|anychart.charts.Map}
+ * @param {(Object|Function|anychart.enums.MapProjections|string)=} opt_value Name of common projection
+ * (anychart.enums.MapProjections) or projection string representation or projection Object or Function
+ * (like d3 projection, example - https://github.com/d3/d3-geo-projection/blob/master/src/bonne.js).
+ * @return {Object|Function|anychart.enums.MapProjections|string|anychart.charts.Map}
  */
 anychart.charts.Map.prototype.crs = function(opt_value) {
   if (goog.isDef(opt_value)) {
-
-    var scale = this.scale();
-    var x, y, scaledCoord, x_, y_;
-    var projected;
-
-    for (var k = 0, len = this.internalGeoData.length; k < len; k++) {
-      var feature = this.internalGeoData[k];
-      var bounds = feature.domElement.getBounds();
-      var latLon = scale.inverseTransform(
-          bounds.left + bounds.width / 2,
-          bounds.top + bounds.height / 2);
-
-      var current_tx = scale.pickTx(latLon[0], latLon[1]);
-
-      if (current_tx == this.mapTX['default']) {
-        feature.domElement.clear();
-
-        var featureTx = this.mapTX['default'];
-        var old_crs = featureTx.crs || anychart.charts.Map.DEFAULT_TX['default']['crs'];
-        var new_crs = opt_value;
-        var xoffset = featureTx.xoffset || 0;
-        var yoffset = featureTx.yoffset || 0;
-        var featureScale = featureTx.scale || anychart.charts.Map.DEFAULT_TX['default']['scale'];
-
-        for (var i = 0, len_ = feature['polygones'].length; i < len_; i++) {
-          var polygon = feature['polygones'][i];
-          var outerPath = polygon['outerPath'];
-          for (var j = 0; j < outerPath.length - 1; j += 2) {
-            x_ = ((outerPath[j] - xoffset) / featureScale);
-            y_ = ((outerPath[j + 1] - yoffset) / featureScale);
-
-            projected = window['proj4'](old_crs, new_crs).forward([x_, y_]);
-
-            outerPath[j] = projected[0] * featureScale + xoffset;
-            outerPath[j + 1] = projected[1] * featureScale + yoffset;
-
-            scaledCoord = scale.scaleToPx(outerPath[j], outerPath[j + 1]);
-
-            x = scaledCoord[0];
-            y = scaledCoord[1];
-
-            if (j == 0)
-              feature.domElement.moveTo(x, y);
-            else
-              feature.domElement.lineTo(x, y);
-          }
-          var holes = polygon['holes'];
-          for (j = 0; j < holes.length - 1; j += 2) {
-            x_ = ((holes[j] - xoffset) / featureScale);
-            y_ = ((holes[j + 1] - yoffset) / featureScale);
-
-            projected = window['proj4'](old_crs, new_crs).forward([x_, y_]);
-
-            holes[j] = projected[0] * featureScale + xoffset;
-            holes[j + 1] = projected[1] * featureScale + yoffset;
-
-            scaledCoord = scale.scaleToPx(holes[j], holes[j + 1]);
-
-            x = scaledCoord[0];
-            y = scaledCoord[1];
-
-            if (j == 0)
-              feature.domElement.moveTo(x, y);
-            else
-              feature.domElement.lineTo(x, y);
-          }
-        }
-
-        var bounds_ = feature.domElement.getBoundsWithoutTransform();
-        var startCoords = scale.pxToScale(bounds_.left + bounds_.width / 2, bounds_.top + bounds_.height / 2);
-        var endCoords = scale.pxToScale(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
-
-        var dx = endCoords[0] - startCoords[0];
-        var dy = endCoords[1] - startCoords[1];
-
-        for (i = 0, len_ = feature['polygones'].length; i < len_; i++) {
-          polygon = feature['polygones'][i];
-          outerPath = polygon['outerPath'];
-          for (j = 0; j < outerPath.length - 1; j += 2) {
-            outerPath[j] += dx;
-            outerPath[j + 1] += dy;
-          }
-
-          holes = polygon['holes'];
-          for (j = 0; j < holes.length - 1; j += 2) {
-            holes[j] += dx;
-            holes[j + 1] += dy;
-          }
-        }
-
-        feature.domElement.setPosition(bounds.left + bounds.width / 2 - bounds_.width / 2, bounds.top + bounds.height / 2 - bounds_.height / 2);
-      }
+    opt_value = anychart.enums.normalizeMapProjections(opt_value);
+    if (this.crs_ != opt_value) {
+      this.crs_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.MAP_SCALE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
     }
-
-    this.mapTX['default'].crs = opt_value;
-    this.invalidate(anychart.ConsistencyState.MAP_SCALE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
-  return this.mapTX['default'].crs;
+  return this.crs_ || this.currentCrs_ || anychart.charts.Map.DEFAULT_TX['default']['crs'];
 };
 
 
@@ -3361,12 +3514,10 @@ anychart.charts.Map.prototype.drillDown_ = function(id, target) {
   newScene.setParentEventTarget(root);
 
 
-
   var zoomParam = newScene.zoomToBounds(featureBounds);
   newScene.unlimitedZoom = true;
   newScene.zoomDuration = 0;
   newScene.zoomTo(1 / zoomParam[0], zoomParam[1], zoomParam[2]);
-
 
 
   this.doAfterAnimation(newScene, function(newScene, scene, root, featureBounds, featureProperties) {
@@ -3673,11 +3824,11 @@ anychart.charts.Map.prototype.zoom = function(value, opt_cx, opt_cy) {
 
 
 /**
-* It moves focus point for map. By default focus point is [0,0].
-* @param {number} dx Offset x coordinate.
-* @param {number} dy Offset y coordinate.
-* @return {anychart.charts.Map} Returns itself for chaining.
-*/
+ * It moves focus point for map. By default focus point is [0,0].
+ * @param {number} dx Offset x coordinate.
+ * @param {number} dy Offset y coordinate.
+ * @return {anychart.charts.Map} Returns itself for chaining.
+ */
 anychart.charts.Map.prototype.move = function(dx, dy) {
   if (goog.isDef(dx) || goog.isDef(dy)) {
     var state = 0;
@@ -3737,7 +3888,7 @@ anychart.charts.Map.prototype.transform = function(xLong, yLat) {
  */
 anychart.charts.Map.prototype.inverseTransform = function(x, y) {
   var lonLat = this.scale().inverseTransform(x, y);
-  return {'x': lonLat[0], 'long': lonLat[0], 'y': lonLat[1] , 'lat': lonLat[1]};
+  return {'x': lonLat[0], 'long': lonLat[0], 'y': lonLat[1], 'lat': lonLat[1]};
 };
 
 
@@ -3782,6 +3933,9 @@ anychart.charts.Map.prototype.setupByJSON = function(config) {
     this.interactivity().selectionMode(
         config['allowPointsSelect'] ? anychart.enums.SelectionMode.MULTI_SELECT : anychart.enums.SelectionMode.NONE);
   }
+
+  this.crsAnimation(config['crsAnimation']);
+  this.crs(config['crs']);
 
   var i, json, scale;
   if (config['geoScale']) {
@@ -3858,6 +4012,17 @@ anychart.charts.Map.prototype.serialize = function() {
   json['geoIdField'] = this.geoIdField();
   json['geoData'] = this.geoDataStringName_ ? this.geoDataStringName_ : this.geoData_;
 
+  json['crsAnimation'] = this.crsAnimation().serialize();
+  if (goog.isObject(this.crs_)) {
+    anychart.utils.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Map crs']
+    );
+  } else if (this.crs_) {
+    json['crs'] = this.crs_;
+  }
+
   var series = [];
   var scalesIds = {};
   var scales = [];
@@ -3915,7 +4080,6 @@ anychart.charts.Map.prototype.disposeInternal = function() {
     goog.events.unlisten(container, goog.events.EventType.DBLCLICK, this.mapDbClickHandler_, false, this);
     goog.events.unlisten(container, goog.events.EventType.POINTERUP, this.mapTouchEndHandler_, false, this);
     goog.events.unlisten(container, goog.events.EventType.TOUCHEND, this.mapTouchEndHandler_, false, this);
-    goog.events.unlisten(container, goog.events.EventType.MOUSEENTER, this.mapMouseEnterHandler_, false, this);
     goog.events.unlisten(container, goog.events.EventType.MOUSELEAVE, this.mapMouseLeaveHandler_, false, this);
   }
 
@@ -3956,6 +4120,8 @@ anychart.charts.Map.prototype['removeAllSeries'] = anychart.charts.Map.prototype
 anychart.charts.Map.prototype['getPlotBounds'] = anychart.charts.Map.prototype.getPlotBounds;
 
 anychart.charts.Map.prototype['interactivity'] = anychart.charts.Map.prototype.interactivity;
+
+anychart.charts.Map.prototype['crsAnimation'] = anychart.charts.Map.prototype.crsAnimation;
 
 anychart.charts.Map.prototype['toGeoJSON'] = anychart.charts.Map.prototype.toGeoJSON;
 anychart.charts.Map.prototype['featureTranslation'] = anychart.charts.Map.prototype.featureTranslation;

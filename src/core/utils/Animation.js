@@ -57,7 +57,7 @@ anychart.core.utils.Animation.prototype.enabled = function(opt_value) {
  */
 anychart.core.utils.Animation.prototype.duration = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeToNaturalNumber(opt_value, this.duration_, false);
+    opt_value = anychart.utils.normalizeToNaturalNumber(opt_value, this.duration_, true);
     if (this.duration_ != opt_value) {
       this.duration_ = opt_value;
       this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);

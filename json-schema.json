@@ -2038,7 +2038,10 @@
         },
         "geoData": {
           "type": ["string", "object"]
-        }
+        },
+
+        "crsAnimation": {"$ref": "#/definitions/anychart.core.utils.Animation"},
+        "crs": {"type": "string"}
       },
       "required": ["type"]
     },
