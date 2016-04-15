@@ -262,7 +262,29 @@ anychart.charts.Map = function() {
         }
       }, false, this);
 
-      this.mouseWheelHandler = new acgraph.events.MouseWheelHandler(/** @type {Element} */(this.container().getStage().container()), false, /** @type {acgraph.math.Rect}*/(this.getPlotBounds()));
+      var isPreventDefault = goog.bind(function(e) {
+        var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+        var be = e.getBrowserEvent();
+
+        var scene = this.getCurrentScene();
+        var zoomFactor = goog.math.clamp(1 - be.deltaY / 120, 0.7, 2);
+        var maxZoomFactor = anychart.charts.Map.ZOOM_MAX_FACTOR;
+        var minZoomFactor = anychart.charts.Map.ZOOM_MIN_FACTOR;
+        var isMouseWheel = scene.interactivity().mouseWheel();
+        var bounds = this.getPlotBounds();
+
+        var insideBounds = bounds &&
+            e.clientX >= bounds.left + containerPosition.x &&
+            e.clientX <= bounds.left + containerPosition.x + bounds.width &&
+            e.clientY >= bounds.top + containerPosition.y &&
+            e.clientY <= bounds.top + containerPosition.y + bounds.height;
+
+        return (insideBounds || !bounds) && (isMouseWheel && !((zoomFactor > 1 && scene.fullZoom >= maxZoomFactor) || (zoomFactor < 1 && scene.fullZoom <= minZoomFactor)));
+      }, this);
+      this.mouseWheelHandler = new acgraph.events.MouseWheelHandler(
+          /** @type {Element} */(this.container().getStage().container()),
+          false,
+          isPreventDefault);
       this.mouseWheelHandler.listen('mousewheel', function(e) {
         var scene = this.getCurrentScene();
         var mapLayer = scene.getMapLayer();
