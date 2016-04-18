@@ -18,15 +18,31 @@ goog.require('anychart.ui.Title');
 
 
 /**
- * Namespace with standalone UI elements.
+ * Namespace with standalone and anychart.ui UI elements.
  * @namespace
  * @name anychart.ui
  */
 
 
+/**
+ * @ignoreDoc
+ */
+anychart.ui.contextMenu = anychart.ui.contextMenu || /** @type {function():null} */ (function(opt_fromTheme) {
+  if (!opt_fromTheme) {
+    anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['anychart.ui.ContextMenu']);
+  }
+  return null;
+});
 
 
+/**
+ * @ignoreDoc
+ */
+anychart.ui.ganttToolbar = anychart.ui.ganttToolbar || /** @type {function():null} */ (function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['anychart.ui.GanttToolbar']);
+  return null;
+});
 
 
-
-
+goog.exportSymbol('anychart.ui.contextMenu', anychart.ui.contextMenu);
+goog.exportSymbol('anychart.ui.ganttToolbar', anychart.ui.ganttToolbar);

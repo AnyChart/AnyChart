@@ -1750,6 +1750,7 @@ anychart.core.ui.Legend.prototype.handleMouseOut_ = function(event) {
  * @private
  */
 anychart.core.ui.Legend.prototype.handleMouseClick_ = function(event) {
+  if (event['button'] != acgraph.events.BrowserEvent.MouseButton.LEFT) return;
   var evt = this.makePointEvent_(event);
   if (evt && this.dispatchEvent(evt)) {
     var item = this.items_ && this.items_[evt['itemIndex']];

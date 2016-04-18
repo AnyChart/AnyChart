@@ -1,4 +1,4 @@
-goog.provide('anychart.core.ui.toolbar.ToolbarSeparatorRenderer');
+goog.provide('anychart.ui.toolbar.SeparatorRenderer');
 
 goog.require('goog.ui.Separator');
 goog.require('goog.ui.ToolbarSeparatorRenderer');
@@ -11,18 +11,18 @@ goog.require('goog.ui.registry');
  * @constructor
  * @extends {goog.ui.ToolbarSeparatorRenderer}
  */
-anychart.core.ui.toolbar.ToolbarSeparatorRenderer = function() {
-  goog.base(this);
+anychart.ui.toolbar.SeparatorRenderer = function() {
+  anychart.ui.toolbar.SeparatorRenderer.base(this, 'constructor');
 };
-goog.inherits(anychart.core.ui.toolbar.ToolbarSeparatorRenderer, goog.ui.ToolbarSeparatorRenderer);
-goog.addSingletonGetter(anychart.core.ui.toolbar.ToolbarSeparatorRenderer);
+goog.inherits(anychart.ui.toolbar.SeparatorRenderer, goog.ui.ToolbarSeparatorRenderer);
+goog.addSingletonGetter(anychart.ui.toolbar.SeparatorRenderer);
 
 
 /**
  * Default CSS class to be applied to the root element of toolbars rendered by this renderer.
  * @type {string}
  */
-anychart.core.ui.toolbar.ToolbarSeparatorRenderer.CSS_CLASS = goog.getCssName('anychart-toolbar-separator');
+anychart.ui.toolbar.SeparatorRenderer.CSS_CLASS = goog.getCssName('anychart-toolbar-separator');
 
 
 /**
@@ -30,8 +30,8 @@ anychart.core.ui.toolbar.ToolbarSeparatorRenderer.CSS_CLASS = goog.getCssName('a
  * @return {string} - Renderer-specific CSS class.
  * @override
  */
-anychart.core.ui.toolbar.ToolbarSeparatorRenderer.prototype.getCssClass = function() {
-  return anychart.core.ui.toolbar.ToolbarSeparatorRenderer.CSS_CLASS;
+anychart.ui.toolbar.SeparatorRenderer.prototype.getCssClass = function() {
+  return anychart.ui.toolbar.SeparatorRenderer.CSS_CLASS;
 };
 
 
@@ -43,16 +43,16 @@ anychart.core.ui.toolbar.ToolbarSeparatorRenderer.prototype.getCssClass = functi
  * @return {!Element} - Root element for the separator.
  * @override
  */
-anychart.core.ui.toolbar.ToolbarSeparatorRenderer.prototype.createDom = function(separator) {
+anychart.ui.toolbar.SeparatorRenderer.prototype.createDom = function(separator) {
   // 00A0 is &nbsp;
   return separator.getDomHelper().createDom(
-      'div', this.getClassNames(separator).join(' ') + ' ' + anychart.core.ui.toolbar.Toolbar.INLINE_BLOCK_CLASSNAME, '\u00A0'
+      'div', this.getClassNames(separator).join(' ') + ' ' + anychart.ui.INLINE_BLOCK_CLASSNAME, '\u00A0'
   );
 };
 
 
 // Registers a decorator factory function for toolbar separators.
 // TODO (A.Kudryavtsev): Totally copied from final class goog.ui.ToolbarSeparator.
-goog.ui.registry.setDecoratorByClassName(anychart.core.ui.toolbar.ToolbarSeparatorRenderer.CSS_CLASS, function() {
-  return new goog.ui.Separator(anychart.core.ui.toolbar.ToolbarSeparatorRenderer.getInstance());
+goog.ui.registry.setDecoratorByClassName(anychart.ui.toolbar.SeparatorRenderer.CSS_CLASS, function() {
+  return new goog.ui.Separator(anychart.ui.toolbar.SeparatorRenderer.getInstance());
 });

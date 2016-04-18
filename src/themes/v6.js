@@ -505,6 +505,10 @@ window['anychart']['themes']['v6'] = {
   // base/separated chart
   'chart': {
     'enabled': true,
+    'contextMenu': {
+      'fromTheme': true, // suppress NO_FEATURE_IN_MODULE warning
+      'enabled': true
+    },
     'title': {
       'text': 'Chart Title',
       'margin': {

@@ -1,0 +1,402 @@
+/* ------- TOOLBAR ------- */
+
+.anychart-toolbar {
+  /* Old browsers */
+  background-color: #fafafa;
+  /* W3C */
+  /* @alternate */ background: linear-gradient(to bottom, #fafafa 0%, #f8f8f8 17%, #e5e5e5 100%);
+  /* FF3.6+ */
+  /* @alternate */ background: -moz-linear-gradient(top, #fafafa 0%, #f8f8f8 17%, #e5e5e5 100%);
+  /* Chrome10+,Safari5.1+ */
+  /* @alternate */ background: -webkit-linear-gradient(top, #fafafa 0%, #f8f8f8 17%, #e5e5e5 100%);
+  /* Opera 11.10+ */
+  /* @alternate */ background: -o-linear-gradient(top, #fafafa 0%, #f8f8f8 17%, #e5e5e5 100%);
+  /* IE10+ */
+  /* @alternate */ background: -ms-linear-gradient(top, #fafafa 0%, #f8f8f8 17%, #e5e5e5 100%);
+  /* IE6-9 */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#fafafa", endColorstr="#e5e5e5", GradientType=0);
+
+  border-bottom: 1px solid #d5d5d5;
+  cursor: default;
+  font: normal 12px Arial, sans-serif;
+  margin: 0;
+  outline: none;
+  padding: 2px;
+  position: relative;
+  zoom: 1; /* The toolbar element must have layout on IE. */
+}
+
+/*
+ * Styles used by anychart.ui.ToolbarButtonRenderer.
+ */
+
+.anychart-toolbar-button {
+  margin: 0 2px;
+  border: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  color: #333;
+  text-decoration: none;
+  list-style: none;
+  vertical-align: middle;
+  cursor: default;
+  outline: none;
+}
+
+/* Pseudo-rounded corners. */
+.anychart-toolbar-button-outer-box,
+.anychart-toolbar-button-inner-box {
+  border: 0;
+  vertical-align: top;
+}
+
+.anychart-toolbar-button-outer-box {
+  margin: 0;
+  padding: 1px 0;
+}
+
+.anychart-toolbar-button-inner-box {
+  margin: 0 -1px;
+  padding: 3px 4px;
+}
+
+/* Pre-IE7 IE hack; ignored by IE7 and all non-IE browsers. */
+* html .anychart-toolbar-button-inner-box {
+  /* IE6 needs to have the box shifted to make the borders line up. */
+  left: -1px;
+}
+
+/* Pre-IE7 BiDi fixes. */
+* html .anychart-toolbar-button-rtl .anychart-toolbar-button-outer-box {
+  /* @noflip */
+  left: -1px;
+}
+
+* html .anychart-toolbar-button-rtl .anychart-toolbar-button-inner-box {
+  /* @noflip */
+  right: auto;
+}
+
+/* IE7-only hack; ignored by all other browsers. */
+*:first-child + html .anychart-toolbar-button-inner-box {
+  /* IE7 needs to have the box shifted to make the borders line up. */
+  left: -1px;
+}
+
+/* IE7 BiDi fix. */
+*:first-child + html .anychart-toolbar-button-rtl .anychart-toolbar-button-inner-box {
+  /* @noflip */
+  left: 1px;
+  /* @noflip */
+  right: auto;
+}
+
+/* Safari-only hacks. */
+::root .anychart-toolbar-button,
+::root .anychart-toolbar-button-outer-box {
+  /* Required to make pseudo-rounded corners work on Safari. */
+  line-height: 0;
+}
+
+::root .anychart-toolbar-button-inner-box {
+  /* Required to make pseudo-rounded corners work on Safari. */
+  line-height: normal;
+}
+
+/* Disabled styles. */
+.anychart-toolbar-button-disabled {
+  opacity: 0.3;
+  -moz-opacity: 0.3;
+  filter: alpha(opacity=30);
+}
+
+.anychart-toolbar-button-disabled .anychart-toolbar-button-outer-box,
+.anychart-toolbar-button-disabled .anychart-toolbar-button-inner-box {
+  /* Disabled text/border color trumps everything else. */
+  color: #333 !important;
+  border-color: #999 !important;
+}
+
+/* Pre-IE7 IE hack; ignored by IE7 and all non-IE browsers. */
+* html .anychart-toolbar-button-disabled {
+  /* IE can't apply alpha to an element with a transparent background... */
+  background-color: #f0f0f0;
+  margin: 0 1px;
+  padding: 0 1px;
+}
+
+/* IE7-only hack; ignored by all other browsers. */
+*:first-child + html .anychart-toolbar-button-disabled {
+  /* IE can't apply alpha to an element with a transparent background... */
+  background-color: #f0f0f0;
+  margin: 0 1px;
+  padding: 0 1px;
+}
+
+/* Only draw borders when in a non-default state. */
+.anychart-toolbar-button-hover .anychart-toolbar-button-outer-box,
+.anychart-toolbar-button-active .anychart-toolbar-button-outer-box,
+.anychart-toolbar-button-checked .anychart-toolbar-button-outer-box,
+.anychart-toolbar-button-selected .anychart-toolbar-button-outer-box {
+  border-width: 1px 0;
+  border-style: solid;
+  padding: 0;
+}
+
+.anychart-toolbar-button-hover .anychart-toolbar-button-inner-box,
+.anychart-toolbar-button-active .anychart-toolbar-button-inner-box,
+.anychart-toolbar-button-checked .anychart-toolbar-button-inner-box,
+.anychart-toolbar-button-selected .anychart-toolbar-button-inner-box {
+  border-width: 0 1px;
+  border-style: solid;
+  padding: 3px;
+}
+
+/* Hover styles. */
+.anychart-toolbar-button-hover .anychart-toolbar-button-outer-box,
+.anychart-toolbar-button-hover .anychart-toolbar-button-inner-box {
+  /* Hover border style wins over active/checked/selected. */
+  border-color: #a1badf !important;
+}
+
+/* Active/checked/selected styles. */
+.anychart-toolbar-button-active,
+.anychart-toolbar-button-checked,
+.anychart-toolbar-button-selected {
+  /* Active/checked/selected background color always wins. */
+  background-color: #dde1eb !important;
+}
+
+.anychart-toolbar-button-active .anychart-toolbar-button-outer-box,
+.anychart-toolbar-button-active .anychart-toolbar-button-inner-box,
+.anychart-toolbar-button-checked .anychart-toolbar-button-outer-box,
+.anychart-toolbar-button-checked .anychart-toolbar-button-inner-box,
+.anychart-toolbar-button-selected .anychart-toolbar-button-outer-box,
+.anychart-toolbar-button-selected .anychart-toolbar-button-inner-box {
+  border-color: #729bd1;
+}
+
+/* Pill (collapsed border) styles. */
+.anychart-toolbar-button-collapse-right,
+.anychart-toolbar-button-collapse-right .anychart-toolbar-button-outer-box,
+.anychart-toolbar-button-collapse-right .anychart-toolbar-button-inner-box {
+  margin-right: 0;
+}
+
+.anychart-toolbar-button-collapse-left,
+.anychart-toolbar-button-collapse-left .anychart-toolbar-button-outer-box,
+.anychart-toolbar-button-collapse-left .anychart-toolbar-button-inner-box {
+  margin-left: 0;
+}
+
+/* Pre-IE7 IE hack; ignored by IE7 and all non-IE browsers. */
+* html .anychart-toolbar-button-collapse-left .anychart-toolbar-button-inner-box {
+  left: 0;
+}
+
+/* IE7-only hack; ignored by all other browsers. */
+*:first-child + html .anychart-toolbar-button-collapse-left
+.anychart-toolbar-button-inner-box {
+  left: 0;
+}
+
+/*
+ * Styles used by anychart.ui.toolbar.MenuButtonRenderer.
+ */
+
+.anychart-toolbar-menu-button {
+  margin: 0 2px;
+  border: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  color: #333;
+  text-decoration: none;
+  list-style: none;
+  vertical-align: middle;
+  cursor: default;
+  outline: none;
+}
+
+/* Pseudo-rounded corners. */
+.anychart-toolbar-menu-button-outer-box,
+.anychart-toolbar-menu-button-inner-box {
+  border: 0;
+  vertical-align: top;
+}
+
+.anychart-toolbar-menu-button-outer-box {
+  margin: 0;
+  padding: 1px 0;
+}
+
+.anychart-toolbar-menu-button-inner-box {
+  margin: 0 -1px;
+  padding: 3px 4px;
+}
+
+/* Pre-IE7 IE hack; ignored by IE7 and all non-IE browsers. */
+* html .anychart-toolbar-menu-button-inner-box {
+  /* IE6 needs to have the box shifted to make the borders line up. */
+  left: -1px;
+}
+
+/* Pre-IE7 BiDi fixes. */
+* html .anychart-toolbar-menu-button-rtl .anychart-toolbar-menu-button-outer-box {
+  /* @noflip */ left: -1px;
+}
+* html .anychart-toolbar-menu-button-rtl .anychart-toolbar-menu-button-inner-box {
+  /* @noflip */ right: auto;
+}
+
+/* IE7-only hack; ignored by all other browsers. */
+*:first-child+html .anychart-toolbar-menu-button-inner-box {
+  /* IE7 needs to have the box shifted to make the borders line up. */
+  left: -1px;
+}
+
+/* IE7 BiDi fix. */
+*:first-child+html .anychart-toolbar-menu-button-rtl
+.anychart-toolbar-menu-button-inner-box {
+  /* @noflip */ left: 1px;
+  /* @noflip */ right: auto;
+}
+
+/* Safari-only hacks. */
+::root .anychart-toolbar-menu-button,
+::root .anychart-toolbar-menu-button-outer-box,
+::root .anychart-toolbar-menu-button-inner-box {
+  /* Required to make pseudo-rounded corners work on Safari. */
+  line-height: 0;
+}
+
+::root .anychart-toolbar-menu-button-caption,
+::root .anychart-toolbar-menu-button-dropdown {
+  /* Required to make pseudo-rounded corners work on Safari. */
+  line-height: normal;
+}
+
+/* Disabled styles. */
+.anychart-toolbar-menu-button-disabled {
+  opacity: 0.3;
+  -moz-opacity: 0.3;
+  filter: alpha(opacity=30);
+}
+
+.anychart-toolbar-menu-button-disabled .anychart-toolbar-menu-button-outer-box,
+.anychart-toolbar-menu-button-disabled .anychart-toolbar-menu-button-inner-box {
+  /* Disabled text/border color trumps everything else. */
+  color: #333 !important;
+  border-color: #999 !important;
+}
+
+/* Pre-IE7 IE hack; ignored by IE7 and all non-IE browsers. */
+* html .anychart-toolbar-menu-button-disabled {
+  /* IE can't apply alpha to an element with a transparent background... */
+  background-color: #f0f0f0;
+  margin: 0 1px;
+  padding: 0 1px;
+}
+
+/* IE7-only hack; ignored by all other browsers. */
+*:first-child+html .anychart-toolbar-menu-button-disabled {
+  /* IE can't apply alpha to an element with a transparent background... */
+  background-color: #f0f0f0;
+  margin: 0 1px;
+  padding: 0 1px;
+}
+
+/* Only draw borders when in a non-default state. */
+.anychart-toolbar-menu-button-hover .anychart-toolbar-menu-button-outer-box,
+.anychart-toolbar-menu-button-active .anychart-toolbar-menu-button-outer-box,
+.anychart-toolbar-menu-button-open .anychart-toolbar-menu-button-outer-box {
+  border-width: 1px 0;
+  border-style: solid;
+  padding: 0;
+}
+
+.anychart-toolbar-menu-button-hover .anychart-toolbar-menu-button-inner-box,
+.anychart-toolbar-menu-button-active .anychart-toolbar-menu-button-inner-box,
+.anychart-toolbar-menu-button-open .anychart-toolbar-menu-button-inner-box {
+  border-width: 0 1px;
+  border-style: solid;
+  padding: 3px;
+}
+
+/* Hover styles. */
+.anychart-toolbar-menu-button-hover .anychart-toolbar-menu-button-outer-box,
+.anychart-toolbar-menu-button-hover .anychart-toolbar-menu-button-inner-box {
+  /* Hover border color trumps active/open style. */
+  border-color: #a1badf !important;
+}
+
+/* Active/open styles. */
+.anychart-toolbar-menu-button-active,
+.anychart-toolbar-menu-button-open {
+  /* Active/open background color wins. */
+  background-color: #dde1eb !important;
+}
+
+.anychart-toolbar-menu-button-active .anychart-toolbar-menu-button-outer-box,
+.anychart-toolbar-menu-button-active .anychart-toolbar-menu-button-inner-box,
+.anychart-toolbar-menu-button-open .anychart-toolbar-menu-button-outer-box,
+.anychart-toolbar-menu-button-open .anychart-toolbar-menu-button-inner-box {
+  border-color: #729bd1;
+}
+
+/* Menu button caption style. */
+.anychart-toolbar-menu-button-caption {
+  padding: 0 4px 0 0;
+  vertical-align: middle;
+}
+
+/* Dropdown style. */
+.anychart-toolbar-menu-button-dropdown {
+  width:0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #000;
+  vertical-align: middle;
+}
+
+
+/*
+ * Styles used by anychart.ui.ToolbarSeparatorRenderer.
+ */
+
+.anychart-toolbar-separator {
+  margin: 0 2px;
+  border-left: 1px solid #d6d6d6;
+  border-right: 1px solid #f7f7f7;
+  padding: 0;
+  width: 0;
+  text-decoration: none;
+  list-style: none;
+  outline: none;
+  vertical-align: middle;
+  line-height: normal;
+  font-size: 120%;
+  overflow: hidden;
+}
+
+
+/*
+ * Additional styling for toolbar select controls, which always have borders.
+ */
+
+.anychart-toolbar-select .anychart-toolbar-menu-button-outer-box {
+  border-width: 1px 0;
+  border-style: solid;
+  padding: 0;
+}
+
+.anychart-toolbar-select .anychart-toolbar-menu-button-inner-box {
+  border-width: 0 1px;
+  border-style: solid;
+  padding: 3px;
+}
+
+.anychart-toolbar-select .anychart-toolbar-menu-button-outer-box,
+.anychart-toolbar-select .anychart-toolbar-menu-button-inner-box {
+  border-color: #bfcbdf;
+}

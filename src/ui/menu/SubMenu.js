@@ -1,6 +1,7 @@
-goog.provide('anychart.core.ui.toolbar.SubMenu');
+goog.provide('anychart.ui.menu.SubMenu');
 
-goog.require('anychart.core.ui.toolbar.SubMenuRenderer');
+goog.require('anychart.ui.menu.Menu');
+goog.require('anychart.ui.menu.SubMenuRenderer');
 goog.require('goog.Timer');
 goog.require('goog.asserts');
 goog.require('goog.dom');
@@ -26,29 +27,29 @@ goog.require('goog.ui.registry');
  * @param {goog.dom.DomHelper=} opt_domHelper Optional dom helper used for dom
  *     interactions.
  * @param {goog.ui.MenuItemRenderer=} opt_renderer Renderer used to render or
- *     decorate the component; defaults to {@link anychart.core.ui.toolbar.SubMenuRenderer}.
+ *     decorate the component; defaults to {@link anychart.ui.menu.SubMenuRenderer}.
  * @constructor
  * @extends {goog.ui.MenuItem}
  */
-anychart.core.ui.toolbar.SubMenu = function(content, opt_model, opt_domHelper, opt_renderer) {
+anychart.ui.menu.SubMenu = function(content, opt_model, opt_domHelper, opt_renderer) {
   /*
     TODO (A.Kudryavtsev):
     We can't extend goog.ui.SubMenu because we can't access private (not @protected) field subMenu_ and override
     method goog.ui.SubMenu.prototype.getMenu() to make it return instance of anychart.core.ui.toolbar.Menu.
     That's why we have a copy of goog.ui.SubMenu class here.
    */
-  goog.ui.MenuItem.call(this, content, opt_model, opt_domHelper,
-      opt_renderer || anychart.core.ui.toolbar.SubMenuRenderer.getInstance());
+  anychart.ui.menu.SubMenu.base(this, 'constructor', content, opt_model, opt_domHelper,
+      opt_renderer || anychart.ui.menu.SubMenuRenderer.getInstance());
 };
-goog.inherits(anychart.core.ui.toolbar.SubMenu, goog.ui.MenuItem);
-goog.tagUnsealableClass(anychart.core.ui.toolbar.SubMenu);
+goog.inherits(anychart.ui.menu.SubMenu, goog.ui.MenuItem);
+goog.tagUnsealableClass(anychart.ui.menu.SubMenu);
 
 
 /**
  * The delay before opening the sub menu in milliseconds.
  * @type {number}
  */
-anychart.core.ui.toolbar.SubMenu.MENU_DELAY_MS = 218;
+anychart.ui.menu.SubMenu.MENU_DELAY_MS = 218;
 
 
 /**
@@ -56,7 +57,7 @@ anychart.core.ui.toolbar.SubMenu.MENU_DELAY_MS = 218;
  * @type {?number}
  * @private
  */
-anychart.core.ui.toolbar.SubMenu.prototype.dismissTimer_ = null;
+anychart.ui.menu.SubMenu.prototype.dismissTimer_ = null;
 
 
 /**
@@ -64,7 +65,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.dismissTimer_ = null;
  * @type {?number}
  * @private
  */
-anychart.core.ui.toolbar.SubMenu.prototype.showTimer_ = null;
+anychart.ui.menu.SubMenu.prototype.showTimer_ = null;
 
 
 /**
@@ -72,7 +73,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.showTimer_ = null;
  * @type {boolean}
  * @private
  */
-anychart.core.ui.toolbar.SubMenu.prototype.menuIsVisible_ = false;
+anychart.ui.menu.SubMenu.prototype.menuIsVisible_ = false;
 
 
 /**
@@ -80,7 +81,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.menuIsVisible_ = false;
  * @type {?goog.ui.Menu}
  * @private
  */
-anychart.core.ui.toolbar.SubMenu.prototype.subMenu_ = null;
+anychart.ui.menu.SubMenu.prototype.subMenu_ = null;
 
 
 /**
@@ -88,7 +89,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.subMenu_ = null;
  * @type {boolean}
  * @private
  */
-anychart.core.ui.toolbar.SubMenu.prototype.externalSubMenu_ = false;
+anychart.ui.menu.SubMenu.prototype.externalSubMenu_ = false;
 
 
 /**
@@ -98,7 +99,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.externalSubMenu_ = false;
  * @type {boolean}
  * @private
  */
-anychart.core.ui.toolbar.SubMenu.prototype.alignToEnd_ = true;
+anychart.ui.menu.SubMenu.prototype.alignToEnd_ = true;
 
 
 /**
@@ -107,12 +108,12 @@ anychart.core.ui.toolbar.SubMenu.prototype.alignToEnd_ = true;
  * @type {boolean}
  * @private
  */
-anychart.core.ui.toolbar.SubMenu.prototype.isPositionAdjustable_ = false;
+anychart.ui.menu.SubMenu.prototype.isPositionAdjustable_ = false;
 
 
 /** @override */
-anychart.core.ui.toolbar.SubMenu.prototype.enterDocument = function() {
-  anychart.core.ui.toolbar.SubMenu.superClass_.enterDocument.call(this);
+anychart.ui.menu.SubMenu.prototype.enterDocument = function() {
+  anychart.ui.menu.SubMenu.superClass_.enterDocument.call(this);
 
   this.getHandler().listen(this.getParent(), goog.ui.Component.EventType.HIDE,
       this.onParentHidden_);
@@ -124,7 +125,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.enterDocument = function() {
 
 
 /** @override */
-anychart.core.ui.toolbar.SubMenu.prototype.exitDocument = function() {
+anychart.ui.menu.SubMenu.prototype.exitDocument = function() {
   this.getHandler().unlisten(this.getParent(), goog.ui.Component.EventType.HIDE,
       this.onParentHidden_);
 
@@ -136,17 +137,17 @@ anychart.core.ui.toolbar.SubMenu.prototype.exitDocument = function() {
     }
   }
 
-  anychart.core.ui.toolbar.SubMenu.superClass_.exitDocument.call(this);
+  anychart.ui.menu.SubMenu.superClass_.exitDocument.call(this);
 };
 
 
 /** @override */
-anychart.core.ui.toolbar.SubMenu.prototype.disposeInternal = function() {
+anychart.ui.menu.SubMenu.prototype.disposeInternal = function() {
   if (this.subMenu_ && !this.externalSubMenu_) {
     this.subMenu_.dispose();
   }
   this.subMenu_ = null;
-  anychart.core.ui.toolbar.SubMenu.superClass_.disposeInternal.call(this);
+  anychart.ui.menu.SubMenu.superClass_.disposeInternal.call(this);
 };
 
 
@@ -158,8 +159,8 @@ anychart.core.ui.toolbar.SubMenu.prototype.disposeInternal = function() {
  * @param {boolean} highlight Whether item should be highlighted.
  * @param {boolean=} opt_btnPressed Whether the mouse button is held down.
  */
-anychart.core.ui.toolbar.SubMenu.prototype.setHighlighted = function(highlight, opt_btnPressed) {
-  anychart.core.ui.toolbar.SubMenu.superClass_.setHighlighted.call(this, highlight);
+anychart.ui.menu.SubMenu.prototype.setHighlighted = function(highlight, opt_btnPressed) {
+  anychart.ui.menu.SubMenu.superClass_.setHighlighted.call(this, highlight);
 
   if (opt_btnPressed) {
     this.getMenu().setMouseButtonPressed(true);
@@ -170,7 +171,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.setHighlighted = function(highlight, 
       goog.Timer.clear(this.dismissTimer_);
     }
     this.dismissTimer_ = goog.Timer.callOnce(
-        this.dismissSubMenu, anychart.core.ui.toolbar.SubMenu.MENU_DELAY_MS, this);
+        this.dismissSubMenu, anychart.ui.menu.SubMenu.MENU_DELAY_MS, this);
   }
 };
 
@@ -178,7 +179,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.setHighlighted = function(highlight, 
 /**
  * Show the submenu and ensure that all siblings are hidden.
  */
-anychart.core.ui.toolbar.SubMenu.prototype.showSubMenu = function() {
+anychart.ui.menu.SubMenu.prototype.showSubMenu = function() {
   // Only show the menu if this item is still selected. This is called on a
   // timeout, so make sure our parent still exists.
   var parent = this.getParent();
@@ -192,7 +193,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.showSubMenu = function() {
 /**
  * Dismisses the menu and all further submenus.
  */
-anychart.core.ui.toolbar.SubMenu.prototype.dismissSubMenu = function() {
+anychart.ui.menu.SubMenu.prototype.dismissSubMenu = function() {
   // Because setHighlighted calls this function on a timeout, we need to make
   // sure that the sub menu hasn't been disposed when we come back.
   var subMenu = this.subMenu_;
@@ -210,7 +211,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.dismissSubMenu = function() {
 /**
  * Clears the show and hide timers for the sub menu.
  */
-anychart.core.ui.toolbar.SubMenu.prototype.clearTimers = function() {
+anychart.ui.menu.SubMenu.prototype.clearTimers = function() {
   if (this.dismissTimer_) {
     goog.Timer.clear(this.dismissTimer_);
   }
@@ -228,8 +229,8 @@ anychart.core.ui.toolbar.SubMenu.prototype.clearTimers = function() {
  * @return {boolean} - Whether the visibility was changed.
  * @override
  */
-anychart.core.ui.toolbar.SubMenu.prototype.setVisible = function(visible, opt_force) {
-  var visibilityChanged = anychart.core.ui.toolbar.SubMenu.superClass_.setVisible.call(this, visible, opt_force);
+anychart.ui.menu.SubMenu.prototype.setVisible = function(visible, opt_force) {
+  var visibilityChanged = anychart.ui.menu.SubMenu.superClass_.setVisible.call(this, visible, opt_force);
   // For menus that allow menu items to be hidden (i.e. ComboBox) ensure that the submenu is hidden.
   if (visibilityChanged && !this.isVisible()) {
     this.dismissSubMenu();
@@ -242,7 +243,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.setVisible = function(visible, opt_fo
  * Dismiss all the sub menus of sibling menu items.
  * @private
  */
-anychart.core.ui.toolbar.SubMenu.prototype.dismissSiblings_ = function() {
+anychart.ui.menu.SubMenu.prototype.dismissSiblings_ = function() {
   this.getParent().forEachChild(function(child) {
     if (child != this && typeof child.dismissSubMenu == 'function') {
       child.dismissSubMenu();
@@ -261,7 +262,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.dismissSiblings_ = function() {
  * @return {boolean} Whether the event was handled.
  * @override
  */
-anychart.core.ui.toolbar.SubMenu.prototype.handleKeyEvent = function(e) {
+anychart.ui.menu.SubMenu.prototype.handleKeyEvent = function(e) {
   var keyCode = e.keyCode;
   var openKeyCode = this.isRightToLeft() ? goog.events.KeyCodes.LEFT :
       goog.events.KeyCodes.RIGHT;
@@ -310,7 +311,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.handleKeyEvent = function(e) {
  * @param {goog.events.Event} e Enter event to handle.
  * @private
  */
-anychart.core.ui.toolbar.SubMenu.prototype.onChildEnter_ = function(e) {
+anychart.ui.menu.SubMenu.prototype.onChildEnter_ = function(e) {
   if (this.subMenu_.getParent() == this) {
     this.clearTimers();
     this.getParentEventTarget().setHighlighted(this);
@@ -325,7 +326,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.onChildEnter_ = function(e) {
  * @param {goog.events.Event} e The event.
  * @private
  */
-anychart.core.ui.toolbar.SubMenu.prototype.onParentHidden_ = function(e) {
+anychart.ui.menu.SubMenu.prototype.onParentHidden_ = function(e) {
   // Ignore propagated events
   if (e.target == this.getParentEventTarget()) {
     // TODO(user): Using an event for this is expensive.  Consider having a
@@ -344,12 +345,12 @@ anychart.core.ui.toolbar.SubMenu.prototype.onParentHidden_ = function(e) {
  * @param {goog.events.BrowserEvent} e - Mouse event to handle.
  * @protected
  */
-anychart.core.ui.toolbar.SubMenu.prototype.handleMouseOver = function(e) {
+anychart.ui.menu.SubMenu.prototype.handleMouseOver = function(e) {
   if (this.isEnabled()) {
     this.clearTimers();
-    this.showTimer_ = goog.Timer.callOnce(this.showSubMenu, anychart.core.ui.toolbar.SubMenu.MENU_DELAY_MS, this);
+    this.showTimer_ = goog.Timer.callOnce(this.showSubMenu, anychart.ui.menu.SubMenu.MENU_DELAY_MS, this);
   }
-  anychart.core.ui.toolbar.SubMenu.superClass_.handleMouseOver.call(this, e);
+  anychart.ui.menu.SubMenu.superClass_.handleMouseOver.call(this, e);
 };
 
 
@@ -360,11 +361,13 @@ anychart.core.ui.toolbar.SubMenu.prototype.handleMouseOver = function(e) {
  * @return {boolean} True if the action was allowed to proceed, false otherwise.
  * @override
  */
-anychart.core.ui.toolbar.SubMenu.prototype.performActionInternal = function(e) {
+anychart.ui.menu.SubMenu.prototype.performActionInternal = function(e) {
   this.clearTimers();
-  var shouldHandleClick = this.isSupportedState(goog.ui.Component.State.SELECTED);
+  var shouldHandleClick =
+      this.isSupportedState(goog.ui.Component.State.SELECTED) ||
+      this.isSupportedState(goog.ui.Component.State.CHECKED);
   if (shouldHandleClick) {
-    return anychart.core.ui.toolbar.SubMenu.superClass_.performActionInternal.call(this, e);
+    return anychart.ui.menu.SubMenu.superClass_.performActionInternal.call(this, e);
   } else {
     this.showSubMenu();
     return true;
@@ -377,7 +380,13 @@ anychart.core.ui.toolbar.SubMenu.prototype.performActionInternal = function(e) {
  * @param {boolean} visible Whether to show menu.
  * @private
  */
-anychart.core.ui.toolbar.SubMenu.prototype.setSubMenuVisible_ = function(visible) {
+anychart.ui.menu.SubMenu.prototype.setSubMenuVisible_ = function(visible) {
+  // Unhighlighting the menuitems if closing the menu so the event handlers can
+  // determine the correct state.
+  if (!visible && this.getMenu()) {
+    this.getMenu().setHighlightedIndex(-1);
+  }
+
   // Dispatch OPEN event before calling getMenu(), so we can create the menu
   // lazily on first access.
   this.dispatchEvent(goog.ui.Component.getStateTransitionEvent(goog.ui.Component.State.OPENED, visible));
@@ -413,7 +422,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.setSubMenuVisible_ = function(visible
  * @param {boolean} attach Whether to attach or detach event listeners.
  * @private
  */
-anychart.core.ui.toolbar.SubMenu.prototype.setMenuListenersEnabled_ = function(menu, attach) {
+anychart.ui.menu.SubMenu.prototype.setMenuListenersEnabled_ = function(menu, attach) {
   var handler = this.getHandler();
   var method = attach ? handler.listen : handler.unlisten;
   method.call(handler, menu, goog.ui.Component.EventType.ENTER,
@@ -425,7 +434,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.setMenuListenersEnabled_ = function(m
  * Sets whether the submenu is aligned at the end of the parent menu.
  * @param {boolean} alignToEnd True to align to end, false to align to start.
  */
-anychart.core.ui.toolbar.SubMenu.prototype.setAlignToEnd = function(alignToEnd) {
+anychart.ui.menu.SubMenu.prototype.setAlignToEnd = function(alignToEnd) {
   if (alignToEnd != this.alignToEnd_) {
     this.alignToEnd_ = alignToEnd;
     if (this.isInDocument()) {
@@ -448,7 +457,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.setAlignToEnd = function(alignToEnd) 
  * @return {boolean} True if aligned to the end (the default), false if
  *     aligned to the start.
  */
-anychart.core.ui.toolbar.SubMenu.prototype.isAlignedToEnd = function() {
+anychart.ui.menu.SubMenu.prototype.isAlignedToEnd = function() {
   return this.alignToEnd_;
 };
 
@@ -458,7 +467,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.isAlignedToEnd = function() {
  * opened and the menu element's size changes (e.g., when adding/removing items
  * to an opened sub menu).
  */
-anychart.core.ui.toolbar.SubMenu.prototype.positionSubMenu = function() {
+anychart.ui.menu.SubMenu.prototype.positionSubMenu = function() {
   var position = new goog.positioning.AnchoredViewportPosition(
       this.getElement(), this.isAlignedToEnd() ?
           goog.positioning.Corner.TOP_END : goog.positioning.Corner.TOP_START,
@@ -491,7 +500,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.positionSubMenu = function() {
  * @param {goog.ui.MenuHeader|goog.ui.MenuItem|goog.ui.MenuSeparator} item Menu
  *     item to add to the menu.
  */
-anychart.core.ui.toolbar.SubMenu.prototype.addItem = function(item) {
+anychart.ui.menu.SubMenu.prototype.addItem = function(item) {
   this.getMenu().addChild(item, true);
 };
 
@@ -502,7 +511,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.addItem = function(item) {
  *     item to add to the menu.
  * @param {number} n Index at which to insert the menu item.
  */
-anychart.core.ui.toolbar.SubMenu.prototype.addItemAt = function(item, n) {
+anychart.ui.menu.SubMenu.prototype.addItemAt = function(item, n) {
   this.getMenu().addChildAt(item, n, true);
 };
 
@@ -511,7 +520,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.addItemAt = function(item, n) {
  * Removes an item from the menu and disposes it.
  * @param {goog.ui.MenuItem} item The menu item to remove.
  */
-anychart.core.ui.toolbar.SubMenu.prototype.removeItem = function(item) {
+anychart.ui.menu.SubMenu.prototype.removeItem = function(item) {
   var child = this.getMenu().removeChild(item, true);
   if (child) {
     child.dispose();
@@ -523,7 +532,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.removeItem = function(item) {
  * Removes a menu item at a given index in the menu and disposes it.
  * @param {number} n Index of item.
  */
-anychart.core.ui.toolbar.SubMenu.prototype.removeItemAt = function(n) {
+anychart.ui.menu.SubMenu.prototype.removeItemAt = function(n) {
   var child = this.getMenu().removeChildAt(n, true);
   if (child) {
     child.dispose();
@@ -536,7 +545,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.removeItemAt = function(n) {
  * @param {number} n Index of menu item.
  * @return {goog.ui.Component} Reference to the menu item.
  */
-anychart.core.ui.toolbar.SubMenu.prototype.getItemAt = function(n) {
+anychart.ui.menu.SubMenu.prototype.getItemAt = function(n) {
   return this.getMenu().getChildAt(n);
 };
 
@@ -545,7 +554,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.getItemAt = function(n) {
  * Returns the number of items in the sub menu (including separators).
  * @return {number} The number of items in the menu.
  */
-anychart.core.ui.toolbar.SubMenu.prototype.getItemCount = function() {
+anychart.ui.menu.SubMenu.prototype.getItemCount = function() {
   return this.getMenu().getChildCount();
 };
 
@@ -555,7 +564,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.getItemCount = function() {
  * @return {!Array<!goog.ui.MenuItem>} An array of menu items.
  * @deprecated Use getItemAt/getItemCount instead.
  */
-anychart.core.ui.toolbar.SubMenu.prototype.getItems = function() {
+anychart.ui.menu.SubMenu.prototype.getItems = function() {
   return this.getMenu().getItems();
 };
 
@@ -564,10 +573,10 @@ anychart.core.ui.toolbar.SubMenu.prototype.getItems = function() {
  * Gets a reference to the submenu's actual menu.
  * @return {!goog.ui.Menu} - Reference to the object representing the sub menu.
  */
-anychart.core.ui.toolbar.SubMenu.prototype.getMenu = function() {
+anychart.ui.menu.SubMenu.prototype.getMenu = function() {
   if (!this.subMenu_) {
-    this.setMenu(new goog.ui.Menu(void 0,
-        /** @type {goog.ui.MenuRenderer} */ (goog.ui.ContainerRenderer.getCustomRenderer(goog.ui.MenuRenderer, 'anychart-menu'))));
+    this.setMenu(
+        new anychart.ui.menu.Menu(this.getDomHelper()), /* opt_internal */ true);
   } else if (this.externalSubMenu_ && this.subMenu_.getParent() != this) {
     // Since it is possible for the same popup menu to be attached to multiple
     // submenus, we need to ensure that it has the correct parent event target.
@@ -587,7 +596,7 @@ anychart.core.ui.toolbar.SubMenu.prototype.getMenu = function() {
  * @param {boolean=} opt_internal - Whether this menu is an "internal" menu, and
  *     should be disposed of when this object is disposed of.
  */
-anychart.core.ui.toolbar.SubMenu.prototype.setMenu = function(menu, opt_internal) {
+anychart.ui.menu.SubMenu.prototype.setMenu = function(menu, opt_internal) {
   var oldMenu = this.subMenu_;
   if (menu != oldMenu) {
     if (oldMenu) {
@@ -621,12 +630,12 @@ anychart.core.ui.toolbar.SubMenu.prototype.setMenu = function(menu, opt_internal
  * @param {Element} element The element to test for.
  * @return {boolean} Whether or not the provided element is contained.
  */
-anychart.core.ui.toolbar.SubMenu.prototype.containsElement = function(element) {
+anychart.ui.menu.SubMenu.prototype.containsElement = function(element) {
   return this.getMenu().containsElement(element);
 };
 
 
-// Register a decorator factory function for anychart.core.ui.toolbar.SubMenus.
+// Register a decorator factory function for anychart.ui.menu.SubMenus.
 goog.ui.registry.setDecoratorByClassName(goog.getCssName('anychart-submenu'), function() {
-  return new anychart.core.ui.toolbar.SubMenu(null);
+  return new anychart.ui.menu.SubMenu(null);
 });

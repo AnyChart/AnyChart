@@ -30,6 +30,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="chart_labels" type="core.Label_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="animation" type="utils.Animation"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="interactivity" type="utils.Interactivity"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="context_menu" type="utils.ContextMenu"/>
             <!-- Common elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="data" type="Data"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="palette" type="palettes.Colors"/>
@@ -119,6 +120,7 @@
         <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="true"/>
         <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
         <xsd:attribute name="animation" type="simple.Bool" default="false"/>
+        <xsd:attribute name="context_menu" type="simple.Bool" default="true"/>
         <!-- charts.Bullet attrs -->
         <xsd:attribute name="layout" type="enums.Layout" default="horizontal"/>
         <xsd:attribute name="scale" type="simple.ChartScaleRef" default="linear"/>
@@ -237,6 +239,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="chart_labels" type="core.Label_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="animation" type="utils.Animation"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="interactivity" type="utils.Interactivity"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="context_menu" type="utils.ContextMenu"/>
             <!-- Common elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="data" type="Data"/>
             <!-- anychart.charts.CircularGauge elements -->
@@ -259,6 +262,7 @@
         <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
         <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="animation" type="simple.Bool" default="false"/>
+        <xsd:attribute name="context_menu" type="simple.Bool" default="true"/>
         <!-- anychart.charts.CircularGauge common attrs -->
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
@@ -283,6 +287,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="credits" type="core.Credits"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="chart_labels" type="core.Label_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="interactivity" type="utils.Interactivity"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="context_menu" type="utils.ContextMenu"/>
             <!-- Gantt elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="controller" type="core.gantt.Controller"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="data_grid" type="core.DataGrid"/>
@@ -299,6 +304,7 @@
         <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
         <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="animation" type="simple.Bool" default="false"/>
+        <xsd:attribute name="context_menu" type="simple.Bool" default="true"/>
         <xsd:attribute name="editing" type="simple.Bool" default="false"/>
         <!-- Gantt attributes -->
 
@@ -323,6 +329,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="animation" type="utils.Animation"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="crs_animation" type="utils.Animation"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="interactivity" type="utils.MapInteractivity"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="context_menu" type="utils.ContextMenu"/>
             <!-- Common elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="data" type="Data"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="palette" type="palettes.Colors"/>
@@ -348,6 +355,7 @@
         <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="true"/>
         <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
         <xsd:attribute name="animation" type="simple.Bool" default="false"/>
+        <xsd:attribute name="context_menu" type="simple.Bool" default="true"/>
         <!-- Map attrs -->
         <xsd:attribute name="min_bubble_size" type="simple.NumberOrPercent" default="5%"/>
         <xsd:attribute name="max_bubble_size" type="simple.NumberOrPercent" default="20%"/>
@@ -1583,6 +1591,10 @@
     <xsd:complexType name="utils.Animation">
         <xsd:attribute name="enabled" type="simple.Bool"/>
         <xsd:attribute name="duration" type="xsd:integer"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="utils.ContextMenu">
+        <xsd:attribute name="enabled" type="simple.Bool"/>
     </xsd:complexType>
 
     <xsd:complexType name="utils.Interactivity">

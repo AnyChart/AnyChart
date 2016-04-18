@@ -221,6 +221,12 @@ anychart.charts.Gantt.prototype.getAllSeries = function() {
 
 
 /** @inheritDoc */
+anychart.charts.Gantt.prototype.getVersionHistoryLink = function() {
+  return 'http://anychart.com/products/anygantt/history';
+};
+
+
+/** @inheritDoc */
 anychart.charts.Gantt.prototype.createFormatProvider = function(item, opt_period, opt_periodIndex) {
   if (!this.formatProvider_)
     this.formatProvider_ = new anychart.core.utils.GanttContextProvider(this.controller_.isResources());

@@ -324,6 +324,25 @@ anychart.charts.Stock.prototype.getType = function() {
 };
 
 
+/** @inheritDoc */
+anychart.charts.Stock.prototype.getVersionHistoryLink = function() {
+  return 'http://anychart.com/products/anystock/history';
+};
+
+
+/** @override */
+anychart.charts.Stock.prototype.getAllSeries = function() {
+  var series = [];
+  for (var i = 0; i < this.plots_.length; i++) {
+    var plot = this.plots_[i];
+    if (plot) {
+      series.push.apply(series, plot.getAllSeries());
+    }
+  }
+  return series;
+};
+
+
 /**
  * Returns normalized series type and a config for this series type.
  * @param {string} type

@@ -22,7 +22,9 @@ PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 CONTRIB_PATH = os.path.join(PROJECT_PATH, 'contrib')
 SRC_PATH = os.path.join(PROJECT_PATH, 'src')
 OUT_PATH = os.path.join(PROJECT_PATH, 'out')
-CSS_PATH = os.path.join(PROJECT_PATH, 'css', 'anychart.css')
+CSS_SRC_PATH = os.path.join(PROJECT_PATH, 'css', 'anychart.less')
+CSS_OUT_PATH = os.path.join(PROJECT_PATH, 'out', 'anychart-ui.css')
+CSS_MIN_OUT_PATH = os.path.join(PROJECT_PATH, 'out', 'anychart-ui.min.css')
 MODULES_PATH = os.path.join(SRC_PATH, 'modules')
 THEMES_PATH = os.path.join(SRC_PATH, 'themes')
 
@@ -78,6 +80,16 @@ def __sync_contrib():
             CONTRIB_PATH,
             'compiler'
         )
+
+    #Install lesscpy
+    print 'Install lesscpy'
+    commands = [] if platform.system() == 'Windows' else ['sudo']
+    commands.append('easy_install')
+    commands.append('lesscpy')
+    try:
+        subprocess.call(commands)
+    except StandardError:
+        raise StandardError('Sync contribution failed: you should install easy_install module for python')
 
     #Install closure linter
     global arguments
@@ -193,25 +205,6 @@ def __get_performance_monitoring_compiler_args():
     return [
         '--define "anychart.PERFORMANCE_MONITORING=%s"' % flag,
     ]
-
-
-def __get_toolbar_css_compiler_args(modules):
-    if ('anychart' in modules) or ('toolbar' in modules) or ('anygantt' in modules) or ('anychart_bundle' in modules):
-        with open(CSS_PATH, 'r') as css_file:
-            #Removing new lines
-            css_data = css_file.read().replace('\n', '')
-
-            #Removing comments
-            css_data = re.sub('\/\*[^*]*\*+([^/*][^*]*\*+)*\/', '', css_data)
-
-            #Removing multiple spaces
-            css_data = re.sub('\s\s+', ' ', css_data)
-
-        return [
-            '--define "anychart.TOOLBAR_CSS=\'%s\'"' % css_data
-        ]
-
-    return []
 
 
 def __get_optimized_compiler_args():
@@ -340,7 +333,6 @@ def __build_project_sources(modules):
                __get_not_optimized_compiler_args() + \
                __get_developers_edition_compiler_args() + \
                __get_performance_monitoring_compiler_args() + \
-               __get_toolbar_css_compiler_args(modules) + \
                __get_name_spaces(modules) + \
                __get_roots() + \
                __get_output_file_arg(output_file) + \
@@ -348,6 +340,9 @@ def __build_project_sources(modules):
 
     # print build log
     __log_compilation(False, modules, output_file)
+
+    if 'anychart_ui' in modules or 'anychart_bundle' in modules:
+        __compile_css()
 
     # build binary file
     __call_console_commands(commands)
@@ -373,7 +368,6 @@ def __build_project(modules):
                __get_optimized_compiler_args() + \
                __get_developers_edition_compiler_args() + \
                __get_performance_monitoring_compiler_args() + \
-               __get_toolbar_css_compiler_args(modules) + \
                __get_name_spaces(modules) + \
                __get_roots() + \
                __get_output_file_arg(output_file) + \
@@ -389,6 +383,9 @@ def __build_project(modules):
 
     # print build log
     __log_compilation(True, modules, output_file)
+
+    if 'anychart_ui' in modules or 'anychart_bundle' in modules:
+        __compile_css()
 
     # build binary file
     __call_console_commands(commands)
@@ -443,6 +440,8 @@ def __log_compilation(is_binary, modules, output_file):
 def __apply_specific_file_name_rule(file_name, modules):
     if modules == ['anychart_bundle']:
         file_name = file_name.replace('anychart_bundle', 'anychart-bundle')
+    elif modules == ['anychart_ui']:
+        file_name = file_name.replace('anychart_ui', 'anychart-ui')
     return file_name
 
 
@@ -458,7 +457,7 @@ def __call_console_commands(commands, cwd=None):
 
 
 def __get_copyrigth(modules):
-    if len(modules) != 1 or modules[0] not in ['anychart_bundle', 'anychart', 'anymap', 'anygantt', 'anystock']:
+    if len(modules) != 1 or modules[0] not in ['anychart_bundle', 'anychart', 'anymap', 'anygantt', 'anystock', 'anychart_ui']:
         return ''
 
     module = modules[0]
@@ -469,7 +468,7 @@ def __get_copyrigth(modules):
     name = ''
     if module == 'anychart_bundle':
         name = 'AnyChart'
-        title = 'Charting Framework\n * AnyChart, AnyMap, AnyGantt, AnyStock'
+        title = 'Charting Framework\n * AnyChart, AnyMap, AnyGantt, AnyStock, AnyChart UI'
     elif module == 'anychart':
         name = 'AnyChart'
         title = 'Charts'
@@ -482,6 +481,9 @@ def __get_copyrigth(modules):
     elif module == 'anystock':
         name = 'AnyStock'
         title = 'Financial Charts'
+    elif module == 'anychart_ui':
+        name = 'AnyChart UI'
+        title = 'Charting User Interface'
 
     build = 'Development' if __is_develop() else 'Production'
 
@@ -739,6 +741,11 @@ def __build_release():
     arguments = dev_options
     __build_project(['anygantt'])
 
+    #ui
+    print "Compile AnyChart UI"
+    __call_console_commands(['./build compile -m anychart_ui -gz'])
+    __call_console_commands(['./build compile -m anychart_ui -gz -d'])
+
     print "Compile Themes"
     __build_themes()
 
@@ -866,6 +873,34 @@ def __print_gz_stat():
         print "    " + "\n    ".join(result)
     else:
         print "No gzip files found in out directory"
+
+
+#=======================================================================================================================
+#                            Less css.
+#=======================================================================================================================
+def __compile_css():
+    try:
+        import lesscpy
+    except ImportError:
+        raise ImportError('You need install lesscpy. Run `./build contrib`')
+
+    print "Compile AnyChart UI css"
+    if os.path.exists(CSS_OUT_PATH):
+        os.remove(CSS_OUT_PATH)
+    if os.path.exists(CSS_MIN_OUT_PATH):
+        os.remove(CSS_MIN_OUT_PATH)
+
+    # Less
+    f = open(CSS_OUT_PATH, 'w')
+    f.write(lesscpy.compile(CSS_SRC_PATH))
+    f.close()
+
+    # Minify
+    f_min = open(CSS_MIN_OUT_PATH, 'w')
+    f_min.write(lesscpy.compile(CSS_SRC_PATH, xminify=True))
+    f_min.close()
+
+    print "CSS compiled"
 
 
 #=======================================================================================================================
@@ -1008,6 +1043,10 @@ def __exec_main_script():
     subparsers.add_parser('gz_stat', help='Print into console size of all gzip files in out directory,'
                                           ' very useful on release day.')
 
+    # create the parser for the "css" command
+    subparsers.add_parser('css', help='Compile AnyChart UI css')
+
+
     global arguments
     arguments = vars(parser.parse_args())
 
@@ -1033,6 +1072,8 @@ def __exec_main_script():
         __build_release()
     elif command == 'gz_stat':
         __print_gz_stat()
+    elif command == 'css':
+        __compile_css()
 
     __print_warnings_list()
 

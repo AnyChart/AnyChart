@@ -634,6 +634,7 @@ anychart.core.ui.BaseGrid.prototype.handleAll_ = function(event) {
   if (event['type'] == acgraph.events.EventType.DBLCLICK) this.handleDblMouseClick_(event);
   if (event['type'] == acgraph.events.EventType.MOUSEDOWN) this.handleMouseDown_(event);
   if (event['type'] == acgraph.events.EventType.MOUSEUP) this.handleMouseUp_(event);
+  if (event['type'] == acgraph.events.EventType.CONTEXTMENU) this.interactivityHandler.dispatchEvent(event);
 };
 
 

@@ -546,6 +546,12 @@ anychart.charts.Map.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.MAP_ZOOM;
 
 
+/** @inheritDoc */
+anychart.charts.Map.prototype.getVersionHistoryLink = function() {
+  return 'http://anychart.com/products/anymap/history';
+};
+
+
 /**
  * Animation and other timings.
  * @enum {number}

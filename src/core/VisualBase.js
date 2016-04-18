@@ -148,6 +148,7 @@ anychart.core.VisualBase.prototype.bindHandlersToGraphics = function(element, op
   this.eventsHandler.listen(element, acgraph.events.EventType.TOUCHEND, this.handleBrowserEvent);
   this.eventsHandler.listen(element, acgraph.events.EventType.TOUCHCANCEL, this.handleBrowserEvent);
   this.eventsHandler.listen(element, acgraph.events.EventType.TOUCHMOVE, this.handleBrowserEvent);
+  this.eventsHandler.listen(element, acgraph.events.EventType.CONTEXTMENU, this.handleBrowserEvent);
 };
 
 
@@ -176,6 +177,7 @@ anychart.core.VisualBase.prototype.bindHandlersToComponent = function(target, op
   this.eventsHandler.listen(target, acgraph.events.EventType.TOUCHEND, opt_allHandler || this.handleMouseEvent);
   this.eventsHandler.listen(target, acgraph.events.EventType.TOUCHCANCEL, opt_allHandler || this.handleMouseEvent);
   this.eventsHandler.listen(target, acgraph.events.EventType.TOUCHMOVE, opt_allHandler || this.handleMouseEvent);
+  this.eventsHandler.listen(target, acgraph.events.EventType.CONTEXTMENU, opt_allHandler || this.handleMouseEvent);
 };
 
 
@@ -192,6 +194,14 @@ anychart.core.VisualBase.prototype.handleBrowserEvent = function(e) {
   e.stopWrapperPropagation();
   var wrappedEvent = this.makeBrowserEvent(e);
   wrappedEvent.originalEvent = e;
+  /**
+   * Returns original event.
+   * @this {anychart.core.MouseEvent}
+   * @return {acgraph.events.BrowserEvent}
+   */
+  wrappedEvent['getOriginalEvent'] = function() {
+    return this.originalEvent;
+  };
   return this.dispatchEvent(wrappedEvent);
 };
 

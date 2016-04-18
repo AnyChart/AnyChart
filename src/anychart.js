@@ -6,6 +6,7 @@
 goog.provide('anychart');
 goog.provide('anychart.globalLock');
 goog.require('acgraph');
+goog.require('anychart.base');
 goog.require('anychart.performance');
 goog.require('anychart.themes.merging');
 goog.require('anychart.utils');
@@ -17,46 +18,6 @@ goog.require('goog.json.hybrid');
  * @namespace
  * @name anychart
  */
-
-
-/**
- * Current version of the framework.
- * @example <t>lineChart</t>
- * chart.line([1.1, 1.4, 1.3, 1.6]);
- * chart.title().text('Current version:' + anychart.VERSION);
- * @define {string} Replaced on compile time.
- */
-anychart.VERSION = '';
-
-
-/**
- * Defines if it is developer edition.
- * @example <t>lineChart</t>
- * chart.line([1.1, 1.4, 1.3, 1.6]);
- * if (!anychart.DEVELOP){
- *   chart.title().text('It is production edition');
- * }else{
- *   chart.title().text('It is developer edition');
- * }
- * @define {boolean} Replaced on compile time.
- */
-anychart.DEVELOP = true;
-
-
-/**
- *
- * @define {boolean} Replaced on compile time.
- */
-anychart.PERFORMANCE_MONITORING = true;
-
-
-/**
- * Full toolbar css.
- * Takes content from {project_dir}/css/anychart.css file.
- * Used to embed anychart default css if toolbar module is in use.
- * @define {string} Replaced on compile time.
- */
-anychart.TOOLBAR_CSS = '';
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -533,32 +494,6 @@ anychart.isValidKey = function() {
 
 
 /**
- * Embeds default anychart style node.
- * @param {string} css - CSS string to be embedded.
- */
-anychart.embedCss = function(css) {
-  if (css) {
-    var cssEl = goog.dom.createDom(goog.dom.TagName.STYLE);
-    cssEl.type = 'text/css';
-
-    if (cssEl.styleSheet)
-      cssEl['styleSheet']['cssText'] = css;
-    else
-      goog.dom.appendChild(cssEl, goog.dom.createTextNode(css));
-
-    goog.dom.insertChildAt(goog.dom.getElementsByTagNameAndClass('head')[0], cssEl, 0);
-  }
-};
-
-
-/**
- * Defines the default theme.
- * @define {string} Replaced on compile time.
- */
-anychart.DEFAULT_THEME = 'defaultTheme';
-
-
-/**
  * Sets the theme for anychart globally or gets current theme.
  * @param {(string|Object)=} opt_value Object with theme settings or name of the theme.
  * @return {Object}
@@ -861,17 +796,19 @@ anychart.stock = anychart.stock || function() {
 /**
  * @ignoreDoc
  */
-anychart.toolbar = anychart.toolbar || function() {
+anychart.toolbar = anychart.toolbar || /** @type {function():null} */ (function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Toolbar']);
-};
+  return null;
+});
 
 
 /**
  * @ignoreDoc
  */
-anychart.ganttToolbar = anychart.ganttToolbar || function() {
+anychart.ganttToolbar = anychart.ganttToolbar || /** @type {function():null} */ (function() {
   anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Gantt toolbar']);
-};
+  return null;
+});
 
 
 /**
@@ -883,10 +820,6 @@ anychart.treeMap = anychart.treeMap || function() {
 
 
 //exports
-goog.exportSymbol('anychart.VERSION', anychart.VERSION);//doc|ex
-goog.exportSymbol('anychart.DEVELOP', anychart.DEVELOP);//doc|ex
-goog.exportSymbol('anychart.DEFAULT_THEME', anychart.DEFAULT_THEME);
-goog.exportSymbol('anychart.PERFORMANCE_MONITORING', anychart.PERFORMANCE_MONITORING);
 goog.exportSymbol('anychart.graphics', anychart.graphics);//import
 goog.exportSymbol('anychart.server', anychart.server);
 goog.exportSymbol('anychart.fromJson', anychart.fromJson);//doc|ex
@@ -939,7 +872,7 @@ goog.exportSymbol('anychart.circularGauge', anychart.circularGauge);
 goog.exportSymbol('anychart.ganttProject', anychart.ganttProject);
 goog.exportSymbol('anychart.ganttResource', anychart.ganttResource);
 goog.exportSymbol('anychart.stock', anychart.stock);
+goog.exportSymbol('anychart.theme', anychart.theme);
 goog.exportSymbol('anychart.toolbar', anychart.toolbar);
 goog.exportSymbol('anychart.ganttToolbar', anychart.ganttToolbar);
 goog.exportSymbol('anychart.treeMap', anychart.treeMap);
-goog.exportSymbol('anychart.theme', anychart.theme);

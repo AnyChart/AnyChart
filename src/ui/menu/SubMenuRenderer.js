@@ -1,13 +1,13 @@
-goog.provide('anychart.core.ui.toolbar.SubMenuRenderer');
+goog.provide('anychart.ui.menu.SubMenuRenderer');
 
-goog.require('anychart.core.ui.toolbar.MenuItemRenderer');
+goog.require('anychart.ui.menu.ItemRenderer');
+goog.require('anychart.ui.menu.Menu');
 goog.require('goog.a11y.aria');
 goog.require('goog.a11y.aria.State');
 goog.require('goog.asserts');
 goog.require('goog.dom');
 goog.require('goog.dom.classlist');
 goog.require('goog.style');
-goog.require('goog.ui.Menu');
 
 
 
@@ -21,13 +21,13 @@ goog.require('goog.ui.Menu');
  *      </div>
  *    </div>
  * @constructor
- * @extends {anychart.core.ui.toolbar.MenuItemRenderer}
+ * @extends {anychart.ui.menu.ItemRenderer}
  */
-anychart.core.ui.toolbar.SubMenuRenderer = function() {
-  anychart.core.ui.toolbar.MenuItemRenderer.call(this);
+anychart.ui.menu.SubMenuRenderer = function() {
+  anychart.ui.menu.SubMenuRenderer.base(this, 'constructor');
 };
-goog.inherits(anychart.core.ui.toolbar.SubMenuRenderer, anychart.core.ui.toolbar.MenuItemRenderer);
-goog.addSingletonGetter(anychart.core.ui.toolbar.SubMenuRenderer);
+goog.inherits(anychart.ui.menu.SubMenuRenderer, anychart.ui.menu.ItemRenderer);
+goog.addSingletonGetter(anychart.ui.menu.SubMenuRenderer);
 
 
 /**
@@ -35,7 +35,7 @@ goog.addSingletonGetter(anychart.core.ui.toolbar.SubMenuRenderer);
  * by this renderer.
  * @type {string}
  */
-anychart.core.ui.toolbar.SubMenuRenderer.CSS_CLASS = goog.getCssName('anychart-submenu');
+anychart.ui.menu.SubMenuRenderer.CSS_CLASS = goog.getCssName('anychart-submenu');
 
 
 /**
@@ -43,23 +43,23 @@ anychart.core.ui.toolbar.SubMenuRenderer.CSS_CLASS = goog.getCssName('anychart-s
  * @type {string}
  * @private
  */
-anychart.core.ui.toolbar.SubMenuRenderer.CSS_CLASS_SUBMENU_ = goog.getCssName('anychart-submenu-arrow');
+anychart.ui.menu.SubMenuRenderer.CSS_CLASS_SUBMENU_ = goog.getCssName('anychart-submenu-arrow');
 
 
 /**
  * Overrides {@link goog.ui.MenuItemRenderer#createDom} by adding
  * the additional class 'anychart-submenu' to the created element,
- * and passes the element to {@link anychart.ui.SubMenuItemRenderer#addArrow_}
+ * and passes the element to {@link anychart.ui.menu.SubMenuItemRenderer#addArrow_}
  * to add an child element that can be styled to show an arrow.
  * @param {goog.ui.Control} control goog.ui.SubMenu to render.
  * @return {!Element} Root element for the item.
  * @override
  */
-anychart.core.ui.toolbar.SubMenuRenderer.prototype.createDom = function(control) {
+anychart.ui.menu.SubMenuRenderer.prototype.createDom = function(control) {
   var subMenu = /** @type {goog.ui.SubMenu} */ (control);
-  var element = anychart.core.ui.toolbar.SubMenuRenderer.superClass_.createDom.call(this, subMenu);
+  var element = anychart.ui.menu.SubMenuRenderer.superClass_.createDom.call(this, subMenu);
   goog.asserts.assert(element);
-  goog.dom.classlist.add(element, anychart.core.ui.toolbar.SubMenuRenderer.CSS_CLASS);
+  goog.dom.classlist.add(element, anychart.ui.menu.SubMenuRenderer.CSS_CLASS);
   this.addArrow_(subMenu, element);
   return element;
 };
@@ -69,24 +69,24 @@ anychart.core.ui.toolbar.SubMenuRenderer.prototype.createDom = function(control)
  * Overrides {@link goog.ui.MenuItemRenderer#decorate} by adding the additional class 'anychart-submenu' to the decorated element,
  * and passing the element to renderer to add a child element that can be styled to show an arrow.
  * Also searches the element for a child with the class anychart-menu. If a matching child element is found, creates a
- * anychart.core.ui.toolbar.Menu, uses it to decorate the child element, and passes that menu to subMenu.setMenu.
+ * anychart.ui.menu.Menu, uses it to decorate the child element, and passes that menu to subMenu.setMenu.
  * @param {goog.ui.Control} control - SubMenu to render.
  * @param {Element} element - Element to decorate.
  * @return {!Element} - Root element for the item.
  * @override
  */
-anychart.core.ui.toolbar.SubMenuRenderer.prototype.decorate = function(control, element) {
+anychart.ui.menu.SubMenuRenderer.prototype.decorate = function(control, element) {
   var subMenu = /** @type {goog.ui.SubMenu} */ (control);
-  element = anychart.core.ui.toolbar.SubMenuRenderer.superClass_.decorate.call(
+  element = anychart.ui.menu.SubMenuRenderer.superClass_.decorate.call(
       this, subMenu, element);
   goog.asserts.assert(element);
-  goog.dom.classlist.add(element, anychart.core.ui.toolbar.SubMenuRenderer.CSS_CLASS);
+  goog.dom.classlist.add(element, anychart.ui.menu.SubMenuRenderer.CSS_CLASS);
   this.addArrow_(subMenu, element);
 
   // Search for a child menu and decorate it.
   var childMenuEls = goog.dom.getElementsByTagNameAndClass('div', goog.getCssName('anychart-menu'), element);
   if (childMenuEls.length) {
-    var childMenu = new goog.ui.Menu(subMenu.getDomHelper());
+    var childMenu = new anychart.ui.menu.Menu(subMenu.getDomHelper());
     var childMenuEl = childMenuEls[0];
     // Hide the menu element before attaching it to the document body; see bug 1089244.
     goog.style.setElementShown(childMenuEl, false);
@@ -107,16 +107,16 @@ anychart.core.ui.toolbar.SubMenuRenderer.prototype.decorate = function(control, 
  *     set as the item's content.
  * @override
  */
-anychart.core.ui.toolbar.SubMenuRenderer.prototype.setContent = function(element, content) {
+anychart.ui.menu.SubMenuRenderer.prototype.setContent = function(element, content) {
   // Save the submenu arrow element, if present.
   var contentElement = this.getContentElement(element);
   var arrowElement = contentElement && contentElement.lastChild;
-  anychart.core.ui.toolbar.SubMenuRenderer.superClass_.setContent.call(this, element, content);
+  anychart.ui.menu.SubMenuRenderer.superClass_.setContent.call(this, element, content);
   // If the arrowElement was there, is no longer there, and really was an arrow, reappend it.
   if (arrowElement &&
       contentElement.lastChild != arrowElement &&
       goog.dom.classlist.contains(/** @type {!Element} */ (arrowElement),
-          anychart.core.ui.toolbar.SubMenuRenderer.CSS_CLASS_SUBMENU_)) {
+          anychart.ui.menu.SubMenuRenderer.CSS_CLASS_SUBMENU_)) {
     contentElement.appendChild(arrowElement);
   }
 };
@@ -134,12 +134,12 @@ anychart.core.ui.toolbar.SubMenuRenderer.prototype.setContent = function(element
  *     initialized as it enters the document.
  * @override
  */
-anychart.core.ui.toolbar.SubMenuRenderer.prototype.initializeDom = function(control) {
+anychart.ui.menu.SubMenuRenderer.prototype.initializeDom = function(control) {
   var subMenu = /** @type {goog.ui.SubMenu} */ (control);
-  anychart.core.ui.toolbar.SubMenuRenderer.superClass_.initializeDom.call(this, subMenu);
+  anychart.ui.menu.SubMenuRenderer.superClass_.initializeDom.call(this, subMenu);
   var element = subMenu.getContentElement();
   var arrow = subMenu.getDomHelper().getElementsByTagNameAndClass(
-      'span', anychart.core.ui.toolbar.SubMenuRenderer.CSS_CLASS_SUBMENU_, element)[0];
+      'span', anychart.ui.menu.SubMenuRenderer.CSS_CLASS_SUBMENU_, element)[0];
   /*
     TODO (A.Kudryavtsev): Explanation.
     In currently used version of closure library, the compiler does not obfuscate ASCII symbols correctly.
@@ -170,10 +170,9 @@ anychart.core.ui.toolbar.SubMenuRenderer.prototype.initializeDom = function(cont
  * @param {Element} element Element to decorate.
  * @private
  */
-anychart.core.ui.toolbar.SubMenuRenderer.prototype.addArrow_ = function(subMenu, element) {
+anychart.ui.menu.SubMenuRenderer.prototype.addArrow_ = function(subMenu, element) {
   var arrow = subMenu.getDomHelper().createDom('span');
-  arrow.className = anychart.core.ui.toolbar.SubMenuRenderer.CSS_CLASS_SUBMENU_;
+  arrow.className = anychart.ui.menu.SubMenuRenderer.CSS_CLASS_SUBMENU_;
   arrow.innerHTML = '&nbsp;';
   this.getContentElement(element).appendChild(arrow);
 };
-

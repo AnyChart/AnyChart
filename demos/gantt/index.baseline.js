@@ -5,7 +5,7 @@ anychart.onDocumentReady(function() {
   //create project gantt chart
   chart = anychart.ganttProject();
 
-  var toolbar = anychart.ganttToolbar();
+  var toolbar = anychart.ui.ganttToolbar();
   toolbar.container('container');
   toolbar.target(chart);
   toolbar.draw();

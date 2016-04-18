@@ -1,4 +1,4 @@
-goog.provide('anychart.core.ui.toolbar.ToolbarButtonRenderer');
+goog.provide('anychart.ui.toolbar.ButtonRenderer');
 
 goog.require('goog.ui.ToolbarButtonRenderer');
 
@@ -9,18 +9,18 @@ goog.require('goog.ui.ToolbarButtonRenderer');
  * @constructor
  * @extends {goog.ui.ToolbarButtonRenderer}
  */
-anychart.core.ui.toolbar.ToolbarButtonRenderer = function() {
-  goog.base(this);
+anychart.ui.toolbar.ButtonRenderer = function() {
+  anychart.ui.toolbar.ButtonRenderer.base(this, 'constructor');
 };
-goog.inherits(anychart.core.ui.toolbar.ToolbarButtonRenderer, goog.ui.ToolbarButtonRenderer);
-goog.addSingletonGetter(anychart.core.ui.toolbar.ToolbarButtonRenderer);
+goog.inherits(anychart.ui.toolbar.ButtonRenderer, goog.ui.ToolbarButtonRenderer);
+goog.addSingletonGetter(anychart.ui.toolbar.ButtonRenderer);
 
 
 /**
  * Default CSS class to be applied to the root element of toolbars rendered by this renderer.
  * @type {string}
  */
-anychart.core.ui.toolbar.ToolbarButtonRenderer.CSS_CLASS = goog.getCssName('anychart-toolbar-button');
+anychart.ui.toolbar.ButtonRenderer.CSS_CLASS = goog.getCssName('anychart-toolbar-button');
 
 
 /**
@@ -28,8 +28,8 @@ anychart.core.ui.toolbar.ToolbarButtonRenderer.CSS_CLASS = goog.getCssName('anyc
  * @return {string} - Renderer-specific CSS class.
  * @override
  */
-anychart.core.ui.toolbar.ToolbarButtonRenderer.prototype.getCssClass = function() {
-  return anychart.core.ui.toolbar.ToolbarButtonRenderer.CSS_CLASS;
+anychart.ui.toolbar.ButtonRenderer.prototype.getCssClass = function() {
+  return anychart.ui.toolbar.ButtonRenderer.CSS_CLASS;
 };
 
 
@@ -47,10 +47,10 @@ anychart.core.ui.toolbar.ToolbarButtonRenderer.prototype.getCssClass = function(
  * @return {!Element} - Root element for the button.
  * @override
  */
-anychart.core.ui.toolbar.ToolbarButtonRenderer.prototype.createDom = function(control) {
+anychart.ui.toolbar.ButtonRenderer.prototype.createDom = function(control) {
   var button = /** @type {goog.ui.Button} */ (control);
   var classNames = this.getClassNames(button);
-  var attributes = {'class': anychart.core.ui.toolbar.Toolbar.INLINE_BLOCK_CLASSNAME + ' ' + classNames.join(' ')};
+  var attributes = {'class': anychart.ui.INLINE_BLOCK_CLASSNAME + ' ' + classNames.join(' ')};
   var buttonElement = button.getDomHelper().createDom('div', attributes, this.createButton(button.getContent(), button.getDomHelper()));
   this.setTooltip(buttonElement, /** @type {!string}*/ (button.getTooltip()));
   this.setAriaStates(button, buttonElement);
@@ -68,11 +68,11 @@ anychart.core.ui.toolbar.ToolbarButtonRenderer.prototype.createDom = function(co
  *    </div>
  *  </div>
  * Used by both {@link #createDom} and {@link #decorate}. To be overridden by subclasses.
- * @param {anychart.core.ui.toolbar.Toolbar.ControlContent} content - Text caption or DOM structure to wrap in a box.
+ * @param {anychart.ui.toolbar.Toolbar.ControlContent} content - Text caption or DOM structure to wrap in a box.
  * @param {goog.dom.DomHelper} dom - DOM helper, used for document interaction.
  * @return {Element} - Pseudo-rounded-corner box containing the content.
  */
-anychart.core.ui.toolbar.ToolbarButtonRenderer.prototype.createButton = function(content, dom) {
-  return dom.createDom('div', anychart.core.ui.toolbar.Toolbar.INLINE_BLOCK_CLASSNAME + ' ' + goog.getCssName(this.getCssClass(), 'outer-box'),
-      dom.createDom('div', anychart.core.ui.toolbar.Toolbar.INLINE_BLOCK_CLASSNAME + ' ' + goog.getCssName(this.getCssClass(), 'inner-box'), content));
+anychart.ui.toolbar.ButtonRenderer.prototype.createButton = function(content, dom) {
+  return dom.createDom('div', anychart.ui.INLINE_BLOCK_CLASSNAME + ' ' + goog.getCssName(this.getCssClass(), 'outer-box'),
+      dom.createDom('div', anychart.ui.INLINE_BLOCK_CLASSNAME + ' ' + goog.getCssName(this.getCssClass(), 'inner-box'), content));
 };

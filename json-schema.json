@@ -158,7 +158,13 @@
             {"$ref": "#/definitions/anychart.core.ui.ChartTooltip"}
           ]
         },
-        "interactivity": {"$ref": "#/definitions/anychart.core.utils.Interactivity"}
+        "interactivity": {"$ref": "#/definitions/anychart.core.utils.Interactivity"},
+        "contextMenu": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.ui.ContextMenu"}
+          ]
+        }
       }
     },
     "anychart.core.SeparateChart": {
@@ -5138,6 +5144,15 @@
           "type": "boolean"
         },
         "drag": {
+          "type": "boolean"
+        }
+      }
+    },
+
+    "anychart.ui.ContextMenu": {
+      "type": "object",
+      "properties": {
+        "enabled": {
           "type": "boolean"
         }
       }

@@ -1,4 +1,4 @@
-goog.provide('anychart.core.ui.toolbar.MenuItemRenderer');
+goog.provide('anychart.ui.menu.ItemRenderer');
 
 goog.require('goog.ui.MenuItemRenderer');
 
@@ -21,21 +21,21 @@ goog.require('goog.ui.MenuItemRenderer');
  * @constructor
  * @extends {goog.ui.MenuItemRenderer}
  */
-anychart.core.ui.toolbar.MenuItemRenderer = function() {
-  goog.base(this);
+anychart.ui.menu.ItemRenderer = function() {
+  anychart.ui.menu.ItemRenderer.base(this, 'constructor');
 };
-goog.inherits(anychart.core.ui.toolbar.MenuItemRenderer, goog.ui.MenuItemRenderer);
-goog.addSingletonGetter(anychart.core.ui.toolbar.MenuItemRenderer);
+goog.inherits(anychart.ui.menu.ItemRenderer, goog.ui.MenuItemRenderer);
+goog.addSingletonGetter(anychart.ui.menu.ItemRenderer);
 
 
 /**
  * CSS class name the renderer applies to menu item elements.
  * @type {string}
  */
-anychart.core.ui.toolbar.MenuItemRenderer.CSS_CLASS = goog.getCssName('anychart-menuitem');
+anychart.ui.menu.ItemRenderer.CSS_CLASS = goog.getCssName('anychart-menuitem');
 
 
 /** @override */
-anychart.core.ui.toolbar.MenuItemRenderer.prototype.getCssClass = function() {
-  return anychart.core.ui.toolbar.MenuItemRenderer.CSS_CLASS;
+anychart.ui.menu.ItemRenderer.prototype.getCssClass = function() {
+  return anychart.ui.menu.ItemRenderer.CSS_CLASS;
 };

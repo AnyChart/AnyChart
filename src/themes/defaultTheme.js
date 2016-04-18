@@ -635,6 +635,10 @@ window['anychart']['themes']['defaultTheme'] = {
     'padding': {'top': 10, 'right': 20, 'bottom': 5, 'left': 10},
     'margin': {'top': 0, 'right': 0, 'bottom': 0, 'left': 0},
     'background': {'enabled': true, 'zIndex': 1},
+    'contextMenu': {
+      'fromTheme': true, // suppress NO_FEATURE_IN_MODULE warning
+      'enabled': true
+    },
     'title': {
       'text': 'Chart Title',
       'padding': {'top': 0, 'right': 0, 'bottom': 10, 'left': 0},

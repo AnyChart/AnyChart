@@ -1,4 +1,4 @@
-goog.provide('anychart.core.ui.toolbar.ToolbarMenuButtonRenderer');
+goog.provide('anychart.ui.toolbar.MenuButtonRenderer');
 
 
 goog.require('goog.ui.ToolbarMenuButtonRenderer');
@@ -10,18 +10,18 @@ goog.require('goog.ui.ToolbarMenuButtonRenderer');
  * @constructor
  * @extends {goog.ui.ToolbarMenuButtonRenderer}
  */
-anychart.core.ui.toolbar.ToolbarMenuButtonRenderer = function() {
-  goog.base(this);
+anychart.ui.toolbar.MenuButtonRenderer = function() {
+  anychart.ui.toolbar.MenuButtonRenderer.base(this, 'constructor');
 };
-goog.inherits(anychart.core.ui.toolbar.ToolbarMenuButtonRenderer, goog.ui.ToolbarMenuButtonRenderer);
-goog.addSingletonGetter(anychart.core.ui.toolbar.ToolbarMenuButtonRenderer);
+goog.inherits(anychart.ui.toolbar.MenuButtonRenderer, goog.ui.ToolbarMenuButtonRenderer);
+goog.addSingletonGetter(anychart.ui.toolbar.MenuButtonRenderer);
 
 
 /**
  * Default CSS class to be applied to the root element of toolbars rendered by this renderer.
  * @type {string}
  */
-anychart.core.ui.toolbar.ToolbarMenuButtonRenderer.CSS_CLASS = goog.getCssName('anychart-toolbar-menu-button');
+anychart.ui.toolbar.MenuButtonRenderer.CSS_CLASS = goog.getCssName('anychart-toolbar-menu-button');
 
 
 /**
@@ -29,8 +29,8 @@ anychart.core.ui.toolbar.ToolbarMenuButtonRenderer.CSS_CLASS = goog.getCssName('
  * @return {string} - Renderer-specific CSS class.
  * @override
  */
-anychart.core.ui.toolbar.ToolbarMenuButtonRenderer.prototype.getCssClass = function() {
-  return anychart.core.ui.toolbar.ToolbarMenuButtonRenderer.CSS_CLASS;
+anychart.ui.toolbar.MenuButtonRenderer.prototype.getCssClass = function() {
+  return anychart.ui.toolbar.MenuButtonRenderer.CSS_CLASS;
 };
 
 
@@ -44,15 +44,15 @@ anychart.core.ui.toolbar.ToolbarMenuButtonRenderer.prototype.getCssClass = funct
  *      </div>
  *    </div>
  * Overrides {@link goog.ui.ButtonRenderer#createDom}.
- * @param {goog.ui.Control} control - anychart.core.ui.toolbar.Button to render.
+ * @param {goog.ui.Control} control - anychart.ui.toolbar.Button to render.
  * @return {!Element} - Root element for the button.
  * @override
  */
-anychart.core.ui.toolbar.ToolbarMenuButtonRenderer.prototype.createDom = function(control) {
+anychart.ui.toolbar.MenuButtonRenderer.prototype.createDom = function(control) {
   //TODO (A.Kudryavtsev): Copied to override goog-inline class.
   var button = /** @type {goog.ui.Button} */ (control);
   var classNames = this.getClassNames(button);
-  var attributes = {'class': anychart.core.ui.toolbar.Toolbar.INLINE_BLOCK_CLASSNAME + ' ' + classNames.join(' ')};
+  var attributes = {'class': anychart.ui.INLINE_BLOCK_CLASSNAME + ' ' + classNames.join(' ')};
   var buttonElement = button.getDomHelper().createDom('div', attributes, this.createButton(button.getContent(), button.getDomHelper()));
   this.setTooltip(buttonElement, /** @type {!string}*/ (button.getTooltip()));
   this.setAriaStates(button, buttonElement);
@@ -67,13 +67,13 @@ anychart.core.ui.toolbar.ToolbarMenuButtonRenderer.prototype.createDom = functio
  *    <div class="anychart-inline-block anychart-menu-button-caption">
  *      Contents...
  *    </div>
- * @param {anychart.core.ui.toolbar.Toolbar.ControlContent} content - Text caption or DOM structure to wrap in a box.
+ * @param {anychart.ui.toolbar.Toolbar.ControlContent} content - Text caption or DOM structure to wrap in a box.
  * @param {string} cssClass - The CSS class for the renderer.
  * @param {goog.dom.DomHelper} dom - DOM helper, used for document interaction.
  * @return {!Element} - Caption element.
  */
-anychart.core.ui.toolbar.ToolbarMenuButtonRenderer.wrapCaption = function(content, cssClass, dom) {
-  return dom.createDom('div', anychart.core.ui.toolbar.Toolbar.INLINE_BLOCK_CLASSNAME + ' ' + goog.getCssName(cssClass, 'caption'), content);
+anychart.ui.toolbar.MenuButtonRenderer.wrapCaption = function(content, cssClass, dom) {
+  return dom.createDom('div', anychart.ui.INLINE_BLOCK_CLASSNAME + ' ' + goog.getCssName(cssClass, 'caption'), content);
 };
 
 
@@ -83,12 +83,12 @@ anychart.core.ui.toolbar.ToolbarMenuButtonRenderer.wrapCaption = function(conten
  *    <div class="anychart-inline-block anychart-menu-button-caption">
  *      Contents...
  *    </div>
- * @param {anychart.core.ui.toolbar.Toolbar.ControlContent} content - Text caption or DOM structure to wrap in a box.
+ * @param {anychart.ui.toolbar.Toolbar.ControlContent} content - Text caption or DOM structure to wrap in a box.
  * @param {goog.dom.DomHelper} dom - DOM helper, used for document interaction.
  * @return {Element} - Caption element.
  */
-anychart.core.ui.toolbar.ToolbarMenuButtonRenderer.prototype.createCaption = function(content, dom) {
-  return anychart.core.ui.toolbar.ToolbarMenuButtonRenderer.wrapCaption(content, this.getCssClass(), dom);
+anychart.ui.toolbar.MenuButtonRenderer.prototype.createCaption = function(content, dom) {
+  return anychart.ui.toolbar.MenuButtonRenderer.wrapCaption(content, this.getCssClass(), dom);
 };
 
 
@@ -101,8 +101,8 @@ anychart.core.ui.toolbar.ToolbarMenuButtonRenderer.prototype.createCaption = fun
  * @param {goog.dom.DomHelper} dom - DOM helper, used for document interaction.
  * @return {Element} - Dropdown element.
  */
-anychart.core.ui.toolbar.ToolbarMenuButtonRenderer.prototype.createDropdown = function(dom) {
-  var element = dom.createDom('div', anychart.core.ui.toolbar.Toolbar.INLINE_BLOCK_CLASSNAME + ' ' + goog.getCssName(this.getCssClass(), 'dropdown'));
+anychart.ui.toolbar.MenuButtonRenderer.prototype.createDropdown = function(dom) {
+  var element = dom.createDom('div', anychart.ui.INLINE_BLOCK_CLASSNAME + ' ' + goog.getCssName(this.getCssClass(), 'dropdown'));
   element.innerHTML = '&nbsp';
   return element;
 };
@@ -117,12 +117,12 @@ anychart.core.ui.toolbar.ToolbarMenuButtonRenderer.prototype.createDropdown = fu
  *    </div>
  *  </div>
  * Used by both {@link #createDom} and {@link #decorate}.  To be overridden by subclasses.
- * @param {anychart.core.ui.toolbar.Toolbar.ControlContent} content - Text caption or DOM structure to wrap in a box.
+ * @param {anychart.ui.toolbar.Toolbar.ControlContent} content - Text caption or DOM structure to wrap in a box.
  * @param {goog.dom.DomHelper} dom - DOM helper, used for document interaction.
  * @return {Element} - Pseudo-rounded-corner box containing the content.
  */
-anychart.core.ui.toolbar.ToolbarMenuButtonRenderer.prototype.createButton = function(content, dom) {
+anychart.ui.toolbar.MenuButtonRenderer.prototype.createButton = function(content, dom) {
   content = [this.createCaption(content, dom), this.createDropdown(dom)];
-  return dom.createDom('div', anychart.core.ui.toolbar.Toolbar.INLINE_BLOCK_CLASSNAME + ' ' + goog.getCssName(this.getCssClass(), 'outer-box'),
-      dom.createDom('div', anychart.core.ui.toolbar.Toolbar.INLINE_BLOCK_CLASSNAME + ' ' + goog.getCssName(this.getCssClass(), 'inner-box'), content));
+  return dom.createDom('div', anychart.ui.INLINE_BLOCK_CLASSNAME + ' ' + goog.getCssName(this.getCssClass(), 'outer-box'),
+      dom.createDom('div', anychart.ui.INLINE_BLOCK_CLASSNAME + ' ' + goog.getCssName(this.getCssClass(), 'inner-box'), content));
 };
