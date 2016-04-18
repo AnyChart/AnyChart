@@ -52,7 +52,7 @@ anychart.core.scatter.series.Line.prototype.drawPoint = function(pointState) {
     if (pointDrawn) {
       this.drawMarker(pointState);
       this.drawLabel(pointState);
-      if (this.isErrorAvailable() && this.error().hasAnyErrorValues())
+      if (this.supportsError() && this.error().hasAnyErrorValues())
         this.drawError();
     }
     this.pointDrawn = (this.connectMissing && this.pointDrawn) || pointDrawn;

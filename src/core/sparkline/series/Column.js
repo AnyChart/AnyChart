@@ -44,7 +44,7 @@ anychart.core.sparkline.series.Column.prototype.isWidthBased = function() {
  */
 anychart.core.sparkline.series.Column.prototype.fixBounds = function(bounds) {
   var pointsCount = this.getResetIterator().getRowsCount();
-  var pointWidth = this.getPointWidth(bounds);
+  var pointWidth = this.getPixelPointWidth(bounds);
 
   var expectedSpaceCount = pointsCount - 1;
   var currentSpaceCount = bounds.width - pointsCount * pointWidth;
@@ -78,7 +78,7 @@ anychart.core.sparkline.series.Column.prototype.rootTypedLayerInitializer = func
  * @return {number} Point width in pixels.
  * @protected
  */
-anychart.core.sparkline.series.Column.prototype.getPointWidth = function(opt_bounds) {
+anychart.core.sparkline.series.Column.prototype.getPixelPointWidth = function(opt_bounds) {
   var bounds = opt_bounds || this.pixelBoundsCache;
   // todo(Anton Saukh): fix for linear scale case.
   var categoryWidth = Math.floor((this.chart.xScale().getPointWidthRatio() || (1 / this.getIterator().getRowsCount())) *
@@ -198,7 +198,7 @@ anychart.core.sparkline.series.Column.prototype.drawSubsequentPoint = function()
 
     /** @type {!acgraph.vector.Rect} */
     var rect = /** @type {!acgraph.vector.Rect} */(this.rootElement.genNextChild());
-    var barWidth = this.getPointWidth();
+    var barWidth = this.getPixelPointWidth();
     var pixelShift = barWidth % 2 == 0 ? 0 : .5;
 
     this.getIterator().meta('x', xPos).meta('value', yPos).meta('shape', rect);

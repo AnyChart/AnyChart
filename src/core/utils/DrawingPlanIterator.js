@@ -5,30 +5,39 @@ goog.require('anychart.data.Iterator');
 
 /**
  *
- * @param {Object} drawingPlan
- * @param {!anychart.data.View} view The view to iterate through.
+ * @param {anychart.core.series.Cartesian} series
  * @constructor
  * @extends {anychart.data.Iterator}
  */
-anychart.core.utils.DrawingPlanIterator = function(drawingPlan, view) {
-  anychart.core.utils.DrawingPlanIterator.base(this, 'constructor', view);
-
+anychart.core.utils.DrawingPlanIterator = function(series) {
   /**
-   * Data to be drawn.
-   * @type {Array.<*>}
+   * @type {anychart.core.series.Cartesian}
    * @private
    */
-  this.drawingData_ = drawingPlan.data;
+  this.series_ = series;
+  anychart.core.utils.DrawingPlanIterator.base(this, 'constructor', /** @type {!anychart.data.View} */(series.data()));
 };
 goog.inherits(anychart.core.utils.DrawingPlanIterator, anychart.data.Iterator);
 
 
 /** @inheritDoc */
+anychart.core.utils.DrawingPlanIterator.prototype.reset = function() {
+  /**
+   * @type {Array.<{data:Object, meta:Object}>}
+   * @private
+   */
+  this.data_ = this.series_.drawingPlan.data;
+
+  return anychart.core.utils.DrawingPlanIterator.base(this, 'reset');
+};
+
+
+/** @inheritDoc */
 anychart.core.utils.DrawingPlanIterator.prototype.advance = function() {
   this.currentIndex++;
-  this.currentPoint_ = this.drawingData_[this.currentIndex];
+  this.currentPoint_ = this.data_[this.currentIndex];
   this.currentRow = undefined;
-  return this.currentIndex < this.drawingData_.length;
+  return this.currentIndex < this.data_.length;
 };
 
 
@@ -37,7 +46,7 @@ anychart.core.utils.DrawingPlanIterator.prototype.advance = function() {
  * @return {number}
  */
 anychart.core.utils.DrawingPlanIterator.prototype.getRawDataIndex = function() {
-  return this.currentPoint_ ? this.currentPoint_['rawIndex'] : NaN;
+  return /** @type {number} */(this.meta(anychart.opt.RAW_INDEX));
 };
 
 
@@ -45,18 +54,20 @@ anychart.core.utils.DrawingPlanIterator.prototype.getRawDataIndex = function() {
 anychart.core.utils.DrawingPlanIterator.prototype.get = function(fieldName) {
   var res = undefined;
   if (this.currentPoint_) {
-    if (fieldName in this.currentPoint_) {
-      res = this.currentPoint_[fieldName];
+    if (fieldName in this.currentPoint_.data) {
+      res = this.currentPoint_.data[fieldName];
     } else {
       //anychart.core.utils.DrawingPlanIterator.misses[fieldName] = true;
-      var rawIndex = this.currentPoint_['rawIndex'];
+      var rawIndex = this.currentPoint_.meta[anychart.opt.RAW_INDEX];
       if (!this.currentRow) {
         if (goog.isDef(rawIndex))
           this.currentRow = this.view.row(rawIndex);
         else
-          return res;//undefined
+          return this.currentPoint_.data[fieldName] = res;//undefined
       }
-      res = this.view.getRowMapping(rawIndex).getInternal(this.currentRow, rawIndex, fieldName);
+      // aggressively caching
+      this.currentPoint_.data[fieldName] = res =
+          this.view.getRowMapping(rawIndex).getInternal(this.currentRow, rawIndex, fieldName);
     }
   }
   return res;
@@ -65,23 +76,17 @@ anychart.core.utils.DrawingPlanIterator.prototype.get = function(fieldName) {
 
 /** @inheritDoc */
 anychart.core.utils.DrawingPlanIterator.prototype.getRowsCount = function() {
-  return this.drawingData_.length;
+  return this.data_.length;
 };
 
 
 /** @inheritDoc */
 anychart.core.utils.DrawingPlanIterator.prototype.meta = function(name, opt_value) {
   var isSetter = arguments.length > 1;
-  if (this.currentPoint_) {
-    var meta = this.currentPoint_['meta'];
-    if (!meta)
-      this.currentPoint_['meta'] = meta = {};
-  } else {
-    if (isSetter)
-      return this;
-    else
-      return undefined;
+  if (!this.currentPoint_) {
+    return isSetter ? this : undefined;
   }
+  var meta = this.currentPoint_.meta;
   if (isSetter) {
     meta[name] = opt_value;
     return this;

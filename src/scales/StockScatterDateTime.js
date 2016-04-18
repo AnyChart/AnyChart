@@ -1,6 +1,7 @@
 goog.provide('anychart.scales.StockScatterDateTime');
 goog.require('anychart.core.Base');
 goog.require('anychart.enums');
+goog.require('anychart.scales.IXScale');
 goog.require('anychart.scales.StockScatterTicksIterator');
 goog.require('anychart.utils');
 
@@ -11,6 +12,7 @@ goog.require('anychart.utils');
  * @param {!(anychart.charts.Stock|anychart.core.stock.Scroller)} chartOrScroller
  * @constructor
  * @extends {anychart.core.Base}
+ * @implements {anychart.scales.IXScale}
  */
 anychart.scales.StockScatterDateTime = function(chartOrScroller) {
   goog.base(this);
@@ -247,10 +249,11 @@ anychart.scales.StockScatterDateTime.prototype.getMinorIntervalUnitCount = funct
 
 /**
  * Transforms values to ratio.
- * @param {number|string|Date} value
+ * @param {*} value
+ * @param {number=} opt_subrangeRatio
  * @return {number}
  */
-anychart.scales.StockScatterDateTime.prototype.transform = function(value) {
+anychart.scales.StockScatterDateTime.prototype.transform = function(value, opt_subrangeRatio) {
   return this.transformInternal(value, NaN);
 };
 
@@ -350,11 +353,12 @@ anychart.scales.StockScatterDateTime.prototype.ensureTicksIteratorCreated = func
 
 /**
  * Transforms values to ratio.
- * @param {number|string|Date} key Key of the point to transform.
+ * @param {*} key Key of the point to transform.
  * @param {number} index Point index. If it is needed but not passed it would be retrieved automatically.
+ * @param {number=} opt_subRangeRatio Subrange ratio. Doesn't mean anything for stock for now.
  * @return {number}
  */
-anychart.scales.StockScatterDateTime.prototype.transformInternal = function(key, index) {
+anychart.scales.StockScatterDateTime.prototype.transformInternal = function(key, index, opt_subRangeRatio) {
   return (anychart.utils.normalizeTimestamp(key) - this.minKey) / (this.maxKey - this.minKey);
 };
 

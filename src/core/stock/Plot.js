@@ -1,13 +1,15 @@
 goog.provide('anychart.core.stock.Plot');
+goog.require('anychart.core.IPlot');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.axes.StockDateTime');
 goog.require('anychart.core.grids.Stock');
+goog.require('anychart.core.series.Stock');
 goog.require('anychart.core.stock.indicators');
-goog.require('anychart.core.stock.series');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.Legend');
 goog.require('anychart.enums');
+goog.require('anychart.palettes');
 goog.require('anychart.scales.Linear');
 goog.require('anychart.utils');
 goog.require('goog.fx.Dragger');
@@ -26,6 +28,7 @@ goog.require('goog.fx.Dragger');
  * @param {!anychart.charts.Stock} chart Stock chart reference.
  * @constructor
  * @extends {anychart.core.VisualBaseWithBounds}
+ * @implements {anychart.core.IPlot}
  */
 anychart.core.stock.Plot = function(chart) {
   goog.base(this);
@@ -46,7 +49,7 @@ anychart.core.stock.Plot = function(chart) {
 
   /**
    * Series list.
-   * @type {!Array.<!anychart.core.stock.series.Base>}
+   * @type {!Array.<!anychart.core.series.Stock>}
    * @private
    */
   this.series_ = [];
@@ -203,6 +206,42 @@ anychart.core.stock.Plot.prototype.getChart = function() {
 
 //region Series-related methods
 /**
+ * Creates and returns a new area series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.Stock}
+ */
+anychart.core.stock.Plot.prototype.area = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.AREA, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new candlestick series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.Stock}
+ */
+anychart.core.stock.Plot.prototype.candlestick = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.CANDLESTICK, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
  * Creates and returns a new column series.
  * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
  * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
@@ -213,7 +252,7 @@ anychart.core.stock.Plot.prototype.getChart = function() {
  *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
  *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
  * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
- * @return {anychart.core.stock.series.Base}
+ * @return {anychart.core.series.Stock}
  */
 anychart.core.stock.Plot.prototype.column = function(opt_data, opt_mappingSettings, opt_csvSettings) {
   return this.createSeriesByType(anychart.enums.StockSeriesType.COLUMN, opt_data, opt_mappingSettings, opt_csvSettings);
@@ -231,10 +270,28 @@ anychart.core.stock.Plot.prototype.column = function(opt_data, opt_mappingSettin
  *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
  *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
  * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
- * @return {anychart.core.stock.series.Base}
+ * @return {anychart.core.series.Stock}
  */
 anychart.core.stock.Plot.prototype.line = function(opt_data, opt_mappingSettings, opt_csvSettings) {
   return this.createSeriesByType(anychart.enums.StockSeriesType.LINE, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new marker series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.Stock}
+ */
+anychart.core.stock.Plot.prototype.marker = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.MARKER, opt_data, opt_mappingSettings, opt_csvSettings);
 };
 
 
@@ -249,7 +306,7 @@ anychart.core.stock.Plot.prototype.line = function(opt_data, opt_mappingSettings
  *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
  *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
  * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
- * @return {anychart.core.stock.series.Base}
+ * @return {anychart.core.series.Stock}
  */
 anychart.core.stock.Plot.prototype.ohlc = function(opt_data, opt_mappingSettings, opt_csvSettings) {
   return this.createSeriesByType(anychart.enums.StockSeriesType.OHLC, opt_data, opt_mappingSettings, opt_csvSettings);
@@ -257,9 +314,153 @@ anychart.core.stock.Plot.prototype.ohlc = function(opt_data, opt_mappingSettings
 
 
 /**
+ * Creates and returns a new rangeArea series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.Stock}
+ */
+anychart.core.stock.Plot.prototype.rangeArea = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.RANGE_AREA, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new rangeColumn series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.Stock}
+ */
+anychart.core.stock.Plot.prototype.rangeColumn = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.RANGE_COLUMN, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new rangeSplineArea series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.Stock}
+ */
+anychart.core.stock.Plot.prototype.rangeSplineArea = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.RANGE_SPLINE_AREA, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new rangeStepArea series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.Stock}
+ */
+anychart.core.stock.Plot.prototype.rangeStepArea = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.RANGE_STEP_AREA, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new spline series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.Stock}
+ */
+anychart.core.stock.Plot.prototype.spline = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.SPLINE, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new splineArea series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.Stock}
+ */
+anychart.core.stock.Plot.prototype.splineArea = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.SPLINE_AREA, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new stepArea series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.Stock}
+ */
+anychart.core.stock.Plot.prototype.stepArea = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.STEP_AREA, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new stepLine series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.Stock}
+ */
+anychart.core.stock.Plot.prototype.stepLine = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.STEP_LINE, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
  * Add series to chart.
  * @param {...anychart.data.TableMapping} var_args Chart series data.
- * @return {Array.<anychart.core.stock.series.Base>} Array of created series.
+ * @return {Array.<anychart.core.series.Stock>} Array of created series.
  */
 anychart.core.stock.Plot.prototype.addSeries = function(var_args) {
   var rv = [];
@@ -293,7 +494,7 @@ anychart.core.stock.Plot.prototype.getSeriesIndexBySeriesId = function(id) {
 /**
  * Gets series by its id.
  * @param {number|string} id Id of the series.
- * @return {anychart.core.stock.series.Base} Series instance.
+ * @return {anychart.core.series.Stock} Series instance.
  */
 anychart.core.stock.Plot.prototype.getSeries = function(id) {
   return this.getSeriesAt(this.getSeriesIndexBySeriesId(id));
@@ -303,7 +504,7 @@ anychart.core.stock.Plot.prototype.getSeries = function(id) {
 /**
  * Gets series by its index.
  * @param {number} index Index of the series.
- * @return {?anychart.core.stock.series.Base} Series instance.
+ * @return {?anychart.core.series.Stock} Series instance.
  */
 anychart.core.stock.Plot.prototype.getSeriesAt = function(index) {
   return this.series_[index] || null;
@@ -370,7 +571,7 @@ anychart.core.stock.Plot.prototype.removeAllSeries = function() {
 
 /**
  * Returns series list. Considered internal. Returns it for reading only.
- * @return {!Array.<!anychart.core.stock.series.Base>}
+ * @return {!Array.<anychart.core.series.Stock>}
  */
 anychart.core.stock.Plot.prototype.getAllSeries = function() {
   return this.series_;
@@ -455,10 +656,15 @@ anychart.core.stock.Plot.prototype.sma = function(mapping, opt_period, opt_serie
 
 /**
  * Getter/setter for series default settings.
- * @param {Object} value Object with default series settings.
+ * @param {Object=} opt_value Object with default series settings.
+ * @return {Object}
  */
-anychart.core.stock.Plot.prototype.setDefaultSeriesSettings = function(value) {
-  this.defaultSeriesSettings_ = value;
+anychart.core.stock.Plot.prototype.defaultSeriesSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultSeriesSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultSeriesSettings_ || {};
 };
 
 
@@ -473,40 +679,41 @@ anychart.core.stock.Plot.prototype.setDefaultSeriesSettings = function(value) {
  *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
  *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
  * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
- * @return {anychart.core.stock.series.Base}
+ * @return {anychart.core.series.Stock}
  */
 anychart.core.stock.Plot.prototype.createSeriesByType = function(type, opt_data, opt_mappingSettings, opt_csvSettings) {
-  type = anychart.enums.normalizeStockSeriesType(type);
-  var ctl = anychart.core.stock.series.Base.SeriesTypesMap[type];
-  var instance;
+  var configAndType = this.chart_.getConfigByType(type);
+  if (configAndType) {
+    var config = /** @type {anychart.core.series.TypeConfig} */(configAndType[1]);
+    var series = new anychart.core.series.Stock(this.chart_, this, type, config);
 
-  if (ctl) {
-    instance = new ctl(this.chart_, this);
-    instance.data(opt_data, opt_mappingSettings, opt_csvSettings);
-    instance.setParentEventTarget(this);
     var lastSeries = this.series_[this.series_.length - 1];
-    var index = lastSeries ? /** @type {number} */ (lastSeries.index()) + 1 : 0;
-    this.series_.push(instance);
+    var index = lastSeries ? /** @type {number} */(lastSeries.autoIndex()) + 1 : 0;
+    this.series_.push(series);
     var inc = index * anychart.core.stock.Plot.ZINDEX_INCREMENT_MULTIPLIER;
-    instance.index(index).id(index);
-    var seriesZIndex = ((type == anychart.enums.StockSeriesType.LINE) ?
+    var seriesZIndex = (series.isLineBased() ?
             anychart.core.stock.Plot.ZINDEX_LINE_SERIES :
             anychart.core.stock.Plot.ZINDEX_SERIES) + inc;
-    instance.setAutoZIndex(seriesZIndex);
-    instance.clip(true);
-    //instance.setAutoColor(this.palette().colorAt(this.series_.length - 1));
-    instance.setup(this.defaultSeriesSettings_[type]);
-    instance.listenSignals(this.seriesInvalidated_, this);
+
+    series.autoIndex(index);
+    series.data(opt_data, opt_mappingSettings, opt_csvSettings);
+    series.setAutoZIndex(seriesZIndex);
+    series.clip(true);
+    series.setAutoColor(this.palette().itemAt(index));
+    series.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(index)));
+    series.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
+    series.setParentEventTarget(this);
+    series.listenSignals(this.seriesInvalidated_, this);
+
     this.invalidate(
         anychart.ConsistencyState.STOCK_PLOT_SERIES |
         anychart.ConsistencyState.STOCK_PLOT_LEGEND,
         anychart.Signal.NEEDS_REDRAW);
   } else {
-    anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
-    instance = null;
+    series = null;
   }
 
-  return instance;
+  return series;
 };
 //endregion
 
@@ -802,6 +1009,21 @@ anychart.core.stock.Plot.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_PLOT_PALETTE)) {
+    var palette = this.palette();
+    var markerPalette = this.markerPalette();
+    var hatchFillPalette = this.hatchFillPalette();
+    for (i = 0; i < this.series_.length; i++) {
+      series = this.series_[i];
+      var index = /** @type {number} */(series.autoIndex());
+      series.setAutoColor(/** @type {acgraph.vector.Fill} */(palette.itemAt(index)));
+      series.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(markerPalette.itemAt(index)));
+      series.setAutoHatchFill(/** @type {acgraph.vector.PatternFill} */(hatchFillPalette.itemAt(index)));
+    }
+    this.invalidateRedrawable(false);
+    this.markConsistent(anychart.ConsistencyState.STOCK_PLOT_PALETTE);
+  }
+
   if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_PLOT_SERIES)) {
     for (i = 0; i < this.series_.length; i++) {
       series = this.series_[i];
@@ -1028,12 +1250,12 @@ anychart.core.stock.Plot.prototype.createLegendItemsProvider = function(sourceMo
    */
   var data = [];
   for (var i = 0; i < this.series_.length; i++) {
-    /** @type {anychart.core.stock.series.Base} */
+    /** @type {anychart.core.series.Stock} */
     var series = this.series_[i];
     if (series) {
       var itemData = series.getLegendItemData(itemsTextFormatter);
       itemData['sourceUid'] = goog.getUid(this);
-      itemData['sourceKey'] = series.index();
+      itemData['sourceKey'] = i;
       data.push(itemData);
     }
   }
@@ -1079,7 +1301,7 @@ anychart.core.stock.Plot.prototype.legendItemOut = goog.nullFunction;
 /**
  * Prepares highlight and returns an array of highlighted data rows for each series of the plot.
  * @param {number} value
- * @return {Array.<{series:?anychart.core.stock.series.Base, point:?anychart.data.TableSelectable.RowProxy}>}
+ * @return {Array.<{series:?anychart.core.series.Stock, point:?anychart.data.TableSelectable.RowProxy}>}
  */
 anychart.core.stock.Plot.prototype.prepareHighlight = function(value) {
   return goog.array.map(this.series_, function(series) {
@@ -1337,6 +1559,115 @@ anychart.core.stock.Plot.prototype.invalidateRedrawable = function(doInvalidateB
 //endregion
 
 
+//region Palettes
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Palettes
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter/setter for palette.
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|Object|Array.<string>)=} opt_value .
+ * @return {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors|anychart.core.stock.Plot)} .
+ */
+anychart.core.stock.Plot.prototype.palette = function(opt_value) {
+  if (opt_value instanceof anychart.palettes.RangeColors) {
+    this.setupPalette_(anychart.palettes.RangeColors, opt_value);
+    return this;
+  } else if (opt_value instanceof anychart.palettes.DistinctColors) {
+    this.setupPalette_(anychart.palettes.DistinctColors, opt_value);
+    return this;
+  } else if (goog.isObject(opt_value) && opt_value['type'] == 'range') {
+    this.setupPalette_(anychart.palettes.RangeColors);
+  } else if (goog.isObject(opt_value) || this.palette_ == null)
+    this.setupPalette_(anychart.palettes.DistinctColors);
+
+  if (goog.isDef(opt_value)) {
+    this.palette_.setup(opt_value);
+    return this;
+  }
+  return /** @type {!(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)} */(this.palette_);
+};
+
+
+/**
+ * Chart markers palette settings.
+ * @param {(anychart.palettes.Markers|Object|Array.<anychart.enums.MarkerType>)=} opt_value Chart marker palette settings to set.
+ * @return {!(anychart.palettes.Markers|anychart.core.stock.Plot)} Return current chart markers palette or itself for chaining call.
+ */
+anychart.core.stock.Plot.prototype.markerPalette = function(opt_value) {
+  if (!this.markerPalette_) {
+    this.markerPalette_ = new anychart.palettes.Markers();
+    this.markerPalette_.listenSignals(this.paletteInvalidated_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.markerPalette_.setup(opt_value);
+    return this;
+  } else {
+    return this.markerPalette_;
+  }
+};
+
+
+/**
+ * Chart hatch fill palette settings.
+ * @param {(Array.<acgraph.vector.HatchFill.HatchFillType>|Object|anychart.palettes.HatchFills)=} opt_value Chart
+ * hatch fill palette settings to set.
+ * @return {!(anychart.palettes.HatchFills|anychart.core.stock.Plot)} Return current chart hatch fill palette or itself
+ * for chaining call.
+ */
+anychart.core.stock.Plot.prototype.hatchFillPalette = function(opt_value) {
+  if (!this.hatchFillPalette_) {
+    this.hatchFillPalette_ = new anychart.palettes.HatchFills();
+    this.hatchFillPalette_.listenSignals(this.paletteInvalidated_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.hatchFillPalette_.setup(opt_value);
+    return this;
+  } else {
+    return this.hatchFillPalette_;
+  }
+};
+
+
+/**
+ * @param {Function} cls Palette constructor.
+ * @param {(anychart.palettes.RangeColors|anychart.palettes.DistinctColors)=} opt_cloneFrom Settings to clone from.
+ * @private
+ */
+anychart.core.stock.Plot.prototype.setupPalette_ = function(cls, opt_cloneFrom) {
+  if (this.palette_ instanceof cls) {
+    if (opt_cloneFrom)
+      this.palette_.setup(opt_cloneFrom);
+  } else {
+    // we dispatch only if we replace existing palette.
+    var doDispatch = !!this.palette_;
+    goog.dispose(this.palette_);
+    this.palette_ = new cls();
+    if (opt_cloneFrom)
+      this.palette_.setup(opt_cloneFrom);
+    this.palette_.listenSignals(this.paletteInvalidated_, this);
+    if (doDispatch)
+      this.invalidate(anychart.ConsistencyState.STOCK_PLOT_PALETTE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+/**
+ * Internal palette invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.core.stock.Plot.prototype.paletteInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    this.invalidate(anychart.ConsistencyState.STOCK_PLOT_PALETTE, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+//endregion
+
+
 /** @inheritDoc */
 anychart.core.stock.Plot.prototype.disposeInternal = function() {
   goog.dispose(this.background_);
@@ -1355,6 +1686,9 @@ anychart.core.stock.Plot.prototype.disposeInternal = function() {
   this.xAxis_ = null;
 
   delete this.chart_;
+
+  goog.disposeAll(this.palette_, this.markerPalette_, this.hatchFillPalette_);
+  this.palette_ = this.markerPalette_ = this.hatchFillPalette_ = null;
 
   goog.base(this, 'disposeInternal');
 };
@@ -1563,7 +1897,7 @@ anychart.core.stock.Plot.prototype.setupByJSON = function(config) {
   }
 
   if ('defaultSeriesSettings' in config)
-    this.setDefaultSeriesSettings(config['defaultSeriesSettings']);
+    this.defaultSeriesSettings(config['defaultSeriesSettings']);
 
   var series = config['series'];
   if (goog.isArray(series)) {
@@ -1688,9 +2022,20 @@ anychart.core.stock.Plot.Dragger.prototype.limitY = function(y) {
 //exports
 anychart.core.stock.Plot.prototype['background'] = anychart.core.stock.Plot.prototype.background;
 anychart.core.stock.Plot.prototype['legend'] = anychart.core.stock.Plot.prototype.legend;
-anychart.core.stock.Plot.prototype['line'] = anychart.core.stock.Plot.prototype.line;
-anychart.core.stock.Plot.prototype['ohlc'] = anychart.core.stock.Plot.prototype.ohlc;
+anychart.core.stock.Plot.prototype['area'] = anychart.core.stock.Plot.prototype.area;
+anychart.core.stock.Plot.prototype['candlestick'] = anychart.core.stock.Plot.prototype.candlestick;
 anychart.core.stock.Plot.prototype['column'] = anychart.core.stock.Plot.prototype.column;
+anychart.core.stock.Plot.prototype['line'] = anychart.core.stock.Plot.prototype.line;
+anychart.core.stock.Plot.prototype['marker'] = anychart.core.stock.Plot.prototype.marker;
+anychart.core.stock.Plot.prototype['ohlc'] = anychart.core.stock.Plot.prototype.ohlc;
+anychart.core.stock.Plot.prototype['rangeArea'] = anychart.core.stock.Plot.prototype.rangeArea;
+anychart.core.stock.Plot.prototype['rangeColumn'] = anychart.core.stock.Plot.prototype.rangeColumn;
+anychart.core.stock.Plot.prototype['rangeSplineArea'] = anychart.core.stock.Plot.prototype.rangeSplineArea;
+anychart.core.stock.Plot.prototype['rangeStepArea'] = anychart.core.stock.Plot.prototype.rangeStepArea;
+anychart.core.stock.Plot.prototype['spline'] = anychart.core.stock.Plot.prototype.spline;
+anychart.core.stock.Plot.prototype['splineArea'] = anychart.core.stock.Plot.prototype.splineArea;
+anychart.core.stock.Plot.prototype['stepArea'] = anychart.core.stock.Plot.prototype.stepArea;
+anychart.core.stock.Plot.prototype['stepLine'] = anychart.core.stock.Plot.prototype.stepLine;
 anychart.core.stock.Plot.prototype['getSeries'] = anychart.core.stock.Plot.prototype.getSeries;
 anychart.core.stock.Plot.prototype['yScale'] = anychart.core.stock.Plot.prototype.yScale;
 anychart.core.stock.Plot.prototype['yAxis'] = anychart.core.stock.Plot.prototype.yAxis;
@@ -1710,3 +2055,6 @@ anychart.core.stock.Plot.prototype['macd'] = anychart.core.stock.Plot.prototype.
 anychart.core.stock.Plot.prototype['roc'] = anychart.core.stock.Plot.prototype.roc;
 anychart.core.stock.Plot.prototype['rsi'] = anychart.core.stock.Plot.prototype.rsi;
 anychart.core.stock.Plot.prototype['sma'] = anychart.core.stock.Plot.prototype.sma;
+anychart.core.stock.Plot.prototype['palette'] = anychart.core.stock.Plot.prototype.palette;
+anychart.core.stock.Plot.prototype['markerPalette'] = anychart.core.stock.Plot.prototype.markerPalette;
+anychart.core.stock.Plot.prototype['hatchFillPalette'] = anychart.core.stock.Plot.prototype.hatchFillPalette;

@@ -396,7 +396,7 @@ anychart.core.utils.Error.prototype.drawVerticalErrorLine_ = function(path, lowe
  * @param {anychart.scales.Base} scale Scale.
  * @return {boolean} Availability.
  */
-anychart.core.utils.Error.isErrorAvailableForScale = function(scale) {
+anychart.core.utils.Error.supportsErrorForScale = function(scale) {
   return (scale instanceof anychart.scales.ScatterBase) &&
       !(scale instanceof anychart.scales.DateTime) &&
       (scale.stackMode() == anychart.enums.ScaleStackMode.NONE);
@@ -415,7 +415,7 @@ anychart.core.utils.Error.isErrorAvailableForScale = function(scale) {
  * @param {number} upperCoord Upper coordinate.
  */
 anychart.core.utils.Error.prototype.drawError = function(scale, horizontal, isBarBased, x, y, path, lowerCoord, upperCoord) {
-  if (!anychart.core.utils.Error.isErrorAvailableForScale(scale))
+  if (!anychart.core.utils.Error.supportsErrorForScale(scale))
     return;
 
   var constCoord = horizontal ? y : x;
@@ -480,12 +480,7 @@ anychart.core.utils.Error.prototype.draw = function(horizontal, isBarBased) {
  * @protected
  */
 anychart.core.utils.Error.prototype.getErrorStroke = function(horizontal) {
-  var iterator = this.series_.getIterator();
-  var errorStroke = horizontal ? this.xErrorStroke() : this.valueErrorStroke();
-  var pointStroke = horizontal ? iterator.get('xErrorStroke') : iterator.get('valueErrorStroke');
-
-  var result = /** @type {!acgraph.vector.Stroke} */ (this.series_.normalizeColor(/** @type {acgraph.vector.Stroke|Function} */ (pointStroke || errorStroke)));
-  result = acgraph.vector.normalizeStroke(result);
+  var result = this.series_.getErrorStroke(horizontal);
 
   if (goog.isObject(result) && ('keys' in result) && !goog.isObject(result['mode']))
     result['mode'] = this.series_.getPixelBounds();
@@ -499,7 +494,7 @@ anychart.core.utils.Error.prototype.getErrorStroke = function(horizontal) {
  * @return {Array.<number, number>} Array of lower and upper errors value.
  */
 anychart.core.utils.Error.prototype.getErrorValues = function(horizontal) {
-  if (!this.series_.isErrorAvailable())
+  if (!this.series_.supportsError())
     return [0, 0];
   var type = horizontal ? 'x' : 'value';
   var typeError = type + 'Error';
@@ -677,32 +672,31 @@ anychart.core.utils.ISeriesWithError = function() {
 
 /**
  * Returns current mapping iterator.
- * @return {!anychart.data.Iterator} Current series iterator.
+ * @return {!anychart.data.IIterator} Current series iterator.
  */
-anychart.core.utils.ISeriesWithError.prototype.getIterator;
+anychart.core.utils.ISeriesWithError.prototype.getIterator = function() {};
 
 
 /**
  * Gets final normalized fill or stroke color.
- * @param {acgraph.vector.Fill|acgraph.vector.Stroke|Function} color Normal state color.
- * @param {...(acgraph.vector.Fill|acgraph.vector.Stroke|Function)} var_args .
- * @return {!(acgraph.vector.Fill|acgraph.vector.Stroke)} Normalized color.
+ * @param {boolean} horizontal
+ * @return {acgraph.vector.Stroke} Normalized color.
  * @protected
  */
-anychart.core.utils.ISeriesWithError.prototype.normalizeColor;
+anychart.core.utils.ISeriesWithError.prototype.getErrorStroke = function(horizontal) {};
 
 
 /**
  * Returns pixel bounds of the element due to parent bounds and self bounds settings.
  * @return {!anychart.math.Rect} .
  */
-anychart.core.utils.ISeriesWithError.prototype.getPixelBounds;
+anychart.core.utils.ISeriesWithError.prototype.getPixelBounds = function() {};
 
 
 /**
  * Removes all error paths and clears hashes.
  */
-anychart.core.utils.ISeriesWithError.prototype.resetErrorPaths;
+anychart.core.utils.ISeriesWithError.prototype.resetErrorPaths = function() {};
 
 
 /**
@@ -710,7 +704,7 @@ anychart.core.utils.ISeriesWithError.prototype.resetErrorPaths;
  * @param {!acgraph.vector.Stroke} stroke
  * @return {!acgraph.vector.Path}
  */
-anychart.core.utils.ISeriesWithError.prototype.getErrorPath;
+anychart.core.utils.ISeriesWithError.prototype.getErrorPath = function(stroke) {};
 
 
 /**
@@ -718,7 +712,7 @@ anychart.core.utils.ISeriesWithError.prototype.getErrorPath;
  * @param {boolean} horizontal is error horizontal (x error).
  * @return {Array.<number, number>} Array of lower and upper errors value.
  */
-anychart.core.utils.ISeriesWithError.prototype.getErrorValues;
+anychart.core.utils.ISeriesWithError.prototype.getErrorValues = function(horizontal) {};
 
 
 /**
@@ -729,21 +723,21 @@ anychart.core.utils.ISeriesWithError.prototype.getErrorValues;
  * @return {number} .
  * @protected
  */
-anychart.core.utils.ISeriesWithError.prototype.applyRatioToBounds;
+anychart.core.utils.ISeriesWithError.prototype.applyRatioToBounds = function(ratio, horizontal) {};
 
 
 /**
  * Tester if the series can have an error..
  * @return {boolean}
  */
-anychart.core.utils.ISeriesWithError.prototype.isErrorAvailable;
+anychart.core.utils.ISeriesWithError.prototype.supportsError = function() {};
 
 
 /**
  * Draws an error.
  * @protected
  */
-anychart.core.utils.ISeriesWithError.prototype.drawError;
+anychart.core.utils.ISeriesWithError.prototype.drawError = function() {};
 
 
 /**
@@ -751,7 +745,7 @@ anychart.core.utils.ISeriesWithError.prototype.drawError;
  * @param {(Object|null|boolean|string)=} opt_value Error or self for chaining.
  * @return {(anychart.core.utils.Error|anychart.core.utils.ISeriesWithError)}
  */
-anychart.core.utils.ISeriesWithError.prototype.error;
+anychart.core.utils.ISeriesWithError.prototype.error = function(opt_value) {};
 
 //exports
 anychart.core.utils.Error.prototype['mode'] = anychart.core.utils.Error.prototype.mode;

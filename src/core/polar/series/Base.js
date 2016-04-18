@@ -471,7 +471,7 @@ anychart.core.polar.series.Base.prototype.transformXY = function(xVal, yVal) {
  * Tester if the series has markers() method.
  * @return {boolean}
  */
-anychart.core.polar.series.Base.prototype.hasMarkers = function() {
+anychart.core.polar.series.Base.prototype.supportsMarkers = function() {
   return false;
 };
 

@@ -83,7 +83,7 @@ anychart.core.polar.series.ContinuousBase.prototype.selectMarkers_ = null;
 
 
 /** @inheritDoc */
-anychart.core.polar.series.ContinuousBase.prototype.hasMarkers = function() {
+anychart.core.polar.series.ContinuousBase.prototype.supportsMarkers = function() {
   return true;
 };
 

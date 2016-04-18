@@ -16,6 +16,11 @@ goog.require('anychart.utils');
 
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  COMPLETELY TRANSFERED TO ANYCHART.CORE.SERIES
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Base class for all base series.<br/>
  * Base class defines common methods, such as those for:
@@ -488,6 +493,15 @@ anychart.core.SeriesBase.prototype.index = function(opt_value) {
   } else {
     return this.index_;
   }
+};
+
+
+/**
+ * For compatibility with core.series.Base.
+ * @return {number}
+ */
+anychart.core.SeriesBase.prototype.getIndex = function() {
+  return this.index_;
 };
 
 
@@ -1350,6 +1364,15 @@ anychart.core.SeriesBase.prototype.finalizePointAppearance = function() {
  * @param {anychart.PointState|number} pointState .
  */
 anychart.core.SeriesBase.prototype.applyAppearanceToSeries = goog.nullFunction;
+
+
+/**
+ * Creates tooltip format provider.
+ * @return {Object}
+ */
+anychart.core.SeriesBase.prototype.createTooltipContextProvider = function() {
+  return this.createFormatProvider();
+};
 
 
 //----------------------------------------------------------------------------------------------------------------------

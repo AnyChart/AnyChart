@@ -704,7 +704,7 @@ anychart.core.ui.ChartTooltip.prototype.setContainerToTooltip_ = function(toolti
  * @param {Array} points
  * @param {number} clientX
  * @param {number} clientY
- * @param {anychart.core.cartesian.series.Base} hoveredSeries
+ * @param {anychart.core.series.Base} hoveredSeries
  * @param {boolean=} opt_useUnionAsSingle
  * @param {Object=} opt_tooltipContextLoad
  */
@@ -726,11 +726,11 @@ anychart.core.ui.ChartTooltip.prototype.show = function(points, clientX, clientY
     }
 
     // for compile_each (gantt, bullet)
-    if (!goog.isDef(firstSeries.createFormatProvider)) {
+    if (!goog.isDef(firstSeries.createTooltipContextProvider)) {
       return;
     }
 
-    var contextProvider = firstSeries.createFormatProvider();
+    var contextProvider = firstSeries.createTooltipContextProvider();
     contextProvider['clientX'] = clientX;
     contextProvider['clientY'] = clientY;
     this.singleTooltip_.title().autoText(this.singleTooltip_.getFormattedTitle(contextProvider));
@@ -766,20 +766,20 @@ anychart.core.ui.ChartTooltip.prototype.show = function(points, clientX, clientY
       }
 
       // for compile_each (gantt, bullet)
-      if (!goog.isDef(series.createFormatProvider)) {
+      if (!goog.isDef(series.createTooltipContextProvider)) {
         return;
       }
 
-      var contextProvider = series.createFormatProvider();
+      var contextProvider = series.createTooltipContextProvider();
       unionContextProvider['formattedValues'].push(tooltip.getFormattedContent(contextProvider));
       unionContextProvider['points'].push(contextProvider);
 
-      if (series.getIterator)
+      if (goog.isArray(status['points']))
         allPoints.push({
           'series': series,
           'points': goog.array.map(status['points'], function(pointIndex) {
             series.getIterator().select(pointIndex);
-            return /** @type {{createFormatProvider:Function}} */(series).createFormatProvider(true);
+            return /** @type {{createTooltipContextProvider:Function}} */(series).createTooltipContextProvider(true);
           })
         });
     });
@@ -818,11 +818,11 @@ anychart.core.ui.ChartTooltip.prototype.show = function(points, clientX, clientY
       }
 
       // for compile_each (gantt, bullet)
-      if (!goog.isDef(series.createFormatProvider)) {
+      if (!goog.isDef(series.createTooltipContextProvider)) {
         return;
       }
 
-      var contextProvider = series.createFormatProvider();
+      var contextProvider = series.createTooltipContextProvider();
       contextProvider['clientX'] = clientX;
       contextProvider['clientY'] = clientY;
       tooltip.title().autoText(tooltip.getFormattedTitle(contextProvider));
@@ -870,7 +870,7 @@ anychart.core.ui.ChartTooltip.prototype.updatePosition = function(clientX, clien
  * @param {anychart.core.ui.SeriesTooltip} tooltip
  * @param {number} clientX
  * @param {number} clientY
- * @param {anychart.core.cartesian.series.Base=} opt_series
+ * @param {anychart.core.series.Base=} opt_series
  * @private
  */
 anychart.core.ui.ChartTooltip.prototype.setPositionToTooltip_ = function(tooltip, clientX, clientY, opt_series) {

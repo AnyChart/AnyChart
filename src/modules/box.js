@@ -5,7 +5,7 @@
 
 goog.provide('anychart.modules.box');
 goog.require('anychart.charts.Cartesian');
-goog.require('anychart.core.cartesian.series.Box');
+goog.require('anychart.core.drawers.Box');
 goog.require('anychart.modules.base');
 
 

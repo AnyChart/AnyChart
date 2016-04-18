@@ -27,6 +27,26 @@ anychart.core.utils.LegendItemSettings.prototype.markAllConsistent = function() 
 
 
 /**
+ * Resets LegendItemSettings class properties.
+ */
+anychart.core.utils.LegendItemSettings.prototype.reset = function() {
+  this.settingsObj = {};
+  this.iconTextSpacing_ = undefined;
+  this.iconEnabled_ = undefined;
+  this.iconType_ = undefined;
+  this.iconFill_ = undefined;
+  this.iconStroke_ = undefined;
+  this.iconHatchFill_ = undefined;
+  this.iconMarkerType_ = undefined;
+  this.iconMarkerFill_ = undefined;
+  this.iconMarkerStroke_ = undefined;
+  this.iconSize_ = undefined;
+  this.disabled_ = undefined;
+  // text is not reset.
+};
+
+
+/**
  * Getter/setter for iconTextSpacing setting.
  * @param {number=} opt_value Value of spacing between icon and text.
  * @return {(anychart.core.utils.LegendItemSettings|number)} Spacing between icon and text or self for method chaining.
@@ -94,7 +114,7 @@ anychart.core.utils.LegendItemSettings.prototype.iconType = function(opt_value) 
  */
 anychart.core.utils.LegendItemSettings.prototype.iconFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = goog.isFunction(opt_fillOrColorOrKeys) ?
+    var fill = (goog.isNull(opt_fillOrColorOrKeys) || goog.isFunction(opt_fillOrColorOrKeys)) ?
         opt_fillOrColorOrKeys :
         acgraph.vector.normalizeFill.apply(null, arguments);
     if (fill != this.iconFill_) {
@@ -119,7 +139,7 @@ anychart.core.utils.LegendItemSettings.prototype.iconFill = function(opt_fillOrC
  */
 anychart.core.utils.LegendItemSettings.prototype.iconStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = goog.isFunction(opt_strokeOrFill) ?
+    var stroke = (goog.isNull(opt_strokeOrFill) || goog.isFunction(opt_strokeOrFill)) ?
         opt_strokeOrFill :
         acgraph.vector.normalizeStroke.apply(null, arguments);
     if (stroke != this.iconStroke_) {
@@ -280,7 +300,7 @@ anychart.core.utils.LegendItemSettings.prototype.disabled = function(opt_value) 
  */
 anychart.core.utils.LegendItemSettings.prototype.getJSON = function() {
   // retrieve anychart.core.Text settings
-  var json = anychart.core.utils.LegendItemSettings.superClass_.serialize.call(this);
+  var json = anychart.core.Text.prototype.serialize.call(this);
   if (goog.isDef(this.iconTextSpacing()))
     json['iconTextSpacing'] = this.iconTextSpacing();
   if (goog.isDef(this.text()))
@@ -289,6 +309,8 @@ anychart.core.utils.LegendItemSettings.prototype.getJSON = function() {
     json['iconEnabled'] = this.iconEnabled();
   if (goog.isDef(this.iconType()))
     json['iconType'] = this.iconType();
+  if (goog.isDef(this.iconSize()))
+    json['iconSize'] = this.iconSize();
   if (goog.isDef(this.iconFill()))
     json['iconFill'] = this.iconFill();
   if (goog.isDef(this.iconStroke()))

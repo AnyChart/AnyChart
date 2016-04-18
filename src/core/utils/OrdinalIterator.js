@@ -5,7 +5,7 @@ goog.require('anychart.core.utils.ScatterIterator');
 
 
 /**
- * @param {!Array.<(anychart.core.cartesian.series.Base|anychart.core.polar.series.Base|anychart.core.radar.series.Base)>} series .
+ * @param {!Array.<(anychart.core.polar.series.Base|anychart.core.radar.series.Base)>} series .
  * @param {!Array} categories .
  * @param {Function=} opt_pointCallback .
  * @param {Function=} opt_missingCallback .

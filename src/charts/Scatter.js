@@ -1004,7 +1004,7 @@ anychart.charts.Scatter.prototype.createSeriesByType_ = function(type, data, opt
     instance.setAutoColor(this.palette().itemAt(index));
     instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(index)));
     instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
-    if (instance.hasMarkers()) {
+    if (instance.supportsMarkers()) {
       instance.markers().setAutoZIndex(seriesZIndex + anychart.charts.Scatter.ZINDEX_INCREMENT_MULTIPLIER / 2);
       instance.markers().setAutoFill(instance.getMarkerFill());
       instance.markers().setAutoStroke(instance.getMarkerStroke());
@@ -1416,7 +1416,7 @@ anychart.charts.Scatter.prototype.calculate = function() {
       while (iterator.advance()) {
         x = anychart.utils.toNumber(iterator.get('x'));
         y = anychart.utils.toNumber(iterator.get('value'));
-        if (aSeries.isErrorAvailable()) {
+        if (aSeries.supportsError()) {
           errValues = aSeries.getErrorValues(true);
           xScale.extendDataRange(x - errValues[0], x + errValues[1]);
           errValues = aSeries.getErrorValues(false);

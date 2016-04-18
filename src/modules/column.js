@@ -6,8 +6,8 @@
 goog.provide('anychart.modules.column');
 
 goog.require('anychart.charts.Cartesian');
-goog.require('anychart.core.cartesian.series.Column');
-goog.require('anychart.core.cartesian.series.RangeColumn');
+goog.require('anychart.core.drawers.Column');
+goog.require('anychart.core.drawers.RangeColumn');
 goog.require('anychart.modules.base');
 
 

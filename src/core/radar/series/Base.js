@@ -401,7 +401,7 @@ anychart.core.radar.series.Base.prototype.applyRatioToBounds = function(ratio, h
  * Tester if the series has markers() method.
  * @return {boolean}
  */
-anychart.core.radar.series.Base.prototype.hasMarkers = function() {
+anychart.core.radar.series.Base.prototype.supportsMarkers = function() {
   return false;
 };
 

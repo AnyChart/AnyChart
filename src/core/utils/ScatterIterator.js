@@ -4,7 +4,7 @@ goog.provide('anychart.core.utils.ScatterIterator');
 
 /**
  * Synced iterator to iterate over synchronous data sets.
- * @param {!Array.<(anychart.core.cartesian.series.Base|anychart.core.polar.series.Base|anychart.core.radar.series.Base)>} series .
+ * @param {!Array.<(anychart.core.polar.series.Base|anychart.core.radar.series.Base)>} series .
  * @param {boolean} isDateTime .
  * @param {Function=} opt_pointCallback .
  * @param {Function=} opt_missingCallback .
@@ -15,7 +15,7 @@ goog.provide('anychart.core.utils.ScatterIterator');
 anychart.core.utils.ScatterIterator = function(series, isDateTime, opt_pointCallback, opt_missingCallback, opt_beforePointCallback,
     opt_afterPointCallback) {
   /**
-   * @type {!Array.<(anychart.core.cartesian.series.Base|anychart.core.polar.series.Base|anychart.core.radar.series.Base)>}
+   * @type {!Array.<(anychart.core.polar.series.Base|anychart.core.radar.series.Base)>}
    * @protected
    */
   this.series = series;

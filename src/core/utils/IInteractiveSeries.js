@@ -17,13 +17,13 @@ anychart.core.utils.IInteractiveSeries.prototype.enabled;
 
 
 /**
- * @return {anychart.data.Iterator}
+ * @return {!anychart.data.IIterator}
  */
 anychart.core.utils.IInteractiveSeries.prototype.getIterator;
 
 
 /**
- * @return {anychart.data.Iterator}
+ * @return {!anychart.data.IIterator}
  */
 anychart.core.utils.IInteractiveSeries.prototype.getResetIterator;
 

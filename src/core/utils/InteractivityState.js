@@ -467,6 +467,25 @@ anychart.core.utils.InteractivityState.prototype.isStateContains = function(stat
 };
 
 
+/**
+ * Clarifies the state to make it non-mixed. Returns the strongest state.
+ * @param {number|anychart.PointState} state
+ * @return {anychart.PointState}
+ */
+anychart.core.utils.InteractivityState.clarifyState = function(state) {
+  // currently possible states are:
+  // 0 - NORMAL
+  // 1 - HOVER
+  // 2 - SELECTED
+  // 3 - SELECTED (mixed with HOVER)
+  // other - SELECTED or HOVER depending on first two bits.
+  // this function in case of mixed states returns the clear SELECTED or HOVER state.
+  return /** @type {anychart.PointState} */(Math.min(
+      state & (anychart.PointState.HOVER | anychart.PointState.SELECT),
+      anychart.PointState.SELECT));
+};
+
+
 
 /**
  * Interactivity state class for pie. See #addPointStateInternal method.

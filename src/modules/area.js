@@ -6,12 +6,12 @@
 goog.provide('anychart.modules.area');
 
 goog.require('anychart.charts.Cartesian');
-goog.require('anychart.core.cartesian.series.Area');
-goog.require('anychart.core.cartesian.series.RangeArea');
-goog.require('anychart.core.cartesian.series.RangeSplineArea');
-goog.require('anychart.core.cartesian.series.RangeStepArea');
-goog.require('anychart.core.cartesian.series.SplineArea');
-goog.require('anychart.core.cartesian.series.StepArea');
+goog.require('anychart.core.drawers.Area');
+goog.require('anychart.core.drawers.RangeArea');
+goog.require('anychart.core.drawers.RangeSplineArea');
+goog.require('anychart.core.drawers.RangeStepArea');
+goog.require('anychart.core.drawers.SplineArea');
+goog.require('anychart.core.drawers.StepArea');
 goog.require('anychart.modules.base');
 
 

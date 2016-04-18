@@ -4,246 +4,91 @@ goog.require('anychart.animations.Animation');
 
 
 /**
- * Column animation.
- * @param {anychart.core.cartesian.series.Column|anychart.core.cartesian.series.Column3d} series
+ * Bar animation.
+ * @param {anychart.core.series.Cartesian} series
  * @param {number} duration
  * @param {Function=} opt_acc
  * @constructor
  * @extends {anychart.animations.Animation}
  */
 anychart.animations.ColumnAnimation = function(series, duration, opt_acc) {
-  this.series_ = series;
-  this.labels_ = this.series_.labels();
-  this.markers_ = this.series_.markers();
-
-  goog.base(this, [], [], duration, opt_acc);
+  anychart.animations.ColumnAnimation.base(this, 'constructor', series, [], [], duration, opt_acc);
+  /**
+   * If this animation is rotated (as for bar).
+   * @type {boolean}
+   */
+  this.isBarAnimation = false;
 };
 goog.inherits(anychart.animations.ColumnAnimation, anychart.animations.Animation);
 
 
-/**
- * Creates position provider for label.
- * @param {anychart.math.Rect} shapeBounds .
- * @param {string} position .
- * @return {Object}
- */
-anychart.animations.ColumnAnimation.prototype.createPositionProvider = function(shapeBounds, position) {
-  position = anychart.enums.normalizeAnchor(position);
-  return {'value': anychart.utils.getCoordinateByAnchor(shapeBounds, position)};
-};
-
-
 /** @inheritDoc */
-anychart.animations.ColumnAnimation.prototype.onBegin = function() {
-  this.series_.setAnimation(true);
-};
-
-
-/** @inheritDoc */
-anychart.animations.ColumnAnimation.prototype.cycle = function(now) {
-  this.startPoint = [];
-  this.endPoint = [];
-  /** @type {Array} */
-  this.zero = [];
-  var iterator = this.series_.getResetIterator();
-  var columnWidth = this.series_.getPointWidth();
+anychart.animations.ColumnAnimation.prototype.update = function() {
+  this.startPoint.length = this.endPoint.length = 0;
+  var iterator = this.series.getDetachedIterator();
+  // we would use variable number of arguments per point - from zero to five
   while (iterator.advance()) {
-    var x = /** @type {number} */ (iterator.meta('x'));
-    var y = this.series_.is3d ? /** @type {number} */ (iterator.meta('y3d')) : /** @type {number} */ (iterator.meta('value'));
-    var zero = this.series_.is3d ? /** @type {number} */ (iterator.meta('zero3d')) : /** @type {number} */ (iterator.meta('zero'));
-    var height = /** @type {number} */ (iterator.meta('zero')) - /** @type {number} */ (iterator.meta('value'));
-
-    var shapeBounds = anychart.math.rect(x - columnWidth / 2, Math.min(zero, y), columnWidth, Math.abs(height));
-
-    var labelsPosition = this.series_.getLabelsPosition(anychart.PointState.NORMAL);
-    var labelProvider = this.series_.is3d ?
-        this.series_.createLabelsPositionProvider(labelsPosition)['value'] :
-        this.createPositionProvider(shapeBounds, labelsPosition)['value'];
-
-    var markersPosition = this.series_.getMarkersPosition(anychart.PointState.NORMAL);
-    var markerProvider = this.createPositionProvider(shapeBounds, markersPosition)['value'];
-
-    this.startPoint.push(0);    // rect
-    this.startPoint.push(zero); // labels
-    this.startPoint.push(zero); // markers
-
-    this.endPoint.push(height);              // rect
-    this.endPoint.push(labelProvider['y']);  // labels
-    this.endPoint.push(markerProvider['y']); // marker
-
-    this.zero.push(zero);
+    if (!iterator.meta(anychart.opt.MISSING)) {
+      var x = /** @type {number} */(iterator.meta(anychart.opt.X));
+      var value = /** @type {number} */(iterator.meta(anychart.opt.VALUE));
+      var zero = /** @type {number} */(iterator.meta(anychart.opt.ZERO));
+      // we need this to make the drawer choose appropriate shape.
+      this.startPoint.push(zero);
+      this.endPoint.push(value);
+      var positionProvider;
+      var label = /** @type {anychart.core.ui.LabelsFactory.Label} */(iterator.meta(anychart.opt.LABEL));
+      if (label) {
+        positionProvider = label.positionProvider()[anychart.opt.VALUE];
+        if (this.isBarAnimation)
+          this.startPoint.push(zero, x);
+        else
+          this.startPoint.push(x, zero);
+        this.endPoint.push(positionProvider[anychart.opt.X], positionProvider[anychart.opt.Y]);
+      }
+      var marker = /** @type {anychart.core.ui.MarkersFactory.Marker} */(iterator.meta(anychart.opt.MARKER));
+      if (marker) {
+        positionProvider = marker.positionProvider()[anychart.opt.VALUE];
+        if (this.isBarAnimation)
+          this.startPoint.push(zero, x);
+        else
+          this.startPoint.push(x, zero);
+        this.endPoint.push(positionProvider[anychart.opt.X], positionProvider[anychart.opt.Y]);
+      }
+    }
   }
-
-  goog.base(this, 'cycle', now);
 };
 
 
 /** @inheritDoc */
 anychart.animations.ColumnAnimation.prototype.onAnimate = function() {
-  if (this.series_.is3d) {
-    var iter = this.series_.getResetIterator();
-    var index;
-    while (iter.advance()) {
-      index = iter.getIndex();
-      this.animate3dPoint_();
-      this.animateLabel_(index, true);
-      this.animateMarker_(index, true);
+  var iterator = this.series.getDetachedIterator();
+  var currentCoordIndex = 0;
+  while (iterator.advance()) {
+    if (!iterator.meta(anychart.opt.MISSING)) {
+      iterator.meta(anychart.opt.VALUE, this.coords[currentCoordIndex++]);
+      this.series.drawer.updatePointOnAnimate(iterator);
+      var label = /** @type {anychart.core.ui.LabelsFactory.Label} */(iterator.meta(anychart.opt.LABEL));
+      if (label) {
+        label.positionProvider({'value': {
+          'x': this.coords[currentCoordIndex++],
+          'y': this.coords[currentCoordIndex++]
+        }});
+        label.draw();
+      }
+      var marker = /** @type {anychart.core.ui.MarkersFactory.Marker} */(iterator.meta(anychart.opt.MARKER));
+      if (marker) {
+        marker.positionProvider({'value': {
+          'x': this.coords[currentCoordIndex++],
+          'y': this.coords[currentCoordIndex++]
+        }});
+        marker.draw();
+      }
     }
-  } else {
-    this.series_.getRootElement().forEachChild(function(child, index) {
-      child.setY(this.zero[index] - this.coords[index * 3]).setHeight(this.coords[index * 3]);
-      this.animateLabel_(index, true);
-      this.animateMarker_(index, true);
-    }, this);
   }
 };
 
 
 /** @inheritDoc */
 anychart.animations.ColumnAnimation.prototype.onEnd = function() {
-  if (this.series_.is3d) {
-    var iter = this.series_.getResetIterator();
-    var index;
-    while (iter.advance()) {
-      index = iter.getIndex();
-      this.animate3dPoint_();
-      this.animateLabel_(index, false);
-      this.animateMarker_(index, false);
-    }
-  } else {
-    this.series_.getRootElement().forEachChild(function(child, index) {
-      child.setY(this.zero[index] - this.endPoint[index * 3]).setHeight(this.endPoint[index * 3]);
-      this.animateLabel_(index, false);
-      this.animateMarker_(index, false);
-    }, this);
-  }
-  this.series_.setAnimation(false);
-};
-
-
-/**
- * Animate point.
- * @private
- */
-anychart.animations.ColumnAnimation.prototype.animate3dPoint_ = function() {
-  var iter = this.series_.getIterator();
-  var width = this.series_.getPointWidth();
-  var index, x_, y_, height, pixelShift, x3dShift, y3dShift;
-  var bottomSide, backSide, leftSide, rightSide, frontSide, topSide;
-
-  frontSide = iter.meta('frontSide');
-  backSide = iter.meta('backSide');
-  topSide = iter.meta('topSide');
-  bottomSide = iter.meta('bottomSide');
-  leftSide = iter.meta('leftSide');
-  rightSide = iter.meta('rightSide');
-
-  x_ = iter.meta('x3d');
-  index = iter.getIndex();
-  x3dShift = /** @type {number} */(iter.meta('x3dShift'));
-  y3dShift = /** @type {number} */(iter.meta('y3dShift'));
-
-  if (frontSide) {
-    pixelShift = /** @type {number} */(iter.meta('pixelShift'));
-    y_ = this.zero[index] - this.coords[index * 3];
-    height = this.coords[index * 3];
-
-    // valueIsNegative
-    if (anychart.utils.toNumber(iter.get('value')) < 0) {
-      topSide.clear()
-          .moveTo(x_ + pixelShift, y_ + height)
-          .lineTo(x_ + width, y_ + height)
-          .lineTo(x_ + width + x3dShift - pixelShift, y_ + height - y3dShift + pixelShift)
-          .lineTo(x_ + x3dShift, y_ + height - y3dShift)
-          .close();
-
-      bottomSide.clear()
-          .moveTo(x_ + pixelShift, y_)
-          .lineTo(x_ + width, y_)
-          .lineTo(x_ + width + x3dShift - pixelShift, y_ - y3dShift + pixelShift)
-          .lineTo(x_ + x3dShift, y_ - y3dShift)
-          .close();
-
-    } else {
-      bottomSide.clear()
-          .moveTo(x_ + pixelShift, y_ + height)
-          .lineTo(x_ + width, y_ + height)
-          .lineTo(x_ + width + x3dShift - pixelShift, y_ + height - y3dShift + pixelShift)
-          .lineTo(x_ + x3dShift, y_ + height - y3dShift)
-          .close();
-
-      topSide.clear()
-          .moveTo(x_ + pixelShift, y_)
-          .lineTo(x_ + width, y_)
-          .lineTo(x_ + width + x3dShift - pixelShift, y_ - y3dShift + pixelShift)
-          .lineTo(x_ + x3dShift, y_ - y3dShift)
-          .close();
-    }
-
-    backSide.clear()
-        .moveTo(x_ + x3dShift, y_ - y3dShift)
-        .lineTo(x_ + x3dShift + width, y_ - y3dShift)
-        .lineTo(x_ + x3dShift + width, y_ - y3dShift + height)
-        .lineTo(x_ + x3dShift, y_ - y3dShift + height)
-        .close();
-
-    leftSide.clear()
-        .moveTo(x_, y_)
-        .lineTo(x_ + x3dShift - pixelShift, y_ - y3dShift + pixelShift)
-        .lineTo(x_ + x3dShift, y_ + height - y3dShift)
-        .lineTo(x_, y_ + height - pixelShift)
-        .close();
-
-    rightSide.clear()
-        .moveTo(x_ + width, y_)
-        .lineTo(x_ + width + x3dShift - pixelShift, y_ - y3dShift + pixelShift)
-        .lineTo(x_ + width + x3dShift, y_ + height - y3dShift)
-        .lineTo(x_ + width, y_ + height - pixelShift)
-        .close();
-
-    frontSide.clear()
-        .moveTo(x_, y_)
-        .lineTo(x_ + width, y_)
-        .lineTo(x_ + width, y_ + height)
-        .lineTo(x_, y_ + height)
-        .close();
-  }
-};
-
-
-/**
- * Animate points label.
- * @param {number} index Points index.
- * @param {boolean} startPhase Start phase flag.
- * @private
- */
-anychart.animations.ColumnAnimation.prototype.animateLabel_ = function(index, startPhase) {
-  var label = this.labels_.getLabel(index);
-  if (label) {
-    var labelPositionProvider = label.positionProvider()['value'];
-    var coordIndex = index * 3 + 1;
-    var y = startPhase ? this.coords[coordIndex] : this.endPoint[coordIndex];
-    label
-        .positionProvider({'value': {'x': labelPositionProvider['x'], 'y': y}})
-        .draw();
-  }
-};
-
-
-/**
- * Animate points marker.
- * @param {number} index Points index.
- * @param {boolean} startPhase Start phase flag.
- * @private
- */
-anychart.animations.ColumnAnimation.prototype.animateMarker_ = function(index, startPhase) {
-  var marker = this.markers_.getMarker(index);
-  if (marker) {
-    var markerPositionProvider = marker.positionProvider()['value'];
-    var coordIndex = index * 3 + 2;
-    var y = startPhase ? this.coords[coordIndex] : this.endPoint[coordIndex];
-    marker
-        .positionProvider({'value': {'x': markerPositionProvider['x'], 'y': y}})
-        .draw();
-  }
+  this.onAnimate();
 };

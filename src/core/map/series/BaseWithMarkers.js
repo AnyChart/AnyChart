@@ -51,7 +51,7 @@ anychart.core.map.series.BaseWithMarkers.prototype.selectMarkers_ = null;
 
 
 /** @inheritDoc */
-anychart.core.map.series.BaseWithMarkers.prototype.hasMarkers = function() {
+anychart.core.map.series.BaseWithMarkers.prototype.supportsMarkers = function() {
   return true;
 };
 

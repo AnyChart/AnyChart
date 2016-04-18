@@ -6,7 +6,7 @@
 goog.provide('anychart.modules.area3d');
 
 goog.require('anychart.charts.Cartesian3d');
-goog.require('anychart.core.cartesian.series.Area3d');
+goog.require('anychart.core.drawers.Area3d');
 goog.require('anychart.modules.base');
 
 

@@ -1,5 +1,8 @@
 goog.provide('anychart.charts.Cartesian');
 goog.require('anychart.core.CartesianBase');
+goog.require('anychart.core.series');
+goog.require('anychart.core.shapeManagers');
+goog.require('anychart.enums');
 
 
 
@@ -25,6 +28,276 @@ anychart.charts.Cartesian = function(opt_barChartMode) {
   anychart.charts.Cartesian.base(this, 'constructor', opt_barChartMode);
 };
 goog.inherits(anychart.charts.Cartesian, anychart.core.CartesianBase);
+
+
+/**
+ * Series config for Cartesian chart.
+ * @type {Object.<string, anychart.core.series.TypeConfig>}
+ */
+anychart.charts.Cartesian.prototype.seriesConfig = (function() {
+  var res = {};
+  var capabilities = (
+      anychart.core.series.Capabilities.ALLOW_INTERACTIVITY |
+      anychart.core.series.Capabilities.ALLOW_POINT_SETTINGS |
+      anychart.core.series.Capabilities.ALLOW_ERROR |
+      anychart.core.series.Capabilities.SUPPORTS_MARKERS |
+      anychart.core.series.Capabilities.SUPPORTS_LABELS |
+      0);
+  res[anychart.enums.CartesianSeriesType.AREA] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.AREA,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillConfig,
+      anychart.core.shapeManagers.pathStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.ZERO
+  };
+  res[anychart.enums.CartesianSeriesType.BAR] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.BAR,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.ZERO
+  };
+  res[anychart.enums.CartesianSeriesType.BOX] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.BOX,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig,
+      anychart.core.shapeManagers.pathMedianStrokeConfig,
+      anychart.core.shapeManagers.pathStemStrokeConfig,
+      anychart.core.shapeManagers.pathWhiskerStrokeConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGHEST,
+    anchoredPositionBottom: anychart.opt.LOWEST
+  };
+  res[anychart.enums.CartesianSeriesType.BUBBLE] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.BUBBLE,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.circleFillStrokeConfig,
+      anychart.core.shapeManagers.circleHatchConfig,
+      anychart.core.shapeManagers.circleNegativeFillStrokeConfig,
+      anychart.core.shapeManagers.circleNegativeHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.VALUE
+  };
+  res[anychart.enums.CartesianSeriesType.CANDLESTICK] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.CANDLESTICK,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathRisingFillStrokeConfig,
+      anychart.core.shapeManagers.pathRisingHatchConfig,
+      anychart.core.shapeManagers.pathFallingFillStrokeConfig,
+      anychart.core.shapeManagers.pathFallingHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGH,
+    anchoredPositionBottom: anychart.opt.LOW
+  };
+  res[anychart.enums.CartesianSeriesType.COLUMN] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.COLUMN,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.ZERO
+  };
+  res[anychart.enums.CartesianSeriesType.LINE] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.LINE,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathStrokeConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.VALUE
+  };
+  res[anychart.enums.CartesianSeriesType.MARKER] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.MARKER,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: (
+        anychart.core.series.Capabilities.ALLOW_INTERACTIVITY |
+        anychart.core.series.Capabilities.ALLOW_POINT_SETTINGS |
+        anychart.core.series.Capabilities.ALLOW_ERROR |
+        // anychart.core.series.Capabilities.SUPPORTS_MARKERS |
+        anychart.core.series.Capabilities.SUPPORTS_LABELS |
+        0),
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.VALUE
+  };
+  res[anychart.enums.CartesianSeriesType.OHLC] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.OHLC,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathRisingStrokeConfig,
+      anychart.core.shapeManagers.pathFallingStrokeConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGH,
+    anchoredPositionBottom: anychart.opt.LOW
+  };
+  res[anychart.enums.CartesianSeriesType.RANGE_AREA] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_AREA,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillConfig,
+      anychart.core.shapeManagers.pathLowStrokeConfig,
+      anychart.core.shapeManagers.pathHighStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGH,
+    anchoredPositionBottom: anychart.opt.LOW
+  };
+  res[anychart.enums.CartesianSeriesType.RANGE_BAR] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_BAR,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGH,
+    anchoredPositionBottom: anychart.opt.LOW
+  };
+  res[anychart.enums.CartesianSeriesType.RANGE_COLUMN] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_COLUMN,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGH,
+    anchoredPositionBottom: anychart.opt.LOW
+  };
+  res[anychart.enums.CartesianSeriesType.RANGE_SPLINE_AREA] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_SPLINE_AREA,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillConfig,
+      anychart.core.shapeManagers.pathHighStrokeConfig,
+      anychart.core.shapeManagers.pathLowStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGH,
+    anchoredPositionBottom: anychart.opt.LOW
+  };
+  res[anychart.enums.CartesianSeriesType.RANGE_STEP_AREA] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_STEP_AREA,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillConfig,
+      anychart.core.shapeManagers.pathHighStrokeConfig,
+      anychart.core.shapeManagers.pathLowStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGH,
+    anchoredPositionBottom: anychart.opt.LOW
+  };
+  res[anychart.enums.CartesianSeriesType.SPLINE] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.SPLINE,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathStrokeConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.VALUE
+  };
+  res[anychart.enums.CartesianSeriesType.SPLINE_AREA] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.SPLINE_AREA,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillConfig,
+      anychart.core.shapeManagers.pathStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.ZERO
+  };
+  res[anychart.enums.CartesianSeriesType.STEP_AREA] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.STEP_AREA,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillConfig,
+      anychart.core.shapeManagers.pathStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.ZERO
+  };
+  res[anychart.enums.CartesianSeriesType.STEP_LINE] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.STEP_LINE,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathStrokeConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.VALUE
+  };
+  return res;
+})();
 
 
 /**

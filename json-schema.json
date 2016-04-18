@@ -254,24 +254,7 @@
           "items": {
             "anyOf": [
               {"$ref": "#/definitions/disable"},
-              {"$ref": "#/definitions/anychart.core.cartesian.series.Area"},
-              {"$ref": "#/definitions/anychart.core.cartesian.series.Bar"},
-              {"$ref": "#/definitions/anychart.core.cartesian.series.Box"},
-              {"$ref": "#/definitions/anychart.core.cartesian.series.Bubble"},
-              {"$ref": "#/definitions/anychart.core.cartesian.series.Candlestick"},
-              {"$ref": "#/definitions/anychart.core.cartesian.series.Column"},
-              {"$ref": "#/definitions/anychart.core.cartesian.series.Line"},
-              {"$ref": "#/definitions/anychart.core.cartesian.series.Marker"},
-              {"$ref": "#/definitions/anychart.core.cartesian.series.OHLC"},
-              {"$ref": "#/definitions/anychart.core.cartesian.series.RangeArea"},
-              {"$ref": "#/definitions/anychart.core.cartesian.series.RangeBar"},
-              {"$ref": "#/definitions/anychart.core.cartesian.series.RangeColumn"},
-              {"$ref": "#/definitions/anychart.core.cartesian.series.RangeSplineArea"},
-              {"$ref": "#/definitions/anychart.core.cartesian.series.RangeStepArea"},
-              {"$ref": "#/definitions/anychart.core.cartesian.series.Spline"},
-              {"$ref": "#/definitions/anychart.core.cartesian.series.SplineArea"},
-              {"$ref": "#/definitions/anychart.core.cartesian.series.StepArea"},
-              {"$ref": "#/definitions/anychart.core.cartesian.series.StepLine"}
+              {"$ref": "#/definitions/anychart.core.series.Base"}
             ]
           }
         },
@@ -2166,7 +2149,7 @@
       ],
       "properties": {
         "color": {
-          "type": ["string", "object"]
+          "type": ["string", "object", "null"]
         },
         "name": {
           "type": "string"
@@ -2214,28 +2197,58 @@
       }
     },
 
-    "anychart.core.cartesian.series.Base": {
+    "anychart.core.series.Base": {
       "type": "object",
       "allOf": [
         {"$ref": "#/definitions/anychart.core.SeriesBase"}
       ],
       "properties": {
+        "seriesType": {
+          "enum": [
+            "area",
+            "bar",
+            "box",
+            "bubble",
+            "candlestick",
+            "column",
+            "line",
+            "marker",
+            "ohlc",
+            "rangeArea",
+            "rangeBar",
+            "rangeColumn",
+            "rangeSplineArea",
+            "rangeStepArea",
+            "spline",
+            "splineArea",
+            "stepArea",
+            "stepLine"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "autoIndex": {
+          "type": "number"
+        },
         "xPointPosition": {
           "type": [
             "number",
             "null"
           ]
         },
+        "pointWidth": {
+          "type": [
+            "string",
+            "number",
+            "null"
+          ]
+        },
+        "connectMissingPoints": {
+          "type": "boolean"
+        },
         "clip": {"$ref": "#/definitions/clip"},
-        "error": {"$ref": "#/definitions/error"}
-      }
-    },
-    "anychart.core.cartesian.series.BaseWithMarkers": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.Base"}
-      ],
-      "properties": {
+        "error": {"$ref": "#/definitions/error"},
         "markers": {
           "oneOf": [
             {"$ref": "#/definitions/disable"},
@@ -2253,75 +2266,13 @@
             {"$ref": "#/definitions/disable"},
             {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
           ]
-        }
-      }
-    },
-    "anychart.core.cartesian.series.WidthBased": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.BaseWithMarkers"}
-      ],
-      "properties": {
-        "pointWidth": {
-          "type": [
-            "string",
-            "number",
-            "null"
-          ]
-        }
-      }
-    },
-    "anychart.core.cartesian.series.ContinuousBase": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.BaseWithMarkers"}
-      ],
-      "properties": {
-        "connectMissingPoints": {
-          "type": "boolean"
-        }
-      }
-    },
-    "anychart.core.cartesian.series.ContinuousRangeBase": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.ContinuousBase"}
-      ],
-      "properties": {
+        },
         "highStroke": {"$ref": "#/definitions/stroke"},
         "hoverHighStroke": {"$ref": "#/definitions/stroke"},
         "selectHighStroke": {"$ref": "#/definitions/stroke"},
         "lowStroke": {"$ref": "#/definitions/stroke"},
         "hoverLowStroke": {"$ref": "#/definitions/stroke"},
-        "selectLowStroke": {"$ref": "#/definitions/stroke"}
-      }
-    },
-    "anychart.core.cartesian.series.Area": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.ContinuousBase"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["area"]}
-      }
-    },
-    "anychart.core.cartesian.series.Bar": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.WidthBased"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["bar"]}
-      }
-    },
-    "anychart.core.cartesian.series.Box": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.WidthBased"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["box"]},
-
+        "selectLowStroke": {"$ref": "#/definitions/stroke"},
         "medianStroke": {"$ref": "#/definitions/stroke"},
         "hoverMedianStroke": {"$ref": "#/definitions/stroke"},
         "selectMedianStroke": {"$ref": "#/definitions/stroke"},
@@ -2361,16 +2312,7 @@
             {"$ref": "#/definitions/disable"},
             {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
           ]
-        }
-      }
-    },
-    "anychart.core.cartesian.series.Bubble": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.BaseWithMarkers"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["bubble"]},
+        },
         "minimumSize": {
           "type": [
             "string",
@@ -2396,16 +2338,8 @@
 
         "negativeHatchFill": {"$ref": "#/definitions/hatchFillSet"},
         "hoverNegativeHatchFill": {"$ref": "#/definitions/hatchFillSet"},
-        "selectNegativeHatchFill": {"$ref": "#/definitions/hatchFillSet"}
-      }
-    },
-    "anychart.core.cartesian.series.Candlestick": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.WidthBased"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["candlestick"]},
+        "selectNegativeHatchFill": {"$ref": "#/definitions/hatchFillSet"},
+
         "risingStroke": {"$ref": "#/definitions/stroke"},
         "hoverRisingStroke": {"$ref": "#/definitions/stroke"},
         "selectRisingStroke": {"$ref": "#/definitions/stroke"},
@@ -2428,34 +2362,8 @@
 
         "fallingHatchFill": {"$ref": "#/definitions/hatchFillSet"},
         "hoverFallingHatchFill": {"$ref": "#/definitions/hatchFillSet"},
-        "selectFallingHatchFill": {"$ref": "#/definitions/hatchFillSet"}
-      }
-    },
-    "anychart.core.cartesian.series.Column": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.WidthBased"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["column"]}
-      }
-    },
-    "anychart.core.cartesian.series.Line": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.ContinuousBase"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["line"]}
-      }
-    },
-    "anychart.core.cartesian.series.Marker": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.Base"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["marker"]},
+        "selectFallingHatchFill": {"$ref": "#/definitions/hatchFillSet"},
+
         "type": {"$ref": "#/definitions/anychart.enums.MarkerType"},
         "hoverType": {"$ref": "#/definitions/anychart.enums.MarkerType"},
         "selectType": {"$ref": "#/definitions/anychart.enums.MarkerType"},
@@ -2469,105 +2377,6 @@
         "selectSize": {
           "type": "number"
         }
-
-      }
-    },
-    "anychart.core.cartesian.series.OHLC": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.WidthBased"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["ohlc"]},
-
-        "risingStroke": {"$ref": "#/definitions/stroke"},
-        "hoverRisingStroke": {"$ref": "#/definitions/stroke"},
-        "selectRisingStroke": {"$ref": "#/definitions/stroke"},
-
-        "fallingStroke": {"$ref": "#/definitions/stroke"},
-        "hoverFallingStroke": {"$ref": "#/definitions/stroke"},
-        "selectFallingStroke": {"$ref": "#/definitions/stroke"}
-      }
-    },
-    "anychart.core.cartesian.series.RangeArea": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.ContinuousRangeBase"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["rangeArea"]}
-      }
-    },
-    "anychart.core.cartesian.series.RangeBar": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.WidthBased"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["rangeBar"]}
-      }
-    },
-    "anychart.core.cartesian.series.RangeColumn": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.WidthBased"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["rangeColumn"]}
-      }
-    },
-    "anychart.core.cartesian.series.RangeSplineArea": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.ContinuousRangeBase"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["rangeSplineArea"]}
-      }
-    },
-    "anychart.core.cartesian.series.RangeStepArea": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.ContinuousRangeBase"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["rangeStepArea"]}
-      }
-    },
-    "anychart.core.cartesian.series.Spline": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.ContinuousBase"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["spline"]}
-      }
-    },
-    "anychart.core.cartesian.series.SplineArea": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.ContinuousBase"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["splineArea"]}
-      }
-    },
-    "anychart.core.cartesian.series.StepArea": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.ContinuousBase"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["stepArea"]}
-      }
-    },
-    "anychart.core.cartesian.series.StepLine": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.cartesian.series.ContinuousBase"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["stepLine"]}
       }
     },
 

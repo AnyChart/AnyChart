@@ -172,11 +172,12 @@ anychart.data.TableComputer.prototype.invokeStart = function() {
  * Invokes calculation function on the passed row. It also should know if the row is from aggregated storage.
  * @param {!anychart.data.TableRow} row
  * @param {boolean} aggregated
+ * @param {number} index
  */
-anychart.data.TableComputer.prototype.invokeCalculation = function(row, aggregated) {
+anychart.data.TableComputer.prototype.invokeCalculation = function(row, aggregated, index) {
   this.calculateFunc_.call(
       this.context_,
-      new anychart.data.TableComputer.RowProxy(row, this, aggregated),
+      new anychart.data.TableComputer.RowProxy(row, this, aggregated, index),
       this.context_);
 };
 
@@ -202,11 +203,12 @@ anychart.data.TableComputer.prototype.disposeInternal = function() {
  * @param {!anychart.data.TableRow} row
  * @param {!anychart.data.TableComputer} computer
  * @param {boolean} aggregated
+ * @param {number} index
  * @constructor
  * @extends {anychart.data.TableSelectable.RowProxy}
  */
-anychart.data.TableComputer.RowProxy = function(row, computer, aggregated) {
-  anychart.data.TableComputer.RowProxy.base(this, 'constructor', row, computer.getInputMapping(), aggregated);
+anychart.data.TableComputer.RowProxy = function(row, computer, aggregated, index) {
+  anychart.data.TableComputer.RowProxy.base(this, 'constructor', row, computer.getInputMapping(), aggregated, index, {});
 
   /**
    * Computer reference.

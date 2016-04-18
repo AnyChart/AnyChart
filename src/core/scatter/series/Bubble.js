@@ -224,7 +224,7 @@ anychart.core.scatter.series.Bubble.prototype.isDiscreteBased = function() {
 /**
  * @inheritDoc
  */
-anychart.core.scatter.series.Bubble.prototype.isErrorAvailable = function() {
+anychart.core.scatter.series.Bubble.prototype.supportsError = function() {
   return false;
 };
 

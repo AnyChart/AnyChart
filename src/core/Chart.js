@@ -789,10 +789,8 @@ anychart.core.Chart.prototype.draw = function() {
   //after all chart items drawn, we can clear other states
   this.markConsistent(anychart.ConsistencyState.BOUNDS);
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_ANIMATION)) {
-    this.markConsistent(anychart.ConsistencyState.CHART_ANIMATION);
-    if (this.animation().enabled()) this.doAnimation();
-  }
+  this.doAnimation();
+  this.markConsistent(anychart.ConsistencyState.CHART_ANIMATION);
 
   this.resumeSignalsDispatching(false);
 
@@ -1116,7 +1114,7 @@ anychart.core.Chart.prototype.credits = function(opt_value) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Internal public method. Returns all chart series.
- * @return {!Array.<anychart.core.SeriesBase>}
+ * @return {!Array.<anychart.core.series.Base|anychart.core.SeriesBase>}
  */
 anychart.core.Chart.prototype.getAllSeries = goog.abstractMethod;
 
@@ -1124,7 +1122,7 @@ anychart.core.Chart.prototype.getAllSeries = goog.abstractMethod;
 /**
  * Getter series by index.
  * @param {number} index .
- * @return {anychart.core.SeriesBase}
+ * @return {anychart.core.series.Base|anychart.core.SeriesBase}
  */
 anychart.core.Chart.prototype.getSeries = function(index) {
   return null;
@@ -1276,7 +1274,7 @@ anychart.core.Chart.prototype.makeCurrentPoint = function(seriesStatus, event, o
 anychart.core.Chart.prototype.makeInteractivityPointEvent = function(type, event, seriesStatus, opt_empty, opt_forbidTooltip) {
   var currentPoint = this.makeCurrentPoint(seriesStatus, type, opt_empty);
   var wrappedPoints = [];
-  /** @type {anychart.core.SeriesBase} */
+  /** @type {anychart.core.series.Base|anychart.core.SeriesBase} */
   var series;
   for (var i = 0; i < seriesStatus.length; i++) {
     var status = seriesStatus[i];
@@ -1312,7 +1310,7 @@ anychart.core.Chart.prototype.getPoint = goog.abstractMethod;
 /**
  * Returns points by event.
  * @param {anychart.core.MouseEvent} event
- * @return {?Array.<{series: anychart.core.SeriesBase, points: Array.<number>, lastPoint: number, nearestPointToCursor: Object.<number>}>}
+ * @return {?Array.<{series: (anychart.core.series.Base|anychart.core.SeriesBase), points: Array.<number>, lastPoint: number, nearestPointToCursor: Object.<number>}>}
  */
 anychart.core.Chart.prototype.getSeriesStatus = goog.abstractMethod;
 
@@ -1320,7 +1318,7 @@ anychart.core.Chart.prototype.getSeriesStatus = goog.abstractMethod;
 /**
  * Some action on mouse over and move.
  * @param {Array.<number>|number} index Point index or indexes.
- * @param {anychart.core.SeriesBase} series Series.
+ * @param {anychart.core.series.Base|anychart.core.SeriesBase} series Series.
  */
 anychart.core.Chart.prototype.doAdditionActionsOnMouseOverAndMove = goog.nullFunction;
 
@@ -1372,7 +1370,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
   if (series && !series.isDisposed() && series.enabled() && goog.isFunction(series.makePointEvent)) {
     var evt = series.makePointEvent(event);
 
-    if (series.hasOutlierMarkers && series.hasOutlierMarkers() && goog.isNumber(evt['pointIndex']))
+    if (series.supportsOutliers && series.supportsOutliers() && goog.isNumber(evt['pointIndex']))
       index = evt['pointIndex'];
     if (evt && ((anychart.utils.checkIfParent(/** @type {!goog.events.EventTarget} */(series), event['relatedTarget'])) || series.dispatchEvent(evt))) {
       if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
@@ -1385,7 +1383,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
           if (goog.isFunction(series.hoverPoint))
             series.hoverPoint(/** @type {number} */ (index), event);
 
-          this.doAdditionActionsOnMouseOverAndMove(/** @type {number|Array.<number>} */(index), /** @type {!anychart.core.SeriesBase} */(series));
+          this.doAdditionActionsOnMouseOverAndMove(/** @type {number|Array.<number>} */(index), /** @type {!anychart.core.series.Base|anychart.core.SeriesBase} */(series));
 
           var alreadyHoveredPoints = series.state.getIndexByPointState(anychart.PointState.HOVER);
           var eventSeriesStatus = [];

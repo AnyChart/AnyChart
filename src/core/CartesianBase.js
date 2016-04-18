@@ -2,13 +2,15 @@ goog.provide('anychart.core.CartesianBase');
 
 goog.require('anychart'); // otherwise we can't use anychart.chartTypesMap object.
 goog.require('anychart.animations');
+goog.require('anychart.core.IChart');
+goog.require('anychart.core.IPlot');
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.axisMarkers.Line');
 goog.require('anychart.core.axisMarkers.Range');
 goog.require('anychart.core.axisMarkers.Text');
-goog.require('anychart.core.cartesian.series.Base');
 goog.require('anychart.core.grids.Linear');
+goog.require('anychart.core.series.Cartesian');
 goog.require('anychart.core.ui.ChartScroller');
 goog.require('anychart.core.ui.Crosshair');
 goog.require('anychart.core.utils.IZoomableChart');
@@ -26,6 +28,8 @@ goog.require('anychart.scales');
  * CartesianBase chart class.
  * @extends {anychart.core.SeparateChart}
  * @implements {anychart.core.utils.IZoomableChart}
+ * @implements {anychart.core.IChart}
+ * @implements {anychart.core.IPlot}
  * @constructor
  * @param {boolean=} opt_barChartMode If true, sets the chart to Bar Chart mode, swapping default chart elements
  *    behaviour to horizontal-oriented (setting default layout to VERTICAL, swapping axes, etc).
@@ -58,7 +62,7 @@ anychart.core.CartesianBase = function(opt_barChartMode) {
   this.yScale_ = null;
 
   /**
-   * @type {!Array.<anychart.core.cartesian.series.Base>}
+   * @type {!Array.<anychart.core.series.Cartesian>}
    * @private
    */
   this.series_ = [];
@@ -228,17 +232,17 @@ anychart.core.CartesianBase.ZINDEX_MARKER = 40;
 
 
 /**
- * Label z-index in chart root layer.
- * @type {number}
- */
-anychart.core.CartesianBase.ZINDEX_LABEL = 40;
-
-
-/**
  * Z-index increment multiplier.
  * @type {number}
  */
 anychart.core.CartesianBase.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
+
+
+/**
+ * Series config for the chart.
+ * @type {Object.<string, anychart.core.series.TypeConfig>}
+ */
+anychart.core.CartesianBase.prototype.seriesConfig = ({});
 
 
 /**
@@ -631,7 +635,7 @@ anychart.core.CartesianBase.prototype.yScale = function(opt_value) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * @type {!Object.<!Array.<anychart.core.cartesian.series.Base>>}
+ * @type {!Object.<!Array.<anychart.core.series.Cartesian>>}
  * @private
  */
 anychart.core.CartesianBase.prototype.seriesOfStackedScaleMap_;
@@ -652,14 +656,14 @@ anychart.core.CartesianBase.prototype.xScales;
 
 
 /**
- * @type {!Object.<!Array.<anychart.core.cartesian.series.Base>>}
+ * @type {!Object.<!Array.<anychart.core.series.Cartesian>>}
  * @private
  */
 anychart.core.CartesianBase.prototype.seriesOfXScaleMap_;
 
 
 /**
- * @type {!Object.<!Array.<anychart.core.cartesian.series.Base>>}
+ * @type {!Object.<!Array.<anychart.core.series.Cartesian>>}
  * @private
  */
 anychart.core.CartesianBase.prototype.seriesOfYScaleMap_;
@@ -1076,7 +1080,7 @@ anychart.core.CartesianBase.prototype.onCrosshairSignal_ = function(event) {
  * @param {!(anychart.data.View|anychart.data.Set|Array)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Area} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.CartesianBase.prototype.area = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -1096,7 +1100,7 @@ anychart.core.CartesianBase.prototype.area = function(data, opt_csvSettings) {
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Bar} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.CartesianBase.prototype.bar = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -1123,7 +1127,7 @@ anychart.core.CartesianBase.prototype.bar = function(data, opt_csvSettings) {
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Box} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.CartesianBase.prototype.box = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -1148,7 +1152,7 @@ anychart.core.CartesianBase.prototype.box = function(data, opt_csvSettings) {
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Bubble} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.CartesianBase.prototype.bubble = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -1173,7 +1177,7 @@ anychart.core.CartesianBase.prototype.bubble = function(data, opt_csvSettings) {
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Candlestick} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.CartesianBase.prototype.candlestick = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -1193,7 +1197,7 @@ anychart.core.CartesianBase.prototype.candlestick = function(data, opt_csvSettin
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Column} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.CartesianBase.prototype.column = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -1213,7 +1217,7 @@ anychart.core.CartesianBase.prototype.column = function(data, opt_csvSettings) {
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Line} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.CartesianBase.prototype.line = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -1233,7 +1237,7 @@ anychart.core.CartesianBase.prototype.line = function(data, opt_csvSettings) {
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Marker} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.CartesianBase.prototype.marker = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -1258,7 +1262,7 @@ anychart.core.CartesianBase.prototype.marker = function(data, opt_csvSettings) {
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.OHLC} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.CartesianBase.prototype.ohlc = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -1283,7 +1287,7 @@ anychart.core.CartesianBase.prototype.ohlc = function(data, opt_csvSettings) {
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.RangeArea} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.CartesianBase.prototype.rangeArea = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -1308,7 +1312,7 @@ anychart.core.CartesianBase.prototype.rangeArea = function(data, opt_csvSettings
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.RangeBar} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.CartesianBase.prototype.rangeBar = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -1333,7 +1337,7 @@ anychart.core.CartesianBase.prototype.rangeBar = function(data, opt_csvSettings)
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.RangeColumn} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.CartesianBase.prototype.rangeColumn = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -1358,7 +1362,7 @@ anychart.core.CartesianBase.prototype.rangeColumn = function(data, opt_csvSettin
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.RangeSplineArea} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.CartesianBase.prototype.rangeSplineArea = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -1383,7 +1387,7 @@ anychart.core.CartesianBase.prototype.rangeSplineArea = function(data, opt_csvSe
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.RangeColumn} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.CartesianBase.prototype.rangeStepArea = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -1403,7 +1407,7 @@ anychart.core.CartesianBase.prototype.rangeStepArea = function(data, opt_csvSett
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Spline} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.CartesianBase.prototype.spline = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -1423,7 +1427,7 @@ anychart.core.CartesianBase.prototype.spline = function(data, opt_csvSettings) {
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.SplineArea} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.CartesianBase.prototype.splineArea = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -1443,7 +1447,7 @@ anychart.core.CartesianBase.prototype.splineArea = function(data, opt_csvSetting
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.StepLine} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.CartesianBase.prototype.stepLine = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -1463,7 +1467,7 @@ anychart.core.CartesianBase.prototype.stepLine = function(data, opt_csvSettings)
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.StepArea} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.CartesianBase.prototype.stepArea = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -1475,13 +1479,21 @@ anychart.core.CartesianBase.prototype.stepArea = function(data, opt_csvSettings)
 
 
 /**
- * Get series constructor by series type.
+ * Returns normalized series type and a config for this series type.
  * @param {string} type
- * @protected
- * @return {Function}
+ * @return {?Array.<string|anychart.core.series.TypeConfig>}
  */
-anychart.core.CartesianBase.prototype.getSeriesCtor = function(type) {
-  return anychart.core.cartesian.series.Base.SeriesTypesMap[type];
+anychart.core.CartesianBase.prototype.getConfigByType = function(type) {
+  type = anychart.enums.normalizeCartesianSeriesType(type);
+  var config = this.seriesConfig[type];
+  var res;
+  if (config && (config.drawerType in anychart.core.drawers.AvailableDrawers)) {
+    res = [type, config];
+  } else {
+    anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
+    res = null;
+  }
+  return res;
 };
 
 
@@ -1491,49 +1503,37 @@ anychart.core.CartesianBase.prototype.getSeriesCtor = function(type) {
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
  * @protected
- * @return {anychart.core.cartesian.series.Base}
+ * @return {anychart.core.series.Cartesian}
  */
 anychart.core.CartesianBase.prototype.createSeriesByType = function(type, data, opt_csvSettings) {
-  type = anychart.enums.normalizeCartesianSeriesType(type);
-  var ctl = this.getSeriesCtor(type);
-  var instance;
+  var configAndType = this.getConfigByType(type);
+  if (configAndType) {
+    type = /** @type {string} */(configAndType[0]);
+    var config = /** @type {anychart.core.series.TypeConfig} */(configAndType[1]);
+    var series = new anychart.core.series.Cartesian(this, this, type, config);
+    this.registerDisposable(series);
 
-  if (ctl) {
-    instance = new ctl(data, opt_csvSettings);
-    instance.setChart(this);
-    instance.setParentEventTarget(this);
-    this.registerDisposable(instance);
     var lastSeries = this.series_[this.series_.length - 1];
-    var index = lastSeries ? /** @type {number} */ (lastSeries.index()) + 1 : 0;
-    this.series_.push(instance);
+    var index = lastSeries ? /** @type {number} */(lastSeries.autoIndex()) + 1 : 0;
+    this.series_.push(series);
     var inc = index * anychart.core.CartesianBase.ZINDEX_INCREMENT_MULTIPLIER;
-    instance.index(index).id(index);
-    var seriesZIndex = ((type == anychart.enums.CartesianSeriesType.LINE ||
-        type == anychart.enums.CartesianSeriesType.SPLINE ||
-        type == anychart.enums.CartesianSeriesType.STEP_LINE) ?
+    var seriesZIndex = (series.isLineBased() ?
             anychart.core.CartesianBase.ZINDEX_LINE_SERIES :
             anychart.core.CartesianBase.ZINDEX_SERIES) + inc;
-    instance.setAutoZIndex(seriesZIndex);
-    instance.labels().setAutoZIndex(seriesZIndex + anychart.core.CartesianBase.ZINDEX_INCREMENT_MULTIPLIER / 2);
-    instance.clip(true);
-    instance.setAutoColor(this.palette().itemAt(index));
-    instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(index)));
-    instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
-    if (instance.hasMarkers()) {
-      instance.markers().setAutoZIndex(seriesZIndex + anychart.core.CartesianBase.ZINDEX_INCREMENT_MULTIPLIER / 2);
-      instance.markers().setAutoFill((/** @type {anychart.core.cartesian.series.BaseWithMarkers} */ (instance)).getMarkerFill());
-      instance.markers().setAutoStroke((/** @type {anychart.core.cartesian.series.BaseWithMarkers} */ (instance)).getMarkerStroke());
-    }
-    if (instance.hasOutlierMarkers()) {
-      instance.outlierMarkers().setAutoZIndex(anychart.core.CartesianBase.ZINDEX_MARKER + inc);
-    }
-    if (anychart.DEFAULT_THEME != 'v6')
-      instance.labels().setAutoColor(anychart.color.darken(instance.color()));
-    instance.setup(this.defaultSeriesSettings()[type]);
-    instance.listenSignals(this.seriesInvalidated, this);
+
+    series.autoIndex(index);
+    series.data(data, opt_csvSettings);
+    series.setAutoZIndex(seriesZIndex);
+    series.clip(true);
+    series.setAutoColor(this.palette().itemAt(index));
+    series.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(index)));
+    series.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
+    series.setParentEventTarget(this);
+    series.listenSignals(this.seriesInvalidated, this);
+
     this.invalidate(
         // When you add 3D series, bounds may change (eg. afterDraw case).
-        (instance.is3d ? anychart.ConsistencyState.BOUNDS : 0) |
+        (series.check(anychart.core.drawers.Capabilities.IS_3D_BASED) ? anychart.ConsistencyState.BOUNDS : 0) |
         anychart.ConsistencyState.CARTESIAN_SERIES |
         anychart.ConsistencyState.CHART_LEGEND |
         anychart.ConsistencyState.CARTESIAN_SCALES |
@@ -1541,18 +1541,17 @@ anychart.core.CartesianBase.prototype.createSeriesByType = function(type, data, 
         anychart.ConsistencyState.CARTESIAN_SCALE_MAPS,
         anychart.Signal.NEEDS_REDRAW);
   } else {
-    anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
-    instance = null;
+    series = null;
   }
 
-  return instance;
+  return series;
 };
 
 
 /**
  * Add series to chart.
  * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Chart series data.
- * @return {Array.<anychart.core.cartesian.series.Base>} Array of created series.
+ * @return {Array.<anychart.core.series.Cartesian>} Array of created series.
  */
 anychart.core.CartesianBase.prototype.addSeries = function(var_args) {
   var rv = [];
@@ -1586,7 +1585,7 @@ anychart.core.CartesianBase.prototype.getSeriesIndexBySeriesId = function(id) {
 /**
  * Gets series by its id.
  * @param {number|string} id Id of the series.
- * @return {anychart.core.cartesian.series.Base} Series instance.
+ * @return {anychart.core.series.Cartesian} Series instance.
  */
 anychart.core.CartesianBase.prototype.getSeries = function(id) {
   return this.getSeriesAt(this.getSeriesIndexBySeriesId(id));
@@ -1596,7 +1595,7 @@ anychart.core.CartesianBase.prototype.getSeries = function(id) {
 /**
  * Gets series by its index.
  * @param {number} index Index of the series.
- * @return {?anychart.core.cartesian.series.Base} Series instance.
+ * @return {?anychart.core.series.Cartesian} Series instance.
  */
 anychart.core.CartesianBase.prototype.getSeriesAt = function(index) {
   return this.series_[index] || null;
@@ -1723,7 +1722,8 @@ anychart.core.CartesianBase.prototype.barGroupsPadding = function(opt_value) {
     if (this.barGroupsPadding_ != +opt_value) {
       this.barGroupsPadding_ = +opt_value;
       this.invalidateWidthBasedSeries_();
-      this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES | anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   }
@@ -1741,7 +1741,8 @@ anychart.core.CartesianBase.prototype.barsPadding = function(opt_value) {
     if (this.barsPadding_ != +opt_value) {
       this.barsPadding_ = +opt_value;
       this.invalidateWidthBasedSeries_();
-      this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES | anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
   }
@@ -1878,7 +1879,7 @@ anychart.core.CartesianBase.prototype.calculateXScales = function() {
         xScale.startAutoCalc();
     }
     for (i = 0; i < seriesCount; i++) {
-      series = /** @type {anychart.core.cartesian.series.Base} */(this.series_[i]);
+      series = /** @type {anychart.core.series.Cartesian} */(this.series_[i]);
       if (!series || !series.enabled()) continue;
       xScale = /** @type {anychart.scales.Base} */(series.xScale());
       uid = goog.getUid(xScale);
@@ -1928,10 +1929,7 @@ anychart.core.CartesianBase.prototype.calculateXScales = function() {
           for (i = 0; i < drawingPlans.length - 1; i++) {
             drawingPlan = drawingPlans[i];
             for (j = drawingPlan.data.length; j < lastPlanXArray.length; j++) {
-              drawingPlan.data.push({
-                'x': lastPlanXArray[j],
-                'missing': true
-              });
+              drawingPlan.data.push(anychart.core.series.Cartesian.makeMissingPoint(lastPlanXArray[j]));
             }
           }
         } else {
@@ -1944,30 +1942,30 @@ anychart.core.CartesianBase.prototype.calculateXScales = function() {
           dataLength1 = data1.length;
           current0 = 0;
           current1 = 0;
-          val0 = current0 < dataLength0 ? data0[current0]['x'] : NaN;
-          val1 = current1 < dataLength1 ? data0[current1]['x'] : NaN;
+          val0 = current0 < dataLength0 ? data0[current0].data['x'] : NaN;
+          val1 = current1 < dataLength1 ? data0[current1].data['x'] : NaN;
           while (!isNaN(val0) && !isNaN(val1)) {
             inc0 = val0 <= val1;
             inc1 = val0 >= val1;
             registry.push(inc0 ? val0 : val1);
             if (inc0) {
               current0++;
-              val0 = current0 < dataLength0 ? data0[current0]['x'] : NaN;
+              val0 = current0 < dataLength0 ? data0[current0].data['x'] : NaN;
             }
             if (inc1) {
               current1++;
-              val1 = current1 < dataLength1 ? data1[current1]['x'] : NaN;
+              val1 = current1 < dataLength1 ? data1[current1].data['x'] : NaN;
             }
           }
           while (!isNaN(val0)) {
             registry.push(val0);
             current0++;
-            val0 = current0 < dataLength0 ? data0[current0]['x'] : NaN;
+            val0 = current0 < dataLength0 ? data0[current0].data['x'] : NaN;
           }
           while (!isNaN(val1)) {
             registry.push(val1);
             current1++;
-            val1 = current1 < dataLength1 ? data1[current1]['x'] : NaN;
+            val1 = current1 < dataLength1 ? data1[current1].data['x'] : NaN;
           }
 
           // step two - we merge i-th source and the merge result of the previous arrays.
@@ -1980,7 +1978,7 @@ anychart.core.CartesianBase.prototype.calculateXScales = function() {
             current0 = 0;
             current1 = 0;
             val0 = current0 < dataLength0 ? data0[current0] : NaN;
-            val1 = current1 < dataLength1 ? data1[current1]['x'] : NaN;
+            val1 = current1 < dataLength1 ? data1[current1].data['x'] : NaN;
             while (!isNaN(val0) && !isNaN(val1)) {
               inc0 = val0 <= val1;
               inc1 = val0 >= val1;
@@ -1991,7 +1989,7 @@ anychart.core.CartesianBase.prototype.calculateXScales = function() {
               }
               if (inc1) {
                 current1++;
-                val1 = current1 < dataLength1 ? data1[current1]['x'] : NaN;
+                val1 = current1 < dataLength1 ? data1[current1].data['x'] : NaN;
               }
             }
             while (!isNaN(val0)) {
@@ -2002,7 +2000,7 @@ anychart.core.CartesianBase.prototype.calculateXScales = function() {
             while (!isNaN(val1)) {
               res.push(val1);
               current1++;
-              val1 = current1 < dataLength1 ? data1[current1]['x'] : NaN;
+              val1 = current1 < dataLength1 ? data1[current1].data['x'] : NaN;
             }
             registry = res;
           }
@@ -2017,19 +2015,16 @@ anychart.core.CartesianBase.prototype.calculateXScales = function() {
               var resultingData = [];
               current0 = 0;
               point = data0[current0];
-              val0 = point ? point['x'] : NaN;
+              val0 = point ? point.data['x'] : NaN;
               for (j = 0; j < registry.length; j++) {
                 val1 = registry[j];
                 if (val0 <= val1) { // false for val0 == NaN
                   resultingData.push(point);
                   current0++;
                   point = data0[current0];
-                  val0 = point ? point['x'] : NaN;
+                  val0 = point ? point.data['x'] : NaN;
                 } else {
-                  resultingData.push({
-                    'x': val1,
-                    'missing': true
-                  });
+                  resultingData.push(anychart.core.series.Cartesian.makeMissingPoint(val1));
                 }
               }
               drawingPlan.data = resultingData;
@@ -2042,14 +2037,14 @@ anychart.core.CartesianBase.prototype.calculateXScales = function() {
         if (xScale instanceof anychart.scales.Ordinal) {
           xScale.setAutoValues(drawingPlan.xHashMap, drawingPlan.xArray);
         } else if (drawingPlan.data.length) {
-          xScale.extendDataRange(drawingPlan.data[0]['x'], drawingPlan.data[drawingPlan.data.length - 1]['x']);
-          if (drawingPlan.series.isErrorAvailable()) {
+          xScale.extendDataRange(drawingPlan.data[0].data['x'], drawingPlan.data[drawingPlan.data.length - 1].data['x']);
+          if (drawingPlan.series.supportsError()) {
             var iterator;
             var error;
             if (drawingPlan.hasPointXErrors) {
               iterator = drawingPlan.series.getResetIterator();
               while (iterator.advance()) { // we need iterator to make error work :(
-                if (!iterator.get('missing')) {
+                if (!iterator.meta(anychart.opt.MISSING)) {
                   error = drawingPlan.series.error().getErrorValues(true);
                   val = iterator.get('x');
                   xScale.extendDataRange(val - error[0], val + error[1]);
@@ -2081,7 +2076,7 @@ anychart.core.CartesianBase.prototype.calculateXScales = function() {
             var drawingPlanData = drawingPlans[i].data;
             if (remainingNames > 0) {
               for (j = 0; j < drawingPlanData.length; j++) {
-                if (!goog.isDef(autoNames[j]) && goog.isDef(val = drawingPlanData[j][namesField])) {
+                if (!goog.isDef(autoNames[j]) && goog.isDef(val = drawingPlanData[j].data[namesField])) {
                   autoNames[j] = val;
                   remainingNames--;
                 }
@@ -2135,11 +2130,11 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
           /**
            * Comparator function.
            * @param {number} target
-           * @param {{x:number}} item
+           * @param {Object} item
            * @return {number}
            */
           var searcher = function(target, item) {
-            return target - item.x;
+            return target - item.data['x'];
           };
           firstIndex = goog.array.binarySearch(data, firstVal, searcher);
           if (firstIndex < 0) firstIndex = ~firstIndex - 1;
@@ -2171,7 +2166,7 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
         }
         for (i = 0; i < drawingPlans.length; i++) {
           drawingPlan = drawingPlans[i];
-          series = /** @type {anychart.core.cartesian.series.Base} */(drawingPlan.series);
+          series = /** @type {anychart.core.series.Cartesian} */(drawingPlan.series);
           drawingPlan.firstIndex = firstIndex;
           drawingPlan.lastIndex = lastIndex;
           drawingPlan.stacked = yScaleStacked && series.supportsStack();
@@ -2181,57 +2176,57 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
             for (j = firstIndex; j <= lastIndex; j++) {
               point = data[j];
               stackVal = stack[j - firstIndex];
-              point['stackedMissing'] = stackVal.missing;
-              if (point['missing']) {
-                point['stackedPositiveZero'] = stackVal.positive;
-                point['stackedNegativeZero'] = stackVal.negative;
+              point.meta[anychart.opt.STACKED_MISSING] = stackVal.missing;
+              if (point.meta[anychart.opt.MISSING]) {
+                point.meta['stackedPositiveZero'] = stackVal.positive;
+                point.meta['stackedNegativeZero'] = stackVal.negative;
                 stackVal.missing = true;
               } else {
-                val = +point['value'];
+                val = +point.data[anychart.opt.VALUE];
                 if (val >= 0) {
-                  point['stackedZero'] = stackVal.positive;
+                  point.meta[anychart.opt.STACKED_ZERO] = stackVal.positive;
                   stackVal.positive += val;
-                  point['stackedValue'] = stackVal.positive;
+                  point.meta[anychart.opt.STACKED_VALUE] = stackVal.positive;
                 } else {
-                  point['stackedZero'] = stackVal.negative;
+                  point.meta[anychart.opt.STACKED_ZERO] = stackVal.negative;
                   stackVal.negative += val;
-                  point['stackedValue'] = stackVal.negative;
+                  point.meta[anychart.opt.STACKED_VALUE] = stackVal.negative;
                 }
                 if (!yScalePercentStacked)
-                  yScale.extendDataRange(point['stackedValue']);
+                  yScale.extendDataRange(point.meta[anychart.opt.STACKED_VALUE]);
                 stackVal.missing = false;
               }
             }
           } else {
-            var names = series.yValueNames;
+            var names = series.getYValueNames();
             var k;
             for (j = firstIndex; j <= lastIndex; j++) {
               point = data[j];
-              if (!point['missing']) {
+              if (!point.meta[anychart.opt.MISSING]) {
                 for (k = 0; k < names.length; k++) {
-                  yScale.extendDataRange(point[names[k]]);
+                  yScale.extendDataRange(point.data[names[k]]);
                 }
               }
             }
-            if (drawingPlan.series.hasOutlierMarkers()) {
+            if (drawingPlan.series.supportsOutliers()) {
               for (j = firstIndex; j <= lastIndex; j++) {
                 point = data[j];
-                var outliers = point['outliers'];
-                if (!point['missing'] && goog.isArray(outliers)) {
+                var outliers = point.data[anychart.opt.OUTLIERS];
+                if (!point.meta[anychart.opt.MISSING] && goog.isArray(outliers)) {
                   for (k = 0; k < outliers.length; k++) {
                     yScale.extendDataRange(outliers[k]);
                   }
                 }
               }
             }
-            if (drawingPlan.series.isErrorAvailable() &&
+            if (drawingPlan.series.supportsError() &&
                 (drawingPlan.series.error().hasGlobalErrorValues() ||
                 drawingPlan.hasPointYErrors)) {
               var iterator = drawingPlan.series.getResetIterator();
               while (iterator.advance()) { // we need iterator to make error work :(
-                if (!iterator.get('missing')) {
+                if (!iterator.meta(anychart.opt.MISSING)) {
                   var error = drawingPlan.series.error().getErrorValues(false);
-                  val = anychart.utils.toNumber(iterator.get('value'));
+                  val = anychart.utils.toNumber(iterator.get(anychart.opt.VALUE));
                   yScale.extendDataRange(val - error[0], val + error[1]);
                 }
               }
@@ -2246,12 +2241,12 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
             for (j = firstIndex; j <= lastIndex; j++) {
               point = data[j];
               stackVal = stack[j - firstIndex];
-              point['stackedMissing'] = stackVal.missing;
-              if (point['missing']) {
-                point['stackedPositiveZero'] = (point['stackedPositiveZero'] / stackVal.positive * 100) || 0;
-                point['stackedNegativeZero'] = (point['stackedNegativeZero'] / stackVal.negative * 100) || 0;
+              point.meta[anychart.opt.STACKED_MISSING] = stackVal.missing;
+              if (point.meta[anychart.opt.MISSING]) {
+                point.meta['stackedPositiveZero'] = (point.meta['stackedPositiveZero'] / stackVal.positive * 100) || 0;
+                point.meta['stackedNegativeZero'] = (point.meta['stackedNegativeZero'] / stackVal.negative * 100) || 0;
               } else {
-                val = point['stackedValue'];
+                val = point.meta[anychart.opt.STACKED_VALUE];
                 var sum;
                 if (val >= 0) {
                   sum = stackVal.positive;
@@ -2260,8 +2255,8 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
                   sum = -stackVal.negative;
                   yScale.extendDataRange(-100);
                 }
-                point['stackedZero'] = (point['stackedZero'] / sum * 100) || 0;
-                point['stackedValue'] = (point['stackedValue'] / sum * 100) || 0;
+                point.meta[anychart.opt.STACKED_ZERO] = (point.meta[anychart.opt.STACKED_ZERO] / sum * 100) || 0;
+                point.meta[anychart.opt.STACKED_VALUE] = (point.meta[anychart.opt.STACKED_VALUE] / sum * 100) || 0;
               }
             }
           }
@@ -2405,16 +2400,16 @@ anychart.core.CartesianBase.prototype.distributeColumnClusters = function(numCol
         scale = /** @type {anychart.scales.Base} */(wSeries.yScale());
         if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
           wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
-          wSeries.setAutoBarWidth(barWidthRatio);
+          wSeries.setAutoPointWidth(barWidthRatio);
           currPosition += barWidthRatio * (1 + this.barsPadding_);
         } else {
           id = goog.getUid(scale);
           if (id in seenScales) {
             wSeries.setAutoXPointPosition(seenScales[id] + barWidthRatio / 2);
-            wSeries.setAutoBarWidth(barWidthRatio);
+            wSeries.setAutoPointWidth(barWidthRatio);
           } else {
             wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
-            wSeries.setAutoBarWidth(barWidthRatio);
+            wSeries.setAutoPointWidth(barWidthRatio);
             seenScales[id] = currPosition;
             currPosition += barWidthRatio * (1 + this.barsPadding_);
           }
@@ -2450,16 +2445,16 @@ anychart.core.CartesianBase.prototype.distributeBarClusters = function(numBarClu
         scale = /** @type {anychart.scales.Base} */(wSeries.yScale());
         if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
           wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
-          wSeries.setAutoBarWidth(barWidthRatio);
+          wSeries.setAutoPointWidth(barWidthRatio);
           currPosition += barWidthRatio * (1 + this.barsPadding_);
         } else {
           id = goog.getUid(scale);
           if (id in seenScales) {
             wSeries.setAutoXPointPosition(seenScales[id] + barWidthRatio / 2);
-            wSeries.setAutoBarWidth(barWidthRatio);
+            wSeries.setAutoPointWidth(barWidthRatio);
           } else {
             wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
-            wSeries.setAutoBarWidth(barWidthRatio);
+            wSeries.setAutoPointWidth(barWidthRatio);
             seenScales[id] = currPosition;
             currPosition += barWidthRatio * (1 + this.barsPadding_);
           }
@@ -2634,39 +2629,25 @@ anychart.core.CartesianBase.prototype.beforeDraw = function() {
   if (this.isConsistent())
     return;
 
-  anychart.core.Base.suspendSignalsDispatching(this.series_);
-
-  var i;
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_PALETTE)) {
-    for (i = this.series_.length; i--;) {
-      this.series_[i].setAutoColor(this.palette().itemAt(i));
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_PALETTE |
+          anychart.ConsistencyState.CARTESIAN_MARKER_PALETTE |
+          anychart.ConsistencyState.CARTESIAN_HATCH_FILL_PALETTE)) {
+    anychart.core.Base.suspendSignalsDispatching(this.series_);
+    for (var i = this.series_.length; i--;) {
+      var series = this.series_[i];
+      var index = /** @type {number} */(series.autoIndex());
+      series.setAutoColor(this.palette().itemAt(index));
+      series.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(index)));
+      series.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
     }
     this.invalidateSeries();
     this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES);
-    this.markConsistent(anychart.ConsistencyState.CARTESIAN_PALETTE);
+    this.markConsistent(anychart.ConsistencyState.CARTESIAN_PALETTE |
+        anychart.ConsistencyState.CARTESIAN_MARKER_PALETTE |
+        anychart.ConsistencyState.CARTESIAN_HATCH_FILL_PALETTE);
+    anychart.core.Base.resumeSignalsDispatchingFalse(this.series_);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_MARKER_PALETTE)) {
-    for (i = this.series_.length; i--;) {
-      this.series_[i].setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(i)));
-    }
-    this.invalidateSeries();
-    this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES);
-    this.markConsistent(anychart.ConsistencyState.CARTESIAN_MARKER_PALETTE);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_HATCH_FILL_PALETTE)) {
-    for (i = this.series_.length; i--;) {
-      this.series_[i].setAutoHatchFill(
-          /** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(i)));
-    }
-    this.invalidateSeries();
-    this.invalidate(anychart.ConsistencyState.CARTESIAN_SERIES);
-    this.markConsistent(anychart.ConsistencyState.CARTESIAN_HATCH_FILL_PALETTE);
-  }
-
-  anychart.core.Base.resumeSignalsDispatchingFalse(this.series_);
 };
 
 
@@ -3010,7 +2991,7 @@ anychart.core.CartesianBase.prototype.drawContent = function(bounds) {
 
     anychart.performance.start('Series drawing');
     for (i = 0; i < this.series_.length; i++) {
-      this.series_[i].drawPlan();
+      this.series_[i].draw();
     }
     anychart.performance.end('Series drawing');
 
@@ -3047,7 +3028,7 @@ anychart.core.CartesianBase.prototype.drawContent = function(bounds) {
 anychart.core.CartesianBase.prototype.invalidateWidthBasedSeries_ = function() {
   for (var i = this.series_.length; i--;) {
     if (this.series_[i].isWidthBased())
-      this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
+      this.series_[i].invalidate(anychart.ConsistencyState.SERIES_POINTS);
   }
 };
 
@@ -3059,7 +3040,7 @@ anychart.core.CartesianBase.prototype.invalidateWidthBasedSeries_ = function() {
 anychart.core.CartesianBase.prototype.invalidateSizeBasedSeries_ = function() {
   for (var i = this.series_.length; i--;) {
     if (this.series_[i].isSizeBased())
-      this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
+      this.series_[i].invalidate(anychart.ConsistencyState.SERIES_POINTS);
   }
 };
 
@@ -3070,7 +3051,7 @@ anychart.core.CartesianBase.prototype.invalidateSizeBasedSeries_ = function() {
  */
 anychart.core.CartesianBase.prototype.invalidateSeries = function() {
   for (var i = this.series_.length; i--;)
-    this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
+    this.series_[i].invalidate(anychart.ConsistencyState.SERIES_COLOR);
 };
 
 
@@ -3124,11 +3105,11 @@ anychart.core.CartesianBase.prototype.createLegendItemsProvider = function(sourc
     }
   } else {
     for (i = 0, count = this.series_.length; i < count; i++) {
-      /** @type {anychart.core.cartesian.series.Base} */
+      /** @type {anychart.core.series.Cartesian} */
       var series = this.series_[i];
       var itemData = series.getLegendItemData(itemsTextFormatter);
       itemData['sourceUid'] = goog.getUid(this);
-      itemData['sourceKey'] = series.index();
+      itemData['sourceKey'] = i;
       data.push(itemData);
     }
   }
@@ -3165,12 +3146,12 @@ anychart.core.CartesianBase.prototype.getSeriesStatus = function(event) {
 
   var points = [];
   var interactivity = this.interactivity();
-  var i, len, series;
+  var i, len, series, names;
 
   if (interactivity.hoverMode() == anychart.enums.HoverMode.BY_SPOT) {
     var spotRadius = interactivity.spotRadius();
     var minRatio, maxRatio;
-    if (this.getType() == anychart.enums.ChartTypes.BAR || this.getType() == anychart.enums.ChartTypes.BAR_3D) {
+    if (this.barChartMode) {
       minRatio = (rangeY - (y - spotRadius - minY)) / rangeY;
       maxRatio = (rangeY - (y + spotRadius - minY)) / rangeY;
 
@@ -3183,8 +3164,6 @@ anychart.core.CartesianBase.prototype.getSeriesStatus = function(event) {
       maxRatio = (x + spotRadius - minX) / rangeX;
     }
 
-    var isOrdinal = this.xScale() instanceof anychart.scales.Ordinal;
-
     var minValue, maxValue;
     for (i = 0, len = this.series_.length; i < len; i++) {
       series = this.series_[i];
@@ -3192,12 +3171,7 @@ anychart.core.CartesianBase.prototype.getSeriesStatus = function(event) {
         minValue =  /** @type {number} */(series.xScale().inverseTransform(minRatio));
         maxValue = /** @type {number} */(series.xScale().inverseTransform(maxRatio));
 
-        if (isOrdinal) {
-          minValue = series.xScale().getIndexByValue(minValue);
-          maxValue = series.xScale().getIndexByValue(maxValue);
-        }
-
-        var indexes = series.data().findInRangeByX(minValue, maxValue, isOrdinal);
+        var indexes = series.findInRangeByX(minValue, maxValue);
 
         iterator = series.getResetIterator();
         var ind = [];
@@ -3206,20 +3180,23 @@ anychart.core.CartesianBase.prototype.getSeriesStatus = function(event) {
         for (var j = 0; j < indexes.length; j++) {
           index = indexes[j];
           if (iterator.select(index)) {
-            var pixX = /** @type {number} */(iterator.meta('x'));
-            var pickValue = false;
-            for (var k = 0; k < series.yValueNames.length; k++) {
-              var pixY = /** @type {number} */(iterator.meta(series.yValueNames[k]));
+            if (!iterator.meta(anychart.opt.MISSING)) {
+              var pixX = /** @type {number} */(iterator.meta('x'));
+              var pickValue = false;
+              names = series.getYValueNames();
+              for (var k = 0; k < names.length; k++) {
+                var pixY = /** @type {number} */(iterator.meta(names[k]));
 
-              var length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
-              pickValue = pickValue || length <= spotRadius;
-              if (length < minLength) {
-                minLength = length;
-                minLengthIndex = index;
+                var length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
+                pickValue = pickValue || length <= spotRadius;
+                if (length < minLength) {
+                  minLength = length;
+                  minLengthIndex = index;
+                }
               }
-            }
-            if (pickValue) {
-              ind.push(index);
+              if (pickValue) {
+                ind.push(index);
+              }
             }
           }
         }
@@ -3247,10 +3224,11 @@ anychart.core.CartesianBase.prototype.getSeriesStatus = function(event) {
         minLength = Infinity;
 
         if (iterator.select(index)) {
-          if (!iterator.get('missing')) {
+          if (!iterator.meta(anychart.opt.MISSING)) {
             pixX = /** @type {number} */(iterator.meta('x'));
-            for (k = 0; k < series.yValueNames.length; k++) {
-              pixY = /** @type {number} */(iterator.meta(series.yValueNames[k]));
+            names = series.getYValueNames();
+            for (k = 0; k < names.length; k++) {
+              pixY = /** @type {number} */(iterator.meta(names[k]));
               length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
               if (length < minLength) {
                 minLength = length;
@@ -3279,32 +3257,34 @@ anychart.core.CartesianBase.prototype.getSeriesStatus = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.CartesianBase.prototype.doAnimation = function() {
-  if (!this.animationQueue_) {
-    this.animationQueue_ = new anychart.animations.AnimationParallelQueue();
-    for (var i = 0; i < this.series_.length; i++) {
-      var series = this.series_[i];
-      var ctl = anychart.animations.AnimationBySeriesType[series.getType().toLowerCase()];
-      if (!ctl) continue;
+  if (this.animation().enabled() && this.animation().duration() > 0) {
+    if (this.animationQueue_ && this.animationQueue_.isPlaying()) {
+      this.animationQueue_.update();
+    } else if (this.hasInvalidationState(anychart.ConsistencyState.CHART_ANIMATION)) {
+      goog.dispose(this.animationQueue_);
+      this.animationQueue_ = new anychart.animations.AnimationParallelQueue();
       var duration = /** @type {number} */(this.animation().duration());
-      if (ctl === anychart.animations.ClipAnimation) {
-        this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (new ctl(this.container().getStage(), /** @type {anychart.core.cartesian.series.BaseWithMarkers} */(series), duration)));
-      } else
-        this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (new ctl(series, duration)));
+      for (var i = 0; i < this.series_.length; i++) {
+        var series = this.series_[i];
+        var ctl = anychart.animations.AnimationBySeriesType[/** @type {string} */(series.seriesType())];
+        if (ctl)
+          this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (new ctl(series, duration)));
+      }
+      this.animationQueue_.listen(goog.fx.Transition.EventType.BEGIN, function() {
+        this.dispatchDetachedEvent({
+          'type': anychart.enums.EventType.ANIMATION_START,
+          'chart': this
+        });
+      }, false, this);
+      this.animationQueue_.listen(goog.fx.Transition.EventType.END, function() {
+        this.dispatchDetachedEvent({
+          'type': anychart.enums.EventType.ANIMATION_END,
+          'chart': this
+        });
+      }, false, this);
+      this.animationQueue_.play(false);
     }
-    this.animationQueue_.listen(goog.fx.Transition.EventType.BEGIN, function() {
-      this.dispatchDetachedEvent({
-        'type': anychart.enums.EventType.ANIMATION_START,
-        'chart': this
-      });
-    }, false, this);
-    this.animationQueue_.listen(goog.fx.Transition.EventType.END, function() {
-      this.dispatchDetachedEvent({
-        'type': anychart.enums.EventType.ANIMATION_END,
-        'chart': this
-      });
-    }, false, this);
   }
-  this.animationQueue_.play(false);
 };
 
 

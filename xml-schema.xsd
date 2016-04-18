@@ -379,6 +379,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="error" type="utils.Error"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="legend_item" type="utils.LegendItemSettings"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="name" type="xsd:string"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="id" type="xsd:string"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="selectionMode" type="enums.SelectionMode"/>
             <!-- BaseWithMarkers series -->
             <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
@@ -449,6 +450,8 @@
         <xsd:attribute name="color" type="xsd:string"/>
         <xsd:attribute name="x_point_position" type="simple.Ratio"/>
         <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="id" type="xsd:string"/>
+        <xsd:attribute name="autoIndex" type="xsd:unsignedInt"/>
         <xsd:attribute name="labels" type="simple.BoolOrNull" default="false"/>
         <xsd:attribute name="hover_labels" type="simple.BoolOrNull" default="false"/>
         <xsd:attribute name="select_labels" type="simple.BoolOrNull" default="false"/>

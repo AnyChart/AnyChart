@@ -1,6 +1,7 @@
 goog.provide('anychart.scales.Base');
 goog.require('anychart.core.Base');
 goog.require('anychart.enums');
+goog.require('anychart.scales.IXScale');
 
 
 
@@ -8,6 +9,7 @@ goog.require('anychart.enums');
  * Basic methods for scales.
  * @constructor
  * @extends {anychart.core.Base}
+ * @implements {anychart.scales.IXScale}
  */
 anychart.scales.Base = function() {
   goog.base(this);
@@ -68,6 +70,18 @@ anychart.scales.Base.prototype.transform = goog.abstractMethod;
  * @return {*} Value transformed to output scope.
  */
 anychart.scales.Base.prototype.inverseTransform = goog.abstractMethod;
+
+
+/**
+ * This is an internal method to maintain compatibility with Stock scales in X scale transformation.
+ * @param {*} key Key of the point to transform.
+ * @param {number} index Point index. If it is needed but not passed it would be retrieved automatically.
+ * @param {number=} opt_subRangeRatio Subrange ratio. Doesn't mean anything for stock for now.
+ * @return {number}
+ */
+anychart.scales.Base.prototype.transformInternal = function(key, index, opt_subRangeRatio) {
+  return this.transform(key, opt_subRangeRatio);
+};
 
 
 /**

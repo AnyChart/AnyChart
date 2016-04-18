@@ -6,8 +6,8 @@
 goog.provide('anychart.modules.finance');
 
 goog.require('anychart.charts.Cartesian');
-goog.require('anychart.core.cartesian.series.Candlestick');
-goog.require('anychart.core.cartesian.series.OHLC');
+goog.require('anychart.core.drawers.Candlestick');
+goog.require('anychart.core.drawers.OHLC');
 goog.require('anychart.modules.base');
 
 

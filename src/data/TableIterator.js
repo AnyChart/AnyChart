@@ -1,5 +1,6 @@
 goog.provide('anychart.data.TableIterator');
 goog.provide('anychart.data.TableIterator.ICoIterator');
+goog.require('anychart.data.IIterator');
 goog.require('anychart.data.TableRow');
 
 
@@ -8,11 +9,13 @@ goog.require('anychart.data.TableRow');
  * Table iterator class. Assumes coiterator (if any) to return not less keys than the table has.
  * @param {!anychart.data.TableMapping} mapping
  * @param {!anychart.data.TableStorage.Selection} selection
+ * @param {Object} metaObj
  * @param {boolean} usesAggregatedMapping
  * @param {anychart.data.TableIterator.ICoIterator=} opt_coIterator
  * @constructor
+ * @implements {anychart.data.IIterator}
  */
-anychart.data.TableIterator = function(mapping, selection, usesAggregatedMapping, opt_coIterator) {
+anychart.data.TableIterator = function(mapping, selection, metaObj, usesAggregatedMapping, opt_coIterator) {
   /**
    * Associated mapping reference.
    * @type {!anychart.data.TableMapping}
@@ -45,6 +48,13 @@ anychart.data.TableIterator = function(mapping, selection, usesAggregatedMapping
   this.stop_ = selection.postLastRow;
 
   /**
+   * Last index of the selection. Currently used to determine rows count.
+   * @type {number}
+   * @private
+   */
+  this.lastIndex_ = selection.lastIndex;
+
+  /**
    * CoIterator.
    * @type {anychart.data.TableIterator.ICoIterator}
    * @private
@@ -65,12 +75,19 @@ anychart.data.TableIterator = function(mapping, selection, usesAggregatedMapping
    */
   this.getIndex_ = this.coIterator_ ? this.getCoIndex_ : this.getIndexSimple_;
 
+  /**
+   * @type {Object}
+   * @private
+   */
+  this.meta_ = metaObj;
+
   this.reset();
 };
 
 
 /**
  * Resets the iterator to a pre-first position.
+ * @return {anychart.data.TableIterator}
  */
 anychart.data.TableIterator.prototype.reset = function() {
   if (this.coIterator_)
@@ -112,6 +129,8 @@ anychart.data.TableIterator.prototype.reset = function() {
    * @private
    */
   this.shouldMove_ = true;
+
+  return this;
 };
 
 
@@ -144,8 +163,26 @@ anychart.data.TableIterator.prototype.get = function(field) {
 
 
 /**
+ * Gets or sets META value for current row.
+ * @param {string} name
+ * @param {*=} opt_value
+ * @return {anychart.data.TableIterator|*}
+ */
+anychart.data.TableIterator.prototype.meta = function(name, opt_value) {
+  var meta = this.meta_[this.getIndex()];
+  if (!meta)
+    meta = this.meta_[this.getIndex()] = {};
+  if (arguments.length > 1) {
+    meta[name] = opt_value;
+    return this;
+  }
+  return meta[name];
+};
+
+
+/**
  * Returns current column value.
- * @param {(number|string)} column
+ * @param {string|number} column
  * @return {*}
  */
 anychart.data.TableIterator.prototype.getColumn = function(column) {
@@ -166,7 +203,7 @@ anychart.data.TableIterator.prototype.getColumn = function(column) {
  * Returns item key.
  * @return {number}
  */
-anychart.data.TableIterator.prototype.getKey = function() {
+anychart.data.TableIterator.prototype.getX = function() {
   return this.currentKey_;
 };
 
@@ -177,6 +214,25 @@ anychart.data.TableIterator.prototype.getKey = function() {
  */
 anychart.data.TableIterator.prototype.getIndex = function() {
   return this.getIndex_();
+};
+
+
+/**
+ * Returns rows count.
+ * @return {number}
+ */
+anychart.data.TableIterator.prototype.getRowsCount = function() {
+  // no +1 because pre-first key is firstIndex - 1 already.
+  return this.lastIndex_ - this.preFirst_.key;
+};
+
+
+/**
+ * Returns item key.
+ * @return {number}
+ */
+anychart.data.TableIterator.prototype.getKey = function() {
+  return this.currentKey_;
 };
 
 
@@ -265,27 +321,27 @@ anychart.data.TableIterator.ICoIterator = function() {};
  * Returns item key.
  * @return {number}
  */
-anychart.data.TableIterator.ICoIterator.prototype.currentKey;
+anychart.data.TableIterator.ICoIterator.prototype.currentKey = function() {};
 
 
 /**
  * Returns item index.
  * @return {number}
  */
-anychart.data.TableIterator.ICoIterator.prototype.currentIndex;
+anychart.data.TableIterator.ICoIterator.prototype.currentIndex = function() {};
 
 
 /**
  * Advances the iterator to the next position.
  * @return {boolean}
  */
-anychart.data.TableIterator.ICoIterator.prototype.advance;
+anychart.data.TableIterator.ICoIterator.prototype.advance = function() {};
 
 
 /**
  * Resets the iterator to a pre-first position.
  */
-anychart.data.TableIterator.ICoIterator.prototype.reset;
+anychart.data.TableIterator.ICoIterator.prototype.reset = function() {};
 
 
 //anychart.data.TableIterator.prototype['getColumn'] = anychart.data.TableIterator.prototype.getColumn;

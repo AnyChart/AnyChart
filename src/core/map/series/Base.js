@@ -224,7 +224,7 @@ anychart.core.map.series.Base.prototype.setGeoData = function(map, geoData) {
  * Tester if the series has markers() method.
  * @return {boolean}
  */
-anychart.core.map.series.Base.prototype.hasMarkers = function() {
+anychart.core.map.series.Base.prototype.supportsMarkers = function() {
   return false;
 };
 

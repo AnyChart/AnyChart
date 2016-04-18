@@ -405,9 +405,19 @@ anychart.data.Set.prototype.getRowsCount = function() {
  * @param {number} rowIndex The index of the row.
  */
 anychart.data.Set.prototype.getRowMapping = function(rowIndex) {
-  //TODO(Anton Saukh): replace this throw by proper error handling.
-  //TODO(Anton Saukh): please avoid curses in the code!
-  throw new Error('Asking rowMapping from a Set! What a shame...');
+  throw new Error('Wrong usage of the data Set');
+};
+
+
+/**
+ * Getter/setter for meta.
+ * @param {number} rowIndex .
+ * @param {string} name .
+ * @param {*=} opt_value .
+ * @return {anychart.data.View|*|undefined} .
+ */
+anychart.data.Set.prototype.meta = function(rowIndex, name, opt_value) {
+  throw new Error('Wrong usage of the data Set');
 };
 
 

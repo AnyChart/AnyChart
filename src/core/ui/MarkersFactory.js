@@ -600,12 +600,13 @@ anychart.core.ui.MarkersFactory.prototype.clear = function(opt_index) {
   if (!this.freeToUseMarkersPool_)
     this.freeToUseMarkersPool_ = [];
 
-  if (this.markers_) {
-    opt_index = +opt_index;
-    if (!isNaN(opt_index) && opt_index in this.markers_) {
-      this.markers_[opt_index].clear();
-      this.freeToUseMarkersPool_.push(this.markers_[opt_index]);
-      delete this.markers_[opt_index];
+  if (this.markers_ && this.markers_.length) {
+    if (goog.isDef(opt_index)) {
+      if (this.markers_[opt_index]) {
+        this.markers_[opt_index].clear();
+        this.freeToUseMarkersPool_.push(this.markers_[opt_index]);
+        delete this.markers_[opt_index];
+      }
     } else {
       for (var i = this.markers_.length; i--;) {
         var marker = this.markers_[i];

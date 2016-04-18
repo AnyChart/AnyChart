@@ -379,6 +379,15 @@ anychart.core.gauge.pointers.Base.prototype.createFormatProvider = function(opt_
 
 
 /**
+ * Creates tooltip format provider.
+ * @return {Object}
+ */
+anychart.core.gauge.pointers.Base.prototype.createTooltipContextProvider = function() {
+  return this.createFormatProvider();
+};
+
+
+/**
  * Apply appearance to point.
  * @param {anychart.PointState|number} pointState
  */

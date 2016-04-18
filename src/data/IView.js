@@ -39,3 +39,13 @@ anychart.data.IView.prototype.getRowsCount = function() {};
  * @return {!anychart.data.Mapping} Mapping for the row.
  */
 anychart.data.IView.prototype.getRowMapping = function(rowIndex) {};
+
+
+/**
+ * Getter/setter for meta.
+ * @param {number} rowIndex .
+ * @param {string} name .
+ * @param {*=} opt_value .
+ * @return {anychart.data.View|*|undefined} .
+ */
+anychart.data.IView.prototype.meta = function(rowIndex, name, opt_value) {};

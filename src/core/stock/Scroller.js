@@ -1,7 +1,9 @@
 goog.provide('anychart.core.stock.Scroller');
+goog.require('anychart.core.IChart');
+goog.require('anychart.core.IPlot');
 goog.require('anychart.core.axes.StockDateTime');
+goog.require('anychart.core.series.StockScroller');
 goog.require('anychart.core.stock.indicators');
-goog.require('anychart.core.stock.scrollerSeries');
 goog.require('anychart.core.ui.Scroller');
 goog.require('anychart.scales');
 goog.require('anychart.scales.StockOrdinalDateTime');
@@ -14,6 +16,8 @@ goog.require('anychart.scales.StockScatterDateTime');
  * @param {!anychart.charts.Stock} chart
  * @constructor
  * @extends {anychart.core.ui.Scroller}
+ * @implements {anychart.core.IPlot}
+ * @implements {anychart.core.IChart}
  */
 anychart.core.stock.Scroller = function(chart) {
   goog.base(this);
@@ -27,7 +31,7 @@ anychart.core.stock.Scroller = function(chart) {
 
   /**
    * Series list.
-   * @type {!Array.<!anychart.core.stock.scrollerSeries.Base>}
+   * @type {!Array.<!anychart.core.series.StockScroller>}
    * @private
    */
   this.series_ = [];
@@ -80,6 +84,263 @@ anychart.core.stock.Scroller.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.ui.Scroller.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.STOCK_SCROLLER_SERIES |
     anychart.ConsistencyState.STOCK_SCROLLER_AXIS;
+
+
+/**
+ * Series config for the scroller.
+ * @type {Object.<string, anychart.core.series.TypeConfig>}
+ */
+anychart.core.stock.Scroller.prototype.seriesConfig = (function() {
+  var res = {};
+  var capabilities = (
+      // anychart.core.series.Capabilities.ALLOW_INTERACTIVITY |
+      // anychart.core.series.Capabilities.ALLOW_POINT_SETTINGS |
+      // anychart.core.series.Capabilities.ALLOW_ERROR |
+      // anychart.core.series.Capabilities.SUPPORTS_MARKERS |
+      // anychart.core.series.Capabilities.SUPPORTS_LABELS |
+      0);
+  res[anychart.enums.StockSeriesType.AREA] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.AREA,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathScrollerFillConfig,
+      anychart.core.shapeManagers.pathScrollerStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerHatchConfig
+    ],
+    secondaryShapesConfig: [
+      anychart.core.shapeManagers.pathScrollerSelectFillConfig,
+      anychart.core.shapeManagers.pathScrollerSelectStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerSelectHatchConfig
+    ],
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.ZERO
+  };
+  res[anychart.enums.StockSeriesType.CANDLESTICK] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.CANDLESTICK,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathScrollerRisingFillStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerRisingHatchConfig,
+      anychart.core.shapeManagers.pathScrollerFallingFillStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerFallingHatchConfig
+    ],
+    secondaryShapesConfig: [
+      anychart.core.shapeManagers.pathScrollerSelectRisingFillStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerSelectRisingHatchConfig,
+      anychart.core.shapeManagers.pathScrollerSelectFallingFillStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerSelectFallingHatchConfig
+    ],
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGH,
+    anchoredPositionBottom: anychart.opt.LOW
+  };
+  res[anychart.enums.StockSeriesType.COLUMN] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.COLUMN,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathScrollerFillStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerHatchConfig
+    ],
+    secondaryShapesConfig: [
+      anychart.core.shapeManagers.pathScrollerSelectFillStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerSelectHatchConfig
+    ],
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.ZERO
+  };
+  res[anychart.enums.StockSeriesType.LINE] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.LINE,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathScrollerStrokeConfig
+    ],
+    secondaryShapesConfig: [
+      anychart.core.shapeManagers.pathScrollerSelectStrokeConfig
+    ],
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.VALUE
+  };
+  res[anychart.enums.StockSeriesType.MARKER] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.MARKER,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathScrollerFillStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerHatchConfig
+    ],
+    secondaryShapesConfig: [
+      anychart.core.shapeManagers.pathScrollerSelectFillStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerSelectHatchConfig
+    ],
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.VALUE
+  };
+  res[anychart.enums.StockSeriesType.OHLC] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.OHLC,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathScrollerRisingStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerFallingStrokeConfig
+    ],
+    secondaryShapesConfig: [
+      anychart.core.shapeManagers.pathScrollerSelectRisingStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerSelectFallingStrokeConfig
+    ],
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGH,
+    anchoredPositionBottom: anychart.opt.LOW
+  };
+  res[anychart.enums.StockSeriesType.RANGE_AREA] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_AREA,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathScrollerFillConfig,
+      anychart.core.shapeManagers.pathScrollerLowStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerHighStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerHatchConfig
+    ],
+    secondaryShapesConfig: [
+      anychart.core.shapeManagers.pathScrollerSelectFillConfig,
+      anychart.core.shapeManagers.pathScrollerSelectLowStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerSelectHighStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerSelectHatchConfig
+    ],
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGH,
+    anchoredPositionBottom: anychart.opt.LOW
+  };
+  res[anychart.enums.StockSeriesType.RANGE_COLUMN] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_COLUMN,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathScrollerFillStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerHatchConfig
+    ],
+    secondaryShapesConfig: [
+      anychart.core.shapeManagers.pathScrollerSelectFillStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerSelectHatchConfig
+    ],
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGH,
+    anchoredPositionBottom: anychart.opt.LOW
+  };
+  res[anychart.enums.StockSeriesType.RANGE_SPLINE_AREA] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_SPLINE_AREA,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathScrollerFillConfig,
+      anychart.core.shapeManagers.pathScrollerHighStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerLowStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerHatchConfig
+    ],
+    secondaryShapesConfig: [
+      anychart.core.shapeManagers.pathScrollerSelectFillConfig,
+      anychart.core.shapeManagers.pathScrollerSelectHighStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerSelectLowStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerSelectHatchConfig
+    ],
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGH,
+    anchoredPositionBottom: anychart.opt.LOW
+  };
+  res[anychart.enums.StockSeriesType.RANGE_STEP_AREA] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_STEP_AREA,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathScrollerFillConfig,
+      anychart.core.shapeManagers.pathScrollerHighStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerLowStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerHatchConfig
+    ],
+    secondaryShapesConfig: [
+      anychart.core.shapeManagers.pathScrollerSelectFillConfig,
+      anychart.core.shapeManagers.pathScrollerSelectHighStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerSelectLowStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerSelectHatchConfig
+    ],
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGH,
+    anchoredPositionBottom: anychart.opt.LOW
+  };
+  res[anychart.enums.StockSeriesType.SPLINE] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.SPLINE,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathScrollerStrokeConfig
+    ],
+    secondaryShapesConfig: [
+      anychart.core.shapeManagers.pathScrollerSelectStrokeConfig
+    ],
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.VALUE
+  };
+  res[anychart.enums.StockSeriesType.SPLINE_AREA] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.SPLINE_AREA,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathScrollerFillConfig,
+      anychart.core.shapeManagers.pathScrollerStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerHatchConfig
+    ],
+    secondaryShapesConfig: [
+      anychart.core.shapeManagers.pathScrollerSelectFillConfig,
+      anychart.core.shapeManagers.pathScrollerSelectStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerSelectHatchConfig
+    ],
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.ZERO
+  };
+  res[anychart.enums.StockSeriesType.STEP_AREA] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.STEP_AREA,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathScrollerFillConfig,
+      anychart.core.shapeManagers.pathScrollerStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerHatchConfig
+    ],
+    secondaryShapesConfig: [
+      anychart.core.shapeManagers.pathScrollerSelectFillConfig,
+      anychart.core.shapeManagers.pathScrollerSelectStrokeConfig,
+      anychart.core.shapeManagers.pathScrollerSelectHatchConfig
+    ],
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.ZERO
+  };
+  res[anychart.enums.StockSeriesType.STEP_LINE] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.STEP_LINE,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathScrollerStrokeConfig
+    ],
+    secondaryShapesConfig: [
+      anychart.core.shapeManagers.pathScrollerSelectStrokeConfig
+    ],
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.VALUE
+  };
+  return res;
+})();
 
 
 /**
@@ -152,6 +413,42 @@ anychart.core.stock.Scroller.prototype.xAxis = function(opt_value) {
 
 //region Series-related methods
 /**
+ * Creates and returns a new area series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.StockScroller}
+ */
+anychart.core.stock.Scroller.prototype.area = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.AREA, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new candlestick series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.StockScroller}
+ */
+anychart.core.stock.Scroller.prototype.candlestick = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.CANDLESTICK, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
  * Creates and returns a new column series.
  * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
  * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
@@ -162,7 +459,7 @@ anychart.core.stock.Scroller.prototype.xAxis = function(opt_value) {
  *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
  *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
  * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
- * @return {anychart.core.stock.scrollerSeries.Base}
+ * @return {anychart.core.series.StockScroller}
  */
 anychart.core.stock.Scroller.prototype.column = function(opt_data, opt_mappingSettings, opt_csvSettings) {
   return this.createSeriesByType(anychart.enums.StockSeriesType.COLUMN, opt_data, opt_mappingSettings, opt_csvSettings);
@@ -180,10 +477,28 @@ anychart.core.stock.Scroller.prototype.column = function(opt_data, opt_mappingSe
  *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
  *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
  * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
- * @return {anychart.core.stock.scrollerSeries.Base}
+ * @return {anychart.core.series.StockScroller}
  */
 anychart.core.stock.Scroller.prototype.line = function(opt_data, opt_mappingSettings, opt_csvSettings) {
   return this.createSeriesByType(anychart.enums.StockSeriesType.LINE, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new marker series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.StockScroller}
+ */
+anychart.core.stock.Scroller.prototype.marker = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.MARKER, opt_data, opt_mappingSettings, opt_csvSettings);
 };
 
 
@@ -198,7 +513,7 @@ anychart.core.stock.Scroller.prototype.line = function(opt_data, opt_mappingSett
  *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
  *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
  * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
- * @return {anychart.core.stock.scrollerSeries.Base}
+ * @return {anychart.core.series.StockScroller}
  */
 anychart.core.stock.Scroller.prototype.ohlc = function(opt_data, opt_mappingSettings, opt_csvSettings) {
   return this.createSeriesByType(anychart.enums.StockSeriesType.OHLC, opt_data, opt_mappingSettings, opt_csvSettings);
@@ -206,9 +521,153 @@ anychart.core.stock.Scroller.prototype.ohlc = function(opt_data, opt_mappingSett
 
 
 /**
+ * Creates and returns a new rangeArea series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.StockScroller}
+ */
+anychart.core.stock.Scroller.prototype.rangeArea = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.RANGE_AREA, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new rangeColumn series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.StockScroller}
+ */
+anychart.core.stock.Scroller.prototype.rangeColumn = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.RANGE_COLUMN, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new rangeSplineArea series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.StockScroller}
+ */
+anychart.core.stock.Scroller.prototype.rangeSplineArea = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.RANGE_SPLINE_AREA, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new rangeStepArea series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.StockScroller}
+ */
+anychart.core.stock.Scroller.prototype.rangeStepArea = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.RANGE_STEP_AREA, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new spline series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.StockScroller}
+ */
+anychart.core.stock.Scroller.prototype.spline = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.SPLINE, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new splineArea series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.StockScroller}
+ */
+anychart.core.stock.Scroller.prototype.splineArea = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.SPLINE_AREA, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new stepArea series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.StockScroller}
+ */
+anychart.core.stock.Scroller.prototype.stepArea = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.STEP_AREA, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new stepLine series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.StockScroller}
+ */
+anychart.core.stock.Scroller.prototype.stepLine = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.STEP_LINE, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
  * Add series to chart.
  * @param {...(anychart.data.TableMapping)} var_args Chart series data.
- * @return {Array.<anychart.core.stock.scrollerSeries.Base>} Array of created series.
+ * @return {Array.<anychart.core.series.StockScroller>} Array of created series.
  */
 anychart.core.stock.Scroller.prototype.addSeries = function(var_args) {
   var rv = [];
@@ -240,7 +699,7 @@ anychart.core.stock.Scroller.prototype.getSeriesIndexBySeriesId = function(id) {
 /**
  * Gets series by its id.
  * @param {number|string} id Id of the series.
- * @return {anychart.core.stock.scrollerSeries.Base} Series instance.
+ * @return {anychart.core.series.StockScroller} Series instance.
  */
 anychart.core.stock.Scroller.prototype.getSeries = function(id) {
   return this.getSeriesAt(this.getSeriesIndexBySeriesId(id));
@@ -250,7 +709,7 @@ anychart.core.stock.Scroller.prototype.getSeries = function(id) {
 /**
  * Gets series by its index.
  * @param {number} index Index of the series.
- * @return {?anychart.core.stock.scrollerSeries.Base} Series instance.
+ * @return {?anychart.core.series.StockScroller} Series instance.
  */
 anychart.core.stock.Scroller.prototype.getSeriesAt = function(index) {
   return this.series_[index] || null;
@@ -315,7 +774,7 @@ anychart.core.stock.Scroller.prototype.removeAllSeries = function() {
 
 /**
  * Returns series list. Considered internal. Returns it for reading only.
- * @return {!Array.<!anychart.core.stock.scrollerSeries.Base>}
+ * @return {!Array.<!anychart.core.series.StockScroller>}
  */
 anychart.core.stock.Scroller.prototype.getAllSeries = function() {
   return this.series_;
@@ -400,10 +859,34 @@ anychart.core.stock.Scroller.prototype.sma = function(mapping, opt_period, opt_s
 
 /**
  * Getter/setter for series default settings.
- * @param {Object} value Object with default series settings.
+ * @param {Object=} opt_value Object with default series settings.
+ * @return {Object}
  */
-anychart.core.stock.Scroller.prototype.setDefaultSeriesSettings = function(value) {
-  this.defaultSeriesSettings_ = value;
+anychart.core.stock.Scroller.prototype.defaultSeriesSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultSeriesSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultSeriesSettings_ || {};
+};
+
+
+/**
+ * Returns normalized series type and a config for this series type.
+ * @param {string} type
+ * @return {?Array.<string|anychart.core.series.TypeConfig>}
+ */
+anychart.core.stock.Scroller.prototype.getConfigByType = function(type) {
+  type = anychart.enums.normalizeStockSeriesType(type);
+  var config = this.seriesConfig[type];
+  var res;
+  if (config && (config.drawerType in anychart.core.drawers.AvailableDrawers)) {
+    res = [type, config];
+  } else {
+    anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
+    res = null;
+  }
+  return res;
 };
 
 
@@ -418,37 +901,41 @@ anychart.core.stock.Scroller.prototype.setDefaultSeriesSettings = function(value
  *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
  *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
  * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
- * @return {anychart.core.stock.scrollerSeries.Base}
+ * @return {anychart.core.series.StockScroller}
  */
 anychart.core.stock.Scroller.prototype.createSeriesByType = function(type, opt_data, opt_mappingSettings,
     opt_csvSettings) {
-  type = anychart.enums.normalizeStockSeriesType(type);
-  var ctl = anychart.core.stock.scrollerSeries.Base.SeriesTypesMap[type];
+  var configAndType = this.getConfigByType(type);
+  if (configAndType) {
+    var config = /** @type {anychart.core.series.TypeConfig} */(configAndType[1]);
+    var series = new anychart.core.series.StockScroller(this, type, config);
 
-  var instance;
-  if (ctl) {
-    instance = new ctl(this);
-    instance.data(opt_data, opt_mappingSettings, opt_csvSettings);
-    instance.setParentEventTarget(this);
     var lastSeries = this.series_[this.series_.length - 1];
-    var index = lastSeries ? /** @type {number} */ (lastSeries.getIndex()) + 1 : 0;
-    this.series_.push(instance);
+    var index = lastSeries ? /** @type {number} */(lastSeries.autoIndex()) + 1 : 0;
+    this.series_.push(series);
     var inc = index * anychart.core.stock.Plot.ZINDEX_INCREMENT_MULTIPLIER;
-    instance.id(index).index(index);
-    var seriesZIndex = ((type == anychart.enums.StockSeriesType.LINE) ?
+    var seriesZIndex = (series.isLineBased() ?
             anychart.core.stock.Plot.ZINDEX_LINE_SERIES :
             anychart.core.stock.Plot.ZINDEX_SERIES) + inc;
-    instance.setAutoZIndex(seriesZIndex);
-    instance.setup(this.defaultSeriesSettings_[type]);
-    instance.listenSignals(this.seriesInvalidated_, this);
+
+    series.autoIndex(index);
+    series.data(opt_data, opt_mappingSettings, opt_csvSettings);
+    series.setAutoZIndex(seriesZIndex);
+    series.clip(true);
+    series.setAutoPointWidth(.9);
+    // series.setAutoColor(this.palette().itemAt(index));
+    // series.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(index)));
+    // series.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
+    series.setParentEventTarget(this);
+    series.listenSignals(this.seriesInvalidated_, this);
+
     this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_SERIES,
         anychart.Signal.NEEDS_REDRAW);
   } else {
-    anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
-    instance = null;
+    series = null;
   }
 
-  return instance;
+  return series;
 };
 
 
@@ -535,6 +1022,7 @@ anychart.core.stock.Scroller.prototype.draw = function() {
   if (!this.seriesContainer_) {
     this.seriesContainer_ = this.rootLayer.layer();
     this.seriesContainer_.zIndex(1);
+    this.seriesContainer_.clip(this.nonSelectedClipRect);
     this.selectedSeriesContainer_ = this.rootLayer.layer();
     this.selectedSeriesContainer_.disablePointerEvents(true);
     this.selectedSeriesContainer_.zIndex(51);
@@ -542,13 +1030,14 @@ anychart.core.stock.Scroller.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_SCROLLER_SERIES)) {
+    this.nonSelectedClipRect.shape(this.pixelBoundsCache);
     for (var i = 0; i < this.series_.length; i++) {
       var series = this.series_[i];
       if (series) {
         series.suspendSignalsDispatching();
         series.parentBounds(this.pixelBoundsCache);
         series.container(this.seriesContainer_);
-        series.selectedContainer(this.selectedSeriesContainer_);
+        series.secondaryContainer(this.selectedSeriesContainer_);
         series.draw();
         series.resumeSignalsDispatching(false);
       }
@@ -635,13 +1124,11 @@ anychart.core.stock.Scroller.prototype.updateBoundsCache = function() {
 
 /** @inheritDoc */
 anychart.core.stock.Scroller.prototype.disposeInternal = function() {
-  delete this.chart_;
+  goog.disposeAll(this.series_);
+  delete this.series_;
 
   goog.disposeAll(this.indicators_);
   delete this.indicators_;
-
-  goog.disposeAll(this.series_);
-  delete this.series_;
 
   goog.dispose(this.seriesContainer_);
   goog.dispose(this.selectedSeriesContainer_);
@@ -653,6 +1140,8 @@ anychart.core.stock.Scroller.prototype.disposeInternal = function() {
 
   goog.dispose(this.xScale_);
   this.xScale_ = null;
+
+  delete this.chart_;
 
   goog.base(this, 'disposeInternal');
 };
@@ -722,7 +1211,7 @@ anychart.core.stock.Scroller.prototype.setupByJSON = function(config) {
     this.yScale(scale);
 
   if ('defaultSeriesSettings' in config)
-    this.setDefaultSeriesSettings(config['defaultSeriesSettings']);
+    this.defaultSeriesSettings(config['defaultSeriesSettings']);
 
   var series = config['series'];
   if (goog.isArray(series)) {
@@ -743,9 +1232,20 @@ anychart.core.stock.Scroller.prototype.setupByJSON = function(config) {
 
 
 //exports
-anychart.core.stock.Scroller.prototype['line'] = anychart.core.stock.Scroller.prototype.line;
-anychart.core.stock.Scroller.prototype['ohlc'] = anychart.core.stock.Scroller.prototype.ohlc;
+anychart.core.stock.Scroller.prototype['area'] = anychart.core.stock.Scroller.prototype.area;
+anychart.core.stock.Scroller.prototype['candlestick'] = anychart.core.stock.Scroller.prototype.candlestick;
 anychart.core.stock.Scroller.prototype['column'] = anychart.core.stock.Scroller.prototype.column;
+anychart.core.stock.Scroller.prototype['line'] = anychart.core.stock.Scroller.prototype.line;
+anychart.core.stock.Scroller.prototype['marker'] = anychart.core.stock.Scroller.prototype.marker;
+anychart.core.stock.Scroller.prototype['ohlc'] = anychart.core.stock.Scroller.prototype.ohlc;
+anychart.core.stock.Scroller.prototype['rangeArea'] = anychart.core.stock.Scroller.prototype.rangeArea;
+anychart.core.stock.Scroller.prototype['rangeColumn'] = anychart.core.stock.Scroller.prototype.rangeColumn;
+anychart.core.stock.Scroller.prototype['rangeSplineArea'] = anychart.core.stock.Scroller.prototype.rangeSplineArea;
+anychart.core.stock.Scroller.prototype['rangeStepArea'] = anychart.core.stock.Scroller.prototype.rangeStepArea;
+anychart.core.stock.Scroller.prototype['spline'] = anychart.core.stock.Scroller.prototype.spline;
+anychart.core.stock.Scroller.prototype['splineArea'] = anychart.core.stock.Scroller.prototype.splineArea;
+anychart.core.stock.Scroller.prototype['stepArea'] = anychart.core.stock.Scroller.prototype.stepArea;
+anychart.core.stock.Scroller.prototype['stepLine'] = anychart.core.stock.Scroller.prototype.stepLine;
 anychart.core.stock.Scroller.prototype['getSeries'] = anychart.core.stock.Scroller.prototype.getSeries;
 anychart.core.stock.Scroller.prototype['yScale'] = anychart.core.stock.Scroller.prototype.yScale;
 anychart.core.stock.Scroller.prototype['xAxis'] = anychart.core.stock.Scroller.prototype.xAxis;

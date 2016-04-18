@@ -137,10 +137,16 @@ anychart.ConsistencyState = {
   HEATMAP_ZOOM: 1 << 18,
   //---------------------------------- SERIES STATES (VB) ---------------------------------
   // also combined, due to a very big prefix
-  SERIES_HATCH_FILL: 1 << 5,
-  SERIES_MARKERS: 1 << 6,
-  SERIES_LABELS: 1 << 7,
+  SERIES_HATCH_FILL: 1 << 5, //
+  SERIES_MARKERS: 1 << 6, //
+  SERIES_LABELS: 1 << 7, //
   SERIES_DATA: 1 << 8,
+  //
+  SERIES_POINTS: 1 << 9, //
+  SERIES_COLOR: 1 << 10, //
+  SERIES_CLIP: 1 << 11, //
+  SERIES_ERROR: 1 << 12, //
+  SERIES_OUTLIERS: 1 << 13, //
   //---------------------------------- AXES STATES (VB) ---------------------------------
   // also combined
   AXIS_TITLE: 1 << 5,
@@ -239,6 +245,7 @@ anychart.ConsistencyState = {
   STOCK_PLOT_DT_AXIS: 1 << 8,
   STOCK_PLOT_GRIDS: 1 << 9,
   STOCK_PLOT_LEGEND: 1 << 10,
+  STOCK_PLOT_PALETTE: 1 << 11,
   //---------------------------------- STOCK SERIES (VB) -------------------------------------------
   STOCK_SERIES_POINTS: 1 << 5,
   STOCK_SERIES_COLOR: 1 << 6,
@@ -287,8 +294,8 @@ anychart.Signal = {
  */
 anychart.PointState = {
   NORMAL: 0,
-  HOVER: 1 << 1,
-  SELECT: 1 << 2,
+  HOVER: 1,
+  SELECT: 2,
   ALL: 0xFFFFFFFF
 };
 

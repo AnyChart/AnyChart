@@ -237,6 +237,13 @@ anychart.charts.Bullet.prototype.isHorizontal = function() {
  * @return {!(anychart.scales.Base|anychart.charts.Bullet)} Default chart scale value or itself for method chaining.
  */
 anychart.charts.Bullet.prototype.scale = function(opt_value) {
+  if (!this.scale_) {
+    this.scale_ = new anychart.scales.Linear();
+    this.scale_.minimumGap(0);
+    this.scale_.maximumGap(0);
+    this.scale_.ticks().count(3, 5);
+  }
+
   if (goog.isDef(opt_value)) {
     if (goog.isString(opt_value)) {
       opt_value = anychart.scales.Base.fromString(opt_value, false);
@@ -245,22 +252,16 @@ anychart.charts.Bullet.prototype.scale = function(opt_value) {
       this.scale_ = opt_value;
       this.invalidate(
           anychart.ConsistencyState.BULLET_SCALES |
-              anychart.ConsistencyState.BULLET_AXES |
-              anychart.ConsistencyState.BULLET_MARKERS |
-              anychart.ConsistencyState.BULLET_AXES_MARKERS,
+          anychart.ConsistencyState.BULLET_AXES |
+          anychart.ConsistencyState.BULLET_MARKERS |
+          anychart.ConsistencyState.BULLET_AXES_MARKERS,
           anychart.Signal.NEEDS_REDRAW
       );
     }
     return this;
-  } else {
-    if (!this.scale_) {
-      this.scale_ = new anychart.scales.Linear();
-      this.scale_.minimumGap(0);
-      this.scale_.maximumGap(0);
-      this.scale_.ticks().count(3, 5);
-    }
-    return this.scale_;
   }
+
+  return this.scale_;
 };
 
 
@@ -445,9 +446,7 @@ anychart.charts.Bullet.prototype.calculate = function() {
   for (i = 0, count = this.markers_.length; i < count; i++) {
     marker = this.markers_[i];
     if (goog.isDefAndNotNull(marker)) {
-      if (!marker.scale()) {
-        marker.scale(scale);
-      }
+      marker.scale(scale);
       if (marker.type() == anychart.enums.BulletMarkerType.BAR) {
         scale.extendDataRange(0);
       }
@@ -458,9 +457,7 @@ anychart.charts.Bullet.prototype.calculate = function() {
   for (i = 0, count = this.ranges_.length; i < count; i++) {
     range = this.ranges_[i];
     if (goog.isDefAndNotNull(range)) {
-      if (!range.scale()) {
-        range.scale(scale);
-      }
+      range.scale(scale);
       scale.extendDataRange(range.from());
       scale.extendDataRange(range.to());
     }
@@ -471,9 +468,7 @@ anychart.charts.Bullet.prototype.calculate = function() {
   }
 
   var axis = this.axis();
-  if (!axis.scale()) {
-    axis.scale(/** @type {anychart.scales.Base} */(this.scale()));
-  }
+  axis.scale(/** @type {anychart.scales.Base} */(this.scale()));
 };
 
 
@@ -621,8 +616,18 @@ anychart.charts.Bullet.prototype.createMarker_ = function(iterator) {
   marker.fill(/** @type {acgraph.vector.Fill} */(iterator.get('fill')));
   marker.stroke(/** @type {acgraph.vector.Stroke} */(iterator.get('stroke')));
   marker.resumeSignalsDispatching(false);
+  marker.listenSignals(this.markerInvalidated_, this);
 
   return marker;
+};
+
+
+/**
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.charts.Bullet.prototype.markerInvalidated_ = function(e) {
+  this.invalidate(anychart.ConsistencyState.BULLET_MARKERS, anychart.Signal.NEEDS_REDRAW);
 };
 
 

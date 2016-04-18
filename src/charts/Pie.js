@@ -3549,6 +3549,15 @@ anychart.charts.Pie.prototype.createFormatProvider = function(opt_force) {
 
 
 /**
+ * Creates tooltip format provider.
+ * @return {Object}
+ */
+anychart.charts.Pie.prototype.createTooltipContextProvider = function() {
+  return this.createFormatProvider();
+};
+
+
+/**
  *
  * @param {anychart.core.ui.CircularLabelsFactory.Label} label .
  * @return {anychart.math.Rect}

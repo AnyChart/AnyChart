@@ -1334,10 +1334,10 @@ anychart.charts.Map.prototype.createSeriesByType_ = function(type, data, opt_csv
     instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(index)));
     instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
 
-    if (instance.hasMarkers()) {
+    if (instance.supportsMarkers()) {
       instance.markers().setAutoZIndex(anychart.charts.Map.ZINDEX_MARKER + inc);
-      instance.markers().setAutoFill((/** @type {anychart.core.cartesian.series.BaseWithMarkers} */ (instance)).getMarkerFill());
-      instance.markers().setAutoStroke((/** @type {anychart.core.cartesian.series.BaseWithMarkers} */ (instance)).getMarkerStroke());
+      instance.markers().setAutoFill((/** @type {anychart.core.map.series.BaseWithMarkers} */ (instance)).getMarkerFill());
+      instance.markers().setAutoStroke((/** @type {anychart.core.map.series.BaseWithMarkers} */ (instance)).getMarkerStroke());
     }
 
     instance.setup(this.defaultSeriesSettings()[type]);

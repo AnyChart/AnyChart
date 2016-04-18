@@ -116,7 +116,7 @@ anychart.charts.TreeMap.prototype.getType = function() {
 ///  IInteractivitySeries INTERFACE IMPLEMENTATION ///
 /**
  * Returns iterator.
- * @return {anychart.core.utils.ArrayIterator}
+ * @return {!anychart.core.utils.ArrayIterator}
  */
 anychart.charts.TreeMap.prototype.getIterator = function() {
   return this.iterator_ || this.getResetIterator();
@@ -125,7 +125,7 @@ anychart.charts.TreeMap.prototype.getIterator = function() {
 
 /**
  * Returns reset iterator.
- * @return {anychart.core.utils.ArrayIterator}
+ * @return {!anychart.core.utils.ArrayIterator}
  */
 anychart.charts.TreeMap.prototype.getResetIterator = function() {
   return this.iterator_ = new anychart.core.utils.ArrayIterator(this.drawingNodes_);
@@ -622,8 +622,8 @@ anychart.charts.TreeMap.prototype.sort = function(opt_value) {
  * @return {number}
  */
 anychart.charts.TreeMap.SORT_DESC = function(node1, node2) {
-  var size1 = /** @type {number} */ (node1.meta(anychart.charts.TreeMap.DataFields.SIZE));
-  var size2 = /** @type {number} */ (node2.meta(anychart.charts.TreeMap.DataFields.SIZE));
+  var size1 = /** @type {number} */(node1.meta(anychart.charts.TreeMap.DataFields.SIZE));
+  var size2 = /** @type {number} */(node2.meta(anychart.charts.TreeMap.DataFields.SIZE));
   return size2 - size1;
 };
 
@@ -1707,6 +1707,15 @@ anychart.charts.TreeMap.prototype.createFormatProvider = function(opt_force) {
     this.pointProvider_ = new anychart.core.utils.TreeMapPointContextProvider(this);
   this.pointProvider_.applyReferenceValues();
   return this.pointProvider_;
+};
+
+
+/**
+ * Creates tooltip format provider.
+ * @return {Object}
+ */
+anychart.charts.TreeMap.prototype.createTooltipContextProvider = function() {
+  return this.createFormatProvider();
 };
 
 

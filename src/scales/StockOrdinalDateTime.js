@@ -18,7 +18,7 @@ goog.inherits(anychart.scales.StockOrdinalDateTime, anychart.scales.StockScatter
 
 
 /** @inheritDoc */
-anychart.scales.StockOrdinalDateTime.prototype.transform = function(value) {
+anychart.scales.StockOrdinalDateTime.prototype.transform = function(value, opt_subrangeRatio) {
   return this.transformInternal(value, this.keyIndexTransformer.getIndexByKey(anychart.utils.normalizeTimestamp(value)));
 };
 
@@ -31,7 +31,7 @@ anychart.scales.StockOrdinalDateTime.prototype.inverseTransform = function(ratio
 
 
 /** @inheritDoc */
-anychart.scales.StockOrdinalDateTime.prototype.transformInternal = function(key, index) {
+anychart.scales.StockOrdinalDateTime.prototype.transformInternal = function(key, index, opt_subRangeRatio) {
   return (index - this.minIndex) / (this.maxIndex - this.minIndex);
 };
 

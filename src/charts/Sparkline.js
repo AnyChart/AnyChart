@@ -278,6 +278,15 @@ anychart.charts.Sparkline.prototype.createFormatProvider = function() {
 };
 
 
+/**
+ * Creates tooltip format provider.
+ * @return {Object}
+ */
+anychart.charts.Sparkline.prototype.createTooltipContextProvider = function() {
+  return this.createFormatProvider();
+};
+
+
 /** @inheritDoc */
 anychart.charts.Sparkline.prototype.useUnionTooltipAsSingle = function() {
   return true;

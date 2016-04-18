@@ -6,7 +6,7 @@
 goog.provide('anychart.modules.column3d');
 
 goog.require('anychart.charts.Cartesian3d');
-goog.require('anychart.core.cartesian.series.Column3d');
+goog.require('anychart.core.drawers.Column3d');
 goog.require('anychart.modules.base');
 
 

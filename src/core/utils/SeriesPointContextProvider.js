@@ -8,7 +8,7 @@ goog.require('anychart.enums');
 /**
  * Series point context provider.
  * @implements {anychart.core.utils.IContextProvider}
- * @param {(anychart.core.SeriesBase|anychart.core.sparkline.series.Base|anychart.core.gauge.pointers.Base)} series Series.
+ * @param {(anychart.core.series.Base|anychart.core.SeriesBase|anychart.core.sparkline.series.Base|anychart.core.gauge.pointers.Base)} series Series.
  * @param {Array.<string>} referenceValueNames Reference value names to be applied.
  * @param {boolean} addErrorInfo Whether to add error info to a provider.
  * @extends {anychart.core.utils.BaseContextProvider}
@@ -17,16 +17,16 @@ goog.require('anychart.enums');
 anychart.core.utils.SeriesPointContextProvider = function(series, referenceValueNames, addErrorInfo) {
   anychart.core.utils.SeriesPointContextProvider.base(this, 'constructor');
   /**
-   * @type {(anychart.core.SeriesBase|anychart.core.sparkline.series.Base|anychart.core.gauge.pointers.Base)}
+   * @type {(anychart.core.series.Base|anychart.core.SeriesBase|anychart.core.sparkline.series.Base|anychart.core.gauge.pointers.Base)}
    * @private
    */
   this['series'] = series;
 
   /**
    * @type {boolean}
-   * @private
+   * @protected
    */
-  this.errorAvailable_ = addErrorInfo;
+  this.errorAvailable = addErrorInfo;
 
   /**
    * @type {Array.<string>}
@@ -39,17 +39,26 @@ goog.inherits(anychart.core.utils.SeriesPointContextProvider, anychart.core.util
 
 /** @inheritDoc */
 anychart.core.utils.SeriesPointContextProvider.prototype.applyReferenceValues = function() {
-  var iterator = this['series'].getIterator();
+  this.applyReferenceValuesInternal(this['series'].getIterator());
+};
+
+
+/**
+ * Applies reference values for passed point.
+ * @param {anychart.data.IRowInfo} point
+ * @protected
+ */
+anychart.core.utils.SeriesPointContextProvider.prototype.applyReferenceValuesInternal = function(point) {
   var value;
-  this['index'] = iterator.getIndex();
-  this['x'] = iterator.get('x'); // redundant for all series except Cartesian
+  this['index'] = point.getIndex();
+  this['x'] = point.getX(); // redundant for all series except Cartesian
   for (var i = 0; i < this.referenceValueNames.length; i++) {
     value = this.referenceValueNames[i];
-    this[value] = iterator.get(value);
+    this[value] = point.get(value);
   }
   if (this['series'].name)
-    this['seriesName'] = this['series'].name() || 'Series: ' + this['series'].index();
-  if (this.errorAvailable_) {
+    this['seriesName'] = this['series'].name() || 'Series ' + this['series'].getIndex();
+  if (this.errorAvailable) {
     /** @type {anychart.core.utils.ISeriesWithError} */
     var series = /** @type {anychart.core.utils.ISeriesWithError} */(this['series']);
     /** @type {anychart.enums.ErrorMode} */
@@ -69,13 +78,21 @@ anychart.core.utils.SeriesPointContextProvider.prototype.applyReferenceValues = 
 };
 
 
-/** @inheritDoc */
+/**
+ * Fetch statistics value by its key or a whole object if no key provided.
+ * @param {string=} opt_key Key.
+ * @return {*}
+ */
 anychart.core.utils.SeriesPointContextProvider.prototype.getStat = function(opt_key) {
-  return (/** @type {anychart.core.SeriesBase} */ (this['series'])).statistics(opt_key);
+  return (/** @type {anychart.core.series.Base|anychart.core.SeriesBase} */ (this['series'])).statistics(opt_key);
 };
 
 
-/** @inheritDoc */
+/**
+ * Fetch data value by its key.
+ * @param {string} key Key.
+ * @return {*}
+ */
 anychart.core.utils.SeriesPointContextProvider.prototype.getDataValue = function(key) {
   return this['series'].getIterator().get(key);
 };
@@ -133,7 +150,7 @@ anychart.core.utils.SeriesPointContextProvider.prototype.getTokenValue = functio
     case '%DataPlotPointCount':
       return this.getStat('pointsCount');
     case '%DataPlotSeriesCount':
-      var series = /** @type {anychart.core.SeriesBase} */ (this['series']);
+      var series = /** @type {anychart.core.series.Base|anychart.core.SeriesBase} */ (this['series']);
       var chart = /** @type {anychart.charts.Cartesian|anychart.charts.Scatter|anychart.charts.Radar|anychart.charts.Polar|anychart.charts.Map} */ (series.getChart());
       return chart.getSeriesCount();
     case '%YPercentOfSeries':

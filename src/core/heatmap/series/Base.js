@@ -401,7 +401,7 @@ anychart.core.heatMap.series.Base.prototype.isDiscreteBased = function() {
  * Tester if the series has markers() method.
  * @return {boolean}
  */
-anychart.core.heatMap.series.Base.prototype.hasMarkers = function() {
+anychart.core.heatMap.series.Base.prototype.supportsMarkers = function() {
   return true;
 };
 

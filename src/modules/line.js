@@ -6,9 +6,9 @@
 goog.provide('anychart.modules.line');
 
 goog.require('anychart.charts.Cartesian');
-goog.require('anychart.core.cartesian.series.Line');
-goog.require('anychart.core.cartesian.series.Spline');
-goog.require('anychart.core.cartesian.series.StepLine');
+goog.require('anychart.core.drawers.Line');
+goog.require('anychart.core.drawers.Spline');
+goog.require('anychart.core.drawers.StepLine');
 goog.require('anychart.modules.base');
 
 
@@ -57,4 +57,3 @@ anychart.lineChart = anychart.line;
 //exports
 goog.exportSymbol('anychart.line', anychart.line);
 goog.exportSymbol('anychart.lineChart', anychart.lineChart);
-goog.exportSymbol('anychart.cartesian.series.line', anychart.core.cartesian.series.line);//doc|ex

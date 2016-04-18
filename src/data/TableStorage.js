@@ -105,6 +105,7 @@ anychart.data.TableStorage = function(table) {
  *   startKey: number,
  *   endKey: number,
  *   firstIndex: number,
+ *   lastIndex: number,
  *   firstRow: anychart.data.TableRow,
  *   lastRow: anychart.data.TableRow,
  *   preFirstRow: anychart.data.TableRow,
@@ -175,14 +176,18 @@ anychart.data.TableStorage.prototype.update = function() {
       if (this.lastComputedColumn <= this.table.getRightMostFieldByComputerIndex(i)) { // if not - the computer is OK
         var computer = computers[i];
         computer.invokeStart();
+        var index = 0;
         var row = this.storage[0];
         while (row) {
           if (!row.computedValues)
             row.computedValues = [];
           while (row.computedValues.length < lastColumnToCompute) // we want this array to be solid to increase performance
             row.computedValues.push(undefined);
-          computer.invokeCalculation(row, aggregated);
+          // this index we pass here can differ from the index on the chart
+          // because the storage is not directly attached to a Controller that can resolve indexes
+          computer.invokeCalculation(row, aggregated, index);
           row = row.next;
+          index++;
         }
       }
     }
@@ -241,11 +246,13 @@ anychart.data.TableStorage.prototype.selectFast = function(startKey, endKey, fir
       // this means that we tried to select keys greater than there are in the storage
       preFirst = this.storage[this.storage.length - 1];
       first = last = postLast = null;
+      lastIndex = NaN;
     } else {
       first = this.storage[firstIndex]; // always exist but can be incorrect first
       if (isNaN(lastIndex)) {
         // this means that we tried to select keys less than there are in the storage
-        // and, thereby first should be now the first row in the storage (index 0)
+        // and, thereby, first should be now the first row in the storage (index 0),
+        // but that's not correct first row
         postLast = first;
         first = last = preFirst = null;
         firstIndex = NaN;
@@ -257,7 +264,7 @@ anychart.data.TableStorage.prototype.selectFast = function(startKey, endKey, fir
     }
   } else {
     first = last = preFirst = postLast = null;
-    firstIndex = NaN;
+    firstIndex = lastIndex = NaN;
   }
 
   var fields = this.getKnownFields();
@@ -386,6 +393,7 @@ anychart.data.TableStorage.prototype.selectFast = function(startKey, endKey, fir
     startKey: startKey,
     endKey: endKey,
     firstIndex: firstIndex,
+    lastIndex: lastIndex,
     firstRow: first,
     lastRow: last,
     preFirstRow: preFirst,

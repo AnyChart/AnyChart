@@ -75,6 +75,13 @@ anychart.core.ui.Scroller = function(opt_usesAbsolutePadding) {
   this.selectedBackground_ = null;
 
   /**
+   * Non-selected range clip.
+   * @type {acgraph.vector.Clip}
+   * @protected
+   */
+  this.nonSelectedClipRect = null;
+
+  /**
    * Selected range clip.
    * @type {acgraph.vector.Clip}
    * @protected
@@ -612,6 +619,9 @@ anychart.core.ui.Scroller.prototype.draw = function() {
 
     this.nonSelectedBackground_ = this.rootLayer.rect();
     this.nonSelectedBackground_.zIndex(0);
+
+    this.nonSelectedClipRect = acgraph.clip();
+    this.nonSelectedBackground_.clip(this.nonSelectedClipRect);
 
     this.selectedBackground_ = this.rootLayer.rect();
     this.selectedBackground_.zIndex(50);

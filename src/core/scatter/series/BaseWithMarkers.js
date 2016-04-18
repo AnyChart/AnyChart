@@ -44,7 +44,7 @@ anychart.core.scatter.series.BaseWithMarkers.prototype.hoverMarkers_ = null;
 
 
 /** @inheritDoc */
-anychart.core.scatter.series.BaseWithMarkers.prototype.hasMarkers = function() {
+anychart.core.scatter.series.BaseWithMarkers.prototype.supportsMarkers = function() {
   return true;
 };
 

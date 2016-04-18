@@ -6,7 +6,7 @@
 goog.provide('anychart.modules.bar3d');
 
 goog.require('anychart.charts.Cartesian3d');
-goog.require('anychart.core.cartesian.series.Bar3d');
+goog.require('anychart.core.drawers.Bar3d');
 goog.require('anychart.modules.base');
 
 

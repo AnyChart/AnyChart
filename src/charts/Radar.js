@@ -615,7 +615,7 @@ anychart.charts.Radar.prototype.createSeriesByType_ = function(type, data, opt_c
     instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
     var markerType = /** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(index));
     instance.setAutoMarkerType(markerType);
-    if (instance.hasMarkers()) {
+    if (instance.supportsMarkers()) {
       instance.markers().setAutoZIndex(seriesZIndex + anychart.charts.Radar.ZINDEX_INCREMENT_MULTIPLIER / 2);
       instance.markers().setAutoType(markerType);
       instance.markers().setAutoFill(instance.getMarkerFill());

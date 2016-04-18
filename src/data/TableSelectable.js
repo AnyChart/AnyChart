@@ -1,6 +1,7 @@
 goog.provide('anychart.data.TableSelectable');
 goog.provide('anychart.data.TableSelectable.RowProxy');
 goog.require('anychart.core.utils.DateTimeIntervalGenerator');
+goog.require('anychart.data.IRowInfo');
 goog.require('anychart.data.TableIterator');
 
 
@@ -52,6 +53,28 @@ anychart.data.TableSelectable = function(mapping) {
    * @private
    */
   this.selectionInvalid_ = false;
+
+  /**
+   * Array of meta.
+   * @type {Array.<Object>}
+   * @private
+   */
+  this.metaData_ = [];
+
+  this.resetMeta_();
+};
+
+
+/**
+ * Resets meta information. Currently when meta is reset we assume that the series would write correct values to the
+ * meta prior to reading them from it. That's why we do not recreate those objects on each reselect.
+ * //todo (Anton Saukh): Implement meta division to persistent/non-persistent.
+ * @private
+ */
+anychart.data.TableSelectable.prototype.resetMeta_ = function() {
+  var len = this.currentStorage_.getRowsCount();
+  while (this.metaData_.length < len)
+    this.metaData_.push({});
 };
 
 
@@ -62,9 +85,10 @@ anychart.data.TableSelectable = function(mapping) {
  * @return {anychart.data.TableSelectable.RowProxy}
  */
 anychart.data.TableSelectable.prototype.search = function(key, opt_mode) {
-  var row = this.currentStorage_.search(key, anychart.enums.normalizeTableSearchMode(opt_mode));
+  var index = this.currentStorage_.searchIndex(key, anychart.enums.normalizeTableSearchMode(opt_mode));
+  var row = this.currentStorage_.getRow(index);
   if (row)
-    return new anychart.data.TableSelectable.RowProxy(row, this.mapping_, !this.currentStorageIsMain_);
+    return new anychart.data.TableSelectable.RowProxy(row, this.mapping_, !this.currentStorageIsMain_, index, this.metaData_[index]);
   else
     return null;
 };
@@ -108,6 +132,7 @@ anychart.data.TableSelectable.prototype.selectAll = function(opt_intervalUnit, o
   this.currentStorage_ = storage;
   this.currentStorageIsMain_ = !interval; // currently equals the check (storage == table.getStorage())
   this.currentSelection_ = storage.selectAll();
+  this.resetMeta_();
   return this;
 };
 
@@ -138,8 +163,29 @@ anychart.data.TableSelectable.prototype.selectInternal = function(startKey, endK
     this.currentStorage_ = storage;
     this.currentStorageIsMain_ = !opt_interval; // currently equals the check (storage == table.getStorage())
     this.currentSelection_ = storage.select(startKey, endKey);
+    this.resetMeta_();
   }
   return this;
+};
+
+
+/**
+ * Wraps passed TableRow to a RowProxy.
+ * @param {anychart.data.TableRow} row
+ * @param {number} rowIndexInStorage
+ * @return {?anychart.data.TableSelectable.RowProxy}
+ * @private
+ */
+anychart.data.TableSelectable.prototype.wrapRow_ = function(row, rowIndexInStorage) {
+  return row ?
+      new anychart.data.TableSelectable.RowProxy(
+          row,
+          this.mapping_,
+          !this.currentStorageIsMain_,
+          this.controller_.getIndex(row.key),
+          this.metaData_[rowIndexInStorage]
+      ) :
+      null;
 };
 
 
@@ -148,12 +194,7 @@ anychart.data.TableSelectable.prototype.selectInternal = function(startKey, endK
  * @return {anychart.data.TableSelectable.RowProxy}
  */
 anychart.data.TableSelectable.prototype.getPreFirstRow = function() {
-  return this.currentSelection_.preFirstRow ?
-      new anychart.data.TableSelectable.RowProxy(
-          this.currentSelection_.preFirstRow,
-          this.mapping_,
-          this.currentStorageIsMain_) :
-      null;
+  return this.wrapRow_(this.currentSelection_.preFirstRow, this.currentSelection_.firstIndex - 1);
 };
 
 
@@ -162,12 +203,7 @@ anychart.data.TableSelectable.prototype.getPreFirstRow = function() {
  * @return {anychart.data.TableSelectable.RowProxy}
  */
 anychart.data.TableSelectable.prototype.getPostLastRow = function() {
-  return this.currentSelection_.postLastRow ?
-      new anychart.data.TableSelectable.RowProxy(
-          this.currentSelection_.postLastRow,
-          this.mapping_,
-          this.currentStorageIsMain_) :
-      null;
+  return this.wrapRow_(this.currentSelection_.postLastRow, this.currentSelection_.lastIndex + 1);
 };
 
 
@@ -176,12 +212,8 @@ anychart.data.TableSelectable.prototype.getPostLastRow = function() {
  * @return {anychart.data.TableSelectable.RowProxy}
  */
 anychart.data.TableSelectable.prototype.getLastRow = function() {
-  return this.currentSelection_.lastRow ?
-      new anychart.data.TableSelectable.RowProxy(
-          this.currentSelection_.lastRow,
-          this.mapping_,
-          !this.currentStorageIsMain_) :
-      null;
+  return this.wrapRow_(this.currentSelection_.lastRow, this.currentSelection_.lastIndex);
+
 };
 
 
@@ -269,7 +301,7 @@ anychart.data.TableSelectable.prototype.getColumnMax = function(column) {
  * @return {!anychart.data.TableIterator}
  */
 anychart.data.TableSelectable.prototype.getIteratorInternal = function(opt_passCoIterator, opt_getFullRangeCoIterator) {
-  return new anychart.data.TableIterator(this.mapping_, this.currentSelection_, !this.currentStorageIsMain_,
+  return new anychart.data.TableIterator(this.mapping_, this.currentSelection_, this.metaData_, !this.currentStorageIsMain_,
       (opt_passCoIterator && this.controller_) ? this.controller_.getCoIterator(!!opt_getFullRangeCoIterator) : null);
 };
 
@@ -283,12 +315,21 @@ anychart.data.TableSelectable.prototype.getIteratorInternal = function(opt_passC
 anychart.data.TableSelectable.prototype.getExportingIterator = function() {
   var coIterator = this.controller_ ? this.controller_.getCoIterator(false, true) : null;
   var storage = this.currentStorage_.getStorageInternal();
-  var firstRow = storage.length ? storage[0] : null;
-  var lastRow = storage.length ? storage[storage.length - 1] : null;
+  var firstIndex, lastIndex, firstRow, lastRow;
+  if (storage.length) {
+    firstIndex = 0;
+    lastIndex = storage.length - 1;
+    firstRow = storage[firstIndex];
+    lastRow = storage[lastIndex];
+  } else {
+    firstIndex = lastIndex = NaN;
+    firstRow = lastRow = null;
+  }
   var selection = {
     startKey: NaN,
     endKey: NaN,
-    firstIndex: 0,
+    firstIndex: firstIndex,
+    lastIndex: lastIndex,
     firstRow: firstRow,
     lastRow: lastRow,
     preFirstRow: null,
@@ -299,7 +340,7 @@ anychart.data.TableSelectable.prototype.getExportingIterator = function() {
     calcMins: [],
     minDistance: NaN
   };
-  return new anychart.data.TableIterator(this.mapping_, selection, !this.currentStorageIsMain_, coIterator);
+  return new anychart.data.TableIterator(this.mapping_, selection, this.metaData_, !this.currentStorageIsMain_, coIterator);
 };
 
 
@@ -331,6 +372,7 @@ anychart.data.TableSelectable.prototype.selectFast = function(startKey, endKey, 
     this.currentStorage_ = storage;
     this.currentStorageIsMain_ = !opt_interval; // currently equals the check (storage == table.getStorage())
     this.currentSelection_ = storage.selectFast(startKey, endKey, startIndex, endIndex);
+    this.resetMeta_();
   }
   return this;
 };
@@ -360,15 +402,25 @@ anychart.data.TableSelectable.IController = function() {};
 anychart.data.TableSelectable.IController.prototype.getCoIterator;
 
 
+/**
+ * @param {number} key
+ * @return {number}
+ */
+anychart.data.TableSelectable.IController.prototype.getIndex;
+
+
 
 /**
  * Represents table row with associated mapping. Allows fetching rows values.
  * @param {!anychart.data.TableRow} row
  * @param {!anychart.data.TableMapping} mapping
  * @param {boolean} aggregated
+ * @param {number} index
+ * @param {Object} metaObj
  * @constructor
+ * @implements {anychart.data.IRowInfo}
  */
-anychart.data.TableSelectable.RowProxy = function(row, mapping, aggregated) {
+anychart.data.TableSelectable.RowProxy = function(row, mapping, aggregated, index, metaObj) {
   /**
    * @type {!anychart.data.TableRow}
    * @protected
@@ -386,6 +438,18 @@ anychart.data.TableSelectable.RowProxy = function(row, mapping, aggregated) {
    * @private
    */
   this.aggregated_ = aggregated;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  this.index_ = index;
+
+  /**
+   * @type {Object}
+   * @private
+   */
+  this.meta_ = metaObj;
 };
 
 
@@ -417,6 +481,40 @@ anychart.data.TableSelectable.RowProxy.prototype.getColumn = function(column) {
 
 
 /**
+ * Returns index of the item in the selection that have created this item.
+ * @return {number}
+ */
+anychart.data.TableSelectable.RowProxy.prototype.getIndex = function() {
+  return this.index_;
+};
+
+
+/**
+ * Returns current row value that is considered to be X.
+ * @return {*}
+ */
+anychart.data.TableSelectable.RowProxy.prototype.getX = function() {
+  return this.row.key;
+};
+
+
+/**
+ * Getter-setter for row meta. This row meta is valid only for the current Table
+ * @param {string} name
+ * @param {*=} opt_value
+ * @return {*|anychart.data.TableSelectable.RowProxy}
+ */
+anychart.data.TableSelectable.RowProxy.prototype.meta = function(name, opt_value) {
+  if (arguments.length > 1) {
+    if (this.meta_)
+      this.meta_[name] = opt_value;
+    return this;
+  }
+  return this.meta_ ? this.meta_[name] : undefined;
+};
+
+
+/**
  * Returns item key.
  * @return {number}
  */
@@ -442,3 +540,4 @@ anychart.data.TableSelectable.prototype['getIterator'] = anychart.data.TableSele
 anychart.data.TableSelectable.RowProxy.prototype['get'] = anychart.data.TableSelectable.RowProxy.prototype.get;
 anychart.data.TableSelectable.RowProxy.prototype['getKey'] = anychart.data.TableSelectable.RowProxy.prototype.getKey;
 anychart.data.TableSelectable.RowProxy.prototype['getColumn'] = anychart.data.TableSelectable.RowProxy.prototype.getColumn;
+anychart.data.TableSelectable.RowProxy.prototype['getIndex'] = anychart.data.TableSelectable.RowProxy.prototype.getIndex;

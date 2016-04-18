@@ -596,6 +596,12 @@ anychart.themes.merging.mergingMap_ = [
     ]
   },
   {
+    defaultObj: 'hatchFillPaletteFor3D',
+    targets: [
+      'cartesian3d.hatchFillPalette'
+    ]
+  },
+  {
     defaultObj: 'markerPalette',
     targets: [
       'chart.markerPalette'
@@ -740,7 +746,6 @@ anychart.themes.merging.mergingMap_ = [
     defaultObj: 'pie',
     targets: ['pie3d']
   },
-
   {
     defaultObj: 'cartesianBase.defaultSeriesSettings.base',
     targets: [
@@ -800,10 +805,15 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'cartesian3d.defaultSeriesSettings.bar',
       'cartesian3d.defaultSeriesSettings.column',
-      'cartesian3d.defaultSeriesSettings.area',
-      'bar3d.defaultSeriesSettings.bar',
-      'column3d.defaultSeriesSettings.column',
-      'area3d.defaultSeriesSettings.area'
+      'cartesian3d.defaultSeriesSettings.area'
+    ]
+  },
+  {
+    defaultObj: 'cartesian3d',
+    targets: [
+      'area3d',
+      'bar3d',
+      'column3d'
     ]
   },
   {
@@ -826,14 +836,6 @@ anychart.themes.merging.mergingMap_ = [
     defaultObj: 'scatter.defaultSeriesSettings.base',
     targets: [
       'scatter.defaultSeriesSettings.bubble',
-      'scatter.defaultSeriesSettings.lineLike',
-      'scatter.defaultSeriesSettings.marker'
-    ]
-  },
-  {
-    defaultObj: 'scatter.defaultSeriesSettings.base',
-    targets: [
-      'scatter.defaultSeriesSettings.areaLike',
       'scatter.defaultSeriesSettings.lineLike',
       'scatter.defaultSeriesSettings.marker'
     ]
@@ -930,9 +932,85 @@ anychart.themes.merging.mergingMap_ = [
   {
     defaultObj: 'stock.defaultPlotSettings.defaultSeriesSettings.base',
     targets: [
-      'stock.defaultPlotSettings.defaultSeriesSettings.line',
+      'stock.defaultPlotSettings.defaultSeriesSettings.areaLike',
+      'stock.defaultPlotSettings.defaultSeriesSettings.barLike',
+      'stock.defaultPlotSettings.defaultSeriesSettings.lineLike',
+      'stock.defaultPlotSettings.defaultSeriesSettings.pieLike',
+      'stock.defaultPlotSettings.defaultSeriesSettings.marker',
+      'stock.defaultPlotSettings.defaultSeriesSettings.bubble'
+    ]
+  },
+  {
+    defaultObj: 'stock.defaultPlotSettings.defaultSeriesSettings.areaLike',
+    targets: [
+      'stock.defaultPlotSettings.defaultSeriesSettings.area',
+      'stock.defaultPlotSettings.defaultSeriesSettings.splineArea',
+      'stock.defaultPlotSettings.defaultSeriesSettings.stepArea',
+      'stock.defaultPlotSettings.defaultSeriesSettings.rangeArea',
+      'stock.defaultPlotSettings.defaultSeriesSettings.rangeSplineArea',
+      'stock.defaultPlotSettings.defaultSeriesSettings.rangeStepArea'
+    ]
+  },
+  {
+    defaultObj: 'stock.defaultPlotSettings.defaultSeriesSettings.barLike',
+    targets: [
+      'stock.defaultPlotSettings.defaultSeriesSettings.bar',
       'stock.defaultPlotSettings.defaultSeriesSettings.column',
+      'stock.defaultPlotSettings.defaultSeriesSettings.box',
+      'stock.defaultPlotSettings.defaultSeriesSettings.rangeBar',
+      'stock.defaultPlotSettings.defaultSeriesSettings.rangeColumn',
+      'stock.defaultPlotSettings.defaultSeriesSettings.candlestick'
+    ]
+  },
+  {
+    defaultObj: 'stock.defaultPlotSettings.defaultSeriesSettings.lineLike',
+    targets: [
+      'stock.defaultPlotSettings.defaultSeriesSettings.line',
+      'stock.defaultPlotSettings.defaultSeriesSettings.spline',
+      'stock.defaultPlotSettings.defaultSeriesSettings.stepLine',
       'stock.defaultPlotSettings.defaultSeriesSettings.ohlc'
+    ]
+  },
+  {
+    defaultObj: 'stock.scroller.defaultSeriesSettings.base',
+    targets: [
+      'stock.scroller.defaultSeriesSettings.areaLike',
+      'stock.scroller.defaultSeriesSettings.barLike',
+      'stock.scroller.defaultSeriesSettings.lineLike',
+      'stock.scroller.defaultSeriesSettings.pieLike',
+      'stock.scroller.defaultSeriesSettings.marker',
+      'stock.scroller.defaultSeriesSettings.bubble'
+    ]
+  },
+  {
+    defaultObj: 'stock.scroller.defaultSeriesSettings.areaLike',
+    targets: [
+      'stock.scroller.defaultSeriesSettings.area',
+      'stock.scroller.defaultSeriesSettings.splineArea',
+      'stock.scroller.defaultSeriesSettings.stepArea',
+      'stock.scroller.defaultSeriesSettings.rangeArea',
+      'stock.scroller.defaultSeriesSettings.rangeSplineArea',
+      'stock.scroller.defaultSeriesSettings.rangeStepArea'
+    ]
+  },
+  {
+    defaultObj: 'stock.scroller.defaultSeriesSettings.barLike',
+    targets: [
+      'stock.scroller.defaultSeriesSettings.bar',
+      'stock.scroller.defaultSeriesSettings.column',
+      'stock.scroller.defaultSeriesSettings.box',
+      'stock.scroller.defaultSeriesSettings.rangeBar',
+      'stock.scroller.defaultSeriesSettings.rangeColumn',
+      'stock.scroller.defaultSeriesSettings.candlestick'
+    ]
+  },
+  {
+    defaultObj: 'stock.scroller.defaultSeriesSettings.lineLike',
+    targets: [
+      'stock.scroller.defaultSeriesSettings.line',
+      'stock.scroller.defaultSeriesSettings.spline',
+      'stock.scroller.defaultSeriesSettings.stepLine',
+      'stock.scroller.defaultSeriesSettings.ohlc'
     ]
   },
   {
@@ -1023,6 +1101,9 @@ anychart.themes.merging.nonMergableEntities_ = {
   'dragAreaFill': anychart.themes.merging.NonMergableEntityTypes_.FILL,
   'cellFill': anychart.themes.merging.NonMergableEntityTypes_.FILL,
   'selectedFill': anychart.themes.merging.NonMergableEntityTypes_.FILL,
+  'selectNegativeFill': anychart.themes.merging.NonMergableEntityTypes_.FILL,
+  'selectRisingFill': anychart.themes.merging.NonMergableEntityTypes_.FILL,
+  'selectFallingFill': anychart.themes.merging.NonMergableEntityTypes_.FILL,
 
   'hatchFill': anychart.themes.merging.NonMergableEntityTypes_.HATCH_FILL,
   'hoverHatchFill': anychart.themes.merging.NonMergableEntityTypes_.HATCH_FILL,
@@ -1038,6 +1119,10 @@ anychart.themes.merging.nonMergableEntities_ = {
   'hoverFallingHatchFill': anychart.themes.merging.NonMergableEntityTypes_.HATCH_FILL,
   'selectedHatchFill': anychart.themes.merging.NonMergableEntityTypes_.HATCH_FILL,
   'iconHatchFill': anychart.themes.merging.NonMergableEntityTypes_.HATCH_FILL,
+  'selectHatchFill': anychart.themes.merging.NonMergableEntityTypes_.HATCH_FILL,
+  'selectNegativeHatchFill': anychart.themes.merging.NonMergableEntityTypes_.HATCH_FILL,
+  'selectRisingHatchFill': anychart.themes.merging.NonMergableEntityTypes_.HATCH_FILL,
+  'selectFallingHatchFill': anychart.themes.merging.NonMergableEntityTypes_.HATCH_FILL,
 
   'columnStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
   'rowStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
@@ -1074,7 +1159,17 @@ anychart.themes.merging.nonMergableEntities_ = {
   'dragPreviewStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
   'dragAreaStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
   'xErrorStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
-  'valueErrorStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE
+  'valueErrorStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
+  'selectedStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
+  'selectLowStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
+  'selectNegativeStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
+  'selectRisingStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
+  'selectFallingStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
+  'selectedRisingStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
+  'selectedFallingStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
+  'selectMedianStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
+  'selectStemStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
+  'selectWhiskerStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE
 };
 
 

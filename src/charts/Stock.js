@@ -1,5 +1,6 @@
 goog.provide('anychart.charts.Stock');
 goog.require('anychart.core.ChartWithCredits');
+goog.require('anychart.core.IChart');
 goog.require('anychart.core.stock.Controller');
 goog.require('anychart.core.stock.Plot');
 goog.require('anychart.core.stock.Scroller');
@@ -15,6 +16,7 @@ goog.require('anychart.utils');
  * Stock chart class.
  * @constructor
  * @extends {anychart.core.ChartWithCredits}
+ * @implements {anychart.core.IChart}
  */
 anychart.charts.Stock = function() {
   // See SeparateChart
@@ -109,9 +111,235 @@ anychart.charts.Stock.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.STOCK_FULL_RANGE_PARAMS;
 
 
+/**
+ * Series config for the chart.
+ * @type {Object.<string, anychart.core.series.TypeConfig>}
+ */
+anychart.charts.Stock.prototype.seriesConfig = (function() {
+  var res = {};
+  var capabilities = (
+      // anychart.core.series.Capabilities.ALLOW_INTERACTIVITY |
+      // anychart.core.series.Capabilities.ALLOW_POINT_SETTINGS |
+      // anychart.core.series.Capabilities.ALLOW_ERROR |
+      // anychart.core.series.Capabilities.SUPPORTS_MARKERS |
+      // anychart.core.series.Capabilities.SUPPORTS_LABELS |
+      0);
+  res[anychart.enums.StockSeriesType.AREA] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.AREA,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillConfig,
+      anychart.core.shapeManagers.pathStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.ZERO
+  };
+  res[anychart.enums.StockSeriesType.CANDLESTICK] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.CANDLESTICK,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathRisingFillStrokeConfig,
+      anychart.core.shapeManagers.pathRisingHatchConfig,
+      anychart.core.shapeManagers.pathFallingFillStrokeConfig,
+      anychart.core.shapeManagers.pathFallingHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGH,
+    anchoredPositionBottom: anychart.opt.LOW
+  };
+  res[anychart.enums.StockSeriesType.COLUMN] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.COLUMN,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.ZERO
+  };
+  res[anychart.enums.StockSeriesType.LINE] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.LINE,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathStrokeConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.VALUE
+  };
+  res[anychart.enums.StockSeriesType.MARKER] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.MARKER,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.VALUE
+  };
+  res[anychart.enums.StockSeriesType.OHLC] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.OHLC,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathRisingStrokeConfig,
+      anychart.core.shapeManagers.pathFallingStrokeConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGH,
+    anchoredPositionBottom: anychart.opt.LOW
+  };
+  res[anychart.enums.StockSeriesType.RANGE_AREA] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_AREA,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillConfig,
+      anychart.core.shapeManagers.pathLowStrokeConfig,
+      anychart.core.shapeManagers.pathHighStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGH,
+    anchoredPositionBottom: anychart.opt.LOW
+  };
+  res[anychart.enums.StockSeriesType.RANGE_COLUMN] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_COLUMN,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGH,
+    anchoredPositionBottom: anychart.opt.LOW
+  };
+  res[anychart.enums.StockSeriesType.RANGE_SPLINE_AREA] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_SPLINE_AREA,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillConfig,
+      anychart.core.shapeManagers.pathHighStrokeConfig,
+      anychart.core.shapeManagers.pathLowStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGH,
+    anchoredPositionBottom: anychart.opt.LOW
+  };
+  res[anychart.enums.StockSeriesType.RANGE_STEP_AREA] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_STEP_AREA,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillConfig,
+      anychart.core.shapeManagers.pathHighStrokeConfig,
+      anychart.core.shapeManagers.pathLowStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.HIGH,
+    anchoredPositionBottom: anychart.opt.LOW
+  };
+  res[anychart.enums.StockSeriesType.SPLINE] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.SPLINE,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathStrokeConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.VALUE
+  };
+  res[anychart.enums.StockSeriesType.SPLINE_AREA] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.SPLINE_AREA,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillConfig,
+      anychart.core.shapeManagers.pathStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.ZERO
+  };
+  res[anychart.enums.StockSeriesType.STEP_AREA] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.STEP_AREA,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillConfig,
+      anychart.core.shapeManagers.pathStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.ZERO
+  };
+  res[anychart.enums.StockSeriesType.STEP_LINE] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.STEP_LINE,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathStrokeConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.VALUE
+  };
+  return res;
+})();
+
+
 /** @inheritDoc */
 anychart.charts.Stock.prototype.getType = function() {
   return anychart.enums.ChartTypes.STOCK;
+};
+
+
+/**
+ * Returns normalized series type and a config for this series type.
+ * @param {string} type
+ * @return {?Array.<string|anychart.core.series.TypeConfig>}
+ */
+anychart.charts.Stock.prototype.getConfigByType = function(type) {
+  type = anychart.enums.normalizeStockSeriesType(type);
+  var config = this.seriesConfig[type];
+  var res;
+  if (config && (config.drawerType in anychart.core.drawers.AvailableDrawers)) {
+    res = [type, config];
+  } else {
+    anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
+    res = null;
+  }
+  return res;
 };
 
 
@@ -688,7 +916,7 @@ anychart.charts.Stock.prototype.deregisterSource = function(source) {
   var isUsed = false;
   for (var i = 0; i < this.plots_.length; i++) {
     var plot = this.plots_[i];
-    if (plot) {
+    if (plot && !plot.isDisposed()) {
       var series = plot.getAllSeries();
       for (var j = 0; j < series.length; j++) {
         if (series[j].getSelectableData() == source) {
@@ -1082,13 +1310,10 @@ anychart.charts.Stock.prototype.dragEnd = function() {
 
 /** @inheritDoc */
 anychart.charts.Stock.prototype.disposeInternal = function() {
-  goog.disposeAll(this.plots_);
+  goog.disposeAll(this.plots_, this.scroller_, this.dataController_);
+
   this.plots_ = null;
-
-  goog.dispose(this.scroller_);
   this.scroller_ = null;
-
-  goog.dispose(this.dataController_);
   this.dataController_ = null;
 
   goog.base(this, 'disposeInternal');

@@ -6,8 +6,8 @@
 goog.provide('anychart.modules.bar');
 
 goog.require('anychart.charts.Cartesian');
-goog.require('anychart.core.cartesian.series.Bar');
-goog.require('anychart.core.cartesian.series.RangeBar');
+goog.require('anychart.core.drawers.Bar');
+goog.require('anychart.core.drawers.RangeBar');
 goog.require('anychart.modules.base');
 
 

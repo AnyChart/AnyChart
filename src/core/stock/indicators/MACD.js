@@ -92,10 +92,10 @@ anychart.core.stock.indicators.MACD.prototype.setupMapping = function(mapping, c
 /**
  * Getter for the indicator MACD series or setter for it's type. If passed - recreates the series.
  * @param {anychart.enums.StockSeriesType=} opt_type
- * @return {anychart.core.stock.indicators.MACD|anychart.core.stock.series.Base|anychart.core.stock.scrollerSeries.Base}
+ * @return {anychart.core.stock.indicators.MACD|anychart.core.series.Stock}
  */
 anychart.core.stock.indicators.MACD.prototype.macdSeries = function(opt_type) {
-  return /** @type {anychart.core.stock.indicators.MACD|anychart.core.stock.series.Base|anychart.core.stock.scrollerSeries.Base} */(
+  return /** @type {anychart.core.stock.indicators.MACD|anychart.core.series.Stock} */(
       this.seriesInternal('macd', opt_type));
 };
 
@@ -103,10 +103,10 @@ anychart.core.stock.indicators.MACD.prototype.macdSeries = function(opt_type) {
 /**
  * Getter for the indicator signal series or setter for it's type. If passed - recreates the series.
  * @param {anychart.enums.StockSeriesType=} opt_type
- * @return {anychart.core.stock.indicators.MACD|anychart.core.stock.series.Base|anychart.core.stock.scrollerSeries.Base}
+ * @return {anychart.core.stock.indicators.MACD|anychart.core.series.Stock}
  */
 anychart.core.stock.indicators.MACD.prototype.signalSeries = function(opt_type) {
-  return /** @type {anychart.core.stock.indicators.MACD|anychart.core.stock.series.Base|anychart.core.stock.scrollerSeries.Base} */(
+  return /** @type {anychart.core.stock.indicators.MACD|anychart.core.series.Stock} */(
       this.seriesInternal('signal', opt_type));
 };
 
@@ -114,10 +114,10 @@ anychart.core.stock.indicators.MACD.prototype.signalSeries = function(opt_type) 
 /**
  * Getter for the indicator histogram series or setter for it's type. If passed - recreates the series.
  * @param {anychart.enums.StockSeriesType=} opt_type
- * @return {anychart.core.stock.indicators.MACD|anychart.core.stock.series.Base|anychart.core.stock.scrollerSeries.Base}
+ * @return {anychart.core.stock.indicators.MACD|anychart.core.series.Stock}
  */
 anychart.core.stock.indicators.MACD.prototype.histogramSeries = function(opt_type) {
-  return /** @type {anychart.core.stock.indicators.MACD|anychart.core.stock.series.Base|anychart.core.stock.scrollerSeries.Base} */(
+  return /** @type {anychart.core.stock.indicators.MACD|anychart.core.series.Stock} */(
       this.seriesInternal('histogram', opt_type));
 };
 

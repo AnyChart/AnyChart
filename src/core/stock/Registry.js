@@ -142,11 +142,7 @@ anychart.core.stock.Registry.prototype.getIndex = function(key) {
  * @return {!anychart.core.stock.Registry.Iterator}
  */
 anychart.core.stock.Registry.prototype.getIterator = function(firstKey, lastKey) {
-  var index = Math.max(0, Math.floor(this.getIndex(lastKey)));
-  var lastItem = this.keys_.length > index ? this.keys_[index] : null;
-  index = Math.max(0, Math.ceil(this.getIndex(firstKey)));
-  var firstItem = this.keys_.length > index ? this.keys_[index] : null;
-  return new anychart.core.stock.Registry.Iterator(index, firstItem, lastItem);
+  return this.getIteratorFast(this.getIndex(firstKey), this.getIndex(lastKey));
 };
 
 

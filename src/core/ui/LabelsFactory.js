@@ -805,13 +805,14 @@ anychart.core.ui.LabelsFactory.prototype.clear = function(opt_index) {
   if (!this.freeToUseLabelsPool_)
     this.freeToUseLabelsPool_ = [];
 
-  if (this.labels_) {
-    opt_index = +opt_index;
-    if (!isNaN(opt_index) && opt_index in this.labels_) {
-      this.labels_[opt_index].clear();
-      this.freeToUseLabelsPool_.push(this.labels_[opt_index]);
-      this.dropCallsCache(opt_index);
-      delete this.labels_[opt_index];
+  if (this.labels_ && this.labels_.length) {
+    if (goog.isDef(opt_index)) {
+      if (this.labels_[opt_index]) {
+        this.labels_[opt_index].clear();
+        this.freeToUseLabelsPool_.push(this.labels_[opt_index]);
+        this.dropCallsCache(opt_index);
+        delete this.labels_[opt_index];
+      }
     } else {
       this.dropCallsCache();
       for (var i = this.labels_.length; i--;) {

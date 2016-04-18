@@ -197,17 +197,17 @@ anychart.utils.isPercent = function(value) {
 
 /**
  * Tries to convert incoming value to valid numeric or percent value.
- * @param {(number|string|null)=} opt_value - Value.
+ * @param {*} value - Value.
  * @param {(number|string|null)=} opt_default - Default value to be set.
  * @return {number|string|null} - Converted value.
  */
-anychart.utils.normalizeNumberOrPercent = function(opt_value, opt_default) {
-  if (goog.isNull(opt_value)) return null;
-  opt_value = goog.isDef(opt_value) ? opt_value : 0;
+anychart.utils.normalizeNumberOrPercent = function(value, opt_default) {
+  if (goog.isNull(value)) return null;
+  value = goog.isDef(value) ? value : 0;
   opt_default = goog.isDef(opt_default) ? opt_default : 0;
-  var isPercent = anychart.utils.isPercent(opt_value);
-  var parsed = parseFloat(opt_value);
-  return isNaN(parsed) ? opt_default : (isPercent ? opt_value : parsed);
+  var isPercent = anychart.utils.isPercent(value);
+  var parsed = parseFloat(value);
+  return isNaN(parsed) ? opt_default : (isPercent ? /** @type {string} */(value) : parsed);
 };
 
 

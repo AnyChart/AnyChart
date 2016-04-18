@@ -15,11 +15,13 @@ goog.inherits(anychart.animations.AnimationParallelQueue, goog.fx.AnimationParal
 
 
 /**
- * Sets duration to animation queue.
- * @param {number} duration Duration in milliseconds.
+ * Updates all animations.
  */
-anychart.animations.AnimationParallelQueue.prototype.setDuration = function(duration) {
-  goog.array.forEach(this.queue, function(animation) {
-    (/** @type {anychart.animations.Animation} */(animation)).setDuration(duration);
-  });
+anychart.animations.AnimationParallelQueue.prototype.update = function() {
+  var now = goog.now();
+  for (var i = 0; i < this.queue.length; i++) {
+    var anim = (/** @type {anychart.animations.Animation} */(this.queue[i]));
+    anim.update();
+    anim.cycle(now);
+  }
 };

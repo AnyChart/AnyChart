@@ -412,18 +412,22 @@ anychart.core.axes.StockDateTime.prototype.draw = function() {
         this.drawLabels_(bounds, this.scale_.getTicks());
       }
 
+      if (!this.clipElement_)
+        this.clipElement_ = acgraph.clip();
+      this.clipElement_.shape(bounds);
+
       var tmp;
       if (this.labels_) {
         this.labels_.container(this.rootLayer_);
         this.labels_.draw();
         tmp = this.labels_.getRootLayer();
-        if (tmp) tmp.clip(bounds);
+        if (tmp) tmp.clip(this.clipElement_);
       }
       if (this.minorLabels_) {
         this.minorLabels_.container(this.rootLayer_);
         this.minorLabels_.draw();
         tmp = this.minorLabels_.getRootLayer();
-        if (tmp) tmp.clip(bounds);
+        if (tmp) tmp.clip(this.clipElement_);
       }
     }
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);

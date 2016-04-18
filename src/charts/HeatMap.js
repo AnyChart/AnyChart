@@ -1114,6 +1114,15 @@ anychart.charts.HeatMap.prototype.createFormatProvider = function(opt_force) {
 };
 
 
+/**
+ * Creates tooltip format provider.
+ * @return {Object}
+ */
+anychart.charts.HeatMap.prototype.createTooltipContextProvider = function() {
+  return this.createFormatProvider();
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Tooltip.

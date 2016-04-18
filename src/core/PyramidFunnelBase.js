@@ -3459,6 +3459,15 @@ anychart.core.PyramidFunnelBase.prototype.createFormatProvider = function(opt_fo
 };
 
 
+/**
+ * Creates tooltip format provider.
+ * @return {Object}
+ */
+anychart.core.PyramidFunnelBase.prototype.createTooltipContextProvider = function() {
+  return this.createFormatProvider();
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Legend.

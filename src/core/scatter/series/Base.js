@@ -304,7 +304,7 @@ anychart.core.scatter.series.Base.prototype.isDiscreteBased = function() {
  * Tester if the series has markers() method.
  * @return {boolean}
  */
-anychart.core.scatter.series.Base.prototype.hasMarkers = function() {
+anychart.core.scatter.series.Base.prototype.supportsMarkers = function() {
   return false;
 };
 
@@ -313,7 +313,7 @@ anychart.core.scatter.series.Base.prototype.hasMarkers = function() {
  * Tester if the series can have an error. (line, marker).
  * @return {boolean}
  */
-anychart.core.scatter.series.Base.prototype.isErrorAvailable = function() {
+anychart.core.scatter.series.Base.prototype.supportsError = function() {
   return true;
 };
 
@@ -376,7 +376,7 @@ anychart.core.scatter.series.Base.prototype.drawPoint = function(pointState) {
   if (this.enabled()) {
     if (this.pointDrawn = this.drawSeriesPoint(pointState | this.state.getSeriesState())) {
       this.drawLabel(pointState);
-      if (this.isErrorAvailable() && this.error().hasAnyErrorValues())
+      if (this.supportsError() && this.error().hasAnyErrorValues())
         this.drawError();
     }
   }
@@ -481,7 +481,7 @@ anychart.core.scatter.series.Base.prototype.createFormatProvider = function(opt_
   if (!this.pointProvider_ || opt_force) {
     var referenceValueNames = this.isSizeBased() ? ['x', 'value', 'size'] : ['x', 'value'];
     this.pointProvider_ = new anychart.core.utils.SeriesPointContextProvider(this, referenceValueNames,
-        this.isErrorAvailable() && anychart.core.utils.Error.isErrorAvailableForScale(this.xScale_));
+        this.supportsError() && anychart.core.utils.Error.supportsErrorForScale(this.xScale_));
   }
   this.pointProvider_.applyReferenceValues();
   return this.pointProvider_;
@@ -661,7 +661,7 @@ anychart.core.scatter.series.Base.prototype.calculateStatistics = function() {
  * @return {(anychart.core.utils.Error|anychart.core.scatter.series.Base)}
  */
 anychart.core.scatter.series.Base.prototype.error = function(opt_value) {
-  if (!this.isErrorAvailable())
+  if (!this.supportsError())
     anychart.utils.warning(anychart.enums.WarningCode.SERIES_DOESNT_SUPPORT_ERROR, undefined, [this.getType()]);
   if (!this.error_) {
     this.error_ = new anychart.core.utils.Error(this);
@@ -749,6 +749,21 @@ anychart.core.scatter.series.Base.prototype.getErrorValues = function(horizontal
 
 
 /**
+ * Returns proper error stroke in current point.
+ * @param {boolean} horizontal
+ * @return {acgraph.vector.Stroke}
+ */
+anychart.core.scatter.series.Base.prototype.getErrorStroke = function(horizontal) {
+  var iterator = this.getIterator();
+  var errorStroke = horizontal ? this.error().xErrorStroke() : this.error().valueErrorStroke();
+  var pointStroke = horizontal ? iterator.get('xErrorStroke') : iterator.get('valueErrorStroke');
+
+  var result = /** @type {!acgraph.vector.Stroke} */ (this.normalizeColor(/** @type {acgraph.vector.Stroke|Function} */ (pointStroke || errorStroke)));
+  return acgraph.vector.normalizeStroke(result);
+};
+
+
+/**
  * Draws an error.
  */
 anychart.core.scatter.series.Base.prototype.drawError = function() {
@@ -805,7 +820,7 @@ anychart.core.scatter.series.Base.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['seriesType'] = this.getType();
   json['clip'] = (this.clip_ instanceof anychart.math.Rect) ? this.clip_.serialize() : this.clip_;
-  if (this.isErrorAvailable())
+  if (this.supportsError())
     json['error'] = this.error().serialize();
   return json;
 };
@@ -816,7 +831,7 @@ anychart.core.scatter.series.Base.prototype.serialize = function() {
  */
 anychart.core.scatter.series.Base.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  if (this.isErrorAvailable())
+  if (this.supportsError())
     this.error(config['error']);
   this.clip(config['clip']);
 };

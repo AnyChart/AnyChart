@@ -1,9 +1,19 @@
+/**
+ * @fileoverview anychart.charts.Cartesian3d class.
+ * @suppress {extraRequire}
+ */
 goog.provide('anychart.charts.Cartesian3d');
 goog.require('anychart.core.CartesianBase');
+goog.require('anychart.core.I3DProvider');
 goog.require('anychart.core.axisMarkers.Line3d');
 goog.require('anychart.core.axisMarkers.Range3d');
 goog.require('anychart.core.axisMarkers.Text3d');
+goog.require('anychart.core.drawers.Area3d');
+goog.require('anychart.core.drawers.Bar3d');
+goog.require('anychart.core.drawers.Column3d');
 goog.require('anychart.core.grids.Linear3d');
+goog.require('anychart.enums');
+goog.require('goog.color');
 
 
 
@@ -17,8 +27,9 @@ goog.require('anychart.core.grids.Linear3d');
  *  </ul>
  * Chart can contain any number of series.
  * Each series is interactive, you can customize click and hover behavior and other params.
- * @extends {anychart.core.CartesianBase}
  * @constructor
+ * @extends {anychart.core.CartesianBase}
+ * @implements {anychart.core.I3DProvider}
  * @param {boolean=} opt_barChartMode If true, sets the chart to Bar Chart mode, swapping default chart elements
  *    behaviour to horizontal-oriented (setting default layout to VERTICAL, swapping axes, etc).
  */
@@ -64,6 +75,189 @@ anychart.charts.Cartesian3d = function(opt_barChartMode) {
   this.setType(anychart.enums.ChartTypes.CARTESIAN_3D);
 };
 goog.inherits(anychart.charts.Cartesian3d, anychart.core.CartesianBase);
+
+
+/**
+ * Coloring post processor for Area 3D series.
+ * @param {anychart.core.series.Base} series
+ * @param {Object.<string, acgraph.vector.Shape>} shapes
+ * @param {number|anychart.PointState} pointState
+ */
+anychart.charts.Cartesian3d.areaPostProcessor = function(series, shapes, pointState) {
+  var frontFill, topFill, rightFill, bottomFill, backFill, leftFill;
+  var resolver = anychart.core.series.Base.getColorResolver(
+      [anychart.opt.FILL, anychart.opt.HOVER_FILL, anychart.opt.SELECT_FILL], anychart.enums.ColorType.FILL);
+  var fill = resolver(series, pointState);
+  var opacity = goog.isObject(fill) ? fill['opacity'] : 1;
+  var color = goog.isObject(fill) ? fill['color'] : fill;
+  var parsedColor = anychart.color.parseColor(color);
+
+  if (goog.isNull(parsedColor)) {
+    frontFill = topFill = rightFill = bottomFill = backFill = leftFill = 'none';
+  } else {
+    color = parsedColor.hex;
+    var rgbColor = goog.color.hexToRgb(color);
+    var rgbDarken = goog.color.darken(rgbColor, .2);
+    var rgbDarken03 = goog.color.darken(rgbColor, .3);
+    var rgbMoreDarken = goog.color.darken(rgbColor, .25);
+    var rgbLighten = goog.color.lighten(rgbColor, .1);
+
+    var darkBlendedColor = goog.color.rgbArrayToHex(goog.color.blend(rgbColor, rgbDarken, .7));
+    var darkBlendedColor2 = goog.color.rgbArrayToHex(goog.color.blend(rgbColor, rgbDarken03, .7));
+    var lightBlendedColor = goog.color.rgbArrayToHex(goog.color.blend(rgbDarken, rgbLighten, .1));
+    var softDarkBlendedColor = goog.color.rgbArrayToHex(goog.color.blend(rgbColor, rgbDarken, .1));
+
+    frontFill = /** @type {acgraph.vector.Fill} */({
+      'angle': 90,
+      'opacity': opacity,
+      'keys': [
+        anychart.color.lighten(darkBlendedColor, .2),
+        anychart.color.lighten(color, .3)]
+    });
+    topFill = /** @type {string} */(anychart.color.lighten(darkBlendedColor2, .2));
+    rightFill = bottomFill = /** @type {string} */(anychart.color.lighten(softDarkBlendedColor, .2));
+    backFill = lightBlendedColor;
+    leftFill = goog.color.rgbArrayToHex(rgbMoreDarken);
+
+  }
+
+  shapes[anychart.opt.BOTTOM].fill({'color': bottomFill, 'opacity': opacity});
+  shapes[anychart.opt.BACK].fill({'color': backFill, 'opacity': opacity});
+  shapes[anychart.opt.LEFT].fill({'color': leftFill, 'opacity': opacity});
+  shapes[anychart.opt.RIGHT].fill({'color': rightFill, 'opacity': opacity});
+  shapes[anychart.opt.TOP].fill({'color': topFill, 'opacity': opacity});
+  shapes[anychart.opt.FRONT].fill(frontFill);
+};
+
+
+/**
+ * Coloring post processor for Bar 3D and Column 3D series.
+ * @param {anychart.core.series.Base} series
+ * @param {Object.<string, acgraph.vector.Shape>} shapes
+ * @param {number|anychart.PointState} pointState
+ */
+anychart.charts.Cartesian3d.barColumnPostProcessor = function(series, shapes, pointState) {
+  var frontFill, topFill, rightFill, bottomFill, backFill, leftFill;
+  var resolver = anychart.core.series.Base.getColorResolver(
+      [anychart.opt.FILL, anychart.opt.HOVER_FILL, anychart.opt.SELECT_FILL], anychart.enums.ColorType.FILL);
+  var fill = resolver(series, pointState);
+  var opacity = goog.isObject(fill) ? fill['opacity'] : 1;
+  var color = goog.isObject(fill) ? fill['color'] : fill;
+  var parsedColor = anychart.color.parseColor(color);
+
+  if (goog.isNull(parsedColor)) {
+    frontFill = rightFill = topFill = bottomFill = backFill = leftFill = 'none';
+  } else {
+    color = parsedColor.hex;
+    var rgbColor = goog.color.hexToRgb(color);
+
+    var rgbDarken = goog.color.darken(rgbColor, .2);
+    var rgbMoreDarken = goog.color.darken(rgbColor, .25);
+    var rgbLighten = goog.color.lighten(rgbColor, .1);
+
+    var darkBlendedColor = goog.color.rgbArrayToHex(goog.color.blend(rgbColor, rgbDarken, .7));
+    var lightBlendedColor = goog.color.rgbArrayToHex(goog.color.blend(rgbDarken, rgbLighten, .1));
+    var softDarkBlendedColor = goog.color.rgbArrayToHex(goog.color.blend(rgbColor, rgbDarken, .1));
+
+    frontFill = {
+      'angle': series.isBarBased() ? 0 : 90,
+      'opacity': opacity,
+      'keys': [
+        anychart.color.lighten(darkBlendedColor, .2),
+        anychart.color.lighten(color, .3)]
+    };
+    rightFill = anychart.color.lighten(softDarkBlendedColor, .2);
+    topFill = anychart.color.lighten(darkBlendedColor, .2);
+    bottomFill = goog.color.rgbArrayToHex(rgbDarken);
+    backFill = lightBlendedColor;
+    leftFill = goog.color.rgbArrayToHex(rgbMoreDarken);
+
+  }
+
+  shapes[anychart.opt.BOTTOM].fill(/** @type {!acgraph.vector.Fill} */({'color': bottomFill, 'opacity': opacity}));
+  shapes[anychart.opt.BACK].fill(/** @type {!acgraph.vector.Fill} */({'color': backFill, 'opacity': opacity}));
+  shapes[anychart.opt.LEFT].fill(/** @type {!acgraph.vector.Fill} */({'color': leftFill, 'opacity': opacity}));
+  shapes[anychart.opt.RIGHT].fill(/** @type {!acgraph.vector.Fill} */({'color': rightFill, 'opacity': opacity}));
+  shapes[anychart.opt.TOP].fill(/** @type {!acgraph.vector.Fill} */({'color': topFill, 'opacity': opacity}));
+  shapes[anychart.opt.FRONT].fill(/** @type {!acgraph.vector.Fill} */(frontFill));
+};
+
+
+/**
+ * Series config for Cartesian chart.
+ * @type {Object.<string, anychart.core.series.TypeConfig>}
+ */
+anychart.charts.Cartesian3d.prototype.seriesConfig = (function() {
+  var res = {};
+  var capabilities = (
+      anychart.core.series.Capabilities.ALLOW_INTERACTIVITY |
+      anychart.core.series.Capabilities.ALLOW_POINT_SETTINGS |
+      // anychart.core.series.Capabilities.ALLOW_ERROR |
+      anychart.core.series.Capabilities.SUPPORTS_MARKERS |
+      anychart.core.series.Capabilities.SUPPORTS_LABELS |
+      0);
+  res[anychart.enums.Cartesian3dSeriesType.AREA] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.AREA_3D,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathTopArea3DConfig,
+      anychart.core.shapeManagers.pathBottom3DConfig,
+      anychart.core.shapeManagers.pathLeft3DConfig,
+      anychart.core.shapeManagers.pathRight3DConfig,
+      anychart.core.shapeManagers.pathBack3DConfig,
+      anychart.core.shapeManagers.pathFront3DConfig,
+      // anychart.core.shapeManagers.pathRight3DHatchConfig,
+      // anychart.core.shapeManagers.pathTop3DHatchConfig,
+      anychart.core.shapeManagers.pathFront3DHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: anychart.charts.Cartesian3d.areaPostProcessor,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.ZERO
+  };
+  res[anychart.enums.Cartesian3dSeriesType.BAR] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.BAR_3D,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathTop3DConfig,
+      anychart.core.shapeManagers.pathBottom3DConfig,
+      anychart.core.shapeManagers.pathLeft3DConfig,
+      anychart.core.shapeManagers.pathRight3DConfig,
+      anychart.core.shapeManagers.pathBack3DConfig,
+      anychart.core.shapeManagers.pathFront3DConfig,
+      anychart.core.shapeManagers.pathFront3DHatchConfig,
+      anychart.core.shapeManagers.pathRight3DHatchConfig,
+      anychart.core.shapeManagers.pathTop3DHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: anychart.charts.Cartesian3d.barColumnPostProcessor,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.ZERO
+  };
+  res[anychart.enums.Cartesian3dSeriesType.COLUMN] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.COLUMN_3D,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathTop3DConfig,
+      anychart.core.shapeManagers.pathBottom3DConfig,
+      anychart.core.shapeManagers.pathLeft3DConfig,
+      anychart.core.shapeManagers.pathRight3DConfig,
+      anychart.core.shapeManagers.pathBack3DConfig,
+      anychart.core.shapeManagers.pathFront3DConfig,
+      anychart.core.shapeManagers.pathFront3DHatchConfig,
+      anychart.core.shapeManagers.pathRight3DHatchConfig,
+      anychart.core.shapeManagers.pathTop3DHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: anychart.charts.Cartesian3d.barColumnPostProcessor,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.ZERO
+  };
+  return res;
+})();
 
 
 /**
@@ -199,6 +393,99 @@ anychart.charts.Cartesian3d.prototype.zPadding = function(opt_value) {
 };
 
 
+/**
+ * @param {number} seriesIndex
+ * @param {boolean} seriesIsStacked
+ * @return {number}
+ */
+anychart.charts.Cartesian3d.prototype.getX3DDistributionShift = function(seriesIndex, seriesIsStacked) {
+  var x3dShift;
+  if (seriesIsStacked || !this.zDistribution()) {
+    x3dShift = 0;
+  } else {
+    var seriesCount = this.getSeriesCount();
+    var drawIndex = seriesCount - seriesIndex - 1;
+    x3dShift = (this.getX3DShift(seriesIsStacked) + this.zPaddingXShift) * drawIndex;
+  }
+  return x3dShift;
+};
+
+
+/**
+ * @param {number} seriesIndex
+ * @param {boolean} seriesIsStacked
+ * @return {number}
+ */
+anychart.charts.Cartesian3d.prototype.getY3DDistributionShift = function(seriesIndex, seriesIsStacked) {
+  var y3dShift;
+  if (seriesIsStacked || !this.zDistribution()) {
+    y3dShift = 0;
+  } else {
+    var seriesCount = this.getSeriesCount();
+    var drawIndex = seriesCount - seriesIndex - 1;
+    y3dShift = (this.getY3DShift(seriesIsStacked) + this.zPaddingYShift) * drawIndex;
+  }
+  return y3dShift;
+};
+
+
+/**
+ * @param {boolean} seriesIsStacked
+ * @return {number}
+ */
+anychart.charts.Cartesian3d.prototype.getX3DShift = function(seriesIsStacked) {
+  var seriesCount = this.getSeriesCount();
+  var zPaddingShift = this.zPaddingXShift;
+  var seriesShift = this.x3dShift;
+  if (!seriesIsStacked && this.zDistribution()) {
+    seriesShift = (seriesShift - zPaddingShift * (seriesCount - 1)) / seriesCount;
+  }
+  return seriesShift;
+};
+
+
+/**
+ * @param {boolean} seriesIsStacked
+ * @return {number}
+ */
+anychart.charts.Cartesian3d.prototype.getY3DShift = function(seriesIsStacked) {
+  var seriesCount = this.getSeriesCount();
+  var zPaddingShift = this.zPaddingYShift;
+  var seriesShift = this.y3dShift;
+  if (!seriesIsStacked && this.zDistribution()) {
+    seriesShift = (seriesShift - zPaddingShift * (seriesCount - 1)) / seriesCount;
+  }
+  return seriesShift;
+};
+
+
+/**
+ * @param {number} seriesIndex
+ * @param {boolean} seriesIsStacked
+ * @param {string} scalesIds
+ * @return {boolean}
+ */
+anychart.charts.Cartesian3d.prototype.shouldDrawTopSide = function(seriesIndex, seriesIsStacked, scalesIds) {
+  return !seriesIsStacked || seriesIndex == this.lastEnabledAreaSeriesMap[scalesIds];
+};
+
+
+/**
+ * @return {boolean}
+ */
+anychart.charts.Cartesian3d.prototype.yInverted = function() {
+  return /** @type {boolean} */(this.yScale().inverted());
+};
+
+
+/**
+ * @return {boolean}
+ */
+anychart.charts.Cartesian3d.prototype.xInverted = function() {
+  return /** @type {boolean} */(this.xScale().inverted());
+};
+
+
 /** @inheritDoc */
 anychart.charts.Cartesian3d.prototype.createGridInstance = function() {
   return new anychart.core.grids.Linear3d();
@@ -231,19 +518,19 @@ anychart.charts.Cartesian3d.prototype.createTextMarkerInstance = function() {
 
 /**
  * Set zIndex for point.
- * @param {anychart.core.cartesian.series.Base} series
+ * @param {anychart.core.series.Cartesian} series
  * @private
  */
 anychart.charts.Cartesian3d.prototype.setSeriesPointZIndex_ = function(series) {
-  var seriesIndex = series.index();
+  var seriesIndex = series.getIndex();
   var inc = seriesIndex * anychart.core.CartesianBase.ZINDEX_INCREMENT_MULTIPLIER;
   var iterator = series.getIterator();
-  var value = iterator.get('value');
+  var value = anychart.utils.toNumber(iterator.get('value'));
   var zIndex = anychart.core.CartesianBase.ZINDEX_SERIES;
 
-  if (anychart.utils.toNumber(value) > 0 || !goog.isNumber(value)) {
+  if (value > 0) {
     if (series.isBarBased()) {
-      if (!series.drawingPlan.stacked) {
+      if (!series.planIsStacked()) {
         if (this.zDistribution()) {
           zIndex += inc;
         } else {
@@ -256,11 +543,11 @@ anychart.charts.Cartesian3d.prototype.setSeriesPointZIndex_ = function(series) {
       zIndex += inc;
     }
 
-  } else {
+  } else if (value < 0) {
     if (series.isBarBased()) {
       zIndex -= inc;
     } else {
-      if (!series.drawingPlan.stacked) {
+      if (!series.planIsStacked()) {
         zIndex += inc;
       } else {
         zIndex -= inc;
@@ -274,24 +561,25 @@ anychart.charts.Cartesian3d.prototype.setSeriesPointZIndex_ = function(series) {
 
 /** @inheritDoc */
 anychart.charts.Cartesian3d.prototype.prepare3d = function() {
+  /** @type {Object.<string, number>} */
   this.lastEnabledAreaSeriesMap = {};
   var allSeries = this.getAllSeries();
   var series;
   for (var i = 0; i < allSeries.length; i++) {
     series = allSeries[i];
     if (series && series.enabled()) {
-      if (series.drawingPlan.stacked && series.hasMarkers()) {
-        var inc = series.index() * anychart.core.CartesianBase.ZINDEX_INCREMENT_MULTIPLIER;
-        series.markers().setAutoZIndex(anychart.core.CartesianBase.ZINDEX_MARKER + inc);
-      }
+      // if (series.planIsStacked() && series.supportsMarkers()) {
+      //   var inc = i * anychart.core.CartesianBase.ZINDEX_INCREMENT_MULTIPLIER;
+      //   series.markers().setAutoZIndex(anychart.core.CartesianBase.ZINDEX_MARKER + inc);
+      // }
 
-      if (series.isAreaBased()) {
-        this.lastEnabledAreaSeriesMap[goog.getUid(series.xScale()) + '_' + goog.getUid(series.yScale())] = series.index();
-      } else {
+      if (series.isDiscreteBased()) {
         var iterator = series.getResetIterator();
         while (iterator.advance()) {
-          this.setSeriesPointZIndex_(/** @type {anychart.core.cartesian.series.Base} */(series));
+          this.setSeriesPointZIndex_(/** @type {anychart.core.series.Cartesian} */(series));
         }
+      } else {
+        this.lastEnabledAreaSeriesMap[series.getScalesPairIdentifier()] = i;
       }
     }
   }
@@ -330,7 +618,7 @@ anychart.charts.Cartesian3d.prototype.getContentAreaBounds = function(bounds) {
         var barWidthRatio;
         var barWidthRatioOfTotalWidth;
 
-        if (series.drawingPlan.stacked || this.zDistribution()) {
+        if (series.planIsStacked() || this.zDistribution()) {
           barWidthRatio = 1 / (1 + /** @type {number} */(this.barGroupsPadding()));
         } else {
           barWidthRatio = 1 / (seriesCount + (seriesCount - 1) * this.barsPadding() + this.barGroupsPadding());
@@ -338,10 +626,9 @@ anychart.charts.Cartesian3d.prototype.getContentAreaBounds = function(bounds) {
 
         barWidthRatioOfTotalWidth = catWidthRatio * barWidthRatio;
 
-        if (!series.drawingPlan.stacked && this.zDistribution()) {
+        if (!series.planIsStacked() && this.zDistribution()) {
           x3dShiftRatio += barWidthRatioOfTotalWidth * xAspectRatio;
           y3dShiftRatio += barWidthRatioOfTotalWidth * yAspectRatio;
-
         } else if (!x3dShiftRatio) {
           x3dShiftRatio = barWidthRatioOfTotalWidth * xAspectRatio;
           y3dShiftRatio = barWidthRatioOfTotalWidth * yAspectRatio;
@@ -407,12 +694,6 @@ anychart.charts.Cartesian3d.prototype.getContentAreaBounds = function(bounds) {
 
 
 /** @inheritDoc */
-anychart.charts.Cartesian3d.prototype.getSeriesCtor = function(type) {
-  return anychart.core.cartesian.series.Base.Series3dTypesMap[type];
-};
-
-
-/** @inheritDoc */
 anychart.charts.Cartesian3d.prototype.distributeColumnClusters = function(numColumnClusters, drawingPlansOfScale) {
   var wSeries;
 
@@ -424,7 +705,7 @@ anychart.charts.Cartesian3d.prototype.distributeColumnClusters = function(numCol
         wSeries = drawingPlansOfScale[i].series;
         if (wSeries.isWidthBased() && !wSeries.isBarBased()) {
           wSeries.setAutoXPointPosition(0.5);
-          wSeries.setAutoBarWidth(barWidthRatio);
+          wSeries.setAutoPointWidth(barWidthRatio);
         }
       }
     }
@@ -446,7 +727,7 @@ anychart.charts.Cartesian3d.prototype.distributeBarClusters = function(numBarClu
         wSeries = drawingPlansOfScale[i].series;
         if (wSeries.isBarBased()) {
           wSeries.setAutoXPointPosition(0.5);
-          wSeries.setAutoBarWidth(barWidthRatio);
+          wSeries.setAutoPointWidth(barWidthRatio);
         }
       }
     }
@@ -465,7 +746,7 @@ anychart.charts.Cartesian3d.prototype.distributeBarClusters = function(numBarClu
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Bar3d} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.cartesian.series.Bar3d} instance for method chaining.
  */
 anychart.charts.Cartesian3d.prototype.bar = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -485,7 +766,7 @@ anychart.charts.Cartesian3d.prototype.bar = function(data, opt_csvSettings) {
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Column3d} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.cartesian.series.Column3d} instance for method chaining.
  */
 anychart.charts.Cartesian3d.prototype.column = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -505,7 +786,7 @@ anychart.charts.Cartesian3d.prototype.column = function(data, opt_csvSettings) {
  * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
- * @return {anychart.core.cartesian.series.Base} {@link anychart.core.cartesian.series.Area3d} instance for method chaining.
+ * @return {anychart.core.series.Cartesian} {@link anychart.core.cartesian.series.Area3d} instance for method chaining.
  */
 anychart.charts.Cartesian3d.prototype.area = function(data, opt_csvSettings) {
   return this.createSeriesByType(
@@ -583,5 +864,5 @@ anychart.charts.Cartesian3d.prototype['xScroller'] = anychart.charts.Cartesian3d
 anychart.charts.Cartesian3d.prototype['zAspect'] = anychart.charts.Cartesian3d.prototype.zAspect;
 anychart.charts.Cartesian3d.prototype['zAngle'] = anychart.charts.Cartesian3d.prototype.zAngle;
 anychart.charts.Cartesian3d.prototype['zDistribution'] = anychart.charts.Cartesian3d.prototype.zDistribution;
-anychart.charts.Cartesian3d.prototype['zDepth'] = anychart.charts.Cartesian3d.prototype.zDepth;
 anychart.charts.Cartesian3d.prototype['zPadding'] = anychart.charts.Cartesian3d.prototype.zPadding;
+anychart.charts.Cartesian3d.prototype['zDepth'] = anychart.charts.Cartesian3d.prototype.zDepth; // deprecated

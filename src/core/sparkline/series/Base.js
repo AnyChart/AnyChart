@@ -328,6 +328,15 @@ anychart.core.sparkline.series.Base.prototype.createFormatProvider = function(op
 
 
 /**
+ * Creates tooltip format provider.
+ * @return {Object}
+ */
+anychart.core.sparkline.series.Base.prototype.createTooltipContextProvider = function() {
+  return this.createFormatProvider();
+};
+
+
+/**
  * Create series position provider.
  * @param {string} position Understands anychart.enums.Position and some additional values.
  * @return {Object} Object with info for labels formatting.

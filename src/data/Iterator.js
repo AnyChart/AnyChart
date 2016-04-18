@@ -1,4 +1,5 @@
 goog.provide('anychart.data.Iterator');
+goog.require('anychart.data.IIterator');
 
 
 
@@ -7,12 +8,13 @@ goog.provide('anychart.data.Iterator');
  * Iterator allows to get data from a {@link anychart.data.View} by crawling through rows. Iterator
  * can be obtained using {@link anychart.data.View#getIterator} method and has methods to control current
  * index and get values from data/metadata fields in a current row.
- * @param {!anychart.data.View} view The view to iterate through.
+ * @param {!anychart.data.IView} view The view to iterate through.
  * @constructor
+ * @implements {anychart.data.IIterator}
  */
 anychart.data.Iterator = function(view) {
   /**
-   * @type {anychart.data.View}
+   * @type {anychart.data.IView}
    * @protected
    */
   this.view = view;
@@ -172,6 +174,16 @@ anychart.data.Iterator.prototype.get = function(fieldName) {
 
 
 /**
+ * Gets the value from the current row by the column name. For this implementation - exactly the same as get() method.
+ * @param {string|number} columnId
+ * @return {*}
+ */
+anychart.data.Iterator.prototype.getColumn = function(columnId) {
+  return this.get(/** @type {string} */(columnId));
+};
+
+
+/**
  * Returns the index of the item to which iterator points to.
  * @example <t>listingOnly</t>
  * // Data in some working state.
@@ -182,6 +194,15 @@ anychart.data.Iterator.prototype.get = function(fieldName) {
  */
 anychart.data.Iterator.prototype.getIndex = function() {
   return this.currentIndex;
+};
+
+
+/**
+ * Returns current row value that is considered to be X.
+ * @return {*}
+ */
+anychart.data.Iterator.prototype.getX = function() {
+  return this.get('x');
 };
 
 

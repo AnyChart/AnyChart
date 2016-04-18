@@ -47,7 +47,7 @@ goog.inherits(anychart.core.stock.indicators.Base, goog.Disposable);
 
 /**
  * @typedef {{
- *   series: ?(anychart.core.stock.series.Base|anychart.core.stock.scrollerSeries.Base),
+ *   series: ?(anychart.core.series.Stock),
  *   seriesType: anychart.enums.StockSeriesType,
  *   mappingSet: boolean,
  *   mapping: anychart.data.TableMapping
@@ -68,7 +68,7 @@ anychart.core.stock.indicators.Base.prototype.createComputer = goog.abstractMeth
 /**
  * Returns a string that will be set as a name for the series.
  * @param {string} seriesId
- * @param {!(anychart.core.stock.series.Base|anychart.core.stock.scrollerSeries.Base)} series
+ * @param {!anychart.core.series.Stock} series
  * @return {string}
  * @protected
  */
@@ -96,7 +96,7 @@ anychart.core.stock.indicators.Base.prototype.declareSeries = function(id, opt_t
  * Getter/setter for series that should be proxied to the actual series getters/setters.
  * @param {string} id
  * @param {anychart.enums.StockSeriesType=} opt_type
- * @return {anychart.core.stock.indicators.Base|anychart.core.stock.series.Base|anychart.core.stock.scrollerSeries.Base}
+ * @return {anychart.core.stock.indicators.Base|anychart.core.series.Stock}
  */
 anychart.core.stock.indicators.Base.prototype.seriesInternal = function(id, opt_type) {
   var descriptor = this.series_[id];
@@ -124,7 +124,7 @@ anychart.core.stock.indicators.Base.prototype.seriesInternal = function(id, opt_
  * @param {!anychart.data.TableMapping} mapping
  * @param {anychart.data.TableComputer} computer
  * @param {string} seriesId
- * @param {!(anychart.core.stock.series.Base|anychart.core.stock.scrollerSeries.Base)} series
+ * @param {!anychart.core.series.Stock} series
  * @protected
  */
 anychart.core.stock.indicators.Base.prototype.setupMapping = function(mapping, computer, seriesId, series) {
@@ -143,14 +143,15 @@ anychart.core.stock.indicators.Base.prototype.init = function() {
 
   for (var seriesId in this.series_) {
     var descriptor = this.series_[seriesId];
-    if (!descriptor.series || descriptor.series.getType() != descriptor.seriesType) {
-      if (descriptor.series)
-        this.plot_.removeSeries(/** @type {number|string} */(descriptor.series.id()));
-      goog.dispose(descriptor.series);
+    if (!descriptor.series) {
       descriptor.series = this.plot_.createSeriesByType(descriptor.seriesType);
       descriptor.mappingSet = false;
     }
     descriptor.series.suspendSignalsDispatching();
+    if (descriptor.series.seriesType() != descriptor.seriesType) {
+      descriptor.series.seriesType(descriptor.seriesType);
+      descriptor.mappingSet = false;
+    }
     if (!descriptor.mapping) {
       descriptor.mapping = this.mapping_.getTable().mapAs();
       this.setupMapping(descriptor.mapping, this.computer_, seriesId, descriptor.series);

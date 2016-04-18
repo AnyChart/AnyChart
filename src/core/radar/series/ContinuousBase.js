@@ -83,7 +83,7 @@ anychart.core.radar.series.ContinuousBase.prototype.firstDrawnPoint;
 
 
 /** @inheritDoc */
-anychart.core.radar.series.ContinuousBase.prototype.hasMarkers = function() {
+anychart.core.radar.series.ContinuousBase.prototype.supportsMarkers = function() {
   return true;
 };
 
