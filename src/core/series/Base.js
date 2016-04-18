@@ -1188,8 +1188,8 @@ anychart.core.series.Base.prototype.resetErrorPaths = function() {
 anychart.core.series.Base.prototype.getErrorPath = function(stroke) {
   var index = this.getIterator().getIndex();
   var path = this.errorPathsPool_.length ?
-    /** @type {!acgraph.vector.Path} */(this.errorPathsPool_.pop()) :
-    /** @type {!acgraph.vector.Path} */ (acgraph.path().zIndex(anychart.core.shapeManagers.ERROR_SHAPES_ZINDEX));
+      /** @type {!acgraph.vector.Path} */(this.errorPathsPool_.pop()) :
+      /** @type {!acgraph.vector.Path} */ (acgraph.path().zIndex(anychart.core.shapeManagers.ERROR_SHAPES_ZINDEX));
 
   this.rootLayer.addChild(path);
   this.shapeManager.setupInteractivity(path, this.supportsInteractivity(), index);
