@@ -544,6 +544,15 @@ anychart.core.scatter.series.Base.prototype.applyRatioToBounds = function(ratio,
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * Getter for xScale.
+ * @return {anychart.scales.ScatterBase} Series X Scale or itself for chaining call.
+ */
+anychart.core.scatter.series.Base.prototype.getXScale = function() {
+  return this.xScale_;
+};
+
+
+/**
  * Getter/setter for xScale.
  * @param {anychart.scales.ScatterBase=} opt_value Value to set.
  * @return {(anychart.scales.ScatterBase|!anychart.core.scatter.series.Base)} Series X Scale or itself for chaining call.
@@ -571,8 +580,8 @@ anychart.core.scatter.series.Base.prototype.xScale = function(opt_value) {
 
 /**
  * Getter/setter for yScale.
- * @param {anychart.scales.ScatterBase=} opt_value Value to set.
- * @return {(anychart.scales.ScatterBase|!anychart.core.scatter.series.Base)} Series Y Scale or itself for chaining call.
+ * @param {anychart.scales.Base=} opt_value Value to set.
+ * @return {(anychart.scales.ScatterBase|anychart.core.scatter.series.Base)} Series Y Scale or itself for chaining call.
  */
 anychart.core.scatter.series.Base.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {

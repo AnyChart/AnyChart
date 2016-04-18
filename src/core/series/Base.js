@@ -874,9 +874,9 @@ anychart.core.series.Base.prototype.axesLinesSpace = function(opt_spaceOrTopOrTo
  */
 anychart.core.series.Base.prototype.getWhiskerWidth = function(point, pointState) {
   var name;
-  if (this.state.isStateContains(pointState, anychart.PointState.SELECT)) {
+  if (!!(pointState & anychart.PointState.SELECT)) {
     name = anychart.opt.SELECT_WHISKER_WIDTH;
-  } else if (this.state.isStateContains(pointState, anychart.PointState.HOVER)) {
+  } else if (!!(pointState & anychart.PointState.HOVER)) {
     name = anychart.opt.HOVER_WHISKER_WIDTH;
   }
   var result;

@@ -437,7 +437,7 @@ anychart.core.utils.Error.prototype.drawError = function(scale, horizontal, isBa
  * @param {boolean} isBarBased Whether series is bar based.
  */
 anychart.core.utils.Error.prototype.draw = function(horizontal, isBarBased) {
-  var scale = horizontal ? this.series_.xScale() : this.series_.yScale();
+  var scale = horizontal ? this.series_.getXScale() : this.series_.yScale();
   var iterator = this.series_.getIterator();
   var x = /** @type {number} */ (iterator.meta('x'));
   var y = /** @type {number} */ (iterator.meta('value'));
@@ -746,6 +746,21 @@ anychart.core.utils.ISeriesWithError.prototype.drawError = function() {};
  * @return {(anychart.core.utils.Error|anychart.core.utils.ISeriesWithError)}
  */
 anychart.core.utils.ISeriesWithError.prototype.error = function(opt_value) {};
+
+
+/**
+ * @return {anychart.scales.IXScale}
+ */
+anychart.core.utils.ISeriesWithError.prototype.getXScale = function() {};
+
+
+/**
+ * Getter/setter for yScale.
+ * @param {anychart.scales.Base=} opt_value Value to set.
+ * @return {(anychart.scales.Base|anychart.core.utils.ISeriesWithError)} Series Y Scale or itself for chaining call.
+ */
+anychart.core.utils.ISeriesWithError.prototype.yScale = function(opt_value) {};
+
 
 //exports
 anychart.core.utils.Error.prototype['mode'] = anychart.core.utils.Error.prototype.mode;
