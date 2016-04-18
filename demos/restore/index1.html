@@ -38,39 +38,14 @@
 </body>
 <script>
     anychart.onDocumentReady(function() {
-//        dataSet = anychart.data.set([
-//            {points:[47.40, 1.75, 42.08, 9.05]},
-//            {points:[47.40, 1.75, 42.08, 9.05]},
-//            {points:[47.40, 1.75, 16.19, -61.7]},
-//            {points:[47.40, 1.75, 4.51, -53.06]},
-//            {points:[47.40, 1.75, -21.18, 55.42]},
-//            {points:[47.40, 1.75, 49.04, 6.2]}
-//        ]);
-//
-//        chart = anychart.connector();
-//        chart.geoData(anychart.maps.france);
-//        series = chart.connector(dataSet)
-//                .stroke('red')
-//                .hoverStroke('green')
-//                .selectStroke('purple')
-//                .startSize(5)
-//                .endSize(5);
-
-        var treeData = anychart.data.tree(getData(), anychart.enums.TreeFillingMethod.AS_TABLE);
-        chart = anychart.ganttResource();
-        chart.data(treeData);
-        chart.splitterPosition(200);
-
-        var timeLine = chart.getTimeline();
-
-        timeLine.textMarker(0).text('Start').value('start');
-        timeLine.textMarker(1).text('Current').value('current');
-        timeLine.textMarker(2).text('End').value('end');
-        timeLine.textMarker(3).text('2015 8 15').value(Date.UTC(2015, 8, 15));
-
-        chart.zoomTo(Date.UTC(2015, 0, 1), Date.UTC(2017, 9, 1));
-
-
+        chart = anychart.polar();
+        chart.line(['4', 10, -1, 8, 4]);
+        chart.title().text('layout CIRCUIT, evenFill, oddFill');
+        chart.grid(5)
+                .evenFill('red')
+                .oddFill('green')
+                .stroke('4 yellow')
+                .layout(anychart.enums.RadialGridLayout.CIRCUIT);
 
         chart.container('container').draw();
 

@@ -546,6 +546,7 @@ anychart.charts.HeatMap.prototype.grid = function(opt_indexOrValue, opt_value) {
   var grid = this.grids_[index];
   if (!grid) {
     grid = new anychart.core.grids.Linear();
+    grid.setChart(this);
     grid.setup(this.defaultGridSettings());
     this.grids_[index] = grid;
     this.registerDisposable(grid);
@@ -677,6 +678,17 @@ anychart.charts.HeatMap.prototype.onAxisSignal_ = function(event) {
   }
   // if there are no signals, state == 0 and nothing happens.
   this.invalidate(state, signal);
+};
+
+
+/**
+ * Gets axis by index. First of all goes through x-axes, then y-axes.
+ * SAMPLE: if we have 4 x-axes and 3 y-axes, chart.getAxisByIndex(4) will return very first y-axis.
+ * @param {number} index - Index to be found.
+ * @return {anychart.core.axes.Linear|undefined}
+ */
+anychart.charts.HeatMap.prototype.getAxisByIndex = function(index) {
+  return (index >= this.xAxes_.length) ? this.yAxes_[index - this.xAxes_.length] : this.xAxes_[index];
 };
 
 
@@ -1920,14 +1932,6 @@ anychart.charts.HeatMap.prototype.setupByJSON = function(config) {
   if (scale)
     this.colorScale(scale);
 
-  if (goog.isArray(grids)) {
-    for (i = 0; i < grids.length; i++) {
-      json = grids[i];
-      this.grid(i, json);
-      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.grid(i).scale(scalesInstances[json['scale']]);
-    }
-  }
-
   if (goog.isArray(xAxes)) {
     for (i = 0; i < xAxes.length; i++) {
       json = xAxes[i];
@@ -1941,6 +1945,14 @@ anychart.charts.HeatMap.prototype.setupByJSON = function(config) {
       json = yAxes[i];
       this.yAxis(i, json);
       if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.yAxis(i).scale(scalesInstances[json['scale']]);
+    }
+  }
+
+  if (goog.isArray(grids)) {
+    for (i = 0; i < grids.length; i++) {
+      json = grids[i];
+      this.grid(i, json);
+      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.grid(i).scale(scalesInstances[json['scale']]);
     }
   }
 
@@ -2012,9 +2024,17 @@ anychart.charts.HeatMap.prototype.serialize = function() {
   var i;
   var scalesIds = {};
   var scales = [];
+  var axesIds = [];
+
   var scale;
   var config;
   var objId;
+  var axisId;
+  var axis;
+  var axisIndex;
+  var axisScale;
+  var axisOrientation;
+  var isHorizontal;
 
   scalesIds[goog.getUid(this.xScale())] = this.xScale().serialize();
   scales.push(scalesIds[goog.getUid(this.xScale())]);
@@ -2033,28 +2053,6 @@ anychart.charts.HeatMap.prototype.serialize = function() {
   }
 
   json['type'] = this.getType();
-
-  var grids = [];
-  for (i = 0; i < this.grids_.length; i++) {
-    var grid = this.grids_[i];
-    if (grid) {
-      config = grid.serialize();
-      scale = grid.scale();
-      if (scale) {
-        objId = goog.getUid(scale);
-        if (!scalesIds[objId]) {
-          scalesIds[objId] = scale.serialize();
-          scales.push(scalesIds[objId]);
-          config['scale'] = scales.length - 1;
-        } else {
-          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
-        }
-      }
-      grids.push(config);
-    }
-  }
-  if (grids.length)
-    json['grids'] = grids;
 
   var xAxes = [];
   for (i = 0; i < this.xAxes_.length; i++) {
@@ -2099,6 +2097,56 @@ anychart.charts.HeatMap.prototype.serialize = function() {
   }
   if (yAxes.length)
     json['yAxes'] = yAxes;
+
+
+  var grids = [];
+  for (i = 0; i < this.grids_.length; i++) {
+    var grid = this.grids_[i];
+    if (grid) {
+      config = grid.serialize();
+      scale = grid.scale();
+      if (scale) {
+        objId = goog.getUid(scale);
+        if (!scalesIds[objId]) {
+          scalesIds[objId] = scale.serialize();
+          scales.push(scalesIds[objId]);
+          config['scale'] = scales.length - 1;
+        } else {
+          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
+      }
+
+      axis = grid.axis();
+      if (axis) {
+        axisId = goog.getUid(axis);
+        axisIndex = goog.array.indexOf(axesIds, axisId);
+        if (axisIndex < 0) { //axis presents but not found in existing axes. Taking scale and layout from it.
+          axisScale = axis.scale();
+          if (!('layout' in config)) {
+            axisOrientation = axis.orientation();
+            isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
+            config['layout'] = isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;
+          }
+          if (!('scale' in config)) { //doesn't override the scale already set.
+            objId = goog.getUid(axisScale);
+            if (!scalesIds[objId]) {
+              scalesIds[objId] = axisScale.serialize();
+              scales.push(scalesIds[objId]);
+              config['scale'] = scales.length - 1;
+            } else {
+              config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+            }
+          }
+        } else {
+          config['axis'] = axisIndex;
+        }
+      }
+
+      grids.push(config);
+    }
+  }
+  if (grids.length)
+    json['grids'] = grids;
 
   if (scales.length)
     json['scales'] = scales;

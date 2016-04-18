@@ -14,24 +14,6 @@ anychart.core.axisMarkers.Text3d = function() {
 goog.inherits(anychart.core.axisMarkers.Text3d, anychart.core.axisMarkers.Text);
 
 
-/**
- * Sets the chart axisMarkers belongs to.
- * @param {anychart.core.SeparateChart} chart Chart instance.
- */
-anychart.core.axisMarkers.Text3d.prototype.setChart = function(chart) {
-  this.chart_ = chart;
-};
-
-
-/**
- * Get the chart axisMarkers belongs to.
- * @return {anychart.core.SeparateChart}
- */
-anychart.core.axisMarkers.Text3d.prototype.getChart = function() {
-  return this.chart_;
-};
-
-
 /** @inheritDoc */
 anychart.core.axisMarkers.Text3d.prototype.parentBounds = function(opt_boundsOrLeft, opt_top, opt_width, opt_height) {
   var parentBounds = goog.base(this, 'parentBounds', opt_boundsOrLeft, opt_top, opt_width, opt_height);

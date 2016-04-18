@@ -87,6 +87,26 @@ anychart.core.grids.Polar = function() {
    * @private
    */
   this.drawLastLine_;
+
+  /**
+   * @type {anychart.enums.RadialGridLayout}
+   * @private
+   */
+  this.defaultLayout_ = anychart.enums.RadialGridLayout.CIRCUIT;
+
+  /**
+   * Assigned axis.
+   * @type {anychart.core.axes.Polar|anychart.core.axes.Radial}
+   * @private
+   */
+  this.axis_ = null;
+
+  /**
+   * Chart instance.
+   * @type {anychart.charts.Polar}
+   * @private
+   */
+  this.chart_ = null;
 };
 goog.inherits(anychart.core.grids.Polar, anychart.core.VisualBase);
 
@@ -113,9 +133,38 @@ anychart.core.grids.Polar.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.GRIDS_POSITION;
 
 
+/**
+ * Sets the chart series belongs to.
+ * @param {anychart.charts.Polar} chart Chart instance.
+ */
+anychart.core.grids.Polar.prototype.setChart = function(chart) {
+  this.chart_ = chart;
+};
+
+
+/**
+ * Get the chart series belongs to.
+ * @return {anychart.charts.Polar}
+ */
+anychart.core.grids.Polar.prototype.getChart = function() {
+  return this.chart_;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //  Layout.
 //----------------------------------------------------------------------------------------------------------------------
+/**
+ * Set default layout.
+ * @param {anychart.enums.RadialGridLayout} value - Layout value.
+ */
+anychart.core.grids.Polar.prototype.setDefaultLayout = function(value) {
+  var needInvalidate = !this.layout_ && this.defaultLayout_ != value;
+  this.defaultLayout_ = value;
+  if (needInvalidate) this.invalidate(anychart.ConsistencyState.GRIDS_POSITION);
+};
+
+
 /**
  * Get/set grid layout.
  * @param {anychart.enums.RadialGridLayout=} opt_value Grid layout.
@@ -130,8 +179,13 @@ anychart.core.grids.Polar.prototype.layout = function(opt_value) {
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
-  } else {
+  } else if (this.layout_) {
     return this.layout_;
+  } else if (this.axis_) {
+    var isCircuit = this.axis_ instanceof anychart.core.axes.Radial;
+    return isCircuit ? anychart.enums.RadialGridLayout.CIRCUIT : anychart.enums.RadialGridLayout.RADIAL;
+  } else {
+    return this.defaultLayout_;
   }
 };
 
@@ -153,8 +207,14 @@ anychart.core.grids.Polar.prototype.yScale = function(opt_value) {
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
-  } else {
+  } else if (this.yScale_) {
     return this.yScale_;
+  } else if (this.axis_ && this.axis_ instanceof anychart.core.axes.Radial) {
+    return /**@type {anychart.scales.Base} */ (this.axis_.scale());
+  } else if (this.chart_) {
+    return /**@type {anychart.scales.Base} */ (this.chart_.yScale());
+  } else {
+    return null;
   }
 };
 
@@ -194,8 +254,14 @@ anychart.core.grids.Polar.prototype.xScale = function(opt_value) {
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
-  } else {
+  } else if (this.xScale_) {
     return this.xScale_;
+  } else if (this.axis_ && this.axis_ instanceof anychart.core.axes.Radar) {
+    return /**@type {anychart.scales.Base} */ (this.axis_.scale());
+  } else if (this.chart_) {
+    return /**@type {anychart.scales.Base} */ (this.chart_.xScale());
+  } else {
+    return null;
   }
 };
 
@@ -218,6 +284,39 @@ anychart.core.grids.Polar.prototype.xScaleInvalidated_ = function(event) {
       anychart.ConsistencyState.APPEARANCE;
 
   this.invalidate(state, signal);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//  Axis.
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Axis invalidation handler.
+ * @param {anychart.SignalEvent} event - Event object.
+ * @private
+ */
+anychart.core.grids.Polar.prototype.axisInvalidated_ = function(event) {
+  this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+};
+
+
+/**
+ * Sets axis.
+ * @param {(anychart.core.axes.Polar|anychart.core.axes.Radial)=} opt_value - Value to be set.
+ * @return {(anychart.core.axes.Polar|anychart.core.axes.Radial|anychart.core.grids.Polar)} - Current value or itself for method chaining.
+ */
+anychart.core.grids.Polar.prototype.axis = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.axis_ != opt_value) {
+      if (this.axis_) this.axis_.unlistenSignals(this.axisInvalidated_, this);
+      this.axis_ = opt_value;
+      this.axis_.listenSignals(this.axisInvalidated_, this);
+      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.axis_;
 };
 
 
@@ -387,7 +486,7 @@ anychart.core.grids.Polar.prototype.drawLineRadial = function(x, y, xPixelShift,
  * @return {boolean} If the marker is horizontal.
  */
 anychart.core.grids.Polar.prototype.isRadial = function() {
-  return this.layout_ == anychart.enums.RadialGridLayout.RADIAL;
+  return this.layout() == anychart.enums.RadialGridLayout.RADIAL;
 };
 
 
@@ -713,7 +812,7 @@ anychart.core.grids.Polar.prototype.evenFillElement = function() {
 anychart.core.grids.Polar.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['isMinor'] = this.isMinor();
-  json['layout'] = this.layout();
+  if (this.layout_) json['layout'] = this.layout_;
   json['drawLastLine'] = this.drawLastLine();
   //json['startAngle'] = this.startAngle();
   json['oddFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.oddFill()));
@@ -733,6 +832,16 @@ anychart.core.grids.Polar.prototype.setupByJSON = function(config) {
   this.oddFill(config['oddFill']);
   this.evenFill(config['evenFill']);
   this.stroke(config['stroke']);
+  if ('axis' in config) {
+    var ax = config['axis'];
+    if (goog.isNumber(ax)) {
+      if (this.chart_) {
+        this.axis((/** @type {anychart.charts.Polar} */(this.chart_)).getAxisByIndex(ax));
+      }
+    } else if (ax instanceof anychart.core.axes.Radial || ax instanceof anychart.core.axes.Polar) {
+      this.axis(ax);
+    }
+  }
 };
 
 
@@ -742,6 +851,8 @@ anychart.core.grids.Polar.prototype.setupByJSON = function(config) {
 /** @inheritDoc */
 anychart.core.grids.Polar.prototype.disposeInternal = function() {
   delete this.stroke_;
+  this.axis_ = null;
+  this.chart_ = null;
   goog.base(this, 'disposeInternal');
 };
 
@@ -757,3 +868,5 @@ anychart.core.grids.Polar.prototype['yScale'] = anychart.core.grids.Polar.protot
 anychart.core.grids.Polar.prototype['xScale'] = anychart.core.grids.Polar.prototype.xScale;
 anychart.core.grids.Polar.prototype['stroke'] = anychart.core.grids.Polar.prototype.stroke;
 anychart.core.grids.Polar.prototype['drawLastLine'] = anychart.core.grids.Polar.prototype.drawLastLine;
+anychart.core.grids.Polar.prototype['axis'] = anychart.core.grids.Polar.prototype.axis;
+

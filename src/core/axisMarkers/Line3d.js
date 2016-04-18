@@ -14,24 +14,6 @@ anychart.core.axisMarkers.Line3d = function() {
 goog.inherits(anychart.core.axisMarkers.Line3d, anychart.core.axisMarkers.Line);
 
 
-/**
- * Sets the chart axisMarkers belongs to.
- * @param {anychart.core.SeparateChart} chart Chart instance.
- */
-anychart.core.axisMarkers.Line3d.prototype.setChart = function(chart) {
-  this.chart_ = chart;
-};
-
-
-/**
- * Get the chart axisMarkers belongs to.
- * @return {anychart.core.SeparateChart}
- */
-anychart.core.axisMarkers.Line3d.prototype.getChart = function() {
-  return this.chart_;
-};
-
-
 /** @inheritDoc */
 anychart.core.axisMarkers.Line3d.prototype.boundsInvalidated = function() {
   var ratio = goog.math.clamp(this.scale().transform(this.value(), 0.5), 0, 1);

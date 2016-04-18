@@ -30,6 +30,20 @@ anychart.core.axisMarkers.PathBase = function() {
   this.scale_;
 
   /**
+   * Assigned axis.
+   * @type {anychart.core.axes.Linear}
+   * @private
+   */
+  this.axis_ = null;
+
+  /**
+   * Parent chart instance.
+   * @type {anychart.core.SeparateChart}
+   * @private
+   */
+  this.chart_ = null;
+
+  /**
    * Marker element.
    * @type {acgraph.vector.Path} - Marker line element.
    * @private
@@ -71,12 +85,30 @@ anychart.core.axisMarkers.PathBase.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.APPEARANCE;
 
 
+/**
+ * Sets the chart axisMarkers belongs to.
+ * @param {anychart.core.SeparateChart} chart - Chart instance.
+ */
+anychart.core.axisMarkers.PathBase.prototype.setChart = function(chart) {
+  this.chart_ = chart;
+};
+
+
+/**
+ * Get the chart axisMarkers belongs to.
+ * @return {anychart.core.SeparateChart}
+ */
+anychart.core.axisMarkers.PathBase.prototype.getChart = function() {
+  return this.chart_;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //  Layout.
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Get/set line marker layout.
- * @param {anychart.enums.Layout=} opt_value - LineMarker layout.
+ * @param {anychart.enums.Layout=} opt_value - Layout.
  * @return {anychart.enums.Layout|anychart.core.axisMarkers.PathBase} - Layout or this.
  */
 anychart.core.axisMarkers.PathBase.prototype.layout = goog.abstractMethod;
@@ -101,7 +133,13 @@ anychart.core.axisMarkers.PathBase.prototype.scaleInternal = function(opt_value)
     }
     return this;
   } else {
-    return /** @type {anychart.scales.Base|anychart.scales.GanttDateTime} */ (this.scale_);
+    if (this.scale_) {
+      return /** @type {anychart.scales.Base|anychart.scales.GanttDateTime} */ (this.scale_);
+    } else {
+      if (this.axis_)
+        return /** @type {?anychart.scales.Base} */ (this.axis_.scale());
+      return null;
+    }
   }
 };
 
@@ -146,6 +184,39 @@ anychart.core.axisMarkers.PathBase.prototype.valueInternal = function(opt_value)
 
 
 //----------------------------------------------------------------------------------------------------------------------
+//  Axis.
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Axis invalidation handler.
+ * @param {anychart.SignalEvent} event - Event object.
+ * @private
+ */
+anychart.core.axisMarkers.PathBase.prototype.axisInvalidated_ = function(event) {
+  this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+};
+
+
+/**
+ * Sets axis for marker.
+ * @param {anychart.core.axes.Linear=} opt_value - Value to be set.
+ * @return {(anychart.core.axes.Linear|anychart.core.axisMarkers.PathBase)} - Current value or itself for method chaining.
+ */
+anychart.core.axisMarkers.PathBase.prototype.axis = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.axis_ != opt_value) {
+      if (this.axis_) this.axis_.unlistenSignals(this.axisInvalidated_, this);
+      this.axis_ = opt_value;
+      this.axis_.listenSignals(this.axisInvalidated_, this);
+      this.invalidate(anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.axis_;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
 //  Bounds.
 //----------------------------------------------------------------------------------------------------------------------
 /**
@@ -173,7 +244,7 @@ anychart.core.axisMarkers.PathBase.prototype.axesLinesSpace = function(opt_space
 
 
 /**
- * Whether marker is horizontal
+ * Whether marker is horizontal.
  * @return {boolean} - If the marker is horizontal.
  */
 anychart.core.axisMarkers.PathBase.prototype.isHorizontal = function() {
@@ -203,7 +274,7 @@ anychart.core.axisMarkers.PathBase.prototype.appearanceInvalidated = goog.nullFu
  * @return {anychart.core.axisMarkers.PathBase} - Itself for method chaining.
  */
 anychart.core.axisMarkers.PathBase.prototype.draw = function() {
-  if (!this.scale_) {
+  if (!this.scale()) {
     anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
     return this;
   }
@@ -243,14 +314,16 @@ anychart.core.axisMarkers.PathBase.prototype.draw = function() {
  * @return {anychart.core.axisMarkers.PathBase} - Itself for method chaining.
  */
 anychart.core.axisMarkers.PathBase.prototype.drawLine = function() {
-  if (!this.scale_) {
+  var scale = /** @type {anychart.scales.Base|anychart.scales.GanttDateTime} */ (this.scale());
+
+  if (!scale) { //Here we can get null.
     anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
     return this;
   }
 
   var el = /** @type {acgraph.vector.Path} */ (this.markerElement());
 
-  var ratio = this.scale_.transform(this.val, 0.5);
+  var ratio = scale.transform(this.val, 0.5);
   if (isNaN(ratio)) return this;
   el.clear();
 
@@ -283,7 +356,9 @@ anychart.core.axisMarkers.PathBase.prototype.drawLine = function() {
 anychart.core.axisMarkers.PathBase.prototype.drawRange = function() {
   var range = /** @type {anychart.core.axisMarkers.PathBase.Range} */ (this.val);
 
-  if (!this.scale_) {
+  var scale = /** @type {anychart.scales.Base|anychart.scales.GanttDateTime} */ (this.scale());
+
+  if (!scale) { //Here we can get null.
     anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
     return this;
   }
@@ -294,8 +369,8 @@ anychart.core.axisMarkers.PathBase.prototype.drawRange = function() {
   var from = range.from;
 
   //Safe transformation to ratio.
-  var fromScaleRatio = this.scale_.transform(from);
-  var toScaleRatio = this.scale_.transform(to);
+  var fromScaleRatio = scale.transform(from);
+  var toScaleRatio = scale.transform(to);
 
   //Safe comparison - comparing numbers.
   if (fromScaleRatio > toScaleRatio) {
@@ -303,8 +378,8 @@ anychart.core.axisMarkers.PathBase.prototype.drawRange = function() {
     from = range.to;
   }
 
-  var fromRatio = this.scale_.transform(from, 0);
-  var toRatio = this.scale_.transform(to, 1);
+  var fromRatio = scale.transform(from, 0);
+  var toRatio = scale.transform(to, 1);
 
   var ratioMinValue = Math.min(toRatio, fromRatio);
   var ratioMaxValue = Math.max(toRatio, fromRatio);
@@ -377,5 +452,23 @@ anychart.core.axisMarkers.PathBase.prototype.markerElement = function() {
 /** @inheritDoc */
 anychart.core.axisMarkers.PathBase.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  this.layout(config['layout']);
+  if ('layout' in config && config['layout']) this.layout(config['layout']);
+  if ('axis' in config) {
+    var ax = config['axis'];
+    if (goog.isNumber(ax)) {
+      if (this.chart_) {
+        this.axis((/** @type {anychart.core.CartesianBase} */(this.chart_)).getAxisByIndex(ax));
+      }
+    } else if (ax instanceof anychart.core.axes.Linear) {
+      this.axis(ax);
+    }
+  }
+};
+
+
+/** @inheritDoc */
+anychart.core.axisMarkers.PathBase.prototype.disposeInternal = function() {
+  this.axis_ = null;
+  this.chart_ = null;
+  goog.base(this, 'disposeInternal');
 };

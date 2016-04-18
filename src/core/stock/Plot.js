@@ -860,6 +860,16 @@ anychart.core.stock.Plot.prototype.xAxis = function(opt_value) {
 
 
 /**
+ * Gets axis by index.
+ * @param {number} index - Index to be found.
+ * @return {anychart.core.axes.StockDateTime|anychart.core.axes.Linear|undefined}
+ */
+anychart.core.stock.Plot.prototype.getAxisByIndex = function(index) {
+  return index ? (this.yAxes_[index - 1]) : this.xAxis_;
+};
+
+
+/**
  * Getter/setter for grid default settings.
  * @param {Object} value Object with default grid settings.
  */
@@ -886,6 +896,8 @@ anychart.core.stock.Plot.prototype.grid = function(opt_indexOrValue, opt_value) 
   var grid = this.grids_[index];
   if (!grid) {
     grid = new anychart.core.grids.Stock();
+    grid.setPlot(this);
+    grid.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultGridSettings_);
     this.grids_[index] = grid;
     this.registerDisposable(grid);
@@ -929,6 +941,8 @@ anychart.core.stock.Plot.prototype.minorGrid = function(opt_indexOrValue, opt_va
   var grid = this.minorGrids_[index];
   if (!grid) {
     grid = new anychart.core.grids.Stock();
+    grid.setPlot(this);
+    grid.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultMinorGridSettings_);
     this.minorGrids_[index] = grid;
     this.registerDisposable(grid);
@@ -1699,10 +1713,18 @@ anychart.core.stock.Plot.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   var scalesIds = {};
   var scales = [];
+  var axesIds = [];
+
   var scale;
   var config;
   var objId;
   var i;
+  var axisId;
+  var axis;
+  var axisIndex;
+  var axisScale;
+  var axisOrientation;
+  var isHorizontal;
 
   scalesIds[goog.getUid(this.yScale())] = this.yScale().serialize();
   scales.push(scalesIds[goog.getUid(this.yScale())]);
@@ -1710,8 +1732,33 @@ anychart.core.stock.Plot.prototype.serialize = function() {
 
   json['defaultSeriesType'] = this.defaultSeriesType();
   json['background'] = this.background().serialize();
+
+  axesIds.push(goog.getUid(this.xAxis()));
   json['xAxis'] = this.xAxis().serialize();
   json['dateTimeHighlighter'] = anychart.color.serialize(this.dateTimeHighlighterStroke_);
+
+  var yAxes = [];
+  for (i = 0; i < this.yAxes_.length; i++) {
+    var yAxis = this.yAxes_[i];
+    config = yAxis.serialize();
+    scale = yAxis.scale();
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['scale'] = scales.length - 1;
+      } else {
+        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
+    }
+    axesIds.push(goog.getUid(yAxis));
+
+    yAxes.push(config);
+  }
+  if (yAxes.length)
+    json['yAxes'] = yAxes;
+
 
   var grids = [];
   for (i = 0; i < this.grids_.length; i++) {
@@ -1727,6 +1774,35 @@ anychart.core.stock.Plot.prototype.serialize = function() {
           config['scale'] = scales.length - 1;
         } else {
           config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
+      }
+
+      axis = grid.axis();
+      if (axis) {
+        axisId = goog.getUid(axis);
+        axisIndex = goog.array.indexOf(axesIds, axisId);
+        if (axisIndex < 0) { //axis presents but not found in existing axes. Taking scale and layout from it.
+          axisScale = axis.scale();
+          if (!('layout' in config)) {
+            isHorizontal = false;
+            if (axis instanceof anychart.core.axes.Linear) {
+              axisOrientation = axis.orientation();
+              isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
+            }
+            config['layout'] = isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;
+          }
+          if (!('scale' in config)) { //doesn't override the scale already set.
+            objId = goog.getUid(axisScale);
+            if (!scalesIds[objId]) {
+              scalesIds[objId] = axisScale.serialize();
+              scales.push(scalesIds[objId]);
+              config['scale'] = scales.length - 1;
+            } else {
+              config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+            }
+          }
+        } else {
+          config['axis'] = axisIndex;
         }
       }
       grids.push(config);
@@ -1757,27 +1833,6 @@ anychart.core.stock.Plot.prototype.serialize = function() {
   if (minorGrids.length)
     json['minorGrids'] = minorGrids;
 
-  var yAxes = [];
-  for (i = 0; i < this.yAxes_.length; i++) {
-    var yAxis = this.yAxes_[i];
-    if (yAxis) {
-      config = yAxis.serialize();
-      scale = yAxis.scale();
-      if (scale) {
-        objId = goog.getUid(scale);
-        if (!scalesIds[objId]) {
-          scalesIds[objId] = scale.serialize();
-          scales.push(scalesIds[objId]);
-          config['scale'] = scales.length - 1;
-        } else {
-          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
-        }
-      }
-      yAxes.push(config);
-    }
-  }
-  if (yAxes.length)
-    json['yAxes'] = yAxes;
 
   var series = [];
   for (i = 0; i < this.series_.length; i++) {

@@ -864,6 +864,7 @@
         <xsd:attribute name="stroke" type="xsd:string"/>
         <xsd:attribute name="layout" type="enums.Layout"/>
         <xsd:attribute name="scale" type="simple.ScaleRef"/>
+        <xsd:attribute name="axis" type="simple.AxisRef"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 
@@ -884,6 +885,7 @@
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="layout" type="enums.Layout"/>
         <xsd:attribute name="scale" type="simple.ScaleRef"/>
+        <xsd:attribute name="axis" type="simple.AxisRef"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 
@@ -915,6 +917,7 @@
         <xsd:attribute name="height" type="simple.NumberOrPercentOrNull" default="null"/>
         <xsd:attribute name="width" type="simple.NumberOrPercentOrNull" default="null"/>
         <xsd:attribute name="scale" type="simple.ScaleRef"/>
+        <xsd:attribute name="axis" type="simple.AxisRef"/>
         <xsd:attributeGroup ref="attrs.TextSettings"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
@@ -964,6 +967,7 @@
         <xsd:attribute name="scale" type="simple.ScaleRef"/>
         <xsd:attribute name="x_scale" type="simple.ScaleRef"/>
         <xsd:attribute name="y_scale" type="simple.ScaleRef"/>
+        <xsd:attribute name="axis" type="simple.AxisRef"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 
@@ -2374,6 +2378,10 @@
     </xsd:simpleType>
 
     <xsd:simpleType name="simple.ScaleRef">
+        <xsd:restriction base="xsd:unsignedInt"/>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="simple.AxisRef">
         <xsd:restriction base="xsd:unsignedInt"/>
     </xsd:simpleType>
 

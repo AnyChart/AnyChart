@@ -55,9 +55,7 @@ anychart.core.axisMarkers.GanttRange.prototype.SUPPORTED_CONSISTENCY_STATES =
 //  Layout.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Get/set layout.
- * @param {anychart.enums.Layout=} opt_value - RangeMarker layout.
- * @return {anychart.enums.Layout|anychart.core.axisMarkers.GanttRange} - Layout or this.
+ * @inheritDoc
  */
 anychart.core.axisMarkers.GanttRange.prototype.layout = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -67,13 +65,6 @@ anychart.core.axisMarkers.GanttRange.prototype.layout = function(opt_value) {
   }
   return /** @type {anychart.enums.Layout} */ (anychart.enums.Layout.VERTICAL);
 };
-
-
-/**
- * Does nothing.
- * @param {anychart.enums.Layout} value - Layout value.
- */
-anychart.core.axisMarkers.GanttRange.prototype.setDefaultLayout = function(value) {};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -202,7 +193,6 @@ anychart.core.axisMarkers.GanttRange.prototype.serialize = function() {
   json['from'] = this.from();
   json['to'] = this.to();
   json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
-  if (this.layout_) json['layout'] = this.layout_;
   return json;
 };
 

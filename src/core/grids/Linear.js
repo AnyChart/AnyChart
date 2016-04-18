@@ -81,6 +81,19 @@ anychart.core.grids.Linear = function() {
    * @private
    */
   this.drawLastLine_;
+
+  /**
+   * Assigned axis.
+   * @type {anychart.core.axes.Linear}
+   * @private
+   */
+  this.axis_ = null;
+
+  /**
+   * @type {anychart.enums.Layout}
+   * @private
+   */
+  this.defaultLayout_ = anychart.enums.Layout.HORIZONTAL;
 };
 goog.inherits(anychart.core.grids.Linear, anychart.core.VisualBase);
 
@@ -142,9 +155,26 @@ anychart.core.grids.Linear.prototype.layout = function(opt_value) {
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
-  } else {
+  } else if (this.layout_) {
     return this.layout_;
+  } else if (this.axis_) {
+    var axisOrientation = this.axis_.orientation();
+    var isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
+    return isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;
+  } else {
+    return this.defaultLayout_;
   }
+};
+
+
+/**
+ * Set default layout.
+ * @param {anychart.enums.Layout} value - Layout value.
+ */
+anychart.core.grids.Linear.prototype.setDefaultLayout = function(value) {
+  var needInvalidate = !this.layout_ && this.defaultLayout_ != value;
+  this.defaultLayout_ = value;
+  if (needInvalidate) this.invalidate(anychart.ConsistencyState.GRIDS_POSITION);
 };
 
 
@@ -166,7 +196,13 @@ anychart.core.grids.Linear.prototype.scale = function(opt_value) {
     }
     return this;
   } else {
-    return this.scale_;
+    if (this.scale_) {
+      return this.scale_;
+    } else {
+      if (this.axis_)
+        return /** @type {?anychart.scales.Base} */ (this.axis_.scale());
+      return null;
+    }
   }
 };
 
@@ -189,6 +225,39 @@ anychart.core.grids.Linear.prototype.scaleInvalidated_ = function(event) {
       anychart.ConsistencyState.APPEARANCE;
 
   this.invalidate(state, signal);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//  Axis.
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Axis invalidation handler.
+ * @param {anychart.SignalEvent} event - Event object.
+ * @private
+ */
+anychart.core.grids.Linear.prototype.axisInvalidated_ = function(event) {
+  this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+};
+
+
+/**
+ * Sets axis.
+ * @param {anychart.core.axes.Linear=} opt_value - Value to be set.
+ * @return {(anychart.core.axes.Linear|anychart.core.grids.Linear)} - Current value or itself for method chaining.
+ */
+anychart.core.grids.Linear.prototype.axis = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.axis_ != opt_value) {
+      if (this.axis_) this.axis_.unlistenSignals(this.axisInvalidated_, this);
+      this.axis_ = opt_value;
+      this.axis_.listenSignals(this.axisInvalidated_, this);
+      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.axis_;
 };
 
 
@@ -401,7 +470,7 @@ anychart.core.grids.Linear.prototype.drawLineVertical = function(ratio, shift) {
  * @return {boolean} If the marker is horizontal.
  */
 anychart.core.grids.Linear.prototype.isHorizontal = function() {
-  return this.layout_ == anychart.enums.Layout.HORIZONTAL;
+  return this.layout() == anychart.enums.Layout.HORIZONTAL;
 };
 
 
@@ -500,6 +569,13 @@ anychart.core.grids.Linear.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
+    this.lineElement().stroke(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+    this.oddFillElement().fill(/** @type {acgraph.vector.Fill} */(this.oddFill()));
+    this.evenFillElement().fill(/** @type {acgraph.vector.Fill} */(this.evenFill()));
+    this.markConsistent(anychart.ConsistencyState.APPEARANCE);
+  }
+
   if (this.hasInvalidationState(anychart.ConsistencyState.GRIDS_POSITION) ||
       this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     var layout;
@@ -507,7 +583,7 @@ anychart.core.grids.Linear.prototype.draw = function() {
     var path;
     var ratio;
     var prevRatio = NaN;
-    var isOrdinal = this.scale_ instanceof anychart.scales.Ordinal;
+    var isOrdinal = this.scale() instanceof anychart.scales.Ordinal;
     var ticks = isOrdinal ? scale.ticks() : this.isMinor() ? scale.minorTicks() : scale.ticks();
     var ticksArray = ticks.get();
 
@@ -596,13 +672,6 @@ anychart.core.grids.Linear.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.lineElement().stroke(/** @type {acgraph.vector.Stroke} */(this.stroke()));
-    this.oddFillElement().fill(/** @type {acgraph.vector.Fill} */(this.oddFill()));
-    this.evenFillElement().fill(/** @type {acgraph.vector.Fill} */(this.evenFill()));
-    this.markConsistent(anychart.ConsistencyState.APPEARANCE);
-  }
-
   return this;
 };
 
@@ -670,7 +739,7 @@ anychart.core.grids.Linear.prototype.evenFillElement = function() {
 anychart.core.grids.Linear.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['isMinor'] = this.isMinor();
-  json['layout'] = this.layout();
+  if (this.layout_) json['layout'] = this.layout_;
   json['drawFirstLine'] = this.drawFirstLine();
   json['drawLastLine'] = this.drawLastLine();
   json['oddFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.oddFill()));
@@ -684,12 +753,22 @@ anychart.core.grids.Linear.prototype.serialize = function() {
 anychart.core.grids.Linear.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
   this.isMinor(config['isMinor']);
-  this.layout(config['layout']);
+  if ('layout' in config && config['layout']) this.layout(config['layout']);
   this.drawFirstLine(config['drawFirstLine']);
   this.drawLastLine(config['drawLastLine']);
   this.oddFill(config['oddFill']);
   this.evenFill(config['evenFill']);
   this.stroke(config['stroke']);
+  if ('axis' in config) {
+    var ax = config['axis'];
+    if (goog.isNumber(ax)) {
+      if (this.chart_) {
+        this.axis((/** @type {anychart.core.CartesianBase} */(this.chart_)).getAxisByIndex(ax));
+      }
+    } else if (ax instanceof anychart.core.axes.Linear) {
+      this.axis(ax);
+    }
+  }
 };
 
 
@@ -699,6 +778,8 @@ anychart.core.grids.Linear.prototype.setupByJSON = function(config) {
 /** @inheritDoc */
 anychart.core.grids.Linear.prototype.disposeInternal = function() {
   delete this.stroke_;
+  this.axis_ = null;
+  this.chart_ = null;
   goog.base(this, 'disposeInternal');
 };
 
@@ -713,3 +794,4 @@ anychart.core.grids.Linear.prototype['scale'] = anychart.core.grids.Linear.proto
 anychart.core.grids.Linear.prototype['stroke'] = anychart.core.grids.Linear.prototype.stroke;
 anychart.core.grids.Linear.prototype['drawFirstLine'] = anychart.core.grids.Linear.prototype.drawFirstLine;
 anychart.core.grids.Linear.prototype['drawLastLine'] = anychart.core.grids.Linear.prototype.drawLastLine;
+anychart.core.grids.Linear.prototype['axis'] = anychart.core.grids.Linear.prototype.axis;

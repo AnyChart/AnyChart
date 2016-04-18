@@ -1650,7 +1650,7 @@ window['anychart']['themes']['v6'] = {
     'defaultLineMarkerSettings': {
       'enabled': true,
       'value': 0,
-      'layout': 'horizontal',
+      'layout': null,
       'stroke': {
         'color': '#DC0A0A',
         'thickness': 1,
@@ -1673,7 +1673,7 @@ window['anychart']['themes']['v6'] = {
       'value': 0,
       'anchor': 'center',
       'align': 'center',
-      'layout': 'horizontal',
+      'layout': null,
       //'rotation': undefined,
       'offsetX': 0,
       'offsetY': 0,
@@ -1687,7 +1687,7 @@ window['anychart']['themes']['v6'] = {
       'enabled': true,
       'from': 0,
       'to': 0,
-      'layout': 'horizontal',
+      'layout': null,
       'fill': '#000 0.3',
       'zIndex': 25.1,
       'scale': 1
@@ -1902,11 +1902,8 @@ window['anychart']['themes']['v6'] = {
     'xAxes': [{'scale': 0}],
     'yAxes': [{'scale': 1}],
     'grids': [
+      {},
       {
-        'layout': 'horizontal'
-      },
-      {
-        'layout': 'vertical',
         'evenFill': 'none',
         'oddFill': 'none',
         'scale': 0
@@ -1916,8 +1913,7 @@ window['anychart']['themes']['v6'] = {
       {
         'evenFill': 'none',
         'oddFill': 'none',
-        'stroke': '#000 0.075',
-        'layout': 'horizontal'
+        'stroke': '#000 0.075'
       }
     ],
     'padding': {
@@ -1944,23 +1940,11 @@ window['anychart']['themes']['v6'] = {
     'defaultYAxisSettings': {
       'orientation': 'bottom'
     },
-    'defaultLineMarkerSettings': {
-      'layout': 'vertical'
-    },
-    'defaultTextMarkerSettings': {
-      'layout': 'vertical'
-    },
-    'defaultRangeMarkerSettings': {
-      'layout': 'vertical'
-    },
     'xAxes': [{}],
     'yAxes': [{}],
     'grids': [
+      {},
       {
-        'layout': 'vertical'
-      },
-      {
-        'layout': 'horizontal',
         'evenFill': 'none',
         'oddFill': 'none',
         'scale': 0
@@ -2028,7 +2012,6 @@ window['anychart']['themes']['v6'] = {
     'yAxes': [{}],
     'grids': [
       {
-        'layout': 'horizontal',
         'evenFill': '#fff',
         'oddFill': '#fff'
       }
@@ -2037,8 +2020,7 @@ window['anychart']['themes']['v6'] = {
       {
         'evenFill': 'none',
         'oddFill': 'none',
-        'stroke': '#000 0.075',
-        'layout': 'horizontal'
+        'stroke': '#000 0.075'
       }
     ],
     'padding': {
@@ -2058,11 +2040,8 @@ window['anychart']['themes']['v6'] = {
     'xAxes': [{}],
     'yAxes': [{}],
     'grids': [
+      {},
       {
-        'layout': 'horizontal'
-      },
-      {
-        'layout': 'vertical',
         'evenFill': 'none',
         'oddFill': 'none',
         'scale': 0
@@ -2072,8 +2051,7 @@ window['anychart']['themes']['v6'] = {
       {
         'evenFill': 'none',
         'oddFill': 'none',
-        'stroke': '#000 0.075',
-        'layout': 'horizontal'
+        'stroke': '#000 0.075'
       }
     ],
     'padding': {
@@ -2141,11 +2119,8 @@ window['anychart']['themes']['v6'] = {
     ],
     'yAxes': [{}],
     'grids': [
+      {},
       {
-        'layout': 'horizontal'
-      },
-      {
-        'layout': 'vertical',
         'evenFill': 'none',
         'oddFill': 'none',
         'scale': 0
@@ -2155,8 +2130,7 @@ window['anychart']['themes']['v6'] = {
       {
         'evenFill': 'none',
         'oddFill': 'none',
-        'stroke': '#000 0.075',
-        'layout': 'horizontal'
+        'stroke': '#000 0.075'
       }
     ],
     'scales': [
@@ -2217,11 +2191,8 @@ window['anychart']['themes']['v6'] = {
     'xAxes': [{}],
     'yAxes': [{}],
     'grids': [
+      {},
       {
-        'layout': 'horizontal'
-      },
-      {
-        'layout': 'vertical',
         'evenFill': 'none',
         'oddFill': 'none',
         'scale': 0
@@ -2231,8 +2202,7 @@ window['anychart']['themes']['v6'] = {
       {
         'evenFill': 'none',
         'oddFill': 'none',
-        'stroke': '#000 0.075',
-        'layout': 'horizontal'
+        'stroke': '#000 0.075'
       }
     ],
     'padding': {
@@ -2302,11 +2272,8 @@ window['anychart']['themes']['v6'] = {
     'xAxes': [{}],
     'yAxes': [{}],
     'grids': [
+      {},
       {
-        'layout': 'horizontal'
-      },
-      {
-        'layout': 'vertical',
         'evenFill': 'none',
         'oddFill': 'none',
         'scale': 0
@@ -2316,8 +2283,7 @@ window['anychart']['themes']['v6'] = {
       {
         'evenFill': 'none',
         'oddFill': 'none',
-        'stroke': '#000 0.075',
-        'layout': 'horizontal'
+        'stroke': '#000 0.075'
       }
     ],
     'padding': {
@@ -2948,7 +2914,7 @@ window['anychart']['themes']['v6'] = {
     'defaultGridSettings': {
       'enabled': true,
       'isMinor': false,
-      'layout': 'horizontal',
+      //'layout': 'horizontal',
       'drawFirstLine': true,
       'drawLastLine': true,
       'oddFill': '#ffffff',
@@ -2960,7 +2926,7 @@ window['anychart']['themes']['v6'] = {
     'defaultMinorGridSettings': {
       'enabled': true,
       'isMinor': true,
-      'layout': 'horizontal',
+      //'layout': 'horizontal',
       'drawFirstLine': true,
       'drawLastLine': true,
       'oddFill': '#ffffff',
@@ -2996,7 +2962,7 @@ window['anychart']['themes']['v6'] = {
     'defaultLineMarkerSettings': {
       'enabled': true,
       'value': 0,
-      'layout': 'horizontal',
+      'layout': null,
       'stroke': {
         'color': '#DC0A0A',
         'thickness': 1,
@@ -3017,9 +2983,9 @@ window['anychart']['themes']['v6'] = {
       'fontWeight': 'bold',
 
       'value': 0,
+      'layout': null,
       'anchor': 'center',
       'align': 'center',
-      'layout': 'horizontal',
       //'rotation': undefined,
       'offsetX': 0,
       'offsetY': 0,
@@ -3033,7 +2999,7 @@ window['anychart']['themes']['v6'] = {
       'enabled': true,
       'from': 0,
       'to': 0,
-      'layout': 'horizontal',
+      'layout': null,
       'fill': '#000 0.3',
       'zIndex': 25.1,
       'scale': 1
@@ -3043,13 +3009,11 @@ window['anychart']['themes']['v6'] = {
     'grids': [
       {
         'oddFill': '#f9f9f9',
-        'evenFill': '#ffffff',
-        'layout': 'horizontal'
+        'evenFill': '#ffffff'
       },
       {
         'oddFill': 'none',
         'evenFill': 'none',
-        'layout': 'vertical',
         'scale': 0
       }
     ],
@@ -3057,14 +3021,12 @@ window['anychart']['themes']['v6'] = {
       {
         'oddFill': 'none',
         'evenFill': 'none',
-        'stroke': '#000 0.1',
-        'layout': 'horizontal'
+        'stroke': '#000 0.1'
       },
       {
         'oddFill': 'none',
         'evenFill': 'none',
         'stroke': '#000 0.1',
-        'layout': 'vertical',
         'scale': 0
       }
     ],
@@ -3235,7 +3197,6 @@ window['anychart']['themes']['v6'] = {
       'from': 0,
       'to': 0,
       'zIndex': 2
-      //'layout': 'horizontal'
       //'fill': '#000 0.3'
     },
     'defaultMarkerSettings': {
@@ -4349,7 +4310,7 @@ window['anychart']['themes']['v6'] = {
     'defaultLineMarkerSettings': {
       'enabled': true,
       'value': 0,
-      'layout': 'horizontal',
+      'layout': null,
       'stroke': {
         'color': '#DC0A0A',
         'thickness': 1,
@@ -4372,7 +4333,7 @@ window['anychart']['themes']['v6'] = {
       'value': 0,
       'anchor': 'center',
       'align': 'center',
-      'layout': 'horizontal',
+      'layout': null,
       //'rotation': undefined,
       'offsetX': 0,
       'offsetY': 0,
@@ -4386,7 +4347,7 @@ window['anychart']['themes']['v6'] = {
       'enabled': true,
       'from': 0,
       'to': 0,
-      'layout': 'horizontal',
+      'layout': null,
       'fill': '#000 0.3',
       'zIndex': 25.1,
       'scale': 1
@@ -6157,7 +6118,7 @@ window['anychart']['themes']['v6'] = {
     'lineAxisMarker': {
       'enabled': true,
       'value': 0,
-      'layout': 'horizontal',
+      'layout': null,
       'stroke': {
         'color': '#DC0A0A',
         'thickness': 1,
@@ -6175,7 +6136,7 @@ window['anychart']['themes']['v6'] = {
       'value': 0,
       'anchor': 'center',
       'align': 'center',
-      'layout': 'horizontal',
+      'layout': null,
       //'rotation': undefined,
       'offsetX': 0,
       'offsetY': 0,
@@ -6187,7 +6148,7 @@ window['anychart']['themes']['v6'] = {
       'enabled': true,
       'from': 0,
       'to': 0,
-      'layout': 'horizontal',
+      'layout': null,
       'fill': '#000 0.3'
     },
     'dataGrid': {

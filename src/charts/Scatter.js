@@ -618,6 +618,17 @@ anychart.charts.Scatter.prototype.onAxisSignal_ = function(event) {
 
 
 /**
+ * Gets axis by index. First of all goes through x-axes, then y-axes.
+ * SAMPLE: if we have 4 x-axes and 3 y-axes, chart.getAxisByIndex(4) will return very first y-axis.
+ * @param {number} index - Index to be found.
+ * @return {anychart.core.axes.Linear|undefined}
+ */
+anychart.charts.Scatter.prototype.getAxisByIndex = function(index) {
+  return (index >= this.xAxes_.length) ? this.yAxes_[index - this.xAxes_.length] : this.xAxes_[index];
+};
+
+
+/**
  * Getter/setter for lineMarker.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Chart line marker settings to set.
  * @param {(Object|boolean|null)=} opt_value Chart line marker settings to set.
@@ -636,6 +647,7 @@ anychart.charts.Scatter.prototype.lineMarker = function(opt_indexOrValue, opt_va
   var lineMarker = this.lineAxesMarkers_[index];
   if (!lineMarker) {
     lineMarker = new anychart.core.axisMarkers.Line();
+    lineMarker.setChart(this);
     lineMarker.setup(this.defaultLineMarkerSettings());
     this.lineAxesMarkers_[index] = lineMarker;
     this.registerDisposable(lineMarker);
@@ -671,6 +683,7 @@ anychart.charts.Scatter.prototype.rangeMarker = function(opt_indexOrValue, opt_v
   var rangeMarker = this.rangeAxesMarkers_[index];
   if (!rangeMarker) {
     rangeMarker = new anychart.core.axisMarkers.Range();
+    rangeMarker.setChart(this);
     rangeMarker.setup(this.defaultRangeMarkerSettings());
     this.rangeAxesMarkers_[index] = rangeMarker;
     this.registerDisposable(rangeMarker);
@@ -706,6 +719,7 @@ anychart.charts.Scatter.prototype.textMarker = function(opt_indexOrValue, opt_va
   var textMarker = this.textAxesMarkers_[index];
   if (!textMarker) {
     textMarker = new anychart.core.axisMarkers.Text();
+    textMarker.setChart(this);
     textMarker.setup(this.defaultTextMarkerSettings());
     this.textAxesMarkers_[index] = textMarker;
     this.registerDisposable(textMarker);
@@ -1810,9 +1824,16 @@ anychart.charts.Scatter.prototype.serialize = function() {
   var i;
   var scalesIds = {};
   var scales = [];
+  var axesIds = [];
   var scale;
   var config;
   var objId;
+  var axisId;
+  var axis;
+  var axisIndex;
+  var axisScale;
+  var axisOrientation;
+  var isHorizontal;
 
   scalesIds[goog.getUid(this.xScale())] = this.xScale().serialize();
   scales.push(scalesIds[goog.getUid(this.xScale())]);
@@ -1832,6 +1853,46 @@ anychart.charts.Scatter.prototype.serialize = function() {
   json['maxBubbleSize'] = this.maxBubbleSize();
   json['crosshair'] = this.crosshair().serialize();
 
+  var xAxes = [];
+  for (i = 0; i < this.xAxes_.length; i++) {
+    var xAxis = this.xAxes_[i];
+    config = xAxis.serialize();
+    scale = xAxis.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    axesIds.push(goog.getUid(xAxis));
+
+    xAxes.push(config);
+  }
+  if (xAxes.length)
+    json['xAxes'] = xAxes;
+
+  var yAxes = [];
+  for (i = 0; i < this.yAxes_.length; i++) {
+    var yAxis = this.yAxes_[i];
+    config = yAxis.serialize();
+    scale = yAxis.scale();
+    objId = goog.getUid(scale);
+    if (!scalesIds[objId]) {
+      scalesIds[objId] = scale.serialize();
+      scales.push(scalesIds[objId]);
+      config['scale'] = scales.length - 1;
+    } else {
+      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    }
+    axesIds.push(goog.getUid(yAxis));
+
+    yAxes.push(config);
+  }
+  if (yAxes.length)
+    json['yAxes'] = yAxes;
+
   var grids = [];
   for (i = 0; i < this.grids_.length; i++) {
     var grid = this.grids_[i];
@@ -1845,6 +1906,31 @@ anychart.charts.Scatter.prototype.serialize = function() {
         config['scale'] = scales.length - 1;
       } else {
         config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
+      axis = grid.axis();
+      if (axis) {
+        axisId = goog.getUid(axis);
+        axisIndex = goog.array.indexOf(axesIds, axisId);
+        if (axisIndex < 0) { //axis presents but not found in existing axes. Taking scale and layout from it.
+          axisScale = axis.scale();
+          if (!('layout' in config)) {
+            axisOrientation = axis.orientation();
+            isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
+            config['layout'] = isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;
+          }
+          if (!('scale' in config)) { //doesn't override the scale already set.
+            objId = goog.getUid(axisScale);
+            if (!scalesIds[objId]) {
+              scalesIds[objId] = axisScale.serialize();
+              scales.push(scalesIds[objId]);
+              config['scale'] = scales.length - 1;
+            } else {
+              config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+            }
+          }
+        } else {
+          config['axis'] = axisIndex;
+        }
       }
       grids.push(config);
     }
@@ -1866,64 +1952,76 @@ anychart.charts.Scatter.prototype.serialize = function() {
       } else {
         config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
       }
+      axis = minorGrid.axis();
+      if (axis) {
+        axisId = goog.getUid(axis);
+        axisIndex = goog.array.indexOf(axesIds, axisId);
+        if (axisIndex < 0) { //axis presents but not found in existing axes. Taking scale and layout from it.
+          axisScale = axis.scale();
+          if (!('layout' in config)) {
+            axisOrientation = axis.orientation();
+            isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
+            config['layout'] = isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;
+          }
+          if (!('scale' in config)) { //doesn't override the scale already set.
+            objId = goog.getUid(axisScale);
+            if (!scalesIds[objId]) {
+              scalesIds[objId] = axisScale.serialize();
+              scales.push(scalesIds[objId]);
+              config['scale'] = scales.length - 1;
+            } else {
+              config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+            }
+          }
+        } else {
+          config['axis'] = axisIndex;
+        }
+      }
       minorGrids.push(config);
     }
   }
   if (minorGrids.length)
     json['minorGrids'] = minorGrids;
 
-  var xAxes = [];
-  for (i = 0; i < this.xAxes_.length; i++) {
-    var xAxis = this.xAxes_[i];
-    if (xAxis) {
-      config = xAxis.serialize();
-      scale = xAxis.scale();
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['scale'] = scales.length - 1;
-      } else {
-        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
-      }
-      xAxes.push(config);
-    }
-  }
-  if (xAxes.length)
-    json['xAxes'] = xAxes;
-
-  var yAxes = [];
-  for (i = 0; i < this.yAxes_.length; i++) {
-    var yAxis = this.yAxes_[i];
-    if (yAxis) {
-      config = yAxis.serialize();
-      scale = yAxis.scale();
-      objId = goog.getUid(scale);
-      if (!scalesIds[objId]) {
-        scalesIds[objId] = scale.serialize();
-        scales.push(scalesIds[objId]);
-        config['scale'] = scales.length - 1;
-      } else {
-        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
-      }
-      yAxes.push(config);
-    }
-  }
-  if (yAxes.length)
-    json['yAxes'] = yAxes;
-
   var lineAxesMarkers = [];
   for (i = 0; i < this.lineAxesMarkers_.length; i++) {
     var lineAxesMarker = this.lineAxesMarkers_[i];
     config = lineAxesMarker.serialize();
     scale = lineAxesMarker.scale();
-    objId = goog.getUid(scale);
-    if (!scalesIds[objId]) {
-      scalesIds[objId] = scale.serialize();
-      scales.push(scalesIds[objId]);
-      config['scale'] = scales.length - 1;
-    } else {
-      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['scale'] = scales.length - 1;
+      } else {
+        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
+    }
+    axis = lineAxesMarker.axis();
+    if (axis) {
+      axisId = goog.getUid(axis);
+      axisIndex = goog.array.indexOf(axesIds, axisId);
+      if (axisIndex < 0) { //axis presents but not found in existing axes. Taking scale and layout from it.
+        axisScale = axis.scale();
+        if (!('layout' in config)) {
+          axisOrientation = axis.orientation();
+          isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
+          config['layout'] = isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;
+        }
+        if (!('scale' in config)) { //doesn't override the scale already set.
+          objId = goog.getUid(axisScale);
+          if (!scalesIds[objId]) {
+            scalesIds[objId] = axisScale.serialize();
+            scales.push(scalesIds[objId]);
+            config['scale'] = scales.length - 1;
+          } else {
+            config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+          }
+        }
+      } else {
+        config['axis'] = axisIndex;
+      }
     }
     lineAxesMarkers.push(config);
   }
@@ -1935,13 +2033,40 @@ anychart.charts.Scatter.prototype.serialize = function() {
     var rangeAxesMarker = this.rangeAxesMarkers_[i];
     config = rangeAxesMarker.serialize();
     scale = rangeAxesMarker.scale();
-    objId = goog.getUid(scale);
-    if (!scalesIds[objId]) {
-      scalesIds[objId] = scale.serialize();
-      scales.push(scalesIds[objId]);
-      config['scale'] = scales.length - 1;
-    } else {
-      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['scale'] = scales.length - 1;
+      } else {
+        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
+    }
+    axis = rangeAxesMarker.axis();
+    if (axis) {
+      axisId = goog.getUid(axis);
+      axisIndex = goog.array.indexOf(axesIds, axisId);
+      if (axisIndex < 0) { //axis presents but not found in existing axes. Taking scale and layout from it.
+        axisScale = axis.scale();
+        if (!('layout' in config)) {
+          axisOrientation = axis.orientation();
+          isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
+          config['layout'] = isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;
+        }
+        if (!('scale' in config)) { //doesn't override the scale already set.
+          objId = goog.getUid(axisScale);
+          if (!scalesIds[objId]) {
+            scalesIds[objId] = axisScale.serialize();
+            scales.push(scalesIds[objId]);
+            config['scale'] = scales.length - 1;
+          } else {
+            config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+          }
+        }
+      } else {
+        config['axis'] = axisIndex;
+      }
     }
     rangeAxesMarkers.push(config);
   }
@@ -1953,13 +2078,40 @@ anychart.charts.Scatter.prototype.serialize = function() {
     var textAxesMarker = this.textAxesMarkers_[i];
     config = textAxesMarker.serialize();
     scale = textAxesMarker.scale();
-    objId = goog.getUid(scale);
-    if (!scalesIds[objId]) {
-      scalesIds[objId] = scale.serialize();
-      scales.push(scalesIds[objId]);
-      config['scale'] = scales.length - 1;
-    } else {
-      config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['scale'] = scales.length - 1;
+      } else {
+        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
+    }
+    axis = textAxesMarker.axis();
+    if (axis) {
+      axisId = goog.getUid(axis);
+      axisIndex = goog.array.indexOf(axesIds, axisId);
+      if (axisIndex < 0) { //axis presents but not found in existing axes. Taking scale and layout from it.
+        axisScale = axis.scale();
+        if (!('layout' in config)) {
+          axisOrientation = axis.orientation();
+          isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
+          config['layout'] = isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;
+        }
+        if (!('scale' in config)) { //doesn't override the scale already set.
+          objId = goog.getUid(axisScale);
+          if (!scalesIds[objId]) {
+            scalesIds[objId] = axisScale.serialize();
+            scales.push(scalesIds[objId]);
+            config['scale'] = scales.length - 1;
+          } else {
+            config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+          }
+        }
+      } else {
+        config['axis'] = axisIndex;
+      }
     }
     textAxesMarkers.push(config);
   }
@@ -2107,22 +2259,6 @@ anychart.charts.Scatter.prototype.setupByJSON = function(config) {
   if (scale)
     this.yScale(scale);
 
-  if (goog.isArray(grids)) {
-    for (i = 0; i < grids.length; i++) {
-      json = grids[i];
-      this.grid(i, json);
-      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.grid(i).scale(scalesInstances[json['scale']]);
-    }
-  }
-
-  if (goog.isArray(minorGrids)) {
-    for (i = 0; i < minorGrids.length; i++) {
-      json = minorGrids[i];
-      this.minorGrid(i, json);
-      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.minorGrid(i).scale(scalesInstances[json['scale']]);
-    }
-  }
-
   if (goog.isArray(xAxes)) {
     for (i = 0; i < xAxes.length; i++) {
       json = xAxes[i];
@@ -2136,6 +2272,22 @@ anychart.charts.Scatter.prototype.setupByJSON = function(config) {
       json = yAxes[i];
       this.yAxis(i, json);
       if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.yAxis(i).scale(scalesInstances[json['scale']]);
+    }
+  }
+
+  if (goog.isArray(grids)) {
+    for (i = 0; i < grids.length; i++) {
+      json = grids[i];
+      this.grid(i, json);
+      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.grid(i).scale(scalesInstances[json['scale']]);
+    }
+  }
+
+  if (goog.isArray(minorGrids)) {
+    for (i = 0; i < minorGrids.length; i++) {
+      json = minorGrids[i];
+      this.minorGrid(i, json);
+      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.minorGrid(i).scale(scalesInstances[json['scale']]);
     }
   }
 

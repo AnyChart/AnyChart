@@ -1,7 +1,6 @@
 goog.provide('anychart.core.axisMarkers.Text');
 
 goog.require('anychart.core.axisMarkers.TextBase');
-goog.require('anychart.enums');
 
 
 
@@ -49,27 +48,6 @@ anychart.core.axisMarkers.Text.prototype.scale = function(opt_value) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//  Layout.
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * @inheritDoc
- */
-anychart.core.axisMarkers.Text.prototype.layout = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var layout = anychart.enums.normalizeLayout(opt_value);
-    if (this.layout_ != layout) {
-      this.layout_ = layout;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.layout_;
-  }
-};
-
-
 /**
  * Get/set value.
  * @param {number=} opt_newValue TextMarker value settings.
@@ -102,6 +80,7 @@ anychart.core.axisMarkers.Text.prototype.setupByJSON = function(config) {
 //exports
 anychart.core.axisMarkers.Text.prototype['value'] = anychart.core.axisMarkers.Text.prototype.value;
 anychart.core.axisMarkers.Text.prototype['scale'] = anychart.core.axisMarkers.Text.prototype.scale;
+anychart.core.axisMarkers.Text.prototype['axis'] = anychart.core.axisMarkers.Text.prototype.axis;
 anychart.core.axisMarkers.Text.prototype['anchor'] = anychart.core.axisMarkers.Text.prototype.anchor;
 anychart.core.axisMarkers.Text.prototype['align'] = anychart.core.axisMarkers.Text.prototype.align;
 anychart.core.axisMarkers.Text.prototype['layout'] = anychart.core.axisMarkers.Text.prototype.layout;

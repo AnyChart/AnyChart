@@ -106,9 +106,7 @@ anychart.core.axisMarkers.GanttLine.prototype.value = function(opt_newValue) {
 //  Direction.
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Get line marker layout.
- * @param {anychart.enums.Layout=} opt_value - LineMarker layout.
- * @return {anychart.enums.Layout|anychart.core.axisMarkers.GanttLine} - Layout or this.
+ * @inheritDoc
  */
 anychart.core.axisMarkers.GanttLine.prototype.layout = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -154,7 +152,6 @@ anychart.core.axisMarkers.GanttLine.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['value'] = this.value();
   json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
-  if (this.layout_) json['layout'] = this.layout_;
   return json;
 };
 

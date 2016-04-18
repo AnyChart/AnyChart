@@ -3,7 +3,6 @@ goog.provide('anychart.core.axisMarkers.Line');
 goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.axisMarkers.PathBase');
-goog.require('anychart.enums');
 
 
 
@@ -15,13 +14,6 @@ goog.require('anychart.enums');
 anychart.core.axisMarkers.Line = function() {
   anychart.core.axisMarkers.Line.base(this, 'constructor');
 
-
-  /**
-   * @type {anychart.enums.Layout}
-   * @private
-   */
-  this.layout_;
-
   this.val = 0;
 
   /**
@@ -29,6 +21,18 @@ anychart.core.axisMarkers.Line = function() {
    * @private
    */
   this.stroke_;
+
+  /**
+   * @type {anychart.enums.Layout}
+   * @private
+   */
+  this.layout_;
+
+  /**
+   * @type {anychart.enums.Layout}
+   * @private
+   */
+  this.defaultLayout_ = anychart.enums.Layout.HORIZONTAL;
 };
 goog.inherits(anychart.core.axisMarkers.Line, anychart.core.axisMarkers.PathBase);
 
@@ -65,13 +69,30 @@ anychart.core.axisMarkers.Line.prototype.layout = function(opt_value) {
     var layout = anychart.enums.normalizeLayout(opt_value);
     if (this.layout_ != layout) {
       this.layout_ = layout;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
-  } else {
+  } else if (this.layout_) {
     return this.layout_;
+  } else if (this.axis()) {
+    var axisOrientation = this.axis().orientation();
+    var isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
+    return isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;
+  } else {
+    return this.defaultLayout_;
   }
+};
+
+
+/**
+ * Set Default layout.
+ * @param {anychart.enums.Layout} value Layout value.
+ */
+anychart.core.axisMarkers.Line.prototype.setDefaultLayout = function(value) {
+  var needInvalidate = !this.layout_ && this.defaultLayout_ != value;
+  this.defaultLayout_ = value;
+  if (needInvalidate)
+    this.invalidate(anychart.ConsistencyState.BOUNDS);
 };
 
 
@@ -175,6 +196,7 @@ anychart.core.axisMarkers.Line.prototype.setupByJSON = function(config) {
 //exports
 anychart.core.axisMarkers.Line.prototype['value'] = anychart.core.axisMarkers.Line.prototype.value;
 anychart.core.axisMarkers.Line.prototype['scale'] = anychart.core.axisMarkers.Line.prototype.scale;
+anychart.core.axisMarkers.Line.prototype['axis'] = anychart.core.axisMarkers.Line.prototype.axis;
 anychart.core.axisMarkers.Line.prototype['layout'] = anychart.core.axisMarkers.Line.prototype.layout;
 anychart.core.axisMarkers.Line.prototype['stroke'] = anychart.core.axisMarkers.Line.prototype.stroke;
 anychart.core.axisMarkers.Line.prototype['isHorizontal'] = anychart.core.axisMarkers.Line.prototype.isHorizontal;

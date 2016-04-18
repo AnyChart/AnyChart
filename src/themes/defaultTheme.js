@@ -420,7 +420,6 @@ window['anychart']['themes']['defaultTheme'] = {
   'defaultGridSettings': {
     'enabled': true,
     'isMinor': false,
-    'layout': 'horizontal',
     'drawFirstLine': true,
     'drawLastLine': true,
     'oddFill': 'none',
@@ -439,7 +438,7 @@ window['anychart']['themes']['defaultTheme'] = {
   'defaultLineMarkerSettings': {
     'enabled': true,
     'value': 0,
-    'layout': 'horizontal',
+    'layout': null,
     'stroke': {
       'color': '#7c868e',
       'thickness': 2,
@@ -458,7 +457,7 @@ window['anychart']['themes']['defaultTheme'] = {
     'value': 0,
     'anchor': 'center',
     'align': 'center',
-    'layout': 'horizontal',
+    'layout': null,
     'offsetX': 0,
     'offsetY': 0,
     'text': 'Text marker',
@@ -472,7 +471,7 @@ window['anychart']['themes']['defaultTheme'] = {
     'enabled': true,
     'from': 0,
     'to': 0,
-    'layout': 'horizontal',
+    'layout': null,
     'fill': colorStrokeBright + ' 0.4',
     'zIndex': 25.1,
     'scale': 1
@@ -1277,15 +1276,6 @@ window['anychart']['themes']['defaultTheme'] = {
     'defaultMinorGridSettings': {
       'layout': 'vertical'
     },
-    'defaultLineMarkerSettings': {
-      'layout': 'vertical'
-    },
-    'defaultTextMarkerSettings': {
-      'layout': 'vertical'
-    },
-    'defaultRangeMarkerSettings': {
-      'layout': 'vertical'
-    },
     'defaultXAxisSettings': {
       'orientation': 'left'
     },
@@ -1820,12 +1810,12 @@ window['anychart']['themes']['defaultTheme'] = {
       'line': {},
       'marker': {}
     },
-    'defaultGridSettings': {
-      'layout': 'radial'
-    },
-    'defaultMinorGridSettings': {
-      'layout': 'circuit'
-    },
+    //'defaultGridSettings': {
+    //  'layout': null//'radial'
+    //},
+    //'defaultMinorGridSettings': {
+    //  'layout': null//'circuit'
+    //},
     'xAxis': {
       'scale': 0,
       'zIndex': 25
@@ -1882,12 +1872,12 @@ window['anychart']['themes']['defaultTheme'] = {
       'line': {},
       'marker': {}
     },
-    'defaultGridSettings': {
-      'layout': 'radial'
-    },
-    'defaultMinorGridSettings': {
-      'layout': 'circuit'
-    },
+    //'defaultGridSettings': {
+    //  'layout': null//'radial'
+    //},
+    //'defaultMinorGridSettings': {
+    //  'layout': null//'circuit'
+    //},
     'xAxis': {
       'scale': 0,
       'zIndex': 25

@@ -81,6 +81,19 @@ anychart.core.grids.Stock = function() {
    * @private
    */
   this.drawLastLine_;
+
+  /**
+   * Assigned axis.
+   * @type {anychart.core.axes.StockDateTime|anychart.core.axes.Linear}
+   * @private
+   */
+  this.axis_ = null;
+
+  /**
+   * @type {anychart.enums.Layout}
+   * @private
+   */
+  this.defaultLayout_ = anychart.enums.Layout.HORIZONTAL;
 };
 goog.inherits(anychart.core.grids.Stock, anychart.core.VisualBase);
 
@@ -105,6 +118,24 @@ anychart.core.grids.Stock.prototype.SUPPORTED_CONSISTENCY_STATES =
         anychart.ConsistencyState.GRIDS_POSITION;
 
 
+/**
+ * Sets the plot that grid belongs to.
+ * @param {anychart.core.stock.Plot} plot - Plot instance.
+ */
+anychart.core.grids.Stock.prototype.setPlot = function(plot) {
+  this.plot_ = plot;
+};
+
+
+/**
+ * Gets the plot that grid belongs to.
+ * @return {anychart.core.stock.Plot}
+ */
+anychart.core.grids.Stock.prototype.getPlot = function() {
+  return this.plot_;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //  Layout.
 //----------------------------------------------------------------------------------------------------------------------
@@ -121,9 +152,29 @@ anychart.core.grids.Stock.prototype.layout = function(opt_value) {
       this.invalidate(anychart.ConsistencyState.GRIDS_POSITION, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
-  } else {
+  } else if (this.layout_) {
     return this.layout_;
+  } else if (this.axis_) {
+    var isHorizontal = false;
+    if (this.axis_ instanceof anychart.core.axes.Linear) {
+      var axisOrientation = this.axis_.orientation();
+      isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
+    }
+    return isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;
+  } else {
+    return this.defaultLayout_;
   }
+};
+
+
+/**
+ * Set default layout.
+ * @param {anychart.enums.Layout} value - Layout value.
+ */
+anychart.core.grids.Stock.prototype.setDefaultLayout = function(value) {
+  var needInvalidate = !this.layout_ && this.defaultLayout_ != value;
+  this.defaultLayout_ = value;
+  if (needInvalidate) this.invalidate(anychart.ConsistencyState.GRIDS_POSITION);
 };
 
 
@@ -144,7 +195,13 @@ anychart.core.grids.Stock.prototype.scale = function(opt_value) {
     }
     return this;
   } else {
-    return this.scale_;
+    if (this.scale_) {
+      return this.scale_;
+    } else {
+      if (this.axis_)
+        return /** @type {anychart.scales.Base|anychart.scales.StockScatterDateTime} */ (this.axis_.scale());
+      return null;
+    }
   }
 };
 
@@ -160,6 +217,40 @@ anychart.core.grids.Stock.prototype.scaleInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION))
     this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.APPEARANCE,
         anychart.Signal.NEEDS_REDRAW);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//  Axis.
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Axis invalidation handler.
+ * @param {anychart.SignalEvent} event - Event object.
+ * @private
+ */
+anychart.core.grids.Stock.prototype.axisInvalidated_ = function(event) {
+  this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * Sets axis.
+ * @param {(anychart.core.axes.StockDateTime|anychart.core.axes.Linear)=} opt_value - Value to be set.
+ * @return {(anychart.core.axes.StockDateTime|anychart.core.axes.Linear|anychart.core.grids.Stock)} - Current value or itself for method chaining.
+ */
+anychart.core.grids.Stock.prototype.axis = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.axis_ != opt_value) {
+      if (this.axis_) this.axis_.unlistenSignals(this.axisInvalidated_, this);
+      this.axis_ = opt_value;
+      this.axis_.listenSignals(this.axisInvalidated_, this);
+      this.invalidate(anychart.ConsistencyState.GRIDS_POSITION | anychart.ConsistencyState.APPEARANCE,
+          anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.axis_;
 };
 
 
@@ -364,7 +455,7 @@ anychart.core.grids.Stock.prototype.drawLineVertical = function(ratio, needsShif
  * @return {boolean} If the marker is horizontal.
  */
 anychart.core.grids.Stock.prototype.isHorizontal = function() {
-  return this.layout_ == anychart.enums.Layout.HORIZONTAL;
+  return this.layout() == anychart.enums.Layout.HORIZONTAL;
 };
 
 
@@ -474,17 +565,17 @@ anychart.core.grids.Stock.prototype.draw = function() {
     var path;
     var ratio;
     var prevRatio = NaN;
-    var isOrdinal = this.scale_ instanceof anychart.scales.Ordinal;
-    var isStock = this.scale_ instanceof anychart.scales.StockScatterDateTime;
+    var isOrdinal = scale instanceof anychart.scales.Ordinal;
+    var isStock = scale instanceof anychart.scales.StockScatterDateTime;
     var ticksArray;
     if (isStock) {
-      ticksArray = (/** @type {anychart.scales.StockScatterDateTime} */(this.scale_)).getTicks().toArray(!this.isMinor_);
+      ticksArray = (/** @type {anychart.scales.StockScatterDateTime} */(scale)).getTicks().toArray(!this.isMinor_);
     } else if (isOrdinal) {
-      ticksArray = (/** @type {anychart.scales.Ordinal} */(this.scale_)).ticks().get();
+      ticksArray = (/** @type {anychart.scales.Ordinal} */(scale)).ticks().get();
     } else if (this.isMinor_) {
-      ticksArray = (/** @type {anychart.scales.Linear} */(this.scale_)).minorTicks().get();
+      ticksArray = (/** @type {anychart.scales.Linear} */(scale)).minorTicks().get();
     } else {
-      ticksArray = (/** @type {anychart.scales.Linear} */(this.scale_)).ticks().get();
+      ticksArray = (/** @type {anychart.scales.Linear} */(scale)).ticks().get();
     }
 
     if (this.isHorizontal()) {
@@ -634,7 +725,7 @@ anychart.core.grids.Stock.prototype.evenFillElement = function() {
 anychart.core.grids.Stock.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['isMinor'] = this.isMinor();
-  json['layout'] = this.layout();
+  if (this.layout_) json['layout'] = this.layout_;
   json['drawFirstLine'] = this.drawFirstLine();
   json['drawLastLine'] = this.drawLastLine();
   json['oddFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.oddFill()));
@@ -654,6 +745,16 @@ anychart.core.grids.Stock.prototype.setupByJSON = function(config) {
   this.oddFill(config['oddFill']);
   this.evenFill(config['evenFill']);
   this.stroke(config['stroke']);
+  if ('axis' in config) {
+    var ax = config['axis'];
+    if (goog.isNumber(ax)) {
+      if (this.plot_) {
+        this.axis((/** @type {anychart.core.stock.Plot} */(this.plot_)).getAxisByIndex(ax));
+      }
+    } else if (ax instanceof anychart.core.axes.StockDateTime || ax instanceof anychart.core.axes.Linear) {
+      this.axis(ax);
+    }
+  }
 };
 
 
@@ -663,6 +764,8 @@ anychart.core.grids.Stock.prototype.setupByJSON = function(config) {
 /** @inheritDoc */
 anychart.core.grids.Stock.prototype.disposeInternal = function() {
   delete this.stroke_;
+  this.axis_ = null;
+  this.plot_ = null;
   goog.base(this, 'disposeInternal');
 };
 
@@ -677,3 +780,4 @@ anychart.core.grids.Stock.prototype['scale'] = anychart.core.grids.Stock.prototy
 anychart.core.grids.Stock.prototype['stroke'] = anychart.core.grids.Stock.prototype.stroke;
 anychart.core.grids.Stock.prototype['drawFirstLine'] = anychart.core.grids.Stock.prototype.drawFirstLine;
 anychart.core.grids.Stock.prototype['drawLastLine'] = anychart.core.grids.Stock.prototype.drawLastLine;
+anychart.core.grids.Stock.prototype['axis'] = anychart.core.grids.Stock.prototype.axis;

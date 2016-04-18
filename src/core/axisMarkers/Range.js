@@ -2,7 +2,6 @@ goog.provide('anychart.core.axisMarkers.Range');
 goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.axisMarkers.PathBase');
-goog.require('anychart.enums');
 
 
 
@@ -13,18 +12,6 @@ goog.require('anychart.enums');
  */
 anychart.core.axisMarkers.Range = function() {
   anychart.core.axisMarkers.Range.base(this, 'constructor');
-
-  /**
-   * @type {anychart.enums.Layout}
-   * @private
-   */
-  this.layout_;
-
-  /**
-   * @type {anychart.enums.Layout}
-   * @private
-   */
-  this.defaultLayout_;
 
   /**
    * @type {anychart.core.axisMarkers.PathBase.Range}
@@ -43,7 +30,18 @@ anychart.core.axisMarkers.Range = function() {
    */
   this.defaultFill_ = 'black';
 
-  this.setDefaultLayout(anychart.enums.Layout.HORIZONTAL);
+  /**
+   * @type {anychart.enums.Layout}
+   * @private
+   */
+  this.layout_;
+
+  /**
+   * @type {anychart.enums.Layout}
+   * @private
+   */
+  this.defaultLayout_ = anychart.enums.Layout.HORIZONTAL;
+
   this.setDefaultFill('#c1c1c1 0.4');
 };
 goog.inherits(anychart.core.axisMarkers.Range, anychart.core.axisMarkers.PathBase);
@@ -84,8 +82,14 @@ anychart.core.axisMarkers.Range.prototype.layout = function(opt_value) {
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
+  } else if (this.layout_) {
+    return this.layout_;
+  } else if (this.axis()) {
+    var axisOrientation = this.axis().orientation();
+    var isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
+    return isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;
   } else {
-    return this.layout_ || this.defaultLayout_;
+    return this.defaultLayout_;
   }
 };
 
@@ -244,6 +248,7 @@ anychart.core.axisMarkers.Range.prototype.setupByJSON = function(config) {
 anychart.core.axisMarkers.Range.prototype['from'] = anychart.core.axisMarkers.Range.prototype.from;
 anychart.core.axisMarkers.Range.prototype['to'] = anychart.core.axisMarkers.Range.prototype.to;
 anychart.core.axisMarkers.Range.prototype['scale'] = anychart.core.axisMarkers.Range.prototype.scale;
+anychart.core.axisMarkers.Range.prototype['axis'] = anychart.core.axisMarkers.Range.prototype.axis;
 anychart.core.axisMarkers.Range.prototype['layout'] = anychart.core.axisMarkers.Range.prototype.layout;
 anychart.core.axisMarkers.Range.prototype['fill'] = anychart.core.axisMarkers.Range.prototype.fill;
 anychart.core.axisMarkers.Range.prototype['isHorizontal'] = anychart.core.axisMarkers.Range.prototype.isHorizontal;

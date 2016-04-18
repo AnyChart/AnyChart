@@ -386,6 +386,8 @@ anychart.charts.Radar.prototype.grid = function(opt_indexOrValue, opt_value) {
   var grid = this.grids_[index];
   if (!grid) {
     grid = new anychart.core.grids.Radar();
+    grid.setChart(this);
+    grid.setDefaultLayout(anychart.enums.RadialGridLayout.RADIAL);
     grid.setup(this.defaultGridSettings());
     this.grids_[index] = grid;
     this.registerDisposable(grid);
@@ -421,6 +423,8 @@ anychart.charts.Radar.prototype.minorGrid = function(opt_indexOrValue, opt_value
   var grid = this.minorGrids_[index];
   if (!grid) {
     grid = new anychart.core.grids.Radar();
+    grid.setChart(this);
+    grid.setDefaultLayout(anychart.enums.RadialGridLayout.CIRCUIT);
     grid.setup(this.defaultMinorGridSettings());
     this.minorGrids_[index] = grid;
     this.registerDisposable(grid);
@@ -515,6 +519,23 @@ anychart.charts.Radar.prototype.onAxisSignal_ = function(event) {
   }
   // if there are no signals, state == 0 and nothing happens.
   this.invalidate(state, signal);
+};
+
+
+/**
+ * Gets axis by index. 0 is x-axes 1 is y-axes, another numbers return undefined.
+ * @param {number} index - Index to be found.
+ * @return {anychart.core.axes.Radar|anychart.core.axes.Radial|undefined}
+ */
+anychart.charts.Radar.prototype.getAxisByIndex = function(index) {
+  switch (index) {
+    case 0:
+      return this.xAxis_;
+    case 1:
+      return this.yAxis_;
+    default:
+      return void 0;
+  }
 };
 
 
@@ -1316,6 +1337,8 @@ anychart.charts.Radar.prototype.drawContent = function(bounds) {
   if (this.isConsistent())
     return;
 
+  var axisInvalidated = false;
+
   anychart.core.Base.suspendSignalsDispatching(this.series_, this.xAxis_, this.yAxis_);
 
   // set default scales for axis if they not set
@@ -1330,6 +1353,8 @@ anychart.charts.Radar.prototype.drawContent = function(bounds) {
     }
     this.yAxis().labels().dropCallsCache();
     this.yAxis().minorLabels().dropCallsCache();
+
+    axisInvalidated = true;
   }
 
   //calculate axes space first, the result is data bounds
@@ -1341,6 +1366,9 @@ anychart.charts.Radar.prototype.drawContent = function(bounds) {
     this.dataBounds_ = this.xAxis().getRemainingBounds().round();
 
     this.invalidateSeries_();
+
+    axisInvalidated = true;
+
     this.invalidate(anychart.ConsistencyState.RADAR_AXES |
         anychart.ConsistencyState.RADAR_GRIDS |
         anychart.ConsistencyState.RADAR_SERIES);
@@ -1353,8 +1381,7 @@ anychart.charts.Radar.prototype.drawContent = function(bounds) {
       var grid = grids[i];
       if (grid) {
         grid.suspendSignalsDispatching();
-        if (!grid.xScale())
-          this.setDefaultScaleForLayoutBasedElements_(grid);
+        if (axisInvalidated) grid.invalidate(anychart.ConsistencyState.GRIDS_POSITION);
         grid.parentBounds(this.dataBounds_);
         grid.container(this.rootElement);
         grid.startAngle(this.startAngle_);
@@ -1698,9 +1725,15 @@ anychart.charts.Radar.prototype.serialize = function() {
   var i;
   var scalesIds = {};
   var scales = [];
+  var axesIds = [];
   var scale;
   var config;
   var objId;
+  var axis;
+  var axisId;
+  var axisIndex;
+  var axisScale;
+  var isCircuit;
 
   scalesIds[goog.getUid(this.xScale())] = this.xScale().serialize();
   scales.push(scalesIds[goog.getUid(this.xScale())]);
@@ -1717,6 +1750,32 @@ anychart.charts.Radar.prototype.serialize = function() {
   json['markerPalette'] = this.markerPalette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
   json['startAngle'] = this.startAngle();
+
+  config = this.xAxis_.serialize();
+  scale = this.xAxis_.scale();
+  axesIds.push(goog.getUid(this.xAxis_));
+  objId = goog.getUid(scale);
+  if (!scalesIds[objId]) {
+    scalesIds[objId] = scale.serialize();
+    scales.push(scalesIds[objId]);
+    config['scale'] = scales.length - 1;
+  } else {
+    config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+  }
+  json['xAxis'] = config;
+
+  config = this.yAxis_.serialize();
+  scale = this.yAxis_.scale();
+  axesIds.push(goog.getUid(this.yAxis_));
+  objId = goog.getUid(scale);
+  if (!scalesIds[objId]) {
+    scalesIds[objId] = scale.serialize();
+    scales.push(scalesIds[objId]);
+    config['scale'] = scales.length - 1;
+  } else {
+    config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+  }
+  json['yAxis'] = config;
 
   var grids = [];
   for (i = 0; i < this.grids_.length; i++) {
@@ -1746,6 +1805,32 @@ anychart.charts.Radar.prototype.serialize = function() {
           config['yScale'] = goog.array.indexOf(scales, scalesIds[objId]);
         }
       }
+
+      axis = grid.axis();
+      if (axis) {
+        axisId = goog.getUid(axis);
+        axisIndex = goog.array.indexOf(axesIds, axisId);
+        if (axisIndex < 0) { //axis presents but not found in existing axes. Taking scale and layout from it.
+          axisScale = axis.scale();
+          if (!('layout' in config)) {
+            isCircuit = axis instanceof anychart.core.axes.Radial;
+            config['layout'] = isCircuit ? anychart.enums.RadialGridLayout.CIRCUIT : anychart.enums.RadialGridLayout.RADIAL;
+          }
+          if (!('scale' in config)) { //doesn't override the scale already set.
+            objId = goog.getUid(axisScale);
+            if (!scalesIds[objId]) {
+              scalesIds[objId] = axisScale.serialize();
+              scales.push(scalesIds[objId]);
+              config['scale'] = scales.length - 1;
+            } else {
+              config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+            }
+          }
+        } else {
+          config['axis'] = axisIndex;
+        }
+      }
+
       grids.push(config);
     }
   }
@@ -1778,6 +1863,31 @@ anychart.charts.Radar.prototype.serialize = function() {
           config['yScale'] = scales.length - 1;
         } else {
           config['yScale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
+      }
+
+      axis = minorGrid.axis();
+      if (axis) {
+        axisId = goog.getUid(axis);
+        axisIndex = goog.array.indexOf(axesIds, axisId);
+        if (axisIndex < 0) { //axis presents but not found in existing axes. Taking scale and layout from it.
+          axisScale = axis.scale();
+          if (!('layout' in config)) {
+            isCircuit = axis instanceof anychart.core.axes.Radial;
+            config['layout'] = isCircuit ? anychart.enums.RadialGridLayout.CIRCUIT : anychart.enums.RadialGridLayout.RADIAL;
+          }
+          if (!('scale' in config)) { //doesn't override the scale already set.
+            objId = goog.getUid(axisScale);
+            if (!scalesIds[objId]) {
+              scalesIds[objId] = axisScale.serialize();
+              scales.push(scalesIds[objId]);
+              config['scale'] = scales.length - 1;
+            } else {
+              config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+            }
+          }
+        } else {
+          config['axis'] = axisIndex;
         }
       }
       minorGrids.push(config);

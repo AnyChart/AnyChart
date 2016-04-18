@@ -718,6 +718,7 @@ anychart.core.CartesianBase.prototype.grid = function(opt_indexOrValue, opt_valu
   if (!grid) {
     grid = this.createGridInstance();
     grid.setChart(this);
+    grid.setDefaultLayout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultGridSettings());
     this.grids_[index] = grid;
     this.registerDisposable(grid);
@@ -754,6 +755,7 @@ anychart.core.CartesianBase.prototype.minorGrid = function(opt_indexOrValue, opt
   if (!grid) {
     grid = this.createGridInstance();
     grid.setChart(this);
+    grid.setDefaultLayout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     grid.setup(this.defaultMinorGridSettings());
     this.minorGrids_[index] = grid;
     this.registerDisposable(grid);
@@ -877,6 +879,17 @@ anychart.core.CartesianBase.prototype.onAxisSignal_ = function(event) {
 };
 
 
+/**
+ * Gets axis by index. First of all goes through x-axes, then y-axes.
+ * SAMPLE: if we have 4 x-axes and 3 y-axes, chart.getAxisByIndex(4) will return very first y-axis.
+ * @param {number} index - Index to be found.
+ * @return {anychart.core.axes.Linear|undefined}
+ */
+anychart.core.CartesianBase.prototype.getAxisByIndex = function(index) {
+  return (index >= this.xAxes_.length) ? this.yAxes_[index - this.xAxes_.length] : this.xAxes_[index];
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Axes markers.
@@ -911,7 +924,9 @@ anychart.core.CartesianBase.prototype.lineMarker = function(opt_indexOrValue, op
   var lineMarker = this.lineAxesMarkers_[index];
   if (!lineMarker) {
     lineMarker = this.createLineMarkerInstance();
+    lineMarker.setChart(this);
     lineMarker.setup(this.defaultLineMarkerSettings());
+    lineMarker.setDefaultLayout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     this.lineAxesMarkers_[index] = lineMarker;
     this.registerDisposable(lineMarker);
     lineMarker.listenSignals(this.onMarkersSignal, this);
@@ -956,7 +971,9 @@ anychart.core.CartesianBase.prototype.rangeMarker = function(opt_indexOrValue, o
   var rangeMarker = this.rangeAxesMarkers_[index];
   if (!rangeMarker) {
     rangeMarker = this.createRangeMarkerInstance();
+    rangeMarker.setChart(this);
     rangeMarker.setup(this.defaultRangeMarkerSettings());
+    rangeMarker.setDefaultLayout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     this.rangeAxesMarkers_[index] = rangeMarker;
     this.registerDisposable(rangeMarker);
     rangeMarker.listenSignals(this.onMarkersSignal, this);
@@ -1001,7 +1018,9 @@ anychart.core.CartesianBase.prototype.textMarker = function(opt_indexOrValue, op
   var textMarker = this.textAxesMarkers_[index];
   if (!textMarker) {
     textMarker = this.createTextMarkerInstance();
+    textMarker.setChart(this);
     textMarker.setup(this.defaultTextMarkerSettings());
+    textMarker.setDefaultLayout(this.barChartMode ? anychart.enums.Layout.VERTICAL : anychart.enums.Layout.HORIZONTAL);
     this.textAxesMarkers_[index] = textMarker;
     this.registerDisposable(textMarker);
     textMarker.listenSignals(this.onMarkersSignal, this);
@@ -2669,6 +2688,7 @@ anychart.core.CartesianBase.prototype.getContentAreaBounds = function(bounds) {
  */
 anychart.core.CartesianBase.prototype.getBoundsWithoutAxes = function(contentAreaBounds) {
   var i, count;
+  var xAxis, yAxis;
   var axes = goog.array.concat(this.xAxes_, this.yAxes_);
   var attempt = 0;
   var scroller = this.xScroller();
@@ -2688,13 +2708,19 @@ anychart.core.CartesianBase.prototype.getBoundsWithoutAxes = function(contentAre
   }
 
   for (i = 0, count = this.xAxes_.length; i < count; i++) {
-    this.xAxes_[i].suspendSignalsDispatching();
-    this.xAxes_[i].padding(0);
+    xAxis = this.xAxes_[i];
+    if (xAxis) {
+      xAxis.suspendSignalsDispatching();
+      xAxis.padding(0);
+    }
   }
 
   for (i = 0, count = this.yAxes_.length; i < count; i++) {
-    this.yAxes_[i].suspendSignalsDispatching();
-    this.yAxes_[i].padding(0);
+    yAxis = this.yAxes_[i];
+    if (yAxis) {
+      yAxis.suspendSignalsDispatching();
+      yAxis.padding(0);
+    }
   }
 
   var boundsWithoutAxes;
@@ -2818,11 +2844,13 @@ anychart.core.CartesianBase.prototype.getBoundsWithoutAxes = function(contentAre
   } while (!complete && attempt < anychart.core.CartesianBase.MAX_ATTEMPTS_AXES_CALCULATION);
 
   for (i = 0, count = this.xAxes_.length; i < count; i++) {
-    this.xAxes_[i].resumeSignalsDispatching(false);
+    xAxis = this.xAxes_[i];
+    if (xAxis) xAxis.resumeSignalsDispatching(false);
   }
 
   for (i = 0, count = this.yAxes_.length; i < count; i++) {
-    this.yAxes_[i].resumeSignalsDispatching(false);
+    yAxis = this.yAxes_[i];
+    if (yAxis) yAxis.resumeSignalsDispatching(false);
   }
 
   return boundsWithoutAxes.clone().round();
@@ -2875,18 +2903,22 @@ anychart.core.CartesianBase.prototype.drawContent = function(bounds) {
     var item;
     for (i = 0, count = this.xAxes_.length; i < count; i++) {
       item = this.xAxes_[i];
-      item.labels().dropCallsCache();
-      item.minorLabels().dropCallsCache();
-      if (item && !item.scale())
-        item.scale(/** @type {anychart.scales.Base} */(this.xScale()));
+      if (item) {
+        item.labels().dropCallsCache();
+        item.minorLabels().dropCallsCache();
+        if (item && !item.scale())
+          item.scale(/** @type {anychart.scales.Base} */(this.xScale()));
+      }
     }
 
     for (i = 0, count = this.yAxes_.length; i < count; i++) {
       item = this.yAxes_[i];
-      item.labels().dropCallsCache();
-      item.minorLabels().dropCallsCache();
-      if (item && !item.scale())
-        item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
+      if (item) {
+        item.labels().dropCallsCache();
+        item.minorLabels().dropCallsCache();
+        if (item && !item.scale())
+          item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
+      }
     }
   }
 
@@ -3404,22 +3436,6 @@ anychart.core.CartesianBase.prototype.setupByJSON = function(config) {
   if (scale)
     this.yScale(scale);
 
-  if (goog.isArray(grids)) {
-    for (i = 0; i < grids.length; i++) {
-      json = grids[i];
-      this.grid(i, json);
-      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.grid(i).scale(scalesInstances[json['scale']]);
-    }
-  }
-
-  if (goog.isArray(minorGrids)) {
-    for (i = 0; i < minorGrids.length; i++) {
-      json = minorGrids[i];
-      this.minorGrid(i, json);
-      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.minorGrid(i).scale(scalesInstances[json['scale']]);
-    }
-  }
-
   if (goog.isArray(xAxes)) {
     for (i = 0; i < xAxes.length; i++) {
       json = xAxes[i];
@@ -3433,6 +3449,22 @@ anychart.core.CartesianBase.prototype.setupByJSON = function(config) {
       json = yAxes[i];
       this.yAxis(i, json);
       if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.yAxis(i).scale(scalesInstances[json['scale']]);
+    }
+  }
+
+  if (goog.isArray(grids)) {
+    for (i = 0; i < grids.length; i++) {
+      json = grids[i];
+      this.grid(i, json);
+      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.grid(i).scale(scalesInstances[json['scale']]);
+    }
+  }
+
+  if (goog.isArray(minorGrids)) {
+    for (i = 0; i < minorGrids.length; i++) {
+      json = minorGrids[i];
+      this.minorGrid(i, json);
+      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1) this.minorGrid(i).scale(scalesInstances[json['scale']]);
     }
   }
 
@@ -3500,9 +3532,16 @@ anychart.core.CartesianBase.prototype.serialize = function() {
   var i;
   var scalesIds = {};
   var scales = [];
+  var axesIds = [];
   var scale;
   var config;
   var objId;
+  var axisId;
+  var axis;
+  var axisIndex;
+  var axisScale;
+  var axisOrientation;
+  var isHorizontal;
 
   scalesIds[goog.getUid(this.xScale())] = this.xScale().serialize();
   scales.push(scalesIds[goog.getUid(this.xScale())]);
@@ -3527,6 +3566,50 @@ anychart.core.CartesianBase.prototype.serialize = function() {
   json['xScroller'] = this.xScroller().serialize();
   json['xZoom'] = this.xZoom().serialize();
 
+  var xAxes = [];
+  for (i = 0; i < this.xAxes_.length; i++) {
+    var xAxis = this.xAxes_[i];
+    config = xAxis.serialize();
+    scale = xAxis.scale();
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['scale'] = scales.length - 1;
+      } else {
+        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
+    }
+    axesIds.push(goog.getUid(xAxis));
+
+    xAxes.push(config);
+  }
+  if (xAxes.length)
+    json['xAxes'] = xAxes;
+
+  var yAxes = [];
+  for (i = 0; i < this.yAxes_.length; i++) {
+    var yAxis = this.yAxes_[i];
+    config = yAxis.serialize();
+    scale = yAxis.scale();
+    if (scale) {
+      objId = goog.getUid(scale);
+      if (!scalesIds[objId]) {
+        scalesIds[objId] = scale.serialize();
+        scales.push(scalesIds[objId]);
+        config['scale'] = scales.length - 1;
+      } else {
+        config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+      }
+    }
+    axesIds.push(goog.getUid(yAxis));
+
+    yAxes.push(config);
+  }
+  if (yAxes.length)
+    json['yAxes'] = yAxes;
+
   var grids = [];
   for (i = 0; i < this.grids_.length; i++) {
     var grid = this.grids_[i];
@@ -3541,6 +3624,32 @@ anychart.core.CartesianBase.prototype.serialize = function() {
           config['scale'] = scales.length - 1;
         } else {
           config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
+      }
+
+      axis = grid.axis();
+      if (axis) {
+        axisId = goog.getUid(axis);
+        axisIndex = goog.array.indexOf(axesIds, axisId);
+        if (axisIndex < 0) { //axis presents but not found in existing axes. Taking scale and layout from it.
+          axisScale = axis.scale();
+          if (!('layout' in config)) {
+            axisOrientation = axis.orientation();
+            isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
+            config['layout'] = isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;
+          }
+          if (!('scale' in config)) { //doesn't override the scale already set.
+            objId = goog.getUid(axisScale);
+            if (!scalesIds[objId]) {
+              scalesIds[objId] = axisScale.serialize();
+              scales.push(scalesIds[objId]);
+              config['scale'] = scales.length - 1;
+            } else {
+              config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+            }
+          }
+        } else {
+          config['axis'] = axisIndex;
         }
       }
       grids.push(config);
@@ -3565,55 +3674,36 @@ anychart.core.CartesianBase.prototype.serialize = function() {
           config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
         }
       }
+      axis = minorGrid.axis();
+      if (axis) {
+        axisId = goog.getUid(axis);
+        axisIndex = goog.array.indexOf(axesIds, axisId);
+        if (axisIndex < 0) { //axis presents but not found in existing axes. Taking scale and layout from it.
+          axisScale = axis.scale();
+          if (!('layout' in config)) {
+            axisOrientation = axis.orientation();
+            isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
+            config['layout'] = isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;
+          }
+          if (!('scale' in config)) { //doesn't override the scale already set.
+            objId = goog.getUid(axisScale);
+            if (!scalesIds[objId]) {
+              scalesIds[objId] = axisScale.serialize();
+              scales.push(scalesIds[objId]);
+              config['scale'] = scales.length - 1;
+            } else {
+              config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+            }
+          }
+        } else {
+          config['axis'] = axisIndex;
+        }
+      }
       minorGrids.push(config);
     }
   }
   if (minorGrids.length)
     json['minorGrids'] = minorGrids;
-
-  var xAxes = [];
-  for (i = 0; i < this.xAxes_.length; i++) {
-    var xAxis = this.xAxes_[i];
-    if (xAxis) {
-      config = xAxis.serialize();
-      scale = xAxis.scale();
-      if (scale) {
-        objId = goog.getUid(scale);
-        if (!scalesIds[objId]) {
-          scalesIds[objId] = scale.serialize();
-          scales.push(scalesIds[objId]);
-          config['scale'] = scales.length - 1;
-        } else {
-          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
-        }
-      }
-      xAxes.push(config);
-    }
-  }
-  if (xAxes.length)
-    json['xAxes'] = xAxes;
-
-  var yAxes = [];
-  for (i = 0; i < this.yAxes_.length; i++) {
-    var yAxis = this.yAxes_[i];
-    if (yAxis) {
-      config = yAxis.serialize();
-      scale = yAxis.scale();
-      if (scale) {
-        objId = goog.getUid(scale);
-        if (!scalesIds[objId]) {
-          scalesIds[objId] = scale.serialize();
-          scales.push(scalesIds[objId]);
-          config['scale'] = scales.length - 1;
-        } else {
-          config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
-        }
-      }
-      yAxes.push(config);
-    }
-  }
-  if (yAxes.length)
-    json['yAxes'] = yAxes;
 
   var lineAxesMarkers = [];
   for (i = 0; i < this.lineAxesMarkers_.length; i++) {
@@ -3629,6 +3719,31 @@ anychart.core.CartesianBase.prototype.serialize = function() {
           config['scale'] = scales.length - 1;
         } else {
           config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
+      }
+      axis = lineAxesMarker.axis();
+      if (axis) {
+        axisId = goog.getUid(axis);
+        axisIndex = goog.array.indexOf(axesIds, axisId);
+        if (axisIndex < 0) { //axis presents but not found in existing axes. Taking scale and layout from it.
+          axisScale = axis.scale();
+          if (!('layout' in config)) {
+            axisOrientation = axis.orientation();
+            isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
+            config['layout'] = isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;
+          }
+          if (!('scale' in config)) { //doesn't override the scale already set.
+            objId = goog.getUid(axisScale);
+            if (!scalesIds[objId]) {
+              scalesIds[objId] = axisScale.serialize();
+              scales.push(scalesIds[objId]);
+              config['scale'] = scales.length - 1;
+            } else {
+              config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+            }
+          }
+        } else {
+          config['axis'] = axisIndex;
         }
       }
       lineAxesMarkers.push(config);
@@ -3653,6 +3768,31 @@ anychart.core.CartesianBase.prototype.serialize = function() {
           config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
         }
       }
+      axis = rangeAxesMarker.axis();
+      if (axis) {
+        axisId = goog.getUid(axis);
+        axisIndex = goog.array.indexOf(axesIds, axisId);
+        if (axisIndex < 0) { //axis presents but not found in existing axes. Taking scale and layout from it.
+          axisScale = axis.scale();
+          if (!('layout' in config)) {
+            axisOrientation = axis.orientation();
+            isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
+            config['layout'] = isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;
+          }
+          if (!('scale' in config)) { //doesn't override the scale already set.
+            objId = goog.getUid(axisScale);
+            if (!scalesIds[objId]) {
+              scalesIds[objId] = axisScale.serialize();
+              scales.push(scalesIds[objId]);
+              config['scale'] = scales.length - 1;
+            } else {
+              config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+            }
+          }
+        } else {
+          config['axis'] = axisIndex;
+        }
+      }
       rangeAxesMarkers.push(config);
     }
   }
@@ -3673,6 +3813,31 @@ anychart.core.CartesianBase.prototype.serialize = function() {
           config['scale'] = scales.length - 1;
         } else {
           config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+        }
+      }
+      axis = textAxesMarker.axis();
+      if (axis) {
+        axisId = goog.getUid(axis);
+        axisIndex = goog.array.indexOf(axesIds, axisId);
+        if (axisIndex < 0) { //axis presents but not found in existing axes. Taking scale and layout from it.
+          axisScale = axis.scale();
+          if (!('layout' in config)) {
+            axisOrientation = axis.orientation();
+            isHorizontal = (axisOrientation == anychart.enums.Orientation.LEFT || axisOrientation == anychart.enums.Orientation.RIGHT);
+            config['layout'] = isHorizontal ? anychart.enums.Layout.HORIZONTAL : anychart.enums.Layout.VERTICAL;
+          }
+          if (!('scale' in config)) { //doesn't override the scale already set.
+            objId = goog.getUid(axisScale);
+            if (!scalesIds[objId]) {
+              scalesIds[objId] = axisScale.serialize();
+              scales.push(scalesIds[objId]);
+              config['scale'] = scales.length - 1;
+            } else {
+              config['scale'] = goog.array.indexOf(scales, scalesIds[objId]);
+            }
+          }
+        } else {
+          config['axis'] = axisIndex;
         }
       }
       textAxesMarkers.push(config);
