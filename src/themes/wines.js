@@ -1,6 +1,18 @@
 goog.provide('anychart.themes.wines');
 
 
+var stockScrollerUnselected = '#999';
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+var returnSourceColor = function() {
+  return this['sourceColor'];
+};
+
+
 /**
  * @this {*}
  * @return {*}
@@ -77,10 +89,14 @@ window['anychart']['themes']['wines'] = {
       'hoverStroke': '#e9e4e4'
     }
   },
-  'chart': {
-    'padding': {'top': 20, 'right': 25, 'bottom': 10, 'left': 15}
+  'defaultGridSettings': {
+    'stroke': '#9e9e9e 0.4'
   },
-  'cartesianBase': {
+  'defaultMinorGridSettings': {
+    'stroke': '#bdbdbd 0.4'
+  },
+  'chart': {
+    'padding': {'top': 20, 'right': 25, 'bottom': 10, 'left': 15},
     'defaultSeriesSettings': {
       'candlestick': {
         'risingFill': '#6f3448',
@@ -111,7 +127,7 @@ window['anychart']['themes']['wines'] = {
     'linearColor': {'colors': ['#f1a122', '#a50b01']},
     'defaultSeriesSettings': {
       'base': {
-        'stroke': '#eceff1',
+        'stroke': returnDarkenSourceColor,
         'labels': {
           'fontColor': '#212121'
         }
@@ -176,13 +192,18 @@ window['anychart']['themes']['wines'] = {
       'background': {
         'enabled': true,
         'fill': '#e3e3e3',
-        'stroke': '#bdbdbd'
+        'stroke': '#bdbdbd',
+        'cornerType': 'square',
+        'corners': 0
       }
     },
     'hoverHeaders': {
       'fontColor': '#3e2723',
       'background': {
-        'fill': '#bdbdbd'
+        'fill': '#bdbdbd',
+        'stroke': '#bdbdbd',
+        'cornerType': 'square',
+        'corners': 0
       }
     },
     'labels': {
@@ -193,5 +214,50 @@ window['anychart']['themes']['wines'] = {
     },
     'stroke': '#bdbdbd',
     'selectStroke': '2 #eceff1'
+  },
+  'stock': {
+    'padding': [20, 30, 20, 60],
+    'defaultPlotSettings': {
+      'xAxis': {
+        'background': {
+          'fill': '#e3e3e3 0.5',
+          'stroke': '#bdbdbd',
+          'cornerType': 'square',
+          'corners': 0
+        }
+      }
+    },
+    'scroller': {
+      'fill': 'none',
+      'selectedFill': '#e3e3e3 0.5',
+      'outlineStroke': '#bdbdbd',
+      'defaultSeriesSettings': {
+        'base': {
+          'color': '#6f3448 0.6',
+          'selectStroke': returnSourceColor
+        },
+        'candlestick': {
+          'risingFill': stockScrollerUnselected,
+          'risingStroke': stockScrollerUnselected,
+          'fallingFill': stockScrollerUnselected,
+          'fallingStroke': stockScrollerUnselected,
+          'selectRisingStroke': returnSourceColor,
+          'selectFallingStroke': returnSourceColor,
+          'selectRisingFill': returnSourceColor,
+          'selectFallingFill': returnSourceColor
+        },
+        'ohlc': {
+          'risingStroke': stockScrollerUnselected,
+          'fallingStroke': stockScrollerUnselected,
+          'selectRisingStroke': returnSourceColor,
+          'selectFallingStroke': returnSourceColor
+        }
+      }
+    },
+    'xAxis': {
+      'background': {
+        'enabled': false
+      }
+    }
   }
 };

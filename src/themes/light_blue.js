@@ -1,6 +1,18 @@
 goog.provide('anychart.themes.light_blue');
 
 
+var stockScrollerUnselected = '#999';
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+var returnSourceColor = function() {
+  return this['sourceColor'];
+};
+
+
 /**
  * @this {*}
  * @return {*}
@@ -24,11 +36,11 @@ window['anychart']['themes'] = window['anychart']['themes'] || {};
 window['anychart']['themes']['lightBlue'] = {
   'palette': {
     'type': 'distinct',
-    'items': ['#90caf9', '#42a5f5', '#1976d2', '#9fa8da', '#5c6bc0', '#7e57c2', '#54dbdf', '#15a9c7', '#00897b', '#304ffe']
+    'items': ['#40c4ff', '#0288d1', '#01579b', '#9fa8da', '#5c6bc0', '#7e57c2', '#54dbdf', '#15a9c7', '#00897b', '#304ffe']
   },
   'ordinalColor': {
     'autoColors': function(rangesCount) {
-      return window['anychart']['color']['blendedHueProgression']('#e3f2fd', '#1976d2', rangesCount);
+      return window['anychart']['color']['blendedHueProgression']('#40c4ff', '#01579b', rangesCount);
     }
   },
   'defaultFontSettings': {
@@ -105,36 +117,34 @@ window['anychart']['themes']['lightBlue'] = {
     }
   },
   'chart': {
-    'title': {
-      'fontSize': 14
-    },
-    'padding': {'top': 20, 'right': 25, 'bottom': 15, 'left': 15}
-  },
-  'cartesianBase': {
     'defaultSeriesSettings': {
       'candlestick': {
-        'risingFill': '#42a5f5',
-        'risingStroke': '#42a5f5',
+        'risingFill': '#01579b',
+        'risingStroke': '#01579b',
         'hoverRisingFill': returnLightenSourceColor,
         'hoverRisingStroke': returnDarkenSourceColor,
-        'fallingFill': '#bbdefb',
-        'fallingStroke': '#bbdefb',
+        'fallingFill': '#40c4ff',
+        'fallingStroke': '#40c4ff',
         'hoverFallingFill': returnLightenSourceColor,
         'hoverFallingStroke': returnLightenSourceColor,
-        'selectRisingStroke': '3 #42a5f5',
-        'selectFallingStroke': '3 #bbdefb',
+        'selectRisingStroke': '3 #01579b',
+        'selectFallingStroke': '3 #40c4ff',
         'selectRisingFill': '#333333 0.85',
         'selectFallingFill': '#333333 0.85'
       },
       'ohlc': {
-        'risingStroke': '#42a5f5',
+        'risingStroke': '#01579b',
         'hoverRisingStroke': returnLightenSourceColor,
-        'fallingStroke': '#bbdefb',
+        'fallingStroke': '#40c4ff',
         'hoverFallingStroke': returnLightenSourceColor,
-        'selectRisingStroke': '3 #42a5f5',
-        'selectFallingStroke': '3 #bbdefb'
+        'selectRisingStroke': '3 #01579b',
+        'selectFallingStroke': '3 #40c4ff'
       }
-    }
+    },
+    'title': {
+      'fontSize': 14
+    },
+    'padding': {'top': 20, 'right': 25, 'bottom': 15, 'left': 15}
   },
   'pieFunnelPyramidBase': {
     'labels': {
@@ -146,7 +156,7 @@ window['anychart']['themes']['lightBlue'] = {
   },
   'map': {
     'unboundRegions': {'enabled': true, 'fill': '#cfd8dc', 'stroke': '#b0bec5'},
-    'linearColor': {'colors': ['#e3f2fd', '#1976d2']},
+    'linearColor': {'colors': ['#40c4ff', '#01579b']},
     'defaultSeriesSettings': {
       'base': {
         'labels': {
@@ -172,27 +182,27 @@ window['anychart']['themes']['lightBlue'] = {
     'background': {'stroke': '#eceff1'},
     'defaultSeriesSettings': {
       'area': {
-        'stroke': '1.5 #42a5f5',
-        'fill': '#42a5f5 0.5'
+        'stroke': '1.5 #40c4ff',
+        'fill': '#40c4ff 0.5'
       },
       'column': {
-        'fill': '#42a5f5',
-        'negativeFill': '#bbdefb'
+        'fill': '#40c4ff',
+        'negativeFill': '#01579b'
       },
       'line': {
-        'stroke': '1.5 #42a5f5'
+        'stroke': '1.5 #40c4ff'
       },
       'winLoss': {
-        'fill': '#42a5f5',
-        'negativeFill': '#bbdefb'
+        'fill': '#40c4ff',
+        'negativeFill': '#01579b'
       }
     }
   },
   'bullet': {
     'background': {'stroke': '#eceff1'},
     'defaultMarkerSettings': {
-      'fill': '#90caf9',
-      'stroke': '2 #90caf9'
+      'fill': '#40c4ff',
+      'stroke': '2 #40c4ff'
     },
     'padding': {'top': 5, 'right': 10, 'bottom': 5, 'left': 10},
     'margin': {'top': 0, 'right': 0, 'bottom': 0, 'left': 0},
@@ -219,7 +229,8 @@ window['anychart']['themes']['lightBlue'] = {
     'hoverHeaders': {
       'fontColor': '#546e7a',
       'background': {
-        'fill': '#b0bec5'
+        'fill': '#b0bec5',
+        'stroke': '#b0bec5'
       }
     },
     'labels': {
@@ -230,5 +241,48 @@ window['anychart']['themes']['lightBlue'] = {
     },
     'stroke': '#b0bec5',
     'selectStroke': '2 #eceff1'
+  },
+  'stock': {
+    'padding': [20, 30, 20, 60],
+    'defaultPlotSettings': {
+      'xAxis': {
+        'background': {
+          'fill': '#cfd8dc 0.5',
+          'stroke': '#b0bec5'
+        }
+      }
+    },
+    'scroller': {
+      'fill': 'none',
+      'selectedFill': '#cfd8dc 0.5',
+      'outlineStroke': '#b0bec5',
+      'defaultSeriesSettings': {
+        'base': {
+          'color': '#40c4ff 0.5',
+          'selectStroke': returnSourceColor
+        },
+        'candlestick': {
+          'risingFill': stockScrollerUnselected,
+          'risingStroke': stockScrollerUnselected,
+          'fallingFill': stockScrollerUnselected,
+          'fallingStroke': stockScrollerUnselected,
+          'selectRisingStroke': returnSourceColor,
+          'selectFallingStroke': returnSourceColor,
+          'selectRisingFill': returnSourceColor,
+          'selectFallingFill': returnSourceColor
+        },
+        'ohlc': {
+          'risingStroke': stockScrollerUnselected,
+          'fallingStroke': stockScrollerUnselected,
+          'selectRisingStroke': returnSourceColor,
+          'selectFallingStroke': returnSourceColor
+        }
+      }
+    },
+    'xAxis': {
+      'background': {
+        'enabled': false
+      }
+    }
   }
 };

@@ -700,6 +700,7 @@ anychart.themes.merging.mergingMap_ = [
       'cartesianBase.xScroller',
       'heatMap.xScroller',
       'heatMap.yScroller',
+      'stock.scroller',
       'standalones.scroller'
     ]
   },

@@ -1,6 +1,18 @@
 goog.provide('anychart.themes.light_provence');
 
 
+var stockScrollerUnselected = '#999 0.6';
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+var returnSourceColor = function() {
+  return this['sourceColor'];
+};
+
+
 /**
  * @this {*}
  * @return {*}
@@ -28,7 +40,7 @@ window['anychart']['themes']['lightProvence'] = {
   },
   'ordinalColor': {
     'autoColors': function(rangesCount) {
-      return window['anychart']['color']['blendedHueProgression']('#e1bee7', '#9656a1', rangesCount);
+      return window['anychart']['color']['blendedHueProgression']('#b7cbe2', '#574774', rangesCount);
     }
   },
   'defaultFontSettings': {
@@ -114,12 +126,6 @@ window['anychart']['themes']['lightProvence'] = {
     'fontSize': 13
   },
   'chart': {
-    'title': {
-      'fontSize': 17
-    },
-    'padding': {'top': 20, 'right': 25, 'bottom': 15, 'left': 15}
-  },
-  'cartesianBase': {
     'defaultSeriesSettings': {
       'candlestick': {
         'risingFill': '#aa8ab3',
@@ -143,7 +149,11 @@ window['anychart']['themes']['lightProvence'] = {
         'selectRisingStroke': '3 #aa8ab3',
         'selectFallingStroke': '3 #b7cbe2'
       }
-    }
+    },
+    'title': {
+      'fontSize': 17
+    },
+    'padding': {'top': 20, 'right': 25, 'bottom': 15, 'left': 15}
   },
   'pieFunnelPyramidBase': {
     'labels': {
@@ -155,7 +165,7 @@ window['anychart']['themes']['lightProvence'] = {
   },
   'map': {
     'unboundRegions': {'enabled': true, 'fill': '#f2ebf3', 'stroke': '#e2dce3'},
-    'linearColor': {'colors': ['#e1bee7', '#aa8ab3', '#9656a1']},
+    'linearColor': {'colors': ['#b7cbe2', '#574774']},
     'defaultSeriesSettings': {
       'base': {
         'stroke': '#b2aab5',
@@ -229,7 +239,8 @@ window['anychart']['themes']['lightProvence'] = {
     'hoverHeaders': {
       'fontColor': '#997f89',
       'background': {
-        'fill': '#e2dce3'
+        'fill': '#e2dce3',
+        'stroke': '#e2dce3'
       }
     },
     'labels': {
@@ -240,5 +251,37 @@ window['anychart']['themes']['lightProvence'] = {
     },
     'stroke': '#e2dce3',
     'selectStroke': '2 #eceff1'
+  },
+  'stock': {
+    'padding': [20, 30, 20, 60],
+    'defaultPlotSettings': {
+      'xAxis': {
+        'background': {
+          'fill': '#f2ebf3 0.3',
+          'stroke': '#dacfd3'
+        }
+      }
+    },
+    'scroller': {
+      'fill': 'none',
+      'selectedFill': '#f2ebf3 0.3',
+      'outlineStroke': '#dacfd3',
+      'defaultSeriesSettings': {
+        'base': {
+          'color': '#aa8ab3',
+          'selectStroke': returnSourceColor
+        },
+        'candlestick': {
+          'risingStroke': stockScrollerUnselected,
+          'fallingFill': stockScrollerUnselected,
+          'risingFill': stockScrollerUnselected,
+          'fallingStroke': stockScrollerUnselected
+        },
+        'ohlc': {
+          'risingStroke': stockScrollerUnselected,
+          'fallingStroke': stockScrollerUnselected
+        }
+      }
+    }
   }
 };

@@ -1,6 +1,18 @@
 goog.provide('anychart.themes.light_glamour');
 
 
+var stockScrollerUnselected = '#999 0.6';
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+var returnSourceColor = function() {
+  return this['sourceColor'];
+};
+
+
 /**
  * @this {*}
  * @return {*}
@@ -28,7 +40,7 @@ window['anychart']['themes']['lightGlamour'] = {
   },
   'ordinalColor': {
     'autoColors': function(rangesCount) {
-      return window['anychart']['color']['blendedHueProgression']('#f8bbd0', '#ab47bc', rangesCount);
+      return window['anychart']['color']['blendedHueProgression']('#f8bbd0', '#d81b60', rangesCount);
     }
   },
   'defaultFontSettings': {
@@ -107,12 +119,6 @@ window['anychart']['themes']['lightGlamour'] = {
     'fontSize': 13
   },
   'chart': {
-    'title': {
-      'fontSize': 17
-    },
-    'padding': {'top': 20, 'right': 25, 'bottom': 15, 'left': 15}
-  },
-  'cartesianBase': {
     'defaultSeriesSettings': {
       'candlestick': {
         'risingFill': '#f8bbd0',
@@ -136,7 +142,11 @@ window['anychart']['themes']['lightGlamour'] = {
         'selectRisingStroke': '3 #f8bbd0',
         'selectFallingStroke': '3 #880e4f'
       }
-    }
+    },
+    'title': {
+      'fontSize': 17
+    },
+    'padding': {'top': 20, 'right': 25, 'bottom': 15, 'left': 15}
   },
   'pieFunnelPyramidBase': {
     'labels': {
@@ -148,10 +158,10 @@ window['anychart']['themes']['lightGlamour'] = {
   },
   'map': {
     'unboundRegions': {'enabled': true, 'fill': '#f4efef', 'stroke': '#ece1e3'},
-    'linearColor': {'colors': ['#f8bbd0', '#d81b60', '#ab47bc']},
+    'linearColor': {'colors': ['#f8bbd0', '#d81b60']},
     'defaultSeriesSettings': {
       'base': {
-        'stroke': '#fafafa',
+        'stroke': returnDarkenSourceColor,
         'labels': {
           'fontColor': '#212121'
         }
@@ -220,7 +230,8 @@ window['anychart']['themes']['lightGlamour'] = {
     'hoverHeaders': {
       'fontColor': '#5d1b3e',
       'background': {
-        'fill': '#ece1e3'
+        'fill': '#ece1e3',
+        'stroke': '#ece1e3'
       }
     },
     'labels': {
@@ -231,5 +242,44 @@ window['anychart']['themes']['lightGlamour'] = {
     },
     'stroke': '#ece1e3',
     'selectStroke': '2 #eceff1'
+  },
+  'stock': {
+    'padding': [20, 30, 20, 60],
+    'defaultPlotSettings': {
+      'xAxis': {
+        'background': {
+          'fill': '#d7cacc 0.3',
+          'stroke': '#d7cacc'
+        }
+      }
+    },
+    'scroller': {
+      'fill': 'none',
+      'selectedFill': '#d7cacc 0.3',
+      'outlineStroke': '#d7cacc',
+      'defaultSeriesSettings': {
+        'base': {
+          'color': '#f8bbd0 0.6',
+          'selectFill': returnSourceColor,
+          'selectStroke': returnSourceColor
+        },
+        'candlestick': {
+          'risingFill': stockScrollerUnselected,
+          'risingStroke': stockScrollerUnselected,
+          'fallingFill': stockScrollerUnselected,
+          'fallingStroke': stockScrollerUnselected,
+          'selectRisingStroke': returnSourceColor,
+          'selectFallingStroke': returnSourceColor,
+          'selectRisingFill': returnSourceColor,
+          'selectFallingFill': returnSourceColor
+        },
+        'ohlc': {
+          'risingStroke': stockScrollerUnselected,
+          'fallingStroke': stockScrollerUnselected,
+          'selectRisingStroke': returnSourceColor,
+          'selectFallingStroke': returnSourceColor
+        }
+      }
+    }
   }
 };

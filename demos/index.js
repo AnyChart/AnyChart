@@ -49,10 +49,10 @@ anychart.onDocumentReady(function() {
 //   thirdSeries.stroke({color: '#64b5f6', thickness: 3, dash: '10 5'});
 
 // create scroller series with mapped data
-  chart.scroller().height(200).column(mapping).color('red');
+  chart.scroller().height(200).stepArea(mapping);
 
 // set chart selected date/time range
-  chart.selectRange('2005-01-03', '2005-05-20');
+  // chart.selectRange('2005-01-03', '2005-05-20');
 
 // set container id for the chart
   chart.container('container');

@@ -9,6 +9,7 @@
         goog.require('anychart.themes.defaultTheme');
         goog.require('anychart.modules.anychart');
         goog.require('anychart.modules.anymap');
+        goog.require('anychart.modules.anystock');
         goog.require('anychart.modules.treeMap');
 
         goog.require('anychart.themes.coffee');
@@ -27,12 +28,17 @@
         goog.require('anychart.themes.pastel');
         goog.require('anychart.themes.sea');
         goog.require('anychart.themes.wines');
+        goog.require('anychart.themes.v6');
 
         // write your themes require here
     </script>
     <script src="http://code.jquery.com/jquery-1.12.1.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.3/proj4.js"></script>
     <script src="http://cdn.anychart.com/geodata/1.1.0/countries/austria/austria.js"></script>
+    <script src="//cdn.anychart.com/csv-data/ixic-daily-short.js"></script>
+    <script src="./data.js"></script>
+    <script src="./chart.js"></script>
+    <script src="./stock.js"></script>
     <script src="./index.js"></script>
     <style>
         .container-chart {
@@ -40,6 +46,13 @@
             width: 46%;
             height: 350px;
             padding: 0 1% 30px;
+        }
+        .container-stock {
+            float: left;
+            width: 46%;
+            height: 700px;
+            padding: 0 1% 0px;
+            display: none;
         }
         .themes-demo{
             width: 90%;
@@ -115,6 +128,8 @@
             <option value="sparklines">Sparklines</option>
             <option value="bullet-financial">Bullets & Financial Charts</option>
             <option value="tree-map-heat-map">Tree maps & Heat Maps</option>
+            <option value="stock-line-column">Stock Lines & Columns</option>
+            <option value="stock-ohlc-area">Stock OHLS & Area</option>
         </select>
     </div>
     <div style="clear: both"></div>
@@ -124,6 +139,8 @@
     <div class="container-chart" id="container-chart-2"></div>
     <div class="container-chart" id="container-chart-3"></div>
     <div class="container-chart" id="container-chart-4"></div>
+    <div class="container-stock" id="container-stock-1"></div>
+    <div class="container-stock" id="container-stock-2"></div>
 </div>
 </body>
 </html>
