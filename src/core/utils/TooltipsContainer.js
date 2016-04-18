@@ -2,6 +2,8 @@ goog.provide('anychart.core.utils.TooltipsContainer');
 goog.require('acgraph');
 goog.require('goog.Disposable');
 goog.require('goog.dom');
+goog.require('goog.dom.BufferedViewportSizeMonitor');
+goog.require('goog.dom.ViewportSizeMonitor');
 goog.require('goog.userAgent');
 
 
@@ -45,11 +47,21 @@ anychart.core.utils.TooltipsContainer = function() {
     height = viewportSize.availHeight;
   }
 
+  // IE 6-8
   if (goog.userAgent.IE && !goog.userAgent.isVersionOrHigher('9')) {
     // hack like `pointer-events: none`
     this.stage_ = acgraph.create(this.root_, 1, 1);
+
   } else {
     this.stage_ = acgraph.create(this.root_, width, height);
+
+    this.vsm_ = new goog.dom.ViewportSizeMonitor();
+    this.registerDisposable(this.vsm_);
+
+    this.bufferedVsm_ = new goog.dom.BufferedViewportSizeMonitor(this.vsm_);
+    this.registerDisposable(this.bufferedVsm_);
+
+    goog.events.listen(this.bufferedVsm_, goog.events.EventType.RESIZE, this.updateStageSize_, false, this);
   }
 
   this.stage_.domElement()['style']['cssText'] = 'position:fixed; left:0; top:0; opacity:1; pointer-events: none';
@@ -75,6 +87,17 @@ anychart.core.utils.TooltipsContainer.prototype.root_ = null;
  * @private
  */
 anychart.core.utils.TooltipsContainer.prototype.stage_ = null;
+
+
+/**
+ * @private
+ */
+anychart.core.utils.TooltipsContainer.prototype.updateStageSize_ = function() {
+  var newSize = this.bufferedVsm_.getSize();
+
+  this.stage_.width(newSize.width);
+  this.stage_.height(newSize.height);
+};
 
 
 /**
@@ -132,6 +155,9 @@ anychart.core.utils.TooltipsContainer.prototype.selectable = function(opt_value)
 anychart.core.utils.TooltipsContainer.prototype.disposeInternal = function() {
   //todo this method is never called
 
+  if (goog.isDef(this.bufferedVsm_)) {
+    goog.events.unlisten(this.bufferedVsm_, goog.events.EventType.RESIZE, this.updateStageSize_, false, this);
+  }
   this.stage_.dispose();
   this.stage_ = null;
   goog.dom.removeNode(this.root_);
