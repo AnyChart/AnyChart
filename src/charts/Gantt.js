@@ -1039,7 +1039,7 @@ anychart.charts.Gantt.prototype.setupByJSON = function(config) {
  */
 anychart.charts.Gantt.prototype.makeObject = function(node, rawData, headers, headersLength, parentId, originalParent) {
   var data = goog.object.clone(node['treeDataItemData']);
-  if (!data['id']) {
+  if (!goog.isDef(data['id'])) {
     this.missedIds_++;
     this.idStatus_ = -1;
   }
