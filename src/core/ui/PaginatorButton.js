@@ -70,53 +70,5 @@ anychart.core.ui.PaginatorButton.prototype.drawBackground = function(fill, strok
 
 /** @inheritDoc */
 anychart.core.ui.PaginatorButton.prototype.initStateSettings = function() {
-  this.stateSettings_ = {
-    'normal': {
-      'stroke': '1 #666 1',
-      'fill': {
-        'keys': ['0 #ffffff', '0.5 #e7e7e7', '1 #d0d0d0'],
-        'angle': '-90'
-      },
-      'text': {
-        'fontColor': '#000'
-      }
-    },
-    'hover': {
-      'stroke': '1 #aaa 1',
-      'fill': {
-        'keys': ['0 #ffffff', '0.5 #e7e7e7', '1 #d0d0d0'],
-        'angle': '-90'
-      },
-      'text': {
-        'fontColor': '#000'
-      }
-    },
-    'pushed': {
-      'stroke': '1 #888 1',
-      'fill': {
-        'keys': ['0 #ffffff', '0.5 #e7e7e7', '1 #d0d0d0'],
-        'angle': '90'
-      },
-      'text': {
-        'fontColor': '#333'
-      }
-    },
-    'checked': {
-      'stroke': '1 #666 1',
-      'fill': {
-        'keys': ['0 #ffffff', '0.5 #e7e7e7', '1 #d0d0d0'],
-        'angle': '90'
-      },
-      'text': {
-        'fontColor': '#000'
-      }
-    },
-    'disabled': {
-      'stroke': '1 #666 1',
-      'fill': '#aaa',
-      'text': {
-        'fontColor': '#777'
-      }
-    }
-  };
+  this.stateSettings_ = anychart.getFullTheme()['defaultLegend']['paginator']['buttonsSettings'];
 };

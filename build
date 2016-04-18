@@ -12,6 +12,7 @@ import re
 import argparse
 import shlex
 import gzip
+import shutil
 
 #=======================================================================================================================
 #           Project paths
@@ -74,6 +75,7 @@ def __sync_contrib():
         print 'Download closure compiler'
         __download_and_unzip_from_http(
             'http://dl.google.com/closure-compiler/compiler-20151015.zip',
+            CONTRIB_PATH,
             'compiler'
         )
 
@@ -85,8 +87,8 @@ def __sync_contrib():
     print 'All contributions installed'
 
 
-def __download_and_unzip_from_http(from_url, dri_name):
-    z_obj_path = os.path.join(CONTRIB_PATH, dri_name + '.zip')
+def __download_and_unzip_from_http(from_url, path, dri_name):
+    z_obj_path = os.path.join(path, dri_name + '.zip')
 
     # download zip archive from url
     if not os.path.exists(z_obj_path):
@@ -96,7 +98,7 @@ def __download_and_unzip_from_http(from_url, dri_name):
         )
 
     # extract zip archive
-    target_path = os.path.join(CONTRIB_PATH, dri_name)
+    target_path = os.path.join(path, dri_name)
     __create_dir_if_not_exists(target_path)
     z_obj = zipfile.ZipFile(z_obj_path)
     z_obj.extractall(path=target_path)
@@ -332,8 +334,8 @@ def __build_project_sources(modules):
     file_name = "%s%s%s%s" % ('_'.join(modules), dev_postfix, perf_postfix, '.js')
     file_name = __apply_specific_file_name_rule(file_name, modules)
     output_file = os.path.join(OUT_PATH, file_name)
-    print "Compile source file for modules: %s\nOutput: %s\nVersion: %s\nDevelopers edition: %s\nPerformance monitoring: %s" % (
-        ', '.join(modules), output_file, __get_version(True), str(arguments['develop']), str(arguments['performance_monitoring']))
+    copyright = __get_copyrigth(modules)
+    wrapper = __get_wrapper(file_name)
     commands = __get_default_compiler_args() + \
                __get_not_optimized_compiler_args() + \
                __get_developers_edition_compiler_args() + \
@@ -341,11 +343,117 @@ def __build_project_sources(modules):
                __get_toolbar_css_compiler_args(modules) + \
                __get_name_spaces(modules) + \
                __get_roots() + \
-               __get_output_file_arg(output_file)
+               __get_output_file_arg(output_file) + \
+               ['--output_wrapper "' + copyright + wrapper + '"']
+
+    # print build log
+    __log_compilation(False, modules, output_file)
+
+    # build binary file
     __call_console_commands(commands)
 
-    if 'gzip' in arguments:
-        __gzip(output_file)
+    #include proj4js for maps and bundle in binary file
+    if __should_include_proj4js(modules):
+        __include_proj4js(output_file)
+
+    # gzip binary file
+    if __should_gen_gzip():
+        __gzip_file(output_file)
+
+
+def __build_project(modules):
+    dev_postfix = '.dev' if __is_develop() else ''
+    perf_postfix = '.perf' if __is_performance_monitoring() else ''
+    file_name = "%s%s%s%s" % ('_'.join(modules), dev_postfix, perf_postfix, '.min.js')
+    file_name = __apply_specific_file_name_rule(file_name, modules)
+    output_file = os.path.join(OUT_PATH, file_name)
+    copyright = __get_copyrigth(modules)
+    wrapper = __get_wrapper(file_name)
+    commands = __get_default_compiler_args() + \
+               __get_optimized_compiler_args() + \
+               __get_developers_edition_compiler_args() + \
+               __get_performance_monitoring_compiler_args() + \
+               __get_toolbar_css_compiler_args(modules) + \
+               __get_name_spaces(modules) + \
+               __get_roots() + \
+               __get_output_file_arg(output_file) + \
+               ['--output_wrapper "' + copyright + wrapper + '"']
+
+    #debug info
+    if __should_gen_debug_files():
+        path = PROJECT_PATH.replace('\\', '/')
+        commands += ['--property_renaming_report %s' % output_file + '_prop_out.txt',
+                     '--variable_renaming_report %s' % output_file + '_var_out.txt',
+                     '--create_source_map %s' % output_file + '.map',
+                     '--source_map_location_mapping \"%s|http://localhost:63341/ACDVF\"' % path]
+
+    # print build log
+    __log_compilation(True, modules, output_file)
+
+    # build binary file
+    __call_console_commands(commands)
+
+    #include proj4js for maps and bundle in binary file
+    if __should_include_proj4js(modules):
+        __include_proj4js(output_file)
+
+    # gzip binary file
+    if __should_gen_gzip():
+        __gzip_file(output_file)
+
+
+def __include_proj4js(output_file):
+    f = open(output_file, 'r')
+    ac_binaries = f.read()
+    f.close()
+
+    f = open(os.path.join(SRC_PATH, '..', 'proj4.js'), 'r')
+    proj4js_binaries = f.read()
+    f.close()
+
+    f = open(output_file, 'w')
+    f.write(ac_binaries + proj4js_binaries)
+    f.close()
+
+
+def __log_compilation(is_binary, modules, output_file):
+    print "Compile %s file for modules: %s\n" \
+          "Output: %s\n" \
+          "Version: %s\n" \
+          "Developers edition: %s\n" \
+          "Debug files: %s\n" \
+          "Gzip: %s \n" \
+          "Theme: %s\n" \
+          "Performance monitoring: %s\n" \
+          "Proj4js included: %s" % (
+              "binary" if is_binary else "source",
+              ', '.join(modules),
+              output_file,
+              __get_version(True),
+              str(arguments['develop']),
+              str(arguments['debug_files']),
+              str(arguments['gzip']),
+              str(arguments['theme']),
+              str(arguments['performance_monitoring']),
+              str(__should_include_proj4js(modules))
+          )
+
+
+def __apply_specific_file_name_rule(file_name, modules):
+    if modules == ['anychart_bundle']:
+        file_name = file_name.replace('anychart_bundle', 'anychart-bundle')
+    return file_name
+
+
+def __call_console_commands(commands, cwd=None):
+    commands = " ".join(commands).replace('\\', '\\\\')
+    commands = shlex.split(commands)
+    #print commands
+    p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=cwd)
+    (output, err) = p.communicate()
+    retcode = p.poll()
+    if len(output) > 0:
+        print output
 
 
 def __get_copyrigth(modules):
@@ -382,11 +490,11 @@ def __get_copyrigth(modules):
     if not module == 'anychart_bundle':
         url = '/products/%s/' % module
 
-    copyright =\
-        "/* %s - %sJavaScript HTML5 Web %s\n"\
-        " * %s Build\n"\
-        " * Version: %s\n"\
-        " * http://anychart.com%s\n"\
+    copyright = \
+        "/* %s - %sJavaScript HTML5 Web %s\n" \
+        " * %s Build\n" \
+        " * Version: %s\n" \
+        " * http://anychart.com%s\n" \
         " */\n" % (name, robust, title, build, version, url)
     return copyright
 
@@ -396,81 +504,12 @@ def __get_wrapper(file_name):
     performanceEnd = ''
     if __is_performance_monitoring():
         performanceStart = 'window.anychart_init_start=(typeof window.performance==\'object\')' + \
-            '&&(typeof window.performance.now==\'function\')?window.performance.now():+new Date();'
+                           '&&(typeof window.performance.now==\'function\')?window.performance.now():+new Date();'
         performanceEnd = ';if(console&&(typeof console.log!=\'object\'))console.log(\'AnyChart library initialized in:\',' + \
-            '(window.anychart_init_start=(typeof window.performance==\'object\')' + \
-            '&&(typeof window.performance.now==\'function\')?window.performance.now():+new Date()-window.anychart_init_start).toFixed(5),\'ms\');delete window.anychart_init_start'
+                         '(window.anychart_init_start=(typeof window.performance==\'object\')' + \
+                         '&&(typeof window.performance.now==\'function\')?window.performance.now():+new Date()-window.anychart_init_start).toFixed(5),\'ms\');delete window.anychart_init_start'
     sourceMapping = ('//# sourceMappingURL=%s.map' % file_name) if __should_gen_debug_files() else ''
     return '(function(){%s%s%s})()%s' % (performanceStart, '%output%', performanceEnd, sourceMapping)
-
-
-def __build_project(modules):
-    dev_postfix = '.dev' if __is_develop() else ''
-    perf_postfix = '.perf' if __is_performance_monitoring() else ''
-    file_name = "%s%s%s%s" % ('_'.join(modules), dev_postfix, perf_postfix, '.min.js')
-    file_name = __apply_specific_file_name_rule(file_name, modules)
-    output_file = os.path.join(OUT_PATH, file_name)
-    print "Compile binary file for modules: %s\nOutput: %s\nVersion: %s\nDevelopers edition: %s\nDebug files: %s\nGzip: %s \nTheme: %s\nPerformance monitoring: %s" % (
-        ', '.join(modules), output_file, __get_version(True), str(arguments['develop']), str(arguments['debug_files']),
-        str(arguments['gzip']), str(arguments['theme']), str(arguments['performance_monitoring']))
-    copyright = __get_copyrigth(modules)
-    wrapper = __get_wrapper(file_name)
-    commands = __get_default_compiler_args() + \
-               __get_optimized_compiler_args() + \
-               __get_developers_edition_compiler_args() + \
-               __get_performance_monitoring_compiler_args() + \
-               __get_toolbar_css_compiler_args(modules) + \
-               __get_name_spaces(modules) + \
-               __get_roots() + \
-               __get_output_file_arg(output_file) + \
-               ['--output_wrapper "' + copyright + wrapper + '"']
-
-    #debug info
-    if __should_gen_debug_files():
-        path = PROJECT_PATH.replace('\\', '/')
-        print path
-        commands += ['--property_renaming_report %s' % output_file + '_prop_out.txt',
-                     '--variable_renaming_report %s' % output_file + '_var_out.txt',
-                     '--create_source_map %s' % output_file + '.map',
-                     '--source_map_location_mapping \"%s|http://localhost:63341/ACDVF\"' % path]
-
-    #include proj4js for maps and bundle
-    inclute_proj4js = 'connector' in modules or 'bubbleMap' in modules or 'anymap' in modules or 'anychart_bundle' in modules
-    print "Proj4js included: %s" % str(inclute_proj4js)
-
-    __call_console_commands(commands)
-
-    if inclute_proj4js:
-        f = open(output_file, 'r')
-        ac_binaries = f.read()
-        f.close()
-
-        f = open(os.path.join(SRC_PATH, '..', 'proj4.js'), 'r')
-        proj4js_binaries = f.read()
-        f.close()
-
-        f = open(output_file, 'w')
-        f.write(ac_binaries + proj4js_binaries)
-        f.close()
-
-    if __should_gen_gzip():
-        __gzip(output_file)
-
-
-def __apply_specific_file_name_rule(file_name, modules):
-    if modules == ['anychart_bundle']:
-        file_name = file_name.replace('anychart_bundle', 'anychart-bundle')
-    return file_name
-
-
-def __call_console_commands(commands):
-    commands = " ".join(commands).replace('\\', '\\\\')
-    commands = shlex.split(commands)
-    #print commands
-    p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    (output, err) = p.communicate()
-    retcode = p.poll()
-    print output
 
 
 def __is_allowed_modules(modules):
@@ -495,12 +534,20 @@ def __get_modules_list():
     return modules_list_cache
 
 
-def __gzip(output_file):
+def __gzip_file(output_file):
     f_in = open(output_file, 'rb')
     f_out = gzip.open(output_file + '.gz', 'wb')
     f_out.writelines(f_in)
     f_out.close()
     f_in.close()
+
+
+def __gzip_dir(input_path, output_path):
+    archive = zipfile.ZipFile(output_path, 'w')
+    for root, dirs, files in os.walk(input_path):
+        for f in files:
+            archive.write(os.path.join(root, f))
+    archive.close()
 
 
 #=======================================================================================================================
@@ -599,27 +646,51 @@ def __build_theme():
     theme = arguments['name']
 
     if theme in __get_themes_list():
-        print "Compile standalone theme %s" % theme
-        commands = [
-            'java -jar',
-            COMPILER_PATH,
-            '--charset UTF-8',
-            '--only_closure_dependencies',
-            '--warning_level VERBOSE',
-            '--compilation_level ADVANCED_OPTIMIZATIONS',
-            "--closure_entry_point anychart.themes.%s" % theme,
-            "--js_output_file %s" % os.path.join(OUT_PATH, theme + '.min.js')
-        ] + __get_roots()
-        __call_console_commands(commands)
+        print "Build theme: %s" % theme
+        __exec_build_theme(theme, False)
+        __exec_build_theme(theme, True)
         print "Complete"
     else:
         print "Wrong theme name %s" % theme
+
+def __build_themes():
+    print 'Build all available themes'
+    for theme in __get_themes_list():
+        print '    Build %s' % theme
+        __exec_build_theme(theme, False)
+        __exec_build_theme(theme, True)
+        print "    Complete"
+    print "All themes built"
+
+
+def __exec_build_theme(theme, is_source):
+    output_file_postfix = '.js' if is_source else '.min.js'
+    commands = ['java -jar',
+                COMPILER_PATH,
+                '--charset UTF-8',
+                '--only_closure_dependencies',
+                '--warning_level VERBOSE',
+                '--compilation_level ADVANCED_OPTIMIZATIONS',
+                "--closure_entry_point anychart.themes.%s" % theme,
+                "--js_output_file %s" % os.path.join(OUT_PATH, theme + output_file_postfix)]
+
+    commands += __get_roots()
+
+    if is_source:
+        __set_pretty_print(commands)
+
+    __call_console_commands(commands)
+
 
 #=======================================================================================================================
 #                            Build release.
 #=======================================================================================================================
 @sync_required
 def __build_release():
+    t = time.time()
+    full_version = __get_version(True)
+    short_version = __get_version(False)
+    print "Build release for version: %s" % full_version
 
     #bubdle
     print "Compile AnyChart Bundle"
@@ -647,8 +718,115 @@ def __build_release():
     __call_console_commands(['./build compile -m anygantt -gz -d'])
 
     print "Compile Themes"
+    __build_themes()
+
+    print "Build install packages"
+    print "    Download demos from PG"
+    if os.path.exists(os.path.join(OUT_PATH, 'gallery_demos')):
+        shutil.rmtree(os.path.join(OUT_PATH, 'gallery_demos'))
+    __download_and_unzip_from_http('http://playground.anychart.stg/gallery/develop/download', OUT_PATH, 'gallery_demos')
+
+    print "    Build AnyGantt install packages"
+
+    def anygantt_gallery_pass_func(name):
+        return name.startswith('Gantt')
+    __build_product_package(
+        os.path.join(OUT_PATH, 'AnyGantt' + '-' + short_version),
+        'anygantt',
+        anygantt_gallery_pass_func
+    )
+
+    print "    Build AnyStock install packages"
+
+    def anystock_gallery_pass_func(name):
+        return name.startswith('Stock')
+    __build_product_package(
+        os.path.join(OUT_PATH, 'AnyStock' + '-' + short_version),
+        'anystock',
+        anystock_gallery_pass_func
+    )
+
+    print "    Build AnyMap install packages"
+
+    def anymap_gallery_pass_func(name):
+        return name.startswith('Maps') and name != 'Maps_in_Dashboard'
+    __build_product_package(
+        os.path.join(OUT_PATH, 'AnyMap' + '-' + short_version),
+        'anymap',
+        anymap_gallery_pass_func
+    )
+
+    print "    Build AnyChart install packages"
+
+    def anychart_gallery_pass_func(name):
+        return not name.startswith('Gantt') and not name.startswith('Maps') and not name.startswith('Stock')
+    __build_product_package(
+        os.path.join(OUT_PATH, 'AnyChart' + '-' + short_version),
+        'anychart',
+        anychart_gallery_pass_func
+    )
+
+    #rm gallery demos dir
+    shutil.rmtree(os.path.join(OUT_PATH, 'gallery_demos'))
+
+    print "Release build complete! Build time: {:.3f} sec".format(time.time() - t)
+
+
+def __build_product_package(output_dir, binary_name, gallery_pass_func=None):
+    # create folders structure
+    if os.path.exists(output_dir):
+        shutil.rmtree(output_dir)
+    os.mkdir(output_dir)
+    os.mkdir(os.path.join(output_dir, 'js'))
+    os.mkdir(os.path.join(output_dir, 'js', 'themes'))
+    os.mkdir(os.path.join(output_dir, 'demos'))
+    os.mkdir(os.path.join(output_dir, 'schemas'))
+
+    # copy binaries
+    shutil.copyfile(os.path.join(OUT_PATH, '%s.min.js' % binary_name), os.path.join(output_dir, 'js', '%s.min.js' % binary_name))
+    shutil.copyfile(os.path.join(OUT_PATH, '%s.min.js.gz' % binary_name), os.path.join(output_dir, 'js', '%s.min.js.gz' % binary_name))
+    shutil.copyfile(os.path.join(OUT_PATH, '%s.dev.min.js' % binary_name), os.path.join(output_dir, 'js', '%s.dev.min.js' % binary_name))
+    shutil.copyfile(os.path.join(OUT_PATH, '%s.dev.min.js.gz' % binary_name), os.path.join(output_dir, 'js', '%s.dev.min.js.gz' % binary_name))
+
+    # copy schemas
+    shutil.copyfile(os.path.join(PROJECT_PATH, 'xml-schema.xsd'), os.path.join(output_dir, 'schemas', 'xml-schema.xsd'))
+    shutil.copyfile(os.path.join(PROJECT_PATH, 'json-schema.json'), os.path.join(output_dir, 'schemas', 'json-schema.json'))
+
+    # copy themes
     for theme in __get_themes_list():
-        __call_console_commands(['./build theme -n %s' % theme])
+        shutil.copyfile(os.path.join(OUT_PATH, theme + '.js'), os.path.join(output_dir, 'js', 'themes', theme + '.js'))
+        shutil.copyfile(os.path.join(OUT_PATH, theme + '.min.js'), os.path.join(output_dir, 'js', 'themes', theme + '.min.js'))
+
+    # copy demos
+    for name in os.listdir(os.path.join(OUT_PATH, 'gallery_demos')):
+        if name != 'js' and (not gallery_pass_func or gallery_pass_func(name)):
+            shutil.copytree(os.path.join(OUT_PATH, 'gallery_demos', name), os.path.join(output_dir, 'demos', name))
+
+    for (dirpath, dirnames, filenames) in os.walk(os.path.join(output_dir, 'demos')):
+        for filename in filenames:
+            if filename.endswith('.html'):
+                filepath = os.path.join(dirpath, filename)
+                f = open(filepath, 'r')
+                text = f.read()
+                f.close()
+                f = open(filepath, 'w')
+                f.write(text.replace('<script src="./../js/anychart.min.js"></script>', '<script src="../../js/%s.min.js"></script>' % binary_name))
+                f.close()
+
+    # gzip package
+    zip_out_file = os.path.join(OUT_PATH, binary_name + '.zip')
+    if os.path.exists(zip_out_file):
+        os.remove(zip_out_file)
+    cls_command = [
+        'zip',
+        '-r',
+        (binary_name + '.zip').lower(),
+        os.path.basename(output_dir)
+    ]
+    __call_console_commands(cls_command, './out')
+
+    # remove dir
+    shutil.rmtree(output_dir)
 
 
 def __print_gz_stat():
@@ -658,7 +836,7 @@ def __print_gz_stat():
         if f.endswith('.gz'):
             full_path = os.path.join(OUT_PATH, f)
             stat = os.stat(full_path)
-            result.append("%s size is %s" % (f, str(stat.st_size/1024) + "Kb"))
+            result.append("%s size is %s" % (f, str(stat.st_size / 1024) + "Kb"))
 
     if len(result):
         print "Looking for gzip files size in out directory:"
@@ -732,6 +910,10 @@ def __should_gen_gzip():
     return 'gzip' in arguments and str(arguments['gzip']) == 'True'
 
 
+def __should_include_proj4js(modules):
+    return 'connector' in modules or 'bubbleMap' in modules or 'anymap' in modules or 'anychart_bundle' in modules
+
+
 #=======================================================================================================================
 #           Main
 #=======================================================================================================================
@@ -751,7 +933,8 @@ def __exec_main_script():
     compile_parser.add_argument('-s', '--sources', action='store_true',
                                 help='Build project sources file (not minimized).')
     compile_parser.add_argument('-d', '--develop', action='store_true', help='Include developers tools into build.')
-    compile_parser.add_argument('-pm', '--performance_monitoring', action='store_true', help='Include performance monitoring tools into build.')
+    compile_parser.add_argument('-pm', '--performance_monitoring', action='store_true',
+                                help='Include performance monitoring tools into build.')
     compile_parser.add_argument('-gz', '--gzip', action='store_true', help='Create gzip copy of output file.')
     compile_parser.add_argument('-df', '--debug_files', action='store_true',
                                 help='Create files with debug info (prop_out, var_out, sourcemap).')
@@ -764,7 +947,7 @@ def __exec_main_script():
     compile_each_parser.add_argument('-d', '--develop', action='store_true',
                                      help='Include developers tools flag in each module compilation.')
     compile_each_parser.add_argument('-pm', '--performance_monitoring', action='store_true',
-                                    help='Include performance monitoring tools into build.')
+                                     help='Include performance monitoring tools into build.')
     compile_each_parser.add_argument('-df', '--debug_files', action='store_true',
                                      help='Create files with debug info (prop_out, var_out, sourcemap).')
     compile_each_parser.add_argument('-gz', '--gzip', action='store_true', help='Create gzip copy of output file.')
@@ -792,6 +975,9 @@ def __exec_main_script():
     themes_parser.add_argument('-n', '--name', action='store',
                                help="Name of the theme, default value is 'defaultTheme'.\nPossible values are: %s"
                                     % ", ".join(__get_themes_list()), default='defaultTheme')
+    # create the parser for the "theme" command
+    themes_parser = subparsers.add_parser('themes', help='Build standalone files for all available themes')
+
     # create files for release
     subparsers.add_parser('release', help='Creates release files in output directory.')
 
@@ -818,6 +1004,8 @@ def __exec_main_script():
         __autofix_project()
     elif command == 'theme':
         __build_theme()
+    elif command == 'themes':
+        __build_themes()
     elif command == 'release':
         __build_release()
     elif command == 'gz_stat':

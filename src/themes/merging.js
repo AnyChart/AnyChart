@@ -674,12 +674,27 @@ anychart.themes.merging.mergingMap_ = [
       'stock.defaultPlotSettings.defaultYAxisSettings',
       'stock.defaultPlotSettings.xAxis',
       'stock.scroller.xAxis',
-      'map.colorRange',
-      'treeMap.colorRange',
+      'defaultColorRange',
       'standalones.linearAxis',
       'standalones.polarAxis',
       'standalones.radarAxis',
       'standalones.radialAxis'
+    ]
+  },
+  {
+    defaultObj: 'defaultColorRange',
+    targets: [
+      'map.colorRange',
+      'treeMap.colorRange'
+    ]
+  },
+  {
+    defaultObj: 'defaultScroller',
+    targets: [
+      'cartesianBase.xScroller',
+      'heatMap.xScroller',
+      'heatMap.yScroller',
+      'standalones.scroller'
     ]
   },
   {

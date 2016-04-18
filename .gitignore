@@ -6,3 +6,4 @@ contrib/compiler/
 out/*
 src/deps.js
 *.swo
+demos-local

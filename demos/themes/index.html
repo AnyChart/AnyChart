@@ -1,99 +1,129 @@
 <!doctype html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link rel="icon" type="image/ico" href="../utils/media/fav.ico">
-    <title> Themes </title>
-    <script src="../utils/media/jquery/jquery-2.1.3.min.js"></script>
-    <script src="../utils/media/bootstrap/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="../utils/media/bootstrap/css/bootstrap.css"/>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <!--Non Compiled JS-->
+    <script src="../../contrib/closure-library/closure/goog/base.js"></script>
+    <script src="../../src/deps.js"></script>
+    <script>
+        goog.require('anychart.themes.defaultTheme');
+        goog.require('anychart.modules.anychart');
+        goog.require('anychart.modules.anymap');
+        goog.require('anychart.modules.treeMap');
+
+        goog.require('anychart.themes.coffee');
+        goog.require('anychart.themes.dark_blue');
+        goog.require('anychart.themes.dark_earth');
+        goog.require('anychart.themes.dark_glamour');
+        goog.require('anychart.themes.dark_provence');
+        goog.require('anychart.themes.light_blue');
+        goog.require('anychart.themes.light_earth');
+        goog.require('anychart.themes.light_glamour');
+        goog.require('anychart.themes.light_provence');
+        goog.require('anychart.themes.dark_turquoise');
+        goog.require('anychart.themes.light_turquoise');
+        goog.require('anychart.themes.monochrome');
+        goog.require('anychart.themes.morning');
+        goog.require('anychart.themes.pastel');
+        goog.require('anychart.themes.sea');
+        goog.require('anychart.themes.wines');
+
+        // write your themes require here
+    </script>
+    <script src="http://code.jquery.com/jquery-1.12.1.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.3/proj4.js"></script>
+    <script src="http://cdn.anychart.com/geodata/1.1.0/countries/austria/austria.js"></script>
+    <script src="./index.js"></script>
     <style>
-        .chart-container {
-            box-shadow: rgba(43, 59, 93, 0.290196) 0 1px 2px;
+        .container-chart {
+            float: left;
+            width: 46%;
             height: 350px;
-            margin-bottom: 20px;
+            padding: 0 1% 30px;
+        }
+        .themes-demo{
+            width: 90%;
+            padding: 20px 5%;
+        }
+        .themes-demo:first-child{
+            border-bottom: 1px solid #dedede;
+        }
+        .select{
+            float: left;
+            margin: 0 20px 0 0;
+        }
+        .select h5{
+            display: inline;
         }
     </style>
+
 </head>
 <body>
-<nav class="navbar navbar-default navbar-fixed-top">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
-                    aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">Theme previewer</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li class="dropdown">
-                    <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                       aria-expanded="false">Default <span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="">Action</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
 
-<div class="container-fluid" style="margin-top: 65px">
-    <div class="row" id="chart-places">
+<div class="themes-demo">
+    <div class="select">
+        <h5>Theme</h5>
+        <select id="themes-select">
+            <option value="defaultTheme|defaultPalette" selected="selected">Default</option>
+            <option value="darkBlue|blue" data-palette-value="blue">Dark Blue</option>
+            <option value="lightBlue|blue">Light Blue</option>
+            <option value="darkEarth|earth">Dark Earth</option>
+            <option value="lightEarth|earth">Light Earth</option>
+            <option value="darkGlamour|glamour">Dark Glamour</option>
+            <option value="lightGlamour|glamour">Light Glamour</option>
+            <option value="darkProvence|provence">Dark Provence</option>
+            <option value="lightProvence|provence">Light Provence</option>
+            <option value="darkTurquoise|turquoise">Dark Turquoise</option>
+            <option value="lightTurquoise|turquoise">Light Turquoise</option>
+            <option value="coffee|coffee">Coffee</option>
+            <option value="monochrome|monochrome">Monochrome</option>
+            <option value="morning|morning">Morning</option>
+            <option value="pastel|pastel">Pastel</option>
+            <option value="sea|sea">Sea</option>
+            <option value="wines|wines">Wines</option>
+            <option value="v6|v6">6.x Version</option>
+        </select>
     </div>
+
+    <div class="select">
+        <h5>Palette</h5>
+        <select id="palettes-select">
+            <option value="defaultPalette" selected="selected">Default</option>
+            <option value="blue">Blue</option>
+            <option value="earth">Earth</option>
+            <option value="glamour">Glamour</option>
+            <option value="provence">Provence</option>
+            <option value="turquoise">Turquoise</option>
+            <option value="coffee">Coffee</option>
+            <option value="monochrome">Monochrome</option>
+            <option value="morning">Morning</option>
+            <option value="pastel">Pastel</option>
+            <option value="sea">Sea</option>
+            <option value="wines">Wines</option>
+            <option value="v6">Version 6.x</option>
+        </select>
+    </div>
+    <div class="select">
+        <h5>Charts</h5>
+        <select id="chart-types-select">
+            <option value="area-line-bar-column" selected="selected">Area, Line, Bar & Column Charts</option>
+            <option value="pie-donut-funnel-pyramid">Pie, Donut, Funnel & Pyramid Charts</option>
+            <option value="3d">3D Charts</option>
+            <option value="marker-bubble-box-error">Marker, Bubble, Box & Error Charts</option>
+            <option value="polar-radar">Polar & Radar Charts</option>
+            <option value="maps">Maps</option>
+            <option value="sparklines">Sparklines</option>
+            <option value="bullet-financial">Bullets & Financial Charts</option>
+            <option value="tree-map-heat-map">Tree maps & Heat Maps</option>
+        </select>
+    </div>
+    <div style="clear: both"></div>
+</div>
+<div class="themes-demo">
+    <div class="container-chart" id="container-chart-1"></div>
+    <div class="container-chart" id="container-chart-2"></div>
+    <div class="container-chart" id="container-chart-3"></div>
+    <div class="container-chart" id="container-chart-4"></div>
 </div>
 </body>
-
-<script src="../../contrib/closure-library/closure/goog/base.js"></script>
-<script src="../../src/deps.js"></script>
-<script>
-  goog.require('anychart.modules.anychart_bundle');
-  goog.require('anychart.themes.defaultTheme');
-//  goog.require('anychart.themes.newDefaultTheme');
-  </script>
-
-<script src="../utils/data.js"></script>
-<script>
-    var getPercentScale = function () {
-        var extraYScale = anychart.scales.linear();
-        extraYScale.ticks().interval(10);
-        extraYScale.minorTicks().interval(2);
-        extraYScale.minimum(0).maximum(100);
-        return extraYScale
-    };
-</script>
-<script src="charts/basic_types/pie.js"></script>
-<script src="charts/basic_types/funnel.js"></script>
-<script src="charts/basic_types/pyramid.js"></script>
-<script src="charts/basic_types/line.js"></script>
-<script src="charts/basic_types/box.js"></script>
-<script src="charts/basic_types/financial.js"></script>
-<script src="charts/basic_types/bubble.js"></script>
-<script src="charts/basic_types/scatter.js"></script>
-<script src="charts/basic_types/errors.js"></script>
-<script src="charts/basic_types/polar.js"></script>
-<script src="charts/basic_types/radar.js"></script>
-<script src="charts/basic_types/area.js"></script>
-<script src="charts/basic_types/range_area.js"></script>
-<script src="charts/basic_types/area_stacked.js"></script>
-<script src="charts/basic_types/area_stacked100.js"></script>
-<script src="charts/basic_types/bar.js"></script>
-<script src="charts/basic_types/range_bar.js"></script>
-<script src="charts/basic_types/bar_multiSeries.js"></script>
-<script src="charts/basic_types/bar_stacked.js"></script>
-<script src="charts/basic_types/bar_stacked100.js"></script>
-<script src="charts/basic_types/column.js"></script>
-<script src="charts/basic_types/range_column.js"></script>
-<script src="charts/basic_types/column_stacked100.js"></script>
-<script src="charts/basic_types/column_multiSeries.js"></script>
-<script src="charts/basic_types/column_stacked.js"></script>
-<script src="charts/basic_types/bullet.js"></script>
-<script src="charts/basic_types/sparkline_area.js"></script>
-<script src="charts/basic_types/sparkline_column.js"></script>
-<script src="charts/basic_types/sparkline_line.js"></script>
-<script src="charts/basic_types/sparkline_winn_loss.js"></script>
 </html>
