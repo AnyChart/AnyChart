@@ -417,6 +417,7 @@ def __include_proj4js(output_file):
 
 
 def __log_compilation(is_binary, modules, output_file):
+    global arguments
     print "Compile %s file for modules: %s\n" \
           "Output: %s\n" \
           "Version: %s\n" \
@@ -653,6 +654,7 @@ def __build_theme():
     else:
         print "Wrong theme name %s" % theme
 
+
 def __build_themes():
     print 'Build all available themes'
     for theme in __get_themes_list():
@@ -687,35 +689,55 @@ def __exec_build_theme(theme, is_source):
 #=======================================================================================================================
 @sync_required
 def __build_release():
+    global arguments
+
     t = time.time()
     full_version = __get_version(True)
     short_version = __get_version(False)
     print "Build release for version: %s" % full_version
 
+    dev_options = {'develop': False, 'modules': None, 'sources': False, 'theme': 'defaultTheme', 'debug_files': False, 'gzip': True, 'performance_monitoring': False}
+    prod_options = {'develop': True, 'modules': None, 'sources': False, 'theme': 'defaultTheme', 'debug_files': False, 'gzip': True, 'performance_monitoring': False}
+
     #bubdle
     print "Compile AnyChart Bundle"
-    __call_console_commands(['./build compile -gz'])
-    __call_console_commands(['./build compile -gz -d'])
+    arguments = dev_options
+    __build_project(['anychart_bundle'])
+
+    arguments = prod_options
+    __build_project(['anychart_bundle'])
 
     #charts
     print "Compile AnyChart"
-    __call_console_commands(['./build compile -m anychart -gz'])
-    __call_console_commands(['./build compile -m anychart -gz -d'])
+    arguments = prod_options
+    __build_project(['anychart'])
+
+    arguments = dev_options
+    __build_project(['anychart'])
 
     #map
     print "Compile AnyMap"
-    __call_console_commands(['./build compile -m anymap -gz'])
-    __call_console_commands(['./build compile -m anymap -gz -d'])
+    arguments = prod_options
+    __build_project(['anymap'])
+
+    arguments = dev_options
+    __build_project(['anymap'])
 
     #stock
     print "Compile AnyStock"
-    __call_console_commands(['./build compile -m anystock -gz'])
-    __call_console_commands(['./build compile -m anystock -gz -d'])
+    arguments = prod_options
+    __build_project(['anystock'])
+
+    arguments = dev_options
+    __build_project(['anystock'])
 
     #gantt
     print "Compile AnyGantt"
-    __call_console_commands(['./build compile -m anygantt -gz'])
-    __call_console_commands(['./build compile -m anygantt -gz -d'])
+    arguments = prod_options
+    __build_project(['anygantt'])
+
+    arguments = dev_options
+    __build_project(['anygantt'])
 
     print "Compile Themes"
     __build_themes()
@@ -817,16 +839,17 @@ def __build_product_package(output_dir, binary_name, gallery_pass_func=None):
     zip_out_file = os.path.join(OUT_PATH, binary_name + '.zip')
     if os.path.exists(zip_out_file):
         os.remove(zip_out_file)
-    cls_command = [
+    cls_zip_command = [
         'zip',
         '-r',
         (binary_name + '.zip').lower(),
         os.path.basename(output_dir)
     ]
-    __call_console_commands(cls_command, './out')
-
-    # remove dir
-    shutil.rmtree(output_dir)
+    try:
+        __call_console_commands(cls_zip_command, './out')
+        shutil.rmtree(output_dir)
+    except Exception as e:
+        print "Can't zip packages because of an Error:\n" + e.message + "\n" + "You have to zip it by your self.\nRecommended command is:\n" + ' '.join(cls_zip_command)
 
 
 def __print_gz_stat():
