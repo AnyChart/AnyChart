@@ -54,7 +54,7 @@ anychart.palettes.pastel = ['#90caf9', '#80cbc4', '#aed581', '#e6ee9c', '#ffcc80
 
 
 /** @type {Array.<string>} */
-anychart.palettes.blue = ['#90caf9', '#42a5f5', '#1976d2', '#9fa8da', '#5c6bc0', '#7e57c2', '#54dbdf', '#15a9c7', '#00897b', '#304ffe'];
+anychart.palettes.blue = ['#40c4ff', '#0288d1', '#01579b', '#9fa8da', '#5c6bc0', '#7e57c2', '#54dbdf', '#15a9c7', '#00897b', '#304ffe'];
 
 
 /** @type {Array.<string>} */

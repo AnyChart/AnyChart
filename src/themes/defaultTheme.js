@@ -17,6 +17,8 @@ var defaultSelectSolidColor = '#333';
 var defaultSelectColor = '#333 0.85';
 var defaultSelectStroke = '1.5 #212121';
 
+var stockScrollerUnselected = '#999 0.6';
+
 var fontColorReversedNormal = '#ffffff';
 var opacityThin = ' 0.3';
 var opacityStrong = ' 0.7';
@@ -215,6 +217,7 @@ window['anychart']['themes']['defaultTheme'] = {
   'ordinalColor': {
     'autoColors': function(rangesCount) {
       return window['anychart']['color']['blendedHueProgression']('#90caf9', '#01579b', rangesCount);
+      //return window['anychart']['color']['blendedHueProgression']('#ffd54f', '#ef6c00', rangesCount); //todo: delete after final choice
     }
   },
 
@@ -2240,7 +2243,7 @@ window['anychart']['themes']['defaultTheme'] = {
         },
         'hoverFill': defaultHoverColor,
         'selectFill': defaultSelectColor,
-        'stroke': {'thickness': 0.5, 'color': '#545f69'},
+        'stroke': returnDarkenSourceColor,
         'hoverStroke': {'thickness': 0.5, 'color': '#545f69'},
         'selectStroke': {'thickness': 0.5, 'color': '#545f69'},
         'hatchFill': false,
@@ -2367,11 +2370,9 @@ window['anychart']['themes']['defaultTheme'] = {
           'enabled': true
         },
         'hoverLabels': {
-          'enabled': true,
           'fontWeight': 'bold'
         },
         'selectLabels': {
-          'enabled': true,
           'fontWeight': 'bold'
         },
         'tooltip': {
@@ -2398,6 +2399,7 @@ window['anychart']['themes']['defaultTheme'] = {
     },
     'unboundRegions': {'enabled': true, 'fill': '#F7F7F7', 'stroke': '#e0e0e0'},
     'linearColor': {'colors': ['#90caf9', '#01579b']},
+    //'linearColor': {'colors': ['#ffd54f', '#ef6c00']}, //todo: delete after final choice
     'legend': {'enabled': false},
     'maxBubbleSize': '20%',
     'minBubbleSize': '5%',
@@ -2767,9 +2769,11 @@ window['anychart']['themes']['defaultTheme'] = {
       'textFormatter': returnName
     },
     'hoverHeaders': {
+      'enabled': true,
       'fontColor': defaultSelectColor,
       'background': {
-        'fill': '#e0e0e0'
+        'fill': '#e0e0e0',
+        'stroke': '#e0e0e0'
       }
     },
     'labels': {
@@ -3260,6 +3264,9 @@ window['anychart']['themes']['defaultTheme'] = {
 
   'stock': {
     'defaultPlotSettings': {
+      'background': {
+        'enabled': false
+      },
       'defaultSeriesSettings': {
         'base': {
           'pointWidth': '75%',
@@ -3285,28 +3292,10 @@ window['anychart']['themes']['defaultTheme'] = {
         }
       },
       'defaultGridSettings': {
-        'enabled': true,
-        'isMinor': false,
-        'layout': 'horizontal',
-        'drawFirstLine': true,
-        'drawLastLine': true,
-        'oddFill': 'none',
-        'evenFill': 'none',
-        'stroke': '#cecece',
-        'scale': 0,
-        'zIndex': 11
+        'scale': 0
       },
       'defaultMinorGridSettings': {
-        'enabled': true,
-        'isMinor': true,
-        'layout': 'horizontal',
-        'drawFirstLine': true,
-        'drawLastLine': true,
-        'oddFill': 'none',
-        'evenFill': 'none',
-        'stroke': '#eaeaea',
-        'scale': 0,
-        'zIndex': 10
+        'scale': 0
       },
       'defaultYAxisSettings': {
         'enabled': true,
@@ -3345,8 +3334,8 @@ window['anychart']['themes']['defaultTheme'] = {
         'enabled': true,
         'orientation': 'bottom',
         'background': {
-          //'stroke': '#cecece'
-          //fill: '#F7F7F7'
+          'stroke': '#cecece',
+          'fill': '#F7F7F7'
         },
         'height': 25,
         'scale': 0,
@@ -3436,19 +3425,7 @@ window['anychart']['themes']['defaultTheme'] = {
       'legend': {
         'enabled': true,
         'vAlign': 'bottom',
-        'fontSize': 12,
-        'itemsLayout': 'horizontal',
-        'itemsSpacing': 15,
-        'items': null,
         'iconSize': 13,
-        'itemsFormatter': null, // effectively equals current settings
-        'itemsTextFormatter': null,
-        'itemsSourceMode': 'default',
-        'inverted': false,
-        'hoverCursor': 'pointer',
-        'iconTextSpacing': 5,
-        'width': null,
-        'height': null,
         'position': 'top',
         /**
          * @this {*}
@@ -3478,23 +3455,11 @@ window['anychart']['themes']['defaultTheme'] = {
           return window['anychart']['format']['dateTime'](date, 'dd MMM yyyy');
         },
         'align': 'center',
-        'margin': {
-          'top': 0,
-          'right': 0,
-          'bottom': 0,
-          'left': 0
-        },
         'padding': {
           'top': 10,
           'right': 10,
           'bottom': 10,
           'left': 10
-        },
-        'background': {
-          'enabled': false,
-          'fill': '#fff',
-          'stroke': 'none',
-          'corners': 5
         },
         'title': {
           'enabled': true,
@@ -3548,66 +3513,7 @@ window['anychart']['themes']['defaultTheme'] = {
           'orientation': 'top',
           'fill': ['#000 0', '#000', '#000 0'],
           'stroke': 'none'
-        },
-        'paginator': {
-          'enabled': true,
-
-          'fontSize': 12,
-          'fontColor': '#545f69',
-
-          'background': {
-            'enabled': false,
-            'fill': {
-              'keys': [
-                '#fff',
-                '#f3f3f3',
-                '#fff'
-              ],
-              'angle': '90'
-            },
-            'stroke': {
-              'keys': [
-                '#ddd',
-                '#d0d0d0'
-              ],
-              'angle': '90'
-            }
-          },
-          'padding': {
-            'top': 0,
-            'right': 0,
-            'bottom': 0,
-            'left': 0
-          },
-          'margin': {
-            'top': 0,
-            'right': 0,
-            'bottom': 0,
-            'left': 0
-          },
-          'orientation': 'right',
-          'layout': 'horizontal',
-          'zIndex': 30
-        },
-        'tooltip': {
-          'enabled': false,
-          'title': {
-            'enabled': false,
-            'margin': {
-              'top': 3,
-              'right': 3,
-              'bottom': 0,
-              'left': 3
-            },
-            'padding': {
-              'top': 0,
-              'right': 0,
-              'bottom': 0,
-              'left': 0
-            }
-          }
-        },
-        'zIndex': 20
+        }
       },
       'scales': [
         {
@@ -3643,40 +3549,53 @@ window['anychart']['themes']['defaultTheme'] = {
     'scroller': {
       'defaultSeriesSettings': {
         'base': {
+          'color': '#64b5f6',
+          'fill': stockScrollerUnselected,
+          'selectFill': returnSourceColor,
+          'stroke': stockScrollerUnselected,
+          'selectStroke': returnSourceColor,
+          'lowStroke': stockScrollerUnselected,
+          'selectLowStroke': returnSourceColor,
+          'highStroke': stockScrollerUnselected,
+          'selectHighStroke': returnSourceColor,
           'pointWidth': '75%'
         },
-        'line': {
-          'stroke': '#999 0.9',
-          'selectedStroke': '1.5 #64b5f6'
+        'marker': {
+          'fill': stockScrollerUnselected,
+          'stroke': stockScrollerUnselected,
+          'selectFill': returnSourceColor,
+          'selectStroke': returnSourceColor
         },
-        'column': {
-          'fill': '#64b5f6 0.6',
-          'stroke': 'none',
-          'selectedFill': '#64b5f6 0.9',
-          'selectedStroke': 'none'
+        'areaLike': {
+          'fill': stockScrollerUnselected
+        },
+        'barLike': {
+          'fill': stockScrollerUnselected
+        },
+        'candlestick': {
+          'risingFill': stockScrollerUnselected,
+          'risingStroke': stockScrollerUnselected,
+          'fallingFill': stockScrollerUnselected,
+          'fallingStroke': stockScrollerUnselected,
+          'selectFallingFill': fallingColor,
+          'selectRisingFill': risingColor,
+          'selectRisingStroke': risingColor,
+          'selectFallingStroke': fallingColor
         },
         'ohlc': {
-          'risingStroke': '#1976d2 0.6',
-          'fallingStroke': '#ef6c00 0.6',
-          'selectedRisingStroke': '#1976d2 0.9',
-          'selectedFallingStroke': '#ef6c00 0.9'
+          'risingStroke': stockScrollerUnselected,
+          'fallingStroke': stockScrollerUnselected,
+          'selectRisingStroke': risingColor,
+          'selectFallingStroke': fallingColor
         }
       },
       'enabled': true,
-      'fill': '#fff',
+      'fill': 'none',
       'selectedFill': '#1976d2 0.2',
       'outlineStroke': '#cecece',
       'height': 40,
       'minHeight': null,
       'maxHeight': null,
-      'thumbs': {
-        'enabled': true,
-        'autoHide': false,
-        'fill': '#f7f7f7',
-        'stroke': '#7c868e',
-        'hoverFill': '#ffffff',
-        'hoverStroke': '#545f69'
-      },
       'zIndex': 40,
       'xAxis': {
         'background': {

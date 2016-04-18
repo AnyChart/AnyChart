@@ -1,6 +1,18 @@
 goog.provide('anychart.themes.monochrome');
 
 
+var stockScrollerUnselected = '#999 0.6';
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+var returnSourceColor = function() {
+  return this['sourceColor'];
+};
+
+
 /**
  * @this {*}
  * @return {*}
@@ -89,6 +101,7 @@ window['anychart']['themes']['monochrome'] = {
       },
       'lineLike': {
         'selectStroke': '3 #212121',
+        'markers': {'enabled': true},
         'selectMarkers': {
           'enabled': true,
           'fill': '#bdbdbd',
@@ -102,13 +115,6 @@ window['anychart']['themes']['monochrome'] = {
           'fill': '#bdbdbd',
           'stroke': '1.5 #212121'
         }
-      }
-    }
-  },
-  'cartesianBase': {
-    'defaultSeriesSettings': {
-      'lineLike': {
-        'markers': {'enabled': true}
       },
       'candlestick': {
         'risingFill': '#252525',
@@ -224,7 +230,8 @@ window['anychart']['themes']['monochrome'] = {
     'hoverHeaders': {
       'fontColor': '#959595',
       'background': {
-        'fill': '#B9B9B9'
+        'fill': '#B9B9B9',
+        'stroke': '#B9B9B9'
       }
     },
     'labels': {
@@ -235,5 +242,57 @@ window['anychart']['themes']['monochrome'] = {
     },
     'stroke': '#B9B9B9',
     'selectStroke': '2 #eceff1'
+  },
+  'stock': {
+    'padding': [20, 30, 20, 60],
+    'defaultPlotSettings': {
+      'xAxis': {
+        'background': {
+          'fill': '#B9B9B9 0.5',
+          'stroke': '#B9B9B9'
+        }
+      }
+    },
+    'scroller': {
+      'fill': 'none',
+      'selectedFill': '#B9B9B9 0.5',
+      'outlineStroke': '#B9B9B9',
+      'defaultSeriesSettings': {
+        'base': {
+          'color': '#252525 0.6',
+          'fill': stockScrollerUnselected,
+          'stroke': stockScrollerUnselected,
+          'selectFill': returnSourceColor,
+          'selectHatchFill': null,
+          'selectStroke': returnSourceColor
+        },
+        'lineLike': {
+          'selectStroke': returnSourceColor,
+          'fill': stockScrollerUnselected,
+          'stroke': stockScrollerUnselected
+        },
+        'areaLike': {
+          'selectStroke': returnSourceColor,
+          'fill': stockScrollerUnselected,
+          'stroke': stockScrollerUnselected
+        },
+        'candlestick': {
+          'risingFill': stockScrollerUnselected,
+          'risingStroke': stockScrollerUnselected,
+          'fallingFill': stockScrollerUnselected,
+          'fallingStroke': stockScrollerUnselected,
+          'selectRisingStroke': returnSourceColor,
+          'selectFallingStroke': returnSourceColor,
+          'selectRisingFill': returnSourceColor,
+          'selectFallingFill': returnSourceColor
+        },
+        'ohlc': {
+          'risingStroke': stockScrollerUnselected,
+          'fallingStroke': stockScrollerUnselected,
+          'selectRisingStroke': returnSourceColor,
+          'selectFallingStroke': returnSourceColor
+        }
+      }
+    }
   }
 };

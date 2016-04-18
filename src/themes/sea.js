@@ -1,6 +1,18 @@
 goog.provide('anychart.themes.sea');
 
 
+var stockScrollerUnselected = '#999';
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+var returnSourceColor = function() {
+  return this['sourceColor'];
+};
+
+
 /**
  * @this {*}
  * @return {*}
@@ -107,9 +119,6 @@ window['anychart']['themes']['sea'] = {
     'title': {
       'fontSize': 14
     },
-    'padding': {'top': 20, 'right': 25, 'bottom': 15, 'left': 15}
-  },
-  'cartesianBase': {
     'defaultSeriesSettings': {
       'candlestick': {
         'risingFill': '#54dbdf',
@@ -133,7 +142,8 @@ window['anychart']['themes']['sea'] = {
         'selectRisingStroke': '3 #54dbdf',
         'selectFallingStroke': '3 #207fbf'
       }
-    }
+    },
+    'padding': {'top': 20, 'right': 25, 'bottom': 15, 'left': 15}
   },
   'pieFunnelPyramidBase': {
     'labels': {
@@ -229,7 +239,8 @@ window['anychart']['themes']['sea'] = {
     'hoverHeaders': {
       'fontColor': '#757575',
       'background': {
-        'fill': '#dcd8d4'
+        'fill': '#dcd8d4',
+        'stroke': '#dcd8d4'
       }
     },
     'labels': {
@@ -240,5 +251,48 @@ window['anychart']['themes']['sea'] = {
     },
     'stroke': '#dcd8d4',
     'selectStroke': '2 #eceff1'
+  },
+  'stock': {
+    'padding': [20, 30, 20, 60],
+    'defaultPlotSettings': {
+      'xAxis': {
+        'background': {
+          'fill': '#e9e6e3 0.5',
+          'stroke': '#dcd8d4'
+        }
+      }
+    },
+    'scroller': {
+      'fill': 'none',
+      'selectedFill': '#e9e6e3 0.5',
+      'outlineStroke': '#dcd8d4',
+      'defaultSeriesSettings': {
+        'base': {
+          'color': '#a9e1d4 0.6',
+          'selectStroke': returnSourceColor
+        },
+        'candlestick': {
+          'risingFill': stockScrollerUnselected,
+          'risingStroke': stockScrollerUnselected,
+          'fallingFill': stockScrollerUnselected,
+          'fallingStroke': stockScrollerUnselected,
+          'selectRisingStroke': returnSourceColor,
+          'selectFallingStroke': returnSourceColor,
+          'selectRisingFill': returnSourceColor,
+          'selectFallingFill': returnSourceColor
+        },
+        'ohlc': {
+          'risingStroke': stockScrollerUnselected,
+          'fallingStroke': stockScrollerUnselected,
+          'selectRisingStroke': returnSourceColor,
+          'selectFallingStroke': returnSourceColor
+        }
+      }
+    },
+    'xAxis': {
+      'background': {
+        'enabled': false
+      }
+    }
   }
 };

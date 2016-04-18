@@ -1,6 +1,18 @@
 goog.provide('anychart.themes.light_turquoise');
 
 
+var stockScrollerUnselected = '#999 0.6';
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+var returnSourceColor = function() {
+  return this['sourceColor'];
+};
+
+
 /**
  * @this {*}
  * @return {*}
@@ -109,20 +121,6 @@ window['anychart']['themes']['lightTurquoise'] = {
     }
   },
   'chart': {
-    'title': {
-      'fontSize': 14
-    },
-    'padding': {'top': 20, 'right': 25, 'bottom': 15, 'left': 15}
-  },
-  'pieFunnelPyramidBase': {
-    'labels': {
-      'fontColor': null
-    },
-    'connectorStroke': '#757575',
-    'outsideLabels': {'autoColor': '#424242'},
-    'insideLabels': {'autoColor': '#424242'}
-  },
-  'cartesianBase': {
     'defaultSeriesSettings': {
       'candlestick': {
         'risingFill': '#80deea',
@@ -147,6 +145,20 @@ window['anychart']['themes']['lightTurquoise'] = {
         'selectFallingStroke': '3 #00838f'
       }
     },
+    'title': {
+      'fontSize': 14
+    },
+    'padding': {'top': 20, 'right': 25, 'bottom': 15, 'left': 15}
+  },
+  'pieFunnelPyramidBase': {
+    'labels': {
+      'fontColor': null
+    },
+    'connectorStroke': '#757575',
+    'outsideLabels': {'autoColor': '#424242'},
+    'insideLabels': {'autoColor': '#424242'}
+  },
+  'cartesianBase': {
     'defaultXAxisSettings': {
       'orientation': 'bottom',
       'title': {
@@ -176,10 +188,9 @@ window['anychart']['themes']['lightTurquoise'] = {
   },
   'map': {
     'unboundRegions': {'enabled': true, 'fill': '#e0e0e0', 'stroke': '#bdbdbd'},
-    'linearColor': {'colors': ['#b2dfdb', '#80deea', '#00acc1', '#00838f']},
+    'linearColor': {'colors': ['#b2dfdb', '#00838f']},
     'defaultSeriesSettings': {
       'base': {
-        'stroke': '#757575',
         'labels': {
           'fontColor': '#424242'
         }
@@ -251,14 +262,15 @@ window['anychart']['themes']['lightTurquoise'] = {
     'headers': {
       'background': {
         'enabled': true,
-        'fill': '#e0e0e0',
+        'fill': '#c7c7c7',
         'stroke': '#bdbdbd'
       }
     },
     'hoverHeaders': {
       'fontColor': '#424242',
       'background': {
-        'fill': '#bdbdbd'
+        'fill': '#bdbdbd',
+        'stroke': '#bdbdbd'
       }
     },
     'labels': {
@@ -269,5 +281,44 @@ window['anychart']['themes']['lightTurquoise'] = {
     },
     'stroke': '#bdbdbd',
     'selectStroke': '2 #eceff1'
+  },
+  'stock': {
+    'padding': [20, 30, 20, 60],
+    'defaultPlotSettings': {
+      'xAxis': {
+        'background': {
+          'fill': '#bdbdbd 0.5',
+          'stroke': '#bdbdbd'
+        }
+      }
+    },
+    'scroller': {
+      'fill': 'none',
+      'selectedFill': '#bdbdbd 0.5',
+      'outlineStroke': '#bdbdbd',
+      'defaultSeriesSettings': {
+        'base': {
+          'color': '#00838f 0.5',
+          'selectFill': returnSourceColor,
+          'selectStroke': returnSourceColor
+        },
+        'candlestick': {
+          'risingFill': stockScrollerUnselected,
+          'risingStroke': stockScrollerUnselected,
+          'fallingFill': stockScrollerUnselected,
+          'fallingStroke': stockScrollerUnselected,
+          'selectRisingStroke': returnSourceColor,
+          'selectFallingStroke': returnSourceColor,
+          'selectRisingFill': returnSourceColor,
+          'selectFallingFill': returnSourceColor
+        },
+        'ohlc': {
+          'risingStroke': stockScrollerUnselected,
+          'fallingStroke': stockScrollerUnselected,
+          'selectRisingStroke': returnSourceColor,
+          'selectFallingStroke': returnSourceColor
+        }
+      }
+    }
   }
 };

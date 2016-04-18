@@ -1,6 +1,18 @@
 goog.provide('anychart.themes.dark_provence');
 
 
+var stockScrollerUnselected = '#999 0.6';
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+var returnSourceColor = function() {
+  return this['sourceColor'];
+};
+
+
 /**
  * @this {*}
  * @return {*}
@@ -28,7 +40,7 @@ window['anychart']['themes']['darkProvence'] = {
   },
   'ordinalColor': {
     'autoColors': function(rangesCount) {
-      return window['anychart']['color']['blendedHueProgression']('#e1bee7', '#9656a1', rangesCount);
+      return window['anychart']['color']['blendedHueProgression']('#b7cbe2', '#574774', rangesCount);
     }
   },
   'defaultFontSettings': {
@@ -79,7 +91,7 @@ window['anychart']['themes']['darkProvence'] = {
     'fontSize': 13,
     'background': {
       'fill': '#ffffff 0.9',
-      'stroke': '1 #ebebeb',
+      'stroke': '#b2aab5',
       'corners': 0
     },
     'offsetX': 15,
@@ -129,25 +141,6 @@ window['anychart']['themes']['darkProvence'] = {
       },
       'marker': {
         'selectStroke': '1.5 #fafafa'
-      }
-    },
-    'title': {
-      'fontSize': 17
-    },
-    'padding': {'top': 20, 'right': 25, 'bottom': 15, 'left': 15}
-  },
-  'cartesianBase': {
-    'defaultSeriesSettings': {
-      'box': {
-        'selectMedianStroke': '#fafafa',
-        'selectStemStroke': '#fafafa',
-        'selectWhiskerStroke': '#fafafa',
-        'selectOutlierMarkers': {
-          'enabled': null,
-          'size': 4,
-          'fill': '#fafafa',
-          'stroke': '#fafafa'
-        }
       },
       'candlestick': {
         'risingFill': '#aa8ab3',
@@ -171,6 +164,25 @@ window['anychart']['themes']['darkProvence'] = {
         'selectRisingStroke': '3 #aa8ab3',
         'selectFallingStroke': '3 #b7cbe2'
       }
+    },
+    'title': {
+      'fontSize': 17
+    },
+    'padding': {'top': 20, 'right': 25, 'bottom': 15, 'left': 15}
+  },
+  'cartesianBase': {
+    'defaultSeriesSettings': {
+      'box': {
+        'selectMedianStroke': '#fafafa',
+        'selectStemStroke': '#fafafa',
+        'selectWhiskerStroke': '#fafafa',
+        'selectOutlierMarkers': {
+          'enabled': null,
+          'size': 4,
+          'fill': '#fafafa',
+          'stroke': '#fafafa'
+        }
+      }
     }
   },
   'pieFunnelPyramidBase': {
@@ -184,7 +196,7 @@ window['anychart']['themes']['darkProvence'] = {
   },
   'map': {
     'unboundRegions': {'enabled': true, 'fill': '#616161', 'stroke': '#757575'},
-    'linearColor': {'colors': ['#e1bee7', '#aa8ab3', '#9656a1']},
+    'linearColor': {'colors': ['#b7cbe2', '#574774']},
     'defaultSeriesSettings': {
       'base': {
         'stroke': '#b2aab5',
@@ -265,7 +277,8 @@ window['anychart']['themes']['darkProvence'] = {
     'hoverHeaders': {
       'fontColor': '#b2aab5',
       'background': {
-        'fill': '#b2aab5'
+        'fill': '#414141',
+        'stroke': '#414141'
       }
     },
     'labels': {
@@ -276,5 +289,46 @@ window['anychart']['themes']['darkProvence'] = {
     },
     'stroke': '#414141',
     'selectStroke': '2 #eceff1'
+  },
+  'stock': {
+    'padding': [20, 30, 20, 60],
+    'defaultPlotSettings': {
+      'xAxis': {
+        'background': {
+          'fill': '#616161 0.3',
+          'stroke': '#5f5b61 0.8'
+        }
+      }
+    },
+    'scroller': {
+      'fill': 'none',
+      'selectedFill': '#616161 0.3',
+      'outlineStroke': '#5f5b61 0.8',
+      'defaultSeriesSettings': {
+        'base': {
+          'color': '#aa8ab3',
+          'selectStroke': returnSourceColor
+        },
+        'lineLike': {
+          'selectStroke': returnSourceColor
+        },
+        'areaLike': {
+          'selectStroke': returnSourceColor
+        },
+        'marker': {
+          'selectStroke': returnSourceColor
+        },
+        'candlestick': {
+          'risingStroke': stockScrollerUnselected,
+          'fallingFill': stockScrollerUnselected,
+          'risingFill': stockScrollerUnselected,
+          'fallingStroke': stockScrollerUnselected
+        },
+        'ohlc': {
+          'risingStroke': stockScrollerUnselected,
+          'fallingStroke': stockScrollerUnselected
+        }
+      }
+    }
   }
 };
