@@ -521,7 +521,9 @@ anychart.themes.merging.mergingMap_ = [
       'ganttBase.timeline.header.labelsFactory',
       'standalones.labelsFactory',
       'heatMap.labels',
-      'map.defaultSeriesSettings.base.labels'
+      'map.defaultSeriesSettings.base.labels',
+      'treeMap.headers',
+      'treeMap.labels'
     ]
   },
   {
@@ -541,7 +543,8 @@ anychart.themes.merging.mergingMap_ = [
       'ganttBase.timeline.markers',
       'standalones.markersFactory',
       'heatMap.markers',
-      'map.defaultSeriesSettings.base.markers'
+      'map.defaultSeriesSettings.base.markers',
+      'treeMap.markers'
     ]
   },
   {
@@ -672,6 +675,7 @@ anychart.themes.merging.mergingMap_ = [
       'stock.defaultPlotSettings.xAxis',
       'stock.scroller.xAxis',
       'map.colorRange',
+      'treeMap.colorRange',
       'standalones.linearAxis',
       'standalones.polarAxis',
       'standalones.radarAxis',
@@ -693,7 +697,8 @@ anychart.themes.merging.mergingMap_ = [
       'sparkline',
       'ganttBase',
       'stock',
-      'stock.defaultPlotSettings'
+      'stock.defaultPlotSettings',
+      'treeMap'
     ]
   },
   {

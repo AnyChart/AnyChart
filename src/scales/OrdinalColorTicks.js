@@ -20,6 +20,8 @@ goog.inherits(anychart.scales.OrdinalColorTicks, anychart.scales.OrdinalTicks);
 anychart.scales.OrdinalColorTicks.prototype.calcAutoTicks = function() {
   var res = [];
   var ranges = this.scale.ranges();
+  if (!ranges.length)
+    ranges = this.scale.getProcessedRanges();
   if (ranges) {
     for (var i = 0, len = ranges.length; i < len; i += this.interval()) {
       res.push(i);

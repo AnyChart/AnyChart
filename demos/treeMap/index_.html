@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+    <!--Compiled JS-->
+    <!--<script src="../../out/anychart-bundle.min.js"></script>-->
+
+    <!--Non Compiled JS-->
+    <script src="../../contrib/closure-library/closure/goog/base.js"></script>
+    <script src="../../src/deps.js"></script>
+    <script>
+        goog.require('anychart.themes.defaultTheme');
+        goog.require('anychart.modules.treeMap');
+    </script>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        #container {
+            width: 500px;
+            height: 500px;
+            float: left
+        }
+
+        #controls {
+            margin: 5px;
+            float: left
+        }
+    </style>
+</head>
+<body>
+<div id="container" style="border: 1px solid; width: 800px; height: 600px;"></div>
+<div id="container1" style="border: 1px solid; width: 800px; height: 600px;"></div>
+<script>
+    var stage, chart, chart1, chart2, chart4;
+    anychart.onDocumentReady(function() {
+        document.getElementById('container').style.display = 'none';
+        document.getElementById('container1').style.display = 'none';
+        tree = anychart.data.tree([
+            {id: 'Continents', name: 'Continents'},
+            {id: 0, name: 'Asia', parent: 'Continents'},
+            {id: 1, name: 'Europe', parent: 'Continents'},
+            {id: 2, name: 'Asia 1', parent: 0, value: 50},
+            {id: 3, name: 'Asia 2', parent: 0, value: 150},
+            {id: 4, name: 'Asia 3', parent: 0, value: 350},
+            {id: 5, name: 'Europe 1', parent: 1, value: 300},
+            {id: 6, name: 'Europe 2', parent: 1, value: 400}
+        ], 'asTable');
+        chart = anychart.treeMap();
+        chart.data(tree).hoverHeaders(true).drillTo(tree.search("id", "1"));
+        chart.container('container').draw();
+        document.getElementById('container').style.display = '';
+        document.getElementById('container').style.display = 'none';
+        document.getElementById('container1').style.display = '';
+        chart.container('container1').draw();
+    });
+</script>
+</body>

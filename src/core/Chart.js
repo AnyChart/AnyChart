@@ -1354,6 +1354,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
       if (tag.points_) {
         series = tag.points_.series;
         index = tag.points_.points;
+        if (goog.isArray(index) && index.length == 0) index = NaN;
       } else {
         // I don't understand, why it is like this here.
         //series = tag.series_;
@@ -1401,6 +1402,12 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
           }
         }
       }
+    }
+  } else {
+    if (this.prevHoverSeriesStatus) {
+      this.unhover();
+      this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, this.prevHoverSeriesStatus, true));
+      this.prevHoverSeriesStatus = null;
     }
   }
 
@@ -1473,6 +1480,7 @@ anychart.core.Chart.prototype.handleMouseOut = function(event) {
       if (tag.points_) {
         series = tag.points_.series;
         index = tag.points_.points;
+        if (goog.isArray(index) && index.length == 0) index = NaN;
       } else {
         // I don't understand, why it is like this here.
         //series = tag.series_;

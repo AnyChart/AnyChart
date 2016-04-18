@@ -20,7 +20,8 @@
         {"$ref": "#/definitions/anychart.charts.Radar"},
         {"$ref": "#/definitions/anychart.charts.Scatter"},
         {"$ref": "#/definitions/anychart.charts.Sparkline"},
-        {"$ref": "#/definitions/anychart.charts.HeatMap"}
+        {"$ref": "#/definitions/anychart.charts.HeatMap"},
+        {"$ref": "#/definitions/anychart.charts.TreeMap"}
       ],
       "properties": {
         "container": {
@@ -1701,7 +1702,7 @@
         "markers": {
           "oneOf": [
             {"$ref": "#/definitions/disable"},
-            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory.Marker"}
+            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
           ]
         },
         "hoverMarkers": {
@@ -1780,6 +1781,118 @@
           "oneOf": [
             {"$ref": "#/definitions/disable"},
             {"$ref": "#/definitions/anychart.core.ui.ChartScroller"}
+          ]
+        }
+      },
+      "required": ["type"]
+    },
+    "anychart.charts.TreeMap": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.Chart"}
+      ],
+      "properties": {
+        "type": {"enum": ["treemap"]},
+        "data": {"$ref": "#/definitions/data"},
+
+        "scales": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "items": {
+            "anyOf": [
+              {"$ref": "#/definitions/anychart.scales.OrdinalColor"},
+              {"$ref": "#/definitions/anychart.scales.LinearColor"}
+            ]
+          },
+          "patternProperties": {
+            ".*": {
+              "anyOf": [
+                {"$ref": "#/definitions/anychart.scales.OrdinalColor"},
+                {"$ref": "#/definitions/anychart.scales.LinearColor"}
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+
+        "markers": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
+          ]
+        },
+        "hoverMarkers": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
+          ]
+        },
+        "selectMarkers": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
+          ]
+        },
+
+        "labels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "hoverLabels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "selectLabels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+
+        "headers": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "hoverHeaders": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+
+        "stroke": {"$ref": "#/definitions/stroke"},
+        "hoverStroke": {"$ref": "#/definitions/stroke"},
+        "selectStroke": {"$ref": "#/definitions/stroke"},
+
+        "fill": {"$ref": "#/definitions/fill"},
+        "hoverFill": {"$ref": "#/definitions/fill"},
+        "selectFill": {"$ref": "#/definitions/fill"},
+
+        "hatchFill": {"$ref": "#/definitions/hatchFillSet"},
+        "hoverHatchFill": {"$ref": "#/definitions/hatchFillSet"},
+        "selectHatchFill": {"$ref": "#/definitions/hatchFillSet"},
+
+        "labelsDisplayMode": {"$ref": "#/definitions/anychart.enums.LabelsDisplayMode"},
+        "headersDisplayMode": {"$ref": "#/definitions/anychart.enums.LabelsDisplayMode"},
+        "maxDepth": {"type": "number"},
+        "hintDepth": {"type": "number"},
+        "hintOpacity": {"type": "number"},
+        "maxHeadersHeight": {"type": ["number", "string"]},
+        "sort": {"type": "string"},
+
+        "colorScale": {
+          "oneOf": [
+            {"type": ["string", "number"]},
+            {"$ref": "#/definitions/anychart.scales.OrdinalColor"},
+            {"$ref": "#/definitions/anychart.scales.LinearColor"}
           ]
         }
       },

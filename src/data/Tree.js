@@ -144,7 +144,7 @@ anychart.data.Tree.ChangeEvent;
 /**
  * @typedef {{
  *    treeDataItemData: !Object,
- *    treeDataItemMeta: !Object,
+ *    treeDataItemMeta: (Object|undefined),
  *    children: (Array.<anychart.data.Tree.SerializedDataItem>|undefined)
  * }}
  */
@@ -826,6 +826,27 @@ anychart.data.Tree.prototype.serialize = function() {
   for (var i = 0; i < this.numChildren(); i++) {
     var root = this.getChildAt(i);
     json['children'].push(root.serialize());
+  }
+
+  json['index'] = [];
+  for (var key in this.index_) {
+    json['index'].push(key);
+  }
+
+  return json;
+};
+
+
+/**
+ * Serializes tree without meta information.
+ * @return {!Object} Serialized JSON object.
+ */
+anychart.data.Tree.prototype.serializeWithoutMeta = function() {
+  var json = {};
+  json['children'] = [];
+  for (var i = 0; i < this.numChildren(); i++) {
+    var root = this.getChildAt(i);
+    json['children'].push(root.serialize(false));
   }
 
   json['index'] = [];
@@ -1781,18 +1802,20 @@ anychart.data.Tree.DataItem.prototype.isChildOf = function(potentialParent) {
 
 /**
  * Serializes tree data item with its children.
+ * @param {boolean=} opt_addMeta [true] Whether to add meta to tree.
  * @return {anychart.data.Tree.SerializedDataItem} - Serialized tree data item.
  */
-anychart.data.Tree.DataItem.prototype.serialize = function() {
+anychart.data.Tree.DataItem.prototype.serialize = function(opt_addMeta) {
   var result = {
-    'treeDataItemData': this.data_,
-    'treeDataItemMeta': this.meta_
+    'treeDataItemData': this.data_
   };
+  if (opt_addMeta !== false)
+    result['treeDataItemMeta'] = this.meta_;
 
   for (var i = 0, len = this.numChildren(); i < len; i++) {
     var child = this.getChildAt(i);
     if (!result.children) result.children = [];
-    result.children.push(child.serialize());
+    result.children.push(child.serialize(opt_addMeta));
   }
 
   return result;

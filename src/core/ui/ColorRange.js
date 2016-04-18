@@ -156,8 +156,8 @@ anychart.core.ui.ColorRange.prototype.markerInvalidated_ = function(event) {
 
 /**
  * Set/get target series.
- * @param {anychart.core.map.series.Base=} opt_series Target series.
- * @return {anychart.core.map.series.Base|anychart.core.ui.ColorRange} target series.
+ * @param {anychart.core.map.series.Base|anychart.charts.TreeMap=} opt_series Target series.
+ * @return {anychart.core.map.series.Base|anychart.charts.TreeMap|anychart.core.ui.ColorRange} target series.
  */
 anychart.core.ui.ColorRange.prototype.target = function(opt_series) {
   if (goog.isDef(opt_series)) {
@@ -797,7 +797,7 @@ anychart.core.ui.ColorRange.prototype.draw = function() {
  */
 anychart.core.ui.ColorRange.prototype.handleMouseClick = function(event) {
   var scale = this.scale();
-  var series = /** @type {anychart.core.map.series.Base} */(this.targetSeries_);
+  var series = /** @type {anychart.core.map.series.Base|anychart.charts.TreeMap} */(this.targetSeries_);
 
   if (this.enabled() && scale && series && series.enabled() && series.colorScale() == scale) {
     var lineBounds = this.line.getBounds();
@@ -813,7 +813,7 @@ anychart.core.ui.ColorRange.prototype.handleMouseClick = function(event) {
     }
 
     value = /** @type {number} */(scale.inverseTransform(ratio));
-    if (!(event.metaKey || event.shiftKey)) {
+    if (!(event.metaKey || event.shiftKey) && series.map) {
       series.map.unselect();
     }
     var iterator, pointValue, points;
@@ -887,7 +887,7 @@ anychart.core.ui.ColorRange.prototype.handleMouseClick = function(event) {
  */
 anychart.core.ui.ColorRange.prototype.handleMouseOverAndMove = function(event) {
   var scale = this.scale();
-  var series = /** @type {anychart.core.map.series.Base} */(this.targetSeries_);
+  var series = /** @type {anychart.core.map.series.Base|anychart.charts.TreeMap} */(this.targetSeries_);
   if (this.enabled() && scale && series && series.enabled() && series.colorScale() == scale) {
     var lineBounds = this.line.getBounds();
     var x, y, min, ratio, value;

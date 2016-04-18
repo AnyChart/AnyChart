@@ -47,6 +47,15 @@ var returnX = function() {
  * @this {*}
  * @return {*}
  */
+var returnName = function() {
+  return this['name'];
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
 var returnDateTimeX = function() {
   var date = new Date(this['x']);
   var options = {
@@ -1722,6 +1731,154 @@ window['anychart']['themes']['defaultTheme'] = {
       },
       'zIndex': 35
     }
+  },
+  'treeMap': {
+    'sort': 'desc',
+    'colorRange': {
+      'enabled': true,
+      'stroke': null,
+      'orientation': 'bottom',
+      'title': {'enabled': false},
+      'colorLineSize': 20,
+      'padding': {'top': 10, 'right': 0, 'bottom': 20, 'left': 0},
+      'align': 'center',
+      'length': '70%',
+      'marker': {
+        'padding': {'top': 3, 'right': 3, 'bottom': 3, 'left': 3},
+        'fill': '#545f69',
+        'hoverFill': '#545f69',
+        'stroke': '#545f69',
+        'hoverStroke': '#545f69',
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'positionFormatter': returnValue,
+        'legendItem': {
+          'iconStroke': null
+        },
+        'enabled': true,
+        'disablePointerEvents': false,
+        'position': 'center',
+        'rotation': 0,
+        'anchor': 'center',
+        'offsetX': 0,
+        'offsetY': 0,
+        'type': 'triangleDown',
+        'size': 10
+      },
+      'labels': {
+        /**
+         * @this {*}
+         * @return {*}
+         */
+        'textFormatter': returnValue,
+        'offsetX': 0
+      },
+      'ticks': {
+        'stroke': {'thickness': 3, 'color': '#fff', 'position': 'center', 'length': 20}
+      }
+    },
+    'labelsDisplayMode': 'clip',
+    'headersDisplayMode': 'alwaysShow',
+    'tooltip': {
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'titleFormatter': returnName,
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'textFormatter': returnValue
+    },
+    'colorScale': {
+      'type': 'ordinalColor'
+      //'colors': ['#009688', '#f7f7f7', '#ee8100']
+    },
+    'legend': {
+      'itemsSourceMode': 'categories'
+    },
+    'maxDepth': 1,
+    'hintDepth': 0,
+    'hintOpacity': 0.4,
+    'maxHeadersHeight': '25',
+    'headers': {
+      'enabled': true,
+      'fontSize': 11,
+      'hAlign': 'center',
+      'vAlign': 'center',
+      'position': 'leftTop',
+      'anchor': 'leftTop',
+      'rotation': 0,
+      'fontColor': 'black',
+      'background': {
+        'enabled': true,
+        'fill': 'lightgreen',
+        'stroke': 'darkgreen'
+      },
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'textFormatter': returnName
+    },
+    'hoverHeaders': {
+      'fontColor': 'cyan'
+    },
+    'labels': {
+      'enabled': true,
+      'hAlign': 'center',
+      'vAlign': 'center',
+      'position': 'leftTop',
+      'anchor': 'leftTop',
+      'rotation': 0,
+      'fontColor': 'blue',
+      'background': {
+        'enabled': false,
+        'fill': 'none',
+        'stroke': 'none'
+      },
+      /**
+       * @this {*}
+       * @return {*}
+       */
+      'textFormatter': returnName
+    },
+    'markers': {
+      'enabled': false,
+      'position': 'center',
+      'type': 'star5',
+      'size': 6
+    },
+    'hoverMarkers': {
+      'enabled': true,
+      'position': 'center',
+      'type': 'star5',
+      'size': 10,
+      'offsetY': 15,
+      'fill': 'yellow',
+      'stroke': 'black'
+    },
+    /**
+     * @this {*}
+     * @return {*}
+     */
+    'fill': function() {
+      var color;
+      if (this['colorScale']) {
+        color = this['colorScale']['valueToColor'](this['value']);
+      } else {
+        color = window['anychart']['color']['setOpacity'](this['sourceColor'], 0.85, true);
+      }
+      return color;
+    },
+    'hoverFill': '#545f69',
+    'selectFill': '#333',
+    'hatchFill': false,
+    'hoverHatchFill': true,
+    'selectHatchFill': false
   },
 
   // merge with chart

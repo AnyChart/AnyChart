@@ -44,7 +44,8 @@ anychart.enums.ChartTypes = {
   SCATTER: 'scatter',
   STOCK: 'stock',
   SPARKLINE: 'sparkline',
-  HEAT_MAP: 'heatMap'
+  HEAT_MAP: 'heatMap',
+  TREE_MAP: 'treeMap'
 };
 
 
@@ -2634,6 +2635,8 @@ anychart.enums.WarningCode = {
   SCALE_TYPE_NOT_SUPPORTED: 16,
 
   DATA_ITEM_SET_PATH: 17,
+
+  TREEMAP_MANY_ROOTS: 18,
 
   TABLE_ALREADY_IN_TRANSACTION: 101,
 

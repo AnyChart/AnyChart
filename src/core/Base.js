@@ -248,6 +248,14 @@ anychart.ConsistencyState = {
   //---------------------------------- STOCK SCROLLER (SCROLLER) ----------------------------------------
   STOCK_SCROLLER_SERIES: 1 << 8,
   STOCK_SCROLLER_AXIS: 1 << 9,
+  //---------------------------------- TREE MAP CHART (SEPARATE CHART) ----------------------------------
+  TREEMAP_DATA: 1 << 11,
+  TREEMAP_LABELS: 1 << 12,
+  TREEMAP_MARKERS: 1 << 13,
+  TREEMAP_COLOR_SCALE: 1 << 14,
+  TREEMAP_NODE_TYPES: 1 << 15,
+  TREEMAP_COLOR_RANGE: 1 << 16,
+  TREEMAP_HINT_OPACITY: 1 << 17,
   /**
    * Combination of all states.
    */

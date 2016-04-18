@@ -369,6 +369,24 @@ anychart.core.ui.LabelsFactory.prototype.textFormatter = function(opt_value) {
 };
 
 
+/**
+ * Gets text formatter.
+ * @return {Function|string} Text formatter.
+ */
+anychart.core.ui.LabelsFactory.prototype.getTextFormatterInternal = function() {
+  return this.textFormatter_;
+};
+
+
+/**
+ * Sets text formatter.
+ * @param {Function|string} value Text formatter value.
+ */
+anychart.core.ui.LabelsFactory.prototype.setTextFormatterInternal = function(value) {
+  this.textFormatter_ = value;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Position.

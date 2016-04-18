@@ -1,0 +1,581 @@
+<!doctype html>
+<html>
+<head>
+    <!--Static url js JS-->
+    <!--<script src="http://static.anychart.com/js/DVF-1730-treemap-feature/anychart-bundle.min.js"></script>-->
+
+    <!--Compiled JS-->
+    <!--<script src="../../out/anychart-bundle.min.js"></script>-->
+
+    <!--Non Compiled JS-->
+    <script src="../../contrib/closure-library/closure/goog/base.js"></script>
+    <script src="../../src/deps.js"></script>
+    <script>
+        goog.require('anychart.themes.defaultTheme');
+        goog.require('anychart.modules.treeMap');
+    </script>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        #container {
+            width: 500px;
+            height: 500px;
+            float: left
+        }
+
+        #controls {
+            margin: 5px;
+            float: left
+        }
+    </style>
+</head>
+<body>
+<div id="container" style="border: 1px solid; width: 800px; height: 600px;"></div>
+<div id="controls">
+    <label>
+        maxDepth [1, 10]:
+        <input id="maxDepthRange" type="range" min="1" max="3" value="1" oninput="maxDepthRangeChange(this.value)"/>
+        <input id="maxDepthInput" type="text" value="1" onchange="maxDepthInputChange(this.value)">
+    </label>
+    <br/>
+    <label>
+        hintDepth [0, 10]:
+        <input id="hintDepthRange" type="range" min="0" max="2" value="0" oninput="hintDepthRangeChange(this.value)"/>
+        <input id="hintDepthInput" type="text" value="0" onchange="hintDepthInputChange(this.value)">
+    </label>
+    <br/>
+    <label>
+        hintOpacity [0, 1]:
+        <input id="hintOpacityRange" type="range" min="0" max="1" value="1" step="0.01"
+               oninput="hintOpacityRangeChange(this.value)"/>
+        <input id="hintOpacityInput" type="text" value="1" onchange="hintOpacityInputChange(this.value)">
+    </label>
+    <div id="crumbs"></div>
+</div>
+
+<script>
+    var chart, range, rangeInput;
+    range = document.getElementById('hintOpacity');
+    rangeInput = document.getElementById('hintOpacityText');
+    anychart.onDocumentReady(function() {
+        /*var rawData = [
+         {
+         name: 'Eurasia',
+         children: [
+         {
+         name: 'Asia',
+         children: [
+         {
+         name: 'Asia 1',
+         children: [
+         {name: 'Asia 11', value: 20},
+         {name: 'Asia 12', value: 30}
+         ]
+         },
+         {
+         name: 'Asia 2',
+         value: 60,
+         children: [
+         {name: 'Asia 21', value: 50},
+         {name: 'Asia 22', value: 50},
+         {name: 'Asia 23', value: 50}
+         ]
+         },
+         {
+         name: 'Asia 3',
+         value: 70,
+         children: [
+         {name: 'Asia 31', value: 35},
+         {name: 'Asia 32', value: 70},
+         {name: 'Asia 33', value: 105},
+         {name: 'Asia 34', value: 140}
+         ]
+         }
+         ]
+         },
+         {
+         name: 'Europe',
+         children: [
+         {name: 'Europe 1', value: 300},
+         {name: 'Europe 2', value: 400}
+         ]
+         }
+         ]
+         }
+         ];*/
+
+        var rawData = [
+            {id: 'Shakespeare', parent: null},
+
+            {id: 'Comedies', parent: 'Shakespeare'},
+            {id: 'Tragedies', parent: 'Shakespeare'},
+            {id: 'Histories', parent: 'Shakespeare'},
+
+            {id: 'As You Like It', parent: 'Comedies'},
+            {id: 'Adam', parent: 'As You Like It', value: 10},
+            {id: 'Amiens', parent: 'As You Like It', value: 10},
+            {id: 'Audrey', parent: 'As You Like It', value: 12},
+            {id: 'Celia', parent: 'As You Like It', value: 108},
+            {id: 'Charles', parent: 'As You Like It', value: 8},
+            {id: 'Corin', parent: 'As You Like It', value: 24},
+            {id: 'Dennis', parent: 'As You Like It', value: 2},
+            {id: 'Duke', parent: 'As You Like It', value: 32},
+            {id: 'Frederick', parent: 'As You Like It', value: 20},
+            {id: 'Hymen', parent: 'As You Like It', value: 1},
+            {id: 'Jaques (lord)', parent: 'As You Like It', value: 57},
+            {id: 'Jaques (son)', parent: 'As You Like It', value: 2},
+            {id: 'Le Beau', parent: 'As You Like It', value: 14},
+            {id: 'Oliver', parent: 'As You Like It', value: 37},
+            {id: 'Orlando', parent: 'As You Like It', value: 120},
+            {id: 'Phebe', parent: 'As You Like It', value: 23},
+            {id: 'Rosalind', parent: 'As You Like It', value: 201},
+            {id: 'Silvius', parent: 'As You Like It', value: 24},
+            {id: 'Sir Oliver Martext', parent: 'As You Like It', value: 3},
+            {id: 'Touchstone', parent: 'As You Like It', value: 74},
+            {id: 'William', parent: 'As You Like It', value: 11},
+
+            {id: 'Comedy Of Errors', parent: 'Comedies'},
+            {id: 'Adriana', parent: 'Comedy Of Errors', value: 79},
+            {id: 'Aegeon', parent: 'Comedy Of Errors', value: 17},
+            {id: 'Aemilia', parent: 'Comedy Of Errors', value: 16},
+            {id: 'Angelo', parent: 'Comedy Of Errors', value: 31},
+            {id: 'Antipholus of Ephesus', parent: 'Comedy Of Errors', value: 76},
+            {id: 'Antipholus of Syracuse', parent: 'Comedy Of Errors', value: 103},
+            {id: 'Balthazar', parent: 'Comedy Of Errors', value: 5},
+            {id: 'Courtezan', parent: 'Comedy Of Errors', value: 11},
+            {id: 'Dromio of Ephesus', parent: 'Comedy Of Errors', value: 63},
+            {id: 'Dromio of Syracuse', parent: 'Comedy Of Errors', value: 99},
+            {id: 'Luce', parent: 'Comedy Of Errors', value: 7},
+            {id: 'Luciana', parent: 'Comedy Of Errors', value: 43},
+            {id: 'Pinch', parent: 'Comedy Of Errors', value: 6},
+            {id: 'Solinus', parent: 'Comedy Of Errors', value: 22},
+
+            {id: 'Merchant Of Venice', parent: 'Comedies'},
+            {id: 'Antonio', parent: 'Merchant Of Venice', value: 47},
+            {id: 'Balthasar', parent: 'Merchant Of Venice', value: 1},
+            {id: 'Bassanio', parent: 'Merchant Of Venice', value: 73},
+            {id: 'Duke (of Venice)', parent: 'Merchant Of Venice', value: 18},
+            {id: 'Gratiano', parent: 'Merchant Of Venice', value: 48},
+            {id: 'Jessica', parent: 'Merchant Of Venice', value: 26},
+            {id: 'Launcelot Gobbo', parent: 'Merchant Of Venice', value: 44},
+            {id: 'Leonardo', parent: 'Merchant Of Venice', value: 2},
+            {id: 'Lorenzo', parent: 'Merchant Of Venice', value: 47},
+            {id: 'Nerissa', parent: 'Merchant Of Venice', value: 36},
+            {id: 'Old Gobbo', parent: 'Merchant Of Venice', value: 19},
+            {id: 'Portia', parent: 'Merchant Of Venice', value: 117},
+            {id: 'Prince of Arragon', parent: 'Merchant Of Venice', value: 4},
+            {id: 'Prince of Morocco', parent: 'Merchant Of Venice', value: 7},
+            {id: 'Salanio', parent: 'Merchant Of Venice', value: 18},
+            {id: 'Salarino', parent: 'Merchant Of Venice', value: 27},
+            {id: 'Salerio', parent: 'Merchant Of Venice', value: 6},
+            {id: 'Shylock', parent: 'Merchant Of Venice', value: 79},
+            {id: 'Stephano', parent: 'Merchant Of Venice', value: 3},
+            {id: 'Tubal', parent: 'Merchant Of Venice', value: 8},
+
+            {id: 'Midsummer Night\'s Dream', parent: 'Comedies'},
+            {id: 'Bottom', parent: 'Midsummer Night\'s Dream', value: 59},
+            {id: 'Cobweb', parent: 'Midsummer Night\'s Dream', value: 4},
+            {id: 'Demetrius', parent: 'Midsummer Night\'s Dream', value: 48},
+            {id: 'Egeus', parent: 'Midsummer Night\'s Dream', value: 7},
+            {id: 'Fairy', parent: 'Midsummer Night\'s Dream', value: 4},
+            {id: 'Flute', parent: 'Midsummer Night\'s Dream', value: 18},
+            {id: 'Helena', parent: 'Midsummer Night\'s Dream', value: 36},
+            {id: 'Hermia', parent: 'Midsummer Night\'s Dream', value: 48},
+            {id: 'Hippolyta', parent: 'Midsummer Night\'s Dream', value: 14},
+            {id: 'Lysander', parent: 'Midsummer Night\'s Dream', value: 50},
+            {id: 'Moth', parent: 'Midsummer Night\'s Dream', value: 2},
+            {id: 'Mustardseed', parent: 'Midsummer Night\'s Dream', value: 5},
+            {id: 'Oberon', parent: 'Midsummer Night\'s Dream', value: 29},
+            {id: 'Peaseblossom', parent: 'Midsummer Night\'s Dream', value: 4},
+            {id: 'Philostrate', parent: 'Midsummer Night\'s Dream', value: 6},
+            {id: 'Puck', parent: 'Midsummer Night\'s Dream', value: 33},
+            {id: 'Quince', parent: 'Midsummer Night\'s Dream', value: 40},
+            {id: 'Snout', parent: 'Midsummer Night\'s Dream', value: 9},
+            {id: 'Snug', parent: 'Midsummer Night\'s Dream', value: 4},
+            {id: 'Starveling', parent: 'Midsummer Night\'s Dream', value: 7},
+            {id: 'Theseus', parent: 'Midsummer Night\'s Dream', value: 48},
+            {id: 'Titania', parent: 'Midsummer Night\'s Dream', value: 23},
+
+            {id: 'Taming Of The Shrew', parent: 'Comedies'},
+            {id: 'Baptista Minola', parent: 'Taming Of The Shrew', value: 68},
+            {id: 'Bianca', parent: 'Taming Of The Shrew', value: 29},
+            {id: 'Biondello', parent: 'Taming Of The Shrew', value: 39},
+            {id: 'Christopher Sly', parent: 'Taming Of The Shrew', value: 24},
+            {id: 'Curtis', parent: 'Taming Of The Shrew', value: 20},
+            {id: 'Gremio', parent: 'Taming Of The Shrew', value: 58},
+            {id: 'Grumio', parent: 'Taming Of The Shrew', value: 63},
+            {id: 'Haberdasher', parent: 'Taming Of The Shrew', value: 1},
+            {id: 'Hortensio', parent: 'Taming Of The Shrew', value: 70},
+            {id: 'Joseph', parent: 'Taming Of The Shrew', value: 1},
+            {id: 'Katherina', parent: 'Taming Of The Shrew', value: 82},
+            {id: 'Lucentio', parent: 'Taming Of The Shrew', value: 61},
+            {id: 'Nathaniel', parent: 'Taming Of The Shrew', value: 4},
+            {id: 'Nicholas', parent: 'Taming Of The Shrew', value: 1},
+            {id: 'Peter', parent: 'Taming Of The Shrew', value: 2},
+            {id: 'Petruchio', parent: 'Taming Of The Shrew', value: 158},
+            {id: 'Philip', parent: 'Taming Of The Shrew', value: 1},
+            {id: 'Tranio', parent: 'Taming Of The Shrew', value: 90},
+            {id: 'Vincentio', parent: 'Taming Of The Shrew', value: 23},
+
+            {id: 'The Tempest', parent: 'Comedies'},
+            {id: 'Adrian', parent: 'The Tempest', value: 9},
+            {id: 'Alonso', parent: 'The Tempest', value: 40},
+            {id: 'Antonio, duke of Milan', parent: 'The Tempest', value: 57},
+            {id: 'Ariel', parent: 'The Tempest', value: 45},
+            {id: 'Caliban', parent: 'The Tempest', value: 50},
+            {id: 'Ceres', parent: 'The Tempest', value: 4},
+            {id: 'Ferdinand', parent: 'The Tempest', value: 31},
+            {id: 'Francisco', parent: 'The Tempest', value: 2},
+            {id: 'Gonzalo', parent: 'The Tempest', value: 52},
+            {id: 'Iris', parent: 'The Tempest', value: 4},
+            {id: 'Juno', parent: 'The Tempest', value: 2},
+            {id: 'Master', parent: 'The Tempest', value: 2},
+            {id: 'Miranda', parent: 'The Tempest', value: 50},
+            {id: 'Nymphs', parent: 'The Tempest', value: 0},
+            {id: 'Prospero', parent: 'The Tempest', value: 114},
+            {id: 'Reapers', parent: 'The Tempest', value: 0},
+            {id: 'Sebastian', parent: 'The Tempest', value: 67},
+            {id: 'Stephano (Servant to Portia)', parent: 'The Tempest', value: 60},
+            {id: 'Trinculo', parent: 'The Tempest', value: 39},
+
+            {id: 'Henry VIII', parent: 'Histories'},
+            {id: 'Anne Bullen', parent: 'Henry VIII', value: 18},
+            {id: 'Archbishop Cranmer', parent: 'Henry VIII', value: 21},
+            {id: 'Bishop Lincoln', parent: 'Henry VIII', value: 2},
+            {id: 'Brandon', parent: 'Henry VIII', value: 6},
+            {id: 'Capucius', parent: 'Henry VIII', value: 5},
+            {id: 'Cardinal Campeius', parent: 'Henry VIII', value: 14},
+            {id: 'Cardinal Wolsey', parent: 'Henry VIII', value: 79},
+            {id: 'Cromwell', parent: 'Henry VIII', value: 21},
+            {id: 'Doctor Butts', parent: 'Henry VIII', value: 4},
+            {id: 'Duke of Buckingham', parent: 'Henry VIII', value: 26},
+            {id: 'Duke of Norfolk', parent: 'Henry VIII', value: 48},
+            {id: 'Duke of Suffolk', parent: 'Henry VIII', value: 30},
+            {id: 'Earl of Surrey', parent: 'Henry VIII', value: 24},
+            {id: 'First Secretary to Wolsey', parent: 'Henry VIII', value: 2},
+            {id: 'Gardiner', parent: 'Henry VIII', value: 22},
+            {id: 'Garter', parent: 'Henry VIII', value: 1},
+            {id: 'Griffith', parent: 'Henry VIII', value: 13},
+            {id: 'King Henry VIII', parent: 'Henry VIII', value: 81},
+            {id: 'Lord Abergavenny', parent: 'Henry VIII', value: 5},
+            {id: 'Lord Chamberlain', parent: 'Henry VIII', value: 38},
+            {id: 'Lord Chancellor', parent: 'Henry VIII', value: 7},
+            {id: 'Lord Sands', parent: 'Henry VIII', value: 17},
+            {id: 'Old Lady', parent: 'Henry VIII', value: 14},
+            {id: 'Patience', parent: 'Henry VIII', value: 3},
+            {id: 'Porter (door-keeper of the Council-chamber)', parent: 'Henry VIII', value: 10},
+            {id: 'Queen Katharine', parent: 'Henry VIII', value: 50},
+            {id: 'Sir Anthony Denny', parent: 'Henry VIII', value: 3},
+            {id: 'Sir Henry Guildford', parent: 'Henry VIII', value: 1},
+            {id: 'Sir Nicholas Vaux', parent: 'Henry VIII', value: 1},
+            {id: 'Sir Thomas Lovell', parent: 'Henry VIII', value: 21},
+            {id: 'Surveyor to the Duke of Buckingham', parent: 'Henry VIII', value: 9},
+
+            {id: 'History Of King John', parent: 'Histories'},
+            {id: 'Arthur Duke of Bretagne', parent: 'History Of King John', value: 23},
+            {id: 'Blanch', parent: 'History Of King John', value: 9},
+            {id: 'Cardinal Pandulph', parent: 'History Of King John', value: 23},
+            {id: 'Chatillon', parent: 'History Of King John', value: 5},
+            {id: 'Constance', parent: 'History Of King John', value: 36},
+            {id: 'Essex', parent: 'History Of King John', value: 1},
+            {id: 'Faulconbridge', parent: 'History Of King John', value: 4},
+            {id: 'Hubert de Burgh', parent: 'History Of King John', value: 52},
+            {id: 'James Gurney', parent: 'History Of King John', value: 1},
+            {id: 'King John', parent: 'History Of King John', value: 95},
+            {id: 'King Phillip', parent: 'History Of King John', value: 43},
+            {id: 'Lady Faulconbridge', parent: 'History Of King John', value: 5},
+            {id: 'Lewis the Dauphin', parent: 'History Of King John', value: 29},
+            {id: 'Lord Bigot', parent: 'History Of King John', value: 6},
+            {id: 'Lymoges duke of Austria', parent: 'History Of King John', value: 16},
+            {id: 'Melun', parent: 'History Of King John', value: 3},
+            {id: 'Pembroke earl of Pembroke', parent: 'History Of King John', value: 20},
+            {id: 'Peter of Pomfret', parent: 'History Of King John', value: 1},
+            {id: 'Philip the Bastard', parent: 'History Of King John', value: 89},
+            {id: 'Prince Henry', parent: 'History Of King John', value: 8},
+            {id: 'Queen Elinor', parent: 'History Of King John', value: 22},
+            {id: 'Salisbury earl of Salisbury', parent: 'History Of King John', value: 36},
+
+            {id: 'Antony And Cleopatra', parent: 'Tragedies'},
+            {id: 'Agrippa', parent: 'Antony And Cleopatra', value: 28},
+            {id: 'Alexas', parent: 'Antony And Cleopatra', value: 15},
+            {id: 'Antony', parent: 'Antony And Cleopatra', value: 202},
+            {id: 'Canidius', parent: 'Antony And Cleopatra', value: 10},
+            {id: 'Captain', parent: 'Antony And Cleopatra', value: 1},
+            {id: 'Charmian', parent: 'Antony And Cleopatra', value: 63},
+            {id: 'Cleopatra', parent: 'Antony And Cleopatra', value: 204},
+            {id: 'Demetrius (Friend to Antony)', parent: 'Antony And Cleopatra', value: 2},
+            {id: 'Dercetas', parent: 'Antony And Cleopatra', value: 5},
+            {id: 'Diomedes', parent: 'Antony And Cleopatra', value: 7},
+            {id: 'Dolabella', parent: 'Antony And Cleopatra', value: 23},
+            {id: 'Domitius Enobarus', parent: 'Antony And Cleopatra', value: 113},
+            {id: 'Egyptian', parent: 'Antony And Cleopatra', value: 2},
+            {id: 'Eros', parent: 'Antony And Cleopatra', value: 27},
+            {id: 'Euphronius', parent: 'Antony And Cleopatra', value: 5},
+            {id: 'Gallus', parent: 'Antony And Cleopatra', value: 1},
+            {id: 'Iras', parent: 'Antony And Cleopatra', value: 18},
+            {id: 'Lepidus', parent: 'Antony And Cleopatra', value: 30},
+            {id: 'Mardian', parent: 'Antony And Cleopatra', value: 7},
+            {id: 'Mecaenas', parent: 'Antony And Cleopatra', value: 16},
+            {id: 'Menas', parent: 'Antony And Cleopatra', value: 35},
+            {id: 'Menecrates', parent: 'Antony And Cleopatra', value: 2},
+            {id: 'Octavia', parent: 'Antony And Cleopatra', value: 13},
+            {id: 'Octavius', parent: 'Antony And Cleopatra', value: 98},
+            {id: 'Philo', parent: 'Antony And Cleopatra', value: 2},
+            {id: 'Pompey', parent: 'Antony And Cleopatra', value: 41},
+            {id: 'Proculeius', parent: 'Antony And Cleopatra', value: 10},
+            {id: 'Scarus', parent: 'Antony And Cleopatra', value: 12},
+            {id: 'Seleucus', parent: 'Antony And Cleopatra', value: 3},
+            {id: 'Silius', parent: 'Antony And Cleopatra', value: 3},
+            {id: 'Taurus', parent: 'Antony And Cleopatra', value: 1},
+            {id: 'Thyreus', parent: 'Antony And Cleopatra', value: 12},
+            {id: 'Varrius', parent: 'Antony And Cleopatra', value: 1},
+            {id: 'Ventidius', parent: 'Antony And Cleopatra', value: 4},
+
+            {id: 'Coriolanus', parent: 'Tragedies'},
+            {id: 'Aedile', parent: 'Coriolanus', value: 10},
+            {id: 'Cominius', parent: 'Coriolanus', value: 67},
+            {id: 'Coriolanus (Caius Marcius Coriolanus)', parent: 'Coriolanus', value: 189},
+            {id: 'Junius Brutus', parent: 'Coriolanus', value: 91},
+            {id: 'Lieutenant', parent: 'Coriolanus', value: 4},
+            {id: 'Menenius Agrippa', parent: 'Coriolanus', value: 162},
+            {id: 'Patrician', parent: 'Coriolanus', value: 3},
+            {id: 'Roman', parent: 'Coriolanus', value: 10},
+            {id: 'Sicinius Velutus', parent: 'Coriolanus', value: 117},
+            {id: 'Titus Lartius', parent: 'Coriolanus', value: 23},
+            {id: 'Tullus Aufidius', parent: 'Coriolanus', value: 45},
+            {id: 'Valeria', parent: 'Coriolanus', value: 14},
+            {id: 'Virgilia', parent: 'Coriolanus', value: 26},
+            {id: 'Volsce', parent: 'Coriolanus', value: 9},
+            {id: 'Volumnia', parent: 'Coriolanus', value: 57},
+            {id: 'Young Coriolanus', parent: 'Coriolanus', value: 1},
+
+            {id: 'Cymbeline', parent: 'Tragedies'},
+            {id: 'Arviragus', parent: 'Cymbeline', value: 46},
+            {id: 'Belarius', parent: 'Cymbeline', value: 58},
+            {id: 'Caius Lucius', parent: 'Cymbeline', value: 25},
+            {id: 'Cloten', parent: 'Cymbeline', value: 77},
+            {id: 'Cornelius (physician)', parent: 'Cymbeline', value: 13},
+            {id: 'Cymbeline, King of Britain', parent: 'Cymbeline', value: 81},
+            {id: 'Guiderius', parent: 'Cymbeline', value: 62},
+            {id: 'Helen', parent: 'Cymbeline', value: 0},
+            {id: 'Iachimo', parent: 'Cymbeline', value: 77},
+            {id: 'Imogen', parent: 'Cymbeline', value: 118},
+            {id: 'Jupiter', parent: 'Cymbeline', value: 1},
+            {id: 'Philario', parent: 'Cymbeline', value: 14},
+            {id: 'Pisanio', parent: 'Cymbeline', value: 58},
+            {id: 'Posthumus Leonatus', parent: 'Cymbeline', value: 77},
+            {id: 'Queen', parent: 'Cymbeline', value: 27},
+            {id: 'Roman Captain', parent: 'Cymbeline', value: 4},
+            {id: 'Sicilius Leonatus', parent: 'Cymbeline', value: 7},
+
+            {id: 'The Tragedy of Hamlet, Prince of Denmark', parent: 'Tragedies'},
+            {id: 'Bernardo', parent: 'The Tragedy of Hamlet, Prince of Denmark', value: 19},
+            {id: 'Claudius, King of Denmark', parent: 'The Tragedy of Hamlet, Prince of Denmark', value: 102},
+            {id: 'Cornelius', parent: 'The Tragedy of Hamlet, Prince of Denmark', value: 1},
+            {id: 'Father\'s Ghost', parent: 'The Tragedy of Hamlet, Prince of Denmark', value: 15},
+            {id: 'Fortinbras', parent: 'The Tragedy of Hamlet, Prince of Denmark', value: 6},
+            {id: 'Francisco ', parent: 'The Tragedy of Hamlet, Prince of Denmark', value: 8},
+            {id: 'Gertrude', parent: 'The Tragedy of Hamlet, Prince of Denmark', value: 69},
+            {id: 'Guildenstern', parent: 'The Tragedy of Hamlet, Prince of Denmark', value: 29},
+            {id: 'Hamlet', parent: 'The Tragedy of Hamlet, Prince of Denmark', value: 358},
+            {id: 'Horatio', parent: 'The Tragedy of Hamlet, Prince of Denmark', value: 109},
+            {id: 'Laertes', parent: 'The Tragedy of Hamlet, Prince of Denmark', value: 62},
+            {id: 'Lucianus', parent: 'The Tragedy of Hamlet, Prince of Denmark', value: 0},
+            {id: 'Marcellus', parent: 'The Tragedy of Hamlet, Prince of Denmark', value: 37},
+            {id: 'Ophelia', parent: 'The Tragedy of Hamlet, Prince of Denmark', value: 58},
+            {id: 'Osric', parent: 'The Tragedy of Hamlet, Prince of Denmark', value: 25},
+            {id: 'Polonius', parent: 'The Tragedy of Hamlet, Prince of Denmark', value: 86},
+            {id: 'Reynaldo', parent: 'The Tragedy of Hamlet, Prince of Denmark', value: 13},
+            {id: 'Rosencrantz', parent: 'The Tragedy of Hamlet, Prince of Denmark', value: 48},
+            {id: 'Voltemand', parent: 'The Tragedy of Hamlet, Prince of Denmark', value: 1},
+
+            {id: 'Julius Caesar', parent: 'Tragedies'},
+            {id: 'Antony (Marcus Antonius)', parent: 'Julius Caesar', value: 51},
+            {id: 'Artemidorus of Cnidos', parent: 'Julius Caesar', value: 4},
+            {id: 'Brutus (Marcus Brutus)', parent: 'Julius Caesar', value: 194},
+            {id: 'Caesar (Julius Caesar)', parent: 'Julius Caesar', value: 42},
+            {id: 'Calpurnia', parent: 'Julius Caesar', value: 6},
+            {id: 'Casca', parent: 'Julius Caesar', value: 39},
+            {id: 'Cassius', parent: 'Julius Caesar', value: 140},
+            {id: 'Cicero', parent: 'Julius Caesar', value: 4},
+            {id: 'Cinna', parent: 'Julius Caesar', value: 11},
+            {id: 'Cinna the Poet', parent: 'Julius Caesar', value: 8},
+            {id: 'Claudius', parent: 'Julius Caesar', value: 2},
+            {id: 'Clitus', parent: 'Julius Caesar', value: 8},
+            {id: 'Dardanius', parent: 'Julius Caesar', value: 3},
+            {id: 'Decius Brutus', parent: 'Julius Caesar', value: 12},
+            {id: 'Flavius', parent: 'Julius Caesar', value: 5},
+            {id: 'Lepidus (Marcus Antonius Lepidus)', parent: 'Julius Caesar', value: 3},
+            {id: 'Ligarius', parent: 'Julius Caesar', value: 5},
+            {id: 'Lucilius', parent: 'Julius Caesar', value: 10},
+            {id: 'Lucius', parent: 'Julius Caesar', value: 24},
+            {id: 'Marullus', parent: 'Julius Caesar', value: 6},
+            {id: 'Messala', parent: 'Julius Caesar', value: 20},
+            {id: 'Metellus Cimber', parent: 'Julius Caesar', value: 5},
+            {id: 'Octavius (Octavius Caesar)', parent: 'Julius Caesar', value: 19},
+            {id: 'Pindarus', parent: 'Julius Caesar', value: 5},
+            {id: 'Popilius (Popilius Lena)', parent: 'Julius Caesar', value: 2},
+            {id: 'Portia (wife of Brutus)', parent: 'Julius Caesar', value: 16},
+            {id: 'Publius', parent: 'Julius Caesar', value: 2},
+            {id: 'Strato', parent: 'Julius Caesar', value: 4},
+            {id: 'Tintinius', parent: 'Julius Caesar', value: 10},
+            {id: 'Trebonius', parent: 'Julius Caesar', value: 4},
+            {id: 'Varro', parent: 'Julius Caesar', value: 6},
+            {id: 'Volumnius', parent: 'Julius Caesar', value: 3},
+            {id: 'Young Cato', parent: 'Julius Caesar', value: 3},
+
+            {id: 'King Lear', parent: 'Tragedies'},
+            {id: 'Cordelia', parent: 'King Lear', value: 31},
+            {id: 'Curan', parent: 'King Lear', value: 4},
+            {id: 'Duke of Albany', parent: 'King Lear', value: 58},
+            {id: 'Duke of Burgundy', parent: 'King Lear', value: 5},
+            {id: 'Duke of Cornwall', parent: 'King Lear', value: 53},
+            {id: 'Earl of Gloucester', parent: 'King Lear', value: 118},
+            {id: 'Earl of Kent', parent: 'King Lear', value: 127},
+            {id: 'Edgar', parent: 'King Lear', value: 98},
+            {id: 'Edmund', parent: 'King Lear', value: 79},
+            {id: 'Goneril', parent: 'King Lear', value: 53},
+            {id: 'King of France', parent: 'King Lear', value: 5},
+            {id: 'Lear', parent: 'King Lear', value: 188},
+            {id: 'Oswald', parent: 'King Lear', value: 38},
+            {id: 'Regan', parent: 'King Lear', value: 73},
+
+            {id: 'The Tragedy Of Macbeth', parent: 'Tragedies'},
+            {id: 'Angus', parent: 'The Tragedy Of Macbeth', value: 4},
+            {id: 'Banquo', parent: 'The Tragedy Of Macbeth', value: 33},
+            {id: 'Caithness', parent: 'The Tragedy Of Macbeth', value: 3},
+            {id: 'Donalbain', parent: 'The Tragedy Of Macbeth', value: 3},
+            {id: 'Duncan', parent: 'The Tragedy Of Macbeth', value: 18},
+            {id: 'Fleance', parent: 'The Tragedy Of Macbeth', value: 2},
+            {id: 'Hecate', parent: 'The Tragedy Of Macbeth', value: 2},
+            {id: 'Lady Macbeth', parent: 'The Tragedy Of Macbeth', value: 59},
+            {id: 'Lady Macduff', parent: 'The Tragedy Of Macbeth', value: 19},
+            {id: 'Lennox', parent: 'The Tragedy Of Macbeth', value: 21},
+            {id: 'Macbeth', parent: 'The Tragedy Of Macbeth', value: 146},
+            {id: 'Macduff', parent: 'The Tragedy Of Macbeth', value: 59},
+            {id: 'Malcolm', parent: 'The Tragedy Of Macbeth', value: 40},
+            {id: 'Menteith', parent: 'The Tragedy Of Macbeth', value: 5},
+            {id: 'Porter', parent: 'The Tragedy Of Macbeth', value: 4},
+            {id: 'Ross', parent: 'The Tragedy Of Macbeth', value: 39},
+            {id: 'Seyton', parent: 'The Tragedy Of Macbeth', value: 5},
+            {id: 'Siward', parent: 'The Tragedy Of Macbeth', value: 11},
+            {id: 'Son (Macduff\'s son)', parent: 'The Tragedy Of Macbeth', value: 14},
+            {id: 'Young Siward', parent: 'The Tragedy Of Macbeth', value: 4},
+
+            {id: 'The Tragedy Of Othello', parent: 'Tragedies'},
+            {id: 'Bianca (Mistress to Cassio)', parent: 'The Tragedy Of Othello', value: 15},
+            {id: 'Brabantio', parent: 'The Tragedy Of Othello', value: 30},
+            {id: 'Cassio', parent: 'The Tragedy Of Othello', value: 110},
+            {id: 'Desdemona', parent: 'The Tragedy Of Othello', value: 165},
+            {id: 'Duke of Venice', parent: 'The Tragedy Of Othello', value: 25},
+            {id: 'Emilia', parent: 'The Tragedy Of Othello', value: 103},
+            {id: 'Gratiano (Brother to Brabantio)', parent: 'The Tragedy Of Othello', value: 20},
+            {id: 'Iago', parent: 'The Tragedy Of Othello', value: 272},
+            {id: 'Lodovico', parent: 'The Tragedy Of Othello', value: 33},
+            {id: 'Montano', parent: 'The Tragedy Of Othello', value: 24},
+            {id: 'Othello', parent: 'The Tragedy Of Othello', value: 274},
+            {id: 'Roderigo', parent: 'The Tragedy Of Othello', value: 59},
+
+            {id: 'Romeo And Juliet', parent: 'Tragedies'},
+            {id: 'Abraham', parent: 'Romeo And Juliet', value: 5},
+            {id: 'Balthasar (Servant to Romeo)', parent: 'Romeo And Juliet', value: 12},
+            {id: 'Benvolio', parent: 'Romeo And Juliet', value: 64},
+            {id: 'Capulet', parent: 'Romeo And Juliet', value: 51},
+            {id: 'Friar John', parent: 'Romeo And Juliet', value: 4},
+            {id: 'Friar Laurence', parent: 'Romeo And Juliet', value: 55},
+            {id: 'Gregory', parent: 'Romeo And Juliet', value: 15},
+            {id: 'Juliet', parent: 'Romeo And Juliet', value: 118},
+            {id: 'Lady Capulet', parent: 'Romeo And Juliet', value: 45},
+            {id: 'Lady Montague', parent: 'Romeo And Juliet', value: 2},
+            {id: 'Mercutio', parent: 'Romeo And Juliet', value: 62},
+            {id: 'Montague', parent: 'Romeo And Juliet', value: 10},
+            {id: 'Paris', parent: 'Romeo And Juliet', value: 23},
+            {id: 'Peter (Servant to Juliet\'s Nurse)', parent: 'Romeo And Juliet', value: 13},
+            {id: 'Prince Escalus', parent: 'Romeo And Juliet', value: 16},
+            {id: 'Romeo', parent: 'Romeo And Juliet', value: 163},
+            {id: 'Sampson', parent: 'Romeo And Juliet', value: 20},
+            {id: 'Tybalt', parent: 'Romeo And Juliet', value: 17}
+        ];
+
+        var data = anychart.data.tree(rawData, anychart.enums.TreeFillingMethod.AS_TABLE);
+        chart = anychart.treeMap(data);
+        chart.container('container');
+        chart.headers().textFormatter(function() {
+            return this.getDataValue('id');
+        });
+        chart.labels().textFormatter(function() {
+            return this.getDataValue('id');
+        });
+        chart.tooltip().titleFormatter(function() {
+            return this.getDataValue('id');
+        });
+
+//        var scale = anychart.scales.linearColor();
+//        var colors = anychart.color.bipolarHueProgression('#009688', '#ee8100');
+//        scale.colors(['#009688', '#f7f7f7', '#ee8100']);
+//        chart.colorScale(scale);
+        chart.maxDepth(2);
+//        chart.hintDepth(0);
+//        chart.hintOpacity(1);
+//        chart.legend(true);
+//        var colorRange = chart.colorRange();
+//        colorRange.enabled(true);
+//        colorRange.colorLineSize(9);
+//        colorRange.ticks().enabled(true);
+//        colorRange.marker().size(7);
+//        chart.stroke(null);
+        chart.draw();
+//        makeCrumbs(chart.getCurrentPath());
+//        chart.listen(anychart.enums.EventType.DRILL_CHANGE, function(event) {
+//           makeCrumbs(event.path);
+//        });
+    });
+
+    function makeCrumbs(crumbs) {
+        var div = document.getElementById('crumbs');
+        var arr = crumbs.map(function(item) {
+           return item.get('id');
+        });
+        div.innerHTML = 'crumbs: ' + arr.join(' -> ');
+    }
+
+    var maxDepthRange = document.getElementById('maxDepthRange');
+    var maxDepthInput = document.getElementById('maxDepthInput');
+    function maxDepthRangeChange(value) {
+        chart.maxDepth(value);
+        maxDepthInput.value = value;
+    }
+    function maxDepthInputChange(value) {
+        chart.maxDepth(value);
+        maxDepthRange.value = value;
+    }
+
+    var hintDepthRange = document.getElementById('hintDepthRange');
+    var hintDepthInput = document.getElementById('hintDepthInput');
+    function hintDepthRangeChange(value) {
+        chart.hintDepth(value);
+        hintDepthInput.value = value;
+    }
+    function hintDepthInputChange(value) {
+        chart.hintDepth(value);
+        hintDepthRange.value = value;
+    }
+
+    var hintOpacityRange = document.getElementById('hintOpacityRange');
+    var hintOpacityInput = document.getElementById('hintOpacityInput');
+    function hintOpacityRangeChange(value) {
+        chart.hintOpacity(value);
+        hintOpacityInput.value = value;
+    }
+    function hintOpacityInputChange(value) {
+        chart.hintOpacity(value);
+        hintOpacityRange.value = value;
+    }
+</script>
+
+</body>
+</html>

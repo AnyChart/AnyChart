@@ -874,6 +874,14 @@ anychart.ganttToolbar = anychart.ganttToolbar || function() {
 };
 
 
+/**
+ * @ignoreDoc
+ */
+anychart.treeMap = anychart.treeMap || function() {
+  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['TreeMap chart']);
+};
+
+
 //exports
 goog.exportSymbol('anychart.VERSION', anychart.VERSION);//doc|ex
 goog.exportSymbol('anychart.DEVELOP', anychart.DEVELOP);//doc|ex
@@ -933,4 +941,5 @@ goog.exportSymbol('anychart.ganttResource', anychart.ganttResource);
 goog.exportSymbol('anychart.stock', anychart.stock);
 goog.exportSymbol('anychart.toolbar', anychart.toolbar);
 goog.exportSymbol('anychart.ganttToolbar', anychart.ganttToolbar);
+goog.exportSymbol('anychart.treeMap', anychart.treeMap);
 goog.exportSymbol('anychart.theme', anychart.theme);
