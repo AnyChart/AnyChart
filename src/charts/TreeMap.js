@@ -678,6 +678,11 @@ anychart.charts.TreeMap.prototype.data = function(opt_value, opt_fillMethod) {
  * @param {anychart.data.Tree.DataItem} target Target to drill down to.
  */
 anychart.charts.TreeMap.prototype.drillTo = function(target) {
+  if (this.prevHoverSeriesStatus) {
+    this.unhover();
+    this.dispatchEvent(this.makeInteractivityPointEvent('hovered', {'target': this}, this.prevHoverSeriesStatus, true));
+    this.prevHoverSeriesStatus = null;
+  }
   this.ensureDataPrepared();
   this.setRootNode(target);
 };

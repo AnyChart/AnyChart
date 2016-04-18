@@ -2200,8 +2200,6 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
 
     scale.setBounds(dataBounds);
     this.dataBounds_ = dataBounds;
-    if (this.mouseWheelHandler)
-      this.mouseWheelHandler.setBounds(/** @type {acgraph.math.Rect}*/(this.getPlotBounds()));
 
     if (this.mapContentLayer_)
       this.mapContentLayer_.clip(contentAreaBounds);
