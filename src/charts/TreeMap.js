@@ -159,7 +159,7 @@ anychart.charts.TreeMap.prototype.applyAppearanceToPoint = function(pointState) 
 
   // here type can only be RECT and LEAF. both has shape in meta.
 
-  var shape = node.meta('shape');
+  var shape = node.meta(anychart.charts.TreeMap.DataFields.SHAPE);
   if (shape) {
     this.colorizeShape(pointState);
     this.applyHatchFill(pointState);
@@ -2455,6 +2455,10 @@ anychart.charts.TreeMap.prototype.drawNode_ = function(node, bounds, depth) {
       contentBounds = this.getBoundsForContent_(bounds, pointBounds);
       node.meta(anychart.charts.TreeMap.DataFields.POINT_BOUNDS, pointBounds);
       node.meta(anychart.charts.TreeMap.DataFields.CONTENT_BOUNDS, contentBounds);
+      // this kind of thing need for tooltip's positionMode=point
+      // because it uses iterator.meta('x').meta('y') to calculate
+      // tooltip's coordinate
+      node.meta('x', pointBounds.left).meta('y', pointBounds.top);
     }
     if (type == anychart.charts.TreeMap.NodeType.RECT || type == anychart.charts.TreeMap.NodeType.TRANSIENT) {
       pointBounds = bounds.clone();
