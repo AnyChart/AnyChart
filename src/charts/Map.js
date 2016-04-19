@@ -3983,8 +3983,17 @@ anychart.charts.Map.prototype.setupByJSON = function(config) {
       var seriesInst = this.createSeriesByType_(seriesType, data);
       if (seriesInst) {
         seriesInst.setup(json);
-        if (goog.isObject(json)) {
-          if ('colorScale' in json) seriesInst.colorScale(scalesInstances[json['colorScale']]);
+        if (goog.isObject(json) && 'colorScale' in json) {
+          var colorScale = json['colorScale'];
+          if (goog.isNumber(colorScale)) {
+            seriesInst.colorScale(scalesInstances[colorScale]);
+          } else {
+            type = goog.isString(colorScale) ? colorScale : colorScale['type'];
+            scale = anychart.scales.Base.fromString(type, null);
+            if (scale && goog.isObject(colorScale))
+              scale.setup(colorScale);
+
+          }
         }
       }
     }

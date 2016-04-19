@@ -85,11 +85,13 @@ window['anychart']['themes']['v6'] = {
     'items': ['circle', 'square', 'triangleUp', 'diamond', 'triangleDown', 'cross', 'diagonalCross', 'star4', 'star5', 'star6', 'star7', 'star10', 'pentagon', 'trapezium', 'line']
   },
 
-  'ordinalColor': {
+  'defaultOrdinalColorScale': {
     'autoColors': function(rangesCount) {
       return window['anychart']['color']['blendedHueProgression']('#ffd54f', '#ef6c00', rangesCount);
     }
   },
+
+  'defaultLinearColorScale': {'colors': ['#fff', '#ffd54f', '#ef6c00']},
 
   // global background settings
   'defaultBackground': {
@@ -4885,7 +4887,6 @@ window['anychart']['themes']['v6'] = {
       'minorTicks': {'enabled': false}
     },
     'unboundRegions': {'enabled': true, 'fill': '#F7F7F7', 'stroke': '#B9B9B9'},
-    'linearColor': {'colors': ['#fff', '#ffd54f', '#ef6c00']},
     'maxBubbleSize': '20%',
     'minBubbleSize': '5%',
     'geoIdField': 'id',

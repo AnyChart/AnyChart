@@ -53,6 +53,8 @@ anychart.scales.OrdinalColor = function() {
    * @private
    */
   this.data_ = [];
+
+  this.setupByJSON(anychart.getFullTheme()['defaultOrdinalColorScale']);
 };
 goog.inherits(anychart.scales.OrdinalColor, anychart.scales.Base);
 
@@ -202,7 +204,7 @@ anychart.scales.OrdinalColor.prototype.ranges = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.ranges_ != opt_value) {
       this.ranges_ = opt_value;
-      this.autoColors_ = anychart.getFullTheme()['ordinalColor']['autoColors'](this.ranges_.length);
+      this.autoColors_ = anychart.getFullTheme()['defaultOrdinalColorScale']['autoColors'](this.ranges_.length);
       this.resetDataRange();
       this.ticks().markInvalid();
       this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
@@ -494,7 +496,7 @@ anychart.scales.OrdinalColor.prototype.calculate = function() {
       }
 
       this.autoRanges_ = this.autoRanges_.concat(eqRanges);
-      this.autoColors_ = anychart.getFullTheme()['ordinalColor']['autoColors'](this.autoRanges_.length);
+      this.autoColors_ = anychart.getFullTheme()['defaultOrdinalColorScale']['autoColors'](this.autoRanges_.length);
     }
 
     var ranges = this.ranges_.length ? this.ranges_ : this.autoRanges_;

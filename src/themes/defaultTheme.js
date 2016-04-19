@@ -214,12 +214,15 @@ window['anychart']['themes']['defaultTheme'] = {
     'items': ['circle', 'diamond', 'square', 'triangleDown', 'triangleUp', 'diagonalCross', 'pentagon', 'cross', 'line', 'star5', 'star4', 'trapezium', 'star7', 'star6', 'star10']
   },
 
-  'ordinalColor': {
+  'defaultOrdinalColorScale': {
     'autoColors': function(rangesCount) {
       return window['anychart']['color']['blendedHueProgression']('#90caf9', '#01579b', rangesCount);
       //return window['anychart']['color']['blendedHueProgression']('#ffd54f', '#ef6c00', rangesCount); //todo: delete after final choice
     }
   },
+
+  'defaultLinearColorScale': {'colors': ['#90caf9', '#01579b']},
+  //'defaultLinearColorScale': {'colors': ['#ffd54f', '#ef6c00']}, //todo: delete after final choice
 
   'defaultFontSettings': {
     'fontSize': 13,
@@ -2299,7 +2302,8 @@ window['anychart']['themes']['defaultTheme'] = {
       'choropleth': {
         'labels': {
           'fontColor': fontColorDark
-        }
+        },
+        'colorScale': {}
       },
       'connector': {
         'startSize': 0,
@@ -2392,8 +2396,6 @@ window['anychart']['themes']['defaultTheme'] = {
       'zIndex': 50
     },
     'unboundRegions': {'enabled': true, 'fill': '#F7F7F7', 'stroke': '#e0e0e0'},
-    'linearColor': {'colors': ['#90caf9', '#01579b']},
-    //'linearColor': {'colors': ['#ffd54f', '#ef6c00']}, //todo: delete after final choice
     'legend': {'enabled': false},
     'maxBubbleSize': '20%',
     'minBubbleSize': '5%',

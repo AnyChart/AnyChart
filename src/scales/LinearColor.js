@@ -34,7 +34,7 @@ anychart.scales.LinearColor = function() {
    */
   this.logBaseVal = 10;
 
-  this.setupByJSON(anychart.getFullTheme()['map']['linearColor']);
+  this.setupByJSON(anychart.getFullTheme()['defaultLinearColorScale']);
 };
 goog.inherits(anychart.scales.LinearColor, anychart.scales.ScatterBase);
 

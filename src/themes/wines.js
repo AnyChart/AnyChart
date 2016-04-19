@@ -38,11 +38,12 @@ window['anychart']['themes']['wines'] = {
     'type': 'distinct',
     'items': ['#6f3448', '#857600', '#f1a122', '#a50b01', '#400001', '#a98b80', '#c08081', '#86614e', '#c26364', '#615060']
   },
-  'ordinalColor': {
+  'defaultOrdinalColorScale': {
     'autoColors': function(rangesCount) {
       return window['anychart']['color']['blendedHueProgression']('#f1a122', '#a50b01', rangesCount);
     }
   },
+  'defaultLinearColorScale': {'colors': ['#f1a122', '#a50b01']},
   'defaultFontSettings': {
     'fontColor': '#3e2723'
   },
@@ -124,7 +125,6 @@ window['anychart']['themes']['wines'] = {
   },
   'map': {
     'unboundRegions': {'enabled': true, 'fill': '#e3e3e3', 'stroke': '#bdbdbd'},
-    'linearColor': {'colors': ['#f1a122', '#a50b01']},
     'defaultSeriesSettings': {
       'base': {
         'stroke': returnDarkenSourceColor,

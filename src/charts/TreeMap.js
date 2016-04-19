@@ -2719,8 +2719,9 @@ anychart.charts.TreeMap.prototype.setupByJSON = function(config) {
     if (goog.isString(json)) {
       scale = anychart.scales.Base.fromString(json, null);
     } else if (goog.isObject(json)) {
-      scale = anychart.scales.Base.fromString(json['type'], false);
-      scale.setup(json);
+      scale = anychart.scales.Base.fromString(json['type'], null);
+      if (scale)
+        scale.setup(json);
     }
     if (scale)
       this.colorScale(/** @type {anychart.scales.LinearColor|anychart.scales.OrdinalColor} */ (scale));

@@ -38,11 +38,12 @@ window['anychart']['themes']['pastel'] = {
     'type': 'distinct',
     'items': ['#90caf9', '#80cbc4', '#aed581', '#e6ee9c', '#ffcc80', '#ffab91', '#f8bbd0', '#d1c4e9', '#9e9e9e', '#c7b299']
   },
-  'ordinalColor': {
+  'defaultOrdinalColorScale': {
     'autoColors': function(rangesCount) {
       return window['anychart']['color']['blendedHueProgression']('#e6ee9c', '#80cbc4', rangesCount);
     }
   },
+  'defaultLinearColorScale': {'colors': ['#e6ee9c', '#80cbc4']},
   'defaultFontSettings': {
     'fontColor': '#9b8b7e'
   },
@@ -131,7 +132,6 @@ window['anychart']['themes']['pastel'] = {
   },
   'map': {
     'unboundRegions': {'enabled': true, 'fill': '#f2efec', 'stroke': '#dcd8d4'},
-    'linearColor': {'colors': ['#e6ee9c', '#80cbc4']},
     'defaultSeriesSettings': {
       'base': {
         'stroke': returnDarkenSourceColor,
