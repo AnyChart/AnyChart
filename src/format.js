@@ -139,10 +139,10 @@ anychart.format.inputLocale_ = 'default';
 
 /**
  * Input date time format.
- * @type {string}
+ * @type {?string}
  * @private
  */
-anychart.format.inputDateTimeFormat_ = 'yyyy.MM.dd';
+anychart.format.inputDateTimeFormat_ = null;
 
 
 /**
@@ -186,12 +186,13 @@ anychart.format.inputLocale = function(opt_value) {
 
 /**
  * Input date time format.
- * @param {string=} opt_value
- * @return {string}
+ * @param {?string=} opt_value - Value to be set. If is null, input value will be interpreted
+ *  as timestamp or string representation of timestamp.
+ * @return {?string}
  */
 anychart.format.inputDateTimeFormat = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    anychart.format.inputDateTimeFormat_ = String(opt_value);
+    anychart.format.inputDateTimeFormat_ = opt_value;
   }
   return anychart.format.inputDateTimeFormat_;
 };
@@ -395,8 +396,16 @@ anychart.format.parseDateTime = function(value, opt_format, opt_dateHolder, opt_
       return new Date(value);
     }
   } else if (goog.isString(value)) {
-    var numValue = +value;
-    if (isNaN(numValue)) {
+    if (!anychart.format.inputDateTimeFormat_) { //null or '' literally means that we interpret value as timestamp.
+      var numValue = +value;
+      var newDate = new Date(isNaN(numValue) ? value : numValue);
+      if (isNaN(newDate.getTime())) { //Got string not in ISO8601 format.
+        anychart.utils.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
+        return null; // Parsing error.
+      } else {
+        return newDate;
+      }
+    } else {
       var locale = opt_locale || anychart.format.inputLocale_;
 
       if (goog.isString(locale)) {
@@ -409,6 +418,7 @@ anychart.format.parseDateTime = function(value, opt_format, opt_dateHolder, opt_
 
       /** @type {goog.i18n.DateTimeParse} */
       var parser;
+      //Here anychart.format.inputDateTimeFormat_ is string and not null.
       var pattern = opt_format || anychart.format.inputDateTimeFormat_;
 
       var parserCacheKey = pattern + localeHash;
@@ -439,8 +449,6 @@ anychart.format.parseDateTime = function(value, opt_format, opt_dateHolder, opt_
         anychart.utils.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value, resultLength], true);
         return null;
       }
-    } else { //Got string representation of timestamp.
-      return new Date(numValue);
     }
   } else {
     anychart.utils.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
@@ -609,8 +617,23 @@ anychart.format.parseNumber = function(value, opt_locale) {
       locale['scaleSuffixSeparator'] :
       defLoc['scaleSuffixSeparator'];
 
+  var useBracketsForNegative = (locale && goog.isDef(locale['useBracketsForNegative'])) ?
+      !!locale['useBracketsForNegative'] :
+      !!defLoc['useBracketsForNegative'];
+
+  var negative = 1;
+
   if (goog.isString(value)) {
     var re = new RegExp(goog.string.regExpEscape(decimalPoint), 'g'); //this construction is taken from goog.string.replace().
+
+    if (useBracketsForNegative) { //replacing brackets
+      if (value.charAt(0) == '(' && value.charAt(value.length - 1) == ')') {
+        //NOTE: Incoming value "(5)" becomes -5 and "(-5)" becomes 5 (negative of negative).
+        negative = -1;
+        value = value.substring(1, value.length - 1);
+      }
+    }
+
     value = value.replace(re, '.'); //replacing decimalPoint with JS default symbol.
 
     value = goog.string.removeAll(value, groupsSeparator); //replacing groupsSeparator.
@@ -647,6 +670,7 @@ anychart.format.parseNumber = function(value, opt_locale) {
 
   }
   var result = +/** @type {number} */ (value);
+  result *= negative;
   return isNaN(result) ? result : anychart.math.round(result, decimalsCount);
 };
 
