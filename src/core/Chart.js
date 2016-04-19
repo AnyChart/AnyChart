@@ -600,8 +600,10 @@ anychart.core.Chart.prototype.contextMenu = function(opt_value) {
   if (!this.contextMenu_) {
     // suppress NO_FEATURE_IN_MODULE warning
     this.contextMenu_ = goog.global['anychart']['ui']['contextMenu'](!!goog.isObject(opt_value) && opt_value['fromTheme']);
-    this.registerDisposable(this.contextMenu_);
-    this.contextMenu_['itemsProvider'](this.contextMenuItemsProvider);
+    if (this.contextMenu_) {
+      this.registerDisposable(this.contextMenu_);
+      this.contextMenu_['itemsProvider'](this.contextMenuItemsProvider);
+    }
   }
 
   if (goog.isDef(opt_value)) {
