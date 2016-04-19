@@ -204,12 +204,19 @@ anychart.core.map.series.Base.prototype.getFinalGeoIdField = function() {
 
 
 /**
- * Internal method. Sets link to geo data.
+ * Internal method. Sets link to parent chart.
  * @param {anychart.charts.Map} map .
+ */
+anychart.core.map.series.Base.prototype.setMap = function(map) {
+  this.map = map;
+};
+
+
+/**
+ * Internal method. Sets link to geo data.
  * @param {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>} geoData Geo data to set.
  */
-anychart.core.map.series.Base.prototype.setGeoData = function(map, geoData) {
-  this.map = map;
+anychart.core.map.series.Base.prototype.setGeoData = function(geoData) {
   this.geoData = geoData;
   this.calculate();
 };

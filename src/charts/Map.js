@@ -1334,8 +1334,9 @@ anychart.charts.Map.prototype.createSeriesByType_ = function(type, data, opt_csv
     instance.labels().setAutoZIndex(anychart.charts.Map.ZINDEX_LABEL + inc + anychart.charts.Map.ZINDEX_INCREMENT_MULTIPLIER / 2);
 
     instance.setAutoGeoIdField(this.geoIdField());
+    instance.setMap(this);
     if (this.internalGeoData)
-      instance.setGeoData(this, this.internalGeoData);
+      instance.setGeoData(this.internalGeoData);
     instance.setAutoColor(this.palette().itemAt(index));
     instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(index)));
     instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
@@ -2109,7 +2110,7 @@ anychart.charts.Map.prototype.calculate = function() {
 
       for (i = this.series_.length; i--;) {
         series = this.series_[i];
-        series.setGeoData(this, /** @type {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>} */(this.internalGeoData));
+        series.setGeoData(/** @type {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>} */(this.internalGeoData));
         series.invalidate(anychart.ConsistencyState.SERIES_DATA, anychart.Signal.NEEDS_REDRAW);
 
         //----------------------------------calc statistics for series
