@@ -214,3 +214,8 @@ anychart.data.PieView.Mapping_.prototype.meta = function(index, name, opt_value)
 anychart.data.PieView.Mapping_.prototype.getRowsCount = function() {
   return goog.isDef(this.row_) ? 1 : 0;
 };
+
+
+//exports
+anychart.data.PieView.prototype['row'] = anychart.data.PieView.prototype.row;
+anychart.data.PieView.prototype['getRowsCount'] = anychart.data.PieView.prototype.getRowsCount;

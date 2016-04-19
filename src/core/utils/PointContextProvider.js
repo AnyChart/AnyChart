@@ -36,11 +36,15 @@ anychart.core.utils.PointContextProvider.prototype.applyReferenceValues = functi
     value = this.referenceValueNames[i];
     this[value] = iterator.get(value);
   }
-  if (iterator.meta('groupedPoint') == true) {
+  if (iterator.meta('groupedPoint')) {
     this['name'] = 'Other points';
     this['groupedPoint'] = true;
     this['names'] = iterator.meta('names');
     this['values'] = iterator.meta('values');
+  } else {
+    delete this['groupedPoint'];
+    delete this['names'];
+    delete this['values'];
   }
 };
 

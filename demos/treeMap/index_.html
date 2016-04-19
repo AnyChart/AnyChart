@@ -36,9 +36,7 @@
 <script>
     var stage, chart, chart1, chart2, chart4;
     anychart.onDocumentReady(function() {
-        document.getElementById('container').style.display = 'none';
-        document.getElementById('container1').style.display = 'none';
-        tree = anychart.data.tree([
+        tree1 = anychart.data.tree([
             {id: 'Continents', name: 'Continents'},
             {id: 0, name: 'Asia', parent: 'Continents'},
             {id: 1, name: 'Europe', parent: 'Continents'},
@@ -47,14 +45,15 @@
             {id: 4, name: 'Asia 3', parent: 0, value: 350},
             {id: 5, name: 'Europe 1', parent: 1, value: 300},
             {id: 6, name: 'Europe 2', parent: 1, value: 400}
-        ], 'asTable');
-        chart = anychart.treeMap();
-        chart.data(tree).hoverHeaders(true).drillTo(tree.search("id", "1"));
+        ], anychart.enums.TreeFillingMethod.AS_TABLE);
+
+        chart = anychart.treeMap(tree1);
         chart.container('container').draw();
-        document.getElementById('container').style.display = '';
-        document.getElementById('container').style.display = 'none';
-        document.getElementById('container1').style.display = '';
-        chart.container('container1').draw();
+        var xml = chart.toJson(false, true);
+        console.log(xml);
+        chart.dispose();
+        chart = anychart.fromJson(xml);
+        chart.container('container').draw();
     });
 </script>
 </body>

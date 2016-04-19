@@ -2710,8 +2710,8 @@ anychart.charts.TreeMap.prototype.resizeHandler = function(e) {
 anychart.charts.TreeMap.prototype.setupByJSON = function(config) {
   anychart.charts.TreeMap.base(this, 'setupByJSON', config);
 
-  if ('data' in config)
-    this.data(config['data'] || null);
+  if ('treeData' in config)
+    this.data(anychart.data.Tree.fromJson(config['treeData']));
 
   if ('colorScale' in config) {
     var json = config['colorScale'];
@@ -2870,7 +2870,9 @@ anychart.charts.TreeMap.prototype.serialize = function() {
         (this.selectHatchFill()));
   }
 
-  json['data'] = this.data().serializeWithoutMeta();
+  var data = this.data();
+  if (data)
+    json['treeData'] = data.serializeWithoutMeta();
   json['colorRange'] = this.colorRange().serialize();
   json['maxDepth'] = this.maxDepth();
   json['hintDepth'] = this.hintDepth();

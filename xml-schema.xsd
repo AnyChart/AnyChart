@@ -33,6 +33,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="context_menu" type="utils.ContextMenu"/>
             <!-- Common elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="data" type="Data"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="tree_data" type="TreeData"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="palette" type="palettes.Colors"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill_palette" type="palettes.HatchFills"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="marker_palette" type="palettes.Markers"/>
@@ -100,13 +101,13 @@
             <!-- charts.Sparkline and charts.Funnel and charts.Pyramid elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
             <!-- charts.HeatMap elements -->
-            <xsd:element minOccurs="0" maxOccurs="1" name="color_scale" type="OrdinalColorScale"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="color_scale" type="Scale"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="y_zoom" type="core.CartesianXZoom"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="y_scroller" type="core.ChartScroller"/>
             <!-- charts.TreeMap elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="headers" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_headers" type="core.LabelsFactory"/>
-
+            <xsd:element minOccurs="0" maxOccurs="1" name="color_range" type="core.ColorRange"/>
             <!-- new Cartesian elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="x_zoom" type="core.CartesianXZoom"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="x_scroller" type="core.ChartScroller"/>
@@ -682,6 +683,14 @@
     </xsd:complexType>
 
     <!-- data complex types -->
+
+    <xsd:complexType name="DataOrTreeData">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="1" name="children" type="Children_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="index" type="TreeDataIndex"/>
+            <xsd:element minOccurs="0" maxOccurs="unbounded" name="point" type="DataPoint"/>
+        </xsd:sequence>
+    </xsd:complexType>
 
     <xsd:complexType name="Data">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">

@@ -1781,8 +1781,8 @@
         {"$ref": "#/definitions/anychart.core.Chart"}
       ],
       "properties": {
-        "type": {"enum": ["treemap"]},
-        "data": {"$ref": "#/definitions/data"},
+        "type": {"enum": ["treeMap"]},
+        "treeData": {"$ref": "#/definitions/treeData"},
 
         "scales": {
           "type": [
