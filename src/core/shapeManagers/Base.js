@@ -309,6 +309,20 @@ anychart.core.shapeManagers.Base.prototype.replaceZIndex = function(name, newZIn
 };
 
 
+/**
+ * Apply clip to shape. Used for 3d shapes.
+ * @param {acgraph.vector.Clip} clipElement
+ */
+anychart.core.shapeManagers.Base.prototype.applyClip = function(clipElement) {
+  for (var type in this.usedShapes) {
+    var shapes = this.usedShapes[type];
+    for (var i = 0; i < shapes.length; i++) {
+      shapes[i].clip(clipElement);
+    }
+  }
+};
+
+
 /** @inheritDoc */
 anychart.core.shapeManagers.Base.prototype.disposeInternal = function() {
   for (var type in this.shapePools) {

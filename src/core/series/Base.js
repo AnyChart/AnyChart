@@ -2529,6 +2529,10 @@ anychart.core.series.Base.prototype.draw = function() {
       }
     }
     this.markConsistent(anychart.ConsistencyState.SERIES_COLOR | anychart.ConsistencyState.Z_INDEX);
+
+    if (this.check(anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT)) {
+      this.invalidate(anychart.ConsistencyState.SERIES_CLIP);
+    }
   } else if (elementsDrawersLength) {
     iterator = this.getResetIterator();
     while (iterator.advance()) {
@@ -2687,8 +2691,11 @@ anychart.core.series.Base.prototype.applyClip = function(opt_customClip) {
   } else {
     clipElement = null;
   }
-  if (!this.check(anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT))
+  if (this.check(anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT)) {
+    this.shapeManager.applyClip(clipElement);
+  } else {
     this.rootLayer.clip(clipElement);
+  }
   if (this.labels_) {
     var labelDOM = this.labels_.getDomElement();
     if (labelDOM) labelDOM.clip(clipElement);
