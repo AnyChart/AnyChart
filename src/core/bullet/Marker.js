@@ -564,13 +564,8 @@ anychart.core.bullet.Marker.prototype.draw = function() {
     var ratio = this.scale().transform(value, 0);
     this.path_.clear();
 
-    if (isNaN(ratio)) {
-      anychart.utils.warning(anychart.enums.WarningCode.BULLET_CHART_OUT_OF_RANGE, null, [value]);
-    } else {
-      if (ratio < 0 || ratio > 1) {
-        anychart.utils.warning(anychart.enums.WarningCode.BULLET_CHART_OUT_OF_RANGE, null, [value]);
-        ratio = goog.math.clamp(ratio, 0, 1);
-      }
+    if (!isNaN(ratio)) {
+      ratio = goog.math.clamp(ratio, 0, 1);
       var drawer = anychart.core.bullet.Marker.getDrawer(
           /** @type {anychart.enums.Layout} */(this.layout()),
           /** @type {anychart.enums.BulletMarkerType} */(this.type())

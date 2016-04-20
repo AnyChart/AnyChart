@@ -16,6 +16,14 @@ goog.require('goog.json.hybrid');
  */
 
 
+/**
+ * Last info code.
+ * @type {number}
+ * @private
+ */
+anychart.utils.lastInfoCode_ = -1;
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Utils functions.
@@ -1353,18 +1361,21 @@ anychart.utils.getErrorDescription = function(code, opt_arguments) {
 
 
 /**
- * Log en info by code.
+ * Logs an info.
  * @param {anychart.enums.InfoCode|string} codeOrMsg Info internal code,. @see anychart.enums.InfoCode.
  * @param {Array.<*>=} opt_descArgs Description message arguments.
  */
 anychart.utils.info = function(codeOrMsg, opt_descArgs) {
   if (anychart.DEVELOP) {
     if (goog.isNumber(codeOrMsg)) {
-      anychart.utils.callLog_(
-          'info',
-          ('Info: ' + codeOrMsg + '\nDescription: ' + anychart.utils.getInfoDescription(codeOrMsg, opt_descArgs)),
-          ''
-      );
+      if (anychart.utils.lastInfoCode_ != codeOrMsg) {
+        anychart.utils.lastInfoCode_ = /** @type {number} */ (codeOrMsg);
+        anychart.utils.callLog_(
+            'info',
+            ('Info: ' + codeOrMsg + '\nDescription: ' + anychart.utils.getInfoDescription(codeOrMsg, opt_descArgs)),
+            ''
+        );
+      }
     } else {
       anychart.utils.callLog_('info', codeOrMsg, '');
     }
@@ -1448,9 +1459,6 @@ anychart.utils.getWarningDescription = function(code, opt_arguments) {
       return 'Data grid incorrect method \'' + opt_arguments[0] + '()\' usage: You use not standalone data grid. Perform all operations ' +
           'on data grid using the controller, but not directly. In current case, use \'' + opt_arguments[1] + '()\' instead. ' +
           opt_arguments[2];
-
-    case anychart.enums.WarningCode.BULLET_CHART_OUT_OF_RANGE:
-      return 'Bullet Chart point value: ' + opt_arguments[0] + ' is out of scale range. Check minimum and maximum scale settings.';
 
     case anychart.enums.WarningCode.NOT_FOUND:
       //TODO (A.Kudryavtsev): Make another suggestion what to do.
