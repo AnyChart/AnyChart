@@ -121,7 +121,9 @@ goog.inherits(anychart.core.stock.Plot, anychart.core.VisualBaseWithBounds);
  * Supported consistency states.
  * @type {number}
  */
-anychart.core.stock.Plot.prototype.SUPPORTED_SIGNALS = anychart.core.VisualBase.prototype.SUPPORTED_SIGNALS;
+anychart.core.stock.Plot.prototype.SUPPORTED_SIGNALS =
+    anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
+    anychart.Signal.NEEDS_RECALCULATION;
 
 
 /**
@@ -994,7 +996,7 @@ anychart.core.stock.Plot.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
     return this;
 
-  var i, axis, legend, series;
+  var i, axis, series;
 
   this.suspendSignalsDispatching();
 
@@ -1269,7 +1271,7 @@ anychart.core.stock.Plot.prototype.createLegendItemsProvider = function(sourceMo
     if (series) {
       var itemData = series.getLegendItemData(itemsTextFormatter);
       itemData['sourceUid'] = goog.getUid(this);
-      itemData['sourceKey'] = i;
+      itemData['sourceKey'] = series.id();
       data.push(itemData);
     }
   }
@@ -1284,7 +1286,7 @@ anychart.core.stock.Plot.prototype.createLegendItemsProvider = function(sourceMo
  * @return {boolean} Can interact or not.
  */
 anychart.core.stock.Plot.prototype.legendItemCanInteractInMode = function(mode) {
-  return false;
+  return (mode == anychart.enums.LegendItemsSourceMode.DEFAULT);
 };
 
 
@@ -1293,21 +1295,49 @@ anychart.core.stock.Plot.prototype.legendItemCanInteractInMode = function(mode) 
  * @param {anychart.core.ui.LegendItem} item Legend item that was clicked.
  * @param {anychart.core.MouseEvent} event Mouse event.
  */
-anychart.core.stock.Plot.prototype.legendItemClick = goog.nullFunction;
+anychart.core.stock.Plot.prototype.legendItemClick = function(item, event) {
+  var sourceKey = item.sourceKey();
+  var series = this.getSeries(/** @type {number} */ (sourceKey));
+  if (series) {
+    series.enabled(!series.enabled());
+    if (series.enabled())
+      series.hoverSeries();
+    else
+      series.unhover();
+  }
+};
 
 
 /**
  * Calls when legend item that some how belongs to the chart was hovered.
  * @param {anychart.core.ui.LegendItem} item Legend item that was hovered.
+ * @param {anychart.core.MouseEvent} event Mouse event.
  */
-anychart.core.stock.Plot.prototype.legendItemOver = goog.nullFunction;
+anychart.core.stock.Plot.prototype.legendItemOver = function(item, event) {
+  var sourceKey = item.sourceKey();
+  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
+    return;
+  var series = this.getSeries(/** @type {number} */ (sourceKey));
+  if (series) {
+    series.hoverSeries();
+  }
+};
 
 
 /**
  * Calls when legend item that some how belongs to the chart was unhovered.
  * @param {anychart.core.ui.LegendItem} item Legend item that was unhovered.
+ * @param {anychart.core.MouseEvent} event Mouse event.
  */
-anychart.core.stock.Plot.prototype.legendItemOut = goog.nullFunction;
+anychart.core.stock.Plot.prototype.legendItemOut = function(item, event) {
+  var sourceKey = item.sourceKey();
+  if (item && !goog.isDefAndNotNull(sourceKey) && !isNaN(sourceKey))
+    return;
+  var series = this.getSeries(/** @type {number} */ (sourceKey));
+  if (series) {
+    series.unhover();
+  }
+};
 //endregion
 
 
@@ -1481,6 +1511,9 @@ anychart.core.stock.Plot.prototype.seriesInvalidated_ = function(e) {
   var state = anychart.ConsistencyState.STOCK_PLOT_SERIES;
   if (e.hasSignal(anychart.Signal.NEED_UPDATE_LEGEND))
     state |= anychart.ConsistencyState.STOCK_PLOT_LEGEND;
+  if (e.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
+    signal |= anychart.Signal.NEEDS_RECALCULATION;
+  }
   this.invalidate(state, signal);
 };
 

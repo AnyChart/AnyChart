@@ -599,7 +599,8 @@ anychart.charts.Stock.prototype.calculateScales_ = function() {
         scale = /** @type {anychart.scales.Base} */(aSeries.yScale());
         if (scale.needsAutoCalc()) {
           scale.startAutoCalc();
-          scale.extendDataRange.apply(scale, aSeries.getScaleReferenceValues());
+          if (aSeries.enabled())
+            scale.extendDataRange.apply(scale, aSeries.getScaleReferenceValues());
           scales.push(scale);
         }
       }
@@ -613,7 +614,8 @@ anychart.charts.Stock.prototype.calculateScales_ = function() {
       scale = /** @type {anychart.scales.Base} */(aSeries.yScale());
       if (scale.needsAutoCalc()) {
         scale.startAutoCalc();
-        scale.extendDataRange.apply(scale, aSeries.getScaleReferenceValues());
+        if (aSeries.enabled())
+          scale.extendDataRange.apply(scale, aSeries.getScaleReferenceValues());
         scales.push(scale);
       }
     }
@@ -860,13 +862,15 @@ anychart.charts.Stock.prototype.dispatchRangeChange_ = function(type, source, op
 //region Signals handlers
 /**
  * Plot signals handler.
- * @param {anychart.SignalEvent} event
+ * @param {anychart.SignalEvent} e
  * @private
  */
-anychart.charts.Stock.prototype.plotInvalidated_ = function(event) {
+anychart.charts.Stock.prototype.plotInvalidated_ = function(e) {
   var state = anychart.ConsistencyState.STOCK_PLOTS_APPEARANCE;
-  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED))
+  if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED))
     state |= anychart.ConsistencyState.BOUNDS;
+  if (e.hasSignal(anychart.Signal.NEEDS_RECALCULATION))
+    state |= anychart.ConsistencyState.STOCK_SCALES;
   this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
 };
 
@@ -883,6 +887,8 @@ anychart.charts.Stock.prototype.scrollerInvalidated_ = function(e) {
     state |= anychart.ConsistencyState.BOUNDS;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
+  if (e.hasSignal(anychart.Signal.NEEDS_RECALCULATION))
+    state |= anychart.ConsistencyState.STOCK_SCALES;
   this.invalidate(state, signal);
 };
 

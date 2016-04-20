@@ -3141,7 +3141,7 @@ anychart.core.CartesianBase.prototype.createLegendItemsProvider = function(sourc
       var series = this.series_[i];
       var itemData = series.getLegendItemData(itemsTextFormatter);
       itemData['sourceUid'] = goog.getUid(this);
-      itemData['sourceKey'] = i;
+      itemData['sourceKey'] = series.id();
       data.push(itemData);
     }
   }

@@ -773,11 +773,7 @@ anychart.core.series.Base.prototype.get3DProvider = function() {
 
 /** @inheritDoc */
 anychart.core.series.Base.prototype.getEnableChangeSignals = function() {
-  return anychart.Signal.NEEDS_REDRAW |
-      anychart.Signal.BOUNDS_CHANGED |
-      anychart.Signal.DATA_CHANGED |
-      anychart.Signal.NEEDS_RECALCULATION |
-      anychart.Signal.NEED_UPDATE_LEGEND;
+  return this.SUPPORTED_SIGNALS;
 };
 
 

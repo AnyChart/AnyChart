@@ -77,6 +77,15 @@ goog.inherits(anychart.core.stock.Scroller, anychart.core.ui.Scroller);
 
 
 /**
+ * Supported signals.
+ * @type {number}
+ */
+anychart.core.stock.Scroller.prototype.SUPPORTED_SIGNALS =
+    anychart.core.ui.Scroller.prototype.SUPPORTED_SIGNALS |
+    anychart.Signal.NEEDS_RECALCULATION;
+
+
+/**
  * Supported consistency states.
  * @type {number}
  */
@@ -945,7 +954,10 @@ anychart.core.stock.Scroller.prototype.createSeriesByType = function(type, opt_d
  * @private
  */
 anychart.core.stock.Scroller.prototype.seriesInvalidated_ = function(e) {
-  this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_SERIES, anychart.Signal.NEEDS_REDRAW);
+  var signal = anychart.Signal.NEEDS_REDRAW;
+  if (e.hasSignal(anychart.Signal.NEEDS_RECALCULATION))
+    signal |= anychart.Signal.NEEDS_RECALCULATION;
+  this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_SERIES, signal);
 };
 //endregion
 

@@ -141,7 +141,6 @@ anychart.ConsistencyState = {
   SERIES_MARKERS: 1 << 6, //
   SERIES_LABELS: 1 << 7, //
   SERIES_DATA: 1 << 8,
-  //
   SERIES_POINTS: 1 << 9, //
   SERIES_COLOR: 1 << 10, //
   SERIES_CLIP: 1 << 11, //

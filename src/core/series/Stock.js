@@ -342,6 +342,40 @@ anychart.core.series.Stock.prototype.highlight = function(value) {
 anychart.core.series.Stock.prototype.removeHighlight = function() {
   this.highlightedRow_ = null;
 };
+
+
+/** @inheritDoc */
+anychart.core.series.Stock.prototype.getSeriesState = function() {
+  return this.seriesState;
+};
+
+
+/**
+ * WE DO NOT CURRENTLY EXPORT THIS METHOD.
+ * Hovers all points of the series. Use <b>unhover</b> method for unhover series.
+ * @return {!anychart.core.series.Stock}
+ */
+anychart.core.series.Stock.prototype.hoverSeries = function() {
+  if (!(this.seriesState & anychart.PointState.HOVER)) {
+    this.seriesState = anychart.PointState.HOVER;
+    this.invalidate(anychart.ConsistencyState.SERIES_COLOR, anychart.Signal.NEEDS_REDRAW);
+  }
+  return this;
+};
+
+
+/**
+ * WE DO NOT CURRENTLY EXPORT THIS METHOD.
+ * Removes hover from the series or point by index.
+ * @return {!anychart.core.series.Stock}
+ */
+anychart.core.series.Stock.prototype.unhover = function() {
+  if (this.seriesState != anychart.PointState.NORMAL) {
+    this.seriesState = anychart.PointState.NORMAL;
+    this.invalidate(anychart.ConsistencyState.SERIES_COLOR, anychart.Signal.NEEDS_REDRAW);
+  }
+  return this;
+};
 //endregion
 
 
