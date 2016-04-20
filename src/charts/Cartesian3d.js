@@ -127,6 +127,9 @@ anychart.charts.Cartesian3d.areaPostProcessor = function(series, shapes, pointSt
   shapes[anychart.opt.RIGHT].fill({'color': rightFill, 'opacity': opacity});
   shapes[anychart.opt.TOP].fill({'color': topFill, 'opacity': opacity});
   shapes[anychart.opt.FRONT].fill(frontFill);
+
+  // fix for batik (DVF-2068)
+  shapes[anychart.opt.TOP].stroke({'color': topFill, 'thickness': 0.8});
 };
 
 
