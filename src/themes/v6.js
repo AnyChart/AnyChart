@@ -82,7 +82,7 @@ window['anychart']['themes']['v6'] = {
     'items': ['backwardDiagonal', 'forwardDiagonal', 'horizontal', 'vertical', 'dashedBackwardDiagonal', 'grid', 'dashedForwardDiagonal', 'dashedHorizontal', 'dashedVertical', 'diagonalCross', 'diagonalBrick', 'divot', 'horizontalBrick', 'verticalBrick', 'checkerBoard', 'confetti', 'plaid', 'solidDiamond', 'zigZag', 'weave', 'percent05', 'percent10', 'percent20', 'percent25', 'percent30', 'percent40', 'percent50', 'percent60', 'percent70', 'percent75', 'percent80', 'percent90']
   },
   'markerPalette': {
-    'items': ['circle', 'square', 'triangleUp', 'diamond', 'triangleDown', 'cross', 'diagonalCross', 'star4', 'star5', 'star6', 'star7', 'star10', 'pentagon', 'trapezium', 'line']
+    'items': ['circle', 'square', 'triangleUp', 'diamond', 'triangleDown', 'cross', 'diagonalCross', 'star4', 'star5', 'star6', 'star7', 'star10', 'pentagon', 'trapezium', 'vline']
   },
 
   'defaultOrdinalColorScale': {

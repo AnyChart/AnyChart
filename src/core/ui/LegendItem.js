@@ -203,7 +203,7 @@ anychart.core.ui.LegendItem.prototype.drawIconMarker_ = function(path, size) {
  * @return {function(this: anychart.core.ui.LegendItem, acgraph.vector.Path, number)} Drawer function.
  */
 anychart.core.ui.LegendItem.prototype.getIconDrawer = function(opt_iconType) {
-  var drawer;
+  var drawer, mDrawer;
   switch (opt_iconType) {
     case anychart.enums.LegendItemIconType.STEP_AREA:
       drawer = function(path, size) {
@@ -375,7 +375,6 @@ anychart.core.ui.LegendItem.prototype.getIconDrawer = function(opt_iconType) {
       };
       break;
 
-    case anychart.enums.LegendItemIconType.MARKER:
     case anychart.enums.LegendItemIconType.BUBBLE:
     case anychart.enums.LegendItemIconType.CIRCLE:
       drawer = function(path, size) {
@@ -407,6 +406,27 @@ anychart.core.ui.LegendItem.prototype.getIconDrawer = function(opt_iconType) {
             .moveTo(size * 0.5, size * 0.8)
             .lineTo(size, size * 0.8)
             .close();
+      };
+      break;
+
+    case anychart.enums.LegendItemIconType.TRIANGLE_UP:
+    case anychart.enums.LegendItemIconType.TRIANGLE_DOWN:
+    case anychart.enums.LegendItemIconType.DIAMOND:
+    case anychart.enums.LegendItemIconType.CROSS:
+    case anychart.enums.LegendItemIconType.DIAGONAL_CROSS:
+    case anychart.enums.LegendItemIconType.STAR4:
+    case anychart.enums.LegendItemIconType.STAR5:
+    case anychart.enums.LegendItemIconType.STAR6:
+    case anychart.enums.LegendItemIconType.STAR7:
+    case anychart.enums.LegendItemIconType.STAR10:
+    case anychart.enums.LegendItemIconType.PENTAGON:
+    case anychart.enums.LegendItemIconType.TRAPEZIUM:
+    case anychart.enums.LegendItemIconType.ARROWHEAD:
+    case anychart.enums.LegendItemIconType.V_LINE:
+      opt_iconType = anychart.enums.normalizeMarkerType(opt_iconType);
+      mDrawer = anychart.enums.getMarkerDrawer(opt_iconType);
+      drawer = function(path, size) {
+        return mDrawer(path, size / 2, size / 2, size / 2);
       };
       break;
 
@@ -947,6 +967,8 @@ anychart.core.ui.LegendItem.prototype.applyHover = function(hover) {
  * @private
  */
 anychart.core.ui.LegendItem.prototype.drawIcon_ = function(drawer) {
+  if (this.marker_)
+    this.marker_.clear();
   if (this.iconEnabled_) {
     drawer.call(this, this.icon_.clear(), this.iconSize_);
     if (this.hatch_)

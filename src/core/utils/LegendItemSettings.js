@@ -144,7 +144,7 @@ anychart.core.utils.LegendItemSettings.prototype.iconStroke = function(opt_strok
         acgraph.vector.normalizeStroke.apply(null, arguments);
     if (stroke != this.iconStroke_) {
       this.iconStroke_ = stroke;
-      this.dispatchSignal(anychart.Signal.NEED_UPDATE_LEGEND);
+      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }

@@ -171,8 +171,8 @@ anychart.core.series.Cartesian.prototype.applyConfig = function(config) {
 
 
 /** @inheritDoc */
-anychart.core.series.Cartesian.prototype.applyDefaultsToElements = function(defaults) {
-  anychart.core.series.Cartesian.base(this, 'applyDefaultsToElements', defaults);
+anychart.core.series.Cartesian.prototype.applyDefaultsToElements = function(defaults, opt_resetLegendItem) {
+  anychart.core.series.Cartesian.base(this, 'applyDefaultsToElements', defaults, opt_resetLegendItem);
 
   if (goog.isDef(defaults['allowPointsSelect'])) {
     this.selectionMode(goog.isBoolean(defaults['allowPointsSelect']) ?

@@ -648,14 +648,18 @@ anychart.core.map.series.Base.prototype.getLegendItemData = function(itemsTextFo
   legendItem.markAllConsistent();
   var json = legendItem.serialize();
   var iconFill, iconStroke, iconHatchFill;
+  var ctx = {
+    'sourceColor': this.color()
+  };
   if (goog.isFunction(legendItem.iconFill())) {
-    iconFill = legendItem.iconFill().call(this.color());
+    json['iconFill'] = legendItem.iconFill().call(ctx, ctx);
   }
   if (goog.isFunction(legendItem.iconStroke())) {
-    iconStroke = legendItem.iconStroke().call(this.color());
+    json['iconStroke'] = legendItem.iconStroke().call(ctx, ctx);
   }
   if (goog.isFunction(legendItem.iconHatchFill())) {
-    iconHatchFill = legendItem.iconHatchFill().call(this.autoHatchFill);
+    ctx['sourceColor'] = this.autoHatchFill;
+    json['iconHatchFill'] = legendItem.iconHatchFill().call(ctx, ctx);
   }
   var itemText;
   if (goog.isFunction(itemsTextFormatter)) {
@@ -665,13 +669,19 @@ anychart.core.map.series.Base.prototype.getLegendItemData = function(itemsTextFo
   if (!goog.isString(itemText))
     itemText = goog.isDef(this.name()) ? this.name() : 'Series: ' + this.index();
 
+  if (json['iconType'] == anychart.enums.LegendItemIconType.MARKER && this.supportsMarkers()) {
+    json['iconFill'] = this.markers_.fill();
+    json['iconStroke'] = this.markers_.stroke();
+  }
+
+  json['iconType'] = this.getLegendIconType(json['iconType']);
+
   var ret = {
     'text': /** @type {string} */ (itemText),
     'iconEnabled': true,
-    'iconType': this.getLegendIconType(),
-    'iconStroke': iconStroke,
-    'iconFill': iconFill || this.color(),
-    'iconHatchFill': iconHatchFill,
+    'iconStroke': void 0,
+    'iconFill': /** @type {acgraph.vector.Fill} */ (this.color()),
+    'iconHatchFill': void 0,
     'disabled': !this.enabled()
   };
   goog.object.extend(ret, json);

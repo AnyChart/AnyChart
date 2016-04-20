@@ -124,12 +124,6 @@ anychart.core.radar.series.Line.prototype.getType = function() {
 };
 
 
-/** @inheritDoc */
-anychart.core.radar.series.Line.prototype.getLegendIconType = function() {
-  return /** @type {anychart.enums.LegendItemIconType} */(anychart.enums.LegendItemIconType.LINE);
-};
-
-
 //anychart.core.radar.series.Line.prototype['finalizeDrawing'] = anychart.core.radar.series.Line.prototype.finalizeDrawing;
 //anychart.core.radar.series.Line.prototype['startDrawing'] = anychart.core.radar.series.Line.prototype.startDrawing;
 //exports

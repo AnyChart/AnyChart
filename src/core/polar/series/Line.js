@@ -199,12 +199,6 @@ anychart.core.polar.series.Line.prototype.getType = function() {
 };
 
 
-/** @inheritDoc */
-anychart.core.polar.series.Line.prototype.getLegendIconType = function() {
-  return /** @type {anychart.enums.LegendItemIconType} */(anychart.enums.LegendItemIconType.LINE);
-};
-
-
 //anychart.core.polar.series.Line.prototype['finalizeDrawing'] = anychart.core.polar.series.Line.prototype.finalizeDrawing;
 //exports
 anychart.core.polar.series.Line.prototype['stroke'] = anychart.core.polar.series.Line.prototype.stroke;//inherited

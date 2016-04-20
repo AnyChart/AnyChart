@@ -89,7 +89,7 @@ anychart.core.polar.series.Marker.prototype.type = function(opt_value) {
     if (!goog.isFunction(opt_value)) opt_value = anychart.enums.normalizeMarkerType(opt_value);
     if (this.type_ != opt_value) {
       this.type_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
     }
     return this;
   } else {
@@ -477,15 +477,6 @@ anychart.core.polar.series.Marker.prototype.applyHatchFill = function(pointState
  */
 anychart.core.polar.series.Marker.prototype.getType = function() {
   return anychart.enums.CartesianSeriesType.MARKER;
-};
-
-
-/** @inheritDoc */
-anychart.core.polar.series.Marker.prototype.getLegendIconType = function() {
-  var markerDrawer = anychart.enums.getMarkerDrawer(this.type());
-  return function(path, size) {
-    return markerDrawer(path, size / 2, size / 2, size / 2);
-  };
 };
 
 

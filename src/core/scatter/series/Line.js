@@ -36,12 +36,6 @@ goog.inherits(anychart.core.scatter.series.Line, anychart.core.scatter.series.Ba
 anychart.core.scatter.series.Base.SeriesTypesMap[anychart.enums.ScatterSeriesType.LINE] = anychart.core.scatter.series.Line;
 
 
-/** @inheritDoc */
-anychart.core.scatter.series.Line.prototype.getLegendIconType = function() {
-  return /** @type {anychart.enums.LegendItemIconType} */(anychart.enums.LegendItemIconType.LINE);
-};
-
-
 // ----------------------
 // --- ContinuousBase ---
 // ----------------------

@@ -464,13 +464,15 @@ anychart.core.series.Stock.prototype.getLegendIconColor = function(legendItemJso
 
 
 /** @inheritDoc */
-anychart.core.series.Stock.prototype.getLegendIconType = function(context) {
-  // commented yet because legendItem doesn't currently support icon types other than anychart.enums.LegendIconType
-  // if (this.check(anychart.core.drawers.Capabilities.IS_OHLC_BASED))
-  //   return (context['open'] < context['close']) ?
-  //       anychart.enums.MarkerType.TRIANGLE_UP :
-  //       anychart.enums.MarkerType.TRIANGLE_DOWN;
-  return anychart.core.series.Stock.base(this, 'getLegendIconType', context);
+anychart.core.series.Stock.prototype.getLegendIconType = function(type, context) {
+  if (String(type).toLowerCase() == anychart.enums.LegendItemIconType.RISING_FALLING) {
+    if (this.check(anychart.core.drawers.Capabilities.IS_OHLC_BASED)) {
+      return (context[anychart.opt.OPEN] < context[anychart.opt.CLOSE]) ?
+          anychart.enums.LegendItemIconType.TRIANGLE_UP :
+          anychart.enums.LegendItemIconType.TRIANGLE_DOWN;
+    }
+  }
+  return anychart.core.series.Stock.base(this, 'getLegendIconType', type, context);
 };
 
 

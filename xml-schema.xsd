@@ -2585,6 +2585,7 @@
             <xsd:enumeration value="bar"/>
             <xsd:enumeration value="x"/>
             <xsd:enumeration value="line"/>
+            <xsd:enumeration value="vline"/>
             <xsd:enumeration value="ellipse"/>
             <xsd:enumeration value="trapezium"/>
             <xsd:enumeration value="pentagon"/>

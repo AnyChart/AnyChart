@@ -792,6 +792,11 @@ anychart.core.series.Base.prototype.setAutoPointWidth = function(value) {
  */
 anychart.core.series.Base.prototype.setAutoColor = function(value) {
   this.autoSettings[anychart.opt.COLOR] = value;
+  this.labels().setAutoColor(this.getLabelsColor());
+  this.markers().setAutoFill(this.getMarkerFill());
+  this.markers().setAutoStroke(this.getMarkerStroke());
+  this.outlierMarkers().setAutoFill(this.getOutliersFill());
+  this.outlierMarkers().setAutoStroke(this.getOutliersStroke());
 };
 
 
@@ -809,8 +814,8 @@ anychart.core.series.Base.prototype.setAutoXPointPosition = function(position) {
  * @param {anychart.enums.MarkerType} value Auto marker type distributed by the chart.
  */
 anychart.core.series.Base.prototype.setAutoMarkerType = function(value) {
-  // not used yet
   this.autoSettings[anychart.opt.TYPE] = value;
+  this.markers().setAutoType(value);
 };
 
 
@@ -1352,9 +1357,11 @@ anychart.core.series.Base.prototype.getLegendItemData = function(itemsTextFormat
       itemText = this.getLegendItemText(context);
     json[anychart.opt.TEXT] = itemText;
   }
-  if (!goog.isDefAndNotNull(json[anychart.opt.ICON_TYPE])) {
-    json[anychart.opt.ICON_TYPE] = this.getLegendIconType(context);
+  if (json[anychart.opt.ICON_TYPE] == anychart.enums.LegendItemIconType.MARKER && !this.check(anychart.core.drawers.Capabilities.IS_MARKER_BASED)) {
+    json[anychart.opt.ICON_FILL] = this.markers_.fill();
+    json[anychart.opt.ICON_STROKE] = this.markers_.stroke();
   }
+  json[anychart.opt.ICON_TYPE] = this.getLegendIconType(json[anychart.opt.ICON_TYPE], context);
   json[anychart.opt.ICON_ENABLED] = anychart.opt.ICON_ENABLED in json ? !!json[anychart.opt.ICON_ENABLED] : true;
   json[anychart.opt.ICON_STROKE] = this.getLegendIconColor(
       json[anychart.opt.ICON_STROKE],
@@ -1387,18 +1394,25 @@ anychart.core.series.Base.prototype.getLegendItemData = function(itemsTextFormat
 
 /**
  * Gets legend icon type for the series.
- * @param {Object=} opt_context
+ * @param {*} type
+ * @param {Object} context
  * @return {(anychart.enums.LegendItemIconType|function(acgraph.vector.Path, number))}
  */
-anychart.core.series.Base.prototype.getLegendIconType = function(opt_context) {
-  if (this.check(anychart.core.drawers.Capabilities.IS_MARKER_BASED)) {
-    var type = this.getSeriesOption(anychart.opt.TYPE);
-    var markerDrawer = goog.isFunction(type) ? type : anychart.enums.getMarkerDrawer(type);
-    return function(path, size) {
-      return markerDrawer(path, size / 2, size / 2, size / 2);
-    };
+anychart.core.series.Base.prototype.getLegendIconType = function(type, context) {
+  if (type == anychart.enums.LegendItemIconType.MARKER) {
+    if (this.check(anychart.core.drawers.Capabilities.IS_MARKER_BASED)) {
+      type = this.getSeriesOption(anychart.opt.TYPE);
+    } else if (this.supportsMarkers()) {
+      type = this.markers().type();
+    } else {
+      type = anychart.enums.LegendItemIconType.SQUARE;
+    }
+    if (type == anychart.enums.LegendItemIconType.LINE)
+      type = anychart.enums.LegendItemIconType.V_LINE;
+  } else if (!goog.isFunction(type)) {
+    type = anychart.enums.normalizeLegendItemIconType(type);
   }
-  return anychart.enums.LegendItemIconType.SQUARE;
+  return /** @type {anychart.enums.LegendItemIconType} */ (type);
 };
 
 
@@ -1413,7 +1427,10 @@ anychart.core.series.Base.prototype.getLegendIconType = function(opt_context) {
 anychart.core.series.Base.prototype.getLegendIconColor = function(legendItemJson, colorType, baseColor, context) {
   if (legendItemJson) {
     if (goog.isFunction(legendItemJson)) {
-      legendItemJson = legendItemJson.call(baseColor);
+      var ctx = {
+        'sourceColor': baseColor
+      };
+      legendItemJson = legendItemJson.call(ctx, ctx);
     } else {
       legendItemJson = anychart.color.serialize(
           /** @type {acgraph.vector.Fill|acgraph.vector.Stroke} */(legendItemJson));
@@ -2422,7 +2439,6 @@ anychart.core.series.Base.prototype.draw = function() {
     stateFactoriesEnabled = /** @type {boolean} */(this.hoverLabels().enabled() || this.selectLabels().enabled());
     if (this.prepareFactory(factory, stateFactoriesEnabled, this.planHasPointLabels(),
         anychart.core.series.Capabilities.SUPPORTS_LABELS, anychart.ConsistencyState.SERIES_LABELS)) {
-      factory.setAutoColor(this.getLabelsColor());
       factory.setAutoZIndex(/** @type {number} */(this.zIndex() + anychart.core.shapeManagers.LABELS_ZINDEX));
       elementsDrawers.push(this.drawLabel);
       factoriesToFinalize.push(factory);
@@ -2435,9 +2451,6 @@ anychart.core.series.Base.prototype.draw = function() {
     stateFactoriesEnabled = /** @type {boolean} */(this.hoverMarkers().enabled() || this.selectMarkers().enabled());
     if (this.prepareFactory(factory, stateFactoriesEnabled, this.planHasPointMarkers(),
         anychart.core.series.Capabilities.SUPPORTS_MARKERS, anychart.ConsistencyState.SERIES_MARKERS)) {
-      factory.setAutoType(this.autoSettings[anychart.opt.TYPE]);
-      factory.setAutoFill(this.getMarkerFill());
-      factory.setAutoStroke(this.getMarkerStroke());
       factory.setAutoZIndex(/** @type {number} */(this.zIndex() + anychart.core.shapeManagers.MARKERS_ZINDEX));
       elementsDrawers.push(this.drawMarker);
       factoriesToFinalize.push(factory);
@@ -2460,8 +2473,6 @@ anychart.core.series.Base.prototype.draw = function() {
     stateFactoriesEnabled = /** @type {boolean} */(this.hoverOutlierMarkers().enabled() || this.selectOutlierMarkers().enabled());
     if (this.prepareFactory(factory, stateFactoriesEnabled, this.planHasPointOutliers(),
         anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS, anychart.ConsistencyState.SERIES_OUTLIERS)) {
-      factory.setAutoFill(this.getOutliersFill());
-      factory.setAutoStroke(this.getOutliersStroke());
       factory.setAutoZIndex(/** @type {number} */(this.zIndex() + anychart.core.shapeManagers.OUTLIERS_ZINDEX));
       elementsDrawers.push(this.drawPointOutliers);
       factoriesToFinalize.push(factory);

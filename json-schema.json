@@ -4787,6 +4787,7 @@
         "trapezium",
         "pentagon",
         "line",
+        "vline",
         "x",
         "ellipse",
         "bar",

@@ -808,6 +808,7 @@ anychart.enums.MarkerType = {
   PENTAGON: 'pentagon',
   TRAPEZIUM: 'trapezium',
   LINE: 'line',
+  V_LINE: 'vline',
   ARROWHEAD: 'arrowhead'
 };
 
@@ -823,6 +824,8 @@ anychart.enums.normalizeMarkerType = function(type, opt_default) {
   switch (type) {
     case 'line':
       return anychart.enums.MarkerType.LINE;
+    case 'vline':
+      return anychart.enums.MarkerType.V_LINE;
     case 'star4':
       return anychart.enums.MarkerType.STAR4;
     case 'star5':
@@ -908,6 +911,8 @@ anychart.enums.normalizeAnyMarkerType = function(type) {
     case 'arrow':
     case 'arrowhead':
       return anychart.enums.MarkerType.ARROWHEAD;
+    case 'vline':
+      return anychart.enums.MarkerType.V_LINE;
   }
   return null;
 };
@@ -1029,6 +1034,7 @@ anychart.enums.getMarkerDrawer = function(type) {
 
         return path;
       };
+    case 'vline':
     case 'line':
       return function(path, x, y, size) {
         var height = size * 2;
@@ -1381,13 +1387,13 @@ anychart.enums.normalizeBackgroundCornerType = function(value, opt_default) {
  * @enum {string}
  */
 anychart.enums.LegendItemIconType = {
+  // icons by series type
   AREA: 'area',
   BAR: 'bar',
   BUBBLE: 'bubble',
   CANDLESTICK: 'candlestick',
   COLUMN: 'column',
   LINE: 'line',
-  MARKER: 'marker',
   OHLC: 'ohlc',
   RANGE_AREA: 'rangearea',
   RANGE_BAR: 'rangebar',
@@ -1399,7 +1405,26 @@ anychart.enums.LegendItemIconType = {
   STEP_LINE: 'stepline',
   STEP_AREA: 'steparea',
   CIRCLE: 'circle',
-  SQUARE: 'square'
+  SQUARE: 'square',
+
+  // icons by marker type
+  TRIANGLE_UP: 'triangleup',
+  TRIANGLE_DOWN: 'triangledown',
+  DIAMOND: 'diamond',
+  CROSS: 'cross',
+  DIAGONAL_CROSS: 'diagonalcross',
+  STAR4: 'star4',
+  STAR5: 'star5',
+  STAR6: 'star6',
+  STAR7: 'star7',
+  STAR10: 'star10',
+  PENTAGON: 'pentagon',
+  TRAPEZIUM: 'trapezium',
+  ARROWHEAD: 'arrowhead',
+  V_LINE: 'vline',
+  // special icon types
+  MARKER: 'marker',
+  RISING_FALLING: 'risingfalling'
 };
 
 
@@ -1450,6 +1475,39 @@ anychart.enums.normalizeLegendItemIconType = function(value, opt_default) {
       return anychart.enums.LegendItemIconType.CIRCLE;
     case 'square':
       return anychart.enums.LegendItemIconType.SQUARE;
+    case 'star4':
+      return anychart.enums.LegendItemIconType.STAR4;
+    case 'star5':
+      return anychart.enums.LegendItemIconType.STAR5;
+    case 'star6':
+      return anychart.enums.LegendItemIconType.STAR6;
+    case 'star7':
+      return anychart.enums.LegendItemIconType.STAR7;
+    case 'star10':
+      return anychart.enums.LegendItemIconType.STAR10;
+    case 'diamond':
+      return anychart.enums.LegendItemIconType.DIAMOND;
+    case 'triangleup':
+      return anychart.enums.LegendItemIconType.TRIANGLE_UP;
+    case 'triangledown':
+      return anychart.enums.LegendItemIconType.TRIANGLE_DOWN;
+    case 'cross':
+      return anychart.enums.LegendItemIconType.CROSS;
+    case 'diagonalcross':
+      return anychart.enums.LegendItemIconType.DIAGONAL_CROSS;
+    case 'trapezoid':
+    case 'trapezium':
+      return anychart.enums.LegendItemIconType.TRAPEZIUM;
+    case 'pentagon':
+      return anychart.enums.LegendItemIconType.PENTAGON;
+    case 'arrow':
+    case 'arrowhead':
+      return anychart.enums.LegendItemIconType.ARROWHEAD;
+    case 'vline':
+      return anychart.enums.LegendItemIconType.V_LINE;
+    case 'rf':
+    case 'risingfalling':
+      return anychart.enums.LegendItemIconType.RISING_FALLING;
   }
   return opt_default || anychart.enums.LegendItemIconType.SQUARE;
 };

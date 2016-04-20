@@ -604,14 +604,18 @@ anychart.core.SeriesBase.prototype.getLegendItemData = function(itemsTextFormatt
   legendItem.markAllConsistent();
   var json = legendItem.serialize();
   var iconFill, iconStroke, iconHatchFill;
+  var ctx = {
+    'sourceColor': this.color()
+  };
   if (goog.isFunction(legendItem.iconFill())) {
-    iconFill = legendItem.iconFill().call(this.color());
+    json['iconFill'] = legendItem.iconFill().call(ctx, ctx);
   }
   if (goog.isFunction(legendItem.iconStroke())) {
-    iconStroke = legendItem.iconStroke().call(this.color());
+    json['iconStroke'] = legendItem.iconStroke().call(ctx, ctx);
   }
   if (goog.isFunction(legendItem.iconHatchFill())) {
-    iconHatchFill = legendItem.iconHatchFill().call(this.autoHatchFill);
+    ctx['sourceColor'] = this.autoHatchFill;
+    json['iconHatchFill'] = legendItem.iconHatchFill().call(ctx, ctx);
   }
   var itemText;
   if (goog.isFunction(itemsTextFormatter)) {
@@ -621,14 +625,20 @@ anychart.core.SeriesBase.prototype.getLegendItemData = function(itemsTextFormatt
   if (!goog.isString(itemText))
     itemText = goog.isDef(this.name()) ? this.name() : 'Series: ' + this.index();
 
+  if (json['iconType'] == anychart.enums.LegendItemIconType.MARKER && this.supportsMarkers()) {
+    json['iconFill'] = this.markers_.fill();
+    json['iconStroke'] = this.markers_.stroke();
+  }
+
+  json['iconType'] = this.getLegendIconType(json['iconType']);
+
   var ret = {
     'meta': /** @type {Object} */ (this.meta()),
     'text': /** @type {string} */ (itemText),
     'iconEnabled': true,
-    'iconType': this.getLegendIconType(),
-    'iconStroke': iconStroke || this.getFinalStroke(false, anychart.PointState.NORMAL),
-    'iconFill': iconFill || this.getFinalFill(false, anychart.PointState.NORMAL),
-    'iconHatchFill': iconHatchFill || this.getFinalHatchFill(false, anychart.PointState.NORMAL),
+    'iconStroke': this.getFinalStroke(false, anychart.PointState.NORMAL),
+    'iconFill': this.getFinalFill(false, anychart.PointState.NORMAL),
+    'iconHatchFill': this.getFinalHatchFill(false, anychart.PointState.NORMAL),
     'disabled': !this.enabled()
   };
   goog.object.extend(ret, json);
@@ -638,10 +648,22 @@ anychart.core.SeriesBase.prototype.getLegendItemData = function(itemsTextFormatt
 
 /**
  * Gets legend icon type for the series.
+ * @param {*} type iconType.
  * @return {(anychart.enums.LegendItemIconType|function(acgraph.vector.Path, number))}
  */
-anychart.core.SeriesBase.prototype.getLegendIconType = function() {
-  return /** @type {anychart.enums.LegendItemIconType} */(anychart.enums.LegendItemIconType.SQUARE);
+anychart.core.SeriesBase.prototype.getLegendIconType = function(type) {
+  if (type == anychart.enums.LegendItemIconType.MARKER) {
+    if (!this.supportsMarkers()) {
+      type = this.type();
+    } else if (this.markers().enabled()) {
+      type = this.markers().type();
+    }
+    if (type == anychart.enums.LegendItemIconType.LINE)
+      type = anychart.enums.LegendItemIconType.V_LINE;
+  } else if (!goog.isFunction(type)) {
+    type = anychart.enums.normalizeLegendItemIconType(type);
+  }
+  return /** @type {anychart.enums.LegendItemIconType} */ (type);
 };
 
 
@@ -712,11 +734,32 @@ anychart.core.SeriesBase.prototype.color = function(opt_fillOrColorOrKeys, opt_o
 
 
 /**
+ * Returns labels default font color.
+ * @return {string}
+ */
+anychart.core.SeriesBase.prototype.getLabelsColor = function() {
+  var color;
+  if (anychart.DEFAULT_THEME != 'v6') {
+    color = anychart.color.darken(/** @type {acgraph.vector.Fill} */(this.color()));
+    if (goog.isObject(color)) {
+      color = /** @type {string|undefined} */(color['color']);
+    }
+  }
+  return /** @type {string} */(color || '');
+};
+
+
+/**
  * Sets series color that parent chart have set for it.
  * @param {acgraph.vector.Fill} value Auto color fill distributed by the chart.
  */
 anychart.core.SeriesBase.prototype.setAutoColor = function(value) {
   this.autoColor_ = value;
+  this.labels().setAutoColor(this.getLabelsColor());
+  if (this.supportsMarkers()) {
+    this.markers().setAutoFill(this.getMarkerFill());
+    this.markers().setAutoStroke(this.getMarkerStroke());
+  }
 };
 
 
