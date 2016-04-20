@@ -94,10 +94,18 @@ anychart.core.map.series.Connector.prototype.curvature = function(opt_value) {
 
 
 /** @inheritDoc */
-anychart.core.map.series.Connector.prototype.rootTypedLayerInitializer = function() {
-  var path = acgraph.path();
-  path.disableStrokeScaling(true);
-  return path;
+anychart.core.map.series.Connector.prototype.setGeoData = function(geoData) {
+  anychart.core.map.series.Connector.base(this, 'setGeoData', geoData);
+
+  this.map.listen(anychart.enums.EventType.ANIMATION_END, function(e) {
+    this.zoomingInProgress = false;
+    this.mapTx = this.map.getMapLayer().getFullTransformation().clone();
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
+  }, false, this);
+
+  this.map.listen(anychart.enums.EventType.ANIMATION_START, function(e) {
+    this.zoomingInProgress = true;
+  }, false, this);
 };
 
 
@@ -105,14 +113,16 @@ anychart.core.map.series.Connector.prototype.rootTypedLayerInitializer = functio
 anychart.core.map.series.Connector.prototype.configureMarker = function(pointState, opt_reset) {
   var marker = /** @type {anychart.core.ui.MarkersFactory.Marker} */(anychart.core.map.series.Connector.base(this, 'configureMarker', pointState, opt_reset));
   if (marker) {
-    var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
-    var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
-    var normal = !(selected || hovered);
-
     var rotation = /** @type {number} */(marker.getFinalSettings('rotation'));
     if (!goog.isDef(rotation) || goog.isNull(rotation) || isNaN(rotation)) {
       var autoRotation = {'rotation': /** @type {number} */(this.getIterator().meta('markerRotation'))};
       marker.setSettings(autoRotation, autoRotation);
+    }
+
+    var anchor = /** @type {anychart.enums.Anchor} */(marker.getFinalSettings('anchor'));
+    if (!goog.isDef(anchor) || goog.isNull(anchor)) {
+      var autoAnchor = {'anchor': /** @type {anychart.enums.Anchor} */(this.getIterator().meta('markerAnchor'))};
+      marker.setSettings(autoAnchor, autoAnchor);
     }
   }
 
@@ -123,8 +133,13 @@ anychart.core.map.series.Connector.prototype.configureMarker = function(pointSta
 /** @inheritDoc */
 anychart.core.map.series.Connector.prototype.configureLabel = function(pointState, opt_reset) {
   var label = /** @type {anychart.core.ui.LabelsFactory.Label} */(anychart.core.map.series.Connector.base(this, 'configureLabel', pointState, opt_reset));
-  if (label && (!goog.isDef(label.anchor()) || goog.isNull(label.anchor())))
-    label.anchor(/** @type {string} */(this.getIterator().meta('labelAnchor')));
+  if (label) {
+    var anchor = /** @type {number} */(label.getMergedSettings()['anchor']);
+    if (!goog.isDef(anchor) || goog.isNull(anchor)) {
+      var autoAnchor = {'anchor': /** @type {string} */(this.getIterator().meta('labelAnchor'))};
+      label.setSettings(autoAnchor, autoAnchor);
+    }
+  }
 
   return label;
 };
@@ -154,7 +169,7 @@ anychart.core.map.series.Connector.prototype.createFormatProvider = function(opt
 anychart.core.map.series.Connector.prototype.getReferenceCoords = function() {
   if (!this.enabled()) return null;
   var scale = /** @type {anychart.core.map.scale.Geo} */(this.map.scale());
-  var zoom = /** @type {number} */(scale.zoom);
+
   var iterator = this.getIterator();
 
   var points = iterator.get(this.referenceValueNames[0]);
@@ -169,6 +184,7 @@ anychart.core.map.series.Connector.prototype.getReferenceCoords = function() {
     lon = anychart.utils.toNumber(points[i + 1]);
 
     var txCoords = scale.transform(lon, lat);
+
     x = txCoords[0];
     y = txCoords[1];
 
@@ -314,6 +330,7 @@ anychart.core.map.series.Connector.prototype.createPositionProvider = function(p
 
         iterator.meta('labelAnchor', this.getAnchorForLabel_(anglePathNormal));
         iterator.meta('markerRotation', anglePathNormal);
+        iterator.meta('markerAnchor', normalizedPosition == 1 ? anychart.enums.Anchor.RIGHT_CENTER : normalizedPosition == 0 ? anychart.enums.Anchor.LEFT_CENTER : anychart.enums.Anchor.CENTER);
 
         //todo (blackart) shapes for debug, don't remove.
         //if (!this['q0' + this.getIterator().getIndex()]) this['q0' + this.getIterator().getIndex()] = this.container().circle().zIndex(1000).stroke('red');
@@ -346,12 +363,21 @@ anychart.core.map.series.Connector.prototype.createPositionProvider = function(p
       accumDist += currPathDist;
     }
 
+    if (this.zoomingInProgress || this.map.drag) {
+      var prevTx = this.mapTx;
+      var tx = this.map.getMapLayer().getFullTransformation().clone();
 
-    var tx = this.map.getMapLayer().getFullTransformation();
-    var scale = tx.getScaleX();
-    var dx = tx.getTranslateX();
-    var dy = tx.getTranslateY();
-    return {'value': {'x': bx * scale + dx, 'y': by * scale + dy}};
+      if (prevTx) {
+        tx.concatenate(prevTx.createInverse());
+      }
+
+      var scale = tx.getScaleX();
+      var dx = tx.getTranslateX();
+      var dy = tx.getTranslateY();
+      return {'value': {'x': bx * scale + dx, 'y': by * scale + dy}};
+    } else {
+      return {'value': {'x': bx, 'y': by}};
+    }
   }
   return {'value': {'x': 0, 'y': 0}};
 };
@@ -372,7 +398,14 @@ anychart.core.map.series.Connector.prototype.applyZoomMoveTransform = function()
   var iterator = this.getIterator();
 
   var paths = iterator.meta('shape');
-  var tx = this.map.getMapLayer().getFullTransformation();
+
+  var prevTx = this.mapTx;
+  var tx = this.map.getMapLayer().getFullTransformation().clone();
+
+  if (prevTx) {
+    tx.concatenate(prevTx.createInverse());
+  }
+
   var scale = tx.getScaleX();
   var dx = tx.getTranslateX();
   var dy = tx.getTranslateY();
@@ -744,6 +777,7 @@ anychart.core.map.series.Connector.prototype.drawPoint = function(pointState) {
         .meta('points', points)
         .meta('sumDist', sumDist)
         .meta('connectorsDist', connectorsDist);
+
     this.colorizeShape(pointState | this.state.getSeriesState());
   }
 
@@ -768,6 +802,14 @@ anychart.core.map.series.Connector.prototype.drawPoint = function(pointState) {
   }
 
   goog.base(this, 'drawPoint', pointState);
+
+  this.applyZoomMoveTransform();
+};
+
+
+/** @inheritDoc */
+anychart.core.map.series.Connector.prototype.finalizeDrawing = function() {
+  anychart.core.map.series.Connector.base(this, 'finalizeDrawing');
 };
 
 

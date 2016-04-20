@@ -565,7 +565,7 @@ anychart.core.map.scale.Geo.prototype.pickTx = function(lon, lat) {
  * @param {number} lat Latitude in degrees.
  * @return {Array.<number>} Transformed value adjust bounds [x, y].
  */
-anychart.core.map.scale.Geo.prototype.transform = function(lon, lat) {
+anychart.core.map.scale.Geo.prototype.transformWithoutTx = function(lon, lat) {
   this.calculate();
 
   if (!this.bounds_ || isNaN(lon) || isNaN(lat))
@@ -605,7 +605,23 @@ anychart.core.map.scale.Geo.prototype.transform = function(lon, lat) {
       this.bounds_.top + this.centerOffsetY + transformY :
       this.bounds_.getBottom() - this.centerOffsetY - transformY;
 
-  return [resultX * this.zoom + this.dx_, resultY * this.zoom + this.dy_];
+  return [resultX, resultY];
+};
+
+
+/**
+ * Transform coords in lat/lon to pixel values.
+ * @param {number} lon Longitude in degrees.
+ * @param {number} lat Latitude in degrees.
+ * @return {Array.<number>} Transformed value adjust bounds [x, y].
+ */
+anychart.core.map.scale.Geo.prototype.transform = function(lon, lat) {
+  var coords = this.transformWithoutTx(lon, lat);
+
+  coords[0] = coords[0] * this.zoom + this.dx_;
+  coords[1] = coords[1] * this.zoom + this.dy_;
+
+  return coords;
 };
 
 

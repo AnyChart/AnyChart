@@ -64,7 +64,7 @@ anychart.core.ui.LabelsFactory = function() {
 
   /**
    * Labels anchor settings.
-   * @type {anychart.enums.Anchor}
+   * @type {?anychart.enums.Anchor}
    * @private
    */
   this.anchor_;
@@ -437,9 +437,9 @@ anychart.core.ui.LabelsFactory.prototype.position = function(opt_value) {
  */
 anychart.core.ui.LabelsFactory.prototype.anchor = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeAnchor(opt_value);
-    if (this.anchor_ != opt_value) {
-      this.anchor_ = opt_value;
+    var value = goog.isNull(opt_value) ? null : anychart.enums.normalizeAnchor(opt_value);
+    if (this.anchor_ != value) {
+      this.anchor_ = value;
       this.changedSettings['anchor'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
@@ -1486,9 +1486,9 @@ anychart.core.ui.LabelsFactory.Label.prototype.rotation = function(opt_value) {
  */
 anychart.core.ui.LabelsFactory.Label.prototype.anchor = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeAnchor(opt_value);
-    if (this.settingsObj.anchor !== opt_value) {
-      this.settingsObj.anchor = opt_value;
+    var value = goog.isNull(opt_value) ? null : anychart.enums.normalizeAnchor(opt_value);
+    if (this.settingsObj.anchor !== value) {
+      this.settingsObj.anchor = value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -1910,15 +1910,50 @@ anychart.core.ui.LabelsFactory.Label.prototype.calculateFontSize = function(orig
 
 
 /**
+ * Returns final value of settings with passed name.
+ * @param {string} value Name of settings.
+ * @return {*} settings value.
+ */
+anychart.core.ui.LabelsFactory.Label.prototype.getFinalSettings = function(value) {
+  var parentLabelsFactory = this.parentLabelsFactory();
+  var currentLabelsFactory = this.currentLabelsFactory() ? this.currentLabelsFactory() : parentLabelsFactory;
+  var labelsFactory = currentLabelsFactory ? currentLabelsFactory : parentLabelsFactory;
+  var settingsChangedStates;
+  var notSelfSettings = labelsFactory != parentLabelsFactory;
+  if (notSelfSettings)
+    settingsChangedStates = labelsFactory.getSettingsChangedStatesObj();
+
+  var result;
+  if (value == 'enabled') {
+    result = this.getFinalSettings_(
+        this.enabled(),
+        this.superSettingsObj['enabled'],
+        parentLabelsFactory.enabled(),
+        currentLabelsFactory.enabled(),
+        !goog.isNull(currentLabelsFactory.enabled()));
+  } else {
+    result = this.getFinalSettings_(
+        value == 'background' || value == 'padding' ? this.settingsObj[value] : this[value](),
+        this.superSettingsObj[value],
+        parentLabelsFactory[value](),
+        currentLabelsFactory[value](),
+        !!(settingsChangedStates && settingsChangedStates[value]));
+  }
+  return result;
+};
+
+
+/**
  * Merge settings.
  * @param {*} pointSettings Custom settings from a point.
  * @param {*} pointSuperSettings Custom settings from a point (hover usually).
  * @param {*} factorySettings Settings from the parent factory.
  * @param {*} factorySuperSettings Settings from the current factory.
  * @param {boolean} isFactorySettingsChanged
+ * @private
  * @return {*} Final settings.
  */
-anychart.core.ui.LabelsFactory.Label.prototype.getFinalSettings = function(
+anychart.core.ui.LabelsFactory.Label.prototype.getFinalSettings_ = function(
     pointSettings,
     pointSuperSettings,
     factorySettings,
@@ -2010,8 +2045,8 @@ anychart.core.ui.LabelsFactory.Label.prototype.getMergedSettings = function() {
 
   for (var i = 0, len = labelsFactory.settingsFieldsForMerge.length; i < len; i++) {
     var field = labelsFactory.settingsFieldsForMerge[i];
-    mergedSettings[field] = this.getFinalSettings(
-        field == 'background' || 'padding' ? this.settingsObj[field] : this[field](),
+    mergedSettings[field] = this.getFinalSettings_(
+        field == 'background' || field == 'padding' ? this.settingsObj[field] : this[field](),
         this.superSettingsObj[field],
         parentLabelsFactory[field](),
         currentLabelsFactory[field](),
@@ -2038,14 +2073,14 @@ anychart.core.ui.LabelsFactory.Label.prototype.getMergedSettings = function() {
   var adjFontSizeFactorySet = parentLabelsFactory.adjustFontSize();
   var adjFontSizeFactorySupSet = currentLabelsFactory.adjustFontSize();
 
-  mergedSettings['adjustByWidth'] = this.getFinalSettings(
+  mergedSettings['adjustByWidth'] = this.getFinalSettings_(
       this.settingsObj.adjustByWidth,
       adjustByWidthPointSupSet,
       adjFontSizeFactorySet.width,
       adjFontSizeFactorySupSet.width,
       !!(settingsChangedStates && settingsChangedStates['adjustByWidth']));
 
-  mergedSettings['adjustByHeight'] = this.getFinalSettings(
+  mergedSettings['adjustByHeight'] = this.getFinalSettings_(
       this.settingsObj.adjustByHeight,
       adjustByHeightPointSupSet,
       adjFontSizeFactorySet.height,

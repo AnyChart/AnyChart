@@ -551,7 +551,7 @@ anychart.core.map.series.Bubble.prototype.calculateSize_ = function(size) {
 
 /** @inheritDoc */
 anychart.core.map.series.Bubble.prototype.rootTypedLayerInitializer = function() {
-  return acgraph.circle();
+  return acgraph.path();
 };
 
 
@@ -714,15 +714,13 @@ anychart.core.map.series.Bubble.prototype.drawPoint = function(pointState) {
 
     if (size < 0 && !this.displayNegative_) return;
 
-    /** @type {!acgraph.vector.Circle} */
-    var circle = /** @type {!acgraph.vector.Circle} */(this.rootElement.genNextChild());
+    /** @type {!acgraph.vector.Path} */
+    var circle = /** @type {!acgraph.vector.Path} */(this.rootElement.genNextChild());
 
     this.getIterator().meta('x', x).meta('value', y).meta('size', size).meta('shape', circle);
 
-    circle
-        .radius(Math.abs(size))
-        .centerX(x)
-        .centerY(y);
+    var radius = Math.abs(size);
+    circle.moveTo(x + radius, y).arcTo(radius, radius, 0, 360);
 
     this.colorizeShape(pointState | this.state.getSeriesState());
     this.makeInteractive(circle);

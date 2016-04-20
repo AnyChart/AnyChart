@@ -348,11 +348,49 @@ anychart.core.map.series.Base.prototype.updateOnZoomOrMove = function() {
 
 
 /**
+ * Applying zoom and move transformations to marker element.
+ * @param {anychart.core.ui.LabelsFactory.Label} label .
+ * @param {number} pointState .
+ */
+anychart.core.map.series.Base.prototype.applyZoomMoveTransformToLabel = function(label, pointState) {
+  var domElement, prevPos, newPos, trX, trY, selfTx;
+
+  domElement = label.getDomElement();
+  var iterator = this.getIterator();
+
+  var position = this.getLabelsPosition(pointState);
+  var positionProvider = this.createPositionProvider(position);
+
+  var labelRotation = label.getFinalSettings('rotation');
+
+  var labelAnchor = label.getFinalSettings('anchor');
+  if (!goog.isDef(labelAnchor) || goog.isNull(labelAnchor)) {
+    labelAnchor = iterator.meta('labelAnchor');
+  }
+
+  if (goog.isDef(labelRotation))
+    domElement.rotateByAnchor(-labelRotation, /** @type {anychart.enums.Anchor} */(labelAnchor));
+
+  prevPos = label.positionProvider()['value'];
+  newPos = positionProvider['value'];
+
+  selfTx = domElement.getSelfTransformation();
+
+  trX = -selfTx.getTranslateX() + newPos['x'] - prevPos['x'];
+  trY = -selfTx.getTranslateY() + newPos['y'] - prevPos['y'];
+
+  domElement.translate(trX, trY);
+
+
+  if (goog.isDef(labelRotation))
+    domElement.rotateByAnchor(/** @type {number}*/(labelRotation), /** @type {anychart.enums.Anchor} */(labelAnchor));
+};
+
+
+/**
  * Applying zoom and move transformations to series elements for improve performans.
  */
 anychart.core.map.series.Base.prototype.applyZoomMoveTransform = function() {
-  var domElement, prevPos, newPos, trX, trY, selfTx;
-
   var iterator = this.getIterator();
   var index = iterator.getIndex();
   var pointState = this.state.getPointStateByIndex(index);
@@ -393,20 +431,7 @@ anychart.core.map.series.Base.prototype.applyZoomMoveTransform = function() {
   if (isDraw) {
     var label = this.labels().getLabel(index);
     if (label && label.getDomElement() && label.positionProvider()) {
-
-      var position = this.getLabelsPosition(pointState);
-      var positionProvider = this.createPositionProvider(position);
-
-      prevPos = label.positionProvider()['value'];
-      newPos = positionProvider['value'];
-
-      domElement = label.getDomElement();
-      selfTx = domElement.getSelfTransformation();
-
-      trX = -selfTx.getTranslateX() + newPos['x'] - prevPos['x'];
-      trY = -selfTx.getTranslateY() + newPos['y'] - prevPos['y'];
-
-      domElement.translate(trX, trY);
+      this.applyZoomMoveTransformToLabel(label, pointState);
     }
   }
 };
@@ -494,7 +519,7 @@ anychart.core.map.series.Base.prototype.drawPoint = function(pointState) {
  * series.finalizeDrawing();
  */
 anychart.core.map.series.Base.prototype.finalizeDrawing = function() {
-  this.labels().container(/** @type {acgraph.vector.ILayer} */(this.container()));
+  this.labels().container(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
   this.labels().draw();
 
   this.labels().resumeSignalsDispatching(false);

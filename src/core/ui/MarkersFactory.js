@@ -87,7 +87,7 @@ anychart.core.ui.MarkersFactory = function() {
 
   /**
    * Marker anchor settings.
-   * @type {anychart.enums.Anchor|string}
+   * @type {?(anychart.enums.Anchor|string)}
    * @private
    */
   this.anchor_;
@@ -285,13 +285,13 @@ anychart.core.ui.MarkersFactory.prototype.position = function(opt_value) {
 
 /**
  * Getter/setter for anchor.
- * @param {(anychart.enums.Anchor|string)=} opt_value .
- * @return {!(anychart.core.ui.MarkersFactory|anychart.enums.Anchor|string)} .
+ * @param {(anychart.enums.Anchor|string|null)=} opt_value .
+ * @return {!anychart.core.ui.MarkersFactory|anychart.enums.Anchor|string|null} .
  */
 anychart.core.ui.MarkersFactory.prototype.anchor = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeAnchor(opt_value);
-    if (this.anchor_ != opt_value) {
+    opt_value = goog.isNull(opt_value) ? opt_value : anychart.enums.normalizeAnchor(opt_value);
+    if (this.anchor_ !== opt_value) {
       this.anchor_ = opt_value;
       this.changedSettings['anchor'] = true;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
@@ -553,7 +553,7 @@ anychart.core.ui.MarkersFactory.prototype.measure = function(positionProvider) {
 
   var type = this.type();
   var size = /** @type {number} */(this.size());
-  var anchor = /** @type {anychart.enums.Anchor} */(this.anchor());
+  var anchor = /** @type {anychart.enums.Anchor} */(anychart.enums.normalizeAnchor(this.anchor()));
   var offsetX = /** @type {number} */(this.offsetX());
   var offsetY = /** @type {number} */(this.offsetY());
 
@@ -1005,8 +1005,8 @@ anychart.core.ui.MarkersFactory.Marker.prototype.position = function(opt_value) 
  */
 anychart.core.ui.MarkersFactory.Marker.prototype.anchor = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeAnchor(opt_value);
-    if (this.settingsObj['anchor'] != opt_value) {
+    opt_value = goog.isNull(opt_value) ? opt_value : anychart.enums.normalizeAnchor(opt_value);
+    if (this.settingsObj['anchor'] !== opt_value) {
       this.settingsObj['anchor'] = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
@@ -1305,6 +1305,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.draw = function() {
       !isSingleMarker && parentMarkersFactory.enabled(),
       !isSingleMarker && currentMarkersFactory.enabled(),
       !goog.isNull(isSingleMarker ? null : currentMarkersFactory.enabled()));
+
   if (goog.isNull(enabled)) enabled = true;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.ENABLED) ||
@@ -1377,15 +1378,15 @@ anychart.core.ui.MarkersFactory.Marker.prototype.draw = function() {
 
     this.markerElement_.clear();
 
+    var anchor = /** @type {anychart.enums.Anchor} */(anychart.enums.normalizeAnchor(settings['anchor']));
+
     drawer.call(this, this.markerElement_, 0, 0, settings['size']);
-    var markerBounds = this.markerElement_.getBounds();
+    var markerBounds = this.markerElement_.getBoundsWithoutTransform();
 
     var positionProvider = this.positionProvider();
     var formattedPosition = goog.object.clone(settings['positionFormatter'].call(positionProvider, positionProvider));
     var position = new acgraph.math.Coordinate(formattedPosition['x'], formattedPosition['y']);
-    var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
-        new anychart.math.Rect(0, 0, markerBounds.width, markerBounds.height),
-        /** @type {anychart.enums.Anchor} */(settings['anchor']));
+    var anchorCoordinate = anychart.utils.getCoordinateByAnchor(new anychart.math.Rect(0, 0, markerBounds.width, markerBounds.height), anchor);
 
     position.x -= anchorCoordinate.x;
     position.y -= anchorCoordinate.y;
@@ -1395,7 +1396,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.draw = function() {
     var offsetYNorm = goog.isDef(settings['offsetY']) ?
         anychart.utils.normalizeSize(/** @type {string|number} */(settings['offsetY']), parentHeight) : 0;
 
-    anychart.utils.applyOffsetByAnchor(position, /** @type {anychart.enums.Anchor} */(settings['anchor']), offsetXNorm, offsetYNorm);
+    anychart.utils.applyOffsetByAnchor(position, anchor, offsetXNorm, offsetYNorm);
 
     markerBounds.left = position.x + markerBounds.width / 2;
     markerBounds.top = position.y + markerBounds.height / 2;

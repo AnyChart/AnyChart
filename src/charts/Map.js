@@ -403,13 +403,13 @@ anychart.charts.Map = function() {
       this.mapTouchEndHandler_ = function(e) {
         goog.style.setStyle(document['body'], 'cursor', '');
         this.touchDist = 0;
-        this.drag_ = false;
+        this.drag = false;
         goog.events.unlisten(document, [goog.events.EventType.POINTERMOVE, goog.events.EventType.TOUCHMOVE], this.touchMoveHandler, false, this);
         this.updateSeriesOnZoomOrMove();
       };
 
       this.mapMouseLeaveHandler_ = function(e) {
-        if (!this.drag_) {
+        if (!this.drag) {
           goog.events.unlisten(document, goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, false, this);
           goog.events.unlisten(document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, false, this);
         }
@@ -437,7 +437,7 @@ anychart.charts.Map = function() {
           this.isDesktop = true;
           startX = e.clientX;
           startY = e.clientY;
-          this.drag_ = true;
+          this.drag = true;
 
           goog.events.listen(document, goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, true, this);
           goog.events.listen(document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, true, this);
@@ -446,7 +446,7 @@ anychart.charts.Map = function() {
       this.mouseMoveHandler = function(e) {
         var scene = this.getCurrentScene();
 
-        if (this.drag_ && this.interactivity_.drag() && scene.zoomLevel() != 1) {
+        if (this.drag && this.interactivity_.drag() && scene.zoomLevel() != 1) {
           goog.style.setStyle(document['body'], 'cursor', acgraph.vector.Cursor.MOVE);
           scene.move(e.clientX - startX, e.clientY - startY);
 
@@ -458,7 +458,14 @@ anychart.charts.Map = function() {
       };
       this.mouseUpHandler = function(e) {
         goog.style.setStyle(document['body'], 'cursor', '');
-        this.drag_ = false;
+        this.drag = false;
+
+        for (var i = this.series_.length; i--;) {
+          var series = this.series_[i];
+          series.mapTx = this.getMapLayer().getFullTransformation().clone();
+          series.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
+          series.updateOnZoomOrMove();
+        }
 
         goog.events.unlisten(document, goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, true, this);
         goog.events.unlisten(document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, true, this);
@@ -589,17 +596,24 @@ anychart.charts.Map.ZINDEX_MAP = 10;
 
 
 /**
+ * Series hatch fill z-index in chart root layer.
+ * @type {number}
+ */
+anychart.charts.Map.ZINDEX_CHORPLETH_HATCH_FILL = 11;
+
+
+/**
  * Series labels z-index in chart root layer.
  * @type {number}
  */
-anychart.charts.Map.ZINDEX_CHORPLETH_LABELS = 11;
+anychart.charts.Map.ZINDEX_CHORPLETH_LABELS = 12;
 
 
 /**
  * Series markers z-index in chart root layer.
  * @type {number}
  */
-anychart.charts.Map.ZINDEX_CHORPLETH_MARKERS = 12;
+anychart.charts.Map.ZINDEX_CHORPLETH_MARKERS = 13;
 
 
 /**
@@ -607,6 +621,13 @@ anychart.charts.Map.ZINDEX_CHORPLETH_MARKERS = 12;
  * @type {number}
  */
 anychart.charts.Map.ZINDEX_SERIES = 30;
+
+
+/**
+ * Marker z-index in chart root layer.
+ * @type {number}
+ */
+anychart.charts.Map.ZINDEX_HATCH_FILL = 31;
 
 
 /**
@@ -628,13 +649,6 @@ anychart.charts.Map.ZINDEX_MARKER = 40;
  * @type {number}
  */
 anychart.charts.Map.ZINDEX_COLOR_RANGE = 50;
-
-
-/**
- * Series hatch fill z-index in chart root layer.
- * @type {number}
- */
-anychart.charts.Map.ZINDEX_CHORPLETH_HATCH_FILL = 60;
 
 
 /**
@@ -801,7 +815,7 @@ anychart.charts.Map.prototype.tapHandler = function(event) {
 
       this.startTouchX = event.clientX;
       this.startTouchY = event.clientY;
-      this.drag_ = true;
+      this.drag = true;
     } else {
       this.tap = false;
     }
@@ -946,7 +960,7 @@ anychart.charts.Map.prototype.touchMoveHandler = function(e) {
       }
     }
   } else if (touchCount == 1) {
-    if (this.drag_ && this.interactivity_.drag() && this.zoomLevel() != 1) {
+    if (this.drag && this.interactivity_.drag() && this.zoomLevel() != 1) {
       goog.style.setStyle(document['body'], 'cursor', acgraph.vector.Cursor.MOVE);
       scene.move(e.clientX - scene.startTouchX, e.clientY - scene.startTouchY);
 

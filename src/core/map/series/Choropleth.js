@@ -127,7 +127,9 @@ anychart.core.map.series.Choropleth.prototype.hatchFillRootElement = null;
 
 /** @inheritDoc */
 anychart.core.map.series.Choropleth.prototype.rootTypedLayerInitializer = function() {
-  return acgraph.path();
+  var path = acgraph.path();
+  path.disableStrokeScaling(true);
+  return path;
 };
 
 
@@ -226,6 +228,18 @@ anychart.core.map.series.Choropleth.prototype.calculate = function() {
 
 
 /** @inheritDoc */
+anychart.core.map.series.Choropleth.prototype.updateOnZoomOrMove = function() {
+  var tx = this.map.getMapLayer().getFullTransformation();
+  var hatchFill = this.hatchFillRootElement;
+  if (hatchFill) {
+    hatchFill.setTransformationMatrix(tx.getScaleX(), tx.getShearX(), tx.getShearY(), tx.getScaleY(), tx.getTranslateX(), tx.getTranslateY());
+  }
+
+  return anychart.core.map.series.Choropleth.base(this, 'updateOnZoomOrMove');
+};
+
+
+/** @inheritDoc */
 anychart.core.map.series.Choropleth.prototype.startDrawing = function() {
   goog.base(this, 'startDrawing');
 
@@ -271,7 +285,7 @@ anychart.core.map.series.Choropleth.prototype.drawPoint = function(pointState) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     var hatchFillShape = this.hatchFillRootElement ?
-        /** @type {!acgraph.vector.Rect} */(this.hatchFillRootElement.genNextChild()) :
+        /** @type {!acgraph.vector.Path} */(this.hatchFillRootElement.genNextChild()) :
         null;
     iterator.meta('hatchFillShape', hatchFillShape);
     shape = /** @type {acgraph.vector.Shape} */(iterator.meta('regionShape'));

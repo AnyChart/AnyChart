@@ -48,7 +48,9 @@ anychart.core.map.series.DiscreteBase.prototype.hatchFillRootElement = null;
 
 /** @inheritDoc */
 anychart.core.map.series.DiscreteBase.prototype.rootTypedLayerInitializer = function() {
-  return acgraph.rect();
+  var path = acgraph.path();
+  path.disableStrokeScaling(true);
+  return path;
 };
 
 
@@ -61,7 +63,15 @@ anychart.core.map.series.DiscreteBase.prototype.startDrawing = function() {
   if (!this.rootElement) {
     this.rootElement = new anychart.core.utils.TypedLayer(
         this.rootTypedLayerInitializer,
-        goog.nullFunction);
+        function(path) {
+          if (path) {
+            path.clear();
+            path.parent(null);
+            path.removeAllListeners();
+            path.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+            delete path.tag;
+          }
+        });
     this.rootElement.zIndex(anychart.core.map.series.Base.ZINDEX_SERIES);
     this.registerDisposable(this.rootElement);
   }
@@ -82,7 +92,7 @@ anychart.core.map.series.DiscreteBase.prototype.startDrawing = function() {
           goog.nullFunction);
 
       this.hatchFillRootElement.parent(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
-      this.hatchFillRootElement.zIndex(anychart.charts.Map.ZINDEX_CHORPLETH_HATCH_FILL);
+      this.hatchFillRootElement.zIndex(anychart.charts.Map.ZINDEX_HATCH_FILL);
       this.hatchFillRootElement.disablePointerEvents(true);
     }
     if (this.hatchFillRootElement) this.hatchFillRootElement.clear();

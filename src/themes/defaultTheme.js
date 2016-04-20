@@ -2315,6 +2315,7 @@ window['anychart']['themes']['defaultTheme'] = {
           'fill': '#455a64',
           'stroke': '1.5 #f7f7f7',
           'rotation': null,
+          'anchor': null,
           'type': 'arrowhead'
         },
         'hoverMarkers': {
@@ -2323,6 +2324,7 @@ window['anychart']['themes']['defaultTheme'] = {
         'labels': {
           'enabled': false,
           'position': 'middle',
+          'anchor': null,
           /**
            * @this {*}
            * @return {*}

@@ -4827,6 +4827,7 @@ window['anychart']['themes']['v6'] = {
         'labels': {
           'enabled': false,
           'position': 'middle',
+          'anchor': null,
           /**
            * @this {*}
            * @return {*}

@@ -19,13 +19,13 @@ function curvatureInp(value) {
 
 function markerPos(value) {
   series.markers().position(value);
-  //series.labels().position(value);
+  series.labels().position(value);
   inputMarkerPos.value = series.markers().position();
 }
 
 function markerPosInp(value) {
   series.markers().position(value);
-  //series.labels().position(value);
+  series.labels().position(value);
   rangerMarkerPos.value = series.markers().position();
 }
 
@@ -58,13 +58,41 @@ $(document).ready(function() {
   //    });
 
 
+  stage = anychart.graphics.create('container');
+  chart = anychart.map();
+  chart.title().enabled(true).text('');
+  chart.geoData(anychart.maps.world);
+
+
+
+
+
+  var data = [];
+  var features = chart.geoData()['features'];
+  for (var i = 0, len = features.length; i < len; i++) {
+    var feature = features[i];
+    if (feature['properties']) {
+      var id = feature['properties'][chart.geoIdField()];
+      data.push({'id': id, 'value': randomExt(-300, 300), 'size': randomExt(0, 1000)});
+    }
+  }
+  //
+  series2 = chart.choropleth(data);
+  series2
+      .hatchFill(true);
+  series2.labels().enabled(true);
+  series2.markers()
+      .fill('red')
+      .size(20)
+      .enabled(true);
 
 
 
 
 
 
-  var data = [
+
+  data = [
     //null,
     //'',
     //1,
@@ -75,12 +103,13 @@ $(document).ready(function() {
     //{'points': '45'},
     //{'points': ['sdfsf', null, 's60.326948', 'sdf-114.609375', 'ss66.160511', 'sf-44.472656']},
     {
-      points: ['dfs', null, '60.326948', '-114.609375', '66.160511', '-44.472656'],
-      selected: true,
-      marker: {rotation: null, position: .1},
+      points: ['dfs', null, '66.160511', '-44.472656', '60.326948', '-114.609375'],
+      selected: false,
+      //label: {anchor: 'top'},
+      // marker: {rotation: null, position: .1},
       hoverMarker: {rotation: null, position: .3},
       selectMarker: {rotation: null, position: 1}
-    }
+    },
     //{
     //  'points': [52.2895, 104.2616, 59.9302, 30.3167, 36.162270, -115.175171],
     //  'curvature': .2,
@@ -95,9 +124,9 @@ $(document).ready(function() {
     //  'fill': 'red 0.2',
     //  'stroke': 'none'
     //},
-    //{
-    //  'points': [4.915833, -68.730469, -26.115986, 24.082031, -25.799891, 132.890625, 66.231457, 176.386719]
-    //},
+    // {
+    //   'points': [4.915833, -68.730469, -26.115986, 24.082031, -25.799891, 132.890625, 66.231457, 176.386719]
+    // },
     //{
     //  'points': [4.915833, -68.730469, 16.299051, -129.902344]
     //},
@@ -126,101 +155,33 @@ $(document).ready(function() {
     //{'points': [52.5763, 13.3374, 65.275, -15.666]}
   ];
 
+  series = chart.connector(data);
 
-  var data = [
-    {points: [40.71262,-74.006124,38.716183,-75.075441], number: 25, to: "Rehoboth Beach, DE", marker: {fill: "#9fa8da"}},
-    {points: [40.71262,-74.006124,39.941479,-74.07011], number: 24, to: "Seaside Heights, NJ", marker: {fill: "#93abe0"}},
-    {points: [40.71262,-74.006124,40.089822,-74.037677], number: 23, to: "Point Pleasant Beach, NJ", marker: {fill: "#86ade6"}},
-    {points: [40.71262,-74.006124,42.364363,-73.594993], number: 22, to: "Chatham, NY", marker: {fill: "#7ab0ec"}},
-    {points: [40.71262,-74.006124,41.456637,-70.555377], number: 21, to: "Oak Bluffs, MA", marker: {fill: "#6eb3f1"}, label: {enabled: true, anchor: 'bottom'}},
-    {points: [40.71262,-74.006124,39.27582,-74.574824], number: 20, to: "Ocean City, NJ", marker: {fill: "#61b2f5"}},
-    {points: [40.71262,-74.006124,40.971872,-72.122145], number: 19, to: "Amagansett, NY", marker: {fill: "#51a5ed"}},
-    {points: [40.71262,-74.006124,39.563483,-74.23509], number: 18, to: "Beach Haven, NJ", marker: {fill: "#4298e6"}},
-    {points: [40.71262,-74.006124,36.17002,-115.140154], number: 17, to: "Las Vegas, NV", marker: {fill: "#328bde"}, label: {enabled: true}},
-    {points: [40.71262,-74.006124,38.931883,-74.906278], number: 16, to: "Cape May, NJ", marker: {fill: "#227ed7"}},
-    {points: [40.71262,-74.006124,26.105904,-80.10741], number: 15, to: "Fort Lauderdale, FL", marker: {fill: "#1b74cf"}, label: {enabled: true}},
-    {points: [40.71262,-74.006124,36.83094,-75.97903], number: 14, to: "Virginia Beach, VA", marker: {fill: "#216ec8"}},
-    {points: [40.71262,-74.006124,43.560453,-73.641411], number: 13, to: "Lake George, NY", marker: {fill: "#2769c2"}, label: {enabled: true}},
-    {points: [40.71262,-74.006124,40.653823,-73.107648], number: 12, to: "Fire Island, NY", marker: {fill: "#2d64bb"}},
-    {points: [40.71262,-74.006124,41.25058,-70.004391], number: 11, to: "Nantucket, MA", marker: {fill: "#335eb4"}},
-    {points: [40.71262,-74.006124,35.556088,-75.467633], number: 10, to: "Outer Banks, NC", marker: {fill: "#3a57ab"}, label: {enabled: true, anchor: 'top'}},
-    {points: [40.71262,-74.006124,38.980089,-74.820254], number: 9, to: "Wildwood, NJ", marker: {fill: "#4250a2"}},
-    {points: [40.71262,-74.006124,33.698234,-78.875056], number: 8, to: "Myrtle Beach, SC", marker: {fill: "#4a4998"}, label: {enabled: true}},
-    {points: [40.71262,-74.006124,39.641815,-74.187045], number: 7, to: "Long Beach Island, NJ", marker: {fill: "#52418f"}},
-    {points: [40.71262,-74.006124,42.006971,-74.386233], number: 6, to: "Catskills, NY", marker: {fill: "#5a3985"}, label: {enabled: true}},
-    {points: [40.71262,-74.006124,41.664336,-70.463233], number: 5, to: "Cape Cod, MA", marker: {fill: "#63317a"}},
-    {points: [40.71262,-74.006124,38.39482,-75.061095], number: 4, to: "Ocean City, MD", marker: {fill: "#6d2870"}},
-    {points: [40.71262,-74.006124,41.040324,-71.923127], number: 3, to: "Montauk, NY", marker: {fill: "#762065"}},
-    {points: [40.71262,-74.006124,41.2478,-75.248327], number: 2, to: "The Poconos, PA", marker: {fill: "#7f175a"}, label: {enabled: true}},
-    {points: [40.71262,-74.006124,40.922888,-72.3563], number: 1, to: "The Hamptons, NY", marker: {fill: "#880e4f"}}
-  ];
-
-  stage = anychart.graphics.create('container');
-  chart = anychart.connector(data);
-
-  //chart.geoData(anychart.maps.world);
-  chart.geoData(anychart.maps.united_states_of_america);
-
-  chart.title().enabled(true).text('');
-
-  series = chart.getSeriesAt(0);
-
-  //series
-  //    .markers()
-  //      //.position(.1)
-  //      .enabled(true)
-  //      .stroke('none')
-  //      .fill('red')
-  //      .size(20)
-  //
-  //series
-  //    .hoverMarkers()
-  //      .size(20);
-  //
-  //series
-  //    .curvature(0.5)
-  //    .stroke('1 gray')
-  //    .fill('gray .3')
-  //    .endSize(20)
-  //    .startSize(20);
-  //
-  //series
-  //    .labels().enabled(false);
-  //
-  //series
-  //    .hatchFill(true);
-
-
-  // create connector series for directions
   series
-      .startSize(0)
-      .endSize(0)
-      //.fill('#455a64')
-      //.hoverFill('#1976d2')
-      .hoverStroke('#1976d2')
-      .stroke('#455a64')
-      .markers({position: '100%', size: 5, fill: '#1976d2', stroke: '2 #E1E1E1', type: 'circle'})
-      .hoverMarkers({position: '100%', size: 5, type: 'circle'})
-      .curvature(0);
+      .markers()
+      // .position(.1)
+      .enabled(true)
+      .stroke('none')
+      .fill('red')
+      .size(20);
+      //.anchor('right');
 
-  series.labels()
-      .enabled(false)
-      .fontSize(12)
-      .anchor('center')
-      .offsetY(5)
-      .offsetX(5)
-      .position('100%')
-      .textFormatter(function () {
-        return this.getDataValue('to')
-      });
+  series
+      .hoverMarkers()
+        .size(20);
 
-  series.tooltip({padding: [8, 13, 10, 13]});
-  series.tooltip().title().enabled(false);
-  series.tooltip().separator().enabled(false);
-  series.tooltip().useHtml(true).fontSize(13).textFormatter(function() {
-    return '<span style="font-size: 12px; color: #E1E1E1">Number: </span>' + this.getDataValue('number') + '<br/>'+
-        '<span style="font-size: 12px; color: #E1E1E1">Destination: </span>' + this.getDataValue('to');
-  });
+  series
+      .curvature(0.5)
+      .stroke('1 gray')
+      .fill('gray .3')
+      .endSize(10)
+      .startSize(10);
+
+  series
+      .labels().enabled(true).anchor(null);
+
+  series
+      .hatchFill(true);
 
   //series.tooltip(false).labels().enabled(true).textFormatter(function() {return this.regionProperties.name});
   //
@@ -233,8 +194,11 @@ $(document).ready(function() {
 
 
 
-  //series2 = chart.bubble(dataSet);
-  //series2.tooltip(false).labels().enabled(true).textFormatter(function() {return this['size']});
+  // chart.connector([
+  //   {
+  //    'points': [4.915833, -68.730469, 34.452218, -37.265625]
+  //   }
+  // ]);
 
   chart.container(stage).draw();
 

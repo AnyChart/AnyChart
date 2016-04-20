@@ -178,16 +178,56 @@ anychart.core.map.series.BaseWithMarkers.prototype.startDrawing = function() {
     markers.setAutoStroke(strokeColor);
 
     markers.clear();
-    markers.container(/** @type {acgraph.vector.ILayer} */(this.container()));
+    markers.container(/** @type {acgraph.vector.ILayer} */(this.rootLayer));
     markers.parentBounds(this.container().getBounds());
   }
 };
 
 
+/**
+ * Applying zoom and move transformations to marker element.
+ * @param {anychart.core.ui.MarkersFactory.Marker} marker .
+ * @param {number} pointState .
+ */
+anychart.core.map.series.BaseWithMarkers.prototype.applyZoomMoveTransformToMarker = function(marker, pointState) {
+  var prevPos, newPos, trX, trY, selfTx;
+
+  var domElement = marker.getDomElement();
+  var iterator = this.getIterator();
+
+  var position = this.getMarkersPosition(pointState);
+  var positionProvider = this.createPositionProvider(/** @type {string} */(position));
+
+  var markerRotation = marker.getFinalSettings('rotation');
+  if (!goog.isDef(markerRotation) || goog.isNull(markerRotation) || isNaN(markerRotation)) {
+    markerRotation = iterator.meta('markerRotation');
+  }
+
+  var markerAnchor = marker.getFinalSettings('anchor');
+  if (!goog.isDef(markerAnchor) || goog.isNull(markerAnchor)) {
+    markerAnchor = iterator.meta('markerAnchor');
+  }
+
+  if (goog.isDef(markerRotation))
+    domElement.rotateByAnchor(-markerRotation, /** @type {anychart.enums.Anchor} */(markerAnchor));
+
+  prevPos = marker.positionProvider()['value'];
+  newPos = positionProvider['value'];
+
+  selfTx = domElement.getSelfTransformation();
+
+  trX = -selfTx.getTranslateX() + newPos['x'] - prevPos['x'];
+  trY = -selfTx.getTranslateY() + newPos['y'] - prevPos['y'];
+
+  domElement.translate(trX, trY);
+
+  if (goog.isDef(markerRotation))
+    domElement.rotateByAnchor(/** @type {number}*/(markerRotation), /** @type {anychart.enums.Anchor} */(markerAnchor));
+};
+
+
 /** @inheritDoc */
 anychart.core.map.series.BaseWithMarkers.prototype.applyZoomMoveTransform = function() {
-  var domElement, prevPos, newPos, trX, trY, selfTx;
-
   var iterator = this.getIterator();
   var index = iterator.getIndex();
   var pointState = this.state.getPointStateByIndex(index);
@@ -227,27 +267,7 @@ anychart.core.map.series.BaseWithMarkers.prototype.applyZoomMoveTransform = func
 
   if (isDraw) {
     if (marker && marker.getDomElement() && marker.positionProvider()) {
-      prevPos = marker.positionProvider()['value'];
-
-      var position = this.getMarkersPosition(pointState);
-      var positionProvider = this.createPositionProvider(/** @type {string} */(position));
-
-      newPos = positionProvider['value'];
-
-      domElement = marker.getDomElement();
-      selfTx = domElement.getSelfTransformation();
-
-      var markerRotation = iterator.meta('markerRotation');
-      if (goog.isDef(markerRotation))
-        domElement.rotateByAnchor(-markerRotation);
-
-      trX = -selfTx.getTranslateX() + newPos['x'] - prevPos['x'];
-      trY = -selfTx.getTranslateY() + newPos['y'] - prevPos['y'];
-
-      domElement.translate(trX, trY);
-
-      if (goog.isDef(markerRotation))
-        domElement.rotateByAnchor(/** @type {number}*/(markerRotation));
+      this.applyZoomMoveTransformToMarker(marker, pointState);
     }
   }
   anychart.core.map.series.BaseWithMarkers.base(this, 'applyZoomMoveTransform');
@@ -418,7 +438,7 @@ anychart.core.map.series.BaseWithMarkers.prototype.setupByJSON = function(config
   if (config['hoverMarkers'])
     this.hoverMarkers().setup(config['hoverMarkers']);
   if (config['selectMarkers'])
-    this.hoverMarkers().setup(config['selectMarkers']);
+    this.selectMarkers().setup(config['selectMarkers']);
 };
 
 
