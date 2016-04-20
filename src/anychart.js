@@ -229,9 +229,13 @@ anychart.fromJson = function(jsonConfig) {
       instance = anychart.createChartByType(chart['type']);
     else if (gauge)
       instance = anychart.createGaugeByType(gauge['type']);
-    else if (gantt)
+    else if (gantt) {
+      if (gantt['type'] == 'project') //legacy
+        gantt['type'] = anychart.enums.ChartTypes.GANTT_PROJECT;
+      else if (gantt['type'] == 'resource')
+        gantt['type'] = anychart.enums.ChartTypes.GANTT_RESOURCE;
       instance = anychart.createGanttByType(gantt['type']);
-    else if (map)
+    } else if (map)
       instance = anychart.createMapByType(map['type']);
   }
 
