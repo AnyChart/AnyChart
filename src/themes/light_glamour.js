@@ -167,13 +167,16 @@ window['anychart']['themes']['lightGlamour'] = {
         }
       },
       'connector': {
-        'stroke': '1.5 #ce93d8',
+        //'selectStroke': '1.5 #fafafa',
         'markers': {
-          'stroke': '1.5 #ece1e3',
-          'fill': '#d81b60'
+          'stroke': '1.5 #ece1e3'
         },
         'hoverMarkers': {
-          'fill': '#d81b60'
+          'stroke': '1.5 #ece1e3'
+        },
+        'selectMarkers': {
+          //'fill': '#fafafa',
+          'stroke': '1.5 #ece1e3'
         }
       }
     }

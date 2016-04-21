@@ -172,7 +172,17 @@ window['anychart']['themes']['monochrome'] = {
           'stroke': '1.5 #F7F7F7'
         },
         'hoverMarkers': {
-          'fill': '#252525'
+          'fill': '#252525',
+          'stroke': '1.5 #F7F7F7'
+        },
+        'selectMarkers': {
+          'fill': '#000',
+          'stroke': '1.5 #F7F7F7'
+        }
+      },
+      'marker': {
+        'labels': {
+          'fontColor': '#000'
         }
       }
     }

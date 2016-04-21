@@ -237,15 +237,29 @@ window['anychart']['themes']['coffee'] = {
           'fontColor': '#fafafa'
         }
       },
+      'bubble': {
+        'stroke': returnDarkenSourceColor
+      },
       'connector': {
         'selectStroke': '1.5 #000',
-        'stroke': '1.5 #8d5932',
+        'hoverStroke': '#8d5932',
+        'stroke': '#482311',
         'markers': {
           'fill': '#482311',
           'stroke': '1.5 #bcaaa4'
         },
         'hoverMarkers': {
-          'fill': '#482311'
+          'fill': '#482311',
+          'stroke': '1.5 #bcaaa4'
+        },
+        'selectMarkers': {
+          'fill': '#000',
+          'stroke': '1.5 #bcaaa4'
+        }
+      },
+      'marker': {
+        'labels': {
+          'fontColor': '#3e2723'
         }
       }
     }

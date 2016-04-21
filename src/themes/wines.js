@@ -142,6 +142,9 @@ window['anychart']['themes']['wines'] = {
         },
         'hoverMarkers': {
           'fill': '#857600'
+        },
+        'selectMarkers': {
+          'fill': '#000'
         }
       }
     }

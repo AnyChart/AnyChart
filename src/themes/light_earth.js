@@ -159,14 +159,15 @@ window['anychart']['themes']['lightEarth'] = {
       },
       'connector': {
         'selectStroke': '1.5 #212121',
-        'hoverStroke': '1.5 #424242',
-        'stroke': '1.5 #827717',
         'markers': {
-          'fill': '#c77532',
           'stroke': '1.5 #e9e4e4'
         },
         'hoverMarkers': {
-          'fill': '#c77532'
+          'stroke': '1.5 #e9e4e4'
+        },
+        'selectMarkers': {
+          'fill': '#212121',
+          'stroke': '1.5 #e9e4e4'
         }
       }
     }

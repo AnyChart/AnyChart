@@ -149,6 +149,9 @@ window['anychart']['themes']['pastel'] = {
         },
         'hoverMarkers': {
           'fill': '#80cbc4'
+        },
+        'selectMarkers': {
+          'fill': '#000'
         }
       }
     }

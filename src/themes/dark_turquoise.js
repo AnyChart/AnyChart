@@ -220,26 +220,27 @@ window['anychart']['themes']['darkTurquoise'] = {
     'unboundRegions': {'enabled': true, 'fill': '#616161', 'stroke': '#757575'},
     'defaultSeriesSettings': {
       'base': {
-        'stroke': returnDarkenSourceColor,
+        'stroke': returnLightenSourceColor,
         'selectStroke': '1.5 #fafafa',
         'labels': {
           'fontColor': '#424242'
         }
       },
       'connector': {
-        'stroke': '1.5 #80deea',
-        'hoverStroke': '1.5 #b2dfdb',
         'selectStroke': '1.5 #000',
         'markers': {
-          'stroke': '1.5 #616161',
-          'fill': '#00acc1'
+          'stroke': '1.5 #616161'
         },
         'hoverMarkers': {
-          'fill': '#00acc1'
+          'stroke': '1.5 #616161'
+        },
+        'selectMarkers': {
+          'fill': '#000',
+          'stroke': '1.5 #616161'
         }
       },
       'bubble': {
-        'stroke': '1.5 #424242',
+        'stroke': returnLightenSourceColor,
         'hoverStroke': '1.5 #909090'
       },
       'marker': {

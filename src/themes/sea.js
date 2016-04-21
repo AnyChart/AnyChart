@@ -173,6 +173,9 @@ window['anychart']['themes']['sea'] = {
           'fontColor': '#212121'
         }
       },
+      'bubble': {
+        'stroke': returnDarkenSourceColor
+      },
       'connector': {
         'stroke': '1.5 #207fbf',
         'hoverStroke': '1.5 #37474f',
@@ -183,6 +186,9 @@ window['anychart']['themes']['sea'] = {
         },
         'hoverMarkers': {
           'fill': '#15a9c7'
+        },
+        'selectMarkers': {
+          'fill': '#000'
         }
       }
     }

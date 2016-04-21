@@ -83,7 +83,14 @@ var dataSet_austria_map_3 = anychart.data.set([
 var dataSet_austria_map_4 = anychart.data.set([
   {points: [48.208185, 16.373503, 47.808747, 13.054934], from: 'Wien', to: 'Salzburg'},
   {points: [48.208185, 16.373503, 47.070115, 15.439200], from: 'Wien', to: 'Graz'},
-  {points: [47.808747, 13.054934, 47.070115, 15.439200], from: 'Salzburg', to: 'Graz'},
+  {points: [47.808747, 13.054934, 47.070115, 15.439200], from: 'Salzburg', to: 'Graz'}
+  //{points: [47.808747, 13.054934, 47.268186, 11.403967], from: 'Salzburg', to: 'Innsbruck'},
+  //{points: [47.808747, 13.054934, 46.636389, 14.311742], from: 'Salzburg', to: 'Klagenfurt am\nWörthersee'}
+]);
+var dataSet_austria_map_5 = anychart.data.set([
+  //{points: [48.208185, 16.373503, 47.808747, 13.054934], from: 'Wien', to: 'Salzburg'},
+  //{points: [48.208185, 16.373503, 47.070115, 15.439200], from: 'Wien', to: 'Graz'},
+  //{points: [47.808747, 13.054934, 47.070115, 15.439200], from: 'Salzburg', to: 'Graz'},
   {points: [47.808747, 13.054934, 47.268186, 11.403967], from: 'Salzburg', to: 'Innsbruck'},
   {points: [47.808747, 13.054934, 46.636389, 14.311742], from: 'Salzburg', to: 'Klagenfurt am\nWörthersee'}
 ]);

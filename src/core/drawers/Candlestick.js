@@ -38,7 +38,7 @@ anychart.core.drawers.Candlestick.prototype.flags = (
     // anychart.core.drawers.Capabilities.IS_3D_BASED |
     // anychart.core.drawers.Capabilities.IS_BAR_BASED |
     // anychart.core.drawers.Capabilities.IS_MARKER_BASED |
-    // anychart.core.drawers.Capabilities.IS_OHLC_BASED |
+    anychart.core.drawers.Capabilities.IS_OHLC_BASED |
     // anychart.core.drawers.Capabilities.IS_LINE_BASED |
     0);
 

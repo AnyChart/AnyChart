@@ -174,7 +174,7 @@ window['anychart']['themes']['darkEarth'] = {
     'unboundRegions': {'enabled': true, 'fill': '#424242', 'stroke': '#616161'},
     'defaultSeriesSettings': {
       'base': {
-        'stroke': returnDarkenSourceColor,
+        'stroke': returnLightenSourceColor,
         'hoverFill': '#bdbdbd',
         'selectFill': '#e0e0e0',
         'selectStroke': '1.5 #212121',
@@ -184,15 +184,19 @@ window['anychart']['themes']['darkEarth'] = {
       },
       'connector': {
         'selectStroke': '1.5 #fafafa',
-        'hoverStroke': '1.5 #eeeeee',
-        'stroke': '1.5 #827717',
         'markers': {
-          'fill': '#c77532',
           'stroke': '1.5 #424242'
         },
         'hoverMarkers': {
-          'fill': '#c77532'
+          'stroke': '1.5 #424242'
+        },
+        'selectMarkers': {
+          'fill': '#fafafa',
+          'stroke': '1.5 #424242'
         }
+      },
+      'bubble': {
+        'stroke': returnLightenSourceColor
       },
       'marker': {
         'labels': {

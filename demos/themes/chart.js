@@ -200,6 +200,7 @@ function create_bubble_markers_map(palette) {
   chart.minBubbleSize(7);
   chart.maxBubbleSize(20);
   chart.bubble(dataSet_austria_map_2);
+
   return chart;
 }
 function create_connector_map(palette) {
@@ -207,9 +208,8 @@ function create_connector_map(palette) {
   chart.geoData(anychart.maps['austria']);
   if (palette) chart.palette(palette);
   chart.marker(dataSet_austria_map_3);
-  chart.connector(dataSet_austria_map_4)
-    //todo: remove this line after Sergey M fix the issue
-      .hoverMarkers().enabled(true).size(15);
+  chart.connector(dataSet_austria_map_4);
+  chart.connector(dataSet_austria_map_5);
   return chart;
 }
 function create_sparkline(data, type, palette) {

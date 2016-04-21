@@ -215,16 +215,23 @@ window['anychart']['themes']['morning'] = {
           'fontColor': '#212121'
         }
       },
+      'bubble': {
+        'stroke': returnDarkenSourceColor
+      },
       'connector': {
-        'stroke': '1.5 #0288d1',
-        'hoverStroke': '1.5 #37474f',
         'selectStroke': '1.5 #000',
+        'hoverStroke': '#58abd7',
+        'stroke': '#0288d1',
         'markers': {
-          'stroke': '1.5 #F9FAFB',
-          'fill': '#f8bbd0'
+          'fill': '#58abd7',
+          'stroke': '1.5 #e8ecf1'
         },
         'hoverMarkers': {
-          'fill': '#f8bbd0'
+          'stroke': '1.5 #e8ecf1'
+        },
+        'selectMarkers': {
+          'fill': '#000',
+          'stroke': '1.5 #e8ecf1'
         }
       }
     }

@@ -208,15 +208,20 @@ window['anychart']['themes']['darkProvence'] = {
       },
       'connector': {
         'selectStroke': '1.5 #000',
-        'hoverStroke': '1.5 #b0bec5',
-        'stroke': '1.5 #aa8ab3',
+        'stroke': returnSourceColor,
         'markers': {
-          'fill': '#b7cbe2',
           'stroke': '1.5 #616161'
         },
         'hoverMarkers': {
-          'fill': '#b7cbe2'
+          'stroke': '1.5 #616161'
+        },
+        'selectMarkers': {
+          'fill': '#000',
+          'stroke': '1.5 #616161'
         }
+      },
+      'bubble': {
+        'stroke': returnLightenSourceColor
       },
       'marker': {
         'labels': {

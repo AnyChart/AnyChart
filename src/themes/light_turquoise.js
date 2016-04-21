@@ -196,15 +196,16 @@ window['anychart']['themes']['lightTurquoise'] = {
         }
       },
       'connector': {
-        'stroke': '1.5 #80deea',
-        'hoverStroke': '1.5 #b2dfdb',
         'selectStroke': '1.5 #000',
         'markers': {
-          'stroke': '1.5 #e0e0e0',
-          'fill': '#00acc1'
+          'stroke': '1.5 #e0e0e0'
         },
         'hoverMarkers': {
-          'fill': '#00acc1'
+          'stroke': '1.5 #e0e0e0'
+        },
+        'selectMarkers': {
+          'fill': '#000',
+          'stroke': '1.5 #e0e0e0'
         }
       },
       'marker': {
@@ -212,7 +213,7 @@ window['anychart']['themes']['lightTurquoise'] = {
         'hoverStroke': '1.5 #bdbdbd'
       },
       'bubble': {
-        'stroke': '1.5 #bdbdbd',
+        'stroke': returnDarkenSourceColor,
         'hoverStroke': '1.5 #bdbdbd'
       }
     }

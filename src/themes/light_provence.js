@@ -173,16 +173,21 @@ window['anychart']['themes']['lightProvence'] = {
           'fontColor': '#212121'
         }
       },
+      'bubble': {
+        'stroke': returnDarkenSourceColor
+      },
       'connector': {
         'selectStroke': '1.5 #000',
-        'hoverStroke': '1.5 #b0bec5',
-        'stroke': '1.5 #aa8ab3',
+        'stroke': returnDarkenSourceColor,
         'markers': {
-          'fill': '#b7cbe2',
           'stroke': '1.5 #f2ebf3'
         },
         'hoverMarkers': {
-          'fill': '#b7cbe2'
+          'stroke': '1.5 #f2ebf3'
+        },
+        'selectMarkers': {
+          'fill': '#000',
+          'stroke': '1.5 #f2ebf3'
         }
       }
     }

@@ -1274,12 +1274,6 @@ window['anychart']['themes']['defaultTheme'] = {
   'bar': {
     'barChartMode': true,
     'defaultSeriesType': 'bar',
-    'defaultGridSettings': {
-      'layout': 'vertical'
-    },
-    'defaultMinorGridSettings': {
-      'layout': 'vertical'
-    },
     'defaultXAxisSettings': {
       'orientation': 'left'
     },
@@ -1814,12 +1808,6 @@ window['anychart']['themes']['defaultTheme'] = {
       'line': {},
       'marker': {}
     },
-    //'defaultGridSettings': {
-    //  'layout': null//'radial'
-    //},
-    //'defaultMinorGridSettings': {
-    //  'layout': null//'circuit'
-    //},
     'xAxis': {
       'scale': 0,
       'zIndex': 25
@@ -1876,12 +1864,6 @@ window['anychart']['themes']['defaultTheme'] = {
       'line': {},
       'marker': {}
     },
-    //'defaultGridSettings': {
-    //  'layout': null//'radial'
-    //},
-    //'defaultMinorGridSettings': {
-    //  'layout': null//'circuit'
-    //},
     'xAxis': {
       'scale': 0,
       'zIndex': 25
@@ -2305,21 +2287,27 @@ window['anychart']['themes']['defaultTheme'] = {
       'connector': {
         'startSize': 0,
         'endSize': 0,
-        'hoverStroke': '1.5 #455a64',
-        'stroke': '1.5 #1976d2',
         'curvature': .3,
+        'stroke': returnSourceColor,
+        'hoverStroke': returnLightenSourceColor,
+        'selectStroke': '2 ' + defaultSelectColor,
         'markers': {
           'position': 'middle',
           'enabled': true,
           'size': 15,
-          'fill': '#455a64',
           'stroke': '1.5 #f7f7f7',
           'rotation': null,
           'anchor': null,
           'type': 'arrowhead'
         },
         'hoverMarkers': {
-          'fill': '#1976d2'
+          'stroke': '1.5 #f7f7f7',
+          'size': 15
+        },
+        'selectMarkers': {
+          'fill': defaultSelectColor,
+          'stroke': '1.5 #f7f7f7',
+          'size': 15
         },
         'labels': {
           'enabled': false,

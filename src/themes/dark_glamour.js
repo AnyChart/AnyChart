@@ -191,7 +191,7 @@ window['anychart']['themes']['darkGlamour'] = {
     'unboundRegions': {'enabled': true, 'fill': '#37474f', 'stroke': '#455a64'},
     'defaultSeriesSettings': {
       'base': {
-        'stroke': returnDarkenSourceColor,
+        'stroke': returnLightenSourceColor,
         'hoverFill': '#bdbdbd',
         'selectFill': '3 #fafafa',
         'labels': {
@@ -200,14 +200,15 @@ window['anychart']['themes']['darkGlamour'] = {
       },
       'connector': {
         'selectStroke': '1.5 #fafafa',
-        'hoverStroke': '1.5 #eeeeee',
-        'stroke': '1.5 #ce93d8',
         'markers': {
-          'fill': '#d81b60',
           'stroke': '1.5 #37474f'
         },
         'hoverMarkers': {
-          'fill': '#d81b60'
+          'stroke': '1.5 #37474f'
+        },
+        'selectMarkers': {
+          'fill': '#fafafa',
+          'stroke': '1.5 #37474f'
         }
       },
       'marker': {
