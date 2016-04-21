@@ -761,6 +761,7 @@ anychart.core.ui.LabelsFactory.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.ui.LabelsFactory.prototype.setupByJSON = function(config) {
+  var enabledState = this.enabled();
   goog.base(this, 'setupByJSON', config);
   if (config['background']) this.background(config['background']);
   if (config['padding']) this.padding(config['padding']);
@@ -776,7 +777,7 @@ anychart.core.ui.LabelsFactory.prototype.setupByJSON = function(config) {
   this.maxFontSize(config['maxFontSize']);
   this.textFormatter(config['textFormatter']);
   this.positionFormatter(config['positionFormatter']);
-  this.enabled(('enabled' in config) ? config['enabled'] : null);
+  this.enabled('enabled' in config ? config['enabled'] : enabledState);
 };
 
 
@@ -2420,6 +2421,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.ui.LabelsFactory.Label.prototype.setupByJSON = function(config) {
+  var enabledState = this.enabled();
   goog.base(this, 'setupByJSON', config);
   if (goog.isDef(config['background'])) this.background(config['background']);
   if (goog.isDef(config['padding'])) this.padding(config['padding']);
@@ -2436,6 +2438,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.setupByJSON = function(config) {
   this.textFormatter(config['textFormatter']);
   this.positionFormatter(config['positionFormatter']);
   if (!goog.isDef(config['enabled'])) delete this.settingsObj.enabledLabel;
+  this.enabled('enabled' in config ? config['enabled'] : enabledState);
 };
 
 

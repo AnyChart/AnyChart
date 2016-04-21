@@ -794,6 +794,7 @@ anychart.core.ui.MarkersFactory.prototype.setupSpecial = function() {
 
 /** @inheritDoc */
 anychart.core.ui.MarkersFactory.prototype.setupByJSON = function(config) {
+  var enabledState = this.enabled();
   goog.base(this, 'setupByJSON', config);
   this.disablePointerEvents(config['disablePointerEvents']);
   this.position(config['position']);
@@ -806,7 +807,7 @@ anychart.core.ui.MarkersFactory.prototype.setupByJSON = function(config) {
   this.fill(config['fill']);
   this.stroke(config['stroke']);
   this.positionFormatter(config['positionFormatter']);
-  this.enabled('enabled' in config ? config['enabled'] : null);
+  this.enabled('enabled' in config ? config['enabled'] : enabledState);
 };
 
 
@@ -1460,6 +1461,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.ui.MarkersFactory.Marker.prototype.setupByJSON = function(config) {
+  var enabledState = this.enabled();
   goog.base(this, 'setupByJSON', config);
   this.position(config['position']);
   this.rotation(config['rotation']);
@@ -1472,7 +1474,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.setupByJSON = function(config) 
   this.stroke(config['stroke']);
   this.positionFormatter(config['positionFormatter']);
   if (!goog.isDef(config['enabled'])) delete this.settingsObj['enabled'];
-  this.enabled('enabled' in config ? config['enabled'] : null);
+  this.enabled('enabled' in config ? config['enabled'] : enabledState);
 };
 
 
