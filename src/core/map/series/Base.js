@@ -694,10 +694,7 @@ anychart.core.map.series.Base.prototype.getLegendItemData = function(itemsTextFo
   if (!goog.isString(itemText))
     itemText = goog.isDef(this.name()) ? this.name() : 'Series: ' + this.index();
 
-  if (json['iconType'] == anychart.enums.LegendItemIconType.MARKER && this.supportsMarkers()) {
-    json['iconFill'] = this.markers_.fill();
-    json['iconStroke'] = this.markers_.stroke();
-  }
+  this.updateLegendItemMarker(json);
 
   json['iconType'] = this.getLegendIconType(json['iconType']);
 

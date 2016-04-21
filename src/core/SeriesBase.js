@@ -625,10 +625,7 @@ anychart.core.SeriesBase.prototype.getLegendItemData = function(itemsTextFormatt
   if (!goog.isString(itemText))
     itemText = goog.isDef(this.name()) ? this.name() : 'Series: ' + this.index();
 
-  if (json['iconType'] == anychart.enums.LegendItemIconType.MARKER && this.supportsMarkers()) {
-    json['iconFill'] = this.markers_.fill();
-    json['iconStroke'] = this.markers_.stroke();
-  }
+  this.updateLegendItemMarker(json);
 
   json['iconType'] = this.getLegendIconType(json['iconType']);
 
@@ -647,6 +644,13 @@ anychart.core.SeriesBase.prototype.getLegendItemData = function(itemsTextFormatt
 
 
 /**
+ * Update legend item marker.
+ * @param {Object} json JSON object for update.
+ */
+anychart.core.SeriesBase.prototype.updateLegendItemMarker = function(json) {};
+
+
+/**
  * Gets legend icon type for the series.
  * @param {*} type iconType.
  * @return {(anychart.enums.LegendItemIconType|function(acgraph.vector.Path, number))}
@@ -655,8 +659,10 @@ anychart.core.SeriesBase.prototype.getLegendIconType = function(type) {
   if (type == anychart.enums.LegendItemIconType.MARKER) {
     if (!this.supportsMarkers()) {
       type = this.type();
-    } else if (this.markers().enabled()) {
-      type = this.markers().type();
+    } else {
+      var markerType = this.getMarkerType();
+      if (markerType)
+        type = markerType;
     }
     if (type == anychart.enums.LegendItemIconType.LINE)
       type = anychart.enums.LegendItemIconType.V_LINE;
@@ -664,6 +670,15 @@ anychart.core.SeriesBase.prototype.getLegendIconType = function(type) {
     type = anychart.enums.normalizeLegendItemIconType(type);
   }
   return /** @type {anychart.enums.LegendItemIconType} */ (type);
+};
+
+
+/**
+ * Returns marker tyoe.
+ * @return {?anychart.enums.MarkerType}
+ */
+anychart.core.SeriesBase.prototype.getMarkerType = function() {
+  return null;
 };
 
 
@@ -756,11 +771,14 @@ anychart.core.SeriesBase.prototype.getLabelsColor = function() {
 anychart.core.SeriesBase.prototype.setAutoColor = function(value) {
   this.autoColor_ = value;
   this.labels().setAutoColor(this.getLabelsColor());
-  if (this.supportsMarkers()) {
-    this.markers().setAutoFill(this.getMarkerFill());
-    this.markers().setAutoStroke(this.getMarkerStroke());
-  }
+  this.setAutoMarkerColor();
 };
+
+
+/**
+ * Sets marker auto colors
+ */
+anychart.core.SeriesBase.prototype.setAutoMarkerColor = goog.nullFunction;
 
 
 /**

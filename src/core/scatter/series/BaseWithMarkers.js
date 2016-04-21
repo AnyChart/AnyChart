@@ -134,6 +134,15 @@ anychart.core.scatter.series.BaseWithMarkers.prototype.setAutoMarkerType = funct
 
 
 /** @inheritDoc */
+anychart.core.scatter.series.BaseWithMarkers.prototype.setAutoMarkerColor = function() {
+  if (this.supportsMarkers()) {
+    this.markers().setAutoFill(this.getMarkerFill());
+    this.markers().setAutoStroke(/** @type {acgraph.vector.Stroke} */(this.getMarkerStroke()));
+  }
+};
+
+
+/** @inheritDoc */
 anychart.core.scatter.series.BaseWithMarkers.prototype.remove = function() {
   this.markers().container(null);
 
@@ -305,6 +314,12 @@ anychart.core.scatter.series.BaseWithMarkers.prototype.getMarkerStroke = functio
 };
 
 
+/** @inheritDoc */
+anychart.core.scatter.series.BaseWithMarkers.prototype.getMarkerType = function() {
+  return /** @type {?anychart.enums.MarkerType} */(this.markers().enabled() ? this.markers().type() : null);
+};
+
+
 /**
  * @inheritDoc
  */
@@ -323,6 +338,15 @@ anychart.core.scatter.series.BaseWithMarkers.prototype.getLegendItemData = funct
     data['iconMarkerStroke'] = null;
   }
   return data;
+};
+
+
+/** @inheritDoc */
+anychart.core.scatter.series.BaseWithMarkers.prototype.updateLegendItemMarker = function(json) {
+  if (json['iconType'] == anychart.enums.LegendItemIconType.MARKER && this.supportsMarkers()) {
+    json['iconFill'] = this.markers_.fill();
+    json['iconStroke'] = this.markers_.stroke();
+  }
 };
 
 

@@ -167,6 +167,15 @@ anychart.core.radar.series.ContinuousBase.prototype.markersInvalidated_ = functi
 
 
 /** @inheritDoc */
+anychart.core.radar.series.ContinuousBase.prototype.setAutoMarkerColor = function() {
+  if (this.supportsMarkers()) {
+    this.markers().setAutoFill(this.getMarkerFill(anychart.PointState.NORMAL));
+    this.markers().setAutoStroke(/** @type {acgraph.vector.Stroke} */(this.getMarkerStroke()));
+  }
+};
+
+
+/** @inheritDoc */
 anychart.core.radar.series.ContinuousBase.prototype.drawPoint = function(pointState) {
   if (this.enabled()) {
     var pointDrawn;
@@ -504,6 +513,12 @@ anychart.core.radar.series.ContinuousBase.prototype.getMarkerStroke = function()
 };
 
 
+/** @inheritDoc */
+anychart.core.radar.series.ContinuousBase.prototype.getMarkerType = function() {
+  return /** @type {?anychart.enums.MarkerType} */(this.markers().enabled() ? this.markers().type() : null);
+};
+
+
 /**
  * @inheritDoc
  */
@@ -523,6 +538,15 @@ anychart.core.radar.series.ContinuousBase.prototype.getLegendItemData = function
     data['iconMarkerStroke'] = null;
   }
   return data;
+};
+
+
+/** @inheritDoc */
+anychart.core.radar.series.ContinuousBase.prototype.updateLegendItemMarker = function(json) {
+  if (json['iconType'] == anychart.enums.LegendItemIconType.MARKER && this.supportsMarkers()) {
+    json['iconFill'] = this.markers_.fill();
+    json['iconStroke'] = this.markers_.stroke();
+  }
 };
 
 

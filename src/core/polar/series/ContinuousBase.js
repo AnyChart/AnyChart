@@ -154,6 +154,15 @@ anychart.core.polar.series.ContinuousBase.prototype.selectMarkers = function(opt
 };
 
 
+/** @inheritDoc */
+anychart.core.polar.series.ContinuousBase.prototype.setAutoMarkerColor = function() {
+  if (this.supportsMarkers()) {
+    this.markers().setAutoFill(this.getMarkerFill());
+    this.markers().setAutoStroke(/** @type {acgraph.vector.Stroke} */(this.getMarkerStroke()));
+  }
+};
+
+
 /**
  * Listener for markers invalidation.
  * @param {anychart.SignalEvent} event Invalidation event.
@@ -470,6 +479,12 @@ anychart.core.polar.series.ContinuousBase.prototype.getMarkerStroke = function()
 };
 
 
+/** @inheritDoc */
+anychart.core.polar.series.ContinuousBase.prototype.getMarkerType = function() {
+  return /** @type {?anychart.enums.MarkerType} */(this.markers().enabled() ? this.markers().type() : null);
+};
+
+
 /**
  * @inheritDoc
  */
@@ -488,6 +503,15 @@ anychart.core.polar.series.ContinuousBase.prototype.getLegendItemData = function
     data['iconMarkerStroke'] = null;
   }
   return data;
+};
+
+
+/** @inheritDoc */
+anychart.core.polar.series.ContinuousBase.prototype.updateLegendItemMarker = function(json) {
+  if (json['iconType'] == anychart.enums.LegendItemIconType.MARKER && this.supportsMarkers()) {
+    json['iconFill'] = this.markers_.fill();
+    json['iconStroke'] = this.markers_.stroke();
+  }
 };
 
 
