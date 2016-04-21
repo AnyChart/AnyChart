@@ -19,6 +19,19 @@ goog.inherits(anychart.core.utils.MapPointContextProvider, anychart.core.utils.S
 
 
 /** @inheritDoc */
+anychart.core.utils.MapPointContextProvider.prototype.getTokenValue = function(name) {
+  var tokenResult = anychart.core.utils.MapPointContextProvider.base(this, 'getTokenValue', name);
+  if (!goog.isDef(tokenResult)) {
+    var iterator = this['series'].getIterator();
+    var pointGeoProp = iterator.meta('regionProperties');
+    if (pointGeoProp)
+      tokenResult = pointGeoProp[name.substr(1)];
+  }
+  return tokenResult;
+};
+
+
+/** @inheritDoc */
 anychart.core.utils.MapPointContextProvider.prototype.applyReferenceValues = function() {
   var iterator = this['series'].getIterator();
   var value;
@@ -41,3 +54,7 @@ anychart.core.utils.MapPointContextProvider.prototype.applyReferenceValues = fun
     this['regionProperties'] = pointGeoProp;
   }
 };
+
+
+//exports
+anychart.core.utils.MapPointContextProvider.prototype['getTokenValue'] = anychart.core.utils.MapPointContextProvider.prototype.getTokenValue;

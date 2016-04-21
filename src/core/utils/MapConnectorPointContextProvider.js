@@ -1,6 +1,6 @@
 goog.provide('anychart.core.utils.MapConnectorPointContextProvider');
 goog.require('anychart.core.utils.IContextProvider');
-goog.require('anychart.core.utils.SeriesPointContextProvider');
+goog.require('anychart.core.utils.MapPointContextProvider');
 
 
 
@@ -9,13 +9,13 @@ goog.require('anychart.core.utils.SeriesPointContextProvider');
  * @implements {anychart.core.utils.IContextProvider}
  * @param {(anychart.core.SeriesBase|anychart.core.sparkline.series.Base)} series Series.
  * @param {Array.<string>} referenceValueNames Reference value names to be applied.
- * @extends {anychart.core.utils.SeriesPointContextProvider}
+ * @extends {anychart.core.utils.MapPointContextProvider}
  * @constructor
  */
 anychart.core.utils.MapConnectorPointContextProvider = function(series, referenceValueNames) {
-  anychart.core.utils.MapConnectorPointContextProvider.base(this, 'constructor', series, referenceValueNames, false);
+  anychart.core.utils.MapConnectorPointContextProvider.base(this, 'constructor', series, referenceValueNames);
 };
-goog.inherits(anychart.core.utils.MapConnectorPointContextProvider, anychart.core.utils.SeriesPointContextProvider);
+goog.inherits(anychart.core.utils.MapConnectorPointContextProvider, anychart.core.utils.MapPointContextProvider);
 
 
 /** @inheritDoc */
