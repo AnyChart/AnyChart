@@ -104,6 +104,18 @@ anychart.core.I3DProvider.prototype.getY3DShift = function(seriesIsStacked) {};
 
 
 /**
+ * @return {number}
+ */
+anychart.core.I3DProvider.prototype.getX3DFullShift = function() {};
+
+
+/**
+ * @return {number}
+ */
+anychart.core.I3DProvider.prototype.getY3DFullShift = function() {};
+
+
+/**
  * @param {number} seriesIndex
  * @param {boolean} seriesIsStacked
  * @param {string} scalesIds

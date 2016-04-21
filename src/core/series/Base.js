@@ -2658,11 +2658,10 @@ anychart.core.series.Base.prototype.calcFullClipBounds = function() {
     if (this.check(anychart.core.drawers.Capabilities.IS_3D_BASED)) {
       clip = (/** @type {anychart.math.Rect} */(clip)).clone();
       var provider = this.get3DProvider();
-      var stacked = this.planIsStacked();
-      var yShift = provider.getY3DShift(stacked);
+      var yShift = provider.getY3DFullShift();
       clip.top -= yShift;
       clip.height += yShift;
-      clip.width += provider.getX3DShift(stacked);
+      clip.width += provider.getX3DFullShift();
     }
   }
   return /** @type {!anychart.math.Rect} */(clip);

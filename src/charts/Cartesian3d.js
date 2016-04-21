@@ -463,6 +463,22 @@ anychart.charts.Cartesian3d.prototype.getY3DShift = function(seriesIsStacked) {
 
 
 /**
+ * @return {number}
+ */
+anychart.charts.Cartesian3d.prototype.getX3DFullShift = function() {
+  return this.x3dShift;
+};
+
+
+/**
+ * @return {number}
+ */
+anychart.charts.Cartesian3d.prototype.getY3DFullShift = function() {
+  return this.y3dShift;
+};
+
+
+/**
  * @param {number} seriesIndex
  * @param {boolean} seriesIsStacked
  * @param {string} scalesIds
