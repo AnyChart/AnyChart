@@ -137,6 +137,7 @@ anychart.core.stock.Plot.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.STOCK_PLOT_DT_AXIS |
     anychart.ConsistencyState.STOCK_PLOT_SERIES |
     anychart.ConsistencyState.STOCK_PLOT_BACKGROUND |
+    anychart.ConsistencyState.STOCK_PLOT_PALETTE |
     anychart.ConsistencyState.STOCK_PLOT_LEGEND;
 
 
@@ -1770,6 +1771,10 @@ anychart.core.stock.Plot.prototype.serialize = function() {
   json['xAxis'] = this.xAxis().serialize();
   json['dateTimeHighlighter'] = anychart.color.serialize(this.dateTimeHighlighterStroke_);
 
+  json['palette'] = this.palette().serialize();
+  // json['markerPalette'] = this.markerPalette().serialize();
+  json['hatchFillPalette'] = this.hatchFillPalette().serialize();
+
   var yAxes = [];
   for (i = 0; i < this.yAxes_.length; i++) {
     var yAxis = this.yAxes_[i];
@@ -1899,6 +1904,11 @@ anychart.core.stock.Plot.prototype.setupByJSON = function(config) {
   var i, json, scale;
 
   this.defaultSeriesType(config['defaultSeriesType']);
+
+  this.palette(config['palette']);
+  // this.markerPalette(config['markerPalette']);
+  this.hatchFillPalette(config['hatchFillPalette']);
+
   this.background(config['background']);
   this.xAxis(config['xAxis']);
   this.dateTimeHighlighter(config['dateTimeHighlighter']);
@@ -2144,5 +2154,5 @@ anychart.core.stock.Plot.prototype['roc'] = anychart.core.stock.Plot.prototype.r
 anychart.core.stock.Plot.prototype['rsi'] = anychart.core.stock.Plot.prototype.rsi;
 anychart.core.stock.Plot.prototype['sma'] = anychart.core.stock.Plot.prototype.sma;
 anychart.core.stock.Plot.prototype['palette'] = anychart.core.stock.Plot.prototype.palette;
-anychart.core.stock.Plot.prototype['markerPalette'] = anychart.core.stock.Plot.prototype.markerPalette;
+// anychart.core.stock.Plot.prototype['markerPalette'] = anychart.core.stock.Plot.prototype.markerPalette;
 anychart.core.stock.Plot.prototype['hatchFillPalette'] = anychart.core.stock.Plot.prototype.hatchFillPalette;

@@ -22,7 +22,6 @@ anychart.onDocumentReady(function() {
   c.dispose();
 
   var c3 = table.createComputer(mapping);
-  debugger;
   console.log(c3.addOutputField('asdf', 'qwer'));
   c3.setContext({a: 100});
   c3.setCalculationFunction(function(row) {

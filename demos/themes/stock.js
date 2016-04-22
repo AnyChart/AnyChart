@@ -1,4 +1,4 @@
-function create_column_stock() {
+function create_column_stock(palette) {
   var dataTable = anychart.data.table();
   dataTable.addData(get_ixic_daily_short_data());
   var mapping = dataTable.mapAs();
@@ -17,9 +17,14 @@ function create_column_stock() {
   plot2.rangeColumn(mapping);
   chart.scroller().column(scrollMapping);
   chart.selectRange('2007-04-01', '2008-08-28');
+
+  if (palette) {
+    plot1.palette(palette);
+    plot2.palette(palette);
+  }
   return chart;
 }
-function create_line_stock() {
+function create_line_stock(palette) {
   var dataTable = anychart.data.table();
   dataTable.addData(get_ixic_daily_short_data());
   var dataSet1 = dataTable.mapAs({'value': 2});
@@ -45,9 +50,14 @@ function create_line_stock() {
   plot2.minorGrid().enabled(true);
   chart.scroller().line(scrollMapping);
   chart.selectRange('2007-04-01', '2008-08-28');
+
+  if (palette) {
+    plot1.palette(palette);
+    plot2.palette(palette);
+  }
   return chart;
 }
-function create_ohlc_stock() {
+function create_ohlc_stock(palette) {
   var dataTable = anychart.data.table();
   dataTable.addData(get_ixic_daily_short_data());
   var mapping = dataTable.mapAs();
@@ -67,9 +77,14 @@ function create_ohlc_stock() {
   plot2.candlestick(mapping);
   chart.scroller().candlestick(mapping);
   chart.selectRange('2007-04-01', '2008-08-28');
+
+  if (palette) {
+    plot1.palette(palette);
+    plot2.palette(palette);
+  }
   return chart;
 }
-function create_area_stock() {
+function create_area_stock(palette) {
   var dataTable = anychart.data.table();
   dataTable.addData(get_ixic_daily_short_data());
   var mapping = dataTable.mapAs();
@@ -92,5 +107,10 @@ function create_area_stock() {
 
   chart.scroller().stepArea(scrollMapping);
   chart.selectRange('2007-04-01', '2008-08-28');
+
+  if (palette) {
+    plot1.palette(palette);
+    plot2.palette(palette);
+  }
   return chart;
 }
