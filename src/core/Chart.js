@@ -636,38 +636,59 @@ anychart.core.Chart.prototype.getVersionHistoryLink = function() {
  * @protected
  */
 anychart.core.Chart.prototype.contextMenuItemsProvider = function(context) {
+  // For fired on MarkersFactory or LabelsFactory
+  var parentEventTarget = context['event']['target'].getParentEventTarget();
+  // For fired on series point (context['event']['target'] == chart)
   var meta = anychart.utils.extractTag(context['event']['domTarget']);
-  var isPointContext = context['target'].isSeries && context['target'].isSeries() &&
-      goog.isObject(meta) && goog.isDef(meta['index']);
+  var isSeries = goog.isObject(meta) && goog.isDef(meta.series) &&
+      meta.series['seriesType'] && goog.isDef(meta.index);
+  var isPointContext = isSeries || (parentEventTarget && parentEventTarget['seriesType']);
 
-  var defaultMenu = isPointContext ?
-      anychart.core.Chart.contextMenuMap.point :
-      anychart.core.Chart.contextMenuMap.main;
-
-  defaultMenu = /** @type {Array.<anychart.ui.ContextMenu.Item>} */ (anychart.utils.recursiveClone(defaultMenu));
+  var items = /** @type {Array.<anychart.ui.ContextMenu.Item>} */ (anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap.main));
 
   // prepare version link (specific to each product)
-  var versionItemIndex = goog.array.findIndex(defaultMenu, function(item) {
+  var versionItemIndex = goog.array.findIndex(items, function(item) {
     return (item && item['text']) == 'Version ' + anychart.VERSION;
   });
   if (versionItemIndex != -1) {
-    defaultMenu[versionItemIndex]['href'] = context['chart'].getVersionHistoryLink();
+    items[versionItemIndex]['href'] = context['chart'].getVersionHistoryLink();
   }
 
-  return context['chart'].specificContextMenuItems(defaultMenu, context);
+  return context['chart'].specificContextMenuItems(items, context, isPointContext);
 };
 
 
 /**
  * Specific set context menu items to chart.
- * @param {Array.<anychart.ui.ContextMenu.Item>} defaultItems Default items provided from chart.
+ * @param {Array.<anychart.ui.ContextMenu.Item>} items Default items provided from chart.
  * @param {anychart.ui.ContextMenu.PrepareItemsContext} context Context object.
- * @this {anychart.ui.ContextMenu.PrepareItemsContext}
+ * @param {boolean} isPointContext
  * @return {Array.<anychart.ui.ContextMenu.Item>}
  * @protected
  */
-anychart.core.Chart.prototype.specificContextMenuItems = function(defaultItems, context) {
-  return defaultItems;
+anychart.core.Chart.prototype.specificContextMenuItems = function(items, context, isPointContext) {
+  return items;
+};
+
+
+/**
+ * Get selected points.
+ * @return {Array.<anychart.core.Point>}
+ */
+anychart.core.Chart.prototype.getSelectedPoints = function() {
+  var selectedPoints = [];
+  var selectedPointsIndexes, series, i, j;
+  var allSeries = this.getAllSeries();
+  for (i = 0; i < allSeries.length; i++) {
+    series = allSeries[i];
+    if (!series || !series.state) continue;
+    selectedPointsIndexes = series.state.getIndexByPointState(anychart.PointState.SELECT);
+    for (j = 0; j < selectedPointsIndexes.length; j++) {
+      selectedPoints.push(series.getPoint(selectedPointsIndexes[j]));
+    }
+  }
+
+  return selectedPoints;
 };
 
 
@@ -685,28 +706,28 @@ anychart.core.Chart.contextMenuItems = {
       'iconClass': 'fa fa-file-image-o',
       'eventType': 'anychart.saveAsPng',
       'action': function(context) {
-        context['chart']['saveAsPng']();
+        context['chart'].saveAsPng();
       }
     },{
       'text': '.jpg',
       'iconClass': 'fa fa-file-image-o',
       'eventType': 'anychart.saveAsJpg',
       'action': function(context) {
-        context['chart']['saveAsJpg']();
+        context['chart'].saveAsJpg();
       }
     },{
       'text': '.pdf',
       'iconClass': 'fa fa-file-pdf-o',
       'eventType': 'anychart.saveAsPdf',
       'action': function(context) {
-        context['chart']['saveAsPdf']();
+        context['chart'].saveAsPdf();
       }
     },{
       'text': '.svg',
       'iconClass': 'fa fa-file-code-o',
       'eventType': 'anychart.saveAsSvg',
       'action': function(context) {
-        context['chart']['saveAsSvg']();
+        context['chart'].saveAsSvg();
       }
     }]
   },
@@ -718,14 +739,16 @@ anychart.core.Chart.contextMenuItems = {
     'subMenu': [{
       'text': '.csv',
       'iconClass': 'fa fa-file-excel-o',
+      'eventType': 'anychart.saveAsCsv',
       'action': function(context) {
-        //context['chart']['saveAsCsv']();
+        context['chart'].saveAsCsv();
       }
     },{
       'text': '.xslx',
       'iconClass': 'fa fa-file-excel-o',
+      'eventType': 'anychart.saveAsXlsx',
       'action': function(context) {
-        //context['chart']['saveAsXlsx']();
+        context['chart'].saveAsXlsx();
       }
     }]
   },
@@ -737,14 +760,16 @@ anychart.core.Chart.contextMenuItems = {
     'subMenu': [{
       'text': '.json',
       'iconClass': 'fa fa-file-code-o',
+      'eventType': 'anychart.saveAsJson',
       'action': function(context) {
-        //context['chart']['saveAsJson']();
+        context['chart'].saveAsJson();
       }
     },{
       'text': '.xml',
       'iconClass': 'fa fa-file-code-o',
+      'eventType': 'anychart.saveAsXml',
       'action': function(context) {
-        //context['chart']['saveAsXml']();
+        context['chart'].saveAsXml();
       }
     }]
   },
@@ -755,7 +780,7 @@ anychart.core.Chart.contextMenuItems = {
     'iconClass': 'fa fa-print',
     'eventType': 'anychart.print',
     'action': function(context) {
-      context['chart']['print']();
+      context['chart'].print();
     }
   },
 
@@ -775,16 +800,6 @@ anychart.core.Chart.contextMenuItems = {
   linkToHelp: {
     'text': 'Need help? Go to support center!',
     'href': 'http://anychart.com/support'
-  },
-
-  // Item 'Exclude Point'.
-  excludePoint: {
-    'text': 'Exclude Point',
-    'eventType': 'anychart.excludePoint',
-    'action': function(context) {
-      //todo
-      //console.log(context['selectedPoints']);
-    }
   }
 };
 
@@ -796,19 +811,6 @@ anychart.core.Chart.contextMenuItems = {
 anychart.core.Chart.contextMenuMap = {
   // Menu 'Default menu'.
   main: [
-    anychart.core.Chart.contextMenuItems.exportAs,
-    anychart.core.Chart.contextMenuItems.saveConfigAs,
-    anychart.core.Chart.contextMenuItems.saveDataAs,
-    anychart.core.Chart.contextMenuItems.printChart,
-    null,
-    anychart.core.Chart.contextMenuItems.version,
-    anychart.core.Chart.contextMenuItems.about,
-    anychart.core.Chart.contextMenuItems.linkToHelp
-  ],
-  // Menu 'Point menu'.
-  point: [
-    anychart.core.Chart.contextMenuItems.excludePoint,
-    null,
     anychart.core.Chart.contextMenuItems.exportAs,
     anychart.core.Chart.contextMenuItems.saveConfigAs,
     anychart.core.Chart.contextMenuItems.saveDataAs,
@@ -2085,27 +2087,6 @@ anychart.core.Chart.prototype.unhover = function(opt_indexOrIndexes) {
   for (i = 0, len = series.length; i < len; i++) {
     if (series[i]) series[i].unhover(opt_indexOrIndexes);
   }
-};
-
-
-/**
- * Get selected points.
- * @return {Array.<anychart.core.Point>}
- */
-anychart.core.Chart.prototype.getSelectedPoints = function() {
-  var selectedPoints = [];
-  var selectedPointsIndexes, series, i, j;
-  var allSeries = this.getAllSeries();
-  for (i = 0; i < allSeries.length; i++) {
-    series = allSeries[i];
-    if (!series || !series.state) continue;
-    selectedPointsIndexes = series.state.getIndexByPointState(anychart.PointState.SELECT);
-    for (j = 0; j < selectedPointsIndexes.length; j++) {
-      selectedPoints.push(series.getPoint(selectedPointsIndexes[j]));
-    }
-  }
-
-  return selectedPoints;
 };
 
 

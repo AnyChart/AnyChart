@@ -1,5 +1,6 @@
 goog.provide('anychart.utils');
 
+goog.require('anychart.core.utils.TooltipsContainer');
 goog.require('anychart.enums');
 goog.require('anychart.math');
 goog.require('goog.array');

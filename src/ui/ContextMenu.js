@@ -8,8 +8,6 @@ goog.require('anychart.ui.menu.Renderer');
 goog.require('anychart.ui.menu.Separator');
 goog.require('anychart.ui.menu.SubMenu');
 goog.require('goog.dom.classlist');
-goog.require('goog.ui.Menu');
-goog.require('goog.ui.MenuItem');
 goog.require('goog.ui.PopupMenu');
 
 goog.forwardDeclare('anychart.core.Chart');
@@ -88,7 +86,7 @@ anychart.ui.ContextMenu = function() {
   this.setModel([]);
 
   this.listen(goog.ui.Component.EventType.ACTION, function(e) {
-    var menuItem = /** @type {goog.ui.MenuItem} */ (e.target);
+    var menuItem = /** @type {anychart.ui.menu.Item} */ (e.target);
     var menuItemModel = /** @type {anychart.ui.ContextMenu.Item} */ (menuItem.getModel());
     var actionContext = {
       'type': menuItemModel['eventType'] || goog.ui.Component.EventType.ACTION,
@@ -204,10 +202,9 @@ anychart.ui.ContextMenu.prototype.removeClassName = function(className) {
  */
 anychart.ui.ContextMenu.prototype.items = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (!goog.array.equals(/** @type {Array.<anychart.ui.ContextMenu.Item>} */ (this.getModel()), opt_value)) {
-      this.setModel(opt_value);
-      this.isDirty_ = true;
-    }
+    // To compare arrays, we need a deep comparison.
+    this.setModel(opt_value);
+    this.isDirty_ = true;
     return this;
   }
   return /** @type {Array.<anychart.ui.ContextMenu.Item>} */ (this.getModel());
@@ -266,7 +263,7 @@ anychart.ui.ContextMenu.prototype.handleContextMenu_ = function(e) {
   };
 
   if (this.chart_ && goog.isFunction(this.chart_['getSelectedPoints'])) {
-    // Check anychart-ui.css attached. (DVF-1619)
+    // Check anychart-ui.css attached.
     var stage = this.chart_['container']() ? this.chart_['container']()['getStage']() : null;
     if (goog.isNull(stage) || goog.style.getComputedStyle(stage['domElement'](), 'border-style') == 'none') return;
 
@@ -371,7 +368,7 @@ anychart.ui.ContextMenu.prototype.clear_ = function() {
 
 /**
  * To make one level of menu. Recursive function.
- * @param {goog.ui.Menu|anychart.ui.menu.SubMenu} menu
+ * @param {anychart.ui.ContextMenu|anychart.ui.menu.Menu|anychart.ui.menu.SubMenu} menu
  * @param {Array.<anychart.ui.ContextMenu.Item>} model
  * @private
  */
@@ -393,9 +390,12 @@ anychart.ui.ContextMenu.prototype.makeLevel_ = function(menu, model) {
     } else if (itemData['subMenu']) {
       var subMenu = new anychart.ui.menu.SubMenu(itemData['text']);
       if (classNames.length) subMenu.addClassName(classNames.join(' '));
+      if (goog.isBoolean(itemData['enabled'])) subMenu.setEnabled(itemData['enabled']);
 
       this.makeLevel_(subMenu, itemData['subMenu']);
       this.addItemToMenu_(menu, subMenu);
+
+      if (goog.isDef(itemData['iconClass'])) this.setIconTo_(subMenu, itemData['iconClass']);
 
     // treat as menu item
     } else {
@@ -415,12 +415,11 @@ anychart.ui.ContextMenu.prototype.makeLevel_ = function(menu, model) {
       var menuItem = new anychart.ui.menu.Item(menuItemText, itemData);
       if (classNames.length) menuItem.addClassName(classNames.join(' '));
       if (goog.isBoolean(itemData['enabled'])) menuItem.setEnabled(itemData['enabled']);
+      if (goog.isBoolean(itemData['scrollable'])) menuItem.scrollable(itemData['scrollable']);
 
       this.addItemToMenu_(menu, menuItem);
 
-      if (goog.isDef(itemData['iconClass'])) {
-        this.setIconTo_(menuItem, itemData['iconClass']);
-      }
+      if (goog.isDef(itemData['iconClass'])) this.setIconTo_(menuItem, itemData['iconClass']);
     }
   }
 };
@@ -428,18 +427,18 @@ anychart.ui.ContextMenu.prototype.makeLevel_ = function(menu, model) {
 
 /**
  * Right add menuItem to menu or subMenu.
- * @param {goog.ui.Menu|anychart.ui.menu.SubMenu} menu
- * @param {goog.ui.MenuItem|anychart.ui.menu.Separator|anychart.ui.menu.SubMenu} item
+ * @param {anychart.ui.ContextMenu|anychart.ui.menu.Menu|anychart.ui.menu.SubMenu} menu
+ * @param {anychart.ui.menu.Item|anychart.ui.menu.Separator|anychart.ui.menu.SubMenu} item
  * @private
  */
 anychart.ui.ContextMenu.prototype.addItemToMenu_ = function(menu, item) {
-  menu instanceof anychart.ui.menu.SubMenu ? menu.getMenu().addChild(item, true) : menu.addChild(item, true);
+  menu instanceof anychart.ui.menu.SubMenu ? menu.addItem(item) : menu.addChild(item, true);
 };
 
 
 /**
  * Set icon to menu item.
- * @param {goog.ui.MenuItem|anychart.ui.menu.SubMenu} item
+ * @param {anychart.ui.menu.Item|anychart.ui.menu.SubMenu} item
  * @param {string=} opt_icon
  * @param {number=} opt_index
  * @private
@@ -499,6 +498,7 @@ anychart.ui.ContextMenu.ActionContext;
  *  iconClass: string,
  *  subMenu: Array.<anychart.ui.ContextMenu.Item>,
  *  enabled: boolean,
+ *  scrollable: boolean,
  *  classNames: (string|Array.<string>),
  *  meta: *
  * }|null|undefined}

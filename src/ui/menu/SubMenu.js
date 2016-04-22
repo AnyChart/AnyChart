@@ -489,6 +489,18 @@ anychart.ui.menu.SubMenu.prototype.positionSubMenu = function() {
     goog.style.setElementShown(el, false);
     el.style.visibility = 'visible';
   }
+
+  var viewportSize = goog.dom.getViewportSize();
+  var elementBounds = goog.style.getBounds(el);
+  var elementClientPosition = goog.style.getClientPosition(el);
+  var scrollableContainer = subMenu.getScrollableContainer();
+  var scrollableBounds = goog.style.getBounds(scrollableContainer);
+  var BOTTOM_MARGIN = 15;
+  var scrollableMaxHeight = viewportSize.height - elementClientPosition.getY() -
+      (elementBounds.getHeight() - scrollableBounds.getHeight()) -
+      BOTTOM_MARGIN;
+
+  scrollableContainer.style.maxHeight = scrollableMaxHeight + 'px';
 };
 
 
@@ -497,7 +509,7 @@ anychart.ui.menu.SubMenu.prototype.positionSubMenu = function() {
 
 /**
  * Adds a new menu item at the end of the menu.
- * @param {goog.ui.MenuHeader|goog.ui.MenuItem|goog.ui.MenuSeparator} item Menu
+ * @param {goog.ui.MenuHeader|anychart.ui.menu.Item|anychart.ui.menu.SubMenu|anychart.ui.menu.Separator} item Menu
  *     item to add to the menu.
  */
 anychart.ui.menu.SubMenu.prototype.addItem = function(item) {
@@ -507,7 +519,7 @@ anychart.ui.menu.SubMenu.prototype.addItem = function(item) {
 
 /**
  * Adds a new menu item at a specific index in the menu.
- * @param {goog.ui.MenuHeader|goog.ui.MenuItem|goog.ui.MenuSeparator} item Menu
+ * @param {goog.ui.MenuHeader|anychart.ui.menu.Item|anychart.ui.menu.SubMenu|anychart.ui.menu.Separator} item Menu
  *     item to add to the menu.
  * @param {number} n Index at which to insert the menu item.
  */
@@ -518,7 +530,7 @@ anychart.ui.menu.SubMenu.prototype.addItemAt = function(item, n) {
 
 /**
  * Removes an item from the menu and disposes it.
- * @param {goog.ui.MenuItem} item The menu item to remove.
+ * @param {anychart.ui.menu.Item} item The menu item to remove.
  */
 anychart.ui.menu.SubMenu.prototype.removeItem = function(item) {
   var child = this.getMenu().removeChild(item, true);

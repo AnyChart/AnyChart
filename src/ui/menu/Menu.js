@@ -16,6 +16,13 @@ goog.require('goog.ui.Menu');
 anychart.ui.menu.Menu = function(opt_domHelper, opt_renderer) {
   anychart.ui.menu.Menu.base(this, 'constructor', opt_domHelper,
       opt_renderer || anychart.ui.menu.Renderer.getInstance());
+
+  /**
+   * Scrollable container.
+   * @type {Element}
+   * @private
+   */
+  this.scrollableContainer_ = null;
 };
 goog.inherits(anychart.ui.menu.Menu, goog.ui.Menu);
 goog.tagUnsealableClass(anychart.ui.menu.Menu);
@@ -32,4 +39,43 @@ anychart.ui.menu.Menu.prototype.handleEnterItem = function(e) {
   }
 
   return true;
+};
+
+
+/**
+ * Get scrollable container.
+ * @return {Element}
+ */
+anychart.ui.menu.Menu.prototype.getScrollableContainer = function() {
+  return this.scrollableContainer_;
+};
+
+
+/**
+ * @type {string}
+ */
+anychart.ui.menu.Menu.CSS_CLASS_SCROLLABLE = goog.getCssName('anychart-menu-scrollable');
+
+
+/**
+ * Creates the container's DOM.
+ * @override
+ */
+anychart.ui.menu.Menu.prototype.createDom = function() {
+  anychart.ui.menu.Menu.superClass_.createDom.call(this);
+
+  this.scrollableContainer_ = this.getDomHelper().createDom(goog.dom.TagName.DIV, anychart.ui.menu.Menu.CSS_CLASS_SCROLLABLE);
+  this.getDomHelper().insertChildAt(this.getElement(), this.scrollableContainer_, 0);
+};
+
+
+/** @override */
+anychart.ui.menu.Menu.prototype.setHighlightedIndex = function(index) {
+  anychart.ui.menu.Menu.base(this, 'setHighlightedIndex', index);
+
+  // Support scrollable container.
+  var child = this.getChildAt(index);
+  if (child) {
+    goog.style.scrollIntoContainerView(child.getElement(), this.getScrollableContainer());
+  }
 };

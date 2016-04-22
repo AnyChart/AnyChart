@@ -1144,3 +1144,31 @@ anychart.opt.TOOLTIP = 'tooltip';
  * @const {string}
  */
 anychart.opt.CLIP = 'clip';
+
+
+/**
+ * Constant replacer for "excluded" string.
+ * @const {string}
+ */
+anychart.opt.EXCLUDED = 'excluded';
+
+
+/**
+ * Constant replacer for "hasPointMarker" string.
+ * @const {string}
+ */
+anychart.opt.HAS_POINT_MARKER = 'hasPointMarker';
+
+
+/**
+ * Constant replacer for "hasPointLabel" string.
+ * @const {string}
+ */
+anychart.opt.HAS_POINT_LABEL = 'hasPointLabel';
+
+
+/**
+ * Constant replacer for "hasPointOutlier" string.
+ * @const {string}
+ */
+anychart.opt.HAS_POINT_OUTLIER = 'hasPointOutlier';

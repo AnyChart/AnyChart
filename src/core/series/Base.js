@@ -1086,14 +1086,6 @@ anychart.core.series.Base.prototype.scaleInvalidated = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Gets wrapped point by index.
- * @param {number} index Point index.
- * @return {anychart.core.Point} Wrapped point.
- */
-anychart.core.series.Base.prototype.getPoint = goog.abstractMethod;
-
-
-/**
  * Transforms x to pix coords.
  * @param {*} value
  * @param {number=} opt_subRangeRatio
@@ -2771,10 +2763,10 @@ anychart.core.series.Base.prototype.getSeriesState = function() {
 
 /**
  * Returns if the point is in visible subset (due to zoom).
- * @param {number} index
+ * @param {anychart.data.IRowInfo} point
  * @return {boolean}
  */
-anychart.core.series.Base.prototype.isPointVisible = function(index) {
+anychart.core.series.Base.prototype.isPointVisible = function(point) {
   return true;
 };
 
@@ -2853,7 +2845,7 @@ anychart.core.series.Base.prototype.applyAxesLinesSpace = function(value) {
  */
 anychart.core.series.Base.prototype.makePointMeta = function(rowInfo, yNames, yColumns) {
   var i;
-  var shouldBeDrawn = !rowInfo.meta(anychart.opt.ARTIFICIAL) && this.isPointVisible(rowInfo.getIndex());
+  var shouldBeDrawn = this.isPointVisible(rowInfo);
   if (shouldBeDrawn && this.isSizeBased()) {
     var size = Number(rowInfo.get(anychart.opt.SIZE));
     if (isNaN(size) || (size < 0 && !this.getSeriesOption(anychart.opt.DISPLAY_NEGATIVE))) {

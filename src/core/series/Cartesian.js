@@ -11,6 +11,7 @@ goog.require('anychart.data');
 goog.require('anychart.enums');
 goog.require('anychart.opt');
 goog.require('anychart.utils');
+goog.require('goog.array');
 
 
 
@@ -329,7 +330,7 @@ anychart.core.series.Cartesian.prototype.data = function(opt_value, opt_csvSetti
       this.dataInternal = this.parentView;
       this.dataInternal.listenSignals(this.dataInvalidated_, this);
       // DATA is supported only in Bubble, so we invalidate only for it.
-      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_DATA,
+      this.invalidate(anychart.ConsistencyState.SERIES_POINTS | anychart.ConsistencyState.SERIES_DATA,
           anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED);
     }
     return this;
@@ -443,6 +444,95 @@ anychart.core.series.Cartesian.prototype.setValueInternal = function(index, name
   }
   this.data().set(index, name, value);
 };
+
+
+/**
+ * Excludes points at passed indexes.
+ * @param {number|Array.<number>} indexes Point indexes.
+ * @return {boolean} If anything changed.
+ */
+anychart.core.series.Cartesian.prototype.excludePoint = function(indexes) {
+  if (!this.excludedPoints_)
+    this.excludedPoints_ = [];
+  if (!goog.isArray(indexes))
+    indexes = [indexes];
+  var doInvalidate = false;
+  for (var i = 0; i < indexes.length; i++) {
+    doInvalidate = goog.array.binaryInsert(this.excludedPoints_, indexes[i]) || doInvalidate;
+  }
+  if (doInvalidate)
+    this.invalidate(anychart.ConsistencyState.SERIES_POINTS,
+        anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW);
+  return doInvalidate;
+};
+
+
+/**
+ * Includes excluded points at passed indexes.
+ * @param {number|Array.<number>} indexes Point indexes.
+ * @return {boolean} If anything changed.
+ */
+anychart.core.series.Cartesian.prototype.includePoint = function(indexes) {
+  if (!this.excludedPoints_)
+    return false;
+  if (!goog.isArray(indexes))
+    indexes = [indexes];
+  var doInvalidate = false;
+  for (var i = 0; i < indexes.length; i++) {
+    doInvalidate = goog.array.binaryRemove(this.excludedPoints_, indexes[i]) || doInvalidate;
+  }
+  if (doInvalidate)
+    this.invalidate(anychart.ConsistencyState.SERIES_POINTS,
+        anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW);
+  return doInvalidate;
+};
+
+
+/**
+ * Returns an array of excluded points.
+ * @return {Array.<number>}
+ */
+anychart.core.series.Cartesian.prototype.getExcludedIndexesInternal = function() {
+  return this.excludedPoints_ || [];
+};
+
+
+/**
+ * Returns an array of excluded points.
+ * @return {Array.<anychart.core.Point>}
+ */
+anychart.core.series.Cartesian.prototype.getExcludedPoints = function() {
+  return goog.array.map(this.excludedPoints_ || [], this.getPoint, this);
+};
+
+
+/**
+ * Keep only passed points.
+ * @param {number|Array.<number>} indexes Point index.
+ */
+anychart.core.series.Cartesian.prototype.keepOnlyPoints = function(indexes) {
+  this.excludedPoints_ ? this.excludedPoints_.length = 0 : this.excludedPoints_ = [];
+  var pointsCount = this.getIterator().getRowsCount();
+  for (var i = 0; i < pointsCount; i++) {
+    this.excludedPoints_.push(i);
+  }
+  this.includePoint(indexes);
+};
+
+
+/**
+ * Includes all points.
+ * @return {boolean} If anything changed.
+ */
+anychart.core.series.Cartesian.prototype.includeAllPoints = function() {
+  if (this.excludedPoints_ && this.excludedPoints_.length) {
+    this.excludedPoints_.length = 0;
+    this.invalidate(anychart.ConsistencyState.SERIES_POINTS,
+        anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW);
+    return true;
+  }
+  return false;
+};
 //endregion
 
 
@@ -489,8 +579,11 @@ anychart.core.series.Cartesian.prototype.planIsXScaleInverted = function() {
 
 
 /** @inheritDoc */
-anychart.core.series.Cartesian.prototype.isPointVisible = function(index) {
-  return !this.drawingPlan || index >= this.drawingPlan.firstIndex && index <= this.drawingPlan.lastIndex;
+anychart.core.series.Cartesian.prototype.isPointVisible = function(point) {
+  var index = point.getIndex();
+  return !point.meta(anychart.opt.ARTIFICIAL) &&
+      !point.meta(anychart.opt.EXCLUDED) &&
+      (!this.drawingPlan || index >= this.drawingPlan.firstIndex && index <= this.drawingPlan.lastIndex);
 };
 //endregion
 
@@ -580,21 +673,27 @@ anychart.core.series.Cartesian.prototype.getDrawingData_ = function(data, dataPu
       if (this.supportsMarkers() && (
           pointData[anychart.opt.MARKER] ||
           pointData[anychart.opt.HOVER_MARKER] ||
-          pointData[anychart.opt.SELECT_MARKER]))
+          pointData[anychart.opt.SELECT_MARKER])) {
+        meta[anychart.opt.HAS_POINT_MARKER] = true;
         pointMarkersCount++;
+      }
       // we count label pointData settings
       if (this.supportsLabels() && (
           pointData[anychart.opt.LABEL] ||
           pointData[anychart.opt.HOVER_LABEL] ||
-          pointData[anychart.opt.SELECT_LABEL]))
+          pointData[anychart.opt.SELECT_LABEL])) {
+        meta[anychart.opt.HAS_POINT_LABEL] = true;
         pointLabelsCount++;
+      }
       // we count label pointData settings
       if (this.supportsOutliers() && (
           pointData[anychart.opt.OUTLIERS] ||
           pointData[anychart.opt.OUTLIER_MARKER] ||
           pointData[anychart.opt.HOVER_OUTLIER_MARKER] ||
-          pointData[anychart.opt.SELECT_OUTLIER_MARKER]))
+          pointData[anychart.opt.SELECT_OUTLIER_MARKER])) {
+        meta[anychart.opt.HAS_POINT_OUTLIER] = true;
         pointOutliersCount++;
+      }
     }
     var point = {
       data: pointData,
@@ -602,16 +701,13 @@ anychart.core.series.Cartesian.prototype.getDrawingData_ = function(data, dataPu
     };
     point = dataPusher(data, point);
     // if the new pointData replaced a pointData, we should decrease labels and markers counters
-    if (point) {
-      if (!point.meta[anychart.opt.MISSING]) {
-        if (point[anychart.opt.MARKER])
-          pointMarkersCount--;
-        if (point[anychart.opt.LABEL])
-          pointLabelsCount--;
-        // we count label pointData settings
-        if (this.supportsOutliers() && pointData[anychart.opt.OUTLIERS])
-          pointOutliersCount--;
-      }
+    if (point && !point.meta[anychart.opt.MISSING]) {
+      if (point.meta[anychart.opt.HAS_POINT_MARKER])
+        pointMarkersCount--;
+      if (point.meta[anychart.opt.HAS_POINT_LABEL])
+        pointLabelsCount--;
+      if (point.meta[anychart.opt.HAS_POINT_OUTLIER])
+        pointOutliersCount--;
     }
   }
   this.statistics('seriesMax', seriesMax);
@@ -1201,7 +1297,7 @@ anychart.core.series.Cartesian.prototype.makePointEvent = function(event) {
 /**
  * Gets wrapped point by index.
  * @param {number} index Point index.
- * @return {anychart.core.Point} Wrapped point.
+ * @return {anychart.core.SeriesPoint} Wrapped point.
  */
 anychart.core.series.Cartesian.prototype.getPoint = function(index) {
   if (this.isSizeBased()) {
@@ -1294,3 +1390,8 @@ anychart.core.series.Cartesian.prototype['selectionMode'] = anychart.core.series
 anychart.core.series.Cartesian.prototype['allowPointsSelect'] = anychart.core.series.Cartesian.prototype.allowPointsSelect;
 
 anychart.core.series.Cartesian.prototype['getPoint'] = anychart.core.series.Cartesian.prototype.getPoint;
+anychart.core.series.Cartesian.prototype['excludePoint'] = anychart.core.series.Cartesian.prototype.excludePoint;
+anychart.core.series.Cartesian.prototype['includePoint'] = anychart.core.series.Cartesian.prototype.includePoint;
+anychart.core.series.Cartesian.prototype['keepOnlyPoints'] = anychart.core.series.Cartesian.prototype.keepOnlyPoints;
+anychart.core.series.Cartesian.prototype['includeAllPoints'] = anychart.core.series.Cartesian.prototype.includeAllPoints;
+anychart.core.series.Cartesian.prototype['getExcludedPoints'] = anychart.core.series.Cartesian.prototype.getExcludedPoints;

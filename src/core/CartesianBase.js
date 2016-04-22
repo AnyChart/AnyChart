@@ -21,6 +21,7 @@ goog.require('anychart.palettes.HatchFills');
 goog.require('anychart.palettes.Markers');
 goog.require('anychart.palettes.RangeColors');
 goog.require('anychart.scales');
+goog.require('goog.array');
 
 
 
@@ -1087,6 +1088,172 @@ anychart.core.CartesianBase.prototype.onCrosshairSignal_ = function(event) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  ContextMenu.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/** @override */
+anychart.core.CartesianBase.prototype.specificContextMenuItems = function(items, context, isPointContext) {
+  var newItems = isPointContext ?
+      anychart.core.CartesianBase.contextMenuMap.cartesianPoint.concat(items) :
+      anychart.core.CartesianBase.contextMenuMap.cartesianDefault.concat(items);
+
+  var excludedPoints = this.getExcludedPoints();
+  var excludedPointsItem = isPointContext ? newItems[1] : newItems[0];
+  excludedPointsItem['subMenu'].length = 0;
+  excludedPointsItem['enabled'] = false;
+
+  if (excludedPoints.length) {
+    var footer = [null, anychart.core.CartesianBase.contextMenuItems.includeAllPoints];
+    var excludedPointsModel = [];
+    var seriesType;
+
+    for (var i = 0; i < excludedPoints.length; i++) {
+      seriesType = excludedPoints[i].getSeries().seriesType();
+      var value;
+      if (seriesType == anychart.enums.CartesianSeriesType.CANDLESTICK ||
+          seriesType == anychart.enums.CartesianSeriesType.OHLC) {
+        value = 'o - ' + excludedPoints[i].get('open') + ', h - ' + excludedPoints[i].get('high') +
+            ', l - ' + excludedPoints[i].get('low') + ', c - ' + excludedPoints[i].get('close');
+
+      } else if (seriesType == anychart.enums.CartesianSeriesType.BOX) {
+        value = 'high - ' + excludedPoints[i].get('high') + ', low - ' + excludedPoints[i].get('low');
+
+      // range charts
+      } else if (seriesType == anychart.enums.CartesianSeriesType.RANGE_AREA ||
+          seriesType == anychart.enums.CartesianSeriesType.RANGE_BAR ||
+          seriesType == anychart.enums.CartesianSeriesType.RANGE_COLUMN ||
+          seriesType == anychart.enums.CartesianSeriesType.RANGE_SPLINE_AREA ||
+          seriesType == anychart.enums.CartesianSeriesType.RANGE_STEP_AREA) {
+        value = 'high - ' + excludedPoints[i].get('high') + ', low - ' + excludedPoints[i].get('low');
+
+      } else if (seriesType == anychart.enums.CartesianSeriesType.BUBBLE) {
+        value = 'x - ' + excludedPoints[i].get('x') + ', y - ' + excludedPoints[i].get('value') +
+            ', size - ' + excludedPoints[i].get('size');
+
+      } else {
+        value = excludedPoints[i].get('value');
+      }
+
+      excludedPointsModel.push({
+        'text': excludedPoints[i].getSeries().name() + ': ' + value,
+        'eventType': 'anychart.include',
+        'scrollable': true,
+        'action': goog.bind(excludedPoints[i].getSeries().includePoint, excludedPoints[i].getSeries(), excludedPoints[i].getIndex())
+      });
+    }
+
+    excludedPointsItem['subMenu'] = excludedPointsModel.concat(footer);
+    excludedPointsItem['enabled'] = true;
+  }
+
+  return /** @type {Array.<anychart.ui.ContextMenu.Item>} */ (anychart.utils.recursiveClone(newItems));
+};
+
+
+/**
+ * Get excluded points.
+ * @return {Array.<anychart.core.SeriesPoint>}
+ */
+anychart.core.CartesianBase.prototype.getExcludedPoints = function() {
+  return goog.array.reduce(
+      goog.array.map(this.series_, function(series) { return series.getExcludedPoints(); }),
+      function(result, seriesPoints) { return goog.array.join(result, seriesPoints); },
+      []
+  );
+};
+
+
+/**
+ * Items map.
+ * @type {Object.<string, anychart.ui.ContextMenu.Item>}
+ */
+anychart.core.CartesianBase.contextMenuItems = {
+  // Item 'Exclude Point'.
+  excludePoint: {
+    'text': 'Exclude',
+    'eventType': 'anychart.exclude',
+    'action': function(context) {
+      context['chart'].suspendSignalsDispatching();
+      var selectedPoints = context['selectedPoints'];
+      var selectedPoint;
+      for (var i = 0; i < selectedPoints.length; i++) {
+        selectedPoint = selectedPoints[i];
+        if (goog.isFunction(selectedPoint.getSeries)) {
+          selectedPoint.getSeries().excludePoint(selectedPoint.getIndex());
+        }
+      }
+      context['chart'].resumeSignalsDispatching(true);
+    }
+  },
+
+  // Item-subMenu 'Excluded Points'.
+  excludedPoints: {
+    'text': 'Include',
+    'subMenu': [],
+    'enabled': false
+  },
+
+  // Item 'Include all points'.
+  includeAllPoints: {
+    'text': 'Include All',
+    'eventType': 'anychart.includeAll',
+    'action': function(context) {
+      context['chart'].suspendSignalsDispatching();
+      var series, i;
+      var allSeries = context['chart'].getAllSeries();
+      for (i = 0; i < allSeries.length; i++) {
+        series = allSeries[i];
+        if (!goog.isFunction(series.includeAllPoints)) continue;
+        series.includeAllPoints();
+      }
+      context['chart'].resumeSignalsDispatching(true);
+    }
+  },
+
+  // Item 'Keep Only'.
+  keepOnly: {
+    'text': 'Keep only',
+    'eventType': 'anychart.keepOnly',
+    'action': function(context) {
+      context['chart'].suspendSignalsDispatching();
+      // We don't use context['selectedPoints'] because it call .keepOnlyPoints() for each point.
+      // Current implementation call .keepOnlyPoints() for each series.
+      var selectedPointsIndexes, series, i;
+      var allSeries = context['chart'].getAllSeries();
+      for (i = 0; i < allSeries.length; i++) {
+        series = allSeries[i];
+        if (!series || !series.state) continue;
+        selectedPointsIndexes = series.state.getIndexByPointState(anychart.PointState.SELECT);
+        series.keepOnlyPoints(selectedPointsIndexes);
+      }
+      context['chart'].resumeSignalsDispatching(true);
+    }
+  }
+};
+
+
+/**
+ * Menu map.
+ * @type {Object.<string, Array.<anychart.ui.ContextMenu.Item>>}
+ */
+anychart.core.CartesianBase.contextMenuMap = {
+  // Cartesian 'Default menu'. (will be added to `main`)
+  cartesianDefault: [
+    anychart.core.CartesianBase.contextMenuItems.excludedPoints,
+    null
+  ],
+  // Cartesian 'Point menu'. (will be added to `main`)
+  cartesianPoint: [
+    anychart.core.CartesianBase.contextMenuItems.excludePoint,
+    anychart.core.CartesianBase.contextMenuItems.excludedPoints,
+    anychart.core.CartesianBase.contextMenuItems.keepOnly,
+    null
+  ]
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Series constructors
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -2051,12 +2218,68 @@ anychart.core.CartesianBase.prototype.calculateXScales = function() {
           }
         }
       }
+      var hasExcludes = false;
+      var excludesMap = {};
+      for (i = 0; i < drawingPlans.length; i++) {
+        drawingPlan = drawingPlans[i];
+        series = /** @type {anychart.core.series.Cartesian} */(drawingPlan.series);
+        var seriesExcludes = series.getExcludedIndexesInternal();
+        if (seriesExcludes.length) {
+          hasExcludes = true;
+          for (j = 0; j < seriesExcludes.length; j++) {
+            var index = seriesExcludes[j];
+            excludesMap[index] = true;
+            drawingPlan.data[index].meta[anychart.opt.EXCLUDED] = true;
+            drawingPlan.data[index].meta[anychart.opt.MISSING] = true;
+          }
+        }
+      }
+      if (hasExcludes) {
+        excludesMap = goog.object.filter(excludesMap, function(ignored, index) {
+          for (var i = 0; i < drawingPlans.length; i++) {
+            var drawingPlan = drawingPlans[i];
+            var meta = drawingPlan.data[+index].meta;
+            if (!meta[anychart.opt.EXCLUDED] && !meta[anychart.opt.ARTIFICIAL])
+              return false;
+          }
+          return true;
+        });
+      }
       drawingPlan = drawingPlans[0];
       if (xScale.needsAutoCalc()) {
         if (xScale instanceof anychart.scales.Ordinal) {
-          xScale.setAutoValues(drawingPlan.xHashMap, drawingPlan.xArray);
+          if (hasExcludes) {
+            xHashMap = {};
+            xArray = [];
+            for (i = 0; i < drawingPlan.data.length; i++) {
+              if (!(i in excludesMap)) {
+                var xValue = drawingPlan.data[i].data[anychart.opt.X];
+                xHashMap[anychart.utils.hash(xValue)] = xArray.length;
+                xArray.push(xValue);
+              }
+            }
+          } else {
+            xHashMap = drawingPlan.xHashMap;
+            xArray = drawingPlan.xArray;
+          }
+          xScale.setAutoValues(xHashMap, xArray);
         } else if (drawingPlan.data.length) {
-          xScale.extendDataRange(drawingPlan.data[0].data['x'], drawingPlan.data[drawingPlan.data.length - 1].data['x']);
+          if (hasExcludes) {
+            for (i = 0; i < drawingPlan.data.length; i++) {
+              if (!(i in excludesMap)) {
+                xScale.extendDataRange(drawingPlan.data[i].data[anychart.opt.X]);
+              }
+            }
+            for (i = drawingPlan.data.length; i--;) {
+              if (!(i in excludesMap)) {
+                xScale.extendDataRange(drawingPlan.data[i].data[anychart.opt.X]);
+              }
+            }
+          } else {
+            xScale.extendDataRange(
+                drawingPlan.data[0].data[anychart.opt.X],
+                drawingPlan.data[drawingPlan.data.length - 1].data[anychart.opt.X]);
+          }
           if (drawingPlan.series.supportsError()) {
             var iterator;
             var error;
@@ -2065,7 +2288,7 @@ anychart.core.CartesianBase.prototype.calculateXScales = function() {
               while (iterator.advance()) { // we need iterator to make error work :(
                 if (!iterator.meta(anychart.opt.MISSING)) {
                   error = drawingPlan.series.error().getErrorValues(true);
-                  val = iterator.get('x');
+                  val = iterator.get(anychart.opt.X);
                   xScale.extendDataRange(val - error[0], val + error[1]);
                 }
               }
@@ -2073,11 +2296,11 @@ anychart.core.CartesianBase.prototype.calculateXScales = function() {
               iterator = drawingPlan.series.getResetIterator();
               iterator.select(0);
               error = drawingPlan.series.error().getErrorValues(true);
-              val = iterator.get('x');
+              val = iterator.get(anychart.opt.X);
               xScale.extendDataRange(val - error[0], val + error[1]);
               iterator.select(drawingPlan.data.length - 1);
               error = drawingPlan.series.error().getErrorValues(true);
-              val = iterator.get('x');
+              val = iterator.get(anychart.opt.X);
               xScale.extendDataRange(val - error[0], val + error[1]);
             }
           }
