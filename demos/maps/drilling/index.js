@@ -189,6 +189,12 @@ $(document).ready(function() {
   //   map.drillDownMap({'US.NV': drillDownMap['AU']})
   // });
 
+  // chart = anychart.map();
+  // chart.geoData(anychart.maps.world_source);
+  // var series = chart.choropleth(generateData(chart));
+  // series.labels().enabled(true).textFormatter('{%id}');
+  // chart.container(stage).draw();
+
   createMap('world', 'world', function(pointId, map) {
     chart = map;
 
