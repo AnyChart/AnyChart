@@ -2,15 +2,15 @@
 <html>
 <head>
     <!--Compiled JS-->
-    <!--<script src="../../out/anychart-bundle.min.js"></script>-->
+    <script src="../../out/anychart-bundle.min.js"></script>
 
     <!--Non Compiled JS-->
-    <script src="../../contrib/closure-library/closure/goog/base.js"></script>
+    <!--<script src="../../contrib/closure-library/closure/goog/base.js"></script>
     <script src="../../src/deps.js"></script>
     <script>
         goog.require('anychart.themes.defaultTheme');
         goog.require('anychart.modules.treeMap');
-    </script>
+    </script>-->
     <style>
         html, body {
             width: 100%;
@@ -29,31 +29,226 @@
             float: left
         }
     </style>
+    <link rel="stylesheet" href="http://cdn.anychart.com/css/latest/anychart-ui.css" />
 </head>
 <body>
 <div id="container" style="border: 1px solid; width: 800px; height: 600px;"></div>
 <div id="container1" style="border: 1px solid; width: 800px; height: 600px;"></div>
 <script>
-    var stage, chart, chart1, chart2, chart4;
-    anychart.onDocumentReady(function() {
-        tree1 = anychart.data.tree([
-            {id: 'Continents', name: 'Continents'},
-            {id: 0, name: 'Asia', parent: 'Continents'},
-            {id: 1, name: 'Europe', parent: 'Continents'},
-            {id: 2, name: 'Asia 1', parent: 0, value: 50},
-            {id: 3, name: 'Asia 2', parent: 0, value: 150},
-            {id: 4, name: 'Asia 3', parent: 0, value: 350},
-            {id: 5, name: 'Europe 1', parent: 1, value: 300},
-            {id: 6, name: 'Europe 2', parent: 1, value: 400}
-        ], anychart.enums.TreeFillingMethod.AS_TABLE);
+    var export_data = [
+        {id: "00", direction: 'Export Directions', parent: null},
+        {parent: "00", id: "01", direction: 'United States', value: 410.8, percent: '18.1'},
+        {parent: "00", id: "02", direction: 'Hong Kong', value: 334.3, percent: '14.7'},
+        {parent: "00", id: "03", direction: 'Japan', value: 135.9, percent: '6'},
+        {parent: "00", id: "04", direction: 'South Korea', value: 101.5, percent: '4.5'},
+        {parent: "00", id: "05", direction: 'Germany', value: 69.2, percent: '3'},
+        {parent: "00", id: "06", direction: 'Vietnam', value: 69.2, percent: '2.9'},
+        {parent: "00", id: "07", direction: 'United Kingdom', value: 59.7, percent: '2.6'},
+        {parent: "00", id: "08", direction: 'Netherlands', value: 59.6, percent: '2.6'},
+        {parent: "00", id: "09", direction: 'India', value: 58.3, percent: '2.6'},
+        {parent: "00", id: "010", direction: 'Singapore', value: 53.1, percent: '2.3'},
+        {parent: "00", id: "011", direction: 'Taiwan', value: 45.1, percent: '2'},
 
-        chart = anychart.treeMap(tree1);
-        chart.container('container').draw();
-        var xml = chart.toJson(false, true);
-        console.log(xml);
-        chart.dispose();
-        chart = anychart.fromJson(xml);
-        chart.container('container').draw();
+
+        {parent: "011", id: "1", direction: "Electronic<br/>equipment", value: 18.6},
+        {parent: "011", id: "2", direction: "Machinery", value: 5.1},
+        {parent: "011", id: "3", direction: "Medical,<br/>technical equipment", value: 2.2},
+        {parent: "011", id: "4", direction: "Iron and steel", value: 2},
+        {parent: "011", id: "5", direction: "Other chemical goods", value: 1.8},
+        {parent: "011", id: "6", direction: "Organic<br/>chemicals", value: 1.2},
+        {parent: "011", id: "7", direction: "Plastics", value: 1.1},
+        {parent: "011", id: "8", direction: "Fish", value: 0.9722},
+        {parent: "011", id: "9", direction: "Vehicles", value: 0.9536},
+        {parent: "011", id: "10", direction: "Furniture,<br/>lighting, signs", value: 0.865},
+
+        {parent: "010", id: "11", direction: "Electronic<br/>equipment", value: 14.9},
+        {parent: "010", id: "12", direction: "Machinery", value: 8},
+        {parent: "010", id: "13", direction: "Ships, boats", value: 5.5},
+        {parent: "010", id: "14", direction: "Oil", value: 3.9},
+        {parent: "010", id: "15", direction: "Furniture,<br/>lighting, signs", value: 3.2},
+        {parent: "010", id: "16", direction: "Iron or<br/>steel products", value: 1.4},
+        {parent: "010", id: "17", direction: "Ceramic<br/>products", value: 1.3},
+        {parent: "010", id: "18", direction: "Iron and steel", value: 1.1},
+        {parent: "010", id: "19", direction: "Toys, games", value: 1.1},
+        {parent: "010", id: "20", direction: "Medical,<br/>technical equipment", value: 1.1},
+
+        {parent: "09", id: "21", direction: "Electronic<br/>equipment", value: 13.4},
+        {parent: "09", id: "22", direction: "Machinery", value: 10.2},
+        {parent: "09", id: "23", direction: "Organic<br/>chemicals", value: 5.9},
+        {parent: "09", id: "24", direction: "Fertilizers", value: 3.5},
+        {parent: "09", id: "25", direction: "Iron and steel", value: 2.3},
+        {parent: "09", id: "26", direction: "Plastics", value: 2.1},
+        {parent: "09", id: "27", direction: "Furniture,<br/>lighting, signs", value: 2},
+        {parent: "09", id: "28", direction: "Medical,<br/>technical equipment", value: 1.5},
+        {parent: "09", id: "29", direction: "Iron or<br/>steel products", value: 1.4},
+        {parent: "09", id: "30", direction: "Vehicles", value: 1.2},
+
+        {parent: "08", id: "31", direction: "Electronic<br/>equipment", value: 18},
+        {parent: "08", id: "32", direction: "Machinery", value: 16.7},
+        {parent: "08", id: "33", direction: "Toys, games", value: 2.5},
+        {parent: "08", id: "34", direction: "Furniture,<br/>lighting, signs", value: 2.3},
+        {parent: "08", id: "35", direction: "Organic<br/>chemicals", value: 1.8},
+        {parent: "08", id: "36", direction: "Clothing<br/>(not knit or crochet)", value: 1.8},
+        {parent: "08", id: "37", direction: "Knit or<br/>crochet clothing", value: 1.6},
+        {parent: "08", id: "38", direction: "Plastics", value: 1.2},
+        {parent: "08", id: "39", direction: "Medical,<br/>technical equipment", value: 1.1},
+        {parent: "08", id: "40", direction: "Iron or<br/>steel products", value: 1.1},
+
+        {parent: "07", id: "41", direction: "Electronic<br/>equipment", value: 10.5},
+        {parent: "07", id: "42", direction: "Machinery", value: 8.4},
+        {parent: "07", id: "43", direction: "Knit or<br/>crochet clothing", value: 5.2},
+        {parent: "07", id: "44", direction: "Clothing<br/>(not knit or crochet)", value: 4.8},
+        {parent: "07", id: "45", direction: "Furniture,<br/>lighting, signs", value: 4.7},
+        {parent: "07", id: "46", direction: "Footwear", value: 2.8},
+        {parent: "07", id: "47", direction: "Toys, games", value: 2.5},
+        {parent: "07", id: "48", direction: "Plastics", value: 1.8},
+        {parent: "07", id: "49", direction: "Iron or<br/>steel products", value: 1.4},
+        {parent: "07", id: "50", direction: "Leather,<br/>animal gut articles", value: 1.3},
+
+        {parent: "06", id: "51", direction: "Machinery", value: 15.4},
+        {parent: "06", id: "52", direction: "Electronic<br/>equipment", value: 14.2},
+        {parent: "06", id: "53", direction: "Furniture,<br/>lighting, signs", value: 4.3},
+        {parent: "06", id: "54", direction: "Clothing<br/>(not knit or crochet)", value: 3.8},
+        {parent: "06", id: "55", direction: "Knit or<br/>crochet clothing", value: 3.2},
+        {parent: "06", id: "56", direction: "Medical,<br/>technical equipment:", value: 2.9},
+        {parent: "06", id: "57", direction: "Footwear", value: 2},
+        {parent: "06", id: "58", direction: "Organic<br/>chemicals", value: 1.8},
+        {parent: "06", id: "59", direction: "Vehicles", value: 1.8},
+        {parent: "06", id: "60", direction: "Toys, games", value: 1.7},
+
+        {parent: "05", id: "61", direction: "Machinery", value: 15.4},
+        {parent: "05", id: "62", direction: "Electronic<br/>equipment", value: 14.2},
+        {parent: "05", id: "63", direction: "Furniture,<br/>lighting, signs", value: 4.3},
+        {parent: "05", id: "64", direction: "Clothing<br/>(not knit or crochet)", value: 3.8},
+        {parent: "05", id: "65", direction: "Knit or<br/>crochet clothing", value: 3.2},
+        {parent: "05", id: "66", direction: "Medical,<br/>technical equipment:", value: 2.9},
+        {parent: "05", id: "67", direction: "Footwear", value: 2},
+        {parent: "05", id: "68", direction: "Organic<br/>chemicals", value: 1.8},
+        {parent: "05", id: "69", direction: "Vehicles", value: 1.8},
+        {parent: "05", id: "70", direction: "Toys, games", value: 1.7},
+
+        {parent: "04", id: "71", direction: "Electronic<br/>equipment", value: 38.9},
+        {parent: "04", id: "72", direction: "Machinery", value: 9.4},
+        {parent: "04", id: "73", direction: "Iron and steel", value: 6.3},
+        {parent: "04", id: "74", direction: "Medical,<br/>technical equipment:", value: 4.3},
+        {parent: "04", id: "75", direction: "Iron or<br/>steel products", value: 3},
+        {parent: "04", id: "76", direction: "Knit or<br/>crochet clothing", value: 2.9},
+        {parent: "04", id: "77", direction: "Clothing<br/>(not knit or crochet)", value: 2.6},
+        {parent: "04", id: "78", direction: "Furniture,<br/>lighting, signs", value: 2.3},
+        {parent: "04", id: "79", direction: "Organic<br/>chemicals", value: 2.2},
+        {parent: "04", id: "80", direction: "Plastics", value: 2},
+
+        {parent: "03", id: "81", direction: "Electronic<br/>equipment", value: 33.8},
+        {parent: "03", id: "82", direction: "Machinery", value: 22},
+        {parent: "03", id: "83", direction: "Knit or<br/>crochet clothing", value: 8.8},
+        {parent: "03", id: "84", direction: "Clothing<br/>(not knit or crochet)", value: 7.7},
+        {parent: "03", id: "85", direction: "Medical,<br/>technical equipment:", value: 4.8},
+        {parent: "03", id: "86", direction: "Furniture,<br/>lighting, signs", value: 4.8},
+        {parent: "03", id: "87", direction: "Plastics", value: 4.1},
+        {parent: "03", id: "88", direction: "Vehicles", value: 3.9},
+        {parent: "03", id: "89", direction: "Iron or<br/>steel products", value: 3.2},
+        {parent: "03", id: "90", direction: "Organic<br/>chemicals", value: 2.9},
+
+        {parent: "02", id: "91", direction: "Electronic<br/>equipment", value: 175.6},
+        {parent: "02", id: "92", direction: "Machinery", value: 47.1},
+        {parent: "02", id: "93", direction: "Gems,<br/>precious metals", value: 20.6},
+        {parent: "02", id: "94", direction: "Medical,<br/>technical equipment:", value: 18.9},
+        {parent: "02", id: "95", direction: "Ships, boat", value: 6.8},
+        {parent: "02", id: "96", direction: "Oil", value: 6.5},
+        {parent: "02", id: "97", direction: "Plastics", value: 4.6},
+        {parent: "02", id: "98", direction: "Knit or<br/>crochet clothing", value: 3.6},
+        {parent: "02", id: "99", direction: "Clothing<br/>(not knit or crochet)", value: 3.1},
+        {parent: "02", id: "100", direction: "Furniture,<br/>lighting, signs", value: 2.9},
+
+        {parent: "01", id: "101", direction: "Electronic<br/>equipment", value: 95.6},
+        {parent: "01", id: "102", direction: "Machinery", value: 84.5},
+        {parent: "01", id: "103", direction: "Furniture,<br/>lighting, signs", value: 29.2},
+        {parent: "01", id: "104", direction: "Knit or<br/>crochet clothing", value: 17.6},
+        {parent: "01", id: "105", direction: "Toys, games", value: 15.2},
+        {parent: "01", id: "106", direction: "Clothing<br/>(not knit or crochet)", value: 15.1},
+        {parent: "01", id: "107", direction: "Footwear", value: 14.1},
+        {parent: "01", id: "108", direction: "Plastics", value: 14.1},
+        {parent: "01", id: "109", direction: "Vehicles", value: 13.3},
+        {parent: "01", id: "110", direction: "Iron or<br/>steel products", value: 10.5}
+    ];
+    var chart;
+    anychart.onDocumentReady(function() {
+        // makes tree from the data for the sample
+        var data = anychart.data.tree(export_data, anychart.enums.TreeFillingMethod.AS_TABLE);
+        chart = anychart.treeMap(data);
+
+        // sets credits data
+        var credits = chart.credits();
+        credits.enabled(true);
+        credits.url('//www.worldsrichestcountries.com/top_china_exports.html');
+        credits.text('Data source: www.worldsrichestcountries.com/top_china_exports.html');
+
+        // sets title for chart and customizes it
+        chart.title().enabled(true).padding([0, 0, 20, 0]).useHtml(true).text('Top 10 Chinese Export Directions to the World<br/>' +
+                '<span style="color:#212121; font-size: 13px;">According to www.worldsrichestcountries.com</span>');
+        // sets scale
+        var scale = anychart.scales.ordinalColor([
+            {less: 1},
+            {from: 1, to: 2},
+            {from: 2, to: 3},
+            {from: 3, to: 5},
+            {from: 5, to: 15},
+            {from: 15, to: 25},
+            {from: 25, to: 50},
+            {from: 50, to: 100},
+            {greater: 100}
+        ]);
+
+        // setting the number of levels shown
+        chart.hintDepth(1);
+
+        // hintOpacity setting
+        chart.hintOpacity(0.5);
+
+        // sets chart settings
+        chart.hoverFill('#bdbdbd');
+        chart.hoverStroke('#212121');
+        chart.selectionMode('none');
+
+        // sets padding for legend
+        chart.legend().padding([0, 0, 20, 0]);
+
+        // sets settings for labels
+        chart.labels().fontColor('#212121').fontSize(16).useHtml(true).textFormatter(function() {
+            return this.getDataValue('direction') + '<br/><span style="color: #455a64">$' + this.value + ' billions</span>';
+        });
+
+        // sets settings for headers
+        chart.headers().textFormatter(function() {
+            return this.getDataValue('direction');
+        });
+
+        // sets settings for tooltip
+        chart.tooltip().title().useHtml(true);
+        chart.tooltip().useHtml(true).textFormatter(function() {
+            if (this.getDataValue('percent'))
+                return '<span style="color: #bfbfbf">Revenue: </span>$' + this.value + ' billions<br/>' +
+                        '<span style="color: #bfbfbf">Percent: ' + '</span>' + this.getDataValue('percent') + '%';
+            return '<span style="color: #bfbfbf">Revenue: </span>$' + this.value + ' billions';
+        });
+
+        // turns on legend on drill down (for all children nodes)
+        chart.listen(anychart.enums.EventType.DRILL_CHANGE, function(e) {
+            if (e.path.length != 1) chart.labels().fontSize(12);
+            else chart.labels().fontSize(16);
+            chart.legend(e.path.length != 1);
+        });
+
+        // sets colors for scale
+        scale.colors(['#e1f5fe', '#b3e5fc', '#81d4fa', '#4fc3f7', '#29b6f6', '#039be5', '#26c6da', '#00b8d4', '#00acc1']);
+        chart.colorScale(scale);
+
+        // set container id for the chart
+        chart.container('container');
+
+        // initiate chart drawing
+        chart.draw();
     });
+
 </script>
 </body>

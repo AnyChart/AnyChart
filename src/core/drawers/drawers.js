@@ -28,6 +28,7 @@ anychart.core.drawers.Capabilities = {
   IS_MARKER_BASED: 1 << 12,
   IS_OHLC_BASED: 1 << 13,
   IS_LINE_BASED: 1 << 14,
+  IS_RANGE_BASED: 1 << 15,
   /**
    * Combination of all states.
    */

@@ -341,8 +341,6 @@ anychart.core.map.series.Base.prototype.updateOnZoomOrMove = function() {
   if (manualSuspend)
     stage.resume();
 
-  this.markConsistent(anychart.ConsistencyState.ALL);
-
   return this;
 };
 

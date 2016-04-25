@@ -133,6 +133,7 @@ anychart.onDocumentReady(function() {
 
   chart.zPadding(10);
   //chart.zDepth(100);
+  chart.zDistribution(true);
 
   // initiate chart drawing
   chart.draw();

@@ -1838,6 +1838,7 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
   if (series && !series.isDisposed() && series.enabled() && goog.isFunction(series.makePointEvent)) {
     var evt = series.makePointEvent(event);
     if (evt && ((anychart.utils.checkIfParent(/** @type {!goog.events.EventTarget} */(series), event['relatedTarget'])) || series.dispatchEvent(evt))) {
+      index = evt['pointIndex'];
       if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
         if (interactivity.selectionMode() == anychart.enums.SelectionMode.NONE || series.selectionMode() == anychart.enums.SelectionMode.NONE)
           return;

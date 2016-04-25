@@ -474,7 +474,7 @@ anychart.core.SeriesBase.prototype.name = function(opt_value) {
     }
     return this;
   } else {
-    return this.name_;
+    return this.name_ || ('Series ' + this.getIndex());
   }
 };
 

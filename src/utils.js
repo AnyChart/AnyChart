@@ -1098,6 +1098,8 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
       return ['outliers', 'outlier'];
     case 'inverted':
       return ['inverted_list', 'inverted'];
+    case 'drillTo':
+      return ['drill_to', 'item'];
   }
   return null;
 };
@@ -1169,6 +1171,8 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
       return ['inverted', 'inverted'];
     case 'colorScales':
       return ['colorScales', 'scale'];
+    case 'drillTo':
+      return ['drillTo', 'item'];
   }
   return null;
 };

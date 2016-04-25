@@ -1783,6 +1783,7 @@
       "properties": {
         "type": {"enum": ["treeMap"]},
         "treeData": {"$ref": "#/definitions/treeData"},
+        "drillTo": {"type": "array"},
 
         "scales": {
           "type": [

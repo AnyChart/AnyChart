@@ -398,28 +398,29 @@ anychart.core.map.series.Connector.prototype.applyZoomMoveTransform = function()
   var iterator = this.getIterator();
 
   var paths = iterator.meta('shape');
+  if (paths) {
+    var prevTx = this.mapTx;
+    var tx = this.map.getMapLayer().getFullTransformation().clone();
 
-  var prevTx = this.mapTx;
-  var tx = this.map.getMapLayer().getFullTransformation().clone();
+    if (prevTx) {
+      tx.concatenate(prevTx.createInverse());
+    }
 
-  if (prevTx) {
-    tx.concatenate(prevTx.createInverse());
-  }
+    var scale = tx.getScaleX();
+    var dx = tx.getTranslateX();
+    var dy = tx.getTranslateY();
 
-  var scale = tx.getScaleX();
-  var dx = tx.getTranslateX();
-  var dy = tx.getTranslateY();
+    for (var i = 0, len = paths.length; i < len; i++) {
+      var path = paths[i];
+      path.setTransformationMatrix(scale, 0, 0, scale, dx, dy);
+    }
 
-  for (var i = 0, len = paths.length; i < len; i++) {
-    var path = paths[i];
-    path.setTransformationMatrix(scale, 0, 0, scale, dx, dy);
-  }
-
-  var hatchFill = this.hatchFillRootElement;
-  var hatchFillShapes = iterator.meta('hatchFillShape');
-  if (hatchFill && hatchFillShapes) {
-    for (i = 0, len = hatchFillShapes.length; i < len; i++) {
-      hatchFillShapes[i].setTransformationMatrix(scale, 0, 0, scale, dx, dy);
+    var hatchFill = this.hatchFillRootElement;
+    var hatchFillShapes = iterator.meta('hatchFillShape');
+    if (hatchFill && hatchFillShapes) {
+      for (i = 0, len = hatchFillShapes.length; i < len; i++) {
+        hatchFillShapes[i].setTransformationMatrix(scale, 0, 0, scale, dx, dy);
+      }
     }
   }
 

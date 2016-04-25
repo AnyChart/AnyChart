@@ -2483,7 +2483,6 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
             for (j = firstIndex; j <= lastIndex; j++) {
               point = data[j];
               stackVal = stack[j - firstIndex];
-              point.meta[anychart.opt.STACKED_MISSING] = stackVal.missing;
               if (point.meta[anychart.opt.MISSING]) {
                 point.meta['stackedPositiveZero'] = (point.meta['stackedPositiveZero'] / stackVal.positive * 100) || 0;
                 point.meta['stackedNegativeZero'] = (point.meta['stackedNegativeZero'] / stackVal.negative * 100) || 0;

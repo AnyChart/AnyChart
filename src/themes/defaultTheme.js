@@ -192,6 +192,52 @@ var returnRangeLabelsContentFormatter = function() {
  * @this {*}
  * @return {*}
  */
+var OHLCTooltipFormatter = function() {
+  return 'Open: ' + parseFloat(this['open']).toFixed(2) + '\n' +
+      'High: ' + parseFloat(this['high']).toFixed(2) + '\n' +
+      'Low: ' + parseFloat(this['low']).toFixed(2) + '\n' +
+      'Close: ' + parseFloat(this['close']).toFixed(2);
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+var StockSimpleTooltipFormatter = function() {
+  var val = parseFloat(this['value']).toFixed(2);
+  return this['seriesName'] + ': ' + this['valuePrefix'] + val + this['valuePostfix'];
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+var StockRangeTooltipFormatter = function() {
+  return this['seriesName'] + ':\n' +
+      '  High: ' + parseFloat(this['high']).toFixed(2) + '\n' +
+      '  Low: ' + parseFloat(this['low']).toFixed(2);
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
+var StockOHLCTooltipFormatter = function() {
+  return this['seriesName'] + ':\n' +
+      '  Open: ' + parseFloat(this['open']).toFixed(2) + '\n' +
+      '  High: ' + parseFloat(this['high']).toFixed(2) + '\n' +
+      '  Low: ' + parseFloat(this['low']).toFixed(2) + '\n' +
+      '  Close: ' + parseFloat(this['close']).toFixed(2);
+};
+
+
+/**
+ * @this {*}
+ * @return {*}
+ */
 var returnStrokeWithThickness = function() {
   return window['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
 };
@@ -973,16 +1019,7 @@ window['anychart']['themes']['defaultTheme'] = {
         'selectRisingStroke': defaultSelectColor,
         'selectFallingStroke': defaultSelectColor,
         'tooltip': {
-          /**
-           * @this {*}
-           * @return {string}
-           */
-          'textFormatter': function() {
-            return 'O: ' + parseFloat(this['open']).toFixed(4) + '\n' +
-                'H: ' + parseFloat(this['high']).toFixed(4) + '\n' +
-                'L: ' + parseFloat(this['low']).toFixed(4) + '\n' +
-                'C: ' + parseFloat(this['close']).toFixed(4);
-          }
+          'textFormatter': OHLCTooltipFormatter
         },
         'markers': {
           'position': 'centerTop'
@@ -1029,16 +1066,7 @@ window['anychart']['themes']['defaultTheme'] = {
         'selectRisingStroke': '3 ' + defaultSelectColor,
         'selectFallingStroke': '3 ' + defaultSelectColor,
         'tooltip': {
-          /**
-           * @this {*}
-           * @return {*}
-           */
-          'textFormatter': function() {
-            return 'O: ' + parseFloat(this['open']).toFixed(4) + '\n' +
-                'H: ' + parseFloat(this['high']).toFixed(4) + '\n' +
-                'L: ' + parseFloat(this['low']).toFixed(4) + '\n' +
-                'C: ' + parseFloat(this['close']).toFixed(4);
-          }
+          'textFormatter': OHLCTooltipFormatter
         },
         'markers': {
           'position': 'centerTop'
@@ -1153,6 +1181,17 @@ window['anychart']['themes']['defaultTheme'] = {
           'size': 4,
           'fill': defaultSelectColor,
           'stroke': defaultSelectStroke
+        },
+        'labels': {
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'textFormatter': function() {
+            return 'Highest: ' + parseFloat(this['highest']).toFixed(2) + '\n' +
+                'Median: ' + parseFloat(this['median']).toFixed(2) + '\n' +
+                'Lowest: ' + parseFloat(this['lowest']).toFixed(2);
+          }
         },
         'tooltip': {
           /**
@@ -3254,24 +3293,43 @@ window['anychart']['themes']['defaultTheme'] = {
         'base': {
           'pointWidth': '75%',
           'tooltip': {
-            /**
-             * @this {*}
-             * @return {*}
-             */
-            'textFormatter': function() {
-              var val = this['value'];
-              if (val === undefined) val = this['close'];
-              val = parseFloat(val).toFixed(4);
-              return this['seriesName'] + (isNaN(val) ? '' : (': ' + this['valuePrefix'] + val + this['valuePostfix']));
-            }
+            'textFormatter': StockSimpleTooltipFormatter
           },
           'legendItem': {'iconStroke': 'none'}
+        },
+        'rangeArea': {
+          'tooltip': {
+            'textFormatter': StockRangeTooltipFormatter
+          }
+        },
+        'rangeSplineArea': {
+          'tooltip': {
+            'textFormatter': StockRangeTooltipFormatter
+          }
+        },
+        'rangeStepArea': {
+          'tooltip': {
+            'textFormatter': StockRangeTooltipFormatter
+          }
+        },
+        'candlestick': {
+          'tooltip': {
+            'textFormatter': StockOHLCTooltipFormatter
+          }
         },
         'column': {
           'stroke': 'none'
         },
         'rangeColumn': {
-          'stroke': 'none'
+          'stroke': 'none',
+          'tooltip': {
+            'textFormatter': StockRangeTooltipFormatter
+          }
+        },
+        'ohlc': {
+          'tooltip': {
+            'textFormatter': StockOHLCTooltipFormatter
+          }
         }
       },
       'defaultGridSettings': {

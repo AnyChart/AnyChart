@@ -962,7 +962,9 @@ window['anychart']['themes']['v6'] = {
            * @return {*}
            */
           'textFormatter': function() {
-            return this['x'];
+            return 'Highest: ' + parseFloat(this['highest']).toFixed(2) + '\n' +
+                'Median: ' + parseFloat(this['median']).toFixed(2) + '\n' +
+                'Lowest: ' + parseFloat(this['lowest']).toFixed(2);
           }
         },
         /**

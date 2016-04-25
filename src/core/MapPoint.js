@@ -8,7 +8,7 @@ goog.require('anychart.core.Point');
  * @param {anychart.core.SeparateChart} parentMap Parent map chart. That own this point.
  * @param {anychart.core.SeparateChart} currentMap Current map chart. Current visible map on stage.
  * @param {Object} properties Feature properties.
- * @param {string} id Feature geo id.
+ * @param {?string} id Feature geo id.
  * @constructor
  * @extends {anychart.core.Point}
  */
@@ -17,7 +17,7 @@ anychart.core.MapPoint = function(parentMap, currentMap, properties, id) {
 
   /**
    * Feature geo id.
-   * @type {string}
+   * @type {?string}
    * @protected
    */
   this.id = id;
@@ -39,7 +39,7 @@ goog.inherits(anychart.core.MapPoint, anychart.core.Point);
 
 /**
  * Returns point geo id.
- * @return {string}
+ * @return {?string}
  */
 anychart.core.MapPoint.prototype.getId = function() {
   return this.id;

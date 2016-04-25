@@ -80,7 +80,7 @@ anychart.core.drawers.Column3d.prototype.startDrawing = function(shapeManager) {
 /** @inheritDoc */
 anychart.core.drawers.Column3d.prototype.drawSubsequentPoint = function(point, state) {
   var zIndex = /** @type {number} */(this.series.getIterator().meta('zIndex'));
-  var shapes = this.shapesManager.getShapesGroup(state, null, zIndex + point.getIndex() * 1e-4);
+  var shapes = this.shapesManager.getShapesGroup(state, null, zIndex + point.getIndex() * 1e-8);
   this.drawPoint_(point, /** @type {Object.<acgraph.vector.Path>} */(shapes));
 };
 

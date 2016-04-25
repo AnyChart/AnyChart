@@ -1841,7 +1841,7 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(factoryGetters
           (stateFactory && stateFactory.position()) ||
           (pointOverride && pointOverride[anychart.opt.POSITION]) ||
           mainFactory.position();
-      positionProvider = this.createPositionProvider(/** @type {anychart.enums.Position|string} */(position), isLabel);
+      positionProvider = this.createPositionProvider(/** @type {anychart.enums.Position|string} */(position), true);
       return this.drawSingleFactoryElement(mainFactory, index, positionProvider, formatProvider,
           stateFactory, pointOverride, statePointOverride);
     }
@@ -2972,7 +2972,6 @@ anychart.core.series.Base.prototype.createLegendContextProvider = function() {
  * @param {string} position Understands anychart.enums.Position and some additional values.
  * @param {boolean=} opt_shift3D If true, adds a 3D shift if possible.
  * @return {Object} Object with info for labels formatting.
- * @protected
  */
 anychart.core.series.Base.prototype.createPositionProvider = function(position, opt_shift3D) {
   var iterator = this.getIterator();
@@ -3019,16 +3018,17 @@ anychart.core.series.Base.prototype.createPositionProvider = function(position, 
           val = NaN;
         }
       }
-      if (opt_shift3D && this.check(anychart.core.drawers.Capabilities.IS_3D_BASED)) {
-        var provider3D = this.get3DProvider();
-        var index = this.getIndex();
-        x += provider3D.getX3DDistributionShift(index, this.planIsStacked());
-        val -= provider3D.getY3DDistributionShift(index, this.planIsStacked());
-      }
       if (this.isBarBased())
         point = {'x': val, 'y': x};
       else
         point = {'x': x, 'y': val};
+    }
+
+    if (opt_shift3D && this.check(anychart.core.drawers.Capabilities.IS_3D_BASED)) {
+      var provider3D = this.get3DProvider();
+      var index = this.getIndex();
+      point['x'] += provider3D.getX3DDistributionShift(index, this.planIsStacked());
+      point['y'] -= provider3D.getY3DDistributionShift(index, this.planIsStacked());
     }
   }
   return {'value': point};

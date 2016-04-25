@@ -478,7 +478,23 @@ anychart.core.series.Stock.prototype.getLegendIconType = function(type, context)
 
 /** @inheritDoc */
 anychart.core.series.Stock.prototype.getLegendItemText = function(context) {
-  return this.name() + (isNaN(context['value']) ? '' : (': ' + anychart.utils.toNumber(context['value']).toFixed(2)));
+  var missing;
+  var result;
+  if (this.check(anychart.core.drawers.Capabilities.IS_OHLC_BASED)) {
+    missing = isNaN(context['high']) || isNaN(context['low']) || isNaN(context['open']) || isNaN(context['close']);
+    result = ': (O: ' + Number(context['open']).toFixed(2) +
+        '; H: ' + Number(context['high']).toFixed(2) +
+        '; L: ' + Number(context['low']).toFixed(2) +
+        '; C: ' + Number(context['close']).toFixed(2) + ')';
+  } else if (this.check(anychart.core.drawers.Capabilities.IS_RANGE_BASED)) {
+    missing = isNaN(context['high']) || isNaN(context['low']);
+    result = ': (H: ' + Number(context['high']).toFixed(2) +
+        '; L: ' + Number(context['low']).toFixed(2) + ')';
+  } else {
+    missing = isNaN(context['value']);
+    result = ': ' + Number(context['value']).toFixed(2);
+  }
+  return this.name() + (missing ? '' : result);
 };
 //endregion
 

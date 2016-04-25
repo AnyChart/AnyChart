@@ -40,6 +40,7 @@ anychart.core.drawers.RangeStepArea.prototype.flags = (
     // anychart.core.drawers.Capabilities.IS_MARKER_BASED |
     // anychart.core.drawers.Capabilities.IS_OHLC_BASED |
     // anychart.core.drawers.Capabilities.IS_LINE_BASED |
+    anychart.core.drawers.Capabilities.IS_RANGE_BASED |
     0);
 
 

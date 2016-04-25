@@ -57,15 +57,15 @@ anychart.onDocumentReady(function() {
 
   // helper function to setup label settings for all series
   var setupSeriesLabels = function(series, name) {
-    //var seriesLabels = series.labels();
-    //series.hoverLabels().enabled(false);
-    //seriesLabels.enabled(true);
-    //seriesLabels.position('top');
-    //seriesLabels.textFormatter(function(){
-    //  return '$' + this.value.toLocaleString();
-    //});
-    //seriesLabels.anchor('bottom');
-    //series.markers(true);
+    var seriesLabels = series.labels();
+    series.hoverLabels().enabled(false);
+    seriesLabels.enabled(true);
+    seriesLabels.position('top');
+    seriesLabels.textFormatter(function(){
+     return '$' + this.value.toLocaleString();
+    });
+    seriesLabels.anchor('bottom');
+    series.markers(true);
     //series.hatchFill(true);
     series.name(name);
     series.tooltip().titleFormatter(function () {
@@ -136,11 +136,11 @@ anychart.onDocumentReady(function() {
   secondMarker.value(40);
 
 
-  chart.xScroller(true);
+  //chart.xScroller(true);
   //chart.zAspect(10);
   chart.zAspect('50%');
   //chart.zPadding(10);
-  //chart.zDistribution(false);
+  chart.zDistribution(true);
   //chart.zDepth(100);
 
   chart.container('container').draw();

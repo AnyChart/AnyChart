@@ -85,7 +85,7 @@ anychart.animations.MapZoomAnimation.prototype.onFinish = function() {
   var currZoom = this.coords[0];
 
   var tx = this.map.getMapLayer().getSelfTransformation();
-  if (!this.map.unlimitedZoom && currZoom <= anychart.charts.Map.ZOOM_MIN_FACTOR && !tx.isIdentity()) {
+  if (!this.map.unlimitedZoom && currZoom <= anychart.charts.Map.ZOOM_MIN_FACTOR && !tx.isIdentity() || this.map.zoomDest == anychart.charts.Map.ZOOM_MIN_FACTOR) {
     var minZoom = anychart.charts.Map.ZOOM_MIN_FACTOR;
     this.map.getMapLayer().setTransformationMatrix(minZoom, 0, 0, minZoom, 0, 0);
 
