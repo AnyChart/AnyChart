@@ -1,20 +1,18 @@
 goog.provide('anychart.core.stock.Controller');
 goog.require('anychart.core.Base');
+goog.require('anychart.core.stock.Grouping');
 goog.require('anychart.core.stock.Registry');
-goog.require('anychart.core.utils.DateTimeIntervalGenerator');
-goog.require('anychart.core.utils.DateTimeIntervalsList');
 goog.require('anychart.data.TableSelectable');
 
 
 
 /**
  * Controller class.
- * @param {!Array.<!anychart.core.utils.DateTimeIntervalGenerator>=} opt_intervals
  * @constructor
  * @implements {anychart.data.TableSelectable.IController}
  * @extends {anychart.core.Base}
  */
-anychart.core.stock.Controller = function(opt_intervals) {
+anychart.core.stock.Controller = function() {
   goog.base(this);
 
   /**
@@ -36,7 +34,7 @@ anychart.core.stock.Controller = function(opt_intervals) {
    * @type {!Object.<!anychart.data.TableSelectable>}
    * @private
    */
-  this.fullRangeSources_ = {};
+  this.scrollerSources_ = {};
 
   /**
    * Tables hash map by GUID.
@@ -46,41 +44,6 @@ anychart.core.stock.Controller = function(opt_intervals) {
   this.tables_ = {};
 
   /**
-   * Aggregation intervals manager.
-   * @type {!anychart.core.utils.DateTimeIntervalsList}
-   * @private
-   */
-  this.intervals_ = new anychart.core.utils.DateTimeIntervalsList(opt_intervals || [
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.MILLISECOND, 1),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.MILLISECOND, 5),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.MILLISECOND, 10),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.MILLISECOND, 25),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.MILLISECOND, 50),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.MILLISECOND, 100),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.MILLISECOND, 250),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.MILLISECOND, 500),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.SECOND, 1),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.SECOND, 5),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.SECOND, 10),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.SECOND, 20),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.SECOND, 30),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.MINUTE, 1),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.MINUTE, 5),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.MINUTE, 15),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.MINUTE, 30),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.HOUR, 1),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.HOUR, 2),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.HOUR, 6),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.HOUR, 12),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.DAY, 1),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.WEEK, 1),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.MONTH, 1),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.MONTH, 3),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.MONTH, 6),
-    new anychart.core.utils.DateTimeIntervalGenerator(anychart.enums.Interval.YEAR, 1)
-  ]);
-
-  /**
    * Current aggregation interval.
    * @type {anychart.core.utils.DateTimeIntervalGenerator}
    * @private
@@ -88,32 +51,11 @@ anychart.core.stock.Controller = function(opt_intervals) {
   this.currentInterval_ = null;
 
   /**
-   * Points count for full range sources.
-   * @type {number}
-   * @private
-   */
-  this.fullRangePointsCount_ = 0;
-
-  /**
-   * Current full range selection start.
-   * @type {number}
-   * @private
-   */
-  this.fullRangeStart_ = NaN;
-
-  /**
-   * Current full range selection end.
-   * @type {number}
-   * @private
-   */
-  this.fullRangeEnd_ = NaN;
-
-  /**
    * Current aggregation interval for full range sources.
    * @type {anychart.core.utils.DateTimeIntervalGenerator}
    * @private
    */
-  this.fullRangeInterval_ = null;
+  this.currentScrollerInterval_ = null;
 
   /**
    * Main registry (for non-aggregated data).
@@ -134,7 +76,7 @@ anychart.core.stock.Controller = function(opt_intervals) {
    * @type {!anychart.core.stock.Registry}
    * @private
    */
-  this.fullRangeRegistry_ = this.mainRegistry_;
+  this.currentScrollerRegistry_ = this.mainRegistry_;
 
   /**
    * Registries map by interval hash.
@@ -164,7 +106,7 @@ anychart.core.stock.Controller = function(opt_intervals) {
    * @type {!anychart.core.stock.Registry.Selection}
    * @private
    */
-  this.fullRangeSelection_ = {
+  this.currentScrollerSelection_ = {
     startKey: NaN,
     endKey: NaN,
     startIndex: NaN,
@@ -174,8 +116,22 @@ anychart.core.stock.Controller = function(opt_intervals) {
     lastIndex: NaN,
     postLastIndex: NaN
   };
+
+  /**
+   * Last pixel width considered by the controller.
+   * @type {number}
+   * @private
+   */
+  this.currentPixelWidth_ = NaN;
 };
 goog.inherits(anychart.core.stock.Controller, anychart.core.Base);
+
+
+/**
+ * Supported consistency state.
+ * @type {number}
+ */
+anychart.core.stock.Controller.prototype.SUPPORTED_CONSISTENCY_STATES = anychart.ConsistencyState.STOCK_DATA;
 
 
 /**
@@ -193,7 +149,7 @@ anychart.core.stock.Controller.prototype.SUPPORTED_SIGNALS = anychart.Signal.DAT
  */
 anychart.core.stock.Controller.prototype.registerSource = function(selectable, allowSelection) {
   var guid = goog.getUid(selectable).toFixed(0);
-  var sourcesMap = allowSelection ? this.selectableSources_ : this.fullRangeSources_;
+  var sourcesMap = allowSelection ? this.selectableSources_ : this.scrollerSources_;
   if (!(guid in this.sources_) || !(guid in sourcesMap)) {
     this.sources_[guid] = selectable;
     sourcesMap[guid] = selectable;
@@ -209,7 +165,7 @@ anychart.core.stock.Controller.prototype.registerSource = function(selectable, a
     for (var hash in this.registryMap_) {
       this.registryMap_[hash].setDirty();
     }
-    this.dispatchSignal(anychart.Signal.DATA_CHANGED);
+    this.invalidate(anychart.ConsistencyState.STOCK_DATA, anychart.Signal.DATA_CHANGED);
   }
   return this;
 };
@@ -226,7 +182,7 @@ anychart.core.stock.Controller.prototype.deregisterSource = function(selectable)
     selectable.setController(null);
     delete this.sources_[guid];
     delete this.selectableSources_[guid];
-    delete this.fullRangeSources_[guid];
+    delete this.scrollerSources_[guid];
     var newTables = {};
     for (guid in this.sources_) {
       var table = this.sources_[guid].getMapping().getTable();
@@ -247,9 +203,76 @@ anychart.core.stock.Controller.prototype.deregisterSource = function(selectable)
     for (var hash in this.registryMap_) {
       this.registryMap_[hash].setDirty();
     }
-    this.dispatchSignal(anychart.Signal.DATA_CHANGED);
+    this.invalidate(anychart.ConsistencyState.STOCK_DATA, anychart.Signal.DATA_CHANGED);
   }
   return this;
+};
+
+
+/**
+ * Refreshes current selection after data or bounds update. Returns update status:
+ *    0 - nothing changed;
+ *    1 - data selection update;
+ *    2 - scroller selection update;
+ *    3 - both updated.
+ * @param {number} newPixelWidth
+ * @return {number}
+ */
+anychart.core.stock.Controller.prototype.refreshSelection = function(newPixelWidth) {
+  this.updateMainRegistry();
+  // we check main registry change in this manner, because there can be attempts to update main registry before
+  // selection refreshing.
+  var mainRegistryUpdated = this.hasInvalidationState(anychart.ConsistencyState.STOCK_DATA);
+
+  this.currentPixelWidth_ = newPixelWidth;
+
+  var veryFirst = this.mainRegistry_.getFirstKey();
+  var veryLast = this.mainRegistry_.getLastKey();
+
+  var startKey = this.currentSelection_.startKey;
+  if (isNaN(startKey) || (this.currentSelectionSticksLeft() && !isNaN(veryFirst)))
+    startKey = veryFirst;
+  var endKey = this.currentSelection_.endKey;
+  if (isNaN(endKey) || (this.currentSelectionSticksRight() && !isNaN(veryLast)))
+    endKey = veryLast;
+
+  var result = 0;
+  if (!isNaN(startKey)) {
+    var selectionChanged = this.select_(
+        startKey,
+        endKey,
+        this.grouping_,
+        this.selectableSources_,
+        this.currentRegistry_,
+        this.currentSelection_,
+        this.currentInterval_,
+        mainRegistryUpdated);
+    if (selectionChanged) {
+      this.currentRegistry_ = selectionChanged[0];
+      this.currentInterval_ = selectionChanged[1];
+      this.currentSelection_ = selectionChanged[2];
+      result += 1;
+    }
+
+    var scrollerSelectionChanged = this.select_(
+        veryFirst,
+        veryLast,
+        this.scrollerGrouping_,
+        this.scrollerSources_,
+        this.currentScrollerRegistry_,
+        this.currentScrollerSelection_,
+        this.currentScrollerInterval_,
+        mainRegistryUpdated);
+    if (scrollerSelectionChanged) {
+      this.currentScrollerRegistry_ = scrollerSelectionChanged[0];
+      this.currentScrollerInterval_ = scrollerSelectionChanged[1];
+      this.currentScrollerSelection_ = scrollerSelectionChanged[2];
+      result += 2;
+    }
+  }
+
+  this.markConsistent(anychart.ConsistencyState.STOCK_DATA);
+  return result;
 };
 
 
@@ -257,19 +280,58 @@ anychart.core.stock.Controller.prototype.deregisterSource = function(selectable)
  * Selects a data range between two keys. Returns true, whether the new select updated anything.
  * @param {number} startKey
  * @param {number} endKey
- * @param {boolean=} opt_forceUpdate
  * @return {boolean}
  */
-anychart.core.stock.Controller.prototype.select = function(startKey, endKey, opt_forceUpdate) {
-  var res = this.ensureInit_();
-
+anychart.core.stock.Controller.prototype.select = function(startKey, endKey) {
   if (isNaN(startKey)) startKey = this.currentSelection_.startKey;
   if (isNaN(endKey)) endKey = this.currentSelection_.endKey;
+
+  // this case can be only if there is no currentSelection, no data and no valid range passed by user yet.
+  if (isNaN(startKey) || isNaN(endKey))
+    return false;
+
+  this.updateMainRegistry();
+  var result = this.select_(
+      startKey,
+      endKey,
+      this.grouping_,
+      this.selectableSources_,
+      this.currentRegistry_,
+      this.currentSelection_,
+      this.currentInterval_,
+      false);
+  if (result) {
+    this.currentRegistry_ = result[0];
+    this.currentInterval_ = result[1];
+    this.currentSelection_ = result[2];
+  }
+  return !!result;
+};
+
+
+/**
+ * Common selection method. Returns null if nothing changed or an array of [newRegistry, newInterval, newSelection].
+ * @param {number} startKey Selection start.
+ * @param {number} endKey Selection end.
+ * @param {!anychart.core.stock.Grouping} grouping Grouping settings.
+ * @param {!Object.<!anychart.data.TableSelectable>} sources Sources hash map.
+ * @param {!anychart.core.stock.Registry} currentRegistry Current registry used for the selection.
+ * @param {!anychart.core.stock.Registry.Selection} currentSelection Current selection object.
+ * @param {anychart.core.utils.IIntervalGenerator} currentInterval Current interval object.
+ * @param {boolean} mainRegistryUpdated If the main registry was updated (data changed).
+ * @return {Array}
+ * @private
+ */
+anychart.core.stock.Controller.prototype.select_ = function(startKey, endKey, grouping,
+                                                            sources, currentRegistry,
+                                                            currentSelection, currentInterval,
+                                                            mainRegistryUpdated) {
   if (startKey > endKey) {
     var tmp = startKey;
     startKey = endKey;
     endKey = tmp;
   }
+
   // todo: improve this strategy
   if (endKey - startKey < 1) {
     if (endKey > this.mainRegistry_.getFirstKey())
@@ -278,150 +340,112 @@ anychart.core.stock.Controller.prototype.select = function(startKey, endKey, opt
       endKey = startKey + 1;
   }
 
-  if (opt_forceUpdate ||
-      startKey != this.currentSelection_.startKey ||
-      endKey != this.currentSelection_.endKey ||
-      this.currentRegistry_.isDirty()) {
-    // choosing interval
-    var interval = this.intervals_.chooseInterval(endKey - startKey);
-    var keysRange = this.mainRegistry_.getLastKey() - this.mainRegistry_.getFirstKey(); // may be NaN
-    var indexesRange = this.mainRegistry_.getLastIndex() - this.mainRegistry_.getFirstIndex(); // may be NaN
-    var realInterval = interval;
-    if (keysRange / indexesRange > interval.getRange())
-      interval = null;
-
-    // choosing registry
-    if (this.currentInterval_ != realInterval) {
-      this.currentInterval_ = realInterval;
-      if (interval) {
-        var intervalHash = interval.getHash();
-        if (intervalHash in this.registryMap_) {
-          this.currentRegistry_ = this.registryMap_[intervalHash];
-        } else {
-          this.registryMap_[intervalHash] = this.currentRegistry_ = new anychart.core.stock.Registry();
-        }
-      } else {
-        this.currentRegistry_ = this.mainRegistry_;
-      }
-    }
-
-    // updating registry
-    var hash;
-    if (opt_forceUpdate || this.currentRegistry_.isDirty()) {
-      this.currentRegistry_.resetSources();
-      for (hash in this.tables_) {
-        this.currentRegistry_.addSource(this.tables_[hash].getStorage(interval));
-      }
-      this.currentRegistry_.update();
-    }
-
-    // initializing selection
-    this.currentSelection_ = this.currentRegistry_.getSelection(startKey, endKey);
-    if (this.currentRegistry_.isInSyncMode()) {
-      for (hash in this.selectableSources_)
-        this.selectableSources_[hash].selectFast(startKey, endKey, this.currentSelection_.firstIndex,
-            this.currentSelection_.lastIndex, interval);
-    } else {
-      for (hash in this.selectableSources_)
-        this.selectableSources_[hash].selectInternal(startKey, endKey, interval);
-    }
-
-    return true;
-  } else {
-    return res;
-  }
-};
-
-
-/**
- * Refreshes selection for full range sources (scroller).
- * @param {number} pointsCount
- * @return {!anychart.core.stock.Controller}
- */
-anychart.core.stock.Controller.prototype.refreshFullRangeSources = function(pointsCount) {
-  var mainUpdated = this.ensureInit_();
-  var startKey = this.mainRegistry_.getFirstKey();
-  var endKey = this.mainRegistry_.getLastKey();
-
-  if (!mainUpdated &&
-      this.fullRangeSelection_.startKey == startKey &&
-      this.fullRangeSelection_.endKey == endKey &&
-      this.fullRangePointsCount_ == pointsCount &&
-      !this.fullRangeRegistry_.isDirty()) {
-    return this;
-  }
-
-  this.fullRangePointsCount_ = pointsCount;
+  var selectionRangeChanged = startKey != currentSelection.startKey || endKey != currentSelection.endKey;
 
   // choosing interval
-  var keysRange = endKey - startKey; // may be NaN
-  var indexesRange = this.mainRegistry_.getLastIndex() - this.mainRegistry_.getFirstIndex(); // may be NaN
-  var interval = this.intervals_.chooseInterval(keysRange, pointsCount);
-  var realInterval = interval;
-  if (keysRange / indexesRange > interval.getRange())
-    interval = null;
+  var interval = grouping.chooseInterval(startKey, endKey, this.currentPixelWidth_, this.mainRegistry_);
 
   // choosing registry
-  if (this.fullRangeInterval_ != realInterval) {
-    this.fullRangeInterval_ = realInterval;
-    if (interval) {
-      var intervalHash = interval.getHash();
-      if (intervalHash in this.registryMap_) {
-        this.fullRangeRegistry_ = this.registryMap_[intervalHash];
-      } else {
-        this.registryMap_[intervalHash] = this.fullRangeRegistry_ = new anychart.core.stock.Registry();
-      }
+  var registry;
+  if (!interval) {
+    registry = this.mainRegistry_;
+  } else {
+    var intervalHash = interval.getHash();
+    if (intervalHash in this.registryMap_) {
+      registry = this.registryMap_[intervalHash];
     } else {
-      this.fullRangeRegistry_ = this.mainRegistry_;
+      this.registryMap_[intervalHash] = registry = new anychart.core.stock.Registry();
     }
   }
 
   // updating registry
-  var hash;
-  if (this.fullRangeRegistry_.isDirty()) {
-    this.fullRangeRegistry_.resetSources();
-    for (hash in this.tables_) {
-      this.fullRangeRegistry_.addSource(this.tables_[hash].getStorage(interval));
+  var registryUpdated = (registry == this.mainRegistry_) ?
+      mainRegistryUpdated :
+      this.updateRegistrySources_(registry, interval);
+
+  if (selectionRangeChanged || registry != currentRegistry || registryUpdated) {
+    // initializing selection
+    var hash;
+    var selection = registry.getSelection(startKey, endKey);
+    if (registry.isInSyncMode()) {
+      for (hash in sources)
+        sources[hash].selectFast(startKey, endKey, selection.firstIndex, selection.lastIndex, interval);
+    } else {
+      for (hash in sources)
+        sources[hash].selectInternal(startKey, endKey, interval);
     }
-    this.fullRangeRegistry_.update();
+    return [registry, interval, selection];
   }
-
-  // initializing selection
-  this.fullRangeSelection_ = this.fullRangeRegistry_.getSelection(startKey, endKey);
-  if (this.fullRangeRegistry_.isInSyncMode()) {
-    for (hash in this.fullRangeSources_)
-      this.fullRangeSources_[hash].selectFast(
-          startKey,
-          endKey,
-          this.fullRangeSelection_.firstIndex,
-          this.fullRangeSelection_.lastIndex,
-          interval);
-  } else {
-    for (hash in this.fullRangeSources_)
-      this.fullRangeSources_[hash].selectInternal(startKey, endKey, interval);
-  }
-
-  return this;
+  return null;
 };
 
 
 /**
  * Returns registry iterator if registry is not in sync mode. Internal method.
- * @param {boolean} fullRange
+ * @param {boolean} scroller
  * @param {boolean=} opt_exportingData
  * @return {anychart.core.stock.Registry.Iterator}
  */
-anychart.core.stock.Controller.prototype.getCoIterator = function(fullRange, opt_exportingData) {
-  var registry = fullRange ? this.fullRangeRegistry_ : this.currentRegistry_;
+anychart.core.stock.Controller.prototype.getCoIterator = function(scroller, opt_exportingData) {
+  var registry = scroller ? this.currentScrollerRegistry_ : this.currentRegistry_;
   if (registry.isInSyncMode())
     return null;
   var selection;
   if (opt_exportingData) {
     return registry.getIteratorFast(registry.getFirstIndex(), registry.getLastIndex());
   } else {
-    selection = fullRange ? this.fullRangeSelection_ : this.currentSelection_;
+    selection = scroller ? this.currentScrollerSelection_ : this.currentSelection_;
     return registry.getIteratorFast(selection.firstIndex, selection.lastIndex);
   }
+};
+
+
+/**
+ * Grouping settings object getter/setter.
+ * @param {(boolean|Array.<string|anychart.core.stock.Grouping.Level>|Object)=} opt_value
+ * @return {anychart.core.stock.Controller|anychart.core.stock.Grouping}
+ */
+anychart.core.stock.Controller.prototype.grouping = function(opt_value) {
+  if (!this.grouping_) {
+    this.grouping_ = new anychart.core.stock.Grouping();
+    this.grouping_.listenSignals(this.groupingInvalidated_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.grouping_.setup(opt_value);
+    return this;
+  }
+  return this.grouping_;
+};
+
+
+/**
+ * Scroller grouping settings object getter/setter.
+ * @param {(boolean|Array.<string|anychart.core.stock.Grouping.Level>|Object)=} opt_value
+ * @return {anychart.core.stock.Controller|anychart.core.stock.Grouping}
+ */
+anychart.core.stock.Controller.prototype.scrollerGrouping = function(opt_value) {
+  if (!this.scrollerGrouping_) {
+    this.scrollerGrouping_ = new anychart.core.stock.Grouping();
+    this.scrollerGrouping_.listenSignals(this.groupingInvalidated_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.scrollerGrouping_.setup(opt_value);
+    return this;
+  }
+  return this.scrollerGrouping_;
+};
+
+
+/**
+ * Grouping invalidation handler.
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.core.stock.Controller.prototype.groupingInvalidated_ = function(e) {
+  // no invalidation in this case, only dispatching
+  this.dispatchSignal(anychart.Signal.DATA_CHANGED);
 };
 
 
@@ -433,7 +457,6 @@ anychart.core.stock.Controller.prototype.getCoIterator = function(fullRange, opt
 anychart.core.stock.Controller.prototype.tableInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
     this.mainRegistry_.setDirty();
-    this.fullRangeRegistry_.setDirty();
     var i;
     for (i in this.registryMap_) {
       this.registryMap_[i].setDirty();
@@ -441,23 +464,26 @@ anychart.core.stock.Controller.prototype.tableInvalidated_ = function(e) {
     for (i in this.selectableSources_) {
       this.selectableSources_[i].invalidateSelection();
     }
-    this.dispatchSignal(anychart.Signal.DATA_CHANGED);
+    this.invalidate(anychart.ConsistencyState.STOCK_DATA, anychart.Signal.DATA_CHANGED);
   }
 };
 
 
 /**
- * Ensures that the controller has main registry up end running.
+ * Updates registry sources by sources got from all tables with passed interval.
+ * Returns true if the sources were updated.
+ * @param {!anychart.core.stock.Registry} registry
+ * @param {anychart.core.utils.IIntervalGenerator=} opt_interval
  * @return {boolean}
  * @private
  */
-anychart.core.stock.Controller.prototype.ensureInit_ = function() {
-  if (this.mainRegistry_.isDirty()) {
-    this.mainRegistry_.resetSources();
+anychart.core.stock.Controller.prototype.updateRegistrySources_ = function(registry, opt_interval) {
+  if (registry.isDirty()) {
+    registry.resetSources();
     for (var hash in this.tables_) {
-      this.mainRegistry_.addSource(this.tables_[hash].getStorage());
+      registry.addSource(this.tables_[hash].getStorage(opt_interval));
     }
-    this.mainRegistry_.update();
+    registry.update();
     return true;
   }
   return false;
@@ -465,13 +491,56 @@ anychart.core.stock.Controller.prototype.ensureInit_ = function() {
 
 
 /**
+ * Ensures that the controller has main registry up end running.
+ * @return {boolean}
+ */
+anychart.core.stock.Controller.prototype.updateMainRegistry = function() {
+  return this.updateRegistrySources_(this.mainRegistry_);
+};
+
+
+/**
+ * Returns current registry selection.
+ * @param {anychart.scales.StockScatterDateTime} scale
+ * @param {boolean} forScroller
+ */
+anychart.core.stock.Controller.prototype.updateCurrentRangeForScale = function(scale, forScroller) {
+  var selection = forScroller ? this.currentScrollerSelection_ : this.currentSelection_;
+  var veryFirst = this.mainRegistry_.getFirstKey();
+  var veryLast = this.mainRegistry_.getLastKey();
+  var unit, count;
+  var interval = forScroller ? this.currentScrollerInterval_ : this.currentInterval_;
+  if (interval) {
+    unit = interval.getUnit();
+    count = interval.getCount();
+  } else {
+    unit = anychart.enums.Interval.MILLISECOND;
+    count = 1;
+  }
+  scale.setCurrentRange(
+      goog.math.clamp(selection.startKey, veryFirst, veryLast),
+      goog.math.clamp(selection.endKey, veryFirst, veryLast),
+      // effectively equals to clamping :)
+      isNaN(selection.preFirstIndex) ? selection.firstIndex : selection.startIndex,
+      isNaN(selection.postLastIndex) ? selection.lastIndex : selection.endIndex,
+      unit, count);
+};
+
+
+//region Key to index and index to key methods
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Key to index and index to key methods
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
  * Returns key by index. Index can be fractional - the key will be inter- or extrapolated.
  * @param {number} index
  * @return {number}
  */
-anychart.core.stock.Controller.prototype.getKey = function(index) {
-  this.ensureInit_();
-  return this.currentRegistry_.getKey(index);
+anychart.core.stock.Controller.prototype.getKeyByIndex = function(index) {
+  this.updateMainRegistry();
+  return this.currentRegistry_.getKeyByIndex(index);
 };
 
 
@@ -480,9 +549,9 @@ anychart.core.stock.Controller.prototype.getKey = function(index) {
  * @param {number} key
  * @return {number}
  */
-anychart.core.stock.Controller.prototype.getIndex = function(key) {
-  this.ensureInit_();
-  return this.currentRegistry_.getIndex(key);
+anychart.core.stock.Controller.prototype.getIndexByKey = function(key) {
+  this.updateMainRegistry();
+  return this.currentRegistry_.getIndexByKey(key);
 };
 
 
@@ -491,9 +560,9 @@ anychart.core.stock.Controller.prototype.getIndex = function(key) {
  * @param {number} index
  * @return {number}
  */
-anychart.core.stock.Controller.prototype.getFullRangeKey = function(index) {
-  this.ensureInit_();
-  return this.fullRangeRegistry_.getKey(index);
+anychart.core.stock.Controller.prototype.getKeyByScrollerIndex = function(index) {
+  this.updateMainRegistry();
+  return this.currentScrollerRegistry_.getKeyByIndex(index);
 };
 
 
@@ -502,9 +571,9 @@ anychart.core.stock.Controller.prototype.getFullRangeKey = function(index) {
  * @param {number} key
  * @return {number}
  */
-anychart.core.stock.Controller.prototype.getFullRangeIndex = function(key) {
-  this.ensureInit_();
-  return this.fullRangeRegistry_.getIndex(key);
+anychart.core.stock.Controller.prototype.getScrollerIndexByKey = function(key) {
+  this.updateMainRegistry();
+  return this.currentScrollerRegistry_.getIndexByKey(key);
 };
 
 
@@ -514,8 +583,8 @@ anychart.core.stock.Controller.prototype.getFullRangeIndex = function(key) {
  * @return {number}
  */
 anychart.core.stock.Controller.prototype.getMainRegistryKey = function(index) {
-  this.ensureInit_();
-  return this.mainRegistry_.getKey(index);
+  this.updateMainRegistry();
+  return this.mainRegistry_.getKeyByIndex(index);
 };
 
 
@@ -525,18 +594,24 @@ anychart.core.stock.Controller.prototype.getMainRegistryKey = function(index) {
  * @return {number}
  */
 anychart.core.stock.Controller.prototype.getMainRegistryIndex = function(key) {
-  this.ensureInit_();
-  return this.mainRegistry_.getIndex(key);
+  this.updateMainRegistry();
+  return this.mainRegistry_.getIndexByKey(key);
 };
+//endregion
 
 
 //region Selection properties retrieval
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Selection properties retrieval
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Returns the first key in the main registry.
  * @return {number}
  */
 anychart.core.stock.Controller.prototype.getFirstKey = function() {
-  this.ensureInit_();
+  this.updateMainRegistry();
   return this.mainRegistry_.getFirstKey();
 };
 
@@ -546,7 +621,7 @@ anychart.core.stock.Controller.prototype.getFirstKey = function() {
  * @return {number}
  */
 anychart.core.stock.Controller.prototype.getLastKey = function() {
-  this.ensureInit_();
+  this.updateMainRegistry();
   return this.mainRegistry_.getLastKey();
 };
 
@@ -556,7 +631,7 @@ anychart.core.stock.Controller.prototype.getLastKey = function() {
  * @return {number}
  */
 anychart.core.stock.Controller.prototype.getFirstIndex = function() {
-  this.ensureInit_();
+  this.updateMainRegistry();
   return this.mainRegistry_.getFirstIndex();
 };
 
@@ -566,7 +641,7 @@ anychart.core.stock.Controller.prototype.getFirstIndex = function() {
  * @return {number}
  */
 anychart.core.stock.Controller.prototype.getLastIndex = function() {
-  this.ensureInit_();
+  this.updateMainRegistry();
   return this.mainRegistry_.getLastIndex();
 };
 
@@ -612,8 +687,8 @@ anychart.core.stock.Controller.prototype.getLastSelectedIndex = function() {
  * @return {number}
  */
 anychart.core.stock.Controller.prototype.getFirstVisibleKey = function() {
-  this.ensureInit_();
-  return this.currentRegistry_.getKey(this.currentSelection_.firstIndex);
+  this.updateRegistrySources_(this.currentRegistry_);
+  return this.currentRegistry_.getKeyByIndex(this.currentSelection_.firstIndex);
 };
 
 
@@ -622,8 +697,8 @@ anychart.core.stock.Controller.prototype.getFirstVisibleKey = function() {
  * @return {number}
  */
 anychart.core.stock.Controller.prototype.getLastVisibleKey = function() {
-  this.ensureInit_();
-  return this.currentRegistry_.getKey(this.currentSelection_.lastIndex);
+  this.updateRegistrySources_(this.currentRegistry_);
+  return this.currentRegistry_.getKeyByIndex(this.currentSelection_.lastIndex);
 };
 
 
@@ -651,14 +726,7 @@ anychart.core.stock.Controller.prototype.getLastVisibleIndex = function() {
  */
 anychart.core.stock.Controller.prototype.currentSelectionSticksLeft = function() {
   return isNaN(this.currentSelection_.preFirstIndex) &&
-      // we need this check to avoid expanding current range to full range when the selectRange call was done
-      // before any data was given to the chart
-      (
-          !isNaN(this.currentSelection_.firstIndex) ||
-          !isNaN(this.currentSelection_.lastIndex) ||
-          !isNaN(this.currentSelection_.preFirstIndex) ||
-          !isNaN(this.currentSelection_.postLastIndex)
-      );
+      !isNaN(this.currentSelection_.startKey);
 };
 
 
@@ -668,14 +736,7 @@ anychart.core.stock.Controller.prototype.currentSelectionSticksLeft = function()
  */
 anychart.core.stock.Controller.prototype.currentSelectionSticksRight = function() {
   return isNaN(this.currentSelection_.postLastIndex) &&
-      // we need this check to avoid expanding current range to full range when the selectRange call was done
-      // before any data was given to the chart
-      (
-          !isNaN(this.currentSelection_.firstIndex) ||
-          !isNaN(this.currentSelection_.lastIndex) ||
-          !isNaN(this.currentSelection_.preFirstIndex) ||
-          !isNaN(this.currentSelection_.postLastIndex)
-      );
+      !isNaN(this.currentSelection_.startKey);
 };
 
 
@@ -701,8 +762,8 @@ anychart.core.stock.Controller.prototype.getCurrentGroupingIntervalCount = funct
  * Returns first selected index.
  * @return {number}
  */
-anychart.core.stock.Controller.prototype.getFirstFullRangeIndex = function() {
-  return this.fullRangeSelection_.startIndex;
+anychart.core.stock.Controller.prototype.getFirstScrollerIndex = function() {
+  return this.currentScrollerSelection_.startIndex;
 };
 
 
@@ -710,8 +771,8 @@ anychart.core.stock.Controller.prototype.getFirstFullRangeIndex = function() {
  * Returns last selected index.
  * @return {number}
  */
-anychart.core.stock.Controller.prototype.getLastFullRangeIndex = function() {
-  return this.fullRangeSelection_.endIndex;
+anychart.core.stock.Controller.prototype.getLastScrollerIndex = function() {
+  return this.currentScrollerSelection_.endIndex;
 };
 
 
@@ -719,8 +780,8 @@ anychart.core.stock.Controller.prototype.getLastFullRangeIndex = function() {
  * Returns current grouping interval.
  * @return {anychart.enums.Interval}
  */
-anychart.core.stock.Controller.prototype.getFullRangeGroupingIntervalUnit = function() {
-  return this.fullRangeInterval_.getUnit();
+anychart.core.stock.Controller.prototype.getScrollerGroupingIntervalUnit = function() {
+  return this.currentScrollerInterval_.getUnit();
 };
 
 
@@ -728,17 +789,16 @@ anychart.core.stock.Controller.prototype.getFullRangeGroupingIntervalUnit = func
  * Returns current grouping interval count.
  * @return {number}
  */
-anychart.core.stock.Controller.prototype.getFullRangeGroupingIntervalCount = function() {
-  return this.fullRangeInterval_.getCount();
+anychart.core.stock.Controller.prototype.getScrollerGroupingIntervalCount = function() {
+  return this.currentScrollerInterval_.getCount();
 };
 //endregion
 
 
 /**
  * Creates and returns stock data controller.
- * @param {!Array.<!anychart.core.utils.DateTimeIntervalGenerator>=} opt_intervals
  * @return {!anychart.core.stock.Controller}
  */
-anychart.core.stock.controller = function(opt_intervals) {
-  return new anychart.core.stock.Controller(opt_intervals);
+anychart.core.stock.controller = function() {
+  return new anychart.core.stock.Controller();
 };

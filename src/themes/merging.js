@@ -1027,6 +1027,13 @@ anychart.themes.merging.mergingMap_ = [
       'ganttResource',
       'ganttProject'
     ]
+  },
+  {
+    defaultObj: 'defaultGroupingSettings',
+    targets: [
+      'stock.grouping',
+      'stock.scrollerGrouping'
+    ]
   }
 ];
 

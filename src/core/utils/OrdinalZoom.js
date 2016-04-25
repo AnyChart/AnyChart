@@ -14,13 +14,13 @@ anychart.core.utils.IZoomableChart = function() {};
  * Should make the chart reapply zoom.
  * @param {boolean} forX
  */
-anychart.core.utils.IZoomableChart.prototype.invalidateZoom;
+anychart.core.utils.IZoomableChart.prototype.invalidateZoom = function(forX) {};
 
 
 /**
  * Should ensure that scales are ready for zooming.
  */
-anychart.core.utils.IZoomableChart.prototype.ensureScalesReadyForZoom;
+anychart.core.utils.IZoomableChart.prototype.ensureScalesReadyForZoom = function() {};
 
 
 /**
@@ -28,7 +28,7 @@ anychart.core.utils.IZoomableChart.prototype.ensureScalesReadyForZoom;
  * @param {boolean} forX
  * @return {anychart.scales.Base}
  */
-anychart.core.utils.IZoomableChart.prototype.getDefaultScale;
+anychart.core.utils.IZoomableChart.prototype.getDefaultScale = function(forX) {};
 
 
 

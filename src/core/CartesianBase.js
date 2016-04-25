@@ -414,7 +414,7 @@ anychart.core.CartesianBase.prototype.scrollerChangeHandler_ = function(e) {
   //    anychart.enums.EventType.SELECTED_RANGE_BEFORE_CHANGE,
   //    source,
   //    Math.min(first, last), Math.max(first, last))) {
-  //  this.selectRangeInternal(first, last);
+  //  this.selectRangeInternal_(first, last);
   //  this.dispatchRangeChange_(anychart.enums.EventType.SELECTED_RANGE_CHANGE, source);
   //}
 };

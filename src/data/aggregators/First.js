@@ -7,12 +7,11 @@ goog.require('anychart.utils');
 /**
  * Stores the passed first value as the value of the aggregate.
  * @param {number|string} valuesColumn
- * @param {(number|string)=} opt_weightsColumn
  * @constructor
  * @extends {anychart.data.aggregators.Base}
  */
-anychart.data.aggregators.First = function(valuesColumn, opt_weightsColumn) {
-  goog.base(this, valuesColumn, opt_weightsColumn);
+anychart.data.aggregators.First = function(valuesColumn) {
+  goog.base(this, valuesColumn);
 };
 goog.inherits(anychart.data.aggregators.First, anychart.data.aggregators.Base);
 
@@ -24,7 +23,7 @@ anychart.data.aggregators.First.prototype.clear = function() {
 
 
 /** @inheritDoc */
-anychart.data.aggregators.First.prototype.process = function(value, weight) {
+anychart.data.aggregators.First.prototype.process = function(value) {
   if (isNaN(this.value))
     this.value = anychart.utils.toNumber(value);
 };

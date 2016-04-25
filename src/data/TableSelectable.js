@@ -182,7 +182,7 @@ anychart.data.TableSelectable.prototype.wrapRow_ = function(row, rowIndexInStora
           row,
           this.mapping_,
           !this.currentStorageIsMain_,
-          this.controller_.getIndex(row.key),
+          this.controller_.getIndexByKey(row.key),
           this.metaData_[rowIndexInStorage]
       ) :
       null;
@@ -399,14 +399,14 @@ anychart.data.TableSelectable.IController = function() {};
  * @param {boolean=} opt_exportingData
  * @return {anychart.data.TableIterator.ICoIterator}
  */
-anychart.data.TableSelectable.IController.prototype.getCoIterator;
+anychart.data.TableSelectable.IController.prototype.getCoIterator = function(fullRange, opt_exportingData) {};
 
 
 /**
  * @param {number} key
  * @return {number}
  */
-anychart.data.TableSelectable.IController.prototype.getIndex;
+anychart.data.TableSelectable.IController.prototype.getIndexByKey = function(key) {};
 
 
 

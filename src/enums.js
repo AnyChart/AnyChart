@@ -2746,30 +2746,38 @@ anychart.enums.WarningCode = {
 //  DateTimeTicks Interval
 //
 //----------------------------------------------------------------------------------------------------------------------
-///**
+// /**
 // * Returns human readable
 // * @param {anychart.enums.Interval} value
 // * @return {string}
 // */
-//anychart.enums.denormalizeInterval = function(value) {
-//  switch (value) {
-//    case anychart.enums.Interval.YEAR:
-//      return 'years';
-//    case anychart.enums.Interval.MONTH:
-//      return 'months';
-//    case anychart.enums.Interval.DAY:
-//      return 'days';
-//    case anychart.enums.Interval.HOUR:
-//      return 'hours';
-//    case anychart.enums.Interval.MINUTE:
-//      return 'minutes';
-//    case anychart.enums.Interval.SECOND:
-//      return 'seconds';
-//    case anychart.enums.Interval.MILLISECOND:
-//      return 'milliseconds';
-//  }
-//  return 'unknown';
-//};
+// anychart.enums.denormalizeInterval = function(value) {
+//   switch (value) {
+//     case anychart.enums.Interval.YEAR:
+//       return 'year';
+//     case anychart.enums.Interval.SEMESTER:
+//       return 'semester';
+//     case anychart.enums.Interval.QUARTER:
+//       return 'quarter';
+//     case anychart.enums.Interval.MONTH:
+//       return 'month';
+//     case anychart.enums.Interval.THIRD_OF_MONTH:
+//       return 'thirdOfMonth';
+//     case anychart.enums.Interval.WEEK:
+//       return 'week';
+//     case anychart.enums.Interval.DAY:
+//       return 'day';
+//     case anychart.enums.Interval.HOUR:
+//       return 'hour';
+//     case anychart.enums.Interval.MINUTE:
+//       return 'minute';
+//     case anychart.enums.Interval.SECOND:
+//       return 'second';
+//     case anychart.enums.Interval.MILLISECOND:
+//       return 'millisecond';
+//   }
+//   return 'unknown';
+// };
 
 
 /**
@@ -3248,6 +3256,34 @@ anychart.enums.normalizeAggregationType = function(value) {
 };
 
 
+// /**
+//  * X determining mode.
+//  * @enum {string}
+//  */
+// anychart.enums.XGroupingMode = {
+//   FIRST: 'first',
+//   LAST: 'last'
+// };
+//
+//
+// /**
+//  * Normalizes X grouping mode.
+//  * @param {*} value
+//  * @return {anychart.enums.XGroupingMode|Function}
+//  */
+// anychart.enums.normalizeXGroupingMode = function(value) {
+//   var res;
+//   if (goog.isFunction(value)) {
+//     res = value;
+//   } else {
+//     res = String(value).toLowerCase();
+//     if (res != 'last')
+//       res = anychart.enums.XGroupingMode.FIRST;
+//   }
+//   return /** @type {anychart.enums.XGroupingMode|Function} */(res);
+// };
+
+
 /**
  * Enum for data table search modes.
  * @enum {string}
@@ -3577,6 +3613,10 @@ anychart.enums.PropertyHandlerType = {
 };
 //endregion
 
+
+// DVF-1826
+// goog.exportSymbol('anychart.enums.XGroupingMode.FIRST', anychart.enums.XGroupingMode.FIRST);
+// goog.exportSymbol('anychart.enums.XGroupingMode.LAST', anychart.enums.XGroupingMode.LAST);
 
 //exports
 goog.exportSymbol('anychart.enums.RadialGridLayout.CIRCUIT', anychart.enums.RadialGridLayout.CIRCUIT);

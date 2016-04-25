@@ -679,6 +679,42 @@ window['anychart']['themes']['defaultTheme'] = {
     'zIndex': 35
   },
 
+  'defaultGroupingSettings': {
+    'enabled': true,
+    'forced': false,
+    'levels': [
+      {'unit': 'millisecond', 'count': 1},
+      {'unit': 'millisecond', 'count': 5},
+      {'unit': 'millisecond', 'count': 10},
+      {'unit': 'millisecond', 'count': 25},
+      {'unit': 'millisecond', 'count': 50},
+      {'unit': 'millisecond', 'count': 100},
+      {'unit': 'millisecond', 'count': 250},
+      {'unit': 'millisecond', 'count': 500},
+      {'unit': 'second', 'count': 1},
+      {'unit': 'second', 'count': 5},
+      {'unit': 'second', 'count': 10},
+      {'unit': 'second', 'count': 20},
+      {'unit': 'second', 'count': 30},
+      {'unit': 'minute', 'count': 1},
+      {'unit': 'minute', 'count': 5},
+      {'unit': 'minute', 'count': 15},
+      {'unit': 'minute', 'count': 30},
+      {'unit': 'hour', 'count': 1},
+      {'unit': 'hour', 'count': 2},
+      {'unit': 'hour', 'count': 6},
+      {'unit': 'hour', 'count': 12},
+      {'unit': 'day', 'count': 1},
+      {'unit': 'week', 'count': 1},
+      {'unit': 'month', 'count': 1},
+      {'unit': 'month', 'count': 3},
+      {'unit': 'month', 'count': 6},
+      {'unit': 'year', 'count': 1}
+    ],
+    'maxVisiblePoints': 500,
+    'minPixPerPoint': NaN
+  },
+
   'chart': {
     'enabled': true,
     'padding': {'top': 10, 'right': 20, 'bottom': 5, 'left': 10},
@@ -3285,6 +3321,50 @@ window['anychart']['themes']['defaultTheme'] = {
   },
 
   'stock': {
+    'grouping': {},
+    'scrollerGrouping': {
+      'levels': [
+        {'unit': 'millisecond', 'count': 1},
+        {'unit': 'millisecond', 'count': 2},
+        {'unit': 'millisecond', 'count': 5},
+        {'unit': 'millisecond', 'count': 10},
+        {'unit': 'millisecond', 'count': 25},
+        {'unit': 'millisecond', 'count': 50},
+        {'unit': 'millisecond', 'count': 100},
+        {'unit': 'millisecond', 'count': 250},
+        {'unit': 'millisecond', 'count': 500},
+        {'unit': 'second', 'count': 1},
+        {'unit': 'second', 'count': 2},
+        {'unit': 'second', 'count': 5},
+        {'unit': 'second', 'count': 10},
+        {'unit': 'second', 'count': 20},
+        {'unit': 'second', 'count': 30},
+        {'unit': 'minute', 'count': 1},
+        {'unit': 'minute', 'count': 2},
+        {'unit': 'minute', 'count': 5},
+        {'unit': 'minute', 'count': 10},
+        {'unit': 'minute', 'count': 20},
+        {'unit': 'minute', 'count': 30},
+        {'unit': 'hour', 'count': 1},
+        {'unit': 'hour', 'count': 2},
+        {'unit': 'hour', 'count': 3},
+        {'unit': 'hour', 'count': 4},
+        {'unit': 'hour', 'count': 6},
+        {'unit': 'hour', 'count': 12},
+        {'unit': 'day', 'count': 1},
+        {'unit': 'day', 'count': 2},
+        {'unit': 'day', 'count': 4},
+        {'unit': 'week', 'count': 1},
+        {'unit': 'week', 'count': 2},
+        {'unit': 'month', 'count': 1},
+        {'unit': 'month', 'count': 2},
+        {'unit': 'month', 'count': 3},
+        {'unit': 'month', 'count': 6},
+        {'unit': 'year', 'count': 1}
+      ],
+      'maxVisiblePoints': NaN,
+      'minPixPerPoint': 1
+    },
     'defaultPlotSettings': {
       'background': {
         'enabled': false

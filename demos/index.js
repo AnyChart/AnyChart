@@ -1,49 +1,42 @@
-var chart, series;
 anychart.onDocumentReady(function() {
-  // data
-  // var data = anychart.data.set([
-  //   [Date.UTC(2010, 0, 01), 10000],
-  //   [Date.UTC(2010, 1, 01), 12000],
-  //   [Date.UTC(2010, 2, 01), 18000],
-  //   [Date.UTC(2010, 3, 01), 11000],
-  //   [Date.UTC(2010, 4, 01), 9000],
-  //   [Date.UTC(2010, 5, 01), 12000],
-  //   [Date.UTC(2010, 6, 01), 15000],
-  //   [Date.UTC(2010, 7, 01), 16000],
-  //   [Date.UTC(2010, 8, 01), 13000],
-  //   [Date.UTC(2010, 9, 01), 19000],
-  //   [Date.UTC(2010, 10, 01), 12000],
-  //   [Date.UTC(2010, 11, 01), 14000],
-  //   [Date.UTC(2010, 11, 31), 13000]
-  // ]);
+// The data that have been used for this sample can be taken from the CDN
+// http://cdn.anychart.com/csv-data/ixic-daily-short.js
 
-  var data = anychart.data.set([
-    [0, 10000],
-    [1, 12000],
-    [2, 18000]
-  ]);
+// create data table on loaded data
+  var dataTable = anychart.data.table();
+  dataTable.addData(get_ixic_daily_short_data());
 
-  var dataSet = anychart.data.set();
-  dataSet.mapAs()
+// map loaded data
+  var mapping = dataTable.mapAs({'value': 4});
+  var mapping2 = dataTable.mapAs({'value': {column: 4, type: function(values) { return values[Math.floor(values.length / 2)]; }}});
+  var mapping3 = dataTable.mapAs({'value': {column: 4, type: {
+    reset: function() { this.a = 0; },
+    considerItem: function() { this.a++; },
+    getResult: function() { return this.a;}
+  }}});
 
-  // var dataTable = anychart.data.table();
-  // dataTable.addData(get_ixic_daily_short_data());
+// create stock chart
+  chart = anychart.stock();
 
-// map loaded data for the ohlc series
-  var mapping = dataTable.mapAs();
-  mapping.addField('x', 0);
-  mapping.addField('open', 1, 'first');
-  mapping.addField('high', 2, 'max');
-  mapping.addField('low', 3, 'min');
-  mapping.addField('close', 4, 'last');
+// create first plot on the chart with line series
+  var firstPlot = chart.plot(0);
+  firstPlot.column(mapping)
+  firstPlot.line(mapping2)
+  firstPlot.line(mapping3)
+  // firstPlot.column(mapping).fill('red 0.1');
+  // firstPlot.column(mapping2).fill('green 0.1');
+  // firstPlot.column(mapping3).fill('blue 0.1');
 
-  console.log(mapping);
+// create scroller series with mapped data
+  chart.scroller().column(mapping);
 
-  // chart type
-  chart = anychart.financial(mapping);
-  // series = chart.line(data);
+// set chart selected date/time range
+  chart.selectRange('2005-01-03', '2005-05-20');
 
-  // draw
-  chart.container("container");
+// set container id for the chart
+  chart.container('container');
+
+// initiate chart drawing
   chart.draw();
 });
+    

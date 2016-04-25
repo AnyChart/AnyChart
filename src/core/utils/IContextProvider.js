@@ -13,7 +13,7 @@ anychart.core.utils.IContextProvider = function() {
 /**
  * Applies reference values.
  */
-anychart.core.utils.IContextProvider.prototype.applyReferenceValues;
+anychart.core.utils.IContextProvider.prototype.applyReferenceValues = function() {};
 
 
 /**
@@ -21,7 +21,7 @@ anychart.core.utils.IContextProvider.prototype.applyReferenceValues;
  * @param {string=} opt_key Key.
  * @return {*}
  */
-anychart.core.utils.IContextProvider.prototype.getStat;
+anychart.core.utils.IContextProvider.prototype.getStat = function(opt_key) {};
 
 
 /**
@@ -29,4 +29,4 @@ anychart.core.utils.IContextProvider.prototype.getStat;
  * @param {string} key Key.
  * @return {*}
  */
-anychart.core.utils.IContextProvider.prototype.getDataValue;
+anychart.core.utils.IContextProvider.prototype.getDataValue = function(key) {};

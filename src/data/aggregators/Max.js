@@ -7,12 +7,11 @@ goog.require('anychart.utils');
 /**
  * Stores the highest passed non-NaN value as the value of the aggregate.
  * @param {number|string} valuesColumn
- * @param {(number|string)=} opt_weightsColumn
  * @constructor
  * @extends {anychart.data.aggregators.Base}
  */
-anychart.data.aggregators.Max = function(valuesColumn, opt_weightsColumn) {
-  goog.base(this, valuesColumn, opt_weightsColumn);
+anychart.data.aggregators.Max = function(valuesColumn) {
+  goog.base(this, valuesColumn);
 };
 goog.inherits(anychart.data.aggregators.Max, anychart.data.aggregators.Base);
 
@@ -24,7 +23,7 @@ anychart.data.aggregators.Max.prototype.clear = function() {
 
 
 /** @inheritDoc */
-anychart.data.aggregators.Max.prototype.process = function(value, weight) {
+anychart.data.aggregators.Max.prototype.process = function(value) {
   value = anychart.utils.toNumber(value);
   // the second construction replaces both NaN checking and max determining
   if (!isNaN(value) && !(/** @type {number} */(this.value) >= value))

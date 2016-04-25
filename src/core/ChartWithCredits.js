@@ -149,16 +149,6 @@ anychart.core.ChartWithCredits.prototype.calculateContentAreaSpace = function(to
 };
 
 
-/** @inheritDoc */
-anychart.core.ChartWithCredits.prototype.resizeHandler = function(evt) {
-  this.suspendSignalsDispatching();
-  this.invalidate(anychart.ConsistencyState.CHART_CREDITS, anychart.Signal.NEEDS_REDRAW);
-  this.credits().invalidate(anychart.ConsistencyState.CREDITS_POSITION);
-  anychart.core.ChartWithCredits.base(this, 'resizeHandler', evt);
-  this.resumeSignalsDispatching(true);
-};
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Setup.

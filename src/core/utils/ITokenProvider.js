@@ -15,7 +15,7 @@ anychart.core.utils.ITokenProvider = function() {
  * @param {string} name Token name.
  * @return {anychart.enums.TokenType} Type of the token.
  */
-anychart.core.utils.ITokenProvider.prototype.getTokenType;
+anychart.core.utils.ITokenProvider.prototype.getTokenType = function(name) {};
 
 
 /**
@@ -23,4 +23,4 @@ anychart.core.utils.ITokenProvider.prototype.getTokenType;
  * @param {string} name Name of the token.
  * @return {*} Value of the token.
  */
-anychart.core.utils.ITokenProvider.prototype.getTokenValue;
+anychart.core.utils.ITokenProvider.prototype.getTokenValue = function(name) {};

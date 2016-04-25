@@ -404,8 +404,10 @@ anychart.data.TableStorage.prototype.selectFast = function(startKey, endKey, fir
     calcMins: calcMins,
     minDistance: minDistance
   };
-  this.selectionCache_[this.selectionCachePointer_] = selection;
-  this.selectionCachePointer_ = (this.selectionCachePointer_ + 1) % anychart.data.TableStorage.SELECTION_CACHE_SIZE;
+  if (this.storage.length) {
+    this.selectionCache_[this.selectionCachePointer_] = selection;
+    this.selectionCachePointer_ = (this.selectionCachePointer_ + 1) % anychart.data.TableStorage.SELECTION_CACHE_SIZE;
+  }
   return selection;
 };
 
@@ -653,7 +655,7 @@ anychart.data.TableAggregatedStorage.prototype.aggregateRemoves_ = function(tabl
     while (item && (!firstValid || item.key < firstValid.key)) {
       for (i = 0; i < this.numColumns_; i++) {
         var aggregator = aggregators[i];
-        aggregator.process(item.values[aggregator.valuesColumn], item.values[aggregator.weightsColumn]);
+        aggregator.process(item.values[aggregator.valuesColumn], item.values[aggregator.weightsColumn], item.values);
       }
       item = item.next;
     }
@@ -711,7 +713,7 @@ anychart.data.TableAggregatedStorage.prototype.aggregateNewColumns_ = function(t
       for (i = first; i <= last; i++) {
         var aggregator = aggregators[i];
         aggregator.process(currentInMain.values[aggregator.valuesColumn],
-            currentInMain.values[aggregator.weightsColumn]);
+            currentInMain.values[aggregator.weightsColumn], currentInMain.values);
       }
       currentInMain = currentInMain.next;
     }
@@ -760,7 +762,7 @@ anychart.data.TableAggregatedStorage.prototype.createAggregate_ = function(table
         for (i = 0; i < aggregatorsLength; i++) {
           aggregator = aggregators[i];
           aggregator.process(currentInStorage.values[aggregator.valuesColumn],
-              currentInStorage.values[aggregator.weightsColumn]);
+              currentInStorage.values[aggregator.weightsColumn], currentInStorage.values);
         }
         currentInStorage = currentInStorage.next;
       }
@@ -782,7 +784,7 @@ anychart.data.TableAggregatedStorage.prototype.createAggregate_ = function(table
       for (i = 0; i < aggregatorsLength; i++) {
         aggregator = aggregators[i];
         aggregator.process(currentInStorage.values[aggregator.valuesColumn],
-            currentInStorage.values[aggregator.weightsColumn]);
+            currentInStorage.values[aggregator.weightsColumn], currentInStorage.values);
       }
       row = new Array(aggregatorsLength);
       for (i = 0; i < aggregatorsLength; i++) {

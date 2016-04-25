@@ -31,7 +31,7 @@ anychart.core.ui.table.IProxyUser = function() {
  * @param {(anychart.Signal|number)=} opt_signal Signal to raise on table if value changed. Defaults to NEEDS_REDRAW.
  * @return {!(anychart.core.ui.table.IProxyUser|Object|string|number|boolean)} A copy of settings or the Text for chaining.
  */
-anychart.core.ui.table.IProxyUser.prototype.settings;
+anychart.core.ui.table.IProxyUser.prototype.settings = function(opt_name, opt_value, opt_state, opt_signal) {};
 
 
 

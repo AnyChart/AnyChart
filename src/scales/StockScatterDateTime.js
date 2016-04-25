@@ -1,5 +1,6 @@
 goog.provide('anychart.scales.StockScatterDateTime');
 goog.require('anychart.core.Base');
+goog.require('anychart.core.stock.IKeyIndexTransformer');
 goog.require('anychart.enums');
 goog.require('anychart.scales.IXScale');
 goog.require('anychart.scales.StockScatterTicksIterator');
@@ -9,7 +10,7 @@ goog.require('anychart.utils');
 
 /**
  * Stock scatter datetime scale class.
- * @param {!(anychart.charts.Stock|anychart.core.stock.Scroller)} chartOrScroller
+ * @param {!anychart.core.stock.IKeyIndexTransformer} chartOrScroller
  * @constructor
  * @extends {anychart.core.Base}
  * @implements {anychart.scales.IXScale}
@@ -18,7 +19,7 @@ anychart.scales.StockScatterDateTime = function(chartOrScroller) {
   goog.base(this);
   /**
    * Chart reference. Used for key<->index transformations.
-   * @type {!(anychart.charts.Stock|anychart.core.stock.Scroller)}
+   * @type {!anychart.core.stock.IKeyIndexTransformer}
    * @protected
    */
   this.keyIndexTransformer = chartOrScroller;

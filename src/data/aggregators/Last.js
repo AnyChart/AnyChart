@@ -7,12 +7,11 @@ goog.require('anychart.utils');
 /**
  * Stores the last passed non-NaN value as the value of the aggregate.
  * @param {number|string} valuesColumn
- * @param {(number|string)=} opt_weightsColumn
  * @constructor
  * @extends {anychart.data.aggregators.Base}
  */
-anychart.data.aggregators.Last = function(valuesColumn, opt_weightsColumn) {
-  goog.base(this, valuesColumn, opt_weightsColumn);
+anychart.data.aggregators.Last = function(valuesColumn) {
+  goog.base(this, valuesColumn);
 };
 goog.inherits(anychart.data.aggregators.Last, anychart.data.aggregators.Base);
 
@@ -24,7 +23,7 @@ anychart.data.aggregators.Last.prototype.clear = function() {
 
 
 /** @inheritDoc */
-anychart.data.aggregators.Last.prototype.process = function(value, weight) {
+anychart.data.aggregators.Last.prototype.process = function(value) {
   value = anychart.utils.toNumber(value);
   if (!isNaN(value))
     this.value = value;

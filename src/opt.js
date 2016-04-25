@@ -1147,6 +1147,90 @@ anychart.opt.CLIP = 'clip';
 
 
 /**
+ * Constant replacer for "unit" string.
+ * @const {string}
+ */
+anychart.opt.UNIT = 'unit';
+
+
+/**
+ * Constant replacer for "count" string.
+ * @const {string}
+ */
+anychart.opt.COUNT = 'count';
+
+
+/**
+ * Constant replacer for "levels" string.
+ * @const {string}
+ */
+anychart.opt.LEVELS = 'levels';
+
+
+/**
+ * Constant replacer for "maxVisiblePoints" string.
+ * @const {string}
+ */
+anychart.opt.MAX_VISIBLE_POINTS = 'maxVisiblePoints';
+
+
+/**
+ * Constant replacer for "minPixPerPoint" string.
+ * @const {string}
+ */
+anychart.opt.MIN_PIX_PER_POINT = 'minPixPerPoint';
+
+
+/**
+ * Constant replacer for "xMode" string.
+ * @const {string}
+ */
+anychart.opt.X_MODE = 'xMode';
+
+
+/**
+ * Constant replacer for "forced" string.
+ * @const {string}
+ */
+anychart.opt.FORCED = 'forced';
+
+
+/**
+ * Constant replacer for "reset" string.
+ * @const {string}
+ */
+anychart.opt.RESET = 'reset';
+
+
+/**
+ * Constant replacer for "considerItem" string.
+ * @const {string}
+ */
+anychart.opt.CONSIDER_ITEM = 'considerItem';
+
+
+/**
+ * Constant replacer for "getResult" string.
+ * @const {string}
+ */
+anychart.opt.GET_RESULT = 'getResult';
+
+
+/**
+ * Constant replacer for "COLUMN" string.
+ * @const {string}
+ */
+anychart.opt.COLUMN = 'COLUMN';
+
+
+/**
+ * Constant replacer for "weights" string.
+ * @const {string}
+ */
+anychart.opt.WEIGHTS = 'weights';
+
+
+/**
  * Constant replacer for "excluded" string.
  * @const {string}
  */

@@ -7,12 +7,11 @@ goog.require('anychart.utils');
 /**
  * Counts the average between all passed non-NaN values as the value of the aggregate.
  * @param {number|string} valuesColumn
- * @param {number|string=} opt_weightsColumn
  * @constructor
  * @extends {anychart.data.aggregators.Base}
  */
-anychart.data.aggregators.Average = function(valuesColumn, opt_weightsColumn) {
-  goog.base(this, valuesColumn, opt_weightsColumn);
+anychart.data.aggregators.Average = function(valuesColumn) {
+  goog.base(this, valuesColumn);
 };
 goog.inherits(anychart.data.aggregators.Average, anychart.data.aggregators.Base);
 
@@ -30,7 +29,7 @@ anychart.data.aggregators.Average.prototype.clear = function() {
 
 
 /** @inheritDoc */
-anychart.data.aggregators.Average.prototype.process = function(value, weight) {
+anychart.data.aggregators.Average.prototype.process = function(value) {
   value = anychart.utils.toNumber(value);
   if (!isNaN(value)) {
     // Doesn't work good, when values are big, but it was the same technique in Flash Stock - nobody complained

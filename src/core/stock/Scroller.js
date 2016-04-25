@@ -3,6 +3,7 @@ goog.require('anychart.core.IChart');
 goog.require('anychart.core.IPlot');
 goog.require('anychart.core.axes.StockDateTime');
 goog.require('anychart.core.series.StockScroller');
+goog.require('anychart.core.stock.IKeyIndexTransformer');
 goog.require('anychart.core.stock.indicators');
 goog.require('anychart.core.ui.Scroller');
 goog.require('anychart.scales');
@@ -18,6 +19,7 @@ goog.require('anychart.scales.StockScatterDateTime');
  * @extends {anychart.core.ui.Scroller}
  * @implements {anychart.core.IPlot}
  * @implements {anychart.core.IChart}
+ * @implements {anychart.core.stock.IKeyIndexTransformer}
  */
 anychart.core.stock.Scroller = function(chart) {
   goog.base(this);
@@ -95,6 +97,12 @@ anychart.core.stock.Scroller.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.STOCK_SCROLLER_AXIS;
 
 
+//region Series and indicators -related methods
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Series and indicators -related methods
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Series config for the scroller.
  * @type {Object.<string, anychart.core.series.TypeConfig>}
@@ -367,60 +375,6 @@ anychart.core.stock.Scroller.prototype.defaultSeriesType = function(opt_value) {
 };
 
 
-/**
- * Default plot Y scale getter/setter.
- * @param {(anychart.enums.ScatterScaleTypes|anychart.scales.ScatterBase)=} opt_value Y Scale to set.
- * @return {!(anychart.scales.ScatterBase|anychart.core.stock.Scroller)} Default chart scale value or itself for method chaining.
- */
-anychart.core.stock.Scroller.prototype.yScale = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (goog.isString(opt_value)) {
-      this.registerDisposable(opt_value = anychart.scales.ScatterBase.fromString(opt_value, false));
-    }
-    if (!(opt_value instanceof anychart.scales.ScatterBase)) {
-      anychart.utils.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
-      return this;
-    }
-    if (this.yScale_ != opt_value) {
-      this.yScale_ = opt_value;
-      //this.chart_.redrawSeries();
-    }
-    return this;
-  } else {
-    if (!this.yScale_) {
-      this.yScale_ = new anychart.scales.Linear();
-      this.registerDisposable(this.yScale_);
-    }
-    return this.yScale_;
-  }
-};
-
-
-/**
- * X axis getter/setter.
- * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.
- * @return {!(anychart.core.axes.StockDateTime|anychart.core.stock.Scroller)}
- */
-anychart.core.stock.Scroller.prototype.xAxis = function(opt_value) {
-  if (!this.xAxis_) {
-    this.xAxis_ = new anychart.core.axes.StockDateTime(true);
-    this.xAxis_.setParentEventTarget(this);
-    this.xAxis_.enabled(false);
-    this.xAxis_.zIndex(52);
-    this.xAxis_.listenSignals(this.xAxisInvalidated_, this);
-    this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_AXIS, anychart.Signal.NEEDS_REDRAW);
-  }
-
-  if (goog.isDef(opt_value)) {
-    this.xAxis_.setup(opt_value);
-    return this;
-  } else {
-    return this.xAxis_;
-  }
-};
-
-
-//region Series-related methods
 /**
  * Creates and returns a new area series.
  * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
@@ -962,6 +916,12 @@ anychart.core.stock.Scroller.prototype.seriesInvalidated_ = function(e) {
 //endregion
 
 
+//region Infrastructure
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Infrastructure
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Returns the chart that created this scroller.
  * @return {!anychart.charts.Stock}
@@ -981,7 +941,7 @@ anychart.core.stock.Scroller.prototype.getPixelBounds = function() {
 
 
 /**
- * Internal x scale getter/setter. Managed by stock chart.
+ * INTERNAL x scale getter/setter. Managed by stock chart.
  * @param {anychart.scales.StockScatterDateTime=} opt_value
  * @return {anychart.scales.StockScatterDateTime|anychart.core.stock.Scroller}
  */
@@ -999,6 +959,102 @@ anychart.core.stock.Scroller.prototype.xScale = function(opt_value) {
 
 
 /**
+ * Sets range and invalidates what is needed to be invalidated.
+ * @param {number} start
+ * @param {number} end
+ * @return {anychart.core.stock.Scroller}
+ */
+anychart.core.stock.Scroller.prototype.setRangeByValues = function(start, end) {
+  start = this.xScale().transform(start);
+  if (isNaN(start))
+    start = 0;
+  else
+    start = goog.math.clamp(start, 0, 1);
+  end = this.xScale().transform(end);
+  if (isNaN(end))
+    end = 1;
+  else
+    end = goog.math.clamp(end, 0, 1);
+  this.setRangeInternal(start, end);
+  return this;
+};
+
+
+/** @inheritDoc */
+anychart.core.stock.Scroller.prototype.updateBoundsCache = function() {
+  goog.base(this, 'updateBoundsCache');
+  this.invalidateScaleDependend();
+};
+//endregion
+
+
+//region Public methods
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Public methods
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Default plot Y scale getter/setter.
+ * @param {(anychart.enums.ScatterScaleTypes|anychart.scales.ScatterBase)=} opt_value Y Scale to set.
+ * @return {!(anychart.scales.ScatterBase|anychart.core.stock.Scroller)} Default chart scale value or itself for method chaining.
+ */
+anychart.core.stock.Scroller.prototype.yScale = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (goog.isString(opt_value)) {
+      this.registerDisposable(opt_value = anychart.scales.ScatterBase.fromString(opt_value, false));
+    }
+    if (!(opt_value instanceof anychart.scales.ScatterBase)) {
+      anychart.utils.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
+      return this;
+    }
+    if (this.yScale_ != opt_value) {
+      this.yScale_ = opt_value;
+      //this.chart_.redrawSeries();
+    }
+    return this;
+  } else {
+    if (!this.yScale_) {
+      this.yScale_ = new anychart.scales.Linear();
+      this.registerDisposable(this.yScale_);
+    }
+    return this.yScale_;
+  }
+};
+
+
+/**
+ * X axis getter/setter.
+ * @param {(Object|boolean|null)=} opt_value Chart axis settings to set.
+ * @return {!(anychart.core.axes.StockDateTime|anychart.core.stock.Scroller)}
+ */
+anychart.core.stock.Scroller.prototype.xAxis = function(opt_value) {
+  if (!this.xAxis_) {
+    this.xAxis_ = new anychart.core.axes.StockDateTime(true);
+    this.xAxis_.setParentEventTarget(this);
+    this.xAxis_.enabled(false);
+    this.xAxis_.zIndex(52);
+    this.xAxis_.listenSignals(this.xAxisInvalidated_, this);
+    this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_AXIS, anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.xAxis_.setup(opt_value);
+    return this;
+  } else {
+    return this.xAxis_;
+  }
+};
+//endregion
+
+
+//region Invalidation handlers
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Invalidation handlers
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
  * X axis invalidation handler.
  * @param {anychart.SignalEvent} e
  * @private
@@ -1015,15 +1071,22 @@ anychart.core.stock.Scroller.prototype.invalidateScaleDependend = function() {
   for (var i = 0; i < this.series_.length; i++) {
     var series = this.series_[i];
     if (series) {
-      series.invalidate(anychart.ConsistencyState.STOCK_SERIES_POINTS);
+      series.invalidate(anychart.ConsistencyState.SERIES_POINTS);
     }
   }
   if (this.xAxis_)
     this.xAxis_.invalidate(anychart.ConsistencyState.APPEARANCE);
   this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_SERIES | anychart.ConsistencyState.STOCK_SCROLLER_AXIS);
 };
+//endregion
 
 
+//region Drawing
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Drawing
+//
+//----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.stock.Scroller.prototype.draw = function() {
   goog.base(this, 'draw');
@@ -1072,15 +1135,22 @@ anychart.core.stock.Scroller.prototype.draw = function() {
 
   return this;
 };
+//endregion
 
 
+//region IKeyIndexTransformer
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  IKeyIndexTransformer
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * Returns key by index. Index can be fractional - the key will be inter- or extrapolated.
  * @param {number} index
  * @return {number}
  */
 anychart.core.stock.Scroller.prototype.getKeyByIndex = function(index) {
-  return this.chart_.getKeyByFullRangeIndex(index);
+  return this.chart_.getKeyByScrollerIndex(index);
 };
 
 
@@ -1090,10 +1160,17 @@ anychart.core.stock.Scroller.prototype.getKeyByIndex = function(index) {
  * @return {number}
  */
 anychart.core.stock.Scroller.prototype.getIndexByKey = function(key) {
-  return this.chart_.getFullRangeIndexByKey(key);
+  return this.chart_.getScrollerIndexByKey(key);
 };
+//endregion
 
 
+//region Events
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Events
+//
+//----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.stock.Scroller.prototype.makeRangeChangeEvent = function(type, startRatio, endRatio, source) {
   return {
@@ -1105,35 +1182,15 @@ anychart.core.stock.Scroller.prototype.makeRangeChangeEvent = function(type, sta
     'source': source
   };
 };
+//endregion
 
 
-/**
- * Sets range and invalidates what is needed to be invalidated.
- * @param {number} start
- * @param {number} end
- */
-anychart.core.stock.Scroller.prototype.setRangeByValues = function(start, end) {
-  start = this.xScale().transform(start);
-  if (isNaN(start))
-    start = 0;
-  else
-    start = goog.math.clamp(start, 0, 1);
-  end = this.xScale().transform(end);
-  if (isNaN(end))
-    end = 1;
-  else
-    end = goog.math.clamp(end, 0, 1);
-  this.setRangeInternal(start, end);
-};
-
-
-/** @inheritDoc */
-anychart.core.stock.Scroller.prototype.updateBoundsCache = function() {
-  goog.base(this, 'updateBoundsCache');
-  this.invalidateScaleDependend();
-};
-
-
+//region Serialization / Deserialization / Disposing
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Serialization / Deserialization / Disposing
+//
+//----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.stock.Scroller.prototype.disposeInternal = function() {
   goog.disposeAll(this.series_);
@@ -1241,6 +1298,7 @@ anychart.core.stock.Scroller.prototype.setupByJSON = function(config) {
     }
   }
 };
+//endregion
 
 
 //exports

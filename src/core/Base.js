@@ -236,7 +236,6 @@ anychart.ConsistencyState = {
   STOCK_SCROLLER: 1 << 12,
   STOCK_DATA: 1 << 22, //13,
   STOCK_SCALES: 1 << 14,
-  STOCK_FULL_RANGE_PARAMS: 1 << 15,
   //---------------------------------- STOCK PLOT (VB) -------------------------------------------
   STOCK_PLOT_BACKGROUND: 1 << 5,
   STOCK_PLOT_SERIES: 1 << 6,
@@ -245,10 +244,6 @@ anychart.ConsistencyState = {
   STOCK_PLOT_GRIDS: 1 << 9,
   STOCK_PLOT_LEGEND: 1 << 10,
   STOCK_PLOT_PALETTE: 1 << 11,
-  //---------------------------------- STOCK SERIES (VB) -------------------------------------------
-  STOCK_SERIES_POINTS: 1 << 5,
-  STOCK_SERIES_COLOR: 1 << 6,
-  STOCK_SERIES_CLIP: 1 << 7,
   //---------------------------------- STOCK DATETIME AXIS (VB) ----------------------------------------
   STOCK_DTAXIS_BACKGROUND: 1 << 5,
   //---------------------------------- STOCK SCROLLER (SCROLLER) ----------------------------------------

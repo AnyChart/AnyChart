@@ -6,12 +6,11 @@ goog.require('anychart.data.aggregators.Base');
 /**
  * Counts the average between all passed non-NaN values as the value of the aggregate.
  * @param {number|string} valuesColumn
- * @param {(number|string)=} opt_weightsColumn
  * @constructor
  * @extends {anychart.data.aggregators.Base}
  */
-anychart.data.aggregators.List = function(valuesColumn, opt_weightsColumn) {
-  goog.base(this, valuesColumn, opt_weightsColumn);
+anychart.data.aggregators.List = function(valuesColumn) {
+  goog.base(this, valuesColumn);
 };
 goog.inherits(anychart.data.aggregators.List, anychart.data.aggregators.Base);
 
@@ -23,7 +22,7 @@ anychart.data.aggregators.List.prototype.clear = function() {
 
 
 /** @inheritDoc */
-anychart.data.aggregators.List.prototype.process = function(value, weight) {
+anychart.data.aggregators.List.prototype.process = function(value) {
   if (goog.isDef(value))
     this.value.push(value);
 };

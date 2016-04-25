@@ -248,18 +248,17 @@ anychart.data.Table.prototype.deregisterComputer = function(computer) {
  * Registers a combination of aggregation type and source column and returns a number of column, where it will be placed.
  * If this combination was already registered - returns reused column index.
  * @param {number|string} sourceColumn
- * @param {string=} opt_aggregatorType
- * @param {(number|string)=} opt_weightsColumn
+ * @param {anychart.enums.AggregationType|anychart.data.TableMapping.CustomFieldType} type
+ * @param {(number|string|*)=} opt_context
  * @return {number}
  */
-anychart.data.Table.prototype.registerField = function(sourceColumn, opt_aggregatorType, opt_weightsColumn) {
-  var type = anychart.enums.normalizeAggregationType(opt_aggregatorType);
-  var hash = anychart.data.aggregators.getHash(type, sourceColumn, opt_weightsColumn);
+anychart.data.Table.prototype.registerField = function(sourceColumn, type, opt_context) {
+  var hash = anychart.data.aggregators.getHash(type, sourceColumn, opt_context);
   var result;
   if (hash in this.columnsMap_) {
     result = this.columnsMap_[hash];
   } else {
-    var aggregator = anychart.data.aggregators.create(type, sourceColumn, opt_weightsColumn);
+    var aggregator = anychart.data.aggregators.create(type, sourceColumn, opt_context);
     this.columnsMap_[hash] = result = this.aggregators_.length;
     this.aggregators_.push(aggregator);
     this.setAggregatesDirty(anychart.data.TableAggregatedStorage.DirtyState.COLUMNS_COUNT, false);
@@ -324,8 +323,7 @@ anychart.data.Table.prototype.getStorage = function(opt_interval) {
     if (intervalHash in this.aggregates_) {
       result = this.aggregates_[intervalHash];
     } else {
-      result = new anychart.data.TableAggregatedStorage(this, opt_interval);
-      this.aggregates_[intervalHash] = result;
+      this.aggregates_[intervalHash] = result = new anychart.data.TableAggregatedStorage(this, opt_interval);
     }
   } else {
     result = this.storage_;
@@ -393,6 +391,7 @@ anychart.data.Table.prototype.getRightMostFieldByComputerIndex = function(index)
 anychart.data.Table.prototype.disposeInternal = function() {
   this.suspendSignalsDispatching();
   delete this.storage_;
+  goog.disposeAll(this.aggregators_);
   delete this.aggregators_;
   delete this.aggregates_;
   goog.disposeAll(this.computers_);
