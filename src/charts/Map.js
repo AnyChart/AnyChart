@@ -1955,7 +1955,7 @@ anychart.charts.Map.prototype.drawCredits = function(parentBounds) {
 /**
  * Calculate geo scale.
  */
-anychart.charts.Map.prototype.calculate = function() {
+anychart.charts.Map.prototype.calculateGeoScale = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_GEO_DATA)) {
 
     var geoData = this.geoData();
@@ -2218,7 +2218,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     }
   }
 
-  this.calculate();
+  this.calculateGeoScale();
 
   var mapLayer = this.getMapLayer();
 
@@ -2492,7 +2492,7 @@ anychart.charts.Map.prototype.createLegendItemsProvider = function(sourceMode, i
    */
   var data = [];
   // we need to calculate statistics
-  this.calculate();
+  this.calculateGeoScale();
 
   var series, scale, itemData;
   if (sourceMode == anychart.enums.LegendItemsSourceMode.DEFAULT) {

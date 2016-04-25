@@ -14,6 +14,8 @@ goog.require('anychart.core.utils.IContextProvider');
 anychart.core.utils.TreeMapPointContextProvider = function(chart) {
   anychart.core.utils.TreeMapPointContextProvider.base(this, 'constructor');
 
+  this.chartInternal = chart;
+
   /**
    * @type {anychart.charts.TreeMap}
    */
@@ -53,7 +55,7 @@ anychart.core.utils.TreeMapPointContextProvider.prototype.getDataValue = functio
 /** @inheritDoc */
 anychart.core.utils.TreeMapPointContextProvider.prototype.getTokenValue = function(name) {
   switch (name) {
-    case '%Name':
+    case anychart.enums.StringToken.NAME:
       return this['name'];
   }
   return anychart.core.utils.TreeMapPointContextProvider.base(this, 'getTokenValue', name);

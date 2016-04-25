@@ -22,6 +22,12 @@ anychart.core.Point = function(chart, index) {
    * @protected
    */
   this.index = anychart.utils.normalizeToNaturalNumber(index, 0, true);
+
+  /**
+   * Statistics object.
+   * @type {Object.<string, *>}
+   */
+  this.statistics = {};
 };
 
 
@@ -116,6 +122,16 @@ anychart.core.Point.prototype.exists = function() {
 };
 
 
+/**
+ * Gets statistics value by key.
+ * @param {string} key - Key.
+ * @return {*} - Statistics value.
+ */
+anychart.core.Point.prototype.getStat = function(key) {
+  return goog.isDef(this.statistics[key]) ? this.statistics[key] : this.get(key);
+};
+
+
 //exports
 anychart.core.Point.prototype['getIndex'] = anychart.core.Point.prototype.getIndex;
 anychart.core.Point.prototype['getChart'] = anychart.core.Point.prototype.getChart;
@@ -124,3 +140,4 @@ anychart.core.Point.prototype['set'] = anychart.core.Point.prototype.set;
 anychart.core.Point.prototype['hovered'] = anychart.core.Point.prototype.hovered;
 anychart.core.Point.prototype['selected'] = anychart.core.Point.prototype.selected;
 anychart.core.Point.prototype['exists'] = anychart.core.Point.prototype.exists;
+anychart.core.Point.prototype['getStat'] = anychart.core.Point.prototype.getStat;

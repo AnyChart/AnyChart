@@ -225,14 +225,6 @@ anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
   this.reversed_ = false;
 
   /**
-   * Object with information about chart.
-   * (bounds, sum of values, neckWidth/neckHeight normalized, neckY, centerX, ...).
-   * @type {Object}
-   * @private
-   */
-  this.statistics_;
-
-  /**
    * Default stroke function.
    * this {{index:number, sourceColor: acgraph.vector.Stroke}}
    * return {acgraph.vector.Stroke} Stroke for a chart point.
@@ -311,7 +303,8 @@ anychart.core.PyramidFunnelBase.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS |
-    anychart.ConsistencyState.PYRAMID_FUNNEL_MARKERS;
+    anychart.ConsistencyState.PYRAMID_FUNNEL_MARKERS |
+    anychart.ConsistencyState.PYRAMID_FUNNEL_DATA;
 
 
 /**
@@ -355,8 +348,6 @@ anychart.core.PyramidFunnelBase.prototype.data = function(opt_value, opt_csvSett
         goog.dispose(this.parentViewToDispose_);
         delete this.iterator_;
 
-        this.statistics_ = null;
-
         /**
          * @type {anychart.data.View}
          */
@@ -384,7 +375,8 @@ anychart.core.PyramidFunnelBase.prototype.data = function(opt_value, opt_csvSett
           anychart.ConsistencyState.APPEARANCE |
           anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS |
           anychart.ConsistencyState.PYRAMID_FUNNEL_MARKERS |
-          anychart.ConsistencyState.CHART_LEGEND,
+          anychart.ConsistencyState.CHART_LEGEND |
+          anychart.ConsistencyState.PYRAMID_FUNNEL_DATA,
           anychart.Signal.NEEDS_REDRAW |
           anychart.Signal.DATA_CHANGED
       );
@@ -402,16 +394,15 @@ anychart.core.PyramidFunnelBase.prototype.data = function(opt_value, opt_csvSett
  */
 anychart.core.PyramidFunnelBase.prototype.dataInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
-    this.statistics_ = null;
     this.invalidate(
         anychart.ConsistencyState.APPEARANCE |
         anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS |
         anychart.ConsistencyState.PYRAMID_FUNNEL_MARKERS |
-        anychart.ConsistencyState.CHART_LEGEND,
+        anychart.ConsistencyState.CHART_LEGEND |
+        anychart.ConsistencyState.PYRAMID_FUNNEL_DATA,
         anychart.Signal.NEEDS_REDRAW |
         anychart.Signal.DATA_CHANGED
     );
-
   }
 };
 
@@ -1042,6 +1033,8 @@ anychart.core.PyramidFunnelBase.prototype.remove = function() {
 anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
   if (this.isConsistent()) return;
 
+  this.calculate();
+
   var iterator = this.getIterator();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
@@ -1102,7 +1095,7 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
     var value;
     var isMissing;
 
-    var countMissing = iterator.getRowsCount() - anychart.utils.toNumber(this.statistics('count'));
+    var countMissing = iterator.getRowsCount() - anychart.utils.toNumber(this.statistics[anychart.enums.Statistics.COUNT]);
     var paddingPercent = anychart.math.round(this.pointsPaddingValue_ / bounds.height * 100, 2);
 
     iterator.reset();
@@ -1111,7 +1104,7 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
       isMissing = this.isMissing_(value);
       value = this.handleValue_(value);
 
-      var percent = anychart.math.round(value / anychart.utils.toNumber(this.statistics('sum')) * 100, 2);
+      var percent = anychart.math.round(value / anychart.utils.toNumber(this.statistics[anychart.enums.Statistics.SUM]) * 100, 2);
       if (isMissing) {
         percent = paddingPercent;
       }
@@ -3385,60 +3378,42 @@ anychart.core.PyramidFunnelBase.prototype.hideTooltip = function() {
 
 
 /**
- * Calculates statistic for chart.
- * @private
+ * @inheritDoc
  */
-anychart.core.PyramidFunnelBase.prototype.calculateStatistics_ = function() {
-  this.statistics_ = {};
-  var iterator = this.data().getIterator();
-  var value;
-  var missingPoints = 0;
-  var min = Number.MAX_VALUE;
-  var max = -Number.MAX_VALUE;
-  var sum = 0;
-  while (iterator.advance()) {
-    value = /** @type {number|string|null|undefined} */ (iterator.get('value'));
-    // if missing
-    if (this.isMissing_(value)) {
-      missingPoints++;
-    } else {
-      value = this.handleValue_(value);
-      min = Math.min(value, min);
-      max = Math.max(value, max);
-      sum += value;
+anychart.core.PyramidFunnelBase.prototype.calculate = function() {
+  if (this.hasInvalidationState(anychart.ConsistencyState.PYRAMID_FUNNEL_DATA)) {
+    this.statistics = {};
+
+    var iterator = this.data().getIterator();
+    var value;
+    var missingPoints = 0;
+    var min = Number.MAX_VALUE;
+    var max = -Number.MAX_VALUE;
+    var sum = 0;
+    while (iterator.advance()) {
+      value = /** @type {number|string|null|undefined} */ (iterator.get('value'));
+      // if missing
+      if (this.isMissing_(value)) {
+        missingPoints++;
+      } else {
+        value = this.handleValue_(value);
+        min = Math.min(value, min);
+        max = Math.max(value, max);
+        sum += value;
+      }
     }
-  }
 
-  var count = iterator.getRowsCount() - missingPoints; // do not count missing points
-  var avg;
-  if (count == 0) min = max = sum = avg = undefined;
-  else avg = sum / count;
-  this.statistics_['count'] = count;
-  this.statistics_['min'] = min;
-  this.statistics_['max'] = max;
-  this.statistics_['sum'] = sum;
-  this.statistics_['average'] = avg;
-};
+    var count = iterator.getRowsCount() - missingPoints; // do not count missing points
+    var avg;
+    if (count == 0) min = max = sum = avg = undefined;
+    else avg = sum / count;
+    this.statistics[anychart.enums.Statistics.COUNT] = count;
+    this.statistics[anychart.enums.Statistics.MIN] = min;
+    this.statistics[anychart.enums.Statistics.MAX] = max;
+    this.statistics[anychart.enums.Statistics.SUM] = sum;
+    this.statistics[anychart.enums.Statistics.AVERAGE] = avg;
 
-
-/**
- * Gets statistic value by its key.
- * @param {string=} opt_key
- * @param {string=} opt_value
- * @return {*} Statistic value by key, statistic object, or self in case of setter.
- */
-anychart.core.PyramidFunnelBase.prototype.statistics = function(opt_key, opt_value) {
-  if (!this.statistics_)
-    this.calculateStatistics_();
-  if (goog.isDef(opt_key)) {
-    if (goog.isDef(opt_value)) {
-      this.statistics_[opt_key] = opt_value;
-      return this;
-    } else {
-      return this.statistics_[opt_key];
-    }
-  } else {
-    return this.statistics_;
+    this.markConsistent(anychart.ConsistencyState.PYRAMID_FUNNEL_DATA);
   }
 };
 
@@ -3492,6 +3467,7 @@ anychart.core.PyramidFunnelBase.prototype.createLegendItemsProvider = function(s
     var itemText = null;
     if (goog.isFunction(itemsTextFormatter)) {
       var format = this.createFormatProvider();
+      format.pointInternal = this.getPoint(index);
       itemText = itemsTextFormatter.call(format, format);
     }
     if (!goog.isString(itemText)) {

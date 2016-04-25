@@ -1152,7 +1152,7 @@ anychart.charts.HeatMap.prototype.useUnionTooltipAsSingle = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Calculate cartesian chart properties.
+ * @inheritDoc
  */
 anychart.charts.HeatMap.prototype.calculate = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.HEATMAP_SCALES)) {

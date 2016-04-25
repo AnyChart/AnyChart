@@ -10,76 +10,44 @@ goog.require('anychart.enums');
  * @constructor
  */
 anychart.core.utils.BaseContextProvider = function() {
+  /**
+   * @type {anychart.core.Chart}
+   */
+  this.chartInternal = null;
+
+  /**
+   * @type {(anychart.core.series.Base|anychart.core.SeriesBase|anychart.core.sparkline.series.Base|anychart.core.gauge.pointers.Base)}
+   */
+  this.seriesInternal = null;
+
+  /**
+   * @type {anychart.core.Point}
+   */
+  this.pointInternal = null;
 };
 
 
 /** @inheritDoc */
 anychart.core.utils.BaseContextProvider.prototype.getTokenValue = function(name) {
+  var origName = name.substr(1);
+  var statName = origName.charAt(0).toLowerCase() + origName.slice(1);
+
+  if (this.pointInternal && goog.isDef(this.pointInternal.getStat(statName))) {
+    return this.pointInternal.getStat(statName);
+  } else if (this.seriesInternal && this.seriesInternal.getStat(statName)) {
+    return this.seriesInternal.getStat(statName);
+  } else if (this.chartInternal && this.chartInternal.getStat(statName)) {
+    return this.chartInternal.getStat(statName);
+  }
+
   switch (name) {
-    case '%YPercentOfCategory':
-    case '%XPercentOfSeries':
-    case '%XPercentOfTotal':
-    case '%BubbleSizePercentOfCategory':
-    case '%BubbleSizePercentOfSeries':
-    case '%BubbleSizePercentOfTotal':
-    case '%SeriesFirstXValue':
-    case '%SeriesFirstYValue':
-    case '%SeriesLastXValue':
-    case '%SeriesLastYValue':
-    case '%SeriesXSum':
-    case '%SeriesBubbleSizeSum':
-    case '%SeriesXMax':
-    case '%SeriesXMin':
-    case '%SeriesBubbleMaxSize':
-    case '%SeriesBubbleMinSize':
-    case '%SeriesXAverage':
-    case '%SeriesBubbleSizeAverage':
-    case '%SeriesYMedian':
-    case '%SeriesXMedian':
-    case '%SeriesBubbleSizeMedian':
-    case '%SeriesYMode':
-    case '%SeriesXMode':
-    case '%SeriesBubbleSizeMode':
-    case '%SeriesYAxisName':
-    case '%SeriesXAxisName':
-    case '%SeriesYRangeMax':
-    case '%SeriesYRangeMin':
-    case '%SeriesYRangeSum':
-    case '%CategoryYPercentOfTotal':
-    case '%CategoryYSum':
-    case '%CategoryYAverage':
-    case '%CategoryYMedian':
-    case '%CategoryYMode':
-    case '%CategoryName':
-    case '%CategoryYRangeMax':
-    case '%CategoryYRangeMin':
-    case '%CategoryYRangeSum':
-    case '%DataPlotXSum':
-    case '%DataPlotBubbleSizeSum':
-    case '%DataPlotXMax':
-    case '%DataPlotXMin':
-    case '%DataPlotBubbleMaxSize':
-    case '%DataPlotBubbleMinSize':
-    case '%DataPlotXAverage':
-    case '%DataPlotBubbleSizeAverage':
-    case '%DataPlotMaxYValuePointName':
-    case '%DataPlotMinYValuePointName':
-    case '%DataPlotMaxYValuePointSeriesName':
-    case '%DataPlotMinYValuePointSeriesName':
-    case '%DataPlotMaxYSumSeriesName':
-    case '%DataPlotMinYSumSeriesName':
-    case '%DataPlotYRangeMax':
-    case '%DataPlotYRangeMin':
-    case '%DataPlotYRangeSum':
-    case '%Icon':
-      return void 0;
-    case '%Value':
-    case '%YValue':
+    case anychart.enums.StringToken.VALUE:
+    case anychart.enums.StringToken.Y_VALUE:
       return this['value'];
-    case '%Index':
+    case anychart.enums.StringToken.INDEX:
       return this['index'];
     default:
-      return this.getDataValue(name.substr(1));
+      return this.getDataValue(origName);
   }
 };
 
@@ -87,127 +55,98 @@ anychart.core.utils.BaseContextProvider.prototype.getTokenValue = function(name)
 /** @inheritDoc */
 anychart.core.utils.BaseContextProvider.prototype.getTokenType = function(name) {
   switch (name) {
-    case '%YPercentOfCategory':
-    case '%XPercentOfSeries':
-    case '%XPercentOfTotal':
-    case '%BubbleSizePercentOfCategory':
-    case '%BubbleSizePercentOfSeries':
-    case '%BubbleSizePercentOfTotal':
-    case '%SeriesFirstXValue':
-    case '%SeriesFirstYValue':
-    case '%SeriesLastXValue':
-    case '%SeriesLastYValue':
-    case '%SeriesXSum':
-    case '%SeriesBubbleSizeSum':
-    case '%SeriesXMax':
-    case '%SeriesXMin':
-    case '%SeriesBubbleMaxSize':
-    case '%SeriesBubbleMinSize':
-    case '%SeriesXAverage':
-    case '%SeriesBubbleSizeAverage':
-    case '%SeriesYMedian':
-    case '%SeriesXMedian':
-    case '%SeriesBubbleSizeMedian':
-    case '%SeriesYMode':
-    case '%SeriesXMode':
-    case '%SeriesBubbleSizeMode':
-    case '%SeriesYAxisName':
-    case '%SeriesXAxisName':
-    case '%SeriesYRangeMax':
-    case '%SeriesYRangeMin':
-    case '%SeriesYRangeSum':
-    case '%CategoryYPercentOfTotal':
-    case '%CategoryYSum':
-    case '%CategoryYAverage':
-    case '%CategoryYMedian':
-    case '%CategoryYMode':
-    case '%CategoryName':
-    case '%CategoryYRangeMax':
-    case '%CategoryYRangeMin':
-    case '%CategoryYRangeSum':
-    case '%DataPlotXSum':
-    case '%DataPlotBubbleSizeSum':
-    case '%DataPlotXMax':
-    case '%DataPlotXMin':
-    case '%DataPlotBubbleMaxSize':
-    case '%DataPlotBubbleMinSize':
-    case '%DataPlotXAverage':
-    case '%DataPlotBubbleSizeAverage':
-    case '%DataPlotMaxYValuePointName':
-    case '%DataPlotMinYValuePointName':
-    case '%DataPlotMaxYValuePointSeriesName':
-    case '%DataPlotMinYValuePointSeriesName':
-    case '%DataPlotMaxYSumSeriesName':
-    case '%DataPlotMinYSumSeriesName':
-    case '%DataPlotYRangeMax':
-    case '%DataPlotYRangeMin':
-    case '%DataPlotYRangeSum':
-    /*case '%YAxisSum':
-    case '%YAxisBubbleSizeSum':
-    case '%YAxisMax':
-    case '%YAxisMin':
-    case '%YAxisScaleMax':
-    case '%YAxisScaleMin':
-    case '%YAxisBubbleSizeMax':
-    case '%YAxisBubbleSizeMin':
-    case '%YAxisAverage':
-    case '%YAxisMedian':
-    case '%YAxisMode':
-    case '%YAxisName':
-    case '%XAxisSum':
-    case '%XAxisBubbleSizeSum':
-    case '%XAxisMax':
-    case '%XAxisMin':
-    case '%XAxisScaleMax':
-    case '%XAxisScaleMin':
-    case '%XAxisBubbleSizeMax':
-    case '%XAxisBubbleSizeMin':
-    case '%XAxisAverage':
-    case '%XAxisMedian':
-    case '%XAxisMode':
-    case '%XAxisName':
-    case '%AxisSum':
-    case '%AxisBubbleSizeSum':
-    case '%AxisMax':
-    case '%AxisMin':
-    case '%AxisScaleMax':
-    case '%AxisScaleMin':
-    case '%AxisBubbleSizeMax':
-    case '%AxisBubbleSizeMin':
-    case '%AxisAverage':
-    case '%AxisMedian':
-    case '%AxisMode':
-    case '%AxisName':*/
-    case '%Icon':
-      return anychart.enums.TokenType.UNKNOWN;
-    case '%Value':
-    case '%YValue':
-    case '%YPercentOfSeries':
-    case '%YPercentOfTotal':
-    case '%High':
-    case '%Low':
-    case '%Open':
-    case '%Close':
-    case '%XValue':
-    case '%BubbleSize':
-    case '%Index':
-    case '%RangeStart':
-    case '%RangeEnd':
-    case '%Range':
-    case '%SeriesYSum':
-    case '%SeriesYMax':
-    case '%SeriesYMin':
-    case '%SeriesYAverage':
-    case '%SeriesPointCount':
-    case '%DataPlotYSum':
-    case '%DataPlotYMax':
-    case '%DataPlotYMin':
-    case '%DataPlotYAverage':
-    case '%DataPlotPointCount':
-    case '%DataPlotSeriesCount':
+    case anychart.enums.StringToken.BUBBLE_SIZE_PERCENT_OF_CATEGORY:
+    case anychart.enums.StringToken.BUBBLE_SIZE_PERCENT_OF_SERIES:
+    case anychart.enums.StringToken.BUBBLE_SIZE_PERCENT_OF_TOTAL:
+    case anychart.enums.StringToken.CATEGORY_Y_PERCENT_OF_TOTAL:
+    case anychart.enums.StringToken.CATEGORY_Y_RANGE_PERCENT_OF_TOTAL:
+    case anychart.enums.StringToken.Y_PERCENT_OF_CATEGORY:
+    case anychart.enums.StringToken.Y_PERCENT_OF_SERIES:
+    case anychart.enums.StringToken.Y_PERCENT_OF_TOTAL:
+    case anychart.enums.StringToken.X_PERCENT_OF_SERIES:
+    case anychart.enums.StringToken.X_PERCENT_OF_TOTAL:
+      return anychart.enums.TokenType.PERCENT;
+
+    case anychart.enums.StringToken.AXIS_SCALE_MAX:
+    case anychart.enums.StringToken.AXIS_SCALE_MIN:
+    case anychart.enums.StringToken.DATA_PLOT_Y_RANGE_MAX:
+    case anychart.enums.StringToken.DATA_PLOT_Y_RANGE_MIN:
+    case anychart.enums.StringToken.DATA_PLOT_Y_RANGE_SUM:
+    case anychart.enums.StringToken.SERIES_FIRST_X_VALUE:
+    case anychart.enums.StringToken.SERIES_FIRST_Y_VALUE:
+    case anychart.enums.StringToken.SERIES_LAST_X_VALUE:
+    case anychart.enums.StringToken.SERIES_LAST_Y_VALUE:
+    case anychart.enums.StringToken.SERIES_X_SUM:
+    case anychart.enums.StringToken.SERIES_BUBBLE_SIZE_SUM:
+    case anychart.enums.StringToken.SERIES_X_MAX:
+    case anychart.enums.StringToken.SERIES_X_MIN:
+    case anychart.enums.StringToken.SERIES_BUBBLE_MAX_SIZE:
+    case anychart.enums.StringToken.SERIES_BUBBLE_MIN_SIZE:
+    case anychart.enums.StringToken.SERIES_X_AVERAGE:
+    case anychart.enums.StringToken.SERIES_BUBBLE_SIZE_AVERAGE:
+    case anychart.enums.StringToken.SERIES_Y_MEDIAN:
+    case anychart.enums.StringToken.SERIES_X_MEDIAN:
+    case anychart.enums.StringToken.SERIES_BUBBLE_SIZE_MEDIAN:
+    case anychart.enums.StringToken.SERIES_Y_MODE:
+    case anychart.enums.StringToken.SERIES_X_MODE:
+    case anychart.enums.StringToken.SERIES_BUBBLE_SIZE_MODE:
+    case anychart.enums.StringToken.SERIES_Y_RANGE_MAX:
+    case anychart.enums.StringToken.SERIES_Y_RANGE_MIN:
+    case anychart.enums.StringToken.SERIES_Y_RANGE_SUM:
+    case anychart.enums.StringToken.CATEGORY_Y_SUM:
+    case anychart.enums.StringToken.CATEGORY_Y_AVERAGE:
+    case anychart.enums.StringToken.CATEGORY_Y_MEDIAN:
+    case anychart.enums.StringToken.CATEGORY_Y_MODE:
+    case anychart.enums.StringToken.CATEGORY_Y_RANGE_MAX:
+    case anychart.enums.StringToken.CATEGORY_Y_RANGE_MIN:
+    case anychart.enums.StringToken.CATEGORY_Y_RANGE_SUM:
+    case anychart.enums.StringToken.DATA_PLOT_X_SUM:
+    case anychart.enums.StringToken.DATA_PLOT_BUBBLE_SIZE_SUM:
+    case anychart.enums.StringToken.DATA_PLOT_X_MAX:
+    case anychart.enums.StringToken.DATA_PLOT_X_MIN:
+    case anychart.enums.StringToken.DATA_PLOT_BUBBLE_MAX_SIZE:
+    case anychart.enums.StringToken.DATA_PLOT_BUBBLE_MIN_SIZE:
+    case anychart.enums.StringToken.DATA_PLOT_X_AVERAGE:
+    case anychart.enums.StringToken.DATA_PLOT_BUBBLE_SIZE_AVERAGE:
+    case anychart.enums.StringToken.VALUE:
+    case anychart.enums.StringToken.Y_VALUE:
+    case anychart.enums.StringToken.HIGH:
+    case anychart.enums.StringToken.LOW:
+    case anychart.enums.StringToken.OPEN:
+    case anychart.enums.StringToken.CLOSE:
+    case anychart.enums.StringToken.X_VALUE:
+    case anychart.enums.StringToken.BUBBLE_SIZE:
+    case anychart.enums.StringToken.INDEX:
+    case anychart.enums.StringToken.RANGE_START:
+    case anychart.enums.StringToken.RANGE_END:
+    case anychart.enums.StringToken.RANGE:
+    case anychart.enums.StringToken.SERIES_Y_SUM:
+    case anychart.enums.StringToken.SERIES_Y_MAX:
+    case anychart.enums.StringToken.SERIES_Y_MIN:
+    case anychart.enums.StringToken.SERIES_Y_AVERAGE:
+    case anychart.enums.StringToken.SERIES_POINT_COUNT:
+    case anychart.enums.StringToken.SERIES_POINTS_COUNT:
+    case anychart.enums.StringToken.DATA_PLOT_Y_SUM:
+    case anychart.enums.StringToken.DATA_PLOT_Y_MAX:
+    case anychart.enums.StringToken.DATA_PLOT_Y_MIN:
+    case anychart.enums.StringToken.DATA_PLOT_Y_AVERAGE:
+    case anychart.enums.StringToken.DATA_PLOT_POINT_COUNT:
+    case anychart.enums.StringToken.DATA_PLOT_SERIES_COUNT:
       return anychart.enums.TokenType.NUMBER;
-    case '%Name':
-    case '%SeriesName':
+
+    case anychart.enums.StringToken.NAME:
+    case anychart.enums.StringToken.SERIES_NAME:
+    case anychart.enums.StringToken.DATA_PLOT_MAX_Y_VALUE_POINT_NAME:
+    case anychart.enums.StringToken.DATA_PLOT_MIN_Y_VALUE_POINT_NAME:
+    case anychart.enums.StringToken.DATA_PLOT_MAX_Y_VALUE_POINT_SERIES_NAME:
+    case anychart.enums.StringToken.DATA_PLOT_MIN_Y_VALUE_POINT_SERIES_NAME:
+    case anychart.enums.StringToken.DATA_PLOT_MAX_Y_SUM_SERIES_NAME:
+    case anychart.enums.StringToken.DATA_PLOT_MIN_Y_SUM_SERIES_NAME:
+    case anychart.enums.StringToken.SERIES_Y_AXIS_NAME:
+    case anychart.enums.StringToken.SERIES_X_AXIS_NAME:
+    case anychart.enums.StringToken.CATEGORY_NAME:
+    case anychart.enums.StringToken.AXIS_NAME:
+      return anychart.enums.TokenType.STRING;
     default:
       return anychart.enums.TokenType.STRING;
   }

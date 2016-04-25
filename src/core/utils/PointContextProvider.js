@@ -13,6 +13,8 @@ goog.require('anychart.core.utils.IContextProvider');
  */
 anychart.core.utils.PointContextProvider = function(chartInstance, referenceValueNames) {
   anychart.core.utils.PointContextProvider.base(this, 'constructor');
+
+  this.chartInternal = chartInstance;
   /**
    * @type {anychart.charts.Pie|anychart.core.PyramidFunnelBase|anychart.charts.Sparkline}
    */
@@ -51,7 +53,7 @@ anychart.core.utils.PointContextProvider.prototype.applyReferenceValues = functi
 
 /** @inheritDoc */
 anychart.core.utils.PointContextProvider.prototype.getStat = function(opt_key) {
-  return /** @type {{statistics:Function, getIterator:Function}} */(this['chart']).statistics(opt_key);
+  return /** @type {{statistics:Function, getIterator:Function}} */(this['chart']).getStat(opt_key);
 };
 
 
@@ -64,24 +66,9 @@ anychart.core.utils.PointContextProvider.prototype.getDataValue = function(key) 
 /** @inheritDoc */
 anychart.core.utils.PointContextProvider.prototype.getTokenValue = function(name) {
   switch (name) {
-    case '%Name':
+    case anychart.enums.StringToken.NAME:
       return this['name'];
-    case '%SeriesYSum':
-    case '%DataPlotYSum':
-      return this.getStat('sum');
-    case '%SeriesYMax':
-    case '%DataPlotYMax':
-      return this.getStat('max');
-    case '%SeriesYMin':
-    case '%DataPlotYMin':
-      return this.getStat('min');
-    case '%SeriesYAverage':
-    case '%DataPlotYAverage':
-      return this.getStat('average');
-    case '%SeriesPointCount':
-    case '%DataPlotPointCount':
-      return this.getStat('count');
-    case '%XValue':
+    case anychart.enums.StringToken.X_VALUE:
       return this['x'];
   }
   return anychart.core.utils.PointContextProvider.base(this, 'getTokenValue', name);

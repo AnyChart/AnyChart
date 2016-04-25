@@ -854,6 +854,13 @@ anychart.core.stock.Scroller.prototype.getConfigByType = function(type) {
 
 
 /**
+ * @inheritDoc
+ * TODO (A.Kudryavtsev): statistics calculations TBA.
+ */
+anychart.core.stock.Scroller.prototype.calculate = goog.nullFunction;
+
+
+/**
  * @param {string} type Series type.
  * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
  * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings

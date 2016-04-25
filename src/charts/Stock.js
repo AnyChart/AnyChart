@@ -384,6 +384,13 @@ anychart.charts.Stock.prototype.getConfigByType = function(type) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * @inheritDoc
+ * TODO (A.Kudryavtsev): statistics calculations TBA.
+ */
+anychart.charts.Stock.prototype.calculate = goog.nullFunction;
+
+
+/**
  * ALSO A DUMMY. Redeclared to show another error text.
  * @ignoreDoc
  * @param {(Object|boolean|null)=} opt_value Legend settings.

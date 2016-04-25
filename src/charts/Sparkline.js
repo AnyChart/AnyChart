@@ -84,12 +84,6 @@ anychart.charts.Sparkline = function(opt_data, opt_csvSettings) {
   this.connectMissing;
 
   /**
-   * @type {Object}
-   * @private
-   */
-  this.statistics_ = {};
-
-  /**
    * Series clip.
    * @type {boolean|anychart.math.Rect}
    * @private
@@ -795,26 +789,6 @@ anychart.charts.Sparkline.prototype.onMarkersSignal_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Series statistics.
- * @param {string=} opt_name Statistics parameter name.
- * @param {number=} opt_value Statistics parameter value.
- * @return {anychart.charts.Sparkline|Object.<number>|number}
- */
-anychart.charts.Sparkline.prototype.statistics = function(opt_name, opt_value) {
-  if (goog.isDef(opt_name)) {
-    if (goog.isDef(opt_value)) {
-      this.statistics_[opt_name] = opt_value;
-      return this;
-    } else {
-      return this.statistics_[opt_name];
-    }
-  } else {
-    return this.statistics_;
-  }
-};
-
-
-/**
  * Getter/setter for data.
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
@@ -1267,10 +1241,10 @@ anychart.charts.Sparkline.prototype.getFinalFill = function(usePointSettings) {
   } else if (index == 0 && goog.isDef(this.firstFill())) {
     //first point
     finalFill = this.firstFill();
-  } else if (val == this.statistics('max') && goog.isDef(this.maxFill())) {
+  } else if (val == this.getStat(anychart.enums.Statistics.MAX) && goog.isDef(this.maxFill())) {
     //point have max value
     finalFill = this.maxFill();
-  } else if (val == this.statistics('min') && goog.isDef(this.minFill())) {
+  } else if (val == this.getStat(anychart.enums.Statistics.MIN) && goog.isDef(this.minFill())) {
     //point have min value
     finalFill = this.minFill();
   } else if (val < 0 && goog.isDef(this.negativeFill())) {
@@ -1522,10 +1496,10 @@ anychart.charts.Sparkline.prototype.getFinalHatchFill = function(usePointSetting
   } else if (index == 0 && goog.isDef(this.firstHatchFill())) {
     //first point
     finalHatchFill = this.firstHatchFill();
-  } else if (val == this.statistics('max') && goog.isDef(this.maxHatchFill())) {
+  } else if (val == this.getStat(anychart.enums.Statistics.MAX) && goog.isDef(this.maxHatchFill())) {
     //point have max value
     finalHatchFill = this.maxHatchFill();
-  } else if (val == this.statistics('min') && goog.isDef(this.minHatchFill())) {
+  } else if (val == this.getStat(anychart.enums.Statistics.MIN) && goog.isDef(this.minHatchFill())) {
     //point have min value
     finalHatchFill = this.minHatchFill();
   } else if (val < 0 && goog.isDef(this.negativeHatchFill())) {
@@ -1779,11 +1753,11 @@ anychart.charts.Sparkline.prototype.getFinalMarker = function(usePointSettings) 
 
   var maxOrMinMarkers;
   var defaultMaxOrMinMarkers;
-  if (val == this.statistics('max')) {
+  if (val == this.getStat(anychart.enums.Statistics.MAX)) {
     //point have max value
     maxOrMinMarkers = this.maxMarkers();
     defaultMaxOrMinMarkers = this.seriesDefaults_['maxMarkers'];
-  } else if (val == this.statistics('min')) {
+  } else if (val == this.getStat(anychart.enums.Statistics.MIN)) {
     //point have min value
     maxOrMinMarkers = this.minMarkers();
     defaultMaxOrMinMarkers = this.seriesDefaults_['minMarkers'];
@@ -2026,11 +2000,11 @@ anychart.charts.Sparkline.prototype.getFinalLabel = function(usePointSettings) {
 
   var maxOrMinLabels;
   var defaultMaxOrMinLabels;
-  if (val == this.statistics('max')) {
+  if (val == this.getStat(anychart.enums.Statistics.MAX)) {
     //point have max value
     maxOrMinLabels = this.maxLabels();
     defaultMaxOrMinLabels = this.seriesDefaults_['maxLabels'];
-  } else if (val == this.statistics('min')) {
+  } else if (val == this.getStat(anychart.enums.Statistics.MIN)) {
     //point have min value
     maxOrMinLabels = this.minLabels();
     defaultMaxOrMinLabels = this.seriesDefaults_['minLabels'];
@@ -2101,7 +2075,7 @@ anychart.charts.Sparkline.prototype.labelsInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Calculate sparkline chart properties.
+ * @inheritDoc
  */
 anychart.charts.Sparkline.prototype.calculate = function() {
   /** @type {anychart.data.Iterator} */
@@ -2110,6 +2084,7 @@ anychart.charts.Sparkline.prototype.calculate = function() {
   var value;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SPARK_SCALES)) {
+    this.statistics = {};
     var x, y;
     var xScale = /** @type {anychart.scales.Base} */ (this.xScale());
     var yScale = /** @type {anychart.scales.Base} */ (this.yScale());
@@ -2156,11 +2131,11 @@ anychart.charts.Sparkline.prototype.calculate = function() {
     }
     var seriesAverage = seriesSum / seriesPointsCount;
 
-    this.statistics('max', seriesMax);
-    this.statistics('min', seriesMin);
-    this.statistics('sum', seriesSum);
-    this.statistics('average', seriesAverage);
-    this.statistics('pointsCount', seriesPointsCount);
+    this.statistics[anychart.enums.Statistics.MAX] = seriesMax;
+    this.statistics[anychart.enums.Statistics.MIN] = seriesMin;
+    this.statistics[anychart.enums.Statistics.SUM] = seriesSum;
+    this.statistics[anychart.enums.Statistics.AVERAGE] = seriesAverage;
+    this.statistics[anychart.enums.Statistics.POINTS_COUNT] = seriesPointsCount;
 
     this.markConsistent(anychart.ConsistencyState.SPARK_SCALES);
   }

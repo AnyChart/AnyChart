@@ -1204,11 +1204,11 @@ anychart.core.heatMap.series.Base.prototype.calculateStatistics = function() {
   }
   var average = sum / pointsCount;
 
-  this.statistics('max', max);
-  this.statistics('min', min);
-  this.statistics('sum', sum);
-  this.statistics('average', average);
-  this.statistics('pointsCount', pointsCount);
+  this.statistics(anychart.enums.Statistics.MAX, max);
+  this.statistics(anychart.enums.Statistics.MIN, min);
+  this.statistics(anychart.enums.Statistics.SUM, sum);
+  this.statistics(anychart.enums.Statistics.AVERAGE, average);
+  this.statistics(anychart.enums.Statistics.POINTS_COUNT, pointsCount);
 };
 
 

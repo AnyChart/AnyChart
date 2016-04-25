@@ -1352,42 +1352,44 @@ anychart.charts.Scatter.prototype.getSeriesStatus = function(event) {
 
 
 /**
- * Calculate scatter chart properties.
+ * @inheritDoc
  */
 anychart.charts.Scatter.prototype.calculate = function() {
-  /** @type {number} */
-  var i;
-  /** @type {number} */
-  var count;
-
-  /** @type {anychart.scales.ScatterBase} */
-  var scale;
-
-  /** @type {anychart.core.scatter.series.Base} */
-  var aSeries;
-  /** @type {anychart.data.Iterator} */
-  var iterator;
-
-  /** @type {number} */
-  var id;
-
-  /** @type {anychart.scales.ScatterBase} */
-  var xScale;
-
-  /** @type {anychart.scales.ScatterBase} */
-  var yScale;
-
-  /** @type {!Object.<anychart.scales.ScatterBase>} */
-  var scales = {};
-
-  /** @type {*} */
-  var x;
-  /** @type {*} */
-  var y;
-  /** @type {Array.<number, number>} */
-  var errValues;
-
   if (this.hasInvalidationState(anychart.ConsistencyState.SCATTER_SCALES)) {
+    /** @type {number} */
+    var i;
+    /** @type {number} */
+    var count;
+
+    /** @type {anychart.scales.ScatterBase} */
+    var scale;
+
+    /** @type {anychart.core.scatter.series.Base} */
+    var aSeries;
+    /** @type {anychart.data.Iterator} */
+    var iterator;
+
+    /** @type {number} */
+    var id;
+
+    /** @type {anychart.scales.ScatterBase} */
+    var xScale;
+
+    /** @type {anychart.scales.ScatterBase} */
+    var yScale;
+
+    /** @type {!Object.<anychart.scales.ScatterBase>} */
+    var scales = {};
+
+    /** @type {*} */
+    var x;
+    /** @type {*} */
+    var y;
+    /** @type {Array.<number, number>} */
+    var errValues;
+
+    this.statistics = {};
+
     anychart.core.Base.suspendSignalsDispatching(this.series_);
 
     for (i = 0, count = this.series_.length; i < count; i++) {
@@ -1463,25 +1465,134 @@ anychart.charts.Scatter.prototype.calculate = function() {
       //----------------------------------calc statistics for series
       aSeries = this.series_[i];
       aSeries.calculateStatistics();
-      max = Math.max(max, /** @type {number} */(aSeries.statistics('seriesMax')));
-      min = Math.min(min, /** @type {number} */ (aSeries.statistics('seriesMin')));
-      sum += /** @type {number} */(aSeries.statistics('seriesSum'));
-      pointsCount += /** @type {number} */(aSeries.statistics('seriesPointsCount'));
+      max = Math.max(max, /** @type {number} */(aSeries.statistics(anychart.enums.Statistics.SERIES_MAX)));
+      min = Math.min(min, /** @type {number} */ (aSeries.statistics(anychart.enums.Statistics.SERIES_MIN)));
+      sum += /** @type {number} */(aSeries.statistics(anychart.enums.Statistics.SERIES_SUM));
+      pointsCount += /** @type {number} */(aSeries.statistics(anychart.enums.Statistics.SERIES_POINTS_COUNT));
       //----------------------------------end calc statistics for series
     }
 
-    //----------------------------------calc statistics for series
     //todo (Roman Lubushikin): to avoid this loop on series we can store this info in the chart instance and provide it to all series
     var average = sum / pointsCount;
+    var ySum = 0;
+    var xSum = 0;
+    var bubbleSizeSum = 0;
+    var bubbleSizeMax = -Infinity;
+    var bubbleSizeMin = Infinity;
+    var yMax = -Infinity;
+    var yMin = Infinity;
+    var xMax = -Infinity;
+    var xMin = Infinity;
+    var maxXSum = -Infinity;
+    var minXSum = Infinity;
+    var maxYSum = -Infinity;
+    var minYSum = Infinity;
+    var maxXSeriesName, minXSeriesName;
+    var maxXSumSeriesName, minXSumSeriesName;
+    var maxYSeriesName, minYSeriesName;
+    var maxYSumSeriesName, minYSumSeriesName;
+    var isBubble = false;
+
     for (i = 0; i < this.series_.length; i++) {
       aSeries = this.series_[i];
-      aSeries.statistics('max', max);
-      aSeries.statistics('min', min);
-      aSeries.statistics('sum', sum);
-      aSeries.statistics('average', average);
-      aSeries.statistics('pointsCount', pointsCount);
+      var sName = aSeries.name();
+
+      aSeries.statistics(anychart.enums.Statistics.MAX, max);
+      aSeries.statistics(anychart.enums.Statistics.MIN, min);
+      aSeries.statistics(anychart.enums.Statistics.SUM, sum);
+      aSeries.statistics(anychart.enums.Statistics.AVERAGE, average);
+      aSeries.statistics(anychart.enums.Statistics.POINTS_COUNT, pointsCount);
+
+      if (aSeries.getType() == anychart.enums.ScatterSeriesType.BUBBLE) {
+        isBubble = true;
+        var bubSizeSum = aSeries.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_SUM);
+        if (!isNaN(bubSizeSum)) bubbleSizeSum += bubSizeSum;
+        var bubSizeMax = aSeries.statistics(anychart.enums.Statistics.SERIES_BUBBLE_MAX_SIZE);
+        if (!isNaN(bubbleSizeMax)) bubbleSizeMax = Math.max(bubbleSizeMax, bubSizeMax);
+        var bubSizeMin = aSeries.statistics(anychart.enums.Statistics.SERIES_BUBBLE_MIN_SIZE);
+        if (!isNaN(bubbleSizeMin)) bubbleSizeMin = Math.min(bubbleSizeMin, bubSizeMin);
+      }
+
+      var serXMax = /** @type {number} */(aSeries.statistics(anychart.enums.Statistics.SERIES_X_MAX));
+      if (serXMax > xMax) {
+        xMax = serXMax;
+        maxXSeriesName = sName;
+      }
+
+      var serXMin = /** @type {number} */ (aSeries.statistics(anychart.enums.Statistics.SERIES_X_MIN));
+      if (serXMin < xMin) {
+        xMin = serXMin;
+        minXSeriesName = sName;
+      }
+
+      var serXSum = /** @type {number} */(aSeries.statistics(anychart.enums.Statistics.SERIES_X_SUM));
+      if (serXSum > maxXSum) {
+        maxXSum = serXSum;
+        maxXSumSeriesName = sName;
+      }
+
+      if (serXSum < minXSum) {
+        minXSum = serXSum;
+        minXSumSeriesName = sName;
+      }
+
+      var serYMax = /** @type {number} */(aSeries.statistics(anychart.enums.Statistics.SERIES_Y_MAX));
+      if (serYMax > yMax) {
+        yMax = serYMax;
+        maxYSeriesName = sName;
+      }
+
+      var serYMin = /** @type {number} */ (aSeries.statistics(anychart.enums.Statistics.SERIES_Y_MIN));
+      if (serYMin < yMin) {
+        yMin = serYMin;
+        minYSeriesName = sName;
+      }
+
+      var serYSum = /** @type {number} */(aSeries.statistics(anychart.enums.Statistics.SERIES_Y_SUM));
+      if (serYSum > maxYSum) {
+        maxYSum = serYSum;
+        maxYSumSeriesName = sName;
+      }
+
+      if (serYSum < minYSum) {
+        minYSum = serYSum;
+        minYSumSeriesName = sName;
+      }
+
+      ySum += serYSum;
+      xSum += serXSum;
     }
-    //----------------------------------end calc statistics for series
+
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_SUM] = ySum;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_X_SUM] = xSum;
+
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_MAX] = yMax;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_MIN] = yMin;
+
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_X_MAX] = xMax;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_X_MIN] = xMin;
+
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_X_AVERAGE] = xSum / pointsCount;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_AVERAGE] = ySum / pointsCount;
+
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_SERIES_COUNT] = this.series_.length;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_POINT_COUNT] = pointsCount;
+
+    if (isBubble) {
+      this.statistics[anychart.enums.Statistics.DATA_PLOT_BUBBLE_SIZE_SUM] = bubbleSizeSum;
+      this.statistics[anychart.enums.Statistics.DATA_PLOT_BUBBLE_MIN_SIZE] = bubbleSizeMin;
+      this.statistics[anychart.enums.Statistics.DATA_PLOT_BUBBLE_MAX_SIZE] = bubbleSizeMax;
+      this.statistics[anychart.enums.Statistics.DATA_PLOT_BUBBLE_SIZE_AVERAGE] = bubbleSizeSum / pointsCount;
+    }
+
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_MAX_X_VALUE_POINT_SERIES_NAME] = maxXSeriesName;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_MIN_X_VALUE_POINT_SERIES_NAME] = minXSeriesName;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_MAX_X_SUM_SERIES_NAME] = maxXSumSeriesName;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_MIN_X_SUM_SERIES_NAME] = minXSumSeriesName;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_MAX_Y_VALUE_POINT_SERIES_NAME] = maxYSeriesName;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_MIN_Y_VALUE_POINT_SERIES_NAME] = minYSeriesName;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_MAX_Y_SUM_SERIES_NAME] = maxYSumSeriesName;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_MIN_Y_SUM_SERIES_NAME] = minYSumSeriesName;
 
     anychart.core.Base.resumeSignalsDispatchingTrue(this.series_);
 

@@ -115,6 +115,45 @@ anychart.math.pow = function(base, pow) {
 
 
 /**
+ * Calculates array's median.
+ * @param {Array.<number>} arr - Input array.
+ * @return {number} - Median value.
+ */
+anychart.math.median = function(arr) {
+  var a = goog.array.clone(arr);
+  goog.array.sort(a);
+  var half = Math.floor(a.length / 2);
+  return (a.length % 2) ? a[half] : (a[half - 1] + a[half]) / 2.0;
+};
+
+
+/**
+ * Calculates array's mode.
+ * @param {Array.<number>} arr - Input array.
+ * @return {number} - Mode value.
+ */
+anychart.math.mode = function(arr) {
+  var valuesMap = {};
+  var maxElement = arr[0];
+  var maxCount = 1;
+  for (var i = 0; i < arr.length; i++) {
+    var val = arr[i];
+    if (goog.isDef(valuesMap[val])) {
+      valuesMap[val]++;
+    } else {
+      valuesMap[val] = 1;
+    }
+
+    if (valuesMap[val] > maxCount) {
+      maxElement = val;
+      maxCount = valuesMap[val];
+    }
+  }
+  return maxElement;
+};
+
+
+/**
  * Cheking rectangles intersection. Rectangle described by an array of its vertices.
  * We consider that two rectangles do not intersect, if we find a side of any of two rectangles
  * relative to which all vertices of another rect lie towards the same direction or lie on this side.

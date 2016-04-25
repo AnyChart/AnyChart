@@ -120,6 +120,8 @@ anychart.core.utils.TokenParser.parse = function(format) {
         return anychart.format.dateTime(value, params['dateTimeFormat'], params['timeZone']);
       case anychart.enums.TokenType.NUMBER:
         return anychart.format.number(value, params);
+      case anychart.enums.TokenType.PERCENT:
+        return anychart.utils.normalizeToPercent(anychart.math.round(value * 100, 2));
     }
   }
 

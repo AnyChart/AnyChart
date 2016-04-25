@@ -133,6 +133,15 @@ anychart.core.sparkline.series.Base.prototype.getResetIterator = function() {
 
 
 /**
+ * Returns chart.
+ * @return {anychart.charts.Sparkline}
+ */
+anychart.core.sparkline.series.Base.prototype.getChart = function() {
+  return this.chart;
+};
+
+
+/**
  * Gets an array of reference 'y' fields from the row iterator point to
  * and gets pixel values. Reference fields are defined using referenceValueNames and referenceValueMeanings.
  * If there is only one field - a value is returned.

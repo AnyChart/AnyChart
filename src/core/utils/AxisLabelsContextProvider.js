@@ -54,45 +54,11 @@ goog.inherits(anychart.core.utils.AxisLabelsContextProvider, anychart.core.utils
 /** @inheritDoc */
 anychart.core.utils.AxisLabelsContextProvider.prototype.getTokenValue = function(name) {
   switch (name) {
-    case '%YAxisSum':
-    case '%YAxisBubbleSizeSum':
-    case '%YAxisMax':
-    case '%YAxisMin':
-    case '%YAxisScaleMax':
-    case '%YAxisScaleMin':
-    case '%YAxisBubbleSizeMax':
-    case '%YAxisBubbleSizeMin':
-    case '%YAxisAverage':
-    case '%YAxisMedian':
-    case '%YAxisMode':
-    case '%YAxisName':
-    case '%XAxisSum':
-    case '%XAxisBubbleSizeSum':
-    case '%XAxisMax':
-    case '%XAxisMin':
-    case '%XAxisScaleMax':
-    case '%XAxisScaleMin':
-    case '%XAxisBubbleSizeMax':
-    case '%XAxisBubbleSizeMin':
-    case '%XAxisAverage':
-    case '%XAxisMedian':
-    case '%XAxisMode':
-    case '%XAxisName':
-    case '%AxisSum':
-    case '%AxisBubbleSizeSum':
-    case '%AxisMax':
-    case '%AxisMin':
-    case '%AxisBubbleSizeMax':
-    case '%AxisBubbleSizeMin':
-    case '%AxisAverage':
-    case '%AxisMedian':
-    case '%AxisMode':
-      return undefined;
-    case '%AxisName':
+    case anychart.enums.StringToken.AXIS_NAME:
       return this['axis'].title().text();
-    case '%AxisScaleMax':
+    case anychart.enums.StringToken.AXIS_SCALE_MAX:
       return this['max'];
-    case '%AxisScaleMin':
+    case anychart.enums.StringToken.AXIS_SCALE_MIN:
       return this['min'];
   }
   return anychart.core.utils.AxisLabelsContextProvider.base(this, 'getTokenValue', name);
@@ -102,9 +68,9 @@ anychart.core.utils.AxisLabelsContextProvider.prototype.getTokenValue = function
 /** @inheritDoc */
 anychart.core.utils.AxisLabelsContextProvider.prototype.getTokenType = function(name) {
   switch (name) {
-    case '%AxisScaleMax':
-    case '%AxisScaleMin':
-    case '%Index':
+    case anychart.enums.StringToken.AXIS_SCALE_MAX:
+    case anychart.enums.StringToken.AXIS_SCALE_MIN:
+    case anychart.enums.StringToken.INDEX:
       return anychart.enums.TokenType.NUMBER;
     default:
       return anychart.enums.TokenType.STRING;

@@ -16,6 +16,11 @@ goog.require('anychart.enums');
  */
 anychart.core.utils.SeriesPointContextProvider = function(series, referenceValueNames, addErrorInfo) {
   anychart.core.utils.SeriesPointContextProvider.base(this, 'constructor');
+
+  this.seriesInternal = series;
+
+  this.chartInternal = series.getChart();
+
   /**
    * @type {(anychart.core.series.Base|anychart.core.SeriesBase|anychart.core.sparkline.series.Base|anychart.core.gauge.pointers.Base)}
    * @private
@@ -51,6 +56,10 @@ anychart.core.utils.SeriesPointContextProvider.prototype.applyReferenceValues = 
 anychart.core.utils.SeriesPointContextProvider.prototype.applyReferenceValuesInternal = function(point) {
   var value;
   this['index'] = point.getIndex();
+
+  //TODO (A.Kudryavtsev): Do we need to add point from chart (not from series)?
+  this.pointInternal = this.seriesInternal.getPoint ? this.seriesInternal.getPoint(this['index']) : null;
+
   this['x'] = point.getX(); // redundant for all series except Cartesian
   for (var i = 0; i < this.referenceValueNames.length; i++) {
     value = this.referenceValueNames[i];
@@ -111,55 +120,27 @@ anychart.core.utils.SeriesPointContextProvider.prototype.getSeriesMeta = functio
 /** @inheritDoc */
 anychart.core.utils.SeriesPointContextProvider.prototype.getTokenValue = function(name) {
   switch (name) {
-    case '%High':
+    case anychart.enums.StringToken.HIGH:
       return this['high'];
-    case '%Low':
+    case anychart.enums.StringToken.LOW:
       return this['low'];
-    case '%Open':
+    case anychart.enums.StringToken.OPEN:
       return this['open'];
-    case '%Close':
+    case anychart.enums.StringToken.CLOSE:
       return this['close'];
-    case '%BubbleSize':
+    case anychart.enums.StringToken.BUBBLE_SIZE:
       return this['size'];
-    case '%RangeStart':
+    case anychart.enums.StringToken.RANGE_START:
       return this['low'];
-    case '%RangeEnd':
+    case anychart.enums.StringToken.RANGE_END:
       return this['high'];
-    case '%Range':
+    case anychart.enums.StringToken.RANGE:
       return this['high'] - this['low'];
-    case '%SeriesName':
+    case anychart.enums.StringToken.SERIES_NAME:
       return this['seriesName'];
-    case '%SeriesYSum':
-      return this.getStat('seriesSum');
-    case '%SeriesYMax':
-      return this.getStat('seriesMax');
-    case '%SeriesYMin':
-      return this.getStat('seriesMin');
-    case '%SeriesYAverage':
-      return this.getStat('seriesAverage');
-    case '%SeriesPointCount':
-      return this.getStat('seriesPointsCount');
-    case '%DataPlotYSum':
-      return this.getStat('sum');
-    case '%DataPlotYMax':
-      return this.getStat('max');
-    case '%DataPlotYMin':
-      return this.getStat('min');
-    case '%DataPlotYAverage':
-      return this.getStat('average');
-    case '%DataPlotPointCount':
-      return this.getStat('pointsCount');
-    case '%DataPlotSeriesCount':
-      var series = /** @type {anychart.core.series.Base|anychart.core.SeriesBase} */ (this['series']);
-      var chart = /** @type {anychart.charts.Cartesian|anychart.charts.Scatter|anychart.charts.Radar|anychart.charts.Polar|anychart.charts.Map} */ (series.getChart());
-      return chart.getSeriesCount();
-    case '%YPercentOfSeries':
-      return this['value'] * 100 / /** @type {number} */ (this.getStat('seriesSum'));
-    case '%YPercentOfTotal':
-      return this['value'] * 100 / /** @type {number} */ (this.getStat('sum'));
-    case '%XValue':
+    case anychart.enums.StringToken.X_VALUE:
       return this['x'];
-    case '%Name':
+    case anychart.enums.StringToken.NAME:
       return this.getDataValue('name');
   }
   return anychart.core.utils.SeriesPointContextProvider.base(this, 'getTokenValue', name);

@@ -884,4 +884,5 @@ anychart.charts.Cartesian3d.prototype['zAspect'] = anychart.charts.Cartesian3d.p
 anychart.charts.Cartesian3d.prototype['zAngle'] = anychart.charts.Cartesian3d.prototype.zAngle;
 anychart.charts.Cartesian3d.prototype['zDistribution'] = anychart.charts.Cartesian3d.prototype.zDistribution;
 anychart.charts.Cartesian3d.prototype['zPadding'] = anychart.charts.Cartesian3d.prototype.zPadding;
+anychart.charts.Cartesian3d.prototype['getStat'] = anychart.charts.Cartesian3d.prototype.getStat;
 anychart.charts.Cartesian3d.prototype['zDepth'] = anychart.charts.Cartesian3d.prototype.zDepth; // deprecated

@@ -119,6 +119,13 @@ anychart.core.Chart = function() {
    */
   this.y3dShift = 0;
 
+
+  /**
+   * Statistics object.
+   * @type {Object}
+   */
+  this.statistics = {};
+
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
 };
@@ -419,6 +426,34 @@ anychart.core.Chart.prototype.onLabelSignal_ = function(event) {
  */
 anychart.core.Chart.prototype.createChartLabel = function() {
   return new anychart.core.ui.Label();
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Statistics.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Developers note:
+ * This method:
+ * - Calculates all required drawing data.
+ * - Considering all calculated data, fills the statistics object with calculated values.
+ * - Can be called before this.draw() method is called.
+ * - Can be called any amount of times. Must do the calculations only if something important had been changed.
+ * - This method is called EVERY TIME getStat() is called.
+ */
+anychart.core.Chart.prototype.calculate = goog.nullFunction;
+
+
+/**
+ * Gets statistics value by key.
+ * @param {string} key - Key.
+ * @return {*} - Statistics value.
+ */
+anychart.core.Chart.prototype.getStat = function(key) {
+  this.calculate();
+  return this.statistics[key];
 };
 
 
@@ -2473,4 +2508,6 @@ anychart.core.Chart.prototype['saveAsJson'] = anychart.core.Chart.prototype.save
 anychart.core.Chart.prototype['toCsv'] = anychart.core.Chart.prototype.toCsv;
 anychart.core.Chart.prototype['localToGlobal'] = anychart.core.Chart.prototype.localToGlobal;
 anychart.core.Chart.prototype['globalToLocal'] = anychart.core.Chart.prototype.globalToLocal;
+anychart.core.Chart.prototype['getStat'] = anychart.core.Chart.prototype.getStat;
 anychart.core.Chart.prototype['getSelectedPoints'] = anychart.core.Chart.prototype.getSelectedPoints;
+

@@ -79,12 +79,14 @@ anychart.ConsistencyState = {
   //---------------------------------- PYRAMID/FUNNEL STATES (CHART) ---------------------------------
   PYRAMID_FUNNEL_LABELS: 1 << 11,
   PYRAMID_FUNNEL_MARKERS: 1 << 12,
+  PYRAMID_FUNNEL_DATA: 1 << 13,
   //---------------------------------- GANTT STATES (CHART) ---------------------------------
   GANTT_DATA: 1 << 11,
   GANTT_POSITION: 1 << 12,
   GANTT_SPLITTER_POSITION: 1 << 13,
   //---------------------------------- PIE STATES (CHART) ---------------------------------
   PIE_LABELS: 1 << 11,
+  PIE_DATA: 1 << 12,
   //---------------------------------- POLAR STATES (CHART) ---------------------------------
   POLAR_PALETTE: 1 << 11,
   POLAR_MARKER_PALETTE: 1 << 12,

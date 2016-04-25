@@ -3752,7 +3752,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
 /**
  * Series statistics.
  * @param {string=} opt_name Statistics parameter name.
- * @param {number=} opt_value Statistics parameter value.
+ * @param {*=} opt_value Statistics parameter value.
  * @return {anychart.core.series.Base|Object.<number>|number}
  */
 anychart.core.series.Base.prototype.statistics = function(opt_name, opt_value) {
@@ -3774,6 +3774,17 @@ anychart.core.series.Base.prototype.statistics = function(opt_name, opt_value) {
  */
 anychart.core.series.Base.prototype.calculateStatistics = goog.nullFunction;
 //endregion
+
+
+/**
+ * Gets statistics value by key.
+ * @param {string} key - Key.
+ * @return {*} - Statistics value.
+ */
+anychart.core.series.Base.prototype.getStat = function(key) {
+  this.chart.calculate();
+  return this.statistics_[key];
+};
 
 
 //region Serialization/Deserialization/Dispose
@@ -4050,3 +4061,5 @@ anychart.core.series.Base.prototype['transformY'] = anychart.core.series.Base.pr
 
 anychart.core.series.Base.prototype['getPixelBounds'] = anychart.core.series.Base.prototype.getPixelBounds;
 anychart.core.series.Base.prototype['getPixelPointWidth'] = anychart.core.series.Base.prototype.getPixelPointWidth;
+
+anychart.core.series.Base.prototype['getStat'] = anychart.core.series.Base.prototype.getStat;

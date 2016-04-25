@@ -607,14 +607,12 @@ anychart.core.series.Cartesian.prototype.getDrawingData_ = function(data, dataPu
   anychart.performance.start('Drawing plan calc');
   var iterator = this.data().getIterator();
   var yScale = /** @type {anychart.scales.Base} */ (this.yScale());
-  var seriesMin = Infinity;
-  var seriesMax = -Infinity;
-  var seriesSum = 0;
   var pointLabelsCount = 0;
   var pointMarkersCount = 0;
   var pointOutliersCount = 0;
   var hasXErrors = false;
   var hasYErrors = false;
+
   while (iterator.advance()) {
     var xValue = xNormalizer(iterator.get(anychart.opt.X));
     if (xMissingChecker(xValue)) // we do not add missings for points that have undefined X
@@ -663,12 +661,6 @@ anychart.core.series.Cartesian.prototype.getDrawingData_ = function(data, dataPu
     meta[anychart.opt.RAW_INDEX] = iterator.getIndex();
 
     if (!missing) {
-      val = pointData[anychart.opt.VALUE];
-      seriesSum += val;
-      if (seriesMax < val)
-        seriesMax = val;
-      if (seriesMin > val)
-        seriesMin = val;
       // we count marker pointData settings
       if (this.supportsMarkers() && (
           pointData[anychart.opt.MARKER] ||
@@ -710,9 +702,7 @@ anychart.core.series.Cartesian.prototype.getDrawingData_ = function(data, dataPu
         pointOutliersCount--;
     }
   }
-  this.statistics('seriesMax', seriesMax);
-  this.statistics('seriesMin', seriesMin);
-  this.statistics('seriesSum', seriesSum);
+
   anychart.performance.end('Drawing plan calc');
   this.invalidate(anychart.ConsistencyState.SERIES_DATA);
   return this.drawingPlan = {
@@ -761,7 +751,9 @@ anychart.core.series.Cartesian.prototype.getScatterDrawingPlan = function(sorted
     };
   }
   var needsSorting = false;
-  var xNormalizer = dateTimeMode ? anychart.utils.normalizeTimestamp : function(a) { return a; };
+  var xNormalizer = dateTimeMode ? anychart.utils.normalizeTimestamp : function(a) {
+    return a;
+  };
   var xMissingChecker = isNaN;
 
   var result = this.getDrawingData_([], dataPusher, xNormalizer, xMissingChecker);
@@ -807,8 +799,12 @@ anychart.core.series.Cartesian.prototype.getOrdinalDrawingPlan = function(xHashM
       return result || null;
     };
   }
-  var xNormalizer = function(a) { return a; };
-  var xMissingChecker = function(a) { return a === undefined; };
+  var xNormalizer = function(a) {
+    return a;
+  };
+  var xMissingChecker = function(a) {
+    return a === undefined;
+  };
 
   var result = this.getDrawingData_(new Array(xArray.length), dataPusher, xNormalizer, xMissingChecker, opt_namesField);
   var data = result.data;
@@ -860,7 +856,9 @@ anychart.core.series.Cartesian.prototype.findX = function(fieldValue) {
       res = this.drawingPlan.xHashMap[anychart.utils.hash(fieldValue)];
       return isNaN(res) ? -1 : res;
     } else { // scatter case - plan.data should be sorted by X field
-      res = goog.array.binarySelect(this.drawingPlan.data, function(val) { return /** @type {number} */(fieldValue) - val.data[anychart.opt.X]; });
+      res = goog.array.binarySelect(this.drawingPlan.data, function(val) {
+        return /** @type {number} */(fieldValue) - val.data[anychart.opt.X];
+      });
       if (res < 0) {
         res = ~res;
         if (res > 0) {
@@ -897,9 +895,13 @@ anychart.core.series.Cartesian.prototype.findInRangeByX = function(minValue, max
       start = this.drawingPlan.xHashMap[anychart.utils.hash(minValue)];
       end = this.drawingPlan.xHashMap[anychart.utils.hash(maxValue)];
     } else { // scatter case - plan.data should be sorted by X field
-      start = goog.array.binarySelect(this.drawingPlan.data, function(val) { return /** @type {number} */(minValue) - val.data[anychart.opt.X]; });
+      start = goog.array.binarySelect(this.drawingPlan.data, function(val) {
+        return /** @type {number} */(minValue) - val.data[anychart.opt.X];
+      });
       if (start < 0) start = ~start;
-      end = goog.array.binarySelect(this.drawingPlan.data, function(val) { return /** @type {number} */(maxValue) - val.data[anychart.opt.X]; });
+      end = goog.array.binarySelect(this.drawingPlan.data, function(val) {
+        return /** @type {number} */(maxValue) - val.data[anychart.opt.X];
+      });
       if (end < 0) end = ~end;
     }
     if (!isNaN(start) && !isNaN(end)) {
@@ -1045,8 +1047,7 @@ anychart.core.series.Cartesian.prototype.hover = function(opt_indexOrIndexes) {
  */
 anychart.core.series.Cartesian.prototype.unhover = function(opt_indexOrIndexes) {
   if (!(this.state.hasPointState(anychart.PointState.HOVER) ||
-      this.state.isStateContains(this.state.getSeriesState(), anychart.PointState.HOVER)) ||
-      !this.enabled())
+      this.state.isStateContains(this.state.getSeriesState(), anychart.PointState.HOVER)) || !this.enabled())
     return this;
 
   var index;
@@ -1300,11 +1301,77 @@ anychart.core.series.Cartesian.prototype.makePointEvent = function(event) {
  * @return {anychart.core.SeriesPoint} Wrapped point.
  */
 anychart.core.series.Cartesian.prototype.getPoint = function(index) {
+  var point;
   if (this.isSizeBased()) {
-    return new anychart.core.BubblePoint(this, index);
+    point = new anychart.core.BubblePoint(this, index);
   } else {
-    return new anychart.core.SeriesPoint(this, index);
+    point = new anychart.core.SeriesPoint(this, index);
   }
+
+  this.chart.calculate();
+  var chartStat = (/** @type {anychart.core.CartesianBase} */ (this.chart)).statistics;
+  var isRangeSeries = this.check(anychart.core.drawers.Capabilities.IS_RANGE_BASED | anychart.core.drawers.Capabilities.IS_OHLC_BASED);
+
+  var val = /** @type {number} */ (isRangeSeries ? (/** @type {number} */ (point.get(anychart.opt.HIGH)) - /** @type {number} */ (point.get(anychart.opt.LOW))) :
+      point.get(anychart.opt.VALUE));
+
+  var size = /** @type {number} */ (point.get(anychart.opt.SIZE)); //Bubble.
+
+  if (goog.isNumber(chartStat[anychart.enums.Statistics.DATA_PLOT_X_SUM])) {
+    point.statistics[anychart.enums.Statistics.X_PERCENT_OF_TOTAL] = val / /** @type {number} */ (chartStat[anychart.enums.Statistics.DATA_PLOT_X_SUM]);
+  }
+
+  if (goog.isNumber(this.statistics(anychart.enums.Statistics.SERIES_X_SUM))) {
+    point.statistics[anychart.enums.Statistics.X_PERCENT_OF_SERIES] = val / /** @type {number} */ (this.statistics(anychart.enums.Statistics.SERIES_X_SUM));
+  }
+
+  if (goog.isNumber(this.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_SUM))) {
+    point.statistics[anychart.enums.Statistics.BUBBLE_SIZE_PERCENT_OF_SERIES] = size / /** @type {number} */ (this.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_SUM));
+    point.statistics[anychart.enums.Statistics.BUBBLE_SIZE_PERCENT_OF_TOTAL] = size / /** @type {number} */ (chartStat[anychart.enums.Statistics.DATA_PLOT_BUBBLE_SIZE_SUM]);
+    point.statistics[anychart.enums.Statistics.BUBBLE_SIZE] = size;
+  }
+
+  var sumArr = isRangeSeries ?
+      this.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_SUM_ARR_) :
+      this.statistics(anychart.enums.Statistics.CATEGORY_Y_SUM_ARR_);
+  var x = /** @type {number} */ (point.get(anychart.opt.X));
+
+  if (sumArr) {
+    point.statistics[anychart.enums.Statistics.CATEGORY_NAME] = x;
+    var catSum = sumArr[index];
+
+    if (isRangeSeries) {
+      point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_SERIES] = val / /** @type {number} */ (this.statistics(anychart.enums.Statistics.SERIES_Y_RANGE_SUM));
+      point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_TOTAL] = val / chartStat[anychart.enums.Statistics.DATA_PLOT_Y_SUM];
+      point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_CATEGORY] = val / catSum;
+      point.statistics[anychart.enums.Statistics.CATEGORY_Y_RANGE_PERCENT_OF_TOTAL] = catSum / chartStat[anychart.enums.Statistics.DATA_PLOT_Y_SUM];
+      point.statistics[anychart.enums.Statistics.CATEGORY_Y_RANGE_SUM] = catSum;
+      point.statistics[anychart.enums.Statistics.CATEGORY_Y_RANGE_MAX] = this.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MAX_ARR_)[index];
+      point.statistics[anychart.enums.Statistics.CATEGORY_Y_RANGE_MIN] = this.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MIN_ARR_)[index];
+      point.statistics[anychart.enums.Statistics.CATEGORY_Y_RANGE_AVERAGE] = this.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_AVG_ARR_)[index];
+      point.statistics[anychart.enums.Statistics.CATEGORY_Y_RANGE_MEDIAN] = this.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MEDIAN_ARR_)[index];
+      point.statistics[anychart.enums.Statistics.CATEGORY_Y_RANGE_MODE] = this.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MODE_ARR_)[index];
+    } else {
+      point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_SERIES] = val / /** @type {number} */ (this.statistics(anychart.enums.Statistics.SERIES_Y_SUM));
+      point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_TOTAL] = val / chartStat[anychart.enums.Statistics.DATA_PLOT_Y_SUM];
+      point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_CATEGORY] = val / catSum;
+      point.statistics[anychart.enums.Statistics.CATEGORY_Y_PERCENT_OF_TOTAL] = catSum / chartStat[anychart.enums.Statistics.DATA_PLOT_Y_SUM];
+      point.statistics[anychart.enums.Statistics.CATEGORY_Y_SUM] = catSum;
+      point.statistics[anychart.enums.Statistics.CATEGORY_Y_MAX] = this.statistics(anychart.enums.Statistics.CATEGORY_Y_MAX_ARR_)[index];
+      point.statistics[anychart.enums.Statistics.CATEGORY_Y_MIN] = this.statistics(anychart.enums.Statistics.CATEGORY_Y_MIN_ARR_)[index];
+      point.statistics[anychart.enums.Statistics.CATEGORY_Y_AVERAGE] = this.statistics(anychart.enums.Statistics.CATEGORY_Y_AVG_ARR_)[index];
+      point.statistics[anychart.enums.Statistics.CATEGORY_Y_MEDIAN] = this.statistics(anychart.enums.Statistics.CATEGORY_Y_MEDIAN_ARR_)[index];
+      point.statistics[anychart.enums.Statistics.CATEGORY_Y_MODE] = this.statistics(anychart.enums.Statistics.CATEGORY_Y_MODE_ARR_)[index];
+    }
+  } else {
+    point.statistics[anychart.enums.Statistics.X_PERCENT_OF_SERIES] = x / /** @type {number} */ (this.statistics(anychart.enums.Statistics.SERIES_X_SUM));
+    point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_SERIES] = val / /** @type {number} */ (this.statistics(anychart.enums.Statistics.SERIES_Y_SUM));
+    point.statistics[anychart.enums.Statistics.X_PERCENT_OF_TOTAL] = x / /** @type {number} */ (chartStat[anychart.enums.Statistics.DATA_PLOT_X_SUM]);
+    point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_TOTAL] = val / /** @type {number} */ (chartStat[anychart.enums.Statistics.DATA_PLOT_Y_SUM]);
+
+  }
+
+  return point;
 };
 //endregion
 

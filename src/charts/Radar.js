@@ -822,7 +822,7 @@ anychart.charts.Radar.prototype.seriesInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Calculate cartesian chart properties.
+ * @inheritDoc
  */
 anychart.charts.Radar.prototype.calculate = function() {
   /** @type {number} */
@@ -1008,10 +1008,10 @@ anychart.charts.Radar.prototype.calculate = function() {
       //----------------------------------calc statistics for series
       aSeries = this.series_[i];
       aSeries.calculateStatistics();
-      max = Math.max(max, /** @type {number} */(aSeries.statistics('seriesMax')));
-      min = Math.min(min, /** @type {number} */ (aSeries.statistics('seriesMin')));
-      sum += /** @type {number} */(aSeries.statistics('seriesSum'));
-      pointsCount += /** @type {number} */(aSeries.statistics('seriesPointsCount'));
+      max = Math.max(max, /** @type {number} */(aSeries.statistics(anychart.enums.Statistics.SERIES_MAX)));
+      min = Math.min(min, /** @type {number} */ (aSeries.statistics(anychart.enums.Statistics.SERIES_MIN)));
+      sum += /** @type {number} */(aSeries.statistics(anychart.enums.Statistics.SERIES_SUM));
+      pointsCount += /** @type {number} */(aSeries.statistics(anychart.enums.Statistics.SERIES_POINTS_COUNT));
       //----------------------------------end calc statistics for series
     }
 
@@ -1020,11 +1020,11 @@ anychart.charts.Radar.prototype.calculate = function() {
     var average = sum / pointsCount;
     for (i = 0; i < this.series_.length; i++) {
       aSeries = this.series_[i];
-      aSeries.statistics('max', max);
-      aSeries.statistics('min', min);
-      aSeries.statistics('sum', sum);
-      aSeries.statistics('average', average);
-      aSeries.statistics('pointsCount', pointsCount);
+      aSeries.statistics(anychart.enums.Statistics.MAX, max);
+      aSeries.statistics(anychart.enums.Statistics.MIN, min);
+      aSeries.statistics(anychart.enums.Statistics.SUM, sum);
+      aSeries.statistics(anychart.enums.Statistics.AVERAGE, average);
+      aSeries.statistics(anychart.enums.Statistics.POINTS_COUNT, pointsCount);
     }
     //----------------------------------end calc statistics for series
 

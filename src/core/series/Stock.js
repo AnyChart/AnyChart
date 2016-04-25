@@ -91,6 +91,17 @@ anychart.core.series.Stock.prototype.getCategoryWidth = function() {
 };
 
 
+/**
+ * Gets wrapped point by index.
+ * @param {number} index - Point index.
+ * @return {anychart.core.Point} Wrapped point.
+ */
+anychart.core.series.Stock.prototype.getPoint = function(index) {
+  //TODO (A.Kudryavtsev): Add for stock statistics?
+  return null;
+};
+
+
 /** @inheritDoc */
 anychart.core.series.Stock.prototype.getPointOption = function(name) {
   return undefined;

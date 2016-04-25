@@ -7,6 +7,7 @@ goog.require('anychart.core.utils.Padding');
 goog.require('anychart.core.utils.SeriesPointContextProvider');
 goog.require('anychart.data');
 goog.require('anychart.enums');
+goog.require('anychart.math');
 goog.require('anychart.utils');
 
 
@@ -627,35 +628,105 @@ anychart.core.scatter.series.Base.prototype.onScaleSignal_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Calculate series statistics.
+ * @inheritDoc
  */
 anychart.core.scatter.series.Base.prototype.calculateStatistics = function() {
-  var seriesMax = -Infinity;
-  var seriesMin = Infinity;
-  var seriesSum = 0;
+  var seriesXMax = -Infinity;
+  var seriesYMax = -Infinity;
+  var seriesXMin = Infinity;
+  var seriesYMin = Infinity;
+  var seriesXSum = 0;
+  var seriesYSum = 0;
   var seriesPointsCount = 0;
 
   var iterator = this.getResetIterator();
 
+  var isBubble = this.getType() == anychart.enums.ScatterSeriesType.BUBBLE;
+  var size;
+  var sizeMin = Infinity;
+  var sizeMax = -Infinity;
+  var sizeSum = 0;
+  var sizes = [];
+
+  var xValues = [];
+  var yValues = [];
+
   while (iterator.advance()) {
     var value = iterator.get('value');
-    if (value) {
+    var x = iterator.get('x');
+    if (goog.isDef(value)) {
       var y = anychart.utils.toNumber(value);
       if (!isNaN(y)) {
-        seriesMax = Math.max(seriesMax, y);
-        seriesMin = Math.min(seriesMin, y);
-        seriesSum += y;
+        seriesYMax = Math.max(seriesYMax, y);
+        seriesYMin = Math.min(seriesYMin, y);
+        seriesYSum += y;
+        yValues.push(y);
       }
     }
+    if (goog.isDef(x)) {
+      x = anychart.utils.toNumber(x);
+      if (!isNaN(x)) {
+        seriesXMax = Math.max(seriesXMax, x);
+        seriesXMin = Math.min(seriesXMin, x);
+        seriesXSum += x;
+        xValues.push(x);
+      }
+    }
+
+    if (isBubble) {
+      size = iterator.get('size');
+      if (goog.isDef(size)) {
+        size = anychart.utils.toNumber(size);
+        if (!isNaN(size)) {
+          sizeMax = Math.max(sizeMax, size);
+          sizeMin = Math.min(sizeMin, size);
+          sizeSum += size;
+          sizes.push(size);
+        }
+      }
+    }
+
     seriesPointsCount++;
   }
-  var seriesAverage = seriesSum / seriesPointsCount;
+  var seriesYAverage = seriesYSum / seriesPointsCount;
+  var seriesXAverage = seriesXSum / seriesPointsCount;
 
-  this.statistics('seriesMax', seriesMax);
-  this.statistics('seriesMin', seriesMin);
-  this.statistics('seriesSum', seriesSum);
-  this.statistics('seriesAverage', seriesAverage);
-  this.statistics('seriesPointsCount', seriesPointsCount);
+  this.statistics(anychart.enums.Statistics.SERIES_MAX, seriesYMax);
+  this.statistics(anychart.enums.Statistics.SERIES_MIN, seriesYMin);
+  this.statistics(anychart.enums.Statistics.SERIES_SUM, seriesYSum);
+  this.statistics(anychart.enums.Statistics.SERIES_AVERAGE, seriesYAverage);
+  this.statistics(anychart.enums.Statistics.SERIES_POINTS_COUNT, seriesPointsCount);
+  this.statistics(anychart.enums.Statistics.SERIES_POINT_COUNT, seriesPointsCount);
+
+  this.statistics(anychart.enums.Statistics.SERIES_FIRST_X_VALUE, xValues[0]);
+  this.statistics(anychart.enums.Statistics.SERIES_FIRST_Y_VALUE, yValues[0]);
+  this.statistics(anychart.enums.Statistics.SERIES_LAST_X_VALUE, xValues[xValues.length - 1]);
+  this.statistics(anychart.enums.Statistics.SERIES_LAST_Y_VALUE, yValues[yValues.length - 1]);
+
+  this.statistics(anychart.enums.Statistics.SERIES_Y_SUM, seriesYSum);
+  this.statistics(anychart.enums.Statistics.SERIES_X_SUM, seriesXSum);
+  this.statistics(anychart.enums.Statistics.SERIES_X_MIN, seriesXMin);
+  this.statistics(anychart.enums.Statistics.SERIES_Y_MIN, seriesYMin);
+  this.statistics(anychart.enums.Statistics.SERIES_X_MAX, seriesXMax);
+  this.statistics(anychart.enums.Statistics.SERIES_Y_MAX, seriesYMax);
+
+  this.statistics(anychart.enums.Statistics.SERIES_Y_AVERAGE, seriesYAverage);
+  this.statistics(anychart.enums.Statistics.SERIES_X_AVERAGE, seriesXAverage);
+
+  this.statistics(anychart.enums.Statistics.SERIES_X_MEDIAN, anychart.math.median(xValues));
+  this.statistics(anychart.enums.Statistics.SERIES_Y_MEDIAN, anychart.math.median(yValues));
+
+  this.statistics(anychart.enums.Statistics.SERIES_X_MODE, anychart.math.mode(xValues));
+  this.statistics(anychart.enums.Statistics.SERIES_Y_MODE, anychart.math.mode(yValues));
+
+  if (isBubble) {
+    this.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_SUM, sizeSum);
+    this.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_AVERAGE, sizeSum / seriesPointsCount);
+    this.statistics(anychart.enums.Statistics.SERIES_BUBBLE_MIN_SIZE, sizeMin);
+    this.statistics(anychart.enums.Statistics.SERIES_BUBBLE_MAX_SIZE, sizeMax);
+    this.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_MEDIAN, anychart.math.median(sizes));
+    this.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_MODE, anychart.math.mode(sizes));
+  }
 };
 
 

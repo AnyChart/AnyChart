@@ -21,6 +21,7 @@ anychart.core.SeparateChart = function() {
 
   if (this.supportsBaseHighlight)
     this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove, null, this.handleMouseDown);
+
 };
 goog.inherits(anychart.core.SeparateChart, anychart.core.ChartWithCredits);
 

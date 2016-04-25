@@ -39,6 +39,13 @@ anychart.core.IChart.prototype.xScale = function() {};
 anychart.core.IChart.prototype.getConfigByType = function(name) {};
 
 
+/**
+ * Performs calculations before chart draw.
+ * Also must include calculation of statistics.
+ */
+anychart.core.IChart.prototype.calculate = function() {};
+
+
 
 /**
  * @interface

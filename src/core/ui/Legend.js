@@ -647,7 +647,7 @@ anychart.core.ui.Legend.prototype.onTooltipSignal_ = function(event) {
  */
 anychart.core.ui.Legend.prototype.getTokenType = function(name) {
   switch (name) {
-    case '%Value':
+    case anychart.enums.StringToken.VALUE:
       return anychart.enums.TokenType.STRING;
     default:
       return anychart.enums.TokenType.UNKNOWN;
@@ -662,7 +662,7 @@ anychart.core.ui.Legend.prototype.getTokenType = function(name) {
  */
 anychart.core.ui.Legend.prototype.getTokenValue = function(name) {
   switch (name) {
-    case '%Value':
+    case anychart.enums.StringToken.VALUE:
       return this['value'];
     default:
       return void 0;

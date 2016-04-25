@@ -128,13 +128,6 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
   this.parentViewToDispose_ = null;
 
   /**
-   * Object with information about pie. (min value, max value, sum of values, average value, count of slices)
-   * @type {Object}
-   * @private
-   */
-  this.statistics_;
-
-  /**
    * Template for aqua style fill.
    * @private
    * @type {Object}
@@ -365,7 +358,8 @@ anychart.charts.Pie.prototype.SUPPORTED_SIGNALS =
 anychart.charts.Pie.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
-    anychart.ConsistencyState.PIE_LABELS;
+    anychart.ConsistencyState.PIE_LABELS |
+    anychart.ConsistencyState.PIE_DATA;
 
 
 /**
@@ -415,8 +409,6 @@ anychart.charts.Pie.prototype.data = function(opt_value, opt_csvSettings) {
         //drop data cache
         goog.dispose(this.parentViewToDispose_);
 
-        this.statistics_ = null;
-
         /**
          * @type {anychart.data.View}
          */
@@ -457,7 +449,8 @@ anychart.charts.Pie.prototype.redefineView_ = function() {
   this.invalidate(
       anychart.ConsistencyState.APPEARANCE |
       anychart.ConsistencyState.PIE_LABELS |
-      anychart.ConsistencyState.CHART_LEGEND,
+      anychart.ConsistencyState.CHART_LEGEND |
+      anychart.ConsistencyState.PIE_DATA,
       anychart.Signal.NEEDS_REDRAW |
       anychart.Signal.DATA_CHANGED
   );
@@ -879,7 +872,7 @@ anychart.charts.Pie.prototype.labels = function(opt_value) {
   if (!this.labels_) {
     this.labels_ = new anychart.core.ui.CircularLabelsFactory();
     this.labels_.textFormatter(function() {
-      return (this['value'] * 100 / this.getStat('sum')).toFixed(1) + '%';
+      return (this['value'] * 100 / this.getStat(anychart.enums.Statistics.SUM)).toFixed(1) + '%';
     });
     this.labels_.positionFormatter(function() {
       return this['value'];
@@ -1309,12 +1302,8 @@ anychart.charts.Pie.prototype.calculate_ = function(bounds) {
    * @type {anychart.math.Rect}
    * @private
    */
-  this.pieBounds_ = new anychart.math.Rect(
-      this.cx_ - this.radiusValue_,
-      this.cy_ - this.radiusValue_,
-      this.radiusValue_ * 2,
-      this.radiusValue_ * 2
-      );
+  this.pieBounds_ = new anychart.math.Rect(this.cx_ - this.radiusValue_, this.cy_ - this.radiusValue_,
+      this.radiusValue_ * 2, this.radiusValue_ * 2);
 
   //Calculate aqua style relative bounds.
   var ac6_angle = goog.math.toRadians(-145);
@@ -1441,6 +1430,7 @@ anychart.charts.Pie.prototype.beforeDraw = function() {
  * @param {anychart.math.Rect} bounds Bounds of content area.
  */
 anychart.charts.Pie.prototype.drawContent = function(bounds) {
+  this.calculate();
   this.labels().dropCallsCache();
   var iterator = this.getIterator();
   var exploded;
@@ -1497,7 +1487,7 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
       value = /** @type {number|string|null|undefined} */ (iterator.get('value'));
       if (this.isMissing_(value)) continue;
       value = +value;
-      sweep = value / /** @type {number} */ (this.statistics('sum')) * 360;
+      sweep = value / /** @type {number} */ (this.getStat(anychart.enums.Statistics.SUM)) * 360;
 
       iterator.meta('start', start).meta('sweep', sweep);
       if (!goog.isDef(exploded = iterator.meta('exploded'))) {
@@ -2002,8 +1992,8 @@ anychart.charts.Pie.prototype.colorize3DSlice_ = function(pointState) {
   for (i = 0; i < length; i++) {
     side = this.sides3D_[i];
     if (side.index == index) {
-      var uniqueValue = side.type == anychart.charts.Pie.Side3DType.FRONT ||
-                        side.type == anychart.charts.Pie.Side3DType.BACK ? side.start : '';
+      var uniqueValue = (side.type == anychart.charts.Pie.Side3DType.FRONT ||
+          side.type == anychart.charts.Pie.Side3DType.BACK) ? side.start : '';
       this.colorize3DPath_(side.type + 'Path' + uniqueValue, pointState);
     }
   }
@@ -2128,7 +2118,7 @@ anychart.charts.Pie.prototype.colorize3DPath_ = function(pathName, pointState) {
   } else if (goog.string.startsWith(pathName, 'backPath')) {
     fill = hovered ? anychart.color.lighten(darkPathColor, .2) : darkPathColor;
 
-  // sides (start, end)
+    // sides (start, end)
   } else {
     fill = hovered ? anychart.color.lighten(darkSidesPathColor, .2) : darkSidesPathColor;
   }
@@ -2835,11 +2825,11 @@ anychart.charts.Pie.prototype.applyHatchFill = function(pointState, opt_pathName
  */
 anychart.charts.Pie.prototype.dataInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
-    this.statistics_ = null;
     this.invalidate(
         anychart.ConsistencyState.PIE_LABELS |
         anychart.ConsistencyState.APPEARANCE |
-        anychart.ConsistencyState.CHART_LEGEND,
+        anychart.ConsistencyState.CHART_LEGEND |
+        anychart.ConsistencyState.PIE_DATA,
         anychart.Signal.NEEDS_REDRAW |
         anychart.Signal.DATA_CHANGED
     );
@@ -3210,8 +3200,7 @@ anychart.charts.Pie.prototype.hover = function(opt_indexOrIndexes) {
 /** @inheritDoc */
 anychart.charts.Pie.prototype.unhover = function(opt_indexOrIndexes) {
   if (!(this.state.hasPointState(anychart.PointState.HOVER) ||
-      this.state.isStateContains(this.state.getSeriesState(), anychart.PointState.HOVER)) ||
-      !this.enabled())
+      this.state.isStateContains(this.state.getSeriesState(), anychart.PointState.HOVER)) || !this.enabled())
     return;
 
   var index;
@@ -3476,60 +3465,42 @@ anychart.charts.Pie.prototype.hideTooltip = function() {
 
 
 /**
- * Calculates statistic for pie.
- * @private
+ * @inheritDoc
  */
-anychart.charts.Pie.prototype.calculateStatistics_ = function() {
-  this.statistics_ = {};
-  var iterator = this.data().getIterator();
-  var value;
-  var missingPoints = 0;
-  var min = Number.MAX_VALUE;
-  var max = -Number.MAX_VALUE;
-  var sum = 0;
-  while (iterator.advance()) {
-    value = /** @type {number|string|null|undefined} */ (iterator.get('value'));
-    // if missing
-    if (this.isMissing_(value)) {
-      missingPoints++;
-      continue;
+anychart.charts.Pie.prototype.calculate = function() {
+  if (this.hasInvalidationState(anychart.ConsistencyState.PIE_DATA)) {
+    this.statistics = {};
+
+    var iterator = this.data().getIterator();
+    var value;
+    var missingPoints = 0;
+    var min = Number.MAX_VALUE;
+    var max = -Number.MAX_VALUE;
+    var sum = 0;
+    while (iterator.advance()) {
+      value = /** @type {number|string|null|undefined} */ (iterator.get('value'));
+      // if missing
+      if (this.isMissing_(value)) {
+        missingPoints++;
+        continue;
+      }
+      value = +value;
+      min = Math.min(value, min);
+      max = Math.max(value, max);
+      sum += value;
     }
-    value = +value;
-    min = Math.min(value, min);
-    max = Math.max(value, max);
-    sum += value;
-  }
 
-  var count = iterator.getRowsCount() - missingPoints; // do not count missing points
-  var avg;
-  if (count == 0) min = max = sum = avg = undefined;
-  else avg = sum / count;
-  this.statistics_['count'] = count;
-  this.statistics_['min'] = min;
-  this.statistics_['max'] = max;
-  this.statistics_['sum'] = sum;
-  this.statistics_['average'] = avg;
-};
+    var count = iterator.getRowsCount() - missingPoints; // do not count missing points
+    var avg;
+    if (count == 0) min = max = sum = avg = undefined;
+    else avg = sum / count;
+    this.statistics[anychart.enums.Statistics.COUNT] = count;
+    this.statistics[anychart.enums.Statistics.MIN] = min;
+    this.statistics[anychart.enums.Statistics.MAX] = max;
+    this.statistics[anychart.enums.Statistics.SUM] = sum;
+    this.statistics[anychart.enums.Statistics.AVERAGE] = avg;
 
-
-/**
- * Gets statistic value by its key.
- * @param {string=} opt_key
- * @param {string=} opt_value
- * @return {*} Statistic value by key, statistic object, or self in case of setter.
- */
-anychart.charts.Pie.prototype.statistics = function(opt_key, opt_value) {
-  if (!this.statistics_)
-    this.calculateStatistics_();
-  if (goog.isDef(opt_key)) {
-    if (goog.isDef(opt_value)) {
-      this.statistics_[opt_key] = opt_value;
-      return this;
-    } else {
-      return this.statistics_[opt_key];
-    }
-  } else {
-    return this.statistics_;
+    this.markConsistent(anychart.ConsistencyState.PIE_DATA);
   }
 };
 
@@ -3696,7 +3667,7 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
 
     dR0 = this.radiusValue_ + (exploded ? this.explodeValue_ : 0);
     var dR1 = this.mode3d_ ?
-        this.get3DYRadius(this.radiusValue_) + (exploded ? this.get3DYRadius(this.explodeValue_) : 0) :
+        (this.get3DYRadius(this.radiusValue_) + (exploded ? this.get3DYRadius(this.explodeValue_) : 0)) :
         dR0;
 
     // coordinates of the point where the connector touches a pie
