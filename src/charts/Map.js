@@ -3733,27 +3733,26 @@ anychart.charts.Map.prototype.zoomToFeature = function(id) {
   var cx = zoomParam[1];
   var cy = zoomParam[2];
 
+  var dx = tx.getTranslateX();
+  var dy = tx.getTranslateY();
+
   this.doAfterAnimation(this, function() {
     this.zoomDuration = isNaN(this.zoomDuration) ? 500 : this.zoomDuration;
     if (goToHome) {
-      this.zoomTo(anychart.charts.Map.ZOOM_MIN_FACTOR, cx, cy);
+      if (anychart.math.roughlyEqual(sourceZoom, zoom, 0.00001)) {
+        this.zoomAnimation = new anychart.animations.MapMoveAnimation(
+            this, [dx, dy], [0, 0], anychart.charts.Map.TIMINGS.ZOOM_TO_FEATURE_DURATION);
+        this.zoomAnimation.play();
+      } else {
+        this.zoomTo(anychart.charts.Map.ZOOM_MIN_FACTOR, cx, cy);
+      }
       this.prevZoomedFeature = null;
       this.prevTx = null;
     } else {
       this.unlimitedZoom = true;
       if (anychart.math.roughlyEqual(sourceZoom, zoom, 0.00001)) {
-        var prevDx = 0, prevDy = 0;
-        if (this.prevTx) {
-          prevDx = this.prevTx.getTranslateX();
-          prevDy = this.prevTx.getTranslateY();
-
-          this.zoomAnimation = new anychart.animations.MapMoveAnimation(
-              this, [prevDx - cx, prevDy - cy], [prevDx, prevDy], anychart.charts.Map.TIMINGS.ZOOM_TO_FEATURE_DURATION);
-        } else {
-          this.zoomAnimation = new anychart.animations.MapMoveAnimation(
-              this, [prevDx, prevDy], [cx, cy], anychart.charts.Map.TIMINGS.ZOOM_TO_FEATURE_DURATION);
-        }
-
+        this.zoomAnimation = new anychart.animations.MapMoveAnimation(
+            this, [dx, dy], [dx + cx, dy + cy], anychart.charts.Map.TIMINGS.ZOOM_TO_FEATURE_DURATION);
         this.zoomAnimation.play();
       } else {
         this.zoomTo(zoom, cx, cy);
