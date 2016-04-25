@@ -98,7 +98,7 @@ anychart.scales.StockScatterDateTime = function(chartOrScroller) {
    * Consistency flag. Easier to use than Base consistency here.
    * @type {boolean}
    */
-  this.consistent = true;
+  this.consistent = false;
 
   /**
    * Major ticks for the scale.

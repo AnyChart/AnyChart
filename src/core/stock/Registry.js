@@ -157,7 +157,7 @@ anychart.core.stock.Registry.prototype.getKeyByIndex = function(index) {
       } else if (low > len - 1) {
         low = len - 1;
       } else {
-        low = index
+        low = index;
       }
       result = this.keys_[low].key;
     } else {
