@@ -3635,9 +3635,6 @@ anychart.charts.Map.prototype.drillUp_ = function(target, opt_levels) {
     this.zoomDuration = 400;
     this.zoomTo(1 / zoom, cx, cy);
 
-    target.tooltip().hide(null);
-    this.tooltip().hide(null);
-
     this.doAfterAnimation(this, function(target, root) {
       this.zoomTo(anychart.charts.Map.ZOOM_MIN_FACTOR);
 
@@ -3649,6 +3646,10 @@ anychart.charts.Map.prototype.drillUp_ = function(target, opt_levels) {
       root.drillingInAction = false;
 
       goog.array.splice(root.currentBreadcrumbsPath, root.currentBreadcrumbsPath.length - levels, levels);
+
+      target.tooltip().hide(null);
+      this.tooltip().hide(null);
+
       target.show();
       setTimeout(goog.bind(function() {this.dispatchEvent(this.createDrillChangeEvent())}, root), 0);
     }, target, root);
