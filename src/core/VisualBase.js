@@ -2,6 +2,7 @@ goog.provide('anychart.core.MouseEvent');
 goog.provide('anychart.core.VisualBase');
 goog.require('acgraph');
 goog.require('anychart.core.Base');
+goog.require('anychart.exports');
 goog.require('goog.dom');
 goog.require('goog.events.EventHandler');
 
@@ -520,7 +521,7 @@ anychart.core.VisualBase.prototype.invalidateParentBounds = function() {
  */
 anychart.core.VisualBase.prototype.saveAsPng = function(opt_width, opt_height, opt_quality, opt_filename) {
   var stage = this.container() ? this.container().getStage() : null;
-  if (stage) stage.saveAsPng(opt_width, opt_height, opt_quality, opt_filename);
+  if (stage) stage.saveAsPng(opt_width, opt_height, opt_quality, opt_filename || anychart.exports.filename());
 };
 
 
@@ -545,7 +546,7 @@ anychart.core.VisualBase.prototype.saveAsPng = function(opt_width, opt_height, o
  */
 anychart.core.VisualBase.prototype.saveAsJpg = function(opt_width, opt_height, opt_quality, opt_forceTransparentWhite, opt_filename) {
   var stage = this.container() ? this.container().getStage() : null;
-  if (stage) stage.saveAsJpg(opt_width, opt_height, opt_quality, opt_forceTransparentWhite, opt_filename);
+  if (stage) stage.saveAsJpg(opt_width, opt_height, opt_quality, opt_forceTransparentWhite, opt_filename || anychart.exports.filename());
 };
 
 
@@ -570,7 +571,7 @@ anychart.core.VisualBase.prototype.saveAsJpg = function(opt_width, opt_height, o
  */
 anychart.core.VisualBase.prototype.saveAsPdf = function(opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_x, opt_y, opt_filename) {
   var stage = this.container() ? this.container().getStage() : null;
-  if (stage) stage.saveAsPdf(opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_x, opt_y, opt_filename);
+  if (stage) stage.saveAsPdf(opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_x, opt_y, opt_filename || anychart.exports.filename());
 };
 
 
@@ -593,7 +594,7 @@ anychart.core.VisualBase.prototype.saveAsPdf = function(opt_paperSizeOrWidth, op
  */
 anychart.core.VisualBase.prototype.saveAsSvg = function(opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_filename) {
   var stage = this.container() ? this.container().getStage() : null;
-  if (stage) stage.saveAsSvg(opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_filename);
+  if (stage) stage.saveAsSvg(opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_filename || anychart.exports.filename());
 };
 
 

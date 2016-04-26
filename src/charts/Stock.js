@@ -1,6 +1,7 @@
 goog.provide('anychart.charts.Stock');
 goog.require('anychart.core.ChartWithCredits');
 goog.require('anychart.core.IChart');
+goog.require('anychart.core.IGroupingProvider');
 goog.require('anychart.core.stock.Controller');
 goog.require('anychart.core.stock.IKeyIndexTransformer');
 goog.require('anychart.core.stock.Plot');
@@ -18,6 +19,7 @@ goog.require('anychart.utils');
  * @constructor
  * @extends {anychart.core.ChartWithCredits}
  * @implements {anychart.core.IChart}
+ * @implements {anychart.core.IGroupingProvider}
  * @implements {anychart.core.stock.IKeyIndexTransformer}
  */
 anychart.charts.Stock = function() {
@@ -42,7 +44,7 @@ anychart.charts.Stock = function() {
 
   /**
    * Stock data controller.
-   * @type {anychart.core.stock.Controller}
+   * @type {!anychart.core.stock.Controller}
    * @private
    */
   this.dataController_ = new anychart.core.stock.Controller();
@@ -594,6 +596,7 @@ anychart.charts.Stock.prototype.dispatchRangeChange_ = function(type, source, op
       'lastSelected': opt_last
     });
   } else {
+    var grouping = /** @type {anychart.core.stock.Grouping} */(this.grouping());
     return this.dispatchEvent({
       'type': type,
       'source': source,
@@ -601,8 +604,9 @@ anychart.charts.Stock.prototype.dispatchRangeChange_ = function(type, source, op
       'lastSelected': this.dataController_.getLastSelectedKey(),
       'firstVisible': this.dataController_.getFirstVisibleKey(),
       'lastVisible': this.dataController_.getLastVisibleKey(),
-      'groupingIntervalUnit': this.dataController_.getCurrentGroupingIntervalUnit(),
-      'groupingIntervalUnitCount': this.dataController_.getCurrentGroupingIntervalCount()
+      'dataIntervalUnit': grouping.getCurrentDataInterval().unit,
+      'dataIntervalUnitCount': grouping.getCurrentDataInterval().count,
+      'dataIsGrouped': grouping.isGrouped()
     });
   }
 };
@@ -624,6 +628,24 @@ anychart.charts.Stock.prototype.createTooltip = function() {
   tooltip.chart(this);
 
   return tooltip;
+};
+
+
+/**
+ * Returns current selection min distance (from selectable sources).
+ * @return {number}
+ */
+anychart.charts.Stock.prototype.getCurrentMinDistance = function() {
+  return this.dataController_.getCurrentMinDistance();
+};
+
+
+/**
+ * Returns current selection min distance (from scroller sources).
+ * @return {number}
+ */
+anychart.charts.Stock.prototype.getCurrentScrollerMinDistance = function() {
+  return this.dataController_.getCurrentScrollerMinDistance();
 };
 //endregion
 
@@ -1412,12 +1434,10 @@ anychart.charts.Stock.prototype.dragEnd = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.charts.Stock.prototype.disposeInternal = function() {
-  goog.disposeAll(this.plots_, this.scroller_, this.grouping_, this.scrollerGrouping_, this.dataController_);
+  goog.disposeAll(this.plots_, this.scroller_, this.dataController_);
   this.plots_ = null;
   this.scroller_ = null;
-  this.dataController_ = null;
-  this.grouping_ = null;
-  this.scrollerGrouping_ = null;
+  delete this.dataController_;
 
   goog.base(this, 'disposeInternal');
 };
@@ -1494,10 +1514,10 @@ anychart.charts.Stock.prototype.extractHeaders = function(storage, headers, head
 
 
 /** @inheritDoc */
-anychart.charts.Stock.prototype.toCsv = function(opt_csvMode, opt_csvSettings) {
-  opt_csvMode = anychart.enums.normalizeCsvMode(opt_csvMode);
-  var rawData = (opt_csvMode == anychart.enums.CsvMode.RAW);
-  var groupedData = (opt_csvMode == anychart.enums.CsvMode.GROUPED);
+anychart.charts.Stock.prototype.toCsv = function(opt_chartDataExportMode, opt_csvSettings) {
+  opt_chartDataExportMode = anychart.enums.normalizeChartDataExportMode(opt_chartDataExportMode);
+  var rawData = (opt_chartDataExportMode == anychart.enums.ChartDataExportMode.RAW);
+  var groupedData = (opt_chartDataExportMode == anychart.enums.ChartDataExportMode.GROUPED);
   var settings = goog.isObject(opt_csvSettings) ? opt_csvSettings : {};
   var rowsSeparator = settings['rowsSeparator'] || '\n';
   this.checkSeparator(rowsSeparator);

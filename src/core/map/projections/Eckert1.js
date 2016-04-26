@@ -19,9 +19,9 @@ anychart.core.map.projections.Eckert1.prototype.forward = function(x, y) {
   x = goog.math.toRadians(x);
   y = goog.math.toRadians(y);
 
-  var α = Math.sqrt(8 / (3 * Math.PI));
-  x = α * x * (1 - Math.abs(y) / Math.PI);
-  y = α * y;
+  var alpha = Math.sqrt(8 / (3 * Math.PI));
+  x = alpha * x * (1 - Math.abs(y) / Math.PI);
+  y = alpha * y;
 
 
   return [x, y];
@@ -30,10 +30,10 @@ anychart.core.map.projections.Eckert1.prototype.forward = function(x, y) {
 
 /** @inheritDoc */
 anychart.core.map.projections.Eckert1.prototype.invert = function(x, y) {
-  var α = Math.sqrt(8 / (3 * Math.PI));
-  var φ = y / α;
-  x = x / (α * (1 - Math.abs(φ) / Math.PI));
-  y = φ;
+  var alpha = Math.sqrt(8 / (3 * Math.PI));
+  var phi = y / alpha;
+  x = x / (alpha * (1 - Math.abs(phi) / Math.PI));
+  y = phi;
 
   return [goog.math.toDegrees(x), goog.math.toDegrees(y)];
 };

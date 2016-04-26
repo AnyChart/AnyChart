@@ -13,7 +13,7 @@ goog.require('anychart.utils');
 
 
 /**
- * Bullet chart c§lass.<br/>
+ * Bullet chart class.<br/>
  * <b>Note:</b> Use these methods to get an instance of this class:
  *  <ul>
  *      <li>{@link anychart.bullet}</li>

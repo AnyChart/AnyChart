@@ -262,7 +262,7 @@ anychart.charts.Gantt.prototype.selectPoint = function(indexOrIndexes, opt_event
 
 
 /**
- * Рщмук a point of the series by its index.
+ * Hover a point of the series by its index.
  * @param {number|Array<number>} indexOrIndexes Index of the point to hover.
  * @param {anychart.core.MouseEvent=} opt_event Event that initiate point hovering.<br/>
  *    <b>Note:</b> Used only to display float tooltip.
@@ -1065,7 +1065,7 @@ anychart.charts.Gantt.prototype.makeObject = function(node, rawData, headers, he
 
 
 /** @inheritDoc */
-anychart.charts.Gantt.prototype.toCsv = function(csvMode, opt_csvSettings) {
+anychart.charts.Gantt.prototype.toCsv = function(chartDataExportMode, opt_csvSettings) {
   var settings = goog.isObject(opt_csvSettings) ? opt_csvSettings : {};
   var rowsSeparator = settings['rowsSeparator'] || '\n';
   this.checkSeparator(rowsSeparator);

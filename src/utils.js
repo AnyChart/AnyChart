@@ -1610,6 +1610,61 @@ anychart.utils.getKeys = function(obj) {
 };
 
 
+/**
+ * Interval estimations.
+ * @type {Array.<{unit: anychart.enums.Interval, range: number, basic: boolean}>}
+ */
+anychart.utils.INTERVAL_ESTIMATIONS = [
+  {unit: anychart.enums.Interval.YEAR, range: 1000 * 60 * 60 * 24 * 365, basic: true},
+  {unit: anychart.enums.Interval.SEMESTER, range: 1000 * 60 * 60 * 24 * 365 / 2, basic: false},
+  {unit: anychart.enums.Interval.QUARTER, range: 1000 * 60 * 60 * 24 * 365 / 4, basic: false},
+  {unit: anychart.enums.Interval.MONTH, range: 1000 * 60 * 60 * 24 * 28, basic: true},
+  {unit: anychart.enums.Interval.THIRD_OF_MONTH, range: 1000 * 60 * 60 * 24 * 365 / 36, basic: false},
+  {unit: anychart.enums.Interval.WEEK, range: 1000 * 60 * 60 * 24 * 7, basic: false},
+  {unit: anychart.enums.Interval.DAY, range: 1000 * 60 * 60 * 24, basic: true},
+  {unit: anychart.enums.Interval.HOUR, range: 1000 * 60 * 60, basic: true},
+  {unit: anychart.enums.Interval.MINUTE, range: 1000 * 60, basic: true},
+  {unit: anychart.enums.Interval.SECOND, range: 1000, basic: true},
+  {unit: anychart.enums.Interval.MILLISECOND, range: 1, basic: true}
+];
+
+
+/**
+ * Returns an array of [unit: anychart.enums.Interval, count: number] with estimation of the data interval passed.
+ * Interval must be a valid number (not a NaN).
+ * @param {number} interval
+ * @return {!anychart.core.stock.Grouping.Level}
+ */
+anychart.utils.estimateInterval = function(interval) {
+  interval = Math.floor(interval);
+  var estimation, largestEstimation, unit, count = 1;
+  if (interval) {
+    for (var i = 0; i < anychart.utils.INTERVAL_ESTIMATIONS.length; i++) {
+      estimation = anychart.utils.INTERVAL_ESTIMATIONS[i];
+      var divResult = interval / estimation.range;
+      // we add 1 percent for rounding errors
+      if (Math.floor(divResult * 1.1) >= 1) {
+        largestEstimation = largestEstimation || estimation;
+        if (divResult - Math.floor(divResult) < 0.15) {
+          count = Math.floor(divResult);
+          break;
+        }
+      }
+    }
+    if (largestEstimation != estimation && largestEstimation.basic && count > 100) {
+      estimation = largestEstimation;
+      count = Math.round(20 * interval / estimation.range) / 20;
+    }
+  }
+  if (!estimation) { // very unlikely that this is a case
+    unit = anychart.enums.Interval.MILLISECOND;
+  } else {
+    unit = estimation.unit;
+  }
+  return {'unit': unit, 'count': count};
+};
+
+
 //exports
 goog.exportSymbol('anychart.utils.xml2json', anychart.utils.xml2json);
 goog.exportSymbol('anychart.utils.json2xml', anychart.utils.json2xml);

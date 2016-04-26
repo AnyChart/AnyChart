@@ -1684,13 +1684,14 @@ anychart.charts.HeatMap.prototype.drawSeries_ = function() {
     var index = iterator.getIndex();
     if (iterator.get('selected')) {
       series.state.setPointState(anychart.PointState.SELECT, index);
-      //TODO(AntonKagakin): этот прекрасный костыль тут потому, что в хитмапах переделано рисование лейблов
-      // 1) находит селектед лейбл
-      // 2) выставляет стейт
-      // 3) идет перерисовывать все лейблы которые до этого нарисовал (ибо вызывается label.draw() в finalizePointAppearance)
-      // 4) резетит итератор (ибо при рисовании лейблов - селектится серийный итератор по которому идет текущее рисование
-      // 5) селектится он на последний лейбл который был до текущего значения итератора (то есть index - 1)
-      // 6) получаем бесконечный цикл
+      //TODO(AntonKagakin): rewrite it. This is because the HeatMap makes the following:
+      // 1) finds the selected label
+      // 2) sets state
+      // 3) redraws all labels that were already drawn (because finalizePointAppearance calls label.draw())
+      // 4) resets iterator (because it is used in drawing)
+      // 5) selects iterator to a label prior to the last one
+      // 6) ...
+      // 7) PROFIT! - infinite loop!
       iterator.select(index);
     }
 

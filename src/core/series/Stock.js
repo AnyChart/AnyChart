@@ -86,8 +86,10 @@ anychart.core.series.Stock.prototype.getCategoryWidth = function() {
   var xScale = this.getXScale();
   if (xScale instanceof anychart.scales.StockOrdinalDateTime)
     return this.pixelBoundsCache.width / (xScale.getMaximumIndex() - xScale.getMinimumIndex());
-  else
-    return this.getSelectableData().getMinDistance() / (xScale.getMaximum() - xScale.getMinimum()) * this.pixelBoundsCache.width;
+  else {
+    var minDistance = (/** @type {anychart.core.IGroupingProvider} */(this.chart)).getCurrentMinDistance();
+    return minDistance / (xScale.getMaximum() - xScale.getMinimum()) * this.pixelBoundsCache.width;
+  }
 };
 
 

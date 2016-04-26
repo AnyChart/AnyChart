@@ -17,6 +17,7 @@ goog.require('anychart.core.utils.Interactivity');
 goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.Margin');
 goog.require('anychart.core.utils.Padding');
+goog.require('anychart.exports');
 goog.require('anychart.performance');
 goog.require('anychart.themes.merging');
 goog.require('anychart.utils');
@@ -364,7 +365,7 @@ anychart.core.Chart.prototype.onTitleSignal_ = function(event) {
     state |= anychart.ConsistencyState.BOUNDS;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
-  // If there are no signals – state == 0 and nothing will happen.
+  // If there are no signals - state == 0 and nothing will happen.
   this.invalidate(state, signal);
 };
 
@@ -681,15 +682,20 @@ anychart.core.Chart.prototype.contextMenuItemsProvider = function(context) {
 
   var items = /** @type {Array.<anychart.ui.ContextMenu.Item>} */ (anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap.main));
 
-  // prepare version link (specific to each product)
-  var versionItemIndex = goog.array.findIndex(items, function(item) {
-    return (item && item['text']) == 'Version ' + anychart.VERSION;
-  });
-  if (versionItemIndex != -1) {
-    items[versionItemIndex]['href'] = context['chart'].getVersionHistoryLink();
+  if (anychart.DEVELOP) {
+    // prepare version link (specific to each product)
+    var versionHistoryItem = anychart.utils.recursiveClone(anychart.core.Chart.contextMenuItems.versionHistory);
+    versionHistoryItem['href'] = context['chart'].getVersionHistoryLink() + '?version=' + anychart.VERSION;
+
+    items.push(
+        null,
+        anychart.core.Chart.contextMenuItems.saveConfigAs,
+        anychart.core.Chart.contextMenuItems.linkToHelp,
+        versionHistoryItem
+    );
   }
 
-  return context['chart'].specificContextMenuItems(items, context, isPointContext);
+  return context['chart'].specificContextMenuItems(anychart.utils.recursiveClone(items), context, isPointContext);
 };
 
 
@@ -734,7 +740,7 @@ anychart.core.Chart.prototype.getSelectedPoints = function() {
 anychart.core.Chart.contextMenuItems = {
   // Item 'Export as ...'.
   exportAs: {
-    'text': 'Export as...',
+    'text': 'Save chart as...',
     'iconClass': 'fa fa-floppy-o',
     'subMenu': [{
       'text': '.png',
@@ -811,7 +817,7 @@ anychart.core.Chart.contextMenuItems = {
 
   // Item 'Print Chart'.
   printChart: {
-    'text': 'Print Chart',
+    'text': 'Print',
     'iconClass': 'fa fa-print',
     'eventType': 'anychart.print',
     'action': function(context) {
@@ -819,15 +825,17 @@ anychart.core.Chart.contextMenuItems = {
     }
   },
 
-  // Item-link to version history 'Version x.x.x'.
-  version: {
-    'text': 'Version ' + anychart.VERSION,
+  // Item-link to version history.
+  versionHistory: {
+    'text': 'Version History',
     'href': ''
   },
 
-  // Item-link to our site 'About AnyChart'.
+  // Item-link to our site.
   about: {
-    'text': 'About AnyChart',
+    'text': 'AnyChart ' + (anychart.VERSION ?
+        goog.string.subs.apply(null, ['v%s.%s.%s'].concat(anychart.VERSION.split('.'))) :
+        ' develop version'),
     'href': 'http://anychart.com'
   },
 
@@ -847,13 +855,10 @@ anychart.core.Chart.contextMenuMap = {
   // Menu 'Default menu'.
   main: [
     anychart.core.Chart.contextMenuItems.exportAs,
-    anychart.core.Chart.contextMenuItems.saveConfigAs,
     anychart.core.Chart.contextMenuItems.saveDataAs,
     anychart.core.Chart.contextMenuItems.printChart,
     null,
-    anychart.core.Chart.contextMenuItems.version,
-    anychart.core.Chart.contextMenuItems.about,
-    anychart.core.Chart.contextMenuItems.linkToHelp
+    anychart.core.Chart.contextMenuItems.about
   ]
 };
 
@@ -1119,7 +1124,7 @@ anychart.core.Chart.prototype.drawContent = goog.nullFunction;
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Define auto resize settings. В таком  виде это экспортить нельзя.
+ * Define auto resize settings.
  * @param {boolean=} opt_value
  * @return {!(boolean|anychart.core.Chart)} Auto resize settings or itself for chaining call.
  */
@@ -2195,8 +2200,8 @@ anychart.core.Chart.prototype.extractHeaders = function(dataSet, headers, header
         if (!(column in headers))
           headers[column] = headersLength++;
     } else {
-      if (!('*' in headers))
-        headers['*'] = headersLength++;
+      if (!('value' in headers))
+        headers['value'] = headersLength++;
     }
   }
   return headersLength;
@@ -2245,13 +2250,13 @@ anychart.core.Chart.prototype.escapeValuesInRow = function(row, colSep, rowSep) 
 
 /**
  * Returns CSV string with series data.
- * @param {(string|anychart.enums.CsvMode)=} opt_csvMode CSV mode.
+ * @param {(string|anychart.enums.ChartDataExportMode)=} opt_chartDataExportMode CSV mode.
  * @param {Object.<string, (string|boolean|undefined)>=} opt_csvSettings CSV settings.
  * @return {string} CSV string.
  */
-anychart.core.Chart.prototype.toCsv = function(opt_csvMode, opt_csvSettings) {
-  opt_csvMode = anychart.enums.normalizeCsvMode(opt_csvMode);
-  var rawData = (opt_csvMode == anychart.enums.CsvMode.RAW);
+anychart.core.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvSettings) {
+  opt_chartDataExportMode = anychart.enums.normalizeChartDataExportMode(opt_chartDataExportMode);
+  var rawData = (opt_chartDataExportMode == anychart.enums.ChartDataExportMode.RAW);
   var type = this.getType();
   var scatterPolar = (type == anychart.enums.ChartTypes.SCATTER || type == anychart.enums.ChartTypes.POLAR);
   var settings = goog.isObject(opt_csvSettings) ? opt_csvSettings : {};
@@ -2331,7 +2336,7 @@ anychart.core.Chart.prototype.toCsv = function(opt_csvMode, opt_csvSettings) {
             csvRow[columnIndex] = finalValue;
           }
         } else {
-          columnIndex = headers['*'];
+          columnIndex = headers['value'];
           csvRow[columnIndex] = row;
         }
 
@@ -2393,7 +2398,7 @@ anychart.core.Chart.prototype.toCsv = function(opt_csvMode, opt_csvSettings) {
             csvRows[groupingField][columnIndex] = finalValue;
           }
         } else {
-          prefixed = seriesPrefix + '*';
+          prefixed = seriesPrefix + 'value';
           if (!(prefixed in headers)) {
             headers[prefixed] = headersLength++;
           }
@@ -2427,7 +2432,7 @@ anychart.core.Chart.prototype.saveAsXml = function(opt_includeTheme, opt_filenam
   if (stage) {
     var xml = /** @type {string} */(this.toXml(false, opt_includeTheme));
     var option = {};
-    if (goog.isString(opt_filename)) option['file-name'] = opt_filename;
+    option['file-name'] = opt_filename || anychart.exports.filename();
     stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/xml', xml, 'xml', 'file', option);
   }
 };
@@ -2443,7 +2448,7 @@ anychart.core.Chart.prototype.saveAsJson = function(opt_includeTheme, opt_filena
   if (stage) {
     var json = /** @type {string} */(this.toJson(true, opt_includeTheme));
     var option = {};
-    if (goog.isString(opt_filename)) option['file-name'] = opt_filename;
+    option['file-name'] = opt_filename || anychart.exports.filename();
     stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/json', json, 'json', 'file', option);
   }
 };
@@ -2451,16 +2456,16 @@ anychart.core.Chart.prototype.saveAsJson = function(opt_includeTheme, opt_filena
 
 /**
  * Saves chart data as csv.
- * @param {(string|anychart.enums.CsvMode)=} opt_csvMode CSV mode.
+ * @param {(string|anychart.enums.ChartDataExportMode)=} opt_chartDataExportMode CSV mode.
  * @param {Object.<string, (string|boolean|undefined)>=} opt_csvSettings CSV settings.
  * @param {string=} opt_filename file name to save.
  */
-anychart.core.Chart.prototype.saveAsCsv = function(opt_csvMode, opt_csvSettings, opt_filename) {
+anychart.core.Chart.prototype.saveAsCsv = function(opt_chartDataExportMode, opt_csvSettings, opt_filename) {
   var stage = this.container() ? this.container().getStage() : null;
   if (stage) {
-    var csv = this.toCsv(opt_csvMode, opt_csvSettings);
+    var csv = this.toCsv(opt_chartDataExportMode, opt_csvSettings);
     var option = {};
-    if (goog.isString(opt_filename)) option['file-name'] = opt_filename;
+    option['file-name'] = opt_filename || anychart.exports.filename();
     stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/csv', csv, 'csv', 'file', option);
   }
 };
@@ -2468,15 +2473,15 @@ anychart.core.Chart.prototype.saveAsCsv = function(opt_csvMode, opt_csvSettings,
 
 /**
  * Saves chart data as excel document.
- * @param {(string|anychart.enums.CsvMode)=} opt_csvMode CSV mode.
+ * @param {(string|anychart.enums.ChartDataExportMode)=} opt_chartDataExportMode CSV mode.
  * @param {string=} opt_filename file name to save.
  */
-anychart.core.Chart.prototype.saveAsXlsx = function(opt_csvMode, opt_filename) {
+anychart.core.Chart.prototype.saveAsXlsx = function(opt_chartDataExportMode, opt_filename) {
   var stage = this.container() ? this.container().getStage() : null;
   if (stage) {
-    var csv = this.toCsv(opt_csvMode, {'rowsSeparator': '\n', 'columnsSeparator': ',', 'ignoreFirstRow': false});
+    var csv = this.toCsv(opt_chartDataExportMode, {'rowsSeparator': '\n', 'columnsSeparator': ',', 'ignoreFirstRow': false});
     var option = {};
-    if (goog.isString(opt_filename)) option['file-name'] = opt_filename;
+    option['file-name'] = opt_filename || anychart.exports.filename();
     stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/xlsx', csv, 'xlsx', 'file', option);
   }
 };

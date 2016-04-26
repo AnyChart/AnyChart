@@ -108,7 +108,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="headers" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_headers" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="color_range" type="core.ColorRange"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="drill_to" type="DrillToList">
+            <xsd:element minOccurs="0" maxOccurs="1" name="drill_to" type="DrillToList"/>
             <!-- new Cartesian elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="x_zoom" type="core.CartesianXZoom"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="x_scroller" type="core.ChartScroller"/>

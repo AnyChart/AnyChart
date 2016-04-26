@@ -57,10 +57,16 @@ anychart.core.stock.Grouping = function() {
   // this.xMode_ = anychart.enums.XGroupingMode.FIRST;
 
   /**
-   * @type {?anychart.core.utils.DateTimeIntervalGenerator}
+   * @type {!anychart.core.stock.Grouping.Level}
    * @private
    */
-  this.currentInterval_ = null;
+  this.currentInterval_ = {'unit': anychart.enums.Interval.MILLISECOND, 'count': 1};
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.isGrouped_ = false;
 };
 goog.inherits(anychart.core.stock.Grouping, anychart.core.Base);
 
@@ -189,11 +195,20 @@ anychart.core.stock.Grouping.prototype.minPixPerPoint = function(opt_value) {
 
 
 /**
- * Returns current grouping level. Published - do not use internally.
- * @return {?anychart.core.stock.Grouping.Level}
+ * Returns current grouping level.
+ * @return {anychart.core.stock.Grouping.Level}
  */
-anychart.core.stock.Grouping.prototype.getCurrentLevel = function() {
-  return this.currentInterval_ ? this.exportLevel_(this.currentInterval_) : null;
+anychart.core.stock.Grouping.prototype.getCurrentDataInterval = function() {
+  return this.currentInterval_;
+};
+
+
+/**
+ * Returns true or false depending on current grouping state of the data.
+ * @return {boolean}
+ */
+anychart.core.stock.Grouping.prototype.isGrouped = function() {
+  return this.isGrouped_;
 };
 
 
@@ -208,13 +223,15 @@ anychart.core.stock.Grouping.prototype.getCurrentLevel = function() {
 anychart.core.stock.Grouping.prototype.chooseInterval = function(startKey, endKey, pixelWidth, mainRegistry) {
   var first, len = this.intervals_.length;
   var range = endKey - startKey;
-  var originalPointsCount = Math.ceil(mainRegistry.getIndexByKey(endKey)) - Math.floor(mainRegistry.getIndexByKey(startKey)) + 1; // may be NaN
-  var minDistance = mainRegistry.getMinDistance();
+  var mainRegistrySelection = mainRegistry.getSelection(startKey, endKey);
+  var originalPointsCount = mainRegistrySelection.lastIndex - mainRegistrySelection.firstIndex; // may be NaN
+  originalPointsCount = originalPointsCount ? originalPointsCount + 1 : 0;
+  var minDistance = mainRegistrySelection.minDistance;
   var targetPointsCountMax = isNaN(this.maxPoints_) ?
       (pixelWidth / this.minPixels_) :
       this.maxPoints_;
   var result = null;
-  if (this.enabled_ && len > 0 && (this.forced_ || (originalPointsCount > targetPointsCountMax))) {
+  if (this.enabled_ && len > 0 && minDistance && (this.forced_ || (originalPointsCount > targetPointsCountMax))) {
     first = 0;
     while (first < len && this.intervals_[first].getRange() <= minDistance) {
       first++;
@@ -232,7 +249,12 @@ anychart.core.stock.Grouping.prototype.chooseInterval = function(startKey, endKe
     if (!result && first < len)
       result = this.intervals_[len - 1];
   }
-  this.currentInterval_ = result;
+  this.currentInterval_ = result ?
+      this.exportLevel_(result) :
+      minDistance ?
+          anychart.utils.estimateInterval(minDistance) :
+          {'unit': anychart.enums.Interval.MILLISECOND, 'count': 1};
+  this.isGrouped_ = !!result;
   return result;
 };
 
@@ -288,7 +310,7 @@ anychart.core.stock.Grouping.prototype.exportLevels_ = function() {
 /**
  * Exports passed interval.
  * @param {!anychart.core.utils.DateTimeIntervalGenerator} interval
- * @return {anychart.core.stock.Grouping.Level}
+ * @return {!anychart.core.stock.Grouping.Level}
  * @private
  */
 anychart.core.stock.Grouping.prototype.exportLevel_ = function(interval) {
@@ -365,4 +387,5 @@ anychart.core.stock.Grouping.prototype['levels'] = anychart.core.stock.Grouping.
 // anychart.core.stock.Grouping.prototype['xMode'] = anychart.core.stock.Grouping.prototype.xMode;
 anychart.core.stock.Grouping.prototype['maxVisiblePoints'] = anychart.core.stock.Grouping.prototype.maxVisiblePoints;
 anychart.core.stock.Grouping.prototype['minPixPerPoint'] = anychart.core.stock.Grouping.prototype.minPixPerPoint;
-anychart.core.stock.Grouping.prototype['getCurrentLevel'] = anychart.core.stock.Grouping.prototype.getCurrentLevel;
+anychart.core.stock.Grouping.prototype['getCurrentDataInterval'] = anychart.core.stock.Grouping.prototype.getCurrentDataInterval;
+anychart.core.stock.Grouping.prototype['isGrouped'] = anychart.core.stock.Grouping.prototype.isGrouped;

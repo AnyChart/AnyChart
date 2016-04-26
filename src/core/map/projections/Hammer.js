@@ -25,10 +25,10 @@ anychart.core.map.projections.Hammer = function() {
   /**
    * @type {anychart.core.map.projections.Azimuthal}
    */
-  this.azimuthalProj = new anychart.core.map.projections.Azimuthal(function(cosλcosφ) {
-    return Math.sqrt(2 / (1 + cosλcosφ));
-  }, function(ρ) {
-    return 2 * Math.asin(ρ / 2);
+  this.azimuthalProj = new anychart.core.map.projections.Azimuthal(function(coslambdacosphi) {
+    return Math.sqrt(2 / (1 + coslambdacosphi));
+  }, function(ro) {
+    return 2 * Math.asin(ro / 2);
   });
 };
 goog.inherits(anychart.core.map.projections.Hammer, anychart.core.map.projections.Base);

@@ -195,24 +195,6 @@ anychart.scales.StockScatterDateTime.prototype.getMaximumIndex = function() {
 
 
 /**
- * Gets current grouping unit.
- * @return {anychart.enums.Interval}
- */
-anychart.scales.StockScatterDateTime.prototype.getGroupingUnit = function() {
-  return this.unit;
-};
-
-
-/**
- * Gets current grouping unit count.
- * @return {number}
- */
-anychart.scales.StockScatterDateTime.prototype.getGroupingUnitCount = function() {
-  return this.count;
-};
-
-
-/**
  * Gets current major interval unit.
  * @return {anychart.enums.Interval}
  */
@@ -427,6 +409,26 @@ anychart.scales.StockScatterDateTime.prototype.ticksInvalidated_ = function(even
     this.consistent = false;
     this.dispatchSignal(anychart.Signal.NEED_UPDATE_TICK_DEPENDENT);
   }
+};
+
+
+/**
+ * Gets current grouping unit.
+ * @return {anychart.enums.Interval}
+ * @deprecated Use stockChart.grouping().getEstimatedDataInterval() instead.
+ */
+anychart.scales.StockScatterDateTime.prototype.getGroupingUnit = function() {
+  return this.unit;
+};
+
+
+/**
+ * Gets current grouping unit count.
+ * @return {number}
+ * @deprecated Use stockChart.grouping().getEstimatedDataInterval() instead.
+ */
+anychart.scales.StockScatterDateTime.prototype.getGroupingUnitCount = function() {
+  return this.count;
 };
 
 

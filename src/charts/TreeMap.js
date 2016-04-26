@@ -2218,6 +2218,10 @@ anychart.charts.TreeMap.prototype.drawNodeBox_ = function(pointState) {
   var thickness = 0;
   if (stroke)
     thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */ (stroke));
+  shiftedBounds.left += thickness / 2;
+  shiftedBounds.width -= thickness;
+  shiftedBounds.top += thickness / 2;
+  shiftedBounds.height -= thickness;
 
   var l = anychart.utils.applyPixelShift(shiftedBounds.left, thickness);
   var dl = l - shiftedBounds.left;
@@ -2268,9 +2272,6 @@ anychart.charts.TreeMap.prototype.colorizeShape = function(pointState) {
       fill = this.hintColorScale_ ? this.hintColorScale_.valueToColor(value) : fill;
     shape.stroke(this.getFinalStroke(true, pointState));
     shape.fill(fill);
-    var zIndex = shape.zIndex();
-    var clarified = anychart.core.utils.InteractivityState.clarifyState(pointState);
-    shape.zIndex(clarified == anychart.PointState.HOVER ? zIndex + 1 : zIndex - 1);
   }
 };
 
@@ -3039,7 +3040,7 @@ anychart.charts.TreeMap.prototype.makeObject = function(node, rawData, headers, 
 
 
 /** @inheritDoc */
-anychart.charts.TreeMap.prototype.toCsv = function(csvMode, opt_csvSettings) {
+anychart.charts.TreeMap.prototype.toCsv = function(chartDataExportMode, opt_csvSettings) {
   var settings = goog.isObject(opt_csvSettings) ? opt_csvSettings : {};
   var rowsSeparator = settings['rowsSeparator'] || '\n';
   this.checkSeparator(rowsSeparator);

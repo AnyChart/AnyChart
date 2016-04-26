@@ -87,7 +87,8 @@ anychart.core.stock.Registry.Item;
  *   firstIndex: number,
  *   preFirstIndex: number,
  *   lastIndex: number,
- *   postLastIndex: number
+ *   postLastIndex: number,
+ *   minDistance: number
  * }}
  */
 anychart.core.stock.Registry.Selection;
@@ -339,11 +340,11 @@ anychart.core.stock.Registry.prototype.addSource = function(table) {
  * @return {anychart.core.stock.Registry.Selection}
  */
 anychart.core.stock.Registry.prototype.getSelection = function(startKey, endKey) {
-  var first, last, preFirst, postLast, startIndex, endIndex, selection;
+  var first, last, preFirst, postLast, startIndex, endIndex, selection, minDistance, i;
   var keysLength = this.keys_.length;
   if (keysLength) {
     // checking cache
-    for (var i = 0; i < this.selectionCache_.length; i++) {
+    for (i = 0; i < this.selectionCache_.length; i++) {
       // we need this indexing to prioritize selection cache lookup (from the most recent to older ones)
       // assume we have a cache like [3, 4, 5, 0, 1, 2] (greater is more recent, MAX_CACHE_SIZE = 6)
       // than we have a pointer with value 3 (points to 0) and we want to lookup the cache from 5 to 0
@@ -364,7 +365,7 @@ anychart.core.stock.Registry.prototype.getSelection = function(startKey, endKey)
     if (isNaN(first)) {
       // this means that we tried to select keys greater than there are in the storage
       preFirst = keysLength - 1;
-      last = postLast = NaN;
+      last = postLast = minDistance = NaN;
     } else {
       last = Math.floor(endIndex);
       if (last < 0)
@@ -373,16 +374,27 @@ anychart.core.stock.Registry.prototype.getSelection = function(startKey, endKey)
         // this means that we tried to select keys less than there are in the storage
         // and, thereby first should be now the first row in the storage (index 0)
         postLast = first;
-        first = preFirst = NaN;
+        first = preFirst = minDistance = NaN;
       } else {
         first = Math.max(0, first);
         last = Math.min(last, keysLength - 1);
         preFirst = first > 0 ? first - 1 : NaN;
         postLast = last < keysLength - 1 ? last + 1 : NaN;
+        minDistance = Infinity;
+        var tmpFirst = isNaN(preFirst) ? first : preFirst;
+        var tmpLast = isNaN(postLast) ? last : postLast;
+        var curr = this.keys_[tmpFirst];
+        for (i = tmpFirst; i < tmpLast; i++) {
+          var prev = curr;
+          curr = prev.next;
+          minDistance = Math.min(minDistance, curr.key - prev.key);
+        }
+        if (!isFinite(minDistance))
+          minDistance = NaN;
       }
     }
   } else {
-    first = last = preFirst = postLast = startIndex = endIndex = NaN;
+    first = last = preFirst = postLast = startIndex = endIndex = minDistance = NaN;
   }
 
   selection = {
@@ -393,7 +405,8 @@ anychart.core.stock.Registry.prototype.getSelection = function(startKey, endKey)
     firstIndex: first,
     preFirstIndex: preFirst,
     lastIndex: last,
-    postLastIndex: postLast
+    postLastIndex: postLast,
+    minDistance: minDistance
   };
   if (keysLength) {
     this.selectionCache_[this.selectionCachePointer_] = selection;
@@ -518,31 +531,6 @@ anychart.core.stock.Registry.prototype.update = function() {
       return;
     }
   }
-  /**
-   * Minimal distance between keys. Can be NaN.
-   * @type {number}
-   * @private
-   */
-  this.minDistance_ = Infinity;
-  prev = this.keys_[0];
-  for (i = 1; i < this.keys_.length; i++) {
-    var curr = prev.next;
-    var val = curr.key - prev.key;
-    if (this.minDistance_ > val)
-      this.minDistance_ = val;
-    prev = curr;
-  }
-  if (!isFinite(this.minDistance_))
-    this.minDistance_ = NaN;
-};
-
-
-/**
- * Returns minimal distance between keys. Can be NaN.
- * @return {number}
- */
-anychart.core.stock.Registry.prototype.getMinDistance = function() {
-  return this.minDistance_;
 };
 
 

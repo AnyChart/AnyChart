@@ -107,7 +107,7 @@ anychart.color.singleHueProgression = function(opt_color, opt_count, opt_startOr
  * In contrast to uni-polar data, bipolar data consist of a natural, meaningful division-point that splits the
  * thematic information into two groups of poles. Such bipolar maps for example describe features that range from
  * negative to positive, as well as from below to above a certain average point. Moreover we may use it to express a
- * qualitative value from “negative” to “positive”.
+ * qualitative value from "negative" to "positive".
  *
  * For bipolar data we recommend colour schemes in which two hues diverge away from a common light/white hue.
  * For maps with a bipolar progression we usually choose two complementary colour hues of the common colour circle
@@ -140,7 +140,7 @@ anychart.color.bipolarHueProgression = function(opt_color1, opt_color2, opt_coun
  * is typically used to show elevation changes. For example from yellow through orange to brown.
  *
  * Magnitude variations are often represented by a progression of related hues, from which at least one hue is not
- * part of the visible spectrum, which means that it is a so called “impure mixed colour”, which is brown. These hues
+ * part of the visible spectrum, which means that it is a so called "impure mixed colour", which is brown. These hues
  * must blend smoothly and change uniformly in hue, brightness, and saturation between the chosen endpoint hues.
  *
  * @param {?string=} opt_color1 [blue] Color in rgb, named or hex string representation like 'rgb(255, 0, 0)', 'red' or

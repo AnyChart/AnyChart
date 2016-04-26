@@ -1237,12 +1237,12 @@ anychart.core.CartesianBase.contextMenuItems = {
  * @type {Object.<string, Array.<anychart.ui.ContextMenu.Item>>}
  */
 anychart.core.CartesianBase.contextMenuMap = {
-  // Cartesian 'Default menu'. (will be added to `main`)
+  // Cartesian 'Default menu'. (will be added to 'main')
   cartesianDefault: [
     anychart.core.CartesianBase.contextMenuItems.excludedPoints,
     null
   ],
-  // Cartesian 'Point menu'. (will be added to `main`)
+  // Cartesian 'Point menu'. (will be added to 'main')
   cartesianPoint: [
     anychart.core.CartesianBase.contextMenuItems.excludePoint,
     anychart.core.CartesianBase.contextMenuItems.excludedPoints,
@@ -2619,7 +2619,6 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
         ser.statistics(anychart.enums.Statistics.MIN, seriesMin);
         ser.statistics(anychart.enums.Statistics.SUM, seriesSum);
         ser.statistics(anychart.enums.Statistics.AVERAGE, avg);
-        ser.statistics(anychart.enums.Statistics.SERIES_AVERAGE, avg);
         ser.statistics(anychart.enums.Statistics.POINTS_COUNT, pointsCount);
 
         if (isRangeSeries) {
@@ -2635,7 +2634,6 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
           ser.statistics(anychart.enums.Statistics.SERIES_Y_SUM, seriesSum);
           ser.statistics(anychart.enums.Statistics.SERIES_FIRST_Y_VALUE, seriesValues[0]);
           ser.statistics(anychart.enums.Statistics.SERIES_LAST_Y_VALUE, seriesValues[seriesValues.length - 1]);
-          ser.statistics(anychart.enums.Statistics.SERIES_AVERAGE, avg);
           ser.statistics(anychart.enums.Statistics.SERIES_Y_AVERAGE, avg);
           ser.statistics(anychart.enums.Statistics.SERIES_Y_MODE, anychart.math.mode(seriesValues));
           ser.statistics(anychart.enums.Statistics.SERIES_Y_MEDIAN, anychart.math.median(seriesValues));
@@ -2643,12 +2641,12 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
       }
 
       var catSumArr = new Array(len);
-      var сatYMinArr = new Array(len);
-      var сatYMaxArr = new Array(len);
+      var catYMinArr = new Array(len);
+      var catYMaxArr = new Array(len);
 
-      var сatYAvgArr = new Array(len);
-      var сatYMedArr = new Array(len);
-      var сatYModArr = new Array(len);
+      var catYAvgArr = new Array(len);
+      var catYMedArr = new Array(len);
+      var catYModArr = new Array(len);
 
       for (d = 0; d < len; d++) {
         var catValues = valsArr[d];
@@ -2664,11 +2662,11 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
         }
 
         catSumArr[d] = catYSum;
-        сatYMinArr[d] = catYMin;
-        сatYMaxArr[d] = catYMax;
-        сatYAvgArr[d] = catYSum / catValues.length;
-        сatYMedArr[d] = anychart.math.median(catValues);
-        сatYModArr[d] = anychart.math.mode(catValues);
+        catYMinArr[d] = catYMin;
+        catYMaxArr[d] = catYMax;
+        catYAvgArr[d] = catYSum / catValues.length;
+        catYMedArr[d] = anychart.math.median(catValues);
+        catYModArr[d] = anychart.math.mode(catValues);
       }
 
       for (j = 0; j < plans.length; j++) {
@@ -2679,18 +2677,18 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
 
         if (isRangeSeries) {
           ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_SUM_ARR_, catSumArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MIN_ARR_, сatYMinArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MAX_ARR_, сatYMaxArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_AVG_ARR_, сatYAvgArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MEDIAN_ARR_, сatYMedArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MODE_ARR_, сatYModArr);
+          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MIN_ARR_, catYMinArr);
+          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MAX_ARR_, catYMaxArr);
+          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_AVG_ARR_, catYAvgArr);
+          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MEDIAN_ARR_, catYMedArr);
+          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MODE_ARR_, catYModArr);
         } else {
           ser.statistics(anychart.enums.Statistics.CATEGORY_Y_SUM_ARR_, catSumArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_MIN_ARR_, сatYMinArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_MAX_ARR_, сatYMaxArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_AVG_ARR_, сatYAvgArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_MEDIAN_ARR_, сatYMedArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_MODE_ARR_, сatYModArr);
+          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_MIN_ARR_, catYMinArr);
+          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_MAX_ARR_, catYMaxArr);
+          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_AVG_ARR_, catYAvgArr);
+          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_MEDIAN_ARR_, catYMedArr);
+          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_MODE_ARR_, catYModArr);
         }
       }
     }

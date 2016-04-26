@@ -28,11 +28,11 @@ goog.inherits(anychart.core.map.projections.Azimuthal, anychart.core.map.project
 
 /** @inheritDoc */
 anychart.core.map.projections.Azimuthal.prototype.forward = function(x, y) {
-  var cosλ = Math.cos(x);
-  var cosφ = Math.cos(y);
-  var k = this.scale(cosλ * cosφ);
+  var coslambda = Math.cos(x);
+  var cosphi = Math.cos(y);
+  var k = this.scale(coslambda * cosphi);
 
-  x = k * cosφ * Math.sin(x);
+  x = k * cosphi * Math.sin(x);
   y = k * Math.sin(y);
 
   return [x, y];
@@ -41,13 +41,13 @@ anychart.core.map.projections.Azimuthal.prototype.forward = function(x, y) {
 
 /** @inheritDoc */
 anychart.core.map.projections.Azimuthal.prototype.invert = function(x, y) {
-  var ρ = Math.sqrt(x * x + y * y);
-  var c = this.angle(ρ);
+  var ro = Math.sqrt(x * x + y * y);
+  var c = this.angle(ro);
   var sinc = Math.sin(c);
   var cosc = Math.cos(c);
 
-  x = Math.atan2(x * sinc, ρ * cosc);
-  y = Math.asin(ρ && y * sinc / ρ);
+  x = Math.atan2(x * sinc, ro * cosc);
+  y = Math.asin(ro && y * sinc / ro);
 
   return [x, y];
 };

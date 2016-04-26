@@ -1618,8 +1618,14 @@ window['anychart']['themes']['defaultTheme'] = {
         return this['name'] ? this['name'] : this['x'];
       }
     },
-    'outsideLabels': {'autoColor': fontColorBright},
-    'insideLabels': {'autoColor': fontColorReversedNormal},
+    'outsideLabels': {
+      'disablePointerEvents': false,
+      'autoColor': fontColorBright
+    },
+    'insideLabels': {
+      'disablePointerEvents': true,
+      'autoColor': fontColorReversedNormal
+    },
     'hoverLabels': {
       'enabled': null
     },
@@ -3554,7 +3560,7 @@ window['anychart']['themes']['defaultTheme'] = {
          */
         'titleFormatter': function() {
           var date = /** @type {number} */(this['value']);
-          switch (this['groupingIntervalUnit']) {
+          switch (this['dataIntervalUnit']) {
             case 'year':
               return window['anychart']['format']['dateTime'](date, 'yyyy');
             case 'semester':
@@ -3823,7 +3829,7 @@ window['anychart']['themes']['defaultTheme'] = {
        */
       'titleFormatter': function() {
         var date = /** @type {number} */(this['hoveredDate']);
-        switch (this['groupingIntervalUnit']) {
+        switch (this['dataIntervalUnit']) {
           case 'year':
             return window['anychart']['format']['dateTime'](date, 'yyyy');
           case 'semester':

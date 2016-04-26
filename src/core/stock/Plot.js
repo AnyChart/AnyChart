@@ -936,7 +936,7 @@ anychart.core.stock.Plot.prototype.yAxis = function(opt_indexOrValue, opt_value)
  */
 anychart.core.stock.Plot.prototype.xAxis = function(opt_value) {
   if (!this.xAxis_) {
-    this.xAxis_ = new anychart.core.axes.StockDateTime();
+    this.xAxis_ = new anychart.core.axes.StockDateTime(this.chart_);
     this.xAxis_.setParentEventTarget(this);
     this.xAxis_.enabled(false);
     this.xAxis_.zIndex(anychart.core.stock.Plot.ZINDEX_AXIS);
@@ -1322,10 +1322,12 @@ anychart.core.stock.Plot.prototype.updateLegend_ = function(opt_seriesBounds, op
   }
   var formatter;
   if (!isNaN(opt_titleValue) && goog.isFunction(formatter = legend.titleFormatter())) {
+    var grouping = /** @type {anychart.core.stock.Grouping} */(this.chart_.grouping());
     var context = {
       'value': opt_titleValue,
-      'groupingIntervalUnit': this.chart_.xScale().getGroupingUnit(),
-      'groupingIntervalUnitCount': this.chart_.xScale().getGroupingUnitCount()
+      'dataIntervalUnit': grouping.getCurrentDataInterval().unit,
+      'dataIntervalUnitCount': grouping.getCurrentDataInterval().count,
+      'isGrouped': grouping.isGrouped()
     };
     legend.title().text(formatter.call(context, context));
   }
@@ -1352,7 +1354,7 @@ anychart.core.stock.Plot.prototype.onLegendSignal_ = function(event) {
     state |= anychart.ConsistencyState.BOUNDS;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
-  // If there are no signals � state == 0 and nothing will happen.
+  // If there are no signals state == 0 and nothing will happen.
   this.invalidate(state, signal);
 };
 

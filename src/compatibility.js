@@ -12,7 +12,7 @@ var userAgentString = goog.userAgent.getUserAgentString();
 
 
 /**
- * Bug with `pointer-events: none;` (svg root node) in Safari 5.1.x
+ * Bug with 'pointer-events: none;' (svg root node) in Safari 5.1.x
  * https://bugs.webkit.org/show_bug.cgi?id=45467
  * Safari 5.1.x detect
  * @type {boolean}

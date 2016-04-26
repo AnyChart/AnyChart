@@ -49,7 +49,7 @@ anychart.core.utils.TooltipsContainer = function() {
 
   // IE 6-8
   if (goog.userAgent.IE && !goog.userAgent.isVersionOrHigher('9')) {
-    // hack like `pointer-events: none`
+    // hack like 'pointer-events: none'
     this.stage_ = acgraph.create(this.root_, 1, 1);
 
   } else {

@@ -1546,18 +1546,23 @@ anychart.core.SeriesBase.prototype.getPoint = function(index) {
     var chartStat = this.chart_.statistics;
     var val = /** @type {number} */ (point.get(anychart.opt.VALUE));
     var size = /** @type {number} */ (point.get(anychart.opt.SIZE)); //Bubble.
+    var v;
 
     if (goog.isNumber(chartStat[anychart.enums.Statistics.DATA_PLOT_X_SUM])) {
-      point.statistics[anychart.enums.Statistics.X_PERCENT_OF_TOTAL] = val / /** @type {number} */ (chartStat[anychart.enums.Statistics.DATA_PLOT_X_SUM]);
+      v = val / /** @type {number} */ (chartStat[anychart.enums.Statistics.DATA_PLOT_X_SUM]);
+      point.statistics[anychart.enums.Statistics.X_PERCENT_OF_TOTAL] = v * 100;
     }
 
     if (goog.isNumber(this.statistics(anychart.enums.Statistics.SERIES_X_SUM))) {
-      point.statistics[anychart.enums.Statistics.X_PERCENT_OF_SERIES] = val / /** @type {number} */ (this.statistics(anychart.enums.Statistics.SERIES_X_SUM));
+      v = val / /** @type {number} */ (this.statistics(anychart.enums.Statistics.SERIES_X_SUM));
+      point.statistics[anychart.enums.Statistics.X_PERCENT_OF_SERIES] = v * 100;
     }
 
     if (goog.isNumber(this.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_SUM))) {
-      point.statistics[anychart.enums.Statistics.BUBBLE_SIZE_PERCENT_OF_SERIES] = size / /** @type {number} */ (this.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_SUM));
-      point.statistics[anychart.enums.Statistics.BUBBLE_SIZE_PERCENT_OF_TOTAL] = size / /** @type {number} */ (chartStat[anychart.enums.Statistics.DATA_PLOT_BUBBLE_SIZE_SUM]);
+      v = size / /** @type {number} */ (this.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_SUM));
+      point.statistics[anychart.enums.Statistics.BUBBLE_SIZE_PERCENT_OF_SERIES] = v * 100;
+      v = size / /** @type {number} */ (chartStat[anychart.enums.Statistics.DATA_PLOT_BUBBLE_SIZE_SUM]);
+      point.statistics[anychart.enums.Statistics.BUBBLE_SIZE_PERCENT_OF_TOTAL] = v * 100;
       point.statistics[anychart.enums.Statistics.BUBBLE_SIZE] = size;
     }
 
@@ -1568,10 +1573,14 @@ anychart.core.SeriesBase.prototype.getPoint = function(index) {
       point.statistics[anychart.enums.Statistics.CATEGORY_NAME] = x;
       var catSum = chartSumArr[index];
 
-      point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_SERIES] = val / /** @type {number} */ (this.statistics(anychart.enums.Statistics.SERIES_Y_SUM));
-      point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_TOTAL] = val / chartStat[anychart.enums.Statistics.DATA_PLOT_Y_SUM];
-      point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_CATEGORY] = val / catSum;
-      point.statistics[anychart.enums.Statistics.CATEGORY_Y_PERCENT_OF_TOTAL] = catSum / chartStat[anychart.enums.Statistics.DATA_PLOT_Y_SUM];
+      v = val / /** @type {number} */ (this.statistics(anychart.enums.Statistics.SERIES_Y_SUM));
+      point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_SERIES] = v * 100;
+      v = val / chartStat[anychart.enums.Statistics.DATA_PLOT_Y_SUM];
+      point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_TOTAL] = v * 100;
+      v = val / catSum;
+      point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_CATEGORY] = v * 100;
+      v = catSum / chartStat[anychart.enums.Statistics.DATA_PLOT_Y_SUM];
+      point.statistics[anychart.enums.Statistics.CATEGORY_Y_PERCENT_OF_TOTAL] = v * 100;
       point.statistics[anychart.enums.Statistics.CATEGORY_Y_SUM] = catSum;
       point.statistics[anychart.enums.Statistics.CATEGORY_Y_MAX] = chartStat[anychart.enums.Statistics.CATEGORY_Y_MAX_ARR_][index];
       point.statistics[anychart.enums.Statistics.CATEGORY_Y_MIN] = chartStat[anychart.enums.Statistics.CATEGORY_Y_MIN_ARR_][index];
@@ -1579,10 +1588,14 @@ anychart.core.SeriesBase.prototype.getPoint = function(index) {
       point.statistics[anychart.enums.Statistics.CATEGORY_Y_MEDIAN] = chartStat[anychart.enums.Statistics.CATEGORY_Y_MEDIAN_ARR_][index];
       point.statistics[anychart.enums.Statistics.CATEGORY_Y_MODE] = chartStat[anychart.enums.Statistics.CATEGORY_Y_MODE_ARR_][index];
     } else {
-      point.statistics[anychart.enums.Statistics.X_PERCENT_OF_SERIES] = x / /** @type {number} */ (this.statistics(anychart.enums.Statistics.SERIES_X_SUM));
-      point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_SERIES] = val / /** @type {number} */ (this.statistics(anychart.enums.Statistics.SERIES_Y_SUM));
-      point.statistics[anychart.enums.Statistics.X_PERCENT_OF_TOTAL] = x / /** @type {number} */ (chartStat[anychart.enums.Statistics.DATA_PLOT_X_SUM]);
-      point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_TOTAL] = val / /** @type {number} */ (chartStat[anychart.enums.Statistics.DATA_PLOT_Y_SUM]);
+      v = x / /** @type {number} */ (this.statistics(anychart.enums.Statistics.SERIES_X_SUM));
+      point.statistics[anychart.enums.Statistics.X_PERCENT_OF_SERIES] = v * 100;
+      v = val / /** @type {number} */ (this.statistics(anychart.enums.Statistics.SERIES_Y_SUM));
+      point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_SERIES] = v * 100;
+      v = x / /** @type {number} */ (chartStat[anychart.enums.Statistics.DATA_PLOT_X_SUM]);
+      point.statistics[anychart.enums.Statistics.X_PERCENT_OF_TOTAL] = v * 100;
+      v = val / /** @type {number} */ (chartStat[anychart.enums.Statistics.DATA_PLOT_Y_SUM]);
+      point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_TOTAL] = v * 100;
 
     }
   }

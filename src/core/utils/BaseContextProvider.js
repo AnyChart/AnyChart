@@ -55,18 +55,6 @@ anychart.core.utils.BaseContextProvider.prototype.getTokenValue = function(name)
 /** @inheritDoc */
 anychart.core.utils.BaseContextProvider.prototype.getTokenType = function(name) {
   switch (name) {
-    case anychart.enums.StringToken.BUBBLE_SIZE_PERCENT_OF_CATEGORY:
-    case anychart.enums.StringToken.BUBBLE_SIZE_PERCENT_OF_SERIES:
-    case anychart.enums.StringToken.BUBBLE_SIZE_PERCENT_OF_TOTAL:
-    case anychart.enums.StringToken.CATEGORY_Y_PERCENT_OF_TOTAL:
-    case anychart.enums.StringToken.CATEGORY_Y_RANGE_PERCENT_OF_TOTAL:
-    case anychart.enums.StringToken.Y_PERCENT_OF_CATEGORY:
-    case anychart.enums.StringToken.Y_PERCENT_OF_SERIES:
-    case anychart.enums.StringToken.Y_PERCENT_OF_TOTAL:
-    case anychart.enums.StringToken.X_PERCENT_OF_SERIES:
-    case anychart.enums.StringToken.X_PERCENT_OF_TOTAL:
-      return anychart.enums.TokenType.PERCENT;
-
     case anychart.enums.StringToken.AXIS_SCALE_MAX:
     case anychart.enums.StringToken.AXIS_SCALE_MIN:
     case anychart.enums.StringToken.DATA_PLOT_Y_RANGE_MAX:
@@ -132,6 +120,17 @@ anychart.core.utils.BaseContextProvider.prototype.getTokenType = function(name) 
     case anychart.enums.StringToken.DATA_PLOT_Y_AVERAGE:
     case anychart.enums.StringToken.DATA_PLOT_POINT_COUNT:
     case anychart.enums.StringToken.DATA_PLOT_SERIES_COUNT:
+
+    case anychart.enums.StringToken.BUBBLE_SIZE_PERCENT_OF_CATEGORY:
+    case anychart.enums.StringToken.BUBBLE_SIZE_PERCENT_OF_SERIES:
+    case anychart.enums.StringToken.BUBBLE_SIZE_PERCENT_OF_TOTAL:
+    case anychart.enums.StringToken.CATEGORY_Y_PERCENT_OF_TOTAL:
+    case anychart.enums.StringToken.CATEGORY_Y_RANGE_PERCENT_OF_TOTAL:
+    case anychart.enums.StringToken.Y_PERCENT_OF_CATEGORY:
+    case anychart.enums.StringToken.Y_PERCENT_OF_SERIES:
+    case anychart.enums.StringToken.Y_PERCENT_OF_TOTAL:
+    case anychart.enums.StringToken.X_PERCENT_OF_SERIES:
+    case anychart.enums.StringToken.X_PERCENT_OF_TOTAL:
       return anychart.enums.TokenType.NUMBER;
 
     case anychart.enums.StringToken.NAME:

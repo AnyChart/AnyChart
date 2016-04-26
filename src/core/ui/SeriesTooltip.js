@@ -1171,7 +1171,7 @@ anychart.core.ui.SeriesTooltip.prototype.hideDelay = function(opt_value) {
  * @private
  */
 anychart.core.ui.SeriesTooltip.prototype.createDelayObject_ = function() {
-  // This wrapper with `refreshDaley_` necessary to avoid memory leaks when changing hideDelay_ value.
+  // This wrapper with 'refreshDaley_' necessary to avoid memory leaks when changing hideDelay_ value.
   if (this.delay_ && this.delay_.isActive()) {
     this.refreshDaley_ = true;
 

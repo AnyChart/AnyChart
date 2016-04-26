@@ -79,7 +79,7 @@ anychart.core.ChartWithCredits.prototype.onCreditsSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
     state |= anychart.ConsistencyState.BOUNDS;
   }
-  // If there are no signals – state == 0 and nothing will happen.
+  // If there are no signals - state == 0 and nothing will happen.
   this.invalidate(state, signal);
 };
 

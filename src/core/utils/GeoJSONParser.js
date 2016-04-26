@@ -455,9 +455,9 @@ anychart.utils.GeoJSONParser.prototype.transform_ = function(coord) {
   //   y = Math.round(y);
   // }
 
-  var ε = 1e-6, ε2 = ε * ε, τ = 2 * Math.PI, τε = τ - ε;
+  var epsilon = 1e-6, epsilon2 = epsilon * epsilon, tau = 2 * Math.PI, tauepsilon = tau - epsilon;
   var d3_radians = Math.PI / 180, d3_degrees = 180 / Math.PI;
-  var sqrtπ = Math.sqrt(Math.PI), radians = Math.PI / 180, degrees = 180 / Math.PI;
+  var sqrtpi = Math.sqrt(Math.PI), radians = Math.PI / 180, degrees = 180 / Math.PI;
 
   function sinci(x) {
     return x ? x / Math.sin(x) : 1;
@@ -496,17 +496,17 @@ anychart.utils.GeoJSONParser.prototype.transform_ = function(coord) {
   }
 
   function d3_geo_azimuthal(scale, angle) {
-    function azimuthal(λ, φ) {
-      var cosλ = Math.cos(λ);
-      var cosφ = Math.cos(φ);
-      var k = scale(cosλ * cosφ);
-      return [k * cosφ * Math.sin(λ), k * Math.sin(φ)];
+    function azimuthal(lambda, phi) {
+      var coslambda = Math.cos(lambda);
+      var cosphi = Math.cos(phi);
+      var k = scale(coslambda * cosphi);
+      return [k * cosphi * Math.sin(lambda), k * Math.sin(phi)];
     }
     azimuthal.invert = function(x, y) {
-      var ρ = Math.sqrt(x * x + y * y);
-      var c = angle(ρ);
+      var ro = Math.sqrt(x * x + y * y);
+      var c = angle(ro);
       var sinc = Math.sin(c), cosc = Math.cos(c);
-      return [Math.atan2(x * sinc, ρ * cosc), Math.asin(ρ && y * sinc / ρ)];
+      return [Math.atan2(x * sinc, ro * cosc), Math.asin(ro && y * sinc / ro)];
     };
     return azimuthal;
   }
@@ -514,7 +514,7 @@ anychart.utils.GeoJSONParser.prototype.transform_ = function(coord) {
   x = x * d3_radians;
   y = y * d3_radians;
 
-  x = x > Math.PI ? x - τ : x < -Math.PI ? x + τ : x;
+  x = x > Math.PI ? x - tau : x < -Math.PI ? x + tau : x;
   y = y;
 
   //--------------------------------------------------------------------------------
@@ -522,35 +522,35 @@ anychart.utils.GeoJSONParser.prototype.transform_ = function(coord) {
   //bonne
 
   // var parallel = 45;
-  // var φ0 = parallel * Math.PI / 180;
-  // var cotφ0 = 1 / Math.tan(φ0);
+  // var phi0 = parallel * Math.PI / 180;
+  // var cotphi0 = 1 / Math.tan(phi0);
   //
-  // var ρ = cotφ0 + φ0 - y;
-  // var E = ρ ? x * Math.cos(y) / ρ : ρ;
-  // x = ρ * Math.sin(E);
-  // y = cotφ0 - ρ * Math.cos(E);
+  // var ro = cotphi0 + phi0 - y;
+  // var E = ro ? x * Math.cos(y) / ro : ro;
+  // x = ro * Math.sin(E);
+  // y = cotphi0 - ro * Math.cos(E);
 
   //---------invert
 
-  // var ρ = Math.sqrt(x * x + (y = cotφ0 - y) * y);
-  // var φ = cotφ0 + φ0 - ρ;
-  // x = ρ / Math.cos(φ) * Math.atan2(x, y);
-  // y = φ;
+  // var ro = Math.sqrt(x * x + (y = cotphi0 - y) * y);
+  // var phi = cotphi0 + phi0 - ro;
+  // x = ro / Math.cos(phi) * Math.atan2(x, y);
+  // y = phi;
 
   //--------------------------------------------------------------------------------
 
   //eckert1
 
-  // var α = Math.sqrt(8 / (3 * Math.PI));
-  // x = α * x * (1 - Math.abs(y) / Math.PI);
-  // y = α * y;
+  // var alpha = Math.sqrt(8 / (3 * Math.PI));
+  // x = alpha * x * (1 - Math.abs(y) / Math.PI);
+  // y = alpha * y;
 
   //---------invert
 
-  // var α = Math.sqrt(8 / (3 * Math.PI));
-  // var φ = y / α;
-  // x = x / (α * (1 - Math.abs(φ) / Math.PI));
-  // y = φ;
+  // var alpha = Math.sqrt(8 / (3 * Math.PI));
+  // var phi = y / alpha;
+  // x = x / (alpha * (1 - Math.abs(phi) / Math.PI));
+  // y = phi;
 
   //--------------------------------------------------------------------------------
 
@@ -589,14 +589,14 @@ anychart.utils.GeoJSONParser.prototype.transform_ = function(coord) {
   // var x2 = x * x;
   // var y2 = y * y;
   // var s = 1 + x2 + y2;
-  // var sin3η = Math.sqrt(.5 * (s - Math.sqrt(s * s - 4 * y * y)));
-  // var η = asin(sin3η) / 3;
-  // var ξ = sin3η ? arcosh(Math.abs(y / sin3η)) / 3 : arsinh(Math.abs(x)) / 3;
-  // var cosη = Math.cos(η);
-  // var coshξ = cosh(ξ);
-  // var d = coshξ * coshξ - cosη * cosη;
-  // x = sgn(x) * 2 * Math.atan2(sinh(ξ) * cosη, .25 - d);
-  // y = sgn(y) * 2 * Math.atan2(coshξ * Math.sin(η), .25 + d);
+  // var sin3eta = Math.sqrt(.5 * (s - Math.sqrt(s * s - 4 * y * y)));
+  // var eta = asin(sin3eta) / 3;
+  // var xi = sin3eta ? arcosh(Math.abs(y / sin3eta)) / 3 : arsinh(Math.abs(x)) / 3;
+  // var coseta = Math.cos(eta);
+  // var coshxi = cosh(xi);
+  // var d = coshxi * coshxi - coseta * coseta;
+  // x = sgn(x) * 2 * Math.atan2(sinh(xi) * coseta, .25 - d);
+  // y = sgn(y) * 2 * Math.atan2(coshxi * Math.sin(eta), .25 + d);
 
   //--------------------------------------------------------------------------------
 
@@ -625,10 +625,10 @@ anychart.utils.GeoJSONParser.prototype.transform_ = function(coord) {
 
   //hammer
 
-  // var d3_geo_azimuthalEqualArea = d3_geo_azimuthal(function(cosλcosφ) {
-  //   return Math.sqrt(2 / (1 + cosλcosφ));
-  // }, function(ρ) {
-  //   return 2 * Math.asin(ρ / 2);
+  // var d3_geo_azimuthalEqualArea = d3_geo_azimuthal(function(coslambdacosphi) {
+  //   return Math.sqrt(2 / (1 + coslambdacosphi));
+  // }, function(ro) {
+  //   return 2 * Math.asin(ro / 2);
   // });
 
   // var B = 2;
@@ -652,44 +652,44 @@ anychart.utils.GeoJSONParser.prototype.transform_ = function(coord) {
 
   //Aitoff
 
-  // var cosφ = Math.cos(y);
-  // var sinciα = sinci(acos(cosφ * Math.cos(x /= 2)));
-  // x = 2 * cosφ * Math.sin(x) * sinciα;
-  // y = Math.sin(y) * sinciα;
+  // var cosphi = Math.cos(y);
+  // var sincialpha = sinci(acos(cosphi * Math.cos(x /= 2)));
+  // x = 2 * cosphi * Math.sin(x) * sincialpha;
+  // y = Math.sin(y) * sincialpha;
 
   //---------invert
 
-  // if (x * x + 4 * y * y > Math.PI * Math.PI + ε) return;
-  // var λ = x, φ = y, i = 25;
+  // if (x * x + 4 * y * y > Math.PI * Math.PI + epsilon) return;
+  // var lambda = x, phi = y, i = 25;
   // do {
-  //   var sinλ = Math.sin(λ);
-  //   var sinλ_2 = Math.sin(λ / 2);
-  //   var cosλ_2 = Math.cos(λ / 2);
-  //   var sinφ = Math.sin(φ);
-  //   var cosφ = Math.cos(φ);
-  //   var sin_2φ = Math.sin(2 * φ);
-  //   var sin2φ = sinφ * sinφ;
-  //   var cos2φ = cosφ * cosφ;
-  //   var sin2λ_2 = sinλ_2 * sinλ_2;
-  //   var C = 1 - cos2φ * cosλ_2 * cosλ_2;
-  //   var E = C ? acos(cosφ * cosλ_2) * Math.sqrt(F = 1 / C) : F = 0;
+  //   var sinlambda = Math.sin(lambda);
+  //   var sinlambda_2 = Math.sin(lambda / 2);
+  //   var coslambda_2 = Math.cos(lambda / 2);
+  //   var sinphi = Math.sin(phi);
+  //   var cosphi = Math.cos(phi);
+  //   var sin_2phi = Math.sin(2 * phi);
+  //   var sin2phi = sinphi * sinphi;
+  //   var cos2phi = cosphi * cosphi;
+  //   var sin2lambda_2 = sinlambda_2 * sinlambda_2;
+  //   var C = 1 - cos2phi * coslambda_2 * coslambda_2;
+  //   var E = C ? acos(cosphi * coslambda_2) * Math.sqrt(F = 1 / C) : F = 0;
   //   var F;
-  //   var fx = 2 * E * cosφ * sinλ_2 - x;
-  //   var fy = E * sinφ - y;
-  //   var δxδλ = F * (cos2φ * sin2λ_2 + E * cosφ * cosλ_2 * sin2φ);
-  //   var δxδφ = F * (.5 * sinλ * sin_2φ - E * 2 * sinφ * sinλ_2);
-  //   var δyδλ = F * .25 * (sin_2φ * sinλ_2 - E * sinφ * cos2φ * sinλ);
-  //   var δyδφ = F * (sin2φ * cosλ_2 + E * sin2λ_2 * cosφ);
-  //   var denominator = δxδφ * δyδλ - δyδφ * δxδλ;
+  //   var fx = 2 * E * cosphi * sinlambda_2 - x;
+  //   var fy = E * sinphi - y;
+  //   var deltaxdeltalambda = F * (cos2phi * sin2lambda_2 + E * cosphi * coslambda_2 * sin2phi);
+  //   var deltaxdeltaphi = F * (.5 * sinlambda * sin_2phi - E * 2 * sinphi * sinlambda_2);
+  //   var deltaydeltalambda = F * .25 * (sin_2phi * sinlambda_2 - E * sinphi * cos2phi * sinlambda);
+  //   var deltaydeltaphi = F * (sin2phi * coslambda_2 + E * sin2lambda_2 * cosphi);
+  //   var denominator = deltaxdeltaphi * deltaydeltalambda - deltaydeltaphi * deltaxdeltalambda;
   //   if (!denominator) break;
   //
-  //   var δλ = (fy * δxδφ - fx * δyδφ) / denominator;
-  //   var δφ = (fx * δyδλ - fy * δxδλ) / denominator;
-  //   λ -= δλ;
-  //   φ -= δφ;
-  // } while ((Math.abs(δλ) > ε || Math.abs(δφ) > ε) && --i > 0);
-  // x = λ;
-  // y = φ;
+  //   var deltalambda = (fy * deltaxdeltaphi - fx * deltaydeltaphi) / denominator;
+  //   var deltaphi = (fx * deltaydeltalambda - fy * deltaxdeltalambda) / denominator;
+  //   lambda -= deltalambda;
+  //   phi -= deltaphi;
+  // } while ((Math.abs(deltalambda) > epsilon || Math.abs(deltaphi) > epsilon) && --i > 0);
+  // x = lambda;
+  // y = phi;
 
   //--------------------------------------------------------------------------------
 
@@ -743,8 +743,8 @@ anychart.utils.GeoJSONParser.prototype.transform_ = function(coord) {
   //---------invert
 
   // var yy = y / Math.PI / 2;
-  // var φ = yy * 90;
-  // var i = Math.min(18, Math.abs(φ / 5));
+  // var phi = yy * 90;
+  // var i = Math.min(18, Math.abs(phi / 5));
   // var i0 = Math.max(0, Math.floor(i));
   // do {
   //   var ay = robinsonConstants[i0][1];
@@ -756,17 +756,17 @@ anychart.utils.GeoJSONParser.prototype.transform_ = function(coord) {
   //   var c = v / u;
   //   var di = t * (1 - c * t * (1 - 2 * c * t));
   //   if (di >= 0 || i0 === 1) {
-  //     φ = (y >= 0 ? 5 : -5) * (di + i);
-  //     var j = 50, δ;
+  //     phi = (y >= 0 ? 5 : -5) * (di + i);
+  //     var j = 50, delta;
   //     do {
-  //       i = Math.min(18, Math.abs(φ) / 5);
+  //       i = Math.min(18, Math.abs(phi) / 5);
   //       i0 = Math.floor(i);
   //       di = i - i0;
   //       ay = robinsonConstants[i0][1];
   //       by = robinsonConstants[i0 + 1][1];
   //       cy = robinsonConstants[Math.min(19, i0 + 2)][1];
-  //       φ -= (δ = (y >= 0 ? Math.PI / 2 : -Math.PI / 2) * (by + di * (cy - ay) / 2 + di * di * (cy - 2 * by + ay) / 2) - y) * degrees;
-  //     } while (Math.abs(δ) > ε2 && --j > 0);
+  //       phi -= (delta = (y >= 0 ? Math.PI / 2 : -Math.PI / 2) * (by + di * (cy - ay) / 2 + di * di * (cy - 2 * by + ay) / 2) - y) * degrees;
+  //     } while (Math.abs(delta) > epsilon2 && --j > 0);
   //     break;
   //   }
   // } while (--i0 >= 0);
@@ -774,7 +774,7 @@ anychart.utils.GeoJSONParser.prototype.transform_ = function(coord) {
   // var bx = robinsonConstants[i0 + 1][0];
   // var cx = robinsonConstants[Math.min(19, i0 + 2)][0];
   // x = x / (bx + di * (cx - ax) / 2 + di * di * (cx - 2 * bx + ax) / 2);
-  // y = φ * radians;
+  // y = phi * radians;
 
   //--------------------------------------------------------------------------------
 

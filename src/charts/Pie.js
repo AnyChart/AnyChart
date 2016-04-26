@@ -1532,11 +1532,14 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
       if (this.mode3d_) this.connectorsLowerLayer_.clear();
     }
 
+    var themePart = this.isOutsideLabels_() ?
+        anychart.getFullTheme()['pie']['outsideLabels'] :
+        anychart.getFullTheme()['pie']['insideLabels'];
+    this.labels().setAutoColor(themePart['autoColor']);
+    this.labels().disablePointerEvents(themePart['disablePointerEvents']);
     if (this.isOutsideLabels_()) {
-      this.labels().setAutoColor(anychart.getFullTheme()['pie']['outsideLabels']['autoColor']);
       this.calculateOutsideLabels();
     } else {
-      this.labels().setAutoColor(anychart.getFullTheme()['pie']['insideLabels']['autoColor']);
       iterator.reset();
       while (iterator.advance()) {
         if (this.isMissing_(iterator.get('value'))) continue;
@@ -4545,7 +4548,7 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.calcDomain = function() {
     var a = dRPie + this.pie.connectorLengthValue_;
     var b = dRYPie + this.pie.connectorLengthValue_;
 
-    // 3d pie hard fix (but works fine). (y - cy) should not be less than `b` by equation below.
+    // 3d pie hard fix (but works fine). (y - cy) should not be less than 'b' by equation below.
     if (Math.abs(y - cy) > b) {
       b += Math.abs(y - cy) - b;
     }

@@ -1167,11 +1167,13 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
       this.connectorsLayer_.clear();
     }
 
-    if (this.isInsideLabels_()) {
-      this.labels().setAutoColor(this.getProperThemePart()['insideLabels']['autoColor']);
-    } else {
-      this.labels().setAutoColor(this.getProperThemePart()['outsideLabels']['autoColor']);
+    var themePart = this.isInsideLabels_() ?
+        anychart.getFullTheme()['pie']['insideLabels'] :
+        anychart.getFullTheme()['pie']['outsideLabels'];
+    this.labels().setAutoColor(themePart['autoColor']);
+    this.labels().disablePointerEvents(themePart['disablePointerEvents']);
 
+    if (!this.isInsideLabels_()) {
       this.connectorLengthValue_ = anychart.utils.normalizeSize(
           this.connectorLength_, ((bounds.width - this.baseWidthValue_) / 2));
       // foolproof
@@ -1200,7 +1202,7 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
     while (iterator.advance()) {
       // fix for change position to inside after draw
       if (this.isInsideLabels_()) {
-        // reset `labelWidthForced` meta
+        // reset 'labelWidthForced' meta
         iterator.meta('labelWidthForced', undefined);
       }
 
@@ -1494,9 +1496,7 @@ anychart.core.PyramidFunnelBase.prototype.makeBrowserEvent = function(e) {
     'state': e['state']
   };
   var tag = anychart.utils.extractTag(res['domTarget']);
-  if (!anychart.utils.isNaN(tag))
-    res['pointIndex'] = anychart.utils.toNumber(tag.index);
-
+  res['pointIndex'] = anychart.utils.toNumber(tag.index);
   return res;
 };
 
@@ -2746,7 +2746,7 @@ anychart.core.PyramidFunnelBase.prototype.shiftCenterX_ = function() {
   this.calculatePoint_();
 
   var iterator = this.getIterator();
-  // reset `labelWidthForced` meta
+  // reset 'labelWidthForced' meta
   iterator.meta('labelWidthForced', undefined);
 
   var bounds = this.boundsValue_;
@@ -2905,7 +2905,7 @@ anychart.core.PyramidFunnelBase.prototype.drawConnectorLine_ = function(label, p
   var bounds = this.boundsValue_;
   var index = label.getIndex();
 
-  // `.data()` drawing connector should occur regardless of the position of the iterator.
+  // '.data()' drawing connector should occur regardless of the position of the iterator.
   // Since the connectors can be redrawn several times through the method of
   // anychart.core.PyramidFunnelBase.LabelsDomain.prototype.applyLabelsPosition_
   var pointPath = this.data().meta(index, 'point');

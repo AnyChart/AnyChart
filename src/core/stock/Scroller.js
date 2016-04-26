@@ -1,5 +1,6 @@
 goog.provide('anychart.core.stock.Scroller');
 goog.require('anychart.core.IChart');
+goog.require('anychart.core.IGroupingProvider');
 goog.require('anychart.core.IPlot');
 goog.require('anychart.core.axes.StockDateTime');
 goog.require('anychart.core.series.StockScroller');
@@ -19,6 +20,7 @@ goog.require('anychart.scales.StockScatterDateTime');
  * @extends {anychart.core.ui.Scroller}
  * @implements {anychart.core.IPlot}
  * @implements {anychart.core.IChart}
+ * @implements {anychart.core.IGroupingProvider}
  * @implements {anychart.core.stock.IKeyIndexTransformer}
  */
 anychart.core.stock.Scroller = function(chart) {
@@ -992,6 +994,24 @@ anychart.core.stock.Scroller.prototype.updateBoundsCache = function() {
   goog.base(this, 'updateBoundsCache');
   this.invalidateScaleDependend();
 };
+
+
+/**
+ * Returns current selection min distance (from scroller sources).
+ * @return {number}
+ */
+anychart.core.stock.Scroller.prototype.getCurrentMinDistance = function() {
+  return this.chart_.getCurrentScrollerMinDistance();
+};
+
+
+/**
+ * Returns gropuing.
+ * @return {anychart.core.stock.Grouping}
+ */
+anychart.core.stock.Scroller.prototype.grouping = function() {
+  return /** @type {anychart.core.stock.Grouping} */(this.chart_.scrollerGrouping());
+};
 //endregion
 
 
@@ -1037,7 +1057,7 @@ anychart.core.stock.Scroller.prototype.yScale = function(opt_value) {
  */
 anychart.core.stock.Scroller.prototype.xAxis = function(opt_value) {
   if (!this.xAxis_) {
-    this.xAxis_ = new anychart.core.axes.StockDateTime(true);
+    this.xAxis_ = new anychart.core.axes.StockDateTime(this, true);
     this.xAxis_.setParentEventTarget(this);
     this.xAxis_.enabled(false);
     this.xAxis_.zIndex(52);

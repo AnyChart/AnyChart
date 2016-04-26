@@ -44,20 +44,6 @@ anychart.core.stock.Controller = function() {
   this.tables_ = {};
 
   /**
-   * Current aggregation interval.
-   * @type {anychart.core.utils.DateTimeIntervalGenerator}
-   * @private
-   */
-  this.currentInterval_ = null;
-
-  /**
-   * Current aggregation interval for full range sources.
-   * @type {anychart.core.utils.DateTimeIntervalGenerator}
-   * @private
-   */
-  this.currentScrollerInterval_ = null;
-
-  /**
    * Main registry (for non-aggregated data).
    * @type {!anychart.core.stock.Registry}
    * @private
@@ -98,7 +84,8 @@ anychart.core.stock.Controller = function() {
     firstIndex: NaN,
     preFirstIndex: NaN,
     lastIndex: NaN,
-    postLastIndex: NaN
+    postLastIndex: NaN,
+    minDistance: NaN
   };
 
   /**
@@ -114,7 +101,8 @@ anychart.core.stock.Controller = function() {
     firstIndex: NaN,
     preFirstIndex: NaN,
     lastIndex: NaN,
-    postLastIndex: NaN
+    postLastIndex: NaN,
+    minDistance: NaN
   };
 
   /**
@@ -245,12 +233,10 @@ anychart.core.stock.Controller.prototype.refreshSelection = function(newPixelWid
         this.selectableSources_,
         this.currentRegistry_,
         this.currentSelection_,
-        this.currentInterval_,
         mainRegistryUpdated);
     if (selectionChanged) {
       this.currentRegistry_ = selectionChanged[0];
-      this.currentInterval_ = selectionChanged[1];
-      this.currentSelection_ = selectionChanged[2];
+      this.currentSelection_ = selectionChanged[1];
       result += 1;
     }
 
@@ -261,12 +247,10 @@ anychart.core.stock.Controller.prototype.refreshSelection = function(newPixelWid
         this.scrollerSources_,
         this.currentScrollerRegistry_,
         this.currentScrollerSelection_,
-        this.currentScrollerInterval_,
         mainRegistryUpdated);
     if (scrollerSelectionChanged) {
       this.currentScrollerRegistry_ = scrollerSelectionChanged[0];
-      this.currentScrollerInterval_ = scrollerSelectionChanged[1];
-      this.currentScrollerSelection_ = scrollerSelectionChanged[2];
+      this.currentScrollerSelection_ = scrollerSelectionChanged[1];
       result += 2;
     }
   }
@@ -298,33 +282,30 @@ anychart.core.stock.Controller.prototype.select = function(startKey, endKey) {
       this.selectableSources_,
       this.currentRegistry_,
       this.currentSelection_,
-      this.currentInterval_,
       false);
   if (result) {
     this.currentRegistry_ = result[0];
-    this.currentInterval_ = result[1];
-    this.currentSelection_ = result[2];
+    this.currentSelection_ = result[1];
   }
   return !!result;
 };
 
 
 /**
- * Common selection method. Returns null if nothing changed or an array of [newRegistry, newInterval, newSelection].
+ * Common selection method. Returns null if nothing changed or an array of [newRegistry, newSelection].
  * @param {number} startKey Selection start.
  * @param {number} endKey Selection end.
  * @param {!anychart.core.stock.Grouping} grouping Grouping settings.
  * @param {!Object.<!anychart.data.TableSelectable>} sources Sources hash map.
  * @param {!anychart.core.stock.Registry} currentRegistry Current registry used for the selection.
  * @param {!anychart.core.stock.Registry.Selection} currentSelection Current selection object.
- * @param {anychart.core.utils.IIntervalGenerator} currentInterval Current interval object.
  * @param {boolean} mainRegistryUpdated If the main registry was updated (data changed).
  * @return {Array}
  * @private
  */
 anychart.core.stock.Controller.prototype.select_ = function(startKey, endKey, grouping,
                                                             sources, currentRegistry,
-                                                            currentSelection, currentInterval,
+                                                            currentSelection,
                                                             mainRegistryUpdated) {
   if (startKey > endKey) {
     var tmp = startKey;
@@ -374,7 +355,7 @@ anychart.core.stock.Controller.prototype.select_ = function(startKey, endKey, gr
       for (hash in sources)
         sources[hash].selectInternal(startKey, endKey, interval);
     }
-    return [registry, interval, selection];
+    return [registry, selection];
   }
   return null;
 };
@@ -505,17 +486,15 @@ anychart.core.stock.Controller.prototype.updateMainRegistry = function() {
  * @param {boolean} forScroller
  */
 anychart.core.stock.Controller.prototype.updateCurrentRangeForScale = function(scale, forScroller) {
-  var selection = forScroller ? this.currentScrollerSelection_ : this.currentSelection_;
+  var selection, interval;
   var veryFirst = this.mainRegistry_.getFirstKey();
   var veryLast = this.mainRegistry_.getLastKey();
-  var unit, count;
-  var interval = forScroller ? this.currentScrollerInterval_ : this.currentInterval_;
-  if (interval) {
-    unit = interval.getUnit();
-    count = interval.getCount();
+  if (forScroller) {
+    selection = this.currentScrollerSelection_;
+    interval = this.grouping().getCurrentDataInterval();
   } else {
-    unit = anychart.enums.Interval.MILLISECOND;
-    count = 1;
+    selection = this.currentSelection_;
+    interval = this.scrollerGrouping().getCurrentDataInterval();
   }
   scale.setCurrentRange(
       goog.math.clamp(selection.startKey, veryFirst, veryLast),
@@ -523,7 +502,7 @@ anychart.core.stock.Controller.prototype.updateCurrentRangeForScale = function(s
       // effectively equals to clamping :)
       isNaN(selection.preFirstIndex) ? selection.firstIndex : selection.startIndex,
       isNaN(selection.postLastIndex) ? selection.lastIndex : selection.endIndex,
-      unit, count);
+      interval.unit, interval.count);
 };
 
 
@@ -741,20 +720,20 @@ anychart.core.stock.Controller.prototype.currentSelectionSticksRight = function(
 
 
 /**
- * Returns current grouping interval.
- * @return {anychart.enums.Interval}
+ * Returns min keys distance for current selection.
+ * @return {number}
  */
-anychart.core.stock.Controller.prototype.getCurrentGroupingIntervalUnit = function() {
-  return this.currentInterval_ ? this.currentInterval_.getUnit() : anychart.enums.Interval.MILLISECOND;
+anychart.core.stock.Controller.prototype.getCurrentMinDistance = function() {
+  return this.currentSelection_.minDistance;
 };
 
 
 /**
- * Returns current grouping interval count.
+ * Returns min keys distance for current scroller selection.
  * @return {number}
  */
-anychart.core.stock.Controller.prototype.getCurrentGroupingIntervalCount = function() {
-  return this.currentInterval_ ? this.currentInterval_.getCount() : 1;
+anychart.core.stock.Controller.prototype.getCurrentScrollerMinDistance = function() {
+  return this.currentScrollerSelection_.minDistance;
 };
 
 
@@ -773,24 +752,6 @@ anychart.core.stock.Controller.prototype.getFirstScrollerIndex = function() {
  */
 anychart.core.stock.Controller.prototype.getLastScrollerIndex = function() {
   return this.currentScrollerSelection_.endIndex;
-};
-
-
-/**
- * Returns current grouping interval.
- * @return {anychart.enums.Interval}
- */
-anychart.core.stock.Controller.prototype.getScrollerGroupingIntervalUnit = function() {
-  return this.currentScrollerInterval_.getUnit();
-};
-
-
-/**
- * Returns current grouping interval count.
- * @return {number}
- */
-anychart.core.stock.Controller.prototype.getScrollerGroupingIntervalCount = function() {
-  return this.currentScrollerInterval_.getCount();
 };
 //endregion
 

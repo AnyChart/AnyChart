@@ -1,5 +1,6 @@
 goog.provide('anychart.core.I3DProvider');
 goog.provide('anychart.core.IChart');
+goog.provide('anychart.core.IGroupingProvider');
 goog.provide('anychart.core.IPlot');
 
 
@@ -141,3 +142,23 @@ anychart.core.I3DProvider.prototype.yInverted = function() {};
  * @return {boolean}
  */
 anychart.core.I3DProvider.prototype.xInverted = function() {};
+
+
+
+/**
+ * @interface
+ * @extends {anychart.core.IChart}
+ */
+anychart.core.IGroupingProvider = function() {};
+
+
+/**
+ * @return {number}
+ */
+anychart.core.IGroupingProvider.prototype.getCurrentMinDistance = function() {};
+
+
+/**
+ * @return {anychart.core.IGroupingProvider|anychart.core.stock.Grouping}
+ */
+anychart.core.IGroupingProvider.prototype.grouping = function() {};

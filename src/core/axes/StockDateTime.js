@@ -1,5 +1,6 @@
 goog.provide('anychart.core.axes.StockDateTime');
 goog.require('acgraph');
+goog.require('anychart.core.IGroupingProvider');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.axes.StockTicks');
 goog.require('anychart.core.ui.Background');
@@ -10,12 +11,20 @@ goog.require('anychart.math.Rect');
 
 /**
  * Stock date time axis class.
+ * @param {anychart.core.IGroupingProvider} groupingProvider
  * @param {boolean=} opt_disableInteractivity
  * @constructor
  * @extends {anychart.core.VisualBase}
  */
-anychart.core.axes.StockDateTime = function(opt_disableInteractivity) {
+anychart.core.axes.StockDateTime = function(groupingProvider, opt_disableInteractivity) {
   goog.base(this);
+
+  /**
+   * Grouping provider
+   * @type {anychart.core.IGroupingProvider}
+   * @private
+   */
+  this.groupingProvider_ = groupingProvider;
 
   /**
    * Axis labels.
@@ -462,8 +471,6 @@ anychart.core.axes.StockDateTime.prototype.draw = function() {
  */
 anychart.core.axes.StockDateTime.prototype.drawLabels_ = function(bounds, iterator) {
   // interval info
-  var groupingUnit = this.scale_.getGroupingUnit();
-  var groupingUnitCount = this.scale_.getGroupingUnitCount();
   var majorUnit = this.scale_.getMajorIntervalUnit();
   var majorUnitCount = this.scale_.getMajorIntervalUnitCount();
   var minorUnit = this.scale_.getMinorIntervalUnit();
@@ -516,15 +523,15 @@ anychart.core.axes.StockDateTime.prototype.drawLabels_ = function(bounds, iterat
         majorIndexes.push(majorIndex);
         if (!firstMajorLabelBounds)
           firstMajorLabelBounds = this.getLabelBounds_(curr, currIsMajor, bounds,
-              groupingUnit, groupingUnitCount, majorUnit, majorUnitCount, minorUnit, minorUnitCount, 0);
+              majorUnit, majorUnitCount, minorUnit, minorUnitCount, 0);
       } else if (allowMinor) {
         minorToDraw.push(curr);
         minorIndexes.push(minorIndex);
         allMinorBounds.push(this.getLabelBounds_(curr, currIsMajor, bounds,
-            groupingUnit, groupingUnitCount, majorUnit, majorUnitCount, minorUnit, minorUnitCount, 0));
+            majorUnit, majorUnitCount, minorUnit, minorUnitCount, 0));
       }
     } else {
-      currBounds = this.getLabelBounds_(curr, currIsMajor, bounds, groupingUnit, groupingUnitCount,
+      currBounds = this.getLabelBounds_(curr, currIsMajor, bounds,
           majorUnit, majorUnitCount, minorUnit, minorUnitCount, currIsMajor ? majorIndex : minorIndex);
       if (currIsMajor) {
         if (this.labelsOverlapMode_ == anychart.enums.StockLabelsOverlapMode.ALLOW_MAJOR_OVERLAP ||
@@ -570,7 +577,7 @@ anychart.core.axes.StockDateTime.prototype.drawLabels_ = function(bounds, iterat
 
   curr = iterator.getPreFirstMajor();
   if (this.drawHelperLabel_ && !isNaN(curr)) {
-    currBounds = this.getLabelBounds_(curr, true, bounds, groupingUnit, groupingUnitCount,
+    currBounds = this.getLabelBounds_(curr, true, bounds,
         majorUnit, majorUnitCount, minorUnit, minorUnitCount, 0);
     if (currBounds && (!firstMajorLabelBounds || !currBounds.intersects(firstMajorLabelBounds))) {
       if (this.labelsOverlapMode_ != anychart.enums.StockLabelsOverlapMode.ALLOW_OVERLAP) {
@@ -584,18 +591,18 @@ anychart.core.axes.StockDateTime.prototype.drawLabels_ = function(bounds, iterat
           goog.array.splice(minorIndexes, 0, i);
         }
       }
-      this.drawLabel_(curr, true, bounds, groupingUnit, groupingUnitCount,
+      this.drawLabel_(curr, true, bounds,
           majorUnit, majorUnitCount, minorUnit, minorUnitCount, 0);
     }
 
   }
 
   for (i = 0; i < majorToDraw.length; i++) {
-    this.drawLabel_(majorToDraw[i], true, bounds, groupingUnit, groupingUnitCount,
+    this.drawLabel_(majorToDraw[i], true, bounds,
         majorUnit, majorUnitCount, minorUnit, minorUnitCount, majorIndexes[i]);
   }
   for (i = 0; i < minorToDraw.length; i++) {
-    this.drawLabel_(minorToDraw[i], false, bounds, groupingUnit, groupingUnitCount,
+    this.drawLabel_(minorToDraw[i], false, bounds,
         majorUnit, majorUnitCount, minorUnit, minorUnitCount, minorIndexes[i]);
   }
 };
@@ -606,8 +613,6 @@ anychart.core.axes.StockDateTime.prototype.drawLabels_ = function(bounds, iterat
  * @param {number} value
  * @param {boolean} isMajor
  * @param {anychart.math.Rect} bounds
- * @param {anychart.enums.Interval} groupingUnit
- * @param {number} groupingUnitCount
  * @param {anychart.enums.Interval} majorUnit
  * @param {number} majorUnitCount
  * @param {anychart.enums.Interval} minorUnit
@@ -615,8 +620,8 @@ anychart.core.axes.StockDateTime.prototype.drawLabels_ = function(bounds, iterat
  * @param {number} index
  * @private
  */
-anychart.core.axes.StockDateTime.prototype.drawLabel_ = function(value, isMajor, bounds, groupingUnit,
-    groupingUnitCount, majorUnit, majorUnitCount, minorUnit, minorUnitCount, index) {
+anychart.core.axes.StockDateTime.prototype.drawLabel_ = function(value, isMajor, bounds,
+    majorUnit, majorUnitCount, minorUnit, minorUnitCount, index) {
   var labels;
   if (isMajor) {
     labels = this.labels();
@@ -627,8 +632,7 @@ anychart.core.axes.StockDateTime.prototype.drawLabel_ = function(value, isMajor,
   var x = Math.round(bounds.left + this.scale_.transformAligned(value) * bounds.width);
   var y = bounds.top;
 
-  var formatProvider = this.getLabelsFormatProvider_(value, groupingUnit, groupingUnitCount,
-      majorUnit, majorUnitCount, minorUnit, minorUnitCount);
+  var formatProvider = this.getLabelsFormatProvider_(value, majorUnit, majorUnitCount, minorUnit, minorUnitCount);
   var positionProvider = {'value': {'x': x, 'y': y}};
 
   var labelBounds = labels.measure(formatProvider, positionProvider, undefined, index);
@@ -646,8 +650,6 @@ anychart.core.axes.StockDateTime.prototype.drawLabel_ = function(value, isMajor,
  * @param {number} value
  * @param {boolean} isMajor
  * @param {anychart.math.Rect} bounds
- * @param {anychart.enums.Interval} groupingUnit
- * @param {number} groupingUnitCount
  * @param {anychart.enums.Interval} majorUnit
  * @param {number} majorUnitCount
  * @param {anychart.enums.Interval} minorUnit
@@ -656,16 +658,15 @@ anychart.core.axes.StockDateTime.prototype.drawLabel_ = function(value, isMajor,
  * @return {anychart.math.Rect}
  * @private
  */
-anychart.core.axes.StockDateTime.prototype.getLabelBounds_ = function(value, isMajor, bounds, groupingUnit,
-    groupingUnitCount, majorUnit, majorUnitCount, minorUnit, minorUnitCount, index) {
+anychart.core.axes.StockDateTime.prototype.getLabelBounds_ = function(value, isMajor, bounds,
+    majorUnit, majorUnitCount, minorUnit, minorUnitCount, index) {
   var labels = isMajor ? this.labels() : this.minorLabels();
   if (!labels.enabled()) return null;
 
   var x = Math.round(bounds.left + this.scale_.transformAligned(value) * bounds.width);
   var y = bounds.top;
 
-  var formatProvider = this.getLabelsFormatProvider_(value, groupingUnit, groupingUnitCount,
-      majorUnit, majorUnitCount, minorUnit, minorUnitCount);
+  var formatProvider = this.getLabelsFormatProvider_(value, majorUnit, majorUnitCount, minorUnit, minorUnitCount);
   var positionProvider = {'value': {'x': x, 'y': y}};
 
   var labelBounds = labels.measure(formatProvider, positionProvider, undefined, index);
@@ -677,8 +678,6 @@ anychart.core.axes.StockDateTime.prototype.getLabelBounds_ = function(value, isM
 /**
  * Gets format provider for label.
  * @param {number} value Label value.
- * @param {anychart.enums.Interval} groupingUnit
- * @param {number} groupingUnitCount
  * @param {anychart.enums.Interval} majorUnit
  * @param {number} majorUnitCount
  * @param {anychart.enums.Interval} minorUnit
@@ -686,7 +685,7 @@ anychart.core.axes.StockDateTime.prototype.getLabelBounds_ = function(value, isM
  * @return {Object} Labels format provider.
  * @private
  */
-anychart.core.axes.StockDateTime.prototype.getLabelsFormatProvider_ = function(value, groupingUnit, groupingUnitCount,
+anychart.core.axes.StockDateTime.prototype.getLabelsFormatProvider_ = function(value,
     majorUnit, majorUnitCount, minorUnit, minorUnitCount) {
   var labelText;
   var date = new Date(value);
@@ -699,9 +698,11 @@ anychart.core.axes.StockDateTime.prototype.getLabelsFormatProvider_ = function(v
 
   labelText = mm + '-' + dd + '-' + yy;
 
+  var grouping = this.groupingProvider_.grouping();
   return {
-    'groupingUnit': groupingUnit,
-    'groupingUnitCount': groupingUnitCount,
+    'dataIntervalUnit': grouping.getCurrentDataInterval().unit,
+    'dataIntervalUnitCount': grouping.getCurrentDataInterval().count,
+    'dataIsGrouped': grouping.isGrouped(),
     'majorIntervalUnit': majorUnit,
     'majorIntervalUnitCount': minorUnitCount,
     'minorIntervalUnit': minorUnit,

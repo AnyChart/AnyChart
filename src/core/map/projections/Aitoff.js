@@ -19,10 +19,10 @@ anychart.core.map.projections.Aitoff.prototype.forward = function(x, y) {
   x = goog.math.toRadians(x);
   y = goog.math.toRadians(y);
 
-  var cosφ = Math.cos(y);
-  var sinciα = this.sinci(this.acos(cosφ * Math.cos(x /= 2)));
-  x = 2 * cosφ * Math.sin(x) * sinciα;
-  y = Math.sin(y) * sinciα;
+  var cosphi = Math.cos(y);
+  var sincialpha = this.sinci(this.acos(cosphi * Math.cos(x /= 2)));
+  x = 2 * cosphi * Math.sin(x) * sincialpha;
+  y = Math.sin(y) * sincialpha;
 
   return [x, y];
 };
@@ -30,38 +30,38 @@ anychart.core.map.projections.Aitoff.prototype.forward = function(x, y) {
 
 /** @inheritDoc */
 anychart.core.map.projections.Aitoff.prototype.invert = function(x, y) {
-  var ε = 1e-6;
-  if (x * x + 4 * y * y > Math.PI * Math.PI + ε) return null;
-  var λ = x, φ = y, i = 25;
+  var epsilon = 1e-6;
+  if (x * x + 4 * y * y > Math.PI * Math.PI + epsilon) return null;
+  var lambda = x, phi = y, i = 25;
   var F = 0;
   do {
-    var sinλ = Math.sin(λ);
-    var sinλ_2 = Math.sin(λ / 2);
-    var cosλ_2 = Math.cos(λ / 2);
-    var sinφ = Math.sin(φ);
-    var cosφ = Math.cos(φ);
-    var sin_2φ = Math.sin(2 * φ);
-    var sin2φ = sinφ * sinφ;
-    var cos2φ = cosφ * cosφ;
-    var sin2λ_2 = sinλ_2 * sinλ_2;
-    var C = 1 - cos2φ * cosλ_2 * cosλ_2;
-    var E = C ? this.acos(cosφ * cosλ_2) * Math.sqrt(F = 1 / C) : F = 0;
-    var fx = 2 * E * cosφ * sinλ_2 - x;
-    var fy = E * sinφ - y;
-    var δxδλ = F * (cos2φ * sin2λ_2 + E * cosφ * cosλ_2 * sin2φ);
-    var δxδφ = F * (.5 * sinλ * sin_2φ - E * 2 * sinφ * sinλ_2);
-    var δyδλ = F * .25 * (sin_2φ * sinλ_2 - E * sinφ * cos2φ * sinλ);
-    var δyδφ = F * (sin2φ * cosλ_2 + E * sin2λ_2 * cosφ);
-    var denominator = δxδφ * δyδλ - δyδφ * δxδλ;
+    var sinlambda = Math.sin(lambda);
+    var sinlambda_2 = Math.sin(lambda / 2);
+    var coslambda_2 = Math.cos(lambda / 2);
+    var sinphi = Math.sin(phi);
+    var cosphi = Math.cos(phi);
+    var sin_2phi = Math.sin(2 * phi);
+    var sin2phi = sinphi * sinphi;
+    var cos2phi = cosphi * cosphi;
+    var sin2lambda_2 = sinlambda_2 * sinlambda_2;
+    var C = 1 - cos2phi * coslambda_2 * coslambda_2;
+    var E = C ? this.acos(cosphi * coslambda_2) * Math.sqrt(F = 1 / C) : F = 0;
+    var fx = 2 * E * cosphi * sinlambda_2 - x;
+    var fy = E * sinphi - y;
+    var deltaxdeltalambda = F * (cos2phi * sin2lambda_2 + E * cosphi * coslambda_2 * sin2phi);
+    var deltaxdeltaphi = F * (.5 * sinlambda * sin_2phi - E * 2 * sinphi * sinlambda_2);
+    var deltaydeltalambda = F * .25 * (sin_2phi * sinlambda_2 - E * sinphi * cos2phi * sinlambda);
+    var deltaydeltaphi = F * (sin2phi * coslambda_2 + E * sin2lambda_2 * cosphi);
+    var denominator = deltaxdeltaphi * deltaydeltalambda - deltaydeltaphi * deltaxdeltalambda;
     if (!denominator) break;
 
-    var δλ = (fy * δxδφ - fx * δyδφ) / denominator;
-    var δφ = (fx * δyδλ - fy * δxδλ) / denominator;
-    λ -= δλ;
-    φ -= δφ;
-  } while ((Math.abs(δλ) > ε || Math.abs(δφ) > ε) && --i > 0);
-  x = λ;
-  y = φ;
+    var deltalambda = (fy * deltaxdeltaphi - fx * deltaydeltaphi) / denominator;
+    var deltaphi = (fx * deltaydeltalambda - fy * deltaxdeltalambda) / denominator;
+    lambda -= deltalambda;
+    phi -= deltaphi;
+  } while ((Math.abs(deltalambda) > epsilon || Math.abs(deltaphi) > epsilon) && --i > 0);
+  x = lambda;
+  y = phi;
 
   return [goog.math.toDegrees(x), goog.math.toDegrees(y)];
 };

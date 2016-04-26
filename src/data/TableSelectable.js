@@ -238,15 +238,6 @@ anychart.data.TableSelectable.prototype.getMax = function(field) {
 
 
 /**
- * Returns minimum keys distance for the selection. If selection contains less than 2 points, returns NaN.
- * @return {number}
- */
-anychart.data.TableSelectable.prototype.getMinDistance = function() {
-  return this.currentSelection_.minDistance;
-};
-
-
-/**
  * Returns an index of the column mapped by the passed field name.
  * @param {string} field
  * @return {number|string}
@@ -337,8 +328,7 @@ anychart.data.TableSelectable.prototype.getExportingIterator = function() {
     mins: {},
     maxs: {},
     calcMaxs: [],
-    calcMins: [],
-    minDistance: NaN
+    calcMins: []
   };
   return new anychart.data.TableIterator(this.mapping_, selection, this.metaData_, !this.currentStorageIsMain_, coIterator);
 };
@@ -528,7 +518,6 @@ anychart.data.TableSelectable.RowProxy.prototype.getKey = function() {
 //anychart.data.TableSelectable.prototype['getMax'] = anychart.data.TableSelectable.prototype.getMax;
 //anychart.data.TableSelectable.prototype['getColumnMin'] = anychart.data.TableSelectable.prototype.getColumnMin;
 //anychart.data.TableSelectable.prototype['getColumnMax'] = anychart.data.TableSelectable.prototype.getColumnMax;
-//anychart.data.TableSelectable.prototype['getMinDistance'] = anychart.data.TableSelectable.prototype.getMinDistance;
 //anychart.data.TableSelectable.prototype['getMapping'] = anychart.data.TableSelectable.prototype.getMapping;
 
 //exports

@@ -504,6 +504,42 @@ window['anychart']['themes']['v6'] = {
     }
   },
 
+  'defaultGroupingSettings': {
+    'enabled': true,
+    'forced': false,
+    'levels': [
+      {'unit': 'millisecond', 'count': 1},
+      {'unit': 'millisecond', 'count': 5},
+      {'unit': 'millisecond', 'count': 10},
+      {'unit': 'millisecond', 'count': 25},
+      {'unit': 'millisecond', 'count': 50},
+      {'unit': 'millisecond', 'count': 100},
+      {'unit': 'millisecond', 'count': 250},
+      {'unit': 'millisecond', 'count': 500},
+      {'unit': 'second', 'count': 1},
+      {'unit': 'second', 'count': 5},
+      {'unit': 'second', 'count': 10},
+      {'unit': 'second', 'count': 20},
+      {'unit': 'second', 'count': 30},
+      {'unit': 'minute', 'count': 1},
+      {'unit': 'minute', 'count': 5},
+      {'unit': 'minute', 'count': 15},
+      {'unit': 'minute', 'count': 30},
+      {'unit': 'hour', 'count': 1},
+      {'unit': 'hour', 'count': 2},
+      {'unit': 'hour', 'count': 6},
+      {'unit': 'hour', 'count': 12},
+      {'unit': 'day', 'count': 1},
+      {'unit': 'week', 'count': 1},
+      {'unit': 'month', 'count': 1},
+      {'unit': 'month', 'count': 3},
+      {'unit': 'month', 'count': 6},
+      {'unit': 'year', 'count': 1}
+    ],
+    'maxVisiblePoints': 500,
+    'minPixPerPoint': NaN
+  },
+
   // base/separated chart
   'chart': {
     'enabled': true,
@@ -5510,7 +5546,7 @@ window['anychart']['themes']['v6'] = {
          */
         'titleFormatter': function() {
           var date = /** @type {number} */(this['value']);
-          switch (this['groupingIntervalUnit']) {
+          switch (this['dataIntervalUnit']) {
             case 'year':
               return window['anychart']['format']['dateTime'](date, 'yyyy');
             case 'semester':
@@ -5838,7 +5874,7 @@ window['anychart']['themes']['v6'] = {
        */
       'titleFormatter': function() {
         var date = /** @type {number} */(this['hoveredDate']);
-        switch (this['groupingIntervalUnit']) {
+        switch (this['dataIntervalUnit']) {
           case 'year':
             return window['anychart']['format']['dateTime'](date, 'yyyy');
           case 'semester':

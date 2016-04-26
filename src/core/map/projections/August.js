@@ -42,14 +42,14 @@ anychart.core.map.projections.August.prototype.invert = function(x, y) {
   var x2 = x * x;
   var y2 = y * y;
   var s = 1 + x2 + y2;
-  var sin3η = Math.sqrt(.5 * (s - Math.sqrt(s * s - 4 * y * y)));
-  var η = this.asin(sin3η) / 3;
-  var ξ = sin3η ? this.arcosh(Math.abs(y / sin3η)) / 3 : this.arsinh(Math.abs(x)) / 3;
-  var cosη = Math.cos(η);
-  var coshξ = this.cosh(ξ);
-  var d = coshξ * coshξ - cosη * cosη;
-  x = this.sgn(x) * 2 * Math.atan2(this.sinh(ξ) * cosη, .25 - d);
-  y = this.sgn(y) * 2 * Math.atan2(coshξ * Math.sin(η), .25 + d);
+  var sin3eta = Math.sqrt(.5 * (s - Math.sqrt(s * s - 4 * y * y)));
+  var eta = this.asin(sin3eta) / 3;
+  var xi = sin3eta ? this.arcosh(Math.abs(y / sin3eta)) / 3 : this.arsinh(Math.abs(x)) / 3;
+  var coseta = Math.cos(eta);
+  var coshxi = this.cosh(xi);
+  var d = coshxi * coshxi - coseta * coseta;
+  x = this.sgn(x) * 2 * Math.atan2(this.sinh(xi) * coseta, .25 - d);
+  y = this.sgn(y) * 2 * Math.atan2(coshxi * Math.sin(eta), .25 + d);
 
   return [goog.math.toDegrees(x), goog.math.toDegrees(y)];
 };

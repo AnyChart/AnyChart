@@ -2613,7 +2613,7 @@ anychart.enums.normalizeGaugeScaleTypes = function(value) {
  * Csv mode enum.
  * @enum {string}
  */
-anychart.enums.CsvMode = {
+anychart.enums.ChartDataExportMode = {
   RAW: 'raw',
   SPECIFIC: 'specific',
   GROUPED: 'grouped'
@@ -2624,21 +2624,21 @@ anychart.enums.CsvMode = {
  * Normalizes csv mode.
  * By default normalizes as SPECIFIC.
  * @param {string=} opt_value
- * @return {anychart.enums.CsvMode} Normalized csv mode.
+ * @return {anychart.enums.ChartDataExportMode} Normalized csv mode.
  */
-anychart.enums.normalizeCsvMode = function(opt_value) {
+anychart.enums.normalizeChartDataExportMode = function(opt_value) {
   opt_value = (String(opt_value)).toLowerCase();
 
   switch (opt_value) {
     case 'raw':
-      return anychart.enums.CsvMode.RAW;
+      return anychart.enums.ChartDataExportMode.RAW;
     case 'specific':
-      return anychart.enums.CsvMode.SPECIFIC;
+      return anychart.enums.ChartDataExportMode.SPECIFIC;
     case 'grouped':
-      return anychart.enums.CsvMode.GROUPED;
+      return anychart.enums.ChartDataExportMode.GROUPED;
   }
 
-  return anychart.enums.CsvMode.SPECIFIC;
+  return anychart.enums.ChartDataExportMode.SPECIFIC;
 };
 
 
@@ -5321,6 +5321,6 @@ goog.exportSymbol('anychart.enums.Statistics.Y_PERCENT_OF_SERIES', anychart.enum
 goog.exportSymbol('anychart.enums.Statistics.Y_PERCENT_OF_TOTAL', anychart.enums.Statistics.Y_PERCENT_OF_TOTAL);
 goog.exportSymbol('anychart.enums.Statistics.Y_VALUE', anychart.enums.Statistics.Y_VALUE);
 
-goog.exportSymbol('anychart.enums.CsvMode.RAW', anychart.enums.CsvMode.RAW);
-goog.exportSymbol('anychart.enums.CsvMode.SPECIFIC', anychart.enums.CsvMode.SPECIFIC);
-goog.exportSymbol('anychart.enums.CsvMode.GROUPED', anychart.enums.CsvMode.GROUPED);
+goog.exportSymbol('anychart.enums.ChartDataExportMode.RAW', anychart.enums.ChartDataExportMode.RAW);
+goog.exportSymbol('anychart.enums.ChartDataExportMode.SPECIFIC', anychart.enums.ChartDataExportMode.SPECIFIC);
+goog.exportSymbol('anychart.enums.ChartDataExportMode.GROUPED', anychart.enums.ChartDataExportMode.GROUPED);
