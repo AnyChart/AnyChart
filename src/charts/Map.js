@@ -593,7 +593,7 @@ anychart.charts.Map.TIMINGS = {
  */
 anychart.charts.Map.DEFAULT_TX = {
   'default': {
-    'crs': '+proj=longlat +datum=WGS84 +no_defs',
+    'crs': 'wsg84',
     'scale': 1
   }
 };

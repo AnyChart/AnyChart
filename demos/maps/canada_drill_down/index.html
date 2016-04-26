@@ -1,0 +1,904 @@
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="tags" content="[{'x': '',  'value': ''}, ]"/>
+    <meta name="index" content="1000"/>
+    <meta name="is-new" content="false"/>
+
+    <!-- todo: remove -->
+    <!--<script src="https://code.highcharts.com/maps/highmaps.js"></script>-->
+    <!--<script src="https://code.highcharts.com/maps/modules/exporting.js"></script>-->
+
+
+    <script src="//code.jquery.com/jquery-1.12.0.min.js" data-export="true"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js" data-export="true"></script>
+
+
+
+    <!--<script src="../../../out/anychart-bundle.min.js"></script>-->
+
+
+    <script src="../../../contrib/closure-library/closure/goog/base.js"></script>
+    <script src="../../../src/deps.js"></script>
+    <script>
+        goog.require('anychart.themes.defaultTheme');
+        goog.require('anychart.modules.anychart_bundle');
+    </script>
+    <script src="../../../proj4.js"></script>
+
+
+    <script src="https://cdn.anychart.com/js/utils/style_installer.min.js" data-export="true"></script>
+    <script src="http://cdn.anychart.com/geodata/1.2.0/countries/canada/canada.js" data-export="true"></script>
+
+
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.anychart.com/css/latest/anychart-ui.min.css">
+    <script x-export="map">
+        var generateData, getData;
+        $(document).ready(function() {
+            var showPreload = true;
+            anychart.onDocumentReady(function() {
+                var randomExt = function(a, b) {
+                    return Math.round(Math.random() * (b - a + 1) + a);
+                };
+
+                getData = function() {
+                    features = map.geoData()['features'];
+                    for (var i = 0, len = features.length; i < len; i++) {
+                        var feature = features[i];
+                        var prop = feature['properties'];
+                        if (prop) {
+                            var url_name = prop['name'].toLowerCase().replace(/\s/g, '_').replace('é', 'e');
+                            var url = 'http://cdn.anychart.com/geodata/1.1.0/canada_states/' + url_name + '/' + url_name + '.js';
+                            $.ajax({
+                                type: "GET",
+                                url: url,
+                                dataType: "script"
+                            });
+                        }
+                    }
+                };
+
+                generateData = function(opt_min, opt_max) {
+                    var resultData = {};
+                    features = map.geoData()['features'];
+                    var min = opt_min !== void 0 ? opt_min : 0;
+                    var max = opt_max !== void 0 ? opt_max : 100;
+
+                    for (var i = 0, len = features.length; i < len; i++) {
+                        var feature = features[i];
+                        var prop = feature['properties'];
+                        if (prop) {
+                            var id = feature['properties']['id'];
+                            var countyData = [];
+
+                            var url_name = prop['name'].toLowerCase().replace(/\s/g, '_').replace('é', 'e');
+                            var data = anychart.maps[url_name];
+
+                            if (data) {
+                                var features_ = data['features'];
+
+                                for (var j = 0, len_ = features_.length; j < len_; j++) {
+                                    var feature_ = features_[j];
+                                    var prop_ = feature_['properties'];
+                                    if (prop_) {
+                                        countyData.push({
+                                            'id': prop_['id'],
+                                            'name': prop_['fedename'],
+                                            'value': randomExt(min, max)
+                                        });
+                                    }
+                                }
+
+                                resultData[id] = countyData;
+                            }
+                        }
+                    }
+                    return JSON.stringify(resultData);
+                };
+
+                // Defines settings for maps regions (regions bounds are not relevant for this data, so let's make it less contrast)
+                var customTheme = {
+                    "map": {
+                        'unboundRegions': {'enabled': true, 'fill': '#E1E1E1', 'stroke': '#D2D2D2'}
+                    }
+                };
+                anychart.theme(customTheme);
+                // creates root map
+                map = anychart.map();
+
+                // sets geo data
+                map.geoData(anychart.maps.canada);
+
+                // sets title settings
+                var title = 'ACME Online Shop Popularity in Canada by Region<br/><span style="color:#212121; font-size: 13px;">Popularity estimated by the number of orders in the last year.</span>';
+                map.title().enabled(true).padding([0, 0, 20, 0]).useHtml(true).text(title);
+
+                // sets settings for map chart
+                map.padding([10, 10, 10, 10]);
+                map.interactivity().selectionMode("none");
+
+                map.maxBubbleSize(50);
+                map.minBubbleSize(15);
+                var series = map.bubble(anychart.data.set(general_data).mapAs(undefined, {'size': 'value'}));
+                series.fill('#00b8d4');
+                series.stroke('3 #fafafa');
+                series.labels().enabled(true).position('right').fontColor('#474747').anchor('left').useHtml(true).textFormatter(function() {
+                    return this.getDataValue('name') + '<br/><span style="font-size: 12px; color: #212121"><b>' + this.getDataValue("value") + '</b> orders</span>';
+                });
+
+                // sets tooltip setting for the destination series
+                series.tooltip().enabled(false);
+
+                map.container('container');
+                map.listen('pointClick', function(evt) {
+                    var point = evt.point;
+                    var id = point.get('id');
+                    var name = point.get('name');
+                    var url_name = point.get('name').toLowerCase().replace(/\s/g, '_');
+
+                    if (regions_data[id]) {
+                        var url = 'http://cdn.anychart.com/geodata/1.2.0/canada_states/' + url_name + '/' + url_name + '.js';
+                        $.ajax({
+                            type: "GET",
+                            url: url,
+                            dataType: "script",
+                            beforeSend: function() {
+                                showPreload = true;
+                                setTimeout(showPreloader(), 10);
+                            },
+                            success: function() {
+                                var geoData = 'anychart.maps.' + url_name;
+                                var drillMap = anychart.map();
+                                var drillDownTitle = 'Orders from ACME Online Shop in ' + name + '<br/><span style="color:#212121; font-size: 13px;">Average number of orders by month.</span>';
+                                drillMap.crs(map.crs());
+                                drillMap.padding([10, 10, 10, 10]);
+                                drillMap.title().enabled(true).padding([0, 0, 20, 0]).useHtml(true).text(drillDownTitle);
+                                drillMap.geoData(geoData);
+
+                                var colorRange = drillMap.colorRange();
+                                colorRange.enabled(true);
+                                colorRange.length('30%');
+
+                                colorRange.padding([30, 0, 0, 0]);
+                                colorRange.labels().padding(0);
+                                colorRange.colorLineSize(10);
+                                colorRange.stroke('#CECECE');
+                                colorRange.ticks().stroke('#CECECE').position('outside').length(5).enabled(true);
+                                colorRange.marker().size(5);
+
+                                var dataSet = anychart.data.set(regions_data[id]).mapAs();
+                                var series = drillMap.choropleth(dataSet);
+
+                                series.stroke('2 #fff');
+                                series.labels().enabled(false);
+                                series.colorScale(anychart.scales.linearColor('#b2ebf2', '#00b8d4', '#0d47a1'));
+
+                                series.tooltip().titleFormatter(function() {
+                                    return this.getDataValue('name');
+                                });
+                                series.tooltip().enabled(true).useHtml(true).padding([8, 13, 10, 13]).fontSize(13).textFormatter(function() {
+                                    return '<span style="font-size: 12px; color: #cbcbcb">Orders:</span> ' + this.getDataValue("value") + '<span style="font-size: 12px; color: #cbcbcb"></span>';
+                                });
+                                map.drillTo(id, drillMap);
+                                hidePreloader();
+                            },
+                            error: function(data) {
+                                console.log('Error: ', data);
+                            }
+                        });
+                    }
+                });
+                map.draw();
+            });
+            function showPreloader() {
+                if (showPreload) $('#container').append('<div id="loader-wrapper" class="anychart-loader"><div class="rotating-cover"><div class="rotating-plane"><div class="chart-row"><span class="chart-col green"></span><span class="chart-col orange"></span><span class="chart-col red"></span></div></div></div></div>');
+            }
+
+            function hidePreloader() {
+                $('#loader-wrapper').remove();
+                showPreload = false;
+            }
+
+            var general_data = [
+                {
+                    'id': 'CA.AB',
+                    'name': 'Alberta',
+                    "value": "250",
+                    'label': {'position': 'top', 'anchor': 'bottomLeft'}
+                },
+                {'id': 'CA.BC', 'name': 'British Columbia', "value": "340"},
+                {'id': 'CA.MB', 'name': 'Manitoba', "value": "108"},
+                {
+                    'id': 'CA.NB',
+                    'name': 'New Brunswick',
+                    "value": "223",
+                    'label': {'position': 'left', 'anchor': 'right', 'hAlign': 'right'}
+                },
+                {
+                    'id': 'CA.NF',
+                    'name': 'Newfoundland and Labrador',
+                    "value": "247",
+                    'label': {'position': 'left', 'anchor': 'right', 'hAlign': 'right'}
+                },
+                {'id': 'CA.NS', 'name': 'Nova Scotia', "value": "191"},
+                {
+                    'id': 'CA.NT',
+                    'name': 'Northwest Territories',
+                    "value": "527",
+                    'label': {'position': 'bottom', 'anchor': 'top', 'hAlign': 'center'}
+                },
+                {
+                    'id': 'CA.NU',
+                    'name': 'Nunavut',
+                    "value": "247",
+                    'label': {'position': 'bottom', 'anchor': 'topRight'}
+                },
+                {'id': 'CA.ON', 'name': 'Ontario', "value": "910"},
+                {
+                    'id': 'CA.PE',
+                    'name': 'Prince Edward Island',
+                    "value": "130",
+                    'label': {'position': 'top', 'anchor': 'leftBottom'}
+                },
+                {'id': 'CA.QC', 'name': 'Quebec', "value": "668"},
+                {
+                    'id': 'CA.SK',
+                    'name': 'Saskatchewan',
+                    "value": "101",
+                    'label': {'position': 'bottom', 'anchor': 'top', 'hAlign': 'center'}
+                },
+                {'id': 'CA.YT', 'name': 'Yukon', "value": "291"}
+            ];
+            var regions_data = {
+                "CA.MB": [{
+                    "id": "CA.MB.46009",
+                    "name": "Saint Boniface",
+                    "value": 22
+                }, {"id": "CA.MB.46013", "name": "Winnipeg South", "value": 35}, {
+                    "id": "CA.MB.46014",
+                    "name": "Winnipeg South Centre",
+                    "value": 21
+                }, {"id": "CA.MB.46012", "name": "Winnipeg North", "value": 18}, {
+                    "id": "CA.MB.46005",
+                    "name": "Elmwood - Transcona",
+                    "value": 61
+                }, {"id": "CA.MB.46007", "name": "Portage - Lisgar", "value": 81}, {
+                    "id": "CA.MB.46011",
+                    "name": "Winnipeg Centre",
+                    "value": 1
+                }, {"id": "CA.MB.46002", "name": "Charleswood - St. James - Assiniboia", "value": 67}, {
+                    "id": "CA.MB.46006",
+                    "name": "Kildonan - St. Paul",
+                    "value": 100
+                }, {"id": "CA.MB.46004", "name": "Dauphin - Swan River - Marquette", "value": 97}, {
+                    "id": "CA.MB.46001",
+                    "name": "Brandon - Souris",
+                    "value": 13
+                }, {"id": "CA.MB.46010", "name": "Selkirk - Interlake", "value": 24}, {
+                    "id": "CA.MB.46003",
+                    "name": "Churchill",
+                    "value": 12
+                }, {"id": "CA.MB.46008", "name": "Provencher", "value": 64}],
+                "CA.SK": [{"id": "CA.SK.47011", "name": "Saskatoon - Wanuskewin", "value": 23}, {
+                    "id": "CA.SK.47013",
+                    "name": "Wascana",
+                    "value": 64
+                }, {"id": "CA.SK.47009", "name": "Saskatoon - Humboldt", "value": 56}, {
+                    "id": "CA.SK.47012",
+                    "name": "Souris - Moose Mountain",
+                    "value": 33
+                }, {"id": "CA.SK.47006", "name": "Prince Albert", "value": 65}, {
+                    "id": "CA.SK.47004",
+                    "name": "Cypress Hills - Grasslands",
+                    "value": 79
+                }, {
+                    "id": "CA.SK.47003",
+                    "name": "Desneth - Missinippi - Churchill River",
+                    "value": 71
+                }, {"id": "CA.SK.47002", "name": "Blackstrap", "value": 58}, {
+                    "id": "CA.SK.47005",
+                    "name": "Palliser",
+                    "value": 30
+                }, {"id": "CA.SK.47014", "name": "Yorkton - Melville", "value": 57}, {
+                    "id": "CA.SK.47010",
+                    "name": "Saskatoon - Rosetown - Biggar",
+                    "value": 10
+                }, {"id": "CA.SK.47007", "name": "Regina - Lumsden - Lake Centre", "value": 100}, {
+                    "id": "CA.SK.47008",
+                    "name": "Regina - Qu'Appelle",
+                    "value": 79
+                }, {"id": "CA.SK.47001", "name": "Battlefords - Lloydminster", "value": 88}],
+                "CA.AB": [{"id": "CA.AB.48003", "name": "Calgary Centre-North", "value": 70}, {
+                    "id": "CA.AB.48005",
+                    "name": "Calgary - Nose Hill",
+                    "value": 63
+                }, {"id": "CA.AB.48027", "name": "Wild Rose", "value": 68}, {
+                    "id": "CA.AB.48019",
+                    "name": "Lethbridge",
+                    "value": 85
+                }, {"id": "CA.AB.48012", "name": "Edmonton Centre", "value": 36}, {
+                    "id": "CA.AB.48002",
+                    "name": "Calgary East",
+                    "value": 38
+                }, {"id": "CA.AB.48010", "name": "Crowfoot", "value": 80}, {
+                    "id": "CA.AB.48018",
+                    "name": "Edmonton - Strathcona",
+                    "value": 69
+                }, {"id": "CA.AB.48011", "name": "Edmonton - Mill Woods - Beaumont", "value": 97}, {
+                    "id": "CA.AB.48024",
+                    "name": "Vegreville - Wainwright",
+                    "value": 25
+                }, {"id": "CA.AB.48020", "name": "Macleod", "value": 69}, {
+                    "id": "CA.AB.48022",
+                    "name": "Peace River",
+                    "value": 68
+                }, {"id": "CA.AB.48016", "name": "Edmonton - Sherwood Park", "value": 67}, {
+                    "id": "CA.AB.48008",
+                    "name": "Calgary Southwest",
+                    "value": 39
+                }, {"id": "CA.AB.48014", "name": "Edmonton - Leduc", "value": 20}, {
+                    "id": "CA.AB.48013",
+                    "name": "Edmonton East",
+                    "value": 91
+                }, {"id": "CA.AB.48028", "name": "Yellowhead", "value": 59}, {
+                    "id": "CA.AB.48004",
+                    "name": "Calgary Northeast",
+                    "value": 36
+                }, {"id": "CA.AB.48021", "name": "Medicine Hat", "value": 7}, {
+                    "id": "CA.AB.48007",
+                    "name": "Calgary Southeast",
+                    "value": 24
+                }, {"id": "CA.AB.48017", "name": "Edmonton - Spruce Grove", "value": 46}, {
+                    "id": "CA.AB.48006",
+                    "name": "Calgary Centre",
+                    "value": 42
+                }, {"id": "CA.AB.48023", "name": "Red Deer", "value": 51}, {
+                    "id": "CA.AB.48001",
+                    "name": "Fort McMurray - Athabasca",
+                    "value": 62
+                }, {"id": "CA.AB.48025", "name": "Westlock - St. Paul", "value": 8}, {
+                    "id": "CA.AB.48026",
+                    "name": "Wetaskiwin",
+                    "value": 45
+                }, {"id": "CA.AB.48015", "name": "Edmonton - St. Albert", "value": 9}, {
+                    "id": "CA.AB.48009",
+                    "name": "Calgary West",
+                    "value": 20
+                }],
+                "CA.BC": [{
+                    "id": "CA.BC.59036",
+                    "name": "West Vancouver - Sunshine Coast - Sea to Sky Country",
+                    "value": 20
+                }, {"id": "CA.BC.59024", "name": "Saanich - Gulf Islands", "value": 49}, {
+                    "id": "CA.BC.59006",
+                    "name": "Delta - Richmond East",
+                    "value": 38
+                }, {"id": "CA.BC.59016", "name": "Newton - North Delta", "value": 17}, {
+                    "id": "CA.BC.59028",
+                    "name": "Surrey North",
+                    "value": 58
+                }, {"id": "CA.BC.59018", "name": "Okanagan - Shuswap", "value": 43}, {
+                    "id": "CA.BC.59034",
+                    "name": "Vancouver South",
+                    "value": 61
+                }, {"id": "CA.BC.59022", "name": "Prince George - Peace River", "value": 71}, {
+                    "id": "CA.BC.59015",
+                    "name": "Nanaimo - Cowichan",
+                    "value": 82
+                }, {
+                    "id": "CA.BC.59027",
+                    "name": "South Surrey - White Rock - Cloverdale",
+                    "value": 80
+                }, {
+                    "id": "CA.BC.59021",
+                    "name": "Port Moody - Westwood - Port Coquitlam",
+                    "value": 87
+                }, {"id": "CA.BC.59014", "name": "Nanaimo - Alberni", "value": 96}, {
+                    "id": "CA.BC.59017",
+                    "name": "New Westminster - Coquitlam",
+                    "value": 83
+                }, {"id": "CA.BC.59002", "name": "Burnaby - Douglas", "value": 5}, {
+                    "id": "CA.BC.59023",
+                    "name": "Richmond",
+                    "value": 99
+                }, {"id": "CA.BC.59008", "name": "Esquimalt - Juan de Fuca", "value": 33}, {
+                    "id": "CA.BC.59011",
+                    "name": "Kelowna - Lake Country",
+                    "value": 34
+                }, {"id": "CA.BC.59010", "name": "Kamloops - Thompson - Cariboo", "value": 29}, {
+                    "id": "CA.BC.59009",
+                    "name": "Fleetwood - Port Kells",
+                    "value": 14
+                }, {"id": "CA.BC.59032", "name": "Vancouver Kingsway", "value": 39}, {
+                    "id": "CA.BC.59020",
+                    "name": "Okanagan - Coquihalla",
+                    "value": 33
+                }, {"id": "CA.BC.59035", "name": "Victoria", "value": 66}, {
+                    "id": "CA.BC.59005",
+                    "name": "Chilliwack - Fraser Canyon",
+                    "value": 78
+                }, {"id": "CA.BC.59012", "name": "Kootenay - Columbia", "value": 22}, {
+                    "id": "CA.BC.59019",
+                    "name": "North Vancouver",
+                    "value": 91
+                }, {"id": "CA.BC.59025", "name": "Skeena - Bulkley Valley", "value": 12}, {
+                    "id": "CA.BC.59004",
+                    "name": "Cariboo - Prince George",
+                    "value": 96
+                }, {"id": "CA.BC.59031", "name": "Vancouver Island North", "value": 54}, {
+                    "id": "CA.BC.59033",
+                    "name": "Vancouver Quadra",
+                    "value": 76
+                }, {
+                    "id": "CA.BC.59007",
+                    "name": "Pitt Meadows - Maple Ridge - Mission",
+                    "value": 42
+                }, {"id": "CA.BC.59030", "name": "Vancouver East", "value": 55}, {
+                    "id": "CA.BC.59013",
+                    "name": "Langley",
+                    "value": 35
+                }, {"id": "CA.BC.59003", "name": "Burnaby - New Westminster", "value": 78}, {
+                    "id": "CA.BC.59001",
+                    "name": "Abbotsford",
+                    "value": 89
+                }, {"id": "CA.BC.59029", "name": "Vancouver Centre", "value": 43}, {
+                    "id": "CA.BC.59026",
+                    "name": "British Columbia Southern Interior",
+                    "value": 66
+                }],
+                "CA.NU": [{"id": "CA.NU.62001", "name": "Nunavut", "value": 70}],
+                "CA.NT": [{"id": "CA.NT.61001", "name": "Western Arctic", "value": 80}],
+                "CA.YT": [{"id": "CA.YT.60001", "name": "Yukon", "value": 83}],
+                "CA.ON": [{
+                    "id": "CA.ON.35058",
+                    "name": "Northumberland - Quinte West",
+                    "value": 68
+                }, {"id": "CA.ON.35004", "name": "Barrie", "value": 4}, {
+                    "id": "CA.ON.35049",
+                    "name": "Mississauga - Erindale",
+                    "value": 88
+                }, {"id": "CA.ON.35075", "name": "Richmond Hill", "value": 9}, {
+                    "id": "CA.ON.35044",
+                    "name": "London West",
+                    "value": 96
+                }, {"id": "CA.ON.35043", "name": "London North Centre", "value": 26}, {
+                    "id": "CA.ON.35066",
+                    "name": "Ottawa West - Nepean",
+                    "value": 29
+                }, {"id": "CA.ON.35098", "name": "Wellington - Halton Hills", "value": 87}, {
+                    "id": "CA.ON.35070",
+                    "name": "Perth - Wellington",
+                    "value": 45
+                }, {
+                    "id": "CA.ON.35087",
+                    "name": "Stormont - Dundas - South Glengarry",
+                    "value": 25
+                }, {"id": "CA.ON.35082", "name": "Scarborough - Guildwood", "value": 75}, {
+                    "id": "CA.ON.35090",
+                    "name": "Thunder Bay - Rainy River",
+                    "value": 11
+                }, {"id": "CA.ON.35065", "name": "Ottawa - Vanier", "value": 13}, {
+                    "id": "CA.ON.35061",
+                    "name": "Oshawa",
+                    "value": 72
+                }, {"id": "CA.ON.35042", "name": "London - Fanshawe", "value": 15}, {
+                    "id": "CA.ON.35064",
+                    "name": "Ottawa South",
+                    "value": 84
+                }, {"id": "CA.ON.35062", "name": "Ottawa Centre", "value": 81}, {
+                    "id": "CA.ON.35106",
+                    "name": "York West",
+                    "value": 82
+                }, {"id": "CA.ON.35076", "name": "St. Catharines", "value": 67}, {
+                    "id": "CA.ON.35074",
+                    "name": "Renfrew - Nipissing - Pembroke",
+                    "value": 19
+                }, {"id": "CA.ON.35009", "name": "Brant", "value": 1}, {
+                    "id": "CA.ON.35053",
+                    "name": "Newmarket - Aurora",
+                    "value": 69
+                }, {"id": "CA.ON.35017", "name": "Don Valley West", "value": 23}, {
+                    "id": "CA.ON.35081",
+                    "name": "Scarborough Centre",
+                    "value": 22
+                }, {"id": "CA.ON.35026", "name": "Bruce - Grey - Owen Sound", "value": 0}, {
+                    "id": "CA.ON.35034",
+                    "name": "Huron - Bruce",
+                    "value": 94
+                }, {"id": "CA.ON.35014", "name": "Durham", "value": 43}, {
+                    "id": "CA.ON.35031",
+                    "name": "Hamilton Centre",
+                    "value": 99
+                }, {"id": "CA.ON.35039", "name": "Kitchener - Waterloo", "value": 15}, {
+                    "id": "CA.ON.35089",
+                    "name": "Thornhill",
+                    "value": 64
+                }, {"id": "CA.ON.35038", "name": "Kitchener - Conestoga", "value": 79}, {
+                    "id": "CA.ON.35002",
+                    "name": "Algoma - Manitoulin - Kapuskasing",
+                    "value": 51
+                }, {"id": "CA.ON.35088", "name": "Sudbury", "value": 2}, {
+                    "id": "CA.ON.35097",
+                    "name": "Welland",
+                    "value": 74
+                }, {"id": "CA.ON.35095", "name": "Trinity - Spadina", "value": 52}, {
+                    "id": "CA.ON.35045",
+                    "name": "Markham - Unionville",
+                    "value": 23
+                }, {"id": "CA.ON.35101", "name": "Windsor - Tecumseh", "value": 33}, {
+                    "id": "CA.ON.35006",
+                    "name": "Bramalea - Gore - Malton",
+                    "value": 45
+                }, {"id": "CA.ON.35059", "name": "Oak Ridges - Markham", "value": 39}, {
+                    "id": "CA.ON.35015",
+                    "name": "Davenport",
+                    "value": 20
+                }, {"id": "CA.ON.35071", "name": "Peterborough", "value": 62}, {
+                    "id": "CA.ON.35028",
+                    "name": "Haldimand - Norfolk",
+                    "value": 64
+                }, {"id": "CA.ON.35023", "name": "Etobicoke - Lakeshore", "value": 59}, {
+                    "id": "CA.ON.35068",
+                    "name": "Parkdale - High Park",
+                    "value": 68
+                }, {"id": "CA.ON.35083", "name": "Scarborough - Rouge River", "value": 59}, {
+                    "id": "CA.ON.35073",
+                    "name": "Prince Edward - Hastings",
+                    "value": 32
+                }, {"id": "CA.ON.35024", "name": "Etobicoke North", "value": 50}, {
+                    "id": "CA.ON.35033",
+                    "name": "Hamilton Mountain",
+                    "value": 1
+                }, {"id": "CA.ON.35056", "name": "Nickel Belt", "value": 89}, {
+                    "id": "CA.ON.35084",
+                    "name": "Scarborough Southwest",
+                    "value": 32
+                }, {"id": "CA.ON.35048", "name": "Mississauga East - Cooksville", "value": 85}, {
+                    "id": "CA.ON.35020",
+                    "name": "Elgin - Middlesex - London",
+                    "value": 46
+                }, {"id": "CA.ON.35035", "name": "Kenora", "value": 88}, {
+                    "id": "CA.ON.35093",
+                    "name": "Toronto Centre",
+                    "value": 70
+                }, {"id": "CA.ON.35041", "name": "Leeds - Grenville", "value": 82}, {
+                    "id": "CA.ON.35011",
+                    "name": "Cambridge",
+                    "value": 49
+                }, {"id": "CA.ON.35013", "name": "Chatham-Kent - Essex", "value": 37}, {
+                    "id": "CA.ON.35063",
+                    "name": "Ottawa - Orlans",
+                    "value": 21
+                }, {"id": "CA.ON.35032", "name": "Hamilton East - Stoney Creek", "value": 30}, {
+                    "id": "CA.ON.35092",
+                    "name": "Timmins - James Bay",
+                    "value": 85
+                }, {"id": "CA.ON.35103", "name": "York Centre", "value": 26}, {
+                    "id": "CA.ON.35010",
+                    "name": "Burlington",
+                    "value": 36
+                }, {"id": "CA.ON.35057", "name": "Nipissing - Timiskaming", "value": 83}, {
+                    "id": "CA.ON.35079",
+                    "name": "Sault Ste. Marie",
+                    "value": 71
+                }, {"id": "CA.ON.35102", "name": "Windsor West", "value": 67}, {
+                    "id": "CA.ON.35003",
+                    "name": "Ancaster - Dundas - Flamborough - Westdale",
+                    "value": 41
+                }, {"id": "CA.ON.35046", "name": "Lambton - Kent - Middlesex", "value": 17}, {
+                    "id": "CA.ON.35007",
+                    "name": "Brampton - Springdale",
+                    "value": 50
+                }, {"id": "CA.ON.35078", "name": "Sarnia - Lambton", "value": 71}, {
+                    "id": "CA.ON.35067",
+                    "name": "Oxford",
+                    "value": 76
+                }, {"id": "CA.ON.35077", "name": "St. Paul's", "value": 95}, {
+                    "id": "CA.ON.35080",
+                    "name": "Scarborough - Agincourt",
+                    "value": 99
+                }, {"id": "CA.ON.35100", "name": "Willowdale", "value": 76}, {
+                    "id": "CA.ON.35105",
+                    "name": "York South - Weston",
+                    "value": 45
+                }, {"id": "CA.ON.35060", "name": "Oakville", "value": 46}, {
+                    "id": "CA.ON.35055",
+                    "name": "Niagara West - Glanbrook",
+                    "value": 44
+                }, {"id": "CA.ON.35091", "name": "Thunder Bay - Superior North", "value": 65}, {
+                    "id": "CA.ON.35012",
+                    "name": "Carleton - Mississippi Mills",
+                    "value": 56
+                }, {"id": "CA.ON.35037", "name": "Kitchener Centre", "value": 26}, {
+                    "id": "CA.ON.35047",
+                    "name": "Mississauga - Brampton South",
+                    "value": 68
+                }, {"id": "CA.ON.35054", "name": "Niagara Falls", "value": 18}, {
+                    "id": "CA.ON.35036",
+                    "name": "Kingston and the Islands",
+                    "value": 6
+                }, {"id": "CA.ON.35019", "name": "Eglinton - Lawrence", "value": 87}, {
+                    "id": "CA.ON.35005",
+                    "name": "Beaches - East York",
+                    "value": 87
+                }, {"id": "CA.ON.35069", "name": "Parry Sound - Muskoka", "value": 8}, {
+                    "id": "CA.ON.35051",
+                    "name": "Mississauga - Streetsville",
+                    "value": 59
+                }, {"id": "CA.ON.35085", "name": "Simcoe - Grey", "value": 13}, {
+                    "id": "CA.ON.35072",
+                    "name": "Pickering - Scarborough East",
+                    "value": 5
+                }, {"id": "CA.ON.35022", "name": "Etobicoke Centre", "value": 80}, {
+                    "id": "CA.ON.35001",
+                    "name": "Ajax - Pickering",
+                    "value": 71
+                }, {"id": "CA.ON.35021", "name": "Essex", "value": 47}, {
+                    "id": "CA.ON.35025",
+                    "name": "Glengarry - Prescott - Russell",
+                    "value": 68
+                }, {"id": "CA.ON.35052", "name": "Nepean - Carleton", "value": 24}, {
+                    "id": "CA.ON.35096",
+                    "name": "Vaughan",
+                    "value": 10
+                }, {"id": "CA.ON.35008", "name": "Brampton West", "value": 101}, {
+                    "id": "CA.ON.35029",
+                    "name": "Haliburton - Kawartha Lakes - Brock",
+                    "value": 43
+                }, {"id": "CA.ON.35030", "name": "Halton", "value": 100}, {
+                    "id": "CA.ON.35086",
+                    "name": "Simcoe North",
+                    "value": 69
+                }, {"id": "CA.ON.35094", "name": "Toronto - Danforth", "value": 4}, {
+                    "id": "CA.ON.35040",
+                    "name": "Lanark - Frontenac - Lennox and Addington",
+                    "value": 69
+                }, {"id": "CA.ON.35027", "name": "Guelph", "value": 85}, {
+                    "id": "CA.ON.35104",
+                    "name": "York - Simcoe",
+                    "value": 21
+                }, {"id": "CA.ON.35016", "name": "Don Valley East", "value": 71}, {
+                    "id": "CA.ON.35050",
+                    "name": "Mississauga South",
+                    "value": 25
+                }, {"id": "CA.ON.35018", "name": "Dufferin - Caledon", "value": 6}, {
+                    "id": "CA.ON.35099",
+                    "name": "Whitby - Oshawa",
+                    "value": 55
+                }],
+                "CA.QC": [{
+                    "id": "CA.QC.24045",
+                    "name": "Notre-Dame-de-Grce - Lachine",
+                    "value": 82
+                }, {
+                    "id": "CA.QC.24013",
+                    "name": "Charlesbourg - Haute-Saint-Charles",
+                    "value": 38
+                }, {
+                    "id": "CA.QC.24058",
+                    "name": "Montmagny - L'Islet - Kamouraska - Rivire-du-Loup",
+                    "value": 8
+                }, {"id": "CA.QC.24005", "name": "Beauce", "value": 21}, {
+                    "id": "CA.QC.24026",
+                    "name": "Jonquire - Alma",
+                    "value": 63
+                }, {"id": "CA.QC.24061", "name": "Rosemont - La Petite-Patrie", "value": 25}, {
+                    "id": "CA.QC.24036",
+                    "name": "Lotbinire - Chutes-de-la-Chaudire",
+                    "value": 0
+                }, {"id": "CA.QC.24051", "name": "Portneuf - Jacques-Cartier", "value": 81}, {
+                    "id": "CA.QC.24032",
+                    "name": "Laval",
+                    "value": 16
+                }, {"id": "CA.QC.24069", "name": "Shefford", "value": 80}, {
+                    "id": "CA.QC.24025",
+                    "name": "Joliette",
+                    "value": 45
+                }, {"id": "CA.QC.24012", "name": "Chambly - Borduas", "value": 93}, {
+                    "id": "CA.QC.24034",
+                    "name": "Lvis - Bellechasse",
+                    "value": 62
+                }, {
+                    "id": "CA.QC.24056",
+                    "name": "Rimouski-Neigette - Tmiscouata - Les Basques",
+                    "value": 21
+                }, {"id": "CA.QC.24053", "name": "Repentigny", "value": 94}, {
+                    "id": "CA.QC.24021",
+                    "name": "Hochelaga",
+                    "value": 0
+                }, {"id": "CA.QC.24068", "name": "Saint-Maurice - Champlain", "value": 94}, {
+                    "id": "CA.QC.24049",
+                    "name": "Pierrefonds - Dollard",
+                    "value": 49
+                }, {"id": "CA.QC.24073", "name": "Vaudreuil-Soulanges", "value": 93}, {
+                    "id": "CA.QC.24030",
+                    "name": "Laurentides - Labelle",
+                    "value": 11
+                }, {"id": "CA.QC.24028", "name": "La Pointe-de-l'le", "value": 89}, {
+                    "id": "CA.QC.24022",
+                    "name": "Honor-Mercier",
+                    "value": 42
+                }, {"id": "CA.QC.24016", "name": "Chicoutimi - Le Fjord", "value": 24}, {
+                    "id": "CA.QC.24042",
+                    "name": "Mgantic - L'rable",
+                    "value": 15
+                }, {"id": "CA.QC.24018", "name": "Drummond", "value": 45}, {
+                    "id": "CA.QC.24075",
+                    "name": "Westmount - Ville-Marie",
+                    "value": 32
+                }, {"id": "CA.QC.24003", "name": "Alfred-Pellan", "value": 84}, {
+                    "id": "CA.QC.24070",
+                    "name": "Sherbrooke",
+                    "value": 19
+                }, {"id": "CA.QC.24009", "name": "Bourassa", "value": 4}, {
+                    "id": "CA.QC.24023",
+                    "name": "Hull - Aylmer",
+                    "value": 83
+                }, {"id": "CA.QC.24047", "name": "Outremont", "value": 74}, {
+                    "id": "CA.QC.24008",
+                    "name": "Berthier - Maskinong",
+                    "value": 86
+                }, {"id": "CA.QC.24033", "name": "Laval - Les les", "value": 40}, {
+                    "id": "CA.QC.24057",
+                    "name": "Rivire-des-Mille-les",
+                    "value": 76
+                }, {"id": "CA.QC.24064", "name": "Saint-Jean", "value": 48}, {
+                    "id": "CA.QC.24052",
+                    "name": "Qubec",
+                    "value": 21
+                }, {"id": "CA.QC.24031", "name": "Laurier - Sainte-Marie", "value": 53}, {
+                    "id": "CA.QC.24059",
+                    "name": "Rivire-du-Nord",
+                    "value": 51
+                }, {"id": "CA.QC.24067", "name": "Saint-Lonard - Saint-Michel", "value": 10}, {
+                    "id": "CA.QC.24074",
+                    "name": "Verchres - Les Patriotes",
+                    "value": 2
+                }, {"id": "CA.QC.24020", "name": "Gatineau", "value": 54}, {
+                    "id": "CA.QC.24014",
+                    "name": "Montmorency - Charlevoix - Haute-Cte-Nord",
+                    "value": 2
+                }, {"id": "CA.QC.24004", "name": "Argenteuil - Papineau - Mirabel", "value": 99}, {
+                    "id": "CA.QC.24054",
+                    "name": "Bas-Richelieu - Nicolet - Bcancour",
+                    "value": 84
+                }, {"id": "CA.QC.24055", "name": "Richmond - Arthabaska", "value": 78}, {
+                    "id": "CA.QC.24010",
+                    "name": "Brome - Missisquoi",
+                    "value": 78
+                }, {"id": "CA.QC.24001", "name": "Abitibi - Tmiscamingue", "value": 94}, {
+                    "id": "CA.QC.24015",
+                    "name": "Chteauguay - Saint-Constant",
+                    "value": 93
+                }, {"id": "CA.QC.24066", "name": "Saint-Laurent - Cartierville", "value": 47}, {
+                    "id": "CA.QC.24006",
+                    "name": "Beauharnois - Salaberry",
+                    "value": 29
+                }, {"id": "CA.QC.24038", "name": "Louis-Saint-Laurent", "value": 58}, {
+                    "id": "CA.QC.24035",
+                    "name": "Longueuil - Pierre-Boucher",
+                    "value": 6
+                }, {"id": "CA.QC.24060", "name": "Roberval - Lac-Saint-Jean", "value": 86}, {
+                    "id": "CA.QC.24029",
+                    "name": "LaSalle - mard",
+                    "value": 101
+                }, {"id": "CA.QC.24039", "name": "Manicouagan", "value": 14}, {
+                    "id": "CA.QC.24037",
+                    "name": "Louis-Hbert",
+                    "value": 1
+                }, {
+                    "id": "CA.QC.24041",
+                    "name": "Haute-Gaspsie - La Mitis - Matane - Matapdia",
+                    "value": 96
+                }, {"id": "CA.QC.24007", "name": "Beauport - Limoilou", "value": 38}, {
+                    "id": "CA.QC.24017",
+                    "name": "Compton - Stanstead",
+                    "value": 80
+                }, {"id": "CA.QC.24024", "name": "Jeanne-Le Ber", "value": 1}, {
+                    "id": "CA.QC.24065",
+                    "name": "Saint-Lambert",
+                    "value": 89
+                }, {"id": "CA.QC.24072", "name": "Trois-Rivires", "value": 30}, {
+                    "id": "CA.QC.24062",
+                    "name": "Saint-Bruno - Saint-Hubert",
+                    "value": 52
+                }, {"id": "CA.QC.24040", "name": "Marc-Aurle-Fortin", "value": 49}, {
+                    "id": "CA.QC.24044",
+                    "name": "Mount Royal",
+                    "value": 4
+                }, {"id": "CA.QC.24019", "name": "Gaspsie - les-de-la-Madeleine", "value": 64}, {
+                    "id": "CA.QC.24063",
+                    "name": "Saint-Hyacinthe - Bagot",
+                    "value": 87
+                }, {"id": "CA.QC.24011", "name": "Brossard - La Prairie", "value": 100}, {
+                    "id": "CA.QC.24027",
+                    "name": "Lac-Saint-Louis",
+                    "value": 5
+                }, {"id": "CA.QC.24071", "name": "Terrebonne - Blainville", "value": 17}, {
+                    "id": "CA.QC.24050",
+                    "name": "Pontiac",
+                    "value": 91
+                }, {"id": "CA.QC.24043", "name": "Montcalm", "value": 17}, {
+                    "id": "CA.QC.24048",
+                    "name": "Papineau",
+                    "value": 25
+                }, {"id": "CA.QC.24002", "name": "Ahuntsic", "value": 42}, {
+                    "id": "CA.QC.24046",
+                    "name": "Abitibi - Baie-James - Nunavik - Eeyou",
+                    "value": 48
+                }],
+                "CA.NB": [{"id": "CA.NB.13009", "name": "Saint John", "value": 56}, {
+                    "id": "CA.NB.13010",
+                    "name": "Tobique - Mactaquac",
+                    "value": 94
+                }, {"id": "CA.NB.13005", "name": "Madawaska - Restigouche", "value": 78}, {
+                    "id": "CA.NB.13003",
+                    "name": "Fredericton",
+                    "value": 79
+                }, {"id": "CA.NB.13006", "name": "Miramichi", "value": 15}, {
+                    "id": "CA.NB.13002",
+                    "name": "Beausjour",
+                    "value": 55
+                }, {"id": "CA.NB.13004", "name": "Fundy Royal", "value": 15}, {
+                    "id": "CA.NB.13001",
+                    "name": "Acadie - Bathurst",
+                    "value": 16
+                }, {"id": "CA.NB.13007", "name": "Moncton - Riverview - Dieppe", "value": 89}, {
+                    "id": "CA.NB.13008",
+                    "name": "New Brunswick Southwest",
+                    "value": 34
+                }],
+                "CA.NS": [{"id": "CA.NS.12004", "name": "Halifax", "value": 72}, {
+                    "id": "CA.NS.12008",
+                    "name": "Sackville - Eastern Shore",
+                    "value": 100
+                }, {"id": "CA.NS.12006", "name": "Kings - Hants", "value": 4}, {
+                    "id": "CA.NS.12009",
+                    "name": "South Shore - St. Margaret's",
+                    "value": 72
+                }, {"id": "CA.NS.12010", "name": "Sydney - Victoria", "value": 91}, {
+                    "id": "CA.NS.12007",
+                    "name": "Cumberland - Colchester - Musquodoboit Valley",
+                    "value": 93
+                }, {"id": "CA.NS.12005", "name": "Halifax West", "value": 15}, {
+                    "id": "CA.NS.12002",
+                    "name": "Central Nova",
+                    "value": 53
+                }, {"id": "CA.NS.12011", "name": "West Nova", "value": 52}, {
+                    "id": "CA.NS.12001",
+                    "name": "Cape Breton - Canso",
+                    "value": 82
+                }, {"id": "CA.NS.12003", "name": "Dartmouth - Cole Harbour", "value": 87}],
+                "CA.NF": [{"id": "CA.NF.10001", "name": "Avalon", "value": 80}, {
+                    "id": "CA.NF.10006",
+                    "name": "St. John's East",
+                    "value": 42
+                }, {"id": "CA.NF.10003", "name": "Humber - St. Barbe - Baie Verte", "value": 27}, {
+                    "id": "CA.NF.10002",
+                    "name": "Bonavista - Gander - Grand Falls - Windsor",
+                    "value": 23
+                }, {"id": "CA.NF.10005", "name": "Random - Burin - St. George's", "value": 78}, {
+                    "id": "CA.NF.10004",
+                    "name": "Labrador",
+                    "value": 14
+                }, {"id": "CA.NF.10007", "name": "St. John's South - Mount Pearl", "value": 77}],
+                "CA.PE": [{"id": "CA.PE.11004", "name": "Malpeque", "value": 83}, {
+                    "id": "CA.PE.11003",
+                    "name": "Egmont",
+                    "value": 17
+                }, {"id": "CA.PE.11001", "name": "Cardigan", "value": 49}, {
+                    "id": "CA.PE.11002",
+                    "name": "Charlottetown",
+                    "value": 87
+                }]
+            };
+            anychart.installStyles('.anychart-loader{background-color:rgba(255,255,255,.5);position:absolute;top:0;left:0;width:100%;height:100%;z-index:1000}.anychart-loader .rotating-cover{width:70px;height:70px;position:absolute;top:50%;margin-top:-35px;left:50%;margin-left:-35px}.anychart-loader .rotating-plane{display:block;width:100%;height:100%;border-radius:20%;border:5px solid #1c75ba;margin:0 auto;position:relative;-webkit-animation:rotateplane 3s infinite;animation:rotateplane 3s infinite}.anychart-loader .chart-row{position:absolute;top:10px;bottom:0;left:10px;right:10px;letter-spacing:-3px;line-height:0;font-size:0;white-space:nowrap}.anychart-loader .chart-row .chart-col{display:inline-block;width:25%;height:90%;background:#000;margin:0 12.5% 0 0;vertical-align:bottom}.anychart-loader .chart-row .chart-col.green{background:#26a957;height:50%;-webkit-animation:blinkplane 1.5s infinite;animation:blinkplane 1.5s infinite}.anychart-loader .chart-row .chart-col.orange{background:#ff8207;height:70%;-webkit-animation:blinkplane 1.5s infinite .15s;animation:blinkplane 1.5s infinite .25s}.anychart-loader .chart-row .chart-col.red{background:#f0402e;height:90%;-webkit-animation:blinkplane 1.5s infinite .3s;animation:blinkplane 1.5s infinite .5s}@keyframes rotateplane{0%{-webkit-transform:perspective(120px) rotateX(0deg) rotateY(0deg);transform:perspective(120px) rotateX(0deg) rotateY(0deg);opacity:1}25%{-webkit-transform:perspective(120px) rotateX(-180.1deg) rotateY(0deg);transform:perspective(120px) rotateX(-180.1deg) rotateY(0deg);opacity:.3}50%{-webkit-transform:perspective(120px) rotateX(-180deg) rotateY(-179.9deg);transform:perspective(120px) rotateX(-180deg) rotateY(-179.9deg);opacity:1}75%{-webkit-transform:perspective(120px) rotateX(0deg) rotateY(-180.1deg);transform:perspective(120px) rotateX(0deg) rotateY(-180.1deg);opacity:.3}100%{-webkit-transform:perspective(120px) rotateX(0deg) rotateY(0deg);transform:perspective(120px) rotateX(0deg) rotateY(0deg);opacity:1}}@keyframes blinkplane{0%{opacity:1}50%{opacity:.01}100%{opacity:1}}');
+        });
+    </script>
+
+</head>
+<body>
+<div id="container"></div>
+</body>
+</html>

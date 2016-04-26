@@ -2036,6 +2036,7 @@ anychart.enums.normalizeMapProjections = function(value) {
     case 'none':
     case 'wsg84':
     case 'base':
+    case '+proj=longlat +datum=WGS84 +no_defs':
       return anychart.enums.MapProjections.WSG84;
       break;
     case 'equirectangular':
