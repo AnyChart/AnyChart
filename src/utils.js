@@ -1633,7 +1633,7 @@ anychart.utils.INTERVAL_ESTIMATIONS = [
  * Returns an array of [unit: anychart.enums.Interval, count: number] with estimation of the data interval passed.
  * Interval must be a valid number (not a NaN).
  * @param {number} interval
- * @return {!anychart.core.stock.Grouping.Level}
+ * @return {!{unit: anychart.enums.Interval, count: number}}}
  */
 anychart.utils.estimateInterval = function(interval) {
   interval = Math.floor(interval);
