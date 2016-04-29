@@ -91,6 +91,11 @@ def __sync_contrib():
     except StandardError:
         raise StandardError('Sync contribution failed: you should install easy_install module for python')
 
+    print 'Install jsbeautifier'
+    commands = [] if platform.system() == 'Windows' else ['sudo']
+    commands += ['easy_install', 'jsbeautifier==1.6.2']
+    subprocess.call(commands)
+
     #Install closure linter
     global arguments
     if 'linter' in arguments and arguments['linter']:
@@ -643,6 +648,16 @@ def __get_themes_list():
     return themes_list
 
 
+def __js_beautifier(path):
+    try:
+        import jsbeautifier
+        res = jsbeautifier.beautify_file(path)
+        with open(path, 'w') as f:
+            f.write(res)
+    except ImportError:
+        raise ImportError('You need install jsbeautifier. Run `./build contrib`')
+
+
 @sync_required
 def __build_theme():
     global arguments
@@ -680,11 +695,10 @@ def __exec_build_theme(theme, is_source):
 
     commands += __get_roots()
 
-    if is_source:
-        __set_pretty_print(commands)
-
     __call_console_commands(commands)
 
+    if is_source:
+        __js_beautifier(os.path.join(OUT_PATH, theme + output_file_postfix))
 
 #=======================================================================================================================
 #                            Build release.
@@ -756,43 +770,31 @@ def __build_release():
     __download_and_unzip_from_http('http://playground.anychart.stg/gallery/develop/download', OUT_PATH, 'gallery_demos')
 
     print "    Build AnyGantt install packages"
-
-    def anygantt_gallery_pass_func(name):
-        return name.startswith('Gantt')
     __build_product_package(
         os.path.join(OUT_PATH, 'AnyGantt' + '-' + short_version),
         'anygantt',
-        anygantt_gallery_pass_func
+        lambda name: name.startswith('Gantt')
     )
 
     print "    Build AnyStock install packages"
-
-    def anystock_gallery_pass_func(name):
-        return name.startswith('Stock')
     __build_product_package(
         os.path.join(OUT_PATH, 'AnyStock' + '-' + short_version),
         'anystock',
-        anystock_gallery_pass_func
+        lambda name: name.startswith('Stock')
     )
 
     print "    Build AnyMap install packages"
-
-    def anymap_gallery_pass_func(name):
-        return name.startswith('Maps') and name != 'Maps_in_Dashboard'
     __build_product_package(
         os.path.join(OUT_PATH, 'AnyMap' + '-' + short_version),
         'anymap',
-        anymap_gallery_pass_func
+        lambda name: name.startswith('Maps') and name != 'Maps_in_Dashboard'
     )
 
     print "    Build AnyChart install packages"
-
-    def anychart_gallery_pass_func(name):
-        return not name.startswith('Gantt') and not name.startswith('Maps') and not name.startswith('Stock')
     __build_product_package(
         os.path.join(OUT_PATH, 'AnyChart' + '-' + short_version),
         'anychart',
-        anychart_gallery_pass_func
+        lambda name: not name.startswith('Gantt') and not name.startswith('Maps') and not name.startswith('Stock')
     )
 
     #rm gallery demos dir
@@ -807,6 +809,7 @@ def __build_product_package(output_dir, binary_name, gallery_pass_func=None):
         shutil.rmtree(output_dir)
     os.mkdir(output_dir)
     os.mkdir(os.path.join(output_dir, 'js'))
+    os.mkdir(os.path.join(output_dir, 'css'))
     os.mkdir(os.path.join(output_dir, 'js', 'themes'))
     os.mkdir(os.path.join(output_dir, 'demos'))
     os.mkdir(os.path.join(output_dir, 'schemas'))
@@ -820,6 +823,14 @@ def __build_product_package(output_dir, binary_name, gallery_pass_func=None):
     # copy schemas
     shutil.copyfile(os.path.join(PROJECT_PATH, 'xml-schema.xsd'), os.path.join(output_dir, 'schemas', 'xml-schema.xsd'))
     shutil.copyfile(os.path.join(PROJECT_PATH, 'json-schema.json'), os.path.join(output_dir, 'schemas', 'json-schema.json'))
+
+    # copy UI css
+    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.css'), os.path.join(output_dir, 'css', 'anychart-ui.css'))
+    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.min.css'), os.path.join(output_dir, 'css', 'anychart-ui.min.css'))
+    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.min.js'), os.path.join(output_dir, 'js', 'anychart-ui.min.js'))
+    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.min.js.gz'), os.path.join(output_dir, 'js', 'anychart-ui.min.js.gz'))
+    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.dev.min.js'), os.path.join(output_dir, 'js', 'anychart-ui.dev.min.js'))
+    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.dev.min.js.gz'), os.path.join(output_dir, 'js', 'anychart-ui.dev.min.js.gz'))
 
     # copy themes
     for theme in __get_themes_list():
@@ -839,7 +850,14 @@ def __build_product_package(output_dir, binary_name, gallery_pass_func=None):
                 text = f.read()
                 f.close()
                 f = open(filepath, 'w')
-                f.write(text.replace('<script src="./../js/anychart.min.js"></script>', '<script src="../../js/%s.min.js"></script>' % binary_name))
+
+                # replace binary name and add link to anychart-ui-.min.js
+                text = text.replace('<script src="./../js/anychart.min.js"></script>', '<script src="../../js/%s.min.js"></script>\n        <script src="../../js/anychart-ui.min.js"></script>' % binary_name)
+
+                # replace cdn link, to local link
+                text = text.replace('https://cdn.anychart.com/css/latest/anychart-ui.min.css', '../../css/anychart-ui.min.css')
+
+                f.write(text)
                 f.close()
 
     # gzip package

@@ -253,6 +253,15 @@ anychart.core.ui.Credits.prototype.drawLogo_ = function() {
 };
 
 
+/** @inheritDoc */
+anychart.core.ui.Credits.prototype.enabled = function(opt_value) {
+  if (goog.isNull(opt_value)) {
+    opt_value = !anychart.core.ui.Credits.DOMAIN_REGEXP.test(goog.dom.getWindow().location.hostname);
+  }
+  return anychart.core.ui.Credits.base(this, 'enabled', opt_value);
+};
+
+
 /**
  * Draw credits.
  * @return {anychart.core.ui.Credits} Return itself for chaining call.

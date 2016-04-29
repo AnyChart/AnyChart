@@ -2605,6 +2605,8 @@ anychart.charts.HeatMap.prototype.labelsDisplayMode = function(opt_value) {
 
 
 //exports
+anychart.charts.HeatMap.prototype['getType'] = anychart.charts.HeatMap.prototype.getType;
+
 anychart.charts.HeatMap.prototype['grid'] = anychart.charts.HeatMap.prototype.grid;
 
 anychart.charts.HeatMap.prototype['xAxis'] = anychart.charts.HeatMap.prototype.xAxis;

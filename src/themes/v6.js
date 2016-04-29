@@ -4948,7 +4948,7 @@ goog.provide('anychart.themes.v6');
           return result || 'no selected points';
         },
         'drag': true,
-        'mouseWheel': true
+        'mouseWheel': false
       }
     },
 

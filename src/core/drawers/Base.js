@@ -61,6 +61,15 @@ anychart.core.drawers.Base.prototype.yValueNames = ([anychart.opt.VALUE]);
 
 
 /**
+ * Returns reference value names. Needed to include bubble size.
+ * @return {Array.<string>}
+ */
+anychart.core.drawers.Base.prototype.getReferenceNames = function() {
+  return this.yValueNames;
+};
+
+
+/**
  * This function is invoked before the drawing process starts.
  * @param {anychart.core.shapeManagers.Base} shapeManager
  */

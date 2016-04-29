@@ -816,6 +816,18 @@ anychart.charts.Cartesian3d.prototype.area = function(data, opt_csvSettings) {
 };
 
 
+/** @inheritDoc */
+anychart.charts.Cartesian3d.prototype.makeBrowserEvent = function(e) {
+  //this method is invoked only for events from data layer
+  var tag = anychart.utils.extractTag(e['target']);
+  var series = tag && tag.series;
+  if (series && !series.isDisposed() && series.enabled()) {
+    return series.makeBrowserEvent(e);
+  }
+  return anychart.charts.Cartesian3d.base(this, 'makeBrowserEvent', e);
+};
+
+
 /**
  * @inheritDoc
  * @suppress {deprecated}

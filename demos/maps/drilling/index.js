@@ -198,6 +198,8 @@ $(document).ready(function() {
   createMap('world', 'world', function(pointId, map) {
     chart = map;
 
+    chart.interactivity().mouseWheel(true);
+
     chart.connector([
       [-37.788081, 144.975586, -42.244785, 146.689453],
       {'points': [-37.788081, 144.975586, -42.244785, 146.689453]},
@@ -236,7 +238,7 @@ $(document).ready(function() {
 
     chart.listen(anychart.enums.EventType.DRILL_CHANGE, function(e) {
       // var mapPoint = e.path[e.path.length - 1];
-      e.currentMap.crs(chart.crs());
+      // e.currentTarget.crs(chart.crs());
 
       breadcrumbs.html('');
 
@@ -245,10 +247,10 @@ $(document).ready(function() {
       a.bind('click', function() {chart.drillTo(this.id)});
       breadcrumbs.append(a);
 
-      if (e.path.length)
+      if (e.path.length > 1)
         breadcrumbs.append('<span> - </span>');
 
-      for (var i = 0; i < e.path.length; i++) {
+      for (var i = 1; i < e.path.length; i++) {
         var label = e.path[i].getProperties().name || e.path[i].getId();
 
         // if (i != e.path.length - 1)

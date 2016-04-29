@@ -811,9 +811,12 @@ anychart.charts.Stock.prototype.distributeBounds_ = function(contentBounds) {
 
   this.minPlotsDrawingWidth_ = Infinity;
   for (i = 0; i < this.plots_.length; i++) {
-    var width = this.plots_[i].getDrawingWidth();
-    if (this.minPlotsDrawingWidth_ > width)
-      this.minPlotsDrawingWidth_ = width;
+    var plot = this.plots_[i];
+    if (plot && plot.enabled()) {
+      var width = plot.getDrawingWidth();
+      if (this.minPlotsDrawingWidth_ > width)
+        this.minPlotsDrawingWidth_ = width;
+    }
   }
   if (!isFinite(this.minPlotsDrawingWidth_))
     this.minPlotsDrawingWidth_ = NaN;
@@ -1541,18 +1544,20 @@ anychart.charts.Stock.prototype.toCsv = function(opt_chartDataExportMode, opt_cs
   var storagesCount = 0;
   for (k = 0, len = this.plots_.length; k < len; k++) {
     plot = this.plots_[k];
-    seriesList = plot.getAllSeries();
-    seriesListLength = seriesList.length;
+    if (plot) {
+      seriesList = plot.getAllSeries();
+      seriesListLength = seriesList.length;
 
-    for (i = 0; i < seriesListLength; i++) {
-      series = seriesList[i];
-      seriesData = series.getSelectableData();
-      seriesDataTable = seriesData.getMapping().getTable();
-      storage = seriesDataTable.getStorage();
-      uid = goog.getUid(storage);
-      if (!(uid in storages)) {
-        storages[uid] = storage;
-        storagesCount++;
+      for (i = 0; i < seriesListLength; i++) {
+        series = seriesList[i];
+        seriesData = series.getSelectableData();
+        seriesDataTable = seriesData.getMapping().getTable();
+        storage = seriesDataTable.getStorage();
+        uid = goog.getUid(storage);
+        if (!(uid in storages)) {
+          storages[uid] = storage;
+          storagesCount++;
+        }
       }
     }
   }
@@ -1622,19 +1627,23 @@ anychart.charts.Stock.prototype.toCsv = function(opt_chartDataExportMode, opt_cs
       for (k = 0, len = this.plots_.length; k < len; k++) {
         plotPrefix = this.plots_.length > 1 ? ('plot_' + k + '_') : '';
         plot = this.plots_[k];
-        seriesList = plot.getAllSeries();
-        seriesListLength = seriesList.length;
+        if (plot) {
+          seriesList = plot.getAllSeries();
+          seriesListLength = seriesList.length;
 
-        for (i = 0; i < seriesListLength; i++) {
-          seriesPrefix = seriesListLength > 1 ? ('series_' + i + '_') : '';
-          series = seriesList[i];
-          seriesData = series.getSelectableData();
-          headers = [];
-          fields = seriesData.getMapping().getFieldsInternal();
-          for (field in fields) {
-            headers.push(plotPrefix + seriesPrefix + field);
+          for (i = 0; i < seriesListLength; i++) {
+            seriesPrefix = seriesListLength > 1 ? ('series_' + i + '_') : '';
+            series = seriesList[i];
+            if (series) {
+              seriesData = series.getSelectableData();
+              headers = [];
+              fields = seriesData.getMapping().getFieldsInternal();
+              for (field in fields) {
+                headers.push(plotPrefix + seriesPrefix + field);
+              }
+              csvHeaders = goog.array.concat(csvHeaders, headers);
+            }
           }
-          csvHeaders = goog.array.concat(csvHeaders, headers);
         }
       }
 
@@ -1648,31 +1657,35 @@ anychart.charts.Stock.prototype.toCsv = function(opt_chartDataExportMode, opt_cs
       for (k = 0, len = this.plots_.length; k < len; k++) {
         plotPrefix = this.plots_.length > 1 ? ('plot_' + k + '_') : '';
         plot = this.plots_[k];
-        seriesList = plot.getAllSeries();
-        seriesListLength = seriesList.length;
-        seriesPrefix = seriesListLength > 1 ? 'series_' : '';
+        if (plot) {
+          seriesList = plot.getAllSeries();
+          seriesListLength = seriesList.length;
+          seriesPrefix = seriesListLength > 1 ? 'series_' : '';
 
-        for (i = 0; i < seriesListLength; i++) {
-          seriesPrefix = seriesListLength > 1 ? ('series_' + i + '_') : '';
-          series = seriesList[i];
-          seriesData = series.getSelectableData();
-          mapping = seriesData.getMapping();
-          fields = mapping.getFieldsInternal();
+          for (i = 0; i < seriesListLength; i++) {
+            seriesPrefix = seriesListLength > 1 ? ('series_' + i + '_') : '';
+            series = seriesList[i];
+            if (series) {
+              seriesData = series.getSelectableData();
+              mapping = seriesData.getMapping();
+              fields = mapping.getFieldsInternal();
 
-          var iterator = seriesData.getExportingIterator();
-          while (iterator.advance()) {
-            x = iterator.getKey();
+              var iterator = seriesData.getExportingIterator();
+              while (iterator.advance()) {
+                x = iterator.getKey();
 
-            if (!csvRows[x]) {
-              csvRows[x] = new Array(csvHeaders.length);
-              csvRows[x][0] = x;
-            }
-            for (field in fields) {
-              prefixed = plotPrefix + seriesPrefix + field;
-              columnIndex = columnToIndex[prefixed];
-              value = iterator.get(field);
-              finalValue = goog.isObject(value) ? goog.json.serialize(value) : value;
-              csvRows[x][columnIndex] = finalValue;
+                if (!csvRows[x]) {
+                  csvRows[x] = new Array(csvHeaders.length);
+                  csvRows[x][0] = x;
+                }
+                for (field in fields) {
+                  prefixed = plotPrefix + seriesPrefix + field;
+                  columnIndex = columnToIndex[prefixed];
+                  value = iterator.get(field);
+                  finalValue = goog.isObject(value) ? goog.json.serialize(value) : value;
+                  csvRows[x][columnIndex] = finalValue;
+                }
+              }
             }
           }
         }
@@ -1687,19 +1700,23 @@ anychart.charts.Stock.prototype.toCsv = function(opt_chartDataExportMode, opt_cs
       for (k = 0, len = this.plots_.length; k < len; k++) {
         plotPrefix = this.plots_.length > 1 ? ('plot_' + k + '_') : '';
         plot = this.plots_[k];
-        seriesList = plot.getAllSeries();
-        seriesListLength = seriesList.length;
+        if (plot) {
+          seriesList = plot.getAllSeries();
+          seriesListLength = seriesList.length;
 
-        for (i = 0; i < seriesListLength; i++) {
-          seriesPrefix = seriesListLength > 1 ? ('series_' + i + '_') : '';
-          series = seriesList[i];
-          seriesData = series.getSelectableData();
-          storage = seriesData.getMapping().getTable().getStorage();
-          headersLength = this.extractHeaders(storage, headers, headersLength);
-          for (header in headers) {
-            csvHeaders[headers[header]] = plotPrefix + seriesPrefix + header;
+          for (i = 0; i < seriesListLength; i++) {
+            seriesPrefix = seriesListLength > 1 ? ('series_' + i + '_') : '';
+            series = seriesList[i];
+            if (series) {
+              seriesData = series.getSelectableData();
+              storage = seriesData.getMapping().getTable().getStorage();
+              headersLength = this.extractHeaders(storage, headers, headersLength);
+              for (header in headers) {
+                csvHeaders[headers[header]] = plotPrefix + seriesPrefix + header;
+              }
+              headers = {};
+            }
           }
-          headers = {};
         }
       }
 
@@ -1707,27 +1724,31 @@ anychart.charts.Stock.prototype.toCsv = function(opt_chartDataExportMode, opt_cs
       for (k = 0, len = this.plots_.length; k < len; k++) {
         plotPrefix = this.plots_.length > 1 ? ('plot_' + k + '_') : '';
         plot = this.plots_[k];
-        seriesList = plot.getAllSeries();
-        seriesListLength = seriesList.length;
+        if (plot) {
+          seriesList = plot.getAllSeries();
+          seriesListLength = seriesList.length;
 
-        for (i = 0; i < seriesListLength; i++) {
-          seriesPrefix = seriesListLength > 1 ? ('series_' + i + '_') : '';
-          series = seriesList[i];
-          seriesData = series.getSelectableData();
-          storage = seriesData.getMapping().getTable().getStorage();
-          for (j = 0; j < storage.getRowsCount(); j++) {
-            row = storage.getRow(j);
-            values = row.values;
-            x = row.key;
-            if (!csvRows[x]) {
-              csvRows[x] = new Array(csvHeaders.length);
-              csvRows[x][0] = x;
-            }
-            for (column in values) {
-              prefixed = plotPrefix + seriesPrefix + column;
-              columnIndex = goog.array.indexOf(csvHeaders, prefixed);
-              finalValue = goog.isObject(values[column]) ? goog.json.serialize(values[column]) : values[column];
-              csvRows[x][columnIndex] = finalValue;
+          for (i = 0; i < seriesListLength; i++) {
+            seriesPrefix = seriesListLength > 1 ? ('series_' + i + '_') : '';
+            series = seriesList[i];
+            if (series) {
+              seriesData = series.getSelectableData();
+              storage = seriesData.getMapping().getTable().getStorage();
+              for (j = 0; j < storage.getRowsCount(); j++) {
+                row = storage.getRow(j);
+                values = row.values;
+                x = row.key;
+                if (!csvRows[x]) {
+                  csvRows[x] = new Array(csvHeaders.length);
+                  csvRows[x][0] = x;
+                }
+                for (column in values) {
+                  prefixed = plotPrefix + seriesPrefix + column;
+                  columnIndex = goog.array.indexOf(csvHeaders, prefixed);
+                  finalValue = goog.isObject(values[column]) ? goog.json.serialize(values[column]) : values[column];
+                  csvRows[x][columnIndex] = finalValue;
+                }
+              }
             }
           }
         }

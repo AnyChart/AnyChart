@@ -384,6 +384,7 @@ anychart.charts.Map = function() {
         }
       }, false, this);
 
+
       this.mapClickHandler_ = function(e) {
         var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
         var bounds = this.getPixelBounds();
@@ -2315,6 +2316,11 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
 
           var duration = this.zoomDuration || anychart.charts.Map.TIMINGS.DEFAULT_ZOOM_DURATION;
 
+          var contextMenu = this.contextMenu();
+          if (contextMenu && contextMenu.isVisible()) {
+            contextMenu.hide();
+          }
+
           this.zoomAnimation = new anychart.animations.MapZoomAnimation(this, [this.zoomLevel()], [this.zoomDest], duration, this != this.getCurrentScene());
           this.zoomAnimation
               .play();
@@ -3982,7 +3988,10 @@ anychart.charts.Map.prototype.setupByJSON = function(config) {
   this.minBubbleSize(config['minBubbleSize']);
   this.maxBubbleSize(config['maxBubbleSize']);
   this.geoIdField(config['geoIdField']);
-  this.geoData(config['geoData']);
+  var geoData = config['geoData'];
+  if (geoData) {
+    this.geoData(/** @type {string} */(goog.string.startsWith(geoData, '{') ? JSON.parse(geoData) : geoData));
+  }
   if (goog.isDef(config['allowPointsSelect'])) {
     this.interactivity().selectionMode(
         config['allowPointsSelect'] ? anychart.enums.SelectionMode.MULTI_SELECT : anychart.enums.SelectionMode.NONE);
@@ -4073,7 +4082,7 @@ anychart.charts.Map.prototype.serialize = function() {
   json['minBubbleSize'] = this.minBubbleSize();
   json['maxBubbleSize'] = this.maxBubbleSize();
   json['geoIdField'] = this.geoIdField();
-  json['geoData'] = this.geoDataStringName_ ? this.geoDataStringName_ : this.geoData_;
+  json['geoData'] = this.geoDataStringName_ ? this.geoDataStringName_ : JSON.stringify(this.geoData_);
 
   json['crsAnimation'] = this.crsAnimation().serialize();
   if (goog.isObject(this.crs_)) {
@@ -4139,11 +4148,11 @@ anychart.charts.Map.prototype.disposeInternal = function() {
 
   if (this.container() && this.container().getStage() && this.container().getStage().container()) {
     var container = this.container().getStage().container();
-    goog.events.unlisten(container, goog.events.EventType.CLICK, this.mapClickHandler_, false, this);
-    goog.events.unlisten(container, goog.events.EventType.DBLCLICK, this.mapDbClickHandler_, false, this);
-    goog.events.unlisten(container, goog.events.EventType.POINTERUP, this.mapTouchEndHandler_, false, this);
-    goog.events.unlisten(container, goog.events.EventType.TOUCHEND, this.mapTouchEndHandler_, false, this);
-    goog.events.unlisten(container, goog.events.EventType.MOUSELEAVE, this.mapMouseLeaveHandler_, false, this);
+    if (this.mapClickHandler_) goog.events.unlisten(container, goog.events.EventType.CLICK, this.mapClickHandler_, false, this);
+    if (this.mapDbClickHandler_) goog.events.unlisten(container, goog.events.EventType.DBLCLICK, this.mapDbClickHandler_, false, this);
+    if (this.mapTouchEndHandler_) goog.events.unlisten(container, goog.events.EventType.POINTERUP, this.mapTouchEndHandler_, false, this);
+    if (this.mapTouchEndHandler_) goog.events.unlisten(container, goog.events.EventType.TOUCHEND, this.mapTouchEndHandler_, false, this);
+    if (this.mapMouseLeaveHandler_) goog.events.unlisten(container, goog.events.EventType.MOUSELEAVE, this.mapMouseLeaveHandler_, false, this);
   }
 
   if (this.mapTextarea) {

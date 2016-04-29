@@ -239,7 +239,13 @@ anychart.core.series.Cartesian.prototype.getPointState = function(index) {
 
 /** @inheritDoc */
 anychart.core.series.Cartesian.prototype.getSeriesState = function() {
-  return this.state.getSeriesState();
+  var state = this.state.getSeriesState();
+  if (state || this.isDiscreteBased() || this.hoverMode() != anychart.enums.HoverMode.SINGLE) return state;
+  if (this.state.hasPointState(anychart.PointState.SELECT))
+    return anychart.PointState.SELECT;
+  else if (this.state.hasPointState(anychart.PointState.HOVER))
+    return anychart.PointState.HOVER;
+  return anychart.PointState.NORMAL;
 };
 //endregion
 
@@ -253,9 +259,13 @@ anychart.core.series.Cartesian.prototype.getSeriesState = function() {
 /** @inheritDoc */
 anychart.core.series.Cartesian.prototype.prepareData = function() {
   var iterator = this.getDetachedIterator();
+  var indexes = [];
   while (iterator.advance()) {
     if (iterator.get('selected'))
-      this.state.setPointState(anychart.PointState.SELECT, iterator.getIndex());
+      indexes.push(iterator.getIndex());
+  }
+  if (indexes.length) {
+    this.selectPoint(indexes);
   }
   anychart.core.series.Cartesian.base(this, 'prepareData');
 };
@@ -996,13 +1006,9 @@ anychart.core.series.Cartesian.prototype.selectionMode = function(opt_value) {
  */
 anychart.core.series.Cartesian.prototype.hoverMode = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeHoverMode(opt_value);
-    if (opt_value != this.hoverMode_) {
-      this.hoverMode_ = opt_value;
-    }
     return this;
   }
-  return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
+  return /** @type {anychart.enums.HoverMode} */((/** @type {anychart.core.CartesianBase}*/(this.chart)).interactivity().hoverMode());
 };
 
 
@@ -1314,6 +1320,9 @@ anychart.core.series.Cartesian.prototype.getPoint = function(index) {
 
   var val = /** @type {number} */ (isRangeSeries ? (/** @type {number} */ (point.get(anychart.opt.HIGH)) - /** @type {number} */ (point.get(anychart.opt.LOW))) :
       point.get(anychart.opt.VALUE));
+
+  point.statistics[anychart.enums.Statistics.INDEX] = index;
+  if (goog.isDef(val)) point.statistics[anychart.enums.Statistics.VALUE] = val;
 
   var size = /** @type {number} */ (point.get(anychart.opt.SIZE)); //Bubble.
   var v;

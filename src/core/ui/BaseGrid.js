@@ -536,7 +536,7 @@ anychart.core.ui.BaseGrid.HIGHER_DRAG_EDIT_RATIO = 1 - anychart.core.ui.BaseGrid
 anychart.core.ui.BaseGrid.isMilestone = function(treeDataItem) {
   var actualStart = treeDataItem.meta(anychart.enums.GanttDataFields.ACTUAL_START);
   var actualEnd = treeDataItem.meta(anychart.enums.GanttDataFields.ACTUAL_END);
-  return (!isNaN(actualStart) && !goog.isDef(actualEnd)) || (actualStart == actualEnd);
+  return goog.isDef(actualStart) && ((!isNaN(actualStart) && !goog.isDef(actualEnd)) || (actualStart == actualEnd));
 };
 
 
@@ -1611,11 +1611,16 @@ anychart.core.ui.BaseGrid.prototype.drawRowFills_ = function() {
  * @private
  */
 anychart.core.ui.BaseGrid.prototype.mouseWheelHandler_ = function(e) {
+  if (this.interactivityHandler.contextMenu) {
+    var menu = this.interactivityHandler.contextMenu();
+    if (menu.isVisible()) menu.hide();
+  }
+
   var dx = e.deltaX;
   var dy = e.deltaY;
 
-  var scrollsVertically = Math.abs(dy) > 15;
-  var scrollsHorizontally = Math.abs(dx) > 15;
+  var scrollsVertically = Math.abs(dy) > 0;
+  var scrollsHorizontally = Math.abs(dx) > 0;
 
   if (goog.userAgent.WINDOWS) {
     dx = dx * 15;
@@ -1623,6 +1628,7 @@ anychart.core.ui.BaseGrid.prototype.mouseWheelHandler_ = function(e) {
   }
 
   var preventDefault = true;
+  var allowScrolling = true;
   var bodyScrollLeft = goog.global['document']['body']['scrollLeft'];
   var horizontalScroll = this.getHorizontalScrollBar();
   var verticalScroll = this.controller.getScrollBar();
@@ -1630,6 +1636,7 @@ anychart.core.ui.BaseGrid.prototype.mouseWheelHandler_ = function(e) {
   if (scrollsVertically && !scrollsHorizontally) {
     preventDefault = verticalScroll.startRatio() > 0 &&
         verticalScroll.endRatio() < 1;
+    allowScrolling = preventDefault;
   }
 
   if (scrollsHorizontally && !scrollsVertically) {
@@ -1642,9 +1649,11 @@ anychart.core.ui.BaseGrid.prototype.mouseWheelHandler_ = function(e) {
         verticalScroll.endRatio() < 1 &&
         horizontalScroll.startRatio() > 0 &&
         horizontalScroll.endRatio() < 1);
+
+    allowScrolling = preventDefault;
   }
 
-  this.scroll(dx, dy);
+  if (allowScrolling) this.scroll(dx, dy);
   if (preventDefault) e.preventDefault();
 };
 

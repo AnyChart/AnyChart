@@ -2926,7 +2926,7 @@ anychart.core.series.Base.prototype.makeMissing = function(rowInfo, yNames) {
  * @protected
  */
 anychart.core.series.Base.prototype.createLabelsContextProvider = function() {
-  var provider = new anychart.core.utils.SeriesPointContextProvider(this, this.drawer.yValueNames, this.supportsError());
+  var provider = new anychart.core.utils.SeriesPointContextProvider(this, this.drawer.getReferenceNames(), this.supportsError());
   provider.applyReferenceValues();
   return provider;
 };
@@ -2943,7 +2943,7 @@ anychart.core.series.Base.prototype.createTooltipContextProvider = function() {
      * @type {anychart.core.utils.SeriesPointContextProvider}
      * @protected
      */
-    this.tooltipContext = new anychart.core.utils.SeriesPointContextProvider(this, this.drawer.yValueNames, this.supportsError());
+    this.tooltipContext = new anychart.core.utils.SeriesPointContextProvider(this, this.drawer.getReferenceNames(), this.supportsError());
   }
   this.tooltipContext.applyReferenceValues();
   return this.tooltipContext;

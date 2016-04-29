@@ -135,15 +135,23 @@ anychart.core.utils.InteractivityState.prototype.getSeriesStateForUpdate = funct
 anychart.core.utils.InteractivityState.prototype.setPointState = function(state, opt_index, opt_stateToChange) {
   var i;
   if (goog.isDef(opt_index)) {
-    //If passed index out of index data, then do nothing
-    if (opt_index >= this.target.getIterator().getRowsCount())
-      return;
+    var rowsCount = this.target.getIterator().getRowsCount();
+    var ret = true;
     if (goog.isArray(opt_index)) {
       goog.array.sort(opt_index);
-      for (i = opt_index.length; i--;)
-        this.setPointState_(state, +opt_index[i], opt_stateToChange);
-    } else
+      for (i = opt_index.length; i--;) {
+        var ind = +opt_index[i];
+        if (ind < rowsCount) {
+          this.setPointState_(state, ind, opt_stateToChange);
+          ret = false;
+        }
+      }
+    } else if (+opt_index < rowsCount) {
       this.setPointState_(state, +opt_index, opt_stateToChange);
+      ret = false;
+    }
+    if (ret)
+      return;
     this.target.finalizePointAppearance();
   } else if (!this.isStateContains(this.seriesState, state)) {
     var iterator, index, update;

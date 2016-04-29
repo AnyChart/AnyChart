@@ -1546,6 +1546,9 @@ anychart.core.SeriesBase.prototype.getPoint = function(index) {
     var chartStat = this.chart_.statistics;
     var val = /** @type {number} */ (point.get(anychart.opt.VALUE));
     var size = /** @type {number} */ (point.get(anychart.opt.SIZE)); //Bubble.
+
+    point.statistics[anychart.enums.Statistics.INDEX] = index;
+    if (goog.isDef(val)) point.statistics[anychart.enums.Statistics.VALUE] = val;
     var v;
 
     if (goog.isNumber(chartStat[anychart.enums.Statistics.DATA_PLOT_X_SUM])) {

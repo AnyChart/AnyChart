@@ -2140,7 +2140,7 @@
           }
         },
         "geoData": {
-          "type": ["string", "object"]
+          "type": ["string"]
         },
 
         "crsAnimation": {"$ref": "#/definitions/anychart.core.utils.Animation"},

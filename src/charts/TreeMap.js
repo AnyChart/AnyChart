@@ -890,11 +890,10 @@ anychart.charts.TreeMap.NodeType = {
 /**
  * Checks value for missing.
  * Point is missing when it's undefined or its number value less or equal to zero.
- * @param {*} value Value to check.
+ * @param {number} value Value to check.
  * @return {boolean} Whether value is missing.
  */
 anychart.charts.TreeMap.prototype.isMissing = function(value) {
-  value = anychart.utils.toNumber(value);
   return isNaN(value) || value <= 0;
 };
 
@@ -932,12 +931,12 @@ anychart.charts.TreeMap.prototype.calculateNodeSize = function(node, depth) {
     value = node.get(anychart.charts.TreeMap.DataFields.VALUE);
     size = node.get(anychart.charts.TreeMap.DataFields.SIZE);
 
+    value = anychart.utils.toNumber(value);
     if (this.isMissing(value)) {
       node.meta(anychart.charts.TreeMap.DataFields.MISSING, true);
       size = value = 0;
     } else {
-      value = anychart.utils.normalizeToNaturalNumber(value, 0, true);
-      size = anychart.utils.normalizeToNaturalNumber(size, 0, true) || value;
+      size = anychart.utils.toNumber(size) || value;
       if (size == 0)
         node.meta(anychart.charts.TreeMap.DataFields.MISSING, true);
     }
@@ -3143,6 +3142,8 @@ anychart.charts.TreeMap.prototype.toCsv = function(chartDataExportMode, opt_csvS
 
 
 //exports
+anychart.charts.TreeMap.prototype['getType'] = anychart.charts.TreeMap.prototype.getType;
+
 anychart.charts.TreeMap.prototype['data'] = anychart.charts.TreeMap.prototype.data;
 anychart.charts.TreeMap.prototype['maxDepth'] = anychart.charts.TreeMap.prototype.maxDepth;
 anychart.charts.TreeMap.prototype['hintDepth'] = anychart.charts.TreeMap.prototype.hintDepth;

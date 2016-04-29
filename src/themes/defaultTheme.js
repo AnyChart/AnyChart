@@ -2490,7 +2490,7 @@ goog.provide('anychart.themes.defaultTheme');
           return result || 'no selected points';
         },
         'drag': true,
-        'mouseWheel': true
+        'mouseWheel': false
       },
       'crsAnimation': {
         'enabled': true,

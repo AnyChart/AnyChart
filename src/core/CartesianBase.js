@@ -3720,6 +3720,10 @@ anychart.core.CartesianBase.prototype.doAnimation = function() {
 };
 
 
+/** @inheritDoc */
+anychart.core.CartesianBase.prototype.onInteractivitySignal = function() {};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Setup
