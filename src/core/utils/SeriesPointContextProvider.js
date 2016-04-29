@@ -19,7 +19,7 @@ anychart.core.utils.SeriesPointContextProvider = function(series, referenceValue
 
   this.seriesInternal = series;
 
-  this.chartInternal = series.getChart();
+  this.chartInternal = series.getChart && series.getChart();
 
   /**
    * @type {(anychart.core.series.Base|anychart.core.SeriesBase|anychart.core.sparkline.series.Base|anychart.core.gauge.pointers.Base)}
