@@ -6,6 +6,7 @@
 goog.provide('anychart.core.Chart');
 goog.require('acgraph');
 goog.require('anychart.core.VisualBaseWithBounds');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.ChartTooltip');
 goog.require('anychart.core.ui.Credits');
@@ -1092,7 +1093,7 @@ anychart.core.Chart.prototype.draw = function() {
 
   if (anychart.DEVELOP) {
     var msg = 'Chart rendering time: ' + anychart.math.round((anychart.performance.relativeNow() - startTime), 4);
-    anychart.utils.info(msg);
+    anychart.core.reporting.info(msg);
   }
 
 
@@ -1382,7 +1383,7 @@ anychart.core.Chart.prototype.disposeInternal = function() {
  * @return {anychart.core.Chart|anychart.core.ui.Legend} Chart legend instance of itself for chaining call.
  */
 anychart.core.Chart.prototype.legend = function(opt_value) {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_LEGEND_IN_CHART);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_LEGEND_IN_CHART);
   return goog.isDef(opt_value) ? this : null;
 };
 
@@ -1393,7 +1394,7 @@ anychart.core.Chart.prototype.legend = function(opt_value) {
  * @return {anychart.core.Chart|anychart.core.ui.Credits}
  */
 anychart.core.Chart.prototype.credits = function(opt_value) {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_CREDITS_IN_CHART);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_CREDITS_IN_CHART);
   return goog.isDef(opt_value) ? this : null;
 };
 
@@ -2215,7 +2216,7 @@ anychart.core.Chart.prototype.extractHeaders = function(dataSet, headers, header
  */
 anychart.core.Chart.prototype.checkSeparator = function(separator) {
   if (separator.indexOf('\"') != -1) {
-    anychart.utils.error(anychart.enums.ErrorCode.CSV_DOUBLE_QUOTE_IN_SEPARATOR);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.CSV_DOUBLE_QUOTE_IN_SEPARATOR);
     throw new Error('Double quotes in separator are not allowed');
   }
 };

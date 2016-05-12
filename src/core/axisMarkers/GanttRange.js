@@ -2,6 +2,7 @@ goog.provide('anychart.core.axisMarkers.GanttRange');
 goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.axisMarkers.PathBase');
+goog.require('anychart.core.reporting');
 goog.require('anychart.enums');
 
 
@@ -60,7 +61,7 @@ anychart.core.axisMarkers.GanttRange.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.core.axisMarkers.GanttRange.prototype.layout = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (opt_value == anychart.enums.Layout.HORIZONTAL)
-      anychart.utils.warning(anychart.enums.WarningCode.IMMUTABLE_MARKER_LAYOUT);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.IMMUTABLE_MARKER_LAYOUT);
     return this;
   }
   return /** @type {anychart.enums.Layout} */ (anychart.enums.Layout.VERTICAL);
@@ -77,7 +78,7 @@ anychart.core.axisMarkers.GanttRange.prototype.layout = function(opt_value) {
  */
 anychart.core.axisMarkers.GanttRange.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    anychart.utils.warning(anychart.enums.WarningCode.IMMUTABLE_MARKER_SCALE);
+    anychart.core.reporting.warning(anychart.enums.WarningCode.IMMUTABLE_MARKER_SCALE);
     return this;
   }
   return /** @type {anychart.scales.GanttDateTime} */ (this.scaleInternal());

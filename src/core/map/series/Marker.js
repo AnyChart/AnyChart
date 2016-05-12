@@ -559,7 +559,7 @@ anychart.core.map.series.Marker.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
   if (goog.isFunction(this.type())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Marker type']
@@ -569,7 +569,7 @@ anychart.core.map.series.Marker.prototype.serialize = function() {
   }
 
   if (goog.isFunction(this.hoverType())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Marker hoverType']
@@ -579,7 +579,7 @@ anychart.core.map.series.Marker.prototype.serialize = function() {
   }
 
   if (goog.isFunction(this.selectType())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Marker selectType']

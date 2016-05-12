@@ -558,7 +558,7 @@ anychart.core.ui.MarkersFactory.prototype.measure = function(positionProvider) {
   var offsetY = /** @type {number} */(this.offsetY());
 
   drawer = goog.isString(type) ?
-      anychart.enums.getMarkerDrawer(type) :
+      anychart.utils.getMarkerDrawer(type) :
       type;
 
   this.measureMarkerElement_.clear();
@@ -1366,7 +1366,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.draw = function() {
     }
 
     var drawer = goog.isString(settings['type']) ?
-        anychart.enums.getMarkerDrawer(settings['type']) :
+        anychart.utils.getMarkerDrawer(settings['type']) :
         settings['type'];
 
     //define parent bounds

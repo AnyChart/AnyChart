@@ -342,7 +342,7 @@ anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
     json['iconSize'] = this.iconSize();
 
   //if (goog.isFunction(this.iconType())) {
-  //  anychart.utils.warning(
+  //  anychart.core.reporting.warning(
   //      anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
   //      null,
   //      ['LegendItemSetting iconType']
@@ -353,7 +353,7 @@ anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
   //}
 
   //if (goog.isFunction(this.iconMarkerType())) {
-  //  anychart.utils.warning(
+  //  anychart.core.reporting.warning(
   //      anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
   //      null,
   //      ['LegendItemSetting iconMarkerType']
@@ -367,7 +367,7 @@ anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
     json['disabled'] = this.disabled();
 
   //if (goog.isFunction(this.iconFill())) {
-  //  anychart.utils.warning(
+  //  anychart.core.reporting.warning(
   //      anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
   //      null,
   //      ['LegendItemSetting iconFill']
@@ -378,7 +378,7 @@ anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
   //}
 
   //if (goog.isFunction(this.iconStroke())) {
-  //  anychart.utils.warning(
+  //  anychart.core.reporting.warning(
   //      anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
   //      null,
   //      ['LegendItemSetting iconStroke']
@@ -389,7 +389,7 @@ anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
   //}
 
   //if (goog.isFunction(this.iconHatchFill())) {
-  //  anychart.utils.warning(
+  //  anychart.core.reporting.warning(
   //      anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
   //      null,
   //      ['LegendItemSetting iconHatchFill']

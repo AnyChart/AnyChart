@@ -1,6 +1,7 @@
 goog.provide('anychart.core.ui.Table');
 goog.require('acgraph');
 goog.require('anychart.core.VisualBaseWithBounds');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.MarkersFactory');
 goog.require('anychart.core.ui.table.Border');
@@ -124,17 +125,17 @@ anychart.core.ui.Table = function(opt_rowsCount, opt_colsCount) {
    *  fontFamily: (string|undefined),
    *  fontColor: (string|undefined),
    *  fontOpacity: (number|undefined),
-   *  fontDecoration: (acgraph.vector.Text.Decoration|undefined),
-   *  fontStyle: (acgraph.vector.Text.FontStyle|undefined),
-   *  fontVariant: (acgraph.vector.Text.FontVariant|undefined),
+   *  fontDecoration: (anychart.enums.TextDecoration|undefined),
+   *  fontStyle: (anychart.enums.FontStyle|undefined),
+   *  fontVariant: (anychart.enums.FontVariant|undefined),
    *  fontWeight: (string|number|undefined),
    *  letterSpacing: (string|number|undefined),
-   *  textDirection: (acgraph.vector.Text.Direction|undefined),
+   *  textDirection: (anychart.enums.TextDirection|undefined),
    *  lineHeight: (string|number|undefined),
    *  textIndent: (number|undefined),
-   *  vAlign: (acgraph.vector.Text.VAlign|undefined),
-   *  hAlign: (acgraph.vector.Text.HAlign|undefined),
-   *  textWrap: (acgraph.vector.Text.TextWrap|undefined),
+   *  vAlign: (anychart.enums.VAlign|undefined),
+   *  hAlign: (anychart.enums.HAlign|undefined),
+   *  textWrap: (anychart.enums.TextWrap|undefined),
    *  textOverflow: (acgraph.vector.Text.TextOverflow|undefined),
    *  selectable: (boolean|undefined),
    *  disablePointerEvents: (boolean|undefined),
@@ -626,7 +627,7 @@ anychart.core.ui.Table.prototype.contents = function(opt_tableValues, opt_demerg
       }
     }
     if (fail || !rowsCount || !colsCount) {
-      anychart.utils.error(anychart.enums.ErrorCode.WRONG_TABLE_CONTENTS);
+      anychart.core.reporting.error(anychart.enums.ErrorCode.WRONG_TABLE_CONTENTS);
     } else {
       this.suspendSignalsDispatching();
       this.rowsCount(rowsCount);
@@ -798,40 +799,40 @@ anychart.core.ui.Table.prototype.fontOpacity = function(opt_value) {
 
 /**
  * Getter/setter for fontDecoration.
- * @param {(acgraph.vector.Text.Decoration|string)=} opt_value .
- * @return {!anychart.core.ui.Table|acgraph.vector.Text.Decoration} .
+ * @param {(anychart.enums.TextDecoration|string)=} opt_value .
+ * @return {!anychart.core.ui.Table|anychart.enums.TextDecoration} .
  */
 anychart.core.ui.Table.prototype.fontDecoration = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = anychart.enums.normalizeFontDecoration(opt_value);
   }
-  return /** @type {!anychart.core.ui.Table|acgraph.vector.Text.Decoration} */(this.settings('fontDecoration', opt_value));
+  return /** @type {!anychart.core.ui.Table|anychart.enums.TextDecoration} */(this.settings('fontDecoration', opt_value));
 };
 
 
 /**
  * Getter/setter for fontStyle.
- * @param {acgraph.vector.Text.FontStyle|string=} opt_value .
- * @return {!anychart.core.ui.Table|acgraph.vector.Text.FontStyle} .
+ * @param {anychart.enums.FontStyle|string=} opt_value .
+ * @return {!anychart.core.ui.Table|anychart.enums.FontStyle} .
  */
 anychart.core.ui.Table.prototype.fontStyle = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = anychart.enums.normalizeFontStyle(opt_value);
   }
-  return /** @type {!anychart.core.ui.Table|acgraph.vector.Text.FontStyle} */(this.settings('fontStyle', opt_value));
+  return /** @type {!anychart.core.ui.Table|anychart.enums.FontStyle} */(this.settings('fontStyle', opt_value));
 };
 
 
 /**
  * Getter/setter for fontVariant.
- * @param {acgraph.vector.Text.FontVariant|string=} opt_value .
- * @return {!anychart.core.ui.Table|acgraph.vector.Text.FontVariant} .
+ * @param {anychart.enums.FontVariant|string=} opt_value .
+ * @return {!anychart.core.ui.Table|anychart.enums.FontVariant} .
  */
 anychart.core.ui.Table.prototype.fontVariant = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = anychart.enums.normalizeFontVariant(opt_value);
   }
-  return /** @type {!anychart.core.ui.Table|acgraph.vector.Text.FontVariant} */(this.settings('fontVariant', opt_value));
+  return /** @type {!anychart.core.ui.Table|anychart.enums.FontVariant} */(this.settings('fontVariant', opt_value));
 };
 
 
@@ -859,14 +860,14 @@ anychart.core.ui.Table.prototype.letterSpacing = function(opt_value) {
 
 /**
  * Getter/setter for textDirection.
- * @param {acgraph.vector.Text.Direction|string=} opt_value .
- * @return {!anychart.core.ui.Table|acgraph.vector.Text.Direction} .
+ * @param {anychart.enums.TextDirection|string=} opt_value .
+ * @return {!anychart.core.ui.Table|anychart.enums.TextDirection} .
  */
 anychart.core.ui.Table.prototype.textDirection = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = anychart.enums.normalizeTextDirection(opt_value);
   }
-  return /** @type {!anychart.core.ui.Table|acgraph.vector.Text.Direction} */(this.settings('textDirection', opt_value));
+  return /** @type {!anychart.core.ui.Table|anychart.enums.TextDirection} */(this.settings('textDirection', opt_value));
 };
 
 
@@ -894,40 +895,40 @@ anychart.core.ui.Table.prototype.textIndent = function(opt_value) {
 
 /**
  * Getter/setter for vAlign.
- * @param {acgraph.vector.Text.VAlign|string=} opt_value .
- * @return {!anychart.core.ui.Table|acgraph.vector.Text.VAlign} .
+ * @param {anychart.enums.VAlign|string=} opt_value .
+ * @return {!anychart.core.ui.Table|anychart.enums.VAlign} .
  */
 anychart.core.ui.Table.prototype.vAlign = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = anychart.enums.normalizeVAlign(opt_value);
   }
-  return /** @type {!anychart.core.ui.Table|acgraph.vector.Text.VAlign} */(this.settings('vAlign', opt_value));
+  return /** @type {!anychart.core.ui.Table|anychart.enums.VAlign} */(this.settings('vAlign', opt_value));
 };
 
 
 /**
  * Getter/setter for hAlign.
- * @param {acgraph.vector.Text.HAlign|string=} opt_value .
- * @return {!anychart.core.ui.Table|acgraph.vector.Text.HAlign} .
+ * @param {anychart.enums.HAlign|string=} opt_value .
+ * @return {!anychart.core.ui.Table|anychart.enums.HAlign} .
  */
 anychart.core.ui.Table.prototype.hAlign = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = anychart.enums.normalizeHAlign(opt_value);
   }
-  return /** @type {!anychart.core.ui.Table|acgraph.vector.Text.HAlign} */(this.settings('hAlign', opt_value));
+  return /** @type {!anychart.core.ui.Table|anychart.enums.HAlign} */(this.settings('hAlign', opt_value));
 };
 
 
 /**
  * Getter/setter for textWrap.
- * @param {acgraph.vector.Text.TextWrap|string=} opt_value .
- * @return {!anychart.core.ui.Table|acgraph.vector.Text.TextWrap} .
+ * @param {anychart.enums.TextWrap|string=} opt_value .
+ * @return {!anychart.core.ui.Table|anychart.enums.TextWrap} .
  */
 anychart.core.ui.Table.prototype.textWrap = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = anychart.enums.normalizeTextWrap(opt_value);
   }
-  return /** @type {!anychart.core.ui.Table|acgraph.vector.Text.TextWrap} */(this.settings('textWrap', opt_value));
+  return /** @type {!anychart.core.ui.Table|anychart.enums.TextWrap} */(this.settings('textWrap', opt_value));
 };
 
 

@@ -6,6 +6,7 @@ goog.require('anychart.core.IPlot');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.series');
 goog.require('anychart.core.shapeManagers.PerPoint');
 goog.require('anychart.core.shapeManagers.PerSeries');
@@ -1123,7 +1124,7 @@ anychart.core.series.Base.prototype.transformY = function(value, opt_subRangeRat
  */
 anychart.core.series.Base.prototype.error = function(opt_value) {
   if (!this.supportsError())
-    anychart.utils.warning(anychart.enums.WarningCode.SERIES_DOESNT_SUPPORT_ERROR, undefined, [this.seriesType()]);
+    anychart.core.reporting.warning(anychart.enums.WarningCode.SERIES_DOESNT_SUPPORT_ERROR, undefined, [this.seriesType()]);
   if (!this.error_) {
     this.error_ = new anychart.core.utils.Error(this);
     this.error_.listenSignals(this.onErrorSignal_, this);
@@ -3843,7 +3844,7 @@ anychart.core.series.Base.prototype.serialize = function() {
   for (name in this.settings) {
     val = this.settings[name];
     if (goog.isFunction(val)) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series ' + name]

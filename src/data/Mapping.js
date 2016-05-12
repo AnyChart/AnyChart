@@ -1,5 +1,6 @@
 goog.provide('anychart.data.Mapping');
 
+goog.require('anychart.core.reporting');
 goog.require('anychart.data.View');
 goog.require('anychart.utils');
 goog.require('goog.array');
@@ -107,16 +108,16 @@ anychart.data.Mapping.prototype.setInternal = function(row, fieldName, value) {
       return row;
 
     }
-    anychart.utils.warning(anychart.enums.WarningCode.NOT_MAPPED_FIELD, null, [fieldName]);
+    anychart.core.reporting.warning(anychart.enums.WarningCode.NOT_MAPPED_FIELD, null, [fieldName]);
   } else if (rowType == 'object') {
     anychart.utils.mapObject(/** @type {!Object} */(row), fieldName, this.objectMapping_[fieldName], value,
         this.writeToFirstFieldByMapping_);
   } else if (goog.array.indexOf(this.defaultProps_, fieldName) > -1) {
     if (anychart.DEVELOP && (goog.isArray(value) || goog.isObject(value)))
-      anychart.utils.warning(anychart.enums.WarningCode.COMPLEX_VALUE_TO_DEFAULT_FIELD, null, [fieldName]);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.COMPLEX_VALUE_TO_DEFAULT_FIELD, null, [fieldName]);
     row = value;
   } else {
-    anychart.utils.warning(anychart.enums.WarningCode.NOT_OBJECT_OR_ARRAY, null, [fieldName]);
+    anychart.core.reporting.warning(anychart.enums.WarningCode.NOT_OBJECT_OR_ARRAY, null, [fieldName]);
   }
   return row;
 };

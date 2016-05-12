@@ -2,9 +2,9 @@ goog.provide('anychart.core.grids.Polar');
 goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.VisualBase');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.enums');
-goog.require('anychart.utils');
 
 
 
@@ -563,12 +563,12 @@ anychart.core.grids.Polar.prototype.draw = function() {
   var yScale = /** @type {anychart.scales.ScatterBase|anychart.scales.Ordinal} */(this.yScale());
 
   if (!xScale) {
-    anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
     return this;
   }
 
   if (!this.isRadial() && !yScale) {
-    anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
     return this;
   }
 

@@ -17,6 +17,7 @@ goog.require('anychart.core.drawers.Spline');
 goog.require('anychart.core.drawers.SplineArea');
 goog.require('anychart.core.drawers.StepArea');
 goog.require('anychart.core.drawers.StepLine');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.series.Base');
 goog.require('anychart.core.utils.StockHighlightContextProvider');
 goog.require('anychart.data.Table');
@@ -273,7 +274,7 @@ anychart.core.series.Stock.prototype.retrieveDataColumns = function() {
   for (var i = 0; i < fields.length; i++) {
     var column = this.data_.getFieldColumn(fields[i]);
     if (!goog.isString(column) && isNaN(column)) {
-      anychart.utils.warning(anychart.enums.WarningCode.STOCK_WRONG_MAPPING, undefined, [this.seriesType(), fields[i]]);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.STOCK_WRONG_MAPPING, undefined, [this.seriesType(), fields[i]]);
       return null;
     }
     res.push(column);

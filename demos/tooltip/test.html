@@ -49,7 +49,7 @@
       series2 = chart.line(data2);
 
       var tooltip = series1.tooltip();
-      //tooltip.content().textWrap(acgraph.vector.Text.TextWrap.BY_LETTER);
+      //tooltip.content().textWrap(anychart.enums.TextWrap.BY_LETTER);
       tooltip.textFormatter(function() {
         return this.x + ': ' + this.value + ' wtf!!' + '\n' + this.seriesName + ': awesome!';
       });
@@ -113,7 +113,7 @@
 
 //      var stage = acgraph.create().container('container');
 //      var text = stage.text(0, 0, 'Department Stores: 637166 wtf!!\nSeries: 0: hUI!');
-//      text.textWrap(acgraph.vector.Text.TextWrap.BY_LETTER);
+//      text.textWrap(anychart.enums.TextWrap.BY_LETTER);
 //      stage.rect().setBounds(text.getBounds());
     }
 

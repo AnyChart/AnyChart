@@ -1,6 +1,7 @@
 goog.provide('anychart.data.Tree');
 
 goog.require('anychart.core.Base');
+goog.require('anychart.core.reporting');
 goog.require('anychart.data.Traverser');
 goog.require('anychart.data.csv.Parser');
 goog.require('anychart.data.csv.TreeItemsProcessor');
@@ -275,12 +276,12 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
           found = (searchResult instanceof anychart.data.Tree.DataItem) ? searchResult : searchResult[0];
           goog.array.insertAt(uitems, found, pos);
           found.meta('nc', true);
-          anychart.utils.warning(anychart.enums.WarningCode.DUPLICATED_DATA_ITEM, null, [id]);
+          anychart.core.reporting.warning(anychart.enums.WarningCode.DUPLICATED_DATA_ITEM, null, [id]);
         } else {
           goog.array.insertAt(uitems, dataItem, pos);
         }
       } else {
-        anychart.utils.warning(anychart.enums.WarningCode.REFERENCE_IS_NOT_UNIQUE, null, [id]);
+        anychart.core.reporting.warning(anychart.enums.WarningCode.REFERENCE_IS_NOT_UNIQUE, null, [id]);
       }
     }
   }
@@ -299,7 +300,7 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
           found.addChildWithoutIndexing(tdi);
         } else {
           this.roots_.push(tdi);
-          anychart.utils.warning(anychart.enums.WarningCode.MISSING_PARENT_ID, null, [parentId]);
+          anychart.core.reporting.warning(anychart.enums.WarningCode.MISSING_PARENT_ID, null, [parentId]);
         }
         this.indexBranch_(tdi);
       } else {
@@ -318,7 +319,7 @@ anychart.data.Tree.prototype.fillAsParentPointer_ = function(data) {
     for (i = 0; i < tdis.length; i++) {
       tdi = tdis[i]; //Tree data item.
       if (!tdi.meta('nc'))
-        anychart.utils.warning(
+        anychart.core.reporting.warning(
             anychart.enums.WarningCode.CYCLE_REFERENCE,
             null,
             [tdi.get(anychart.enums.GanttDataFields.ID), tdi.getParent().get(anychart.enums.GanttDataFields.ID)]
@@ -1121,7 +1122,7 @@ anychart.data.Tree.DataItem.prototype.set = function(var_args) {
       for (i = 1; i < iter.length - reduce; i++) {
         item = iter[i];
         if (!goog.isNumber(item) && !goog.isString(item)) {
-          anychart.utils.warning(anychart.enums.WarningCode.DATA_ITEM_SET_PATH);
+          anychart.core.reporting.warning(anychart.enums.WarningCode.DATA_ITEM_SET_PATH);
           return this;
         }
       }
@@ -1136,7 +1137,7 @@ anychart.data.Tree.DataItem.prototype.set = function(var_args) {
               curr = parent[item];
               prevItem = item;
             } else {
-              anychart.utils.warning(anychart.enums.WarningCode.DATA_ITEM_SET_PATH);
+              anychart.core.reporting.warning(anychart.enums.WarningCode.DATA_ITEM_SET_PATH);
               return this; //Incorrect input.
             }
           } else {
@@ -1152,7 +1153,7 @@ anychart.data.Tree.DataItem.prototype.set = function(var_args) {
               curr = parent[item];
               prevItem = item;
             } else {
-              anychart.utils.warning(anychart.enums.WarningCode.DATA_ITEM_SET_PATH);
+              anychart.core.reporting.warning(anychart.enums.WarningCode.DATA_ITEM_SET_PATH);
               return this; //Incorrect input.
             }
           } else {
@@ -1162,7 +1163,7 @@ anychart.data.Tree.DataItem.prototype.set = function(var_args) {
             prevItem = item;
           }
         } else {
-          anychart.utils.warning(anychart.enums.WarningCode.DATA_ITEM_SET_PATH);
+          anychart.core.reporting.warning(anychart.enums.WarningCode.DATA_ITEM_SET_PATH);
           return this; //Incorrect input.
         }
       }
@@ -1186,7 +1187,7 @@ anychart.data.Tree.DataItem.prototype.set = function(var_args) {
         }
       }
     } else {
-      anychart.utils.warning(anychart.enums.WarningCode.DATA_ITEM_SET_PATH);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.DATA_ITEM_SET_PATH);
     }
 
   }

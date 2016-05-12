@@ -1,4 +1,6 @@
 goog.provide('anychart.format');
+
+goog.require('anychart.core.reporting');
 goog.require('anychart.math');
 goog.require('anychart.utils');
 goog.require('goog.i18n.DateTimeFormat');
@@ -390,7 +392,7 @@ anychart.format.parseDateTime = function(value, opt_format, opt_dateHolder, opt_
     return /** @type {Date} */ (value);
   } else if (goog.isNumber(value)) {
     if (isNaN(value)) {
-      anychart.utils.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
       return null;
     } else {
       return new Date(value);
@@ -400,7 +402,7 @@ anychart.format.parseDateTime = function(value, opt_format, opt_dateHolder, opt_
       var numValue = +value;
       var newDate = new Date(isNaN(numValue) ? value : numValue);
       if (isNaN(newDate.getTime())) { //Got string not in ISO8601 format.
-        anychart.utils.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
+        anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
         return null; // Parsing error.
       } else {
         return newDate;
@@ -446,12 +448,12 @@ anychart.format.parseDateTime = function(value, opt_format, opt_dateHolder, opt_
       if (valueLength == resultLength) {//parsing successful.
         return /** @type {Date} */ (date);
       } else {
-        anychart.utils.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value, resultLength], true);
+        anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value, resultLength], true);
         return null;
       }
     }
   } else {
-    anychart.utils.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
+    anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
     return null;
   }
 };

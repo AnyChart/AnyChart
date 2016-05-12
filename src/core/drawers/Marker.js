@@ -91,7 +91,7 @@ anychart.core.drawers.Marker.prototype.drawPoint_ = function(point, state, shape
   var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
   var type = /** @type {anychart.enums.MarkerType|Function} */(this.typeGetter_(this.series, point, state));
   var size = /** @type {number} */(this.sizeGetter_(this.series, point, state));
-  var drawer = goog.isFunction(type) ? type : anychart.enums.getMarkerDrawer(type);
+  var drawer = goog.isFunction(type) ? type : anychart.utils.getMarkerDrawer(type);
 
   drawer(shapes[anychart.opt.PATH], x, y, size);
   drawer(shapes[anychart.opt.HATCH_FILL], x, y, size);

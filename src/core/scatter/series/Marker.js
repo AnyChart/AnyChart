@@ -1,5 +1,6 @@
 goog.provide('anychart.core.scatter.series.Marker');
 goog.require('acgraph');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.scatter.series.Base');
 goog.require('anychart.core.ui.MarkersFactory');
 goog.require('anychart.enums');
@@ -508,7 +509,7 @@ anychart.core.scatter.series.Marker.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
   if (goog.isFunction(this.type())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Marker type']
@@ -518,7 +519,7 @@ anychart.core.scatter.series.Marker.prototype.serialize = function() {
   }
 
   if (goog.isFunction(this.hoverType())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Marker hoverType']
@@ -528,7 +529,7 @@ anychart.core.scatter.series.Marker.prototype.serialize = function() {
   }
 
   if (goog.isFunction(this.selectType())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Marker selectType']

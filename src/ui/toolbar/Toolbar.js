@@ -1,6 +1,6 @@
 goog.provide('anychart.ui.toolbar.Toolbar');
 
-goog.require('anychart.utils');
+goog.require('anychart.core.reporting');
 goog.require('goog.ui.ContainerRenderer');
 goog.require('goog.ui.Toolbar');
 goog.require('goog.ui.ToolbarRenderer');
@@ -82,7 +82,7 @@ anychart.ui.toolbar.Toolbar.prototype.draw = function() {
   if (this.container_) {
     this.render(this.container_);
   } else {
-    anychart.utils.warning(anychart.enums.WarningCode.TOOLBAR_CONTAINER);
+    anychart.core.reporting.warning(anychart.enums.WarningCode.TOOLBAR_CONTAINER);
   }
   return this;
 };
@@ -94,7 +94,7 @@ anychart.ui.toolbar.Toolbar.prototype.draw = function() {
  * @deprecated Use anychart.ui.ganttToolbar() instead.
  */
 anychart.toolbar = function() {
-  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.toolbar()', 'anychart.ui.ganttToolbar()'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.toolbar()', 'anychart.ui.ganttToolbar()'], true);
   return new anychart.ui.toolbar.Toolbar();
 };
 

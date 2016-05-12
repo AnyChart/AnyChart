@@ -1,6 +1,7 @@
 goog.provide('anychart.charts.TreeMap');
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.TreeMapPoint');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.ColorRange');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.MarkersFactory');
@@ -2563,7 +2564,7 @@ anychart.charts.TreeMap.prototype.ensureDataPrepared = function() {
       var numChildren = data.numChildren();
       // more than one root node
       if (numChildren > 1)
-        anychart.utils.warning(anychart.enums.WarningCode.TREEMAP_MANY_ROOTS);
+        anychart.core.reporting.warning(anychart.enums.WarningCode.TREEMAP_MANY_ROOTS);
       // no data case
       else if (numChildren == 0)
         return;
@@ -2860,7 +2861,7 @@ anychart.charts.TreeMap.prototype.serialize = function() {
   json['type'] = this.getType();
 
   if (goog.isFunction(this.fill())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Series fill']
@@ -2870,7 +2871,7 @@ anychart.charts.TreeMap.prototype.serialize = function() {
   }
 
   if (goog.isFunction(this.hoverFill())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Series hoverFill']
@@ -2880,7 +2881,7 @@ anychart.charts.TreeMap.prototype.serialize = function() {
   }
 
   if (goog.isFunction(this.selectFill())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Series selectFill']
@@ -2890,7 +2891,7 @@ anychart.charts.TreeMap.prototype.serialize = function() {
   }
 
   if (goog.isFunction(this.stroke())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Series stroke']
@@ -2900,7 +2901,7 @@ anychart.charts.TreeMap.prototype.serialize = function() {
   }
 
   if (goog.isFunction(this.hoverStroke())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Series hoverStroke']
@@ -2910,7 +2911,7 @@ anychart.charts.TreeMap.prototype.serialize = function() {
   }
 
   if (goog.isFunction(this.selectStroke())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Series selectStroke']
@@ -2920,7 +2921,7 @@ anychart.charts.TreeMap.prototype.serialize = function() {
   }
 
   if (goog.isFunction(this.hatchFill())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Series hatchFill']
@@ -2930,7 +2931,7 @@ anychart.charts.TreeMap.prototype.serialize = function() {
   }
 
   if (goog.isFunction(this.hoverHatchFill())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Series hoverHatchFill']
@@ -2941,7 +2942,7 @@ anychart.charts.TreeMap.prototype.serialize = function() {
   }
 
   if (goog.isFunction(this.selectHatchFill())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Series selectHatchFill']

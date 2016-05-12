@@ -496,8 +496,8 @@ anychart.ui.menu.SubMenu.prototype.positionSubMenu = function() {
   var scrollableContainer = subMenu.getScrollableContainer();
   var scrollableBounds = goog.style.getBounds(scrollableContainer);
   var BOTTOM_MARGIN = 15;
-  var scrollableMaxHeight = viewportSize.height - elementClientPosition.getY() -
-      (elementBounds.getHeight() - scrollableBounds.getHeight()) -
+  var scrollableMaxHeight = viewportSize.height - elementClientPosition.y -
+      (elementBounds.height - scrollableBounds.height) -
       BOTTOM_MARGIN;
 
   scrollableContainer.style.maxHeight = scrollableMaxHeight + 'px';

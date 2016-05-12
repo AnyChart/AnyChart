@@ -4,6 +4,7 @@
  */
 
 goog.provide('anychart.ui');
+goog.require('anychart.core.reporting');
 goog.require('anychart.ui.Background');
 goog.require('anychart.ui.DataGrid');
 goog.require('anychart.ui.Label');
@@ -27,9 +28,9 @@ goog.require('anychart.ui.Title');
 /**
  * @ignoreDoc
  */
-anychart.ui.contextMenu = anychart.ui.contextMenu || /** @type {function():null} */ (function(opt_fromTheme) {
+anychart.ui.contextMenu = goog.global['anychart']['ui']['contextMenu'] || /** @type {function():null} */ (function(opt_fromTheme) {
   if (!opt_fromTheme) {
-    anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['anychart.ui.ContextMenu']);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['anychart.ui.ContextMenu']);
   }
   return null;
 });
@@ -38,8 +39,8 @@ anychart.ui.contextMenu = anychart.ui.contextMenu || /** @type {function():null}
 /**
  * @ignoreDoc
  */
-anychart.ui.ganttToolbar = anychart.ui.ganttToolbar || /** @type {function():null} */ (function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['anychart.ui.GanttToolbar']);
+anychart.ui.ganttToolbar = goog.global['anychart']['ui']['ganttToolbar'] || /** @type {function():null} */ (function() {
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['anychart.ui.GanttToolbar']);
   return null;
 });
 

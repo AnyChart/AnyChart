@@ -2,6 +2,7 @@ goog.provide('anychart.core.gantt.TimelineHeader');
 
 goog.require('acgraph');
 goog.require('anychart.core.VisualBaseWithBounds');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.scales.GanttDateTime');
 
@@ -245,7 +246,7 @@ anychart.core.gantt.TimelineHeader.prototype.draw = function() {
 
     if (this.hasInvalidationState(anychart.ConsistencyState.TIMELINE_HEADER_SCALES)) {
       if (!this.scale_) {
-        anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
+        anychart.core.reporting.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
         return this;
       }
 
@@ -533,7 +534,7 @@ anychart.core.gantt.TimelineHeader.Level.prototype.draw = function() {
   if (this.checkDrawingNeeded()) {
     var scale = this.timelineHeader_.scale();
     if (!scale) {
-      anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
+      anychart.core.reporting.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
       return this;
     }
 

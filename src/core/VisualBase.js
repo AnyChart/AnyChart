@@ -2,6 +2,7 @@ goog.provide('anychart.core.MouseEvent');
 goog.provide('anychart.core.VisualBase');
 goog.require('acgraph');
 goog.require('anychart.core.Base');
+goog.require('anychart.core.reporting');
 goog.require('anychart.exports');
 goog.require('goog.dom');
 goog.require('goog.events.EventHandler');
@@ -408,7 +409,7 @@ anychart.core.VisualBase.prototype.checkDrawingNeeded = function() {
   } else if (!this.container()) {
     this.remove(); // It should be removed if it was drawn.
     this.invalidate(anychart.ConsistencyState.CONTAINER);
-    anychart.utils.error(anychart.enums.ErrorCode.CONTAINER_NOT_SET);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.CONTAINER_NOT_SET);
     return false;
   }
   this.markConsistent(anychart.ConsistencyState.ENABLED);
@@ -630,7 +631,7 @@ anychart.core.VisualBase.prototype.print = function(opt_paperSize, opt_landscape
  * Saves the current visual state into PNG file.
  */
 anychart.core.VisualBase.prototype.saveAsPNG = function() {
-  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsPNG()', 'saveAsPng()'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsPNG()', 'saveAsPng()'], true);
   this.saveAsPng();
 };
 
@@ -639,7 +640,7 @@ anychart.core.VisualBase.prototype.saveAsPNG = function() {
  * Saves the current visual state into JPEG file.
  */
 anychart.core.VisualBase.prototype.saveAsJPG = function() {
-  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsJPG()', 'saveAsJpg()'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsJPG()', 'saveAsJpg()'], true);
   this.saveAsJpg();
 };
 
@@ -648,7 +649,7 @@ anychart.core.VisualBase.prototype.saveAsJPG = function() {
  * Saves the current visual state into PDF file.
  */
 anychart.core.VisualBase.prototype.saveAsPDF = function() {
-  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsPDF()', 'saveAsPdf()'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsPDF()', 'saveAsPdf()'], true);
   this.saveAsPdf();
 };
 
@@ -657,7 +658,7 @@ anychart.core.VisualBase.prototype.saveAsPDF = function() {
  * Saves the current visual state into SVG file.
  */
 anychart.core.VisualBase.prototype.saveAsSVG = function() {
-  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsSVG()', 'saveAsSvg()'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsSVG()', 'saveAsSvg()'], true);
   this.saveAsSvg();
 };
 
@@ -667,7 +668,7 @@ anychart.core.VisualBase.prototype.saveAsSVG = function() {
  * @return {string}
  */
 anychart.core.VisualBase.prototype.toSVG = function() {
-  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['toSVG()', 'toSvg()'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['toSVG()', 'toSvg()'], true);
   return this.toSvg();
 };
 

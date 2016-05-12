@@ -1,6 +1,7 @@
 goog.provide('anychart.core.ui.Tooltip');
 goog.require('anychart.compatibility');
 goog.require('anychart.core.Base');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.TooltipItem');
 goog.require('anychart.core.utils.TooltipsContainer');
 goog.require('anychart.enums');
@@ -132,7 +133,7 @@ anychart.core.ui.Tooltip.prototype.textFormatter = function(opt_value) {
  * @deprecated It shouldn't be used ever.
  */
 anychart.core.ui.Tooltip.prototype.contentFormatter = function(opt_value) {
-  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.contentFormatter()', '.textFormatter()'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.contentFormatter()', '.textFormatter()'], true);
   return /** @type {Function} */ (this.textFormatter(opt_value));
 };
 

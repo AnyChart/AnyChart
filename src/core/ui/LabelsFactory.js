@@ -2,6 +2,7 @@ goog.provide('anychart.core.ui.LabelsFactory');
 goog.provide('anychart.core.ui.LabelsFactory.Label');
 goog.require('acgraph.math.Coordinate');
 goog.require('anychart.core.Text');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.core.utils.TokenParser');
@@ -746,7 +747,7 @@ anychart.core.ui.LabelsFactory.prototype.serialize = function() {
   if (goog.isDef(this.maxFontSize())) json['maxFontSize'] = this.maxFontSize();
 
   if (goog.isFunction(this.textFormatter_)) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Labels textFormatter']

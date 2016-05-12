@@ -1,6 +1,7 @@
 goog.provide('anychart.core.scatter.series.Base');
 goog.require('acgraph');
 goog.require('anychart.core.SeriesBase');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.Error');
 goog.require('anychart.core.utils.ISeriesWithError');
 goog.require('anychart.core.utils.Padding');
@@ -561,7 +562,7 @@ anychart.core.scatter.series.Base.prototype.getXScale = function() {
 anychart.core.scatter.series.Base.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (!(opt_value instanceof anychart.scales.ScatterBase)) {
-      anychart.utils.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
+      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
       return this;
     }
     if (this.xScale_ != opt_value) {
@@ -587,7 +588,7 @@ anychart.core.scatter.series.Base.prototype.xScale = function(opt_value) {
 anychart.core.scatter.series.Base.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (!(opt_value instanceof anychart.scales.ScatterBase)) {
-      anychart.utils.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
+      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
       return this;
     }
     if (this.yScale_ != opt_value) {
@@ -742,7 +743,7 @@ anychart.core.scatter.series.Base.prototype.calculateStatistics = function() {
  */
 anychart.core.scatter.series.Base.prototype.error = function(opt_value) {
   if (!this.supportsError())
-    anychart.utils.warning(anychart.enums.WarningCode.SERIES_DOESNT_SUPPORT_ERROR, undefined, [this.getType()]);
+    anychart.core.reporting.warning(anychart.enums.WarningCode.SERIES_DOESNT_SUPPORT_ERROR, undefined, [this.getType()]);
   if (!this.error_) {
     this.error_ = new anychart.core.utils.Error(this);
     this.registerDisposable(this.error_);

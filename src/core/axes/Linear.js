@@ -3,6 +3,7 @@ goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.axes.Ticks');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.Title');
 goog.require('anychart.core.utils.AxisLabelsContextProvider');
@@ -1727,7 +1728,7 @@ anychart.core.axes.Linear.prototype.draw = function() {
   var scale = /** @type {anychart.scales.Linear|anychart.scales.Ordinal} */(this.scale());
 
   if (!scale) {
-    anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
     return this;
   }
 

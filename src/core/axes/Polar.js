@@ -3,12 +3,12 @@ goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.axes.RadialTicks');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.utils.AxisLabelsContextProvider');
 goog.require('anychart.core.utils.Bounds');
 goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
-goog.require('anychart.utils');
 
 
 
@@ -1006,7 +1006,7 @@ anychart.core.axes.Polar.prototype.draw = function() {
   var scale = /** @type {anychart.scales.ScatterBase} */(this.scale());
 
   if (!scale) {
-    anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
     return this;
   }
 

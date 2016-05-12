@@ -1,6 +1,7 @@
 goog.provide('anychart.core.ui.Paginator');
 goog.require('acgraph');
 goog.require('anychart.core.Text');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.PaginatorButton');
 goog.require('anychart.core.utils.Margin');
@@ -417,7 +418,7 @@ anychart.core.ui.Paginator.prototype.checkDrawingNeeded = function() {
   } else if (!this.container()) {
     this.remove(); // It should be removed if it was drawn.
     this.invalidate(anychart.ConsistencyState.CONTAINER);
-    anychart.utils.error(anychart.enums.ErrorCode.CONTAINER_NOT_SET);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.CONTAINER_NOT_SET);
     return false;
   }
   this.markConsistent(anychart.ConsistencyState.ENABLED);

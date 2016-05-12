@@ -1,5 +1,6 @@
 goog.provide('anychart.core.axisMarkers.GanttText');
 goog.require('anychart.core.axisMarkers.TextBase');
+goog.require('anychart.core.reporting');
 goog.require('anychart.enums');
 
 
@@ -53,7 +54,7 @@ anychart.core.axisMarkers.GanttText.prototype.SUPPORTED_CONSISTENCY_STATES =
  */
 anychart.core.axisMarkers.GanttText.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    anychart.utils.warning(anychart.enums.WarningCode.IMMUTABLE_MARKER_SCALE);
+    anychart.core.reporting.warning(anychart.enums.WarningCode.IMMUTABLE_MARKER_SCALE);
     return this;
   }
   return /** @type {anychart.scales.GanttDateTime} */ (this.scaleInternal());
@@ -71,7 +72,7 @@ anychart.core.axisMarkers.GanttText.prototype.scale = function(opt_value) {
 anychart.core.axisMarkers.GanttText.prototype.layout = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (opt_value == anychart.enums.Layout.HORIZONTAL)
-      anychart.utils.warning(anychart.enums.WarningCode.IMMUTABLE_MARKER_LAYOUT);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.IMMUTABLE_MARKER_LAYOUT);
     return this;
   }
   return /** @type {anychart.enums.Layout} */ (anychart.enums.Layout.VERTICAL);

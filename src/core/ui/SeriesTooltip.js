@@ -2,6 +2,7 @@ goog.provide('anychart.core.ui.SeriesTooltip');
 goog.require('acgraph.math.Coordinate');
 goog.require('anychart.compatibility');
 goog.require('anychart.core.VisualBase');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.Label');
 goog.require('anychart.core.ui.Separator');
@@ -147,7 +148,7 @@ anychart.core.ui.SeriesTooltip.prototype.textFormatter = function(opt_value) {
  * @deprecated Use {@link #textFormatter} instead.
  */
 anychart.core.ui.SeriesTooltip.prototype.contentFormatter = function(opt_value) {
-  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.contentFormatter()', '.textFormatter()'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.contentFormatter()', '.textFormatter()'], true);
   return /** @type {Function} */ (this.textFormatter(opt_value));
 };
 
@@ -389,7 +390,7 @@ anychart.core.ui.SeriesTooltip.prototype.contentInternal = function(opt_value) {
  * @return {!(anychart.core.ui.Label|anychart.core.ui.SeriesTooltip)} Labels instance or itself for method chaining.
  */
 anychart.core.ui.SeriesTooltip.prototype.content = function(opt_value) {
-  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.content()', 'method directly'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.content()', 'method directly'], true);
   return this.contentInternal(opt_value);
 };
 
@@ -693,8 +694,8 @@ anychart.core.ui.SeriesTooltip.prototype.fontOpacity = function(opt_value) {
 
 /**
  * Getter/Setter for the text font decoration.
- * @param {(acgraph.vector.Text.Decoration|string)=} opt_value
- * @return {!anychart.core.ui.SeriesTooltip|acgraph.vector.Text.Decoration}
+ * @param {(anychart.enums.TextDecoration|string)=} opt_value
+ * @return {!anychart.core.ui.SeriesTooltip|anychart.enums.TextDecoration}
  */
 anychart.core.ui.SeriesTooltip.prototype.fontDecoration = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -708,8 +709,8 @@ anychart.core.ui.SeriesTooltip.prototype.fontDecoration = function(opt_value) {
 
 /**
  * Getter/Setter for the text font style.
- * @param {acgraph.vector.Text.FontStyle|string=} opt_value
- * @return {!anychart.core.ui.SeriesTooltip|acgraph.vector.Text.FontStyle}
+ * @param {anychart.enums.FontStyle|string=} opt_value
+ * @return {!anychart.core.ui.SeriesTooltip|anychart.enums.FontStyle}
  */
 anychart.core.ui.SeriesTooltip.prototype.fontStyle = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -723,8 +724,8 @@ anychart.core.ui.SeriesTooltip.prototype.fontStyle = function(opt_value) {
 
 /**
  * Getter/Setter for the text font variant.
- * @param {acgraph.vector.Text.FontVariant|string=} opt_value
- * @return {!anychart.core.ui.SeriesTooltip|acgraph.vector.Text.FontVariant}
+ * @param {anychart.enums.FontVariant|string=} opt_value
+ * @return {!anychart.core.ui.SeriesTooltip|anychart.enums.FontVariant}
  */
 anychart.core.ui.SeriesTooltip.prototype.fontVariant = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -768,8 +769,8 @@ anychart.core.ui.SeriesTooltip.prototype.letterSpacing = function(opt_value) {
 
 /**
  * Getter/Setter for the text direction.
- * @param {acgraph.vector.Text.Direction|string=} opt_value
- * @return {!anychart.core.ui.SeriesTooltip|acgraph.vector.Text.Direction}
+ * @param {anychart.enums.TextDirection|string=} opt_value
+ * @return {!anychart.core.ui.SeriesTooltip|anychart.enums.TextDirection}
  */
 anychart.core.ui.SeriesTooltip.prototype.textDirection = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -813,8 +814,8 @@ anychart.core.ui.SeriesTooltip.prototype.textIndent = function(opt_value) {
 
 /**
  * Getter/Setter for the text vertical align.
- * @param {acgraph.vector.Text.VAlign|string=} opt_value
- * @return {!anychart.core.ui.SeriesTooltip|acgraph.vector.Text.VAlign}
+ * @param {anychart.enums.VAlign|string=} opt_value
+ * @return {!anychart.core.ui.SeriesTooltip|anychart.enums.VAlign}
  */
 anychart.core.ui.SeriesTooltip.prototype.vAlign = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -828,8 +829,8 @@ anychart.core.ui.SeriesTooltip.prototype.vAlign = function(opt_value) {
 
 /**
  * Getter/Setter for the text horizontal align.
- * @param {acgraph.vector.Text.HAlign|string=} opt_value
- * @return {!anychart.core.ui.SeriesTooltip|acgraph.vector.Text.HAlign}
+ * @param {anychart.enums.HAlign|string=} opt_value
+ * @return {!anychart.core.ui.SeriesTooltip|anychart.enums.HAlign}
  */
 anychart.core.ui.SeriesTooltip.prototype.hAlign = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -843,8 +844,8 @@ anychart.core.ui.SeriesTooltip.prototype.hAlign = function(opt_value) {
 
 /**
  * Getter/Setter for the text wrap settings.
- * @param {acgraph.vector.Text.TextWrap|string=} opt_value
- * @return {!anychart.core.ui.SeriesTooltip|acgraph.vector.Text.TextWrap}
+ * @param {anychart.enums.TextWrap|string=} opt_value
+ * @return {!anychart.core.ui.SeriesTooltip|anychart.enums.TextWrap}
  */
 anychart.core.ui.SeriesTooltip.prototype.textWrap = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -1464,7 +1465,7 @@ anychart.core.ui.SeriesTooltip.prototype.remove = function() {
  * @deprecated Use chart.tooltip().allowLeaveScreen() instead.
  */
 anychart.core.ui.SeriesTooltip.prototype.allowLeaveScreen = function(opt_value) {
-  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['series.tooltip().allowLeaveScreen()', 'chart.tooltip().allowLeaveScreen()'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['series.tooltip().allowLeaveScreen()', 'chart.tooltip().allowLeaveScreen()'], true);
 };
 
 
@@ -1480,7 +1481,7 @@ anychart.core.ui.SeriesTooltip.prototype.allowLeaveScreenInternal = anychart.cor
  * @deprecated Use chart.tooltip().positionMode('float') instead.
  */
 anychart.core.ui.SeriesTooltip.prototype.isFloating = function(opt_value) {
-  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['series.tooltip().isFloating()', 'chart.tooltip().positionMode()'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['series.tooltip().isFloating()', 'chart.tooltip().positionMode()'], true);
 };
 
 

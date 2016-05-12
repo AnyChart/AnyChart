@@ -5,6 +5,7 @@ goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.grids.Linear');
 goog.require('anychart.core.heatMap.series.Base');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.ChartScroller');
 goog.require('anychart.core.utils.IZoomableChart');
 goog.require('anychart.core.utils.OrdinalZoom');
@@ -448,7 +449,7 @@ anychart.charts.HeatMap.prototype.defaultGridSettings = function(opt_value) {
 anychart.charts.HeatMap.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (!(opt_value instanceof anychart.scales.Ordinal)) {
-      anychart.utils.warning(anychart.enums.WarningCode.SCALE_TYPE_NOT_SUPPORTED, null, [opt_value.getType(), 'Ordinal'], false);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.SCALE_TYPE_NOT_SUPPORTED, null, [opt_value.getType(), 'Ordinal'], false);
       return this;
     }
 
@@ -488,7 +489,7 @@ anychart.charts.HeatMap.prototype.scaleInvalidated_ = function(event) {
 anychart.charts.HeatMap.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (!(opt_value instanceof anychart.scales.Ordinal)) {
-      anychart.utils.warning(anychart.enums.WarningCode.SCALE_TYPE_NOT_SUPPORTED, null, [opt_value.getType(), 'Ordinal'], false);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.SCALE_TYPE_NOT_SUPPORTED, null, [opt_value.getType(), 'Ordinal'], false);
       return this;
     }
 
@@ -2461,7 +2462,7 @@ anychart.charts.HeatMap.prototype.serialize = function() {
 
   if (goog.isFunction(this['fill'])) {
     if (goog.isFunction(this.fill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series fill']
@@ -2472,7 +2473,7 @@ anychart.charts.HeatMap.prototype.serialize = function() {
   }
   if (goog.isFunction(this['hoverFill'])) {
     if (goog.isFunction(this.hoverFill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series hoverFill']
@@ -2483,7 +2484,7 @@ anychart.charts.HeatMap.prototype.serialize = function() {
   }
   if (goog.isFunction(this['selectFill'])) {
     if (goog.isFunction(this.selectFill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series selectFill']
@@ -2495,7 +2496,7 @@ anychart.charts.HeatMap.prototype.serialize = function() {
 
   if (goog.isFunction(this['stroke'])) {
     if (goog.isFunction(this.stroke())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series stroke']
@@ -2506,7 +2507,7 @@ anychart.charts.HeatMap.prototype.serialize = function() {
   }
   if (goog.isFunction(this['hoverStroke'])) {
     if (goog.isFunction(this.hoverStroke())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series hoverStroke']
@@ -2517,7 +2518,7 @@ anychart.charts.HeatMap.prototype.serialize = function() {
   }
   if (goog.isFunction(this['selectStroke'])) {
     if (goog.isFunction(this.selectStroke())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series selectStroke']
@@ -2529,7 +2530,7 @@ anychart.charts.HeatMap.prototype.serialize = function() {
 
   if (goog.isFunction(this['hatchFill'])) {
     if (goog.isFunction(this.hatchFill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series hatchFill']
@@ -2540,7 +2541,7 @@ anychart.charts.HeatMap.prototype.serialize = function() {
   }
   if (goog.isFunction(this['hoverHatchFill'])) {
     if (goog.isFunction(this.hoverHatchFill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series hoverHatchFill']
@@ -2554,7 +2555,7 @@ anychart.charts.HeatMap.prototype.serialize = function() {
   }
   if (goog.isFunction(this['selectHatchFill'])) {
     if (goog.isFunction(this.selectHatchFill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series selectHatchFill']

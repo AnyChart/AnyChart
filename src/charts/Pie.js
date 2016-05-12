@@ -3,6 +3,7 @@ goog.require('acgraph.math.Coordinate');
 goog.require('anychart.color');
 goog.require('anychart.core.PiePoint');
 goog.require('anychart.core.SeparateChart');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.CircularLabelsFactory');
 goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.core.utils.IInteractiveSeries');
@@ -1438,7 +1439,7 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
   var rowsCount = iterator.getRowsCount();
 
   if (rowsCount > 7) {
-    anychart.utils.info(anychart.enums.InfoCode.PIE_TOO_MUCH_POINTS, [rowsCount]);
+    anychart.core.reporting.info(anychart.enums.InfoCode.PIE_TOO_MUCH_POINTS, [rowsCount]);
   }
 
   if (!this.tooltip().container()) {
@@ -4128,7 +4129,7 @@ anychart.charts.Pie.prototype.serialize = function() {
   // The values of group() function can be function or null or 'none'. So we don't serialize it anyway.
   //if (goog.isFunction(this['group'])) {
   //  if (goog.isFunction(this.group())) {
-  //    anychart.utils.warning(
+  //    anychart.core.reporting.warning(
   //        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
   //        null,
   //        ['Pie group']
@@ -4139,7 +4140,7 @@ anychart.charts.Pie.prototype.serialize = function() {
   //}
   if (goog.isFunction(this['innerRadius'])) {
     if (goog.isFunction(this.innerRadius())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Pie innerRadius']
@@ -4150,7 +4151,7 @@ anychart.charts.Pie.prototype.serialize = function() {
   }
   if (goog.isFunction(this['connectorStroke'])) {
     if (goog.isFunction(this.connectorStroke())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Pie connectorStroke']
@@ -4161,7 +4162,7 @@ anychart.charts.Pie.prototype.serialize = function() {
   }
   if (goog.isFunction(this['fill'])) {
     if (goog.isFunction(this.fill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Pie fill']
@@ -4172,7 +4173,7 @@ anychart.charts.Pie.prototype.serialize = function() {
   }
   if (goog.isFunction(this['hoverFill'])) {
     if (goog.isFunction(this.hoverFill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Pie hoverFill']
@@ -4183,7 +4184,7 @@ anychart.charts.Pie.prototype.serialize = function() {
   }
   if (goog.isFunction(this['stroke'])) {
     if (goog.isFunction(this.stroke())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Pie stroke']
@@ -4194,7 +4195,7 @@ anychart.charts.Pie.prototype.serialize = function() {
   }
   if (goog.isFunction(this['hoverStroke'])) {
     if (goog.isFunction(this.hoverStroke())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Pie hoverStroke']
@@ -4205,7 +4206,7 @@ anychart.charts.Pie.prototype.serialize = function() {
   }
   if (goog.isFunction(this['hatchFill'])) {
     if (goog.isFunction(this.hatchFill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Pie hatchFill']
@@ -4216,7 +4217,7 @@ anychart.charts.Pie.prototype.serialize = function() {
   }
   if (goog.isFunction(this['hoverHatchFill'])) {
     if (goog.isFunction(this.hoverHatchFill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Pie hoverHatchFill']

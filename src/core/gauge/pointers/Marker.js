@@ -1,6 +1,7 @@
 goog.provide('anychart.core.gauge.pointers.Marker');
 goog.require('acgraph');
 goog.require('anychart.core.gauge.pointers.Base');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.MarkersFactory');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
@@ -271,7 +272,7 @@ anychart.core.gauge.pointers.Marker.prototype.serialize = function() {
   json['position'] = this.position();
   json['size'] = this.size();
   if (goog.isFunction(this.type())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Gauge marker pointer type']

@@ -1,6 +1,4 @@
 goog.provide('anychart.enums');
-goog.require('acgraph');
-goog.require('acgraph.vector.primitives');
 
 
 /**
@@ -174,7 +172,64 @@ anychart.enums.normalizeSelectMode = function(value, opt_default) {
  * Cursor enum. Defines 15 items.
  * @enum {string}
  */
-anychart.enums.Cursor = acgraph.vector.Cursor;
+anychart.enums.Cursor = {
+  /** <span style="cursor:default">Default type</span> */
+  DEFAULT: 'default',
+
+  /** <span style="cursor:crosshair">Crosshair type</span> */
+  CROSSHAIR: 'crosshair',
+
+  /** <span style="cursor:pointer">Pointer type</span> */
+  POINTER: 'pointer',
+
+  /** <span style="cursor:move">Move type</span> */
+  MOVE: 'move',
+
+  /** <span style="cursor:text">Text type</span> */
+  TEXT: 'text',
+
+  /** <span style="cursor:wait">Wait type</span> */
+  WAIT: 'wait',
+
+  /** <span style="cursor:help">Help type</span> */
+  HELP: 'help',
+
+  /** <span style="cursor:n-resize">N-resize type</span> */
+  N_RESIZE: 'n-resize',
+
+  /** <span style="cursor:ne-resize">NE-resize type</span> */
+  NE_RESIZE: 'ne-resize',
+
+  /** <span style="cursor:e-resize">E-resize type</span> */
+  E_RESIZE: 'e-resize',
+
+  /** <span style="cursor:se-resize">SE-resize type</span> */
+  SE_RESIZE: 'se-resize',
+
+  /** <span style="cursor:s-resize">S-resize type</span> */
+  S_RESIZE: 's-resize',
+
+  /** <span style="cursor:sw-resize">SW-resize type</span> */
+  SW_RESIZE: 'sw-resize',
+
+  /** <span style="cursor:w-resize">W-resize type</span> */
+  W_RESIZE: 'w-resize',
+
+  /** <span style="cursor:nw-resize">NW-resize type</span> */
+  NW_RESIZE: 'nw-resize',
+
+  /** <span style="cursor:ns-resize">NS-resize type</span> */
+  NS_RESIZE: 'ns-resize',
+
+  /** <span style="cursor:ew-resize">EW-resize type</span> */
+  EW_RESIZE: 'ew-resize',
+
+  /** <span style="cursor:nwse-resize">NWSE-resize type</span> */
+  NWSE_RESIZE: 'nwse-resize',
+
+  /** <span style="cursor:nesw-resize">NESW-resize type</span> */
+  NESW_RESIZE: 'nesw-resize'
+};
 
 
 /**
@@ -278,7 +333,34 @@ anychart.enums.normalizeCursor = function(value, opt_default) {
  * stage.circle(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height, 3).fill('blue');
  * @enum {string}
  */
-anychart.enums.Anchor = acgraph.vector.Anchor;
+anychart.enums.Anchor = {
+  /** The left-top anchor of the element. */
+  LEFT_TOP: 'leftTop',
+
+  /** The left-center anchor of the element. */
+  LEFT_CENTER: 'leftCenter',
+
+  /** The left-bottom anchor of the element. */
+  LEFT_BOTTOM: 'leftBottom',
+
+  /** The center-top anchor of the element. */
+  CENTER_TOP: 'centerTop',
+
+  /** The center anchor of the element. */
+  CENTER: 'center',
+
+  /** The center-bottom anchor of the element. */
+  CENTER_BOTTOM: 'centerBottom',
+
+  /** The right-top anchor of the element. */
+  RIGHT_TOP: 'rightTop',
+
+  /** The right-center anchor of the element.*/
+  RIGHT_CENTER: 'rightCenter',
+
+  /** The right-bottom anchor of the element. */
+  RIGHT_BOTTOM: 'rightBottom'
+};
 
 
 /**
@@ -938,130 +1020,6 @@ anychart.enums.PENTAGON_SIN = [
   1 + Math.sin((6 / 5 - .5) * Math.PI),
   1 + Math.sin((8 / 5 - .5) * Math.PI),
   1 + Math.sin(1.5 * Math.PI)];
-
-
-/**
- * Method to get marker drawer.
- * @param {*} type Marker type.
- * @return {function(!acgraph.vector.Path, number, number, number):!acgraph.vector.Path} Marker drawer.
- */
-anychart.enums.getMarkerDrawer = function(type) {
-  type = (String(type)).toLowerCase();
-  switch (type) {
-    case 'arrowhead':
-      return function(path, x, y, radius) {
-        var p1x = x + radius / 2;
-        var p1y = y;
-        var p2x = x - radius / 2;
-        var p2y = y - radius / 3;
-        var p3x = x - radius / 2;
-        var p3y = y + radius / 3;
-
-        path
-            .moveTo(p1x, p1y)
-            .lineTo(p2x, p2y)
-            .lineTo(p3x, p3y)
-            .close();
-
-        return path;
-      };
-    case 'star4':
-      return acgraph.vector.primitives.star4;
-    case 'star6':
-      return acgraph.vector.primitives.star6;
-    case 'star7':
-      return acgraph.vector.primitives.star7;
-    case 'star10':
-      return acgraph.vector.primitives.star10;
-    case 'diamond':
-      return acgraph.vector.primitives.diamond;
-    case 'triangleup':
-      return acgraph.vector.primitives.triangleUp;
-    case 'triangledown':
-      return acgraph.vector.primitives.triangleDown;
-    case 'cross':
-      return acgraph.vector.primitives.cross;
-    case 'diagonalcross':
-      return acgraph.vector.primitives.diagonalCross;
-    case 'circle':
-      return function(path, x, y, radius) {
-        return acgraph.vector.primitives.pie(path, x, y, radius, 0, 360);
-      };
-    case 'trapezium':
-      return function(path, x, y, radius) {
-        var d = radius / 3;
-        var halfW = radius / 2;
-        var halfL = radius / 2;
-        var left = x - halfW;
-        var top = y - halfL;
-
-        path.moveTo(left + d, top + radius);
-        path.lineTo(left + radius - d, top + radius);
-        path.lineTo(left + radius, top);
-        path.lineTo(left, top);
-        path.close();
-
-        return path;
-      };
-    case 'pentagon':
-      return function(path, x, y, radius) {
-        x -= radius;
-        y -= radius;
-        var pentagonCos = anychart.enums.PENTAGON_COS;
-        var pentagonSin = anychart.enums.PENTAGON_SIN;
-        path.moveTo(x + radius * pentagonCos[0], y + radius * pentagonSin[0]);
-        for (var i = 1; i < 5; i++)
-          path.lineTo(x + radius * pentagonCos[i], y + radius * pentagonSin[i]);
-        path.lineTo(x + radius * pentagonCos[0], y + radius * pentagonSin[0]);
-        path.close();
-
-        return path;
-      };
-    case 'square':
-      return function(path, x, y, size) {
-        var left = x - size;
-        var top = y - size;
-        var right = x + size;
-        var bottom = y + size;
-
-        path
-            .moveTo(left, top)
-            .lineTo(right, top)
-            .lineTo(right, bottom)
-            .lineTo(left, bottom)
-            .lineTo(left, top)
-            .close();
-
-        return path;
-      };
-    case 'vline':
-    case 'line':
-      return function(path, x, y, size) {
-        var height = size * 2;
-        var width = height / 2;
-
-        var halfW = width / 2;
-        var halfL = height / 2;
-
-        var left = x - halfW;
-        var top = y - halfL;
-        var right = left + width;
-        var bottom = top + height;
-
-        path
-            .moveTo(left, top)
-            .lineTo(right, top)
-            .lineTo(right, bottom)
-            .lineTo(left, bottom)
-            .lineTo(left, top)
-            .close();
-
-        return path;
-      };
-    default:
-      return acgraph.vector.primitives.star5;
-  }
-};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2923,13 +2881,34 @@ anychart.enums.normalizeErrorMode = function(value, opt_default) {
  * Horizontal align enum.
  * @enum {string}
  */
-anychart.enums.HAlign = acgraph.vector.Text.HAlign;
+anychart.enums.HAlign = {
+  /**
+   Aligns the text to the left.
+   */
+  LEFT: 'left',
+  /**
+   The same as left if direction is left-to-right and right if direction is right-to-left.
+   */
+  START: 'start',
+  /**
+   The inline contents are centered within the line box.
+   */
+  CENTER: 'center',
+  /**
+   The same as right if direction is left-to-right and left if direction is right-to-left.
+   */
+  END: 'end',
+  /**
+   Aligns the text to the right.
+   */
+  RIGHT: 'right'
+};
 
 
 /**
  * Normalizes HAlign enum.
  * @param {*} value
- * @return {acgraph.vector.Text.HAlign}
+ * @return {anychart.enums.HAlign}
  */
 anychart.enums.normalizeHAlign = function(value) {
   value = (String(value)).toLowerCase();
@@ -2960,13 +2939,25 @@ anychart.enums.normalizeHAlign = function(value) {
  * Vertical align enum.
  * @enum {string}
  */
-anychart.enums.VAlign = acgraph.vector.Text.VAlign;
+anychart.enums.VAlign = {
+  /**
+   vAlign top.
+   */
+  TOP: 'top',
+  /**
+   */
+  MIDDLE: 'middle',
+  /**
+   vAlign bottom.
+   */
+  BOTTOM: 'bottom'
+};
 
 
 /**
  * Normalizes VAlign enum.
  * @param {*} value
- * @return {acgraph.vector.Text.VAlign}
+ * @return {anychart.enums.VAlign}
  */
 anychart.enums.normalizeVAlign = function(value) {
   value = (String(value)).toLowerCase();
@@ -2991,13 +2982,35 @@ anychart.enums.normalizeVAlign = function(value) {
  * Font decoration enumeration.
  * @enum {string}
  */
-anychart.enums.TextDecoration = acgraph.vector.Text.Decoration;
+anychart.enums.TextDecoration = {
+  /**
+   Blinking text. This value is not supported by some browser and is discussed in CSS3,
+   animation is recommended instead.
+   */
+  BLINK: 'blink',
+  /**
+   Line through decoration.
+   */
+  LINE_THROUGH: 'line-through',
+  /**
+   Overline decoration.
+   */
+  OVERLINE: 'overline',
+  /**
+   Underline decoration.
+   */
+  UNDERLINE: 'underline',
+  /**
+   Cancels all decorations, including links underline.
+   */
+  NONE: 'none'
+};
 
 
 /**
  * Normalizes font decoration.
  * @param {*} value
- * @return {acgraph.vector.Text.Decoration}
+ * @return {anychart.enums.TextDecoration}
  */
 anychart.enums.normalizeFontDecoration = function(value) {
   value = (String(value)).toLowerCase();
@@ -3031,13 +3044,26 @@ anychart.enums.normalizeFontDecoration = function(value) {
  * Font style enumeration.
  * @enum {string}
  */
-anychart.enums.FontStyle = acgraph.vector.Text.FontStyle;
+anychart.enums.FontStyle = {
+  /**
+   Normal.
+   */
+  NORMAL: 'normal',
+  /**
+   Italic.
+   */
+  ITALIC: 'italic',
+  /**
+   Oblique.
+   */
+  OBLIQUE: 'oblique'
+};
 
 
 /**
  * Normalizes font style.
  * @param {*} value
- * @return {acgraph.vector.Text.FontStyle}
+ * @return {anychart.enums.FontStyle}
  */
 anychart.enums.normalizeFontStyle = function(value) {
   value = (String(value)).toLowerCase();
@@ -3060,13 +3086,22 @@ anychart.enums.normalizeFontStyle = function(value) {
  * Font variant enumeration.
  * @enum {string}
  */
-anychart.enums.FontVariant = acgraph.vector.Text.FontVariant;
+anychart.enums.FontVariant = {
+  /**
+   Leave lovercase as is.
+   */
+  NORMAL: 'normal',
+  /**
+   Make lowercase smaller.
+   */
+  SMALL_CAP: 'small-caps'
+};
 
 
 /**
  * Normalizes font variant.
  * @param {*} value
- * @return {acgraph.vector.Text.FontVariant}
+ * @return {anychart.enums.FontVariant}
  */
 anychart.enums.normalizeFontVariant = function(value) {
   value = (String(value)).toLowerCase();
@@ -3092,13 +3127,22 @@ anychart.enums.normalizeFontVariant = function(value) {
  * Text direction enumeration.
  * @enum {string}
  */
-anychart.enums.TextDirection = acgraph.vector.Text.Direction;
+anychart.enums.TextDirection = {
+  /**
+   Left to right.
+   */
+  LTR: 'ltr',
+  /**
+   Right to left.
+   */
+  RTL: 'rtl'
+};
 
 
 /**
  * Normalizes text direction.
  * @param {*} value
- * @return {acgraph.vector.Text.Direction}
+ * @return {anychart.enums.TextDirection}
  */
 anychart.enums.normalizeTextDirection = function(value) {
   value = (String(value)).toLowerCase();
@@ -3118,13 +3162,22 @@ anychart.enums.normalizeTextDirection = function(value) {
  * Text wrap settings enumeration.
  * @enum {string}
  */
-anychart.enums.TextWrap = acgraph.vector.Text.TextWrap;
+anychart.enums.TextWrap = {
+  /**
+   No wrap.
+   */
+  NO_WRAP: 'noWrap',
+  /**
+   Wrap by symbol.
+   */
+  BY_LETTER: 'byLetter'
+};
 
 
 /**
  * Normalizes font style.
  * @param {*} value
- * @return {acgraph.vector.Text.TextWrap}
+ * @return {anychart.enums.TextWrap}
  */
 anychart.enums.normalizeTextWrap = function(value) {
   value = (String(value)).toLowerCase();
@@ -4718,6 +4771,64 @@ anychart.enums.PropertyHandlerType = {
   MULTI_ARG: 1
 };
 //endregion
+
+
+/**
+ * Paper sizes.
+ * @enum {string}
+ */
+anychart.enums.PaperSize = {
+  /**
+   * It measures 8.5 by 11 inches (215.9 mm x 279.4 mm). US Letter size is a recognized standard adopted by the American National Standards Institute (ANSI) whereas the A4 is the International Standard (ISO) used in most countries.
+   */
+  US_LETTER: 'usletter',
+
+  /**
+   * The base A0 size of paper is defined as having an area of 1 m2. Rounded to the nearest millimetre, the A0 paper size is 841 by 1,189 millimetres (33.1 in × 46.8 in). Successive paper sizes in the series A1, A2, A3, and so forth, are defined by halving the preceding paper size across the larger dimension.
+   */
+  A0: 'a0',
+
+  /**
+   * A1 measures 594 × 841 millimeters or 23.4 × 33.1 inches.
+   */
+  A1: 'a1',
+
+  /**
+   * A2 measures 420 × 594 millimeters or 16.5 × 23.4 inches.
+   */
+  A2: 'a2',
+
+  /**
+   * The A3 size print measures 29.7 x 42.0cm, 11.69 x 16.53 inches, if mounted 40.6 x 50.8cm, 15.98 x 20 inches. The A4 size print measures 21.0 x 29.7cm, 8.27 x 11.69 inches, if mounted 30.3 x 40.6cm, 11.93 x 15.98 inches.
+   */
+  A3: 'a3',
+
+  /**
+   * A transitional size called PA4 (210 mm × 280 mm or 8.27 in × 11.02 in) was proposed for inclusion into the ISO 216 standard in 1975. It has the height of Canadian P4 paper (215 mm × 280 mm, about 8½ in × 11 in) and the width of international A4 paper (210 mm × 297 mm or 8.27 in × 11.69 in).
+   */
+  A4: 'a4',
+
+  /**
+   * A5 measures 148 × 210 millimeters or 5.83 × 8.27 inches.
+   */
+  A5: 'a5',
+
+  /**
+   * A6 measures 105 × 148 millimeters or 4.13 × 5.83 inches. In PostScript, its dimensions are rounded off to 298 × 420 points. The matching envelope format is C6 (114 × 162 mm).
+   */
+  A6: 'a6'
+};
+
+
+/**
+ * Prettify name of paper size. Used in anychart.ui.ganttToolbar.
+ * @param {anychart.enums.PaperSize} paperSize - Paper size.
+ * @return {string} - Prettified name of paper size.
+ */
+anychart.enums.normalizePaperSizeCaption = function(paperSize) {
+  if (paperSize == anychart.enums.PaperSize.US_LETTER) return 'US Letter';
+  return goog.string.toTitleCase(paperSize);
+};
 
 
 // DVF-1826

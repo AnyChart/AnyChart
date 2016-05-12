@@ -3,6 +3,7 @@ goog.require('anychart.core.IChart');
 goog.require('anychart.core.IGroupingProvider');
 goog.require('anychart.core.IPlot');
 goog.require('anychart.core.axes.StockDateTime');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.series.StockScroller');
 goog.require('anychart.core.stock.IKeyIndexTransformer');
 goog.require('anychart.core.stock.indicators');
@@ -848,7 +849,7 @@ anychart.core.stock.Scroller.prototype.getConfigByType = function(type) {
   if (config && (config.drawerType in anychart.core.drawers.AvailableDrawers)) {
     res = [type, config];
   } else {
-    anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
     res = null;
   }
   return res;
@@ -1032,7 +1033,7 @@ anychart.core.stock.Scroller.prototype.yScale = function(opt_value) {
       this.registerDisposable(opt_value = anychart.scales.ScatterBase.fromString(opt_value, false));
     }
     if (!(opt_value instanceof anychart.scales.ScatterBase)) {
-      anychart.utils.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
+      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
       return this;
     }
     if (this.yScale_ != opt_value) {

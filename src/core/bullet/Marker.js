@@ -1,6 +1,7 @@
 goog.provide('anychart.core.bullet.Marker');
 
 goog.require('anychart.core.VisualBase');
+goog.require('anychart.core.reporting');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
 
@@ -525,7 +526,7 @@ anychart.core.bullet.Marker.prototype.draw = function() {
   var scale = /** @type {anychart.scales.Linear|anychart.scales.Ordinal} */(this.scale());
 
   if (!scale) {
-    anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
     return this;
   }
 

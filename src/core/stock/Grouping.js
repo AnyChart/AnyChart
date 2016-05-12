@@ -338,7 +338,7 @@ anychart.core.stock.Grouping.prototype.serialize = function() {
   json[anychart.opt.MAX_VISIBLE_POINTS] = this.maxPoints_;
   json[anychart.opt.MIN_PIX_PER_POINT] = this.minPixels_;
   // if (goog.isFunction(this.xMode_)) {
-  //   anychart.utils.warning(
+  //   anychart.core.reporting.warning(
   //       anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
   //       null,
   //       ['Stock grouping xMode']

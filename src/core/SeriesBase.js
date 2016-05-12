@@ -4,6 +4,7 @@ goog.require('anychart.color');
 goog.require('anychart.core.BubblePoint');
 goog.require('anychart.core.SeriesPoint');
 goog.require('anychart.core.VisualBaseWithBounds');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.SeriesTooltip');
 goog.require('anychart.core.utils.IInteractiveSeries');
@@ -1917,7 +1918,7 @@ anychart.core.SeriesBase.prototype.serialize = function() {
   json['legendItem'] = this.legendItem().serialize();
   if (goog.isFunction(this['fill'])) {
     if (goog.isFunction(this.fill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series fill']
@@ -1928,7 +1929,7 @@ anychart.core.SeriesBase.prototype.serialize = function() {
   }
   if (goog.isFunction(this['hoverFill'])) {
     if (goog.isFunction(this.hoverFill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series hoverFill']
@@ -1939,7 +1940,7 @@ anychart.core.SeriesBase.prototype.serialize = function() {
   }
   if (goog.isFunction(this['selectFill'])) {
     if (goog.isFunction(this.selectFill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series selectFill']
@@ -1950,7 +1951,7 @@ anychart.core.SeriesBase.prototype.serialize = function() {
   }
   if (goog.isFunction(this['stroke'])) {
     if (goog.isFunction(this.stroke())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series stroke']
@@ -1961,7 +1962,7 @@ anychart.core.SeriesBase.prototype.serialize = function() {
   }
   if (goog.isFunction(this['hoverStroke'])) {
     if (goog.isFunction(this.hoverStroke())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series hoverStroke']
@@ -1972,7 +1973,7 @@ anychart.core.SeriesBase.prototype.serialize = function() {
   }
   if (goog.isFunction(this['selectStroke'])) {
     if (goog.isFunction(this.selectStroke())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series selectStroke']
@@ -1983,7 +1984,7 @@ anychart.core.SeriesBase.prototype.serialize = function() {
   }
   if (goog.isFunction(this['hatchFill'])) {
     if (goog.isFunction(this.hatchFill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series hatchFill']
@@ -1995,7 +1996,7 @@ anychart.core.SeriesBase.prototype.serialize = function() {
   }
   if (goog.isFunction(this['hoverHatchFill'])) {
     if (goog.isFunction(this.hoverHatchFill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series hoverHatchFill']
@@ -2008,7 +2009,7 @@ anychart.core.SeriesBase.prototype.serialize = function() {
   }
   if (goog.isFunction(this['selectHatchFill'])) {
     if (goog.isFunction(this.selectHatchFill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series selectHatchFill']

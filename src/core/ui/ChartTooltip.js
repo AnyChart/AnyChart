@@ -444,45 +444,45 @@ anychart.core.ui.ChartTooltip.prototype.fontOpacity = function(opt_value) {
 
 /**
  * Getter/Setter for the text font decoration.
- * @param {(acgraph.vector.Text.Decoration|string)=} opt_value
- * @return {!anychart.core.ui.ChartTooltip|acgraph.vector.Text.Decoration}
+ * @param {(anychart.enums.TextDecoration|string)=} opt_value
+ * @return {!anychart.core.ui.ChartTooltip|anychart.enums.TextDecoration}
  */
 anychart.core.ui.ChartTooltip.prototype.fontDecoration = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.unionTooltip_.fontDecoration(opt_value);
     return this;
   } else {
-    return /** @type {acgraph.vector.Text.Decoration} */(this.unionTooltip_.fontDecoration());
+    return /** @type {anychart.enums.TextDecoration} */(this.unionTooltip_.fontDecoration());
   }
 };
 
 
 /**
  * Getter/Setter for the text font style.
- * @param {acgraph.vector.Text.FontStyle|string=} opt_value
- * @return {!anychart.core.ui.ChartTooltip|acgraph.vector.Text.FontStyle}
+ * @param {anychart.enums.FontStyle|string=} opt_value
+ * @return {!anychart.core.ui.ChartTooltip|anychart.enums.FontStyle}
  */
 anychart.core.ui.ChartTooltip.prototype.fontStyle = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.unionTooltip_.fontStyle(opt_value);
     return this;
   } else {
-    return /** @type {acgraph.vector.Text.FontStyle} */(this.unionTooltip_.fontStyle());
+    return /** @type {anychart.enums.FontStyle} */(this.unionTooltip_.fontStyle());
   }
 };
 
 
 /**
  * Getter/Setter for the text font variant.
- * @param {acgraph.vector.Text.FontVariant|string=} opt_value
- * @return {!anychart.core.ui.ChartTooltip|acgraph.vector.Text.FontVariant}
+ * @param {anychart.enums.FontVariant|string=} opt_value
+ * @return {!anychart.core.ui.ChartTooltip|anychart.enums.FontVariant}
  */
 anychart.core.ui.ChartTooltip.prototype.fontVariant = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.unionTooltip_.fontVariant(opt_value);
     return this;
   } else {
-    return /** @type {acgraph.vector.Text.FontVariant} */(this.unionTooltip_.fontVariant());
+    return /** @type {anychart.enums.FontVariant} */(this.unionTooltip_.fontVariant());
   }
 };
 
@@ -519,15 +519,15 @@ anychart.core.ui.ChartTooltip.prototype.letterSpacing = function(opt_value) {
 
 /**
  * Getter/Setter for the text direction.
- * @param {acgraph.vector.Text.Direction|string=} opt_value
- * @return {!anychart.core.ui.ChartTooltip|acgraph.vector.Text.Direction}
+ * @param {anychart.enums.TextDirection|string=} opt_value
+ * @return {!anychart.core.ui.ChartTooltip|anychart.enums.TextDirection}
  */
 anychart.core.ui.ChartTooltip.prototype.textDirection = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.unionTooltip_.textDirection(opt_value);
     return this;
   } else {
-    return /** @type {acgraph.vector.Text.Direction} */(this.unionTooltip_.textDirection());
+    return /** @type {anychart.enums.TextDirection} */(this.unionTooltip_.textDirection());
   }
 };
 
@@ -564,45 +564,45 @@ anychart.core.ui.ChartTooltip.prototype.textIndent = function(opt_value) {
 
 /**
  * Getter/Setter for the text vertical align.
- * @param {acgraph.vector.Text.VAlign|string=} opt_value
- * @return {!anychart.core.ui.ChartTooltip|acgraph.vector.Text.VAlign}
+ * @param {anychart.enums.VAlign|string=} opt_value
+ * @return {!anychart.core.ui.ChartTooltip|anychart.enums.VAlign}
  */
 anychart.core.ui.ChartTooltip.prototype.vAlign = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.unionTooltip_.vAlign(opt_value);
     return this;
   } else {
-    return /** @type {acgraph.vector.Text.VAlign} */(this.unionTooltip_.vAlign());
+    return /** @type {anychart.enums.VAlign} */(this.unionTooltip_.vAlign());
   }
 };
 
 
 /**
  * Getter/Setter for the text horizontal align.
- * @param {acgraph.vector.Text.HAlign|string=} opt_value
- * @return {!anychart.core.ui.ChartTooltip|acgraph.vector.Text.HAlign}
+ * @param {anychart.enums.HAlign|string=} opt_value
+ * @return {!anychart.core.ui.ChartTooltip|anychart.enums.HAlign}
  */
 anychart.core.ui.ChartTooltip.prototype.hAlign = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.unionTooltip_.hAlign(opt_value);
     return this;
   } else {
-    return /** @type {acgraph.vector.Text.HAlign} */(this.unionTooltip_.hAlign());
+    return /** @type {anychart.enums.HAlign} */(this.unionTooltip_.hAlign());
   }
 };
 
 
 /**
  * Getter/Setter for the text wrap settings.
- * @param {acgraph.vector.Text.TextWrap|string=} opt_value
- * @return {!anychart.core.ui.ChartTooltip|acgraph.vector.Text.TextWrap}
+ * @param {anychart.enums.TextWrap|string=} opt_value
+ * @return {!anychart.core.ui.ChartTooltip|anychart.enums.TextWrap}
  */
 anychart.core.ui.ChartTooltip.prototype.textWrap = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.unionTooltip_.textWrap(opt_value);
     return this;
   } else {
-    return /** @type {acgraph.vector.Text.TextWrap} */(this.unionTooltip_.textWrap());
+    return /** @type {anychart.enums.TextWrap} */(this.unionTooltip_.textWrap());
   }
 };
 
@@ -1019,7 +1019,7 @@ anychart.core.ui.ChartTooltip.prototype.hideOtherTooltips_ = function(ignoreTool
  * @deprecated Use {@link #textFormatter} instead.
  */
 anychart.core.ui.ChartTooltip.prototype.contentFormatter = function(opt_value) {
-  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.contentFormatter()', '.textFormatter()'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.contentFormatter()', '.textFormatter()'], true);
   return this.textFormatter(opt_value);
 };
 
@@ -1046,7 +1046,7 @@ anychart.core.ui.ChartTooltip.prototype.contentInternal = function(opt_value) {
  * @deprecated Use methods directly.
  */
 anychart.core.ui.ChartTooltip.prototype.content = function(opt_value) {
-  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.content()', 'method directly'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.content()', 'method directly'], true);
   return this.contentInternal(opt_value);
 };
 
@@ -1057,7 +1057,7 @@ anychart.core.ui.ChartTooltip.prototype.content = function(opt_value) {
  * @return {!(boolean|anychart.core.ui.ChartTooltip)}
  */
 anychart.core.ui.ChartTooltip.prototype.isFloatingInternal = function(opt_value) {
-  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.isFloating()', '.positionMode()'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.isFloating()', '.positionMode()'], true);
   if (goog.isDef(opt_value)) {
     this.positionMode(opt_value ? anychart.enums.TooltipPositionMode.FLOAT : anychart.enums.TooltipPositionMode.POINT);
     return this;

@@ -6,7 +6,7 @@ var scale_max_y;
 var geoData, properties, dictionary, sortBy, props, acGeoDataFromQGIS, transformedGeoData;
 
 anychart.onDocumentReady(function() {
-  parser = anychart.utils.GeoJSONParser.getInstance();
+  parser = anychart.core.utils.GeoJSONParser.getInstance();
   map = anychart.map();
 
   //World map

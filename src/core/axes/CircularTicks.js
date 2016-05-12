@@ -2,6 +2,7 @@ goog.provide('anychart.core.axes.CircularTicks');
 goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.VisualBase');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.MarkersFactory');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
@@ -412,21 +413,21 @@ anychart.core.axes.CircularTicks.prototype.serialize = function() {
   if (goog.isDef(this.length())) json['length'] = this.length();
   if (goog.isFunction(this['type'])) {
     if (goog.isFunction(this.type())) {
-      anychart.utils.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Gauge axis ticks type']);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Gauge axis ticks type']);
     } else {
       json['type'] = this.type();
     }
   }
   if (goog.isFunction(this['fill'])) {
     if (goog.isFunction(this.fill())) {
-      anychart.utils.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Ticks fill']);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Ticks fill']);
     } else {
       json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
     }
   }
   if (goog.isFunction(this['stroke'])) {
     if (goog.isFunction(this.stroke())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Ticks stroke']

@@ -7,6 +7,7 @@ goog.provide('anychart');
 goog.provide('anychart.globalLock');
 goog.require('acgraph');
 goog.require('anychart.base');
+goog.require('anychart.core.reporting');
 goog.require('anychart.performance');
 goog.require('anychart.themes.merging');
 goog.require('anychart.utils');
@@ -242,7 +243,7 @@ anychart.fromJson = function(jsonConfig) {
   if (instance)
     instance.setup(chart || gauge || gantt || map);
   else
-    anychart.utils.error(anychart.enums.ErrorCode.EMPTY_CONFIG);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.EMPTY_CONFIG);
 
   return instance;
 };
@@ -545,7 +546,7 @@ anychart.getFullTheme();
  * @ignoreDoc
  */
 anychart.area = anychart.area || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Area chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Area chart']);
 };
 
 
@@ -553,7 +554,7 @@ anychart.area = anychart.area || function() {
  * @ignoreDoc
  */
 anychart.area3d = anychart.area3d || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Area chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Area chart']);
 };
 
 
@@ -561,7 +562,7 @@ anychart.area3d = anychart.area3d || function() {
  * @ignoreDoc
  */
 anychart.bar = anychart.bar || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Bar chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Bar chart']);
 };
 
 
@@ -569,7 +570,7 @@ anychart.bar = anychart.bar || function() {
  * @ignoreDoc
  */
 anychart.bar3d = anychart.bar3d || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Bar chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Bar chart']);
 };
 
 
@@ -577,7 +578,7 @@ anychart.bar3d = anychart.bar3d || function() {
  * @ignoreDoc
  */
 anychart.bubble = anychart.bubble || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Bubble chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Bubble chart']);
 };
 
 
@@ -585,7 +586,7 @@ anychart.bubble = anychart.bubble || function() {
  * @ignoreDoc
  */
 anychart.bullet = anychart.bullet || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Bullet chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Bullet chart']);
 };
 
 
@@ -593,7 +594,7 @@ anychart.bullet = anychart.bullet || function() {
  * @ignoreDoc
  */
 anychart.cartesian = anychart.cartesian || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Cartesian chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Cartesian chart']);
 };
 
 
@@ -601,7 +602,7 @@ anychart.cartesian = anychart.cartesian || function() {
  * @ignoreDoc
  */
 anychart.cartesian3d = anychart.cartesian3d || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Cartesian chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Cartesian chart']);
 };
 
 
@@ -609,7 +610,7 @@ anychart.cartesian3d = anychart.cartesian3d || function() {
  * @ignoreDoc
  */
 anychart.scatter = anychart.scatter || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Scatter chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Scatter chart']);
 };
 
 
@@ -617,7 +618,7 @@ anychart.scatter = anychart.scatter || function() {
  * @ignoreDoc
  */
 anychart.column = anychart.column || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Column chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Column chart']);
 };
 
 
@@ -625,7 +626,7 @@ anychart.column = anychart.column || function() {
  * @ignoreDoc
  */
 anychart.column3d = anychart.column3d || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Column chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Column chart']);
 };
 
 
@@ -633,7 +634,7 @@ anychart.column3d = anychart.column3d || function() {
  * @ignoreDoc
  */
 anychart.box = anychart.box || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Box chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Box chart']);
 };
 
 
@@ -641,7 +642,7 @@ anychart.box = anychart.box || function() {
  * @ignoreDoc
  */
 anychart.financial = anychart.financial || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Financial chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Financial chart']);
 };
 
 
@@ -649,7 +650,7 @@ anychart.financial = anychart.financial || function() {
  * @ignoreDoc
  */
 anychart.funnel = anychart.funnel || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Funnel chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Funnel chart']);
 };
 
 
@@ -657,7 +658,7 @@ anychart.funnel = anychart.funnel || function() {
  * @ignoreDoc
  */
 anychart.line = anychart.line || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Line chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Line chart']);
 };
 
 
@@ -665,7 +666,7 @@ anychart.line = anychart.line || function() {
  * @ignoreDoc
  */
 anychart.marker = anychart.marker || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Marker chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Marker chart']);
 };
 
 
@@ -673,7 +674,7 @@ anychart.marker = anychart.marker || function() {
  * @ignoreDoc
  */
 anychart.pie = anychart.pie || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Pie chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Pie chart']);
 };
 
 
@@ -681,7 +682,7 @@ anychart.pie = anychart.pie || function() {
  * @ignoreDoc
  */
 anychart.pie3d = anychart.pie3d || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Pie chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Pie chart']);
 };
 
 
@@ -689,7 +690,7 @@ anychart.pie3d = anychart.pie3d || function() {
  * @ignoreDoc
  */
 anychart.pyramid = anychart.pyramid || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Pyramid chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Pyramid chart']);
 };
 
 
@@ -697,7 +698,7 @@ anychart.pyramid = anychart.pyramid || function() {
  * @ignoreDoc
  */
 anychart.radar = anychart.radar || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Radar chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Radar chart']);
 };
 
 
@@ -705,7 +706,7 @@ anychart.radar = anychart.radar || function() {
  * @ignoreDoc
  */
 anychart.polar = anychart.polar || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Polar chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Polar chart']);
 };
 
 
@@ -713,7 +714,7 @@ anychart.polar = anychart.polar || function() {
  * @ignoreDoc
  */
 anychart.sparkline = anychart.sparkline || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Sparkline chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Sparkline chart']);
 };
 
 
@@ -721,7 +722,7 @@ anychart.sparkline = anychart.sparkline || function() {
  * @ignoreDoc
  */
 anychart.heatMap = anychart.heatMap || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['HeatMap chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['HeatMap chart']);
 };
 
 
@@ -729,7 +730,7 @@ anychart.heatMap = anychart.heatMap || function() {
  * @ignoreDoc
  */
 anychart.circularGauge = anychart.circularGauge || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Circular gauge']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Circular gauge']);
 };
 
 
@@ -737,7 +738,7 @@ anychart.circularGauge = anychart.circularGauge || function() {
  * @ignoreDoc
  */
 anychart.map = anychart.map || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Map']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Map']);
 };
 
 
@@ -745,7 +746,7 @@ anychart.map = anychart.map || function() {
  * @ignoreDoc
  */
 anychart.choropleth = anychart.choropleth || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Choropleth map']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Choropleth map']);
 };
 
 
@@ -753,7 +754,7 @@ anychart.choropleth = anychart.choropleth || function() {
  * @ignoreDoc
  */
 anychart.bubbleMap = anychart.bubbleMap || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Bubble map']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Bubble map']);
 };
 
 
@@ -761,7 +762,7 @@ anychart.bubbleMap = anychart.bubbleMap || function() {
  * @ignoreDoc
  */
 anychart.connector = anychart.connector || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Connector map']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Connector map']);
 };
 
 
@@ -769,7 +770,7 @@ anychart.connector = anychart.connector || function() {
  * @ignoreDoc
  */
 anychart.markerMap = anychart.markerMap || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Marker map']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Marker map']);
 };
 
 
@@ -777,7 +778,7 @@ anychart.markerMap = anychart.markerMap || function() {
  * @ignoreDoc
  */
 anychart.ganttProject = anychart.ganttProject || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Gantt Project chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Gantt Project chart']);
 };
 
 
@@ -785,7 +786,7 @@ anychart.ganttProject = anychart.ganttProject || function() {
  * @ignoreDoc
  */
 anychart.ganttResource = anychart.ganttResource || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Gantt Resource chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Gantt Resource chart']);
 };
 
 
@@ -793,7 +794,7 @@ anychart.ganttResource = anychart.ganttResource || function() {
  * @ignoreDoc
  */
 anychart.stock = anychart.stock || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Stock chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Stock chart']);
 };
 
 
@@ -801,7 +802,7 @@ anychart.stock = anychart.stock || function() {
  * @ignoreDoc
  */
 anychart.toolbar = anychart.toolbar || /** @type {function():null} */ (function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Toolbar']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Toolbar']);
   return null;
 });
 
@@ -810,7 +811,7 @@ anychart.toolbar = anychart.toolbar || /** @type {function():null} */ (function(
  * @ignoreDoc
  */
 anychart.ganttToolbar = anychart.ganttToolbar || /** @type {function():null} */ (function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Gantt toolbar']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Gantt toolbar']);
   return null;
 });
 
@@ -819,7 +820,7 @@ anychart.ganttToolbar = anychart.ganttToolbar || /** @type {function():null} */ 
  * @ignoreDoc
  */
 anychart.treeMap = anychart.treeMap || function() {
-  anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['TreeMap chart']);
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['TreeMap chart']);
 };
 
 

@@ -4,6 +4,7 @@ goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.axes.StockDateTime');
 goog.require('anychart.core.grids.Stock');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.series.Stock');
 goog.require('anychart.core.stock.indicators');
 goog.require('anychart.core.ui.Background');
@@ -876,7 +877,7 @@ anychart.core.stock.Plot.prototype.yScale = function(opt_value) {
       opt_value = anychart.scales.ScatterBase.fromString(opt_value, false);
     }
     if (!(opt_value instanceof anychart.scales.ScatterBase)) {
-      anychart.utils.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
+      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
       return this;
     }
     if (this.yScale_ != opt_value) {

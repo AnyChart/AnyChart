@@ -3,6 +3,7 @@ goog.provide('anychart.core.axisMarkers.TextBase');
 goog.require('acgraph.math.Coordinate');
 goog.require('anychart.core.Text');
 goog.require('anychart.core.axes.Linear');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
@@ -491,7 +492,7 @@ anychart.core.axisMarkers.TextBase.prototype.applyTextSettings = function(textEl
  */
 anychart.core.axisMarkers.TextBase.prototype.draw = function() {
   if (!this.scale()) {
-    anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
     return this;
   }
 

@@ -1,9 +1,9 @@
 goog.provide('anychart.core.axisMarkers.PathBase');
 goog.require('acgraph');
 goog.require('anychart.core.VisualBase');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
-goog.require('anychart.utils');
 
 
 
@@ -275,7 +275,7 @@ anychart.core.axisMarkers.PathBase.prototype.appearanceInvalidated = goog.nullFu
  */
 anychart.core.axisMarkers.PathBase.prototype.draw = function() {
   if (!this.scale()) {
-    anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
     return this;
   }
 
@@ -317,7 +317,7 @@ anychart.core.axisMarkers.PathBase.prototype.drawLine = function() {
   var scale = /** @type {anychart.scales.Base|anychart.scales.GanttDateTime} */ (this.scale());
 
   if (!scale) { //Here we can get null.
-    anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
     return this;
   }
 
@@ -359,7 +359,7 @@ anychart.core.axisMarkers.PathBase.prototype.drawRange = function() {
   var scale = /** @type {anychart.scales.Base|anychart.scales.GanttDateTime} */ (this.scale());
 
   if (!scale) { //Here we can get null.
-    anychart.utils.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.SCALE_NOT_SET);
     return this;
   }
 

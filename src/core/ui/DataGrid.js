@@ -3,6 +3,7 @@ goog.provide('anychart.core.ui.DataGrid');
 goog.require('acgraph');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.gantt.Controller');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.BaseGrid');
 goog.require('anychart.core.ui.Button');
 goog.require('anychart.core.ui.LabelsFactory');
@@ -1266,9 +1267,9 @@ anychart.core.ui.DataGrid.Column.prototype.title = function(opt_value) {
     this.title_
         .container(this.getTitleLayer_())
         .margin(0)
-        .textWrap(acgraph.vector.Text.TextWrap.NO_WRAP)
-        .hAlign(acgraph.vector.Text.HAlign.CENTER)
-        .vAlign(acgraph.vector.Text.VAlign.MIDDLE);
+        .textWrap(anychart.enums.TextWrap.NO_WRAP)
+        .hAlign(anychart.enums.HAlign.CENTER)
+        .vAlign(anychart.enums.VAlign.MIDDLE);
     this.title_.resumeSignalsDispatching(false);
 
     this.title_.listenSignals(this.titleInvalidated_, this);
@@ -1636,7 +1637,7 @@ anychart.core.ui.DataGrid.Column.prototype.serialize = function() {
   json['title'] = this.title_.serialize();
 
   if (this.textFormatter_ != this.defaultTextFormatter_) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Data Grid Column textFormatter']
@@ -1644,7 +1645,7 @@ anychart.core.ui.DataGrid.Column.prototype.serialize = function() {
   }
 
   if (this.cellTextSettingsOverrider_ != this.defaultCellTextSettingsOverrider_) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Data Grid Column cellTextSettingsOverrider']

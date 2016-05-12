@@ -7,6 +7,7 @@ goog.require('anychart.core.axisMarkers.Line');
 goog.require('anychart.core.axisMarkers.Range');
 goog.require('anychart.core.axisMarkers.Text');
 goog.require('anychart.core.grids.Linear');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.scatter.series.Base');
 goog.require('anychart.core.ui.Crosshair');
 goog.require('anychart.enums');
@@ -400,7 +401,7 @@ anychart.charts.Scatter.prototype.xScale = function(opt_value) {
       opt_value = anychart.scales.ScatterBase.fromString(opt_value, false);
     }
     if (!(opt_value instanceof anychart.scales.ScatterBase)) {
-      anychart.utils.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
+      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
       return this;
     }
     if (this.xScale_ != opt_value) {
@@ -428,7 +429,7 @@ anychart.charts.Scatter.prototype.yScale = function(opt_value) {
       opt_value = anychart.scales.ScatterBase.fromString(opt_value, false);
     }
     if (!(opt_value instanceof anychart.scales.ScatterBase)) {
-      anychart.utils.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
+      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
       return this;
     }
     if (this.yScale_ != opt_value) {
@@ -1033,7 +1034,7 @@ anychart.charts.Scatter.prototype.createSeriesByType_ = function(type, data, opt
         anychart.ConsistencyState.SCATTER_SCALES,
         anychart.Signal.NEEDS_REDRAW);
   } else {
-    anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
     instance = null;
   }
 

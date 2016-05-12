@@ -13,6 +13,7 @@ goog.require('anychart.core.map.projections');
 goog.require('anychart.core.map.projections.TwinProjection');
 goog.require('anychart.core.map.scale.Geo');
 goog.require('anychart.core.map.series.Base');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.ColorRange');
 goog.require('anychart.core.utils.Animation');
 goog.require('anychart.core.utils.MapInteractivity');
@@ -23,7 +24,7 @@ goog.require('anychart.palettes.HatchFills');
 goog.require('anychart.palettes.Markers');
 goog.require('anychart.scales.LinearColor');
 goog.require('anychart.scales.OrdinalColor');
-goog.require('anychart.utils.GeoJSONParser');
+goog.require('anychart.core.utils.GeoJSONParser');
 goog.require('goog.dom');
 goog.require('goog.ui.KeyboardShortcutHandler');
 
@@ -1393,7 +1394,7 @@ anychart.charts.Map.prototype.createSeriesByType_ = function(type, data, opt_csv
         anychart.ConsistencyState.CHART_LEGEND,
         anychart.Signal.NEEDS_REDRAW);
   } else {
-    anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
     instance = null;
   }
 
@@ -1966,7 +1967,7 @@ anychart.charts.Map.prototype.calculateGeoScale = function() {
       }
       geoData = goog.isString(this.geoData_) ? goog.dom.getWindow()['anychart']['maps'][this.geoData_] : this.geoData_;
 
-      this.internalSourceGeoData = anychart.utils.GeoJSONParser.getInstance().parse(/** @type {Object} */(geoData));
+      this.internalSourceGeoData = anychart.core.utils.GeoJSONParser.getInstance().parse(/** @type {Object} */(geoData));
       goog.dispose(this.internalGeoData);
       this.internalGeoData = null;
 
@@ -3482,7 +3483,7 @@ anychart.charts.Map.prototype.drillTo = function(id, opt_map) {
       if (target) {
         this.drillUp_(target, root.currentBreadcrumbsPath.length - 1 - i);
       } else {
-        anychart.utils.warning(anychart.enums.WarningCode.FEATURE_ID_NOT_FOUND, null, [id]);
+        anychart.core.reporting.warning(anychart.enums.WarningCode.FEATURE_ID_NOT_FOUND, null, [id]);
       }
       return this;
     }
@@ -3513,7 +3514,7 @@ anychart.charts.Map.prototype.drillDown_ = function(id, target) {
     featureBounds = feature.domElement.getBoundsWithTransform(scene.getMapLayer().getFullTransformation());
     featureProperties = feature['properties'];
   } else {
-    anychart.utils.warning(anychart.enums.WarningCode.FEATURE_ID_NOT_FOUND, null, [id]);
+    anychart.core.reporting.warning(anychart.enums.WarningCode.FEATURE_ID_NOT_FOUND, null, [id]);
     var plotBounds = root.getPlotBounds();
     if (plotBounds) {
       var cx = plotBounds.left + plotBounds.width / 2 - 1;
@@ -3625,7 +3626,7 @@ anychart.charts.Map.prototype.drillUp_ = function(target, opt_levels) {
 
     var zoom, cx, cy;
     if (!feature) {
-      anychart.utils.warning(anychart.enums.WarningCode.FEATURE_ID_NOT_FOUND, null, [this.sceneId]);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.FEATURE_ID_NOT_FOUND, null, [this.sceneId]);
       zoom = 10;
     } else {
       var domEl = feature.domElement;
@@ -3719,7 +3720,7 @@ anychart.charts.Map.prototype.zoomTo = function(value, opt_cx, opt_cy) {
 anychart.charts.Map.prototype.zoomToFeature = function(id) {
   var feature = this.getFeatureById(id);
   if (!feature) {
-    anychart.utils.warning(anychart.enums.WarningCode.FEATURE_ID_NOT_FOUND, null, [id]);
+    anychart.core.reporting.warning(anychart.enums.WarningCode.FEATURE_ID_NOT_FOUND, null, [id]);
     return;
   }
 
@@ -3957,7 +3958,7 @@ anychart.charts.Map.prototype.inverseTransform = function(x, y) {
  * @return {Object}
  */
 anychart.charts.Map.prototype.toGeoJSON = function() {
-  return anychart.utils.GeoJSONParser.getInstance().exportToGeoJSON(this.internalGeoData, this.mapTX);
+  return anychart.core.utils.GeoJSONParser.getInstance().exportToGeoJSON(this.internalGeoData, this.mapTX);
 };
 
 
@@ -4086,7 +4087,7 @@ anychart.charts.Map.prototype.serialize = function() {
 
   json['crsAnimation'] = this.crsAnimation().serialize();
   if (goog.isObject(this.crs_)) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Map crs']

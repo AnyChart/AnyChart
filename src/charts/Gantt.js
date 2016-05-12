@@ -2,6 +2,7 @@ goog.provide('anychart.charts.Gantt');
 goog.require('acgraph.math.Coordinate');
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.gantt.Controller');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.DataGrid');
 goog.require('anychart.core.ui.IInteractiveGrid');
 goog.require('anychart.core.ui.ScrollBar');
@@ -567,10 +568,10 @@ anychart.charts.Gantt.prototype.fitToTask = function(taskId) {
     if (goog.isNumber(actualStart) && goog.isNumber(actualEnd)) { //no range for milestone.
       this.getTimeline().getScale().setRange(actualStart, actualEnd);
     } else {
-      anychart.utils.warning(anychart.enums.WarningCode.GANTT_FIT_TO_TASK, null, [taskId]);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.GANTT_FIT_TO_TASK, null, [taskId]);
     }
   } else {
-    anychart.utils.warning(anychart.enums.WarningCode.NOT_FOUND, null, ['Task', taskId]);
+    anychart.core.reporting.warning(anychart.enums.WarningCode.NOT_FOUND, null, ['Task', taskId]);
   }
 
   return this;
@@ -653,7 +654,7 @@ anychart.charts.Gantt.prototype.collapseTask_ = function(taskId, value) {
       task.meta(anychart.enums.GanttDataFields.COLLAPSED, value);
 
   } else {
-    anychart.utils.warning(anychart.enums.WarningCode.NOT_FOUND, null, ['Task', taskId]);
+    anychart.core.reporting.warning(anychart.enums.WarningCode.NOT_FOUND, null, ['Task', taskId]);
   }
   return this;
 };

@@ -286,6 +286,11 @@ def __get_default_compiler_args():
         '--extra_annotation_name "shortDescription"',
     ]
 
+    # Build AnyChart UI without theme.
+    modules = arguments['modules']
+    if modules and len(modules) == 1 and 'anychart_ui' in modules:
+        arguments['theme'] = 'none'
+
     theme = arguments['theme'] if ('theme' in arguments) else 'defaultTheme'
     if not (theme == 'none'):
         if not os.path.exists(os.path.join(SRC_PATH, 'themes', theme + '.js')):

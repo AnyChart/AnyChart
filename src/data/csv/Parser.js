@@ -1,5 +1,6 @@
 goog.provide('anychart.data.csv.Parser');
 
+goog.require('anychart.core.reporting');
 goog.require('anychart.data.csv.DefaultItemsProcessor');
 goog.require('anychart.data.csv.IItemsProcessor');
 goog.require('goog.Disposable');
@@ -324,7 +325,7 @@ anychart.data.csv.Parser.prototype.getPrefixFunction_ = function(pattern) {
   for (var i = 1; i < length; i++) {
     var ch = pattern.charAt(i);
     if (ch == '\"') {
-      anychart.utils.error(anychart.enums.ErrorCode.CSV_DOUBLE_QUOTE_IN_SEPARATOR);
+      anychart.core.reporting.error(anychart.enums.ErrorCode.CSV_DOUBLE_QUOTE_IN_SEPARATOR);
       throw new Error('Double quotes in separator are not allowed');
     }
     while ((k > 0) && (pattern.charAt(k + 1) != ch))

@@ -10,6 +10,7 @@ goog.require('anychart.core.axisMarkers.Line');
 goog.require('anychart.core.axisMarkers.Range');
 goog.require('anychart.core.axisMarkers.Text');
 goog.require('anychart.core.grids.Linear');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.series.Cartesian');
 goog.require('anychart.core.ui.ChartScroller');
 goog.require('anychart.core.ui.Crosshair');
@@ -1676,7 +1677,7 @@ anychart.core.CartesianBase.prototype.getConfigByType = function(type) {
   if (config && (config.drawerType in anychart.core.drawers.AvailableDrawers)) {
     res = [type, config];
   } else {
-    anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
     res = null;
   }
   return res;

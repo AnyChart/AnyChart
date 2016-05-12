@@ -4,6 +4,7 @@ goog.require('anychart.core.Chart');
 goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.axisMarkers.Range');
 goog.require('anychart.core.bullet.Marker');
+goog.require('anychart.core.reporting');
 goog.require('anychart.data.Set');
 goog.require('anychart.enums');
 goog.require('anychart.palettes');
@@ -543,7 +544,7 @@ anychart.charts.Bullet.prototype.drawContent = function(bounds) {
       }
     }
     if (count > 5) {
-      anychart.utils.info(anychart.enums.InfoCode.BULLET_TOO_MUCH_RANGES, [count]);
+      anychart.core.reporting.info(anychart.enums.InfoCode.BULLET_TOO_MUCH_RANGES, [count]);
     }
     this.markConsistent(anychart.ConsistencyState.BULLET_AXES_MARKERS);
   }
@@ -577,7 +578,7 @@ anychart.charts.Bullet.prototype.createMarkers_ = function() {
 
   var rowsCount = iterator.getRowsCount();
   if (rowsCount > 2) {
-    anychart.utils.info(anychart.enums.InfoCode.BULLET_TOO_MUCH_MEASURES, [rowsCount]);
+    anychart.core.reporting.info(anychart.enums.InfoCode.BULLET_TOO_MUCH_MEASURES, [rowsCount]);
   }
 
   while (iterator.advance()) {

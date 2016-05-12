@@ -2,6 +2,7 @@ goog.provide('anychart.core.radar.series.Base');
 goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.SeriesBase');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.SeriesPointContextProvider');
 goog.require('anychart.data');
 goog.require('anychart.enums');
@@ -741,7 +742,7 @@ anychart.core.radar.series.Base.prototype.serialize = function() {
   json['legendItem'] = this.legendItem().serialize();
   if (goog.isFunction(this['fill'])) {
     if (goog.isFunction(this.fill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series fill']
@@ -752,7 +753,7 @@ anychart.core.radar.series.Base.prototype.serialize = function() {
   }
   if (goog.isFunction(this['hoverFill'])) {
     if (goog.isFunction(this.hoverFill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series hoverFill']
@@ -763,7 +764,7 @@ anychart.core.radar.series.Base.prototype.serialize = function() {
   }
   if (goog.isFunction(this['stroke'])) {
     if (goog.isFunction(this.stroke())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series stroke']
@@ -774,7 +775,7 @@ anychart.core.radar.series.Base.prototype.serialize = function() {
   }
   if (goog.isFunction(this['hoverStroke'])) {
     if (goog.isFunction(this.hoverStroke())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series hoverStroke']
@@ -785,7 +786,7 @@ anychart.core.radar.series.Base.prototype.serialize = function() {
   }
   if (goog.isFunction(this['hatchFill'])) {
     if (goog.isFunction(this.hatchFill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series hatchFill']
@@ -796,7 +797,7 @@ anychart.core.radar.series.Base.prototype.serialize = function() {
   }
   if (goog.isFunction(this['hoverHatchFill'])) {
     if (goog.isFunction(this.hoverHatchFill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Series hoverHatchFill']

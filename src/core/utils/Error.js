@@ -1,6 +1,7 @@
 goog.provide('anychart.core.utils.Error');
 goog.provide('anychart.core.utils.ISeriesWithError');
 goog.require('anychart.core.Base');
+goog.require('anychart.core.reporting');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
 
@@ -597,7 +598,7 @@ anychart.core.utils.Error.prototype.serialize = function() {
   json['valueErrorWidth'] = this.valueErrorWidth();
   if (goog.isFunction(this['xErrorStroke'])) {
     if (goog.isFunction(this.xErrorStroke())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['x error stroke']
@@ -608,7 +609,7 @@ anychart.core.utils.Error.prototype.serialize = function() {
   }
   if (goog.isFunction(this['valueErrorStroke'])) {
     if (goog.isFunction(this.valueErrorStroke())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['value error stroke']

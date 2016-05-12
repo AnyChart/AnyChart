@@ -99,17 +99,17 @@ goog.inherits(anychart.core.ui.table.Base, goog.Disposable);
  *  fontFamily: (string|undefined),
  *  fontColor: (string|undefined),
  *  fontOpacity: (number|undefined),
- *  fontDecoration: (acgraph.vector.Text.Decoration|undefined),
- *  fontStyle: (acgraph.vector.Text.FontStyle|undefined),
- *  fontVariant: (acgraph.vector.Text.FontVariant|undefined),
+ *  fontDecoration: (anychart.enums.TextDecoration|undefined),
+ *  fontStyle: (anychart.enums.FontStyle|undefined),
+ *  fontVariant: (anychart.enums.FontVariant|undefined),
  *  fontWeight: (string|number|undefined),
  *  letterSpacing: (string|number|undefined),
- *  textDirection: (acgraph.vector.Text.Direction|undefined),
+ *  textDirection: (anychart.enums.TextDirection|undefined),
  *  lineHeight: (string|number|undefined),
  *  textIndent: (number|undefined),
- *  vAlign: (acgraph.vector.Text.VAlign|undefined),
- *  hAlign: (acgraph.vector.Text.HAlign|undefined),
- *  textWrap: (acgraph.vector.Text.TextWrap|undefined),
+ *  vAlign: (anychart.enums.VAlign|undefined),
+ *  hAlign: (anychart.enums.HAlign|undefined),
+ *  textWrap: (anychart.enums.TextWrap|undefined),
  *  textOverflow: (acgraph.vector.Text.TextOverflow|undefined),
  *  selectable: (boolean|undefined),
  *  disablePointerEvents: (boolean|undefined),
@@ -202,40 +202,40 @@ anychart.core.ui.table.Base.prototype.fontOpacity = function(opt_value) {
 
 /**
  * Getter/setter for fontDecoration.
- * @param {(acgraph.vector.Text.Decoration|string)=} opt_value .
- * @return {!anychart.core.ui.table.Base|acgraph.vector.Text.Decoration} .
+ * @param {(anychart.enums.TextDecoration|string)=} opt_value .
+ * @return {!anychart.core.ui.table.Base|anychart.enums.TextDecoration} .
  */
 anychart.core.ui.table.Base.prototype.fontDecoration = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = anychart.enums.normalizeFontDecoration(opt_value);
   }
-  return /** @type {!anychart.core.ui.table.Base|acgraph.vector.Text.Decoration} */(this.settings('fontDecoration', opt_value));
+  return /** @type {!anychart.core.ui.table.Base|anychart.enums.TextDecoration} */(this.settings('fontDecoration', opt_value));
 };
 
 
 /**
  * Getter/setter for fontStyle.
- * @param {acgraph.vector.Text.FontStyle|string=} opt_value .
- * @return {!anychart.core.ui.table.Base|acgraph.vector.Text.FontStyle} .
+ * @param {anychart.enums.FontStyle|string=} opt_value .
+ * @return {!anychart.core.ui.table.Base|anychart.enums.FontStyle} .
  */
 anychart.core.ui.table.Base.prototype.fontStyle = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = anychart.enums.normalizeFontStyle(opt_value);
   }
-  return /** @type {!anychart.core.ui.table.Base|acgraph.vector.Text.FontStyle} */(this.settings('fontStyle', opt_value));
+  return /** @type {!anychart.core.ui.table.Base|anychart.enums.FontStyle} */(this.settings('fontStyle', opt_value));
 };
 
 
 /**
  * Getter/setter for fontVariant.
- * @param {acgraph.vector.Text.FontVariant|string=} opt_value .
- * @return {!anychart.core.ui.table.Base|acgraph.vector.Text.FontVariant} .
+ * @param {anychart.enums.FontVariant|string=} opt_value .
+ * @return {!anychart.core.ui.table.Base|anychart.enums.FontVariant} .
  */
 anychart.core.ui.table.Base.prototype.fontVariant = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = anychart.enums.normalizeFontVariant(opt_value);
   }
-  return /** @type {!anychart.core.ui.table.Base|acgraph.vector.Text.FontVariant} */(this.settings('fontVariant', opt_value));
+  return /** @type {!anychart.core.ui.table.Base|anychart.enums.FontVariant} */(this.settings('fontVariant', opt_value));
 };
 
 
@@ -263,14 +263,14 @@ anychart.core.ui.table.Base.prototype.letterSpacing = function(opt_value) {
 
 /**
  * Getter/setter for textDirection.
- * @param {acgraph.vector.Text.Direction|string=} opt_value .
- * @return {!anychart.core.ui.table.Base|acgraph.vector.Text.Direction} .
+ * @param {anychart.enums.TextDirection|string=} opt_value .
+ * @return {!anychart.core.ui.table.Base|anychart.enums.TextDirection} .
  */
 anychart.core.ui.table.Base.prototype.textDirection = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = anychart.enums.normalizeTextDirection(opt_value);
   }
-  return /** @type {!anychart.core.ui.table.Base|acgraph.vector.Text.Direction} */(this.settings('textDirection', opt_value));
+  return /** @type {!anychart.core.ui.table.Base|anychart.enums.TextDirection} */(this.settings('textDirection', opt_value));
 };
 
 
@@ -298,40 +298,40 @@ anychart.core.ui.table.Base.prototype.textIndent = function(opt_value) {
 
 /**
  * Getter/setter for vAlign.
- * @param {acgraph.vector.Text.VAlign|string=} opt_value .
- * @return {!anychart.core.ui.table.Base|acgraph.vector.Text.VAlign} .
+ * @param {anychart.enums.VAlign|string=} opt_value .
+ * @return {!anychart.core.ui.table.Base|anychart.enums.VAlign} .
  */
 anychart.core.ui.table.Base.prototype.vAlign = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = anychart.enums.normalizeVAlign(opt_value);
   }
-  return /** @type {!anychart.core.ui.table.Base|acgraph.vector.Text.VAlign} */(this.settings('vAlign', opt_value));
+  return /** @type {!anychart.core.ui.table.Base|anychart.enums.VAlign} */(this.settings('vAlign', opt_value));
 };
 
 
 /**
  * Getter/setter for hAlign.
- * @param {acgraph.vector.Text.HAlign|string=} opt_value .
- * @return {!anychart.core.ui.table.Base|acgraph.vector.Text.HAlign} .
+ * @param {anychart.enums.HAlign|string=} opt_value .
+ * @return {!anychart.core.ui.table.Base|anychart.enums.HAlign} .
  */
 anychart.core.ui.table.Base.prototype.hAlign = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = anychart.enums.normalizeHAlign(opt_value);
   }
-  return /** @type {!anychart.core.ui.table.Base|acgraph.vector.Text.HAlign} */(this.settings('hAlign', opt_value));
+  return /** @type {!anychart.core.ui.table.Base|anychart.enums.HAlign} */(this.settings('hAlign', opt_value));
 };
 
 
 /**
  * Getter/setter for textWrap.
- * @param {acgraph.vector.Text.TextWrap|string=} opt_value .
- * @return {!anychart.core.ui.table.Base|acgraph.vector.Text.TextWrap} .
+ * @param {anychart.enums.TextWrap|string=} opt_value .
+ * @return {!anychart.core.ui.table.Base|anychart.enums.TextWrap} .
  */
 anychart.core.ui.table.Base.prototype.textWrap = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = anychart.enums.normalizeTextWrap(opt_value);
   }
-  return /** @type {!anychart.core.ui.table.Base|acgraph.vector.Text.TextWrap} */(this.settings('textWrap', opt_value));
+  return /** @type {!anychart.core.ui.table.Base|anychart.enums.TextWrap} */(this.settings('textWrap', opt_value));
 };
 
 

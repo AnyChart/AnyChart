@@ -799,7 +799,7 @@ anychart.core.map.series.Bubble.prototype.serialize = function() {
   json['displayNegative'] = this.displayNegative();
 
   if (goog.isFunction(this.negativeFill())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Bubble Series negativeFill']
@@ -808,7 +808,7 @@ anychart.core.map.series.Bubble.prototype.serialize = function() {
     json['negativeFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.negativeFill()));
   }
   if (goog.isFunction(this.hoverNegativeFill())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Bubble Series hoverNegativeFill']
@@ -817,7 +817,7 @@ anychart.core.map.series.Bubble.prototype.serialize = function() {
     json['hoverNegativeFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverNegativeFill()));
   }
   if (goog.isFunction(this.selectNegativeFill())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Bubble Series selectNegativeFill']
@@ -827,7 +827,7 @@ anychart.core.map.series.Bubble.prototype.serialize = function() {
   }
 
   if (goog.isFunction(this.negativeStroke())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Bubble Series negativeStroke']
@@ -836,7 +836,7 @@ anychart.core.map.series.Bubble.prototype.serialize = function() {
     json['negativeStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.negativeStroke()));
   }
   if (goog.isFunction(this.hoverNegativeStroke())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Bubble Series hoverNegativeStroke']
@@ -845,7 +845,7 @@ anychart.core.map.series.Bubble.prototype.serialize = function() {
     json['hoverNegativeStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverNegativeStroke()));
   }
   if (goog.isFunction(this.selectNegativeStroke())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Bubble Series selectNegativeStroke']
@@ -855,7 +855,7 @@ anychart.core.map.series.Bubble.prototype.serialize = function() {
   }
 
   if (goog.isFunction(this.negativeHatchFill())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Bubble Series negativeHatchFill']
@@ -864,7 +864,7 @@ anychart.core.map.series.Bubble.prototype.serialize = function() {
     json['negativeHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.negativeHatchFill()));
   }
   if (goog.isFunction(this.hoverNegativeHatchFill())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Bubble Series hoverNegativeHatchFill']
@@ -873,7 +873,7 @@ anychart.core.map.series.Bubble.prototype.serialize = function() {
     json['hoverNegativeHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverNegativeHatchFill()));
   }
   if (goog.isFunction(this.selectNegativeHatchFill())) {
-    anychart.utils.warning(
+    anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
         ['Bubble Series selectNegativeHatchFill']

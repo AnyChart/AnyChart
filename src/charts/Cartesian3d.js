@@ -12,6 +12,7 @@ goog.require('anychart.core.drawers.Area3d');
 goog.require('anychart.core.drawers.Bar3d');
 goog.require('anychart.core.drawers.Column3d');
 goog.require('anychart.core.grids.Linear3d');
+goog.require('anychart.core.reporting');
 goog.require('anychart.enums');
 goog.require('goog.color');
 
@@ -339,7 +340,7 @@ anychart.charts.Cartesian3d.prototype.zAspect = function(opt_value) {
  * @deprecated Deprecated since 7.10.0. Use chart.zAspect instead.
  */
 anychart.charts.Cartesian3d.prototype.zDepth = function(opt_value) {
-  anychart.utils.warning(anychart.enums.WarningCode.DEPRECATED, null, ['chart.zDepth', 'chart.zAspect with chart.zPadding']);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['chart.zDepth', 'chart.zAspect with chart.zPadding']);
   if (goog.isDef(opt_value)) {
     if (this.zDepth_ != opt_value) {
       this.zDepth_ = goog.isNull(opt_value) ? opt_value : anychart.utils.toNumber(opt_value);

@@ -1,6 +1,8 @@
 goog.provide('anychart.data.TableAggregatedStorage');
 goog.provide('anychart.data.TableMainStorage');
 goog.provide('anychart.data.TableStorage');
+
+goog.require('anychart.core.reporting');
 goog.require('anychart.data.TableRow');
 goog.require('anychart.data.csv.Parser');
 goog.require('anychart.data.csv.TableItemsProcessor');
@@ -872,7 +874,7 @@ goog.inherits(anychart.data.TableMainStorage, anychart.data.TableStorage);
  */
 anychart.data.TableMainStorage.prototype.startTransaction = function() {
   if (this.inTransaction_)
-    anychart.utils.warning(anychart.enums.WarningCode.TABLE_ALREADY_IN_TRANSACTION);
+    anychart.core.reporting.warning(anychart.enums.WarningCode.TABLE_ALREADY_IN_TRANSACTION);
   this.inTransaction_ = true;
   return this;
 };

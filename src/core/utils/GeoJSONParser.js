@@ -1,5 +1,6 @@
-goog.provide('anychart.utils.GeoJSONParser');
+goog.provide('anychart.core.utils.GeoJSONParser');
 goog.require('anychart.core.map.geom');
+goog.require('anychart.core.reporting');
 //goog.require('goog.math.Coordinate');
 
 
@@ -8,9 +9,9 @@ goog.require('anychart.core.map.geom');
  * Geo JSON parser class.
  * @constructor
  */
-anychart.utils.GeoJSONParser = function() {
+anychart.core.utils.GeoJSONParser = function() {
 };
-goog.addSingletonGetter(anychart.utils.GeoJSONParser);
+goog.addSingletonGetter(anychart.core.utils.GeoJSONParser);
 
 
 /**
@@ -18,14 +19,14 @@ goog.addSingletonGetter(anychart.utils.GeoJSONParser);
  * @param {Object} data GeoJSON data to parse.
  * @return {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>} .
  */
-anychart.utils.GeoJSONParser.prototype.parse = function(data) {
+anychart.core.utils.GeoJSONParser.prototype.parse = function(data) {
   var i, len;
   var objects = [];
 
   switch (data['type']) {
     case 'FeatureCollection':
       if (!data['features']) {
-        anychart.utils.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'FeatureCollection object missing \'features\' member.');
+        anychart.core.reporting.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'FeatureCollection object missing \'features\' member.');
       } else {
         var features = data['features'];
         for (i = 0, len = features.length; i < len; i++) {
@@ -37,7 +38,7 @@ anychart.utils.GeoJSONParser.prototype.parse = function(data) {
 
     case 'GeometryCollection':
       if (!data['geometries']) {
-        anychart.utils.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'GeometryCollection object missing \'geometries\' member.');
+        anychart.core.reporting.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'GeometryCollection object missing \'geometries\' member.');
       } else {
         var geometries = data['geometries'];
         for (i = 0, len = geometries.length; i < len; i++) {
@@ -48,7 +49,7 @@ anychart.utils.GeoJSONParser.prototype.parse = function(data) {
 
     case 'Feature':
       if (!(data['properties'] && data['geometry'])) {
-        anychart.utils.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'Feature object missing \'properties\' or \'geometry\' member.');
+        anychart.core.reporting.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'Feature object missing \'properties\' or \'geometry\' member.');
       } else {
         objects.push(this.parseGeometry_(data['geometry'], data['properties']));
       }
@@ -63,12 +64,12 @@ anychart.utils.GeoJSONParser.prototype.parse = function(data) {
       if (data['coordinates']) {
         objects.push(this.parseGeometry_(data, null));
       } else {
-        anychart.utils.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'Geometry object missing \'coordinates\' member.');
+        anychart.core.reporting.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'Geometry object missing \'coordinates\' member.');
       }
       break;
 
     default:
-      anychart.utils.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'GeoJSON object must be one of \'Point\',' +
+      anychart.core.reporting.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'GeoJSON object must be one of \'Point\',' +
           ' \'LineString\', \'Polygon\', \'MultiPolygon\', \'Feature\', \'FeatureCollection\' or \'GeometryCollection\'.');
   }
 
@@ -82,7 +83,7 @@ anychart.utils.GeoJSONParser.prototype.parse = function(data) {
  * @return {null|anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection}
  * @private
  */
-anychart.utils.GeoJSONParser.prototype.parseGeometry_ = function(geojsonGeometry, properties) {
+anychart.core.utils.GeoJSONParser.prototype.parseGeometry_ = function(geojsonGeometry, properties) {
   var coord,
       path,
       polygon,
@@ -202,7 +203,7 @@ anychart.utils.GeoJSONParser.prototype.parseGeometry_ = function(geojsonGeometry
 
     case 'GeometryCollection':
       if (!geojsonGeometry['geometries']) {
-        anychart.utils.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'GeometryCollection object missing \'geometries\' member.');
+        anychart.core.reporting.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'GeometryCollection object missing \'geometries\' member.');
       } else {
         var geoms = [];
         var geometries = geojsonGeometry['geometries'];
@@ -219,7 +220,7 @@ anychart.utils.GeoJSONParser.prototype.parseGeometry_ = function(geojsonGeometry
       break;
 
     default:
-      anychart.utils.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'Geometry object must be one of ' +
+      anychart.core.reporting.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'Geometry object must be one of ' +
           '\'Point\', \'LineString\', \'Polygon\' or \'MultiPolygon\'.');
       return null;
       break;
@@ -234,7 +235,7 @@ anychart.utils.GeoJSONParser.prototype.parseGeometry_ = function(geojsonGeometry
  * @param {Object} tx Object with transformation for geo data.
  * @return {Object}
  */
-anychart.utils.GeoJSONParser.prototype.exportToGeoJSON = function(gdom, tx) {
+anychart.core.utils.GeoJSONParser.prototype.exportToGeoJSON = function(gdom, tx) {
   var geojson = {
     'type': 'FeatureCollection',
     'crs': gdom['crs'] || {
@@ -301,7 +302,7 @@ anychart.utils.GeoJSONParser.prototype.exportToGeoJSON = function(gdom, tx) {
  * @param {string} sortBy Field name for sort.
  * @return {Array.<Object>}
  */
-anychart.utils.GeoJSONParser.prototype.getProperties = function(data, properties, dictionary, sortBy) {
+anychart.core.utils.GeoJSONParser.prototype.getProperties = function(data, properties, dictionary, sortBy) {
   var i, len;
 
   var props = [];
@@ -309,7 +310,7 @@ anychart.utils.GeoJSONParser.prototype.getProperties = function(data, properties
   switch (data['type']) {
     case 'FeatureCollection':
       if (!data['features']) {
-        anychart.utils.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'FeatureCollection object missing \'features\' member.');
+        anychart.core.reporting.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'FeatureCollection object missing \'features\' member.');
       } else {
         var features = data['features'];
         for (i = 0, len = features.length; i < len; i++) {
@@ -321,7 +322,7 @@ anychart.utils.GeoJSONParser.prototype.getProperties = function(data, properties
 
     case 'Feature':
       if (!(data['properties'] && data['geometry'])) {
-        anychart.utils.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'Feature object missing \'properties\' or \'geometry\' member.');
+        anychart.core.reporting.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'Feature object missing \'properties\' or \'geometry\' member.');
       } else {
         props.push(this.getProps_(data['properties'], properties, dictionary));
       }
@@ -345,7 +346,7 @@ anychart.utils.GeoJSONParser.prototype.getProperties = function(data, properties
  * @return {Object}
  * @private
  */
-anychart.utils.GeoJSONParser.prototype.getProps_ = function(properties, props, dictionary) {
+anychart.core.utils.GeoJSONParser.prototype.getProps_ = function(properties, props, dictionary) {
   var result = {};
   for (var i = 0, len = props.length; i < len; i++) {
     var prop = props[i];
@@ -365,14 +366,14 @@ anychart.utils.GeoJSONParser.prototype.getProps_ = function(properties, props, d
  * @param {string} hcFieldName
  * @return {Object}
  */
-anychart.utils.GeoJSONParser.prototype.convert = function(data, txObj, donor, acFieldName, hcFieldName) {
+anychart.core.utils.GeoJSONParser.prototype.convert = function(data, txObj, donor, acFieldName, hcFieldName) {
   var i, len;
   this.txObj_ = txObj;
 
   switch (data['type']) {
     case 'FeatureCollection':
       if (!data['features']) {
-        anychart.utils.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'FeatureCollection object missing \'features\' member.');
+        anychart.core.reporting.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'FeatureCollection object missing \'features\' member.');
       } else {
         var features = data['features'];
         for (i = 0, len = features.length; i < len; i++) {
@@ -386,7 +387,7 @@ anychart.utils.GeoJSONParser.prototype.convert = function(data, txObj, donor, ac
 
     case 'GeometryCollection':
       if (!data['geometries']) {
-        anychart.utils.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'GeometryCollection object missing \'geometries\' member.');
+        anychart.core.reporting.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'GeometryCollection object missing \'geometries\' member.');
       } else {
         var geometries = data['geometries'];
         for (i = 0, len = geometries.length; i < len; i++) {
@@ -398,7 +399,7 @@ anychart.utils.GeoJSONParser.prototype.convert = function(data, txObj, donor, ac
 
     case 'Feature':
       if (!(data['properties'] && data['geometry'])) {
-        anychart.utils.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'Feature object missing \'properties\' or \'geometry\' member.');
+        anychart.core.reporting.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'Feature object missing \'properties\' or \'geometry\' member.');
       } else {
         if (txObj)
           this.transformCoords_(data['geometry']);
@@ -416,12 +417,12 @@ anychart.utils.GeoJSONParser.prototype.convert = function(data, txObj, donor, ac
         if (txObj)
           this.transformCoords_(data);
       } else {
-        anychart.utils.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'Geometry object missing \'coordinates\' member.');
+        anychart.core.reporting.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'Geometry object missing \'coordinates\' member.');
       }
       break;
 
     default:
-      anychart.utils.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'GeoJSON object must be one of \'Point\',' +
+      anychart.core.reporting.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'GeoJSON object must be one of \'Point\',' +
           ' \'LineString\', \'Polygon\', \'MultiPolygon\', \'Feature\', \'FeatureCollection\' or \'GeometryCollection\'.');
   }
 
@@ -433,7 +434,7 @@ anychart.utils.GeoJSONParser.prototype.convert = function(data, txObj, donor, ac
  * @param {Array.<number>} coord
  * @private
  */
-anychart.utils.GeoJSONParser.prototype.transform_ = function(coord) {
+anychart.core.utils.GeoJSONParser.prototype.transform_ = function(coord) {
   var x = coord[0];
   var y = coord[1];
 
@@ -801,7 +802,7 @@ anychart.utils.GeoJSONParser.prototype.transform_ = function(coord) {
  * @param {string} hcFieldName
  * @private
  */
-anychart.utils.GeoJSONParser.prototype.transformProp_ = function(properties, donor, acFieldName, hcFieldName) {
+anychart.core.utils.GeoJSONParser.prototype.transformProp_ = function(properties, donor, acFieldName, hcFieldName) {
   if (!donor) return;
 
   var name = properties[acFieldName];
@@ -823,7 +824,7 @@ anychart.utils.GeoJSONParser.prototype.transformProp_ = function(properties, don
  * @return {null}
  * @private
  */
-anychart.utils.GeoJSONParser.prototype.transformCoords_ = function(geosonGeometry) {
+anychart.core.utils.GeoJSONParser.prototype.transformCoords_ = function(geosonGeometry) {
   var coord,
       polygon,
       i,
@@ -904,7 +905,7 @@ anychart.utils.GeoJSONParser.prototype.transformCoords_ = function(geosonGeometr
 
     case 'GeometryCollection':
       if (!geosonGeometry['geometries']) {
-        anychart.utils.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'GeometryCollection object missing \'geometries\' member.');
+        anychart.core.reporting.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'GeometryCollection object missing \'geometries\' member.');
       } else {
         var geometries = geosonGeometry['geometries'];
         for (i = 0, len = geometries.length; i < len; i++) {
@@ -914,7 +915,7 @@ anychart.utils.GeoJSONParser.prototype.transformCoords_ = function(geosonGeometr
       break;
 
     default:
-      anychart.utils.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'Geometry object must be one of ' +
+      anychart.core.reporting.error(anychart.enums.ErrorCode.INVALID_GEO_JSON_OBJECT, 'Geometry object must be one of ' +
           '\'Point\', \'LineString\', \'Polygon\' or \'MultiPolygon\'.');
       return null;
       break;

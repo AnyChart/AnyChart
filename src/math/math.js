@@ -1,7 +1,7 @@
 goog.provide('anychart.math');
 goog.provide('anychart.math.Rect');
-goog.require('acgraph');
 goog.require('acgraph.math.Coordinate');
+goog.require('acgraph.math.Rect');
 
 
 

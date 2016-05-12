@@ -6,6 +6,7 @@ goog.require('anychart.core.axes.Radar');
 goog.require('anychart.core.axes.Radial');
 goog.require('anychart.core.grids.Radar');
 goog.require('anychart.core.radar.series.Base');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.OrdinalIterator');
 goog.require('anychart.enums');
 goog.require('anychart.palettes.DistinctColors');
@@ -655,7 +656,7 @@ anychart.charts.Radar.prototype.createSeriesByType_ = function(type, data, opt_c
         anychart.ConsistencyState.RADAR_SCALES,
         anychart.Signal.NEEDS_REDRAW);
   } else {
-    anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
     instance = null;
   }
 

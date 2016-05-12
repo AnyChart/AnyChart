@@ -5,6 +5,7 @@ goog.require('anychart.core.Chart');
 goog.require('anychart.core.axisMarkers.Line');
 goog.require('anychart.core.axisMarkers.Range');
 goog.require('anychart.core.axisMarkers.Text');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.sparkline.series.Base');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.MarkersFactory');
@@ -912,7 +913,7 @@ anychart.charts.Sparkline.prototype.createSeriesByType_ = function(type) {
         anychart.Signal.NEEDS_REDRAW);
 
   } else {
-    anychart.utils.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [type + ' series']);
     instance = null;
   }
 
@@ -2435,14 +2436,14 @@ anychart.charts.Sparkline.prototype.serialize = function() {
 
   if (goog.isFunction(this['lastFill'])) {
     if (goog.isFunction(this.lastFill())) {
-      anychart.utils.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series last fill']);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series last fill']);
     } else if (goog.isDef(this.lastFill())) {
       json['lastFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.lastFill()));
     }
   }
   if (goog.isFunction(this['lastHatchFill'])) {
     if (goog.isFunction(this.lastHatchFill())) {
-      anychart.utils.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series last hatch fill']);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series last hatch fill']);
     } else if (goog.isDef(this.lastHatchFill())) {
       json['lastHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.lastHatchFill()));
     }
@@ -2451,14 +2452,14 @@ anychart.charts.Sparkline.prototype.serialize = function() {
   json['lastLabels'] = this.lastLabels().serialize();
   if (goog.isFunction(this['firstFill'])) {
     if (goog.isFunction(this.firstFill())) {
-      anychart.utils.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series first fill']);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series first fill']);
     } else if (goog.isDef(this.firstFill())) {
       json['firstFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.firstFill()));
     }
   }
   if (goog.isFunction(this['firstHatchFill'])) {
     if (goog.isFunction(this.firstHatchFill())) {
-      anychart.utils.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series first hatch fill']);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series first hatch fill']);
     } else if (goog.isDef(this.firstHatchFill())) {
       json['firstHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.firstHatchFill()));
     }
@@ -2467,14 +2468,14 @@ anychart.charts.Sparkline.prototype.serialize = function() {
   json['firstLabels'] = this.firstLabels().serialize();
   if (goog.isFunction(this['maxFill'])) {
     if (goog.isFunction(this.maxFill())) {
-      anychart.utils.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series max fill']);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series max fill']);
     } else if (goog.isDef(this.maxFill())) {
       json['maxFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.maxFill()));
     }
   }
   if (goog.isFunction(this['maxHatchFill'])) {
     if (goog.isFunction(this.maxHatchFill())) {
-      anychart.utils.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series max hatch fill']);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series max hatch fill']);
     } else if (goog.isDef(this.maxHatchFill())) {
       json['maxHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.maxHatchFill()));
     }
@@ -2483,14 +2484,14 @@ anychart.charts.Sparkline.prototype.serialize = function() {
   json['maxLabels'] = this.maxLabels().serialize();
   if (goog.isFunction(this['minFill'])) {
     if (goog.isFunction(this.minFill())) {
-      anychart.utils.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series min fill']);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series min fill']);
     } else if (goog.isDef(this.minFill())) {
       json['minFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.minFill()));
     }
   }
   if (goog.isFunction(this['minHatchFill'])) {
     if (goog.isFunction(this.minHatchFill())) {
-      anychart.utils.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series min hatch fill']);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series min hatch fill']);
     } else if (goog.isDef(this.minHatchFill())) {
       json['minHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.minHatchFill()));
     }
@@ -2499,14 +2500,14 @@ anychart.charts.Sparkline.prototype.serialize = function() {
   json['minLabels'] = this.minLabels().serialize();
   if (goog.isFunction(this['negativeFill'])) {
     if (goog.isFunction(this.negativeFill())) {
-      anychart.utils.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series negative fill']);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series negative fill']);
     } else if (goog.isDef(this.negativeFill())) {
       json['negativeFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.negativeFill()));
     }
   }
   if (goog.isFunction(this['negativeHatchFill'])) {
     if (goog.isFunction(this.negativeHatchFill())) {
-      anychart.utils.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series negative hatch fill']);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series negative hatch fill']);
     } else if (goog.isDef(this.negativeHatchFill())) {
       json['negativeHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.negativeHatchFill()));
     }
@@ -2515,14 +2516,14 @@ anychart.charts.Sparkline.prototype.serialize = function() {
   json['negativeLabels'] = this.negativeLabels().serialize();
   if (goog.isFunction(this['fill'])) {
     if (goog.isFunction(this.fill())) {
-      anychart.utils.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series fill']);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series fill']);
     } else if (goog.isDef(this.fill())) {
       json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
     }
   }
   if (goog.isFunction(this['hatchFill'])) {
     if (goog.isFunction(this.hatchFill())) {
-      anychart.utils.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series hatch fill']);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series hatch fill']);
     } else if (goog.isDef(this.hatchFill())) {
       json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
     }
@@ -2531,7 +2532,7 @@ anychart.charts.Sparkline.prototype.serialize = function() {
   json['labels'] = this.labels().serialize();
   if (goog.isFunction(this['stroke'])) {
     if (goog.isFunction(this.stroke())) {
-      anychart.utils.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series stroke']);
+      anychart.core.reporting.warning(anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION, null, ['Series stroke']);
     } else if (goog.isDef(this.stroke())) {
       json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
     }

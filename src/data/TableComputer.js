@@ -1,5 +1,7 @@
 goog.provide('anychart.data.TableComputer');
 goog.provide('anychart.data.TableComputer.RowProxy');
+
+goog.require('anychart.core.reporting');
 goog.require('anychart.data.TableSelectable.RowProxy');
 goog.require('goog.Disposable');
 
@@ -110,7 +112,7 @@ anychart.data.TableComputer.prototype.getOutputFields = function() {
  */
 anychart.data.TableComputer.prototype.addOutputField = function(name, opt_uid) {
   if (name in this.outputFields_) {
-    anychart.utils.error(anychart.enums.ErrorCode.TABLE_COMPUTER_OUTPUT_FIELD_DUPLICATE, undefined, [name]);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.TABLE_COMPUTER_OUTPUT_FIELD_DUPLICATE, undefined, [name]);
     return NaN;
   }
   var index = this.getTable().registerComputedField(this, opt_uid);

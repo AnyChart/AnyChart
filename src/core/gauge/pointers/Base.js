@@ -1,6 +1,7 @@
 goog.provide('anychart.core.gauge.pointers.Base');
 goog.require('acgraph');
 goog.require('anychart.core.VisualBase');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.IInteractiveSeries');
 goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.SeriesPointContextProvider');
@@ -672,7 +673,7 @@ anychart.core.gauge.pointers.Base.prototype.serialize = function() {
 
   if (goog.isFunction(this['fill'])) {
     if (goog.isFunction(this.fill())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Pointers fill']
@@ -683,7 +684,7 @@ anychart.core.gauge.pointers.Base.prototype.serialize = function() {
   }
   if (goog.isFunction(this['stroke'])) {
     if (goog.isFunction(this.stroke())) {
-      anychart.utils.warning(
+      anychart.core.reporting.warning(
           anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
           null,
           ['Pointers stroke']
