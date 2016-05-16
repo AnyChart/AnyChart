@@ -55,15 +55,15 @@ anychart.core.utils.SeriesPointContextProvider.prototype.applyReferenceValues = 
  */
 anychart.core.utils.SeriesPointContextProvider.prototype.applyReferenceValuesInternal = function(point) {
   var value;
-  this['index'] = point.getIndex();
+  this['index'] = point ? point.getIndex() : NaN;
 
   //TODO (A.Kudryavtsev): Do we need to add point from chart (not from series)?
   this.pointInternal = this.seriesInternal.getPoint ? this.seriesInternal.getPoint(this['index']) : null;
 
-  this['x'] = point.getX(); // redundant for all series except Cartesian
+  this['x'] = point ? point.getX() : undefined; // redundant for all series except Cartesian
   for (var i = 0; i < this.referenceValueNames.length; i++) {
     value = this.referenceValueNames[i];
-    this[value] = point.get(value);
+    this[value] = point ? point.get(value) : undefined;
   }
   if (this['series'].name)
     this['seriesName'] = this['series'].name() || 'Series ' + this['series'].getIndex();

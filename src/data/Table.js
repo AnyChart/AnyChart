@@ -234,7 +234,7 @@ anychart.data.Table.prototype.deregisterComputer = function(computer) {
         }
       }
     }
-    this.reusableComputedColumns_.sort();
+    goog.array.sort(this.reusableComputedColumns_);
     for (i = 0; i < itemsToRemove.length; i++)
       delete this.computedColumnsAliases_[itemsToRemove[i]];
 
@@ -302,7 +302,7 @@ anychart.data.Table.prototype.registerComputedField = function(computer, opt_nam
     }
     this.computedColumnsAliases_[opt_name] = nextIndex;
   }
-  this.computerRightMostFields_[computer.getIndex()] = Math.max(this.computerRightMostFields_[computer.getIndex()], nextIndex);
+  this.computerRightMostFields_[computer.getIndex()] = Math.max(this.computerRightMostFields_[computer.getIndex()], ~nextIndex);
   if (indexReused)
     this.reusableComputedColumns_.shift();
   else
