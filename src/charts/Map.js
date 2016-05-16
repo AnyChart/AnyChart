@@ -16,6 +16,7 @@ goog.require('anychart.core.map.series.Base');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.ColorRange');
 goog.require('anychart.core.utils.Animation');
+goog.require('anychart.core.utils.GeoJSONParser');
 goog.require('anychart.core.utils.MapInteractivity');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.core.utils.UnboundRegionsSettings');
@@ -24,7 +25,6 @@ goog.require('anychart.palettes.HatchFills');
 goog.require('anychart.palettes.Markers');
 goog.require('anychart.scales.LinearColor');
 goog.require('anychart.scales.OrdinalColor');
-goog.require('anychart.core.utils.GeoJSONParser');
 goog.require('goog.dom');
 goog.require('goog.ui.KeyboardShortcutHandler');
 
