@@ -2393,10 +2393,6 @@ anychart.core.series.Base.prototype.draw = function() {
     this.maximumSizeValue_ = anychart.utils.normalizeSize(this.maximumSizeSetting_, size);
     this.invalidate(anychart.ConsistencyState.SERIES_CLIP |
         anychart.ConsistencyState.SERIES_POINTS |
-        anychart.ConsistencyState.SERIES_LABELS |
-        anychart.ConsistencyState.SERIES_MARKERS |
-        anychart.ConsistencyState.SERIES_ERROR |
-        anychart.ConsistencyState.SERIES_OUTLIERS |
         anychart.ConsistencyState.SERIES_COLOR);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
@@ -2404,13 +2400,15 @@ anychart.core.series.Base.prototype.draw = function() {
   // calculating pixel positions
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA)) {
     this.prepareData();
-    this.invalidate(anychart.ConsistencyState.SERIES_POINTS |
-        anychart.ConsistencyState.SERIES_LABELS |
+    this.invalidate(anychart.ConsistencyState.SERIES_POINTS | anychart.ConsistencyState.SERIES_COLOR);
+    this.markConsistent(anychart.ConsistencyState.SERIES_DATA);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_POINTS)) {
+    this.invalidate(anychart.ConsistencyState.SERIES_LABELS |
         anychart.ConsistencyState.SERIES_MARKERS |
         anychart.ConsistencyState.SERIES_ERROR |
-        anychart.ConsistencyState.SERIES_OUTLIERS |
-        anychart.ConsistencyState.SERIES_COLOR);
-    this.markConsistent(anychart.ConsistencyState.SERIES_DATA);
+        anychart.ConsistencyState.SERIES_OUTLIERS);
   }
 
   /** @type {Array.<Function>} */
