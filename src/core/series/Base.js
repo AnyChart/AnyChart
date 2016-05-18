@@ -2393,10 +2393,6 @@ anychart.core.series.Base.prototype.draw = function() {
     this.maximumSizeValue_ = anychart.utils.normalizeSize(this.maximumSizeSetting_, size);
     this.invalidate(anychart.ConsistencyState.SERIES_CLIP |
         anychart.ConsistencyState.SERIES_POINTS |
-        anychart.ConsistencyState.SERIES_LABELS |
-        anychart.ConsistencyState.SERIES_MARKERS |
-        anychart.ConsistencyState.SERIES_ERROR |
-        anychart.ConsistencyState.SERIES_OUTLIERS |
         anychart.ConsistencyState.SERIES_COLOR);
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
@@ -2404,13 +2400,15 @@ anychart.core.series.Base.prototype.draw = function() {
   // calculating pixel positions
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA)) {
     this.prepareData();
-    this.invalidate(anychart.ConsistencyState.SERIES_POINTS |
-        anychart.ConsistencyState.SERIES_LABELS |
+    this.invalidate(anychart.ConsistencyState.SERIES_POINTS | anychart.ConsistencyState.SERIES_COLOR);
+    this.markConsistent(anychart.ConsistencyState.SERIES_DATA);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_POINTS)) {
+    this.invalidate(anychart.ConsistencyState.SERIES_LABELS |
         anychart.ConsistencyState.SERIES_MARKERS |
         anychart.ConsistencyState.SERIES_ERROR |
-        anychart.ConsistencyState.SERIES_OUTLIERS |
-        anychart.ConsistencyState.SERIES_COLOR);
-    this.markConsistent(anychart.ConsistencyState.SERIES_DATA);
+        anychart.ConsistencyState.SERIES_OUTLIERS);
   }
 
   /** @type {Array.<Function>} */
@@ -2846,30 +2844,26 @@ anychart.core.series.Base.prototype.applyAxesLinesSpace = function(value) {
  */
 anychart.core.series.Base.prototype.makePointMeta = function(rowInfo, yNames, yColumns) {
   var i;
-  var shouldBeDrawn = this.isPointVisible(rowInfo);
-  if (shouldBeDrawn && this.isSizeBased()) {
-    var size = Number(rowInfo.get(anychart.opt.SIZE));
-    if (isNaN(size) || (size < 0 && !this.getSeriesOption(anychart.opt.DISPLAY_NEGATIVE))) {
-      shouldBeDrawn = false;
-    } else {
-      rowInfo.meta(anychart.opt.SIZE, this.calculateSize(size));
-    }
-  }
-  if (shouldBeDrawn) {
-    rowInfo.meta(anychart.opt.X,
-        this.applyRatioToBounds(
-            this.getXScale().transformInternal(
-                rowInfo.getX(),
-                rowInfo.getIndex(),
-                /** @type {number} */(this.getSeriesOption(anychart.opt.X_POINT_POSITION))), true));
+  var pointMissing = (Number(rowInfo.meta(anychart.opt.MISSING)) || 0) & ~anychart.core.series.PointAbsenceReason.OUT_OF_RANGE;
+  if (!this.isPointVisible(rowInfo))
+    pointMissing |= anychart.core.series.PointAbsenceReason.OUT_OF_RANGE;
+  rowInfo.meta(anychart.opt.X,
+      this.applyRatioToBounds(
+          this.getXScale().transformInternal(
+              rowInfo.getX(),
+              rowInfo.getIndex(),
+              /** @type {number} */(this.getSeriesOption(anychart.opt.X_POINT_POSITION))), true));
+  if (!!pointMissing) {
+    this.makeMissing(rowInfo, yNames);
+  } else {
     var yScale = /** @type {anychart.scales.Base} */(this.yScale());
     var val;
     if (this.planIsStacked()) {
       val = yScale.transform(rowInfo.meta(anychart.opt.STACKED_VALUE), 0.5);
-      if (isNaN(val)) shouldBeDrawn = false;
+      if (isNaN(val)) pointMissing = false;
       rowInfo.meta(anychart.opt.VALUE, this.applyRatioToBounds(val, false));
       val = yScale.transform(rowInfo.meta(anychart.opt.STACKED_ZERO), 0.5);
-      if (isNaN(val)) shouldBeDrawn = false;
+      if (isNaN(val)) pointMissing = false;
       rowInfo.meta(anychart.opt.ZERO, this.applyRatioToBounds(goog.math.clamp(val, 0, 1), false));
       rowInfo.meta(anychart.opt.ZERO_MISSING, rowInfo.meta(anychart.opt.STACKED_MISSING));
     } else {
@@ -2879,9 +2873,14 @@ anychart.core.series.Base.prototype.makePointMeta = function(rowInfo, yNames, yC
       }
       for (i = 0; i < yColumns.length; i++) {
         val = yScale.transform(rowInfo.getColumn(yColumns[i]), 0.5);
-        if (isNaN(val)) shouldBeDrawn = false;
+        if (isNaN(val)) pointMissing |= anychart.core.series.PointAbsenceReason.VALUE_FIELD_MISSING;
         rowInfo.meta(yNames[i], this.applyRatioToBounds(val, false));
       }
+    }
+    if (this.isSizeBased()) {
+      // negative sizes should be filtered out on drawing plan calculation stage
+      // by settings missing reason VALUE_FIELD_MISSING
+      rowInfo.meta(anychart.opt.SIZE, this.calculateSize(Number(rowInfo.get(anychart.opt.SIZE))));
     }
     if (this.supportsOutliers()) {
       var outliers = [];
@@ -2894,10 +2893,8 @@ anychart.core.series.Base.prototype.makePointMeta = function(rowInfo, yNames, yC
       }
       rowInfo.meta(anychart.opt.OUTLIERS, outliers);
     }
-  } else {
-    this.makeMissing(rowInfo, yNames);
   }
-  rowInfo.meta(anychart.opt.MISSING, !shouldBeDrawn);
+  rowInfo.meta(anychart.opt.MISSING, pointMissing);
 };
 
 
@@ -2907,7 +2904,7 @@ anychart.core.series.Base.prototype.makePointMeta = function(rowInfo, yNames, yC
  * @param {Array.<string>} yNames
  */
 anychart.core.series.Base.prototype.makeMissing = function(rowInfo, yNames) {
-  rowInfo.meta(anychart.opt.X, undefined);
+  // rowInfo.meta(anychart.opt.X, undefined);
   for (var i = 0; i < yNames.length; i++) {
     rowInfo.meta(yNames[i], undefined);
   }
@@ -3647,7 +3644,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
     normalizer: anychart.core.series.Base.booleanNormalizer,
     capabilityCheck: anychart.core.drawers.Capabilities.NEEDS_SIZE_SCALE,
     consistency: anychart.ConsistencyState.SERIES_POINTS,
-    signal: anychart.Signal.NEEDS_REDRAW
+    signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_RECALCULATION
   };
   map[anychart.opt.WHISKER_WIDTH] = {
     handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
