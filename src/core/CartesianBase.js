@@ -2231,8 +2231,9 @@ anychart.core.CartesianBase.prototype.calculateXScales = function() {
           for (j = 0; j < seriesExcludes.length; j++) {
             var index = seriesExcludes[j];
             excludesMap[index] = true;
-            drawingPlan.data[index].meta[anychart.opt.EXCLUDED] = true;
-            drawingPlan.data[index].meta[anychart.opt.MISSING] = true;
+            drawingPlan.data[index].meta[anychart.opt.MISSING] = anychart.core.series.mixPointAbsenceReason(
+                drawingPlan.data[index].meta[anychart.opt.MISSING],
+                anychart.core.series.PointAbsenceReason.EXCLUDED_POINT);
           }
         }
       }
@@ -2241,7 +2242,8 @@ anychart.core.CartesianBase.prototype.calculateXScales = function() {
           for (var i = 0; i < drawingPlans.length; i++) {
             var drawingPlan = drawingPlans[i];
             var meta = drawingPlan.data[+index].meta;
-            if (!meta[anychart.opt.EXCLUDED] && !meta[anychart.opt.ARTIFICIAL])
+            if (!anychart.core.series.filterPointAbsenceReason(meta[anychart.opt.MISSING],
+                anychart.core.series.PointAbsenceReason.EXCLUDED_OR_ARTIFICIAL))
               return false;
           }
           return true;
@@ -2288,7 +2290,8 @@ anychart.core.CartesianBase.prototype.calculateXScales = function() {
             if (drawingPlan.hasPointXErrors) {
               iterator = drawingPlan.series.getResetIterator();
               while (iterator.advance()) { // we need iterator to make error work :(
-                if (!iterator.meta(anychart.opt.MISSING)) {
+                if (!anychart.core.series.filterPointAbsenceReason(iterator.meta(anychart.opt.MISSING),
+                    anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
                   error = drawingPlan.series.error().getErrorValues(true);
                   val = iterator.get(anychart.opt.X);
                   xScale.extendDataRange(val - error[0], val + error[1]);
@@ -2421,7 +2424,8 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
               point = data[j];
               stackVal = stack[j - firstIndex];
               point.meta[anychart.opt.STACKED_MISSING] = stackVal.missing;
-              if (point.meta[anychart.opt.MISSING]) {
+              if (anychart.core.series.filterPointAbsenceReason(point.meta[anychart.opt.MISSING],
+                  anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
                 point.meta['stackedPositiveZero'] = stackVal.positive;
                 point.meta['stackedNegativeZero'] = stackVal.negative;
                 stackVal.missing = true;
@@ -2446,7 +2450,8 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
             var k;
             for (j = firstIndex; j <= lastIndex; j++) {
               point = data[j];
-              if (!point.meta[anychart.opt.MISSING]) {
+              if (!anychart.core.series.filterPointAbsenceReason(point.meta[anychart.opt.MISSING],
+                  anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
                 for (k = 0; k < names.length; k++) {
                   yScale.extendDataRange(point.data[names[k]]);
                 }
@@ -2456,7 +2461,8 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
               for (j = firstIndex; j <= lastIndex; j++) {
                 point = data[j];
                 var outliers = point.data[anychart.opt.OUTLIERS];
-                if (!point.meta[anychart.opt.MISSING] && goog.isArray(outliers)) {
+                if (!anychart.core.series.filterPointAbsenceReason(point.meta[anychart.opt.MISSING],
+                    anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE) && goog.isArray(outliers)) {
                   for (k = 0; k < outliers.length; k++) {
                     yScale.extendDataRange(outliers[k]);
                   }
@@ -2468,7 +2474,8 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
                 drawingPlan.hasPointYErrors)) {
               var iterator = drawingPlan.series.getResetIterator();
               while (iterator.advance()) { // we need iterator to make error work :(
-                if (!iterator.meta(anychart.opt.MISSING)) {
+                if (!anychart.core.series.filterPointAbsenceReason(iterator.meta(anychart.opt.MISSING),
+                    anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
                   var error = drawingPlan.series.error().getErrorValues(false);
                   val = anychart.utils.toNumber(iterator.get(anychart.opt.VALUE));
                   yScale.extendDataRange(val - error[0], val + error[1]);
@@ -2485,7 +2492,8 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
             for (j = firstIndex; j <= lastIndex; j++) {
               point = data[j];
               stackVal = stack[j - firstIndex];
-              if (point.meta[anychart.opt.MISSING]) {
+              if (anychart.core.series.filterPointAbsenceReason(point.meta[anychart.opt.MISSING],
+                  anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
                 point.meta['stackedPositiveZero'] = (point.meta['stackedPositiveZero'] / stackVal.positive * 100) || 0;
                 point.meta['stackedNegativeZero'] = (point.meta['stackedNegativeZero'] / stackVal.negative * 100) || 0;
               } else {
@@ -2556,11 +2564,12 @@ anychart.core.CartesianBase.prototype.calculateYScales = function() {
         var seriesRangeMax = -Infinity;
         var seriesSum = 0;
 
-        for (var d = 0; d < len; d++) { //iteratind by points in series.
+        for (var d = 0; d < len; d++) { //iterating by points in series.
           var pointObj = plan.data[d];
           var pointVal = NaN;
 
-          if (!pointObj.meta[anychart.opt.MISSING]) {
+          if (!anychart.core.series.filterPointAbsenceReason(pointObj.meta[anychart.opt.MISSING],
+              anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
             pointsCount++;
             totalPointsCount++;
             if (isRangeSeries) {

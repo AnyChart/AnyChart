@@ -591,9 +591,7 @@ anychart.core.series.Cartesian.prototype.planIsXScaleInverted = function() {
 /** @inheritDoc */
 anychart.core.series.Cartesian.prototype.isPointVisible = function(point) {
   var index = point.getIndex();
-  return !point.meta(anychart.opt.ARTIFICIAL) &&
-      !point.meta(anychart.opt.EXCLUDED) &&
-      (!this.drawingPlan || index >= this.drawingPlan.firstIndex && index <= this.drawingPlan.lastIndex);
+  return (index >= this.drawingPlan.firstIndex && index <= this.drawingPlan.lastIndex);
 };
 //endregion
 
@@ -641,8 +639,11 @@ anychart.core.series.Cartesian.prototype.getDrawingData_ = function(data, dataPu
       val = iterator.get(name);
       pointData[name] = val;
     }
-    if (this.isSizeBased())
-      missing = missing || isNaN(pointData[anychart.opt.SIZE]);
+    if (this.isSizeBased()) {
+      var size = Number(pointData[anychart.opt.SIZE]);
+      if (isNaN(size) || (size < 0 && !this.getSeriesOption(anychart.opt.DISPLAY_NEGATIVE)))
+        missing = true;
+    }
     if (this.supportsError()) {
       if (anychart.core.utils.Error.supportsErrorForScale(/** @type {anychart.scales.Base} */(this.xScale()))) {
         for (i = 0, len = this.xErrorNames.length; i < len; i++) {
@@ -667,7 +668,7 @@ anychart.core.series.Cartesian.prototype.getDrawingData_ = function(data, dataPu
       pointData[opt_nameField] = iterator.get(opt_nameField);
 
     var meta = {};
-    meta[anychart.opt.MISSING] = missing;
+    meta[anychart.opt.MISSING] = missing ? anychart.core.series.PointAbsenceReason.VALUE_FIELD_MISSING : 0;
     meta[anychart.opt.RAW_INDEX] = iterator.getIndex();
 
     if (!missing) {
@@ -835,8 +836,7 @@ anychart.core.series.Cartesian.prototype.getOrdinalDrawingPlan = function(xHashM
  */
 anychart.core.series.Cartesian.makeMissingPoint = function(x) {
   var meta = {};
-  meta[anychart.opt.MISSING] = true;
-  meta[anychart.opt.ARTIFICIAL] = true;
+  meta[anychart.opt.MISSING] = anychart.core.series.PointAbsenceReason.ARTIFICIAL_POINT;
   return {
     data: {'x': x},
     meta: meta

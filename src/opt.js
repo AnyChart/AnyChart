@@ -587,13 +587,6 @@ anychart.opt.MISSING = 'missing';
 
 
 /**
- * Constant replacer for "artificial" string.
- * @const {string}
- */
-anychart.opt.ARTIFICIAL = 'artificial';
-
-
-/**
  * Constant replacer for "front" string.
  * @const {string}
  */
@@ -1228,13 +1221,6 @@ anychart.opt.COLUMN = 'COLUMN';
  * @const {string}
  */
 anychart.opt.WEIGHTS = 'weights';
-
-
-/**
- * Constant replacer for "excluded" string.
- * @const {string}
- */
-anychart.opt.EXCLUDED = 'excluded';
 
 
 /**
