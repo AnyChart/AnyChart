@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+    .land {
+        fill: #222;
+    }
+
+    .county-boundary {
+        fill: none;
+        stroke: #fff;
+        stroke-width: .5px;
+    }
+
+    .state-boundary {
+        fill: none;
+        stroke: #fff;
+    }
+
+</style>
+<body>
+<script src="//d3js.org/d3.v3.min.js"></script>
+<!--<script src="//d3js.org/topojson.v1.min.js"></script>-->
+
+<script src="../../../contrib/closure-library/closure/goog/base.js"></script>
+<script src="../../../src/deps.js"></script>
+
+<meta charset="utf-8">
+<script>
+    goog.require('anychart.themes.defaultTheme');
+    goog.require('anychart.modules.anychart_bundle');
+</script>
+
+<script>
+
+    var width = 960,
+            height = 500;
+
+    var projection = d3.geo.albersUsa()
+            .scale(1000)
+            .translate([width / 2, height / 2]);
+
+    var path = d3.geo.path()
+            .projection(projection);
+
+    var svg = d3.select("body").append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+    d3.json("us.json", function(error, us) {
+        if (error) throw error;
+
+
+        console.log(anychart.core.utils.TopoJSONParser.getInstance().feature(us, us.objects.states));
+//        console.log(topojson.feature(us, us.objects.land));
+//        console.log(topojson.mesh(us, us.objects.counties, function(a, b) { return a !== b && !(a.id / 1000 ^ b.id / 1000); }));
+//        console.log(topojson.feature(us, us.objects.states));
+
+
+//        svg.insert("path", ".graticule")
+//                .datum(topojson.feature(us, us.objects.land))
+//                .attr("class", "land")
+//                .attr("d", path);
+//
+//        svg.insert("path", ".graticule")
+//                .datum(topojson.mesh(us, us.objects.counties, function(a, b) { return a !== b && !(a.id / 1000 ^ b.id / 1000); }))
+//                .attr("class", "county-boundary")
+//                .attr("d", path);
+//
+//        svg.insert("path", ".graticule")
+//                .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+//                .attr("class", "state-boundary")
+//                .attr("d", path);
+    });
+
+    d3.select(self.frameElement).style("height", height + "px");
+
+</script>

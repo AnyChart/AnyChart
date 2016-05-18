@@ -18,6 +18,7 @@ goog.require('anychart.core.ui.ColorRange');
 goog.require('anychart.core.utils.Animation');
 goog.require('anychart.core.utils.GeoJSONParser');
 goog.require('anychart.core.utils.MapInteractivity');
+goog.require('anychart.core.utils.TopoJSONParser');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.core.utils.UnboundRegionsSettings');
 goog.require('anychart.math.Rect');
@@ -1964,10 +1965,14 @@ anychart.charts.Map.prototype.calculateGeoScale = function() {
     if (goog.isDefAndNotNull(geoData)) {
       if ((goog.isString(geoData) && goog.string.startsWith(geoData, '<')) || goog.dom.isNodeLike(geoData)) {
         //todo (blackart): Here will be svg parsing. coming soon ...
-      }
-      geoData = goog.isString(this.geoData_) ? goog.dom.getWindow()['anychart']['maps'][this.geoData_] : this.geoData_;
+      } else {
+        geoData = goog.isString(this.geoData_) ? goog.dom.getWindow()['anychart']['maps'][this.geoData_] : this.geoData_;
+        var parser = geoData['type'].toLowerCase() === 'topology' ?
+            anychart.core.utils.TopoJSONParser.getInstance() :
+            anychart.core.utils.GeoJSONParser.getInstance();
 
-      this.internalSourceGeoData = anychart.core.utils.GeoJSONParser.getInstance().parse(/** @type {Object} */(geoData));
+        this.internalSourceGeoData = parser.parse(/** @type {Object} */(geoData));
+      }
       goog.dispose(this.internalGeoData);
       this.internalGeoData = null;
 
