@@ -41,6 +41,7 @@ anychart.core.drawers.Base.prototype.flags = (
     //anychart.core.drawers.Capabilities.NEEDS_SIZE_SCALE |
     //anychart.core.drawers.Capabilities.SUPPORTS_CONNECTING_MISSING |
     //anychart.core.drawers.Capabilities.SUPPORTS_STACK |
+    //anychart.core.drawers.Capabilities.SUPPORTS_COMPARISON |
     //anychart.core.drawers.Capabilities.SUPPORTS_ERROR |
     //anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS |
     //anychart.core.drawers.Capabilities.IS_DISCRETE_BASED |

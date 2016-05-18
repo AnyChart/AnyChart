@@ -1868,6 +1868,54 @@ anychart.enums.normalizeScaleStackMode = function(value, opt_default) {
 };
 
 
+/**
+ * Enum for scale changes mode. Currently this enum is equal to the ScaleStackMode, so we reuse it.
+ * @enum {string}
+ */
+anychart.enums.ScaleComparisonMode = anychart.enums.ScaleStackMode;
+
+
+/**
+ * Normalizes scale changes mode.
+ * @param {*} value Stack mode to normalize.
+ * @param {anychart.enums.ScaleComparisonMode=} opt_default Custom default value (defaults to NONE).
+ * @return {anychart.enums.ScaleComparisonMode}
+ */
+anychart.enums.normalizeScaleComparisonMode = anychart.enums.normalizeScaleStackMode;
+
+
+/**
+ * Enum for predefined part of LinearScale.chagnesFrom() acceptable values.
+ * @enum {string}
+ */
+anychart.enums.ScaleCompareWithMode = {
+  SERIES_START: 'seriesStart',
+  FIRST_VISIBLE: 'firstVisible'
+};
+
+
+/**
+ * Normalizes enum part of the value. To completely normalize passed value use
+ * anychart.enums.normalizeScaleCompareWithModeMode(value) || anychart.utils.normalizeTimestamp(value)
+ * @param {*} value
+ * @return {?anychart.enums.ScaleCompareWithMode}
+ */
+anychart.enums.normalizeScaleCompareWithModeMode = function(value) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'series':
+    case 'datastart':
+    case 'seriesstart':
+      return anychart.enums.ScaleCompareWithMode.SERIES_START;
+    case 'firstvisible':
+    case 'first':
+    case 'default':
+      return anychart.enums.ScaleCompareWithMode.FIRST_VISIBLE;
+  }
+  return null;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  ScatterTicksMode
@@ -5029,6 +5077,13 @@ goog.exportSymbol('anychart.enums.EventType.TREE_ITEM_UPDATE', anychart.enums.Ev
 goog.exportSymbol('anychart.enums.ScaleStackMode.NONE', anychart.enums.ScaleStackMode.NONE);
 goog.exportSymbol('anychart.enums.ScaleStackMode.VALUE', anychart.enums.ScaleStackMode.VALUE);
 goog.exportSymbol('anychart.enums.ScaleStackMode.PERCENT', anychart.enums.ScaleStackMode.PERCENT);
+
+goog.exportSymbol('anychart.enums.ScaleComparisonMode.NONE', anychart.enums.ScaleComparisonMode.NONE);
+goog.exportSymbol('anychart.enums.ScaleComparisonMode.VALUE', anychart.enums.ScaleComparisonMode.VALUE);
+goog.exportSymbol('anychart.enums.ScaleComparisonMode.PERCENT', anychart.enums.ScaleComparisonMode.PERCENT);
+
+goog.exportSymbol('anychart.enums.ScaleCompareWithMode.SERIES_START', anychart.enums.ScaleCompareWithMode.SERIES_START);
+goog.exportSymbol('anychart.enums.ScaleCompareWithMode.FIRST_VISIBLE', anychart.enums.ScaleCompareWithMode.FIRST_VISIBLE);
 
 goog.exportSymbol('anychart.enums.ScatterTicksMode.LINEAR', anychart.enums.ScatterTicksMode.LINEAR);
 goog.exportSymbol('anychart.enums.ScatterTicksMode.LOGARITHMIC', anychart.enums.ScatterTicksMode.LOGARITHMIC);

@@ -38,6 +38,7 @@ anychart.core.drawers.RangeSplineArea.prototype.flags = (
     // anychart.core.drawers.Capabilities.USES_STROKE_AS_FILL |
     anychart.core.drawers.Capabilities.SUPPORTS_CONNECTING_MISSING |
     // anychart.core.drawers.Capabilities.SUPPORTS_STACK |
+    // anychart.core.drawers.Capabilities.SUPPORTS_COMPARISON |
     // anychart.core.drawers.Capabilities.SUPPORTS_ERROR |
     // anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS |
     // anychart.core.drawers.Capabilities.IS_DISCRETE_BASED |

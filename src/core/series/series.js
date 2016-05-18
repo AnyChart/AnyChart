@@ -8,11 +8,11 @@ goog.require('anychart.enums');
  * @enum {number}
  */
 anychart.core.series.Capabilities = {
-  ALLOW_INTERACTIVITY: 1 << 16,
-  ALLOW_POINT_SETTINGS: 1 << 17,
-  ALLOW_ERROR: 1 << 18,
-  SUPPORTS_MARKERS: 1 << 19,
-  SUPPORTS_LABELS: 1 << 20,
+  ALLOW_INTERACTIVITY: 1 << 17,
+  ALLOW_POINT_SETTINGS: 1 << 18,
+  ALLOW_ERROR: 1 << 19,
+  SUPPORTS_MARKERS: 1 << 20,
+  SUPPORTS_LABELS: 1 << 21,
   /**
    * Combination of all states.
    */

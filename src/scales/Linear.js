@@ -41,8 +41,31 @@ anychart.scales.Linear = function() {
   this.logBaseVal = 10;
 
   this.stickToZeroFlag = true;
+
+  /**
+   * Polymorphic function to support different comparisons
+   * @param {*} value
+   * @param {number} comparisonZero
+   * @return {*}
+   * @private
+   */
+  this.applyComparison_ = this.makeNoneComparison_;
 };
 goog.inherits(anychart.scales.Linear, anychart.scales.ScatterBase);
+
+
+/**
+ * @type {anychart.enums.ScaleComparisonMode}
+ * @private
+ */
+anychart.scales.Linear.prototype.comparisonMode_ = anychart.enums.ScaleComparisonMode.NONE;
+
+
+/**
+ * @type {anychart.enums.ScaleCompareWithMode|number}
+ * @private
+ */
+anychart.scales.Linear.prototype.compareWith_ = anychart.enums.ScaleCompareWithMode.FIRST_VISIBLE;
 
 
 /** @inheritDoc */
@@ -158,6 +181,95 @@ anychart.scales.Linear.prototype.createTicks = function() {
 };
 
 
+/**
+ * Getter and setter for scale changes mode.
+ * @param {(string|anychart.enums.ScaleComparisonMode)=} opt_value
+ * @return {anychart.enums.ScaleComparisonMode|anychart.scales.Linear}
+ */
+anychart.scales.Linear.prototype.comparisonMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeScaleComparisonMode(opt_value);
+    if (this.comparisonMode_ != opt_value) {
+      this.comparisonMode_ = opt_value;
+      switch (this.comparisonMode_) {
+        case anychart.enums.ScaleComparisonMode.NONE:
+          this.applyComparison_ = this.makeNoneComparison_;
+          break;
+        case anychart.enums.ScaleComparisonMode.VALUE:
+          this.applyComparison_ = this.makeValuesComparison_;
+          break;
+        case anychart.enums.ScaleComparisonMode.PERCENT:
+          this.applyComparison_ = this.makePercentComparison_;
+          break;
+      }
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION | anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  }
+  return this.comparisonMode_;
+};
+
+
+/**
+ * Getter and setter for date which should be used as a changes zero for series.
+ * @param {(string|anychart.enums.ScaleCompareWithMode|number|Date)=} opt_value
+ * @return {anychart.enums.ScaleCompareWithMode|number|anychart.scales.Linear}
+ */
+anychart.scales.Linear.prototype.compareWith = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeScaleCompareWithModeMode(opt_value) || anychart.utils.normalizeTimestamp(opt_value);
+    if (this.compareWith_ != opt_value) {
+      this.compareWith_ = opt_value;
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION | anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  }
+  return this.compareWith_;
+};
+
+
+/** @inheritDoc */
+anychart.scales.Linear.prototype.applyComparison = function(value, comparisonZero) {
+  return this.applyComparison_(value, comparisonZero);
+};
+
+
+/**
+ * Polymorphic function to calculate NONE comparison.
+ * @param {*} value
+ * @param {number} comparisonZero
+ * @return {*}
+ * @private
+ */
+anychart.scales.Linear.prototype.makeNoneComparison_ = function(value, comparisonZero) {
+  return value;
+};
+
+
+/**
+ * Polymorphic function to calculate VALUES comparison.
+ * @param {*} value
+ * @param {number} comparisonZero
+ * @return {*}
+ * @private
+ */
+anychart.scales.Linear.prototype.makeValuesComparison_ = function(value, comparisonZero) {
+  return anychart.utils.toNumber(value) - comparisonZero;
+};
+
+
+/**
+ * Polymorphic function to calculate PERCENT comparison.
+ * @param {*} value
+ * @param {number} comparisonZero
+ * @return {*}
+ * @private
+ */
+anychart.scales.Linear.prototype.makePercentComparison_ = function(value, comparisonZero) {
+  return (anychart.utils.toNumber(value) - comparisonZero) / (comparisonZero || 1) * 100;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //  Serialize & Deserialize
 //----------------------------------------------------------------------------------------------------------------------
@@ -212,3 +324,6 @@ anychart.scales.Linear.prototype['softMinimum'] = anychart.scales.Linear.prototy
 anychart.scales.Linear.prototype['softMaximum'] = anychart.scales.Linear.prototype.softMaximum;
 anychart.scales.Linear.prototype['minimumGap'] = anychart.scales.Linear.prototype.minimumGap;//doc|ex
 anychart.scales.Linear.prototype['maximumGap'] = anychart.scales.Linear.prototype.maximumGap;//doc|ex
+anychart.scales.Linear.prototype['comparisonMode'] = anychart.scales.Linear.prototype.comparisonMode;
+anychart.scales.Linear.prototype['compareWith'] = anychart.scales.Linear.prototype.compareWith;
+

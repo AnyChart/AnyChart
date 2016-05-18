@@ -85,6 +85,17 @@ anychart.scales.Base.prototype.transformInternal = function(key, index, opt_subR
 
 
 /**
+ * Function to apply NONE comparison.
+ * @param {*} value
+ * @param {number} comparisonZero
+ * @return {*}
+ */
+anychart.scales.Base.prototype.applyComparison = function(value, comparisonZero) {
+  return value;
+};
+
+
+/**
  * Sets scale zoom and requests scale reapplication.
  * @param {number} factor
  * @param {number} start

@@ -114,6 +114,12 @@ anychart.core.series.Base = function(chart, plot, type, config) {
    */
   this.clipElement_ = null;
 
+  /**
+   * A comparison-zeroed value. This value should be substracted from all values series draw.
+   * @type {number}
+   */
+  this.comparisonZero = 0;
+
   this.applyConfig(config);
 };
 goog.inherits(anychart.core.series.Base, anychart.core.VisualBaseWithBounds);
@@ -632,6 +638,15 @@ anychart.core.series.Base.prototype.supportsPointSettings = function() {
  */
 anychart.core.series.Base.prototype.supportsStack = function() {
   return this.check(anychart.core.drawers.Capabilities.SUPPORTS_STACK);
+};
+
+
+/**
+ * Whether series can be drawn in comparison mode.
+ * @return {boolean} .
+ */
+anychart.core.series.Base.prototype.supportsComparison = function() {
+  return this.check(anychart.core.drawers.Capabilities.SUPPORTS_COMPARISON);
 };
 
 
@@ -2872,7 +2887,7 @@ anychart.core.series.Base.prototype.makePointMeta = function(rowInfo, yNames, yC
         rowInfo.meta(anychart.opt.ZERO_MISSING, false);
       }
       for (i = 0; i < yColumns.length; i++) {
-        val = yScale.transform(rowInfo.getColumn(yColumns[i]), 0.5);
+        val = yScale.transform(yScale.applyComparison(rowInfo.getColumn(yColumns[i]), this.comparisonZero), 0.5);
         if (isNaN(val)) pointMissing |= anychart.core.series.PointAbsenceReason.VALUE_FIELD_MISSING;
         rowInfo.meta(yNames[i], this.applyRatioToBounds(val, false));
       }
@@ -2888,7 +2903,14 @@ anychart.core.series.Base.prototype.makePointMeta = function(rowInfo, yNames, yC
       if (goog.isArray(outliersSource)) {
         for (i = 0; i < outliersSource.length; i++) {
           if (!yScale.isMissing(outliersSource[i]))
-            outliers.push(this.applyRatioToBounds(yScale.transform(outliersSource[i], 0.5), false));
+            outliers.push(
+                this.applyRatioToBounds(
+                    yScale.transform(
+                        yScale.applyComparison(
+                            outliersSource[i],
+                            this.comparisonZero),
+                        0.5),
+                    false));
         }
       }
       rowInfo.meta(anychart.opt.OUTLIERS, outliers);
@@ -3771,7 +3793,6 @@ anychart.core.series.Base.prototype.statistics = function(opt_name, opt_value) {
  * Calculate series statistics.
  */
 anychart.core.series.Base.prototype.calculateStatistics = goog.nullFunction;
-//endregion
 
 
 /**
@@ -3783,6 +3804,7 @@ anychart.core.series.Base.prototype.getStat = function(key) {
   this.chart.calculate();
   return this.statistics_[key];
 };
+//endregion
 
 
 //region Serialization/Deserialization/Dispose

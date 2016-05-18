@@ -738,6 +738,7 @@ anychart.charts.Stock.prototype.calculateScales_ = function() {
       series = plot.getAllSeries();
       for (j = 0; j < series.length; j++) {
         aSeries = series[j];
+        aSeries.updateComparisonZero();
         scale = /** @type {anychart.scales.Base} */(aSeries.yScale());
         if (scale.needsAutoCalc()) {
           scale.startAutoCalc();
@@ -753,6 +754,7 @@ anychart.charts.Stock.prototype.calculateScales_ = function() {
     series = this.scroller_.getAllSeries();
     for (j = 0; j < series.length; j++) {
       aSeries = series[j];
+      aSeries.updateComparisonZero();
       scale = /** @type {anychart.scales.Base} */(aSeries.yScale());
       if (scale.needsAutoCalc()) {
         scale.startAutoCalc();

@@ -130,6 +130,33 @@ anychart.core.series.Stock.prototype.getPostLastPoint = function() {
 anychart.core.series.Stock.prototype.getMainChart = function() {
   return /** @type {anychart.charts.Stock} */(this.chart);
 };
+
+
+/**
+ * Setups comparison zero.
+ */
+anychart.core.series.Stock.prototype.updateComparisonZero = function() {
+  /** @type {?anychart.data.TableSelectable.RowProxy} */
+  var row;
+  var scale = this.yScale();
+  if (this.supportsComparison() && (scale instanceof anychart.scales.Linear)) {
+    var mode = /** @type {anychart.enums.ScaleComparisonMode} */(scale.comparisonMode());
+    if (mode != anychart.enums.ScaleComparisonMode.NONE) {
+      var changesFrom = /** @type {anychart.enums.ScaleCompareWithMode|number} */(scale.compareWith());
+      if (changesFrom == anychart.enums.ScaleCompareWithMode.FIRST_VISIBLE) {
+        row = this.data_.getFirstVisibleRow();
+      } else {
+        row = this.data_.getRowFromMainStorage(
+            changesFrom == anychart.enums.ScaleCompareWithMode.SERIES_START ?
+                undefined :
+                /** @type {number} */(changesFrom));
+      }
+    }
+  }
+  // if we have found a row to get value from - we cast it to number
+  // if anything went wrong - we get 0 value and fail to make a comparison, which is a good result
+  this.comparisonZero = Number(row && row.get(anychart.opt.VALUE)) || 0;
+};
 //endregion
 
 
@@ -291,24 +318,25 @@ anychart.core.series.Stock.prototype.getScaleReferenceValues = function() {
   var columns = this.retrieveDataColumns();
   var res = [];
   if (columns) {
+    var yScale = /** @type {anychart.scales.Base} */(this.yScale());
     var i, len = columns.length;
     for (i = 0; i < len; i++) {
       var column = columns[i];
-      res.push(this.data_.getColumnMin(column));
-      res.push(this.data_.getColumnMax(column));
+      res.push(yScale.applyComparison(this.data_.getColumnMin(column), this.comparisonZero));
+      res.push(yScale.applyComparison(this.data_.getColumnMax(column), this.comparisonZero));
     }
 
     var row = this.data_.getPreFirstRow();
     if (row) {
       for (i = 0; i < len; i++) {
-        res.push(row.getColumn(columns[i]));
+        res.push(yScale.applyComparison(row.getColumn(columns[i]), this.comparisonZero));
       }
     }
 
     row = this.data_.getPostLastRow();
     if (row) {
       for (i = 0; i < len; i++) {
-        res.push(row.getColumn(columns[i]));
+        res.push(yScale.applyComparison(row.getColumn(columns[i]), this.comparisonZero));
       }
     }
   }
@@ -337,7 +365,7 @@ anychart.core.series.Stock.prototype.prepareHighlight = function(value) {
  * Updates last row. Used in plot.
  */
 anychart.core.series.Stock.prototype.updateLastRow = function() {
-  this.lastRow_ = this.data_.getLastRow();
+  this.lastRow_ = this.data_.getLastVisibleRow();
 };
 
 

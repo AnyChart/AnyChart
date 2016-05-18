@@ -209,11 +209,33 @@ anychart.data.TableSelectable.prototype.getPostLastRow = function() {
 
 /**
  * Returns the last row in current selection if there is one.
- * @return {anychart.data.TableSelectable.RowProxy}
+ * @return {?anychart.data.TableSelectable.RowProxy}
  */
-anychart.data.TableSelectable.prototype.getLastRow = function() {
+anychart.data.TableSelectable.prototype.getLastVisibleRow = function() {
   return this.wrapRow_(this.currentSelection_.lastRow, this.currentSelection_.lastIndex);
+};
 
+
+/**
+ * Returns the first row in current selection if there is one.
+ * @return {?anychart.data.TableSelectable.RowProxy}
+ */
+anychart.data.TableSelectable.prototype.getFirstVisibleRow = function() {
+  return this.wrapRow_(this.currentSelection_.firstRow, this.currentSelection_.firstIndex);
+};
+
+
+/**
+ * Returns a row wrapper from main storage if it exists. If no key passed - returns first row in storage.
+ * WARNING: row wrappers returned by this method do not have valid meta data.
+ * @param {number=} opt_key
+ * @return {?anychart.data.TableSelectable.RowProxy}
+ */
+anychart.data.TableSelectable.prototype.getRowFromMainStorage = function(opt_key) {
+  var mainStorage = this.mapping_.getTable().getStorage();
+  var index = goog.isDef(opt_key) ? mainStorage.searchIndex(opt_key, anychart.enums.TableSearchMode.EXACT) : 0;
+  var row = mainStorage.getRow(index);
+  return row ? new anychart.data.TableSelectable.RowProxy(row, this.mapping_, false, index, null) : null;
 };
 
 
