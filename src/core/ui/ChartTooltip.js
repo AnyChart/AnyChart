@@ -870,7 +870,7 @@ anychart.core.ui.ChartTooltip.prototype.updatePosition = function(clientX, clien
  * @param {anychart.core.ui.SeriesTooltip} tooltip
  * @param {number} clientX
  * @param {number} clientY
- * @param {anychart.core.series.Base=} opt_series
+ * @param {anychart.core.series.Base|anychart.charts.TreeMap=} opt_series
  * @private
  */
 anychart.core.ui.ChartTooltip.prototype.setPositionToTooltip_ = function(tooltip, clientX, clientY, opt_series) {

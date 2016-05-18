@@ -54,7 +54,7 @@ goog.provide('anychart.themes.defaultTheme');
    */
   var returnNameWithValue = function() {
     var name = this['name'] || this['getDataValue']('id');
-    return name + '\n' + this['value'];
+    return name + '\n' + parseFloat(this['value']).toFixed(2);
   };
 
 
