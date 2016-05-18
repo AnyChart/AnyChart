@@ -1760,11 +1760,11 @@ anychart.charts.TreeMap.prototype.createTooltipContextProvider = function() {
 
 /**
  * Creates position provider for point.
- * @param {anychart.math.Rect} bounds Point bounds.
  * @param {anychart.enums.Anchor} anchor Label anchor.
  * @return {*} Position provider.
  */
-anychart.charts.TreeMap.prototype.createPositionProvider = function(bounds, anchor) {
+anychart.charts.TreeMap.prototype.createPositionProvider = function(anchor) {
+  var bounds = /** @type {anychart.math.Rect} */ (this.getIterator().meta(anychart.charts.TreeMap.DataFields.POINT_BOUNDS));
   anchor = anychart.enums.normalizeAnchor(anchor);
   return {
     'value': anychart.utils.getCoordinateByAnchor(bounds, anchor)
@@ -2044,7 +2044,7 @@ anychart.charts.TreeMap.prototype.configureLabel = function(pointState, isHeader
 
   if (isDraw) {
     var anchor = this.getLabelsAnchor(pointState, isHeader);
-    var positionProvider = this.createPositionProvider(bounds, anchor);
+    var positionProvider = this.createPositionProvider(anchor);
     var formatProvider = this.createFormatProvider();
     if (label) {
       factory.dropCallsCache(index);
@@ -2493,10 +2493,6 @@ anychart.charts.TreeMap.prototype.drawNode_ = function(node, bounds, depth) {
       contentBounds = this.getBoundsForContent_(bounds, pointBounds);
       node.meta(anychart.charts.TreeMap.DataFields.POINT_BOUNDS, pointBounds);
       node.meta(anychart.charts.TreeMap.DataFields.CONTENT_BOUNDS, contentBounds);
-      // this kind of thing need for tooltip's positionMode=point
-      // because it uses iterator.meta('x').meta('y') to calculate
-      // tooltip's coordinate
-      node.meta('x', pointBounds.left).meta('y', pointBounds.top);
     }
     if (type == anychart.charts.TreeMap.NodeType.RECT || type == anychart.charts.TreeMap.NodeType.TRANSIENT) {
       pointBounds = bounds.clone();
