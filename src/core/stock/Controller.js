@@ -106,6 +106,34 @@ anychart.core.stock.Controller = function() {
   };
 
   /**
+   * First key of data.
+   * @type {number}
+   * @private
+   */
+  this.dataFirstKey_ = NaN;
+
+  /**
+   * Last key of data.
+   * @type {number}
+   * @private
+   */
+  this.dataLastKey_ = NaN;
+
+  /**
+   * First key with alignment.
+   * @type {number}
+   * @private
+   */
+  this.alignedFirstKey_ = NaN;
+
+  /**
+   * Last key with alignment.
+   * @type {number}
+   * @private
+   */
+  this.alignedLastKey_ = NaN;
+
+  /**
    * Last pixel width considered by the controller.
    * @type {number}
    * @private
@@ -198,6 +226,26 @@ anychart.core.stock.Controller.prototype.deregisterSource = function(selectable)
 
 
 /**
+ * Refreshes full data range boundaries.
+ * @return {boolean} Returns true if the full range have changed.
+ */
+anychart.core.stock.Controller.prototype.refreshFullRange = function() {
+  if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_DATA)) {
+    this.updateMainRegistry();
+    var range = this.mainRegistry_.getBoundariesInfo();
+    if (this.alignedFirstKey_ != range[2] || this.alignedLastKey_ != range[3]) {
+      this.dataFirstKey_ = range[0];
+      this.dataLastKey_ = range[1];
+      this.alignedFirstKey_ = range[2];
+      this.alignedLastKey_ = range[3];
+      return true;
+    }
+  }
+  return false;
+};
+
+
+/**
  * Refreshes current selection after data or bounds update. Returns update status:
  *    0 - nothing changed;
  *    1 - data selection update;
@@ -207,22 +255,22 @@ anychart.core.stock.Controller.prototype.deregisterSource = function(selectable)
  * @return {number}
  */
 anychart.core.stock.Controller.prototype.refreshSelection = function(newPixelWidth) {
-  this.updateMainRegistry();
+  this.refreshFullRange();
+  var alignedFirst = this.getFirstKey();
+  var alignedLast = this.getLastKey();
+
   // we check main registry change in this manner, because there can be attempts to update main registry before
   // selection refreshing.
   var mainRegistryUpdated = this.hasInvalidationState(anychart.ConsistencyState.STOCK_DATA);
 
   this.currentPixelWidth_ = newPixelWidth;
 
-  var veryFirst = this.mainRegistry_.getFirstKey();
-  var veryLast = this.mainRegistry_.getLastKey();
-
   var startKey = this.currentSelection_.startKey;
-  if (isNaN(startKey) || (this.currentSelectionSticksLeft() && !isNaN(veryFirst)))
-    startKey = veryFirst;
+  if (isNaN(startKey) || (this.currentSelectionSticksLeft() && !isNaN(alignedFirst)))
+    startKey = alignedFirst;
   var endKey = this.currentSelection_.endKey;
-  if (isNaN(endKey) || (this.currentSelectionSticksRight() && !isNaN(veryLast)))
-    endKey = veryLast;
+  if (isNaN(endKey) || (this.currentSelectionSticksRight() && !isNaN(alignedLast)))
+    endKey = alignedLast;
 
   var result = 0;
   if (!isNaN(startKey)) {
@@ -241,8 +289,8 @@ anychart.core.stock.Controller.prototype.refreshSelection = function(newPixelWid
     }
 
     var scrollerSelectionChanged = this.select_(
-        veryFirst,
-        veryLast,
+        alignedFirst,
+        alignedLast,
         this.scrollerGrouping_,
         this.scrollerSources_,
         this.currentScrollerRegistry_,
@@ -315,7 +363,7 @@ anychart.core.stock.Controller.prototype.select_ = function(startKey, endKey, gr
 
   // todo: improve this strategy
   if (endKey - startKey < 1) {
-    if (endKey > this.mainRegistry_.getFirstKey())
+    if (endKey > this.getFirstKey())
       startKey = endKey - 1;
     else
       endKey = startKey + 1;
@@ -350,7 +398,7 @@ anychart.core.stock.Controller.prototype.select_ = function(startKey, endKey, gr
     var selection = registry.getSelection(startKey, endKey);
     if (registry.isInSyncMode()) {
       for (hash in sources)
-        sources[hash].selectFast(startKey, endKey, selection.firstIndex, selection.lastIndex, interval);
+        sources[hash].selectFast(startKey, endKey, selection.preFirstIndex, selection.postLastIndex, interval);
     } else {
       for (hash in sources)
         sources[hash].selectInternal(startKey, endKey, interval);
@@ -481,28 +529,31 @@ anychart.core.stock.Controller.prototype.updateMainRegistry = function() {
 
 
 /**
- * Returns current registry selection.
+ * Updates current range for scale.
  * @param {anychart.scales.StockScatterDateTime} scale
  * @param {boolean} forScroller
  */
-anychart.core.stock.Controller.prototype.updateCurrentRangeForScale = function(scale, forScroller) {
+anychart.core.stock.Controller.prototype.updateCurrentScaleRange = function(scale, forScroller) {
   var selection, interval;
-  var veryFirst = this.mainRegistry_.getFirstKey();
-  var veryLast = this.mainRegistry_.getLastKey();
   if (forScroller) {
     selection = this.currentScrollerSelection_;
-    interval = this.grouping().getCurrentDataInterval();
+    interval = this.scrollerGrouping().getCurrentDataInterval();
   } else {
     selection = this.currentSelection_;
-    interval = this.scrollerGrouping().getCurrentDataInterval();
+    interval = this.grouping().getCurrentDataInterval();
   }
   scale.setCurrentRange(
-      goog.math.clamp(selection.startKey, veryFirst, veryLast),
-      goog.math.clamp(selection.endKey, veryFirst, veryLast),
-      // effectively equals to clamping :)
-      isNaN(selection.preFirstIndex) ? selection.firstIndex : selection.startIndex,
-      isNaN(selection.postLastIndex) ? selection.lastIndex : selection.endIndex,
+      selection.startKey, selection.endKey,
       interval.unit, interval.count);
+};
+
+
+/**
+ * Updates auto full range for scale.
+ * @param {anychart.scales.StockScatterDateTime} scale
+ */
+anychart.core.stock.Controller.prototype.updateFullScaleRange = function(scale) {
+  scale.setAutoFullRange(this.getFirstKey(), this.getLastKey(), this.dataFirstKey_, this.dataLastKey_);
 };
 
 
@@ -557,24 +608,12 @@ anychart.core.stock.Controller.prototype.getScrollerIndexByKey = function(key) {
 
 
 /**
- * Returns key by index. Index can be fractional - the key will be inter- or extrapolated.
- * @param {number} index
- * @return {number}
- */
-anychart.core.stock.Controller.prototype.getMainRegistryKey = function(index) {
-  this.updateMainRegistry();
-  return this.mainRegistry_.getKeyByIndex(index);
-};
-
-
-/**
- * Returns index by key. If the key is not in the registry - returns fractional inter/extrapolated index for it.
+ * Aligns passed timestamp to current registry points set.
  * @param {number} key
  * @return {number}
  */
-anychart.core.stock.Controller.prototype.getMainRegistryIndex = function(key) {
-  this.updateMainRegistry();
-  return this.mainRegistry_.getIndexByKey(key);
+anychart.core.stock.Controller.prototype.alignHighlight = function(key) {
+  return this.currentRegistry_.alignKey(key);
 };
 //endregion
 
@@ -590,8 +629,7 @@ anychart.core.stock.Controller.prototype.getMainRegistryIndex = function(key) {
  * @return {number}
  */
 anychart.core.stock.Controller.prototype.getFirstKey = function() {
-  this.updateMainRegistry();
-  return this.mainRegistry_.getFirstKey();
+  return this.alignedFirstKey_;
 };
 
 
@@ -600,28 +638,7 @@ anychart.core.stock.Controller.prototype.getFirstKey = function() {
  * @return {number}
  */
 anychart.core.stock.Controller.prototype.getLastKey = function() {
-  this.updateMainRegistry();
-  return this.mainRegistry_.getLastKey();
-};
-
-
-/**
- * Returns the first index in the main registry.
- * @return {number}
- */
-anychart.core.stock.Controller.prototype.getFirstIndex = function() {
-  this.updateMainRegistry();
-  return this.mainRegistry_.getFirstIndex();
-};
-
-
-/**
- * Returns the last index in the main registry.
- * @return {number}
- */
-anychart.core.stock.Controller.prototype.getLastIndex = function() {
-  this.updateMainRegistry();
-  return this.mainRegistry_.getLastIndex();
+  return this.alignedLastKey_;
 };
 
 

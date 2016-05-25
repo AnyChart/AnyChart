@@ -1187,6 +1187,17 @@ anychart.core.stock.Plot.prototype.draw = function() {
 
   this.resumeSignalsDispatching(false);
 
+  // this is a debug code and should remain until we finally decide what to do with auto gaps
+  // if (!this.__zeroPath)
+  //   this.__zeroPath = this.container().getStage().rect().zIndex(1000).stroke('3 red');
+  // var s = this.getSeriesAt(0);
+  // var b = this.seriesBounds_;
+  // var l = this.chart_.xScale().transform(this.chart_.dataController_.getFirstSelectedKey());
+  // var r = this.chart_.xScale().transform(this.chart_.dataController_.getLastSelectedKey());
+  // var tmp = s.applyRatioToBounds(l, true);
+  // this.__zeroPath.setY(b.top).setHeight(b.height).setX(tmp).setWidth(s.applyRatioToBounds(r, true) - tmp);
+
+
   return this;
 };
 

@@ -101,7 +101,7 @@ anychart.core.utils.DateTimeIntervalGenerator = function(unit, count) {
 
 /**
  * Aligns current position to the left by current unit and count and shifts left for one interval.
- * @type {function(this:anychart.core.utils.DateTimeIntervalGenerator)}
+ * @type {function(this:anychart.core.utils.DateTimeIntervalGenerator, Date=)}
  * @private
  */
 anychart.core.utils.DateTimeIntervalGenerator.prototype.align_;
@@ -123,6 +123,37 @@ anychart.core.utils.DateTimeIntervalGenerator.prototype.next;
 
 
 /**
+ * Aligns passed dates to an interval.
+ * @param {number} firstDate
+ * @param {number} lastDate
+ * @return {Array.<number>}
+ */
+anychart.core.utils.DateTimeIntervalGenerator.prototype.getAlignedBoundaries = function(firstDate, lastDate) {
+  var res = [];
+  this.setStart(firstDate);
+  // the first version produces non expanded boundaries,
+  // while the second one produces boundaries expanded by a half of the interval
+  // do not remove commented-out part until the decision is made on how we handle
+  // range distortions caused by grouping (DVF-
+  //*
+  res.push(this.next());
+  var tmp = new Date(this.date_.getTime());
+  this.date_.setTime(lastDate);
+  this.align_(tmp);
+  res.push(this.next());
+  /*/
+  var current = this.date_.getTime();
+  res.push((this.next() + current) / 2);
+  var tmp = new Date(this.date_.getTime());
+  this.date_.setTime(lastDate);
+  this.align_(tmp);
+  res.push((this.next() + this.next()) / 2);
+  //*/
+  return res;
+};
+
+
+/**
  * Sets generator current position to the date previous to aligned passed value.
  * Known issue - for complex intervals like P2Y3D aligning works unstable.
  * @param {number} value Date to start iteration from.
@@ -137,55 +168,53 @@ anychart.core.utils.DateTimeIntervalGenerator.prototype.setStart = function(valu
 
 /**
  * Aligns by years.
+ * @param {Date=} opt_baseDate
  * @private
  */
-anychart.core.utils.DateTimeIntervalGenerator.prototype.alignYears_ = function() {
-  var year = anychart.utils.alignLeft(this.date_.getUTCFullYear(), this.count_, 2000) - this.count_;
+anychart.core.utils.DateTimeIntervalGenerator.prototype.alignYears_ = function(opt_baseDate) {
+  var baseValue = opt_baseDate ? opt_baseDate.getUTCFullYear() : 2000;
+  var year = anychart.utils.alignLeft(this.date_.getUTCFullYear(), this.count_, baseValue) - this.count_;
   this.date_.setTime(Date.UTC(year, 0));
 };
 
 
 /**
  * Aligns by semesters.
+ * @param {Date=} opt_baseDate
  * @private
  */
-anychart.core.utils.DateTimeIntervalGenerator.prototype.alignSemesters_ = function() {
-  var val = anychart.utils.alignLeft(
-      this.date_.getUTCMonth() + this.date_.getUTCFullYear() * 12,
-      this.count_ * 6,
-      2000 * 12) - this.count_ * 6;
-  var year = Math.floor(val / 12);
-  var month = val % 12;
-  if (month < 0) month += 12;
-  this.date_.setTime(Date.UTC(year, month));
+anychart.core.utils.DateTimeIntervalGenerator.prototype.alignSemesters_ = function(opt_baseDate) {
+  var tmp = this.count_;
+  this.count_ *= 6;
+  this.alignMonths_(opt_baseDate);
+  this.count_ = tmp;
 };
 
 
 /**
  * Aligns by quarters.
+ * @param {Date=} opt_baseDate
  * @private
  */
-anychart.core.utils.DateTimeIntervalGenerator.prototype.alignQuarters_ = function() {
-  var val = anychart.utils.alignLeft(
-      this.date_.getUTCMonth() + this.date_.getUTCFullYear() * 12,
-      this.count_ * 3,
-      2000 * 12) - this.count_ * 3;
-  var year = Math.floor(val / 12);
-  var month = val % 12;
-  if (month < 0) month += 12;
-  this.date_.setTime(Date.UTC(year, month));
+anychart.core.utils.DateTimeIntervalGenerator.prototype.alignQuarters_ = function(opt_baseDate) {
+  var tmp = this.count_;
+  this.count_ *= 3;
+  this.alignMonths_(opt_baseDate);
+  this.count_ = tmp;
 };
 
 
 /**
  * Aligns by months.
+ * @param {Date=} opt_baseDate
  * @private
  */
-anychart.core.utils.DateTimeIntervalGenerator.prototype.alignMonths_ = function() {
+anychart.core.utils.DateTimeIntervalGenerator.prototype.alignMonths_ = function(opt_baseDate) {
+  var baseValue = opt_baseDate ? (opt_baseDate.getUTCMonth() + opt_baseDate.getUTCFullYear() * 12) : (2000 * 12);
   var val = anychart.utils.alignLeft(
       this.date_.getUTCMonth() + this.date_.getUTCFullYear() * 12,
       this.count_,
-      2000 * 12) - this.count_;
+      baseValue) - this.count_;
   var year = Math.floor(val / 12);
   var month = val % 12;
   if (month < 0) month += 12;
@@ -195,26 +224,20 @@ anychart.core.utils.DateTimeIntervalGenerator.prototype.alignMonths_ = function(
 
 /**
  * Aligns by third of months.
+ * @param {Date=} opt_baseDate
  * @private
  */
-anychart.core.utils.DateTimeIntervalGenerator.prototype.alignThirdOfMonths_ = function() {
-  var decade;
-  var date = this.date_.getUTCDate();
-  if (date <= 10)
-    decade = 0;
-  else if (date <= 20)
-    decade = 1;
-  else
-    decade = 2;
-  var val = anychart.utils.alignLeft(
-      (this.date_.getUTCFullYear() * 12 + this.date_.getUTCMonth()) * 3 + decade,
+anychart.core.utils.DateTimeIntervalGenerator.prototype.alignThirdOfMonths_ = function(opt_baseDate) {
+  var baseValue = opt_baseDate ? this.getDecadeNumber_(opt_baseDate) : (2000 * 12 * 3);
+  var decade = anychart.utils.alignLeft(
+      this.getDecadeNumber_(this.date_),
       this.count_,
-      2000 * 12 * 3) - this.count_;
-  var year = Math.floor(val / 36);
-  val %= 36;
-  var month = Math.floor(val / 3);
+      baseValue) - this.count_;
+  var year = Math.floor(decade / 36);
+  decade %= 36;
+  var month = Math.floor(decade / 3);
   if (month < 0) month += 12;
-  decade = val % 3;
+  decade = decade % 3;
   if (decade < 0) decade += 3;
   this.date_.setTime(Date.UTC(year, month, 1 + decade * 10));
 };
@@ -222,62 +245,93 @@ anychart.core.utils.DateTimeIntervalGenerator.prototype.alignThirdOfMonths_ = fu
 
 /**
  * Aligns by weeks.
+ * @param {Date=} opt_baseDate
  * @private
  */
-anychart.core.utils.DateTimeIntervalGenerator.prototype.alignWeeks_ = function() {
-  var time = this.count_ * 1000 * 60 * 60 * 24 * 7;
+anychart.core.utils.DateTimeIntervalGenerator.prototype.alignWeeks_ = function(opt_baseDate) {
   // we align relative to the 2nd of Jan, 2000 because it's Sunday
-  this.date_.setTime(anychart.utils.alignLeft(this.date_.getTime(), time, Date.UTC(2000, 0, 2)) - time);
+  this.alignTime_(this.count_ * 1000 * 60 * 60 * 24 * 7, opt_baseDate || new Date(Date.UTC(2000, 0, 2)));
 };
 
 
 /**
  * Aligns by days.
+ * @param {Date=} opt_baseDate
  * @private
  */
-anychart.core.utils.DateTimeIntervalGenerator.prototype.alignDays_ = function() {
-  var time = this.count_ * 1000 * 60 * 60 * 24;
-  this.date_.setTime(anychart.utils.alignLeft(this.date_.getTime(), time, Date.UTC(2000, 0)) - time);
+anychart.core.utils.DateTimeIntervalGenerator.prototype.alignDays_ = function(opt_baseDate) {
+  this.alignTime_(this.count_ * 1000 * 60 * 60 * 24, opt_baseDate);
 };
 
 
 /**
  * Aligns by hours.
+ * @param {Date=} opt_baseDate
  * @private
  */
-anychart.core.utils.DateTimeIntervalGenerator.prototype.alignHours_ = function() {
-  var time = this.count_ * 1000 * 60 * 60;
-  this.date_.setTime(anychart.utils.alignLeft(this.date_.getTime(), time, Date.UTC(2000, 0)) - time);
+anychart.core.utils.DateTimeIntervalGenerator.prototype.alignHours_ = function(opt_baseDate) {
+  this.alignTime_(this.count_ * 1000 * 60 * 60, opt_baseDate);
 };
 
 
 /**
  * Aligns by minutes.
+ * @param {Date=} opt_baseDate
  * @private
  */
-anychart.core.utils.DateTimeIntervalGenerator.prototype.alignMinutes_ = function() {
-  var time = this.count_ * 1000 * 60;
-  this.date_.setTime(anychart.utils.alignLeft(this.date_.getTime(), time, Date.UTC(2000, 0)) - time);
+anychart.core.utils.DateTimeIntervalGenerator.prototype.alignMinutes_ = function(opt_baseDate) {
+  this.alignTime_(this.count_ * 1000 * 60, opt_baseDate);
 };
 
 
 /**
  * Aligns by seconds.
+ * @param {Date=} opt_baseDate
  * @private
  */
-anychart.core.utils.DateTimeIntervalGenerator.prototype.alignSeconds_ = function() {
-  var time = this.count_ * 1000;
-  this.date_.setTime(anychart.utils.alignLeft(this.date_.getTime(), time, Date.UTC(2000, 0)) - time);
+anychart.core.utils.DateTimeIntervalGenerator.prototype.alignSeconds_ = function(opt_baseDate) {
+  this.alignTime_(this.count_ * 1000, opt_baseDate);
 };
 
 
 /**
  * Aligns by milliseconds.
+ * @param {Date=} opt_baseDate
  * @private
  */
-anychart.core.utils.DateTimeIntervalGenerator.prototype.alignMilliseconds_ = function() {
-  var time = this.count_;
-  this.date_.setTime(anychart.utils.alignLeft(this.date_.getTime(), time, Date.UTC(2000, 0)) - time);
+anychart.core.utils.DateTimeIntervalGenerator.prototype.alignMilliseconds_ = function(opt_baseDate) {
+  this.alignTime_(this.count_, opt_baseDate);
+};
+
+
+/**
+ * This is an internal method that is used by other alignments.
+ * @param {number} interval
+ * @param {Date=} opt_baseDate
+ * @private
+ */
+anychart.core.utils.DateTimeIntervalGenerator.prototype.alignTime_ = function(interval, opt_baseDate) {
+  var baseDate = opt_baseDate ? opt_baseDate.getTime() : Date.UTC(2000, 0);
+  this.date_.setTime(anychart.utils.alignLeft(this.date_.getTime(), interval, baseDate) - interval);
+};
+
+
+/**
+ * Returns "absolute" decade number.
+ * @param {Date} date
+ * @return {number}
+ * @private
+ */
+anychart.core.utils.DateTimeIntervalGenerator.prototype.getDecadeNumber_ = function(date) {
+  var decade;
+  var dayNumber = date.getUTCDate();
+  if (dayNumber <= 10)
+    decade = 0;
+  else if (dayNumber <= 20)
+    decade = 1;
+  else
+    decade = 2;
+  return (date.getUTCFullYear() * 12 + date.getUTCMonth()) * 3 + decade;
 };
 
 

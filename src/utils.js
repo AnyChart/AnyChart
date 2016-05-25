@@ -470,6 +470,8 @@ anychart.utils.alignDateLeft = function(date, interval, flagDateValue) {
   } else if (interval.months) {
     months = anychart.utils.alignLeft(months, interval.months);
     return Date.UTC(years, months);
+  } else if (interval.days && interval.days % 7 == 0) { // weeks
+    return anychart.utils.alignLeft(dateObj.getTime(), interval.days * 1000 * 60 * 60 * 24, Date.UTC(2000, 0, 2));
   } else if (interval.days) {
     days = anychart.utils.alignLeft(days, interval.days);
     return Date.UTC(years, months, days);
@@ -1333,6 +1335,41 @@ anychart.utils.getKeys = function(obj) {
       res[i++] = key;
   }
   return res;
+};
+
+
+/**
+ * Returns interval range.
+ * @param {anychart.enums.Interval} unit
+ * @param {number} count
+ * @return {number}
+ */
+anychart.utils.getIntervalRange = function(unit, count) {
+  switch (unit) {
+    case anychart.enums.Interval.YEAR:
+      return count * 1000 * 60 * 60 * 24 * 365.25;
+    case anychart.enums.Interval.SEMESTER:
+      return count * 1000 * 60 * 60 * 24 * 365.25 / 2;
+    case anychart.enums.Interval.QUARTER:
+      return count * 1000 * 60 * 60 * 24 * 365.25 / 4;
+    case anychart.enums.Interval.MONTH:
+      return count * 1000 * 60 * 60 * 24 * 365.25 / 12;
+    case anychart.enums.Interval.THIRD_OF_MONTH:
+      return count * 1000 * 60 * 60 * 24 * 365.25 / 36;
+    case anychart.enums.Interval.WEEK:
+      return count * 1000 * 60 * 60 * 24 * 7;
+    case anychart.enums.Interval.DAY:
+      return count * 1000 * 60 * 60 * 24;
+    case anychart.enums.Interval.HOUR:
+      return count * 1000 * 60 * 60;
+    case anychart.enums.Interval.MINUTE:
+      return count * 1000 * 60;
+    case anychart.enums.Interval.SECOND:
+      return count * 1000;
+    case anychart.enums.Interval.MILLISECOND:
+    default:
+      return count;
+  }
 };
 
 
