@@ -154,6 +154,11 @@ anychart.data.TableSelectable.prototype.getIterator = function() {
  * @return {!anychart.data.TableSelectable}
  */
 anychart.data.TableSelectable.prototype.selectInternal = function(startKey, endKey, opt_interval) {
+  if (startKey > endKey) { // if any of it is NaN, condition fails
+    var tmp = startKey;
+    startKey = endKey;
+    endKey = tmp;
+  }
   var storage = this.mapping_.getTable().getStorage(opt_interval);
   if (this.selectionInvalid_ ||
       storage != this.currentStorage_ ||
@@ -194,7 +199,7 @@ anychart.data.TableSelectable.prototype.wrapRow_ = function(row, rowIndexInStora
  * @return {anychart.data.TableSelectable.RowProxy}
  */
 anychart.data.TableSelectable.prototype.getPreFirstRow = function() {
-  return this.wrapRow_(this.currentSelection_.preFirstRow, this.currentSelection_.firstIndex - 1);
+  return this.wrapRow_(this.currentSelection_.preFirstRow, this.currentSelection_.preFirstIndex);
 };
 
 
@@ -203,7 +208,7 @@ anychart.data.TableSelectable.prototype.getPreFirstRow = function() {
  * @return {anychart.data.TableSelectable.RowProxy}
  */
 anychart.data.TableSelectable.prototype.getPostLastRow = function() {
-  return this.wrapRow_(this.currentSelection_.postLastRow, this.currentSelection_.lastIndex + 1);
+  return this.wrapRow_(this.currentSelection_.postLastRow, this.currentSelection_.postLastIndex);
 };
 
 
@@ -319,11 +324,13 @@ anychart.data.TableSelectable.prototype.getExportingIterator = function() {
   var selection = {
     startKey: NaN,
     endKey: NaN,
+    preFirstIndex: NaN,
     firstIndex: firstIndex,
     lastIndex: lastIndex,
+    postLastIndex: NaN,
+    preFirstRow: null,
     firstRow: firstRow,
     lastRow: lastRow,
-    preFirstRow: null,
     postLastRow: null,
     mins: {},
     maxs: {},
@@ -347,12 +354,12 @@ anychart.data.TableSelectable.prototype.setController = function(value) {
  * Selects asked range.
  * @param {number} startKey
  * @param {number} endKey
- * @param {number} startIndex
- * @param {number} endIndex
+ * @param {number} preFirstIndex
+ * @param {number} postLastIndex
  * @param {anychart.core.utils.IIntervalGenerator=} opt_interval
  * @return {!anychart.data.TableSelectable}
  */
-anychart.data.TableSelectable.prototype.selectFast = function(startKey, endKey, startIndex, endIndex, opt_interval) {
+anychart.data.TableSelectable.prototype.selectFast = function(startKey, endKey, preFirstIndex, postLastIndex, opt_interval) {
   var storage = this.mapping_.getTable().getStorage(opt_interval);
   if (this.selectionInvalid_ ||
       storage != this.currentStorage_ ||
@@ -361,7 +368,7 @@ anychart.data.TableSelectable.prototype.selectFast = function(startKey, endKey, 
     this.selectionInvalid_ = false;
     this.currentStorage_ = storage;
     this.currentStorageIsMain_ = !opt_interval; // currently equals the check (storage == table.getStorage())
-    this.currentSelection_ = storage.selectFast(startKey, endKey, startIndex, endIndex);
+    this.currentSelection_ = storage.selectFast(startKey, endKey, preFirstIndex, postLastIndex);
     this.resetMeta_();
   }
   return this;

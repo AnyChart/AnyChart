@@ -5,6 +5,7 @@ goog.require('anychart.enums');
 goog.require('anychart.scales.IXScale');
 goog.require('anychart.scales.StockScatterTicksIterator');
 goog.require('anychart.utils');
+goog.require('goog.math');
 
 
 
@@ -24,47 +25,33 @@ anychart.scales.StockScatterDateTime = function(chartOrScroller) {
    */
   this.keyIndexTransformer = chartOrScroller;
 
-  ///**
-  // * Full scale minimum index.
-  // * @type {number}
-  // * @protected
-  // */
-  //this.fullMinIndex = NaN;
-  //
-  ///**
-  // * Full scale maximum index.
-  // * @type {number}
-  // * @protected
-  // */
-  //this.fullMaxIndex = NaN;
-
   /**
    * Auto calculated full scale minimum key.
    * @type {number}
    * @protected
    */
-  this.autoFullMinKey = NaN;
+  this.alignedFullMinKey = NaN;
 
   /**
    * Auto calculated full scale maximum key.
    * @type {number}
    * @protected
    */
-  this.autoFullMaxKey = NaN;
+  this.alignedFullMaxKey = NaN;
 
-  ///**
-  // * Auto calculated full scale minimum index.
-  // * @type {number}
-  // * @protected
-  // */
-  //this.autoFullMinIndex = NaN;
-  //
-  ///**
-  // * Auto calculated full scale maximum index.
-  // * @type {number}
-  // * @protected
-  // */
-  //this.autoFullMaxIndex = NaN;
+  /**
+   * Auto calculated full data minimum key.
+   * @type {number}
+   * @protected
+   */
+  this.dataFullMinKey = NaN;
+
+  /**
+   * Auto calculated full data maximum key.
+   * @type {number}
+   * @protected
+   */
+  this.dataFullMaxKey = NaN;
 
   /**
    * Current scale minimum key.
@@ -145,7 +132,7 @@ anychart.scales.StockScatterDateTime.prototype.SUPPORTED_SIGNALS =
  * @return {number|anychart.scales.StockScatterDateTime}
  */
 anychart.scales.StockScatterDateTime.prototype.getFullMinimum = function() {
-  return this.autoFullMinKey;
+  return this.alignedFullMinKey;
 };
 
 
@@ -154,7 +141,7 @@ anychart.scales.StockScatterDateTime.prototype.getFullMinimum = function() {
  * @return {number}
  */
 anychart.scales.StockScatterDateTime.prototype.getFullMaximum = function() {
-  return this.autoFullMaxKey;
+  return this.alignedFullMaxKey;
 };
 
 
@@ -247,7 +234,7 @@ anychart.scales.StockScatterDateTime.prototype.transform = function(value, opt_s
  * @return {number} Returns timestamp.
  */
 anychart.scales.StockScatterDateTime.prototype.inverseTransform = function(ratio) {
-  return ratio * (this.maxKey - this.minKey) + this.minKey;
+  return Math.round(ratio * (this.maxKey - this.minKey) + this.minKey);
 };
 
 
@@ -279,7 +266,16 @@ anychart.scales.StockScatterDateTime.prototype.calculate = function() {
 
   this.ensureTicksIteratorCreated();
 
-  var range = Math.abs(this.maxKey - this.minKey) / 6;
+  var dataMinKey, dataMaxKey;
+  if (this.maxKey <= this.dataFullMinKey || this.minKey >= this.dataFullMaxKey) {
+    dataMinKey = this.minKey;
+    dataMaxKey = this.maxKey;
+  } else {
+    dataMinKey = goog.math.clamp(this.minKey, this.dataFullMinKey, this.dataFullMaxKey);
+    dataMaxKey = goog.math.clamp(this.maxKey, this.dataFullMinKey, this.dataFullMaxKey);
+  }
+
+  var range = Math.abs(dataMaxKey - dataMinKey) / 6;
   if (isNaN(range)) {
     this.ticksIterator.setup(
         NaN,
@@ -307,11 +303,11 @@ anychart.scales.StockScatterDateTime.prototype.calculate = function() {
   }
 
   this.ticksIterator.setup(
-      this.minKey,
-      this.maxKey,
+      dataMinKey,
+      dataMaxKey,
       anychart.utils.getIntervalFromInfo(majorInterval[0], majorInterval[1]),
       anychart.utils.getIntervalFromInfo(minorInterval[0], minorInterval[1]),
-      this.autoFullMinKey);
+      this.dataFullMinKey);
 
   this.majorUnit_ = majorInterval[0];
   this.majorUnitCount_ = majorInterval[1];
@@ -319,9 +315,6 @@ anychart.scales.StockScatterDateTime.prototype.calculate = function() {
   this.minorUnitCount_ = minorInterval[1];
 
   this.consistent = true;
-  //console.log(majorInterval, minorInterval);
-  //console.log(this.ticksIterator.toArray(true));
-  //console.log(this.ticksIterator.toArray(false));
 };
 
 
@@ -358,40 +351,41 @@ anychart.scales.StockScatterDateTime.prototype.transformAligned = function(key) 
 
 /**
  * Sets full range.
- * @param {number} minKey
- * @param {number} maxKey
- * @param {number} minIndex
- * @param {number} maxIndex
+ * @param {number} alignedMinKey
+ * @param {number} alignedMaxKey
+ * @param {number} dataMinKey
+ * @param {number} dataMaxKey
  */
-anychart.scales.StockScatterDateTime.prototype.setAutoFullRange = function(minKey, maxKey, minIndex, maxIndex) {
-  this.autoFullMinKey = minKey;
-  this.autoFullMaxKey = maxKey;
-  //this.autoFullMinIndex = minIndex;
-  //this.autoFullMaxIndex = maxIndex;
+anychart.scales.StockScatterDateTime.prototype.setAutoFullRange = function(alignedMinKey, alignedMaxKey, dataMinKey, dataMaxKey) {
+  this.alignedFullMinKey = alignedMinKey;
+  this.alignedFullMaxKey = alignedMaxKey;
+  this.dataFullMinKey = dataMinKey;
+  this.dataFullMaxKey = dataMaxKey;
   this.dispatchSignal(anychart.Signal.NEED_UPDATE_FULL_RANGE_ITEMS);
 };
 
 
 /**
  * Sets current range.
- * @param {number} minKey
- * @param {number} maxKey
- * @param {number} minIndex
- * @param {number} maxIndex
+ * @param {number} startKey
+ * @param {number} endKey
  * @param {anychart.enums.Interval} unit
  * @param {number} count
  */
-anychart.scales.StockScatterDateTime.prototype.setCurrentRange = function(minKey, maxKey, minIndex, maxIndex, unit,
-    count) {
-  if (isNaN(minIndex) || isNaN(maxIndex)) {
+anychart.scales.StockScatterDateTime.prototype.setCurrentRange = function(startKey, endKey, unit, count) {
+  startKey = goog.math.clamp(startKey, this.alignedFullMinKey, this.alignedFullMaxKey);
+  endKey = goog.math.clamp(endKey, this.alignedFullMinKey, this.alignedFullMaxKey);
+  var startIndex = this.keyIndexTransformer.getIndexByKey(startKey);
+  var endIndex = this.keyIndexTransformer.getIndexByKey(endKey);
+  if (isNaN(startIndex) || isNaN(endIndex)) {
     this.minKey = NaN;
     this.maxKey = NaN;
   } else {
-    this.minKey = minKey;
-    this.maxKey = maxKey;
+    this.minKey = startKey;
+    this.maxKey = endKey;
   }
-  this.minIndex = minIndex;
-  this.maxIndex = maxIndex;
+  this.minIndex = startIndex;
+  this.maxIndex = endIndex;
   this.unit = unit;
   this.count = count;
   this.consistent = false;

@@ -221,40 +221,104 @@ anychart.core.stock.Grouping.prototype.isGrouped = function() {
  * @return {?anychart.core.utils.DateTimeIntervalGenerator}
  */
 anychart.core.stock.Grouping.prototype.chooseInterval = function(startKey, endKey, pixelWidth, mainRegistry) {
-  var first, len = this.intervals_.length;
   var range = endKey - startKey;
   var mainRegistrySelection = mainRegistry.getSelection(startKey, endKey);
-  var originalPointsCount = mainRegistrySelection.lastIndex - mainRegistrySelection.firstIndex; // may be NaN
-  originalPointsCount = originalPointsCount ? originalPointsCount + 1 : 0;
+  var originalPointsCount = (mainRegistrySelection.lastIndex - mainRegistrySelection.firstIndex + 1) || 0;
   var minDistance = mainRegistrySelection.minDistance;
-  var targetPointsCountMax = isNaN(this.maxPoints_) ?
-      (pixelWidth / this.minPixels_) :
-      this.maxPoints_;
-  var result = null;
-  if (this.enabled_ && len > 0 && minDistance && (this.forced_ || (originalPointsCount > targetPointsCountMax))) {
-    first = 0;
-    while (first < len && this.intervals_[first].getRange() <= minDistance) {
-      first++;
-    }
-    first = Math.max(first - 1, 0);
-    var i;
-    for (i = first; i < len; i++) {
-      var interval = this.intervals_[i];
-      if (interval.getRange() * targetPointsCountMax >= range) {
-        result = interval;
-        break;
+  var targetPointsCountMax = isNaN(this.maxPoints_) ? (pixelWidth / this.minPixels_) : this.maxPoints_;
+  var index = -1;
+  if (this.enabled_ && this.intervals_.length > 0 && minDistance && (this.forced_ || (originalPointsCount > targetPointsCountMax))) {
+    index = this.getAcceptableIntervalIndex_(range / targetPointsCountMax, this.getFirstIntervalIndex_(minDistance));
+  }
+  var result;
+  if (index < 0) {
+    result = null;
+    this.currentInterval_ = minDistance ?
+        anychart.utils.estimateInterval(minDistance) :
+        {'unit': anychart.enums.Interval.MILLISECOND, 'count': 1};
+  } else {
+    result = this.intervals_[index];
+    this.currentInterval_ = this.exportLevel_(result);
+  }
+  this.isGrouped_ = !!result;
+  return result;
+};
+
+
+/**
+ * Returns aligned boundaries. Currently unused, but should remain.
+ * @param {!anychart.core.stock.Registry} mainRegistry
+ * @param {number} pixelWidth
+ * @return {Array.<number>}
+ */
+anychart.core.stock.Grouping.prototype.getMaxBoundaries = function(mainRegistry, pixelWidth) {
+  var registryBounds = mainRegistry.getBoundariesInfo();
+  var startKey = registryBounds[0];
+  var endKey = registryBounds[1];
+  var result = [registryBounds[2], registryBounds[3]];
+  if (!isNaN(startKey) && !isNaN(endKey) && endKey > startKey) {
+    var range = endKey - startKey;
+    var mainRegistrySelection = mainRegistry.getSelection(startKey, endKey);
+    var originalPointsCount = (mainRegistrySelection.lastIndex - mainRegistrySelection.firstIndex + 1) || 0;
+    var minDistance = mainRegistrySelection.minDistance;
+    var targetPointsCountMax = isNaN(this.maxPoints_) ? (pixelWidth / this.minPixels_) : this.maxPoints_;
+    if (this.enabled_ && this.intervals_.length > 0 && minDistance && (this.forced_ || (originalPointsCount > targetPointsCountMax))) {
+      var firstIndex = this.getFirstIntervalIndex_(minDistance);
+      var lastIndex = this.getAcceptableIntervalIndex_(range / targetPointsCountMax, firstIndex);
+      if (lastIndex >= 0) {
+        if (this.forced_) {
+          result = this.intervals_[firstIndex].getAlignedBoundaries(startKey, endKey);
+          firstIndex++;
+        }
+        for (var i = firstIndex; i <= lastIndex; i++) {
+          var levelBounds = this.intervals_[i].getAlignedBoundaries(startKey, endKey);
+          // console.log(this.intervals_[i].getHash(), new Date(levelBounds[0]), new Date(levelBounds[1]));
+          result[0] = Math.min(result[0], levelBounds[0]);
+          result[1] = Math.max(result[1], levelBounds[1]);
+        }
       }
     }
-    // we choose the largest of existing grouping levels that are larger than the original data
-    if (!result && first < len)
-      result = this.intervals_[len - 1];
   }
-  this.currentInterval_ = result ?
-      this.exportLevel_(result) :
-      minDistance ?
-          anychart.utils.estimateInterval(minDistance) :
-          {'unit': anychart.enums.Interval.MILLISECOND, 'count': 1};
-  this.isGrouped_ = !!result;
+  return result;
+};
+
+
+/**
+ * Returns an index of the first interval that can be used for approximation due to min distance between points.
+ * @param {number} minDistance
+ * @return {number}
+ * @private
+ */
+anychart.core.stock.Grouping.prototype.getFirstIntervalIndex_ = function(minDistance) {
+  var first = 0, len = this.intervals_.length;
+  while (first < len && this.intervals_[first].getRange() <= minDistance) {
+    first++;
+  }
+  return Math.max(first - 1, 0);
+};
+
+
+/**
+ * Returns first interval that has a point range larger or equal to the minAcceptableRange
+ * @param {number} minAcceptableRange
+ * @param {number=} opt_first
+ * @return {number}
+ * @private
+ */
+anychart.core.stock.Grouping.prototype.getAcceptableIntervalIndex_ = function(minAcceptableRange, opt_first) {
+  var first = opt_first || 0;
+  var len = this.intervals_.length;
+  var result = -1;
+  for (var i = first; i < len; i++) {
+    var interval = this.intervals_[i];
+    if (interval.getRange() >= minAcceptableRange) {
+      result = i;
+      break;
+    }
+  }
+  // we choose the largest of existing grouping levels that are larger than the original data
+  if (result < 0 && first < len)
+    result = len - 1;
   return result;
 };
 

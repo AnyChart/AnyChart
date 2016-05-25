@@ -26,7 +26,7 @@ anychart.scales.StockOrdinalDateTime.prototype.transform = function(value, opt_s
 /** @inheritDoc */
 anychart.scales.StockOrdinalDateTime.prototype.inverseTransform = function(ratio) {
   var result = ratio * (this.maxIndex - this.minIndex) + this.minIndex;
-  return this.keyIndexTransformer.getKeyByIndex(result);
+  return Math.round(this.keyIndexTransformer.getKeyByIndex(result));
 };
 
 

@@ -99,11 +99,13 @@ anychart.data.TableStorage = function(table) {
  * @typedef {{
  *   startKey: number,
  *   endKey: number,
+ *   preFirstIndex: number,
  *   firstIndex: number,
  *   lastIndex: number,
+ *   postLastIndex: number,
+ *   preFirstRow: anychart.data.TableRow,
  *   firstRow: anychart.data.TableRow,
  *   lastRow: anychart.data.TableRow,
- *   preFirstRow: anychart.data.TableRow,
  *   postLastRow: anychart.data.TableRow,
  *   mins: !Object.<number>,
  *   maxs: !Object.<number>,
@@ -197,14 +199,30 @@ anychart.data.TableStorage.prototype.update = function() {
  * @return {!anychart.data.TableStorage.Selection}
  */
 anychart.data.TableStorage.prototype.select = function(startKey, endKey) {
-  if (startKey > endKey) {
-    var tmp = startKey;
-    startKey = endKey;
-    endKey = tmp;
+  var preFirst, postLast, first, last;
+  var storageLength = this.storage.length;
+  if (storageLength) {
+    first = isNaN(startKey) ? 0 : this.searchIndex(startKey, anychart.enums.TableSearchMode.EXACT_OR_NEXT);
+    if (isNaN(first)) { // empty selection after all data
+      preFirst = storageLength - 1;
+      postLast = NaN;
+    } else {
+      last = isNaN(endKey) ? storageLength - 1 : this.searchIndex(endKey, anychart.enums.TableSearchMode.EXACT_OR_PREV);
+      if (isNaN(last)) { // empty selection before all data
+        preFirst = NaN;
+        postLast = 0;
+      } else if (first <= last) { // valid non-empty selection
+        preFirst = first > 0 ? first - 1 : NaN;
+        postLast = last < storageLength - 1 ? last + 1 : NaN;
+      } else { // empty selection between two points
+        preFirst = last;
+        postLast = first;
+      }
+    }
+  } else {
+    preFirst = postLast = NaN;
   }
-  var firstIndex = this.searchIndex(startKey, anychart.enums.TableSearchMode.EXACT_OR_NEXT);
-  var lastIndex = isNaN(firstIndex) ? NaN : this.searchIndex(endKey, anychart.enums.TableSearchMode.EXACT_OR_PREV);
-  return this.selectFast(startKey, endKey, firstIndex, lastIndex);
+  return this.selectFast(startKey, endKey, preFirst, postLast);
 };
 
 
@@ -213,14 +231,15 @@ anychart.data.TableStorage.prototype.select = function(startKey, endKey) {
  * storage index of asked keys - that allows to save one or two storage lookup passes.
  * @param {number} startKey
  * @param {number} endKey
- * @param {number} firstIndex
- * @param {number} lastIndex
+ * @param {number} preFirstIndex
+ * @param {number} postLastIndex
  * @return {!anychart.data.TableStorage.Selection}
  */
-anychart.data.TableStorage.prototype.selectFast = function(startKey, endKey, firstIndex, lastIndex) {
-  var first, last, preFirst, postLast, i, selection;
+anychart.data.TableStorage.prototype.selectFast = function(startKey, endKey, preFirstIndex, postLastIndex) {
+  var first, last, preFirst, postLast, i, selection, firstIndex, lastIndex;
+  var storageLength = this.storage.length;
   // if there is nothing in the storage we do nothing
-  if (this.storage.length) {
+  if (storageLength) {
     // checking cache
     for (i = 0; i < this.selectionCache_.length; i++) {
       // we need this indexing to prioritize selection cache lookup (from the most recent to older ones)
@@ -230,34 +249,42 @@ anychart.data.TableStorage.prototype.selectFast = function(startKey, endKey, fir
       var cacheIndex = (this.selectionCachePointer_ - i - 1 + anychart.data.TableStorage.SELECTION_CACHE_SIZE) %
           anychart.data.TableStorage.SELECTION_CACHE_SIZE;
       selection = this.selectionCache_[cacheIndex];
-      if (selection.startKey == startKey && selection.endKey == endKey)
+      if (selection.startKey == startKey && selection.endKey == endKey) {
         return selection;
-    }
-
-    // searching the storage for the appropriate rows
-    if (isNaN(firstIndex)) {
-      // this means that we tried to select keys greater than there are in the storage
-      preFirst = this.storage[this.storage.length - 1];
-      first = last = postLast = null;
-      lastIndex = NaN;
-    } else {
-      first = this.storage[firstIndex]; // always exist but can be incorrect first
-      if (isNaN(lastIndex)) {
-        // this means that we tried to select keys less than there are in the storage
-        // and, thereby, first should be now the first row in the storage (index 0),
-        // but that's not correct first row
-        postLast = first;
-        first = last = preFirst = null;
-        firstIndex = NaN;
-      } else {
-        last = this.storage[lastIndex];
-        preFirst = first.prev; // can be null
-        postLast = last.next; // can be null
       }
     }
+
+    // determining first and last indexes
+    if (isNaN(preFirstIndex)) {
+      if (isNaN(postLastIndex)) { // full range selection
+        firstIndex = 0;
+        lastIndex = storageLength - 1;
+      } else if (postLastIndex == 0) { // whole selection is to the left of the data
+        firstIndex = lastIndex = NaN;
+      } else { // normal selection stuck to the left end of data
+        firstIndex = 0;
+        lastIndex = postLastIndex - 1;
+      }
+    } else if (isNaN(postLastIndex)) {
+      if (preFirstIndex == storageLength - 1) { // whole selection is to the right of the data
+        firstIndex = lastIndex = NaN;
+      } else { // normal selection stuck to the right end of data
+        firstIndex = preFirstIndex + 1;
+        lastIndex = storageLength - 1;
+      }
+    } else if (postLastIndex - preFirstIndex == 1) { // whole selection between two valid points
+      firstIndex = lastIndex = NaN;
+    } else { // normal selection
+      firstIndex = preFirstIndex + 1;
+      lastIndex = postLastIndex - 1;
+    }
+    preFirst = this.storage[preFirstIndex] || null;
+    first = this.storage[firstIndex] || null;
+    last = this.storage[lastIndex] || null;
+    postLast = this.storage[postLastIndex] || null;
   } else {
     first = last = preFirst = postLast = null;
-    firstIndex = lastIndex = NaN;
+    firstIndex = lastIndex = preFirstIndex = postLastIndex = NaN;
   }
 
   var fields = this.getKnownFields();
@@ -267,7 +294,7 @@ anychart.data.TableStorage.prototype.selectFast = function(startKey, endKey, fir
   var calcMins = [];
   var calcMaxs = [];
   var field, val;
-  if (first) { // first and last can be null only in the same time, so no point to check last in addition
+  if (preFirst || first || postLast) { // first and last can be null only in the same time, so no point to check last in addition
     var isFullRangeSelect = !preFirst && !postLast;
     // we have additional cache for full range selections
     if (isFullRangeSelect && this.fullRangeMinsCache_) { // caches should exist only all at once
@@ -297,8 +324,9 @@ anychart.data.TableStorage.prototype.selectFast = function(startKey, endKey, fir
       }
       var prev = null;
       /** @type {anychart.data.TableRow} */
-      var curr = first;
-      while (curr && curr != postLast) {
+      var curr = preFirst || first || postLast;
+      var finalRow = postLast ? postLast.next : postLast;
+      while (curr && curr != finalRow) {
         if (asArray) {
           var len = Math.min((/** @type {Array} */(curr.values)).length, fields);
           for (i = 0; i < len; i++) {
@@ -376,18 +404,20 @@ anychart.data.TableStorage.prototype.selectFast = function(startKey, endKey, fir
   selection = {
     startKey: startKey,
     endKey: endKey,
+    preFirstIndex: preFirstIndex,
     firstIndex: firstIndex,
     lastIndex: lastIndex,
+    postLastIndex: postLastIndex,
+    preFirstRow: preFirst,
     firstRow: first,
     lastRow: last,
-    preFirstRow: preFirst,
     postLastRow: postLast,
     mins: mins,
     maxs: maxs,
     calcMaxs: calcMaxs,
     calcMins: calcMins
   };
-  if (this.storage.length) {
+  if (storageLength) {
     this.selectionCache_[this.selectionCachePointer_] = selection;
     this.selectionCachePointer_ = (this.selectionCachePointer_ + 1) % anychart.data.TableStorage.SELECTION_CACHE_SIZE;
   }
@@ -402,7 +432,7 @@ anychart.data.TableStorage.prototype.selectFast = function(startKey, endKey, fir
 anychart.data.TableStorage.prototype.selectAll = function() {
   var len = this.storage.length;
   if (len)
-    return this.selectFast(this.storage[0].key, this.storage[len - 1].key, 0, len - 1);
+    return this.selectFast(this.storage[0].key, this.storage[len - 1].key, NaN, NaN);
   else
     return this.selectFast(NaN, NaN, NaN, NaN); // will return valid selection object
 };
@@ -455,7 +485,7 @@ anychart.data.TableStorage.prototype.searchIndex = function(key, opt_mode) {
         var item = this.storage[index];
         return (key - item.prev.key < item.key - key) ? index - 1 : index;
       } else
-        return length ? length : NaN;
+        return length ? length - 1 : NaN;
     } else
       index = NaN;
   }

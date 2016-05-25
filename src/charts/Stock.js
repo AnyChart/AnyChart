@@ -571,8 +571,13 @@ anychart.charts.Stock.prototype.setDefaultPlotSettings = function(value) {
  * @private
  */
 anychart.charts.Stock.prototype.selectRangeInternal_ = function(start, end) {
+  var xScale = /** @type {!anychart.scales.StockScatterDateTime} */(this.xScale());
+  if (this.dataController_.refreshFullRange()) {
+    this.dataController_.updateFullScaleRange(xScale);
+    this.dataController_.updateFullScaleRange(/** @type {!anychart.scales.StockScatterDateTime} */(this.scroller().xScale()));
+  }
   if (this.dataController_.select(start, end)) {
-    this.dataController_.updateCurrentRangeForScale(/** @type {!anychart.scales.StockScatterDateTime} */(this.xScale()), false);
+    this.dataController_.updateCurrentScaleRange(xScale, false);
     this.invalidateRedrawable();
   }
 };
@@ -672,18 +677,14 @@ anychart.charts.Stock.prototype.drawContent = function(bounds) {
     var xScale = /** @type {anychart.scales.StockScatterDateTime} */(this.xScale());
     var scrollerXScale = /** @type {anychart.scales.StockScatterDateTime} */(this.scroller().xScale());
     var changed = this.dataController_.refreshSelection(this.minPlotsDrawingWidth_);
-    var firstKey = this.dataController_.getFirstKey();
-    var lastKey = this.dataController_.getLastKey();
-    var firstIndex = this.dataController_.getFirstIndex();
-    var lastIndex = this.dataController_.getLastIndex();
-    xScale.setAutoFullRange(firstKey, lastKey, firstIndex, lastIndex);
-    scrollerXScale.setAutoFullRange(firstKey, lastKey, firstIndex, lastIndex);
+    this.dataController_.updateFullScaleRange(xScale);
+    this.dataController_.updateFullScaleRange(scrollerXScale);
     if (!!(changed & 1)) {
-      this.dataController_.updateCurrentRangeForScale(xScale, false);
+      this.dataController_.updateCurrentScaleRange(xScale, false);
       this.invalidateRedrawable();
     }
     if (!!(changed & 2)) {
-      this.dataController_.updateCurrentRangeForScale(scrollerXScale, true);
+      this.dataController_.updateCurrentScaleRange(scrollerXScale, true);
       this.scroller_.invalidateScaleDependend();
       this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER);
     }
@@ -1159,11 +1160,8 @@ anychart.charts.Stock.prototype.refreshHighlight_ = function() {
  */
 anychart.charts.Stock.prototype.highlightAtRatio_ = function(ratio, clientX, clientY) {
   if (this.highlightPrevented_ || ratio < 0 || ratio > 1) return;
-  var value = this.xScale().inverseTransform(ratio);
+  var value = this.dataController_.alignHighlight(this.xScale().inverseTransform(ratio));
   if (isNaN(value)) return;
-  var index = this.getIndexByKey(value);
-  if (index % 1 != 0) // aligning by points
-    value = this.getKeyByIndex(Math.round(index));
 
   var i;
   var eventInfo = {
@@ -1327,15 +1325,23 @@ anychart.charts.Stock.DragAnchor;
  */
 anychart.charts.Stock.prototype.getDragAnchor = function() {
   var controller = this.dataController_;
+  var vf = controller.getFirstKey();
+  var vl = controller.getLastKey();
+  var vfi = this.getIndexByKey(vf);
+  var vli = this.getIndexByKey(vl);
+  var fs = controller.getFirstSelectedKey();
+  var ls = controller.getLastSelectedKey();
+  var fsi = controller.getFirstSelectedIndex();//this.getIndexByKey(fs);
+  var lsi = controller.getLastSelectedIndex();//this.getIndexByKey(ls);
   return {
-    firstKey: controller.getFirstSelectedKey(),
-    lastKey: controller.getLastSelectedKey(),
-    firstIndex: controller.getFirstSelectedIndex(),
-    lastIndex: controller.getLastSelectedIndex(),
-    minKey: controller.getFirstKey(),
-    maxKey: controller.getLastKey(),
-    minIndex: controller.getFirstIndex(),
-    maxIndex: controller.getLastIndex()
+    firstKey: fs,
+    lastKey: ls,
+    firstIndex: fsi,
+    lastIndex: lsi,
+    minKey: vf,
+    maxKey: vl,
+    minIndex: vfi,
+    maxIndex: vli
   };
 };
 
@@ -1368,10 +1374,10 @@ anychart.charts.Stock.prototype.dragToRatio = function(ratio, anchor) {
     this.selectRangeInternal_(start, end);
     anchor.firstIndex = this.getIndexByKey(anchor.firstKey);
     anchor.lastIndex = this.getIndexByKey(anchor.lastKey);
-    anchor.minIndex = this.getIndexByKey(this.dataController_.getFirstKey());
-    anchor.maxIndex = this.getIndexByKey(this.dataController_.getLastKey());
-    anchor.minKey = this.dataController_.getFirstKey();
-    anchor.maxKey = this.dataController_.getLastKey();
+    anchor.minIndex = this.getIndexByKey(anchor.minKey);
+    anchor.maxIndex = this.getIndexByKey(anchor.maxKey);
+    // anchor.minKey = this.dataController_.getFirstKey();
+    // anchor.maxKey = this.dataController_.getLastKey();
     this.dispatchRangeChange_(
         anychart.enums.EventType.SELECTED_RANGE_CHANGE,
         anychart.enums.StockRangeChangeSource.PLOT_DRAG);
