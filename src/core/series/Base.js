@@ -66,6 +66,7 @@ anychart.core.series.Base = function(chart, plot, type, config) {
    * @type {!Object}
    */
   this.autoSettings = {};
+  this.autoSettings[anychart.opt.POINT_WIDTH] = '90%';
 
   /**
    * Default (theme) settings holder.
