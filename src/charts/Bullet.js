@@ -474,7 +474,7 @@ anychart.charts.Bullet.prototype.calculate = function() {
 
 
 /** @inheritDoc */
-anychart.charts.Bullet.prototype.draw = function() {
+anychart.charts.Bullet.prototype.drawInternal = function() {
   //we must update layout before draw
   var isHorizontal = this.isHorizontal();
   var title = this.title();
@@ -487,7 +487,7 @@ anychart.charts.Bullet.prototype.draw = function() {
     axis.setDefaultOrientation(anychart.enums.Orientation.LEFT);
     title.setDefaultOrientation(anychart.enums.Orientation.BOTTOM);
   }
-  return goog.base(this, 'draw');
+  return anychart.charts.Bullet.base(this, 'drawInternal');
 };
 
 
@@ -805,6 +805,5 @@ anychart.charts.Bullet.prototype['markerPalette'] = anychart.charts.Bullet.proto
 anychart.charts.Bullet.prototype['scale'] = anychart.charts.Bullet.prototype.scale;//doc|ex
 anychart.charts.Bullet.prototype['axis'] = anychart.charts.Bullet.prototype.axis;//doc|ex
 anychart.charts.Bullet.prototype['range'] = anychart.charts.Bullet.prototype.range;//doc|ex
-anychart.charts.Bullet.prototype['draw'] = anychart.charts.Bullet.prototype.draw;//inherited
 anychart.charts.Bullet.prototype['isHorizontal'] = anychart.charts.Bullet.prototype.isHorizontal;//doc
 anychart.charts.Bullet.prototype['getType'] = anychart.charts.Bullet.prototype.getType;//doc

@@ -1170,7 +1170,6 @@ anychart.charts.Gantt.prototype.toCsv = function(chartDataExportMode, opt_csvSet
 
 
 //exports
-anychart.charts.Gantt.prototype['draw'] = anychart.charts.Gantt.prototype.draw;
 anychart.charts.Gantt.prototype['data'] = anychart.charts.Gantt.prototype.data;
 anychart.charts.Gantt.prototype['dataGrid'] = anychart.charts.Gantt.prototype.dataGrid;
 anychart.charts.Gantt.prototype['getTimeline'] = anychart.charts.Gantt.prototype.getTimeline;

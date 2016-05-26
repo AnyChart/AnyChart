@@ -965,10 +965,9 @@ anychart.core.Chart.prototype.doAnimation = goog.nullFunction;
 
 
 /**
- * Starts the rendering of the chart into the container.
- * @return {anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
+ * Renders chart.
  */
-anychart.core.Chart.prototype.draw = function() {
+anychart.core.Chart.prototype.drawInternal = function() {
   if (!this.autoRedrawIsSet_) {
     if (this.autoRedraw_)
       this.listenSignals(this.invalidateHandler_, this);
@@ -978,7 +977,7 @@ anychart.core.Chart.prototype.draw = function() {
   }
 
   if (!this.checkDrawingNeeded())
-    return this;
+    return;
 
   anychart.performance.start('Chart.draw()');
   var startTime;
@@ -1096,11 +1095,25 @@ anychart.core.Chart.prototype.draw = function() {
     anychart.core.reporting.info(msg);
   }
 
-
   if (this.supportsBaseHighlight)
     this.onInteractivitySignal();
 
   anychart.performance.end('Chart.draw()');
+};
+
+
+/**
+ * Starts the rendering of the chart into the container.
+ * @param {boolean=} opt_async Whether do draw asynchronously.
+ * @return {anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
+ */
+anychart.core.Chart.prototype.draw = function(opt_async) {
+  if (!!opt_async) {
+    if (!this.bindedDraw_)
+      this.bindedDraw_ = goog.bind(this.draw, this);
+    setTimeout(this.bindedDraw_, 0);
+  } else
+    this.drawInternal();
 
   return this;
 };

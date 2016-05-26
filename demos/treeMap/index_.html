@@ -29,7 +29,7 @@
             float: left
         }
     </style>
-    <link rel="stylesheet" href="http://cdn.anychart.com/css/latest/anychart-ui.css"/>
+    <link rel="stylesheet" href="http://cdn.anychart.com/css/latest/anychart-ui.css" />
 </head>
 <body>
 <div id="container" style="border: 1px solid; width: 800px; height: 600px;"></div>
@@ -38,145 +38,117 @@
     var chart;
     anychart.onDocumentReady(function() {
 
-        chart = anychart.treeMap();
+        // makes tree from the data for the sample
+        var data = anychart.data.tree(composition_data, anychart.enums.TreeFillingMethod.AS_TABLE);
+        chart = anychart.treeMap(data);
 
-        // tooltips settings
-        chart.tooltip(true);
-        chart.tooltip().positionMode('point');
-        chart.tooltip().titleFormatter("{%id}");
-        chart.tooltip().textFormatter("Income from export in 2012: $ {%Value}B");
+        // sets credits for this sample
+        chart.credits(true);
+        chart.credits().url('//en.wikipedia.org/wiki/Composition_of_the_human_body');
+        chart.credits().text('Data source: en.wikipedia.org/wiki/Composition_of_the_human_body');
+        chart.credits().logoSrc('//en.wikipedia.org/static/favicon/wikipedia.ico');
 
-        var data = [
-            {id: 'Europe', parent: null},
-            {id: 'Eastern Europe', parent: 'Europe'},
-            {id: 'Western Europe', parent: 'Europe'},
-            {id: 'Southern Europe', parent: 'Europe'},
-            {id: 'Northern Europe', parent: 'Europe'},
-            {id: 'Poland', parent: 'Eastern Europe'},
-            {id: "Vehicles (Pl)", parent: "Poland"},
-            {id: "Tractors", parent: "Vehicles (Pl)", value: 0.458},
-            {id: "Cars", parent: "Vehicles (Pl)", value: 5.01},
-            {id: "Parts and accessories of the motor vehicles", parent: "Vehicles (Pl)", value: 7.94},
-            {id: "Motor vehicles for transporting goods", parent: "Vehicles (Pl)", value: 1.2},
-            {id: "Food (Pl)", parent: "Poland"},
-            {id: "Cigars", parent: "Food (Pl)", value: 2.38},
-            {id: "Cocoa powder, sweetened", parent: "Food (Pl)", value: 1.07},
-            {id: "Poultry", parent: "Food (Pl)", value: 1.1},
-            {id: "Swine meat", parent: "Food (Pl)", value: 0.89},
-            {id: "Furniture (Pl)", parent: "Poland"},
-            {id: "Seats", parent: "Furniture (Pl)", value: 3.8},
-            {id: "Other furniture and parts thereof", parent: "Furniture (Pl)", value: 3.14},
-            {id: "Mattress supports; articles of bedding", parent: "Furniture (Pl)", value: 0.916},
-            {id: 'Ukraine', parent: 'Eastern Europe'},
-            {id: "Food (Ua)", parent: "Ukraine"},
-            {id: "Maize (corn) seed", parent: "Food (Ua)", value: 4.11},
-            {id: "Wheat and meslin", parent: "Food (Ua)", value: 2.31},
-            {id: "Sunflower-seed or safflower oil, crude", parent: "Food (Ua)", value: 3.79},
-            {id: "Petroleum (Ua)", parent: "Ukraine"},
-            {id: "Iron ores and concentrates", parent: "Petroleum (Ua)", value: 4.37},
-            {id: "Petroleum oils, refined", parent: "Petroleum (Ua)", value: 2.27},
-            {id: "Steel (Ua)", parent: "Ukraine"},
-            {id: "Semifinished products of iron or nonalloy steel", parent: "Steel (Ua)", value: 6.75},
-            {id: "Hot rolled iron or non-alloy steel", parent: "Steel (Ua)", value: 3.28},
-            {id: "Other bars and rods of iron or nonalloy steel", parent: "Steel (Ua)", value: 1.61},
-            {id: 'Germany', parent: 'Western Europe'},
-            {id: "Food (De)", parent: "Germany"},
-            {id: "Swine meat (DE)", parent: "Food (De)", value: 4.52},
-            {id: "Fresh cheese", parent: "Food (De)", value: 4.2},
-            {id: "Coffee, not roasted", parent: "Food (De)", value: 1.89},
-            {id: "Bread, pastry, cakes, biscuits and other baked goods", parent: "Food (De)", value: 3.64},
-            {id: "Medical (De)", parent: "Germany"},
-            {id: "Blood for therapetic uses", parent: "Medical (De)", value: 13.6},
-            {id: "Packages medicaments", parent: "Medical (De)", value: 49.5},
-            {id: "Industrial monocarboxylic fatty acids, etc.", parent: "Medical (De)", value: 5.95},
-            {id: "Vehicles (De)", parent: "Germany"},
-            {id: "Aircraft, spacecraft & launch vehicles", parent: "Vehicles (De)", value: 26.2},
-            {id: "Cars", parent: "Vehicles (De)", value: 141},
-            {id: "Parts and accessories of the motor vehicles", parent: "Vehicles (De)", value: 53.7},
-            {id: "Motor vehicles for transporting goods", parent: "Vehicles (De)", value: 11.9},
-            {id: 'France', parent: 'Western Europe'},
-            {id: "Medical (Fr)", parent: "France"},
-            {id: "Blood for therapetic uses", parent: "Medical (Fr)", value: 5.22},
-            {id: "Packages medicaments", parent: "Medical (Fr)", value: 26.8},
-            {id: "Make-up products", parent: "Medical (Fr)", value: 6.6},
-            {id: "Vehicles (Fr)", parent: "France"},
-            {id: "Aircraft, spacecraft & launch vehicles", parent: "Vehicles (Fr)", value: 38.4},
-            {id: "Cars", parent: "Vehicles (Fr)", value: 23.4},
-            {id: "Parts and accessories of the motor vehicles", parent: "Vehicles (Fr)", value: 19},
-            {id: "Food (Fr)", parent: "France"},
-            {id: "Wine of fresh grapes", parent: "Food (Fr)", value: 10.4},
-            {id: "Fresh cheese", parent: "Food (Fr)", value: 3.56},
-            {id: "Wheat and meslin, virgin", parent: "Food (Fr)", value: 4.93},
-            {id: "Maize (corn) seed", parent: "Food (Fr)", value: 2.16},
-            {id: 'Greece', parent: 'Southern Europe'},
-            {id: "Petroleum (Gr)", parent: "Greece"},
-            {id: "Petroleum oils, refined", parent: "Petroleum (Gr)", value: 8.92},
-            {id: "Petroleum gases", parent: "Petroleum (Gr)", value: 1.08},
-            {id: "Food (Gr)", parent: "Greece"},
-            {id: "Fruit, nuts and edible plants preserved with sugar", parent: "Food (Gr)", value: 0.403},
-            {id: "Apricots", parent: "Food (Gr)", value: 0.229},
-            {id: "Olive oil, virgin", parent: "Food (Gr)", value: 0.410},
-            {id: "Fish", parent: "Food (Gr)", value: 0.544},
-            {id: 'Italy', parent: 'Southern Europe'},
-            {id: "Petroleum (It)", parent: "Italy"},
-            {id: "Petroleum oils, refined", parent: "Petroleum (It)", value: 23.2},
-            {id: "Petroleum gases", parent: "Petroleum (It)", value: 1.08},
-            {id: "Medical (It)", parent: "Italy"},
-            {id: "Blood for therapetic uses", parent: "Medical (It)", value: 2.51},
-            {id: "Packages medicaments", parent: "Medical (It)", value: 20.7},
-            {id: "Make-up products", parent: "Medical (It)", value: 1.47},
-            {id: "Vehicles (It)", parent: "Italy"},
-            {id: "Parts and accessories of the motor vehicles", parent: "Vehicles (It)", value: 11.8},
-            {id: "Cars", parent: "Vehicles (It)", value: 9.7},
-            {id: "Motor vehicles for transporting goods", parent: "Vehicles (It)", value: 4.32},
-            {id: "Food (It)", parent: "Italy"},
-            {id: "Fresh cheese", parent: "Food (It)", value: 2.34},
-            {id: "Apples", parent: "Food (It)", value: 1.07},
-            {id: "Pasta", parent: "Food (It)", value: 2.53},
-            {id: "Wine of fresh grapes", parent: "Food (It)", value: 6},
-            {id: 'Finland', parent: 'Northern Europe'},
-            {id: "Paper (Fin)", parent: "Finland"},
-            {id: "Paper and paperboard, coated on one or both sides with kaolin", parent: "Paper (Fin)", value: 5.33},
-            {id: "Paper, uncoat, for writing etc, rolls, handmade paper", parent: "Paper (Fin)", value: 1.99},
-            {id: "Petroleum (Fin)", parent: "Finland"},
-            {id: "Petroleum oils, refined", parent: "Petroleum (Fin)", value: 7.29},
-            {id: "Iron ores and concentrates", parent: "Petroleum (Fin)", value: 0.145},
-            {id: "Petroleum gases", parent: "Petroleum (Fin)", value: 5.6},
-            {id: "Machinery (Fin)", parent: "Finland"},
-            {id: "Electrical transofrmers", parent: "Machinery (Fin)", value: 1.29},
-            {id: "Transmission apparatus for radio, TV, telephone", parent: "Machinery (Fin)", value: 0.845},
-            {id: "Telephones", parent: "Machinery (Fin)", value: 1.23},
-            {id: 'Great Britain', parent: 'Northern Europe', value: 409},
-            {id: "Medical (GB)", parent: "Great Britain"},
-            {id: "Blood for therapetic uses", parent: "Medical (GB)", value: 3.19},
-            {id: "Packages medicaments", parent: "Medical (GB)", value: 20.3},
-            {id: "Antibiotics", parent: "Medical (GB)", value: 0.268},
-            {id: "Machinery (GB)", parent: "Great Britain"},
-            {id: "Turbo jets and other gas turbines", parent: "Machinery (GB)", value: 11.3},
-            {id: "Parts for use in excavation machinery", parent: "Machinery (GB)", value: 2.72},
-            {id: "Automated data processing machines", parent: "Machinery (GB)", value: 3.67},
-            {id: "Telephones", parent: "Machinery (GB)", value: 3.47},
-            {id: "Petroleum (GB)", parent: "Great Britain"},
-            {id: "Petroleum oils, refined", parent: "Petroleum (GB)", value: 31.2},
-            {id: "Petroleum oils, crude", parent: "Petroleum (GB)", value: 25.7},
-            {id: "Petroleum gases", parent: "Petroleum (GB)", value: 5.6},
-            {id: 'Ireland', parent: 'Northern Europe'},
-            {id: "Medical (Irl)", parent: "Ireland"},
-            {id: "Instruments (surgery, vet, dental)", parent: "Medical (Irl)", value: 4.05},
-            {id: "Packages medicaments", parent: "Medical (Irl)", value: 20.1},
-            {id: "Antibiotics", parent: "Medical (Irl)", value: 0.817},
-            {id: "Machinery (Irl)", parent: "Ireland"},
-            {id: "Automated data processing machines", parent: "Machinery (Irl)", value: 5.21},
-            {id: "Transmission apparatus for radio, TV, telephone", parent: "Machinery (Irl)", value: 1.86},
-            {id: "Printers and copying machines", parent: "Machinery (Irl)", value: 1.17}
-        ];
+        // sets chart settings
+        chart.selectionMode('none');
+        chart.stroke('#bdc8ce');
+        chart.headers().background().fill('#eceff1').stroke('#bdc8ce');
 
-        // set data
-        chart.data(data, anychart.enums.TreeFillingMethod.AS_TABLE);
+        // sets title for chart and customizes it
+        chart.title().enabled(true).padding([0, 0, 20, 0]).useHtml(true).text(
+                'Composition of Human Body<br/>' +
+                '<span style="color:#212121; font-size: 13px;">Mass from the average adult human body 70 kg.</span>'
+        );
 
-        // display chart
+        // sets settings for labels
+        chart.labels().fontColor('#212121').fontSize(12).useHtml(true).textFormatter(function() {
+            return this.getDataValue('name') + '<br/><span style="font-size: 11px; font-weight: bold">' +
+                    parseFloat(this.value).toLocaleString() + '</span> kg';
+        });
+
+        // set colorScale with colors
+        chart.colorScale(anychart.scales.linearColor('#ffe082', '#f06292'));
+
+        // setting the number of levels shown
+        chart.hintDepth(1);
+
+        // hintOpacity setting
+        chart.hintOpacity(0.5);
+
+        // set container id for the chart
         chart.container('container');
-        chart.draw();
+
+        // initiate chart drawing
+        chart.draw(true);
+
     });
+
+// create data for the sample
+var composition_data = [
+  {parent: null, name: "Elements", id: "0"},
+  {parent: "0", id:"1", atomic_number: "8", name: "Oxygen", value: 43, positive: "Yes (e.g. water, electron acceptor)", negative: "Reactive Oxygen Species"},
+  {parent: "0", id:"2", atomic_number: "6", name: "Carbon", value: 16, positive: "Yes (organic compounds are hydrocarbon derivatives)", negative: ""},
+  {parent: "0", id:"3", atomic_number: "1", name: "Hydrogen", value: 7, positive: "Yes (e.g. water)", negative: ""},
+  {parent: "0", id:"4", atomic_number: "7", name: "Nitrogen", value: 1.8, positive: "Yes (e.g. DNA and amino acids)", negative: ""},
+  {parent: "0", id:"5", atomic_number: "20", name: "Calcium", value: 1.0, positive: "Yes (e.g. Calmodulin and Hydroxylapatite in bones)", negative: ""},
+
+  {parent: "0", id:"00", name: "Other"},
+    {parent: "00", id:"6", atomic_number: "15", name: "Phosphorus", value: 0.78, positive: "Yes (e.g. DNA and phosphorylation)", negative: ""},
+    {parent: "00", id:"7", atomic_number: "19", name: "Potassium", value: 0.14, positive: "Yes (e.g. Na+/K+-ATPase)", negative: ""},
+    {parent: "00", id:"8", atomic_number: "16", name: "Sulfur", value: 0.14, positive: "Yes (e.g.Cysteine, Methionine, Biotin, Thiamine)", negative: ""},
+    {parent: "00", id:"9", atomic_number: "11", name: "Sodium", value: 0.10, positive: "Yes (e.g. Na+/K+-ATPase)", negative: ""},
+    {parent: "00", id:"10", atomic_number: "17", name: "Chlorine", value: 0.095, positive: "Yes (e.g. Cl-transporting ATPase)", negative: ""},
+    {parent: "00", id:"11", atomic_number: "12", name: "Magnesium", value: 0.019, positive: "Yes (e.g. binding to ATP and other nucleotides)", negative: ""},
+    {parent: "00", id:"12", atomic_number: "26", name: "Iron*", value: 0.0042, positive: "Yes (e.g. Hemoglobin, Cytochromes)", negative: ""},
+    {parent: "00", id:"13", atomic_number: "9", name: "Fluorine", value: 0.0026, positive: "Yes (topically hardens teeth)", negative: "toxic in high amounts"},
+    {parent: "00", id:"14", atomic_number: "30", name: "Zinc", value: 0.0023, positive: "Yes (e.g. Zinc finger proteins)", negative: ""},
+    {parent: "00", id:"15", atomic_number: "14", name: "Silicon", value: 0.001, positive: "Yes (probable)", negative: ""},
+    {parent: "00", id:"16", atomic_number: "37", name: "Rubidium", value: 0.00068, positive: "No (probable)", negative: ""},
+    {parent: "00", id:"17", atomic_number: "38", name: "Strontium", value: 0.00032, positive: "Possible (suspected bone growth factor)", negative: ""},
+    {parent: "00", id:"18", atomic_number: "35", name: "Bromine", value: 0.00026, positive: "Yes (not confirmed) Collagen IV crosslink synthetic cofactor.", negative: ""},
+    {parent: "00", id:"19", atomic_number: "82", name: "Lead", value: 0.00012, positive: "No, probably (possible NMDA antagonist)", negative: "toxic in higher amounts"},
+
+    {parent: "00", id:"000", name: "Other"},
+      {parent: "000", id:"20", atomic_number: "29", name: "Copper", value: 0.000072, positive: "Yes (e.g. copper proteins)", negative: ""},
+      {parent: "000", id:"21", atomic_number: "13", name: "Aluminum", value: 0.000060, positive: "No", negative: ""},
+      {parent: "000", id:"22", atomic_number: "48", name: "Cadmium", value: 0.000050, positive: "No, probably", negative: "toxic in higher amounts"},
+      {parent: "000", id:"23", atomic_number: "58", name: "Cerium", value: 0.000040, positive: "No", negative: ""},
+      {parent: "000", id:"24", atomic_number: "56", name: "Barium", value: 0.000022, positive: "No, probably", negative: "toxic"},
+      {parent: "000", id:"25", atomic_number: "50", name: "Tin", value: 0.000020, positive: "No, probably", negative: ""},
+      {parent: "000", id:"26", atomic_number: "53", name: "Iodine", value: 0.000020, positive: "Yes (e.g. thyroxine, triiodothyronine)", negative: ""},
+      {parent: "000", id:"27", atomic_number: "22", name: "Titanium", value: 0.000020, positive: "No", negative: ""},
+      {parent: "000", id:"28", atomic_number: "5", name: "Boron", value: 0.000018, positive: "Yes (probably)", negative: ""},
+      {parent: "000", id:"29", atomic_number: "34", name: "Selenium", value: 0.000015, positive: "Yes", negative: "toxic in higher amounts"},
+      {parent: "000", id:"30", atomic_number: "28", name: "Nickel", value: 0.000015, positive: "No, probably", negative: ""},
+      {parent: "000", id:"31", atomic_number: "24", name: "Chromium", value: 0.000014, positive: "Yes (not confirmed)", negative: ""},
+      {parent: "000", id:"32", atomic_number: "25", name: "Manganese", value: 0.000012, positive: "Yes (e.g. Mn-SOD)", negative: ""},
+      {parent: "000", id:"33", atomic_number: "33", name: "Arsenic", value: 0.000007, positive: "Yes in rats, hamsters, goats. Probably humans.", negative: "toxic in higher amounts"},
+      {parent: "000", id:"34", atomic_number: "3", name: "Lithium", value: 0.000007, positive: "Yes, probably. Useful medically (mood stabilizer).", negative: "toxic in higher amounts"},
+      {parent: "000", id:"35", atomic_number: "80", name: "Mercury", value: 0.000006, positive: "No", negative: "toxic"},
+      {parent: "000", id:"36", atomic_number: "55", name: "Caesium", value: 0.000006, positive: "No", negative: ""},
+      {parent: "000", id:"37", atomic_number: "42", name: "Molybdenum", value: 0.000005, positive: "Yes (e.g. the molybdenum oxotransferases, Xanthine oxidase and Sulfite oxidase)", negative: ""},
+      {parent: "000", id:"38", atomic_number: "32", name: "Germanium", value: 0.000005, positive: "No, probably", negative: ""},
+      {parent: "000", id:"39", atomic_number: "27", name: "Cobalt", value: 0.000003, positive: "Yes (cobalamin, B12)", negative: ""},
+      {parent: "000", id:"40", atomic_number: "51", name: "Antimony", value: 0.000002, positive: "No", negative: "toxic"},
+      {parent: "000", id:"41", atomic_number: "47", name: "Silver", value: 0.000002, positive: "No", negative: ""},
+      {parent: "000", id:"42", atomic_number: "41", name: "Niobium", value: 0.0000015, positive: "No", negative: ""},
+      {parent: "000", id:"43", atomic_number: "40", name: "Zirconium", value: 0.000001, positive: "No", negative: ""},
+      {parent: "000", id:"44", atomic_number: "57", name: "Lanthanum", value: 0.0000008, positive: "No", negative: ""},
+      {parent: "000", id:"45", atomic_number: "52", name: "Tellurium", value: 0.0000007, positive: "No", negative: ""},
+      {parent: "000", id:"46", atomic_number: "31", name: "Gallium", value: 0.0000007, positive: "No", negative: ""},
+      {parent: "000", id:"47", atomic_number: "39", name: "Yttrium", value: 0.0000006, positive: "No", negative: ""},
+      {parent: "000", id:"48", atomic_number: "83", name: "Bismuth", value: 0.0000005, positive: "No (Useful in small amounts for gastrointestinal pain)", negative: ""},
+      {parent: "000", id:"49", atomic_number: "81", name: "Thallium", value: 0.0000005, positive: "No", negative: "toxic"},
+      {parent: "000", id:"50", atomic_number: "49", name: "Indium", value: 0.0000004, positive: "No", negative: ""},
+      {parent: "000", id:"51", atomic_number: "79", name: "Gold", value: 0.0000002, positive: "No", negative: ""},
+      {parent: "000", id:"52", atomic_number: "21", name: "Scandium", value: 0.0000002, positive: "No", negative: ""},
+      {parent: "000", id:"53", atomic_number: "73", name: "Tantalum", value: 0.0000002, positive: "No", negative: ""},
+      {parent: "000", id:"54", atomic_number: "23", name: "Vanadium", value: 0.00000011, positive: "Yes (?) (In humans, suggested osteo-metabolism (bone) growth factor)", negative: ""},
+      {parent: "000", id:"55", atomic_number: "90", name: "Thorium", value: 0.0000001, positive: "No", negative: "toxic"},
+      {parent: "000", id:"56", atomic_number: "92", name: "Uranium", value: 0.0000001, positive: "No", negative: "toxic"},
+      {parent: "000", id:"57", atomic_number: "62", name: "Samarium", value: 0.00000005, positive: "No", negative: ""},
+      {parent: "000", id:"58", atomic_number: "74", name: "Tungsten", value: 0.00000002, positive: "No", negative: ""},
+      {parent: "000", id:"59", atomic_number: "4", name: "Beryllium", value: 0.000000036, positive: "No", negative: "toxic"},
+      {parent: "000", id:"60", atomic_number: "88", name: "Radium", value: 0.00000000000003, positive: "No", negative: "toxic"}
+]
 </script>
 </body>

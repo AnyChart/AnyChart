@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+<body>
+<div id="container" style="width: 400px; height: 300px;"></div>
+<script src="../../out/anychart-bundle.min.js"></script>
+<script>
+    anychart.onDocumentReady(function() {
+        chart = anychart.column([1, 4, 2, 3, 7, 5]);
+        chart.container('container');
+        chart.draw(true);
+    });
+</script>
+</body>
+</html>
