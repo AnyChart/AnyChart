@@ -2317,9 +2317,9 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
 
           var duration = this.zoomDuration || anychart.charts.Map.TIMINGS.DEFAULT_ZOOM_DURATION;
 
-          var contextMenu = this.contextMenu();
-          if (contextMenu && contextMenu.isVisible()) {
-            contextMenu.hide();
+          if (goog.global['anychart']['ui']['ContextMenu']) {
+            var contextMenu = this.contextMenu();
+            if (contextMenu.isVisible()) contextMenu.hide();
           }
 
           this.zoomAnimation = new anychart.animations.MapZoomAnimation(this, [this.zoomLevel()], [this.zoomDest], duration, this != this.getCurrentScene());
