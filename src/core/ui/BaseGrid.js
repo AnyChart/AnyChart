@@ -1611,9 +1611,11 @@ anychart.core.ui.BaseGrid.prototype.drawRowFills_ = function() {
  * @private
  */
 anychart.core.ui.BaseGrid.prototype.mouseWheelHandler_ = function(e) {
-  if (this.interactivityHandler.contextMenu) {
-    var menu = this.interactivityHandler.contextMenu();
-    if (menu.isVisible()) menu.hide();
+  if (goog.global['anychart']['ui']['ContextMenu']) {
+    if (this.interactivityHandler.contextMenu) {
+      var menu = this.interactivityHandler.contextMenu();
+      if (menu.isVisible()) menu.hide();
+    }
   }
 
   var dx = e.deltaX;
