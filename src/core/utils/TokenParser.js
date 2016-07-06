@@ -61,6 +61,7 @@ anychart.core.utils.TokenParser.parse = function(format) {
 
   function modifyParams(params) {
     var del = [];
+    var i;
     for (var key in params) {
       if (params.hasOwnProperty(key)) {
         var value = params[key];
@@ -82,13 +83,39 @@ anychart.core.utils.TokenParser.parse = function(format) {
               var filter = function(item, index) {
                 return index % 2 != 0;
               };
-              var arrFact = goog.array.filter(arr[0].split(/(\w+)/), filter);
-              var arrSuff = goog.array.filter(arr[1].split(/(\w+)/), filter);
-              arrFact = goog.array.map(arrFact, function(item) {
+              var arrFactors = goog.array.filter(arr[0].split(/\(([ \w\+\-]*)\)/), filter);
+              var arrSuffixes = goog.array.filter(arr[1].split(/\(([ \w]*)\)/), filter);
+              arrFactors = goog.array.map(arrFactors, function(item) {
                 return +item;
               });
-              newScale['factors'] = arrFact;
-              newScale['suffixes'] = arrSuff;
+
+              // cause string tokens with scale formatting mostly used
+              // like 6.x legacy we suppose that scale format is in
+              // anychart 6.x style too, so scale factors are cumulative
+              // and in ascending order and we should convert scale params to
+              // anychart 7.x style (non-cumulative factors in descending order)
+              var acc = arrFactors[0];
+              var newFactors = [acc];
+              for (i = 1; i < arrFactors.length; i++) {
+                acc *= arrFactors[i];
+                newFactors.push(acc);
+              }
+
+              // cause we will reverse factors/suffixes arrays - we should
+              // make them same length
+              if (newFactors.length != arrSuffixes.length) {
+                var min = Math.min(newFactors.length, arrSuffixes.length);
+                newFactors.length = min;
+                arrSuffixes.length = min;
+              }
+
+              // newFactors and arrSuffixes are have same length now.
+              // just reverse them
+              newFactors.reverse();
+              arrSuffixes.reverse();
+
+              newScale['factors'] = newFactors;
+              newScale['suffixes'] = arrSuffixes;
               value = newScale;
             }
           }
@@ -102,7 +129,7 @@ anychart.core.utils.TokenParser.parse = function(format) {
         params[newKey] = value;
       }
     }
-    for (var i = del.length; i--;)
+    for (i = del.length; i--;)
       delete params[del[i]];
   }
 

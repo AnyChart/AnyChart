@@ -72,9 +72,8 @@ anychart.core.utils.AxisLabelsContextProvider.prototype.getTokenType = function(
     case anychart.enums.StringToken.AXIS_SCALE_MIN:
     case anychart.enums.StringToken.INDEX:
       return anychart.enums.TokenType.NUMBER;
-    default:
-      return anychart.enums.TokenType.STRING;
   }
+  return anychart.core.utils.AxisLabelsContextProvider.base(this, 'getTokenType', name);
 };
 
 
