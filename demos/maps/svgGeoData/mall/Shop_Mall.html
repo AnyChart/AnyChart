@@ -1,0 +1,131 @@
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+
+
+    <!--<script src="../../../../out/anychart-bundle.min.js"></script>-->
+
+
+    <script src="../../../../contrib/closure-library/closure/goog/base.js"></script>
+    <script src="../../../../src/deps.js"></script>
+    <script>
+        goog.require('anychart.themes.defaultTheme');
+        goog.require('anychart.modules.anychart_bundle');
+    </script>
+    <script src="../../../../proj4.js"></script>
+
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.anychart.com/css/latest/anychart-ui.min.css">
+    <style>
+        #container {
+            /*width: 700px;*/
+            /*height: 500px;*/
+            margin: 0 auto;
+         }
+    </style>
+
+    <script x-export="chart">
+        anychart.onDocumentReady(function () {
+            $.ajax({
+                type: 'GET',
+                url: 'sport-mall.svg',
+                success: function (data) {
+
+                    // data for creating a SeatMap
+                    chart = anychart.seatMap([
+//                        {id: 'nike', value: 'Nike'},
+                        {id: ['nike1', 'nike2', 'nike3', 'nike4', 'nike5', 'nike6', 'nike7', 'nike8', 'nike9', 'nike10', 'nike11', 'nike12'], value: 'Nike'},
+//                        {id: 'adidas', value: 'Adidas'},
+                        {id: ['adidas1', 'adidas2', 'adidas3', 'adidas4'], value: 'Adidas'},
+                        {id: 'puma', value: 'Puma'},
+                        {id: 'reebok', value: 'Reebok'}
+                    ]);
+                    // set svg data
+                    chart.geoData(data);
+                    // load svg-file how it looked(colors stroke/fill)
+                    chart.unboundRegions('as-is');
+
+                    var stage = anychart.graphics.create('container');
+
+                    var series = chart.getSeries(0);
+                    // set color scale.
+                    series.colorScale(anychart.scales.ordinalColor([
+                        {'equal': 'Nike', 'color': 'rgb(127, 210, 235)'},
+                        {'equal': 'Adidas', 'color': 'rgb(111, 193, 117)'},
+                        {'equal': 'Puma', 'color': 'rgb(242, 203, 117)'},
+                        {'equal': 'Reebok', 'color': 'rgb(188, 139, 191)'}
+                    ]));
+
+                    function returnColor() {
+
+                        var attrs = this.attributes;
+                        if (attrs) {
+                            // attr in svg.file
+                            var class_ = attrs.class;
+                            switch (class_) {
+                                case 'nike' :
+                                    return 'rgb(127, 210, 235)';
+                                case 'adidas' :
+                                    return 'rgb(111, 193, 117)';
+                                case 'puma' :
+                                    return 'rgb(242, 203, 117)';
+                                case 'reebok' :
+                                    return 'rgb(188, 139, 191)';
+                                case 'nike-logo' :
+                                case 'adidas-logo' :
+                                case 'puma-logo' :
+                                case 'reebok-logo' :
+                                    return '#606061';
+                                default:
+                                    return this.sourceColor;
+                                    // it returns the original color for
+                                    // those elements that are not fill/stroke over
+                            }
+                        }
+                    }
+
+                    // sets stroke/fill series
+                    series.stroke(returnColor);
+                    series.fill(returnColor);
+
+                    function returnColorHoverAndSelect() {
+                        var attrs = this.attributes;
+                        if (attrs) {
+                            // attr in svg.file
+                            var class_ = attrs.class;
+                            switch (class_) {
+                                case 'nike' :
+                                case 'adidas' :
+                                case 'puma' :
+                                case 'reebok' :
+                                    return anychart.color.lighten(this.sourceColor, 0.25);
+                                case 'nike-logo' :
+                                case 'adidas-logo' :
+                                case 'puma-logo' :
+                                case 'reebok-logo' :
+                                    return anychart.color.darken(this.sourceColor, 0.5);
+                                default:
+                                    return this.sourceColor;
+                                    // it returns the original color for
+                                    // those elements that are not fill/stroke over
+                            }
+                        }
+                    }
+
+                    // sets fill on hover series and select series
+                    series.hoverFill(returnColorHoverAndSelect);
+                    series.selectFill(returnColorHoverAndSelect);
+
+                    // drawing chart in container
+                    chart.container(stage).draw();
+                }
+            });
+
+        });
+    </script>
+</head>
+<body>
+<div id="container"></div>
+</body>
+</html>

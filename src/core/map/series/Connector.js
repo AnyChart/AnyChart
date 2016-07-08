@@ -230,12 +230,7 @@ anychart.core.map.series.Connector.prototype.getAnchorForLabel_ = function(angle
 };
 
 
-/**
- * Create series position provider.
- * @param {string} position Understands anychart.enums.Position and some additional values.
- * @return {Object} Object with info for labels formatting.
- * @protected
- */
+/** @inheritDoc */
 anychart.core.map.series.Connector.prototype.createPositionProvider = function(position) {
   var iterator = this.getIterator();
   var shape = iterator.meta('shape');
@@ -383,9 +378,7 @@ anychart.core.map.series.Connector.prototype.createPositionProvider = function(p
 };
 
 
-/**
- * @inheritDoc
- */
+/** @inheritDoc */
 anychart.core.map.series.Connector.prototype.startDrawing = function() {
   goog.base(this, 'startDrawing');
 

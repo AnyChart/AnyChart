@@ -621,7 +621,8 @@ anychart.core.map.series.Bubble.prototype.getReferenceCoords = function() {
     y = txCoords[1];
 
   if (isNaN(x) || isNaN(y)) {
-    var prop = iterator.meta('regionProperties');
+    var features = iterator.meta('features');
+    var prop = features && features.length ? features[0]['properties'] : null;
     if (prop) {
       iterator.meta('regionId', id);
       var position = this.getPositionByRegion()['value'];

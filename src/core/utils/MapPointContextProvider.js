@@ -23,7 +23,8 @@ anychart.core.utils.MapPointContextProvider.prototype.getTokenValue = function(n
   var tokenResult = anychart.core.utils.MapPointContextProvider.base(this, 'getTokenValue', name);
   if (!goog.isDef(tokenResult)) {
     var iterator = this['series'].getIterator();
-    var pointGeoProp = iterator.meta('regionProperties');
+    var features = iterator.meta('features');
+    var pointGeoProp = features && features.length ? features[0]['properties'] : null;
     if (pointGeoProp)
       tokenResult = pointGeoProp[name.substr(1)];
   }
@@ -48,7 +49,8 @@ anychart.core.utils.MapPointContextProvider.prototype.applyReferenceValues = fun
   if (this['series'].name)
     this['seriesName'] = this['series'].name() || 'Series: ' + this['series'].index();
 
-  var pointGeoProp = iterator.meta('regionProperties');
+  var features = iterator.meta('features');
+  var pointGeoProp = features && features.length ? features[0]['properties'] : null;
   if (pointGeoProp) {
     this['name'] = pointGeoProp['name'];
     this['regionProperties'] = pointGeoProp;

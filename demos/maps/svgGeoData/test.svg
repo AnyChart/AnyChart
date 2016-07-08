@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 15.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="595.28px" height="841.89px" viewBox="0 0 595.28 841.89" enable-background="new 0 0 595.28 841.89" xml:space="preserve">
+    <rect id='1' x="62.682" y="61.636" fill="#FFFFFF" stroke="#000000" stroke-miterlimit="10" width="179.546" height="73.864">
+        <desc>
+        <name>Kenya</name>
+        <labelrank>2</labelrank>
+        <country-abbrev>Ken.</country-abbrev>
+        <subregion>Eastern Africa</subregion>
+        <region-wb>Sub-Saharan Africa</region-wb>
+        <iso-a3>KEN</iso-a3>
+        <iso-a2>KE</iso-a2>
+        <woe-id>23424863</woe-id>
+        <continent>Africa</continent>
+        <hc-middle-x>0.47</hc-middle-x>
+        <hc-middle-y>0.43</hc-middle-y>
+        <hc-key>ke</hc-key>
+        <hc-a2>KE</hc-a2>
+      </desc>
+    </rect>
+
+    <!--<rect id='245' x="0" y="0" fill="#FFFFFF" stroke="#000000" stroke-miterlimit="10" width="179.546" height="111.364"/>-->
+    <rect id='2' x="62.682" y="177.545" fill="#FFFFFF" stroke="#000000" stroke-miterlimit="10" width="179.546" height="111.364"/>
+    <rect id='3' x="305.863" y="61.636" fill="#FFFFFF" stroke="#000000" stroke-miterlimit="10" width="157.955" height="73.864"/>
+    <rect id='4' x="301.752" y="219.989" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -82.2115 352.8646)" fill="#FFFFFF" stroke="#000000" stroke-miterlimit="10" width="166.178" height="111.364"/>
+    <g id='5'>
+        <g>
+            <rect id='6' x="86.714" y="413.91" fill="#FFFFFF" stroke="#000000" stroke-miterlimit="10" width="229.545" height="144.318"/>
+        </g>
+        <rect id='7' x="160.41" y="475.843" fill="#FFFFFF" stroke="#000000" stroke-miterlimit="10" width="94.486" height="46.591"/>
+    </g>
+    <g id="8">
+        <rect id="9" x="401.318" y="449.99" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -214.2029 455.0082)" fill="#FFFFFF" stroke="#000000" stroke-miterlimit="10" width="81.647" height="72.159"/>
+        <rect x="431.51" y="477.492" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -214.5654 460.2714)" fill="#FFFFFF" stroke="#000000" stroke-miterlimit="10" width="33.607" height="23.294"/>
+    </g>
+    <g id="10">
+        <rect x="160.41" y="655.954" fill="#FFFFFF" stroke="#000000" stroke-miterlimit="10" width="81.818" height="61.364"/>
+        <rect x="183.136" y="679.818" fill="#FFFFFF" stroke="#000000" stroke-miterlimit="10" width="40.909" height="26.136"/>
+    </g>
+
+    <circle id="11" fill="#FFFFFF" stroke="#000000" stroke-miterlimit="10" cx="432.14" cy="687.445" r="120"/>
+    <ellipse id="12" fill="#FFFFFF" stroke="#000000" stroke-miterlimit="10" cx="432.14" cy="687.445" rx="101" ry="59"/>
+    <ellipse transform="matrix(0.7847 -0.6198 0.6198 0.7847 -333.0778 415.8435)" stroke-miterlimit="10" cx="432.14" cy="687.445" rx="59" ry="101"/>
+
+    <!--<path id="13" d="M 99.4794963642581 489.6476769560063 A 274.815 274.815 0 1 1 520.520503635742 489.64767695600625 L 526.9322956246478 495.02780924908257 A 283.185 283.185 0 1 0 93.06770437535224 495.0278092490827 Z"/>-->
+    <path id="14" d="M99.4794963642581,489.6476769560063A274.815,274.815,0,1,1,520.520503635742,489.64767695600625L 526.9322956246478 495.02780924908257 A 283.185 283.185 0 1 0 93.06770437535224 495.0278092490827 Z"/>
+
+    <path id="15" fill="#FFFFFF" stroke="#000000" stroke-miterlimit="10" d="M72.141,628.445c29,53,124.539-13,88.27-38s-78.27-34-92.27,0
+        s-62,124-31,141s6.141,20,60.57,6s9.43-35-5.57-50"/>
+
+    <text transform="matrix(1 0 0 1 110.1406 187)"><tspan x="0" y="0" font-family="'MyriadPro-Regular'" font-size="12">Тестовый</tspan><tspan x="0" y="14.4" font-family="'MyriadPro-Regular'" font-size="12">Текст спереносом</tspan></text>
+    <text transform="matrix(0.7071 -0.7071 0.7071 0.7071 347.1396 311.4453)"><tspan x="0" y="0" font-family="'MyriadPro-Regular'" font-size="12">Трансформированный</tspan><tspan x="0" y="14.4" font-family="'MyriadPro-Regular'" font-size="12">Текст !!!!</tspan></text>
+
+
+    <text x="100" y="100" transform="matrix(1 0 0 1 100 100)">
+        <tspan font-family="'MyriadPro-Regular'" font-size="12">Тестовый</tspan>
+        <!--<tspan x="0" y="0" font-family="'MyriadPro-Regular'" font-size="12">Тестовый</tspan>-->
+        <!--<tspan x="0" y="14.4" font-family="'MyriadPro-Regular'" font-size="12">Текст спереносом</tspan>-->
+    </text>
+</svg>

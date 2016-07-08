@@ -1,0 +1,588 @@
+<svg xmlns="http://www.w3.org/2000/svg" border="0" data-ac-wrapper-id="2" width="819" height="480"
+     class="anychart-ui-support" style="display: block;">
+    <defs>
+        <pattern data-ac-wrapper-id="23" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse"
+                 id="#ac_hatchFill_0">
+            <path data-ac-wrapper-id="24" d="M 0 0 L 5 5" fill="none" stroke="black" stroke-opacity="0.5"
+                  stroke-width="1"/>
+        </pattern>
+        <pattern data-ac-wrapper-id="30" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse"
+                 id="#ac_hatchFill_1">
+            <path data-ac-wrapper-id="31" d="M 4 1 L 1 2.5 4 4 M 6 6 L 9 7.5 6 9" fill="none" stroke="black"
+                  stroke-opacity="0.5" stroke-width="1"/>
+        </pattern>
+        <clipPath clip-rule="nonzero" id="#ac_clip_3">
+            <path data-ac-wrapper-id="33" d="M 89 74.5 L 799 74.5 799 429 89 429 89 74.5 Z" fill="none" stroke="black"/>
+        </clipPath>
+        <clipPath clip-rule="nonzero" id="#ac_clip_5">
+            <path data-ac-wrapper-id="35" d="M 89 74.5 L 799 74.5 799 429 89 429 89 74.5 Z" fill="none" stroke="black"/>
+        </clipPath>
+        <clipPath clip-rule="nonzero" id="#ac_clip_7">
+            <path data-ac-wrapper-id="37" d="M 89 74.5 L 799 74.5 799 429 89 429 89 74.5 Z" fill="none" stroke="black"/>
+        </clipPath>
+        <clipPath clip-rule="nonzero" id="#ac_clip_9">
+            <path data-ac-wrapper-id="39" d="M 89 74.5 L 799 74.5 799 429 89 429 89 74.5 Z" fill="none" stroke="black"/>
+        </clipPath>
+        <clipPath clip-rule="nonzero" id="#ac_clip_b">
+            <path data-ac-wrapper-id="41" d="M 89 74.5 L 799 74.5 799 429 89 429 89 74.5 Z" fill="none" stroke="black"/>
+        </clipPath>
+        <clipPath clip-rule="nonzero" id="#ac_clip_d">
+            <path data-ac-wrapper-id="43" d="M 89 74.5 L 799 74.5 799 429 89 429 89 74.5 Z" fill="none" stroke="black"/>
+        </clipPath>
+        <clipPath clip-rule="nonzero" id="#ac_clip_f">
+            <path data-ac-wrapper-id="77" d="M 89 75 L 799 75 799 429 89 429 89 75 Z" fill="none" stroke="black"/>
+        </clipPath>
+        <linearGradient id="#ac_linearGradient_g" x1="0.49999999999999994" y1="1" x2="0.5" y2="0"
+                        gradientUnits="objectBoundingBox">
+            <stop offset="0" style="stop-color:#7ebbec;stop-opacity:1"/>
+            <stop offset="1" style="stop-color:#93cbf9;stop-opacity:1"/>
+        </linearGradient>
+        <clipPath clip-rule="nonzero" id="#ac_clip_i">
+            <path data-ac-wrapper-id="141" d="M 89 75 L 799 75 799 429 89 429 89 75 Z" fill="none" stroke="black"/>
+        </clipPath>
+        <linearGradient id="#ac_linearGradient_j" x1="0.49999999999999994" y1="1" x2="0.5" y2="0"
+                        gradientUnits="objectBoundingBox">
+            <stop offset="0" style="stop-color:#468cd1;stop-opacity:1"/>
+            <stop offset="1" style="stop-color:#5e9fe0;stop-opacity:1"/>
+        </linearGradient>
+    </defs>
+    <g data-ac-wrapper-id="3">
+        <g data-ac-wrapper-id="12">
+            <path data-ac-wrapper-id="13" d="M 0.5 0.5 L 818.5 0.5 818.5 479.5 0.5 479.5 0.5 0.5 Z" fill="#ffffff"
+                  stroke="none"/>
+            <path data-ac-wrapper-id="32" d="M 0,0" fill="none" stroke="none" clip-path="url(##ac_clip_3)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="34" d="M 0,0" fill="none" stroke="none" clip-path="url(##ac_clip_5)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="36"
+                  d="M 88 429.5 L 99 418.5 799 418.5 M 88 429.5 L 99 418.5 799 418.5 M 88 343.5 L 99 332.5 799 332.5 M 88 257.5 L 99 246.5 799 246.5 M 88 171.5 L 99 160.5 799 160.5 M 88 86.5 L 99 75.5 799 75.5"
+                  fill="none" stroke="#CECECE" clip-path="url(##ac_clip_7)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="38" d="M 0,0" fill="none" stroke="none" clip-path="url(##ac_clip_9)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="40" d="M 699.5 75 L 798.5 75 798.5 419 787.5 430 688.5 430 699.5 419 Z"
+                  fill="none" stroke="none" clip-path="url(##ac_clip_b)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="42"
+                  d="M 88.5 430 L 99.5 419 99.5 75 M 188.5 430 L 199.5 419 199.5 75 M 288.5 430 L 299.5 419 299.5 75 M 388.5 430 L 399.5 419 399.5 75 M 488.5 430 L 499.5 419 499.5 75 M 588.5 430 L 599.5 419 599.5 75 M 688.5 430 L 699.5 419 699.5 75 M 787.5 430 L 798.5 419 798.5 75"
+                  fill="none" stroke="#CECECE" clip-path="url(##ac_clip_d)" clipPathUnits="userSpaceOnUse"/>
+            <g data-ac-wrapper-id="16" transform="matrix(1,0,0,1,336.0234375,39.296875)">
+                <g data-ac-wrapper-id="17">
+                    <g data-ac-wrapper-id="18">
+                        <text data-ac-wrapper-id="19" font-style="normal" font-variant="normal"
+                              font-family="Verdana, Helvetica, Arial, sans-serif" font-size="13" font-weight="normal"
+                              fill="#7c868e" letter-spacing="normal" text-decoration="none" direction="ltr"
+                              text-anchor="start" x="20" y="13"
+                              style="-webkit-user-select: none; opacity: 1; cursor: pointer;">
+                            <tspan dy="0">Florida</tspan>
+                        </text>
+                        <path data-ac-wrapper-id="20" d="M 0 0 L 15 0 15 15 0 15 Z" fill="#64b5f6" stroke="none"
+                              style="cursor: pointer;"/>
+                        <path data-ac-wrapper-id="22" d="M 0 0 L 15 0 15 15 0 15 Z" fill="url(##ac_hatchFill_0)"
+                              stroke="none" style="cursor: pointer;"/>
+                        <path data-ac-wrapper-id="21" d="M 0 0 L 63.9375 0 63.9375 16 0 16 0 0 Z" fill="#FFFFFF"
+                              fill-opacity="0.00001" stroke="none" style="cursor: pointer;"/>
+                    </g>
+                    <g data-ac-wrapper-id="25" transform="matrix(1,0,0,1,78.9375,0)">
+                        <text data-ac-wrapper-id="26" font-style="normal" font-variant="normal"
+                              font-family="Verdana, Helvetica, Arial, sans-serif" font-size="13" font-weight="normal"
+                              fill="#7c868e" letter-spacing="normal" text-decoration="none" direction="ltr"
+                              text-anchor="start" x="20" y="13"
+                              style="-webkit-user-select: none; opacity: 1; cursor: pointer;">
+                            <tspan dy="0">Texas</tspan>
+                        </text>
+                        <path data-ac-wrapper-id="27" d="M 0 0 L 15 0 15 15 0 15 Z" fill="#1976d2" stroke="none"
+                              style="cursor: pointer;"/>
+                        <path data-ac-wrapper-id="29" d="M 0 0 L 15 0 15 15 0 15 Z" fill="url(##ac_hatchFill_1)"
+                              stroke="none" style="cursor: pointer;"/>
+                        <path data-ac-wrapper-id="28" d="M 0 0 L 58.015625 0 58.015625 16 0 16 0 0 Z" fill="#FFFFFF"
+                              fill-opacity="0.00001" stroke="none" style="cursor: pointer;"/>
+                    </g>
+                </g>
+            </g>
+            <path data-ac-wrapper-id="81"
+                  d="M 111.5 109.43439999999998 L 142.75 109.43439999999998 142.75 418 111.5 418 Z" fill="#70b8f2"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="90" d="M 211.5 293.0788 L 242.75 293.0788 242.75 418 211.5 418 Z" fill="#70b8f2"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="99" d="M 311.5 281.4344 L 342.75 281.4344 342.75 418 311.5 418 Z" fill="#70b8f2"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="108" d="M 411.5 328.5108 L 442.75 328.5108 442.75 418 411.5 418 Z" fill="#70b8f2"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="117" d="M 511.5 311.3108 L 542.75 311.3108 542.75 418 511.5 418 Z" fill="#70b8f2"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="126" d="M 611.5 327.1176 L 642.75 327.1176 642.75 418 611.5 418 Z" fill="#70b8f2"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="135" d="M 711.5 305.0672 L 742.75 305.0672 742.75 418 711.5 418 Z" fill="#70b8f2"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="79"
+                  d="M 100.5 120.43439999999998 L 111.5 109.43439999999998 111.5 418 100.5 429 Z" fill="#4b88b9"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="88" d="M 200.5 304.0788 L 211.5 293.0788 211.5 418 200.5 429 Z" fill="#4b88b9"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="97" d="M 300.5 292.4344 L 311.5 281.4344 311.5 418 300.5 429 Z" fill="#4b88b9"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="106" d="M 400.5 339.5108 L 411.5 328.5108 411.5 418 400.5 429 Z" fill="#4b88b9"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="115" d="M 500.5 322.3108 L 511.5 311.3108 511.5 418 500.5 429 Z" fill="#4b88b9"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="124" d="M 600.5 338.1176 L 611.5 327.1176 611.5 418 600.5 429 Z" fill="#4b88b9"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="133" d="M 700.5 316.0672 L 711.5 305.0672 711.5 418 700.5 429 Z" fill="#4b88b9"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="78" d="M 100.5 429 L 131.75 429 142.75 418 111.5 418 Z" fill="#5091c5"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="87" d="M 200.5 429 L 231.75 429 242.75 418 211.5 418 Z" fill="#5091c5"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="96" d="M 300.5 429 L 331.75 429 342.75 418 311.5 418 Z" fill="#5091c5"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="105" d="M 400.5 429 L 431.75 429 442.75 418 411.5 418 Z" fill="#5091c5"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="114" d="M 500.5 429 L 531.75 429 542.75 418 511.5 418 Z" fill="#5091c5"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="123" d="M 600.5 429 L 631.75 429 642.75 418 611.5 418 Z" fill="#5091c5"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="132" d="M 700.5 429 L 731.75 429 742.75 418 711.5 418 Z" fill="#5091c5"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="76"
+                  d="M 100.5 120.43439999999998 L 131.75 120.43439999999998 142.75 109.43439999999998 111.5 109.43439999999998 Z"
+                  fill="#7ebbec" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="86" d="M 200.5 304.0788 L 231.75 304.0788 242.75 293.0788 211.5 293.0788 Z"
+                  fill="#7ebbec" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="95" d="M 300.5 292.4344 L 331.75 292.4344 342.75 281.4344 311.5 281.4344 Z"
+                  fill="#7ebbec" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="104" d="M 400.5 339.5108 L 431.75 339.5108 442.75 328.5108 411.5 328.5108 Z"
+                  fill="#7ebbec" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="113" d="M 500.5 322.3108 L 531.75 322.3108 542.75 311.3108 511.5 311.3108 Z"
+                  fill="#7ebbec" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="122" d="M 600.5 338.1176 L 631.75 338.1176 642.75 327.1176 611.5 327.1176 Z"
+                  fill="#7ebbec" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="131" d="M 700.5 316.0672 L 731.75 316.0672 742.75 305.0672 711.5 305.0672 Z"
+                  fill="#7ebbec" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="80"
+                  d="M 131.75 120.43439999999998 L 142.75 109.43439999999998 142.75 418 131.75 429 Z" fill="#75aad5"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="89" d="M 231.75 304.0788 L 242.75 293.0788 242.75 418 231.75 429 Z" fill="#75aad5"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="98" d="M 331.75 292.4344 L 342.75 281.4344 342.75 418 331.75 429 Z" fill="#75aad5"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="107" d="M 431.75 339.5108 L 442.75 328.5108 442.75 418 431.75 429 Z"
+                  fill="#75aad5" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="116" d="M 531.75 322.3108 L 542.75 311.3108 542.75 418 531.75 429 Z"
+                  fill="#75aad5" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="125" d="M 631.75 338.1176 L 642.75 327.1176 642.75 418 631.75 429 Z"
+                  fill="#75aad5" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="134" d="M 731.75 316.0672 L 742.75 305.0672 742.75 418 731.75 429 Z"
+                  fill="#75aad5" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="82"
+                  d="M 100.5 120.43439999999998 L 131.75 120.43439999999998 131.75 429 100.5 429 Z"
+                  fill="url(##ac_linearGradient_g)" stroke="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="91" d="M 200.5 304.0788 L 231.75 304.0788 231.75 429 200.5 429 Z"
+                  fill="url(##ac_linearGradient_g)" stroke="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="100" d="M 300.5 292.4344 L 331.75 292.4344 331.75 429 300.5 429 Z"
+                  fill="url(##ac_linearGradient_g)" stroke="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="109" d="M 400.5 339.5108 L 431.75 339.5108 431.75 429 400.5 429 Z"
+                  fill="url(##ac_linearGradient_g)" stroke="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="118" d="M 500.5 322.3108 L 531.75 322.3108 531.75 429 500.5 429 Z"
+                  fill="url(##ac_linearGradient_g)" stroke="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="127" d="M 600.5 338.1176 L 631.75 338.1176 631.75 429 600.5 429 Z"
+                  fill="url(##ac_linearGradient_g)" stroke="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="136" d="M 700.5 316.0672 L 731.75 316.0672 731.75 429 700.5 429 Z"
+                  fill="url(##ac_linearGradient_g)" stroke="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="85"
+                  d="M 100.5 120.43439999999998 L 131.75 120.43439999999998 142.75 109.43439999999998 111.5 109.43439999999998 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="94" d="M 200.5 304.0788 L 231.75 304.0788 242.75 293.0788 211.5 293.0788 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="103" d="M 300.5 292.4344 L 331.75 292.4344 342.75 281.4344 311.5 281.4344 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="112" d="M 400.5 339.5108 L 431.75 339.5108 442.75 328.5108 411.5 328.5108 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="121" d="M 500.5 322.3108 L 531.75 322.3108 542.75 311.3108 511.5 311.3108 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="130" d="M 600.5 338.1176 L 631.75 338.1176 642.75 327.1176 611.5 327.1176 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="139" d="M 700.5 316.0672 L 731.75 316.0672 742.75 305.0672 711.5 305.0672 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="84"
+                  d="M 131.75 120.43439999999998 L 142.75 109.43439999999998 142.75 418 131.75 429 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="93" d="M 231.75 304.0788 L 242.75 293.0788 242.75 418 231.75 429 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="102" d="M 331.75 292.4344 L 342.75 281.4344 342.75 418 331.75 429 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="111" d="M 431.75 339.5108 L 442.75 328.5108 442.75 418 431.75 429 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="120" d="M 531.75 322.3108 L 542.75 311.3108 542.75 418 531.75 429 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="129" d="M 631.75 338.1176 L 642.75 327.1176 642.75 418 631.75 429 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="138" d="M 731.75 316.0672 L 742.75 305.0672 742.75 418 731.75 429 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="83"
+                  d="M 100.5 120.43439999999998 L 131.75 120.43439999999998 131.75 429 100.5 429 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="92" d="M 200.5 304.0788 L 231.75 304.0788 231.75 429 200.5 429 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="101" d="M 300.5 292.4344 L 331.75 292.4344 331.75 429 300.5 429 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="110" d="M 400.5 339.5108 L 431.75 339.5108 431.75 429 400.5 429 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="119" d="M 500.5 322.3108 L 531.75 322.3108 531.75 429 500.5 429 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="128" d="M 600.5 338.1176 L 631.75 338.1176 631.75 429 600.5 429 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="137" d="M 700.5 316.0672 L 731.75 316.0672 731.75 429 700.5 429 Z"
+                  fill="url(##ac_hatchFill_0)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_f)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="145" d="M 155.25 297.8604 L 186.5 297.8604 186.5 418 155.25 418 Z" fill="#2d80d2"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="154" d="M 255.25 245.8476 L 286.5 245.8476 286.5 418 255.25 418 Z" fill="#2d80d2"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="163"
+                  d="M 355.24999999999994 297.8604 L 386.49999999999994 297.8604 386.49999999999994 418 355.24999999999994 418 Z"
+                  fill="#2d80d2" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="172" d="M 455.25 256.9932 L 486.5 256.9932 486.5 418 455.25 418 Z" fill="#2d80d2"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="181"
+                  d="M 555.25 325.79319999999996 L 586.5 325.79319999999996 586.5 418 555.25 418 Z" fill="#2d80d2"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="190" d="M 655.25 330.9532 L 686.5 330.9532 686.5 418 655.25 418 Z" fill="#2d80d2"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="199" d="M 755.25 384.5312 L 786.5 384.5312 786.5 418 755.25 418 Z" fill="#2d80d2"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="143" d="M 144.25 308.8604 L 155.25 297.8604 155.25 418 144.25 429 Z"
+                  fill="#13599e" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="152" d="M 244.25 256.8476 L 255.25 245.8476 255.25 418 244.25 429 Z"
+                  fill="#13599e" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="161"
+                  d="M 344.24999999999994 308.8604 L 355.24999999999994 297.8604 355.24999999999994 418 344.24999999999994 429 Z"
+                  fill="#13599e" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="170" d="M 444.25 267.9932 L 455.25 256.9932 455.25 418 444.25 429 Z"
+                  fill="#13599e" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="179"
+                  d="M 544.25 336.79319999999996 L 555.25 325.79319999999996 555.25 418 544.25 429 Z" fill="#13599e"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="188" d="M 644.25 341.9532 L 655.25 330.9532 655.25 418 644.25 429 Z"
+                  fill="#13599e" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="197" d="M 744.25 395.5312 L 755.25 384.5312 755.25 418 744.25 429 Z"
+                  fill="#13599e" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="142" d="M 144.25 429 L 175.5 429 186.5 418 155.25 418 Z" fill="#145ea8"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="151" d="M 244.25 429 L 275.5 429 286.5 418 255.25 418 Z" fill="#145ea8"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="160"
+                  d="M 344.24999999999994 429 L 375.49999999999994 429 386.49999999999994 418 355.24999999999994 418 Z"
+                  fill="#145ea8" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="169" d="M 444.25 429 L 475.5 429 486.5 418 455.25 418 Z" fill="#145ea8"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="178" d="M 544.25 429 L 575.5 429 586.5 418 555.25 418 Z" fill="#145ea8"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="187" d="M 644.25 429 L 675.5 429 686.5 418 655.25 418 Z" fill="#145ea8"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="196" d="M 744.25 429 L 775.5 429 786.5 418 755.25 418 Z" fill="#145ea8"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="140" d="M 144.25 308.8604 L 175.5 308.8604 186.5 297.8604 155.25 297.8604 Z"
+                  fill="#468cd1" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="150" d="M 244.25 256.8476 L 275.5 256.8476 286.5 245.8476 255.25 245.8476 Z"
+                  fill="#468cd1" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="159"
+                  d="M 344.24999999999994 308.8604 L 375.49999999999994 308.8604 386.49999999999994 297.8604 355.24999999999994 297.8604 Z"
+                  fill="#468cd1" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="168" d="M 444.25 267.9932 L 475.5 267.9932 486.5 256.9932 455.25 256.9932 Z"
+                  fill="#468cd1" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="177"
+                  d="M 544.25 336.79319999999996 L 575.5 336.79319999999996 586.5 325.79319999999996 555.25 325.79319999999996 Z"
+                  fill="#468cd1" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="186" d="M 644.25 341.9532 L 675.5 341.9532 686.5 330.9532 655.25 330.9532 Z"
+                  fill="#468cd1" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="195" d="M 744.25 395.5312 L 775.5 395.5312 786.5 384.5312 755.25 384.5312 Z"
+                  fill="#468cd1" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="144" d="M 175.5 308.8604 L 186.5 297.8604 186.5 418 175.5 429 Z" fill="#4480bd"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="153" d="M 275.5 256.8476 L 286.5 245.8476 286.5 418 275.5 429 Z" fill="#4480bd"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="162"
+                  d="M 375.49999999999994 308.8604 L 386.49999999999994 297.8604 386.49999999999994 418 375.49999999999994 429 Z"
+                  fill="#4480bd" fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="171" d="M 475.5 267.9932 L 486.5 256.9932 486.5 418 475.5 429 Z" fill="#4480bd"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="180"
+                  d="M 575.5 336.79319999999996 L 586.5 325.79319999999996 586.5 418 575.5 429 Z" fill="#4480bd"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="189" d="M 675.5 341.9532 L 686.5 330.9532 686.5 418 675.5 429 Z" fill="#4480bd"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="198" d="M 775.5 395.5312 L 786.5 384.5312 786.5 418 775.5 429 Z" fill="#4480bd"
+                  fill-opacity="1" stroke="none" clip-path="url(##ac_clip_i)" clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="146" d="M 144.25 308.8604 L 175.5 308.8604 175.5 429 144.25 429 Z"
+                  fill="url(##ac_linearGradient_j)" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="155" d="M 244.25 256.8476 L 275.5 256.8476 275.5 429 244.25 429 Z"
+                  fill="url(##ac_linearGradient_j)" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="164"
+                  d="M 344.24999999999994 308.8604 L 375.49999999999994 308.8604 375.49999999999994 429 344.24999999999994 429 Z"
+                  fill="url(##ac_linearGradient_j)" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="173" d="M 444.25 267.9932 L 475.5 267.9932 475.5 429 444.25 429 Z"
+                  fill="url(##ac_linearGradient_j)" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="182"
+                  d="M 544.25 336.79319999999996 L 575.5 336.79319999999996 575.5 429 544.25 429 Z"
+                  fill="url(##ac_linearGradient_j)" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="191" d="M 644.25 341.9532 L 675.5 341.9532 675.5 429 644.25 429 Z"
+                  fill="url(##ac_linearGradient_j)" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="200" d="M 744.25 395.5312 L 775.5 395.5312 775.5 429 744.25 429 Z"
+                  fill="url(##ac_linearGradient_j)" stroke="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="149" d="M 144.25 308.8604 L 175.5 308.8604 186.5 297.8604 155.25 297.8604 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="158" d="M 244.25 256.8476 L 275.5 256.8476 286.5 245.8476 255.25 245.8476 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="167"
+                  d="M 344.24999999999994 308.8604 L 375.49999999999994 308.8604 386.49999999999994 297.8604 355.24999999999994 297.8604 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="176" d="M 444.25 267.9932 L 475.5 267.9932 486.5 256.9932 455.25 256.9932 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="185"
+                  d="M 544.25 336.79319999999996 L 575.5 336.79319999999996 586.5 325.79319999999996 555.25 325.79319999999996 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="194" d="M 644.25 341.9532 L 675.5 341.9532 686.5 330.9532 655.25 330.9532 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="203" d="M 744.25 395.5312 L 775.5 395.5312 786.5 384.5312 755.25 384.5312 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="148" d="M 175.5 308.8604 L 186.5 297.8604 186.5 418 175.5 429 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="157" d="M 275.5 256.8476 L 286.5 245.8476 286.5 418 275.5 429 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="166"
+                  d="M 375.49999999999994 308.8604 L 386.49999999999994 297.8604 386.49999999999994 418 375.49999999999994 429 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="175" d="M 475.5 267.9932 L 486.5 256.9932 486.5 418 475.5 429 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="184"
+                  d="M 575.5 336.79319999999996 L 586.5 325.79319999999996 586.5 418 575.5 429 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="193" d="M 675.5 341.9532 L 686.5 330.9532 686.5 418 675.5 429 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="202" d="M 775.5 395.5312 L 786.5 384.5312 786.5 418 775.5 429 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="147" d="M 144.25 308.8604 L 175.5 308.8604 175.5 429 144.25 429 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="156" d="M 244.25 256.8476 L 275.5 256.8476 275.5 429 244.25 429 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="165"
+                  d="M 344.24999999999994 308.8604 L 375.49999999999994 308.8604 375.49999999999994 429 344.24999999999994 429 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="174" d="M 444.25 267.9932 L 475.5 267.9932 475.5 429 444.25 429 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="183"
+                  d="M 544.25 336.79319999999996 L 575.5 336.79319999999996 575.5 429 544.25 429 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="192" d="M 644.25 341.9532 L 675.5 341.9532 675.5 429 644.25 429 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="201" d="M 744.25 395.5312 L 775.5 395.5312 775.5 429 744.25 429 Z"
+                  fill="url(##ac_hatchFill_1)" stroke="none" pointer-events="none" clip-path="url(##ac_clip_i)"
+                  clipPathUnits="userSpaceOnUse"/>
+            <path data-ac-wrapper-id="44" d="M 88.5 429.5 L 787.5 429.5" fill="none" stroke="#CECECE"/>
+            <path data-ac-wrapper-id="45"
+                  d="M 88.5 430 L 88.5 436 M 188.5 430 L 188.5 436 M 288.5 430 L 288.5 436 M 388.5 430 L 388.5 436 M 488.5 430 L 488.5 436 M 588.5 430 L 588.5 436 M 688.5 430 L 688.5 436 M 787.5 430 L 787.5 436"
+                  fill="none" stroke="#CECECE"/>
+            <g data-ac-wrapper-id="46">
+                <g data-ac-wrapper-id="47">
+                    <text data-ac-wrapper-id="48" font-style="normal" font-variant="normal"
+                          font-family="Verdana, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal"
+                          fill="#7c868e" letter-spacing="normal" text-decoration="none" direction="ltr"
+                          text-anchor="start" x="111.390625" y="452" style="-webkit-user-select: none; opacity: 1;">
+                        <tspan dy="0">Lip gloss</tspan>
+                    </text>
+                </g>
+                <g data-ac-wrapper-id="49">
+                    <text data-ac-wrapper-id="50" font-style="normal" font-variant="normal"
+                          font-family="Verdana, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal"
+                          fill="#7c868e" letter-spacing="normal" text-decoration="none" direction="ltr"
+                          text-anchor="start" x="213.3359375" y="452" style="-webkit-user-select: none; opacity: 1;">
+                        <tspan dy="0">Eyeliner</tspan>
+                    </text>
+                </g>
+                <g data-ac-wrapper-id="51">
+                    <text data-ac-wrapper-id="52" font-style="normal" font-variant="normal"
+                          font-family="Verdana, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal"
+                          fill="#7c868e" letter-spacing="normal" text-decoration="none" direction="ltr"
+                          text-anchor="start" x="300.640625" y="452" style="-webkit-user-select: none; opacity: 1;">
+                        <tspan dy="0">Eyeshadows</tspan>
+                    </text>
+                </g>
+                <g data-ac-wrapper-id="53">
+                    <text data-ac-wrapper-id="54" font-style="normal" font-variant="normal"
+                          font-family="Verdana, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal"
+                          fill="#7c868e" letter-spacing="normal" text-decoration="none" direction="ltr"
+                          text-anchor="start" x="415.4375" y="452" style="-webkit-user-select: none; opacity: 1;">
+                        <tspan dy="0">Powder</tspan>
+                    </text>
+                </g>
+                <g data-ac-wrapper-id="55">
+                    <text data-ac-wrapper-id="56" font-style="normal" font-variant="normal"
+                          font-family="Verdana, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal"
+                          fill="#7c868e" letter-spacing="normal" text-decoration="none" direction="ltr"
+                          text-anchor="start" x="512.8203125" y="452" style="-webkit-user-select: none; opacity: 1;">
+                        <tspan dy="0">Mascara</tspan>
+                    </text>
+                </g>
+                <g data-ac-wrapper-id="57">
+                    <text data-ac-wrapper-id="58" font-style="normal" font-variant="normal"
+                          font-family="Verdana, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal"
+                          fill="#7c868e" letter-spacing="normal" text-decoration="none" direction="ltr"
+                          text-anchor="start" x="604.03125" y="452" style="-webkit-user-select: none; opacity: 1;">
+                        <tspan dy="0">Foundation</tspan>
+                    </text>
+                </g>
+                <g data-ac-wrapper-id="59">
+                    <text data-ac-wrapper-id="60" font-style="normal" font-variant="normal"
+                          font-family="Verdana, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal"
+                          fill="#7c868e" letter-spacing="normal" text-decoration="none" direction="ltr"
+                          text-anchor="start" x="718.578125" y="452" style="-webkit-user-select: none; opacity: 1;">
+                        <tspan dy="0">Rouge</tspan>
+                    </text>
+                </g>
+            </g>
+            <path data-ac-wrapper-id="61" d="M 88.5 86.5 L 88.5 429.5" fill="none" stroke="#CECECE"/>
+            <g data-ac-wrapper-id="62"
+               transform="matrix(6.123233995736766e-17,-1,1,6.123233995736766e-17,10,319.2578125)">
+                <text data-ac-wrapper-id="63" font-style="normal" font-variant="normal"
+                      font-family="Verdana, Helvetica, Arial, sans-serif" font-size="13" font-weight="normal"
+                      fill="#545f69" letter-spacing="normal" text-decoration="none" direction="ltr" text-anchor="middle"
+                      x="61.2578125" y="13" style="-webkit-user-select: none; opacity: 1;">
+                    <tspan dy="0">Revenue in Dollars</tspan>
+                </text>
+            </g>
+            <path data-ac-wrapper-id="64"
+                  d="M 88 429.5 L 82 429.5 M 88 343.5 L 82 343.5 M 88 257.5 L 82 257.5 M 88 171.5 L 82 171.5 M 88 86.5 L 82 86.5"
+                  fill="none" stroke="#CECECE"/>
+            <g data-ac-wrapper-id="65">
+                <g data-ac-wrapper-id="66">
+                    <text data-ac-wrapper-id="67" font-style="normal" font-variant="normal"
+                          font-family="Verdana, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal"
+                          fill="#7c868e" letter-spacing="normal" text-decoration="none" direction="ltr"
+                          text-anchor="start" x="43.125" y="434" style="-webkit-user-select: none; opacity: 1;">
+                        <tspan dy="0">5,000</tspan>
+                    </text>
+                </g>
+                <g data-ac-wrapper-id="68">
+                    <text data-ac-wrapper-id="69" font-style="normal" font-variant="normal"
+                          font-family="Verdana, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal"
+                          fill="#7c868e" letter-spacing="normal" text-decoration="none" direction="ltr"
+                          text-anchor="start" x="35.5" y="348" style="-webkit-user-select: none; opacity: 1;">
+                        <tspan dy="0">10,000</tspan>
+                    </text>
+                </g>
+                <g data-ac-wrapper-id="70">
+                    <text data-ac-wrapper-id="71" font-style="normal" font-variant="normal"
+                          font-family="Verdana, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal"
+                          fill="#7c868e" letter-spacing="normal" text-decoration="none" direction="ltr"
+                          text-anchor="start" x="35.5" y="262" style="-webkit-user-select: none; opacity: 1;">
+                        <tspan dy="0">15,000</tspan>
+                    </text>
+                </g>
+                <g data-ac-wrapper-id="72">
+                    <text data-ac-wrapper-id="73" font-style="normal" font-variant="normal"
+                          font-family="Verdana, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal"
+                          fill="#7c868e" letter-spacing="normal" text-decoration="none" direction="ltr"
+                          text-anchor="start" x="35.5" y="176" style="-webkit-user-select: none; opacity: 1;">
+                        <tspan dy="0">20,000</tspan>
+                    </text>
+                </g>
+                <g data-ac-wrapper-id="74">
+                    <text data-ac-wrapper-id="75" font-style="normal" font-variant="normal"
+                          font-family="Verdana, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal"
+                          fill="#7c868e" letter-spacing="normal" text-decoration="none" direction="ltr"
+                          text-anchor="start" x="35.5" y="90" style="-webkit-user-select: none; opacity: 1;">
+                        <tspan dy="0">25,000</tspan>
+                    </text>
+                </g>
+            </g>
+            <g data-ac-wrapper-id="14" transform="matrix(1,0,0,1,232.484375,10)">
+                <text data-ac-wrapper-id="15" font-style="normal" font-variant="normal"
+                      font-family="Verdana, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal"
+                      fill="#7c868e" letter-spacing="normal" text-decoration="none" direction="ltr" text-anchor="middle"
+                      x="172.015625" y="16" style="-webkit-user-select: none; opacity: 1;">
+                    <tspan dy="0">Top 7 Products by Revenue in two Regions</tspan>
+                </text>
+            </g>
+        </g>
+    </g>
+</svg>

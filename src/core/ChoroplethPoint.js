@@ -23,7 +23,8 @@ goog.inherits(anychart.core.ChoroplethPoint, anychart.core.SeriesPoint);
 anychart.core.ChoroplethPoint.prototype.getFeatureProp = function() {
   var iterator = this.series.getIterator();
   iterator.select(this.index);
-  return  /** @type {Object}*/(iterator.meta('regionProperties'));
+  var features = iterator.meta('features');
+  return /** @type {Object}*/(features[0]['properties']);
 };
 
 
@@ -34,7 +35,8 @@ anychart.core.ChoroplethPoint.prototype.getFeatureProp = function() {
 anychart.core.ChoroplethPoint.prototype.getFeatureBounds = function() {
   var iterator = this.series.getIterator();
   iterator.select(this.index);
-  var featureElement = iterator.meta('regionShape');
+  var features = iterator.meta('features');
+  var featureElement = features[0].domElement;
   return /** @type {anychart.math.Rect} */(featureElement.getBoundsWithTransform(featureElement.getFullTransformation()));
 };
 
@@ -52,10 +54,11 @@ anychart.core.ChoroplethPoint.prototype.middleX = function(opt_value) {
     var iterator = this.series.getIterator();
     iterator.select(this.index);
 
-    var properties = /** @type {Object}*/(iterator.meta('regionProperties'));
+    var features = iterator.meta('features');
+    var properties = features && features.length ? features[0]['properties'] : null;
     var midX = this.get('middle-x');
 
-    return /** @type {number}*/(goog.isDef(midX) ? midX : properties['middle-x']);
+    return /** @type {number}*/(goog.isDef(midX) ? midX : properties ? properties['middle-x'] : .5);
   }
 };
 
@@ -73,10 +76,11 @@ anychart.core.ChoroplethPoint.prototype.middleY = function(opt_value) {
     var iterator = this.series.getIterator();
     iterator.select(this.index);
 
-    var properties = /** @type {Object}*/(iterator.meta('regionProperties'));
+    var features = iterator.meta('features');
+    var properties = features && features.length ? features[0]['properties'] : null;
     var midY = this.get('middle-y');
 
-    return /** @type {number}*/(goog.isDef(midY) ? midY : properties['middle-y']);
+    return /** @type {number}*/(goog.isDef(midY) ? midY : properties ? properties['middle-y'] : .5);
   }
 };
 

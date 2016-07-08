@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" border="0" data-ac-wrapper-id="2" width="1436" height="583"
+     class="anychart-ui-support" style="display: block;">
+    <defs>
+        <radialGradient id="#ac_radialGradient_0" cx="0.5" cy="0.5" fx="0.5" fy="0.5" gradientUnits="objectBoundingBox">
+            <stop offset="0" style="stop-color:#b2dafb;stop-opacity:1"/>
+            <stop offset="0.95" style="stop-color:#3c6d94;stop-opacity:1"/>
+            <stop offset="1" style="stop-color:#3c6d94;stop-opacity:1"/>
+        </radialGradient>
+        <radialGradient id="#ac_radialGradient_1" cx="0.5" cy="0.5" fx="0.5" fy="0.5" gradientUnits="objectBoundingBox">
+            <stop offset="0" style="stop-color:#8cbbe9;stop-opacity:1"/>
+            <stop offset="0.95" style="stop-color:#0f477e;stop-opacity:1"/>
+            <stop offset="1" style="stop-color:#0f477e;stop-opacity:1"/>
+        </radialGradient>
+        <radialGradient id="#ac_radialGradient_2" cx="0.5" cy="0.5" fx="0.5" fy="0.5" gradientUnits="objectBoundingBox">
+            <stop offset="0" style="stop-color:#f7b680;stop-opacity:1"/>
+            <stop offset="0.95" style="stop-color:#8f4100;stop-opacity:1"/>
+            <stop offset="1" style="stop-color:#8f4100;stop-opacity:1"/>
+        </radialGradient>
+        <radialGradient id="#ac_radialGradient_3" cx="713" cy="273.5" fx="605.0767181649254" fy="197.9313045107496"
+                        r="263.5" spreadMethod="pad" gradientUnits="userSpaceOnUse">
+            <stop offset="0" style="stop-color:#b2dafb;stop-opacity:1"/>
+            <stop offset="0.95" style="stop-color:#3c6d94;stop-opacity:1"/>
+            <stop offset="1" style="stop-color:#3c6d94;stop-opacity:1"/>
+        </radialGradient>
+        <radialGradient id="#ac_radialGradient_4" cx="713" cy="273.5" fx="605.0767181649254" fy="197.9313045107496"
+                        r="263.5" spreadMethod="pad" gradientUnits="userSpaceOnUse">
+            <stop offset="0" style="stop-color:#8cbbe9;stop-opacity:1"/>
+            <stop offset="0.95" style="stop-color:#0f477e;stop-opacity:1"/>
+            <stop offset="1" style="stop-color:#0f477e;stop-opacity:1"/>
+        </radialGradient>
+        <radialGradient id="#ac_radialGradient_5" cx="713" cy="273.5" fx="605.0767181649254" fy="197.9313045107496"
+                        r="263.5" spreadMethod="pad" gradientUnits="userSpaceOnUse">
+            <stop offset="0" style="stop-color:#f7b680;stop-opacity:1"/>
+            <stop offset="0.95" style="stop-color:#8f4100;stop-opacity:1"/>
+            <stop offset="1" style="stop-color:#8f4100;stop-opacity:1"/>
+        </radialGradient>
+        <clipPath clip-rule="nonzero" id="#ac_clip_7">
+            <path data-ac-wrapper-id="42" d="M 10 10 L 1416 10 1416 537 10 537 10 10 Z" fill="none" stroke="black"/>
+        </clipPath>
+    </defs>
+    <g data-ac-wrapper-id="3">
+        <g data-ac-wrapper-id="11">
+            <path data-ac-wrapper-id="12" d="M 0.5 0.5 L 1435.5 0.5 1435.5 582.5 0.5 582.5 0.5 0.5 Z" fill="#ffffff"
+                  stroke="none"/>
+            <g data-ac-wrapper-id="13" transform="matrix(1,0,0,1,646.5625,537)">
+                <g data-ac-wrapper-id="14">
+                    <g data-ac-wrapper-id="15" transform="matrix(1,0,0,1,10,10)">
+                        <text data-ac-wrapper-id="16" font-style="normal" font-variant="normal"
+                              font-family="Verdana, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal"
+                              fill="#7c868e" letter-spacing="normal" text-decoration="none" direction="ltr"
+                              text-anchor="start" x="20" y="12"
+                              style="-webkit-user-select: none; opacity: 1; cursor: pointer;">
+                            <tspan dy="0">0</tspan>
+                        </text>
+                        <path data-ac-wrapper-id="17" d="M 0 0 L 15 0 15 15 0 15 Z" fill="url(##ac_radialGradient_0)"
+                              stroke="none" style="cursor: pointer;"/>
+                        <path data-ac-wrapper-id="18" d="M 0 0 L 27.625 0 27.625 15 0 15 0 0 Z" fill="#FFFFFF"
+                              fill-opacity="0.00001" stroke="none" style="cursor: pointer;"/>
+                    </g>
+                    <g data-ac-wrapper-id="19" transform="matrix(1,0,0,1,52.625,10)">
+                        <text data-ac-wrapper-id="20" font-style="normal" font-variant="normal"
+                              font-family="Verdana, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal"
+                              fill="#7c868e" letter-spacing="normal" text-decoration="none" direction="ltr"
+                              text-anchor="start" x="20" y="12"
+                              style="-webkit-user-select: none; opacity: 1; cursor: pointer;">
+                            <tspan dy="0">1</tspan>
+                        </text>
+                        <path data-ac-wrapper-id="21" d="M 0 0 L 15 0 15 15 0 15 Z" fill="url(##ac_radialGradient_1)"
+                              stroke="none" style="cursor: pointer;"/>
+                        <path data-ac-wrapper-id="22" d="M 0 0 L 27.625 0 27.625 15 0 15 0 0 Z" fill="#FFFFFF"
+                              fill-opacity="0.00001" stroke="none" style="cursor: pointer;"/>
+                    </g>
+                    <g data-ac-wrapper-id="23" transform="matrix(1,0,0,1,95.25,10)">
+                        <text data-ac-wrapper-id="24" font-style="normal" font-variant="normal"
+                              font-family="Verdana, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal"
+                              fill="#7c868e" letter-spacing="normal" text-decoration="none" direction="ltr"
+                              text-anchor="start" x="20" y="12"
+                              style="-webkit-user-select: none; opacity: 1; cursor: pointer;">
+                            <tspan dy="0">2</tspan>
+                        </text>
+                        <path data-ac-wrapper-id="25" d="M 0 0 L 15 0 15 15 0 15 Z" fill="url(##ac_radialGradient_2)"
+                              stroke="none" style="cursor: pointer;"/>
+                        <path data-ac-wrapper-id="26" d="M 0 0 L 27.625 0 27.625 15 0 15 0 0 Z" fill="#FFFFFF"
+                              fill-opacity="0.00001" stroke="none" style="cursor: pointer;"/>
+                    </g>
+                </g>
+            </g>
+            <g data-ac-wrapper-id="27">
+                <path data-ac-wrapper-id="28"
+                      d="M 713 273.5 L 713 36.349999999999994 A 237.15 237.15 0 0 1 918.3779245074796 154.925 Z"
+                      fill="url(##ac_radialGradient_3)" stroke="none"/>
+                <path data-ac-wrapper-id="29"
+                      d="M 713 273.5 L 918.3779245074796 154.925 A 237.15 237.15 0 0 1 713 510.65 Z"
+                      fill="url(##ac_radialGradient_4)" stroke="none"/>
+                <path data-ac-wrapper-id="30"
+                      d="M 713 273.5 L 713 510.65 A 237.15 237.15 0 0 1 713 36.349999999999994 Z"
+                      fill="url(##ac_radialGradient_5)" stroke="none"/>
+            </g>
+            <g data-ac-wrapper-id="31" pointer-events="none">
+                <path data-ac-wrapper-id="32"
+                      d="M 713 273.5 L 713 36.349999999999994 A 237.15 237.15 0 0 1 918.3779245074796 154.925 Z"
+                      fill="none" stroke="none"/>
+                <path data-ac-wrapper-id="33"
+                      d="M 713 273.5 L 918.3779245074796 154.925 A 237.15 237.15 0 0 1 713 510.65 Z" fill="none"
+                      stroke="none"/>
+                <path data-ac-wrapper-id="34"
+                      d="M 713 273.5 L 713 510.65 A 237.15 237.15 0 0 1 713 36.349999999999994 Z" fill="none"
+                      stroke="none"/>
+            </g>
+            <g data-ac-wrapper-id="35" clip-path="url(##ac_clip_7)" clipPathUnits="userSpaceOnUse">
+                <g data-ac-wrapper-id="36">
+                    <text data-ac-wrapper-id="37" font-style="normal" font-variant="normal"
+                          font-family="Verdana, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal"
+                          fill="#ffffff" letter-spacing="normal" text-decoration="none" direction="ltr"
+                          text-anchor="start" x="752.209375" y="175.31103774626018" pointer-events="none"
+                          style="-webkit-user-select: none; opacity: 1;">
+                        <tspan dy="0">16.7%</tspan>
+                    </text>
+                </g>
+                <g data-ac-wrapper-id="38">
+                    <text data-ac-wrapper-id="39" font-style="normal" font-variant="normal"
+                          font-family="Verdana, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal"
+                          fill="#ffffff" letter-spacing="normal" text-decoration="none" direction="ltr"
+                          text-anchor="start" x="795.6108372537399" y="337.2875" pointer-events="none"
+                          style="-webkit-user-select: none; opacity: 1;">
+                        <tspan dy="0">33.3%</tspan>
+                    </text>
+                </g>
+                <g data-ac-wrapper-id="40">
+                    <text data-ac-wrapper-id="41" font-style="normal" font-variant="normal"
+                          font-family="Verdana, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal"
+                          fill="#ffffff" letter-spacing="normal" text-decoration="none" direction="ltr"
+                          text-anchor="start" x="574.346875" y="278" pointer-events="none"
+                          style="-webkit-user-select: none; opacity: 1;">
+                        <tspan dy="0">50.0%</tspan>
+                    </text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

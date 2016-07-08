@@ -173,7 +173,7 @@ anychart.core.map.series.Base.prototype.geoIdField = function(opt_value) {
     if (opt_value != this.geoIdField_) {
       this.geoIdField_ = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_DATA,
-          anychart.Signal.NEEDS_REDRAW);
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_RECALCULATION);
     }
     return this;
   }
@@ -208,6 +208,9 @@ anychart.core.map.series.Base.prototype.getFinalGeoIdField = function() {
  * @param {anychart.charts.Map} map .
  */
 anychart.core.map.series.Base.prototype.setMap = function(map) {
+  /**
+   * @type {anychart.charts.Map}
+   */
   this.map = map;
 };
 
@@ -218,7 +221,6 @@ anychart.core.map.series.Base.prototype.setMap = function(map) {
  */
 anychart.core.map.series.Base.prototype.setGeoData = function(geoData) {
   this.geoData = geoData;
-  this.calculate();
 };
 
 
@@ -303,21 +305,26 @@ anychart.core.map.series.Base.prototype.calculateStatistics = function() {
 anychart.core.map.series.Base.prototype.calculate = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA)) {
     var iterator = this.getResetIterator();
+    var index = this.map.getIndexedGeoData()[this.geoIdField()];
     while (iterator.advance()) {
       var name = iterator.get('id');
-      if (!name || !goog.isString(name))
+      if (!name || !(goog.isString(name) || goog.isArray(name)))
         continue;
+      name = goog.isArray(name) ? name : [name];
 
-      iterator.meta('regionShape', undefined).meta('regionProperties', undefined);
-      for (var i = 0, len = this.geoData.length; i < len; i++) {
-        var geom = this.geoData[i];
-        if (!geom) continue;
-        var prop = geom['properties'];
-        if (prop[this.getFinalGeoIdField()] == name) {
-          iterator.meta('regionShape', geom.domElement).meta('regionProperties', prop);
-          break;
+      iterator.meta('features', undefined);
+      var features = [];
+      for (var j = 0, len_ = name.length; j < len_; j++) {
+        var id = name[j];
+        var point = index[id];
+        if (point) {
+          //todo (blackart) Don't remove it for the time.
+          if (point.domElement) this.bindHandlersToGraphics(point.domElement);
+
+          features.push(point);
         }
       }
+      iterator.meta('features', features);
     }
   }
 };
@@ -587,14 +594,17 @@ anychart.core.map.series.Base.prototype.createFormatProvider = function(opt_forc
  */
 anychart.core.map.series.Base.prototype.getPositionByRegion = function() {
   var iterator = this.getIterator();
-  var pointGeoProp = /** @type {Object}*/(iterator.meta('regionProperties'));
+
+  var features = iterator.meta('features');
+  var feature = features && features.length ? features[0] : null;
+  var pointGeoProp = /** @type {Object}*/(feature ? feature['properties'] : null);
 
   var midX = iterator.get('middle-x');
   var midY = iterator.get('middle-y');
   var middleX = /** @type {number}*/(goog.isDef(midX) ? midX : pointGeoProp ? pointGeoProp['middle-x'] : .5);
   var middleY = /** @type {number}*/(goog.isDef(midY) ? midY : pointGeoProp ? pointGeoProp['middle-y'] : .5);
 
-  var shape = iterator.meta('regionShape');
+  var shape = feature ? feature.domElement : null;
   var positionProvider;
   if (shape) {
     var bounds = shape.getAbsoluteBounds();
@@ -614,7 +624,9 @@ anychart.core.map.series.Base.prototype.getPositionByRegion = function() {
  */
 anychart.core.map.series.Base.prototype.createPositionProvider = function(position) {
   var iterator = this.getIterator();
-  var shape = iterator.meta('shape');
+  var features = iterator.meta('features');
+  var feature = features && features.length ? features[0] : null;
+  var shape = feature ? feature.domElement : null;
   if (shape) {
     var shapeBounds = shape.getBounds();
     position = anychart.enums.normalizeAnchor(position);

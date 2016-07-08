@@ -67,7 +67,7 @@ anychart.enums.GaugeTypes = {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Gauge types.
+ * Map types.
  * @enum {string}
  */
 anychart.enums.MapTypes = {
@@ -75,7 +75,55 @@ anychart.enums.MapTypes = {
   CHOROPLETH: 'choropleth',
   BUBBLE: 'bubble',
   MARKER: 'marker',
-  CONNECTOR: 'connector'
+  CONNECTOR: 'connector',
+  SEAT_MAP: 'seatMap'
+};
+
+
+/**
+ * Map geo data types.
+ * @enum {string}
+ */
+anychart.enums.MapGeoDataTypes = {
+  SVG: 'svg',
+  TOPO_JSON: 'topojson',
+  GEO_JSON: 'geojson'
+};
+
+
+/**
+ * Map unbounding regions mode.
+ * @enum {string}
+ */
+anychart.enums.MapUnboundRegionsMode = {
+  AS_IS: 'asis',
+  HIDE: 'hide'
+};
+
+
+/**
+ * Normalizes value to MapUnboundRegionsMode enum.
+ * @param {*} value Input to normalize.
+ * @param {anychart.enums.MapUnboundRegionsMode=} opt_default Default value, if input cannot be recognized. Defaults to HIDE.
+ * @return {anychart.enums.MapUnboundRegionsMode}
+ */
+anychart.enums.normalizeMapUnboundRegionsMode = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'asis':
+    case 'as-is':
+    case 'as is':
+    case 'true':
+    case '1':
+      return anychart.enums.MapUnboundRegionsMode.AS_IS;
+    case 'hide':
+    case 'none':
+    case 'null':
+    case 'false':
+    case '0':
+      return anychart.enums.MapUnboundRegionsMode.HIDE;
+  }
+  return opt_default || anychart.enums.MapUnboundRegionsMode.HIDE;
 };
 
 
@@ -4987,6 +5035,9 @@ goog.exportSymbol('anychart.enums.MapProjections.ORTHOGRAPHIC', anychart.enums.M
 goog.exportSymbol('anychart.enums.MapProjections.ROBINSON', anychart.enums.MapProjections.ROBINSON);
 goog.exportSymbol('anychart.enums.MapProjections.WAGNER6', anychart.enums.MapProjections.WAGNER6);
 goog.exportSymbol('anychart.enums.MapProjections.WSG84', anychart.enums.MapProjections.WSG84);
+
+goog.exportSymbol('anychart.enums.MapUnboundRegionsMode.AS_IS', anychart.enums.MapUnboundRegionsMode.AS_IS);
+goog.exportSymbol('anychart.enums.MapUnboundRegionsMode.HIDE', anychart.enums.MapUnboundRegionsMode.HIDE);
 
 goog.exportSymbol('anychart.enums.TreeFillingMethod.AS_TREE', anychart.enums.TreeFillingMethod.AS_TREE);
 goog.exportSymbol('anychart.enums.TreeFillingMethod.AS_TABLE', anychart.enums.TreeFillingMethod.AS_TABLE);

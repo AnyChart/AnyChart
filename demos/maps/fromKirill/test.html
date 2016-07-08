@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <!--<script src="http://cdn.anychart.com/js/7.10.0/anychart-bundle.min.js"></script>-->
+
+
+    <script src="../../../contrib/closure-library/closure/goog/base.js"></script>
+    <script src="../../../src/deps.js"></script>
+    <script>
+        goog.require('anychart.themes.defaultTheme');
+        goog.require('anychart.modules.anychart_bundle');
+    </script>
+    <script src="../../../proj4.js"></script>
+
+
+    <script src="test.js"></script>
+    <script>
+
+    </script>
+
+    <title>United States of America</title>
+    <style>
+        html, body, #container {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        #tags {
+            position: absolute;
+            width: 300px;
+            top:20px;
+            left:20px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+<div id="tags"></div>
+<div id="container"></div>
+<script type="text/javascript">
+    anychart.onDocumentReady(function() {
+        // Creates map chart
+        map = anychart.map();
+        // create data set
+        var dataSet = anychart.data.set([{"id": "US", "value": 0}, {"id": "US-VI", "value": 0}, {"id": "US-VT", "value": 0}, {"id": "US-CA", "value": 0}, {"id": "US-MI", "value": 0}, {"id": "US-AK", "value": 0}, {"id": "US-MN", "value": 0}, {"id": "US-WY", "value": 0}, {"id": "US-FL", "value": 0}, {"id": "US-420422", "value": 0}, {"id": "US-MD", "value": 0}, {"id": "US-AZ", "value": 0}, {"id": "US-447655", "value": 0}, {"id": "US-1838160", "value": 0}, {"id": "US-DC", "value": 0}, {"id": "US-PR", "value": 0}, {"id": "US-1840992", "value": 0}, {"id": "US-1839474", "value": 0}, {"id": "US-2532505", "value": 0}, {"id": "US-CO", "value": 0}, {"id": "US-OH", "value": 0}, {"id": "US-OK", "value": 0}, {"id": "US-AR", "value": 0}, {"id": "US-MA", "value": 0}, {"id": "US-NV", "value": 0}, {"id": "US-NM", "value": 0}, {"id": "US-1740302", "value": 0}, {"id": "US-MS", "value": 0}, {"id": "US-1836929", "value": 0}, {"id": "US-VA", "value": 0}, {"id": "US-UT", "value": 0}, {"id": "US-NY", "value": 0}, {"id": "US-1826828", "value": 0}, {"id": "US-WI", "value": 0}, {"id": "US-IL", "value": 0}, {"id": "US-TX", "value": 0}, {"id": "US-1839478", "value": 0}, {"id": "US-1827486", "value": 0}, {"id": "US-1856996", "value": 0}, {"id": "US-SC", "value": 0}, {"id": "US-2532497", "value": 0}, {"id": "US-452082", "value": 0}, {"id": "US-NE", "value": 0}, {"id": "US-UM", "value": 0}, {"id": "US-1740282", "value": 0}, {"id": "US-HI", "value": 0}, {"id": "US-1836981", "value": 0}, {"id": "US-NJ", "value": 0}, {"id": "US-GA", "value": 0}, {"id": "US-1634509", "value": 0}, {"id": "US-1840938", "value": 0}, {"id": "US-1827111", "value": 0}, {"id": "US-ME", "value": 0}, {"id": "US-NC", "value": 0}, {"id": "US-SD", "value": 0}, {"id": "US-IA", "value": 0}, {"id": "US-1837616", "value": 0}, {"id": "US-1357530", "value": 0}, {"id": "US-PA", "value": 0}, {"id": "US-1826829", "value": 0}, {"id": "US-1634428", "value": 0}, {"id": "US-1838142", "value": 0}, {"id": "US-1149481", "value": 0}, {"id": "US-MP", "value": 0}, {"id": "US-IN", "value": 0}, {"id": "US-AL", "value": 0}, {"id": "US-2552442", "value": 0}, {"id": "US-1740316", "value": 0}, {"id": "US-MO", "value": 0}, {"id": "US-ID", "value": 0}, {"id": "US-DE", "value": 0}, {"id": "US-RI", "value": 0}, {"id": "US-WV", "value": 0}, {"id": "US-MT", "value": 0}, {"id": "US-448597", "value": 0}, {"id": "US-2532517", "value": 0}, {"id": "US-LA", "value": 0}, {"id": "US-NH", "value": 0}, {"id": "US-1634544", "value": 0}, {"id": "US-WA", "value": 0}, {"id": "US-ND", "value": 0}, {"id": "US-1827019", "value": 0}, {"id": "US-416911", "value": 0}, {"id": "US-1838163", "value": 0}, {"id": "US-OR", "value": 0}, {"id": "US-KS", "value": 0}, {"id": "US-306002", "value": 0}, {"id": "US-TN", "value": 0}, {"id": "US-CT", "value": 0}, {"id": "US-448085", "value": 0}, {"id": "US-2532495", "value": 0}, {"id": "US-KY", "value": 0}, {"id": "US-452088", "value": 0}, {"id": "US-1826820", "value": 0}, {"id": "US-448430", "value": 0}, {"id": "US-AS", "value": 0}, {"id": "US-1357072", "value": 0}, {"id": "US-166852362", "value": 0}, {"id": "US-1740290", "value": 0}, {"id": "US-1840928", "value": 0}]);
+
+        // create choropleth series
+        series = map.choropleth(dataSet);
+
+        // set geoIdField to 'id', this field contains in geo data meta properties
+        series.geoIdField('id');
+
+        // set map color settings
+        series.colorScale(anychart.scales.linearColor('#deebf7', '#3182bd'));
+        series.hoverFill('#addd8e');
+
+        // disable series labels
+        series.labels(false);
+
+        // Sets tooltip settings
+        var tooltipSettings = {
+            background: {fill: 'white', stroke: '#c1c1c1', corners: 3, cornerType: 'ROUND'},
+            padding: [8, 13, 10, 13]
+        };
+
+        map.geoData(anychart.maps.test);
+
+        // Sets bubble min/max size settings
+        map.minBubbleSize(5);
+        map.maxBubbleSize(50);
+
+        // Sets Chart Title
+        map.title().text('United States of America').enabled(true).padding([0,0,10,0]);
+
+
+        // Sets container id for the chart
+        map.container('container');
+
+        // Sets legend
+        map.legend(true);
+        map.legend().position('top').align('center').itemsLayout('h').padding(0, 0, 30, 0);
+        map.legend().paginator(false);
+        map.allowPointsSelect(false);
+
+        // Initiates chart drawing
+        map.draw();
+    });
+
+</script>
+</body>
+</html>

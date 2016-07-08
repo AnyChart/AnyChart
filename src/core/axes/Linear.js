@@ -551,6 +551,8 @@ anychart.core.axes.Linear.prototype.scaleInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     this.dropStaggeredLabelsCache_();
     this.dropBoundsCache();
+    this.labels().dropCallsCache();
+    this.minorLabels().dropCallsCache();
     this.invalidate(this.ALL_VISUAL_STATES, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   }
 };

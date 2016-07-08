@@ -2291,15 +2291,7 @@ goog.provide('anychart.themes.defaultTheme');
            * @return {*}
            */
           'fill': function() {
-            var color;
-            if (this['colorScale']) {
-              var refVale = this['referenceValueNames'][1];
-              var value = this['iterator']['get'](refVale);
-              color = this['colorScale']['valueToColor'](value);
-            } else {
-              color = this['sourceColor'];
-            }
-            return color;
+            return this['scaledColor'] || this['sourceColor'];
           },
           'hoverFill': defaultHoverColor,
           'selectFill': defaultSelectColor,
@@ -2490,7 +2482,9 @@ goog.provide('anychart.themes.defaultTheme');
           return result || 'no selected points';
         },
         'drag': true,
-        'mouseWheel': false
+        'zoomOnMouseWheel': false,
+        'keyboardZoomAndMove': true,
+        'zoomOnDoubleClick': false
       },
       'crsAnimation': {
         'enabled': true,
@@ -2505,6 +2499,8 @@ goog.provide('anychart.themes.defaultTheme');
     'markerMap': {},
     // merge with map
     'connector': {},
+    // merge with map
+    'seatMap': {},
 
     // merge with chart
     'circularGauge': {

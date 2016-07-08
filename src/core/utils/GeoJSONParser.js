@@ -15,6 +15,15 @@ goog.addSingletonGetter(anychart.core.utils.GeoJSONParser);
 
 
 /**
+ * Returns parser type.
+ * @return {anychart.enums.MapGeoDataTypes}
+ */
+anychart.core.utils.GeoJSONParser.prototype.getType = function() {
+  return anychart.enums.MapGeoDataTypes.GEO_JSON;
+};
+
+
+/**
  * Parse geo JSON data.
  * @param {Object} data GeoJSON data to parse.
  * @return {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>} .

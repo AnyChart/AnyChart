@@ -1,6 +1,7 @@
 goog.provide('anychart.charts.Map');
 
 goog.require('acgraph.events.MouseWheelHandler');
+goog.require('acgraph.vector.UnmanagedLayer');
 goog.require('anychart'); // otherwise we can't use anychart.chartTypesMap object.
 goog.require('anychart.animations.MapAnimationController');
 goog.require('anychart.animations.MapCrsAnimation');
@@ -17,6 +18,7 @@ goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.ColorRange');
 goog.require('anychart.core.utils.Animation');
 goog.require('anychart.core.utils.GeoJSONParser');
+goog.require('anychart.core.utils.GeoSVGParser');
 goog.require('anychart.core.utils.MapInteractivity');
 goog.require('anychart.core.utils.TopoJSONParser');
 goog.require('anychart.core.utils.TypedLayer');
@@ -27,6 +29,7 @@ goog.require('anychart.palettes.Markers');
 goog.require('anychart.scales.LinearColor');
 goog.require('anychart.scales.OrdinalColor');
 goog.require('goog.dom');
+goog.require('goog.graphics.AffineTransform');
 goog.require('goog.ui.KeyboardShortcutHandler');
 
 
@@ -98,7 +101,7 @@ anychart.charts.Map = function() {
 
   /**
    * Geo data settings.
-   * @type {Node|string|Object}
+   * @type {Node|string|Object|Element}
    * @private
    */
   this.geoData_ = null;
@@ -216,6 +219,14 @@ anychart.charts.Map = function() {
       this.shortcutHandler.registerShortcut('zoom_out', goog.events.KeyCodes.DASH, CTRL);
       this.shortcutHandler.registerShortcut('zoom_full_out', goog.events.KeyCodes.ZERO, CTRL);
 
+      this.shortcutHandler.registerShortcut('zoom_in', goog.events.KeyCodes.NUM_PLUS, META);
+      this.shortcutHandler.registerShortcut('zoom_out', goog.events.KeyCodes.NUM_MINUS, META);
+      this.shortcutHandler.registerShortcut('zoom_full_out', goog.events.KeyCodes.NUM_ZERO, META);
+
+      this.shortcutHandler.registerShortcut('zoom_in', goog.events.KeyCodes.NUM_PLUS, CTRL);
+      this.shortcutHandler.registerShortcut('zoom_out', goog.events.KeyCodes.NUM_MINUS, CTRL);
+      this.shortcutHandler.registerShortcut('zoom_full_out', goog.events.KeyCodes.NUM_ZERO, CTRL);
+
       this.shortcutHandler.registerShortcut('move_left', goog.events.KeyCodes.LEFT);
       this.shortcutHandler.registerShortcut('move_right', goog.events.KeyCodes.RIGHT);
       this.shortcutHandler.registerShortcut('move_up', goog.events.KeyCodes.UP);
@@ -225,6 +236,9 @@ anychart.charts.Map = function() {
       this.shortcutHandler.registerShortcut('drill_up', goog.events.KeyCodes.ESC);
 
       this.shortcutHandler.listen(goog.ui.KeyboardShortcutHandler.EventType.SHORTCUT_TRIGGERED, function(e) {
+        if (!this.interactivity_.keyboardZoomAndMove())
+          return;
+
         var dx = 0, dy = 0;
         this.isDesktop = true;
         this.zoomDuration = 100;
@@ -244,8 +258,8 @@ anychart.charts.Map = function() {
               this.doAfterAnimation(scene, function() {
                 this.goingToHome = true;
                 this.zoomDuration = anychart.charts.Map.TIMINGS.ZOOM_TO_HOME_DURATION;
-                if (scene.zoomLevel() != anychart.charts.Map.ZOOM_MIN_FACTOR) {
-                  this.zoomTo(anychart.charts.Map.ZOOM_MIN_FACTOR);
+                if (scene.zoomLevel() != this.minZoomLevel_) {
+                  this.zoomTo(this.minZoomLevel_);
                 } else {
                   var tx = scene.getMapLayer().getSelfTransformation();
                   dx = tx.getTranslateX();
@@ -285,7 +299,7 @@ anychart.charts.Map = function() {
             dx = tx.getTranslateX();
             dy = tx.getTranslateY();
 
-            if (scene.zoomLevel() == anychart.charts.Map.ZOOM_MIN_FACTOR && dx == 0 && dy == 0) {
+            if (scene.zoomLevel() == this.minZoomLevel_ && dx == 0 && dy == 0) {
               this.drillUp();
             } else {
               if (!this.drillingInAction) {
@@ -294,8 +308,8 @@ anychart.charts.Map = function() {
                 this.doAfterAnimation(scene, function() {
                   this.goingToHome = true;
                   this.zoomDuration = anychart.charts.Map.TIMINGS.ZOOM_TO_HOME_DURATION;
-                  if (scene.zoomLevel() != anychart.charts.Map.ZOOM_MIN_FACTOR) {
-                    this.zoomTo(anychart.charts.Map.ZOOM_MIN_FACTOR);
+                  if (scene.zoomLevel() != this.minZoomLevel_) {
+                    this.zoomTo(this.minZoomLevel_);
                   } else {
                     scene.zoomAnimation = new anychart.animations.MapMoveAnimation(scene, [dx, dy], [0, 0], anychart.charts.Map.TIMINGS.ZOOM_TO_FEATURE_DURATION);
                     scene.zoomAnimation.play();
@@ -316,9 +330,9 @@ anychart.charts.Map = function() {
 
         var scene = this.getCurrentScene();
         var zoomFactor = goog.math.clamp(1 - be.deltaY / 120, 0.7, 2);
-        var maxZoomFactor = anychart.charts.Map.ZOOM_MAX_FACTOR;
-        var minZoomFactor = anychart.charts.Map.ZOOM_MIN_FACTOR;
-        var isMouseWheel = scene.interactivity().mouseWheel();
+        var maxZoomFactor = this.maxZoomLevel_;
+        var minZoomFactor = this.minZoomLevel_;
+        var isMouseWheel = scene.interactivity().zoomOnMouseWheel();
         var bounds = this.getPlotBounds();
 
         var insideBounds = bounds &&
@@ -347,12 +361,12 @@ anychart.charts.Map = function() {
             e.clientY >= bounds.top + containerPosition.y &&
             e.clientY <= bounds.top + containerPosition.y + bounds.height;
 
-        if (this.interactivity_.mouseWheel() && insideBounds) {
+        if (this.interactivity_.zoomOnMouseWheel() && insideBounds) {
           if (scene.goingToHome) return;
           var zoomFactor = goog.math.clamp(1 - e.deltaY / 120, 0.7, 2);
 
-          var maxZoomFactor = anychart.charts.Map.ZOOM_MAX_FACTOR;
-          var minZoomFactor = anychart.charts.Map.ZOOM_MIN_FACTOR;
+          var maxZoomFactor = this.maxZoomLevel_;
+          var minZoomFactor = this.minZoomLevel_;
 
           this.prevZoomState_ = this.zoomState_;
           this.zoomState_ = zoomFactor > 1 ? true : zoomFactor == 1 ? !this.prevZoomState_ : false;
@@ -364,14 +378,14 @@ anychart.charts.Map = function() {
           }
 
           if (zoomFactor < 1 && anychart.math.round(scene.zoomLevel(), 2) == minZoomFactor && !mapLayer.getSelfTransformation().isIdentity()) {
-            mapLayer.setTransformationMatrix(anychart.charts.Map.ZOOM_MIN_FACTOR, 0, 0, anychart.charts.Map.ZOOM_MIN_FACTOR, 0, 0);
-            scene.fullZoom = anychart.charts.Map.ZOOM_MIN_FACTOR;
+            mapLayer.setTransformationMatrix(this.minZoomLevel_, 0, 0, this.minZoomLevel_, 0, 0);
+            scene.fullZoom = this.minZoomLevel_;
             scene.goingToHome = false;
             if (scene.zoomAnimation && scene.zoomAnimation.isPlaying()) {
               scene.zoomAnimation.stop();
             }
 
-            scene.scale().setMapZoom(anychart.charts.Map.ZOOM_MIN_FACTOR);
+            scene.scale().setMapZoom(this.minZoomLevel_);
             scene.scale().setOffsetFocusPoint(0, 0);
 
             scene.updateSeriesOnZoomOrMove();
@@ -405,24 +419,26 @@ anychart.charts.Map = function() {
         }
       };
       this.mapDbClickHandler_ = function(e) {
-        var scene = this.getCurrentScene();
-        var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
-        var bounds = scene.getPlotBounds();
+        if (this.interactivity_.zoomOnDoubleClick()) {
+          var scene = this.getCurrentScene();
+          var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+          var bounds = scene.getPlotBounds();
 
-        var insideBounds = bounds &&
-            e.clientX >= bounds.left + containerPosition.x &&
-            e.clientX <= bounds.left + containerPosition.x + bounds.width &&
-            e.clientY >= bounds.top + containerPosition.y &&
-            e.clientY <= bounds.top + containerPosition.y + bounds.height;
+          var insideBounds = bounds &&
+              e.clientX >= bounds.left + containerPosition.x &&
+              e.clientX <= bounds.left + containerPosition.x + bounds.width &&
+              e.clientY >= bounds.top + containerPosition.y &&
+              e.clientY <= bounds.top + containerPosition.y + bounds.height;
 
-        if (insideBounds) {
-          this.isDesktop = true;
-          var zoomFactor = this.zoomFactor_;
-          var cx = e.clientX;
-          var cy = e.clientY;
+          if (insideBounds) {
+            this.isDesktop = true;
+            var zoomFactor = this.zoomFactor_;
+            var cx = e.clientX;
+            var cy = e.clientY;
 
-          this.zoomDuration = 100;
-          scene.zoom(zoomFactor, cx, cy);
+            this.zoomDuration = 100;
+            scene.zoom(zoomFactor, cx, cy);
+          }
         }
       };
       this.mapTouchEndHandler_ = function(e) {
@@ -534,6 +550,12 @@ anychart.charts.Map = function() {
   }, this);
 
   /**
+   * Wrapper for mouseDown handler for async usage.
+   * @type {!Function}
+   */
+  this.acyncMouseDown = goog.bind(this.onMouseDown, this);
+
+  /**
    * Current scene.
    * @type {anychart.charts.Map}
    */
@@ -550,6 +572,12 @@ anychart.charts.Map = function() {
    * @type {Array.<anychart.core.MapPoint>}
    */
   this.currentBreadcrumbsPath = [];
+
+  /**
+   * Geo data parser.
+   * @type {anychart.core.utils.GeoSVGParser|anychart.core.utils.GeoJSONParser|anychart.core.utils.TopoJSONParser}
+   */
+  this.parser = null;
 
   this.unboundRegions(true);
   this.defaultSeriesType(anychart.enums.MapSeriesType.CHOROPLETH);
@@ -570,6 +598,7 @@ anychart.charts.Map.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.MAP_SERIES |
     anychart.ConsistencyState.MAP_SCALE |
     anychart.ConsistencyState.MAP_GEO_DATA |
+    anychart.ConsistencyState.MAP_GEO_DATA_INDEX |
     anychart.ConsistencyState.MAP_PALETTE |
     anychart.ConsistencyState.MAP_COLOR_RANGE |
     anychart.ConsistencyState.MAP_MARKER_PALETTE |
@@ -771,6 +800,20 @@ anychart.charts.Map.prototype.fullZoom = 1;
 
 
 /**
+ * @type {number}
+ * @private
+ */
+anychart.charts.Map.prototype.maxZoomLevel_ = anychart.charts.Map.ZOOM_MAX_FACTOR;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+anychart.charts.Map.prototype.minZoomLevel_ = anychart.charts.Map.ZOOM_MIN_FACTOR;
+
+
+/**
  * Map transformations object.
  * @type {Object.<string, Object.<{scale: number, src: string, xoffset: number, yoffset: number, heatZone: Object.<{left: number, top: number, width: number, height: number}>}>>}
  */
@@ -855,7 +898,10 @@ anychart.charts.Map.prototype.tapHandler = function(event) {
 anychart.charts.Map.prototype.handleMouseDown = function(event) {
   this.itWasDrag = false;
   this.originEvent = event;
-  if (!this.mouseMoveTesting) {
+
+  if (this.zoomLevel() == this.minZoomLevel_) {
+    setTimeout(this.acyncMouseDown, 0, event);
+  } else if (!this.mouseMoveTesting) {
     this.testDragHandler = this.eventsHandler.listenOnce(this, acgraph.events.EventType.MOUSEMOVE, function(e) {
       this.itWasDrag = true;
     });
@@ -952,7 +998,7 @@ anychart.charts.Map.prototype.touchMoveHandler = function(e) {
     var isZooming = Math.abs(dist - this.touchDist) > 25;
 
 
-    if (this.interactivity_.mouseWheel() && isZooming) {
+    if (this.interactivity_.zoomOnMouseWheel() && isZooming) {
       var zoomFactor = goog.math.clamp(1 - e.deltaY / 120, 0.7, 2);
       if (scene.goingToHome) zoomFactor = 1 / scene.zoomLevel();
 
@@ -965,15 +1011,15 @@ anychart.charts.Map.prototype.touchMoveHandler = function(e) {
         }
       }
 
-      if (zoomFactor < 1 && anychart.math.round(scene.zoomLevel(), 2) == anychart.charts.Map.ZOOM_MIN_FACTOR && !mapLayer.getSelfTransformation().isIdentity()) {
-        mapLayer.setTransformationMatrix(anychart.charts.Map.ZOOM_MIN_FACTOR, 0, 0, anychart.charts.Map.ZOOM_MIN_FACTOR, 0, 0);
-        scene.fullZoom = anychart.charts.Map.ZOOM_MIN_FACTOR;
+      if (zoomFactor < 1 && anychart.math.round(scene.zoomLevel(), 2) == this.minZoomLevel_ && !mapLayer.getSelfTransformation().isIdentity()) {
+        mapLayer.setTransformationMatrix(this.minZoomLevel_, 0, 0, this.minZoomLevel_, 0, 0);
+        scene.fullZoom = /** @type {number} */(this.minZoomLevel_);
         scene.goingToHome = false;
         if (scene.zoomAnimation && scene.zoomAnimation.isPlaying()) {
           scene.zoomAnimation.stop();
         }
 
-        scene.scale().setMapZoom(anychart.charts.Map.ZOOM_MIN_FACTOR);
+        scene.scale().setMapZoom(/** @type {number} */(this.minZoomLevel_));
         scene.scale().setOffsetFocusPoint(0, 0);
 
         scene.updateSeriesOnZoomOrMove();
@@ -1030,7 +1076,10 @@ anychart.charts.Map.prototype.geoIdField = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (opt_value != this.geoIdField_) {
       this.geoIdField_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.MAP_SERIES, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(
+          anychart.ConsistencyState.APPEARANCE |
+          anychart.ConsistencyState.MAP_GEO_DATA_INDEX,
+          anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -1075,7 +1124,7 @@ anychart.charts.Map.prototype.scale = function(opt_value) {
  * @private
  */
 anychart.charts.Map.prototype.geoScaleInvalidated_ = function(event) {
-  if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REAPPLICATION)) {
+  if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION) || event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     this.invalidate(anychart.ConsistencyState.MAP_SCALE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
 };
@@ -1088,15 +1137,20 @@ anychart.charts.Map.prototype.geoScaleInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Sets/gets settings for regions doesn't linked to anything regions.
- * @param {(Object|boolean)=} opt_value Settings object or boolean value like enabled state.
- * @return {anychart.core.utils.UnboundRegionsSettings|anychart.charts.Map}
+ * @param {(Object|anychart.enums.MapUnboundRegionsMode|boolean)=} opt_value Settings object or boolean value like enabled state.
+ * @return {anychart.core.utils.UnboundRegionsSettings|anychart.enums.MapUnboundRegionsMode|anychart.charts.Map}
  */
 anychart.charts.Map.prototype.unboundRegions = function(opt_value) {
-  if (!this.unboundRegionsSettings_)
-    this.unboundRegionsSettings_ = new anychart.core.utils.UnboundRegionsSettings(this);
-
   if (goog.isDef(opt_value)) {
-    this.unboundRegionsSettings_.setup(opt_value);
+    if (goog.isObject(opt_value)) {
+      if (!this.unboundRegionsSettings_ || goog.isString(this.unboundRegionsSettings_))
+        this.unboundRegionsSettings_ = new anychart.core.utils.UnboundRegionsSettings(this);
+
+      this.unboundRegionsSettings_.setup(opt_value);
+    } else {
+      this.unboundRegionsSettings_ = anychart.enums.normalizeMapUnboundRegionsMode(opt_value, anychart.enums.MapUnboundRegionsMode.HIDE);
+    }
+    this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
   return this.unboundRegionsSettings_;
@@ -1284,6 +1338,10 @@ anychart.charts.Map.prototype.colorRangeInvalidated_ = function(event) {
   }
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
     state |= anychart.ConsistencyState.BOUNDS;
+    signal |= anychart.Signal.BOUNDS_CHANGED;
+  }
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    state |= anychart.ConsistencyState.MAP_COLOR_RANGE;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
   // if there are no signals, state == 0 and nothing happens.
@@ -1579,11 +1637,17 @@ anychart.charts.Map.prototype.seriesInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     state = anychart.ConsistencyState.MAP_SERIES | anychart.ConsistencyState.APPEARANCE;
   }
+  if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
+    state |= anychart.ConsistencyState.MAP_GEO_DATA_INDEX;
+  }
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
     state |= anychart.ConsistencyState.MAP_SERIES | anychart.ConsistencyState.CHART_LEGEND;
-    this.invalidateSeries_();
     for (var i = this.series_.length; i--;)
-      this.series_[i].invalidate(anychart.ConsistencyState.SERIES_DATA);
+      this.series_[i].invalidate(
+          anychart.ConsistencyState.BOUNDS |
+          anychart.ConsistencyState.SERIES_DATA |
+          anychart.ConsistencyState.MAP_COLOR_SCALE
+      );
   }
   if (event.hasSignal(anychart.Signal.NEED_UPDATE_LEGEND)) {
     state |= anychart.ConsistencyState.CHART_LEGEND;
@@ -1608,13 +1672,26 @@ anychart.charts.Map.prototype.getAllSeries = function() {
 
 
 /**
+ * Whether geo data type SVG.
+ * @return {boolean}
+ */
+anychart.charts.Map.prototype.isSvgGeoData = function() {
+  return this.parser ?
+      this.parser.getType() == anychart.enums.MapGeoDataTypes.SVG :
+      this.geoData_ ?
+          goog.isString(this.geoData_) && goog.string.startsWith(this.geoData_, '<') || goog.dom.isNodeLike(this.geoData_) :
+          false;
+};
+
+
+/**
  * Getter/setter geo data.
  * @param {Node|string|Object=} opt_data SVG|SVGString|GeoJSON|MapNameString.
  * @return {Node|string|Object} Passed geo data.
  */
 anychart.charts.Map.prototype.geoData = function(opt_data) {
   if (goog.isDef(opt_data)) {
-    if (goog.isString(opt_data)) {
+    if (goog.isString(opt_data) && !goog.string.startsWith(opt_data, '<')) {
       this.geoDataStringName_ = opt_data;
       var configPath = opt_data.split('.');
       opt_data = goog.dom.getWindow();
@@ -1638,6 +1715,15 @@ anychart.charts.Map.prototype.geoData = function(opt_data) {
     return this;
   }
   return this.geoData_;
+};
+
+
+/**
+ * Returns indexed geo data.
+ * @return {Object}
+ */
+anychart.charts.Map.prototype.getIndexedGeoData = function() {
+  return this.indexedGeoData_;
 };
 
 
@@ -1675,10 +1761,61 @@ anychart.charts.Map.prototype.getContentLayer = function() {
 
 
 /**
+ * Creates path.
+ * @param {acgraph.vector.ILayer=} opt_parent .
+ * @return {!acgraph.vector.Path}
+ * @private
+ */
+anychart.charts.Map.prototype.createPath_ = function(opt_parent) {
+  var path = opt_parent ? opt_parent.path() : acgraph.path();
+  path.disableStrokeScaling(true);
+  return path;
+};
+
+
+/**
+ * Clear path.
+ * @param {!acgraph.vector.Element} path .
+ * @private
+ */
+anychart.charts.Map.prototype.clearPath_ = function(path) {
+  path.clear();
+  path.parent(null);
+  path.removeAllListeners();
+  path.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  delete path.tag;
+};
+
+
+/**
+ * Clear layer.
+ * @param {!acgraph.vector.Layer} layer .
+ * @private
+ */
+anychart.charts.Map.prototype.clearLayer_ = function(layer) {
+  var children = layer.removeChildren();
+  for (var i = 0, len = children.length; i < len; i++) {
+    var child = children[i];
+    if (child instanceof acgraph.vector.Path) {
+      this.clearPath_(child);
+    } else if (child instanceof acgraph.vector.Layer) {
+      this.clearLayer_(child);
+    }
+  }
+};
+
+
+/**
  * Clear map paths.
  */
 anychart.charts.Map.prototype.clear = function() {
-  if (this.mapLayer_) this.mapLayer_.clear();
+  if (this.mapLayer_) {
+    if (this.isSvgGeoData()) {
+      this.clearLayer_(this.mapLayer_);
+    } else {
+      this.mapLayer_.clear();
+    }
+  }
   this.mapPaths.length = 0;
 };
 
@@ -1720,7 +1857,7 @@ anychart.charts.Map.prototype.updateSeriesOnZoomOrMove = function() {
  */
 anychart.charts.Map.prototype.invalidateSeries_ = function() {
   for (var i = this.series_.length; i--;)
-    this.series_[i].invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
+    this.series_[i].invalidate(anychart.ConsistencyState.BOUNDS);
 };
 
 
@@ -1767,47 +1904,66 @@ anychart.charts.Map.prototype.drawGeom_ = function(coords, index, geom) {
  *    tx: Object,
  *    projection1: anychart.core.map.projections.Base,
  *    projection2: anychart.core.map.projections.Base,
- *    geoScale: anychart.core.map.scale.Geo
+ *    geoScale: anychart.core.map.scale.Geo,
+ *    map: anychart.charts.Map
  * }}
  * @private
  */
 anychart.charts.Map.prototype.calcGeom_ = function(coords, index, geom) {
-  var x, y, projected;
-
-  if (this.projection2) {
-    x = ((coords[index] - this.tx.xoffset) / this.tx.scale);
-    y = ((coords[index + 1] - this.tx.yoffset) / this.tx.scale);
-
-    if (this.projection1) {
-      projected = this.projection1.invert(x, y);
-      x = projected[0];
-      y = projected[1];
-    }
-
-    projected = this.projection2.forward(x, y);
-
-    coords[index] = projected[0] * this.tx.scale + this.tx.xoffset;
-    coords[index + 1] = projected[1] * this.tx.scale + this.tx.yoffset;
-  }
-
+  var x, y, projected, bounds;
   var geoScale = this.geoScale;
 
-  geoScale.extendDataRangeX(coords[index]);
-  geoScale.extendDataRangeY(coords[index + 1]);
+  if (this.map.isSvgGeoData()) {
+    if (geom['type'] == 'image' || geom['type'] == 'text') {
+      bounds = acgraph.getRenderer().measureElement(geom['cloneNode']);
+
+      geoScale.extendDataRangeX(bounds.getLeft(), bounds.getRight());
+      geoScale.extendDataRangeY(bounds.getTop(), bounds.getBottom());
+    } else if (geom['type'] == 'path') {
+      if (!this.map.measurePath)
+        this.map.measurePath = acgraph.path();
+
+      this.map.parser.createPathByCommands(geom['commands_tx'] ? geom['commands_tx'] : geom['commands'], this.map.measurePath);
+
+      bounds = this.map.measurePath.getBounds();
+
+      geoScale.extendDataRangeX(bounds.getLeft(), bounds.getRight());
+      geoScale.extendDataRangeY(bounds.getTop(), bounds.getBottom());
+    }
+  } else {
+    if (this.projection2) {
+      x = ((coords[index] - this.tx.xoffset) / this.tx.scale);
+      y = ((coords[index + 1] - this.tx.yoffset) / this.tx.scale);
+
+      if (this.projection1) {
+        projected = this.projection1.invert(x, y);
+        x = projected[0];
+        y = projected[1];
+      }
+
+      projected = this.projection2.forward(x, y);
+
+      coords[index] = projected[0] * this.tx.scale + this.tx.xoffset;
+      coords[index + 1] = projected[1] * this.tx.scale + this.tx.yoffset;
+    }
+
+    geoScale.extendDataRangeX(coords[index]);
+    geoScale.extendDataRangeY(coords[index + 1]);
+  }
 };
 
 
 /**
  * Draw geometry.
- * @param {anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon} geom Geometry.
+ * @param {Object} geom Geometry.
  * @param {Function} callBack DOM element.
- * @param {anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon=} opt_output Output object for clone geometry.
+ * @param {Object=} opt_output Output object for clone geometry.
  * @param {boolean=} opt_initGeoData .
  * @private
  */
 anychart.charts.Map.prototype.iterateGeometry_ = function(geom, callBack, opt_output, opt_initGeoData) {
   var j, k, m, geomsLen, pointsLen;
-  var polygones_, polygone_, holes_;
+  var polygones_, polygone_, holes_, paths_, path;
 
   if (!geom) return;
   if (goog.object.containsKey(geom, 'polygones')) {
@@ -1862,7 +2018,6 @@ anychart.charts.Map.prototype.iterateGeometry_ = function(geom, callBack, opt_ou
       opt_output['polygones'] = polygones_;
   } else if (goog.object.containsKey(geom, 'paths')) {
     var paths = geom['paths'];
-    var paths_;
     geomsLen = paths.length;
     if (opt_initGeoData)
       paths_ = [];
@@ -1870,7 +2025,7 @@ anychart.charts.Map.prototype.iterateGeometry_ = function(geom, callBack, opt_ou
       paths_ = opt_output['paths'];
 
     for (j = 0; j < geomsLen; j++) {
-      var path = paths[j];
+      path = paths[j];
 
       if (opt_initGeoData) {
         path = goog.array.clone(path);
@@ -1897,6 +2052,80 @@ anychart.charts.Map.prototype.iterateGeometry_ = function(geom, callBack, opt_ou
     }
     for (k = 0; k < pointsLen - 1; k += 2) {
       callBack.call(this, coords, k, geom);
+    }
+  } else if (goog.object.containsKey(geom, 'type')) {
+    if (geom['type'] == 'path') {
+      if (opt_initGeoData || opt_output) {
+        opt_output['type'] = geom['type'];
+        opt_output['commands'] = geom['commands'];
+        opt_output['commands_tx'] = geom['commands_tx'];
+        opt_output['attrs'] = geom['attrs'];
+        opt_output['properties'] = geom['properties'];
+        opt_output['tx'] = geom['tx'];
+      }
+
+      callBack.call(this, null, 0, geom);
+    } else if (geom['type'] == 'image') {
+      if (opt_initGeoData || opt_output) {
+        opt_output['type'] = geom['type'];
+        opt_output['bounds'] = geom['bounds'];
+        opt_output['attrs'] = geom['attrs'];
+        opt_output['properties'] = geom['properties'];
+        opt_output['sourceNode'] = geom['sourceNode'];
+        opt_output['cloneNode'] = geom['cloneNode'];
+        opt_output['tx'] = geom['tx'];
+      }
+
+      callBack.call(this, null, 0, geom);
+    } else if (geom['type'] == 'text') {
+      if (opt_initGeoData || opt_output) {
+        opt_output['type'] = geom['type'];
+        opt_output['text'] = geom['text'];
+        opt_output['cloneNode'] = geom['cloneNode'];
+        opt_output['attrs'] = geom['attrs'];
+        opt_output['properties'] = geom['properties'];
+        opt_output['tx'] = geom['tx'];
+      }
+
+      callBack.call(this, null, 0, geom);
+    } else if (geom['type'] == 'group') {
+      var features = geom['features'];
+      var featuresLength = features.length;
+      var features_;
+
+      if (opt_initGeoData) {
+        features_ = [];
+      } else if (opt_output) {
+        features_ = opt_output['features'];
+      }
+
+      for (k = 0; k < featuresLength; k++) {
+        var feature = features[k];
+        var feature_;
+
+        if (opt_initGeoData) {
+          feature_ = {};
+          if (goog.object.containsKey(feature, 'properties')) {
+            feature_['properties'] = feature['properties'];
+          }
+        } else if (opt_output) {
+          feature_ = feature;
+        }
+
+        this.iterateGeometry_(feature, callBack, feature_, opt_initGeoData);
+
+        if (opt_initGeoData)
+          features_.push(feature_);
+      }
+
+      if (opt_initGeoData)
+        opt_output['features'] = features_;
+
+      if (opt_initGeoData || opt_output) {
+        opt_output['type'] = geom['type'];
+        opt_output['attrs'] = geom['attrs'];
+        opt_output['tx'] = geom['tx'];
+      }
     }
   }
 };
@@ -1956,6 +2185,26 @@ anychart.charts.Map.prototype.drawCredits = function(parentBounds) {
 
 
 /**
+ * Creates map layer.
+ * @param {acgraph.vector.ILayer=} opt_parent .
+ * @return {acgraph.vector.Layer}
+ */
+anychart.charts.Map.prototype.createMapLayer = function(opt_parent) {
+  var layer;
+  if (this.isSvgGeoData()) {
+    layer = acgraph.layer();
+  } else {
+    layer = new anychart.core.utils.TypedLayer(this.createPath_, this.clearPath_);
+  }
+
+  layer.parent(opt_parent);
+  layer.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+
+  return layer;
+};
+
+
+/**
  * Calculate geo scale.
  */
 anychart.charts.Map.prototype.calculateGeoScale = function() {
@@ -1963,16 +2212,19 @@ anychart.charts.Map.prototype.calculateGeoScale = function() {
 
     var geoData = this.geoData();
     if (goog.isDefAndNotNull(geoData)) {
-      if ((goog.isString(geoData) && goog.string.startsWith(geoData, '<')) || goog.dom.isNodeLike(geoData)) {
-        //todo (blackart): Here will be svg parsing. coming soon ...
-      } else {
-        geoData = goog.isString(this.geoData_) ? goog.dom.getWindow()['anychart']['maps'][this.geoData_] : this.geoData_;
-        var parser = geoData['type'].toLowerCase() === 'topology' ?
-            anychart.core.utils.TopoJSONParser.getInstance() :
-            anychart.core.utils.GeoJSONParser.getInstance();
+      geoData = goog.isString(this.geoData_) && !goog.string.startsWith(/** @type {string} */(geoData), '<') ?
+          goog.dom.getWindow()['anychart']['maps'][this.geoData_] : this.geoData_;
 
-        this.internalSourceGeoData = parser.parse(/** @type {Object} */(geoData));
+      if (goog.isString(geoData) && goog.string.startsWith(geoData, '<') || goog.dom.isNodeLike(geoData)) {
+        this.parser = anychart.core.utils.GeoSVGParser.getInstance();
+      } else if (geoData['type'].toLowerCase() === 'topology') {
+        this.parser = anychart.core.utils.TopoJSONParser.getInstance();
+      } else {
+        this.parser = anychart.core.utils.GeoJSONParser.getInstance();
       }
+
+      this.internalSourceGeoData = this.parser.parse(/** @type {Object} */(geoData));
+
       goog.dispose(this.internalGeoData);
       this.internalGeoData = null;
 
@@ -2008,27 +2260,16 @@ anychart.charts.Map.prototype.calculateGeoScale = function() {
       }
 
       if (!this.mapLayer_) {
-        this.mapLayer_ = new anychart.core.utils.TypedLayer(function() {
-          var path = acgraph.path();
-          path.disableStrokeScaling(true);
-          return path;
-        }, function(path) {
-          if (path) {
-            path.clear();
-            path.parent(null);
-            path.removeAllListeners();
-            path.setTransformationMatrix(1, 0, 0, 1, 0, 0);
-            delete path.tag;
-          }
-        });
-        this.mapLayer_.parent(/** @type {acgraph.vector.ILayer} */(this.mapContentLayer_));
-        this.mapLayer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
-
+        this.mapLayer_ = this.createMapLayer(/** @type {acgraph.vector.ILayer} */(this.mapContentLayer_));
         if (this.getRootScene() == this)
           this.initControlsInteractivity_();
 
       } else {
         this.clear();
+      }
+
+      if (this.isSvgGeoData() && !this.svgRootLayer_) {
+        this.svgRootLayer_ = this.createMapLayer(/** @type {acgraph.vector.ILayer} */(this.mapLayer_));
       }
 
       if (!this.dataLayer_) {
@@ -2041,7 +2282,7 @@ anychart.charts.Map.prototype.calculateGeoScale = function() {
     this.markConsistent(anychart.ConsistencyState.MAP_GEO_DATA);
   }
 
-  var i, series;
+  var i, len, series;
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_SCALE)) {
     if (this.mapTX) {
       var scale = this.scale();
@@ -2052,8 +2293,8 @@ anychart.charts.Map.prototype.calculateGeoScale = function() {
         scale.setMapZoom(tx.getScaleX());
         scale.setOffsetFocusPoint(tx.getTranslateX(), tx.getTranslateY());
 
-        //if (this.zoomLevel() != anychart.charts.Map.ZOOM_MIN_FACTOR) {
-        //scene.zoomInc = anychart.charts.Map.ZOOM_MIN_FACTOR;
+        //if (this.zoomLevel() != this.minZoomLevel_) {
+        //scene.zoomInc = this.minZoomLevel_;
         //}
       }
 
@@ -2066,11 +2307,11 @@ anychart.charts.Map.prototype.calculateGeoScale = function() {
       this.newCrs_ = null;
       if (firstDrawing && this.crs_) {
         this.newCrs_ = this.crs_;
-      } else if ((this.currentCrs_ != tx.crs || this.currentCrs_ != crs) && !firstDrawing) {
+      } else if ((this.currentCrs_ != tx.crs || this.currentCrs_ != crs) && !firstDrawing && !this.isSvgGeoData()) {
         this.newCrs_ = crs;
       }
 
-      var changeProjection = !!this.newCrs_;
+      var changeProjection = !!this.newCrs_ && !this.isSvgGeoData();
 
       var destinationProjection, currentProjection, sourceProjection;
 
@@ -2108,7 +2349,7 @@ anychart.charts.Map.prototype.calculateGeoScale = function() {
       }
 
       if ((this.crsMapAnimation && this.crsMapAnimation.isStopped()) || !this.crsMapAnimation) {
-        var isAnimate = this.crsAnimation_.enabled() && this.crsAnimation_.duration() > 0 && !initInternalGeoData && changeProjection;
+        var isAnimate = this.crsAnimation_ && this.crsAnimation_.enabled() && this.crsAnimation_.duration() > 0 && !initInternalGeoData && changeProjection;
         if (isAnimate) {
           tx.curProj = new anychart.core.map.projections.TwinProjection(
               /** @type {anychart.core.map.projections.Base} */(currentProjection),
@@ -2132,7 +2373,8 @@ anychart.charts.Map.prototype.calculateGeoScale = function() {
             tx: tx,
             projection1: sourceProjection,
             projection2: destinationProjection,
-            geoScale: this.scale()
+            geoScale: this.scale(),
+            map: this
           });
 
           scale.startAutoCalc();
@@ -2144,6 +2386,15 @@ anychart.charts.Map.prototype.calculateGeoScale = function() {
               changeProjection);
 
           scale.finishAutoCalc();
+
+          if (this.isSvgGeoData()) {
+            scale.inverted(false, true);
+
+            this.svgRootLayer_.parent(this.getMapLayer());
+            this.svgRootLayer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+          } else {
+            scale.inverted(false, false);
+          }
         }
       }
 
@@ -2164,7 +2415,7 @@ anychart.charts.Map.prototype.calculateGeoScale = function() {
         sum += /** @type {number} */(series.statistics('seriesSum'));
         pointsCount += /** @type {number} */(series.statistics('seriesPointsCount'));
         //----------------------------------end calc statistics for series
-        series.calculate();
+        // series.calculate();
       }
 
       //----------------------------------calc statistics for series
@@ -2189,11 +2440,220 @@ anychart.charts.Map.prototype.calculateGeoScale = function() {
     this.markConsistent(anychart.ConsistencyState.MAP_SCALE);
   }
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_GEO_DATA_INDEX)) {
+    this.indexedGeoData_ = {};
+    this.indexedGeoData_[this.geoIdField_] = {};
+    if (this.internalGeoData) {
+      for (i = this.series_.length; i--;) {
+        series = this.series_[i];
+        if (goog.isDef(series.geoIdField()) && series.geoIdField() != this.geoIdField_) {
+          this.indexedGeoData_[series.geoIdField()] = {};
+        }
+      }
+
+      for (i = 0, len = this.internalGeoData.length; i < len; i++) {
+        var geom = this.internalGeoData[i];
+        this.featureTraverser(geom, function(feature) {
+          var prop = feature['properties'];
+          if (prop) {
+            for (var index in this.indexedGeoData_) {
+              if (index in prop) {
+                this.indexedGeoData_[index][prop[index]] = feature;
+              }
+            }
+          }
+        }, this);
+      }
+    }
+    this.markConsistent(anychart.ConsistencyState.MAP_GEO_DATA_INDEX);
+  }
+
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_SERIES)) {
     for (i = this.series_.length; i--;) {
       series = this.series_[i];
+      series.suspendSignalsDispatching();
       series.container(this.dataLayer_);
+      series.resumeSignalsDispatching(false);
     }
+  }
+};
+
+
+/**
+ * Draw geometry.
+ * @param {Object} geometry .
+ * @param {acgraph.vector.ILayer} parent .
+ * @param {Function=} opt_transform .
+ * @private
+ */
+anychart.charts.Map.prototype.drawGeometry_ = function(geometry, parent, opt_transform) {
+  if (!geometry) return;
+
+  var domElement, j, geomsLen, tx, features;
+
+  if (this.isSvgGeoData()) {
+    if (goog.object.containsKey(geometry, 'type')) {
+      if (geometry['type'] == 'group') {
+        if (!geometry.domElement)
+          geometry.domElement = this.createMapLayer(parent);
+
+        features = geometry['features'];
+        geomsLen = features.length;
+        for (j = 0; j < geomsLen; j++) {
+          this.drawGeometry_(features[j], geometry.domElement, opt_transform);
+        }
+
+        goog.object.forEach(geometry['attrs'], function(value, key) {
+          if (key == 'id') {
+            geometry.domElement.id(value);
+          } else if (key == 'clip-path') {
+            value.domElement = this.parser.createPathByCommands(value['commands'], value.domElement);
+            geometry.domElement.clip(value.domElement);
+          } else {
+            geometry.domElement.attr(key, value);
+          }
+        }, this);
+      } else if (geometry['type'] == 'image') {
+        if (!geometry.domElement)
+          geometry.domElement = parent.image();
+        var bounds = geometry['bounds'];
+
+        geometry.domElement.x(bounds.left);
+        geometry.domElement.y(bounds.top);
+        geometry.domElement.width(bounds.width);
+        geometry.domElement.height(bounds.height);
+
+        geometry.domElement.src(geometry['attrs']['xlink:href']);
+      } else if (geometry['type'] == 'path') {
+        if (!geometry.domElement)
+          geometry.domElement = this.createPath_(parent);
+        this.parser.createPathByCommands(geometry['commands'], geometry.domElement);
+
+        goog.object.forEach(geometry['attrs'], function(value, key) {
+          if (key == 'id') {
+            geometry.domElement.id(value);
+          } else if (key == 'clip-path') {
+            value.domElement = this.parser.createPathByCommands(value['commands'], value.domElement);
+            geometry.domElement.clip(value.domElement);
+          } else {
+            var bounds;
+            if (key == 'fill') {
+              var fill;
+              if (goog.isObject(value)) {
+                if (value['type'] && value['type'] == 'pattern') {
+                  bounds = value['bounds'];
+                  if (!value.domElement) {
+                    value.domElement = acgraph.patternFill(bounds);
+
+                    value.domElement.parent(parent);
+                    value.domElement.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+
+                    features = value['features'];
+                    geomsLen = features.length;
+                    for (j = 0; j < geomsLen; j++) {
+                      this.drawGeometry_(features[j], value.domElement, null);
+                    }
+                  }
+                  fill = value.domElement;
+                } else {
+                  fill = value;
+                }
+              } else {
+                fill = value;
+              }
+              geometry.domElement.fill(fill);
+            } else if (key == 'stroke') {
+              var stroke;
+              if (goog.isObject(value)) {
+                if (value['type'] && value['type'] == 'pattern') {
+                  bounds = value['bounds'];
+                  if (!value.domElement) {
+                    value.domElement = acgraph.patternFill(bounds);
+
+                    value.domElement.parent(parent);
+                    value.domElement.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+
+                    features = value['features'];
+                    geomsLen = features.length;
+                    for (j = 0; j < geomsLen; j++) {
+                      this.drawGeometry_(features[j], value.domElement, null);
+                    }
+                  }
+                  stroke = value.domElement;
+                } else {
+                  stroke = value;
+                }
+              } else {
+                stroke = value;
+              }
+              geometry.domElement.stroke(stroke);
+            } else {
+              geometry.domElement.attr(key, value);
+            }
+          }
+        }, this);
+      } else if (geometry['type'] == 'text') {
+        if (!geometry.domElement) {
+          geometry.domElement = new acgraph.vector.UnmanagedLayer();
+        }
+
+        var content = geometry['cloneNode'].cloneNode(true);
+        content.removeAttribute('transform');
+
+        geometry.domElement.content(content);
+      }
+    }
+    if (geometry.domElement) {
+      tx = geometry['tx'] ? geometry['tx'].self : null;
+      if (tx) {
+        geometry.domElement.setTransformationMatrix(
+            tx.getScaleX(),
+            tx.getShearY(),
+            tx.getShearX(),
+            tx.getScaleY(),
+            tx.getTranslateX(),
+            tx.getTranslateY()
+        );
+      }
+
+      geometry.domElement.parent(parent);
+      if (geometry['type'] != 'group') {
+        this.mapPaths.push(geometry.domElement);
+      }
+    }
+  } else {
+    domElement = parent.genNextChild();
+    geometry.domElement = domElement;
+    this.mapPaths.push(domElement);
+
+    if (goog.object.containsKey(geometry, 'geometries')) {
+      var geometries = geometry['geometries'];
+      geomsLen = geometries.length;
+      for (j = 0; j < geomsLen; j++) {
+        this.iterateGeometry_(geometries[j], this.drawGeom_);
+      }
+    } else {
+      this.iterateGeometry_(/** @type {Object} */(geometry), this.drawGeom_);
+    }
+  }
+};
+
+
+/**
+ * Traverser for complex feature.
+ * @param {Object} feature Geo feature.
+ * @param {!Function} f Function for applying to feature chilren.
+ * @param {Object=} opt_obj This is used as the 'this' object within f.
+ */
+anychart.charts.Map.prototype.featureTraverser = function(feature, f, opt_obj) {
+  if (feature['type'] == 'group') {
+    for (var i = 0, len = feature['features'].length; i < len; i++) {
+      var feature_ = feature['features'][i];
+      f.call(opt_obj, feature);
+      this.featureTraverser(feature_, f, opt_obj);
+    }
+  } else {
+    f.call(opt_obj, feature);
   }
 };
 
@@ -2202,19 +2662,22 @@ anychart.charts.Map.prototype.calculateGeoScale = function() {
 anychart.charts.Map.prototype.drawContent = function(bounds) {
   this.getRootScene();
 
-  var i, series, tx, dx, dy;
-  var maxZoomFactor = anychart.charts.Map.ZOOM_MAX_FACTOR;
-  var minZoomFactor = anychart.charts.Map.ZOOM_MIN_FACTOR;
+  var i, series, tx, dx, dy, len, geom;
+  var maxZoomFactor = this.maxZoomLevel_;
+  var minZoomFactor = this.minZoomLevel_;
   var boundsWithoutTx, boundsWithTx;
+
+  this.calculateGeoScale();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_COLOR_RANGE)) {
     if (this.colorRange_) {
       var targetSeries;
-      for (i = 0; i < this.series_.length; i++) {
+      for (i = 0, len = this.series_.length; i < len; i++) {
         if (this.series_[i].isChoropleth())
           targetSeries = this.series_[i];
       }
       if (targetSeries) {
+        targetSeries.calculate();
         this.colorRange_.suspendSignalsDispatching();
         this.colorRange_.scale(targetSeries.colorScale());
         this.colorRange_.target(targetSeries);
@@ -2225,12 +2688,10 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     }
   }
 
-  this.calculateGeoScale();
-
   var mapLayer = this.getMapLayer();
+  var scale = this.scale();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var scale = this.scale();
     var contentAreaBounds;
     if (this.colorRange_) {
       this.colorRange_.parentBounds(bounds.clone().round());
@@ -2239,7 +2700,9 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
       contentAreaBounds = bounds.clone();
     }
 
-    var unboundRegionsStrokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.unboundRegionsSettings_.stroke()));
+    var unboundRegionsStrokeThickness = goog.isObject(this.unboundRegionsSettings_) ?
+        acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.unboundRegionsSettings_.stroke())) : 0;
+
     if (unboundRegionsStrokeThickness > this.maxStrokeThickness_)
       this.maxStrokeThickness_ = unboundRegionsStrokeThickness;
 
@@ -2257,27 +2720,25 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
 
     this.clear();
 
+    if (this.isSvgGeoData()) {
+      scale.calculate();
+      this.svgRootLayer_.parent(this.getMapLayer());
+      this.svgRootLayer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+      this.svgRootLayer_.scale(scale.ratio, scale.ratio, 0, 0);
+
+      var xy = scale.scaleToPx(0, 0);
+      tx = new goog.graphics.AffineTransform(1, 0, 0, 1, xy[0], xy[1]);
+
+      tx.concatenate(this.svgRootLayer_.getSelfTransformation());
+      this.svgRootLayer_.setTransformationMatrix(tx.getScaleX(), tx.getShearY(), tx.getShearX(), tx.getScaleY(), tx.getTranslateX(), tx.getTranslateY());
+    }
+
     if (this.internalGeoData) {
-      var j, len;
+      var parent = this.isSvgGeoData() ? this.svgRootLayer_ : this.mapLayer_;
+
       for (i = 0, len = this.internalGeoData.length; i < len; i++) {
-        var geom = this.internalGeoData[i];
-        if (!geom) continue;
-
-        var domElement = this.mapLayer_.genNextChild();
-        geom.domElement = domElement;
-        this.mapPaths.push(domElement);
-
-        if (goog.object.containsKey(geom, 'geometries')) {
-          var geometries = geom['geometries'];
-          var geomsLen = geometries.length;
-          for (j = 0; j < geomsLen; j++) {
-            this.iterateGeometry_(geometries[j], this.drawGeom_);
-          }
-        } else {
-          this.iterateGeometry_(
-              /** @type {anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon} */(geom),
-              this.drawGeom_);
-        }
+        geom = this.internalGeoData[i];
+        this.drawGeometry_(geom, parent);
       }
     }
 
@@ -2400,17 +2861,36 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    if (this.unboundRegionsSettings_ && this.unboundRegionsSettings_.enabled()) {
+    var path;
+    if (this.unboundRegionsSettings_ == anychart.enums.MapUnboundRegionsMode.AS_IS) {
       for (i = 0, len = this.mapPaths.length; i < len; i++) {
-        this.mapPaths[i].visible(true)
-            .fill(this.unboundRegionsSettings_.fill())
-            .stroke(this.unboundRegionsSettings_.stroke());
+        path = this.mapPaths[i];
+        path.visible(true);
+        path.removeAllListeners();
+        delete path.tag;
+      }
+    } else if (goog.isObject(this.unboundRegionsSettings_) && this.unboundRegionsSettings_.enabled()) {
+      for (i = 0, len = this.mapPaths.length; i < len; i++) {
+        path = this.mapPaths[i];
+        path.visible(true);
+        path.removeAllListeners();
+        delete path.tag;
+        if (path instanceof acgraph.vector.Shape) {
+          path
+              .fill(this.unboundRegionsSettings_.fill())
+              .stroke(this.unboundRegionsSettings_.stroke());
+        }
       }
     } else {
       for (i = 0, len = this.mapPaths.length; i < len; i++) {
-        this.mapPaths[i].visible(false);
+        path = this.mapPaths[i];
+        path.visible(false);
+        path.removeAllListeners();
+        delete path.tag;
       }
     }
+
+
     this.invalidateSeries_();
     this.invalidate(anychart.ConsistencyState.MAP_SERIES);
 
@@ -2775,7 +3255,7 @@ anychart.charts.Map.prototype.getSeriesStatus = function(event) {
 
 /** @inheritDoc */
 anychart.charts.Map.prototype.createEventSeriesStatus = function(seriesStatus, opt_empty) {
-  var eventSeriesStatus = [];
+  var eventSeriesStatus = [], features, prop;
   for (var i = 0, len = seriesStatus.length; i < len; i++) {
     var status = seriesStatus[i];
     var series = status.series;
@@ -2786,7 +3266,8 @@ anychart.charts.Map.prototype.createEventSeriesStatus = function(seriesStatus, o
       for (var j = 0; j < status.points.length; j++) {
         var index = status.points[j];
         if (iterator.select(index)) {
-          var prop = iterator.meta('regionProperties');
+          features = iterator.meta('features');
+          prop = features && features.length ? features[0]['properties'] : null;
           if (prop) {
             var point = {
               'id': prop[series.getFinalGeoIdField()],
@@ -2808,7 +3289,8 @@ anychart.charts.Map.prototype.createEventSeriesStatus = function(seriesStatus, o
       index = status.nearestPointToCursor.index;
       if (iterator.select(index)) {
         point = {};
-        prop = iterator.meta('regionProperties');
+        features = iterator.meta('features');
+        prop = features && features.length ? features[0]['properties'] : null;
         if (prop) {
           point['id'] = prop[series.getFinalGeoIdField()];
           point['index'] = iterator.getIndex();
@@ -2866,7 +3348,7 @@ anychart.charts.Map.prototype.doAdditionActionsOnMouseOut = function() {
  */
 anychart.charts.Map.prototype.resizeHandler = function(evt) {
   if (this.bounds().dependsOnContainerSize()) {
-    this.invalidate(anychart.ConsistencyState.ALL & ~(anychart.ConsistencyState.CHART_ANIMATION | anychart.ConsistencyState.MAP_GEO_DATA),
+    this.invalidate(anychart.ConsistencyState.BOUNDS,
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   }
 };
@@ -2957,7 +3439,7 @@ anychart.charts.Map.prototype.getFeatureById = function(id) {
 anychart.charts.Map.prototype.translateFeature = function(id, dx, dy) {
   var feature = this.getFeatureById(id);
   var bounds, latLon, current_tx, featureTx;
-  if (feature) {
+  if (feature && !this.isSvgGeoData()) {
     bounds = feature.domElement.getBoundsWithoutTransform();
     latLon = this.scale().inverseTransform(
         bounds.left + bounds.width / 2,
@@ -3027,7 +3509,7 @@ anychart.charts.Map.prototype.featureTranslation = function(id, opt_dx, opt_dy) 
   }
 
   if (goog.isDef(opt_dx) || goog.isDef(opt_dy)) {
-    if (feature) {
+    if (feature && !this.isSvgGeoData()) {
       var offsetX = featureTx.xoffset || 0;
       var offsetY = featureTx.yoffset || 0;
 
@@ -3099,7 +3581,7 @@ anychart.charts.Map.prototype.featureScaleFactor = function(id, opt_ratio) {
   }
 
   if (goog.isDef(opt_ratio)) {
-    if (feature) {
+    if (feature && !this.isSvgGeoData()) {
       var ratio = anychart.utils.toNumber(opt_ratio) || 1;
 
       var xoffset = featureTx.xoffset || 0;
@@ -3182,7 +3664,7 @@ anychart.charts.Map.prototype.featureCrs_ = function(feature, opt_crs) {
 
   if (!goog.isDef(opt_crs)) {
     return goog.isDef(current_tx.crs) ? current_tx.crs : this.mapTX['default'].crs;
-  } else {
+  } else if (!this.isSvgGeoData()) {
     var x, y, scaledCoord, x_, y_;
 
     var projected, oldProjection, newProjection;
@@ -3595,10 +4077,10 @@ anychart.charts.Map.prototype.drillDown_ = function(id, target) {
     newScene.zoomDuration = 400;
     newScene.unlimitedZoom = true;
 
-    newScene.zoomTo(anychart.charts.Map.ZOOM_MIN_FACTOR, zoomParam[1], zoomParam[2]);
+    newScene.zoomTo(this.minZoomLevel_, zoomParam[1], zoomParam[2]);
 
     this.doAfterAnimation(newScene, function(root) {
-      this.zoomTo(anychart.charts.Map.ZOOM_MIN_FACTOR);
+      this.zoomTo(this.minZoomLevel_);
       root.drillingInAction = false;
       setTimeout(goog.bind(function() {this.dispatchEvent(this.createDrillChangeEvent())}, root), 0);
     }, root);
@@ -3621,7 +4103,7 @@ anychart.charts.Map.prototype.drillUp_ = function(target, opt_levels) {
   root.drillingInAction = true;
 
   source.zoomDuration = 700;
-  source.zoomTo(anychart.charts.Map.ZOOM_MIN_FACTOR);
+  source.zoomTo(/** @type {number} */(this.minZoomLevel_));
 
   var levels = opt_levels || 1;
 
@@ -3648,7 +4130,7 @@ anychart.charts.Map.prototype.drillUp_ = function(target, opt_levels) {
     this.zoomTo(1 / zoom, cx, cy);
 
     this.doAfterAnimation(this, function(target, root) {
-      this.zoomTo(anychart.charts.Map.ZOOM_MIN_FACTOR);
+      this.zoomTo(this.minZoomLevel_);
 
       this.hide();
       this.unhover();
@@ -3705,6 +4187,42 @@ anychart.charts.Map.prototype.zoomLevel = function() {
 
 
 /**
+ * Max zoom level.
+ * @param {number=} opt_value
+ * @return {number|anychart.charts.Map}
+ */
+anychart.charts.Map.prototype.maxZoomLevel = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.toNumber(opt_value);
+    if (this.maxZoomLevel_ != opt_value) {
+      this.maxZoomLevel_ = opt_value;
+    }
+    return this;
+  }
+
+  return this.maxZoomLevel_;
+};
+
+
+/**
+ * Min zoom level.
+ * @param {number=} opt_value
+ * @return {number|anychart.charts.Map}
+ */
+anychart.charts.Map.prototype.minZoomLevel = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.toNumber(opt_value);
+    if (this.minZoomLevel_ != opt_value) {
+      this.minZoomLevel_ = opt_value;
+    }
+    return this;
+  }
+
+  return this.minZoomLevel_;
+};
+
+
+/**
  * Zooms the map to passed zoom level and coordinates.
  * @param {number} value Zoom level for zooming.
  * @param {number=} opt_cx X coord of zoom point.
@@ -3713,7 +4231,7 @@ anychart.charts.Map.prototype.zoomLevel = function() {
  */
 anychart.charts.Map.prototype.zoomTo = function(value, opt_cx, opt_cy) {
   if (!this.unlimitedZoom)
-    value = goog.math.clamp(value, anychart.charts.Map.ZOOM_MIN_FACTOR, anychart.charts.Map.ZOOM_MAX_FACTOR);
+    value = goog.math.clamp(value, /** @type {number} */(this.minZoomLevel_), /** @type {number} */(this.maxZoomLevel_));
   return this.zoom(value / this.zoomLevel(), opt_cx, opt_cy);
 };
 
@@ -3757,7 +4275,7 @@ anychart.charts.Map.prototype.zoomToFeature = function(id) {
             this, [dx, dy], [0, 0], anychart.charts.Map.TIMINGS.ZOOM_TO_FEATURE_DURATION);
         this.zoomAnimation.play();
       } else {
-        this.zoomTo(anychart.charts.Map.ZOOM_MIN_FACTOR, cx, cy);
+        this.zoomTo(this.minZoomLevel_, cx, cy);
       }
       this.prevZoomedFeature = null;
       this.prevTx = null;
@@ -3863,8 +4381,8 @@ anychart.charts.Map.prototype.zoom = function(value, opt_cx, opt_cy) {
     var signal = 0;
 
     value = anychart.utils.toNumber(value);
-    if (((this.zoomLevel() == anychart.charts.Map.ZOOM_MIN_FACTOR && value < 1) ||
-        (this.zoomLevel() == anychart.charts.Map.ZOOM_MAX_FACTOR && value > 1)) && !this.unlimitedZoom) {
+    if (((this.zoomLevel() == this.minZoomLevel_ && value < 1) ||
+        (this.zoomLevel() == this.maxZoomLevel_ && value > 1)) && !this.unlimitedZoom) {
       return this;
     }
 
@@ -4082,13 +4600,26 @@ anychart.charts.Map.prototype.serialize = function() {
   json['palette'] = this.palette().serialize();
   json['markerPalette'] = this.markerPalette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
-  json['unboundRegions'] = this.unboundRegions().serialize();
+  json['unboundRegions'] = goog.isString(this.unboundRegions()) ? this.unboundRegions() : this.unboundRegions().serialize();
   json['colorRange'] = this.colorRange().serialize();
   json['geoScale'] = this.scale().serialize();
   json['minBubbleSize'] = this.minBubbleSize();
   json['maxBubbleSize'] = this.maxBubbleSize();
   json['geoIdField'] = this.geoIdField();
-  json['geoData'] = this.geoDataStringName_ ? this.geoDataStringName_ : JSON.stringify(this.geoData_);
+
+  var geoData;
+  if (this.geoDataStringName_) {
+    geoData = this.geoDataStringName_;
+  } else if (this.isSvgGeoData()) {
+    if (goog.isString(this.geoData_)) {
+      geoData = this.geoData_;
+    } else {
+      geoData = this.geoData_.nodeName == '#document' ? this.geoData_.documentElement.outerHTML : this.geoData_.outerHTML;
+    }
+  } else {
+    geoData = JSON.stringify(this.geoData_);
+  }
+  json['geoData'] = geoData;
 
   json['crsAnimation'] = this.crsAnimation().serialize();
   if (goog.isObject(this.crs_)) {
@@ -4216,6 +4747,8 @@ anychart.charts.Map.prototype['inverseTransform'] = anychart.charts.Map.prototyp
 
 anychart.charts.Map.prototype['zoomToFeature'] = anychart.charts.Map.prototype.zoomToFeature;
 anychart.charts.Map.prototype['zoomTo'] = anychart.charts.Map.prototype.zoomTo;
+// anychart.charts.Map.prototype['maxZoomLevel'] = anychart.charts.Map.prototype.maxZoomLevel;
+// anychart.charts.Map.prototype['minZoomLevel'] = anychart.charts.Map.prototype.minZoomLevel;
 
 anychart.charts.Map.prototype['drillTo'] = anychart.charts.Map.prototype.drillTo;
 anychart.charts.Map.prototype['drillUp'] = anychart.charts.Map.prototype.drillUp;

@@ -359,6 +359,7 @@
         <xsd:attribute name="animation" type="simple.Bool" default="false"/>
         <xsd:attribute name="context_menu" type="simple.Bool" default="true"/>
         <!-- Map attrs -->
+        <xsd:attribute name="unbound_regions" type="xsd:string"/>
         <xsd:attribute name="min_bubble_size" type="simple.NumberOrPercent" default="5%"/>
         <xsd:attribute name="max_bubble_size" type="simple.NumberOrPercent" default="20%"/>
         <xsd:attribute name="geo_id_field" type="xsd:string"/>
@@ -1619,7 +1620,9 @@
         <xsd:attribute name="selection_mode" type="enums.SelectionMode"/>
         <xsd:attribute name="spot_radius" type="xsd:integer"/>
         <xsd:attribute name="allow_multi_series_selection" type="xsd:boolean"/>
-        <xsd:attribute name="mouse_wheel" type="xsd:boolean"/>
+        <xsd:attribute name="zoom_on_mouse_wheel" type="xsd:boolean"/>
+        <xsd:attribute name="keyboard_zoom_and_move" type="xsd:boolean"/>
+        <xsd:attribute name="zoom_on_double_click" type="xsd:boolean"/>
         <xsd:attribute name="drag" type="xsd:boolean"/>
     </xsd:complexType>
 

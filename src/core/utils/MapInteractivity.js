@@ -16,7 +16,19 @@ anychart.core.utils.MapInteractivity = function(parent) {
    * @type {boolean}
    * @private
    */
-  this.mouseWheel_;
+  this.zoomOnMouseWheel_;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.zoomOnDoubleClick_;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.keyboardZoomAndMove_;
 
   /**
    * @type {boolean}
@@ -34,19 +46,65 @@ goog.inherits(anychart.core.utils.MapInteractivity, anychart.core.utils.Interact
 
 
 /**
- * Allows use mouse wheel
+ * Allows use mouse wheel for zoming.
  * @param {boolean=} opt_value Whether will use mouse wheel.
  * @return {anychart.core.utils.Interactivity|boolean} .
  */
-anychart.core.utils.MapInteractivity.prototype.mouseWheel = function(opt_value) {
+anychart.core.utils.MapInteractivity.prototype.zoomOnMouseWheel = function(opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = !!opt_value;
-    if (opt_value != this.mouseWheel_) {
-      this.mouseWheel_ = opt_value;
+    if (opt_value != this.zoomOnMouseWheel_) {
+      this.zoomOnMouseWheel_ = opt_value;
     }
     return this;
   }
-  return /** @type {boolean} */(this.mouseWheel_);
+  return /** @type {boolean} */(this.zoomOnMouseWheel_);
+};
+
+
+/**
+ * Allows use mouse wheel
+ * @param {boolean=} opt_value Whether will use mouse wheel.
+ * @return {anychart.core.utils.Interactivity|boolean} .
+ * @deprecated Use {@link anychart.core.utils.MapInteractivity.zoomOnMouseWheel} instead.
+ */
+anychart.core.utils.MapInteractivity.prototype.mouseWheel = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.mouseWheel()', '.zoomOnMouseWheel()']);
+  return this.zoomOnMouseWheel(opt_value);
+};
+
+
+/**
+ * Allows use double click for zoom.
+ * @param {boolean=} opt_value Whether will use dbl click for zoom.
+ * @return {anychart.core.utils.Interactivity|boolean} .
+ */
+anychart.core.utils.MapInteractivity.prototype.zoomOnDoubleClick = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = !!opt_value;
+    if (opt_value != this.zoomOnDoubleClick_) {
+      this.zoomOnDoubleClick_ = opt_value;
+    }
+    return this;
+  }
+  return /** @type {boolean} */(this.zoomOnDoubleClick_);
+};
+
+
+/**
+ * Allows use keyboard for zoom and move.
+ * @param {boolean=} opt_value Whether will use dbl click for zoom.
+ * @return {anychart.core.utils.Interactivity|boolean} .
+ */
+anychart.core.utils.MapInteractivity.prototype.keyboardZoomAndMove = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = !!opt_value;
+    if (opt_value != this.keyboardZoomAndMove_) {
+      this.keyboardZoomAndMove_ = opt_value;
+    }
+    return this;
+  }
+  return /** @type {boolean} */(this.keyboardZoomAndMove_);
 };
 
 
@@ -88,7 +146,9 @@ anychart.core.utils.MapInteractivity.prototype.copyFormatter = function(opt_valu
  */
 anychart.core.utils.MapInteractivity.prototype.setup = function(value) {
   if (goog.isDef(value) && goog.isObject(value)) {
-    this.mouseWheel(value['mouseWheel']);
+    this.zoomOnMouseWheel(value['zoomOnMouseWheel']);
+    this.keyboardZoomAndMove(value['keyboardZoomAndMove']);
+    this.zoomOnDoubleClick(value['zoomOnDoubleClick']);
     this.drag(value['drag']);
     this.copyFormatter(value['copyFormatter']);
   }
@@ -102,7 +162,9 @@ anychart.core.utils.MapInteractivity.prototype.setup = function(value) {
  */
 anychart.core.utils.MapInteractivity.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['mouseWheel'] = this.mouseWheel();
+  json['zoomOnMouseWheel'] = this.zoomOnMouseWheel();
+  json['keyboardZoomAndMove'] = this.keyboardZoomAndMove();
+  json['zoomOnDoubleClick'] = this.zoomOnDoubleClick();
   json['drag'] = this.drag();
   if (!goog.isFunction(this.copyFormatter()))
     json['copyFormatter'] = this.copyFormatter();
@@ -111,7 +173,11 @@ anychart.core.utils.MapInteractivity.prototype.serialize = function() {
 
 
 //exports
-anychart.core.utils.MapInteractivity.prototype['mouseWheel'] = anychart.core.utils.MapInteractivity.prototype.mouseWheel;
+
+anychart.core.utils.MapInteractivity.prototype['mouseWheel'] = anychart.core.utils.MapInteractivity.prototype.mouseWheel;               //deprecated
+anychart.core.utils.MapInteractivity.prototype['zoomOnMouseWheel'] = anychart.core.utils.MapInteractivity.prototype.zoomOnMouseWheel;
+anychart.core.utils.MapInteractivity.prototype['keyboardZoomAndMove'] = anychart.core.utils.MapInteractivity.prototype.keyboardZoomAndMove;
+anychart.core.utils.MapInteractivity.prototype['zoomOnDoubleClick'] = anychart.core.utils.MapInteractivity.prototype.zoomOnDoubleClick;
 anychart.core.utils.MapInteractivity.prototype['drag'] = anychart.core.utils.MapInteractivity.prototype.drag;
 anychart.core.utils.MapInteractivity.prototype['copyFormatter'] = anychart.core.utils.MapInteractivity.prototype.copyFormatter;
 

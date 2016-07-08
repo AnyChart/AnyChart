@@ -11,6 +11,7 @@ goog.require('anychart.modules.bubbleMap');
 goog.require('anychart.modules.choropleth');
 goog.require('anychart.modules.connector');
 goog.require('anychart.modules.markerMap');
+goog.require('anychart.modules.seatMap');
 
 
 /**

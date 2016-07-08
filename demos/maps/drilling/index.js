@@ -6,7 +6,7 @@ var startX, startY;
 var series, series2;
 var mapCache = {};
 var showPreload = true;
-var breadcrumbs;
+var breadcrumbs, name;
 
 var customMap;
 
@@ -56,7 +56,7 @@ var createMap = function(name, id, callback) {
     }
   }
   name = name.replace('é', 'e');
-  url = 'http://cdn.anychart.com/geodata/1.1.0/' + dir + '/' + name + '/' + name + '.js';
+  url = 'http://cdn.anychart.com/geodata/1.2.0/' + dir + '/' + name + '/' + name + '.js';
   geoData = 'anychart.maps.' + name;
 
   $.ajax({
@@ -68,57 +68,14 @@ var createMap = function(name, id, callback) {
     },
     success: function() {
       var map;
-      if (id == 'KZ') {
-        map = anychart.map();
-        map.geoData(geoData);
-        map.crs(null);
-        var series = map.choropleth(generateData(map, 20, 100));
-        series.colorScale(anychart.scales.linearColor('red', 'white'));
-        callback.call(chart, id, map);
-      } else if (id == 'AU') {
-        map = anychart.map();
-        map.crs(null);
-        // map.listen(anychart.enums.EventType.ANIMATION_START, function(e) {
-        //   console.log('AU ' + e.type);
-        // });
-        //
-        // map.listen(anychart.enums.EventType.ANIMATION_END, function(e) {
-        //   console.log('AU ' + e.type);
-        // });
-        map.geoData(geoData);
-        map.choropleth(generateData(map));
-        map.colorRange().enabled(true);
-        var scale = anychart.scales.linearColor(anychart.color.blendedHueProgression('red', 'green', 10));
-        map.getSeriesAt(0).colorScale(scale);
-        callback.call(chart, id, map);
-      } else if (id == 'FR') {
-        $.ajax({
-          url: 'franceMap.js',
-          dataType: 'script',
-          beforeSend: function() {
-            showPreload = true;
-            setTimeout(showPreloader(), 20);
-          },
-          success: function() {
-            map = france;
-            callback.call(chart, id, map);
-            hidePreloader();
-          }
-        });
-      } else {
-        map = anychart.map();
 
-        // if (id == 'world')
-        //   map.zoomTo(50, 1200, 425);
+      map = anychart.map();
+      map.crs(null);
+      map.geoData(geoData);
+      var series = map.choropleth(generateData(map));
+      series.labels().enabled(true).textFormatter('{%incits}');
+      callback.call(chart, id, map);
 
-        map.crs(null);
-        map.geoData(geoData);
-        var series = map.choropleth(generateData(map));
-        series.labels().enabled(true).textFormatter('{%incits}');
-        //map.title(id);
-        //map.getSeriesAt(0).labels(false);
-        callback.call(chart, id, map);
-      }
       hidePreloader();
     },
     error: function() {
@@ -135,20 +92,20 @@ var drilldown = function(e) {
   var map = mapCache[pointId];
   if (map === void 0) {
     if (featureProp.iso_a3) {
-      var name = featureProp.admin.toLowerCase().replace(/\s/g, '_');
+      name = featureProp.admin.toLowerCase().replace(/\s/g, '_');
       createMap(name, pointId, function(id, map) {
         mapCache[id] = map;
         chart.drillTo(id, map);
       });
     } else {
       if (pointId.search(/US[.].+/g) != -1) {
-        var name = featureProp.name.toLowerCase().replace(/\s/g, '_');
+        name = featureProp.name.toLowerCase().replace(/\s/g, '_');
         createMap(name, pointId, function(id, map) {
           mapCache[id] = map;
           chart.drillTo(id, map);
         });
       } else if (pointId.search(/CA[.].+/g) != -1) {
-        var name = featureProp.name.toLowerCase().replace(/\s/g, '_');
+        name = featureProp.name.toLowerCase().replace(/\s/g, '_');
         createMap(name, pointId, function(id, map) {
           mapCache[id] = map;
           chart.drillTo(id, map);
@@ -171,104 +128,42 @@ $(document).ready(function() {
   breadcrumbs = $('#breadcrumbs');
   stage = anychart.graphics.create('container');
 
-  // var drillDownMap = {};
-  // createMap('australia', 'KZ', function(pointId, map) {
-  //   drillDownMap[pointId] = map;
-  // });
-  // createMap('australia', 'AU', function(pointId, map) {
-  //   drillDownMap[pointId] = map.toJson();
-  // });
-  // createMap('france', 'FR', function(pointId, map) {
-  //   drillDownMap[pointId] = map;
-  // });
-  // createMap('china', 'CN', function(pointId, map) {
-  //   drillDownMap[pointId] = map.toJson();
-  // });
-  // createMap('united_states_of_america', 'US', function(pointId, map) {
-  //   drillDownMap[pointId] = map;
-  //   map.drillDownMap({'US.NV': drillDownMap['AU']})
-  // });
-
-  // chart = anychart.map();
-  // chart.geoData(anychart.maps.world_source);
-  // var series = chart.choropleth(generateData(chart));
-  // series.labels().enabled(true).textFormatter('{%id}');
-  // chart.container(stage).draw();
-
   createMap('world', 'world', function(pointId, map) {
     chart = map;
 
-    chart.interactivity().mouseWheel(true);
-
-    chart.connector([
-      [-37.788081, 144.975586, -42.244785, 146.689453],
-      {'points': [-37.788081, 144.975586, -42.244785, 146.689453]},
-      [144.975586, -37.788081, 146.689453, -42.244785]
-    ]);
-
-    chart.marker([
-      [-37.788081, 144.975586], [-42.244785, 146.689453]
-    ]);
-
     chart.listen('pointClick', drilldown);
-
-    // chart.listen('pointClick', function(e) {
-    //   var pointId = e.point.get('id');
-    //   var featureProp = e.point.getFeatureProp();
-    //   var name = featureProp.admin.toLowerCase().replace(/\s/g, '_');
-    //
-    //   console.log(name, pointId);
-    // });
-
     chart.interactivity().selectionMode(anychart.enums.SelectionMode.DRILL_DOWN);
-    // chart.drillDownMap(drillDownMap);
 
-    // chart.listen(anychart.enums.EventType.ANIMATION_START, function(e) {
-    //   console.log(e);
-    // });
+    // var a = $('<a>World Map</a>');
+    // a.attr({'id': 'null', 'href': '#'});
+    // a.bind('click', function() {chart.drillTo(this.id)});
+    // breadcrumbs.append(a);
     //
-    // chart.listen(anychart.enums.EventType.ANIMATION_END, function(e) {
-    //   console.log(e);
+    // chart.listen(anychart.enums.EventType.DRILL_CHANGE, function(e) {
+    //   breadcrumbs.html('');
+
+    //   var a = $('<a>World Map</a>');
+    //   a.attr({'id': 'null', 'href': '#'});
+    //   a.bind('click', function() {chart.drillTo(this.id)});
+    //   breadcrumbs.append(a);
+    //
+    //   if (e.path.length > 1)
+    //     breadcrumbs.append('<span> - </span>');
+    //
+    //   for (var i = 1; i < e.path.length; i++) {
+    //     var label = e.path[i].getProperties().name || e.path[i].getId();
+    //
+    //     a = $('<a>' + label + '</a>');
+    //     a.attr({'id': e.path[i].getId(), 'href': '#'});
+    //     a.bind('click', function() {chart.drillTo(this.id)});
+    //     breadcrumbs.append(a);
+    //
+    //     if (i != e.path.length - 1)
+    //       breadcrumbs.append('<span> - </span>');
+    //   }
     // });
-
-    var a = $('<a>World Map</a>');
-    a.attr({'id': 'null', 'href': '#'});
-    a.bind('click', function() {chart.drillTo(this.id)});
-    breadcrumbs.append(a);
-
-    chart.listen(anychart.enums.EventType.DRILL_CHANGE, function(e) {
-      // var mapPoint = e.path[e.path.length - 1];
-      // e.currentTarget.crs(chart.crs());
-
-      breadcrumbs.html('');
-
-      var a = $('<a>World Map</a>');
-      a.attr({'id': 'null', 'href': '#'});
-      a.bind('click', function() {chart.drillTo(this.id)});
-      breadcrumbs.append(a);
-
-      if (e.path.length > 1)
-        breadcrumbs.append('<span> - </span>');
-
-      for (var i = 1; i < e.path.length; i++) {
-        var label = e.path[i].getProperties().name || e.path[i].getId();
-
-        // if (i != e.path.length - 1)
-        a = $('<a>' + label + '</a>');
-        a.attr({'id': e.path[i].getId(), 'href': '#'});
-        a.bind('click', function() {chart.drillTo(this.id)});
-        breadcrumbs.append(a);
-
-        if (i != e.path.length - 1)
-          breadcrumbs.append('<span> - </span>');
-      }
-      // setTimeout(function() {e.currentMap.crs(chart.crs())}, 0);
-
-    });
 
     series = chart.getSeriesAt(0);
-
-
 
     var scale = anychart.scales.ordinalColor([
       {less: 1907},
@@ -283,36 +178,6 @@ $(document).ready(function() {
 
     scale.colors(['#42a5f5', '#64b5f6', '#90caf9', '#ffa726', '#fb8c00', '#f57c00', '#ef6c00', '#e65100']);
     series.colorScale(scale);
-
-    var colorRange = map.colorRange();
-    colorRange.enabled(true).padding([20, 0, 0, 0]);
-    colorRange.colorLineSize(5);
-    colorRange.ticks().stroke('3 #ffffff').position('center').length(20).enabled(true);
-    colorRange.marker().size(7);
-    colorRange.labels().fontSize(10).padding(0, 0, 0, 5).textFormatter(function() {
-      var range = this.colorRange;
-      if (!range)
-        return;
-
-      var name;
-      if (isFinite(range.start + range.end)) {
-        name = range.start + ' - ' + range.end;
-      } else if (isFinite(range.start)) {
-        name = 'After ' + range.start;
-      } else {
-        name = 'Before ' + range.end;
-      }
-      return name;
-    });
-
-
-
-
-    chart.legend()
-        .itemsSourceMode(anychart.enums.LegendItemsSourceMode.CATEGORIES)
-        .enabled(true);
-
-    // chart.interactivity().selectionMode('none');
 
     chart.container(stage).draw();
   });
