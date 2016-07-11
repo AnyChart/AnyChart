@@ -409,8 +409,11 @@ anychart.core.utils.GeoSVGParser.prototype.getGradientStops = function(node) {
     stops = [];
     for (var i = 0, len = children.length; i < len; i++) {
       var child = children[i];
-      var stopColor = goog.style.getStyle(child, 'stop-color');
-      var stopOpacity = parseFloat(goog.style.getStyle(child, 'stop-opacity'));
+      var styleColor = goog.style.getStyle(child, 'stop-color');
+      var styleOpacity = parseFloat(goog.style.getStyle(child, 'stop-opacity'));
+
+      var stopColor = styleColor ? styleColor : child.getAttribute('stop-color');
+      var stopOpacity = isNaN(styleOpacity) ? parseFloat(child.getAttribute('stop-opacity')) : styleOpacity;
       var offset = parseFloat(child.getAttribute('offset'));
 
       stops.push(/** @type {acgraph.vector.GradientKey} */({
@@ -768,10 +771,8 @@ anychart.core.utils.GeoSVGParser.prototype.getAttributes = function(node, type) 
 
   var attrs = node.attributes;
 
-  if (type == 'element') {
-    res['fill'] = {};
-    res['stroke'] = {};
-  }
+  res['fill'] = {};
+  res['stroke'] = {};
 
   for (var i = 0, len = attrs.length; i < len; i++) {
     var attr = attrs[i];
@@ -783,6 +784,12 @@ anychart.core.utils.GeoSVGParser.prototype.getAttributes = function(node, type) 
         if (clipPath) {
           res[attr.name] = clipPath['clippath'];
         }
+        break;
+      case 'opacity':
+        if (!goog.isDef(res['fill']['opacity']))
+          res['fill']['opacity'] = attr.value;
+        if (!goog.isDef(res['stroke']['opacity']))
+          res['stroke']['opacity'] = attr.value;
         break;
       case 'fill':
         res['fill']['color'] = attr.value;

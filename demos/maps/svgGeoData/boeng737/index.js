@@ -5,7 +5,7 @@ $(document).ready(function() {
 
   $.ajax({
     type: 'GET',
-    url: 'Boeing_737_02.svg',
+    url: 'Boeing_737.svg',
     success: function(data) {
       chart = anychart.seatMap();
       chart.geoData(data);
