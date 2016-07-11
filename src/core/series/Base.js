@@ -2447,6 +2447,8 @@ anychart.core.series.Base.prototype.draw = function() {
     if (this.prepareFactory(factory, stateFactoriesEnabled, this.planHasPointLabels(),
         anychart.core.series.Capabilities.SUPPORTS_LABELS, anychart.ConsistencyState.SERIES_LABELS)) {
       factory.setAutoZIndex(/** @type {number} */(this.zIndex() + anychart.core.shapeManagers.LABELS_ZINDEX));
+      // see DVF-2259
+      factory.invalidate(anychart.ConsistencyState.Z_INDEX);
       elementsDrawers.push(this.drawLabel);
       factoriesToFinalize.push(factory);
     }
