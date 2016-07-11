@@ -185,6 +185,9 @@ anychart.core.map.series.Choropleth.prototype.normalizeColor = function(color, v
  */
 anychart.core.map.series.Choropleth.prototype.colorizeShape = function(pointState) {
   var features = this.getIterator().meta('features');
+  if (!features)
+    return;
+
   for (var i = 0, len = features.length; i < len; i++) {
     var feature = features[i];
     if (goog.isDef(feature.domElement)) {
