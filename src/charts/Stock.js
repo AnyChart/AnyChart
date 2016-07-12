@@ -1171,7 +1171,7 @@ anychart.charts.Stock.prototype.highlightAtRatio_ = function(ratio, clientX, cli
     'infoByPlots': goog.array.map(this.plots_, function(plot) {
       return {
         'plot': plot,
-        'infoBySeries': plot ? plot.prepareHighlight(value) : null
+        'infoBySeries': (plot && plot.enabled()) ? plot.prepareHighlight(value) : null
       };
     }),
     'hoveredDate': value

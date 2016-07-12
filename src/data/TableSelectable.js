@@ -72,7 +72,7 @@ anychart.data.TableSelectable = function(mapping) {
  * @private
  */
 anychart.data.TableSelectable.prototype.resetMeta_ = function() {
-  var len = this.currentStorage_.getRowsCount();
+  var len = this.controller_ ? this.controller_.getGlobalPointsCountForCurrentGrouping() : this.currentStorage_.getRowsCount();
   while (this.metaData_.length < len)
     this.metaData_.push({});
 };
@@ -182,15 +182,17 @@ anychart.data.TableSelectable.prototype.selectInternal = function(startKey, endK
  * @private
  */
 anychart.data.TableSelectable.prototype.wrapRow_ = function(row, rowIndexInStorage) {
-  return row ?
-      new anychart.data.TableSelectable.RowProxy(
-          row,
-          this.mapping_,
-          !this.currentStorageIsMain_,
-          this.controller_.getIndexByKey(row.key),
-          this.metaData_[rowIndexInStorage]
-      ) :
-      null;
+  if (row) {
+    var globalIndex = this.controller_ ? this.controller_.getIndexByKey(row.key) : rowIndexInStorage;
+    return new anychart.data.TableSelectable.RowProxy(
+        row,
+        this.mapping_,
+        !this.currentStorageIsMain_,
+        globalIndex,
+        this.metaData_[globalIndex]
+    );
+  }
+  return null;
 };
 
 
@@ -426,6 +428,12 @@ anychart.data.TableSelectable.IController.prototype.getCoIterator = function(ful
  * @return {number}
  */
 anychart.data.TableSelectable.IController.prototype.getIndexByKey = function(key) {};
+
+
+/**
+ * @return {number}
+ */
+anychart.data.TableSelectable.IController.prototype.getGlobalPointsCountForCurrentGrouping = function() {};
 
 
 

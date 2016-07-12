@@ -575,6 +575,15 @@ anychart.core.stock.Registry.prototype.update = function() {
 };
 
 
+/**
+ * Returns current keys count.
+ * @return {number}
+ */
+anychart.core.stock.Registry.prototype.getKeysCount = function() {
+  return this.keys_.length;
+};
+
+
 
 /**
  * Registry iterator. Should be used only if the registry is not in single-source mode.

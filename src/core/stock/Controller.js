@@ -770,6 +770,15 @@ anychart.core.stock.Controller.prototype.getFirstScrollerIndex = function() {
 anychart.core.stock.Controller.prototype.getLastScrollerIndex = function() {
   return this.currentScrollerSelection_.endIndex;
 };
+
+
+/**
+ * Returns total points count for current grouping level.
+ * @return {number}
+ */
+anychart.core.stock.Controller.prototype.getGlobalPointsCountForCurrentGrouping = function() {
+  return this.currentRegistry_.getKeysCount();
+};
 //endregion
 
 

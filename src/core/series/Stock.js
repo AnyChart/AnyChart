@@ -65,6 +65,13 @@ anychart.core.series.Stock = function(chart, plot, type, config) {
   this.highlightedRow_ = null;
 
   /**
+   * A flag to mark, that the series is in highlight. The highlightedRow_ prop is not enough, because of DVF-2226.
+   * @type {boolean}
+   * @private
+   */
+  this.inHighlight_ = false;
+
+  /**
    * Currently last point.
    * @type {anychart.data.TableSelectable.RowProxy}
    * @private
@@ -375,6 +382,7 @@ anychart.core.series.Stock.prototype.updateLastRow = function() {
  */
 anychart.core.series.Stock.prototype.highlight = function(value) {
   this.highlightedRow_ = this.prepareHighlight(value);
+  this.inHighlight_ = true;
 };
 
 
@@ -383,6 +391,7 @@ anychart.core.series.Stock.prototype.highlight = function(value) {
  */
 anychart.core.series.Stock.prototype.removeHighlight = function() {
   this.highlightedRow_ = null;
+  this.inHighlight_ = false;
 };
 
 
@@ -455,7 +464,7 @@ anychart.core.series.Stock.prototype.createLegendContextProvider = function() {
  * @return {?anychart.data.TableSelectable.RowProxy}
  */
 anychart.core.series.Stock.prototype.getCurrentPoint = function() {
-  return this.highlightedRow_ || this.lastRow_;
+  return this.inHighlight_ ? this.highlightedRow_ : this.lastRow_;
 };
 //endregion
 
