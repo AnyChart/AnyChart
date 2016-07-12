@@ -5541,3 +5541,63 @@ goog.exportSymbol('anychart.enums.Statistics.Y_VALUE', anychart.enums.Statistics
 goog.exportSymbol('anychart.enums.ChartDataExportMode.RAW', anychart.enums.ChartDataExportMode.RAW);
 goog.exportSymbol('anychart.enums.ChartDataExportMode.SPECIFIC', anychart.enums.ChartDataExportMode.SPECIFIC);
 goog.exportSymbol('anychart.enums.ChartDataExportMode.GROUPED', anychart.enums.ChartDataExportMode.GROUPED);
+
+goog.exportSymbol('anychart.enums.MapSeriesType.CHOROPLETH', anychart.enums.MapSeriesType.CHOROPLETH);
+goog.exportSymbol('anychart.enums.MapSeriesType.BUBBLE', anychart.enums.MapSeriesType.BUBBLE);
+goog.exportSymbol('anychart.enums.MapSeriesType.MARKER', anychart.enums.MapSeriesType.MARKER);
+goog.exportSymbol('anychart.enums.MapSeriesType.CONNECTOR', anychart.enums.MapSeriesType.CONNECTOR);
+
+goog.exportSymbol('anychart.enums.CartesianSeriesType.AREA', anychart.enums.CartesianSeriesType.AREA);
+goog.exportSymbol('anychart.enums.CartesianSeriesType.BAR', anychart.enums.CartesianSeriesType.BAR);
+goog.exportSymbol('anychart.enums.CartesianSeriesType.BOX', anychart.enums.CartesianSeriesType.BOX);
+goog.exportSymbol('anychart.enums.CartesianSeriesType.BUBBLE', anychart.enums.CartesianSeriesType.BUBBLE);
+goog.exportSymbol('anychart.enums.CartesianSeriesType.CANDLESTICK', anychart.enums.CartesianSeriesType.CANDLESTICK);
+goog.exportSymbol('anychart.enums.CartesianSeriesType.COLUMN', anychart.enums.CartesianSeriesType.COLUMN);
+goog.exportSymbol('anychart.enums.CartesianSeriesType.LINE', anychart.enums.CartesianSeriesType.LINE);
+goog.exportSymbol('anychart.enums.CartesianSeriesType.MARKER', anychart.enums.CartesianSeriesType.MARKER);
+goog.exportSymbol('anychart.enums.CartesianSeriesType.OHLC', anychart.enums.CartesianSeriesType.OHLC);
+goog.exportSymbol('anychart.enums.CartesianSeriesType.RANGE_AREA', anychart.enums.CartesianSeriesType.RANGE_AREA);
+goog.exportSymbol('anychart.enums.CartesianSeriesType.RANGE_BAR', anychart.enums.CartesianSeriesType.RANGE_BAR);
+goog.exportSymbol('anychart.enums.CartesianSeriesType.RANGE_COLUMN', anychart.enums.CartesianSeriesType.RANGE_COLUMN);
+goog.exportSymbol('anychart.enums.CartesianSeriesType.RANGE_SPLINE_AREA', anychart.enums.CartesianSeriesType.RANGE_SPLINE_AREA);
+goog.exportSymbol('anychart.enums.CartesianSeriesType.RANGE_STEP_AREA', anychart.enums.CartesianSeriesType.RANGE_STEP_AREA);
+goog.exportSymbol('anychart.enums.CartesianSeriesType.SPLINE', anychart.enums.CartesianSeriesType.SPLINE);
+goog.exportSymbol('anychart.enums.CartesianSeriesType.SPLINE_AREA', anychart.enums.CartesianSeriesType.SPLINE_AREA);
+goog.exportSymbol('anychart.enums.CartesianSeriesType.STEP_AREA', anychart.enums.CartesianSeriesType.STEP_AREA);
+goog.exportSymbol('anychart.enums.CartesianSeriesType.STEP_LINE', anychart.enums.CartesianSeriesType.STEP_LINE);
+
+goog.exportSymbol('anychart.enums.Cartesian3dSeriesType.AREA', anychart.enums.Cartesian3dSeriesType.AREA);
+goog.exportSymbol('anychart.enums.Cartesian3dSeriesType.BAR', anychart.enums.Cartesian3dSeriesType.BAR);
+goog.exportSymbol('anychart.enums.Cartesian3dSeriesType.COLUMN', anychart.enums.Cartesian3dSeriesType.COLUMN);
+
+goog.exportSymbol('anychart.enums.ScatterSeriesType.BUBBLE', anychart.enums.ScatterSeriesType.BUBBLE);
+goog.exportSymbol('anychart.enums.ScatterSeriesType.LINE', anychart.enums.ScatterSeriesType.LINE);
+goog.exportSymbol('anychart.enums.ScatterSeriesType.MARKER', anychart.enums.ScatterSeriesType.MARKER);
+
+goog.exportSymbol('anychart.enums.SparklineSeriesType.AREA', anychart.enums.SparklineSeriesType.AREA);
+goog.exportSymbol('anychart.enums.SparklineSeriesType.COLUMN', anychart.enums.SparklineSeriesType.COLUMN);
+goog.exportSymbol('anychart.enums.SparklineSeriesType.LINE', anychart.enums.SparklineSeriesType.LINE);
+goog.exportSymbol('anychart.enums.SparklineSeriesType.WIN_LOSS', anychart.enums.SparklineSeriesType.WIN_LOSS);
+
+goog.exportSymbol('anychart.enums.StockSeriesType.AREA', anychart.enums.StockSeriesType.AREA);
+goog.exportSymbol('anychart.enums.StockSeriesType.CANDLESTICK', anychart.enums.StockSeriesType.CANDLESTICK);
+goog.exportSymbol('anychart.enums.StockSeriesType.COLUMN', anychart.enums.StockSeriesType.COLUMN);
+goog.exportSymbol('anychart.enums.StockSeriesType.LINE', anychart.enums.StockSeriesType.LINE);
+goog.exportSymbol('anychart.enums.StockSeriesType.MARKER', anychart.enums.StockSeriesType.MARKER);
+goog.exportSymbol('anychart.enums.StockSeriesType.OHLC', anychart.enums.StockSeriesType.OHLC);
+goog.exportSymbol('anychart.enums.StockSeriesType.RANGE_AREA', anychart.enums.StockSeriesType.RANGE_AREA);
+goog.exportSymbol('anychart.enums.StockSeriesType.RANGE_COLUMN', anychart.enums.StockSeriesType.RANGE_COLUMN);
+goog.exportSymbol('anychart.enums.StockSeriesType.RANGE_SPLINE_AREA', anychart.enums.StockSeriesType.RANGE_SPLINE_AREA);
+goog.exportSymbol('anychart.enums.StockSeriesType.RANGE_STEP_AREA', anychart.enums.StockSeriesType.RANGE_STEP_AREA);
+goog.exportSymbol('anychart.enums.StockSeriesType.SPLINE', anychart.enums.StockSeriesType.SPLINE);
+goog.exportSymbol('anychart.enums.StockSeriesType.SPLINE_AREA', anychart.enums.StockSeriesType.SPLINE_AREA);
+goog.exportSymbol('anychart.enums.StockSeriesType.STEP_AREA', anychart.enums.StockSeriesType.STEP_AREA);
+goog.exportSymbol('anychart.enums.StockSeriesType.STEP_LINE', anychart.enums.StockSeriesType.STEP_LINE);
+
+goog.exportSymbol('anychart.enums.RadarSeriesType.AREA', anychart.enums.RadarSeriesType.AREA);
+goog.exportSymbol('anychart.enums.RadarSeriesType.LINE', anychart.enums.RadarSeriesType.LINE);
+goog.exportSymbol('anychart.enums.RadarSeriesType.MARKER', anychart.enums.RadarSeriesType.MARKER);
+
+goog.exportSymbol('anychart.enums.PolarSeriesType.AREA', anychart.enums.PolarSeriesType.AREA);
+goog.exportSymbol('anychart.enums.PolarSeriesType.LINE', anychart.enums.PolarSeriesType.LINE);
+goog.exportSymbol('anychart.enums.PolarSeriesType.MARKER', anychart.enums.PolarSeriesType.MARKER);
