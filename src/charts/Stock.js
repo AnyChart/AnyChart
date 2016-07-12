@@ -144,7 +144,7 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
       // anychart.core.series.Capabilities.ALLOW_INTERACTIVITY |
       // anychart.core.series.Capabilities.ALLOW_POINT_SETTINGS |
       // anychart.core.series.Capabilities.ALLOW_ERROR |
-      // anychart.core.series.Capabilities.SUPPORTS_MARKERS |
+      anychart.core.series.Capabilities.SUPPORTS_MARKERS |
       // anychart.core.series.Capabilities.SUPPORTS_LABELS |
       0);
   res[anychart.enums.StockSeriesType.AREA] = {
