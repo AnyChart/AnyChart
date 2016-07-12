@@ -198,10 +198,12 @@ anychart.core.radar.series.Area.prototype.finalizeDrawing = function() {
         this.path.lineTo(this.firstDrawnPoint.x, this.firstDrawnPoint.y);
         this.strokePath.lineTo(this.firstDrawnPoint.x, this.firstDrawnPoint.y);
 
-        if (this.firstMissings) goog.array.extend(this.zeroesStack, this.firstMissings);
+        if (this.zeroesStack) {
+          if (this.firstMissings) goog.array.extend(this.zeroesStack, this.firstMissings);
 
-        if (this.yScale().stackMode() != anychart.enums.ScaleStackMode.NONE)
-          this.zeroesStack.push(this.firstDrawnZeroPoint.x, this.firstDrawnZeroPoint.y, false);
+          if (this.yScale().stackMode() != anychart.enums.ScaleStackMode.NONE)
+            this.zeroesStack.push(this.firstDrawnZeroPoint.x, this.firstDrawnZeroPoint.y, false);
+        }
       }
     }
   }
