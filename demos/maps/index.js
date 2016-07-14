@@ -1,90 +1,153 @@
+var chart, series;
+
 var randomExt = function(a, b) {
   return Math.round(Math.random() * (b - a + 1) + a);
 };
 
+var generateData = function(map, opt_min, opt_max) {
+  var auChoroplethData = [];
+
+  features = map.geoData()['features'];
+  var min = opt_min !== void 0 ? opt_min : 1900;
+  var max = opt_max !== void 0 ? opt_max : 2000;
+  for (var i = 0, len = features.length; i < len; i++) {
+    var feature = features[i];
+    if (feature['properties']) {
+      id = feature['properties'][map.geoIdField()];
+      if (id == 'FR.D')
+        feature['properties']['overlapMode'] = true;
+
+      auChoroplethData.push({'id': id, 'value': randomExt(min, max), 'labelrank': 1});
+    }
+  }
+
+  return auChoroplethData;
+};
+
 anychart.onDocumentReady(function() {
-  // anychart.licenseKey('anychart-CAT-64a5f14c-5d66a546');
-  // stage = anychart.graphics.create('container', 400, 300);
+  var data = [
+    {'id': 'FR.A', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.B', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.C', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.P', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.D', size: 10, 'labelrank': 10, 'value': 10},
+    {'id': 'FR.E', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.F', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.G', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.H', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.I', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.GP', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.GF', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.Q', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.J', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.K', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.RE', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.L', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.M', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.MQ', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.YT', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.N', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.O', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.R', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.S', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.T', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.U', size: 10, 'labelrank': 10, 'value': 1},
+    {'id': 'FR.V', size: 10, 'labelrank': 10, 'value': 1}
+  ];
+  //
+  var data1 = [
+    {'id': 'FR.Q', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.J', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.K', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.RE', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.L', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.M', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.MQ', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.YT', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.N', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.O', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.R', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.S', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.T', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.U', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.V', 'labelrank': 10, 'value': 1},
 
-  var dataSet = anychart.data.set([
-    {id: 'AU.CT', value: 15, title: 'Australian Capital Territory'},
-    {id: 'AU.VI', value: 23, title: 'Victoria'},
-    {id: 'AU.WA', value: 86, title: 'Western Australia'}
-  ]);
-  var dataSetForSeries = dataSet.mapAs({id: 'id'});
-  var dataSet2 = anychart.data.set([
-    {id: 'AU.QL', value: 16, title: 'Queensland', size: 40},
-    {id: 'AU.NS', value: 32, title: 'New South Wales', size: 40},
-    {id: 'AU.NT', value: 64, title: 'Northern Territory', size: 40}
-  ]);
-  dataSetForSeries2 = dataSet2.mapAs({id: 'id'});
-  var dataSet3 = anychart.data.set([
-    {id: 'AU.TS', value: 28, title: 'Tasmania'},
-    {id: 'AU.SA', value: 45, title: 'South Australian'}
-  ]);
-  dataSetForSeries3 = dataSet3.mapAs({id: 'id'});
-  var dataSet4 = anychart.data.set([
-    {id: 'AU.TS', size: 28},
-    {id: 'AU.SA', size: 45}
-  ]);
-  dataSetForSeries4 = dataSet4.mapAs({id: 'id'});
+    {'id': 'FR.I', 'labelrank': 20, 'value': 1}
+  ];
+
+  var data2 = [
+    {'id': 'FR.A', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.B', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.C', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.P', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.E', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.F', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.G', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.H', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.GP', 'labelrank': 10, 'value': 1},
+    {'id': 'FR.GF', 'labelrank': 10, 'value': 1},
+
+    {'id': 'FR.D', 'labelrank': 10, 'value': 1}
+  ];
+
   chart = anychart.map();
-  // chart.geoIdField('code_hasc');
-  var series1 = chart.choropleth(dataSetForSeries);
-  series1.geoIdField('code_hasc');
+  chart.geoData(anychart.maps.france);
+  // generateData(chart);
+  chart.interactivity().zoomOnMouseWheel(true);
 
-  series1
-      .hatchFill('vertical')
-      .hoverHatchFill('diagonalbrick');
+  chart.overlapMode(false);
 
-  chart.geoData(anychart.maps.australia);
-  chart.legend(true);
+  // series = chart.choropleth(generateData(chart));
+  // series.overlapMode(true);
+
+
+
+  series1 = chart.choropleth(data1);
+  series1.labels().enabled(true).padding(0);
+  series1.tooltip(false);
+  // series1.overlapMode(false);
+  // series1.enabled(false);
+
+
+  series2 = chart.choropleth(data2);
+  series2.labels().enabled(true).padding(0);
+  series2.tooltip(false);
+  // series2.overlapMode(false);
+
+
+  // var series3 = chart.bubble([{lat: 49.745781, long: -1.922607, size: 15}]);
+  // series3.labels().enabled(true).padding(0);
+  //
+  // chart.maxBubbleSize('5%');
+  // chart.minBubbleSize('3%');
+
+
+
+
+  // series.labels()
+  //     .enabled(true)
+  //     .padding(0);
+  //     .textFormatter(function() {
+  //       return 'labelrank: ' + this.getDataValue('labelrank');
+  //     });
+  //
+  // series.tooltip()
+  //     .textFormatter(function() {
+  //       return 'labelrank: ' + this.getDataValue('labelrank');
+  //     });
+  // series.hoverLabels().fontColor('red');
+
+  // series.selectLabels().fontSize(30);
+
+  // series1 = chart.choropleth([
+  //   {id: 'FR.J', value: 2, labelrank: 1},
+  //   {id: 'FR.M', value: 2, labelrank: 3}
+  // ]);
+  // series1.labels(true);
+  // series2 = chart.choropleth([
+  //   {id: 'FR.G', value: 2, labelrank: 1}
+  // ]);
+  // series2.labels(true);
+
   chart.container('container').draw();
-  chart.addSeries(dataSetForSeries2, dataSetForSeries3);
-  chart.getSeries(1).geoIdField('code_hasc');
-  chart.getSeries(2).geoIdField('code_hasc');
-
-
-  // dataSet2 = anychart.data.set([]);
-  //
-  // chart2 = anychart.map();
-  // chart2.geoData(anychart.maps.france);
-  // chart2.choropleth(dataSet2);
-  // chart2.bounds('50%', 0, '50%', '100%');
-  // chart2.credits().enabled(false);
-  //
-  // chart2.container(stage).draw();
-  //
-  //
-  // var data = [];
-  // var features = chart2.geoData()['features'];
-  // for (var i = 0, len = features.length; i < len; i++) {
-  //   var feature = features[i];
-  //   if (feature['properties']) {
-  //     var id = feature['properties'][chart2.geoIdField()];
-  //     data.push({'id': id, 'title': feature['properties']['nom_cl'], 'value': randomExt(100, 1000)});
-  //   }
-  // }
-  // dataSet2.data(data);
-
-
-  // def2 = chart1.featureScaleFactor('AU.WA');
-  // chart1.featureScaleFactor('AU.WA', 0.009);
-  // console.log(chart1.featureScaleFactor('AU.WA'), 0.009);
-  // chart1.featureScaleFactor('AU.WA', def2);
-  //
-  //
-  // def1 = chart1.featureCrs('AU.WA');
-  // chart1.featureCrs('AU.WA', change);
-  // console.log(chart1.featureCrs('AU.WA') == change);
-  // chart1.featureCrs('AU.WA', def1);
-
-
-  // result1 = chart1.transform(49, 50);
-  // console.log(result1['x'], '-603.2984840397139');
-  // console.log(result1['y'], '-246.22451623555497');
-
-  // result2 = chart2.transform(49, 50);
-  // console.log(result2['x'], '909.3702720948354');
-  // console.log(result2['y'], '-124.09981949083709');
 });

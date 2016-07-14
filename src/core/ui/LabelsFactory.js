@@ -165,7 +165,7 @@ anychart.core.ui.LabelsFactory = function() {
    * @protected
    */
   this.settingsFieldsForMerge = ['background', 'padding', 'height', 'width', 'offsetY', 'offsetX', 'position', 'anchor', 'rotation',
-    'textFormatter', 'positionFormatter', 'minFontSize', 'maxFontSize', 'fontSize', 'fontWeight', 'clip'];
+    'textFormatter', 'positionFormatter', 'minFontSize', 'maxFontSize', 'fontSize', 'fontWeight', 'clip', 'connectorStroke'];
 
   this.adjustFontSizeMode('different');
 
@@ -486,6 +486,30 @@ anychart.core.ui.LabelsFactory.prototype.offsetY = function(opt_value) {
   } else {
     return this.offsetY_;
   }
+};
+
+
+/**
+ * Getter/setter for stroke.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings.
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.core.ui.LabelsFactory|acgraph.vector.Stroke} .
+ */
+anychart.core.ui.LabelsFactory.prototype.connectorStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
+
+    if (stroke != this.connectorStroke_) {
+      this.connectorStroke_ = stroke;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.connectorStroke_;
 };
 
 
@@ -864,6 +888,20 @@ anychart.core.ui.LabelsFactory.prototype.getSettingsChangedStatesObj = function(
 
 
 /**
+ * Returns changed settings.
+ * @return {Object}
+ */
+anychart.core.ui.LabelsFactory.prototype.getChangedSettings = function() {
+  var result = {};
+  goog.object.forEach(this.changedSettings, function(value, key) {
+    if (value)
+      result[key] = this[key]();
+  }, this);
+  return result;
+};
+
+
+/**
  * Returns DOM element.
  * @return {acgraph.vector.Layer}
  */
@@ -1029,10 +1067,12 @@ anychart.core.ui.LabelsFactory.prototype.getDimension = function(formatProviderO
   var offsetY = /** @type {number|string} */(this.measureCustomLabel_.offsetY() || this.offsetY());
   var offsetX = /** @type {number|string} */(this.measureCustomLabel_.offsetX() || this.offsetX());
   var anchor = /** @type {string} */(this.measureCustomLabel_.anchor() || this.anchor());
+  var textFormatter = this.measureCustomLabel_.textFormatter() || this.textFormatter();
 
 
   if (!this.measureTextElement_) this.measureTextElement_ = acgraph.text();
-  text = this.callTextFormatter(this.textFormatter_, formatProvider, opt_cacheIndex);
+
+  text = this.callTextFormatter(textFormatter, formatProvider, opt_cacheIndex);
   this.measureTextElement_.width(null);
   this.measureTextElement_.height(null);
   if (isHtml) {
@@ -1297,6 +1337,15 @@ anychart.core.ui.LabelsFactory.Label.prototype.getDomElement = function() {
 
 
 /**
+ * Returns connector graphics element.
+ * @return {acgraph.vector.Layer}
+ */
+anychart.core.ui.LabelsFactory.Label.prototype.getConnectorElement = function() {
+  return this.connector;
+};
+
+
+/**
  * Gets/sets parent LabelsFactory.
  * @param {!anychart.core.ui.LabelsFactory=} opt_value labels factory.
  * @return {anychart.core.ui.LabelsFactory|anychart.core.ui.LabelsFactory.Label} Returns LabelsFactory or self
@@ -1533,6 +1582,30 @@ anychart.core.ui.LabelsFactory.Label.prototype.offsetY = function(opt_value) {
   } else {
     return this.settingsObj.offsetY;
   }
+};
+
+
+/**
+ * Getter/setter for stroke.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings.
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.core.ui.LabelsFactory.Label|acgraph.vector.Stroke} .
+ */
+anychart.core.ui.LabelsFactory.Label.prototype.connectorStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
+
+    if (stroke != this.settingsObj.connectorStroke) {
+      this.settingsObj.connectorStroke = stroke;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.settingsObj.connectorStroke;
 };
 
 
@@ -1999,6 +2072,21 @@ anychart.core.ui.LabelsFactory.Label.prototype.drawLabel = function(bounds, pare
   var formattedPosition = goog.object.clone(positionFormatter.call(positionProvider, positionProvider));
   var position = new acgraph.math.Coordinate(formattedPosition['x'], formattedPosition['y']);
 
+  var connectorPoint = positionProvider && positionProvider['connectorPoint'];
+  if (this.connector) {
+    this.connector.clear();
+    this.connector.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  }
+  if (connectorPoint) {
+    if (!this.connector) {
+      this.connector = this.layer_.path();
+      this.connector.disableStrokeScaling(true);
+    }
+    this.connector.stroke(this.mergedSettings['connectorStroke']);
+    var formattedConnectorPosition = goog.object.clone(positionFormatter.call(connectorPoint, connectorPoint));
+    this.connector.moveTo(position.x, position.y).lineTo(formattedConnectorPosition['x'], formattedConnectorPosition['y']);
+  }
+
   var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
       new anychart.math.Rect(0, 0, bounds.width, bounds.height), anchor);
 
@@ -2407,6 +2495,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.serialize = function() {
   if (goog.isDef(this.anchor())) json['anchor'] = this.anchor();
   if (goog.isDef(this.offsetX())) json['offsetX'] = this.offsetX();
   if (goog.isDef(this.offsetY())) json['offsetY'] = this.offsetY();
+  if (goog.isDef(this.connectorStroke())) json['connectorStroke'] = this.connectorStroke();
   if (goog.isDef(this.width())) json['width'] = this.width();
   if (goog.isDef(this.height())) json['height'] = this.height();
   if (goog.isDef(this.rotation())) json['rotation'] = this.rotation();
@@ -2430,6 +2519,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.setupByJSON = function(config) {
   this.anchor(config['anchor']);
   this.offsetX(config['offsetX']);
   this.offsetY(config['offsetY']);
+  this.connectorStroke(config['connectorStroke']);
   this.rotation(config['rotation']);
   this.width(config['width']);
   this.height(config['height']);
@@ -2463,6 +2553,7 @@ anychart.core.ui.LabelsFactory.prototype['position'] = anychart.core.ui.LabelsFa
 anychart.core.ui.LabelsFactory.prototype['anchor'] = anychart.core.ui.LabelsFactory.prototype.anchor;
 anychart.core.ui.LabelsFactory.prototype['offsetX'] = anychart.core.ui.LabelsFactory.prototype.offsetX;
 anychart.core.ui.LabelsFactory.prototype['offsetY'] = anychart.core.ui.LabelsFactory.prototype.offsetY;
+anychart.core.ui.LabelsFactory.prototype['connectorStroke'] = anychart.core.ui.LabelsFactory.prototype.connectorStroke;
 anychart.core.ui.LabelsFactory.prototype['rotation'] = anychart.core.ui.LabelsFactory.prototype.rotation;
 anychart.core.ui.LabelsFactory.prototype['width'] = anychart.core.ui.LabelsFactory.prototype.width;
 anychart.core.ui.LabelsFactory.prototype['height'] = anychart.core.ui.LabelsFactory.prototype.height;
@@ -2483,6 +2574,7 @@ anychart.core.ui.LabelsFactory.Label.prototype['clear'] = anychart.core.ui.Label
 anychart.core.ui.LabelsFactory.Label.prototype['background'] = anychart.core.ui.LabelsFactory.Label.prototype.background;
 anychart.core.ui.LabelsFactory.Label.prototype['offsetX'] = anychart.core.ui.LabelsFactory.Label.prototype.offsetX;
 anychart.core.ui.LabelsFactory.Label.prototype['offsetY'] = anychart.core.ui.LabelsFactory.Label.prototype.offsetY;
+anychart.core.ui.LabelsFactory.Label.prototype['connectorStroke'] = anychart.core.ui.LabelsFactory.Label.prototype.connectorStroke;
 anychart.core.ui.LabelsFactory.Label.prototype['width'] = anychart.core.ui.LabelsFactory.Label.prototype.width;
 anychart.core.ui.LabelsFactory.Label.prototype['height'] = anychart.core.ui.LabelsFactory.Label.prototype.height;
 anychart.core.ui.LabelsFactory.Label.prototype['enabled'] = anychart.core.ui.LabelsFactory.Label.prototype.enabled;

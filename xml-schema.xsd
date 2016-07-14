@@ -1099,12 +1099,14 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="adjust_font_size" type="utils.AdjustFontSizeObj"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="text_formatter" type="simple.Text"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="connector_stroke" type="Stroke"/>
         </xsd:all>
         <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
         <xsd:attribute name="position" type="xsd:string"/>
         <xsd:attribute name="anchor" type="enums.AnchorAndPosition"/>
         <xsd:attribute name="offset_x" type="xsd:double" default="0"/>
         <xsd:attribute name="offset_y" type="xsd:double" default="0"/>
+        <xsd:attribute name="connector_stroke" type="xsd:string"/>
         <xsd:attribute name="rotation" type="xsd:double" default="0"/>
         <xsd:attribute name="width" type="simple.NumberOrPercentOrNull" default="null"/>
         <xsd:attribute name="height" type="simple.NumberOrPercentOrNull" default="null"/>
@@ -2537,6 +2539,7 @@
             <xsd:enumeration value="rightTop"/>
             <xsd:enumeration value="rightCenter"/>
             <xsd:enumeration value="rightBottom"/>
+            <xsd:enumeration value="null"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -2604,6 +2607,7 @@
             <xsd:enumeration value="ellipse"/>
             <xsd:enumeration value="trapezium"/>
             <xsd:enumeration value="pentagon"/>
+            <xsd:enumeration value="arrowhead"/>
         </xsd:restriction>
     </xsd:simpleType>
 

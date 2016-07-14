@@ -9,7 +9,7 @@ $(document).ready(function() {
     success: function(data) {
       chart = anychart.seatMap();
       chart.geoData(data);
-      // chart.interactivity().mouseWheel(true);
+      // chart.interactivity().zoomOnMouseWheel(true);
       chart.interactivity().zoomOnMouseWheel(true);
       chart.interactivity().keyboardZoomAndMove(true);
       chart.unboundRegions(true);

@@ -220,15 +220,15 @@ anychart.core.map.series.Marker.prototype.startDrawing = function() {
   goog.base(this, 'startDrawing');
   if (this.isConsistent() || !this.enabled()) return;
 
-  this.marker_.suspendSignalsDispatching();
-  this.marker_.clear();
-
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     /** @type {acgraph.vector.Element} */(this.rootLayer).zIndex(/** @type {number} */(this.zIndex()));
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
+    this.marker_.suspendSignalsDispatching();
+    this.marker_.clear();
+
     this.marker_.fill(this.getFinalFill(false, anychart.PointState.NORMAL));
     this.marker_.stroke(this.getFinalStroke(false, anychart.PointState.NORMAL));
     this.marker_.type(/** @type {anychart.enums.MarkerType} */(this.type()));

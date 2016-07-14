@@ -129,6 +129,7 @@ anychart.ConsistencyState = {
   MAP_MOVE: 1 << 19,
   MAP_ZOOM: 1 << 20,
   MAP_GEO_DATA_INDEX: 1 << 21,
+  MAP_LABELS: 1 << 22,
   //---------------------------------- HEAT MAP STATES (CHART) ---------------------------------
   HEATMAP_SCALES: 1 << 11,
   HEATMAP_SERIES: 1 << 12,
@@ -281,7 +282,8 @@ anychart.Signal = {
   NEED_UPDATE_LEGEND: 1 << 6,
   NEED_UPDATE_COLOR_RANGE: 1 << 7,
   NEED_UPDATE_FULL_RANGE_ITEMS: 1 << 8,
-  NEED_UPDATE_TICK_DEPENDENT: 1 << 9
+  NEED_UPDATE_TICK_DEPENDENT: 1 << 9,
+  NEED_UPDATE_OVERLAP: 1 << 10
 };
 
 

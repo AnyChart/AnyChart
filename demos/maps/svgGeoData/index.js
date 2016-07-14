@@ -95,7 +95,7 @@ var createMap = function(name, id, callback) {
       chart.geoData(data);
       // chart.geoData('anychart.maps.australia');
       // chart.geoData('anychart.maps.world_source');
-      chart.interactivity().mouseWheel(true);
+      chart.interactivity().zoomOnMouseWheel(true);
       chart.unboundRegions('asis');
       // chart.legend()
       //     .enabled(true)

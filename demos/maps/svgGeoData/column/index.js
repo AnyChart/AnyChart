@@ -55,7 +55,7 @@ $(document).ready(function() {
     success: function(data) {
       chart = anychart.map();
       chart.geoData(data);
-      chart.interactivity().mouseWheel(true);
+      chart.interactivity().zoomOnMouseWheel(true);
       chart.unboundRegions('asis');
 
       chart.choropleth(generateData('f'));

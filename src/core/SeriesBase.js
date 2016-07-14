@@ -1268,7 +1268,7 @@ anychart.core.SeriesBase.prototype.selectLabels = function(opt_value) {
  */
 anychart.core.SeriesBase.prototype.labelsInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    this.invalidate(anychart.ConsistencyState.SERIES_LABELS, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SERIES_LABELS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_OVERLAP);
   }
 };
 
@@ -1325,11 +1325,28 @@ anychart.core.SeriesBase.prototype.getLabelsPosition = function(pointState) {
 
 
 /**
+ * Sets drawing labels map.
+ * @param {Array.<boolean>=} opt_value .
+ * @return {anychart.core.SeriesBase|Array.<boolean>}
+ */
+anychart.core.SeriesBase.prototype.labelsDrawingMap = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (!goog.array.equals(this.labelsDrawingMap_, opt_value)) {
+      this.labelsDrawingMap_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.SERIES_LABELS, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+
+  return this.labelsDrawingMap_;
+};
+
+
+/**
  * Creates and configures labels.
  * @param {anychart.PointState|number} pointState Point state - normal, hover or select.
  * @param {boolean=} opt_reset Whether reset labels settings.
  * @return {?anychart.core.ui.LabelsFactory.Label}
- * @protected
  */
 anychart.core.SeriesBase.prototype.configureLabel = function(pointState, opt_reset) {
   var iterator = this.getIterator();
@@ -1369,7 +1386,7 @@ anychart.core.SeriesBase.prototype.configureLabel = function(pointState, opt_res
         labelEnabledState;
   }
 
-  if (isDraw) {
+  if (isDraw && !(this.labelsDrawingMap_ && goog.isDef(this.labelsDrawingMap_[index]) && !this.labelsDrawingMap_[index])) {
     var position = this.getLabelsPosition(pointState);
 
     var positionProvider = this.createLabelsPositionProvider(/** @type {anychart.enums.Position|string} */(position));

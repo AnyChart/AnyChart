@@ -2356,7 +2356,11 @@ goog.provide('anychart.themes.defaultTheme');
         },
         'choropleth': {
           'labels': {
-            'fontColor': fontColorDark
+            'fontColor': fontColorDark,
+            'anchor': null
+          },
+          'markers': {
+            'anchor': null
           },
           'colorScale': {}
         },
@@ -2486,6 +2490,7 @@ goog.provide('anychart.themes.defaultTheme');
         'keyboardZoomAndMove': true,
         'zoomOnDoubleClick': false
       },
+      'overlapMode': 'noOverlap',
       'crsAnimation': {
         'enabled': true,
         'duration': 300

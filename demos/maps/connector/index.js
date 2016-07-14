@@ -61,10 +61,11 @@ $(document).ready(function() {
   stage = anychart.graphics.create('container');
   chart = anychart.map();
   chart.title().enabled(true).text('');
-  chart.geoData(anychart.maps.world);
+  chart.geoData('anychart.maps.world');
+  chart.interactivity().zoomOnMouseWheel(true);
 
 
-
+  chart.overlapMode(false);
 
 
   var data = [];
@@ -73,18 +74,75 @@ $(document).ready(function() {
     var feature = features[i];
     if (feature['properties']) {
       var id = feature['properties'][chart.geoIdField()];
-      data.push({'id': id, 'value': randomExt(-300, 300), 'size': randomExt(0, 1000)});
+      var pointData = {'id': id, 'value': randomExt(-300, 300), 'size': randomExt(0, 1000)};
+
+      if (id == 'LV') {
+        // pointData['middleXYMode'] = 'absolute';
+        // pointData['middle-x'] = '-173.9';
+        // pointData['middle-y'] = '-10.83';
+        pointData['label'] = {
+          'x': -2,
+          'y': -2,
+          'positionMode': 'relative',
+          'fontColor': 'red',
+          'enabled': true
+        };
+        pointData['marker'] = {
+          'enabled': true
+        };
+        // pointData['labelrank'] = 10;
+      }
+
+      if (id == 'EE') {
+        // pointData['middleXYMode'] = 'absolute';
+        // pointData['middle-x'] = '-173.9';
+        // pointData['middle-y'] = '-10.83';
+        pointData['label'] = {
+          'x': 6.503,
+          'y': 66.089,
+          'positionMode': 'absolute',
+          'fontColor': 'red',
+          'enabled': true
+        };
+        // pointData['labelrank'] = 10;
+      }
+
+      if (id == 'IS') {
+        // pointData['middleXYMode'] = 'absolute';
+        // pointData['middle-x'] = '-173.9';
+        // pointData['middle-y'] = '-10.83';
+        pointData['label'] = {
+          'x': 45,
+          'y': 30,
+          'positionMode': 'offset',
+          'fontColor': 'red',
+          'connectorStroke': 'yellow',
+          'enabled': true
+        };
+        pointData['marker'] = {
+          'enabled': true
+        };
+        // pointData['labelrank'] = 10;
+      }
+
+      if (id == 'SE') {
+        pointData['labelrank'] = 10;
+      }
+
+      data.push(pointData);
     }
   }
+
   //
   series2 = chart.choropleth(data);
-  series2
-      .hatchFill(true);
-  series2.labels().enabled(true);
-  series2.markers()
-      .fill('red')
-      .size(20)
-      .enabled(true);
+  // series2
+  //     .hatchFill(true);
+  series2.labels().enabled(false).padding(0).anchor(null).connectorStroke('blue');
+  series2.markers().enabled(false);
+  // series2.markers()
+  //     .fill('red')
+  //     .size(20)
+  //     .enabled(true);
 
 
 
@@ -101,7 +159,19 @@ $(document).ready(function() {
     //{},
     //undefined,
     //{'points': '45'},
-    //{'points': ['sdfsf', null, 's60.326948', 'sdf-114.609375', 'ss66.160511', 'sf-44.472656']},
+    // {'points': ['sdfsf', null, 's60.326948', 'sdf-114.609375', 'ss66.160511', 'sf-44.472656']},
+    {
+      'points': ['46.160511', '-44.472656', '40.326948', '-114.609375'],
+      label: {
+        anchor: 'righttop',
+        'x': -2,
+        'y': -2,
+        'positionMode': 'relative',
+        'fontColor': 'red',
+        'enabled': true
+      },
+      labelrank: 10,
+    },
     {
       points: ['dfs', null, '66.160511', '-44.472656', '60.326948', '-114.609375'],
       selected: false,
@@ -178,7 +248,7 @@ $(document).ready(function() {
       .startSize(10);
 
   series
-      .labels().enabled(true).anchor(null);
+      .labels().enabled(false).anchor(null);
 
   series
       .hatchFill(true);

@@ -112,12 +112,6 @@ anychart.core.map.series.Choropleth.prototype.createFormatProvider = function(op
 };
 
 
-/** @inheritDoc */
-anychart.core.map.series.Choropleth.prototype.createPositionProvider = function(position) {
-  return this.getPositionByRegion();
-};
-
-
 /**
  * @type {anychart.core.utils.TypedLayer}
  * @protected
@@ -238,27 +232,128 @@ anychart.core.map.series.Choropleth.prototype.remove = function() {
 };
 
 
-/**
- * Find point from features.
- * @param {Object} feature .
- * @param {string} id .
- * @return {Object}
- */
-anychart.core.map.series.Choropleth.prototype.findPoint = function(feature, id) {
-  var prop = feature['properties'];
+/** @inheritDoc */
+anychart.core.map.series.Choropleth.prototype.createPositionProvider = function(position) {
+  var iterator = this.getIterator();
+  var features = iterator.meta('features');
+  var feature = features && features.length ? features[0] : null;
+  var middlePoint, midX, midY, middleX, middleY, txCoords;
+  if (feature) {
+    var pointGeoProp = /** @type {Object}*/(feature['properties']);
 
-  if (prop && prop[this.getFinalGeoIdField()] == id) {
-    return feature;
-  } else if (feature['features']) {
-    for (var i = 0, len = feature['features'].length; i < len; i++) {
-      var feature_ = feature['features'][i];
-      var point = this.findPoint(feature_, id);
-      if (point) {
-        return point;
-      }
+    var middleXYModeGeoSettings = pointGeoProp && pointGeoProp['middleXYMode'];
+    var middleXYModeDataSettings = iterator.get('middleXYMode');
+
+    var middleXYMode = goog.isDef(middleXYModeDataSettings) ?
+        middleXYModeDataSettings : middleXYModeGeoSettings ?
+        middleXYModeGeoSettings : anychart.enums.MapPointMiddlePositionMode.RELATIVE;
+
+    if (middleXYMode == anychart.enums.MapPointMiddlePositionMode.RELATIVE) {
+      middlePoint = this.getPositionByRegion();
+    } else if (middleXYMode == anychart.enums.MapPointMiddlePositionMode.ABSOLUTE) {
+      midX = iterator.get('middle-x');
+      midY = iterator.get('middle-y');
+      middleX = /** @type {number}*/(goog.isDef(midX) ? midX : pointGeoProp ? pointGeoProp['middle-x'] : 0);
+      middleY = /** @type {number}*/(goog.isDef(midY) ? midY : pointGeoProp ? pointGeoProp['middle-y'] : 0);
+
+      middleX = anychart.utils.toNumber(middleX);
+      middleY = anychart.utils.toNumber(middleY);
+
+      txCoords = this.map.scale().transform(middleX, middleY);
+
+      middlePoint = {'value': {'x': txCoords[0], 'y': txCoords[1]}};
+    } else {
+      middlePoint = {'value': {'x': 0, 'y': 0}};
     }
+
+    var dataLabel = iterator.get('label');
+    var dataLabelPositionMode, dataLabelXPos, dataLabelYPos;
+    if (dataLabel) {
+      dataLabelPositionMode = dataLabel['positionMode'];
+      dataLabelXPos = dataLabel['x'];
+      dataLabelYPos = dataLabel['y'];
+    }
+
+    var geoLabel = pointGeoProp && pointGeoProp['label'];
+    var geoLabelPositionMode, geoLabelXPos, geoLabelYPos;
+    if (geoLabel) {
+      geoLabelPositionMode = geoLabel && geoLabel['positionMode'];
+      geoLabelXPos = dataLabel['x'];
+      geoLabelYPos = dataLabel['y'];
+    }
+
+    var positionMode = dataLabelPositionMode || geoLabelPositionMode || anychart.enums.MapPointOutsidePositionMode.RELATIVE;
+    var x = goog.isDef(dataLabelXPos) ? dataLabelXPos : geoLabelXPos;
+    var y = goog.isDef(dataLabelYPos) ? dataLabelYPos : geoLabelYPos;
+
+    var labelPoint;
+    if (goog.isDef(x) && goog.isDef(y)) {
+      iterator.meta('positionMode', positionMode);
+
+      midX = middlePoint['value']['x'];
+      midY = middlePoint['value']['y'];
+
+      if (positionMode == anychart.enums.MapPointOutsidePositionMode.RELATIVE) {
+        x = anychart.utils.normalizeNumberOrPercent(x);
+        y = anychart.utils.normalizeNumberOrPercent(y);
+
+        x = anychart.utils.isPercent(x) ? parseFloat(x) / 100 : x;
+        y = anychart.utils.isPercent(y) ? parseFloat(y) / 100 : y;
+
+        var shape = feature.domElement;
+        if (shape) {
+          var bounds = shape.getAbsoluteBounds();
+          x = bounds.left + bounds.width * x;
+          y = bounds.top + bounds.height * y;
+        } else {
+          x = 0;
+          y = 0;
+        }
+      } else if (positionMode == anychart.enums.MapPointOutsidePositionMode.ABSOLUTE) {
+        txCoords = this.map.scale().transform(parseFloat(x), parseFloat(y));
+        x = txCoords[0];
+        y = txCoords[1];
+      } else if (positionMode == anychart.enums.MapPointOutsidePositionMode.OFFSET) {
+        var angle = goog.math.toRadians(parseFloat(x) - 90);
+        var r = parseFloat(y);
+
+        x = midX + r * Math.cos(angle);
+        y = midY + r * Math.sin(angle);
+      }
+
+      var horizontal = Math.sqrt(Math.pow(midX - x, 2));
+      var vertical = Math.sqrt(Math.pow(midY - y, 2));
+      var connectorAngle = anychart.math.round(goog.math.toDegrees(Math.atan(vertical / horizontal)), 7);
+
+      if (midX < x && midY < y) {
+        connectorAngle = connectorAngle - 180;
+      } else if (midX < x && midY > y) {
+        connectorAngle = 180 - connectorAngle;
+      } else if (midX > x && midY > y) {
+        //connectorAngle = connectorAngle;
+      } else if (midX > x && midY < y) {
+        connectorAngle = -connectorAngle;
+      }
+
+      var anchor = this.getAnchorForLabel(goog.math.standardAngle(connectorAngle - 90));
+      iterator.meta('labelAnchor', anchor);
+      iterator.meta('markerAnchor', anchor);
+
+      labelPoint = {'value': {'x': x, 'y': y}};
+    } else {
+      iterator.meta('labelAnchor', anychart.enums.Anchor.CENTER);
+      iterator.meta('markerAnchor', anychart.enums.Anchor.CENTER);
+    }
+  } else {
+    middlePoint = {'value': {'x': 0, 'y': 0}};
   }
-  return null;
+
+  if (labelPoint) {
+    labelPoint['connectorPoint'] = middlePoint;
+    return labelPoint;
+  } else {
+    return middlePoint;
+  }
 };
 
 

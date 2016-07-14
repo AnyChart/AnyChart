@@ -84,64 +84,12 @@ anychart.core.map.series.Connector.prototype.curvature = function(opt_value) {
     opt_value = anychart.utils.toNumber(opt_value) || 0;
     if (this.curvature_ != opt_value) {
       this.curvature_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_OVERLAP);
     }
     return this;
   } else {
     return this.curvature_;
   }
-};
-
-
-/** @inheritDoc */
-anychart.core.map.series.Connector.prototype.setGeoData = function(geoData) {
-  anychart.core.map.series.Connector.base(this, 'setGeoData', geoData);
-
-  this.map.listen(anychart.enums.EventType.ANIMATION_END, function(e) {
-    this.zoomingInProgress = false;
-    this.mapTx = this.map.getMapLayer().getFullTransformation().clone();
-    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
-  }, false, this);
-
-  this.map.listen(anychart.enums.EventType.ANIMATION_START, function(e) {
-    this.zoomingInProgress = true;
-  }, false, this);
-};
-
-
-/** @inheritDoc */
-anychart.core.map.series.Connector.prototype.configureMarker = function(pointState, opt_reset) {
-  var marker = /** @type {anychart.core.ui.MarkersFactory.Marker} */(anychart.core.map.series.Connector.base(this, 'configureMarker', pointState, opt_reset));
-  if (marker) {
-    var rotation = /** @type {number} */(marker.getFinalSettings('rotation'));
-    if (!goog.isDef(rotation) || goog.isNull(rotation) || isNaN(rotation)) {
-      var autoRotation = {'rotation': /** @type {number} */(this.getIterator().meta('markerRotation'))};
-      marker.setSettings(autoRotation, autoRotation);
-    }
-
-    var anchor = /** @type {anychart.enums.Anchor} */(marker.getFinalSettings('anchor'));
-    if (!goog.isDef(anchor) || goog.isNull(anchor)) {
-      var autoAnchor = {'anchor': /** @type {anychart.enums.Anchor} */(this.getIterator().meta('markerAnchor'))};
-      marker.setSettings(autoAnchor, autoAnchor);
-    }
-  }
-
-  return marker;
-};
-
-
-/** @inheritDoc */
-anychart.core.map.series.Connector.prototype.configureLabel = function(pointState, opt_reset) {
-  var label = /** @type {anychart.core.ui.LabelsFactory.Label} */(anychart.core.map.series.Connector.base(this, 'configureLabel', pointState, opt_reset));
-  if (label) {
-    var anchor = /** @type {number} */(label.getMergedSettings()['anchor']);
-    if (!goog.isDef(anchor) || goog.isNull(anchor)) {
-      var autoAnchor = {'anchor': /** @type {string} */(this.getIterator().meta('labelAnchor'))};
-      label.setSettings(autoAnchor, autoAnchor);
-    }
-  }
-
-  return label;
 };
 
 
@@ -197,36 +145,6 @@ anychart.core.map.series.Connector.prototype.getReferenceCoords = function() {
   iterator.meta('pointsWithoutMissing', pointsWithoutMissing);
 
   return result;
-};
-
-
-/**
- * Anchor for angle of label
- * @param {number} angle Label angle.
- * @return {anychart.enums.Anchor}
- * @private
- */
-anychart.core.map.series.Connector.prototype.getAnchorForLabel_ = function(angle) {
-  angle = goog.math.standardAngle(angle);
-  var anchor = anychart.enums.Anchor.CENTER;
-  if (angle == 0) {
-    anchor = anychart.enums.Anchor.LEFT_CENTER;
-  } else if (angle < 90) {
-    anchor = anychart.enums.Anchor.LEFT_TOP;
-  } else if (angle == 90) {
-    anchor = anychart.enums.Anchor.CENTER_TOP;
-  } else if (angle < 180) {
-    anchor = anychart.enums.Anchor.RIGHT_TOP;
-  } else if (angle == 180) {
-    anchor = anychart.enums.Anchor.RIGHT_CENTER;
-  } else if (angle < 270) {
-    anchor = anychart.enums.Anchor.RIGHT_BOTTOM;
-  } else if (angle == 270) {
-    anchor = anychart.enums.Anchor.CENTER_BOTTOM;
-  } else if (angle > 270) {
-    anchor = anychart.enums.Anchor.LEFT_BOTTOM;
-  }
-  return anchor;
 };
 
 
@@ -323,7 +241,7 @@ anychart.core.map.series.Connector.prototype.createPositionProvider = function(p
           anglePathNormal = -anglePathNormal;
         }
 
-        iterator.meta('labelAnchor', this.getAnchorForLabel_(anglePathNormal));
+        iterator.meta('labelAnchor', this.getAnchorForLabel(goog.math.standardAngle(anglePathNormal + 90)));
         iterator.meta('markerRotation', anglePathNormal);
         iterator.meta('markerAnchor', normalizedPosition == 1 ? anychart.enums.Anchor.RIGHT_CENTER : normalizedPosition == 0 ? anychart.enums.Anchor.LEFT_CENTER : anychart.enums.Anchor.CENTER);
 
@@ -358,8 +276,8 @@ anychart.core.map.series.Connector.prototype.createPositionProvider = function(p
       accumDist += currPathDist;
     }
 
-    if (this.zoomingInProgress || this.map.drag) {
-      var prevTx = this.mapTx;
+    if (this.map.zoomingInProgress || this.map.moving) {
+      var prevTx = this.map.mapTx;
       var tx = this.map.getMapLayer().getFullTransformation().clone();
 
       if (prevTx) {
@@ -392,7 +310,7 @@ anychart.core.map.series.Connector.prototype.applyZoomMoveTransform = function()
 
   var paths = iterator.meta('shape');
   if (paths) {
-    var prevTx = this.mapTx;
+    var prevTx = this.map.mapTx;
     var tx = this.map.getMapLayer().getFullTransformation().clone();
 
     if (prevTx) {
@@ -609,6 +527,7 @@ anychart.core.map.series.Connector.prototype.drawConnector_ = function(path, sta
 
 /** @inheritDoc */
 anychart.core.map.series.Connector.prototype.drawPoint = function(pointState) {
+  var iterator = this.getIterator();
   var referenceValues = this.getReferenceCoords();
 
   if (!referenceValues)
@@ -625,7 +544,6 @@ anychart.core.map.series.Connector.prototype.drawPoint = function(pointState) {
 
     var controlLength, direction, finalControlLength, controlDirection;
 
-    var iterator = this.getIterator();
     var userCurvature = iterator.get('curvature');
     var curvature = /** @type {number} */(goog.isDefAndNotNull(userCurvature) ? userCurvature : this.curvature());
     var userStartSize = iterator.get('startSize');

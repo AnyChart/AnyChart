@@ -98,7 +98,7 @@ anychart.onDocumentReady(function() {
 
   map = anychart.map();
 
-  map.geoData(anychart.maps.world);
+  map.geoData(anychart.maps.world_source);
   // // map.geoData(anychart.maps.australia);
   //
   // map.legend(true);
@@ -117,7 +117,7 @@ anychart.onDocumentReady(function() {
   }
 
   var series = map.choropleth(choroplethData);
-  series.labels().enabled(false);
+  series.labels().enabled(true);
 
   // var scale = anychart.scales.ordinalColor([
   //   {less: 1907},
@@ -227,7 +227,7 @@ anychart.onDocumentReady(function() {
   map.container('container').draw();
 
 
-  // setInterval(changeProjection, 500);
+  setInterval(changeProjection, 500);
 
   proj.on('change', function() {
     map.crs(this.value);

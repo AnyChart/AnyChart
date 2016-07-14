@@ -414,6 +414,20 @@ anychart.core.map.series.BaseWithMarkers.prototype.configureMarker = function(po
       marker.currentMarkersFactory(markersFactory);
       marker.setSettings(/** @type {Object} */(pointMarker), /** @type {Object} */(hovered ? hoverPointMarker : selectPointMarker));
     }
+
+    var rotation = /** @type {number} */(marker.getFinalSettings('rotation'));
+    if (!goog.isDef(rotation) || goog.isNull(rotation) || isNaN(rotation)) {
+      var autoRotation = {'rotation': /** @type {number} */(this.getIterator().meta('markerRotation'))};
+      marker.setSettings(autoRotation, autoRotation);
+    }
+
+    var anchor = /** @type {anychart.enums.Anchor} */(marker.getFinalSettings('anchor'));
+
+    if (!goog.isDef(anchor) || goog.isNull(anchor)) {
+      var autoAnchor = {'anchor': /** @type {anychart.enums.Anchor} */(this.getIterator().meta('markerAnchor'))};
+      marker.setSettings(autoAnchor, autoAnchor);
+    }
+
     return marker;
   } else if (marker) {
     this.markers_.clear(marker.getIndex());

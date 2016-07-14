@@ -3,6 +3,7 @@ goog.require('anychart.core.SeriesBase');
 goog.require('anychart.core.map.geom');
 goog.require('anychart.core.utils.MapPointContextProvider');
 goog.require('anychart.enums');
+goog.require('goog.graphics.AffineTransform');
 
 
 
@@ -41,7 +42,8 @@ anychart.core.map.series.Base.prototype.SUPPORTED_SIGNALS =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.DATA_CHANGED |
     anychart.Signal.NEEDS_RECALCULATION |
-    anychart.Signal.NEED_UPDATE_LEGEND;
+    anychart.Signal.NEED_UPDATE_LEGEND |
+    anychart.Signal.NEED_UPDATE_OVERLAP;
 
 
 /**
@@ -127,20 +129,11 @@ anychart.core.map.series.Base.prototype.calculateSizeScale = goog.nullFunction;
 anychart.core.map.series.Base.prototype.setAutoSizeScale = goog.nullFunction;
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Color scale.
-//
-//----------------------------------------------------------------------------------------------------------------------
 /**
- * Color scale.
- * @param {(anychart.scales.LinearColor|anychart.scales.OrdinalColor)=} opt_value Scale to set.
- * @return {anychart.scales.OrdinalColor|anychart.scales.LinearColor|anychart.core.map.series.Base} Default chart color scale value or itself for
- * method chaining.
+ * @type {?boolean}
+ * @private
  */
-anychart.core.map.series.Base.prototype.colorScale = function(opt_value) {
-  return null;
-};
+anychart.core.map.series.Base.prototype.overlapMode_ = null;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -161,6 +154,17 @@ anychart.core.map.series.Base.prototype.geoIdField_;
  * @protected
  */
 anychart.core.map.series.Base.prototype.geoData;
+
+
+/**
+ * Color scale.
+ * @param {(anychart.scales.LinearColor|anychart.scales.OrdinalColor)=} opt_value Scale to set.
+ * @return {anychart.scales.OrdinalColor|anychart.scales.LinearColor|anychart.core.map.series.Base} Default chart color scale value or itself for
+ * method chaining.
+ */
+anychart.core.map.series.Base.prototype.colorScale = function(opt_value) {
+  return null;
+};
 
 
 /**
@@ -258,6 +262,33 @@ anychart.core.map.series.Base.prototype.needDrawHatchFill = function() {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Label settings.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Defines show label if it don't intersect with other anyone label or not show.
+ * @param {(anychart.enums.LabelsOverlapMode|string|boolean)=} opt_value .
+ * @return {anychart.enums.LabelsOverlapMode|anychart.core.map.series.Base} .
+ */
+anychart.core.map.series.Base.prototype.overlapMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = goog.isNull(opt_value) ? opt_value : anychart.enums.normalizeLabelsOverlapMode(opt_value) == anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP;
+    if (this.overlapMode_ != val) {
+      this.overlapMode_ = val;
+      this.invalidate(anychart.ConsistencyState.SERIES_LABELS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_OVERLAP);
+    }
+    return this;
+  }
+  return goog.isNull(this.overlapMode_) ?
+      /** @type {anychart.enums.LabelsOverlapMode} */(this.map.overlapMode()) :
+      this.overlapMode_ ?
+          anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP :
+          anychart.enums.LabelsOverlapMode.NO_OVERLAP;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Statistics
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -318,9 +349,6 @@ anychart.core.map.series.Base.prototype.calculate = function() {
         var id = name[j];
         var point = index[id];
         if (point) {
-          //todo (blackart) Don't remove it for the time.
-          if (point.domElement) this.bindHandlersToGraphics(point.domElement);
-
           features.push(point);
         }
       }
@@ -388,6 +416,35 @@ anychart.core.map.series.Base.prototype.applyZoomMoveTransformToLabel = function
   domElement.translate(trX, trY);
 
 
+  var connectorElement = label.getConnectorElement();
+  if (connectorElement && iterator.meta('positionMode') != anychart.enums.MapPointOutsidePositionMode.OFFSET) {
+    var scale, dx, dy;
+    var prevTx = this.map.mapTx;
+    var tx = this.map.getMapLayer().getFullTransformation().clone();
+
+    if (prevTx) {
+      tx.concatenate(prevTx.createInverse());
+    }
+
+    scale = tx.getScaleX();
+    dx = tx.getTranslateX();
+    dy = tx.getTranslateY();
+
+    tx = new goog.graphics.AffineTransform(scale, 0, 0, scale, dx, dy);
+    tx.preConcatenate(domElement.getSelfTransformation().createInverse());
+
+    scale = tx.getScaleX();
+    if (!anychart.math.roughlyEqual(scale, 1, 0.000001)) {
+      dx = tx.getTranslateX();
+      dy = tx.getTranslateY();
+    } else {
+      dx = 0;
+      dy = 0;
+    }
+    connectorElement.setTransformationMatrix(scale, 0, 0, scale, dx, dy);
+  }
+
+
   if (goog.isDef(labelRotation))
     domElement.rotateByAnchor(/** @type {number}*/(labelRotation), /** @type {anychart.enums.Anchor} */(labelAnchor));
 };
@@ -448,6 +505,9 @@ anychart.core.map.series.Base.prototype.applyZoomMoveTransform = function() {
  * @return {anychart.core.map.series.Base} An instance of {@link anychart.core.map.series.Base} class for method chaining.
  */
 anychart.core.map.series.Base.prototype.draw = function() {
+  if (!this.checkDrawingNeeded())
+    return this;
+
   this.suspendSignalsDispatching();
   this.calculate();
 
@@ -574,6 +634,123 @@ anychart.core.map.series.Base.prototype.transformXY = function(xCoord, yCoord) {
 
 
 /**
+ * Returns label bounds.
+ * @param {number} index Point index.
+ * @param {number=} opt_pointState Point state.
+ * @return {Array.<number>}
+ */
+anychart.core.map.series.Base.prototype.getLabelBounds = function(index, opt_pointState) {
+  var iterator = this.getIterator();
+  iterator.select(index);
+  var pointState = goog.isDef(opt_pointState) ? opt_pointState : this.state.getPointStateByIndex(index);
+
+  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
+  var isDraw, pointLabel, stateLabel, labelEnabledState, stateLabelEnabledState;
+
+  pointLabel = iterator.get('label');
+  labelEnabledState = pointLabel && goog.isDef(pointLabel['enabled']) ? pointLabel['enabled'] : null;
+  var parentLabelsFactory = this.labels();
+  var currentLabelsFactory = null;
+  if (selected) {
+    stateLabel = iterator.get('selectLabel');
+    stateLabelEnabledState = stateLabel && goog.isDef(stateLabel['enabled']) ? stateLabel['enabled'] : null;
+    currentLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels());
+  } else if (hovered) {
+    stateLabel = iterator.get('hoverLabel');
+    stateLabelEnabledState = stateLabel && goog.isDef(stateLabel['enabled']) ? stateLabel['enabled'] : null;
+    currentLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels());
+  } else {
+    stateLabel = null;
+  }
+
+  if (selected || hovered) {
+    isDraw = goog.isNull(stateLabelEnabledState) ?
+        goog.isNull(currentLabelsFactory.enabled()) ?
+            goog.isNull(labelEnabledState) ?
+                parentLabelsFactory.enabled() :
+                labelEnabledState :
+            currentLabelsFactory.enabled() :
+        stateLabelEnabledState;
+  } else {
+    isDraw = goog.isNull(labelEnabledState) ?
+        parentLabelsFactory.enabled() :
+        labelEnabledState;
+  }
+
+  if (isDraw) {
+    var position = this.getLabelsPosition(pointState);
+
+    var positionProvider = this.createLabelsPositionProvider(/** @type {anychart.enums.Position|string} */(position));
+    var formatProvider = this.createFormatProvider(true);
+
+    var settings = {};
+
+    if (pointLabel)
+      goog.object.extend(settings, /** @type {Object} */(pointLabel));
+    if (currentLabelsFactory)
+      goog.object.extend(settings, currentLabelsFactory.getChangedSettings());
+    if (stateLabel)
+      goog.object.extend(settings, /** @type {Object} */(stateLabel));
+
+    var anchor = settings['anchor'];
+    if (!goog.isDef(anchor) || goog.isNull(anchor)) {
+      settings['anchor'] = this.getIterator().meta('labelAnchor');
+    }
+
+    return parentLabelsFactory.measure(formatProvider, positionProvider, settings, index).toCoordinateBox();
+  } else {
+    return null;
+  }
+};
+
+
+/** @inheritDoc */
+anychart.core.map.series.Base.prototype.configureLabel = function(pointState, opt_reset) {
+  var label = /** @type {anychart.core.ui.LabelsFactory.Label} */(anychart.core.map.series.Base.base(this, 'configureLabel', pointState, opt_reset));
+  if (label) {
+    var anchor = /** @type {anychart.enums.Anchor} */(label.getMergedSettings()['anchor']);
+    if (!goog.isDef(anchor) || goog.isNull(anchor)) {
+      var autoAnchor = {'anchor': /** @type {anychart.enums.Anchor} */(this.getIterator().meta('labelAnchor'))};
+      label.setSettings(autoAnchor, autoAnchor);
+    }
+  }
+
+  return label;
+};
+
+
+/**
+ * Anchor for angle of label
+ * @param {number} angle Label angle.
+ * @return {anychart.enums.Anchor}
+ * @protected
+ */
+anychart.core.map.series.Base.prototype.getAnchorForLabel = function(angle) {
+  angle = goog.math.standardAngle(angle);
+  var anchor = anychart.enums.Anchor.CENTER;
+  if (angle == 0) {
+    anchor = anychart.enums.Anchor.CENTER_BOTTOM;
+  } else if (angle < 90) {
+    anchor = anychart.enums.Anchor.LEFT_BOTTOM;
+  } else if (angle == 90) {
+    anchor = anychart.enums.Anchor.LEFT_CENTER;
+  } else if (angle < 180) {
+    anchor = anychart.enums.Anchor.LEFT_TOP;
+  } else if (angle == 180) {
+    anchor = anychart.enums.Anchor.CENTER_TOP;
+  } else if (angle < 270) {
+    anchor = anychart.enums.Anchor.RIGHT_TOP;
+  } else if (angle == 270) {
+    anchor = anychart.enums.Anchor.RIGHT_CENTER;
+  } else if (angle > 270) {
+    anchor = anychart.enums.Anchor.RIGHT_BOTTOM;
+  }
+  return anchor;
+};
+
+
+/**
  * Create base series format provider.
  * @param {boolean=} opt_force create context provider forcibly.
  * @return {Object} Object with info for labels formatting.
@@ -613,27 +790,6 @@ anychart.core.map.series.Base.prototype.getPositionByRegion = function() {
     positionProvider = {'value': {'x': 0, 'y': 0}};
   }
   return positionProvider;
-};
-
-
-/**
- * Create series position provider.
- * @param {string} position Understands anychart.enums.Position and some additional values.
- * @return {Object} Object with info for labels formatting.
- * @protected
- */
-anychart.core.map.series.Base.prototype.createPositionProvider = function(position) {
-  var iterator = this.getIterator();
-  var features = iterator.meta('features');
-  var feature = features && features.length ? features[0] : null;
-  var shape = feature ? feature.domElement : null;
-  if (shape) {
-    var shapeBounds = shape.getBounds();
-    position = anychart.enums.normalizeAnchor(position);
-    return {'value': anychart.utils.getCoordinateByAnchor(shapeBounds, position)};
-  } else {
-    return {'value': {'x': iterator.meta('x'), 'y': iterator.meta('value')}};
-  }
 };
 
 
@@ -788,4 +944,5 @@ anychart.core.map.series.Base.prototype['hoverHatchFill'] = anychart.core.map.se
 anychart.core.map.series.Base.prototype['hatchFill'] = anychart.core.map.series.Base.prototype.hatchFill;
 
 anychart.core.map.series.Base.prototype['geoIdField'] = anychart.core.map.series.Base.prototype.geoIdField;
+anychart.core.map.series.Base.prototype['overlapMode'] = anychart.core.map.series.Base.prototype.overlapMode;
 anychart.core.map.series.Base.prototype['transformXY'] = anychart.core.map.series.Base.prototype.transformXY;

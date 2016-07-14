@@ -70,8 +70,8 @@ $(document).ready(function() {
     //{"id": "AU.NT", "value": 136, "size": 185, selected: true},
     //{"id": "AU.WA", "value": -146, "size": 471},
     //{"id": "AU.CT", "value": -242, "size": 339},
-    //{"id": "AU.NS", "value": 30, "size": 137},
-    //{"id": "AU.SA", "value": 69, "size": 525},
+    {"id": "FR.C", "value": 30, "size": 137},
+    {"id": "FR.F", "value": 69, "size": 525},
     //{"id": "AU.VI", "value": 110, "size": 178},
     //{"id": "AU.QL", "value": -53, "size": 621, 'lat': -25.6, 'lon': 141.6},
     //{"id": "AU.TS", "value": 168, "size": 359, 'lat': -27.1, 'lon': 123.6}

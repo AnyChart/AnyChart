@@ -2104,6 +2104,32 @@ anychart.enums.normalizeMapProjections = function(value) {
 };
 
 
+/**
+ * Defines that middleX and middleY field means.
+ * If mode is 'absolute' then coords of middle sets as lat/lon coords.
+ * If 'relative' - as ratio of region bounds.
+ * @enum {string}
+ */
+anychart.enums.MapPointMiddlePositionMode = {
+  ABSOLUTE: 'absolute',
+  RELATIVE: 'relative'
+};
+
+
+/**
+ * Defines that x and y field of label means.
+ * If mode is 'absolute' then coords of middle sets as lat/lon coords.
+ * If 'relative' - as ratio of region bounds.
+ * If 'offset' - as static position in polar coords, x - angle, y - radius. 0 degrees - 12 o'clock position.
+ * @enum {string}
+ */
+anychart.enums.MapPointOutsidePositionMode = {
+  ABSOLUTE: 'absolute',
+  RELATIVE: 'relative',
+  OFFSET: 'offset'
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  CartesianSeriesTypes
@@ -5038,6 +5064,13 @@ goog.exportSymbol('anychart.enums.MapProjections.WSG84', anychart.enums.MapProje
 
 goog.exportSymbol('anychart.enums.MapUnboundRegionsMode.AS_IS', anychart.enums.MapUnboundRegionsMode.AS_IS);
 goog.exportSymbol('anychart.enums.MapUnboundRegionsMode.HIDE', anychart.enums.MapUnboundRegionsMode.HIDE);
+
+goog.exportSymbol('anychart.enums.MapPointMiddlePositionMode.ABSOLUTE', anychart.enums.MapPointMiddlePositionMode.ABSOLUTE);
+goog.exportSymbol('anychart.enums.MapPointMiddlePositionMode.RELATIVE', anychart.enums.MapPointMiddlePositionMode.RELATIVE);
+
+goog.exportSymbol('anychart.enums.MapPointOutsidePositionMode.RELATIVE', anychart.enums.MapPointOutsidePositionMode.RELATIVE);
+goog.exportSymbol('anychart.enums.MapPointOutsidePositionMode.ABSOLUTE', anychart.enums.MapPointOutsidePositionMode.ABSOLUTE);
+goog.exportSymbol('anychart.enums.MapPointOutsidePositionMode.OFFSET', anychart.enums.MapPointOutsidePositionMode.OFFSET);
 
 goog.exportSymbol('anychart.enums.TreeFillingMethod.AS_TREE', anychart.enums.TreeFillingMethod.AS_TREE);
 goog.exportSymbol('anychart.enums.TreeFillingMethod.AS_TABLE', anychart.enums.TreeFillingMethod.AS_TABLE);
