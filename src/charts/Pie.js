@@ -1731,21 +1731,25 @@ anychart.charts.Pie.prototype.prepare3DSlice_ = function() {
   });
 
   if (Math.abs(sweep) != 360) {
-    this.sides3D_.push({
-      index: index,
-      type: anychart.charts.Pie.Side3DType.START,
-      angle: start,
-      ex: ex,
-      ey: ey
-    });
+    if (this.hasStartSide_(start)) {
+      this.sides3D_.push({
+        index: index,
+        type: anychart.charts.Pie.Side3DType.START,
+        angle: start,
+        ex: ex,
+        ey: ey
+      });
+    }
 
-    this.sides3D_.push({
-      index: index,
-      type: anychart.charts.Pie.Side3DType.END,
-      angle: end,
-      ex: ex,
-      ey: ey
-    });
+    if (this.hasEndSide_(end)) {
+      this.sides3D_.push({
+        index: index,
+        type: anychart.charts.Pie.Side3DType.END,
+        angle: end,
+        ex: ex,
+        ey: ey
+      });
+    }
   }
 
   var len1;
@@ -2145,6 +2149,37 @@ anychart.charts.Pie.prototype.colorize3DPath_ = function(pathName, pointState) {
 
 
 /**
+ * Checks slice for having start side.
+ * @param {number} startAngle Start angle.
+ * @return {boolean} Whether slice have start side or not.
+ * @private
+ */
+anychart.charts.Pie.prototype.hasStartSide_ = function(startAngle) {
+  startAngle = goog.math.toRadians(startAngle);
+  var startCos = anychart.math.round(Math.cos(startAngle), 7);
+  var startSin = anychart.math.round(Math.sin(startAngle), 7);
+
+  var startQuadrant = this.getQuadrant_(startCos, startSin);
+  return ((!(startCos == 0 && Math.abs(startSin) == 1) && startQuadrant == 3) || startQuadrant == 2);
+};
+
+
+/**
+ * Checks slice for having end side.
+ * @param {number} endAngle Start angle.
+ * @return {boolean} Whether slice have end side or not.
+ * @private
+ */
+anychart.charts.Pie.prototype.hasEndSide_ = function(endAngle) {
+  endAngle = goog.math.toRadians(endAngle);
+  var endCos = anychart.math.round(Math.cos(endAngle), 7);
+  var endSin = anychart.math.round(Math.sin(endAngle), 7);
+  var endQuadrant = this.getQuadrant_(endCos, endSin);
+  return ((!(endCos == 0 && Math.abs(endSin) == 1) && endQuadrant == 1) || endQuadrant == 4);
+};
+
+
+/**
  * True if slice has front side.
  * @param {number} startAngle
  * @param {number} endAngle
@@ -2188,7 +2223,7 @@ anychart.charts.Pie.prototype.hasFrontSide_ = function(startAngle, endAngle) {
  * @private
  */
 anychart.charts.Pie.prototype.hasBackSide_ = function(startAngle, endAngle) {
-  if (startAngle == endAngle) return false;
+  if (startAngle == endAngle || this.innerRadiusValue_ == 0) return false;
 
   startAngle = goog.math.toRadians(startAngle);
   endAngle = goog.math.toRadians(endAngle);
