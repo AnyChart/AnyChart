@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+<head>
+  <link rel="stylesheet" href="../../utils/media/anychart-font/anychart.css">
+  <link rel="stylesheet" href="../../../out/anychart-ui.css">
+    <!--<script src="../../../out/anychart-bundle.min.js"></script>-->
+  <script src="../../../out/anychart.min.js"></script>
+  <script src="../../../out/anychart-ui.min.js"></script>
+  <script src="http://cdn.anychart.com/themes/latest/coffee.min.js"></script>
+  <script src="http://cdn.anychart.com/themes/latest/light_glamour.min.js"></script>
+  <script src="http://cdn.anychart.com/themes/latest/dark_turquoise.min.js"></script>
+  <style>
+
+  </style>
+  <title>chartEditor Demo</title>
+</head>
+<body>
+<h2>Create editor</h2>
+<pre>
+var data1 = [
+  {name: 'Product A', value: '4132'},
+  {name: 'Product B', value: '2431'},
+  {name: 'Product C', value: '3213'},
+  {name: 'Product D', value: '5243'},
+  {name: 'Product E', value: '6813'},
+  {name: 'Product F', value: '5321'},
+  {name: 'Product G', value: '1567'},
+  {name: 'Product H', value: '3876'},
+  {name: 'Product I', value: '2187'}
+];
+
+var data2 = [
+  ['Nail polish', 6814, 3054, 4229],
+  ['Eyebrow pencil', 7012, 3954, 8987, 3932],
+  ['Pomade', 8814, 9054, 4376, 9256]
+];
+
+var editor = anychart.ui.chartEditorDialog();
+editor.data(data1, data2);
+editor.render();
+</pre>
+<button onclick="editor.visible(true);" autofocus style="position: absolute; top: 10px; left: 350px; font-size: 20px;">Chart Editor</button>
+<div style="clear: both"></div>
+
+<h2>Result as JSON</h2>
+
+<div id="container-1" style="width: 400px; height: 300px; border: 1px solid #000000; float: left;"></div>
+<pre style="float: left; margin-left: 20px;">
+var json = editor.getResultJson();
+var chart = anychart.fromJson(json);
+chart.container('container-1');
+chart.draw();
+</pre>
+<button onclick="createFromJson()" style="float: left;">RUN</button>
+<div style="clear: both"></div>
+<div style="height: 20px;"></div>
+
+<h2>Result as XML</h2>
+
+<div id="container-2" style="width: 400px; height: 300px; border: 1px solid #000000; float: left;"></div>
+<pre style="float: left; margin-left: 20px;">
+var xml = editor.getResultXml();
+var chart = anychart.fromXml(xml);
+chart.container('container-2');
+chart.draw();
+</pre>
+<button onclick="createFromXml()" style="float: left;">RUN</button>
+<div style="clear: both"></div>
+<div style="height: 20px;"></div>
+
+<h2>Result as Code</h2>
+
+<div id="container-3" style="width: 400px; height: 300px; border: 1px solid #000000; float: left;"></div>
+<pre style="float: left; margin-left: 20px;">
+var code = editor.getResultCode();
+var constructorFunc = eval(code);
+var chart = constructorFunc(data1, data2);
+chart.container('container-3');
+chart.draw();
+</pre>
+<button onclick="createFromCode()" style="float: left;">RUN</button>
+<div style="clear: both"></div>
+<div style="height: 20px;"></div>
+
+<h2>Real world integration</h2>
+
+<h3>Step 1</h3>
+<pre>
+// select data from your DB or any other backend
+var data = [];
+
+// use chart editor
+var editor = anychart.ui.chartEditorDialog();
+editor.data(data);
+editor.render();
+editor.setVisible(true);
+
+// get result code from editor and save on your backend
+var code = editor.getResultCode();
+</pre>
+
+<h3>Step 2</h3>
+<pre>
+// select data from your DB or any other backend
+var data = [];
+
+// load saved code from your backend
+var code = '';
+
+// create and draw chart
+var constructorFunc = eval(code);
+var chart = constructorFunc(data);
+
+// set container id and draw chart
+chart.container('container-id');
+chart.draw();
+</pre>
+<script src="index.js"></script>
+</body>
+</html>

@@ -45,5 +45,15 @@ anychart.ui.ganttToolbar = goog.global['anychart']['ui']['ganttToolbar'] || /** 
 });
 
 
+/**
+ * @ignoreDoc
+ */
+anychart.ui.preloader = goog.global['anychart']['ui']['preloader'] || /** @type {function():null} */ (function() {
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['anychart.ui.preloader']);
+  return null;
+});
+
+
 goog.exportSymbol('anychart.ui.contextMenu', anychart.ui.contextMenu);
 goog.exportSymbol('anychart.ui.ganttToolbar', anychart.ui.ganttToolbar);
+goog.exportSymbol('anychart.ui.preloader', anychart.ui.preloader);

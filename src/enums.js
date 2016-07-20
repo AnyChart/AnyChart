@@ -1886,7 +1886,11 @@ anychart.enums.EventType = {
   // Annotation events
   ANNOTATION_SELECT: 'annotationSelect',
   ANNOTATION_UNSELECT: 'annotationUnselect',
-  ANNOTATION_DRAWING_FINISH: 'annotationDrawingFinish'
+  ANNOTATION_DRAWING_FINISH: 'annotationDrawingFinish',
+
+  // UI events
+  CLOSE: 'close',
+  COMPLETE: 'complete'
 };
 
 

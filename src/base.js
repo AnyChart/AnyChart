@@ -43,6 +43,14 @@ anychart.DEFAULT_THEME = 'defaultTheme';
 anychart.PERFORMANCE_MONITORING = true;
 
 
+/**
+ * Set default css name mapping for anychart ui.
+ */
+goog.setCssNameMapping({
+  'goog': 'anychart'
+});
+
+
 goog.exportSymbol('anychart.VERSION', anychart.VERSION);
 goog.exportSymbol('anychart.DEVELOP', anychart.DEVELOP);
 goog.exportSymbol('anychart.DEFAULT_THEME', anychart.DEFAULT_THEME);

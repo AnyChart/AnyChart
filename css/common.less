@@ -5,6 +5,10 @@
   border-style: hidden;
 }
 
+*[class^="anychart"] {
+  outline: none;
+}
+
 /*
  * Default rule; only Safari, Webkit, and Opera handle it without hacks.
  */
@@ -30,4 +34,172 @@
  */
 *:first-child + html .anychart-inline-block {
   display: inline;
+}
+
+.anychart-label-input {
+  -webkit-border-radius: 1px;
+  -moz-border-radius: 1px;
+  border-radius: 1px;
+
+  border: 1px solid #d9d9d9;
+  border-top: 1px solid silver;
+
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+
+  font-size: 13px;
+  height: 16px;
+  padding: 5px 4px;
+
+  &:focus {
+    border-color: #4d90fe;
+  }
+}
+
+.anychart-thumbnail {
+  display: block;
+  padding: 4px;
+  margin-bottom: 20px;
+  line-height: 1.42857143;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  -webkit-transition: border .2s ease-in-out;
+  transition: border .2s ease-in-out;
+
+  > img {
+    margin-right: auto;
+    margin-left: auto;
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  &:hover,
+  &:focus {
+    border-color: #ccc;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  }
+
+  &:active {
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.3);
+    border-color: #489adc;
+  }
+}
+
+.anychart-loader {
+  background-color: rgba(255, 255, 255, .5);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+
+  .anychart-loader-rotating-cover {
+    width: 70px;
+    height: 70px;
+    position: absolute;
+    top: 50%;
+    margin-top: -35px;
+    left: 50%;
+    margin-left: -35px;
+  }
+
+  .anychart-loader-rotating-plane {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 20%;
+    border: 5px solid #1c75ba;
+    margin: 0 auto;
+    position: relative;
+    -webkit-animation: anychart-loader-rotate-plane 3s infinite;
+    animation: anychart-loader-rotate-plane 3s infinite;
+  }
+
+  .anychart-loader-chart-row {
+    position: absolute;
+    top: 10px;
+    bottom: 0;
+    left: 10px;
+    right: 10px;
+    letter-spacing: -3px;
+    line-height: 0;
+    font-size: 0;
+    white-space: nowrap;
+
+    .anychart-loader-chart-col {
+      display: inline-block;
+      width: 25%;
+      height: 90%;
+      background: #000;
+      margin: 0 12.5% 0 0;
+      vertical-align: bottom;
+
+      &.anychart-loader-green {
+        background: #26a957;
+        height: 50%;
+        -webkit-animation: anychart-loader-blink-plane 1.5s infinite;
+        animation: anychart-loader-blink-plane 1.5s infinite;
+      }
+
+      &.anychart-loader-orange {
+        background: #ff8207;
+        height: 70%;
+        -webkit-animation: anychart-loader-blink-plane 1.5s infinite .15s;
+        animation: anychart-loader-blink-plane 1.5s infinite .25s
+      }
+
+      &.anychart-loader-red {
+        background: #f0402e;
+        height: 90%;
+        -webkit-animation: anychart-loader-blink-plane 1.5s infinite .3s;
+        animation: anychart-loader-blink-plane 1.5s infinite .5s
+      }
+    }
+  }
+}
+
+@keyframes anychart-loader-rotate-plane {
+  0% {
+    -webkit-transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+    transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+    opacity: 1
+  }
+  25% {
+    -webkit-transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+    transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+    opacity: .3
+  }
+  50% {
+    -webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+    transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+    opacity: 1
+  }
+  75% {
+    -webkit-transform: perspective(120px) rotateX(0deg) rotateY(-180.1deg);
+    transform: perspective(120px) rotateX(0deg) rotateY(-180.1deg);
+    opacity: .3
+  }
+  100% {
+    -webkit-transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+    transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+    opacity: 1
+  }
+}
+
+@keyframes anychart-loader-blink-plane {
+  0% {
+    opacity: 1
+  }
+  50% {
+    opacity: .01
+  }
+  100% {
+    opacity: 1
+  }
 }

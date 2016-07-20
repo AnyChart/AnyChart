@@ -30,6 +30,24 @@ goog.provide('anychart.themes.v6');
 
 
   /**
+   * @const {string}
+   */
+  var VALUE_TOKEN_DECIMALS_COUNT_2 = '{%Value}{decimalsCount:2}';
+
+
+  /**
+   * @const {string}
+   */
+  var VALUE_TOKEN_DECIMALS_COUNT_10 = '{%Value}{decimalsCount:10}';
+
+
+  /**
+   * @const {string}
+   */
+  var Y_PERCENT_OF_TOTAL_TOKEN = '{%YPercentOfTotal}{decimalsCount:1,zeroFillDecimals:true}';
+
+
+  /**
    * @this {*}
    * @return {*}
    */
@@ -53,7 +71,7 @@ goog.provide('anychart.themes.v6');
     // default font settings
     'defaultFontSettings': {
       'fontSize': 10,
-      'fontFamily': 'Verdana',
+      'fontFamily': 'Verdana, Helvetica, Arial, sans-serif',
       'fontColor': '#222',
       'textDirection': 'ltr',
       'fontOpacity': 1,
@@ -107,7 +125,7 @@ goog.provide('anychart.themes.v6');
       'enabled': true,
 
       'fontSize': 11,
-      'fontFamily': 'Tahoma',
+      'fontFamily': 'Tahoma, Geneva, sans-serif',
       'fontColor': '#222',
       'fontWeight': 'bold',
 
@@ -147,7 +165,7 @@ goog.provide('anychart.themes.v6');
         'bottom': 2,
         'left': 4
       },
-      'fontFamily': 'Arial',
+      'fontFamily': 'Arial, Helvetica, sans-serif',
       'fontSize': 11,
       'fontColor': '#000',
       'rotation': 0,
@@ -162,13 +180,7 @@ goog.provide('anychart.themes.v6');
         'stroke': {'keys': ['0 #DDDDDD 1', '1 #D0D0D0 1'], 'angle': '90'},
         'fill': {'keys': ['0 #FFFFFF 1', '0.5 #F3F3F3 1', '1 #FFFFFF 1'], 'angle': '90'}
       },
-      /**
-       * @this {*}
-       * @return {*}
-       */
-      'textFormatter': function() {
-        return this['value'];
-      },
+      'textFormatter': returnValue,
       /**
        * @this {*}
        * @return {*}
@@ -202,7 +214,7 @@ goog.provide('anychart.themes.v6');
       'title': {
         'enabled': false,
         'fontSize': 10,
-        'fontFamily': 'Verdana',
+        'fontFamily': 'Verdana, Helvetica, Arial, sans-serif',
         'fontColor': '#232323',
         'fontWeight': 'bold',
         'vAlign': 'top',
@@ -247,7 +259,7 @@ goog.provide('anychart.themes.v6');
       'content': {
         'enabled': true,
         'fontSize': 10,
-        'fontFamily': 'Verdana',
+        'fontFamily': 'Verdana, Helvetica, Arial, sans-serif',
         'fontColor': '#232323',
         'fontWeight': 'bold',
         'vAlign': 'top',
@@ -279,7 +291,7 @@ goog.provide('anychart.themes.v6');
         'zIndex': 1
       },
       'fontSize': 10,
-      'fontFamily': 'Verdana',
+      'fontFamily': 'Verdana, Helvetica, Arial, sans-serif',
       'fontColor': '#232323',
       'fontWeight': 'bold',
       'vAlign': 'top',
@@ -370,7 +382,7 @@ goog.provide('anychart.themes.v6');
         'maxFontSize': 72,
         'anchor': 'center',
         'padding': {'top': 1, 'right': 2, 'bottom': 1, 'left': 2},
-        'fontFamily': 'Tahoma',
+        'fontFamily': 'Tahoma, Geneva, sans-serif',
         'fontSize': 11,
         'textWrap': 'noWrap',
         'background': {
@@ -378,13 +390,7 @@ goog.provide('anychart.themes.v6');
           'stroke': {'keys': ['#ddd', '#d0d0d0'], 'angle': '90'},
           'fill': {'keys': ['#fff', '#f3f3f3', '#fff'], 'angle': '90'}
         },
-        /**
-         * @this {*}
-         * @return {*}
-         */
-        'textFormatter': function() {
-          return (this['value']);
-        },
+        'textFormatter': returnValue,
         /**
          * @this {*}
          * @return {*}
@@ -408,7 +414,7 @@ goog.provide('anychart.themes.v6');
           'bottom': 0,
           'left': 1
         },
-        'fontFamily': 'Tahoma',
+        'fontFamily': 'Tahoma, Geneva, sans-serif',
         'fontSize': 11,
         'textWrap': 'noWrap',
         'background': {
@@ -575,7 +581,7 @@ goog.provide('anychart.themes.v6');
       'legend': {
         'enabled': false,
         'fontSize': '11',
-        'fontFamily': 'Tahoma',
+        'fontFamily': 'Tahoma, Geneva, sans-serif',
         'itemsLayout': 'horizontal',
         'itemsSpacing': 15,
         'iconSize': 13,
@@ -611,7 +617,7 @@ goog.provide('anychart.themes.v6');
         'title': {
           'enabled': false,
           'fontSize': '10',
-          'fontFamily': 'Verdana',
+          'fontFamily': 'Verdana, Helvetica, Arial, sans-serif',
           'text': 'Legend title',
           'background': {
             'enabled': false,
@@ -727,7 +733,7 @@ goog.provide('anychart.themes.v6');
       'defaultLabelSettings': {
         'enabled': true,
         'fontSize': 11,
-        'fontFamily': 'Tahoma',
+        'fontFamily': 'Tahoma, Geneva, sans-serif',
         'fontWeight': 'bold',
         'textWrap': 'byLetter',
 
@@ -858,7 +864,7 @@ goog.provide('anychart.themes.v6');
 
           'labels': {
             'enabled': false,
-            'fontFamily': 'Arial',
+            'fontFamily': 'Arial, Helvetica, sans-serif',
             'fontSize': 11,
 
             'background': {
@@ -877,13 +883,7 @@ goog.provide('anychart.themes.v6');
             'rotation': 0,
             'width': null,
             'height': null,
-            /**
-             * @this {*}
-             * @return {*}
-             */
-            'textFormatter': function() {
-              return this['value'];
-            },
+            'textFormatter': VALUE_TOKEN_DECIMALS_COUNT_2,
             /**
              * @this {*}
              * @return {*}
@@ -1676,6 +1676,9 @@ goog.provide('anychart.themes.v6');
           'text': 'X-Axis'
         },
         'width': null,
+        'labels': {
+          'textFormatter': VALUE_TOKEN_DECIMALS_COUNT_10
+        },
         'scale': 0
       },
       'defaultYAxisSettings': {
@@ -1689,6 +1692,9 @@ goog.provide('anychart.themes.v6');
           'enabled': true
         },
         'width': null,
+        'labels': {
+          'textFormatter': VALUE_TOKEN_DECIMALS_COUNT_10
+        },
         'scale': 1
       },
       'defaultLineMarkerSettings': {
@@ -1710,7 +1716,7 @@ goog.provide('anychart.themes.v6');
         'enabled': true,
 
         'fontSize': 11,
-        'fontFamily': 'Tahoma',
+        'fontFamily': 'Tahoma, Geneva, sans-serif',
         'fontColor': '#222222',
         'fontWeight': 'bold',
 
@@ -1827,7 +1833,7 @@ goog.provide('anychart.themes.v6');
           },
           'enabled': true,
           'fontSize': 11,
-          'fontFamily': 'Tahoma',
+          'fontFamily': 'Tahoma, Geneva, sans-serif',
           'fontColor': '#fff',
           'fontWeight': 400,
           'textWrap': 'byLetter',
@@ -1872,7 +1878,7 @@ goog.provide('anychart.themes.v6');
           },
           'enabled': true,
           'fontSize': 11,
-          'fontFamily': 'Tahoma',
+          'fontFamily': 'Tahoma, Geneva, sans-serif',
           'fontColor': '#fff',
           'fontWeight': 400,
           'textWrap': 'byLetter',
@@ -3022,7 +3028,7 @@ goog.provide('anychart.themes.v6');
         'enabled': true,
 
         'fontSize': 11,
-        'fontFamily': 'Tahoma',
+        'fontFamily': 'Tahoma, Geneva, sans-serif',
         'fontColor': '#222222',
         'fontWeight': 'bold',
 
@@ -3149,7 +3155,7 @@ goog.provide('anychart.themes.v6');
           },
           'enabled': true,
           'fontSize': 11,
-          'fontFamily': 'Tahoma',
+          'fontFamily': 'Tahoma, Geneva, sans-serif',
           'fontColor': '#fff',
           'fontWeight': 400,
           'textWrap': 'byLetter',
@@ -3192,7 +3198,7 @@ goog.provide('anychart.themes.v6');
           },
           'enabled': true,
           'fontSize': 11,
-          'fontFamily': 'Tahoma',
+          'fontFamily': 'Tahoma, Geneva, sans-serif',
           'fontColor': '#fff',
           'fontWeight': 400,
           'textWrap': 'byLetter',
@@ -3380,7 +3386,7 @@ goog.provide('anychart.themes.v6');
         'enabled': true,
         'fontSize': 13,
         'fontColor': null,
-        'fontFamily': 'Arial',
+        'fontFamily': 'Arial, Helvetica, sans-serif',
         'background': {
           'enabled': false
         },
@@ -3398,13 +3404,7 @@ goog.provide('anychart.themes.v6');
         'width': null,
         'height': null,
         'autoRotate': false,
-        /**
-         * @this {*}
-         * @return {*}
-         */
-        'textFormatter': function() {
-          return (this['value'] * 100 / this['getStat']('sum')).toFixed(1) + '%';
-        },
+        'textFormatter': Y_PERCENT_OF_TOTAL_TOKEN + '%',
         /**
          * @this {*}
          * @return {*}
@@ -3574,7 +3574,7 @@ goog.provide('anychart.themes.v6');
       'labels': {
         'enabled': true,
         'fontSize': 13,
-        'fontFamily': 'Arial',
+        'fontFamily': 'Arial, Helvetica, sans-serif',
         'fontColor': null,
         'disablePointerEvents': false,
 
@@ -4370,7 +4370,7 @@ goog.provide('anychart.themes.v6');
         'enabled': true,
 
         'fontSize': 11,
-        'fontFamily': 'Tahoma',
+        'fontFamily': 'Tahoma, Geneva, sans-serif',
         'fontColor': '#222222',
         'fontWeight': 'bold',
 
@@ -6314,7 +6314,7 @@ goog.provide('anychart.themes.v6');
       'label': {
         'enabled': true,
         'fontSize': 11,
-        'fontFamily': 'Tahoma',
+        'fontFamily': 'Tahoma, Geneva, sans-serif',
         'fontWeight': 'bold',
         'textWrap': 'byLetter',
         'text': 'Label text',
@@ -6388,7 +6388,7 @@ goog.provide('anychart.themes.v6');
         },
         'title': {
           'enabled': true,
-          'fontFamily': 'Verdana',
+          'fontFamily': 'Verdana, Helvetica, Arial, sans-serif',
           'fontSize': 10,
           'fontColor': '#232323',
           'text': 'Legend Title',
@@ -6575,7 +6575,7 @@ goog.provide('anychart.themes.v6');
       'textAxisMarker': {
         'enabled': true,
         'fontSize': 11,
-        'fontFamily': 'Tahoma',
+        'fontFamily': 'Tahoma, Geneva, sans-serif',
         'fontWeight': 'bold',
         'value': 0,
         'anchor': 'center',

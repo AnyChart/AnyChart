@@ -907,6 +907,8 @@ def __compile_css():
     except ImportError:
         raise ImportError('You need install lesscpy. Run `./build contrib`')
 
+    __create_dir_if_not_exists(OUT_PATH)
+
     print "Compile AnyChart UI css"
     if os.path.exists(CSS_OUT_PATH):
         os.remove(CSS_OUT_PATH)

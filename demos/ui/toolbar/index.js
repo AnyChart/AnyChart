@@ -2,24 +2,24 @@ var toolbar;
 anychart.onDocumentReady(function() {
   toolbar = anychart.toolbar();
 
-  toolbar.addChild(new anychart.ui.toolbar.Button('Button'), true);
+  toolbar.addChild(new goog.ui.ToolbarButton('Button'), true);
   toolbar.getChildAt(0).setTooltip('This is a tooltip for a button');
-  toolbar.addChild(new anychart.ui.toolbar.Button('AnotherButton'), true);
+  toolbar.addChild(new goog.ui.ToolbarButton('AnotherButton'), true);
   toolbar.addChild(new anychart.ui.toolbar.Separator(), true);
-  toolbar.addChild(new anychart.ui.toolbar.Button('Disabled'), true);
+  toolbar.addChild(new goog.ui.ToolbarButton('Disabled'), true);
   toolbar.getChildAt(3).setEnabled(false);
-  toolbar.addChild(new anychart.ui.toolbar.Button('YetAnotherButton'), true);
+  toolbar.addChild(new goog.ui.ToolbarButton('YetAnotherButton'), true);
   //var toggleButton = new goog.ui.ToolbarToggleButton(goog.dom.createDom('div',
   //    'icon goog-edit-bold'));
   //toggleButton.setChecked(true);
   //toolbar.addChild(toggleButton, true);
-  var btnLeft = new anychart.ui.toolbar.Button('Left');
+  var btnLeft = new goog.ui.ToolbarButton('Left');
   btnLeft.setCollapsed(goog.ui.ButtonSide.END);
   toolbar.addChild(btnLeft, true);
-  var btnCenter = new anychart.ui.toolbar.Button('Center');
+  var btnCenter = new goog.ui.ToolbarButton('Center');
   btnCenter.setCollapsed(goog.ui.ButtonSide.END | goog.ui.ButtonSide.START);
   toolbar.addChild(btnCenter, true);
-  var btnRight = new anychart.ui.toolbar.Button('Right');
+  var btnRight = new goog.ui.ToolbarButton('Right');
   btnRight.setCollapsed(goog.ui.ButtonSide.START);
   toolbar.addChild(btnRight, true);
 

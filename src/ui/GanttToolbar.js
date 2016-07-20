@@ -4,12 +4,13 @@ goog.require('anychart.core.reporting');
 goog.require('anychart.enums');
 goog.require('anychart.ui.menu.Item');
 goog.require('anychart.ui.menu.Menu');
-goog.require('anychart.ui.menu.Separator');
 goog.require('anychart.ui.menu.SubMenu');
-goog.require('anychart.ui.toolbar.Button');
 goog.require('anychart.ui.toolbar.MenuButton');
 goog.require('anychart.ui.toolbar.Separator');
 goog.require('anychart.ui.toolbar.Toolbar');
+
+goog.require('goog.ui.MenuSeparator');
+goog.require('goog.ui.ToolbarButton');
 
 
 
@@ -51,7 +52,7 @@ anychart.ui.GanttToolbar = function() {
   });
 
   this.printMenu_.addChild(this.switchPageOrientation_, true);
-  this.printMenu_.addChild(new anychart.ui.menu.Separator(), true);
+  this.printMenu_.addChild(new goog.ui.MenuSeparator(), true);
 
   this.printButton_ = new anychart.ui.toolbar.MenuButton('Print', this.printMenu_);
   this.printButton_.addClassName(anychart.ui.GanttToolbar.CssClass.PRINT);
@@ -97,17 +98,17 @@ anychart.ui.GanttToolbar = function() {
   // --------- ZOOM IN, ZOOM OUT, FIT ALL ----------
   this.addChild(new anychart.ui.toolbar.Separator(), true);
 
-  var zoomInButton = new anychart.ui.toolbar.Button('Zoom In');
+  var zoomInButton = new goog.ui.ToolbarButton('Zoom In');
   zoomInButton.addClassName(anychart.ui.GanttToolbar.CssClass.ZOOM_IN);
   zoomInButton.setModel({func: 'zoomIn'});
   this.addChild(zoomInButton, true);
 
-  var zoomOutButton = new anychart.ui.toolbar.Button('Zoom Out');
+  var zoomOutButton = new goog.ui.ToolbarButton('Zoom Out');
   zoomOutButton.addClassName(anychart.ui.GanttToolbar.CssClass.ZOOM_OUT);
   zoomOutButton.setModel({func: 'zoomOut'});
   this.addChild(zoomOutButton, true);
 
-  var fitAllButton = new anychart.ui.toolbar.Button('Fit All');
+  var fitAllButton = new goog.ui.ToolbarButton('Fit All');
   fitAllButton.addClassName(anychart.ui.GanttToolbar.CssClass.FIT_ALL);
   fitAllButton.setModel({func: 'fitAll'});
   this.addChild(fitAllButton, true);
@@ -115,12 +116,12 @@ anychart.ui.GanttToolbar = function() {
   // --------- EXPAND/COLLAPSE ----------
   this.addChild(new anychart.ui.toolbar.Separator(), true);
 
-  var expandAllButton = new anychart.ui.toolbar.Button('Expand All');
+  var expandAllButton = new goog.ui.ToolbarButton('Expand All');
   expandAllButton.addClassName(anychart.ui.GanttToolbar.CssClass.EXPAND_ALL);
   expandAllButton.setModel({func: 'expandAll'});
   this.addChild(expandAllButton, true);
 
-  var collapseAllButton = new anychart.ui.toolbar.Button('Collapse All');
+  var collapseAllButton = new goog.ui.ToolbarButton('Collapse All');
   collapseAllButton.addClassName(anychart.ui.GanttToolbar.CssClass.COLLAPSE_ALL);
   collapseAllButton.setModel({func: 'collapseAll'});
   this.addChild(collapseAllButton, true);

@@ -1,0 +1,93 @@
+.anychart-flat-menu-button {
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  background-color: #f5f5f5;
+  background-image: -webkit-linear-gradient(top,#f5f5f5,#f1f1f1);
+  background-image: -moz-linear-gradient(top,#f5f5f5,#f1f1f1);
+  background-image: -ms-linear-gradient(top,#f5f5f5,#f1f1f1);
+  background-image: -o-linear-gradient(top,#f5f5f5,#f1f1f1);
+  background-image: linear-gradient(top,#f5f5f5,#f1f1f1);
+  border: 1px solid #dcdcdc;
+  color: #333;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 27px;
+  list-style: none;
+  margin: 0 2px;
+  min-width: 46px;
+  outline: none;
+  padding: 0 18px 0 6px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.anychart-flat-menu-button-disabled {
+  background-color: #fff;
+  border-color: #f3f3f3;
+  color: #b8b8b8;
+  cursor: default;
+
+  .anychart-flat-menu-button-dropdown {
+    border-color: #b8b8b8 transparent;
+  }
+}
+
+.anychart-flat-menu-button-hover {
+  background-color: #f8f8f8;
+  background-image: -webkit-linear-gradient(top,#f8f8f8,#f1f1f1);
+  background-image: -moz-linear-gradient(top,#f8f8f8,#f1f1f1);
+  background-image: -ms-linear-gradient(top,#f8f8f8,#f1f1f1);
+  background-image: -o-linear-gradient(top,#f8f8f8,#f1f1f1);
+  background-image: linear-gradient(top,#f8f8f8,#f1f1f1);
+  -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.1);
+  -moz-box-shadow: 0 1px 1px rgba(0,0,0,.1);
+  box-shadow: 0 1px 1px rgba(0,0,0,.1);
+  border-color: #c6c6c6;
+  color: #111;
+}
+
+.anychart-flat-menu-button.anychart-flat-menu-button-open,
+.anychart-flat-menu-button.anychart-flat-menu-button-active {
+  -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+  -moz-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+  background-color: #eee;
+  background-image: -webkit-linear-gradient(top,#eee,#e0e0e0);
+  background-image: -moz-linear-gradient(top,#eee,#e0e0e0);
+  background-image: -ms-linear-gradient(top,#eee,#e0e0e0);
+  background-image: -o-linear-gradient(top,#eee,#e0e0e0);
+  background-image: linear-gradient(top,#eee,#e0e0e0);
+  border: 1px solid #ccc;
+  color: #333;
+  z-index: 2;
+}
+
+.anychart-flat-menu-button-focused {
+  border-color: #4d90fe;
+}
+
+.anychart-flat-menu-button-caption {
+  vertical-align: top;
+  white-space: nowrap;
+  padding-right: 20px;
+}
+
+.anychart-flat-menu-button-dropdown {
+  border-color: #777 transparent;
+  border-style: solid;
+  border-width: 4px 4px 0 4px;
+  height: 0;
+  width: 0;
+  position: absolute;
+  right: 5px;
+  top: 12px;
+}
+
+.anychart-flat-menu-button-active .anychart-flat-menu-button-dropdown,
+.anychart-flat-menu-button-open .anychart-flat-menu-button-dropdown,
+.anychart-flat-menu-button-selected .anychart-flat-menu-button-dropdown,
+.anychart-flat-menu-button-hover .anychart-flat-menu-button-dropdown {
+  border-color: #595959 transparent;
+}

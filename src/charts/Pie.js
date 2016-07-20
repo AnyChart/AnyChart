@@ -3117,7 +3117,17 @@ anychart.charts.Pie.prototype.makePointEvent = function(event) {
 
 /** @inheritDoc */
 anychart.charts.Pie.prototype.getPoint = function(index) {
-  return new anychart.core.PiePoint(this, index);
+  var point = new anychart.core.PiePoint(this, index);
+  var iter = this.getIterator();
+  var value;
+  if (iter.select(index) &&
+      point.exists() &&
+      !this.isMissing_(value = /** @type {number} */(point.get('value')))) {
+
+    point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_TOTAL] = value / /** @type {number} */(this.getStat(anychart.enums.Statistics.SUM)) * 100;
+  }
+
+  return point;
 };
 
 
@@ -3553,6 +3563,7 @@ anychart.charts.Pie.prototype.calculate = function() {
 anychart.charts.Pie.prototype.createFormatProvider = function(opt_force) {
   if (!this.pointProvider_ || opt_force)
     this.pointProvider_ = new anychart.core.utils.PointContextProvider(this, ['x', 'value', 'name']);
+  this.pointProvider_.pointInternal = this.getPoint(this.getIterator().getIndex());
   this.pointProvider_.applyReferenceValues();
   return this.pointProvider_;
 };

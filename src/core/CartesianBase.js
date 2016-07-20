@@ -867,6 +867,22 @@ anychart.core.CartesianBase.prototype.yAxis = function(opt_indexOrValue, opt_val
 
 
 /**
+ * @return {number} Number of series.
+ */
+anychart.core.CartesianBase.prototype.getXAxesCount = function() {
+  return this.xAxes_.length;
+};
+
+
+/**
+ * @return {number} Number of series.
+ */
+anychart.core.CartesianBase.prototype.getYAxesCount = function() {
+  return this.yAxes_.length;
+};
+
+
+/**
  * Listener for axes invalidation.
  * @param {anychart.SignalEvent} event Invalidation event.
  * @private

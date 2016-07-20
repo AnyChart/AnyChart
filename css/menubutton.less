@@ -1,0 +1,160 @@
+/* ------- MENU BUTTON ------- */
+
+/* State: resting. */
+.anychart-menu-button {
+  /* Client apps may override the URL at which they serve the image. */
+//todo
+  background: #ddd url("//ssl.gstatic.com/editor/button-bg.png") repeat-x top left;
+  border: 0;
+  color: #000;
+  cursor: pointer;
+  list-style: none;
+  margin: 2px;
+  outline: none;
+  padding: 0;
+  text-decoration: none;
+  vertical-align: middle;
+}
+
+/* Pseudo-rounded corners. */
+.anychart-menu-button-outer-box,
+.anychart-menu-button-inner-box {
+  border-style: solid;
+  border-color: #aaa;
+  vertical-align: top;
+}
+.anychart-menu-button-outer-box {
+  margin: 0;
+  border-width: 1px 0;
+  padding: 0;
+}
+.anychart-menu-button-inner-box {
+  margin: 0 -1px;
+  border-width: 0 1px;
+  padding: 3px 4px;
+}
+
+/* Pre-IE7 IE hack; ignored by IE7 and all non-IE browsers. */
+* html .anychart-menu-button-inner-box {
+  /* IE6 needs to have the box shifted to make the borders line up. */
+  left: -1px;
+}
+
+/* Pre-IE7 BiDi fixes. */
+* html .anychart-menu-button-rtl .anychart-menu-button-outer-box {
+  /* @noflip */ left: -1px;
+  /* @noflip */ right: auto;
+}
+* html .anychart-menu-button-rtl .anychart-menu-button-inner-box {
+  /* @noflip */ right: auto;
+}
+
+/* IE7-only hack; ignored by all other browsers. */
+*:first-child+html .anychart-menu-button-inner-box {
+  /* IE7 needs to have the box shifted to make the borders line up. */
+  left: -1px;
+}
+/* IE7 BiDi fix. */
+*:first-child+html .anychart-menu-button-rtl .anychart-menu-button-inner-box {
+  /* @noflip */ left: 1px;
+  /* @noflip */ right: auto;
+}
+
+/* Safari-only hacks. */
+::root .anychart-menu-button,
+::root .anychart-menu-button-outer-box,
+::root .anychart-menu-button-inner-box {
+  /* Required to make pseudo-rounded corners work on Safari. */
+  line-height: 0;
+}
+::root .anychart-menu-button-caption,
+::root .anychart-menu-button-dropdown {
+  /* Required to make pseudo-rounded corners work on Safari. */
+  line-height: normal;
+}
+
+/* State: disabled. */
+.anychart-menu-button-disabled {
+  background-image: none !important;
+  opacity: 0.3;
+  -moz-opacity: 0.3;
+  filter: alpha(opacity=30);
+  cursor: default;
+}
+.anychart-menu-button-disabled .anychart-menu-button-outer-box,
+.anychart-menu-button-disabled .anychart-menu-button-inner-box,
+.anychart-menu-button-disabled .anychart-menu-button-caption,
+.anychart-menu-button-disabled .anychart-menu-button-dropdown {
+  color: #333 !important;
+  border-color: #999 !important;
+}
+
+/* Pre-IE7 IE hack; ignored by IE7 and all non-IE browsers. */
+* html .anychart-menu-button-disabled {
+  margin: 2px 1px !important;
+  padding: 0 1px !important;
+}
+
+/* IE7-only hack; ignored by all other browsers. */
+*:first-child+html .anychart-menu-button-disabled {
+  margin: 2px 1px !important;
+  padding: 0 1px !important;
+}
+
+/* State: hover. */
+.anychart-menu-button-hover .anychart-menu-button-outer-box,
+.anychart-menu-button-hover .anychart-menu-button-inner-box {
+  border-color: #9cf #69e #69e #7af !important; /* Hover border wins. */
+}
+
+/* State: active, open. */
+.anychart-menu-button-active,
+.anychart-menu-button-open {
+  background-color: #bbb;
+  background-position: bottom left;
+}
+
+/* State: focused. */
+.anychart-menu-button-focused .anychart-menu-button-outer-box,
+.anychart-menu-button-focused .anychart-menu-button-inner-box {
+  border-color: orange;
+}
+
+/* Caption style. */
+.anychart-menu-button-caption {
+  padding: 0 4px 0 0;
+  vertical-align: top;
+}
+
+/* Dropdown arrow style. */
+.anychart-menu-button-dropdown {
+  height: 15px;
+  width: 7px;
+  /* Client apps may override the URL at which they serve the sprite. */
+  //todo
+  background: url("//ssl.gstatic.com/editor/editortoolbar.png") no-repeat -388px 0;
+  vertical-align: top;
+}
+
+/* Pill (collapsed border) styles. */
+/* TODO(gboyer): Remove specific menu button styles and have any button support being a menu button. */
+.anychart-menu-button-collapse-right,
+.anychart-menu-button-collapse-right .anychart-menu-button-outer-box,
+.anychart-menu-button-collapse-right .anychart-menu-button-inner-box {
+  margin-right: 0;
+}
+
+.anychart-menu-button-collapse-left,
+.anychart-menu-button-collapse-left .anychart-menu-button-outer-box,
+.anychart-menu-button-collapse-left .anychart-menu-button-inner-box {
+  margin-left: 0;
+}
+
+.anychart-menu-button-collapse-left .anychart-menu-button-inner-box  {
+  border-left: 1px solid #fff;
+}
+
+.anychart-menu-button-collapse-left.anychart-menu-button-checked
+.anychart-menu-button-inner-box {
+  border-left: 1px solid #ddd;
+}

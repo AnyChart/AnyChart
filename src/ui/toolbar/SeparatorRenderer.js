@@ -1,8 +1,6 @@
 goog.provide('anychart.ui.toolbar.SeparatorRenderer');
 
-goog.require('goog.ui.Separator');
 goog.require('goog.ui.ToolbarSeparatorRenderer');
-goog.require('goog.ui.registry');
 
 
 
@@ -19,23 +17,6 @@ goog.addSingletonGetter(anychart.ui.toolbar.SeparatorRenderer);
 
 
 /**
- * Default CSS class to be applied to the root element of toolbars rendered by this renderer.
- * @type {string}
- */
-anychart.ui.toolbar.SeparatorRenderer.CSS_CLASS = goog.getCssName('anychart-toolbar-separator');
-
-
-/**
- * Returns the CSS class to be applied to the root element of containers rendered using this renderer.
- * @return {string} - Renderer-specific CSS class.
- * @override
- */
-anychart.ui.toolbar.SeparatorRenderer.prototype.getCssClass = function() {
-  return anychart.ui.toolbar.SeparatorRenderer.CSS_CLASS;
-};
-
-
-/**
  * Returns a styled toolbar separator implemented by the following DOM:
  * <div class="anychart-toolbar-separator anychart-inline-block">&nbsp;</div>
  * Overrides {@link goog.ui.MenuSeparatorRenderer#createDom}.
@@ -44,15 +25,11 @@ anychart.ui.toolbar.SeparatorRenderer.prototype.getCssClass = function() {
  * @override
  */
 anychart.ui.toolbar.SeparatorRenderer.prototype.createDom = function(separator) {
-  // 00A0 is &nbsp;
-  return separator.getDomHelper().createDom(
-      'div', this.getClassNames(separator).join(' ') + ' ' + anychart.ui.INLINE_BLOCK_CLASSNAME, '\u00A0'
-  );
+  var element = separator.getDomHelper().createDom(goog.dom.TagName.DIV,
+      this.getClassNames(separator).join(' ') +
+          ' ' + goog.ui.INLINE_BLOCK_CLASSNAME);
+
+  // Don't use UTF-8.
+  element.innerHTML = '&nbsp;';
+  return element;
 };
-
-
-// Registers a decorator factory function for toolbar separators.
-// TODO (A.Kudryavtsev): Totally copied from final class goog.ui.ToolbarSeparator.
-goog.ui.registry.setDecoratorByClassName(anychart.ui.toolbar.SeparatorRenderer.CSS_CLASS, function() {
-  return new goog.ui.Separator(anychart.ui.toolbar.SeparatorRenderer.getInstance());
-});

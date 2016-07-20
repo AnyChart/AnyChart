@@ -13,7 +13,6 @@ goog.require('goog.style');
 goog.require('goog.ui.Component');
 goog.require('goog.ui.Menu');
 goog.require('goog.ui.MenuItem');
-goog.require('goog.ui.registry');
 
 
 
@@ -490,6 +489,7 @@ anychart.ui.menu.SubMenu.prototype.positionSubMenu = function() {
     el.style.visibility = 'visible';
   }
 
+  // Scrollable support
   var viewportSize = goog.dom.getViewportSize();
   var elementBounds = goog.style.getBounds(el);
   var elementClientPosition = goog.style.getClientPosition(el);
@@ -509,7 +509,7 @@ anychart.ui.menu.SubMenu.prototype.positionSubMenu = function() {
 
 /**
  * Adds a new menu item at the end of the menu.
- * @param {goog.ui.MenuHeader|anychart.ui.menu.Item|anychart.ui.menu.SubMenu|anychart.ui.menu.Separator} item Menu
+ * @param {goog.ui.MenuHeader|anychart.ui.menu.Item|anychart.ui.menu.SubMenu|goog.ui.MenuSeparator} item Menu
  *     item to add to the menu.
  */
 anychart.ui.menu.SubMenu.prototype.addItem = function(item) {
@@ -519,7 +519,7 @@ anychart.ui.menu.SubMenu.prototype.addItem = function(item) {
 
 /**
  * Adds a new menu item at a specific index in the menu.
- * @param {goog.ui.MenuHeader|anychart.ui.menu.Item|anychart.ui.menu.SubMenu|anychart.ui.menu.Separator} item Menu
+ * @param {goog.ui.MenuHeader|anychart.ui.menu.Item|anychart.ui.menu.SubMenu|goog.ui.MenuSeparator} item Menu
  *     item to add to the menu.
  * @param {number} n Index at which to insert the menu item.
  */
@@ -645,9 +645,3 @@ anychart.ui.menu.SubMenu.prototype.setMenu = function(menu, opt_internal) {
 anychart.ui.menu.SubMenu.prototype.containsElement = function(element) {
   return this.getMenu().containsElement(element);
 };
-
-
-// Register a decorator factory function for anychart.ui.menu.SubMenus.
-goog.ui.registry.setDecoratorByClassName(goog.getCssName('anychart-submenu'), function() {
-  return new anychart.ui.menu.SubMenu(null);
-});

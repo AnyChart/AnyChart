@@ -1,6 +1,5 @@
 goog.provide('anychart.ui.menu.SubMenuRenderer');
 
-goog.require('anychart.ui.menu.ItemRenderer');
 goog.require('anychart.ui.menu.Menu');
 goog.require('goog.a11y.aria');
 goog.require('goog.a11y.aria.State');
@@ -8,6 +7,7 @@ goog.require('goog.asserts');
 goog.require('goog.dom');
 goog.require('goog.dom.classlist');
 goog.require('goog.style');
+goog.require('goog.ui.MenuItemRenderer');
 
 
 
@@ -21,12 +21,12 @@ goog.require('goog.style');
  *      </div>
  *    </div>
  * @constructor
- * @extends {anychart.ui.menu.ItemRenderer}
+ * @extends {goog.ui.MenuItemRenderer}
  */
 anychart.ui.menu.SubMenuRenderer = function() {
   anychart.ui.menu.SubMenuRenderer.base(this, 'constructor');
 };
-goog.inherits(anychart.ui.menu.SubMenuRenderer, anychart.ui.menu.ItemRenderer);
+goog.inherits(anychart.ui.menu.SubMenuRenderer, goog.ui.MenuItemRenderer);
 goog.addSingletonGetter(anychart.ui.menu.SubMenuRenderer);
 
 
@@ -141,10 +141,9 @@ anychart.ui.menu.SubMenuRenderer.prototype.initializeDom = function(control) {
   var arrow = subMenu.getDomHelper().getElementsByTagNameAndClass(
       'span', anychart.ui.menu.SubMenuRenderer.CSS_CLASS_SUBMENU_, element)[0];
   /*
-    TODO (A.Kudryavtsev): Explanation.
-    In currently used version of closure library, the compiler does not obfuscate ASCII symbols correctly.
+    ACDVF must work with any encoding
       <code>
-        //This will not be compiled correctly.
+        //This will not be correctly in ASCII mode in browser.
         var leftArrow = '\u25C4';
         var rightArrow = '\u25BA';
         var nbsp = '\u00A0';

@@ -119,7 +119,7 @@ goog.global['anychart']['format']['locales'] = {
       'firstWeekCutOfDay': 3
     },
     'numberLocale': {
-      'decimalsCount': 2,
+      'decimalsCount': 1,
       'decimalPoint': '.',
       'groupsSeparator': '',
       'scale': false,
@@ -288,7 +288,7 @@ anychart.format.normalizeNumberLocale_ = function(locale) {
   var locales = goog.global['anychart']['format']['locales'];
   if (goog.isString(locale)) {
     var loc = locales[locale] || locales['default'];
-    locale = (loc && loc['numberLocale']) ? loc['numberLocale'] : null;
+    locale = (loc && loc['numberLocale']) ? loc['numberLocale'] : locales['default']['numberLocale'];
   }
   return goog.isObject(locale) ? locale : null;
 };

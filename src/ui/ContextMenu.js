@@ -4,10 +4,9 @@ goog.provide('anychart.ui.ContextMenu.Item');
 goog.provide('anychart.ui.ContextMenu.PrepareItemsContext');
 
 goog.require('anychart.ui.menu.Item');
-goog.require('anychart.ui.menu.Renderer');
-goog.require('anychart.ui.menu.Separator');
 goog.require('anychart.ui.menu.SubMenu');
 goog.require('goog.dom.classlist');
+goog.require('goog.ui.MenuSeparator');
 goog.require('goog.ui.PopupMenu');
 
 goog.forwardDeclare('anychart.core.Chart');
@@ -23,7 +22,7 @@ goog.forwardDeclare('anychart.core.VisualBase');
  * @extends {goog.ui.PopupMenu}
  */
 anychart.ui.ContextMenu = function() {
-  anychart.ui.ContextMenu.base(this, 'constructor', undefined, anychart.ui.menu.Renderer.getInstance());
+  anychart.ui.ContextMenu.base(this, 'constructor');
 
   /**
    * Save link to visual target on which triggered CONTEXTMENU event for ACTION event on items.
@@ -384,7 +383,7 @@ anychart.ui.ContextMenu.prototype.makeLevel_ = function(menu, model) {
 
     // treat as separator
     if (!goog.isDefAndNotNull(itemData)) {
-      this.addItemToMenu_(menu, new anychart.ui.menu.Separator());
+      this.addItemToMenu_(menu, new goog.ui.MenuSeparator());
 
     // treat as subMenu
     } else if (itemData['subMenu']) {
@@ -428,7 +427,7 @@ anychart.ui.ContextMenu.prototype.makeLevel_ = function(menu, model) {
 /**
  * Right add menuItem to menu or subMenu.
  * @param {anychart.ui.ContextMenu|anychart.ui.menu.Menu|anychart.ui.menu.SubMenu} menu
- * @param {anychart.ui.menu.Item|anychart.ui.menu.Separator|anychart.ui.menu.SubMenu} item
+ * @param {anychart.ui.menu.Item|goog.ui.MenuSeparator|anychart.ui.menu.SubMenu} item
  * @private
  */
 anychart.ui.ContextMenu.prototype.addItemToMenu_ = function(menu, item) {
@@ -452,7 +451,9 @@ anychart.ui.ContextMenu.prototype.setIconTo_ = function(item, opt_icon, opt_inde
         goog.dom.classlist.set(iconElement, opt_icon);
         goog.style.setElementShown(iconElement, true);
       } else {
-        goog.dom.insertChildAt(element, goog.dom.createDom(goog.dom.TagName.I, opt_icon), opt_index || 0);
+        iconElement = goog.dom.createDom(goog.dom.TagName.I, opt_icon);
+        goog.a11y.aria.setState(iconElement, goog.a11y.aria.State.HIDDEN, true);
+        goog.dom.insertChildAt(element, iconElement, opt_index || 0);
       }
     } else {
       if (iconElement) goog.style.setElementShown(iconElement, false);

@@ -2,7 +2,6 @@ goog.provide('anychart.ui.toolbar.MenuButton');
 
 goog.require('anychart.ui.toolbar.MenuButtonRenderer');
 goog.require('goog.ui.ToolbarMenuButton');
-goog.require('goog.ui.registry');
 
 
 
@@ -78,11 +77,3 @@ anychart.ui.toolbar.MenuButton.prototype.handleKeyEventInternal = function(e) {
   // Key event wasn't handled by the component.
   return false;
 };
-
-
-// Registers a decorator factory function for toolbar menu buttons.
-goog.ui.registry.setDecoratorByClassName(
-    anychart.ui.toolbar.MenuButtonRenderer.CSS_CLASS,
-    function() {
-      return new anychart.ui.toolbar.MenuButton(null);
-    });

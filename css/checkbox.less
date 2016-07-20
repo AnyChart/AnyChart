@@ -1,0 +1,77 @@
+/* ------- CHECKBOX ------- */
+
+.anychart-checkbox {
+  cursor: pointer;
+  display: inline-block;
+  margin: 2px 2px 2px 0;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+  white-space: nowrap;
+  vertical-align: middle;
+
+  .anychart-checkbox-element {
+    -webkit-border-radius: 1px;
+    -moz-border-radius: 1px;
+    border-radius: 1px;
+    background-color: rgba(255,255,255,.05);
+    border: 1px solid #c6c6c6;
+    border: 1px solid rgba(155,155,155,.57);
+    height: 11px;
+    margin: 0 4px 1px 1px;
+    outline: 0;
+    vertical-align: text-bottom;
+    width: 11px;
+  }
+}
+
+.anychart-checkbox-hover {
+  .anychart-checkbox-element {
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .1);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .1);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .1);
+    border: 1px solid #b2b2b2;
+  }
+}
+
+.anychart-checkbox-focused {
+  .anychart-checkbox-element {
+    border: 1px solid #4d90fe;
+  }
+}
+
+.anychart-checkbox-checked {
+  background-color: #fff;
+  background-color: rgba(255,255,255,.65);
+
+  .anychart-checkbox-checkmark {
+    display: inline-block;
+  }
+}
+
+.anychart-checkbox-undetermined {
+
+}
+
+.anychart-checkbox-unchecked {
+
+}
+
+.anychart-checkbox-disabled {
+  .anychart-checkbox-element {
+    background-color: #fff;
+    border: 1px solid #f1f1f1;
+    cursor: default;
+  }
+}
+
+.anychart-checkbox-checkmark {
+  display: none;
+  opacity: 0.6;
+  height: 15px;
+  outline: 0;
+  width: 15px;
+  left: 0;
+  position: relative;
+  top: -3px;
+}

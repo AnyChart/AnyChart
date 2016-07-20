@@ -67,11 +67,21 @@ anychart.core.utils.AxisLabelsContextProvider.prototype.getTokenValue = function
 
 /** @inheritDoc */
 anychart.core.utils.AxisLabelsContextProvider.prototype.getTokenType = function(name) {
+  var scale = this['axis'].scale();
+
   switch (name) {
     case anychart.enums.StringToken.AXIS_SCALE_MAX:
     case anychart.enums.StringToken.AXIS_SCALE_MIN:
     case anychart.enums.StringToken.INDEX:
       return anychart.enums.TokenType.NUMBER;
+    case anychart.enums.StringToken.VALUE:
+      if (scale instanceof anychart.scales.Linear) {
+        return anychart.enums.TokenType.NUMBER;
+      } else if (scale instanceof anychart.scales.Ordinal) {
+        return anychart.enums.TokenType.STRING;
+      } else if (scale instanceof anychart.scales.DateTime) {
+        return anychart.enums.TokenType.STRING;
+      }
   }
   return anychart.core.utils.AxisLabelsContextProvider.base(this, 'getTokenType', name);
 };

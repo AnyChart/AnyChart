@@ -150,6 +150,74 @@ anychart.data.Mapping.prototype.parentViewChangedHandler = function(event) {
 
 
 /**
+ * @const
+ * @type {!Object.<Array.<number>>}
+ */
+anychart.data.Mapping.DEFAULT_ARRAY_MAPPING = {
+  'x': [0],
+  'value': [1, 0],
+  'size': [2, 1], // bubble series
+  'open': [1],
+  'high': [2],
+  'low': [3, 1],
+  'close': [4],
+
+  // box/whisker series
+  'lowest': [1],
+  'q1': [2],
+  'median': [3],
+  'q3': [4],
+  'highest': [5],
+  'outliers': [6],
+
+  // maps
+  'id': [0],
+  'lat': [0],
+  'long': [1],
+  'points': [0],  //connector series
+
+  // heat map
+  'y': [1],
+  'heat': [2]
+};
+
+
+/**
+ * @const
+ * @type {!Object.<Array.<string>>}
+ */
+anychart.data.Mapping.DEFAULT_OBJECT_MAPPING = {
+  //'x': ['x'], // this mapping entry can be omitted cause of defaults
+  'x': ['column', 'x'],
+  'value': ['value', 'y', 'close', 'heat'], // 'value' here enforces checking order
+
+  'lowest': ['lowest', 'low'],
+  'highest': ['highest', 'high'],
+  //for maps
+  'lat': ['lat', 'y', 'value'],
+  'long': ['long', 'lon', 'x'],
+  //for heat map
+
+  'y': ['row', 'y'],
+  'heat': ['heat', 'value']
+};
+
+
+/**
+ * @const
+ * @type {!Array<string>}
+ */
+anychart.data.Mapping.DEFAULT_SIMPLE_ROW_MAPPING = ['value', 'close'];
+
+
+/**
+ * @const
+ * @type {!Array<string>}
+ */
+anychart.data.Mapping.DEFAULT_INDEX_MAPPING = ['x'];
+
+
+/**
  * Initializes mapping info objects for the mapping.
  * @param {!Object.<(Array.<number>|number)>=} opt_arrayMapping Mapping settings for array rows.
  * @param {!Object.<(Array.<string>|string)>=} opt_objectMapping Mapping setting for object rows.
@@ -186,54 +254,14 @@ anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt
    * @type {!Object.<Array.<number>>}
    * @private
    */
-  this.arrayMapping_ = /** @type {!Object.<Array.<number>>} */(opt_arrayMapping) || {
-    'x': [0],
-    'value': [1, 0],
-    'size': [2, 1], // bubble series
-    'open': [1],
-    'high': [2],
-    'low': [3, 1],
-    'close': [4],
-
-    // box/whisker series
-    'lowest': [1],
-    'q1': [2],
-    'median': [3],
-    'q3': [4],
-    'highest': [5],
-    'outliers': [6],
-
-    // maps
-    'id': [0],
-    'lat': [0],
-    'long': [1],
-    'points': [0],  //connector series
-
-    // heat map
-    'y': [1],
-    'heat': [2]
-  };
+  this.arrayMapping_ = /** @type {!Object.<Array.<number>>} */(opt_arrayMapping) || anychart.data.Mapping.DEFAULT_ARRAY_MAPPING;
 
   /**
    * Mapping settings for object rows.
    * @type {!Object.<Array.<string>>}
    * @private
    */
-  this.objectMapping_ = /** @type {!Object.<Array.<string>>} */(opt_objectMapping) || {
-    //'x': ['x'], // this mapping entry can be omitted cause of defaults
-    'x': ['column', 'x'],
-    'value': ['value', 'y', 'close', 'heat'], // 'value' here enforces checking order
-
-    'lowest': ['lowest', 'low'],
-    'highest': ['highest', 'high'],
-    //for maps
-    'lat': ['lat', 'y', 'value'],
-    'long': ['long', 'lon', 'x'],
-    //for heat map
-
-    'y': ['row', 'y'],
-    'heat': ['heat', 'value']
-  };
+  this.objectMapping_ = /** @type {!Object.<Array.<string>>} */(opt_objectMapping) || anychart.data.Mapping.DEFAULT_OBJECT_MAPPING;
 
   /**
    * Mapping array for the fields where values can be taken as a row value
@@ -241,7 +269,7 @@ anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt
    * @type {!Array.<string>}
    * @private
    */
-  this.defaultProps_ = opt_defaultProps || ['value', 'close'];
+  this.defaultProps_ = opt_defaultProps || anychart.data.Mapping.DEFAULT_SIMPLE_ROW_MAPPING;
 
   /**
    * Mapping array for the fields where values can be taken as an index of a row
@@ -249,7 +277,7 @@ anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt
    * @type {!Array.<string>}
    * @private
    */
-  this.indexProps_ = opt_indexProps || ['x'];
+  this.indexProps_ = opt_indexProps || anychart.data.Mapping.DEFAULT_INDEX_MAPPING;
 
   this.writeToFirstFieldByMapping_ = !!opt_writeToFirstFieldByMapping;
 };
@@ -273,7 +301,33 @@ anychart.data.Mapping.prototype.getObjectMapping = function() {
 };
 
 
+/**
+ * Getter for simple row mapping.
+ * @return {!Array.<string>} Simple row mapping.
+ */
+anychart.data.Mapping.prototype.getSimpleRowMapping = function() {
+  return this.defaultProps_;
+};
+
+
+/**
+ * Getter for index mapping.
+ * @return {!Array.<string>} Simple row mapping.
+ */
+anychart.data.Mapping.prototype.getIndexMapping = function() {
+  return this.indexProps_;
+};
+
+
 //exports
-anychart.data.Mapping.prototype['row'] = anychart.data.Mapping.prototype.row;//inherited
-anychart.data.Mapping.prototype['getRowsCount'] = anychart.data.Mapping.prototype.getRowsCount;//inherited
-anychart.data.Mapping.prototype['getIterator'] = anychart.data.Mapping.prototype.getIterator;//inherited
+goog.exportSymbol('anychart.data.Mapping.DEFAULT_ARRAY_MAPPING', anychart.data.Mapping.DEFAULT_ARRAY_MAPPING);
+goog.exportSymbol('anychart.data.Mapping.DEFAULT_OBJECT_MAPPING', anychart.data.Mapping.DEFAULT_OBJECT_MAPPING);
+goog.exportSymbol('anychart.data.Mapping.DEFAULT_SIMPLE_ROW_MAPPING', anychart.data.Mapping.DEFAULT_SIMPLE_ROW_MAPPING);
+goog.exportSymbol('anychart.data.Mapping.DEFAULT_INDEX_MAPPING', anychart.data.Mapping.DEFAULT_INDEX_MAPPING);
+anychart.data.Mapping.prototype['getRowsCount'] = anychart.data.Mapping.prototype.getRowsCount;
+anychart.data.Mapping.prototype['getIterator'] = anychart.data.Mapping.prototype.getIterator;
+anychart.data.Mapping.prototype['row'] = anychart.data.Mapping.prototype.row;
+anychart.data.Mapping.prototype['getArrayMapping'] = anychart.data.Mapping.prototype.getArrayMapping;
+anychart.data.Mapping.prototype['getObjectMapping'] = anychart.data.Mapping.prototype.getObjectMapping;
+anychart.data.Mapping.prototype['getSimpleRowMapping'] = anychart.data.Mapping.prototype.getSimpleRowMapping;
+anychart.data.Mapping.prototype['getIndexMapping'] = anychart.data.Mapping.prototype.getIndexMapping;

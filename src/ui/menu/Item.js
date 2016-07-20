@@ -1,8 +1,6 @@
 goog.provide('anychart.ui.menu.Item');
 
-goog.require('anychart.ui.menu.ItemRenderer');
 goog.require('goog.ui.MenuItem');
-goog.require('goog.ui.registry');
 
 
 
@@ -15,13 +13,12 @@ goog.require('goog.ui.registry');
  * @param {*=} opt_model Data/model associated with the menu item.
  * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper used for
  *     document interactions.
- * @param {anychart.ui.menu.ItemRenderer=} opt_renderer Optional renderer.
+ * @param {goog.ui.MenuItemRenderer=} opt_renderer Optional renderer.
  * @constructor
  * @extends {goog.ui.MenuItem}
  */
 anychart.ui.menu.Item = function(content, opt_model, opt_domHelper, opt_renderer) {
-  anychart.ui.menu.Item.base(this, 'constructor', content, opt_model, opt_domHelper,
-      opt_renderer || anychart.ui.menu.ItemRenderer.getInstance());
+  anychart.ui.menu.Item.base(this, 'constructor', content, opt_model, opt_domHelper, opt_renderer);
 
   /**
    * Item is placed in a scrollable container.
@@ -29,8 +26,6 @@ anychart.ui.menu.Item = function(content, opt_model, opt_domHelper, opt_renderer
    * @private
    */
   this.scrollable_ = false;
-
-  this.setValue(opt_model);
 };
 goog.inherits(anychart.ui.menu.Item, goog.ui.MenuItem);
 goog.tagUnsealableClass(anychart.ui.menu.Item);
@@ -63,12 +58,3 @@ anychart.ui.menu.Item.prototype.render_ = function(opt_parentElement, opt_before
   }
   anychart.ui.menu.Item.superClass_.render_.call(this, opt_parentElement, opt_beforeNode);
 };
-
-
-// Register a decorator factory function for anychart.ui.menu.Items.
-goog.ui.registry.setDecoratorByClassName(anychart.ui.menu.ItemRenderer.CSS_CLASS,
-    function() {
-      // MenuItem defaults to using MenuItemRenderer.
-      return new anychart.ui.menu.Item(null);
-    });
-

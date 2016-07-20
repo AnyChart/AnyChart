@@ -31,6 +31,24 @@ goog.provide('anychart.themes.defaultTheme');
 
 
   /**
+   * @const {string}
+   */
+  var VALUE_TOKEN_DECIMALS_COUNT_2 = '{%Value}{decimalsCount:2}';
+
+
+  /**
+   * @const {string}
+   */
+  var VALUE_TOKEN_DECIMALS_COUNT_10 = '{%Value}{decimalsCount:10}';
+
+
+  /**
+   * @const {string}
+   */
+  var Y_PERCENT_OF_TOTAL_TOKEN = '{%YPercentOfTotal}{decimalsCount:1,zeroFillDecimals:true}';
+
+
+  /**
    * @this {*}
    * @return {*}
    */
@@ -1324,6 +1342,11 @@ goog.provide('anychart.themes.defaultTheme');
 
     'cartesianBase': {
       'defaultSeriesSettings': {
+        'base': {
+          'labels': {
+            'textFormatter': VALUE_TOKEN_DECIMALS_COUNT_2
+          }
+        },
         'bar': {
           'markers': {
             'position': 'right'
@@ -1428,6 +1451,9 @@ goog.provide('anychart.themes.defaultTheme');
           'text': 'X-Axis',
           'padding': {'top': 5, 'right': 0, 'bottom': 0, 'left': 0}
         },
+        'labels': {
+          'textFormatter': VALUE_TOKEN_DECIMALS_COUNT_10
+        },
         'scale': 0
       },
       'defaultYAxisSettings': {
@@ -1435,6 +1461,9 @@ goog.provide('anychart.themes.defaultTheme');
         'title': {
           'text': 'Y-Axis',
           'padding': {'top': 0, 'right': 0, 'bottom': 5, 'left': 0}
+        },
+        'labels': {
+          'textFormatter': VALUE_TOKEN_DECIMALS_COUNT_10
         },
         'scale': 1
       },
@@ -1863,13 +1892,7 @@ goog.provide('anychart.themes.defaultTheme');
       'outsideLabelsSpace': 30,
       'insideLabelsOffset': '50%',
       'labels': {
-        /**
-         * @this {*}
-         * @return {*}
-         */
-        'textFormatter': function() {
-          return (this['value'] * 100 / this['getStat']('sum')).toFixed(1) + '%';
-        }
+        'textFormatter': Y_PERCENT_OF_TOTAL_TOKEN + '%'
       }
     },
     'funnel': {

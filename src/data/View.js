@@ -754,6 +754,7 @@ anychart.data.View.prototype['concat'] = anychart.data.View.prototype.concat;//d
 anychart.data.View.prototype['row'] = anychart.data.View.prototype.row;//doc|ex
 anychart.data.View.prototype['getRowsCount'] = anychart.data.View.prototype.getRowsCount;//doc|ex
 anychart.data.View.prototype['getIterator'] = anychart.data.View.prototype.getIterator;//doc|ex
+anychart.data.View.prototype['getDataSets'] = anychart.data.View.prototype.getDataSets;//doc|ex
 anychart.data.View.prototype['meta'] = anychart.data.View.prototype.meta;//doc|need-ex
 anychart.data.View.prototype['get'] = anychart.data.View.prototype.get;//doc|ex
 anychart.data.View.prototype['set'] = anychart.data.View.prototype.set;//doc|ex
