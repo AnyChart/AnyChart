@@ -657,6 +657,22 @@ goog.provide('anychart.themes.defaultTheme');
       }
     },
 
+    'defaultCallout': {
+      'enabled': true,
+      'orientation': 'left',
+      'title': {'enabled': false},
+      'padding': {'top': 0, 'right': 0, 'bottom': 0, 'left': 0},
+      'margin': {'top': 0, 'right': 0, 'bottom': 0, 'left': 0},
+      'align': 'center',
+      'labels': {
+        'vAlign': 'center',
+        'hAlign': 'center',
+        'positionFormatter': returnValue,
+        'adjustFontSize': false,
+        'connectorStroke': null
+      }
+    },
+
     'defaultScroller': {
       'enabled': false,
       'fill': '#f7f7f7',
@@ -2441,6 +2457,7 @@ goog.provide('anychart.themes.defaultTheme');
 
     // merge with chart
     'map': {
+      'defaultCalloutSettings': {},
       'defaultSeriesSettings': {
         'base': {
           /**
@@ -2619,6 +2636,7 @@ goog.provide('anychart.themes.defaultTheme');
       'colorRange': {
         'zIndex': 50
       },
+      'callouts': [],
       'unboundRegions': {'enabled': true, 'fill': '#F7F7F7', 'stroke': '#e0e0e0'},
       'legend': {'enabled': false},
       'maxBubbleSize': '20%',

@@ -94,7 +94,6 @@ anychart.onDocumentReady(function() {
   chart.geoData(anychart.maps.france);
   // generateData(chart);
   chart.interactivity().zoomOnMouseWheel(true);
-
   chart.overlapMode(false);
 
   // series = chart.choropleth(generateData(chart));
@@ -109,9 +108,9 @@ anychart.onDocumentReady(function() {
   // series1.enabled(false);
 
 
-  series2 = chart.choropleth(data2);
-  series2.labels().enabled(true).padding(0);
-  series2.tooltip(false);
+  // series2 = chart.choropleth(data2);
+  // series2.labels().enabled(true).padding(0);
+  // series2.tooltip(false);
   // series2.overlapMode(false);
 
 
@@ -148,6 +147,8 @@ anychart.onDocumentReady(function() {
   //   {id: 'FR.G', value: 2, labelrank: 1}
   // ]);
   // series2.labels(true);
+
+  chart.legend(true);
 
   chart.container('container').draw();
 });

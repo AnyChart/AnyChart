@@ -1,9 +1,11 @@
+//region --- Requiring and Providing
 goog.provide('anychart.core.map.series.Base');
 goog.require('anychart.core.SeriesBase');
 goog.require('anychart.core.map.geom');
 goog.require('anychart.core.utils.MapPointContextProvider');
 goog.require('anychart.enums');
 goog.require('goog.graphics.AffineTransform');
+//endregion
 
 
 
@@ -21,19 +23,14 @@ anychart.core.map.series.Base = function(opt_data, opt_csvSettings) {
 
   this.geoData = [];
   this.needSelfLayer = true;
+  this.seriesPoints = [];
 
   this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.core.map.series.Base, anychart.core.SeriesBase);
 
 
-/**
- * Map of series constructors by type.
- * @type {Object.<string, Function>}
- */
-anychart.core.map.series.Base.SeriesTypesMap = {};
-
-
+//region --- Class const
 /**
  * Supported signals.
  * @type {number}
@@ -77,6 +74,15 @@ anychart.core.map.series.Base.ZINDEX_SERIES = 1;
  * @type {number}
  */
 anychart.core.map.series.Base.ZINDEX_HATCH_FILL = 2;
+
+
+//endregion
+//region --- Class prop
+/**
+ * Map of series constructors by type.
+ * @type {Object.<string, Function>}
+ */
+anychart.core.map.series.Base.SeriesTypesMap = {};
 
 
 /**
@@ -157,6 +163,14 @@ anychart.core.map.series.Base.prototype.geoData;
 
 
 /**
+ * @type {Array.<String>}
+ */
+anychart.core.map.series.Base.prototype.seriesPoints;
+
+
+//endregion
+//region --- Coloring
+/**
  * Color scale.
  * @param {(anychart.scales.LinearColor|anychart.scales.OrdinalColor)=} opt_value Scale to set.
  * @return {anychart.scales.OrdinalColor|anychart.scales.LinearColor|anychart.core.map.series.Base} Default chart color scale value or itself for
@@ -167,6 +181,28 @@ anychart.core.map.series.Base.prototype.colorScale = function(opt_value) {
 };
 
 
+/** @inheritDoc */
+anychart.core.map.series.Base.prototype.normalizeColor = function(color, var_args) {
+  var fill;
+  if (goog.isFunction(color)) {
+    var sourceColor = arguments.length > 1 ?
+        this.normalizeColor.apply(this, goog.array.slice(arguments, 1)) :
+        this.color();
+    var scope = {
+      'index': this.getIterator().getIndex(),
+      'sourceColor': sourceColor,
+      'iterator': this.getIterator(),
+      'referenceValueNames': this.referenceValueNames
+    };
+    fill = color.call(scope);
+  } else
+    fill = color;
+  return fill;
+};
+
+
+//endregion
+//region --- Geo properties
 /**
  * Sets/gets geo id field.
  * @param {?string=} opt_value Geo id.
@@ -228,11 +264,149 @@ anychart.core.map.series.Base.prototype.setGeoData = function(geoData) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Sufficient properties
-//
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region --- Labels
+/**
+ * Returns label bounds.
+ * @param {number} index Point index.
+ * @param {number=} opt_pointState Point state.
+ * @return {Array.<number>}
+ */
+anychart.core.map.series.Base.prototype.getLabelBounds = function(index, opt_pointState) {
+  var iterator = this.getIterator();
+  iterator.select(index);
+  var pointState = goog.isDef(opt_pointState) ? opt_pointState : this.state.getPointStateByIndex(index);
+
+  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
+  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
+  var isDraw, pointLabel, stateLabel, labelEnabledState, stateLabelEnabledState;
+
+  pointLabel = iterator.get('label');
+  labelEnabledState = pointLabel && goog.isDef(pointLabel['enabled']) ? pointLabel['enabled'] : null;
+  var parentLabelsFactory = this.labels();
+  var currentLabelsFactory = null;
+  if (selected) {
+    stateLabel = iterator.get('selectLabel');
+    stateLabelEnabledState = stateLabel && goog.isDef(stateLabel['enabled']) ? stateLabel['enabled'] : null;
+    currentLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels());
+  } else if (hovered) {
+    stateLabel = iterator.get('hoverLabel');
+    stateLabelEnabledState = stateLabel && goog.isDef(stateLabel['enabled']) ? stateLabel['enabled'] : null;
+    currentLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels());
+  } else {
+    stateLabel = null;
+  }
+
+  if (selected || hovered) {
+    isDraw = goog.isNull(stateLabelEnabledState) ?
+        goog.isNull(currentLabelsFactory.enabled()) ?
+            goog.isNull(labelEnabledState) ?
+                parentLabelsFactory.enabled() :
+                labelEnabledState :
+            currentLabelsFactory.enabled() :
+        stateLabelEnabledState;
+  } else {
+    isDraw = goog.isNull(labelEnabledState) ?
+        parentLabelsFactory.enabled() :
+        labelEnabledState;
+  }
+
+  if (isDraw) {
+    var position = this.getLabelsPosition(pointState);
+
+    var positionProvider = this.createLabelsPositionProvider(/** @type {anychart.enums.Position|string} */(position));
+    var formatProvider = this.createFormatProvider(true);
+
+    var settings = {};
+
+    if (pointLabel)
+      goog.object.extend(settings, /** @type {Object} */(pointLabel));
+    if (currentLabelsFactory)
+      goog.object.extend(settings, currentLabelsFactory.getChangedSettings());
+    if (stateLabel)
+      goog.object.extend(settings, /** @type {Object} */(stateLabel));
+
+    var anchor = settings['anchor'];
+    if (!goog.isDef(anchor) || goog.isNull(anchor)) {
+      settings['anchor'] = this.getIterator().meta('labelAnchor');
+    }
+
+    return parentLabelsFactory.measure(formatProvider, positionProvider, settings, index).toCoordinateBox();
+  } else {
+    return null;
+  }
+};
+
+
+/** @inheritDoc */
+anychart.core.map.series.Base.prototype.configureLabel = function(pointState, opt_reset) {
+  var label = /** @type {anychart.core.ui.LabelsFactory.Label} */(anychart.core.map.series.Base.base(this, 'configureLabel', pointState, opt_reset));
+  if (label) {
+    var anchor = /** @type {anychart.enums.Anchor} */(label.getMergedSettings()['anchor']);
+    if (!goog.isDef(anchor) || goog.isNull(anchor)) {
+      var autoAnchor = {'anchor': /** @type {anychart.enums.Anchor} */(this.getIterator().meta('labelAnchor'))};
+      label.setSettings(autoAnchor, autoAnchor);
+    }
+  }
+
+  return label;
+};
+
+
+/**
+ * Anchor for angle of label
+ * @param {number} angle Label angle.
+ * @return {anychart.enums.Anchor}
+ * @protected
+ */
+anychart.core.map.series.Base.prototype.getAnchorForLabel = function(angle) {
+  angle = goog.math.standardAngle(angle);
+  var anchor = anychart.enums.Anchor.CENTER;
+  if (angle == 0) {
+    anchor = anychart.enums.Anchor.CENTER_BOTTOM;
+  } else if (angle < 90) {
+    anchor = anychart.enums.Anchor.LEFT_BOTTOM;
+  } else if (angle == 90) {
+    anchor = anychart.enums.Anchor.LEFT_CENTER;
+  } else if (angle < 180) {
+    anchor = anychart.enums.Anchor.LEFT_TOP;
+  } else if (angle == 180) {
+    anchor = anychart.enums.Anchor.CENTER_TOP;
+  } else if (angle < 270) {
+    anchor = anychart.enums.Anchor.RIGHT_TOP;
+  } else if (angle == 270) {
+    anchor = anychart.enums.Anchor.RIGHT_CENTER;
+  } else if (angle > 270) {
+    anchor = anychart.enums.Anchor.RIGHT_BOTTOM;
+  }
+  return anchor;
+};
+
+
+/**
+ * Defines show label if it don't intersect with other anyone label or not show.
+ * @param {(anychart.enums.LabelsOverlapMode|string|boolean)=} opt_value .
+ * @return {anychart.enums.LabelsOverlapMode|anychart.core.map.series.Base} .
+ */
+anychart.core.map.series.Base.prototype.overlapMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = goog.isNull(opt_value) ? opt_value : anychart.enums.normalizeLabelsOverlapMode(opt_value) == anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP;
+    if (this.overlapMode_ != val) {
+      this.overlapMode_ = val;
+      this.invalidate(anychart.ConsistencyState.SERIES_LABELS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_OVERLAP);
+    }
+    return this;
+  }
+  return goog.isNull(this.overlapMode_) ?
+      /** @type {anychart.enums.LabelsOverlapMode} */(this.map.overlapMode()) :
+      this.overlapMode_ ?
+          anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP :
+          anychart.enums.LabelsOverlapMode.NO_OVERLAP;
+};
+
+
+//endregion
+//region --- Check functions
 /**
  * Tester if the series has markers() method.
  * @return {boolean}
@@ -260,38 +434,8 @@ anychart.core.map.series.Base.prototype.needDrawHatchFill = function() {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Label settings.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Defines show label if it don't intersect with other anyone label or not show.
- * @param {(anychart.enums.LabelsOverlapMode|string|boolean)=} opt_value .
- * @return {anychart.enums.LabelsOverlapMode|anychart.core.map.series.Base} .
- */
-anychart.core.map.series.Base.prototype.overlapMode = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    var val = goog.isNull(opt_value) ? opt_value : anychart.enums.normalizeLabelsOverlapMode(opt_value) == anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP;
-    if (this.overlapMode_ != val) {
-      this.overlapMode_ = val;
-      this.invalidate(anychart.ConsistencyState.SERIES_LABELS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_OVERLAP);
-    }
-    return this;
-  }
-  return goog.isNull(this.overlapMode_) ?
-      /** @type {anychart.enums.LabelsOverlapMode} */(this.map.overlapMode()) :
-      this.overlapMode_ ?
-          anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP :
-          anychart.enums.LabelsOverlapMode.NO_OVERLAP;
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Statistics
-//
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region --- Statistics
 /** @inheritDoc */
 anychart.core.map.series.Base.prototype.calculateStatistics = function() {
   var seriesMax = -Infinity;
@@ -325,39 +469,8 @@ anychart.core.map.series.Base.prototype.calculateStatistics = function() {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Drawing.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Calculation before draw.
- */
-anychart.core.map.series.Base.prototype.calculate = function() {
-  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA)) {
-    var iterator = this.getResetIterator();
-    var index = this.map.getIndexedGeoData()[this.geoIdField()];
-    while (iterator.advance()) {
-      var name = iterator.get('id');
-      if (!name || !(goog.isString(name) || goog.isArray(name)))
-        continue;
-      name = goog.isArray(name) ? name : [name];
-
-      iterator.meta('features', undefined);
-      var features = [];
-      for (var j = 0, len_ = name.length; j < len_; j++) {
-        var id = name[j];
-        var point = index[id];
-        if (point) {
-          features.push(point);
-        }
-      }
-      iterator.meta('features', features);
-    }
-  }
-};
-
-
+//endregion
+//region --- Interactivity
 /**
  * Update series elements on zoom or move map interactivity.
  * p.s. There is should be logic for series that does some manipulation with series elements. Now it is just series redrawing.
@@ -500,6 +613,36 @@ anychart.core.map.series.Base.prototype.applyZoomMoveTransform = function() {
 };
 
 
+//endregion
+//region --- Drawing
+/**
+ * Calculation before draw.
+ */
+anychart.core.map.series.Base.prototype.calculate = function() {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA)) {
+    var iterator = this.getResetIterator();
+    var index = this.map.getIndexedGeoData()[this.geoIdField()];
+    while (iterator.advance()) {
+      var name = iterator.get('id');
+      if (!name || !(goog.isString(name) || goog.isArray(name)))
+        continue;
+      name = goog.isArray(name) ? name : [name];
+
+      iterator.meta('features', undefined);
+      var features = [];
+      for (var j = 0, len_ = name.length; j < len_; j++) {
+        var id = name[j];
+        var point = index[id];
+        if (point) {
+          features.push(point);
+        }
+      }
+      iterator.meta('features', features);
+    }
+  }
+};
+
+
 /**
  * Draws series into the current container.
  * @return {anychart.core.map.series.Base} An instance of {@link anychart.core.map.series.Base} class for method chaining.
@@ -598,242 +741,8 @@ anychart.core.map.series.Base.prototype.finalizeDrawing = function() {
 };
 
 
-/**
- * Gets an array of reference 'y' fields from the row iterator points to.
- * Reference fields are defined using referenceValueNames and referenceValueMeanings.
- * If there is only one field - a value is returned.
- * If there are several - array.
- * If any of the two is undefined - returns null.
- *
- * @return {Array.<*>|null} Fetches significant scale values from current data row.
- */
-anychart.core.map.series.Base.prototype.getReferenceScaleValues = function() {
-  if (!this.enabled()) return null;
-  var res = [];
-  var iterator = this.getIterator();
-  for (var i = 0, len = this.referenceValueNames.length; i < len; i++) {
-    if (this.referenceValueMeanings[i] != 'y') continue;
-    var val = iterator.get(this.referenceValueNames[i]);
-    if (anychart.utils.isNaN(val)) return null;
-    res.push(val);
-  }
-  return res;
-};
-
-
-/**
- * Transform coords to pix values.
- * @param {number} xCoord X coordinate.
- * @param {number} yCoord Y coordinate.
- * @return {Object.<string, number>} Object with pix values.
- */
-anychart.core.map.series.Base.prototype.transformXY = function(xCoord, yCoord) {
-  var values = this.getChart().scale().transform(xCoord, yCoord);
-  return {'x': values[0], 'y': values[1]};
-};
-
-
-/**
- * Returns label bounds.
- * @param {number} index Point index.
- * @param {number=} opt_pointState Point state.
- * @return {Array.<number>}
- */
-anychart.core.map.series.Base.prototype.getLabelBounds = function(index, opt_pointState) {
-  var iterator = this.getIterator();
-  iterator.select(index);
-  var pointState = goog.isDef(opt_pointState) ? opt_pointState : this.state.getPointStateByIndex(index);
-
-  var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
-  var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
-  var isDraw, pointLabel, stateLabel, labelEnabledState, stateLabelEnabledState;
-
-  pointLabel = iterator.get('label');
-  labelEnabledState = pointLabel && goog.isDef(pointLabel['enabled']) ? pointLabel['enabled'] : null;
-  var parentLabelsFactory = this.labels();
-  var currentLabelsFactory = null;
-  if (selected) {
-    stateLabel = iterator.get('selectLabel');
-    stateLabelEnabledState = stateLabel && goog.isDef(stateLabel['enabled']) ? stateLabel['enabled'] : null;
-    currentLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels());
-  } else if (hovered) {
-    stateLabel = iterator.get('hoverLabel');
-    stateLabelEnabledState = stateLabel && goog.isDef(stateLabel['enabled']) ? stateLabel['enabled'] : null;
-    currentLabelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels());
-  } else {
-    stateLabel = null;
-  }
-
-  if (selected || hovered) {
-    isDraw = goog.isNull(stateLabelEnabledState) ?
-        goog.isNull(currentLabelsFactory.enabled()) ?
-            goog.isNull(labelEnabledState) ?
-                parentLabelsFactory.enabled() :
-                labelEnabledState :
-            currentLabelsFactory.enabled() :
-        stateLabelEnabledState;
-  } else {
-    isDraw = goog.isNull(labelEnabledState) ?
-        parentLabelsFactory.enabled() :
-        labelEnabledState;
-  }
-
-  if (isDraw) {
-    var position = this.getLabelsPosition(pointState);
-
-    var positionProvider = this.createLabelsPositionProvider(/** @type {anychart.enums.Position|string} */(position));
-    var formatProvider = this.createFormatProvider(true);
-
-    var settings = {};
-
-    if (pointLabel)
-      goog.object.extend(settings, /** @type {Object} */(pointLabel));
-    if (currentLabelsFactory)
-      goog.object.extend(settings, currentLabelsFactory.getChangedSettings());
-    if (stateLabel)
-      goog.object.extend(settings, /** @type {Object} */(stateLabel));
-
-    var anchor = settings['anchor'];
-    if (!goog.isDef(anchor) || goog.isNull(anchor)) {
-      settings['anchor'] = this.getIterator().meta('labelAnchor');
-    }
-
-    return parentLabelsFactory.measure(formatProvider, positionProvider, settings, index).toCoordinateBox();
-  } else {
-    return null;
-  }
-};
-
-
-/** @inheritDoc */
-anychart.core.map.series.Base.prototype.configureLabel = function(pointState, opt_reset) {
-  var label = /** @type {anychart.core.ui.LabelsFactory.Label} */(anychart.core.map.series.Base.base(this, 'configureLabel', pointState, opt_reset));
-  if (label) {
-    var anchor = /** @type {anychart.enums.Anchor} */(label.getMergedSettings()['anchor']);
-    if (!goog.isDef(anchor) || goog.isNull(anchor)) {
-      var autoAnchor = {'anchor': /** @type {anychart.enums.Anchor} */(this.getIterator().meta('labelAnchor'))};
-      label.setSettings(autoAnchor, autoAnchor);
-    }
-  }
-
-  return label;
-};
-
-
-/**
- * Anchor for angle of label
- * @param {number} angle Label angle.
- * @return {anychart.enums.Anchor}
- * @protected
- */
-anychart.core.map.series.Base.prototype.getAnchorForLabel = function(angle) {
-  angle = goog.math.standardAngle(angle);
-  var anchor = anychart.enums.Anchor.CENTER;
-  if (angle == 0) {
-    anchor = anychart.enums.Anchor.CENTER_BOTTOM;
-  } else if (angle < 90) {
-    anchor = anychart.enums.Anchor.LEFT_BOTTOM;
-  } else if (angle == 90) {
-    anchor = anychart.enums.Anchor.LEFT_CENTER;
-  } else if (angle < 180) {
-    anchor = anychart.enums.Anchor.LEFT_TOP;
-  } else if (angle == 180) {
-    anchor = anychart.enums.Anchor.CENTER_TOP;
-  } else if (angle < 270) {
-    anchor = anychart.enums.Anchor.RIGHT_TOP;
-  } else if (angle == 270) {
-    anchor = anychart.enums.Anchor.RIGHT_CENTER;
-  } else if (angle > 270) {
-    anchor = anychart.enums.Anchor.RIGHT_BOTTOM;
-  }
-  return anchor;
-};
-
-
-/**
- * Create base series format provider.
- * @param {boolean=} opt_force create context provider forcibly.
- * @return {Object} Object with info for labels formatting.
- * @protected
- */
-anychart.core.map.series.Base.prototype.createFormatProvider = function(opt_force) {
-  if (!this.pointProvider || opt_force)
-    this.pointProvider = new anychart.core.utils.MapPointContextProvider(this, this.referenceValueNames);
-  this.pointProvider.applyReferenceValues();
-
-  return this.pointProvider;
-};
-
-
-/**
- * Returns position relative bounded region.
- * @return {Object} Object with info for labels formatting.
- */
-anychart.core.map.series.Base.prototype.getPositionByRegion = function() {
-  var iterator = this.getIterator();
-
-  var features = iterator.meta('features');
-  var feature = features && features.length ? features[0] : null;
-  var pointGeoProp = /** @type {Object}*/(feature ? feature['properties'] : null);
-
-  var midX = iterator.get('middle-x');
-  var midY = iterator.get('middle-y');
-  var middleX = /** @type {number}*/(goog.isDef(midX) ? midX : pointGeoProp ? pointGeoProp['middle-x'] : .5);
-  var middleY = /** @type {number}*/(goog.isDef(midY) ? midY : pointGeoProp ? pointGeoProp['middle-y'] : .5);
-
-  var shape = feature ? feature.domElement : null;
-  var positionProvider;
-  if (shape) {
-    var bounds = shape.getAbsoluteBounds();
-    positionProvider = {'value': {'x': bounds.left + bounds.width * middleX, 'y': bounds.top + bounds.height * middleY}};
-  } else {
-    positionProvider = {'value': {'x': 0, 'y': 0}};
-  }
-  return positionProvider;
-};
-
-
-/** @inheritDoc */
-anychart.core.map.series.Base.prototype.remove = function() {
-  if (this.rootLayer && this.needSelfLayer)
-    this.rootLayer.remove();
-
-  this.labels().container(null);
-
-  goog.base(this, 'remove');
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Coloring
-//
-//----------------------------------------------------------------------------------------------------------------------
-/** @inheritDoc */
-anychart.core.map.series.Base.prototype.normalizeColor = function(color, var_args) {
-  var fill;
-  if (goog.isFunction(color)) {
-    var sourceColor = arguments.length > 1 ?
-        this.normalizeColor.apply(this, goog.array.slice(arguments, 1)) :
-        this.color();
-    var scope = {
-      'index': this.getIterator().getIndex(),
-      'sourceColor': sourceColor,
-      'iterator': this.getIterator(),
-      'referenceValueNames': this.referenceValueNames
-    };
-    fill = color.call(scope);
-  } else
-    fill = color;
-  return fill;
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Legend
-//
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region --- Legend
 /** @inheritDoc */
 anychart.core.map.series.Base.prototype.getLegendItemData = function(itemsTextFormatter) {
   var legendItem = this.legendItem();
@@ -878,11 +787,99 @@ anychart.core.map.series.Base.prototype.getLegendItemData = function(itemsTextFo
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Series default settings.
-//
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region --- Position and Formating
+/**
+ * Transform coords to pix values.
+ * @param {number} xCoord X coordinate.
+ * @param {number} yCoord Y coordinate.
+ * @return {Object.<string, number>} Object with pix values.
+ */
+anychart.core.map.series.Base.prototype.transformXY = function(xCoord, yCoord) {
+  var values = this.getChart().scale().transform(xCoord, yCoord);
+  return {'x': values[0], 'y': values[1]};
+};
+
+
+/**
+ * Create base series format provider.
+ * @param {boolean=} opt_force create context provider forcibly.
+ * @return {Object} Object with info for labels formatting.
+ */
+anychart.core.map.series.Base.prototype.createFormatProvider = function(opt_force) {
+  if (!this.pointProvider || opt_force)
+    this.pointProvider = new anychart.core.utils.MapPointContextProvider(this, this.referenceValueNames);
+  this.pointProvider.applyReferenceValues();
+
+  return this.pointProvider;
+};
+
+
+/**
+ * Returns position relative bounded region.
+ * @return {Object} Object with info for labels formatting.
+ */
+anychart.core.map.series.Base.prototype.getPositionByRegion = function() {
+  var iterator = this.getIterator();
+
+  var features = iterator.meta('features');
+  var feature = features && features.length ? features[0] : null;
+  var pointGeoProp = /** @type {Object}*/(feature ? feature['properties'] : null);
+
+  var midX = iterator.get('middle-x');
+  var midY = iterator.get('middle-y');
+  var middleX = /** @type {number}*/(goog.isDef(midX) ? midX : pointGeoProp ? pointGeoProp['middle-x'] : .5);
+  var middleY = /** @type {number}*/(goog.isDef(midY) ? midY : pointGeoProp ? pointGeoProp['middle-y'] : .5);
+
+  var shape = feature ? feature.domElement : null;
+  var positionProvider;
+  if (shape) {
+    var bounds = shape.getAbsoluteBounds();
+    positionProvider = {'value': {'x': bounds.left + bounds.width * middleX, 'y': bounds.top + bounds.height * middleY}};
+  } else {
+    positionProvider = {'value': {'x': 0, 'y': 0}};
+  }
+  return positionProvider;
+};
+
+
+//endregion
+//region --- Base methods
+/**
+ * Gets an array of reference 'y' fields from the row iterator points to.
+ * Reference fields are defined using referenceValueNames and referenceValueMeanings.
+ * If there is only one field - a value is returned.
+ * If there are several - array.
+ * If any of the two is undefined - returns null.
+ *
+ * @return {Array.<*>|null} Fetches significant scale values from current data row.
+ */
+anychart.core.map.series.Base.prototype.getReferenceScaleValues = function() {
+  if (!this.enabled()) return null;
+  var res = [];
+  var iterator = this.getIterator();
+  for (var i = 0, len = this.referenceValueNames.length; i < len; i++) {
+    if (this.referenceValueMeanings[i] != 'y') continue;
+    var val = iterator.get(this.referenceValueNames[i]);
+    if (anychart.utils.isNaN(val)) return null;
+    res.push(val);
+  }
+  return res;
+};
+
+
+/** @inheritDoc */
+anychart.core.map.series.Base.prototype.remove = function() {
+  if (this.rootLayer && this.needSelfLayer)
+    this.rootLayer.remove();
+
+  this.labels().container(null);
+  this.labels().draw();
+
+  goog.base(this, 'remove');
+};
+
+
 /** @inheritDoc */
 anychart.core.map.series.Base.prototype.getEnableChangeSignals = function() {
   return goog.base(this, 'getEnableChangeSignals') | anychart.Signal.DATA_CHANGED |
@@ -897,11 +894,19 @@ anychart.core.map.series.Base.prototype.getEnableChangeSignals = function() {
 anychart.core.map.series.Base.prototype.getType = goog.abstractMethod;
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Setup.
-//
-//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Returns series point by id.
+ * @param {string} value Point id.
+ * @return {anychart.core.Point} Wrapped point.
+ */
+anychart.core.map.series.Base.prototype.getPointById = function(value) {
+  var index = goog.array.indexOf(this.seriesPoints, value);
+  return index != -1 ? this.getPoint(index) : null;
+};
+
+
+//endregion
+//region --- Setup
 /** @inheritDoc */
 anychart.core.map.series.Base.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
@@ -923,11 +928,8 @@ anychart.core.map.series.Base.prototype.setupByJSON = function(config) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Exports.
-//
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region --- Exports
 //exports
 anychart.core.map.series.Base.prototype['color'] = anychart.core.map.series.Base.prototype.color;
 
@@ -946,3 +948,4 @@ anychart.core.map.series.Base.prototype['hatchFill'] = anychart.core.map.series.
 anychart.core.map.series.Base.prototype['geoIdField'] = anychart.core.map.series.Base.prototype.geoIdField;
 anychart.core.map.series.Base.prototype['overlapMode'] = anychart.core.map.series.Base.prototype.overlapMode;
 anychart.core.map.series.Base.prototype['transformXY'] = anychart.core.map.series.Base.prototype.transformXY;
+//endregion

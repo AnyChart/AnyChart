@@ -131,6 +131,7 @@ anychart.ConsistencyState = {
   MAP_ZOOM: 1 << 20,
   MAP_GEO_DATA_INDEX: 1 << 21,
   MAP_LABELS: 1 << 22,
+  MAP_CALLOUT: 1 << 23,
   //---------------------------------- HEAT MAP STATES (CHART) ---------------------------------
   HEATMAP_SCALES: 1 << 11,
   HEATMAP_SERIES: 1 << 12,
@@ -151,6 +152,10 @@ anychart.ConsistencyState = {
   SERIES_CLIP: 1 << 11, //
   SERIES_ERROR: 1 << 12, //
   SERIES_OUTLIERS: 1 << 13, //
+  //---------------------------------- AXES STATES (VB) ---------------------------------
+  CALLOUT_TITLE: 1 << 5,
+  CALLOUT_LABELS: 1 << 6,
+  CALLOUT_BACKGROUND: 1 << 7,
   //---------------------------------- AXES STATES (VB) ---------------------------------
   // also combined
   AXIS_TITLE: 1 << 5,
@@ -194,6 +199,7 @@ anychart.ConsistencyState = {
   LABELS_FACTORY_BACKGROUND: 1 << 5,
   LABELS_FACTORY_HANDLERS: 1 << 6,
   LABELS_FACTORY_CLIP: 1 << 7,
+  LABELS_FACTORY_CONNECTOR: 1 << 8,
   //---------------------------------- LEGEND STATES (VB) ---------------------------------
   LEGEND_BACKGROUND: 1 << 5,
   LEGEND_TITLE: 1 << 6,

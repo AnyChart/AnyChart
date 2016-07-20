@@ -1647,12 +1647,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
   var forbidTooltip = false;
   var isTargetLegendOrColorRange = event['target'] instanceof anychart.core.ui.Legend || this.checkIfColorRange(event['target']);
 
-  if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
-    var parent = event['target'].getParentEventTarget();
-    if (parent.isSeries && parent.isSeries())
-      series = parent;
-    index = tag;
-  } else if (isTargetLegendOrColorRange) {
+  if (isTargetLegendOrColorRange) {
     if (tag) {
       if (tag.points_) {
         series = tag.points_.series;
@@ -1667,6 +1662,11 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
       }
       forbidTooltip = true;
     }
+  } else if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
+    var parent = event['target'].getParentEventTarget();
+    if (parent.isSeries && parent.isSeries())
+      series = parent;
+    index = tag;
   } else {
     series = tag && tag.series;
     index = goog.isNumber(tag && tag.index) ? tag.index : event['pointIndex'];
@@ -1865,13 +1865,10 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
 
   var tag = anychart.utils.extractTag(event['domTarget']);
 
+  var isTargetLegendOrColorRange = event['target'] instanceof anychart.core.ui.Legend || this.checkIfColorRange(event['target']);
+
   var series, s, index;
-  if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
-    var parent = event['target'].getParentEventTarget();
-    if (parent.isSeries && parent.isSeries())
-      series = parent;
-    index = tag;
-  } else if (event['target'] instanceof anychart.core.ui.Legend || this.checkIfColorRange(event['target'])) {
+  if (isTargetLegendOrColorRange) {
     if (tag) {
       if (tag.points_) {
         series = tag.points_.series;
@@ -1884,6 +1881,11 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
         index = tag.index;
       }
     }
+  } else if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
+    var parent = event['target'].getParentEventTarget();
+    if (parent.isSeries && parent.isSeries())
+      series = parent;
+    index = tag;
   } else {
     series = tag && tag.series;
     index = goog.isNumber(tag.index) ? tag.index : event['pointIndex'];

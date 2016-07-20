@@ -1037,7 +1037,6 @@ anychart.core.SeriesBase.prototype.selectFill = function(opt_fillOrColorOrKeys, 
  * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
  * @param {anychart.PointState|number} pointState Point state.
  * @return {!acgraph.vector.Fill} Final hover stroke for the current row.
- * @protected
  */
 anychart.core.SeriesBase.prototype.getFinalFill = function(usePointSettings, pointState) {
   var iterator = this.getIterator();
@@ -1141,7 +1140,6 @@ anychart.core.SeriesBase.prototype.selectStroke = function(opt_strokeOrFill, opt
  * @param {boolean} usePointSettings If point settings should count too (iterator questioning).
  * @param {anychart.PointState|number} pointState Point state.
  * @return {!acgraph.vector.Stroke} Final hover stroke for the current row.
- * @protected
  */
 anychart.core.SeriesBase.prototype.getFinalStroke = function(usePointSettings, pointState) {
   var iterator = this.getIterator();
@@ -1392,6 +1390,7 @@ anychart.core.SeriesBase.prototype.configureLabel = function(pointState, opt_res
     var positionProvider = this.createLabelsPositionProvider(/** @type {anychart.enums.Position|string} */(position));
     var formatProvider = this.createFormatProvider(true);
     formatProvider.pointInternal = this.getPoint(index);
+
     if (label) {
       label.formatProvider(formatProvider);
       label.positionProvider(positionProvider);

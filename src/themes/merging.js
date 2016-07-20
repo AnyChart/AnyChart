@@ -697,6 +697,12 @@ anychart.themes.merging.mergingMap_ = [
     ]
   },
   {
+    defaultObj: 'defaultCallout',
+    targets: [
+      'map.defaultCalloutSettings'
+    ]
+  },
+  {
     defaultObj: 'defaultScroller',
     targets: [
       'cartesianBase.xScroller',
@@ -1246,7 +1252,8 @@ anychart.themes.merging.multipleEntities_ = {
   'gauge.markers': 'gauge.defaultPointerSettings',
   'gauge.needles': 'gauge.defaultPointerSettings',
   'gauge.knobs': 'gauge.defaultPointerSettings',
-  'gauge.ranges': 'gauge.defaultRangeSettings'
+  'gauge.ranges': 'gauge.defaultRangeSettings',
+  'map.callouts': 'map.defaultCalloutSettings'
 };
 
 

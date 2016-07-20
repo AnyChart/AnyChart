@@ -164,8 +164,10 @@ anychart.core.ui.LabelsFactory = function() {
    * @type {Array.<string>}
    * @protected
    */
-  this.settingsFieldsForMerge = ['background', 'padding', 'height', 'width', 'offsetY', 'offsetX', 'position', 'anchor', 'rotation',
-    'textFormatter', 'positionFormatter', 'minFontSize', 'maxFontSize', 'fontSize', 'fontWeight', 'clip', 'connectorStroke'];
+  this.settingsFieldsForMerge = ['background', 'padding', 'height', 'width', 'offsetY', 'offsetX', 'position', 'anchor',
+    'rotation', 'textFormatter', 'positionFormatter', 'minFontSize', 'maxFontSize', 'fontSize', 'fontWeight', 'clip',
+    'connectorStroke'
+  ];
 
   this.adjustFontSizeMode('different');
 
@@ -190,7 +192,8 @@ anychart.core.ui.LabelsFactory.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.Text.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.LABELS_FACTORY_BACKGROUND |
     anychart.ConsistencyState.LABELS_FACTORY_HANDLERS |
-    anychart.ConsistencyState.LABELS_FACTORY_CLIP;
+    anychart.ConsistencyState.LABELS_FACTORY_CLIP |
+    anychart.ConsistencyState.LABELS_FACTORY_CONNECTOR;
 
 
 /**
@@ -505,7 +508,8 @@ anychart.core.ui.LabelsFactory.prototype.connectorStroke = function(opt_strokeOr
 
     if (stroke != this.connectorStroke_) {
       this.connectorStroke_ = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.changedSettings['connectorStroke'] = true;
+      this.invalidate(anychart.ConsistencyState.LABELS_FACTORY_CONNECTOR, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -765,6 +769,7 @@ anychart.core.ui.LabelsFactory.prototype.serialize = function() {
   if (this.changedSettings['rotation']) json['rotation'] = this.rotation();
   if (this.changedSettings['width']) json['width'] = this.width();
   if (this.changedSettings['height']) json['height'] = this.height();
+  if (this.changedSettings['connectorStroke']) json['connectorStroke'] = this.connectorStroke();
   if (this.changedSettings['adjustByHeight'] || this.changedSettings['adjustByWidth'])
     json['adjustFontSize'] = this.adjustFontSize();
   if (goog.isDef(this.minFontSize())) json['minFontSize'] = this.minFontSize();
@@ -797,6 +802,7 @@ anychart.core.ui.LabelsFactory.prototype.setupByJSON = function(config) {
   this.rotation(config['rotation']);
   this.width(config['width']);
   this.height(config['height']);
+  this.connectorStroke(config['connectorStroke']);
   this.adjustFontSize(config['adjustFontSize']);
   this.minFontSize(config['minFontSize']);
   this.maxFontSize(config['maxFontSize']);
@@ -894,8 +900,12 @@ anychart.core.ui.LabelsFactory.prototype.getSettingsChangedStatesObj = function(
 anychart.core.ui.LabelsFactory.prototype.getChangedSettings = function() {
   var result = {};
   goog.object.forEach(this.changedSettings, function(value, key) {
-    if (value)
+    if (value) {
+      if (key == 'adjustByHeight' || key == 'adjustByWidth') {
+        key = 'adjustFontSize';
+      }
       result[key] = this[key]();
+    }
   }, this);
   return result;
 };
@@ -1041,7 +1051,7 @@ anychart.core.ui.LabelsFactory.prototype.getDimension = function(formatProviderO
 
   if (formatProviderOrLabel instanceof anychart.core.ui.LabelsFactory.Label) {
     var label = (/** @type {anychart.core.ui.LabelsFactory.Label} */(formatProviderOrLabel));
-    this.measureCustomLabel_.setup(label.serialize());
+    this.measureCustomLabel_.setup(label.getMergedSettings());
     formatProvider = label.formatProvider();
     positionProvider = opt_positionProvider || label.positionProvider() || {'value' : {'x': 0, 'y': 0}};
   } else {
@@ -1164,11 +1174,11 @@ anychart.core.ui.LabelsFactory.prototype.measure = function(formatProviderOrLabe
 anychart.core.ui.LabelsFactory.prototype.measureWithTransform = function(formatProviderOrLabel, opt_positionProvider, opt_settings, opt_cacheIndex) {
   var rotation, anchor;
   if (formatProviderOrLabel instanceof anychart.core.ui.LabelsFactory.Label) {
-    rotation = goog.isDef(formatProviderOrLabel.rotation()) ? formatProviderOrLabel.rotation() : this.rotation();
+    rotation = goog.isDef(formatProviderOrLabel.rotation()) ? formatProviderOrLabel.rotation() : this.rotation() || 0;
     anchor = formatProviderOrLabel.anchor() || this.anchor();
     opt_cacheIndex = opt_cacheIndex || formatProviderOrLabel.getIndex();
   } else {
-    rotation = goog.isDef(opt_settings) && goog.isDef(opt_settings['rotation']) ? opt_settings['rotation'] : this.rotation();
+    rotation = goog.isDef(opt_settings) && goog.isDef(opt_settings['rotation']) ? opt_settings['rotation'] : this.rotation() || 0;
     anchor = goog.isDef(opt_settings) && opt_settings['anchor'] || this.anchor();
   }
 
@@ -1324,7 +1334,8 @@ anychart.core.ui.LabelsFactory.Label.prototype.SUPPORTED_SIGNALS = anychart.core
  */
 anychart.core.ui.LabelsFactory.Label.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.Text.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.LABELS_FACTORY_CLIP;
+    anychart.ConsistencyState.LABELS_FACTORY_CLIP |
+    anychart.ConsistencyState.LABELS_FACTORY_CONNECTOR;
 
 
 /**
@@ -1601,7 +1612,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.connectorStroke = function(opt_st
 
     if (stroke != this.settingsObj.connectorStroke) {
       this.settingsObj.connectorStroke = stroke;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      this.invalidate(anychart.ConsistencyState.LABELS_FACTORY_CONNECTOR, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
@@ -2108,6 +2119,32 @@ anychart.core.ui.LabelsFactory.Label.prototype.drawLabel = function(bounds, pare
 
 
 /**
+ * Connector drawing.
+ */
+anychart.core.ui.LabelsFactory.Label.prototype.drawConnector = function() {
+  var positionProvider = this.positionProvider();
+  var positionFormatter = this.mergedSettings['positionFormatter'];
+  var formattedPosition = goog.object.clone(positionFormatter.call(positionProvider, positionProvider));
+  var position = new acgraph.math.Coordinate(formattedPosition['x'], formattedPosition['y']);
+
+  var connectorPoint = positionProvider && positionProvider['connectorPoint'];
+  if (this.connector) {
+    this.connector.clear();
+    this.connector.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  }
+  if (connectorPoint) {
+    if (!this.connector) {
+      this.connector = this.layer_.path();
+      this.connector.disableStrokeScaling(true);
+    }
+    this.connector.stroke(this.mergedSettings['connectorStroke']);
+    var formattedConnectorPosition = goog.object.clone(positionFormatter.call(connectorPoint, connectorPoint));
+    this.connector.moveTo(position.x, position.y).lineTo(formattedConnectorPosition['x'], formattedConnectorPosition['y']);
+  }
+};
+
+
+/**
  * Drops merged settings.
  */
 anychart.core.ui.LabelsFactory.Label.prototype.dropMergedSettings = function() {
@@ -2287,7 +2324,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
 
     var formatProvider = this.formatProvider();
     if (goog.isDef(formatProvider) && formatProvider['series'] && (!this.textFormatterCallsCache_ || !goog.isDef(this.textFormatterCallsCache_[this.getIndex()]))) {
-      formatProvider['series'].getIterator().select(this.getIndex());
+      formatProvider['series'].getIterator().select(goog.isDef(formatProvider['index']) ? formatProvider['index'] : this.getIndex());
     }
     var text = parentLabelsFactory.callTextFormatter(mergedSettings['textFormatter'], formatProvider, this.getIndex());
 
@@ -2473,7 +2510,13 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
 
     this.layer_.setRotationByAnchor(/** @type {number} */(mergedSettings['rotation']), mergedSettings['anchor']);
 
+    this.invalidate(anychart.ConsistencyState.LABELS_FACTORY_CONNECTOR);
     this.markConsistent(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.LABELS_FACTORY_CONNECTOR)) {
+    this.drawConnector();
+    this.markConsistent(anychart.ConsistencyState.LABELS_FACTORY_CONNECTOR);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.LABELS_FACTORY_CLIP) ||

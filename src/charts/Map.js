@@ -16,6 +16,7 @@ goog.require('anychart.core.map.projections.TwinProjection');
 goog.require('anychart.core.map.scale.Geo');
 goog.require('anychart.core.map.series.Base');
 goog.require('anychart.core.reporting');
+goog.require('anychart.core.ui.Callout');
 goog.require('anychart.core.ui.ColorRange');
 goog.require('anychart.core.utils.Animation');
 goog.require('anychart.core.utils.BinaryHeap');
@@ -600,6 +601,13 @@ anychart.charts.Map = function() {
    */
   this.parser = null;
 
+  /**
+   * Array of defined callout elements.
+   * @type {Array.<anychart.core.ui.Callout>}
+   * @private
+   */
+  this.callouts_ = [];
+
   this.unboundRegions(true);
   this.defaultSeriesType(anychart.enums.MapSeriesType.CHOROPLETH);
 
@@ -624,6 +632,7 @@ anychart.charts.Map.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.MAP_GEO_DATA_INDEX |
     anychart.ConsistencyState.MAP_PALETTE |
     anychart.ConsistencyState.MAP_COLOR_RANGE |
+    anychart.ConsistencyState.MAP_CALLOUT |
     anychart.ConsistencyState.MAP_MARKER_PALETTE |
     anychart.ConsistencyState.MAP_HATCH_FILL_PALETTE |
     anychart.ConsistencyState.MAP_MOVE |
@@ -734,6 +743,13 @@ anychart.charts.Map.ZINDEX_COLOR_RANGE = 50;
 
 
 /**
+ * Callout z-index in chart root layer.
+ * @type {number}
+ */
+anychart.charts.Map.ZINDEX_CALLOUT = 60;
+
+
+/**
  * Axis z-index in chart root layer.
  * @type {number}
  */
@@ -804,22 +820,6 @@ anychart.charts.Map.prototype.offsetY_ = 0;
 
 
 /**
- * Origin x coordinate.
- * @type {number}
- * @private
- */
-anychart.charts.Map.prototype.cx_;
-
-
-/**
- * Origin y coordinate.
- * @type {number}
- * @private
- */
-anychart.charts.Map.prototype.cy_;
-
-
-/**
  * Current zoom increse.
  * @type {number}
  */
@@ -867,6 +867,13 @@ anychart.charts.Map.prototype.allowPointsSelect_;
  * @private
  */
 anychart.charts.Map.prototype.overlapMode_;
+
+
+/**
+ * @type {anychart.core.utils.MapInteractivity}
+ * @private
+ */
+anychart.charts.Map.prototype.interactivity_;
 
 
 //endregion
@@ -1298,10 +1305,7 @@ anychart.charts.Map.prototype.doAdditionActionsOnMouseOut = function() {
 };
 
 
-/**
- * @param {goog.events.Event} evt
- * @protected
- */
+/** @inheritDoc */
 anychart.charts.Map.prototype.resizeHandler = function(evt) {
   if (this.bounds().dependsOnContainerSize()) {
     this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -1321,7 +1325,7 @@ anychart.charts.Map.prototype.interactivity = function(opt_value) {
     if (goog.isObject(opt_value))
       this.interactivity_.setup(opt_value);
     else
-      this.interactivity_.hoverMode(opt_value);
+      this.interactivity_.hoverMode(/** @type {anychart.enums.HoverMode} */(opt_value));
     return this;
   }
   return this.interactivity_;
@@ -1333,10 +1337,16 @@ anychart.charts.Map.prototype.interactivity = function(opt_value) {
  */
 anychart.charts.Map.prototype.updateSeriesOnZoomOrMove = function() {
   this.dataLayer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  var i;
 
-  for (var i = this.series_.length; i--;) {
+  for (i = this.series_.length; i--;) {
     var series = this.series_[i];
     series.updateOnZoomOrMove();
+  }
+
+  for (i = this.callouts_.length; i--;) {
+    var callout = this.callouts_[i];
+    callout.updateOnZoomOrMove();
   }
 };
 
@@ -1378,8 +1388,145 @@ anychart.core.Chart.prototype.onCrsAnimationSignal_ = function() {
 
 
 //endregion
+//region --- UI elements
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Color Range
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter/setter for color range.
+ * @param {Object=} opt_value Color range settings to set.
+ * @return {!(anychart.core.ui.ColorRange|anychart.charts.Map)} Return current chart markers palette or itself for chaining call.
+ */
+anychart.charts.Map.prototype.colorRange = function(opt_value) {
+  if (!this.colorRange_) {
+    this.colorRange_ = new anychart.core.ui.ColorRange();
+    this.colorRange_.listenSignals(this.colorRangeInvalidated_, this);
+    this.invalidate(anychart.ConsistencyState.MAP_COLOR_RANGE | anychart.ConsistencyState.BOUNDS,
+        anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.colorRange_.setup(opt_value);
+    return this;
+  } else {
+    return this.colorRange_;
+  }
+};
+
+
+/**
+ * Internal marker palette invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.charts.Map.prototype.colorRangeInvalidated_ = function(event) {
+  var state = 0;
+  var signal = 0;
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    state |= anychart.ConsistencyState.MAP_COLOR_RANGE |
+        anychart.ConsistencyState.MAP_SERIES | anychart.ConsistencyState.APPEARANCE;
+    signal |= anychart.Signal.NEEDS_REDRAW;
+    this.invalidateSeries_();
+  }
+  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    state |= anychart.ConsistencyState.BOUNDS;
+    signal |= anychart.Signal.BOUNDS_CHANGED;
+  }
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    state |= anychart.ConsistencyState.MAP_COLOR_RANGE;
+    signal |= anychart.Signal.BOUNDS_CHANGED;
+  }
+  // if there are no signals, state == 0 and nothing happens.
+  this.invalidate(state, signal);
+};
+
+
+/** @inheritDoc */
+anychart.charts.Map.prototype.checkIfColorRange = function(target) {
+  return target instanceof anychart.core.ui.ColorRange;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Callout elements
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter/setter for callout elements.
+ * @param {(Object|boolean|null|number)=} opt_indexOrValue Callout settings to set or index of existing callout element to get.
+ * @param {(Object|boolean|null)=} opt_value Callout settings to set.
+ * @return {!(anychart.core.ui.Callout|anychart.charts.Map)} Callout instance by index or itself for method chaining.
+ */
+anychart.charts.Map.prototype.callout = function(opt_indexOrValue, opt_value) {
+  var index, value;
+  index = anychart.utils.toNumber(opt_indexOrValue);
+  if (isNaN(index)) {
+    index = 0;
+    value = opt_indexOrValue;
+  } else {
+    index = opt_indexOrValue;
+    value = opt_value;
+  }
+  var callout = this.callouts_[index];
+  if (!callout) {
+    callout = new anychart.core.ui.Callout();
+    callout.setParentEventTarget(this);
+    callout.setup(this.defaultCalloutSettings());
+    this.callouts_[index] = callout;
+    this.registerDisposable(callout);
+    callout.listenSignals(this.onCalloutSignal_, this);
+    this.invalidate(anychart.ConsistencyState.MAP_CALLOUT | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+  }
+
+  if (goog.isDef(value)) {
+    callout.setup(value);
+    return this;
+  } else {
+    return callout;
+  }
+};
+
+
+/**
+ * Internal callout invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.charts.Map.prototype.onCalloutSignal_ = function(event) {
+  var state = 0;
+  var signal = 0;
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    state |= anychart.ConsistencyState.MAP_CALLOUT;
+    signal |= anychart.Signal.NEEDS_REDRAW;
+  }
+  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    state |= anychart.ConsistencyState.BOUNDS;
+    signal |= anychart.Signal.BOUNDS_CHANGED;
+  }
+  // if there are no signals, state == 0 and nothing happens.
+  this.invalidate(state, signal);
+};
+
+
+/**
+ * Default callout settings.
+ * @param {Object=} opt_value .
+ * @return {Object}
+ */
+anychart.charts.Map.prototype.defaultCalloutSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultCalloutSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultCalloutSettings_ || {};
+};
+
+
+//endregion
 //region --- Coloring
-//region --- Typical coloring
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Coloring
@@ -1509,69 +1656,6 @@ anychart.charts.Map.prototype.hatchFillPaletteInvalidated_ = function(event) {
     this.invalidate(anychart.ConsistencyState.MAP_HATCH_FILL_PALETTE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
   }
 };
-
-
-//endregion
-//region --- Color range
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Color Range
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter/setter for color range.
- * @param {Object=} opt_value Color range settings to set.
- * @return {!(anychart.core.ui.ColorRange|anychart.charts.Map)} Return current chart markers palette or itself for chaining call.
- */
-anychart.charts.Map.prototype.colorRange = function(opt_value) {
-  if (!this.colorRange_) {
-    this.colorRange_ = new anychart.core.ui.ColorRange();
-    this.colorRange_.listenSignals(this.colorRangeInvalidated_, this);
-    this.invalidate(anychart.ConsistencyState.MAP_COLOR_RANGE | anychart.ConsistencyState.BOUNDS,
-        anychart.Signal.NEEDS_REDRAW);
-  }
-
-  if (goog.isDef(opt_value)) {
-    this.colorRange_.setup(opt_value);
-    return this;
-  } else {
-    return this.colorRange_;
-  }
-};
-
-
-/**
- * Internal marker palette invalidation handler.
- * @param {anychart.SignalEvent} event Event object.
- * @private
- */
-anychart.charts.Map.prototype.colorRangeInvalidated_ = function(event) {
-  var state = 0;
-  var signal = 0;
-  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state |= anychart.ConsistencyState.MAP_COLOR_RANGE |
-        anychart.ConsistencyState.MAP_SERIES | anychart.ConsistencyState.APPEARANCE;
-    signal |= anychart.Signal.NEEDS_REDRAW;
-    this.invalidateSeries_();
-  }
-  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
-    state |= anychart.ConsistencyState.BOUNDS;
-    signal |= anychart.Signal.BOUNDS_CHANGED;
-  }
-  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    state |= anychart.ConsistencyState.MAP_COLOR_RANGE;
-    signal |= anychart.Signal.BOUNDS_CHANGED;
-  }
-  // if there are no signals, state == 0 and nothing happens.
-  this.invalidate(state, signal);
-};
-
-
-/** @inheritDoc */
-anychart.charts.Map.prototype.checkIfColorRange = function(target) {
-  return target instanceof anychart.core.ui.ColorRange;
-};
-//endregion
 
 
 //endregion
@@ -2485,8 +2569,6 @@ anychart.charts.Map.prototype.calculateGeoScale = function() {
 
       this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.MAP_SCALE);
     }
-
-    this.markConsistent(anychart.ConsistencyState.MAP_GEO_DATA);
   }
 
   var i, len, series;
@@ -2612,7 +2694,6 @@ anychart.charts.Map.prototype.calculateGeoScale = function() {
 
       for (i = this.series_.length; i--;) {
         series = this.series_[i];
-        series.setGeoData(/** @type {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>} */(this.internalGeoData));
         series.invalidate(anychart.ConsistencyState.SERIES_DATA, anychart.Signal.NEEDS_REDRAW);
 
         //----------------------------------calc statistics for series
@@ -2842,6 +2923,15 @@ anychart.charts.Map.prototype.drawGeometry_ = function(geometry, parent, opt_tra
     } else {
       this.iterateGeometry_(/** @type {Object} */(geometry), this.drawGeom_);
     }
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_GEO_DATA)) {
+    for (var i = this.series_.length; i--;) {
+      var series = this.series_[i];
+      series.setGeoData(/** @type {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>} */(this.internalGeoData));
+    }
+
+    this.markConsistent(anychart.ConsistencyState.MAP_GEO_DATA);
   }
 };
 
@@ -3111,16 +3201,70 @@ anychart.charts.Map.prototype.drawCredits = function(parentBounds) {
 };
 
 
+/**
+ * Returns bounds without callout elements.
+ * @param {anychart.math.Rect} bounds
+ * @return {anychart.math.Rect}
+ */
+anychart.charts.Map.prototype.getBoundsWithoutCallouts = function(bounds) {
+  var i, callout, remainingBounds, orientation;
+  var callouts = this.callouts_;
+
+  var boundsWithoutCallouts = bounds.clone();
+  var topOffset = 0;
+  var bottomOffset = 0;
+  var leftOffset = 0;
+  var rightOffset = 0;
+
+  for (i = callouts.length; i--;) {
+    callout = /** @type {anychart.core.ui.Callout} */(callouts[i]);
+    if (callout && callout.enabled()) {
+      callout.parentBounds(bounds);
+      orientation = callout.orientation();
+
+      if (orientation == anychart.enums.Orientation.TOP) {
+        remainingBounds = callout.getRemainingBounds();
+        topOffset = bounds.height - remainingBounds.height;
+      } else if (orientation == anychart.enums.Orientation.BOTTOM) {
+        remainingBounds = callout.getRemainingBounds();
+        bottomOffset = bounds.height - remainingBounds.height;
+      } else if (orientation == anychart.enums.Orientation.LEFT) {
+        remainingBounds = callout.getRemainingBounds();
+        leftOffset = bounds.width - remainingBounds.width;
+      } else if (orientation == anychart.enums.Orientation.RIGHT) {
+        remainingBounds = callout.getRemainingBounds();
+        rightOffset = bounds.width - remainingBounds.width;
+      }
+    }
+  }
+
+  boundsWithoutCallouts.left += leftOffset;
+  boundsWithoutCallouts.top += topOffset;
+  boundsWithoutCallouts.width -= rightOffset + leftOffset;
+  boundsWithoutCallouts.height -= bottomOffset + topOffset;
+
+  return boundsWithoutCallouts;
+};
+
+
 /** @inheritDoc */
 anychart.charts.Map.prototype.drawContent = function(bounds) {
   this.getRootScene();
 
-  var i, series, tx, dx, dy, len, geom;
+  var i, series, tx, dx, dy, len, geom, callout;
   var maxZoomFactor = this.maxZoomLevel_;
   var minZoomFactor = this.minZoomLevel_;
   var boundsWithoutTx, boundsWithTx, seriesType;
 
   this.calculateGeoScale();
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    for (i = 0, len = this.callouts_.length; i < len; i++) {
+      callout = this.callouts_[i];
+      callout.invalidate(anychart.ConsistencyState.BOUNDS);
+    }
+    this.invalidate(anychart.ConsistencyState.MAP_CALLOUT);
+  }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_SERIES)) {
     this.applyLabelsOverlapState_ = {};
@@ -3146,6 +3290,35 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     }
   }
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_CALLOUT)) {
+    for (i = 0, len = this.callouts_.length; i < len; i++) {
+      callout = this.callouts_[i];
+      if (callout) {
+        var assignedItems = [];
+        var items = callout.items();
+        var itemIndex = 0;
+        for (var j = 0, len_ = items.length; j < len_; j++) {
+          var item = items[j];
+          for (var k = 0, len__ = this.series_.length; k < len__; k++) {
+            series = this.series_[k];
+            var seriesPoint = series.getPointById(item);
+            if (seriesPoint) {
+              assignedItems[itemIndex] = seriesPoint;
+              itemIndex++;
+            }
+          }
+
+        }
+        callout.suspendSignalsDispatching();
+        callout.setProcessedItems(assignedItems);
+        callout.setParentEventTarget(this.getRootScene());
+        callout.container(this.rootElement);
+        callout.zIndex(anychart.charts.Map.ZINDEX_CALLOUT);
+        callout.resumeSignalsDispatching(false);
+      }
+    }
+  }
+
   var mapLayer = this.getMapLayer();
   var scale = this.scale();
 
@@ -3164,17 +3337,22 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     if (unboundRegionsStrokeThickness > this.maxStrokeThickness_)
       this.maxStrokeThickness_ = unboundRegionsStrokeThickness;
 
-    var dataBounds = contentAreaBounds.clone();
-    dataBounds.left = contentAreaBounds.left + this.maxStrokeThickness_ / 2;
-    dataBounds.top = contentAreaBounds.top + this.maxStrokeThickness_ / 2;
-    dataBounds.width = contentAreaBounds.width - this.maxStrokeThickness_;
-    dataBounds.height = contentAreaBounds.height - this.maxStrokeThickness_;
+    var boundsWithoutCallouts = this.getBoundsWithoutCallouts(contentAreaBounds);
+    var dataBounds = boundsWithoutCallouts.clone();
+
+    dataBounds.left = dataBounds.left + this.maxStrokeThickness_ / 2;
+    dataBounds.top = dataBounds.top + this.maxStrokeThickness_ / 2;
+    dataBounds.width = dataBounds.width - this.maxStrokeThickness_;
+    dataBounds.height = dataBounds.height - this.maxStrokeThickness_;
 
     scale.setBounds(dataBounds);
     this.dataBounds_ = dataBounds;
 
+    // if (!this.dataBoundsRect) this.dataBoundsRect = this.container().rect().zIndex(1000);
+    // this.dataBoundsRect.setBounds(this.dataBounds_);
+
     if (this.mapContentLayer_)
-      this.mapContentLayer_.clip(contentAreaBounds);
+      this.mapContentLayer_.clip(boundsWithoutCallouts);
 
     this.clear();
 
@@ -3420,8 +3598,10 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
       seriesType = series.getType();
       this.applyLabelsOverlapState_[seriesType] = this.applyLabelsOverlapState_[seriesType] || !series.isConsistent();
 
+      series.suspendSignalsDispatching();
       series.setAutoGeoIdField(/** @type {string} */(this.geoIdField()));
       series.draw();
+      series.resumeSignalsDispatching(false);
     }
     this.markConsistent(anychart.ConsistencyState.MAP_SERIES);
   }
@@ -3440,6 +3620,20 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
       this.colorRange_.resumeSignalsDispatching(false);
     }
     this.markConsistent(anychart.ConsistencyState.MAP_COLOR_RANGE);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_CALLOUT)) {
+    for (i = 0, len = this.callouts_.length; i < len; i++) {
+      callout = this.callouts_[i];
+      if (callout) {
+        callout.suspendSignalsDispatching();
+        callout.container(this.rootElement);
+        callout.zIndex(anychart.charts.Map.ZINDEX_CALLOUT);
+        callout.draw();
+        callout.resumeSignalsDispatching(false);
+      }
+    }
+    this.markConsistent(anychart.ConsistencyState.MAP_CALLOUT);
   }
 };
 
@@ -4549,7 +4743,7 @@ anychart.charts.Map.prototype.createLegendItemsProvider = function(sourceMode, i
    */
   var data = [];
   // we need to calculate statistics
-  this.calculateGeoScale();
+  // this.calculateGeoScale();
 
   var series, scale, itemData;
   if (sourceMode == anychart.enums.LegendItemsSourceMode.DEFAULT) {
@@ -4755,6 +4949,9 @@ anychart.charts.Map.prototype.setupByJSON = function(config) {
   if ('defaultSeriesSettings' in config)
     this.defaultSeriesSettings(config['defaultSeriesSettings']);
 
+  if ('defaultCalloutSettings' in config)
+    this.defaultCalloutSettings(config['defaultCalloutSettings']);
+
   this.defaultSeriesType(config['defaultSeriesType']);
   this.palette(config['palette']);
   this.markerPalette(config['markerPalette']);
@@ -4786,6 +4983,16 @@ anychart.charts.Map.prototype.setupByJSON = function(config) {
   var series = config['series'];
   var scales = config['colorScales'];
   var drillDownMap = config['drillDownMap'];
+
+  if ('callouts' in config) {
+    var callouts = config['callouts'];
+    for (var j = 0, len = callouts.length; j < len; j++) {
+      var callout = callouts[j];
+      if (callout) {
+        this.callout(j, callout);
+      }
+    }
+  }
 
   var scalesInstances = {};
   if (goog.isObject(scales)) {
@@ -4904,6 +5111,18 @@ anychart.charts.Map.prototype.serialize = function() {
     }
     series.push(config);
   }
+
+  var callouts = [];
+  for (var j = 0, len = this.callouts_.length; j < len; j++) {
+    var callout = this.callouts_[j];
+    if (callout) {
+      callouts[j] = callout.serialize();
+    }
+  }
+  if (callouts.length)
+    json['callouts'] = callouts;
+
+
   if (series.length)
     json['series'] = series;
 
@@ -4965,6 +5184,7 @@ anychart.charts.Map.prototype['marker'] = anychart.charts.Map.prototype.marker;
 anychart.charts.Map.prototype['connector'] = anychart.charts.Map.prototype.connector;
 anychart.charts.Map.prototype['unboundRegions'] = anychart.charts.Map.prototype.unboundRegions;
 anychart.charts.Map.prototype['colorRange'] = anychart.charts.Map.prototype.colorRange;
+anychart.charts.Map.prototype['callout'] = anychart.charts.Map.prototype.callout;
 anychart.charts.Map.prototype['palette'] = anychart.charts.Map.prototype.palette;
 anychart.charts.Map.prototype['markerPalette'] = anychart.charts.Map.prototype.markerPalette;
 anychart.charts.Map.prototype['hatchFillPalette'] = anychart.charts.Map.prototype.hatchFillPalette;
