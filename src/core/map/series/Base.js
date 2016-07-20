@@ -36,7 +36,7 @@ goog.inherits(anychart.core.map.series.Base, anychart.core.SeriesBase);
  * @type {number}
  */
 anychart.core.map.series.Base.prototype.SUPPORTED_SIGNALS =
-    anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
+    anychart.core.SeriesBase.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.DATA_CHANGED |
     anychart.Signal.NEEDS_RECALCULATION |
     anychart.Signal.NEED_UPDATE_LEGEND |
@@ -48,7 +48,7 @@ anychart.core.map.series.Base.prototype.SUPPORTED_SIGNALS =
  * @type {number}
  */
 anychart.core.map.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.core.SeriesBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.SERIES_HATCH_FILL |
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.SERIES_LABELS |
@@ -686,7 +686,7 @@ anychart.core.map.series.Base.prototype.startDrawing = function() {
       this.rootLayer = acgraph.layer();
       this.bindHandlersToGraphics(this.rootLayer);
     } else {
-      this.rootLayer = this.container();
+      this.rootLayer = /** @type {acgraph.vector.ILayer} */ (this.container());
     }
   }
 
@@ -699,6 +699,8 @@ anychart.core.map.series.Base.prototype.startDrawing = function() {
   this.labels().clear();
 
   this.labels().parentBounds(/** @type {anychart.math.Rect} */(this.container().getBounds()));
+
+  this.drawA11y();
 };
 
 
@@ -801,11 +803,7 @@ anychart.core.map.series.Base.prototype.transformXY = function(xCoord, yCoord) {
 };
 
 
-/**
- * Create base series format provider.
- * @param {boolean=} opt_force create context provider forcibly.
- * @return {Object} Object with info for labels formatting.
- */
+/** @inheritDoc */
 anychart.core.map.series.Base.prototype.createFormatProvider = function(opt_force) {
   if (!this.pointProvider || opt_force)
     this.pointProvider = new anychart.core.utils.MapPointContextProvider(this, this.referenceValueNames);
@@ -885,13 +883,6 @@ anychart.core.map.series.Base.prototype.getEnableChangeSignals = function() {
   return goog.base(this, 'getEnableChangeSignals') | anychart.Signal.DATA_CHANGED |
       anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEED_UPDATE_LEGEND;
 };
-
-
-/**
- * Returns type of current series.
- * @return {anychart.enums.MapSeriesType} Series type.
- */
-anychart.core.map.series.Base.prototype.getType = goog.abstractMethod;
 
 
 /**

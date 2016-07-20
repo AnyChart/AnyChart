@@ -132,3 +132,4 @@ anychart.core.radar.series.Line.prototype['hoverStroke'] = anychart.core.radar.s
 anychart.core.radar.series.Line.prototype['selectStroke'] = anychart.core.radar.series.Line.prototype.selectStroke;//inherited
 anychart.core.radar.series.Line.prototype['finalizeDrawing'] = anychart.core.radar.series.Line.prototype.finalizeDrawing;//inherited
 anychart.core.radar.series.Line.prototype['startDrawing'] = anychart.core.radar.series.Line.prototype.startDrawing;//inherited
+anychart.core.radar.series.Line.prototype['getType'] = anychart.core.radar.series.Line.prototype.getType;

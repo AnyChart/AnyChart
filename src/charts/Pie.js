@@ -451,6 +451,7 @@ anychart.charts.Pie.prototype.redefineView_ = function() {
       anychart.ConsistencyState.APPEARANCE |
       anychart.ConsistencyState.PIE_LABELS |
       anychart.ConsistencyState.CHART_LEGEND |
+      anychart.ConsistencyState.A11Y |
       anychart.ConsistencyState.PIE_DATA,
       anychart.Signal.NEEDS_REDRAW |
       anychart.Signal.DATA_CHANGED
@@ -2868,6 +2869,7 @@ anychart.charts.Pie.prototype.dataInvalidated_ = function(event) {
         anychart.ConsistencyState.PIE_LABELS |
         anychart.ConsistencyState.APPEARANCE |
         anychart.ConsistencyState.CHART_LEGEND |
+        anychart.ConsistencyState.A11Y |
         anychart.ConsistencyState.PIE_DATA,
         anychart.Signal.NEEDS_REDRAW |
         anychart.Signal.DATA_CHANGED

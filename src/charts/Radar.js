@@ -795,6 +795,9 @@ anychart.charts.Radar.prototype.getAllSeries = function() {
  */
 anychart.charts.Radar.prototype.seriesInvalidated_ = function(event) {
   var state = 0;
+  if (event.hasSignal(anychart.Signal.NEEDS_UPDATE_A11Y)) {
+    state = anychart.ConsistencyState.A11Y;
+  }
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     state = anychart.ConsistencyState.RADAR_SERIES;
   }

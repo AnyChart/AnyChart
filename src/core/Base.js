@@ -33,6 +33,10 @@ anychart.ConsistencyState = {
    * Visual settings have changed (fill, stroke, etc.).
    */
   APPEARANCE: 1 << 4,
+  /**
+   * Accessibility settings.
+   */
+  A11Y: 1 << 5,
   //---------------------------------- DATA STATES (BASE) ---------------------------------
   /**
    * Data mask invalidated.
@@ -42,255 +46,255 @@ anychart.ConsistencyState = {
   /**
    * Chart title has changed.
    */
-  CHART_BACKGROUND: 1 << 5,
+  CHART_BACKGROUND: 1 << 6,
   /**
    * Chart title has changed.
    */
-  CHART_TITLE: 1 << 6,
+  CHART_TITLE: 1 << 7,
   /**
    * Chart title has changed.
    */
-  CHART_LABELS: 1 << 7,
+  CHART_LABELS: 1 << 8,
   // We also add SeparateChart states here to not to add prefix SEPARATE_CHART.
   // But if bullet or spark chart will need some new consistency states, there is a possibility to add 2 here.
-  CHART_LEGEND: 1 << 8,
-  CHART_CREDITS: 1 << 9,
-  CHART_ANIMATION: 1 << 10,
+  CHART_LEGEND: 1 << 9,
+  CHART_CREDITS: 1 << 10,
+  CHART_ANIMATION: 1 << 11,
   //---------------------------------- BULLET STATES (CHART) ---------------------------------
-  BULLET_DATA: 1 << 11,
-  BULLET_SCALES: 1 << 12,
-  BULLET_AXES: 1 << 13,
-  BULLET_AXES_MARKERS: 1 << 14,
-  BULLET_MARKERS: 1 << 15,
+  BULLET_DATA: 1 << 12,
+  BULLET_SCALES: 1 << 13,
+  BULLET_AXES: 1 << 14,
+  BULLET_AXES_MARKERS: 1 << 15,
+  BULLET_MARKERS: 1 << 16,
   //---------------------------------- CARTESIAN STATES (CHART) ---------------------------------
-  CARTESIAN_PALETTE: 1 << 11,
-  CARTESIAN_MARKER_PALETTE: 1 << 12,
-  CARTESIAN_HATCH_FILL_PALETTE: 1 << 13,
-  CARTESIAN_SCALES: 1 << 14,
-  CARTESIAN_SERIES: 1 << 15,
-  CARTESIAN_AXES: 1 << 16,
-  CARTESIAN_AXES_MARKERS: 1 << 17,
-  CARTESIAN_GRIDS: 1 << 18,
-  CARTESIAN_CROSSHAIR: 1 << 19,
-  CARTESIAN_ZOOM: 1 << 20,
-  CARTESIAN_SCALE_MAPS: 1 << 21,
-  CARTESIAN_Y_SCALES: 1 << 22,
-  CARTESIAN_X_SCROLLER: 1 << 23,
-  CARTESIAN_ANNOTATIONS: 1 << 24,
+  CARTESIAN_PALETTE: 1 << 12,
+  CARTESIAN_MARKER_PALETTE: 1 << 13,
+  CARTESIAN_HATCH_FILL_PALETTE: 1 << 14,
+  CARTESIAN_SCALES: 1 << 15,
+  CARTESIAN_SERIES: 1 << 16,
+  CARTESIAN_AXES: 1 << 17,
+  CARTESIAN_AXES_MARKERS: 1 << 18,
+  CARTESIAN_GRIDS: 1 << 19,
+  CARTESIAN_CROSSHAIR: 1 << 20,
+  CARTESIAN_ZOOM: 1 << 21,
+  CARTESIAN_SCALE_MAPS: 1 << 22,
+  CARTESIAN_Y_SCALES: 1 << 23,
+  CARTESIAN_X_SCROLLER: 1 << 24,
+  CARTESIAN_ANNOTATIONS: 1 << 25,
   //---------------------------------- PYRAMID/FUNNEL STATES (CHART) ---------------------------------
-  PYRAMID_FUNNEL_LABELS: 1 << 11,
-  PYRAMID_FUNNEL_MARKERS: 1 << 12,
-  PYRAMID_FUNNEL_DATA: 1 << 13,
+  PYRAMID_FUNNEL_LABELS: 1 << 12,
+  PYRAMID_FUNNEL_MARKERS: 1 << 13,
+  PYRAMID_FUNNEL_DATA: 1 << 14,
   //---------------------------------- GANTT STATES (CHART) ---------------------------------
-  GANTT_DATA: 1 << 11,
-  GANTT_POSITION: 1 << 12,
-  GANTT_SPLITTER_POSITION: 1 << 13,
+  GANTT_DATA: 1 << 12,
+  GANTT_POSITION: 1 << 13,
+  GANTT_SPLITTER_POSITION: 1 << 14,
   //---------------------------------- PIE STATES (CHART) ---------------------------------
-  PIE_LABELS: 1 << 11,
-  PIE_DATA: 1 << 12,
+  PIE_LABELS: 1 << 12,
+  PIE_DATA: 1 << 13,
   //---------------------------------- POLAR STATES (CHART) ---------------------------------
-  POLAR_PALETTE: 1 << 11,
-  POLAR_MARKER_PALETTE: 1 << 12,
-  POLAR_HATCH_FILL_PALETTE: 1 << 13,
-  POLAR_SCALES: 1 << 14,
-  POLAR_SERIES: 1 << 15,
-  POLAR_AXES: 1 << 16,
-  POLAR_GRIDS: 1 << 17,
+  POLAR_PALETTE: 1 << 12,
+  POLAR_MARKER_PALETTE: 1 << 13,
+  POLAR_HATCH_FILL_PALETTE: 1 << 14,
+  POLAR_SCALES: 1 << 15,
+  POLAR_SERIES: 1 << 16,
+  POLAR_AXES: 1 << 17,
+  POLAR_GRIDS: 1 << 18,
   //---------------------------------- RADAR STATES (CHART) ---------------------------------
-  RADAR_PALETTE: 1 << 11,
-  RADAR_MARKER_PALETTE: 1 << 12,
-  RADAR_HATCH_FILL_PALETTE: 1 << 13,
-  RADAR_SCALES: 1 << 14,
-  RADAR_SERIES: 1 << 15,
-  RADAR_AXES: 1 << 16,
-  RADAR_GRIDS: 1 << 17,
+  RADAR_PALETTE: 1 << 12,
+  RADAR_MARKER_PALETTE: 1 << 13,
+  RADAR_HATCH_FILL_PALETTE: 1 << 14,
+  RADAR_SCALES: 1 << 15,
+  RADAR_SERIES: 1 << 16,
+  RADAR_AXES: 1 << 17,
+  RADAR_GRIDS: 1 << 18,
   //---------------------------------- SCATTER STATES (CHART) ---------------------------------
-  SCATTER_PALETTE: 1 << 11,
-  SCATTER_MARKER_PALETTE: 1 << 12,
-  SCATTER_HATCH_FILL_PALETTE: 1 << 13,
-  SCATTER_SCALES: 1 << 14,
-  SCATTER_SERIES: 1 << 15,
-  SCATTER_AXES: 1 << 16,
-  SCATTER_AXES_MARKERS: 1 << 17,
-  SCATTER_GRIDS: 1 << 18,
-  SCATTER_CROSSHAIR: 1 << 19,
+  SCATTER_PALETTE: 1 << 12,
+  SCATTER_MARKER_PALETTE: 1 << 13,
+  SCATTER_HATCH_FILL_PALETTE: 1 << 14,
+  SCATTER_SCALES: 1 << 15,
+  SCATTER_SERIES: 1 << 16,
+  SCATTER_AXES: 1 << 17,
+  SCATTER_AXES_MARKERS: 1 << 18,
+  SCATTER_GRIDS: 1 << 19,
+  SCATTER_CROSSHAIR: 1 << 20,
   //---------------------------------- SPARKLINE STATES (CHART) ---------------------------------
-  SPARK_SCALES: 1 << 11,
-  SPARK_SERIES: 1 << 12,
-  SPARK_AXES_MARKERS: 1 << 13,
+  SPARK_SCALES: 1 << 12,
+  SPARK_SERIES: 1 << 13,
+  SPARK_AXES_MARKERS: 1 << 14,
   //---------------------------------- MAP STATES (CHART) ---------------------------------
-  MAP_SCALE: 1 << 11,
-  MAP_COLOR_SCALE: 1 << 12,
-  MAP_GEO_DATA: 1 << 13,
-  MAP_SERIES: 1 << 14,
-  MAP_PALETTE: 1 << 15,
-  MAP_MARKER_PALETTE: 1 << 16,
-  MAP_HATCH_FILL_PALETTE: 1 << 17,
-  MAP_COLOR_RANGE: 1 << 18,
-  MAP_MOVE: 1 << 19,
-  MAP_ZOOM: 1 << 20,
-  MAP_GEO_DATA_INDEX: 1 << 21,
-  MAP_LABELS: 1 << 22,
-  MAP_CALLOUT: 1 << 23,
+  MAP_SCALE: 1 << 12,
+  MAP_COLOR_SCALE: 1 << 13,
+  MAP_GEO_DATA: 1 << 14,
+  MAP_SERIES: 1 << 15,
+  MAP_PALETTE: 1 << 16,
+  MAP_MARKER_PALETTE: 1 << 17,
+  MAP_HATCH_FILL_PALETTE: 1 << 18,
+  MAP_COLOR_RANGE: 1 << 19,
+  MAP_MOVE: 1 << 20,
+  MAP_ZOOM: 1 << 21,
+  MAP_GEO_DATA_INDEX: 1 << 22,
+  MAP_LABELS: 1 << 23,
+  MAP_CALLOUT: 1 << 24,
   //---------------------------------- HEAT MAP STATES (CHART) ---------------------------------
-  HEATMAP_SCALES: 1 << 11,
-  HEATMAP_SERIES: 1 << 12,
-  HEATMAP_AXES: 1 << 13,
-  HEATMAP_GRIDS: 1 << 14,
-  HEATMAP_COLOR_SCALE: 1 << 15,
-  HEATMAP_X_SCROLLER: 1 << 16,
-  HEATMAP_Y_SCROLLER: 1 << 17,
-  HEATMAP_ZOOM: 1 << 18,
+  HEATMAP_SCALES: 1 << 12,
+  HEATMAP_SERIES: 1 << 13,
+  HEATMAP_AXES: 1 << 14,
+  HEATMAP_GRIDS: 1 << 15,
+  HEATMAP_COLOR_SCALE: 1 << 16,
+  HEATMAP_X_SCROLLER: 1 << 17,
+  HEATMAP_Y_SCROLLER: 1 << 18,
+  HEATMAP_ZOOM: 1 << 19,
   //---------------------------------- SERIES STATES (VB) ---------------------------------
   // also combined, due to a very big prefix
-  SERIES_HATCH_FILL: 1 << 5, //
-  SERIES_MARKERS: 1 << 6, //
-  SERIES_LABELS: 1 << 7, //
-  SERIES_DATA: 1 << 8,
-  SERIES_POINTS: 1 << 9, //
-  SERIES_COLOR: 1 << 10, //
-  SERIES_CLIP: 1 << 11, //
-  SERIES_ERROR: 1 << 12, //
-  SERIES_OUTLIERS: 1 << 13, //
+  SERIES_HATCH_FILL: 1 << 6, //
+  SERIES_MARKERS: 1 << 7, //
+  SERIES_LABELS: 1 << 8, //
+  SERIES_DATA: 1 << 9,
+  SERIES_POINTS: 1 << 10, //
+  SERIES_COLOR: 1 << 11, //
+  SERIES_CLIP: 1 << 12, //
+  SERIES_ERROR: 1 << 13, //
+  SERIES_OUTLIERS: 1 << 14, //
   //---------------------------------- AXES STATES (VB) ---------------------------------
   CALLOUT_TITLE: 1 << 5,
   CALLOUT_LABELS: 1 << 6,
   CALLOUT_BACKGROUND: 1 << 7,
   //---------------------------------- AXES STATES (VB) ---------------------------------
   // also combined
-  AXIS_TITLE: 1 << 5,
-  AXIS_LABELS: 1 << 6,
-  AXIS_TICKS: 1 << 7,
-  AXIS_OVERLAP: 1 << 8,
+  AXIS_TITLE: 1 << 6,
+  AXIS_LABELS: 1 << 7,
+  AXIS_TICKS: 1 << 8,
+  AXIS_OVERLAP: 1 << 9,
   //---------------------------------- AXES STATES (AXIS) ---------------------------------
-  COLOR_RANGE_MARKER: 1 << 9,
+  COLOR_RANGE_MARKER: 1 << 10,
   //---------------------------------- GANTT CONTROLLER STATES (VB) ---------------------------------
-  CONTROLLER_DATA: 1 << 5,
-  CONTROLLER_VISIBILITY: 1 << 6,
-  CONTROLLER_POSITION: 1 << 7,
+  CONTROLLER_DATA: 1 << 6,
+  CONTROLLER_VISIBILITY: 1 << 7,
+  CONTROLLER_POSITION: 1 << 8,
   //---------------------------------- GANTT TIMELINE STATES (VB) ---------------------------------
-  TIMELINE_SCALES: 1 << 8,
+  TIMELINE_SCALES: 1 << 9,
   //---------------------------------- GANTT TIMELINE HEADER STATES (VB) ---------------------------------
-  TIMELINE_HEADER_SCALES: 1 << 5,
+  TIMELINE_HEADER_SCALES: 1 << 6,
   //---------------------------------- GANTT TIMELINE HEADER LEVEL STATES (VB) ---------------------------------
-  TIMELINE_HEADER_LEVEL_LABELS: 1 << 5,
-  TIMELINE_HEADER_LEVEL_TICKS: 1 << 6,
+  TIMELINE_HEADER_LEVEL_LABELS: 1 << 6,
+  TIMELINE_HEADER_LEVEL_TICKS: 1 << 7,
   //---------------------------------- GRIDS STATES (VB) ---------------------------------
   // also combined
-  GRIDS_POSITION: 1 << 5,
+  GRIDS_POSITION: 1 << 6,
   //---------------------------------- BASE GRIDS STATES (VB) ---------------------------------
-  BASE_GRID_REDRAW: 1 << 6,
-  BASE_GRID_HOVER: 1 << 7,
+  BASE_GRID_REDRAW: 1 << 7,
+  BASE_GRID_HOVER: 1 << 8,
   //---------------------------------- BUTTON STATES (VB) ---------------------------------
-  BUTTON_BACKGROUND: 1 << 5,
+  BUTTON_BACKGROUND: 1 << 6,
   //---------------------------------- CREDITS STATES (VB) ---------------------------------
-  CREDITS_POSITION: 1 << 5,
-  CREDITS_REDRAW_IMAGE: 1 << 6,
+  CREDITS_POSITION: 1 << 6,
+  CREDITS_REDRAW_IMAGE: 1 << 7,
   //---------------------------------- DATA GRID STATES (BASE GRID) ---------------------------------
-  DATA_GRID_GRIDS: 1 << 8,
+  DATA_GRID_GRIDS: 1 << 9,
   //---------------------------------- DATA GRID COLUMN STATES (VB) ---------------------------------
-  DATA_GRID_COLUMN_TITLE: 1 << 5,
-  DATA_GRID_COLUMN_POSITION: 1 << 6,
+  DATA_GRID_COLUMN_TITLE: 1 << 6,
+  DATA_GRID_COLUMN_POSITION: 1 << 7,
   //---------------------------------- BACKGROUND STATES (VB) ---------------------------------
-  BACKGROUND_POINTER_EVENTS: 1 << 5,
+  BACKGROUND_POINTER_EVENTS: 1 << 6,
   //---------------------------------- LABEL STATES (VB) ---------------------------------
-  LABEL_BACKGROUND: 1 << 5,
+  LABEL_BACKGROUND: 1 << 6,
   //---------------------------------- LABELS FACTORY STATES (VB) ---------------------------------
-  LABELS_FACTORY_BACKGROUND: 1 << 5,
-  LABELS_FACTORY_HANDLERS: 1 << 6,
-  LABELS_FACTORY_CLIP: 1 << 7,
-  LABELS_FACTORY_CONNECTOR: 1 << 8,
+  LABELS_FACTORY_BACKGROUND: 1 << 6,
+  LABELS_FACTORY_HANDLERS: 1 << 7,
+  LABELS_FACTORY_CLIP: 1 << 8,
+  LABELS_FACTORY_CONNECTOR: 1 << 9,
   //---------------------------------- LEGEND STATES (VB) ---------------------------------
-  LEGEND_BACKGROUND: 1 << 5,
-  LEGEND_TITLE: 1 << 6,
-  LEGEND_SEPARATOR: 1 << 7,
-  LEGEND_PAGINATOR: 1 << 8,
+  LEGEND_BACKGROUND: 1 << 6,
+  LEGEND_TITLE: 1 << 7,
+  LEGEND_SEPARATOR: 1 << 8,
+  LEGEND_PAGINATOR: 1 << 9,
   //---------------------------------- MARKERS FACTORY STATES (VB) ---------------------------------
-  MARKERS_FACTORY_HANDLERS: 1 << 5,
+  MARKERS_FACTORY_HANDLERS: 1 << 6,
   //---------------------------------- PAGINATOR STATES (VB) ---------------------------------
-  PAGINATOR_BACKGROUND: 1 << 5,
+  PAGINATOR_BACKGROUND: 1 << 6,
   //---------------------------------- SCROLLBAR STATES (VB) ---------------------------------
-  SCROLLBAR_POSITION: 1 << 5,
+  SCROLLBAR_POSITION: 1 << 6,
   //---------------------------------- SPLITTER STATES (VB) ---------------------------------
-  SPLITTER_POSITION: 1 << 5,
+  SPLITTER_POSITION: 1 << 6,
   //---------------------------------- TITLE STATES (VB) ---------------------------------
   TITLE_BACKGROUND: 1 << 5,
   //---------------------------------- TOOLTIP STATES (VB) ---------------------------------
   // actually its for TooltipItem, but tooltip doesn't have any states and we hope they will merge
-  TOOLTIP_POSITION: 1 << 5,
-  TOOLTIP_TITLE: 1 << 6,
-  TOOLTIP_SEPARATOR: 1 << 7,
-  TOOLTIP_CONTENT: 1 << 8,
-  TOOLTIP_BACKGROUND: 1 << 9,
-  TOOLTIP_VISIBILITY: 1 << 10,
+  TOOLTIP_POSITION: 1 << 7,
+  TOOLTIP_TITLE: 1 << 8,
+  TOOLTIP_SEPARATOR: 1 << 9,
+  TOOLTIP_CONTENT: 1 << 10,
+  TOOLTIP_BACKGROUND: 1 << 11,
+  TOOLTIP_VISIBILITY: 1 << 12,
   //------------------------------ CIRCULAR/LINEAR GAUGE (CHART) ------------------------------
-  GAUGE_POINTERS: 1 << 11,
-  GAUGE_KNOB: 1 << 12,
-  GAUGE_CAP: 1 << 13,
-  GAUGE_AXES: 1 << 14,
-  GAUGE_HATCH_FILL: 1 << 15,
-  GAUGE_AXIS_MARKERS: 1 << 16,
-  GAUGE_SCALE: 1 << 17,
-  GAUGE_MARKER_PALETTE: 1 << 18,
-  GAUGE_COLOR_SCALE: 1 << 19,
-  GAUGE_PALETTE: 1 << 20,
-  GAUGE_HATCH_FILL_PALETTE: 1 << 21,
-  GAUGE_SCALE_BAR: 1 << 22,
-  GAUGE_POINTER_LABEL: 1 << 12, // reset knob state for linear gauge, cause it doesn't need it
+  GAUGE_POINTERS: 1 << 12,
+  GAUGE_KNOB: 1 << 13,
+  GAUGE_CAP: 1 << 14,
+  GAUGE_AXES: 1 << 15,
+  GAUGE_HATCH_FILL: 1 << 16,
+  GAUGE_AXIS_MARKERS: 1 << 17,
+  GAUGE_SCALE: 1 << 18,
+  GAUGE_MARKER_PALETTE: 1 << 19,
+  GAUGE_COLOR_SCALE: 1 << 20,
+  GAUGE_PALETTE: 1 << 21,
+  GAUGE_HATCH_FILL_PALETTE: 1 << 22,
+  GAUGE_SCALE_BAR: 1 << 23,
+  GAUGE_POINTER_LABEL: 1 << 13, // reset knob state for linear gauge, cause it doesn't need it
   //---------------------------------- TABLE (VB) ---------------------------------------------
-  TABLE_CELL_BOUNDS: 1 << 5,
-  TABLE_OVERLAP: 1 << 6,
-  TABLE_BORDERS: 1 << 7,
-  TABLE_FILLS: 1 << 8,
-  TABLE_CONTENT: 1 << 9,
-  TABLE_STRUCTURE: 1 << 10,
+  TABLE_CELL_BOUNDS: 1 << 6,
+  TABLE_OVERLAP: 1 << 7,
+  TABLE_BORDERS: 1 << 8,
+  TABLE_FILLS: 1 << 9,
+  TABLE_CONTENT: 1 << 10,
+  TABLE_STRUCTURE: 1 << 11,
   //---------------------------------- SCROLLER (VB) ---------------------------------------------
-  SCROLLER_THUMBS_SHAPE: 1 << 5,
-  SCROLLER_ORIENTATION: 1 << 6,
-  SCROLLER_AUTO_HIDE: 1 << 7,
+  SCROLLER_THUMBS_SHAPE: 1 << 6,
+  SCROLLER_ORIENTATION: 1 << 7,
+  SCROLLER_AUTO_HIDE: 1 << 8,
   //---------------------------------- STOCK CHART (CHART) -------------------------------------------
-  STOCK_PLOTS_APPEARANCE: 1 << 11,
-  STOCK_SCROLLER: 1 << 12,
-  STOCK_DATA: 1 << 22, //13,
-  STOCK_SCALES: 1 << 14,
+  STOCK_PLOTS_APPEARANCE: 1 << 12,
+  STOCK_SCROLLER: 1 << 13,
+  STOCK_DATA: 1 << 23, //14,
+  STOCK_SCALES: 1 << 15,
   //---------------------------------- STOCK PLOT (VB) -------------------------------------------
-  STOCK_PLOT_BACKGROUND: 1 << 5,
-  STOCK_PLOT_SERIES: 1 << 6,
-  STOCK_PLOT_AXES: 1 << 7,
-  STOCK_PLOT_DT_AXIS: 1 << 8,
-  STOCK_PLOT_GRIDS: 1 << 9,
-  STOCK_PLOT_LEGEND: 1 << 10,
-  STOCK_PLOT_PALETTE: 1 << 11,
-  STOCK_PLOT_ANNOTATIONS: 1 << 12,
+  STOCK_PLOT_BACKGROUND: 1 << 6,
+  STOCK_PLOT_SERIES: 1 << 7,
+  STOCK_PLOT_AXES: 1 << 8,
+  STOCK_PLOT_DT_AXIS: 1 << 9,
+  STOCK_PLOT_GRIDS: 1 << 10,
+  STOCK_PLOT_LEGEND: 1 << 11,
+  STOCK_PLOT_PALETTE: 1 << 12,
+  STOCK_PLOT_ANNOTATIONS: 1 << 13,
   //---------------------------------- STOCK DATETIME AXIS (VB) ----------------------------------------
-  STOCK_DTAXIS_BACKGROUND: 1 << 5,
+  STOCK_DTAXIS_BACKGROUND: 1 << 6,
   //---------------------------------- STOCK SCROLLER (SCROLLER) ----------------------------------------
-  STOCK_SCROLLER_SERIES: 1 << 8,
-  STOCK_SCROLLER_AXIS: 1 << 9,
+  STOCK_SCROLLER_SERIES: 1 << 9,
+  STOCK_SCROLLER_AXIS: 1 << 10,
   //---------------------------------- TREE MAP CHART (SEPARATE CHART) ----------------------------------
-  TREEMAP_DATA: 1 << 11,
-  TREEMAP_LABELS: 1 << 12,
-  TREEMAP_MARKERS: 1 << 13,
-  TREEMAP_COLOR_SCALE: 1 << 14,
-  TREEMAP_NODE_TYPES: 1 << 15,
-  TREEMAP_COLOR_RANGE: 1 << 16,
-  TREEMAP_HINT_OPACITY: 1 << 17,
+  TREEMAP_DATA: 1 << 12,
+  TREEMAP_LABELS: 1 << 13,
+  TREEMAP_MARKERS: 1 << 14,
+  TREEMAP_COLOR_SCALE: 1 << 15,
+  TREEMAP_NODE_TYPES: 1 << 16,
+  TREEMAP_COLOR_RANGE: 1 << 17,
+  TREEMAP_HINT_OPACITY: 1 << 18,
   //---------------------------------- PERT CHART (SEPARATE CHART) ----------------------------------
-  PERT_DATA: 1 << 11,
-  PERT_CALCULATIONS: 1 << 12,
-  PERT_LABELS: 1 << 13,
-  PERT_APPEARANCE: 1 << 14,
+  PERT_DATA: 1 << 12,
+  PERT_CALCULATIONS: 1 << 13,
+  PERT_LABELS: 1 << 14,
+  PERT_APPEARANCE: 1 << 15,
   //---------------------------------- ANNOTATIONS (VB) ----------------------------------
-  ANNOTATIONS_ANCHORS: 1 << 6,
-  ANNOTATIONS_LAST_POINT: 1 << 7,
-  ANNOTATIONS_SHAPES: 1 << 8,
-  ANNOTATIONS_MARKERS: 1 << 9,
-  ANNOTATIONS_INTERACTIVITY: 1 << 10,
-  ANNOTATIONS_LABELS: 1 << 11,
-  ANNOTATIONS_LEVELS: 1 << 12,
+  ANNOTATIONS_ANCHORS: 1 << 7,
+  ANNOTATIONS_LAST_POINT: 1 << 8,
+  ANNOTATIONS_SHAPES: 1 << 9,
+  ANNOTATIONS_MARKERS: 1 << 10,
+  ANNOTATIONS_INTERACTIVITY: 1 << 11,
+  ANNOTATIONS_LABELS: 1 << 12,
+  ANNOTATIONS_LEVELS: 1 << 13,
   //---------------------------------- ANNOTATIONS (VB) ----------------------------------
-  ANNOTATIONS_CONTROLLER_ANNOTATIONS: 1 << 5,
-  ANNOTATIONS_CONTROLLER_DRAWING_MODE: 1 << 6,
+  ANNOTATIONS_CONTROLLER_ANNOTATIONS: 1 << 6,
+  ANNOTATIONS_CONTROLLER_DRAWING_MODE: 1 << 7,
   /**
    * Combination of all states.
    */
@@ -314,8 +318,9 @@ anychart.Signal = {
   NEED_UPDATE_FULL_RANGE_ITEMS: 1 << 8,
   NEED_UPDATE_TICK_DEPENDENT: 1 << 9,
   NEED_UPDATE_OVERLAP: 1 << 10,
-  NEEDS_REDRAW_LABELS: 1 << 11,
-  NEEDS_REDRAW_APPEARANCE: 1 << 12
+  NEEDS_UPDATE_A11Y: 1 << 11,
+  NEEDS_REDRAW_LABELS: 1 << 12,
+  NEEDS_REDRAW_APPEARANCE: 1 << 13
 };
 
 

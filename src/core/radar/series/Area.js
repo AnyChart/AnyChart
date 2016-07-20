@@ -271,3 +271,4 @@ anychart.core.radar.series.Area.prototype['selectStroke'] = anychart.core.radar.
 anychart.core.radar.series.Area.prototype['hatchFill'] = anychart.core.radar.series.Area.prototype.hatchFill;//inherited
 anychart.core.radar.series.Area.prototype['hoverHatchFill'] = anychart.core.radar.series.Area.prototype.hoverHatchFill;//inherited
 anychart.core.radar.series.Area.prototype['selectHatchFill'] = anychart.core.radar.series.Area.prototype.selectHatchFill;//inherited
+anychart.core.radar.series.Area.prototype['getType'] = anychart.core.radar.series.Area.prototype.getType;

@@ -1067,11 +1067,14 @@ anychart.charts.HeatMap.prototype.createSeries_ = function(data, opt_csvSettings
   if (anychart.DEFAULT_THEME != 'v6')
     instance.labels().setAutoColor(anychart.color.darken(/** @type {(acgraph.vector.Fill|acgraph.vector.Stroke)} */(instance.color())));
 
+  instance.a11y(theme[this.getType()]['defaultSeriesSettings']['base']['a11y']);
+
   instance.listenSignals(this.seriesInvalidated_, this);
 
   this.invalidate(
       anychart.ConsistencyState.HEATMAP_SERIES |
       anychart.ConsistencyState.CHART_LEGEND |
+      anychart.ConsistencyState.A11Y |
       anychart.ConsistencyState.HEATMAP_SCALES,
       anychart.Signal.NEEDS_REDRAW);
 
@@ -1089,8 +1092,12 @@ anychart.charts.HeatMap.prototype.seriesInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     state = anychart.ConsistencyState.HEATMAP_SERIES;
   }
+  if (event.hasSignal(anychart.Signal.NEEDS_UPDATE_A11Y)) {
+    state = anychart.ConsistencyState.A11Y;
+  }
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
     state |= anychart.ConsistencyState.HEATMAP_SERIES;
+    state |= anychart.ConsistencyState.A11Y;
     this.invalidateSeries_();
     if (this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
       state |= anychart.ConsistencyState.CHART_LEGEND;
@@ -1109,7 +1116,8 @@ anychart.charts.HeatMap.prototype.seriesInvalidated_ = function(event) {
 
 
 /**
- * @inheritDoc
+ * Internal public method. Returns all chart series.
+ * @return {!Array.<anychart.core.heatMap.series.Base>}
  */
 anychart.charts.HeatMap.prototype.getAllSeries = function() {
   return [this.series_];

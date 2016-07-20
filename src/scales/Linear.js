@@ -316,6 +316,7 @@ anychart.scales.linear = function() {
 
 //exports
 goog.exportSymbol('anychart.scales.linear', anychart.scales.linear);//doc|ex
+anychart.scales.Linear.prototype['getType'] = anychart.scales.Linear.prototype.getType;
 anychart.scales.Linear.prototype['ticks'] = anychart.scales.Linear.prototype.ticks;//doc|ex
 anychart.scales.Linear.prototype['minorTicks'] = anychart.scales.Linear.prototype.minorTicks;//doc|ex
 anychart.scales.Linear.prototype['stackMode'] = anychart.scales.Linear.prototype.stackMode;//inherited

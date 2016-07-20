@@ -27,7 +27,8 @@ anychart.core.utils.StockHighlightContextProvider.prototype.applyReferenceValues
 
 /** @inheritDoc */
 anychart.core.utils.StockHighlightContextProvider.prototype.getDataValue = function(key) {
-  return this['series'].getCurrentPoint().get(key);
+  var point = this['series'].getCurrentPoint();
+  return point ? point.get(key) : void 0;
 };
 
 

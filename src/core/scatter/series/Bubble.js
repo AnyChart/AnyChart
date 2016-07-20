@@ -970,3 +970,5 @@ anychart.core.scatter.series.Bubble.prototype['selectStroke'] = anychart.core.sc
 anychart.core.scatter.series.Bubble.prototype['hatchFill'] = anychart.core.scatter.series.Bubble.prototype.hatchFill;//inherited
 anychart.core.scatter.series.Bubble.prototype['hoverHatchFill'] = anychart.core.scatter.series.Bubble.prototype.hoverHatchFill;//inherited
 anychart.core.scatter.series.Bubble.prototype['selectHatchFill'] = anychart.core.scatter.series.Bubble.prototype.selectHatchFill;//inherited
+
+anychart.core.scatter.series.Bubble.prototype['getType'] = anychart.core.scatter.series.Bubble.prototype.getType;

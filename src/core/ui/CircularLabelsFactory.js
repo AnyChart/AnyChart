@@ -233,7 +233,10 @@ anychart.core.ui.CircularLabelsFactory.prototype.getDimension = function(formatP
   var anchor = /** @type {string} */(this.measureCustomLabel_.anchor() || this.anchor());
 
 
-  if (!this.measureTextElement_) this.measureTextElement_ = acgraph.text();
+  if (!this.measureTextElement_) {
+    this.measureTextElement_ = acgraph.text();
+    this.measureTextElement_.attr('aria-hidden', 'true');
+  }
   text = this.callTextFormatter(/** @type {Function} */(this.textFormatter()), formatProvider, opt_cacheIndex);
   this.measureTextElement_.width(null);
   this.measureTextElement_.height(null);

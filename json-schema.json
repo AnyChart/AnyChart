@@ -154,6 +154,12 @@
             {"$ref": "#/definitions/anychart.core.utils.Animation"}
           ]
         },
+        "a11y": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.utils.A11y"}
+          ]
+        },
         "tooltip": {
           "oneOf": [
             {"$ref": "#/definitions/disable"},
@@ -2435,6 +2441,12 @@
           "oneOf": [
             {"$ref": "#/definitions/disable"},
             {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
+          ]
+        },
+        "a11y": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.utils.A11y"}
           ]
         },
         "selectMarkers": {
@@ -5319,6 +5331,19 @@
         },
         "duration": {
           "type": "number"
+        }
+      }
+    },
+    "anychart.core.utils.A11y": {
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "titleFormatter": {
+          "type": "string"
+        },
+        "mode": {
+          "type": "string"
         }
       }
     },

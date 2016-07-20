@@ -29,6 +29,7 @@ anychart.core.ui.LegendItem = function() {
    * @private
    */
   this.textElement_ = this.layer_.text();
+  this.textElement_.attr('aria-hidden', 'true');
   this.registerDisposable(this.textElement_);
 
   /**

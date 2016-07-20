@@ -389,6 +389,7 @@ anychart.scales.ordinal = function() {
 
 //exports
 goog.exportSymbol('anychart.scales.ordinal', anychart.scales.ordinal);//doc|ex
+anychart.scales.Ordinal.prototype['getType'] = anychart.scales.Ordinal.prototype.getType;
 anychart.scales.Ordinal.prototype['transform'] = anychart.scales.Ordinal.prototype.transform;//doc|ex
 anychart.scales.Ordinal.prototype['inverseTransform'] = anychart.scales.Ordinal.prototype.inverseTransform;//doc|ex
 anychart.scales.Ordinal.prototype['ticks'] = anychart.scales.Ordinal.prototype.ticks;//doc|ex

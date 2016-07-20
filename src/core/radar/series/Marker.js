@@ -560,3 +560,4 @@ anychart.core.radar.series.Marker.prototype['selectType'] = anychart.core.radar.
 anychart.core.radar.series.Marker.prototype['hatchFill'] = anychart.core.radar.series.Marker.prototype.hatchFill;//inherited
 anychart.core.radar.series.Marker.prototype['hoverHatchFill'] = anychart.core.radar.series.Marker.prototype.hoverHatchFill;//inherited
 anychart.core.radar.series.Marker.prototype['selectHatchFill'] = anychart.core.radar.series.Marker.prototype.selectHatchFill;//inherited
+anychart.core.radar.series.Marker.prototype['getType'] = anychart.core.radar.series.Marker.prototype.getType;

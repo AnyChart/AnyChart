@@ -43,6 +43,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="x_scale" type="Scale"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="y_scale" type="Scale"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="series_list" type="Series_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="a11y" type="utils.A11y"/>
             <!-- charts.Bullet elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="range_palette" type="palettes.Colors"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="scale" type="Scale"/>
@@ -267,6 +268,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill_palette" type="palettes.HatchFills"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="scale" type="Scale"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="scales" type="Scale_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="a11y" type="utils.A11y"/>
         </xsd:all>
         <!-- core.Chart attrs -->
         <xsd:attributeGroup ref="attrs.VisualBase"/>
@@ -313,6 +315,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="timeline" type="core.Timeline"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_hover_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_selected_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="a11y" type="utils.A11y"/>
         </xsd:all>
 
         <xsd:attributeGroup ref="attrs.VisualBase"/>
@@ -364,6 +367,7 @@
 
             <xsd:element minOccurs="0" maxOccurs="1" name="geo_data" type="GeoData"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="drill_down_map" type="DrillDownMap"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="a11y" type="utils.A11y"/>
         </xsd:all>
         <!-- core.Chart attrs -->
         <xsd:attributeGroup ref="attrs.VisualBase"/>
@@ -409,6 +413,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="name" type="xsd:string"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="id" type="xsd:string"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="selectionMode" type="enums.SelectionMode"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="a11y" type="utils.A11y"/>
             <!-- BaseWithMarkers series -->
             <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_markers" type="core.MarkersFactory"/>
@@ -488,6 +493,7 @@
         <xsd:attribute name="error" type="simple.NumberOrPercentOrNullOrBool" default="true"/>
         <xsd:attribute name="x_scale" type="simple.ScaleRef"/>
         <xsd:attribute name="y_scale" type="simple.ScaleRef"/>
+        <xsd:attribute name="a11y" type="simple.Bool"/>
         <!-- BaseWithMarkers series -->
         <xsd:attribute name="markers" type="simple.MarkerType"/>
         <xsd:attribute name="hover_markers" type="simple.MarkerType"/>
@@ -629,6 +635,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="select_negative_hatch_fill" type="HatchFill"/>
             <!-- Choropleth series -->
             <xsd:element minOccurs="0" maxOccurs="1" name="color_scale" type="ColorScale"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="a11y" type="utils.A11y"/>
         </xsd:all>
         <!-- Base series -->
         <xsd:attribute name="series_type" type="enums.MapSeriesTypes"/>
@@ -1727,6 +1734,12 @@
         <xsd:attribute name="enabled" type="xsd:boolean"/>
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="utils.A11y">
+        <xsd:attribute name="enabled" type="xsd:boolean"/>
+        <xsd:attribute name="mode" type="xsd:string"/>
+        <xsd:attribute name="title_formatter" type="xsd:string"/>
     </xsd:complexType>
 
     <!-- Colors -->

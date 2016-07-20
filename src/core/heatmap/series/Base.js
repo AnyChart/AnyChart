@@ -88,7 +88,7 @@ anychart.core.heatMap.series.Base.prototype.selectMarkers_ = null;
  * @type {number}
  */
 anychart.core.heatMap.series.Base.prototype.SUPPORTED_SIGNALS =
-    anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
+    anychart.core.SeriesBase.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.DATA_CHANGED |
     anychart.Signal.NEEDS_RECALCULATION |
     anychart.Signal.NEED_UPDATE_LEGEND;
@@ -99,7 +99,7 @@ anychart.core.heatMap.series.Base.prototype.SUPPORTED_SIGNALS =
  * @type {number}
  */
 anychart.core.heatMap.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.core.SeriesBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.SERIES_HATCH_FILL |
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.SERIES_LABELS |
@@ -134,23 +134,6 @@ anychart.core.heatMap.series.Base.ZINDEX_ERROR_PATH = 3;
  * @private
  */
 anychart.core.heatMap.series.Base.prototype.clip_ = false;
-
-
-/**
- * Root layer.
- * @type {acgraph.vector.Layer}
- * @protected
- */
-anychart.core.heatMap.series.Base.prototype.rootLayer;
-
-
-/**
- * Gets root layer of series.
- * @return {acgraph.vector.Layer}
- */
-anychart.core.heatMap.series.Base.prototype.getRootLayer = function() {
-  return this.rootLayer;
-};
 
 
 /**
@@ -228,6 +211,12 @@ anychart.core.heatMap.series.Base.prototype.referenceValueNames;
 anychart.core.heatMap.series.Base.prototype.referenceValueMeanings;
 
 
+/** @inheritDoc */
+anychart.core.heatMap.series.Base.prototype.getType = function() {
+  return anychart.enums.HeatMapSeriesType.HEAT_MAP;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Data
@@ -250,7 +239,7 @@ anychart.core.heatMap.series.Base.prototype.data = function(opt_value, opt_csvSe
       this.dataInternal = this.parentView.derive();
       this.dataInternal.listenSignals(this.onDataSignal_, this);
       // DATA is supported only in Bubble, so we invalidate only for it.
-      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_DATA,
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_DATA | anychart.ConsistencyState.A11Y,
           anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND);
     }
     return this;
@@ -511,6 +500,8 @@ anychart.core.heatMap.series.Base.prototype.startDrawing = function() {
   markers.clear();
   markers.container(/** @type {acgraph.vector.ILayer} */(this.container()));
   markers.parentBounds(this.getPixelBounds());
+
+  this.drawA11y();
 };
 
 
@@ -1205,10 +1196,15 @@ anychart.core.heatMap.series.Base.prototype.calculateStatistics = function() {
   var average = sum / pointsCount;
 
   this.statistics(anychart.enums.Statistics.MAX, max);
+  this.statistics(anychart.enums.Statistics.SERIES_MAX, max);
+  this.statistics(anychart.enums.Statistics.SERIES_Y_MAX, max);
   this.statistics(anychart.enums.Statistics.MIN, min);
+  this.statistics(anychart.enums.Statistics.SERIES_MIN, min);
+  this.statistics(anychart.enums.Statistics.SERIES_Y_MIN, min);
   this.statistics(anychart.enums.Statistics.SUM, sum);
   this.statistics(anychart.enums.Statistics.AVERAGE, average);
   this.statistics(anychart.enums.Statistics.POINTS_COUNT, pointsCount);
+  this.statistics(anychart.enums.Statistics.SERIES_POINTS_COUNT, pointsCount);
 };
 
 

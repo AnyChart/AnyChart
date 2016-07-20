@@ -1886,6 +1886,9 @@ anychart.core.CartesianBase.prototype.seriesInvalidated = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     state = anychart.ConsistencyState.CARTESIAN_SERIES;
   }
+  if (event.hasSignal(anychart.Signal.NEEDS_UPDATE_A11Y)) {
+    state = anychart.ConsistencyState.A11Y;
+  }
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
     state |= anychart.ConsistencyState.CARTESIAN_SERIES | anychart.ConsistencyState.CARTESIAN_ANNOTATIONS;
     this.invalidateSeries();

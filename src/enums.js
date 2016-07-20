@@ -2709,6 +2709,36 @@ anychart.enums.normalizeScatterSeriesType = function(value, opt_default) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  HeatMapSeriesType
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all series types.
+ * @enum {string}
+ */
+anychart.enums.HeatMapSeriesType = {
+  HEAT_MAP: 'heatMap'
+};
+
+
+/**
+ * Normalizes scatter series type.
+ * @param {*} value Series type to normalize.
+ * @param {anychart.enums.HeatMapSeriesType=} opt_default Custom default value (defaults to heatMap).
+ * @return {anychart.enums.HeatMapSeriesType}
+ */
+anychart.enums.normalizeHeatMapSeriesType = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'heatmap':
+      return anychart.enums.HeatMapSeriesType.HEAT_MAP;
+  }
+  return opt_default || anychart.enums.HeatMapSeriesType.HEAT_MAP;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Scale types
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -4126,6 +4156,14 @@ anychart.enums.StringToken = {
    */
   SERIES_LAST_Y_VALUE: '%SeriesLastYValue',
   /**
+   Series min value.
+   */
+  SERIES_MIN: '%SeriesMin',
+  /**
+   Series max value.
+   */
+  SERIES_MAX: '%SeriesMax',
+  /**
    The name of this series.
    */
   SERIES_NAME: '%SeriesName',
@@ -5019,6 +5057,33 @@ anychart.enums.PropertyHandlerType = {
 //endregion
 
 
+/**
+ * Accessibility mode.
+ * @enum {string}
+ */
+anychart.enums.A11yMode = {
+  CHART_ELEMENTS: 'chartElements',
+  DATA_TABLE: 'dataTable'
+};
+
+
+/**
+ * Normalizes a11y mode.
+ * @param {anychart.enums.A11yMode|string} mode - A11y mode.
+ * @return {anychart.enums.A11yMode} - Normalized mode.
+ */
+anychart.enums.normalizeA11yMode = function(mode) {
+  var value = (String(mode)).toLowerCase();
+  switch (value) {
+    case 'chartelements':
+      return anychart.enums.A11yMode.CHART_ELEMENTS;
+    case 'datatable':
+      return anychart.enums.A11yMode.DATA_TABLE;
+  }
+  return anychart.enums.A11yMode.CHART_ELEMENTS;
+};
+
+
 //region Annotations
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -5636,6 +5701,8 @@ goog.exportSymbol('anychart.enums.StringToken.SERIES_FIRST_X_VALUE', anychart.en
 goog.exportSymbol('anychart.enums.StringToken.SERIES_FIRST_Y_VALUE', anychart.enums.StringToken.SERIES_FIRST_Y_VALUE);
 goog.exportSymbol('anychart.enums.StringToken.SERIES_LAST_X_VALUE', anychart.enums.StringToken.SERIES_LAST_X_VALUE);
 goog.exportSymbol('anychart.enums.StringToken.SERIES_LAST_Y_VALUE', anychart.enums.StringToken.SERIES_LAST_Y_VALUE);
+goog.exportSymbol('anychart.enums.StringToken.SERIES_MIN', anychart.enums.StringToken.SERIES_MIN);
+goog.exportSymbol('anychart.enums.StringToken.SERIES_MAX', anychart.enums.StringToken.SERIES_MAX);
 goog.exportSymbol('anychart.enums.StringToken.SERIES_NAME', anychart.enums.StringToken.SERIES_NAME);
 goog.exportSymbol('anychart.enums.StringToken.SERIES_POINT_COUNT', anychart.enums.StringToken.SERIES_POINT_COUNT);
 goog.exportSymbol('anychart.enums.StringToken.SERIES_X_AVERAGE', anychart.enums.StringToken.SERIES_X_AVERAGE);
@@ -5917,3 +5984,6 @@ goog.exportSymbol('anychart.enums.AnnotationTypes.FIBONACCI_ARC', anychart.enums
 goog.exportSymbol('anychart.enums.AnnotationTypes.FIBONACCI_RETRACEMENT', anychart.enums.AnnotationTypes.FIBONACCI_RETRACEMENT);
 goog.exportSymbol('anychart.enums.AnnotationTypes.FIBONACCI_TIMEZONES', anychart.enums.AnnotationTypes.FIBONACCI_TIMEZONES);
 goog.exportSymbol('anychart.enums.AnnotationTypes.MARKER', anychart.enums.AnnotationTypes.MARKER);
+
+goog.exportSymbol('anychart.enums.A11yMode.CHART_ELEMENTS', anychart.enums.A11yMode.CHART_ELEMENTS);
+goog.exportSymbol('anychart.enums.A11yMode.DATA_TABLE', anychart.enums.A11yMode.DATA_TABLE);

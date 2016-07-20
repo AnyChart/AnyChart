@@ -642,6 +642,7 @@ anychart.scales.OrdinalColor.prototype.setupByJSON = function(config) {
 
 //exports
 goog.exportSymbol('anychart.scales.ordinalColor', anychart.scales.ordinalColor);
+anychart.scales.OrdinalColor.prototype['getType'] = anychart.scales.OrdinalColor.prototype.getType;
 anychart.scales.OrdinalColor.prototype['colors'] = anychart.scales.OrdinalColor.prototype.colors;
 anychart.scales.OrdinalColor.prototype['ranges'] = anychart.scales.OrdinalColor.prototype.ranges;
 anychart.scales.OrdinalColor.prototype['names'] = anychart.scales.OrdinalColor.prototype.names;

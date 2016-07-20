@@ -657,6 +657,7 @@ anychart.core.axisMarkers.TextBase.prototype.remove = function() {
 anychart.core.axisMarkers.TextBase.prototype.markerElement = function() {
   if (!this.markerElement_) {
     this.markerElement_ = acgraph.text();
+    this.markerElement_.attr('aria-hidden', 'true');
     this.registerDisposable(this.markerElement_);
   }
   return this.markerElement_;

@@ -1080,9 +1080,11 @@ anychart.core.ui.LabelsFactory.prototype.getDimension = function(formatProviderO
   var textFormatter = this.measureCustomLabel_.textFormatter() || this.textFormatter();
 
 
-  if (!this.measureTextElement_) this.measureTextElement_ = acgraph.text();
-
-  text = this.callTextFormatter(textFormatter, formatProvider, opt_cacheIndex);
+  if (!this.measureTextElement_) {
+    this.measureTextElement_ = acgraph.text();
+    this.measureTextElement_.attr('aria-hidden', 'true');
+  }
+  text = this.callTextFormatter(this.textFormatter_, formatProvider, opt_cacheIndex);
   this.measureTextElement_.width(null);
   this.measureTextElement_.height(null);
   if (isHtml) {
@@ -2237,8 +2239,10 @@ anychart.core.ui.LabelsFactory.Label.prototype.createSizeMeasureElement_ = funct
   var formatProvider = this.formatProvider();
   var text = parentLabelsFactory.callTextFormatter(mergedSettings['textFormatter'], formatProvider, this.getIndex());
 
-  if (!this.fontSizeMeasureElement_)
+  if (!this.fontSizeMeasureElement_) {
     this.fontSizeMeasureElement_ = acgraph.text();
+    this.fontSizeMeasureElement_.attr('aria-hidden', 'true');
+  }
 
   if (isHtml) this.fontSizeMeasureElement_.htmlText(goog.isDef(text) ? String(text) : '');
   else this.fontSizeMeasureElement_.text(goog.isDef(text) ? String(text) : '');
@@ -2344,6 +2348,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
 
     if (!this.textElement) {
       this.textElement = acgraph.text();
+      this.textElement.attr('aria-hidden', 'true');
       this.textElement.zIndex(1);
       this.textElement.parent(this.layer_);
       this.textElement.disablePointerEvents(true);

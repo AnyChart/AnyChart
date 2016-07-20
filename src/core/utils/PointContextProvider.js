@@ -5,10 +5,10 @@ goog.require('anychart.core.utils.IContextProvider');
 
 
 /**
- * @implements {anychart.core.utils.IContextProvider}
  * @param {anychart.charts.Pie|anychart.core.PyramidFunnelBase|anychart.charts.Sparkline} chartInstance chart instance.
  * @param {Array.<string>} referenceValueNames reference value names to be applied.
  * @extends {anychart.core.utils.BaseContextProvider}
+ * @implements {anychart.core.utils.IContextProvider}
  * @constructor
  */
 anychart.core.utils.PointContextProvider = function(chartInstance, referenceValueNames) {

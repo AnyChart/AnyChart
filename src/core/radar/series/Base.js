@@ -60,7 +60,7 @@ anychart.core.radar.series.Base.prototype.pixelBoundsCache;
  * @type {number}
  */
 anychart.core.radar.series.Base.prototype.SUPPORTED_SIGNALS =
-    anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
+    anychart.core.SeriesBase.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.DATA_CHANGED |
     anychart.Signal.NEEDS_RECALCULATION |
     anychart.Signal.NEED_UPDATE_LEGEND;
@@ -71,7 +71,7 @@ anychart.core.radar.series.Base.prototype.SUPPORTED_SIGNALS =
  * @type {number}
  */
 anychart.core.radar.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.core.SeriesBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.SERIES_HATCH_FILL |
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.SERIES_LABELS |
@@ -90,14 +90,6 @@ anychart.core.radar.series.Base.ZINDEX_SERIES = 1;
  * @type {number}
  */
 anychart.core.radar.series.Base.ZINDEX_HATCH_FILL = 2;
-
-
-/**
- * Root layer.
- * @type {acgraph.vector.Layer}
- * @protected
- */
-anychart.core.radar.series.Base.prototype.rootLayer;
 
 
 /**
@@ -502,6 +494,8 @@ anychart.core.radar.series.Base.prototype.startDrawing = function() {
   this.labels().clear();
   this.labels().container(/** @type {acgraph.vector.ILayer} */(this.container()));
   this.labels().parentBounds(this.pixelBoundsCache);
+
+  this.drawA11y();
 };
 
 
@@ -681,8 +675,10 @@ anychart.core.radar.series.Base.prototype.calculateStatistics = function() {
   }
   var seriesAverage = seriesSum / seriesPointsCount;
 
+  this.statistics(anychart.enums.Statistics.SERIES_Y_MAX, seriesMax);
   this.statistics(anychart.enums.Statistics.SERIES_MAX, seriesMax);
   this.statistics(anychart.enums.Statistics.SERIES_MIN, seriesMin);
+  this.statistics(anychart.enums.Statistics.SERIES_Y_MIN, seriesMin);
   this.statistics(anychart.enums.Statistics.SERIES_SUM, seriesSum);
   this.statistics(anychart.enums.Statistics.SERIES_AVERAGE, seriesAverage);
   this.statistics(anychart.enums.Statistics.SERIES_POINTS_COUNT, seriesPointsCount);
@@ -709,13 +705,6 @@ anychart.core.radar.series.Base.prototype.setAutoMarkerType = function(value) {
 //  Series default settings.
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Returns type of current series.
- * @return {anychart.enums.CartesianSeriesType} Series type.
- */
-anychart.core.radar.series.Base.prototype.getType = goog.abstractMethod;
-
-
 /** @inheritDoc */
 anychart.core.radar.series.Base.prototype.getEnableChangeSignals = function() {
   return goog.base(this, 'getEnableChangeSignals') | anychart.Signal.DATA_CHANGED | anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEED_UPDATE_LEGEND;

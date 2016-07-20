@@ -563,6 +563,7 @@ anychart.core.ui.LabelBase.prototype.calculateFontSize_ = function(originWidth, 
 
   var settings = this.changedSettings;
   var text = acgraph.text();
+  text.attr('aria-hidden', 'true');
   this.applyTextSettings(text, true);
   this.changedSettings = settings;
 
@@ -920,6 +921,7 @@ anychart.core.ui.LabelBase.prototype.createTextElement_ = function() {
   var isInitial;
   if (isInitial = !this.textElement) {
     this.textElement = acgraph.text();
+    this.textElement.attr('aria-hidden', 'true');
     this.registerDisposable(this.textElement);
   }
   return isInitial;

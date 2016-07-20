@@ -185,6 +185,7 @@ anychart.scales.dateTime = function() {
 
 //exports
 goog.exportSymbol('anychart.scales.dateTime', anychart.scales.dateTime);//doc|ex
+anychart.scales.DateTime.prototype['getType'] = anychart.scales.DateTime.prototype.getType;
 anychart.scales.DateTime.prototype['ticks'] = anychart.scales.DateTime.prototype.ticks;//doc|ex
 anychart.scales.DateTime.prototype['minorTicks'] = anychart.scales.DateTime.prototype.minorTicks;//doc|ex
 anychart.scales.DateTime.prototype['transform'] = anychart.scales.DateTime.prototype.transform;//inherited

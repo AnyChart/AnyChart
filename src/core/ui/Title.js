@@ -438,6 +438,7 @@ anychart.core.ui.Title.prototype.draw = function() {
   if (isInitial = !this.layer_) {
     this.layer_ = acgraph.layer();
     this.text_ = this.layer_.text();
+    this.text_.attr('aria-hidden', 'true');
     this.text_.zIndex(1);
     this.registerDisposable(this.layer_);
     this.bindHandlersToGraphics(this.layer_);
@@ -655,6 +656,7 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
   if (isInitial = !this.layer_) {
     this.layer_ = acgraph.layer();
     this.text_ = this.layer_.text();
+    this.text_.attr('aria-hidden', 'true');
     this.text_.zIndex(1);
     this.registerDisposable(this.layer_);
     this.bindHandlersToGraphics(this.layer_);

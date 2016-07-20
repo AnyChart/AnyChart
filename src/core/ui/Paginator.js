@@ -442,6 +442,7 @@ anychart.core.ui.Paginator.prototype.draw = function() {
   var isInitial;
   if (isInitial = !this.text_) {
     this.text_ = acgraph.text();
+    this.text_.attr('aria-hidden', 'true');
     this.registerDisposable(this.text_);
   }
 
@@ -575,6 +576,7 @@ anychart.core.ui.Paginator.prototype.measureMaxDimensions_ = function() {
   var cacheIndex = this.pageCount_ + this.layout_.substr(0, 1);
   if (reCache || !this.boundsCache_[cacheIndex]) {
     var measureText = acgraph.text();
+    measureText.attr('aria-hidden', 'true');
     var stngs = this.changedSettings;
     this.applyTextSettings(measureText, true);
     this.changedSettings = stngs;

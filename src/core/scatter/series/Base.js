@@ -89,7 +89,7 @@ anychart.core.scatter.series.Base.prototype.pixelBoundsCache;
  * @type {number}
  */
 anychart.core.scatter.series.Base.prototype.SUPPORTED_SIGNALS =
-    anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
+    anychart.core.SeriesBase.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.DATA_CHANGED |
     anychart.Signal.NEEDS_RECALCULATION |
     anychart.Signal.NEED_UPDATE_LEGEND;
@@ -100,7 +100,7 @@ anychart.core.scatter.series.Base.prototype.SUPPORTED_SIGNALS =
  * @type {number}
  */
 anychart.core.scatter.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.core.SeriesBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.SERIES_HATCH_FILL |
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.SERIES_LABELS |
@@ -134,14 +134,6 @@ anychart.core.scatter.series.Base.ZINDEX_ERROR_PATH = 3;
  * @private
  */
 anychart.core.scatter.series.Base.prototype.clip_ = false;
-
-
-/**
- * Root layer.
- * @type {acgraph.vector.Layer}
- * @protected
- */
-anychart.core.scatter.series.Base.prototype.rootLayer;
 
 
 /**
@@ -207,7 +199,7 @@ anychart.core.scatter.series.Base.prototype.data = function(opt_value, opt_csvSe
       this.dataInternal = this.parentView.derive();
       this.dataInternal.listenSignals(this.onDataSignal_, this);
       // DATA is supported only in Bubble, so we invalidate only for it.
-      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_DATA,
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_DATA | anychart.ConsistencyState.A11Y,
           anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -421,6 +413,8 @@ anychart.core.scatter.series.Base.prototype.startDrawing = function() {
   this.labels().clear();
   this.labels().container(/** @type {acgraph.vector.ILayer} */(this.container()));
   this.labels().parentBounds(this.pixelBoundsCache);
+
+  this.drawA11y();
 };
 
 
@@ -876,13 +870,6 @@ anychart.core.scatter.series.Base.prototype.drawError = function() {
 //  Series default settings.
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Returns type of current series.
- * @return {anychart.enums.ScatterSeriesType} Series type.
- */
-anychart.core.scatter.series.Base.prototype.getType = goog.abstractMethod;
-
-
 /** @inheritDoc */
 anychart.core.scatter.series.Base.prototype.getEnableChangeSignals = function() {
   return goog.base(this, 'getEnableChangeSignals') | anychart.Signal.DATA_CHANGED | anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEED_UPDATE_LEGEND;

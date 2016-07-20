@@ -151,6 +151,7 @@ anychart.scales.log = function() {
 
 //exports
 goog.exportSymbol('anychart.scales.log', anychart.scales.log);//doc|ex
+anychart.scales.Logarithmic.prototype['getType'] = anychart.scales.Logarithmic.prototype.getType;//inherited
 anychart.scales.Logarithmic.prototype['transform'] = anychart.scales.Logarithmic.prototype.transform;//inherited
 anychart.scales.Logarithmic.prototype['inverseTransform'] = anychart.scales.Logarithmic.prototype.inverseTransform;//inherited
 anychart.scales.Logarithmic.prototype['logBase'] = anychart.scales.Logarithmic.prototype.logBase;//doc|ex

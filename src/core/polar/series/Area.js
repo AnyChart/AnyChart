@@ -296,3 +296,4 @@ anychart.core.polar.series.Area.prototype['hatchFill'] = anychart.core.polar.ser
 anychart.core.polar.series.Area.prototype['hoverHatchFill'] = anychart.core.polar.series.Area.prototype.hoverHatchFill;//inherited
 anychart.core.polar.series.Area.prototype['selectHatchFill'] = anychart.core.polar.series.Area.prototype.selectHatchFill;//inherited
 anychart.core.polar.series.Area.prototype['finalizeDrawing'] = anychart.core.polar.series.Area.prototype.finalizeDrawing;//inherited
+anychart.core.polar.series.Area.prototype['getType'] = anychart.core.polar.series.Area.prototype.getType;

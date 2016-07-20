@@ -264,6 +264,204 @@ goog.provide('anychart.themes.defaultTheme');
   };
 
 
+  /**
+   * @this {*}
+   * @return {*}
+   */
+  var chartA11yTitleFormatter = function() {
+    var chart = this['chart'];
+    var title = chart['title']();
+    var titleText = title && title['enabled']() && title['text']() ? title['text']() : '';
+    var type = chart['getType']();
+    var typeText = type || 'Anychart ';
+    return typeText + ' chart ' + (titleText ? ' entitled ' + titleText : '');
+  };
+
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
+  var pieA11yTitleFormatter = function() {
+    var chart = this['chart'];
+    var res = chartA11yTitleFormatter.apply(this);
+    res += ', with ' + chart['getStat']('count') + ' points. ';
+    res += 'Min value is ' + chart['getStat']('min') + ', max value is ' + chart['getStat']('max') + '.';
+    return res;
+  };
+
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
+  var bulletA11yTitleFormatter = function() {
+    var res = chartA11yTitleFormatter.apply(this);
+    return res + '. ';
+  };
+
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
+  var cartesianBaseA11yTitleFormatter = function() {
+    var chart = this['chart'];
+    var res = chartA11yTitleFormatter.call(this);
+    var seriesLength = chart['getSeriesCount']();
+
+    var seriesMap = {};
+    for (var i = 0; i < seriesLength; i++) {
+      var ser = chart['getSeriesAt'](i);
+      var type = ser['seriesType']();
+      if (seriesMap.hasOwnProperty(type)) {
+        seriesMap[type] += 1;
+      } else {
+        seriesMap[type] = 1;
+      }
+    }
+
+    res += ', with ';
+    for (var key in seriesMap) {
+      res += seriesMap[key] + ' ' + key + ' series, ';
+    }
+    res += '. ';
+
+    var yScale = chart['yScale']();
+    var xScale = chart['xScale']();
+    var xType = xScale['getType']();
+    var yType = yScale['getType']();
+
+    if (yType == 'ordinal') { //By xml-scheme, enums.ScaleTypes
+      var yVals = yScale['values']();
+      res += 'Y-scale with ' + yVals.length + ' categories: ';
+      for (var y = 0; y < yVals.length; y++) {
+        res += yVals[y] + ', ';
+      }
+      res += '. ';
+    } else if (yType == 'dateTime') {
+      res += 'Y-scale minimum value is ' + window['anychart']['format']['dateTime'](yScale['minimum']()) +
+          ' , maximum value is ' + window['anychart']['format']['dateTime'](yScale['maximum']()) + '. ';
+    } else { // log/linear.
+      res += 'Y-scale minimum value is ' + yScale['minimum']() + ' , maximum value is ' + yScale['maximum']() + '. ';
+    }
+
+    if (xType == 'ordinal') {
+      var xVals = xScale['values']();
+      res += 'X-scale with ' + xVals.length + ' categories: ';
+      for (var x = 0; x < xVals.length; x++) {
+        res += xVals[x] + ', ';
+      }
+      res += '. ';
+    } else if (xType == 'dateTime') {
+      res += 'X-scale minimum value is ' + window['anychart']['format']['dateTime'](xScale['minimum']()) +
+          ' , maximum value is ' + window['anychart']['format']['dateTime'](xScale['maximum']()) + '. ';
+    } else { // log/linear.
+      res += 'X-scale minimum value is ' + xScale['minimum']() + ' , maximum value is ' + xScale['maximum']() + '. ';
+    }
+
+    return res;
+  };
+
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
+  var stockBaseA11yTitleFormatter = function() {
+    var chart = this['chart'];
+    var res = chartA11yTitleFormatter.call(this);
+    var seriesLength = chart['getSeriesCount']();
+
+    var seriesMap = {};
+    for (var i = 0; i < seriesLength; i++) {
+      var ser = chart['getSeriesAt'](i);
+      var type = ser['seriesType']();
+      if (seriesMap.hasOwnProperty(type)) {
+        seriesMap[type] += 1;
+      } else {
+        seriesMap[type] = 1;
+      }
+    }
+
+    res += ', with ';
+    for (var key in seriesMap) {
+      res += seriesMap[key] + ' ' + key + ' series, ';
+    }
+    res += '. ';
+
+    var xScale = chart['xScale']();
+
+    res += 'X-scale minimum value is ' + window['anychart']['format']['dateTime'](xScale['getMinimum']()) +
+        ' , maximum value is ' + window['anychart']['format']['dateTime'](xScale['getMaximum']()) + '. ';
+
+    return res;
+  };
+
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
+  var scatterA11yTitleFormatter = function() {
+    var chart = this['chart'];
+    var res = chartA11yTitleFormatter.call(this);
+    var seriesLength = chart['getSeriesCount']();
+
+    var seriesMap = {};
+    for (var i = 0; i < seriesLength; i++) {
+      var ser = chart['getSeriesAt'](i);
+      var type = ser['getType']();
+      if (seriesMap.hasOwnProperty(type)) {
+        seriesMap[type] += 1;
+      } else {
+        seriesMap[type] = 1;
+      }
+    }
+
+    res += ', with ';
+    for (var key in seriesMap) {
+      res += seriesMap[key] + ' ' + key + ' series, ';
+    }
+    res += '. ';
+
+    var yScale = chart['yScale']();
+    var xScale = chart['xScale']();
+    var xType = xScale['getType']();
+    var yType = yScale['getType']();
+
+    if (yType == 'ordinal') { //By xml-scheme, enums.ScaleTypes
+      var yVals = yScale['values']();
+      res += 'Y-scale with ' + yVals.length + ' categories: ';
+      for (var y = 0; y < yVals.length; y++) {
+        res += yVals[y] + ', ';
+      }
+      res += '. ';
+    } else if (yType == 'dateTime') {
+      res += 'Y-scale minimum value is ' + window['anychart']['format']['dateTime'](yScale['minimum']()) +
+          ' , maximum value is ' + window['anychart']['format']['dateTime'](yScale['maximum']()) + '. ';
+    } else { // log/linear.
+      res += 'Y-scale minimum value is ' + yScale['minimum']() + ' , maximum value is ' + yScale['maximum']() + '. ';
+    }
+
+    if (xType == 'ordinal') {
+      var xVals = xScale['values']();
+      res += 'X-scale with ' + xVals.length + ' categories: ';
+      for (var x = 0; x < xVals.length; x++) {
+        res += xVals[x] + ', ';
+      }
+      res += '. ';
+    } else if (xType == 'dateTime') {
+      res += 'X-scale minimum value is ' + window['anychart']['format']['dateTime'](xScale['minimum']()) +
+          ' , maximum value is ' + window['anychart']['format']['dateTime'](xScale['maximum']()) + '. ';
+    } else { // log/linear.
+      res += 'X-scale minimum value is ' + xScale['minimum']() + ' , maximum value is ' + xScale['maximum']() + '. ';
+    }
+
+    return res;
+  };
+
+
   window['anychart'] = window['anychart'] || {};
   window['anychart']['themes'] = window['anychart']['themes'] || {};
   window['anychart']['themes']['defaultTheme'] = {
@@ -905,7 +1103,11 @@ goog.provide('anychart.themes.defaultTheme');
             'valueErrorStroke': returnDarkenSourceColor
           },
           'pointWidth': null,
-          'connectMissingPoints': false
+          'connectMissingPoints': false,
+          'a11y': {
+            'enabled': true,
+            'titleFormatter': 'Series named {%SeriesName} with {%SeriesPointsCount} points. Min value is {%SeriesYMin}, max value is {%SeriesYMax}'
+          }
         },
         'marker': {
           'fill': returnSourceColor,
@@ -1185,6 +1387,11 @@ goog.provide('anychart.themes.defaultTheme');
       'chartLabels': [],
       'maxBubbleSize': '20%',
       'minBubbleSize': '5%',
+      'a11y': {
+        'enabled': true,
+        'titleFormatter': chartA11yTitleFormatter,
+        'mode': 'chartElements'
+      },
       'defaultAnnotationSettings': {
         'base': {
           'enabled': true,
@@ -1531,6 +1738,9 @@ goog.provide('anychart.themes.defaultTheme');
         'continuous': true,
         'startRatio': 0,
         'endRatio': 1
+      },
+      'a11y': {
+        'titleFormatter': cartesianBaseA11yTitleFormatter
       }
     },
 
@@ -1893,6 +2103,9 @@ goog.provide('anychart.themes.defaultTheme');
       'insideLabelsOffset': '50%',
       'labels': {
         'textFormatter': Y_PERCENT_OF_TOTAL_TOKEN + '%'
+      },
+      'a11y': {
+        'titleFormatter': pieA11yTitleFormatter
       }
     },
     'funnel': {
@@ -1960,7 +2173,11 @@ goog.provide('anychart.themes.defaultTheme');
             }
           },
           'xScale': null,
-          'yScale': null
+          'yScale': null,
+          'a11y': {
+            'enabled': true,
+            'titleFormatter': 'Series named {%SeriesName} with {%SeriesPointsCount} points. Min value is {%SeriesYMin}, max value is {%SeriesYMax}'
+          }
         },
         'bubble': {
           'displayNegative': false,
@@ -2070,6 +2287,9 @@ goog.provide('anychart.themes.defaultTheme');
         'xStroke': colorStrokeExtraBright,
         'yStroke': colorStrokeExtraBright,
         'zIndex': 41
+      },
+      'a11y': {
+        'titleFormatter': scatterA11yTitleFormatter
       }
     },
     // merge with scatter
@@ -2082,7 +2302,11 @@ goog.provide('anychart.themes.defaultTheme');
       'defaultSeriesSettings': {
         'base': {
           'enabled': true,
-          'hatchFill': null
+          'hatchFill': null,
+          'a11y': {
+            'enabled': true,
+            'titleFormatter': 'Series named {%SeriesName} with {%SeriesPointsCount} points. Min value is {%SeriesYMin}, max value is {%SeriesYMax}'
+          }
         },
         'area': {},
         'line': {},
@@ -2129,7 +2353,10 @@ goog.provide('anychart.themes.defaultTheme');
         }
       ],
       'xScale': 0,
-      'yScale': 1
+      'yScale': 1,
+      'a11y': {
+        'titleFormatter': scatterA11yTitleFormatter
+      }
     },
     // merge with chart
     'polar': {
@@ -2200,7 +2427,10 @@ goog.provide('anychart.themes.defaultTheme');
         }
       ],
       'xScale': 0,
-      'yScale': 1
+      'yScale': 1,
+      'a11y': {
+        'titleFormatter': scatterA11yTitleFormatter
+      }
     },
 
     // merge with chart
@@ -2278,7 +2508,10 @@ goog.provide('anychart.themes.defaultTheme');
         'maximum': null,
         'inverted': false
       },
-      'ranges': []
+      'ranges': [],
+      'a11y': {
+        'titleFormatter': bulletA11yTitleFormatter
+      }
     },
     // merge with chart
     'sparkline': {
@@ -3161,6 +3394,9 @@ goog.provide('anychart.themes.defaultTheme');
       'yScroller': {
         'orientation': 'right',
         'inverted': true
+      },
+      'a11y': {
+        'titleFormatter': chartA11yTitleFormatter
       }
     },
 
@@ -4230,6 +4466,9 @@ goog.provide('anychart.themes.defaultTheme');
         'textFormatter': function() {
           return this['formattedValues'].join('\n');
         }
+      },
+      'a11y': {
+        'titleFormatter': chartA11yTitleFormatter
       }
     },
 

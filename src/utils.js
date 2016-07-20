@@ -3,11 +3,13 @@ goog.provide('anychart.utils');
 goog.require('acgraph.vector.primitives');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.TooltipsContainer');
+goog.require('anychart.data.csv.Parser');
 goog.require('anychart.enums');
 goog.require('anychart.math');
 goog.require('goog.array');
 goog.require('goog.date.Interval');
 goog.require('goog.date.UtcDateTime');
+goog.require('goog.dom');
 goog.require('goog.dom.xml');
 goog.require('goog.i18n.DateTimeFormat');
 goog.require('goog.json.hybrid');
@@ -163,9 +165,7 @@ anychart.utils.checkIfParent = function(parent, target) {
 anychart.utils.hash = function(value) {
   // Prefix each type with a single character representing the type to
   // prevent conflicting keys (e.g. true and 'true').
-  return goog.isObject(value) ?
-      'o' + goog.getUid(value) :
-      (typeof value).charAt(0) + value;
+  return goog.isObject(value) ? 'o' + goog.getUid(value) : (typeof value).charAt(0) + value;
 };
 
 
@@ -182,7 +182,7 @@ anychart.utils.normalizeSize = function(value, opt_containerSize, opt_invert) {
   var result = goog.isNumber(value) ?
       value :
       (!isNaN(opt_containerSize) && anychart.utils.isPercent(value) ?
-          opt_containerSize * parseFloat(value) / 100 :
+      opt_containerSize * parseFloat(value) / 100 :
           parseFloat(value));
   return (opt_invert && !isNaN(opt_containerSize)) ? opt_containerSize - result : result;
 };
@@ -1803,9 +1803,79 @@ anychart.utils.getMarkerDrawer = function(type) {
 };
 
 
+/**
+ * Creates HTML Table by csv.
+ * @param {string} csv - Source csv string.
+ * @param {string=} opt_title - Title to be set.
+ * @param {boolean=} opt_asString - Whether to represent table as string.
+ * @param {Object=} opt_csvSettings - CSV settings.
+ * @return {?Element} - HTML table instance or null if got some parse errors.
+ */
+anychart.utils.htmlTableFromCsv = function(csv, opt_title, opt_asString, opt_csvSettings) {
+  var parser = new anychart.data.csv.Parser();
+  var allowHeader = true;
+  if (goog.isObject(opt_csvSettings)) {
+    parser.rowsSeparator(/** @type {string|undefined} */(opt_csvSettings['rowsSeparator']));
+    parser.columnsSeparator(/** @type {string|undefined} */(opt_csvSettings['columnsSeparator']));
+    parser.ignoreTrailingSpaces(/** @type {boolean|undefined} */(opt_csvSettings['ignoreTrailingSpaces']));
+    allowHeader = !(opt_csvSettings['ignoreFirstRow']);
+    parser.ignoreFirstRow(allowHeader);
+  }
+
+  var result = parser.parse(csv);
+  if (result) {
+    var table = goog.dom.createDom('table');
+
+    if (opt_title) {
+      var caption = goog.dom.createDom('caption');
+      goog.dom.append(caption, opt_title);
+      goog.dom.appendChild(table, caption);
+    }
+
+    var thead, theadTr;
+    if (allowHeader) {
+      thead = goog.dom.createDom('thead');
+      theadTr = goog.dom.createDom('tr');
+      goog.dom.appendChild(thead, theadTr);
+    }
+
+    var tbody = goog.dom.createDom('tbody');
+
+    for (var i = 0; i < result.length; i++) {
+      var rows = result[i];
+      var j, row;
+
+      if (i || !allowHeader) {
+        var tbodyTr = goog.dom.createDom('tr');
+        for (j = 0; j < rows.length; j++) {
+          row = rows[j];
+          var el = goog.dom.createDom(j ? 'td' : 'th');
+          goog.dom.append(el, row);
+          goog.dom.appendChild(tbodyTr, el);
+        }
+        goog.dom.appendChild(tbody, tbodyTr);
+      } else if (allowHeader) {
+        for (j = 0; j < rows.length; j++) {
+          row = rows[j];
+          var theadTh = goog.dom.createDom('th');
+          goog.dom.append(theadTh, row);
+          goog.dom.appendChild(/** @type {!Element} */ (theadTr), theadTh);
+        }
+      }
+    }
+
+    if (allowHeader) goog.dom.appendChild(table, /** @type {!Element} */ (thead));
+    goog.dom.appendChild(table, tbody);
+    return table;
+  }
+  return null;
+};
+
+
 //exports
 goog.exportSymbol('anychart.utils.xml2json', anychart.utils.xml2json);
 goog.exportSymbol('anychart.utils.json2xml', anychart.utils.json2xml);
 goog.exportSymbol('anychart.utils.defaultDateFormatter', anychart.utils.defaultDateFormatter);
 goog.exportSymbol('anychart.utils.formatDateTime', anychart.utils.formatDateTime);
 goog.exportSymbol('anychart.utils.hideTooltips', anychart.utils.hideTooltips);
+goog.exportSymbol('anychart.utils.htmlTableFromCsv', anychart.utils.htmlTableFromCsv);

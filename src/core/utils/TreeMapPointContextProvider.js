@@ -7,8 +7,8 @@ goog.require('anychart.core.utils.IContextProvider');
 /**
  * TreeMap point context provider.
  * @param {anychart.charts.TreeMap} chart chart instance.
- * @implements {anychart.core.utils.IContextProvider}
  * @extends {anychart.core.utils.BaseContextProvider}
+ * @implements {anychart.core.utils.IContextProvider}
  * @constructor
  */
 anychart.core.utils.TreeMapPointContextProvider = function(chart) {

@@ -581,3 +581,4 @@ anychart.core.scatter.series.Marker.prototype['selectType'] = anychart.core.scat
 anychart.core.scatter.series.Marker.prototype['hatchFill'] = anychart.core.scatter.series.Marker.prototype.hatchFill;//inherited
 anychart.core.scatter.series.Marker.prototype['hoverHatchFill'] = anychart.core.scatter.series.Marker.prototype.hoverHatchFill;//inherited
 anychart.core.scatter.series.Marker.prototype['selectHatchFill'] = anychart.core.scatter.series.Marker.prototype.selectHatchFill;//inherited
+anychart.core.scatter.series.Marker.prototype['getType'] = anychart.core.scatter.series.Marker.prototype.getType;

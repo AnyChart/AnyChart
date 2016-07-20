@@ -20,6 +20,7 @@ goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.LegendContextProvider');
 goog.require('anychart.core.utils.LegendItemSettings');
 goog.require('anychart.core.utils.Padding');
+goog.require('anychart.core.utils.SeriesA11y');
 goog.require('anychart.core.utils.SeriesPointContextProvider');
 goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
@@ -123,6 +124,12 @@ anychart.core.series.Base = function(chart, plot, type, config) {
    */
   this.comparisonZero = 0;
 
+  /**
+   * @type {anychart.core.utils.SeriesA11y}
+   * @private
+   */
+  this.a11y_ = null;
+
   this.applyConfig(config);
 };
 goog.inherits(anychart.core.series.Base, anychart.core.VisualBaseWithBounds);
@@ -141,7 +148,8 @@ anychart.core.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.SERIES_ERROR |
     anychart.ConsistencyState.SERIES_COLOR |
     anychart.ConsistencyState.SERIES_CLIP |
-    anychart.ConsistencyState.SERIES_POINTS;
+    anychart.ConsistencyState.SERIES_POINTS |
+    anychart.ConsistencyState.A11Y;
 
 
 /**
@@ -152,7 +160,8 @@ anychart.core.series.Base.prototype.SUPPORTED_SIGNALS =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.DATA_CHANGED |
     anychart.Signal.NEEDS_RECALCULATION |
-    anychart.Signal.NEED_UPDATE_LEGEND;
+    anychart.Signal.NEED_UPDATE_LEGEND |
+    anychart.Signal.NEEDS_UPDATE_A11Y;
 
 
 //region Properties
@@ -491,6 +500,8 @@ anychart.core.series.Base.prototype.applyDefaultsToElements = function(defaults,
 
   this.clip(defaults[anychart.opt.CLIP]);
   this.zIndex(defaults[anychart.opt.Z_INDEX]);
+
+  this.a11y(defaults['a11y'] || this.plot.defaultSeriesSettings()['a11y']);
 };
 //endregion
 
@@ -2394,6 +2405,42 @@ anychart.core.series.Base.prototype.remove = function() {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Accessibility.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Setter/getter for accessibility setting.
+ * @param {(boolean|Object)=} opt_enabledOrJson - Whether to enable accessibility.
+ * @return {anychart.core.utils.SeriesA11y|anychart.core.series.Base} - Accessibility settings object or self for chaining.
+ */
+anychart.core.series.Base.prototype.a11y = function(opt_enabledOrJson) {
+  if (!this.a11y_) {
+    this.a11y_ = new anychart.core.utils.SeriesA11y(this);
+    this.registerDisposable(this.a11y_);
+    this.a11y_.listenSignals(this.onA11ySignal_, this);
+    if (this.chart instanceof anychart.core.Chart)
+      this.a11y_.parentA11y(/** @type {anychart.core.utils.A11y} */ (/** @type {anychart.core.Chart} */ (this.chart).a11y()));
+  }
+  if (goog.isDef(opt_enabledOrJson)) {
+    this.a11y_.setup.apply(this.a11y_, arguments);
+    return this;
+  } else {
+    return this.a11y_;
+  }
+};
+
+
+/**
+ * Animation enabled change handler.
+ * @private
+ */
+anychart.core.series.Base.prototype.onA11ySignal_ = function() {
+  this.invalidate(anychart.ConsistencyState.A11Y, anychart.Signal.NEEDS_REDRAW);
+};
+
+
 /**
  * Draws the series.
  * @return {anychart.core.series.Base}
@@ -2422,7 +2469,8 @@ anychart.core.series.Base.prototype.draw = function() {
   // calculating pixel positions
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA)) {
     this.prepareData();
-    this.invalidate(anychart.ConsistencyState.SERIES_POINTS | anychart.ConsistencyState.SERIES_COLOR);
+    this.invalidate(anychart.ConsistencyState.SERIES_POINTS | anychart.ConsistencyState.SERIES_COLOR | anychart.ConsistencyState.A11Y,
+        anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_UPDATE_A11Y);
     this.markConsistent(anychart.ConsistencyState.SERIES_DATA);
   }
 
@@ -2579,6 +2627,12 @@ anychart.core.series.Base.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_CLIP)) {
     this.applyClip();
     this.markConsistent(anychart.ConsistencyState.SERIES_CLIP);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.A11Y)) {
+    //SeriesPointContextProvider is pretty suitable in this case.
+    this.a11y().applyA11y(this.createTooltipContextProvider());
+    this.markConsistent(anychart.ConsistencyState.A11Y);
   }
 
   this.resumeSignalsDispatching(false);
@@ -3705,6 +3759,8 @@ anychart.core.series.Base.prototype.serialize = function() {
 
   anychart.core.settings.serialize(this, anychart.core.series.Base.PROPERTY_DESCRIPTORS, json);
 
+  json['a11y'] = this.a11y().serialize();
+
   return json;
 };
 
@@ -3720,6 +3776,7 @@ anychart.core.series.Base.prototype.setupByJSON = function(config) {
   this.name(config['name']);
   this.meta(config['meta']);
   this.clip(config['clip']);
+  this.a11y(config['a11y']);
 
   anychart.core.settings.deserialize(this, anychart.core.series.Base.PROPERTY_DESCRIPTORS, config);
 
@@ -3856,6 +3913,8 @@ anychart.core.series.Base.prototype.disposeInternal = function() {
 //endregion
 
 //exports
+anychart.core.series.Base.prototype['a11y'] = anychart.core.series.Base.prototype.a11y;
+
 anychart.core.series.Base.prototype['seriesType'] = anychart.core.series.Base.prototype.seriesType;
 anychart.core.series.Base.prototype['name'] = anychart.core.series.Base.prototype.name;
 anychart.core.series.Base.prototype['id'] = anychart.core.series.Base.prototype.id;

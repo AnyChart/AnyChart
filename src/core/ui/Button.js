@@ -347,6 +347,7 @@ anychart.core.ui.Button.prototype.drawText = function(textSettings) {
 
   if (isInitial) {
     this.textElement = acgraph.text();
+    this.textElement.attr('aria-hidden', 'true');
     this.bindHandlersToGraphics(this.textElement, this.handleMouseOver, this.handleMouseOut, null, null,
         this.handleMouseDown, this.handleMouseUp);
     this.registerDisposable(this.textElement);

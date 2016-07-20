@@ -11,6 +11,7 @@ goog.require('anychart.core.utils.IInteractiveSeries');
 goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.LegendContextProvider');
 goog.require('anychart.core.utils.LegendItemSettings');
+goog.require('anychart.core.utils.SeriesA11y');
 goog.require('anychart.data');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
@@ -44,12 +45,36 @@ anychart.core.SeriesBase = function(opt_data, opt_csvSettings) {
   this.statistics_ = {};
 
   /**
+   * @type {anychart.core.utils.SeriesA11y}
+   * @private
+   */
+  this.a11y_ = null;
+
+  /**
    * Interactivity state.
    * @type {anychart.core.utils.InteractivityState}
    */
   this.state = new anychart.core.utils.InteractivityState(this);
 };
 goog.inherits(anychart.core.SeriesBase, anychart.core.VisualBaseWithBounds);
+
+
+/**
+ * Supported signals.
+ * @type {number}
+ */
+anychart.core.SeriesBase.prototype.SUPPORTED_SIGNALS =
+    anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
+    anychart.Signal.NEEDS_UPDATE_A11Y;
+
+
+/**
+ * Consistency states supported by series.
+ * @type {number}
+ */
+anychart.core.SeriesBase.prototype.SUPPORTED_CONSISTENCY_STATES =
+    anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.ConsistencyState.A11Y;
 
 
 /**
@@ -266,6 +291,23 @@ anychart.core.SeriesBase.prototype.autoHatchFill;
 
 
 /**
+ * Root layer.
+ * @type {acgraph.vector.ILayer}
+ * @protected
+ */
+anychart.core.SeriesBase.prototype.rootLayer = null;
+
+
+/**
+ * Gets root layer of series.
+ * @return {acgraph.vector.ILayer}
+ */
+anychart.core.SeriesBase.prototype.getRootLayer = function() {
+  return this.rootLayer;
+};
+
+
+/**
  * Tester if the series is discrete based.
  * @return {boolean}
  */
@@ -307,6 +349,7 @@ anychart.core.SeriesBase.prototype.isSizeBased = function() {
  */
 anychart.core.SeriesBase.prototype.setChart = function(chart) {
   this.chart_ = chart;
+  this.a11y().parentA11y(/** @type {anychart.core.utils.A11y} */ (/** @type {anychart.core.Chart} */ (this.chart_).a11y()));
 };
 
 
@@ -317,6 +360,21 @@ anychart.core.SeriesBase.prototype.setChart = function(chart) {
 anychart.core.SeriesBase.prototype.getChart = function() {
   return this.chart_;
 };
+
+
+/**
+ * Returns type of current series.
+ * @return {string} Series type.
+ */
+anychart.core.SeriesBase.prototype.getType = goog.abstractMethod;
+
+
+/**
+ * Create base series format provider.
+ * @param {boolean=} opt_force create context provider forcibly.
+ * @return {Object} Object with info for labels formatting.
+ */
+anychart.core.SeriesBase.prototype.createFormatProvider = goog.abstractMethod;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -346,7 +404,7 @@ anychart.core.SeriesBase.prototype.data = function(opt_value, opt_csvSettings) {
       this.dataInternal = this.parentView;
       this.dataInternal.listenSignals(this.dataInvalidated_, this);
       // DATA is supported only in Bubble, so we invalidate only for it.
-      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_DATA,
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_DATA | anychart.ConsistencyState.A11Y,
           anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED);
     }
     return this;
@@ -1742,6 +1800,51 @@ anychart.core.SeriesBase.prototype.hoverSeries = function() {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Accessibility.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Setter/getter for accessibility setting.
+ * @param {(boolean|Object)=} opt_enabledOrJson - Whether to enable accessibility.
+ * @return {anychart.core.utils.SeriesA11y|anychart.core.SeriesBase} - Accessibility settings object or self for chaining.
+ */
+anychart.core.SeriesBase.prototype.a11y = function(opt_enabledOrJson) {
+  if (!this.a11y_) {
+    this.a11y_ = new anychart.core.utils.SeriesA11y(this);
+    this.registerDisposable(this.a11y_);
+    this.a11y_.listenSignals(this.onA11ySignal_, this);
+  }
+  if (goog.isDef(opt_enabledOrJson)) {
+    this.a11y_.setup.apply(this.a11y_, arguments);
+    return this;
+  } else {
+    return this.a11y_;
+  }
+};
+
+
+/**
+ * Animation enabled change handler.
+ * @private
+ */
+anychart.core.SeriesBase.prototype.onA11ySignal_ = function() {
+  this.invalidate(anychart.ConsistencyState.A11Y, anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_UPDATE_A11Y);
+};
+
+
+/**
+ * Draws a11y.
+ */
+anychart.core.SeriesBase.prototype.drawA11y = function() {
+  if (this.hasInvalidationState(anychart.ConsistencyState.A11Y)) {
+    this.a11y().applyA11y(this.createFormatProvider());
+    this.markConsistent(anychart.ConsistencyState.A11Y);
+  }
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Select.
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -1932,6 +2035,8 @@ anychart.core.SeriesBase.prototype.serialize = function() {
   json['selectLabels'] = this.selectLabels().serialize();
   json['tooltip'] = this.tooltip().serialize();
   json['legendItem'] = this.legendItem().serialize();
+  json['a11y'] = this.a11y().serialize();
+
   if (goog.isFunction(this['fill'])) {
     if (goog.isFunction(this.fill())) {
       anychart.core.reporting.warning(
@@ -2092,10 +2197,14 @@ anychart.core.SeriesBase.prototype.setupByJSON = function(config) {
         config['allowPointsSelect']);
   }
   this.selectionMode(config['selectionMode']);
+  this.a11y(config['a11y']);
+
 };
 
 
 //exports
+anychart.core.SeriesBase.prototype['a11y'] = anychart.core.SeriesBase.prototype.a11y;//doc|ex
+
 anychart.core.SeriesBase.prototype['color'] = anychart.core.SeriesBase.prototype.color;//doc|ex
 anychart.core.SeriesBase.prototype['name'] = anychart.core.SeriesBase.prototype.name;//doc|ex
 anychart.core.SeriesBase.prototype['id'] = anychart.core.SeriesBase.prototype.id;

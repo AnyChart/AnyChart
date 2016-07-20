@@ -36,7 +36,7 @@ anychart.core.utils.BaseContextProvider.prototype.getTokenValue = function(name)
     return this.pointInternal.getStat(statName);
   } else if (this.seriesInternal && this.seriesInternal.getStat(statName)) {
     return this.seriesInternal.getStat(statName);
-  } else if (this.chartInternal && this.chartInternal.getStat(statName)) {
+  } else if (this.chartInternal && this.chartInternal.getStat && this.chartInternal.getStat(statName)) {
     return this.chartInternal.getStat(statName);
   }
 

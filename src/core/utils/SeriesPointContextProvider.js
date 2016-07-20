@@ -7,11 +7,11 @@ goog.require('anychart.enums');
 
 /**
  * Series point context provider.
- * @implements {anychart.core.utils.IContextProvider}
  * @param {(anychart.core.series.Base|anychart.core.SeriesBase|anychart.core.sparkline.series.Base|anychart.core.gauge.pointers.Base)} series Series.
  * @param {Array.<string>} referenceValueNames Reference value names to be applied.
  * @param {boolean} addErrorInfo Whether to add error info to a provider.
  * @extends {anychart.core.utils.BaseContextProvider}
+ * @implements {anychart.core.utils.IContextProvider}
  * @constructor
  */
 anychart.core.utils.SeriesPointContextProvider = function(series, referenceValueNames, addErrorInfo) {

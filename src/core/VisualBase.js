@@ -279,6 +279,8 @@ anychart.core.VisualBase.prototype.container = function(opt_value) {
         // TODO(Anton Saukh): fix type cast to {Element|string} when this will be fixed in graphics.
         this.container_ = acgraph.create();
         this.registerDisposable(this.container_);
+        if (acgraph.type() != acgraph.StageType.VML)
+          this.container_.domElement().setAttribute('role', 'presentation');
         this.container_.container(/** @type {Element} */(opt_value));
 
         //if graphics engine can't recognize passed container

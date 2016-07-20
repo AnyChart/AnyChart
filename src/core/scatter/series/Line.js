@@ -243,3 +243,4 @@ anychart.core.scatter.series.Line.prototype['connectMissingPoints'] = anychart.c
 anychart.core.scatter.series.Line.prototype['stroke'] = anychart.core.scatter.series.Line.prototype.stroke;//inherited
 anychart.core.scatter.series.Line.prototype['hoverStroke'] = anychart.core.scatter.series.Line.prototype.hoverStroke;//inherited
 anychart.core.scatter.series.Line.prototype['selectStroke'] = anychart.core.scatter.series.Line.prototype.selectStroke;
+anychart.core.scatter.series.Line.prototype['getType'] = anychart.core.scatter.series.Line.prototype.getType;
