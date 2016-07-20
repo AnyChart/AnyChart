@@ -562,7 +562,7 @@ anychart.core.scatter.series.Base.prototype.getXScale = function() {
 anychart.core.scatter.series.Base.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (!(opt_value instanceof anychart.scales.ScatterBase)) {
-      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
+      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Scatter chart scales']);
       return this;
     }
     if (this.xScale_ != opt_value) {
@@ -588,7 +588,7 @@ anychart.core.scatter.series.Base.prototype.xScale = function(opt_value) {
 anychart.core.scatter.series.Base.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (!(opt_value instanceof anychart.scales.ScatterBase)) {
-      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
+      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Scatter chart scales']);
       return this;
     }
     if (this.yScale_ != opt_value) {

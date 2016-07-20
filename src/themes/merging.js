@@ -525,6 +525,7 @@ anychart.themes.merging.mergingMap_ = [
       'map.defaultSeriesSettings.base.labels',
       'treeMap.headers',
       'treeMap.labels',
+      'linearGauge.defaultPointerSettings.base.label',
       'pert.milestones.labels',
       'pert.tasks.upperLabels',
       'pert.tasks.lowerLabels',
@@ -693,6 +694,7 @@ anychart.themes.merging.mergingMap_ = [
       'stock.defaultPlotSettings.xAxis',
       'stock.scroller.xAxis',
       'defaultColorRange',
+      'linearGauge.defaultAxisSettings',
       'standalones.linearAxis',
       'standalones.polarAxis',
       'standalones.radarAxis',
@@ -739,6 +741,7 @@ anychart.themes.merging.mergingMap_ = [
       'stock',
       'stock.defaultPlotSettings',
       'treeMap',
+      'linearGauge',
       'pert'
     ]
   },
@@ -1096,6 +1099,26 @@ anychart.themes.merging.mergingMap_ = [
       'stock.grouping',
       'stock.scrollerGrouping'
     ]
+  },
+  {
+    defaultObj: 'linearGauge.defaultPointerSettings.base',
+    targets: [
+      'linearGauge.defaultPointerSettings.bar',
+      'linearGauge.defaultPointerSettings.rangeBar',
+      'linearGauge.defaultPointerSettings.marker',
+      'linearGauge.defaultPointerSettings.tank',
+      'linearGauge.defaultPointerSettings.thermometer',
+      'linearGauge.defaultPointerSettings.led'
+    ]
+  },
+  {
+    defaultObj: 'linearGauge',
+    targets: [
+      'bulletGauge',
+      'thermometerGauge',
+      'tankGauge',
+      'ledGauge'
+    ]
   }
 ];
 
@@ -1264,6 +1287,8 @@ anychart.themes.merging.multipleEntities_ = {
   'gauge.needles': 'gauge.defaultPointerSettings',
   'gauge.knobs': 'gauge.defaultPointerSettings',
   'gauge.ranges': 'gauge.defaultRangeSettings',
+  'gauge.axes': 'gauge.defaultAxisSettings',
+  'gauge.scaleBars': 'gauge.defaultScaleBarSettings',
   'map.callouts': 'map.defaultCalloutSettings'
 };
 
@@ -1274,7 +1299,8 @@ anychart.themes.merging.multipleEntities_ = {
  * @private
  */
 anychart.themes.merging.scaleEntities_ = [
-  'chart.scales'
+  'chart.scales',
+  'gauge.scales'
 ];
 
 
@@ -1287,6 +1313,10 @@ anychart.themes.merging.typedEntities_ = {
   'chart.series': {
     defaults: 'chart.defaultSeriesSettings',
     typeDescriptor: 'seriesType'
+  },
+  'gauge.pointers': {
+    defaults: 'gauge.defaultPointerSettings',
+    typeDescriptor: 'pointerType'
   },
   // this part is for own annotation serialization
   'annotationsList': {

@@ -2784,6 +2784,172 @@ goog.provide('anychart.themes.defaultTheme');
         }
       }
     },
+    'linearGauge': {
+      'padding': 10,
+      'markerPalette': {
+        'items': ['circle', 'diamond', 'square', 'triangleDown', 'triangleUp', 'triangleLeft', 'triangleRight', 'diagonalCross', 'pentagon', 'cross', 'vline', 'star5', 'star4', 'trapezium', 'star7', 'star6', 'star10']
+      },
+      'globalOffset': '0%',
+      'layout': 'vertical',
+      'tooltip': {
+        'titleFormatter': function() {
+          return this['name'];
+        },
+        'textFormatter': function() {
+          if (this['high'])
+            return returnRangeTooltipContentFormatter.call(this);
+          else
+            return 'Value: ' + this['value'];
+        }
+      },
+      'scales': [
+        {
+          'type': 'linear',
+          'inverted': false,
+          'maximum': null,
+          'minimum': null,
+          'minimumGap': 0.1,
+          'maximumGap': 0.1,
+          'softMinimum': null,
+          'softMaximum': null,
+          'ticks': {
+            'mode': 'linear',
+            'base': 0,
+            'minCount': 4,
+            'maxCount': 6
+          },
+          'minorTicks': {
+            'mode': 'linear',
+            'base': 0,
+            'count': 5
+          },
+          'stackMode': 'none',
+          'stickToZero': true
+        }
+      ],
+
+      'defaultAxisSettings': {
+        'enabled': true,
+        'width': '10%',
+        'offset': '0%'
+      },
+      'defaultScaleBarSettings': {
+        'enabled': true,
+        'width': '10%',
+        'offset': '0%',
+        'from': 'min',
+        'to': 'max',
+        'colorScale': {
+          'type' : 'ordinalColor',
+          'inverted': false,
+          'ticks': {
+            'interval': 1
+          }
+        },
+        'points': [
+          {
+            'height': 0,
+            'left': 0,
+            'right': 0
+          },
+          {
+            'height': 1,
+            'left': 0,
+            'right': 0
+          }
+        ]
+      },
+      'defaultPointerSettings': {
+        'base': {
+          'enabled': true,
+          'selectionMode': 'single',
+          'width': '10%',
+          'offset': '0%',
+          'legendItem': {
+            'enabled': true
+          },
+          'label': {
+            'enabled': false,
+            'zIndex': 0,
+            'position': 'top',
+            'anchor': 'center'
+          },
+          'hoverLabel': {
+            'enabled': false,
+            'fontColor': 'yellow'
+          },
+          'selectLabel': {
+            'enabled': false,
+            'fontColor': 'pink'
+          },
+          'stroke': returnStrokeSourceColor,
+          'hoverStroke': returnLightenStrokeSourceColor,
+          'selectStroke': returnDarkenSourceColor,
+          'fill': returnSourceColor,
+          'hoverFill': returnLightenSourceColor,
+          'selectFill': returnDarkenSourceColor
+        },
+        'bar': {},
+        'rangeBar': {
+          'label': {
+            'textFormatter': function() {
+              return this['high'];
+            }
+          }
+        },
+        'marker': {},
+        'tank': {},
+        'thermometer': {
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'fill': function() {
+            var sourceColor = this['sourceColor'];
+            var darken = anychart.color.darken(sourceColor);
+            var key1 = {
+              'color': darken
+            };
+            var key2 = {
+              'color': sourceColor
+            };
+            var key3 = {
+              'color': darken
+            };
+            var isVertical = this['isVertical'];
+            return {
+              'angle': isVertical ? 0 : 90,
+              'keys': [key1, key2, key3]
+            };
+          },
+          'bulbRadius': '80%',
+          'bulbPadding': '3%'
+        },
+        'led': {
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'dimmer': function(color) {
+            return anychart.color.darken(color);
+          },
+          'gap': '1%',
+          'size': '2%',
+          'count': null,
+          'colorScale': {
+            'type' : 'ordinalColor',
+            'inverted': false,
+            'ticks': {
+              'interval': 1
+            }
+          }
+        }
+      }
+    },
+    'thermometerGauge': {},
+    'tankGauge': {},
+    'ledGauge': {},
+    'bulletGauge': {},
 
     // merge with chart
     'heatMap': {

@@ -42,7 +42,8 @@
         {"$ref": "#/definitions/anychart.core.SeparateChart"}
       ],
       "oneOf": [
-        {"$ref": "#/definitions/anychart.charts.CircularGauge"}
+        {"$ref": "#/definitions/anychart.charts.CircularGauge"},
+        {"$ref": "#/definitions/anychart.charts.LinearGauge"}
       ],
       "properties": {
         "container": {
@@ -2065,6 +2066,127 @@
       },
       "required": ["type"]
     },
+    "anychart.charts.LinearGauge": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.Chart"}
+      ],
+      "properties": {
+        "type": {"enum": ["linearGauge", "thermometerGauge", "tankGauge", "ledGauge"]},
+        "data": {"$ref": "#/definitions/data"},
+        "globalOffset": {
+          "type": "string"
+        },
+        "layout": {"$ref": "#/definitions/anychart.enums.Layout"},
+        "palette": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "distinct",
+                "range"
+              ]
+            },
+            "items": {
+              "type": ["array"],
+              "items": {"$ref": "#/definitions/fill"}
+            },
+            "count": {
+              "type": "number"
+            }
+          },
+          "items": {
+            "type": "string"
+          }
+        },
+        "markerPalette": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/anychart.enums.MarkerType"}
+            }
+          },
+          "items": {"$ref": "#/definitions/anychart.enums.MarkerType"}
+        },
+        "hatchFillPalette": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/hatchFillSet"}
+            }
+          },
+          "items": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"}
+        },
+        "scale": {
+          "anyOf": [
+            {
+              "type": [
+                "string",
+                "number"
+              ]
+            },
+            {"$ref": "#/definitions/anychart.scales.Linear"},
+            {"$ref": "#/definitions/anychart.scales.Ordinal"},
+            {"$ref": "#/definitions/anychart.scales.Logarithmic"},
+            {"$ref": "#/definitions/anychart.scales.DateTime"}
+          ]
+        },
+        "scales": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "items": {
+            "anyOf": [
+              {"$ref": "#/definitions/anychart.scales.Linear"},
+              {"$ref": "#/definitions/anychart.scales.Ordinal"},
+              {"$ref": "#/definitions/anychart.scales.Logarithmic"},
+              {"$ref": "#/definitions/anychart.scales.DateTime"}
+            ]
+          },
+          "patternProperties": {
+            ".*": {
+              "anyOf": [
+                {"$ref": "#/definitions/anychart.scales.Linear"},
+                {"$ref": "#/definitions/anychart.scales.Ordinal"},
+                {"$ref": "#/definitions/anychart.scales.Logarithmic"},
+                {"$ref": "#/definitions/anychart.scales.DateTime"}
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "axes": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.axes.LinearGauge"}
+            ]
+          }
+        },
+        "pointers": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/anychart.core.linearGauge.pointers.Base"}
+        },
+        "scaleBars": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/anychart.core.linearGauge.ScaleBar"}
+        }
+      },
+      "required": ["type"]
+    },
 
     "anychart.charts.Map": {
       "type": "object",
@@ -2801,6 +2923,131 @@
       }
     },
 
+    "anychart.core.linearGauge.pointers.Base": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.VisualBase"}
+      ],
+      "properties": {
+        "pointerType": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "width": {
+          "type": "string"
+        },
+        "offset": {
+          "type": "string"
+        },
+        "id": {
+          "type": ["number", "string"]
+        },
+        "autoIndex": {
+          "type": "number"
+        },
+        "dataIndex": {
+          "type": "number"
+        },
+        "selectionMode": {"$ref": "#/definitions/anychart.enums.SelectionMode"},
+        "label": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "hoverLabel": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "selectLabel": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "legendItem": {"$ref": "#/definitions/anychart.core.utils.LegendItemSettings"},
+        "color": {
+          "type": ["string", "object", "null"]
+        },
+        "stroke": {"$ref": "#/definitions/stroke"},
+        "hoverStroke": {"$ref": "#/definitions/stroke"},
+        "selectStroke": {"$ref": "#/definitions/stroke"},
+
+        "fill": {"$ref": "#/definitions/fill"},
+        "hoverFill": {"$ref": "#/definitions/fill"},
+        "selectFill": {"$ref": "#/definitions/fill"},
+
+        "hatchFill": {"$ref": "#/definitions/hatchFillSet"},
+        "hoverHatchFill": {"$ref": "#/definitions/hatchFillSet"},
+        "selectHatchFill": {"$ref": "#/definitions/hatchFillSet"},
+
+        "type": {
+          "$ref": "#/definitions/anychart.enums.MarkerType"
+        },
+
+        "bulbRadius": {
+          "type": "string"
+        },
+        "bulbPadding": {
+          "type": "string"
+        },
+
+        "gap": {
+          "type": ["string", "null"]
+        },
+        "size": {
+          "type": ["string", "null"]
+        },
+        "count": {
+          "type": ["number", "null"]
+        },
+        "colorScale": {
+          "anyOf": [
+            {"$ref": "#/definitions/anychart.scales.LinearColor"},
+            {"$ref": "#/definitions/anychart.scales.OrdinalColor"}
+          ]
+        }
+      }
+    },
+    "anychart.core.linearGauge.ScaleBar": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.VisualBase"}
+      ],
+      "properties": {
+        "from" : {
+          "type": ["string", "number"]
+        },
+        "to" : {
+          "type": ["string", "number"]
+        },
+        "width" : {
+          "type": "string"
+        },
+        "offset" : {
+          "type": "string"
+        },
+        "fill": {"$ref": "#/definitions/fill"},
+        "stroke": {"$ref": "#/definitions/stroke"},
+        "colorScale": {
+          "anyOf": [
+            {"$ref": "#/definitions/anychart.scales.LinearColor"},
+            {"$ref": "#/definitions/anychart.scales.OrdinalColor"}
+          ]
+        },
+        "points": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+
     "anychart.core.map.series.Base": {
       "type": "object",
       "allOf": [
@@ -3150,6 +3397,17 @@
             "null",
             "number"
           ]
+        }
+      }
+    },
+    "anychart.core.axes.LinearGauge": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.axes.Linear"}
+      ],
+      "properties": {
+        "offset": {
+          "type": "string"
         }
       }
     },
@@ -4838,6 +5096,8 @@
         "star10",
         "triangleUp",
         "triangleDown",
+        "triangleLeft",
+        "triangleRight",
         "cross",
         "diamond",
         "diagonalCross",
@@ -5412,7 +5672,19 @@
     "hatchFill": {
       "type": ["object"],
       "properties": {
-        "type": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"},
+        "type": {
+          "oneOf": [
+            {"enum": ["pattern"]},
+            {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"}
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "bounds": {"$ref": "#/definitions/anychart.math.Rect"},
+        "children": {
+          "type": "array"
+        },
         "color": {
           "type": "string"
         },

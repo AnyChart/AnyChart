@@ -4,6 +4,7 @@
  */
 
 goog.provide('anychart');
+goog.provide('anychart.gauges');
 goog.provide('anychart.globalLock');
 goog.require('acgraph');
 goog.require('anychart.base');
@@ -737,6 +738,46 @@ anychart.circularGauge = anychart.circularGauge || function() {
 /**
  * @ignoreDoc
  */
+anychart.gauges.circular = anychart.gauges.circular || function() {
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Circular gauge']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.gauges.linear = anychart.gauges.linear || function() {
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Linear gauge']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.gauges.tank = anychart.gauges.tank || function() {
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Tank gauge']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.gauges.thermometer = anychart.gauges.thermometer || function() {
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Thermometer gauge']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.gauges.led = anychart.gauges.led || function() {
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['LED gauge']);
+};
+
+
+/**
+ * @ignoreDoc
+ */
 anychart.map = anychart.map || function() {
   anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Map']);
 };
@@ -883,6 +924,11 @@ goog.exportSymbol('anychart.radarChart', anychart.radar);
 goog.exportSymbol('anychart.polarChart', anychart.polar);
 goog.exportSymbol('anychart.scatterChart', anychart.scatter);
 goog.exportSymbol('anychart.circularGauge', anychart.circularGauge);
+goog.exportSymbol('anychart.gauges.circular', anychart.gauges.circular);
+goog.exportSymbol('anychart.gauges.linear', anychart.gauges.linear);
+goog.exportSymbol('anychart.gauges.thermometer', anychart.gauges.thermometer);
+goog.exportSymbol('anychart.gauges.tank', anychart.gauges.tank);
+goog.exportSymbol('anychart.gauges.led', anychart.gauges.led);
 goog.exportSymbol('anychart.ganttProject', anychart.ganttProject);
 goog.exportSymbol('anychart.ganttResource', anychart.ganttResource);
 goog.exportSymbol('anychart.stock', anychart.stock);

@@ -1055,6 +1055,12 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
       return ['needle_pointers', 'pointer'];
     case 'knobs':
       return ['knob_pointers', 'pointer'];
+    case 'pointers':
+      return ['pointers', 'pointer'];
+    case 'scaleBars':
+      return ['scale_bars', 'scale_bar'];
+    case 'points':
+      return ['points', 'point'];
     case 'scales':
       return ['scales', 'scale'];
     case 'colorScales':
@@ -1130,6 +1136,12 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
       return ['needles', 'pointer'];
     case 'knobPointers':
       return ['knobs', 'pointer'];
+    case 'pointers':
+      return ['pointers', 'pointer'];
+    case 'scaleBars':
+      return ['scaleBars', 'scaleBar'];
+    case 'points':
+      return ['points', 'point'];
     case 'scales':
       return ['scales', 'scale'];
     case 'explicit':
@@ -1491,6 +1503,10 @@ anychart.utils.getMarkerDrawer = function(type) {
       return acgraph.vector.primitives.triangleUp;
     case 'triangledown':
       return acgraph.vector.primitives.triangleDown;
+    case 'triangleright':
+      return acgraph.vector.primitives.triangleRight;
+    case 'triangleleft':
+      return acgraph.vector.primitives.triangleLeft;
     case 'cross':
       return acgraph.vector.primitives.cross;
     case 'diagonalcross':

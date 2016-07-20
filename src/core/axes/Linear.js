@@ -1209,21 +1209,32 @@ anychart.core.axes.Linear.prototype.getRemainingBounds = function() {
 
 
 /**
+ * Calculates size.
+ * @param {number} parentSize Parent size.
+ * @param {number} length Length.
+ * @param {anychart.math.Rect} parentBounds Parent bounds.
+ * @return {number} Calculated size.
+ */
+anychart.core.axes.Linear.prototype.calculateSize = function(parentSize, length, parentBounds) {
+  return this.width_ ?
+      anychart.utils.normalizeSize(this.width_, parentSize) :
+      this.getSize(parentBounds, length);
+};
+
+
+/**
  * Gets axis pixel bounds.
  * @return {anychart.math.Rect} Pixel bounds.
  */
 anychart.core.axes.Linear.prototype.getPixelBounds = function() {
   if (!this.pixelBounds || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
-
     if (parentBounds) {
       var parentLength, parentSize;
-
       parentBounds.top = Math.round(parentBounds.top);
       parentBounds.left = Math.round(parentBounds.left);
       parentBounds.width = Math.round(parentBounds.width);
       parentBounds.height = Math.round(parentBounds.height);
-
       if (this.isHorizontal()) {
         parentLength = parentBounds.width;
         parentSize = parentBounds.height;
@@ -1233,9 +1244,7 @@ anychart.core.axes.Linear.prototype.getPixelBounds = function() {
       }
 
       var length = this.getLength(parentLength);
-      var size = this.width_ ?
-          anychart.utils.normalizeSize(this.width_, parentSize) :
-          this.getSize(parentBounds, length);
+      var size = this.calculateSize(parentSize, length, parentBounds);
 
       var x, y;
       var padding = this.padding();
@@ -2003,6 +2012,8 @@ anychart.core.axes.Linear.prototype.setupByJSON = function(config) {
 anychart.core.axes.Linear.prototype.disposeInternal = function() {
   goog.base(this, 'disposeInternal');
 
+  if (this.internalScale)
+    this.internalScale.unlistenSignals(this.scaleInvalidated_, this);
   delete this.internalScale;
   this.labelsBounds_ = null;
   this.minorLabelsBounds_ = null;

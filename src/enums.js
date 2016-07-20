@@ -58,7 +58,12 @@ anychart.enums.ChartTypes = {
  * @enum {string}
  */
 anychart.enums.GaugeTypes = {
-  CIRCULAR: 'circular'
+  CIRCULAR: 'circular',
+  LINEAR: 'linearGauge',
+  BULLET: 'bullet',
+  THERMOMETER: 'thermometerGauge',
+  TANK: 'tankGauge',
+  LED: 'ledGauge'
 };
 
 
@@ -887,6 +892,8 @@ anychart.enums.MarkerType = {
    *      .triangleDown(stage.width()/2, stage.height()/2, stage.height()/2-5);
    */
   TRIANGLE_DOWN: 'triangleDown',
+  TRIANGLE_RIGHT: 'triangleRight',
+  TRIANGLE_LEFT: 'triangleLeft',
   /**
    * @illustration
    * stage.width(200)
@@ -977,6 +984,10 @@ anychart.enums.normalizeMarkerType = function(type, opt_default) {
       return anychart.enums.MarkerType.TRIANGLE_UP;
     case 'triangledown':
       return anychart.enums.MarkerType.TRIANGLE_DOWN;
+    case 'triangleleft':
+      return anychart.enums.MarkerType.TRIANGLE_LEFT;
+    case 'triangleright':
+      return anychart.enums.MarkerType.TRIANGLE_RIGHT;
     case 'cross':
       return anychart.enums.MarkerType.CROSS;
     case 'diagonalcross':
@@ -1034,6 +1045,10 @@ anychart.enums.normalizeAnyMarkerType = function(type) {
       return anychart.enums.MarkerType.TRIANGLE_UP;
     case 'triangledown':
       return anychart.enums.MarkerType.TRIANGLE_DOWN;
+    case 'triangleleft':
+      return anychart.enums.MarkerType.TRIANGLE_LEFT;
+    case 'triangleright':
+      return anychart.enums.MarkerType.TRIANGLE_RIGHT;
     case 'cross':
       return anychart.enums.MarkerType.CROSS;
     case 'diagonalcross':
@@ -2387,6 +2402,60 @@ anychart.enums.normalizeSparklineSeriesType = function(value, opt_default) {
       return anychart.enums.SparklineSeriesType.WIN_LOSS;
   }
   return opt_default || anychart.enums.SparklineSeriesType.LINE;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  LinearGaugePointerTypes
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all linear gauge pointers type.
+ * @enum {string}
+ */
+anychart.enums.LinearGaugePointerType = {
+  BAR: 'bar',
+  RANGE_BAR: 'rangeBar',
+  MARKER: 'marker',
+  THERMOMETER: 'thermometer',
+  TANK: 'tank',
+  LED: 'led'
+};
+
+
+/**
+ * Normalizes linear gauge pointers type.
+ * @param {*} value Pointer's type to normalize.
+ * @param {anychart.enums.LinearGaugePointerType=} opt_default Custom default value (defaults to BAR).
+ * @return {anychart.enums.LinearGaugePointerType}
+ */
+anychart.enums.normalizeLinearGaugePointerType = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'bar':
+    case 'b':
+      return anychart.enums.LinearGaugePointerType.BAR;
+    case 'rangebar':
+    case 'range':
+    case 'rb':
+    case 'r':
+      return anychart.enums.LinearGaugePointerType.RANGE_BAR;
+    case 'marker':
+    case 'm':
+      return anychart.enums.LinearGaugePointerType.MARKER;
+    case 'thermometer':
+    case 'ther':
+    case 'th':
+      return anychart.enums.LinearGaugePointerType.THERMOMETER;
+    case 'tank':
+    case 't':
+      return anychart.enums.LinearGaugePointerType.TANK;
+    case 'led':
+    case 'l':
+      return anychart.enums.LinearGaugePointerType.LED;
+  }
+  return opt_default || anychart.enums.LinearGaugePointerType.BAR;
 };
 
 
@@ -5199,6 +5268,8 @@ goog.exportSymbol('anychart.enums.MarkerType.SQUARE', anychart.enums.MarkerType.
 goog.exportSymbol('anychart.enums.MarkerType.TRIANGLE_UP', anychart.enums.MarkerType.TRIANGLE_UP);
 goog.exportSymbol('anychart.enums.MarkerType.DIAMOND', anychart.enums.MarkerType.DIAMOND);
 goog.exportSymbol('anychart.enums.MarkerType.TRIANGLE_DOWN', anychart.enums.MarkerType.TRIANGLE_DOWN);
+goog.exportSymbol('anychart.enums.MarkerType.TRIANGLE_LEFT', anychart.enums.MarkerType.TRIANGLE_LEFT);
+goog.exportSymbol('anychart.enums.MarkerType.TRIANGLE_RIGHT', anychart.enums.MarkerType.TRIANGLE_RIGHT);
 goog.exportSymbol('anychart.enums.MarkerType.CROSS', anychart.enums.MarkerType.CROSS);
 goog.exportSymbol('anychart.enums.MarkerType.DIAGONAL_CROSS', anychart.enums.MarkerType.DIAGONAL_CROSS);
 goog.exportSymbol('anychart.enums.MarkerType.STAR4', anychart.enums.MarkerType.STAR4);
@@ -5342,6 +5413,13 @@ goog.exportSymbol('anychart.enums.SparklineSeriesType.AREA', anychart.enums.Spar
 goog.exportSymbol('anychart.enums.SparklineSeriesType.LINE', anychart.enums.SparklineSeriesType.LINE);
 goog.exportSymbol('anychart.enums.SparklineSeriesType.COLUMN', anychart.enums.SparklineSeriesType.COLUMN);
 goog.exportSymbol('anychart.enums.SparklineSeriesType.WIN_LOSS', anychart.enums.SparklineSeriesType.WIN_LOSS);
+
+goog.exportSymbol('anychart.enums.LinearGaugePointerType.BAR', anychart.enums.LinearGaugePointerType.BAR);
+goog.exportSymbol('anychart.enums.LinearGaugePointerType.RANGE_BAR', anychart.enums.LinearGaugePointerType.RANGE_BAR);
+goog.exportSymbol('anychart.enums.LinearGaugePointerType.THERMOMETER', anychart.enums.LinearGaugePointerType.THERMOMETER);
+goog.exportSymbol('anychart.enums.LinearGaugePointerType.MARKER', anychart.enums.LinearGaugePointerType.MARKER);
+goog.exportSymbol('anychart.enums.LinearGaugePointerType.TANK', anychart.enums.LinearGaugePointerType.TANK);
+goog.exportSymbol('anychart.enums.LinearGaugePointerType.LED', anychart.enums.LinearGaugePointerType.LED);
 
 goog.exportSymbol('anychart.enums.GanttDataFields.ACTUAL', anychart.enums.GanttDataFields.ACTUAL);
 goog.exportSymbol('anychart.enums.GanttDataFields.ACTUAL_START', anychart.enums.GanttDataFields.ACTUAL_START);

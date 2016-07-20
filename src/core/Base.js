@@ -223,7 +223,7 @@ anychart.ConsistencyState = {
   TOOLTIP_CONTENT: 1 << 8,
   TOOLTIP_BACKGROUND: 1 << 9,
   TOOLTIP_VISIBILITY: 1 << 10,
-  //---------------------------------- GAUGE (CHART) ------------------------------------------
+  //------------------------------ CIRCULAR/LINEAR GAUGE (CHART) ------------------------------
   GAUGE_POINTERS: 1 << 11,
   GAUGE_KNOB: 1 << 12,
   GAUGE_CAP: 1 << 13,
@@ -231,6 +231,12 @@ anychart.ConsistencyState = {
   GAUGE_HATCH_FILL: 1 << 15,
   GAUGE_AXIS_MARKERS: 1 << 16,
   GAUGE_SCALE: 1 << 17,
+  GAUGE_MARKER_PALETTE: 1 << 18,
+  GAUGE_COLOR_SCALE: 1 << 19,
+  GAUGE_PALETTE: 1 << 20,
+  GAUGE_HATCH_FILL_PALETTE: 1 << 21,
+  GAUGE_SCALE_BAR: 1 << 22,
+  GAUGE_POINTER_LABEL: 1 << 12, // reset knob state for linear gauge, cause it doesn't need it
   //---------------------------------- TABLE (VB) ---------------------------------------------
   TABLE_CELL_BOUNDS: 1 << 5,
   TABLE_OVERLAP: 1 << 6,

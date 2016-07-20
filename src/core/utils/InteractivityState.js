@@ -1,4 +1,5 @@
 goog.provide('anychart.core.utils.InteractivityState');
+goog.provide('anychart.core.utils.LinearGaugeInteractivityState');
 goog.provide('anychart.core.utils.PieInteractivityState');
 
 
@@ -41,16 +42,15 @@ anychart.core.utils.InteractivityState = function(target) {
  * @param {anychart.PointState|number} state .
  * @param {number} index .
  * @param {(anychart.PointState|number)=} opt_stateToChange .
- * @private
  */
-anychart.core.utils.InteractivityState.prototype.setPointState_ = function(state, index, opt_stateToChange) {
+anychart.core.utils.InteractivityState.prototype.setPointStateInternal = function(state, index, opt_stateToChange) {
   if (isNaN(index)) return;
 
   var arrIndex = goog.array.binarySearch(this.stateIndex, index);
   //if state is normal - remove state.
   if (state == anychart.PointState.NORMAL) {
     if (arrIndex > 0)
-      this.doRemovePointState_(state, arrIndex);
+      this.doRemovePointStateInternal(state, arrIndex);
   } else {
     //if state by index doesn't found then adds it
     //else updates state.
@@ -142,12 +142,12 @@ anychart.core.utils.InteractivityState.prototype.setPointState = function(state,
       for (i = opt_index.length; i--;) {
         var ind = +opt_index[i];
         if (ind < rowsCount) {
-          this.setPointState_(state, ind, opt_stateToChange);
+          this.setPointStateInternal(state, ind, opt_stateToChange);
           ret = false;
         }
       }
     } else if (+opt_index < rowsCount) {
-      this.setPointState_(state, +opt_index, opt_stateToChange);
+      this.setPointStateInternal(state, +opt_index, opt_stateToChange);
       ret = false;
     }
     if (ret)
@@ -285,9 +285,8 @@ anychart.core.utils.InteractivityState.prototype.removePointStateByIndex = funct
  * Apply appearance to target.
  * @param {anychart.PointState|number} state
  * @param {number} arrIndex
- * @private
  */
-anychart.core.utils.InteractivityState.prototype.doRemovePointState_ = function(state, arrIndex) {
+anychart.core.utils.InteractivityState.prototype.doRemovePointStateInternal = function(state, arrIndex) {
   var pointIndex = this.stateIndex[arrIndex];
   if (this.removePointStateByIndex(state, arrIndex)) {
     goog.array.splice(this.stateIndex, arrIndex, 1);
@@ -308,14 +307,13 @@ anychart.core.utils.InteractivityState.prototype.doRemovePointState_ = function(
  * Removes state by index.
  * @param {anychart.PointState|number} state
  * @param {number} index
- * @private
  */
-anychart.core.utils.InteractivityState.prototype.removePointState_ = function(state, index) {
+anychart.core.utils.InteractivityState.prototype.removePointStateInternal = function(state, index) {
   if (isNaN(index)) return;
 
   var arrIndex = goog.array.binarySearch(this.stateIndex, index);
   if (arrIndex >= 0)
-    this.doRemovePointState_(state, arrIndex);
+    this.doRemovePointStateInternal(state, arrIndex);
 };
 
 
@@ -331,12 +329,12 @@ anychart.core.utils.InteractivityState.prototype.removePointState = function(sta
     if (goog.isArray(opt_index)) {
       goog.array.sort(opt_index);
       for (i = opt_index.length; i--;)
-        this.removePointState_(state, +opt_index[i]);
+        this.removePointStateInternal(state, +opt_index[i]);
     } else if (isNaN(opt_index)) {
       for (i = this.stateIndex.length; i--;)
-        this.doRemovePointState_(state, i);
+        this.doRemovePointStateInternal(state, i);
     } else
-      this.removePointState_(state, +opt_index);
+      this.removePointStateInternal(state, +opt_index);
 
     this.target.finalizePointAppearance();
 
@@ -532,6 +530,116 @@ anychart.core.utils.PieInteractivityState.prototype.addPointStateInternal = func
       // when state adds - update point appearance.
       this.stateValue[arrIndex] |= state;
       this.target.applyAppearanceToPoint(this.stateValue[arrIndex]);
+    }
+  }
+};
+
+
+
+/**
+ * Interactivity state class for linear gauge. Overrides setPointState method.
+ * @param {anychart.core.linearGauge.pointers.Base} target Pie chart.
+ * @constructor
+ * @extends {anychart.core.utils.InteractivityState}
+ */
+anychart.core.utils.LinearGaugeInteractivityState = function(target) {
+  anychart.core.utils.LinearGaugeInteractivityState.base(this, 'constructor', target);
+};
+goog.inherits(anychart.core.utils.LinearGaugeInteractivityState, anychart.core.utils.InteractivityState);
+
+
+/** @inheritDoc */
+anychart.core.utils.LinearGaugeInteractivityState.prototype.setPointState = function(state, opt_index, opt_stateToChange) {
+  var i;
+  if (goog.isDef(opt_index)) {
+    var rowsCount = this.target.getIterator().getRowsCount();
+    var ret = true;
+    if (goog.isArray(opt_index)) {
+      goog.array.sort(opt_index);
+      for (i = opt_index.length; i--;) {
+        var ind = +opt_index[i];
+        if (ind < rowsCount) {
+          this.setPointStateInternal(state, ind, opt_stateToChange);
+          ret = false;
+        }
+      }
+    } else if (+opt_index < rowsCount) {
+      this.setPointStateInternal(state, +opt_index, opt_stateToChange);
+      ret = false;
+    }
+    if (ret)
+      return;
+    this.target.finalizePointAppearance();
+  } else if (!this.isStateContains(this.seriesState, state)) {
+    var removeState = anychart.PointState.NORMAL;
+    if (state == anychart.PointState.NORMAL || state == anychart.PointState.HOVER) {
+      removeState = anychart.PointState.HOVER;
+    } else if (state == anychart.PointState.SELECT) {
+      removeState = anychart.PointState.SELECT | anychart.PointState.HOVER;
+    }
+
+    for (i = this.stateValue.length; i--;) {
+      if (this.removePointStateByIndex(removeState, i)) {
+        if (this.target.getIterator().select(this.stateIndex[i])) {
+          this.target.applyAppearanceToPoint(anychart.PointState.NORMAL);
+        }
+
+        goog.array.splice(this.stateValue, i, 1);
+        goog.array.splice(this.stateIndex, i, 1);
+      }
+    }
+    this.target.finalizePointAppearance();
+
+    if (this.updateRules(state)) {
+      if (this.target.isConsistent()) {
+        if (this.updateRules(state, 0)) {
+          this.target.applyAppearanceToSeries(state);
+        }
+      }
+      this.seriesState = /** @type {anychart.PointState|number}*/(state);
+    }
+  }
+};
+
+
+/** @inheritDoc */
+anychart.core.utils.LinearGaugeInteractivityState.prototype.removePointState = function(state, opt_index) {
+  var i;
+  if (goog.isDef(opt_index)) {
+    if (goog.isArray(opt_index)) {
+      goog.array.sort(opt_index);
+      for (i = opt_index.length; i--;)
+        this.removePointStateInternal(state, +opt_index[i]);
+    } else if (isNaN(opt_index)) {
+      for (i = this.stateIndex.length; i--;)
+        this.doRemovePointStateInternal(state, i);
+    } else
+      this.removePointStateInternal(state, +opt_index);
+
+    this.target.finalizePointAppearance();
+
+    if (!this.target.isDiscreteBased() && this.target.hoverMode() == anychart.enums.HoverMode.SINGLE) {
+      this.target.applyAppearanceToSeries(this.getSeriesStateForUpdate());
+    }
+  } else {
+    for (i = this.stateValue.length; i--;) {
+      if (this.removePointStateByIndex(state, i)) {
+        if (this.target.getIterator().select(this.stateIndex[i])) {
+          this.target.applyAppearanceToPoint(anychart.PointState.NORMAL);
+        }
+
+        goog.array.splice(this.stateIndex, i, 1);
+        goog.array.splice(this.stateValue, i, 1);
+      }
+    }
+    this.target.finalizePointAppearance();
+
+    this.seriesState &= ~state;
+
+    if (this.target.isConsistent()) {
+      if (this.updateRules(state, 0)) {
+        this.target.applyAppearanceToSeries(this.seriesState);
+      }
     }
   }
 };

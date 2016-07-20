@@ -1298,7 +1298,11 @@ anychart.core.Chart.prototype.getNormalizedType_ = function() {
     case 'ganttresource':
     case 'ganttproject':
       return 'gantt';
-    case 'gauge':
+    case 'circular':
+    case 'lineargauge':
+    case 'thermometergauge':
+    case 'tankgauge':
+    case 'ledgauge':
       return 'gauge';
     default:
       return 'chart';
@@ -1419,7 +1423,7 @@ anychart.core.Chart.prototype.credits = function(opt_value) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Internal public method. Returns all chart series.
- * @return {!Array.<anychart.core.series.Base|anychart.core.SeriesBase>}
+ * @return {!Array.<anychart.core.series.Base|anychart.core.SeriesBase|anychart.core.linearGauge.pointers.Base>}
  */
 anychart.core.Chart.prototype.getAllSeries = goog.abstractMethod;
 
@@ -2282,7 +2286,13 @@ anychart.core.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvS
   this.checkSeparator(columnsSeparator);
   var ignoreFirstRow = settings['ignoreFirstRow'] || false;
 
-  var isGauge = this.getType() == anychart.enums.GaugeTypes.CIRCULAR;
+  var isGauge =
+      type == anychart.enums.GaugeTypes.CIRCULAR |
+      type == anychart.enums.GaugeTypes.LINEAR |
+      type == anychart.enums.GaugeTypes.BULLET |
+      type == anychart.enums.GaugeTypes.THERMOMETER |
+      type == anychart.enums.GaugeTypes.TANK |
+      type == anychart.enums.GaugeTypes.LED;
   var seriesList = isGauge ? [this] : this.getAllSeries();
   var seriesListLength = seriesList.length;
   var series;

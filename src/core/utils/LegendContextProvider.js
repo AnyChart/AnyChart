@@ -7,7 +7,7 @@ goog.require('anychart.enums');
 /**
  * Context provider for legend itemsTextFormatter function
  * @implements {anychart.core.utils.ITokenProvider}
- * @param {(anychart.core.series.Base|anychart.core.SeriesBase)=} opt_source Source for statistics and meta.
+ * @param {(anychart.core.series.Base|anychart.core.SeriesBase|anychart.core.linearGauge.pointers.Base)=} opt_source Source for statistics and meta.
  * @constructor
  */
 anychart.core.utils.LegendContextProvider = function(opt_source) {
@@ -21,7 +21,8 @@ anychart.core.utils.LegendContextProvider = function(opt_source) {
  * @return {*}
  */
 anychart.core.utils.LegendContextProvider.prototype.getStat = function(opt_key) {
-  return this.source_.statistics(opt_key);
+  if (this.source_.statistics)
+    return this.source_.statistics(opt_key);
 };
 
 
