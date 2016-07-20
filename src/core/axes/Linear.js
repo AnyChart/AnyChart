@@ -706,7 +706,7 @@ anychart.core.axes.Linear.prototype.getOverlappedLabels_ = function(opt_bounds) 
                 else
                   bounds3 = null;
 
-                if (!(anychart.math.checkRectIntersection(bounds1, bounds2) ||
+                if (bounds1 && !(anychart.math.checkRectIntersection(bounds1, bounds2) ||
                     anychart.math.checkRectIntersection(bounds1, bounds3))) {
                   tempRatio = scale.transform(scaleTicksArr[k]);
                   if ((tempRatio <= 0 && this.drawFirstLabel()) || (tempRatio >= 1 && this.drawLastLabel()))
