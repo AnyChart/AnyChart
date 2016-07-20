@@ -21,7 +21,8 @@
         {"$ref": "#/definitions/anychart.charts.Scatter"},
         {"$ref": "#/definitions/anychart.charts.Sparkline"},
         {"$ref": "#/definitions/anychart.charts.HeatMap"},
-        {"$ref": "#/definitions/anychart.charts.TreeMap"}
+        {"$ref": "#/definitions/anychart.charts.TreeMap"},
+        {"$ref": "#/definitions/anychart.charts.Pert"}
       ],
       "properties": {
         "container": {
@@ -1857,6 +1858,52 @@
             {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
           ]
         },
+
+        "stroke": {"$ref": "#/definitions/stroke"},
+        "hoverStroke": {"$ref": "#/definitions/stroke"},
+        "selectStroke": {"$ref": "#/definitions/stroke"},
+
+        "fill": {"$ref": "#/definitions/fill"},
+        "hoverFill": {"$ref": "#/definitions/fill"},
+        "selectFill": {"$ref": "#/definitions/fill"},
+
+        "hatchFill": {"$ref": "#/definitions/hatchFillSet"},
+        "hoverHatchFill": {"$ref": "#/definitions/hatchFillSet"},
+        "selectHatchFill": {"$ref": "#/definitions/hatchFillSet"},
+
+        "labelsDisplayMode": {"$ref": "#/definitions/anychart.enums.LabelsDisplayMode"},
+        "headersDisplayMode": {"$ref": "#/definitions/anychart.enums.LabelsDisplayMode"},
+        "maxDepth": {"type": "number"},
+        "hintDepth": {"type": "number"},
+        "hintOpacity": {"type": "number"},
+        "maxHeadersHeight": {"type": ["number", "string"]},
+        "sort": {"type": "string"},
+
+        "colorScale": {
+          "oneOf": [
+            {"type": ["string", "number"]},
+            {"$ref": "#/definitions/anychart.scales.OrdinalColor"},
+            {"$ref": "#/definitions/anychart.scales.LinearColor"}
+          ]
+        }
+      },
+      "required": ["type"]
+    },
+
+    "anychart.charts.Pert": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.Chart"}
+      ],
+      "properties": {
+        "type": {"enum": ["pert"]},
+        "treeData": {"$ref": "#/definitions/treeData"},
+
+        "milestones": {"$ref": "#/definitions/milestones"},
+        "tasks": {"$ref": "#/definitions/tasks"},
+        "criticalPath": {"$ref": "#/definitions/criticalPath"},
+
+
 
         "stroke": {"$ref": "#/definitions/stroke"},
         "hoverStroke": {"$ref": "#/definitions/stroke"},
@@ -5174,6 +5221,111 @@
         "enabled": {
           "type": "boolean"
         }
+      }
+    },
+
+    "milestones": {
+      "type": "object",
+      "properties": {
+        "fill": {"$ref": "#/definitions/fill"},
+        "hoverFill": {"$ref": "#/definitions/fill"},
+        "selectFill": {"$ref": "#/definitions/fill"},
+        "stroke": {"$ref": "#/definitions/stroke"},
+        "hoverStroke": {"$ref": "#/definitions/stroke"},
+        "selectStroke": {"$ref": "#/definitions/stroke"},
+        "labels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "hoverLabels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "selectLabels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "tooltip": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.Tooltip"}
+          ]
+        },
+        "shape": {"type": "string"}
+      }
+    },
+
+    "tasks": {
+      "type": "object",
+      "properties": {
+        "fill": {"$ref": "#/definitions/fill"},
+        "hoverFill": {"$ref": "#/definitions/fill"},
+        "selectFill": {"$ref": "#/definitions/fill"},
+        "stroke": {"$ref": "#/definitions/stroke"},
+        "hoverStroke": {"$ref": "#/definitions/stroke"},
+        "selectStroke": {"$ref": "#/definitions/stroke"},
+        "dummyFill": {"$ref": "#/definitions/fill"},
+        "hoverDummyFill": {"$ref": "#/definitions/fill"},
+        "selectDummyFill": {"$ref": "#/definitions/fill"},
+        "dummyStroke": {"$ref": "#/definitions/stroke"},
+        "hoverDummyStroke": {"$ref": "#/definitions/stroke"},
+        "selectDummyStroke": {"$ref": "#/definitions/stroke"},
+        "upperLabels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "hoverUpperLabels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "selectUpperLabels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "lowerLabels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "hoverLowerLabels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "selectLowerLabels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "tooltip": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.Tooltip"}
+          ]
+        }
+      }
+    },
+
+    "criticalPath": {
+      "type": "object",
+      "properties": {
+        "tasks": {"$ref": "#/definitions/tasks"},
+        "milestones": {"$ref": "#/definitions/milestones"}
       }
     },
 

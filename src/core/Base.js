@@ -269,6 +269,11 @@ anychart.ConsistencyState = {
   TREEMAP_NODE_TYPES: 1 << 15,
   TREEMAP_COLOR_RANGE: 1 << 16,
   TREEMAP_HINT_OPACITY: 1 << 17,
+  //---------------------------------- PERT CHART (SEPARATE CHART) ----------------------------------
+  PERT_DATA: 1 << 11,
+  PERT_CALCULATIONS: 1 << 12,
+  PERT_LABELS: 1 << 13,
+  PERT_APPEARANCE: 1 << 14,
   //---------------------------------- ANNOTATIONS (VB) ----------------------------------
   ANNOTATIONS_ANCHORS: 1 << 6,
   ANNOTATIONS_LAST_POINT: 1 << 7,
@@ -302,7 +307,9 @@ anychart.Signal = {
   NEED_UPDATE_COLOR_RANGE: 1 << 7,
   NEED_UPDATE_FULL_RANGE_ITEMS: 1 << 8,
   NEED_UPDATE_TICK_DEPENDENT: 1 << 9,
-  NEED_UPDATE_OVERLAP: 1 << 10
+  NEED_UPDATE_OVERLAP: 1 << 10,
+  NEEDS_REDRAW_LABELS: 1 << 11,
+  NEEDS_REDRAW_APPEARANCE: 1 << 12
 };
 
 

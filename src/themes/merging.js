@@ -524,7 +524,13 @@ anychart.themes.merging.mergingMap_ = [
       'heatMap.labels',
       'map.defaultSeriesSettings.base.labels',
       'treeMap.headers',
-      'treeMap.labels'
+      'treeMap.labels',
+      'pert.milestones.labels',
+      'pert.tasks.upperLabels',
+      'pert.tasks.lowerLabels',
+      'pert.criticalPath.milestones.labels',
+      'pert.criticalPath.tasks.upperLabels',
+      'pert.criticalPath.tasks.lowerLabels'
     ]
   },
   {
@@ -575,7 +581,11 @@ anychart.themes.merging.mergingMap_ = [
       'chart.defaultSeriesSettings.base.tooltip',
       'pieFunnelPyramidBase.tooltip',
       'defaultDataGrid.tooltip',
-      'ganttBase.timeline.tooltip'
+      'ganttBase.timeline.tooltip',
+      'pert.milestones.tooltip',
+      'pert.tasks.tooltip',
+      'pert.criticalPath.milestones.tooltip',
+      'pert.criticalPath.tasks.tooltip'
     ]
   },
   {
@@ -728,7 +738,8 @@ anychart.themes.merging.mergingMap_ = [
       'ganttBase',
       'stock',
       'stock.defaultPlotSettings',
-      'treeMap'
+      'treeMap',
+      'pert'
     ]
   },
   {

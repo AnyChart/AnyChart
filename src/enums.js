@@ -43,7 +43,8 @@ anychart.enums.ChartTypes = {
   STOCK: 'stock',
   SPARKLINE: 'sparkline',
   HEAT_MAP: 'heatMap',
-  TREE_MAP: 'treeMap'
+  TREE_MAP: 'treeMap',
+  PERT: 'pert'
 };
 
 
@@ -2504,6 +2505,29 @@ anychart.enums.GanttDateTimeMarkers = {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  Reserved data fields.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Data fields.
+ * @enum {string}
+ */
+anychart.enums.DataField = {
+  DEPENDS_ON: 'dependsOn',
+  OPTIMISTIC: 'optimistic',
+  PESSIMISTIC: 'pessimistic',
+  MOST_LIKELY: 'mostLikely',
+  EXPECTED: 'expected',
+  DURATION: 'duration',
+  FROM: 'from',
+  TO: 'to',
+  ID: 'id',
+  NAME: 'name'
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  RadarSeriesTypes
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -3969,6 +3993,14 @@ anychart.enums.StringToken = {
    */
   OPEN: '%Open',
   /**
+   PERT chart statistics - standard deviation for critical path.
+   */
+  PERT_CHART_CRITICAL_PATH_STANDARD_DEVIATION: '%PertChartCriticalPathStandardDeviation',
+  /**
+   PERT chart statistics - project duration.
+   */
+  PERT_CHART_PROJECT_DURATION: '%PertChartProjectDuration',
+  /**
    The range of this point (RangeEnd - RangeStart).
    */
   RANGE: '%Range',
@@ -4515,6 +4547,14 @@ anychart.enums.Statistics = {
    Points count.
    */
   POINTS_COUNT: 'pointsCount',
+  /**
+   PERT chart statistics - Standard deviation for critical path.
+   */
+  PERT_CHART_CRITICAL_PATH_STANDARD_DEVIATION: 'pertChartCriticalPathStandardDeviation',
+  /**
+   PERT chart statistics - duration of project.
+   */
+  PERT_CHART_PROJECT_DURATION: 'pertChartProjectDuration',
   /**
    The range of this point (RangeEnd - RangeStart).
    */
@@ -5063,6 +5103,22 @@ anychart.enums.normalizePaperSizeCaption = function(paperSize) {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Pert enums
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * A enum for milestones shape.
+ * @enum {string}
+ */
+anychart.enums.MilestoneShape = {
+  CIRCLE: 'circle',
+  RHOMBUS: 'rhombus',
+  RECTANGLE: 'rectangle'
+};
+
+
 // DVF-1826
 // goog.exportSymbol('anychart.enums.XGroupingMode.FIRST', anychart.enums.XGroupingMode.FIRST);
 // goog.exportSymbol('anychart.enums.XGroupingMode.LAST', anychart.enums.XGroupingMode.LAST);
@@ -5334,6 +5390,17 @@ goog.exportSymbol('anychart.enums.GanttDateTimeMarkers.START', anychart.enums.Ga
 goog.exportSymbol('anychart.enums.GanttDateTimeMarkers.END', anychart.enums.GanttDateTimeMarkers.END);
 goog.exportSymbol('anychart.enums.GanttDateTimeMarkers.CURRENT', anychart.enums.GanttDateTimeMarkers.CURRENT);
 
+
+goog.exportSymbol('anychart.enums.DataField.DEPENDS_ON', anychart.enums.DataField.DEPENDS_ON);
+goog.exportSymbol('anychart.enums.DataField.OPTIMISTIC', anychart.enums.DataField.OPTIMISTIC);
+goog.exportSymbol('anychart.enums.DataField.PESSIMISTIC', anychart.enums.DataField.PESSIMISTIC);
+goog.exportSymbol('anychart.enums.DataField.MOST_LIKELY', anychart.enums.DataField.MOST_LIKELY);
+goog.exportSymbol('anychart.enums.DataField.EXPECTED', anychart.enums.DataField.EXPECTED);
+goog.exportSymbol('anychart.enums.DataField.FROM', anychart.enums.DataField.FROM);
+goog.exportSymbol('anychart.enums.DataField.TO', anychart.enums.DataField.TO);
+goog.exportSymbol('anychart.enums.DataField.ID', anychart.enums.DataField.ID);
+goog.exportSymbol('anychart.enums.DataField.NAME', anychart.enums.DataField.NAME);
+
 goog.exportSymbol('anychart.enums.Interval.YEARS', anychart.enums.Interval.YEAR);//deprecated since >7.6.0
 goog.exportSymbol('anychart.enums.Interval.MONTHS', anychart.enums.Interval.MONTH);//deprecated since >7.6.0
 goog.exportSymbol('anychart.enums.Interval.DAYS', anychart.enums.Interval.DAY);//deprecated since >7.6.0
@@ -5472,6 +5539,8 @@ goog.exportSymbol('anychart.enums.StringToken.INDEX', anychart.enums.StringToken
 goog.exportSymbol('anychart.enums.StringToken.LOW', anychart.enums.StringToken.LOW);
 goog.exportSymbol('anychart.enums.StringToken.NAME', anychart.enums.StringToken.NAME);
 goog.exportSymbol('anychart.enums.StringToken.OPEN', anychart.enums.StringToken.OPEN);
+goog.exportSymbol('anychart.enums.StringToken.PERT_CHART_CRITICAL_PATH_STANDARD_DEVIATION', anychart.enums.StringToken.PERT_CHART_CRITICAL_PATH_STANDARD_DEVIATION);
+goog.exportSymbol('anychart.enums.StringToken.PERT_CHART_PROJECT_DURATION', anychart.enums.StringToken.PERT_CHART_PROJECT_DURATION);
 goog.exportSymbol('anychart.enums.StringToken.RANGE', anychart.enums.StringToken.RANGE);
 goog.exportSymbol('anychart.enums.StringToken.RANGE_END', anychart.enums.StringToken.RANGE_END);
 goog.exportSymbol('anychart.enums.StringToken.RANGE_START', anychart.enums.StringToken.RANGE_START);
@@ -5606,6 +5675,8 @@ goog.exportSymbol('anychart.enums.Statistics.NAME', anychart.enums.Statistics.NA
 goog.exportSymbol('anychart.enums.Statistics.MAX', anychart.enums.Statistics.MAX);
 goog.exportSymbol('anychart.enums.Statistics.MIN', anychart.enums.Statistics.MIN);
 goog.exportSymbol('anychart.enums.Statistics.OPEN', anychart.enums.Statistics.OPEN);
+goog.exportSymbol('anychart.enums.Statistics.PERT_CHART_CRITICAL_PATH_STANDARD_DEVIATION', anychart.enums.Statistics.PERT_CHART_CRITICAL_PATH_STANDARD_DEVIATION);
+goog.exportSymbol('anychart.enums.Statistics.PERT_CHART_PROJECT_DURATION', anychart.enums.Statistics.PERT_CHART_PROJECT_DURATION);
 goog.exportSymbol('anychart.enums.Statistics.POINTS_COUNT', anychart.enums.Statistics.POINTS_COUNT);
 goog.exportSymbol('anychart.enums.Statistics.RANGE', anychart.enums.Statistics.RANGE);
 goog.exportSymbol('anychart.enums.Statistics.RANGE_END', anychart.enums.Statistics.RANGE_END);
@@ -5744,6 +5815,10 @@ goog.exportSymbol('anychart.enums.RadarSeriesType.MARKER', anychart.enums.RadarS
 goog.exportSymbol('anychart.enums.PolarSeriesType.AREA', anychart.enums.PolarSeriesType.AREA);
 goog.exportSymbol('anychart.enums.PolarSeriesType.LINE', anychart.enums.PolarSeriesType.LINE);
 goog.exportSymbol('anychart.enums.PolarSeriesType.MARKER', anychart.enums.PolarSeriesType.MARKER);
+
+goog.exportSymbol('anychart.enums.MilestoneShape.CIRCLE', anychart.enums.MilestoneShape.CIRCLE);
+goog.exportSymbol('anychart.enums.MilestoneShape.RHOMBUS', anychart.enums.MilestoneShape.RHOMBUS);
+goog.exportSymbol('anychart.enums.MilestoneShape.RECTANGLE', anychart.enums.MilestoneShape.RECTANGLE);
 
 goog.exportSymbol('anychart.enums.AnnotationTypes.RAY', anychart.enums.AnnotationTypes.RAY);
 goog.exportSymbol('anychart.enums.AnnotationTypes.LINE', anychart.enums.AnnotationTypes.LINE);

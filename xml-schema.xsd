@@ -112,6 +112,11 @@
             <!-- new Cartesian elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="x_zoom" type="core.CartesianXZoom"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="x_scroller" type="core.ChartScroller"/>
+            <!-- chart.Pert elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="milestones" type="core.Milestones"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="tasks" type="core.Tasks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="critical_path" type="core.CriticalPath"/>
+
         </xsd:all>
         <!-- core.Chart attrs -->
         <xsd:attributeGroup ref="attrs.VisualBase"/>
@@ -2169,6 +2174,77 @@
         <xsd:attribute name="auto_hide" type="simple.Bool" default="false"/>
     </xsd:complexType>
 
+    <xsd:complexType name="core.Milestones">
+        <xsd:all>
+            <xsd:element name="fill" type="Fill" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="hover_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="select_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="hover_stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="select_stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="hover_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="select_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="tooltip" type="core.Tooltip" minOccurs="0" maxOccurs="1"/>
+        </xsd:all>
+        <xsd:attribute name="enabled" type="simple.BoolOrNull"/>
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="hover_fill" type="xsd:string"/>
+        <xsd:attribute name="select_fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="hover_stroke" type="xsd:string"/>
+        <xsd:attribute name="select_stroke" type="xsd:string"/>
+        <xsd:attribute name="labels" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="hover_labels" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="select_labels" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="shape" type="xsd:string" default="circle"/>
+        <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.Tasks">
+        <xsd:all>
+            <xsd:element name="fill" type="Fill" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="hover_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="select_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="hover_stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="select_stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="dummy_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="dummy_stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
+
+            <xsd:element name="upper_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="hover_upper_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="select_upper_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="lower_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="hover_lower_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="select_lower_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="tooltip" type="core.Tooltip" minOccurs="0" maxOccurs="1"/>
+        </xsd:all>
+        <xsd:attribute name="enabled" type="simple.BoolOrNull"/>
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="hover_fill" type="xsd:string"/>
+        <xsd:attribute name="select_fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="hover_stroke" type="xsd:string"/>
+        <xsd:attribute name="select_stroke" type="xsd:string"/>
+        <xsd:attribute name="dummy_fill" type="xsd:string"/>
+        <xsd:attribute name="dummy_stroke" type="xsd:string"/>
+        <xsd:attribute name="upper_labels" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="hover_upper_labels" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="select_upper_labels" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="lower_labels" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="hover_lower_labels" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="select_lower_labels" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.CriticalPath">
+        <xsd:all>
+            <xsd:element name="tasks" type="core.Tasks" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="milestones" type="core.Milestones" minOccurs="0" maxOccurs="1"/>
+        </xsd:all>
+    </xsd:complexType>
+
     <xsd:complexType name="DrillToList">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="item" type="simple.UnsignedInteger"/>
@@ -2492,6 +2568,7 @@
             <xsd:enumeration value="ganttResource"/>
             <xsd:enumeration value="ganttProject"/>
             <xsd:enumeration value="map"/>
+            <xsd:enumeration value="pert"/>
         </xsd:restriction>
     </xsd:simpleType>
 
