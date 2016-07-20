@@ -3,8 +3,11 @@ goog.provide('anychart.core.CartesianBase');
 goog.require('anychart'); // otherwise we can't use anychart.chartTypesMap object.
 goog.require('anychart.animations');
 goog.require('anychart.core.IChart');
+goog.require('anychart.core.IChartWithAnnotations');
 goog.require('anychart.core.IPlot');
 goog.require('anychart.core.SeparateChart');
+goog.require('anychart.core.annotations.ChartController');
+goog.require('anychart.core.annotations.PlotController');
 goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.axisMarkers.Line');
 goog.require('anychart.core.axisMarkers.Range');
@@ -31,6 +34,7 @@ goog.require('goog.array');
  * @extends {anychart.core.SeparateChart}
  * @implements {anychart.core.utils.IZoomableChart}
  * @implements {anychart.core.IChart}
+ * @implements {anychart.core.IChartWithAnnotations}
  * @implements {anychart.core.IPlot}
  * @constructor
  * @param {boolean=} opt_barChartMode If true, sets the chart to Bar Chart mode, swapping default chart elements
@@ -209,7 +213,8 @@ anychart.core.CartesianBase.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.CARTESIAN_GRIDS |
     anychart.ConsistencyState.CARTESIAN_CROSSHAIR |
     anychart.ConsistencyState.CARTESIAN_X_SCROLLER |
-    anychart.ConsistencyState.CARTESIAN_ZOOM;
+    anychart.ConsistencyState.CARTESIAN_ZOOM |
+    anychart.ConsistencyState.CARTESIAN_ANNOTATIONS;
 
 
 /**
@@ -1866,11 +1871,12 @@ anychart.core.CartesianBase.prototype.seriesInvalidated = function(event) {
     state = anychart.ConsistencyState.CARTESIAN_SERIES;
   }
   if (event.hasSignal(anychart.Signal.DATA_CHANGED)) {
-    state |= anychart.ConsistencyState.CARTESIAN_SERIES;
+    state |= anychart.ConsistencyState.CARTESIAN_SERIES | anychart.ConsistencyState.CARTESIAN_ANNOTATIONS;
     this.invalidateSeries();
     if (this.legend().itemsSourceMode() == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
       state |= anychart.ConsistencyState.CHART_LEGEND;
     }
+    this.annotations().invalidateAnnotations();
   }
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
     state |= anychart.ConsistencyState.CARTESIAN_SCALES |
@@ -2021,9 +2027,11 @@ anychart.core.CartesianBase.prototype.makeScaleMaps = function() {
     }
     if (changed) {
       this.invalidateSeries();
+      this.annotations().invalidateAnnotations();
       this.invalidate(
           anychart.ConsistencyState.CARTESIAN_SERIES |
           anychart.ConsistencyState.CARTESIAN_SCALES |
+          anychart.ConsistencyState.CARTESIAN_ANNOTATIONS |
           anychart.ConsistencyState.CARTESIAN_Y_SCALES);
     }
     anychart.core.Base.resumeSignalsDispatchingFalse(this.series_);
@@ -3277,7 +3285,8 @@ anychart.core.CartesianBase.prototype.calculate = function() {
     }
     this.xScroller().setRangeInternal(this.xZoom().getStartRatio(), this.xZoom().getEndRatio());
     this.markConsistent(anychart.ConsistencyState.CARTESIAN_ZOOM);
-    this.invalidate(anychart.ConsistencyState.CARTESIAN_Y_SCALES | anychart.ConsistencyState.CARTESIAN_X_SCROLLER);
+    this.invalidate(anychart.ConsistencyState.CARTESIAN_Y_SCALES | anychart.ConsistencyState.CARTESIAN_X_SCROLLER |
+        anychart.ConsistencyState.CARTESIAN_ANNOTATIONS);
   }
   this.calculateYScales();
   anychart.performance.end('Cartesian.calculate()');
@@ -3291,6 +3300,9 @@ anychart.core.CartesianBase.prototype.calculate = function() {
  * @param {anychart.math.Rect} bounds Bounds of cartesian content area.
  */
 anychart.core.CartesianBase.prototype.drawContent = function(bounds) {
+  this.annotations();
+  this.annotationsChartController_.ready(true);
+
   var i, count;
 
   this.xScroller().suspendSignalsDispatching();
@@ -3337,11 +3349,13 @@ anychart.core.CartesianBase.prototype.drawContent = function(bounds) {
     this.dataBounds = this.getBoundsWithoutAxes(this.getContentAreaBounds(bounds));
 
     this.invalidateSeries();
+    this.annotations().invalidateAnnotations();
     this.invalidate(anychart.ConsistencyState.CARTESIAN_AXES |
         anychart.ConsistencyState.CARTESIAN_GRIDS |
         anychart.ConsistencyState.CARTESIAN_AXES_MARKERS |
         anychart.ConsistencyState.CARTESIAN_SERIES |
         anychart.ConsistencyState.CARTESIAN_X_SCROLLER |
+        anychart.ConsistencyState.CARTESIAN_ANNOTATIONS |
         anychart.ConsistencyState.CARTESIAN_CROSSHAIR);
   }
 
@@ -3457,6 +3471,16 @@ anychart.core.CartesianBase.prototype.drawContent = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.CARTESIAN_CROSSHAIR);
   }
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.CARTESIAN_ANNOTATIONS)) {
+    var annotations = this.annotations();
+    annotations.suspendSignalsDispatching();
+    annotations.parentBounds(this.dataBounds);
+    annotations.container(this.rootElement);
+    annotations.draw();
+    annotations.resumeSignalsDispatching(false);
+    this.markConsistent(anychart.ConsistencyState.CARTESIAN_ANNOTATIONS);
+  }
+
   this.xScroller().resumeSignalsDispatching(false);
   anychart.core.Base.resumeSignalsDispatchingFalse(this.series_, this.xAxes_, this.yAxes_);
 };
@@ -3494,6 +3518,72 @@ anychart.core.CartesianBase.prototype.invalidateSeries = function() {
   for (var i = this.series_.length; i--;)
     this.series_[i].invalidate(anychart.ConsistencyState.SERIES_COLOR);
 };
+
+
+//region Annotations
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Annotations
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Annotations plot-level controller.
+ * @param {Array.<anychart.enums.AnnotationTypes|anychart.core.annotations.AnnotationJSONFormat>=} opt_annotationsList
+ * @return {anychart.core.CartesianBase|anychart.core.annotations.PlotController}
+ */
+anychart.core.CartesianBase.prototype.annotations = function(opt_annotationsList) {
+  if (!this.annotationsPlotController_) {
+    /**
+     * @type {anychart.core.annotations.ChartController}
+     * @private
+     */
+    this.annotationsChartController_ = new anychart.core.annotations.ChartController(this);
+    /**
+     * @type {anychart.core.annotations.PlotController}
+     * @private
+     */
+    this.annotationsPlotController_ = new anychart.core.annotations.PlotController(this.annotationsChartController_, this);
+    this.annotationsPlotController_.listenSignals(this.annotationsInvalidated_, this);
+    this.registerDisposable(this.annotationsPlotController_);
+  }
+  if (goog.isDef(opt_annotationsList)) {
+    this.annotationsPlotController_.setup(opt_annotationsList);
+    return this;
+  }
+  return this.annotationsPlotController_;
+};
+
+
+/**
+ * Background invalidation handler.
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.core.CartesianBase.prototype.annotationsInvalidated_ = function(e) {
+  this.invalidate(anychart.ConsistencyState.CARTESIAN_ANNOTATIONS, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * Getter/Setter for default annotation settings.
+ * @param {Object=} opt_value
+ * @return {Object}
+ */
+anychart.core.CartesianBase.prototype.defaultAnnotationSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultAnnotationSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultAnnotationSettings_;
+};
+
+
+/** @inheritDoc */
+anychart.core.CartesianBase.prototype.onMouseDown = function(event) {
+  this.annotations().unselect();
+  anychart.core.CartesianBase.base(this, 'onMouseDown', event);
+};
+//endregion
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -3779,6 +3869,11 @@ anychart.core.CartesianBase.prototype.setupByJSON = function(config) {
 
   if ('defaultRangeMarkerSettings' in config)
     this.defaultRangeMarkerSettings(config['defaultRangeMarkerSettings']);
+
+  if ('defaultAnnotationSettings' in config)
+    this.defaultAnnotationSettings(config['defaultAnnotationSettings']);
+
+  this.annotations(config['annotations']);
 
   var i, json, scale;
   var grids = config['grids'];

@@ -37,20 +37,6 @@ anychart.core.series.TypeConfig;
 
 
 /**
- * Series property descriptor.
- * @typedef {{
- *    handler: number,
- *    propName: string,
- *    normalizer: Function,
- *    capabilityCheck: (anychart.core.series.Capabilities|number),
- *    consistency: (anychart.ConsistencyState|number),
- *    signal: number
- * }}
- */
-anychart.core.series.PropertyDescriptor;
-
-
-/**
  * Series points missing flag enum.
  * @enum {number}
  */

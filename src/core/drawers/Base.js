@@ -93,7 +93,7 @@ anychart.core.drawers.Base.prototype.startDrawing = function(shapeManager) {
    * @protected
    */
   this.connectMissing = !!(this.flags & anychart.core.drawers.Capabilities.SUPPORTS_CONNECTING_MISSING) &&
-          !!this.series.getSeriesOption(anychart.opt.CONNECT_MISSING_POINTS);
+          !!this.series.getOption(anychart.opt.CONNECT_MISSING_POINTS);
   /**
    * Series state.
    * @type {anychart.PointState|number}

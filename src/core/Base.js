@@ -76,6 +76,7 @@ anychart.ConsistencyState = {
   CARTESIAN_SCALE_MAPS: 1 << 21,
   CARTESIAN_Y_SCALES: 1 << 22,
   CARTESIAN_X_SCROLLER: 1 << 23,
+  CARTESIAN_ANNOTATIONS: 1 << 24,
   //---------------------------------- PYRAMID/FUNNEL STATES (CHART) ---------------------------------
   PYRAMID_FUNNEL_LABELS: 1 << 11,
   PYRAMID_FUNNEL_MARKERS: 1 << 12,
@@ -248,6 +249,7 @@ anychart.ConsistencyState = {
   STOCK_PLOT_GRIDS: 1 << 9,
   STOCK_PLOT_LEGEND: 1 << 10,
   STOCK_PLOT_PALETTE: 1 << 11,
+  STOCK_PLOT_ANNOTATIONS: 1 << 12,
   //---------------------------------- STOCK DATETIME AXIS (VB) ----------------------------------------
   STOCK_DTAXIS_BACKGROUND: 1 << 5,
   //---------------------------------- STOCK SCROLLER (SCROLLER) ----------------------------------------
@@ -261,6 +263,17 @@ anychart.ConsistencyState = {
   TREEMAP_NODE_TYPES: 1 << 15,
   TREEMAP_COLOR_RANGE: 1 << 16,
   TREEMAP_HINT_OPACITY: 1 << 17,
+  //---------------------------------- ANNOTATIONS (VB) ----------------------------------
+  ANNOTATIONS_ANCHORS: 1 << 6,
+  ANNOTATIONS_LAST_POINT: 1 << 7,
+  ANNOTATIONS_SHAPES: 1 << 8,
+  ANNOTATIONS_MARKERS: 1 << 9,
+  ANNOTATIONS_INTERACTIVITY: 1 << 10,
+  ANNOTATIONS_LABELS: 1 << 11,
+  ANNOTATIONS_LEVELS: 1 << 12,
+  //---------------------------------- ANNOTATIONS (VB) ----------------------------------
+  ANNOTATIONS_CONTROLLER_ANNOTATIONS: 1 << 5,
+  ANNOTATIONS_CONTROLLER_DRAWING_MODE: 1 << 6,
   /**
    * Combination of all states.
    */

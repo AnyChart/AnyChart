@@ -1,7 +1,9 @@
 goog.provide('anychart.charts.Stock');
 goog.require('anychart.core.ChartWithCredits');
 goog.require('anychart.core.IChart');
+goog.require('anychart.core.IChartWithAnnotations');
 goog.require('anychart.core.IGroupingProvider');
+goog.require('anychart.core.annotations.ChartController');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.stock.Controller');
 goog.require('anychart.core.stock.IKeyIndexTransformer');
@@ -20,6 +22,7 @@ goog.require('anychart.utils');
  * @constructor
  * @extends {anychart.core.ChartWithCredits}
  * @implements {anychart.core.IChart}
+ * @implements {anychart.core.IChartWithAnnotations}
  * @implements {anychart.core.IGroupingProvider}
  * @implements {anychart.core.stock.IKeyIndexTransformer}
  */
@@ -99,6 +102,20 @@ anychart.charts.Stock = function() {
    * @private
    */
   this.minPlotsDrawingWidth_ = NaN;
+
+  /**
+   * Annotations controller.
+   * @type {anychart.core.annotations.ChartController}
+   * @private
+   */
+  this.annotations_ = null;
+
+  /**
+   * Default annotation settings.
+   * @type {Object}
+   * @private
+   */
+  this.defaultAnnotationSettings_ = {};
 };
 goog.inherits(anychart.charts.Stock, anychart.core.ChartWithCredits);
 
@@ -664,6 +681,8 @@ anychart.charts.Stock.prototype.getCurrentScrollerMinDistance = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.charts.Stock.prototype.drawContent = function(bounds) {
+  this.annotations().ready(true);
+
   // anychart.core.Base.suspendSignalsDispatching(this.plots_, this.scroller_);
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.distributeBounds_(bounds);
@@ -1087,6 +1106,44 @@ anychart.charts.Stock.prototype.getScrollerIndexByKey = function(key) {
 //endregion
 
 
+//region Annotations
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Annotations
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Chart-level annotations controller getter/setter.
+ * @param {(Object|boolean)=} opt_value
+ * @return {anychart.charts.Stock|anychart.core.annotations.ChartController}
+ */
+anychart.charts.Stock.prototype.annotations = function(opt_value) {
+  if (!this.annotations_) {
+    this.annotations_ = new anychart.core.annotations.ChartController(this);
+  }
+  if (goog.isDef(opt_value)) {
+    this.annotations_.setup(opt_value);
+    return this;
+  }
+  return this.annotations_;
+};
+
+
+/**
+ * Getter/Setter for default annotation settings.
+ * @param {Object=} opt_value
+ * @return {Object}
+ */
+anychart.charts.Stock.prototype.defaultAnnotationSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultAnnotationSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultAnnotationSettings_;
+};
+//endregion
+
+
 //region Interactivity
 /**
  * Highlights points on all charts by ratio of current selected range. Used by plots.
@@ -1446,10 +1503,13 @@ anychart.charts.Stock.prototype.dragEnd = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.charts.Stock.prototype.disposeInternal = function() {
-  goog.disposeAll(this.plots_, this.scroller_, this.dataController_);
+  // plot annotations should be disposed before chart annotations
+  goog.disposeAll(this.plots_, this.scroller_, this.dataController_, this.annotations_);
   this.plots_ = null;
   this.scroller_ = null;
+  this.annotations_ = null;
   delete this.dataController_;
+  delete this.defaultAnnotationSettings_;
 
   goog.base(this, 'disposeInternal');
 };
@@ -1488,6 +1548,9 @@ anychart.charts.Stock.prototype.setupByJSON = function(config) {
   this.scroller(config['scroller']);
   this.grouping(config['grouping']);
   this.scrollerGrouping(config['scrollerGrouping']);
+
+  if ('defaultAnnotationSettings' in config)
+    this.defaultAnnotationSettings(config['defaultAnnotationSettings']);
 
   json = config['selectedRange'];
   if (goog.isObject(json)) {
@@ -1796,3 +1859,4 @@ anychart.charts.Stock.prototype['legend'] = anychart.charts.Stock.prototype.lege
 anychart.charts.Stock.prototype['toCsv'] = anychart.charts.Stock.prototype.toCsv;
 anychart.charts.Stock.prototype['grouping'] = anychart.charts.Stock.prototype.grouping;
 anychart.charts.Stock.prototype['scrollerGrouping'] = anychart.charts.Stock.prototype.scrollerGrouping;
+anychart.charts.Stock.prototype['annotations'] = anychart.charts.Stock.prototype.annotations;

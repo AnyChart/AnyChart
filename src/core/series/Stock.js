@@ -279,7 +279,7 @@ anychart.core.series.Stock.prototype.getDetachedIterator = function() {
 /** @inheritDoc */
 anychart.core.series.Stock.prototype.getColorResolutionContext = function(opt_baseColor) {
   return {
-    'sourceColor': opt_baseColor || this.getSeriesOption(anychart.opt.COLOR) || 'blue'
+    'sourceColor': opt_baseColor || this.getOption(anychart.opt.COLOR) || 'blue'
   };
 };
 

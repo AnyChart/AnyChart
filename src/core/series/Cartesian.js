@@ -280,7 +280,7 @@ anychart.core.series.Cartesian.prototype.prepareData = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.series.Cartesian.prototype.getColorResolutionContext = function(opt_baseColor) {
-  var source = opt_baseColor || this.getSeriesOption(anychart.opt.COLOR) || 'blue';
+  var source = opt_baseColor || this.getOption(anychart.opt.COLOR) || 'blue';
   if (this.supportsPointSettings()) {
     var iterator = this.getIterator();
     return {
@@ -641,7 +641,7 @@ anychart.core.series.Cartesian.prototype.getDrawingData_ = function(data, dataPu
     }
     if (this.isSizeBased()) {
       var size = Number(pointData[anychart.opt.SIZE]);
-      if (isNaN(size) || (size < 0 && !this.getSeriesOption(anychart.opt.DISPLAY_NEGATIVE)))
+      if (isNaN(size) || (size < 0 && !this.getOption(anychart.opt.DISPLAY_NEGATIVE)))
         missing = true;
     }
     if (this.supportsError()) {

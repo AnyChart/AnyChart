@@ -314,11 +314,9 @@ anychart.utils.normalizeToNaturalNumber = function(value, opt_default, opt_allow
     value = parseFloat(value);
   value = Math.round(value);
   // value > 0 also checks for NaN, because NaN > 0 == false.
-  opt_default = goog.isDef(opt_default) ? opt_default : opt_allowZero ? 0 : 1;
-  if (opt_allowZero)
-    return value >= 0 ? value : opt_default;
-  else
-    return value > 0 ? value : opt_default;
+  return ((value > 0) || (opt_allowZero && value == 0)) ?
+      value :
+      (goog.isDef(opt_default) ? opt_default : opt_allowZero ? 0 : 1);
 };
 
 
@@ -1027,6 +1025,8 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
   switch (arrayPropName) {
     case 'series':
       return ['series_list', 'series'];
+    case 'annotationsList':
+      return ['annotations_list', 'annotation'];
     case 'keys':
       return ['keys', 'key'];
     case 'data':
@@ -1100,6 +1100,8 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
   switch (nodeName) {
     case 'seriesList':
       return ['series', 'series'];
+    case 'annotationsList':
+      return ['annotationsList', 'annotation'];
     case 'keys':
       return ['keys', 'key'];
     case 'data':
@@ -1429,9 +1431,31 @@ anychart.utils.estimateInterval = function(interval) {
 
 
 /**
+ * @type {Array.<number>}
+ */
+anychart.utils.PENTAGON_COS = [
+  1 + Math.cos((2 / 5 - .5) * Math.PI),
+  1 + Math.cos((4 / 5 - .5) * Math.PI),
+  1 + Math.cos((6 / 5 - .5) * Math.PI),
+  1 + Math.cos((8 / 5 - .5) * Math.PI),
+  1 + Math.cos(1.5 * Math.PI)];
+
+
+/**
+ * @type {Array.<number>}
+ */
+anychart.utils.PENTAGON_SIN = [
+  1 + Math.sin((2 / 5 - .5) * Math.PI),
+  1 + Math.sin((4 / 5 - .5) * Math.PI),
+  1 + Math.sin((6 / 5 - .5) * Math.PI),
+  1 + Math.sin((8 / 5 - .5) * Math.PI),
+  1 + Math.sin(1.5 * Math.PI)];
+
+
+/**
  * Method to get marker drawer.
  * @param {*} type Marker type.
- * @return {function(!acgraph.vector.Path, number, number, number):!acgraph.vector.Path} Marker drawer.
+ * @return {function(!acgraph.vector.Path, number, number, number, number=):!acgraph.vector.Path} Marker drawer.
  */
 anychart.utils.getMarkerDrawer = function(type) {
   type = (String(type)).toLowerCase();
@@ -1495,8 +1519,8 @@ anychart.utils.getMarkerDrawer = function(type) {
       return function(path, x, y, radius) {
         x -= radius;
         y -= radius;
-        var pentagonCos = anychart.enums.PENTAGON_COS;
-        var pentagonSin = anychart.enums.PENTAGON_SIN;
+        var pentagonCos = anychart.utils.PENTAGON_COS;
+        var pentagonSin = anychart.utils.PENTAGON_SIN;
         path.moveTo(x + radius * pentagonCos[0], y + radius * pentagonSin[0]);
         for (var i = 1; i < 5; i++)
           path.lineTo(x + radius * pentagonCos[i], y + radius * pentagonSin[i]);
@@ -1506,46 +1530,257 @@ anychart.utils.getMarkerDrawer = function(type) {
         return path;
       };
     case 'square':
-      return function(path, x, y, size) {
-        var left = x - size;
-        var top = y - size;
-        var right = x + size;
-        var bottom = y + size;
+      return (
+          /**
+           * @param {!acgraph.vector.Path} path
+           * @param {number} x
+           * @param {number} y
+           * @param {number} size
+           * @param {number=} opt_strokeThickness
+           * @return {!acgraph.vector.Path}
+           */
+          (function(path, x, y, size, opt_strokeThickness) {
+            var left = x - size;
+            var top = y - size;
+            var right = x + size;
+            var bottom = y + size;
 
-        path
-            .moveTo(left, top)
-            .lineTo(right, top)
-            .lineTo(right, bottom)
-            .lineTo(left, bottom)
-            .lineTo(left, top)
-            .close();
+            if (goog.isDef(opt_strokeThickness)) {
+              opt_strokeThickness = opt_strokeThickness || 0;
+              left = anychart.utils.applyPixelShift(left, opt_strokeThickness);
+              top = anychart.utils.applyPixelShift(top, opt_strokeThickness);
+              right = anychart.utils.applyPixelShift(right, opt_strokeThickness);
+              bottom = anychart.utils.applyPixelShift(bottom, opt_strokeThickness);
+            }
 
-        return path;
-      };
+            path
+                .moveTo(left, top)
+                .lineTo(right, top)
+                .lineTo(right, bottom)
+                .lineTo(left, bottom)
+                .lineTo(left, top)
+                .close();
+
+            return path;
+          }));
     case 'vline':
     case 'line':
-      return function(path, x, y, size) {
-        var height = size * 2;
-        var width = height / 2;
+      return (
+          /**
+           * @param {!acgraph.vector.Path} path
+           * @param {number} x
+           * @param {number} y
+           * @param {number} size
+           * @param {number=} opt_strokeThickness
+           * @return {!acgraph.vector.Path}
+           */
+          (function(path, x, y, size, opt_strokeThickness) {
+            opt_strokeThickness = opt_strokeThickness || 0;
+            var height = size * 2;
+            var width = height / 2;
 
-        var halfW = width / 2;
-        var halfL = height / 2;
+            var halfW = width / 2;
+            var halfL = height / 2;
 
-        var left = x - halfW;
-        var top = y - halfL;
-        var right = left + width;
-        var bottom = top + height;
+            var left = x - halfW;
+            var top = y - halfL;
+            var right = left + width;
+            var bottom = top + height;
 
-        path
-            .moveTo(left, top)
-            .lineTo(right, top)
-            .lineTo(right, bottom)
-            .lineTo(left, bottom)
-            .lineTo(left, top)
-            .close();
+            if (goog.isDef(opt_strokeThickness)) {
+              opt_strokeThickness = opt_strokeThickness || 0;
+              left = anychart.utils.applyPixelShift(left, opt_strokeThickness);
+              top = anychart.utils.applyPixelShift(top, opt_strokeThickness);
+              right = anychart.utils.applyPixelShift(right, opt_strokeThickness);
+              bottom = anychart.utils.applyPixelShift(bottom, opt_strokeThickness);
+            }
 
-        return path;
-      };
+            path
+                .moveTo(left, top)
+                .lineTo(right, top)
+                .lineTo(right, bottom)
+                .lineTo(left, bottom)
+                .lineTo(left, top)
+                .close();
+
+            return path;
+          }));
+    case 'arrowup':
+      return (
+          /**
+           * @param {!acgraph.vector.Path} path
+           * @param {number} x
+           * @param {number} y
+           * @param {number} size
+           * @param {number=} opt_strokeThickness
+           * @return {!acgraph.vector.Path}
+           */
+          (function(path, x, y, size, opt_strokeThickness) {
+            var halfSize = size / 2;
+            var quarterSize = halfSize / 2;
+            var xphs = x + halfSize;
+            var xmhs = x - halfSize;
+            var yphs = y + halfSize;
+            var ymhs = y - halfSize;
+            var xpqs = x + quarterSize;
+            var xmqs = x - quarterSize;
+            // var ypqs = y + quarterSize;
+            // var ymqs = y - quarterSize;
+            if (goog.isDef(opt_strokeThickness)) {
+              opt_strokeThickness = opt_strokeThickness || 0;
+              xphs = anychart.utils.applyPixelShift(xphs, opt_strokeThickness);
+              xmhs = anychart.utils.applyPixelShift(xmhs, opt_strokeThickness);
+              yphs = anychart.utils.applyPixelShift(yphs, opt_strokeThickness);
+              ymhs = anychart.utils.applyPixelShift(ymhs, opt_strokeThickness);
+              xpqs = anychart.utils.applyPixelShift(xpqs, opt_strokeThickness);
+              xmqs = anychart.utils.applyPixelShift(xmqs, opt_strokeThickness);
+              // ypqs = anychart.utils.applyPixelShift(ypqs, opt_strokeThickness);
+              // ymqs = anychart.utils.applyPixelShift(ymqs, opt_strokeThickness);
+              x = anychart.utils.applyPixelShift(x, opt_strokeThickness);
+              y = anychart.utils.applyPixelShift(y, opt_strokeThickness);
+            }
+            path.moveTo(x, ymhs);
+            path.lineTo(xphs, y,
+                xpqs, y,
+                xpqs, yphs,
+                xmqs, yphs,
+                xmqs, y,
+                xmhs, y);
+            path.close();
+            return path;
+          }));
+    case 'arrowdown':
+      return (
+          /**
+           * @param {!acgraph.vector.Path} path
+           * @param {number} x
+           * @param {number} y
+           * @param {number} size
+           * @param {number=} opt_strokeThickness
+           * @return {!acgraph.vector.Path}
+           */
+          (function(path, x, y, size, opt_strokeThickness) {
+            var halfSize = size / 2;
+            var quarterSize = halfSize / 2;
+            var xphs = x + halfSize;
+            var xmhs = x - halfSize;
+            var yphs = y + halfSize;
+            var ymhs = y - halfSize;
+            var xpqs = x + quarterSize;
+            var xmqs = x - quarterSize;
+            // var ypqs = y + quarterSize;
+            // var ymqs = y - quarterSize;
+            if (goog.isDef(opt_strokeThickness)) {
+              opt_strokeThickness = opt_strokeThickness || 0;
+              xphs = anychart.utils.applyPixelShift(xphs, opt_strokeThickness);
+              xmhs = anychart.utils.applyPixelShift(xmhs, opt_strokeThickness);
+              yphs = anychart.utils.applyPixelShift(yphs, opt_strokeThickness);
+              ymhs = anychart.utils.applyPixelShift(ymhs, opt_strokeThickness);
+              xpqs = anychart.utils.applyPixelShift(xpqs, opt_strokeThickness);
+              xmqs = anychart.utils.applyPixelShift(xmqs, opt_strokeThickness);
+              // ypqs = anychart.utils.applyPixelShift(ypqs, opt_strokeThickness);
+              // ymqs = anychart.utils.applyPixelShift(ymqs, opt_strokeThickness);
+              x = anychart.utils.applyPixelShift(x, opt_strokeThickness);
+              y = anychart.utils.applyPixelShift(y, opt_strokeThickness);
+            }
+            path.moveTo(x, yphs);
+            path.lineTo(xphs, y,
+                xpqs, y,
+                xpqs, ymhs,
+                xmqs, ymhs,
+                xmqs, y,
+                xmhs, y);
+            path.close();
+            return path;
+          }));
+    case 'arrowleft':
+      return (
+          /**
+           * @param {!acgraph.vector.Path} path
+           * @param {number} x
+           * @param {number} y
+           * @param {number} size
+           * @param {number=} opt_strokeThickness
+           * @return {!acgraph.vector.Path}
+           */
+          (function(path, x, y, size, opt_strokeThickness) {
+            var halfSize = size / 2;
+            var quarterSize = halfSize / 2;
+            var xphs = x + halfSize;
+            var xmhs = x - halfSize;
+            var yphs = y + halfSize;
+            var ymhs = y - halfSize;
+            // var xpqs = x + quarterSize;
+            // var xmqs = x - quarterSize;
+            var ypqs = y + quarterSize;
+            var ymqs = y - quarterSize;
+            if (goog.isDef(opt_strokeThickness)) {
+              opt_strokeThickness = opt_strokeThickness || 0;
+              xphs = anychart.utils.applyPixelShift(xphs, opt_strokeThickness);
+              xmhs = anychart.utils.applyPixelShift(xmhs, opt_strokeThickness);
+              yphs = anychart.utils.applyPixelShift(yphs, opt_strokeThickness);
+              ymhs = anychart.utils.applyPixelShift(ymhs, opt_strokeThickness);
+              // xpqs = anychart.utils.applyPixelShift(xpqs, opt_strokeThickness);
+              // xmqs = anychart.utils.applyPixelShift(xmqs, opt_strokeThickness);
+              ypqs = anychart.utils.applyPixelShift(ypqs, opt_strokeThickness);
+              ymqs = anychart.utils.applyPixelShift(ymqs, opt_strokeThickness);
+              x = anychart.utils.applyPixelShift(x, opt_strokeThickness);
+              y = anychart.utils.applyPixelShift(y, opt_strokeThickness);
+            }
+            path.moveTo(xmhs, y);
+            path.lineTo(x, yphs,
+                x, ypqs,
+                xphs, ypqs,
+                xphs, ymqs,
+                x, ymqs,
+                x, ymhs);
+            path.close();
+            return path;
+          }));
+    case 'arrowright':
+      return (
+          /**
+           * @param {!acgraph.vector.Path} path
+           * @param {number} x
+           * @param {number} y
+           * @param {number} size
+           * @param {number=} opt_strokeThickness
+           * @return {!acgraph.vector.Path}
+           */
+          (function(path, x, y, size, opt_strokeThickness) {
+            var halfSize = size / 2;
+            var quarterSize = halfSize / 2;
+            var xphs = x + halfSize;
+            var xmhs = x - halfSize;
+            var yphs = y + halfSize;
+            var ymhs = y - halfSize;
+            // var xpqs = x + quarterSize;
+            // var xmqs = x - quarterSize;
+            var ypqs = y + quarterSize;
+            var ymqs = y - quarterSize;
+            if (goog.isDef(opt_strokeThickness)) {
+              opt_strokeThickness = opt_strokeThickness || 0;
+              xphs = anychart.utils.applyPixelShift(xphs, opt_strokeThickness);
+              xmhs = anychart.utils.applyPixelShift(xmhs, opt_strokeThickness);
+              yphs = anychart.utils.applyPixelShift(yphs, opt_strokeThickness);
+              ymhs = anychart.utils.applyPixelShift(ymhs, opt_strokeThickness);
+              // xpqs = anychart.utils.applyPixelShift(xpqs, opt_strokeThickness);
+              // xmqs = anychart.utils.applyPixelShift(xmqs, opt_strokeThickness);
+              ypqs = anychart.utils.applyPixelShift(ypqs, opt_strokeThickness);
+              ymqs = anychart.utils.applyPixelShift(ymqs, opt_strokeThickness);
+              x = anychart.utils.applyPixelShift(x, opt_strokeThickness);
+              y = anychart.utils.applyPixelShift(y, opt_strokeThickness);
+            }
+            path.moveTo(xphs, y);
+            path.lineTo(x, yphs,
+                x, ypqs,
+                xmhs, ypqs,
+                xmhs, ymqs,
+                x, ymqs,
+                x, ymhs);
+            path.close();
+            return path;
+          }));
     default:
       return acgraph.vector.primitives.star5;
   }

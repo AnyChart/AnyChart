@@ -21,14 +21,14 @@ anychart.core.drawers.Marker = function(series) {
    */
   this.typeGetter_ = anychart.core.series.Base.getSettingsResolver(
       [anychart.opt.TYPE, anychart.opt.HOVER_TYPE, anychart.opt.SELECT_TYPE],
-      anychart.core.series.Base.markerTypeNormalizer);
+      anychart.core.settings.markerTypeNormalizer);
   /**
    * @type {function(anychart.core.series.Base, anychart.data.IRowInfo, number):*}
    * @private
    */
   this.sizeGetter_ = anychart.core.series.Base.getSettingsResolver(
       [anychart.opt.MARKER_SIZE, anychart.opt.HOVER_MARKER_SIZE, anychart.opt.SELECT_MARKER_SIZE],
-      anychart.core.series.Base.numberNormalizer,
+      anychart.core.settings.numberNormalizer,
       [anychart.opt.SIZE, anychart.opt.HOVER_SIZE, anychart.opt.SELECT_SIZE]);
 };
 goog.inherits(anychart.core.drawers.Marker, anychart.core.drawers.Base);

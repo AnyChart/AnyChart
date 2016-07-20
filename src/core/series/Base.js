@@ -8,6 +8,7 @@ goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.series');
+goog.require('anychart.core.settings');
 goog.require('anychart.core.shapeManagers.PerPoint');
 goog.require('anychart.core.shapeManagers.PerSeries');
 goog.require('anychart.core.ui.LabelsFactory');
@@ -38,6 +39,7 @@ goog.require('goog.math');
  * @constructor
  * @extends {anychart.core.VisualBaseWithBounds}
  * @implements {anychart.core.utils.ISeriesWithError}
+ * @implements {anychart.core.settings.IObjectWithSettings}
  */
 anychart.core.series.Base = function(chart, plot, type, config) {
   anychart.core.series.Base.base(this, 'constructor');
@@ -764,7 +766,7 @@ anychart.core.series.Base.prototype.isChart = function() {
  */
 anychart.core.series.Base.prototype.getPixelPointWidth = function() {
   if (this.isWidthBased())
-    return anychart.utils.normalizeSize(/** @type {(number|string)} */(this.getSeriesOption(anychart.opt.POINT_WIDTH)),
+    return anychart.utils.normalizeSize(/** @type {(number|string)} */(this.getOption(anychart.opt.POINT_WIDTH)),
         this.getCategoryWidth());
   else
     return 0;
@@ -902,14 +904,14 @@ anychart.core.series.Base.prototype.getWhiskerWidth = function(point, pointState
     if (this.supportsPointSettings())
       result = point.get(name);
     if (!goog.isDef(result))
-      result = this.getSeriesOption(name);
+      result = this.getOption(name);
   }
 
   if (!goog.isDef(result)) {
     if (this.supportsPointSettings())
       result = point.get(anychart.opt.WHISKER_WIDTH);
     if (!goog.isDef(result))
-      result = this.getSeriesOption(anychart.opt.WHISKER_WIDTH);
+      result = this.getOption(anychart.opt.WHISKER_WIDTH);
   }
 
   return anychart.utils.normalizeSize(/** @type {(number|string)} */(result), this.pointWidthCache);
@@ -936,7 +938,7 @@ anychart.core.series.Base.prototype.calculateSizeScale = function(minMax) {
     var iter = this.getDetachedIterator();
     while (iter.advance()) {
       var size = Number(iter.get(anychart.opt.SIZE));
-      if (!isNaN(size) && (size >= 0 || this.getSeriesOption(anychart.opt.DISPLAY_NEGATIVE))) {
+      if (!isNaN(size) && (size >= 0 || this.getOption(anychart.opt.DISPLAY_NEGATIVE))) {
         size = Math.abs(size);
         if (size > this.selfMaximumBubbleValue_)
           this.selfMaximumBubbleValue_ = size;
@@ -1352,7 +1354,7 @@ anychart.core.series.Base.prototype.getLegendItemData = function(itemsTextFormat
   legendItem.markAllConsistent();
 
   var json = legendItem.getJSON();
-  var baseColor = this.getSeriesOption(anychart.opt.COLOR);
+  var baseColor = this.getOption(anychart.opt.COLOR);
   var context = this.createLegendContextProvider();
 
   json[anychart.opt.DISABLED] = anychart.opt.DISABLED in json ? !!json[anychart.opt.DISABLED] : !this.enabled();
@@ -1410,7 +1412,7 @@ anychart.core.series.Base.prototype.getLegendItemData = function(itemsTextFormat
 anychart.core.series.Base.prototype.getLegendIconType = function(type, context) {
   if (type == anychart.enums.LegendItemIconType.MARKER) {
     if (this.check(anychart.core.drawers.Capabilities.IS_MARKER_BASED)) {
-      type = this.getSeriesOption(anychart.opt.TYPE);
+      type = this.getOption(anychart.opt.TYPE);
     } else if (this.supportsMarkers()) {
       type = this.markers().type();
     } else {
@@ -1524,14 +1526,14 @@ anychart.core.series.Base.getColorResolver = function(colorNames, colorType) {
     var normalizerFunc;
     switch (colorType) {
       case anychart.enums.ColorType.STROKE:
-        normalizerFunc = anychart.core.series.Base.strokeOrFunctionSimpleNormalizer;
+        normalizerFunc = anychart.core.settings.strokeOrFunctionSimpleNormalizer;
         break;
       case anychart.enums.ColorType.HATCH_FILL:
-        normalizerFunc = anychart.core.series.Base.hatchFillOrFunctionSimpleNormalizer;
+        normalizerFunc = anychart.core.settings.hatchFillOrFunctionSimpleNormalizer;
         break;
       default:
       case anychart.enums.ColorType.FILL:
-        normalizerFunc = anychart.core.series.Base.fillOrFunctionSimpleNormalizer;
+        normalizerFunc = anychart.core.settings.fillOrFunctionSimpleNormalizer;
         break;
     }
     anychart.core.series.Base.colorResolversCache_[hash] = result = goog.partial(anychart.core.series.Base.getColor_,
@@ -1557,8 +1559,8 @@ anychart.core.series.Base.getColor_ = function(colorNames, normalizer, isHatchFi
   state = anychart.core.utils.InteractivityState.clarifyState(state);
   if (state != anychart.PointState.NORMAL && colorNames.length > 1) {
     stateColor = opt_ignorePointSettings ?
-        series.getSeriesOption(colorNames[state]) :
-        series.getOption(colorNames[state], series.getIterator(), normalizer);
+        series.getOption(colorNames[state]) :
+        series.resolveOption(colorNames[state], series.getIterator(), normalizer);
     if (isHatchFill && stateColor === true)
       stateColor = normalizer(series.getAutoHatchFill());
     if (goog.isDef(stateColor)) {
@@ -1572,8 +1574,8 @@ anychart.core.series.Base.getColor_ = function(colorNames, normalizer, isHatchFi
   }
   // we can get here only if state color is undefined or is a function
   var color = opt_ignorePointSettings ?
-      series.getSeriesOption(colorNames[0]) :
-      series.getOption(colorNames[0], series.getIterator(), normalizer);
+      series.getOption(colorNames[0]) :
+      series.resolveOption(colorNames[0], series.getIterator(), normalizer);
   if (isHatchFill && color === true)
     color = normalizer(series.getAutoHatchFill());
   if (goog.isFunction(color)) {
@@ -1597,42 +1599,6 @@ anychart.core.series.Base.getColor_ = function(colorNames, normalizer, isHatchFi
  */
 anychart.core.series.Base.getNullColor_ = function() {
   return anychart.opt.NONE;
-};
-
-
-/**
- * Array normalizer for stroke.
- * @param {*} val
- * @return {*}
- */
-anychart.core.series.Base.strokeOrFunctionSimpleNormalizer = function(val) {
-  return goog.isFunction(val) ?
-      val :
-      acgraph.vector.normalizeStroke(/** @type {acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null|undefined} */(val));
-};
-
-
-/**
- * Array normalizer for fill.
- * @param {*} val
- * @return {*}
- */
-anychart.core.series.Base.fillOrFunctionSimpleNormalizer = function(val) {
-  return goog.isFunction(val) ?
-      val :
-      acgraph.vector.normalizeFill(/** @type {acgraph.vector.Fill|Array.<(acgraph.vector.GradientKey|string)>|null|undefined} */(val));
-};
-
-
-/**
- * Array normalizer for hatchFill.
- * @param {*} val
- * @return {*}
- */
-anychart.core.series.Base.hatchFillOrFunctionSimpleNormalizer = function(val) {
-  return goog.isFunction(val) || val === true ?
-      val :
-      acgraph.vector.normalizeHatchFill(/** @type {string|Object|null|undefined} */(val));
 };
 
 
@@ -1677,11 +1643,11 @@ anychart.core.series.Base.getSettingsResolver = function(names, normalizer, opt_
       state = anychart.core.utils.InteractivityState.clarifyState(state);
       var val;
       if (state != anychart.PointState.NORMAL && names.length > 1) {
-        val = series.getOption(names[state], point, normalizer, opt_seriesNames[state]);
+        val = series.resolveOption(names[state], point, normalizer, opt_seriesNames[state]);
         if (goog.isDef(val))
           return val;
       }
-      return series.getOption(names[0], point, normalizer, opt_seriesNames[0]);
+      return series.resolveOption(names[0], point, normalizer, opt_seriesNames[0]);
     };
   }
   return result;
@@ -1711,11 +1677,41 @@ anychart.core.series.Base.prototype.getPointOption = function(name) {
 
 
 /**
+ * Returns option value if it was set directly to the series.
+ * @param {string} name
+ * @return {*}
+ */
+anychart.core.series.Base.prototype.getOwnOption = function(name) {
+  return this.settings[name];
+};
+
+
+/**
+ * Returns option value from the theme if any.
+ * @param {string} name
+ * @return {*}
+ */
+anychart.core.series.Base.prototype.getThemeOption = function(name) {
+  return this.defaultSettings[name];
+};
+
+
+/**
+ * RReturns true if the option value was set directly to the object.
+ * @param {string} name
+ * @return {boolean}
+ */
+anychart.core.series.Base.prototype.hasOwnOption = function(name) {
+  return goog.isDefAndNotNull(this.settings[name]);
+};
+
+
+/**
  * Returns an option value for the series.
  * @param {string} name
  * @return {*}
  */
-anychart.core.series.Base.prototype.getSeriesOption = function(name) {
+anychart.core.series.Base.prototype.getOption = function(name) {
   var res = this.settings[name];
   if (!goog.isDefAndNotNull(res)) {
     res = this.defaultSettings[name];
@@ -1728,6 +1724,16 @@ anychart.core.series.Base.prototype.getSeriesOption = function(name) {
 
 
 /**
+ * Sets series option value.
+ * @param {string} name
+ * @param {*} value
+ */
+anychart.core.series.Base.prototype.setOption = function(name, value) {
+  this.settings[name] = value;
+};
+
+
+/**
  * Returns proper settings due to the state if point settings are supported by the series.
  * @param {string} name
  * @param {anychart.data.IRowInfo} point
@@ -1735,7 +1741,7 @@ anychart.core.series.Base.prototype.getSeriesOption = function(name) {
  * @param {string=} opt_seriesName - series option name if differs from point names.
  * @return {*}
  */
-anychart.core.series.Base.prototype.getOption = function(name, point, normalizer, opt_seriesName) {
+anychart.core.series.Base.prototype.resolveOption = function(name, point, normalizer, opt_seriesName) {
   var val;
   if (this.supportsPointSettings())
     val = point.get(name);
@@ -2017,7 +2023,7 @@ anychart.core.series.Base.prototype.drawLabel = function(point, pointState) {
 anychart.core.series.Base.prototype.getLabelsColor = function() {
   var color;
   if (anychart.DEFAULT_THEME != 'v6') {
-    color = anychart.color.darken(/** @type {acgraph.vector.Fill} */(this.getSeriesOption(anychart.opt.COLOR)));
+    color = anychart.color.darken(/** @type {acgraph.vector.Fill} */(this.getOption(anychart.opt.COLOR)));
     if (goog.isObject(color)) {
       color = /** @type {string|undefined} */(color['color']);
     }
@@ -2870,7 +2876,7 @@ anychart.core.series.Base.prototype.makePointMeta = function(rowInfo, yNames, yC
           this.getXScale().transformInternal(
               rowInfo.getX(),
               rowInfo.getIndex(),
-              /** @type {number} */(this.getSeriesOption(anychart.opt.X_POINT_POSITION))), true));
+              /** @type {number} */(this.getOption(anychart.opt.X_POINT_POSITION))), true));
   if (!!pointMissing) {
     this.makeMissing(rowInfo, yNames);
   } else {
@@ -3059,157 +3065,6 @@ anychart.core.series.Base.prototype.createPositionProvider = function(position, 
 //endregion
 
 
-//region Settings optimization
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Settings optimization
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Simple field handler, that is suitable for partial application to make real handlers.
- * @param {string} fieldName
- * @param {function(*):*} normalizer
- * @param {number} supportCheck - set to anychart.core.series.Capabilities.ANY to invalidate in any case.
- * @param {anychart.ConsistencyState|number} consistencyState
- * @param {anychart.Signal|number} signal
- * @param {*=} opt_value
- * @return {*|anychart.core.series.Base}
- * @this {anychart.core.series.Base}
- */
-anychart.core.series.Base.simpleHandler = function(fieldName, normalizer, supportCheck, consistencyState, signal, opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = normalizer(opt_value);
-    if (this.settings[fieldName] != opt_value) {
-      this.settings[fieldName] = opt_value;
-      if (this.check(supportCheck))
-        this.invalidate(consistencyState, signal);
-    }
-    return this;
-  }
-  return this.getSeriesOption(fieldName);
-};
-
-
-/**
- * Field handler, that is suitable for partial application to make real handlers. Unlike the simpleHandler it passes
- * all args starting to the normalizer instead of the first param only.
- * @param {string} fieldName
- * @param {function(Array):*} arrayNormalizer
- * @param {number} supportCheck - set to anychart.core.series.Capabilities.ANY to invalidate in any case.
- * @param {anychart.ConsistencyState|number} consistencyState
- * @param {anychart.Signal|number} signal
- * @param {*=} opt_value
- * @param {...*} var_args
- * @return {*|anychart.core.series.Base}
- * @this {anychart.core.series.Base}
- */
-anychart.core.series.Base.multiArgsHandler = function(fieldName, arrayNormalizer, supportCheck, consistencyState, signal, opt_value, var_args) {
-  if (goog.isDef(opt_value)) {
-    // Copying using loop to avoid deop due to passing arguments object to
-    // function. This is faster in many JS engines as of late 2014.
-    var args = [];
-    for (var i = 5; i < arguments.length; i++) {
-      args.push(arguments[i]);
-    }
-    opt_value = arrayNormalizer(args);
-    if (this.settings[fieldName] != opt_value) {
-      this.settings[fieldName] = opt_value;
-      if (this.check(supportCheck))
-        this.invalidate(consistencyState, signal);
-    }
-    return this;
-  }
-  return this.getSeriesOption(fieldName);
-};
-
-
-/**
- * Array normalizer for fill.
- * @param {*} val
- * @return {?acgraph.vector.Fill}
- */
-anychart.core.series.Base.colorNormalizer = function(val) {
-  return goog.isNull(val) ? val : acgraph.vector.normalizeFill(/** @type {acgraph.vector.Fill} */(val));
-};
-
-
-/**
- * Array normalizer for stroke.
- * @param {Array.<*>} args
- * @return {*}
- */
-anychart.core.series.Base.strokeOrFunctionNormalizer = function(args) {
-  return goog.isFunction(args[0]) ?
-      args[0] :
-      acgraph.vector.normalizeStroke.apply(null, args);
-};
-
-
-/**
- * Array normalizer for fill.
- * @param {Array.<*>} args
- * @return {*}
- */
-anychart.core.series.Base.fillOrFunctionNormalizer = function(args) {
-  return goog.isFunction(args[0]) ?
-      args[0] :
-      acgraph.vector.normalizeFill.apply(null, args);
-};
-
-
-/**
- * Array normalizer for hatchFill.
- * @param {Array.<*>} args
- * @return {*}
- */
-anychart.core.series.Base.hatchFillOrFunctionNormalizer = function(args) {
-  return goog.isFunction(args[0]) || args[0] === true ?
-      args[0] :
-      acgraph.vector.normalizeHatchFill.apply(null, args);
-};
-
-
-/**
- * Single arg normalizer for boolean params.
- * @param {*} val
- * @return {boolean}
- */
-anychart.core.series.Base.booleanNormalizer = function(val) {
-  return !!val;
-};
-
-
-/**
- * Single arg normalizer for number params.
- * @param {*} val
- * @return {number}
- */
-anychart.core.series.Base.numberNormalizer = function(val) {
-  return Number(val);
-};
-
-
-/**
- * Single arg normalizer for number params.
- * @param {*} val
- * @return {number|string|null}
- */
-anychart.core.series.Base.numberOrPercentNormalizer = function(val) {
-  return anychart.utils.normalizeNumberOrPercent(val, null);
-};
-
-
-/**
- * Single arg normalizer for marker type params.
- * @param {*} val
- * @return {anychart.enums.MarkerType|Function}
- */
-anychart.core.series.Base.markerTypeNormalizer = function(val) {
-  return goog.isFunction(val) ? val : anychart.enums.normalizeMarkerType(val);
-};
-//endregion
-
-
 //region OptimizedProperties
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -3218,15 +3073,15 @@ anychart.core.series.Base.markerTypeNormalizer = function(val) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Properties that should be defined in series.Base prototype.
- * @type {!Object.<string, anychart.core.series.PropertyDescriptor>}
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
 anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
-  /** @type {!Object.<string, anychart.core.series.PropertyDescriptor>} */
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
   map[anychart.opt.FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.FILL,
-    normalizer: anychart.core.series.Base.fillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.fillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: anychart.ConsistencyState.SERIES_COLOR,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
@@ -3234,7 +3089,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.HOVER_FILL,
-    normalizer: anychart.core.series.Base.fillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.fillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ALLOW_INTERACTIVITY,
     consistency: 0,
     signal: 0
@@ -3242,7 +3097,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.SELECT_FILL,
-    normalizer: anychart.core.series.Base.fillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.fillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3250,7 +3105,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.NEGATIVE_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.NEGATIVE_FILL,
-    normalizer: anychart.core.series.Base.fillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.fillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: anychart.ConsistencyState.SERIES_COLOR,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
@@ -3258,7 +3113,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_NEGATIVE_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.HOVER_NEGATIVE_FILL,
-    normalizer: anychart.core.series.Base.fillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.fillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3266,7 +3121,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_NEGATIVE_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.SELECT_NEGATIVE_FILL,
-    normalizer: anychart.core.series.Base.fillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.fillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3274,7 +3129,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.RISING_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.RISING_FILL,
-    normalizer: anychart.core.series.Base.fillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.fillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: anychart.ConsistencyState.SERIES_COLOR,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
@@ -3282,7 +3137,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_RISING_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.HOVER_RISING_FILL,
-    normalizer: anychart.core.series.Base.fillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.fillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3290,7 +3145,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_RISING_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.SELECT_RISING_FILL,
-    normalizer: anychart.core.series.Base.fillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.fillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3298,7 +3153,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.FALLING_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.FALLING_FILL,
-    normalizer: anychart.core.series.Base.fillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.fillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: anychart.ConsistencyState.SERIES_COLOR,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
@@ -3306,7 +3161,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_FALLING_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.HOVER_FALLING_FILL,
-    normalizer: anychart.core.series.Base.fillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.fillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3314,7 +3169,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_FALLING_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.SELECT_FALLING_FILL,
-    normalizer: anychart.core.series.Base.fillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.fillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3322,7 +3177,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: anychart.ConsistencyState.SERIES_COLOR,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
@@ -3330,7 +3185,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.HOVER_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3338,7 +3193,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.SELECT_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3346,7 +3201,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.LOW_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.LOW_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: anychart.ConsistencyState.SERIES_COLOR,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
@@ -3354,7 +3209,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_LOW_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.HOVER_LOW_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3362,7 +3217,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_LOW_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.SELECT_LOW_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3370,7 +3225,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HIGH_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.HIGH_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: anychart.ConsistencyState.SERIES_COLOR,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
@@ -3378,7 +3233,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_HIGH_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.HOVER_HIGH_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3386,7 +3241,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_HIGH_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.SELECT_HIGH_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3394,7 +3249,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.NEGATIVE_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.NEGATIVE_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: anychart.ConsistencyState.SERIES_COLOR,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
@@ -3402,7 +3257,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_NEGATIVE_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.HOVER_NEGATIVE_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3410,7 +3265,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_NEGATIVE_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.SELECT_NEGATIVE_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3418,7 +3273,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.RISING_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.RISING_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: anychart.ConsistencyState.SERIES_COLOR,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
@@ -3426,7 +3281,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_RISING_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.HOVER_RISING_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3434,7 +3289,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_RISING_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.SELECT_RISING_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3442,7 +3297,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.FALLING_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.FALLING_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: anychart.ConsistencyState.SERIES_COLOR,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
@@ -3450,7 +3305,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_FALLING_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.HOVER_FALLING_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3458,7 +3313,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_FALLING_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.SELECT_FALLING_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3466,7 +3321,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.MEDIAN_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.MEDIAN_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: anychart.ConsistencyState.SERIES_COLOR,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
@@ -3474,7 +3329,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_MEDIAN_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.HOVER_MEDIAN_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3482,7 +3337,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_MEDIAN_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.SELECT_MEDIAN_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3490,7 +3345,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.STEM_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.STEM_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: anychart.ConsistencyState.SERIES_COLOR,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
@@ -3498,7 +3353,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_STEM_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.HOVER_STEM_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3506,7 +3361,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_STEM_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.SELECT_STEM_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3514,7 +3369,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.WHISKER_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.WHISKER_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: anychart.ConsistencyState.SERIES_COLOR,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
@@ -3522,7 +3377,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_WHISKER_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.HOVER_WHISKER_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3530,7 +3385,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_WHISKER_STROKE] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.SELECT_WHISKER_STROKE,
-    normalizer: anychart.core.series.Base.strokeOrFunctionNormalizer,
+    normalizer: anychart.core.settings.strokeOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3538,7 +3393,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HATCH_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.HATCH_FILL,
-    normalizer: anychart.core.series.Base.hatchFillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.hatchFillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: anychart.ConsistencyState.SERIES_COLOR,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
@@ -3546,7 +3401,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_HATCH_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.HOVER_HATCH_FILL,
-    normalizer: anychart.core.series.Base.hatchFillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.hatchFillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3554,7 +3409,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_HATCH_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.SELECT_HATCH_FILL,
-    normalizer: anychart.core.series.Base.hatchFillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.hatchFillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3562,7 +3417,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.NEGATIVE_HATCH_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.NEGATIVE_HATCH_FILL,
-    normalizer: anychart.core.series.Base.hatchFillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.hatchFillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: anychart.ConsistencyState.SERIES_COLOR,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
@@ -3570,7 +3425,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_NEGATIVE_HATCH_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.HOVER_NEGATIVE_HATCH_FILL,
-    normalizer: anychart.core.series.Base.hatchFillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.hatchFillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3578,7 +3433,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_NEGATIVE_HATCH_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.SELECT_NEGATIVE_HATCH_FILL,
-    normalizer: anychart.core.series.Base.hatchFillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.hatchFillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3586,7 +3441,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.RISING_HATCH_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.RISING_HATCH_FILL,
-    normalizer: anychart.core.series.Base.hatchFillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.hatchFillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: anychart.ConsistencyState.SERIES_COLOR,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
@@ -3594,7 +3449,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_RISING_HATCH_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.HOVER_RISING_HATCH_FILL,
-    normalizer: anychart.core.series.Base.hatchFillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.hatchFillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3602,7 +3457,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_RISING_HATCH_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.SELECT_RISING_HATCH_FILL,
-    normalizer: anychart.core.series.Base.hatchFillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.hatchFillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3610,7 +3465,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.FALLING_HATCH_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.FALLING_HATCH_FILL,
-    normalizer: anychart.core.series.Base.hatchFillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.hatchFillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: anychart.ConsistencyState.SERIES_COLOR,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
@@ -3618,7 +3473,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_FALLING_HATCH_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.HOVER_FALLING_HATCH_FILL,
-    normalizer: anychart.core.series.Base.hatchFillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.hatchFillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3626,7 +3481,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_FALLING_HATCH_FILL] = {
     handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
     propName: anychart.opt.SELECT_FALLING_HATCH_FILL,
-    normalizer: anychart.core.series.Base.hatchFillOrFunctionNormalizer,
+    normalizer: anychart.core.settings.hatchFillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: 0,
     signal: 0
@@ -3634,7 +3489,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.COLOR] = {
     handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
     propName: anychart.opt.COLOR,
-    normalizer: anychart.core.series.Base.colorNormalizer,
+    normalizer: anychart.core.settings.colorNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: anychart.ConsistencyState.SERIES_COLOR,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
@@ -3642,7 +3497,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.X_POINT_POSITION] = {
     handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
     propName: anychart.opt.X_POINT_POSITION,
-    normalizer: anychart.core.series.Base.numberNormalizer,
+    normalizer: anychart.core.settings.numberNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
     consistency: anychart.ConsistencyState.SERIES_POINTS,
     signal: anychart.Signal.NEEDS_REDRAW
@@ -3650,7 +3505,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.POINT_WIDTH] = {
     handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
     propName: anychart.opt.POINT_WIDTH,
-    normalizer: anychart.core.series.Base.numberOrPercentNormalizer,
+    normalizer: anychart.core.settings.numberOrPercentNormalizer,
     capabilityCheck: anychart.core.drawers.Capabilities.IS_WIDTH_BASED,
     consistency: anychart.ConsistencyState.SERIES_POINTS,
     signal: anychart.Signal.NEEDS_REDRAW
@@ -3658,7 +3513,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.CONNECT_MISSING_POINTS] = {
     handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
     propName: anychart.opt.CONNECT_MISSING_POINTS,
-    normalizer: anychart.core.series.Base.booleanNormalizer,
+    normalizer: anychart.core.settings.booleanNormalizer,
     capabilityCheck: anychart.core.drawers.Capabilities.SUPPORTS_CONNECTING_MISSING,
     consistency: anychart.ConsistencyState.SERIES_POINTS,
     signal: anychart.Signal.NEEDS_REDRAW
@@ -3666,7 +3521,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.DISPLAY_NEGATIVE] = {
     handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
     propName: anychart.opt.DISPLAY_NEGATIVE,
-    normalizer: anychart.core.series.Base.booleanNormalizer,
+    normalizer: anychart.core.settings.booleanNormalizer,
     capabilityCheck: anychart.core.drawers.Capabilities.NEEDS_SIZE_SCALE,
     consistency: anychart.ConsistencyState.SERIES_POINTS,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_RECALCULATION
@@ -3674,7 +3529,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.WHISKER_WIDTH] = {
     handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
     propName: anychart.opt.WHISKER_WIDTH,
-    normalizer: anychart.core.series.Base.numberOrPercentNormalizer,
+    normalizer: anychart.core.settings.numberOrPercentNormalizer,
     capabilityCheck: anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS,
     consistency: anychart.ConsistencyState.SERIES_POINTS,
     signal: anychart.Signal.NEEDS_REDRAW
@@ -3682,7 +3537,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_WHISKER_WIDTH] = {
     handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
     propName: anychart.opt.HOVER_WHISKER_WIDTH,
-    normalizer: anychart.core.series.Base.numberOrPercentNormalizer,
+    normalizer: anychart.core.settings.numberOrPercentNormalizer,
     capabilityCheck: anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS,
     consistency: 0,
     signal: 0
@@ -3690,7 +3545,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_WHISKER_WIDTH] = {
     handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
     propName: anychart.opt.SELECT_WHISKER_WIDTH,
-    normalizer: anychart.core.series.Base.numberOrPercentNormalizer,
+    normalizer: anychart.core.settings.numberOrPercentNormalizer,
     capabilityCheck: anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS,
     consistency: 0,
     signal: 0
@@ -3698,7 +3553,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.TYPE] = {
     handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
     propName: anychart.opt.TYPE,
-    normalizer: anychart.core.series.Base.markerTypeNormalizer,
+    normalizer: anychart.core.settings.markerTypeNormalizer,
     capabilityCheck: anychart.core.drawers.Capabilities.IS_MARKER_BASED,
     consistency: anychart.ConsistencyState.SERIES_POINTS,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
@@ -3706,7 +3561,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_TYPE] = {
     handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
     propName: anychart.opt.HOVER_TYPE,
-    normalizer: anychart.core.series.Base.markerTypeNormalizer,
+    normalizer: anychart.core.settings.markerTypeNormalizer,
     capabilityCheck: anychart.core.drawers.Capabilities.IS_MARKER_BASED,
     consistency: 0,
     signal: 0
@@ -3714,7 +3569,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_TYPE] = {
     handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
     propName: anychart.opt.SELECT_TYPE,
-    normalizer: anychart.core.series.Base.markerTypeNormalizer,
+    normalizer: anychart.core.settings.markerTypeNormalizer,
     capabilityCheck: anychart.core.drawers.Capabilities.IS_MARKER_BASED,
     consistency: 0,
     signal: 0
@@ -3722,7 +3577,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SIZE] = {
     handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
     propName: anychart.opt.SIZE,
-    normalizer: anychart.core.series.Base.numberNormalizer,
+    normalizer: anychart.core.settings.numberNormalizer,
     capabilityCheck: anychart.core.drawers.Capabilities.IS_MARKER_BASED,
     consistency: anychart.ConsistencyState.SERIES_POINTS,
     signal: anychart.Signal.NEEDS_REDRAW
@@ -3730,7 +3585,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.HOVER_SIZE] = {
     handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
     propName: anychart.opt.HOVER_SIZE,
-    normalizer: anychart.core.series.Base.numberNormalizer,
+    normalizer: anychart.core.settings.numberNormalizer,
     capabilityCheck: anychart.core.drawers.Capabilities.IS_MARKER_BASED,
     consistency: 0,
     signal: 0
@@ -3738,7 +3593,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
   map[anychart.opt.SELECT_SIZE] = {
     handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
     propName: anychart.opt.SELECT_SIZE,
-    normalizer: anychart.core.series.Base.numberNormalizer,
+    normalizer: anychart.core.settings.numberNormalizer,
     capabilityCheck: anychart.core.drawers.Capabilities.IS_MARKER_BASED,
     consistency: 0,
     signal: 0
@@ -3748,21 +3603,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
 
 
 // populating series base prototype with properties
-(function() {
-  var descriptors = anychart.core.series.Base.PROPERTY_DESCRIPTORS;
-  for (var i in descriptors) {
-    var descriptor = descriptors[i];
-    anychart.core.series.Base.prototype[i] = goog.partial(
-        descriptor.handler == anychart.enums.PropertyHandlerType.MULTI_ARG ?
-            anychart.core.series.Base.multiArgsHandler :
-            anychart.core.series.Base.simpleHandler,
-        descriptor.propName,
-        descriptor.normalizer,
-        descriptor.capabilityCheck,
-        descriptor.consistency,
-        descriptor.signal);
-  }
-})();
+anychart.core.settings.populate(anychart.core.series.Base, anychart.core.series.Base.PROPERTY_DESCRIPTORS);
 //endregion
 
 
@@ -3862,44 +3703,7 @@ anychart.core.series.Base.prototype.serialize = function() {
     json['error'] = this.error().serialize();
   }
 
-  var name, val, descriptor;
-  for (name in this.settings) {
-    val = this.settings[name];
-    if (goog.isFunction(val)) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Series ' + name]
-      );
-    } else {
-      descriptor = anychart.core.series.Base.PROPERTY_DESCRIPTORS[name];
-      if (descriptor) {
-        if (descriptor.normalizer == anychart.core.series.Base.strokeOrFunctionNormalizer ||
-            descriptor.normalizer == anychart.core.series.Base.fillOrFunctionNormalizer ||
-            descriptor.normalizer == anychart.core.series.Base.hatchFillOrFunctionNormalizer) {
-          val = anychart.color.serialize(descriptor.normalizer([val]));
-        } else if (descriptor.normalizer == anychart.core.series.Base.colorNormalizer && !goog.isNull(val)) {
-          val = anychart.color.serialize(descriptor.normalizer(val));
-        }
-      }
-      json[name] = val;
-    }
-  }
-
-  for (name in anychart.core.series.Base.PROPERTY_DESCRIPTORS) {
-    descriptor = anychart.core.series.Base.PROPERTY_DESCRIPTORS[name];
-    val = this.defaultSettings[name];
-    if (this.check(descriptor.capabilityCheck) && !goog.isDef(json[name]) && goog.isDef(val) && !goog.isFunction(val)) {
-      if (descriptor.normalizer == anychart.core.series.Base.strokeOrFunctionNormalizer ||
-          descriptor.normalizer == anychart.core.series.Base.fillOrFunctionNormalizer ||
-          descriptor.normalizer == anychart.core.series.Base.hatchFillOrFunctionNormalizer) {
-        val = anychart.color.serialize(descriptor.normalizer([val]));
-      } else if (descriptor.normalizer == anychart.core.series.Base.colorNormalizer && !goog.isNull(val)) {
-        val = anychart.color.serialize(descriptor.normalizer(val));
-      }
-      json[name] = val;
-    }
-  }
+  anychart.core.settings.serialize(this, anychart.core.series.Base.PROPERTY_DESCRIPTORS, json);
 
   return json;
 };
@@ -3917,9 +3721,7 @@ anychart.core.series.Base.prototype.setupByJSON = function(config) {
   this.meta(config['meta']);
   this.clip(config['clip']);
 
-  for (var name in anychart.core.series.Base.PROPERTY_DESCRIPTORS) {
-    this[name](config[name]);
-  }
+  anychart.core.settings.deserialize(this, anychart.core.series.Base.PROPERTY_DESCRIPTORS, config);
 
   this.applyDefaultsToElements(config);
 };

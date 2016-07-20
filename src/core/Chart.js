@@ -1669,7 +1669,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
     }
   } else {
     series = tag && tag.series;
-    index = goog.isNumber(tag.index) ? tag.index : event['pointIndex'];
+    index = goog.isNumber(tag && tag.index) ? tag.index : event['pointIndex'];
   }
 
   if (series && !series.isDisposed() && series.enabled() && goog.isFunction(series.makePointEvent)) {

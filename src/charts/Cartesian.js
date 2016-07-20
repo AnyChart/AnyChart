@@ -399,3 +399,4 @@ anychart.charts.Cartesian.prototype['getPlotBounds'] = anychart.charts.Cartesian
 anychart.charts.Cartesian.prototype['xZoom'] = anychart.charts.Cartesian.prototype.xZoom;
 anychart.charts.Cartesian.prototype['xScroller'] = anychart.charts.Cartesian.prototype.xScroller;
 anychart.charts.Cartesian.prototype['getStat'] = anychart.charts.Cartesian.prototype.getStat;
+anychart.charts.Cartesian.prototype['annotations'] = anychart.charts.Cartesian.prototype.annotations;

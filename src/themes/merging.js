@@ -514,6 +514,7 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'defaultAxis.labels',
       'defaultAxis.minorLabels',
+      'chart.defaultAnnotationSettings.base.labels',
       'chart.defaultSeriesSettings.base.labels',
       'pieFunnelPyramidBase.labels',
       'ganttBase.timeline.labels',
@@ -538,6 +539,7 @@ anychart.themes.merging.mergingMap_ = [
   {
     defaultObj: 'defaultMarkerFactory',
     targets: [
+      'chart.defaultAnnotationSettings.base.markers',
       'chart.defaultSeriesSettings.base.markers',
       'pieFunnelPyramidBase.markers',
       'ganttBase.timeline.markers',
@@ -748,6 +750,27 @@ anychart.themes.merging.mergingMap_ = [
     targets: ['pie3d']
   },
   {
+    defaultObj: 'cartesianBase.defaultAnnotationSettings.base',
+    targets: [
+      'cartesianBase.defaultAnnotationSettings.ray',
+      'cartesianBase.defaultAnnotationSettings.line',
+      'cartesianBase.defaultAnnotationSettings.infiniteLine',
+      'cartesianBase.defaultAnnotationSettings.verticalLine',
+      'cartesianBase.defaultAnnotationSettings.horizontalLine',
+      'cartesianBase.defaultAnnotationSettings.rectangle',
+      'cartesianBase.defaultAnnotationSettings.ellipse',
+      'cartesianBase.defaultAnnotationSettings.triangle',
+      'cartesianBase.defaultAnnotationSettings.trendChannel',
+      'cartesianBase.defaultAnnotationSettings.andrewsPitchfork',
+      'cartesianBase.defaultAnnotationSettings.fibonacciFan',
+      'cartesianBase.defaultAnnotationSettings.fibonacciArc',
+      'cartesianBase.defaultAnnotationSettings.fibonacciRetracement',
+      'cartesianBase.defaultAnnotationSettings.fibonacciTimezones',
+      'cartesianBase.defaultAnnotationSettings.marker',
+      'cartesianBase.defaultAnnotationSettings.label'
+    ]
+  },
+  {
     defaultObj: 'cartesianBase.defaultSeriesSettings.base',
     targets: [
       'cartesianBase.defaultSeriesSettings.areaLike',
@@ -929,6 +952,27 @@ anychart.themes.merging.mergingMap_ = [
       'connector',
       'markerMap',
       'seatMap'
+    ]
+  },
+  {
+    defaultObj: 'stock.defaultAnnotationSettings.base',
+    targets: [
+      'stock.defaultAnnotationSettings.ray',
+      'stock.defaultAnnotationSettings.line',
+      'stock.defaultAnnotationSettings.infiniteLine',
+      'stock.defaultAnnotationSettings.verticalLine',
+      'stock.defaultAnnotationSettings.horizontalLine',
+      'stock.defaultAnnotationSettings.rectangle',
+      'stock.defaultAnnotationSettings.ellipse',
+      'stock.defaultAnnotationSettings.triangle',
+      'stock.defaultAnnotationSettings.trendChannel',
+      'stock.defaultAnnotationSettings.andrewsPitchfork',
+      'stock.defaultAnnotationSettings.fibonacciFan',
+      'stock.defaultAnnotationSettings.fibonacciArc',
+      'stock.defaultAnnotationSettings.fibonacciRetracement',
+      'stock.defaultAnnotationSettings.fibonacciTimezones',
+      'stock.defaultAnnotationSettings.marker',
+      'stock.defaultAnnotationSettings.label'
     ]
   },
   {
@@ -1225,5 +1269,10 @@ anychart.themes.merging.typedEntities_ = {
   'chart.series': {
     defaults: 'chart.defaultSeriesSettings',
     typeDescriptor: 'seriesType'
+  },
+  // this part is for own annotation serialization
+  'annotationsList': {
+    defaults: 'defaultAnnotationSettings',
+    typeDescriptor: 'type'
   }
 };

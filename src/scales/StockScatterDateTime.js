@@ -218,6 +218,16 @@ anychart.scales.StockScatterDateTime.prototype.getMinorIntervalUnitCount = funct
 
 
 /**
+ * Checks if passed value will be treated as missing by this scale.
+ * @param {*} value
+ * @return {boolean}
+ */
+anychart.scales.StockScatterDateTime.prototype.isMissing = function(value) {
+  return isNaN(anychart.utils.normalizeTimestamp(value));
+};
+
+
+/**
  * Transforms values to ratio.
  * @param {*} value
  * @param {number=} opt_subrangeRatio

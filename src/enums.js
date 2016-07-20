@@ -939,7 +939,11 @@ anychart.enums.MarkerType = {
   TRAPEZIUM: 'trapezium',
   LINE: 'line',
   V_LINE: 'vline',
-  ARROWHEAD: 'arrowhead'
+  ARROWHEAD: 'arrowhead',
+  ARROW_UP: 'arrowUp',
+  ARROW_RIGHT: 'arrowRight',
+  ARROW_DOWN: 'arrowDown',
+  ARROW_LEFT: 'arrowLeft'
 };
 
 
@@ -988,6 +992,18 @@ anychart.enums.normalizeMarkerType = function(type, opt_default) {
     case 'arrow':
     case 'arrowhead':
       return anychart.enums.MarkerType.ARROWHEAD;
+    case 'arrowup':
+    case 'up':
+      return anychart.enums.MarkerType.ARROW_UP;
+    case 'arrowdown':
+    case 'down':
+      return anychart.enums.MarkerType.ARROW_DOWN;
+    case 'arrowright':
+    case 'right':
+      return anychart.enums.MarkerType.ARROW_RIGHT;
+    case 'arrowleft':
+    case 'left':
+      return anychart.enums.MarkerType.ARROW_LEFT;
   }
   return opt_default || anychart.enums.MarkerType.STAR5;
 };
@@ -1043,31 +1059,21 @@ anychart.enums.normalizeAnyMarkerType = function(type) {
       return anychart.enums.MarkerType.ARROWHEAD;
     case 'vline':
       return anychart.enums.MarkerType.V_LINE;
+    case 'arrowup':
+    case 'up':
+      return anychart.enums.MarkerType.ARROW_UP;
+    case 'arrowdown':
+    case 'down':
+      return anychart.enums.MarkerType.ARROW_DOWN;
+    case 'arrowright':
+    case 'right':
+      return anychart.enums.MarkerType.ARROW_RIGHT;
+    case 'arrowleft':
+    case 'left':
+      return anychart.enums.MarkerType.ARROW_LEFT;
   }
   return null;
 };
-
-
-/**
- * @type {Array.<number>}
- */
-anychart.enums.PENTAGON_COS = [
-  1 + Math.cos((2 / 5 - .5) * Math.PI),
-  1 + Math.cos((4 / 5 - .5) * Math.PI),
-  1 + Math.cos((6 / 5 - .5) * Math.PI),
-  1 + Math.cos((8 / 5 - .5) * Math.PI),
-  1 + Math.cos(1.5 * Math.PI)];
-
-
-/**
- * @type {Array.<number>}
- */
-anychart.enums.PENTAGON_SIN = [
-  1 + Math.sin((2 / 5 - .5) * Math.PI),
-  1 + Math.sin((4 / 5 - .5) * Math.PI),
-  1 + Math.sin((6 / 5 - .5) * Math.PI),
-  1 + Math.sin((8 / 5 - .5) * Math.PI),
-  1 + Math.sin(1.5 * Math.PI)];
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1859,7 +1865,12 @@ anychart.enums.EventType = {
   TREE_ITEM_MOVE: 'treeItemMove',
   TREE_ITEM_UPDATE: 'treeItemUpdate',
   TREE_ITEM_CREATE: 'treeItemCreate',
-  TREE_ITEM_REMOVE: 'treeItemRemove'
+  TREE_ITEM_REMOVE: 'treeItemRemove',
+
+  // Annotation events
+  ANNOTATION_SELECT: 'annotationSelect',
+  ANNOTATION_UNSELECT: 'annotationUnselect',
+  ANNOTATION_DRAWING_FINISH: 'annotationDrawingFinish'
 };
 
 
@@ -4895,6 +4906,105 @@ anychart.enums.PropertyHandlerType = {
 //endregion
 
 
+//region Annotations
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Annotations
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Enum of annotation types.
+ * @enum {string}
+ */
+anychart.enums.AnnotationTypes = {
+  RAY: 'ray',
+  LINE: 'line',
+  INFINITE_LINE: 'infiniteLine',
+  VERTICAL_LINE: 'verticalLine',
+  HORIZONTAL_LINE: 'horizontalLine',
+  RECTANGLE: 'rectangle',
+  ELLIPSE: 'ellipse',
+  TRIANGLE: 'triangle',
+  TREND_CHANNEL: 'trendChannel',
+  ANDREWS_PITCHFORK: 'andrewsPitchfork',
+  FIBONACCI_FAN: 'fibonacciFan',
+  FIBONACCI_ARC: 'fibonacciArc',
+  FIBONACCI_RETRACEMENT: 'fibonacciRetracement',
+  FIBONACCI_TIMEZONES: 'fibonacciTimezones',
+  MARKER: 'marker'
+  // LABEL: 'label'
+};
+
+
+/**
+ * Normalizes annotation type string to a enum.
+ * @param {*} value
+ * @return {anychart.enums.AnnotationTypes}
+ */
+anychart.enums.normalizeAnnotationType = function(value) {
+  value = String(value).toLowerCase();
+  switch (value) {
+    case 'ray':
+      return anychart.enums.AnnotationTypes.RAY;
+    case 'line':
+    case 'interval':
+      return anychart.enums.AnnotationTypes.LINE;
+    case 'iline':
+    case 'infiniteline':
+      return anychart.enums.AnnotationTypes.INFINITE_LINE;
+    case 'vline':
+    case 'verticalline':
+      return anychart.enums.AnnotationTypes.VERTICAL_LINE;
+    case 'hline':
+    case 'horizontalline':
+      return anychart.enums.AnnotationTypes.HORIZONTAL_LINE;
+    case 'rect':
+    case 'rectangle':
+      return anychart.enums.AnnotationTypes.RECTANGLE;
+    case 'circle':
+    case 'ellipse':
+      return anychart.enums.AnnotationTypes.ELLIPSE;
+    case 'tri':
+    case 'triangle':
+      return anychart.enums.AnnotationTypes.TRIANGLE;
+    case 'trend':
+    case 'channel':
+    case 'trendchannel':
+      return anychart.enums.AnnotationTypes.TREND_CHANNEL;
+    case 'fork':
+    case 'pitchfork':
+    case 'andrewspitchfork':
+      return anychart.enums.AnnotationTypes.ANDREWS_PITCHFORK;
+    case 'fan':
+    case 'ffan':
+    case 'fibonaccifan':
+      return anychart.enums.AnnotationTypes.FIBONACCI_FAN;
+    case 'arc':
+    case 'farc':
+    case 'fibonacciarc':
+      return anychart.enums.AnnotationTypes.FIBONACCI_ARC;
+    case 'ret':
+    case 'retracement':
+    case 'fretracement':
+    case 'fibonacciretracement':
+      return anychart.enums.AnnotationTypes.FIBONACCI_RETRACEMENT;
+    case 'tz':
+    case 'ftz':
+    case 'timezones':
+    case 'ftimezones':
+    case 'fibonaccitimezones':
+      return anychart.enums.AnnotationTypes.FIBONACCI_TIMEZONES;
+    case 'arrow':
+    case 'marker':
+      return anychart.enums.AnnotationTypes.MARKER;
+      // case 'label':
+      //   return anychart.enums.AnnotationTypes.LABEL;
+  }
+  return anychart.enums.AnnotationTypes.LINE;
+};
+//endregion
+
+
 /**
  * Paper sizes.
  * @enum {string}
@@ -5634,3 +5744,19 @@ goog.exportSymbol('anychart.enums.RadarSeriesType.MARKER', anychart.enums.RadarS
 goog.exportSymbol('anychart.enums.PolarSeriesType.AREA', anychart.enums.PolarSeriesType.AREA);
 goog.exportSymbol('anychart.enums.PolarSeriesType.LINE', anychart.enums.PolarSeriesType.LINE);
 goog.exportSymbol('anychart.enums.PolarSeriesType.MARKER', anychart.enums.PolarSeriesType.MARKER);
+
+goog.exportSymbol('anychart.enums.AnnotationTypes.RAY', anychart.enums.AnnotationTypes.RAY);
+goog.exportSymbol('anychart.enums.AnnotationTypes.LINE', anychart.enums.AnnotationTypes.LINE);
+goog.exportSymbol('anychart.enums.AnnotationTypes.INFINITE_LINE', anychart.enums.AnnotationTypes.INFINITE_LINE);
+goog.exportSymbol('anychart.enums.AnnotationTypes.VERTICAL_LINE', anychart.enums.AnnotationTypes.VERTICAL_LINE);
+goog.exportSymbol('anychart.enums.AnnotationTypes.HORIZONTAL_LINE', anychart.enums.AnnotationTypes.HORIZONTAL_LINE);
+goog.exportSymbol('anychart.enums.AnnotationTypes.RECTANGLE', anychart.enums.AnnotationTypes.RECTANGLE);
+goog.exportSymbol('anychart.enums.AnnotationTypes.ELLIPSE', anychart.enums.AnnotationTypes.ELLIPSE);
+goog.exportSymbol('anychart.enums.AnnotationTypes.TRIANGLE', anychart.enums.AnnotationTypes.TRIANGLE);
+goog.exportSymbol('anychart.enums.AnnotationTypes.TREND_CHANNEL', anychart.enums.AnnotationTypes.TREND_CHANNEL);
+goog.exportSymbol('anychart.enums.AnnotationTypes.ANDREWS_PITCHFORK', anychart.enums.AnnotationTypes.ANDREWS_PITCHFORK);
+goog.exportSymbol('anychart.enums.AnnotationTypes.FIBONACCI_FAN', anychart.enums.AnnotationTypes.FIBONACCI_FAN);
+goog.exportSymbol('anychart.enums.AnnotationTypes.FIBONACCI_ARC', anychart.enums.AnnotationTypes.FIBONACCI_ARC);
+goog.exportSymbol('anychart.enums.AnnotationTypes.FIBONACCI_RETRACEMENT', anychart.enums.AnnotationTypes.FIBONACCI_RETRACEMENT);
+goog.exportSymbol('anychart.enums.AnnotationTypes.FIBONACCI_TIMEZONES', anychart.enums.AnnotationTypes.FIBONACCI_TIMEZONES);
+goog.exportSymbol('anychart.enums.AnnotationTypes.MARKER', anychart.enums.AnnotationTypes.MARKER);

@@ -364,6 +364,195 @@ anychart.math.checkForPointIsOutOfCircleBounds = function(x1, y1, cx, cy, r) {
 };
 
 
+/**
+ * Clips a line defined by two points with a given rect and returns an array of four coordinates (two points) or null.
+ * The resulting points are returned in the same direction as the original vector lays.
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} x2
+ * @param {number} y2
+ * @param {anychart.math.Rect} rect
+ * @return {?Array.<number>}
+ */
+anychart.math.clipLineByRect = function(x1, y1, x2, y2, rect) {
+  var rectRight = rect.left + rect.width;
+  var rectBottom = rect.top + rect.height;
+  var k = (y2 - y1) / (x2 - x1);
+  var rx1, rx2, ry1, ry2, missing = false;
+
+  if (isNaN(k)) { // two points overlap -> no line, single point
+    if (x1 < rect.left || x1 > rectRight || y1 < rect.top || y1 > rectBottom) {
+      // missing rect
+      missing = true;
+    } else {
+      rx1 = rx2 = x1;
+      ry1 = ry2 = y1;
+    }
+  } else if (k == 0) { // horizontal line
+    if (y1 < rect.top || y1 > rectBottom) {
+      // missing rect
+      missing = true;
+    } else {
+      rx1 = rect.left;
+      rx2 = rectRight;
+      ry1 = ry2 = y1;
+    }
+  } else if (isFinite(k)) { // non-vertical and non-horizontal line
+    var b = y1 - x1 * k;
+    var leftY = k * rect.left + b;
+    var rightY = k * rectRight + b;
+    if ((leftY < rect.top && rightY < rect.top) ||
+        (leftY > rectBottom && rightY > rectBottom)) {
+      // the line is above or below the rect
+      missing = true;
+    } else {
+      var topX = (rect.top - b) / k;
+      var bottomX = (rectBottom - b) / k;
+      if (leftY < rect.top) {
+        // the line goes through the top side of the rect
+        rx1 = topX;
+        ry1 = rect.top;
+      } else if (leftY > rectBottom) {
+        // the line goes through the bottom side of the rect
+        rx1 = bottomX;
+        ry1 = rectBottom;
+      } else {
+        // the line goes through the left side of the rect
+        rx1 = rect.left;
+        ry1 = leftY;
+      }
+      if (rightY < rect.top) {
+        // the line goes through the top side of the rect
+        rx2 = topX;
+        ry2 = rect.top;
+      } else if (rightY > rectBottom) {
+        // the line goes through the bottom side of the rect
+        rx2 = bottomX;
+        ry2 = rectBottom;
+      } else {
+        // the line goes through the right side of the rect
+        rx2 = rectRight;
+        ry2 = rightY;
+      }
+    }
+  } else { // vertical line
+    if (x1 < rect.left || x1 > rectRight) {// missing rect
+      missing = true;
+    } else {
+      rx1 = rx2 = x1;
+      ry1 = rect.top;
+      ry2 = rectBottom;
+    }
+  }
+  if (missing)
+    return null;
+  if (x1 > x2 || (x1 == x2 && y1 > y2)) {
+    var tmp = rx1;
+    rx1 = rx2;
+    rx2 = tmp;
+    tmp = ry1;
+    ry1 = ry2;
+    ry2 = tmp;
+  }
+  return [rx1, ry1, rx2, ry2];
+};
+
+
+/**
+ * Clips a ray defined by a start point and an other point on the ray with a given rect and returns
+ * an array of four coordinates (two points) or null.
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} x2
+ * @param {number} y2
+ * @param {anychart.math.Rect} rect
+ * @return {?Array.<number>}
+ */
+anychart.math.clipRayByRect = function(x1, y1, x2, y2, rect) {
+  var res = anychart.math.clipLineByRect(x1, y1, x2, y2, rect);
+  if (res) { // the line intersects the rect
+    // we calculate three 1-dimensional vectors:
+    //  v0 - original ray vector
+    //  v1 - a vector from the ray start to the first returned point
+    //  v1 - a vector from the ray start to the second returned point
+    var v0, v1, v2;
+    v0 = x2 - x1;
+    if (v0) { // non-vertical line
+      v1 = res[0] - x1;
+      v2 = res[2] - x1;
+    } else { // vertical line or point, using Y coords instead of X
+      v0 = y2 - y1;
+      if (v0) { // the ray exists
+        v1 = res[1] - y1;
+        v2 = res[3] - y1;
+      } else { // the ray is a point, just returning the result
+        return res;
+      }
+    }
+    if (v2 * v0 < 0) { // the whole ray is out of clipping rect
+      res = null;
+    } else if (v0 * v1 < 0) { // the first returned point lays on the opposite side of the start point, clipping
+      res[0] = x1;
+      res[1] = y1;
+    }
+  }
+  return res;
+};
+
+
+/**
+ * Clips a segment defined by a two points with a given rect and returns an array of four coordinates (two points) or null.
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} x2
+ * @param {number} y2
+ * @param {anychart.math.Rect} rect
+ * @return {?Array.<number>}
+ */
+anychart.math.clipSegmentByRect = function(x1, y1, x2, y2, rect) {
+  var res = anychart.math.clipLineByRect(x1, y1, x2, y2, rect);
+  if (res) { // the line intersects the rect
+    // we calculate three 1-dimensional vectors:
+    //  v0 - original segment vector
+    //  v11 - point1 -> res1 vector
+    //  v12 - point1 -> res2 vector
+    //  v21 - point2 -> res1 vector
+    //  v22 - point2 -> res2 vector
+    var v0, v11, v12, v21, v22;
+    v0 = x2 - x1;
+    if (v0) { // non-vertical line
+      v11 = res[0] - x1;
+      v12 = res[2] - x1;
+      v21 = res[0] - x2;
+      v22 = res[2] - x2;
+    } else { // vertical line or point, using Y coords instead of X
+      v0 = y2 - y1;
+      if (v0) { // the ray exists
+        v11 = res[1] - y1;
+        v12 = res[3] - y1;
+        v21 = res[1] - y2;
+        v22 = res[3] - y2;
+      } else { // the segment is a point, just returning the result
+        return res;
+      }
+    }
+    if (v12 * v0 < 0 || v21 * v0 > 0) {
+      res = null;
+    } else {
+      if (v11 * v0 < 0) {
+        res[0] = x1;
+        res[1] = y1;
+      }
+      if (v22 * v0 > 0) {
+        res[2] = x2;
+        res[3] = y2;
+      }
+    }
+  }
+  return res;
+};
+
+
 
 /**
  * Define rectangle.

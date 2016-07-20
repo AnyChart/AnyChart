@@ -49,7 +49,6 @@ anychart.core.VisualBase = function() {
    * @type {goog.events.EventHandler}
    */
   this.eventsHandler = new goog.events.EventHandler(this);
-  this.registerDisposable(this.eventsHandler);
 
   this.invalidate(anychart.ConsistencyState.ALL);
 };

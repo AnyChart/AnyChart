@@ -1,10 +1,18 @@
 goog.provide('anychart.core.I3DProvider');
 goog.provide('anychart.core.IChart');
+goog.provide('anychart.core.IChartWithAnnotations');
 goog.provide('anychart.core.IGroupingProvider');
 goog.provide('anychart.core.IPlot');
+goog.require('goog.events.Listenable');
 
 
 
+//region IChart
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  IChart
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * @interface
  */
@@ -46,8 +54,16 @@ anychart.core.IChart.prototype.getConfigByType = function(name) {};
  */
 anychart.core.IChart.prototype.calculate = function() {};
 
+//endregion
 
 
+
+//region IPlot
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  IPlot
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * @interface
  */
@@ -72,9 +88,16 @@ anychart.core.IPlot.prototype.getAllSeries = function() {};
  * @return {Object}
  */
 anychart.core.IPlot.prototype.defaultSeriesSettings = function(opt_value) {};
+//endregion
 
 
 
+//region I3DProvider
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  I3DProvider
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * @interface
  */
@@ -142,9 +165,16 @@ anychart.core.I3DProvider.prototype.yInverted = function() {};
  * @return {boolean}
  */
 anychart.core.I3DProvider.prototype.xInverted = function() {};
+//endregion
 
 
 
+//region IGroupingProvider
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  IGroupingProvider
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
  * @interface
  * @extends {anychart.core.IChart}
@@ -162,3 +192,28 @@ anychart.core.IGroupingProvider.prototype.getCurrentMinDistance = function() {};
  * @return {anychart.core.IGroupingProvider|anychart.core.stock.Grouping}
  */
 anychart.core.IGroupingProvider.prototype.grouping = function() {};
+//endregion
+
+
+
+//region IChartWithAnnotations
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  IChartWithAnnotations
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * @interface
+ * @extends {anychart.core.IChart}
+ * @extends {goog.events.Listenable}
+ */
+anychart.core.IChartWithAnnotations = function() {};
+
+
+/**
+ * Getter/setter for annotations default settings.
+ * @param {Object=} opt_value
+ * @return {Object}
+ */
+anychart.core.IChartWithAnnotations.prototype.defaultAnnotationSettings = function(opt_value) {};
+//endregion
