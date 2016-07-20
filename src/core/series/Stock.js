@@ -209,9 +209,10 @@ anychart.core.series.Stock.prototype.data = function(opt_value, opt_mappingSetti
     this.dataSource_ = opt_value;
 
     // creating data table if needed
-    if (goog.isArray(opt_value) || goog.isString(opt_value)) {
+    if (!(opt_value instanceof anychart.data.Table) && !(opt_value instanceof anychart.data.TableMapping)) {
       data = new anychart.data.Table();
-      data.addData(opt_value, false, opt_csvSettings);
+      if (opt_value)
+        data.addData(opt_value, false, opt_csvSettings);
       this.dataToDispose_ = opt_value = data;
     }
 

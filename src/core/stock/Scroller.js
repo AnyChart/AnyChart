@@ -892,7 +892,7 @@ anychart.core.stock.Scroller.prototype.createSeriesByType = function(type, opt_d
             anychart.core.stock.Plot.ZINDEX_SERIES) + inc;
 
     series.autoIndex(index);
-    series.data(opt_data, opt_mappingSettings, opt_csvSettings);
+    series.data(opt_data || null, opt_mappingSettings, opt_csvSettings);
     series.setAutoZIndex(seriesZIndex);
     series.clip(true);
     series.setAutoPointWidth(.9);
