@@ -3153,7 +3153,7 @@ goog.provide('anychart.themes.defaultTheme');
             }
           }
         },
-        'marker': {},
+        'marker': {'width': '3%'},
         'tank': {},
         'thermometer': {
           /**
@@ -3178,7 +3178,8 @@ goog.provide('anychart.themes.defaultTheme');
               'keys': [key1, key2, key3]
             };
           },
-          'bulbRadius': '80%',
+          'width': '3%',
+          'bulbRadius': '120%',
           'bulbPadding': '3%'
         },
         'led': {
