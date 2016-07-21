@@ -155,7 +155,8 @@ anychart.core.ui.Legend.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.LEGEND_BACKGROUND |
     anychart.ConsistencyState.LEGEND_TITLE |
     anychart.ConsistencyState.LEGEND_SEPARATOR |
-    anychart.ConsistencyState.LEGEND_PAGINATOR;
+    anychart.ConsistencyState.LEGEND_PAGINATOR |
+    anychart.ConsistencyState.LEGEND_RECREATE_ITEMS;
 
 
 /**
@@ -1423,6 +1424,11 @@ anychart.core.ui.Legend.prototype.draw = function() {
 
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.LEGEND_RECREATE_ITEMS)) {
+    this.recreateItems_ = true;
+    this.markConsistent(anychart.ConsistencyState.LEGEND_RECREATE_ITEMS);
+  }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     var formatter = this.itemsFormatter();

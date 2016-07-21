@@ -157,9 +157,9 @@ anychart.ConsistencyState = {
   SERIES_ERROR: 1 << 13, //
   SERIES_OUTLIERS: 1 << 14, //
   //---------------------------------- AXES STATES (VB) ---------------------------------
-  CALLOUT_TITLE: 1 << 5,
-  CALLOUT_LABELS: 1 << 6,
-  CALLOUT_BACKGROUND: 1 << 7,
+  CALLOUT_TITLE: 1 << 6,
+  CALLOUT_LABELS: 1 << 7,
+  CALLOUT_BACKGROUND: 1 << 8,
   //---------------------------------- AXES STATES (VB) ---------------------------------
   // also combined
   AXIS_TITLE: 1 << 6,
@@ -209,6 +209,7 @@ anychart.ConsistencyState = {
   LEGEND_TITLE: 1 << 7,
   LEGEND_SEPARATOR: 1 << 8,
   LEGEND_PAGINATOR: 1 << 9,
+  LEGEND_RECREATE_ITEMS: 1 << 10,
   //---------------------------------- MARKERS FACTORY STATES (VB) ---------------------------------
   MARKERS_FACTORY_HANDLERS: 1 << 6,
   //---------------------------------- PAGINATOR STATES (VB) ---------------------------------
@@ -218,15 +219,15 @@ anychart.ConsistencyState = {
   //---------------------------------- SPLITTER STATES (VB) ---------------------------------
   SPLITTER_POSITION: 1 << 6,
   //---------------------------------- TITLE STATES (VB) ---------------------------------
-  TITLE_BACKGROUND: 1 << 5,
+  TITLE_BACKGROUND: 1 << 6,
   //---------------------------------- TOOLTIP STATES (VB) ---------------------------------
   // actually its for TooltipItem, but tooltip doesn't have any states and we hope they will merge
-  TOOLTIP_POSITION: 1 << 7,
-  TOOLTIP_TITLE: 1 << 8,
-  TOOLTIP_SEPARATOR: 1 << 9,
-  TOOLTIP_CONTENT: 1 << 10,
-  TOOLTIP_BACKGROUND: 1 << 11,
-  TOOLTIP_VISIBILITY: 1 << 12,
+  TOOLTIP_POSITION: 1 << 6,
+  TOOLTIP_TITLE: 1 << 7,
+  TOOLTIP_SEPARATOR: 1 << 8,
+  TOOLTIP_CONTENT: 1 << 9,
+  TOOLTIP_BACKGROUND: 1 << 10,
+  TOOLTIP_VISIBILITY: 1 << 11,
   //------------------------------ CIRCULAR/LINEAR GAUGE (CHART) ------------------------------
   GAUGE_POINTERS: 1 << 12,
   GAUGE_KNOB: 1 << 13,
@@ -255,7 +256,7 @@ anychart.ConsistencyState = {
   //---------------------------------- STOCK CHART (CHART) -------------------------------------------
   STOCK_PLOTS_APPEARANCE: 1 << 12,
   STOCK_SCROLLER: 1 << 13,
-  STOCK_DATA: 1 << 23, //14,
+  STOCK_DATA: 1 << 14,
   STOCK_SCALES: 1 << 15,
   //---------------------------------- STOCK PLOT (VB) -------------------------------------------
   STOCK_PLOT_BACKGROUND: 1 << 6,
@@ -285,13 +286,13 @@ anychart.ConsistencyState = {
   PERT_LABELS: 1 << 14,
   PERT_APPEARANCE: 1 << 15,
   //---------------------------------- ANNOTATIONS (VB) ----------------------------------
-  ANNOTATIONS_ANCHORS: 1 << 7,
-  ANNOTATIONS_LAST_POINT: 1 << 8,
-  ANNOTATIONS_SHAPES: 1 << 9,
-  ANNOTATIONS_MARKERS: 1 << 10,
-  ANNOTATIONS_INTERACTIVITY: 1 << 11,
-  ANNOTATIONS_LABELS: 1 << 12,
-  ANNOTATIONS_LEVELS: 1 << 13,
+  ANNOTATIONS_ANCHORS: 1 << 6,
+  ANNOTATIONS_LAST_POINT: 1 << 7,
+  ANNOTATIONS_SHAPES: 1 << 8,
+  ANNOTATIONS_MARKERS: 1 << 9,
+  ANNOTATIONS_INTERACTIVITY: 1 << 10,
+  ANNOTATIONS_LABELS: 1 << 11,
+  ANNOTATIONS_LEVELS: 1 << 12,
   //---------------------------------- ANNOTATIONS (VB) ----------------------------------
   ANNOTATIONS_CONTROLLER_ANNOTATIONS: 1 << 6,
   ANNOTATIONS_CONTROLLER_DRAWING_MODE: 1 << 7,

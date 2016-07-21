@@ -737,12 +737,12 @@ anychart.core.ui.LegendItem.prototype.sourceUid = function(opt_value) {
 
 /**
  * Getter/setter for legend item source key.
- * @param {number=} opt_value source key.
- * @return {(number|anychart.core.ui.LegendItem)} Source key or self for chaining.
+ * @param {*=} opt_value source key.
+ * @return {(*|anychart.core.ui.LegendItem)} Source key or self for chaining.
  */
 anychart.core.ui.LegendItem.prototype.sourceKey = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    this.sourceKey_ = anychart.utils.toNumber(opt_value);
+    this.sourceKey_ = opt_value;
     return this;
   }
   return this.sourceKey_;

@@ -173,6 +173,8 @@ anychart.core.SeparateChart.prototype.calculateContentAreaSpace = function(total
       legend.itemsSource(this);
     legend.resumeSignalsDispatching(false);
     legend.invalidate(anychart.ConsistencyState.APPEARANCE);
+    if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND))
+      legend.invalidate(anychart.ConsistencyState.LEGEND_RECREATE_ITEMS);
     legend.draw();
 
     // DVF-1518

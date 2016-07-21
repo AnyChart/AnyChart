@@ -1360,7 +1360,7 @@ anychart.core.stock.Plot.prototype.updateLegend_ = function(opt_seriesBounds, op
   }
   if (!legend.itemsSource())
     legend.itemsSource(this);
-  legend.invalidate(anychart.ConsistencyState.APPEARANCE);
+  legend.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LEGEND_RECREATE_ITEMS);
   legend.draw();
   legend.resumeSignalsDispatching(false);
 };
