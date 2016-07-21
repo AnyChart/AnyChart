@@ -350,6 +350,7 @@ anychart.core.SeriesBase.prototype.isSizeBased = function() {
 anychart.core.SeriesBase.prototype.setChart = function(chart) {
   this.chart_ = chart;
   this.a11y().parentA11y(/** @type {anychart.core.utils.A11y} */ (/** @type {anychart.core.Chart} */ (this.chart_).a11y()));
+  this.a11y().parentA11y().applyChangesInChildA11y();
 };
 
 

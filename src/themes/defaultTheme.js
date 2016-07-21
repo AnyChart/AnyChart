@@ -2782,7 +2782,10 @@ goog.provide('anychart.themes.defaultTheme');
             }
           },
           'xScale': null,
-          'yScale': null
+          'yScale': null,
+          'a11y': {
+            'titleFormatter': 'Series named {%SeriesName}'
+          }
         },
         'choropleth': {
           'labels': {

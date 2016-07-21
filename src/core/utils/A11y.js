@@ -122,6 +122,16 @@ anychart.core.utils.A11y.prototype.onParentEnabled_ = function(event) {
 
 
 /**
+ * Applies changes made by child a11y.
+ * @return {anychart.core.utils.A11y} - Itself for method chaining.
+ */
+anychart.core.utils.A11y.prototype.applyChangesInChildA11y = function() {
+  this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+  return this;
+};
+
+
+/**
  * Applies accessibility settings.
  * @param {Object} textInfo - Object with info to format title.
  */
@@ -182,8 +192,10 @@ anychart.core.utils.A11y.prototype.setupByJSON = function(json) {
 /** @inheritDoc */
 anychart.core.utils.A11y.prototype.disposeInternal = function() {
   this.chart = null;
-  if (this.parentA11y_)
+  if (this.parentA11y_) {
+    this.parentA11y_.applyChangesInChildA11y();
     this.parentA11y_.unlistenSignals(this.onParentEnabled_, this);
+  }
   this.parentA11y_ = null;
   anychart.core.utils.A11y.base(this, 'disposeInternal');
 };

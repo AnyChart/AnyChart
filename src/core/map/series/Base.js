@@ -425,6 +425,12 @@ anychart.core.map.series.Base.prototype.overlapMode = function(opt_value) {
 
 //endregion
 //region --- Check functions
+/** @inheritDoc */
+anychart.core.map.series.Base.prototype.hasOwnLayer = function() {
+  return this.needSelfLayer;
+};
+
+
 /**
  * Tester if the series has markers() method.
  * @return {boolean}
