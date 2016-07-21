@@ -76,6 +76,21 @@ anychart.core.drawers.SplineArea.prototype.startDrawing = function(shapeManager)
 
 
 /** @inheritDoc */
+anychart.core.drawers.SplineArea.prototype.drawMissingPoint = function(point, state) {
+  if (this.connectMissing) {
+    if (this.series.planIsStacked()) {
+      var x = /** @type {number} */(point.meta(anychart.opt.X));
+      var zero = /** @type {number} */(point.meta(anychart.opt.ZERO));
+      var zeroMissing = /** @type {boolean} */(point.meta(anychart.opt.ZERO_MISSING));
+      this.zeroesStack.push(x, zero, zeroMissing);
+    }
+  } else {
+    this.finalizeSegment();
+  }
+};
+
+
+/** @inheritDoc */
 anychart.core.drawers.SplineArea.prototype.drawFirstPoint = function(point, state) {
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
   var x = /** @type {number} */(point.meta(anychart.opt.X));

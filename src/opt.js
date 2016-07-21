@@ -405,6 +405,34 @@ anychart.opt.ZERO_MISSING = 'zeroMissing';
 
 
 /**
+ * Constant replacer for "prevValue" string.
+ * @const {string}
+ */
+anychart.opt.PREV_VALUE = 'prevValue';
+
+
+/**
+ * Constant replacer for "nextValue" string.
+ * @const {string}
+ */
+anychart.opt.NEXT_VALUE = 'nextValue';
+
+
+/**
+ * Constant replacer for "prevZero" string.
+ * @const {string}
+ */
+anychart.opt.PREV_ZERO = 'prevZero';
+
+
+/**
+ * Constant replacer for "nextZero" string.
+ * @const {string}
+ */
+anychart.opt.NEXT_ZERO = 'nextZero';
+
+
+/**
  * Constant replacer for "stackedValue" string.
  * @const {string}
  */
@@ -416,6 +444,34 @@ anychart.opt.STACKED_VALUE = 'stackedValue';
  * @const {string}
  */
 anychart.opt.STACKED_ZERO = 'stackedZero';
+
+
+/**
+ * Constant replacer for "stackedValuePrev" string.
+ * @const {string}
+ */
+anychart.opt.STACKED_VALUE_PREV = 'stackedValuePrev';
+
+
+/**
+ * Constant replacer for "stackedZeroPrev" string.
+ * @const {string}
+ */
+anychart.opt.STACKED_ZERO_PREV = 'stackedZeroPrev';
+
+
+/**
+ * Constant replacer for "stackedValueNext" string.
+ * @const {string}
+ */
+anychart.opt.STACKED_VALUE_NEXT = 'stackedValueNext';
+
+
+/**
+ * Constant replacer for "stackedZeroNext" string.
+ * @const {string}
+ */
+anychart.opt.STACKED_ZERO_NEXT = 'stackedZeroNext';
 
 
 /**

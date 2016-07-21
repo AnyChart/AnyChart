@@ -46,14 +46,15 @@ anychart.core.drawers.Area.prototype.flags = (
     0);
 
 
-/** @inheritDoc */
-anychart.core.drawers.Area.prototype.drawFirstPoint = function(point, state) {
-  var shapes = this.shapesManager.getShapesGroup(this.seriesState);
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var zero = /** @type {number} */(point.meta(anychart.opt.ZERO));
-  var zeroMissing = /** @type {boolean} */(point.meta(anychart.opt.ZERO_MISSING));
-  var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
-
+/**
+ * Draws area start.
+ * @param {Object.<string, acgraph.vector.Shape>} shapes
+ * @param {number} x
+ * @param {number} y
+ * @param {number} zero
+ * @private
+ */
+anychart.core.drawers.Area.prototype.drawSegmentStart_ = function(shapes, x, y, zero) {
   shapes[anychart.opt.FILL]
       .moveTo(x, zero)
       .lineTo(x, y);
@@ -62,11 +63,44 @@ anychart.core.drawers.Area.prototype.drawFirstPoint = function(point, state) {
       .lineTo(x, y);
   shapes[anychart.opt.STROKE]
       .moveTo(x, y);
+};
+
+
+/**
+ * Draws area start.
+ * @param {Object.<string, acgraph.vector.Shape>} shapes
+ * @param {number} x
+ * @param {number} y
+ * @private
+ */
+anychart.core.drawers.Area.prototype.drawSegmentContinuation_ = function(shapes, x, y) {
+  shapes[anychart.opt.FILL].lineTo(x, y);
+  shapes[anychart.opt.HATCH_FILL].lineTo(x, y);
+  shapes[anychart.opt.STROKE].lineTo(x, y);
+};
+
+
+/** @inheritDoc */
+anychart.core.drawers.Area.prototype.drawFirstPoint = function(point, state) {
+  var shapes = this.shapesManager.getShapesGroup(this.seriesState);
+  var x = /** @type {number} */(point.meta(anychart.opt.X));
+  var zero = /** @type {number} */(point.meta(anychart.opt.ZERO));
+  var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
+
 
   if (this.series.planIsStacked()) {
-    /** @type {Array.<number|boolean>} */
-    this.zeroesStack = [x, zero, zeroMissing];
+    var nextZero = /** @type {number} */(point.meta(anychart.opt.NEXT_ZERO));
+    var nextY = /** @type {number} */(point.meta(anychart.opt.NEXT_VALUE));
+    if (!isNaN(nextZero) && !isNaN(nextY)) {
+      shapes[anychart.opt.STROKE].moveTo(x, y).lineTo(x, y);
+      this.drawSegmentStart_(shapes, x, nextY, nextZero);
+      this.zeroesStack = [x, nextZero];
+    } else {
+      this.drawSegmentStart_(shapes, x, y, zero);
+      this.zeroesStack = [x, zero];
+    }
   } else {
+    this.drawSegmentStart_(shapes, x, y, zero);
     /** @type {number} */
     this.lastDrawnX = x;
     /** @type {number} */
@@ -80,16 +114,29 @@ anychart.core.drawers.Area.prototype.drawSubsequentPoint = function(point, state
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
   var x = /** @type {number} */(point.meta(anychart.opt.X));
   var zero = /** @type {number} */(point.meta(anychart.opt.ZERO));
-  var zeroMissing = /** @type {boolean} */(point.meta(anychart.opt.ZERO_MISSING));
   var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
 
-  shapes[anychart.opt.FILL].lineTo(x, y);
-  shapes[anychart.opt.HATCH_FILL].lineTo(x, y);
-  shapes[anychart.opt.STROKE].lineTo(x, y);
-
   if (this.series.planIsStacked()) {
-    this.zeroesStack.push(x, zero, zeroMissing);
+    var prevZero = /** @type {number} */(point.meta(anychart.opt.PREV_ZERO));
+    var prevY = /** @type {number} */(point.meta(anychart.opt.PREV_VALUE));
+    var nextZero = /** @type {number} */(point.meta(anychart.opt.NEXT_ZERO));
+    var nextY = /** @type {number} */(point.meta(anychart.opt.NEXT_VALUE));
+    if (!isNaN(prevZero) && !isNaN(prevY)) {
+      this.drawSegmentContinuation_(shapes, x, prevY);
+      this.zeroesStack.push(x, prevZero);
+      this.finalizeSegment();
+      this.drawSegmentStart_(shapes, x, y, zero);
+      this.zeroesStack = [x, zero];
+    }
+    this.drawSegmentContinuation_(shapes, x, y);
+    this.zeroesStack.push(x, zero);
+    if (!isNaN(nextZero) && !isNaN(nextY)) {
+      this.finalizeSegment();
+      this.drawSegmentStart_(shapes, x, nextY, nextZero);
+      this.zeroesStack = [x, nextZero];
+    }
   } else {
+    this.drawSegmentContinuation_(shapes, x, y);
     this.lastDrawnX = x;
   }
 };
@@ -102,31 +149,13 @@ anychart.core.drawers.Area.prototype.finalizeSegment = function() {
   var path = shapes[anychart.opt.FILL];
   var hatchPath = shapes[anychart.opt.HATCH_FILL];
   if (this.zeroesStack) {
-    /** @type {number} */
-    var prevX = NaN;
-    /** @type {number} */
-    var prevY = NaN;
-    /** @type {boolean} */
-    var prevWasMissing = false;
-    for (var i = this.zeroesStack.length - 1; i >= 0; i -= 3) {
+    for (var i = this.zeroesStack.length - 1; i >= 0; i -= 2) {
       /** @type {number} */
-      var x = /** @type {number} */(this.zeroesStack[i - 2]);
+      var x = /** @type {number} */(this.zeroesStack[i - 1]);
       /** @type {number} */
-      var y = /** @type {number} */(this.zeroesStack[i - 1]);
-      /** @type {boolean} */
-      var isMissing = /** @type {boolean} */(this.zeroesStack[i]);
-      if (isMissing && !isNaN(prevX)) {
-        path.lineTo(prevX, y);
-        hatchPath.lineTo(prevX, y);
-      } else if (prevWasMissing && !isNaN(prevY)) {
-        path.lineTo(x, prevY);
-        hatchPath.lineTo(x, prevY);
-      }
+      var y = /** @type {number} */(this.zeroesStack[i]);
       path.lineTo(x, y);
       hatchPath.lineTo(x, y);
-      prevX = x;
-      prevY = y;
-      prevWasMissing = isMissing;
     }
     path.close();
     hatchPath.close();

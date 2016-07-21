@@ -2953,6 +2953,10 @@ anychart.core.series.Base.prototype.makePointMeta = function(rowInfo, yNames, yC
       if (isNaN(val)) pointMissing = false;
       rowInfo.meta(anychart.opt.ZERO, this.applyRatioToBounds(goog.math.clamp(val, 0, 1), false));
       rowInfo.meta(anychart.opt.ZERO_MISSING, rowInfo.meta(anychart.opt.STACKED_MISSING));
+      rowInfo.meta(anychart.opt.PREV_VALUE, this.applyRatioToBounds(yScale.transform(rowInfo.meta(anychart.opt.STACKED_VALUE_PREV), 0.5), false));
+      rowInfo.meta(anychart.opt.PREV_ZERO, this.applyRatioToBounds(yScale.transform(rowInfo.meta(anychart.opt.STACKED_ZERO_PREV), 0.5), false));
+      rowInfo.meta(anychart.opt.NEXT_VALUE, this.applyRatioToBounds(yScale.transform(rowInfo.meta(anychart.opt.STACKED_VALUE_NEXT), 0.5), false));
+      rowInfo.meta(anychart.opt.NEXT_ZERO, this.applyRatioToBounds(yScale.transform(rowInfo.meta(anychart.opt.STACKED_ZERO_NEXT), 0.5), false));
     } else {
       if (this.check(anychart.core.drawers.Capabilities.NEEDS_ZERO)) {
         rowInfo.meta(anychart.opt.ZERO, this.zeroY);
