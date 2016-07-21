@@ -54,6 +54,12 @@ anychart.core.map.series.Choropleth.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.core.map.series.Choropleth.prototype.hatchFillRootElement = null;
 
 
+/** @inheritDoc */
+anychart.core.map.series.Choropleth.prototype.needsUpdateMapAppearance = function() {
+  return true;
+};
+
+
 //endregion
 //region --- Getters
 /** @inheritDoc */
@@ -305,10 +311,7 @@ anychart.core.map.series.Choropleth.prototype.remove = function() {
 };
 
 
-/**
- * Returns middle point position.
- * @return {Object}
- */
+/** @inheritDoc */
 anychart.core.map.series.Choropleth.prototype.getMiddlePoint = function() {
   var middleX, middleY, middlePoint, midX, midY, txCoords;
   var iterator = this.getIterator();

@@ -762,6 +762,15 @@ anychart.core.series.Base.prototype.isSeries = function() {
 anychart.core.series.Base.prototype.isChart = function() {
   return false;
 };
+
+
+/**
+ * If the series has its own root layer.
+ * @return {boolean}
+ */
+anychart.core.series.Base.prototype.hasOwnLayer = function() {
+  return !this.check(anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT);
+};
 //endregion
 
 

@@ -377,6 +377,15 @@ anychart.core.SeriesBase.prototype.getType = goog.abstractMethod;
 anychart.core.SeriesBase.prototype.createFormatProvider = goog.abstractMethod;
 
 
+/**
+ * If the series has its own root layer.
+ * @return {boolean}
+ */
+anychart.core.SeriesBase.prototype.hasOwnLayer = function() {
+  return true;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Data

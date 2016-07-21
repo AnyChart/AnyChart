@@ -1947,7 +1947,7 @@ anychart.charts.Map.prototype.seriesInvalidated_ = function(event) {
 
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     state = anychart.ConsistencyState.MAP_SERIES;
-    if (event['target'] instanceof anychart.core.map.series.Choropleth)
+    if ((/** @type {anychart.core.map.series.Base} */(event['target'])).needsUpdateMapAppearance())
       state |= anychart.ConsistencyState.APPEARANCE;
   }
   if (event.hasSignal(anychart.Signal.NEED_UPDATE_OVERLAP)) {

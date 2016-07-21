@@ -86,6 +86,24 @@ anychart.core.map.series.Base.SeriesTypesMap = {};
 
 
 /**
+ * If the series inflicts Map appearance update on series update.
+ * @return {boolean}
+ */
+anychart.core.map.series.Base.prototype.needsUpdateMapAppearance = function() {
+  return false;
+};
+
+
+/**
+ * Returns middle point position. Needed here for compatibility with the Choropleth.
+ * @return {Object}
+ */
+anychart.core.map.series.Base.prototype.getMiddlePoint = function() {
+  return {'value': {'x': 0, 'y': 0}};
+};
+
+
+/**
  * @type {boolean}
  * @protected
  */

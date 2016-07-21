@@ -344,11 +344,9 @@ anychart.core.utils.SeriesA11y.prototype.applyA11y = function(textInfo) {
     role = 'img';
   }
 
-  if (this.series_ instanceof anychart.core.series.Base) {
-    if (this.series_.check(anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT) && !this.forceLayer_) {
-      this.forceLayer_ = this.series_.getRootLayer().layer();
-      layer = this.forceLayer_;
-    }
+  if (!this.series_.hasOwnLayer() && !this.forceLayer_) {
+    this.forceLayer_ = this.series_.getRootLayer().layer();
+    layer = this.forceLayer_;
   }
   layer.attr('aria-label', titleText);
   layer.attr('role', role);
