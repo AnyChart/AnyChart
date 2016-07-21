@@ -1352,8 +1352,8 @@ anychart.core.stock.Plot.prototype.updateLegend_ = function(opt_seriesBounds, op
     var grouping = /** @type {anychart.core.stock.Grouping} */(this.chart_.grouping());
     var context = {
       'value': opt_titleValue,
-      'dataIntervalUnit': grouping.getCurrentDataInterval().unit,
-      'dataIntervalUnitCount': grouping.getCurrentDataInterval().count,
+      'dataIntervalUnit': grouping.getCurrentDataInterval()['unit'],
+      'dataIntervalUnitCount': grouping.getCurrentDataInterval()['count'],
       'isGrouped': grouping.isGrouped()
     };
     legend.title().text(formatter.call(context, context));

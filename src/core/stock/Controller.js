@@ -544,7 +544,7 @@ anychart.core.stock.Controller.prototype.updateCurrentScaleRange = function(scal
   }
   scale.setCurrentRange(
       selection.startKey, selection.endKey,
-      interval.unit, interval.count);
+      interval['unit'], interval['count']);
 };
 
 

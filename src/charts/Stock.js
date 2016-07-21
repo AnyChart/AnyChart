@@ -627,8 +627,8 @@ anychart.charts.Stock.prototype.dispatchRangeChange_ = function(type, source, op
       'lastSelected': this.dataController_.getLastSelectedKey(),
       'firstVisible': this.dataController_.getFirstVisibleKey(),
       'lastVisible': this.dataController_.getLastVisibleKey(),
-      'dataIntervalUnit': grouping.getCurrentDataInterval().unit,
-      'dataIntervalUnitCount': grouping.getCurrentDataInterval().count,
+      'dataIntervalUnit': grouping.getCurrentDataInterval()['unit'],
+      'dataIntervalUnitCount': grouping.getCurrentDataInterval()['count'],
       'dataIsGrouped': grouping.isGrouped()
     });
   }

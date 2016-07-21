@@ -700,8 +700,8 @@ anychart.core.axes.StockDateTime.prototype.getLabelsFormatProvider_ = function(v
 
   var grouping = this.groupingProvider_.grouping();
   return {
-    'dataIntervalUnit': grouping.getCurrentDataInterval().unit,
-    'dataIntervalUnitCount': grouping.getCurrentDataInterval().count,
+    'dataIntervalUnit': grouping.getCurrentDataInterval()['unit'],
+    'dataIntervalUnitCount': grouping.getCurrentDataInterval()['count'],
     'dataIsGrouped': grouping.isGrouped(),
     'majorIntervalUnit': majorUnit,
     'majorIntervalUnitCount': minorUnitCount,
