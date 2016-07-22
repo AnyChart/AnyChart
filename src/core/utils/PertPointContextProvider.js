@@ -83,6 +83,7 @@ anychart.core.utils.PertPointContextProvider.prototype.applyReferenceValues = fu
     if (this.milestone.creator)
       this['creator'] = this.milestone.creator.item;
     this['isStart'] = this.milestone.isStart;
+    this['index'] = this.milestone.index;
   }
 };
 

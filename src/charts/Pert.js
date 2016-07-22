@@ -270,7 +270,8 @@ anychart.charts.Pert.ActivityData;
  *    lowerMilestone: (anychart.charts.Pert.Milestone|anychart.charts.Pert.FakeMilestone),
  *    brokenTo: Array.<anychart.charts.Pert.Milestone>,
  *    parent: ?anychart.charts.Pert.Milestone,
- *    radius: number
+ *    radius: number,
+ *    index: number
  * }}
  */
 anychart.charts.Pert.Milestone;
@@ -1045,7 +1046,8 @@ anychart.charts.Pert.prototype.createEmptyMilestone_ = function(creator, isStart
     creator: creator,
     flag: false,
     flagPlotted: false,
-    edges: []
+    edges: [],
+    index: -1
   });
   var hash = this.hash_('m', result);
   this.milestonesMap_[hash] = result;
@@ -1834,9 +1836,10 @@ anychart.charts.Pert.prototype.calculateLevels_ = function() {
   this.milestonesLocation_[0] = [this.startMilestone_];
   this.milestonesLocation_[this.maxLevel_] = [this.finishMilestone_];
   this.maxLevelHeight_ = 1;
+  var i, j;
 
   if (this.faces_.length > 2) {
-    for (var i = 0; i < this.faces_.length; i++) {
+    for (i = 0; i < this.faces_.length; i++) {
       var face = this.faces_[i];
       var mostLeftIndex = this.getMostLeftIndex_(/** @type {Array.<anychart.charts.Pert.Milestone|anychart.charts.Pert.FakeMilestone>} */ (face));
       var offset = 0;
@@ -1863,7 +1866,7 @@ anychart.charts.Pert.prototype.calculateLevels_ = function() {
     }
   }
 
-  for (var j in this.milestonesMap_) {
+  for (j in this.milestonesMap_) {
     var mil = this.milestonesMap_[j];
     if (mil != this.startMilestone_ && mil != this.finishMilestone_ && !mil.upperMilestone) {
       var level = mil.level;
@@ -1873,6 +1876,17 @@ anychart.charts.Pert.prototype.calculateLevels_ = function() {
         this.milestonesLocation_[level].push(child.lowerMilestone);
         child = child.lowerMilestone;
         this.maxLevelHeight_ = Math.max(this.maxLevelHeight_, this.milestonesLocation_[level].length);
+      }
+    }
+  }
+
+  var index = 0;
+  for (i = 0; i < this.milestonesLocation_.length; i++) {
+    var column = this.milestonesLocation_[i];
+    for (j = 0; j < column.length; j++) {
+      var milestone = column[j];
+      if (milestone && !milestone.isFake) {
+        milestone.index = index++;
       }
     }
   }
@@ -2088,8 +2102,12 @@ anychart.charts.Pert.prototype.worksLayerAppearanceCallback_ = function(element,
       fill = source.getFinalFill(state, formatProvider);
       stroke = source.getFinalStroke(state, formatProvider);
 
+      if (tag['a']) {
+        if (goog.isObject(stroke))
+          delete stroke['dash'];
+        /** @type {acgraph.vector.Path} */ (element).fill(fill);
+      }
       /** @type {acgraph.vector.Path} */ (element).stroke(stroke);
-      if (tag['a']) /** @type {acgraph.vector.Path} */ (element).fill(fill);
 
       var upperLf = /** @type {anychart.core.ui.LabelsFactory} */ (work.isSelected ? source.selectUpperLabels() : source.upperLabels());
       var lowerLf = /** @type {anychart.core.ui.LabelsFactory} */ (work.isSelected ? source.selectLowerLabels() : source.lowerLabels());
@@ -2107,8 +2125,12 @@ anychart.charts.Pert.prototype.worksLayerAppearanceCallback_ = function(element,
       fill = source.getFinalDummyFill(formatProvider);
       stroke = source.getFinalDummyStroke(formatProvider);
 
+      if (tag['a']) {
+        if (goog.isObject(stroke))
+          delete stroke['dash'];
+        /** @type {acgraph.vector.Path} */ (element).fill(fill);
+      }
       /** @type {acgraph.vector.Path} */ (element).stroke(stroke);
-      if (tag['a']) /** @type {acgraph.vector.Path} */ (element).fill(fill);
     }
   }
 };
