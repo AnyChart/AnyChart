@@ -12,13 +12,15 @@
   border: 1px solid gainsboro;
   border: 1px solid rgba(0,0,0,0.1);
 
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
+  .border-radius(2px);
 
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
 
   font: normal small arial, sans-serif;
 
@@ -80,9 +82,11 @@
 }
 
 .anychart-combobox input {
-  -webkit-border-radius: 1px;
-  -moz-border-radius: 1px;
-  border-radius: 1px;
+  .border-radius(1px);
+
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
 
   background: transparent;
   border: 1px solid transparent;
