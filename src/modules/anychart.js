@@ -12,7 +12,6 @@ goog.require('anychart.modules.cartesian3d');
 goog.require('anychart.modules.funnel');
 goog.require('anychart.modules.gauges');
 goog.require('anychart.modules.heatMap');
-goog.require('anychart.modules.pert');
 goog.require('anychart.modules.pie');
 goog.require('anychart.modules.pie3d');
 goog.require('anychart.modules.polar');
