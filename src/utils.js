@@ -1872,7 +1872,17 @@ anychart.utils.htmlTableFromCsv = function(csv, opt_title, opt_asString, opt_csv
 };
 
 
+/**
+ * It's super hidden name for isValidKey method.
+ * @return {boolean}
+ */
+anychart.utils.printUtilsBoolean = function() {
+  return anychart.isValidKey();
+};
+
+
 //exports
+goog.exportSymbol('anychart.utils.printUtilsBoolean', anychart.utils.printUtilsBoolean);
 goog.exportSymbol('anychart.utils.xml2json', anychart.utils.xml2json);
 goog.exportSymbol('anychart.utils.json2xml', anychart.utils.json2xml);
 goog.exportSymbol('anychart.utils.defaultDateFormatter', anychart.utils.defaultDateFormatter);

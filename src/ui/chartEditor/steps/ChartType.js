@@ -32,10 +32,23 @@ anychart.ui.chartEditor.steps.ChartType.CSS_CLASS = goog.getCssName('anychart-ch
 anychart.ui.chartEditor.steps.ChartType.CssClass = {};
 
 
+anychart.ui.chartEditor.steps.ChartType.prototype.checkDataMapping_ = function() {
+  var model = this.getSharedModel();
+
+  goog.dom.classlist.enable(this.existDataMappingWarningEl_, goog.getCssName('anychart-hidden'), Boolean(model.dataMappings.length));
+  this.enableNextStep(Boolean(model.dataMappings.length));
+
+  goog.dom.classlist.enable(this.fieldsDataMappingWarningEl_, goog.getCssName('anychart-hidden'), Boolean(this.getChartType()));
+  this.enableNextStep(Boolean(this.getChartType()));
+};
+
+
 /** @override */
 anychart.ui.chartEditor.steps.ChartType.prototype.createDom = function() {
   anychart.ui.chartEditor.steps.ChartType.base(this, 'createDom');
   var element = /** @type {Element} */(this.getElement());
+  var dom = this.getDomHelper();
+  var model = this.getSharedModel();
 
   var className = anychart.ui.chartEditor.steps.ChartType.CSS_CLASS;
   goog.dom.classlist.add(element, className);
@@ -46,7 +59,39 @@ anychart.ui.chartEditor.steps.ChartType.prototype.createDom = function() {
   chartTypeSidebar.setParentEventTarget(this);
   chartTypeSidebar.render(asideEl);
 
+  this.existDataMappingWarningEl_ = dom.createDom(
+      goog.dom.TagName.DIV,
+      [
+        goog.ui.INLINE_BLOCK_CLASSNAME,
+        goog.getCssName('anychart-data-mapping-warning-outer')
+      ],
+      dom.createDom(
+          goog.dom.TagName.DIV,
+          [
+            goog.ui.INLINE_BLOCK_CLASSNAME,
+            goog.getCssName('anychart-data-mapping-warning-inner')
+          ],
+          'You need at least one Data Mapping to build your chart.'));
+  goog.dom.appendChild(this.getContentElement(), this.existDataMappingWarningEl_);
+
+
+  this.fieldsDataMappingWarningEl_ = dom.createDom(
+      goog.dom.TagName.DIV,
+      [
+        goog.ui.INLINE_BLOCK_CLASSNAME,
+        goog.getCssName('anychart-data-mapping-warning-outer')
+      ],
+      dom.createDom(
+          goog.dom.TagName.DIV,
+          [
+            goog.ui.INLINE_BLOCK_CLASSNAME,
+            goog.getCssName('anychart-data-mapping-warning-inner')
+          ],
+          'Not enough fields in Data Mapping to build your chart.'));
+  goog.dom.appendChild(this.getContentElement(), this.fieldsDataMappingWarningEl_);
   this.chartTypeSidebar_ = chartTypeSidebar;
+
+  this.checkDataMapping_();
 };
 
 
@@ -63,10 +108,12 @@ anychart.ui.chartEditor.steps.ChartType.prototype.enterDocument = function() {
 };
 
 
-/** @inheritDoc */
+/** @override */
 anychart.ui.chartEditor.steps.ChartType.prototype.update = function() {
   var model = this.getSharedModel();
   this.chartTypeSidebar_.update(model.presetsList, model);
+
+  this.checkDataMapping_();
 };
 
 

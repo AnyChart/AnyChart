@@ -1,6 +1,5 @@
 goog.provide('anychart.ui.chartEditor.group.Credits');
 
-goog.require('anychart.ui.chartEditor.checkbox.Base');
 goog.require('anychart.ui.chartEditor.group.Base');
 goog.require('anychart.ui.chartEditor.settings.Input');
 
@@ -15,6 +14,10 @@ anychart.ui.chartEditor.group.Credits = function(model) {
   anychart.ui.chartEditor.group.Credits.base(this, 'constructor', model);
 
   this.setHeader('Credits');
+  this.useEnabledButton(true);
+  this.setKey('chart.credits()');
+
+  this.setEnabled(window['anychart']['utils']['printUtilsBoolean']());
 };
 goog.inherits(anychart.ui.chartEditor.group.Credits, anychart.ui.chartEditor.group.Base);
 
@@ -24,9 +27,31 @@ anychart.ui.chartEditor.group.Credits.CssClass = {};
 
 
 /** @override */
+anychart.ui.chartEditor.group.Credits.prototype.setContentEnabled = function(enabled) {
+  anychart.ui.chartEditor.group.Credits.base(this, 'setContentEnabled', enabled);
+
+  if (this.textInputLabel_) {
+    goog.dom.classlist.enable(
+        goog.asserts.assert(this.textInputLabel_),
+        goog.getCssName('anychart-control-disabled'), !enabled);
+  }
+
+  if (this.urlInputLabel_) {
+    goog.dom.classlist.enable(
+        goog.asserts.assert(this.urlInputLabel_),
+        goog.getCssName('anychart-control-disabled'), !enabled);
+  }
+
+  if (this.logoSrcInputLabel_) {
+    goog.dom.classlist.enable(
+        goog.asserts.assert(this.logoSrcInputLabel_),
+        goog.getCssName('anychart-control-disabled'), !enabled);
+  }
+};
+
+
+/** @override */
 anychart.ui.chartEditor.group.Credits.prototype.disposeInternal = function() {
-  goog.dispose(this.enabledBtn_);
-  this.enabledBtn_ = null;
   this.textInput_ = null;
   this.urlInput_ = null;
   this.logoSrcInput_ = null;
@@ -40,15 +65,6 @@ anychart.ui.chartEditor.group.Credits.prototype.createDom = function() {
   anychart.ui.chartEditor.group.Credits.base(this, 'createDom');
 
   var content = this.getContentElement();
-
-  var enabledBtn = new anychart.ui.chartEditor.checkbox.Base();
-  enabledBtn.addClassName(goog.getCssName('anychart-chart-editor-settings-control-right'));
-  enabledBtn.addClassName(goog.getCssName('anychart-chart-editor-settings-enabled'));
-  enabledBtn.setKey('chart.credits().enabled()');
-  enabledBtn.setNormalValue(false);
-  enabledBtn.setCheckedValue(true);
-  enabledBtn.render(this.getHeaderElement());
-  enabledBtn.setParent(this);
 
   var textInputLabel = goog.dom.createDom(
       goog.dom.TagName.LABEL,
@@ -100,18 +116,22 @@ anychart.ui.chartEditor.group.Credits.prototype.createDom = function() {
   this.addChild(logoSrcInput, true);
   goog.dom.classlist.add(logoSrcInput.getElement(), goog.getCssName('anychart-chart-editor-settings-control-right'));
 
-  this.enabledBtn_ = enabledBtn;
   this.textInput_ = textInput;
   this.urlInput_ = urlInput;
   this.logoSrcInput_ = logoSrcInput;
+
+  this.textInputLabel_ = textInputLabel;
+  this.urlInputLabel_ = urlInputLabel;
+  this.logoSrcInputLabel_ = logoSrcInputLabel;
 };
 
 
 /** @override */
-anychart.ui.chartEditor.group.Credits.prototype.update = function() {
-  this.enabledBtn_.update(this.model);
-  this.textInput_.update(this.model);
-  this.urlInput_.update(this.model);
-  this.logoSrcInput_.update(this.model);
+anychart.ui.chartEditor.group.Credits.prototype.update = function(model) {
+  anychart.ui.chartEditor.group.Credits.base(this, 'update', model);
+
+  this.textInput_.update(model);
+  this.urlInput_.update(model);
+  this.logoSrcInput_.update(model);
 };
 

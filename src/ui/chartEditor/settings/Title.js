@@ -23,6 +23,8 @@ goog.require('goog.ui.Component');
  */
 anychart.ui.chartEditor.settings.Title = function() {
   anychart.ui.chartEditor.settings.Title.base(this, 'constructor');
+
+  this.enabled_ = true;
 };
 goog.inherits(anychart.ui.chartEditor.settings.Title, goog.ui.Component);
 
@@ -61,6 +63,19 @@ anychart.ui.chartEditor.settings.Title.prototype.headerText_ = 'Title';
 /** @param {string} value */
 anychart.ui.chartEditor.settings.Title.prototype.setHeaderText = function(value) {
   this.headerText_ = value;
+};
+
+
+/**
+ * @type {boolean}
+ * @private
+ */
+anychart.ui.chartEditor.settings.Title.prototype.allowEnabled_ = true;
+
+
+/** @param {boolean} value */
+anychart.ui.chartEditor.settings.Title.prototype.allowEnabled = function(value) {
+  this.allowEnabled_ = value;
 };
 
 
@@ -188,6 +203,56 @@ anychart.ui.chartEditor.settings.Title.prototype.setOrientationKey = function(va
 };
 
 
+/**
+ * Enables/Disables the Title settings.
+ * @param {boolean} enabled Whether to enable (true) or disable (false) the
+ *     title settings.
+ */
+anychart.ui.chartEditor.settings.Title.prototype.setEnabled = function(enabled) {
+  this.enabled_ = true;
+
+  this.forEachChild(function(child) {
+    child.setEnabled(enabled);
+  });
+
+  if (this.enabledBtn_) this.enabledBtn_.setEnabled(enabled);
+
+  this.enabled_ = enabled;
+
+  if (this.titleHeader_) {
+    goog.dom.classlist.enable(
+        goog.asserts.assert(this.titleHeader_),
+        goog.getCssName('anychart-control-disabled'), !enabled);
+  }
+
+  if (this.colorLabel_) {
+    goog.dom.classlist.enable(
+        goog.asserts.assert(this.colorLabel_),
+        goog.getCssName('anychart-control-disabled'), !enabled);
+  }
+
+  if (this.positionLabel_) {
+    goog.dom.classlist.enable(
+        goog.asserts.assert(this.positionLabel_),
+        goog.getCssName('anychart-control-disabled'), !enabled);
+  }
+
+  if (this.alignLabel_) {
+    goog.dom.classlist.enable(
+        goog.asserts.assert(this.alignLabel_),
+        goog.getCssName('anychart-control-disabled'), !enabled);
+  }
+};
+
+
+/**
+ * @return {boolean} Whether the title settings is enabled.
+ */
+anychart.ui.chartEditor.settings.Title.prototype.isEnabled = function() {
+  return this.enabled_;
+};
+
+
 /** @override */
 anychart.ui.chartEditor.settings.Title.prototype.disposeInternal = function() {
   this.textInput_ = null;
@@ -211,28 +276,31 @@ anychart.ui.chartEditor.settings.Title.prototype.createDom = function() {
   var element = this.getElement();
   goog.dom.classlist.add(element, anychart.ui.chartEditor.settings.Title.CSS_CLASS);
 
-  var enabledBtn = new anychart.ui.chartEditor.checkbox.Base();
-  enabledBtn.addClassName(goog.getCssName('anychart-chart-editor-settings-control-right'));
-  enabledBtn.addClassName(goog.getCssName('anychart-chart-editor-settings-enabled'));
-  enabledBtn.setNormalValue(false);
-  enabledBtn.setCheckedValue(true);
-  if (this.enabledButtonContainer_) {
-    enabledBtn.render(this.enabledButtonContainer_);
-    enabledBtn.setParent(this);
-  } else {
-    var titleHeader = goog.dom.createDom(
-        goog.dom.TagName.DIV,
-        goog.getCssName('anychart-chart-editor-settings-header'),
-        this.headerText_);
-    goog.dom.appendChild(element, titleHeader);
+  if (this.allowEnabled_) {
+    var enabledBtn = new anychart.ui.chartEditor.checkbox.Base();
+    enabledBtn.addClassName(goog.getCssName('anychart-chart-editor-settings-control-right'));
+    enabledBtn.addClassName(goog.getCssName('anychart-chart-editor-settings-enabled'));
+    enabledBtn.setNormalValue(false);
+    enabledBtn.setCheckedValue(true);
+    if (this.enabledButtonContainer_) {
+      // todo удалить это! и enabledButtonContainer_
+      enabledBtn.render(this.enabledButtonContainer_);
+      enabledBtn.setParent(this);
+    } else {
+      var titleHeader = goog.dom.createDom(
+          goog.dom.TagName.DIV,
+          goog.getCssName('anychart-chart-editor-settings-header'),
+          this.headerText_);
+      goog.dom.appendChild(element, titleHeader);
 
-    enabledBtn.setLabel(titleHeader);
-    enabledBtn.render(titleHeader);
-    enabledBtn.setParent(this);
+      enabledBtn.setLabel(titleHeader);
+      enabledBtn.render(titleHeader);
+      enabledBtn.setParent(this);
 
-    goog.dom.appendChild(element, goog.dom.createDom(
-        goog.dom.TagName.DIV,
-        goog.getCssName('anychart-chart-editor-settings-item-gap-mini')));
+      goog.dom.appendChild(element, goog.dom.createDom(
+          goog.dom.TagName.DIV,
+          goog.getCssName('anychart-chart-editor-settings-item-gap-mini')));
+    }
   }
 
   var textInput = null;
@@ -351,6 +419,11 @@ anychart.ui.chartEditor.settings.Title.prototype.createDom = function() {
   this.italicBtn_ = italicBtn;
   this.underlineBtn_ = underlineBtn;
   this.colorPicker_ = colorPicker;
+
+  this.titleHeader_ = titleHeader;
+  this.colorLabel_ = colorLabel;
+  this.positionLabel_ = positionLabel;
+  this.alignLabel_ = alignLabel;
 
   this.updateKeys();
 };

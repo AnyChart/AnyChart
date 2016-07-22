@@ -1,0 +1,34 @@
+// Don't work in lesscpy, we need less for node.js
+// from http://webdesign.tutsplus.com/tutorials/making-gradients-easier-with-less-mixins--cms-24072
+//.gradient(@type; @colors; @dir: 0deg; @prefixes: webkit, moz, ms, o; @index: length(@prefixes)) when (@index > 0) {
+//  .gradient(@type; @colors; @dir; @prefixes; (@index - 1));
+//
+//  @prefix  : extract(@prefixes, @index);
+//  @dir-old : 90 - (@dir);
+//
+//  background-image: ~"-@{prefix}-@{type}-gradient(@{dir-old}, @{colors})";
+//  & when ( @index = length(@prefixes) ) {
+//    background-image: ~"@{type}-gradient(@{dir}, @{colors})";
+//  }
+//}
+
+
+.linear-gradient(@color_one, @color_two) {
+  background-image: -webkit-linear-gradient(top, @color_one, @color_two);
+  background-image: -moz-linear-gradient(top, @color_one, @color_two);
+  background-image: -ms-linear-gradient(top, @color_one, @color_two);
+  background-image: -o-linear-gradient(top, @color_one, @color_two);
+  background-image: linear-gradient(top, @color_one, @color_two);
+}
+
+.border-radius(@value) {
+  -webkit-border-radius: @value;
+  -moz-border-radius: @value;
+  border-radius: @value;
+}
+
+.box-shadow(@value) {
+  -webkit-box-shadow: @value;
+  -moz-box-shadow: @value;
+  box-shadow: @value;
+}

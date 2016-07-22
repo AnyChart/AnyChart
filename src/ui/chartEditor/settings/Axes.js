@@ -12,6 +12,8 @@ goog.require('goog.ui.Component');
  */
 anychart.ui.chartEditor.settings.Axes = function() {
   anychart.ui.chartEditor.settings.Axes.base(this, 'constructor');
+
+  this.enabled_ = true;
 };
 goog.inherits(anychart.ui.chartEditor.settings.Axes, goog.ui.Component);
 
@@ -88,6 +90,34 @@ anychart.ui.chartEditor.settings.Axes.prototype.countKey_ = 'chart.getAxisCount(
 /** @param {string} value */
 anychart.ui.chartEditor.settings.Axes.prototype.setCountKey = function(value) {
   this.countKey_ = value;
+};
+
+
+/**
+ * Enables/Disables the Axes settings.
+ * @param {boolean} enabled Whether to enable (true) or disable (false) the
+ *     Axes settings.
+ */
+anychart.ui.chartEditor.settings.Axes.prototype.setEnabled = function(enabled) {
+  if (enabled) {
+    this.enabled_ = enabled;
+  }
+
+  this.forEachChild(function(child) {
+    child.setEnabled(enabled);
+  });
+
+  if (!enabled) {
+    this.enabled_ = enabled;
+  }
+};
+
+
+/**
+ * @return {boolean} Whether the Axes settings is enabled.
+ */
+anychart.ui.chartEditor.settings.Axes.prototype.isEnabled = function() {
+  return this.enabled_;
 };
 
 

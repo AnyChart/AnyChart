@@ -86,13 +86,17 @@ anychart.ui.chartEditor.steps.Data.prototype.createDom = function() {
 
 
 /**
- * Update data sets.
+ * Update data sets UI in left column.
  * @private
  */
 anychart.ui.chartEditor.steps.Data.prototype.updateDataSets_ = function() {
   var dom = this.getDomHelper();
   var className = anychart.ui.chartEditor.steps.Data.CSS_CLASS;
   var sharedModel = this.getSharedModel();
+
+  // Clear old data sets
+  goog.dom.removeChildren(this.dataSetsEl_);
+
   var dataSet;
   var dataSetEl;
   for (var i = 0; i < sharedModel.dataSets.length; i++) {
@@ -226,23 +230,14 @@ anychart.ui.chartEditor.steps.Data.prototype.enterDocument = function() {
  */
 anychart.ui.chartEditor.steps.Data.prototype.onChangeStep_ = function(e) {
   var sharedModel = this.getSharedModel();
-  sharedModel.dataMappings.length = 0;
-
-  // build data mappings
-  var dataSet, i, count;
-  for (i = 0, count = sharedModel.dataSets.length; i < count; i++) {
-    dataSet = sharedModel.dataSets[i];
-    if (!dataSet.rawMappings.length) continue;
-
-    Array.prototype.push.apply(sharedModel.dataMappings, this.getDataMappings_(dataSet));
-  }
+  this.updateSharedDataMappings();
 
   this.dispatchEvent({
     type: anychart.ui.chartEditor.events.EventType.REMOVE_ALL_SERIES
   });
 
   // build series
-  for (i = 0, count = sharedModel.dataMappings.length; i < count; i++) {
+  for (var i = 0, count = sharedModel.dataMappings.length; i < count; i++) {
     this.dispatchEvent({
       type: anychart.ui.chartEditor.events.EventType.ADD_SERIES,
       id: ++sharedModel.lastSeriesId,
@@ -257,44 +252,6 @@ anychart.ui.chartEditor.steps.Data.prototype.onChangeStep_ = function(e) {
     value: 0,
     rebuild: false
   });
-};
-
-
-/**
- * Get data mappings from all data sets.
- * @param {anychart.ui.chartEditor.steps.Base.DataSet} dataSet
- * @return {Array.<anychart.data.Mapping>}
- * @private
- */
-anychart.ui.chartEditor.steps.Data.prototype.getDataMappings_ = function(dataSet) {
-  var dataMappings = [];
-
-  var rawMapping;
-  for (var i = 0; i < dataSet.rawMappings.length; i++) {
-    rawMapping = dataSet.rawMappings[i];
-
-    // Prepare raw mappings to anychart mapping format.
-    var rawMappingField;
-    var formattedMapping = {};
-    var isArrayMapping = true;
-    for (var j = 0; j < rawMapping.length; j++) {
-      rawMappingField = rawMapping[j];
-      if (!goog.isDef(rawMappingField.key) || !goog.isDef(rawMappingField.value)) continue;
-      if (goog.isString(rawMappingField.value)) isArrayMapping = false;
-
-      formattedMapping[rawMappingField.key] = formattedMapping[rawMappingField.key] || [];
-      goog.array.insert(formattedMapping[rawMappingField.key], rawMappingField.value);
-    }
-
-    if (!goog.object.isEmpty(formattedMapping)) {
-      dataMappings.push(
-          dataSet.instance['mapAs'](
-              isArrayMapping ? formattedMapping : undefined,
-              !isArrayMapping ? formattedMapping : undefined));
-    }
-  }
-
-  return dataMappings;
 };
 
 
