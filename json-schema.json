@@ -1910,35 +1910,8 @@
         "tasks": {"$ref": "#/definitions/tasks"},
         "criticalPath": {"$ref": "#/definitions/criticalPath"},
 
-
-
-        "stroke": {"$ref": "#/definitions/stroke"},
-        "hoverStroke": {"$ref": "#/definitions/stroke"},
-        "selectStroke": {"$ref": "#/definitions/stroke"},
-
-        "fill": {"$ref": "#/definitions/fill"},
-        "hoverFill": {"$ref": "#/definitions/fill"},
-        "selectFill": {"$ref": "#/definitions/fill"},
-
-        "hatchFill": {"$ref": "#/definitions/hatchFillSet"},
-        "hoverHatchFill": {"$ref": "#/definitions/hatchFillSet"},
-        "selectHatchFill": {"$ref": "#/definitions/hatchFillSet"},
-
-        "labelsDisplayMode": {"$ref": "#/definitions/anychart.enums.LabelsDisplayMode"},
-        "headersDisplayMode": {"$ref": "#/definitions/anychart.enums.LabelsDisplayMode"},
-        "maxDepth": {"type": "number"},
-        "hintDepth": {"type": "number"},
-        "hintOpacity": {"type": "number"},
-        "maxHeadersHeight": {"type": ["number", "string"]},
-        "sort": {"type": "string"},
-
-        "colorScale": {
-          "oneOf": [
-            {"type": ["string", "number"]},
-            {"$ref": "#/definitions/anychart.scales.OrdinalColor"},
-            {"$ref": "#/definitions/anychart.scales.LinearColor"}
-          ]
-        }
+        "horizontalSpacing": ["number", "string"],
+        "verticalSpacing": ["number", "string"]
       },
       "required": ["type"]
     },
@@ -5542,7 +5515,10 @@
             {"$ref": "#/definitions/anychart.core.ui.Tooltip"}
           ]
         },
-        "shape": {"type": "string"}
+        "shape": {"type": "string"},
+        "size": {
+          "type": ["string", "number"]
+        }
       }
     },
 

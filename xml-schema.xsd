@@ -230,6 +230,9 @@
         <!-- new Cartesian attributes -->
         <xsd:attribute name="x_zoom" type="simple.NumberOrBoolOrNull"/>
         <xsd:attribute name="x_scroller" type="simple.BoolOrNull"/>
+        <!-- Pert attributes -->
+        <xsd:attribute name="vertical_spacing" type="simple.NumberOrPercent"/>
+        <xsd:attribute name="horizontal_spacing" type="simple.NumberOrPercent"/>
     </xsd:complexType>
 
     <xsd:complexType name="Gauge">
@@ -2385,6 +2388,7 @@
         <xsd:attribute name="hover_labels" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="select_labels" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="shape" type="xsd:string" default="circle"/>
+        <xsd:attribute name="size" type="simple.NumberOrPercent"/>
         <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
     </xsd:complexType>
 
