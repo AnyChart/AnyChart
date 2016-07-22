@@ -2309,7 +2309,7 @@ anychart.charts.Pert.prototype.drawContent = function(bounds) {
         interactPath.tag = work ? {'w': work} : {'d': isCrit};
 
         src = edge.isCritical ? this.criticalPath().tasks() : this.tasks();
-        var formatProvider = this.createFormatProvider(false, work, activity, void 0);
+        var formatProvider = this.createFormatProvider(true, work, activity, void 0);
 
         if (work) {
           var state = work.isSelected ? anychart.PointState.SELECT : anychart.PointState.NORMAL;
