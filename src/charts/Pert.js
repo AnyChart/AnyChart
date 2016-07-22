@@ -2103,11 +2103,13 @@ anychart.charts.Pert.prototype.worksLayerAppearanceCallback_ = function(element,
       stroke = source.getFinalStroke(state, formatProvider);
 
       if (tag['a']) {
-        if (goog.isObject(stroke))
+        if (goog.isObject(stroke)) {
+          stroke = goog.object.clone(stroke);
           delete stroke['dash'];
+        }
         /** @type {acgraph.vector.Path} */ (element).fill(fill);
       }
-      /** @type {acgraph.vector.Path} */ (element).stroke(stroke);
+      /** @type {acgraph.vector.Path} */ (element).stroke(/** @type {acgraph.vector.Stroke} */ (stroke));
 
       var upperLf = /** @type {anychart.core.ui.LabelsFactory} */ (work.isSelected ? source.selectUpperLabels() : source.upperLabels());
       var lowerLf = /** @type {anychart.core.ui.LabelsFactory} */ (work.isSelected ? source.selectLowerLabels() : source.lowerLabels());
@@ -2126,11 +2128,13 @@ anychart.charts.Pert.prototype.worksLayerAppearanceCallback_ = function(element,
       stroke = source.getFinalDummyStroke(formatProvider);
 
       if (tag['a']) {
-        if (goog.isObject(stroke))
+        if (goog.isObject(stroke)) {
+          stroke = goog.object.clone(stroke);
           delete stroke['dash'];
+        }
         /** @type {acgraph.vector.Path} */ (element).fill(fill);
       }
-      /** @type {acgraph.vector.Path} */ (element).stroke(stroke);
+      /** @type {acgraph.vector.Path} */ (element).stroke(/** @type {acgraph.vector.Stroke} */ (stroke));
     }
   }
 };
