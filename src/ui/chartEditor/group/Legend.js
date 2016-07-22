@@ -15,12 +15,44 @@ anychart.ui.chartEditor.group.Legend = function(model) {
   anychart.ui.chartEditor.group.Legend.base(this, 'constructor', model);
 
   this.setHeader('Legend');
+  this.useEnabledButton(true);
+  this.setKey('chart.legend()');
 };
 goog.inherits(anychart.ui.chartEditor.group.Legend, anychart.ui.chartEditor.group.Base);
 
 
 /** @enum {string} */
 anychart.ui.chartEditor.group.Legend.CssClass = {};
+
+
+/** @override */
+anychart.ui.chartEditor.group.Legend.prototype.setContentEnabled = function(enabled) {
+  anychart.ui.chartEditor.group.Legend.base(this, 'setContentEnabled', enabled);
+
+  if (this.itemsHeader_) {
+    goog.dom.classlist.enable(
+        goog.asserts.assert(this.itemsHeader_),
+        goog.getCssName('anychart-control-disabled'), !enabled);
+  }
+
+  if (this.layoutLabel_) {
+    goog.dom.classlist.enable(
+        goog.asserts.assert(this.layoutLabel_),
+        goog.getCssName('anychart-control-disabled'), !enabled);
+  }
+
+  if (this.orientationLabel_) {
+    goog.dom.classlist.enable(
+        goog.asserts.assert(this.orientationLabel_),
+        goog.getCssName('anychart-control-disabled'), !enabled);
+  }
+
+  if (this.alignLabel_) {
+    goog.dom.classlist.enable(
+        goog.asserts.assert(this.alignLabel_),
+        goog.getCssName('anychart-control-disabled'), !enabled);
+  }
+};
 
 
 /** @override */
@@ -115,12 +147,12 @@ anychart.ui.chartEditor.group.Legend.prototype.createDom = function() {
       goog.getCssName('anychart-chart-editor-settings-item-gap')));
 
   var items = new anychart.ui.chartEditor.settings.Title();
+  items.allowEnabled(false);
   items.allowEditTitle(false);
   items.allowEditPosition(false);
   items.allowEditAlign(false);
   items.allowEditColor(false);
-  items.setKey('chart.legend()');
-  items.setEnabledButtonContainer(this.getHeaderElement());
+  items.setKey(this.getKey());
   this.addChild(items, true);
 
   goog.dom.appendChild(content, goog.dom.createDom(
@@ -137,15 +169,22 @@ anychart.ui.chartEditor.group.Legend.prototype.createDom = function() {
   this.itemsAlign_ = alignSelect;
   this.title_ = title;
   this.items_ = items;
+
+  this.itemsHeader_ = itemsHeader;
+  this.layoutLabel_ = layoutLabel;
+  this.orientationLabel_ = orientationLabel;
+  this.alignLabel_ = alignLabel;
 };
 
 
 /** @override */
-anychart.ui.chartEditor.group.Legend.prototype.update = function() {
-  this.itemsLayout_.update(this.model);
-  this.itemsOrientation_.update(this.model);
-  this.itemsAlign_.update(this.model);
-  this.title_.update(this.model);
-  this.items_.update(this.model);
+anychart.ui.chartEditor.group.Legend.prototype.update = function(model) {
+  anychart.ui.chartEditor.group.Legend.base(this, 'update', model);
+
+  this.itemsLayout_.update(model);
+  this.itemsOrientation_.update(model);
+  this.itemsAlign_.update(model);
+  this.title_.update(model);
+  this.items_.update(model);
 };
 

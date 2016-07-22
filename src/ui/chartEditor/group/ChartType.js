@@ -22,7 +22,7 @@ goog.inherits(anychart.ui.chartEditor.group.ChartType, anychart.ui.chartEditor.g
 anychart.ui.chartEditor.group.ChartType.CssClass = {};
 
 
-/** @inheritDoc */
+/** @override */
 anychart.ui.chartEditor.group.ChartType.prototype.disposeInternal = function() {
 
 
@@ -30,7 +30,7 @@ anychart.ui.chartEditor.group.ChartType.prototype.disposeInternal = function() {
 };
 
 
-/** @inheritDoc */
+/** @override */
 anychart.ui.chartEditor.group.ChartType.prototype.createDom = function() {
   goog.base(this, 'createDom');
 
@@ -38,10 +38,7 @@ anychart.ui.chartEditor.group.ChartType.prototype.createDom = function() {
 };
 
 
-/**
- * @param {anychart.ui.chartEditor.steps.Base.Preset} item
- * @override
- */
+/** @override */
 anychart.ui.chartEditor.group.ChartType.prototype.update = function(item) {
   this.setHeader(item.caption);
 
@@ -58,7 +55,7 @@ anychart.ui.chartEditor.group.ChartType.prototype.update = function(item) {
         this.addChildAt(child, i, true);
       }
 
-      var listItem =/** @type {{type: string, caption: string, image: string, seriesType: string}} */(item.list[i]);
+      var listItem = /** @type {{type: string, caption: string, image: string, seriesType: string}} */(item.list[i]);
       child.update(item.category, listItem, listItem.type == this.model.presetType);
       child.setEnabled(anychart.ui.chartEditor.group.ChartType.isReferenceValuesPresent(listItem.referenceNames, this.model));
       goog.style.setElementShown(child.getElement(), true);
@@ -70,11 +67,12 @@ anychart.ui.chartEditor.group.ChartType.prototype.update = function(item) {
 
 
 /**
- * @param {Array.<anychart.ui.chartEditor.steps.Base.Preset>} values
+ * @param {Array<string>} values
  * @param {anychart.ui.chartEditor.steps.Base.Model} model
  * @return {boolean}
  */
 anychart.ui.chartEditor.group.ChartType.isReferenceValuesPresent = function(values, model) {
+  if (!model.dataMappings.length) return false;
   var result = true;
 
   for (var i = 0, count = values.length; i < count; i++) {
@@ -85,6 +83,7 @@ anychart.ui.chartEditor.group.ChartType.isReferenceValuesPresent = function(valu
           mapping['getArrayMapping']()[name];
       var presentInObjectMapping = mapping['getObjectMapping']() != window['anychart']['data']['Mapping']['DEFAULT_OBJECT_MAPPING'] &&
           mapping['getObjectMapping']()[name];
+
       result = result && (presentInArrayMapping || presentInObjectMapping);
     }
   }

@@ -35,18 +35,18 @@ var data2 = [
   ['Pomade', 8814, 9054, 4376, 9256]
 ];
 
-var editor = anychart.ui.chartEditorDialog();
-editor.data(data1, data2);
-editor.render();
+var chartEditor = anychart.ui.chartEditorDialog();
+chartEditor.data(data1, data2);
+chartEditor.render();
 </pre>
-<button onclick="editor.visible(true);" autofocus style="position: absolute; top: 10px; left: 350px; font-size: 20px;">Chart Editor</button>
+<button onclick="chartEditor.visible(true);" autofocus style="position: absolute; top: 10px; left: 350px; font-size: 20px;">Chart Editor</button>
 <div style="clear: both"></div>
 
 <h2>Result as JSON</h2>
 
 <div id="container-1" style="width: 400px; height: 300px; border: 1px solid #000000; float: left;"></div>
 <pre style="float: left; margin-left: 20px;">
-var json = editor.getResultJson();
+var json = chartEditor.getResultJson();
 var chart = anychart.fromJson(json);
 chart.container('container-1');
 chart.draw();
@@ -59,7 +59,7 @@ chart.draw();
 
 <div id="container-2" style="width: 400px; height: 300px; border: 1px solid #000000; float: left;"></div>
 <pre style="float: left; margin-left: 20px;">
-var xml = editor.getResultXml();
+var xml = chartEditor.getResultXml();
 var chart = anychart.fromXml(xml);
 chart.container('container-2');
 chart.draw();
@@ -72,7 +72,7 @@ chart.draw();
 
 <div id="container-3" style="width: 400px; height: 300px; border: 1px solid #000000; float: left;"></div>
 <pre style="float: left; margin-left: 20px;">
-var code = editor.getResultCode();
+var code = chartEditor.getResultCode();
 var constructorFunc = eval(code);
 var chart = constructorFunc(data1, data2);
 chart.container('container-3');
@@ -90,13 +90,13 @@ chart.draw();
 var data = [];
 
 // use chart editor
-var editor = anychart.ui.chartEditorDialog();
-editor.data(data);
-editor.render();
-editor.setVisible(true);
+var chartEditor = anychart.ui.chartEditorDialog();
+chartEditor.data(data);
+chartEditor.render();
+chartEditor.setVisible(true);
 
 // get result code from editor and save on your backend
-var code = editor.getResultCode();
+var code = chartEditor.getResultCode();
 </pre>
 
 <h3>Step 2</h3>

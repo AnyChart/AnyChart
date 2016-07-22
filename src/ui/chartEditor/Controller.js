@@ -248,6 +248,8 @@ anychart.ui.chartEditor.Controller.prototype.onBuildChart_ = function(opt_evt) {
     this.model_.chart['dispose']();
   }
 
+  if (!this.model_.dataMappings.length) return;
+
   var i, count;
   var chart = this.model_.anychart[this.model_.chartConstructor]();
   var container = opt_evt ? opt_evt.container || this.model_.chartContainer : this.model_.chartContainer;

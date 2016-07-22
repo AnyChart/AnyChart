@@ -14,6 +14,8 @@ anychart.ui.chartEditor.group.ChartTitle = function(model) {
   anychart.ui.chartEditor.group.ChartTitle.base(this, 'constructor', model);
 
   this.setHeader('Chart Title');
+  this.useEnabledButton(true);
+  this.setKey('chart.title()');
 };
 goog.inherits(anychart.ui.chartEditor.group.ChartTitle, anychart.ui.chartEditor.group.Base);
 
@@ -36,9 +38,9 @@ anychart.ui.chartEditor.group.ChartTitle.prototype.createDom = function() {
   anychart.ui.chartEditor.group.ChartTitle.base(this, 'createDom');
 
   var title = new anychart.ui.chartEditor.settings.Title();
-  title.setKey('chart.title()');
+  title.allowEnabled(false);
+  title.setKey(this.getKey());
   title.setPositionKey('orientation()');
-  title.setEnabledButtonContainer(this.getHeaderElement());
   this.addChild(title, true);
 
   this.title_ = title;
@@ -46,7 +48,8 @@ anychart.ui.chartEditor.group.ChartTitle.prototype.createDom = function() {
 
 
 /** @override */
-anychart.ui.chartEditor.group.ChartTitle.prototype.update = function() {
-  this.title_.update(this.model);
+anychart.ui.chartEditor.group.ChartTitle.prototype.update = function(model) {
+  anychart.ui.chartEditor.group.ChartTitle.base(this, 'update', model);
+  this.title_.update(model);
 };
 

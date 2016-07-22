@@ -15,6 +15,7 @@ goog.require('goog.ui.Component');
 anychart.ui.chartEditor.settings.Axis = function() {
   anychart.ui.chartEditor.settings.Axis.base(this, 'constructor');
 
+  this.enabled_ = true;
 };
 goog.inherits(anychart.ui.chartEditor.settings.Axis, goog.ui.Component);
 
@@ -81,6 +82,52 @@ anychart.ui.chartEditor.settings.Axis.prototype.setKey = function(value) {
     this.key_ = value;
     this.updateKeys();
   }
+};
+
+
+/**
+ * Enables/Disables the Axis settings.
+ * @param {boolean} enabled Whether to enable (true) or disable (false) the
+ *     Axis settings.
+ */
+anychart.ui.chartEditor.settings.Axis.prototype.setEnabled = function(enabled) {
+  if (enabled) {
+    this.enabled_ = enabled;
+  }
+
+  this.forEachChild(function(child) {
+    child.setEnabled(enabled);
+  });
+
+  if (!enabled) {
+    this.enabled_ = enabled;
+  }
+
+  if (this.enabledHeader_) {
+    goog.dom.classlist.enable(
+        goog.asserts.assert(this.enabledHeader_),
+        goog.getCssName('anychart-control-disabled'), !enabled);
+  }
+
+  if (this.orientationLabel_) {
+    goog.dom.classlist.enable(
+        goog.asserts.assert(this.orientationLabel_),
+        goog.getCssName('anychart-control-disabled'), !enabled);
+  }
+
+  if (this.invertedLabel_) {
+    goog.dom.classlist.enable(
+        goog.asserts.assert(this.invertedLabel_),
+        goog.getCssName('anychart-control-disabled'), !enabled);
+  }
+};
+
+
+/**
+ * @return {boolean} Whether the Axis settings is enabled.
+ */
+anychart.ui.chartEditor.settings.Axis.prototype.isEnabled = function() {
+  return this.enabled_;
 };
 
 
@@ -183,6 +230,10 @@ anychart.ui.chartEditor.settings.Axis.prototype.createDom = function() {
   this.inverted_ = invertedBtn;
   this.title_ = title;
   this.labels_ = labels;
+
+  this.enabledHeader_ = enabledHeader;
+  this.orientationLabel_ = orientationLabel;
+  this.invertedLabel_ = invertedLabel;
 
   this.updateKeys();
 };
