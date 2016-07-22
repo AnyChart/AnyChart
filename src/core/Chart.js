@@ -2523,12 +2523,12 @@ anychart.core.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvS
  * @return {Element|string|null} - HTML table instance or null if got some parse errors.
  */
 anychart.core.Chart.prototype.toHtmlTable = function(opt_title, opt_asString) {
-  //TODO (A.Kudryavtsev): Replace this with this.toCSV('mode', opt_csvSettings); on CSV export fix.
-  var csv = 'x,Brandy,Whiskey,Tequila\n' +
-      '2007,14.1,20.7,12.2\n' +
-      '2008,15.7,21.6,10\n' +
-      '2009,12,22.5,8.9';
-
+  // This is how result CSV must look like.
+  // var csv = 'x,Brandy,Whiskey,Tequila\n' +
+  //     '2007,14.1,20.7,12.2\n' +
+  //     '2008,15.7,21.6,10\n' +
+  //     '2009,12,22.5,8.9';
+  var csv = this.toCsv();
   var table = anychart.utils.htmlTableFromCsv(csv, opt_title, opt_asString);
   if (table) {
     return opt_asString ? goog.dom.getOuterHtml(table) : table;

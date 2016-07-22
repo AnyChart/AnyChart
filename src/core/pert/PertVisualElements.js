@@ -18,34 +18,40 @@ anychart.core.pert.PertVisualElements = function() {
    * @type {acgraph.vector.Fill}
    * @private
    */
+  this.color_;
+
+  /**
+   * @type {acgraph.vector.Fill|Function}
+   * @private
+   */
   this.fill_;
 
   /**
-   * @type {acgraph.vector.Fill}
+   * @type {acgraph.vector.Fill|Function}
    * @private
    */
   this.hoverFill_;
 
   /**
-   * @type {acgraph.vector.Fill}
+   * @type {acgraph.vector.Fill|Function}
    * @private
    */
   this.selectFill_;
 
   /**
-   * @type {acgraph.vector.Stroke}
+   * @type {acgraph.vector.Stroke|Function}
    * @private
    */
   this.stroke_;
 
   /**
-   * @type {acgraph.vector.Stroke}
+   * @type {acgraph.vector.Stroke|Function}
    * @private
    */
   this.hoverStroke_;
 
   /**
-   * @type {acgraph.vector.Stroke}
+   * @type {acgraph.vector.Stroke|Function}
    * @private
    */
   this.selectStroke_;
@@ -104,7 +110,7 @@ anychart.core.pert.PertVisualElements.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Getter/setter for fill.
+ * Getter/setter for color.
  * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
@@ -114,11 +120,37 @@ anychart.core.pert.PertVisualElements.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @param {number=} opt_fy .
  * @return {acgraph.vector.Fill|anychart.core.pert.PertVisualElements} .
  */
-anychart.core.pert.PertVisualElements.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+anychart.core.pert.PertVisualElements.prototype.color = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.fill_), val)) {
-      this.fill_ = /** @type {acgraph.vector.Fill} */ (val);
+    if (val != this.color_) {
+      this.color_ = val;
+      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE);
+    }
+    return this;
+  }
+  return this.color_;
+};
+
+
+/**
+ * Getter/setter for fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.pert.PertVisualElements|Function} .
+ */
+anychart.core.pert.PertVisualElements.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var val = goog.isFunction(opt_fillOrColorOrKeys) ?
+        opt_fillOrColorOrKeys :
+        acgraph.vector.normalizeFill.apply(null, arguments);
+    if (val != this.fill_) {
+      this.fill_ = val;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE);
     }
     return this;
@@ -129,20 +161,22 @@ anychart.core.pert.PertVisualElements.prototype.fill = function(opt_fillOrColorO
 
 /**
  * Getter/setter for hoverFill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
  * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.pert.PertVisualElements} .
+ * @return {acgraph.vector.Fill|anychart.core.pert.PertVisualElements|Function} .
  */
 anychart.core.pert.PertVisualElements.prototype.hoverFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.hoverFill_), val)) {
-      this.hoverFill_ = /** @type {acgraph.vector.Fill} */ (val);
+    var val = goog.isFunction(opt_fillOrColorOrKeys) ?
+        opt_fillOrColorOrKeys :
+        acgraph.vector.normalizeFill.apply(null, arguments);
+    if (val != this.hoverFill_) {
+      this.hoverFill_ = val;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE);
     }
     return this;
@@ -153,20 +187,22 @@ anychart.core.pert.PertVisualElements.prototype.hoverFill = function(opt_fillOrC
 
 /**
  * Getter/setter for selectFill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|Function|null)=} opt_fillOrColorOrKeys .
  * @param {number=} opt_opacityOrAngleOrCx .
  * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
  * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
  * @param {number=} opt_opacity .
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.pert.PertVisualElements} .
+ * @return {acgraph.vector.Fill|anychart.core.pert.PertVisualElements|Function} .
  */
 anychart.core.pert.PertVisualElements.prototype.selectFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.selectFill_), val)) {
-      this.selectFill_ = /** @type {acgraph.vector.Fill} */ (val);
+    var val = goog.isFunction(opt_fillOrColorOrKeys) ?
+        opt_fillOrColorOrKeys :
+        acgraph.vector.normalizeFill.apply(null, arguments);
+    if (val != this.selectFill_) {
+      this.selectFill_ = val;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE);
     }
     return this;
@@ -176,20 +212,54 @@ anychart.core.pert.PertVisualElements.prototype.selectFill = function(opt_fillOr
 
 
 /**
+ * Gets final fill.
+ * @param {anychart.PointState|number} state - Current state.
+ * @param {anychart.core.utils.PertPointContextProvider} provider - Context provider.
+ * @return {!acgraph.vector.Fill} - Final fill.
+ */
+anychart.core.pert.PertVisualElements.prototype.getFinalFill = function(state, provider) {
+  var result;
+  var fill;
+
+  switch (state) {
+    case anychart.PointState.HOVER:
+      fill = this.hoverFill();
+      break;
+    case anychart.PointState.SELECT:
+      fill = this.selectFill();
+      break;
+    default:
+      fill = this.fill();
+  }
+
+  result = fill;
+
+  if (goog.isFunction(fill)) {
+    provider['sourceColor'] = this.color();
+    result = fill.call(provider);
+  }
+
+  return result;
+};
+
+
+/**
  * Getter/setter for stroke settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.pert.PertVisualElements|acgraph.vector.Stroke} .
+ * @return {anychart.core.pert.PertVisualElements|acgraph.vector.Stroke|Function} .
  */
 anychart.core.pert.PertVisualElements.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Stroke} */ (this.stroke_), val)) {
-      this.stroke_ = /** @type {acgraph.vector.Stroke} */ (val);
+    var stroke = goog.isFunction(opt_strokeOrFill) ?
+        opt_strokeOrFill :
+        acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (stroke != this.stroke_) {
+      this.stroke_ = stroke;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE);
     }
     return this;
@@ -200,19 +270,21 @@ anychart.core.pert.PertVisualElements.prototype.stroke = function(opt_strokeOrFi
 
 /**
  * Getter/setter for hover stroke settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness [1] Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.pert.PertVisualElements|acgraph.vector.Stroke} .
+ * @return {anychart.core.pert.PertVisualElements|acgraph.vector.Stroke|Function} .
  */
 anychart.core.pert.PertVisualElements.prototype.hoverStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Stroke} */ (this.hoverStroke_), val)) {
-      this.hoverStroke_ = /** @type {acgraph.vector.Stroke} */ (val);
+    var stroke = goog.isFunction(opt_strokeOrFill) ?
+        opt_strokeOrFill :
+        acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (stroke != this.hoverStroke_) {
+      this.hoverStroke_ = stroke;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE);
     }
     return this;
@@ -223,24 +295,58 @@ anychart.core.pert.PertVisualElements.prototype.hoverStroke = function(opt_strok
 
 /**
  * Getter/setter for select stroke settings.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|Function|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
  * @param {number=} opt_thickness - Line thickness.
  * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
  * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
  * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.pert.PertVisualElements|acgraph.vector.Stroke} .
+ * @return {anychart.core.pert.PertVisualElements|acgraph.vector.Stroke|Function} .
  */
 anychart.core.pert.PertVisualElements.prototype.selectStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
   if (goog.isDef(opt_strokeOrFill)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Stroke} */ (this.selectStroke_), val)) {
-      this.selectStroke_ = /** @type {acgraph.vector.Stroke} */ (val);
+    var stroke = goog.isFunction(opt_strokeOrFill) ?
+        opt_strokeOrFill :
+        acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (stroke != this.selectStroke_) {
+      this.selectStroke_ = stroke;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW_APPEARANCE);
     }
     return this;
   }
   return this.selectStroke_;
+};
+
+
+/**
+ * Gets final stroke.
+ * @param {anychart.PointState|number} state - Current state.
+ * @param {anychart.core.utils.PertPointContextProvider} provider - Context provider.
+ * @return {!acgraph.vector.Stroke} - Final stroke.
+ */
+anychart.core.pert.PertVisualElements.prototype.getFinalStroke = function(state, provider) {
+  var result;
+  var stroke;
+
+  switch (state) {
+    case anychart.PointState.HOVER:
+      stroke = this.hoverStroke();
+      break;
+    case anychart.PointState.SELECT:
+      stroke = this.selectStroke();
+      break;
+    default:
+      stroke = this.stroke();
+  }
+
+  result = stroke;
+
+  if (goog.isFunction(stroke)) {
+    provider['sourceColor'] = this.color();
+    result = stroke.call(provider);
+  }
+
+  return result;
 };
 
 
@@ -408,6 +514,8 @@ anychart.core.pert.PertVisualElements.prototype.setLabelsParentEventTarget = fun
 anychart.core.pert.PertVisualElements.prototype.serialize = function() {
   var json = anychart.core.pert.PertVisualElements.base(this, 'serialize');
 
+  json['color'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.color()));
+
   if (goog.isFunction(this['fill'])) {
     if (goog.isFunction(this.fill())) {
       anychart.core.reporting.warning(
@@ -493,6 +601,8 @@ anychart.core.pert.PertVisualElements.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.pert.PertVisualElements.prototype.setupByJSON = function(config) {
   anychart.core.pert.PertVisualElements.base(this, 'setupByJSON', config);
+
+  this.color(config['color']);
 
   this.fill(config['fill']);
   this.hoverFill(config['hoverFill']);

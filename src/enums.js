@@ -5257,6 +5257,25 @@ anychart.enums.MilestoneShape = {
 };
 
 
+/**
+ * Normalizes milestone type string to a enum.
+ * @param {*} value
+ * @return {anychart.enums.MilestoneShape}
+ */
+anychart.enums.normalizeMilestoneShape = function(value) {
+  value = String(value).toLowerCase();
+  switch (value) {
+    case 'rhomb':
+    case 'rhombus':
+      return anychart.enums.MilestoneShape.RHOMBUS;
+    case 'rect':
+    case 'rectangle':
+      return anychart.enums.MilestoneShape.RECTANGLE;
+    default:
+      return anychart.enums.MilestoneShape.CIRCLE;
+  }
+};
+
 // DVF-1826
 // goog.exportSymbol('anychart.enums.XGroupingMode.FIRST', anychart.enums.XGroupingMode.FIRST);
 // goog.exportSymbol('anychart.enums.XGroupingMode.LAST', anychart.enums.XGroupingMode.LAST);
