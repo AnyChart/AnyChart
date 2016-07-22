@@ -67,8 +67,7 @@ goog.provide('anychart.themes.defaultTheme');
 
   var returnMilestoneName = function() {
     if (this['creator']) {
-      var name = this['creator'].get('name');
-      return name[0].toUpperCase();
+      return this['index'];
     } else {
       return this['isStart'] ? 'S' : 'F';
     }
@@ -4573,7 +4572,11 @@ goog.provide('anychart.themes.defaultTheme');
            * @return {*}
            */
           'titleFormatter': function() {
-            return 'Milestone';
+            if (this['creator']) {
+              return 'Milestone - ' + this['index'];
+            } else {
+              return 'Milestone - ' + (this['isStart'] ? 'Start' : 'Finish');
+            }
           },
           /**
            * @this {*}
@@ -4583,13 +4586,15 @@ goog.provide('anychart.themes.defaultTheme');
             var result = '';
             var i = 0;
             if (this['successors'] && this['successors'].length) {
-              result += '\nSuccessors:';
+              result += 'Successors:';
               for (i = 0; i < this['successors'].length; i++) {
                 result += '\n - ' + this['successors'][i].get('name');
               }
+              if (this['predecessors'] && this['predecessors'].length)
+                result += '\n\n';
             }
             if (this['predecessors'] && this['predecessors'].length) {
-              result += '\nPredecessors:';
+              result += 'Predecessors:';
               for (i = 0; i < this['predecessors'].length; i++) {
                 result += '\n - ' + this['predecessors'][i].get('name');
               }
@@ -4725,7 +4730,11 @@ goog.provide('anychart.themes.defaultTheme');
              * @return {*}
              */
             'titleFormatter': function() {
-              return 'Milestone';
+              if (this['creator']) {
+                return 'Milestone - ' + this['index'];
+              } else {
+                return 'Milestone - ' + (this['isStart'] ? 'Start' : 'Finish');
+              }
             },
             /**
              * @this {*}
@@ -4735,13 +4744,15 @@ goog.provide('anychart.themes.defaultTheme');
               var result = '';
               var i = 0;
               if (this['successors'] && this['successors'].length) {
-                result += '\nSuccessors:';
+                result += 'Successors:';
                 for (i = 0; i < this['successors'].length; i++) {
                   result += '\n - ' + this['successors'][i].get('name');
                 }
+                if (this['predecessors'] && this['predecessors'].length)
+                  result += '\n\n';
               }
               if (this['predecessors'] && this['predecessors'].length) {
-                result += '\nPredecessors:';
+                result += 'Predecessors:';
                 for (i = 0; i < this['predecessors'].length; i++) {
                   result += '\n - ' + this['predecessors'][i].get('name');
                 }
