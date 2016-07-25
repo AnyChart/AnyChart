@@ -4768,7 +4768,8 @@ goog.provide('anychart.themes.v6');
           'fill': 'red',
           'stroke': 'none'
         },
-        'zIndex': 10
+        'zIndex': 10,
+        'cornersRounding': '0%'
       },
       'defaultPointerSettings': {
         'base': {
@@ -4820,7 +4821,8 @@ goog.provide('anychart.themes.v6');
         'fill': '#008000 .5',
         'position': 'center',
         'startSize': 0,
-        'endSize': '10%'
+        'endSize': '10%',
+        'cornersRounding': '0%'
         //'radius': undefined
       },
       'fill': {

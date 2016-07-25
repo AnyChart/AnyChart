@@ -3001,7 +3001,8 @@ goog.provide('anychart.themes.defaultTheme');
           'fill': fontColorBright,
           'stroke': 'none'
         },
-        'zIndex': 10
+        'zIndex': 10,
+        'cornersRounding': '0%'
       },
       'defaultPointerSettings': {
         'base': {
@@ -3036,7 +3037,8 @@ goog.provide('anychart.themes.defaultTheme');
         'fill': fontColorNormal + opacityStrong,
         'position': 'center',
         'startSize': 0,
-        'endSize': '10%'
+        'endSize': '10%',
+        'cornersRounding': '0%'
       },
       'fill': colorFillExtraThin,
       'stroke': colorStrokeThin,

@@ -779,6 +779,7 @@
         <xsd:attribute name="start_angle" type="simple.DoubleOrNull"/>
         <xsd:attribute name="sweep_angle" type="simple.DoubleOrNull"/>
         <xsd:attribute name="radius" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="corners_rounding" type="simple.NumberOrPercent"/>
         <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="noOverlap"/>
         <xsd:attribute name="labels" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="minor_labels" type="simple.BoolOrNull"/>
@@ -994,6 +995,7 @@
         <xsd:attribute name="axis_index" type="xsd:double"/>
         <xsd:attribute name="start_size" type="simple.NumberOrPercentOrNull"/>
         <xsd:attribute name="end_size" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="corners_rounding" type="simple.NumberOrPercent"/>
         <xsd:attribute name="radius" type="simple.NumberOrPercentOrNull"/>
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="position" type="enums.GaugeSidePosition"/>

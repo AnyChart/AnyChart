@@ -3277,6 +3277,9 @@
         "radius": {
           "type": ["string", "number", "null"]
         },
+        "cornersRounding": {
+          "type": ["string", "number"]
+        },
         "overlapMode": {"$ref": "#/definitions/anychart.enums.LabelsOverlapMode"},
         "labels": {
           "oneOf": [
@@ -4852,6 +4855,9 @@
         },
         "radius": {
           "type": ["string", "number", "null"]
+        },
+        "cornersRounding": {
+          "type": ["string", "number"]
         },
         "axisIndex": {
           "type": "number"

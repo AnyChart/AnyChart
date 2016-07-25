@@ -428,6 +428,25 @@ anychart.core.axes.Circular.prototype.radius = function(opt_value) {
 
 
 /**
+ * Axis ends radius.
+ * @param {(null|number|string)=} opt_value .
+ * @return {string|anychart.core.axes.Circular} .
+ */
+anychart.core.axes.Circular.prototype.cornersRounding = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.normalizeToPercent(opt_value);
+    if (this.cornersRounding_ != opt_value) {
+      this.cornersRounding_ = opt_value;
+      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  } else {
+    return this.cornersRounding_;
+  }
+};
+
+
+/**
  * Axis width.
  * @param {(null|number|string)=} opt_value .
  * @return {string|anychart.core.axes.Circular} .
@@ -997,6 +1016,12 @@ anychart.core.axes.Circular.prototype.draw = function() {
     this.axisWidth_ = anychart.utils.normalizeSize(
         goog.isDefAndNotNull(this.width_) ? this.width_ : '3%', this.gauge_.getPixRadius());
 
+    var cornersRoundingPix = anychart.utils.normalizeSize(/** @type {string} */ (this.cornersRounding()), this.axisWidth_);
+
+    var x, y;
+    var innerR = this.pixRadius_ - this.axisWidth_ / 2;
+    var outerR = this.pixRadius_ + this.axisWidth_ / 2;
+
     this.line_.clear();
     this.line_.circularArc(
         cx,
@@ -1006,13 +1031,31 @@ anychart.core.axes.Circular.prototype.draw = function() {
         startAngle,
         sweepAngle);
 
+    if (cornersRoundingPix) {
+      x = cx + goog.math.angleDx(startAngle + sweepAngle, outerR);
+      y = cy + goog.math.angleDy(startAngle + sweepAngle, outerR);
+      if (cornersRoundingPix < this.axisWidth_ / 2)
+        this.line_.arcToByEndPoint(x, y, this.axisWidth_ - cornersRoundingPix, this.axisWidth_ - cornersRoundingPix, false, false);
+      else
+        this.line_.arcToByEndPoint(x, y, cornersRoundingPix, cornersRoundingPix, true, false);
+    }
+
     this.line_.circularArc(
         cx,
         cy,
         this.pixRadius_ + this.axisWidth_ / 2,
         this.pixRadius_ + this.axisWidth_ / 2,
         startAngle + sweepAngle,
-        -sweepAngle, true);
+        -sweepAngle, !cornersRoundingPix);
+
+    if (cornersRoundingPix) {
+      x = cx + goog.math.angleDx(startAngle, innerR);
+      y = cy + goog.math.angleDy(startAngle, innerR);
+      if (cornersRoundingPix < this.axisWidth_ / 2)
+        this.line_.arcToByEndPoint(x, y, this.axisWidth_ - cornersRoundingPix, this.axisWidth_ - cornersRoundingPix, false, false);
+      else
+        this.line_.arcToByEndPoint(x, y, cornersRoundingPix, cornersRoundingPix, true, false);
+    }
 
     this.line_.close();
 
@@ -1192,6 +1235,8 @@ anychart.core.axes.Circular.prototype.serialize = function() {
     json['width'] = this.width();
   if (goog.isDef(this.radius()))
     json['radius'] = this.radius();
+  if (goog.isDef(this.cornersRounding()))
+    json['cornersRounding'] = this.cornersRounding();
 
   json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
   json['overlapMode'] = this.overlapMode();
@@ -1233,6 +1278,7 @@ anychart.core.axes.Circular.prototype.setupByJSON = function(config) {
   this.fill(config['fill']);
   this.width(config['width']);
   this.radius(config['radius']);
+  this.cornersRounding(config['cornersRounding']);
 
   this.drawFirstLabel(config['drawFirstLabel']);
   this.drawLastLabel(config['drawLastLabel']);
@@ -1256,6 +1302,7 @@ anychart.core.axes.Circular.prototype['sweepAngle'] = anychart.core.axes.Circula
 anychart.core.axes.Circular.prototype['fill'] = anychart.core.axes.Circular.prototype.fill;
 anychart.core.axes.Circular.prototype['width'] = anychart.core.axes.Circular.prototype.width;
 anychart.core.axes.Circular.prototype['radius'] = anychart.core.axes.Circular.prototype.radius;
+anychart.core.axes.Circular.prototype['cornersRounding'] = anychart.core.axes.Circular.prototype.cornersRounding;
 
 anychart.core.axes.Circular.prototype['drawFirstLabel'] = anychart.core.axes.Circular.prototype.drawFirstLabel;
 anychart.core.axes.Circular.prototype['drawLastLabel'] = anychart.core.axes.Circular.prototype.drawLastLabel;
