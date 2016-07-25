@@ -37,6 +37,14 @@ anychart.core.MapPoint = function(parentMap, currentMap, properties, id) {
 goog.inherits(anychart.core.MapPoint, anychart.core.Point);
 
 
+/** @inheritDoc */
+anychart.core.MapPoint.prototype.get = function(field) {
+  return goog.isFunction(this.chart.data) ?
+      (/** @type {{data:Function}} */(this.chart)).data().get(this.index, field) :
+      undefined;
+};
+
+
 /**
  * Returns point geo id.
  * @return {?string}
@@ -78,3 +86,4 @@ anychart.core.MapPoint.prototype['getId'] = anychart.core.MapPoint.prototype.get
 anychart.core.MapPoint.prototype['getProperties'] = anychart.core.MapPoint.prototype.getProperties;
 anychart.core.MapPoint.prototype['getCurrentChart'] = anychart.core.MapPoint.prototype.getCurrentChart;
 anychart.core.MapPoint.prototype['getParentChart'] = anychart.core.MapPoint.prototype.getParentChart;
+anychart.core.MapPoint.prototype['get'] = anychart.core.MapPoint.prototype.get; // dummy
