@@ -912,6 +912,8 @@ anychart.charts.Map.prototype.defaultSeriesType = function(opt_value) {
  * @param {anychart.core.MouseEvent} event Event object.
  */
 anychart.charts.Map.prototype.tapHandler = function(event) {
+  // showing tooltip like on mouseOver
+  this.handleMouseOverAndMove(event);
   this.isDesktop = false;
   var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
   var bounds = this.getPlotBounds();
