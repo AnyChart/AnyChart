@@ -32,6 +32,9 @@ anychart.ui.chartEditor.steps.ChartType.CSS_CLASS = goog.getCssName('anychart-ch
 anychart.ui.chartEditor.steps.ChartType.CssClass = {};
 
 
+/**
+ * @private
+ */
 anychart.ui.chartEditor.steps.ChartType.prototype.checkDataMapping_ = function() {
   var model = this.getSharedModel();
 
