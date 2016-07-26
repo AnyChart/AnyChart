@@ -10,6 +10,41 @@ goog.provide('anychart.themes.v6');
     return this['sourceColor'];
   };
 
+  /**
+   * @this {*}
+   * @return {*}
+   */
+  var returnDarkenSourceColor = function() {
+    return window['anychart']['color']['darken'](this['sourceColor']);
+  };
+
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
+  var returnLightenSourceColor = function() {
+    return window['anychart']['color']['lighten'](this['sourceColor']);
+  };
+
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
+  var returnStrokeSourceColor = function() {
+    return window['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
+  };
+
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
+  var returnLightenStrokeSourceColor = function() {
+    return window['anychart']['color']['setThickness'](window['anychart']['color']['lighten'](this['sourceColor']), 1.5);
+  };
+
 
   /**
    * @this {*}
@@ -26,6 +61,30 @@ goog.provide('anychart.themes.v6');
    */
   var returnLightenSourceColor30 = function() {
     return window['anychart']['color']['lighten'](this['sourceColor'], 0.3);
+  };
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
+  var returnSourceColor85 = function() {
+    return window['anychart']['color']['setOpacity'](this['sourceColor'], 0.85, true);
+  };
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
+  var returnDashedStrokeSourceColor = function() {
+    return {'color': this['sourceColor'], 'dash': '6 4'};
+  };
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
+  var returnThickenedStrokeSourceColor = function() {
+    return window['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
   };
 
 
@@ -62,6 +121,14 @@ goog.provide('anychart.themes.v6');
    */
   var returnName = function() {
     return this['name'];
+  };
+
+  var returnMilestoneName = function() {
+    if (this['creator']) {
+      return this['index'];
+    } else {
+      return this['isStart'] ? 'S' : 'F';
+    }
   };
 
 
@@ -260,6 +327,15 @@ goog.provide('anychart.themes.v6');
     }
 
     return res;
+  };
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
+  var returnRangeTooltipContentFormatter = function() {
+    return 'High: ' + parseFloat(this['high']).toFixed(2) + '\n' +
+        'Low: ' + parseFloat(this['low']).toFixed(2);
   };
 
 
@@ -1011,6 +1087,159 @@ goog.provide('anychart.themes.v6');
         'enabled': true,
         'titleFormatter': chartA11yTitleFormatter,
         'mode': 'chartElements'
+      },
+      'defaultAnnotationSettings': {
+        'base': {
+          'enabled': true,
+          'fill': returnLightenSourceColor,
+          'stroke': returnSourceColor,
+          'hoverFill': returnDarkenSourceColor,
+          'hoverStroke': returnDarkenSourceColor,
+          'selectFill': returnDarkenSourceColor,
+          'selectStroke': returnDarkenSourceColor,
+          'markers': {
+            'enabled': false,
+            'size': 5,
+            'type': 'square',
+            'fill': '#ffff66',
+            'stroke': '#333333'
+          },
+          'hoverMarkers': {
+            'enabled': null
+          },
+          'selectMarkers': {
+            'enabled': true
+          },
+          'labels': {
+            'enabled': true,
+            'position': 'centerTop',
+            'anchor': 'centerTop',
+            /**
+             * @return {*}
+             * @this {*}
+             */
+            'textFormatter': function() {
+              return this['level'];
+            }
+          },
+          'hoverLabels': {
+            'enabled': null
+          },
+          'selectLabels': {
+            'enabled': null
+          },
+          'color': '#e06666',
+          'allowEdit': true,
+          'hoverGap': 5
+        },
+        'ray': {},
+        'line': {},
+        'infiniteLine': {},
+        'verticalLine': {},
+        'horizontalLine': {},
+        'rectangle': {},
+        'ellipse': {},
+        'triangle': {},
+        'trendChannel': {},
+        'andrewsPitchfork': {},
+        'fibonacciFan': {
+          'levels': [
+            0,
+            0.382,
+            0.5,
+            0.618,
+            1
+          ],
+          'timeLevels': [
+            0,
+            0.382,
+            0.5,
+            0.618,
+            1
+          ]
+        },
+        'fibonacciArc': {
+          'levels': [
+            0.236,
+            0.382,
+            0.5,
+            0.618,
+            0.764,
+            1
+          ]
+        },
+        'fibonacciRetracement': {
+          'levels': [
+            0,
+            0.236,
+            0.382,
+            0.5,
+            0.618,
+            0.764,
+            1,
+            1.236,
+            1.382,
+            1.5,
+            1.618,
+            1.764,
+            2.618,
+            4.236
+          ],
+          'labels': {
+            'position': 'leftCenter',
+            'anchor': 'rightCenter'
+          }
+        },
+        'fibonacciTimezones': {
+          'levels': [
+            0,
+            1,
+            2,
+            3,
+            5,
+            8,
+            13,
+            21,
+            34,
+            55,
+            89,
+            144,
+            233,
+            377,
+            610,
+            987,
+            1597,
+            2584,
+            4181,
+            6765,
+            10946,
+            17711,
+            28657,
+            46368,
+            75025,
+            121393,
+            196418,
+            317811,
+            514229,
+            832040,
+            1346269,
+            2178309,
+            3524578,
+            5702887,
+            9227465,
+            14930352,
+            24157817,
+            39088169
+          ]
+        },
+        'marker': {
+          'type': 'arrowUp',
+          'size': 20,
+          'anchor': 'top',
+          'offsetX': 0,
+          'offsetY': 0
+        },
+        'label': {}
       }
     },
 
@@ -4729,6 +4958,173 @@ goog.provide('anychart.themes.v6');
         }
       }
     },
+    'linearGauge': {
+      'padding': 10,
+      'markerPalette': {
+        'items': ['circle', 'diamond', 'square', 'triangleDown', 'triangleUp', 'triangleLeft', 'triangleRight', 'diagonalCross', 'pentagon', 'cross', 'vline', 'star5', 'star4', 'trapezium', 'star7', 'star6', 'star10']
+      },
+      'globalOffset': '0%',
+      'layout': 'vertical',
+      'tooltip': {
+        'titleFormatter': function() {
+          return this['name'];
+        },
+        'textFormatter': function() {
+          if (this['high'])
+            return returnRangeTooltipContentFormatter.call(this);
+          else
+            return 'Value: ' + this['value'];
+        }
+      },
+      'scales': [
+        {
+          'type': 'linear',
+          'inverted': false,
+          'maximum': null,
+          'minimum': null,
+          'minimumGap': 0.1,
+          'maximumGap': 0.1,
+          'softMinimum': null,
+          'softMaximum': null,
+          'ticks': {
+            'mode': 'linear',
+            'base': 0,
+            'minCount': 4,
+            'maxCount': 6
+          },
+          'minorTicks': {
+            'mode': 'linear',
+            'base': 0,
+            'count': 5
+          },
+          'stackMode': 'none',
+          'stickToZero': true
+        }
+      ],
+
+      'defaultAxisSettings': {
+        'enabled': true,
+        'width': '10%',
+        'offset': '0%'
+      },
+      'defaultScaleBarSettings': {
+        'enabled': true,
+        'width': '10%',
+        'offset': '0%',
+        'from': 'min',
+        'to': 'max',
+        'colorScale': {
+          'type': 'ordinalColor',
+          'inverted': false,
+          'ticks': {
+            'interval': 1
+          }
+        },
+        'points': [
+          {
+            'height': 0,
+            'left': 0,
+            'right': 0
+          },
+          {
+            'height': 1,
+            'left': 0,
+            'right': 0
+          }
+        ]
+      },
+      'defaultPointerSettings': {
+        'base': {
+          'enabled': true,
+          'selectionMode': 'single',
+          'width': '10%',
+          'offset': '0%',
+          'legendItem': {
+            'enabled': true
+          },
+          'label': {
+            'enabled': false,
+            'zIndex': 0,
+            'position': 'top',
+            'anchor': 'center'
+          },
+          'hoverLabel': {
+            'enabled': false,
+            'fontColor': 'yellow'
+          },
+          'selectLabel': {
+            'enabled': false,
+            'fontColor': 'pink'
+          },
+          'stroke': returnStrokeSourceColor,
+          'hoverStroke': returnLightenStrokeSourceColor,
+          'selectStroke': returnDarkenSourceColor,
+          'fill': returnSourceColor,
+          'hoverFill': returnLightenSourceColor,
+          'selectFill': returnDarkenSourceColor
+        },
+        'bar': {},
+        'rangeBar': {
+          'label': {
+            'textFormatter': function() {
+              return this['high'];
+            }
+          }
+        },
+        'marker': {'width': '3%'},
+        'tank': {},
+        'thermometer': {
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'fill': function() {
+            var sourceColor = this['sourceColor'];
+            var darken = window['anychart']['color']['darken'](sourceColor);
+            var key1 = {
+              'color': darken
+            };
+            var key2 = {
+              'color': sourceColor
+            };
+            var key3 = {
+              'color': darken
+            };
+            var isVertical = this['isVertical'];
+            return {
+              'angle': isVertical ? 0 : 90,
+              'keys': [key1, key2, key3]
+            };
+          },
+          'width': '3%',
+          'bulbRadius': '120%',
+          'bulbPadding': '3%'
+        },
+        'led': {
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'dimmer': function(color) {
+            return window['anychart']['color']['darken'](color);
+          },
+          'gap': '1%',
+          'size': '2%',
+          'count': null,
+          'colorScale': {
+            'type': 'ordinalColor',
+            'inverted': false,
+            'ticks': {
+              'interval': 1
+            }
+          }
+        }
+      }
+    },
+    'thermometerGauge': {},
+    'tankGauge': {},
+    'ledGauge': {},
+    'bulletGauge': {},
 
     // merge with chart
     'circularGauge': {
@@ -5226,8 +5622,12 @@ goog.provide('anychart.themes.v6');
         'content': {
           'hAlign': 'left'
         },
-        'textFormatter': function(data) {
-          var name = data['get']('name');
+        /**
+         * @this {*}
+         * @return {string}
+         */
+        'textFormatter': function() {
+          var name = this['name'];
           return (name !== void 0) ? name + '' : '';
         }
       },
@@ -5300,128 +5700,168 @@ goog.provide('anychart.themes.v6');
     },
 
     // merge with chart
-    'gantt': {
-      'base': {
-        'splitterPosition': '30%',
-        'headerHeight': 70,
-        'hoverFill': '#edf8ff',
-        'rowSelectedFill': '#d2eafa',
+    'ganttBase': {
+      'splitterPosition': '30%',
+      'headerHeight': 70,
+      'hoverFill': '#edf8ff',
+      'rowSelectedFill': '#d2eafa',
+      'columnStroke': '#ccd7e1',
+      'rowStroke': '#ccd7e1',
+      'title': {
+        'enabled': false
+      },
+      'credits': {
+        'inChart': true
+      },
+      'background': {
+        'fill': '#fff'
+      },
+      'margin': {
+        'top': 0,
+        'right': 0,
+        'bottom': 0,
+        'left': 0
+      },
+      'padding': {
+        'top': 0,
+        'right': 0,
+        'bottom': 0,
+        'left': 0
+      },
+      'dataGrid': {},
+      'timeline': {
         'columnStroke': '#ccd7e1',
         'rowStroke': '#ccd7e1',
-        'title': {
-          'enabled': false
+        'backgroundFill': 'none',
+        'rowOddFill': '#fff',
+        'rowEvenFill': '#fafafa',
+        'rowFill': '#fff',
+        'hoverFill': '#edf8ff',
+        'rowSelectedFill': '#d2eafa',
+        'zIndex': 5,
+        'headerHeight': 70,
+        'editing': false,
+        'connectorPreviewStroke': {
+          'color': '#0000ff',
+          'dash': '3 3',
+          'opacity': .6
         },
-        'credits': {
-          'inChart': true
+        'editPreviewFill': {
+          'color': '#fff',
+          'opacity': 0.00001
         },
-        'background': {
-          'fill': '#fff'
+        'editProgressFill': '#fff',
+        'editProgressStroke': '#000',
+        'editIntervalThumbFill': '#fff',
+        'editIntervalThumbStroke': '#000',
+        'editConnectorThumbFill': '#fff',
+        'editConnectorThumbStroke': '#000',
+        'editStructurePreviewFill': {
+          'color': '#4285F4',
+          'opacity': 0.2
         },
-        'margin': {
-          'top': 0,
-          'right': 0,
-          'bottom': 0,
-          'left': 0
-        },
-        'padding': {
-          'top': 0,
-          'right': 0,
-          'bottom': 0,
-          'left': 0
-        },
-        'dataGrid': {},
-        'timeline': {
-          'columnStroke': '#ccd7e1',
-          'rowStroke': '#ccd7e1',
-          'backgroundFill': 'none',
-          'rowOddFill': '#fff',
-          'rowEvenFill': '#fafafa',
-          'rowFill': '#fff',
-          'hoverFill': '#edf8ff',
-          'rowSelectedFill': '#d2eafa',
-          'zIndex': 5,
-          'headerHeight': 70,
-          'editing': false,
-          'connectorPreviewStroke': {
-            'color': '#0000ff',
-            'dash': '3 3',
-            'opacity': .6
-          },
-          'editPreviewFill': {
-            'color': '#fff',
-            'opacity': 0.00001
-          },
-          'editProgressFill': '#fff',
-          'editProgressStroke': '#000',
-          'editIntervalThumbFill': '#fff',
-          'editIntervalThumbStroke': '#000',
-          'editConnectorThumbFill': '#fff',
-          'editConnectorThumbStroke': '#000',
-          'editStructurePreviewFill': {
-            'color': '#4285F4',
-            'opacity': 0.2
-          },
 
-          'editStructurePreviewStroke': {
-            'color': '#4285F4',
-            'thickness': 2
-          },
+        'editStructurePreviewStroke': {
+          'color': '#4285F4',
+          'thickness': 2
+        },
 
-          'editStructurePreviewDashStroke': {
-            'color': '#4285F4',
-            'dash': '4 4'
+        'editStructurePreviewDashStroke': {
+          'color': '#4285F4',
+          'dash': '4 4'
+        },
+        'baseFill': {
+          'keys': ['#3CA0DE', '#3085BC'],
+          'angle': -90
+        },
+        'baseStroke': '#0C3F5F',
+        'baselineFill': {
+          'keys': ['#E1E1E1', '#A1A1A1'],
+          'angle': -90
+        },
+        'baselineStroke': '#0C3F5F',
+        'progressFill': {
+          'keys': ['#63FF78', '#3DC351', '#188E2D'],
+          'angle': -90
+        },
+        'progressStroke': '#006616',
+        'milestoneFill': {
+          'keys': ['#FAE096', '#EB8344'],
+          'angle': -90
+        },
+        'milestoneStroke': '#000',
+        'parentFill': {
+          'keys': ['#646464', '#282828'],
+          'angle': -90
+        },
+        'parentStroke': '#000',
+        'selectedElementFill': {
+          'keys': ['#f1b8b9', '#f07578'],
+          'angle': -90
+        },
+        'connectorFill': '#000090',
+        'connectorStroke': '#000090',
+        'minimumGap': 0.1,
+        'maximumGap': 0.1,
+        'baselineAbove': false,
+        'tooltip': {
+          'anchor': 'leftTop',
+          'content': {
+            'hAlign': 'left'
+          }
+        },
+        'labels': {
+          'enabled': true,
+          'anchor': 'leftCenter',
+          'position': 'rightCenter',
+          'padding': {
+            'top': 3,
+            'right': 5,
+            'bottom': 3,
+            'left': 5
           },
-          'baseFill': {
-            'keys': ['#3CA0DE', '#3085BC'],
-            'angle': -90
-          },
-          'baseStroke': '#0C3F5F',
-          'baselineFill': {
-            'keys': ['#E1E1E1', '#A1A1A1'],
-            'angle': -90
-          },
-          'baselineStroke': '#0C3F5F',
-          'progressFill': {
-            'keys': ['#63FF78', '#3DC351', '#188E2D'],
-            'angle': -90
-          },
-          'progressStroke': '#006616',
-          'milestoneFill': {
-            'keys': ['#FAE096', '#EB8344'],
-            'angle': -90
-          },
-          'milestoneStroke': '#000',
-          'parentFill': {
-            'keys': ['#646464', '#282828'],
-            'angle': -90
-          },
-          'parentStroke': '#000',
-          'selectedElementFill': {
-            'keys': ['#f1b8b9', '#f07578'],
-            'angle': -90
-          },
-          'connectorFill': '#000090',
-          'connectorStroke': '#000090',
-          'minimumGap': 0.1,
-          'maximumGap': 0.1,
-          'baselineAbove': false,
-          'tooltip': {
+          'vAlign': 'middle',
+          'textWrap': 'noWrap',
+          'background': null,
+          'rotation': 0,
+          'width': null,
+          'height': null,
+          'fontSize': 11,
+          'minFontSize': 8,
+          'maxFontSize': 72,
+          'zIndex': 40,
+          'disablePointerEvents': true
+        },
+        'markers': {
+          'anchor': 'centerTop',
+          'zIndex': 50,
+          'type': 'star5',
+          'fill': '#ff0',
+          'stroke': '2 red'
+        },
+        'defaultLineMarkerSettings': {
+          'layout': 'vertical',
+          'zIndex': 1.5
+        },
+        'defaultRangeMarkerSettings': {
+          'layout': 'vertical',
+          'zIndex': 1
+        },
+        'defaultTextMarkerSettings': {
+          'layout': 'vertical',
+          'zIndex': 2,
+          'textWrap': 'byLetter'
+        },
+        'header': {
+          'labelsFactory': {
             'anchor': 'leftTop',
-            'content': {
-              'hAlign': 'left'
-            }
-          },
-          'labels': {
-            'enabled': true,
-            'anchor': 'leftCenter',
-            'position': 'rightCenter',
+            'vAlign': 'middle',
             'padding': {
-              'top': 3,
+              'top': 0,
               'right': 5,
-              'bottom': 3,
+              'bottom': 0,
               'left': 5
             },
-            'vAlign': 'middle',
             'textWrap': 'noWrap',
             'background': null,
             'rotation': 0,
@@ -5430,163 +5870,166 @@ goog.provide('anychart.themes.v6');
             'fontSize': 11,
             'minFontSize': 8,
             'maxFontSize': 72,
-            'zIndex': 40,
             'disablePointerEvents': true
-          },
-          'markers': {
-            'anchor': 'centerTop',
-            'zIndex': 50,
-            'type': 'star5',
-            'fill': '#ff0',
-            'stroke': '2 red'
-          },
-          'defaultLineMarkerSettings': {
-            'layout': 'vertical',
-            'zIndex': 1.5
-          },
-          'defaultRangeMarkerSettings': {
-            'layout': 'vertical',
-            'zIndex': 1
-          },
-          'defaultTextMarkerSettings': {
-            'layout': 'vertical',
-            'zIndex': 2,
-            'textWrap': 'byLetter'
-          },
-          'header': {
-            'labelsFactory': {
-              'anchor': 'leftTop',
-              'vAlign': 'middle',
-              'padding': {
-                'top': 0,
-                'right': 5,
-                'bottom': 0,
-                'left': 5
-              },
-              'textWrap': 'noWrap',
-              'background': null,
-              'rotation': 0,
-              'width': null,
-              'height': null,
-              'fontSize': 11,
-              'minFontSize': 8,
-              'maxFontSize': 72,
-              'disablePointerEvents': true
-            }
+          }
 
+        }
+      }
+    },
+
+    'ganttResource': {
+      'dataGrid': {
+        'tooltip': {
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'titleFormatter': function() {
+            return this['name'] || '';
+          },
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'textFormatter': function() {
+            var startDate = this['minPeriodDate'];
+            var endDate = this['maxPeriodDate'];
+            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '');
           }
         }
       },
-      'ganttResource': {
-        'dataGrid': {
-          'tooltip': {
-            /**
-             * @this {*}
-             * @return {string}
-             */
-            'titleFormatter': function() {
-              return this['name'] || '';
-            },
-            /**
-             * @this {*}
-             * @return {string}
-             */
-            'textFormatter': function() {
-              var startDate = this['minPeriodDate'];
-              var endDate = this['maxPeriodDate'];
-              return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
-                  (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '');
-            }
+      'timeline': {
+        'selectedElementStroke': 'none',
+        'tooltip': {
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'titleFormatter': function() {
+            return this['name'] || '';
+          },
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'textFormatter': function() {
+            var startDate = this['periodStart'] || this['minPeriodDate'];
+            var endDate = this['periodEnd'] || this['maxPeriodDate'];
+            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '');
           }
-        },
-        'timeline': {
-          'selectedElementStroke': 'none',
-          'tooltip': {
-            /**
-             * @this {*}
-             * @return {string}
-             */
-            'titleFormatter': function() {
-              return this['name'] || '';
-            },
-            /**
-             * @this {*}
-             * @return {string}
-             */
-            'textFormatter': function() {
-              var startDate = this['periodStart'] || this['minPeriodDate'];
-              var endDate = this['periodEnd'] || this['maxPeriodDate'];
-              return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
-                  (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '');
+        }
+      }
+    },
+    'ganttProject': {
+      'dataGrid': {
+        'tooltip': {
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'titleFormatter': function() {
+            return this['name'] || '';
+          },
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'textFormatter': function() {
+            var startDate = this['actualStart'] || this['autoStart'];
+            var endDate = this['actualEnd'] || this['autoEnd'];
+            var progress = this['progressValue'];
+
+            if (progress === void 0) {
+              var auto = this['autoProgress'] * 100;
+              progress = (Math.round(auto * 100) / 100 || 0) + '%';
             }
+
+            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '') +
+                (progress ? '\nComplete: ' + progress : '');
           }
         }
       },
-      'ganttProject': {
-        'dataGrid': {
-          'tooltip': {
-            /**
-             * @this {*}
-             * @return {string}
-             */
-            'titleFormatter': function() {
-              return this['name'] || '';
-            },
-            /**
-             * @this {*}
-             * @return {string}
-             */
-            'textFormatter': function() {
-              var startDate = this['actualStart'] || this['autoStart'];
-              var endDate = this['actualEnd'] || this['autoEnd'];
-              var progress = this['progressValue'];
+      'timeline': {
+        'selectedElementStroke': '#000',
+        'tooltip': {
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'titleFormatter': function() {
+            return this['name'] || '';
+          },
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'textFormatter': function() {
+            var startDate = this['actualStart'] || this['autoStart'];
+            var endDate = this['actualEnd'] || this['autoEnd'];
+            var progress = this['progressValue'];
 
-              if (progress === void 0) {
-                var auto = this['autoProgress'] * 100;
-                progress = (Math.round(auto * 100) / 100 || 0) + '%';
-              }
-
-              return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
-                  (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '') +
-                  (progress ? '\nComplete: ' + progress : '');
+            if (progress === void 0) {
+              var auto = this['autoProgress'] * 100;
+              progress = (Math.round(auto * 100) / 100 || 0) + '%';
             }
-          }
-        },
-        'timeline': {
-          'selectedElementStroke': '#000',
-          'tooltip': {
-            /**
-             * @this {*}
-             * @return {string}
-             */
-            'titleFormatter': function() {
-              return this['name'] || '';
-            },
-            /**
-             * @this {*}
-             * @return {string}
-             */
-            'textFormatter': function() {
-              var startDate = this['actualStart'] || this['autoStart'];
-              var endDate = this['actualEnd'] || this['autoEnd'];
-              var progress = this['progressValue'];
 
-              if (progress === void 0) {
-                var auto = this['autoProgress'] * 100;
-                progress = (Math.round(auto * 100) / 100 || 0) + '%';
-              }
+            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '') +
+                (progress ? '\nComplete: ' + progress : '');
 
-              return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
-                  (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '') +
-                  (progress ? '\nComplete: ' + progress : '');
-
-            }
           }
         }
       }
     },
 
     'stock': {
+      'grouping': {},
+      'scrollerGrouping': {
+        'levels': [
+          {'unit': 'millisecond', 'count': 1},
+          {'unit': 'millisecond', 'count': 2},
+          {'unit': 'millisecond', 'count': 5},
+          {'unit': 'millisecond', 'count': 10},
+          {'unit': 'millisecond', 'count': 25},
+          {'unit': 'millisecond', 'count': 50},
+          {'unit': 'millisecond', 'count': 100},
+          {'unit': 'millisecond', 'count': 250},
+          {'unit': 'millisecond', 'count': 500},
+          {'unit': 'second', 'count': 1},
+          {'unit': 'second', 'count': 2},
+          {'unit': 'second', 'count': 5},
+          {'unit': 'second', 'count': 10},
+          {'unit': 'second', 'count': 20},
+          {'unit': 'second', 'count': 30},
+          {'unit': 'minute', 'count': 1},
+          {'unit': 'minute', 'count': 2},
+          {'unit': 'minute', 'count': 5},
+          {'unit': 'minute', 'count': 10},
+          {'unit': 'minute', 'count': 20},
+          {'unit': 'minute', 'count': 30},
+          {'unit': 'hour', 'count': 1},
+          {'unit': 'hour', 'count': 2},
+          {'unit': 'hour', 'count': 3},
+          {'unit': 'hour', 'count': 4},
+          {'unit': 'hour', 'count': 6},
+          {'unit': 'hour', 'count': 12},
+          {'unit': 'day', 'count': 1},
+          {'unit': 'day', 'count': 2},
+          {'unit': 'day', 'count': 4},
+          {'unit': 'week', 'count': 1},
+          {'unit': 'week', 'count': 2},
+          {'unit': 'month', 'count': 1},
+          {'unit': 'month', 'count': 2},
+          {'unit': 'month', 'count': 3},
+          {'unit': 'month', 'count': 6},
+          {'unit': 'year', 'count': 1}
+        ],
+        'maxVisiblePoints': NaN,
+        'minPixPerPoint': 1
+      },
       'defaultPlotSettings': {
         'defaultSeriesSettings': {
           'base': {
@@ -6152,6 +6595,8 @@ goog.provide('anychart.themes.v6');
       'tooltip': {
         'enabled': false
       },
+      'horizontalSpacing': '15%',
+      'verticalSpacing': '25%',
       /**
        * @this {*}
        * @return {*}
@@ -6171,6 +6616,7 @@ goog.provide('anychart.themes.v6');
       },
       'milestones': {
         'shape': 'circle',
+        'size': '5%',
         'labels': {
           'enabled': true,
           'anchor': 'leftTop',
@@ -6178,45 +6624,40 @@ goog.provide('anychart.themes.v6');
           'hAlign': 'center',
           'fontColor': '#fff',
           'disablePointerEvents': true,
-          /**
-           * @this {*}
-           * @return {*}
-           */
-          'textFormatter': function() {
-            if (this['creator']) {
-              var name = this['creator'].get('name');
-              return this['isStart'] ? 'Start: ' + name : 'Finish: ' + name;
-            } else {
-              return this['isStart'] ? 'Start' : 'Finish';
-            }
-          }
+          'textFormatter': returnMilestoneName
         },
         'hoverLabels': {
-          'fontColor': '#ff0',
+          'fontColor': '#fff',
           'fontOpacity': 1
         },
         'selectLabels': {
           'fontWeight': 'bold'
         },
-        'fill': {
-          'color': '#64b5f6',
-          'opacity': 0.8
-        },
-        'hoverFill': '#757575',
-        'selectFill': '#333',
+
+        'color': '#64b5f6',
+
+        'fill': returnSourceColor85,
         'stroke': 'none',
-        'hoverStroke': 'none',
-        'selectStroke': 'none',
+
+        'hoverFill': returnLightenSourceColor,
+        'hoverStroke': returnLightenSourceColor,
+
+        'selectFill': '#333 0.85',
+        'selectStroke': '#333 0.85',
+
         'tooltip': {
-          'title': {
-            'enabled': true
-          },
+          'title': {'enabled': true},
+          'separator': {'enabled': true},
           /**
            * @this {*}
            * @return {*}
            */
           'titleFormatter': function() {
-            return 'Event';
+            if (this['creator']) {
+              return 'Milestone - ' + this['index'];
+            } else {
+              return 'Milestone - ' + (this['isStart'] ? 'Start' : 'Finish');
+            }
           },
           /**
            * @this {*}
@@ -6226,13 +6667,15 @@ goog.provide('anychart.themes.v6');
             var result = '';
             var i = 0;
             if (this['successors'] && this['successors'].length) {
-              result += '\nSuccessors:';
+              result += 'Successors:';
               for (i = 0; i < this['successors'].length; i++) {
                 result += '\n - ' + this['successors'][i].get('name');
               }
+              if (this['predecessors'] && this['predecessors'].length)
+                result += '\n\n';
             }
             if (this['predecessors'] && this['predecessors'].length) {
-              result += '\nPredecessors:';
+              result += 'Predecessors:';
               for (i = 0; i < this['predecessors'].length; i++) {
                 result += '\n - ' + this['predecessors'][i].get('name');
               }
@@ -6241,51 +6684,35 @@ goog.provide('anychart.themes.v6');
           }
         }
       },
-
       'tasks': {
-        'fill': 'none',
-        'hoverFill': 'none',
-        'selectFill': 'none',
-        'stroke': 'grey',
-        'hoverStroke': {
-          'color': 'grey',
-          'thickness': 2
-        },
-        'selectStroke': {
-          'color': '#333',
-          'thickness': 2,
-          'opacity': 0.85
-        },
-        'dummyFill': 'none',
-        'hoverDummyFill': 'none',
-        'selectDummyFill': 'none',
-        'dummyStroke': {
-          'color': 'grey',
-          'dash': '4 2'
-        },
-        'hoverDummyStroke': {
-          'color': 'grey',
-          'dash': '4 2',
-          'thickness': 2
-        },
-        'selectDummyStroke': {
-          'color': '#333',
-          'dash': '4 2'
-        },
+        'color': '#64b5f6',
+
+        'fill': returnSourceColor85,
+        'stroke': returnSourceColor85,
+
+        'hoverFill': returnLightenSourceColor,
+        'hoverStroke': returnThickenedStrokeSourceColor,
+
+        'selectFill': '#333 0.85',
+        'selectStroke': '#333 0.85',
+
+        'dummyFill': returnSourceColor85,
+        'dummyStroke': returnDashedStrokeSourceColor,
+
         'upperLabels': {
           'enabled': true,
           'anchor': 'centerBottom',
           'vAlign': 'bottom',
           'hAlign': 'center',
-          'fontSize': 10,
-          'fontOpacity': 0.8,
+          'fontSize': 12,
+          'fontOpacity': 1,
+          'contColor': '#333',
           'padding': {
             'top': 1,
             'right': 0,
             'bottom': 1,
             'left': 0
           },
-          'disablePointerEvents': true,
           /**
            * @this {*}
            * @return {*}
@@ -6294,48 +6721,36 @@ goog.provide('anychart.themes.v6');
             return this['name'];
           }
         },
-        'selectUpperLabels': {
-          'fontWeight': 'bold',
-          'fontSize': 12
-        },
-        'hoverUpperLabels': {
-          'fontWeight': 'bold',
-          'fontOpacity': 1
-        },
+        'hoverUpperLabels': {'fontSize': 13, 'offsetY': 1},
+        'selectUpperLabels': {'fontSize': 13, 'offsetY': 1, 'fontWeight': 'bold'},
+
         'lowerLabels': {
           'enabled': true,
           'anchor': 'centerTop',
           'vAlign': 'top',
           'hAlign': 'center',
-          'fontSize': 10,
-          'fontOpacity': 0.8,
-          'fontColor': '#aaa',
+          'fontSize': 12,
+          'fontOpacity': 1,
+          'contColor': '#333',
           'padding': {
             'top': 1,
             'right': 0,
             'bottom': 1,
             'left': 0
           },
-          'disablePointerEvents': true,
           /**
            * @this {*}
            * @return {*}
            */
           'textFormatter': function() {
-            return 'Duration: ' + this['duration'];
+            return 't: ' + this['duration'];
           }
         },
-        'hoverLowerLabels': {
-          'fontWeight': 'bold',
-          'fontOpacity': 1
-        },
-        'selectLowerLabels': {
-          'fontWeight': 'bold'
-        },
+        'hoverLowerLabels': {'fontSize': 13, 'offsetY': -1},
+        'selectLowerLabels': {'fontSize': 13, 'offsetY': -1, 'fontWeight': 'bold'},
         'tooltip': {
-          'title': {
-            'enabled': true
-          },
+          'title': {'enabled': true},
+          'separator': {'enabled': true},
           /**
            * @this {*}
            * @return {*}
@@ -6360,6 +6775,7 @@ goog.provide('anychart.themes.v6');
       'criticalPath': {
         'milestones': {
           'shape': 'circle',
+          'size': '5%',
           'labels': {
             'enabled': true,
             'anchor': 'leftTop',
@@ -6367,45 +6783,39 @@ goog.provide('anychart.themes.v6');
             'hAlign': 'center',
             'fontColor': '#fff',
             'disablePointerEvents': true,
-            /**
-             * @this {*}
-             * @return {*}
-             */
-            'textFormatter': function() {
-              if (this['creator']) {
-                var name = this['creator'].get('name');
-                return this['isStart'] ? 'Start: ' + name : 'Finish: ' + name;
-              } else {
-                return this['isStart'] ? 'Start' : 'Finish';
-              }
-            }
+            'textFormatter': returnMilestoneName
           },
           'hoverLabels': {
-            'fontColor': '#f90',
+            'fontColor': '#fff',
             'fontOpacity': 1
           },
           'selectLabels': {
             'fontWeight': 'bold'
           },
-          'fill': {
-            'color': '#ef6c00',
-            'opacity': 0.8
-          },
-          'hoverFill': '#757575',
-          'selectFill': '#333',
+
+          'color': '#64b5f6',
+          'fill': returnSourceColor85,
           'stroke': 'none',
-          'hoverStroke': 'none',
-          'selectStroke': 'none',
+
+          'hoverFill': returnLightenSourceColor,
+          'hoverStroke': returnThickenedStrokeSourceColor,
+
+          'selectFill': '#333 0.85',
+          'selectStroke': '#333 0.85',
+
           'tooltip': {
-            'title': {
-              'enabled': true
-            },
+            'title': {'enabled': true},
+            'separator': {'enabled': true},
             /**
              * @this {*}
              * @return {*}
              */
             'titleFormatter': function() {
-              return 'Event on critical path';
+              if (this['creator']) {
+                return 'Milestone - ' + this['index'];
+              } else {
+                return 'Milestone - ' + (this['isStart'] ? 'Start' : 'Finish');
+              }
             },
             /**
              * @this {*}
@@ -6415,13 +6825,15 @@ goog.provide('anychart.themes.v6');
               var result = '';
               var i = 0;
               if (this['successors'] && this['successors'].length) {
-                result += '\nSuccessors:';
+                result += 'Successors:';
                 for (i = 0; i < this['successors'].length; i++) {
                   result += '\n - ' + this['successors'][i].get('name');
                 }
+                if (this['predecessors'] && this['predecessors'].length)
+                  result += '\n\n';
               }
               if (this['predecessors'] && this['predecessors'].length) {
-                result += '\nPredecessors:';
+                result += 'Predecessors:';
                 for (i = 0; i < this['predecessors'].length; i++) {
                   result += '\n - ' + this['predecessors'][i].get('name');
                 }
@@ -6431,106 +6843,78 @@ goog.provide('anychart.themes.v6');
           }
         },
         'tasks': {
-          'fill': 'none',
-          'hoverFill': 'none',
-          'selectFill': 'none',
-          'stroke': '#ef6c00',
-          'hoverStroke': {
-            'color': '#ef6c00',
-            'thickness': 2
-          },
-          'selectStroke': {
-            'color': '#333',
-            'thickness': 2,
-            'opactity': 0.85
-          },
-          'dummyFill': 'none',
-          'hoverDummyFill': 'none',
-          'selectDummyFill': 'none',
-          'dummyStroke': {
-            'color': '#ef6c00',
-            'dash': '4 2'
-          },
-          'hoverDummyStroke': {
-            'color': '#ef6c00',
-            'dash': '4 2',
-            'thickness': 2
-          },
-          'selectDummyStroke': {
-            'color': '#333',
-            'dash': '4 2'
-          },
+          'color': '#e06666',
+
+          'fill': returnSourceColor85,
+          'stroke': returnSourceColor85,
+
+          'hoverFill': returnLightenSourceColor,
+          'hoverStroke': returnThickenedStrokeSourceColor,
+
+          'selectFill': '#333 0.85',
+          'selectStroke': '#333 0.85',
+
+          'dummyFill': returnSourceColor85,
+          'dummyStroke': returnDashedStrokeSourceColor,
+
           'upperLabels': {
             'enabled': true,
             'anchor': 'centerBottom',
             'vAlign': 'bottom',
             'hAlign': 'center',
-            'fontSize': 10,
-            'fontOpacity': 0.8,
-            'fontColor': 'red',
+            'fontSize': 12,
+            'fontOpacity': 1,
+            'contColor': '#333',
             'padding': {
               'top': 1,
               'right': 0,
               'bottom': 1,
               'left': 0
             },
-            'disablePointerEvents': true,
             /**
              * @this {*}
              * @return {*}
              */
             'textFormatter': function() {
-              return 'Crit.: ' + this['name'];
+              return this['name'];
             }
           },
-          'selectUpperLabels': {
-            'fontWeight': 'bold',
-            'fontSize': 12
-          },
-          'hoverUpperLabels': {
-            'fontWeight': 'bold',
-            'fontOpacity': 1
-          },
+          'hoverUpperLabels': {'fontSize': 13, 'offsetY': 1},
+          'selectUpperLabels': {'fontSize': 13, 'offsetY': 1, 'fontWeight': 'bold'},
+
           'lowerLabels': {
             'enabled': true,
             'anchor': 'centerTop',
             'vAlign': 'top',
             'hAlign': 'center',
-            'fontSize': 10,
-            'fontOpacity': 0.8,
-            'fontColor': '#f99',
+            'fontSize': 12,
+            'fontOpacity': 1,
+            'contColor': '#333',
             'padding': {
               'top': 1,
               'right': 0,
               'bottom': 1,
               'left': 0
             },
-            'disablePointerEvents': true,
             /**
              * @this {*}
              * @return {*}
              */
             'textFormatter': function() {
-              return 'Duration: ' + this['duration'];
+              return 't: ' + this['duration'];
             }
           },
-          'hoverLowerLabels': {
-            'fontWeight': 'bold',
-            'fontOpacity': 1
-          },
-          'selectLowerLabels': {
-            'fontWeight': 'bold'
-          },
+          'hoverLowerLabels': {'fontSize': 13, 'offsetY': -1},
+          'selectLowerLabels': {'fontSize': 13, 'offsetY': -1, 'fontWeight': 'bold'},
           'tooltip': {
-            'title': {
-              'enabled': true
-            },
+            'title': {'enabled': true},
+            'separator': {'enabled': true},
             /**
              * @this {*}
              * @return {*}
              */
             'titleFormatter': function() {
-              return 'Critical: ' + this['name'];
+              return this['name'];
             },
             /**
              * @this {*}
@@ -6543,7 +6927,6 @@ goog.provide('anychart.themes.v6');
               if (!isNaN(this['variance'])) result += '\nStandard deviation: ' + Math.round(this['variance'] * 100) / 100;
               return result;
             }
-            //'textFormatter': 'Earliest start: {%EarliestStart}\nEarliest finish: {%EarliestFinish}\nLatest start: {%LatestStart}\nLatest finish: {%LatestFinish}\nDuration: {%Duration}\nSlack: {%Slack}'
           }
         }
       }

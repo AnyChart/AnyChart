@@ -321,7 +321,7 @@ anychart.core.axes.Linear.prototype.labelsInvalidated_ = function(event) {
     state = this.ALL_VISUAL_STATES;
     signal = anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW;
   } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
-    state = anychart.ConsistencyState.AXIS_LABELS;
+    state = anychart.ConsistencyState.AXIS_LABELS | anychart.ConsistencyState.AXIS_TICKS;
     signal = anychart.Signal.NEEDS_REDRAW;
   }
   this.dropStaggeredLabelsCache_();

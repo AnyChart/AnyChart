@@ -7,15 +7,14 @@ goog.require('goog.ui.PopupBase.EventType');
 
 /**
  * @param {anychart.ui.chartEditor.Dialog} editor
- * @param {anychart.ui.chartEditor.steps.Base.Model} model
  * @constructor
  */
-anychart.ui.chartEditor.Controller = function(editor, model) {
+anychart.ui.chartEditor.Controller = function(editor) {
   /**
    * @type {anychart.ui.chartEditor.steps.Base.Model}
    * @private
    */
-  this.model_ = model;
+  this.model_ = null;
 
   /**
    * @type {anychart.ui.chartEditor.Dialog}
@@ -43,6 +42,16 @@ anychart.ui.chartEditor.Controller = function(editor, model) {
 
   // public events
   goog.events.listen(editor, anychart.enums.EventType.COMPLETE, this.onComplete_, false, this);
+};
+
+
+/**
+ *
+ * @param {anychart.ui.chartEditor.steps.Base.Model} value
+ */
+anychart.ui.chartEditor.Controller.prototype.setModel = function(value) {
+  this.model_ = value;
+  this.settingsMap_ = {};
 };
 
 

@@ -1910,8 +1910,18 @@
         "tasks": {"$ref": "#/definitions/tasks"},
         "criticalPath": {"$ref": "#/definitions/criticalPath"},
 
-        "horizontalSpacing": ["number", "string"],
-        "verticalSpacing": ["number", "string"]
+        "horizontalSpacing": {
+          "type":[
+            "number",
+            "string"
+          ]
+        },
+        "verticalSpacing": {
+          "type":[
+            "number",
+            "string"
+          ]
+        }
       },
       "required": ["type"]
     },

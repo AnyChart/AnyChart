@@ -60,7 +60,7 @@ anychart.ui.chartEditor.Dialog = function(opt_class, opt_useIframeMask, opt_domH
     dataSets: [],
     dataMappings: [],
     seriesMappings: {},
-    chartMapping: {},
+    chartMapping: 0,
     lastSeriesId: 0,
 
     presets: {},
@@ -76,23 +76,16 @@ anychart.ui.chartEditor.Dialog = function(opt_class, opt_useIframeMask, opt_domH
     seriesType: 'column'
   });
 
+  this.controller_ = new anychart.ui.chartEditor.Controller(this);
+
   this.setTitle('Chart Editor');
   this.setButtonSet(null);
 
-  var dataStep = new anychart.ui.chartEditor.steps.Data();
-  dataStep.setSharedModel(this.sharedModel_);
-  this.addChild(dataStep);
+  this.addChild(new anychart.ui.chartEditor.steps.Data());
+  this.addChild(new anychart.ui.chartEditor.steps.ChartType());
+  this.addChild(new anychart.ui.chartEditor.steps.Settings());
 
-  var typeStep = new anychart.ui.chartEditor.steps.ChartType();
-  typeStep.setSharedModel(this.sharedModel_);
-  this.addChild(typeStep);
-
-  var settingsStep = new anychart.ui.chartEditor.steps.Settings();
-  settingsStep.setSharedModel(this.sharedModel_);
-  this.addChild(settingsStep);
-
-  this.controller_ = new anychart.ui.chartEditor.Controller(this, this.sharedModel_);
-
+  this.updateModelInSteps_();
   this.updateStepsDescriptors_();
 
   this.sharedModel_.presets = {
@@ -479,6 +472,7 @@ anychart.ui.chartEditor.Dialog.prototype.getCurrentStep_ = function() {
  * @private
  */
 anychart.ui.chartEditor.Dialog.prototype.setCurrentStep_ = function(step, doAnimation) {
+  if (!this.isInDocument()) return;
   if (!step || step.isInDocument()) {
     return;
   }
@@ -510,12 +504,12 @@ anychart.ui.chartEditor.Dialog.prototype.setCurrentStep_ = function(step, doAnim
     step.setParentEventTarget(this);
     this.sharedModel_.currentStep.isVisited = true;
 
-    if (doAnimation) {
-      var stepAnimation = new goog.fx.AnimationSerialQueue();
-      var startCoordX = animationForward ? contentWidth : -contentWidth;
-      stepAnimation.add(new goog.fx.dom.Slide(step.getElement(), [startCoordX, 0], [0, 0], 300));
-      stepAnimation.play();
-    }
+    var stepAnimation = new goog.fx.AnimationSerialQueue();
+    var startCoordX = doAnimation ?
+        animationForward ? contentWidth : -contentWidth :
+        0;
+    stepAnimation.add(new goog.fx.dom.Slide(step.getElement(), [startCoordX, 0], [0, 0], 300));
+    stepAnimation.play();
   }
 };
 
@@ -618,7 +612,7 @@ anychart.ui.chartEditor.Dialog.prototype.updateStepsDescriptors_ = function() {
 anychart.ui.chartEditor.Dialog.prototype.data = function(var_args) {
   if (!goog.isDef(window['anychart']['data'])) return;
   if (!arguments.length) return;
-  this.sharedModel_.dataSets.length = 0;
+  this.resetSharedModel_();
 
   for (var i = 0; i < arguments.length; i++) {
     if (goog.isArrayLike(arguments[i])) {
@@ -632,7 +626,47 @@ anychart.ui.chartEditor.Dialog.prototype.data = function(var_args) {
     }
   }
 
+  this.setCurrentStepIndex_(0, goog.isObject(this.currentStep_));
   this.update();
+};
+
+
+/**
+ *
+ * @private
+ */
+anychart.ui.chartEditor.Dialog.prototype.resetSharedModel_ = function() {
+  this.sharedModel_.dataSets.length = 0;
+  this.sharedModel_.dataMappings.length = 0;
+  this.sharedModel_.seriesMappings = {};
+  this.sharedModel_.chartMapping = 0;
+  this.sharedModel_.lastSeriesId = 0;
+
+  this.sharedModel_.presetCategory = 'column';
+  this.sharedModel_.presetType = 'column';
+  this.sharedModel_.presetSettings.length = 0;
+
+  if (this.sharedModel_.chart) this.sharedModel_.chart.dispose();
+  this.sharedModel_.chart = null;
+  this.sharedModel_.isSeriesBased = true;
+  this.sharedModel_.chartContainer = null;
+  this.sharedModel_.chartConstructor = 'column';
+  this.sharedModel_.seriesType = 'column';
+
+  this.updateModelInSteps_();
+};
+
+
+/**
+ * Update shared model in all steps.
+ * @private
+ */
+anychart.ui.chartEditor.Dialog.prototype.updateModelInSteps_ = function() {
+  this.forEachChild(function(step) {
+    step.setSharedModel(this.sharedModel_);
+  }, this);
+
+  this.controller_.setModel(this.sharedModel_);
 };
 
 

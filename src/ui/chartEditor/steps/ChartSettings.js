@@ -15,7 +15,6 @@ goog.require('goog.dom.classlist');
 anychart.ui.chartEditor.steps.Settings = function(opt_domHelper) {
   anychart.ui.chartEditor.steps.Settings.base(this, 'constructor', opt_domHelper);
 
-
   this.setName('Chart Settings');
   this.setTitle('Chart Settings');
 };

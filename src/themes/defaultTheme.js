@@ -3201,7 +3201,7 @@ goog.provide('anychart.themes.defaultTheme');
            */
           'fill': function() {
             var sourceColor = this['sourceColor'];
-            var darken = anychart.color.darken(sourceColor);
+            var darken = window['anychart']['color']['darken'](sourceColor);
             var key1 = {
               'color': darken
             };
@@ -3227,7 +3227,7 @@ goog.provide('anychart.themes.defaultTheme');
            * @return {*}
            */
           'dimmer': function(color) {
-            return anychart.color.darken(color);
+            return window['anychart']['color']['darken'](color);
           },
           'gap': '1%',
           'size': '2%',

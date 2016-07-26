@@ -51,7 +51,7 @@ anychart.core.utils.GeoJSONParser.prototype.parse = function(data) {
       } else {
         var geometries = data['geometries'];
         for (i = 0, len = geometries.length; i < len; i++) {
-          objects.push(this.parseGeometry_(geometries[i], null));
+          objects.push(this.parseGeometry_(geometries[i], geometries[i]['properties']));
         }
       }
       break;
@@ -217,7 +217,7 @@ anychart.core.utils.GeoJSONParser.prototype.parseGeometry_ = function(geojsonGeo
         var geoms = [];
         var geometries = geojsonGeometry['geometries'];
         for (i = 0, len = geometries.length; i < len; i++) {
-          obj = this.parseGeometry_(geometries[i], null);
+          obj = this.parseGeometry_(geometries[i], geometries[i]['properties']);
           if (goog.isDef(obj)) {
             geoms.push(obj);
           } else {

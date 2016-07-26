@@ -941,14 +941,14 @@ anychart.charts.Pert.prototype.calculateActivity_ = function(id) {
     var opt = Number(workData.item.get(anychart.enums.DataField.OPTIMISTIC));
     var pess = Number(workData.item.get(anychart.enums.DataField.PESSIMISTIC));
     //Can be NaN
-    this.activitiesMap_[id].variance = Math.pow(((pess - opt) / 6), 2);
+    this.activitiesMap_[id].variance = anychart.math.round(Math.pow(((pess - opt) / 6), 2), 3);
   }
 
   var activity = this.activitiesMap_[id];
 
   if (!goog.isDef(activity.duration)) {
     var formatProvider = this.createFormatProvider(false, workData, activity);
-    activity.duration = this.expectedTimeCalculator_.call(formatProvider, formatProvider);
+    activity.duration = anychart.math.round(this.expectedTimeCalculator_.call(formatProvider, formatProvider), 3);
   }
 
   var duration = activity.duration;
@@ -967,8 +967,8 @@ anychart.charts.Pert.prototype.calculateActivity_ = function(id) {
       var predActivityEF = this.activitiesMap_[predId].earliestFinish;
       max = Math.max(max, predActivityEF);
     }
-    activity.earliestStart = max;
-    activity.earliestFinish = max + duration;
+    activity.earliestStart = anychart.math.round(max, 3);
+    activity.earliestFinish = anychart.math.round(max + duration, 3);
   }
 
 
@@ -999,9 +999,9 @@ anychart.charts.Pert.prototype.calculateActivity_ = function(id) {
       }
       this.statistics[anychart.enums.Statistics.PERT_CHART_PROJECT_DURATION] = val;
     }
-    activity.latestFinish = val;
-    activity.latestStart = val - duration;
-    activity.slack = val - activity.earliestFinish;
+    activity.latestFinish = anychart.math.round(val, 3);
+    activity.latestStart = anychart.math.round(val - duration, 3);
+    activity.slack = anychart.math.round(val - activity.earliestFinish, 3);
   }
 
 };
