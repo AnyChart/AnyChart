@@ -1084,7 +1084,7 @@ anychart.core.ui.LabelsFactory.prototype.getDimension = function(formatProviderO
     this.measureTextElement_ = acgraph.text();
     this.measureTextElement_.attr('aria-hidden', 'true');
   }
-  text = this.callTextFormatter(this.textFormatter_, formatProvider, opt_cacheIndex);
+  text = this.callTextFormatter(textFormatter, formatProvider, opt_cacheIndex);
   this.measureTextElement_.width(null);
   this.measureTextElement_.height(null);
   if (isHtml) {

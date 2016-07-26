@@ -572,7 +572,7 @@ anychart.core.ui.Callout.prototype.getPixelBounds = function() {
         var label = new anychart.core.ui.LabelsFactory.Label();
         this.configureLabel(item, label);
         label.parentLabelsFactory().dropCallsCache();
-        var labelBounds = label.parentLabelsFactory().measure(label);
+        var labelBounds = label.getFinalSettings('enabled') ? label.parentLabelsFactory().measure(label) : anychart.math.rect(0, 0, 0, 0);
         label.parentLabelsFactory().dropCallsCache();
 
         if (labelBounds.height > maxLabelSize)
@@ -646,12 +646,12 @@ anychart.core.ui.Callout.prototype.getPixelBounds = function() {
       var itemSize;
       if (autoLength && !autoSize) {
         itemSize = size - (affectSize ? titleSize : 0);
-        length = Math.min(itemSize * itemsCount + (affectLength ? titleLength : 0), parentLength);
+        length = Math.min(affectLength ? itemSize * itemsCount + titleLength : Math.max(itemSize * itemsCount, titleLength), parentLength);
         this.internalItemLength_ = (length - (affectLength ? titleLength : 0)) / itemsCount;
         this.internalItemSize_ = itemSize;
       } else if (!autoLength && autoSize) {
         itemSize = (length - (affectLength ? titleLength : 0)) / itemsCount;
-        size = Math.min(itemSize + (affectSize ? titleSize : 0), parentSize);
+        size = Math.min(affectSize ? itemSize + titleSize : Math.max(itemSize, titleSize), parentSize);
         this.internalItemLength_ = itemSize;
         this.internalItemSize_ = size - (affectSize ? titleSize : 0);
       } else if (autoLength && autoSize) {
@@ -664,7 +664,7 @@ anychart.core.ui.Callout.prototype.getPixelBounds = function() {
           itemSize = Math.max(l, s);
         }
 
-        length = (itemSize * itemsCount) + (affectLength ? titleLength : 0);
+        length = affectLength ? (itemSize * itemsCount) + titleLength : Math.max(itemSize * itemsCount, titleLength);
         size = affectSize ? (itemSize + titleSize) : Math.max(itemSize, titleSize);
         this.internalItemLength_ = itemSize;
         this.internalItemSize_ = itemSize;
@@ -893,7 +893,9 @@ anychart.core.ui.Callout.prototype.configureLabel = function(item, label, opt_po
   }
 
   var parentSettings = this.labels().getChangedSettings();
+  parentSettings['enabled'] = this.labels().enabled();
   var currentSettings = calloutLabelsFactory.getChangedSettings();
+  currentSettings['enabled'] = goog.isNull(calloutLabelsFactory.enabled()) ? parentSettings['enabled'] : calloutLabelsFactory.enabled();
 
   label.setSettings(parentSettings, goog.object.extend(label.superSettingsObj, currentSettings));
 
@@ -948,6 +950,9 @@ anychart.core.ui.Callout.prototype.calculateLabels = function() {
     var label = labels.add(null, null);
 
     this.configureLabel(item, label);
+
+    if (!label.getFinalSettings('enabled'))
+      continue;
 
     var positionProvider = label.positionProvider();
 
@@ -1138,9 +1143,9 @@ anychart.core.ui.Callout.prototype.draw = function() {
     for (var i = 0, len = this.labels().labelsCount(); i < len; i++) {
       var label = this.labels().getLabel(i);
       var connector = label.getConnectorElement();
-      var item = this.processedItems_[i];
       label.parentLabelsFactory().dropCallsCache();
-      connector.clip(this.chart.getPlotBounds());
+      if (connector)
+        connector.clip(this.chart.getPlotBounds());
     }
     this.markConsistent(anychart.ConsistencyState.CALLOUT_LABELS);
   }
