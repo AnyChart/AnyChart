@@ -1113,7 +1113,7 @@ anychart.charts.Pert.prototype.createAllMilestones_ = function() {
         var predWork = this.worksMap_[predId];
         if (!predWork.startMilestone)
           predWork.startMilestone = this.createEmptyMilestone_(predWork, true, 'Start: ' + predWork.item.get(anychart.enums.DataField.NAME));
-        if (!succWork.finishMilestone)
+        if (!predWork.finishMilestone)
           predWork.finishMilestone = this.createEmptyMilestone_(predWork, false, 'Finish: ' + predWork.item.get(anychart.enums.DataField.NAME));
         this.addMilestoneSuccessors_(work.startMilestone, predWork.finishMilestone);
       }
