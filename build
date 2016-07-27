@@ -778,7 +778,7 @@ def __build_release():
     __build_product_package(
         os.path.join(OUT_PATH, 'AnyGantt' + '-' + short_version),
         'anygantt',
-        lambda name: name.startswith('Gantt')
+        lambda name: name.startswith('Gantt') or name.startswith('Pert')
     )
 
     print "    Build AnyStock install packages"
@@ -792,14 +792,14 @@ def __build_release():
     __build_product_package(
         os.path.join(OUT_PATH, 'AnyMap' + '-' + short_version),
         'anymap',
-        lambda name: name.startswith('Maps') and name != 'Maps_in_Dashboard'
+        lambda name: (name.startswith('Maps') or name.startswith('Seat')) and name != 'Maps_in_Dashboard'
     )
 
     print "    Build AnyChart install packages"
     __build_product_package(
         os.path.join(OUT_PATH, 'AnyChart' + '-' + short_version),
         'anychart',
-        lambda name: not name.startswith('Gantt') and not name.startswith('Maps') and not name.startswith('Stock')
+        lambda name: not name.startswith('Gantt') and not name.startswith('Maps') and not name.startswith('Stock') and not name.startswith('Pert') and not name.startswith('Graphics')
     )
 
     #rm gallery demos dir
