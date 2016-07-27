@@ -3386,7 +3386,10 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     for (i = this.series_.length; i--;) {
       this.series_[i].invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
     }
-    this.invalidate(anychart.ConsistencyState.MAP_LABELS, anychart.Signal.NEEDS_REDRAW);
+    var state = anychart.ConsistencyState.MAP_LABELS;
+    if (this.isSvgGeoData())
+      state |= anychart.ConsistencyState.APPEARANCE;
+    this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_ZOOM)) {
