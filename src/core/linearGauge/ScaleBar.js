@@ -438,8 +438,6 @@ anychart.core.linearGauge.ScaleBar.prototype.draw = function() {
   var stage = container ? container.getStage() : null;
   var i;
 
-  stage.suspend();
-
   if (!this.rootLayer) {
     this.rootLayer = acgraph.layer();
   }
@@ -609,8 +607,6 @@ anychart.core.linearGauge.ScaleBar.prototype.draw = function() {
 
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
-
-  stage.resume();
 
   return this;
 };
