@@ -3752,8 +3752,14 @@ anychart.core.series.Base.prototype.serialize = function() {
 
   if (this.supportsLabels()) {
     json['labels'] = this.labels().serialize();
-    json['hoverLabels'] = this.hoverLabels().serialize();
-    json['selectLabels'] = this.selectLabels().serialize();
+    json['hoverLabels'] = this.hoverLabels().getChangedSettings();
+    json['selectLabels'] = this.selectLabels().getChangedSettings();
+    if (goog.isNull(json['hoverLabels']['enabled'])) {
+      delete json['hoverLabels']['enabled'];
+    }
+    if (goog.isNull(json['selectLabels']['enabled'])) {
+      delete json['selectLabels']['enabled'];
+    }
   }
 
   if (this.supportsMarkers()) {

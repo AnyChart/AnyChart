@@ -713,7 +713,7 @@ anychart.data.View.prototype.serializeRow = function(index) {
       }
     }
     for (key in row) {
-      if (row.hasOwnProperty(key) && !(key in mapping)) {
+      if (row.hasOwnProperty(key) && !(key in mapping && key in rowObject)) {
         val = row[key];
         if (val instanceof Date)
           val = val.getTime();

@@ -1091,6 +1091,8 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
       return ['inverted_list', 'inverted'];
     case 'drillTo':
       return ['drill_to', 'item'];
+    case 'extraClassNames':
+      return ['extra_class_names', 'class_name'];
   }
   return null;
 };
@@ -1172,6 +1174,8 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
       return ['colorScales', 'scale'];
     case 'drillTo':
       return ['drillTo', 'item'];
+    case 'extraClassNames':
+      return ['extraClassNames', 'className'];
   }
   return null;
 };

@@ -786,7 +786,7 @@ anychart.core.ui.MarkersFactory.prototype.serialize = function() {
   if (this.changedSettings['offsetX']) json['offsetX'] = this.offsetX();
   if (this.changedSettings['offsetY']) json['offsetY'] = this.offsetY();
   if (this.changedSettings['type']) json['type'] = this.type();
-  if (this.changedSettings['rotation']) json['rotation'] = this.rotation();
+  if (this.changedSettings['rotation']) json['rotation'] = isNaN(this.rotation()) ? null : this.rotation();
   if (goog.isDef(this.size())) json['size'] = this.size();
   if (this.changedSettings['fill'] && goog.isDef(this.fill_))
     json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill_));
@@ -1468,7 +1468,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.applyDefaultsForSingle_ = funct
 anychart.core.ui.MarkersFactory.Marker.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   if (goog.isDef(this.position())) json['position'] = this.position();
-  if (goog.isDef(this.rotation())) json['rotation'] = this.rotation();
+  if (goog.isDef(this.rotation())) json['rotation'] = isNaN(this.rotation()) ? null : this.rotation();
   if (goog.isDef(this.anchor())) json['anchor'] = this.anchor();
   if (goog.isDef(this.offsetX())) json['offsetX'] = this.offsetX();
   if (goog.isDef(this.offsetY())) json['offsetY'] = this.offsetY();

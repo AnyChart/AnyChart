@@ -508,14 +508,16 @@ anychart.core.scatter.series.Marker.prototype.getType = function() {
 anychart.core.scatter.series.Marker.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
-  if (goog.isFunction(this.type())) {
-    anychart.core.reporting.warning(
-        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-        null,
-        ['Marker type']
-    );
-  } else {
-    json['type'] = this.type();
+  if (goog.isDef(this.type_)) {
+    if (goog.isFunction(this.type_)) {
+      anychart.core.reporting.warning(
+          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+          null,
+          ['Marker type']
+      );
+    } else {
+      json['type'] = this.type_;
+    }
   }
 
   if (goog.isFunction(this.hoverType())) {

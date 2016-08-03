@@ -2970,9 +2970,15 @@ anychart.charts.TreeMap.prototype.serialize = function() {
   json['sort'] = this.sort();
 
   json['labels'] = this.labels().serialize();
-  json['hoverLabels'] = this.hoverLabels().serialize();
-  json['selectLabels'] = this.selectLabels().serialize();
+  json['hoverLabels'] = this.hoverLabels().getChangedSettings();
+  json['selectLabels'] = this.selectLabels().getChangedSettings();
   json['labelsDisplayMode'] = this.labelsDisplayMode();
+  if (goog.isNull(json['hoverLabels']['enabled'])) {
+    delete json['hoverLabels']['enabled'];
+  }
+  if (goog.isNull(json['selectLabels']['enabled'])) {
+    delete json['selectLabels']['enabled'];
+  }
 
   json['headers'] = this.headers().serialize();
   json['hoverHeaders'] = this.hoverHeaders().serialize();

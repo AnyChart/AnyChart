@@ -1,8 +1,6 @@
 goog.provide('anychart.core.radar.series.Base');
 goog.require('acgraph');
-goog.require('anychart.color');
 goog.require('anychart.core.SeriesBase');
-goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.SeriesPointContextProvider');
 goog.require('anychart.data');
 goog.require('anychart.enums');
@@ -722,80 +720,6 @@ anychart.core.radar.series.Base.prototype.getEnableChangeSignals = function() {
 anychart.core.radar.series.Base.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['seriesType'] = this.getType();
-  json['color'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.color()));
-  if (goog.isDef(this.name()))
-    json['name'] = this.name();
-  json['data'] = this.data().serialize();
-  json['labels'] = this.labels().serialize();
-  json['hoverLabels'] = this.hoverLabels().serialize();
-  json['legendItem'] = this.legendItem().serialize();
-  if (goog.isFunction(this['fill'])) {
-    if (goog.isFunction(this.fill())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Series fill']
-      );
-    } else {
-      json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
-    }
-  }
-  if (goog.isFunction(this['hoverFill'])) {
-    if (goog.isFunction(this.hoverFill())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Series hoverFill']
-      );
-    } else {
-      json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFill()));
-    }
-  }
-  if (goog.isFunction(this['stroke'])) {
-    if (goog.isFunction(this.stroke())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Series stroke']
-      );
-    } else {
-      json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
-    }
-  }
-  if (goog.isFunction(this['hoverStroke'])) {
-    if (goog.isFunction(this.hoverStroke())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Series hoverStroke']
-      );
-    } else {
-      json['hoverStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverStroke()));
-    }
-  }
-  if (goog.isFunction(this['hatchFill'])) {
-    if (goog.isFunction(this.hatchFill())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Series hatchFill']
-      );
-    } else {
-      json['hatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hatchFill()));
-    }
-  }
-  if (goog.isFunction(this['hoverHatchFill'])) {
-    if (goog.isFunction(this.hoverHatchFill())) {
-      anychart.core.reporting.warning(
-          anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
-          null,
-          ['Series hoverHatchFill']
-      );
-    } else {
-      json['hoverHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/
-          (this.hoverHatchFill()));
-    }
-  }
   return json;
 };
 
@@ -805,25 +729,6 @@ anychart.core.radar.series.Base.prototype.serialize = function() {
  */
 anychart.core.radar.series.Base.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  if (goog.isFunction(this['fill']))
-    this.fill(config['fill']);
-  if (goog.isFunction(this['hoverFill']))
-    this.hoverFill(config['hoverFill']);
-  if (goog.isFunction(this['stroke']))
-    this.stroke(config['stroke']);
-  if (goog.isFunction(this['hoverStroke']))
-    this.hoverStroke(config['hoverStroke']);
-  if (goog.isFunction(this['hatchFill']))
-    this.hatchFill(config['hatchFill']);
-  if (goog.isFunction(this['hoverHatchFill']))
-    this.hoverHatchFill(config['hoverHatchFill']);
-  this.color(config['color']);
-  this.name(config['name']);
-  this.meta(config['meta']);
-  if ('data' in config)
-    this.data(config['data'] || null);
-  this.labels(config['labels']);
-  this.legendItem(config['legendItem']);
 };
 
 

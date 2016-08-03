@@ -1727,8 +1727,10 @@ anychart.charts.Map.prototype.createSeriesByType_ = function(type, data, opt_csv
   var ctl;
   type = ('' + type).toLowerCase();
   for (var i in anychart.core.map.series.Base.SeriesTypesMap) {
-    if (i.toLowerCase() == type)
+    if (i.toLowerCase() == type) {
       ctl = anychart.core.map.series.Base.SeriesTypesMap[i];
+      break;
+    }
   }
   var instance;
 
@@ -3555,7 +3557,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
 
       series.suspendSignalsDispatching();
       series.setParentEventTarget(this.getRootScene());
-      // series.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
+      series.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
       series.setAutoGeoIdField(/** @type {string} */(this.geoIdField()));
       var seriesIndex = /** @type {number} */ (series.index());
       series.setAutoColor(this.palette().itemAt(seriesIndex));
@@ -3607,6 +3609,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
       this.applyLabelsOverlapState_[seriesType] = this.applyLabelsOverlapState_[seriesType] || !series.isConsistent();
 
       series.suspendSignalsDispatching();
+      series.setParentEventTarget(this.getRootScene());
       series.setAutoGeoIdField(/** @type {string} */(this.geoIdField()));
       series.draw();
       series.resumeSignalsDispatching(false);
@@ -5086,7 +5089,9 @@ anychart.charts.Map.prototype.serialize = function() {
   } else {
     geoData = JSON.stringify(this.geoData_);
   }
-  json['geoData'] = geoData;
+
+  if (goog.isDef(geoData))
+    json['geoData'] = geoData;
 
   json['crsAnimation'] = this.crsAnimation().serialize();
   if (goog.isObject(this.crs_)) {

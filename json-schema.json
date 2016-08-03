@@ -2258,7 +2258,8 @@
               {"$ref": "#/definitions/disable"},
               {"$ref": "#/definitions/anychart.core.map.series.Choropleth"},
               {"$ref": "#/definitions/anychart.core.map.series.Bubble"},
-              {"$ref": "#/definitions/anychart.core.map.series.Connector"}
+              {"$ref": "#/definitions/anychart.core.map.series.Connector"},
+              {"$ref": "#/definitions/anychart.core.map.series.Marker"}
             ]
           }
         },
@@ -5494,6 +5495,12 @@
       "properties": {
         "enabled": {
           "type": "boolean"
+        },
+        "extraClassNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

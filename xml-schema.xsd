@@ -368,7 +368,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="series_list" type="Map_series_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="color_scales" type="ColorScale_list"/>
 
-            <xsd:element minOccurs="0" maxOccurs="1" name="geo_data" type="GeoData"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="geo_data" type="xsd:anyType"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="drill_down_map" type="DrillDownMap"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="a11y" type="utils.A11y"/>
         </xsd:all>
@@ -580,13 +580,6 @@
     </xsd:complexType>
 
     <xsd:complexType name="DrillDownMap">
-        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-            <xsd:any processContents="skip"/>
-        </xsd:sequence>
-        <xsd:anyAttribute processContents="skip"/>
-    </xsd:complexType>
-
-    <xsd:complexType name="GeoData">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:any processContents="skip"/>
         </xsd:sequence>
@@ -1231,7 +1224,7 @@
         <xsd:attribute name="offset_x" type="xsd:double" default="0"/>
         <xsd:attribute name="offset_y" type="xsd:double" default="0"/>
         <xsd:attribute name="type" type="enums.MarkerType"/>
-        <xsd:attribute name="rotation" type="xsd:double"/>
+        <xsd:attribute name="rotation" type="simple.DoubleOrNull"/>
         <xsd:attribute name="size" type="xsd:double"/>
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
@@ -1648,7 +1641,16 @@
     </xsd:complexType>
 
     <xsd:complexType name="utils.ContextMenu">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="extra_class_names" type="Extra_class_names_list"/>
+        </xsd:all>
         <xsd:attribute name="enabled" type="simple.Bool"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Extra_class_names_list">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="class_name" type="xsd:string"/>
+        </xsd:sequence>
     </xsd:complexType>
 
     <xsd:complexType name="utils.Interactivity">
@@ -2598,6 +2600,29 @@
         </xsd:union>
     </xsd:simpleType>
 
+    <xsd:simpleType name="simple.NumberOrPercentOrNullOrPx">
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:pattern value="-?[0-9]*\.?[0-9]+%"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:pattern value="-?[0-9]*\.?[0-9]+px"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="null"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:double"/>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
     <xsd:simpleType name="simple.NumberOrPercentOrNullOrBool">
         <xsd:union>
             <xsd:simpleType>
@@ -2996,6 +3021,7 @@
             <xsd:enumeration value="bubble"/>
             <xsd:enumeration value="choropleth"/>
             <xsd:enumeration value="connector"/>
+            <xsd:enumeration value="marker"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -3205,16 +3231,16 @@
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="attrs.Bounds">
-        <xsd:attribute name="left" type="simple.NumberOrPercentOrNull"/>
-        <xsd:attribute name="right" type="simple.NumberOrPercentOrNull"/>
-        <xsd:attribute name="top" type="simple.NumberOrPercentOrNull"/>
-        <xsd:attribute name="bottom" type="simple.NumberOrPercentOrNull"/>
-        <xsd:attribute name="width" type="simple.NumberOrPercentOrNull"/>
-        <xsd:attribute name="height" type="simple.NumberOrPercentOrNull"/>
-        <xsd:attribute name="min_width" type="simple.NumberOrPercentOrNull"/>
-        <xsd:attribute name="min_height" type="simple.NumberOrPercentOrNull"/>
-        <xsd:attribute name="max_width" type="simple.NumberOrPercentOrNull"/>
-        <xsd:attribute name="max_height" type="simple.NumberOrPercentOrNull"/>
+        <xsd:attribute name="left" type="simple.NumberOrPercentOrNullOrPx"/>
+        <xsd:attribute name="right" type="simple.NumberOrPercentOrNullOrPx"/>
+        <xsd:attribute name="top" type="simple.NumberOrPercentOrNullOrPx"/>
+        <xsd:attribute name="bottom" type="simple.NumberOrPercentOrNullOrPx"/>
+        <xsd:attribute name="width" type="simple.NumberOrPercentOrNullOrPx"/>
+        <xsd:attribute name="height" type="simple.NumberOrPercentOrNullOrPx"/>
+        <xsd:attribute name="min_width" type="simple.NumberOrPercentOrNullOrPx"/>
+        <xsd:attribute name="min_height" type="simple.NumberOrPercentOrNullOrPx"/>
+        <xsd:attribute name="max_width" type="simple.NumberOrPercentOrNullOrPx"/>
+        <xsd:attribute name="max_height" type="simple.NumberOrPercentOrNullOrPx"/>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="attrs.TextSettings">

@@ -2577,8 +2577,14 @@ anychart.charts.HeatMap.prototype.serialize = function() {
   json['data'] = this.data().serialize();
 
   json['labels'] = this.labels().serialize();
-  json['hoverLabels'] = this.hoverLabels().serialize();
-  json['selectLabels'] = this.selectLabels().serialize();
+  json['hoverLabels'] = this.hoverLabels().getChangedSettings();
+  json['selectLabels'] = this.selectLabels().getChangedSettings();
+  if (goog.isNull(json['hoverLabels']['enabled'])) {
+    delete json['hoverLabels']['enabled'];
+  }
+  if (goog.isNull(json['selectLabels']['enabled'])) {
+    delete json['selectLabels']['enabled'];
+  }
 
   json['markers'] = this.markers().serialize();
   json['hoverMarkers'] = this.hoverMarkers().serialize();

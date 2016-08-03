@@ -589,8 +589,14 @@ anychart.core.pert.PertVisualElements.prototype.serialize = function() {
   }
 
   json['labels'] = this.labels().serialize();
-  json['selectLabels'] = this.selectLabels().serialize();
-  json['hoverLabels'] = this.hoverLabels().serialize();
+  json['selectLabels'] = this.selectLabels().getChangedSettings();
+  json['hoverLabels'] = this.hoverLabels().getChangedSettings();
+  if (goog.isNull(json['hoverLabels']['enabled'])) {
+    delete json['hoverLabels']['enabled'];
+  }
+  if (goog.isNull(json['selectLabels']['enabled'])) {
+    delete json['selectLabels']['enabled'];
+  }
 
   json['tooltip'] = this.tooltip().serialize();
 

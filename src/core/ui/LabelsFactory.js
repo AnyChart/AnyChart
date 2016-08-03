@@ -260,6 +260,7 @@ anychart.core.ui.LabelsFactory.HANDLED_EVENT_TYPES_CAPTURE_SHIFT_ = 12;
 anychart.core.ui.LabelsFactory.prototype.enabled = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.enabledState_ = opt_value;
+    this.changedSettings['enabled'] = true;
     if (!goog.isNull(opt_value)) {
       if (goog.isNull(this.enabledState_) && !!opt_value) {
         this.invalidate(anychart.ConsistencyState.ENABLED, this.getEnableChangeSignals());

@@ -4157,7 +4157,10 @@ anychart.charts.Pie.prototype.serialize = function() {
   json['type'] = this.getType();
   json['data'] = this.data().serialize();
   json['labels'] = this.labels().serialize();
-  json['hoverLabels'] = this.hoverLabels().serialize();
+  json['hoverLabels'] = this.hoverLabels().getChangedSettings();
+  if (goog.isNull(json['hoverLabels']['enabled'])) {
+    delete json['hoverLabels']['enabled'];
+  }
   json['palette'] = this.palette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
   json['tooltip'] = this.tooltip().serialize();

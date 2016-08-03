@@ -529,7 +529,12 @@ anychart.ui.ContextMenu.prototype.disposeInternal = function() {
  */
 anychart.ui.ContextMenu.prototype.serialize = function() {
   var json = {};
+
   json['enabled'] = this.enabled();
+
+  if (this.extraClassNames_) {
+    json['extraClassNames'] = goog.array.clone(this.extraClassNames_);
+  }
   return json;
 };
 
@@ -578,6 +583,13 @@ anychart.ui.ContextMenu.prototype.setupSpecial = function(var_args) {
  */
 anychart.ui.ContextMenu.prototype.setupByJSON = function(config) {
   this.enabled('enabled' in config ? config['enabled'] : true);
+  var extraClassNames = config['extraClassNames'];
+  if (extraClassNames) {
+    for (var i = 0, len = extraClassNames.length; i < len; i++) {
+      var className = extraClassNames[i];
+      this.addClassName(className);
+    }
+  }
 };
 
 
