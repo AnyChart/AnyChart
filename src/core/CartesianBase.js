@@ -2337,8 +2337,6 @@ anychart.core.CartesianBase.prototype.calculateXScales = function() {
             }
           }
         }
-        // we started autocalc before
-        xScale.finishAutoCalc();
       }
       if (xScale instanceof anychart.scales.Ordinal) {
         var namesField = xScale.getNamesField();
@@ -2360,6 +2358,11 @@ anychart.core.CartesianBase.prototype.calculateXScales = function() {
           xScale.setAutoNames(autoNames);
         }
       }
+    }
+    for (uid in this.xScales) {
+      xScale = this.xScales[uid];
+      if (xScale.needsAutoCalc())
+        xScale.finishAutoCalc();
     }
     this.markConsistent(anychart.ConsistencyState.CARTESIAN_SCALES);
     anychart.performance.end('x scales calculation');
