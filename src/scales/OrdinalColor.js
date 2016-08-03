@@ -480,11 +480,11 @@ anychart.scales.OrdinalColor.prototype.calculate = function() {
       //min value
       var maxValue = numRanges[numRanges.length - 1];
       //max value
-      var minValue = numRanges[0];
+      var minValue = Math.floor(numRanges[0]);
       //intervals width
       var h = (maxValue - minValue) / k;
       //left limit of first interval
-      var leftLimit = Math.floor(minValue);
+      var leftLimit = minValue;
       //right limit of first interval
       var rightLimit = Math.ceil(leftLimit + h);
 
