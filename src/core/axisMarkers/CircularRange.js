@@ -591,6 +591,19 @@ anychart.core.axisMarkers.CircularRange.prototype.draw = function() {
       var startR = this.getComplexRadius_(radius, axisWidth, startPercentSize, false);
       var endR = this.getComplexRadius_(radius, axisWidth, endPercentSize, false);
 
+      var tmp;
+      if (startR < baseStartR) {
+        tmp = startR;
+        startR = baseStartR;
+        baseStartR = tmp;
+      }
+
+      if (endR < baseEndR) {
+        tmp = endR;
+        endR = baseEndR;
+        baseEndR = tmp;
+      }
+
       var startWidth = startR - baseStartR;
       var cornersRoundingPixStart = anychart.utils.normalizeSize(/** @type {string} */ (this.cornersRounding()), startWidth);
       var endWidth = endR - baseEndR;
