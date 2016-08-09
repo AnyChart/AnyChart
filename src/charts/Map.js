@@ -1967,6 +1967,8 @@ anychart.charts.Map.prototype.seriesInvalidated_ = function(event) {
     state |= anychart.ConsistencyState.MAP_SERIES |
         anychart.ConsistencyState.CHART_LEGEND |
         anychart.ConsistencyState.MAP_LABELS;
+    if ((/** @type {anychart.core.map.series.Base} */(event['target'])).needsUpdateMapAppearance())
+      state |= anychart.ConsistencyState.APPEARANCE;
     for (var i = this.series_.length; i--;)
       this.series_[i].invalidate(
           anychart.ConsistencyState.BOUNDS |
