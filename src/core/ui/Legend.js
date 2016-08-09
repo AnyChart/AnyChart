@@ -1,5 +1,6 @@
 goog.provide('anychart.core.ui.Legend');
 goog.require('acgraph.math.Coordinate');
+goog.require('acgraph.vector.Text.TextOverflow');
 goog.require('anychart.core.Text');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.LegendItem');
@@ -1445,6 +1446,12 @@ anychart.core.ui.Legend.prototype.draw = function() {
 
   this.clearLastDrawedPage_();
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    // Reset items width (needs when container was resized) for DVF-2119
+    if (this.items_ && this.textOverflow() == acgraph.vector.Text.TextOverflow.ELLIPSIS) {
+      for (var i = 0, len = this.items_.length; i < len; i++) {
+        this.items_[i].getTextElement().width(null);
+      }
+    }
     this.calculateBounds_();
     this.invalidate(anychart.ConsistencyState.LEGEND_BACKGROUND |
         anychart.ConsistencyState.LEGEND_TITLE |

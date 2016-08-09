@@ -1,5 +1,6 @@
 goog.provide('anychart.core.ui.LegendItem');
 goog.require('acgraph');
+goog.require('acgraph.vector.Text.TextOverflow');
 goog.require('anychart.core.Text');
 goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
@@ -779,8 +780,8 @@ anychart.core.ui.LegendItem.prototype.hoverCursor = function(opt_value) {
 
 /**
  * Getter/setter for max width of legend item.
- * @param {(number)=} opt_value Max width setting.
- * @return {(number|anychart.core.ui.LegendItem)} Max width or self for method chaining.
+ * @param {(number|string)=} opt_value Max width setting.
+ * @return {(number|string|anychart.core.ui.LegendItem)} Max width or self for method chaining.
  */
 anychart.core.ui.LegendItem.prototype.maxWidth = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -796,8 +797,8 @@ anychart.core.ui.LegendItem.prototype.maxWidth = function(opt_value) {
 
 /**
  * Getter/setter for max height of legend item.
- * @param {(number)=} opt_value Max height setting.
- * @return {(number|anychart.core.ui.LegendItem)} Max height or self for method chaining.
+ * @param {(number|string)=} opt_value Max height setting.
+ * @return {(number|string|anychart.core.ui.LegendItem)} Max height or self for method chaining.
  */
 anychart.core.ui.LegendItem.prototype.maxHeight = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -900,6 +901,8 @@ anychart.core.ui.LegendItem.prototype.getHeight = function() {
 anychart.core.ui.LegendItem.prototype.calculateBounds_ = function() {
   var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
   var parentWidth, parentHeight;
+  /** @type {anychart.math.Rect} */
+  var textBounds = this.textElement_.getBounds();
 
   if (parentBounds) {
     parentWidth = parentBounds.width;
@@ -916,12 +919,14 @@ anychart.core.ui.LegendItem.prototype.calculateBounds_ = function() {
   if (legendItemMaxWidth) {
     var maxTextWidth = legendItemMaxWidth - (this.iconEnabled_ ? this.iconSize_ + this.iconTextSpacing_ : 0);
     this.textElement_.width(maxTextWidth);
+  } else if (this.textElement_.textOverflow() == acgraph.vector.Text.TextOverflow.ELLIPSIS) {
+    // DVF-2119
+    this.textElement_.width(Math.min(parentWidth - (this.iconEnabled_ ? this.iconSize_ + this.iconTextSpacing_ : 0), textBounds.width));
   }
   if (legendItemMaxHeight)
     this.textElement_.height(legendItemMaxHeight);
 
-  /** @type {anychart.math.Rect} */
-  var textBounds = this.textElement_.getBounds();
+  textBounds = this.textElement_.getBounds();
   var width = (this.iconEnabled_ ? this.iconSize_ + this.iconTextSpacing_ : 0) + textBounds.width;
   var height = textBounds.height;
 

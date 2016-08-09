@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+  <link rel="stylesheet" href="../utils/media/anychart-font/anychart.css">
+  <link rel="stylesheet" href="../../out/anychart-ui.css">
+  <script src="../../contrib/closure-library/closure/goog/base.js"></script>
+  <script src="../../src/deps.js"></script>
+  <meta charset="utf-8">
+  <script>
+    goog.require('anychart.themes.defaultTheme');
+    goog.require('anychart.themes.v6');
+    goog.require('anychart.modules.anychart_bundle');
+  </script>
+</head>
+<body>
+<!--<div id="legendsBody"></div>-->
+<div id="legendsBody" style="width: 70px"></div>
+
+<div id="container" style="width: 800px; height: 600px;"></div>
+
+<script>
+  var chartObject = anychart.line();
+  chartObject.line([1, 3, 2]);
+  chartObject.line([3, 1, 2]);
+  chartObject.line([2, 1, 3]);
+  chartObject.container('container').draw();
+
+  var legendStage = anychart.graphics.create('legendsBody', "100%", "100%");
+  var legend = anychart.ui.legend();
+  legend.container(legendStage);
+  legend.position("left").align("top").itemsLayout("vertical").padding("10px");
+  legend.textWrap("noWrap");
+  legend.textOverflow(anychart.graphics.vector.Text.TextOverflow.ELLIPSIS);
+  legend.itemsSource([chartObject]);
+  legend.background("#CFD8DC"); // just to see the bounds
+
+  legend.itemsFormatter(function(items) {
+    var item;
+    for (var i = 0; i < items.length; i++) {
+      item = items[i];
+      //item['maxWidth'] = '100%';
+    }
+    return items;
+  });
+
+  legend.draw();
+</script>
+</body>
+</html>
