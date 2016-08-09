@@ -4261,7 +4261,7 @@ anychart.charts.Map.prototype.drillDown_ = function(id, target) {
   var feature = scene.getFeatureById(id);
   var featureBounds, featureProperties;
   if (feature) {
-    featureBounds = feature.domElement.getBoundsWithTransform(scene.getMapLayer().getFullTransformation());
+    featureBounds = feature.domElement.getAbsoluteBounds();
     featureProperties = feature['properties'];
   } else {
     anychart.core.reporting.warning(anychart.enums.WarningCode.FEATURE_ID_NOT_FOUND, null, [id]);
@@ -4380,7 +4380,7 @@ anychart.charts.Map.prototype.drillUp_ = function(target, opt_levels) {
       zoom = 10;
     } else {
       var domEl = feature.domElement;
-      var featureBounds = domEl.getBoundsWithTransform(target.getMapLayer().getFullTransformation());
+      var featureBounds = domEl.getAbsoluteBounds();
       var zoomParam = this.zoomToBounds(featureBounds);
 
       zoom = zoomParam[0];
@@ -4521,7 +4521,7 @@ anychart.charts.Map.prototype.zoomToFeature = function(id) {
   if (goToHome) {
     featureBounds = domEl.getBounds();
   } else {
-    featureBounds = domEl.getBoundsWithTransform(tx);
+    featureBounds = domEl.getAbsoluteBounds();
   }
   var sourceZoom = tx.getScaleX();
   var zoomParam = this.zoomToBounds(featureBounds);

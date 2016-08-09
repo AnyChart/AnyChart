@@ -1578,8 +1578,49 @@ anychart.core.ui.Scroller.Dragger = function(scroller, target, isThumb) {
    * @private
    */
   this.targetThumb_ = isThumb ? target : null;
+
+  /**
+   * @type {number|undefined}
+   * @private
+   */
+  this.frame_ = undefined;
+
+  /**
+   * @type {!function(number)}
+   * @private
+   */
+  this.frameAction_ = goog.bind(function(time) {
+    this.frame_ = undefined;
+    this.scroller_.moveHandleTo_(
+        this.targetThumb_ || true,
+        this.lastCoord_);
+  }, this);
+
+  this.setHysteresis(3);
+
+  this.listen(goog.fx.Dragger.EventType.END, this.dragEndHandler_);
 };
 goog.inherits(anychart.core.ui.Scroller.Dragger, goog.fx.Dragger);
+
+
+/**
+ * Drag end handler.
+ * @param {goog.fx.DragEvent} e
+ * @private
+ */
+anychart.core.ui.Scroller.Dragger.prototype.dragEndHandler_ = function(e) {
+  if (goog.isDef(this.frame_)) {
+    window.cancelAnimationFrame(this.frame_);
+    this.frameAction_(0);
+  }
+};
+
+
+/**
+ * @type {number}
+ * @private
+ */
+anychart.core.ui.Scroller.Dragger.prototype.lastCoord_;
 
 
 /** @inheritDoc */
@@ -1596,9 +1637,9 @@ anychart.core.ui.Scroller.Dragger.prototype.computeInitialPosition = function() 
 
 /** @inheritDoc */
 anychart.core.ui.Scroller.Dragger.prototype.defaultAction = function(x, y) {
-  this.scroller_.moveHandleTo_(
-      this.targetThumb_ || true,
-      this.scroller_.isHorizontal() ? x : y);
+  this.lastCoord_ = this.scroller_.isHorizontal() ? x : y;
+  if (!goog.isDef(this.frame_))
+    this.frame_ = window.requestAnimationFrame(this.frameAction_);
 };
 
 

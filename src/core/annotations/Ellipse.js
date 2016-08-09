@@ -125,7 +125,7 @@ anychart.core.annotations.Ellipse.prototype.drawTwoPointsShape = function(firstX
     var path = this.paths_[i];
     path.clear();
     path.moveTo(firstX, middleY);
-    path.arcToAsCurves(rx, ry, 0, 360);
+    path.arcTo(rx, ry, 0, 360);
   }
 };
 

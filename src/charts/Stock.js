@@ -1471,6 +1471,7 @@ anychart.charts.Stock.prototype.limitDragRatio = function(ratio, anchor) {
  * @return {boolean}
  */
 anychart.charts.Stock.prototype.askDragStart = function() {
+  this.annotations().unselect();
   var res = this.dispatchRangeChange_(
       anychart.enums.EventType.SELECTED_RANGE_CHANGE_START,
       anychart.enums.StockRangeChangeSource.PLOT_DRAG);

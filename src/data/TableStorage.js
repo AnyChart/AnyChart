@@ -131,14 +131,14 @@ anychart.data.TableStorage.Search;
  * Selection cache size constant.
  * @type {number}
  */
-anychart.data.TableStorage.SELECTION_CACHE_SIZE = 10;
+anychart.data.TableStorage.SELECTION_CACHE_SIZE = 4;
 
 
 /**
  * Search cache size constant.
  * @type {number}
  */
-anychart.data.TableStorage.SEARCH_CACHE_SIZE = 3;
+anychart.data.TableStorage.SEARCH_CACHE_SIZE = 2;
 
 
 /**

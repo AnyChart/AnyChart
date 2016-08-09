@@ -37,7 +37,7 @@ anychart.core.ChoroplethPoint.prototype.getFeatureBounds = function() {
   iterator.select(this.index);
   var features = iterator.meta('features');
   var featureElement = features[0].domElement;
-  return /** @type {anychart.math.Rect} */(featureElement.getBoundsWithTransform(featureElement.getFullTransformation()));
+  return /** @type {anychart.math.Rect} */(featureElement.getAbsoluteBounds());
 };
 
 

@@ -114,9 +114,48 @@ anychart.core.stock.Plot = function(chart) {
    */
   this.eventsInterceptor_ = null;
 
+  /**
+   * @type {number|undefined}
+   * @private
+   */
+  this.frame_ = undefined;
+
+  /**
+   * @type {!function(number)}
+   * @private
+   */
+  this.frameAction_ = goog.bind(function(time) {
+    this.frame_ = undefined;
+    if (isNaN(this.frameHighlightRatio_))
+      this.chart_.unhighlight();
+    else
+      this.chart_.highlightAtRatio(this.frameHighlightRatio_, this.frameHighlightX_, this.frameHighlightY_);
+  }, this);
+
   this.defaultSeriesType(anychart.enums.StockSeriesType.LINE);
 };
 goog.inherits(anychart.core.stock.Plot, anychart.core.VisualBaseWithBounds);
+
+
+/**
+ * @type {number}
+ * @private
+ */
+anychart.core.stock.Plot.prototype.frameHighlightRatio_ = NaN;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+anychart.core.stock.Plot.prototype.frameHighlightX_;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+anychart.core.stock.Plot.prototype.frameHighlightY_;
 
 
 /**
@@ -1572,35 +1611,7 @@ anychart.core.stock.Plot.prototype.unhighlight = function() {
  */
 anychart.core.stock.Plot.prototype.initDragger_ = function(e) {
   this.dragger_ = new anychart.core.stock.Plot.Dragger(this, this.eventsInterceptor_);
-  this.dragger_.listen(goog.fx.Dragger.EventType.START, this.dragStartHandler_, false, this);
-  this.dragger_.listen(goog.fx.Dragger.EventType.END, this.dragEndHandler_, false, this);
   this.dragger_.startDrag(e.getOriginalEvent());
-};
-
-
-/**
- * Drag start handler.
- * @param {goog.fx.DragEvent} e
- * @return {boolean}
- * @private
- */
-anychart.core.stock.Plot.prototype.dragStartHandler_ = function(e) {
-  this.chart_.annotations().unselect();
-  var res;
-  if (res = this.chart_.askDragStart())
-    goog.style.setStyle(document['body'], 'cursor', acgraph.vector.Cursor.EW_RESIZE);
-  return res;
-};
-
-
-/**
- * Drag end handler.
- * @param {goog.fx.DragEvent} e
- * @private
- */
-anychart.core.stock.Plot.prototype.dragEndHandler_ = function(e) {
-  goog.style.setStyle(document['body'], 'cursor', '');
-  this.chart_.dragEnd();
 };
 
 
@@ -1618,7 +1629,11 @@ anychart.core.stock.Plot.prototype.handlePlotMouseOverAndMove_ = function(e) {
     // testing that the point is inside series area
     if (x >= 0 && x <= this.seriesBounds_.width &&
         y >= 0 && y <= this.seriesBounds_.height) {
-      this.chart_.highlightAtRatio(x / this.seriesBounds_.width, e['clientX'], e['clientY']);
+      this.frameHighlightRatio_ = x / this.seriesBounds_.width;
+      this.frameHighlightX_ = e['clientX'];
+      this.frameHighlightY_ = e['clientY'];
+      if (!goog.isDef(this.frame_))
+        this.frame_ = window.requestAnimationFrame(this.frameAction_);
     }
   }
 };
@@ -1630,7 +1645,9 @@ anychart.core.stock.Plot.prototype.handlePlotMouseOverAndMove_ = function(e) {
  * @private
  */
 anychart.core.stock.Plot.prototype.handlePlotMouseOut_ = function(e) {
-  this.chart_.unhighlight();
+  this.frameHighlightRatio_ = NaN;
+  if (!goog.isDef(this.frame_))
+    this.frame_ = window.requestAnimationFrame(this.frameAction_);
 };
 //endregion
 
@@ -2184,8 +2201,67 @@ anychart.core.stock.Plot.Dragger = function(plot, target) {
    * @private
    */
   this.plot_ = plot;
+
+  /**
+   * @type {number|undefined}
+   * @private
+   */
+  this.frame_ = undefined;
+
+  /**
+   * @type {!function(number)}
+   * @private
+   */
+  this.frameAction_ = goog.bind(function(time) {
+    this.frame_ = undefined;
+    this.plot_.chart_.dragToRatio(this.frameRatio_, this.frameAnchor_);
+  }, this);
+
+  this.setHysteresis(3);
+
+  this.listen(goog.fx.Dragger.EventType.START, this.dragStartHandler_, false, this);
+  this.listen(goog.fx.Dragger.EventType.END, this.dragEndHandler_, false, this);
 };
 goog.inherits(anychart.core.stock.Plot.Dragger, goog.fx.Dragger);
+
+
+/**
+ * @type {number}
+ * @private
+ */
+anychart.core.stock.Plot.Dragger.prototype.frameRatio_;
+
+
+/**
+ * @type {anychart.charts.Stock.DragAnchor}
+ * @private
+ */
+anychart.core.stock.Plot.Dragger.prototype.frameAnchor_;
+
+
+/**
+ * Drag start handler.
+ * @param {goog.fx.DragEvent} e
+ * @return {boolean}
+ * @private
+ */
+anychart.core.stock.Plot.Dragger.prototype.dragStartHandler_ = function(e) {
+  return this.plot_.chart_.askDragStart();
+};
+
+
+/**
+ * Drag end handler.
+ * @param {goog.fx.DragEvent} e
+ * @private
+ */
+anychart.core.stock.Plot.Dragger.prototype.dragEndHandler_ = function(e) {
+  if (goog.isDef(this.frame_)) {
+    window.cancelAnimationFrame(this.frame_);
+    this.frameAction_(0);
+  }
+  this.plot_.chart_.dragEnd();
+};
 
 
 /** @inheritDoc */
@@ -2202,7 +2278,11 @@ anychart.core.stock.Plot.Dragger.prototype.computeInitialPosition = function() {
 
 /** @inheritDoc */
 anychart.core.stock.Plot.Dragger.prototype.defaultAction = function(x, y) {
-  this.plot_.chart_.dragToRatio(x / this.plot_.seriesBounds_.width, this.anchor_);
+  this.frameRatio_ = x / this.plot_.seriesBounds_.width;
+  this.frameAnchor_ = this.anchor_;
+  if (goog.isDef(this.frame_))
+    window.cancelAnimationFrame(this.frame_);
+  this.frame_ = window.requestAnimationFrame(this.frameAction_);
 };
 
 

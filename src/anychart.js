@@ -13,6 +13,7 @@ goog.require('anychart.performance');
 goog.require('anychart.themes.merging');
 goog.require('anychart.utils');
 goog.require('goog.dom');
+goog.require('goog.dom.animationFrame.polyfill');
 goog.require('goog.json.hybrid');
 
 /**
@@ -871,6 +872,15 @@ anychart.ganttToolbar = anychart.ganttToolbar || /** @type {function():null} */ 
 anychart.treeMap = anychart.treeMap || function() {
   anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['TreeMap chart']);
 };
+
+
+if (COMPILED) {
+  goog.dom.animationFrame.polyfill.install();
+} else {
+  anychart.onDocumentReady(function() {
+    goog.dom.animationFrame.polyfill.install();
+  });
+}
 
 
 //exports
