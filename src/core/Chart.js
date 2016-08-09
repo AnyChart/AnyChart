@@ -195,6 +195,15 @@ anychart.core.Chart.prototype.contentBounds;
 
 
 /**
+ * Whether chart uses anychart.data.Tree as data source.
+ * @return {boolean}
+ */
+anychart.core.Chart.prototype.usesTreeData = function() {
+  return false;
+};
+
+
+/**
  * Gets root layer.
  * @return {acgraph.vector.Layer}
  */
@@ -2337,12 +2346,153 @@ anychart.core.Chart.prototype.escapeValuesInRow = function(row, colSep, rowSep) 
 
 
 /**
+ * Creates data suitable to create csv.
+ * @param {Object} node Node.
+ * @param {Array} rawData Raw data.
+ * @param {Object} headers Hash map of seen columns.
+ * @param {number} headersLength length of headers.
+ * @param {?(string|number)} parentId Parent ID.
+ * @param {?(string|number)} originalParent original parent id.
+ * @private
+ */
+anychart.core.Chart.prototype.makeObject_ = function(node, rawData, headers, headersLength, parentId, originalParent) {
+  var data = goog.object.clone(node['treeDataItemData']);
+  if (!goog.isDef(data['id'])) {
+    this.missedIds_++;
+    this.idStatus_ = -1;
+  }
+  data['parent'] = [this.nodesCount_, parentId, originalParent];
+  parentId = this.nodesCount_++;
+  rawData.push(data);
+  for (var key in data) {
+    if (!(key in headers))
+      headers[key] = headersLength++;
+  }
+  var children = node['children'];
+  if (children && children.length) {
+    for (var i = 0, len = children.length; i < len; i++)
+      this.makeObject_(children[i], rawData, headers, headersLength, parentId, data['id']);
+  }
+};
+
+
+/**
+ * Returns CSV string with tree data.
+ * @param {Object.<string, (string|boolean|undefined)>=} opt_csvSettings CSV settings.
+ * @return {string} CSV string.
+ * @private
+ */
+anychart.core.Chart.prototype.toTreeDataCsv_ = function(opt_csvSettings) {
+  var settings = goog.isObject(opt_csvSettings) ? opt_csvSettings : {};
+  var rowsSeparator = settings['rowsSeparator'] || '\n';
+  this.checkSeparator(rowsSeparator);
+  var columnsSeparator = settings['columnsSeparator'] || ',';
+  this.checkSeparator(columnsSeparator);
+  var ignoreFirstRow = settings['ignoreFirstRow'] || false;
+
+  var data = this.data();
+
+  var serialized = data.serialize();
+  var roots = serialized['children'];
+
+  var rawData = [];
+  var headers = {};
+  var i, j;
+  /**
+   * -1 means there is at least one missing id, so use auto generated id|parent and save original id|parent
+   *  0 means there is no id at all use auto generated id|parent without original
+   *  1 means there are all ids in tree, so do not use auto generated - use original id|parent
+   * @type {number}
+   * @private
+   */
+  this.idStatus_ = 1;
+  this.missedIds_ = 0;
+  this.nodesCount_ = 0;
+  headers['id'] = 0;
+  headers['parent'] = 1;
+  for (i = 0; i < roots.length; i++) {
+    this.makeObject_(roots[i], rawData, headers, 2, null, null);
+  }
+  if (this.missedIds_ === this.nodesCount_) {
+    this.idStatus_ = 0;
+  } else if (this.missedIds_ === 0) {
+    this.idStatus_ = 1;
+  }
+
+  var key;
+  var columns = [];
+
+  for (key in headers)
+    columns[headers[key]] = key;
+
+  var rowArray;
+  var rowStrings = [];
+  var row;
+  var column;
+  var parent;
+  var finalValue;
+  var id, parentId;
+  if (this.idStatus_ < 0) {
+    headers['__original_id__'] = columns.length;
+    headers['__original_parent__'] = columns.length + 1;
+    columns.push('__original_id__', '__original_parent__');
+  }
+
+  if (!ignoreFirstRow)
+    rowStrings.push(columns.join(columnsSeparator));
+  for (i = 0; i < rawData.length; i++) {
+    rowArray = new Array(columns.length);
+    row = rawData[i];
+    // parent - array with
+    // 0 - auto generated id
+    // 1 - auto generated parent id
+    // 2 - original parent id
+    parent = row['parent'];
+
+    if (this.idStatus_ <= 0) {
+      id = parent[0];
+      parentId = parent[1];
+    } else {
+      id = row['id'];
+      parentId = parent[2];
+    }
+
+    for (j = 0; j < columns.length; j++) {
+      column = columns[j];
+      finalValue = goog.isObject(row[column]) ? goog.json.serialize(row[column]) : row[column];
+
+      if (column === 'id')
+        rowArray[j] = id;
+
+      else if (column === 'parent')
+        rowArray[j] = goog.isNull(parentId) ? undefined : parentId;
+
+      else if (column === '__original_parent__')
+        rowArray[j] = parent[2];
+
+      else if (column === '__original_id__')
+        rowArray[j] = row['id'];
+
+      else
+        rowArray[j] = finalValue;
+    }
+    this.escapeValuesInRow(rowArray, columnsSeparator, rowsSeparator);
+    rowStrings.push(rowArray.join(columnsSeparator));
+  }
+  return rowStrings.join(rowsSeparator);
+};
+
+
+/**
  * Returns CSV string with series data.
  * @param {(string|anychart.enums.ChartDataExportMode)=} opt_chartDataExportMode CSV mode.
  * @param {Object.<string, (string|boolean|undefined)>=} opt_csvSettings CSV settings.
  * @return {string} CSV string.
  */
 anychart.core.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvSettings) {
+  if (this.usesTreeData())
+    return this.toTreeDataCsv_(opt_csvSettings);
+
   opt_chartDataExportMode = anychart.enums.normalizeChartDataExportMode(opt_chartDataExportMode);
   var rawData = (opt_chartDataExportMode == anychart.enums.ChartDataExportMode.RAW);
   var type = this.getType();

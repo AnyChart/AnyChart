@@ -407,6 +407,12 @@ anychart.charts.Pert.prototype.getType = function() {
 };
 
 
+/** @inheritDoc */
+anychart.charts.Pert.prototype.usesTreeData = function() {
+  return true;
+};
+
+
 /**
  * Creates format provider and applies reference values.
  * @param {boolean=} opt_force - Force create.
@@ -2565,6 +2571,7 @@ anychart.charts.Pert.prototype.setupByJSON = function(config) {
 
 
 //exports
+anychart.charts.Pert.prototype['getType'] = anychart.charts.Pert.prototype.getType;
 anychart.charts.Pert.prototype['tasks'] = anychart.charts.Pert.prototype.tasks;
 anychart.charts.Pert.prototype['milestones'] = anychart.charts.Pert.prototype.milestones;
 anychart.charts.Pert.prototype['criticalPath'] = anychart.charts.Pert.prototype.criticalPath;
@@ -2573,4 +2580,6 @@ anychart.charts.Pert.prototype['getType'] = anychart.charts.Pert.prototype.getTy
 anychart.charts.Pert.prototype['expectedTimeCalculator'] = anychart.charts.Pert.prototype.expectedTimeCalculator;
 anychart.charts.Pert.prototype['verticalSpacing'] = anychart.charts.Pert.prototype.verticalSpacing;
 anychart.charts.Pert.prototype['horizontalSpacing'] = anychart.charts.Pert.prototype.horizontalSpacing;
+anychart.charts.Pert.prototype['toCsv'] = anychart.charts.Pert.prototype.toCsv;
+
 
