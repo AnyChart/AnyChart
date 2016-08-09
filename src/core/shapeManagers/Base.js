@@ -199,9 +199,7 @@ anychart.core.shapeManagers.Base.prototype.createShape = function(name, state, i
     this.setupInteractivity(shape, descriptor.isHatchFill, indexOrGlobal);
 
   // we want to avoid adding invisible hatchFill shapes to the layer.
-  if (descriptor.isHatchFill &&
-      shape.fill() == anychart.opt.NONE &&
-      shape.stroke() == anychart.opt.NONE) {
+  if (descriptor.isHatchFill && !(descriptor.fill(this.series, 0) || descriptor.fill(this.series, 1) || descriptor.fill(this.series, 2))) {
     shape.parent(null);
   } else {
     shape.parent(this.layer);
@@ -286,9 +284,9 @@ anychart.core.shapeManagers.Base.prototype.updateColors = function(state, opt_sh
       // we want to avoid adding invisible hatchFill shapes to the layer.
       if (descriptor.isHatchFill) {
         if (shape.fill() == anychart.opt.NONE && shape.stroke() == anychart.opt.NONE) {
-          shape.parent(null);
+          shape.visible(false);
         } else {
-          shape.parent(this.layer);
+          shape.visible(true);
         }
       }
     }

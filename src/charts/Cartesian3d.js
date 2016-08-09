@@ -79,6 +79,60 @@ goog.inherits(anychart.charts.Cartesian3d, anychart.core.CartesianBase);
 
 
 /**
+ * Dispatchs browser mouse events form series.
+ * @param {anychart.core.MouseEvent} event Event object.
+ */
+anychart.charts.Cartesian3d.prototype.dispatchBrowserEventFromSeries = function(event) {
+  var tag = anychart.utils.extractTag(event['domTarget']);
+
+  if (tag && tag.series && tag.series.check(anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT)) {
+    var prevTag = anychart.utils.extractTag(event['relatedDomTarget']);
+    if (!(prevTag && prevTag.series && prevTag.series == tag.series && prevTag.index == tag.index)) {
+      var series = /** @type {anychart.core.series.Base} */(tag.series);
+      if (series && !series.isDisposed() && series.enabled()) {
+        var eventTarget = series.getParentEventTarget();
+        series.setParentEventTarget(null);
+        series.handleBrowserEvent(event.originalEvent);
+        series.setParentEventTarget(eventTarget);
+      }
+    }
+  }
+};
+
+
+/** @inheritDoc */
+anychart.charts.Cartesian3d.prototype.handleMouseOverAndMove = function(event) {
+  this.dispatchBrowserEventFromSeries(event);
+
+  anychart.charts.Cartesian3d.base(this, 'handleMouseOverAndMove', event);
+};
+
+
+/** @inheritDoc */
+anychart.charts.Cartesian3d.prototype.handleMouseOut = function(event) {
+  this.dispatchBrowserEventFromSeries(event);
+
+  anychart.charts.Cartesian3d.base(this, 'handleMouseOut', event);
+};
+
+
+/** @inheritDoc */
+anychart.charts.Cartesian3d.prototype.handleMouseDown = function(event) {
+  this.dispatchBrowserEventFromSeries(event);
+
+  anychart.charts.Cartesian3d.base(this, 'handleMouseDown', event);
+};
+
+
+/** @inheritDoc */
+anychart.charts.Cartesian3d.prototype.handleMouseEvent = function(event) {
+  this.dispatchBrowserEventFromSeries(event);
+
+  anychart.charts.Cartesian3d.base(this, 'handleMouseEvent', event);
+};
+
+
+/**
  * Coloring post processor for Area 3D series.
  * @param {anychart.core.series.Base} series
  * @param {Object.<string, acgraph.vector.Shape>} shapes
