@@ -750,7 +750,7 @@ anychart.core.Chart.prototype.getSelectedPoints = function() {
   var allSeries = this.getAllSeries();
   for (i = 0; i < allSeries.length; i++) {
     series = allSeries[i];
-    if (!series || !series.state) continue;
+    if (!series || !series.state || !series.getPoint) continue;
     selectedPointsIndexes = series.state.getIndexByPointState(anychart.PointState.SELECT);
     for (j = 0; j < selectedPointsIndexes.length; j++) {
       selectedPoints.push(series.getPoint(selectedPointsIndexes[j]));
