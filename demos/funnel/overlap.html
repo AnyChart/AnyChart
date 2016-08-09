@@ -5,59 +5,110 @@
     <meta charset="utf-8">
 
     <script>
-        goog.require('anychart.modules.anychart');
         goog.require('anychart.themes.defaultTheme');
+        goog.require('anychart.modules.anychart_bundle');
     </script>
     <style>
-        html, body, #container {
-            width: 100%;
-            height: 100%;
-            margin: 0;
+        #container,
+        #container2,
+        #container3 {
+            width: 500px;
+            height: 280px;
+            border: 1px solid #000000;
+        }
+        body {
+            margin: 10px;
         }
     </style>
 </head>
 <body>
-<div id="container" style="width: 400px; height: 370px; border: 1px solid #000000"></div>
+<div id="container"></div>
+<div id="container2"></div>
+<div id="container3"></div>
 <script>
-    var chart;
-    anychart.onDocumentLoad(function(){
-        chart = anychart.funnel([
-            {
-                name: 'Product A Product A',
-                value: 70,
-                label: {
-                    background: '#66CCFF'
-                }
-            },
-            {
-                name: 'Product B Product B Product B Product B',
-                value: 40
-            },
-            {
-                name: 'Product C',
-                //name: 'Product C Product C Product C Product C Product C Product CProduct C',
-                value: 120
-            },
-            {
-                name: 'Product D Product D Product D Product D Product D Product D Product D Product D',
-                value: 40
-            },
-            {
-                name: 'Product E Product E Product E Product E',
-                value: 50
-            },
-            {
-                name: 'Product F Product F Product F Product F Product F Product F Product F Product F Product F Product F Product F',
-                value: 70
-            }
-        ]);
-        chart.legend(true);
+  var chart = anychart.funnel([
+    {
+      name: 'Product A',
+      value: 120,
+      label: {
+        background: '#66CCFF'
+      }
+    },
+    {
+      name: 'Product B',
+      value: 40
+    },
+    {
+      name: 'Product C',
+      value: 40
+    },
+    {
+      name: 'Product 1',
+      value: 120
+    },
+    {
+      name: 'Product D',
+      value: 40
+    },
+    {
+      name: 'Product E',
+      value: 40
+    },
+    {
+      name: 'Product F Product F Product F Product F Product F Product F Product F Product F Product F Product F Product F Product F Product F Product F Product F Product F Product F',
+      value: 120
+    }
+  ]);
+  chart.legend(true);
+  chart.baseWidth('80%');
+  chart.neckHeight(90);
+  chart.pointsPadding(5);
+  chart.container('container').draw();
 
-        chart.baseWidth('80%');
-        chart.neckHeight(90);
+  // --------------------------------------------------------------------------------------------------------
 
-        chart.container('container').draw();
-    });
+  var chart2 = anychart.funnel([
+    {
+      name: 'Product A',
+      value: 150
+    },
+    {
+      name: 'Product B',
+      value: 30
+    },
+    {
+      name: 'Product C',
+      value: 30
+    },
+    {
+      name: 'Product D',
+      value: 30
+    },
+    {
+      name: 'Product E',
+      value: 150
+    }
+  ]);
+  chart2.legend(true);
+  chart2.baseWidth('80%');
+  chart2.neckHeight(90);
+  chart2.pointsPadding(5);
+  chart2.container('container2').draw();
+
+
+  // --------------------------------------------------------------------------------------------------------
+
+  var chart3 = anychart.funnel([
+    ['Add to Cart', 7216301],
+    ['Start Checkout', 6371664],
+    ['Enter Shipping Address', 1486621],
+    ['Enter Billing Address', 786622],
+    ['Payment Info', 643716],
+    ['Order Complete', 430012]
+  ]);
+  chart3.baseWidth("90%");
+  chart3.pointsPadding(5);
+  chart3.container('container3').draw();
 </script>
 </body>
 </html>

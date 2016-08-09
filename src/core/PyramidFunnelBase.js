@@ -262,6 +262,7 @@ anychart.core.PyramidFunnelBase.prototype.rawData_;
 /**
  * Series element z-index in series root layer.
  * @type {number}
+ * @const
  */
 anychart.core.PyramidFunnelBase.ZINDEX_PYRAMID_FUNNEL = 30;
 
@@ -269,6 +270,7 @@ anychart.core.PyramidFunnelBase.ZINDEX_PYRAMID_FUNNEL = 30;
 /**
  * Hatch fill z-index in series root layer.
  * @type {number}
+ * @const
  */
 anychart.core.PyramidFunnelBase.ZINDEX_HATCH_FILL = 31;
 
@@ -276,6 +278,7 @@ anychart.core.PyramidFunnelBase.ZINDEX_HATCH_FILL = 31;
 /**
  * Z-index for labels connectors.
  * @type {number}
+ * @const
  */
 anychart.core.PyramidFunnelBase.ZINDEX_LABELS_CONNECTOR = 32;
 
@@ -283,8 +286,18 @@ anychart.core.PyramidFunnelBase.ZINDEX_LABELS_CONNECTOR = 32;
 /**
  * The length of the connector may not be less than the value of this constant.
  * @type {number}
+ * @const
  */
 anychart.core.PyramidFunnelBase.MIN_CONNECTOR_LENGTH = 5;
+
+
+/**
+ * The maximum number of iterations for overlap correction.
+ * @type {number}
+ * @const
+ * @private
+ */
+anychart.core.PyramidFunnelBase.OVERLAP_CORRECTION_ITERATION_COUNT_MAX_ = 10;
 
 
 /**
@@ -2389,78 +2402,87 @@ anychart.core.PyramidFunnelBase.prototype.overlapCorrection_ = function(opt_hove
     return;
   }
 
-  var pointState = this.state.getSeriesState() | (opt_hoveredLabel ? this.state.getPointStateByIndex(opt_hoveredLabel.getIndex()) : 0);
-
   this.clearLabelDomains_();
-  var count = this.getIterator().getRowsCount();
-  var bounds = this.boundsValue_;
+  this.overlapCorrectionIterationCount_ = 0;
 
-  var i;
+  var pointState = this.state.getSeriesState() | (opt_hoveredLabel ? this.state.getPointStateByIndex(opt_hoveredLabel.getIndex()) : 0);
+  this.checkOverlapWithSiblings_(pointState, opt_hoveredLabel);
+};
+
+
+/**
+ * Check overlap with sibling labels.
+ * It is the recursive method.
+ *
+ * @param {anychart.PointState|number} pointState Point state.
+ * @param {anychart.core.ui.LabelsFactory.Label=} opt_hoveredLabel If label is hovered.
+ * @private
+ */
+anychart.core.PyramidFunnelBase.prototype.checkOverlapWithSiblings_ = function(pointState, opt_hoveredLabel) {
+  if (this.overlapCorrectionIterationCount_ == anychart.core.PyramidFunnelBase.OVERLAP_CORRECTION_ITERATION_COUNT_MAX_) {
+    return;
+  }
+
+  var count = this.getIterator().getRowsCount();
+  var intersectionExist = false;
   var index;
   var label;
   var labelBounds;
-  var comparingLabel;
-  var comparingLabelBounds;
+  var siblingLabel;
+  var siblingLabelBounds;
 
-  var heightTotal = 0;
-  for (i = 0; i < count; i++) {
-    label = this.labels().getLabel(i);
+  for (var i = 0; i < count - 1; i++) {
+    if (this.reversed_) {
+      index = i;
+    } else {
+      // Invert the cycle
+      index = count - 1 - i;
+    }
+
+    label = this.labels().getLabel(index);
     if (!label || label.enabled() == false) {
       continue;
     }
     labelBounds = this.getTrueLabelBounds(label, pointState);
-    heightTotal += labelBounds.height;
-  }
 
-  // super hack (if heightTotal > bounds.height then must be one domain for all labels)
-  if (heightTotal >= bounds.height) {
-    var newLabelsDomain = new anychart.core.PyramidFunnelBase.LabelsDomain(this);
-    for (i = 0; i < count; i++) {
-      label = this.labels().getLabel(i);
-      if (!label || label.enabled() == false) {
-        continue;
-      }
-      newLabelsDomain.addLabel(label);
+    siblingLabel = this.reversed_ ? this.getNextEnabledLabel(label) : this.getPreviousEnabledLabel(label);
+
+    // for disabled labels
+    if (!siblingLabel) {
+      continue;
+    }
+    siblingLabelBounds = this.getTrueLabelBounds(siblingLabel, pointState);
+
+    var labelDomain = this.getLabelsDomainByLabel(label);
+    var siblingLabelDomain = this.getLabelsDomainByLabel(siblingLabel);
+    if (labelDomain && siblingLabelDomain && labelDomain == siblingLabelDomain) {
+      continue;
     }
 
-    this.labelDomains.push(newLabelsDomain);
+    // if intersection exist
+    if (siblingLabelBounds.top <= labelBounds.top + labelBounds.height) {
+      intersectionExist = true;
 
-  } else {
-    // check intersect
-    for (i = 0; i < count - 1; i++) {
-      if (this.reversed_) {
-        index = i;
+      if (labelDomain && siblingLabelDomain) {
+        this.mergeLabelsDomains(labelDomain, siblingLabelDomain);
+
+      } else if (!labelDomain && siblingLabelDomain) {
+        this.putLabelIntoLabelsDomain_(siblingLabel, label);
+
       } else {
-        // Invert the cycle
-        index = count - 1 - i;
-      }
-
-      label = this.labels().getLabel(index);
-      if (!label || label.enabled() == false) {
-        continue;
-      }
-      labelBounds = this.getTrueLabelBounds(label, pointState);
-      heightTotal += labelBounds.height;
-
-      comparingLabel = this.reversed_ ? this.getNextEnabledLabel(label) : this.getPreviousEnabledLabel(label);
-
-      // for disabled labels
-      if (!comparingLabel) {
-        continue;
-      }
-      comparingLabelBounds = this.getTrueLabelBounds(comparingLabel, pointState);
-
-      // if intersected
-      if (comparingLabelBounds.top <= labelBounds.top + labelBounds.height) {
-        this.getLabelsDomainForLabel_(label, comparingLabel);
+        // labelDomain && !siblingLabelDomain OR !labelDomain && !siblingLabelDomain
+        this.putLabelIntoLabelsDomain_(label, siblingLabel);
       }
     }
   }
 
-  if (this.labelDomains.length) {
+  if (intersectionExist) {
     goog.array.forEach(this.labelDomains, function(labelDomain) {
       labelDomain.recalculateLabelsPosition(opt_hoveredLabel);
     });
+
+    this.overlapCorrectionIterationCount_++;
+    this.checkOverlapWithSiblings_(pointState, opt_hoveredLabel);
   }
 };
 
@@ -2527,31 +2549,27 @@ anychart.core.PyramidFunnelBase.prototype.getPreviousEnabledLabel = function(lab
 
 
 /**
- * If the searchLabel is already contained in any domain, returns this domain.
- * Otherwise it will create a new domain.
+ * If the label has a domain then push added label into this domain.
+ * Otherwise we create a new domain for label and push added label into this domain.
  *
  * @private
- * @param {anychart.core.ui.LabelsFactory.Label} searchLabel
- * @param {anychart.core.ui.LabelsFactory.Label} currentLabel
- * @return {anychart.core.PyramidFunnelBase.LabelsDomain}
+ * @param {anychart.core.ui.LabelsFactory.Label} label
+ * @param {anychart.core.ui.LabelsFactory.Label} addedLabel
  */
-anychart.core.PyramidFunnelBase.prototype.getLabelsDomainForLabel_ = function(searchLabel, currentLabel) {
-  var foundDomain = this.getLabelsDomainByLabel(searchLabel);
+anychart.core.PyramidFunnelBase.prototype.putLabelIntoLabelsDomain_ = function(label, addedLabel) {
+  var foundDomain = this.getLabelsDomainByLabel(label);
 
   if (!goog.isNull(foundDomain)) {
-    foundDomain.addLabel(currentLabel);
-    return foundDomain;
+    foundDomain.addLabel(addedLabel);
 
   } else {
     var newLabelsDomain;
 
     newLabelsDomain = new anychart.core.PyramidFunnelBase.LabelsDomain(this);
-    newLabelsDomain.addLabel(searchLabel);
-    newLabelsDomain.addLabel(currentLabel);
+    newLabelsDomain.addLabel(label);
+    newLabelsDomain.addLabel(addedLabel);
 
     this.labelDomains.push(newLabelsDomain);
-
-    return newLabelsDomain;
   }
 };
 
@@ -3784,12 +3802,6 @@ anychart.core.PyramidFunnelBase.LabelsDomain = function(chart) {
   this.labels = [];
 
   /**
-   * Domain height.
-   * @type {number}
-   */
-  this.height;
-
-  /**
    * Top left domain position.
    * @type {number}
    */
@@ -3837,113 +3849,47 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition
     return;
   }
 
-  var pointState;
-  var domain = this;
-  var bounds = this.chart.boundsValue_;
+  var label, pointState, labelBounds, labelPointPath, labelPointBounds;
+  var firstPointTop = 0;
+  var pointsHeight = 0;
+  var domainHeight = 0;
 
-  var firstLabel = this.labels[0];
-  var lastLabel = this.labels[this.labels.length - 1];
-  pointState = this.chart.state.getSeriesState() | this.chart.state.getPointStateByIndex(firstLabel.getIndex());
-  var firstLabelBounds = this.getLabelBounds_(firstLabel, pointState);
-
-  var h1, y1;
-  var h2, y2;
-  var domainTop;
-
-  // To calculate between each two labels
-  var prevLabel = firstLabel;
-  var prevLabelBounds = firstLabelBounds;
-  var prevLabelPointPath = this.chart.data().meta(prevLabel.getIndex(), 'point');
-  var prevLabelPointBounds = prevLabelPointPath.getBounds();
-
-  var label, labelBounds, labelPointPath, labelPointBounds;
-  for (var i = 1, len = this.labels.length; i < len; i++) {
+  for (var i = 0, len = this.labels.length; i < len; i++) {
     label = this.labels[i];
     pointState = this.chart.state.getSeriesState() | this.chart.state.getPointStateByIndex(label.getIndex());
     labelBounds = this.getLabelBounds_(label, pointState);
     labelPointPath = this.chart.data().meta(label.getIndex(), 'point');
     labelPointBounds = labelPointPath.getBounds();
 
-    if (!h1 && !y1) {
-      h1 = prevLabelBounds.height;
-      y1 = prevLabelPointBounds.top + prevLabelPointBounds.height / 2 + (prevLabel.offsetY() || 0);
+    if (i == 0) {
+      firstPointTop = labelPointBounds.top;
     }
 
-    h2 = labelBounds.height;
-    y2 = labelPointBounds.top + labelPointBounds.height / 2 + (label.offsetY() || 0);
-
-    domainTop = 1 / 4 * (-3 * h1 - h2 + 2 * y1 + 2 * y2);
-
-    // To calculate the Y coordinate of the domain center by the formula and remember it as y1
-    y1 = 1 / 4 * (2 * y1 + 2 * y2 - h1 + h2);
-    // And remember the height of the domain for next iteration
-    h1 = h1 + h2;
+    domainHeight += labelBounds.height;
+    pointsHeight += labelPointBounds.height;
   }
 
-  // update
-  this.height = goog.array.reduce(this.labels, function(res, label) {
-    pointState = domain.chart.state.getSeriesState() | domain.chart.state.getPointStateByIndex(label.getIndex());
-    var labelBounds = domain.getLabelBounds_(label, pointState);
-    return res + labelBounds.height;
-  }, 0);
+  pointsHeight += this.chart.pointsPaddingValue_ * (len - 1);
+  var domainCenterY = firstPointTop + pointsHeight / 2;
+  var domainY = domainCenterY - domainHeight / 2;
 
+  var bounds = this.chart.boundsValue_;
   // bottom boundary
-  if (domainTop + this.height > bounds.top + bounds.height) {
-    domainTop = bounds.top + bounds.height - this.height;
+  if (domainY + domainHeight > bounds.top + bounds.height) {
+    domainY = bounds.top + bounds.height - domainHeight;
   }
   // top boundary
-  if (domainTop < bounds.top) {
-    domainTop = bounds.top;
+  if (domainY < bounds.top) {
+    domainY = bounds.top;
   }
-  this.y = domainTop;
-
+  this.y = domainY;
 
   this.applyLabelsPosition_(opt_hoveredLabel);
-
-  var comparingLabel;
-  var comparingLabelBounds;
-  var domainForPreviousLabel;
-  var unitedDomain;
-
-  label = this.chart.reversed_ ? lastLabel : firstLabel;
-
-  if (label.getIndex() > 0) {
-    comparingLabel = this.chart.getNextEnabledLabel(label);
-
-    // for disabled labels
-    if (!comparingLabel) {
-      return;
-    }
-
-    pointState = this.chart.state.getSeriesState() | this.chart.state.getPointStateByIndex(comparingLabel.getIndex());
-    comparingLabelBounds = domain.getLabelBounds_(comparingLabel, pointState);
-    pointState = this.chart.state.getSeriesState() | this.chart.state.getPointStateByIndex(label.getIndex());
-    labelBounds = domain.getLabelBounds_(label, pointState);
-
-    var isOverlap = this.chart.reversed_ ?
-        comparingLabelBounds.top < labelBounds.top + labelBounds.height :
-        labelBounds.top < comparingLabelBounds.top + comparingLabelBounds.height;
-
-    if (isOverlap) {
-      domainForPreviousLabel = domain.chart.getLabelsDomainByLabel(comparingLabel);
-      if (domainForPreviousLabel) {
-        unitedDomain = domain.chart.mergeLabelsDomains(domainForPreviousLabel, this);
-        unitedDomain.recalculateLabelsPosition(opt_hoveredLabel);
-
-      } else {
-        this.chart.reversed_ ?
-            this.labels.push(comparingLabel) :
-            this.labels.unshift(comparingLabel);
-
-        this.recalculateLabelsPosition(opt_hoveredLabel);
-      }
-    }
-  }
 };
 
 
 /**
- * To reposition the labels relative to the top of the domain.
+ * Reposition the labels by relative to the top of this domain.
  * @private
  * @param {anychart.core.ui.LabelsFactory.Label=} opt_hoveredLabel
  */
