@@ -127,7 +127,8 @@ anychart.core.axisMarkers.PathBase.prototype.scaleInternal = function(opt_value)
       if (this.scale_)
         this.scale_.unlistenSignals(this.scaleInvalidated, this);
       this.scale_ = opt_value;
-      this.scale_.listenSignals(this.scaleInvalidated, this);
+      if (this.scale_)
+        this.scale_.listenSignals(this.scaleInvalidated, this);
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
@@ -204,9 +205,15 @@ anychart.core.axisMarkers.PathBase.prototype.axisInvalidated_ = function(event) 
 anychart.core.axisMarkers.PathBase.prototype.axis = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.axis_ != opt_value) {
-      if (this.axis_) this.axis_.unlistenSignals(this.axisInvalidated_, this);
+      if (this.axis_)
+        this.axis_.unlistenSignals(this.axisInvalidated_, this);
       this.axis_ = opt_value;
       this.axis_.listenSignals(this.axisInvalidated_, this);
+
+      if (this.scale_)
+        this.scale_.unlistenSignals(this.scaleInvalidated, this);
+      this.scale_ = null;
+
       this.invalidate(anychart.ConsistencyState.BOUNDS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
@@ -364,6 +371,7 @@ anychart.core.axisMarkers.PathBase.prototype.drawRange = function() {
   }
 
   var el = /** @type {acgraph.vector.Path} */ (this.markerElement());
+  el.clear();
 
   var to = range.to;
   var from = range.from;
@@ -385,8 +393,6 @@ anychart.core.axisMarkers.PathBase.prototype.drawRange = function() {
   var ratioMaxValue = Math.max(toRatio, fromRatio);
 
   if (isNaN(ratioMinValue) || isNaN(ratioMaxValue)) return this;
-
-  el.clear();
 
   if (ratioMaxValue >= 0 && ratioMinValue <= 1) { //range or part of it is visible.
     // clamping to prevent range marker go out from the bounds. Ratio should be between 0 and 1.
