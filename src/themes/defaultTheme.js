@@ -1432,6 +1432,7 @@ goog.provide('anychart.themes.defaultTheme');
           'enabled': true,
           'fill': returnSourceColor50,
           'stroke': returnSourceColor,
+          'hatchFill': null,
           'hoverFill': returnSourceColor70,
           'hoverStroke': returnDarkenSourceColor,
           'selectFill': returnSourceColor70,
@@ -1572,9 +1573,9 @@ goog.provide('anychart.themes.defaultTheme');
           ]
         },
         'marker': {
-          'type': 'arrowUp',
+          'markerType': 'arrowUp',
           'size': 20,
-          'anchor': 'top',
+          'anchor': 'centerTop',
           'offsetX': 0,
           'offsetY': 0
         },
