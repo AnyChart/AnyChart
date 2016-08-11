@@ -354,6 +354,12 @@ anychart.core.PyramidFunnelBase.prototype.isSeries = function() {
  */
 anychart.core.PyramidFunnelBase.prototype.data = function(opt_value, opt_csvSettings) {
   if (goog.isDef(opt_value)) {
+    // handle HTML table data
+    if (opt_value) {
+      if (opt_value['caption']) this.title(opt_value['caption']);
+      if (opt_value['rows']) opt_value = opt_value['rows'];
+    }
+
     if (this.rawData_ !== opt_value) {
       this.rawData_ = opt_value;
       if (this.parentView_ != opt_value || goog.isNull(opt_value)) {

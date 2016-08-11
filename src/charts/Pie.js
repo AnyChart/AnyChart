@@ -397,12 +397,18 @@ anychart.charts.Pie.prototype.isSeries = function() {
 
 /**
  * Getter/setter for data.
- * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_value .
+ * @param {(anychart.data.View|anychart.data.Set|anychart.data.TableData|Array|string)=} opt_value .
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {(anychart.data.View|anychart.charts.Pie)} .
  */
 anychart.charts.Pie.prototype.data = function(opt_value, opt_csvSettings) {
   if (goog.isDef(opt_value)) {
+    // handle HTML table data
+    if (opt_value) {
+      if (opt_value['caption']) this.title(opt_value['caption']);
+      if (opt_value['rows']) opt_value = opt_value['rows'];
+    }
+
     if (this.rawData_ !== opt_value) {
       this.rawData_ = opt_value;
       if (this.parentView_ != opt_value || goog.isNull(opt_value)) {
@@ -410,9 +416,7 @@ anychart.charts.Pie.prototype.data = function(opt_value, opt_csvSettings) {
         //drop data cache
         goog.dispose(this.parentViewToDispose_);
 
-        /**
-         * @type {anychart.data.View}
-         */
+        /** @type {anychart.data.View} */
         var parentView;
         if (opt_value instanceof anychart.data.View) {
           parentView = opt_value;

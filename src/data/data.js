@@ -128,5 +128,37 @@ anychart.data.mapAsTable = function(data, opt_mode, opt_seriesCount) {
 };
 
 
+/**
+ * If opt_keys passed, build object mapping otherwise array mapping
+ * @param {anychart.data.Set} dataSet
+ * @param {number} fromIndex
+ * @param {number} toIndex
+ * @param {!Array.<string>} names
+ * @param {Array.<string>=} opt_keys
+ * @return {!anychart.data.Mapping} *.
+ */
+anychart.data.buildMapping = function(dataSet, fromIndex, toIndex, names, opt_keys) {
+  var settings = {'x': opt_keys ? opt_keys[0] : 0};
+
+  for (var i = 0, count = names.length; i < count; i++) {
+    settings[names[i]] = opt_keys ? opt_keys[fromIndex] : fromIndex;
+    fromIndex++;
+  }
+
+  return opt_keys ? dataSet.mapAs(undefined, settings) : dataSet.mapAs(settings, undefined);
+};
+
+
+/**
+ * @typedef {{
+ *  caption: (string|undefined),
+ *  header: (Array.<string>|undefined),
+ *  rows: (Array|undefined)
+ * }}
+ */
+anychart.data.TableData;
+
+
 //exports
 goog.exportSymbol('anychart.data.mapAsTable', anychart.data.mapAsTable);//doc|ex
+goog.exportSymbol('anychart.data.buildMapping', anychart.data.buildMapping);

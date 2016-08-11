@@ -30,8 +30,6 @@ anychart.enums.ChartTypes = {
   COLUMN_3D: 'column3d',
   FINANCIAL: 'financial',
   FUNNEL: 'funnel',
-  GANTT_RESOURCE: 'ganttResource',
-  GANTT_PROJECT: 'ganttProject',
   LINE: 'line',
   MARKER: 'marker',
   PIE: 'pie',
@@ -40,11 +38,13 @@ anychart.enums.ChartTypes = {
   PYRAMID: 'pyramid',
   RADAR: 'radar',
   SCATTER: 'scatter',
-  STOCK: 'stock',
   SPARKLINE: 'sparkline',
   HEAT_MAP: 'heatMap',
   TREE_MAP: 'treeMap',
-  PERT: 'pert'
+  STOCK: 'stock',
+  PERT: 'pert',
+  GANTT_RESOURCE: 'ganttResource',
+  GANTT_PROJECT: 'ganttProject'
 };
 
 

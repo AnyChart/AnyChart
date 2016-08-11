@@ -318,18 +318,18 @@ anychart.charts.Gantt.prototype.scrollInvalidated_ = function(event) {
 
 /**
  * Gets/sets chart data.
- * @param {(anychart.data.Tree|Array.<Object>)=} opt_data - Data tree or raw data.
+ * @param {(anychart.data.Tree|Array.<Object>)=} opt_value - Data tree or raw data.
  * @param {anychart.enums.TreeFillingMethod=} opt_fillMethod - Fill method.
  * @return {(anychart.data.Tree|anychart.charts.Gantt)} - Current value or itself for method chaining.
  */
-anychart.charts.Gantt.prototype.data = function(opt_data, opt_fillMethod) {
-  if (goog.isDef(opt_data)) {
-    if (opt_data instanceof anychart.data.Tree) {
-      if (this.data_ != opt_data) {
-        this.data_ = opt_data;
+anychart.charts.Gantt.prototype.data = function(opt_value, opt_fillMethod) {
+  if (goog.isDef(opt_value)) {
+    if (opt_value instanceof anychart.data.Tree) {
+      if (this.data_ != opt_value) {
+        this.data_ = opt_value;
       }
     } else {
-      this.data_ = new anychart.data.Tree(opt_data, opt_fillMethod);
+      this.data_ = new anychart.data.Tree(opt_value, opt_fillMethod);
     }
     this.invalidate(anychart.ConsistencyState.GANTT_DATA);
     return this;

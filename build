@@ -452,6 +452,8 @@ def __apply_specific_file_name_rule(file_name, modules):
         file_name = file_name.replace('anychart_bundle', 'anychart-bundle')
     elif modules == ['anychart_ui']:
         file_name = file_name.replace('anychart_ui', 'anychart-ui')
+    elif modules == ['data_adapter']:
+        file_name = file_name.replace('data_adapter', 'data-adapter')
     return file_name
 
 
