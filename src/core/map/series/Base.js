@@ -850,8 +850,8 @@ anychart.core.map.series.Base.prototype.getPositionByRegion = function() {
 
   var midX = iterator.get('middle-x');
   var midY = iterator.get('middle-y');
-  var middleX = /** @type {number}*/(goog.isDef(midX) ? midX : pointGeoProp ? pointGeoProp['middle-x'] : .5);
-  var middleY = /** @type {number}*/(goog.isDef(midY) ? midY : pointGeoProp ? pointGeoProp['middle-y'] : .5);
+  var middleX = /** @type {number} */(goog.isDef(midX) ? midX : pointGeoProp && goog.isDef(pointGeoProp['middle-x']) ? pointGeoProp['middle-x'] : .5);
+  var middleY = /** @type {number} */(goog.isDef(midY) ? midY : pointGeoProp && goog.isDef(pointGeoProp['middle-y']) ? pointGeoProp['middle-y'] : .5);
 
   var shape = feature ? feature.domElement : null;
   var positionProvider;
