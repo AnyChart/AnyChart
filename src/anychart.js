@@ -12,6 +12,7 @@ goog.require('anychart.core.reporting');
 goog.require('anychart.performance');
 goog.require('anychart.themes.merging');
 goog.require('anychart.utils');
+goog.require('goog.array');
 goog.require('goog.dom');
 goog.require('goog.dom.animationFrame.polyfill');
 goog.require('goog.json.hybrid');
@@ -500,19 +501,50 @@ anychart.isValidKey = function() {
 };
 
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Themes.
+//
+//----------------------------------------------------------------------------------------------------------------------
 /**
- * Sets the theme for anychart globally or gets current theme.
- * @param {(string|Object)=} opt_value Object with theme settings or name of the theme.
- * @return {Object}
+ * Array of themes that will be applied for anychart globally.
+ * @type {Array<string|Object>}
+ * @private
+ */
+anychart.themes_ = [];
+
+
+/**
+ * Sets the theme/themes for anychart globally or gets current theme/themes.
+ * @param {?(string|Object|Array<string|Object>)=} opt_value Object/name of a theme or array of objects/names of the themes.
+ * @return {string|Object|Array<string|Object>}
  */
 anychart.theme = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (goog.isString(opt_value))
-      opt_value = goog.global['anychart']['themes'][opt_value];
-    anychart.theme_ = opt_value;
+    if (!goog.isArray(opt_value)) {
+      opt_value = [opt_value];
+    }
+    anychart.themes_ = opt_value || [];
     delete anychart.compiledTheme_;
   }
-  return anychart.theme_ ? anychart.theme_ : goog.global['anychart']['themes'][anychart.DEFAULT_THEME];
+  return anychart.themes_;
+};
+
+
+/**
+ * Append theme for anychart globally.
+ * @param {string|Object} value
+ */
+anychart.appendTheme = function(value) {
+  if (goog.isString(value)) {
+    value = goog.global['anychart']['themes'][value];
+  }
+  anychart.themes_.push(value);
+  if (anychart.compiledTheme_) {
+    anychart.compiledTheme_ = anychart.themes.merging.merge(
+        anychart.themes.merging.compileTheme(value),
+        anychart.compiledTheme_);
+  }
 };
 
 
@@ -527,10 +559,13 @@ anychart.getFullTheme = function() {
       anychart.defaultThemeCompiled_ = anychart.themes.merging.compileTheme(
           goog.global['anychart']['themes'][anychart.DEFAULT_THEME]);
     }
-    if (anychart.theme_) {
-      anychart.compiledTheme_ = anychart.themes.merging.merge(
-          anychart.themes.merging.compileTheme(anychart.theme_),
-          anychart.defaultThemeCompiled_);
+    if (anychart.themes_.length) {
+      anychart.compiledTheme_ = goog.array.reduce(anychart.themes_, function(mergedThemes, themeToMerge) {
+        return anychart.themes.merging.merge(
+            anychart.themes.merging.compileTheme(
+                goog.isString(themeToMerge) ? goog.global['anychart']['themes'][themeToMerge] : themeToMerge),
+            mergedThemes);
+      }, anychart.defaultThemeCompiled_);
     } else {
       anychart.compiledTheme_ = anychart.defaultThemeCompiled_;
     }
@@ -943,6 +978,7 @@ goog.exportSymbol('anychart.ganttProject', anychart.ganttProject);
 goog.exportSymbol('anychart.ganttResource', anychart.ganttResource);
 goog.exportSymbol('anychart.stock', anychart.stock);
 goog.exportSymbol('anychart.theme', anychart.theme);
+goog.exportSymbol('anychart.appendTheme', anychart.appendTheme);
 goog.exportSymbol('anychart.toolbar', anychart.toolbar);
 goog.exportSymbol('anychart.ganttToolbar', anychart.ganttToolbar);
 goog.exportSymbol('anychart.treeMap', anychart.treeMap);
