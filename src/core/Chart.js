@@ -2724,9 +2724,12 @@ anychart.core.Chart.prototype.saveAsXml = function(opt_includeTheme, opt_filenam
   var stage = this.container() ? this.container().getStage() : null;
   if (stage) {
     var xml = /** @type {string} */(this.toXml(false, opt_includeTheme));
-    var option = {};
-    option['file-name'] = opt_filename || anychart.exports.filename();
-    stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/xml', xml, 'xml', 'file', option);
+    var options = {};
+    options['file-name'] = opt_filename || anychart.exports.filename();
+    options['data'] = xml;
+    options['dataType'] = 'xml';
+    options['responseType'] = 'file';
+    stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/xml', options);
   }
 };
 
@@ -2740,9 +2743,12 @@ anychart.core.Chart.prototype.saveAsJson = function(opt_includeTheme, opt_filena
   var stage = this.container() ? this.container().getStage() : null;
   if (stage) {
     var json = /** @type {string} */(this.toJson(true, opt_includeTheme));
-    var option = {};
-    option['file-name'] = opt_filename || anychart.exports.filename();
-    stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/json', json, 'json', 'file', option);
+    var options = {};
+    options['file-name'] = opt_filename || anychart.exports.filename();
+    options['data'] = json;
+    options['dataType'] = 'json';
+    options['responseType'] = 'file';
+    stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/json', options);
   }
 };
 
@@ -2757,9 +2763,12 @@ anychart.core.Chart.prototype.saveAsCsv = function(opt_chartDataExportMode, opt_
   var stage = this.container() ? this.container().getStage() : null;
   if (stage) {
     var csv = this.toCsv(opt_chartDataExportMode, opt_csvSettings);
-    var option = {};
-    option['file-name'] = opt_filename || anychart.exports.filename();
-    stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/csv', csv, 'csv', 'file', option);
+    var options = {};
+    options['file-name'] = opt_filename || anychart.exports.filename();
+    options['data'] = csv;
+    options['dataType'] = 'csv';
+    options['responseType'] = 'file';
+    stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/csv', options);
   }
 };
 
@@ -2777,9 +2786,12 @@ anychart.core.Chart.prototype.saveAsXlsx = function(opt_chartDataExportMode, opt
       'columnsSeparator': ',',
       'ignoreFirstRow': false
     });
-    var option = {};
-    option['file-name'] = opt_filename || anychart.exports.filename();
-    stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/xlsx', csv, 'xlsx', 'file', option);
+    var options = {};
+    options['file-name'] = opt_filename || anychart.exports.filename();
+    options['data'] = csv;
+    options['dataType'] = 'xlsx';
+    options['responseType'] = 'file';
+    stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/xlsx', options);
   }
 };
 
@@ -2803,6 +2815,14 @@ anychart.core.Chart.prototype['saveAsPng'] = anychart.core.Chart.prototype.saveA
 anychart.core.Chart.prototype['saveAsJpg'] = anychart.core.Chart.prototype.saveAsJpg;//inherited
 anychart.core.Chart.prototype['saveAsPdf'] = anychart.core.Chart.prototype.saveAsPdf;//inherited
 anychart.core.Chart.prototype['saveAsSvg'] = anychart.core.Chart.prototype.saveAsSvg;//inherited
+anychart.core.Chart.prototype['shareAsPng'] = anychart.core.Chart.prototype.shareAsPng;//inherited
+anychart.core.Chart.prototype['shareAsJpg'] = anychart.core.Chart.prototype.shareAsJpg;//inherited
+anychart.core.Chart.prototype['shareAsPdf'] = anychart.core.Chart.prototype.shareAsPdf;//inherited
+anychart.core.Chart.prototype['shareAsSvg'] = anychart.core.Chart.prototype.shareAsSvg;//inherited
+anychart.core.Chart.prototype['getPngBase64String'] = anychart.core.Chart.prototype.getPngBase64String;//inherited
+anychart.core.Chart.prototype['getJpgBase64String'] = anychart.core.Chart.prototype.getJpgBase64String;//inherited
+anychart.core.Chart.prototype['getSvgBase64String'] = anychart.core.Chart.prototype.getSvgBase64String;//inherited
+anychart.core.Chart.prototype['getPdfBase64String'] = anychart.core.Chart.prototype.getPdfBase64String;//inherited
 anychart.core.Chart.prototype['toSvg'] = anychart.core.Chart.prototype.toSvg;//inherited
 anychart.core.Chart.prototype['saveAsCsv'] = anychart.core.Chart.prototype.saveAsCsv;
 anychart.core.Chart.prototype['saveAsXlsx'] = anychart.core.Chart.prototype.saveAsXlsx;

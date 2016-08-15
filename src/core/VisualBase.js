@@ -612,6 +612,130 @@ anychart.core.VisualBase.prototype.toSvg = function(opt_paperSizeOrWidth, opt_la
 };
 
 
+//region --- SHARING ---
+/**
+ * Share container's stage as png and return link to shared image.
+ * @param {function(string)} onSuccess Function that will be called when sharing will complete.
+ * @param {function(string)=} opt_onError Function that will be called when sharing will complete.
+ * @param {boolean=} opt_asBase64 Share as base64 file.
+ * @param {number=} opt_width Image width.
+ * @param {number=} opt_height Image height.
+ * @param {number=} opt_quality Image quality in ratio 0-1.
+ * @param {string=} opt_filename file name to save.
+ */
+anychart.core.VisualBase.prototype.shareAsPng = function(onSuccess, opt_onError, opt_asBase64, opt_width, opt_height, opt_quality, opt_filename) {
+  var stage = this.container() ? this.container().getStage() : null;
+  if (stage) stage.shareAsPng(onSuccess, opt_onError, opt_asBase64, opt_width, opt_height, opt_quality, opt_filename || anychart.exports.filename());
+};
+
+
+/**
+ * Share container's stage as jpg and return link to shared image.
+ * @param {function(string)} onSuccess Function that will be called when sharing will complete.
+ * @param {function(string)=} opt_onError Function that will be called when sharing will complete.
+ * @param {boolean=} opt_asBase64 Share as base64 file.
+ * @param {number=} opt_width Image width.
+ * @param {number=} opt_height Image height.
+ * @param {number=} opt_quality Image quality in ratio 0-1.
+ * @param {boolean=} opt_forceTransparentWhite Define, should we force transparent to white background.
+ * @param {string=} opt_filename file name to save.
+ */
+anychart.core.VisualBase.prototype.shareAsJpg = function(onSuccess, opt_onError, opt_asBase64, opt_width, opt_height, opt_quality, opt_forceTransparentWhite, opt_filename) {
+  var stage = this.container() ? this.container().getStage() : null;
+  if (stage) stage.shareAsJpg(onSuccess, opt_onError, opt_asBase64, opt_width, opt_height, opt_quality, opt_forceTransparentWhite, opt_filename || anychart.exports.filename());
+};
+
+
+/**
+ * Share container's stage as svg and return link to shared image.
+ * @param {function(string)} onSuccess Function that will be called when sharing will complete.
+ * @param {function(string)=} opt_onError Function that will be called when sharing will complete.
+ * @param {boolean=} opt_asBase64 Share as base64 file.
+ * @param {(string|number)=} opt_paperSizeOrWidth Paper Size or width.
+ * @param {(boolean|string)=} opt_landscapeOrHeight Landscape or height.
+ * @param {string=} opt_filename file name to save.
+ */
+anychart.core.VisualBase.prototype.shareAsSvg = function(onSuccess, opt_onError, opt_asBase64, opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_filename) {
+  var stage = this.container() ? this.container().getStage() : null;
+  if (stage) stage.shareAsSvg(onSuccess, opt_onError, opt_asBase64, opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_filename || anychart.exports.filename());
+};
+
+
+/**
+ * Share container's stage as pdf and return link to shared pdf document.
+ * @param {function(string)} onSuccess Function that will be called when sharing will complete.
+ * @param {function(string)=} opt_onError Function that will be called when sharing will complete.
+ * @param {boolean=} opt_asBase64 Share as base64 file.
+ * @param {(number|string)=} opt_paperSizeOrWidth Any paper format like 'a0', 'tabloid', 'b4', etc.
+ * @param {(number|boolean)=} opt_landscapeOrWidth Define, is landscape.
+ * @param {number=} opt_x Offset X.
+ * @param {number=} opt_y Offset Y.
+ * @param {string=} opt_filename file name to save.
+ */
+anychart.core.VisualBase.prototype.shareAsPdf = function(onSuccess, opt_onError, opt_asBase64, opt_paperSizeOrWidth, opt_landscapeOrWidth, opt_x, opt_y, opt_filename) {
+  var stage = this.container() ? this.container().getStage() : null;
+  if (stage) stage.shareAsPdf(onSuccess, opt_onError, opt_asBase64, opt_paperSizeOrWidth, opt_landscapeOrWidth, opt_x, opt_y, opt_filename || anychart.exports.filename());
+};
+
+
+/**
+ * Returns base64 string for png.
+ * @param {function(string)} onSuccess Function that will be called when sharing will complete.
+ * @param {function(string)=} opt_onError Function that will be called when sharing will complete.
+ * @param {number=} opt_width Image width.
+ * @param {number=} opt_height Image height.
+ * @param {number=} opt_quality Image quality in ratio 0-1.
+ */
+anychart.core.VisualBase.prototype.getPngBase64String = function(onSuccess, opt_onError, opt_width, opt_height, opt_quality) {
+  var stage = this.container() ? this.container().getStage() : null;
+  if (stage) stage.getPngBase64String(onSuccess, opt_onError, opt_width, opt_height, opt_quality);
+};
+
+
+/**
+ * Returns base64 string for jpg.
+ * @param {function(string)} onSuccess Function that will be called when sharing will complete.
+ * @param {function(string)=} opt_onError Function that will be called when sharing will complete.
+ * @param {number=} opt_width Image width.
+ * @param {number=} opt_height Image height.
+ * @param {number=} opt_quality Image quality in ratio 0-1.
+ * @param {boolean=} opt_forceTransparentWhite Define, should we force transparent to white background.
+ */
+anychart.core.VisualBase.prototype.getJpgBase64String = function(onSuccess, opt_onError, opt_width, opt_height, opt_quality, opt_forceTransparentWhite) {
+  var stage = this.container() ? this.container().getStage() : null;
+  if (stage) stage.getJpgBase64String(onSuccess, opt_onError, opt_width, opt_height, opt_quality, opt_forceTransparentWhite);
+};
+
+
+/**
+ * Returns base64 string for svg.
+ * @param {function(string)} onSuccess Function that will be called when sharing will complete.
+ * @param {function(string)=} opt_onError Function that will be called when sharing will complete.
+ * @param {(string|number)=} opt_paperSizeOrWidth Paper Size or width.
+ * @param {(boolean|string)=} opt_landscapeOrHeight Landscape or height.
+ */
+anychart.core.VisualBase.prototype.getSvgBase64String = function(onSuccess, opt_onError, opt_paperSizeOrWidth, opt_landscapeOrHeight) {
+  var stage = this.container() ? this.container().getStage() : null;
+  if (stage) stage.getSvgBase64String(onSuccess, opt_onError, opt_paperSizeOrWidth, opt_landscapeOrHeight);
+};
+
+
+/**
+ * Returns base64 string for pdf.
+ * @param {function(string)} onSuccess Function that will be called when sharing will complete.
+ * @param {function(string)=} opt_onError Function that will be called when sharing will complete.
+ * @param {(number|string)=} opt_paperSizeOrWidth Any paper format like 'a0', 'tabloid', 'b4', etc.
+ * @param {(number|boolean)=} opt_landscapeOrWidth Define, is landscape.
+ * @param {number=} opt_x Offset X.
+ * @param {number=} opt_y Offset Y.
+ */
+anychart.core.VisualBase.prototype.getPdfBase64String = function(onSuccess, opt_onError, opt_paperSizeOrWidth, opt_landscapeOrWidth, opt_x, opt_y) {
+  var stage = this.container() ? this.container().getStage() : null;
+  if (stage) stage.getPdfBase64String(onSuccess, opt_onError, opt_paperSizeOrWidth, opt_landscapeOrWidth, opt_x, opt_y);
+};
+//endregion
+
+
 /**
  * Print all element on related stage.
  * @param {acgraph.vector.PaperSize=} opt_paperSize
