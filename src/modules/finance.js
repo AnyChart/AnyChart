@@ -37,7 +37,7 @@ anychart.financial = function(var_args) {
   chart.setup(theme['financial']);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
-    chart.candlestick(arguments[i]);
+    chart['candlestick'](arguments[i]);
   }
 
   return chart;

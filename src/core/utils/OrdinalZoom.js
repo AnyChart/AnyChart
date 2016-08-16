@@ -112,9 +112,13 @@ anychart.core.utils.OrdinalZoom.prototype.ensureSetupApplied = function() {
       else
         this.setTo(0, length);
     } else if (goog.isDef(this.setup_.start) && goog.isDef(this.setup_.end) && scale) {
-      this.setTo(
-          scale.reverseZoomAndInverse(scale.transform(this.setup_.start)),
-          scale.reverseZoomAndInverse(scale.transform(this.setup_.end)));
+      var start = scale.reverseZoomAndInverse(scale.transform(this.setup_.start, 0));
+      var end = scale.reverseZoomAndInverse(scale.transform(this.setup_.end, 1));
+      if (start > end) {
+        start = scale.reverseZoomAndInverse(scale.transform(this.setup_.end, 0));
+        end = scale.reverseZoomAndInverse(scale.transform(this.setup_.start, 1));
+      }
+      this.setTo(start, end);
     } else {
       this.setup_ = null;
     }

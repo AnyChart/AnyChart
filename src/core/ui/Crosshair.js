@@ -13,7 +13,7 @@ anychart.core.ui.Crosshair = function() {
   goog.base(this);
 
   /**
-   * @type {anychart.core.CartesianBase|anychart.charts.Scatter}
+   * @type {anychart.core.ChartWithAxes}
    * @private
    */
   this.chart_ = null;
@@ -81,9 +81,6 @@ anychart.core.ui.Crosshair = function() {
 
   this.xLine_.disablePointerEvents(true);
   this.yLine_.disablePointerEvents(true);
-
-  this.xLabel_.markConsistent(anychart.ConsistencyState.ALL);
-  this.yLabel_.markConsistent(anychart.ConsistencyState.ALL);
 
   this.xLabel_.listenSignals(this.labelInvalidated_, this);
   this.yLabel_.listenSignals(this.labelInvalidated_, this);
@@ -346,8 +343,8 @@ anychart.core.ui.Crosshair.prototype.draw = function() {
     this.xLine_.zIndex(zIndex);
     this.yLine_.zIndex(zIndex);
 
-    this.xLabel_.zIndex(zIndex);
-    this.yLabel_.zIndex(zIndex);
+    this.xLabel_.setAutoZIndex(zIndex);
+    this.yLabel_.setAutoZIndex(zIndex);
 
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
@@ -365,7 +362,7 @@ anychart.core.ui.Crosshair.prototype.draw = function() {
 
 /**
  *
- * @param {(anychart.core.CartesianBase|anychart.charts.Scatter)=} opt_chart
+ * @param {anychart.core.ChartWithAxes=} opt_chart
  */
 anychart.core.ui.Crosshair.prototype.bindHandlers = function(opt_chart) {
   if (opt_chart) {

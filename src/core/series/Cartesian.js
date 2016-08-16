@@ -220,14 +220,14 @@ anychart.core.series.Cartesian.prototype.xScale = function(opt_value) {
     }
     return this;
   } else {
-    return this.xScale_;
+    return this.xScale_ || /** @type {anychart.scales.Base} */(this.chart.xScale());
   }
 };
 
 
 /** @inheritDoc */
 anychart.core.series.Cartesian.prototype.getXScale = function() {
-  return /** @type {anychart.scales.Base} */(this.xScale()) || anychart.core.series.Cartesian.base(this, 'getXScale');
+  return /** @type {anychart.scales.Base} */(this.xScale());
 };
 
 
@@ -370,6 +370,24 @@ anychart.core.series.Cartesian.prototype.getDetachedIterator = function() {
     return new anychart.core.utils.DrawingPlanIterator(this);
   else
     return this.data().getIterator();
+};
+
+
+/**
+ * Returns stacked value. Published method.
+ * @param {number} index
+ * @return {number|undefined}
+ */
+anychart.core.series.Cartesian.prototype.getBubblePixelRadius = function(index) {
+  if (this.drawingPlan) {
+    var point = this.drawingPlan.data[index];
+    if (point) {
+      return /** @type {number|undefined} */(point.meta[anychart.opt.SIZE]);
+    } else {
+      return undefined;
+    }
+  }
+  return this.data().meta(index, anychart.opt.SIZE);
 };
 
 

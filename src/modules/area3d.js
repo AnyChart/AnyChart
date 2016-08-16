@@ -29,7 +29,7 @@ anychart.area3d = function(var_args) {
   chart.setup(theme['area3d']);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
-    chart.area(arguments[i]);
+    chart['area'](arguments[i]);
   }
 
   return chart;

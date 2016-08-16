@@ -30,7 +30,7 @@ anychart.column = function(var_args) {
   chart.setup(theme['column']);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
-    chart.column(arguments[i]);
+    chart['column'](arguments[i]);
   }
 
   return chart;

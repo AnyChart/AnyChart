@@ -1699,7 +1699,7 @@ anychart.core.Chart.prototype.getPoint = goog.abstractMethod;
  * @param {anychart.core.MouseEvent} event
  * @return {?Array.<{series: (anychart.core.series.Base|anychart.core.SeriesBase), points: Array.<number>, lastPoint: number, nearestPointToCursor: Object.<number>}>}
  */
-anychart.core.Chart.prototype.getSeriesStatus = goog.abstractMethod;
+anychart.core.Chart.prototype.getSeriesStatus;
 
 
 /**
@@ -2390,7 +2390,7 @@ anychart.core.Chart.prototype.toTreeDataCsv_ = function(opt_csvSettings) {
   this.checkSeparator(columnsSeparator);
   var ignoreFirstRow = settings['ignoreFirstRow'] || false;
 
-  var data = this.data();
+  var data = (/** @type {{data:Function}} */(this)).data();
 
   var serialized = data.serialize();
   var roots = serialized['children'];

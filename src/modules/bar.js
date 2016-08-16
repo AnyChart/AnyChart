@@ -30,7 +30,7 @@ anychart.bar = function(var_args) {
   chart.setup(theme['bar']);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
-    chart.bar(arguments[i]);
+    chart['bar'](arguments[i]);
   }
 
   return chart;

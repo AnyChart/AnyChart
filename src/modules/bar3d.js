@@ -29,7 +29,7 @@ anychart.bar3d = function(var_args) {
   chart.setup(theme['bar3d']);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
-    chart.bar(arguments[i]);
+    chart['bar'](arguments[i]);
   }
 
   return chart;

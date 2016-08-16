@@ -36,7 +36,7 @@ anychart.box = function(var_args) {
   chart.setup(theme['box']);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
-    chart.box(arguments[i]);
+    chart['box'](arguments[i]);
   }
 
   return chart;

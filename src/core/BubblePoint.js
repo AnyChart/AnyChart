@@ -21,6 +21,9 @@ goog.inherits(anychart.core.BubblePoint, anychart.core.SeriesPoint);
  * @return {number} Radius in pixels.
  */
 anychart.core.BubblePoint.prototype.getPixelRadius = function() {
+  if (this.series.getBubblePixelRadius) {
+    return Math.abs(this.series.getBubblePixelRadius(this.index));
+  }
   return /** @type {number} */ (Math.abs(this.series.data().meta(this.index, 'size')));
 };
 

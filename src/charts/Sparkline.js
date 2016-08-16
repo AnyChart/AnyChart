@@ -2243,16 +2243,6 @@ anychart.charts.Sparkline.prototype.drawContent = function(bounds) {
  * Invalidates APPEARANCE for all width-based series.
  * @private
  */
-anychart.charts.Sparkline.prototype.invalidateWidthBasedSeries_ = function() {
-  if (this.series_ && this.series_.isWidthBased())
-    this.series_.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
-};
-
-
-/**
- * Invalidates APPEARANCE for all width-based series.
- * @private
- */
 anychart.charts.Sparkline.prototype.invalidateSeries_ = function() {
   if (this.series_)
     this.series_.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);

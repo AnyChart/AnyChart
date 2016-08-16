@@ -32,7 +32,7 @@ anychart.line = function(var_args) {
   chart.setup(theme['line']);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
-    chart.line(arguments[i]);
+    chart['line'](arguments[i]);
   }
   anychart.performance.end('anychart.line()');
   return chart;

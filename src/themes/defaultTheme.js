@@ -2243,6 +2243,7 @@ goog.provide('anychart.themes.defaultTheme');
           'selectSize': 7
         }
       },
+      'defaultAnnotationSettings': {},
       'defaultXAxisSettings': {
         'orientation': 'bottom',
         'scale': 0,
@@ -2326,6 +2327,10 @@ goog.provide('anychart.themes.defaultTheme');
       },
       'a11y': {
         'titleFormatter': scatterA11yTitleFormatter
+      },
+      'annotations': {
+        'annotationsList': [],
+        'zIndex': 2000
       }
     },
     // merge with scatter

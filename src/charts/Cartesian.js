@@ -32,7 +32,7 @@ goog.inherits(anychart.charts.Cartesian, anychart.core.CartesianBase);
 
 /**
  * Series config for Cartesian chart.
- * @type {Object.<string, anychart.core.series.TypeConfig>}
+ * @type {!Object.<string, anychart.core.series.TypeConfig>}
  */
 anychart.charts.Cartesian.prototype.seriesConfig = (function() {
   var res = {};
@@ -298,6 +298,7 @@ anychart.charts.Cartesian.prototype.seriesConfig = (function() {
   };
   return res;
 })();
+anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.charts.Cartesian, anychart.charts.Cartesian.prototype.seriesConfig);
 
 
 /**
@@ -323,8 +324,6 @@ anychart.cartesian = function(opt_barChartMode) {
 
   return chart;
 };
-
-
 anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN] = anychart.cartesian;
 
 
@@ -365,24 +364,25 @@ anychart.charts.Cartesian.prototype['getXAxesCount'] = anychart.charts.Cartesian
 anychart.charts.Cartesian.prototype['yAxis'] = anychart.charts.Cartesian.prototype.yAxis;
 anychart.charts.Cartesian.prototype['getYAxesCount'] = anychart.charts.Cartesian.prototype.getYAxesCount;
 anychart.charts.Cartesian.prototype['getSeries'] = anychart.charts.Cartesian.prototype.getSeries;
-anychart.charts.Cartesian.prototype['area'] = anychart.charts.Cartesian.prototype.area;
-anychart.charts.Cartesian.prototype['bar'] = anychart.charts.Cartesian.prototype.bar;
-anychart.charts.Cartesian.prototype['box'] = anychart.charts.Cartesian.prototype.box;
-anychart.charts.Cartesian.prototype['bubble'] = anychart.charts.Cartesian.prototype.bubble;
-anychart.charts.Cartesian.prototype['candlestick'] = anychart.charts.Cartesian.prototype.candlestick;
-anychart.charts.Cartesian.prototype['column'] = anychart.charts.Cartesian.prototype.column;
-anychart.charts.Cartesian.prototype['line'] = anychart.charts.Cartesian.prototype.line;
-anychart.charts.Cartesian.prototype['marker'] = anychart.charts.Cartesian.prototype.marker;
-anychart.charts.Cartesian.prototype['ohlc'] = anychart.charts.Cartesian.prototype.ohlc;
-anychart.charts.Cartesian.prototype['rangeArea'] = anychart.charts.Cartesian.prototype.rangeArea;
-anychart.charts.Cartesian.prototype['rangeBar'] = anychart.charts.Cartesian.prototype.rangeBar;
-anychart.charts.Cartesian.prototype['rangeColumn'] = anychart.charts.Cartesian.prototype.rangeColumn;
-anychart.charts.Cartesian.prototype['rangeSplineArea'] = anychart.charts.Cartesian.prototype.rangeSplineArea;
-anychart.charts.Cartesian.prototype['rangeStepArea'] = anychart.charts.Cartesian.prototype.rangeStepArea;
-anychart.charts.Cartesian.prototype['spline'] = anychart.charts.Cartesian.prototype.spline;
-anychart.charts.Cartesian.prototype['splineArea'] = anychart.charts.Cartesian.prototype.splineArea;
-anychart.charts.Cartesian.prototype['stepLine'] = anychart.charts.Cartesian.prototype.stepLine;
-anychart.charts.Cartesian.prototype['stepArea'] = anychart.charts.Cartesian.prototype.stepArea;
+// generated automatically
+// anychart.charts.Cartesian.prototype['area'] = anychart.charts.Cartesian.prototype.area;
+// anychart.charts.Cartesian.prototype['bar'] = anychart.charts.Cartesian.prototype.bar;
+// anychart.charts.Cartesian.prototype['box'] = anychart.charts.Cartesian.prototype.box;
+// anychart.charts.Cartesian.prototype['bubble'] = anychart.charts.Cartesian.prototype.bubble;
+// anychart.charts.Cartesian.prototype['candlestick'] = anychart.charts.Cartesian.prototype.candlestick;
+// anychart.charts.Cartesian.prototype['column'] = anychart.charts.Cartesian.prototype.column;
+// anychart.charts.Cartesian.prototype['line'] = anychart.charts.Cartesian.prototype.line;
+// anychart.charts.Cartesian.prototype['marker'] = anychart.charts.Cartesian.prototype.marker;
+// anychart.charts.Cartesian.prototype['ohlc'] = anychart.charts.Cartesian.prototype.ohlc;
+// anychart.charts.Cartesian.prototype['rangeArea'] = anychart.charts.Cartesian.prototype.rangeArea;
+// anychart.charts.Cartesian.prototype['rangeBar'] = anychart.charts.Cartesian.prototype.rangeBar;
+// anychart.charts.Cartesian.prototype['rangeColumn'] = anychart.charts.Cartesian.prototype.rangeColumn;
+// anychart.charts.Cartesian.prototype['rangeSplineArea'] = anychart.charts.Cartesian.prototype.rangeSplineArea;
+// anychart.charts.Cartesian.prototype['rangeStepArea'] = anychart.charts.Cartesian.prototype.rangeStepArea;
+// anychart.charts.Cartesian.prototype['spline'] = anychart.charts.Cartesian.prototype.spline;
+// anychart.charts.Cartesian.prototype['splineArea'] = anychart.charts.Cartesian.prototype.splineArea;
+// anychart.charts.Cartesian.prototype['stepLine'] = anychart.charts.Cartesian.prototype.stepLine;
+// anychart.charts.Cartesian.prototype['stepArea'] = anychart.charts.Cartesian.prototype.stepArea;
 anychart.charts.Cartesian.prototype['lineMarker'] = anychart.charts.Cartesian.prototype.lineMarker;
 anychart.charts.Cartesian.prototype['rangeMarker'] = anychart.charts.Cartesian.prototype.rangeMarker;
 anychart.charts.Cartesian.prototype['textMarker'] = anychart.charts.Cartesian.prototype.textMarker;

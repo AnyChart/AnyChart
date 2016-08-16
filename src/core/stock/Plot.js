@@ -925,7 +925,11 @@ anychart.core.stock.Plot.prototype.yScale = function(opt_value) {
       return this;
     }
     if (this.yScale_ != opt_value) {
+      if (this.yScale_)
+        this.yScale_.unlistenSignals(this.yScaleInvalidated, this);
       this.yScale_ = opt_value;
+      if (this.yScale_)
+        this.yScale_.listenSignals(this.yScaleInvalidated, this);
       this.invalidateRedrawable(false);
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
     }
@@ -935,6 +939,29 @@ anychart.core.stock.Plot.prototype.yScale = function(opt_value) {
       this.yScale_ = new anychart.scales.Linear();
     }
     return this.yScale_;
+  }
+};
+
+
+/**
+ * Scale invalidation handler.
+ * @param {anychart.SignalEvent} e
+ * @protected
+ */
+anychart.core.stock.Plot.prototype.yScaleInvalidated = function(e) {
+  var foundOne = 0;
+  for (var i = 0; i < this.series_.length; i++) {
+    var series = this.series_[i];
+    if (series && series.enabled() && series.yScale() == this.yScale_) {
+      foundOne |= series.invalidate(anychart.ConsistencyState.SERIES_POINTS);
+    }
+  }
+  if (foundOne) {
+    var signal = anychart.Signal.NEEDS_REDRAW;
+    if (e.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
+      signal |= anychart.Signal.NEEDS_RECALCULATION;
+    }
+    this.invalidate(anychart.ConsistencyState.STOCK_PLOT_SERIES, signal);
   }
 };
 

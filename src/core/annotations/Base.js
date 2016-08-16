@@ -229,7 +229,7 @@ anychart.core.annotations.Base.prototype.type;
 
 /**
  * Annotation Y scale.
- * @type {anychart.scales.ScatterBase}
+ * @type {anychart.scales.Base}
  * @private
  */
 anychart.core.annotations.Base.prototype.yScale_ = null;
@@ -284,14 +284,7 @@ anychart.core.annotations.Base.prototype.getPlot = function() {
  */
 anychart.core.annotations.Base.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (opt_value) {
-      if (!(opt_value instanceof anychart.scales.ScatterBase)) {
-        anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
-        return this;
-      }
-    } else {
-      opt_value = null;
-    }
+    opt_value = opt_value || null;
     if (this.yScale_ != opt_value) {
       if (this.yScale_)
         this.yScale_.unlistenSignals(this.scaleSignalHandler_, this);
@@ -313,14 +306,7 @@ anychart.core.annotations.Base.prototype.yScale = function(opt_value) {
  */
 anychart.core.annotations.Base.prototype.xScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (opt_value) {
-      if (!(opt_value instanceof anychart.scales.ScatterBase)) {
-        anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE);
-        return this;
-      }
-    } else {
-      opt_value = null;
-    }
+    opt_value = opt_value || null;
     if (this.xScale_ != opt_value) {
       if (this.xScale_)
         (/** @type {anychart.core.Base} */(this.xScale_)).unlistenSignals(this.scaleSignalHandler_, this);

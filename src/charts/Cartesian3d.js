@@ -243,7 +243,7 @@ anychart.charts.Cartesian3d.barColumnPostProcessor = function(series, shapes, po
 
 /**
  * Series config for Cartesian chart.
- * @type {Object.<string, anychart.core.series.TypeConfig>}
+ * @type {!Object.<string, anychart.core.series.TypeConfig>}
  */
 anychart.charts.Cartesian3d.prototype.seriesConfig = (function() {
   var res = {};
@@ -316,6 +316,7 @@ anychart.charts.Cartesian3d.prototype.seriesConfig = (function() {
   };
   return res;
 })();
+anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.charts.Cartesian3d, anychart.charts.Cartesian3d.prototype.seriesConfig);
 
 
 /**
@@ -420,7 +421,7 @@ anychart.charts.Cartesian3d.prototype.zDistribution = function(opt_value) {
       this.zDistribution_ = opt_value;
       this.invalidate(
           anychart.ConsistencyState.BOUNDS |
-          anychart.ConsistencyState.CARTESIAN_SCALE_MAPS,
+          anychart.ConsistencyState.SERIES_CHART_SCALE_MAPS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -597,10 +598,10 @@ anychart.charts.Cartesian3d.prototype.createTextMarkerInstance = function() {
  */
 anychart.charts.Cartesian3d.prototype.setSeriesPointZIndex_ = function(series) {
   var seriesIndex = series.getIndex();
-  var inc = seriesIndex * anychart.core.CartesianBase.ZINDEX_INCREMENT_MULTIPLIER;
+  var inc = seriesIndex * anychart.core.ChartWithSeries.ZINDEX_INCREMENT_MULTIPLIER;
   var iterator = series.getIterator();
   var value = anychart.utils.toNumber(iterator.get('value'));
-  var zIndex = anychart.core.CartesianBase.ZINDEX_SERIES;
+  var zIndex = anychart.core.ChartWithSeries.ZINDEX_SERIES;
 
   if (value > 0) {
     if (series.isBarBased()) {
@@ -811,66 +812,6 @@ anychart.charts.Cartesian3d.prototype.distributeBarClusters = function(numBarClu
 };
 
 
-/**
- * Adds 3D Bar series.
- * @example
- * var chart = anychart.bar3d();
- * chart.bar([10, 4, 17, 20]);
- * chart.container(stage).draw();
- * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
- *    here as a hash map.
- * @return {anychart.core.series.Cartesian} {@link anychart.core.cartesian.series.Bar3d} instance for method chaining.
- */
-anychart.charts.Cartesian3d.prototype.bar = function(data, opt_csvSettings) {
-  return this.createSeriesByType(
-      anychart.enums.Cartesian3dSeriesType.BAR,
-      data,
-      opt_csvSettings
-  );
-};
-
-
-/**
- * Adds 3D Column series.
- * @example
- * var chart = anychart.column3d();
- * chart.column([10, 4, 17, 20]);
- * chart.container(stage).draw();
- * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
- *    here as a hash map.
- * @return {anychart.core.series.Cartesian} {@link anychart.core.cartesian.series.Column3d} instance for method chaining.
- */
-anychart.charts.Cartesian3d.prototype.column = function(data, opt_csvSettings) {
-  return this.createSeriesByType(
-      anychart.enums.Cartesian3dSeriesType.COLUMN,
-      data,
-      opt_csvSettings
-  );
-};
-
-
-/**
- * Adds 3D Area series.
- * @example
- * var chart = anychart.area3d();
- * chart.area([10, 4, 17, 20]);
- * chart.container(stage).draw();
- * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
- *    here as a hash map.
- * @return {anychart.core.series.Cartesian} {@link anychart.core.cartesian.series.Area3d} instance for method chaining.
- */
-anychart.charts.Cartesian3d.prototype.area = function(data, opt_csvSettings) {
-  return this.createSeriesByType(
-      anychart.enums.Cartesian3dSeriesType.AREA,
-      data,
-      opt_csvSettings
-  );
-};
-
-
 /** @inheritDoc */
 anychart.charts.Cartesian3d.prototype.makeBrowserEvent = function(e) {
   //this method is invoked only for events from data layer
@@ -927,9 +868,10 @@ anychart.charts.Cartesian3d.prototype['minorGrid'] = anychart.charts.Cartesian3d
 anychart.charts.Cartesian3d.prototype['xAxis'] = anychart.charts.Cartesian3d.prototype.xAxis;
 anychart.charts.Cartesian3d.prototype['yAxis'] = anychart.charts.Cartesian3d.prototype.yAxis;
 anychart.charts.Cartesian3d.prototype['getSeries'] = anychart.charts.Cartesian3d.prototype.getSeries;
-anychart.charts.Cartesian3d.prototype['area'] = anychart.charts.Cartesian3d.prototype.area;
-anychart.charts.Cartesian3d.prototype['bar'] = anychart.charts.Cartesian3d.prototype.bar;
-anychart.charts.Cartesian3d.prototype['column'] = anychart.charts.Cartesian3d.prototype.column;
+// generated automatically
+// anychart.charts.Cartesian3d.prototype['area'] = anychart.charts.Cartesian3d.prototype.area;
+// anychart.charts.Cartesian3d.prototype['bar'] = anychart.charts.Cartesian3d.prototype.bar;
+// anychart.charts.Cartesian3d.prototype['column'] = anychart.charts.Cartesian3d.prototype.column;
 anychart.charts.Cartesian3d.prototype['lineMarker'] = anychart.charts.Cartesian3d.prototype.lineMarker;
 anychart.charts.Cartesian3d.prototype['rangeMarker'] = anychart.charts.Cartesian3d.prototype.rangeMarker;
 anychart.charts.Cartesian3d.prototype['textMarker'] = anychart.charts.Cartesian3d.prototype.textMarker;

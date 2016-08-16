@@ -164,7 +164,7 @@ anychart.core.series.Base.prototype.SUPPORTED_SIGNALS =
     anychart.Signal.NEEDS_UPDATE_A11Y;
 
 
-//region Properties
+//region --- Properties
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Properties
@@ -399,15 +399,23 @@ anychart.core.series.Base.prototype.minimumSizeValue_ = NaN;
  * @private
  */
 anychart.core.series.Base.prototype.maximumSizeValue_ = NaN;
+
+
 //endregion
-
-
-//region Series setup
+//region --- Series setup
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Series setup
 //
 //----------------------------------------------------------------------------------------------------------------------
+/**
+ * @return {string}
+ */
+anychart.core.series.Base.prototype.getType = function() {
+  return this.type_;
+};
+
+
 /**
  * @param {string=} opt_value
  * @return {anychart.core.series.Base|string}
@@ -503,10 +511,19 @@ anychart.core.series.Base.prototype.applyDefaultsToElements = function(defaults,
 
   this.a11y(defaults['a11y'] || this.plot.defaultSeriesSettings()['a11y']);
 };
+
+
+/**
+ * Returns animation type.
+ * @return {string}
+ */
+anychart.core.series.Base.prototype.getAnimationType = function() {
+  return this.type_;
+};
+
+
 //endregion
-
-
-//region Index/Id/Name/SeriesMeta
+//region --- Index/Id/Name/SeriesMeta
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Index/Id/Name
@@ -605,10 +622,10 @@ anychart.core.series.Base.prototype.meta = function(opt_object_or_key, opt_value
     return this.meta_;
   }
 };
+
+
 //endregion
-
-
-//region Support testers
+//region --- Support testers
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Support testers
@@ -771,10 +788,10 @@ anychart.core.series.Base.prototype.isChart = function() {
 anychart.core.series.Base.prototype.hasOwnLayer = function() {
   return !this.check(anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT);
 };
+
+
 //endregion
-
-
-//region Infrastructure
+//region --- Infrastructure
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Infrastructure
@@ -855,6 +872,8 @@ anychart.core.series.Base.prototype.setAutoXPointPosition = function(position) {
 anychart.core.series.Base.prototype.setAutoMarkerType = function(value) {
   this.autoSettings[anychart.opt.TYPE] = value;
   this.markers().setAutoType(value);
+  if (this.check(anychart.core.drawers.Capabilities.IS_MARKER_BASED))
+    this.invalidate(anychart.ConsistencyState.SERIES_POINTS);
 };
 
 
@@ -966,8 +985,6 @@ anychart.core.series.Base.prototype.calculateSizeScale = function(minMax) {
           this.selfMinimumBubbleValue_ = size;
       }
     }
-
-    this.markConsistent(anychart.ConsistencyState.SERIES_DATA);
   }
   minMax[0] = Math.min(minMax[0], this.selfMinimumBubbleValue_);
   minMax[1] = Math.max(minMax[1], this.selfMaximumBubbleValue_);
@@ -1024,10 +1041,10 @@ anychart.core.series.Base.prototype.getRootLayer = function() {
 anychart.core.series.Base.prototype.getChart = function() {
   return /** @type {anychart.core.SeparateChart} */(this.chart);
 };
+
+
 //endregion
-
-
-//region Working with data
+//region --- Working with data
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Working with data
@@ -1056,10 +1073,10 @@ anychart.core.series.Base.prototype.getIterator = function() {
 anychart.core.series.Base.prototype.getResetIterator = function() {
   return this.iterator = this.getDetachedIterator();
 };
+
+
 //endregion
-
-
-//region Working with scales
+//region --- Working with scales
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Working with scales
@@ -1093,9 +1110,7 @@ anychart.core.series.Base.prototype.yScale = function(opt_value) {
     }
     return this;
   } else {
-    if (!this.yScale_)
-      this.yScale(/** @type {anychart.scales.Base} */(this.plot.yScale()));
-    return this.yScale_;
+    return this.yScale_ || this.plot.yScale();
   }
 };
 
@@ -1109,16 +1124,17 @@ anychart.core.series.Base.prototype.scaleInvalidated = function(event) {
   var signal = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION))
     signal |= anychart.Signal.NEEDS_RECALCULATION;
-  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION))
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     signal |= anychart.Signal.NEEDS_REDRAW;
-  else
+    this.invalidate(anychart.ConsistencyState.SERIES_POINTS, signal);
+  } else {
     this.dispatchSignal(signal);
-  this.invalidate(anychart.ConsistencyState.SERIES_POINTS, signal);
+  }
 };
+
+
 //endregion
-
-
-//region Different public methods
+//region --- Different public methods
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Different public methods
@@ -1146,10 +1162,10 @@ anychart.core.series.Base.prototype.transformY = function(value, opt_subRangeRat
       (/** @type {anychart.scales.Base} */(this.yScale())).transform(value, opt_subRangeRatio),
       false);
 };
+
+
 //endregion
-
-
-//region Errors
+//region --- Errors
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Errors
@@ -1293,10 +1309,10 @@ anychart.core.series.Base.prototype.drawError = function() {
     }
   }
 };
+
+
 //endregion
-
-
-//region Working with clip
+//region --- Working with clip
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Working with clip
@@ -1320,10 +1336,10 @@ anychart.core.series.Base.prototype.clip = function(opt_value) {
     return this.clip_;
   }
 };
+
+
 //endregion
-
-
-//region Working with legend
+//region --- Working with legend
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Working with legend
@@ -1497,10 +1513,10 @@ anychart.core.series.Base.prototype.getLegendIconColor = function(legendItemJson
 anychart.core.series.Base.prototype.getLegendItemText = function(context) {
   return /** @type {string} */(this.name());
 };
+
+
 //endregion
-
-
-//region Working with tooltip
+//region --- Working with tooltip
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Working with tooltip
@@ -1522,10 +1538,10 @@ anychart.core.series.Base.prototype.tooltip = function(opt_value) {
     return this.tooltip_;
   }
 };
+
+
 //endregion
-
-
-//region Color resolution
+//region --- Color resolution
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Color resolution
@@ -1637,10 +1653,10 @@ anychart.core.series.Base.prototype.getColorResolutionContext = goog.abstractMet
  * @return {Object}
  */
 anychart.core.series.Base.prototype.getHatchFillResolutionContext = goog.abstractMethod;
+
+
 //endregion
-
-
-//region Settings resolution
+//region --- Settings resolution
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Settings resolution
@@ -1780,10 +1796,10 @@ anychart.core.series.Base.prototype.resolveOption = function(name, point, normal
   }
   return val;
 };
+
+
 //endregion
-
-
-//region Factories optimization
+//region --- Factories optimization
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Factories optimization
@@ -1934,10 +1950,10 @@ anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factory,
   element.draw();
   return element;
 };
+
+
 //endregion
-
-
-//region Labels
+//region --- Labels
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Labels
@@ -2050,10 +2066,10 @@ anychart.core.series.Base.prototype.getLabelsColor = function() {
   }
   return /** @type {string} */(color || '');
 };
+
+
 //endregion
-
-
-//region Markers
+//region --- Markers
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Markers
@@ -2178,10 +2194,10 @@ anychart.core.series.Base.prototype.getMarkerFill = function() {
 anychart.core.series.Base.prototype.getMarkerStroke = function() {
   return /** @type {acgraph.vector.Stroke} */(anychart.color.darken(/** @type {acgraph.vector.Fill} */(this.markers().fill())));
 };
+
+
 //endregion
-
-
-//region Outliers
+//region --- Outliers
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Outliers
@@ -2318,10 +2334,10 @@ anychart.core.series.Base.prototype.getPointIndexByOutlierIndex = function(marke
     });
   }));
 };
+
+
 //endregion
-
-
-//region Drawing plan related checkers
+//region --- Drawing plan related checkers
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Drawing plan related checkers
@@ -2379,10 +2395,10 @@ anychart.core.series.Base.prototype.planIsStacked = function() {
 anychart.core.series.Base.prototype.planIsXScaleInverted = function() {
   return false;
 };
+
+
 //endregion
-
-
-//region Drawing points
+//region --- Drawing points
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Drawing points
@@ -2805,10 +2821,10 @@ anychart.core.series.Base.prototype.updateColors = function() {
     this.shapeManager.updateColors(this.getSeriesState());
   }
 };
+
+
 //endregion
-
-
-//region Extracting data
+//region --- Extracting data
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Extracting data
@@ -2877,10 +2893,10 @@ anychart.core.series.Base.prototype.getPreFirstPoint = function() {
 anychart.core.series.Base.prototype.getPostLastPoint = function() {
   return null;
 };
+
+
 //endregion
-
-
-//region Data to Pixels transformation
+//region --- Data to Pixels transformation
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Data to Pixels transformation
@@ -3009,10 +3025,10 @@ anychart.core.series.Base.prototype.makeMissing = function(rowInfo, yNames) {
     rowInfo.meta(yNames[i], undefined);
   }
 };
+
+
 //endregion
-
-
-//region Format/Position providers generation
+//region --- Format/Position providers generation
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Format/Position providers generation
@@ -3089,10 +3105,10 @@ anychart.core.series.Base.prototype.createPositionProvider = function(position, 
       }
       if (this.isSizeBased()) {
         var size = /** @type {number} */(iterator.meta(anychart.opt.SIZE));
-        bounds.left -= size / 2;
-        bounds.top -= size / 2;
-        bounds.width += size;
-        bounds.height += size;
+        bounds.left -= size;
+        bounds.top -= size;
+        bounds.width += size + size;
+        bounds.height += size + size;
       }
       if (this.isBarBased()) {
         var tmp = bounds.left;
@@ -3131,10 +3147,10 @@ anychart.core.series.Base.prototype.createPositionProvider = function(position, 
   }
   return {'value': point};
 };
+
+
 //endregion
-
-
-//region OptimizedProperties
+//region --- OptimizedProperties
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  OptimizedProperties
@@ -3464,7 +3480,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
     propName: anychart.opt.HATCH_FILL,
     normalizer: anychart.core.settings.hatchFillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
-    consistency: anychart.ConsistencyState.SERIES_COLOR,
+    consistency: anychart.ConsistencyState.SERIES_COLOR | anychart.ConsistencyState.SERIES_POINTS,
     signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEED_UPDATE_LEGEND
   };
   map[anychart.opt.HOVER_HATCH_FILL] = {
@@ -3472,7 +3488,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
     propName: anychart.opt.HOVER_HATCH_FILL,
     normalizer: anychart.core.settings.hatchFillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
-    consistency: 0,
+    consistency: anychart.ConsistencyState.SERIES_COLOR | anychart.ConsistencyState.SERIES_POINTS,
     signal: 0
   };
   map[anychart.opt.SELECT_HATCH_FILL] = {
@@ -3480,7 +3496,7 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
     propName: anychart.opt.SELECT_HATCH_FILL,
     normalizer: anychart.core.settings.hatchFillOrFunctionNormalizer,
     capabilityCheck: anychart.core.series.Capabilities.ANY,
-    consistency: 0,
+    consistency: anychart.ConsistencyState.SERIES_COLOR | anychart.ConsistencyState.SERIES_POINTS,
     signal: 0
   };
   map[anychart.opt.NEGATIVE_HATCH_FILL] = {
@@ -3673,10 +3689,10 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
 
 // populating series base prototype with properties
 anychart.core.settings.populate(anychart.core.series.Base, anychart.core.series.Base.PROPERTY_DESCRIPTORS);
+
+
 //endregion
-
-
-//region Statistics
+//region --- Statistics
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Statistics
@@ -3717,10 +3733,10 @@ anychart.core.series.Base.prototype.getStat = function(key) {
   this.chart.calculate();
   return this.statistics_[key];
 };
+
+
 //endregion
-
-
-//region Serialization/Deserialization/Dispose
+//region --- Serialization/Deserialization/Dispose
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Serialization/Deserialization/Dispose
@@ -3852,10 +3868,10 @@ anychart.core.series.Base.prototype.disposeInternal = function() {
   delete this.error_;
   anychart.core.series.Base.base(this, 'disposeInternal');
 };
+
+
 //endregion
-
-
-//region These methods don't have non-exported versions
+//region --- These methods don't have non-exported versions
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  These methods don't have non-exported versions
@@ -3936,6 +3952,7 @@ anychart.core.series.Base.prototype.disposeInternal = function() {
 //exports
 anychart.core.series.Base.prototype['a11y'] = anychart.core.series.Base.prototype.a11y;
 
+anychart.core.series.Base.prototype['getType'] = anychart.core.series.Base.prototype.getType;//legacy for scatter
 anychart.core.series.Base.prototype['seriesType'] = anychart.core.series.Base.prototype.seriesType;
 anychart.core.series.Base.prototype['name'] = anychart.core.series.Base.prototype.name;
 anychart.core.series.Base.prototype['id'] = anychart.core.series.Base.prototype.id;

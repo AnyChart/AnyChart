@@ -6,9 +6,6 @@
 goog.provide('anychart.modules.scatter');
 
 goog.require('anychart.charts.Scatter');
-goog.require('anychart.core.scatter.series.Bubble');
-goog.require('anychart.core.scatter.series.Line');
-goog.require('anychart.core.scatter.series.Marker');
 goog.require('anychart.modules.base');
 
 
@@ -28,7 +25,7 @@ anychart.scatter = function(var_args) {
   chart.setup(theme['scatter']);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
-    chart.marker(arguments[i]);
+    chart['marker'](arguments[i]);
   }
 
   return chart;
@@ -51,7 +48,7 @@ anychart.marker = function(var_args) {
   chart.setup(theme['marker']);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
-    chart.marker(arguments[i]);
+    chart['marker'](arguments[i]);
   }
 
   return chart;
@@ -78,7 +75,7 @@ anychart.bubble = function(var_args) {
   chart.setup(theme['bubble']);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
-    chart.bubble(arguments[i]);
+    chart['bubble'](arguments[i]);
   }
 
   return chart;

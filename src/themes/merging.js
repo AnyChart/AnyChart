@@ -877,6 +877,27 @@ anychart.themes.merging.mergingMap_ = [
     targets: ['area3d']
   },
   {
+    defaultObj: 'scatter.defaultAnnotationSettings.base',
+    targets: [
+      'scatter.defaultAnnotationSettings.ray',
+      'scatter.defaultAnnotationSettings.line',
+      'scatter.defaultAnnotationSettings.infiniteLine',
+      'scatter.defaultAnnotationSettings.verticalLine',
+      'scatter.defaultAnnotationSettings.horizontalLine',
+      'scatter.defaultAnnotationSettings.rectangle',
+      'scatter.defaultAnnotationSettings.ellipse',
+      'scatter.defaultAnnotationSettings.triangle',
+      'scatter.defaultAnnotationSettings.trendChannel',
+      'scatter.defaultAnnotationSettings.andrewsPitchfork',
+      'scatter.defaultAnnotationSettings.fibonacciFan',
+      'scatter.defaultAnnotationSettings.fibonacciArc',
+      'scatter.defaultAnnotationSettings.fibonacciRetracement',
+      'scatter.defaultAnnotationSettings.fibonacciTimezones',
+      'scatter.defaultAnnotationSettings.marker',
+      'scatter.defaultAnnotationSettings.label'
+    ]
+  },
+  {
     defaultObj: 'scatter.defaultSeriesSettings.base',
     targets: [
       'scatter.defaultSeriesSettings.bubble',
