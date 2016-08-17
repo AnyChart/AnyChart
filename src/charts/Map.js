@@ -1364,9 +1364,9 @@ anychart.charts.Map.prototype.updateSeriesOnZoomOrMove = function() {
  * Setter/getter for animation setting.
  * @param {(boolean|Object)=} opt_enabledOrJson Whether to enable animation.
  * @param {number=} opt_duration A Duration in milliseconds.
- * @return {anychart.core.utils.Animation|anychart.core.Chart} Animations settings object or self for chaining.
+ * @return {anychart.core.utils.Animation|anychart.charts.Map} Animations settings object or self for chaining.
  */
-anychart.core.Chart.prototype.crsAnimation = function(opt_enabledOrJson, opt_duration) {
+anychart.charts.Map.prototype.crsAnimation = function(opt_enabledOrJson, opt_duration) {
   if (!this.crsAnimation_) {
     this.crsAnimation_ = new anychart.core.utils.Animation();
     this.crsAnimation_.listenSignals(this.onCrsAnimationSignal_, this);
@@ -1384,7 +1384,7 @@ anychart.core.Chart.prototype.crsAnimation = function(opt_enabledOrJson, opt_dur
  * Animation enabled change handler.
  * @private
  */
-anychart.core.Chart.prototype.onCrsAnimationSignal_ = function() {
+anychart.charts.Map.prototype.onCrsAnimationSignal_ = function() {
   // this.invalidate(anychart.ConsistencyState.CHART_ANIMATION, anychart.Signal.NEEDS_REDRAW);
 };
 

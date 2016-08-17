@@ -399,8 +399,8 @@ anychart.core.stock.Grouping.prototype.serialize = function() {
   json[anychart.opt.ENABLED] = this.enabled_;
   json[anychart.opt.FORCED] = this.forced_;
   json[anychart.opt.LEVELS] = this.exportLevels_();
-  json[anychart.opt.MAX_VISIBLE_POINTS] = this.maxPoints_;
-  json[anychart.opt.MIN_PIX_PER_POINT] = this.minPixels_;
+  json[anychart.opt.MAX_VISIBLE_POINTS] = isNaN(this.maxPoints_) ? null : this.maxPoints_;
+  json[anychart.opt.MIN_PIX_PER_POINT] = isNaN(this.minPixels_) ? null : this.minPixels_;
   // if (goog.isFunction(this.xMode_)) {
   //   anychart.core.reporting.warning(
   //       anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,

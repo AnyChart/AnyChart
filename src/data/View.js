@@ -662,6 +662,21 @@ anychart.data.View.prototype.transitionMeta = function(on) {
 
 
 /**
+ * Serializes the value.
+ * @param {*} val
+ * @return {*}
+ * @private
+ */
+anychart.data.View.prototype.serializeValue_ = function(val) {
+  if (val instanceof Date)
+    val = val.getTime();
+  if (!goog.isDef(val) || (goog.isNumber(val) && isNaN(val)))
+    val = null;
+  return val;
+};
+
+
+/**
  * Serializes and returns one particular row.
  * @param {number} index
  * @return {*}
@@ -677,50 +692,52 @@ anychart.data.View.prototype.serializeRow = function(index) {
   // if row represented by array - convert it to object with help of array mapping.
   if (goog.isArray(row)) {
     // get array mapping for the row
-    mapping = this.getRowMapping(index).getArrayMapping();
-    rowObject = {};
-    for (key in mapping) {
-      map = mapping[key];
-      for (i = 0; i < map.length; i++) {
-        if (map[i] in row) {
-          val = row[map[i]];
-          if (val instanceof Date)
-            val = val.getTime();
-          if (!goog.isDef(val) || (goog.isNumber(val) && isNaN(val)))
-            val = null;
-          rowObject[key] = val;
-          break;
+    mapping = this.getRowMapping(index);
+    if (mapping.isArrayMappingCustom) {
+      rowObject = {};
+      var arrayMapping = mapping.getArrayMapping();
+      for (key in arrayMapping) {
+        map = arrayMapping[key];
+        for (i = 0; i < map.length; i++) {
+          if (map[i] in row) {
+            val = this.serializeValue_(row[map[i]]);
+            rowObject[key] = val;
+            break;
+          }
         }
       }
+    } else {
+      rowObject = goog.array.map(row, this.serializeValue_);
     }
   } else if (goog.isObject(row)) {
     // if row is presented by object - normalize it to default mapping, because we cannot provide
     // mapping info to the resulting JSON now
-    mapping = this.getRowMapping(index).getObjectMapping();
-    rowObject = {};
-    for (key in mapping) {
-      map = mapping[key];
-      for (i = 0; i < map.length; i++) {
-        if (map[i] in row) {
-          val = row[map[i]];
-          if (val instanceof Date)
-            val = val.getTime();
-          if (!goog.isDef(val) || (goog.isNumber(val) && isNaN(val)))
-            val = null;
-          rowObject[key] = val;
-          break;
+    mapping = this.getRowMapping(index);
+    if (mapping.isObjectMappingCustom) {
+      rowObject = {};
+      var objectMapping = mapping.getObjectMapping();
+      for (key in objectMapping) {
+        map = objectMapping[key];
+        for (i = 0; i < map.length; i++) {
+          if (map[i] in row) {
+            val = row[map[i]];
+            if (val instanceof Date)
+              val = val.getTime();
+            if (!goog.isDef(val) || (goog.isNumber(val) && isNaN(val)))
+              val = null;
+            rowObject[key] = val;
+            break;
+          }
         }
       }
-    }
-    for (key in row) {
-      if (row.hasOwnProperty(key) && !(key in mapping && key in rowObject)) {
-        val = row[key];
-        if (val instanceof Date)
-          val = val.getTime();
-        if (!goog.isDef(val) || (goog.isNumber(val) && isNaN(val)))
-          val = null;
-        rowObject[key] = val;
+      for (key in row) {
+        if (row.hasOwnProperty(key) && !(key in objectMapping && key in rowObject)) {
+          val = this.serializeValue_(row[key]);
+          rowObject[key] = val;
+        }
       }
+    } else {
+      rowObject = goog.object.map(row, this.serializeValue_);
     }
   } else {
     if (!goog.isDef(row) || (goog.isNumber(row) && isNaN(row)))

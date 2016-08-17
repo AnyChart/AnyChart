@@ -343,7 +343,10 @@ anychart.scales.LinearColor.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['ticks'] = this.ticks().serialize();
   json['minorTicks'] = this.minorTicks().serialize();
-  json['colors'] = this.colors();
+  json['colors'] = goog.array.map(/** @type {Array.<Object>} */(this.colors()), function(elem) {
+    return goog.color.rgbArrayToHex(/** @type {!goog.color.Rgb} */(elem.color));
+  });
+
   return json;
 };
 

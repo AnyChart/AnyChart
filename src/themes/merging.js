@@ -1276,6 +1276,7 @@ anychart.themes.merging.nonMergableEntities_ = {
   'valueErrorStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
   'selectedStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
   'selectLowStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
+  'selectHighStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
   'selectNegativeStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
   'selectRisingStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,
   'selectFallingStroke': anychart.themes.merging.NonMergableEntityTypes_.STROKE,

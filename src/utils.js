@@ -789,7 +789,7 @@ anychart.utils.XmlNodeType_ = {
  * @return {Object|string} Transformation result JSON (may by null).
  */
 anychart.utils.xml2json = function(xml) {
-  var node;
+  var node, val;
   if (goog.isString(xml)) {
     node = goog.dom.xml.loadXml(xml);
   } else
@@ -803,7 +803,10 @@ anychart.utils.xml2json = function(xml) {
   switch (node.nodeType) {
     case anychart.utils.XmlNodeType_.ELEMENT_NODE:
       var result = {};
-      var resultIsArray = false;
+      var resultIsArray = !!node.getAttribute(anychart.utils.ARRAY_IDENTIFIER_ATTR_NAME_);
+      if (resultIsArray) {
+        result = [];
+      }
       var multiProp = {};
       var i, name, len, onlyText = true;
 
@@ -816,13 +819,21 @@ anychart.utils.xml2json = function(xml) {
         var subNodeName = childNode.nodeName;
         if (subNodeName.charAt(0) == '#') {
           textValue += subnode;
-        } else if (subNodeName == '__element') {
-          if (!resultIsArray) {
-            result = [];
-            resultIsArray = true;
-          }
+        } else if (resultIsArray && subNodeName == 'item') {
           onlyText = false;
-          result[subnode['index']] = subnode['value'];
+          val = subnode;
+          if (val == '')
+            result.push(val);
+          else if (!goog.isArray(val) && !isNaN(+val))
+            result.push(+val);
+          else if (val == 'true')
+            result.push(true);
+          else if (val == 'false')
+            result.push(false);
+          else if (val == 'null')
+            result.push(null);
+          else
+            result.push(val);
         } else if ((!goog.isNull(subnode) || anychart.utils.isNullNodeAllowed(subNodeName)) && !resultIsArray) {
           onlyText = false;
           var names;
@@ -854,18 +865,20 @@ anychart.utils.xml2json = function(xml) {
       for (i = 0; i < len; i++) {
         /** @type {Attr} */
         var attr = node.attributes[i];
-        name = anychart.utils.toCamelCase(attr.nodeName);
+        name = String(attr.nodeName).toLowerCase();
 
         /*
-          This condition fixes the following case:
-          If some text contains characters like '\n', it turns to xml node with CDATA, not attribute.
-          Safari adds in every node empty attribute 'xmlns'.
-          It means that node 'text' becomes an object after restoration, not just a text value, and title becomes '[object Object]'
+         This condition fixes the following case:
+         If some text contains characters like '\n', it turns to xml node with CDATA, not attribute.
+         Safari adds in every node empty attribute 'xmlns'.
+         It means that node 'text' becomes an object after restoration, not just a text value, and title becomes '[object Object]'
          */
-        if (name == 'xmlns') continue;
+        if (name == 'xmlns' || name == anychart.utils.ARRAY_IDENTIFIER_ATTR_NAME_) continue;
+
+        name = anychart.utils.toCamelCase(attr.nodeName);
 
         if (!(name in result)) {
-          var val = attr.value;
+          val = attr.value;
           if (val == '')
             result[name] = val;
           else if (!isNaN(+val))
@@ -928,6 +941,14 @@ anychart.utils.ACCEPTED_BY_ATTRIBUTE_ = /^[^<&"\n\r]*$/;
 
 
 /**
+ * Name of attribute that specified xml node as array structure.
+ * @type {string}
+ * @private
+ */
+anychart.utils.ARRAY_IDENTIFIER_ATTR_NAME_ = 'treat_as_array';
+
+
+/**
  * Converts JSON object to an XML Node tree or String (string by default).
  * @param {Object|string|number} json
  * @param {string} rootNodeName
@@ -942,26 +963,21 @@ anychart.utils.json2xml_ = function(json, rootNodeName, doc) {
   if (goog.isString(json) || goog.isNumber(json)) {
     root.appendChild(doc.createCDATASection(goog.string.escapeString(String(json))));
   } else if (goog.isArray(json)) {
+    root.setAttribute(anychart.utils.ARRAY_IDENTIFIER_ATTR_NAME_, 'true');
     for (i = 0; i < json.length; i++) {
       if (goog.isDef(json[i])) {
-        root.appendChild(anychart.utils.json2xml_({'index': i, 'value': json[i]}, '__element', doc));
+        root.appendChild(anychart.utils.json2xml_(json[i], 'item', doc));
       }
     }
   } else if (goog.isDefAndNotNull(json)) {
     for (i in json) {
       if (json.hasOwnProperty(i)) {
         var child = json[i];
-        if (goog.isArray(child)) {
-          var nodeNames = anychart.utils.getNodeNames_(i);
-          var grouper, itemName;
-          if (nodeNames) {
-            grouper = doc.createElement(nodeNames[0]);
-            root.appendChild(grouper);
-            itemName = nodeNames[1];
-          } else {
-            grouper = root;
-            itemName = i;
-          }
+        var nodeNames, grouper, itemName;
+        if (goog.isArray(child) && (nodeNames = anychart.utils.getNodeNames_(i))) {
+          grouper = doc.createElement(nodeNames[0]);
+          root.appendChild(grouper);
+          itemName = nodeNames[1];
           for (j = 0; j < child.length; j++) {
             grouper.appendChild(anychart.utils.json2xml_(child[j], itemName, doc));
           }

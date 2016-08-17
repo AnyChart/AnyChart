@@ -2044,7 +2044,7 @@
 
     <xsd:complexType name="OrdinalOrLinearScaleColors">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-            <xsd:element name="color" type="LinearColors"/>
+            <xsd:element name="color" type="simple.Text"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -2061,13 +2061,6 @@
         <xsd:attribute name="to" type="xsd:unsignedInt"/>
         <xsd:attribute name="color" type="xsd:string"/>
         <xsd:attribute name="name" type="xsd:string"/>
-    </xsd:complexType>
-
-    <xsd:complexType name="LinearColors">
-        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-            <xsd:element name="color" type="simple.Text"/>
-        </xsd:sequence>
-        <xsd:attribute name="offset" type="xsd:double"/>
     </xsd:complexType>
 
     <xsd:complexType name="ScaleTicksValues">

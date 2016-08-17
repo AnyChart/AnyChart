@@ -239,6 +239,7 @@ anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt
   } else {
     opt_arrayMapping = undefined;
   }
+  this.isArrayMappingCustom = !!opt_arrayMapping;
 
   if (goog.isObject(opt_objectMapping)) {
     for (i in opt_objectMapping) {
@@ -248,6 +249,7 @@ anychart.data.Mapping.prototype.initMappingInfo = function(opt_arrayMapping, opt
   } else {
     opt_objectMapping = undefined;
   }
+  this.isObjectMappingCustom = !!opt_objectMapping;
 
   /**
    * Mapping settings for array rows.

@@ -3715,7 +3715,7 @@
             "array"
           ],
           "items": {
-            "type": "object"
+            "type": "string"
           }
         }
       }
