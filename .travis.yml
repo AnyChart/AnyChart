@@ -12,7 +12,9 @@ script:
 after_success:
 - echo -e "Host static.anychart.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 - ssh root@static.anychart.com "mkdir -p /apps/static/js/$TRAVIS_BRANCH"
+- git rev-parse HEAD >> ./out/commit-hash.txt
 - scp /home/travis/build/AnyChart/ACDVF/out/anychart-bundle.min.js root@static.anychart.com:/apps/static/js/$TRAVIS_BRANCH/anychart-bundle.min.js
+- scp /home/travis/build/AnyChart/ACDVF/out/commit-hash.txt root@static.anychart.com:/apps/static/js/$TRAVIS_BRANCH/commit-hash.txt
 
 notifications:
   slack: anychart-team:sJRPhNn8Ur8yVdhvhgp6EbDM
