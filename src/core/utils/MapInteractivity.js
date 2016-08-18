@@ -69,7 +69,7 @@ anychart.core.utils.MapInteractivity.prototype.zoomOnMouseWheel = function(opt_v
  * @deprecated Use {@link anychart.core.utils.MapInteractivity.zoomOnMouseWheel} instead.
  */
 anychart.core.utils.MapInteractivity.prototype.mouseWheel = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.mouseWheel()', '.zoomOnMouseWheel()']);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.mouseWheel()', '.zoomOnMouseWheel()'], true);
   return this.zoomOnMouseWheel(opt_value);
 };
 

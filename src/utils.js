@@ -349,7 +349,7 @@ anychart.utils.normalizeTimestamp = function(value) {
  * @deprecated Deprecated since 7.9.0. Use anychart.format.dateTime instead.
  */
 anychart.utils.defaultDateFormatter = function(timestamp) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.utils.defaultDateFormatter', 'anychart.format.dateTime']);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.utils.defaultDateFormatter', 'anychart.format.dateTime'], true);
   if (goog.isNumber(timestamp) || goog.isString(timestamp)) {
     var formatter = new goog.i18n.DateTimeFormat('yyyy.MM.dd');
     return formatter.format(new goog.date.UtcDateTime(new Date(+timestamp)));
@@ -1331,7 +1331,7 @@ anychart.utils.UTCTimeZoneCache_;
  * @deprecated Deprecated since 7.9.0. Use anychart.format.dateTime instead.
  */
 anychart.utils.formatDateTime = function(date, pattern) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.utils.formatDateTime', 'anychart.format.dateTime']);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.utils.formatDateTime', 'anychart.format.dateTime'], true);
   /** @type {goog.i18n.DateTimeFormat} */
   var formatter;
   if (pattern in anychart.utils.formatDateTimeCache_)
