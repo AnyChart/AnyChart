@@ -333,10 +333,14 @@ anychart.core.utils.Space.prototype.widenHeight = function(initialHeight) {
 /** @inheritDoc */
 anychart.core.utils.Space.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['top'] = this.top();
-  json['right'] = this.right();
-  json['bottom'] = this.bottom();
-  json['left'] = this.left();
+  if (goog.isDef(this.top_))
+    json['top'] = this.top_;
+  if (goog.isDef(this.right_))
+    json['right'] = this.right_;
+  if (this.bottom_)
+    json['bottom'] = this.bottom_;
+  if (this.left_)
+    json['left'] = this.left_;
   return json;
 };
 

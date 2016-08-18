@@ -1,14 +1,14 @@
 /// data
 var data = [
-  {id: 'A', duration: 3, name: 'A'},
-  {id: 'B', duration: 2, name: 'B'},
-  {id: 'C', duration: 10, name: 'C'},
-  {id: 'D', duration: 2, name: 'D'},
-  {id: 'E', duration: 4, name: 'E'},
-  {id: 'F', duration: 5, name: 'F', dependsOn: ['A', 'B', 'C']},
-  {id: 'G', duration: 2, name: 'G', dependsOn: ['D', 'E']},
-  {id: 'H', duration: 1, name: 'H', dependsOn: ['F']},
-  {id: 'I', duration: 7, name: 'I', dependsOn: ['F', 'G', 'E']}
+  {id: 'A', duration: 3, name: 'Aasdfasdf'},
+  {id: 'B', duration: 2, name: 'Basdf'},
+  {id: 'C', duration: 10, name: 'Cdfdfdfd'},
+  {id: 'D', duration: 2, name: 'Dvfvfvfvfvfv'},
+  {id: 'E', duration: 4, name: 'Easdvsdva'},
+  {id: 'F', duration: 5, name: 'Faaa', dependsOn: ['A', 'B', 'C']},
+  {id: 'G', duration: 2, name: 'Gasdf', dependsOn: ['D', 'E']},
+  {id: 'H', duration: 1, name: 'Hw33434343', dependsOn: ['F']},
+  {id: 'I', duration: 7, name: 'Ivvv', dependsOn: ['F', 'G', 'E']}
 ];
 
 //var deps = [
@@ -110,6 +110,8 @@ var data = [
 // ];
 
 anychart.onDocumentReady(function() {
+  anychart.theme(anychart.themes.defaultTheme);
+
   //var treeData = anychart.data.tree(data, anychart.enums.TreeFillingMethod.AS_TABLE, deps);
   var treeData = anychart.data.tree(data, anychart.enums.TreeFillingMethod.AS_TABLE);
   chart = anychart.pert();
@@ -127,14 +129,7 @@ anychart.onDocumentReady(function() {
   //   }
   // });
 
-  var task = chart.tasks();
 
-  task.dummyStroke({
-    thickness: 1.5,
-    dash: 10,
-    color: '#60727B'
-  });
-  task.dummyFill('#A0B1BA');
 
   // chart.milestones().shape('rhomb');
   // chart.criticalPath().milestones().shape('rect');
@@ -156,8 +151,39 @@ anychart.onDocumentReady(function() {
   chart.draw();
 
 
-  //debugInfo();
-  //recalc();
+  // chart.milestones().labels().fontSize(14);
+  // chart.milestones().hoverLabels().fontColor('green');
+  // chart.milestones().selectLabels().fontColor('red');
+  // chart.criticalPath().milestones().labels().fontWeight('bold');
+  // chart.criticalPath().milestones().hoverLabels().fontDecoration('underline');
+  // chart.criticalPath().milestones().selectLabels().fontStyle('italic');
+  //
+  //
+  // chart.tasks().upperLabels().fontSize(14);
+  // chart.tasks().lowerLabels().fontSize(14);
+  // chart.tasks().hoverUpperLabels().fontColor('green');
+  // chart.tasks().hoverLowerLabels().fontColor('green');
+  // chart.tasks().selectUpperLabels().fontColor('red');
+  // chart.tasks().selectLowerLabels().fontColor('red');
+  // chart.criticalPath().tasks().upperLabels().fontWeight('bold');
+  // chart.criticalPath().tasks().lowerLabels().fontWeight('bold');
+  // chart.criticalPath().tasks().hoverUpperLabels().fontDecoration('underline');
+  // chart.criticalPath().tasks().hoverLowerLabels().fontDecoration('underline');
+  // chart.criticalPath().tasks().selectUpperLabels().fontStyle('italic');
+  // chart.criticalPath().tasks().selectLowerLabels().fontStyle('italic');
+
+
+  // chart.tasks().color('red');
+  //
+  //
+  // chart.criticalPath().tasks().color('blue');
+
+  // chart.milestones().tooltip().background().fill('green');
+  // chart.milestones().tooltip().background().fill('green');
+  // chart.milestones().tooltip().textFormatter(function() {return 'Mil'});
+  // chart.criticalPath().milestones().tooltip().textFormatter(function() {return 'Crit Mil'});
+  // chart.tasks().tooltip().textFormatter(function() {return 'Task'});
+  // chart.criticalPath().tasks().tooltip().textFormatter(function() {return 'Crit task'});
 });
 
 

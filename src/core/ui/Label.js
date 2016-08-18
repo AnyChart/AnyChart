@@ -38,7 +38,8 @@ goog.inherits(anychart.core.ui.Label, anychart.core.ui.LabelBase);
 /** @inheritDoc */
 anychart.core.ui.Label.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['position'] = this.position();
+  if (goog.isDef(this.position()))
+    json['position'] = this.position();
   return json;
 };
 

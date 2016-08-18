@@ -87,6 +87,13 @@ anychart.core.pert.PertVisualElements = function() {
    */
   this.labelsContainer_ = null;
 
+  /**
+   * Parent PertVisualElements settings object.
+   * @type {?anychart.core.pert.PertVisualElements}
+   * @private
+   */
+  this.parent_ = null;
+
 };
 goog.inherits(anychart.core.pert.PertVisualElements, anychart.core.Base);
 
@@ -98,7 +105,8 @@ goog.inherits(anychart.core.pert.PertVisualElements, anychart.core.Base);
 anychart.core.pert.PertVisualElements.prototype.SUPPORTED_SIGNALS =
     anychart.core.Base.prototype.SUPPORTED_SIGNALS |
     anychart.Signal.NEEDS_REDRAW_LABELS |
-    anychart.Signal.NEEDS_REDRAW_APPEARANCE;
+    anychart.Signal.NEEDS_REDRAW_APPEARANCE |
+    anychart.Signal.NEEDS_UPDATE_TOOLTIP;
 
 
 /**
@@ -107,6 +115,20 @@ anychart.core.pert.PertVisualElements.prototype.SUPPORTED_SIGNALS =
  */
 anychart.core.pert.PertVisualElements.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.Base.prototype.SUPPORTED_CONSISTENCY_STATES;
+
+
+/**
+ * Gets/sets parent settings object.
+ * @param {anychart.core.pert.PertVisualElements=} opt_value - Value.
+ * @return {?anychart.core.pert.PertVisualElements} - Current parent object.
+ */
+anychart.core.pert.PertVisualElements.prototype.parent = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.parent_ = opt_value;
+    return this;
+  }
+  return this.parent_;
+};
 
 
 /**
@@ -129,7 +151,7 @@ anychart.core.pert.PertVisualElements.prototype.color = function(opt_fillOrColor
     }
     return this;
   }
-  return this.color_;
+  return this.color_ || (this.parent_ ? this.parent_.color() : anychart.opt.NONE);
 };
 
 
@@ -155,7 +177,7 @@ anychart.core.pert.PertVisualElements.prototype.fill = function(opt_fillOrColorO
     }
     return this;
   }
-  return this.fill_;
+  return this.fill_ || (this.parent_ ? this.parent_.fill() : anychart.opt.NONE);
 };
 
 
@@ -181,7 +203,7 @@ anychart.core.pert.PertVisualElements.prototype.hoverFill = function(opt_fillOrC
     }
     return this;
   }
-  return this.hoverFill_;
+  return this.hoverFill_ || (this.parent_ ? this.parent_.hoverFill() : anychart.opt.NONE);
 };
 
 
@@ -207,7 +229,7 @@ anychart.core.pert.PertVisualElements.prototype.selectFill = function(opt_fillOr
     }
     return this;
   }
-  return this.selectFill_;
+  return this.selectFill_ || (this.parent_ ? this.parent_.selectFill() : anychart.opt.NONE);
 };
 
 
@@ -264,7 +286,7 @@ anychart.core.pert.PertVisualElements.prototype.stroke = function(opt_strokeOrFi
     }
     return this;
   }
-  return this.stroke_;
+  return this.stroke_ || (this.parent_ ? this.parent_.stroke() : anychart.opt.NONE);
 };
 
 
@@ -289,7 +311,7 @@ anychart.core.pert.PertVisualElements.prototype.hoverStroke = function(opt_strok
     }
     return this;
   }
-  return this.hoverStroke_;
+  return this.hoverStroke_ || (this.parent_ ? this.parent_.hoverStroke() : anychart.opt.NONE);
 };
 
 
@@ -314,7 +336,7 @@ anychart.core.pert.PertVisualElements.prototype.selectStroke = function(opt_stro
     }
     return this;
   }
-  return this.selectStroke_;
+  return this.selectStroke_ || (this.parent_ ? this.parent_.selectStroke() : anychart.opt.NONE);
 };
 
 
@@ -451,8 +473,21 @@ anychart.core.pert.PertVisualElements.prototype.tooltip = function(opt_value) {
  * @private
  */
 anychart.core.pert.PertVisualElements.prototype.onTooltipSignal_ = function(event) {
-  var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.redraw();
+  this.dispatchSignal(anychart.Signal.NEEDS_UPDATE_TOOLTIP);
+};
+
+
+/**
+ * Gets tooltip config. Includes formatter-functions.
+ * @return {Object}
+ */
+anychart.core.pert.PertVisualElements.prototype.getCurrentTooltipConfig = function() {
+  var config = this.tooltip().serialize();
+  if (this.tooltip_.titleFormatter() && this.tooltip_.titleFormatter() != anychart.utils.DEFAULT_FORMATTER)
+    config['titleFormatter'] = this.tooltip().titleFormatter();
+  if (this.tooltip_.textFormatter() && this.tooltip_.textFormatter() != anychart.utils.DEFAULT_FORMATTER)
+    config['textFormatter'] = this.tooltip().textFormatter();
+  return config;
 };
 
 
@@ -479,10 +514,6 @@ anychart.core.pert.PertVisualElements.prototype.labelsContainer = function(opt_v
  */
 anychart.core.pert.PertVisualElements.prototype.drawLabels = function() {
   this.labels().draw();
-
-  //This drawing initializes mouse events on hover-select labels.
-  this.hoverLabels().draw();
-  this.selectLabels().draw();
   return this;
 };
 
@@ -504,17 +535,39 @@ anychart.core.pert.PertVisualElements.prototype.clearLabels = function() {
  */
 anychart.core.pert.PertVisualElements.prototype.setLabelsParentEventTarget = function(parentEventTarget) {
   this.labels().setParentEventTarget(parentEventTarget);
-  this.hoverLabels().setParentEventTarget(parentEventTarget);
-  this.selectLabels().setParentEventTarget(parentEventTarget);
   return this;
 };
+
+
+// /**
+//  * Util method. Use it to deeply compare two objects.
+//  * NOTE: Currently (01 Aug 2016) we can't create tooltip with background without fill and stroke.
+//  * This comparison allows to exclude
+//  *
+//  * @param {*} o1 Object or value to compare.
+//  * @param {*} o2 Object or value to compare.
+//  * @return {boolean} - True if arguments are equal.
+//  * @private
+//  */
+// anychart.core.pert.PertVisualElements.prototype.deepEqual_ = function(o1, o2) {
+//   if (o1 === o2) return true;
+//   var t1 = typeof o1, t2 = typeof o2;
+//   if (t1 == 'object' && t1 == t2) {
+//     for (var key in o1) {
+//       if (!this.deepEqual_(o1[key], o2[key])) return false;
+//     }
+//     return true;
+//   }
+//   return false;
+// };
 
 
 /** @inheritDoc */
 anychart.core.pert.PertVisualElements.prototype.serialize = function() {
   var json = anychart.core.pert.PertVisualElements.base(this, 'serialize');
 
-  json['color'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.color()));
+  if (goog.isDef(this.color_))
+    json['color'] = anychart.color.serialize(this.color_);
 
   if (goog.isFunction(this['fill'])) {
     if (goog.isFunction(this.fill())) {
@@ -524,7 +577,7 @@ anychart.core.pert.PertVisualElements.prototype.serialize = function() {
           ['Pert element fill']
       );
     } else {
-      json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.fill()));
+      if (this.fill_) json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.fill_));
     }
   }
 
@@ -536,7 +589,7 @@ anychart.core.pert.PertVisualElements.prototype.serialize = function() {
           ['Pert element hoverFill']
       );
     } else {
-      json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverFill()));
+      if (this.hoverFill_) json['hoverFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.hoverFill_));
     }
   }
 
@@ -548,7 +601,7 @@ anychart.core.pert.PertVisualElements.prototype.serialize = function() {
           ['Pert element selectFill']
       );
     } else {
-      json['selectFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.selectFill()));
+      if (this.selectFill_) json['selectFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.selectFill_));
     }
   }
 
@@ -560,7 +613,7 @@ anychart.core.pert.PertVisualElements.prototype.serialize = function() {
           ['Pert element stroke']
       );
     } else {
-      json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.stroke()));
+      if (this.stroke_) json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.stroke_));
     }
   }
 
@@ -572,7 +625,7 @@ anychart.core.pert.PertVisualElements.prototype.serialize = function() {
           ['Pert element hoverStroke']
       );
     } else {
-      json['hoverStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverStroke()));
+      if (this.hoverStroke_) json['hoverStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.hoverStroke_));
     }
   }
 
@@ -584,7 +637,7 @@ anychart.core.pert.PertVisualElements.prototype.serialize = function() {
           ['Pert element selectStroke']
       );
     } else {
-      json['selectStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectStroke()));
+      if (this.selectStroke_) json['selectStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.selectStroke_));
     }
   }
 

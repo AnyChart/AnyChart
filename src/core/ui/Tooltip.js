@@ -39,7 +39,7 @@ anychart.core.ui.Tooltip = function() {
    * @type {boolean}
    * @private
    */
-  this.allowLeaveScreen_ = false;
+  this.allowLeaveScreen_;
 
   /**
    * @type {boolean}
@@ -397,10 +397,8 @@ anychart.core.ui.Tooltip.prototype.enabled = function(opt_value) {
 anychart.core.ui.Tooltip.prototype.maybeCreateTooltipItem_ = function() {
   if (!this.item_) {
     this.item_ = new anychart.core.ui.TooltipItem();
-    this.item_.suspendSignalsDispatching();
     this.item_.visible(false);
     this.registerDisposable(this.item_);
-    this.item_.resumeSignalsDispatching(true);
   }
 };
 
@@ -590,18 +588,37 @@ anychart.core.ui.Tooltip.prototype.disposeInternal = function() {
 /** @inheritDoc */
 anychart.core.ui.Tooltip.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['valuePrefix'] = this.valuePrefix();
-  json['valuePostfix'] = this.valuePostfix();
+  if (this.valuePrefix_)
+    json['valuePrefix'] = this.valuePrefix();
+  if (this.valuePostfix_)
+    json['valuePostfix'] = this.valuePostfix();
+
   json['title'] = this.title().serialize();
   json['separator'] = this.separator().serialize();
   json['content'] = this.contentInternal().serialize();
   json['background'] = this.background().serialize();
-  json['padding'] = this.padding().serialize();
-  json['allowLeaveScreen'] = this.allowLeaveScreen();
-  json['offsetX'] = this.offsetX();
-  json['offsetY'] = this.offsetY();
-  json['anchor'] = this.anchor();
-  json['hideDelay'] = this.hideDelay();
+
+  var padding = this.padding().serialize();
+  if (!padding['left']) delete padding['left'];
+  if (!padding['top']) delete padding['top'];
+  if (!padding['right']) delete padding['right'];
+  if (!padding['bottom']) delete padding['bottom'];
+  if (!goog.object.isEmpty(padding)) json['padding'] = padding;
+
+  if (goog.isDef(this.allowLeaveScreen_))
+    json['allowLeaveScreen'] = this.allowLeaveScreen_;
+
+  if (this.offsetX())
+    json['offsetX'] = this.offsetX();
+  if (this.offsetY())
+    json['offsetY'] = this.offsetY();
+
+  if (this.anchor())
+    json['anchor'] = this.anchor();
+
+  if (goog.isDef(this.hideDelay()))
+    json['hideDelay'] = this.hideDelay();
+
   json['enabled'] = this.enabled();
   return json;
 };

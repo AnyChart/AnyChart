@@ -33,27 +33,27 @@ anychart.core.ui.Background = function() {
    * @type {anychart.enums.BackgroundCornersType}
    * @private
    */
-  this.cornerType_ = anychart.enums.BackgroundCornersType.ROUND;
+  this.cornerType_;
 
   /**
    * @type {!Array}
    * @private
    */
-  this.corners_ = [0];
+  this.corners_;
 
   /**
    * Fill settings.
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.fill_ = 'none';
+  this.fill_;
 
   /**
    * Stroke settings.
    * @type {acgraph.vector.Stroke}
    * @private
    */
-  this.stroke_ = 'none';
+  this.stroke_;
 
   /**
    * Pointer events.
@@ -181,7 +181,7 @@ anychart.core.ui.Background.prototype.stroke = function(opt_strokeOrFill, opt_th
     if (!anychart.color.equals(val, this.stroke_)) {
       var state = anychart.ConsistencyState.APPEARANCE;
       var signal = anychart.Signal.NEEDS_REDRAW;
-      if (acgraph.vector.getThickness(val) != acgraph.vector.getThickness(this.stroke_)) {
+      if (!this.stroke_ || (acgraph.vector.getThickness(val) != acgraph.vector.getThickness(this.stroke_))) {
         state |= anychart.ConsistencyState.BOUNDS;
         state |= anychart.Signal.BOUNDS_CHANGED;
       }
@@ -253,8 +253,8 @@ anychart.core.ui.Background.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.rect_.fill(this.fill_);
-    this.rect_.stroke(this.stroke_);
+    this.rect_.fill(/** @type {acgraph.vector.Fill} */ (this.fill()));
+    this.rect_.stroke(/** @type {acgraph.vector.Stroke} */ (this.stroke()));
     switch (this.cornerType_) {
       case anychart.enums.BackgroundCornersType.ROUND:
         this.rect_.round.apply(this.rect_, this.corners_);
@@ -331,19 +331,23 @@ anychart.core.ui.Background.prototype.serialize = function() {
     json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
   }
 
-  json['cornerType'] = this.cornerType();
+  if (this.cornerType_)
+    json['cornerType'] = this.cornerType();
+
   var corners = /** @type {Array} */(this.corners());
-  if (corners.length >= 4) {
-    corners = {
-      'leftTop': corners[0],
-      'rightTop': corners[1],
-      'rightBottom': corners[2],
-      'leftBottom': corners[3]
-    };
-  } else {
-    corners = corners[0];
+  if (corners) {
+    if (corners.length >= 4) {
+      corners = {
+        'leftTop': corners[0],
+        'rightTop': corners[1],
+        'rightBottom': corners[2],
+        'leftBottom': corners[3]
+      };
+    } else {
+      corners = corners[0];
+    }
+    json['corners'] = corners;
   }
-  json['corners'] = corners;
   return json;
 };
 
@@ -382,7 +386,8 @@ anychart.core.ui.Background.prototype.disposeInternal = function() {
   delete this.fill_;
   delete this.stroke_;
   delete this.cornerType_;
-  this.corners_.length = 0;
+  if (this.corners_)
+    this.corners_.length = 0;
   delete this.corners_;
 
   goog.base(this, 'disposeInternal');

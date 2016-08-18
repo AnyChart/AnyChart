@@ -104,7 +104,9 @@ anychart.core.pert.Tasks.prototype.dummyFill = function(opt_fillOrColorOrKeys, o
     }
     return this;
   }
-  return this.dummyFill_;
+  return goog.isDef(this.dummyFill_) ?
+      this.dummyFill_ :
+      (this.parent() ? /** @type {anychart.core.pert.Tasks} */ (this.parent()).dummyFill() : anychart.opt.NONE);
 };
 
 
@@ -196,7 +198,9 @@ anychart.core.pert.Tasks.prototype.dummyStroke = function(opt_strokeOrFill, opt_
     }
     return this;
   }
-  return this.dummyStroke_;
+  return goog.isDef(this.dummyStroke_) ?
+      this.dummyStroke_ :
+      (this.parent() ? /** @type {anychart.core.pert.Tasks} */ (this.parent()).dummyStroke() : anychart.opt.NONE);
 };
 
 
@@ -367,7 +371,6 @@ anychart.core.pert.Tasks.prototype.hoverUpperLabels = function(opt_value) {
 anychart.core.pert.Tasks.prototype.labelsContainer = function(opt_value) {
   //this sets container for upper labels.
   anychart.core.pert.Tasks.base(this, 'labelsContainer', opt_value);
-
   var container = anychart.core.pert.Tasks.base(this, 'labelsContainer');
   if (container) this.lowerLabels().container(/** @type {acgraph.vector.ILayer} */ (container));
   return container;
@@ -378,10 +381,6 @@ anychart.core.pert.Tasks.prototype.labelsContainer = function(opt_value) {
 anychart.core.pert.Tasks.prototype.drawLabels = function() {
   this.lowerLabels().draw();
 
-  //This drawing initializes mouse events on hover-select labels.
-  this.hoverLowerLabels().draw();
-  this.selectLowerLabels().draw();
-
   //This will draw upper labels.
   return anychart.core.pert.Tasks.base(this, 'drawLabels');
 };
@@ -390,8 +389,6 @@ anychart.core.pert.Tasks.prototype.drawLabels = function() {
 /** @inheritDoc */
 anychart.core.pert.Tasks.prototype.setLabelsParentEventTarget = function(parentEventTarget) {
   this.lowerLabels().setParentEventTarget(parentEventTarget);
-  this.hoverLowerLabels().setParentEventTarget(parentEventTarget);
-  this.selectLowerLabels().setParentEventTarget(parentEventTarget);
 
   //This will draw upper labels.
   return anychart.core.pert.Tasks.base(this, 'setLabelsParentEventTarget', parentEventTarget);
@@ -420,10 +417,30 @@ anychart.core.pert.Tasks.prototype.serialize = function() {
   json['hoverUpperLabels'] = goog.object.clone(json['hoverLabels']);
   delete json['hoverLabels'];
 
-  json['dummyFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.dummyFill()));
+  if (goog.isFunction(this.dummyFill())) {
+    anychart.core.reporting.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Pert element dummy fill']
+    );
+  } else {
+    if (this.dummyFill_) json['dummyFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.dummyFill_));
+  }
+
+  if (goog.isFunction(this.dummyStroke())) {
+    anychart.core.reporting.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['Pert element dummy stroke']
+    );
+  } else {
+    if (this.dummyStroke_) json['dummyStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.dummyStroke_));
+  }
+
+  //if (this.dummyFill_) json['dummyFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.dummyFill_));
   //json['hoverDummyFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.hoverDummyFill()));
   //json['selectDummyFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.selectDummyFill()));
-  json['dummyStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.dummyStroke()));
+  //if (this.dummyStroke_) json['dummyStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.dummyStroke_));
   //json['hoverDummyStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.hoverDummyStroke()));
   //json['selectDummyStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.selectDummyStroke()));
 

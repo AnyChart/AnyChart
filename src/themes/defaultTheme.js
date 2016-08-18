@@ -615,7 +615,11 @@ goog.provide('anychart.themes.defaultTheme');
         'align': 'left',
         'hAlign': 'left',
         'orientation': 'top',
-        'zIndex': 1
+        'zIndex': 1,
+        'background': {
+          'fill': 'none',
+          'stroke': 'none'
+        }
       },
       'content': {
         'enabled': true,
@@ -637,7 +641,11 @@ goog.provide('anychart.themes.defaultTheme');
         },
         'padding': {'top': 0, 'right': 0, 'bottom': 0, 'left': 0},
         'rotation': 0,
-        'zIndex': 1
+        'zIndex': 1,
+        'background': {
+          'fill': 'none',
+          'stroke': 'none'
+        }
       },
       'fontSize': 12,
       'minFontSize': 9,
@@ -655,7 +663,8 @@ goog.provide('anychart.themes.defaultTheme');
         'enabled': true,
         'fill': colorFillBackgroundReversed + opacityStrong,
         'corners': 3,
-        'zIndex': 0
+        'zIndex': 0,
+        'cornerType': 'round'
       },
       'offsetX': 10,
       'offsetY': 10,
@@ -3142,7 +3151,7 @@ goog.provide('anychart.themes.defaultTheme');
         'from': 'min',
         'to': 'max',
         'colorScale': {
-          'type' : 'ordinalColor',
+          'type': 'ordinalColor',
           'inverted': false,
           'ticks': {
             'interval': 1
@@ -3240,7 +3249,7 @@ goog.provide('anychart.themes.defaultTheme');
           'size': '2%',
           'count': null,
           'colorScale': {
-            'type' : 'ordinalColor',
+            'type': 'ordinalColor',
             'inverted': false,
             'ticks': {
               'interval': 1
@@ -4523,7 +4532,7 @@ goog.provide('anychart.themes.defaultTheme');
       'tooltip': {
         'enabled': false
       },
-      'horizontalSpacing' : '15%',
+      'horizontalSpacing': '15%',
       'verticalSpacing': '25%',
       /**
        * @this {*}
@@ -4632,15 +4641,15 @@ goog.provide('anychart.themes.defaultTheme');
           'anchor': 'centerBottom',
           'vAlign': 'bottom',
           'hAlign': 'center',
-          'fontSize': 12,
-          'fontOpacity': 1,
+          'fontSize': 10,
           'contColor': '#333',
           'padding': {
             'top': 1,
-            'right': 0,
+            'right': 10,
             'bottom': 1,
-            'left': 0
+            'left': 10
           },
+          'textWrap': 'noWrap',
           /**
            * @this {*}
            * @return {*}
@@ -4649,22 +4658,23 @@ goog.provide('anychart.themes.defaultTheme');
             return this['name'];
           }
         },
-        'hoverUpperLabels': {'fontSize': 13, 'offsetY': 1},
-        'selectUpperLabels': {'fontSize': 13, 'offsetY': 1, 'fontWeight': 'bold'},
+        'hoverUpperLabels': {'fontWeight': 'bold'},
+        'selectUpperLabels': {'fontWeight': 'bold'},
 
         'lowerLabels': {
           'enabled': true,
           'anchor': 'centerTop',
           'vAlign': 'top',
           'hAlign': 'center',
-          'fontSize': 12,
-          'fontOpacity': 1,
+          'fontSize': 9,
+          'fontOpacity': 0.5,
           'contColor': '#333',
+          'textWrap': 'noWrap',
           'padding': {
             'top': 1,
-            'right': 0,
+            'right': 5,
             'bottom': 1,
-            'left': 0
+            'left': 5
           },
           /**
            * @this {*}
@@ -4674,8 +4684,8 @@ goog.provide('anychart.themes.defaultTheme');
             return 't: ' + this['duration'];
           }
         },
-        'hoverLowerLabels': {'fontSize': 13, 'offsetY': -1},
-        'selectLowerLabels': {'fontSize': 13, 'offsetY': -1, 'fontWeight': 'bold'},
+        'hoverLowerLabels': {'fontWeight': 'bold'},
+        'selectLowerLabels': {'fontWeight': 'bold'},
         'tooltip': {
           'title': {'enabled': true},
           'separator': {'enabled': true},
@@ -4701,160 +4711,13 @@ goog.provide('anychart.themes.defaultTheme');
       },
 
       'criticalPath': {
-        'milestones': {
-          'shape': 'circle',
-          'size': '5%',
-          'labels': {
-            'enabled': true,
-            'anchor': 'leftTop',
-            'vAlign': 'middle',
-            'hAlign': 'center',
-            'fontColor': '#fff',
-            'disablePointerEvents': true,
-            'textFormatter': returnMilestoneName
-          },
-          'hoverLabels': {
-            'fontColor': '#fff',
-            'fontOpacity': 1
-          },
-          'selectLabels': {
-            'fontWeight': 'bold'
-          },
-
-          'color': '#64b5f6',
-          'fill': returnSourceColor85,
-          'stroke': 'none',
-
-          'hoverFill': returnLightenSourceColor,
-          'hoverStroke': returnThickenedStrokeSourceColor,
-
-          'selectFill': defaultSelectColor,
-          'selectStroke': defaultSelectColor,
-
-          'tooltip': {
-            'title': {'enabled': true},
-            'separator': {'enabled': true},
-            /**
-             * @this {*}
-             * @return {*}
-             */
-            'titleFormatter': function() {
-              if (this['creator']) {
-                return 'Milestone - ' + this['index'];
-              } else {
-                return 'Milestone - ' + (this['isStart'] ? 'Start' : 'Finish');
-              }
-            },
-            /**
-             * @this {*}
-             * @return {*}
-             */
-            'textFormatter': function() {
-              var result = '';
-              var i = 0;
-              if (this['successors'] && this['successors'].length) {
-                result += 'Successors:';
-                for (i = 0; i < this['successors'].length; i++) {
-                  result += '\n - ' + this['successors'][i].get('name');
-                }
-                if (this['predecessors'] && this['predecessors'].length)
-                  result += '\n\n';
-              }
-              if (this['predecessors'] && this['predecessors'].length) {
-                result += 'Predecessors:';
-                for (i = 0; i < this['predecessors'].length; i++) {
-                  result += '\n - ' + this['predecessors'][i].get('name');
-                }
-              }
-              return result;
-            }
-          }
-        },
         'tasks': {
           'color': '#e06666',
-
-          'fill': returnSourceColor85,
-          'stroke': returnSourceColor85,
-
-          'hoverFill': returnLightenSourceColor,
-          'hoverStroke': returnThickenedStrokeSourceColor,
-
-          'selectFill': defaultSelectColor,
-          'selectStroke': defaultSelectColor,
-
-          'dummyFill': returnSourceColor85,
-          'dummyStroke': returnDashedStrokeSourceColor,
-
-          'upperLabels': {
-            'enabled': true,
-            'anchor': 'centerBottom',
-            'vAlign': 'bottom',
-            'hAlign': 'center',
-            'fontSize': 12,
-            'fontOpacity': 1,
-            'contColor': '#333',
-            'padding': {
-              'top': 1,
-              'right': 0,
-              'bottom': 1,
-              'left': 0
-            },
-            /**
-             * @this {*}
-             * @return {*}
-             */
-            'textFormatter': function() {
-              return this['name'];
-            }
-          },
-          'hoverUpperLabels': {'fontSize': 13, 'offsetY': 1},
-          'selectUpperLabels': {'fontSize': 13, 'offsetY': 1, 'fontWeight': 'bold'},
-
           'lowerLabels': {
-            'enabled': true,
-            'anchor': 'centerTop',
-            'vAlign': 'top',
-            'hAlign': 'center',
-            'fontSize': 12,
-            'fontOpacity': 1,
-            'contColor': '#333',
-            'padding': {
-              'top': 1,
-              'right': 0,
-              'bottom': 1,
-              'left': 0
-            },
-            /**
-             * @this {*}
-             * @return {*}
-             */
-            'textFormatter': function() {
-              return 't: ' + this['duration'];
-            }
+            'textWrap': 'noWrap'
           },
-          'hoverLowerLabels': {'fontSize': 13, 'offsetY': -1},
-          'selectLowerLabels': {'fontSize': 13, 'offsetY': -1, 'fontWeight': 'bold'},
-          'tooltip': {
-            'title': {'enabled': true},
-            'separator': {'enabled': true},
-            /**
-             * @this {*}
-             * @return {*}
-             */
-            'titleFormatter': function() {
-              return this['name'];
-            },
-            /**
-             * @this {*}
-             * @return {*}
-             */
-            'textFormatter': function() {
-              var result = 'Earliest start: ' + this['earliestStart'] + '\nEarliest finish: ' + this['earliestFinish'] +
-                  '\nLatest start: ' + this['latestStart'] + '\nLatest finish: ' + this['latestFinish'] +
-                  '\nDuration: ' + this['duration'] + '\nSlack: ' + this['slack'];
-              if (!isNaN(this['variance'])) result += '\nStandard deviation: ' + Math.round(this['variance'] * 100) / 100;
-              return result;
-            }
+          'upperLabels': {
+            'textWrap': 'noWrap'
           }
         }
       }

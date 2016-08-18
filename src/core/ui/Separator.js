@@ -524,12 +524,17 @@ anychart.core.ui.Separator.prototype.isHorizontal = function() {
 /** @inheritDoc */
 anychart.core.ui.Separator.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  json['width'] = this.width();
-  json['height'] = this.height();
-  json['orientation'] = this.orientation();
+  if (goog.isDefAndNotNull(this.width()))
+    json['width'] = this.width();
+  if (goog.isDefAndNotNull(this.height()))
+    json['height'] = this.height();
+  if (this.orientation())
+    json['orientation'] = this.orientation();
   json['margin'] = this.margin().serialize();
-  json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
-  json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+  if (this.fill_)
+    json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
+  if (this.stroke_)
+    json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
   return json;
 };
 

@@ -2363,6 +2363,7 @@
 
     <xsd:complexType name="core.Milestones">
         <xsd:all>
+            <xsd:element name="color" type="Fill" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="fill" type="Fill" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="hover_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="select_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
@@ -2375,6 +2376,7 @@
             <xsd:element name="tooltip" type="core.Tooltip" minOccurs="0" maxOccurs="1"/>
         </xsd:all>
         <xsd:attribute name="enabled" type="simple.BoolOrNull"/>
+        <xsd:attribute name="color" type="xsd:string"/>
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="hover_fill" type="xsd:string"/>
         <xsd:attribute name="select_fill" type="xsd:string"/>
@@ -2391,6 +2393,7 @@
 
     <xsd:complexType name="core.Tasks">
         <xsd:all>
+            <xsd:element name="color" type="Fill" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="fill" type="Fill" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="hover_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="select_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
@@ -2408,6 +2411,7 @@
             <xsd:element name="select_lower_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="tooltip" type="core.Tooltip" minOccurs="0" maxOccurs="1"/>
         </xsd:all>
+        <xsd:attribute name="color" type="xsd:string"/>
         <xsd:attribute name="enabled" type="simple.BoolOrNull"/>
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="hover_fill" type="xsd:string"/>

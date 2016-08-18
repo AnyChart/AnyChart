@@ -18,14 +18,14 @@ anychart.core.pert.Milestones = function() {
    * @type {anychart.enums.MilestoneShape|string}
    * @private
    */
-  this.shape_ = anychart.enums.MilestoneShape.CIRCLE;
+  this.shape_;
 
   /**
    * Milestone size.
    * @type {number|string}
    * @private
    */
-  this.size_ = 80;
+  this.size_;
 };
 goog.inherits(anychart.core.pert.Milestones, anychart.core.pert.PertVisualElements);
 
@@ -53,7 +53,9 @@ anychart.core.pert.Milestones.prototype.size = function(opt_value) {
     }
     return this;
   }
-  return this.size_;
+  return goog.isDef(this.size_) ?
+      this.size_ :
+      (this.parent() ? /** @type {anychart.core.pert.Milestones} */ (this.parent()).size() : 80);
 };
 
 
@@ -71,15 +73,19 @@ anychart.core.pert.Milestones.prototype.shape = function(opt_value) {
     }
     return this;
   }
-  return this.shape_;
+  return goog.isDef(this.shape_) ?
+      this.shape_ :
+      (this.parent() ? /** @type {anychart.core.pert.Milestones} */ (this.parent()).shape() : anychart.enums.MilestoneShape.CIRCLE);
 };
 
 
 /** @inheritDoc */
 anychart.core.pert.Milestones.prototype.serialize = function() {
   var json = anychart.core.pert.Milestones.base(this, 'serialize');
-  json['shape'] = this.shape_;
-  json['size'] = this.size_;
+  if (goog.isDef(this.shape_))
+    json['shape'] = this.shape_;
+  if (goog.isDef(this.size_))
+    json['size'] = this.size_;
   return json;
 };
 

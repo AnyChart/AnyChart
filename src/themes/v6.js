@@ -6706,6 +6706,7 @@ goog.provide('anychart.themes.v6');
           'hAlign': 'center',
           'fontSize': 12,
           'fontOpacity': 1,
+          'textWrap': 'noWrap',
           'contColor': '#333',
           'padding': {
             'top': 1,
@@ -6731,6 +6732,7 @@ goog.provide('anychart.themes.v6');
           'hAlign': 'center',
           'fontSize': 12,
           'fontOpacity': 1,
+          'textWrap': 'noWrap',
           'contColor': '#333',
           'padding': {
             'top': 1,
@@ -6864,6 +6866,7 @@ goog.provide('anychart.themes.v6');
             'hAlign': 'center',
             'fontSize': 12,
             'fontOpacity': 1,
+            'textWrap': 'noWrap',
             'contColor': '#333',
             'padding': {
               'top': 1,
@@ -6889,6 +6892,7 @@ goog.provide('anychart.themes.v6');
             'hAlign': 'center',
             'fontSize': 12,
             'fontOpacity': 1,
+            'textWrap': 'noWrap',
             'contColor': '#333',
             'padding': {
               'top': 1,

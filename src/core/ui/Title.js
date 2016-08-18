@@ -188,7 +188,7 @@ anychart.core.ui.Title.prototype.defaultOrientation_ = anychart.enums.Orientatio
  * @type {anychart.enums.Align}
  * @private
  */
-anychart.core.ui.Title.prototype.align_ = anychart.enums.Align.CENTER;
+anychart.core.ui.Title.prototype.align_;
 
 
 /**
@@ -868,12 +868,18 @@ anychart.core.ui.Title.prototype.serialize = function() {
   json['margin'] = this.margin().serialize();
   json['padding'] = this.padding().serialize();
   json['background'] = this.background().serialize();
-  json['text'] = this.text();
-  if (goog.isDef(this.rotation())) json['rotation'] = this.rotation();
-  json['width'] = this.width();
-  json['height'] = this.height();
-  json['align'] = this.align();
-  if (goog.isDef(this.orientation_)) json['orientation'] = this.orientation();
+  if (goog.isDef(this.text()))
+    json['text'] = this.text();
+  if (goog.isDef(this.rotation_))
+    json['rotation'] = this.rotation_;
+  if (goog.isDef(this.width_))
+    json['width'] = this.width_;
+  if (goog.isDef(this.height_))
+    json['height'] = this.height_;
+  if (goog.isDef(this.align_))
+    json['align'] = this.align_;
+  if (goog.isDef(this.orientation_))
+    json['orientation'] = this.orientation_;
   return json;
 };
 

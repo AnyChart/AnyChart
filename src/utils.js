@@ -1109,6 +1109,8 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
       return ['drill_to', 'item'];
     case 'extraClassNames':
       return ['extra_class_names', 'class_name'];
+    case 'dependsOn':
+      return ['depends_on', 'item'];
   }
   return null;
 };
@@ -1192,6 +1194,8 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
       return ['drillTo', 'item'];
     case 'extraClassNames':
       return ['extraClassNames', 'className'];
+    case 'dependsOn':
+      return ['dependsOn', 'item'];
   }
   return null;
 };

@@ -528,10 +528,7 @@ anychart.themes.merging.mergingMap_ = [
       'linearGauge.defaultPointerSettings.base.label',
       'pert.milestones.labels',
       'pert.tasks.upperLabels',
-      'pert.tasks.lowerLabels',
-      'pert.criticalPath.milestones.labels',
-      'pert.criticalPath.tasks.upperLabels',
-      'pert.criticalPath.tasks.lowerLabels'
+      'pert.tasks.lowerLabels'
     ]
   },
   {
@@ -584,9 +581,7 @@ anychart.themes.merging.mergingMap_ = [
       'defaultDataGrid.tooltip',
       'ganttBase.timeline.tooltip',
       'pert.milestones.tooltip',
-      'pert.tasks.tooltip',
-      'pert.criticalPath.milestones.tooltip',
-      'pert.criticalPath.tasks.tooltip'
+      'pert.tasks.tooltip'
     ]
   },
   {

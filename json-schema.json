@@ -5508,6 +5508,9 @@
     "milestones": {
       "type": "object",
       "properties": {
+        "color": {
+          "type": ["string", "object", "null"]
+        },
         "fill": {"$ref": "#/definitions/fill"},
         "hoverFill": {"$ref": "#/definitions/fill"},
         "selectFill": {"$ref": "#/definitions/fill"},
@@ -5548,6 +5551,9 @@
     "tasks": {
       "type": "object",
       "properties": {
+        "color": {
+          "type": ["string", "object", "null"]
+        },
         "fill": {"$ref": "#/definitions/fill"},
         "hoverFill": {"$ref": "#/definitions/fill"},
         "selectFill": {"$ref": "#/definitions/fill"},

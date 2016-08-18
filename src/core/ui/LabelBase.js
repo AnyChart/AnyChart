@@ -957,16 +957,25 @@ anychart.core.ui.LabelBase.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['background'] = this.background().serialize();
   json['padding'] = this.padding().serialize();
-  json['width'] = this.width();
-  json['height'] = this.height();
-  if (goog.isDef(this.anchorInternal)) json['anchor'] = this.anchorInternal;
-  json['offsetX'] = this.offsetX();
-  json['offsetY'] = this.offsetY();
-  json['text'] = this.text();
-  json['minFontSize'] = this.minFontSize();
-  json['maxFontSize'] = this.maxFontSize();
+  if (goog.isDefAndNotNull(this.width_))
+    json['width'] = this.width_;
+  if (goog.isDefAndNotNull(this.height_))
+    json['height'] = this.height_;
+  if (goog.isDef(this.anchorInternal))
+    json['anchor'] = this.anchorInternal;
+  if (goog.isDefAndNotNull(this.offsetX_))
+    json['offsetX'] = this.offsetX_;
+  if (goog.isDefAndNotNull(this.offsetY_))
+    json['offsetY'] = this.offsetY();
+  if (goog.isDef(this.text()))
+    json['text'] = this.text();
+  if (!isNaN(this.minFontSize_))
+    json['minFontSize'] = this.minFontSize_;
+  if (!isNaN(this.maxFontSize_))
+    json['maxFontSize'] = this.maxFontSize_;
   json['adjustFontSize'] = this.adjustFontSize();
-  json['rotation'] = this.rotation();
+  if (goog.isDef(this.rotation_))
+    json['rotation'] = this.rotation_;
   return json;
 };
 
