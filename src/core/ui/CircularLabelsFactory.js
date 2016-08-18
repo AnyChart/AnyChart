@@ -198,8 +198,11 @@ anychart.core.ui.CircularLabelsFactory.prototype.getDimension = function(formatP
   var formatProvider;
   var positionProvider;
 
-  if (!this.measureCustomLabel_) this.measureCustomLabel_ = new anychart.core.ui.CircularLabelsFactory.Label();
-  else this.measureCustomLabel_.clear();
+  if (!this.measureCustomLabel_) {
+    this.measureCustomLabel_ = new anychart.core.ui.CircularLabelsFactory.Label();
+  } else {
+    this.measureCustomLabel_.clear();
+  }
 
   if (formatProviderOrLabel instanceof anychart.core.ui.CircularLabelsFactory.Label) {
     var label = (/** @type {anychart.core.ui.LabelsFactory.Label} */(formatProviderOrLabel));

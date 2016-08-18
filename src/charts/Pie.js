@@ -2723,7 +2723,7 @@ anychart.charts.Pie.prototype.drawLabel_ = function(pointState, opt_updateConnec
   var labelHoverEnabledState = hoverSliceLabel && goog.isDef(hoverSliceLabel['enabled']) ? hoverSliceLabel['enabled'] : null;
 
   var positionProvider = this.createPositionProvider();
-  var formatProvider = this.createFormatProvider();
+  var formatProvider = this.createFormatProvider(true);
 
   var isFitToSlice = true;
   if ((!hovered || (hovered && !this.forceHoverLabels_)) && !this.insideLabelsOverlap_) {
@@ -2751,8 +2751,11 @@ anychart.charts.Pie.prototype.drawLabel_ = function(pointState, opt_updateConnec
     var bx = cx + this.radiusValue_ * Math.cos(angle);
     var by = cy + (this.mode3d_ ? this.get3DYRadius(this.radiusValue_) : this.radiusValue_) * Math.sin(angle);
 
-    if (!this.measureLabel_) this.measureLabel_ = new anychart.core.ui.CircularLabelsFactory.Label();
-    else this.measureLabel_.clear();
+    if (!this.measureLabel_) {
+      this.measureLabel_ = new anychart.core.ui.CircularLabelsFactory.Label();
+    } else {
+      this.measureLabel_.clear();
+    }
     this.measureLabel_.formatProvider(formatProvider);
     this.measureLabel_.positionProvider(positionProvider);
     this.measureLabel_.resetSettings();
@@ -2795,8 +2798,6 @@ anychart.charts.Pie.prototype.drawLabel_ = function(pointState, opt_updateConnec
     label.currentLabelsFactory(labelsFactory);
     label.setSettings(/** @type {Object} */(sliceLabel), /** @type {Object} */(hoverSliceLabel));
 
-    label.draw();
-
     //todo: this shit should be reworked when labelsFactory will be reworked
     //if usual label isn't disabled and not drawn then it doesn't have container and hover label doesn't know nothing
     //about its DOM element and trying to apply itself setting to it. But nothing will happen because container is empty.
@@ -2805,10 +2806,9 @@ anychart.charts.Pie.prototype.drawLabel_ = function(pointState, opt_updateConnec
       if (!label.container().parent()) {
         label.container().parent(/** @type {acgraph.vector.ILayer} */(this.labels().container()));
       }
-      label.draw();
     }
   } else if (label) {
-    label.clear();
+    this.labels_.clear(label.getIndex());
   }
   return /** @type {anychart.core.ui.CircularLabelsFactory.Label}*/(label);
 };
@@ -2947,9 +2947,11 @@ anychart.charts.Pie.prototype.clickSlice = function(opt_explode) {
     this.labels().resumeSignalsDispatching(true);
     iterator.select(index);
   }
+  // for support users pointClick changes
   var pointState = this.state.seriesState | this.state.getPointStateByIndex(iterator.getIndex());
   var hovered = this.state.isStateContains(pointState, anychart.PointState.HOVER);
   this.drawLabel_(pointState, hovered);
+  this.labels().draw();
 };
 
 
@@ -3022,8 +3024,21 @@ anychart.charts.Pie.prototype.makeBrowserEvent = function(e) {
     'platformModifierKey': e['platformModifierKey'],
     'state': e['state']
   };
+
   var tag = anychart.utils.extractTag(res['domTarget']);
-  res['pointIndex'] = res['sliceIndex'] = anychart.utils.toNumber(tag.index);
+  var pointIndex = tag.index;
+  // fix for domTarget == layer (mouseDown on label + mouseUp on path = click on layer)
+  if (!goog.isDef(pointIndex) && this.state.hasPointState(anychart.PointState.HOVER)) {
+    var hoveredPointsIndex = this.state.getIndexByPointState(anychart.PointState.HOVER);
+    if (hoveredPointsIndex.length) {
+      pointIndex = hoveredPointsIndex[0];
+    }
+  }
+
+  pointIndex = anychart.utils.toNumber(pointIndex);
+  if (!isNaN(pointIndex)) {
+    res['pointIndex'] = res['sliceIndex'] = pointIndex;
+  }
   return res;
 };
 
@@ -3034,17 +3049,19 @@ anychart.charts.Pie.prototype.makeBrowserEvent = function(e) {
  */
 anychart.charts.Pie.prototype.handleMouseDown = function(event) {
   var evt = this.makePointEvent(event);
+  if (!evt) return;
+
   var index = evt['pointIndex'];
-  if (evt && this.dispatchEvent(evt) && this.getIterator().select(index)) {
+  if (this.dispatchEvent(evt) && this.getIterator().select(index)) {
     this.selectPoint(index);
     var seriesStatus = {
       series: this,
       points: [index],
       nearestPointToCursor: {index: index, distance: 0}
     };
-    var spe = this.makeInteractivityPointEvent('selected', event, [seriesStatus]);
-    spe['currentPoint']['selected'] = !!this.getIterator().meta('exploded');
-    this.dispatchEvent(spe);
+    var selectedPointEvent = this.makeInteractivityPointEvent('selected', event, [seriesStatus]);
+    selectedPointEvent['currentPoint']['selected'] = !!this.getIterator().meta('exploded');
+    this.dispatchEvent(selectedPointEvent);
   }
 };
 
@@ -3073,6 +3090,7 @@ anychart.charts.Pie.prototype.makePointEvent = function(event) {
     pointIndex = event['markerIndex'];
   }
   pointIndex = anychart.utils.toNumber(pointIndex);
+  if (isNaN(pointIndex)) return null;
 
   event['pointIndex'] = pointIndex;
 
@@ -3355,35 +3373,22 @@ anychart.charts.Pie.prototype.selectSeries = function() {
 /**
  * Select a point of the series by its index.
  * @param {number|Array<number>} indexOrIndexes Index of the point to hover.
- * @param {anychart.core.MouseEvent=} opt_event Event that initiate point hovering.<br/>
- *    <b>Note:</b> Used only to display float tooltip.
  * @return {!anychart.charts.Pie}  {@link anychart.charts.Pie} instance for method chaining.
  */
-anychart.charts.Pie.prototype.selectPoint = function(indexOrIndexes, opt_event) {
+anychart.charts.Pie.prototype.selectPoint = function(indexOrIndexes) {
   if (!this.enabled())
     return this;
 
-  var unselect = !(opt_event && opt_event.shiftKey);
-
-  if (goog.isArray(indexOrIndexes)) {
-    if (!opt_event)
-      this.unselect();
-
-    this.state.setPointState(anychart.PointState.SELECT, indexOrIndexes, unselect ? anychart.PointState.HOVER : undefined);
-  } else if (goog.isNumber(indexOrIndexes)) {
-    this.state.setPointState(anychart.PointState.SELECT, indexOrIndexes, unselect ? anychart.PointState.HOVER : undefined);
-  }
-
-  var iterator = this.getResetIterator();
-  while (iterator.advance()) {
-    this.drawLabel_(this.state.getPointStateByIndex(iterator.getIndex()));
-  }
-  var index;
-  if (goog.isNumber(indexOrIndexes))
-    index = this.labels().getLabel(indexOrIndexes);
-
-  // for float tooltip
+  var iterator = this.getIterator();
+  // for float tooltip and exploded checking
   this.getIterator().select(indexOrIndexes[0] || indexOrIndexes);
+
+  if (iterator.meta('exploded')) {
+    this.state.addPointState(anychart.PointState.SELECT, indexOrIndexes);
+  } else {
+    this.state.removePointState(anychart.PointState.SELECT, indexOrIndexes);
+  }
+
   this.clickSlice();
 
   return this;
@@ -3414,7 +3419,7 @@ anychart.charts.Pie.prototype.unselect = function(opt_indexOrIndexes) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  Apply appearance.
+//  Interactivity section (Apply appearance).
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
@@ -3430,7 +3435,9 @@ anychart.charts.Pie.prototype.applyAppearanceToPoint = function(pointState) {
 /**
  * Finalization point appearance. For drawing labels and markers.
  */
-anychart.charts.Pie.prototype.finalizePointAppearance = goog.nullFunction;
+anychart.charts.Pie.prototype.finalizePointAppearance = function() {
+  this.labels().draw();
+};
 
 
 /**
