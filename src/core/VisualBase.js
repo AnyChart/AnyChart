@@ -272,25 +272,34 @@ anychart.core.VisualBase.prototype.getOwnerElement = function(target) {
  */
 anychart.core.VisualBase.prototype.container = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.container_ != opt_value) {
+    if (this.originalContainer_ != opt_value) {
+      this.prevContainer_ = this.container_;
+      this.originalContainer_ = opt_value;
       var containerBounds = this.container_ && this.container_.getStage() && this.container_.getStage().getBounds();
-      if (goog.isString(opt_value) || goog.dom.isElement(opt_value)) {
-        // Should we use registerDisposable in this case?
-        // TODO(Anton Saukh): fix type cast to {Element|string} when this will be fixed in graphics.
-        this.container_ = acgraph.create();
-        this.registerDisposable(this.container_);
-        if (acgraph.type() != acgraph.StageType.VML)
-          this.container_.domElement().setAttribute('role', 'presentation');
-        this.container_.container(/** @type {Element} */(opt_value));
 
-        //if graphics engine can't recognize passed container
-        //we should destroy stage to avoid uncontrolled behaviour
-        if (!this.container_.container()) {
-          this.container_.dispose();
-          this.container_ = null;
-          return this;
+      if (goog.isString(opt_value) || goog.dom.isElement(opt_value)) {
+        if (this.stageOwn_) {
+          this.container_.container(opt_value);
+        } else {
+          // Should we use registerDisposable in this case?
+          // TODO(Anton Saukh): fix type cast to {Element|string} when this will be fixed in graphics.
+          this.container_ = acgraph.create();
+
+          this.registerDisposable(this.container_);
+          if (acgraph.type() != acgraph.StageType.VML)
+            this.container_.domElement().setAttribute('role', 'presentation');
+          this.container_.container(/** @type {Element} */(opt_value));
+
+          //if graphics engine can't recognize passed container
+          //we should destroy stage to avoid uncontrolled behaviour
+          if (!this.container_.container()) {
+            this.container_.dispose();
+            this.container_ = null;
+            return this;
+          }
+          this.stageOwn_ = true;
         }
-      } else {
+      } else if (!opt_value || !/** @type {acgraph.vector.Element} */(opt_value).isDisposed()) {
         this.container_ = /** @type {acgraph.vector.ILayer} */(opt_value);
       }
 
@@ -300,6 +309,12 @@ anychart.core.VisualBase.prototype.container = function(opt_value) {
         state |= anychart.ConsistencyState.BOUNDS;
 
       this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
+
+      if (this.stageOwn_ && this.originalContainer_ instanceof acgraph.vector.Stage) {
+        if (this.prevContainer_.dispose)
+          this.prevContainer_.dispose();
+        this.stageOwn_ = false;
+      }
     }
     return this;
   }

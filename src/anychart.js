@@ -9,6 +9,7 @@ goog.provide('anychart.globalLock');
 goog.require('acgraph');
 goog.require('anychart.base');
 goog.require('anychart.core.reporting');
+goog.require('anychart.core.ui.StageCredits');
 goog.require('anychart.performance');
 goog.require('anychart.themes.merging');
 goog.require('anychart.utils');
@@ -35,6 +36,25 @@ goog.require('goog.json.hybrid');
  * @name anychart.graphics
  */
 anychart.graphics = window['acgraph'];
+
+
+/**
+ * Stage credits.
+ * @param {(Object|boolean|null)=} opt_value .
+ * @return {!(acgraph.vector.Stage|anychart.core.ui.StageCredits)}
+ */
+acgraph.vector.Stage.prototype.credits = function(opt_value) {
+  if (!this.credits_) {
+    this.credits_ = new anychart.core.ui.StageCredits(this);
+    this.credits_.setupByJSON(anychart.getFullTheme()['stageCredits']);
+  }
+  if (goog.isDef(opt_value)) {
+    this.credits_.setupByJSON(opt_value);
+    return this;
+  }
+  return this.credits_;
+};
+acgraph.vector.Stage.prototype['credits'] = acgraph.vector.Stage.prototype.credits;
 
 
 /**

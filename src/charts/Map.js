@@ -3206,7 +3206,7 @@ anychart.charts.Map.prototype.iterateGeometry_ = function(geom, callBack, opt_ou
 /** @inheritDoc */
 anychart.charts.Map.prototype.drawCredits = function(parentBounds) {
   var rootScene = this.getRootScene();
-  return this == rootScene ? anychart.charts.Map.base(this, 'drawCredits', parentBounds) : rootScene.credits().getRemainingBounds();
+  return /** @type {!anychart.math.Rect} */(this == rootScene ? anychart.charts.Map.base(this, 'drawCredits', parentBounds) : parentBounds);
 };
 
 

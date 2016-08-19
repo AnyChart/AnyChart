@@ -993,6 +993,14 @@ goog.provide('anychart.themes.defaultTheme');
       'minPixPerPoint': NaN
     },
 
+    'stageCredits': {
+      'enabled': true,
+      'text': 'AnyChart',
+      'url': 'http://anychart.com',
+      'alt': 'AnyChart.com',
+      'logoSrc': 'https://static.anychart.com/logo.png'
+    },
+
     'chart': {
       'enabled': true,
       'padding': {'top': 10, 'right': 20, 'bottom': 5, 'left': 10},
@@ -1056,14 +1064,7 @@ goog.provide('anychart.themes.defaultTheme');
         'maxWidth': null,
         'maxHeight': null
       },
-      'credits': {
-        'enabled': null,
-        'text': 'AnyChart',
-        'url': 'http://anychart.com',
-        'alt': 'AnyChart.com',
-        'inChart': false,
-        'logoSrc': 'https://static.anychart.com/logo.png'
-      },
+      'credits': {},
       'defaultSeriesSettings': {
         'base': {
           'enabled': true,
@@ -3699,9 +3700,6 @@ goog.provide('anychart.themes.defaultTheme');
       },
       'legend': {
         'enabled': false
-      },
-      'credits': {
-        'inChart': true
       },
       'background': {
         'fill': '#fff'

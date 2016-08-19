@@ -9,8 +9,8 @@ goog.require('acgraph');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.Background');
+goog.require('anychart.core.ui.ChartCredits');
 goog.require('anychart.core.ui.ChartTooltip');
-goog.require('anychart.core.ui.Credits');
 goog.require('anychart.core.ui.Label');
 goog.require('anychart.core.ui.Legend');
 goog.require('anychart.core.ui.Title');
@@ -1486,7 +1486,7 @@ anychart.core.Chart.prototype.legend = function(opt_value) {
 /**
  * @ignoreDoc
  * @param {(Object|boolean|null)=} opt_value
- * @return {anychart.core.Chart|anychart.core.ui.Credits}
+ * @return {anychart.core.Chart|anychart.core.ui.ChartCredits}
  */
 anychart.core.Chart.prototype.credits = function(opt_value) {
   anychart.core.reporting.error(anychart.enums.ErrorCode.NO_CREDITS_IN_CHART);

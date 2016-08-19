@@ -1,7 +1,6 @@
 goog.provide('anychart.core.ChartWithCredits');
-goog.require('acgraph');
 goog.require('anychart.core.Chart');
-goog.require('anychart.core.ui.Credits');
+goog.require('anychart.core.ui.ChartCredits');
 
 
 
@@ -13,7 +12,7 @@ goog.require('anychart.core.ui.Credits');
 anychart.core.ChartWithCredits = function() {
 
   /**
-   * @type {anychart.core.ui.Credits}
+   * @type {anychart.core.ui.ChartCredits}
    * @private
    */
   this.credits_ = null;
@@ -47,11 +46,11 @@ anychart.core.ChartWithCredits.prototype.SUPPORTED_CONSISTENCY_STATES =
 /**
  * Getter/setter for credits.
  * @param {(Object|boolean|null)=} opt_value
- * @return {!(anychart.core.Chart|anychart.core.ui.Credits)} Chart credits or itself for chaining call.
+ * @return {!(anychart.core.Chart|anychart.core.ui.ChartCredits)} Chart credits or itself for chaining call.
  */
 anychart.core.ChartWithCredits.prototype.credits = function(opt_value) {
   if (!this.credits_) {
-    this.credits_ = new anychart.core.ui.Credits();
+    this.credits_ = new anychart.core.ui.ChartCredits(this);
     this.registerDisposable(this.credits_);
     this.credits_.listenSignals(this.onCreditsSignal_, this);
   }
@@ -73,11 +72,8 @@ anychart.core.ChartWithCredits.prototype.credits = function(opt_value) {
 anychart.core.ChartWithCredits.prototype.onCreditsSignal_ = function(event) {
   var state = 0;
   var signal = anychart.Signal.NEEDS_REDRAW;
-  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     state |= anychart.ConsistencyState.CHART_CREDITS;
-  }
-  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
-    state |= anychart.ConsistencyState.BOUNDS;
   }
   // If there are no signals - state == 0 and nothing will happen.
   this.invalidate(state, signal);
@@ -90,17 +86,18 @@ anychart.core.ChartWithCredits.prototype.onCreditsSignal_ = function(event) {
  * @return {!anychart.math.Rect} Bounds without credits bounds.
  */
 anychart.core.ChartWithCredits.prototype.drawCredits = function(parentBounds) {
-  var credits = this.credits();
-  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_CREDITS | anychart.ConsistencyState.BOUNDS)) {
-    credits.suspendSignalsDispatching();
-    if (!credits.container())
-      credits.container(/** @type {acgraph.vector.ILayer} */(this.container()));
-    credits.parentBounds(/** @type {anychart.math.Rect} */ (parentBounds));
-    credits.resumeSignalsDispatching(false);
-    credits.draw();
-    this.markConsistent(anychart.ConsistencyState.CHART_CREDITS);
-  }
-  return this.credits().getRemainingBounds();
+  var stage = this.container().getStage();
+  if (!stage)
+    return /** @type {!anychart.math.Rect} */(parentBounds);
+
+  var stageCredits = stage.credits();
+  var chartCredits = this.credits();
+
+  stageCredits.setupByJSON(chartCredits.serialize());
+  chartCredits.dropSettings();
+
+  this.markConsistent(anychart.ConsistencyState.CHART_CREDITS);
+  return /** @type {!anychart.math.Rect} */(parentBounds);
 };
 
 
