@@ -627,7 +627,7 @@ anychart.core.utils.Bounds.prototype.setup = function(var_args) {
 };
 
 
-//ports
+//exports
 anychart.core.utils.Bounds.prototype['top'] = anychart.core.utils.Bounds.prototype.top;
 anychart.core.utils.Bounds.prototype['right'] = anychart.core.utils.Bounds.prototype.right;
 anychart.core.utils.Bounds.prototype['bottom'] = anychart.core.utils.Bounds.prototype.bottom;
