@@ -1063,33 +1063,34 @@ def __upload_release_item(item, version, api, zone_id, dry_run):
     source_file = item['source_file']
     file_name = os.path.basename(source_file)
 
-    target_path = '/apps/static/cdn%s' % (item['target'] % version if safe_index_of(item['target'], '%s') >= 0 else item['target'])
-    target_file_path = target_path + file_name
-    cdn_path = target_file_path
+    base_path = (item['target'] % version if safe_index_of(item['target'], '%s') >= 0 else item['target'])
+    upload_dir_path = '/apps/static/cdn%s' % base_path
+    upload_file_path = upload_dir_path + file_name
+    cdn_path = base_path + file_name
     errors = []
 
     # ensure target path exists
     try:
-        print "Ensure directory exists: %s" % target_path
+        print "Ensure directory exists: %s" % upload_dir_path
         if not dry_run:
-            if not exists(target_path):
-                print "Create directory: %s" % target_path
-                run('mkdir %s' % target_path, quiet=True)
+            if not exists(upload_dir_path):
+                print "Create directory: %s" % upload_dir_path
+                run('mkdir %s' % upload_dir_path, quiet=True)
     except (KeyboardInterrupt, SystemExit):
         raise
     except:
-        errors.append("Failed ensure path exists: %s\n%s" % (target_path, sys.exc_info()[0]))
+        errors.append("Failed ensure path exists: %s\n%s" % (upload_dir_path, sys.exc_info()[0]))
 
     # upload file
     try:
-        print "Upload file: %s --> %s" % (source_file, target_file_path)
+        print "Upload file: %s --> %s" % (source_file, upload_file_path)
         if not dry_run:
             with hide('output', 'running', 'warnings'):
-                put(source_file, target_file_path)
+                put(source_file, upload_file_path)
     except (KeyboardInterrupt, SystemExit):
         raise
     except:
-        errors.append("Failed to upload file: %s\n%s" % (target_file_path, sys.exc_info()[0]))
+        errors.append("Failed to upload file: %s\n%s" % (upload_file_path, sys.exc_info()[0]))
 
     # invalidate cdn cache
     try:
