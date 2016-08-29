@@ -466,48 +466,46 @@ def __call_console_commands(commands, cwd=None):
 
 
 def __get_copyrigth(modules):
-    if len(modules) != 1 or modules[0] not in ['anychart_bundle', 'anychart', 'anymap', 'anygantt', 'anystock', 'anychart_ui']:
-        return ''
-
-    module = modules[0]
-
-    robust = 'Robust ' if module in ['anychart', 'anychart_bundle'] else ''
-
     title = ''
-    name = ''
-    if module == 'anychart_bundle':
-        name = 'AnyChart'
-        title = 'Charting Framework\n * AnyChart, AnyMap, AnyGantt, AnyStock, AnyChart UI'
-    elif module == 'anychart':
-        name = 'AnyChart'
-        title = 'Charts'
-    elif module == 'anymap':
-        name = 'AnyMap'
-        title = 'Maps'
-    elif module == 'anygantt':
-        name = 'AnyGantt'
-        title = 'Gantt Charts'
-    elif module == 'anystock':
-        name = 'AnyStock'
-        title = 'Financial Charts'
-    elif module == 'anychart_ui':
-        name = 'AnyChart UI'
-        title = 'Charting User Interface'
-
+    contains = ''
     build = 'Development' if __is_develop() else 'Production'
+    version = __get_version(True)
+    url = 'http://anychart.com'
 
-    version = __get_version(False)
+    if len(modules) == 1 and modules[0] in ['anychart_bundle', 'anychart', 'anymap', 'anygantt', 'anystock', 'anychart_ui', 'data_adapter']:
+        module = modules[0]
 
-    url = ''
-    if not module == 'anychart_bundle':
-        url = '/products/%s/' % module
+        if module == 'anychart_bundle':
+            title = 'AnyChart - Robust JavaScript HTML5 Web Charting Framework'
+            contains = 'AnyChart, AnyMap, AnyGantt, AnyStock, AnyChart UI'
+        elif module == 'anychart':
+            title = 'AnyChart - Robust JavaScript HTML5 Web Charts'
+            url = 'http://anychart.com/products/anychart/'
+        elif module == 'anymap':
+            title = 'AnyMap - JavaScript HTML5 Web Maps'
+            url = 'http://anychart.com/products/anymap/'
+        elif module == 'anygantt':
+            title = 'AnyGantt - JavaScript HTML5 Web Gantt Charts'
+            url = 'http://anychart.com/products/anygantt/'
+        elif module == 'anystock':
+            title = 'AnyStock - JavaScript HTML5 Web Financial Charts'
+            url = 'http://anychart.com/products/anystock/'
+        elif module == 'anychart_ui':
+            title = 'AnyChart UI - JavaScript HTML5 Web Charting User Interface'
+        elif module == 'data_adapter':
+            title = 'AnyChart Data Adapter'
+
+    if contains:
+        contains = " * " + contains
 
     copyright = \
-        "/* %s - %sJavaScript HTML5 Web %s\n" \
+        "/**\n" \
+        " * %s\n%s" \
         " * %s Build\n" \
         " * Version: %s\n" \
-        " * http://anychart.com%s\n" \
-        " */\n" % (name, robust, title, build, version, url)
+        " * %s\n" \
+        " */\n" % (title, contains, build, version, url)
+
     return copyright
 
 
@@ -810,7 +808,12 @@ def __build_release():
     __build_product_package(
         os.path.join(OUT_PATH, 'AnyChart' + '-' + short_version),
         'anychart',
-        lambda name: not name.startswith('Gantt') and not name.startswith('Maps') and not name.startswith('Stock') and not name.startswith('Pert') and not name.startswith('Graphics')
+        lambda name: not name.startswith('Gantt') and
+                     not name.startswith('Maps') and
+                     not name.startswith('Stock') and
+                     not name.startswith('Pert') and
+                     not name.startswith('Graphics') and
+                     not name.startswith('Seat')
     )
 
     # rm gallery demos dir
