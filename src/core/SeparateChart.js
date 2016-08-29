@@ -1,5 +1,5 @@
 goog.provide('anychart.core.SeparateChart');
-goog.require('anychart.core.ChartWithCredits');
+goog.require('anychart.core.Chart');
 goog.require('anychart.core.ui.Legend');
 goog.require('anychart.enums');
 
@@ -8,7 +8,7 @@ goog.require('anychart.enums');
 /**
  * Base class for all charts, contains the margins, the background and the title.
  * @constructor
- * @extends {anychart.core.ChartWithCredits}
+ * @extends {anychart.core.Chart}
  */
 anychart.core.SeparateChart = function() {
   /**
@@ -23,7 +23,7 @@ anychart.core.SeparateChart = function() {
     this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove, null, this.handleMouseDown);
 
 };
-goog.inherits(anychart.core.SeparateChart, anychart.core.ChartWithCredits);
+goog.inherits(anychart.core.SeparateChart, anychart.core.Chart);
 
 
 /**
@@ -38,7 +38,7 @@ anychart.core.SeparateChart.prototype.SUPPORTED_SIGNALS = anychart.core.Chart.pr
  * @type {number}
  */
 anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.ChartWithCredits.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.CHART_LEGEND;
 
 

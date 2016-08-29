@@ -145,6 +145,12 @@ anychart.core.Chart = function() {
    */
   this.statistics = {};
 
+  /**
+   * @type {anychart.core.ui.ChartCredits}
+   * @private
+   */
+  this.credits_ = null;
+
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
 };
@@ -168,7 +174,8 @@ anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.CHART_BACKGROUND |
     anychart.ConsistencyState.CHART_TITLE |
     anychart.ConsistencyState.A11Y |
-    anychart.ConsistencyState.CHART_ANIMATION;
+    anychart.ConsistencyState.CHART_ANIMATION |
+    anychart.ConsistencyState.CHART_CREDITS;
 
 
 /**
@@ -911,6 +918,8 @@ anychart.core.Chart.contextMenuMap = {
  * @return {!anychart.math.Rect} Chart content bounds, allocated space for all chart appearance items.
  */
 anychart.core.Chart.prototype.calculateContentAreaSpace = function(totalBounds) {
+  //chart area bounds with applied margin and copped by credits
+  var boundsWithoutCredits;
   //chart area with applied margin
   var boundsWithoutMargin;
   //chart area with applied margin and padding
@@ -920,7 +929,7 @@ anychart.core.Chart.prototype.calculateContentAreaSpace = function(totalBounds) 
   //
   var boundsWithoutBackgroundThickness;
 
-  boundsWithoutMargin = this.margin().tightenBounds(totalBounds).round();
+  boundsWithoutMargin = this.margin().tightenBounds(totalBounds);
 
   var background = this.background();
   if (this.hasInvalidationState(anychart.ConsistencyState.CHART_BACKGROUND | anychart.ConsistencyState.BOUNDS)) {
@@ -933,7 +942,8 @@ anychart.core.Chart.prototype.calculateContentAreaSpace = function(totalBounds) 
   }
 
   boundsWithoutBackgroundThickness = background.enabled() ? background.getRemainingBounds() : boundsWithoutMargin;
-  boundsWithoutPadding = this.padding().tightenBounds(boundsWithoutBackgroundThickness);
+  boundsWithoutCredits = this.drawCredits(boundsWithoutBackgroundThickness);
+  boundsWithoutPadding = this.padding().tightenBounds(boundsWithoutCredits);
 
   var title = this.title();
   if (this.hasInvalidationState(anychart.ConsistencyState.CHART_TITLE | anychart.ConsistencyState.BOUNDS)) {
@@ -944,8 +954,10 @@ anychart.core.Chart.prototype.calculateContentAreaSpace = function(totalBounds) 
     title.draw();
     this.markConsistent(anychart.ConsistencyState.CHART_TITLE);
   }
+
   boundsWithoutTitle = title.enabled() ? title.getRemainingBounds() : boundsWithoutPadding;
-  return boundsWithoutTitle.clone().round();
+
+  return boundsWithoutTitle.clone();
 };
 
 
@@ -957,6 +969,69 @@ anychart.core.Chart.prototype.calculateContentAreaSpace = function(totalBounds) 
  */
 anychart.core.Chart.prototype.setLabelSettings = function(label, bounds) {
   label.parentBounds(bounds);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Credits.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter/setter for credits.
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {!(anychart.core.Chart|anychart.core.ui.ChartCredits)} Chart credits or itself for chaining call.
+ */
+anychart.core.Chart.prototype.credits = function(opt_value) {
+  if (!this.credits_) {
+    this.credits_ = new anychart.core.ui.ChartCredits(this);
+    this.registerDisposable(this.credits_);
+    this.credits_.listenSignals(this.onCreditsSignal_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.credits_.setup(opt_value);
+    return this;
+  } else {
+    return this.credits_;
+  }
+};
+
+
+/**
+ * Internal title invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.core.Chart.prototype.onCreditsSignal_ = function(event) {
+  var state = 0;
+  var signal = anychart.Signal.NEEDS_REDRAW;
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    state |= anychart.ConsistencyState.CHART_CREDITS;
+  }
+  // If there are no signals - state == 0 and nothing will happen.
+  this.invalidate(state, signal);
+};
+
+
+/**
+ * Draw credits.
+ * @param {anychart.math.Rect} parentBounds Parent bounds.
+ * @return {!anychart.math.Rect} Bounds without credits bounds.
+ */
+anychart.core.Chart.prototype.drawCredits = function(parentBounds) {
+  var stage = this.container().getStage();
+  if (!stage)
+    return /** @type {!anychart.math.Rect} */(parentBounds);
+
+  var stageCredits = stage.credits();
+  var chartCredits = this.credits();
+
+  stageCredits.setup(chartCredits.serialize());
+  chartCredits.dropSettings();
+
+  this.markConsistent(anychart.ConsistencyState.CHART_CREDITS);
+  return /** @type {!anychart.math.Rect} */(parentBounds);
 };
 
 
@@ -1422,6 +1497,8 @@ anychart.core.Chart.prototype.serialize = function() {
   if (this.contextMenu_) {
     json['contextMenu'] = this.contextMenu()['serialize']();
   }
+
+  json['credits'] = this.credits().serialize();
   return json;
 };
 
@@ -1462,6 +1539,8 @@ anychart.core.Chart.prototype.setupByJSON = function(config) {
 
   if (goog.isDef(config['contextMenu']))
     this.contextMenu(config['contextMenu']);
+
+  this.credits(config['credits']);
 };
 
 
@@ -1479,17 +1558,6 @@ anychart.core.Chart.prototype.disposeInternal = function() {
  */
 anychart.core.Chart.prototype.legend = function(opt_value) {
   anychart.core.reporting.error(anychart.enums.ErrorCode.NO_LEGEND_IN_CHART);
-  return goog.isDef(opt_value) ? this : null;
-};
-
-
-/**
- * @ignoreDoc
- * @param {(Object|boolean|null)=} opt_value
- * @return {anychart.core.Chart|anychart.core.ui.ChartCredits}
- */
-anychart.core.Chart.prototype.credits = function(opt_value) {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_CREDITS_IN_CHART);
   return goog.isDef(opt_value) ? this : null;
 };
 
@@ -2835,4 +2903,5 @@ anychart.core.Chart.prototype['localToGlobal'] = anychart.core.Chart.prototype.l
 anychart.core.Chart.prototype['globalToLocal'] = anychart.core.Chart.prototype.globalToLocal;
 anychart.core.Chart.prototype['getStat'] = anychart.core.Chart.prototype.getStat;
 anychart.core.Chart.prototype['getSelectedPoints'] = anychart.core.Chart.prototype.getSelectedPoints;
+anychart.core.Chart.prototype['credits'] = anychart.core.Chart.prototype.credits;
 

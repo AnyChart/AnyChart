@@ -676,7 +676,6 @@ anychart.core.map.series.Base.prototype.draw = function() {
     return this;
 
   this.suspendSignalsDispatching();
-  this.calculate();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);

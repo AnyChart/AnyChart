@@ -1295,8 +1295,8 @@ anychart.core.ChartWithSeries.prototype.calculateYScales = function() {
       var xScale = this.xScales[uid];
       if (xScale instanceof anychart.scales.Ordinal) {
         if (dataLength) {
-          firstIndex = goog.math.clamp(Math.floor(this.xZoom_.getStartRatio() * dataLength - 1), 0, dataLength - 1);
-          lastIndex = goog.math.clamp(Math.ceil(this.xZoom_.getEndRatio() * dataLength + 1), 0, dataLength - 1);
+          firstIndex = goog.math.clamp(Math.floor(this.getZoomStartRatio() * dataLength - 1), 0, dataLength - 1);
+          lastIndex = goog.math.clamp(Math.ceil(this.getZoomEndRatio() * dataLength + 1), 0, dataLength - 1);
         } else {
           firstIndex = NaN;
           lastIndex = NaN;
@@ -1912,6 +1912,26 @@ anychart.core.ChartWithSeries.prototype.calculateStatistics = function() {
   }
 
   anychart.performance.end('statistics calculation');
+};
+
+
+/**
+ * Dummy for zoom support in Scatter standalone module.
+ * @return {number}
+ * @protected
+ */
+anychart.core.ChartWithSeries.prototype.getZoomStartRatio = function() {
+  return 0;
+};
+
+
+/**
+ * Dummy for zoom support in Scatter standalone module.
+ * @return {number}
+ * @protected
+ */
+anychart.core.ChartWithSeries.prototype.getZoomEndRatio = function() {
+  return 1;
 };
 
 

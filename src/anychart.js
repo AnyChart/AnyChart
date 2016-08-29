@@ -39,17 +39,24 @@ anychart.graphics = window['acgraph'];
 
 
 /**
+ * If the credits is allowed to be disabled for the stage regardless of the product key.
+ * @type {boolean}
+ */
+acgraph.vector.Stage.prototype.allowCreditsDisabling = false;
+
+
+/**
  * Stage credits.
  * @param {(Object|boolean|null)=} opt_value .
  * @return {!(acgraph.vector.Stage|anychart.core.ui.StageCredits)}
  */
 acgraph.vector.Stage.prototype.credits = function(opt_value) {
   if (!this.credits_) {
-    this.credits_ = new anychart.core.ui.StageCredits(this);
-    this.credits_.setupByJSON(anychart.getFullTheme()['stageCredits']);
+    this.credits_ = new anychart.core.ui.StageCredits(this, this.allowCreditsDisabling);
+    this.credits_.setup(anychart.getFullTheme()['stageCredits']);
   }
   if (goog.isDef(opt_value)) {
-    this.credits_.setupByJSON(opt_value);
+    this.credits_.setup(opt_value);
     return this;
   }
   return this.credits_;

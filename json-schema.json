@@ -5412,7 +5412,7 @@
       }
     },
     "anychart.core.utils.UnboundRegionsSettings": {
-      "type": "object",
+      "type": [ "object", "string" ],
       "properties": {
         "enabled": {
           "type": "boolean"

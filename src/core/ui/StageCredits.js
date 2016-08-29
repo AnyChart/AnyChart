@@ -7,10 +7,11 @@ goog.require('goog.dom');
 /**
  * Credits class.
  * @param {acgraph.vector.Stage} stage Stage credits belongs to.
+ * @param {boolean} disabledByDefault
  * @constructor
  * @extends {goog.Disposable}
  */
-anychart.core.ui.StageCredits = function(stage) {
+anychart.core.ui.StageCredits = function(stage, disabledByDefault) {
   anychart.core.ui.StageCredits.base(this, 'constructor');
 
   /**
@@ -19,6 +20,27 @@ anychart.core.ui.StageCredits = function(stage) {
    * @private
    */
   this.stage_ = stage;
+
+  /**
+   * If the credits should be disabled by default.
+   * @type {boolean}
+   * @private
+   */
+  this.isDisabledByDefault_ = disabledByDefault;
+
+  /**
+   * If we are on anychart domain now.
+   * @type {boolean}
+   * @private
+   */
+  this.onAnyChartDomain_ = anychart.core.ui.StageCredits.DOMAIN_REGEXP.test(goog.dom.getWindow().location.hostname);
+
+  /**
+   * Default enabled value is determined by the domain regexp and the constructor param.
+   * @type {boolean}
+   * @private
+   */
+  this.enabled_ = !(this.isDisabledByDefault_ || this.onAnyChartDomain_);
 
   /**
    * State.
@@ -117,7 +139,7 @@ anychart.core.ui.StageCredits.prototype.enabled = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.enabled_ != opt_value) {
       this.enabled_ = opt_value;
-      if (this.isValid())
+      if (this.isValid() || this.isDisabledByDefault_)
         this.invalidate(anychart.core.ui.StageCredits.States.ENABLED, true);
     }
     return this;
@@ -242,8 +264,9 @@ anychart.core.ui.StageCredits.prototype.createCssElement_ = function() {
   styles += '.' + anychart.core.ui.StageCredits.CssClass_.CREDITS + '{' +
       'position:absolute;' +
       'overflow:hidden;' +
-      'right:6px;' +
+      'right:9px;' +
       'bottom:6px;' +
+      'height:10px;' +
       '}';
 
   styles += '.' + anychart.core.ui.StageCredits.CssClass_.CREDITS + ' a {' +
@@ -255,13 +278,19 @@ anychart.core.ui.StageCredits.prototype.createCssElement_ = function() {
       'margin-right:2px;' +
       'height:10px;' +
       'width:10px;' +
+      'display:inline-block;' +
+      'vertical-align:top;' +
       '}';
 
   styles += '.' + anychart.core.ui.StageCredits.CssClass_.TEXT + '{' +
       'font-size:10px;' +
+      'line-height:9px;' +
+      'display:inline-block;' +
+      'vertical-align:top;' +
       'text-decoration:none;' +
       'font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;' +
       'color:#929292;' +
+      'height:10px;' +
       '}';
 
   if (css.styleSheet)
@@ -294,7 +323,7 @@ anychart.core.ui.StageCredits.prototype.render = function() {
   if (this.isConsistent() || this.isDisposed() || !this.stage_ || this.stage_.isSuspended())
     return this;
 
-  if (valid && !this.enabled()) {
+  if (!this.enabled() && (this.isDisabledByDefault_ || valid)) {
     if (this.hasInvalidationState(anychart.core.ui.StageCredits.States.ENABLED)) {
       goog.dom.removeNode(this.domElement_);
       this.markConsistent(anychart.core.ui.StageCredits.States.ENABLED);
@@ -374,7 +403,7 @@ anychart.core.ui.StageCredits.prototype.render = function() {
  * @return {boolean}
  */
 anychart.core.ui.StageCredits.prototype.isValid = function() {
-  return anychart.isValidKey() || anychart.core.ui.StageCredits.DOMAIN_REGEXP.test(goog.dom.getWindow().location.hostname);
+  return anychart.isValidKey() || this.onAnyChartDomain_;
 };
 
 
@@ -431,21 +460,20 @@ anychart.core.ui.StageCredits.prototype.onImageErrorHandler_ = function(e) {
  * Setup.
  * @param {Object|null|boolean|string} config Config.
  */
-anychart.core.ui.StageCredits.prototype.setupByJSON = function(config) {
+anychart.core.ui.StageCredits.prototype.setup = function(config) {
+  this.stage_.suspend();
   if (goog.isString(config)) {
     this.text(/** @type {string} */(config));
     this.enabled(true);
-    return;
   } else if (goog.isBoolean(config) || goog.isNull(config)) {
     this.enabled(!!config);
-    return;
+  } else if (goog.isObject(config)) {
+    this.url(config['url']);
+    this.text(config['text']);
+    this.alt(config['alt']);
+    this.logoSrc(config['logoSrc']);
+    this.enabled(config['enabled']);
   }
-  this.stage_.suspend();
-  this.url(config['url']);
-  this.text(config['text']);
-  this.alt(config['alt']);
-  this.logoSrc(config['logoSrc']);
-  this.enabled(config['enabled']);
   this.stage_.resume();
 };
 

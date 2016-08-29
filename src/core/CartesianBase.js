@@ -293,6 +293,18 @@ anychart.core.CartesianBase.prototype.applyXZoom = function() {
 };
 
 
+/** @inheritDoc */
+anychart.core.CartesianBase.prototype.getZoomStartRatio = function() {
+  return this.xZoom_.getStartRatio();
+};
+
+
+/** @inheritDoc */
+anychart.core.CartesianBase.prototype.getZoomEndRatio = function() {
+  return this.xZoom_.getEndRatio();
+};
+
+
 //endregion
 //region --- Drawing
 //----------------------------------------------------------------------------------------------------------------------

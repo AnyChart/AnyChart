@@ -2712,7 +2712,6 @@ anychart.charts.Map.prototype.calculateGeoScale = function() {
         sum += /** @type {number} */(series.statistics('seriesSum'));
         pointsCount += /** @type {number} */(series.statistics('seriesPointsCount'));
         //----------------------------------end calc statistics for series
-        // series.calculate();
       }
 
       //----------------------------------calc statistics for series
@@ -2770,6 +2769,8 @@ anychart.charts.Map.prototype.calculateGeoScale = function() {
       series = this.series_[i];
       series.suspendSignalsDispatching();
       series.container(this.dataLayer_);
+      series.setAutoGeoIdField(/** @type {string} */(this.geoIdField()));
+      series.calculate();
       series.resumeSignalsDispatching(false);
     }
   }
@@ -3560,7 +3561,6 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
       series.suspendSignalsDispatching();
       series.setParentEventTarget(this.getRootScene());
       series.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
-      series.setAutoGeoIdField(/** @type {string} */(this.geoIdField()));
       var seriesIndex = /** @type {number} */ (series.index());
       series.setAutoColor(this.palette().itemAt(seriesIndex));
       series.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(seriesIndex)));

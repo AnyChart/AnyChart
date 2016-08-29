@@ -994,7 +994,6 @@ goog.provide('anychart.themes.defaultTheme');
     },
 
     'stageCredits': {
-      'enabled': true,
       'text': 'AnyChart',
       'url': 'http://anychart.com',
       'alt': 'AnyChart.com',
@@ -1003,7 +1002,7 @@ goog.provide('anychart.themes.defaultTheme');
 
     'chart': {
       'enabled': true,
-      'padding': {'top': 10, 'right': 20, 'bottom': 5, 'left': 10},
+      'padding': {'top': 10, 'right': 20, 'bottom': 15, 'left': 10},
       'margin': {'top': 0, 'right': 0, 'bottom': 0, 'left': 0},
       'background': {'enabled': true, 'zIndex': 1},
       'contextMenu': {

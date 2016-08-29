@@ -2073,6 +2073,16 @@ anychart.charts.Sparkline.prototype.labelsInvalidated_ = function(event) {
 };
 
 
+/** @inheritDoc */
+anychart.charts.Sparkline.prototype.createStage = function() {
+  var stage = acgraph.create();
+  stage.allowCreditsDisabling = true;
+  // forcing credits to be created to apply credits disabling policy
+  stage.credits();
+  return stage;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Calculation.

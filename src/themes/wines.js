@@ -98,7 +98,7 @@ goog.provide('anychart.themes.wines');
       'stroke': '#bdbdbd 0.4'
     },
     'chart': {
-      'padding': {'top': 20, 'right': 25, 'bottom': 10, 'left': 15},
+      'padding': {'top': 20, 'right': 25, 'bottom': 15, 'left': 15},
       'defaultSeriesSettings': {
         'candlestick': {
           'risingFill': '#6f3448',

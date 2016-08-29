@@ -744,6 +744,16 @@ anychart.charts.Bullet.prototype.hoverMode = function(opt_value) {
 
 
 /** @inheritDoc */
+anychart.charts.Bullet.prototype.createStage = function() {
+  var stage = acgraph.create();
+  stage.allowCreditsDisabling = true;
+  // forcing credits to be created to apply credits disabling policy
+  stage.credits();
+  return stage;
+};
+
+
+/** @inheritDoc */
 anychart.charts.Bullet.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   json['type'] = anychart.enums.ChartTypes.BULLET;

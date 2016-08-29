@@ -22,9 +22,6 @@ PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 CONTRIB_PATH = os.path.join(PROJECT_PATH, 'contrib')
 SRC_PATH = os.path.join(PROJECT_PATH, 'src')
 OUT_PATH = os.path.join(PROJECT_PATH, 'out')
-CSS_SRC_PATH = os.path.join(PROJECT_PATH, 'css', 'anychart.less')
-CSS_OUT_PATH = os.path.join(PROJECT_PATH, 'out', 'anychart-ui.css')
-CSS_MIN_OUT_PATH = os.path.join(PROJECT_PATH, 'out', 'anychart-ui.min.css')
 MODULES_PATH = os.path.join(SRC_PATH, 'modules')
 THEMES_PATH = os.path.join(SRC_PATH, 'themes')
 
@@ -658,6 +655,7 @@ def __get_themes_list():
 def __js_beautifier(path):
     try:
         import jsbeautifier
+
         res = jsbeautifier.beautify_file(path)
         with open(path, 'w') as f:
             f.write(res)
@@ -707,6 +705,7 @@ def __exec_build_theme(theme, is_source):
     if is_source:
         __js_beautifier(os.path.join(OUT_PATH, theme + output_file_postfix))
 
+
 #=======================================================================================================================
 #                            Build release.
 #=======================================================================================================================
@@ -721,8 +720,9 @@ def __build_release():
 
     dev_options = {'develop': False, 'modules': None, 'sources': False, 'theme': 'defaultTheme', 'debug_files': False, 'gzip': True, 'performance_monitoring': False}
     prod_options = {'develop': True, 'modules': None, 'sources': False, 'theme': 'defaultTheme', 'debug_files': False, 'gzip': True, 'performance_monitoring': False}
+    export_server_project_path = arguments['export_server_path']
 
-    #bubdle
+    # bundle
     print "Compile AnyChart Bundle"
     arguments = dev_options
     __build_project(['anychart_bundle'])
@@ -738,7 +738,7 @@ def __build_release():
     arguments = dev_options
     __build_project(['anychart'])
 
-    #map
+    # map
     print "Compile AnyMap"
     arguments = prod_options
     __build_project(['anymap'])
@@ -746,7 +746,7 @@ def __build_release():
     arguments = dev_options
     __build_project(['anymap'])
 
-    #stock
+    # stock
     print "Compile AnyStock"
     arguments = prod_options
     __build_project(['anystock'])
@@ -754,7 +754,7 @@ def __build_release():
     arguments = dev_options
     __build_project(['anystock'])
 
-    #gantt
+    # gantt
     print "Compile AnyGantt"
     arguments = prod_options
     __build_project(['anygantt'])
@@ -762,7 +762,15 @@ def __build_release():
     arguments = dev_options
     __build_project(['anygantt'])
 
-    #ui
+    # data adapter
+    print "Compile Data Adapter"
+    arguments = prod_options
+    __build_project(['data_adapter'])
+
+    arguments = dev_options
+    __build_project(['data_adapter'])
+
+    # ui
     print "Compile AnyChart UI"
     __call_console_commands(['./build compile -m anychart_ui -gz'])
     __call_console_commands(['./build compile -m anychart_ui -gz -d'])
@@ -770,6 +778,7 @@ def __build_release():
     print "Compile Themes"
     __build_themes()
 
+    # install packages
     print "Build install packages"
     print "    Download demos from PG"
     if os.path.exists(os.path.join(OUT_PATH, 'gallery_demos')):
@@ -804,8 +813,25 @@ def __build_release():
         lambda name: not name.startswith('Gantt') and not name.startswith('Maps') and not name.startswith('Stock') and not name.startswith('Pert') and not name.startswith('Graphics')
     )
 
-    #rm gallery demos dir
+    # rm gallery demos dir
     shutil.rmtree(os.path.join(OUT_PATH, 'gallery_demos'))
+
+    # export server
+    print "Build export-server"
+    if os.path.exists(export_server_project_path):
+        # define version
+        export_server_version, export_server_bundle_version = __get_export_server_version(export_server_project_path)
+
+        # build export server
+        shutil.copyfile(os.path.join(OUT_PATH, 'anychart-bundle.min.js'), os.path.join(export_server_project_path, 'resources', 'js', 'anychart-bundle.min.js'))
+        p = subprocess.Popen(['lein', 'uberjar'], cwd=export_server_project_path)
+        p.wait()
+
+        # copy to out
+        shutil.copyfile(os.path.join(export_server_project_path, 'target', 'export-server-standalone.jar'), os.path.join(OUT_PATH, 'export-server.jar'))
+        shutil.copyfile(os.path.join(export_server_project_path, 'target', 'export-server-standalone.jar'), os.path.join(OUT_PATH, 'export-server-%s-bundle-%s.jar' % (export_server_version, export_server_bundle_version)))
+    else:
+        print "Error: Unable to build export server, there is no project at path: %s" % export_server_project_path
 
     print "Release build complete! Build time: {:.3f} sec".format(time.time() - t)
 
@@ -831,13 +857,23 @@ def __build_product_package(output_dir, binary_name, gallery_pass_func=None):
     shutil.copyfile(os.path.join(PROJECT_PATH, 'xml-schema.xsd'), os.path.join(output_dir, 'schemas', 'xml-schema.xsd'))
     shutil.copyfile(os.path.join(PROJECT_PATH, 'json-schema.json'), os.path.join(output_dir, 'schemas', 'json-schema.json'))
 
-    # copy UI css
+    # copy UI CSS
     shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.css'), os.path.join(output_dir, 'css', 'anychart-ui.css'))
+    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.css.gz'), os.path.join(output_dir, 'css', 'anychart-ui.css.gz'))
     shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.min.css'), os.path.join(output_dir, 'css', 'anychart-ui.min.css'))
+    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.min.css.gz'), os.path.join(output_dir, 'css', 'anychart-ui.min.css.gz'))
+
+    # copy UI JS
     shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.min.js'), os.path.join(output_dir, 'js', 'anychart-ui.min.js'))
     shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.min.js.gz'), os.path.join(output_dir, 'js', 'anychart-ui.min.js.gz'))
     shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.dev.min.js'), os.path.join(output_dir, 'js', 'anychart-ui.dev.min.js'))
     shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.dev.min.js.gz'), os.path.join(output_dir, 'js', 'anychart-ui.dev.min.js.gz'))
+
+    # copy data adapter
+    shutil.copyfile(os.path.join(OUT_PATH, 'data-adapter.min.js'), os.path.join(output_dir, 'js', 'data-adapter.min.js'))
+    shutil.copyfile(os.path.join(OUT_PATH, 'data-adapter.min.js.gz'), os.path.join(output_dir, 'js', 'data-adapter.min.js.gz'))
+    shutil.copyfile(os.path.join(OUT_PATH, 'data-adapter.dev.min.js'), os.path.join(output_dir, 'js', 'data-adapter.dev.min.js'))
+    shutil.copyfile(os.path.join(OUT_PATH, 'data-adapter.dev.min.js.gz'), os.path.join(output_dir, 'js', 'data-adapter.dev.min.js.gz'))
 
     # copy themes
     for theme in __get_themes_list():
@@ -900,6 +936,182 @@ def __print_gz_stat():
         print "No gzip files found in out directory"
 
 
+def __upload_release():
+    from fabric.api import env
+    from maxcdn import MaxCDN
+
+    # define build argumets
+    global arguments
+    version = arguments['version']
+    is_latest = arguments['is_latest']
+    dry_run = arguments['dry_run']
+    export_server_project_path = arguments['export_server_path']
+
+    print "Uploading release"
+    print "version: %s" % version
+    print "latest: %s" % is_latest
+    print "export server: %s" % export_server_project_path
+    print "dry-run: %s" % dry_run
+
+    # static.anychart.com
+    env.user = "root"
+    env.host_string = 'root@static.anychart.com'
+
+    # max cdn
+    api = MaxCDN("anychart", "d1c5e7b52794d69649497f1f51eaf656055d57304", "922b800fdfe54f6fee002b7110464dc3")
+    zone_id = 416666
+
+    # create release upload list
+    upload_list = []
+
+    # bundle
+    upload_list.append({'source_file': '%s/anychart-bundle.min.js' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/anychart-bundle.min.js.gz' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/anychart-bundle.dev.min.js' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/anychart-bundle.dev.min.js.gz' % OUT_PATH, 'target': '/js/%s/'})
+
+    # UI
+    upload_list.append({'source_file': '%s/anychart-ui.min.js' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/anychart-ui.min.js.gz' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/anychart-ui.dev.min.js' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/anychart-ui.dev.min.js.gz' % OUT_PATH, 'target': '/js/%s/'})
+
+    # anychart
+    upload_list.append({'source_file': '%s/anychart.min.js' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/anychart.min.js.gz' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/anychart.dev.min.js' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/anychart.dev.min.js.gz' % OUT_PATH, 'target': '/js/%s/'})
+
+    # anygantt
+    upload_list.append({'source_file': '%s/anygantt.min.js' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/anygantt.min.js.gz' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/anygantt.dev.min.js' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/anygantt.dev.min.js.gz' % OUT_PATH, 'target': '/js/%s/'})
+
+    # anymap
+    upload_list.append({'source_file': '%s/anymap.min.js' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/anymap.min.js.gz' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/anymap.dev.min.js' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/anymap.dev.min.js.gz' % OUT_PATH, 'target': '/js/%s/'})
+
+    # anystock
+    upload_list.append({'source_file': '%s/anystock.min.js' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/anystock.min.js.gz' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/anystock.dev.min.js' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/anystock.dev.min.js.gz' % OUT_PATH, 'target': '/js/%s/'})
+
+    # data adapter
+    upload_list.append({'source_file': '%s/data-adapter.min.js' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/data-adapter.min.js.gz' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/data-adapter.dev.min.js' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/data-adapter.dev.min.js.gz' % OUT_PATH, 'target': '/js/%s/'})
+
+    # css
+    upload_list.append({'source_file': '%s/anychart-ui.css' % OUT_PATH, 'target': '/css/%s/'})
+    upload_list.append({'source_file': '%s/anychart-ui.css.gz' % OUT_PATH, 'target': '/css/%s/'})
+    upload_list.append({'source_file': '%s/anychart-ui.min.css' % OUT_PATH, 'target': '/css/%s/'})
+    upload_list.append({'source_file': '%s/anychart-ui.min.css.gz' % OUT_PATH, 'target': '/css/%s/'})
+
+    # themes
+    for theme in __get_themes_list():
+        upload_list.append({'source_file': '%s/%s%s' % (OUT_PATH, theme, '.js'), 'target': '/themes/%s/'})
+        upload_list.append({'source_file': '%s/%s%s' % (OUT_PATH, theme, '.min.js'), 'target': '/themes/%s/'})
+
+    # schemas
+    upload_list.append({'source_file': '%s/xml-schema.xsd' % PROJECT_PATH, 'target': '/schemas/%s/'})
+    upload_list.append({'source_file': '%s/json-schema.json' % PROJECT_PATH, 'target': '/schemas/%s/'})
+
+    # binaries packages
+    upload_list.append({'source_file': '%s/anychart.zip' % OUT_PATH, 'target': '/binaries-package/%s/'})
+    upload_list.append({'source_file': '%s/anygantt.zip' % OUT_PATH, 'target': '/binaries-package/%s/'})
+    upload_list.append({'source_file': '%s/anystock.zip' % OUT_PATH, 'target': '/binaries-package/%s/'})
+    upload_list.append({'source_file': '%s/anymap.zip' % OUT_PATH, 'target': '/binaries-package/%s/'})
+
+    # export server
+    export_server_version, export_server_bundle_version = __get_export_server_version(export_server_project_path)
+    upload_list.append({'source_file': '%s/export-server.jar' % OUT_PATH, 'target': '/export-server/'})
+    upload_list.append({'source_file': '%s/export-server-%s-bundle-%s.jar' % (OUT_PATH, export_server_version, export_server_bundle_version), 'target': '/export-server/'})
+
+    # check all files exists
+    should_exit = False
+    for item in upload_list:
+        if not os.path.exists(item['source_file']):
+            should_exit = True
+            print "Error: Missing file: %s" % item['source_file']
+
+    if should_exit:
+        sys.exit(1)
+
+    #errors list
+    errors = []
+
+    # upload and invalidate
+    for item in upload_list:
+        errors += __upload_release_item(item, version, api, zone_id, dry_run)
+        if is_latest:
+            errors += __upload_release_item(item, 'latest', api, zone_id, dry_run)
+
+    # print errors if any
+    for error in errors:
+        print error
+
+
+def __upload_release_item(item, version, api, zone_id, dry_run):
+    from fabric.api import hide, run, put
+    from fabric.contrib.files import exists
+
+    source_file = item['source_file']
+    file_name = os.path.basename(source_file)
+
+    target_path = '/apps/static/cdn%s' % (item['target'] % version if safe_index_of(item['target'], '%s') >= 0 else item['target'])
+    target_file_path = target_path + file_name
+    cdn_path = target_file_path
+    errors = []
+
+    # ensure target path exists
+    try:
+        print "Ensure directory exists: %s" % target_path
+        if not dry_run:
+            if not exists(target_path):
+                print "Create directory: %s" % target_path
+                run('mkdir %s' % target_path, quiet=True)
+    except (KeyboardInterrupt, SystemExit):
+        raise
+    except:
+        errors.append("Failed ensure path exists: %s\n%s" % (target_path, sys.exc_info()[0]))
+
+    # upload file
+    try:
+        print "Upload file: %s --> %s" % (source_file, target_file_path)
+        if not dry_run:
+            with hide('output', 'running', 'warnings'):
+                put(source_file, target_file_path)
+    except (KeyboardInterrupt, SystemExit):
+        raise
+    except:
+        errors.append("Failed to upload file: %s\n%s" % (target_file_path, sys.exc_info()[0]))
+
+    # invalidate cdn cache
+    try:
+        print "Invalidate CDN cache: %s" % cdn_path
+        if not dry_run:
+            api.purge(zone_id, cdn_path)
+    except (KeyboardInterrupt, SystemExit):
+        raise
+    except:
+        errors.append("Failed to invalidate CDN cache: %s\n%s" % (cdn_path, sys.exc_info()[0]))
+
+    return errors
+
+
+def safe_index_of(string, substring):
+    try:
+        index_value = string.index(substring)
+    except ValueError:
+        index_value = -1
+    return index_value
+
+
 #=======================================================================================================================
 #                            Less css.
 #=======================================================================================================================
@@ -912,20 +1124,23 @@ def __compile_css():
     __create_dir_if_not_exists(OUT_PATH)
 
     print "Compile AnyChart UI css"
-    if os.path.exists(CSS_OUT_PATH):
-        os.remove(CSS_OUT_PATH)
-    if os.path.exists(CSS_MIN_OUT_PATH):
-        os.remove(CSS_MIN_OUT_PATH)
+    css_src_path = os.path.join(PROJECT_PATH, 'css', 'anychart.less')
+    css_out_path = os.path.join(PROJECT_PATH, 'out', 'anychart-ui.css')
+    css_min_out_path = os.path.join(PROJECT_PATH, 'out', 'anychart-ui.min.css')
 
     # Less
-    f = open(CSS_OUT_PATH, 'w')
-    f.write(lesscpy.compile(CSS_SRC_PATH))
+    f = open(css_out_path, 'w')
+    f.write(lesscpy.compile(css_src_path))
     f.close()
 
     # Minify
-    f_min = open(CSS_MIN_OUT_PATH, 'w')
-    f_min.write(lesscpy.compile(CSS_SRC_PATH, xminify=True))
+    f_min = open(css_min_out_path, 'w')
+    f_min.write(lesscpy.compile(css_src_path, xminify=True))
     f_min.close()
+
+    if __should_gen_gzip():
+        __gzip_file(css_out_path)
+        __gzip_file(css_min_out_path)
 
     print "CSS compiled"
 
@@ -973,6 +1188,16 @@ def __get_version(opt_commits_count=False):
         return "%s.%s.%s.%s" % (major, minor, patch, commit_count)
     else:
         return "%s.%s.%s" % (major, minor, patch)
+
+
+def __get_export_server_version(export_server_project_path):
+        f = open(os.path.join(export_server_project_path, 'project.clj'), 'r')
+        export_server_project_text = f.read()
+        f.close()
+        return (
+            export_server_project_text.split('defproject export-server "')[1].split('"')[0].strip(),
+            export_server_project_text.split('AnyChart Bundle version')[1].split('"')[0].strip()
+        )
 
 
 def __is_develop():
@@ -1064,15 +1289,23 @@ def __exec_main_script():
     themes_parser = subparsers.add_parser('themes', help='Build standalone files for all available themes')
 
     # create files for release
-    subparsers.add_parser('release', help='Creates release files in output directory.')
+    release_parser = subparsers.add_parser('release', help='Creates release files in output directory.')
+    release_parser.add_argument('-esp', '--export-server-path', dest='export_server_path', action='store', default=os.path.join(PROJECT_PATH, '..', 'export-server'))
 
     # create files for release
     subparsers.add_parser('gz_stat', help='Print into console size of all gzip files in out directory,'
                                           ' very useful on release day.')
 
     # create the parser for the "css" command
-    subparsers.add_parser('css', help='Compile AnyChart UI css')
+    css_parser = subparsers.add_parser('css', help='Compile AnyChart UI css')
+    css_parser.add_argument('-gz', '--gzip', action='store_true', help='Create gzip copy of output files.')
 
+    upload_release_parser = subparsers.add_parser('upload_release', help='Uploads release related files from /out folder to static.anychart.com and cdn.anychart.com. Invalidates CDN cache.')
+    upload_release_parser.add_argument('-v', '--version', action='store', help="Version of the release, affects only folder on the remote server. Doesn't affect code version, export server version or wherever else version. ")
+    upload_release_parser.add_argument('-nl', '--not-latest', dest='is_latest', action='store_false', help="Prevent to upload release files to 'latest' directory")
+    upload_release_parser.add_argument('-dr', '--dry-run', dest='dry_run', action='store_true', help="Print what will happen, don't really upload files.")
+    upload_release_parser.add_argument('-esp', '--export-server-path', dest='export_server_path', action='store', default=os.path.join(PROJECT_PATH, '..', 'export-server'))
+    upload_release_parser.set_defaults(is_latest=True, version=__get_version(False))
 
     global arguments
     arguments = vars(parser.parse_args())
@@ -1097,6 +1330,8 @@ def __exec_main_script():
         __build_themes()
     elif command == 'release':
         __build_release()
+    elif command == 'upload_release':
+        __upload_release()
     elif command == 'gz_stat':
         __print_gz_stat()
     elif command == 'css':

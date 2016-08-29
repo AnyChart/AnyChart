@@ -281,10 +281,7 @@ anychart.core.VisualBase.prototype.container = function(opt_value) {
         if (this.stageOwn_) {
           this.container_.container(opt_value);
         } else {
-          // Should we use registerDisposable in this case?
-          // TODO(Anton Saukh): fix type cast to {Element|string} when this will be fixed in graphics.
-          this.container_ = acgraph.create();
-
+          this.container_ = this.createStage();
           this.registerDisposable(this.container_);
           if (acgraph.type() != acgraph.StageType.VML)
             this.container_.domElement().setAttribute('role', 'presentation');
@@ -319,6 +316,20 @@ anychart.core.VisualBase.prototype.container = function(opt_value) {
     return this;
   }
   return this.container_;
+};
+
+
+/**
+ * Must create the Stage.
+ * @return {!acgraph.vector.Stage}
+ * @protected
+ */
+anychart.core.VisualBase.prototype.createStage = function() {
+  var stage = acgraph.create();
+  stage.allowCreditsDisabling = false;
+  // forcing credits to be created to apply credits disabling policy
+  stage.credits();
+  return stage;
 };
 
 

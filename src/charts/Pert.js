@@ -489,6 +489,8 @@ anychart.charts.Pert.prototype.onTooltipSignal_ = function(event) {
 
 /**
  * Sets tooltip settings.
+ *  NOTE: Suspend tooltip's signals dispatching before calling this method to avoid
+ *  applying old this.textInfoCache_ (old contextProvider). Suspension must cover show() method too.
  * @param {Object=} opt_settings1 - Regular tooltip settings (task or milestone).
  * @param {Object=} opt_settings2 - Critical tooltip settings (crit.task or crit.milestone).
  * @private
@@ -496,7 +498,6 @@ anychart.charts.Pert.prototype.onTooltipSignal_ = function(event) {
 anychart.charts.Pert.prototype.applyTooltipSettings_ = function(opt_settings1, opt_settings2) {
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
   var enabled = true;
-  tooltip.suspendSignalsDispatching();
   if (goog.isBoolean(this.defaultTooltipSettings_[anychart.opt.ENABLED])) enabled = this.defaultTooltipSettings_[anychart.opt.ENABLED];
   tooltip.setup(this.defaultTooltipSettings_);
 
@@ -507,7 +508,6 @@ anychart.charts.Pert.prototype.applyTooltipSettings_ = function(opt_settings1, o
   tooltip.setup(opt_settings2);
 
   tooltip.enabled(enabled);
-  tooltip.resumeSignalsDispatching(true);
 };
 //endregion
 
@@ -637,9 +637,11 @@ anychart.charts.Pert.prototype.handleMouseOverAndMove = function(event) {
 
       hideTooltip = false;
       critConfig = milestone.isCritical ? this.criticalPath().milestones().getCurrentTooltipConfig() : void 0;
+      tooltip.suspendSignalsDispatching();
       this.applyTooltipSettings_(this.milestones().getCurrentTooltipConfig(), critConfig);
       position = tooltip.isFloating() ? pos : zeroPos;
       tooltip.show(formatProvider, position);
+      tooltip.resumeSignalsDispatching(true);
 
       label = milestone.relatedLabel;
       if (label) {
@@ -770,9 +772,11 @@ anychart.charts.Pert.prototype.handleMouseOverAndMove = function(event) {
 
       hideTooltip = false;
       critConfig = work.isCritical ? this.criticalPath().tasks().getCurrentTooltipConfig() : void 0;
+      tooltip.suspendSignalsDispatching();
       this.applyTooltipSettings_(this.tasks().getCurrentTooltipConfig(), critConfig);
       position = tooltip.isFloating() ? pos : zeroPos;
       tooltip.show(formatProvider, position);
+      tooltip.resumeSignalsDispatching(true);
     }
   }
 

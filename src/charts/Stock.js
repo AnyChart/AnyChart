@@ -1,5 +1,5 @@
 goog.provide('anychart.charts.Stock');
-goog.require('anychart.core.ChartWithCredits');
+goog.require('anychart.core.Chart');
 goog.require('anychart.core.IChart');
 goog.require('anychart.core.IChartWithAnnotations');
 goog.require('anychart.core.IGroupingProvider');
@@ -20,7 +20,7 @@ goog.require('anychart.utils');
 /**
  * Stock chart class.
  * @constructor
- * @extends {anychart.core.ChartWithCredits}
+ * @extends {anychart.core.Chart}
  * @implements {anychart.core.IChart}
  * @implements {anychart.core.IChartWithAnnotations}
  * @implements {anychart.core.IGroupingProvider}
@@ -117,7 +117,7 @@ anychart.charts.Stock = function() {
    */
   this.defaultAnnotationSettings_ = {};
 };
-goog.inherits(anychart.charts.Stock, anychart.core.ChartWithCredits);
+goog.inherits(anychart.charts.Stock, anychart.core.Chart);
 
 
 /**

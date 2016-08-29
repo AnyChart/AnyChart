@@ -191,7 +191,7 @@ goog.provide('anychart.themes.coffee');
         'fontColor': '#29120e',
         'fontSize': 14
       },
-      'padding': {'top': 20, 'right': 25, 'bottom': 5, 'left': 25}
+      'padding': {'top': 20, 'right': 25, 'bottom': 15, 'left': 25}
     },
     'cartesianBase': {
       'defaultSeriesSettings': {

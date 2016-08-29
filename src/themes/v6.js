@@ -857,7 +857,7 @@ goog.provide('anychart.themes.v6');
       'padding': {
         'top': 10,
         'right': 20,
-        'bottom': 10,
+        'bottom': 15,
         'left': 20
       },
       'legend': {

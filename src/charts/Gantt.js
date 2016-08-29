@@ -944,7 +944,7 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
     if (!this.controller_.timeline()) this.controller_.timeline(/** @type {anychart.core.ui.Timeline} */ (this.getTimeline()));
 
     if (this.hasInvalidationState(anychart.ConsistencyState.GANTT_SPLITTER_POSITION)) {
-      var dgWidth = anychart.utils.normalizeSize(this.splitterPosition_, bounds.width);
+      var dgWidth = Math.round(anychart.utils.normalizeSize(this.splitterPosition_, bounds.width));
       var dgRatio = goog.math.clamp(dgWidth / bounds.width, 0, 1);
       this.splitter().position(dgRatio);
       this.markConsistent(anychart.ConsistencyState.GANTT_SPLITTER_POSITION);
