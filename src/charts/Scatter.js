@@ -133,7 +133,7 @@ anychart.charts.Scatter.prototype.createScaleByType = function(value, isXScale, 
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.charts.Scatter.prototype.createSeriesInstance = function(type, config) {
-  return new anychart.core.series.Cartesian(this, this, type, config);
+  return new anychart.core.series.Cartesian(this, this, type, config, false);
 };
 
 

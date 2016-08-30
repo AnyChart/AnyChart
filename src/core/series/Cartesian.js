@@ -21,11 +21,12 @@ goog.require('goog.array');
  * @param {!anychart.core.IPlot} plot
  * @param {string} type
  * @param {anychart.core.series.TypeConfig} config
+ * @param {boolean} sortedMode
  * @constructor
  * @extends {anychart.core.series.Base}
  * @implements {anychart.core.utils.IInteractiveSeries}
  */
-anychart.core.series.Cartesian = function(chart, plot, type, config) {
+anychart.core.series.Cartesian = function(chart, plot, type, config, sortedMode) {
   anychart.core.series.Cartesian.base(this, 'constructor', chart, plot, type, config);
 
   /**
@@ -33,6 +34,13 @@ anychart.core.series.Cartesian = function(chart, plot, type, config) {
    * @type {anychart.core.utils.InteractivityState}
    */
   this.state = new anychart.core.utils.InteractivityState(this);
+
+  /**
+   * If the series should expect drawing plan data to be sorted by X field.
+   * @type {boolean}
+   * @private
+   */
+  this.sortedMode_ = sortedMode;
 
   this.data(null);
 };
@@ -1213,10 +1221,9 @@ anychart.core.series.Cartesian.prototype.makeBrowserEvent = function(e) {
   //this method is invoked only for events from data layer
   var res = goog.base(this, 'makeBrowserEvent', e);
 
-  var pointIndex;
   if (this.isDiscreteBased()) {
-    pointIndex = anychart.utils.toNumber(anychart.utils.extractTag(res['domTarget']).index);
-  } else {
+    res['pointIndex'] = anychart.utils.toNumber(anychart.utils.extractTag(res['domTarget']).index);
+  } else if (this.sortedMode_) {
     var bounds = this.pixelBoundsCache || anychart.math.rect(0, 0, 0, 0);
     var x = res['clientX'];
     var min, range;
@@ -1231,9 +1238,8 @@ anychart.core.series.Cartesian.prototype.makeBrowserEvent = function(e) {
 
     if (index < 0) index = NaN;
 
-    pointIndex = /** @type {number} */(index);
+    res['pointIndex'] = /** @type {number} */(index);
   }
-  res['pointIndex'] = pointIndex;
 
   return res;
 };

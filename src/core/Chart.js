@@ -1951,20 +1951,22 @@ anychart.core.Chart.prototype.handleMouseOut = function(event) {
   if (series && !series.isDisposed() && series.enabled() &&
       goog.isFunction(series.makePointEvent)) {
     var evt = series.makePointEvent(event);
-    var prevTag = anychart.utils.extractTag(event['relatedDomTarget']);
-    var prevIndex = anychart.utils.toNumber(goog.isObject(prevTag) ? prevTag.index : prevTag);
+    if (evt) {
+      var prevTag = anychart.utils.extractTag(event['relatedDomTarget']);
+      var prevIndex = anychart.utils.toNumber(goog.isObject(prevTag) ? prevTag.index : prevTag);
 
-    var ifParent = anychart.utils.checkIfParent(/** @type {!goog.events.EventTarget} */(series), event['relatedTarget']);
+      var ifParent = anychart.utils.checkIfParent(/** @type {!goog.events.EventTarget} */(series), event['relatedTarget']);
 
-    if ((!ifParent || (prevIndex != index)) && series.dispatchEvent(evt)) {
-      if (hoverMode == anychart.enums.HoverMode.SINGLE && (!isNaN(index) || goog.isArray(index))) {
-        series.unhover();
-        this.doAdditionActionsOnMouseOut();
-        this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, [{
-          series: series,
-          points: [],
-          nearestPointToCursor: {index: (goog.isArray(index) ? index[0] : index), distance: 0}
-        }], false, forbidTooltip));
+      if ((!ifParent || (prevIndex != index)) && series.dispatchEvent(evt)) {
+        if (hoverMode == anychart.enums.HoverMode.SINGLE && (!isNaN(index) || goog.isArray(index))) {
+          series.unhover();
+          this.doAdditionActionsOnMouseOut();
+          this.dispatchEvent(this.makeInteractivityPointEvent('hovered', event, [{
+            series: series,
+            points: [],
+            nearestPointToCursor: {index: (goog.isArray(index) ? index[0] : index), distance: 0}
+          }], false, forbidTooltip));
+        }
       }
     }
   }
