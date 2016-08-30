@@ -496,7 +496,7 @@ def __get_copyrigth(modules):
             title = 'AnyChart Data Adapter'
 
     if contains:
-        contains = " * " + contains
+        contains = " * " + contains + "\n"
 
     copyright = \
         "/**\n" \
