@@ -22,6 +22,7 @@ goog.require('anychart.core.utils.LegendItemSettings');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.core.utils.SeriesA11y');
 goog.require('anychart.core.utils.SeriesPointContextProvider');
+goog.require('anychart.core.utils.TokenParser');
 goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 goog.require('anychart.opt');
@@ -1382,7 +1383,7 @@ anychart.core.series.Base.prototype.onLegendItemSignal = function(event) {
 
 /**
  * Creates legend item data.
- * @param {Function} itemsTextFormatter Items text formatter.
+ * @param {Function|string} itemsTextFormatter Items text formatter.
  * @return {!anychart.core.ui.Legend.LegendItemProvider} Color for legend item.
  */
 anychart.core.series.Base.prototype.getLegendItemData = function(itemsTextFormatter) {
@@ -1393,17 +1394,15 @@ anychart.core.series.Base.prototype.getLegendItemData = function(itemsTextFormat
   var baseColor = this.getOption(anychart.opt.COLOR);
   var context = this.createLegendContextProvider();
 
+  var formatter = json[anychart.opt.TEXT] || itemsTextFormatter;
+  if (goog.isString(formatter))
+    formatter = anychart.core.utils.TokenParser.getInstance().getTextFormatter(formatter);
+  json[anychart.opt.TEXT] = goog.isFunction(formatter) ?
+      formatter.call(context, context) :
+      this.getLegendItemText(context);
+
   json[anychart.opt.DISABLED] = anychart.opt.DISABLED in json ? !!json[anychart.opt.DISABLED] : !this.enabled();
   json[anychart.opt.META] = /** @type {Object} */ (this.meta());
-  if (!goog.isString(json[anychart.opt.TEXT])) {
-    var itemText;
-    if (goog.isFunction(itemsTextFormatter)) {
-      itemText = itemsTextFormatter.call(context, context);
-    }
-    if (!goog.isString(itemText))
-      itemText = this.getLegendItemText(context);
-    json[anychart.opt.TEXT] = itemText;
-  }
   if (json[anychart.opt.ICON_TYPE] == anychart.enums.LegendItemIconType.MARKER && !this.check(anychart.core.drawers.Capabilities.IS_MARKER_BASED)) {
     json[anychart.opt.ICON_FILL] = this.markers_.fill();
     json[anychart.opt.ICON_STROKE] = this.markers_.stroke();

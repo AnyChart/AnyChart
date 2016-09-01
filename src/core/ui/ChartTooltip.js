@@ -2,6 +2,7 @@ goog.provide('anychart.core.ui.ChartTooltip');
 goog.require('anychart.compatibility');
 goog.require('anychart.core.Base');
 goog.require('anychart.core.ui.SeriesTooltip');
+goog.require('anychart.core.utils.GenericContextProvider');
 
 
 
@@ -748,7 +749,7 @@ anychart.core.ui.ChartTooltip.prototype.show = function(points, clientX, clientY
       return;
     }
 
-    var unionContextProvider = {
+    var unionContext = {
       'clientX' : clientX,
       'clientY': clientY,
       'formattedValues': [],
@@ -771,8 +772,8 @@ anychart.core.ui.ChartTooltip.prototype.show = function(points, clientX, clientY
       }
 
       var contextProvider = series.createTooltipContextProvider();
-      unionContextProvider['formattedValues'].push(tooltip.getFormattedContent(contextProvider));
-      unionContextProvider['points'].push(contextProvider);
+      unionContext['formattedValues'].push(tooltip.getFormattedContent(contextProvider));
+      unionContext['points'].push(contextProvider);
 
       if (goog.isArray(status['points']))
         allPoints.push({
@@ -785,15 +786,20 @@ anychart.core.ui.ChartTooltip.prototype.show = function(points, clientX, clientY
     });
 
     if (allPoints.length == points.length)
-      unionContextProvider['allPoints'] = allPoints;
+      unionContext['allPoints'] = allPoints;
 
-    if (!unionContextProvider['formattedValues'].length) {
+    if (!unionContext['formattedValues'].length) {
       return;
     }
 
-    this.unionTooltip_.contentInternal().text(this.unionTooltip_.getFormattedContent(unionContextProvider));
     if (opt_tooltipContextLoad)
-      goog.object.extend(unionContextProvider, opt_tooltipContextLoad);
+      goog.object.extend(unionContext, opt_tooltipContextLoad);
+
+    var unionContextProvider = new anychart.core.utils.GenericContextProvider(unionContext, {
+      'clientX': anychart.enums.TokenType.NUMBER,
+      'clientY': anychart.enums.TokenType.NUMBER
+    }, points[0] && points[0]['series'] && points[0]['series'].getChart && points[0]['series'].getChart() || undefined);
+    this.unionTooltip_.contentInternal().text(this.unionTooltip_.getFormattedContent(unionContextProvider));
     this.unionTooltip_.title().autoText(this.unionTooltip_.getFormattedTitle(unionContextProvider));
 
     this.hideOtherTooltips_([this.unionTooltip_]);

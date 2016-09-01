@@ -100,7 +100,7 @@ anychart.core.ui.Legend = function() {
 
   /**
    * Legend items text formatter.
-   * @type {?Function}
+   * @type {?(Function|string)}
    * @private
    */
   this.itemsTextFormatter_ = null;
@@ -114,7 +114,7 @@ anychart.core.ui.Legend = function() {
 
   /**
    * Title text formatter. If set, overrides the title text.
-   * @type {?Function}
+   * @type {?(Function|string)}
    * @private
    */
   this.titleFormatter_ = null;
@@ -295,8 +295,8 @@ anychart.core.ui.Legend.prototype.itemsFormatter = function(opt_value) {
 
 /**
  * Getter/setter for items text formatter.
- * @param {function(Object):string=} opt_value Items text formatter function.
- * @return {(function(Object):string|anychart.core.ui.Legend)} Items text formatter function or self for chaining.
+ * @param {(string|Function)=} opt_value Items text formatter function.
+ * @return {(Function|string|anychart.core.ui.Legend)} Items text formatter function or self for chaining.
  */
 anychart.core.ui.Legend.prototype.itemsTextFormatter = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -512,8 +512,8 @@ anychart.core.ui.Legend.prototype.titleInvalidated_ = function(event) {
 
 /**
  * If set, formats title. Currently supported in Stock only.
- * @param {?Function=} opt_value
- * @return {Function|anychart.core.ui.Legend}
+ * @param {?(Function|string)=} opt_value
+ * @return {Function|string|anychart.core.ui.Legend}
  */
 anychart.core.ui.Legend.prototype.titleFormatter = function(opt_value) {
   if (goog.isDef(opt_value)) {

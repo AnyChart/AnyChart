@@ -5281,6 +5281,100 @@ anychart.enums.normalizeMilestoneShape = function(value) {
 // goog.exportSymbol('anychart.enums.XGroupingMode.FIRST', anychart.enums.XGroupingMode.FIRST);
 // goog.exportSymbol('anychart.enums.XGroupingMode.LAST', anychart.enums.XGroupingMode.LAST);
 
+
+//region --- Locale DateTime Interval Format Names
+//------------------------------------------------------------------------------
+//
+//  Locale DateTime Interval Format Names
+//
+//------------------------------------------------------------------------------
+/**
+ * Locale date time interval format names.
+ * @enum {string}
+ */
+anychart.enums.LocaleDateTimeFormat = {
+  YEAR: 'year',
+  YEAR_SEMESTER: 'year_semester',
+  YEAR_QUARTER: 'year_quarter',
+  YEAR_MONTH: 'year_month',
+  YEAR_THIRD_OF_MONTH: 'year_third_of_month',
+  YEAR_WEEK: 'year_week',
+  YEAR_DAY: 'year_day',
+  YEAR_HOUR: 'year_hour',
+  YEAR_MINUTE: 'year_minute',
+  YEAR_SECOND: 'year_second',
+  YEAR_MILLISECOND: 'year_millisecond',
+  SEMESTER: 'semester',
+  SEMESTER_QUARTER: 'semester_quarter',
+  SEMESTER_MONTH: 'semester_month',
+  SEMESTER_THIRD_OF_MONTH: 'semester_third_of_month',
+  SEMESTER_WEEK: 'semester_week',
+  SEMESTER_DAY: 'semester_day',
+  SEMESTER_HOUR: 'semester_hour',
+  SEMESTER_MINUTE: 'semester_minute',
+  SEMESTER_SECOND: 'semester_second',
+  SEMESTER_MILLISECOND: 'semester_millisecond',
+  QUARTER: 'quarter',
+  QUARTER_MONTH: 'quarter_month',
+  QUARTER_THIRD_OF_MONTH: 'quarter_third_of_month',
+  QUARTER_WEEK: 'quarter_week',
+  QUARTER_DAY: 'quarter_day',
+  QUARTER_HOUR: 'quarter_hour',
+  QUARTER_MINUTE: 'quarter_minute',
+  QUARTER_SECOND: 'quarter_second',
+  QUARTER_MILLISECOND: 'quarter_millisecond',
+  MONTH: 'month',
+  MONTH_THIRD_OF_MONTH: 'month_third_of_month',
+  MONTH_WEEK: 'month_week',
+  MONTH_DAY: 'month_day',
+  MONTH_HOUR: 'month_hour',
+  MONTH_MINUTE: 'month_minute',
+  MONTH_SECOND: 'month_second',
+  MONTH_MILLISECOND: 'month_millisecond',
+  THIRD_OF_MONTH: 'third_of_month',
+  THIRD_OF_MONTH_WEEK: 'third_of_month_week',
+  THIRD_OF_MONTH_DAY: 'third_of_month_day',
+  THIRD_OF_MONTH_HOUR: 'third_of_month_hour',
+  THIRD_OF_MONTH_MINUTE: 'third_of_month_minute',
+  THIRD_OF_MONTH_SECOND: 'third_of_month_second',
+  THIRD_OF_MONTH_MILLISECOND: 'third_of_month_millisecond',
+  WEEK: 'week',
+  WEEK_DAY: 'week_day',
+  WEEK_HOUR: 'week_hour',
+  WEEK_MINUTE: 'week_minute',
+  WEEK_SECOND: 'week_second',
+  WEEK_MILLISECOND: 'week_millisecond',
+  DAY: 'day',
+  DAY_HOUR: 'day_hour',
+  DAY_MINUTE: 'day_minute',
+  DAY_SECOND: 'day_second',
+  DAY_MILLISECOND: 'day_millisecond',
+  HOUR: 'hour',
+  HOUR_MINUTE: 'hour_minute',
+  HOUR_SECOND: 'hour_second',
+  HOUR_MILLISECOND: 'hour_millisecond',
+  MINUTE: 'minute',
+  MINUTE_SECOND: 'minute_second',
+  MINUTE_MILLISECOND: 'minute_millisecond',
+  SECOND: 'second',
+  SECOND_MILLISECOND: 'second_millisecond',
+  MILLISECOND: 'millisecond'
+};
+
+
+/**
+ * Locale date time interval format prefixes.
+ * @enum {string}
+ */
+anychart.enums.IntervalFormatPrefix = {
+  NONE: '',
+  FULL: 'full'
+};
+
+
+//endregion
+
+
 //exports
 goog.exportSymbol('anychart.enums.RadialGridLayout.CIRCUIT', anychart.enums.RadialGridLayout.CIRCUIT);
 goog.exportSymbol('anychart.enums.RadialGridLayout.RADIAL', anychart.enums.RadialGridLayout.RADIAL);
@@ -6008,3 +6102,73 @@ goog.exportSymbol('anychart.enums.AnnotationTypes.MARKER', anychart.enums.Annota
 
 goog.exportSymbol('anychart.enums.A11yMode.CHART_ELEMENTS', anychart.enums.A11yMode.CHART_ELEMENTS);
 goog.exportSymbol('anychart.enums.A11yMode.DATA_TABLE', anychart.enums.A11yMode.DATA_TABLE);
+
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.YEAR', anychart.enums.LocaleDateTimeFormat.YEAR);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.YEAR_SEMESTER', anychart.enums.LocaleDateTimeFormat.YEAR_SEMESTER);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.YEAR_QUARTER', anychart.enums.LocaleDateTimeFormat.YEAR_QUARTER);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.YEAR_MONTH', anychart.enums.LocaleDateTimeFormat.YEAR_MONTH);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.YEAR_THIRD_OF_MONTH', anychart.enums.LocaleDateTimeFormat.YEAR_THIRD_OF_MONTH);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.YEAR_WEEK', anychart.enums.LocaleDateTimeFormat.YEAR_WEEK);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.YEAR_DAY', anychart.enums.LocaleDateTimeFormat.YEAR_DAY);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.YEAR_HOUR', anychart.enums.LocaleDateTimeFormat.YEAR_HOUR);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.YEAR_MINUTE', anychart.enums.LocaleDateTimeFormat.YEAR_MINUTE);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.YEAR_SECOND', anychart.enums.LocaleDateTimeFormat.YEAR_SECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.YEAR_MILLISECOND', anychart.enums.LocaleDateTimeFormat.YEAR_MILLISECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.SEMESTER', anychart.enums.LocaleDateTimeFormat.SEMESTER);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.SEMESTER_QUARTER', anychart.enums.LocaleDateTimeFormat.SEMESTER_QUARTER);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.SEMESTER_MONTH', anychart.enums.LocaleDateTimeFormat.SEMESTER_MONTH);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.SEMESTER_THIRD_OF_MONTH', anychart.enums.LocaleDateTimeFormat.SEMESTER_THIRD_OF_MONTH);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.SEMESTER_WEEK', anychart.enums.LocaleDateTimeFormat.SEMESTER_WEEK);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.SEMESTER_DAY', anychart.enums.LocaleDateTimeFormat.SEMESTER_DAY);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.SEMESTER_HOUR', anychart.enums.LocaleDateTimeFormat.SEMESTER_HOUR);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.SEMESTER_MINUTE', anychart.enums.LocaleDateTimeFormat.SEMESTER_MINUTE);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.SEMESTER_SECOND', anychart.enums.LocaleDateTimeFormat.SEMESTER_SECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.SEMESTER_MILLISECOND', anychart.enums.LocaleDateTimeFormat.SEMESTER_MILLISECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.QUARTER', anychart.enums.LocaleDateTimeFormat.QUARTER);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.QUARTER_MONTH', anychart.enums.LocaleDateTimeFormat.QUARTER_MONTH);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.QUARTER_THIRD_OF_MONTH', anychart.enums.LocaleDateTimeFormat.QUARTER_THIRD_OF_MONTH);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.QUARTER_WEEK', anychart.enums.LocaleDateTimeFormat.QUARTER_WEEK);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.QUARTER_DAY', anychart.enums.LocaleDateTimeFormat.QUARTER_DAY);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.QUARTER_HOUR', anychart.enums.LocaleDateTimeFormat.QUARTER_HOUR);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.QUARTER_MINUTE', anychart.enums.LocaleDateTimeFormat.QUARTER_MINUTE);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.QUARTER_SECOND', anychart.enums.LocaleDateTimeFormat.QUARTER_SECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.QUARTER_MILLISECOND', anychart.enums.LocaleDateTimeFormat.QUARTER_MILLISECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.MONTH', anychart.enums.LocaleDateTimeFormat.MONTH);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.MONTH_THIRD_OF_MONTH', anychart.enums.LocaleDateTimeFormat.MONTH_THIRD_OF_MONTH);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.MONTH_WEEK', anychart.enums.LocaleDateTimeFormat.MONTH_WEEK);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.MONTH_DAY', anychart.enums.LocaleDateTimeFormat.MONTH_DAY);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.MONTH_HOUR', anychart.enums.LocaleDateTimeFormat.MONTH_HOUR);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.MONTH_MINUTE', anychart.enums.LocaleDateTimeFormat.MONTH_MINUTE);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.MONTH_SECOND', anychart.enums.LocaleDateTimeFormat.MONTH_SECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.MONTH_MILLISECOND', anychart.enums.LocaleDateTimeFormat.MONTH_MILLISECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.THIRD_OF_MONTH', anychart.enums.LocaleDateTimeFormat.THIRD_OF_MONTH);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.THIRD_OF_MONTH_WEEK', anychart.enums.LocaleDateTimeFormat.THIRD_OF_MONTH_WEEK);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.THIRD_OF_MONTH_DAY', anychart.enums.LocaleDateTimeFormat.THIRD_OF_MONTH_DAY);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.THIRD_OF_MONTH_HOUR', anychart.enums.LocaleDateTimeFormat.THIRD_OF_MONTH_HOUR);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.THIRD_OF_MONTH_MINUTE', anychart.enums.LocaleDateTimeFormat.THIRD_OF_MONTH_MINUTE);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.THIRD_OF_MONTH_SECOND', anychart.enums.LocaleDateTimeFormat.THIRD_OF_MONTH_SECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.THIRD_OF_MONTH_MILLISECOND', anychart.enums.LocaleDateTimeFormat.THIRD_OF_MONTH_MILLISECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.WEEK', anychart.enums.LocaleDateTimeFormat.WEEK);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.WEEK_DAY', anychart.enums.LocaleDateTimeFormat.WEEK_DAY);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.WEEK_HOUR', anychart.enums.LocaleDateTimeFormat.WEEK_HOUR);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.WEEK_MINUTE', anychart.enums.LocaleDateTimeFormat.WEEK_MINUTE);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.WEEK_SECOND', anychart.enums.LocaleDateTimeFormat.WEEK_SECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.WEEK_MILLISECOND', anychart.enums.LocaleDateTimeFormat.WEEK_MILLISECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.DAY', anychart.enums.LocaleDateTimeFormat.DAY);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.DAY_HOUR', anychart.enums.LocaleDateTimeFormat.DAY_HOUR);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.DAY_MINUTE', anychart.enums.LocaleDateTimeFormat.DAY_MINUTE);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.DAY_SECOND', anychart.enums.LocaleDateTimeFormat.DAY_SECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.DAY_MILLISECOND', anychart.enums.LocaleDateTimeFormat.DAY_MILLISECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.HOUR', anychart.enums.LocaleDateTimeFormat.HOUR);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.HOUR_MINUTE', anychart.enums.LocaleDateTimeFormat.HOUR_MINUTE);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.HOUR_SECOND', anychart.enums.LocaleDateTimeFormat.HOUR_SECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.HOUR_MILLISECOND', anychart.enums.LocaleDateTimeFormat.HOUR_MILLISECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.MINUTE', anychart.enums.LocaleDateTimeFormat.MINUTE);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.MINUTE_SECOND', anychart.enums.LocaleDateTimeFormat.MINUTE_SECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.MINUTE_MILLISECOND', anychart.enums.LocaleDateTimeFormat.MINUTE_MILLISECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.SECOND', anychart.enums.LocaleDateTimeFormat.SECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.SECOND_MILLISECOND', anychart.enums.LocaleDateTimeFormat.SECOND_MILLISECOND);
+goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.MILLISECOND', anychart.enums.LocaleDateTimeFormat.MILLISECOND);
+
+goog.exportSymbol('anychart.enums.IntervalFormatPrefix.NONE', anychart.enums.IntervalFormatPrefix.NONE);
+goog.exportSymbol('anychart.enums.IntervalFormatPrefix.FULL', anychart.enums.IntervalFormatPrefix.FULL);

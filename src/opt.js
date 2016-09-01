@@ -1431,3 +1431,31 @@ anychart.opt.HOVER_GRID = 'hoverGrid';
  * @const {string}
  */
 anychart.opt.SELECT_GRID = 'selectGrid';
+
+
+/**
+ * Constant replacer for "default" string.
+ * @const {string}
+ */
+anychart.opt.DEFAULT = 'default';
+
+
+/**
+ * Constant replacer for "dateTimeLocale" string.
+ * @const {string}
+ */
+anychart.opt.DATE_TIME_LOCALE = 'dateTimeLocale';
+
+
+/**
+ * Constant replacer for "numberLocale" string.
+ * @const {string}
+ */
+anychart.opt.NUMBER_LOCALE = 'numberLocale';
+
+
+/**
+ * Constant replacer for "messages" string.
+ * @const {string}
+ */
+anychart.opt.MESSAGES = 'messages';

@@ -28,7 +28,8 @@ goog.inherits(anychart.core.utils.ArrayIterator, anychart.data.Iterator);
  */
 anychart.core.utils.ArrayIterator.prototype.advance = function() {
   this.currentRow = this.arr[++this.currentIndex];
-  return this.currentIndex < this.getRowsCount();
+  var rc = this.getRowsCount();
+  return !!rc && this.currentIndex < rc;
 };
 
 

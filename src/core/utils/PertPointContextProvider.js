@@ -90,17 +90,17 @@ anychart.core.utils.PertPointContextProvider.prototype.applyReferenceValues = fu
 
 /**
  * Gets statistics.
- * @param {string=} opt_key - Key.
+ * @param {string} key - Key.
  * @return {*}
  */
-anychart.core.utils.PertPointContextProvider.prototype.getStat = function(opt_key) {
-  if (!opt_key) return void 0;
-  if (this.pointInternal && goog.isDef(this.pointInternal.getStat(opt_key))) {
-    return this.pointInternal.getStat(opt_key);
-  } else if (this.chartInternal && this.chartInternal.getStat(opt_key)) {
-    return this.chartInternal.getStat(opt_key);
+anychart.core.utils.PertPointContextProvider.prototype.getStat = function(key) {
+  if (!key) return void 0;
+  if (this.pointInternal && goog.isDef(this.pointInternal.getStat(key))) {
+    return this.pointInternal.getStat(key);
+  } else if (this.chartInternal && this.chartInternal.getStat(key)) {
+    return this.chartInternal.getStat(key);
   } else {
-    return this.getDataValue(/** @type {string} */ (opt_key));
+    return this.getDataValue(/** @type {string} */ (key));
   }
 };
 

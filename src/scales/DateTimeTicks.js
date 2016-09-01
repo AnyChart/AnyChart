@@ -217,7 +217,7 @@ anychart.scales.DateTimeTicks.prototype.set = function(ticks) {
   if (this.explicit_ != ticks) {
     this.count_ = NaN;
     this.interval_ = null;
-    this.explicit_ = goog.array.map(ticks, anychart.utils.normalizeTimestamp);
+    this.explicit_ = goog.array.map(ticks, function(date) { return anychart.format.parseDateTime(date); });
     goog.array.sort(this.explicit_);
     var prev = this.explicit_[0];
     var currIndex = 1;

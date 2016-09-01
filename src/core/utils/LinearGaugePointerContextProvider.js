@@ -46,7 +46,7 @@ anychart.core.utils.LinearGaugePointerContextProvider.prototype.applyReferenceVa
 
 
 /** @inheritDoc */
-anychart.core.utils.LinearGaugePointerContextProvider.prototype.getStat = function(opt_key) {
+anychart.core.utils.LinearGaugePointerContextProvider.prototype.getStat = function(key) {
   return void 0;
 };
 

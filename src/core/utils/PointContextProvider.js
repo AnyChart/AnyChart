@@ -52,8 +52,8 @@ anychart.core.utils.PointContextProvider.prototype.applyReferenceValues = functi
 
 
 /** @inheritDoc */
-anychart.core.utils.PointContextProvider.prototype.getStat = function(opt_key) {
-  return /** @type {{statistics:Function, getIterator:Function}} */(this['chart']).getStat(opt_key);
+anychart.core.utils.PointContextProvider.prototype.getStat = function(key) {
+  return /** @type {{getStat:function(string):*}} */(this['chart']).getStat(key);
 };
 
 

@@ -788,9 +788,14 @@ anychart.core.series.Cartesian.prototype.getScatterDrawingPlan = function(sorted
     };
   }
   var needsSorting = false;
-  var xNormalizer = dateTimeMode ? anychart.utils.normalizeTimestamp : function(a) {
-    return a;
-  };
+  var xNormalizer = dateTimeMode ?
+      function(a) {
+        var res = anychart.format.parseDateTime(a);
+        return res ? res.getTime() : NaN;
+      } :
+      function(a) {
+        return a;
+      };
   var xMissingChecker = isNaN;
 
   var result = this.getDrawingData_([], dataPusher, xNormalizer, xMissingChecker);
@@ -891,7 +896,7 @@ anychart.core.series.Cartesian.prototype.findX = function(fieldValue) {
     if (this.drawingPlan.xHashMap) { // ordinal plan
       res = this.drawingPlan.xHashMap[anychart.utils.hash(fieldValue)];
       return isNaN(res) ? -1 : res;
-    } else { // scatter case - plan.data should be sorted by X field
+    } else if (this.drawingPlan.data.length) { // scatter case - plan.data should be sorted by X field
       res = goog.array.binarySelect(this.drawingPlan.data, function(val) {
         return /** @type {number} */(fieldValue) - val.data[anychart.opt.X];
       });
@@ -910,6 +915,8 @@ anychart.core.series.Cartesian.prototype.findX = function(fieldValue) {
         }
       }
       return res;
+    } else {
+      return -1;
     }
   } else {
     return this.dataInternal.find(anychart.opt.X, fieldValue);

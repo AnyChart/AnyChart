@@ -1,7 +1,8 @@
 goog.provide('anychart.format');
 
-goog.require('anychart.core.reporting');
+goog.require('anychart.enums');
 goog.require('anychart.math');
+goog.require('anychart.opt');
 goog.require('anychart.utils');
 goog.require('goog.i18n.DateTimeFormat');
 goog.require('goog.i18n.DateTimeParse');
@@ -15,6 +16,12 @@ goog.require('goog.string');
  */
 
 
+//region --- Locale type definitions
+//------------------------------------------------------------------------------
+//
+//  Locale type definitions
+//
+//------------------------------------------------------------------------------
 /**
  * @typedef {{
  *  decimalsCount: number,
@@ -48,12 +55,13 @@ anychart.format.NumberLocale;
  *  shortQuarters: Array.<string>,
  *  quarters: Array.<string>,
  *  ampms: Array.<string>,
- *  dateFormats: Array.<string>,
- *  timeFormats: Array.<string>,
- *  dateTimeFormats: Array.<string>,
  *  firstDayOfWeek: number,
  *  weekendRange: Array.<number>,
- *  firstWeekCutOfDay: number
+ *  firstWeekCutOfDay: number,
+ *  formats: Object.<string|Array.<string>>,
+ *  dateFormat: string,
+ *  timeFormat: string,
+ *  dateTimeFormat: string
  * }}
  */
 anychart.format.DateTimeLocale;
@@ -62,12 +70,143 @@ anychart.format.DateTimeLocale;
 /**
  * @typedef {{
  *  dateTimeLocale: anychart.format.DateTimeLocale,
- *  numberLocale: anychart.format.NumberLocale
+ *  numberLocale: anychart.format.NumberLocale,
+ *  messages: Object.<string, string>
  * }}
  */
 anychart.format.Locale;
 
 
+//endregion
+//region --- Default locale
+//------------------------------------------------------------------------------
+//
+//  Default locale
+//
+//------------------------------------------------------------------------------
+goog.exportSymbol('anychart.format.locales.default.dateTimeLocale', {
+  'eras': ['BC', 'AD'],
+  'erasNames': ['Before Christ', 'Anno Domini'],
+  'narrowMonths': ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'],
+  'standaloneNarrowMonths': ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'],
+  'months': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+  'standaloneMonths': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+  'shortMonths': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  'standaloneShortMonths': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  'weekdays': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  'standaloneWeekdays': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  'shortWeekdays': ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+  'standaloneShortWeekdays': ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+  'narrowWeekdays': ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+  'standaloneNarrowWeekdays': ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+  'shortQuarters': ['Q1', 'Q2', 'Q3', 'Q4'],
+  'quarters': ['1st quarter', '2nd quarter', '3rd quarter', '4th quarter'],
+  'ampms': ['AM', 'PM'],
+  'firstDayOfWeek': 0,
+  'weekendRange': [5, 6],
+  'firstWeekCutOfDay': 3,
+  'dateFormat': 'y MMM d',
+  'timeFormat': 'HH:mm:ss',
+  'dateTimeFormat': 'y MMM d \'at\' HH:mm:ss',
+  'formats': {
+    'full_year': 'yyyy',
+    'full_year_semester': 'MMM yyyy',
+    'full_year_quarter': 'MMM yyyy',
+    'full_year_month': 'MMM yyyy',
+    'full_year_third_of_month': 'dd MMM yyyy',
+    'full_year_week': 'dd MMM yyyy',
+    'full_year_day': 'dd MMM yyyy',
+    'full_year_hour': 'HH dd MMM yyyy',
+    'full_year_minute': 'dd MMM yyyy, HH:mm',
+    'full_year_second': 'dd MMM yyyy, HH:mm:ss',
+    'full_year_millisecond': 'dd MMM yyyy, HH:mm:ss.SSS',
+    'year': 'yyyy',
+    'year_semester': 'yyyy MMM',
+    'year_quarter': 'yyyy MMM',
+    'year_month': 'yyyy MMM',
+    'year_third_of_month': 'MMM dd',
+    'year_week': 'MMM dd',
+    'year_day': 'MMM dd',
+    'year_hour': 'MMM-dd HH',
+    'year_minute': 'dd HH:mm',
+    'year_second': 'HH:mm:ss',
+    'year_millisecond': 'HH:mm:ss.SSS',
+    'semester': 'MMM',
+    'semester_quarter': 'MMM',
+    'semester_month': 'MMM',
+    'semester_third_of_month': 'dd',
+    'semester_week': 'dd',
+    'semester_day': 'dd',
+    'semester_hour': 'HH',
+    'semester_minute': 'HH:mm',
+    'semester_second': 'HH:mm:ss',
+    'semester_millisecond': 'SSS',
+    'quarter': 'MMM',
+    'quarter_month': 'MMM',
+    'quarter_third_of_month': 'dd',
+    'quarter_week': 'dd',
+    'quarter_day': 'dd',
+    'quarter_hour': 'HH',
+    'quarter_minute': 'HH:mm',
+    'quarter_second': 'HH:mm:ss',
+    'quarter_millisecond': 'SSS',
+    'month': 'MMM',
+    'month_third_of_month': 'dd',
+    'month_week': 'dd',
+    'month_day': 'dd',
+    'month_hour': 'HH',
+    'month_minute': 'HH:mm',
+    'month_second': 'HH:mm:ss',
+    'month_millisecond': 'SSS',
+    'third_of_month': 'dd',
+    'third_of_month_week': 'dd',
+    'third_of_month_day': 'dd',
+    'third_of_month_hour': 'HH',
+    'third_of_month_minute': 'HH:mm',
+    'third_of_month_second': 'HH:mm:ss',
+    'third_of_month_millisecond': 'SSS',
+    'week': 'dd',
+    'week_day': 'dd',
+    'week_hour': 'HH',
+    'week_minute': 'HH:mm',
+    'week_second': 'HH:mm:ss',
+    'week_millisecond': 'SSS',
+    'day': 'dd',
+    'day_hour': 'HH',
+    'day_minute': 'HH:mm',
+    'day_second': 'HH:mm:ss',
+    'day_millisecond': 'SSS',
+    'hour': 'HH',
+    'hour_minute': 'HH:mm',
+    'hour_second': 'HH:mm:ss',
+    'hour_millisecond': 'SSS',
+    'minute': 'HH:mm',
+    'minute_second': 'HH:mm:ss',
+    'minute_millisecond': 'SSS',
+    'second': 'HH:mm:ss',
+    'second_millisecond': 'SSS',
+    'millisecond': 'SSS'
+  }
+});
+goog.exportSymbol('anychart.format.locales.default.numberLocale', {
+  'decimalsCount': 1,
+  'decimalPoint': '.',
+  'groupsSeparator': '',
+  'scale': false,
+  'zeroFillDecimals': false,
+  'scaleSuffixSeparator': '',
+  'useBracketsForNegative': false
+});
+goog.exportSymbol('anychart.format.locales.default.messages', {});
+
+
+//endregion
+//region --- Namespace private members
+//------------------------------------------------------------------------------
+//
+//  Namespace private members
+//
+//------------------------------------------------------------------------------
 /**
  * Regular expression for detecting scaling units, such as K, M, G, etc. for
  * converting a string representation to a numeric value.
@@ -79,64 +218,23 @@ anychart.format.SCALED_NUMERIC_RE_ = /^([-]?\d+\.?\d*)(.*?)?$/;
 
 
 /**
- * Locales map.
- * @type {Object.<string, anychart.format.Locale>}
+ * Default scale settings.
+ * NOTE: Lower case 'k' is added as in goog.format.NUMERIC_SCALES_SI_.
+ * @type {{factors:Array.<number>,suffixes:Array.<string>}}
+ * @private
  */
-goog.global['anychart'] = goog.global['anychart'] || {};
-goog.global['anychart']['format'] = goog.global['anychart']['format'] || {};
-goog.global['anychart']['format']['locales'] = {
-  'default': {
-    'dateTimeLocale': {
-      'eras': ['BC', 'AD'],
-      'erasNames': ['Before Christ', 'Anno Domini'],
-      'narrowMonths': ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'],
-      'standaloneNarrowMonths': ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O',
-        'N', 'D'],
-      'months': ['January', 'February', 'March', 'April', 'May', 'June', 'July',
-        'August', 'September', 'October', 'November', 'December'],
-      'standaloneMonths': ['January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'],
-      'shortMonths': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
-        'Oct', 'Nov', 'Dec'],
-      'standaloneShortMonths': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul',
-        'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-      'weekdays': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
-        'Saturday'],
-      'standaloneWeekdays': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday',
-        'Friday', 'Saturday'],
-      'shortWeekdays': ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-      'standaloneShortWeekdays': ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-      'narrowWeekdays': ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
-      'standaloneNarrowWeekdays': ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
-      'shortQuarters': ['Q1', 'Q2', 'Q3', 'Q4'],
-      'quarters': ['1st quarter', '2nd quarter', '3rd quarter', '4th quarter'],
-      'ampms': ['AM', 'PM'],
-      'dateFormats': ['EEEE, y MMMM dd', 'y MMMM d', 'y MMM d', 'yyyy-MM-dd'],
-      'timeFormats': ['HH:mm:ss v', 'HH:mm:ss z', 'HH:mm:ss', 'HH:mm'],
-      'dateTimeFormats': ['{1} \'at\' {0}', '{1} \'at\' {0}', '{1}, {0}', '{1}, {0}'],
-      'firstDayOfWeek': 0,
-      'weekendRange': [5, 6],
-      'firstWeekCutOfDay': 3
-    },
-    'numberLocale': {
-      'decimalsCount': 1,
-      'decimalPoint': '.',
-      'groupsSeparator': '',
-      'scale': false,
-      'zeroFillDecimals': false,
-      'scaleSuffixSeparator': '',
-      'useBracketsForNegative': false
-    }
-  }
+anychart.format.DEFAULT_SCALE_ = {
+  'factors': [1e15, 1e12, 1e9, 1e6, 1e3, 1e3, 1, 1e-3, 1e-6, 1e-9],
+  'suffixes': ['P', 'T', 'G', 'M', 'K', 'k', '', 'm', 'u', 'n']
 };
 
 
 /**
  * Input format setting to be used.
- * @type {string|anychart.format.Locale}
+ * @type {!(string|anychart.format.Locale)}
  * @private
  */
-anychart.format.inputLocale_ = 'default';
+anychart.format.inputLocale_ = anychart.opt.DEFAULT;
 
 
 /**
@@ -148,19 +246,43 @@ anychart.format.inputDateTimeFormat_ = null;
 
 
 /**
- * Output format setting to be used.
- * @type {string|anychart.format.Locale}
+ * Input base date. See anychart.format.inputBaseDate() for details.
+ * @type {number}
  * @private
  */
-anychart.format.outputLocale_ = 'default';
+anychart.format.inputBaseDate_ = NaN;
+
+
+/**
+ * Output format setting to be used.
+ * @type {!(string|anychart.format.Locale)}
+ * @private
+ */
+anychart.format.outputLocale_ = anychart.opt.DEFAULT;
 
 
 /**
  * Output date time format.
- * @type {string}
+ * @type {?string}
  * @private
  */
-anychart.format.outputDateTimeFormat_ = 'yyyy.MM.dd';
+anychart.format.outputDateTimeFormat_ = null;
+
+
+/**
+ * Output date format.
+ * @type {?string}
+ * @private
+ */
+anychart.format.outputDateFormat_ = null;
+
+
+/**
+ * Output time format.
+ * @type {?string}
+ * @private
+ */
+anychart.format.outputTimeFormat_ = null;
 
 
 /**
@@ -169,140 +291,6 @@ anychart.format.outputDateTimeFormat_ = 'yyyy.MM.dd';
  * @private
  */
 anychart.format.outputTimezone_ = 0;
-
-
-/**
- * Input format setting to be used.
- * @param {(string|anychart.format.Locale)=} opt_value
- * @return {string|anychart.format.Locale}
- */
-anychart.format.inputLocale = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (goog.isString(opt_value) || goog.isObject(opt_value)) {
-      anychart.format.inputLocale_ = opt_value;
-    }
-  }
-  return anychart.format.inputLocale_;
-};
-
-
-/**
- * Input date time format.
- * @param {?string=} opt_value - Value to be set. If is null, input value will be interpreted
- *  as timestamp or string representation of timestamp.
- * @return {?string}
- */
-anychart.format.inputDateTimeFormat = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    anychart.format.inputDateTimeFormat_ = opt_value;
-  }
-  return anychart.format.inputDateTimeFormat_;
-};
-
-
-/**
- * Output format setting to be used.
- * @param {(string|anychart.format.Locale)=} opt_value
- * @return {string|anychart.format.Locale}
- */
-anychart.format.outputLocale = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (goog.isString(opt_value) || goog.isObject(opt_value)) {
-      anychart.format.outputLocale_ = opt_value;
-    }
-  }
-  return anychart.format.outputLocale_;
-};
-
-
-/**
- * Output date time format.
- * @param {string=} opt_value
- * @return {string}
- */
-anychart.format.outputDateTimeFormat = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    anychart.format.outputDateTimeFormat_ = String(opt_value);
-  }
-  return anychart.format.outputDateTimeFormat_;
-};
-
-
-/**
- * Actually is output offset in minutes.
- * @param {number=} opt_value
- * @return {number}
- */
-anychart.format.outputTimezone = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    anychart.format.outputTimezone_ = anychart.utils.toNumber(opt_value) || 0;
-  }
-  return anychart.format.outputTimezone_;
-};
-
-
-/**
- * Turns incoming locale to date time symbols suitable to closure library.
- * @param {anychart.format.Locale=} opt_locale - Incoming locale.
- * @private
- * @return {!Object} - Date time symbols.
- */
-anychart.format.localeToDateTimeSymbols_ = function(opt_locale) {
-  var def = goog.global['anychart']['format']['locales']['default']['dateTimeLocale'];
-  opt_locale = opt_locale || def;
-  return {
-    ERAS: opt_locale['eras'] || def['eras'],
-    ERANAMES: opt_locale['erasNames'] || def['erasNames'],
-    NARROWMONTHS: opt_locale['narrowMonths'] || def['narrowMonths'],
-    STANDALONENARROWMONTHS: opt_locale['standaloneNarrowMonths'] || def['standaloneNarrowMonths'],
-    MONTHS: opt_locale['months'] || def['months'],
-    STANDALONEMONTHS: opt_locale['standaloneMonths'] || def['standaloneMonths'],
-    SHORTMONTHS: opt_locale['shortMonths'] || def['shortMonths'],
-    STANDALONESHORTMONTHS: opt_locale['standaloneShortMonths'] || def['standaloneShortMonths'],
-    WEEKDAYS: opt_locale['weekdays'] || def['weekdays'],
-    STANDALONEWEEKDAYS: opt_locale['standaloneWeekdays'] || def['standaloneWeekdays'],
-    SHORTWEEKDAYS: opt_locale['shortWeekdays'] || def['shortWeekdays'],
-    STANDALONESHORTWEEKDAYS: opt_locale['standaloneShortWeekdays'] || def['standaloneShortWeekdays'],
-    NARROWWEEKDAYS: opt_locale['narrowWeekdays'] || def['narrowWeekdays'],
-    STANDALONENARROWWEEKDAYS: opt_locale['standaloneNarrowWeekdays'] || def['standaloneNarrowWeekdays'],
-    SHORTQUARTERS: opt_locale['shortQuarters'] || def['shortQuarters'],
-    QUARTERS: opt_locale['quarters'] || def['quarters'],
-    AMPMS: opt_locale['ampms'] || def['ampms'],
-    DATEFORMATS: opt_locale['dateFormats'] || def['dateFormats'],
-    TIMEFORMATS: opt_locale['timeFormats'] || def['timeFormats'],
-    DATETIMEFORMATS: opt_locale['dateTimeFormats'] || def['dateTimeFormats'],
-    FIRSTDAYOFWEEK: goog.isDef(opt_locale['firstDayOfWeek']) ? opt_locale['firstDayOfWeek'] : def['firstDayOfWeek'],
-    WEEKENDRANGE: opt_locale['weekendRange'] || def['weekendRange'],
-    FIRSTWEEKCUTOFFDAY: goog.isDef(opt_locale['firstWeekCutOfDay']) ? opt_locale['firstWeekCutOfDay'] : def['firstWeekCutOfDay']
-  };
-};
-
-
-/**
- * Gets locale object.
- * @param {*} locale - Locale settings or name of preset.
- * @private
- * @return {?Object} - Locale object or null if something's wrong.
- */
-anychart.format.normalizeNumberLocale_ = function(locale) {
-  var locales = goog.global['anychart']['format']['locales'];
-  if (goog.isString(locale)) {
-    var loc = locales[locale] || locales['default'];
-    locale = (loc && loc['numberLocale']) ? loc['numberLocale'] : locales['default']['numberLocale'];
-  }
-  return goog.isObject(locale) ? locale : null;
-};
-
-
-/**
- * Does simple python-style string substitution.
- * subs("foo%s hot%s", "bar", "dog") becomes "foobar hotdog".
- * @param {string} str The string containing the pattern.
- * @param {...*} var_args The items to substitute into the pattern.
- * @return {string} A copy of {@code str} in which each occurrence of
- *     {@code %s} has been replaced an argument from {@code var_args}.
- */
-anychart.format.subs = goog.string.subs;
 
 
 /**
@@ -330,7 +318,519 @@ anychart.format.UTCTimeZoneCache_ = {};
 
 
 /**
- * Formats date by pattern.
+ * Caches datetime symbols maps generated for the locales.
+ * @type {!Object}
+ * @private
+ */
+anychart.format.dateTimeSymbolsCache_ = {};
+
+
+//endregion
+//region --- Private functions
+//------------------------------------------------------------------------------
+//
+//  Private functions
+//
+//------------------------------------------------------------------------------
+/**
+ * Normalizes locale or locale name to locale.
+ * @param {string|anychart.format.Locale|*} locale
+ * @return {?anychart.format.Locale}
+ * @private
+ */
+anychart.format.getLocale_ = function(locale) {
+  if (!goog.isObject(locale)) {
+    locale = goog.global['anychart']['format']['locales'][String(locale)];
+  }
+  return locale || null;
+};
+
+
+/**
+ * Normalizes locale or locale name to dateTime locale.
+ * @param {string|anychart.format.Locale|*} locale
+ * @return {?anychart.format.DateTimeLocale}
+ * @private
+ */
+anychart.format.getDateTimeLocale_ = function(locale) {
+  var loc = anychart.format.getLocale_(locale);
+  return loc && loc[anychart.opt.DATE_TIME_LOCALE] || null;
+};
+
+
+/**
+ * Normalizes locale or locale name to number locale.
+ * @param {string|anychart.format.Locale|*} locale
+ * @return {?anychart.format.NumberLocale}
+ * @private
+ */
+anychart.format.getNumberLocale_ = function(locale) {
+  var loc = anychart.format.getLocale_(locale);
+  return loc && loc[anychart.opt.NUMBER_LOCALE] || null;
+};
+
+
+/**
+ * Extracts the date time format from locale if any. Returns null if no format found.
+ * @param {string|anychart.format.Locale} locale
+ * @param {string=} opt_formatName
+ * @return {?string}
+ * @private
+ */
+anychart.format.getOutputDateTimeFormat_ = function(locale, opt_formatName) {
+  var loc = anychart.format.getDateTimeLocale_(locale);
+  return loc && loc[opt_formatName || 'dateTimeFormat'] || null;
+};
+
+
+/**
+ * Turns incoming locale to date time symbols suitable to closure library.
+ * @param {?anychart.format.DateTimeLocale} locale - Incoming locale.
+ * @private
+ * @return {!Object} - Date time symbols.
+ */
+anychart.format.localeToDateTimeSymbols_ = function(locale) {
+  if (!locale)
+    return goog.i18n.DateTimeSymbols;
+  var uid = goog.getUid(locale);
+  if (!(uid in anychart.format.dateTimeSymbolsCache_)) {
+    anychart.format.dateTimeSymbolsCache_[uid] = {
+      ERAS: locale['eras'],
+      ERANAMES: locale['erasNames'],
+      NARROWMONTHS: locale['narrowMonths'],
+      STANDALONENARROWMONTHS: locale['standaloneNarrowMonths'],
+      MONTHS: locale['months'],
+      STANDALONEMONTHS: locale['standaloneMonths'],
+      SHORTMONTHS: locale['shortMonths'],
+      STANDALONESHORTMONTHS: locale['standaloneShortMonths'],
+      WEEKDAYS: locale['weekdays'],
+      STANDALONEWEEKDAYS: locale['standaloneWeekdays'],
+      SHORTWEEKDAYS: locale['shortWeekdays'],
+      STANDALONESHORTWEEKDAYS: locale['standaloneShortWeekdays'],
+      NARROWWEEKDAYS: locale['narrowWeekdays'],
+      STANDALONENARROWWEEKDAYS: locale['standaloneNarrowWeekdays'],
+      SHORTQUARTERS: locale['shortQuarters'],
+      QUARTERS: locale['quarters'],
+      AMPMS: locale['ampms'],
+      DATEFORMATS: locale['dateFormats'],
+      TIMEFORMATS: locale['timeFormats'],
+      DATETIMEFORMATS: locale['dateTimeFormats'],
+      FIRSTDAYOFWEEK: locale['firstDayOfWeek'],
+      WEEKENDRANGE: locale['weekendRange'],
+      FIRSTWEEKCUTOFFDAY: locale['firstWeekCutOfDay']
+    };
+  }
+  return anychart.format.dateTimeSymbolsCache_[uid];
+};
+
+
+//endregion
+//region --- Public getters/setters
+//------------------------------------------------------------------------------
+//
+//  Public getters/setters
+//
+//------------------------------------------------------------------------------
+/**
+ * Input format setting to be used.
+ * @param {(string|anychart.format.Locale)=} opt_value
+ * @return {string|anychart.format.Locale}
+ */
+anychart.format.inputLocale = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (goog.isString(opt_value) || goog.isObject(opt_value)) {
+      anychart.format.inputLocale_ = opt_value;
+    } else {
+      anychart.format.inputLocale_ = anychart.opt.DEFAULT;
+    }
+  }
+  return anychart.format.inputLocale_;
+};
+
+
+/**
+ * Input date time format.
+ * @param {?string=} opt_value - Value to be set. If is null, input value will be interpreted
+ *  as timestamp or string representation of timestamp.
+ * @return {?string}
+ */
+anychart.format.inputDateTimeFormat = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (goog.isString(opt_value)) {
+      anychart.format.inputDateTimeFormat_ = opt_value;
+    } else {
+      anychart.format.inputDateTimeFormat_ = null;
+    }
+  }
+  return anychart.format.inputDateTimeFormat_;
+};
+
+
+/**
+ * Getter and setter for the input base date. All dates parsed by the anychart.format.parseDate
+ * in case of lacking of any date time parts like year or month will use parts of this base date.
+ * Defaults to a first millisecond of current UTC month.
+ * @param {(Date|number)=} opt_value
+ * @return {Date}
+ */
+anychart.format.inputBaseDate = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    anychart.format.inputBaseDate_ = goog.isDateLike(opt_value) ?
+        opt_value.getTime() :
+        anychart.utils.toNumber(opt_value);
+  }
+  if (isNaN(anychart.format.inputBaseDate_)) {
+    // we recalculate current year and month on each request for persistent apps
+    var currDate = new Date();
+    currDate.setTime(Date.UTC(currDate.getFullYear(), currDate.getUTCMonth()));
+    return currDate;
+  }
+  return new Date(anychart.format.inputBaseDate_);
+};
+
+
+/**
+ * Output format setting to be used.
+ * @param {(string|anychart.format.Locale)=} opt_value
+ * @return {string|anychart.format.Locale}
+ */
+anychart.format.outputLocale = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (goog.isString(opt_value) || goog.isObject(opt_value)) {
+      anychart.format.outputLocale_ = opt_value;
+    } else {
+      anychart.format.outputLocale_ = anychart.opt.DEFAULT;
+    }
+  }
+  return anychart.format.outputLocale_;
+};
+
+
+/**
+ * Output date time format.
+ * @param {string=} opt_value
+ * @return {string}
+ */
+anychart.format.outputDateTimeFormat = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (goog.isString(opt_value)) {
+      anychart.format.outputDateTimeFormat_ = opt_value;
+    } else {
+      anychart.format.outputDateTimeFormat_ = null;
+    }
+  }
+  return anychart.format.outputDateTimeFormat_ ||
+      anychart.format.getOutputDateTimeFormat_(anychart.format.outputLocale_) ||
+      anychart.format.getOutputDateTimeFormat_(anychart.opt.DEFAULT) ||
+      'yyyy.MM.dd';
+};
+
+
+/**
+ * Output date format.
+ * @param {string=} opt_value
+ * @return {string}
+ */
+anychart.format.outputDateFormat = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (goog.isString(opt_value)) {
+      anychart.format.outputDateFormat_ = opt_value;
+    } else {
+      anychart.format.outputDateFormat_ = null;
+    }
+  }
+  return anychart.format.outputDateFormat_ ||
+      anychart.format.getOutputDateTimeFormat_(anychart.format.outputLocale_, 'dateFormat') ||
+      anychart.format.getOutputDateTimeFormat_(anychart.opt.DEFAULT, 'dateFormat') ||
+      'yyyy.MM.dd';
+};
+
+
+/**
+ * Output time format.
+ * @param {string=} opt_value
+ * @return {string}
+ */
+anychart.format.outputTimeFormat = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (goog.isString(opt_value)) {
+      anychart.format.outputTimeFormat_ = opt_value;
+    } else {
+      anychart.format.outputTimeFormat_ = null;
+    }
+  }
+  return anychart.format.outputTimeFormat_ ||
+      anychart.format.getOutputDateTimeFormat_(anychart.format.outputLocale_, 'timeFormat') ||
+      anychart.format.getOutputDateTimeFormat_(anychart.opt.DEFAULT, 'timeFormat') ||
+      'HH:mm:ss';
+};
+
+
+/**
+ * Actually is output offset in minutes.
+ * @param {number=} opt_value
+ * @return {number}
+ */
+anychart.format.outputTimezone = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    anychart.format.outputTimezone_ = anychart.utils.toNumber(opt_value) || 0;
+  }
+  return anychart.format.outputTimezone_;
+};
+
+
+//endregion
+//region --- Parsing
+//------------------------------------------------------------------------------
+//
+//  Parsing
+//
+//------------------------------------------------------------------------------
+/**
+ * Parses input value to date.
+ * @param {*} value - Input value.
+ * @param {?string=} opt_format - Format to be parsed. If is undefined, anychart.format.inputDateTimeFormat will be used.
+ * @param {?Date=} opt_baseDate - Date object to hold the parsed date. Used for case if input value doesn't contain
+ *  information about year or month or something like that. If parsing process ends successfully, this object will
+ *  contain totally the same values of date time units as return value.
+ *  NOTE: If is not Date, Date.UTC(currentYear, currentMoth) will be used.
+ * @param {?(string|anychart.format.Locale)=} opt_locale - Locale to be used. If not set, anychart.format.inputLocale will
+ *  be used.
+ * @return {?Date} - Parsed date or null if got wrong input value.
+ */
+anychart.format.parseDateTime = function(value, opt_format, opt_baseDate, opt_locale) {
+  var locales = goog.global['anychart']['format']['locales'];
+  if (goog.isDateLike(value)) {
+    return /** @type {Date} */ (value);
+  } else if (goog.isNumber(value)) {
+    if (isNaN(value)) {
+      // anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
+      return null;
+    } else {
+      return new Date(value);
+    }
+  } else if (goog.isString(value)) {
+    var format = (goog.isDef(opt_format) ? opt_format : anychart.format.inputDateTimeFormat_) || null;
+    if (format) {
+      var locale = anychart.format.getDateTimeLocale_(opt_locale) ||
+          anychart.format.getDateTimeLocale_(anychart.format.inputLocale_) ||
+          anychart.format.getDateTimeLocale_(anychart.opt.DEFAULT);
+      var localeHash = goog.getUid(locale);
+      var parserCacheKey = format + localeHash;
+      /** @type {goog.i18n.DateTimeParse} */
+      var parser;
+      if (!(parserCacheKey in anychart.format.formatDateTimeCache_)) {
+        var symbols = anychart.format.localeToDateTimeSymbols_(locale);
+        anychart.format.parseDateTimeCache_[parserCacheKey] = new goog.i18n.DateTimeParse(format, symbols);
+      }
+      parser = anychart.format.parseDateTimeCache_[parserCacheKey];
+
+      var date = goog.isDateLike(opt_baseDate) ? /** @type {Date} */ (opt_baseDate) : anychart.format.inputBaseDate();
+
+      var valueLength = value.length;
+      var resultLength = parser.parse(value, date);
+
+      if (valueLength == resultLength) {//parsing successful.
+        return /** @type {Date} */ (date);
+      } else {
+        // anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value, resultLength], true);
+        return null;
+      }
+    } else { //falling back to anychart.utils.normalizeTimestamp -like behaviour
+      var numValue = +value;
+      var newDate = new Date(isNaN(numValue) ? value : numValue);
+      if (isNaN(newDate.getTime())) { //Got string not in ISO8601 format.
+        // anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
+        return null; // Parsing error.
+      } else {
+        return newDate;
+      }
+    }
+  } else {
+    // anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
+    return null;
+  }
+};
+
+
+/**
+ * Parses passed value to number considering locale.
+ * @param {*} value - Value to be parsed.
+ * @param {(anychart.format.NumberLocale|string)=} opt_locale - Number locale to be used. If not
+ *  defined, anychart.format.input.numberFormat will be used.
+ * @return {number} - Parsed value. NaN if value could not be parsed.
+ */
+anychart.format.parseNumber = function(value, opt_locale) {
+  var locale = anychart.format.getNumberLocale_(opt_locale) ||
+      anychart.format.getNumberLocale_(anychart.format.inputLocale_) ||
+      anychart.format.getNumberLocale_(anychart.opt.DEFAULT);
+  var sign = 1;
+  if (goog.isString(value)) {
+    if (locale['useBracketsForNegative']) { //replacing brackets
+      if (value.charAt(0) == '(' && value.charAt(value.length - 1) == ')') {
+        //NOTE: Incoming value "(5)" becomes -5 and "(-5)" becomes 5 (negative of negative).
+        sign = -1;
+        value = value.substring(1, value.length - 1);
+      }
+    }
+
+    value = value.replace(locale['decimalPoint'], '.'); //replacing decimalPoint with JS default symbol.
+
+    value = goog.string.removeAll(value, locale['groupsSeparator']); //replacing groupsSeparator.
+
+    var scale = locale['scale'];
+    if (scale === true)
+      scale = anychart.format.DEFAULT_SCALE_;
+
+    if (goog.isObject(scale) && goog.isArray(scale['factors']) && goog.isArray(scale['suffixes'])) {
+      value = goog.string.removeAll(value, locale['scaleSuffixSeparator']); //replacing scaleSuffixSeparator.
+
+      var match = value.match(anychart.format.SCALED_NUMERIC_RE_);
+      if (!match)
+        return NaN;
+
+      var factor = 1;
+
+      value = +match[1];
+      var suff = match[2];
+      if (suff) {
+        var factors = scale['factors'];
+        var suffixes = scale['suffixes'];
+        var len = Math.min(factors.length, suffixes.length);
+
+        for (var i = 0; i < len; i++) {
+          if (suff == suffixes[i]) {
+            factor = factors[i];
+            break;
+          }
+        }
+      }
+
+      value *= factor;
+    }
+
+  }
+  var result = +/** @type {number} */ (value);
+  result *= sign;
+  return isNaN(result) ? result : anychart.math.round(result, locale['decimalsCount']);
+};
+
+
+//endregion
+//region --- Formatting
+//------------------------------------------------------------------------------
+//
+//  Formatting
+//
+//------------------------------------------------------------------------------
+/**
+ * Does simple python-style string substitution.
+ * subs("foo%s hot%s", "bar", "dog") becomes "foobar hotdog".
+ * @param {string} str The string containing the pattern.
+ * @param {...*} var_args The items to substitute into the pattern.
+ * @return {string} A copy of {@code str} in which each occurrence of
+ *     {@code %s} has been replaced an argument from {@code var_args}.
+ */
+anychart.format.subs = goog.string.subs;
+
+
+/**
+ * Returns localized message, if the translation is provided in messages section of output locale.
+ * @param {string} keyword
+ * @return {string}
+ */
+anychart.format.getMessage = function(keyword) {
+  var locale = anychart.format.getLocale_(anychart.format.outputLocale_);
+  var messages = locale && locale[anychart.opt.MESSAGES];
+  return (messages && (keyword in messages)) ? messages[keyword] : keyword;
+};
+
+
+/**
+ * Combines two passed intervals into an interval identifier that can be passed to getDateTimeFormat/s() functions.
+ * @param {anychart.enums.Interval} intervalUnit
+ * @param {anychart.enums.Interval=} opt_parentIntervalUnit
+ * @param {(anychart.enums.IntervalFormatPrefix|string)=} opt_prefix
+ * @return {string}
+ */
+anychart.format.getIntervalIdentifier = function(intervalUnit, opt_parentIntervalUnit, opt_prefix) {
+  var parentInterval = anychart.enums.normalizeInterval(opt_parentIntervalUnit);
+  intervalUnit = anychart.enums.normalizeInterval(intervalUnit);
+  opt_prefix = opt_prefix ? opt_prefix + '_' : '';
+  return opt_prefix + ((intervalUnit == parentInterval) ?
+      intervalUnit :
+      parentInterval + '_' + intervalUnit);
+};
+
+
+/**
+ *
+ * @param {string} identifier
+ * @param {number=} opt_index
+ * @param {anychart.format.Locale=} opt_locale
+ * @return {string}
+ */
+anychart.format.getDateTimeFormat = function(identifier, opt_index, opt_locale) {
+  var locale = anychart.format.getDateTimeLocale_(opt_locale) ||
+      anychart.format.getDateTimeLocale_(anychart.format.outputLocale_) ||
+      anychart.format.getDateTimeLocale_(anychart.opt.DEFAULT);
+  var formats = locale && locale['formats'] && locale['formats'][identifier];
+  var format = goog.isArray(formats) ?
+      formats[Math.min(formats.length - 1, opt_index || 0)] :
+      goog.isString(formats) ?
+          formats :
+          '';
+  return format || 'yyyy/MM/dd\'T\'HH:mm:ss.SSS';
+};
+
+
+/**
+ * For an interval range identifier returns an array of applicable localized formats sorted by the length of the output.
+ * @param {string} identifier
+ * @param {anychart.format.Locale=} opt_locale
+ * @return {Array.<string>}
+ */
+anychart.format.getDateTimeFormats = function(identifier, opt_locale) {
+  var locale = anychart.format.getDateTimeLocale_(opt_locale) ||
+      anychart.format.getDateTimeLocale_(anychart.format.outputLocale_) ||
+      anychart.format.getDateTimeLocale_(anychart.opt.DEFAULT);
+  var formats = locale && locale['formats'] && locale['formats'][identifier];
+  return goog.isArray(formats) ?
+      formats :
+      goog.isString(formats) ?
+          [formats] :
+          [];
+};
+
+
+/**
+ * Does the same formatting as anychart.format.dateTime does, but with the default date format.
+ * @param {number|Date} date UTC timestamp or Date object.
+ * @param {number=} opt_timeZone Adjust with time zone. Indicate
+ * minutes WEST of UTC to be used as a constant time zone offset.
+ * @param {(string|anychart.format.Locale)=} opt_locale - Locale to be used.
+ * @return {string}
+ */
+anychart.format.date = function(date, opt_timeZone, opt_locale) {
+  return anychart.format.dateTime(date, anychart.format.outputDateFormat(), opt_timeZone, opt_locale);
+};
+
+
+/**
+ * Does the same formatting as anychart.format.dateTime does, but with the default time format.
+ * @param {number|Date} date UTC timestamp or Date object.
+ * @param {number=} opt_timeZone Adjust with time zone. Indicate
+ * minutes WEST of UTC to be used as a constant time zone offset.
+ * @param {(string|anychart.format.Locale)=} opt_locale - Locale to be used.
+ * @return {string}
+ */
+anychart.format.time = function(date, opt_timeZone, opt_locale) {
+  return anychart.format.dateTime(date, anychart.format.outputTimeFormat(), opt_timeZone, opt_locale);
+};
+
+
+/**
+ * Formats date time by pattern.
  * @param {number|Date} date UTC timestamp or Date object.
  * @param {string=} opt_format ['yyyy.MM.dd'].
  * @param {number=} opt_timeZone Adjust with time zone. Indicate
@@ -339,135 +839,32 @@ anychart.format.UTCTimeZoneCache_ = {};
  * @return {string}
  */
 anychart.format.dateTime = function(date, opt_format, opt_timeZone, opt_locale) {
-  var locale = opt_locale || anychart.format.outputLocale_;
+  date = (date instanceof Date) ? date : new Date(date);
+  if (isNaN(date.getTime())) return String(date);
 
-  if (goog.isString(locale)) {
-    //Here locale MUST become an object.
-    var locales = goog.global['anychart']['format']['locales'];
-    locale = locales[locale] || locales['default'];
-    locale = locale && locale['dateTimeLocale'];
-  }
+  var locale = anychart.format.getDateTimeLocale_(opt_locale) ||
+      anychart.format.getDateTimeLocale_(anychart.format.outputLocale_) ||
+      anychart.format.getDateTimeLocale_(anychart.opt.DEFAULT);
+  var pattern = opt_format ||
+      anychart.format.outputDateTimeFormat_ ||
+      anychart.format.outputDateTimeFormat() ||
+      'yyyy.MM.dd';
+  var formatterCacheKey = pattern + goog.getUid(locale);
 
-  var localeHash = goog.getUid(locale);
-
-  /** @type {goog.i18n.DateTimeFormat} */
-  var formatter;
-  var pattern = opt_format || anychart.format.outputDateTimeFormat_;
-  var formatterCacheKey = pattern + localeHash;
-  if (formatterCacheKey in anychart.format.formatDateTimeCache_) {
-    formatter = anychart.format.formatDateTimeCache_[formatterCacheKey];
-  } else {
+  if (!(formatterCacheKey in anychart.format.formatDateTimeCache_)) {
     var symbols = anychart.format.localeToDateTimeSymbols_(locale);
-    formatter = anychart.format.formatDateTimeCache_[formatterCacheKey] = new goog.i18n.DateTimeFormat(pattern, symbols);
+    anychart.format.formatDateTimeCache_[formatterCacheKey] = new goog.i18n.DateTimeFormat(pattern, symbols);
   }
+  /** @type {goog.i18n.DateTimeFormat} */
+  var formatter = anychart.format.formatDateTimeCache_[formatterCacheKey];
 
-  var timeZone;
   opt_timeZone = opt_timeZone || anychart.format.outputTimezone_;
-  if (opt_timeZone in anychart.format.UTCTimeZoneCache_)
-    timeZone = anychart.format.UTCTimeZoneCache_[opt_timeZone];
-  else
-    timeZone = anychart.format.UTCTimeZoneCache_[opt_timeZone] = goog.i18n.TimeZone.createTimeZone(opt_timeZone);
-
-  date = goog.isNumber(date) ? new Date(date) : date;
+  if (!(opt_timeZone in anychart.format.UTCTimeZoneCache_)) {
+    anychart.format.UTCTimeZoneCache_[opt_timeZone] = goog.i18n.TimeZone.createTimeZone(opt_timeZone);
+  }
+  var timeZone = anychart.format.UTCTimeZoneCache_[opt_timeZone];
 
   return formatter.format(date, timeZone);
-};
-
-
-/**
- * Parses input value to date.
- * @param {*} value - Input value.
- * @param {string=} opt_format - Format to be parsed. If is undefined, anychart.format.inputDateTimeFormat will be used.
- * @param {Date=} opt_dateHolder - Date object to hold the parsed date. Used for case if input value doesn't contain
- *  information about year or month or something like that. If parsing process ends successfully, this object will
- *  contain totally the same values of date time units as return value.
- *  NOTE: If is undefined, Date.UTC(currentYear, currentMoth) will be used.
- * @param {(string|anychart.format.Locale)=} opt_locale - Locale to be used. If not set, anychart.format.inputLocale will
- *  be used.
- * @return {?Date} - Parsed date or null if got wrong input value.
- */
-anychart.format.parseDateTime = function(value, opt_format, opt_dateHolder, opt_locale) {
-  var locales = goog.global['anychart']['format']['locales'];
-  if (goog.isDateLike(value)) {
-    return /** @type {Date} */ (value);
-  } else if (goog.isNumber(value)) {
-    if (isNaN(value)) {
-      anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
-      return null;
-    } else {
-      return new Date(value);
-    }
-  } else if (goog.isString(value)) {
-    if (!anychart.format.inputDateTimeFormat_) { //null or '' literally means that we interpret value as timestamp.
-      var numValue = +value;
-      var newDate = new Date(isNaN(numValue) ? value : numValue);
-      if (isNaN(newDate.getTime())) { //Got string not in ISO8601 format.
-        anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
-        return null; // Parsing error.
-      } else {
-        return newDate;
-      }
-    } else {
-      var locale = opt_locale || anychart.format.inputLocale_;
-
-      if (goog.isString(locale)) {
-        //Here locale MUST become an object.
-        locale = locales[locale] || locales['default'];
-        locale = locale && locale['dateTimeLocale'];
-      }
-
-      var localeHash = goog.getUid(locale);
-
-      /** @type {goog.i18n.DateTimeParse} */
-      var parser;
-      //Here anychart.format.inputDateTimeFormat_ is string and not null.
-      var pattern = opt_format || anychart.format.inputDateTimeFormat_;
-
-      var parserCacheKey = pattern + localeHash;
-
-      if (parserCacheKey in anychart.format.formatDateTimeCache_) {
-        parser = anychart.format.parseDateTimeCache_[parserCacheKey];
-      } else {
-        var symbols = anychart.format.localeToDateTimeSymbols_(locale);
-        parser = anychart.format.parseDateTimeCache_[parserCacheKey] = new goog.i18n.DateTimeParse(pattern, symbols);
-      }
-
-      /** @type {Date} */
-      var date;
-      if (goog.isDateLike(opt_dateHolder)) {
-        date = /** @type {Date} */ (opt_dateHolder);
-      } else {
-        var currDate = new Date();
-        currDate.setTime(Date.UTC(currDate.getFullYear(), currDate.getUTCMonth()));
-        date = currDate;
-      }
-
-      var valueLength = value.length;
-      var resultLength = parser.parse(value, date, 0);
-
-      if (valueLength == resultLength) {//parsing successful.
-        return /** @type {Date} */ (date);
-      } else {
-        anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value, resultLength], true);
-        return null;
-      }
-    }
-  } else {
-    anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value]);
-    return null;
-  }
-};
-
-
-/**
- * Default scale settings.
- * NOTE: Lower case 'k' is added as in goog.format.NUMERIC_SCALES_SI_.
- * @type {{factors:Array.<number>,suffixes:Array.<string>}}
- * @private
- */
-anychart.format.DEFAULT_SCALE_ = {
-  'factors': [1e15, 1e12, 1e9, 1e6, 1e3, 1e3, 1, 1e-3, 1e-6, 1e-9],
-  'suffixes': ['P', 'T', 'G', 'M', 'K', 'k', '', 'm', 'u', 'n']
 };
 
 
@@ -485,8 +882,9 @@ anychart.format.DEFAULT_SCALE_ = {
  */
 anychart.format.number = function(number, opt_decimalsCountOrLocale, opt_decimalPoint, opt_groupsSeparator,
     opt_scale, opt_zeroFillDecimals, opt_scaleSuffixSeparator, opt_useBracketsForNegative) {
-  var obj = anychart.format.normalizeNumberLocale_(opt_decimalsCountOrLocale);
-  var locale = anychart.format.normalizeNumberLocale_(anychart.format.outputLocale_); //Guaranteed default number output locale.
+  var obj = anychart.format.getNumberLocale_(opt_decimalsCountOrLocale);
+  var locale = anychart.format.getNumberLocale_(anychart.format.outputLocale_) ||
+      anychart.format.getNumberLocale_(anychart.opt.DEFAULT);
 
   var decimalsCount = goog.isNumber(opt_decimalsCountOrLocale) ?
       opt_decimalsCountOrLocale :
@@ -588,103 +986,26 @@ anychart.format.number = function(number, opt_decimalsCountOrLocale, opt_decimal
 };
 
 
-/**
- * Parses passed value to number considering locale.
- * @param {*} value - Value to be parsed.
- * @param {(anychart.format.NumberLocale|string)=} opt_locale - Number locale to be used. If not
- *  defined, anychart.format.input.numberFormat will be used.
- * @return {number} - Parsed value. NaN if value could not be parsed.
- */
-anychart.format.parseNumber = function(value, opt_locale) {
-  var locale = anychart.format.normalizeNumberLocale_(opt_locale);
-  var defLoc = anychart.format.normalizeNumberLocale_(anychart.format.inputLocale_); //Guaranteed default locale.
-
-  var decimalsCount = (locale && goog.isNumber(locale['decimalsCount'])) ?
-      locale['decimalsCount'] :
-      defLoc['decimalsCount'];
-
-  var decimalPoint = (locale && goog.isString(locale['decimalPoint'])) ?
-      locale['decimalPoint'] :
-      defLoc['decimalPoint'];
-
-  var groupsSeparator = (locale && goog.isString(locale['groupsSeparator'])) ?
-      locale['groupsSeparator'] :
-      defLoc['groupsSeparator'];
-
-  var scale = (locale && (goog.isObject(locale['scale']) || goog.isBoolean(locale['scale']))) ?
-      locale['scale'] :
-      defLoc['scale'];
-
-  var scaleSuffixSeparator = (locale && goog.isString(locale['scaleSuffixSeparator'])) ?
-      locale['scaleSuffixSeparator'] :
-      defLoc['scaleSuffixSeparator'];
-
-  var useBracketsForNegative = (locale && goog.isDef(locale['useBracketsForNegative'])) ?
-      !!locale['useBracketsForNegative'] :
-      !!defLoc['useBracketsForNegative'];
-
-  var negative = 1;
-
-  if (goog.isString(value)) {
-    var re = new RegExp(goog.string.regExpEscape(decimalPoint), 'g'); //this construction is taken from goog.string.replace().
-
-    if (useBracketsForNegative) { //replacing brackets
-      if (value.charAt(0) == '(' && value.charAt(value.length - 1) == ')') {
-        //NOTE: Incoming value "(5)" becomes -5 and "(-5)" becomes 5 (negative of negative).
-        negative = -1;
-        value = value.substring(1, value.length - 1);
-      }
-    }
-
-    value = value.replace(re, '.'); //replacing decimalPoint with JS default symbol.
-
-    value = goog.string.removeAll(value, groupsSeparator); //replacing groupsSeparator.
-
-    if (scale === true)
-      scale = anychart.format.DEFAULT_SCALE_;
-
-    if (goog.isObject(scale) && goog.isArray(scale['factors']) && goog.isArray(scale['suffixes'])) {
-      value = goog.string.removeAll(value, scaleSuffixSeparator); //replacing scaleSuffixSeparator.
-
-      var match = value.match(anychart.format.SCALED_NUMERIC_RE_);
-      if (!match)
-        return NaN;
-
-      var factor = 1;
-
-      value = +match[1];
-      var suff = match[2];
-      if (suff) {
-        var factors = scale['factors'];
-        var suffixes = scale['suffixes'];
-        var len = Math.min(factors.length, suffixes.length);
-
-        for (var i = 0; i < len; i++) {
-          if (suff == suffixes[i]) {
-            factor = factors[i];
-            break;
-          }
-        }
-      }
-
-      value *= factor;
-    }
-
-  }
-  var result = +/** @type {number} */ (value);
-  result *= negative;
-  return isNaN(result) ? result : anychart.math.round(result, decimalsCount);
-};
+//endregion
 
 
 //exports
-goog.exportSymbol('anychart.format.subs', anychart.format.subs);
-goog.exportSymbol('anychart.format.dateTime', anychart.format.dateTime);
-goog.exportSymbol('anychart.format.parseDateTime', anychart.format.parseDateTime);
-goog.exportSymbol('anychart.format.number', anychart.format.number);
-goog.exportSymbol('anychart.format.parseNumber', anychart.format.parseNumber);
 goog.exportSymbol('anychart.format.inputLocale', anychart.format.inputLocale);
-goog.exportSymbol('anychart.format.outputLocale', anychart.format.outputLocale);
+goog.exportSymbol('anychart.format.inputBaseDate', anychart.format.inputBaseDate);
 goog.exportSymbol('anychart.format.inputDateTimeFormat', anychart.format.inputDateTimeFormat);
-goog.exportSymbol('anychart.format.outputDateTimeFormat', anychart.format.outputDateTimeFormat);
+goog.exportSymbol('anychart.format.outputLocale', anychart.format.outputLocale);
 goog.exportSymbol('anychart.format.outputTimezone', anychart.format.outputTimezone);
+goog.exportSymbol('anychart.format.outputDateFormat', anychart.format.outputDateFormat);
+goog.exportSymbol('anychart.format.outputTimeFormat', anychart.format.outputTimeFormat);
+goog.exportSymbol('anychart.format.outputDateTimeFormat', anychart.format.outputDateTimeFormat);
+goog.exportSymbol('anychart.format.parseDateTime', anychart.format.parseDateTime);
+goog.exportSymbol('anychart.format.parseNumber', anychart.format.parseNumber);
+goog.exportSymbol('anychart.format.subs', anychart.format.subs);
+goog.exportSymbol('anychart.format.getMessage', anychart.format.getMessage);
+goog.exportSymbol('anychart.format.getDateTimeFormats', anychart.format.getDateTimeFormats);
+goog.exportSymbol('anychart.format.getDateTimeFormat', anychart.format.getDateTimeFormat);
+goog.exportSymbol('anychart.format.getIntervalIdentifier', anychart.format.getIntervalIdentifier);
+goog.exportSymbol('anychart.format.date', anychart.format.date);
+goog.exportSymbol('anychart.format.time', anychart.format.time);
+goog.exportSymbol('anychart.format.dateTime', anychart.format.dateTime);
+goog.exportSymbol('anychart.format.number', anychart.format.number);

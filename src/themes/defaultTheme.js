@@ -107,13 +107,16 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnDateTimeX = function() {
-    var date = new Date(this['x']);
-    var options = {
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric'
-    };
-    return date.toLocaleDateString('en-US', options);
+    return window['anychart']['format']['date'](this['x']);
+  };
+
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
+  var returnDateTimeTickValue = function() {
+    return window['anychart']['format']['date'](this['tickValue']);
   };
 
 
@@ -1904,44 +1907,10 @@ goog.provide('anychart.themes.defaultTheme');
       'xAxes': [
         {
           'labels': {
-            /**
-             * @this {*}
-             * @return {*}
-             */
-            'textFormatter': function() {
-              var date = new Date(this['tickValue']);
-              var day = date.getUTCDate();
-              var month = date.getUTCMonth();
-              var year = date.getUTCFullYear();
-              var res = [' ', day, ', ', year].join('');
-              switch (month) {
-                case 0:
-                  return 'Jan' + res;
-                case 1:
-                  return 'Feb' + res;
-                case 2:
-                  return 'Mar' + res;
-                case 3:
-                  return 'Apr' + res;
-                case 4:
-                  return 'May' + res;
-                case 5:
-                  return 'Jun' + res;
-                case 6:
-                  return 'Jul' + res;
-                case 7:
-                  return 'Aug' + res;
-                case 8:
-                  return 'Sep' + res;
-                case 9:
-                  return 'Oct' + res;
-                case 10:
-                  return 'Nov' + res;
-                case 11:
-                  return 'Dec' + res;
-              }
-              return 'Invalid date';
-            }
+            'textFormatter': returnDateTimeTickValue
+          },
+          'minorLabels': {
+            'textFormatter': returnDateTimeTickValue
           }
         }
       ],
@@ -4147,27 +4116,9 @@ goog.provide('anychart.themes.defaultTheme');
              */
             'textFormatter': function() {
               var date = this['tickValue'];
-              switch (this['majorIntervalUnit']) {
-                case 'year':
-                  return window['anychart']['format']['dateTime'](date, 'yyyy');
-                case 'semester':
-                case 'quarter':
-                case 'month':
-                  return window['anychart']['format']['dateTime'](date, 'yyyy MMM');
-                case 'thirdOfMonth':
-                case 'week':
-                case 'day':
-                  return window['anychart']['format']['dateTime'](date, 'MMM dd');
-                case 'hour':
-                  return window['anychart']['format']['dateTime'](date, 'MMM-dd HH');
-                case 'minute':
-                  return window['anychart']['format']['dateTime'](date, 'dd HH:mm');
-                case 'second':
-                  return window['anychart']['format']['dateTime'](date, 'HH:mm:ss');
-                case 'millisecond':
-                  return window['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
-              }
-              return window['anychart']['format']['dateTime'](date, 'yyyy MMM dd');
+              return window['anychart']['format']['dateTime'](date,
+                  window['anychart']['format']['getDateTimeFormat'](
+                      window['anychart']['format']['getIntervalIdentifier'](this['majorIntervalUnit'])));
             }
           },
           'minorLabels': {
@@ -4186,27 +4137,12 @@ goog.provide('anychart.themes.defaultTheme');
              */
             'textFormatter': function() {
               var date = this['tickValue'];
-              switch (this['majorIntervalUnit']) {
-                case 'year':
-                  return window['anychart']['format']['dateTime'](date, 'yyyy');
-                case 'semester':
-                case 'quarter':
-                case 'month':
-                  return window['anychart']['format']['dateTime'](date, 'MMM');
-                case 'thirdOfMonth':
-                case 'week':
-                case 'day':
-                  return window['anychart']['format']['dateTime'](date, 'dd');
-                case 'hour':
-                  return window['anychart']['format']['dateTime'](date, 'HH');
-                case 'minute':
-                  return window['anychart']['format']['dateTime'](date, 'HH:mm');
-                case 'second':
-                  return window['anychart']['format']['dateTime'](date, 'HH:mm:ss');
-                case 'millisecond':
-                  return window['anychart']['format']['dateTime'](date, 'SSS');
-              }
-              return window['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
+              return window['anychart']['format']['dateTime'](date,
+                  window['anychart']['format']['getDateTimeFormat'](
+                      window['anychart']['format']['getIntervalIdentifier'](
+                          this['minorIntervalUnit'],
+                          this['majorIntervalUnit']
+                      )));
             }
           }
         },
@@ -4221,27 +4157,12 @@ goog.provide('anychart.themes.defaultTheme');
            * @return {*}
            */
           'titleFormatter': function() {
-            var date = /** @type {number} */(this['value']);
-            switch (this['dataIntervalUnit']) {
-              case 'year':
-                return window['anychart']['format']['dateTime'](date, 'yyyy');
-              case 'semester':
-              case 'quarter':
-              case 'month':
-                return window['anychart']['format']['dateTime'](date, 'MMM yyyy');
-              case 'thirdofmonth':
-              case 'week':
-              case 'day':
-                return window['anychart']['format']['dateTime'](date, 'dd MMM yyyy');
-              case 'hour':
-              case 'minute':
-                return window['anychart']['format']['dateTime'](date, 'HH:mm, dd MMM');
-              case 'second':
-                return window['anychart']['format']['dateTime'](date, 'HH:mm:ss');
-              case 'millisecond':
-                return window['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
-            }
-            return window['anychart']['format']['dateTime'](date, 'dd MMM yyyy');
+            var date = this['value'];
+            return window['anychart']['format']['dateTime'](date,
+                window['anychart']['format']['getDateTimeFormat'](
+                    window['anychart']['format']['getIntervalIdentifier'](
+                        this['dataIntervalUnit'], null, 'full'
+                    )));
           },
           'align': 'center',
           'padding': {
@@ -4410,27 +4331,9 @@ goog.provide('anychart.themes.defaultTheme');
              */
             'textFormatter': function() {
               var date = this['tickValue'];
-              switch (this['majorIntervalUnit']) {
-                case 'year':
-                  return window['anychart']['format']['dateTime'](date, 'yyyy');
-                case 'semester':
-                case 'quarter':
-                case 'month':
-                  return window['anychart']['format']['dateTime'](date, 'yyyy MMM');
-                case 'thirdOfMonth':
-                case 'week':
-                case 'day':
-                  return window['anychart']['format']['dateTime'](date, 'MMM dd');
-                case 'hour':
-                  return window['anychart']['format']['dateTime'](date, 'MMM-dd HH');
-                case 'minute':
-                  return window['anychart']['format']['dateTime'](date, 'dd HH:mm');
-                case 'second':
-                  return window['anychart']['format']['dateTime'](date, 'HH:mm:ss');
-                case 'millisecond':
-                  return window['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
-              }
-              return window['anychart']['format']['dateTime'](date, 'yyyy MMM dd');
+              return window['anychart']['format']['dateTime'](date,
+                  window['anychart']['format']['getDateTimeFormat'](
+                      window['anychart']['format']['getIntervalIdentifier'](this['majorIntervalUnit'])));
             }
           },
           'minorLabels': {
@@ -4449,27 +4352,12 @@ goog.provide('anychart.themes.defaultTheme');
              */
             'textFormatter': function() {
               var date = this['tickValue'];
-              switch (this['majorIntervalUnit']) {
-                case 'year':
-                  return window['anychart']['format']['dateTime'](date, 'yyyy');
-                case 'semester':
-                case 'quarter':
-                case 'month':
-                  return window['anychart']['format']['dateTime'](date, 'MMM');
-                case 'thirdOfMonth':
-                case 'week':
-                case 'day':
-                  return window['anychart']['format']['dateTime'](date, 'dd');
-                case 'hour':
-                  return window['anychart']['format']['dateTime'](date, 'HH');
-                case 'minute':
-                  return window['anychart']['format']['dateTime'](date, 'HH:mm');
-                case 'second':
-                  return window['anychart']['format']['dateTime'](date, 'HH:mm:ss');
-                case 'millisecond':
-                  return window['anychart']['format']['dateTime'](date, 'SSS');
-              }
-              return window['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
+              return window['anychart']['format']['dateTime'](date,
+                  window['anychart']['format']['getDateTimeFormat'](
+                      window['anychart']['format']['getIntervalIdentifier'](
+                          this['minorIntervalUnit'],
+                          this['majorIntervalUnit']
+                      )));
             }
           },
           'zIndex': 75
@@ -4490,27 +4378,12 @@ goog.provide('anychart.themes.defaultTheme');
          * @return {*}
          */
         'titleFormatter': function() {
-          var date = /** @type {number} */(this['hoveredDate']);
-          switch (this['dataIntervalUnit']) {
-            case 'year':
-              return window['anychart']['format']['dateTime'](date, 'yyyy');
-            case 'semester':
-            case 'quarter':
-            case 'month':
-              return window['anychart']['format']['dateTime'](date, 'MMM yyyy');
-            case 'thirdofmonth':
-            case 'week':
-            case 'day':
-              return window['anychart']['format']['dateTime'](date, 'dd MMM yyyy');
-            case 'hour':
-            case 'minute':
-              return window['anychart']['format']['dateTime'](date, 'HH:mm, dd MMM');
-            case 'second':
-              return window['anychart']['format']['dateTime'](date, 'HH:mm:ss');
-            case 'millisecond':
-              return window['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
-          }
-          return window['anychart']['format']['dateTime'](date, 'dd MMM yyyy');
+          var date = this['hoveredDate'];
+          return window['anychart']['format']['dateTime'](date,
+              window['anychart']['format']['getDateTimeFormat'](
+                  window['anychart']['format']['getIntervalIdentifier'](
+                      this['dataIntervalUnit'], null, 'full'
+                  )));
         },
         /**
          * @this {*}

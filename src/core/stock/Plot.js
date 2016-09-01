@@ -10,6 +10,7 @@ goog.require('anychart.core.series.Stock');
 goog.require('anychart.core.stock.indicators');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.Legend');
+goog.require('anychart.core.utils.GenericContextProvider');
 goog.require('anychart.enums');
 goog.require('anychart.palettes');
 goog.require('anychart.scales.Linear');
@@ -1414,15 +1415,25 @@ anychart.core.stock.Plot.prototype.updateLegend_ = function(opt_seriesBounds, op
     legend.width(opt_seriesBounds.width);
   }
   var formatter;
-  if (!isNaN(opt_titleValue) && goog.isFunction(formatter = legend.titleFormatter())) {
-    var grouping = /** @type {anychart.core.stock.Grouping} */(this.chart_.grouping());
-    var context = {
-      'value': opt_titleValue,
-      'dataIntervalUnit': grouping.getCurrentDataInterval()['unit'],
-      'dataIntervalUnitCount': grouping.getCurrentDataInterval()['count'],
-      'isGrouped': grouping.isGrouped()
-    };
-    legend.title().text(formatter.call(context, context));
+  if (!isNaN(opt_titleValue) && (formatter = legend.titleFormatter())) {
+    if (goog.isString(formatter))
+      formatter = anychart.core.utils.TokenParser.getInstance().getTextFormatter(formatter);
+    if (goog.isFunction(formatter)) {
+      var grouping = /** @type {anychart.core.stock.Grouping} */(this.chart_.grouping());
+      var context = new anychart.core.utils.GenericContextProvider({
+        'value': opt_titleValue,
+        'hoveredDate': opt_titleValue,
+        'dataIntervalUnit': grouping.getCurrentDataInterval()['unit'],
+        'dataIntervalUnitCount': grouping.getCurrentDataInterval()['count'],
+        'isGrouped': grouping.isGrouped()
+      }, {
+        'value': anychart.enums.TokenType.DATE_TIME,
+        'hoveredDate': anychart.enums.TokenType.DATE_TIME,
+        'dataIntervalUnit': anychart.enums.TokenType.STRING,
+        'dataIntervalUnitCount': anychart.enums.TokenType.STRING
+      });
+      legend.title().autoText(formatter.call(context, context));
+    }
   }
   if (!legend.itemsSource())
     legend.itemsSource(this);
@@ -1455,7 +1466,7 @@ anychart.core.stock.Plot.prototype.onLegendSignal_ = function(event) {
 /**
  * Create legend items provider specific to chart type.
  * @param {string} sourceMode Items source mode (default|categories).
- * @param {?Function} itemsTextFormatter Legend items text formatter.
+ * @param {?(Function|string)} itemsTextFormatter Legend items text formatter.
  * @return {!Array.<anychart.core.ui.Legend.LegendItemProvider>} Legend items provider.
  */
 anychart.core.stock.Plot.prototype.createLegendItemsProvider = function(sourceMode, itemsTextFormatter) {

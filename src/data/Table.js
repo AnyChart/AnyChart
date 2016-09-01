@@ -8,6 +8,7 @@ goog.require('anychart.data.TableMainStorage');
 goog.require('anychart.data.TableMapping');
 goog.require('anychart.data.aggregators');
 goog.require('anychart.enums');
+goog.require('anychart.format');
 goog.require('goog.array');
 
 
@@ -15,10 +16,14 @@ goog.require('goog.array');
 /**
  * Stock data table constructor.
  * @param {(number|string)=} opt_keyColumn The number of the data column that contains the indexing field.
+ * @param {string=} opt_dateTimePattern Key column parsing pattern.
+ * @param {number=} opt_timeOffset Shifts all input dates timeOffset hours forward. Defaults to zero.
+ * @param {(number|Date)=} opt_baseDate Base date for the key column.
+ * @param {(string|anychart.format.Locale)=} opt_locale
  * @constructor
  * @extends {anychart.core.Base}
  */
-anychart.data.Table = function(opt_keyColumn) {
+anychart.data.Table = function(opt_keyColumn, opt_dateTimePattern, opt_timeOffset, opt_baseDate, opt_locale) {
   goog.base(this);
 
   /**
@@ -26,7 +31,8 @@ anychart.data.Table = function(opt_keyColumn) {
    * @type {!anychart.data.TableMainStorage}
    * @private
    */
-  this.storage_ = new anychart.data.TableMainStorage(this, opt_keyColumn);
+  this.storage_ = new anychart.data.TableMainStorage(this, opt_keyColumn, opt_dateTimePattern,
+      opt_timeOffset, opt_baseDate, opt_locale);
 
   /**
    * Storage aggregates cache. Each cache may need to be updated before use. See Table.AggregateDescriptor description
@@ -406,10 +412,14 @@ anychart.data.Table.prototype.disposeInternal = function() {
 /**
  * Data table constructor function. Key column index defaults to zero column.
  * @param {number=} opt_keyColumnIndex Index of the column in which table index is located.
+ * @param {string=} opt_dateTimePattern Key column parsing pattern.
+ * @param {number=} opt_timeOffset Shifts all input dates timeOffset hours forward. Defaults to zero.
+ * @param {(number|Date)=} opt_baseDate Base date for the key column.
+ * @param {(string|anychart.format.Locale)=} opt_locale
  * @return {!anychart.data.Table}
  */
-anychart.data.table = function(opt_keyColumnIndex) {
-  return new anychart.data.Table(opt_keyColumnIndex);
+anychart.data.table = function(opt_keyColumnIndex, opt_dateTimePattern, opt_timeOffset, opt_baseDate, opt_locale) {
+  return new anychart.data.Table(opt_keyColumnIndex, opt_dateTimePattern, opt_timeOffset, opt_baseDate, opt_locale);
 };
 
 

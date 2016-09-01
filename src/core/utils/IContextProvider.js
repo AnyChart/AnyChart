@@ -18,10 +18,10 @@ anychart.core.utils.IContextProvider.prototype.applyReferenceValues = function()
 
 /**
  * Fetch statistics value by key.
- * @param {string=} opt_key Key.
+ * @param {string} key Key.
  * @return {*}
  */
-anychart.core.utils.IContextProvider.prototype.getStat = function(opt_key) {};
+anychart.core.utils.IContextProvider.prototype.getStat = function(key) {};
 
 
 /**

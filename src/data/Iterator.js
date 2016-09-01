@@ -131,7 +131,8 @@ anychart.data.Iterator.prototype.reset = function() {
  */
 anychart.data.Iterator.prototype.advance = function() {
   this.currentRow = this.view.row(++this.currentIndex);
-  return this.currentIndex < this.getRowsCount();
+  var rc = this.getRowsCount();
+  return !!rc && this.currentIndex < rc;
 };
 
 

@@ -144,9 +144,13 @@ anychart.core.utils.TokenParser.parse = function(format) {
       case anychart.enums.TokenType.STRING:
         return String(value);
       case anychart.enums.TokenType.DATE_TIME:
+        params = params || {};
         return anychart.format.dateTime(value, params['dateTimeFormat'], params['timeZone']);
       case anychart.enums.TokenType.NUMBER:
-        return anychart.format.number(value, params);
+        params = params || {};
+        return anychart.format.number(value, params['decimalsCount'], params['decimalPoint'],
+            params['groupsSeparator'], params['scale'], params['zeroFillDecimals'], params['scaleSuffixSeparator'],
+            params['useBracketsForNegative']);
       case anychart.enums.TokenType.PERCENT:
         return anychart.utils.normalizeToPercent(anychart.math.round(value * 100, 2));
     }

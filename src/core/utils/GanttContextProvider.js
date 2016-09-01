@@ -78,7 +78,7 @@ anychart.core.utils.GanttContextProvider.prototype.getDataValue = function(key) 
 
 
 /** @inheritDoc */
-anychart.core.utils.GanttContextProvider.prototype.getStat = function(opt_key) {
+anychart.core.utils.GanttContextProvider.prototype.getStat = function(key) {
   return void 0; //TODO (A.Kudryavtsev): TBA on gantt statistics implementation.
 };
 

@@ -62,7 +62,7 @@ anychart.core.Text.prototype.SUPPORTED_CONSISTENCY_STATES =
 /**
  * Getter/setter for textSettings.
  * @param {(Object|string)=} opt_objectOrName Settings object or settings name or nothing to get complete object.
- * @param {(string|number|boolean)=} opt_value Setting value if used as a setter.
+ * @param {(string|number|boolean|Function)=} opt_value Setting value if used as a setter.
  * @return {!(anychart.core.Text|Object|string|number|boolean)} A copy of settings or the Text for chaining.
  */
 anychart.core.Text.prototype.textSettings = function(opt_objectOrName, opt_value) {

@@ -37,7 +37,7 @@ anychart.core.utils.DrawingPlanIterator.prototype.advance = function() {
   this.currentIndex++;
   this.currentPoint_ = this.data_[this.currentIndex];
   this.currentRow = undefined;
-  return this.currentIndex < this.data_.length;
+  return !!this.data_.length && this.currentIndex < this.data_.length;
 };
 
 

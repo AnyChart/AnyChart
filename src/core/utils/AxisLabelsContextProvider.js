@@ -25,15 +25,7 @@ anychart.core.utils.AxisLabelsContextProvider = function(axis, index, value) {
     labelText = scale.ticks().names()[index];
     labelValue = value;
   } else if (scale instanceof anychart.scales.DateTime) {
-    var date = new Date(value);
-    var mm = date.getMonth() + 1;
-    var dd = date.getDate();
-    var yy = date.getFullYear();
-
-    mm = mm < 10 ? '0' + mm : '' + mm;
-    dd = dd < 10 ? '0' + dd : '' + dd;
-
-    labelText = mm + '-' + dd + '-' + yy;
+    labelText = anychart.format.date(/** @type {number} */(value));
     labelValue = value;
   }
   this['index'] = index;

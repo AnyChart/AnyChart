@@ -1260,7 +1260,13 @@ anychart.charts.Stock.prototype.highlightAtRatio_ = function(ratio, clientX, cli
         }
       }
     }
-    tooltip.show(points, clientX, clientY, null, false, {'hoveredDate': value});
+    var grouping = /** @type {anychart.core.stock.Grouping} */(this.grouping());
+    tooltip.show(points, clientX, clientY, null, false, {
+      'hoveredDate': value,
+      'dataIntervalUnit': grouping.getCurrentDataInterval()['unit'],
+      'dataIntervalUnitCount': grouping.getCurrentDataInterval()['count'],
+      'isGrouped': grouping.isGrouped()
+    });
   }
   //}
 };

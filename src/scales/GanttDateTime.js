@@ -166,79 +166,40 @@ anychart.scales.GanttDateTime.RANGES = [
 
 /**
  * Top intervals.
- * @type {Array.<goog.date.Interval>}
+ * @type {Array.<{unit: anychart.enums.Interval, count: number}>}
  */
 anychart.scales.GanttDateTime.TOP_INTERVALS = [
-  new goog.date.Interval(goog.date.Interval.DAYS, 1),    //0
-  new goog.date.Interval(goog.date.Interval.DAYS, 7),    //1
-  new goog.date.Interval(goog.date.Interval.MONTHS, 1),  //2
-  new goog.date.Interval(goog.date.Interval.YEARS, 1),   //3
-  new goog.date.Interval(goog.date.Interval.YEARS, 10)   //4
+  {unit: anychart.enums.Interval.DAY, count: 1},    //0
+  {unit: anychart.enums.Interval.DAY, count: 7},    //1
+  {unit: anychart.enums.Interval.MONTH, count: 1},  //2
+  {unit: anychart.enums.Interval.YEAR, count: 1},   //3
+  {unit: anychart.enums.Interval.YEAR, count: 10}   //4
 ];
 
 
 /**
  * Middle intervals.
- * @type {Array.<goog.date.Interval>}
+ * @type {Array.<{unit: anychart.enums.Interval, count: number}>}
  */
 anychart.scales.GanttDateTime.MID_INTERVALS = [
-  new goog.date.Interval(goog.date.Interval.HOURS, 1),  //0
-  new goog.date.Interval(goog.date.Interval.DAYS, 1),   //1
-  new goog.date.Interval(goog.date.Interval.DAYS, 7),   //2
-  new goog.date.Interval(goog.date.Interval.MONTHS, 3), //3
-  new goog.date.Interval(goog.date.Interval.YEARS, 1)   //4
+  {unit: anychart.enums.Interval.HOUR, count: 1},  //0
+  {unit: anychart.enums.Interval.DAY, count: 1},   //1
+  {unit: anychart.enums.Interval.DAY, count: 7},   //2
+  {unit: anychart.enums.Interval.MONTH, count: 3}, //3
+  {unit: anychart.enums.Interval.YEAR, count: 1}   //4
 ];
 
 
 /**
  * Low intervals.
- * @type {Array.<goog.date.Interval>}
+ * @type {Array.<{unit: anychart.enums.Interval, count: number}>}
  */
 anychart.scales.GanttDateTime.LOW_INTERVALS = [
-  new goog.date.Interval(goog.date.Interval.MINUTES, 10), //0
-  new goog.date.Interval(goog.date.Interval.HOURS, 2),    //1
-  new goog.date.Interval(goog.date.Interval.DAYS, 1),     //2
-  new goog.date.Interval(goog.date.Interval.DAYS, 14),    //3
-  new goog.date.Interval(goog.date.Interval.MONTHS, 3)    //4
-];
-
-
-/**
- * Array of top level text formatters.
- * @type {Array.<function(number):string>}
- */
-anychart.scales.GanttDateTime.TOP_TEXT_FORMATTERS = [
-  anychart.scales.GanttDateTime.createTextFormatter_('EE, MM/dd/yyyy'), //'Tue, 06/13/2001'
-  anychart.scales.GanttDateTime.createTextFormatter_('MM/dd/yyyy', '%s - %s'), //'Week 06/31/2014 - 07/-6/2014'
-  anychart.scales.GanttDateTime.createTextFormatter_('MMMM, yyyy'), //'January, 2014'
-  anychart.scales.GanttDateTime.createTextFormatter_('yyyy'), //'2014'
-  anychart.scales.GanttDateTime.createTextFormatter_('yyyy', '%s - %s') //'2014 - 2024'
-];
-
-
-/**
- * Array of mid level text formatters.
- * @type {Array.<function(number):string>}
- */
-anychart.scales.GanttDateTime.MID_TEXT_FORMATTERS = [
-  anychart.scales.GanttDateTime.createTextFormatter_('KKa'), //'10AM'
-  anychart.scales.GanttDateTime.createTextFormatter_('EEEE, MM/dd'), //'Monday, 01/31'
-  anychart.scales.GanttDateTime.createTextFormatter_('MM/dd/yy', '%s - %s'), //'Week 06/31/2014 - 07/-6/2014'
-  anychart.scales.GanttDateTime.createTextFormatter_('QQQQ'), //'1st quarter'
-  anychart.scales.GanttDateTime.createTextFormatter_('yyyy') //'2014'
-];
-
-
-/**
- * Array of low level text formatters.
- * @type {Array.<function(number):string>}
- */
-anychart.scales.GanttDateTime.LOW_TEXT_FORMATTERS = [
-  anychart.scales.GanttDateTime.createTextFormatter_('mm'), //'15' - minutes
-  anychart.scales.GanttDateTime.createTextFormatter_('KKa'), //'07PM'
-  anychart.scales.GanttDateTime.createTextFormatter_('EE, d'), //'Mon, 2'
-  anychart.scales.GanttDateTime.createTextFormatter_('d MMM'), //'3 Jan'
-  anychart.scales.GanttDateTime.createTextFormatter_('Q') //'Q1'
+  {unit: anychart.enums.Interval.MINUTE, count: 10}, //0
+  {unit: anychart.enums.Interval.HOUR, count: 2},    //1
+  {unit: anychart.enums.Interval.DAY, count: 1},     //2
+  {unit: anychart.enums.Interval.DAY, count: 14},    //3
+  {unit: anychart.enums.Interval.MONTH, count: 3}    //4
 ];
 
 
@@ -557,42 +518,22 @@ anychart.scales.GanttDateTime.prototype.ratioToTimestamp = function(value) {
 
 
 /**
- * Aligns passed timestamp to the left according to the passed interval.
- * @param {number} date - Date to align.
- * @param {goog.date.Interval} interval - Interval to align by.
- * @param {number} flagDateValue - Flag date to align within years scope.
- * @return {number} - Aligned timestamp.
+ * Makes level data.
+ * @param {{unit: anychart.enums.Interval, count: number}} level
+ * @param {{unit: anychart.enums.Interval, count: number}=} opt_parentLevel
+ * @return {Object}
  * @private
  */
-anychart.scales.GanttDateTime.prototype.alignDateLeft_ = function(date, interval, flagDateValue) {
-  var dateObj = new Date(date);
-
-  var years = dateObj.getUTCFullYear();
-  var months = dateObj.getUTCMonth();
-  var days = dateObj.getUTCDate();
-  var hours = dateObj.getUTCHours();
-  var minutes = dateObj.getUTCMinutes();
-
-  if (interval.years) {
-    var flagDate = new Date(flagDateValue);
-    var flagYear = flagDate.getUTCFullYear();
-    years = anychart.utils.alignLeft(years, interval.years, flagYear);
-    return Date.UTC(years, 0);
-  } else if (interval.months) {
-    months = anychart.utils.alignLeft(months, interval.months);
-    return Date.UTC(years, months);
-  } else if (interval.days) {
-    days = anychart.utils.alignLeft(days, interval.days);
-    return Date.UTC(years, months, days);
-  } else if (interval.hours) {
-    hours = anychart.utils.alignLeft(hours, interval.hours);
-    return Date.UTC(years, months, days, hours);
-  } else if (interval.minutes) {
-    minutes = anychart.utils.alignLeft(minutes, interval.minutes);
-    return Date.UTC(years, months, days, hours, minutes);
-  } else {
-    return date;
-  }
+anychart.scales.GanttDateTime.prototype.makeLevelData_ = function(level, opt_parentLevel) {
+  var interval = anychart.utils.getIntervalFromInfo(level.unit, level.count);
+  return {
+    'anchor': anychart.utils.alignDateLeft(this.min_, interval, 0),
+    'interval': interval,
+    'formatter': anychart.scales.GanttDateTime.createTextFormatter_(
+        anychart.format.getDateTimeFormat(
+            anychart.format.getIntervalIdentifier(level.unit, opt_parentLevel && opt_parentLevel.unit),
+            0))
+  };
 };
 
 
@@ -617,23 +558,14 @@ anychart.scales.GanttDateTime.prototype.getLevelsData = function() {
   if (index < 0) index = ranges.length - 1;
 
   return [
-    {
-      'anchor': this.alignDateLeft_(this.min_, anychart.scales.GanttDateTime.TOP_INTERVALS[index], 0),
-      'interval': anychart.scales.GanttDateTime.TOP_INTERVALS[index],
-      'formatter': anychart.scales.GanttDateTime.TOP_TEXT_FORMATTERS[index]
-    },
-
-    {
-      'anchor': this.alignDateLeft_(this.min_, anychart.scales.GanttDateTime.MID_INTERVALS[index], 0),
-      'interval': anychart.scales.GanttDateTime.MID_INTERVALS[index],
-      'formatter': anychart.scales.GanttDateTime.MID_TEXT_FORMATTERS[index]
-    },
-
-    {
-      'anchor': this.alignDateLeft_(this.min_, anychart.scales.GanttDateTime.LOW_INTERVALS[index], 0),
-      'interval': anychart.scales.GanttDateTime.LOW_INTERVALS[index],
-      'formatter': anychart.scales.GanttDateTime.LOW_TEXT_FORMATTERS[index]
-    }
+    this.makeLevelData_(
+        anychart.scales.GanttDateTime.TOP_INTERVALS[index]),
+    this.makeLevelData_(
+        anychart.scales.GanttDateTime.MID_INTERVALS[index],
+        anychart.scales.GanttDateTime.TOP_INTERVALS[index]),
+    this.makeLevelData_(
+        anychart.scales.GanttDateTime.LOW_INTERVALS[index],
+        anychart.scales.GanttDateTime.MID_INTERVALS[index])
   ];
 
 };

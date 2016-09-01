@@ -2689,7 +2689,12 @@ anychart.core.ChartWithSeries.prototype.getSeriesStatus = function(event) {
       series = this.seriesList[i];
       if (series && series.enabled()) {
         value = series.xScale().inverseTransform(ratio);
-        index = this.categorizeData ? [series.findX(value)] : series.data().findInUnsortedDataByX(anychart.utils.toNumber(value));
+        if (this.categorizeData) {
+          var tmp = series.findX(value);
+          index = tmp >= 0 ? [tmp] : [];
+        } else {
+          index = series.data().findInUnsortedDataByX(anychart.utils.toNumber(value));
+        }
         iterator = series.getIterator();
         minLength = Infinity;
         if (index.length) {

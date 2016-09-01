@@ -6,6 +6,7 @@ goog.require('anychart.core.reporting');
 goog.require('anychart.data.TableRow');
 goog.require('anychart.data.csv.Parser');
 goog.require('anychart.data.csv.TableItemsProcessor');
+goog.require('anychart.format');
 goog.require('goog.array');
 
 
@@ -821,10 +822,14 @@ anychart.data.TableAggregatedStorage.prototype.createAggregate_ = function(table
  * Main table storage class.
  * @param {!anychart.data.Table} table Table reference.
  * @param {(number|string)=} opt_keyColumn Key column index.
+ * @param {?string=} opt_dateTimePattern Key column parsing pattern. Null means default behaviour, undefined - default pattern.
+ * @param {number=} opt_timeOffset Shifts all input dates timeOffset hours forward. Defaults to zero.
+ * @param {?(number|Date)=} opt_baseDate Base date for the key column.
+ * @param {?(string|anychart.format.Locale)=} opt_locale Locale for the key column parsing.
  * @constructor
  * @extends {anychart.data.TableStorage}
  */
-anychart.data.TableMainStorage = function(table, opt_keyColumn) {
+anychart.data.TableMainStorage = function(table, opt_keyColumn, opt_dateTimePattern, opt_timeOffset, opt_baseDate, opt_locale) {
   goog.base(this, table);
 
   /**
@@ -872,6 +877,36 @@ anychart.data.TableMainStorage = function(table, opt_keyColumn) {
   this.keyColumn_ = goog.isString(opt_keyColumn) ?
       opt_keyColumn :
       anychart.utils.normalizeToNaturalNumber(opt_keyColumn, 0, true);
+
+  /**
+   * Key column parsing pattern.
+   * @type {string|null|undefined}
+   * @private
+   */
+  this.dtPattern_ = opt_dateTimePattern;
+
+  /**
+   * Offset for all parsed dates.
+   * @type {number}
+   * @private
+   */
+  this.timeOffset_ = anychart.utils.toNumber(opt_timeOffset) || 0;
+
+  /**
+   * Base date for the key column.
+   * @type {number}
+   * @private
+   */
+  this.baseDate_ = goog.isDateLike(opt_baseDate) ?
+      opt_baseDate.getTime() :
+      anychart.utils.toNumber(opt_baseDate);
+
+  /**
+   * Key column parsing locale.
+   * @type {?(string|anychart.format.Locale)}
+   * @private
+   */
+  this.locale_ = opt_locale || null;
 
   /**
    * Known source columns number. Used to determine how much columns we know about.
@@ -1093,7 +1128,7 @@ anychart.data.TableMainStorage.prototype.getKnownFields = function() {
  * @return {boolean}
  */
 anychart.data.TableMainStorage.prototype.addInternal = function(row) {
-  var tmp, key;
+  var tmp;
   if (goog.isArray(row)) {
     row = goog.array.slice(row, 0);
   } else if (goog.isObject(row)) {
@@ -1105,9 +1140,17 @@ anychart.data.TableMainStorage.prototype.addInternal = function(row) {
   } else {
     row = null;
   }
-  var res = !!(row && !isNaN(key = anychart.utils.normalizeTimestamp(row[this.keyColumn_])));
-  if (res)
-    this.pusher_(new anychart.data.TableRow(/** @type {number} */(key), /** @type {!(Object|Array)} */(row)));
+  var key = anychart.format.parseDateTime(
+      row[this.keyColumn_],
+      this.dtPattern_,
+      isNaN(this.baseDate_) ? null : new Date(this.baseDate_),
+      this.locale_);
+  var res = !!(row && key);
+  if (res) {
+    if (this.timeOffset_)
+      key.setTime(key.getTime() + this.timeOffset_ * 60 * 60 * 1000);
+    this.pusher_(new anychart.data.TableRow(key.getTime(), /** @type {!(Object|Array)} */(row)));
+  }
   return res;
 };
 

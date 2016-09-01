@@ -39,7 +39,7 @@ anychart.core.utils.TreeMapPointContextProvider.prototype.applyReferenceValues =
 
 
 /** @inheritDoc */
-anychart.core.utils.TreeMapPointContextProvider.prototype.getStat = function(opt_key) {
+anychart.core.utils.TreeMapPointContextProvider.prototype.getStat = function(key) {
   return void 0;
   //return /** @type {{statistics:Function, getIterator:Function}} */(this['chart']).statistics(opt_key);
 };

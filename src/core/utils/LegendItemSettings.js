@@ -269,10 +269,20 @@ anychart.core.utils.LegendItemSettings.prototype.iconSize = function(opt_value) 
 /**
  * Getter/setter for legend item text.
  * @param {string=} opt_value Legend item text.
- * @return {(string|anychart.core.utils.LegendItemSettings)} Legend item text or self for method chaining.
+ * @return {(string|Function|anychart.core.utils.LegendItemSettings)} Legend item text or self for method chaining.
  */
 anychart.core.utils.LegendItemSettings.prototype.text = function(opt_value) {
   return /** @type {!anychart.core.utils.LegendItemSettings|string} */(this.textSettings('text', opt_value));
+};
+
+
+/**
+ * Getter/setter for legend item textFormatter.
+ * @param {(string|Function)=} opt_value Legend item text.
+ * @return {(string|Function|anychart.core.utils.LegendItemSettings)} Legend item text formatter or self for method chaining.
+ */
+anychart.core.utils.LegendItemSettings.prototype.textFormatter = function(opt_value) {
+  return /** @type {!anychart.core.utils.LegendItemSettings|string|Function} */(this.textSettings('text', opt_value));
 };
 
 
@@ -334,7 +344,7 @@ anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
   if (goog.isDef(this.iconTextSpacing()))
     json['iconTextSpacing'] = this.iconTextSpacing();
-  if (goog.isDefAndNotNull(this.text()))
+  if (goog.isString(this.text()))
     json['text'] = this.text();
   if (goog.isDef(this.iconEnabled()))
     json['iconEnabled'] = this.iconEnabled();
@@ -348,7 +358,7 @@ anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
   //      ['LegendItemSetting iconType']
   //  );
   //} else {
-  if (goog.isDef(this.iconType()))
+  if (goog.isString(this.iconType()))
     json['iconType'] = this.iconType();
   //}
 
@@ -359,7 +369,7 @@ anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
   //      ['LegendItemSetting iconMarkerType']
   //  );
   //} else {
-  if (goog.isDef(this.iconMarkerType()))
+  if (goog.isString(this.iconMarkerType()))
     json['iconMarkerType'] = this.iconMarkerType();
   //}
 
@@ -373,7 +383,7 @@ anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
   //      ['LegendItemSetting iconFill']
   //  );
   //} else {
-  if (goog.isDef(this.iconFill()))
+  if (goog.isDef(this.iconFill()) && !goog.isFunction(this.iconFill()))
     json['iconFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.iconFill()));
   //}
 
@@ -384,7 +394,7 @@ anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
   //      ['LegendItemSetting iconStroke']
   //  );
   //} else {
-  if (goog.isDef(this.iconStroke()))
+  if (goog.isDef(this.iconStroke()) && !goog.isFunction(this.iconStroke()))
     json['iconStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.iconStroke()));
   //}
 
@@ -395,13 +405,13 @@ anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
   //      ['LegendItemSetting iconHatchFill']
   //  );
   //} else {
-  if (goog.isDef(this.iconHatchFill()))
+  if (goog.isDef(this.iconHatchFill()) && !goog.isFunction(this.iconHatchFill()))
     json['iconHatchFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.iconHatchFill()));
   //}
 
-  if (goog.isDef(this.iconMarkerFill()))
+  if (goog.isDef(this.iconMarkerFill()) && !goog.isFunction(this.iconMarkerFill()))
     json['iconMarkerFill'] = this.iconMarkerFill();
-  if (goog.isDef(this.iconMarkerStroke()))
+  if (goog.isDef(this.iconMarkerStroke()) && !goog.isFunction(this.iconMarkerStroke()))
     json['iconMarkerStroke'] = this.iconMarkerStroke();
 
   return json;
@@ -439,4 +449,5 @@ anychart.core.utils.LegendItemSettings.prototype['iconMarkerFill'] = anychart.co
 anychart.core.utils.LegendItemSettings.prototype['iconMarkerStroke'] = anychart.core.utils.LegendItemSettings.prototype.iconMarkerStroke;
 anychart.core.utils.LegendItemSettings.prototype['iconSize'] = anychart.core.utils.LegendItemSettings.prototype.iconSize;
 anychart.core.utils.LegendItemSettings.prototype['text'] = anychart.core.utils.LegendItemSettings.prototype.text;
+anychart.core.utils.LegendItemSettings.prototype['textFormatter'] = anychart.core.utils.LegendItemSettings.prototype.textFormatter;
 anychart.core.utils.LegendItemSettings.prototype['disabled'] = anychart.core.utils.LegendItemSettings.prototype.disabled;

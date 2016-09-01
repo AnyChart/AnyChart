@@ -35,7 +35,7 @@ goog.inherits(anychart.scales.DateTime, anychart.scales.ScatterBase);
 
 /** @inheritDoc */
 anychart.scales.DateTime.prototype.isMissing = function(value) {
-  return isNaN(anychart.utils.normalizeTimestamp(value));
+  return !anychart.format.parseDateTime(value);
 };
 
 
@@ -88,7 +88,7 @@ anychart.scales.DateTime.prototype.minorTicks = function(opt_value) {
 /** @inheritDoc */
 anychart.scales.DateTime.prototype.extendDataRange = function(var_args) {
   for (var i = 0; i < arguments.length; i++) {
-    goog.base(this, 'extendDataRange', anychart.utils.normalizeTimestamp(arguments[i]));
+    goog.base(this, 'extendDataRange', anychart.format.parseDateTime(arguments[i]));
   }
   return this;
 };
@@ -96,7 +96,7 @@ anychart.scales.DateTime.prototype.extendDataRange = function(var_args) {
 
 /** @inheritDoc */
 anychart.scales.DateTime.prototype.transform = function(value, opt_subRangeRatio) {
-  return goog.base(this, 'transform', anychart.utils.normalizeTimestamp(value), opt_subRangeRatio);
+  return goog.base(this, 'transform', anychart.format.parseDateTime(value), opt_subRangeRatio);
 };
 
 
