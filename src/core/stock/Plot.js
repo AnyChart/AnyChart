@@ -677,6 +677,21 @@ anychart.core.stock.Plot.prototype.sma = function(mapping, opt_period, opt_serie
 
 
 /**
+ * Creates Aroon indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {anychart.enums.StockSeriesType=} opt_upSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_downSeriesType
+ * @return {anychart.core.stock.indicators.Aroon}
+ */
+anychart.core.stock.Plot.prototype.aroon = function(mapping, opt_period, opt_upSeriesType, opt_downSeriesType) {
+  var result = new anychart.core.stock.indicators.Aroon(this, mapping, opt_period, opt_upSeriesType, opt_downSeriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
  * Getter/setter for series default settings.
  * @param {Object=} opt_value Object with default series settings.
  * @return {Object}
@@ -2375,6 +2390,7 @@ anychart.core.stock.Plot.prototype['macd'] = anychart.core.stock.Plot.prototype.
 anychart.core.stock.Plot.prototype['roc'] = anychart.core.stock.Plot.prototype.roc;
 anychart.core.stock.Plot.prototype['rsi'] = anychart.core.stock.Plot.prototype.rsi;
 anychart.core.stock.Plot.prototype['sma'] = anychart.core.stock.Plot.prototype.sma;
+anychart.core.stock.Plot.prototype['aroon'] = anychart.core.stock.Plot.prototype.aroon;
 anychart.core.stock.Plot.prototype['palette'] = anychart.core.stock.Plot.prototype.palette;
 // anychart.core.stock.Plot.prototype['markerPalette'] = anychart.core.stock.Plot.prototype.markerPalette;
 anychart.core.stock.Plot.prototype['hatchFillPalette'] = anychart.core.stock.Plot.prototype.hatchFillPalette;

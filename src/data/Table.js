@@ -222,6 +222,9 @@ anychart.data.Table.prototype.createComputer = function(opt_mappingSettingsOrMap
 anychart.data.Table.prototype.deregisterComputer = function(computer) {
   var index = computer.getIndex();
   this.computers_.splice(index, 1);
+  var i;
+  for (i = index; i < this.computers_.length; i++)
+    this.computers_[i].setIndex(i);
   this.computerRightMostFields_.splice(index, 1);
   var fields = computer.getOutputFields();
   if (fields.length) {
@@ -229,7 +232,7 @@ anychart.data.Table.prototype.deregisterComputer = function(computer) {
     // todo(Anton Saukh): maybe do something here to avoid quadratic performance
     var itemsToRemove = [];
     var minField = Number.POSITIVE_INFINITY;
-    for (var i = 0; i < fields.length; i++) {
+    for (i = 0; i < fields.length; i++) {
       var field = ~fields[i];
       minField = Math.min(minField, field);
       this.reusableComputedColumns_.push(field);

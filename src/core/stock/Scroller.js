@@ -824,6 +824,21 @@ anychart.core.stock.Scroller.prototype.sma = function(mapping, opt_period, opt_s
 
 
 /**
+ * Creates Aroon indicator on the scroller.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {anychart.enums.StockSeriesType=} opt_upSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_downSeriesType
+ * @return {anychart.core.stock.indicators.Aroon}
+ */
+anychart.core.stock.Scroller.prototype.aroon = function(mapping, opt_period, opt_upSeriesType, opt_downSeriesType) {
+  var result = new anychart.core.stock.indicators.Aroon(this, mapping, opt_period, opt_upSeriesType, opt_downSeriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
  * Getter/setter for series default settings.
  * @param {Object=} opt_value Object with default series settings.
  * @return {Object}
@@ -1359,3 +1374,4 @@ anychart.core.stock.Scroller.prototype['macd'] = anychart.core.stock.Scroller.pr
 anychart.core.stock.Scroller.prototype['roc'] = anychart.core.stock.Scroller.prototype.roc;
 anychart.core.stock.Scroller.prototype['rsi'] = anychart.core.stock.Scroller.prototype.rsi;
 anychart.core.stock.Scroller.prototype['sma'] = anychart.core.stock.Scroller.prototype.sma;
+anychart.core.stock.Scroller.prototype['aroon'] = anychart.core.stock.Scroller.prototype.aroon;

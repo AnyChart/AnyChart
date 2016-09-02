@@ -3,6 +3,7 @@
  * @suppress {extraRequire}
  */
 goog.provide('anychart.core.stock.indicators');
+goog.require('anychart.core.stock.indicators.Aroon');
 goog.require('anychart.core.stock.indicators.EMA');
 goog.require('anychart.core.stock.indicators.MACD');
 goog.require('anychart.core.stock.indicators.RSI');

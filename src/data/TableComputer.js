@@ -73,6 +73,15 @@ anychart.data.TableComputer.prototype.getIndex = function() {
 
 
 /**
+ * Sets computer index. Internal method.
+ * @param {number} index Index.
+ */
+anychart.data.TableComputer.prototype.setIndex = function(index) {
+  this.index_ = index;
+};
+
+
+/**
  * Returns table.
  * @return {!anychart.data.Table}
  */
