@@ -619,7 +619,7 @@ anychart.format.parseDateTime = function(value, opt_format, opt_baseDate, opt_lo
       var parserCacheKey = format + localeHash;
       /** @type {goog.i18n.DateTimeParse} */
       var parser;
-      if (!(parserCacheKey in anychart.format.formatDateTimeCache_)) {
+      if (!(parserCacheKey in anychart.format.parseDateTimeCache_)) {
         var symbols = anychart.format.localeToDateTimeSymbols_(locale);
         anychart.format.parseDateTimeCache_[parserCacheKey] = new goog.i18n.DateTimeParse(format, symbols);
       }
