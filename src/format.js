@@ -86,7 +86,7 @@ anychart.format.Locale;
 //------------------------------------------------------------------------------
 goog.exportSymbol('anychart.format.locales.default.dateTimeLocale', {
   'eras': ['BC', 'AD'],
-  'erasNames': ['Before Christ', 'Anno Domini'],
+  'eraNames': ['Before Christ', 'Anno Domini'],
   'narrowMonths': ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'],
   'standaloneNarrowMonths': ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'],
   'months': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
@@ -104,7 +104,7 @@ goog.exportSymbol('anychart.format.locales.default.dateTimeLocale', {
   'ampms': ['AM', 'PM'],
   'firstDayOfWeek': 0,
   'weekendRange': [5, 6],
-  'firstWeekCutOfDay': 3,
+  'firstWeekCutOffDay': 3,
   'dateFormat': 'y MMM d',
   'timeFormat': 'HH:mm:ss',
   'dateTimeFormat': 'y MMM d \'at\' HH:mm:ss',
@@ -396,7 +396,7 @@ anychart.format.localeToDateTimeSymbols_ = function(locale) {
   if (!(uid in anychart.format.dateTimeSymbolsCache_)) {
     anychart.format.dateTimeSymbolsCache_[uid] = {
       ERAS: locale['eras'],
-      ERANAMES: locale['erasNames'],
+      ERANAMES: locale['eraNames'],
       NARROWMONTHS: locale['narrowMonths'],
       STANDALONENARROWMONTHS: locale['standaloneNarrowMonths'],
       MONTHS: locale['months'],
@@ -411,13 +411,13 @@ anychart.format.localeToDateTimeSymbols_ = function(locale) {
       STANDALONENARROWWEEKDAYS: locale['standaloneNarrowWeekdays'],
       SHORTQUARTERS: locale['shortQuarters'],
       QUARTERS: locale['quarters'],
-      AMPMS: locale['ampms'],
-      DATEFORMATS: locale['dateFormats'],
-      TIMEFORMATS: locale['timeFormats'],
-      DATETIMEFORMATS: locale['dateTimeFormats'],
+      AMPMS: locale['ampms'] || locale['amPmS'],
+      DATEFORMATS: locale['dateFormats'] || [],
+      TIMEFORMATS: locale['timeFormats'] || [],
+      DATETIMEFORMATS: locale['dateTimeFormats'] || [],
       FIRSTDAYOFWEEK: locale['firstDayOfWeek'],
       WEEKENDRANGE: locale['weekendRange'],
-      FIRSTWEEKCUTOFFDAY: locale['firstWeekCutOfDay']
+      FIRSTWEEKCUTOFFDAY: locale['firstWeekCutOffDay'] || locale['firstWeekCutOfDay']
     };
   }
   return anychart.format.dateTimeSymbolsCache_[uid];
