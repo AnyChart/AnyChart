@@ -2357,7 +2357,9 @@ anychart.charts.Map.prototype.applyLabelsOverlapState = function() {
       label.state = true;
 
       iterator.select(label.index);
-      var prop = iterator.meta('regionProperties');
+      var point = iterator.meta('currentPointElement');
+      var prop;
+      if (point) prop = point['properties'];
 
       var dataOverlapForbidden = iterator.get('overlapMode');
       var pointOverlapForbidden = goog.isDefAndNotNull(dataOverlapForbidden) ?
