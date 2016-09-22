@@ -26,7 +26,7 @@ MODULES_PATH = os.path.join(SRC_PATH, 'modules')
 THEMES_PATH = os.path.join(SRC_PATH, 'themes')
 
 #graphics
-GRAPHICS_PATH = os.path.join(CONTRIB_PATH, 'graphics')
+GRAPHICS_PATH = os.path.join(CONTRIB_PATH, 'graphicsjs')
 GRAPHICS_SRC_PATH = os.path.join(CONTRIB_PATH, GRAPHICS_PATH, 'src')
 
 #closure tools

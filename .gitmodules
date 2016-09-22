@@ -8,3 +8,7 @@
 [submodule "contrib/closure-library"]
 	path = contrib/closure-library
 	url = git@github.com:google/closure-library.git
+[submodule "contrib/graphicsjs"]
+	path = contrib/graphicsjs
+	url = git@github.com:AnyChart/graphicsjs.git
+	branch = develop
