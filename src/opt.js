@@ -1459,3 +1459,241 @@ anychart.opt.NUMBER_LOCALE = 'numberLocale';
  * @const {string}
  */
 anychart.opt.MESSAGES = 'messages';
+
+
+/**
+ * Constant replacer for "width" string.
+ * @const {string}
+ */
+anychart.opt.WIDTH = 'width';
+
+
+/**
+ * Constant replacer for "height" string.
+ * @const {string}
+ */
+anychart.opt.HEIGHT = 'height';
+
+
+/**
+ * Constant replacer for "fontSize" string.
+ * @const {string}
+ */
+anychart.opt.FONT_SIZE = 'fontSize';
+
+
+/**
+ * Constant replacer for "fontFamily" string.
+ * @const {string}
+ */
+anychart.opt.FONT_FAMILY = 'fontFamily';
+
+
+/**
+ * Constant replacer for "fontColor" string.
+ * @const {string}
+ */
+anychart.opt.FONT_COLOR = 'fontColor';
+
+
+/**
+ * Constant replacer for "fontOpacity" string.
+ * @const {string}
+ */
+anychart.opt.FONT_OPACITY = 'fontOpacity';
+
+
+/**
+ * Constant replacer for "fontDecoration" string.
+ * @const {string}
+ */
+anychart.opt.FONT_DECORATION = 'fontDecoration';
+
+
+/**
+ * Constant replacer for "fontStyle" string.
+ * @const {string}
+ */
+anychart.opt.FONT_STYLE = 'fontStyle';
+
+
+/**
+ * Constant replacer for "fontVariant" string.
+ * @const {string}
+ */
+anychart.opt.FONT_VARIANT = 'fontVariant';
+
+
+/**
+ * Constant replacer for "fontWeight" string.
+ * @const {string}
+ */
+anychart.opt.FONT_WEIGHT = 'fontWeight';
+
+
+/**
+ * Constant replacer for "letterSpacing" string.
+ * @const {string}
+ */
+anychart.opt.LETTER_SPACING = 'letterSpacing';
+
+
+/**
+ * Constant replacer for "textDirection" string.
+ * @const {string}
+ */
+anychart.opt.TEXT_DIRECTION = 'textDirection';
+
+
+/**
+ * Constant replacer for "lineHeight" string.
+ * @const {string}
+ */
+anychart.opt.LINE_HEIGHT = 'lineHeight';
+
+
+/**
+ * Constant replacer for "textIndent" string.
+ * @const {string}
+ */
+anychart.opt.TEXT_INDENT = 'textIndent';
+
+
+/**
+ * Constant replacer for "vAlign" string.
+ * @const {string}
+ */
+anychart.opt.V_ALIGN = 'vAlign';
+
+
+/**
+ * Constant replacer for "hAlign" string.
+ * @const {string}
+ */
+anychart.opt.H_ALIGN = 'hAlign';
+
+
+/**
+ * Constant replacer for "textWrap" string.
+ * @const {string}
+ */
+anychart.opt.TEXT_WRAP = 'textWrap';
+
+
+/**
+ * Constant replacer for "textOverflow" string.
+ * @const {string}
+ */
+anychart.opt.TEXT_OVERFLOW = 'textOverflow';
+
+
+/**
+ * Constant replacer for "selectable" string.
+ * @const {string}
+ */
+anychart.opt.SELECTABLE = 'selectable';
+
+
+/**
+ * Constant replacer for "disablePointerEvents" string.
+ * @const {string}
+ */
+anychart.opt.DISABLE_POINTER_EVENTS = 'disablePointerEvents';
+
+
+/**
+ * Constant replacer for "useHtml" string.
+ * @const {string}
+ */
+anychart.opt.USE_HTML = 'useHtml';
+
+
+/**
+ * Constant replacer for "borderRadius" string.
+ * @const {string}
+ */
+anychart.opt.BORDER_RADIUS = 'borderRadius';
+
+
+/**
+ * Constant replacer for "src" string.
+ * @const {string}
+ */
+anychart.opt.SRC = 'src';
+
+
+/**
+ * Constant replacer for "images" string.
+ * @const {string}
+ */
+anychart.opt.IMAGE = 'image';
+
+
+/**
+ * Constant replacer for "name" string.
+ * @const {string}
+ */
+anychart.opt.NAME = 'name';
+
+
+/**
+ * Constant replacer for "description" string.
+ * @const {string}
+ */
+anychart.opt.DESCRIPTION = 'description';
+
+
+/**
+ * Constant replacer for "tags" string.
+ * @const {string}
+ */
+anychart.opt.TAGS = 'tags';
+
+
+/**
+ * Constant replacer for "minHeight" string.
+ * @const {string}
+ */
+anychart.opt.MIN_HEIGHT = 'minHeight';
+
+
+/**
+ * Constant replacer for "maxHeight" string.
+ * @const {string}
+ */
+anychart.opt.MAX_HEIGHT = 'maxHeight';
+
+
+/**
+ * Constant replacer for "opacity" string.
+ * @const {string}
+ */
+anychart.opt.OPACITY = 'opacity';
+
+
+/**
+ * Constant replacer for "align" string.
+ * @const {string}
+ */
+anychart.opt.ALIGN = 'align';
+
+
+/**
+ * Constant replacer for "fittingMode" string.
+ * @const {string}
+ */
+anychart.opt.FITTING_MODE = 'fittingMode';
+
+
+/**
+ * Constant replacer for "margin" string.
+ * @const {string}
+ */
+anychart.opt.MARGIN = 'margin';
+
+
+/**
+ * Constant replacer for "imageSrc" string.
+ * @const {string}
+ */
+anychart.opt.IMAGE_SRC = 'imageSrc';

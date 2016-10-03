@@ -124,7 +124,7 @@ anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Applies all handlers to passed element. By default this.defaultBrowserEvent handler is applied. But you can override
+ * Applies all handlers to passed element. By default this.handleBrowserEvent handler is applied. But you can override
  * handlers by corresponding parameters.
  * @param {acgraph.vector.Element|acgraph.vector.Stage} element
  * @param {?function(acgraph.events.BrowserEvent)=} opt_overHandler
@@ -154,7 +154,7 @@ anychart.core.VisualBase.prototype.bindHandlersToGraphics = function(element, op
 
 
 /**
- * Applies all handlers to passed element. By default this.defaultBrowserEvent handler is applied. But you can override
+ * Applies all handlers to passed element. By default this.handleMouseEvent handler is applied. But you can override
  * handlers by corresponding parameters.
  * @param {anychart.core.VisualBase} target
  * @param {?function(anychart.core.MouseEvent)=} opt_overHandler

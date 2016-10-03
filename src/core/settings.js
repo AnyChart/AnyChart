@@ -3,6 +3,7 @@ goog.require('acgraph.vector');
 goog.require('anychart.core.reporting');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
+goog.require('goog.math');
 
 
 /**
@@ -127,7 +128,7 @@ anychart.core.settings.serialize = function(target, descriptors, json, opt_warni
 anychart.core.settings.simpleHandler = function(fieldName, normalizer, supportCheck, consistencyState, signal, opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = normalizer(opt_value);
-    if (this.getOwnOption(fieldName) != opt_value) {
+    if (this.getOwnOption(fieldName) !== opt_value) {
       this.setOption(fieldName, opt_value);
       if (this.check(supportCheck))
         this.invalidate(consistencyState, signal);
@@ -160,7 +161,7 @@ anychart.core.settings.multiArgsHandler = function(fieldName, arrayNormalizer, s
       args.push(arguments[i]);
     }
     opt_value = arrayNormalizer(args);
-    if (this.getOwnOption(fieldName) != opt_value) {
+    if (this.getOwnOption(fieldName) !== opt_value) {
       this.setOption(fieldName, opt_value);
       if (this.check(supportCheck))
         this.invalidate(consistencyState, signal);
@@ -317,6 +318,49 @@ anychart.core.settings.numberOrPercentNormalizer = function(val) {
  */
 anychart.core.settings.markerTypeNormalizer = function(val) {
   return goog.isFunction(val) ? val : anychart.enums.normalizeMarkerType(val);
+};
+
+
+/**
+ * Single arg normalizer for number or string.
+ * @param {*} val
+ * @return {number|string}
+ */
+anychart.core.settings.numberOrStringNormalizer = function(val) {
+  return anychart.utils.toNumberOrString(val);
+};
+
+
+/**
+ * Ratio normalizer for number or string.
+ * @param {*} val
+ * @return {number}
+ */
+anychart.core.settings.ratioNormalizer = function(val) {
+  return goog.math.clamp(anychart.utils.toNumber(val), 0, 1);
+};
+
+
+/**
+ * Single arg normalizer for string params.
+ * @param {*} val
+ * @return {string}
+ */
+anychart.core.settings.stringNormalizer = function(val) {
+  return String(val);
+};
+
+
+/**
+ * Array normalizer.
+ * @param {Array.<*>} args
+ * @return {*}
+ */
+anychart.core.settings.arrayNormalizer = function(args) {
+  if (goog.isArray(args[0]))
+    return args[0];
+  else
+    return args;
 };
 //endregion
 

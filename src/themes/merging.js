@@ -487,8 +487,8 @@ anychart.themes.merging.mergingMap_ = [
       'scatter.defaultTextMarkerSettings',
       'standalones.label',
       'standalones.table',
-      'standalones.textAxisMarker'
-
+      'standalones.textAxisMarker',
+      'standalones.resourceList.baseSettings'
     ]
   },
   {
@@ -1134,6 +1134,15 @@ anychart.themes.merging.mergingMap_ = [
       'thermometerGauge',
       'tankGauge',
       'ledGauge'
+    ]
+  },
+  {
+    defaultObj: 'standalones.resourceList.baseSettings',
+    targets: [
+      'standalones.resourceList.names',
+      'standalones.resourceList.types',
+      'standalones.resourceList.descriptions',
+      'standalones.resourceList.tags'
     ]
   }
 ];

@@ -337,11 +337,21 @@ anychart.core.utils.Space.prototype.serialize = function() {
     json['top'] = this.top_;
   if (goog.isDef(this.right_))
     json['right'] = this.right_;
-  if (this.bottom_)
+  if (goog.isDef(this.bottom_))
     json['bottom'] = this.bottom_;
-  if (this.left_)
+  if (goog.isDef(this.left_))
     json['left'] = this.left_;
   return json;
+};
+
+
+/** @inheritDoc */
+anychart.core.utils.Space.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.utils.Space.base(this, 'setupByJSON', config, opt_default);
+  this.top(config['top']);
+  this.right(config['right']);
+  this.bottom(config['bottom']);
+  this.left(config['left']);
 };
 
 

@@ -296,6 +296,17 @@ anychart.ConsistencyState = {
   //---------------------------------- ANNOTATIONS (VB) ----------------------------------
   ANNOTATIONS_CONTROLLER_ANNOTATIONS: 1 << 6,
   ANNOTATIONS_CONTROLLER_DRAWING_MODE: 1 << 7,
+  //---------------------------------- RESOURCE LIST (VB) --------------------------------
+  RESOURCE_LIST_BACKGROUND: 1 << 6,
+  RESOURCE_LIST_SCROLL: 1 << 7,
+  RESOURCE_LIST_ITEMS: 1 << 8,
+  RESOURCE_LIST_DATA: 1 << 9,
+  RESOURCE_LIST_ITEMS_SETTINGS: 1 << 10,
+  RESOURCE_LIST_IMAGES_SETTINGS: 1 << 11,
+  RESOURCE_LIST_NAMES_SETTINGS: 1 << 12,
+  RESOURCE_LIST_TYPES_SETTINGS: 1 << 13,
+  RESOURCE_LIST_DESCRIPTIONS_SETTINGS: 1 << 14,
+  RESOURCE_LIST_TAGS_SETTINGS: 1 << 15,
   /**
    * Combination of all states.
    */
@@ -554,9 +565,9 @@ anychart.core.Base.prototype.setup = function(var_args) {
 /**
  * Setups current instance using passed JSON object.
  * @param {!Object} json
- * @protected
+ * @param {boolean=} opt_default Identifies that we should setup defaults.
  */
-anychart.core.Base.prototype.setupByJSON = function(json) {
+anychart.core.Base.prototype.setupByJSON = function(json, opt_default) {
 };
 
 

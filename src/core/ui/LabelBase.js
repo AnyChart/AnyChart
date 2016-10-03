@@ -171,7 +171,6 @@ anychart.core.ui.LabelBase.prototype.text = function(opt_value) {
 anychart.core.ui.LabelBase.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.core.ui.Background();
-    this.registerDisposable(this.background_);
     this.background_.listenSignals(this.backgroundInvalidated_, this);
   }
 
@@ -207,7 +206,6 @@ anychart.core.ui.LabelBase.prototype.backgroundInvalidated_ = function(event) {
 anychart.core.ui.LabelBase.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {
     this.padding_ = new anychart.core.utils.Padding();
-    this.registerDisposable(this.padding_);
     this.padding_.listenSignals(this.boundsInvalidated_, this);
   }
   if (goog.isDef(opt_spaceOrTopOrTopAndBottom)) {
@@ -499,6 +497,15 @@ anychart.core.ui.LabelBase.prototype.disablePointerEvents = function(opt_value) 
   } else {
     return this.disablePointerEvents_;
   }
+};
+
+
+/**
+ * Getter for root layer.
+ * @return {!acgraph.vector.Layer}
+ */
+anychart.core.ui.LabelBase.prototype.getRootLayer = function() {
+  return this.rootLayer_;
 };
 
 
@@ -922,7 +929,6 @@ anychart.core.ui.LabelBase.prototype.createTextElement_ = function() {
   if (isInitial = !this.textElement) {
     this.textElement = acgraph.text();
     this.textElement.attr('aria-hidden', 'true');
-    this.registerDisposable(this.textElement);
   }
   return isInitial;
 };
@@ -1017,7 +1023,8 @@ anychart.core.ui.LabelBase.prototype.setupByJSON = function(config) {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.ui.LabelBase.prototype.disposeInternal = function() {
-  goog.base(this, 'disposeInternal');
-  //we should dispose padding, background and textElement
-  //they all disposed with registerDisposable call
+  goog.dispose(this.padding_);
+  goog.dispose(this.background_);
+  goog.dispose(this.textElement);
+  anychart.core.ui.LabelBase.base(this, 'disposeInternal');
 };

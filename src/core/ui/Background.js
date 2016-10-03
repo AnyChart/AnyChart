@@ -224,7 +224,6 @@ anychart.core.ui.Background.prototype.draw = function() {
 
   if (!this.rect_) {
     this.rect_ = acgraph.rect();
-    this.registerDisposable(this.rect_);
   }
 
   var stage = this.container() ? this.container().getStage() : null;
@@ -378,7 +377,6 @@ anychart.core.ui.Background.prototype.setupByJSON = function(config) {
 /** @inheritDoc */
 anychart.core.ui.Background.prototype.disposeInternal = function() {
   if (this.rect_) {
-    this.rect_.parent(null);
     goog.dispose(this.rect_);
     this.rect_ = null;
   }
@@ -390,7 +388,7 @@ anychart.core.ui.Background.prototype.disposeInternal = function() {
     this.corners_.length = 0;
   delete this.corners_;
 
-  goog.base(this, 'disposeInternal');
+  anychart.core.ui.Background.base(this, 'disposeInternal');
 };
 
 

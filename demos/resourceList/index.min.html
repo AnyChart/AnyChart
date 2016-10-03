@@ -1,0 +1,274 @@
+<!doctype html>
+<html>
+<head>
+    <style>
+        #stage {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #000000;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://cdn.anychart.com/css/latest/anychart-ui.min.css"/>
+    <script src="../../out/anychart-bundle.min.js"></script>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  <script src="index.js"></script>
+
+    <script>
+        function pluralize(name) {
+            return name == 'tags' ? name : name + 's';
+        }
+
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.substr(1);
+        }
+        var textSettings = "fontSize fontFamily fontColor fontOpacity fontDecoration fontStyle fontVariant fontWeight letterSpacing textDirection lineHeight textIndent vAlign hAlign textWrap textOverflow selectable useHtml".split(' ');
+        function generateFontSettings(name) {
+            var i;
+            var plural;
+            var divNode;
+            var divRow;
+            var method;
+            var nodes = '';
+            for (i = 0; i < textSettings.length; i+=2) {
+                divRow = '<div class="row">';
+
+                plural = pluralize(name);
+                divNode =
+                        '<div class="form-group col-md-4">' +
+                        '<label for="list.%s.%s">%s:</label>' +
+                        '<input type="text" class="form-control" id="list.%s.%s">' +
+                        '</div>';
+                method = textSettings[i];
+                divRow += anychart.format.subs(divNode, plural, method, method, plural, method);
+
+                method = textSettings[i + 1];
+                divRow += anychart.format.subs(divNode, plural, method, method, plural, method);
+
+                divRow += '</div>';
+                nodes += divRow;
+            }
+            return nodes;
+        }
+    </script>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <div id="stage"></div>
+        </div>
+        <div class="col-md-8">
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#list">list</a></li>
+                <li><a data-toggle="tab" href="#items">items</a></li>
+                <li><a data-toggle="tab" href="#images">images</a></li>
+                <li><a data-toggle="tab" href="#names">names</a></li>
+                <li><a data-toggle="tab" href="#descriptions">descriptions</a></li>
+                <li><a data-toggle="tab" href="#types">types</a></li>
+                <li><a data-toggle="tab" href="#tags">tags</a></li>
+                <li><a data-toggle="tab" href="#events">events</a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div id="list" class="tab-pane active">
+                    <h3>List settings</h3>
+
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="list.width">width:</label>
+                            <input type="text" class="form-control" id="list.width">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="list.height">height:</label>
+                            <input type="text" class="form-control" id="list.height">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="list.scrollY">Offset Y:</label>
+                            <input type="range" min="0" max="1" step="0.01" value="0" class="form-control" id="list.scrollY">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="items" class="tab-pane">
+                    <h3>Items settings</h3>
+
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="list.items.height">height:</label>
+                            <input type="text" class="form-control" id="list.items.height">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="list.items.minHeight">minHeight:</label>
+                            <input type="text" class="form-control" id="list.items.minHeight">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="list.items.maxHeight">maxHeight:</label>
+                            <input type="text" class="form-control" id="list.items.maxHeight">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="list.items.background.fill">backgroundFill:</label>
+                            <input type="text" class="form-control" id="list.items.background.fill">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="list.items.background.stroke">backgroundStroke:</label>
+                            <input type="text" class="form-control" id="list.items.background.stroke">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="images" class="tab-pane">
+                    <h3>Images settings</h3>
+
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="list.images.margin">margin:</label>
+                            <input type="text" class="form-control" id="list.images.margin">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="list.images.size">width:</label>
+                            <input type="text" class="form-control" id="list.images.size">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="list.images.borderRadius">borderRadius:</label>
+                            <input type="text" class="form-control" id="list.images.borderRadius">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="list.images.opacity">opacity:</label>
+                            <input type="text" class="form-control" id="list.images.opacity">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="list.images.align">align:</label>
+                            <input type="text" class="form-control" id="list.images.align">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="list.images.fittingMode">fittingMode:</label>
+                            <input type="text" class="form-control" id="list.images.fittingMode">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="names" class="tab-pane">
+                    <h3>Names settings</h3>
+
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="list.names.margin">margin:</label>
+                            <input type="text" class="form-control" id="list.names.margin">
+                        </div>
+                    </div>
+
+                    <script>
+                        document.write(window.generateFontSettings('name'))
+                    </script>
+                </div>
+
+                <div id="types" class="tab-pane">
+                    <h3>Types settings</h3>
+
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="list.types.margin">margin:</label>
+                            <input type="text" class="form-control" id="list.types.margin">
+                        </div>
+                    </div>
+
+                    <script>
+                        document.write(window.generateFontSettings('type'))
+                    </script>
+                </div>
+
+                <div id="descriptions" class="tab-pane">
+                    <h3>Descriptions settings</h3>
+
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="list.descriptions.margin">margin:</label>
+                            <input type="text" class="form-control" id="list.descriptions.margin">
+                        </div>
+                    </div>
+
+                    <script>
+                        document.write(window.generateFontSettings('description'))
+                    </script>
+                </div>
+
+                <div id="tags" class="tab-pane">
+                    <h3>Tags settings</h3>
+
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="list.tags.background.fill">backgroundFill:</label>
+                            <input type="text" class="form-control" id="list.tags.background.fill">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="list.tags.background.stroke">backgroundStroke:</label>
+                            <input type="text" class="form-control" id="list.tags.background.stroke">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="list.tags.margin">margin:</label>
+                            <input type="text" class="form-control" id="list.tags.margin">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="list.tags.padding">padding:</label>
+                            <input type="text" class="form-control" id="list.tags.padding">
+                        </div>
+                    </div>
+
+                    <script>
+                        document.write(window.generateFontSettings('tags'))
+                    </script>
+                </div>
+
+                <div id="events" class="tab-pane">
+                    <h3 style="display: inline-block">Events log</h3>
+                    <button onclick="document.getElementById('events-list').innerHTML=''" style="display: inline-block">CLEAR</button>
+                    <div id="events-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

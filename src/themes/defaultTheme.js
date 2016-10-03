@@ -4707,6 +4707,90 @@ goog.provide('anychart.themes.defaultTheme');
       },
       'scroller': {
         'enabled': true
+      },
+      'resourceList': {
+        'width': '33%',
+        'height': '100%',
+        'background': {
+          'enabled': true,
+          'fill': '#ccc',
+          'stroke': '#ccc',
+          'cornerType': 'none',
+          'corners': 0
+        },
+        'items': {
+          'height': null,
+          'minHeight': '20%',
+          'maxHeight': '50%',
+          'background': {
+            'enabled': true,
+            'fill': '#eaeaea',
+            'stroke': '#cecece',
+            'cornerType': 'none',
+            'corners': 0
+          }
+        },
+        'images': {
+          'borderRadius': 10,
+          'opacity': 1,
+          'align': 'none',
+          'fittingMode': 'meet',
+          'size': '25%',
+          'margin': {
+            'top': 5,
+            'right': 0,
+            'bottom': 5,
+            'left': 5
+          }
+        },
+        'baseSettings': {
+          'margin': {
+            'top': 2,
+            'right': 0,
+            'bottom': 3,
+            'left': 5
+          },
+          'fontSize': 15,
+          'textWrap': 'noWrap',
+          'textOverflow': '...'
+        },
+        'names': {
+          'margin': {
+            'top': 5
+          }
+        },
+        'types': {
+          'fontSize': 10,
+          'fontColor': fontColorDark
+        },
+        'descriptions': {
+          'fontSize': 12,
+          'fontColor': fontColorBright,
+          'fontStyle': 'oblique'
+        },
+        'tags': {
+          'fontSize': 9,
+          'fontColor': fontColorDark,
+          'background': {
+            'enabled': true,
+            'fill': '#eee',
+            'stroke': '#ccc',
+            'cornerType': 'round',
+            'corners': 4
+          },
+          'padding': {
+            'top': 5,
+            'right': 5,
+            'bottom': 5,
+            'left': 5
+          },
+          'margin': {
+            'top': 2,
+            'right': 0,
+            'bottom': 3,
+            'left': 5
+          }
+        }
       }
     }
   };
