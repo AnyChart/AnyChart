@@ -1447,7 +1447,7 @@ anychart.core.stock.Plot.prototype.updateLegend_ = function(opt_seriesBounds, op
         'dataIntervalUnit': anychart.enums.TokenType.STRING,
         'dataIntervalUnitCount': anychart.enums.TokenType.STRING
       });
-      legend.title().autoText(formatter.call(context, context));
+      legend.title()[anychart.opt.AUTO_TEXT](formatter.call(context, context));
     }
   }
   if (!legend.itemsSource())
@@ -2122,7 +2122,8 @@ anychart.core.stock.Plot.prototype.setupByJSON = function(config) {
   // this.markerPalette(config['markerPalette']);
   this.hatchFillPalette(config['hatchFillPalette']);
 
-  this.background(config['background']);
+  this.background(config[anychart.opt.BACKGROUND]);
+
   this.xAxis(config['xAxis']);
   this.dateTimeHighlighter(config['dateTimeHighlighter']);
   this.legend(config['legend']);

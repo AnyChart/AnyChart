@@ -26,7 +26,7 @@ anychart.bar3d = function(var_args) {
   chart.defaultSeriesType(anychart.enums.Cartesian3dSeriesType.BAR);
   chart.setType(anychart.enums.ChartTypes.BAR_3D);
 
-  chart.setup(theme['bar3d']);
+  chart.setupByVal(theme['bar3d'], true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['bar'](arguments[i]);

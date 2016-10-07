@@ -94,9 +94,7 @@
     "anychart.core.VisualBase": {
       "type": "object",
       "properties": {
-        "enabled": {
-          "type": "boolean"
-        },
+        "enabled": {"$ref": "#/definitions/disable"},
         "zIndex": {
           "type": "number"
         }
@@ -2239,7 +2237,13 @@
 
         "unboundRegions": {"$ref": "#/definitions/anychart.core.utils.UnboundRegionsSettings"},
         "colorRange": {"$ref": "#/definitions/anychart.core.ui.ColorRange"},
-        "geoScale": {"$ref": "#/definitions/anychart.core.map.scale.Geo"},
+        "geoScale": {"$ref": "#/definitions/anychart.scales.Geo"},
+        "overlapMode": {
+          "oneOf": [
+            {"type": "boolean"},
+            {"$ref": "#/definitions/anychart.enums.LabelsOverlapMode"}
+          ]
+        },
 
         "minBubbleSize": {
           "type": ["string", "number"]
@@ -2303,7 +2307,11 @@
         },
 
         "crsAnimation": {"$ref": "#/definitions/anychart.core.utils.Animation"},
-        "crs": {"type": "string"}
+        "crs": {"type": "string"},
+
+        "axes_settings": {"$ref": "#/definitions/anychart.core.axes.MapSettings"},
+        "grids_settings": {"$ref": "#/definitions/anychart.core.grids.MapSettings"},
+        "crosshair": {"$ref": "#/definitions/anychart.core.ui.Crosshair"}
       },
       "required": ["type"]
     },
@@ -3560,6 +3568,122 @@
         "position": {"$ref": "#/definitions/anychart.enums.GaugeSidePosition"}
       }
     },
+    "anychart.core.axes.Map": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.VisualBase"}
+      ],
+      "properties": {
+        "stroke": {"$ref": "#/definitions/stroke"},
+        "drawFirstLabel": {
+          "type": "boolean"
+        },
+        "drawLastLabel": {
+          "type": "boolean"
+        },
+        "overlapMode": {"$ref": "#/definitions/anychart.enums.LabelsOverlapMode"},
+        "labels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "minorLabels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "ticks": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.axes.Ticks"}
+          ]
+        },
+        "minorTicks": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.axes.Ticks"}
+          ]
+        },
+        "title": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.Title"}
+          ]
+        }
+      }
+    },
+    "anychart.core.axes.MapSettings": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.VisualBase"}
+      ],
+      "properties": {
+        "stroke": {"$ref": "#/definitions/stroke"},
+        "drawFirstLabel": {
+          "type": "boolean"
+        },
+        "drawLastLabel": {
+          "type": "boolean"
+        },
+        "overlapMode": {"$ref": "#/definitions/anychart.enums.LabelsOverlapMode"},
+        "labels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "minorLabels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "ticks": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.axes.Ticks"}
+          ]
+        },
+        "minorTicks": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.axes.Ticks"}
+          ]
+        },
+        "title": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.Title"}
+          ]
+        },
+        "top": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.axes.Map"}
+          ]
+        },
+        "right": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.axes.Map"}
+          ]
+        },
+        "bottom": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.axes.Map"}
+          ]
+        },
+        "left": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.axes.Map"}
+          ]
+        }
+      }
+    },
 
     "anychart.core.gantt.Controller": {
       "type": "object",
@@ -3908,16 +4032,10 @@
         }
       }
     },
-    "anychart.core.map.scale.Geo": {
+    "anychart.scales.Geo": {
       "type": "object",
       "properties": {
         "type": {"enum": ["geo"]},
-        "inverted": {
-          "type": "array",
-          "items": {
-            "type": "boolean"
-          }
-        },
         "minimumX": {
           "type": ["number", "string", "null"]
         },
@@ -3933,7 +4051,51 @@
         "gap": {
           "type": ["number", "string"]
         },
-        "bounds": {"$ref": "#/definitions/anychart.math.Rect"}
+        "precision": {
+          "type": ["array", "number", "string"],
+          "items": {
+            "type": ["number", "string"]
+          }
+        },
+        "xTicks": {"$ref": "#/definitions/anychart.scales.GeoTicks"},
+        "xMinorTicks": {"$ref": "#/definitions/anychart.scales.GeoTicks"},
+        "yTicks": {"$ref": "#/definitions/anychart.scales.GeoTicks"},
+        "yMinorTicks": {"$ref": "#/definitions/anychart.scales.GeoTicks"}
+      }
+    },
+    "anychart.scales.GeoTicks": {
+      "type": "object",
+      "properties": {
+        "explicit": {
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "count": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "minCount": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "maxCount": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "interval": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
       }
     },
 
@@ -4001,6 +4163,44 @@
         "axis": {
           "type": "number"
         }
+      }
+    },
+    "anychart.core.grids.Map": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.VisualBase"}
+      ],
+      "properties": {
+        "stroke": {"$ref": "#/definitions/stroke"},
+        "minorStroke": {"$ref": "#/definitions/stroke"},
+        "oddFill": {"$ref": "#/definitions/fill"},
+        "evenFill": {"$ref": "#/definitions/fill"},
+        "drawFirstLine": {
+          "type": ["boolean"]
+        },
+        "drawLastLine": {
+          "type": ["boolean"]
+        }
+      }
+    },
+    "anychart.core.grids.MapSettings": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.VisualBase"}
+      ],
+      "properties": {
+        "stroke": {"$ref": "#/definitions/stroke"},
+        "minorStroke": {"$ref": "#/definitions/stroke"},
+        "oddFill": {"$ref": "#/definitions/fill"},
+        "evenFill": {"$ref": "#/definitions/fill"},
+        "drawFirstLine": {
+          "type": ["boolean"]
+        },
+        "drawLastLine": {
+          "type": ["boolean"]
+        },
+        "vertical": {"$ref": "#/definitions/anychart.core.grids.Map"},
+        "horizontal": {"$ref": "#/definitions/anychart.core.grids.Map"}
       }
     },
 

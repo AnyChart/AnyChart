@@ -1205,7 +1205,7 @@ anychart.core.Chart.prototype.drawInternal = function() {
 
   // used for crosshair
   var background = this.background();
-  var fill = background.fill();
+  var fill = background.getOption(anychart.opt.FILL);
   if ((!background.enabled() || !fill || fill == 'none')) {
     if (!this.shadowRect_) {
       this.shadowRect_ = this.rootElement.rect();
@@ -1510,10 +1510,10 @@ anychart.core.Chart.prototype.setupByJSON = function(config) {
   if ('defaultLabelSettings' in config)
     this.defaultLabelSettings(config['defaultLabelSettings']);
 
-  this.title(config['title']);
-  this.background(config['background']);
-  this.margin(config['margin']);
-  this.padding(config['padding']);
+  this.title(config[anychart.opt.TITLE]);
+  this.background(config[anychart.opt.BACKGROUND]);
+  this.margin(config[anychart.opt.MARGIN]);
+  this.padding(config[anychart.opt.PADDING]);
 
   var labels = config['chartLabels'];
   if (goog.isArray(labels)) {

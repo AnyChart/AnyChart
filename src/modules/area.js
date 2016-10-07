@@ -31,7 +31,7 @@ anychart.area = function(var_args) {
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.AREA);
   chart.setType(anychart.enums.ChartTypes.AREA);
 
-  chart.setup(theme['area']);
+  chart.setupByVal(theme['area'], true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['area'](arguments[i]);

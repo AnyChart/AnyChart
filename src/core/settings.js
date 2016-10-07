@@ -3,6 +3,7 @@ goog.require('acgraph.vector');
 goog.require('anychart.core.reporting');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
+goog.require('goog.array');
 goog.require('goog.math');
 
 
@@ -100,6 +101,9 @@ anychart.core.settings.serialize = function(target, descriptors, json, opt_warni
         val = anychart.color.serialize(descriptor.normalizer([val]));
       } else if (descriptor.normalizer == anychart.core.settings.colorNormalizer && !goog.isNull(val)) {
         val = anychart.color.serialize(descriptor.normalizer(val));
+      } else if ((descriptor.normalizer == anychart.core.settings.colorNormalizer ||
+          descriptor.normalizer == anychart.core.settings.strokeNormalizer) && !goog.isNull(val)) {
+        val = anychart.color.serialize(descriptor.normalizer([val]));
       }
       json[name] = val;
     }
@@ -130,8 +134,13 @@ anychart.core.settings.simpleHandler = function(fieldName, normalizer, supportCh
     opt_value = normalizer(opt_value);
     if (this.getOwnOption(fieldName) !== opt_value) {
       this.setOption(fieldName, opt_value);
-      if (this.check(supportCheck))
-        this.invalidate(consistencyState, signal);
+      if (this.check(supportCheck)) {
+        if (consistencyState == anychart.ConsistencyState.ONLY_DISPATCHING) {
+          this.dispatchSignal(signal);
+        } else {
+          this.invalidate(consistencyState, signal);
+        }
+      }
     }
     return this;
   }
@@ -164,7 +173,11 @@ anychart.core.settings.multiArgsHandler = function(fieldName, arrayNormalizer, s
     if (this.getOwnOption(fieldName) !== opt_value) {
       this.setOption(fieldName, opt_value);
       if (this.check(supportCheck))
-        this.invalidate(consistencyState, signal);
+        if (consistencyState == anychart.ConsistencyState.ONLY_DISPATCHING) {
+          this.dispatchSignal(signal);
+        } else {
+          this.invalidate(consistencyState, signal);
+        }
     }
     return this;
   }
@@ -196,6 +209,16 @@ anychart.core.settings.asIsNormalizer = function(val) {
  */
 anychart.core.settings.colorNormalizer = function(val) {
   return goog.isNull(val) ? val : acgraph.vector.normalizeFill(/** @type {acgraph.vector.Fill} */(val));
+};
+
+
+/**
+ * Array normalizer for stroke.
+ * @param {Array.<*>} args
+ * @return {?acgraph.vector.Stroke}
+ */
+anychart.core.settings.strokeNormalizer = function(args) {
+  return acgraph.vector.normalizeStroke.apply(null, args);
 };
 
 
@@ -292,6 +315,26 @@ anychart.core.settings.numberNormalizer = function(val) {
 
 
 /**
+ * Single arg normalizer for number params.
+ * @param {*} val
+ * @return {number|string}
+ */
+anychart.core.settings.numberOrZeroNormalizer = function(val) {
+  return anychart.utils.toNumberOrStringOrNull(val) || 0;
+};
+
+
+/**
+ * Single arg normalizer for string params.
+ * @param {*} val
+ * @return {string}
+ */
+anychart.core.settings.stringNormalizer = function(val) {
+  return String(val);
+};
+
+
+/**
  * Single arg normalizer for natural (or zero) params. Defaults to NaN.
  * @param {*} val
  * @return {number}
@@ -322,6 +365,16 @@ anychart.core.settings.markerTypeNormalizer = function(val) {
 
 
 /**
+ * Single arg normalizer for orientation params.
+ * @param {*} val
+ * @return {?anychart.enums.Orientation}
+ */
+anychart.core.settings.orientationNormalizer = function(val) {
+  return goog.isNull(val) ? val : anychart.enums.normalizeOrientation(val);
+};
+
+
+/**
  * Single arg normalizer for number or string.
  * @param {*} val
  * @return {number|string}
@@ -338,16 +391,6 @@ anychart.core.settings.numberOrStringNormalizer = function(val) {
  */
 anychart.core.settings.ratioNormalizer = function(val) {
   return goog.math.clamp(anychart.utils.toNumber(val), 0, 1);
-};
-
-
-/**
- * Single arg normalizer for string params.
- * @param {*} val
- * @return {string}
- */
-anychart.core.settings.stringNormalizer = function(val) {
-  return String(val);
 };
 
 
@@ -434,4 +477,81 @@ anychart.core.settings.IObjectWithSettings.prototype.check = function(flags) {};
  * @return {number} Actually modified consistency states.
  */
 anychart.core.settings.IObjectWithSettings.prototype.invalidate = function(state, opt_signal) {};
+
+
+/**
+ * Sends invalidation event to listeners.
+ *
+ * NOTE: YOU CAN ONLY SEND SIGNALS FROM SUPPORTED_SIGNALS MASK!
+ *
+ * @param {anychart.Signal|number} state Invalidation state(s).
+ * @param {boolean=} opt_force Force to dispatch signal.
+ */
+anychart.core.settings.IObjectWithSettings.prototype.dispatchSignal = function(state, opt_force) {};
+//endregion
+
+
+
+//region IResolvable
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  IResolvable
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * An object that is able to have parent object to take settings from it.
+ * @interface
+ */
+anychart.core.settings.IResolvable = function() {};
+
+
+/**
+ * Gets chain of settings object ordered by priority.
+ * @return {Array.<Object|null|undefined>} - Chain of settings.
+ */
+anychart.core.settings.IResolvable.prototype.getResolutionChain = function() {};
+
+
+/**
+ * Gets chain of low priority settings.
+ * @return {Array.<Object|null|undefined>} - Chain of settings.
+ */
+anychart.core.settings.IResolvable.prototype.getLowPriorityResolutionChain = function() {};
+
+
+/**
+ * Gets chain of high priority settings.
+ * @return {Array.<Object|null|undefined>} - Chain of settings.
+ */
+anychart.core.settings.IResolvable.prototype.getHighPriorityResolutionChain = function() {};
+
+
+/**
+ * Default resolution chain getter for IResolvable object.
+ * @this {anychart.core.settings.IResolvable}
+ * @return {Array.<Object|null|undefined>} - Chain of settings.
+ */
+anychart.core.settings.getResolutionChain = function() {
+  return goog.array.concat(this.getHighPriorityResolutionChain(), this.getLowPriorityResolutionChain());
+};
+
+
+/**
+ * Gets option value by name for IResolvable.
+ * @param {string} name - Option name.
+ * @this {anychart.core.settings.IResolvable}
+ * @return {*} - Option value.
+ */
+anychart.core.settings.getOption = function(name) {
+  var chain = this.getResolutionChain();
+  for (var i = 0; i < chain.length; i++) {
+    var obj = chain[i];
+    if (obj) {
+      var res = obj[name];
+      if (goog.isDef(res))
+        return res;
+    }
+  }
+  return void 0;
+};
 //endregion

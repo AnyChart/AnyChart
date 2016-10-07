@@ -600,7 +600,7 @@ anychart.core.map.series.Bubble.prototype.getReferenceScaleValues = function() {
 anychart.core.map.series.Bubble.prototype.getReferenceCoords = function() {
   if (!this.enabled()) return null;
 
-  var scale = /** @type {anychart.core.map.scale.Geo} */(this.map.scale());
+  var scale = /** @type {anychart.scales.Geo} */(this.map.scale());
   var iterator = this.getIterator();
   var fail = false;
 
@@ -611,8 +611,8 @@ anychart.core.map.series.Bubble.prototype.getReferenceCoords = function() {
 
   var arrayMappingWithRegion = anychart.utils.isNaN(x) && x == id;
 
-  x = anychart.utils.toNumber(x);
-  y = anychart.utils.toNumber(y);
+  x = parseFloat(x);
+  y = parseFloat(y);
 
   var txCoords = scale.transform(x, y);
   if (!isNaN(x))

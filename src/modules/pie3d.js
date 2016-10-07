@@ -23,7 +23,7 @@ anychart.pie3d = function(opt_data, opt_csvSettings) {
   var chart = new anychart.charts.Pie(opt_data, opt_csvSettings);
   var theme = anychart.getFullTheme();
 
-  chart.setup(theme['pie3d']);
+  chart.setupByVal(theme['pie3d'], true);
   chart.mode3d(true);
 
   return chart;

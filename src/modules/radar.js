@@ -25,7 +25,7 @@ anychart.radar = function(var_args) {
   var chart = new anychart.charts.Radar();
   var theme = anychart.getFullTheme();
 
-  chart.setup(theme['radar']);
+  chart.setupByVal(theme['radar'], true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.line(arguments[i]);

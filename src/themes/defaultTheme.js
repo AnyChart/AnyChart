@@ -570,6 +570,9 @@ goog.provide('anychart.themes.defaultTheme');
       'enabled': false,
       'offsetX': 0,
       'offsetY': 0,
+      'width': null,
+      'height': null,
+      'clip': null,
       'fontSize': 12,
       'minFontSize': 8,
       'maxFontSize': 72,
@@ -2914,9 +2917,74 @@ goog.provide('anychart.themes.defaultTheme');
       'colorRange': {
         'zIndex': 50
       },
+      'geoScale': {
+        'precision': 2
+      },
       'callouts': [],
+      'axesSettings': {
+        'enabled': false,
+        'title': {
+          'enabled': false,
+          'padding': 5,
+          'fontSize': 13,
+          'text': 'Axis title',
+          'fontColor': fontColorBright,
+          'zIndex': 35
+        },
+        'labels': {
+          'enabled': true,
+          'padding': 2,
+          'rotation': null,
+          'fontSize': 10,
+          'anchor': null
+        },
+        'minorLabels': {
+          'enabled': false,
+          'padding': 2,
+          'rotation': null,
+          'fontSize': 9,
+          'anchor': null
+        },
+        'overlapMode': 'noOverlap',
+        'ticks': {
+          'enabled': true,
+          'length': 5,
+          'position': 'outside',
+          'stroke': colorStrokeNormal
+        },
+        'minorTicks': {
+          'enabled': false,
+          'length': 2,
+          'position': 'outside',
+          'stroke': colorStrokeNormal
+        },
+        'drawFirstLabel': true,
+        'drawLastLabel': true,
+        'stroke': colorStrokeNormal
+      },
+      'gridsSettings': {
+        'enabled': false,
+        'drawFirstLine': true,
+        'drawLastLine': true,
+        'oddFill': 'none',
+        'evenFill': 'none',
+        'stroke': colorStrokeNormal,
+        'minorStroke': 'none',
+        'zIndex': 5
+      },
+      'crosshair': {
+        'enabled': false,
+        'xStroke': colorStrokeExtraBright,
+        'yStroke': colorStrokeExtraBright,
+        'zIndex': 110,
+        'xLabel': {
+          'axisIndex': 2
+        },
+        'yLabel': {
+          'axisIndex': 3
+        }
+      },
       'unboundRegions': {'enabled': true, 'fill': '#F7F7F7', 'stroke': '#e0e0e0'},
-      'legend': {'enabled': false},
       'maxBubbleSize': '20%',
       'minBubbleSize': '5%',
       'geoIdField': 'id',
@@ -2947,6 +3015,16 @@ goog.provide('anychart.themes.defaultTheme');
       'crsAnimation': {
         'enabled': true,
         'duration': 300
+      },
+      'legend': {
+        'enabled': false,
+        'tooltip': {
+          'content': {
+            'background': {
+              'disablePointerEvents': false
+            }
+          }
+        }
       }
     },
     // merge with map

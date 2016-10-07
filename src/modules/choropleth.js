@@ -22,7 +22,7 @@ anychart.choropleth = function(var_args) {
 
   map.defaultSeriesType(anychart.enums.MapSeriesType.CHOROPLETH);
 
-  map.setup(theme['choropleth']);
+  map.setupByVal(theme['choropleth'], true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     map.choropleth(arguments[i]);

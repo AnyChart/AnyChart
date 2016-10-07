@@ -294,6 +294,34 @@ anychart.core.ui.LabelBase.prototype.rotation = function(opt_value) {
 
 
 /**
+ * Is anchor should be set automatically.
+ * @param {number=} opt_value Rotation auto mode.
+ * @return {number|anychart.core.ui.LabelBase} Is anchor in auto mode or self for chaining.
+ */
+anychart.core.ui.LabelBase.prototype.autoRotation = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.autoRotation_ != opt_value) {
+      this.autoRotation_ = opt_value;
+      if (!this.anchor())
+        this.invalidate(anychart.ConsistencyState.BOUNDS,
+            anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.autoRotation_;
+};
+
+
+/**
+ * Returns final anchor.
+ * @return {number}
+ */
+anychart.core.ui.LabelBase.prototype.getFinalRotation = function() {
+  return goog.isDef(this.rotation_) && !isNaN(this.rotation_) ? this.rotation_ : this.autoRotation_;
+};
+
+
+/**
  * Getter/setter for label anchor settings.
  * @param {?(anychart.enums.Anchor|string)=} opt_value .
  * @return {anychart.core.ui.LabelBase|anychart.enums.Anchor} .
@@ -491,7 +519,7 @@ anychart.core.ui.LabelBase.prototype.disablePointerEvents = function(opt_value) 
     if (opt_value != this.disablePointerEvents_) {
       this.disablePointerEvents_ = opt_value;
       goog.base(this, 'disablePointerEvents', opt_value);
-      this.background().disablePointerEvents(opt_value);
+      this.background()[anychart.opt.DISABLE_POINTER_EVENTS](opt_value);
     }
     return this;
   } else {
@@ -744,8 +772,8 @@ anychart.core.ui.LabelBase.prototype.calculateLabelBounds_ = function() {
   }
   this.resumeSignalsDispatching(false);
 
-  this.textX = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.left()), this.backgroundWidth);
-  this.textY = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.top()), this.backgroundHeight);
+  this.textX = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.LEFT), this.backgroundWidth);
+  this.textY = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.TOP), this.backgroundHeight);
 };
 
 
@@ -872,6 +900,8 @@ anychart.core.ui.LabelBase.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
+    if (this.background_) this.background_.zIndex(0);
+    if (this.textElement) this.textElement.zIndex(1);
     this.rootLayer_.zIndex(/** @type {number} */(this.zIndex()));
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
@@ -882,7 +912,6 @@ anychart.core.ui.LabelBase.prototype.draw = function() {
     var backgroundBounds = this.drawLabel();
 
     this.invalidate(anychart.ConsistencyState.LABEL_BACKGROUND);
-    this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
 
@@ -894,6 +923,22 @@ anychart.core.ui.LabelBase.prototype.draw = function() {
       this.background_.resumeSignalsDispatching(false);
     }
     this.markConsistent(anychart.ConsistencyState.LABEL_BACKGROUND);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    this.rootLayer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+
+    var rotation = /** @type {number} */(this.getFinalRotation());
+    var anchor = /** @type {anychart.enums.Anchor} */(this.getFinalAnchor());
+
+    if (!goog.isDef(rotation) || isNaN(rotation)) {
+      rotation = 0;
+    }
+
+    var coordinateByAnchor = anychart.utils.getCoordinateByAnchor(/** @type {anychart.math.Rect} */(backgroundBounds), anchor);
+    this.rootLayer_.setRotation(/** @type {number} */(rotation), coordinateByAnchor.x, coordinateByAnchor.y);
+
+    this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
   return this;
@@ -1000,9 +1045,11 @@ anychart.core.ui.LabelBase.prototype.setupSpecial = function(var_args) {
 
 /** @inheritDoc */
 anychart.core.ui.LabelBase.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
-  this.background(config['background']);
-  this.padding(config['padding']);
+  anychart.core.ui.LabelBase.base(this, 'setupByJSON', config);
+
+  this.background(config[anychart.opt.BACKGROUND]);
+  this.padding(config[anychart.opt.PADDING]);
+
   this.width(config['width']);
   this.height(config['height']);
   this.anchor(config['anchor']);

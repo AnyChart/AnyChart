@@ -143,8 +143,17 @@ anychart.core.ui.CrosshairLabel.prototype.y = function(value) {
  * @protected
  */
 anychart.core.ui.CrosshairLabel.prototype.drawLabel = function() {
-  //bounds
-  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds()) || anychart.math.rect(0, 0, 0, 0);
+  var parentBounds;
+  if (!this.parentBounds()) {
+    parentBounds = new anychart.math.Rect(0, 0, 0, 0);
+    //calculate text width and outer width
+    var textElementBounds = this.textElement.getBounds();
+    parentBounds.width = this.padding().widenWidth(textElementBounds.width);
+    parentBounds.height = this.padding().widenHeight(textElementBounds.height);
+  } else {
+    parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
+  }
+
   var parentWidth = parentBounds.width;
   var parentHeight = parentBounds.height;
   var backgroundBounds = new anychart.math.Rect(0, 0, this.backgroundWidth, this.backgroundHeight);

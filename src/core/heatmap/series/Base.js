@@ -703,7 +703,6 @@ anychart.core.heatMap.series.Base.prototype.drawLabels = function() {
           mergedSettings['fontSize'] = label.parentLabelsFactory().adjustFontSizeValue;
 
         var bounds = this.labels().measure(label.formatProvider(), label.positionProvider(), mergedSettings);
-        bounds = mergedSettings['padding'].widenBounds(bounds);
 
         var notOutOfCellBounds = cellBounds.left <= bounds.left &&
             cellBounds.getRight() >= bounds.getRight() &&
@@ -761,7 +760,6 @@ anychart.core.heatMap.series.Base.prototype.drawLabel = function(pointState) {
         mergedSettings['fontSize'] = label.parentLabelsFactory().adjustFontSizeValue;
 
       var bounds = this.labels().measure(label.formatProvider(), label.positionProvider(), mergedSettings);
-      bounds = mergedSettings['padding'].widenBounds(bounds);
 
       var notOutOfCellBounds = cellBounds.left <= bounds.left &&
           cellBounds.getRight() >= bounds.getRight() &&

@@ -734,7 +734,7 @@ anychart.core.ui.ChartTooltip.prototype.show = function(points, clientX, clientY
     var contextProvider = firstSeries.createTooltipContextProvider();
     contextProvider['clientX'] = clientX;
     contextProvider['clientY'] = clientY;
-    this.singleTooltip_.title().autoText(this.singleTooltip_.getFormattedTitle(contextProvider));
+    this.singleTooltip_.title()[anychart.opt.AUTO_TEXT](this.singleTooltip_.getFormattedTitle(contextProvider));
     this.singleTooltip_.contentInternal().text(this.singleTooltip_.getFormattedContent(contextProvider));
 
     this.hideOtherTooltips_([this.singleTooltip_]);
@@ -800,7 +800,7 @@ anychart.core.ui.ChartTooltip.prototype.show = function(points, clientX, clientY
       'clientY': anychart.enums.TokenType.NUMBER
     }, points[0] && points[0]['series'] && points[0]['series'].getChart && points[0]['series'].getChart() || undefined);
     this.unionTooltip_.contentInternal().text(this.unionTooltip_.getFormattedContent(unionContextProvider));
-    this.unionTooltip_.title().autoText(this.unionTooltip_.getFormattedTitle(unionContextProvider));
+    this.unionTooltip_.title()[anychart.opt.AUTO_TEXT](this.unionTooltip_.getFormattedTitle(unionContextProvider));
 
     this.hideOtherTooltips_([this.unionTooltip_]);
     this.tooltipsMap_[goog.getUid(this.unionTooltip_).toString()] = this.unionTooltip_;
@@ -831,7 +831,7 @@ anychart.core.ui.ChartTooltip.prototype.show = function(points, clientX, clientY
       var contextProvider = series.createTooltipContextProvider();
       contextProvider['clientX'] = clientX;
       contextProvider['clientY'] = clientY;
-      tooltip.title().autoText(tooltip.getFormattedTitle(contextProvider));
+      tooltip.title()[anychart.opt.AUTO_TEXT](tooltip.getFormattedTitle(contextProvider));
       tooltip.contentInternal().text(tooltip.getFormattedContent(contextProvider));
 
       self.tooltipsMap_[goog.getUid(tooltip).toString()] = tooltip;

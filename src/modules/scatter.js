@@ -22,7 +22,7 @@ anychart.scatter = function(var_args) {
   var chart = new anychart.charts.Scatter();
   var theme = anychart.getFullTheme();
 
-  chart.setup(theme['scatter']);
+  chart.setupByVal(theme['scatter'], true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['marker'](arguments[i]);
@@ -45,7 +45,7 @@ anychart.marker = function(var_args) {
   var chart = new anychart.charts.Scatter();
   var theme = anychart.getFullTheme();
 
-  chart.setup(theme['marker']);
+  chart.setupByVal(theme['marker'], true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['marker'](arguments[i]);
@@ -72,7 +72,7 @@ anychart.bubble = function(var_args) {
   var chart = new anychart.charts.Scatter();
   var theme = anychart.getFullTheme();
 
-  chart.setup(theme['bubble']);
+  chart.setupByVal(theme['bubble'], true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['bubble'](arguments[i]);

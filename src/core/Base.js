@@ -12,6 +12,13 @@ goog.require('goog.events.EventTarget');
  * @enum {number}
  */
 anychart.ConsistencyState = {
+  /**
+   * So magical consistency state. Used to invalidate entities
+   * that don't have own invalidation, can't be drawn but must
+   * be able to dispatch signals.
+   * Don't mix it with any other invalidation states!!!
+   */
+  ONLY_DISPATCHING: -1,
   //---------------------------------- GENERAL STATES ---------------------------------
   /**
    * enabled() has changed.
@@ -136,6 +143,9 @@ anychart.ConsistencyState = {
   MAP_GEO_DATA_INDEX: 1 << 22,
   MAP_LABELS: 1 << 23,
   MAP_CALLOUT: 1 << 24,
+  MAP_AXES: 1 << 25,
+  MAP_GRIDS: 1 << 26,
+  MAP_CROSSHAIR: 1 << 27,
   //---------------------------------- HEAT MAP STATES (CHART) ---------------------------------
   HEATMAP_SCALES: 1 << 12,
   HEATMAP_SERIES: 1 << 13,
@@ -333,7 +343,9 @@ anychart.Signal = {
   NEEDS_UPDATE_A11Y: 1 << 11,
   NEEDS_REDRAW_LABELS: 1 << 12,
   NEEDS_REDRAW_APPEARANCE: 1 << 13,
-  NEEDS_UPDATE_TOOLTIP: 1 << 14
+  NEEDS_UPDATE_TOOLTIP: 1 << 14,
+  ENABLED_STATE_CHANGED: 1 << 15,
+  Z_INDEX_STATE_CHANGED: 1 << 16
 };
 
 
@@ -563,8 +575,31 @@ anychart.core.Base.prototype.setup = function(var_args) {
 
 
 /**
+ * Setups the element using passed configuration value. It can be a JSON object or a special value that setups
+ * instances of descendant classes.
+ * Note: this method only changes element properties if they are supposed to be changed by the config value -
+ * it doesn't reset other properties to their defaults.
+ * @param {Object|Array|number|string|undefined|boolean|null} value Arguments to setup the instance.
+ * @param {boolean=} opt_default .
+ * @return {anychart.core.Base} Returns itself for chaining.
+ */
+anychart.core.Base.prototype.setupByVal = function(value, opt_default) {
+  if (goog.isDef(value)) {
+    this.suspendSignalsDispatching();
+    if (!this.specialSetupByVal(value, opt_default) && goog.isObject(value)) {
+      //if (arg0 instanceof anychart.core.Base)
+      //  throw 'Instance of object is passed to setter. You should use JSON instead';
+      this.setupByJSON(/** @type {!Object} */(value), opt_default);
+    }
+    this.resumeSignalsDispatching(true);
+  }
+  return this;
+};
+
+
+/**
  * Setups current instance using passed JSON object.
- * @param {!Object} json
+ * @param {!Object} json .
  * @param {boolean=} opt_default Identifies that we should setup defaults.
  */
 anychart.core.Base.prototype.setupByJSON = function(json, opt_default) {
@@ -578,6 +613,18 @@ anychart.core.Base.prototype.setupByJSON = function(json, opt_default) {
  * @protected
  */
 anychart.core.Base.prototype.setupSpecial = function(var_args) {
+  return this.specialSetupByVal(arguments[0]);
+};
+
+
+/**
+ * Setups current instance using passed JSON object.
+ * @param {Object|Array|number|string|undefined|boolean|null} value .
+ * @param {boolean=} opt_default .
+ * @return {boolean} If passed values were recognized as special setup values.
+ * @protected
+ */
+anychart.core.Base.prototype.specialSetupByVal = function(value, opt_default) {
   return false;
 };
 

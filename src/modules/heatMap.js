@@ -20,7 +20,7 @@ anychart.heatMap = function(opt_data, opt_csvSettings) {
   var chart = new anychart.charts.HeatMap(opt_data, opt_csvSettings);
 
   var theme = anychart.getFullTheme();
-  chart.setup(theme['heatMap']);
+  chart.setupByVal(theme['heatMap'], true);
 
   return chart;
 };

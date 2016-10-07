@@ -17,7 +17,7 @@ anychart.pert = function() {
   var chart = new anychart.charts.Pert();
 
   var theme = anychart.getFullTheme();
-  chart.setup(theme['pert']);
+  chart.setupByVal(theme['pert'], true);
 
   return chart;
 };

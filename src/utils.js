@@ -1111,6 +1111,8 @@ anychart.utils.getNodeNames_ = function(arrayPropName) {
       return ['extra_class_names', 'class_name'];
     case 'dependsOn':
       return ['depends_on', 'item'];
+    case 'precision':
+      return ['precision_list', 'precision'];
   }
   return null;
 };
@@ -1196,6 +1198,8 @@ anychart.utils.getArrayPropName_ = function(nodeName) {
       return ['extraClassNames', 'className'];
     case 'dependsOn':
       return ['dependsOn', 'item'];
+    case 'precisionList':
+      return ['precision', 'precision'];
   }
   return null;
 };

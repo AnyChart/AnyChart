@@ -80,11 +80,19 @@ anychart.core.VisualBase.prototype.zIndex_;
 
 
 /**
+ * Double suspension flag.
+ * @type {boolean}
+ * @protected
+ */
+anychart.core.VisualBase.prototype.doubleSuspension;
+
+
+/**
  * Auto z index of the element.
  * @type {number}
- * @private
+ * @protected
  */
-anychart.core.VisualBase.prototype.autoZIndex_ = 0;
+anychart.core.VisualBase.prototype.autoZIndex = 0;
 
 
 /**
@@ -109,7 +117,8 @@ anychart.core.VisualBase.prototype.doubleSuspension_ = false;
  */
 anychart.core.VisualBase.prototype.SUPPORTED_SIGNALS =
     anychart.Signal.NEEDS_REDRAW |
-    anychart.Signal.BOUNDS_CHANGED;
+    anychart.Signal.BOUNDS_CHANGED |
+    anychart.Signal.ENABLED_STATE_CHANGED;
 
 
 /**
@@ -347,7 +356,7 @@ anychart.core.VisualBase.prototype.zIndex = function(opt_value) {
     }
     return this;
   }
-  return goog.isDef(this.zIndex_) ? this.zIndex_ : this.autoZIndex_;
+  return goog.isDef(this.zIndex_) ? this.zIndex_ : this.autoZIndex;
 };
 
 
@@ -356,7 +365,7 @@ anychart.core.VisualBase.prototype.zIndex = function(opt_value) {
  * @param {number} value
  */
 anychart.core.VisualBase.prototype.setAutoZIndex = function(value) {
-  this.autoZIndex_ = value;
+  this.autoZIndex = value;
 };
 
 
@@ -371,13 +380,13 @@ anychart.core.VisualBase.prototype.enabled = function(opt_value) {
       this.enabled_ = opt_value;
       this.invalidate(anychart.ConsistencyState.ENABLED, this.getEnableChangeSignals());
       if (this.enabled_) {
-        this.doubleSuspension_ = false;
+        this.doubleSuspension = false;
         this.resumeSignalsDispatching(true);
       } else {
         if (isNaN(this.suspendedDispatching)) {
           this.suspendSignalsDispatching();
         } else {
-          this.doubleSuspension_ = true;
+          this.doubleSuspension = true;
         }
       }
     }
@@ -394,18 +403,18 @@ anychart.core.VisualBase.prototype.enabled = function(opt_value) {
  * @protected
  */
 anychart.core.VisualBase.prototype.getEnableChangeSignals = function() {
-  return anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED;
+  return anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED | anychart.Signal.ENABLED_STATE_CHANGED;
 };
 
 
 /** @inheritDoc */
 anychart.core.VisualBase.prototype.resumeSignalsDispatching = function(doDispatch) {
-  var doSpecial = this.doubleSuspension_ && this.suspensionLevel == 1;
+  var doSpecial = this.doubleSuspension && this.suspensionLevel == 1;
   var realSignals;
   if (doSpecial) {
     realSignals = this.suspendedDispatching;
     this.suspendedDispatching = this.getEnableChangeSignals();
-    this.doubleSuspension_ = false;
+    this.doubleSuspension = false;
   }
   goog.base(this, 'resumeSignalsDispatching', doDispatch);
   if (doSpecial) {
@@ -840,20 +849,21 @@ anychart.core.VisualBase.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.VisualBase.prototype.setupSpecial = function(var_args) {
-  var arg0 = arguments[0];
-  if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
-    this.enabled(!!arg0);
+anychart.core.VisualBase.prototype.specialSetupByVal = function(value) {
+  if (goog.isBoolean(value) || goog.isNull(value)) {
+    this.enabled(!!value);
     return true;
   }
-  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
+  return anychart.core.Base.prototype.specialSetupByVal.apply(this, arguments);
 };
 
 
 /** @inheritDoc */
 anychart.core.VisualBase.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  this.enabled('enabled' in config ? config['enabled'] : true);
+
+  var enabled = config['enabled'];
+  this.enabled(goog.isDefAndNotNull(enabled) ? enabled : !goog.isDef(enabled) ? true : undefined);
   this.zIndex(config['zIndex']);
 };
 

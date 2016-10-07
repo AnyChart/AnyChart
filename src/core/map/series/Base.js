@@ -52,7 +52,8 @@ anychart.core.map.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.SERIES_HATCH_FILL |
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.SERIES_LABELS |
-    anychart.ConsistencyState.SERIES_DATA;
+    anychart.ConsistencyState.SERIES_DATA |
+    anychart.ConsistencyState.MAP_GEO_DATA_INDEX;
 
 
 /**
@@ -643,7 +644,7 @@ anychart.core.map.series.Base.prototype.applyZoomMoveTransform = function() {
  * Calculation before draw.
  */
 anychart.core.map.series.Base.prototype.calculate = function() {
-  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_GEO_DATA_INDEX)) {
     var iterator = this.getResetIterator();
     var index = this.map.getIndexedGeoData()[this.geoIdField()];
     while (iterator.advance()) {
@@ -663,6 +664,7 @@ anychart.core.map.series.Base.prototype.calculate = function() {
       }
       iterator.meta('features', features);
     }
+    this.markConsistent(anychart.ConsistencyState.MAP_GEO_DATA_INDEX);
   }
 };
 
@@ -674,6 +676,8 @@ anychart.core.map.series.Base.prototype.calculate = function() {
 anychart.core.map.series.Base.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
     return this;
+
+  this.calculate();
 
   this.suspendSignalsDispatching();
 

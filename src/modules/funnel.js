@@ -23,7 +23,7 @@ anychart.funnel = function(opt_data, opt_csvSettings) {
   var chart = new anychart.charts.Funnel(opt_data, opt_csvSettings);
   var theme = anychart.getFullTheme();
 
-  chart.setup(theme['funnel']);
+  chart.setupByVal(theme['funnel'], true);
 
   return chart;
 };

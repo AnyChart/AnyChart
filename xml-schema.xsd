@@ -368,6 +368,10 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="series_list" type="Map_series_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="color_scales" type="ColorScale_list"/>
 
+            <xsd:element minOccurs="0" maxOccurs="1" name="crosshair" type="core.Crosshair"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="axes_settings" type="core.axes.MapSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="grids_settings" type="core.grids.MapSettings"/>
+
             <xsd:element minOccurs="0" maxOccurs="1" name="geo_data" type="xsd:anyType"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="drill_down_map" type="DrillDownMap"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="a11y" type="utils.A11y"/>
@@ -389,6 +393,8 @@
         <xsd:attribute name="geo_id_field" type="xsd:string"/>
         <xsd:attribute name="geo_data" type="xsd:string"/>
         <xsd:attribute name="crs" type="xsd:string"/>
+        <xsd:attribute name="axes_settings" type="simple.BoolOrNull"/>
+        <xsd:attribute name="grids_settings" type="simple.BoolOrNull"/>
     </xsd:complexType>
 
     <xsd:complexType name="Series">
@@ -904,6 +910,56 @@
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 
+    <xsd:complexType name="core.axes.Map">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="title" type="core.Title"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="minor_labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="ticks" type="core.axes.Ticks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="minor_ticks" type="core.axes.Ticks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+        </xsd:all>
+        <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="true"/>
+        <xsd:attribute name="labels" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="minor_labels" type="simple.BoolOrNull"/>
+        <xsd:attribute name="ticks" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="minor_ticks" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="draw_first_label" type="simple.Bool" default="true"/>
+        <xsd:attribute name="draw_last_label" type="simple.Bool" default="true"/>
+        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="noOverlap"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.axes.MapSettings">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="title" type="core.Title"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="minor_labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="ticks" type="core.axes.Ticks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="minor_ticks" type="core.axes.Ticks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="top" type="core.axes.Map"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="right" type="core.axes.Map"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="bottom" type="core.axes.Map"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="left" type="core.axes.Map"/>
+        </xsd:all>
+        <xsd:attribute name="top" type="simple.StringOrBoolOrNull" default="false"/>
+        <xsd:attribute name="right" type="simple.StringOrBoolOrNull" default="false"/>
+        <xsd:attribute name="bottom" type="simple.StringOrBoolOrNull" default="false"/>
+        <xsd:attribute name="left" type="simple.StringOrBoolOrNull" default="false"/>
+        <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="false"/>
+        <xsd:attribute name="labels" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="minor_labels" type="simple.BoolOrNull"/>
+        <xsd:attribute name="ticks" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="minor_ticks" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="draw_first_label" type="simple.Bool" default="true"/>
+        <xsd:attribute name="draw_last_label" type="simple.Bool" default="true"/>
+        <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="noOverlap"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
     <!-- core.axisMarkers -->
 
     <xsd:complexType name="core.axisMarkers.Line">
@@ -1029,6 +1085,42 @@
         </xsd:sequence>
     </xsd:complexType>
 
+    <xsd:complexType name="core.grids.Map">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="odd_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="even_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="minor_stroke" type="Stroke"/>
+        </xsd:all>
+        <xsd:attribute name="draw_first_line" type="simple.Bool" default="true"/>
+        <xsd:attribute name="draw_last_line" type="simple.Bool" default="true"/>
+        <xsd:attribute name="odd_fill" type="xsd:string"/>
+        <xsd:attribute name="even_fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="minor_stroke" type="xsd:string"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.grids.MapSettings">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="odd_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="even_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="minor_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="vertical" type="core.grids.Map"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="horizontal" type="core.grids.Map"/>
+        </xsd:all>
+        <xsd:attribute name="vertical" type="simple.Bool" default="false"/>
+        <xsd:attribute name="horizontal" type="simple.Bool" default="false"/>
+        <xsd:attribute name="draw_first_line" type="simple.Bool" default="true"/>
+        <xsd:attribute name="draw_last_line" type="simple.Bool" default="true"/>
+        <xsd:attribute name="odd_fill" type="xsd:string"/>
+        <xsd:attribute name="even_fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="minor_stroke" type="xsd:string"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
     <!-- core.ui complex types -->
 
     <xsd:complexType name="core.Background">
@@ -1039,6 +1131,7 @@
         </xsd:all>
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="disable_pointer_events" type="xsd:boolean"/>
         <xsd:attribute name="corner_type" type="enums.BackgroundCornerTypes" default="none"/>
         <xsd:attribute name="corners" type="xsd:double" default="0"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
@@ -1267,6 +1360,7 @@
         </xsd:all>
         <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
         <xsd:attribute name="text" type="xsd:string"/>
+        <xsd:attribute name="auto_text" type="xsd:string"/>
         <xsd:attribute name="rotation" type="simple.DoubleOrNull" default="null"/>
         <xsd:attribute name="width" type="simple.NumberOrPercentOrNull" default="null"/>
         <xsd:attribute name="height" type="simple.NumberOrPercentOrNull" default="null"/>
@@ -1924,6 +2018,15 @@
         <xsd:attribute name="type" type="enums.ScaleTypes" default="ordinalColor"/>
         <xsd:attribute name="inverted" type="simple.Bool" default="false"/>
         <xsd:attribute name="names" type="xsd:string" default="name"/>
+        <xsd:attribute name="stick_to_zero" type="simple.Bool"/>
+        <xsd:attribute name="stack_mode" type="enums.ScaleStackMode" default="none"/>
+        <xsd:attribute name="log_base" type="xsd:double" default="10"/>
+        <xsd:attribute name="minimum" type="simple.DoubleOrNull" default="null"/>
+        <xsd:attribute name="maximum" type="simple.DoubleOrNull" default="null"/>
+        <xsd:attribute name="soft_minimum" type="simple.DoubleOrNull" default="null"/>
+        <xsd:attribute name="soft_maximum" type="simple.DoubleOrNull" default="null"/>
+        <xsd:attribute name="minimum_gap" type="xsd:double" default="0.1"/>
+        <xsd:attribute name="maximum_gap" type="xsd:double" default="0.1"/>
     </xsd:complexType>
 
     <xsd:complexType name="OrdinalColorScale">
@@ -1940,16 +2043,25 @@
 
     <xsd:complexType name="GeoScale">
         <xsd:all>
-            <xsd:element minOccurs="0" maxOccurs="1" name="bounds" type="utils.Rect"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="precision_list" type="Precision_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="x_ticks" type="GeoScaleTicks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="x_minor_ticks" type="GeoScaleTicks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="y_ticks" type="GeoScaleTicks"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="y_minor_ticks" type="GeoScaleTicks"/>
         </xsd:all>
         <xsd:attribute name="type" type="enums.ScaleTypes" default="geo"/>
         <xsd:attribute name="minimum_x" type="simple.NumberOrPercentOrNull"/>
         <xsd:attribute name="minimum_y" type="simple.NumberOrPercentOrNull"/>
         <xsd:attribute name="maximum_x" type="simple.NumberOrPercentOrNull"/>
         <xsd:attribute name="maximum_y" type="simple.NumberOrPercentOrNull"/>
-        <xsd:attribute name="inverted_x" type="simple.Bool"/>
-        <xsd:attribute name="inverted_y" type="simple.Bool"/>
         <xsd:attribute name="gap" type="xsd:double"/>
+        <xsd:attribute name="precision" type="xsd:double"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Precision_list">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="precision" type="xsd:double"/>
+        </xsd:sequence>
     </xsd:complexType>
 
     <xsd:complexType name="LogOrLinScale">
@@ -2018,6 +2130,16 @@
         </xsd:all>
         <xsd:attribute name="mode" type="enums.ScatterTicksMode"/>
         <xsd:attribute name="base" type="xsd:double" default="0"/>
+        <xsd:attribute name="count" type="xsd:unsignedInt"/>
+        <xsd:attribute name="min_count" type="xsd:unsignedInt" default="4"/>
+        <xsd:attribute name="max_count" type="xsd:unsignedInt" default="6"/>
+        <xsd:attribute name="interval" type="simple.ScaleInterval"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="GeoScaleTicks">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="explicit" type="ScaleTicksValues"/>
+        </xsd:all>
         <xsd:attribute name="count" type="xsd:unsignedInt"/>
         <xsd:attribute name="min_count" type="xsd:unsignedInt" default="4"/>
         <xsd:attribute name="max_count" type="xsd:unsignedInt" default="6"/>

@@ -20,7 +20,7 @@ anychart.gauges.circular = function(opt_data, opt_csvSettings) {
   var gauge = new anychart.charts.CircularGauge(opt_data, opt_csvSettings);
   var theme = anychart.getFullTheme();
 
-  gauge.setup(theme['circularGauge']);
+  gauge.setupByVal(theme['circularGauge'], true);
 
   return gauge;
 };
@@ -39,7 +39,7 @@ anychart.circularGauge = function(opt_data, opt_csvSettings) {
   var gauge = new anychart.charts.CircularGauge(opt_data, opt_csvSettings);
   var theme = anychart.getFullTheme();
 
-  gauge.setup(theme['circularGauge']);
+  gauge.setupByVal(theme['circularGauge'], true);
 
   return gauge;
 };

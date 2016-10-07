@@ -1,78 +1,69 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-    body {
-        background: #fcfcfa;
-        height: 500px;
-        position: relative;
-        width: 960px;
-    }
-</style>
-<body></body>
-<script src="d3.v3.js"></script>
-<script src="d3.geo.projection.v0.js"></script>
-<script>
-    //Width and height
-    var width = 1000;
-    var height = 600;
 
-    //Create SVG element
-    var svg = d3.select("body")
-            .append("svg")
+    .graticule {
+        fill: none;
+        stroke: #777;
+        stroke-width: 0.5px;
+        stroke-opacity: 0.5;
+    }
+
+    .land {
+        fill: #222;
+    }
+
+    .boundary {
+        fill: none;
+        stroke: #fff;
+        stroke-width: 0.5px;
+    }
+
+</style>
+<body>
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script src="//d3js.org/topojson.v1.min.js"></script>
+<script>
+
+    var width = 960,
+            height = 960;
+
+//    var projection = d3.geoEquirectangular()
+//            .scale(height / Math.PI)
+//            .translate([width / 2, height / 2]);
+
+    var projection = d3.geo.azimuthalEquidistant()
+            .scale(150)
+            .translate([width / 2, height / 2])
+            .clipAngle(180 - 1e-3)
+            .precision(.1);
+
+    var path = d3.geo.path().projection(projection);
+
+    graticule = d3.geo.graticule();
+    graticule.precision(30);
+
+    var svg = d3.select("body").append("svg")
             .attr("width", width)
             .attr("height", height);
 
-    //Load in GeoJSON data
-    d3.json("world.json", function(json) {
-//        var center = d3.geo.centroid(json);
-//        var scale  = 150;
-//        var offset = [width/2, height/2];
-//        var projection = d3.geo.mercator().scale(scale).center(center).translate(offset);
-//
-//        // create the path
-//        var path = d3.geo.path().projection(projection);
-//
-//        // using the path determine the bounds of the current map and use
-//        // these to determine better values for the scale and translation
-//        var bounds  = path.bounds(json);
-//        var hscale  = scale*width  / (bounds[1][0] - bounds[0][0]);
-//        var vscale  = scale*height / (bounds[1][1] - bounds[0][1]);
-//        var scale   = (hscale < vscale) ? hscale : vscale;
-//        var offset  = [width - (bounds[0][0] + bounds[1][0])/2,
-//            height - (bounds[0][1] + bounds[1][1])/2];
-//
-//        // new projection
-//        projection = d3.geo.mercator().center(center)
-//                .scale(scale).translate(offset);
-//        path = path.projection(projection);
-//
-//        // add a rectangle to see the bound of the svg
-//        svg.append("rect").attr('width', width).attr('height', height)
-//                .style('stroke', 'black').style('fill', 'none');
-//
-//        svg.selectAll("path").data(json.features).enter().append("path")
-//                .attr("d", path)
-//                .style("fill", "red")
-//                .style("stroke-width", "1")
-//                .style("stroke", "black")
+    svg.append("path")
+            .datum(graticule)
+            .attr("class", "graticule")
+            .attr("d", path);
 
-        //Define map projection
-        var projection = d3.geo.hammer()
-                .translate([width/2, height/2])
-                .scale(100);
+    d3.json("../d3-src/world-50m.json", function(error, world) {
+        if (error) throw error;
 
-        //Define path generator
-        var path = d3.geo.path().projection(projection);
+        svg.insert("path", ".graticule")
+                .datum(topojson.feature(world, world.objects.land))
+                .attr("class", "land")
+                .attr("d", path);
 
-        svg.selectAll("path")
-                .data(json.features)
-                .enter()
-                .append("path")
-                .attr("d", path)
-                .style("fill", "none")
-                .style("stroke", "black")
-
-
+        svg.insert("path", ".graticule")
+                .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
+                .attr("class", "boundary")
+                .attr("d", path);
     });
 
 </script>

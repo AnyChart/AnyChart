@@ -235,34 +235,34 @@ anychart.core.CartesianBase.prototype.applyScrollerOffset = function(offsets, sc
   if (scroller.position() == anychart.enums.ChartScrollerPosition.BEFORE_AXES) {
     switch (scroller.orientation()) {
       case anychart.enums.Orientation.TOP:
-        scroller.padding().top(offsets[0] + (this.topAxisPadding_ || 0));
-        scroller.padding().bottom(0);
+        scroller.padding()[anychart.opt.TOP](offsets[0] + (this.topAxisPadding_ || 0));
+        scroller.padding()[anychart.opt.BOTTOM](0);
         offsets[0] += scrollerSize;
         break;
       case anychart.enums.Orientation.BOTTOM:
-        scroller.padding().top(0);
-        scroller.padding().bottom(offsets[2] + (this.bottomAxisPadding_ || 0));
+        scroller.padding()[anychart.opt.TOP](0);
+        scroller.padding()[anychart.opt.BOTTOM](offsets[2] + (this.bottomAxisPadding_ || 0));
         offsets[2] += scrollerSize;
         break;
       case anychart.enums.Orientation.LEFT:
-        scroller.padding().left(offsets[3] + (this.leftAxisPadding_ || 0));
-        scroller.padding().right(0);
+        scroller.padding()[anychart.opt.LEFT](offsets[3] + (this.leftAxisPadding_ || 0));
+        scroller.padding()[anychart.opt.RIGHT](0);
         offsets[3] += scrollerSize;
         break;
       case anychart.enums.Orientation.RIGHT:
-        scroller.padding().left(0);
-        scroller.padding().right(offsets[1] + (this.rightAxisPadding_ || 0));
+        scroller.padding()[anychart.opt.LEFT](0);
+        scroller.padding()[anychart.opt.RIGHT](offsets[1] + (this.rightAxisPadding_ || 0));
         offsets[1] += scrollerSize;
         break;
     }
   }
 
   if (scroller.isHorizontal()) {
-    scroller.padding().left(offsets[3]);
-    scroller.padding().right(offsets[1]);
+    scroller.padding()[anychart.opt.LEFT](offsets[3]);
+    scroller.padding()[anychart.opt.RIGHT](offsets[1]);
   } else {
-    scroller.padding().top(offsets[0]);
-    scroller.padding().bottom(offsets[2]);
+    scroller.padding()[anychart.opt.TOP](offsets[0]);
+    scroller.padding()[anychart.opt.BOTTOM](offsets[2]);
   }
   return offsets;
 };

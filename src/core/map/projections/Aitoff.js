@@ -31,7 +31,7 @@ anychart.core.map.projections.Aitoff.prototype.forward = function(x, y) {
 /** @inheritDoc */
 anychart.core.map.projections.Aitoff.prototype.invert = function(x, y) {
   var epsilon = 1e-6;
-  if (x * x + 4 * y * y > Math.PI * Math.PI + epsilon) return null;
+  if (x * x + 4 * y * y > Math.PI * Math.PI + epsilon) return [NaN, NaN];
   var lambda = x, phi = y, i = 25;
   var F = 0;
   do {

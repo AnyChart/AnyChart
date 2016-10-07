@@ -1,114 +1,78 @@
-var chart;
+var chart1, chart2, chart3, chart4;
 anychart.onDocumentLoad(function() {
-  anytest.setUp(400, 350);
+  anytest.setUp(500,500);
 
-//---------------------Linear Scale-----------------------------------------
+  chart1 = anychart.map();
+  chart1.geoData(anychart.maps.australia);
+  chart1.axes().left()
+      .enabled(true);
+  chart1.axes().left().ticks({length:10, position:'in', stroke:'3 green .7'});
+  chart1.bounds(0,0,'50%', '50%');
+  anytest.drawInStage(chart1);
 
-  var scale = anychart.scales.linear();
-  scale.ticks([1, 2, 3, 4]).minimum(1).maximum(4);
+  chart2 = anychart.map();
+  chart2.geoData(anychart.maps.australia);
+  chart2.axes().enabled(true);
+  chart2.axes().right().minorTicks({length: 20, stroke:'5 yellow .7', position:'in'});
+  chart2.bounds('50%',0,'50%', '50%');
+  anytest.drawInStage(chart2);
 
-  axis = anychart.axes.linear();
-  axis.parentBounds(105, 65, 200, 100)
-      .scale(scale)
-      .title().enabled(false);
-  anytest.drawInStage(axis);
+  chart3 = anychart.map();
+  chart3.geoData(anychart.maps.australia);
+  chart3.axes().top(true);
+  chart3.axes().top().minorTicks()
+      .enabled(true)
+      .stroke('1 red')
+      .length(10)
+      .position('in');
+  chart3.axes().top().minorLabels()
+      .enabled(true)
+      .rotation(10)
+      .offsetY(-30)
+      .anchor('centerBottom')
+      .fontColor('#B8008A');
+  chart3.bounds(0,'50%','50%', '50%');
+  anytest.drawInStage(chart3);
 
-  lineMarker = anychart.axisMarkers.line();
-  lineMarker.parentBounds(105, 20, 200, 67)
-      .scale(scale)
-      .value(1.5)
-      .layout('vertical');
-  anytest.drawInStage(lineMarker);
+  chart4 = anychart.map();
+  chart4.geoData(anychart.maps.canada);
+  chart4.axes().enabled(true)
+      .ticks(null)
+      .labels(null)
+      .minorTicks({enabled:true, position:'out', length:4, stroke: 'blue'});
+  chart4.axes().top().labels()
+      .enabled(true)
+      .rotation(-90)
+      .anchor('centerTop')
+      .padding(0)
+      .fontSize(7)
+      .fontColor('#B8008A');
+  chart4.axes().left().labels()
+      .enabled(true)
+      .fontColor('#008AB8');
+  chart4.bounds('50%','50%','50%', '50%');
+  anytest.drawInStage(chart4);
 
-  textMarker = anychart.axisMarkers.text();
-  textMarker.scale(scale)
-      .text('Linear')
-      .value(1.5)
-      .parentBounds(55, 5, 200, 67);
-  anytest.drawInStage(textMarker);
+  anytest.stageListen(function() {
+    anytest.step(function(){
+      anytest.CAT.getScreen();
+    });
+    anytest.step(function(){
+      chart1.axes().left().ticks({length:5, position:'in', stroke:'3 green .7'}); // length
+      chart2.axes().right().minorTicks({length: 20, stroke:'5 yellow .7', position:'out'}); //position
+      chart3.axes().top().minorTicks()
+          .enabled(true)
+          .stroke('1 red')
+          .length(10)
+          .position('out'); // position
+      chart4.axes().ticks({length: 5, position:'in', stroke:'3 orange .7'})
+          .labels({fontColor: '#8A00B8'});
+      chart4.axes().minorTicks({enabled:true, position:'out', length:4, stroke: '2 blue'});//stroke
+      anytest.CAT.getScreen('afterDrawChangeTicks', -1);
+    });
 
-//------------------------Logarithmic scale---------------------------------------
+    anytest.exit();
 
-  var scale1 = anychart.scales.log();
-  scale1.minimum(0.001).maximum(1000);
-
-  axis1 = anychart.axes.linear();
-  axis1.parentBounds(105, 140, 200, 100)
-      .scale(scale1)
-      .title().enabled(false);
-  anytest.drawInStage(axis1);
-
-  linemarker1 = anychart.axisMarkers.line();
-  linemarker1.parentBounds(105, 95, 200, 67)
-      .scale(scale1)
-      .value(0.01)
-      .layout(anychart.enums.Layout.VERTICAL);
-  anytest.drawInStage(linemarker1);
-
-  textMarker1 = anychart.axisMarkers.text();
-  textMarker1.scale(scale1)
-      .text('Logarithmic')
-      .value(0.01)
-      .parentBounds(70, 80, 200, 67);
-  anytest.drawInStage(textMarker1);
-
-//------------------------Ordinal scale---------------------------------------
-
-  var scale2 = anychart.scales.ordinal();
-  scale2.values(['P1', 2, 'P3', 4, 5, 6]);
-
-  axis2 = anychart.axes.linear();
-  axis2.parentBounds(105, 215, 200, 67)
-      .scale(scale2);
-  axis2.title().enabled(false);
-  anytest.drawInStage(axis2);
-
-  linemarker2 = anychart.axisMarkers.line();
-  linemarker2.parentBounds(105, 170, 200, 67)
-      .scale(scale2)
-      .value(2)
-      .layout(anychart.enums.Layout.VERTICAL);
-  anytest.drawInStage(linemarker2);
-
-  textMarker2 = anychart.axisMarkers.text();
-  textMarker2.scale(scale2)
-      .text('Ordinal')
-      .value(2)
-      .parentBounds(75, 160, 200, 67);
-  anytest.drawInStage(textMarker2);
-
-//------------------------DateTime scale---------------------------------------
-
-  var scale3 = anychart.scales.dateTime();
-  scale3.minimum(Date.UTC(2004, 7, 1)).maximum(Date.UTC(2016, 8, 5));
-  scale3.ticks().interval('years', 2);
-
-  axis3 = anychart.axes.linear();
-  axis3.parentBounds(105, 290, 200, 67)
-      .scale(scale3);
-  axis3.title().enabled(false);
-  anytest.drawInStage(axis3);
-
-  linemarker3 = anychart.axisMarkers.line();
-  linemarker3.parentBounds(105, 245, 200, 67);
-  linemarker3.scale(scale3);
-  linemarker3.value(1217548800000) //Date.UTC(2008, 08, 01)
-      .layout('vertical');
-  anytest.drawInStage(linemarker3);
-
-  textMarker3 = anychart.axisMarkers.text();
-  textMarker3.scale(scale3)
-      .text('DateTime')
-      .value(1217548800000) //Date.UTC(2008, 08, 01)
-      .parentBounds(100, 240, 200, 67);
-
-  anytest.stageListen().drawInStage(textMarker3);
-  anytest.charts4modes(
-      'axis', 'lineMarker', 'textMarker',
-      'axis1', 'linemarker1', 'textMarker1',
-      'axis2', 'lineMarker2', 'textMarker2',
-      'axis3', 'linemarker3', 'textMarker3');
+  }).charts4modes('chart1', 'chart2', 'chart3', 'chart4');
   stage.resume();
 });
-
-

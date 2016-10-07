@@ -26,7 +26,7 @@ anychart.area3d = function(var_args) {
   chart.defaultSeriesType(anychart.enums.Cartesian3dSeriesType.AREA);
   chart.setType(anychart.enums.ChartTypes.AREA_3D);
 
-  chart.setup(theme['area3d']);
+  chart.setupByVal(theme['area3d'], true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['area'](arguments[i]);

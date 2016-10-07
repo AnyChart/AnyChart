@@ -977,15 +977,15 @@ anychart.core.ui.Scroller.prototype.updateBoundsCache = function() {
     this.pixelBoundsCache = this.padding().tightenBounds(this.fullPixelBoundsCache);
   } else {
     if (this.orientation_ == anychart.enums.Orientation.LEFT) {
-      top = anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().left()), this.fullPixelBoundsCache.width);
-      right = anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().top()), this.fullPixelBoundsCache.height);
-      bottom = anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().right()), this.fullPixelBoundsCache.width);
-      left = anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().bottom()), this.fullPixelBoundsCache.height);
+      top = anychart.utils.normalizeSize(this.padding().getSafeOption(anychart.opt.LEFT), this.fullPixelBoundsCache.width);
+      right = anychart.utils.normalizeSize(this.padding().getSafeOption(anychart.opt.TOP), this.fullPixelBoundsCache.height);
+      bottom = anychart.utils.normalizeSize(this.padding().getSafeOption(anychart.opt.RIGHT), this.fullPixelBoundsCache.width);
+      left = anychart.utils.normalizeSize(this.padding().getSafeOption(anychart.opt.BOTTOM), this.fullPixelBoundsCache.height);
     } else {
-      top = anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().right()), this.fullPixelBoundsCache.width);
-      right = anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().bottom()), this.fullPixelBoundsCache.height);
-      bottom = anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().left()), this.fullPixelBoundsCache.width);
-      left = anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().top()), this.fullPixelBoundsCache.height);
+      top = anychart.utils.normalizeSize(this.padding().getSafeOption(anychart.opt.RIGHT), this.fullPixelBoundsCache.width);
+      right = anychart.utils.normalizeSize(this.padding().getSafeOption(anychart.opt.BOTTOM), this.fullPixelBoundsCache.height);
+      bottom = anychart.utils.normalizeSize(this.padding().getSafeOption(anychart.opt.LEFT), this.fullPixelBoundsCache.width);
+      left = anychart.utils.normalizeSize(this.padding().getSafeOption(anychart.opt.TOP), this.fullPixelBoundsCache.height);
 
     }
     this.pixelBoundsCache.left = this.fullPixelBoundsCache.left + left;

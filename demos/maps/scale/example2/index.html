@@ -1,0 +1,74 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <!-- Konkout - MVVM model provider -->
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js"></script>-->
+
+    <!-- Color picker -->
+    <script src="../../../bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js"></script>
+    <link rel="stylesheet" href="../../../bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css"/>
+
+    <!--bootstrap-chosen-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.6.2/chosen.jquery.min.js"></script>
+    <link rel="stylesheet" href="./bootstrap-chosen/bootsrap-chosen.css"/>
+
+    <!--bootstrap-slider-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.2.0/bootstrap-slider.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.2.0/css/bootstrap-slider.min.css"/>
+
+    <script src="../../../../contrib/closure-library/closure/goog/base.js"></script>
+    <script src="../../../../src/deps.js"></script>
+    <script src="../../../../proj4.js"></script>
+
+    <script>
+        goog.require('anychart.themes.defaultTheme');
+        goog.require('anychart.modules.anychart_bundle');
+    </script>
+
+    <!--<script src="../../../../out/anymap.min.js"></script>-->
+
+    <style>
+        html {
+            overflow-y: scroll;
+        }
+        #container {
+            width: 65%;
+            height: 100%;
+            /*width: 400px;*/
+            /*height: 300px;*/
+            /*border: 1px solid #000;*/
+        }
+    </style>
+    <script src="http://cdn.anychart.com/geodata/1.2.0/custom/world_source/world_source.js"></script>
+    <script src="http://cdn.anychart.com/geodata/1.2.0/custom/world/world.js"></script>
+    <script src="http://cdn.anychart.com/geodata/1.2.0/countries/ireland/ireland.js"></script>
+    <script src="http://cdn.anychart.com/geodata/1.2.0/countries/canada/canada.js"></script>
+    <script src="http://cdn.anychart.com/geodata/1.2.0/countries/france/france.js"></script>
+    <script src="http://cdn.anychart.com/geodata/1.2.0/countries/united_states_of_america/united_states_of_america.js"></script>
+    <script src="http://cdn.anychart.com/geodata/1.2.0/countries/australia/australia.js"></script>
+    <!--<script src="http://cdn.anychart.com/geodata/countries/aus/australia.js"></script>-->
+    <script src="http://cdn.anychart.com/geodata/1.2.0/countries/china/china.js"></script>
+    <script src="index.js"></script>
+</head>
+<body>
+<div class="col-xs-8"><div id="container" style="position: fixed"></div></div>
+<div class="col-xs-4 panel-body" id="chart_settings"></div>
+</body>
+</html>
+
+
+
+

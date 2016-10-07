@@ -456,7 +456,7 @@ anychart.core.ui.Tooltip.prototype.show = function(textInfo, position) {
 
   this.item_.suspendSignalsDispatching();
   this.item_.content().text(contentText);
-  this.item_.title().text(titleText);
+  this.item_.title()[anychart.opt.TEXT](titleText);
 
   var realPosition = this.processPosition_(position);
 
@@ -502,7 +502,7 @@ anychart.core.ui.Tooltip.prototype.redraw = function() {
 
     this.item_.x(realPosition.x);
     this.item_.y(realPosition.y);
-    this.item_.title().text(titleText);
+    this.item_.title()[anychart.opt.TEXT](titleText);
     this.item_.content().text(contentText);
     this.item_.draw();
     this.item_.resumeSignalsDispatching(false);

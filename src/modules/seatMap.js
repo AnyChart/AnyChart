@@ -22,7 +22,7 @@ anychart.seatMap = function(var_args) {
 
   map.defaultSeriesType(anychart.enums.MapSeriesType.CHOROPLETH);
 
-  map.setup(theme['seatMap']);
+  map.setupByVal(theme['seatMap'], true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     map.choropleth(arguments[i]);

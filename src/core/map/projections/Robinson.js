@@ -23,6 +23,8 @@ anychart.core.map.projections.Robinson.CONSTANTS = [[.9986, -.062], [1, 0], [.99
 
 /** @inheritDoc */
 anychart.core.map.projections.Robinson.prototype.forward = function(x, y) {
+  if (isNaN(x) || isNaN(y)) return [NaN, NaN];
+
   x = goog.math.toRadians(x);
   y = goog.math.toRadians(y);
 
@@ -47,6 +49,8 @@ anychart.core.map.projections.Robinson.prototype.forward = function(x, y) {
 
 /** @inheritDoc */
 anychart.core.map.projections.Robinson.prototype.invert = function(x, y) {
+  if (isNaN(x) || isNaN(y)) return [NaN, NaN];
+
   var robinsonConstants = anychart.core.map.projections.Robinson.CONSTANTS;
   var eps = 1e-6, eps2 = eps * eps;
 

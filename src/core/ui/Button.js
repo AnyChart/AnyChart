@@ -227,7 +227,7 @@ anychart.core.ui.Button.prototype.disabled = function(opt_enable) {
  * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
  * @param {(string|number)=} opt_bottom Bottom space.
  * @param {(string|number)=} opt_left Left space.
- * @return {!(anychart.core.ui.Button|anychart.core.utils.Margin)} Padding or self for method chaining.
+ * @return {!(anychart.core.ui.Button|anychart.core.utils.Padding)} Padding or self for method chaining.
  */
 anychart.core.ui.Button.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {
@@ -542,14 +542,14 @@ anychart.core.ui.Button.prototype.calculateButtonBounds_ = function() {
     } else { // in other case - calculating using parent width
       width = anychart.utils.normalizeSize(/** @type {number|string} */ (this.width_), parentWidth);
     }
-    if (hasText) this.textX = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.left()), width);
+    if (hasText) this.textX = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.getSafeOption(anychart.opt.LEFT)), width);
   } else { // if width is not set  - it is either the same as text width, or 0
     if (hasText) {// if there is text - adjust
       width = textWidth;
     } else { // or set to 0
       width = 0;
     }
-    if (hasText) this.textX = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.left()), width);
+    if (hasText) this.textX = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.getSafeOption(anychart.opt.LEFT)), width);
     // if width is not set - use padding
     width = padding.widenWidth(width);
   }
@@ -571,14 +571,14 @@ anychart.core.ui.Button.prototype.calculateButtonBounds_ = function() {
     } else { // in other case - calculating using parent height
       height = anychart.utils.normalizeSize(/** @type {number|string} */ (this.height_), parentHeight);
     }
-    if (hasText) this.textY = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.top()), height);
+    if (hasText) this.textY = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.getSafeOption(anychart.opt.TOP)), height);
   } else { // if height is not set  - it is either the same as text height, or 0
     if (hasText) { // if there is text - adjust
       height = textHeight;
     } else { // or set to 0
       height = 0;
     }
-    if (hasText) this.textY = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.top()), height);
+    if (hasText) this.textY = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.getSafeOption(anychart.opt.TOP)), height);
     // if height is not set - use padding
     height = padding.widenHeight(height);
   }

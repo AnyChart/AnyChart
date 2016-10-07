@@ -27,6 +27,20 @@ anychart.opt.SELECT_FILL = 'selectFill';
 
 
 /**
+ * Constant replacer for "oddFill" string.
+ * @const {string}
+ */
+anychart.opt.ODD_FILL = 'oddFill';
+
+
+/**
+ * Constant replacer for "evenFill" string.
+ * @const {string}
+ */
+anychart.opt.EVEN_FILL = 'evenFill';
+
+
+/**
  * Constant replacer for "selectedFill" string.
  * @const {string}
  */
@@ -66,6 +80,13 @@ anychart.opt.SELECTED_HATCH_FILL = 'selectedHatchFill';
  * @const {string}
  */
 anychart.opt.STROKE = 'stroke';
+
+
+/**
+ * Constant replacer for "minorStroke" string.
+ * @const {string}
+ */
+anychart.opt.MINOR_STROKE = 'minorStroke';
 
 
 /**
@@ -577,6 +598,13 @@ anychart.opt.WHISKER = 'whisker';
  * @const {string}
  */
 anychart.opt.SIZE = 'size';
+
+
+/**
+ * Constant replacer for "length" string.
+ * @const {string}
+ */
+anychart.opt.LENGTH = 'length';
 
 
 /**
@@ -1461,151 +1489,240 @@ anychart.opt.NUMBER_LOCALE = 'numberLocale';
 anychart.opt.MESSAGES = 'messages';
 
 
+//region -- Text props.
 /**
- * Constant replacer for "width" string.
  * @const {string}
  */
-anychart.opt.WIDTH = 'width';
+anychart.opt.MIN_FONT_SIZE = 'minFontSize';
 
 
 /**
- * Constant replacer for "height" string.
  * @const {string}
  */
-anychart.opt.HEIGHT = 'height';
+anychart.opt.MAX_FONT_SIZE = 'maxFontSize';
 
 
 /**
- * Constant replacer for "fontSize" string.
+ * @const {string}
+ */
+anychart.opt.ADJUST_FONT_SIZE = 'adjustFontSize';
+
+
+/**
  * @const {string}
  */
 anychart.opt.FONT_SIZE = 'fontSize';
 
 
 /**
- * Constant replacer for "fontFamily" string.
  * @const {string}
  */
 anychart.opt.FONT_FAMILY = 'fontFamily';
 
 
 /**
- * Constant replacer for "fontColor" string.
  * @const {string}
  */
 anychart.opt.FONT_COLOR = 'fontColor';
 
 
 /**
- * Constant replacer for "fontOpacity" string.
  * @const {string}
  */
 anychart.opt.FONT_OPACITY = 'fontOpacity';
 
 
 /**
- * Constant replacer for "fontDecoration" string.
  * @const {string}
  */
 anychart.opt.FONT_DECORATION = 'fontDecoration';
 
 
 /**
- * Constant replacer for "fontStyle" string.
  * @const {string}
  */
 anychart.opt.FONT_STYLE = 'fontStyle';
 
 
 /**
- * Constant replacer for "fontVariant" string.
  * @const {string}
  */
 anychart.opt.FONT_VARIANT = 'fontVariant';
 
 
 /**
- * Constant replacer for "fontWeight" string.
  * @const {string}
  */
 anychart.opt.FONT_WEIGHT = 'fontWeight';
 
 
 /**
- * Constant replacer for "letterSpacing" string.
  * @const {string}
  */
 anychart.opt.LETTER_SPACING = 'letterSpacing';
 
 
 /**
- * Constant replacer for "textDirection" string.
  * @const {string}
  */
 anychart.opt.TEXT_DIRECTION = 'textDirection';
 
 
 /**
- * Constant replacer for "lineHeight" string.
  * @const {string}
  */
 anychart.opt.LINE_HEIGHT = 'lineHeight';
 
 
 /**
- * Constant replacer for "textIndent" string.
  * @const {string}
  */
 anychart.opt.TEXT_INDENT = 'textIndent';
 
 
 /**
- * Constant replacer for "vAlign" string.
  * @const {string}
  */
 anychart.opt.V_ALIGN = 'vAlign';
 
 
 /**
- * Constant replacer for "hAlign" string.
  * @const {string}
  */
 anychart.opt.H_ALIGN = 'hAlign';
 
 
 /**
- * Constant replacer for "textWrap" string.
  * @const {string}
  */
 anychart.opt.TEXT_WRAP = 'textWrap';
 
 
 /**
- * Constant replacer for "textOverflow" string.
  * @const {string}
  */
 anychart.opt.TEXT_OVERFLOW = 'textOverflow';
 
 
 /**
- * Constant replacer for "selectable" string.
  * @const {string}
  */
 anychart.opt.SELECTABLE = 'selectable';
 
 
 /**
- * Constant replacer for "disablePointerEvents" string.
  * @const {string}
  */
 anychart.opt.DISABLE_POINTER_EVENTS = 'disablePointerEvents';
 
 
 /**
- * Constant replacer for "useHtml" string.
  * @const {string}
  */
 anychart.opt.USE_HTML = 'useHtml';
+//endregion
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.WIDTH = 'width';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.HEIGHT = 'height';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.ALIGN = 'align';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.ORIENTATION = 'orientation';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.ROTATION = 'rotation';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.OVERLAP_MODE = 'overlapMode';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.DRAW_FIRST_LABEL = 'drawFirstLabel';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.DRAW_LAST_LABEL = 'drawLastLabel';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.DRAW_FIRST_LINE = 'drawFirstLine';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.DRAW_LAST_LINE = 'drawLastLine';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.AUTO_TEXT = 'autoText';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.CORNER_TYPE = 'cornerType';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.CORNERS = 'corners';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.TITLE = 'title';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.BACKGROUND = 'background';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.MARGIN = 'margin';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.PADDING = 'padding';
 
 
 /**
@@ -1672,24 +1789,10 @@ anychart.opt.OPACITY = 'opacity';
 
 
 /**
- * Constant replacer for "align" string.
- * @const {string}
- */
-anychart.opt.ALIGN = 'align';
-
-
-/**
  * Constant replacer for "fittingMode" string.
  * @const {string}
  */
 anychart.opt.FITTING_MODE = 'fittingMode';
-
-
-/**
- * Constant replacer for "margin" string.
- * @const {string}
- */
-anychart.opt.MARGIN = 'margin';
 
 
 /**

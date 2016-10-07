@@ -22,7 +22,7 @@ anychart.markerMap = function(var_args) {
 
   map.defaultSeriesType(anychart.enums.MapSeriesType.MARKER);
 
-  map.setup(theme['markerMap']);
+  map.setupByVal(theme['markerMap'], true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     map.marker(arguments[i]);

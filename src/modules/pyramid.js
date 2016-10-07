@@ -23,7 +23,7 @@ anychart.pyramid = function(opt_data, opt_csvSettings) {
   var chart = new anychart.charts.Pyramid(opt_data, opt_csvSettings);
   var theme = anychart.getFullTheme();
 
-  chart.setup(theme['pyramid']);
+  chart.setupByVal(theme['pyramid'], true);
 
   return chart;
 };

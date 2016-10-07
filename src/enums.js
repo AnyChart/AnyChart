@@ -2136,6 +2136,16 @@ anychart.enums.normalizeMapProjections = function(value) {
 
 
 /**
+ * List of grid position relative othe map components. Grid z-index.
+ * @enum {number}
+ */
+anychart.enums.MapGridZIndex = {
+  UNDER_MAP: 5,
+  OVER_MAP: 45
+};
+
+
+/**
  * Defines that middleX and middleY field means.
  * If mode is 'absolute' then coords of middle sets as lat/lon coords.
  * If 'relative' - as ratio of region bounds.
@@ -5481,6 +5491,9 @@ goog.exportSymbol('anychart.enums.MapProjections.ORTHOGRAPHIC', anychart.enums.M
 goog.exportSymbol('anychart.enums.MapProjections.ROBINSON', anychart.enums.MapProjections.ROBINSON);
 goog.exportSymbol('anychart.enums.MapProjections.WAGNER6', anychart.enums.MapProjections.WAGNER6);
 goog.exportSymbol('anychart.enums.MapProjections.WSG84', anychart.enums.MapProjections.WSG84);
+
+goog.exportSymbol('anychart.enums.MapGridZIndex.UNDER_MAP', anychart.enums.MapGridZIndex.UNDER_MAP);
+goog.exportSymbol('anychart.enums.MapGridZIndex.OVER_MAP', anychart.enums.MapGridZIndex.OVER_MAP);
 
 goog.exportSymbol('anychart.enums.MapUnboundRegionsMode.AS_IS', anychart.enums.MapUnboundRegionsMode.AS_IS);
 goog.exportSymbol('anychart.enums.MapUnboundRegionsMode.HIDE', anychart.enums.MapUnboundRegionsMode.HIDE);

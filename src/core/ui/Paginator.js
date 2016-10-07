@@ -91,31 +91,6 @@ anychart.core.ui.Paginator = function() {
    */
   this.text_ = null;
 
-  this
-    .fontColor('#545f69')
-    .fontSize('12px')
-    .orientation('right')
-    .margin(0)
-    .padding(2);
-
-  this.background()
-      .enabled(false)
-      .stroke({
-        'keys': [
-          '0 #DDDDDD 1',
-          '1 #D0D0D0 1'
-        ],
-        'angle' : '90'
-      })
-      .fill({
-        'keys': [
-          '0 #FFFFFF 1',
-          '0.5 #F3F3F3 1',
-          '1 #FFFFFF 1'
-        ],
-        'angle' : '90'
-      });
-
   this.pageCount(1);
   this.currentPage(1);
 
@@ -495,8 +470,8 @@ anychart.core.ui.Paginator.prototype.draw = function() {
     var nextButtonX;
     var nextButtonY;
 
-    var padTop = anychart.utils.normalizeSize(/** @type {number|string} */ (this.padding().top()), this.backgroundHeight_);
-    var padLeft = anychart.utils.normalizeSize(/** @type {number|string} */ (this.padding().left()), this.backgroundWidth_);
+    var padTop = anychart.utils.normalizeSize(/** @type {number|string} */ (this.padding().getSafeOption(anychart.opt.TOP)), this.backgroundHeight_);
+    var padLeft = anychart.utils.normalizeSize(/** @type {number|string} */ (this.padding().getSafeOption(anychart.opt.LEFT)), this.backgroundWidth_);
 
     var availWidth = this.padding().tightenWidth(this.backgroundWidth_);
     var availHeight = this.padding().tightenHeight(this.backgroundHeight_);
@@ -638,8 +613,8 @@ anychart.core.ui.Paginator.prototype.calculatePaginatorBounds_ = function() {
 
   var widthWithMargin = margin.widenWidth(this.backgroundWidth_);
   var heightWithMargin = margin.widenHeight(this.backgroundHeight_);
-  var leftMargin = parentBounds ? anychart.utils.normalizeSize(/** @type {number} */(margin.left()), this.backgroundWidth_) : 0;
-  var topMargin = parentBounds ? anychart.utils.normalizeSize(/** @type {number} */(margin.top()), this.backgroundHeight_) : 0;
+  var leftMargin = parentBounds ? anychart.utils.normalizeSize(margin.getSafeOption(anychart.opt.LEFT), this.backgroundWidth_) : 0;
+  var topMargin = parentBounds ? anychart.utils.normalizeSize(margin.getSafeOption(anychart.opt.TOP), this.backgroundHeight_) : 0;
 
   if (parentBounds) {
     switch (this.orientation_) {
@@ -830,9 +805,11 @@ anychart.core.ui.Paginator.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.ui.Paginator.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  this.background(config['background']);
-  this.padding(config['padding']);
-  this.margin(config['margin']);
+
+  this.background(config[anychart.opt.BACKGROUND]);
+  this.margin(config[anychart.opt.MARGIN]);
+  this.padding(config[anychart.opt.PADDING]);
+
   this.orientation(config['orientation']);
   this.layout(config['layout']);
 };

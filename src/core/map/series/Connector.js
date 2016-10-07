@@ -116,7 +116,7 @@ anychart.core.map.series.Connector.prototype.createFormatProvider = function(opt
  */
 anychart.core.map.series.Connector.prototype.getReferenceCoords = function() {
   if (!this.enabled()) return null;
-  var scale = /** @type {anychart.core.map.scale.Geo} */(this.map.scale());
+  var scale = /** @type {anychart.scales.Geo} */(this.map.scale());
 
   var iterator = this.getIterator();
 

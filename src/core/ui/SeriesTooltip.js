@@ -194,7 +194,7 @@ anychart.core.ui.SeriesTooltip.prototype.valuePostfix = function(opt_value) {
  */
 anychart.core.ui.SeriesTooltip.prototype.getFormattedTitle = function(contextProvider) {
   contextProvider = goog.object.clone(contextProvider);
-  contextProvider['titleText'] = this.title_.text();
+  contextProvider['titleText'] = this.title_.getOption(anychart.opt.TEXT);
   var formatter = this.titleFormatter();
   if (goog.isString(formatter))
     formatter = anychart.core.utils.TokenParser.getInstance().getTextFormatter(formatter);
@@ -881,8 +881,7 @@ anychart.core.ui.SeriesTooltip.prototype.selectable = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.selectable_ != opt_value) {
       this.selectable_ = opt_value;
-
-      this.title_.selectable(opt_value);
+      this.title_[anychart.opt.SELECTABLE](opt_value);
       this.content_.selectable(opt_value);
     }
     return this;
@@ -903,7 +902,7 @@ anychart.core.ui.SeriesTooltip.prototype.disablePointerEvents = function(opt_val
     if (opt_value != this.disablePointerEvents_) {
       this.disablePointerEvents_ = opt_value;
       this.content_.disablePointerEvents(opt_value);
-      this.title_.disablePointerEvents(opt_value);
+      this.title_[anychart.opt.DISABLE_POINTER_EVENTS](opt_value);
     }
     return this;
   } else {
@@ -1564,11 +1563,16 @@ anychart.core.ui.SeriesTooltip.prototype.setupByJSON = function(config) {
   if (goog.isDef(config['isFloating'])) {
     this.isFloatingInternal(config['isFloating']);
   }
-  this.title(config['title']);
+
+  this.title(config[anychart.opt.TITLE]);
+
   this.separator(config['separator']);
   this.contentInternal(config['content']);
-  this.background(config['background']);
-  this.padding(config['padding']);
+
+  this.background(config[anychart.opt.BACKGROUND]);
+
+  this.padding(config[anychart.opt.PADDING]);
+
   this.hideDelay(config['hideDelay']);
 
   this.minFontSize(config['minFontSize']);

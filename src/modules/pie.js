@@ -23,7 +23,7 @@ anychart.pie = function(opt_data, opt_csvSettings) {
   var chart = new anychart.charts.Pie(opt_data, opt_csvSettings);
   var theme = anychart.getFullTheme();
 
-  chart.setup(theme['pie']);
+  chart.setupByVal(theme['pie'], true);
 
   return chart;
 };

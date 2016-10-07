@@ -25,7 +25,7 @@ anychart.polar = function(var_args) {
   var chart = new anychart.charts.Polar();
   var theme = anychart.getFullTheme();
 
-  chart.setup(theme['polar']);
+  chart.setupByVal(theme['polar'], true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.marker(arguments[i]);

@@ -22,7 +22,7 @@ anychart.bubbleMap = function(var_args) {
 
   map.defaultSeriesType(anychart.enums.MapSeriesType.BUBBLE);
 
-  map.setup(theme['bubbleMap']);
+  map.setupByVal(theme['bubbleMap'], true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     map.bubble(arguments[i]);

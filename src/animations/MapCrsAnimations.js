@@ -55,7 +55,7 @@ goog.inherits(anychart.animations.MapCrsAnimation, anychart.animations.MapAnimat
  *    t: number,
  *    tx: Object,
  *    srcProjection: anychart.core.map.projections.Base,
- *    geoScale: anychart.core.map.scale.Geo
+ *    geoScale: anychart.scales.Geo
  * }}
  * @private
  */
@@ -76,8 +76,7 @@ anychart.animations.MapCrsAnimation.prototype.calcGeom_ = function(coords, index
   coords[index] = p1[0] * this.tx.scale + this.tx.xoffset;
   coords[index + 1] = p1[1] * this.tx.scale + this.tx.yoffset;
 
-  this.geoScale.extendDataRangeX(coords[index]);
-  this.geoScale.extendDataRangeY(coords[index + 1]);
+  this.geoScale.extendDataRangeInternal(coords[index], coords[index + 1]);
 };
 
 
@@ -99,13 +98,15 @@ anychart.animations.MapCrsAnimation.prototype.updateCoords = function(t) {
   });
 
   this.tx.curProj.ratio(t);
-  this.map.scale().startAutoCalc();
+  this.map.scale().suspendSignalsDispatching();
+  this.map.scale().startAutoCalc(false);
   this.map.postProcessGeoData(
       /** @type {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>} */(this.geoData),
       callback,
       false,
       true);
   this.map.scale().finishAutoCalc();
+  this.map.scale().resumeSignalsDispatching(true);
 };
 
 

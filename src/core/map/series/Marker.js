@@ -374,8 +374,8 @@ anychart.core.map.series.Marker.prototype.createPositionProvider = function(posi
 
   var arrayMappingWithRegion = anychart.utils.isNaN(x) && x == id;
 
-  x = anychart.utils.toNumber(x);
-  y = anychart.utils.toNumber(y);
+  x = parseFloat(x);
+  y = parseFloat(y);
 
   var txCoords = scale.transform(x, y);
   if (!isNaN(x))

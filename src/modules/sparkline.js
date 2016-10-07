@@ -26,7 +26,7 @@ anychart.sparkline = function(opt_data, opt_csvSettings) {
   var chart = new anychart.charts.Sparkline(opt_data, opt_csvSettings);
   var theme = anychart.getFullTheme();
 
-  chart.setup(theme['sparkline']);
+  chart.setupByVal(theme['sparkline'], true);
 
   return chart;
 };

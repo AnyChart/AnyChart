@@ -432,6 +432,9 @@ goog.provide('anychart.themes.v6');
       'enabled': true,
       'offsetX': 0,
       'offsetY': 0,
+      'width': null,
+      'height': null,
+      'clip': null,
       'anchor': 'center',
       'padding': {
         'top': 2,
@@ -5275,6 +5278,7 @@ goog.provide('anychart.themes.v6');
 
     // merge with chart
     'map': {
+      'defaultCalloutSettings': {},
       'defaultSeriesSettings': {
         'base': {
           /**
@@ -5563,6 +5567,153 @@ goog.provide('anychart.themes.v6');
         },
         'minorTicks': {'enabled': false}
       },
+      'geoScale': {
+        'precision': 2
+      },
+      'callouts': [],
+      'axesSettings': {
+        'enabled': false,
+        'title': {
+          'enabled': false,
+          'padding': 5,
+          'fontSize': 13,
+          'text': 'Axis title',
+          'zIndex': 35
+        },
+        'labels': {
+          'enabled': true,
+          'padding': 2,
+          'rotation': null,
+          'fontSize': 10,
+          'anchor': null
+        },
+        'minorLabels': {
+          'enabled': false,
+          'padding': 2,
+          'rotation': null,
+          'fontSize': 9,
+          'anchor': null
+        },
+        'overlapMode': false,
+        'ticks': {
+          'enabled': true,
+          'length': 5,
+          'position': 'outside'
+        },
+        'minorTicks': {
+          'enabled': false,
+          'length': 2,
+          'position': 'outside'
+        },
+        'drawFirstLabel': true,
+        'drawLastLabel': true
+      },
+      'gridsSettings': {
+        'enabled': false,
+        'drawFirstLine': true,
+        'drawLastLine': true,
+        'oddFill': 'none',
+        'evenFill': 'none',
+        'minorStroke': 'none',
+        'zIndex': 5
+      },
+      'crosshair': {
+        'enabled': false,
+        'zIndex': 110,
+        'displayMode': 'float',
+        'xStroke': '#000',
+        'yStroke': '#000',
+        'xLabel': {
+          'x': 0,
+          'y': 0,
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'textFormatter': function() {
+            return this['value'];
+          },
+          'enabled': true,
+          'fontSize': 11,
+          'fontFamily': 'Tahoma, Geneva, sans-serif',
+          'fontColor': '#fff',
+          'fontWeight': 400,
+          'textWrap': 'byLetter',
+          'disablePointerEvents': true,
+
+          'text': 'Label text',
+          'background': {
+            'enabled': true,
+            'fill': '#000 .85',
+            'stroke': 'none'
+          },
+          'padding': {
+            'top': 6,
+            'right': 10,
+            'bottom': 6,
+            'left': 10
+          },
+          'width': null,
+          'height': null,
+          'anchor': null,
+          'offsetX': 0,
+          'offsetY': 0,
+          'position': null,
+          'minFontSize': 8,
+          'maxFontSize': 72,
+          'adjustFontSize': {
+            'width': false,
+            'height': false
+          },
+          'rotation': 0,
+          'axisIndex': 2
+        },
+        'yLabel': {
+          'x': 0,
+          'y': 0,
+          /**
+           * @this {*}
+           * @return {*}
+           */
+          'textFormatter': function() {
+            return this['value'];
+          },
+          'enabled': true,
+          'fontSize': 11,
+          'fontFamily': 'Tahoma, Geneva, sans-serif',
+          'fontColor': '#fff',
+          'fontWeight': 400,
+          'textWrap': 'byLetter',
+          'disablePointerEvents': true,
+
+          'text': 'Label text',
+          'background': {
+            'enabled': true,
+            'fill': '#000 .85',
+            'stroke': 'none'
+          },
+          'padding': {
+            'top': 6,
+            'right': 10,
+            'bottom': 6,
+            'left': 10
+          },
+          'width': null,
+          'height': null,
+          'anchor': null,
+          'offsetX': 0,
+          'offsetY': 0,
+          'position': null,
+          'minFontSize': 8,
+          'maxFontSize': 72,
+          'adjustFontSize': {
+            'width': false,
+            'height': false
+          },
+          'rotation': 0,
+          'axisIndex': 3
+        }
+      },
       'unboundRegions': {'enabled': true, 'fill': '#F7F7F7', 'stroke': '#B9B9B9'},
       'maxBubbleSize': '20%',
       'minBubbleSize': '5%',
@@ -5587,6 +5738,11 @@ goog.provide('anychart.themes.v6');
         },
         'drag': true,
         'mouseWheel': false
+      },
+      'overlapMode': 'noOverlap',
+      'crsAnimation': {
+        'enabled': true,
+        'duration': 300
       }
     },
 

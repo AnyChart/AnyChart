@@ -533,10 +533,10 @@ anychart.core.ui.ColorRange.prototype.getPixelBounds = function() {
 
       var x, y;
       var padding = this.padding();
-      var topPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.top()), parentBounds.height);
-      var rightPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.right()), parentBounds.width);
-      var bottomPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.bottom()), parentBounds.height);
-      var leftPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.left()), parentBounds.width);
+      var topPad = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.TOP), parentBounds.height);
+      var rightPad = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.RIGHT), parentBounds.width);
+      var bottomPad = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.BOTTOM), parentBounds.height);
+      var leftPad = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.LEFT), parentBounds.width);
 
       var align = this.align();
       var offset;

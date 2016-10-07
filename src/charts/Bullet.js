@@ -202,10 +202,10 @@ anychart.charts.Bullet.prototype.updateLayoutDefaults = function() {
   if (isHorizontal) {
     rangeLayout = anychart.enums.Layout.VERTICAL;
     axis.setDefaultOrientation(anychart.enums.Orientation.BOTTOM);
-    title.setDefaultOrientation(anychart.enums.Orientation.LEFT);
+    title.defaultOrientation(anychart.enums.Orientation.LEFT);
   } else {
     axis.setDefaultOrientation(anychart.enums.Orientation.LEFT);
-    title.setDefaultOrientation(anychart.enums.Orientation.BOTTOM);
+    title.defaultOrientation(anychart.enums.Orientation.BOTTOM);
     rangeLayout = anychart.enums.Layout.HORIZONTAL;
   }
 
@@ -482,10 +482,10 @@ anychart.charts.Bullet.prototype.drawInternal = function() {
 
   if (isHorizontal) {
     axis.setDefaultOrientation(anychart.enums.Orientation.BOTTOM);
-    title.setDefaultOrientation(anychart.enums.Orientation.LEFT);
+    title.defaultOrientation(anychart.enums.Orientation.LEFT);
   } else {
     axis.setDefaultOrientation(anychart.enums.Orientation.LEFT);
-    title.setDefaultOrientation(anychart.enums.Orientation.BOTTOM);
+    title.defaultOrientation(anychart.enums.Orientation.BOTTOM);
   }
   return anychart.charts.Bullet.base(this, 'drawInternal');
 };

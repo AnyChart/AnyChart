@@ -610,7 +610,7 @@ anychart.core.ui.Callout.prototype.getPixelBounds = function() {
         if (!title.container()) title.container(/** @type {acgraph.vector.ILayer} */(this.container()));
         title.suspendSignalsDispatching();
         title.parentBounds(parentBounds);
-        title.setDefaultOrientation(/** @type {anychart.enums.Orientation} */(this.orientation()));
+        title.defaultOrientation(/** @type {anychart.enums.Orientation} */(this.orientation()));
 
         if (this.isHorizontal()) {
           titleSize = title.getContentBounds().height;
@@ -620,7 +620,8 @@ anychart.core.ui.Callout.prototype.getPixelBounds = function() {
           titleLength = title.getContentBounds().height;
         }
 
-        if (title.orientation() == anychart.enums.Orientation.TOP || title.orientation() == anychart.enums.Orientation.BOTTOM) {
+        var titleOrientation = title.getOption(anychart.opt.ORIENTATION) || title.defaultOrientation();
+        if (titleOrientation == anychart.enums.Orientation.TOP || titleOrientation == anychart.enums.Orientation.BOTTOM) {
           affectSize = this.isHorizontal();
           affectLength = !this.isHorizontal();
         } else {
@@ -632,16 +633,16 @@ anychart.core.ui.Callout.prototype.getPixelBounds = function() {
 
       var x, y;
       var padding = this.padding();
-      var topPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.top()), parentBounds.height);
-      var rightPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.right()), parentBounds.width);
-      var bottomPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.bottom()), parentBounds.height);
-      var leftPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.left()), parentBounds.width);
+      var topPad = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.TOP), parentBounds.height);
+      var rightPad = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.RIGHT), parentBounds.width);
+      var bottomPad = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.BOTTOM), parentBounds.height);
+      var leftPad = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.LEFT), parentBounds.width);
 
       var margin = this.margin();
-      var topMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.top()), parentBounds.height);
-      var rightMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.right()), parentBounds.width);
-      var bottomMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.bottom()), parentBounds.height);
-      var leftMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.left()), parentBounds.width);
+      var topMargin = anychart.utils.normalizeSize(margin.getSafeOption(anychart.opt.TOP), parentBounds.height);
+      var rightMargin = anychart.utils.normalizeSize(margin.getSafeOption(anychart.opt.RIGHT), parentBounds.width);
+      var bottomMargin = anychart.utils.normalizeSize(margin.getSafeOption(anychart.opt.BOTTOM), parentBounds.height);
+      var leftMargin = anychart.utils.normalizeSize(margin.getSafeOption(anychart.opt.LEFT), parentBounds.width);
 
       var itemSize;
       if (autoLength && !autoSize) {
@@ -734,7 +735,8 @@ anychart.core.ui.Callout.prototype.getPixelBounds = function() {
       }
 
       if (title.enabled()) {
-        switch (title.orientation()) {
+        var titleOrientation = title.getOption(anychart.opt.ORIENTATION) || title.defaultOrientation();
+        switch (titleOrientation) {
           case anychart.enums.Orientation.TOP:
             this.labelSpace.left = x;
             this.labelSpace.top = y + (this.isHorizontal() ? titleSize : titleLength);
@@ -1201,8 +1203,10 @@ anychart.core.ui.Callout.prototype.serialize = function() {
 anychart.core.ui.Callout.prototype.setupByJSON = function(config) {
   this.suspendSignalsDispatching();
   goog.base(this, 'setupByJSON', config);
-  this.title(config['title']);
-  this.background(config['background']);
+
+  this.title(config[anychart.opt.TITLE]);
+
+  this.background(config[anychart.opt.BACKGROUND]);
 
   this.labels().setup(config['labels']);
   this.hoverLabels().setup(config['hoverLabels']);
@@ -1216,8 +1220,9 @@ anychart.core.ui.Callout.prototype.setupByJSON = function(config) {
 
   this.items(config['items']);
 
-  this.padding(config['padding']);
-  this.margin(config['margin']);
+  this.margin(config[anychart.opt.MARGIN]);
+  this.padding(config[anychart.opt.PADDING]);
+
   this.resumeSignalsDispatching(true);
 };
 

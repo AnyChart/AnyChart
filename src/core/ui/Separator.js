@@ -431,8 +431,8 @@ anychart.core.ui.Separator.prototype.calculateSeparatorBounds_ = function() {
   var widthWithMargin = margin.widenWidth(separatorWidth);
   var heightWithMargin = margin.widenHeight(separatorHeight);
 
-  var leftMargin = anychart.utils.normalizeSize(/** @type {number} */ (margin.left()), parentWidth);
-  var topMargin = anychart.utils.normalizeSize(/** @type {number} */ (margin.top()), parentHeight);
+  var leftMargin = anychart.utils.normalizeSize(margin.getSafeOption(anychart.opt.LEFT), parentWidth);
+  var topMargin = anychart.utils.normalizeSize(margin.getSafeOption(anychart.opt.TOP), parentHeight);
 
   if (parentBounds) {
     switch (this.orientation_) {

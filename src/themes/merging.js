@@ -523,6 +523,8 @@ anychart.themes.merging.mergingMap_ = [
       'standalones.labelsFactory',
       'heatMap.labels',
       'map.defaultSeriesSettings.base.labels',
+      'map.axesSettings.labels',
+      'map.axesSettings.minorLabels',
       'treeMap.headers',
       'treeMap.labels',
       'linearGauge.defaultPointerSettings.base.label',
@@ -537,7 +539,9 @@ anychart.themes.merging.mergingMap_ = [
       'cartesianBase.crosshair.xLabel',
       'cartesianBase.crosshair.yLabel',
       'scatter.crosshair.xLabel',
-      'scatter.crosshair.yLabel'
+      'scatter.crosshair.yLabel',
+      'map.crosshair.xLabel',
+      'map.crosshair.yLabel'
     ]
   },
   {
@@ -561,7 +565,8 @@ anychart.themes.merging.mergingMap_ = [
       'chart.title',
       'defaultLegend.title',
       'defaultDataGrid.defaultColumnSettings.title',
-      'standalones.title'
+      'standalones.title',
+      'map.axesSettings.title'
     ]
   },
   {

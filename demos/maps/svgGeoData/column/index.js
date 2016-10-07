@@ -36,7 +36,7 @@ $(document).ready(function() {
     return this.getDataValue('category');
   };
 
-  var theme = anychart.theme();
+  var theme = anychart.getFullTheme();
   theme['map']['defaultSeriesSettings']['base']['fill'] = theme['chart']['defaultSeriesSettings']['barLike']['fill'];
   theme['map']['defaultSeriesSettings']['base']['hoverFill'] = theme['chart']['defaultSeriesSettings']['barLike']['hoverFill'];
   theme['map']['defaultSeriesSettings']['base']['selectFill'] = theme['chart']['defaultSeriesSettings']['base']['selectFill'];

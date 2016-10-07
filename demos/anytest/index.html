@@ -1,30 +1,44 @@
 <html>
 <head>
-  <!--<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.min.js"></script>-->
-  <link type="text/css" href="../../css/anychart.css" rel="stylesheet">
-  <script src="../../contrib/closure-library/closure/goog/base.js"></script>
-  <script src="../../src/deps.js"></script>
+    <!--<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.min.js"></script>-->
+    <!--<link type="text/css" href="../../css/anychart.css" rel="stylesheet">-->
 
-  <meta charset="utf-8">
+    <script src="../../contrib/closure-library/closure/goog/base.js"></script>
+    <script src="../../src/deps.js"></script>
+    <script src="../../proj4.js"></script>
 
-  <script>
-    goog.require('anychart.modules.anychart_bundle');
-    goog.require('anychart.themes.defaultTheme');
-  </script>
+    <script>
+        goog.require('anychart.themes.defaultTheme');
+        goog.require('anychart.modules.anychart_bundle');
+    </script>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
 
-  <style>
-    html, body {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
-  </style>
-  <script src="http://cdn.anychart.com/geodata/countries/aus/australia.js"></script>
-  <script src="./../stock/data/dji.js"></script>
-  <script src="./../stock/data/ixic.js"></script>
-  <script src="./anytest.min.js"></script>
-  <script src="index.js"></script>
+    <!--Maps-->
+    <script src="http://cdn.anychart.com/geodata/1.2.0/custom/world_source/world_source.js"></script>
+    <script src="http://cdn.anychart.com/geodata/1.2.0/custom/world/world.js"></script>
+    <script src="http://cdn.anychart.com/geodata/1.2.0/countries/ireland/ireland.js"></script>
+    <script src="http://cdn.anychart.com/geodata/1.2.0/countries/canada/canada.js"></script>
+    <script src="http://cdn.anychart.com/geodata/1.2.0/countries/france/france.js"></script>
+    <script src="http://cdn.anychart.com/geodata/1.2.0/countries/united_states_of_america/united_states_of_america.js"></script>
+    <script src="http://cdn.anychart.com/geodata/1.2.0/countries/australia/australia.js"></script>
+    <!--<script src="http://cdn.anychart.com/geodata/countries/aus/australia.js"></script>-->
+    <script src="http://cdn.anychart.com/geodata/1.2.0/countries/china/china.js"></script>
+
+
+    <!--<script src="./../stock/data/dji.js"></script>-->
+    <!--<script src="./../stock/data/ixic.js"></script>-->
+    <!--<script src="./anytest.min.js"></script>-->
+    <script src="http://cat.anychart.com/static/sessions/6781/branch/out/anytest.min.js"></script>
+    <script src="http://cat.anychart.com/static/sessions/6781/branch/out/local-cdn/xmllint.js"></script>
+    <link  src="http://cat.anychart.com/static/sessions/6781/branch/out/scripts/xml-schema.xsd"/>
+    <script src="index.js"></script>
 </head>
 <body>
 <div id="container"></div>

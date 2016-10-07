@@ -509,7 +509,7 @@ anychart.core.ui.DataGrid.prototype.column = function(opt_indexOrValue, opt_valu
           .width(columnWidth)
           .height('100%');
 
-      column.title().text(columnTitle);
+      column.title()[anychart.opt.TEXT](columnTitle);
 
       column.resumeSignalsDispatching(true);
       this.columns_[index] = column;
@@ -578,7 +578,7 @@ anychart.core.ui.DataGrid.prototype.dblClickResizeColumn_ = function(column, col
     var eventY = event['offsetY'] - this.pixelBoundsCache.top;
     if (eventY < height) {
       var titleOriginalBoundsWidth = title.getOriginalBounds().width;
-      titleOriginalBoundsWidth += (title.padding().left() + title.padding().right());
+      titleOriginalBoundsWidth += (title.padding().getSafeOption(anychart.opt.LEFT) + title.padding().getSafeOption(anychart.opt.RIGHT));
       column.width(/** @type {number} */ (column.defaultWidth() ? column.defaultWidth() : titleOriginalBoundsWidth));
     }
   }
@@ -1266,10 +1266,10 @@ anychart.core.ui.DataGrid.Column.prototype.title = function(opt_value) {
     this.title_.suspendSignalsDispatching();
     this.title_
         .container(this.getTitleLayer_())
-        .margin(0)
-        .textWrap(anychart.enums.TextWrap.NO_WRAP)
-        .hAlign(anychart.enums.HAlign.CENTER)
-        .vAlign(anychart.enums.VAlign.MIDDLE);
+        .margin(0);
+    this.title_[anychart.opt.TEXT_WRAP](anychart.enums.TextWrap.NO_WRAP);
+    this.title_[anychart.opt.H_ALIGN](anychart.enums.HAlign.CENTER);
+    this.title_[anychart.opt.V_ALIGN](anychart.enums.VAlign.MIDDLE);
     this.title_.resumeSignalsDispatching(false);
 
     this.title_.listenSignals(this.titleInvalidated_, this);
@@ -1523,13 +1523,13 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
       this.cellTextSettings().suspendSignalsDispatching();
       this.cellTextSettings().clear();
 
-      var paddingLeft = anychart.utils.normalizeSize(/** @type {number|string} */ (this.cellTextSettings().padding().left()),
+      var paddingLeft = anychart.utils.normalizeSize(/** @type {number|string} */ (this.cellTextSettings().padding().getSafeOption(anychart.opt.LEFT)),
           this.pixelBoundsCache_.width);
-      var paddingRight = anychart.utils.normalizeSize(/** @type {(number|string)} */ (this.cellTextSettings().padding().right()),
+      var paddingRight = anychart.utils.normalizeSize(/** @type {(number|string)} */ (this.cellTextSettings().padding().getSafeOption(anychart.opt.RIGHT)),
           this.pixelBoundsCache_.width);
-      var paddingTop = anychart.utils.normalizeSize(/** @type {(number|string)} */ (this.cellTextSettings().padding().top()),
+      var paddingTop = anychart.utils.normalizeSize(/** @type {(number|string)} */ (this.cellTextSettings().padding().getSafeOption(anychart.opt.TOP)),
           this.pixelBoundsCache_.height);
-      var paddingBottom = anychart.utils.normalizeSize(/** @type {(number|string)} */ (this.cellTextSettings().padding().bottom()),
+      var paddingBottom = anychart.utils.normalizeSize(/** @type {(number|string)} */ (this.cellTextSettings().padding().getSafeOption(anychart.opt.BOTTOM)),
           this.pixelBoundsCache_.height);
 
       var counter = -1;
@@ -1589,6 +1589,7 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
 
         this.cellTextSettingsOverrider_(label, item);
         label.resumeSignalsDispatching(false);
+        label.draw();
 
         totalTop = (newTop + this.dataGrid_.rowStrokeThickness);
       }
@@ -1665,6 +1666,7 @@ anychart.core.ui.DataGrid.Column.prototype.setupByJSON = function(json) {
   this.collapseExpandButtons(json['collapseExpandButtons']);
   this.depthPaddingMultiplier(json['depthPaddingMultiplier']);
   this.cellTextSettings(json['cellTextSettings']);
+
   this.title(json['title']);
 
   if ('textFormatter' in json) this.textFormatter(json['textFormatter']);

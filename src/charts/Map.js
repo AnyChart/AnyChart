@@ -10,14 +10,17 @@ goog.require('anychart.animations.MapMoveAnimation');
 goog.require('anychart.animations.MapZoomAnimation');
 goog.require('anychart.core.MapPoint');
 goog.require('anychart.core.SeparateChart');
+// goog.require('anychart.core.axes.Map');
+goog.require('anychart.core.axes.MapSettings');
+goog.require('anychart.core.grids.MapSettings');
 goog.require('anychart.core.map.geom');
 goog.require('anychart.core.map.projections');
 goog.require('anychart.core.map.projections.TwinProjection');
-goog.require('anychart.core.map.scale.Geo');
 goog.require('anychart.core.map.series.Base');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.Callout');
 goog.require('anychart.core.ui.ColorRange');
+goog.require('anychart.core.ui.MapCrosshair');
 goog.require('anychart.core.utils.Animation');
 goog.require('anychart.core.utils.BinaryHeap');
 goog.require('anychart.core.utils.GeoJSONParser');
@@ -29,6 +32,7 @@ goog.require('anychart.core.utils.UnboundRegionsSettings');
 goog.require('anychart.math.Rect');
 goog.require('anychart.palettes.HatchFills');
 goog.require('anychart.palettes.Markers');
+goog.require('anychart.scales.Geo');
 goog.require('anychart.scales.LinearColor');
 goog.require('anychart.scales.OrdinalColor');
 goog.require('goog.dom');
@@ -191,354 +195,7 @@ anychart.charts.Map = function() {
    * @type {!Function}
    * @private
    */
-  this.initControlsInteractivity_ = goog.bind(function() {
-    if (this.container().getStage() && this.container().getStage().container() && this.getPlotBounds()) {
-      var container = /** @type {Node} */(this.container().getStage().container());
-
-      if (goog.userAgent.IE)
-        container.style['-ms-touch-action'] = 'none';
-
-      this.mapTextarea = goog.dom.createDom('textarea');
-      this.mapTextarea.setAttribute('readonly', 'readonly');
-      goog.style.setStyle(this.mapTextarea, {
-        'border': 0,
-        'clip': 'rect(0 0 0 0)',
-        'height': '1px',
-        'margin': '-1px',
-        'overflow': 'hidden',
-        'padding': '0',
-        'position': 'absolute',
-        'left': 0,
-        'top': 0,
-        'width': '1px'
-      });
-      goog.dom.appendChild(container, this.mapTextarea);
-
-
-      this.listen('pointsselect', function(e) {
-        this.mapTextarea.innerHTML = this.interactivity().copyFormatter().call(e, e);
-        this.mapTextarea.select();
-      }, false, this);
-
-      this.shortcutHandler = new goog.ui.KeyboardShortcutHandler(this.mapTextarea);
-      var META = goog.ui.KeyboardShortcutHandler.Modifiers.META;
-      var CTRL = goog.ui.KeyboardShortcutHandler.Modifiers.CTRL;
-
-      this.shortcutHandler.setAlwaysPreventDefault(true);
-      this.shortcutHandler.setAlwaysStopPropagation(true);
-      this.shortcutHandler.setAllShortcutsAreGlobal(true);
-      this.shortcutHandler.setModifierShortcutsAreGlobal(true);
-
-      this.shortcutHandler.registerShortcut('zoom_in', goog.events.KeyCodes.EQUALS, META);
-      this.shortcutHandler.registerShortcut('zoom_out', goog.events.KeyCodes.DASH, META);
-      this.shortcutHandler.registerShortcut('zoom_full_out', goog.events.KeyCodes.ZERO, META);
-
-      this.shortcutHandler.registerShortcut('zoom_in', goog.events.KeyCodes.EQUALS, CTRL);
-      this.shortcutHandler.registerShortcut('zoom_out', goog.events.KeyCodes.DASH, CTRL);
-      this.shortcutHandler.registerShortcut('zoom_full_out', goog.events.KeyCodes.ZERO, CTRL);
-
-      this.shortcutHandler.registerShortcut('zoom_in', goog.events.KeyCodes.NUM_PLUS, META);
-      this.shortcutHandler.registerShortcut('zoom_out', goog.events.KeyCodes.NUM_MINUS, META);
-      this.shortcutHandler.registerShortcut('zoom_full_out', goog.events.KeyCodes.NUM_ZERO, META);
-
-      this.shortcutHandler.registerShortcut('zoom_in', goog.events.KeyCodes.NUM_PLUS, CTRL);
-      this.shortcutHandler.registerShortcut('zoom_out', goog.events.KeyCodes.NUM_MINUS, CTRL);
-      this.shortcutHandler.registerShortcut('zoom_full_out', goog.events.KeyCodes.NUM_ZERO, CTRL);
-
-      this.shortcutHandler.registerShortcut('move_left', goog.events.KeyCodes.LEFT);
-      this.shortcutHandler.registerShortcut('move_right', goog.events.KeyCodes.RIGHT);
-      this.shortcutHandler.registerShortcut('move_up', goog.events.KeyCodes.UP);
-      this.shortcutHandler.registerShortcut('move_down', goog.events.KeyCodes.DOWN);
-
-      this.shortcutHandler.registerShortcut('drill_up', goog.events.KeyCodes.BACKSPACE);
-      this.shortcutHandler.registerShortcut('drill_up', goog.events.KeyCodes.ESC);
-
-      this.shortcutHandler.listen(goog.ui.KeyboardShortcutHandler.EventType.SHORTCUT_TRIGGERED, function(e) {
-        if (!this.interactivity_.keyboardZoomAndMove())
-          return;
-
-        var dx = 0, dy = 0;
-        this.isDesktop = true;
-        this.zoomDuration = 100;
-        var scene = this.getCurrentScene();
-
-        switch (e.identifier) {
-          case 'zoom_in':
-            scene.zoomIn();
-            break;
-          case 'zoom_out':
-            scene.zoomOut();
-            break;
-          case 'zoom_full_out':
-            if (!this.drillingInAction) {
-              if (scene.zoomAnimation)
-                scene.zoomAnimation.stop();
-              this.doAfterAnimation(scene, function() {
-                this.goingToHome = true;
-                this.zoomDuration = anychart.charts.Map.TIMINGS.ZOOM_TO_HOME_DURATION;
-                if (scene.zoomLevel() != this.minZoomLevel_) {
-                  this.zoomTo(this.minZoomLevel_);
-                } else {
-                  var tx = scene.getMapLayer().getSelfTransformation();
-                  dx = tx.getTranslateX();
-                  dy = tx.getTranslateY();
-
-                  scene.zoomAnimation = new anychart.animations.MapMoveAnimation(scene, [dx, dy], [0, 0], anychart.charts.Map.TIMINGS.ZOOM_TO_FEATURE_DURATION);
-                  scene.zoomAnimation.play();
-                }
-                this.doAfterAnimation(this, function() {
-                  this.goingToHome = false;
-                });
-              });
-            }
-            break;
-          case 'move_up':
-            dx = 0;
-            dy = 10 * scene.zoomLevel();
-            scene.move(dx, dy);
-            break;
-          case 'move_left':
-            dx = 10 * scene.zoomLevel();
-            dy = 0;
-            scene.move(dx, dy);
-            break;
-          case 'move_down':
-            dx = 0;
-            dy = -10 * scene.zoomLevel();
-            scene.move(dx, dy);
-            break;
-          case 'move_right':
-            dx = -10 * scene.zoomLevel();
-            dy = 0;
-            scene.move(dx, dy);
-            break;
-          case 'drill_up':
-            var tx = scene.getMapLayer().getSelfTransformation();
-            dx = tx.getTranslateX();
-            dy = tx.getTranslateY();
-
-            if (scene.zoomLevel() == this.minZoomLevel_ && dx == 0 && dy == 0) {
-              this.drillUp();
-            } else {
-              if (!this.drillingInAction) {
-                if (scene.zoomAnimation)
-                  scene.zoomAnimation.stop();
-                this.doAfterAnimation(scene, function() {
-                  this.goingToHome = true;
-                  this.zoomDuration = anychart.charts.Map.TIMINGS.ZOOM_TO_HOME_DURATION;
-                  if (scene.zoomLevel() != this.minZoomLevel_) {
-                    this.zoomTo(this.minZoomLevel_);
-                  } else {
-                    scene.zoomAnimation = new anychart.animations.MapMoveAnimation(scene, [dx, dy], [0, 0], anychart.charts.Map.TIMINGS.ZOOM_TO_FEATURE_DURATION);
-                    scene.zoomAnimation.play();
-                  }
-                  this.doAfterAnimation(this, function() {
-                    this.goingToHome = false;
-                  });
-                });
-              }
-            }
-            break;
-        }
-      }, false, this);
-
-      var isPreventDefault = goog.bind(function(e) {
-        var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
-        var be = e.getBrowserEvent();
-
-        var scene = this.getCurrentScene();
-        var zoomFactor = goog.math.clamp(1 - be.deltaY / 120, 0.7, 2);
-        var maxZoomFactor = this.maxZoomLevel_;
-        var minZoomFactor = this.minZoomLevel_;
-        var isMouseWheel = scene.interactivity().zoomOnMouseWheel();
-        var bounds = this.getPlotBounds();
-
-        var insideBounds = bounds &&
-            e.clientX >= bounds.left + containerPosition.x &&
-            e.clientX <= bounds.left + containerPosition.x + bounds.width &&
-            e.clientY >= bounds.top + containerPosition.y &&
-            e.clientY <= bounds.top + containerPosition.y + bounds.height;
-
-        return (insideBounds || !bounds) && (isMouseWheel && !((zoomFactor > 1 && scene.fullZoom >= maxZoomFactor) || (zoomFactor < 1 && scene.fullZoom <= minZoomFactor)));
-      }, this);
-
-      this.mouseWheelHandler = new acgraph.events.MouseWheelHandler(
-          /** @type {Element} */(this.container().getStage().container()),
-          false,
-          isPreventDefault);
-
-      this.mouseWheelHandler.listen('mousewheel', function(e) {
-        var scene = this.getCurrentScene();
-        var mapLayer = scene.getMapLayer();
-
-        this.isDesktop = true;
-        var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
-        var bounds = this.getPlotBounds();
-
-        var insideBounds = bounds &&
-            e.clientX >= bounds.left + containerPosition.x &&
-            e.clientX <= bounds.left + containerPosition.x + bounds.width &&
-            e.clientY >= bounds.top + containerPosition.y &&
-            e.clientY <= bounds.top + containerPosition.y + bounds.height;
-
-        if (this.interactivity_.zoomOnMouseWheel() && insideBounds) {
-          if (scene.goingToHome) return;
-          var zoomFactor = goog.math.clamp(1 - e.deltaY / 120, 0.7, 2);
-
-          var maxZoomFactor = this.maxZoomLevel_;
-          var minZoomFactor = this.minZoomLevel_;
-
-          this.prevZoomState_ = this.zoomState_;
-          this.zoomState_ = zoomFactor > 1 ? true : zoomFactor == 1 ? !this.prevZoomState_ : false;
-
-          if (this.prevZoomState_ != this.zoomState_) {
-            if (scene.zoomAnimation && scene.zoomAnimation.isPlaying()) {
-              scene.zoomAnimation.stop();
-            }
-          }
-
-          if (zoomFactor < 1 && anychart.math.round(scene.zoomLevel(), 2) == minZoomFactor && !mapLayer.getSelfTransformation().isIdentity()) {
-            mapLayer.setTransformationMatrix(minZoomFactor, 0, 0, minZoomFactor, 0, 0);
-            scene.fullZoom = minZoomFactor;
-            scene.goingToHome = false;
-            if (scene.zoomAnimation && scene.zoomAnimation.isPlaying()) {
-              scene.zoomAnimation.stop();
-            }
-
-            scene.scale().setMapZoom(minZoomFactor);
-            scene.scale().setOffsetFocusPoint(0, 0);
-
-            scene.updateSeriesOnZoomOrMove();
-          } else if ((zoomFactor > 1 && scene.zoomLevel() >= maxZoomFactor) || (zoomFactor < 1 && scene.zoomLevel() <= minZoomFactor)) {
-            return;
-          } else {
-            var x = e.clientX - containerPosition.x;
-            var y = e.clientY - containerPosition.y;
-
-            scene.zoom(zoomFactor, x, y);
-          }
-        }
-      }, false, this);
-
-
-      this.mapClickHandler_ = function(e) {
-        var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
-        var bounds = this.getPixelBounds();
-
-        var insideBounds = bounds &&
-            e.clientX >= bounds.left + containerPosition.x &&
-            e.clientX <= bounds.left + containerPosition.x + bounds.width &&
-            e.clientY >= bounds.top + containerPosition.y &&
-            e.clientY <= bounds.top + containerPosition.y + bounds.height;
-
-        if (insideBounds) {
-          var scrollX = window.scrollX;
-          var scrollY = window.scrollY;
-          this.mapTextarea.focus();
-          window.scrollTo(scrollX, scrollY);
-        }
-      };
-      this.mapDbClickHandler_ = function(e) {
-        if (this.interactivity_.zoomOnDoubleClick()) {
-          var scene = this.getCurrentScene();
-          var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
-          var bounds = scene.getPlotBounds();
-
-          var insideBounds = bounds &&
-              e.clientX >= bounds.left + containerPosition.x &&
-              e.clientX <= bounds.left + containerPosition.x + bounds.width &&
-              e.clientY >= bounds.top + containerPosition.y &&
-              e.clientY <= bounds.top + containerPosition.y + bounds.height;
-
-          if (insideBounds) {
-            this.isDesktop = true;
-            var zoomFactor = this.zoomFactor_;
-            var cx = e.clientX;
-            var cy = e.clientY;
-
-            this.zoomDuration = 100;
-            scene.zoom(zoomFactor, cx, cy);
-          }
-        }
-      };
-      this.mapTouchEndHandler_ = function(e) {
-        goog.style.setStyle(document['body'], 'cursor', '');
-        this.touchDist = 0;
-        this.drag = false;
-        goog.events.unlisten(document, [goog.events.EventType.POINTERMOVE, goog.events.EventType.TOUCHMOVE], this.touchMoveHandler, false, this);
-        this.updateSeriesOnZoomOrMove();
-      };
-
-      this.mapMouseLeaveHandler_ = function(e) {
-        if (!this.drag) {
-          goog.events.unlisten(document, goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, false, this);
-          goog.events.unlisten(document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, false, this);
-        }
-      };
-
-      goog.events.listen(this.container().getStage().container(), goog.events.EventType.CLICK, this.mapClickHandler_, false, this);
-
-      goog.events.listen(this.container().getStage().container(), goog.events.EventType.DBLCLICK, this.mapDbClickHandler_, false, this);
-
-      this.touchDist = 0;
-      goog.events.listen(this.container().getStage().container(), [goog.events.EventType.POINTERUP, goog.events.EventType.TOUCHEND], this.mapTouchEndHandler_, false, this);
-
-      var startX, startY;
-      this.listen(goog.events.EventType.MOUSEDOWN, function(e) {
-        var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
-        var bounds = this.getPlotBounds();
-
-        var insideBounds = bounds &&
-            e.clientX >= bounds.left + containerPosition.x &&
-            e.clientX <= bounds.left + containerPosition.x + bounds.width &&
-            e.clientY >= bounds.top + containerPosition.y &&
-            e.clientY <= bounds.top + containerPosition.y + bounds.height;
-
-        if (insideBounds) {
-          this.isDesktop = true;
-          startX = e.clientX;
-          startY = e.clientY;
-          this.drag = true;
-
-          goog.events.listen(document, goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, true, this);
-          goog.events.listen(document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, true, this);
-        }
-      }, false, this);
-      this.mouseMoveHandler = function(e) {
-        var scene = this.getCurrentScene();
-
-        if (this.drag && this.interactivity_.drag() && scene.zoomLevel() != 1) {
-          goog.style.setStyle(document['body'], 'cursor', acgraph.vector.Cursor.MOVE);
-          scene.move(e.clientX - startX, e.clientY - startY);
-
-          startX = e.clientX;
-          startY = e.clientY;
-        } else {
-          goog.style.setStyle(document['body'], 'cursor', '');
-        }
-      };
-      this.mouseUpHandler = function(e) {
-        goog.style.setStyle(document['body'], 'cursor', '');
-        this.drag = false;
-
-        if (this.itWasDrag) {
-          this.mapTx = this.getMapLayer().getFullTransformation().clone();
-          for (var i = this.series_.length; i--;) {
-            var series = this.series_[i];
-            series.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
-            series.updateOnZoomOrMove();
-          }
-        }
-
-        goog.events.unlisten(document, goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, true, this);
-        goog.events.unlisten(document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, true, this);
-      };
-
-      goog.events.listen(this.container().getStage().container(), goog.events.EventType.MOUSELEAVE, this.mapMouseLeaveHandler_, false, this);
-    } else {
-      setTimeout(this.initControlsInteractivity_, 100);
-    }
-  }, this);
+  this.initControlsInteractivity_ = goog.bind(this.controlsInteractivity_, this);
 
   /**
    * Test function for catching 'click' (tap) event on touch screen devices.
@@ -636,7 +293,10 @@ anychart.charts.Map.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.MAP_MARKER_PALETTE |
     anychart.ConsistencyState.MAP_HATCH_FILL_PALETTE |
     anychart.ConsistencyState.MAP_MOVE |
-    anychart.ConsistencyState.MAP_ZOOM;
+    anychart.ConsistencyState.MAP_ZOOM |
+    anychart.ConsistencyState.MAP_AXES |
+    anychart.ConsistencyState.MAP_GRIDS |
+    anychart.ConsistencyState.MAP_CROSSHAIR;
 
 
 /**
@@ -708,6 +368,13 @@ anychart.charts.Map.ZINDEX_CHORPLETH_MARKERS = 13;
 
 
 /**
+ * Axis z-index in chart root layer.
+ * @type {number}
+ */
+anychart.charts.Map.ZINDEX_AXIS = 20;
+
+
+/**
  * Series z-index in chart root layer.
  * @type {number}
  */
@@ -747,13 +414,6 @@ anychart.charts.Map.ZINDEX_COLOR_RANGE = 50;
  * @type {number}
  */
 anychart.charts.Map.ZINDEX_CALLOUT = 60;
-
-
-/**
- * Axis z-index in chart root layer.
- * @type {number}
- */
-anychart.charts.Map.ZINDEX_AXIS = 100;
 
 
 /**
@@ -797,7 +457,7 @@ anychart.charts.Map.prototype.dataLayer_;
 
 /**
  * Geo scale.
- * @type {anychart.core.map.scale.Geo}
+ * @type {anychart.scales.Geo}
  * @private
  */
 anychart.charts.Map.prototype.scale_;
@@ -907,6 +567,360 @@ anychart.charts.Map.prototype.defaultSeriesType = function(opt_value) {
 
 //endregion
 //region --- Interactivity
+/**
+ * Conrols interactivity.
+ * @private
+ */
+anychart.charts.Map.prototype.controlsInteractivity_ = function() {
+  if (this.container().getStage() && this.container().getStage().container() && this.getPlotBounds()) {
+    var container = /** @type {Node} */(this.container().getStage().container());
+
+    if (goog.userAgent.IE)
+      container.style['-ms-touch-action'] = 'none';
+
+    this.mapTextarea = goog.dom.createDom('textarea');
+    this.mapTextarea.setAttribute('readonly', 'readonly');
+    goog.style.setStyle(this.mapTextarea, {
+      'border': 0,
+      'clip': 'rect(0 0 0 0)',
+      'height': '1px',
+      'margin': '-1px',
+      'overflow': 'hidden',
+      'padding': '0',
+      'position': 'absolute',
+      'left': 0,
+      'top': 0,
+      'width': '1px'
+    });
+    goog.dom.appendChild(container, this.mapTextarea);
+
+
+    this.listen('pointsselect', function(e) {
+      this.mapTextarea.innerHTML = this.interactivity().copyFormatter().call(e, e);
+      this.mapTextarea.select();
+    }, false, this);
+
+    this.shortcutHandler = new goog.ui.KeyboardShortcutHandler(this.mapTextarea);
+    var META = goog.ui.KeyboardShortcutHandler.Modifiers.META;
+    var CTRL = goog.ui.KeyboardShortcutHandler.Modifiers.CTRL;
+
+    this.shortcutHandler.setAlwaysPreventDefault(true);
+    this.shortcutHandler.setAlwaysStopPropagation(true);
+    this.shortcutHandler.setAllShortcutsAreGlobal(true);
+    this.shortcutHandler.setModifierShortcutsAreGlobal(true);
+
+    this.shortcutHandler.registerShortcut('zoom_in', goog.events.KeyCodes.EQUALS, META);
+    this.shortcutHandler.registerShortcut('zoom_out', goog.events.KeyCodes.DASH, META);
+    this.shortcutHandler.registerShortcut('zoom_full_out', goog.events.KeyCodes.ZERO, META);
+
+    this.shortcutHandler.registerShortcut('zoom_in', goog.events.KeyCodes.EQUALS, CTRL);
+    this.shortcutHandler.registerShortcut('zoom_out', goog.events.KeyCodes.DASH, CTRL);
+    this.shortcutHandler.registerShortcut('zoom_full_out', goog.events.KeyCodes.ZERO, CTRL);
+
+    this.shortcutHandler.registerShortcut('zoom_in', goog.events.KeyCodes.NUM_PLUS, META);
+    this.shortcutHandler.registerShortcut('zoom_out', goog.events.KeyCodes.NUM_MINUS, META);
+    this.shortcutHandler.registerShortcut('zoom_full_out', goog.events.KeyCodes.NUM_ZERO, META);
+
+    this.shortcutHandler.registerShortcut('zoom_in', goog.events.KeyCodes.NUM_PLUS, CTRL);
+    this.shortcutHandler.registerShortcut('zoom_out', goog.events.KeyCodes.NUM_MINUS, CTRL);
+    this.shortcutHandler.registerShortcut('zoom_full_out', goog.events.KeyCodes.NUM_ZERO, CTRL);
+
+    this.shortcutHandler.registerShortcut('move_left', goog.events.KeyCodes.LEFT);
+    this.shortcutHandler.registerShortcut('move_right', goog.events.KeyCodes.RIGHT);
+    this.shortcutHandler.registerShortcut('move_up', goog.events.KeyCodes.UP);
+    this.shortcutHandler.registerShortcut('move_down', goog.events.KeyCodes.DOWN);
+
+    this.shortcutHandler.registerShortcut('drill_up', goog.events.KeyCodes.BACKSPACE);
+    this.shortcutHandler.registerShortcut('drill_up', goog.events.KeyCodes.ESC);
+
+    this.shortcutHandler.listen(goog.ui.KeyboardShortcutHandler.EventType.SHORTCUT_TRIGGERED, function(e) {
+      if (!this.interactivity_.keyboardZoomAndMove())
+        return;
+
+      var dx = 0, dy = 0;
+      this.isDesktop = true;
+      this.zoomDuration = 100;
+      var scene = this.getCurrentScene();
+
+      switch (e.identifier) {
+        case 'zoom_in':
+          scene.zoomIn();
+          break;
+        case 'zoom_out':
+          scene.zoomOut();
+          break;
+        case 'zoom_full_out':
+          if (!this.drillingInAction) {
+            if (scene.zoomAnimation)
+              scene.zoomAnimation.stop();
+            this.doAfterAnimation(scene, function() {
+              this.goingToHome = true;
+              this.zoomDuration = anychart.charts.Map.TIMINGS.ZOOM_TO_HOME_DURATION;
+              if (scene.zoomLevel() != this.minZoomLevel_) {
+                this.zoomTo(this.minZoomLevel_);
+              } else {
+                var tx = scene.getMapLayer().getSelfTransformation();
+                dx = tx.getTranslateX();
+                dy = tx.getTranslateY();
+
+                scene.zoomAnimation = new anychart.animations.MapMoveAnimation(scene, [dx, dy], [0, 0], anychart.charts.Map.TIMINGS.ZOOM_TO_FEATURE_DURATION);
+                scene.zoomAnimation.play();
+              }
+              this.doAfterAnimation(this, function() {
+                this.goingToHome = false;
+              });
+            });
+          }
+          break;
+        case 'move_up':
+          dx = 0;
+          dy = 10 * scene.zoomLevel();
+          scene.move(dx, dy);
+          break;
+        case 'move_left':
+          dx = 10 * scene.zoomLevel();
+          dy = 0;
+          scene.move(dx, dy);
+          break;
+        case 'move_down':
+          dx = 0;
+          dy = -10 * scene.zoomLevel();
+          scene.move(dx, dy);
+          break;
+        case 'move_right':
+          dx = -10 * scene.zoomLevel();
+          dy = 0;
+          scene.move(dx, dy);
+          break;
+        case 'drill_up':
+          var tx = scene.getMapLayer().getSelfTransformation();
+          dx = tx.getTranslateX();
+          dy = tx.getTranslateY();
+
+          if (scene.zoomLevel() == this.minZoomLevel_ && dx == 0 && dy == 0) {
+            this.drillUp();
+          } else {
+            if (!this.drillingInAction) {
+              if (scene.zoomAnimation)
+                scene.zoomAnimation.stop();
+              this.doAfterAnimation(scene, function() {
+                this.goingToHome = true;
+                this.zoomDuration = anychart.charts.Map.TIMINGS.ZOOM_TO_HOME_DURATION;
+                if (scene.zoomLevel() != this.minZoomLevel_) {
+                  this.zoomTo(this.minZoomLevel_);
+                } else {
+                  scene.zoomAnimation = new anychart.animations.MapMoveAnimation(scene, [dx, dy], [0, 0], anychart.charts.Map.TIMINGS.ZOOM_TO_FEATURE_DURATION);
+                  scene.zoomAnimation.play();
+                }
+                this.doAfterAnimation(this, function() {
+                  this.goingToHome = false;
+                });
+              });
+            }
+          }
+          break;
+      }
+    }, false, this);
+
+    var isPreventDefault = goog.bind(function(e) {
+      var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+      var be = e.getBrowserEvent();
+
+      var scene = this.getCurrentScene();
+      var zoomFactor = goog.math.clamp(1 - be.deltaY / 120, 0.7, 2);
+      var maxZoomFactor = this.maxZoomLevel_;
+      var minZoomFactor = this.minZoomLevel_;
+      var isMouseWheel = scene.interactivity().zoomOnMouseWheel();
+      var bounds = this.getPlotBounds();
+
+      var insideBounds = bounds &&
+          e.clientX >= bounds.left + containerPosition.x &&
+          e.clientX <= bounds.left + containerPosition.x + bounds.width &&
+          e.clientY >= bounds.top + containerPosition.y &&
+          e.clientY <= bounds.top + containerPosition.y + bounds.height;
+
+      return (insideBounds || !bounds) && (isMouseWheel && !((zoomFactor > 1 && scene.fullZoom >= maxZoomFactor) || (zoomFactor < 1 && scene.fullZoom <= minZoomFactor)));
+    }, this);
+
+    this.mouseWheelHandler = new acgraph.events.MouseWheelHandler(
+        /** @type {Element} */(this.container().getStage().container()),
+        false,
+        isPreventDefault);
+
+    this.mouseWheelHandler.listen('mousewheel', function(e) {
+      var scene = this.getCurrentScene();
+      var mapLayer = scene.getMapLayer();
+
+      this.isDesktop = true;
+      var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+      var bounds = this.getPlotBounds();
+
+      var insideBounds = bounds &&
+          e.clientX >= bounds.left + containerPosition.x &&
+          e.clientX <= bounds.left + containerPosition.x + bounds.width &&
+          e.clientY >= bounds.top + containerPosition.y &&
+          e.clientY <= bounds.top + containerPosition.y + bounds.height;
+
+      if (this.interactivity_.zoomOnMouseWheel() && insideBounds) {
+        if (scene.goingToHome) return;
+        var zoomFactor = goog.math.clamp(1 - e.deltaY / 120, 0.7, 2);
+
+        var maxZoomFactor = this.maxZoomLevel_;
+        var minZoomFactor = this.minZoomLevel_;
+
+        this.prevZoomState_ = this.zoomState_;
+        this.zoomState_ = zoomFactor > 1 ? true : zoomFactor == 1 ? !this.prevZoomState_ : false;
+
+        if (this.prevZoomState_ != this.zoomState_) {
+          if (scene.zoomAnimation && scene.zoomAnimation.isPlaying()) {
+            scene.zoomAnimation.stop();
+          }
+        }
+
+        if (zoomFactor < 1 && anychart.math.round(scene.zoomLevel(), 2) == minZoomFactor && !mapLayer.getSelfTransformation().isIdentity()) {
+          mapLayer.setTransformationMatrix(minZoomFactor, 0, 0, minZoomFactor, 0, 0);
+          scene.fullZoom = minZoomFactor;
+          scene.goingToHome = false;
+          if (scene.zoomAnimation && scene.zoomAnimation.isPlaying()) {
+            scene.zoomAnimation.stop();
+          }
+
+          scene.scale().setMapZoom(minZoomFactor);
+          scene.scale().setOffsetFocusPoint(0, 0);
+
+          scene.updateSeriesOnZoomOrMove();
+        } else if ((zoomFactor > 1 && scene.zoomLevel() >= maxZoomFactor) || (zoomFactor < 1 && scene.zoomLevel() <= minZoomFactor)) {
+          return;
+        } else {
+          var x = e.clientX - containerPosition.x;
+          var y = e.clientY - containerPosition.y;
+
+          scene.zoom(zoomFactor, x, y);
+        }
+      }
+    }, false, this);
+
+
+    this.mapClickHandler_ = function(e) {
+      var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+      var bounds = this.getPixelBounds();
+
+      var insideBounds = bounds &&
+          e.clientX >= bounds.left + containerPosition.x &&
+          e.clientX <= bounds.left + containerPosition.x + bounds.width &&
+          e.clientY >= bounds.top + containerPosition.y &&
+          e.clientY <= bounds.top + containerPosition.y + bounds.height;
+
+      if (insideBounds) {
+        var scrollX = window.scrollX;
+        var scrollY = window.scrollY;
+        this.mapTextarea.focus();
+        window.scrollTo(scrollX, scrollY);
+      }
+    };
+    this.mapDbClickHandler_ = function(e) {
+      if (this.interactivity_.zoomOnDoubleClick()) {
+        var scene = this.getCurrentScene();
+        var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+        var bounds = scene.getPlotBounds();
+
+        var insideBounds = bounds &&
+            e.clientX >= bounds.left + containerPosition.x &&
+            e.clientX <= bounds.left + containerPosition.x + bounds.width &&
+            e.clientY >= bounds.top + containerPosition.y &&
+            e.clientY <= bounds.top + containerPosition.y + bounds.height;
+
+        if (insideBounds) {
+          this.isDesktop = true;
+          var zoomFactor = this.zoomFactor_;
+          var cx = e.clientX;
+          var cy = e.clientY;
+
+          this.zoomDuration = 100;
+          scene.zoom(zoomFactor, cx, cy);
+        }
+      }
+    };
+    this.mapTouchEndHandler_ = function(e) {
+      goog.style.setStyle(document['body'], 'cursor', '');
+      this.touchDist = 0;
+      this.drag = false;
+      goog.events.unlisten(document, [goog.events.EventType.POINTERMOVE, goog.events.EventType.TOUCHMOVE], this.touchMoveHandler, false, this);
+      this.updateSeriesOnZoomOrMove();
+    };
+
+    this.mapMouseLeaveHandler_ = function(e) {
+      if (!this.drag) {
+        goog.events.unlisten(document, goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, false, this);
+        goog.events.unlisten(document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, false, this);
+      }
+    };
+
+    goog.events.listen(this.container().getStage().container(), goog.events.EventType.CLICK, this.mapClickHandler_, false, this);
+
+    goog.events.listen(this.container().getStage().container(), goog.events.EventType.DBLCLICK, this.mapDbClickHandler_, false, this);
+
+    this.touchDist = 0;
+    goog.events.listen(this.container().getStage().container(), [goog.events.EventType.POINTERUP, goog.events.EventType.TOUCHEND], this.mapTouchEndHandler_, false, this);
+
+    var startX, startY;
+    this.listen(goog.events.EventType.MOUSEDOWN, function(e) {
+      var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+      var bounds = this.getPlotBounds();
+
+      var insideBounds = bounds &&
+          e.clientX >= bounds.left + containerPosition.x &&
+          e.clientX <= bounds.left + containerPosition.x + bounds.width &&
+          e.clientY >= bounds.top + containerPosition.y &&
+          e.clientY <= bounds.top + containerPosition.y + bounds.height;
+
+      if (insideBounds) {
+        this.isDesktop = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        this.drag = true;
+
+        goog.events.listen(document, goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, true, this);
+        goog.events.listen(document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, true, this);
+      }
+    }, false, this);
+    this.mouseMoveHandler = function(e) {
+      var scene = this.getCurrentScene();
+
+      if (this.drag && this.interactivity_.drag() && scene.zoomLevel() != 1) {
+        goog.style.setStyle(document['body'], 'cursor', acgraph.vector.Cursor.MOVE);
+        scene.move(e.clientX - startX, e.clientY - startY);
+
+        startX = e.clientX;
+        startY = e.clientY;
+      } else {
+        goog.style.setStyle(document['body'], 'cursor', '');
+      }
+    };
+    this.mouseUpHandler = function(e) {
+      goog.style.setStyle(document['body'], 'cursor', '');
+      this.drag = false;
+
+      if (this.itWasDrag) {
+        this.mapTx = this.getMapLayer().getFullTransformation().clone();
+        for (var i = this.series_.length; i--;) {
+          var series = this.series_[i];
+          series.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL, anychart.Signal.NEEDS_REDRAW);
+          series.updateOnZoomOrMove();
+        }
+      }
+
+      goog.events.unlisten(document, goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, true, this);
+      goog.events.unlisten(document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, true, this);
+    };
+
+    goog.events.listen(this.container().getStage().container(), goog.events.EventType.MOUSELEAVE, this.mapMouseLeaveHandler_, false, this);
+  } else {
+    setTimeout(this.initControlsInteractivity_, 100);
+  }
+};
+
+
 /**
  * Handler for specified touch event - tap.
  * @param {anychart.core.MouseEvent} event Event object.
@@ -1260,6 +1274,8 @@ anychart.charts.Map.prototype.createEventSeriesStatus = function(seriesStatus, o
           point['id'] = prop[series.getFinalGeoIdField()];
           point['index'] = iterator.getIndex();
           point['properties'] = prop;
+        } else {
+          point['index'] = iterator.getIndex();
         }
       } else {
         point = index;
@@ -1339,7 +1355,13 @@ anychart.charts.Map.prototype.interactivity = function(opt_value) {
  */
 anychart.charts.Map.prototype.updateSeriesOnZoomOrMove = function() {
   this.dataLayer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+
+  var tx = this.getMapLayer().getFullTransformation();
   var i;
+
+  if (this.crosshair_) {
+    this.crosshair_.update();
+  }
 
   for (i = this.series_.length; i--;) {
     var series = this.series_[i];
@@ -1349,6 +1371,22 @@ anychart.charts.Map.prototype.updateSeriesOnZoomOrMove = function() {
   for (i = this.callouts_.length; i--;) {
     var callout = this.callouts_[i];
     callout.updateOnZoomOrMove();
+  }
+
+  if (this.axesSettings_) {
+    var axes = this.axesSettings_.getItems();
+    for (i = 0; i < axes.length; i++) {
+      var axis = axes[i];
+      axis.updateOnZoomOrMove(tx);
+    }
+  }
+
+  if (this.gridSettings_) {
+    var grids = this.gridSettings_.getItems();
+    for (i = grids.length; i--;) {
+      var grid = grids[i];
+      grid.updateOnZoomOrMove(tx);
+    }
   }
 };
 
@@ -1524,6 +1562,108 @@ anychart.charts.Map.prototype.defaultCalloutSettings = function(opt_value) {
     return this;
   }
   return this.defaultCalloutSettings_ || {};
+};
+
+
+/**
+ * Axes common settings.
+ * @param {(boolean|Object)=} opt_value .
+ * @return {anychart.charts.Map|anychart.core.axes.MapSettings}
+ */
+anychart.charts.Map.prototype.axes = function(opt_value) {
+  if (!this.axesSettings_) {
+    this.axesSettings_ = new anychart.core.axes.MapSettings(this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.axesSettings_.setupByVal(opt_value);
+    return this;
+  }
+  return this.axesSettings_;
+};
+
+
+/**
+ * Listener for axes settings invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
+ */
+anychart.charts.Map.prototype.onAxesSettingsSignal = function(event) {
+  var state = 0;
+  var signal = anychart.Signal.NEEDS_REDRAW;
+  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    state |= anychart.ConsistencyState.BOUNDS;
+  } else if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    state |= anychart.ConsistencyState.MAP_AXES;
+  }
+  this.invalidate(state, signal);
+};
+
+
+/**
+ * Grids common settings.
+ * @param {(boolean|Object)=} opt_value .
+ * @return {anychart.charts.Map|anychart.core.grids.MapSettings}
+ */
+anychart.charts.Map.prototype.grids = function(opt_value) {
+  if (!this.gridSettings_) {
+    this.gridSettings_ = new anychart.core.grids.MapSettings(this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.gridSettings_.setupByVal(opt_value);
+    return this;
+  }
+  return this.gridSettings_;
+};
+
+
+/**
+ * Listener for axes settings invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
+ */
+anychart.charts.Map.prototype.onGridsSettingsSignal = function(event) {
+  var state = state = anychart.ConsistencyState.MAP_GRIDS;
+  var signal = anychart.Signal.NEEDS_REDRAW;
+
+  this.invalidate(state, signal);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Crosshair
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ *
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {!(anychart.core.ui.MapCrosshair|anychart.charts.Map)}
+ */
+anychart.charts.Map.prototype.crosshair = function(opt_value) {
+  if (!this.crosshair_) {
+    this.crosshair_ = new anychart.core.ui.MapCrosshair();
+    this.crosshair_.enabled(false);
+    this.crosshair_.bindHandlers(this);
+    this.registerDisposable(this.crosshair_);
+    this.crosshair_.listenSignals(this.onCrosshairSignal_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.crosshair_.setup(opt_value);
+    return this;
+  } else {
+    return this.crosshair_;
+  }
+};
+
+
+/**
+ * Listener for crosshair invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
+ * @private
+ */
+anychart.charts.Map.prototype.onCrosshairSignal_ = function(event) {
+  this.invalidate(anychart.ConsistencyState.MAP_CROSSHAIR, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -1973,7 +2113,8 @@ anychart.charts.Map.prototype.seriesInvalidated_ = function(event) {
       this.series_[i].invalidate(
           anychart.ConsistencyState.BOUNDS |
           anychart.ConsistencyState.SERIES_DATA |
-          anychart.ConsistencyState.MAP_COLOR_SCALE
+          anychart.ConsistencyState.MAP_COLOR_SCALE |
+          anychart.ConsistencyState.MAP_GEO_DATA_INDEX
       );
   }
   if (event.hasSignal(anychart.Signal.NEED_UPDATE_LEGEND)) {
@@ -2124,15 +2265,6 @@ anychart.charts.Map.prototype.clearLayer_ = function(layer) {
 
 
 /**
- * Returns map layer (layer with map)
- * @return {acgraph.vector.Layer}
- */
-anychart.charts.Map.prototype.getContentLayer = function() {
-  return this.mapContentLayer_;
-};
-
-
-/**
  * Clear map paths.
  */
 anychart.charts.Map.prototype.clear = function() {
@@ -2157,8 +2289,8 @@ anychart.charts.Map.prototype.getPlotBounds = function() {
 //region --- Geo settings
 /**
  * Map scale.
- * @param {anychart.core.map.scale.Geo=} opt_value Scale to set.
- * @return {!(anychart.core.map.scale.Geo|anychart.charts.Map)} Default chart scale value or itself for method chaining.
+ * @param {anychart.scales.Geo=} opt_value Scale to set.
+ * @return {!(anychart.scales.Geo|anychart.charts.Map)} Default chart scale value or itself for method chaining.
  */
 anychart.charts.Map.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -2173,7 +2305,7 @@ anychart.charts.Map.prototype.scale = function(opt_value) {
     return this;
   } else {
     if (!this.scale_) {
-      this.scale_ = new anychart.core.map.scale.Geo();
+      this.scale_ = new anychart.scales.Geo();
       this.scale_.listenSignals(this.geoScaleInvalidated_, this);
     }
     return this.scale_;
@@ -2187,9 +2319,17 @@ anychart.charts.Map.prototype.scale = function(opt_value) {
  * @private
  */
 anychart.charts.Map.prototype.geoScaleInvalidated_ = function(event) {
-  if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REAPPLICATION)) {
-    this.invalidate(anychart.ConsistencyState.MAP_SCALE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+  var state = 0;
+  var signal = anychart.Signal.NEEDS_REDRAW;
+  if (event.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
+    state |= anychart.ConsistencyState.MAP_SCALE | anychart.ConsistencyState.BOUNDS;
   }
+
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    state |= anychart.ConsistencyState.BOUNDS;
+  }
+
+  this.invalidate(state, signal);
 };
 
 
@@ -2272,6 +2412,7 @@ anychart.charts.Map.prototype.geoData = function(opt_data) {
       this.invalidate(anychart.ConsistencyState.MAP_SCALE |
           anychart.ConsistencyState.MAP_GEO_DATA |
           anychart.ConsistencyState.MAP_SERIES |
+          anychart.ConsistencyState.MAP_GEO_DATA_INDEX |
           anychart.ConsistencyState.MAP_COLOR_RANGE |
           anychart.ConsistencyState.MAP_HATCH_FILL_PALETTE |
           anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
@@ -2507,279 +2648,6 @@ anychart.charts.Map.prototype.postProcessGeoData = function(geoData, callback, i
 
 
 /**
- * Calculate geo scale.
- */
-anychart.charts.Map.prototype.calculateGeoScale = function() {
-  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_GEO_DATA)) {
-
-    var geoData = this.geoData();
-    if (goog.isDefAndNotNull(geoData)) {
-      geoData = goog.isString(this.geoData_) && !goog.string.startsWith(/** @type {string} */(geoData), '<') ?
-          goog.dom.getWindow()['anychart']['maps'][this.geoData_] : this.geoData_;
-
-      if (goog.isString(geoData) && goog.string.startsWith(geoData, '<') || goog.dom.isNodeLike(geoData)) {
-        this.parser = anychart.core.utils.GeoSVGParser.getInstance();
-      } else if (geoData['type'].toLowerCase() === 'topology') {
-        this.parser = anychart.core.utils.TopoJSONParser.getInstance();
-      } else {
-        this.parser = anychart.core.utils.GeoJSONParser.getInstance();
-      }
-
-      this.internalSourceGeoData = this.parser.parse(/** @type {Object} */(geoData));
-
-      goog.dispose(this.internalGeoData);
-      this.internalGeoData = null;
-
-      var geoIdFromGeoData = geoData['ac-geoFieldId'];
-      if (geoIdFromGeoData)
-        this.geoIdField(geoIdFromGeoData);
-
-      this.mapTX = {};
-
-      var mapTx = geoData['ac-tx'] || {};
-      var defaultTx = mapTx['default'];
-      if (!defaultTx)
-        defaultTx = mapTx['default'] = goog.object.clone(anychart.charts.Map.DEFAULT_TX['default']);
-
-      goog.object.forEach(mapTx || anychart.charts.Map.DEFAULT_TX, function(value, key) {
-        var tx_ = {};
-
-        tx_.crs = goog.isDef(value['crs']) ? anychart.enums.normalizeMapProjections(value['crs']) : defaultTx.crs;
-        tx_.srcCrs = tx_.crs;
-        tx_.curProj = anychart.core.map.projections.getProjection(tx_.crs);
-        tx_.srcProj = anychart.core.map.projections.getProjection(tx_.srcCrs);
-        tx_.scale = goog.isDef(value['scale']) ? parseFloat(value['scale']) : 1;
-        tx_.xoffset = goog.isDef(value['xoffset']) ? parseFloat(value['xoffset']) : 0;
-        tx_.yoffset = goog.isDef(value['yoffset']) ? parseFloat(value['yoffset']) : 0;
-        if (goog.isDef(value['heatZone'])) tx_.heatZone = anychart.math.Rect.fromJSON(value['heatZone']);
-
-        this.mapTX[key] = tx_;
-      }, this);
-
-      if (!this.mapContentLayer_) {
-        this.mapContentLayer_ = this.rootElement.layer();
-        this.mapContentLayer_.zIndex(anychart.charts.Map.ZINDEX_MAP);
-      }
-
-      if (!this.mapLayer_) {
-        this.mapLayer_ = this.createMapLayer(/** @type {acgraph.vector.ILayer} */(this.mapContentLayer_));
-        if (this.getRootScene() == this)
-          this.initControlsInteractivity_();
-
-      } else {
-        this.clear();
-      }
-
-      if (this.isSvgGeoData() && !this.svgRootLayer_) {
-        this.svgRootLayer_ = this.createMapLayer(/** @type {acgraph.vector.ILayer} */(this.mapLayer_));
-      }
-
-      if (!this.dataLayer_) {
-        this.dataLayer_ = this.mapContentLayer_.layer();
-      }
-
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.MAP_SCALE);
-    }
-  }
-
-  var i, len, series;
-  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_SCALE)) {
-    if (this.mapTX) {
-      var scale = this.scale();
-      scale.setTxMap(this.mapTX);
-
-      if (this.mapLayer_) {
-        var tx = this.mapLayer_.getSelfTransformation();
-        scale.setMapZoom(tx.getScaleX());
-        scale.setOffsetFocusPoint(tx.getTranslateX(), tx.getTranslateY());
-
-        //if (this.zoomLevel() != this.minZoomLevel_) {
-        //scene.zoomInc = this.minZoomLevel_;
-        //}
-      }
-
-      tx = this.mapTX ? this.mapTX['default'] : null;
-
-      var firstDrawing = !this.currentCrs_;
-      var crs = goog.isNull(this.crs_) ? tx.srcCrs : this.crs_;
-      var initInternalGeoData = !this.internalGeoData;
-
-      this.newCrs_ = null;
-      if (firstDrawing && this.crs_) {
-        this.newCrs_ = this.crs_;
-      } else if ((this.currentCrs_ != tx.crs || this.currentCrs_ != crs) && !firstDrawing && !this.isSvgGeoData()) {
-        this.newCrs_ = crs;
-      }
-
-      var changeProjection = !!this.newCrs_ && !this.isSvgGeoData();
-
-      var destinationProjection, currentProjection, sourceProjection;
-
-      if ((tx.crs != this.newCrs_ && tx.srcCrs != this.newCrs_) || this.crsAnimation_.enabled()) {
-        if (!anychart.core.map.projections.isBaseProjection(tx.srcCrs)) {
-          sourceProjection = tx.srcProj;
-        }
-        if (changeProjection) {
-          destinationProjection = anychart.core.map.projections.getProjection(this.newCrs_);
-        }
-      }
-      currentProjection = tx.curProj;
-
-      if (firstDrawing) {
-        this.currentCrs_ = crs;
-      }
-      if (changeProjection) {
-        if (this.crsMapAnimation && this.crsMapAnimation.isPlaying()) {
-          this.crsMapAnimation.stop();
-          this.crsMapAnimation.dispose();
-          this.crsMapAnimation = null;
-        }
-        this.currentCrs_ = this.newCrs_;
-        tx.crs = this.currentCrs_;
-        tx.curProj = anychart.core.map.projections.getProjection(tx.crs);
-      }
-
-      if (initInternalGeoData) {
-        geoData = this.internalSourceGeoData;
-        this.internalGeoData = [];
-      } else if (changeProjection) {
-        geoData = this.internalSourceGeoData;
-      } else {
-        geoData = this.internalGeoData;
-      }
-
-      if ((this.crsMapAnimation && this.crsMapAnimation.isStopped()) || !this.crsMapAnimation) {
-        var isAnimate = this.crsAnimation_ && this.crsAnimation_.enabled() && this.crsAnimation_.duration() > 0 && !initInternalGeoData && changeProjection;
-        if (isAnimate) {
-          tx.curProj = new anychart.core.map.projections.TwinProjection(
-              /** @type {anychart.core.map.projections.Base} */(currentProjection),
-              /** @type {anychart.core.map.projections.Base} */(destinationProjection));
-          this.crsMapAnimation = new anychart.animations.MapCrsAnimation(
-              this,
-              /** @type {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>} */(geoData),
-              sourceProjection,
-              tx,
-              /** @type {number} */(this.crsAnimation_.duration()),
-              this != this.getCurrentScene());
-          this.crsMapAnimation.listenOnce(goog.fx.Transition.EventType.END, function(e) {
-            this.crsMapAnimation.stop();
-            this.crsMapAnimation.dispose();
-            tx.curProj = tx.curProj.destProjection;
-          }, true, this);
-          this.crsMapAnimation.play();
-
-        } else {
-          var callback = goog.bind(this.calcGeom_, {
-            tx: tx,
-            projection1: sourceProjection,
-            projection2: destinationProjection,
-            geoScale: this.scale(),
-            map: this
-          });
-
-          scale.startAutoCalc();
-
-          this.postProcessGeoData(
-              /** @type {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>} */(geoData),
-              callback,
-              initInternalGeoData,
-              changeProjection);
-
-          scale.finishAutoCalc();
-
-          if (this.isSvgGeoData()) {
-            scale.inverted(false, true);
-
-            this.svgRootLayer_.parent(this.getMapLayer());
-            this.svgRootLayer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
-          } else {
-            scale.inverted(false, false);
-          }
-        }
-      }
-
-      var max = -Infinity;
-      var min = Infinity;
-      var sum = 0;
-      var pointsCount = 0;
-
-      for (i = this.series_.length; i--;) {
-        series = this.series_[i];
-        series.invalidate(anychart.ConsistencyState.SERIES_DATA, anychart.Signal.NEEDS_REDRAW);
-
-        //----------------------------------calc statistics for series
-        series.calculateStatistics();
-        max = Math.max(max, /** @type {number} */(series.statistics('seriesMax')));
-        min = Math.min(min, /** @type {number} */ (series.statistics('seriesMin')));
-        sum += /** @type {number} */(series.statistics('seriesSum'));
-        pointsCount += /** @type {number} */(series.statistics('seriesPointsCount'));
-        //----------------------------------end calc statistics for series
-      }
-
-      //----------------------------------calc statistics for series
-      //todo (Roman Lubushikin): to avoid this loop on series we can store this info in the chart instance and provide it to all series
-
-      this.maxStrokeThickness_ = 0;
-      var average = sum / pointsCount;
-      for (i = 0; i < this.series_.length; i++) {
-        series = this.series_[i];
-        series.statistics('max', max);
-        series.statistics('min', min);
-        series.statistics('sum', sum);
-        series.statistics('average', average);
-        series.statistics('pointsCount', pointsCount);
-        var seriesStrokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(series.stroke()));
-        if (seriesStrokeThickness > this.maxStrokeThickness_) {
-          this.maxStrokeThickness_ = seriesStrokeThickness;
-        }
-      }
-      //----------------------------------end calc statistics for series
-    }
-    this.markConsistent(anychart.ConsistencyState.MAP_SCALE);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_GEO_DATA_INDEX)) {
-    this.indexedGeoData_ = {};
-    this.indexedGeoData_[this.geoIdField_] = {};
-    if (this.internalGeoData) {
-      for (i = this.series_.length; i--;) {
-        series = this.series_[i];
-        if (goog.isDef(series.geoIdField()) && series.geoIdField() != this.geoIdField_) {
-          this.indexedGeoData_[series.geoIdField()] = {};
-        }
-      }
-
-      for (i = 0, len = this.internalGeoData.length; i < len; i++) {
-        var geom = this.internalGeoData[i];
-        this.featureTraverser(geom, function(feature) {
-          var prop = feature['properties'];
-          if (prop) {
-            for (var index in this.indexedGeoData_) {
-              if (index in prop) {
-                this.indexedGeoData_[index][prop[index]] = feature;
-              }
-            }
-          }
-        }, this);
-      }
-    }
-    this.markConsistent(anychart.ConsistencyState.MAP_GEO_DATA_INDEX);
-  }
-
-  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_SERIES)) {
-    for (i = this.series_.length; i--;) {
-      series = this.series_[i];
-      series.suspendSignalsDispatching();
-      series.container(this.dataLayer_);
-      series.setAutoGeoIdField(/** @type {string} */(this.geoIdField()));
-      series.calculate();
-      series.resumeSignalsDispatching(false);
-    }
-  }
-};
-
-
-/**
  * Draw geometry.
  * @param {Object} geometry .
  * @param {acgraph.vector.ILayer} parent .
@@ -2979,7 +2847,7 @@ anychart.charts.Map.prototype.drawGeom_ = function(coords, index, geom) {
  *    tx: Object,
  *    projection1: anychart.core.map.projections.Base,
  *    projection2: anychart.core.map.projections.Base,
- *    geoScale: anychart.core.map.scale.Geo,
+ *    geoScale: anychart.scales.Geo,
  *    map: anychart.charts.Map
  * }}
  * @private
@@ -2992,8 +2860,7 @@ anychart.charts.Map.prototype.calcGeom_ = function(coords, index, geom) {
     if (geom['type'] == 'image' || geom['type'] == 'text') {
       bounds = acgraph.getRenderer().measureElement(geom['cloneNode']);
 
-      geoScale.extendDataRangeX(bounds.getLeft(), bounds.getRight());
-      geoScale.extendDataRangeY(bounds.getTop(), bounds.getBottom());
+      geoScale.extendDataRangeInternal(bounds.getLeft(), bounds.getTop(), bounds.getRight(), bounds.getBottom());
     } else if (geom['type'] == 'path') {
       if (!this.map.measurePath)
         this.map.measurePath = acgraph.path();
@@ -3002,8 +2869,7 @@ anychart.charts.Map.prototype.calcGeom_ = function(coords, index, geom) {
 
       bounds = this.map.measurePath.getBounds();
 
-      geoScale.extendDataRangeX(bounds.getLeft(), bounds.getRight());
-      geoScale.extendDataRangeY(bounds.getTop(), bounds.getBottom());
+      geoScale.extendDataRangeInternal(bounds.getLeft(), bounds.getTop(), bounds.getRight(), bounds.getBottom());
     }
   } else {
     if (this.projection2) {
@@ -3022,8 +2888,7 @@ anychart.charts.Map.prototype.calcGeom_ = function(coords, index, geom) {
       coords[index + 1] = projected[1] * this.tx.scale + this.tx.yoffset;
     }
 
-    geoScale.extendDataRangeX(coords[index]);
-    geoScale.extendDataRangeY(coords[index + 1]);
+    geoScale.extendDataRangeInternal(coords[index], coords[index + 1]);
   }
 };
 
@@ -3259,6 +3124,64 @@ anychart.charts.Map.prototype.getBoundsWithoutCallouts = function(bounds) {
 };
 
 
+/**
+ * Returns bounds without axes elements.
+ * @param {anychart.math.Rect} bounds
+ * @return {anychart.math.Rect}
+ */
+anychart.charts.Map.prototype.getBoundsWithoutAxes = function(bounds) {
+  //todo (blackart) don't remove. Debug purpose.
+  // if (!this.boundsssss) this.boundsssss = this.container().rect().zIndex(1000).stroke('red');
+  // this.boundsssss.setBounds(bounds);
+
+  var boundsWithoutAxis = bounds.clone();
+  if (this.axesSettings_) {
+    var leftOffset = 0;
+    var topOffset = 0;
+    var rightOffset = 0;
+    var bottomOffset = 0;
+
+    boundsWithoutAxis = bounds.clone();
+
+    var axes = this.axesSettings_.getItems();
+    var axis;
+    for (var i = 0; i < axes.length; i++) {
+      axis = axes[i];
+      if (axis.getOption(anychart.opt.ENABLED)) {
+        axis.parentBounds(bounds);
+
+        var remainingBounds = axis.getRemainingBounds();
+
+        var leftOffset_ = bounds.left - remainingBounds.left;
+        if (leftOffset < leftOffset_ && remainingBounds.left) leftOffset = leftOffset_;
+
+        var topOffset_ = bounds.top - remainingBounds.top;
+        if (topOffset < topOffset_ && remainingBounds.top) topOffset = topOffset_;
+
+        var rightOffset_ = remainingBounds.getRight() - bounds.getRight();
+        if (rightOffset < rightOffset_ && remainingBounds.getRight()) rightOffset = rightOffset_;
+
+        var bottomOffset_ = remainingBounds.getBottom() - bounds.getBottom();
+        if (bottomOffset < bottomOffset_ && remainingBounds.getBottom()) bottomOffset = bottomOffset_;
+
+        axis.invalidate(anychart.ConsistencyState.BOUNDS);
+      }
+    }
+
+    boundsWithoutAxis.left += leftOffset;
+    boundsWithoutAxis.top += topOffset;
+    boundsWithoutAxis.width -= leftOffset + rightOffset;
+    boundsWithoutAxis.height -= topOffset + bottomOffset;
+  }
+
+  //todo (blackart) don't remove. Debug purpose.
+  // if (!this.boundsWithoutAxis) this.boundsWithoutAxis = stage.rect().zIndex(1000);
+  // this.boundsWithoutAxis.setBounds(boundsWithoutAxis);
+
+  return boundsWithoutAxis;
+};
+
+
 /** @inheritDoc */
 anychart.charts.Map.prototype.drawContent = function(bounds) {
   this.getRootScene();
@@ -3267,20 +3190,308 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
   var maxZoomFactor = this.maxZoomLevel_;
   var minZoomFactor = this.minZoomLevel_;
   var boundsWithoutTx, boundsWithTx, seriesType;
+  var axes, axis, grids, grid;
 
-  this.calculateGeoScale();
+  var scale = this.scale();
+  var needRecalculateLatLonScaleRange = false;
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_GEO_DATA)) {
+    var geoData = this.geoData();
+
+    if (goog.isDefAndNotNull(geoData)) {
+      geoData = goog.isString(this.geoData_) && !goog.string.startsWith(/** @type {string} */(geoData), '<') ?
+          goog.dom.getWindow()['anychart']['maps'][this.geoData_] : this.geoData_;
+
+      if (goog.isString(geoData) && goog.string.startsWith(geoData, '<') || goog.dom.isNodeLike(geoData)) {
+        this.parser = anychart.core.utils.GeoSVGParser.getInstance();
+      } else if (geoData['type'].toLowerCase() === 'topology') {
+        this.parser = anychart.core.utils.TopoJSONParser.getInstance();
+      } else {
+        this.parser = anychart.core.utils.GeoJSONParser.getInstance();
+      }
+
+      this.internalSourceGeoData = this.parser.parse(/** @type {Object} */(geoData));
+
+      goog.dispose(this.internalGeoData);
+      this.internalGeoData = null;
+
+      var geoIdFromGeoData = geoData['ac-geoFieldId'];
+      if (geoIdFromGeoData)
+        this.geoIdField(geoIdFromGeoData);
+
+      this.mapTX = {};
+
+      var mapTx = geoData['ac-tx'] || {};
+      var defaultTx = mapTx['default'];
+      if (!defaultTx)
+        defaultTx = mapTx['default'] = goog.object.clone(anychart.charts.Map.DEFAULT_TX['default']);
+
+      goog.object.forEach(mapTx || anychart.charts.Map.DEFAULT_TX, function(value, key) {
+        var tx_ = {};
+
+        tx_.crs = goog.isDef(value['crs']) ? anychart.enums.normalizeMapProjections(value['crs']) : defaultTx.crs;
+        tx_.srcCrs = tx_.crs;
+        tx_.curProj = anychart.core.map.projections.getProjection(tx_.crs);
+        tx_.srcProj = anychart.core.map.projections.getProjection(tx_.srcCrs);
+        tx_.scale = goog.isDef(value['scale']) ? parseFloat(value['scale']) : 1;
+        tx_.xoffset = goog.isDef(value['xoffset']) ? parseFloat(value['xoffset']) : 0;
+        tx_.yoffset = goog.isDef(value['yoffset']) ? parseFloat(value['yoffset']) : 0;
+        if (goog.isDef(value['heatZone'])) tx_.heatZone = anychart.math.Rect.fromJSON(value['heatZone']);
+
+        this.mapTX[key] = tx_;
+      }, this);
+
+      if (!this.mapLayer_) {
+        this.mapLayer_ = this.createMapLayer(/** @type {acgraph.vector.ILayer} */(this.rootElement));
+        this.mapLayer_.zIndex(anychart.charts.Map.ZINDEX_MAP);
+        if (this.getRootScene() == this)
+          this.initControlsInteractivity_();
+
+      } else {
+        this.clear();
+      }
+
+      if (this.isSvgGeoData() && !this.svgRootLayer_) {
+        this.svgRootLayer_ = this.createMapLayer(/** @type {acgraph.vector.ILayer} */(this.mapLayer_));
+      }
+
+      if (!this.dataLayer_) {
+        this.dataLayer_ = this.rootElement.layer();
+        this.dataLayer_.zIndex(anychart.charts.Map.ZINDEX_SERIES);
+      }
+
+      needRecalculateLatLonScaleRange = true;
+      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.MAP_SCALE);
+    }
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_SCALE)) {
+    if (this.mapTX) {
+      scale.setTxMap(this.mapTX);
+
+      if (this.mapLayer_) {
+        tx = this.mapLayer_.getSelfTransformation();
+        scale.setMapZoom(tx.getScaleX());
+        scale.setOffsetFocusPoint(tx.getTranslateX(), tx.getTranslateY());
+
+        //if (this.zoomLevel() != this.minZoomLevel_) {
+        //scene.zoomInc = this.minZoomLevel_;
+        //}
+      }
+
+      tx = this.mapTX ? this.mapTX['default'] : null;
+
+      var firstDrawing = !this.currentCrs_;
+      var crs = goog.isNull(this.crs_) ? tx.srcCrs : this.crs_;
+      var initInternalGeoData = !this.internalGeoData;
+
+      this.newCrs_ = null;
+      if (firstDrawing && this.crs_) {
+        this.newCrs_ = this.crs_;
+      } else if ((this.currentCrs_ != tx.crs || this.currentCrs_ != crs) && !firstDrawing && !this.isSvgGeoData()) {
+        this.newCrs_ = crs;
+      }
+
+      var changeProjection = !!this.newCrs_ && !this.isSvgGeoData();
+
+      var destinationProjection, currentProjection, sourceProjection;
+
+      if ((tx.crs != this.newCrs_ && tx.srcCrs != this.newCrs_) || this.crsAnimation_.enabled()) {
+        if (!anychart.core.map.projections.isBaseProjection(tx.srcCrs)) {
+          sourceProjection = tx.srcProj;
+        }
+        if (changeProjection) {
+          destinationProjection = anychart.core.map.projections.getProjection(this.newCrs_);
+        }
+      }
+      currentProjection = tx.curProj;
+
+      if (firstDrawing) {
+        this.currentCrs_ = crs;
+      }
+      if (changeProjection) {
+        if (this.crsMapAnimation && this.crsMapAnimation.isPlaying()) {
+          this.crsMapAnimation.stop();
+          this.crsMapAnimation.dispose();
+          this.crsMapAnimation = null;
+        }
+        this.currentCrs_ = this.newCrs_;
+        tx.crs = this.currentCrs_;
+        tx.curProj = anychart.core.map.projections.getProjection(tx.crs);
+      }
+
+      if (initInternalGeoData) {
+        geoData = this.internalSourceGeoData;
+        this.internalGeoData = [];
+      } else if (changeProjection) {
+        geoData = this.internalSourceGeoData;
+      } else {
+        geoData = this.internalGeoData;
+      }
+
+      if ((this.crsMapAnimation && this.crsMapAnimation.isStopped()) || !this.crsMapAnimation) {
+        var isAnimate = this.crsAnimation_ && this.crsAnimation_.enabled() && this.crsAnimation_.duration() > 0 && !initInternalGeoData && changeProjection;
+        if (isAnimate) {
+          tx.curProj = new anychart.core.map.projections.TwinProjection(
+              /** @type {anychart.core.map.projections.Base} */(currentProjection),
+              /** @type {anychart.core.map.projections.Base} */(destinationProjection));
+          this.crsMapAnimation = new anychart.animations.MapCrsAnimation(
+              this,
+              /** @type {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>} */(geoData),
+              sourceProjection,
+              tx,
+              /** @type {number} */(this.crsAnimation_.duration()),
+              this != this.getCurrentScene());
+          this.crsMapAnimation.listenOnce(goog.fx.Transition.EventType.END, function(e) {
+            this.crsMapAnimation.stop();
+            this.crsMapAnimation.dispose();
+            tx.curProj = tx.curProj.destProjection;
+          }, true, this);
+          this.crsMapAnimation.play();
+
+        } else {
+          var callback = goog.bind(this.calcGeom_, {
+            tx: tx,
+            projection1: sourceProjection,
+            projection2: destinationProjection,
+            geoScale: this.scale(),
+            map: this
+          });
+
+          scale.defWhetherIsSvgDataType(this.isSvgGeoData());
+          scale.suspendSignalsDispatching();
+          scale.startAutoCalc(needRecalculateLatLonScaleRange);
+
+          this.postProcessGeoData(
+              /** @type {!Array.<anychart.core.map.geom.Point|anychart.core.map.geom.Line|anychart.core.map.geom.Polygon|anychart.core.map.geom.Collection>} */(geoData),
+              callback,
+              initInternalGeoData,
+              changeProjection);
+
+          scale.finishAutoCalc();
+          scale.resumeSignalsDispatching(true);
+
+          if (this.isSvgGeoData()) {
+            scale.inverted(false, true);
+
+            this.svgRootLayer_.parent(this.getMapLayer());
+            this.svgRootLayer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+          } else {
+            scale.inverted(false, false);
+          }
+        }
+      }
+
+      var max = -Infinity;
+      var min = Infinity;
+      var sum = 0;
+      var pointsCount = 0;
+
+      for (i = this.series_.length; i--;) {
+        series = this.series_[i];
+        series.invalidate(anychart.ConsistencyState.SERIES_DATA, anychart.Signal.NEEDS_REDRAW);
+
+        //----------------------------------calc statistics for series
+        series.calculateStatistics();
+        max = Math.max(max, /** @type {number} */(series.statistics('seriesMax')));
+        min = Math.min(min, /** @type {number} */ (series.statistics('seriesMin')));
+        sum += /** @type {number} */(series.statistics('seriesSum'));
+        pointsCount += /** @type {number} */(series.statistics('seriesPointsCount'));
+        //----------------------------------end calc statistics for series
+        // series.calculate();
+      }
+
+      //----------------------------------calc statistics for series
+      //todo (Roman Lubushikin): to avoid this loop on series we can store this info in the chart instance and provide it to all series
+
+      this.maxStrokeThickness_ = 0;
+      var average = sum / pointsCount;
+      for (i = 0; i < this.series_.length; i++) {
+        series = this.series_[i];
+        series.statistics('max', max);
+        series.statistics('min', min);
+        series.statistics('sum', sum);
+        series.statistics('average', average);
+        series.statistics('pointsCount', pointsCount);
+        var seriesStrokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(series.stroke()));
+        if (seriesStrokeThickness > this.maxStrokeThickness_) {
+          this.maxStrokeThickness_ = seriesStrokeThickness;
+        }
+      }
+      //----------------------------------end calc statistics for series
+    }
+    this.markConsistent(anychart.ConsistencyState.MAP_SCALE);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_GEO_DATA_INDEX)) {
+    this.indexedGeoData_ = {};
+    this.indexedGeoData_[this.geoIdField_] = {};
+    if (this.internalGeoData) {
+      for (i = this.series_.length; i--;) {
+        series = this.series_[i];
+        if (goog.isDef(series.geoIdField()) && series.geoIdField() != this.geoIdField_) {
+          this.indexedGeoData_[series.geoIdField()] = {};
+        }
+      }
+
+      for (i = 0, len = this.internalGeoData.length; i < len; i++) {
+        geom = this.internalGeoData[i];
+        this.featureTraverser(geom, function(feature) {
+          var prop = feature['properties'];
+          if (prop) {
+            for (var index in this.indexedGeoData_) {
+              if (index in prop) {
+                this.indexedGeoData_[index][prop[index]] = feature;
+              }
+            }
+          }
+        }, this);
+      }
+    }
+    this.markConsistent(anychart.ConsistencyState.MAP_GEO_DATA_INDEX);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_SERIES)) {
+    for (i = this.series_.length; i--;) {
+      series = this.series_[i];
+      series.suspendSignalsDispatching();
+      series.container(this.dataLayer_);
+      series.resumeSignalsDispatching(false);
+    }
+    this.applyLabelsOverlapState_ = {};
+    this.calcBubbleSizes_();
+  }
+
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     for (i = 0, len = this.callouts_.length; i < len; i++) {
       callout = this.callouts_[i];
       callout.invalidate(anychart.ConsistencyState.BOUNDS);
     }
-    this.invalidate(anychart.ConsistencyState.MAP_CALLOUT);
-  }
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_SERIES)) {
-    this.applyLabelsOverlapState_ = {};
-    this.calcBubbleSizes_();
+    if (this.axesSettings_) {
+      axes = this.axesSettings_.getItems();
+      for (i = 0, len = axes.length; i < len; i++) {
+        axis = axes[i];
+        axis.labels().dropCallsCache();
+        axis.minorLabels().dropCallsCache();
+        if (!axis.scale())
+          axis.scale(/** @type {anychart.scales.Geo} */(this.scale()));
+        axis.invalidate(axis.ALL_VISUAL_STATES);
+      }
+    }
+
+    if (this.gridSettings_) {
+      grids = this.gridSettings_.getItems();
+      for (i = 0, len = grids.length; i < len; i++) {
+        grid = grids[i];
+        grid.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.GRIDS_POSITION);
+      }
+    }
+
+    this.invalidate(anychart.ConsistencyState.MAP_GRIDS);
+    this.invalidate(anychart.ConsistencyState.MAP_AXES);
+    this.invalidate(anychart.ConsistencyState.MAP_CALLOUT);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_COLOR_RANGE)) {
@@ -3332,7 +3543,6 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
   }
 
   var mapLayer = this.getMapLayer();
-  var scale = this.scale();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     var contentAreaBounds;
@@ -3343,14 +3553,29 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
       contentAreaBounds = bounds.clone();
     }
 
+    this.rootElement.clip(this.getPixelBounds());
+
     var unboundRegionsStrokeThickness = goog.isObject(this.unboundRegionsSettings_) ?
         acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.unboundRegionsSettings_.stroke())) : 0;
 
     if (unboundRegionsStrokeThickness > this.maxStrokeThickness_)
       this.maxStrokeThickness_ = unboundRegionsStrokeThickness;
 
+    contentAreaBounds.left = contentAreaBounds.left + this.maxStrokeThickness_ / 2;
+    contentAreaBounds.top = contentAreaBounds.top + this.maxStrokeThickness_ / 2;
+    contentAreaBounds.width = contentAreaBounds.width - this.maxStrokeThickness_;
+    contentAreaBounds.height = contentAreaBounds.height - this.maxStrokeThickness_;
+
     var boundsWithoutCallouts = this.getBoundsWithoutCallouts(contentAreaBounds);
-    var dataBounds = boundsWithoutCallouts.clone();
+
+    // if (!this.allBoundsRect) this.allBoundsRect = this.container().rect().zIndex(1000);
+    // this.allBoundsRect.setBounds(boundsWithoutCallouts);
+
+    var boundsWithoutAxes = this.getBoundsWithoutAxes(boundsWithoutCallouts);
+    var dataBounds = boundsWithoutAxes.clone();
+
+    // if (!this.dataBoundsRect) this.dataBoundsRect = stage.rect().zIndex(1000);
+    // this.dataBoundsRect.setBounds(dataBounds);
 
     dataBounds.left = dataBounds.left + this.maxStrokeThickness_ / 2;
     dataBounds.top = dataBounds.top + this.maxStrokeThickness_ / 2;
@@ -3360,11 +3585,20 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     scale.setBounds(dataBounds);
     this.dataBounds_ = dataBounds;
 
-    // if (!this.dataBoundsRect) this.dataBoundsRect = this.container().rect().zIndex(1000);
-    // this.dataBoundsRect.setBounds(this.dataBounds_);
+    if (this.axesSettings_) {
+      axes = this.axesSettings_.getItems();
+      for (i = 0, len = axes.length; i < len; i++) {
+        axis = axes[i];
+        axis.dropBoundsCache();
+      }
+    }
 
-    if (this.mapContentLayer_)
-      this.mapContentLayer_.clip(boundsWithoutCallouts);
+    if (this.mapLayer_) {
+      //todo (blackart) this is harcode! remove this shit when we to kill world map
+      if (this.mapTX['default'].xoffset == 0) {
+        this.mapLayer_.clip(scale.getViewSpace());
+      }
+    }
 
     this.clear();
 
@@ -3399,12 +3633,13 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
   }
 
+
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_ZOOM)) {
     if (!((this.zoomLevel() == minZoomFactor && this.zoomInc * this.zoomLevel() < minZoomFactor) ||
         (this.zoomLevel() == maxZoomFactor && this.zoomLevel() * this.zoomInc > maxZoomFactor)) && mapLayer || this.unlimitedZoom) {
 
       if (isNaN(this.cx) || isNaN(this.cy)) {
-        boundsWithoutTx = mapLayer.getBoundsWithoutTransform();
+        boundsWithoutTx = this.scale().getViewSpace().getBoundsWithoutTransform();
 
         var defaultCx = boundsWithoutTx.left + boundsWithoutTx.width / 2;
         var defaultCy = boundsWithoutTx.top + boundsWithoutTx.height / 2;
@@ -3454,8 +3689,9 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_MOVE)) {
     if (this.zoomLevel() != minZoomFactor && mapLayer) {
-      boundsWithoutTx = mapLayer.getBoundsWithoutTransform();
-      boundsWithTx = mapLayer.getBounds();
+      var viewSpacePath = this.scale().getViewSpace();
+      boundsWithoutTx = viewSpacePath.getBoundsWithoutTransform();
+      boundsWithTx = viewSpacePath.getBoundsWithTransform(mapLayer.getFullTransformation());
 
       if (this.lastZoomIsUnlimited) {
         if ((boundsWithTx.left + this.offsetX >= boundsWithoutTx.left) && this.offsetX > 0) {
@@ -3513,6 +3749,48 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     this.markConsistent(anychart.ConsistencyState.MAP_MOVE);
   }
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_AXES)) {
+    if (this.axesSettings_) {
+      axes = this.axesSettings_.getItems();
+      for (i = 0; i < axes.length; i++) {
+        axis = axes[i];
+        axis.suspendSignalsDispatching();
+        axis.container(this.rootElement);
+        axis.draw();
+        axis.resumeSignalsDispatching(false);
+      }
+    }
+    this.markConsistent(anychart.ConsistencyState.MAP_AXES);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_GRIDS)) {
+    if (this.gridSettings_) {
+      grids = this.gridSettings_.getItems();
+      for (i = 0, len = grids.length; i < len; i++) {
+        grid = grids[i];
+        grid.suspendSignalsDispatching();
+        grid.setScale(/** @type {anychart.scales.Geo} */(this.scale()));
+        grid.container(this.rootElement);
+        grid.draw();
+        grid.resumeSignalsDispatching(false);
+      }
+    }
+    this.markConsistent(anychart.ConsistencyState.MAP_GRIDS);
+  }
+
+  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_CROSSHAIR)) {
+    var crosshair = /** @type {anychart.core.ui.Crosshair} */(this.crosshair());
+    crosshair.suspendSignalsDispatching();
+    crosshair.parentBounds(contentAreaBounds);
+    crosshair.container(this.rootElement);
+    crosshair.xAxis(this.axesSettings_.getItems()[this.crosshair_.xLabel().axisIndex()]);
+    crosshair.yAxis(this.axesSettings_.getItems()[this.crosshair_.yLabel().axisIndex()]);
+    crosshair.draw();
+    crosshair.resumeSignalsDispatching(false);
+
+    this.markConsistent(anychart.ConsistencyState.MAP_CROSSHAIR);
+  }
+
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     var path;
     if (this.unboundRegionsSettings_ == anychart.enums.MapUnboundRegionsMode.AS_IS) {
@@ -3563,6 +3841,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
       series.suspendSignalsDispatching();
       series.setParentEventTarget(this.getRootScene());
       series.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.SERIES_HATCH_FILL);
+      series.setAutoGeoIdField(/** @type {string} */(this.geoIdField()));
       var seriesIndex = /** @type {number} */ (series.index());
       series.setAutoColor(this.palette().itemAt(seriesIndex));
       series.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(seriesIndex)));
@@ -4757,8 +5036,6 @@ anychart.charts.Map.prototype.createLegendItemsProvider = function(sourceMode, i
    * @type {!Array.<anychart.core.ui.Legend.LegendItemProvider>}
    */
   var data = [];
-  // we need to calculate statistics
-  // this.calculateGeoScale();
 
   var series, scale, itemData;
   if (sourceMode == anychart.enums.LegendItemsSourceMode.DEFAULT) {
@@ -4958,7 +5235,7 @@ anychart.charts.Map.prototype.toGeoJSON = function() {
 
 
 /** @inheritDoc */
-anychart.charts.Map.prototype.setupByJSON = function(config) {
+anychart.charts.Map.prototype.setupByJSON = function(config, opt_default) {
   anychart.charts.Map.base(this, 'setupByJSON', config);
 
   if ('defaultSeriesSettings' in config)
@@ -4976,6 +5253,8 @@ anychart.charts.Map.prototype.setupByJSON = function(config) {
   this.minBubbleSize(config['minBubbleSize']);
   this.maxBubbleSize(config['maxBubbleSize']);
   this.geoIdField(config['geoIdField']);
+  this.overlapMode(config['overlapMode']);
+
   var geoData = config['geoData'];
   if (geoData) {
     this.geoData(/** @type {string} */(goog.string.startsWith(geoData, '{') ? JSON.parse(geoData) : geoData));
@@ -4990,7 +5269,7 @@ anychart.charts.Map.prototype.setupByJSON = function(config) {
 
   var i, json, scale;
   if (config['geoScale']) {
-    scale = new anychart.core.map.scale.Geo();
+    scale = new anychart.scales.Geo();
     scale.setup(config['geoScale']);
     this.scale(scale);
   }
@@ -5008,6 +5287,15 @@ anychart.charts.Map.prototype.setupByJSON = function(config) {
       }
     }
   }
+
+  if ('axesSettings' in config) {
+    this.axes().setupByVal(config['axesSettings'], opt_default);
+  }
+  if ('gridsSettings' in config) {
+    this.grids().setupByVal(config['gridsSettings'], opt_default);
+  }
+
+  this.crosshair(config['crosshair']);
 
   var scalesInstances = {};
   if (goog.isObject(scales)) {
@@ -5080,6 +5368,7 @@ anychart.charts.Map.prototype.serialize = function() {
   json['minBubbleSize'] = this.minBubbleSize();
   json['maxBubbleSize'] = this.maxBubbleSize();
   json['geoIdField'] = this.geoIdField();
+  json['overlapMode'] = this.overlapMode();
 
   var geoData;
   if (this.geoDataStringName_) {
@@ -5139,12 +5428,15 @@ anychart.charts.Map.prototype.serialize = function() {
   if (callouts.length)
     json['callouts'] = callouts;
 
-
   if (series.length)
     json['series'] = series;
 
   if (scales.length)
     json['colorScales'] = scales;
+
+  json['axesSettings'] = this.axes().serialize();
+  json['gridsSettings'] = this.grids().serialize();
+  json['crosshair'] = this.crosshair().serialize();
 
   if (this.drilldownMap_) {
     json['drillDownMap'] = {};
@@ -5221,6 +5513,10 @@ anychart.charts.Map.prototype['getPlotBounds'] = anychart.charts.Map.prototype.g
 anychart.charts.Map.prototype['overlapMode'] = anychart.charts.Map.prototype.overlapMode;
 
 anychart.charts.Map.prototype['interactivity'] = anychart.charts.Map.prototype.interactivity;
+
+anychart.charts.Map.prototype['axes'] = anychart.charts.Map.prototype.axes;
+anychart.charts.Map.prototype['grids'] = anychart.charts.Map.prototype.grids;
+anychart.charts.Map.prototype['crosshair'] = anychart.charts.Map.prototype.crosshair;
 
 anychart.charts.Map.prototype['crsAnimation'] = anychart.charts.Map.prototype.crsAnimation;
 

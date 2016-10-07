@@ -121,18 +121,15 @@ anychart.core.utils.Interactivity.prototype.allowMultiSeriesSelection = function
 /**
  * @inheritDoc
  */
-anychart.core.utils.Interactivity.prototype.setup = function(value) {
-  if (goog.isDef(value)) {
-    this.parent_.suspendSignalsDispatching();
-    if (goog.isObject(value)) {
-      this.hoverMode(value['hoverMode']);
-      this.selectionMode(value['selectionMode']);
-      this.spotRadius(value['spotRadius']);
-      this.allowMultiSeriesSelection(value['allowMultiSeriesSelection']);
-    }
-    this.parent_.resumeSignalsDispatching(true);
-  }
-  return this;
+anychart.core.utils.Interactivity.prototype.setupByJSON = function(value) {
+  anychart.core.utils.Interactivity.base(this, 'setupByJSON', value);
+
+  this.parent_.suspendSignalsDispatching();
+  this.hoverMode(value['hoverMode']);
+  this.selectionMode(value['selectionMode']);
+  this.spotRadius(value['spotRadius']);
+  this.allowMultiSeriesSelection(value['allowMultiSeriesSelection']);
+  this.parent_.resumeSignalsDispatching(true);
 };
 
 

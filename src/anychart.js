@@ -271,7 +271,7 @@ anychart.fromJson = function(jsonConfig) {
   }
 
   if (instance)
-    instance.setup(chart || gauge || gantt || map);
+    instance.setupByVal(chart || gauge || gantt || map);
   else
     anychart.core.reporting.error(anychart.enums.ErrorCode.EMPTY_CONFIG);
 

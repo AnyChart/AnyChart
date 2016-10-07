@@ -20,7 +20,7 @@ anychart.treeMap = function(opt_data, opt_fillMethod) {
   var chart = new anychart.charts.TreeMap(opt_data, opt_fillMethod);
 
   var theme = anychart.getFullTheme();
-  chart.setup(theme['treeMap']);
+  chart.setupByVal(theme['treeMap'], true);
 
   return chart;
 };

@@ -1079,7 +1079,7 @@ anychart.core.axes.Linear.prototype.getSize = function(parentBounds, length) {
     if (!title.container()) title.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     title.suspendSignalsDispatching();
     title.parentBounds(parentBounds);
-    title.setDefaultOrientation(orientation);
+    title.defaultOrientation(orientation);
     titleSize = this.isHorizontal() ? title.getContentBounds().height : title.getContentBounds().width;
     title.resumeSignalsDispatching(false);
   }
@@ -1248,10 +1248,10 @@ anychart.core.axes.Linear.prototype.getPixelBounds = function() {
 
       var x, y;
       var padding = this.padding();
-      var topPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.top()), parentBounds.height);
-      var rightPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.right()), parentBounds.width);
-      var bottomPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.bottom()), parentBounds.height);
-      var leftPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.left()), parentBounds.width);
+      var topPad = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.TOP), parentBounds.height);
+      var rightPad = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.RIGHT), parentBounds.width);
+      var bottomPad = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.BOTTOM), parentBounds.height);
+      var leftPad = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.LEFT), parentBounds.width);
 
       var width, height;
       switch (this.orientation()) {
@@ -1788,7 +1788,7 @@ anychart.core.axes.Linear.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.AXIS_TITLE)) {
     var title = this.title();
     title.parentBounds(this.getPixelBounds());
-    title.setDefaultOrientation(orientation);
+    title.defaultOrientation(orientation);
     title.draw();
     this.markConsistent(anychart.ConsistencyState.AXIS_TITLE);
   }
@@ -1991,7 +1991,9 @@ anychart.core.axes.Linear.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.axes.Linear.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
-  this.title(config['title']);
+
+  this.title(config[anychart.opt.TITLE]);
+
   this.labels().setup(config['labels']);
   this.minorLabels().setup(config['minorLabels']);
   this.ticks(config['ticks']);

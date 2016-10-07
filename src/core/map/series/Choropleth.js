@@ -455,7 +455,7 @@ anychart.core.map.series.Choropleth.prototype.createPositionProvider = function(
 
 /** @inheritDoc */
 anychart.core.map.series.Choropleth.prototype.calculate = function() {
-  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA) ||
+  if (this.hasInvalidationState(anychart.ConsistencyState.MAP_GEO_DATA_INDEX) ||
       this.hasInvalidationState(anychart.ConsistencyState.MAP_COLOR_SCALE)) {
 
     this.seriesPoints.length = 0;
@@ -466,7 +466,7 @@ anychart.core.map.series.Choropleth.prototype.calculate = function() {
       seriesIndex = index[this.geoIdField()];
 
     while (iterator.advance()) {
-      if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_DATA)) {
+      if (this.hasInvalidationState(anychart.ConsistencyState.MAP_GEO_DATA_INDEX)) {
         if (!seriesIndex)
           continue;
 
@@ -500,6 +500,7 @@ anychart.core.map.series.Choropleth.prototype.calculate = function() {
       if (this.colorScale_)
         this.colorScale_.finishAutoCalc();
     }
+    this.markConsistent(anychart.ConsistencyState.MAP_GEO_DATA_INDEX);
     this.markConsistent(anychart.ConsistencyState.MAP_COLOR_SCALE);
   }
 };

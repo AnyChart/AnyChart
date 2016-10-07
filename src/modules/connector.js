@@ -22,7 +22,7 @@ anychart.connector = function(var_args) {
 
   map.defaultSeriesType(anychart.enums.MapSeriesType.CONNECTOR);
 
-  map.setup(theme['connector']);
+  map.setupByVal(theme['connector'], true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     map.connector(arguments[i]);
