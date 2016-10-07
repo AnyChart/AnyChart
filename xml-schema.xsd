@@ -395,6 +395,7 @@
         <xsd:attribute name="crs" type="xsd:string"/>
         <xsd:attribute name="axes_settings" type="simple.BoolOrNull"/>
         <xsd:attribute name="grids_settings" type="simple.BoolOrNull"/>
+        <xsd:attribute name="overlap_mode" type="simple.StringOrBoolOrNull"/>
     </xsd:complexType>
 
     <xsd:complexType name="Series">
