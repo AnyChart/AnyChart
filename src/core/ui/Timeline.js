@@ -2488,8 +2488,8 @@ anychart.core.ui.Timeline.prototype.mouseDown = function(evt) {
  * If connector with same parameters already exists, nothing will happen.
  * If connector's data is incorrect, nothing will happen.
  * TODO (A.Kudryavtsev): Do we need to export this method?
- * @param {anychart.data.Tree.DataItem|number|string} startItem - Start data item or its ID.
- * @param {anychart.data.Tree.DataItem|number|string} targetItem - Destination data item or its ID.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem|number|string} startItem - Start data item or its ID.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem|number|string} targetItem - Destination data item or its ID.
  * @param {anychart.enums.ConnectorType=} opt_type - Connection type. anychart.enums.ConnectorType.FINISH_START is default.
  * @param {number=} opt_startPeriodIndex - Index of start period.
  * @param {number=} opt_targetPeriodIndex - Index of destination period.
@@ -2498,13 +2498,13 @@ anychart.core.ui.Timeline.prototype.mouseDown = function(evt) {
  */
 anychart.core.ui.Timeline.prototype.addConnector = function(startItem, targetItem, opt_type, opt_startPeriodIndex, opt_targetPeriodIndex) {
   opt_type = opt_type || anychart.enums.ConnectorType.FINISH_START;
-  if (!(startItem instanceof anychart.data.Tree.DataItem)) {
+  if (!((startItem instanceof anychart.data.Tree.DataItem) || (startItem instanceof anychart.data.TreeView.DataItem))) {
     var soughtStart = this.controller.data().searchItems(anychart.enums.GanttDataFields.ID, /** @type {number|string} */ (startItem));
     startItem = soughtStart.length ? soughtStart[0] : null;
   }
   if (!startItem) return this; //TODO (A.Kudryavtsev): Add warning?
 
-  if (!(targetItem instanceof anychart.data.Tree.DataItem)) {
+  if (!((targetItem instanceof anychart.data.Tree.DataItem) || (targetItem instanceof anychart.data.TreeView.DataItem))) {
     var soughtTarget = this.controller.data().searchItems(anychart.enums.GanttDataFields.ID, /** @type {number|string} */ (targetItem));
     targetItem = soughtTarget.length ? soughtTarget[0] : null;
   }
@@ -2879,7 +2879,7 @@ anychart.core.ui.Timeline.prototype.drawTimelineElements_ = function() {
  * @private
  */
 anychart.core.ui.Timeline.prototype.drawBar_ = function(bounds, item, type, opt_field) {
-  var isTreeDataItem = item instanceof anychart.data.Tree.DataItem; //If item is tree data item. Else: item is period (raw object).
+  var isTreeDataItem = item instanceof anychart.data.Tree.DataItem || item instanceof anychart.data.TreeView.DataItem; //If item is tree data item. Else: item is period (raw object).
 
   var settings; //It is always a raw object.
   if (opt_field) {
@@ -3047,7 +3047,7 @@ anychart.core.ui.Timeline.prototype.drawBar_ = function(bounds, item, type, opt_
 
 /**
  * Draws data item's time markers.
- * @param {anychart.data.Tree.DataItem} dataItem - Current tree data item.
+ * @param {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} dataItem - Current tree data item.
  * @param {number} totalTop - Pixel value of total top. Is needed to place item correctly.
  * @param {number} itemHeight - Height of row.
  * @private
@@ -3142,7 +3142,7 @@ anychart.core.ui.Timeline.prototype.drawProjectTimeline_ = function() {
 
 /**
  * Draws data item as periods.
- * @param {anychart.data.Tree.DataItem} dataItem - Current tree data item.
+ * @param {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} dataItem - Current tree data item.
  * @param {number} totalTop - Pixel value of total top. Is needed to place item correctly.
  * @param {number} itemHeight - Height of row.
  * @private
@@ -3174,7 +3174,7 @@ anychart.core.ui.Timeline.prototype.drawAsPeriods_ = function(dataItem, totalTop
 
 /**
  * Draws data item as baseline.
- * @param {anychart.data.Tree.DataItem} dataItem - Current tree data item.
+ * @param {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} dataItem - Current tree data item.
  * @param {number} totalTop - Pixel value of total top. Is needed to place item correctly.
  * @param {number} itemHeight - Height of row.
  * @private
@@ -3240,7 +3240,7 @@ anychart.core.ui.Timeline.prototype.drawAsBaseline_ = function(dataItem, totalTo
 
 /**
  * Draws data item as parent.
- * @param {anychart.data.Tree.DataItem} dataItem - Current tree data item.
+ * @param {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} dataItem - Current tree data item.
  * @param {number} totalTop - Pixel value of total top. Is needed to place item correctly.
  * @param {number} itemHeight - Height of row.
  * @private
@@ -3285,7 +3285,7 @@ anychart.core.ui.Timeline.prototype.drawAsParent_ = function(dataItem, totalTop,
 
 /**
  * Draws data item as progress.
- * @param {anychart.data.Tree.DataItem} dataItem - Current tree data item.
+ * @param {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} dataItem - Current tree data item.
  * @param {number} totalTop - Pixel value of total top. Is needed to place item correctly.
  * @param {number} itemHeight - Height of row.
  * @private
@@ -3328,7 +3328,7 @@ anychart.core.ui.Timeline.prototype.drawAsProgress_ = function(dataItem, totalTo
 
 /**
  * Draws data item as milestone.
- * @param {anychart.data.Tree.DataItem} dataItem - Current tree data item.
+ * @param {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} dataItem - Current tree data item.
  * @param {number} totalTop - Pixel value of total top. Is needed to place item correctly.
  * @param {number} itemHeight - Height of row.
  * @private

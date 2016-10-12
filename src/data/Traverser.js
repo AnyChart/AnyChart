@@ -4,14 +4,14 @@ goog.provide('anychart.data.Traverser');
 
 /**
  * Tree data traverser.
- * @param {anychart.data.Tree} tree - Tree that current traverser belongs to.
+ * @param {(anychart.data.Tree|anychart.data.TreeView)} tree - Tree that current traverser belongs to.
  * @constructor
  */
 anychart.data.Traverser = function(tree) {
 
   /**
    * Tree that current traverser belongs to.
-   * @type {anychart.data.Tree}
+   * @type {(anychart.data.Tree|anychart.data.TreeView)}
    * @private
    */
   this.tree_ = tree;
@@ -34,7 +34,7 @@ anychart.data.Traverser = function(tree) {
 
   /**
    * Current tree data item.
-   * @type {(anychart.data.Tree.DataItem|undefined)}
+   * @type {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem|undefined)}
    * @private
    */
   this.currentItem_ = undefined;
@@ -42,7 +42,7 @@ anychart.data.Traverser = function(tree) {
 
   /**
    * Function that decides if data item must be returned while passage.
-   * @type {function(anychart.data.Tree.DataItem):boolean}
+   * @type {function((anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)):boolean}
    * @private
    */
   this.nodeYieldCondition_ = this.defaultNodeYieldCondition_;
@@ -50,7 +50,7 @@ anychart.data.Traverser = function(tree) {
 
   /**
    * Function that decides if we go through data item's children while passage.
-   * @type {function(anychart.data.Tree.DataItem):boolean}
+   * @type {function((anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)):boolean}
    * @private
    */
   this.traverseChildrenCondition_ = this.defaultTraverseChildrenCondition_;
@@ -68,7 +68,7 @@ anychart.data.Traverser = function(tree) {
 
 /**
  * Default value of this.nodeYieldCondition_.
- * @param {anychart.data.Tree.DataItem} item - Incoming tree data item.
+ * @param {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} item - Incoming tree data item.
  * @return {boolean}
  * @private
  */
@@ -79,7 +79,7 @@ anychart.data.Traverser.prototype.defaultNodeYieldCondition_ = function(item) {
 
 /**
  * Default value of this.traverseChildrenCondition_.
- * @param {anychart.data.Tree.DataItem} item - Incoming tree data item.
+ * @param {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} item - Incoming tree data item.
  * @return {boolean} - If incoming data item matches.
  * @private
  */
@@ -103,7 +103,7 @@ anychart.data.Traverser.prototype.reset = function() {
 
 /**
  * Gets current tree data item.
- * @return {anychart.data.Tree.DataItem|undefined}
+ * @return {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem|undefined}
  */
 anychart.data.Traverser.prototype.current = function() {
   return this.currentItem_;
@@ -166,8 +166,8 @@ anychart.data.Traverser.prototype.meta = function(key, opt_value) {
 /**
  * Sets function that decides if data item must be returned while passage.
  * Note: if passed argument is passed by not a function, value will be reset to default value that always returns 'true'.
- * @param {(function(anychart.data.Tree.DataItem):boolean)=} opt_value - Function to be set.
- * @return {(function(anychart.data.Tree.DataItem):boolean|anychart.data.Traverser)} - Current decider function or itself
+ * @param {(function((anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)):boolean)=} opt_value - Function to be set.
+ * @return {(function((anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)):boolean|anychart.data.Traverser)} - Current decider function or itself
  *  for method chaining.
  */
 anychart.data.Traverser.prototype.nodeYieldCondition = function(opt_value) {
@@ -186,8 +186,8 @@ anychart.data.Traverser.prototype.nodeYieldCondition = function(opt_value) {
 /**
  * Sets function that decides if we go through data item's children while passage.
  * Note: if passed argument is passed by not a function, value will be reset to default value that always returns 'true'.
- * @param {(function(anychart.data.Tree.DataItem):boolean)=} opt_value - Function to be set.
- * @return {(function(anychart.data.Tree.DataItem):boolean|anychart.data.Traverser)} - Current decider function or itself
+ * @param {(function((anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)):boolean)=} opt_value - Function to be set.
+ * @return {(function((anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)):boolean|anychart.data.Traverser)} - Current decider function or itself
  *  for method chaining.
  */
 anychart.data.Traverser.prototype.traverseChildrenCondition = function(opt_value) {
@@ -219,7 +219,7 @@ anychart.data.Traverser.prototype.advance = function() {
  * NOTE: This method resets a traverser state before turning to array and after it (be very careful in this method usage
  * while advance()-passage). Also don't forget to reset traverser after this method usage.
  *
- * @return {Array.<anychart.data.Tree.DataItem>} - Resulting array.
+ * @return {Array.<(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)>} - Resulting array.
  */
 anychart.data.Traverser.prototype.toArray = function() {
   this.reset();
@@ -236,8 +236,8 @@ anychart.data.Traverser.prototype.toArray = function() {
 /**
  * Looks for next item that corresponds to nodeYieldCondition_ and traverseChildrenCondition_.
  *
- * @param {Array.<anychart.data.Tree.DataItem>} itemsSet - Set of tree data items where to look in.
- * @return {?anychart.data.Tree.DataItem} - Found item or null.
+ * @param {Array.<(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)>} itemsSet - Set of tree data items where to look in.
+ * @return {?(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} - Found item or null.
  * @private
  */
 anychart.data.Traverser.prototype.findNextSuitableItem_ = function(itemsSet) {
@@ -263,7 +263,7 @@ anychart.data.Traverser.prototype.findNextSuitableItem_ = function(itemsSet) {
 
 /**
  * Gets current items set by current path. Also sets current item's depth.
- * @return {Array.<anychart.data.Tree.DataItem>} - Current items set.
+ * @return {Array.<(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)>} - Current items set.
  * @private
  */
 anychart.data.Traverser.prototype.getItemsSet_ = function() {

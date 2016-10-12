@@ -17,7 +17,7 @@ goog.require('anychart.utils');
 
 /**
  * AnyChart TreeMap class.
- * @param {(anychart.data.Tree|Array.<Object>)=} opt_data - Data tree or raw data.
+ * @param {(anychart.data.Tree|anychart.data.TreeView|Array.<Object>)=} opt_data - Data tree or raw data.
  * @param {anychart.enums.TreeFillingMethod=} opt_fillMethod - Fill method.
  * @extends {anychart.core.SeparateChart}
  * @implements {anychart.core.utils.IInteractiveSeries}
@@ -30,7 +30,7 @@ anychart.charts.TreeMap = function(opt_data, opt_fillMethod) {
   this.referenceValueNames = ['x', 'value'];
 
   /**
-   * @type {anychart.data.Tree.DataItem}
+   * @type {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem}
    * @private
    */
   this.rootNode_ = null;
@@ -44,14 +44,14 @@ anychart.charts.TreeMap = function(opt_data, opt_fillMethod) {
 
   /**
    * Array of nodes.
-   * @type {Array.<anychart.data.Tree.DataItem>}
+   * @type {Array.<anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem>}
    * @private
    */
   this.linearNodes_ = [];
 
   /**
    * Array of nodes.
-   * @type {Array.<anychart.data.Tree.DataItem>}
+   * @type {Array.<anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem>}
    * @private
    */
   this.drawingNodes_ = [];
@@ -153,7 +153,7 @@ anychart.charts.TreeMap.prototype.isDiscreteBased = function() {
 
 /** @inheritDoc */
 anychart.charts.TreeMap.prototype.applyAppearanceToPoint = function(pointState) {
-  var node = /** @type {anychart.data.Tree.DataItem} */ (this.getIterator().getItem());
+  var node = /** @type {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} */ (this.getIterator().getItem());
   var missing = !goog.isDef(node) || node.meta(anychart.charts.TreeMap.DataFields.MISSING);
   if (missing)
     return;
@@ -356,7 +356,7 @@ anychart.charts.TreeMap.prototype.checkIfColorRange = function(target) {
 
 /**
  * Dispatch drill change event.
- * @param {anychart.data.Tree.DataItem} node Node in which we are trying to drill.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} node Node in which we are trying to drill.
  * @param {anychart.core.MouseEvent=} opt_event Event object.
  */
 anychart.charts.TreeMap.prototype.doDrillChange = function(node, opt_event) {
@@ -404,7 +404,7 @@ anychart.charts.TreeMap.prototype.handleMouseDown = function(event) {
   if (series && !series.isDisposed() && series.enabled() && goog.isFunction(series.makePointEvent)) {
     var iterator = this.getIterator();
     iterator.select(/** @type {number} */ (index));
-    var node = /** @type {anychart.data.Tree.DataItem} */ (iterator.getItem());
+    var node = /** @type {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} */ (iterator.getItem());
     if (this.isRootNode(node)) {
       if (!this.isTreeRoot(node)) {
         this.doDrillChange(node.getParent());
@@ -420,7 +420,7 @@ anychart.charts.TreeMap.prototype.handleMouseDown = function(event) {
 
 /**
  * Creates crumbs to node from tree root.
- * @param {anychart.data.Tree.DataItem} node Node.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} node Node.
  * @return {Array} Array of crumbs.
  */
 anychart.charts.TreeMap.prototype.createCrumbsTo = function(node) {
@@ -628,8 +628,8 @@ anychart.charts.TreeMap.prototype.sort = function(opt_value) {
 
 /**
  * Desc sort function.
- * @param {anychart.data.Tree.DataItem} node1 First node.
- * @param {anychart.data.Tree.DataItem} node2 Second node.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} node1 First node.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} node2 Second node.
  * @return {number}
  */
 anychart.charts.TreeMap.SORT_DESC = function(node1, node2) {
@@ -641,8 +641,8 @@ anychart.charts.TreeMap.SORT_DESC = function(node1, node2) {
 
 /**
  * Asc sort function.
- * @param {anychart.data.Tree.DataItem} node1 First node.
- * @param {anychart.data.Tree.DataItem} node2 Second node.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} node1 First node.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} node2 Second node.
  * @return {number}
  */
 anychart.charts.TreeMap.SORT_ASC = function(node1, node2) {
@@ -665,13 +665,13 @@ anychart.charts.TreeMap.prototype.resetDataVars = function() {
 
 /**
  * Getter/setter for data.
- * @param {(anychart.data.Tree|Array.<Object>)=} opt_value - Data tree or raw data.
+ * @param {(anychart.data.Tree|anychart.data.TreeView|Array.<Object>)=} opt_value - Data tree or raw data.
  * @param {anychart.enums.TreeFillingMethod=} opt_fillMethod - Fill method.
  * @return {*}
  */
 anychart.charts.TreeMap.prototype.data = function(opt_value, opt_fillMethod) {
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.data.Tree) {
+    if (opt_value instanceof anychart.data.Tree || opt_value instanceof anychart.data.TreeView) {
       if (opt_value != this.data_)
         this.data_ = opt_value;
     } else {
@@ -686,7 +686,7 @@ anychart.charts.TreeMap.prototype.data = function(opt_value, opt_fillMethod) {
 
 /**
  * Drills down to target.
- * @param {(anychart.data.Tree.DataItem|Array|string)} target Target to drill down to.
+ * @param {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem|Array|string)} target Target to drill down to.
  */
 anychart.charts.TreeMap.prototype.drillTo = function(target) {
   if (this.prevHoverSeriesStatus) {
@@ -697,7 +697,7 @@ anychart.charts.TreeMap.prototype.drillTo = function(target) {
   this.ensureDataPrepared();
   var node = null;
   var data;
-  if (target instanceof anychart.data.Tree.DataItem) {
+  if (target instanceof anychart.data.Tree.DataItem || target instanceof anychart.data.TreeView.DataItem) {
     // trying to drill by node
     node = target;
   } else if (goog.isArray(target)) {
@@ -908,7 +908,7 @@ anychart.charts.TreeMap.prototype.isMissing = function(value) {
 /**
  * Recursively calculates node values from leafs (node without children) up to root.
  * If leaf has no value - than set it to 0.
- * @param {anychart.data.Tree.DataItem} node Node which value will be calculated.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} node Node which value will be calculated.
  * @param {number} depth Current depth.
  * @return {Array.<number, number>} Array of values of the node - value and size.
  */
@@ -925,13 +925,13 @@ anychart.charts.TreeMap.prototype.calculateNodeSize = function(node, depth) {
     var sizeSum = 0;
     var ret;
     for (var i = 0; i < numChildren; i++) {
-      ret = this.calculateNodeSize(/** @type {anychart.data.Tree.DataItem} */ (node.getChildAt(i)), depth + 1);
+      ret = this.calculateNodeSize(/** @type {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} */ (node.getChildAt(i)), depth + 1);
       valueSum += ret[0];
       sizeSum += ret[1];
     }
     value = valueSum;
     size = sizeSum;
-    if (this.isMissing(value)) {
+    if (this.isMissing(size)) {
       node.meta(anychart.charts.TreeMap.DataFields.MISSING, true);
     }
   } else {
@@ -939,13 +939,10 @@ anychart.charts.TreeMap.prototype.calculateNodeSize = function(node, depth) {
     size = node.get(anychart.charts.TreeMap.DataFields.SIZE);
 
     value = anychart.utils.toNumber(value);
-    if (this.isMissing(value)) {
+    size = anychart.utils.toNumber(size) || value;
+    if (this.isMissing(size)) {
       node.meta(anychart.charts.TreeMap.DataFields.MISSING, true);
       size = value = 0;
-    } else {
-      size = anychart.utils.toNumber(size) || value;
-      if (size == 0)
-        node.meta(anychart.charts.TreeMap.DataFields.MISSING, true);
     }
   }
   node.meta(anychart.charts.TreeMap.DataFields.SIZE, size);
@@ -956,7 +953,7 @@ anychart.charts.TreeMap.prototype.calculateNodeSize = function(node, depth) {
 
 /**
  * Calculates bounds of points.
- * @param {Array.<anychart.data.Tree.DataItem>} nodes Points to calculate.
+ * @param {Array.<anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem>} nodes Points to calculate.
  * @param {anychart.math.Rect} bounds Content bounds.
  */
 anychart.charts.TreeMap.prototype.calculatePointsBounds = function(nodes, bounds) {
@@ -1069,7 +1066,7 @@ anychart.charts.TreeMap.prototype.calculatePointsBounds = function(nodes, bounds
 
 /**
  * Gets aspect.
- * @param {Array.<anychart.data.Tree.DataItem>} points .
+ * @param {Array.<anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem>} points .
  * @param {number} dWidth .
  * @param {number} dHeight .
  * @param {number} start .
@@ -1115,17 +1112,19 @@ anychart.charts.TreeMap.prototype.getAspect = function(points, dWidth, dHeight, 
 
 /**
  * Checks whether node is root at top level (tree's first child).
- * @param {anychart.data.Tree.DataItem} node Node to check.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} node Node to check.
  * @return {boolean} Is node root.
  */
 anychart.charts.TreeMap.prototype.isTreeRoot = function(node) {
+  if (node instanceof anychart.data.TreeView.DataItem)
+    node = node.getDataItem();
   return node == node.tree().getChildAt(0);
 };
 
 
 /**
  * Checks whether node is root in context of treemap drawing.
- * @param {anychart.data.Tree.DataItem} node Node to check.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} node Node to check.
  * @return {boolean} Is node root.
  */
 anychart.charts.TreeMap.prototype.isRootNode = function(node) {
@@ -1135,7 +1134,7 @@ anychart.charts.TreeMap.prototype.isRootNode = function(node) {
 
 /**
  * Sets root node.
- * @param {anychart.data.Tree.DataItem} node New tree map root.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} node New tree map root.
  */
 anychart.charts.TreeMap.prototype.setRootNode = function(node) {
   this.rootNode_ = node;
@@ -1145,7 +1144,7 @@ anychart.charts.TreeMap.prototype.setRootNode = function(node) {
 
 /**
  * Returns root node.
- * @return {anychart.data.Tree.DataItem} Current root node.
+ * @return {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} Current root node.
  */
 anychart.charts.TreeMap.prototype.getRootNode = function() {
   return this.rootNode_;
@@ -1690,7 +1689,7 @@ anychart.charts.TreeMap.prototype.selectHatchFill = function(opt_patternFillOrTy
 
 /**
  * Gets node type depends on it's depth.
- * @param {anychart.data.Tree.DataItem} node Data node.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} node Data node.
  * @param {number} depth Depth.
  * @return {anychart.charts.TreeMap.NodeType}
  * @private
@@ -1785,7 +1784,7 @@ anychart.charts.TreeMap.prototype.createPositionProvider = function(anchor) {
  * @return {anychart.enums.Anchor} Labels or headers anchor.
  */
 anychart.charts.TreeMap.prototype.getLabelsAnchor = function(pointState, isHeader) {
-  var node = /** @type {anychart.data.Tree.DataItem} */ (this.getIterator().getItem());
+  var node = /** @type {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} */ (this.getIterator().getItem());
   var index = /** @type {number} */ (node.meta('index'));
 
   var factory;
@@ -1857,7 +1856,7 @@ anychart.charts.TreeMap.prototype.createMarkerPositionProvider = function(bounds
  * @return {string} Position settings.
  */
 anychart.charts.TreeMap.prototype.getMarkersPosition = function(pointState) {
-  var node = /** @type {anychart.data.Tree.DataItem} */ (this.getIterator().getItem());
+  var node = /** @type {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} */ (this.getIterator().getItem());
 
   var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
   var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
@@ -1882,7 +1881,7 @@ anychart.charts.TreeMap.prototype.getMarkersPosition = function(pointState) {
  * @private
  */
 anychart.charts.TreeMap.prototype.drawMarker_ = function(pointState) {
-  var node = /** @type {anychart.data.Tree.DataItem} */ (this.getIterator().getItem());
+  var node = /** @type {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} */ (this.getIterator().getItem());
   var bounds = /** @type {anychart.math.Rect} */ (node.meta(anychart.charts.TreeMap.DataFields.POINT_BOUNDS));
   var type = node.meta(anychart.charts.TreeMap.DataFields.TYPE);
   if (type != anychart.charts.TreeMap.NodeType.LEAF && type != anychart.charts.TreeMap.NodeType.RECT)
@@ -1979,7 +1978,7 @@ anychart.charts.TreeMap.prototype.noHeader_ = function(setting, factory) {
  * @return {anychart.core.ui.LabelsFactory.Label} Label.
  */
 anychart.charts.TreeMap.prototype.configureLabel = function(pointState, isHeader) {
-  var node = /** @type {anychart.data.Tree.DataItem} */ (this.getIterator().getItem());
+  var node = /** @type {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} */ (this.getIterator().getItem());
   var bounds = /** @type {anychart.math.Rect} */ (node.meta(anychart.charts.TreeMap.DataFields.POINT_BOUNDS));
   var index = /** @type {number} */ (node.meta('index'));
 
@@ -2078,7 +2077,7 @@ anychart.charts.TreeMap.prototype.configureLabel = function(pointState, isHeader
  * @private
  */
 anychart.charts.TreeMap.prototype.drawLabel_ = function(pointState) {
-  var node = /** @type {anychart.data.Tree.DataItem} */ (this.getIterator().getItem());
+  var node = /** @type {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} */ (this.getIterator().getItem());
   var bounds = /** @type {anychart.math.Rect} */ (node.meta(anychart.charts.TreeMap.DataFields.POINT_BOUNDS));
   var index = /** @type {number} */ (node.meta('index'));
   var type = node.meta(anychart.charts.TreeMap.DataFields.TYPE);
@@ -2207,7 +2206,7 @@ anychart.charts.TreeMap.prototype.drawLabel_ = function(pointState) {
  * @private
  */
 anychart.charts.TreeMap.prototype.drawNodeBox_ = function(pointState) {
-  var node = /** @type {anychart.data.Tree.DataItem} */ (this.getIterator().getItem());
+  var node = /** @type {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} */ (this.getIterator().getItem());
   var bounds = /** @type {anychart.math.Rect} */ (node.meta(anychart.charts.TreeMap.DataFields.POINT_BOUNDS));
   var type = node.meta(anychart.charts.TreeMap.DataFields.TYPE);
 
@@ -2265,7 +2264,7 @@ anychart.charts.TreeMap.prototype.drawNodeBox_ = function(pointState) {
  * @param {anychart.PointState|number} pointState Point state.
  */
 anychart.charts.TreeMap.prototype.colorizeShape = function(pointState) {
-  var node = /** @type {anychart.data.Tree.DataItem} */ (this.getIterator().getItem());
+  var node = /** @type {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} */ (this.getIterator().getItem());
   var shape = node.meta(anychart.charts.TreeMap.DataFields.SHAPE);
 
   if (shape) {
@@ -2287,7 +2286,7 @@ anychart.charts.TreeMap.prototype.colorizeShape = function(pointState) {
  * @param {anychart.PointState|number} pointState Point state.
  */
 anychart.charts.TreeMap.prototype.applyHatchFill = function(pointState) {
-  var node = /** @type {anychart.data.Tree.DataItem} */ (this.getIterator().getItem());
+  var node = /** @type {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} */ (this.getIterator().getItem());
   var hatchFillShape = node.meta(anychart.charts.TreeMap.DataFields.HATCH_SHAPE);
   if (goog.isDefAndNotNull(hatchFillShape)) {
     hatchFillShape
@@ -2304,7 +2303,7 @@ anychart.charts.TreeMap.prototype.applyHatchFill = function(pointState) {
  * @return {!acgraph.vector.Fill} Fill.
  */
 anychart.charts.TreeMap.prototype.getFinalFill = function(usePointSettings, pointState) {
-  var node = /** @type {anychart.data.Tree.DataItem} */ (this.getIterator().getItem());
+  var node = /** @type {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} */ (this.getIterator().getItem());
   var normalColor = /** @type {acgraph.vector.Fill|Function} */((usePointSettings && node.get('fill')) || this.fill());
 
   var result;
@@ -2333,7 +2332,7 @@ anychart.charts.TreeMap.prototype.getFinalFill = function(usePointSettings, poin
  * @return {!acgraph.vector.Stroke} Stroke.
  */
 anychart.charts.TreeMap.prototype.getFinalStroke = function(usePointSettings, pointState) {
-  var node = /** @type {anychart.data.Tree.DataItem} */ (this.getIterator().getItem());
+  var node = /** @type {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} */ (this.getIterator().getItem());
   var normalColor = /** @type {acgraph.vector.Fill|Function} */((usePointSettings && node.get('stroke')) || this.stroke());
 
   var result;
@@ -2362,7 +2361,7 @@ anychart.charts.TreeMap.prototype.getFinalStroke = function(usePointSettings, po
  * @return {!(acgraph.vector.HatchFill|acgraph.vector.PatternFill)} Hatch fill.
  */
 anychart.charts.TreeMap.prototype.getFinalHatchFill = function(usePointSettings, pointState) {
-  var node = /** @type {anychart.data.Tree.DataItem} */ (this.getIterator().getItem());
+  var node = /** @type {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} */ (this.getIterator().getItem());
   var normalHatchFill = /** @type {acgraph.vector.HatchFill|Function} */((usePointSettings && node.get('hatchFill')) || this.hatchFill());
 
   var hatchFill;
@@ -2382,7 +2381,7 @@ anychart.charts.TreeMap.prototype.getFinalHatchFill = function(usePointSettings,
 
 /**
  * Gets final normalized fill or stroke color.
- * @param {anychart.data.Tree.DataItem} node .
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} node .
  * @param {acgraph.vector.Fill|acgraph.vector.Stroke|Function} color Normal state color.
  * @param {...(acgraph.vector.Fill|acgraph.vector.Stroke|Function)} var_args .
  * @return {!(acgraph.vector.Fill|acgraph.vector.Stroke)} Normalized color.
@@ -2442,7 +2441,7 @@ anychart.charts.TreeMap.prototype.normalizeHatchFill = function(hatchFill) {
 
 /**
  * Calculates bounds of header
- * @param {anychart.data.Tree.DataItem} node Node that represents header.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} node Node that represents header.
  * @param {anychart.math.Rect} bounds Full bounds.
  * @return {anychart.math.Rect} Point header bounds.
  * @private
@@ -2469,7 +2468,7 @@ anychart.charts.TreeMap.prototype.calculateHeaderBounds_ = function(node, bounds
 
 /**
  * Recursively draws node into specified bounds.
- * @param {anychart.data.Tree.DataItem} node Node to draw.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} node Node to draw.
  * @param {anychart.math.Rect} bounds Bounds to draw to.
  * @param {number} depth Current depth.
  * @private
@@ -2532,7 +2531,7 @@ anychart.charts.TreeMap.prototype.drawNode_ = function(node, bounds, depth) {
 
 /**
  * Calculates nodes types.
- * @param {anychart.data.Tree.DataItem} node Node.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} node Node.
  * @param {number} depth Depth.
  * @private
  */

@@ -530,7 +530,7 @@ anychart.core.ui.BaseGrid.HIGHER_DRAG_EDIT_RATIO = 1 - anychart.core.ui.BaseGrid
 
 /**
  * Checks whether tree data item is actually a milestone.
- * @param {anychart.data.Tree.DataItem} treeDataItem - Tree data item.
+ * @param {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} treeDataItem - Tree data item.
  * @return {boolean} - Whether tree data item is milestone.
  */
 anychart.core.ui.BaseGrid.isMilestone = function(treeDataItem) {

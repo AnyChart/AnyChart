@@ -5825,6 +5825,9 @@
     "treeData": {
       "type": "object",
       "properties": {
+        "mapping" : {
+          "type": "object"
+        },
         "children": {
           "type": "array",
           "items": {"$ref": "#/definitions/treeDataItem"}

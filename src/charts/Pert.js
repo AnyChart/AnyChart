@@ -23,7 +23,7 @@ anychart.charts.Pert = function() {
 
   /**
    * Data tree.
-   * @private {anychart.data.Tree}
+   * @private {(anychart.data.Tree|anychart.data.TreeView)}
    */
   this.data_ = null;
 
@@ -50,14 +50,14 @@ anychart.charts.Pert = function() {
   /**
    * Start activities.
    * NOTE: activities that do not depend on other activities.
-   * @private {Array.<anychart.data.Tree.DataItem>}
+   * @private {Array.<(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)>}
    */
   this.startActivities_ = [];
 
   /**
    * Finish activities.
    * NOTE: activities that are not dependent on other activities.
-   * @private {Array.<anychart.data.Tree.DataItem>}
+   * @private {Array.<(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)>}
    */
   this.finishActivities_ = [];
 
@@ -270,8 +270,8 @@ anychart.charts.Pert.ActivityData;
  * @typedef {{
  *    id: string,
  *    label: string,
- *    successors: Array.<anychart.data.Tree.DataItem>,
- *    predecessors: Array.<anychart.data.Tree.DataItem>,
+ *    successors: Array.<(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)>,
+ *    predecessors: Array.<(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)>,
  *    mSuccessors: Array.<anychart.charts.Pert.Milestone>,
  *    mPredecessors: Array.<anychart.charts.Pert.Milestone>,
  *    level: number,
@@ -330,9 +330,9 @@ anychart.charts.Pert.FakeMilestone;
  *
  * @typedef {{
  *    id: string,
- *    item: anychart.data.Tree.DataItem,
- *    successors: Array.<anychart.data.Tree.DataItem>,
- *    predecessors: Array.<anychart.data.Tree.DataItem>,
+ *    item: (anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem),
+ *    successors: Array.<(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)>,
+ *    predecessors: Array.<(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)>,
  *    level: number,
  *    startMilestone: (anychart.charts.Pert.Milestone|anychart.charts.Pert.FakeMilestone),
  *    finishMilestone: (anychart.charts.Pert.Milestone|anychart.charts.Pert.FakeMilestone),
@@ -520,14 +520,14 @@ anychart.charts.Pert.prototype.applyTooltipSettings_ = function(opt_settings1, o
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Gets/sets chart data.
- * @param {(anychart.data.Tree|Array.<Object>)=} opt_data - Data tree or raw data.
+ * @param {(anychart.data.Tree|anychart.data.TreeView|Array.<Object>)=} opt_data - Data tree or raw data.
  * @param {anychart.enums.TreeFillingMethod=} opt_fillMethod - Fill method.
  * @param {Array.<anychart.data.Tree.Dependency>=} opt_deps - Dependencies.
- * @return {(anychart.data.Tree|anychart.charts.Pert)} - Current value or itself for method chaining.
+ * @return {(anychart.data.Tree|anychart.data.TreeView|anychart.charts.Pert)} - Current value or itself for method chaining.
  */
 anychart.charts.Pert.prototype.data = function(opt_data, opt_fillMethod, opt_deps) {
   if (goog.isDef(opt_data)) {
-    if (opt_data instanceof anychart.data.Tree) {
+    if (opt_data instanceof anychart.data.Tree || opt_data instanceof anychart.data.TreeView) {
       if (this.data_ != opt_data) {
         if (this.data_) this.data_.unlistenSignals(this.dataInvalidated_, this);
         this.data_ = opt_data;

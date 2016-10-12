@@ -6,7 +6,7 @@ goog.require('anychart.core.Point');
 /**
  * Class that wraps point of series/chart.
  * @param {anychart.charts.TreeMap} chart Chart which point belongs to.
- * @param {anychart.data.Tree.DataItem} node Node that represents point.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} node Node that represents point.
  * @extends {anychart.core.Point}
  * @constructor
  */
@@ -20,7 +20,7 @@ anychart.core.TreeMapPoint = function(chart, node) {
 
   /**
    * Node that represents point.
-   * @type {anychart.data.Tree.DataItem}
+   * @type {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem}
    */
   this.node = node;
 
@@ -54,7 +54,7 @@ anychart.core.TreeMapPoint.prototype.getChart = function() {
 
 /**
  * Returns node that was wrapped.
- * @return {anychart.data.Tree.DataItem}
+ * @return {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem}
  */
 anychart.core.TreeMapPoint.prototype.getNode = function() {
   return this.node;

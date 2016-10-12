@@ -64,14 +64,14 @@ anychart.core.gantt.Controller = function(opt_isResources) {
 
   /**
    * Tree data.
-   * @type {anychart.data.Tree}
+   * @type {(anychart.data.Tree|anychart.data.TreeView)}
    * @private
    */
   this.data_ = null;
 
   /**
    * Visible items of tree (items that are not hidden by collapse).
-   * @type {Array.<anychart.data.Tree.DataItem>}
+   * @type {Array.<(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)>}
    * @private
    */
   this.visibleItems_ = [];
@@ -183,7 +183,7 @@ goog.inherits(anychart.core.gantt.Controller, anychart.core.Base);
 
 /**
  * Correctly calculates data item pixel height.
- * @param {anychart.data.Tree.DataItem} item - Tree data item.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} item - Tree data item.
  * @return {number} - Data item height.
  */
 anychart.core.gantt.Controller.getItemHeight = function(item) {
@@ -260,7 +260,7 @@ anychart.core.gantt.Controller.prototype.dataInvalidated_ = function(event) {
 
 /**
  * Function that decides if we go through data item's children while passage.
- * @param {anychart.data.Tree.DataItem} item - Tree data item.
+ * @param {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} item - Tree data item.
  * @return {boolean} - Whether item is expanded.
  * @private
  */
@@ -271,7 +271,7 @@ anychart.core.gantt.Controller.prototype.traverseChildrenCondition_ = function(i
 
 /**
  * Function that decides whether data item has children.
- * @param {anychart.data.Tree.DataItem} item - Tree data item.
+ * @param {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} item - Tree data item.
  * @return {boolean} - Whether data item has children.
  * @private
  */
@@ -282,7 +282,7 @@ anychart.core.gantt.Controller.prototype.itemHasChildrenCondition_ = function(it
 
 /**
  * Writes item's dates fields to meta as timestamp.
- * @param {anychart.data.Tree.DataItem} item - Tree data item.
+ * @param {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} item - Tree data item.
  * @private
  */
 anychart.core.gantt.Controller.prototype.datesToMeta_ = function(item) {
@@ -307,7 +307,7 @@ anychart.core.gantt.Controller.prototype.datesToMeta_ = function(item) {
 
 /**
  * Writes item's periods to meta as timestamp.
- * @param {anychart.data.Tree.DataItem} item - Tree data item.
+ * @param {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} item - Tree data item.
  * @private
  */
 anychart.core.gantt.Controller.prototype.periodsToMeta_ = function(item) {
@@ -356,7 +356,7 @@ anychart.core.gantt.Controller.prototype.periodsToMeta_ = function(item) {
 
 /**
  * Item's values auto calculation.
- * @param {anychart.data.Tree.DataItem} item - Current tree data item.
+ * @param {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} item - Current tree data item.
  * @param {number} currentDepth - Current depth.
  * @private
  */
@@ -496,7 +496,7 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
   var height = 0;
   this.expandedItemsTraverser_.reset();
   while (this.expandedItemsTraverser_.advance()) {
-    item = /** @type {anychart.data.Tree.DataItem} */ (this.expandedItemsTraverser_.current());
+    item = /** @type {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} */ (this.expandedItemsTraverser_.current());
     this.visibleItems_.push(item);
     height += (anychart.core.gantt.Controller.getItemHeight(item) + this.rowStrokeThickness_);
     this.heightCache_.push(height);
@@ -758,7 +758,7 @@ anychart.core.gantt.Controller.prototype.getHeightCache = function() {
 
 /**
  * Gets visible items.
- * @return {Array.<anychart.data.Tree.DataItem>} - Height cache.
+ * @return {Array.<(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)>} - Height cache.
  */
 anychart.core.gantt.Controller.prototype.getVisibleItems = function() {
   return this.visibleItems_;
@@ -785,12 +785,12 @@ anychart.core.gantt.Controller.prototype.getMaxDate = function() {
 
 /**
  * Gets/sets source data tree.
- * @param {anychart.data.Tree=} opt_value - Value to be set.
- * @return {(anychart.core.gantt.Controller|anychart.data.Tree)} - Current value or itself for method chaining.
+ * @param {(anychart.data.Tree|anychart.data.TreeView)=} opt_value - Value to be set.
+ * @return {(anychart.core.gantt.Controller|anychart.data.Tree|anychart.data.TreeView)} - Current value or itself for method chaining.
  */
 anychart.core.gantt.Controller.prototype.data = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if ((this.data_ != opt_value) && (opt_value instanceof anychart.data.Tree)) {
+    if ((this.data_ != opt_value) && (opt_value instanceof anychart.data.Tree || opt_value instanceof anychart.data.TreeView)) {
       if (this.data_) this.data_.unlistenSignals(this.dataInvalidated_, this); //Stop listening old tree.
       this.data_ = opt_value;
       this.data_.listenSignals(this.dataInvalidated_, this);

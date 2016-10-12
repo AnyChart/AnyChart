@@ -736,6 +736,11 @@
 
     <xsd:complexType name="TreeData">
         <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="mapping">
+                <xsd:complexType>
+                    <xsd:anyAttribute processContents="skip"/>
+                </xsd:complexType>
+            </xsd:element>
             <xsd:element minOccurs="0" maxOccurs="1" name="children" type="Children_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="index" type="TreeDataIndex"/>
         </xsd:all>

@@ -3,6 +3,7 @@ goog.provide('anychart.data.Tree');
 goog.require('anychart.core.Base');
 goog.require('anychart.core.reporting');
 goog.require('anychart.data.Traverser');
+goog.require('anychart.data.TreeView');
 goog.require('anychart.data.csv.Parser');
 goog.require('anychart.data.csv.TreeItemsProcessor');
 goog.require('anychart.enums');
@@ -107,7 +108,7 @@ goog.inherits(anychart.data.Tree, anychart.core.Base);
 /**
  * Creates new data tree by JSON config.
  * @param {Object} config - Config.
- * @return {?anychart.data.Tree} - Data tree created by config.
+ * @return {?(anychart.data.Tree|anychart.data.TreeView)} - Data tree created by config.
  */
 anychart.data.Tree.fromJson = function(config) {
   var tree = new anychart.data.Tree();
@@ -130,6 +131,8 @@ anychart.data.Tree.fromJson = function(config) {
   }
 
   tree.resumeSignalsDispatching(false);
+  if ('mapping' in config)
+    return tree.mapAs(config['mapping']);
   return tree;
 };
 
@@ -493,7 +496,7 @@ anychart.data.Tree.prototype.comparisonFunction_ = (function(item1, item2) {
 anychart.data.Tree.prototype.addToIndex = function(item, opt_field, opt_subTree) {
   if (!opt_field) {
     for (var field in this.index_) {
-      this.addToIndex(item, field);
+      this.addToIndex(item, field, opt_subTree);
     }
     return this;
   }
@@ -552,7 +555,10 @@ anychart.data.Tree.prototype.removeFromIndex = function(item, opt_field, opt_sub
   var indexArr = this.index_[opt_field]; //Array of key-value pairs or undefined.
   if (indexArr) {
     //Looking in index array of key-value pairs for unique key.
-    var index = goog.array.binarySearch(indexArr, {key: item.get(opt_field)}, this.comparisonFunction_); //index here really can't be negative (value must exist). If not found - here's a bug.
+    var indexKey = {key: item.get(/** @type {string} */ (opt_field))};
+    if (this.isStringIndex_[/** @type {string} */ (opt_field)])
+      indexKey.key = '' + indexKey.key;
+    var index = goog.array.binarySearch(indexArr, indexKey, this.comparisonFunction_); //index here really can't be negative (value must exist). If not found - here's a bug.
     var found = indexArr[index]; //found {key:'', value:(TreeDataItem|Array)}-object. Value can be a tree data item or array.
     if (found) {
       if (goog.isArray(found.value) && found.value.length > 1) {
@@ -583,7 +589,7 @@ anychart.data.Tree.prototype.createIndexOn = function(field, opt_asString) {
     if (!this.traverserToArrayCache_) this.traverserToArrayCache_ = this.defaultTraverser_.toArray();
 
     for (var i = 0; i < this.traverserToArrayCache_.length; i++) {
-      this.addToIndex(this.traverserToArrayCache_[i], field);
+      this.addToIndex(/** @type {anychart.data.Tree.DataItem} */ (this.traverserToArrayCache_[i]), field);
     }
   }
   return this;
@@ -745,11 +751,16 @@ anychart.data.Tree.prototype.addChild = function(child) {
 
 /**
  * Inserts a new root element into a specified position.
- * @param {(Object|anychart.data.Tree.DataItem)} child - Child object.
+ * @param {(Object|anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} child - Child object.
  * @param {number} index - Position.
  * @return {anychart.data.Tree.DataItem} - Itself for method chaining.
  */
 anychart.data.Tree.prototype.addChildAt = function(child, index) {
+  var treeView = null;
+  if (child instanceof anychart.data.TreeView.DataItem) {
+    treeView = child.getTreeView();
+    child = child.getDataItem();
+  }
   this.suspendSignalsDispatching();
 
   var source = null;
@@ -778,6 +789,9 @@ anychart.data.Tree.prototype.addChildAt = function(child, index) {
   this.indexBranch_(child);
 
   child.tree(this); //Sets a new tree for all subtree. All signals are suspended.
+  if (treeView) {
+    child.getWrapper(treeView).setParent(null);
+  }
 
   this.dispatchSignal(anychart.Signal.DATA_CHANGED);
 
@@ -854,10 +868,12 @@ anychart.data.Tree.prototype.removeChild = function(child) {
 
 /**
  * Gets index of child in a roots array.
- * @param {anychart.data.Tree.DataItem} child - Sought child.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} child - Sought child.
  * @return {number} - Index of child.
  */
 anychart.data.Tree.prototype.indexOfChild = function(child) {
+  if (child instanceof anychart.data.TreeView.DataItem)
+    child = child.getDataItem();
   return goog.array.indexOf(this.roots_, child);
 };
 
@@ -948,6 +964,18 @@ anychart.data.Tree.prototype.serializeWithoutMeta = function() {
 };
 
 
+//region --- MAPPING ---
+/**
+ * Creates tree view - mapped tree.
+ * @param {Object=} opt_mapping Mapping for the tree.
+ * @return {anychart.data.TreeView} Mapped tree.
+ */
+anychart.data.Tree.prototype.mapAs = function(opt_mapping) {
+  return new anychart.data.TreeView(this, opt_mapping || {});
+};
+//endregion
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Tree data item.
@@ -1007,6 +1035,13 @@ anychart.data.Tree.DataItem = function(parentTree, rawData) {
    */
   this.data_ = copy;
 
+  /**
+   * Map of wrapped data items.
+   * Key is tree view uid.
+   * Value is Array of tree view object and data item object.
+   * @type {Object.<string, Array>}
+   */
+  this.wrappersMap = {};
 };
 
 
@@ -1631,11 +1666,16 @@ anychart.data.Tree.DataItem.prototype.addChild = function(child) {
  * Inserts a child into a specified position.
  * Please make sure that child has not inner cycles to avoid stack overflow exception.
  *
- * @param {(Object|anychart.data.Tree.DataItem)} child - Child to be added.
+ * @param {(Object|anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} child - Child to be added.
  * @param {number} index - Position.
  * @return {anychart.data.Tree.DataItem} - Itself for method chaining.
  */
 anychart.data.Tree.DataItem.prototype.addChildAt = function(child, index) {
+  var treeView = null;
+  if (child instanceof anychart.data.TreeView.DataItem) {
+    treeView = child.getTreeView();
+    child = child.getDataItem();
+  }
   this.tree_.suspendSignalsDispatching();
 
   var oldTree = null;
@@ -1666,6 +1706,9 @@ anychart.data.Tree.DataItem.prototype.addChildAt = function(child, index) {
   child.tree(this.tree_); //Sets a new tree for all subtree. All signals are suspended.
 
   child.parent_ = this;
+  if (treeView) {
+    child.getWrapper(treeView).setParent(this.getWrapper(treeView));
+  }
 
   this.tree_.dispatchSignal(anychart.Signal.DATA_CHANGED);
 
@@ -1804,10 +1847,12 @@ anychart.data.Tree.DataItem.prototype.removeChildren = function() {
 
 /**
  * Gets index of child in a children array.
- * @param {anychart.data.Tree.DataItem} child - Sought child.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} child - Sought child.
  * @return {number} - Index of child.
  */
 anychart.data.Tree.DataItem.prototype.indexOfChild = function(child) {
+  if (child instanceof anychart.data.TreeView.DataItem)
+    child = child.getDataItem();
   return goog.array.indexOf(this.children_, child);
 };
 
@@ -1913,6 +1958,33 @@ anychart.data.Tree.DataItem.prototype.serialize = function(opt_addMeta) {
 
 
 /**
+ * Get data item wrapper.
+ * @param {anychart.data.TreeView} treeView Tree view.
+ * @return {anychart.data.TreeView.DataItem} Tree view data item.
+ */
+anychart.data.Tree.DataItem.prototype.getWrapper = function(treeView) {
+  var uid = String(goog.getUid(treeView));
+  if (uid in this.wrappersMap)
+    return /** @type {anychart.data.TreeView.DataItem} */ (this.wrappersMap[uid][1]);
+  var isRoot = this.getParent() === null;
+  var parentView = isRoot ? null : this.getParent().getWrapper(treeView);
+  var treeViewDataItem = new anychart.data.TreeView.DataItem(treeView, this, parentView);
+  this.wrappersMap[uid] = [treeView, treeViewDataItem];
+  return treeViewDataItem;
+};
+
+
+/**
+ * Checks that data item has wrapper.
+ * @param {anychart.data.TreeView} treeView Tree view.
+ * @return {boolean} Whether data item has wrapper.
+ */
+anychart.data.Tree.DataItem.prototype.hasWrapper = function(treeView) {
+  return (goog.getUid(treeView) in this.wrappersMap);
+};
+
+
+/**
  * Constructor function
  * @param {(Array.<Object>|string)=} opt_data - Raw data or CSV-string. If string is passed, second parameter will be
  *  interpreted as fields mapping.
@@ -1957,6 +2029,7 @@ anychart.data.Tree.prototype['removeChild'] = anychart.data.Tree.prototype.remov
 anychart.data.Tree.prototype['removeChildAt'] = anychart.data.Tree.prototype.removeChildAt;
 anychart.data.Tree.prototype['removeChildren'] = anychart.data.Tree.prototype.removeChildren;
 anychart.data.Tree.prototype['indexOfChild'] = anychart.data.Tree.prototype.indexOfChild;
+anychart.data.Tree.prototype['mapAs'] = anychart.data.Tree.prototype.mapAs;
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  anychart.data.Tree.DataItem

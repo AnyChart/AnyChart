@@ -216,7 +216,8 @@ anychart.core.ui.SeriesTooltip.prototype.getFormattedContent = function(contextP
   if (goog.isString(formatter))
     formatter = anychart.core.utils.TokenParser.getInstance().getTextFormatter(formatter);
 
-  return formatter.call(contextProvider, contextProvider) || contextProvider['seriesName'];
+  var result = formatter.call(contextProvider, contextProvider);
+  return goog.isDefAndNotNull(result) ? result : contextProvider['seriesName'];
 };
 
 

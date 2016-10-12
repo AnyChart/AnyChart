@@ -52,7 +52,7 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
 
   /**
    * Data tree.
-   * @type {anychart.data.Tree}
+   * @type {anychart.data.Tree|anychart.data.TreeView}
    * @private
    */
   this.data_ = null;
@@ -318,20 +318,20 @@ anychart.charts.Gantt.prototype.scrollInvalidated_ = function(event) {
 
 /**
  * Gets/sets chart data.
- * @param {(anychart.data.Tree|Array.<Object>)=} opt_value - Data tree or raw data.
+ * @param {(anychart.data.Tree|anychart.data.TreeView|Array.<Object>)=} opt_value - Data tree or raw data.
  * @param {anychart.enums.TreeFillingMethod=} opt_fillMethod - Fill method.
- * @return {(anychart.data.Tree|anychart.charts.Gantt)} - Current value or itself for method chaining.
+ * @return {(anychart.data.Tree|anychart.data.TreeView|anychart.charts.Gantt)} - Current value or itself for method chaining.
  */
 anychart.charts.Gantt.prototype.data = function(opt_value, opt_fillMethod) {
   if (goog.isDef(opt_value)) {
-    if (opt_value instanceof anychart.data.Tree) {
+    if (opt_value instanceof anychart.data.Tree || opt_value instanceof anychart.data.TreeView) {
       if (this.data_ != opt_value) {
         this.data_ = opt_value;
       }
     } else {
       this.data_ = new anychart.data.Tree(opt_value, opt_fillMethod);
     }
-    this.invalidate(anychart.ConsistencyState.GANTT_DATA);
+    this.invalidate(anychart.ConsistencyState.GANTT_DATA, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
   return this.data_;
