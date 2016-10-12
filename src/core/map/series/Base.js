@@ -930,6 +930,7 @@ anychart.core.map.series.Base.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
 
   json['seriesType'] = this.getType();
+  json['overlapMode'] = this.overlapMode();
 
   if (goog.isDef(this.geoIdField_))
     json['geoIdField'] = this.geoIdField_;
@@ -942,6 +943,7 @@ anychart.core.map.series.Base.prototype.serialize = function() {
 anychart.core.map.series.Base.prototype.setupByJSON = function(config) {
   goog.base(this, 'setupByJSON', config);
 
+  this.overlapMode(config['overlapMode']);
   this.geoIdField(config['geoIdField']);
 };
 
