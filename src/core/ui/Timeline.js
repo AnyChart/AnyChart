@@ -1839,7 +1839,8 @@ anychart.core.ui.Timeline.prototype.editFinishConnectorMouseDown_ = function(e) 
  */
 anychart.core.ui.Timeline.prototype.editPreviewDragStart_ = function(e) {
   if (this.scrollDragger) this.scrollDragger.setEnabled(false);
-  this.tooltip().hide().enabled(false);
+  this.tooltip().hide();
+  this.tooltip().enabled(false);
   this.interactivityHandler.highlight();
   this.getEditProgressPath_().clear();
   this.getEditLeftThumbPath_().clear();
@@ -1970,7 +1971,8 @@ anychart.core.ui.Timeline.prototype.editPreviewEnd_ = function(e) {
 anychart.core.ui.Timeline.prototype.editProgressDragStart_ = function(e) {
   if (this.scrollDragger) this.scrollDragger.setEnabled(false);
   this.draggingProgress = true;
-  this.tooltip().hide().enabled(false);
+  this.tooltip().hide();
+  this.tooltip().enabled(false);
   this.getEditLeftThumbPath_().clear();
   this.getEditRightThumbPath_().clear();
   this.getEditStartConnectorPath_().clear();
@@ -2022,7 +2024,8 @@ anychart.core.ui.Timeline.prototype.editProgressDragEnd_ = function(e) {
  */
 anychart.core.ui.Timeline.prototype.editRightThumbDragStart_ = function(e) {
   if (this.scrollDragger) this.scrollDragger.setEnabled(false);
-  this.tooltip().hide().enabled(false);
+  this.tooltip().hide();
+  this.tooltip().enabled(false);
   this.getEditProgressPath_().clear();
   this.getEditLeftThumbPath_().clear();
   this.getEditRightThumbPath_().clear();
@@ -2041,7 +2044,8 @@ anychart.core.ui.Timeline.prototype.editRightThumbDragStart_ = function(e) {
  */
 anychart.core.ui.Timeline.prototype.editLeftThumbDragStart_ = function(e) {
   if (this.scrollDragger) this.scrollDragger.setEnabled(false);
-  this.tooltip().hide().enabled(false);
+  this.tooltip().hide();
+  this.tooltip().enabled(false);
   this.getEditProgressPath_().clear();
   this.getEditLeftThumbPath_().clear();
   this.getEditRightThumbPath_().clear();
@@ -2244,7 +2248,8 @@ anychart.core.ui.Timeline.prototype.editThumbDragEnd_ = function(e) {
  */
 anychart.core.ui.Timeline.prototype.editConnectorDragStart_ = function(e) {
   if (this.scrollDragger) this.scrollDragger.setEnabled(false);
-  this.tooltip().hide().enabled(false);
+  this.tooltip().hide();
+  this.tooltip().enabled(false);
   this.interactivityHandler.highlight();
   this.currentConnectorDragger_ = /** @type {anychart.core.ui.Timeline.ConnectorDragger} */ (e.target);
   this.clearEdit_();

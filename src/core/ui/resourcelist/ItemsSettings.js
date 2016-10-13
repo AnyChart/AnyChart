@@ -55,29 +55,26 @@ anychart.core.ui.resourceList.ItemsSettings.prototype.backgroundInvalidated_ = f
 anychart.core.ui.resourceList.ItemsSettings.PROPERTY_DESCRIPTORS = (function() {
   var map = {};
 
-  map[anychart.opt.HEIGHT] = {
-    handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
-    propName: anychart.opt.HEIGHT,
-    normalizer: anychart.core.settings.numberOrPercentNormalizer,
-    consistency: 0,
-    signal: anychart.Signal.NEEDS_REDRAW
-  };
+  map[anychart.opt.HEIGHT] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.HEIGHT,
+      anychart.core.settings.numberOrPercentNormalizer,
+      0,
+      anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.MIN_HEIGHT] = {
-    handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
-    propName: anychart.opt.MIN_HEIGHT,
-    normalizer: anychart.core.settings.numberOrPercentNormalizer,
-    consistency: 0,
-    signal: anychart.Signal.NEEDS_REDRAW
-  };
+  map[anychart.opt.MIN_HEIGHT] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.MIN_HEIGHT,
+      anychart.core.settings.numberOrPercentNormalizer,
+      0,
+      anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.MAX_HEIGHT] = {
-    handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
-    propName: anychart.opt.MAX_HEIGHT,
-    normalizer: anychart.core.settings.numberOrPercentNormalizer,
-    consistency: 0,
-    signal: anychart.Signal.NEEDS_REDRAW
-  };
+  map[anychart.opt.MAX_HEIGHT] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.MAX_HEIGHT,
+      anychart.core.settings.numberOrPercentNormalizer,
+      0,
+      anychart.Signal.NEEDS_REDRAW);
 
   return map;
 })();

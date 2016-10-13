@@ -1447,7 +1447,7 @@ anychart.core.stock.Plot.prototype.updateLegend_ = function(opt_seriesBounds, op
         'dataIntervalUnit': anychart.enums.TokenType.STRING,
         'dataIntervalUnitCount': anychart.enums.TokenType.STRING
       });
-      legend.title()[anychart.opt.AUTO_TEXT](formatter.call(context, context));
+      legend.title().autoText(formatter.call(context, context));
     }
   }
   if (!legend.itemsSource())

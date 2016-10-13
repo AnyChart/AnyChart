@@ -18,7 +18,8 @@ goog.require('anychart.utils');
  * Fake chart.
  * @constructor
  */
-anychart.charts.Resource = function() {};
+anychart.charts.Resource = function() {
+};
 
 
 
@@ -175,29 +176,26 @@ anychart.core.ui.ResourceList.prototype.setOption = function(name, value) {
 anychart.core.ui.ResourceList.PROPERTY_DESCRIPTORS = (function() {
   var map = {};
 
-  map[anychart.opt.WIDTH] = {
-    handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
-    propName: anychart.opt.WIDTH,
-    normalizer: anychart.core.settings.numberOrPercentNormalizer,
-    consistency: anychart.ConsistencyState.BOUNDS,
-    signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED
-  };
+  map[anychart.opt.WIDTH] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.WIDTH,
+      anychart.core.settings.numberOrPercentNormalizer,
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map[anychart.opt.HEIGHT] = {
-    handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
-    propName: anychart.opt.HEIGHT,
-    normalizer: anychart.core.settings.numberOrPercentNormalizer,
-    consistency: anychart.ConsistencyState.BOUNDS,
-    signal: anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED
-  };
+  map[anychart.opt.HEIGHT] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.HEIGHT,
+      anychart.core.settings.numberOrPercentNormalizer,
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map[anychart.opt.DATA] = {
-    handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
-    propName: anychart.opt.DATA,
-    normalizer: anychart.core.settings.asIsNormalizer,
-    consistency: anychart.ConsistencyState.RESOURCE_LIST_DATA,
-    signal: anychart.Signal.NEEDS_REDRAW
-  };
+  map[anychart.opt.DATA] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.DATA,
+      anychart.core.settings.asIsNormalizer,
+      anychart.ConsistencyState.RESOURCE_LIST_DATA,
+      anychart.Signal.NEEDS_REDRAW);
 
   return map;
 })();
@@ -515,10 +513,10 @@ anychart.core.ui.ResourceList.prototype.allocItem_ = function(index) {
  */
 anychart.core.ui.ResourceList.prototype.releaseItem_ = function(item) {
   item
-    .suspendSignalsDispatching()
-    .enabled(false)
-    .resumeSignalsDispatching(false)
-    .draw();
+      .suspendSignalsDispatching()
+      .enabled(false)
+      .resumeSignalsDispatching(false)
+      .draw();
   this.itemsPool_.push(item);
   return this;
 };
@@ -633,8 +631,8 @@ anychart.core.ui.ResourceList.prototype.prepareItem_ = function(item, itemData) 
   enabled = goog.isDef(enabled) && !isNaN(enabled) ? !!enabled : true;
 
   item
-    .enabled(enabled)
-    .setParentEventTarget(/** @type {anychart.core.ui.resourceList.TagsSettings} */ (this.tags()));
+      .enabled(enabled)
+      .setParentEventTarget(/** @type {anychart.core.ui.resourceList.TagsSettings} */ (this.tags()));
 };
 
 
@@ -646,11 +644,11 @@ anychart.core.ui.ResourceList.prototype.prepareItem_ = function(item, itemData) 
  */
 anychart.core.ui.ResourceList.prototype.drawItem_ = function(item, offsetY) {
   item
-    .suspendSignalsDispatching()
-    .container(this.itemsLayer)
-    .offsetY(offsetY)
-    .resumeSignalsDispatching(false)
-    .draw();
+      .suspendSignalsDispatching()
+      .container(this.itemsLayer)
+      .offsetY(offsetY)
+      .resumeSignalsDispatching(false)
+      .draw();
 };
 
 

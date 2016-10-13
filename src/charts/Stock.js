@@ -9,7 +9,7 @@ goog.require('anychart.core.stock.Controller');
 goog.require('anychart.core.stock.IKeyIndexTransformer');
 goog.require('anychart.core.stock.Plot');
 goog.require('anychart.core.stock.Scroller');
-goog.require('anychart.core.ui.ChartTooltip');
+goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.enums');
 goog.require('anychart.scales.StockOrdinalDateTime');
 goog.require('anychart.scales.StockScatterDateTime');
@@ -646,7 +646,7 @@ anychart.charts.Stock.prototype.resizeHandler = function(e) {
 
 /** @inheritDoc */
 anychart.charts.Stock.prototype.createTooltip = function() {
-  var tooltip = new anychart.core.ui.ChartTooltip();
+  var tooltip = new anychart.core.ui.Tooltip(anychart.core.ui.Tooltip.Capabilities.ANY);
   this.registerDisposable(tooltip);
   tooltip.chart(this);
 
@@ -1241,11 +1241,11 @@ anychart.charts.Stock.prototype.highlightAtRatio_ = function(ratio, clientX, cli
   this.highlighted_ = true;
 
   /**
-   * @type {!anychart.core.ui.ChartTooltip}
+   * @type {!anychart.core.ui.Tooltip}
    */
-  var tooltip = /** @type {!anychart.core.ui.ChartTooltip} */(this.tooltip());
-  if (tooltip.displayMode() == anychart.enums.TooltipDisplayMode.UNION &&
-      tooltip.positionMode() != anychart.enums.TooltipPositionMode.POINT) {
+  var tooltip = /** @type {!anychart.core.ui.Tooltip} */(this.tooltip());
+  if (tooltip.getOption(anychart.opt.DISPLAY_MODE) == anychart.enums.TooltipDisplayMode.UNION &&
+      tooltip.getOption(anychart.opt.POSITION_MODE) != anychart.enums.TooltipPositionMode.POINT) {
     var points = [];
     var info = eventInfo['infoByPlots'];
     for (i = 0; i < info.length; i++) {
@@ -1261,7 +1261,7 @@ anychart.charts.Stock.prototype.highlightAtRatio_ = function(ratio, clientX, cli
       }
     }
     var grouping = /** @type {anychart.core.stock.Grouping} */(this.grouping());
-    tooltip.show(points, clientX, clientY, null, false, {
+    tooltip.showForSeriesPoints(points, clientX, clientY, null, false, {
       'hoveredDate': value,
       'dataIntervalUnit': grouping.getCurrentDataInterval()['unit'],
       'dataIntervalUnitCount': grouping.getCurrentDataInterval()['count'],

@@ -186,21 +186,21 @@ anychart.core.axes.MapTicks.prototype.parentInvalidated_ = function(e) {
 anychart.core.axes.MapTicks.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.STROKE] = anychart.core.descriptors.make(
+  map[anychart.opt.STROKE] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.STROKE,
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.LENGTH] = anychart.core.descriptors.make(
+  map[anychart.opt.LENGTH] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.LENGTH,
       anychart.utils.toNumber,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map[anychart.opt.POSITION] = anychart.core.descriptors.make(
+  map[anychart.opt.POSITION] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.POSITION,
       anychart.enums.normalizeSidePosition,

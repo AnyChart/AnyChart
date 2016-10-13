@@ -62,7 +62,7 @@
             <!-- charts.Pie and charts.Funnel and charts.Pyramid elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_labels" type="core.LabelsFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.TooltipOrChartTooltip"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.Tooltip"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="connector_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_fill" type="Fill"/>
@@ -244,7 +244,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="margin" type="utils.Space"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.TooltipOrChartTooltip"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.Tooltip"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="legend" type="core.Legend"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="credits" type="core.Credits"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="chart_labels" type="core.Label_list"/>
@@ -305,7 +305,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="margin" type="utils.Space"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.TooltipOrChartTooltip"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.Tooltip"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="legend" type="core.Legend"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="animation" type="utils.Animation"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="credits" type="core.Credits"/>
@@ -360,7 +360,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="palette" type="palettes.Colors"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill_palette" type="palettes.HatchFills"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="marker_palette" type="palettes.Markers"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.TooltipOrChartTooltip"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.Tooltip"/>
             <!-- Map elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="unbound_regions" type="utils.UnboundRegionsSettings"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="color_range" type="core.ColorRange"/>
@@ -416,7 +416,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_labels" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="select_labels" type="core.LabelsFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.SeriesTooltip"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.Tooltip"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="clip" type="utils.Rect"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="error" type="utils.Error"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="legend_item" type="utils.LegendItemSettings"/>
@@ -616,7 +616,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_labels" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="select_labels" type="core.LabelsFactory"/>
 
-            <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.SeriesTooltip"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.Tooltip"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="legend_item" type="utils.LegendItemSettings"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="name" type="xsd:string"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="selectionMode" type="enums.SelectionMode"/>
@@ -1377,117 +1377,40 @@
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 
-    <xsd:complexType name="core.ChartTooltip">
-        <xsd:all>
-            <xsd:element minOccurs="0" maxOccurs="1" name="title" type="core.Title"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="separator" type="core.Separator"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="adjust_font_size" type="utils.AdjustFontSizeObj"/>
-        </xsd:all>
-        <xsd:attribute name="display_mode" type="enums.TooltipDisplayMode" default="single"/>
-        <xsd:attribute name="position" type="enums.AnchorAndPosition" default="leftTop"/>
-        <xsd:attribute name="anchor" type="enums.AnchorAndPosition" default="leftTop"/>
-        <xsd:attribute name="offset_x" type="xsd:double" default="0"/>
-        <xsd:attribute name="offset_y" type="xsd:double" default="0"/>
-        <xsd:attribute name="position_mode" type="enums.TooltipPositionMode" default="float"/>
-        <xsd:attribute name="allow_adjust_position" type="simple.Bool" default="true"/>
-        <xsd:attribute name="allow_leave_chart" type="simple.Bool" default="true"/>
-        <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="false"/>
-        <xsd:attribute name="separator" type="simple.BoolOrNull" default="false"/>
-        <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
-        <xsd:attribute name="enabled" type="simple.Bool" default="true"/>
-        <xsd:attribute name="hide_delay" type="xsd:unsignedInt" default="0"/>
-        <xsd:attribute name="adjust_font_size" type="simple.Bool" default="false"/>
-        <xsd:attribute name="min_font_size" type="xsd:string"/>
-        <xsd:attribute name="max_font_size" type="xsd:string"/>
-        <xsd:attribute name="allow_leave_screen" type="simple.Bool" default="true"/>
-        <xsd:attributeGroup ref="attrs.TextSettings"/>
-    </xsd:complexType>
-
-    <xsd:complexType name="core.SeriesTooltip">
-        <xsd:all>
-            <xsd:element minOccurs="0" maxOccurs="1" name="title" type="core.Title"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="separator" type="core.Separator"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="adjust_font_size" type="utils.AdjustFontSizeObj"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="value_prefix" type="simple.Text"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="value_postfix" type="simple.Text"/>
-        </xsd:all>
-        <xsd:attribute name="value_prefix" type="xsd:string" default=""/>
-        <xsd:attribute name="value_postfix" type="xsd:string" default=""/>
-        <xsd:attribute name="position" type="enums.AnchorAndPosition" default="leftTop"/>
-        <xsd:attribute name="anchor" type="enums.AnchorAndPosition" default="leftTop"/>
-        <xsd:attribute name="offset_x" type="xsd:double" default="0"/>
-        <xsd:attribute name="offset_y" type="xsd:double" default="0"/>
-        <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="false"/>
-        <xsd:attribute name="separator" type="simple.BoolOrNull" default="false"/>
-        <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
-        <xsd:attribute name="enabled" type="simple.Bool" default="true"/>
-        <xsd:attribute name="hide_delay" type="xsd:unsignedInt" default="0"/>
-        <xsd:attribute name="adjust_font_size" type="simple.Bool" default="false"/>
-        <xsd:attribute name="min_font_size" type="xsd:string"/>
-        <xsd:attribute name="max_font_size" type="xsd:string"/>
-        <xsd:attributeGroup ref="attrs.TextSettings"/>
-    </xsd:complexType>
-
     <xsd:complexType name="core.Tooltip">
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="title" type="core.Title"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="separator" type="core.Separator"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="content" type="core.Label"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="value_prefix" type="simple.Text"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="value_postfix" type="simple.Text"/>
-        </xsd:all>
-        <xsd:attribute name="value_prefix" type="xsd:string" default=""/>
-        <xsd:attribute name="value_postfix" type="xsd:string" default=""/>
-        <xsd:attribute name="allow_leave_screen" type="simple.Bool" default="true"/>
-        <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="false"/>
-        <xsd:attribute name="separator" type="simple.BoolOrNull" default="false"/>
-        <xsd:attribute name="content" type="simple.StringOrBoolOrNull"/>
-        <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
-        <xsd:attribute name="offset_x" type="xsd:double" default="5"/>
-        <xsd:attribute name="offset_y" type="xsd:double" default="5"/>
-        <xsd:attribute name="anchor" type="enums.AnchorAndPosition" default="centerBottom"/>
-        <xsd:attribute name="hide_delay" type="xsd:unsignedInt" default="0"/>
-        <xsd:attribute name="enabled" type="simple.Bool" default="true"/>
-    </xsd:complexType>
-
-    <xsd:complexType name="core.TooltipOrChartTooltip">
-        <xsd:all>
-            <xsd:element minOccurs="0" maxOccurs="1" name="title" type="core.Title"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="separator" type="core.Separator"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="content" type="core.Label"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="background" type="core.Background"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="adjust_font_size" type="utils.AdjustFontSizeObj"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="value_prefix" type="simple.Text"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="value_postfix" type="simple.Text"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="content" type="core.Label"/>
         </xsd:all>
-        <xsd:attribute name="value_prefix" type="xsd:string" default=""/>
-        <xsd:attribute name="value_postfix" type="xsd:string" default=""/>
-        <xsd:attribute name="allow_leave_screen" type="simple.Bool" default="true"/>
-        <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="false"/>
-        <xsd:attribute name="separator" type="simple.BoolOrNull" default="false"/>
-        <xsd:attribute name="content" type="simple.StringOrBoolOrNull"/>
-        <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
-        <xsd:attribute name="offset_x" type="xsd:double" default="5"/>
-        <xsd:attribute name="offset_y" type="xsd:double" default="5"/>
-        <xsd:attribute name="anchor" type="enums.AnchorAndPosition" default="centerBottom"/>
-        <xsd:attribute name="hide_delay" type="xsd:unsignedInt" default="0"/>
-        <xsd:attribute name="enabled" type="simple.Bool" default="true"/>
-
         <xsd:attribute name="display_mode" type="enums.TooltipDisplayMode" default="single"/>
         <xsd:attribute name="position" type="enums.AnchorAndPosition" default="leftTop"/>
+        <xsd:attribute name="anchor" type="enums.AnchorAndPosition" default="leftTop"/>
+        <xsd:attribute name="offset_x" type="xsd:double" default="0"/>
+        <xsd:attribute name="offset_y" type="xsd:double" default="0"/>
         <xsd:attribute name="position_mode" type="enums.TooltipPositionMode" default="float"/>
         <xsd:attribute name="allow_adjust_position" type="simple.Bool" default="true"/>
         <xsd:attribute name="allow_leave_chart" type="simple.Bool" default="true"/>
+        <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="false"/>
+        <xsd:attribute name="separator" type="simple.BoolOrNull" default="false"/>
+        <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
+        <xsd:attribute name="content" type="simple.StringOrBoolOrNull" default="true"/>
+        <xsd:attribute name="enabled" type="simple.Bool" default="true"/>
+        <xsd:attribute name="hide_delay" type="xsd:unsignedInt" default="0"/>
         <xsd:attribute name="adjust_font_size" type="simple.Bool" default="false"/>
         <xsd:attribute name="min_font_size" type="xsd:string"/>
         <xsd:attribute name="max_font_size" type="xsd:string"/>
+        <xsd:attribute name="allow_leave_screen" type="simple.Bool" default="true"/>
+        <xsd:attribute name="value_prefix" type="xsd:string" default=""/>
+        <xsd:attribute name="value_postfix" type="xsd:string" default=""/>
+        <xsd:attribute name="width" type="simple.NumberOrPercentOrNull" default="null"/>
+        <xsd:attribute name="height" type="simple.NumberOrPercentOrNull" default="null"/>
+        <xsd:attribute name="z_index" type="simple.NumberOrNull" default="null"/>
         <xsd:attributeGroup ref="attrs.TextSettings"/>
     </xsd:complexType>
 

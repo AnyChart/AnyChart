@@ -1,5 +1,5 @@
 goog.provide('anychart.charts.Gantt');
-goog.require('acgraph.math.Coordinate');
+
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.gantt.Controller');
 goog.require('anychart.core.reporting');
@@ -815,12 +815,12 @@ anychart.charts.Gantt.prototype.rowMouseMove = function(event) {
   } else {
     tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tl_.tooltip());
   }
-  var position = tooltip.isFloating() ?
-      new acgraph.math.Coordinate(event['originalEvent']['clientX'], event['originalEvent']['clientY']) :
-      new acgraph.math.Coordinate(0, 0);
+  // var position = tooltip.isFloating() ?
+  //     new acgraph.math.Coordinate(event['originalEvent']['clientX'], event['originalEvent']['clientY']) :
+  //     new acgraph.math.Coordinate(0, 0);
 
   var formatProvider = this.createFormatProvider(event['item'], event['period'], event['periodIndex']);
-  tooltip.show(formatProvider, position);
+  tooltip.showFloat(event['originalEvent']['clientX'], event['originalEvent']['clientY'], formatProvider);
 };
 
 

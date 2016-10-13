@@ -454,7 +454,7 @@ anychart.core.pert.PertVisualElements.prototype.labelsInvalidated = function(eve
  */
 anychart.core.pert.PertVisualElements.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
-    this.tooltip_ = new anychart.core.ui.Tooltip();
+    this.tooltip_ = new anychart.core.ui.Tooltip(anychart.core.ui.Tooltip.Capabilities.SUPPORTS_ALLOW_LEAVE_SCREEN);
     this.registerDisposable(this.tooltip_);
     this.tooltip_.listenSignals(this.onTooltipSignal_, this);
   }
@@ -483,10 +483,12 @@ anychart.core.pert.PertVisualElements.prototype.onTooltipSignal_ = function(even
  */
 anychart.core.pert.PertVisualElements.prototype.getCurrentTooltipConfig = function() {
   var config = this.tooltip().serialize();
-  if (this.tooltip_.titleFormatter() && this.tooltip_.titleFormatter() != anychart.utils.DEFAULT_FORMATTER)
-    config['titleFormatter'] = this.tooltip().titleFormatter();
-  if (this.tooltip_.textFormatter() && this.tooltip_.textFormatter() != anychart.utils.DEFAULT_FORMATTER)
-    config['textFormatter'] = this.tooltip().textFormatter();
+  var titleFormatter = this.tooltip().getOption(anychart.opt.TITLE_FORMATTER);
+  var textFormatter = this.tooltip().getOption(anychart.opt.TEXT_FORMATTER);
+  if (titleFormatter && titleFormatter != anychart.utils.DEFAULT_FORMATTER)
+    config['titleFormatter'] = titleFormatter;
+  if (textFormatter && textFormatter != anychart.utils.DEFAULT_FORMATTER)
+    config['textFormatter'] = textFormatter;
   return config;
 };
 

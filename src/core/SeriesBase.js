@@ -6,7 +6,7 @@ goog.require('anychart.core.SeriesPoint');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.LabelsFactory');
-goog.require('anychart.core.ui.SeriesTooltip');
+goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.core.utils.IInteractiveSeries');
 goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.LegendContextProvider');
@@ -155,7 +155,7 @@ anychart.core.SeriesBase.prototype.statistics_;
 
 
 /**
- * @type {anychart.core.ui.SeriesTooltip}
+ * @type {anychart.core.ui.Tooltip}
  * @private
  */
 anychart.core.SeriesBase.prototype.tooltip_ = null;
@@ -351,6 +351,7 @@ anychart.core.SeriesBase.prototype.setChart = function(chart) {
   this.chart_ = chart;
   this.a11y().parentA11y(/** @type {anychart.core.utils.A11y} */ (/** @type {anychart.core.Chart} */ (this.chart_).a11y()));
   this.a11y().parentA11y().applyChangesInChildA11y();
+  this.tooltip().parent(/** @type {anychart.core.ui.Tooltip} */ (this.chart_.tooltip()));
 };
 
 
@@ -643,12 +644,13 @@ anychart.core.SeriesBase.prototype.getStat = function(key) {
 /**
  * Gets/sets current series data tooltip.
  * @param {(Object|boolean|null)=} opt_value Tooltip settings.
- * @return {!(anychart.core.SeriesBase|anychart.core.ui.SeriesTooltip)} Tooltip instance or itself for chaining call.
+ * @return {!(anychart.core.SeriesBase|anychart.core.ui.Tooltip)} Tooltip instance or itself for chaining call.
  */
 anychart.core.SeriesBase.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
-    this.tooltip_ = new anychart.core.ui.SeriesTooltip();
+    this.tooltip_ = new anychart.core.ui.Tooltip(0);
     this.registerDisposable(this.tooltip_);
+    this.tooltip_.chart(this.chart_);
   }
   if (goog.isDef(opt_value)) {
     this.tooltip_.setup(opt_value);
@@ -2168,7 +2170,7 @@ anychart.core.SeriesBase.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.core.SeriesBase.prototype.setupByJSON = function(config) {
+anychart.core.SeriesBase.prototype.setupByJSON = function(config, opt_default) {
   goog.base(this, 'setupByJSON', config);
   if (goog.isFunction(this['fill']))
     this.fill(config['fill']);
@@ -2205,7 +2207,10 @@ anychart.core.SeriesBase.prototype.setupByJSON = function(config) {
   this.labels().setup(config['labels']);
   this.hoverLabels().setup(config['hoverLabels']);
   this.selectLabels().setup(config['selectLabels']);
-  this.tooltip(config['tooltip']);
+
+  if (anychart.opt.TOOLTIP in config)
+    this.tooltip().setupByJSON(config['tooltip'], opt_default);
+
   this.legendItem(config['legendItem']);
   if (goog.isDef(config['allowPointsSelect'])) {
     this.selectionMode(goog.isBoolean(config['allowPointsSelect']) ?

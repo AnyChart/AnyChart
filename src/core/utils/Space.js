@@ -33,11 +33,13 @@ anychart.core.utils.Space = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRi
    */
   this.themeSettings = {};
 
+
   /**
    * Own settings (Settings set by user with API).
    * @type {Object}
    */
   this.ownSettings = {};
+
 
   /**
    * Parent.
@@ -45,6 +47,7 @@ anychart.core.utils.Space = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRi
    * @private
    */
   this.parent_ = null;
+
 };
 goog.inherits(anychart.core.utils.Space, anychart.core.Base);
 
@@ -68,8 +71,7 @@ anychart.core.utils.Space.NormalizedSpace;
 anychart.core.utils.Space.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_REAPPLICATION;
 
 
-//endregion
-//region --- Space descriptors
+//region -- Space descriptors
 /**
  * Space descriptors.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
@@ -77,28 +79,28 @@ anychart.core.utils.Space.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_RE
 anychart.core.utils.Space.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.LEFT] = anychart.core.descriptors.make(
+  map[anychart.opt.LEFT] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.LEFT,
       anychart.core.settings.numberOrZeroNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REAPPLICATION);
 
-  map[anychart.opt.TOP] = anychart.core.descriptors.make(
+  map[anychart.opt.TOP] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.TOP,
       anychart.core.settings.numberOrZeroNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REAPPLICATION);
 
-  map[anychart.opt.BOTTOM] = anychart.core.descriptors.make(
+  map[anychart.opt.BOTTOM] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.BOTTOM,
       anychart.core.settings.numberOrZeroNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REAPPLICATION);
 
-  map[anychart.opt.RIGHT] = anychart.core.descriptors.make(
+  map[anychart.opt.RIGHT] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.RIGHT,
       anychart.core.settings.numberOrZeroNormalizer,
@@ -108,10 +110,10 @@ anychart.core.utils.Space.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   return map;
 })();
 anychart.core.settings.populate(anychart.core.utils.Space, anychart.core.utils.Space.prototype.SIMPLE_PROPS_DESCRIPTORS);
-
-
 //endregion
-//region --- IObjectWithSettings implementation
+
+
+//region -- IObjectWithSettings implementation
 /** @inheritDoc */
 anychart.core.utils.Space.prototype.getOwnOption = function(name) {
   return this.ownSettings[name];
@@ -144,10 +146,10 @@ anychart.core.utils.Space.prototype.setOption = function(name, value) {
 anychart.core.utils.Space.prototype.check = function(flags) {
   return true;
 };
-
-
 //endregion
-//region --- IResolvable implementation
+
+
+//region -- IResolvable implementation
 /** @inheritDoc */
 anychart.core.utils.Space.prototype.getResolutionChain = goog.partial(anychart.core.settings.getResolutionChain);
 
@@ -170,10 +172,10 @@ anychart.core.utils.Space.prototype.getHighPriorityResolutionChain = function() 
   }
   return sett;
 };
-
-
 //endregion
-//region --- Parental relations
+
+
+//region -- Parental relations
 /**
  * Gets/sets new parent.
  * @param {anychart.core.utils.Space=} opt_value - Value to set.
@@ -182,10 +184,16 @@ anychart.core.utils.Space.prototype.getHighPriorityResolutionChain = function() 
 anychart.core.utils.Space.prototype.parent = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.parent_ != opt_value) {
-      if (this.parent_)
+      if (goog.isNull(opt_value)) {
+        //this.parent_ is not null here.
         this.parent_.unlistenSignals(this.parentInvalidated_, this);
-      this.parent_ = opt_value;
-      this.parent_.listenSignals(this.parentInvalidated_, this);
+        this.parent_ = null;
+      } else {
+        if (this.parent_)
+          this.parent_.unlistenSignals(this.parentInvalidated_, this);
+        this.parent_ = opt_value;
+        this.parent_.listenSignals(this.parentInvalidated_, this);
+      }
     }
     return this;
   }
@@ -201,10 +209,9 @@ anychart.core.utils.Space.prototype.parent = function(opt_value) {
 anychart.core.utils.Space.prototype.parentInvalidated_ = function(e) {
   this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
 };
-
-
 //endregion
-//region --- Methods for space manipulations
+
+
 /**
  * Normalizes space.
  * @param {...(Object|Array|string|number)} var_args - Arguments.

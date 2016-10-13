@@ -1,5 +1,5 @@
 goog.provide('anychart.charts.Pie');
-goog.require('acgraph.math.Coordinate');
+
 goog.require('anychart.color');
 goog.require('anychart.core.PiePoint');
 goog.require('anychart.core.SeparateChart');
@@ -1447,9 +1447,9 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
     anychart.core.reporting.info(anychart.enums.InfoCode.PIE_TOO_MUCH_POINTS, [rowsCount]);
   }
 
-  if (!this.tooltip().container()) {
-    this.tooltip().container(/** @type {acgraph.vector.ILayer} */(this.container()));
-  }
+  // if (!this.tooltip().container()) {
+  //   this.tooltip().container(/** @type {acgraph.vector.ILayer} */(this.container()));
+  // }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calculate_(bounds);
@@ -3461,7 +3461,8 @@ anychart.charts.Pie.prototype.applyAppearanceToSeries = function(pointState) {
  */
 anychart.charts.Pie.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
-    this.tooltip_ = new anychart.core.ui.Tooltip();
+    this.tooltip_ = new anychart.core.ui.Tooltip(anychart.core.ui.Tooltip.Capabilities.SUPPORTS_ALLOW_LEAVE_SCREEN);
+    this.tooltip_.chart(this);
     this.registerDisposable(this.tooltip_);
     this.tooltip_.listenSignals(this.onTooltipSignal_, this);
   }
@@ -3481,7 +3482,7 @@ anychart.charts.Pie.prototype.tooltip = function(opt_value) {
  */
 anychart.charts.Pie.prototype.onTooltipSignal_ = function(event) {
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.redraw();
+  tooltip.draw();
 };
 
 
@@ -3493,22 +3494,25 @@ anychart.charts.Pie.prototype.showTooltip = function(opt_event) {
   if (opt_event && opt_event['target'] == this.legend()) {
     return;
   }
-
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
   var formatProvider = this.createFormatProvider();
-  if (tooltip.isFloating() && opt_event) {
-    tooltip.show(
-        formatProvider,
-        new acgraph.math.Coordinate(opt_event['clientX'], opt_event['clientY']));
-
-    // for float
+  if (opt_event) {
+    tooltip.showFloat(opt_event['clientX'], opt_event['clientY'], formatProvider);
     this.listen(goog.events.EventType.MOUSEMOVE, this.showTooltip);
-
-  } else {
-    tooltip.show(
-        formatProvider,
-        new acgraph.math.Coordinate(0, 0));
   }
+  // if (tooltip.isFloating() && opt_event) {
+  //   tooltip.show(
+  //       formatProvider,
+  //       new acgraph.math.Coordinate(opt_event['clientX'], opt_event['clientY']));
+  //
+  //   // for float
+  //   this.listen(goog.events.EventType.MOUSEMOVE, this.showTooltip);
+  //
+  // } else {
+  //   tooltip.show(
+  //       formatProvider,
+  //       new acgraph.math.Coordinate(0, 0));
+  // }
 };
 
 
@@ -3518,10 +3522,7 @@ anychart.charts.Pie.prototype.showTooltip = function(opt_event) {
  */
 anychart.charts.Pie.prototype.hideTooltip = function() {
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  if (tooltip.isFloating()) {
-    this.unlisten(goog.events.EventType.MOUSEMOVE, this.showTooltip);
-  }
-
+  this.unlisten(goog.events.EventType.MOUSEMOVE, this.showTooltip);
   tooltip.hide();
 };
 

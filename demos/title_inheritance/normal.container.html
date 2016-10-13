@@ -1,0 +1,61 @@
+<html>
+<head>
+    <meta name="x-cat-tags" content=""/>
+    <script src="../../contrib/closure-library/closure/goog/base.js"></script>
+    <script src="../../src/deps.js"></script>
+
+    <meta charset="utf-8">
+
+    <script>
+        goog.require('anychart.themes.defaultTheme');
+        goog.require('anychart.modules.anychart_bundle');
+    </script>
+    <meta charset="utf-8">
+    <style>
+        #container {
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            border: 1px solid #000000;
+            float: left;
+            width: 400px;
+            height: 300px;
+        }
+        #status{
+            display: none;
+        }
+        body {
+            margin: 0;
+        }
+        .anychart-credits{display:none}
+    </style>
+</head>
+<body>
+<div id="container"></div>
+</body>
+<script>
+    anychart.onDocumentReady(function() {
+        chart = anychart.pie([
+            ['Product A', 1222],
+            ['Product B', 2431],
+            ['Product C', 3624],
+            ['Product D', 5243],
+            ['Product E', 8813],
+            ['Product Y', 4813],
+            ['Product U', 473],
+            ['Product E', 8813],
+            ['Product U', 873]
+        ]);
+
+        chart.title().text('Pie Chart');
+
+        chart.legend().title().enabled(true);
+        chart.legend().titleSeparator().enabled(true);
+        chart.legend().title().text('Products Sales');
+        chart.legend().position('bottom');
+        chart.legend().itemsLayout('horizontal');
+        chart.legend().align('bottom');
+        chart.container('container').draw();
+    });
+</script>
+</html>

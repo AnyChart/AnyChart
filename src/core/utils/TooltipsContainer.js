@@ -24,7 +24,7 @@ anychart.core.utils.TooltipsContainer = function() {
   this.selectable_ = false;
 
   /**
-   * @type {Object.<!string, !anychart.core.ui.SeriesTooltip|!anychart.core.ui.TooltipItem>}
+   * @type {Object.<!string, !anychart.core.ui.Tooltip>}
    * @private
    */
   this.tooltipsMap_ = {};
@@ -102,7 +102,7 @@ anychart.core.utils.TooltipsContainer.prototype.updateStageSize_ = function() {
 
 /**
  * Set container to tooltip.
- * @param {anychart.core.ui.SeriesTooltip|anychart.core.ui.TooltipItem} tooltip
+ * @param {anychart.core.ui.Tooltip} tooltip
  */
 anychart.core.utils.TooltipsContainer.prototype.allocTooltip = function(tooltip) {
   tooltip.container(this.stage_);
@@ -112,7 +112,7 @@ anychart.core.utils.TooltipsContainer.prototype.allocTooltip = function(tooltip)
 
 /**
  * Release passed tooltip.
- * @param {anychart.core.ui.SeriesTooltip|anychart.core.ui.TooltipItem} tooltip
+ * @param {anychart.core.ui.Tooltip} tooltip
  */
 anychart.core.utils.TooltipsContainer.prototype.release = function(tooltip) {
   tooltip.container(null);

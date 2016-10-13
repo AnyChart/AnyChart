@@ -100,6 +100,14 @@ anychart.core.stock.Scroller.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.STOCK_SCROLLER_AXIS;
 
 
+/**
+ * @inheritDoc
+ */
+anychart.core.stock.Scroller.prototype.supportsTooltip = function() {
+  return false;
+};
+
+
 //region Series and indicators -related methods
 //----------------------------------------------------------------------------------------------------------------------
 //

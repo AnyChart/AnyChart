@@ -278,53 +278,47 @@ anychart.core.ui.resourceList.Item.prototype.getComplexOption = function(name, p
 anychart.core.ui.resourceList.Item.PROPERTY_DESCRIPTORS = (function() {
   var map = {};
 
-  map[anychart.opt.WIDTH] = {
-    handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
-    propName: anychart.opt.WIDTH,
-    normalizer: anychart.core.settings.numberOrPercentNormalizer,
-    consistency: 0,
-    signal: 0
-  };
+  map[anychart.opt.WIDTH] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.WIDTH,
+      anychart.core.settings.numberOrPercentNormalizer,
+      0,
+      0);
 
-  map[anychart.opt.IMAGE_SRC] = {
-    handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
-    propName: anychart.opt.IMAGE_SRC,
-    normalizer: anychart.core.settings.stringNormalizer,
-    consistency: 0,
-    signal: 0
-  };
+  map[anychart.opt.IMAGE_SRC] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.IMAGE_SRC,
+      anychart.core.settings.stringNormalizer,
+      0,
+      0);
 
-  map[anychart.opt.NAME] = {
-    handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
-    propName: anychart.opt.NAME,
-    normalizer: anychart.core.settings.asIsNormalizer,
-    consistency: 0,
-    signal: 0
-  };
+  map[anychart.opt.NAME] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.NAME,
+      anychart.core.settings.asIsNormalizer,
+      0,
+      0);
 
-  map[anychart.opt.TYPE] = {
-    handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
-    propName: anychart.opt.TYPE,
-    normalizer: anychart.core.settings.asIsNormalizer,
-    consistency: 0,
-    signal: 0
-  };
+  map[anychart.opt.TYPE] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.TYPE,
+      anychart.core.settings.asIsNormalizer,
+      0,
+      0);
 
-  map[anychart.opt.DESCRIPTION] = {
-    handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
-    propName: anychart.opt.DESCRIPTION,
-    normalizer: anychart.core.settings.asIsNormalizer,
-    consistency: 0,
-    signal: anychart.Signal.NEEDS_REDRAW
-  };
+  map[anychart.opt.DESCRIPTION] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.DESCRIPTION,
+      anychart.core.settings.asIsNormalizer,
+      0,
+      anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.TAGS] = {
-    handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
-    propName: anychart.opt.TAGS,
-    normalizer: anychart.core.settings.arrayNormalizer,
-    consistency: 0,
-    signal: anychart.Signal.NEEDS_REDRAW
-  };
+  map[anychart.opt.TAGS] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      anychart.opt.TAGS,
+      anychart.core.settings.arrayNormalizer,
+      0,
+      anychart.Signal.NEEDS_REDRAW);
 
   return map;
 })();

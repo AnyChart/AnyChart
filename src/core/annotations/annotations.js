@@ -1,6 +1,5 @@
 goog.provide('anychart.core.annotations');
 
-goog.require('anychart.core.descriptors');
 goog.require('anychart.core.settings');
 goog.require('anychart.enums');
 
@@ -96,21 +95,21 @@ anychart.core.annotations.AnnotationJSONFormat;
 anychart.core.annotations.BASE_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.COLOR] = anychart.core.descriptors.make(
+  map[anychart.opt.COLOR] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.COLOR,
       anychart.core.settings.colorNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.ALLOW_EDIT] = anychart.core.descriptors.make(
+  map[anychart.opt.ALLOW_EDIT] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.ALLOW_EDIT,
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.ANNOTATIONS_INTERACTIVITY,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.HOVER_GAP] = anychart.core.descriptors.make(
+  map[anychart.opt.HOVER_GAP] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.HOVER_GAP,
       anychart.core.settings.naturalNumberNormalizer,
@@ -128,7 +127,7 @@ anychart.core.annotations.BASE_DESCRIPTORS = (function() {
 anychart.core.annotations.X_ANCHOR_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.X_ANCHOR] = anychart.core.descriptors.make(
+  map[anychart.opt.X_ANCHOR] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.X_ANCHOR,
       anychart.core.settings.asIsNormalizer,
@@ -145,7 +144,7 @@ anychart.core.annotations.X_ANCHOR_DESCRIPTORS = (function() {
 anychart.core.annotations.VALUE_ANCHOR_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.VALUE_ANCHOR] = anychart.core.descriptors.make(
+  map[anychart.opt.VALUE_ANCHOR] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.VALUE_ANCHOR,
       anychart.core.settings.asIsNormalizer,
@@ -162,14 +161,14 @@ anychart.core.annotations.VALUE_ANCHOR_DESCRIPTORS = (function() {
 anychart.core.annotations.SECOND_ANCHOR_POINT_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.SECOND_X_ANCHOR] = anychart.core.descriptors.make(
+  map[anychart.opt.SECOND_X_ANCHOR] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.SECOND_X_ANCHOR,
       anychart.core.settings.asIsNormalizer,
       anychart.ConsistencyState.ANNOTATIONS_ANCHORS,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.SECOND_VALUE_ANCHOR] = anychart.core.descriptors.make(
+  map[anychart.opt.SECOND_VALUE_ANCHOR] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.SECOND_VALUE_ANCHOR,
       anychart.core.settings.asIsNormalizer,
@@ -186,14 +185,14 @@ anychart.core.annotations.SECOND_ANCHOR_POINT_DESCRIPTORS = (function() {
 anychart.core.annotations.THIRD_ANCHOR_POINT_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.THIRD_X_ANCHOR] = anychart.core.descriptors.make(
+  map[anychart.opt.THIRD_X_ANCHOR] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.THIRD_X_ANCHOR,
       anychart.core.settings.asIsNormalizer,
       anychart.ConsistencyState.ANNOTATIONS_ANCHORS,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.THIRD_VALUE_ANCHOR] = anychart.core.descriptors.make(
+  map[anychart.opt.THIRD_VALUE_ANCHOR] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.THIRD_VALUE_ANCHOR,
       anychart.core.settings.asIsNormalizer,
@@ -211,21 +210,21 @@ anychart.core.annotations.THIRD_ANCHOR_POINT_DESCRIPTORS = (function() {
 anychart.core.annotations.STROKE_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.STROKE] = anychart.core.descriptors.make(
+  map[anychart.opt.STROKE] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.STROKE,
       anychart.core.settings.strokeOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.ANNOTATIONS_SHAPES,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.HOVER_STROKE] = anychart.core.descriptors.make(
+  map[anychart.opt.HOVER_STROKE] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.HOVER_STROKE,
       anychart.core.settings.strokeOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.ANNOTATIONS_SHAPES,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.SELECT_STROKE] = anychart.core.descriptors.make(
+  map[anychart.opt.SELECT_STROKE] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.SELECT_STROKE,
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -243,21 +242,21 @@ anychart.core.annotations.STROKE_DESCRIPTORS = (function() {
 anychart.core.annotations.TREND_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.TREND] = anychart.core.descriptors.make(
+  map[anychart.opt.TREND] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.TREND,
       anychart.core.settings.strokeOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.HOVER_TREND] = anychart.core.descriptors.make(
+  map[anychart.opt.HOVER_TREND] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.HOVER_TREND,
       anychart.core.settings.strokeOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.SELECT_TREND] = anychart.core.descriptors.make(
+  map[anychart.opt.SELECT_TREND] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.SELECT_TREND,
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -275,21 +274,21 @@ anychart.core.annotations.TREND_DESCRIPTORS = (function() {
 anychart.core.annotations.GRID_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.GRID] = anychart.core.descriptors.make(
+  map[anychart.opt.GRID] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.GRID,
       anychart.core.settings.strokeOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.HOVER_GRID] = anychart.core.descriptors.make(
+  map[anychart.opt.HOVER_GRID] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.HOVER_GRID,
       anychart.core.settings.strokeOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.SELECT_GRID] = anychart.core.descriptors.make(
+  map[anychart.opt.SELECT_GRID] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.SELECT_TREND,
       anychart.core.settings.strokeOrFunctionNormalizer,
@@ -307,42 +306,42 @@ anychart.core.annotations.GRID_DESCRIPTORS = (function() {
 anychart.core.annotations.FILL_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.FILL] = anychart.core.descriptors.make(
+  map[anychart.opt.FILL] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.FILL,
       anychart.core.settings.fillOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.HOVER_FILL] = anychart.core.descriptors.make(
+  map[anychart.opt.HOVER_FILL] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.HOVER_FILL,
       anychart.core.settings.fillOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.SELECT_FILL] = anychart.core.descriptors.make(
+  map[anychart.opt.SELECT_FILL] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.SELECT_FILL,
       anychart.core.settings.fillOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.HATCH_FILL] = anychart.core.descriptors.make(
+  map[anychart.opt.HATCH_FILL] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.HATCH_FILL,
       anychart.core.settings.hatchFillOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.HOVER_HATCH_FILL] = anychart.core.descriptors.make(
+  map[anychart.opt.HOVER_HATCH_FILL] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.HOVER_HATCH_FILL,
       anychart.core.settings.hatchFillOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.SELECT_HATCH_FILL] = anychart.core.descriptors.make(
+  map[anychart.opt.SELECT_HATCH_FILL] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.SELECT_HATCH_FILL,
       anychart.core.settings.hatchFillOrFunctionNormalizer,
@@ -360,49 +359,49 @@ anychart.core.annotations.FILL_DESCRIPTORS = (function() {
 anychart.core.annotations.MARKER_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.MARKER_TYPE] = anychart.core.descriptors.make(
+  map[anychart.opt.MARKER_TYPE] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.MARKER_TYPE,
       anychart.enums.normalizeMarkerType,
       anychart.ConsistencyState.ANNOTATIONS_SHAPES,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.ANCHOR] = anychart.core.descriptors.make(
+  map[anychart.opt.ANCHOR] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.ANCHOR,
       anychart.enums.normalizeAnchor,
       anychart.ConsistencyState.ANNOTATIONS_SHAPES,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.OFFSET_X] = anychart.core.descriptors.make(
+  map[anychart.opt.OFFSET_X] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.OFFSET_X,
       anychart.core.settings.numberNormalizer,
       anychart.ConsistencyState.ANNOTATIONS_SHAPES,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.OFFSET_Y] = anychart.core.descriptors.make(
+  map[anychart.opt.OFFSET_Y] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.OFFSET_Y,
       anychart.core.settings.numberNormalizer,
       anychart.ConsistencyState.ANNOTATIONS_SHAPES,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.SIZE] = anychart.core.descriptors.make(
+  map[anychart.opt.SIZE] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.SIZE,
       anychart.core.settings.numberNormalizer,
       anychart.ConsistencyState.ANNOTATIONS_SHAPES,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.HOVER_SIZE] = anychart.core.descriptors.make(
+  map[anychart.opt.HOVER_SIZE] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.HOVER_SIZE,
       anychart.core.settings.numberNormalizer,
       anychart.ConsistencyState.ANNOTATIONS_SHAPES,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.SELECT_SIZE] = anychart.core.descriptors.make(
+  map[anychart.opt.SELECT_SIZE] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.SELECT_SIZE,
       anychart.core.settings.numberNormalizer,

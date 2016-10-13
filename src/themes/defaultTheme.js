@@ -657,7 +657,7 @@ goog.provide('anychart.themes.defaultTheme');
       'minFontSize': 9,
       'maxFontSize': 13,
       'fontColor': fontColorReversedNormal,
-      'hAlign': 'left',
+      // 'hAlign': 'left',
       'text': 'Tooltip Text',
       'width': null,
       'height': null,
@@ -846,6 +846,7 @@ goog.provide('anychart.themes.defaultTheme');
       'tooltip': {
         'enabled': false,
         'allowLeaveScreen': false,
+        'allowLeaveChart': true,
         'title': {'enabled': false}
       },
       'zIndex': 20
@@ -1075,9 +1076,6 @@ goog.provide('anychart.themes.defaultTheme');
           'enabled': true,
           'background': {'enabled': true},
           'tooltip': {
-            'enabled': true,
-            'title': {'enabled': true},
-            'separator': {'enabled': true},
             /**
              * @this {*}
              * @return {*}
@@ -1379,7 +1377,9 @@ goog.provide('anychart.themes.defaultTheme');
             'textFormatter': returnRangeLabelsContentFormatter
           },
           'tooltip': {
-            'textFormatter': returnRangeTooltipContentFormatter
+            'textFormatter': returnRangeTooltipContentFormatter,
+            'anchor': 'leftTop',
+            'offsetX': 10
           }
         },
         'ohlc': {
@@ -1616,6 +1616,14 @@ goog.provide('anychart.themes.defaultTheme');
             'offsetX': 3,
             'anchor': 'leftCenter',
             'position': 'right'
+          },
+          'tooltip': {
+            'anchor': 'leftTop'
+          }
+        },
+        'column': {
+          'tooltip': {
+            'anchor': 'leftTop'
           }
         },
         'rangeBar': {
@@ -1857,9 +1865,7 @@ goog.provide('anychart.themes.defaultTheme');
       'tooltip': {
         'displayMode': 'single',
         'position': 'right',
-        'anchor': 'left',
-        'offsetX': 10,
-        'offsetY': 0
+        'anchor': 'left'
       },
       'xScroller': {
         'orientation': 'left'
@@ -1974,7 +1980,11 @@ goog.provide('anychart.themes.defaultTheme');
           'hoverStroke': returnSourceColor,
           'hoverFill': returnLightenSourceColor,
           'selectStroke': returnSourceColor,
-          'selectFill': defaultSelectSolidColor
+          'selectFill': defaultSelectSolidColor,
+          'tooltip': {
+            'anchor': 'leftTop',
+            'position': 'leftTop'
+          }
         }
       }
     },
@@ -3764,7 +3774,11 @@ goog.provide('anychart.themes.defaultTheme');
       },
       'dataGrid': {
         'isStandalone': false,
-        'backgroundFill': 'none'
+        'backgroundFill': 'none',
+        'tooltip': {
+          'zIndex': 100,
+          'allowLeaveChart': true
+        }
       },
       'timeline': {
         'columnStroke': '#cecece',
@@ -3854,7 +3868,9 @@ goog.provide('anychart.themes.defaultTheme');
           'anchor': 'leftTop',
           'content': {
             'hAlign': 'left'
-          }
+          },
+          'zIndex': 100,
+          'allowLeaveChart': true
         },
         'labels': {
           'enabled': true,

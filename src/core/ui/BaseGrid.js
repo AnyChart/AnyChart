@@ -1,6 +1,5 @@
 goog.provide('anychart.core.ui.BaseGrid');
 
-goog.require('acgraph.math.Coordinate');
 goog.require('acgraph.vector.Path');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.gantt.Controller');
@@ -477,6 +476,13 @@ anychart.core.ui.BaseGrid.CLIP_Z_INDEX = 50;
 
 
 /**
+ * Tooltip z-index.
+ * @type {number}
+ */
+anychart.core.ui.BaseGrid.TOOLTIP_Z_INDEX = 50;
+
+
+/**
  * Scrolls layer z-index.
  * @type {number}
  */
@@ -735,12 +741,12 @@ anychart.core.ui.BaseGrid.prototype.rowMouseMove = function(event) {
   this.interactivityHandler.highlight(event['hoveredIndex'], event['startY'], event['endY']);
 
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  var position = tooltip.isFloating() ?
-      new acgraph.math.Coordinate(event['originalEvent']['clientX'], event['originalEvent']['clientY']) :
-      new acgraph.math.Coordinate(0, 0);
+  // var position = tooltip.isFloating() ?
+  //     new acgraph.math.Coordinate(event['originalEvent']['clientX'], event['originalEvent']['clientY']) :
+  //     new acgraph.math.Coordinate(0, 0);
 
   var formatProvider = this.interactivityHandler.createFormatProvider(event['item'], event['period'], event['periodIndex']);
-  tooltip.show(formatProvider, position);
+  tooltip.showFloat(event['originalEvent']['clientX'], event['originalEvent']['clientY'], formatProvider);
 };
 
 
@@ -1679,7 +1685,8 @@ anychart.core.ui.BaseGrid.prototype.needsReapplicationHandler_ = function(event)
  */
 anychart.core.ui.BaseGrid.prototype.onTooltipSignal_ = function(event) {
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.redraw();
+  tooltip.draw();
+  // tooltip.redraw();
 };
 
 
@@ -1738,9 +1745,9 @@ anychart.core.ui.BaseGrid.prototype.drawInternal = function(positionRecalculated
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
 
-  if (!this.tooltip().container()) {
-    this.tooltip().container(/** @type {acgraph.vector.ILayer} */(this.container()));
-  }
+  // if (!this.tooltip().container()) {
+  //   this.tooltip().container(/** @type {acgraph.vector.ILayer} */(this.container()));
+  // }
 
   var verticalScrollBar, horizontalScrollBar;
 
@@ -2304,9 +2311,10 @@ anychart.core.ui.BaseGrid.prototype.titleHeight = anychart.core.ui.BaseGrid.prot
  */
 anychart.core.ui.BaseGrid.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
-    this.tooltip_ = new anychart.core.ui.Tooltip();
+    this.tooltip_ = new anychart.core.ui.Tooltip(0);
     this.registerDisposable(this.tooltip_);
     this.tooltip_.listenSignals(this.onTooltipSignal_, this);
+    this.tooltip_.boundsProvider = this;
   }
   if (goog.isDef(opt_value)) {
     this.tooltip_.setup(opt_value);

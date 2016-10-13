@@ -54,6 +54,13 @@ anychart.core.IChart.prototype.getConfigByType = function(name) {};
  */
 anychart.core.IChart.prototype.calculate = function() {};
 
+
+/**
+ * Whether IChart supports tooltip.
+ * @return {boolean}
+ */
+anychart.core.IChart.prototype.supportsTooltip = function() {};
+
 //endregion
 
 

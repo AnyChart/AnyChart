@@ -581,7 +581,6 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'defaultLegend.tooltip',
       'chart.tooltip',
-      'chart.defaultSeriesSettings.base.tooltip',
       'pieFunnelPyramidBase.tooltip',
       'defaultDataGrid.tooltip',
       'ganttBase.timeline.tooltip',

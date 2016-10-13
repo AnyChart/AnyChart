@@ -10,10 +10,10 @@ goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.ChartCredits');
-goog.require('anychart.core.ui.ChartTooltip');
 goog.require('anychart.core.ui.Label');
 goog.require('anychart.core.ui.Legend');
 goog.require('anychart.core.ui.Title');
+goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.core.utils.Animation');
 goog.require('anychart.core.utils.ChartA11y');
 goog.require('anychart.core.utils.ChartContextProvider');
@@ -207,6 +207,15 @@ anychart.core.Chart.prototype.contentBounds;
  */
 anychart.core.Chart.prototype.usesTreeData = function() {
   return false;
+};
+
+
+/**
+ * Whether chart supports tooltip.
+ * @return {boolean}
+ */
+anychart.core.Chart.prototype.supportsTooltip = function() {
+  return true;
 };
 
 
@@ -510,7 +519,7 @@ anychart.core.Chart.prototype.getStat = function(key) {
 /**
  * Creates chart tooltip.
  * @param {(Object|boolean|null)=} opt_value
- * @return {!(anychart.core.ui.ChartTooltip|anychart.core.ui.Tooltip|anychart.core.Chart)}
+ * @return {!(anychart.core.ui.Tooltip|anychart.core.Chart)}
  */
 anychart.core.Chart.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
@@ -529,10 +538,10 @@ anychart.core.Chart.prototype.tooltip = function(opt_value) {
 /**
  * Creates tooltip.
  * @protected
- * @return {!anychart.core.ui.ChartTooltip}
+ * @return {!anychart.core.ui.Tooltip}
  */
 anychart.core.Chart.prototype.createTooltip = function() {
-  var tooltip = new anychart.core.ui.ChartTooltip();
+  var tooltip = new anychart.core.ui.Tooltip(anychart.core.ui.Tooltip.Capabilities.ANY);
   this.registerDisposable(tooltip);
   tooltip.chart(this);
 
@@ -563,7 +572,7 @@ anychart.core.Chart.prototype.showTooltip_ = function(event) {
   var toShowSeriesStatus = [];
   goog.array.forEach(event['seriesStatus'], function(status) {
     if (goog.array.isEmpty(status['points'])) {
-      if (this.tooltip_.positionMode() == anychart.enums.TooltipPositionMode.FLOAT) {
+      if (this.tooltip_.getOption(anychart.opt.POSITION_MODE) == anychart.enums.TooltipPositionMode.FLOAT) {
         this.unlisten(goog.events.EventType.MOUSEMOVE, this.updateTooltip);
       }
       this.tooltip_.hide(false, event);
@@ -574,14 +583,14 @@ anychart.core.Chart.prototype.showTooltip_ = function(event) {
   }, this);
 
   if (!goog.array.isEmpty(toShowSeriesStatus)) {
-    if (this.tooltip_.positionMode() == anychart.enums.TooltipPositionMode.FLOAT) {
+    if (this.tooltip_.getOption(anychart.opt.POSITION_MODE) == anychart.enums.TooltipPositionMode.FLOAT) {
       this.listen(goog.events.EventType.MOUSEMOVE, this.updateTooltip);
     }
 
     var interactivity = this.interactivity();
     if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
       var points = [];
-      if (this.tooltip_.displayMode() == anychart.enums.TooltipDisplayMode.SINGLE) {
+      if (this.tooltip_.getOption(anychart.opt.DISPLAY_MODE) == anychart.enums.TooltipDisplayMode.SINGLE) {
         points = event['seriesStatus'];
       } else {
         var pointIndex = event['seriesStatus'][0]['points'][0];
@@ -608,7 +617,7 @@ anychart.core.Chart.prototype.showTooltip_ = function(event) {
         });
       }
 
-      this.tooltip_.show(points,
+      this.tooltip_.showForSeriesPoints(points,
           event['originalEvent']['clientX'],
           event['originalEvent']['clientY'],
           event['seriesStatus'][0]['series'],
@@ -626,17 +635,16 @@ anychart.core.Chart.prototype.showTooltip_ = function(event) {
         }
       });
 
-      if (this.tooltip_.displayMode() == anychart.enums.TooltipDisplayMode.SINGLE) {
+      if (this.tooltip_.getOption(anychart.opt.DISPLAY_MODE) == anychart.enums.TooltipDisplayMode.SINGLE) {
         // show nearest hovered point to cursor
-        this.tooltip_.show([nearestSeriesStatus],
+        this.tooltip_.showForSeriesPoints([nearestSeriesStatus],
             event['originalEvent']['clientX'],
             event['originalEvent']['clientY'],
             nearestSeriesStatus['series'],
             this.useUnionTooltipAsSingle());
-
       } else {
         // show all hovered points, in union mode position will be to nearest hovered point to cursor
-        this.tooltip_.show(toShowSeriesStatus,
+        this.tooltip_.showForSeriesPoints(toShowSeriesStatus,
             event['originalEvent']['clientX'],
             event['originalEvent']['clientY'],
             nearestSeriesStatus['series'],
@@ -1504,7 +1512,7 @@ anychart.core.Chart.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.Chart.prototype.setupByJSON = function(config) {
+anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
   goog.base(this, 'setupByJSON', config);
 
   if ('defaultLabelSettings' in config)
@@ -1534,7 +1542,10 @@ anychart.core.Chart.prototype.setupByJSON = function(config) {
   this.right(config['right']);
   this.bottom(config['bottom']);
   this.animation(config['animation']);
-  this.tooltip(config['tooltip']);
+
+  if (anychart.opt.TOOLTIP in config)
+    this.tooltip().setupByJSON(config['tooltip'], opt_default);
+
   this.a11y(config['a11y']);
 
   if (goog.isDef(config['contextMenu']))

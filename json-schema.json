@@ -161,7 +161,7 @@
         "tooltip": {
           "oneOf": [
             {"$ref": "#/definitions/disable"},
-            {"$ref": "#/definitions/anychart.core.ui.ChartTooltip"}
+            {"$ref": "#/definitions/anychart.core.ui.Tooltip"}
           ]
         },
         "interactivity": {"$ref": "#/definitions/anychart.core.utils.Interactivity"},
@@ -2332,7 +2332,7 @@
         "tooltip": {
           "oneOf": [
             {"$ref": "#/definitions/disable"},
-            {"$ref": "#/definitions/anychart.core.ui.SeriesTooltip"}
+            {"$ref": "#/definitions/anychart.core.ui.Tooltip"}
           ]
         },
         "legendItem": {"$ref": "#/definitions/anychart.core.utils.LegendItemSettings"},
@@ -4585,7 +4585,7 @@
         }
       }
     },
-    "anychart.core.ui.ChartTooltip": {
+    "anychart.core.ui.Tooltip": {
       "type": "object",
       "properties": {
         "displayMode": {"$ref": "#/definitions/anychart.enums.TooltipDisplayMode"},
@@ -4593,6 +4593,8 @@
         "anchor": {"$ref": "#/definitions/anychart.enums.Anchor"},
         "offsetX": {"type": ["number", "string"]},
         "offsetY": {"type": ["number", "string"]},
+        "valuePrefix": {"type": "string"},
+        "valuePostfix": {"type": "string"},
         "positionMode": {"$ref": "#/definitions/anychart.enums.TooltipPositionMode"},
         "allowAdjustPosition": {"type": "boolean"},
         "allowLeaveChart": {"type": "boolean"},
@@ -4601,6 +4603,13 @@
             {"type": "string"},
             {"$ref": "#/definitions/disable"},
             {"$ref": "#/definitions/anychart.core.ui.Title"}
+          ]
+        },
+        "content": {
+          "oneOf": [
+            {"type": "string"},
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.Label"}
           ]
         },
         "separator": {"$ref": "#/definitions/anychart.core.ui.Separator"},
@@ -4616,6 +4625,10 @@
           },
           "items": {"type": "boolean"}
         },
+        "width": {"type": ["number", "string"]},
+        "height": {"type": ["number", "string"]},
+        "zIndex": {"type": "number"},
+
         "minFontSize": {"type": ["number", "string"]},
         "maxFontSize": {"type": ["number", "string"]},
 
@@ -4640,83 +4653,6 @@
         "useHtml": {"type": ["boolean", "null"]},
 
         "allowLeaveScreen": {"type": "boolean"}
-      }
-    },
-    "anychart.core.ui.SeriesTooltip": {
-      "type": "object",
-      "properties": {
-        "valuePrefix": {"type": "string"},
-        "valuePostfix": {"type": "string"},
-        "position": {"$ref": "#/definitions/anychart.enums.Anchor"},
-        "anchor": {"$ref": "#/definitions/anychart.enums.Anchor"},
-        "offsetX": {"type": ["number", "string"]},
-        "offsetY": {"type": ["number", "string"]},
-        "title": {
-          "oneOf": [
-            {"type": "string"},
-            {"$ref": "#/definitions/disable"},
-            {"$ref": "#/definitions/anychart.core.ui.Title"}
-          ]
-        },
-        "separator": {"$ref": "#/definitions/anychart.core.ui.Separator"},
-        "background": {"$ref": "#/definitions/anychart.core.ui.Background"},
-        "padding": {"$ref": "#/definitions/anychart.core.utils.Space"},
-        "enabled": {"type": "boolean"},
-        "hideDelay": {"type": "number"},
-        "adjustFontSize": {
-          "type": ["boolean", "object", "array"],
-          "properties": {
-            "width": {"type": "boolean"},
-            "height": {"type": "boolean"}
-          },
-          "items": {"type": "boolean"}
-        },
-        "minFontSize": {"type": ["number", "string"]},
-        "maxFontSize": {"type": ["number", "string"]},
-
-        "fontSize": {"type": ["string", "number"]},
-        "fontFamily": {"type": ["string", "null"]},
-        "fontColor": {"type": ["string", "null"]},
-        "fontOpacity": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
-        "fontDecoration": {"enum": ["blink", "line-through", "overline", "underline", "none", "null"]},
-        "fontStyle": {"enum": ["normal", "italic", "oblique", "null"]},
-        "fontVariant": {"enum": ["normal", "small-caps", "null"]},
-        "fontWeight": {"type": ["string", "number", "null"]},
-        "letterSpacing": {"type": ["string", "number", "null"]},
-        "textDirection": {"enum": ["ltr", "rtl", "null"]},
-        "lineHeight": {"type": ["string", "number", "null"]},
-        "textIndent": {"type": ["number", "null"]},
-        "vAlign": {"enum": ["top", "middle", "bottom", "null"]},
-        "hAlign": {"enum": ["left", "start", "center", "end", "right", "null"]},
-        "textWrap": {"enum": ["noWrap", "byLetter", "null"]},
-        "textOverflow": {"type": ["string", "null"]},
-        "selectable": {"type": ["boolean", "null"]},
-        "disablePointerEvents": {"type": ["boolean", "null"]},
-        "useHtml": {"type": ["boolean", "null"]}
-      }
-    },
-    "anychart.core.ui.Tooltip": {
-      "type": "object",
-      "properties": {
-        "valuePrefix": {"type": "string"},
-        "valuePostfix": {"type": "string"},
-        "title": {
-          "oneOf": [
-            {"type": "string"},
-            {"$ref": "#/definitions/disable"},
-            {"$ref": "#/definitions/anychart.core.ui.Title"}
-          ]
-        },
-        "separator": {"$ref": "#/definitions/anychart.core.ui.Separator"},
-        "content": {"$ref": "#/definitions/anychart.core.ui.Label"},
-        "background": {"$ref": "#/definitions/anychart.core.ui.Background"},
-        "padding": {"$ref": "#/definitions/anychart.core.utils.Space"},
-        "allowLeaveScreen": {"type": "boolean"},
-        "offsetX": {"type": ["number", "string"]},
-        "offsetY": {"type": ["number", "string"]},
-        "anchor": {"$ref": "#/definitions/anychart.enums.Anchor"},
-        "hideDelay": {"type": "number"},
-        "enabled": {"type": "boolean"}
       }
     },
     "anychart.core.ui.Paginator": {

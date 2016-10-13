@@ -22,45 +22,40 @@ goog.inherits(anychart.core.ui.resourceList.ImageSettings, anychart.core.ui.reso
 anychart.core.ui.resourceList.ImageSettings.PROPERTY_DESCRIPTORS = (function() {
   var map = {};
 
-  map[anychart.opt.SIZE] = {
-    handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
-    propName: anychart.opt.SIZE,
-    normalizer: anychart.core.settings.numberOrPercentNormalizer,
-    consistency: 0,
-    signal: anychart.Signal.NEEDS_REDRAW
-  };
+  map[anychart.opt.SIZE] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.SIZE,
+      anychart.core.settings.numberOrPercentNormalizer,
+      0,
+      anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.BORDER_RADIUS] = {
-    handler: anychart.enums.PropertyHandlerType.MULTI_ARG,
-    propName: anychart.opt.BORDER_RADIUS,
-    normalizer: anychart.core.settings.arrayNormalizer,
-    consistency: 0,
-    signal: anychart.Signal.NEEDS_REDRAW
-  };
+  map[anychart.opt.BORDER_RADIUS] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      anychart.opt.BORDER_RADIUS,
+      anychart.core.settings.arrayNormalizer,
+      0,
+      anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.OPACITY] = {
-    handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
-    propName: anychart.opt.OPACITY,
-    normalizer: anychart.core.settings.ratioNormalizer,
-    consistency: 0,
-    signal: anychart.Signal.NEEDS_REDRAW
-  };
+  map[anychart.opt.OPACITY] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.OPACITY,
+      anychart.core.settings.ratioNormalizer,
+      0,
+      anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.ALIGN] = {
-    handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
-    propName: anychart.opt.ALIGN,
-    normalizer: anychart.core.settings.stringNormalizer,
-    consistency: 0,
-    signal: anychart.Signal.NEEDS_REDRAW
-  };
+  map[anychart.opt.ALIGN] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.ALIGN,
+      anychart.core.settings.stringNormalizer,
+      0,
+      anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.FITTING_MODE] = {
-    handler: anychart.enums.PropertyHandlerType.SINGLE_ARG,
-    propName: anychart.opt.FITTING_MODE,
-    normalizer: anychart.core.settings.stringNormalizer,
-    consistency: 0,
-    signal: anychart.Signal.NEEDS_REDRAW
-  };
+  map[anychart.opt.FITTING_MODE] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.FITTING_MODE,
+      anychart.core.settings.stringNormalizer,
+      0,
+      anychart.Signal.NEEDS_REDRAW);
 
   return map;
 })();

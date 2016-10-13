@@ -155,35 +155,35 @@ anychart.core.axes.MapSettings.prototype.getHighPriorityResolutionChain = functi
 anychart.core.axes.MapSettings.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.STROKE] = anychart.core.descriptors.make(
+  map[anychart.opt.STROKE] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.STROKE,
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.OVERLAP_MODE] = anychart.core.descriptors.make(
+  map[anychart.opt.OVERLAP_MODE] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.OVERLAP_MODE,
       anychart.enums.normalizeLabelsOverlapMode,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map[anychart.opt.DRAW_FIRST_LABEL] = anychart.core.descriptors.make(
+  map[anychart.opt.DRAW_FIRST_LABEL] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.DRAW_FIRST_LABEL,
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map[anychart.opt.DRAW_LAST_LABEL] = anychart.core.descriptors.make(
+  map[anychart.opt.DRAW_LAST_LABEL] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.DRAW_LAST_LABEL,
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map[anychart.opt.ENABLED] = anychart.core.descriptors.make(
+  map[anychart.opt.ENABLED] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.ENABLED,
       anychart.core.settings.booleanNormalizer,

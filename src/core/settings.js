@@ -1,7 +1,9 @@
 goog.provide('anychart.core.settings');
+
 goog.require('acgraph.vector');
 goog.require('anychart.core.reporting');
 goog.require('anychart.enums');
+goog.require('anychart.opt');
 goog.require('anychart.utils');
 goog.require('goog.array');
 goog.require('goog.math');
@@ -25,6 +27,206 @@ goog.require('goog.math');
  * }}
  */
 anychart.core.settings.PropertyDescriptor;
+
+
+//region Creating descriptors
+/**
+ * Creates descriptor.
+ * @param {anychart.enums.PropertyHandlerType} handler - Handler type.
+ * @param {string} propName - Property name.
+ * @param {Function} normalizer - Normalizer function.
+ * @param {number} consistency - Consistency to set.
+ * @param {number} signal - Signal.
+ * @param {number=} opt_check - Check function.
+ * @return {anychart.core.settings.PropertyDescriptor} - Descriptor.
+ */
+anychart.core.settings.createDescriptor = function(handler, propName, normalizer, consistency, signal, opt_check) {
+  /**
+   * @type {anychart.core.settings.PropertyDescriptor}
+   */
+  var descriptor = {
+    handler: handler,
+    propName: propName,
+    normalizer: normalizer,
+    consistency: consistency,
+    signal: signal
+  };
+  if (goog.isDef(opt_check))
+    descriptor.capabilityCheck = opt_check;
+  return descriptor;
+};
+
+
+/**
+ * Creates text properties descriptors.
+ * @param {number} invalidateBoundsState - State to invalidate bounds.
+ * @param {number} nonBoundsState - State to invalidate without bounds.
+ * @param {number} boundsChangedSignal - Signal for changed bounds.
+ * @param {number} nonBoundsSignal - Signal for non-bounds changes.
+ * @return {!Object.<string, anychart.core.settings.PropertyDescriptor>} - Descriptors map.
+ */
+anychart.core.settings.createTextPropertiesDescriptors = function(invalidateBoundsState, nonBoundsState, boundsChangedSignal, nonBoundsSignal) {
+
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  map[anychart.opt.MIN_FONT_SIZE] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.MIN_FONT_SIZE,
+      anychart.core.settings.asIsNormalizer,
+      invalidateBoundsState,
+      boundsChangedSignal);
+
+  map[anychart.opt.MAX_FONT_SIZE] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.MAX_FONT_SIZE,
+      anychart.core.settings.asIsNormalizer,
+      invalidateBoundsState,
+      boundsChangedSignal);
+
+  map[anychart.opt.ADJUST_FONT_SIZE] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      anychart.opt.ADJUST_FONT_SIZE,
+      anychart.core.settings.adjustFontSizeNormalizer,
+      invalidateBoundsState,
+      boundsChangedSignal);
+
+  map[anychart.opt.FONT_SIZE] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.FONT_SIZE,
+      anychart.core.settings.asIsNormalizer,
+      invalidateBoundsState,
+      boundsChangedSignal);
+
+  map[anychart.opt.FONT_FAMILY] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.FONT_FAMILY,
+      anychart.core.settings.stringNormalizer,
+      invalidateBoundsState,
+      boundsChangedSignal);
+
+  map[anychart.opt.FONT_COLOR] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.FONT_COLOR,
+      anychart.core.settings.stringNormalizer,
+      nonBoundsState,
+      nonBoundsSignal);
+
+  map[anychart.opt.FONT_OPACITY] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.FONT_OPACITY,
+      anychart.core.settings.numberNormalizer,
+      nonBoundsState,
+      nonBoundsSignal);
+
+  map[anychart.opt.FONT_DECORATION] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.FONT_DECORATION,
+      anychart.enums.normalizeFontDecoration,
+      invalidateBoundsState,
+      boundsChangedSignal);
+
+  map[anychart.opt.FONT_STYLE] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.FONT_STYLE,
+      anychart.enums.normalizeFontStyle,
+      invalidateBoundsState,
+      boundsChangedSignal);
+
+  map[anychart.opt.FONT_VARIANT] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.FONT_VARIANT,
+      anychart.enums.normalizeFontVariant,
+      invalidateBoundsState,
+      boundsChangedSignal);
+
+  map[anychart.opt.FONT_WEIGHT] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.FONT_WEIGHT,
+      anychart.core.settings.asIsNormalizer,
+      invalidateBoundsState,
+      boundsChangedSignal);
+
+  map[anychart.opt.LETTER_SPACING] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.LETTER_SPACING,
+      anychart.core.settings.asIsNormalizer,
+      invalidateBoundsState,
+      boundsChangedSignal);
+
+  map[anychart.opt.TEXT_DIRECTION] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.TEXT_DIRECTION,
+      anychart.enums.normalizeTextDirection,
+      invalidateBoundsState,
+      boundsChangedSignal);
+
+  map[anychart.opt.LINE_HEIGHT] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.LINE_HEIGHT,
+      anychart.core.settings.asIsNormalizer,
+      invalidateBoundsState,
+      boundsChangedSignal);
+
+  map[anychart.opt.TEXT_INDENT] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.TEXT_INDENT,
+      anychart.core.settings.numberNormalizer,
+      invalidateBoundsState,
+      boundsChangedSignal);
+
+  map[anychart.opt.V_ALIGN] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.V_ALIGN,
+      anychart.enums.normalizeVAlign,
+      invalidateBoundsState,
+      boundsChangedSignal);
+
+  map[anychart.opt.H_ALIGN] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.H_ALIGN,
+      anychart.enums.normalizeHAlign,
+      invalidateBoundsState,
+      boundsChangedSignal);
+
+  map[anychart.opt.TEXT_WRAP] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.TEXT_WRAP,
+      anychart.enums.normalizeTextWrap,
+      invalidateBoundsState,
+      boundsChangedSignal);
+
+  map[anychart.opt.TEXT_OVERFLOW] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.TEXT_OVERFLOW,
+      anychart.core.settings.stringNormalizer,
+      invalidateBoundsState,
+      boundsChangedSignal);
+
+  map[anychart.opt.SELECTABLE] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.SELECTABLE,
+      anychart.core.settings.booleanNormalizer,
+      nonBoundsState,
+      nonBoundsSignal);
+
+  map[anychart.opt.DISABLE_POINTER_EVENTS] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.DISABLE_POINTER_EVENTS,
+      anychart.core.settings.booleanNormalizer,
+      nonBoundsState,
+      nonBoundsSignal);
+
+  map[anychart.opt.USE_HTML] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.USE_HTML,
+      anychart.core.settings.booleanNormalizer,
+      nonBoundsState,
+      nonBoundsSignal);
+
+  return map;
+};
+//endregion
 
 
 //region Functions to work with settings
@@ -135,10 +337,10 @@ anychart.core.settings.simpleHandler = function(fieldName, normalizer, supportCh
     if (this.getOwnOption(fieldName) !== opt_value) {
       this.setOption(fieldName, opt_value);
       if (this.check(supportCheck)) {
-        if (consistencyState == anychart.ConsistencyState.ONLY_DISPATCHING) {
-          this.dispatchSignal(signal);
-        } else {
+        if (consistencyState) {
           this.invalidate(consistencyState, signal);
+        } else {
+          this.dispatchSignal(signal);
         }
       }
     }
@@ -371,6 +573,16 @@ anychart.core.settings.markerTypeNormalizer = function(val) {
  */
 anychart.core.settings.orientationNormalizer = function(val) {
   return goog.isNull(val) ? val : anychart.enums.normalizeOrientation(val);
+};
+
+
+/**
+ * Array normalizer for adjustFontSize.
+ * @param {Array.<boolean>} args
+ * @return {Object|boolean}
+ */
+anychart.core.settings.adjustFontSizeNormalizer = function(args) {
+  return (args.length == 1) ? args[0] : {'width': args[0], 'height': args[1]};
 };
 
 

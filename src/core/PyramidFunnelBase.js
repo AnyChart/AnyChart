@@ -1,6 +1,5 @@
 goog.provide('anychart.core.PyramidFunnelBase');
 
-goog.require('acgraph.math.Coordinate');
 goog.require('anychart.color');
 goog.require('anychart.core.Point');
 goog.require('anychart.core.SeparateChart');
@@ -1061,9 +1060,9 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.PYRAMID_FUNNEL_LABELS);
   }
 
-  if (!this.tooltip().container()) {
-    this.tooltip().container(/** @type {acgraph.vector.ILayer} */(this.container()));
-  }
+  // if (!this.tooltip().container()) {
+  //   this.tooltip().container(/** @type {acgraph.vector.ILayer} */(this.container()));
+  // }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
     if (this.dataLayer_) {
@@ -3337,7 +3336,8 @@ anychart.core.PyramidFunnelBase.prototype.drawMarker = function(pointState) {
  */
 anychart.core.PyramidFunnelBase.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
-    this.tooltip_ = new anychart.core.ui.Tooltip();
+    this.tooltip_ = new anychart.core.ui.Tooltip(anychart.core.ui.Tooltip.Capabilities.SUPPORTS_ALLOW_LEAVE_SCREEN);
+    this.tooltip_.chart(this);
     this.registerDisposable(this.tooltip_);
     this.tooltip_.listenSignals(this.onTooltipSignal_, this);
   }
@@ -3357,7 +3357,7 @@ anychart.core.PyramidFunnelBase.prototype.tooltip = function(opt_value) {
  */
 anychart.core.PyramidFunnelBase.prototype.onTooltipSignal_ = function(event) {
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.redraw();
+  tooltip.draw();
 };
 
 
@@ -3372,19 +3372,24 @@ anychart.core.PyramidFunnelBase.prototype.showTooltip = function(opt_event) {
 
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
   var formatProvider = this.createFormatProvider();
-  if (tooltip.isFloating() && opt_event) {
-    tooltip.show(
-        formatProvider,
-        new acgraph.math.Coordinate(opt_event['clientX'], opt_event['clientY']));
-
+  if (opt_event) {
+    tooltip.showFloat(opt_event['clientX'], opt_event['clientY'], formatProvider);
     // for float
     this.listen(goog.events.EventType.MOUSEMOVE, this.showTooltip);
-
-  } else {
-    tooltip.show(
-        formatProvider,
-        new acgraph.math.Coordinate(0, 0));
   }
+  // if (tooltip.isFloating() && opt_event) {
+  //   tooltip.show(
+  //       formatProvider,
+  //       new acgraph.math.Coordinate(opt_event['clientX'], opt_event['clientY']));
+  //
+  //   // for float
+  //   this.listen(goog.events.EventType.MOUSEMOVE, this.showTooltip);
+  //
+  // } else {
+  //   tooltip.show(
+  //       formatProvider,
+  //       new acgraph.math.Coordinate(0, 0));
+  // }
 };
 
 
@@ -3394,9 +3399,10 @@ anychart.core.PyramidFunnelBase.prototype.showTooltip = function(opt_event) {
  */
 anychart.core.PyramidFunnelBase.prototype.hideTooltip = function() {
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  if (tooltip.isFloating()) {
-    this.unlisten(goog.events.EventType.MOUSEMOVE, this.showTooltip);
-  }
+  this.unlisten(goog.events.EventType.MOUSEMOVE, this.showTooltip);
+  // if (tooltip.isFloating()) {
+  //   this.unlisten(goog.events.EventType.MOUSEMOVE, this.showTooltip);
+  // }
 
   tooltip.hide();
 };

@@ -1,5 +1,4 @@
 goog.provide('anychart.core.ui.Legend');
-goog.require('acgraph.math.Coordinate');
 goog.require('acgraph.vector.Text.TextOverflow');
 goog.require('anychart.core.Text');
 goog.require('anychart.core.ui.Background');
@@ -618,9 +617,10 @@ anychart.core.ui.Legend.prototype.paginatorInvalidated_ = function(event) {
  */
 anychart.core.ui.Legend.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
-    this.tooltip_ = new anychart.core.ui.Tooltip();
+    this.tooltip_ = new anychart.core.ui.Tooltip(anychart.core.ui.Tooltip.Capabilities.SUPPORTS_ALLOW_LEAVE_SCREEN);
     this.registerDisposable(this.tooltip_);
     this.tooltip_.listenSignals(this.onTooltipSignal_, this);
+    this.tooltip_.boundsProvider = this;
   }
   if (goog.isDef(opt_value)) {
     this.tooltip_.setup(opt_value);
@@ -638,7 +638,9 @@ anychart.core.ui.Legend.prototype.tooltip = function(opt_value) {
  */
 anychart.core.ui.Legend.prototype.onTooltipSignal_ = function(event) {
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.redraw();
+  if (tooltip.container()) {
+    tooltip.draw();
+  }
 };
 
 
@@ -679,30 +681,26 @@ anychart.core.ui.Legend.prototype.getTokenValue = function(name) {
  */
 anychart.core.ui.Legend.prototype.showTooltip = function(event) {
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  var index = event['itemIndex'];
-  var item = this.items_[index];
-  if (item) {
-    var formatProvider = {
-      'value': item.text(),
-      'iconType': item.iconType(),
-      'iconStroke': item.iconStroke(),
-      'iconFill': item.iconFill(),
-      'iconHatchFill': item.iconHatchFill(),
-      'iconMarkerType': item.iconMarkerType(),
-      'iconMarkerStroke': item.iconMarkerStroke(),
-      'iconMarkerFill': item.iconMarkerFill(),
-      'meta': this.legendItemsMeta_[index],
-      'getTokenValue': this.getTokenValue,
-      'getTokenType': this.getTokenType
-    };
-    if (tooltip.isFloating() && event) {
-      tooltip.show(
-          formatProvider,
-          new acgraph.math.Coordinate(event['clientX'], event['clientY']));
-    } else {
-      tooltip.show(
-          formatProvider,
-          new acgraph.math.Coordinate(0, 0));
+  if (tooltip.enabled()) {
+    var index = event['itemIndex'];
+    var item = this.items_[index];
+    if (item) {
+      var formatProvider = {
+        'value': item.text(),
+        'iconType': item.iconType(),
+        'iconStroke': item.iconStroke(),
+        'iconFill': item.iconFill(),
+        'iconHatchFill': item.iconHatchFill(),
+        'iconMarkerType': item.iconMarkerType(),
+        'iconMarkerStroke': item.iconMarkerStroke(),
+        'iconMarkerFill': item.iconMarkerFill(),
+        'meta': this.legendItemsMeta_[index],
+        'getTokenValue': this.getTokenValue,
+        'getTokenType': this.getTokenType
+      };
+      if (event) {
+        tooltip.showFloat(event['clientX'], event['clientY'], formatProvider);
+      }
     }
   }
 };
@@ -1109,7 +1107,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
   var titleOrientation = title.getOption(anychart.opt.ORIENTATION) || title.defaultOrientation();
   var titleIsHorizontal = titleOrientation == anychart.enums.Orientation.TOP ||
       titleOrientation == anychart.enums.Orientation.BOTTOM;
-  var separatorIsVertical = separator.orientation() == anychart.enums.Orientation.TOP || separator.orientation() == anychart.enums.Orientation.BOTTOM;
+  var separatorIsHorizontal = separator.isHorizontal();
 
   var contentWidth = this.calculateContentWidth_();
   var contentHeight = this.calculateContentHeight_();
@@ -1147,11 +1145,12 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
     titleBounds = null;
 
   if (separator.enabled()) {
+    var orientation = separator.getOption(anychart.opt.ORIENTATION);
     separator.parentBounds(null);
     if (titleBounds)
-      separator.width(titleBounds.width);
+      separator[anychart.opt.WIDTH](titleBounds.width);
     else
-      separator.width((separator.orientation() == anychart.enums.Orientation.LEFT || separator.orientation() == anychart.enums.Orientation.RIGHT) ? contentHeight : contentWidth);
+      separator[anychart.opt.WIDTH](separator.isHorizontal() ? contentWidth : contentHeight);
     separatorBounds = separator.getContentBounds();
   } else
     separatorBounds = null;
@@ -1171,7 +1170,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
   if (titleIsHorizontal) {
     maxHeightForPaginator -= (titleBounds ? titleBounds.height : 0);
   }
-  if (separatorIsVertical) {
+  if (separatorIsHorizontal) {
     maxHeightForPaginator -= (separatorBounds ? separatorBounds.height : 0);
   }
   if (this.itemsLayout_ == anychart.enums.Layout.VERTICAL) {
@@ -1183,13 +1182,12 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
   }
 
   if (separator.enabled()) {
-    orientation = separator.orientation();
-    if (orientation == anychart.enums.Orientation.LEFT || orientation == anychart.enums.Orientation.RIGHT) {
-      fullAreaWidth += separatorBounds.width;
-      fullAreaHeight = Math.max(fullAreaHeight, separatorBounds.height);
-    } else {
+    if (separator.isHorizontal()) {
       fullAreaWidth = Math.max(fullAreaWidth, separatorBounds.width);
       fullAreaHeight += separatorBounds.height;
+    } else {
+      fullAreaWidth += separatorBounds.width;
+      fullAreaHeight = Math.max(fullAreaHeight, separatorBounds.height);
     }
   }
 
@@ -1233,7 +1231,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
       } else {
         if (fullAreaHeight > maxHeight) {
           var accHeight = 0;
-          if (separatorBounds && separatorIsVertical) {
+          if (separatorBounds && separatorIsHorizontal) {
             accHeight += separatorBounds.height;
           }
           if (paginator.orientation() == anychart.enums.Orientation.TOP || paginator.orientation() == anychart.enums.Orientation.BOTTOM) {
@@ -1248,7 +1246,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
             title.margin().tightenWidth(contentAreaWidth)));
       }
       titleBounds = title.getContentBounds();
-      separator.width(width);
+      separator[anychart.opt.WIDTH](width);
       separatorBounds = separator.getContentBounds();
       if (titleBounds.height != titleHeight) {
         title.height(/** @type {null|number|string} */(goog.isDefAndNotNull(title.height()) ?
@@ -1261,7 +1259,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
           title.width() :
           title.margin().tightenWidth(contentAreaHeight)));
       titleBounds = title.getContentBounds();
-      separator.width(height);
+      separator[anychart.opt.WIDTH](height);
       separatorBounds = separator.getContentBounds();
       if (titleBounds.width != titleWidth) {
         title.height(/** @type {null|number|string} */(goog.isDefAndNotNull(title.height()) ?
@@ -1278,9 +1276,11 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
   }
 
   if (separator.enabled()) {
-    orientation = separator.orientation();
-    if (orientation == anychart.enums.Orientation.TOP || orientation == anychart.enums.Orientation.BOTTOM) contentAreaHeight -= separatorBounds.height;
-    else contentAreaWidth -= separatorBounds.width;
+    if (separator.isHorizontal()) {
+      contentAreaHeight -= separatorBounds.height;
+    } else {
+      contentAreaWidth -= separatorBounds.width;
+    }
   }
 
   var pageWidth = contentAreaWidth, pageHeight = contentAreaHeight;
@@ -1391,9 +1391,9 @@ anychart.core.ui.Legend.prototype.draw = function() {
     }
   }
 
-  if (!this.tooltip().container()) {
-    this.tooltip().container(/** @type {acgraph.vector.ILayer} */(this.container()));
-  }
+  // if (!this.tooltip().container()) {
+  //   this.tooltip().container(/** @type {acgraph.vector.ILayer} */(this.container()));
+  // }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
     this.rootElement.zIndex(/** @type {number} */ (this.zIndex()));

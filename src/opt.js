@@ -1626,6 +1626,60 @@ anychart.opt.USE_HTML = 'useHtml';
 /**
  * @const {string}
  */
+anychart.opt.TITLE_FORMATTER = 'titleFormatter';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.TEXT_FORMATTER = 'textFormatter';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.VALUE_PREFIX = 'valuePrefix';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.VALUE_POSTFIX = 'valuePostfix';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.HIDE_DELAY = 'hideDelay';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.ALLOW_LEAVE_SCREEN = 'allowLeaveScreen';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.ALLOW_LEAVE_CHART = 'allowLeaveChart';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.DISPLAY_MODE = 'displayMode';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.POSITION_MODE = 'positionMode';
+
+
+/**
+ * @const {string}
+ */
 anychart.opt.WIDTH = 'width';
 
 
@@ -1800,3 +1854,9 @@ anychart.opt.FITTING_MODE = 'fittingMode';
  * @const {string}
  */
 anychart.opt.IMAGE_SRC = 'imageSrc';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.SEPARATOR = 'separator';

@@ -1,7 +1,7 @@
 goog.provide('anychart.core.ui.Separator');
 goog.require('acgraph');
-goog.require('anychart.color');
 goog.require('anychart.core.VisualBase');
+goog.require('anychart.core.settings');
 goog.require('anychart.core.utils.Margin');
 goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
@@ -13,6 +13,8 @@ goog.require('anychart.utils');
  * Class for a separator element.
  * @constructor
  * @extends {anychart.core.VisualBase}
+ * @implements {anychart.core.settings.IObjectWithSettings}
+ * @implements {anychart.core.settings.IResolvable}
  */
 anychart.core.ui.Separator = function() {
   goog.base(this);
@@ -25,39 +27,11 @@ anychart.core.ui.Separator = function() {
   this.path_ = null;
 
   /**
-   * Separator fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.fill_;
-
-  /**
-   * Separator stroke.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.stroke_;
-
-  /**
    * Drawer function.
    * @type {function(acgraph.vector.Path, anychart.math.Rect)}
    * @private
    */
   this.drawer_;
-
-  /**
-   * Width settings for the separator.
-   * @type {number|string|null}
-   * @private
-   */
-  this.width_ = null;
-
-  /**
-   * Height settings for the separator.
-   * @type {number|string|null}
-   * @private
-   */
-  this.height_ = null;
 
   /**
    * Separator margin.
@@ -87,11 +61,28 @@ anychart.core.ui.Separator = function() {
   this.pixelBounds_ = null;
 
   /**
-   * Separator orientation.
-   * @type {anychart.enums.Orientation}
+   * Theme settings.
+   * @type {Object}
+   */
+  this.themeSettings = {};
+
+  /**
+   * Own settings (Settings set by user with API).
+   * @type {Object}
+   */
+  this.ownSettings = {};
+
+  /**
+   * Parent separator.
+   * @type {anychart.core.ui.Separator}
    * @private
    */
-  this.orientation_;
+  this.parent_ = null;
+
+  /**
+   * @type {boolean}
+   */
+  this.forceInvalidate = false;
 
   var drawer = goog.bind(function(path, bounds) {
     bounds = bounds.clone().round();
@@ -123,7 +114,7 @@ goog.inherits(anychart.core.ui.Separator, anychart.core.VisualBase);
  */
 anychart.core.ui.Separator.prototype.SUPPORTED_SIGNALS =
     anychart.core.VisualBase.prototype.SUPPORTED_SIGNALS |
-        anychart.Signal.BOUNDS_CHANGED;
+    anychart.Signal.ENABLED_STATE_CHANGED;
 
 
 /**
@@ -132,50 +123,189 @@ anychart.core.ui.Separator.prototype.SUPPORTED_SIGNALS =
  */
 anychart.core.ui.Separator.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
-        anychart.ConsistencyState.APPEARANCE |
-        anychart.ConsistencyState.BOUNDS;
+    anychart.ConsistencyState.APPEARANCE |
+    anychart.ConsistencyState.BOUNDS;
+
+
+//region -- Optimized props descriptors
+/**
+ * Simple Separator descriptors.
+ * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
+ */
+anychart.core.ui.Separator.prototype.SIMPLE_SEPARATOR_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = {};
+
+  map[anychart.opt.FILL] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      anychart.opt.FILL,
+      anychart.core.settings.fillOrFunctionNormalizer,
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW);
+
+  map[anychart.opt.STROKE] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      anychart.opt.STROKE,
+      anychart.core.settings.strokeOrFunctionNormalizer,
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW);
+
+  map[anychart.opt.WIDTH] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.WIDTH,
+      anychart.core.settings.numberOrPercentNormalizer,
+      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+
+  map[anychart.opt.HEIGHT] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.HEIGHT,
+      anychart.core.settings.numberOrPercentNormalizer,
+      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+
+  map[anychart.opt.ORIENTATION] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.ORIENTATION,
+      anychart.enums.normalizeOrientation,
+      anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.ui.Separator, anychart.core.ui.Separator.prototype.SIMPLE_SEPARATOR_DESCRIPTORS);
+//endregion
+
+
+//region -- IObjectWithSettings implementation
+/** @inheritDoc */
+anychart.core.ui.Separator.prototype.getOwnOption = function(name) {
+  return this.ownSettings[name];
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.Separator.prototype.hasOwnOption = function(name) {
+  return goog.isDefAndNotNull(this.ownSettings[name]);
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.Separator.prototype.getThemeOption = function(name) {
+  return this.themeSettings[name];
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.Separator.prototype.getOption = anychart.core.settings.getOption;
+
+
+/** @inheritDoc */
+anychart.core.ui.Separator.prototype.setOption = function(name, value) {
+  this.ownSettings[name] = value;
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.Separator.prototype.check = function(flags) {
+  return true;
+};
+//endregion
+
+
+//region -- IResolvable implementation
+/** @inheritDoc */
+anychart.core.ui.Separator.prototype.getResolutionChain = anychart.core.settings.getResolutionChain;
+
+
+/** @inheritDoc */
+anychart.core.ui.Separator.prototype.getLowPriorityResolutionChain = function() {
+  var sett = [this.themeSettings];
+  if (this.parent_) {
+    sett = goog.array.concat(sett, this.parent_.getLowPriorityResolutionChain());
+  }
+  return sett;
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.Separator.prototype.getHighPriorityResolutionChain = function() {
+  var sett = [this.ownSettings];
+  if (this.parent_) {
+    sett = goog.array.concat(sett, this.parent_.getHighPriorityResolutionChain());
+  }
+  return sett;
+};
+//endregion
+
+
+//region -- Parental relations
+/**
+ * Gets/sets new parent.
+ * @param {anychart.core.ui.Separator=} opt_value - Value to set.
+ * @return {anychart.core.ui.Separator} - Current value or itself for method chaining.
+ */
+anychart.core.ui.Separator.prototype.parent = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.parent_ != opt_value) {
+      if (this.parent_)
+        this.parent_.unlistenSignals(this.parentInvalidated_, this);
+      this.parent_ = opt_value;
+      if (this.parent_) {
+        this.parent_.listenSignals(this.parentInvalidated_, this);
+        this.margin().parent(this.parent_.margin());
+      } else {
+        this.margin().parent(null);
+      }
+    }
+    return this;
+  }
+  return this.parent_;
+};
+
+
+/**
+ * Parent invalidation handler.
+ * @param {anychart.SignalEvent} e - Signal event.
+ * @private
+ */
+anychart.core.ui.Separator.prototype.parentInvalidated_ = function(e) {
+  var state = 0;
+  var signal = 0;
+
+  if (e.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    state |= anychart.ConsistencyState.APPEARANCE;
+    signal |= anychart.Signal.NEEDS_REDRAW;
+  }
+
+  if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
+    state |= anychart.ConsistencyState.BOUNDS;
+    signal |= anychart.Signal.BOUNDS_CHANGED;
+  }
+
+  if (e.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED)) {
+    state |= anychart.ConsistencyState.ENABLED;
+    signal |= anychart.Signal.NEEDS_REDRAW;
+  }
+
+  this.invalidate(state, signal);
+};
+//endregion
+
+
+/**
+ * Whether needs force invalidation.
+ * @return {boolean}
+ */
+anychart.core.ui.Separator.prototype.needsForceInvalidation = function() {
+  return this.forceInvalidate;
+};
 
 
 /** @inheritDoc */
 anychart.core.ui.Separator.prototype.invalidateParentBounds = function() {
   this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-};
-
-
-/**
- * Getter/setter for width.
- * @param {(number|string|null)=} opt_value .
- * @return {!anychart.core.ui.Separator|number|string|null} .
- */
-anychart.core.ui.Separator.prototype.width = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.width_ != opt_value) {
-      this.width_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.width_;
-};
-
-
-/**
- * Getter/setter for height.
- * @param {(number|string|null)=} opt_value .
- * @return {!anychart.core.ui.Separator|number|string|null} .
- */
-anychart.core.ui.Separator.prototype.height = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.height_ != opt_value) {
-      this.height_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.height_;
 };
 
 
@@ -198,73 +328,6 @@ anychart.core.ui.Separator.prototype.margin = function(opt_spaceOrTopOrTopAndBot
     return this;
   }
   return this.margin_;
-};
-
-
-/**
- * Orientation of the separator.
- * @param {(anychart.enums.Orientation|string)=} opt_value .
- * @return {!anychart.core.ui.Separator|anychart.enums.Orientation} .
- */
-anychart.core.ui.Separator.prototype.orientation = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.enums.normalizeOrientation(opt_value);
-    if (this.orientation_ != opt_value) {
-      this.orientation_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.APPEARANCE,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.orientation_;
-};
-
-
-/**
- * Separator fill.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {!(acgraph.vector.Fill|anychart.core.ui.Separator)} .
- */
-anychart.core.ui.Separator.prototype.fill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(val, this.fill_)) {
-      this.fill_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return this.fill_ || 'none';
-  }
-};
-
-
-/**
- * Separator stroke.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
- * @param {number=} opt_thickness .
- * @param {string=} opt_dashpattern .
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
- * @return {(!anychart.core.ui.Separator|acgraph.vector.Stroke)} .
- */
-anychart.core.ui.Separator.prototype.stroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (!anychart.color.equals(val, this.stroke_)) {
-      this.stroke_ = val;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return this.stroke_ || 'none';
-  }
 };
 
 
@@ -311,8 +374,8 @@ anychart.core.ui.Separator.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.path_.fill(/** @type {acgraph.vector.Fill} */ (this.fill()));
-    this.path_.stroke(/** @type {acgraph.vector.Stroke} */ (this.stroke()));
+    this.path_.fill(/** @type {acgraph.vector.Fill} */ (this.getOption(anychart.opt.FILL)));
+    this.path_.stroke(/** @type {acgraph.vector.Stroke} */ (this.getOption(anychart.opt.STROKE)));
     this.path_.clear();
 
     var bounds = new anychart.math.Rect(this.actualLeft_, this.actualTop_, this.separatorWidth_, this.separatorHeight_);
@@ -369,7 +432,7 @@ anychart.core.ui.Separator.prototype.getRemainingBounds = function() {
 
   if (!this.enabled()) return parentBounds;
 
-  switch (this.orientation_) {
+  switch (this.getOption(anychart.opt.ORIENTATION)) {
     case anychart.enums.Orientation.TOP:
       parentBounds.top += this.pixelBounds_.height;
       parentBounds.height -= this.pixelBounds_.height;
@@ -415,8 +478,10 @@ anychart.core.ui.Separator.prototype.calculateSeparatorBounds_ = function() {
     parentWidth = parentHeight = undefined;
   }
 
-  var width = anychart.utils.isNone(this.width_) ? '100%' : this.width_;
-  var height = anychart.utils.isNone(this.height_) ? '100%' : this.height_;
+  var optionWidth = this.getOption(anychart.opt.WIDTH);
+  var optionHeight = this.getOption(anychart.opt.HEIGHT);
+  var width = anychart.utils.isNone(optionWidth) || !goog.isDef(optionWidth) ? '100%' : optionWidth;
+  var height = anychart.utils.isNone(optionHeight) || !goog.isDef(optionHeight) ? '100%' : optionHeight;
 
   var separatorWidth = anychart.utils.normalizeSize(/** @type {number} */ (width), parentWidth);
   if (parentBounds && parentWidth < margin.widenWidth(separatorWidth)) {
@@ -434,8 +499,9 @@ anychart.core.ui.Separator.prototype.calculateSeparatorBounds_ = function() {
   var leftMargin = anychart.utils.normalizeSize(margin.getSafeOption(anychart.opt.LEFT), parentWidth);
   var topMargin = anychart.utils.normalizeSize(margin.getSafeOption(anychart.opt.TOP), parentHeight);
 
+  var orientation = this.getOption(anychart.opt.ORIENTATION) || anychart.enums.Orientation.TOP;
   if (parentBounds) {
-    switch (this.orientation_) {
+    switch (orientation) {
       case anychart.enums.Orientation.TOP:
         this.actualLeft_ = parentBounds.getLeft() + leftMargin;
         this.actualTop_ = parentBounds.getTop() + topMargin;
@@ -517,47 +583,78 @@ anychart.core.ui.Separator.prototype.marginInvalidated_ = function(event) {
  * @return {boolean}
  */
 anychart.core.ui.Separator.prototype.isHorizontal = function() {
-  return (this.orientation_ == anychart.enums.Orientation.TOP || this.orientation_ == anychart.enums.Orientation.BOTTOM);
+  var orientation = this.getOption(anychart.opt.ORIENTATION);
+  return (goog.isDef(orientation)) ?
+      (orientation == anychart.enums.Orientation.TOP || orientation == anychart.enums.Orientation.BOTTOM) :
+      true;
+};
+
+
+/**
+ * @inheritDoc
+ */
+anychart.core.ui.Separator.prototype.invalidate = function(state, opt_signal) {
+  var effective = anychart.core.ui.Separator.base(this, 'invalidate', state, opt_signal);
+  if (!effective && this.needsForceInvalidation())
+    this.dispatchSignal(opt_signal || 0);
+  return effective;
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.Separator.prototype.enabled = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.ownSettings[anychart.opt.ENABLED] != opt_value) {
+      this.ownSettings[anychart.opt.ENABLED] = opt_value;
+      this.invalidate(anychart.ConsistencyState.ENABLED,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED | anychart.Signal.ENABLED_STATE_CHANGED);
+      if (this.ownSettings[anychart.opt.ENABLED]) {
+        this.doubleSuspension = false;
+        this.resumeSignalsDispatching(true);
+      } else {
+        if (isNaN(this.suspendedDispatching)) {
+          this.suspendSignalsDispatching();
+        } else {
+          this.doubleSuspension = true;
+        }
+      }
+    }
+    return this;
+  } else {
+    return /** @type {boolean} */(this.getOption(anychart.opt.ENABLED));
+  }
 };
 
 
 /** @inheritDoc */
 anychart.core.ui.Separator.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  if (goog.isDefAndNotNull(this.width()))
-    json['width'] = this.width();
-  if (goog.isDefAndNotNull(this.height()))
-    json['height'] = this.height();
-  if (this.orientation())
-    json['orientation'] = this.orientation();
-  json['margin'] = this.margin().serialize();
-  if (this.fill_)
-    json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
-  if (this.stroke_)
-    json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
+  anychart.core.settings.serialize(this, this.SIMPLE_SEPARATOR_DESCRIPTORS, json, 'Separator');
+
+  var marginConfig = this.margin().serialize();
+  if (!goog.object.isEmpty(marginConfig))
+    json[anychart.opt.MARGIN] = marginConfig;
+
   return json;
 };
 
 
 /** @inheritDoc */
 anychart.core.ui.Separator.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
-  this.width(config['width']);
-  this.height(config['height']);
+  anychart.core.settings.deserialize(this, this.SIMPLE_SEPARATOR_DESCRIPTORS, config);
   this.margin(config['margin']);
-  this.orientation(config['orientation']);
-  this.fill(config['fill']);
-  this.stroke(config['stroke']);
+  this.zIndex(config['zIndex']);
+  this.enabled(config[anychart.opt.ENABLED]);
 };
 
 
 //anychart.core.ui.Separator.prototype['drawer'] = anychart.core.ui.Separator.prototype.drawer;
 //anychart.core.ui.Separator.prototype['draw'] = anychart.core.ui.Separator.prototype.draw;
 //exports
-anychart.core.ui.Separator.prototype['width'] = anychart.core.ui.Separator.prototype.width;
-anychart.core.ui.Separator.prototype['height'] = anychart.core.ui.Separator.prototype.height;
+// anychart.core.ui.Separator.prototype['width'] = anychart.core.ui.Separator.prototype.width;
+// anychart.core.ui.Separator.prototype['height'] = anychart.core.ui.Separator.prototype.height;
 anychart.core.ui.Separator.prototype['margin'] = anychart.core.ui.Separator.prototype.margin;
-anychart.core.ui.Separator.prototype['orientation'] = anychart.core.ui.Separator.prototype.orientation;
-anychart.core.ui.Separator.prototype['fill'] = anychart.core.ui.Separator.prototype.fill;
-anychart.core.ui.Separator.prototype['stroke'] = anychart.core.ui.Separator.prototype.stroke;
+// anychart.core.ui.Separator.prototype['orientation'] = anychart.core.ui.Separator.prototype.orientation;
+// anychart.core.ui.Separator.prototype['fill'] = anychart.core.ui.Separator.prototype.fill;
+// anychart.core.ui.Separator.prototype['stroke'] = anychart.core.ui.Separator.prototype.stroke;
 anychart.core.ui.Separator.prototype['getRemainingBounds'] = anychart.core.ui.Separator.prototype.getRemainingBounds;

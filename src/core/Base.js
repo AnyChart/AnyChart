@@ -16,9 +16,8 @@ anychart.ConsistencyState = {
    * So magical consistency state. Used to invalidate entities
    * that don't have own invalidation, can't be drawn but must
    * be able to dispatch signals.
-   * Don't mix it with any other invalidation states!!!
    */
-  ONLY_DISPATCHING: -1,
+  ONLY_DISPATCHING: 0,
   //---------------------------------- GENERAL STATES ---------------------------------
   /**
    * enabled() has changed.
@@ -238,6 +237,8 @@ anychart.ConsistencyState = {
   TOOLTIP_CONTENT: 1 << 9,
   TOOLTIP_BACKGROUND: 1 << 10,
   TOOLTIP_VISIBILITY: 1 << 11,
+  TOOLTIP_MODE: 1 << 12,
+  TOOLTIP_ALLOWANCE: 1 << 13, //allowLeaveScreen or allowLeaveChart.
   //------------------------------ CIRCULAR/LINEAR GAUGE (CHART) ------------------------------
   GAUGE_POINTERS: 1 << 12,
   GAUGE_KNOB: 1 << 13,

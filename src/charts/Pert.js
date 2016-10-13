@@ -1,6 +1,5 @@
 goog.provide('anychart.charts.Pert');
 
-goog.require('acgraph.math.Coordinate');
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.pert.CriticalPath');
 goog.require('anychart.core.pert.Milestones');
@@ -463,7 +462,8 @@ anychart.charts.Pert.prototype.createFormatProvider = function(opt_force, opt_wo
  */
 anychart.charts.Pert.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
-    this.tooltip_ = new anychart.core.ui.Tooltip();
+    this.tooltip_ = new anychart.core.ui.Tooltip(anychart.core.ui.Tooltip.Capabilities.SUPPORTS_ALLOW_LEAVE_SCREEN);
+    this.tooltip_.chart(this);
     this.registerDisposable(this.tooltip_);
     this.tooltip_.listenSignals(this.onTooltipSignal_, this);
   }
@@ -483,7 +483,7 @@ anychart.charts.Pert.prototype.tooltip = function(opt_value) {
  */
 anychart.charts.Pert.prototype.onTooltipSignal_ = function(event) {
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  tooltip.redraw();
+  tooltip.draw();
 };
 
 
@@ -615,9 +615,6 @@ anychart.charts.Pert.prototype.handleMouseOverAndMove = function(event) {
   var work, activity, milestone;
   var tooltip = /** @type {anychart.core.ui.Tooltip} */ (this.tooltip());
   var critConfig;
-  var position;
-  var pos = new acgraph.math.Coordinate(event['clientX'], event['clientY']);
-  var zeroPos = new acgraph.math.Coordinate(0, 0);
   var formatProvider;
   var tag = domTarget.tag;
   var state = anychart.PointState.NORMAL;
@@ -639,8 +636,7 @@ anychart.charts.Pert.prototype.handleMouseOverAndMove = function(event) {
       critConfig = milestone.isCritical ? this.criticalPath().milestones().getCurrentTooltipConfig() : void 0;
       tooltip.suspendSignalsDispatching();
       this.applyTooltipSettings_(this.milestones().getCurrentTooltipConfig(), critConfig);
-      position = tooltip.isFloating() ? pos : zeroPos;
-      tooltip.show(formatProvider, position);
+      tooltip.showFloat(event['clientX'], event['clientY'], formatProvider);
       tooltip.resumeSignalsDispatching(true);
 
       label = milestone.relatedLabel;
@@ -774,8 +770,7 @@ anychart.charts.Pert.prototype.handleMouseOverAndMove = function(event) {
       critConfig = work.isCritical ? this.criticalPath().tasks().getCurrentTooltipConfig() : void 0;
       tooltip.suspendSignalsDispatching();
       this.applyTooltipSettings_(this.tasks().getCurrentTooltipConfig(), critConfig);
-      position = tooltip.isFloating() ? pos : zeroPos;
-      tooltip.show(formatProvider, position);
+      tooltip.showFloat(event['clientX'], event['clientY'], formatProvider);
       tooltip.resumeSignalsDispatching(true);
     }
   }
@@ -2566,9 +2561,9 @@ anychart.charts.Pert.prototype.drawContent = function(bounds) {
     this.criticalPath().tasks().drawLabels();
   }
 
-  if (!this.tooltip().container()) {
-    this.tooltip().container(/** @type {acgraph.vector.ILayer} */(this.container()));
-  }
+  // if (!this.tooltip().container()) {
+  //   this.tooltip().container(/** @type {acgraph.vector.ILayer} */(this.container()));
+  // }
 
   // if (!this.milestones().tooltip().container()) {
   //   this.milestones().tooltip().container(/** @type {acgraph.vector.ILayer} */(this.container()));
