@@ -734,6 +734,7 @@ goog.provide('anychart.themes.v6');
 
     // global legend settings
     'defaultLegend': {
+      'textOverflow': '...',
       'paginator': {
         'buttonsSettings': {
           'normal': {

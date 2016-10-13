@@ -1660,6 +1660,8 @@ anychart.core.ui.Legend.prototype.drawLegendContent_ = function(pageNumber, cont
         case anychart.enums.Layout.HORIZONTAL:
           for (i = 0; i < items.length; i++) {
             item = items[i];
+            // fixes ellipsis applying when change content page throughout paginator
+            item.invalidate(anychart.ConsistencyState.BOUNDS);
             item
               .suspendSignalsDispatching()
               .parentBounds(contentBounds)
@@ -1674,6 +1676,8 @@ anychart.core.ui.Legend.prototype.drawLegendContent_ = function(pageNumber, cont
         case anychart.enums.Layout.VERTICAL:
           for (i = 0; i < items.length; i++) {
             item = items[i];
+            // fixes ellipsis applying when change content page throughout paginator
+            item.invalidate(anychart.ConsistencyState.BOUNDS);
             item
               .suspendSignalsDispatching()
               .parentBounds(contentBounds)

@@ -797,6 +797,7 @@ goog.provide('anychart.themes.defaultTheme');
       'enabled': false,
       'vAlign': 'bottom',
       'fontSize': 12,
+      'textOverflow': '...',
       'itemsLayout': 'horizontal',
       'itemsSpacing': 15,
       'items': null,

@@ -429,7 +429,11 @@ anychart.core.ui.Title.prototype.background = function(opt_value) {
  * @param {number|string|null} width
  */
 anychart.core.ui.Title.prototype.setAutoWidth = function(width) {
-  this.autoWidth_ = width;
+  // in the context of DVF-2184
+  // Anton Kagakin:
+  // cause in case of negative width and without own width option
+  // background will draw in the negative coords
+  this.autoWidth_ = width < 0 ? null : width;
 };
 
 

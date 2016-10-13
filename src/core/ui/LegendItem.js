@@ -921,7 +921,17 @@ anychart.core.ui.LegendItem.prototype.calculateBounds_ = function() {
     this.textElement_.width(maxTextWidth);
   } else if (this.textElement_.textOverflow() == acgraph.vector.Text.TextOverflow.ELLIPSIS) {
     // DVF-2119
-    this.textElement_.width(Math.min(parentWidth - (this.iconEnabled_ ? this.iconSize_ + this.iconTextSpacing_ : 0), textBounds.width));
+    var overflowWidth = Math.min(parentWidth - (this.iconEnabled_ ? this.iconSize_ + this.iconTextSpacing_ : 0), textBounds.width);
+
+    // in the context of DVF-2184
+    // Anton Kagakin:
+    // we do need this because of width=0 or width=null set to textElement works the same, so for the ellipsis
+    // width should be more than a zero
+    overflowWidth = Math.max(overflowWidth, 0.00001);
+    this.textElement_.width(overflowWidth);
+    // in the context of DVF-2184
+    // so as we want ellipsis we would also want an non-null height for proper text calculation
+    this.textElement_.height(legendItemMaxHeight ? legendItemMaxHeight : textBounds.height);
   }
   if (legendItemMaxHeight)
     this.textElement_.height(legendItemMaxHeight);
