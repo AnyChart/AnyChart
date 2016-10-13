@@ -665,6 +665,7 @@
         <xsd:attribute name="select_labels" type="simple.BoolOrNull" default="false"/>
 
         <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="overlap_mode" type="simple.StringOrBoolOrNull"/>
         <!-- BaseWithMarkers series -->
         <xsd:attribute name="markers" type="simple.MarkerType"/>
         <xsd:attribute name="hover_markers" type="simple.MarkerType"/>
