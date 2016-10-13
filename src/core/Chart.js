@@ -1494,7 +1494,8 @@ anychart.core.Chart.prototype.serialize = function() {
   json['a11y'] = this.a11y().serialize();
   var labels = [];
   for (var i = 0; i < this.chartLabels_.length; i++) {
-    labels.push(this.chartLabels_[i].serialize());
+    if (this.chartLabels_[i])
+      labels.push(this.chartLabels_[i].serialize());
   }
   if (labels.length > 0)
     json['chartLabels'] = labels;
