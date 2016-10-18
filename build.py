@@ -13,6 +13,7 @@ import argparse
 import shlex
 import gzip
 import shutil
+import multiprocessing
 
 #=======================================================================================================================
 #           Project paths
@@ -194,16 +195,16 @@ def __get_not_optimized_compiler_args():
     return compiler_args
 
 
-def __get_developers_edition_compiler_args():
-    flag = 'true' if __is_develop() else 'false'
+def __get_developers_edition_compiler_args(is_develop):
+    flag = 'true' if is_develop else 'false'
     return [
         '--define "goog.DEBUG=%s"' % flag,
         '--define "anychart.DEVELOP=%s"' % flag,
     ]
 
 
-def __get_performance_monitoring_compiler_args():
-    flag = 'true' if __is_performance_monitoring() else 'false'
+def __get_performance_monitoring_compiler_args(is_performance_monitoring):
+    flag = 'true' if is_performance_monitoring else 'false'
     return [
         '--define "anychart.PERFORMANCE_MONITORING=%s"' % flag,
     ]
@@ -263,8 +264,7 @@ def __get_optimized_compiler_args():
     return compiler_args
 
 
-def __get_default_compiler_args():
-    global arguments
+def __get_default_compiler_args(theme, modules):
     result = [
         'java -jar',
         COMPILER_PATH,
@@ -284,11 +284,8 @@ def __get_default_compiler_args():
     ]
 
     # Build AnyChart UI without theme.
-    modules = arguments['modules']
     if modules and len(modules) == 1 and 'anychart_ui' in modules:
         theme = 'none'
-    else:
-        theme = arguments['theme'] if ('theme' in arguments) else 'defaultTheme'
     if not (theme == 'none'):
         if not os.path.exists(os.path.join(SRC_PATH, 'themes', theme + '.js')):
             theme = 'defaultTheme'
@@ -302,86 +299,69 @@ def __get_default_compiler_args():
 #=======================================================================================================================
 @sync_required
 def __compile_project_each():
+    t = time.time()
     global arguments
     arguments['sources'] = False
     modules = __get_modules_list()
+    args = []
     for module in modules:
-        arguments['modules'] = [str(module)]
-        __compile_project()
+        arguments['modules'] = [module]
+        args.append(dict(arguments))
+    pool = multiprocessing.Pool(arguments['process'])
+    pool.map_async(__compile_project_from_map, args).get(99999)
+    pool.close()
+    pool.join()
+    print "[PY] compile time: {:.3f} sec".format(time.time() - t)
 
 
 @sync_required
 def __compile_project():
     t = time.time()
     global arguments
-
-    modules = arguments['modules'] if arguments['modules'] else ['anychart_bundle']
-    if not __is_allowed_modules(modules):
-        raise Exception("Wrong modules: %s" % ', '.join(modules))
+    if arguments['modules'] is None:
+        arguments['modules'] = ['anychart_bundle']
+    if not __is_allowed_modules(arguments['modules']):
+        raise Exception("Wrong modules: %s" % ', '.join(arguments['modules']))
 
     __create_dir_if_not_exists(OUT_PATH)
-
-    if arguments['sources']:
-        __build_project_sources(modules)
-    __build_project(modules)
-
+    __compile_project_from_map(arguments)
     print "[PY] compile time: {:.3f} sec".format(time.time() - t)
 
 
-def __build_project_sources(modules):
-    dev_postfix = '.dev' if __is_develop() else ''
-    perf_postfix = '.perf' if __is_performance_monitoring() else ''
-    file_name = "%s%s%s%s" % ('_'.join(modules), dev_postfix, perf_postfix, '.js')
-    file_name = __apply_specific_file_name_rule(file_name, modules)
-    output_file = os.path.join(OUT_PATH, file_name)
-    copyright = __get_copyrigth(modules)
-    wrapper = __get_wrapper(file_name)
-    commands = __get_default_compiler_args() + \
-               __get_not_optimized_compiler_args() + \
-               __get_developers_edition_compiler_args() + \
-               __get_performance_monitoring_compiler_args() + \
-               __get_name_spaces(modules) + \
-               __get_roots() + \
-               __get_output_file_arg(output_file) + \
-               ['--output_wrapper "' + copyright + wrapper + '"']
-
-    # print build log
-    __log_compilation(False, modules, output_file)
-
-    if 'anychart_ui' in modules or 'anychart_bundle' in modules:
-        __compile_css()
-
-    # build binary file
-    __call_console_commands(commands)
-
-    #include proj4js for maps and bundle in binary file
-    if __should_include_proj4js(modules):
-        __include_proj4js(output_file)
-
-    # gzip binary file
-    if __should_gen_gzip():
-        __gzip_file(output_file)
+def __compile_project_from_map(options):
+    __build_project(options['develop'],
+                    options['modules'],
+                    options['sources'],
+                    options['theme'],
+                    options['debug_files'],
+                    options['gzip'],
+                    options['performance_monitoring'])
 
 
-def __build_project(modules):
-    dev_postfix = '.dev' if __is_develop() else ''
-    perf_postfix = '.perf' if __is_performance_monitoring() else ''
+def __build_project(develop, modules, sources, theme, debug, gzip, perf_monitoring):
+    args = locals()
+    dev_postfix = '.dev' if develop else ''
+    perf_postfix = '.perf' if perf_monitoring else ''
     file_name = "%s%s%s%s" % ('_'.join(modules), dev_postfix, perf_postfix, '.min.js')
+    __optimized_compiler_args = __get_optimized_compiler_args()
+    if sources:
+        file_name = "%s%s%s%s" % ('_'.join(modules), dev_postfix, perf_postfix, '.js')
+        __optimized_compiler_args = __get_not_optimized_compiler_args()
     file_name = __apply_specific_file_name_rule(file_name, modules)
     output_file = os.path.join(OUT_PATH, file_name)
     copyright = __get_copyrigth(modules)
     wrapper = __get_wrapper(file_name)
-    commands = __get_default_compiler_args() + \
-               __get_optimized_compiler_args() + \
-               __get_developers_edition_compiler_args() + \
-               __get_performance_monitoring_compiler_args() + \
-               __get_name_spaces(modules) + \
-               __get_roots() + \
-               __get_output_file_arg(output_file) + \
-               ['--output_wrapper "' + copyright + wrapper + '"']
+    commands = sum([__get_default_compiler_args(theme, modules),
+                   __optimized_compiler_args,
+                   __get_developers_edition_compiler_args(develop),
+                   __get_performance_monitoring_compiler_args(perf_monitoring),
+                   __get_name_spaces(modules),
+                   __get_roots(),
+                   __get_output_file_arg(output_file),
+                   ['--output_wrapper "' + copyright + wrapper + '"']], [])
 
     #debug info
-    if __should_gen_debug_files():
+    if debug and not sources:
         path = PROJECT_PATH.replace('\\', '/')
         commands += ['--property_renaming_report %s' % output_file + '_prop_out.txt',
                      '--variable_renaming_report %s' % output_file + '_var_out.txt',
@@ -389,8 +369,7 @@ def __build_project(modules):
                      '--source_map_location_mapping \"%s|http://localhost:63341/ACDVF\"' % path]
 
     # print build log
-    __log_compilation(True, modules, output_file)
-
+    __log_compilation(output_file, args)
     if 'anychart_ui' in modules or 'anychart_bundle' in modules:
         __compile_css()
 
@@ -402,7 +381,7 @@ def __build_project(modules):
         __include_proj4js(output_file)
 
     # gzip binary file
-    if __should_gen_gzip():
+    if gzip:
         __gzip_file(output_file)
 
 
@@ -420,8 +399,7 @@ def __include_proj4js(output_file):
     f.close()
 
 
-def __log_compilation(is_binary, modules, output_file):
-    global arguments
+def __log_compilation(output_file, args):
     print "Compile %s file for modules: %s\n" \
           "Output: %s\n" \
           "Version: %s\n" \
@@ -431,16 +409,16 @@ def __log_compilation(is_binary, modules, output_file):
           "Theme: %s\n" \
           "Performance monitoring: %s\n" \
           "Proj4js included: %s" % (
-              "binary" if is_binary else "source",
-              ', '.join(modules),
+              "source" if args['sources'] else "binary",
+              ', '.join(args['modules']),
               output_file,
               __get_version(True),
-              str(arguments['develop']),
-              str(arguments['debug_files']),
-              str(arguments['gzip']),
-              str(arguments['theme']),
-              str(arguments['performance_monitoring']),
-              str(__should_include_proj4js(modules))
+              str(args['develop']),
+              str(args['debug']),
+              str(args['gzip']),
+              str(args['theme']),
+              str(args['perf_monitoring']),
+              str(__should_include_proj4js(args['modules']))
           )
 
 
@@ -658,7 +636,7 @@ def __js_beautifier(path):
         with open(path, 'w') as f:
             f.write(res)
     except ImportError:
-        raise ImportError('You need install jsbeautifier. Run `./build contrib`')
+        raise ImportError('You need install jsbeautifier. Run `./build.py contrib`')
 
 
 @sync_required
@@ -720,58 +698,24 @@ def __build_release():
     prod_options = {'develop': True, 'modules': None, 'sources': False, 'theme': 'defaultTheme', 'debug_files': False, 'gzip': True, 'performance_monitoring': False}
     export_server_project_path = arguments['export_server_path']
 
-    # bundle
-    print "Compile AnyChart Bundle"
-    arguments = dev_options
-    __build_project(['anychart_bundle'])
+    mods = ['anychart_bundle', 'anychart',
+            'anymap', 'anystock', 'anygantt', 'data_adapter']
 
-    arguments = prod_options
-    __build_project(['anychart_bundle'])
-
-    #charts
-    print "Compile AnyChart"
-    arguments = prod_options
-    __build_project(['anychart'])
-
-    arguments = dev_options
-    __build_project(['anychart'])
-
-    # map
-    print "Compile AnyMap"
-    arguments = prod_options
-    __build_project(['anymap'])
-
-    arguments = dev_options
-    __build_project(['anymap'])
-
-    # stock
-    print "Compile AnyStock"
-    arguments = prod_options
-    __build_project(['anystock'])
-
-    arguments = dev_options
-    __build_project(['anystock'])
-
-    # gantt
-    print "Compile AnyGantt"
-    arguments = prod_options
-    __build_project(['anygantt'])
-
-    arguments = dev_options
-    __build_project(['anygantt'])
-
-    # data adapter
-    print "Compile Data Adapter"
-    arguments = prod_options
-    __build_project(['data_adapter'])
-
-    arguments = dev_options
-    __build_project(['data_adapter'])
+    args = []
+    for module in mods:
+        dev_options['modules'] = [module]
+        prod_options['modules'] = [module]
+        args.append(dict(dev_options))
+        args.append(dict(prod_options))
+    pool = multiprocessing.Pool(arguments['process'])
+    pool.map_async(__compile_project_from_map, args).get(99999)
+    pool.close()
+    pool.join()
 
     # ui
     print "Compile AnyChart UI"
-    __call_console_commands(['./build compile -m anychart_ui -gz'])
-    __call_console_commands(['./build compile -m anychart_ui -gz -d'])
+    __call_console_commands(['./build.py compile -m anychart_ui -gz'])
+    __call_console_commands(['./build.py compile -m anychart_ui -gz -d'])
 
     print "Compile Themes"
     __build_themes()
@@ -1123,7 +1067,7 @@ def __compile_css():
     try:
         import lesscpy
     except ImportError:
-        raise ImportError('You need install lesscpy. Run `./build contrib`')
+        raise ImportError('You need install lesscpy. Run `./build.py contrib`')
 
     __create_dir_if_not_exists(OUT_PATH)
 
@@ -1156,7 +1100,7 @@ warnings_list = []
 
 
 def __print_no_bundles():
-    print 'No bundles found, see help for more info. (python build --help)'
+    print 'No bundles found, see help for more info. (python build.py --help)'
 
 
 def __print_warnings_list():
@@ -1268,6 +1212,9 @@ def __exec_main_script():
     compile_each_parser.add_argument('-t', '--theme', action='store',
                                      help="Specify the default theme to compile with. By default - 'defaultTheme'",
                                      default='defaultTheme')
+    compile_each_parser.add_argument('-p', '--process', action='store', type=int,
+                                     help="Specify the number of parallel processes to compile. By default 2 process",
+                                     default=2)
 
     # create the parser for the "contrib" command
     contrib_parser = subparsers.add_parser('contrib', help='Synchronize project dependencies')
@@ -1295,6 +1242,9 @@ def __exec_main_script():
     # create files for release
     release_parser = subparsers.add_parser('release', help='Creates release files in output directory.')
     release_parser.add_argument('-esp', '--export-server-path', dest='export_server_path', action='store', default=os.path.join(PROJECT_PATH, '..', 'export-server'))
+    release_parser.add_argument('-p', '--process', action='store', type=int,
+                                help="Specify the number of parallel processes to compile. By default 2 process",
+                                default=4)
 
     # create files for release
     subparsers.add_parser('gz_stat', help='Print into console size of all gzip files in out directory,'
@@ -1345,13 +1295,8 @@ def __exec_main_script():
 
 
 if __name__ == '__main__':
-    print ('WARNING!\n'
-           'build script is deprecated and will be delete soon, please use'
-           ' build.py script.\nIn build.py was added new flag, that let you use'
-           ' parallel build for compile_each command, for more information'
-           ' use "./build.py compile_each -h"')
     try:
         __exec_main_script()
-    except StandardError as e:
+    except (StandardError, KeyboardInterrupt) as e:
         print e
         sys.exit(1)
