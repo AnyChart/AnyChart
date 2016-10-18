@@ -3032,8 +3032,8 @@ anychart.enums.Interval = {
 /**
  * Normalizes interval
  * @param {*} value Value to normalize.
- * @param {anychart.enums.Interval=} opt_default Custom default value (defaults to YEARS).
- * @return {anychart.enums.Interval}
+ * @param {?anychart.enums.Interval=} opt_default Custom default value (defaults to YEARS).
+ * @return {?anychart.enums.Interval}
  */
 anychart.enums.normalizeInterval = function(value, opt_default) {
   value = (String(value)).toLowerCase();
@@ -3096,7 +3096,7 @@ anychart.enums.normalizeInterval = function(value, opt_default) {
     case 'ms':
       return anychart.enums.Interval.MILLISECOND;
   }
-  return opt_default || anychart.enums.Interval.YEAR;
+  return goog.isDef(opt_default) ? opt_default : anychart.enums.Interval.YEAR;
 };
 
 
@@ -3671,7 +3671,84 @@ anychart.enums.StockRangeChangeSource = {
   SCROLLER_DRAG: 'scrollerDrag',
   SCROLLER_CLICK: 'scrollerClick',
   PLOT_DRAG: 'plotDrag',
-  DATA_CHANGE: 'dataUpdate'
+  DATA_CHANGE: 'dataUpdate',
+  SELECT_RANGE: 'selectRange'
+};
+
+
+/**
+ * Stock period range type.
+ * @enum {string}
+ */
+anychart.enums.StockRangeType = {
+  UNIT: 'Unit',
+  YTD: 'YTD',
+  QTD: 'QTD',
+  MTD: 'MTD',
+  MAX: 'Max'
+};
+
+
+/**
+ * Normalizes StockRangePeriodType enum.
+ * @param {*} value
+ * @param {?anychart.enums.StockRangeType=} opt_default Custom default value (defaults to MAX).
+ * @return {?anychart.enums.StockRangeType}
+ */
+anychart.enums.normalizeStockRangeType = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'unit':
+    case 'u':
+      return anychart.enums.StockRangeType.UNIT;
+    case 'ytd':
+      return anychart.enums.StockRangeType.YTD;
+    case 'qtd':
+      return anychart.enums.StockRangeType.QTD;
+    case 'mtd':
+      return anychart.enums.StockRangeType.MTD;
+    case 'max':
+      return anychart.enums.StockRangeType.MAX;
+  }
+  return goog.isDef(opt_default) ? opt_default : anychart.enums.StockRangeType.MAX;
+};
+
+
+/**
+ * Stock range anchor.
+ * @enum {string}
+ */
+anychart.enums.StockRangeAnchor = {
+  FIRST_DATE: 'firstDate',
+  FIRST_VISIBLE_DATE: 'firstVisibleDate',
+  LAST_VISIBLE_DATE: 'lastVisibleDate',
+  LAST_DATE: 'lastDate'
+};
+
+
+/**
+ * Normalizes range anchor.
+ * @param {*} value
+ * @param {?anychart.enums.StockRangeAnchor=} opt_default Custom default value (defaults to LAST_DATE).
+ * @return {?anychart.enums.StockRangeAnchor}
+ */
+anychart.enums.normalizeStockRangeAnchor = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'firstdate':
+    case 'fd':
+      return anychart.enums.StockRangeAnchor.FIRST_DATE;
+    case 'firstvisibledate':
+    case 'fvd':
+      return anychart.enums.StockRangeAnchor.FIRST_VISIBLE_DATE;
+    case 'lastvisibledate':
+    case 'lvd':
+      return anychart.enums.StockRangeAnchor.LAST_VISIBLE_DATE;
+    case 'lastdate':
+    case 'ld':
+      return anychart.enums.StockRangeAnchor.LAST_DATE;
+  }
+  return goog.isDef(opt_default) ? opt_default : anychart.enums.StockRangeAnchor.LAST_DATE;
 };
 
 
@@ -5738,6 +5815,17 @@ goog.exportSymbol('anychart.enums.StockLabelsOverlapMode.NO_OVERLAP', anychart.e
 goog.exportSymbol('anychart.enums.StockLabelsOverlapMode.ALLOW_OVERLAP', anychart.enums.StockLabelsOverlapMode.ALLOW_OVERLAP);
 goog.exportSymbol('anychart.enums.StockLabelsOverlapMode.ALLOW_MAJOR_OVERLAP', anychart.enums.StockLabelsOverlapMode.ALLOW_MAJOR_OVERLAP);
 goog.exportSymbol('anychart.enums.StockLabelsOverlapMode.ALLOW_MINOR_OVERLAP', anychart.enums.StockLabelsOverlapMode.ALLOW_MINOR_OVERLAP);
+
+goog.exportSymbol('anychart.enums.StockRangeType.UNIT', anychart.enums.StockRangeType.UNIT);
+goog.exportSymbol('anychart.enums.StockRangeType.YTD', anychart.enums.StockRangeType.YTD);
+goog.exportSymbol('anychart.enums.StockRangeType.QTD', anychart.enums.StockRangeType.QTD);
+goog.exportSymbol('anychart.enums.StockRangeType.MTD', anychart.enums.StockRangeType.MTD);
+goog.exportSymbol('anychart.enums.StockRangeType.MAX', anychart.enums.StockRangeType.MAX);
+
+goog.exportSymbol('anychart.enums.StockRangeAnchor.FIRST_DATE', anychart.enums.StockRangeAnchor.FIRST_DATE);
+goog.exportSymbol('anychart.enums.StockRangeAnchor.FIRST_VISIBLE_DATE', anychart.enums.StockRangeAnchor.FIRST_VISIBLE_DATE);
+goog.exportSymbol('anychart.enums.StockRangeAnchor.LAST_VISIBLE_DATE', anychart.enums.StockRangeAnchor.LAST_VISIBLE_DATE);
+goog.exportSymbol('anychart.enums.StockRangeAnchor.LAST_DATE', anychart.enums.StockRangeAnchor.LAST_DATE);
 
 goog.exportSymbol('anychart.enums.TableSearchMode.EXACT_OR_PREV', anychart.enums.TableSearchMode.EXACT_OR_PREV);
 goog.exportSymbol('anychart.enums.TableSearchMode.EXACT', anychart.enums.TableSearchMode.EXACT);

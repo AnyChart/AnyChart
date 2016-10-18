@@ -755,7 +755,7 @@ anychart.format.getMessage = function(keyword) {
  */
 anychart.format.getIntervalIdentifier = function(intervalUnit, opt_parentIntervalUnit, opt_prefix) {
   var parentInterval = anychart.enums.normalizeInterval(opt_parentIntervalUnit);
-  intervalUnit = anychart.enums.normalizeInterval(intervalUnit);
+  intervalUnit = /** @type {anychart.enums.Interval} */(anychart.enums.normalizeInterval(intervalUnit));
   opt_prefix = opt_prefix ? opt_prefix + '_' : '';
   return opt_prefix + ((intervalUnit == parentInterval) ?
       intervalUnit :

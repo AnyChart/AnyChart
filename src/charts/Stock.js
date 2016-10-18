@@ -489,13 +489,158 @@ anychart.charts.Stock.prototype.scroller = function(opt_value) {
 
 /**
  * Selects passed range and initiates data redraw.
- * @param {number|string|Date} start
- * @param {number|string|Date} end
+ * @param {number|string|Date|anychart.enums.StockRangeType|anychart.enums.Interval} typeOrUnitOrStart
+ * @param {(number|string|Date|boolean)=} opt_endOrCountOrDispatchEvent
+ * @param {(anychart.enums.StockRangeAnchor|boolean)=} opt_anchorOrDispatchEvent
+ * @param {boolean=} opt_dispatchEvent
  * @return {anychart.charts.Stock}
  */
-anychart.charts.Stock.prototype.selectRange = function(start, end) {
-  this.selectRangeInternal_(anychart.utils.normalizeTimestamp(start), anychart.utils.normalizeTimestamp(end));
+anychart.charts.Stock.prototype.selectRange = function(
+    typeOrUnitOrStart, opt_endOrCountOrDispatchEvent, opt_anchorOrDispatchEvent, opt_dispatchEvent) {
+  var type, unit;
+  var offset, year, month;
+
+  var baseKey = this.dataController_.getLastKey(), baseDate;
+  var newKey = NaN, newDate;
+
+  if (type = anychart.enums.normalizeStockRangeType(typeOrUnitOrStart, null)) {
+    baseDate = new Date(baseKey);
+    switch (type) {
+      case anychart.enums.StockRangeType.YTD:
+        newKey = Date.UTC(baseDate.getUTCFullYear(), 0);
+        break;
+      case anychart.enums.StockRangeType.QTD:
+        var baseQuarter = Math.floor((baseDate.getUTCMonth() + 3) / 3);
+        newKey = Date.UTC(baseDate.getUTCFullYear(), baseQuarter * 3 - 3, 1);
+        break;
+      case anychart.enums.StockRangeType.MTD:
+        newKey = Date.UTC(baseDate.getUTCFullYear(), baseDate.getUTCMonth());
+        break;
+      case anychart.enums.StockRangeType.MAX:
+        newKey = this.dataController_.getFirstKey();
+        break;
+    }
+  } else if (unit = anychart.enums.normalizeInterval(typeOrUnitOrStart, null)) {
+    var count = opt_endOrCountOrDispatchEvent || 1;
+    var anchor = anychart.enums.normalizeStockRangeAnchor(opt_anchorOrDispatchEvent);
+    /**
+     * Anchor determines the direction of offset.
+     * Direction determines a sign of an operation.
+     * 1 - forward (FIRST_DATE|FIRST_VISIBLE_DATE)
+     * -1 - backward (LAST_DATE|LAST_VISIBLE_DATE)
+     * @type {number}
+     */
+    var direction = -1;
+    if (anchor == anychart.enums.StockRangeAnchor.LAST_VISIBLE_DATE) {
+      baseKey = this.dataController_.getLastVisibleKey();
+    } else if (anchor == anychart.enums.StockRangeAnchor.FIRST_VISIBLE_DATE) {
+      baseKey = this.dataController_.getFirstVisibleKey();
+      direction = 1;
+    } else if (anchor == anychart.enums.StockRangeAnchor.FIRST_DATE) {
+      baseKey = this.dataController_.getFirstKey();
+      direction = 1;
+    }
+
+    baseDate = new Date(baseKey);
+    newDate = new Date(baseKey);
+
+    if (unit == anychart.enums.Interval.YEAR) {
+      newDate.setUTCFullYear(baseDate.getUTCFullYear() + direction * count);
+      newKey = newDate.getTime();
+    } else if (unit == anychart.enums.Interval.SEMESTER ||
+        unit == anychart.enums.Interval.QUARTER ||
+        unit == anychart.enums.Interval.MONTH) {
+      switch (unit) {
+        case anychart.enums.Interval.SEMESTER:
+          offset = count * 6;
+          break;
+        case anychart.enums.Interval.QUARTER:
+          offset = count * 3;
+          break;
+        case anychart.enums.Interval.MONTH:
+          offset = count;
+          break;
+      }
+      month = baseDate.getUTCMonth() + direction * offset;
+      year = baseDate.getUTCFullYear() + Math.floor(month / 12);
+      month %= 12;
+      if (month < 0) {
+        month += 12;
+      }
+      newDate.setUTCFullYear(year);
+      newDate.setUTCMonth(month);
+      newKey = newDate.getTime();
+
+    } else if (unit == anychart.enums.Interval.THIRD_OF_MONTH) {
+      var decade;
+      var date = baseDate.getUTCDate();
+      if (date <= 10)
+        decade = 0;
+      else if (date <= 20)
+        decade = 1;
+      else
+        decade = 2;
+      var val = (baseDate.getUTCFullYear() * 12 + baseDate.getUTCMonth()) * 3 + decade + direction * count;
+      year = Math.floor(val / 36);
+      val %= 36;
+      month = Math.floor(val / 3);
+      if (month < 0) month += 12;
+      decade = val % 3;
+      if (decade < 0) decade += 3;
+      newKey = Date.UTC(year, month, 1 + decade * 10);
+
+    } else {
+      switch (unit) {
+        case anychart.enums.Interval.WEEK:
+          offset = count * 1000 * 60 * 60 * 24 * 7;
+          break;
+        case anychart.enums.Interval.DAY:
+          offset = count * 1000 * 60 * 60 * 24;
+          break;
+        case anychart.enums.Interval.HOUR:
+          offset = count * 1000 * 60 * 60;
+          break;
+        case anychart.enums.Interval.MINUTE:
+          offset = count * 1000 * 60;
+          break;
+        case anychart.enums.Interval.SECOND:
+          offset = count * 1000;
+          break;
+        case anychart.enums.Interval.MILLISECOND:
+          offset = count;
+          break;
+      }
+      newKey = baseKey + direction * offset;
+    }
+  } else {
+    baseKey = anychart.utils.normalizeTimestamp(typeOrUnitOrStart);
+    newKey = anychart.utils.normalizeTimestamp(opt_endOrCountOrDispatchEvent);
+  }
+
+  this.selectRangeInternal_(baseKey, newKey);
+
+  if ((goog.isBoolean(opt_endOrCountOrDispatchEvent) && opt_endOrCountOrDispatchEvent) ||
+      (goog.isBoolean(opt_anchorOrDispatchEvent) && opt_anchorOrDispatchEvent) ||
+      opt_dispatchEvent) {
+    this.dispatchRangeChange_(
+        anychart.enums.EventType.SELECTED_RANGE_CHANGE,
+        anychart.enums.StockRangeChangeSource.SELECT_RANGE);
+  }
   return this;
+};
+
+
+/**
+ * Get selected range.
+ * @return {Object}
+ */
+anychart.charts.Stock.prototype.getSelectedRange = function() {
+  return {
+    'firstSelected': this.dataController_.getFirstSelectedKey(),
+    'lastSelected': this.dataController_.getLastSelectedKey(),
+    'firstVisible': this.dataController_.getFirstVisibleKey(),
+    'lastVisible': this.dataController_.getLastVisibleKey()
+  };
 };
 
 
@@ -616,7 +761,9 @@ anychart.charts.Stock.prototype.dispatchRangeChange_ = function(type, source, op
       'type': type,
       'source': source,
       'firstSelected': opt_first,
-      'lastSelected': opt_last
+      'lastSelected': opt_last,
+      'firstKey': this.dataController_.getFirstKey(),
+      'lastKey': this.dataController_.getLastKey()
     });
   } else {
     var grouping = /** @type {anychart.core.stock.Grouping} */(this.grouping());
@@ -627,6 +774,8 @@ anychart.charts.Stock.prototype.dispatchRangeChange_ = function(type, source, op
       'lastSelected': this.dataController_.getLastSelectedKey(),
       'firstVisible': this.dataController_.getFirstVisibleKey(),
       'lastVisible': this.dataController_.getLastVisibleKey(),
+      'firstKey': this.dataController_.getFirstKey(),
+      'lastKey': this.dataController_.getLastKey(),
       'dataIntervalUnit': grouping.getCurrentDataInterval()['unit'],
       'dataIntervalUnitCount': grouping.getCurrentDataInterval()['count'],
       'dataIsGrouped': grouping.isGrouped()
@@ -1861,6 +2010,7 @@ anychart.charts.Stock.prototype['plot'] = anychart.charts.Stock.prototype.plot;
 anychart.charts.Stock.prototype['scroller'] = anychart.charts.Stock.prototype.scroller;
 anychart.charts.Stock.prototype['xScale'] = anychart.charts.Stock.prototype.xScale;
 anychart.charts.Stock.prototype['selectRange'] = anychart.charts.Stock.prototype.selectRange;
+anychart.charts.Stock.prototype['getSelectedRange'] = anychart.charts.Stock.prototype.getSelectedRange;
 anychart.charts.Stock.prototype['getType'] = anychart.charts.Stock.prototype.getType;
 anychart.charts.Stock.prototype['legend'] = anychart.charts.Stock.prototype.legend;
 anychart.charts.Stock.prototype['toCsv'] = anychart.charts.Stock.prototype.toCsv;

@@ -115,7 +115,7 @@ anychart.scales.DateTimeTicks.prototype.interval = function(opt_years, opt_month
       val = goog.date.Interval.fromIsoString(opt_years);
     else {
       if (goog.isString(opt_years)) {
-        opt_years = anychart.enums.normalizeInterval(opt_years);
+        opt_years = /** @type {anychart.enums.Interval} */(anychart.enums.normalizeInterval(opt_years));
         opt_months = anychart.utils.toNumber(opt_months) || 1;
         switch (opt_years) {
           case anychart.enums.Interval.YEAR:

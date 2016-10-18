@@ -54,6 +54,26 @@ anychart.ui.preloader = goog.global['anychart']['ui']['preloader'] || /** @type 
 });
 
 
+/**
+ * @ignoreDoc
+ */
+anychart.ui.rangePicker = goog.global['anychart']['ui']['rangePicker'] || /** @type {function():null} */ (function() {
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['anychart.ui.rangePicker']);
+  return null;
+});
+
+
+/**
+ * @ignoreDoc
+ */
+anychart.ui.rangeSelector = goog.global['anychart']['ui']['rangeSelector'] || /** @type {function():null} */ (function() {
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['anychart.ui.rangeSelector']);
+  return null;
+});
+
+
 goog.exportSymbol('anychart.ui.contextMenu', anychart.ui.contextMenu);
 goog.exportSymbol('anychart.ui.ganttToolbar', anychart.ui.ganttToolbar);
 goog.exportSymbol('anychart.ui.preloader', anychart.ui.preloader);
+goog.exportSymbol('anychart.ui.rangePicker', anychart.ui.rangePicker);
+goog.exportSymbol('anychart.ui.rangeSelector', anychart.ui.rangeSelector);

@@ -22,7 +22,7 @@ anychart.core.utils.DateTimeIntervalGenerator = function(unit, count) {
    * @type {anychart.enums.Interval}
    * @private
    */
-  this.unit_ = anychart.enums.normalizeInterval(unit);
+  this.unit_ = /** @type {anychart.enums.Interval} */(anychart.enums.normalizeInterval(unit));
 
   /**
    * Interval unit count.
