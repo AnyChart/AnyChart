@@ -365,6 +365,11 @@ anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentD
       .meta('depth', currentDepth)
       .meta('index', this.linearIndex_++);
 
+  var collapsed = item.get(anychart.enums.GanttDataFields.COLLAPSED);
+  if (goog.isBoolean(collapsed)) {
+    item.meta(anychart.enums.GanttDataFields.COLLAPSED, collapsed);
+  }
+
   this.datesToMeta_(item);
   this.periodsToMeta_(item);
 
