@@ -1743,11 +1743,13 @@ anychart.core.Chart.prototype.makeInteractivityPointEvent = function(type, event
   var wrappedPoints = [];
   /** @type {anychart.core.series.Base|anychart.core.SeriesBase} */
   var series;
-  for (var i = 0; i < seriesStatus.length; i++) {
-    var status = seriesStatus[i];
-    series = status.series;
-    for (var j = 0; j < status.points.length; j++)
-      wrappedPoints.push(series.getPoint(status.points[j]));
+  if (!opt_empty) {
+    for (var i = 0; i < seriesStatus.length; i++) {
+      var status = seriesStatus[i];
+      series = status.series;
+      for (var j = 0; j < status.points.length; j++)
+        wrappedPoints.push(series.getPoint(status.points[j]));
+    }
   }
   series = currentPoint['series'];
   var res = {

@@ -19,7 +19,7 @@ goog.inherits(anychart.core.GaugePointer, anychart.core.Point);
 /** @inheritDoc */
 anychart.core.GaugePointer.prototype.hovered = function(opt_value) {
   var pointer = /** @type {anychart.core.linearGauge.pointers.Base} */ (this.getChart().getPointerByAutoIndex(this.index));
-  var state = pointer.state.hasPointStateByPointIndex(anychart.PointState.HOVER, this.index);
+  var state = pointer.state.hasPointStateByPointIndex(anychart.PointState.HOVER, 0);
   if (goog.isDef(opt_value)) {
     if (state != opt_value) {
       if (opt_value)
@@ -36,7 +36,7 @@ anychart.core.GaugePointer.prototype.hovered = function(opt_value) {
 /** @inheritDoc */
 anychart.core.GaugePointer.prototype.selected = function(opt_value) {
   var pointer = /** @type {anychart.core.linearGauge.pointers.Base} */ (this.getChart().getPointerByAutoIndex(this.index));
-  var state = pointer.state.hasPointStateByPointIndex(anychart.PointState.SELECT, this.index);
+  var state = pointer.state.hasPointStateByPointIndex(anychart.PointState.SELECT, 0);
   if (goog.isDef(opt_value)) {
     if (state != opt_value) {
       if (opt_value)

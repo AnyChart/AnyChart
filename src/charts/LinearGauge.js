@@ -691,6 +691,24 @@ anychart.charts.LinearGauge.prototype.legendItemOut = function(item, event) {
 
 
 //region --- INTERACTIVITY ---
+/** @inheritDoc */
+anychart.charts.LinearGauge.prototype.getSelectedPoints = function() {
+  var selectedPointers = [];
+  var allPointers = this.getAllSeries();
+  var pointer, selected;
+
+  for (var i = 0; i < allPointers.length; i++) {
+    pointer = allPointers[i];
+    if (!pointer || !pointer.state) continue;
+    selected = !!pointer.state.getIndexByPointState(anychart.PointState.SELECT).length;
+    if (selected)
+      selectedPointers.push(this.getWrappedPointer(/** @type {number} */ (pointer.autoIndex())));
+  }
+
+  return selectedPointers;
+};
+
+
 /**
  * Wraps pointer with Point class.
  * @param {number} index Point index.
@@ -702,9 +720,39 @@ anychart.charts.LinearGauge.prototype.getWrappedPointer = function(index) {
 
 
 /** @inheritDoc */
+anychart.charts.LinearGauge.prototype.makeCurrentPoint = function(seriesStatus, event, opt_empty) {
+  var series, pointIndex, pointStatus;
+  if (seriesStatus.length) {
+    // current point should and will be last selected/hovered point
+    var status = seriesStatus[seriesStatus.length - 1];
+    series = status.series;
+    pointIndex = series.autoIndex();
+    pointStatus = goog.array.contains(status.points, 0);
+  }
+
+  var currentPoint = {
+    'index': pointIndex,
+    'series': series
+  };
+
+  currentPoint[event] = opt_empty ? !pointStatus : pointStatus;
+
+  return currentPoint;
+};
+
+
+/** @inheritDoc */
 anychart.charts.LinearGauge.prototype.makeInteractivityPointEvent = function(type, event, seriesStatus, opt_empty, opt_forbidTooltip) {
   var currentPoint = this.makeCurrentPoint(seriesStatus, type, opt_empty);
-  var wrappedPointer = this.getWrappedPointer(currentPoint['index']);
+  var wrappedPointer = this.getWrappedPointer(currentPoint.index);
+  var wrappedPointers = [];
+  var pointer;
+  if (!opt_empty) {
+    for (var i = 0, len = seriesStatus.length; i < len; i++) {
+      pointer = /** @type {anychart.core.linearGauge.pointers.Base} */ (seriesStatus[i].series);
+      wrappedPointers.push(this.getWrappedPointer(/** @type {number} */ (pointer.autoIndex())));
+    }
+  }
   var res = {
     'type': (type == 'hovered') ? anychart.enums.EventType.POINTS_HOVER : anychart.enums.EventType.POINTS_SELECT,
     'seriesStatus': this.createEventSeriesStatus(seriesStatus, opt_empty),
@@ -712,7 +760,7 @@ anychart.charts.LinearGauge.prototype.makeInteractivityPointEvent = function(typ
     'actualTarget': event['target'],
     'target': this,
     'point': wrappedPointer,
-    'points': [wrappedPointer],
+    'points': wrappedPointers,
     'originalEvent': event
   };
   if (opt_forbidTooltip)
@@ -1430,6 +1478,7 @@ anychart.charts.LinearGauge.prototype['removeAllPointers'] = anychart.charts.Lin
 anychart.charts.LinearGauge.prototype['getPointer'] = anychart.charts.LinearGauge.prototype.getPointer;
 anychart.charts.LinearGauge.prototype['getPointerAt'] = anychart.charts.LinearGauge.prototype.getPointerAt;
 anychart.charts.LinearGauge.prototype['getPointersCount'] = anychart.charts.LinearGauge.prototype.getPointersCount;
+anychart.charts.LinearGauge.prototype['getSelectedPoints'] = anychart.charts.LinearGauge.prototype.getSelectedPoints;
 
 anychart.charts.LinearGauge.prototype['data'] = anychart.charts.LinearGauge.prototype.data;
 anychart.charts.LinearGauge.prototype['axis'] = anychart.charts.LinearGauge.prototype.axis;
