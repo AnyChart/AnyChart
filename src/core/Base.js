@@ -196,6 +196,7 @@ anychart.ConsistencyState = {
   BASE_GRID_HOVER: 1 << 8,
   //---------------------------------- BUTTON STATES (VB) ---------------------------------
   BUTTON_BACKGROUND: 1 << 6,
+  BUTTON_CURSOR: 1 << 7,
   //---------------------------------- CREDITS STATES (VB) ---------------------------------
   CREDITS_POSITION: 1 << 6,
   CREDITS_REDRAW_IMAGE: 1 << 7,
@@ -204,6 +205,7 @@ anychart.ConsistencyState = {
   //---------------------------------- DATA GRID COLUMN STATES (VB) ---------------------------------
   DATA_GRID_COLUMN_TITLE: 1 << 6,
   DATA_GRID_COLUMN_POSITION: 1 << 7,
+  DATA_GRID_COLUMN_BUTTON_CURSOR: 1 << 8,
   //---------------------------------- BACKGROUND STATES (VB) ---------------------------------
   BACKGROUND_POINTER_EVENTS: 1 << 6,
   //---------------------------------- LABEL STATES (VB) ---------------------------------

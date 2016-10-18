@@ -1466,6 +1466,7 @@
         <xsd:attribute name="defaultWidth" type="xsd:double"/>
         <xsd:attribute name="collapse_expand_buttons" type="simple.Bool"/>
         <xsd:attribute name="depth_padding_multiplier" type="xsd:double"/>
+        <xsd:attribute name="button_cursor" type="xsd:string"/>
 
     </xsd:complexType>
 

@@ -3664,6 +3664,7 @@ goog.provide('anychart.themes.defaultTheme');
       },
       'defaultColumnSettings': {
         'width': 90,
+        'buttonCursor': 'pointer',
         //'defaultWidth': undefined,
         'cellTextSettings': {
           'enabled': true,

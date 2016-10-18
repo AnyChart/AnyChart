@@ -5791,6 +5791,7 @@ goog.provide('anychart.themes.v6');
       },
       'defaultColumnSettings': {
         'width': 90,
+        'buttonCursor': 'pointer',
         //'defaultWidth': undefined,
         'cellTextSettings': {
           'anchor': 'leftTop',

@@ -2,6 +2,7 @@ goog.provide('anychart.core.ui.Button');
 goog.require('acgraph');
 goog.require('anychart.core.Text');
 goog.require('anychart.core.utils.Padding');
+goog.require('anychart.enums');
 goog.require('anychart.math');
 
 
@@ -13,6 +14,13 @@ goog.require('anychart.math');
  */
 anychart.core.ui.Button = function() {
   goog.base(this);
+
+  /**
+   * Button cursor.
+   * @type {anychart.enums.Cursor}
+   * @private
+   */
+  this.buttonCursor_ = anychart.enums.Cursor.DEFAULT;
 
   /**
    * Width of a button.
@@ -71,7 +79,8 @@ anychart.core.ui.Button.prototype.SUPPORTED_SIGNALS = anychart.core.Text.prototy
  */
 anychart.core.ui.Button.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.Text.prototype.SUPPORTED_CONSISTENCY_STATES |
-    anychart.ConsistencyState.BUTTON_BACKGROUND;
+    anychart.ConsistencyState.BUTTON_BACKGROUND |
+    anychart.ConsistencyState.BUTTON_CURSOR;
 
 
 /**
@@ -650,6 +659,14 @@ anychart.core.ui.Button.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.BUTTON_CURSOR)) {
+    if (this.textElement)
+      this.textElement.cursor(/** @type {acgraph.vector.Cursor} */ (this.cursor()));
+    if (this.backgroundPath)
+      this.backgroundPath.cursor(/** @type {acgraph.vector.Cursor} */ (this.cursor()));
+    this.markConsistent(anychart.ConsistencyState.BUTTON_CURSOR);
+  }
+
   return this;
 };
 
@@ -820,6 +837,24 @@ anychart.core.ui.Button.prototype.initStateSettings = function() {
       }
     }
   };
+};
+
+
+/**
+ * Getter/setter for cursor.
+ * @param {(anychart.enums.Cursor|string)=} opt_value cursor.
+ * @return {anychart.enums.Cursor|anychart.core.ui.Button} cursor or self for chaining.
+ */
+anychart.core.ui.Button.prototype.cursor = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeCursor(opt_value, anychart.enums.Cursor.DEFAULT);
+    if (this.cursor_ != opt_value) {
+      this.cursor_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.BUTTON_CURSOR, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.cursor_;
 };
 
 

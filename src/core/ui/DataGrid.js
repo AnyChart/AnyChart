@@ -11,6 +11,7 @@ goog.require('anychart.core.ui.ScrollBar');
 goog.require('anychart.core.ui.SimpleSplitter');
 goog.require('anychart.core.ui.Title');
 goog.require('anychart.data.Tree');
+goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
 
@@ -1054,7 +1055,8 @@ anychart.core.ui.DataGrid.Column.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.DATA_GRID_COLUMN_TITLE |
-    anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION;
+    anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION |
+    anychart.ConsistencyState.DATA_GRID_COLUMN_BUTTON_CURSOR;
 
 
 /**
@@ -1414,6 +1416,24 @@ anychart.core.ui.DataGrid.Column.prototype.height = function(opt_value) {
 
 
 /**
+ * Getter/setter for buttonCursor.
+ * @param {(anychart.enums.Cursor|string)=} opt_value buttonCursor.
+ * @return {anychart.enums.Cursor|anychart.core.ui.DataGrid.Column} buttonCursor or self for chaining.
+ */
+anychart.core.ui.DataGrid.Column.prototype.buttonCursor = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeCursor(opt_value, anychart.enums.Cursor.DEFAULT);
+    if (this.buttonCursor_ != opt_value) {
+      this.buttonCursor_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_BUTTON_CURSOR, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.buttonCursor_;
+};
+
+
+/**
  * Inner getter for this.cellsLayer_.
  * @return {acgraph.vector.Layer}
  * @private
@@ -1560,6 +1580,7 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
           var pixelShift = (acgraph.type() === acgraph.StageType.SVG) ? .5 : 0;
           button
               .enabled(true)
+              .cursor(/** @type {anychart.enums.Cursor} */ (this.buttonCursor()))
               .collapsed(!!item.meta('collapsed'))
               .dataItemIndex(i)
               .parentBounds(this.pixelBoundsCache_)
@@ -1615,6 +1636,17 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
       this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_TITLE);
     }
 
+    if (this.hasInvalidationState(anychart.ConsistencyState.DATA_GRID_COLUMN_BUTTON_CURSOR)) {
+      if (this.buttons_ && this.buttons_.length) {
+        for (i = 0; i < this.buttons_.length; i++) {
+          button = this.buttons_[i];
+          button.cursor(/** @type {anychart.enums.Cursor} */ (this.buttonCursor()));
+          if (button.enabled()) button.draw();
+        }
+      }
+      this.markConsistent(anychart.ConsistencyState.DATA_GRID_COLUMN_BUTTON_CURSOR);
+    }
+
     if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
       this.getBase_().zIndex(/** @type {number} */ (this.zIndex()));
       this.markConsistent(anychart.ConsistencyState.Z_INDEX);
@@ -1636,6 +1668,7 @@ anychart.core.ui.DataGrid.Column.prototype.serialize = function() {
   json['depthPaddingMultiplier'] = this.depthPaddingMultiplier_;
   json['cellTextSettings'] = this.cellTextSettings().serialize();
   json['title'] = this.title_.serialize();
+  json['buttonCursor'] = this.buttonCursor_;
 
   if (this.textFormatter_ != this.defaultTextFormatter_) {
     anychart.core.reporting.warning(
@@ -1666,6 +1699,7 @@ anychart.core.ui.DataGrid.Column.prototype.setupByJSON = function(json) {
   this.collapseExpandButtons(json['collapseExpandButtons']);
   this.depthPaddingMultiplier(json['depthPaddingMultiplier']);
   this.cellTextSettings(json['cellTextSettings']);
+  this.buttonCursor(json['buttonCursor']);
 
   this.title(json['title']);
 
@@ -1822,4 +1856,5 @@ anychart.core.ui.DataGrid.Column.prototype['cellTextSettingsOverrider'] = anycha
 anychart.core.ui.DataGrid.Column.prototype['collapseExpandButtons'] = anychart.core.ui.DataGrid.Column.prototype.collapseExpandButtons;
 anychart.core.ui.DataGrid.Column.prototype['depthPaddingMultiplier'] = anychart.core.ui.DataGrid.Column.prototype.depthPaddingMultiplier;
 anychart.core.ui.DataGrid.Column.prototype['setColumnFormat'] = anychart.core.ui.DataGrid.Column.prototype.setColumnFormat;
+anychart.core.ui.DataGrid.Column.prototype['buttonCursor'] = anychart.core.ui.DataGrid.Column.prototype.buttonCursor;
 anychart.core.ui.DataGrid.Column.prototype['draw'] = anychart.core.ui.DataGrid.Column.prototype.draw;
