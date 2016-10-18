@@ -1,5 +1,6 @@
 goog.provide('anychart.charts.Resource');
 goog.provide('anychart.core.ui.ResourceList');
+goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.Background');
@@ -26,6 +27,7 @@ anychart.charts.Resource = function() {
 /**
  * Resource list constructor.
  * @implements {anychart.core.settings.IObjectWithSettings}
+ * @implements {anychart.core.IStandaloneBackend}
  * @extends {anychart.core.VisualBase}
  * @constructor
  */
@@ -667,20 +669,6 @@ anychart.core.ui.ResourceList.prototype.setThemeSettingsForItem_ = function(name
 
 
 //region --- DRAWING ---
-/**
- * Injects resize handler for in case of standalone element.
- * @protected
- */
-anychart.core.ui.ResourceList.prototype.injectResizeHandler = goog.nullFunction;
-
-
-/**
- * Injects self listener ins case of standalone element.
- * @protected
- */
-anychart.core.ui.ResourceList.prototype.injectSelfListener = goog.nullFunction;
-
-
 /** @inheritDoc */
 anychart.core.ui.ResourceList.prototype.remove = function() {
   if (this.rootLayer) this.rootLayer.parent(null);
@@ -718,7 +706,6 @@ anychart.core.ui.ResourceList.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     this.rootLayer.parent(container);
-    this.injectResizeHandler();
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
@@ -870,8 +857,6 @@ anychart.core.ui.ResourceList.prototype.draw = function() {
   }
 
   if (manualSuspend) stage.resume();
-
-  this.injectSelfListener();
 
   return this;
 };

@@ -1,6 +1,7 @@
 goog.provide('anychart.core.axes.Radial');
 goog.require('acgraph');
 goog.require('anychart.color');
+goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.axes.RadialTicks');
 goog.require('anychart.core.reporting');
@@ -23,6 +24,7 @@ goog.require('anychart.scales.ScatterBase');
  *    .container(stage).draw();
  * @constructor
  * @extends {anychart.core.VisualBase}
+ * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.axes.Radial = function() {
   this.suspendSignalsDispatching();

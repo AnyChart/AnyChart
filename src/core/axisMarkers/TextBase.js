@@ -1,6 +1,7 @@
 goog.provide('anychart.core.axisMarkers.TextBase');
 
 goog.require('acgraph.math.Coordinate');
+goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.Text');
 goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.reporting');
@@ -15,6 +16,7 @@ goog.require('goog.math');
  * Text marker base.
  * @constructor
  * @extends {anychart.core.Text}
+ * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.axisMarkers.TextBase = function() {
   anychart.core.axisMarkers.TextBase.base(this, 'constructor');
@@ -526,6 +528,8 @@ anychart.core.axisMarkers.TextBase.prototype.draw = function() {
       textElement.setTransformationMatrix(1, 0, 0, 1, 0, 0);
       textElement.width(null);
       textElement.height(null);
+      textElement.x(0);
+      textElement.y(0);
 
       var isWidthSet = !goog.isNull(this.width());
       var isHeightSet = !goog.isNull(this.height());

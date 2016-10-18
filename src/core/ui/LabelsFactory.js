@@ -1,6 +1,7 @@
 goog.provide('anychart.core.ui.LabelsFactory');
 goog.provide('anychart.core.ui.LabelsFactory.Label');
 goog.require('acgraph.math.Coordinate');
+goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.Text');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.Background');
@@ -17,6 +18,7 @@ goog.require('anychart.math.Rect');
  * Any individual label can be changed after all labels are displayed.
  * @constructor
  * @extends {anychart.core.Text}
+ * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.ui.LabelsFactory = function() {
   this.suspendSignalsDispatching();

@@ -1,6 +1,7 @@
 //region --- Requiring and Providing
 goog.provide('anychart.core.ui.Background');
 goog.require('acgraph');
+goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.settings');
 goog.require('anychart.enums');
@@ -17,6 +18,7 @@ goog.require('goog.array');
  * Background has a fill, a border and corner shape settings.<br/>
  * <b>Note:</b> Always specify display bounds if you use Background separately.
  * @extends {anychart.core.VisualBaseWithBounds}
+ * @implements {anychart.core.IStandaloneBackend}
  * @constructor
  * @implements {anychart.core.settings.IObjectWithSettings}
  * @implements {anychart.core.settings.IResolvable}
@@ -361,7 +363,10 @@ anychart.core.ui.Background.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     var bounds = this.getPixelBounds();
-    var thicknessHalf = this.rect_.strokeThickness() / 2;
+    var strokeThickness;
+    // stroke have been changed
+    strokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */ (stroke));
+    var thicknessHalf = strokeThickness / 2;
     //TODO(Anton Saukh): remove this fix when graphics is fixed.
     if (isNaN(thicknessHalf)) thicknessHalf = .5;
     bounds.left += thicknessHalf;

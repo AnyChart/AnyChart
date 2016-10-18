@@ -6,7 +6,6 @@
 goog.provide('anychart.modules.anychart_ui');
 
 goog.require('anychart.base');
-goog.require('anychart.standalones.ResourceList');
 goog.require('anychart.ui.ContextMenu');
 goog.require('anychart.ui.GanttToolbar');
 goog.require('anychart.ui.Preloader');

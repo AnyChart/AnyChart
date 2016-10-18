@@ -1,5 +1,6 @@
 goog.provide('anychart.core.ui.LabelBase');
 goog.require('acgraph.math.Coordinate');
+goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.Text');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.utils.Padding');
@@ -13,6 +14,7 @@ goog.require('anychart.utils');
  * LabelBase class.
  * @constructor
  * @extends {anychart.core.Text}
+ * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.ui.LabelBase = function() {
   goog.base(this);

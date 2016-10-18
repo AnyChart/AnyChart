@@ -1,5 +1,5 @@
 goog.provide('anychart.core.ui.ColorRange');
-
+goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.axes.Linear');
 goog.require('anychart.core.ui.ColorRangeTicks');
 goog.require('anychart.core.ui.MarkersFactory');
@@ -13,6 +13,7 @@ goog.require('anychart.scales.OrdinalColor');
  * Color range.
  * @constructor
  * @extends {anychart.core.axes.Linear}
+ * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.ui.ColorRange = function() {
   goog.base(this);

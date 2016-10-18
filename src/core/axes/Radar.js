@@ -1,6 +1,7 @@
 goog.provide('anychart.core.axes.Radar');
 goog.require('acgraph');
 goog.require('anychart.color');
+goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.axes.RadialTicks');
 goog.require('anychart.core.reporting');
@@ -17,6 +18,7 @@ goog.require('anychart.scales.Base');
  * Radar axis Class.
  * @constructor
  * @extends {anychart.core.VisualBase}
+ * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.axes.Radar = function() {
   this.suspendSignalsDispatching();

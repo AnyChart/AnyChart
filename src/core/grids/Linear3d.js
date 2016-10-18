@@ -1,5 +1,6 @@
 goog.provide('anychart.core.grids.Linear3d');
 goog.require('acgraph');
+goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.grids.Linear');
 
 
@@ -8,6 +9,7 @@ goog.require('anychart.core.grids.Linear');
  * Grid.
  * @constructor
  * @extends {anychart.core.grids.Linear}
+ * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.grids.Linear3d = function() {
   anychart.core.grids.Linear3d.base(this, 'constructor');

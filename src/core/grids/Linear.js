@@ -1,6 +1,7 @@
 goog.provide('anychart.core.grids.Linear');
 goog.require('acgraph');
 goog.require('anychart.color');
+goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.Padding');
@@ -12,6 +13,7 @@ goog.require('anychart.enums');
  * Grid.
  * @constructor
  * @extends {anychart.core.VisualBase}
+ * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.grids.Linear = function() {
   anychart.core.grids.Linear.base(this, 'constructor');

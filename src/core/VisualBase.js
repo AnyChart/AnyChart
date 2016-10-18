@@ -533,6 +533,15 @@ anychart.core.VisualBase.prototype.invalidateParentBounds = function() {
 };
 
 
+/**
+ * Whether element depends on container size.
+ * @return {boolean} Depends or not.
+ */
+anychart.core.VisualBase.prototype.dependsOnContainerSize = function() {
+  return true;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Export.

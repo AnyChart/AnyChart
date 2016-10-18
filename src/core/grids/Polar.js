@@ -1,6 +1,7 @@
 goog.provide('anychart.core.grids.Polar');
 goog.require('acgraph');
 goog.require('anychart.color');
+goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.TypedLayer');
@@ -12,6 +13,7 @@ goog.require('anychart.enums');
  * Grid.
  * @constructor
  * @extends {anychart.core.VisualBase}
+ * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.grids.Polar = function() {
   goog.base(this);

@@ -1,5 +1,6 @@
 goog.provide('anychart.core.ui.Scroller');
 goog.require('acgraph');
+goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
@@ -13,6 +14,7 @@ goog.require('goog.style');
  * Scroller ui element
  * @constructor
  * @extends {anychart.core.VisualBase}
+ * @implements {anychart.core.IStandaloneBackend}
  * @param {boolean=} opt_usesAbsolutePadding
  */
 anychart.core.ui.Scroller = function(opt_usesAbsolutePadding) {

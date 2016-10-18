@@ -1,5 +1,6 @@
 goog.provide('anychart.core.ui.Table');
 goog.require('acgraph');
+goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.LabelsFactory');
@@ -25,6 +26,7 @@ goog.require('anychart.utils');
  * @constructor
  * @extends {anychart.core.VisualBaseWithBounds}
  * @implements {anychart.core.ui.table.IProxyUser}
+ * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.ui.Table = function(opt_rowsCount, opt_colsCount) {
   goog.base(this);
@@ -687,6 +689,12 @@ anychart.core.ui.Table.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     // if sizes changed, it will be checked in drawing
     this.invalidate(anychart.ConsistencyState.TABLE_CELL_BOUNDS);
+    if (anychart.utils.isPercent(this.left()) || anychart.utils.isPercent(this.top())) {
+      this.invalidate(
+          anychart.ConsistencyState.TABLE_BORDERS |
+          anychart.ConsistencyState.TABLE_FILLS |
+          anychart.ConsistencyState.TABLE_CONTENT);
+    }
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
@@ -708,33 +716,10 @@ anychart.core.ui.Table.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     this.layer_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
-    if (this.container() && this.container().getStage()) {
-      //listen resize event
-      stage = this.container().getStage();
-      if (this.bounds().dependsOnContainerSize()) {
-        this.container().getStage().listen(
-            acgraph.vector.Stage.EventType.STAGE_RESIZE,
-            this.resizeHandler_,
-            false,
-            this
-        );
-      } else {
-        this.container().getStage().unlisten(
-            acgraph.vector.Stage.EventType.STAGE_RESIZE,
-            this.resizeHandler_,
-            false,
-            this
-        );
-      }
-    }
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
   if (manualSuspend) stage.resume();
-
-  //todo(Anton Saukh): refactor this mess!
-  this.listenSignals(this.invalidateHandler_, this);
-  //end mess
 
   return this;
 };
@@ -2272,22 +2257,6 @@ anychart.core.ui.Table.prototype.allocCell_ = function(row, col) {
   return this.cellsPool_.length ? // checking if there are any cells in pool
       /** @type {anychart.core.ui.table.Cell} */(this.cellsPool_.pop().reset(row, col)) :
       new anychart.core.ui.table.Cell(this, row, col);
-};
-
-
-/**
- * @private
- */
-anychart.core.ui.Table.prototype.resizeHandler_ = function() {
-  this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-};
-
-
-/**
- * @private
- */
-anychart.core.ui.Table.prototype.invalidateHandler_ = function() {
-  anychart.globalLock.onUnlock(this.draw, this);
 };
 
 

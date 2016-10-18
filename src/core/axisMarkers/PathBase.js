@@ -1,5 +1,6 @@
 goog.provide('anychart.core.axisMarkers.PathBase');
 goog.require('acgraph');
+goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.Padding');
@@ -11,6 +12,7 @@ goog.require('anychart.enums');
  * Markers base.
  * @constructor
  * @extends {anychart.core.VisualBase}
+ * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.axisMarkers.PathBase = function() {
   anychart.core.axisMarkers.PathBase.base(this, 'constructor');

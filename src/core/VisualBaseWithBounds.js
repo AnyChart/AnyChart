@@ -47,6 +47,12 @@ anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES;
 
 
+/** @inheritDoc */
+anychart.core.VisualBaseWithBounds.prototype.dependsOnContainerSize = function() {
+  return this.bounds().dependsOnContainerSize();
+};
+
+
 /**
  * Getter/setter for bounds.
  * @param {(number|string|null|Array.<number|string>|anychart.utils.RectObj|anychart.math.Rect|anychart.core.utils.Bounds)=} opt_boundsOrX .

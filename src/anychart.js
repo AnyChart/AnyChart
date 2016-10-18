@@ -11,7 +11,12 @@ goog.require('anychart.base');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.StageCredits');
 goog.require('anychart.performance');
+goog.require('anychart.standalones');
+goog.require('anychart.standalones.axes');
+goog.require('anychart.standalones.axisMarkers');
+goog.require('anychart.standalones.grids');
 goog.require('anychart.themes.merging');
+goog.require('anychart.ui');
 goog.require('anychart.utils');
 goog.require('goog.array');
 goog.require('goog.dom');
@@ -697,334 +702,404 @@ anychart.getFullTheme = function() {
 anychart.getFullTheme();
 
 
+//region --- Patches for missing features
+//------------------------------------------------------------------------------
+//
+//  Patches for missing features
+//
+//------------------------------------------------------------------------------
 /**
- * @ignoreDoc
+ * Creates error reporter for NO_FEATURE_IN_MODULE.
+ * @param {string} featureName
+ * @return {Function}
  */
-anychart.area = anychart.area || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Area chart']);
+anychart.createNFIMError = function(featureName) {
+  return function() {
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, [featureName]);
+  };
 };
 
 
-/**
- * @ignoreDoc
- */
-anychart.area3d = anychart.area3d || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Area chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.bar = anychart.bar || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Bar chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.bar3d = anychart.bar3d || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Bar chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.bubble = anychart.bubble || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Bubble chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.bullet = anychart.bullet || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Bullet chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.cartesian = anychart.cartesian || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Cartesian chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.cartesian3d = anychart.cartesian3d || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Cartesian chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.scatter = anychart.scatter || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Scatter chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.column = anychart.column || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Column chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.column3d = anychart.column3d || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Column chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.box = anychart.box || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Box chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.financial = anychart.financial || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Financial chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.funnel = anychart.funnel || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Funnel chart']);
-};
+/** @ignoreDoc */
+anychart.area = anychart.area || anychart.createNFIMError('Area chart');
 
 
-/**
- * @ignoreDoc
- */
-anychart.line = anychart.line || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Line chart']);
-};
+/** @ignoreDoc */
+anychart.area3d = anychart.area3d || anychart.createNFIMError('3D Area chart');
 
 
-/**
- * @ignoreDoc
- */
-anychart.marker = anychart.marker || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Marker chart']);
-};
+/** @ignoreDoc */
+anychart.bar = anychart.bar || anychart.createNFIMError('Bar chart');
 
 
-/**
- * @ignoreDoc
- */
-anychart.pie = anychart.pie || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Pie chart']);
-};
+/** @ignoreDoc */
+anychart.bar3d = anychart.bar3d || anychart.createNFIMError('3D Bar chart');
 
 
-/**
- * @ignoreDoc
- */
-anychart.pie3d = anychart.pie3d || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['3D Pie chart']);
-};
+/** @ignoreDoc */
+anychart.bubble = anychart.bubble || anychart.createNFIMError('Bubble chart');
 
 
-/**
- * @ignoreDoc
- */
-anychart.pyramid = anychart.pyramid || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Pyramid chart']);
-};
+/** @ignoreDoc */
+anychart.bullet = anychart.bullet || anychart.createNFIMError('Bullet chart');
 
 
-/**
- * @ignoreDoc
- */
-anychart.radar = anychart.radar || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Radar chart']);
-};
+/** @ignoreDoc */
+anychart.cartesian = anychart.cartesian || anychart.createNFIMError('Cartesian chart');
 
 
-/**
- * @ignoreDoc
- */
-anychart.polar = anychart.polar || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Polar chart']);
-};
+/** @ignoreDoc */
+anychart.cartesian3d = anychart.cartesian3d || anychart.createNFIMError('3D Cartesian chart');
 
 
-/**
- * @ignoreDoc
- */
-anychart.sparkline = anychart.sparkline || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Sparkline chart']);
-};
+/** @ignoreDoc */
+anychart.scatter = anychart.scatter || anychart.createNFIMError('Scatter chart');
 
 
-/**
- * @ignoreDoc
- */
-anychart.heatMap = anychart.heatMap || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['HeatMap chart']);
-};
+/** @ignoreDoc */
+anychart.column = anychart.column || anychart.createNFIMError('Column chart');
 
 
-/**
- * @ignoreDoc
- */
-anychart.circularGauge = anychart.circularGauge || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Circular gauge']);
-};
+/** @ignoreDoc */
+anychart.column3d = anychart.column3d || anychart.createNFIMError('3D Column chart');
 
 
-/**
- * @ignoreDoc
- */
-anychart.gauges.circular = anychart.gauges.circular || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Circular gauge']);
-};
+/** @ignoreDoc */
+anychart.box = anychart.box || anychart.createNFIMError('Box chart');
 
 
-/**
- * @ignoreDoc
- */
-anychart.gauges.linear = anychart.gauges.linear || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Linear gauge']);
-};
+/** @ignoreDoc */
+anychart.financial = anychart.financial || anychart.createNFIMError('Financial chart');
 
 
-/**
- * @ignoreDoc
- */
-anychart.gauges.tank = anychart.gauges.tank || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Tank gauge']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.gauges.thermometer = anychart.gauges.thermometer || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Thermometer gauge']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.gauges.led = anychart.gauges.led || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['LED gauge']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.map = anychart.map || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Map']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.choropleth = anychart.choropleth || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Choropleth map']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.bubbleMap = anychart.bubbleMap || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Bubble map']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.connector = anychart.connector || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Connector map']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.markerMap = anychart.markerMap || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Marker map']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.seatMap = anychart.seatMap || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Seat map']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.ganttProject = anychart.ganttProject || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Gantt Project chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.ganttResource = anychart.ganttResource || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Gantt Resource chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.stock = anychart.stock || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Stock chart']);
-};
-
-
-/**
- * @ignoreDoc
- */
-anychart.toolbar = anychart.toolbar || /** @type {function():null} */ (function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Toolbar']);
+/** @ignoreDoc */
+anychart.funnel = anychart.funnel || anychart.createNFIMError('Funnel chart');
+
+
+/** @ignoreDoc */
+anychart.line = anychart.line || anychart.createNFIMError('Line chart');
+
+
+/** @ignoreDoc */
+anychart.marker = anychart.marker || anychart.createNFIMError('Marker chart');
+
+
+/** @ignoreDoc */
+anychart.pie = anychart.pie || anychart.createNFIMError('Pie chart');
+
+
+/** @ignoreDoc */
+anychart.pie3d = anychart.pie3d || anychart.createNFIMError('3D Pie chart');
+
+
+/** @ignoreDoc */
+anychart.pyramid = anychart.pyramid || anychart.createNFIMError('Pyramid chart');
+
+
+/** @ignoreDoc */
+anychart.radar = anychart.radar || anychart.createNFIMError('Radar chart');
+
+
+/** @ignoreDoc */
+anychart.polar = anychart.polar || anychart.createNFIMError('Polar chart');
+
+
+/** @ignoreDoc */
+anychart.sparkline = anychart.sparkline || anychart.createNFIMError('Sparkline chart');
+
+
+/** @ignoreDoc */
+anychart.heatMap = anychart.heatMap || anychart.createNFIMError('HeatMap chart');
+
+
+/** @ignoreDoc */
+anychart.circularGauge = anychart.circularGauge || anychart.createNFIMError('Circular gauge');
+
+
+/** @ignoreDoc */
+anychart.gauges.circular = anychart.gauges.circular || anychart.createNFIMError('Circular gauge');
+
+
+/** @ignoreDoc */
+anychart.gauges.linear = anychart.gauges.linear || anychart.createNFIMError('Linear gauge');
+
+
+/** @ignoreDoc */
+anychart.gauges.tank = anychart.gauges.tank || anychart.createNFIMError('Tank gauge');
+
+
+/** @ignoreDoc */
+anychart.gauges.thermometer = anychart.gauges.thermometer || anychart.createNFIMError('Thermometer gauge');
+
+
+/** @ignoreDoc */
+anychart.gauges.led = anychart.gauges.led || anychart.createNFIMError('LED gauge');
+
+
+/** @ignoreDoc */
+anychart.map = anychart.map || anychart.createNFIMError('Map');
+
+
+/** @ignoreDoc */
+anychart.choropleth = anychart.choropleth || anychart.createNFIMError('Choropleth map');
+
+
+/** @ignoreDoc */
+anychart.bubbleMap = anychart.bubbleMap || anychart.createNFIMError('Bubble map');
+
+
+/** @ignoreDoc */
+anychart.connector = anychart.connector || anychart.createNFIMError('Connector map');
+
+
+/** @ignoreDoc */
+anychart.markerMap = anychart.markerMap || anychart.createNFIMError('Marker map');
+
+
+/** @ignoreDoc */
+anychart.seatMap = anychart.seatMap || anychart.createNFIMError('Seat map');
+
+
+/** @ignoreDoc */
+anychart.ganttProject = anychart.ganttProject || anychart.createNFIMError('Gantt Project chart');
+
+
+/** @ignoreDoc */
+anychart.ganttResource = anychart.ganttResource || anychart.createNFIMError('Gantt Resource chart');
+
+
+/** @ignoreDoc */
+anychart.stock = anychart.stock || anychart.createNFIMError('Stock chart');
+
+
+/** @ignoreDoc */
+anychart.toolbar = anychart.toolbar || anychart.createNFIMError('Toolbar');
+
+
+/** @ignoreDoc */
+anychart.ganttToolbar = anychart.ganttToolbar || anychart.createNFIMError('Gantt toolbar');
+
+
+/** @ignoreDoc */
+anychart.treeMap = anychart.treeMap || anychart.createNFIMError('TreeMap chart');
+
+
+//region ------ Standalones
+/** @ignoreDoc */
+anychart.standalones.background = anychart.standalones.background || anychart.createNFIMError('anychart.standalones.Background');
+
+
+/** @ignoreDoc */
+anychart.ui.background = anychart.ui.background || anychart.createNFIMError('anychart.ui.Background');
+
+
+/** @ignoreDoc */
+anychart.standalones.colorRange = anychart.standalones.colorRange || anychart.createNFIMError('anychart.standalones.ColorRange');
+
+
+/** @ignoreDoc */
+anychart.ui.colorRange = anychart.ui.colorRange || anychart.createNFIMError('anychart.ui.ColorRange');
+
+
+/** @ignoreDoc */
+anychart.standalones.dataGrid = anychart.standalones.dataGrid || anychart.createNFIMError('anychart.standalones.DataGrid');
+
+
+/** @ignoreDoc */
+anychart.ui.dataGrid = anychart.ui.dataGrid || anychart.createNFIMError('anychart.ui.DataGrid');
+
+
+/** @ignoreDoc */
+anychart.standalones.label = anychart.standalones.label || anychart.createNFIMError('anychart.standalones.Label');
+
+
+/** @ignoreDoc */
+anychart.ui.label = anychart.ui.label || anychart.createNFIMError('anychart.ui.Label');
+
+
+/** @ignoreDoc */
+anychart.standalones.labelsFactory = anychart.standalones.labelsFactory || anychart.createNFIMError('anychart.standalones.LabelsFactory');
+
+
+/** @ignoreDoc */
+anychart.ui.labelsFactory = anychart.ui.labelsFactory || anychart.createNFIMError('anychart.ui.LabelsFactory');
+
+
+/** @ignoreDoc */
+anychart.standalones.legend = anychart.standalones.legend || anychart.createNFIMError('anychart.standalones.Legend');
+
+
+/** @ignoreDoc */
+anychart.ui.legend = anychart.ui.legend || anychart.createNFIMError('anychart.ui.Legend');
+
+
+/** @ignoreDoc */
+anychart.standalones.markersFactory = anychart.standalones.markersFactory || anychart.createNFIMError('anychart.standalones.MarkersFactory');
+
+
+/** @ignoreDoc */
+anychart.ui.markersFactory = anychart.ui.markersFactory || anychart.createNFIMError('anychart.ui.MarkersFactory');
+
+
+/** @ignoreDoc */
+anychart.standalones.projectTimeline = anychart.standalones.projectTimeline || anychart.createNFIMError('anychart.standalones.ProjectTimeline');
+
+
+/** @ignoreDoc */
+anychart.ui.projectTimeline = anychart.ui.projectTimeline || anychart.createNFIMError('anychart.ui.ProjectTimeline');
+
+
+/** @ignoreDoc */
+anychart.standalones.resourceTimeline = anychart.standalones.resourceTimeline || anychart.createNFIMError('anychart.standalones.ResourceTimeline');
+
+
+/** @ignoreDoc */
+anychart.ui.resourceTimeline = anychart.ui.resourceTimeline || anychart.createNFIMError('anychart.ui.ResourceTimeline');
+
+
+/** @ignoreDoc */
+anychart.standalones.resourceList = anychart.standalones.resourceList || anychart.createNFIMError('anychart.standalones.ResourceList');
+
+
+/** @ignoreDoc */
+anychart.standalones.scroller = anychart.standalones.scroller || anychart.createNFIMError('anychart.standalones.scroller');
+
+
+/** @ignoreDoc */
+anychart.ui.scroller = anychart.ui.scroller || anychart.createNFIMError('anychart.ui.Scroller');
+
+
+/** @ignoreDoc */
+anychart.standalones.table = anychart.standalones.table || anychart.createNFIMError('anychart.standalones.Table');
+
+
+/** @ignoreDoc */
+anychart.ui.table = anychart.ui.table || anychart.createNFIMError('anychart.ui.Table');
+
+
+/** @ignoreDoc */
+anychart.standalones.title = anychart.standalones.title || anychart.createNFIMError('anychart.standalones.Title');
+
+
+/** @ignoreDoc */
+anychart.ui.title = anychart.ui.title || anychart.createNFIMError('anychart.ui.Title');
+
+
+/** @ignoreDoc */
+anychart.standalones.axes.linear = anychart.standalones.axes.linear || anychart.createNFIMError('anychart.standalones.axes.Linear');
+
+
+/** @ignoreDoc */
+anychart.standalones.axes.polar = anychart.standalones.axes.polar || anychart.createNFIMError('anychart.standalones.axes.Polar');
+
+
+/** @ignoreDoc */
+anychart.standalones.axes.radar = anychart.standalones.axes.radar || anychart.createNFIMError('anychart.standalones.axes.Radar');
+
+
+/** @ignoreDoc */
+anychart.standalones.axes.radial = anychart.standalones.axes.radial || anychart.createNFIMError('anychart.standalones.axes.Radial');
+
+
+/** @ignoreDoc */
+anychart.axes.linear = anychart.axes.linear || anychart.createNFIMError('anychart.axes.Linear');
+
+
+/** @ignoreDoc */
+anychart.axes.polar = anychart.axes.polar || anychart.createNFIMError('anychart.axes.Polar');
+
+
+/** @ignoreDoc */
+anychart.axes.radar = anychart.axes.radar || anychart.createNFIMError('anychart.axes.Radar');
+
+
+/** @ignoreDoc */
+anychart.axes.radial = anychart.axes.radial || anychart.createNFIMError('anychart.axes.Radial');
+
+
+/** @ignoreDoc */
+anychart.axisMarkers.line = anychart.axisMarkers.line || anychart.createNFIMError('anychart.axisMarkers.Line');
+
+
+/** @ignoreDoc */
+anychart.axisMarkers.range = anychart.axisMarkers.range || anychart.createNFIMError('anychart.axisMarkers.Range');
+
+
+/** @ignoreDoc */
+anychart.axisMarkers.text = anychart.axisMarkers.text || anychart.createNFIMError('anychart.axisMarkers.Text');
+
+
+/** @ignoreDoc */
+anychart.standalones.axisMarkers.line = anychart.standalones.axisMarkers.line || anychart.createNFIMError('anychart.standalones.axisMarkers.Line');
+
+
+/** @ignoreDoc */
+anychart.standalones.axisMarkers.range = anychart.standalones.axisMarkers.range || anychart.createNFIMError('anychart.standalones.axisMarkers.Range');
+
+
+/** @ignoreDoc */
+anychart.standalones.axisMarkers.text = anychart.standalones.axisMarkers.text || anychart.createNFIMError('anychart.standalones.axisMarkers.Text');
+
+
+/** @ignoreDoc */
+anychart.grids.linear = anychart.grids.linear || anychart.createNFIMError('anychart.grids.Linear');
+
+
+/** @ignoreDoc */
+anychart.grids.linear3d = anychart.grids.linear3d || anychart.createNFIMError('anychart.grids.Linear3d');
+
+
+/** @ignoreDoc */
+anychart.grids.polar = anychart.grids.polar || anychart.createNFIMError('anychart.grids.Polar');
+
+
+/** @ignoreDoc */
+anychart.grids.radar = anychart.grids.radar || anychart.createNFIMError('anychart.grids.Radar');
+
+
+/** @ignoreDoc */
+anychart.standalones.grids.linear = anychart.standalones.grids.linear || anychart.createNFIMError('anychart.standalones.grids.Linear');
+
+
+/** @ignoreDoc */
+anychart.standalones.grids.linear3d = anychart.standalones.grids.linear3d || anychart.createNFIMError('anychart.standalones.grids.Linear3d');
+
+
+/** @ignoreDoc */
+anychart.standalones.grids.polar = anychart.standalones.grids.polar || anychart.createNFIMError('anychart.standalones.grids.Polar');
+
+
+/** @ignoreDoc */
+anychart.standalones.grids.radar = anychart.standalones.grids.radar || anychart.createNFIMError('anychart.standalones.grids.Radar');
+
+
+//endregion
+//region ------ UI
+/** @ignoreDoc */
+anychart.ui.contextMenu = anychart.ui.contextMenu || /** @type {function():null} */ (function(opt_fromTheme) {
+  if (!opt_fromTheme) {
+    anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Context Menu']);
+  }
   return null;
 });
 
 
-/**
- * @ignoreDoc
- */
-anychart.ganttToolbar = anychart.ganttToolbar || /** @type {function():null} */ (function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['Gantt toolbar']);
-  return null;
-});
+/** @ignoreDoc */
+anychart.ui.ganttToolbar = anychart.ui.ganttToolbar || anychart.createNFIMError('Gantt toolbar');
 
 
-/**
- * @ignoreDoc
- */
-anychart.treeMap = anychart.treeMap || function() {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_FEATURE_IN_MODULE, null, ['TreeMap chart']);
-};
+/** @ignoreDoc */
+anychart.ui.preloader = anychart.ui.preloader || anychart.createNFIMError('Preloader');
+
+
+/** @ignoreDoc */
+anychart.ui.rangePicker = anychart.ui.rangePicker || anychart.createNFIMError('Range picker');
+
+
+/** @ignoreDoc */
+anychart.ui.rangeSelector = anychart.ui.rangeSelector || anychart.createNFIMError('Range selector');
+//endregion
+//endregion
 
 
 if (COMPILED) {
@@ -1100,3 +1175,56 @@ goog.exportSymbol('anychart.appendTheme', anychart.appendTheme);
 goog.exportSymbol('anychart.toolbar', anychart.toolbar);
 goog.exportSymbol('anychart.ganttToolbar', anychart.ganttToolbar);
 goog.exportSymbol('anychart.treeMap', anychart.treeMap);
+goog.exportSymbol('anychart.standalones.background', anychart.standalones.background);
+goog.exportSymbol('anychart.ui.background', anychart.ui.background);
+goog.exportSymbol('anychart.standalones.colorRange', anychart.standalones.colorRange);
+goog.exportSymbol('anychart.ui.colorRange', anychart.ui.colorRange);
+goog.exportSymbol('anychart.standalones.dataGrid', anychart.standalones.dataGrid);
+goog.exportSymbol('anychart.ui.dataGrid', anychart.ui.dataGrid);
+goog.exportSymbol('anychart.standalones.label', anychart.standalones.label);
+goog.exportSymbol('anychart.ui.label', anychart.ui.label);
+goog.exportSymbol('anychart.standalones.labelsFactory', anychart.standalones.labelsFactory);
+goog.exportSymbol('anychart.ui.labelsFactory', anychart.ui.labelsFactory);
+goog.exportSymbol('anychart.standalones.legend', anychart.standalones.legend);
+goog.exportSymbol('anychart.ui.legend', anychart.ui.legend);
+goog.exportSymbol('anychart.standalones.markersFactory', anychart.standalones.markersFactory);
+goog.exportSymbol('anychart.ui.markersFactory', anychart.ui.markersFactory);
+goog.exportSymbol('anychart.standalones.projectTimeline', anychart.standalones.projectTimeline);
+goog.exportSymbol('anychart.ui.projectTimeline', anychart.ui.projectTimeline);
+goog.exportSymbol('anychart.standalones.resourceTimeline', anychart.standalones.resourceTimeline);
+goog.exportSymbol('anychart.ui.resourceTimeline', anychart.ui.resourceTimeline);
+goog.exportSymbol('anychart.standalones.resourceList', anychart.standalones.resourceList);
+goog.exportSymbol('anychart.standalones.scroller', anychart.standalones.scroller);
+goog.exportSymbol('anychart.ui.scroller', anychart.ui.scroller);
+goog.exportSymbol('anychart.standalones.table', anychart.standalones.table);
+goog.exportSymbol('anychart.ui.table', anychart.ui.table);
+goog.exportSymbol('anychart.standalones.title', anychart.standalones.title);
+goog.exportSymbol('anychart.ui.title', anychart.ui.title);
+goog.exportSymbol('anychart.standalones.axes.linear', anychart.standalones.axes.linear);
+goog.exportSymbol('anychart.standalones.axes.polar', anychart.standalones.axes.polar);
+goog.exportSymbol('anychart.standalones.axes.radar', anychart.standalones.axes.radar);
+goog.exportSymbol('anychart.standalones.axes.radial', anychart.standalones.axes.radial);
+goog.exportSymbol('anychart.axes.linear', anychart.axes.linear);
+goog.exportSymbol('anychart.axes.polar', anychart.axes.polar);
+goog.exportSymbol('anychart.axes.radar', anychart.axes.radar);
+goog.exportSymbol('anychart.axes.radial', anychart.axes.radial);
+goog.exportSymbol('anychart.axisMarkers.line', anychart.axisMarkers.line);
+goog.exportSymbol('anychart.axisMarkers.range', anychart.axisMarkers.range);
+goog.exportSymbol('anychart.axisMarkers.text', anychart.axisMarkers.text);
+goog.exportSymbol('anychart.standalones.axisMarkers.line', anychart.standalones.axisMarkers.line);
+goog.exportSymbol('anychart.standalones.axisMarkers.range', anychart.standalones.axisMarkers.range);
+goog.exportSymbol('anychart.standalones.axisMarkers.text', anychart.standalones.axisMarkers.text);
+goog.exportSymbol('anychart.grids.linear', anychart.grids.linear);
+goog.exportSymbol('anychart.grids.linear3d', anychart.grids.linear3d);
+goog.exportSymbol('anychart.grids.polar', anychart.grids.polar);
+goog.exportSymbol('anychart.grids.radar', anychart.grids.radar);
+goog.exportSymbol('anychart.standalones.grids.linear', anychart.standalones.grids.linear);
+goog.exportSymbol('anychart.standalones.grids.linear3d', anychart.standalones.grids.linear3d);
+goog.exportSymbol('anychart.standalones.grids.polar', anychart.standalones.grids.polar);
+goog.exportSymbol('anychart.standalones.grids.radar', anychart.standalones.grids.radar);
+goog.exportSymbol('anychart.ui.contextMenu', anychart.ui.contextMenu);
+goog.exportSymbol('anychart.ui.ganttToolbar', anychart.ui.ganttToolbar);
+goog.exportSymbol('anychart.ui.preloader', anychart.ui.preloader);
+goog.exportSymbol('anychart.ui.rangePicker', anychart.ui.rangePicker);
+goog.exportSymbol('anychart.ui.rangeSelector', anychart.ui.rangeSelector);
+

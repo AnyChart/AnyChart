@@ -920,8 +920,9 @@ anychart.core.ui.LegendItem.prototype.calculateBounds_ = function() {
     var maxTextWidth = legendItemMaxWidth - (this.iconEnabled_ ? this.iconSize_ + this.iconTextSpacing_ : 0);
     this.textElement_.width(maxTextWidth);
   } else if (this.textElement_.textOverflow() == acgraph.vector.Text.TextOverflow.ELLIPSIS) {
+    var overflowWidth;
     // DVF-2119
-    var overflowWidth = Math.min(parentWidth - (this.iconEnabled_ ? this.iconSize_ + this.iconTextSpacing_ : 0), textBounds.width);
+    overflowWidth = parentWidth ? Math.min(parentWidth - (this.iconEnabled_ ? this.iconSize_ + this.iconTextSpacing_ : 0), textBounds.width) : textBounds.width;
 
     // in the context of DVF-2184
     // Anton Kagakin:

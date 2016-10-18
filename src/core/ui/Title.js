@@ -1,5 +1,5 @@
 goog.provide('anychart.core.ui.Title');
-
+goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.Background');
@@ -40,6 +40,7 @@ goog.require('goog.graphics.AffineTransform');
  * @extends {anychart.core.VisualBase}
  * @implements {anychart.core.settings.IObjectWithSettings}
  * @implements {anychart.core.settings.IResolvable}
+ * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.ui.Title = function() {
   anychart.core.ui.Title.base(this, 'constructor');

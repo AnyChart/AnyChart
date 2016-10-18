@@ -1,6 +1,7 @@
 goog.provide('anychart.core.axes.Linear');
 goog.require('acgraph');
 goog.require('anychart.color');
+goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.axes.Ticks');
 goog.require('anychart.core.reporting');
@@ -26,6 +27,7 @@ goog.require('anychart.utils');
  *    .container(stage).draw();
  * @constructor
  * @extends {anychart.core.VisualBase}
+ * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.axes.Linear = function() {
   this.suspendSignalsDispatching();

@@ -2,6 +2,7 @@ goog.provide('anychart.core.ui.Timeline');
 
 
 goog.require('acgraph.vector.Path');
+goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.axisMarkers.GanttLine');
 goog.require('anychart.core.axisMarkers.GanttRange');
 goog.require('anychart.core.axisMarkers.GanttText');
@@ -24,6 +25,7 @@ goog.require('goog.fx.Dragger');
  * @param {boolean=} opt_isResources - Flag if TL must have a controller that works in 'Resources' mode.
  * @constructor
  * @extends {anychart.core.ui.BaseGrid}
+ * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.ui.Timeline = function(opt_controller, opt_isResources) {
   goog.base(this, opt_controller, opt_isResources);

@@ -1,5 +1,6 @@
 goog.provide('anychart.core.ui.Legend');
 goog.require('acgraph.vector.Text.TextOverflow');
+goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.Text');
 goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.LegendItem');
@@ -22,6 +23,7 @@ goog.require('goog.object');
  * Legend element.
  * @constructor
  * @implements {anychart.core.utils.ITokenProvider}
+ * @implements {anychart.core.IStandaloneBackend}
  * @extends {anychart.core.Text}
  */
 anychart.core.ui.Legend = function() {
@@ -1048,12 +1050,25 @@ anychart.core.ui.Legend.prototype.calculateContentHeight_ = function() {
 
 
 /**
+ * @param {anychart.math.Rect} bounds Bounds.
+ * @return {boolean} Whether bounds are empty.
+ * @private
+ */
+anychart.core.ui.Legend.prototype.hiddenBounds_ = function(bounds) {
+  return ((bounds.width <= 0) && (bounds.height <= 0));
+};
+
+
+/**
  * Calculate legend bounds.
  * @private
  */
 anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
   /** @type {anychart.math.Rect} */
   var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
+  if (this.hiddenBounds_(parentBounds))
+    parentBounds = null;
+
   /** @type {number} */
   var parentWidth;
   /** @type {number} */
@@ -1405,23 +1420,6 @@ anychart.core.ui.Legend.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
     this.rootElement.parent(container);
-    if (stage) {
-      if (this.dependsOnContainerSize()) {
-        stage.listen(
-            acgraph.vector.Stage.EventType.STAGE_RESIZE,
-            this.resizeHandler_,
-            false,
-            this
-        );
-      } else {
-        stage.unlisten(
-            acgraph.vector.Stage.EventType.STAGE_RESIZE,
-            this.resizeHandler_,
-            false,
-            this
-        );
-      }
-    }
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
@@ -1523,39 +1521,7 @@ anychart.core.ui.Legend.prototype.draw = function() {
 
   if (manualSuspend) stage.resume();
 
-  //todo(Anton Kagakin): refactor this mess!
-  this.listenSignals(this.invalidateHandler_, this);
-  //end mess
-
   return this;
-};
-
-
-/**
- * Define, is one of the bounds settings set in percent.
- * @return {boolean} Is one of the bounds settings set in percent.
- */
-anychart.core.ui.Legend.prototype.dependsOnContainerSize = function() {
-  return anychart.utils.isPercent(this.width_) ||
-      anychart.utils.isPercent(this.height_) ||
-      goog.isNull(this.width_) ||
-      goog.isNull(this.height_);
-};
-
-
-/**
- * @private
- */
-anychart.core.ui.Legend.prototype.invalidateHandler_ = function() {
-  anychart.globalLock.onUnlock(this.draw, this);
-};
-
-
-/**
- * @private
- */
-anychart.core.ui.Legend.prototype.resizeHandler_ = function() {
-  this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 };
 
 

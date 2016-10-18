@@ -1,6 +1,7 @@
 goog.provide('anychart.core.ui.BaseGrid');
 
 goog.require('acgraph.vector.Path');
+goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.gantt.Controller');
 goog.require('anychart.core.ui.IInteractiveGrid');
@@ -26,6 +27,7 @@ goog.require('goog.fx.Dragger');
  * @constructor
  * @extends {anychart.core.VisualBaseWithBounds}
  * @implements {anychart.core.ui.IInteractiveGrid}
+ * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.ui.BaseGrid = function(opt_controller, opt_isResource) {
   goog.base(this);
