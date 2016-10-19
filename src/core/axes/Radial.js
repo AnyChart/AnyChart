@@ -9,8 +9,7 @@ goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.utils.AxisLabelsContextProvider');
 goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
-goog.require('anychart.scales.Base');
-goog.require('anychart.scales.ScatterBase');
+goog.require('anychart.scales');
 
 
 

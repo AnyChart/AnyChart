@@ -6,6 +6,7 @@ goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
+goog.require('anychart.scales');
 
 
 

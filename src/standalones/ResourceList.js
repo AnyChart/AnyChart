@@ -36,7 +36,7 @@ anychart.standalones.ResourceList.prototype.dependsOnContainerSize = function() 
 anychart.standalones.resourceList = function(opt_data) {
   var list = new anychart.standalones.ResourceList();
   list.setupByJSON(anychart.getFullTheme()['standalones']['resourceList'], true);
-  list.data(opt_data);
+  list['data'](opt_data);
   return list;
 };
 

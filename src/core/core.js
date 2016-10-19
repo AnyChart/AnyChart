@@ -11,6 +11,7 @@ goog.provide('anychart.core.IGroupingProvider');
 goog.provide('anychart.core.IPlot');
 goog.provide('anychart.core.IStandaloneBackend');
 goog.require('goog.events.Listenable');
+goog.forwardDeclare('anychart.core.series.TypeConfig');
 
 
 

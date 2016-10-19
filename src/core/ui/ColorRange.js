@@ -6,6 +6,8 @@ goog.require('anychart.core.ui.MarkersFactory');
 goog.require('anychart.math.Rect');
 goog.require('anychart.scales.LinearColor');
 goog.require('anychart.scales.OrdinalColor');
+goog.forwardDeclare('anychart.core.map.series.Base');
+goog.forwardDeclare('anychart.charts.TreeMap');
 
 
 
@@ -193,9 +195,9 @@ anychart.core.ui.ColorRange.prototype.calculateRangeRegions_ = function() {
   var scale = this.scale();
   if (scale && scale instanceof anychart.scales.OrdinalColor) {
     this.rangeRegions_ = {};
-    var iterator = this.targetSeries_.getResetIterator();
+    var iterator = /** @type {anychart.core.map.series.Base|anychart.charts.TreeMap} */ (this.targetSeries_).getResetIterator();
     while (iterator.advance()) {
-      var pointValue = iterator.get(this.targetSeries_.referenceValueNames[1]);
+      var pointValue = iterator.get(/** @type {anychart.core.map.series.Base|anychart.charts.TreeMap} */ (this.targetSeries_).referenceValueNames[1]);
       var range = scale.getRangeByValue(/** @type {number} */(pointValue));
       if (range) {
         if (!this.rangeRegions_[range.sourceIndex]) this.rangeRegions_[range.sourceIndex] = [];
@@ -948,7 +950,7 @@ anychart.core.ui.ColorRange.prototype.handleMouseOverAndMove = function(event) {
       }
 
       if (scale && series) {
-        var map = series.getChart();
+        var map = /** @type {anychart.charts.Map|anychart.charts.TreeMap} */ (series.getChart());
         if (map.interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
 
           var dispatchUnhover = this.points_ && !goog.array.every(points, function(el) {

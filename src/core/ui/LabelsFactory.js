@@ -2417,7 +2417,8 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
 
     var formatProvider = this.formatProvider();
     if (goog.isDef(formatProvider) && formatProvider['series'] && (!this.textFormatterCallsCache_ || !goog.isDef(this.textFormatterCallsCache_[this.getIndex()]))) {
-      formatProvider['series'].getIterator().select(goog.isDef(formatProvider['index']) ? formatProvider['index'] : this.getIndex());
+      var series = /** @type {{getIterator: Function}} */ (formatProvider['series']);
+      series.getIterator().select(goog.isDef(formatProvider['index']) ? formatProvider['index'] : this.getIndex());
     }
     var text = parentLabelsFactory.callTextFormatter(mergedSettings['textFormatter'], formatProvider, this.getIndex());
 

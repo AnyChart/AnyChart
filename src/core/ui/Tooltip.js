@@ -878,7 +878,7 @@ anychart.core.ui.Tooltip.prototype.showAsUnion_ = function(points, clientX, clie
     for (var i = 0; i < points.length; i++) {
       var point = points[i];
       if (point) {
-        var series = point['series'];
+        var series = /** @type {anychart.core.SeriesBase|anychart.core.series.Base} */ (point['series']);
         var tooltip = series.tooltip();
         if (!series.enabled() || !tooltip.enabled())
           break;
