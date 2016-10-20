@@ -220,14 +220,13 @@ anychart.core.ui.Legend.prototype.items = function(opt_value) {
  * .
  * @param {Array.<Object>} sourceArray Array of source.
  * @return {boolean} .
- * @private
  */
-anychart.core.ui.Legend.prototype.sourceEquals_ = function(sourceArray) {
-  if (!this.itemsSource_ || !sourceArray || (this.itemsSource_.length != sourceArray.length))
+anychart.core.ui.Legend.prototype.sourceEquals = function(sourceArray) {
+  if (!this.itemsSourceInternal || !sourceArray || (this.itemsSourceInternal.length != sourceArray.length))
     return false;
 
   for (var i = 0; i < sourceArray.length; i++) {
-    if (this.itemsSource_[i] != sourceArray[i])
+    if (this.itemsSourceInternal[i] != sourceArray[i])
       return false;
   }
 
@@ -246,14 +245,13 @@ anychart.core.ui.Legend.prototype.itemsSource = function(opt_value) {
         goog.array.slice(/** @type {Array.<anychart.core.SeparateChart|anychart.core.stock.Plot>} */ (opt_value), 0) :
         goog.isNull(opt_value) ?
             opt_value : [opt_value];
-    if (!this.sourceEquals_(opt_value)) {
-      this.itemsSource_ = opt_value;
-      this.recreateItems_ = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    if (!this.sourceEquals(opt_value)) {
+      this.itemsSourceInternal = opt_value;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LEGEND_RECREATE_ITEMS, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
-  return this.itemsSource_;
+  return this.itemsSourceInternal;
 };
 
 
@@ -848,11 +846,11 @@ anychart.core.ui.Legend.prototype.getPixelBounds = function() {
 anychart.core.ui.Legend.prototype.createItemsFromSource_ = function() {
   if (goog.isArray(this.customItems_))
     return this.customItems_;
-  else if (goog.isDefAndNotNull(this.itemsSource_)) {
+  else if (goog.isDefAndNotNull(this.itemsSourceInternal)) {
     var source;
     var items = [];
-    for (var i = 0; i < this.itemsSource_.length; i++) {
-      source = /** @type {anychart.core.SeparateChart|anychart.core.stock.Plot} */ (this.itemsSource_[i]);
+    for (var i = 0; i < this.itemsSourceInternal.length; i++) {
+      source = /** @type {anychart.core.SeparateChart|anychart.core.stock.Plot} */ (this.itemsSourceInternal[i]);
       if (!goog.isNull(source) && goog.isFunction(source.createLegendItemsProvider))
         items = goog.array.concat(items, source.createLegendItemsProvider(this.itemsSourceMode_, this.itemsTextFormatter_));
     }
@@ -1066,7 +1064,7 @@ anychart.core.ui.Legend.prototype.hiddenBounds_ = function(bounds) {
 anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
   /** @type {anychart.math.Rect} */
   var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
-  if (this.hiddenBounds_(parentBounds))
+  if (goog.isDefAndNotNull(parentBounds) && this.hiddenBounds_(parentBounds))
     parentBounds = null;
 
   /** @type {number} */
@@ -1798,9 +1796,9 @@ anychart.core.ui.Legend.prototype.makePointEvent_ = function(event) {
   var itemSource = null;
   var itemIndexInSource = NaN;
   var item = this.items_[itemIndex];
-  if (item && this.itemsSource_) {
-    for (var i = 0; i < this.itemsSource_.length; i++) {
-      var source = /** @type {anychart.core.SeparateChart|anychart.core.stock.Plot} */ (this.itemsSource_[i]);
+  if (item && this.itemsSourceInternal) {
+    for (var i = 0; i < this.itemsSourceInternal.length; i++) {
+      var source = /** @type {anychart.core.SeparateChart|anychart.core.stock.Plot} */ (this.itemsSourceInternal[i]);
       if (goog.getUid(source) == item.sourceUid() &&
           goog.isFunction(source.legendItemCanInteractInMode) &&
           source.legendItemCanInteractInMode(this.itemsSourceMode_)) {

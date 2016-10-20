@@ -165,7 +165,9 @@ anychart.core.stock.Plot.prototype.frameHighlightY_;
  */
 anychart.core.stock.Plot.prototype.SUPPORTED_SIGNALS =
     anychart.core.VisualBaseWithBounds.prototype.SUPPORTED_SIGNALS |
-    anychart.Signal.NEEDS_RECALCULATION;
+    anychart.Signal.NEEDS_RECALCULATION |
+    // signal dispatched on highlight
+    anychart.Signal.NEED_UPDATE_LEGEND;
 
 
 /**
@@ -1352,6 +1354,9 @@ anychart.core.stock.Plot.prototype.ensureBoundsDistributed_ = function() {
       legendTitleDate = NaN;
     }
     this.updateLegend_(seriesBounds, legendTitleDate);
+    // we need forced dispatch signal here to update standalone legend on series enable/disable
+    // we do not worry about it because only standalone legend listens this signal
+    this.dispatchSignal(anychart.Signal.NEED_UPDATE_LEGEND, true);
     seriesBounds = this.legend().getRemainingBounds();
 
     if (this.xAxis_) {
@@ -1416,21 +1421,15 @@ anychart.core.stock.Plot.prototype.ensureBoundsDistributed_ = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Updates legend.
- * @param {anychart.math.Rect=} opt_seriesBounds
- * @param {number=} opt_titleValue
- * @private
+ * Gets autoText for legend title.
+ * @param {string|Function} legendFormatter Legend title formatter.
+ * @param {number=} opt_titleValue Value for title.
+ * @return {?string} Title auto text or null.
  */
-anychart.core.stock.Plot.prototype.updateLegend_ = function(opt_seriesBounds, opt_titleValue) {
-  var legend = /** @type {anychart.core.ui.Legend} */(this.legend());
-  legend.suspendSignalsDispatching();
-  legend.container(this.rootLayer_);
-  if (opt_seriesBounds) {
-    legend.parentBounds(opt_seriesBounds);
-    legend.width(opt_seriesBounds.width);
-  }
+anychart.core.stock.Plot.prototype.getLegendAutoText = function(legendFormatter, opt_titleValue) {
+  opt_titleValue = opt_titleValue || (isNaN(this.highlightedValue_) ? this.chart_.getLastDate() : this.highlightedValue_);
   var formatter;
-  if (!isNaN(opt_titleValue) && (formatter = legend.titleFormatter())) {
+  if (!isNaN(opt_titleValue) && (formatter = legendFormatter)) {
     if (goog.isString(formatter))
       formatter = anychart.core.utils.TokenParser.getInstance().getTextFormatter(formatter);
     if (goog.isFunction(formatter)) {
@@ -1447,9 +1446,30 @@ anychart.core.stock.Plot.prototype.updateLegend_ = function(opt_seriesBounds, op
         'dataIntervalUnit': anychart.enums.TokenType.STRING,
         'dataIntervalUnitCount': anychart.enums.TokenType.STRING
       });
-      legend.title().autoText(formatter.call(context, context));
+      return formatter.call(context, context);
     }
   }
+  return null;
+};
+
+
+/**
+ * Updates legend.
+ * @param {anychart.math.Rect=} opt_seriesBounds
+ * @param {number=} opt_titleValue
+ * @private
+ */
+anychart.core.stock.Plot.prototype.updateLegend_ = function(opt_seriesBounds, opt_titleValue) {
+  var legend = /** @type {anychart.core.ui.Legend} */(this.legend());
+  legend.suspendSignalsDispatching();
+  legend.container(this.rootLayer_);
+  if (opt_seriesBounds) {
+    legend.parentBounds(opt_seriesBounds);
+    legend.width(opt_seriesBounds.width);
+  }
+  var autoText = this.getLegendAutoText(/** @type {string|Function} */ (legend.titleFormatter()), opt_titleValue);
+  if (!goog.isNull(autoText))
+    legend.title().autoText(autoText);
   if (!legend.itemsSource())
     legend.itemsSource(this);
   legend.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LEGEND_RECREATE_ITEMS);
@@ -1627,6 +1647,7 @@ anychart.core.stock.Plot.prototype.highlight = function(value) {
   if (this.legend_ && this.legend_.enabled()) {
     this.updateLegend_(null, value);
   }
+  this.dispatchSignal(anychart.Signal.NEED_UPDATE_LEGEND);
 };
 
 
@@ -1647,6 +1668,7 @@ anychart.core.stock.Plot.prototype.unhighlight = function() {
   if (this.legend_ && this.legend_.enabled()) {
     this.updateLegend_(null, this.chart_.getLastDate());
   }
+  this.dispatchSignal(anychart.Signal.NEED_UPDATE_LEGEND);
 };
 //endregion
 

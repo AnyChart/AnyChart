@@ -30,6 +30,80 @@ anychart.standalones.Legend.prototype.dependsOnContainerSize = function() {
 //endregion
 
 
+/**
+ * Removes signal listeners.
+ * @private
+ */
+anychart.standalones.Legend.prototype.unlistenStockPlots_ = function() {
+  if (!this.itemsSourceInternal) return;
+  var source;
+  for (var i = 0; i < this.itemsSourceInternal.length; i++) {
+    source = this.itemsSourceInternal[i];
+    if (source instanceof anychart.core.stock.Plot) {
+      source.unlistenSignals(this.onStockPlotSignal_, source);
+    }
+  }
+};
+
+
+/**
+ * Adds signal listeners on stock plots.
+ * @private
+ */
+anychart.standalones.Legend.prototype.listenStockPlots_ = function() {
+  if (!this.itemsSourceInternal) return;
+  var source;
+  for (var i = 0; i < this.itemsSourceInternal.length; i++) {
+    source = this.itemsSourceInternal[i];
+    if (source instanceof anychart.core.stock.Plot) {
+      source.listenSignals(this.onStockPlotSignal_, this);
+    }
+  }
+};
+
+
+/**
+ * @param {anychart.SignalEvent} event
+ * @private
+ */
+anychart.standalones.Legend.prototype.onStockPlotSignal_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEED_UPDATE_LEGEND)) {
+    this.suspendSignalsDispatching();
+    var plot = /** @type {anychart.core.stock.Plot} */ (event.target);
+    var autoText = plot.getLegendAutoText(/** @type {string|Function} */ (this.titleFormatter()));
+    if (!goog.isNull(autoText))
+      this.title().autoText(autoText);
+    this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LEGEND_RECREATE_ITEMS);
+    if (this.container())
+      this.draw();
+    this.resumeSignalsDispatching(false);
+  }
+};
+
+
+/**
+ * Getter/setter for items source.
+ * @param {(anychart.core.SeparateChart|anychart.core.stock.Plot|Array.<anychart.core.SeparateChart|anychart.core.stock.Plot>)=} opt_value Items source.
+ * @return {(anychart.core.SeparateChart|anychart.core.stock.Plot|Array.<anychart.core.SeparateChart|anychart.core.stock.Plot>|anychart.core.ui.Legend)} Items source or self for chaining.
+ */
+anychart.standalones.Legend.prototype.itemsSource = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = goog.isArray(opt_value) ?
+        goog.array.slice(/** @type {Array.<anychart.core.SeparateChart|anychart.core.stock.Plot>} */ (opt_value), 0) :
+        goog.isNull(opt_value) ?
+            opt_value : [opt_value];
+    if (!this.sourceEquals(opt_value)) {
+      this.unlistenStockPlots_();
+      this.itemsSourceInternal = opt_value;
+      this.listenStockPlots_();
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LEGEND_RECREATE_ITEMS, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.itemsSourceInternal;
+};
+
+
 /** @inheritDoc */
 anychart.standalones.Legend.prototype.createItem = function() {
   return new anychart.standalones.LegendItem();

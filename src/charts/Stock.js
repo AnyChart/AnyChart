@@ -1117,6 +1117,9 @@ anychart.charts.Stock.prototype.distributeBoundsLocal_ = function(boundsArray, t
  * @private
  */
 anychart.charts.Stock.prototype.plotInvalidated_ = function(e) {
+  // this signal is dispatched by plot to update custom legend on highlight
+  if (e.hasSignal(anychart.Signal.NEED_UPDATE_LEGEND))
+    return;
   var state = anychart.ConsistencyState.STOCK_PLOTS_APPEARANCE;
   if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED))
     state |= anychart.ConsistencyState.BOUNDS;
