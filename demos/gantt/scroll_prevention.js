@@ -16,6 +16,9 @@ anychart.onDocumentReady(function() {
 
   chart.zoomTo(951350400000, 954201600000);
 
+  chart.fitAll();
+  chart.collapseAll();
+
 });
 
 var data = [
@@ -85,39 +88,5 @@ var data = [
   {"id": "64", "name": "Develop distribution structure", parent: "48", "progressValue": "0%", "actualStart": 959360400000, "actualEnd": 959392800000, "connectTo": "65", "connectorType": "FinishStart"},
   {"id": "65", "name": "Describe risks and opportunities", parent: "48", "progressValue": "20%", "actualStart": 959558400000, "actualEnd": 959731200000, "connectTo": "66", "connectorType": "FinishStart"},
   {"id": "66", "name": "Publish the business plan", parent: "48", "progressValue": "0%", "actualStart": 959792400000, "actualEnd": 959824800000, "connectTo": "67", "connectorType": "FinishStart"},
-  {"id": "67", "name": "Confirm decision to proceed", parent: "48", "progressValue": "0%", "actualStart": 959824800000, "actualEnd": 959824800000, "connectTo": "69", "connectorType": "FinishStart"},
-  {"id": "68", "name": "Phase 4 - Proceed With Startup Plan", "progressValue": "24%", "actualStart": 959817600000, "actualEnd": 967075200000},
-  {"id": "69", "name": "Choose a location", parent: "68", "progressValue": "36%", "actualStart": 959817600000, "actualEnd": 959904000000, "connectTo": "72", "connectorType": "FinishStart"},
-  {"id": "70", "name": "Establish Business Structure", parent: "68", "progressValue": "14%", "actualStart": 959904000000, "actualEnd": 963273600000},
-  {"id": "71", "name": "Choose a Name", parent: "70", "progressValue": "33%", "actualStart": 959904000000, "actualEnd": 960249600000},
-  {"id": "72", "name": "Identify implications", parent: "71", "progressValue": "40%", "actualStart": 959904000000, "actualEnd": 959990400000, "connectTo": "73", "connectorType": "FinishStart"},
-  {"id": "73", "name": "Research name availability", parent: "71", "progressValue": "0%", "actualStart": 960224400000, "actualEnd": 960256800000, "connectTo": "87", "connectorType": "StartStart"},
-  {"id": "74", "name": "Choose a Bank", parent: "70", "progressValue": "0%", "actualStart": 960310800000, "actualEnd": 960861600000},
-  {"id": "75", "name": "Establish accounts", parent: "74", "progressValue": "0%", "actualStart": 960310800000, "actualEnd": 960602400000, "connectTo": "77", "connectorType": "StartStart"},
-  {"id": "76", "name": "Establish line of credit", parent: "74", "progressValue": "0%", "actualStart": 960829200000, "actualEnd": 960861600000, "connectTo": "77", "connectorType": "StartStart"},
-  {"id": "77", "name": "Choose legal representation", parent: "70", "progressValue": "0%", "actualStart": 960829200000, "actualEnd": 960861600000, "connectTo": "78", "connectorType": "FinishStart"},
-  {"id": "78", "name": "Select business tax-basis category", parent: "70", "progressValue": "0%", "actualStart": 960915600000, "actualEnd": 961034400000, "connectTo": "79", "connectorType": "FinishStart"},
-  {"id": "79", "name": "Choose capital funding source", parent: "70", "progressValue": "0%", "actualStart": 961088400000, "actualEnd": 961207200000, "connectTo": "98", "connectorType": "FinishStart"},
-  {"id": "80", "name": "Commit capital funding", parent: "70", "progressValue": "0%", "actualStart": 961207200000, "actualEnd": 961207200000, "connectTo": "82", "connectorType": "FinishStart"},
-  {"id": "81", "name": "Establish the Operating Control Base", parent: "70", "progressValue": "19%", "actualStart": 961372800000, "actualEnd": 963273600000},
-  {"id": "82", "name": "Choose and set up the accounting system", parent: "81", "progressValue": "0%", "actualStart": 961434000000, "actualEnd": 961552800000, "connectTo": "83", "connectorType": "FinishStart"},
-  {"id": "83", "name": "Obtain required licenses and permits", parent: "81", "progressValue": "38%", "actualStart": 961545600000, "actualEnd": 962409600000, "connectTo": "84", "connectorType": "FinishStart"},
-  {"id": "84", "name": "Obtain needed insurance", parent: "81", "progressValue": "0%", "actualStart": 962643600000, "actualEnd": 962935200000, "connectTo": "85", "connectorType": "FinishStart"},
-  {"id": "85", "name": "Establish security plan", parent: "81", "progressValue": "0%", "actualStart": 962989200000, "actualEnd": 963280800000, "connectTo": "91", "connectorType": "FinishStart"},
-  {"id": "86", "name": "Develop Marketing Program", parent: "70", "progressValue": "0%", "actualStart": 960224400000, "actualEnd": 960516000000},
-  {"id": "87", "name": "Establish an advertising program", parent: "86", "progressValue": "0%", "actualStart": 960224400000, "actualEnd": 960343200000, "connectTo": "88", "connectorType": "FinishStart"},
-  {"id": "88", "name": "Develop a logo", parent: "86", "progressValue": "0%", "actualStart": 960397200000, "actualEnd": 960429600000, "connectTo": "89", "connectorType": "FinishStart"},
-  {"id": "89", "name": "Order promotional materials", parent: "86", "progressValue": "0%", "actualStart": 960483600000, "actualEnd": 960516000000, "connectTo": "91", "connectorType": "FinishStart"},
-  {"id": "90", "name": "Provide Physical Facilities", parent: "68", "progressValue": "16%", "actualStart": 963273600000, "actualEnd": 967075200000},
-  {"id": "91", "name": "Secure operation space", parent: "90", "progressValue": "0%", "actualStart": 963334800000, "actualEnd": 963885600000, "connectTo": "92", "connectorType": "FinishStart"},
-  {"id": "92", "name": "Select computer network hardware", parent: "90", "progressValue": "100%", "actualStart": 963939600000, "actualEnd": 963972000000, "connectTo": "93", "connectorType": "FinishStart"},
-  {"id": "93", "name": "Select computer software", parent: "90", "progressValue": "0%", "actualStart": 964026000000, "actualEnd": 964058400000, "connectTo": "94", "connectorType": "FinishStart"},
-  {"id": "94", "name": "Establish utilities", parent: "90", "progressValue": "67%", "actualStart": 964137600000, "actualEnd": 964569600000, "connectTo": "95", "connectorType": "FinishStart"},
-  {"id": "95", "name": "Provide furniture and equipment", parent: "90", "progressValue": "15%", "actualStart": 964569600000, "actualEnd": 965088000000, "connectTo": "96", "connectorType": "FinishStart"},
-  {"id": "96", "name": "Move in", parent: "90", "progressValue": "13%", "actualStart": 966988800000, "actualEnd": 967075200000},
-  {"id": "97", "name": "Provide Staffing", parent: "68", "progressValue": "30%", "actualStart": 961372800000, "actualEnd": 966988800000},
-  {"id": "98", "name": "Interview and test candidates", parent: "97", "progressValue": "43%", "actualStart": 961372800000, "actualEnd": 962928000000, "connectTo": "99", "connectorType": "FinishStart"},
-  {"id": "99", "name": "Hire staff", parent: "97", "progressValue": "10%", "actualStart": 962928000000, "actualEnd": 964137600000, "connectTo": "100", "connectorType": "FinishStart"},
-  {"id": "100", "name": "Train staff", parent: "97", "progressValue": "31%", "actualStart": 965088000000, "actualEnd": 966988800000},
-  {"id": "102", "name": "Mau & Ago business", parent: "97", "progressValue": "40%", "actualStart": 951350400000, "actualEnd": 951955200000}
+  {"id": "67", "name": "Confirm decision to proceed", parent: "48", "progressValue": "0%", "actualStart": 959824800000, "actualEnd": 959824800000, "connectTo": "69", "connectorType": "FinishStart"}
 ];

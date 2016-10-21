@@ -1637,34 +1637,47 @@ anychart.core.ui.BaseGrid.prototype.mouseWheelHandler_ = function(e) {
     dy = dy * 15;
   }
 
-  var preventDefault = true;
-  var allowScrolling = true;
-  var bodyScrollLeft = goog.global['document']['body']['scrollLeft'];
+  var denyBodyScrollLeft = !goog.global['document']['body']['scrollLeft'];
   var horizontalScroll = this.getHorizontalScrollBar();
   var verticalScroll = this.controller.getScrollBar();
 
-  if (scrollsVertically && !scrollsHorizontally) {
-    preventDefault = verticalScroll.startRatio() > 0 &&
-        verticalScroll.endRatio() < 1;
-    allowScrolling = preventDefault;
+  var scrollsUp, scrollsLeft;
+  var preventHorizontally = false;
+  var preventVertically = false;
+
+  if (scrollsVertically) {
+    scrollsUp = dy < 0;
+    var vStart = verticalScroll.startRatio();
+    var vEnd = verticalScroll.endRatio();
+    preventVertically = (vStart == 0 && vEnd == 1) ? false :
+        ((vStart > 0 && vEnd < 1) ||
+        (vStart == 0 && !scrollsUp && vEnd != 1) ||
+        (vEnd == 1 && scrollsUp && vStart != 0));
   }
 
-  if (scrollsHorizontally && !scrollsVertically) {
-    preventDefault = !bodyScrollLeft || (horizontalScroll.startRatio() > 0 &&
-        horizontalScroll.endRatio() < 1);
+  if (scrollsHorizontally) {
+    scrollsLeft = dx < 0;
+    var hStart = horizontalScroll.startRatio();
+    var hEnd = horizontalScroll.endRatio();
+    if (scrollsLeft) {
+      preventHorizontally = (hStart == 0 && hEnd == 1) ? denyBodyScrollLeft :
+          (hStart > 0 && hEnd < 1) ||
+          (hEnd == 1 && hStart != 0) ||
+          (hStart == 0 && denyBodyScrollLeft);
+    } else {
+      preventHorizontally = (hStart == 0 && hEnd == 1) ? false :
+          (hStart > 0 && hEnd < 1) ||
+          (hStart == 0 && hEnd != 1);
+    }
   }
 
-  if (scrollsHorizontally && scrollsVertically) {
-    preventDefault = !bodyScrollLeft || (verticalScroll.startRatio() > 0 &&
-        verticalScroll.endRatio() < 1 &&
-        horizontalScroll.startRatio() > 0 &&
-        horizontalScroll.endRatio() < 1);
-
-    allowScrolling = preventDefault;
+  /*
+    Literally means that default page scrolling must be prevented and we scroll BaseGrid instead.
+   */
+  if (preventVertically || preventHorizontally) {
+    e.preventDefault();
+    this.scroll(dx, dy);
   }
-
-  if (allowScrolling) this.scroll(dx, dy);
-  if (preventDefault) e.preventDefault();
 };
 
 
@@ -2078,7 +2091,8 @@ anychart.core.ui.BaseGrid.prototype.initKeysFeatures = function() {
 /**
  * @inheritDoc
  */
-anychart.core.ui.BaseGrid.prototype.deleteKeyHandler = function(e) {};
+anychart.core.ui.BaseGrid.prototype.deleteKeyHandler = function(e) {
+};
 
 
 /**
