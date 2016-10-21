@@ -1606,7 +1606,7 @@ anychart.core.ui.BaseGrid.prototype.drawRowFills_ = function() {
   var clipRect = new anychart.math.Rect(this.pixelBoundsCache.left, this.pixelBoundsCache.top - 1,
       this.pixelBoundsCache.width, totalTop - this.pixelBoundsCache.top + 1);
   this.getClipLayer().clip(clipRect);
-  this.getCellsLayer().clip(clipRect);
+  // this.getCellsLayer().clip(clipRect);
   this.getDrawLayer().clip(clipRect);
 
 };
@@ -1765,7 +1765,7 @@ anychart.core.ui.BaseGrid.prototype.drawInternal = function(positionRecalculated
     this.eventsRect_ = this.base_.rect();
     this.registerDisposable(this.eventsRect_);
     this.eventsRect_
-        .fill('#fff 0.00001')
+        .fill(anychart.color.TRANSPARENT_HANDLER)
         .stroke(null)
         .zIndex(anychart.core.ui.BaseGrid.EVENTS_RECT_Z_INDEX);
 
