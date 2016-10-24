@@ -2516,6 +2516,46 @@ anychart.enums.GanttDataFields = {
 
 
 /**
+ * Gantt range anchor.
+ * @enum {string}
+ * TODO (A.Kudryavtsev): Actually is anychart.enums.StockRangeAnchor from DVF-2364-range-selection-ui.
+ */
+anychart.enums.GanttRangeAnchor = {
+  FIRST_DATE: 'firstDate',
+  FIRST_VISIBLE_DATE: 'firstVisibleDate',
+  LAST_VISIBLE_DATE: 'lastVisibleDate',
+  LAST_DATE: 'lastDate'
+};
+
+
+/**
+ * Normalizes range anchor.
+ * @param {*} value
+ * @param {?anychart.enums.GanttRangeAnchor=} opt_default Custom default value (defaults to FIRST_VISIBLE_DATE).
+ * @return {?anychart.enums.GanttRangeAnchor}
+ * TODO (A.Kudryavtsev): Actually is anychart.enums.normalizeStockRangeAnchor from DVF-2364-range-selection-ui.
+ */
+anychart.enums.normalizeGanttRangeAnchor = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'firstdate':
+    case 'fd':
+      return anychart.enums.GanttRangeAnchor.FIRST_DATE;
+    case 'firstvisibledate':
+    case 'fvd':
+      return anychart.enums.GanttRangeAnchor.FIRST_VISIBLE_DATE;
+    case 'lastvisibledate':
+    case 'lvd':
+      return anychart.enums.GanttRangeAnchor.LAST_VISIBLE_DATE;
+    case 'lastdate':
+    case 'ld':
+      return anychart.enums.GanttRangeAnchor.LAST_DATE;
+  }
+  return goog.isDef(opt_default) ? opt_default : anychart.enums.GanttRangeAnchor.FIRST_VISIBLE_DATE;
+};
+
+
+/**
  * Timeline visual element types.
  * In current time (21 Jul 2015) doesn't need to be exported.
  * @enum {number}
@@ -5722,6 +5762,11 @@ goog.exportSymbol('anychart.enums.GanttDataFields.CONNECTOR_TYPE', anychart.enum
 goog.exportSymbol('anychart.enums.GanttDataFields.START_MARKER', anychart.enums.GanttDataFields.START_MARKER);
 goog.exportSymbol('anychart.enums.GanttDataFields.END_MARKER', anychart.enums.GanttDataFields.END_MARKER);
 goog.exportSymbol('anychart.enums.GanttDataFields.LABEL', anychart.enums.GanttDataFields.LABEL);
+
+goog.exportSymbol('anychart.enums.GanttRangeAnchor.FIRST_DATE', anychart.enums.GanttRangeAnchor.FIRST_DATE);
+goog.exportSymbol('anychart.enums.GanttRangeAnchor.FIRST_VISIBLE_DATE', anychart.enums.GanttRangeAnchor.FIRST_VISIBLE_DATE);
+goog.exportSymbol('anychart.enums.GanttRangeAnchor.LAST_DATE', anychart.enums.GanttRangeAnchor.LAST_DATE);
+goog.exportSymbol('anychart.enums.GanttRangeAnchor.LAST_VISIBLE_DATE', anychart.enums.GanttRangeAnchor.LAST_VISIBLE_DATE);
 
 goog.exportSymbol('anychart.enums.ConnectorType.FINISH_START', anychart.enums.ConnectorType.FINISH_START);
 goog.exportSymbol('anychart.enums.ConnectorType.FINISH_FINISH', anychart.enums.ConnectorType.FINISH_FINISH);

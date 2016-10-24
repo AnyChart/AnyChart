@@ -302,20 +302,6 @@ anychart.core.ui.Timeline = function(opt_controller, opt_isResources) {
   this.selectedConnectorData_ = null;
 
   /**
-   * Minimum gap.
-   * @type {number}
-   * @private
-   */
-  this.minimumGap_ = .01;
-
-  /**
-   * Maximum gap.
-   * @type {number}
-   * @private
-   */
-  this.maximumGap_ = .01;
-
-  /**
    * Whether baseline bar must be placed above the actual interval bar.
    * @type {boolean}
    * @private
@@ -1421,17 +1407,14 @@ anychart.core.ui.Timeline.prototype.onMarkersSignal_ = function(event) {
  * Gets/sets minimum gap.
  * @param {number=} opt_value - Value to be set.
  * @return {number|anychart.core.ui.Timeline} - Current value or itself for method chaining.
+ * @deprecated Use this.scale().minimumGap() instead.
  */
 anychart.core.ui.Timeline.prototype.minimumGap = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = +opt_value || 0;
-    if (this.minimumGap_ != opt_value) {
-      this.minimumGap_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
-      return this;
-    }
+    this.scale_.minimumGap(opt_value);
+    return this;
   }
-  return this.minimumGap_;
+  return /** @type {number} */ (this.scale_.minimumGap());
 };
 
 
@@ -1439,17 +1422,14 @@ anychart.core.ui.Timeline.prototype.minimumGap = function(opt_value) {
  * Gets/sets maximum gap.
  * @param {number=} opt_value - Value to be set.
  * @return {number|anychart.core.ui.Timeline} - Current value or itself for method chaining.
+ * @deprecated Use this.scale().maximumGap() instead.
  */
 anychart.core.ui.Timeline.prototype.maximumGap = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = +opt_value || 0;
-    if (this.maximumGap_ != opt_value) {
-      this.maximumGap_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
-      return this;
-    }
+    this.scale_.maximumGap(opt_value);
+    return this;
   }
-  return this.maximumGap_;
+  return /** @type {number} */ (this.scale_.maximumGap());
 };
 
 
@@ -2936,6 +2916,11 @@ anychart.core.ui.Timeline.prototype.drawBar_ = function(bounds, item, type, opt_
       //It is not in "case anychart.enums.GanttDataFields.BASELINE:"section because this flag is for label coloring.
       //Label belongs to "actual" bar, not to "baseline" bar.
       isActualBaseline = (isTreeDataItem && item.get(anychart.enums.GanttDataFields.BASELINE_START) && item.get(anychart.enums.GanttDataFields.BASELINE_END));
+      if (isTreeDataItem) {
+        item.tree().suspendSignalsDispatching();
+        item.meta('relBounds', bounds);
+        item.tree().resumeSignalsDispatching(false);
+      }
   }
 
   var stroke = /** @type {acgraph.vector.Stroke} */ (settings && goog.isDef(settings[anychart.enums.GanttDataFields.STROKE]) ?
@@ -2976,6 +2961,11 @@ anychart.core.ui.Timeline.prototype.drawBar_ = function(bounds, item, type, opt_
       label.anchor(anychart.enums.Anchor.CENTER);
     }
     if (rawLabel) label.setup(rawLabel);
+    if (isTreeDataItem) {
+      item.tree().suspendSignalsDispatching();
+      item.meta('labelBounds', this.labels().measure(label, positionProvider, rawLabel));
+      item.tree().resumeSignalsDispatching(false);
+    }
   }
 
   //var bar = this.getDrawLayer().genNextChild();
@@ -3384,6 +3374,10 @@ anychart.core.ui.Timeline.prototype.drawAsMilestone_ = function(dataItem, totalT
     var bounds = new anychart.math.Rect(left, top, diagonal, diagonal);
     milestone.currBounds = bounds;
 
+    dataItem.tree().suspendSignalsDispatching();
+    dataItem.meta('relBounds', bounds);
+    dataItem.tree().resumeSignalsDispatching(false);
+
     var rawLabel = settings ? settings[anychart.enums.GanttDataFields.LABEL] : void 0;
     var textValue;
     if (rawLabel && goog.isDef(rawLabel['value'])) {
@@ -3399,6 +3393,9 @@ anychart.core.ui.Timeline.prototype.drawAsMilestone_ = function(dataItem, totalT
       var formatProvider = {'value': textValue};
       var label = this.labels().add(formatProvider, positionProvider);
       if (rawLabel) label.setup(rawLabel);
+      dataItem.tree().suspendSignalsDispatching();
+      dataItem.meta('labelBounds', this.labels().measure(label));
+      dataItem.tree().resumeSignalsDispatching(false);
     }
 
     var isSelected = dataItem == this.selectedItem;
@@ -3910,41 +3907,35 @@ anychart.core.ui.Timeline.prototype.drawLowTicks_ = function(ticks) {
  * Recalculates scale depending on current controller's state.
  */
 anychart.core.ui.Timeline.prototype.initScale = function() {
-  var totalMin = this.controller.getMinDate();
-  var totalMax = this.controller.getMaxDate();
+  var newScale = this.scale_.isEmpty();
+  var range = this.scale_.getRange();
+
+  var dataMin = this.controller.getMinDate();
+  var dataMax = this.controller.getMaxDate();
+  this.scale_.suspendSignalsDispatching();
+  this.scale_.setDataRange(dataMin, dataMax);
 
   //Without these settings scale will not be able to calculate ratio by anychart.enums.GanttDateTimeMarkers.
-  this.scale_.trackedTotalMin = totalMin;
-  this.scale_.trackedTotalMax = totalMax;
-
-  var minGap = this.minimumGap() * (totalMax - totalMin);
-  var maxGap = this.maximumGap() * (totalMax - totalMin);
-
-  var newScale = this.scale_.isEmpty();
-  var newTotalMin = totalMin - minGap;
-  var newTotalMax = totalMax + maxGap;
-
-  var delta = 0;
-  var min = 0, max = 0;
-  if (!newScale) {
-    var range = this.scale_.getRange();
-    max = range['max'];
-    min = range['min'];
-    delta = max - min;
-  }
-
-  this.scale_.setTotalRange(newTotalMin, newTotalMax);
-
-  if (delta) { //this saves currently visible range after totalRange changes.
-    range = this.scale_.getRange();
-    min = range['min'];
-    this.scale_.zoomTo(min, min + delta);
-  }
+  this.scale_.trackedDataMin = dataMin;
+  this.scale_.trackedDataMax = dataMax;
 
   if (newScale) {
-    var newRange = Math.round((totalMax - totalMin) / 10);
-    this.scale_.setRange(newTotalMin, totalMin + newRange); // Initial visible range: 10% of total range.
+    var totalRange = this.scale_.getTotalRange();
+    var newRange = Math.round((totalRange['max'] - totalRange['min']) / 10);
+    this.scale_.zoomTo(totalRange['min'], totalRange['min'] + newRange); // Initial visible range: 10% of total range.
+  } else {
+    var max = range['max'];
+    var min = range['min'];
+    var delta = max - min;
+
+    if (delta) { //this saves currently visible range after totalRange changes.
+      range = this.scale_.getRange();
+      min = range['min'];
+      this.scale_.zoomTo(min, min + delta);
+    }
   }
+
+  this.scale_.resumeSignalsDispatching(true);
 };
 
 
@@ -4203,6 +4194,20 @@ anychart.core.ui.Timeline.prototype.scroll = function(horizontalPixelOffset, ver
   }
 
   anychart.core.Base.resumeSignalsDispatchingTrue(this, this.scale_, this.controller);
+};
+
+
+/**
+ * Gets timeline scale.
+ * @param {Object=} opt_value - Scale config.
+ * @return {anychart.core.ui.Timeline|anychart.scales.GanttDateTime}
+ */
+anychart.core.ui.Timeline.prototype.scale = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.scale_.setup(opt_value);
+    return this;
+  }
+  return this.scale_;
 };
 
 
@@ -4663,6 +4668,7 @@ anychart.core.ui.Timeline.prototype['minimumGap'] = anychart.core.ui.Timeline.pr
 anychart.core.ui.Timeline.prototype['maximumGap'] = anychart.core.ui.Timeline.prototype.maximumGap;
 anychart.core.ui.Timeline.prototype['labels'] = anychart.core.ui.Timeline.prototype.labels;
 anychart.core.ui.Timeline.prototype['markers'] = anychart.core.ui.Timeline.prototype.markers;
+anychart.core.ui.Timeline.prototype['scale'] = anychart.core.ui.Timeline.prototype.scale;
 
 anychart.core.ui.Timeline.prototype['connectorPreviewStroke'] = anychart.core.ui.Timeline.prototype.connectorPreviewStroke;
 anychart.core.ui.Timeline.prototype['editPreviewFill'] = anychart.core.ui.Timeline.prototype.editPreviewFill;

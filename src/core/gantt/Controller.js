@@ -462,6 +462,13 @@ anychart.core.gantt.Controller.prototype.linearizeData_ = function() {
     this.autoCalcItem_(/** @type {anychart.data.Tree.DataItem} */ (root), 0);
   }
 
+  if (this.minDate_ == this.maxDate_) {
+    var date = this.minDate_;
+    var interval = 43200000; //ms in 12 hours.
+    this.minDate_ = date - interval;
+    this.maxDate_ = date + interval;
+  }
+
   this.data_.resumeSignalsDispatching(false);
   return this;
 };
@@ -703,8 +710,8 @@ anychart.core.gantt.Controller.prototype.setGanttLifeYears_ = function() {
   var minGap = 0;
   var maxGap = 0;
   if (this.timeline_) {
-    minGap = this.timeline_.minimumGap();
-    maxGap = this.timeline_.maximumGap();
+    minGap = this.timeline_.scale().minimumGap();
+    maxGap = this.timeline_.scale().maximumGap();
   }
 
   var k = (1 + minGap + maxGap);

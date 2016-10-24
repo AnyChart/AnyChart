@@ -4016,20 +4016,14 @@
     "anychart.scales.GanttDateTime": {
       "type": "object",
       "properties": {
-        "range": {
-          "type": "object",
-          "properties": {
-            "min": {"type": "number"},
-            "max": {"type": "number"}
-          }
-        },
-        "totalRange": {
-          "type": "object",
-          "properties": {
-            "min": {"type": "number"},
-            "max": {"type": "number"}
-          }
-        }
+        "visibleMinimum": {"type": "number"},
+        "visibleMaximum": {"type": "number"},
+        "minimum": {"type": "number"},
+        "maximum": {"type": "number"},
+        "softMinimum": {"type": "number"},
+        "softMaximum": {"type": "number"},
+        "minimumGap": {"type": "number"},
+        "maximumGap": {"type": "number"}
       }
     },
     "anychart.scales.Geo": {

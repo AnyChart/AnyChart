@@ -2123,10 +2123,14 @@
     </xsd:complexType>
 
     <xsd:complexType name="GanttDateTimeScale">
-        <xsd:all>
-            <xsd:element minOccurs="0" maxOccurs="1" name="range" type="simple.MinMaxRange"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="total_range" type="simple.MinMaxRange"/>
-        </xsd:all>
+        <xsd:attribute name="visible_minimum" type="xsd:double"/>
+        <xsd:attribute name="visible_maximum" type="xsd:double"/>
+        <xsd:attribute name="soft_minimum" type="xsd:double"/>
+        <xsd:attribute name="soft_maximum" type="xsd:double"/>
+        <xsd:attribute name="minimum" type="xsd:double"/>
+        <xsd:attribute name="maximum" type="xsd:double"/>
+        <xsd:attribute name="minimum_gap" type="xsd:double"/>
+        <xsd:attribute name="maximum_gap" type="xsd:double"/>
     </xsd:complexType>
 
     <!-- Gauge elements -->
