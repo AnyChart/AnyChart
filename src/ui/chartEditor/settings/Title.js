@@ -283,7 +283,6 @@ anychart.ui.chartEditor.settings.Title.prototype.createDom = function() {
     enabledBtn.setNormalValue(false);
     enabledBtn.setCheckedValue(true);
     if (this.enabledButtonContainer_) {
-      // todo удалить это! и enabledButtonContainer_
       enabledBtn.render(this.enabledButtonContainer_);
       enabledBtn.setParent(this);
     } else {
