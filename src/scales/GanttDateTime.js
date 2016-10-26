@@ -861,10 +861,15 @@ anychart.scales.GanttDateTime.prototype.zoomIn = function(opt_zoomFactor) {
 
   opt_zoomFactor = opt_zoomFactor ? (1 / opt_zoomFactor) : (1 / anychart.scales.GanttDateTime.DEFAULT_ZOOM_FACTOR);
   var range = this.max_ - this.min_;
-  if (range > anychart.scales.GanttDateTime.MILLISECONDS_IN_MINUTE) {
-    var msInterval = Math.round(range * (opt_zoomFactor - 1) / 2);
-    this.setRange(this.min_ - msInterval, this.max_ + msInterval);
+  var msInterval = Math.round(range * (opt_zoomFactor - 1) / 2);
+  var newMin = this.min_ - msInterval;
+  var newMax = this.max_ + msInterval;
+  if (Math.abs(newMin - newMax) <= anychart.scales.GanttDateTime.MILLISECONDS_IN_MINUTE) {
+    var middle = (this.min_ + this.max_) / 2;
+    newMin = middle - anychart.scales.GanttDateTime.MILLISECONDS_IN_MINUTE / 2;
+    newMax = middle + anychart.scales.GanttDateTime.MILLISECONDS_IN_MINUTE / 2;
   }
+  this.setRange(newMin, newMax);
 
   return this;
 };
