@@ -4132,17 +4132,24 @@ anychart.core.ui.Timeline.prototype.deleteKeyHandler = function(e) {
 
 
 /**
- * Generates horizontal scroll bar.
- * @return {anychart.core.ui.ScrollBar} - Scroll bar.
+ * Vertical scrollBar.
+ * @param {Object=} opt_value Object with settings.
+ * @return {anychart.core.ui.Timeline|anychart.core.ui.ScrollBar} ScrollBar or self for chaining.
  */
-anychart.core.ui.Timeline.prototype.getHorizontalScrollBar = function() {
+anychart.core.ui.Timeline.prototype.verticalScrollBar = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.controller.getScrollBar().setup(opt_value);
+    return this;
+  }
+  return this.controller.getScrollBar();
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.Timeline.prototype.horizontalScrollBar = function(opt_value) {
   if (!this.horizontalScrollBar_) {
     this.horizontalScrollBar_ = new anychart.core.ui.ScrollBar();
-    this.horizontalScrollBar_
-        .layout(anychart.enums.Layout.HORIZONTAL)
-        .buttonsVisible(false)
-        .mouseOutOpacity(.25)
-        .mouseOverOpacity(.45);
+    this.horizontalScrollBar_.layout(anychart.enums.Layout.HORIZONTAL);
 
     var scale = this.scale_;
     this.horizontalScrollBar_.listen(anychart.enums.EventType.SCROLL_CHANGE, function(e) {
@@ -4157,8 +4164,27 @@ anychart.core.ui.Timeline.prototype.getHorizontalScrollBar = function() {
       var end = Math.round(totalMin + endRatio * msRange);
       scale.setRange(start, end);
     });
+
+    this.horizontalScrollBar_.listenSignals(this.scrollBarInvalidated_, this);
   }
+
+  if (goog.isDef(opt_value)) {
+    this.horizontalScrollBar_.setup(opt_value);
+    return this;
+  }
+
   return this.horizontalScrollBar_;
+};
+
+
+/**
+ * Scrollbar invalidation.
+ * @param {anychart.SignalEvent} e Event.
+ * @private
+ */
+anychart.core.ui.Timeline.prototype.scrollBarInvalidated_ = function(e) {
+  if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED))
+    this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -4271,6 +4297,11 @@ anychart.core.ui.Timeline.prototype.serialize = function() {
   }
   if (textMarkers.length) json['textAxesMarkers'] = textMarkers;
 
+  if (this.horizontalScrollBar_)
+    json['horizontalScrollBar'] = this.horizontalScrollBar().serialize();
+
+  json['verticalScrollBar'] = this.verticalScrollBar().serialize();
+
   return json;
 };
 
@@ -4343,6 +4374,20 @@ anychart.core.ui.Timeline.prototype.setupByJSON = function(config) {
       this.textMarker(i, textAxesMarkers[i]);
     }
   }
+
+  if ('horizontalScrollBar' in config)
+    this.horizontalScrollBar(config['horizontalScrollBar']);
+
+  if ('verticalScrollBar' in config)
+    this.verticalScrollBar(config['verticalScrollBar']);
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.Timeline.prototype.disposeInternal = function() {
+  goog.dispose(this.horizontalScrollBar_);
+  this.horizontalScrollBar_ = null;
+  anychart.core.ui.Timeline.base(this, 'disposeInternal');
 };
 
 
@@ -4649,6 +4694,8 @@ anychart.core.ui.Timeline.prototype['editing'] = anychart.core.ui.Timeline.proto
 
 anychart.core.ui.Timeline.prototype['baselineAbove'] = anychart.core.ui.Timeline.prototype.baselineAbove;
 
+anychart.core.ui.Timeline.prototype['horizontalScrollBar'] = anychart.core.ui.Timeline.prototype.horizontalScrollBar;
+anychart.core.ui.Timeline.prototype['verticalScrollBar'] = anychart.core.ui.Timeline.prototype.verticalScrollBar;
 anychart.core.ui.Timeline.prototype['baseFill'] = anychart.core.ui.Timeline.prototype.baseFill;
 anychart.core.ui.Timeline.prototype['baseStroke'] = anychart.core.ui.Timeline.prototype.baseStroke;
 anychart.core.ui.Timeline.prototype['baselineFill'] = anychart.core.ui.Timeline.prototype.baselineFill;

@@ -1100,6 +1100,17 @@ anychart.themes.merging.mergingMap_ = [
     ]
   },
   {
+    defaultObj: 'defaultScrollBar',
+    targets: [
+      'defaultDataGrid.horizontalScrollBar',
+      'defaultDataGrid.verticalScrollBar',
+      'standalones.timeline.horizontalScrollBar',
+      'standalones.timeline.verticalScrollBar',
+      'ganttBase.timeline.horizontalScrollBar',
+      'ganttBase.timeline.verticalScrollBar'
+    ]
+  },
+  {
     defaultObj: 'defaultDataGrid',
     targets: [
       'ganttBase.dataGrid',

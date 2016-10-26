@@ -1414,6 +1414,24 @@
         <xsd:attributeGroup ref="attrs.TextSettings"/>
     </xsd:complexType>
 
+    <xsd:complexType name="core.ScrollBar">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="background_fill" type="Fill" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="background_stroke" type="Stroke" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="slider_fill" type="Fill" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="slider_stroke" type="Stroke" />
+        </xsd:all>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+        <xsd:attribute name="background_fill" type="xsd:string" />
+        <xsd:attribute name="background_stroke" type="xsd:string" />
+        <xsd:attribute name="slider_fill" type="xsd:string" />
+        <xsd:attribute name="slider_stroke" type="xsd:string" />
+        <xsd:attribute name="mouse_over_opacity" type="simple.Ratio" />
+        <xsd:attribute name="mouse_out_opacity" type="simple.Ratio" />
+        <xsd:attribute name="buttons_visible" type="simple.Bool" />
+        <xsd:attribute name="bar_size" type="xsd:double" />
+    </xsd:complexType>
+
     <xsd:complexType name="core.DataGrid">
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="row_stroke" type="Stroke"/>
@@ -1430,6 +1448,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="edit_structure_preview_dash_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="horizontal_scroll_bar" type="core.ScrollBar"/>
         </xsd:all>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
         <xsd:attribute name="is_standalone" type="simple.Bool"/>
@@ -1514,6 +1533,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="line_axes_markers" type="core.axisMarkers.Line_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="range_axes_markers" type="core.axisMarkers.Range_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="text_axes_markers" type="core.axisMarkers.Text_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="horizontal_scroll_bar" type="core.ScrollBar"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="vertical_scroll_bar" type="core.ScrollBar"/>
         </xsd:all>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
         <xsd:attribute name="is_standalone" type="simple.Bool"/>

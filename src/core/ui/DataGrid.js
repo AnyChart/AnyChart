@@ -602,17 +602,11 @@ anychart.core.ui.DataGrid.prototype.columnInvalidated_ = function(event) {
 };
 
 
-/**
- * @inheritDoc
- */
-anychart.core.ui.DataGrid.prototype.getHorizontalScrollBar = function() {
+/** @inheritDoc */
+anychart.core.ui.DataGrid.prototype.horizontalScrollBar = function(opt_value) {
   if (!this.horizontalScrollBar_) {
     this.horizontalScrollBar_ = new anychart.core.ui.ScrollBar();
-    this.horizontalScrollBar_
-        .layout(anychart.enums.Layout.HORIZONTAL)
-        .buttonsVisible(false)
-        .mouseOutOpacity(.25)
-        .mouseOverOpacity(.45);
+    this.horizontalScrollBar_.layout(anychart.enums.Layout.HORIZONTAL);
 
     var ths = this;
     this.horizontalScrollBar_.listen(anychart.enums.EventType.SCROLL_CHANGE, function(e) {
@@ -620,8 +614,27 @@ anychart.core.ui.DataGrid.prototype.getHorizontalScrollBar = function() {
       var horOffset = Math.round(startRatio * ths.totalGridsWidth);
       ths.horizontalOffset(horOffset);
     });
+
+    this.horizontalScrollBar_.listenSignals(this.scrollBarInvalidated_, this);
   }
+
+  if (goog.isDef(opt_value)) {
+    this.horizontalScrollBar_.setup(opt_value);
+    return this;
+  }
+
   return this.horizontalScrollBar_;
+};
+
+
+/**
+ * Scrollbar invalidation.
+ * @param {anychart.SignalEvent} e Event.
+ * @private
+ */
+anychart.core.ui.DataGrid.prototype.scrollBarInvalidated_ = function(e) {
+  if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED))
+    this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -862,6 +875,9 @@ anychart.core.ui.DataGrid.prototype.serialize = function() {
     json['columns'].push(col ? col.serialize() : false);
   }
 
+  if (this.horizontalScrollBar_)
+    json['horizontalScrollBar'] = this.horizontalScrollBar().serialize();
+
   return json;
 };
 
@@ -883,6 +899,17 @@ anychart.core.ui.DataGrid.prototype.setupByJSON = function(config) {
       if (col) this.column(i, col);
     }
   }
+
+  if ('horizontalScrollBar' in config)
+    this.horizontalScrollBar(config['horizontalScrollBar']);
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.DataGrid.prototype.disposeInternal = function() {
+  goog.dispose(this.horizontalScrollBar_);
+  this.horizontalScrollBar_ = null;
+  anychart.core.ui.DataGrid.base(this, 'disposeInternal');
 };
 
 
@@ -1837,7 +1864,7 @@ anychart.core.ui.DataGrid.prototype['data'] = anychart.core.ui.DataGrid.prototyp
 anychart.core.ui.DataGrid.prototype['startIndex'] = anychart.core.ui.DataGrid.prototype.startIndex;
 anychart.core.ui.DataGrid.prototype['endIndex'] = anychart.core.ui.DataGrid.prototype.endIndex;
 anychart.core.ui.DataGrid.prototype['getVisibleItems'] = anychart.core.ui.DataGrid.prototype.getVisibleItems;
-anychart.core.ui.DataGrid.prototype['getHorizontalScrollBar'] = anychart.core.ui.DataGrid.prototype.getHorizontalScrollBar;
+anychart.core.ui.DataGrid.prototype['horizontalScrollBar'] = anychart.core.ui.DataGrid.prototype.horizontalScrollBar;
 anychart.core.ui.DataGrid.prototype['horizontalOffset'] = anychart.core.ui.DataGrid.prototype.horizontalOffset;
 anychart.core.ui.DataGrid.prototype['verticalOffset'] = anychart.core.ui.DataGrid.prototype.verticalOffset;
 anychart.core.ui.DataGrid.prototype['tooltip'] = anychart.core.ui.DataGrid.prototype.tooltip;

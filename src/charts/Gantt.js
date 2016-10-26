@@ -5,7 +5,6 @@ goog.require('anychart.core.gantt.Controller');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.DataGrid');
 goog.require('anychart.core.ui.IInteractiveGrid');
-goog.require('anychart.core.ui.ScrollBar');
 goog.require('anychart.core.ui.Splitter');
 goog.require('anychart.core.ui.Timeline');
 goog.require('anychart.core.utils.GanttContextProvider');
@@ -145,7 +144,7 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
    */
   this.verticalScrollBar_ = this.controller_.getScrollBar();
   this.verticalScrollBar_.zIndex(anychart.charts.Gantt.Z_INDEX_SCROLL);
-  this.verticalScrollBar_.listenSignals(this.scrollInvalidated_, this.verticalScrollBar_);
+  this.verticalScrollBar_.listenSignals(this.scrollInvalidated_, this);
   this.registerDisposable(this.verticalScrollBar_);
 
   this.listenOnce(anychart.enums.EventType.CHART_DRAW, function() {
@@ -313,6 +312,8 @@ anychart.charts.Gantt.prototype.controllerInvalidated_ = function(event) {
  */
 anychart.charts.Gantt.prototype.scrollInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) event.target.draw();
+  if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED))
+    this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -1017,11 +1018,12 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
 
       var tlBounds = this.tl_.getPixelBounds();
 
+      var barSize = /** @type {number} */ (this.verticalScrollBar_.barSize());
       this.verticalScrollBar_.bounds(
-          (bounds.left + bounds.width - anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 1),
-          (tlBounds.top + this.headerHeight_ + anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE + 1),
-          anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE,
-          (tlBounds.height - this.headerHeight_ - 2 * anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 2)
+          (bounds.left + bounds.width - barSize - 1),
+          (tlBounds.top + this.headerHeight_ + barSize + 1),
+          barSize,
+          (tlBounds.height - this.headerHeight_ - 2 * barSize - 2)
       );
     }
   }
@@ -1048,7 +1050,7 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
 
 /** @inheritDoc */
 anychart.charts.Gantt.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.charts.Gantt.base(this, 'serialize');
 
   json['type'] = this.getType();
 
@@ -1067,7 +1069,7 @@ anychart.charts.Gantt.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.charts.Gantt.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+  anychart.charts.Gantt.base(this, 'setupByJSON', config);
 
   if ('controller' in config) this.controller_.setupByJSON(config['controller']);
 

@@ -3766,7 +3766,9 @@
               {"$ref": "#/definitions/anychart.core.axisMarkers.Text"}
             ]
           }
-        }
+        },
+        "horizontalScrollBar": {"$ref": "#/definitions/anychart.core.ui.ScrollBar"},
+        "verticalScrollBar": {"$ref": "#/definitions/anychart.core.ui.ScrollBar"}
       }
     },
 
@@ -4726,7 +4728,8 @@
         "editStructurePreviewFill": {"$ref": "#/definitions/fill"},
         "editStructurePreviewStroke": {"$ref": "#/definitions/stroke"},
         "editStructurePreviewDashStroke": {"$ref": "#/definitions/stroke"},
-        "editing": {"type": "boolean"}
+        "editing": {"type": "boolean"},
+        "horizontalScrollBar": {"$ref": "#/definitions/anychart.core.ui.ScrollBar"}
       }
     },
     "anychart.core.ui.DataGrid.Column": {
@@ -4740,6 +4743,20 @@
         "defaultWidth": {"type": "number"},
         "collapseExpandButtons": {"type": "boolean"},
         "depthPaddingMultiplier": {"type": "number"}
+      }
+    },
+    "anychart.core.ui.ScrollBar": {
+      "type": "object",
+      "allOf": [{"$ref": "#/definitions/anychart.core.VisualBase"}],
+      "properties": {
+        "backgroundFill": {"$ref": "#/definitions/fill"},
+        "backgroundStroke": {"$ref": "#/definitions/stroke"},
+        "sliderFill": {"$ref": "#/definitions/fill"},
+        "sliderStroke": {"$ref": "#/definitions/stroke"},
+        "mouseOverOpacity": {"type": "number"},
+        "mouseOutOpacity": {"type": "number"},
+        "buttonsVisible": {"type": "boolean"},
+        "barSize": {"type": "number"}
       }
     },
 

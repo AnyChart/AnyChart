@@ -3612,6 +3612,20 @@ goog.provide('anychart.themes.defaultTheme');
       'selectHatchFill': false
     },
 
+    'defaultScrollBar': {
+      'barSize': 10,
+      'backgroundFill': '#e0e0e0',
+      'backgroundStroke': '#d5d5d5',
+      'sliderFill': '#d5d5d5',
+      'sliderStroke': '#656565',
+      'mouseOverOpacity': 0.45,
+      'mouseOutOpacity': 0.25,
+      'handlePositionChange': true,
+      'startRatio': '0',
+      'endRatio': '1',
+      'buttonsVisible': false
+    },
+
     'defaultDataGrid': {
       'isStandalone': true,
       'headerHeight': 25,

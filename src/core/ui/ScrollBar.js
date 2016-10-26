@@ -228,13 +228,6 @@ anychart.core.ui.ScrollBar.MAX_ROUND = 5;
 
 
 /**
- * Default scroll bar side size.
- * @type {number}
- */
-anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE = 10;
-
-
-/**
  * Minimal slider pixel size.
  * @type {number}
  */
@@ -289,7 +282,7 @@ anychart.core.ui.ScrollBar.prototype.backgroundStroke = function(opt_strokeOrFil
   if (goog.isDef(opt_strokeOrFill)) {
     var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(this.bgStroke_, val)) {
-      this.bgStroke_ = val;
+      this.bgStroke_ = /** @type {acgraph.vector.Stroke} */ (anychart.color.setOpacity(val, this.mouseOutOpacity_, false));
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -313,7 +306,7 @@ anychart.core.ui.ScrollBar.prototype.backgroundFill = function(opt_fillOrColorOr
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(this.bgFill_, val)) {
-      this.bgFill_ = val;
+      this.bgFill_ = /** @type {acgraph.vector.Fill} */ (anychart.color.setOpacity(val, this.mouseOutOpacity_, true));
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -336,7 +329,7 @@ anychart.core.ui.ScrollBar.prototype.sliderStroke = function(opt_strokeOrFill, o
   if (goog.isDef(opt_strokeOrFill)) {
     var val = acgraph.vector.normalizeStroke.apply(null, arguments);
     if (!anychart.color.equals(this.sliderStroke_, val)) {
-      this.sliderStroke_ = val;
+      this.sliderStroke_ = /** @type {acgraph.vector.Stroke} */ (anychart.color.setOpacity(val, this.mouseOutOpacity_, false));
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
@@ -360,12 +353,30 @@ anychart.core.ui.ScrollBar.prototype.sliderFill = function(opt_fillOrColorOrKeys
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
     if (!anychart.color.equals(this.sliderFill_, val)) {
-      this.sliderFill_ = val;
+      this.sliderFill_ = /** @type {acgraph.vector.Fill} */ (anychart.color.setOpacity(val, this.mouseOutOpacity_, true));
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
   return this.sliderFill_ || 'none';
+};
+
+
+/**
+ * Getter/setter for barSize.
+ * @param {number=} opt_value barSize.
+ * @return {number|anychart.core.ui.ScrollBar} barSize setting or self for chaining.
+ */
+anychart.core.ui.ScrollBar.prototype.barSize = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.toNumber(opt_value);
+    if (this.barSize_ != opt_value) {
+      this.barSize_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.barSize_;
 };
 
 
@@ -865,22 +876,11 @@ anychart.core.ui.ScrollBar.prototype.getBase_ = function() {
  * @private
  */
 anychart.core.ui.ScrollBar.prototype.setOpacity_ = function(value) {
-  this.suspendSignalsDispatching();
-  var bgFill = acgraph.vector.normalizeFill(this.bgFill_);
-  bgFill['opacity'] = value;
-
-  var bgStroke = acgraph.vector.normalizeStroke(this.bgStroke_);
-  bgStroke['opacity'] = value;
-
-  var sliderFill = acgraph.vector.normalizeFill(this.sliderFill_);
-  sliderFill['opacity'] = value;
-
-  var sliderStroke = acgraph.vector.normalizeStroke(this.sliderStroke_);
-  sliderStroke['opacity'] = value;
-
-  this.backgroundFill(bgFill).backgroundStroke(bgStroke);
-  this.sliderFill(sliderFill).sliderStroke(sliderStroke);
-  this.resumeSignalsDispatching(true);
+  this.bgFill_ = /** @type {acgraph.vector.Fill} */ (anychart.color.setOpacity(this.bgFill_, value, true));
+  this.bgStroke_ = /** @type {acgraph.vector.Stroke} */ (anychart.color.setOpacity(this.bgStroke_, value, false));
+  this.sliderFill_ = /** @type {acgraph.vector.Fill} */ (anychart.color.setOpacity(this.sliderFill_, value, true));
+  this.sliderStroke_ = /** @type {acgraph.vector.Stroke} */ (anychart.color.setOpacity(this.sliderStroke_, value, false));
+  this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -1228,13 +1228,10 @@ anychart.core.ui.ScrollBar.prototype.synchronizeBounds_ = function() {
  * @private
  */
 anychart.core.ui.ScrollBar.prototype.placeButtons_ = function() {
-  if (this.buttonsVisible_) {
-    if (!this.getForwardButton_().container()) this.forwardButton_.container(this.base_);
-    if (!this.getBackwardButton_().container()) this.backwardButton_.container(this.base_);
-  } else {
-    if (this.forwardButton_ && this.forwardButton_.container()) this.forwardButton_.container(null);
-    if (this.backwardButton_ && this.backwardButton_.container()) this.backwardButton_.container(null);
-  }
+  if (!this.getForwardButton_().container()) this.forwardButton_.container(this.base_);
+  if (!this.getBackwardButton_().container()) this.backwardButton_.container(this.base_);
+  this.getForwardButton_().enabled(this.buttonsVisible_);
+  this.getBackwardButton_().enabled(this.buttonsVisible_);
 
   if (this.buttonsVisible_ && this.forwardButton_ && this.backwardButton_) {
     this.forwardButton_.suspendSignalsDispatching();
@@ -1465,7 +1462,80 @@ anychart.core.ui.ScrollBar.prototype.dispatchScrollEvent_ = function(opt_source)
 };
 
 
+//region --- Setup/Dispose ---
+/** @inheritDoc */
+anychart.core.ui.ScrollBar.prototype.serialize = function() {
+  var json = anychart.core.ui.ScrollBar.base(this, 'serialize');
 
+  if (goog.isFunction(this.backgroundStroke())) {
+    anychart.core.reporting.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['ScrollBar background stroke']
+    );
+  } else {
+    json['backgroundStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.backgroundStroke()));
+  }
+
+  if (goog.isFunction(this.backgroundFill())) {
+    anychart.core.reporting.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['ScrollBar background fill']
+    );
+  } else {
+    json['backgroundFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.backgroundFill()));
+  }
+
+  if (goog.isFunction(this.sliderFill())) {
+    anychart.core.reporting.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['ScrollBar slider fill']
+    );
+  } else {
+    json['sliderFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */ (this.sliderFill()));
+  }
+
+  if (goog.isFunction(this.sliderStroke())) {
+    anychart.core.reporting.warning(
+        anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
+        null,
+        ['ScrollBar slider stroke']
+    );
+  } else {
+    json['sliderStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */ (this.sliderStroke()));
+  }
+
+  json['mouseOverOpacity'] = this.mouseOverOpacity();
+  json['mouseOutOpacity'] = this.mouseOutOpacity();
+
+  json['buttonsVisible'] = this.buttonsVisible();
+  json['barSize'] = this.barSize();
+
+  return json;
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.ScrollBar.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.ui.ScrollBar.base(this, 'setupByJSON', config, opt_default);
+
+  this.backgroundFill(config['backgroundFill']);
+  this.backgroundStroke(config['backgroundStroke']);
+  this.sliderFill(config['sliderFill']);
+  this.sliderStroke(config['sliderStroke']);
+  this.mouseOverOpacity(config['mouseOverOpacity']);
+  this.mouseOutOpacity(config['mouseOutOpacity']);
+
+  this.buttonsVisible(config['buttonsVisible']);
+  this.barSize(config['barSize']);
+};
+//endregion
+
+
+
+//region --- ScrollBar.ScrollEvent ---
 /**
  * Custom scroll event.
  * @param {Object=} opt_target - Reference to the target.
@@ -1504,29 +1574,33 @@ anychart.core.ui.ScrollBar.ScrollEvent.prototype['visibleBounds'] = null;
  * @type {string}
  */
 anychart.core.ui.ScrollBar.ScrollEvent.prototype['source'] = '';
+//endregion
 
 
+//exports
 //goog.exportSymbol('anychart.core.ui.ScrollBar.SCROLL_PIXEL_STEP', anychart.core.ui.ScrollBar.SCROLL_PIXEL_STEP);
 //goog.exportSymbol('anychart.core.ui.ScrollBar.SCROLL_RATIO_STEP', anychart.core.ui.ScrollBar.SCROLL_RATIO_STEP);
 goog.exportSymbol('anychart.core.ui.ScrollBar', anychart.core.ui.ScrollBar);
-anychart.core.ui.ScrollBar.prototype['layout'] = anychart.core.ui.ScrollBar.prototype.layout;
+anychart.core.ui.ScrollBar.prototype['barSize'] = anychart.core.ui.ScrollBar.prototype.barSize;
+//anychart.core.ui.ScrollBar.prototype['layout'] = anychart.core.ui.ScrollBar.prototype.layout;
 anychart.core.ui.ScrollBar.prototype['backgroundStroke'] = anychart.core.ui.ScrollBar.prototype.backgroundStroke;
-anychart.core.ui.ScrollBar.prototype['handlePositionChange'] = anychart.core.ui.ScrollBar.prototype.handlePositionChange;
+//anychart.core.ui.ScrollBar.prototype['handlePositionChange'] = anychart.core.ui.ScrollBar.prototype.handlePositionChange;
 anychart.core.ui.ScrollBar.prototype['backgroundFill'] = anychart.core.ui.ScrollBar.prototype.backgroundFill;
 anychart.core.ui.ScrollBar.prototype['sliderStroke'] = anychart.core.ui.ScrollBar.prototype.sliderStroke;
 anychart.core.ui.ScrollBar.prototype['sliderFill'] = anychart.core.ui.ScrollBar.prototype.sliderFill;
-anychart.core.ui.ScrollBar.prototype['contentBounds'] = anychart.core.ui.ScrollBar.prototype.contentBounds;
-anychart.core.ui.ScrollBar.prototype['visibleBounds'] = anychart.core.ui.ScrollBar.prototype.visibleBounds;
-anychart.core.ui.ScrollBar.prototype['startRatio'] = anychart.core.ui.ScrollBar.prototype.startRatio;
-anychart.core.ui.ScrollBar.prototype['endRatio'] = anychart.core.ui.ScrollBar.prototype.endRatio;
-anychart.core.ui.ScrollBar.prototype['setRatio'] = anychart.core.ui.ScrollBar.prototype.setRatio;
-anychart.core.ui.ScrollBar.prototype['scrollPixelStartTo'] = anychart.core.ui.ScrollBar.prototype.scrollPixelStartTo;
-anychart.core.ui.ScrollBar.prototype['scrollStartTo'] = anychart.core.ui.ScrollBar.prototype.scrollStartTo;
-anychart.core.ui.ScrollBar.prototype['scrollPixelEndTo'] = anychart.core.ui.ScrollBar.prototype.scrollPixelEndTo;
-anychart.core.ui.ScrollBar.prototype['scrollEndTo'] = anychart.core.ui.ScrollBar.prototype.scrollEndTo;
-anychart.core.ui.ScrollBar.prototype['scrollPixel'] = anychart.core.ui.ScrollBar.prototype.scrollPixel;
-anychart.core.ui.ScrollBar.prototype['scroll'] = anychart.core.ui.ScrollBar.prototype.scroll;
+anychart.core.ui.ScrollBar.prototype['mouseOutOpacity'] = anychart.core.ui.ScrollBar.prototype.mouseOutOpacity;
+anychart.core.ui.ScrollBar.prototype['mouseOverOpacity'] = anychart.core.ui.ScrollBar.prototype.mouseOverOpacity;
+//anychart.core.ui.ScrollBar.prototype['contentBounds'] = anychart.core.ui.ScrollBar.prototype.contentBounds;
+//anychart.core.ui.ScrollBar.prototype['visibleBounds'] = anychart.core.ui.ScrollBar.prototype.visibleBounds;
+//anychart.core.ui.ScrollBar.prototype['startRatio'] = anychart.core.ui.ScrollBar.prototype.startRatio;
+//anychart.core.ui.ScrollBar.prototype['endRatio'] = anychart.core.ui.ScrollBar.prototype.endRatio;
+//anychart.core.ui.ScrollBar.prototype['setRatio'] = anychart.core.ui.ScrollBar.prototype.setRatio;
+//anychart.core.ui.ScrollBar.prototype['scrollPixelStartTo'] = anychart.core.ui.ScrollBar.prototype.scrollPixelStartTo;
+//anychart.core.ui.ScrollBar.prototype['scrollStartTo'] = anychart.core.ui.ScrollBar.prototype.scrollStartTo;
+//anychart.core.ui.ScrollBar.prototype['scrollPixelEndTo'] = anychart.core.ui.ScrollBar.prototype.scrollPixelEndTo;
+//anychart.core.ui.ScrollBar.prototype['scrollEndTo'] = anychart.core.ui.ScrollBar.prototype.scrollEndTo;
+//anychart.core.ui.ScrollBar.prototype['scrollPixel'] = anychart.core.ui.ScrollBar.prototype.scrollPixel;
+//anychart.core.ui.ScrollBar.prototype['scroll'] = anychart.core.ui.ScrollBar.prototype.scroll;
 anychart.core.ui.ScrollBar.prototype['buttonsVisible'] = anychart.core.ui.ScrollBar.prototype.buttonsVisible;
-anychart.core.ui.ScrollBar.prototype['container'] = anychart.core.ui.ScrollBar.prototype.container;
-anychart.core.ui.ScrollBar.prototype['draw'] = anychart.core.ui.ScrollBar.prototype.draw;
-//exports
+//anychart.core.ui.ScrollBar.prototype['container'] = anychart.core.ui.ScrollBar.prototype.container;
+//anychart.core.ui.ScrollBar.prototype['draw'] = anychart.core.ui.ScrollBar.prototype.draw;

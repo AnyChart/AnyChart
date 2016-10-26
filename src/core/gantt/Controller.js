@@ -1027,11 +1027,7 @@ anychart.core.gantt.Controller.prototype.run = function() {
 anychart.core.gantt.Controller.prototype.getScrollBar = function() {
   if (!this.verticalScrollBar_) {
     this.verticalScrollBar_ = new anychart.core.ui.ScrollBar();
-    this.verticalScrollBar_
-        .layout(anychart.enums.Layout.VERTICAL)
-        .buttonsVisible(false)
-        .mouseOutOpacity(.25)
-        .mouseOverOpacity(.45);
+    this.verticalScrollBar_.layout(anychart.enums.Layout.VERTICAL);
 
     var controller = this;
 

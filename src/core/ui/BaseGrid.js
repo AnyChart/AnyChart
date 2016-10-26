@@ -1638,7 +1638,7 @@ anychart.core.ui.BaseGrid.prototype.mouseWheelHandler_ = function(e) {
   }
 
   var denyBodyScrollLeft = !goog.global['document']['body']['scrollLeft'];
-  var horizontalScroll = this.getHorizontalScrollBar();
+  var horizontalScroll = this.horizontalScrollBar();
   var verticalScroll = this.controller.getScrollBar();
 
   var scrollsUp, scrollsLeft;
@@ -1799,12 +1799,16 @@ anychart.core.ui.BaseGrid.prototype.drawInternal = function(positionRecalculated
       verticalScrollBar
           .container(this.getScrollsLayer())
           .listenSignals(function(event) {
-            if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) verticalScrollBar.draw();
-          }, verticalScrollBar);
+            // bar size for example
+            if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED))
+              this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+            else
+              verticalScrollBar.draw();
+          }, this);
       this.registerDisposable(verticalScrollBar);
     }
 
-    horizontalScrollBar = this.getHorizontalScrollBar();
+    horizontalScrollBar = this.horizontalScrollBar();
     horizontalScrollBar
         .container(this.getScrollsLayer())
         .listenSignals(function(event) {
@@ -1839,6 +1843,7 @@ anychart.core.ui.BaseGrid.prototype.drawInternal = function(positionRecalculated
         .moveTo(this.pixelBoundsCache.left, headSepTop)
         .lineTo(this.pixelBoundsCache.left + this.totalGridsWidth, headSepTop);
 
+    var barSize;
     if (this.isStandalone) {
       /*
         NOTE: For standalone mode only!
@@ -1846,20 +1851,22 @@ anychart.core.ui.BaseGrid.prototype.drawInternal = function(positionRecalculated
        */
       verticalScrollBar = this.controller.getScrollBar();
 
+      barSize = /** @type {number} */ (verticalScrollBar.barSize());
       verticalScrollBar.bounds(
-          (this.pixelBoundsCache.left + this.pixelBoundsCache.width - anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 1),
-          (this.pixelBoundsCache.top + this.headerHeight() + anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE + 1),
-          anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE,
-          (this.pixelBoundsCache.height - this.headerHeight() - 2 * anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 2)
+          (this.pixelBoundsCache.left + this.pixelBoundsCache.width - barSize - 1),
+          (this.pixelBoundsCache.top + this.headerHeight() + barSize + 1),
+          barSize,
+          (this.pixelBoundsCache.height - this.headerHeight() - 2 * barSize - 2)
       );
     }
 
-    horizontalScrollBar = this.getHorizontalScrollBar();
+    horizontalScrollBar = this.horizontalScrollBar();
+    barSize = /** @type {number} */ (horizontalScrollBar.barSize());
     horizontalScrollBar.bounds(
-        (this.pixelBoundsCache.left + anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE),
-        (this.pixelBoundsCache.top + this.pixelBoundsCache.height - anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE - 1),
-        (this.pixelBoundsCache.width - 2 * anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE),
-        anychart.core.ui.ScrollBar.SCROLL_BAR_SIDE
+        (this.pixelBoundsCache.left + barSize),
+        (this.pixelBoundsCache.top + this.pixelBoundsCache.height - barSize - 1),
+        (this.pixelBoundsCache.width - 2 * barSize),
+        barSize
     );
 
     this.redrawPosition = true;
@@ -1957,9 +1964,10 @@ anychart.core.ui.BaseGrid.prototype.initDom = goog.nullFunction;
 
 /**
  * Generates horizontal scroll bar.
- * @return {anychart.core.ui.ScrollBar} - Scroll bar.
+ * @param {Object=} opt_value Object with settings.
+ * @return {anychart.core.ui.ScrollBar|anychart.core.ui.BaseGrid} - Scroll bar.
  */
-anychart.core.ui.BaseGrid.prototype.getHorizontalScrollBar = goog.abstractMethod;
+anychart.core.ui.BaseGrid.prototype.horizontalScrollBar = goog.abstractMethod;
 
 
 /** @inheritDoc */

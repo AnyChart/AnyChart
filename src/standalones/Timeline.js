@@ -32,7 +32,9 @@ anychart.core.makeStandalone(anychart.standalones.ResourceTimeline, anychart.cor
  * @return {!anychart.standalones.ProjectTimeline}
  */
 anychart.standalones.projectTimeline = function() {
-  return new anychart.standalones.ProjectTimeline();
+  var timeline = new anychart.standalones.ProjectTimeline();
+  timeline.setup(anychart.getFullTheme()['standalones']['timeline']);
+  return timeline;
 };
 
 
@@ -41,7 +43,9 @@ anychart.standalones.projectTimeline = function() {
  * @return {!anychart.standalones.ResourceTimeline}
  */
 anychart.standalones.resourceTimeline = function() {
-  return new anychart.standalones.ResourceTimeline();
+  var timeline = new anychart.standalones.ResourceTimeline();
+  timeline.setup(anychart.getFullTheme()['standalones']['timeline']);
+  return timeline;
 };
 
 
