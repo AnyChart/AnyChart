@@ -355,6 +355,25 @@ anychart.core.gantt.Controller.prototype.periodsToMeta_ = function(item) {
 
 
 /**
+ * Writes item's markers to meta.
+ * @param {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} item - Tree data item.
+ * @private
+ */
+anychart.core.gantt.Controller.prototype.markersToMeta_ = function(item) {
+  var itemMarkers, m, marker, val, parsedDate, parsedVal;
+  itemMarkers = item.get(anychart.enums.GanttDataFields.MARKERS);
+  for (m = 0; itemMarkers && m < itemMarkers.length; m++) {
+    marker = itemMarkers[m];
+    val = marker['value'];
+    parsedDate = anychart.format.parseDateTime(val);
+    parsedVal = goog.isNull(parsedDate) ? null : +parsedDate;
+    item.setMeta(anychart.enums.GanttDataFields.MARKERS, m, 'value', parsedVal);
+    this.checkDate_(parsedVal);
+  }
+};
+
+
+/**
  * Item's values auto calculation.
  * @param {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} item - Current tree data item.
  * @param {number} currentDepth - Current depth.
@@ -372,16 +391,7 @@ anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentD
 
   this.datesToMeta_(item);
   this.periodsToMeta_(item);
-
-  var itemMarkers = item.get(anychart.enums.GanttDataFields.MARKERS);
-  for (var m = 0; itemMarkers && m < itemMarkers.length; m++) {
-    var marker = itemMarkers[m];
-    var val = marker['value'];
-    var parsedDate = anychart.format.parseDateTime(val);
-    var parsedVal = goog.isNull(parsedDate) ? null : +parsedDate;
-    item.setMeta(anychart.enums.GanttDataFields.MARKERS, m, 'value', parsedVal);
-    this.checkDate_(parsedVal);
-  }
+  this.markersToMeta_(item);
 
   var resultStart = item.meta(anychart.enums.GanttDataFields.ACTUAL_START);
   var resultEnd = item.meta(anychart.enums.GanttDataFields.ACTUAL_END);
@@ -400,6 +410,7 @@ anychart.core.gantt.Controller.prototype.autoCalcItem_ = function(item, currentD
 
       this.datesToMeta_(child);
       this.periodsToMeta_(child);
+      this.markersToMeta_(child);
     }
 
     if (!this.isResources_) {
