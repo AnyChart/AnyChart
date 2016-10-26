@@ -46,5 +46,7 @@ anychart.animations.ClipAnimation.prototype.onAnimate = function() {
 
 /** @inheritDoc */
 anychart.animations.ClipAnimation.prototype.onEnd = function() {
-  this.series.applyClip();
+  this.clipBounds_.left = this.endPoint[0];
+  this.clipBounds_.width = this.endPoint[1];
+  this.series.applyClip(this.clipBounds_);
 };
