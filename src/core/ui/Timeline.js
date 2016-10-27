@@ -429,13 +429,6 @@ anychart.core.ui.Timeline = function(opt_controller, opt_isResources) {
   this.scale_.listenSignals(this.scaleInvalidated_, this);
   this.registerDisposable(this.scale_);
 
-  this.header_ = new anychart.core.gantt.TimelineHeader();
-  this.header_.suspendSignalsDispatching();
-  this.header_.scale(this.scale_);
-  this.header_.zIndex(anychart.core.ui.Timeline.HEADER_Z_INDEX);
-  this.header_.resumeSignalsDispatching(false);
-  this.registerDisposable(this.header_);
-
   this.controller.timeline(this);
 
 };
@@ -645,6 +638,41 @@ anychart.core.ui.Timeline.prototype.scaleInvalidated_ = function(event) {
  */
 anychart.core.ui.Timeline.prototype.getScale = function() {
   return this.scale_;
+};
+
+
+/**
+ * Gets/configures timeline header.
+ * @param {Object=} opt_value - Config.
+ * @return {anychart.core.gantt.TimelineHeader|anychart.core.ui.Timeline} - Header or itself for chaining..
+ */
+anychart.core.ui.Timeline.prototype.header = function(opt_value) {
+  if (!this.header_) {
+    this.header_ = new anychart.core.gantt.TimelineHeader();
+    this.header_.scale(this.scale_);
+    this.header_.zIndex(anychart.core.ui.Timeline.HEADER_Z_INDEX);
+    this.registerDisposable(this.header_);
+    this.header_.listenSignals(this.headerInvalidated_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.header_.setup(opt_value);
+    return this;
+  } else {
+    return this.header_;
+  }
+};
+
+
+/**
+ * Scale invalidation handler.
+ * @param {anychart.SignalEvent} event - Signal event.
+ * @private
+ */
+anychart.core.ui.Timeline.prototype.headerInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    this.invalidate(anychart.ConsistencyState.TIMELINE_SCALES, anychart.Signal.NEEDS_REDRAW);
+  }
 };
 
 
@@ -3946,7 +3974,7 @@ anychart.core.ui.Timeline.prototype.initDom = function() {
   this.getClipLayer().zIndex(anychart.core.ui.BaseGrid.DRAW_Z_INDEX - 1); //Put it under draw layer.
   this.markers().container(this.getContentLayer());
   this.labels().container(this.getContentLayer());
-  this.header_.container(this.getBase());
+  this.header().container(this.getBase());
   this.initScale();
 };
 
@@ -3955,7 +3983,7 @@ anychart.core.ui.Timeline.prototype.initDom = function() {
  * @override
  */
 anychart.core.ui.Timeline.prototype.boundsInvalidated = function() {
-  this.header_
+  this.header()
       .bounds()
       .set(this.pixelBoundsCache.left, this.pixelBoundsCache.top,
           this.pixelBoundsCache.width, /** @type {number} */ (this.headerHeight()));
@@ -4009,9 +4037,20 @@ anychart.core.ui.Timeline.prototype.specialInvalidated = function() {
   }
 
   if (this.redrawHeader) {
-    this.header_.invalidate(anychart.ConsistencyState.TIMELINE_HEADER_SCALES);
+    this.header().invalidate(anychart.ConsistencyState.TIMELINE_HEADER_SCALES);
     this.header_.draw();
-    var ticks = this.header_.getLowLevel().getTicks();
+    var level, ticks = [];
+    if (this.header_.lowLevel().enabled()) {
+      level = this.header_.lowLevel();
+    } else if (this.header_.midLevel().enabled()) {
+      level = this.header_.midLevel();
+    } else if (this.header_.topLevel().enabled()) {
+      level = this.header_.topLevel();
+    }
+
+    if (level)
+      ticks = level.getTicks();
+
     this.drawLowTicks_(ticks);
 
     var totalRange = this.scale_.getTotalRange();
@@ -4245,6 +4284,8 @@ anychart.core.ui.Timeline.prototype.serialize = function() {
   json['labels'] = this.labels().serialize();
   json['markers'] = this.markers().serialize();
 
+  json['header'] = this.header().serialize();
+
   json['columnStroke'] = anychart.color.serialize(this.columnStroke_);
 
   json['baselineAbove'] = this.baselineAbove_;
@@ -4313,6 +4354,8 @@ anychart.core.ui.Timeline.prototype.setupByJSON = function(config) {
   if ('scale' in config) this.scale_.setup(config['scale']);
   if ('labels' in config) this.labels(config['labels']);
   if ('markers' in config) this.markers(config['markers']);
+
+  if ('header' in config) this.header(config['header']);
 
   this.columnStroke(config['columnStroke']);
   this.baselineAbove(config['baselineAbove']);
@@ -4733,3 +4776,5 @@ anychart.core.ui.Timeline.prototype['editStructurePreviewDashStroke'] = anychart
 anychart.core.ui.Timeline.prototype['textMarker'] = anychart.core.ui.Timeline.prototype.textMarker;
 anychart.core.ui.Timeline.prototype['lineMarker'] = anychart.core.ui.Timeline.prototype.lineMarker;
 anychart.core.ui.Timeline.prototype['rangeMarker'] = anychart.core.ui.Timeline.prototype.rangeMarker;
+
+anychart.core.ui.Timeline.prototype['header'] = anychart.core.ui.Timeline.prototype.header;

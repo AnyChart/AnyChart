@@ -233,7 +233,7 @@ anychart.scales.GanttDateTime.RANGES = [
  */
 anychart.scales.GanttDateTime.TOP_INTERVALS = [
   {unit: anychart.enums.Interval.DAY, count: 1},    //0
-  {unit: anychart.enums.Interval.DAY, count: 7},    //1
+  {unit: anychart.enums.Interval.WEEK, count: 1},    //1
   {unit: anychart.enums.Interval.MONTH, count: 1},  //2
   {unit: anychart.enums.Interval.YEAR, count: 1},   //3
   {unit: anychart.enums.Interval.YEAR, count: 10}   //4
@@ -247,8 +247,8 @@ anychart.scales.GanttDateTime.TOP_INTERVALS = [
 anychart.scales.GanttDateTime.MID_INTERVALS = [
   {unit: anychart.enums.Interval.HOUR, count: 1},  //0
   {unit: anychart.enums.Interval.DAY, count: 1},   //1
-  {unit: anychart.enums.Interval.DAY, count: 7},   //2
-  {unit: anychart.enums.Interval.MONTH, count: 3}, //3
+  {unit: anychart.enums.Interval.WEEK, count: 1},   //2
+  {unit: anychart.enums.Interval.QUARTER, count: 1}, //3
   {unit: anychart.enums.Interval.YEAR, count: 1}   //4
 ];
 
@@ -261,8 +261,8 @@ anychart.scales.GanttDateTime.LOW_INTERVALS = [
   {unit: anychart.enums.Interval.MINUTE, count: 10}, //0
   {unit: anychart.enums.Interval.HOUR, count: 2},    //1
   {unit: anychart.enums.Interval.DAY, count: 1},     //2
-  {unit: anychart.enums.Interval.DAY, count: 14},    //3
-  {unit: anychart.enums.Interval.MONTH, count: 3}    //4
+  {unit: anychart.enums.Interval.MONTH, count: 1},    //3
+  {unit: anychart.enums.Interval.QUARTER, count: 1}    //4
 ];
 
 
@@ -780,13 +780,13 @@ anychart.scales.GanttDateTime.prototype.ratioToTimestamp = function(value) {
  */
 anychart.scales.GanttDateTime.prototype.makeLevelData_ = function(level, opt_parentLevel) {
   var interval = anychart.utils.getIntervalFromInfo(level.unit, level.count);
+
+  var intervalId = anychart.format.getIntervalIdentifier(level.unit, opt_parentLevel && opt_parentLevel.unit, 'timelineHeader');
+  var format = anychart.format.getDateTimeFormat(intervalId, 0);
   return {
     'anchor': anychart.utils.alignDateLeft(this.min_, interval, 0),
     'interval': interval,
-    'formatter': anychart.scales.GanttDateTime.createTextFormatter_(
-        anychart.format.getDateTimeFormat(
-            anychart.format.getIntervalIdentifier(level.unit, opt_parentLevel && opt_parentLevel.unit),
-            0))
+    'formatter': anychart.scales.GanttDateTime.createTextFormatter_(format)
   };
 };
 
@@ -812,17 +812,13 @@ anychart.scales.GanttDateTime.prototype.getLevelsData = function() {
 
   if (index < 0) index = ranges.length - 1;
 
-  return [
-    this.makeLevelData_(
-        anychart.scales.GanttDateTime.TOP_INTERVALS[index]),
-    this.makeLevelData_(
-        anychart.scales.GanttDateTime.MID_INTERVALS[index],
-        anychart.scales.GanttDateTime.TOP_INTERVALS[index]),
-    this.makeLevelData_(
-        anychart.scales.GanttDateTime.LOW_INTERVALS[index],
-        anychart.scales.GanttDateTime.MID_INTERVALS[index])
-  ];
+  var topLevelData = this.makeLevelData_(anychart.scales.GanttDateTime.TOP_INTERVALS[index]);
+  var midLevelData = this.makeLevelData_(anychart.scales.GanttDateTime.MID_INTERVALS[index],
+      anychart.scales.GanttDateTime.TOP_INTERVALS[index]);
+  var lowLevelData = this.makeLevelData_(anychart.scales.GanttDateTime.LOW_INTERVALS[index],
+      anychart.scales.GanttDateTime.MID_INTERVALS[index]);
 
+  return [topLevelData, midLevelData, lowLevelData];
 };
 
 

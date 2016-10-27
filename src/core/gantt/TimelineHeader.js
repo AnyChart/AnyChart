@@ -4,10 +4,12 @@ goog.require('acgraph');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.LabelsFactory');
+goog.require('anychart.math.Rect');
 goog.require('anychart.scales.GanttDateTime');
 
 
 
+//region TimelineHeader
 /**
  * Timeline header implementation. Contains a time levels.
  * @constructor
@@ -49,7 +51,20 @@ anychart.core.gantt.TimelineHeader = function() {
    * @type {acgraph.vector.Fill}
    * @private
    */
-  this.backgroundFill_ = acgraph.vector.normalizeFill('#cecece');
+  this.backgroundFill_;
+
+  /**
+   * @type {acgraph.vector.Path}
+   * @private
+   */
+  this.levelsSeparationPath_;
+
+  /**
+   * Levels separation stroke.
+   * @type {acgraph.vector.Stroke}
+   * @private
+   */
+  this.levelsSeparationStroke_;
 
   /**
    * Levels of header.
@@ -64,16 +79,19 @@ anychart.core.gantt.TimelineHeader = function() {
   var topLevel = new anychart.core.gantt.TimelineHeader.Level(this);
   topLevel.container(this.getBase_());
   this.registerDisposable(topLevel);
+  topLevel.listenSignals(this.levelInvalidated_, this);
   this.levels_[0] = topLevel;
 
   var midLevel = new anychart.core.gantt.TimelineHeader.Level(this);
   midLevel.container(this.getBase_());
   this.registerDisposable(midLevel);
+  midLevel.listenSignals(this.levelInvalidated_, this);
   this.levels_[1] = midLevel;
 
   var lowLevel = new anychart.core.gantt.TimelineHeader.Level(this);
   lowLevel.container(this.getBase_());
   this.registerDisposable(lowLevel);
+  lowLevel.listenSignals(this.levelInvalidated_, this);
   this.levels_[2] = lowLevel;
 
 };
@@ -107,7 +125,7 @@ anychart.core.gantt.TimelineHeader.prototype.getBase_ = function() {
     this.base_ = /** @type {acgraph.vector.Layer} */ (acgraph.layer());
     this.registerDisposable(this.base_);
     this.bgRect_ = this.base_.rect();
-    this.bgRect_.fill(this.backgroundFill_).stroke(null);
+    this.bgRect_.stroke(null);
     this.registerDisposable(this.bgRect_);
   }
   return this.base_;
@@ -116,31 +134,66 @@ anychart.core.gantt.TimelineHeader.prototype.getBase_ = function() {
 
 /**
  * Getter for top level of header.
+ * @param {(Object|boolean)=} opt_value - Value to set.
  * TODO (A.Kudryavtsev): Remove on advanced leveling implementation.
- * @return {anychart.core.gantt.TimelineHeader.Level} - Top level.
+ * @return {anychart.core.gantt.TimelineHeader.Level|anychart.core.gantt.TimelineHeader} - Top level or itself for chaining..
  */
-anychart.core.gantt.TimelineHeader.prototype.getTopLevel = function() {
-  return this.levels_[0];
+anychart.core.gantt.TimelineHeader.prototype.topLevel = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.levels_[0].setup(opt_value);
+    return this;
+  } else {
+    return this.levels_[0];
+  }
 };
 
 
 /**
  * Getter for mid level of header.
+ * @param {(Object|boolean)=} opt_value - Value to set.
  * TODO (A.Kudryavtsev): Remove on advanced leveling implementation.
- * @return {anychart.core.gantt.TimelineHeader.Level} - Mid level.
+ * @return {anychart.core.gantt.TimelineHeader.Level|anychart.core.gantt.TimelineHeader} - Mid level or itself for chaining..
  */
-anychart.core.gantt.TimelineHeader.prototype.getMidLevel = function() {
-  return this.levels_[1];
+anychart.core.gantt.TimelineHeader.prototype.midLevel = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.levels_[1].setup(opt_value);
+    return this;
+  } else {
+    return this.levels_[1];
+  }
 };
 
 
 /**
  * Getter for low level of header.
+ * @param {(Object|boolean)=} opt_value - Value to set.
  * TODO (A.Kudryavtsev): Remove on advanced leveling implementation.
- * @return {anychart.core.gantt.TimelineHeader.Level} - Low level.
+ * @return {anychart.core.gantt.TimelineHeader.Level|anychart.core.gantt.TimelineHeader} - Low level or itself for chaining..
  */
-anychart.core.gantt.TimelineHeader.prototype.getLowLevel = function() {
-  return this.levels_[2];
+anychart.core.gantt.TimelineHeader.prototype.lowLevel = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.levels_[2].setup(opt_value);
+    return this;
+  } else {
+    return this.levels_[2];
+  }
+};
+
+
+/**
+ * Level invalidation handler.
+ * @param {anychart.SignalEvent} event - Signal event.
+ * @private
+ */
+anychart.core.gantt.TimelineHeader.prototype.levelInvalidated_ = function(event) {
+  var state = 0;
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW))
+    state |= anychart.ConsistencyState.TIMELINE_HEADER_SCALES;
+
+  if (event.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED))
+    state |= anychart.ConsistencyState.BOUNDS;
+
+  this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -200,6 +253,25 @@ anychart.core.gantt.TimelineHeader.prototype.backgroundFill = function(opt_fillO
 
 
 /**
+ * Gets/sets levelsSeparationStroke.
+ * @param {(acgraph.vector.Stroke|string)=} opt_value - Value to be set.
+ * @return {(string|acgraph.vector.Stroke|anychart.core.gantt.TimelineHeader)} - Current value or itself for chaining.
+ */
+anychart.core.gantt.TimelineHeader.prototype.levelsSeparationStroke = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (!anychart.color.equals(/** @type {acgraph.vector.Stroke} */ (this.levelsSeparationStroke_), val)) {
+      this.levelsSeparationStroke_ = val;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    }
+
+    return this;
+  }
+  return this.levelsSeparationStroke_;
+};
+
+
+/**
  * Draws timeline header.
  * @return {anychart.core.gantt.TimelineHeader} - Itself for method chaining.
  */
@@ -211,6 +283,12 @@ anychart.core.gantt.TimelineHeader.prototype.draw = function() {
     if (manualSuspend) stage.suspend();
     var i, l, level;
     var counter = 0;
+
+    if (!this.levelsSeparationPath_) {
+      this.levelsSeparationPath_ = this.getBase_().path();
+      this.levelsSeparationPath_.fill(null).stroke(null);
+      this.registerDisposable(this.levelsSeparationPath_);
+    }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
       this.getBase_().parent(container);
@@ -225,19 +303,33 @@ anychart.core.gantt.TimelineHeader.prototype.draw = function() {
         if (this.levels_[i].enabled()) counter++;
       }
 
-      var height = counter ? Math.floor(this.pixelBoundsCache_.height / counter) : 0;
+      var sepHeight = anychart.utils.extractThickness(this.levelsSeparationStroke_);
+      var sepCount = Math.max(counter - 1, 0);
+      var height = counter ? Math.max(Math.floor((this.pixelBoundsCache_.height - sepCount * sepHeight) / counter), 0) : 0;
 
       var actualHeight = 0;
       var top = this.pixelBoundsCache_.top;
+
+      var sepTop = top + height + sepHeight / 2;
+      this.levelsSeparationPath_.clear();
+      for (i = 0; i < sepCount; i++) {
+        this.levelsSeparationPath_
+            .moveTo(this.pixelBoundsCache_.left, sepTop)
+            .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, sepTop);
+        sepTop += (height + sepHeight);
+      }
+
       for (i = 0, l = this.levels_.length; i < l; i++) {
         level = this.levels_[i];
         if (level.enabled()) {
-          if (i == l - 1) {
+          if (i == counter - 1) { //lowest level
             height = this.pixelBoundsCache_.height - actualHeight;
           }
           level.bounds().set(this.pixelBoundsCache_.left, top, this.pixelBoundsCache_.width, height);
-          top += (height + 1);
-          actualHeight += (height + 1);
+          top += (height + sepHeight);
+          actualHeight += (height + sepHeight);
+        } else {
+          level.remove();
         }
       }
 
@@ -253,18 +345,18 @@ anychart.core.gantt.TimelineHeader.prototype.draw = function() {
       var levelsData = this.scale_.getLevelsData();
       for (i = 0, l = this.levels_.length; i < l; i++) {
         level = this.levels_[i];
-        if (level.enabled()) {
-          level.anchor(levelsData[i]['anchor']);
-          level.interval(levelsData[i]['interval']);
-          level.textFormatter(levelsData[i]['formatter']);
-          level.invalidate(anychart.ConsistencyState.TIMELINE_HEADER_LEVEL_TICKS); //Scale is changed. It means that ticks must be recalculated anyway.
-        }
+        level.suspendSignalsDispatching();
+        level.anchor(levelsData[i]['anchor']);
+        level.interval(levelsData[i]['interval']);
+        level.textFormatter(levelsData[i]['formatter']);
+        level.invalidate(anychart.ConsistencyState.TIMELINE_HEADER_LEVEL_TICKS); //Scale is changed. It means that ticks must be recalculated anyway.
       }
       this.markConsistent(anychart.ConsistencyState.TIMELINE_HEADER_SCALES);
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
       this.bgRect_.fill(this.backgroundFill_);
+      this.levelsSeparationPath_.stroke(this.levelsSeparationStroke_);
       this.markConsistent(anychart.ConsistencyState.APPEARANCE);
     }
 
@@ -275,10 +367,8 @@ anychart.core.gantt.TimelineHeader.prototype.draw = function() {
 
     for (i = 0, l = this.levels_.length; i < l; i++) {
       level = this.levels_[i];
-      if (level.enabled()) {
-        level.resumeSignalsDispatching(false);
-        level.draw();
-      }
+      level.resumeSignalsDispatching(false);
+      level.draw();
     }
 
     if (manualSuspend) stage.resume();
@@ -287,7 +377,36 @@ anychart.core.gantt.TimelineHeader.prototype.draw = function() {
 };
 
 
+/** @inheritDoc */
+anychart.core.gantt.TimelineHeader.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
 
+  json['backgroundFill'] = anychart.color.serialize(this.backgroundFill_);
+  json['levelsSeparationStroke'] = anychart.color.serialize(this.levelsSeparationStroke_);
+  json['topLevel'] = this.topLevel().serialize();
+  json['midLevel'] = this.midLevel().serialize();
+  json['lowLevel'] = this.lowLevel().serialize();
+
+  return json;
+};
+
+
+/** @inheritDoc */
+anychart.core.gantt.TimelineHeader.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+
+  this.backgroundFill(config['backgroundFill']);
+  this.levelsSeparationStroke(config['levelsSeparationStroke']);
+  this.topLevel(config['topLevel']);
+  this.midLevel(config['midLevel']);
+  this.lowLevel(config['lowLevel']);
+
+};
+//endregion
+
+
+
+//region TimelineHeader Level
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Timeline header level.
@@ -345,12 +464,26 @@ anychart.core.gantt.TimelineHeader.Level = function(header) {
   this.bgRect_ = null;
 
   /**
-   * Data grid bg.
+   * Separation path.
+   * @type {acgraph.vector.Path}
+   * @private
+   */
+  this.separationPath_ = null;
+
+  /**
+   * Level tile fill.
    * @type {acgraph.vector.Fill}
    * @private
    */
-  //this.backgroundFill_ = acgraph.vector.normalizeFill(['#f8f8f8', '#fff'], 90);
-  this.backgroundFill_ = '#f7f7f7';
+  this.tileFill_;
+
+
+  /**
+   * Level Tile separation stroke.
+   * @type {acgraph.vector.Stroke}
+   * @private
+   */
+  this.tilesSeparationStroke_;
 
   /**
    * Ticks cache.
@@ -485,20 +618,38 @@ anychart.core.gantt.TimelineHeader.Level.prototype.getTicks = function() {
 
 /**
  * Inner getter for labels factory.
- * @private
- * @return {anychart.core.ui.LabelsFactory}
+ * @param {Object=} opt_value - Config object.
+ * @return {anychart.core.ui.LabelsFactory|anychart.core.gantt.TimelineHeader.Level}
  */
-anychart.core.gantt.TimelineHeader.Level.prototype.getLabelsFactory_ = function() {
+anychart.core.gantt.TimelineHeader.Level.prototype.labels = function(opt_value) {
   if (!this.labelsFactory_) {
     this.labelsFactory_ = new anychart.core.ui.LabelsFactory();
-    var theme = anychart.getFullTheme();
-    var lfGlobalConfig = theme['ganttBase']['timeline']['header']['labelsFactory'];
-    this.labelsFactory_.setup(lfGlobalConfig);
-
-    this.labelsFactory_.container(this.getBase_());
+    this.labelsFactory_.setParentEventTarget(this);
     this.registerDisposable(this.labelsFactory_);
+    this.labelsFactory_.container(this.getBase_());
+    this.labelsFactory_.listenSignals(this.labelsInvalidated_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !(anychart.opt.ENABLED in opt_value))
+      opt_value[anychart.opt.ENABLED] = true;
+    this.labelsFactory_.setup(opt_value);
+    return this;
   }
   return this.labelsFactory_;
+
+};
+
+
+/**
+ * Listener for labels invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
+ * @private
+ */
+anychart.core.gantt.TimelineHeader.Level.prototype.labelsInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    this.invalidate(anychart.ConsistencyState.TIMELINE_HEADER_LEVEL_LABELS, anychart.Signal.NEEDS_REDRAW);
+  }
 };
 
 
@@ -513,16 +664,38 @@ anychart.core.gantt.TimelineHeader.Level.prototype.getLabelsFactory_ = function(
  * @param {number=} opt_fy .
  * @return {acgraph.vector.Fill|anychart.core.gantt.TimelineHeader.Level|string} - Current value or itself for method chaining.
  */
-anychart.core.gantt.TimelineHeader.Level.prototype.backgroundFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+anychart.core.gantt.TimelineHeader.Level.prototype.tileFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
   if (goog.isDef(opt_fillOrColorOrKeys)) {
     var val = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.backgroundFill_), val)) {
-      this.backgroundFill_ = val;
+    if (!anychart.color.equals(/** @type {acgraph.vector.Fill} */ (this.tileFill_), val)) {
+      this.tileFill_ = val;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   }
-  return this.backgroundFill_;
+  return this.tileFill_;
+};
+
+
+/**
+ * Gets/sets a connector preview stroke.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill .
+ * @param {number=} opt_thickness .
+ * @param {string=} opt_dashpattern .
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin .
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap .
+ * @return {acgraph.vector.Stroke|anychart.core.gantt.TimelineHeader.Level|string} - Current value or itself for chaining.
+ */
+anychart.core.gantt.TimelineHeader.Level.prototype.tilesSeparationStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var val = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (!anychart.color.equals(this.tilesSeparationStroke_, val)) {
+      this.tilesSeparationStroke_ = val;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.tilesSeparationStroke_;
 };
 
 
@@ -550,7 +723,7 @@ anychart.core.gantt.TimelineHeader.Level.prototype.draw = function() {
     //Ensure DOM structure is created.
     if (!this.getBase_().numChildren()) {
       this.bgRect_ = this.getBase_().path();
-      this.bgRect_.fill(this.backgroundFill_).stroke(null);
+      this.separationPath_ = this.getBase_().path();
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
@@ -575,15 +748,24 @@ anychart.core.gantt.TimelineHeader.Level.prototype.draw = function() {
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-      this.bgRect_.fill(this.backgroundFill_);
+      this.bgRect_.fill(this.tileFill_).stroke(null);
+      this.separationPath_.stroke(this.tilesSeparationStroke_);
       this.markConsistent(anychart.ConsistencyState.APPEARANCE);
     }
 
     if (redrawTicks) {
-      this.bgRect_.clear();
+      this.bgRect_
+          .clear()
+          .moveTo(this.pixelBoundsCache_.left, this.pixelBoundsCache_.top)
+          .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, this.pixelBoundsCache_.top)
+          .lineTo(this.pixelBoundsCache_.left + this.pixelBoundsCache_.width, this.pixelBoundsCache_.top + this.pixelBoundsCache_.height)
+          .lineTo(this.pixelBoundsCache_.left, this.pixelBoundsCache_.top + this.pixelBoundsCache_.height)
+          .close();
 
-      this.getLabelsFactory_().suspendSignalsDispatching();
-      this.getLabelsFactory_().clear();
+      this.separationPath_.clear();
+
+      this.labels().suspendSignalsDispatching();
+      this.labels().clear();
 
       for (var i = 0, l = this.ticks_.length - 1; i < l; i++) { //this.ticks_.length >= 2 anyway.
         var startTick = this.ticks_[i];
@@ -592,39 +774,32 @@ anychart.core.gantt.TimelineHeader.Level.prototype.draw = function() {
         var endRatio = scale.timestampToRatio(endTick);
 
         var left = this.pixelBoundsCache_.left + startRatio * this.pixelBoundsCache_.width;
+        var right = this.pixelBoundsCache_.left + endRatio * this.pixelBoundsCache_.width;
 
-        var tileActualWidth = this.pixelBoundsCache_.width * (endRatio - startRatio);
+        var sepThickness = anychart.utils.extractThickness(this.tilesSeparationStroke_);
+        var sepLeft = left;
+        this.separationPath_
+            .moveTo(sepLeft, this.pixelBoundsCache_.top)
+            .lineTo(sepLeft, this.pixelBoundsCache_.top + this.pixelBoundsCache_.height);
 
-        this.bgRect_
-            .moveTo(left + .5, this.pixelBoundsCache_.top)
-            .lineTo(left + tileActualWidth - .5, this.pixelBoundsCache_.top)
-            .lineTo(left + tileActualWidth - .5, this.pixelBoundsCache_.top + this.pixelBoundsCache_.height)
-            .lineTo(left + .5, this.pixelBoundsCache_.top + this.pixelBoundsCache_.height)
-            .close();
-
+        var tileActualWidth = this.pixelBoundsCache_.width * (endRatio - startRatio) - sepThickness;
+        var tileLeft = sepLeft + sepThickness / 2;
         var formatProvider = {'value': this.textFormatter_(startTick, endTick, i)};
-        var labelWidth = this.getLabelsFactory_().measure(formatProvider).width;
-
-        var labelLeft = this.calculateTileTextLeft_(left, tileActualWidth, labelWidth);
-
-        var label = this.getLabelsFactory_().add(formatProvider,
+        var labelWidth = this.labels().measure(formatProvider).width;
+        var labelLeft = this.calculateTileTextLeft_(tileLeft, tileActualWidth, labelWidth);
+        var label = this.labels().add(formatProvider,
             {'value': {'x': labelLeft, 'y': this.pixelBoundsCache_.top}});
 
         label.suspendSignalsDispatching();
-
+        var clipBounds = new anychart.math.Rect(left + sepThickness / 2, this.pixelBoundsCache_.top, right - left - sepThickness, this.pixelBoundsCache_.height);
+        label.clip(clipBounds);
         label.height(this.pixelBoundsCache_.height);
-
-        startRatio = Math.max(startRatio, 0); //This aligns negative ratio to a visible area of level.
-        endRatio = Math.min(endRatio, 1); //This prevents label overflow.
-        var tileVisibleWidth = this.pixelBoundsCache_.width * (endRatio - startRatio);
-
-        label.width(tileVisibleWidth);
-
         label.resumeSignalsDispatching(false);
+        label.draw();
       }
 
-      this.getLabelsFactory_().resumeSignalsDispatching(false);
-      this.getLabelsFactory_().draw();
+      this.labels().resumeSignalsDispatching(false);
+      this.labels().draw();
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
@@ -660,4 +835,45 @@ anychart.core.gantt.TimelineHeader.Level.prototype.calculateTileTextLeft_ = func
   return centeredLeft;
 };
 
+
+/** @inheritDoc */
+anychart.core.gantt.TimelineHeader.Level.prototype.remove = function() {
+  this.getBase_().parent(null);
+};
+
+
+/** @inheritDoc */
+anychart.core.gantt.TimelineHeader.Level.prototype.serialize = function() {
+  var json = goog.base(this, 'serialize');
+
+  json['tileFill'] = anychart.color.serialize(this.tileFill_);
+  json['tilesSeparationStroke'] = anychart.color.serialize(this.tilesSeparationStroke_);
+  json['labels'] = this.labels().serialize();
+
+  return json;
+};
+
+
+/** @inheritDoc */
+anychart.core.gantt.TimelineHeader.Level.prototype.setupByJSON = function(config) {
+  goog.base(this, 'setupByJSON', config);
+
+  this.tileFill(config['tileFill']);
+  this.tilesSeparationStroke(config['tilesSeparationStroke']);
+  this.labels(config['labels']);
+
+};
+//endregion
+
+
+//exports
+anychart.core.gantt.TimelineHeader.prototype['backgroundFill'] = anychart.core.gantt.TimelineHeader.prototype.backgroundFill;
+anychart.core.gantt.TimelineHeader.prototype['levelsSeparationStroke'] = anychart.core.gantt.TimelineHeader.prototype.levelsSeparationStroke;
+anychart.core.gantt.TimelineHeader.prototype['topLevel'] = anychart.core.gantt.TimelineHeader.prototype.topLevel;
+anychart.core.gantt.TimelineHeader.prototype['midLevel'] = anychart.core.gantt.TimelineHeader.prototype.midLevel;
+anychart.core.gantt.TimelineHeader.prototype['lowLevel'] = anychart.core.gantt.TimelineHeader.prototype.lowLevel;
+
+anychart.core.gantt.TimelineHeader.Level.prototype['tileFill'] = anychart.core.gantt.TimelineHeader.Level.prototype.tileFill;
+anychart.core.gantt.TimelineHeader.Level.prototype['labels'] = anychart.core.gantt.TimelineHeader.Level.prototype.labels;
+anychart.core.gantt.TimelineHeader.Level.prototype['tilesSeparationStroke'] = anychart.core.gantt.TimelineHeader.Level.prototype.tilesSeparationStroke;
 

@@ -3931,25 +3931,64 @@ goog.provide('anychart.themes.defaultTheme');
           'textWrap': 'byLetter'
         },
         'header': {
-          'labelsFactory': {
-            'enabled': true,
-            'anchor': 'leftTop',
-            'vAlign': 'middle',
-            'padding': {
-              'top': 0,
-              'right': 5,
-              'bottom': 0,
-              'left': 5
-            },
-            'textWrap': 'noWrap',
-            'background': null,
-            'rotation': 0,
-            'width': null,
-            'height': null,
-            'fontSize': 11,
-            'minFontSize': 8,
-            'maxFontSize': 72,
-            'disablePointerEvents': true
+          'backgroundFill': '#cecece',
+          'levelsSeparationStroke': '#cecece',
+
+          'topLevel': {
+            'tileFill': '#f7f7f7',
+            'tilesSeparationStroke': '#cecece',
+            'labels': {
+              'enabled': true,
+              'anchor': 'leftTop',
+              'fontSize': 10,
+              'vAlign': 'middle',
+              'padding': {
+                'top': 0,
+                'right': 5,
+                'bottom': 0,
+                'left': 5
+              },
+              'background': null,
+              'disablePointerEvents': true
+            }
+          },
+
+          'midLevel': {
+            'tileFill': '#f7f7f7',
+            'tilesSeparationStroke': '#cecece',
+            'labels': {
+              'enabled': true,
+              'anchor': 'leftTop',
+              'fontSize': 10,
+              'vAlign': 'middle',
+              'padding': {
+                'top': 0,
+                'right': 5,
+                'bottom': 0,
+                'left': 5
+              },
+              'background': null,
+              'disablePointerEvents': true
+            }
+          },
+
+          'lowLevel': {
+            'tileFill': '#f7f7f7',
+            'tilesSeparationStroke': '#cecece',
+            'labels': {
+              'enabled': true,
+              'anchor': 'leftTop',
+              'fontSize': 10,
+              'vAlign': 'middle',
+              'padding': {
+                'top': 0,
+                'right': 5,
+                'bottom': 0,
+                'left': 5
+              },
+              'background': null,
+              'disablePointerEvents': true
+            }
           }
 
         }

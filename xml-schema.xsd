@@ -1535,6 +1535,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="text_axes_markers" type="core.axisMarkers.Text_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="horizontal_scroll_bar" type="core.ScrollBar"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="vertical_scroll_bar" type="core.ScrollBar"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="header" type="TimelineHeader"/>
         </xsd:all>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
         <xsd:attribute name="is_standalone" type="simple.Bool"/>
@@ -2152,6 +2153,33 @@
         <xsd:attribute name="maximum" type="xsd:double"/>
         <xsd:attribute name="minimum_gap" type="xsd:double"/>
         <xsd:attribute name="maximum_gap" type="xsd:double"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="TimelineHeader">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="background_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="levels_separation_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="top_level" type="TimelineHeaderLevel"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="mid_level" type="TimelineHeaderLevel"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="low_level" type="TimelineHeaderLevel"/>
+        </xsd:all>
+        <xsd:attribute name="background_fill" type="xsd:string"/>
+        <xsd:attribute name="levels_separation_stroke" type="xsd:string"/>
+
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="TimelineHeaderLevel">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="tile_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="tiles_separation_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory" />
+        </xsd:all>
+        <xsd:attribute name="tile_fill" type="xsd:string"/>
+        <xsd:attribute name="tiles_separation_stroke" type="xsd:string"/>
+
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 
     <!-- Gauge elements -->

@@ -2628,6 +2628,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
     mergedSettings = this.getMergedSettings();
     if (this.layer_)
       this.layer_.clip(mergedSettings['clip']);
+    this.markConsistent(anychart.ConsistencyState.LABELS_FACTORY_CLIP);
   }
   return this;
 };

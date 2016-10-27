@@ -519,7 +519,6 @@ anychart.themes.merging.mergingMap_ = [
       'pieFunnelPyramidBase.labels',
       'ganttBase.timeline.labels',
       'defaultDataGrid.defaultColumnSettings.cellTextSettings',
-      'ganttBase.timeline.header.labelsFactory',
       'standalones.labelsFactory',
       'heatMap.labels',
       'map.defaultSeriesSettings.base.labels',
@@ -530,7 +529,10 @@ anychart.themes.merging.mergingMap_ = [
       'linearGauge.defaultPointerSettings.base.label',
       'pert.milestones.labels',
       'pert.tasks.upperLabels',
-      'pert.tasks.lowerLabels'
+      'pert.tasks.lowerLabels',
+      'ganttBase.timeline.header.topLevel.labels',
+      'ganttBase.timeline.header.midLevel.labels',
+      'ganttBase.timeline.header.lowLevel.labels'
     ]
   },
   {

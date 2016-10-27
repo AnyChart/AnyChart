@@ -185,7 +185,18 @@ goog.exportSymbol('anychart.format.locales.default.dateTimeLocale', {
     'minute_millisecond': 'SSS',
     'second': 'HH:mm:ss',
     'second_millisecond': 'SSS',
-    'millisecond': 'SSS'
+    'millisecond': 'SSS',
+
+    'timelineHeader_year': 'yyyy',
+    'timelineHeader_year_month': 'MMMM, yyyy',
+    'timelineHeader_year_week': 'dd MMM yy',
+    'timelineHeader_year_quarter': 'MMM yyyy',
+    'timelineHeader_year_day': 'dd MMM yy',
+    'timelineHeader_quarter_month': 'MMMM',
+    'timelineHeader_month_week': 'dd-MMM',
+    'timelineHeader_week_day': 'd MMM, EEE',
+    'timelineHeader_day_hour': 'HH:mm',
+    'timelineHeader_hour_minute': 'H:mm'
   }
 });
 goog.exportSymbol('anychart.format.locales.default.numberLocale', {

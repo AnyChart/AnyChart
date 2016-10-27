@@ -3725,6 +3725,7 @@
         "selectedConnectorStroke": {"$ref": "#/definitions/stroke"},
         "labels": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"},
         "markers": {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"},
+        "header": {"$ref": "#/definitions/anychart.core.ui.TimelineHeader"},
         "connectorPreviewStroke": {"$ref": "#/definitions/stroke"},
         "editPreviewFill":  {"$ref": "#/definitions/fill"},
         "editPreviewStroke": {"$ref": "#/definitions/stroke"},
@@ -3769,6 +3770,43 @@
         },
         "horizontalScrollBar": {"$ref": "#/definitions/anychart.core.ui.ScrollBar"},
         "verticalScrollBar": {"$ref": "#/definitions/anychart.core.ui.ScrollBar"}
+      }
+    },
+
+    "anychart.core.ui.TimelineHeader": {
+      "type": "object",
+      "allOf": [{"$ref": "#/definitions/anychart.core.VisualBase"}],
+      "properties": {
+        "levelsSeparationStroke": {"$ref": "#/definitions/stroke"},
+        "backgroundFill": {"$ref": "#/definitions/fill"},
+        "topLevel": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.TimelineHeaderLevel"}
+          ]
+        },
+        "midLevel": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.TimelineHeaderLevel"}
+          ]
+        },
+        "lowLevel": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.TimelineHeaderLevel"}
+          ]
+        }
+      }
+    },
+
+    "anychart.core.ui.TimelineHeaderLevel": {
+      "type": "object",
+      "allOf": [{"$ref": "#/definitions/anychart.core.VisualBase"}],
+      "properties": {
+        "tilesSeparationStroke": {"$ref": "#/definitions/stroke"},
+        "tileFill": {"$ref": "#/definitions/fill"},
+        "labels": {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
       }
     },
 

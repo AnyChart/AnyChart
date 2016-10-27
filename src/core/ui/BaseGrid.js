@@ -1836,7 +1836,7 @@ anychart.core.ui.BaseGrid.prototype.drawInternal = function(positionRecalculated
     this.totalGridsWidth = this.pixelBoundsCache.width;
 
     var header = this.pixelBoundsCache.top + this.headerHeight_;
-    var headSepTop = header + .5;
+    var headSepTop = header + 0.5;
 
     this.getHeaderSeparationPath()
         .clear()
