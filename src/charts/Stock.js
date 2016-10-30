@@ -1687,8 +1687,8 @@ anychart.charts.Stock.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.charts.Stock.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.charts.Stock.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   var json;
 
   if ('xScale' in config)
@@ -1725,7 +1725,7 @@ anychart.charts.Stock.prototype.setupByJSON = function(config) {
  */
 anychart.stock = function() {
   var result = new anychart.charts.Stock();
-  result.setup(anychart.getFullTheme()['stock']);
+  result.setupByVal(anychart.getFullTheme()['stock'], true);
   return result;
 };
 

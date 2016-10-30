@@ -1960,8 +1960,8 @@ anychart.charts.Radar.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.charts.Radar.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.charts.Radar.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   if ('defaultSeriesSettings' in config)
     this.defaultSeriesSettings(config['defaultSeriesSettings']);

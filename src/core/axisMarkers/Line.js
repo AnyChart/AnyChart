@@ -186,8 +186,8 @@ anychart.core.axisMarkers.Line.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.axisMarkers.Line.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.axisMarkers.Line.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.value(config['value']);
   this.stroke(config['stroke']);
 };

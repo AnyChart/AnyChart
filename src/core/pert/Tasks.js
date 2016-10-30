@@ -454,8 +454,8 @@ anychart.core.pert.Tasks.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.pert.Tasks.prototype.setupByJSON = function(config) {
-  anychart.core.pert.Tasks.base(this, 'setupByJSON', config);
+anychart.core.pert.Tasks.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.pert.Tasks.base(this, 'setupByJSON', config, opt_default);
   this.upperLabels(config['upperLabels']);
   this.selectUpperLabels(config['selectUpperLabels']);
   this.hoverUpperLabels(config['hoverUpperLabels']);

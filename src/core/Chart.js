@@ -1292,14 +1292,14 @@ anychart.core.Chart.prototype.draw = function(opt_async) {
 /**
  * Extension point do before draw chart content.
  */
-anychart.core.Chart.prototype.beforeDraw = goog.nullFunction;
+anychart.core.Chart.prototype.beforeDraw = function() {};
 
 
 /**
  * Extension point do draw chart content.
  * @param {anychart.math.Rect} bounds Chart content area bounds.
  */
-anychart.core.Chart.prototype.drawContent = goog.nullFunction;
+anychart.core.Chart.prototype.drawContent = function(bounds) {};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1514,15 +1514,23 @@ anychart.core.Chart.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config);
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   if ('defaultLabelSettings' in config)
     this.defaultLabelSettings(config['defaultLabelSettings']);
 
-  this.title(config[anychart.opt.TITLE]);
-  this.background(config[anychart.opt.BACKGROUND]);
-  this.margin(config[anychart.opt.MARGIN]);
-  this.padding(config[anychart.opt.PADDING]);
+  if (anychart.opt.TITLE in config)
+    this.title(config[anychart.opt.TITLE]);
+
+  if (anychart.opt.BACKGROUND in config)
+    this.background(config[anychart.opt.BACKGROUND]);
+
+  if (anychart.opt.PADDING in config)
+    this.padding(config[anychart.opt.PADDING]);
+
+  if (anychart.opt.MARGIN in config)
+    this.margin(config[anychart.opt.MARGIN]);
+
 
   var labels = config['chartLabels'];
   if (goog.isArray(labels)) {
@@ -1545,7 +1553,7 @@ anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
   this.animation(config['animation']);
 
   if (anychart.opt.TOOLTIP in config)
-    this.tooltip().setupByJSON(config['tooltip'], opt_default);
+    this.tooltip().setupByVal(config['tooltip'], opt_default);
 
   this.a11y(config['a11y']);
 

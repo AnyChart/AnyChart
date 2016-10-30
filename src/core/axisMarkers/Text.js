@@ -71,8 +71,8 @@ anychart.core.axisMarkers.Text.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.axisMarkers.Text.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.axisMarkers.Text.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.value(config['value']);
 };
 

@@ -1,4 +1,4 @@
-var chart, series;
+var chart, series, zoom;
 
 var randomExt = function(a, b) {
   return Math.round(Math.random() * (b - a + 1) + a);
@@ -26,16 +26,17 @@ var generateData = function(map, opt_min, opt_max) {
 
 anychart.onDocumentReady(function() {
   chart = anychart.map();
-  // chart.height('20%');
   chart.geoData(anychart.maps.france);
+
   chart.interactivity().zoomOnMouseWheel(true);
   chart.overlapMode(false);
 
   series = chart.choropleth(generateData(chart));
-  series.overlapMode(false);
-  series.labels(true);
-
-  chart.legend(true);
+  series.labels().enabled(true).padding(0);
+  series.tooltip(false);
 
   chart.container('container').draw();
+
+  zoom = anychart.ui.zoom();
+  zoom.render(chart);
 });

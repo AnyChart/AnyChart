@@ -348,8 +348,8 @@ anychart.core.ui.CircularLabelsFactory.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.CircularLabelsFactory.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.ui.CircularLabelsFactory.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.autoRotate(config['autoRotate']);
 };
 
@@ -473,8 +473,8 @@ anychart.core.ui.CircularLabelsFactory.Label.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.CircularLabelsFactory.Label.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.ui.CircularLabelsFactory.Label.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.autoRotate(config['autoRotate']);
 };
 

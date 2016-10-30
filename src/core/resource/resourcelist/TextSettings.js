@@ -1,25 +1,25 @@
-goog.provide('anychart.core.ui.resourceList.TextSettings');
+goog.provide('anychart.core.resource.resourceList.TextSettings');
+goog.require('anychart.core.resource.resourceList.SettingsWithMargin');
 goog.require('anychart.core.settings');
-goog.require('anychart.core.ui.resourceList.SettingsWithMargin');
 
 
 
 /**
  * Class representing text settings for resource list items.
- * @extends {anychart.core.ui.resourceList.SettingsWithMargin}
+ * @extends {anychart.core.resource.resourceList.SettingsWithMargin}
  * @constructor
  */
-anychart.core.ui.resourceList.TextSettings = function() {
-  anychart.core.ui.resourceList.TextSettings.base(this, 'constructor');
+anychart.core.resource.resourceList.TextSettings = function() {
+  anychart.core.resource.resourceList.TextSettings.base(this, 'constructor');
 };
-goog.inherits(anychart.core.ui.resourceList.TextSettings, anychart.core.ui.resourceList.SettingsWithMargin);
+goog.inherits(anychart.core.resource.resourceList.TextSettings, anychart.core.resource.resourceList.SettingsWithMargin);
 
 
 //region --- PROPERTIES ---
 /**
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.core.ui.resourceList.TextSettings.PROPERTY_DESCRIPTORS = (function() {
+anychart.core.resource.resourceList.TextSettings.PROPERTY_DESCRIPTORS = (function() {
   var map = {};
 
   map[anychart.opt.FONT_SIZE] = anychart.core.settings.createDescriptor(
@@ -157,23 +157,23 @@ anychart.core.ui.resourceList.TextSettings.PROPERTY_DESCRIPTORS = (function() {
 
   return map;
 })();
-anychart.core.settings.populate(anychart.core.ui.resourceList.TextSettings, anychart.core.ui.resourceList.TextSettings.PROPERTY_DESCRIPTORS);
+anychart.core.settings.populate(anychart.core.resource.resourceList.TextSettings, anychart.core.resource.resourceList.TextSettings.PROPERTY_DESCRIPTORS);
 //endregion
 
 
 // region --- SETUP/DISPOSE ---
 /** @inheritDoc */
-anychart.core.ui.resourceList.TextSettings.prototype.setupByJSON = function(config, opt_default) {
-  anychart.core.ui.resourceList.TextSettings.base(this, 'setupByJSON', config, opt_default);
+anychart.core.resource.resourceList.TextSettings.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.resource.resourceList.TextSettings.base(this, 'setupByJSON', config, opt_default);
   if (!opt_default)
-    anychart.core.settings.deserialize(this, anychart.core.ui.resourceList.TextSettings.PROPERTY_DESCRIPTORS, config);
+    anychart.core.settings.deserialize(this, anychart.core.resource.resourceList.TextSettings.PROPERTY_DESCRIPTORS, config);
 };
 
 
 /** @inheritDoc */
-anychart.core.ui.resourceList.TextSettings.prototype.serialize = function() {
-  var json = anychart.core.ui.resourceList.TextSettings.base(this, 'serialize');
-  anychart.core.settings.serialize(this, anychart.core.ui.resourceList.TextSettings.PROPERTY_DESCRIPTORS, json);
+anychart.core.resource.resourceList.TextSettings.prototype.serialize = function() {
+  var json = anychart.core.resource.resourceList.TextSettings.base(this, 'serialize');
+  anychart.core.settings.serialize(this, anychart.core.resource.resourceList.TextSettings.PROPERTY_DESCRIPTORS, json);
   return json;
 };
 //endregion
@@ -181,23 +181,23 @@ anychart.core.ui.resourceList.TextSettings.prototype.serialize = function() {
 
 //region --- EXPORTS ---
 //exports
-//anychart.core.ui.resourceList.TextSettings.prototype['fontSize'] = anychart.core.ui.resourceList.TextSettings.prototype.fontSize;
-//anychart.core.ui.resourceList.TextSettings.prototype['fontFamily'] = anychart.core.ui.resourceList.TextSettings.prototype.fontFamily;
-//anychart.core.ui.resourceList.TextSettings.prototype['fontColor'] = anychart.core.ui.resourceList.TextSettings.prototype.fontColor;
-//anychart.core.ui.resourceList.TextSettings.prototype['fontOpacity'] = anychart.core.ui.resourceList.TextSettings.prototype.fontOpacity;
-//anychart.core.ui.resourceList.TextSettings.prototype['fontDecoration'] = anychart.core.ui.resourceList.TextSettings.prototype.fontDecoration;
-//anychart.core.ui.resourceList.TextSettings.prototype['fontStyle'] = anychart.core.ui.resourceList.TextSettings.prototype.fontStyle;
-//anychart.core.ui.resourceList.TextSettings.prototype['fontVariant'] = anychart.core.ui.resourceList.TextSettings.prototype.fontVariant;
-//anychart.core.ui.resourceList.TextSettings.prototype['fontWeight'] = anychart.core.ui.resourceList.TextSettings.prototype.fontWeight;
-//anychart.core.ui.resourceList.TextSettings.prototype['letterSpacing'] = anychart.core.ui.resourceList.TextSettings.prototype.letterSpacing;
-//anychart.core.ui.resourceList.TextSettings.prototype['textDirection'] = anychart.core.ui.resourceList.TextSettings.prototype.textDirection;
-//anychart.core.ui.resourceList.TextSettings.prototype['lineHeight'] = anychart.core.ui.resourceList.TextSettings.prototype.lineHeight;
-//anychart.core.ui.resourceList.TextSettings.prototype['textIndent'] = anychart.core.ui.resourceList.TextSettings.prototype.textIndent;
-//anychart.core.ui.resourceList.TextSettings.prototype['vAlign'] = anychart.core.ui.resourceList.TextSettings.prototype.vAlign;
-//anychart.core.ui.resourceList.TextSettings.prototype['hAlign'] = anychart.core.ui.resourceList.TextSettings.prototype.hAlign;
-//anychart.core.ui.resourceList.TextSettings.prototype['textWrap'] = anychart.core.ui.resourceList.TextSettings.prototype.textWrap;
-//anychart.core.ui.resourceList.TextSettings.prototype['textOverflow'] = anychart.core.ui.resourceList.TextSettings.prototype.textOverflow;
-//anychart.core.ui.resourceList.TextSettings.prototype['selectable'] = anychart.core.ui.resourceList.TextSettings.prototype.selectable;
-//anychart.core.ui.resourceList.TextSettings.prototype['useHtml'] = anychart.core.ui.resourceList.TextSettings.prototype.useHtml;
-//anychart.core.ui.resourceList.TextSettings.prototype['disablePointerEvents'] = anychart.core.ui.resourceList.TextSettings.prototype.disablePointerEvents;
+//anychart.core.resource.resourceList.TextSettings.prototype['fontSize'] = anychart.core.resource.resourceList.TextSettings.prototype.fontSize;
+//anychart.core.resource.resourceList.TextSettings.prototype['fontFamily'] = anychart.core.resource.resourceList.TextSettings.prototype.fontFamily;
+//anychart.core.resource.resourceList.TextSettings.prototype['fontColor'] = anychart.core.resource.resourceList.TextSettings.prototype.fontColor;
+//anychart.core.resource.resourceList.TextSettings.prototype['fontOpacity'] = anychart.core.resource.resourceList.TextSettings.prototype.fontOpacity;
+//anychart.core.resource.resourceList.TextSettings.prototype['fontDecoration'] = anychart.core.resource.resourceList.TextSettings.prototype.fontDecoration;
+//anychart.core.resource.resourceList.TextSettings.prototype['fontStyle'] = anychart.core.resource.resourceList.TextSettings.prototype.fontStyle;
+//anychart.core.resource.resourceList.TextSettings.prototype['fontVariant'] = anychart.core.resource.resourceList.TextSettings.prototype.fontVariant;
+//anychart.core.resource.resourceList.TextSettings.prototype['fontWeight'] = anychart.core.resource.resourceList.TextSettings.prototype.fontWeight;
+//anychart.core.resource.resourceList.TextSettings.prototype['letterSpacing'] = anychart.core.resource.resourceList.TextSettings.prototype.letterSpacing;
+//anychart.core.resource.resourceList.TextSettings.prototype['textDirection'] = anychart.core.resource.resourceList.TextSettings.prototype.textDirection;
+//anychart.core.resource.resourceList.TextSettings.prototype['lineHeight'] = anychart.core.resource.resourceList.TextSettings.prototype.lineHeight;
+//anychart.core.resource.resourceList.TextSettings.prototype['textIndent'] = anychart.core.resource.resourceList.TextSettings.prototype.textIndent;
+//anychart.core.resource.resourceList.TextSettings.prototype['vAlign'] = anychart.core.resource.resourceList.TextSettings.prototype.vAlign;
+//anychart.core.resource.resourceList.TextSettings.prototype['hAlign'] = anychart.core.resource.resourceList.TextSettings.prototype.hAlign;
+//anychart.core.resource.resourceList.TextSettings.prototype['textWrap'] = anychart.core.resource.resourceList.TextSettings.prototype.textWrap;
+//anychart.core.resource.resourceList.TextSettings.prototype['textOverflow'] = anychart.core.resource.resourceList.TextSettings.prototype.textOverflow;
+//anychart.core.resource.resourceList.TextSettings.prototype['selectable'] = anychart.core.resource.resourceList.TextSettings.prototype.selectable;
+//anychart.core.resource.resourceList.TextSettings.prototype['useHtml'] = anychart.core.resource.resourceList.TextSettings.prototype.useHtml;
+//anychart.core.resource.resourceList.TextSettings.prototype['disablePointerEvents'] = anychart.core.resource.resourceList.TextSettings.prototype.disablePointerEvents;
 //endregion

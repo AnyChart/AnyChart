@@ -940,8 +940,8 @@ anychart.core.map.series.Base.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.map.series.Base.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.map.series.Base.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   this.overlapMode(config['overlapMode']);
   this.geoIdField(config['geoIdField']);

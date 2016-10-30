@@ -44,7 +44,8 @@ anychart.enums.ChartTypes = {
   STOCK: 'stock',
   PERT: 'pert',
   GANTT_RESOURCE: 'ganttResource',
-  GANTT_PROJECT: 'ganttProject'
+  GANTT_PROJECT: 'ganttProject',
+  RESOURCE: 'resource'
 };
 
 
@@ -758,19 +759,27 @@ anychart.enums.Orientation = {
 anychart.enums.normalizeOrientation = function(value, opt_default) {
   value = (String(value)).toLowerCase();
   switch (value) {
+    case 'centertop':
+    case 'topcenter':
     case 'top':
     case 't':
     case 'up':
     case 'u':
       return anychart.enums.Orientation.TOP;
+    case 'rightcenter':
+    case 'centerright':
     case 'right':
     case 'r':
       return anychart.enums.Orientation.RIGHT;
+    case 'bottomcenter':
+    case 'centerbottom':
     case 'bottom':
     case 'b':
     case 'down':
     case 'd':
       return anychart.enums.Orientation.BOTTOM;
+    case 'leftcenter':
+    case 'centerleft':
     case 'left':
     case 'l':
       return anychart.enums.Orientation.LEFT;
@@ -2937,6 +2946,8 @@ anychart.enums.ErrorCode = {
 
   INVALID_GEO_JSON_OBJECT: 10,
 
+  FEATURE_NOT_SUPPORTED: 11,
+
   NO_LEGEND_IN_STOCK: 51,
 
   CSV_DOUBLE_QUOTE_IN_SEPARATOR: 100,
@@ -3073,9 +3084,10 @@ anychart.enums.Interval = {
  * Normalizes interval
  * @param {*} value Value to normalize.
  * @param {?anychart.enums.Interval=} opt_default Custom default value (defaults to YEARS).
+ * @param {boolean=} opt_allowDateOnly If true - no time intervals are allowed, only day.
  * @return {?anychart.enums.Interval}
  */
-anychart.enums.normalizeInterval = function(value, opt_default) {
+anychart.enums.normalizeInterval = function(value, opt_default, opt_allowDateOnly) {
   value = (String(value)).toLowerCase();
   switch (value) {
     case 'years':
@@ -3117,24 +3129,24 @@ anychart.enums.normalizeInterval = function(value, opt_default) {
     case 'hour':
     case 'hh':
     case 'h':
-      return anychart.enums.Interval.HOUR;
+      return opt_allowDateOnly ? anychart.enums.Interval.DAY : anychart.enums.Interval.HOUR;
     case 'minutes':
     case 'minute':
     case 'min':
     case 'n':
-      return anychart.enums.Interval.MINUTE;
+      return opt_allowDateOnly ? anychart.enums.Interval.DAY : anychart.enums.Interval.MINUTE;
     case 'seconds':
     case 'second':
     case 'secs':
     case 'sec':
     case 's':
-      return anychart.enums.Interval.SECOND;
+      return opt_allowDateOnly ? anychart.enums.Interval.DAY : anychart.enums.Interval.SECOND;
     case 'milliseconds':
     case 'millisecond':
     case 'millis':
     case 'milli':
     case 'ms':
-      return anychart.enums.Interval.MILLISECOND;
+      return opt_allowDateOnly ? anychart.enums.Interval.DAY : anychart.enums.Interval.MILLISECOND;
   }
   return goog.isDef(opt_default) ? opt_default : anychart.enums.Interval.YEAR;
 };
@@ -5500,6 +5512,87 @@ anychart.enums.IntervalFormatPrefix = {
 
 
 //endregion
+//region --- Calendar items
+//------------------------------------------------------------------------------
+//
+//  Calendar items
+//
+//------------------------------------------------------------------------------
+/**
+ * Availability period.
+ * @enum {string}
+ */
+anychart.enums.AvailabilityPeriod = {
+  YEAR: 'year',
+  WEEK: 'week',
+  DAY: 'day',
+  NONE: 'none'
+};
+
+
+/**
+ * Normalizes availability period.
+ * @param {*} value
+ * @return {anychart.enums.AvailabilityPeriod}
+ */
+anychart.enums.normalizeAvailabilityPeriod = function(value) {
+  value = String(value).toLowerCase();
+  switch (value) {
+    case 'y':
+    case 'year':
+      return anychart.enums.AvailabilityPeriod.YEAR;
+    case 'w':
+    case 'week':
+      return anychart.enums.AvailabilityPeriod.WEEK;
+    case 'd':
+    case 'day':
+      return anychart.enums.AvailabilityPeriod.DAY;
+  }
+  return anychart.enums.AvailabilityPeriod.NONE;
+};
+
+
+//endregion
+//region --- Resource Chart items
+//------------------------------------------------------------------------------
+//
+//  Resource Chart items
+//
+//------------------------------------------------------------------------------
+/**
+ * Time tracking mode.
+ * @enum {string}
+ */
+anychart.enums.TimeTrackingMode = {
+  AVAILABILITY_PER_CHART: 'availabilityPerChart',
+  AVAILABILITY_PER_RESOURCE: 'availabilityPerResource',
+  ACTIVITY_PER_CHART: 'activityPerChart',
+  ACTIVITY_PER_RESOURCE: 'activityPerResource'
+};
+
+
+/**
+ * Normalizes time tracking mode string.
+ * @param {*} value
+ * @return {anychart.enums.TimeTrackingMode}
+ */
+anychart.enums.normalizeTimeTrackingMode = function(value) {
+  value = String(value).toLowerCase();
+  switch (value) {
+    case 'availabilityperchart':
+      return anychart.enums.TimeTrackingMode.AVAILABILITY_PER_CHART;
+    case 'availabilityperresource':
+      return anychart.enums.TimeTrackingMode.AVAILABILITY_PER_RESOURCE;
+    case 'activityperchart':
+      return anychart.enums.TimeTrackingMode.ACTIVITY_PER_CHART;
+    //case 'activityperresource':
+    default:
+      return anychart.enums.TimeTrackingMode.ACTIVITY_PER_RESOURCE;
+  }
+};
+
+
+//endregion
 
 
 //exports
@@ -6318,3 +6411,14 @@ goog.exportSymbol('anychart.enums.LocaleDateTimeFormat.MILLISECOND', anychart.en
 
 goog.exportSymbol('anychart.enums.IntervalFormatPrefix.NONE', anychart.enums.IntervalFormatPrefix.NONE);
 goog.exportSymbol('anychart.enums.IntervalFormatPrefix.FULL', anychart.enums.IntervalFormatPrefix.FULL);
+
+goog.exportSymbol('anychart.enums.AvailabilityPeriod.YEAR', anychart.enums.AvailabilityPeriod.YEAR);
+goog.exportSymbol('anychart.enums.AvailabilityPeriod.WEEK', anychart.enums.AvailabilityPeriod.WEEK);
+goog.exportSymbol('anychart.enums.AvailabilityPeriod.DAY', anychart.enums.AvailabilityPeriod.DAY);
+goog.exportSymbol('anychart.enums.AvailabilityPeriod.NONE', anychart.enums.AvailabilityPeriod.NONE);
+
+goog.exportSymbol('anychart.enums.TimeTrackingMode.AVAILABILITY_PER_CHART', anychart.enums.TimeTrackingMode.AVAILABILITY_PER_CHART);
+goog.exportSymbol('anychart.enums.TimeTrackingMode.AVAILABILITY_PER_RESOURCE', anychart.enums.TimeTrackingMode.AVAILABILITY_PER_RESOURCE);
+goog.exportSymbol('anychart.enums.TimeTrackingMode.ACTIVITY_PER_CHART', anychart.enums.TimeTrackingMode.ACTIVITY_PER_CHART);
+goog.exportSymbol('anychart.enums.TimeTrackingMode.ACTIVITY_PER_RESOURCE', anychart.enums.TimeTrackingMode.ACTIVITY_PER_RESOURCE);
+

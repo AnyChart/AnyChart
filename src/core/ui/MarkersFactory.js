@@ -811,9 +811,9 @@ anychart.core.ui.MarkersFactory.prototype.setupSpecial = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.MarkersFactory.prototype.setupByJSON = function(config) {
+anychart.core.ui.MarkersFactory.prototype.setupByJSON = function(config, opt_default) {
   var enabledState = this.enabled();
-  goog.base(this, 'setupByJSON', config);
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.disablePointerEvents(config['disablePointerEvents']);
   this.position(config['position']);
   this.rotation(config['rotation']);
@@ -1485,9 +1485,9 @@ anychart.core.ui.MarkersFactory.Marker.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.MarkersFactory.Marker.prototype.setupByJSON = function(config) {
+anychart.core.ui.MarkersFactory.Marker.prototype.setupByJSON = function(config, opt_default) {
   var enabledState = this.enabled();
-  goog.base(this, 'setupByJSON', config);
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.position(config['position']);
   this.rotation(config['rotation']);
   this.anchor(config['anchor']);

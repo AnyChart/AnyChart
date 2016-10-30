@@ -45,6 +45,8 @@ anychart.charts.Gantt = function(opt_isResourcesChart) {
   this.isResourcesChart_ = !!opt_isResourcesChart;
 
   this.controller_ = new anychart.core.gantt.Controller(this.isResourcesChart_);
+  this.controller_.dataGrid(/** @type {anychart.core.ui.DataGrid} */ (this.getDataGrid_()));
+  this.controller_.timeline(/** @type {anychart.core.ui.Timeline} */ (this.getTimeline()));
   this.registerDisposable(this.controller_);
   this.controller_.listenSignals(this.controllerInvalidated_, this);
 
@@ -328,11 +330,12 @@ anychart.charts.Gantt.prototype.data = function(opt_value, opt_fillMethod) {
     if (opt_value instanceof anychart.data.Tree || opt_value instanceof anychart.data.TreeView) {
       if (this.data_ != opt_value) {
         this.data_ = opt_value;
+        this.invalidate(anychart.ConsistencyState.GANTT_DATA, anychart.Signal.NEEDS_REDRAW);
       }
     } else {
       this.data_ = new anychart.data.Tree(opt_value, opt_fillMethod);
+      this.invalidate(anychart.ConsistencyState.GANTT_DATA, anychart.Signal.NEEDS_REDRAW);
     }
-    this.invalidate(anychart.ConsistencyState.GANTT_DATA, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
   return this.data_;
@@ -982,9 +985,6 @@ anychart.charts.Gantt.prototype.drawContent = function(bounds) {
     this.verticalScrollBar_.container(this.rootElement);
   }
 
-  if (!this.controller_.dataGrid()) this.controller_.dataGrid(/** @type {anychart.core.ui.DataGrid} */ (this.getDataGrid_()));
-  if (!this.controller_.timeline()) this.controller_.timeline(/** @type {anychart.core.ui.Timeline} */ (this.getTimeline()));
-
   if (this.hasInvalidationState(anychart.ConsistencyState.GANTT_SPLITTER_POSITION) || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     if (bounds.width > 0) {
       var dgWidth = Math.round(anychart.utils.normalizeSize(this.splitterPosition_, bounds.width));
@@ -1068,10 +1068,10 @@ anychart.charts.Gantt.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.charts.Gantt.prototype.setupByJSON = function(config) {
-  anychart.charts.Gantt.base(this, 'setupByJSON', config);
+anychart.charts.Gantt.prototype.setupByJSON = function(config, opt_default) {
+  anychart.charts.Gantt.base(this, 'setupByJSON', config, opt_default);
 
-  if ('controller' in config) this.controller_.setupByJSON(config['controller']);
+  if ('controller' in config) this.controller_.setupByJSON(config['controller'], opt_default);
 
   this.data(/** @type {anychart.data.Tree} */ (this.controller_.data()));
 
@@ -1081,8 +1081,8 @@ anychart.charts.Gantt.prototype.setupByJSON = function(config) {
   this.splitterPosition(config['splitterPosition']);
   this.editing(config['editing']);
 
-  if ('dataGrid' in config) this.dataGrid().setupByJSON(config['dataGrid']);
-  if ('timeline' in config) this.getTimeline().setupByJSON(config['timeline']);
+  if ('dataGrid' in config) this.dataGrid().setupByJSON(config['dataGrid'], opt_default);
+  if ('timeline' in config) this.getTimeline().setupByJSON(config['timeline'], opt_default);
 
 };
 

@@ -1355,8 +1355,8 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
         break;
     }
   } else {
-    left = anychart.utils.normalizeSize(/** @type {string|number} */ (margin.getSafeOption(anychart.opt.LEFT)), 0);
-    top = anychart.utils.normalizeSize(/** @type {string|number} */ (margin.getSafeOption(anychart.opt.TOP)), 0);
+    left = anychart.utils.normalizeSize(/** @type {string|number} */ (margin.getOption(anychart.opt.LEFT)), 0);
+    top = anychart.utils.normalizeSize(/** @type {string|number} */ (margin.getOption(anychart.opt.TOP)), 0);
   }
 
   this.pixelBounds_ = new anychart.math.Rect(left, top, width, height);
@@ -1849,18 +1849,27 @@ anychart.core.ui.Legend.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.Legend.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.ui.Legend.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
-  this.margin(config[anychart.opt.MARGIN]);
-  this.padding(config[anychart.opt.PADDING]);
-  this.background(config[anychart.opt.BACKGROUND]);
-  this.title(config[anychart.opt.TITLE]);
+  if (anychart.opt.TITLE in config)
+    this.title(config[anychart.opt.TITLE]);
+
+  if (anychart.opt.BACKGROUND in config)
+    this.background(config[anychart.opt.BACKGROUND]);
+
+  if (anychart.opt.PADDING in config)
+    this.padding(config[anychart.opt.PADDING]);
+
+  if (anychart.opt.MARGIN in config)
+    this.margin(config[anychart.opt.MARGIN]);
 
   this.titleFormatter(config['titleFormatter']);
   this.titleSeparator(config['titleSeparator']);
   this.paginator(config['paginator']);
-  this.tooltip(config['tooltip']);
+
+  this.tooltip().setupByVal(config[anychart.opt.TOOLTIP], opt_default);
+
   this.itemsLayout(config['itemsLayout']);
   this.itemsSpacing(config['itemsSpacing']);
   this.inverted(config['inverted']);

@@ -121,8 +121,8 @@ anychart.core.utils.Interactivity.prototype.allowMultiSeriesSelection = function
 /**
  * @inheritDoc
  */
-anychart.core.utils.Interactivity.prototype.setupByJSON = function(value) {
-  anychart.core.utils.Interactivity.base(this, 'setupByJSON', value);
+anychart.core.utils.Interactivity.prototype.setupByJSON = function(value, opt_default) {
+  anychart.core.utils.Interactivity.base(this, 'setupByJSON', value, opt_default);
 
   this.parent_.suspendSignalsDispatching();
   this.hoverMode(value['hoverMode']);

@@ -316,8 +316,8 @@ anychart.scales.OrdinalTicks.prototype.setupSpecial = function(var_args) {
 
 
 /** @inheritDoc */
-anychart.scales.OrdinalTicks.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.scales.OrdinalTicks.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   if ('explicit' in config)
     this.set(config['explicit']);
   else if ('interval' in config)

@@ -774,8 +774,8 @@ anychart.core.ui.LabelBase.prototype.calculateLabelBounds_ = function() {
   }
   this.resumeSignalsDispatching(false);
 
-  this.textX = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.LEFT), this.backgroundWidth);
-  this.textY = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.TOP), this.backgroundHeight);
+  this.textX = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.LEFT)), this.backgroundWidth);
+  this.textY = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.TOP)), this.backgroundHeight);
 };
 
 
@@ -1046,11 +1046,14 @@ anychart.core.ui.LabelBase.prototype.setupSpecial = function(var_args) {
 
 
 /** @inheritDoc */
-anychart.core.ui.LabelBase.prototype.setupByJSON = function(config) {
-  anychart.core.ui.LabelBase.base(this, 'setupByJSON', config);
+anychart.core.ui.LabelBase.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.ui.LabelBase.base(this, 'setupByJSON', config, opt_default);
 
-  this.background(config[anychart.opt.BACKGROUND]);
-  this.padding(config[anychart.opt.PADDING]);
+  if (anychart.opt.BACKGROUND in config)
+    this.background(config[anychart.opt.BACKGROUND]);
+
+  if (anychart.opt.PADDING in config)
+    this.padding(config[anychart.opt.PADDING]);
 
   this.width(config['width']);
   this.height(config['height']);

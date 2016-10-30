@@ -83,6 +83,34 @@ anychart.opt.STROKE = 'stroke';
 
 
 /**
+ * Constant replacer for "topStroke" string.
+ * @const {string}
+ */
+anychart.opt.TOP_STROKE = 'topStroke';
+
+
+/**
+ * Constant replacer for "rightStroke" string.
+ * @const {string}
+ */
+anychart.opt.RIGHT_STROKE = 'rightStroke';
+
+
+/**
+ * Constant replacer for "bottomStroke" string.
+ * @const {string}
+ */
+anychart.opt.BOTTOM_STROKE = 'bottomStroke';
+
+
+/**
+ * Constant replacer for "leftStroke" string.
+ * @const {string}
+ */
+anychart.opt.LEFT_STROKE = 'leftStroke';
+
+
+/**
  * Constant replacer for "minorStroke" string.
  * @const {string}
  */
@@ -1638,6 +1666,12 @@ anychart.opt.TEXT_FORMATTER = 'textFormatter';
 /**
  * @const {string}
  */
+anychart.opt.UNION_TEXT_FORMATTER = 'unionTextFormatter';
+
+
+/**
+ * @const {string}
+ */
 anychart.opt.VALUE_PREFIX = 'valuePrefix';
 
 
@@ -1687,6 +1721,12 @@ anychart.opt.WIDTH = 'width';
  * @const {string}
  */
 anychart.opt.HEIGHT = 'height';
+
+
+/**
+ * @const {string}
+ */
+anychart.opt.LEVEL_HEIGHT = 'levelHeight';
 
 
 /**
@@ -1860,3 +1900,213 @@ anychart.opt.IMAGE_SRC = 'imageSrc';
  * @const {string}
  */
 anychart.opt.SEPARATOR = 'separator';
+
+
+/**
+ * Constant replacer for "each" string.
+ * @const {string}
+ */
+anychart.opt.EACH = 'each';
+
+
+/**
+ * Constant replacer for "on" string.
+ * @const {string}
+ */
+anychart.opt.ON = 'on';
+
+
+/**
+ * Constant replacer for "from" string.
+ * @const {string}
+ */
+anychart.opt.FROM = 'from';
+
+
+/**
+ * Constant replacer for "to" string.
+ * @const {string}
+ */
+anychart.opt.TO = 'to';
+
+
+/**
+ * Constant replacer for "starts" string.
+ * @const {string}
+ */
+anychart.opt.STARTS = 'starts';
+
+
+/**
+ * Constant replacer for "ends" string.
+ * @const {string}
+ */
+anychart.opt.ENDS = 'ends';
+
+
+/**
+ * Constant replacer for "isWorking" string.
+ * @const {string}
+ */
+anychart.opt.IS_WORKING = 'isWorking';
+
+
+/**
+ * Constant replacer for "oddHolidayFill" string.
+ * @const {string}
+ */
+anychart.opt.ODD_HOLIDAY_FILL = 'oddHolidayFill';
+
+
+/**
+ * Constant replacer for "evenHolidayFill" string.
+ * @const {string}
+ */
+anychart.opt.EVEN_HOLIDAY_FILL = 'evenHolidayFill';
+
+
+/**
+ * Constant replacer for "oddHatchFill" string.
+ * @const {string}
+ */
+anychart.opt.ODD_HATCH_FILL = 'oddHatchFill';
+
+
+/**
+ * Constant replacer for "evenHatchFill" string.
+ * @const {string}
+ */
+anychart.opt.EVEN_HATCH_FILL = 'evenHatchFill';
+
+
+/**
+ * Constant replacer for "oddHolidayHatchFill" string.
+ * @const {string}
+ */
+anychart.opt.ODD_HOLIDAY_HATCH_FILL = 'oddHolidayHatchFill';
+
+
+/**
+ * Constant replacer for "evenHolidayHatchFill" string.
+ * @const {string}
+ */
+anychart.opt.EVEN_HOLIDAY_HATCH_FILL = 'evenHolidayHatchFill';
+
+
+/**
+ * Constant replacer for "horizontalStroke" string.
+ * @const {string}
+ */
+anychart.opt.HORIZONTAL_STROKE = 'horizontalStroke';
+
+
+/**
+ * Constant replacer for "verticalStroke" string.
+ * @const {string}
+ */
+anychart.opt.VERTICAL_STROKE = 'verticalStroke';
+
+
+/**
+ * Constant replacer for "activities" string.
+ * @const {string}
+ */
+anychart.opt.ACTIVITIES = 'activities';
+
+
+/**
+ * Constant replacer for "start" string.
+ * @const {string}
+ */
+anychart.opt.START = 'start';
+
+
+/**
+ * Constant replacer for "end" string.
+ * @const {string}
+ */
+anychart.opt.END = 'end';
+
+
+/**
+ * Constant replacer for "drawTopLine" string.
+ * @const {string}
+ */
+anychart.opt.DRAW_TOP_LINE = 'drawTopLine';
+
+
+/**
+ * Constant replacer for "drawRightLine" string.
+ * @const {string}
+ */
+anychart.opt.DRAW_RIGHT_LINE = 'drawRightLine';
+
+
+/**
+ * Constant replacer for "drawBottomLine" string.
+ * @const {string}
+ */
+anychart.opt.DRAW_BOTTOM_LINE = 'drawBottomLine';
+
+
+/**
+ * Constant replacer for "drawLeftLine" string.
+ * @const {string}
+ */
+anychart.opt.DRAW_LEFT_LINE = 'drawLeftLine';
+
+
+/**
+ * Constant replacer for "intervals" string.
+ * @const {string}
+ */
+anychart.opt.INTERVALS = 'intervals';
+
+
+/**
+ * Constant replacer for "minutesPerDay" string.
+ * @const {string}
+ */
+anychart.opt.MINUTES_PER_DAY = 'minutesPerDay';
+
+
+/**
+ * Constant replacer for "id" string.
+ * @const {string}
+ */
+anychart.opt.ID = 'id';
+
+
+/**
+ * Constant replacer for "className" string.
+ * @const {string}
+ */
+anychart.opt.CLASS_NAME = 'className';
+
+
+/**
+ * Constant replacer for "totalMinutes" string.
+ * @const {string}
+ */
+anychart.opt.TOTAL_MINUTES = 'totalMinutes';
+
+
+/**
+ * Constant replacer for "rowHeight" string.
+ * @const {string}
+ */
+anychart.opt.ROW_HEIGHT = 'rowHeight';
+
+
+/**
+ * Constant replacer for "minRowHeight" string.
+ * @const {string}
+ */
+anychart.opt.MIN_ROW_HEIGHT = 'minRowHeight';
+
+
+/**
+ * Constant replacer for "maxRowHeight" string.
+ * @const {string}
+ */
+anychart.opt.MAX_ROW_HEIGHT = 'maxRowHeight';

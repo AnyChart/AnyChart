@@ -45,8 +45,8 @@ anychart.core.ui.Label.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.Label.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.ui.Label.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.position(config['position']);
 };
 

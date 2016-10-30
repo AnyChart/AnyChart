@@ -145,8 +145,8 @@ anychart.core.utils.MapInteractivity.prototype.copyFormatter = function(opt_valu
 //endregion
 //region --- Setup and serialize
 /** @inheritDoc */
-anychart.core.utils.MapInteractivity.prototype.setupByJSON = function(value) {
-  anychart.core.utils.MapInteractivity.base(this, 'setupByJSON', value);
+anychart.core.utils.MapInteractivity.prototype.setupByJSON = function(value, opt_default) {
+  anychart.core.utils.MapInteractivity.base(this, 'setupByJSON', value, opt_default);
 
   this.zoomOnMouseWheel(value['zoomOnMouseWheel']);
   this.keyboardZoomAndMove(value['keyboardZoomAndMove']);

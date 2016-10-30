@@ -324,8 +324,8 @@ anychart.palettes.RangeColors.prototype.setupSpecial = function(var_args) {
 
 
 /** @inheritDoc */
-anychart.palettes.RangeColors.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.palettes.RangeColors.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.items(config['items']);
   this.count(config['count']);
 };

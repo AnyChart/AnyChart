@@ -579,7 +579,7 @@ anychart.core.ui.DataGrid.prototype.dblClickResizeColumn_ = function(column, col
     var eventY = event['offsetY'] - this.pixelBoundsCache.top;
     if (eventY < height) {
       var titleOriginalBoundsWidth = title.getOriginalBounds().width;
-      titleOriginalBoundsWidth += (title.padding().getSafeOption(anychart.opt.LEFT) + title.padding().getSafeOption(anychart.opt.RIGHT));
+      titleOriginalBoundsWidth += (title.padding().getOption(anychart.opt.LEFT) + title.padding().getOption(anychart.opt.RIGHT));
       column.width(/** @type {number} */ (column.defaultWidth() ? column.defaultWidth() : titleOriginalBoundsWidth));
     }
   }
@@ -883,8 +883,8 @@ anychart.core.ui.DataGrid.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.DataGrid.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.ui.DataGrid.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   this.columnStroke(config['columnStroke']);
   this.headerFill(config['headerFill']);
@@ -1570,13 +1570,13 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
       this.cellTextSettings().suspendSignalsDispatching();
       this.cellTextSettings().clear();
 
-      var paddingLeft = anychart.utils.normalizeSize(/** @type {number|string} */ (this.cellTextSettings().padding().getSafeOption(anychart.opt.LEFT)),
+      var paddingLeft = anychart.utils.normalizeSize(/** @type {number|string} */ (this.cellTextSettings().padding().getOption(anychart.opt.LEFT)),
           this.pixelBoundsCache_.width);
-      var paddingRight = anychart.utils.normalizeSize(/** @type {(number|string)} */ (this.cellTextSettings().padding().getSafeOption(anychart.opt.RIGHT)),
+      var paddingRight = anychart.utils.normalizeSize(/** @type {(number|string)} */ (this.cellTextSettings().padding().getOption(anychart.opt.RIGHT)),
           this.pixelBoundsCache_.width);
-      var paddingTop = anychart.utils.normalizeSize(/** @type {(number|string)} */ (this.cellTextSettings().padding().getSafeOption(anychart.opt.TOP)),
+      var paddingTop = anychart.utils.normalizeSize(/** @type {(number|string)} */ (this.cellTextSettings().padding().getOption(anychart.opt.TOP)),
           this.pixelBoundsCache_.height);
-      var paddingBottom = anychart.utils.normalizeSize(/** @type {(number|string)} */ (this.cellTextSettings().padding().getSafeOption(anychart.opt.BOTTOM)),
+      var paddingBottom = anychart.utils.normalizeSize(/** @type {(number|string)} */ (this.cellTextSettings().padding().getOption(anychart.opt.BOTTOM)),
           this.pixelBoundsCache_.height);
 
       var counter = -1;
@@ -1718,8 +1718,8 @@ anychart.core.ui.DataGrid.Column.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.DataGrid.Column.prototype.setupByJSON = function(json) {
-  goog.base(this, 'setupByJSON', json);
+anychart.core.ui.DataGrid.Column.prototype.setupByJSON = function(json, opt_default) {
+  goog.base(this, 'setupByJSON', json, opt_default);
 
   this.width(json['width']);
   this.defaultWidth(json['defaultWidth']);

@@ -527,8 +527,8 @@ anychart.core.radar.series.Marker.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.core.radar.series.Marker.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.radar.series.Marker.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.size(config['size']);
   this.hoverSize(config['hoverSize']);
   this.selectSize(config['selectSize']);

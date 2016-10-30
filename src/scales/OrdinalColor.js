@@ -631,8 +631,8 @@ anychart.scales.OrdinalColor.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.scales.OrdinalColor.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.scales.OrdinalColor.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.ticks(config['ticks']);
   this.colors(config['colors']);
   this.ranges(config['ranges']);

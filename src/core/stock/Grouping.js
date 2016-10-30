@@ -432,8 +432,8 @@ anychart.core.stock.Grouping.prototype.setupSpecial = function(var_args) {
 
 
 /** @inheritDoc */
-anychart.core.stock.Grouping.prototype.setupByJSON = function(config) {
-  anychart.core.stock.Grouping.base(this, 'setupByJSON', config);
+anychart.core.stock.Grouping.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.stock.Grouping.base(this, 'setupByJSON', config, opt_default);
 
   this.enabled(config[anychart.opt.ENABLED]);
   this.forced(config[anychart.opt.FORCED]);

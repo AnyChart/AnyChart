@@ -308,8 +308,8 @@ anychart.core.axes.StockTicks.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.axes.StockTicks.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.axes.StockTicks.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.stroke(config['stroke']);
 };
 

@@ -986,8 +986,8 @@ anychart.core.annotations.PlotController.prototype.setupSpecial = function(var_a
 
 
 /** @inheritDoc */
-anychart.core.annotations.PlotController.prototype.setupByJSON = function(config) {
-  anychart.core.annotations.PlotController.base(this, 'setupByJSON', config);
+anychart.core.annotations.PlotController.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.annotations.PlotController.base(this, 'setupByJSON', config, opt_default);
 
   var list = config[anychart.opt.ANNOTATIONS_LIST];
   if (goog.isArray(list)) {

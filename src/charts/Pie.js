@@ -1,5 +1,8 @@
 goog.provide('anychart.charts.Pie');
 
+goog.require('anychart.animations.AnimationSerialQueue');
+goog.require('anychart.animations.PieAnimation');
+goog.require('anychart.animations.PieLabelAnimation');
 goog.require('anychart.color');
 goog.require('anychart.core.PiePoint');
 goog.require('anychart.core.SeparateChart');
@@ -331,6 +334,20 @@ anychart.charts.Pie.OUTSIDE_LABELS_CONNECTOR_SIZE_ = 5;
 
 
 /**
+ * Ratio of pie animation duration.
+ * Full pie animation consists of 2 serial animations (pie slices animation and labels animation).
+ * So this ratio shows pie slices animation duration.
+ * Left ratio goes to labels animation.
+ *
+ * In default case of 1000ms duration:
+ *   slices animation duration will be 550ms.
+ *   labels animation - 450ms.
+ * @type {number}
+ */
+anychart.charts.Pie.PIE_ANIMATION_DURATION_RATIO = 0.85;
+
+
+/**
  * 3D sides type.
  * @enum {string}
  */
@@ -368,6 +385,44 @@ anychart.charts.Pie.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @type {acgraph.vector.HatchFill.HatchFillType|string}
  */
 anychart.charts.Pie.DEFAULT_HATCH_FILL_TYPE = 'none';
+
+
+/** @inheritDoc */
+anychart.charts.Pie.prototype.doAnimation = function() {
+  if (this.animation().enabled() && this.animation().duration() > 0) {
+    if (this.animationQueue_ && this.animationQueue_.isPlaying()) {
+      this.animationQueue_.update();
+    } else if (this.hasInvalidationState(anychart.ConsistencyState.CHART_ANIMATION)) {
+      goog.dispose(this.animationQueue_);
+      this.animationQueue_ = new anychart.animations.AnimationSerialQueue();
+      var duration = /** @type {number} */(this.animation().duration());
+      var pieDuration = duration * anychart.charts.Pie.PIE_ANIMATION_DURATION_RATIO;
+      var pieLabelDuration = duration * (1 - anychart.charts.Pie.PIE_ANIMATION_DURATION_RATIO);
+
+      var pieAnimation = new anychart.animations.PieAnimation(this, pieDuration);
+      var pieLabelAnimation = new anychart.animations.PieLabelAnimation(this, pieLabelDuration);
+
+      this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (pieAnimation));
+      this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (pieLabelAnimation));
+
+      this.animationQueue_.listen(goog.fx.Transition.EventType.BEGIN, function() {
+        this.dispatchDetachedEvent({
+          'type': anychart.enums.EventType.ANIMATION_START,
+          'chart': this
+        });
+      }, false, this);
+
+      this.animationQueue_.listen(goog.fx.Transition.EventType.END, function() {
+        this.dispatchDetachedEvent({
+          'type': anychart.enums.EventType.ANIMATION_END,
+          'chart': this
+        });
+      }, false, this);
+
+      this.animationQueue_.play(false);
+    }
+  }
+};
 
 
 /**
@@ -478,6 +533,15 @@ anychart.charts.Pie.prototype.getIterator = function() {
  */
 anychart.charts.Pie.prototype.getResetIterator = function() {
   return this.iterator_ = this.view_.getIterator();
+};
+
+
+/**
+ * Returns detached iterator.
+ * @return {!anychart.data.Iterator} Detached iterator.
+ */
+anychart.charts.Pie.prototype.getDetachedIterator = function() {
+  return this.view_.getIterator();
 };
 
 
@@ -1280,7 +1344,7 @@ anychart.charts.Pie.prototype.sort = function(opt_value) {
 anychart.charts.Pie.prototype.calculate_ = function(bounds) {
   var minWidthHeight = Math.min(bounds.width, bounds.height);
 
-  this.outsideLabelsOffsetValue_ = this.isOutsideLabels_() && this.labels().enabled() ?
+  this.outsideLabelsOffsetValue_ = this.isOutsideLabels() && this.labels().enabled() ?
       anychart.utils.normalizeSize(this.outsideLabelsSpace_, minWidthHeight) : 0;
   this.radiusValue_ = anychart.utils.normalizeSize(this.radius_, minWidthHeight - this.outsideLabelsOffsetValue_);
   this.connectorLengthValue_ = anychart.utils.normalizeSize(this.connectorLength_, this.radiusValue_);
@@ -1491,7 +1555,10 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
     iterator.reset();
     while (iterator.advance()) {
       value = /** @type {number|string|null|undefined} */ (iterator.get('value'));
-      if (this.isMissing_(value)) continue;
+      if (this.isMissing_(value)) {
+        iterator.meta('missing', true);
+        continue;
+      }
       value = +value;
       sweep = value / /** @type {number} */ (this.getStat(anychart.enums.Statistics.SUM)) * 360;
 
@@ -1538,12 +1605,12 @@ anychart.charts.Pie.prototype.drawContent = function(bounds) {
       if (this.mode3d_) this.connectorsLowerLayer_.clear();
     }
 
-    var themePart = this.isOutsideLabels_() ?
+    var themePart = this.isOutsideLabels() ?
         anychart.getFullTheme()['pie']['outsideLabels'] :
         anychart.getFullTheme()['pie']['insideLabels'];
     this.labels().setAutoColor(themePart['autoColor']);
     this.labels().disablePointerEvents(themePart['disablePointerEvents']);
-    if (this.isOutsideLabels_()) {
+    if (this.isOutsideLabels()) {
       this.calculateOutsideLabels();
     } else {
       iterator.reset();
@@ -1574,6 +1641,57 @@ anychart.charts.Pie.prototype.isMissing_ = function(value) {
 
 
 /**
+ * Updates point on animate.
+ * @param {anychart.data.Iterator} point Iterator pointing to slice.
+ */
+anychart.charts.Pie.prototype.updatePointOnAnimate = function(point) {
+  var slice = /** @type {!acgraph.vector.Path} */ (point.meta('slice'));
+  slice.clear();
+  var start = /** @type {number} */ (point.meta('start'));
+  var sweep = /** @type {number} */ (point.meta('sweep'));
+  var radius = /** @type {number} */ (point.meta('radius'));
+  var innerRadius = /** @type {number} */ (point.meta('innerRadius'));
+  var exploded = !!point.meta('exploded') && !(point.getRowsCount() == 1);
+
+  if (exploded) {
+    var angle = start + sweep / 2;
+    var cos = Math.cos(goog.math.toRadians(angle));
+    var sin = Math.sin(goog.math.toRadians(angle));
+    var ex = this.explodeValue_ * cos;
+    var ey = this.explodeValue_ * sin;
+    slice = acgraph.vector.primitives.donut(slice, this.cx_ + ex, this.cy_ + ey, radius, innerRadius, start, sweep);
+  } else {
+    slice = acgraph.vector.primitives.donut(slice, this.cx_, this.cy_, radius, innerRadius, start, sweep);
+  }
+
+  var hatchSlice = /** @type {!acgraph.vector.Path} */ (point.meta('hatchSlice'));
+  if (hatchSlice) {
+    this.getIterator().select(point.getIndex());
+    hatchSlice.clear();
+    hatchSlice.deserialize(slice.serialize());
+    hatchSlice.stroke(null).fill(this.getFinalHatchFill(true, this.state.getPointStateByIndex(point.getIndex())));
+  }
+};
+
+
+/**
+ * Updates label (and connector) on animate.
+ * @param {number} labelOpacity Label opacity.
+ * @param {number} connectorOpacity Connector opacity.
+ * @param {boolean} isOutside Whether labels has outside position.
+ */
+anychart.charts.Pie.prototype.updateLabelsOnAnimate = function(labelOpacity, connectorOpacity, isOutside) {
+  this.labels().suspendSignalsDispatching().fontOpacity(labelOpacity).draw().resumeSignalsDispatching(false);
+  if (isOutside && this.drawnConnectors_) {
+    for (var i in this.drawnConnectors_) {
+      if (this.drawnConnectors_.hasOwnProperty(i))
+        this.drawnConnectors_[i].stroke(anychart.color.setOpacity(this.connectorStroke_, connectorOpacity));
+    }
+  }
+};
+
+
+/**
  * Internal function for drawinga slice by arguments.
  * @param {boolean=} opt_update Whether to update current slice.
  * @return {boolean} True if point is drawn.
@@ -1585,8 +1703,6 @@ anychart.charts.Pie.prototype.drawSlice_ = function(opt_update) {
   var index = /** @type {number} */ (iterator.getIndex());
   var start = /** @type {number} */ (iterator.meta('start'));
   var sweep = /** @type {number} */ (iterator.meta('sweep'));
-  // if no information about slice in meta (e.g. no slice has drawn: call explodeSlice(_, _) before chart.draw()).
-  if (!goog.isDef(start) || !goog.isDef(sweep) || sweep == 0) return false;
   var exploded = !!iterator.meta('exploded') && !(iterator.getRowsCount() == 1);
 
   /** @type {!acgraph.vector.Path} */
@@ -2706,7 +2822,7 @@ anychart.charts.Pie.prototype.drawOutsideLabel_ = function(pointState, opt_updat
  * @return {anychart.core.ui.CircularLabelsFactory.Label} Label.
  */
 anychart.charts.Pie.prototype.drawLabel_ = function(pointState, opt_updateConnector) {
-  if (this.isOutsideLabels_())
+  if (this.isOutsideLabels())
     return this.drawOutsideLabel_(pointState, opt_updateConnector);
 
   var hovered = this.state.isStateContains(pointState, anychart.PointState.HOVER);
@@ -2933,13 +3049,18 @@ anychart.charts.Pie.prototype.clickSlice = function(opt_explode) {
     iterator.meta('exploded', !exploded);
   }
 
+  var start = /** @type {number} */ (iterator.meta('start'));
+  var sweep = /** @type {number} */ (iterator.meta('sweep'));
+  // if no information about slice in meta (e.g. no slice has drawn: call explodeSlice(_, _) before chart.draw()).
+  if (!goog.isDef(start) || !goog.isDef(sweep) || sweep == 0) return;
+
   var index = iterator.getIndex();
   if (this.mode3d_) {
     this.draw3DSlices_(index, true);
   } else {
     this.drawSlice_(true);
   }
-  if (this.isOutsideLabels_()) {
+  if (this.isOutsideLabels()) {
     this.labels().suspendSignalsDispatching();
     this.labels().clear();
     this.calculateOutsideLabels();
@@ -2956,10 +3077,9 @@ anychart.charts.Pie.prototype.clickSlice = function(opt_explode) {
 
 
 /**
- * @private
  * @return {boolean} Define, is labels have outside position.
  */
-anychart.charts.Pie.prototype.isOutsideLabels_ = function() {
+anychart.charts.Pie.prototype.isOutsideLabels = function() {
   return anychart.enums.normalizeSidePosition(this.labels().position()) == anychart.enums.SidePosition.OUTSIDE;
 };
 
@@ -4097,7 +4217,7 @@ anychart.charts.Pie.prototype.updateConnector_ = function(label, show) {
  * @protected
  */
 anychart.charts.Pie.prototype.createPositionProvider = function() {
-  var outside = this.isOutsideLabels_();
+  var outside = this.isOutsideLabels();
   var iterator = this.getIterator();
   var start = /** @type {number} */ (iterator.meta('start'));
   var sweep = /** @type {number} */ (iterator.meta('sweep'));
@@ -4295,15 +4415,18 @@ anychart.charts.Pie.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.charts.Pie.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.charts.Pie.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.group(config['group']);
   this.data(config['data']);
   this.labels().setup(config['labels']);
   this.hoverLabels().setup(config['hoverLabels']);
   this.palette(config['palette']);
   this.hatchFillPalette(config['hatchFillPalette']);
-  this.tooltip(config['tooltip']);
+
+  if (anychart.opt.TOOLTIP in config)
+    this.tooltip().setupByVal(config['tooltip'], opt_default);
+
   this.sort(config['sort']);
   this.radius(config['radius']);
   this.innerRadius(config['innerRadius']);

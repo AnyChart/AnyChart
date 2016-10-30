@@ -178,12 +178,10 @@ anychart.core.utils.A11y.prototype.setupSpecial = function(var_args) {
 
 
 /**
- * Sets current instance using passed JSON object.
- * @param {!Object} json
- * @protected
+ * @inheritDoc
  */
-anychart.core.utils.A11y.prototype.setupByJSON = function(json) {
-  anychart.core.utils.A11y.base(this, 'setupByJSON', json);
+anychart.core.utils.A11y.prototype.setupByJSON = function(json, opt_default) {
+  anychart.core.utils.A11y.base(this, 'setupByJSON', json, opt_default);
   this.enabled('enabled' in json ? json['enabled'] : true);
   this.titleFormatter(json['titleFormatter']);
 };
@@ -294,8 +292,8 @@ anychart.core.utils.ChartA11y.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.utils.ChartA11y.prototype.setupByJSON = function(config) {
-  anychart.core.utils.ChartA11y.base(this, 'setupByJSON', config);
+anychart.core.utils.ChartA11y.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.utils.ChartA11y.base(this, 'setupByJSON', config, opt_default);
   this.mode(config['mode']);
 };
 

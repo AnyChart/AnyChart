@@ -890,8 +890,8 @@ anychart.core.map.series.Bubble.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.core.map.series.Bubble.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.map.series.Bubble.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.displayNegative(config['displayNegative']);
 
   this.negativeFill(config['negativeFill']);

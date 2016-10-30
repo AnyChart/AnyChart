@@ -588,8 +588,8 @@ anychart.scales.ScatterTicks.prototype.setupSpecial = function(var_args) {
 
 
 /** @inheritDoc */
-anychart.scales.ScatterTicks.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.scales.ScatterTicks.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.mode(config['mode']);
   this.base(config['base']);
   this.explicit_ = config['explicit'] || null;

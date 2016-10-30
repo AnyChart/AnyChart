@@ -390,8 +390,8 @@ anychart.core.Text.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.Text.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.Text.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.fontSize(config['fontSize']);
   this.fontFamily(config['fontFamily']);
   this.fontColor(config['fontColor']);

@@ -280,8 +280,8 @@ anychart.core.polar.series.Area.prototype.applyHatchFill = function(pointState) 
 /**
  * @inheritDoc
  */
-anychart.core.polar.series.Area.prototype.setupByJSON = function(config) {
-  return goog.base(this, 'setupByJSON', config);
+anychart.core.polar.series.Area.prototype.setupByJSON = function(config, opt_default) {
+  return goog.base(this, 'setupByJSON', config, opt_default);
 };
 
 

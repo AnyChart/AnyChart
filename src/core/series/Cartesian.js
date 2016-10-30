@@ -180,8 +180,8 @@ anychart.core.series.Cartesian.prototype.applyConfig = function(config) {
 
 
 /** @inheritDoc */
-anychart.core.series.Cartesian.prototype.applyDefaultsToElements = function(defaults, opt_resetLegendItem) {
-  anychart.core.series.Cartesian.base(this, 'applyDefaultsToElements', defaults, opt_resetLegendItem);
+anychart.core.series.Cartesian.prototype.applyDefaultsToElements = function(defaults, opt_resetLegendItem, opt_default) {
+  anychart.core.series.Cartesian.base(this, 'applyDefaultsToElements', defaults, opt_resetLegendItem, opt_default);
 
   if (goog.isDef(defaults['allowPointsSelect'])) {
     this.selectionMode(goog.isBoolean(defaults['allowPointsSelect']) ?
@@ -1472,8 +1472,8 @@ anychart.core.series.Cartesian.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.core.series.Cartesian.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.series.Cartesian.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   if ('data' in config)
     this.data(config['data'] || null);

@@ -2404,8 +2404,8 @@ anychart.core.ui.BaseGrid.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.BaseGrid.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.ui.BaseGrid.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   this.isStandalone = ('isStandalone' in config) ? config['isStandalone'] : ('controller' in config);
 
@@ -2421,7 +2421,10 @@ anychart.core.ui.BaseGrid.prototype.setupByJSON = function(config) {
   this.rowEvenFill(config['rowEvenFill']);
   this.rowHoverFill(config['hoverFill']);
   this.rowSelectedFill(config['rowSelectedFill']);
-  this.tooltip(config['tooltip']);
+
+  if (anychart.opt.TOOLTIP in config)
+    this.tooltip().setupByVal(config[anychart.opt.TOOLTIP], opt_default);
+
   this.headerHeight(config['headerHeight']);
   this.editStructurePreviewFill(config['editStructurePreviewFill']);
   this.editStructurePreviewStroke(config['editStructurePreviewStroke']);

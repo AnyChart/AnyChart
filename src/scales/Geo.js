@@ -1397,8 +1397,8 @@ anychart.scales.Geo.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.scales.Geo.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.scales.Geo.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   // this.inverted(config['inverted']);
   this.minimumX(config['minimumX']);
   this.minimumY(config['minimumY']);

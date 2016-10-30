@@ -1,5 +1,8 @@
 goog.provide('anychart.core.PyramidFunnelBase');
 
+goog.require('anychart.animations.AnimationSerialQueue');
+goog.require('anychart.animations.PyramidFunnelAnimation');
+goog.require('anychart.animations.PyramidFunnelLabelAnimation');
 goog.require('anychart.color');
 goog.require('anychart.core.Point');
 goog.require('anychart.core.SeparateChart');
@@ -300,6 +303,20 @@ anychart.core.PyramidFunnelBase.OVERLAP_CORRECTION_ITERATION_COUNT_MAX_ = 10;
 
 
 /**
+ * Ratio of pyramid/funnel animation duration.
+ * Full pyramid/funnel animation consists of 2 serial animations (pyramid/funnel points animation and labels animation).
+ * So this ratio shows pyramid/funnel points animation duration.
+ * Left ratio goes to labels animation.
+ *
+ * In default case of 1000ms duration:
+ *   pyramid/funnel points animation duration will be 550ms.
+ *   labels animation - 450ms.
+ * @type {number}
+ */
+anychart.core.PyramidFunnelBase.PIE_ANIMATION_DURATION_RATIO = 0.85;
+
+
+/**
  * Supported signals.
  * @type {number}
  */
@@ -441,6 +458,15 @@ anychart.core.PyramidFunnelBase.prototype.getIterator = function() {
  */
 anychart.core.PyramidFunnelBase.prototype.getResetIterator = function() {
   return this.iterator_ = this.view_.getIterator();
+};
+
+
+/**
+ * Returns detached iterator.
+ * @return {!anychart.data.Iterator} Detached iterator.
+ */
+anychart.core.PyramidFunnelBase.prototype.getDetachedIterator = function() {
+  return this.view_.getIterator();
 };
 
 
@@ -1136,6 +1162,7 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
       iterator.meta('value', value);
       iterator.meta('height', height);
       iterator.meta('startY', startY);
+      iterator.meta('missing', isMissing);
 
       startY += height;
 
@@ -1186,13 +1213,13 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
       this.connectorsLayer_.clear();
     }
 
-    var themePart = this.isInsideLabels_() ?
+    var themePart = this.isInsideLabels() ?
         anychart.getFullTheme()['pie']['insideLabels'] :
         anychart.getFullTheme()['pie']['outsideLabels'];
     this.labels().setAutoColor(themePart['autoColor']);
     this.labels().disablePointerEvents(themePart['disablePointerEvents']);
 
-    if (!this.isInsideLabels_()) {
+    if (!this.isInsideLabels()) {
       this.connectorLengthValue_ = anychart.utils.normalizeSize(
           this.connectorLength_, ((bounds.width - this.baseWidthValue_) / 2));
       // foolproof
@@ -1220,7 +1247,7 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
     iterator.reset();
     while (iterator.advance()) {
       // fix for change position to inside after draw
-      if (this.isInsideLabels_()) {
+      if (this.isInsideLabels()) {
         // reset 'labelWidthForced' meta
         iterator.meta('labelWidthForced', undefined);
       }
@@ -1422,6 +1449,102 @@ anychart.core.PyramidFunnelBase.prototype.calculatePoint_ = function() {
   iterator.meta('y1', y1);
   iterator.meta('y2', y2);
   iterator.meta('y3', y3);
+};
+
+
+/**
+ * Updates point on animate.
+ * @param {anychart.data.Iterator} point
+ */
+anychart.core.PyramidFunnelBase.prototype.updatePointOnAnimate = function(point) {
+  var shape = point.meta('point');
+  shape.clear();
+
+  var x1 = point.meta('x1');
+  var x2 = point.meta('x2');
+  var x3 = point.meta('x3');
+  var x4 = point.meta('x4');
+  var y1 = point.meta('y1');
+  var y2 = point.meta('y2');
+  var y3 = point.meta('y3');
+
+  shape.moveTo(x1, y1)
+      .lineTo(x2, y1);
+
+  // drawing neck
+  if (point.meta('neck')) {
+    shape.lineTo(x4, y2)
+        .lineTo(x4, y3)
+        .lineTo(x3, y3)
+        .lineTo(x3, y2);
+  } else {
+    shape.lineTo(x4, y2)
+        .lineTo(x3, y2);
+  }
+  shape.close();
+
+  var hatchPoint = /** @type {!acgraph.vector.Path} */ (point.meta('hatchPoint'));
+  if (hatchPoint) {
+    this.getIterator().select(point.getIndex());
+    hatchPoint.clear();
+    hatchPoint.deserialize(shape.serialize());
+    hatchPoint.stroke(null).fill(this.getFinalHatchFill(true, this.state.getPointStateByIndex(point.getIndex())));
+  }
+};
+
+
+/**
+ * Updates label (and connector) on animate.
+ * @param {number} labelOpacity Label opacity.
+ * @param {number} connectorOpacity Connector opacity.
+ * @param {boolean} isOutside Whether labels has outside position.
+ */
+anychart.core.PyramidFunnelBase.prototype.updateLabelsOnAnimate = function(labelOpacity, connectorOpacity, isOutside) {
+  this.labels().suspendSignalsDispatching().fontOpacity(labelOpacity).draw().resumeSignalsDispatching(false);
+  if (isOutside && this.drawnConnectors_) {
+    for (var i in this.drawnConnectors_) {
+      if (this.drawnConnectors_.hasOwnProperty(i))
+        this.drawnConnectors_[i].stroke(anychart.color.setOpacity(this.connectorStroke_, connectorOpacity));
+    }
+  }
+};
+
+
+/** @inheritDoc */
+anychart.core.PyramidFunnelBase.prototype.doAnimation = function() {
+  if (this.animation().enabled() && this.animation().duration() > 0) {
+    if (this.animationQueue_ && this.animationQueue_.isPlaying()) {
+      this.animationQueue_.update();
+    } else if (this.hasInvalidationState(anychart.ConsistencyState.CHART_ANIMATION)) {
+      goog.dispose(this.animationQueue_);
+      this.animationQueue_ = new anychart.animations.AnimationSerialQueue();
+      var duration = /** @type {number} */(this.animation().duration());
+      var pyramidFunnelDuration = duration * anychart.core.PyramidFunnelBase.PIE_ANIMATION_DURATION_RATIO;
+      var pyramidFunnelLabelDuration = duration * (1 - anychart.core.PyramidFunnelBase.PIE_ANIMATION_DURATION_RATIO);
+
+      var pyramidFunnelAnimation = new anychart.animations.PyramidFunnelAnimation(this, pyramidFunnelDuration);
+      var pyramidFunnelLabelAnimation = new anychart.animations.PyramidFunnelLabelAnimation(this, pyramidFunnelLabelDuration);
+
+      this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (pyramidFunnelAnimation));
+      this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (pyramidFunnelLabelAnimation));
+
+      this.animationQueue_.listen(goog.fx.Transition.EventType.BEGIN, function() {
+        this.dispatchDetachedEvent({
+          'type': anychart.enums.EventType.ANIMATION_START,
+          'chart': this
+        });
+      }, false, this);
+
+      this.animationQueue_.listen(goog.fx.Transition.EventType.END, function() {
+        this.dispatchDetachedEvent({
+          'type': anychart.enums.EventType.ANIMATION_END,
+          'chart': this
+        });
+      }, false, this);
+
+      this.animationQueue_.play(false);
+    }
+  }
 };
 
 
@@ -2191,7 +2314,7 @@ anychart.core.PyramidFunnelBase.prototype.drawLabel_ = function(pointState) {
   var positionProvider = this.createLabelsPositionProvider_(null, pointState);
   var formatProvider = this.createFormatProvider();
 
-  var isInsideLabels = this.isInsideLabels_();
+  var isInsideLabels = this.isInsideLabels();
 
   var isFitToPoint = true;
   if (!hovered && !selected && isInsideLabels && this.overlapMode() == anychart.enums.LabelsOverlapMode.NO_OVERLAP) {
@@ -2403,7 +2526,7 @@ anychart.core.PyramidFunnelBase.prototype.getTrueLabelBounds = function(label, p
  * @param {anychart.core.ui.LabelsFactory.Label=} opt_hoveredLabel If label is hovered.
  */
 anychart.core.PyramidFunnelBase.prototype.overlapCorrection_ = function(opt_hoveredLabel) {
-  if (this.overlapMode() != anychart.enums.LabelsOverlapMode.NO_OVERLAP || this.isInsideLabels_() || !this.labels().enabled()) {
+  if (this.overlapMode() != anychart.enums.LabelsOverlapMode.NO_OVERLAP || this.isInsideLabels() || !this.labels().enabled()) {
     return;
   }
 
@@ -2708,10 +2831,9 @@ anychart.core.PyramidFunnelBase.prototype.isLabelFitsIntoThePoint_ = function(la
 
 
 /**
- * @private
  * @return {!boolean} Define, is labels have inside position.
  */
-anychart.core.PyramidFunnelBase.prototype.isInsideLabels_ = function() {
+anychart.core.PyramidFunnelBase.prototype.isInsideLabels = function() {
   return this.getLabelsPosition_() == anychart.enums.PyramidLabelsPosition.INSIDE;
 };
 
@@ -2761,7 +2883,7 @@ anychart.core.PyramidFunnelBase.prototype.shiftCenterX_ = function() {
     return;
   }
 
-  if (this.isInsideLabels_()) {
+  if (this.isInsideLabels()) {
     return;
   }
 
@@ -3750,8 +3872,8 @@ anychart.core.PyramidFunnelBase.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.core.PyramidFunnelBase.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.PyramidFunnelBase.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   this.baseWidth(config['baseWidth']);
   this.connectorLength(config['connectorLength']);
@@ -3785,7 +3907,8 @@ anychart.core.PyramidFunnelBase.prototype.setupByJSON = function(config) {
   this.palette(config['palette']);
   this.pointsPadding(config['pointsPadding']);
 
-  this.tooltip(config['tooltip']);
+  if (anychart.opt.TOOLTIP in config)
+    this.tooltip().setupByVal(config['tooltip'], opt_default);
 };
 
 

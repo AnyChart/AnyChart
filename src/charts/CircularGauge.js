@@ -1259,8 +1259,8 @@ anychart.charts.CircularGauge.prototype.drawContent = function(bounds) {
 
 
 /** @inheritDoc */
-anychart.charts.CircularGauge.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.charts.CircularGauge.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   if ('defaultAxisSettings' in config)
     this.defaultAxisSettings(config['defaultAxisSettings']);

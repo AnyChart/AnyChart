@@ -206,8 +206,8 @@ anychart.core.ui.CrosshairLabel.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.CrosshairLabel.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.ui.CrosshairLabel.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.axisIndex(config['axisIndex']);
   this.anchor(config['anchor']);
   this.textFormatter(config['textFormatter']);

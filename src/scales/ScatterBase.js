@@ -424,8 +424,8 @@ anychart.scales.ScatterBase.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.scales.ScatterBase.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.scales.ScatterBase.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.minimumGap(config['minimumGap']);
   this.maximumGap(config['maximumGap']);
   this.softMinimum(config['softMinimum']);
@@ -460,8 +460,6 @@ anychart.scales.ScatterBase.fromString = function(type, opt_canReturnNull) {
 
 
 //exports
-anychart.scales.ScatterBase.prototype['transform'] = anychart.scales.ScatterBase.prototype.transform;//doc|ex
-anychart.scales.ScatterBase.prototype['inverseTransform'] = anychart.scales.ScatterBase.prototype.inverseTransform;//doc|ex
 anychart.scales.ScatterBase.prototype['minimum'] = anychart.scales.ScatterBase.prototype.minimum;//doc|ex
 anychart.scales.ScatterBase.prototype['maximum'] = anychart.scales.ScatterBase.prototype.maximum;//doc|ex
 anychart.scales.ScatterBase.prototype['extendDataRange'] = anychart.scales.ScatterBase.prototype.extendDataRange;//doc|need-ex

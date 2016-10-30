@@ -647,8 +647,8 @@ anychart.core.utils.Error.prototype.setupSpecial = function(var_args) {
 /**
  * @inheritDoc
  */
-anychart.core.utils.Error.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.utils.Error.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.mode(config['mode']);
   this.xError(config['xError']);
   this.xUpperError(config['xUpperError']);

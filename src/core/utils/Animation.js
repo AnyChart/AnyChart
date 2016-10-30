@@ -79,11 +79,9 @@ anychart.core.utils.Animation.prototype.serialize = function() {
 
 
 /**
- * Setups current instance using passed JSON object.
- * @param {!Object} json
- * @protected
+ * @inheritDoc
  */
-anychart.core.utils.Animation.prototype.setupByJSON = function(json) {
+anychart.core.utils.Animation.prototype.setupByJSON = function(json, opt_default) {
   this.enabled(json['enabled']);
   this.duration(json['duration']);
 };

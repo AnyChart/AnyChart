@@ -146,8 +146,8 @@ anychart.core.linearGauge.pointers.Thermometer.prototype.bulbPadding = function(
 
 //region --- SETUP/DISPOSE ---
 /** @inheritDoc */
-anychart.core.linearGauge.pointers.Thermometer.prototype.setupByJSON = function(config) {
-  anychart.core.linearGauge.pointers.Thermometer.base(this, 'setupByJSON', config);
+anychart.core.linearGauge.pointers.Thermometer.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.linearGauge.pointers.Thermometer.base(this, 'setupByJSON', config, opt_default);
 
   this.bulbRadius(config['bulbRadius']);
   this.bulbPadding(config['bulbPadding']);

@@ -1676,8 +1676,8 @@ anychart.core.linearGauge.pointers.Base.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.linearGauge.pointers.Base.prototype.setupByJSON = function(config) {
-  anychart.core.linearGauge.pointers.Base.base(this, 'setupByJSON', config);
+anychart.core.linearGauge.pointers.Base.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.linearGauge.pointers.Base.base(this, 'setupByJSON', config, opt_default);
 
   this.id(config['id']);
   this.autoIndex(config['autoIndex']);

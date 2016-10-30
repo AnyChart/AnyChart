@@ -1250,10 +1250,10 @@ anychart.core.axes.Linear.prototype.getPixelBounds = function() {
 
       var x, y;
       var padding = this.padding();
-      var topPad = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.TOP), parentBounds.height);
-      var rightPad = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.RIGHT), parentBounds.width);
-      var bottomPad = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.BOTTOM), parentBounds.height);
-      var leftPad = anychart.utils.normalizeSize(padding.getSafeOption(anychart.opt.LEFT), parentBounds.width);
+      var topPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.TOP)), parentBounds.height);
+      var rightPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.RIGHT)), parentBounds.width);
+      var bottomPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.BOTTOM)), parentBounds.height);
+      var leftPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.LEFT)), parentBounds.width);
 
       var width, height;
       switch (this.orientation()) {
@@ -1991,10 +1991,11 @@ anychart.core.axes.Linear.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.axes.Linear.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.axes.Linear.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
-  this.title(config[anychart.opt.TITLE]);
+  if (anychart.opt.TITLE in config)
+    this.title(config[anychart.opt.TITLE]);
 
   this.labels().setup(config['labels']);
   this.minorLabels().setup(config['minorLabels']);

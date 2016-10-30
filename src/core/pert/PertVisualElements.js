@@ -660,8 +660,8 @@ anychart.core.pert.PertVisualElements.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.pert.PertVisualElements.prototype.setupByJSON = function(config) {
-  anychart.core.pert.PertVisualElements.base(this, 'setupByJSON', config);
+anychart.core.pert.PertVisualElements.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.pert.PertVisualElements.base(this, 'setupByJSON', config, opt_default);
 
   this.color(config['color']);
 
@@ -677,5 +677,6 @@ anychart.core.pert.PertVisualElements.prototype.setupByJSON = function(config) {
   this.selectLabels(config['selectLabels']);
   this.hoverLabels(config['hoverLabels']);
 
-  this.tooltip(config['tooltip']);
+  if (anychart.opt.TOOLTIP in config)
+    this.tooltip().setupByVal(config['tooltip'], opt_default);
 };

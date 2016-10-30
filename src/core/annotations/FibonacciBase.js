@@ -469,7 +469,7 @@ anychart.core.annotations.FibonacciBase.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.annotations.FibonacciBase.prototype.setupByJSON = function(config) {
+anychart.core.annotations.FibonacciBase.prototype.setupByJSON = function(config, opt_default) {
 
   this.levels(config['levels']);
   anychart.core.settings.deserialize(this, anychart.core.annotations.TREND_DESCRIPTORS, config);
@@ -478,7 +478,7 @@ anychart.core.annotations.FibonacciBase.prototype.setupByJSON = function(config)
   anychart.core.settings.deserialize(this, anychart.core.annotations.VALUE_ANCHOR_DESCRIPTORS, config);
   anychart.core.settings.deserialize(this, anychart.core.annotations.SECOND_ANCHOR_POINT_DESCRIPTORS, config);
 
-  anychart.core.annotations.FibonacciBase.base(this, 'setupByJSON', config);
+  anychart.core.annotations.FibonacciBase.base(this, 'setupByJSON', config, opt_default);
 };
 
 

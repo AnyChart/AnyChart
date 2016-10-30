@@ -154,8 +154,8 @@ anychart.core.axes.RadialTicks.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.axes.RadialTicks.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.axes.RadialTicks.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.length(config['length']);
   this.stroke(config['stroke']);
 };

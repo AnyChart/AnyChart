@@ -192,6 +192,15 @@ anychart.core.SeparateChart.prototype.calculateContentAreaSpace = function(total
 };
 
 
+/**
+ * Returns true, if it is a stock plot. Used in standalone legend.
+ * @return {boolean}
+ */
+anychart.core.SeparateChart.prototype.needsInteractiveLegendUpdate = function() {
+  return false;
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Setup.
@@ -207,8 +216,8 @@ anychart.core.SeparateChart.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.SeparateChart.prototype.setupByJSON = function(config) {
-  anychart.core.SeparateChart.base(this, 'setupByJSON', config);
+anychart.core.SeparateChart.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.SeparateChart.base(this, 'setupByJSON', config, opt_default);
   this.legend(config['legend']);
   this.interactivity(config['interactivity']);
 };

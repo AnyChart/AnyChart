@@ -546,8 +546,8 @@ anychart.scales.DateTimeTicks.prototype.setupSpecial = function(var_args) {
 
 
 /** @inheritDoc */
-anychart.scales.DateTimeTicks.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.scales.DateTimeTicks.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.explicit_ = config['explicit'] || null;
   this.count_ = goog.isNull(config['count']) ? NaN : Math.max(2, Math.ceil(config['count']));
   this.interval_ = goog.isString(config['interval']) ? goog.date.Interval.fromIsoString(config['interval']) : null;

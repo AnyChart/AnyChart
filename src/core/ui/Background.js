@@ -27,26 +27,16 @@ anychart.core.ui.Background = function() {
   goog.base(this);
 
   /**
-   * Graphics element that represents background path.
-   * @type {acgraph.vector.Rect}
-   * @private
-   */
-  this.rect_ = null;
-
-
-  /**
    * Theme settings.
    * @type {Object}
    */
   this.themeSettings = {};
-
 
   /**
    * Own settings (Settings set by user with API).
    * @type {Object}
    */
   this.ownSettings = {};
-
 
   /**
    * Parent title.
@@ -59,6 +49,13 @@ anychart.core.ui.Background = function() {
    * @type {boolean}
    */
   this.forceInvalidate = false;
+
+  /**
+   * Resolution chain cache.
+   * @type {Array.<Object|null|undefined>|null}
+   * @private
+   */
+  this.resolutionChainCache_ = null;
 };
 goog.inherits(anychart.core.ui.Background, anychart.core.VisualBaseWithBounds);
 
@@ -95,14 +92,42 @@ anychart.core.ui.Background.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   map[anychart.opt.FILL] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.FILL,
-      anychart.core.settings.fillOrFunctionNormalizer,
+      anychart.core.settings.fillNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
   map[anychart.opt.STROKE] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.STROKE,
-      anychart.core.settings.strokeOrFunctionNormalizer,
+      anychart.core.settings.strokeNormalizer,
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW);
+
+  map[anychart.opt.TOP_STROKE] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      anychart.opt.TOP_STROKE,
+      anychart.core.settings.strokeNormalizer,
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW);
+
+  map[anychart.opt.RIGHT_STROKE] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      anychart.opt.RIGHT_STROKE,
+      anychart.core.settings.strokeNormalizer,
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW);
+
+  map[anychart.opt.BOTTOM_STROKE] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      anychart.opt.BOTTOM_STROKE,
+      anychart.core.settings.strokeNormalizer,
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW);
+
+  map[anychart.opt.LEFT_STROKE] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.MULTI_ARG,
+      anychart.opt.LEFT_STROKE,
+      anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW);
 
@@ -202,6 +227,15 @@ anychart.core.ui.Background.prototype.check = function(flags) {
 //endregion
 //region -- IResolvable implementation
 /** @inheritDoc */
+anychart.core.ui.Background.prototype.resolutionChainCache = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.resolutionChainCache_ = opt_value;
+  }
+  return this.resolutionChainCache_;
+};
+
+
+/** @inheritDoc */
 anychart.core.ui.Background.prototype.getResolutionChain = anychart.core.settings.getResolutionChain;
 
 
@@ -280,6 +314,18 @@ anychart.core.ui.Background.prototype.needsForceInvalidation = function() {
 };
 
 
+/**
+ * Returns corner size by index.
+ * @param {number} value Corner index.
+ * @return {number}
+ * @private
+ */
+anychart.core.ui.Background.prototype.getCornerSize_ = function(value) {
+  var corners = this.corners();
+  return corners ? parseFloat(corners.length < 4 ? corners[0] : corners[value]) : 0;
+};
+
+
 //endregion
 //region -- Parental relations
 /**
@@ -331,12 +377,39 @@ anychart.core.ui.Background.prototype.parentInvalidated_ = function(e) {
     signal |= anychart.Signal.NEEDS_REDRAW;
   }
 
+  this.resolutionChainCache_ = null;
+
   this.invalidate(state, signal);
 };
 
 
 //endregion
 //region -- Drawing, removing
+/**
+ * @param {acgraph.vector.Path} path .
+ * @param {number} x1 .
+ * @param {number} y1 .
+ * @param {number} x2 .
+ * @param {number} y2 .
+ * @param {number} radius .
+ */
+anychart.core.ui.Background.prototype.drawCorner = function(path, x1, y1, x2, y2, radius) {
+  switch (this.getOption(anychart.opt.CORNER_TYPE)) {
+    case acgraph.vector.Rect.CornerType.ROUND:
+      path.arcToByEndPoint(x2, y2, radius, radius, false, true);
+      break;
+    case acgraph.vector.Rect.CornerType.ROUND_INNER:
+      path.arcToByEndPoint(x2, y2, radius, radius, false, false);
+      break;
+    case acgraph.vector.Rect.CornerType.CUT:
+      path.lineTo(x2, y2);
+      break;
+    default:
+      path.lineTo(x1, y1).lineTo(x2, y2);
+  }
+};
+
+
 /**
  * Render background.
  * @return {!anychart.core.ui.Background} {@link anychart.core.ui.Background} instance for method chaining.
@@ -345,35 +418,220 @@ anychart.core.ui.Background.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
     return this;
 
-  if (!this.rect_) {
-    this.rect_ = acgraph.rect();
-  }
+  var fill = /** @type {acgraph.vector.Fill} */(this.getOption(anychart.opt.FILL) || anychart.opt.NONE);
+  var stroke = /** @type {acgraph.vector.Stroke} */(this.getOption(anychart.opt.STROKE));
+  var topStroke = /** @type {acgraph.vector.Stroke} */(this.getOption(anychart.opt.TOP_STROKE));
+  var rightStroke = /** @type {acgraph.vector.Stroke} */(this.getOption(anychart.opt.RIGHT_STROKE));
+  var bottomStroke = /** @type {acgraph.vector.Stroke} */(this.getOption(anychart.opt.BOTTOM_STROKE));
+  var leftStroke = /** @type {acgraph.vector.Stroke} */(this.getOption(anychart.opt.LEFT_STROKE));
 
-  var fill = this.getOption(anychart.opt.FILL) || anychart.opt.NONE;
-  var stroke = this.getOption(anychart.opt.STROKE) || anychart.opt.NONE;
+  var isSingleStroke = !(topStroke || rightStroke || bottomStroke || leftStroke);
+  var isAtLeastOneCustomStroke = !isSingleStroke;
+  var allStrokeIsCustom = topStroke && rightStroke && bottomStroke && leftStroke;
+  var i, len, strokePath;
 
   var stage = this.container() ? this.container().getStage() : null;
   var manualSuspend = stage && !stage.isSuspended();
   if (manualSuspend) stage.suspend();
 
-  if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND_POINTER_EVENTS)) {
-    this.rect_.disablePointerEvents(/** @type {boolean|undefined} */ (this.getOption(anychart.opt.DISABLE_POINTER_EVENTS)));
-    this.markConsistent(anychart.ConsistencyState.BACKGROUND_POINTER_EVENTS);
-  }
-
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
+    if (!this.rootElement_) {
+      this.rootElement_ = acgraph.layer();
+    }
+
+    if (allStrokeIsCustom && this.strokePath_) {
+      this.strokePath_.clear().parent(null);
+    } else {
+      if (!this.strokePath_) {
+        this.strokePath_ = acgraph.path();
+      }
+      this.strokePath_.parent(this.rootElement_);
+      this.strokePath_.clear();
+    }
+
+    if (isAtLeastOneCustomStroke) {
+      if (!this.fillPath_) {
+        this.fillPath_ = acgraph.path();
+      }
+      this.fillPath_.parent(this.rootElement_);
+      this.fillPath_.clear();
+    } else if (this.fillPath_) {
+      this.fillPath_.clear().parent(null);
+    }
+
+    if (this.strokePathsPoll_) {
+      for (i = 0, len = this.strokePathsPoll_.length; i < len; i++) {
+        strokePath = this.strokePathsPoll_[i];
+        if (strokePath)
+          strokePath.clear().parent(null);
+      }
+    }
+
+    if (isAtLeastOneCustomStroke) {
+      this.strokes_ = [topStroke, rightStroke, bottomStroke, leftStroke];
+      if (!this.strokePathsPoll_) this.strokePathsPoll_ = [];
+      if (!this.strokePaths_) this.strokePaths_ = [];
+
+      for (i = 0, len = this.strokes_.length; i < len; i++) {
+        var stroke_ = this.strokes_[i];
+        if (goog.isDef(stroke_) && !anychart.utils.isNone(stroke_)) {
+          var path = this.strokePathsPoll_[i] ? this.strokePathsPoll_[i] : this.strokePathsPoll_[i] = acgraph.path();
+          path.parent(this.rootElement_);
+          path.clear();
+          this.strokePaths_[i] = path;
+        } else if (goog.isDef(stroke) && !anychart.utils.isNone(stroke)) {
+          this.strokes_[i] = stroke;
+          this.strokePaths_[i] = this.strokePath_;
+        }
+      }
+    }
+
     var bounds = this.getPixelBounds();
-    var strokeThickness;
-    // stroke have been changed
-    strokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */ (stroke));
-    var thicknessHalf = strokeThickness / 2;
-    //TODO(Anton Saukh): remove this fix when graphics is fixed.
-    if (isNaN(thicknessHalf)) thicknessHalf = .5;
-    bounds.left += thicknessHalf;
-    bounds.top += thicknessHalf;
-    bounds.width -= thicknessHalf + thicknessHalf;
-    bounds.height -= thicknessHalf + thicknessHalf;
-    this.rect_.setBounds(bounds);
+
+    var leftTopCorner = this.getCornerSize_(0);
+    var rightTopCorner = this.getCornerSize_(1);
+    var rightBottomCorner = this.getCornerSize_(2);
+    var leftBottomCorner = this.getCornerSize_(3);
+    var points;
+
+    var currentPath, sideIndex;
+
+    if (isAtLeastOneCustomStroke) {
+      var topThickness = this.strokePaths_[0] ? acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(acgraph.vector.normalizeStroke(this.strokes_[0]))) / 2 : 0;
+      var rightThickness = this.strokePaths_[1] ? acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(acgraph.vector.normalizeStroke(this.strokes_[1]))) / 2 : 0;
+      var bottomThickness = this.strokePaths_[2] ? acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(acgraph.vector.normalizeStroke(this.strokes_[2]))) / 2 : 0;
+      var leftThickness = this.strokePaths_[3] ? acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(acgraph.vector.normalizeStroke(this.strokes_[3]))) / 2 : 0;
+
+      bounds.left += leftThickness;
+      bounds.top += topThickness;
+      bounds.width -= leftThickness + rightThickness;
+      bounds.height -= topThickness + bottomThickness;
+
+      var x0 = (bounds.getRight() - rightTopCorner) + rightTopCorner * Math.cos(goog.math.toRadians(315));
+      var y0 = (bounds.top + rightTopCorner) + rightTopCorner * Math.sin(goog.math.toRadians(315));
+
+      var x1 = (bounds.getRight() - rightBottomCorner) + rightBottomCorner * Math.cos(goog.math.toRadians(45));
+      var y1 = (bounds.getBottom() - rightBottomCorner) + rightBottomCorner * Math.sin(goog.math.toRadians(45));
+
+      var x2 = (bounds.left + leftBottomCorner) + leftBottomCorner * Math.cos(goog.math.toRadians(135));
+      var y2 = (bounds.getBottom() - leftBottomCorner) + leftBottomCorner * Math.sin(goog.math.toRadians(135));
+
+      var x3 = (bounds.left + leftTopCorner) + leftTopCorner * Math.cos(goog.math.toRadians(225));
+      var y3 = (bounds.top + leftTopCorner) + leftTopCorner * Math.sin(goog.math.toRadians(225));
+
+      points = [
+        bounds.getRight() - rightTopCorner, bounds.top,
+        bounds.getRight(), bounds.top,
+        bounds.getRight(), bounds.top + rightTopCorner,
+        x0, y0,
+
+        bounds.getRight(), bounds.getBottom() - rightBottomCorner,
+        bounds.getRight(), bounds.getBottom(),
+        bounds.getRight() - rightBottomCorner, bounds.getBottom(),
+        x1, y1,
+
+        bounds.left + leftBottomCorner, bounds.getBottom(),
+        bounds.left, bounds.getBottom(),
+        bounds.left, bounds.getBottom() - leftBottomCorner,
+        x2, y2,
+
+        bounds.left, bounds.top + leftTopCorner,
+        bounds.left, bounds.top,
+        bounds.left + leftTopCorner, bounds.top,
+        x3, y3
+      ];
+
+      var prevPath;
+      for (i = 0, len = points.length; i < len; i = i + 8) {
+        sideIndex = i / 8;
+
+        if (!i) {
+          this.fillPath_.moveTo(points[points.length - 4], points[points.length - 3]);
+        }
+        this.fillPath_.lineTo(points[i], points[i + 1]);
+        this.drawCorner(
+            this.fillPath_,
+            points[i + 2], points[i + 3],
+            points[i + 4], points[i + 5],
+            this.getCornerSize_(sideIndex));
+
+        currentPath = this.strokePaths_[sideIndex];
+        if (!currentPath)
+          continue;
+
+        if (!i) {
+          currentPath.moveTo(points[points.length - 2], points[points.length - 1]);
+          this.drawCorner(
+              currentPath,
+              points[points.length - 6], points[points.length - 5],
+              points[points.length - 4], points[points.length - 3],
+              this.getCornerSize_(sideIndex));
+        } else if (prevPath != currentPath) {
+          currentPath.moveTo(points[i - 2], points[i - 1]);
+          this.drawCorner(
+              currentPath,
+              points[i - 6], points[i - 5],
+              points[i - 4], points[i - 3],
+              this.getCornerSize_(sideIndex));
+        } else {
+          this.drawCorner(
+              currentPath,
+              points[i - 6], points[i - 5],
+              points[i - 4], points[i - 3],
+              this.getCornerSize_(sideIndex));
+        }
+
+        currentPath.lineTo(points[i], points[i + 1]);
+        this.drawCorner(
+            currentPath,
+            points[i + 2], points[i + 3],
+            points[i + 6], points[i + 7],
+            this.getCornerSize_(sideIndex));
+
+        prevPath = currentPath;
+      }
+    } else {
+      var strokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(acgraph.vector.normalizeStroke(stroke)));
+      var thicknessHalf = strokeThickness / 2;
+      if (isNaN(thicknessHalf)) thicknessHalf = .5;
+
+      bounds.left += thicknessHalf;
+      bounds.top += thicknessHalf;
+      bounds.width -= thicknessHalf + thicknessHalf;
+      bounds.height -= thicknessHalf + thicknessHalf;
+
+      points = [
+        bounds.getRight() - rightTopCorner, bounds.top,
+        bounds.getRight(), bounds.top,
+        bounds.getRight(), bounds.top + rightTopCorner,
+
+        bounds.getRight(), bounds.getBottom() - rightBottomCorner,
+        bounds.getRight(), bounds.getBottom(),
+        bounds.getRight() - rightBottomCorner, bounds.getBottom(),
+
+        bounds.left + leftBottomCorner, bounds.getBottom(),
+        bounds.left, bounds.getBottom(),
+        bounds.left, bounds.getBottom() - leftBottomCorner,
+
+        bounds.left, bounds.top + leftTopCorner,
+        bounds.left, bounds.top,
+        bounds.left + leftTopCorner, bounds.top
+      ];
+
+      for (i = 0, len = points.length; i < len; i = i + 6) {
+        if (!i) {
+          this.strokePath_.moveTo(points[points.length - 2], points[points.length - 1]);
+        }
+        this.strokePath_.lineTo(points[i], points[i + 1]);
+        this.drawCorner(
+            this.strokePath_,
+            points[i + 2], points[i + 3],
+            points[i + 4], points[i + 5],
+            this.getCornerSize_((i / 6 + 1) % 4));
+      }
+      this.strokePath_.close();
+    }
+
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
 
     if (goog.isObject(fill) && ('keys' in fill || 'src' in fill))
@@ -381,32 +639,44 @@ anychart.core.ui.Background.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.rect_.fill(/** @type {acgraph.vector.Fill} */ (fill));
-    this.rect_.stroke(/** @type {acgraph.vector.Stroke} */ (stroke));
-    switch (this.getOption(anychart.opt.CORNER_TYPE)) {
-      case anychart.enums.BackgroundCornersType.ROUND:
-        this.rect_.round.apply(this.rect_, /** @type {Array.<number|string>} */(this.getOption(anychart.opt.CORNERS)));
-        break;
-      case anychart.enums.BackgroundCornersType.CUT:
-        this.rect_.cut.apply(this.rect_, /** @type {Array.<number|string>} */(this.getOption(anychart.opt.CORNERS)));
-        break;
-      case anychart.enums.BackgroundCornersType.ROUND_INNER:
-        this.rect_.roundInner.apply(this.rect_, /** @type {Array.<number|string>} */(this.getOption(anychart.opt.CORNERS)));
-        break;
-      default:
-        this.rect_.cut(0);
-        break;
+    if (isAtLeastOneCustomStroke) {
+      for (i = 0, len = this.strokePaths_.length; i < len; i++) {
+        strokePath = this.strokePaths_[i];
+        if (strokePath)
+          strokePath.stroke(this.strokes_[i]);
+      }
+      this.fillPath_.fill(fill);
+      this.fillPath_.stroke(null);
+    } else {
+      this.strokePath_.stroke(stroke);
+      this.strokePath_.fill(fill);
     }
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.BACKGROUND_POINTER_EVENTS)) {
+    var pointerEventsSettings = /** @type {boolean|undefined} */ (this.getOption(anychart.opt.DISABLE_POINTER_EVENTS));
+    if (isAtLeastOneCustomStroke) {
+      for (i = 0, len = this.strokePaths_.length; i < len; i++) {
+        strokePath = this.strokePaths_[i];
+        if (strokePath)
+          strokePath.disablePointerEvents(pointerEventsSettings);
+      }
+      this.fillPath_.disablePointerEvents(pointerEventsSettings);
+    } else {
+      this.strokePath_.disablePointerEvents(pointerEventsSettings);
+    }
+    this.rootElement_.disablePointerEvents(pointerEventsSettings);
+    this.markConsistent(anychart.ConsistencyState.BACKGROUND_POINTER_EVENTS);
+  }
+
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
-    this.rect_.zIndex(/** @type {number} */(this.zIndex()));
+    this.rootElement_.zIndex(/** @type {number} */(this.getOption(anychart.opt.Z_INDEX)));
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CONTAINER)) {
-    this.rect_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+    this.rootElement_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
@@ -418,7 +688,18 @@ anychart.core.ui.Background.prototype.draw = function() {
 
 /** @inheritDoc */
 anychart.core.ui.Background.prototype.remove = function() {
-  if (this.rect_) this.rect_.parent(null);
+  if (this.strokePath_)
+    this.strokePath_.parent(null);
+
+  if (this.strokePaths_) {
+    for (var i = 0, len = this.strokePaths_.length; i < len; i++) {
+      var path = this.strokePaths_[i];
+      path.parent(null);
+    }
+  }
+
+  if (this.fillPath_)
+    this.fillPath_.parent(null);
 };
 
 
@@ -499,7 +780,8 @@ anychart.core.ui.Background.prototype.serialize = function() {
   if (!goog.isDef(enabled)) {
     enabled = this.getThemeOption(anychart.opt.ENABLED);
   }
-  json['enabled'] = goog.isDef(enabled) ? enabled : null;
+  if (goog.isDef(enabled))
+    json['enabled'] = enabled;
 
   anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Background');
 
@@ -559,9 +841,19 @@ anychart.core.ui.Background.prototype.setupByJSON = function(config, opt_default
 
 /** @inheritDoc */
 anychart.core.ui.Background.prototype.disposeInternal = function() {
-  if (this.rect_) {
-    goog.dispose(this.rect_);
-    this.rect_ = null;
+  if (this.strokePath_) {
+    goog.dispose(this.strokePath_);
+    this.strokePath_ = null;
+  }
+
+  if (this.strokePaths_) {
+    goog.disposeAll(this.strokePaths_);
+    this.strokePaths_ = null;
+  }
+
+  if (this.fillPath_) {
+    goog.dispose(this.fillPath_);
+    this.fillPath_ = null;
   }
 
   // delete this.fill_;
@@ -579,5 +871,9 @@ anychart.core.ui.Background.prototype.disposeInternal = function() {
 //exports
 // anychart.core.ui.Background.prototype['fill'] = anychart.core.ui.Background.prototype.fill;//in docs/final
 // anychart.core.ui.Background.prototype['stroke'] = anychart.core.ui.Background.prototype.stroke;//in docs/final
+// anychart.core.ui.Background.prototype['topStroke'] = anychart.core.ui.Background.prototype.topStroke;
+// anychart.core.ui.Background.prototype['rightStroke'] = anychart.core.ui.Background.prototype.rightStroke;
+// anychart.core.ui.Background.prototype['bottomStroke'] = anychart.core.ui.Background.prototype.bottomStroke;
+// anychart.core.ui.Background.prototype['leftStroke'] = anychart.core.ui.Background.prototype.leftStroke;
 // anychart.core.ui.Background.prototype['cornerType'] = anychart.core.ui.Background.prototype.cornerType;//in docs/final
 anychart.core.ui.Background.prototype['corners'] = anychart.core.ui.Background.prototype.corners;//in docs/final

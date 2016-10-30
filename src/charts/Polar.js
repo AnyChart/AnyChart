@@ -1645,8 +1645,8 @@ anychart.charts.Polar.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.charts.Polar.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.charts.Polar.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   if ('defaultSeriesSettings' in config)
     this.defaultSeriesSettings(config['defaultSeriesSettings']);

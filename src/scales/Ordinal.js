@@ -359,8 +359,8 @@ anychart.scales.Ordinal.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.scales.Ordinal.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.scales.Ordinal.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.values(config['values']);
   this.ticks(config['ticks']);
   this.names(config['names']);

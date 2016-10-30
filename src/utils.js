@@ -469,7 +469,9 @@ anychart.utils.alignDateLeft = function(date, interval, flagDateValue) {
     months = anychart.utils.alignLeft(months, interval.months);
     return Date.UTC(years, months);
   } else if (interval.days && interval.days % 7 == 0) { // weeks
-    return anychart.utils.alignLeft(dateObj.getTime(), interval.days * 1000 * 60 * 60 * 24, Date.UTC(2000, 0, 2));
+    var locale = anychart.format.getDateTimeLocale(anychart.format.outputLocale());
+    var firstDay = locale ? locale['firstDayOfWeek'] : 0;
+    return anychart.utils.alignLeft(dateObj.getTime(), interval.days * 1000 * 60 * 60 * 24, Date.UTC(2000, 0, 2 + firstDay));
   } else if (interval.days) {
     days = anychart.utils.alignLeft(days, interval.days);
     return Date.UTC(years, months, days);
@@ -488,6 +490,65 @@ anychart.utils.alignDateLeft = function(date, interval, flagDateValue) {
   } else {
     return date;
   }
+};
+
+
+/**
+ * Aligns passed timestamp to the left according to the passed unit and count.
+ * @param {number} date Date to align.
+ * @param {anychart.enums.Interval} unit
+ * @param {number} count
+ * @param {number} flagDateValue Flag date to align within years scope.
+ * @return {number} Aligned timestamp.
+ */
+anychart.utils.alignDateLeftByUnit = function(date, unit, count, flagDateValue) {
+  var dateObj = new Date(date);
+
+  var years = dateObj.getUTCFullYear();
+  var months = dateObj.getUTCMonth();
+  var days = dateObj.getUTCDate();
+  var hours = dateObj.getUTCHours();
+  var minutes = dateObj.getUTCMinutes();
+  var seconds = dateObj.getUTCSeconds();
+  var milliseconds = dateObj.getUTCMilliseconds();
+
+  switch (unit) {
+    case anychart.enums.Interval.YEAR:
+      var flagDate = new Date(flagDateValue);
+      var flagYear = flagDate.getUTCFullYear();
+      years = anychart.utils.alignLeft(years, count, flagYear);
+      return Date.UTC(years, 0);
+    case anychart.enums.Interval.SEMESTER:
+      months = anychart.utils.alignLeft(months, count * 6);
+      return Date.UTC(years, months);
+    case anychart.enums.Interval.QUARTER:
+      months = anychart.utils.alignLeft(months, count * 3);
+      return Date.UTC(years, months);
+    case anychart.enums.Interval.MONTH:
+      months = anychart.utils.alignLeft(months, count);
+      return Date.UTC(years, months);
+    case anychart.enums.Interval.THIRD_OF_MONTH:
+      return anychart.utils.alignLeft(dateObj.getTime(), count * 1000 * 60 * 60 * 24 * 10, Date.UTC(2000, 0, 2));
+    case anychart.enums.Interval.WEEK:
+      var locale = anychart.format.getDateTimeLocale(anychart.format.outputLocale());
+      var firstDay = locale ? locale['firstDayOfWeek'] : 0;
+      return anychart.utils.alignLeft(dateObj.getTime(), count * 1000 * 60 * 60 * 24 * 7, Date.UTC(2000, 0, 2 + firstDay));
+    case anychart.enums.Interval.DAY:
+      return anychart.utils.alignLeft(dateObj.getTime(), count * 1000 * 60 * 60 * 24, Date.UTC(2000, 0, 2));
+    case anychart.enums.Interval.HOUR:
+      hours = anychart.utils.alignLeft(hours, count);
+      return Date.UTC(years, months, days, hours);
+    case anychart.enums.Interval.MINUTE:
+      minutes = anychart.utils.alignLeft(minutes, count);
+      return Date.UTC(years, months, days, hours, minutes);
+    case anychart.enums.Interval.SECOND:
+      seconds = anychart.utils.alignLeft(seconds, count);
+      return Date.UTC(years, months, days, hours, minutes, seconds);
+    case anychart.enums.Interval.MILLISECOND:
+      milliseconds = anychart.utils.alignLeft(milliseconds, count);
+      return Date.UTC(years, months, days, hours, minutes, seconds, milliseconds);
+  }
+  return date;
 };
 
 
@@ -519,7 +580,7 @@ anychart.utils.getIntervalFromInfo = function(unit, count) {
     case anychart.enums.Interval.THIRD_OF_MONTH:
       // roughly
       u = goog.date.Interval.DAYS;
-      c = count / 3;
+      c = count * 10;
       break;
     case anychart.enums.Interval.WEEK:
       u = goog.date.Interval.DAYS;
@@ -561,11 +622,28 @@ anychart.utils.getIntervalFromInfo = function(unit, count) {
  * @return {number}
  */
 anychart.utils.applyPixelShift = function(value, thickness) {
-  var shift = (+thickness % 2) ? 0.5 : 0;
+  var shift = (thickness & 1) / 2;
   if (value % 1 >= 0.5)
     return Math.ceil(value) - shift;
   else
     return Math.floor(value) + shift;
+};
+
+
+/**
+ * Applies pixel shift to the rect.
+ * @param {!anychart.math.Rect} rect
+ * @param {number} thickness
+ * @return {!anychart.math.Rect}
+ */
+anychart.utils.applyPixelShiftToRect = function(rect, thickness) {
+  var right = rect.getRight();
+  var bottom = rect.getBottom();
+  rect.left = anychart.utils.applyPixelShift(rect.left, thickness);
+  rect.top = anychart.utils.applyPixelShift(rect.top, thickness);
+  rect.width = anychart.utils.applyPixelShift(right, thickness) - rect.left;
+  rect.height = anychart.utils.applyPixelShift(bottom, thickness) - rect.top;
+  return rect;
 };
 
 

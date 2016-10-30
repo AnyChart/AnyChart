@@ -458,8 +458,8 @@ anychart.core.axisMarkers.PathBase.prototype.markerElement = function() {
 
 
 /** @inheritDoc */
-anychart.core.axisMarkers.PathBase.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.axisMarkers.PathBase.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   if ('layout' in config && config['layout']) this.layout(config['layout']);
   if ('axis' in config) {
     var ax = config['axis'];

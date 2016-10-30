@@ -149,8 +149,8 @@ anychart.palettes.DistinctColors.prototype.setupSpecial = function(var_args) {
 
 
 /** @inheritDoc */
-anychart.palettes.DistinctColors.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.palettes.DistinctColors.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.items(config['items']);
 };
 

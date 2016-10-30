@@ -436,8 +436,8 @@ anychart.scales.GeoTicks.prototype.setupSpecial = function(var_args) {
 
 
 /** @inheritDoc */
-anychart.scales.GeoTicks.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.scales.GeoTicks.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   // this.base(config['base']);
   this.explicit_ = config['explicit'] || null;
   if (this.explicit_) {

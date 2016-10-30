@@ -2952,8 +2952,8 @@ anychart.charts.Pert.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.charts.Pert.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.charts.Pert.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   this.defaultTooltipSettings_ = anychart.getFullTheme()['defaultTooltip'];
 

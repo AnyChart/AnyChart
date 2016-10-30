@@ -146,8 +146,8 @@ anychart.palettes.HatchFills.prototype.setupSpecial = function(var_args) {
 /**
  * @inheritDoc
  */
-anychart.palettes.HatchFills.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.palettes.HatchFills.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.items(config['items']);
 };
 

@@ -2171,7 +2171,7 @@ anychart.core.SeriesBase.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.core.SeriesBase.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config);
+  goog.base(this, 'setupByJSON', config, opt_default);
   if (goog.isFunction(this['fill']))
     this.fill(config['fill']);
 
@@ -2209,7 +2209,7 @@ anychart.core.SeriesBase.prototype.setupByJSON = function(config, opt_default) {
   this.selectLabels().setup(config['selectLabels']);
 
   if (anychart.opt.TOOLTIP in config)
-    this.tooltip().setupByJSON(config['tooltip'], opt_default);
+    this.tooltip().setupByVal(config['tooltip'], opt_default);
 
   this.legendItem(config['legendItem']);
   if (goog.isDef(config['allowPointsSelect'])) {

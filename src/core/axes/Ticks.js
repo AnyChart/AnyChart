@@ -364,8 +364,8 @@ anychart.core.axes.Ticks.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.axes.Ticks.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.axes.Ticks.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.length(config['length']);
   this.stroke(config['stroke']);
   this.position(config['position']);

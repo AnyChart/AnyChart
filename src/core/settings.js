@@ -299,7 +299,10 @@ anychart.core.settings.serialize = function(target, descriptors, json, opt_warni
     if (goog.isDef(val) && !goog.isFunction(val)) {
       if (descriptor.normalizer == anychart.core.settings.strokeOrFunctionNormalizer ||
           descriptor.normalizer == anychart.core.settings.fillOrFunctionNormalizer ||
-          descriptor.normalizer == anychart.core.settings.hatchFillOrFunctionNormalizer) {
+          descriptor.normalizer == anychart.core.settings.hatchFillOrFunctionNormalizer ||
+          descriptor.normalizer == anychart.core.settings.strokeNormalizer ||
+          descriptor.normalizer == anychart.core.settings.fillNormalizer ||
+          descriptor.normalizer == anychart.core.settings.hatchFillNormalizer) {
         val = anychart.color.serialize(descriptor.normalizer([val]));
       } else if (descriptor.normalizer == anychart.core.settings.colorNormalizer && !goog.isNull(val)) {
         val = anychart.color.serialize(descriptor.normalizer(val));
@@ -309,6 +312,21 @@ anychart.core.settings.serialize = function(target, descriptors, json, opt_warni
       }
       json[name] = val;
     }
+  }
+};
+
+
+/**
+ * Copy settings from config to target for descriptors map.
+ * @param {!Object} target
+ * @param {!Object.<anychart.core.settings.PropertyDescriptor>} descriptors
+ * @param {!Object} config
+ */
+anychart.core.settings.copy = function(target, descriptors, config) {
+  for (var name in descriptors) {
+    var val = config[name];
+    if (goog.isDef(val))
+      target[name] = val;
   }
 };
 //endregion
@@ -417,7 +435,7 @@ anychart.core.settings.colorNormalizer = function(val) {
 /**
  * Array normalizer for stroke.
  * @param {Array.<*>} args
- * @return {?acgraph.vector.Stroke}
+ * @return {acgraph.vector.Stroke}
  */
 anychart.core.settings.strokeNormalizer = function(args) {
   return acgraph.vector.normalizeStroke.apply(null, args);
@@ -445,6 +463,16 @@ anychart.core.settings.strokeOrFunctionSimpleNormalizer = function(val) {
   return goog.isFunction(val) ?
       val :
       acgraph.vector.normalizeStroke(/** @type {acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null|undefined} */(val));
+};
+
+
+/**
+ * Array normalizer for fill.
+ * @param {Array.<*>} args
+ * @return {acgraph.vector.Fill}
+ */
+anychart.core.settings.fillNormalizer = function(args) {
+  return acgraph.vector.normalizeFill.apply(null, args);
 };
 
 
@@ -493,6 +521,16 @@ anychart.core.settings.hatchFillOrFunctionSimpleNormalizer = function(val) {
   return goog.isFunction(val) || val === true ?
       val :
       acgraph.vector.normalizeHatchFill(/** @type {string|Object|null|undefined} */(val));
+};
+
+
+/**
+ * Array normalizer for hatch fill.
+ * @param {Array.<*>} args
+ * @return {acgraph.vector.PatternFill|acgraph.vector.HatchFill}
+ */
+anychart.core.settings.hatchFillNormalizer = function(args) {
+  return acgraph.vector.normalizeHatchFill.apply(null, args);
 };
 
 
@@ -739,12 +777,26 @@ anychart.core.settings.IResolvable.prototype.getHighPriorityResolutionChain = fu
 
 
 /**
+ * Getter/setter for resolution chain cache.
+ * General idea of this cache is to avoid array re-concatenation on every getOption() call.
+ * @param {Array.<Object|null|undefined>=} opt_value - Value to set.
+ * @return {Array.<Object|null|undefined>|null} - Chain of settings.
+ */
+anychart.core.settings.IResolvable.prototype.resolutionChainCache = function(opt_value) {};
+
+
+/**
  * Default resolution chain getter for IResolvable object.
  * @this {anychart.core.settings.IResolvable}
  * @return {Array.<Object|null|undefined>} - Chain of settings.
  */
 anychart.core.settings.getResolutionChain = function() {
-  return goog.array.concat(this.getHighPriorityResolutionChain(), this.getLowPriorityResolutionChain());
+  var chain = this.resolutionChainCache();
+  if (!chain) {
+    chain = goog.array.concat(this.getHighPriorityResolutionChain(), this.getLowPriorityResolutionChain());
+    this.resolutionChainCache(chain);
+  }
+  return chain;
 };
 
 

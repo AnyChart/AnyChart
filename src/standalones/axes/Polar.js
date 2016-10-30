@@ -15,8 +15,8 @@ anychart.core.makeStandalone(anychart.standalones.axes.Polar, anychart.core.axes
 
 
 /** @inheritDoc */
-anychart.standalones.axes.Polar.prototype.setupByJSON = function(config) {
-  anychart.standalones.axes.Polar.base(this, 'setupByJSON', config);
+anychart.standalones.axes.Polar.prototype.setupByJSON = function(config, opt_default) {
+  anychart.standalones.axes.Polar.base(this, 'setupByJSON', config, opt_default);
   this.startAngle(config['startAngle']);
 };
 

@@ -79,8 +79,8 @@ anychart.core.axes.LinearGauge.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.axes.LinearGauge.prototype.setupByJSON = function(config) {
-  anychart.core.axes.LinearGauge.base(this, 'setupByJSON', config);
+anychart.core.axes.LinearGauge.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.axes.LinearGauge.base(this, 'setupByJSON', config, opt_default);
   this.offset(config['offset']);
 };
 //endregion

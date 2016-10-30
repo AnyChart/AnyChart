@@ -370,6 +370,8 @@ anychart.themes.merging.demerge_ = function(target, defaultObj, opt_nonMergableE
               defVal = anychart.core.utils.Space.normalizeSpace(defVal);
               break;
           }
+        } else {
+          nonMergableEntityType = anychart.themes.merging.NonMergableEntityTypes_.NONE;
         }
         if (nonMergableEntityType == anychart.themes.merging.NonMergableEntityTypes_.SCALE ||
             nonMergableEntityType == anychart.themes.merging.NonMergableEntityTypes_.PADDING) {
@@ -488,7 +490,8 @@ anychart.themes.merging.mergingMap_ = [
       'standalones.label',
       'standalones.table',
       'standalones.textAxisMarker',
-      'standalones.resourceList.baseSettings'
+      'standalones.resourceList.baseSettings',
+      'resource.resourceList.baseSettings'
     ]
   },
   {
@@ -505,8 +508,12 @@ anychart.themes.merging.mergingMap_ = [
       'chart.defaultLabelSettings.background',
       'stock.defaultPlotSettings.xAxis.background',
       'stock.scroller.xAxis.background',
+      'resource.grid.background',
+      'resource.timeLine.background',
+      'resource.resourceList.background',
       'standalones.background',
-      'standalones.label.background'
+      'standalones.label.background',
+      'standalones.resourceList.background'
     ]
   },
   {
@@ -532,7 +539,9 @@ anychart.themes.merging.mergingMap_ = [
       'pert.tasks.lowerLabels',
       'ganttBase.timeline.header.topLevel.labels',
       'ganttBase.timeline.header.midLevel.labels',
-      'ganttBase.timeline.header.lowLevel.labels'
+      'ganttBase.timeline.header.lowLevel.labels',
+      'resource.activities.labels',
+      'resource.conflicts.labels'
     ]
   },
   {
@@ -722,6 +731,8 @@ anychart.themes.merging.mergingMap_ = [
       'heatMap.xScroller',
       'heatMap.yScroller',
       'stock.scroller',
+      'resource.horizontalScrollBar',
+      'resource.verticalScrollBar',
       'standalones.scroller'
     ]
   },
@@ -743,7 +754,8 @@ anychart.themes.merging.mergingMap_ = [
       'stock.defaultPlotSettings',
       'treeMap',
       'linearGauge',
-      'pert'
+      'pert',
+      'resource'
     ]
   },
   {
@@ -1161,6 +1173,15 @@ anychart.themes.merging.mergingMap_ = [
       'standalones.resourceList.descriptions',
       'standalones.resourceList.tags'
     ]
+  },
+  {
+    defaultObj: 'resource.resourceList.baseSettings',
+    targets: [
+      'resource.resourceList.names',
+      'resource.resourceList.types',
+      'resource.resourceList.descriptions',
+      'resource.resourceList.tags'
+    ]
   }
 ];
 
@@ -1171,6 +1192,7 @@ anychart.themes.merging.mergingMap_ = [
  * @private
  */
 anychart.themes.merging.NonMergableEntityTypes_ = {
+  NONE: 0,
   FILL: 1,
   STROKE: 2,
   HATCH_FILL: 3,

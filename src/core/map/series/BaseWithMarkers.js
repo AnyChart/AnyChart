@@ -454,8 +454,8 @@ anychart.core.map.series.BaseWithMarkers.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.core.map.series.BaseWithMarkers.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.map.series.BaseWithMarkers.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   if (config['markers'])
     this.markers().setup(config['markers']);
   if (config['hoverMarkers'])

@@ -366,8 +366,8 @@ anychart.core.gauge.pointers.Needle.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.gauge.pointers.Needle.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.gauge.pointers.Needle.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   this.startRadius(config['startRadius']);
   this.middleRadius(config['middleRadius']);

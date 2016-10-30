@@ -213,20 +213,6 @@ anychart.core.gantt.Controller.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * Henry Laurence Gantt's birth date (20 May 1861).
- * @type {number}
- */
-anychart.core.gantt.Controller.GANTT_BIRTH_DATE = Date.UTC(1861, 4, 20);
-
-
-/**
- * Henry Laurence Gantt's death date (23 Nov 1919).
- * @type {number}
- */
-anychart.core.gantt.Controller.GANTT_DEATH_DATE = Date.UTC(1919, 10, 23);
-
-
-/**
  * Default cell height.
  * @type {number}
  */
@@ -702,44 +688,9 @@ anychart.core.gantt.Controller.prototype.recalculate = function() {
     this.startIndex_ = 0;
     this.endIndex_ = 0;
     this.verticalOffset_ = 0;
-    this.setGanttLifeYears_();
   }
   this.positionRecalculated_ = true;
   this.markConsistent(anychart.ConsistencyState.CONTROLLER_POSITION);
-};
-
-
-/**
- * Sets this.minDate_ and this.maxDate_ to Henry Gantt's life years.
- * Calculates values to fit timeline's gaps.
- * @private
- */
-anychart.core.gantt.Controller.prototype.setGanttLifeYears_ = function() {
-  var minDate = anychart.core.gantt.Controller.GANTT_BIRTH_DATE;
-  var maxDate = anychart.core.gantt.Controller.GANTT_DEATH_DATE;
-
-  var minGap = 0;
-  var maxGap = 0;
-  if (this.timeline_) {
-    minGap = this.timeline_.scale().minimumGap();
-    maxGap = this.timeline_.scale().maximumGap();
-  }
-
-  var k = (1 + minGap + maxGap);
-
-  /*
-    To calculate this values:
-
-       minGap      maxDate_ - minDate_ = delta         maxGap
-    |---------|---------------------------------|--------------------|
-    birth     minDate_                          maxDate_             death
-
-    { minDate_ - minGap * delta = birth
-    { maxDate_ + maxGap * delta = death
-   */
-
-  this.minDate_ = Math.round((minDate + minDate * maxGap + maxDate * minGap) / k);
-  this.maxDate_ = Math.round((maxDate + maxDate * minGap + minDate * maxGap) / k);
 };
 
 
@@ -820,6 +771,8 @@ anychart.core.gantt.Controller.prototype.data = function(opt_value) {
 
       this.expandedItemsTraverser_ = this.data_.getTraverser();
       this.expandedItemsTraverser_.traverseChildrenCondition(this.traverseChildrenCondition_);
+      if (this.timeline_)
+        this.timeline_.scale().reset();
 
       this.invalidate(anychart.ConsistencyState.CONTROLLER_DATA, anychart.Signal.NEEDS_REAPPLICATION);
     }
@@ -965,10 +918,8 @@ anychart.core.gantt.Controller.prototype.run = function() {
     if (this.hasInvalidationState(anychart.ConsistencyState.CONTROLLER_DATA)) {
       this.linearizeData_();
       this.markConsistent(anychart.ConsistencyState.CONTROLLER_DATA);
-
       if (this.timeline_)
         this.timeline_.initScale();
-
       this.invalidate(anychart.ConsistencyState.CONTROLLER_VISIBILITY);
     }
 
@@ -980,9 +931,7 @@ anychart.core.gantt.Controller.prototype.run = function() {
 
     this.recalculate();
 
-    if (isNaN(this.minDate_)) { //In this case this.maxDate_ is NaN as well.
-      this.setGanttLifeYears_();
-    } else if (this.minDate_ == this.maxDate_) {
+    if (!isNaN(this.minDate_) && this.minDate_ == this.maxDate_) {
       this.minDate_ -= anychart.scales.GanttDateTime.MILLISECONDS_IN_DAY;
       this.maxDate_ += anychart.scales.GanttDateTime.MILLISECONDS_IN_DAY;
     }
@@ -1184,8 +1133,8 @@ anychart.core.gantt.Controller.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.gantt.Controller.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.gantt.Controller.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   this.isResources_ = config['isResourceChart']; //Direct setup. I don't want to believe that it is kind of hack.
   if ('treeData' in config) this.data(anychart.data.Tree.fromJson(config['treeData']));

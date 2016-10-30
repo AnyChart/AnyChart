@@ -655,8 +655,8 @@ anychart.core.linearGauge.ScaleBar.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.linearGauge.ScaleBar.prototype.setupByJSON = function(config) {
-  anychart.core.linearGauge.ScaleBar.base(this, 'setupByJSON', config);
+anychart.core.linearGauge.ScaleBar.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.linearGauge.ScaleBar.base(this, 'setupByJSON', config, opt_default);
   this.from(config['from']);
   this.to(config['to']);
   this.width(config['width']);

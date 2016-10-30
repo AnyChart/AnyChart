@@ -285,8 +285,8 @@ anychart.scales.Linear.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.scales.Linear.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.scales.Linear.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
   this.stackMode(config['stackMode']);
@@ -316,6 +316,8 @@ anychart.scales.linear = function() {
 
 //exports
 goog.exportSymbol('anychart.scales.linear', anychart.scales.linear);//doc|ex
+anychart.scales.Linear.prototype['transform'] = anychart.scales.Linear.prototype.transform;//doc|ex
+anychart.scales.Linear.prototype['inverseTransform'] = anychart.scales.Linear.prototype.inverseTransform;//doc|ex
 anychart.scales.Linear.prototype['getType'] = anychart.scales.Linear.prototype.getType;
 anychart.scales.Linear.prototype['ticks'] = anychart.scales.Linear.prototype.ticks;//doc|ex
 anychart.scales.Linear.prototype['minorTicks'] = anychart.scales.Linear.prototype.minorTicks;//doc|ex

@@ -2787,8 +2787,8 @@ anychart.charts.TreeMap.prototype.specificContextMenuItems = function(items, con
 /**
  * @inheritDoc
  */
-anychart.charts.TreeMap.prototype.setupByJSON = function(config) {
-  anychart.charts.TreeMap.base(this, 'setupByJSON', config);
+anychart.charts.TreeMap.prototype.setupByJSON = function(config, opt_default) {
+  anychart.charts.TreeMap.base(this, 'setupByJSON', config, opt_default);
 
   if ('treeData' in config)
     this.data(anychart.data.Tree.fromJson(config['treeData']));

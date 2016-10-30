@@ -43,6 +43,13 @@ anychart.core.axes.Map = function() {
   this.parent_ = null;
 
   /**
+   * Resolution chain cache.
+   * @type {Array.<Object|null|undefined>|null}
+   * @private
+   */
+  this.resolutionChainCache_ = null;
+
+  /**
    * Constant to save space.
    * @type {number}
    */
@@ -195,6 +202,15 @@ anychart.core.axes.Map.prototype.check = function(flags) {
 //endregion
 //region --- IResolvable implementation
 /** @inheritDoc */
+anychart.core.axes.Map.prototype.resolutionChainCache = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.resolutionChainCache_ = opt_value;
+  }
+  return this.resolutionChainCache_;
+};
+
+
+/** @inheritDoc */
 anychart.core.axes.Map.prototype.getResolutionChain = anychart.core.settings.getResolutionChain;
 
 
@@ -263,6 +279,8 @@ anychart.core.axes.Map.prototype.parentInvalidated_ = function(e) {
     state |= anychart.ConsistencyState.ENABLED;
     signal |= anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED;
   }
+
+  this.resolutionChainCache_ = null;
 
   this.invalidate(state, signal);
 };
@@ -1706,11 +1724,19 @@ anychart.core.axes.Map.prototype.serialize = function() {
   }
   json['enabled'] = goog.isDef(enabled) ? enabled : null;
 
-  json['title'] = this.title().serialize();
+  var titleConfig = this.title().serialize();
+  if (!goog.object.isEmpty(titleConfig))
+    json['title'] = titleConfig;
   json['ticks'] = this.ticks().serialize();
   json['minorTicks'] = this.minorTicks().serialize();
-  json['labels'] = this.labels().getChangedSettings();
-  json['minorLabels'] = this.minorLabels().getChangedSettings();
+
+  var labelsConfig = this.labels().getChangedSettings();
+  if (!goog.object.isEmpty(labelsConfig))
+    json['labels'] = labelsConfig;
+
+  var minorLabelsConfig = this.minorLabels().getChangedSettings();
+  if (!goog.object.isEmpty(minorLabelsConfig))
+    json['minorLabels'] = minorLabelsConfig;
 
   anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Map ' + this.orientation_ + ' axis props');
 

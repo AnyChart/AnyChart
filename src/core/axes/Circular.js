@@ -1249,8 +1249,8 @@ anychart.core.axes.Circular.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.axes.Circular.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.axes.Circular.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   var scale;
   var json = config['scale'];

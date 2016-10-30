@@ -336,7 +336,7 @@ anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.charts.Cartesi
  */
 anychart.cartesian3d = function(opt_barChartMode) {
   var chart = new anychart.charts.Cartesian3d(opt_barChartMode);
-  chart.setup(anychart.getFullTheme()['cartesian3d']);
+  chart.setupByVal(anychart.getFullTheme()['cartesian3d'], true);
 
   return chart;
 };
@@ -828,8 +828,8 @@ anychart.charts.Cartesian3d.prototype.makeBrowserEvent = function(e) {
  * @inheritDoc
  * @suppress {deprecated}
  */
-anychart.charts.Cartesian3d.prototype.setupByJSON = function(config) {
-  anychart.charts.Cartesian3d.base(this, 'setupByJSON', config);
+anychart.charts.Cartesian3d.prototype.setupByJSON = function(config, opt_default) {
+  anychart.charts.Cartesian3d.base(this, 'setupByJSON', config, opt_default);
 
   this.zAngle(config['zAngle']);
   if (config['zDepth']) this.zDepth(config['zDepth']);

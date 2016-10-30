@@ -552,8 +552,8 @@ anychart.core.polar.series.ContinuousBase.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.core.polar.series.ContinuousBase.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.polar.series.ContinuousBase.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.closed(config['closed']);
   this.markers().setup(config['markers']);
   this.hoverMarkers().setup(config['hoverMarkers']);

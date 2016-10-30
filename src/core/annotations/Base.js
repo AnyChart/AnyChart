@@ -1307,13 +1307,13 @@ anychart.core.annotations.Base.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.annotations.Base.prototype.setupByJSON = function(config) {
+anychart.core.annotations.Base.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.settings.deserialize(this, anychart.core.annotations.BASE_DESCRIPTORS, config);
   this.markers().setup(config['markers']);
   this.hoverMarkers().setup(config['hoverMarkers']);
   this.selectMarkers().setup(config['selectMarkers']);
 
-  anychart.core.annotations.Base.base(this, 'setupByJSON', config);
+  anychart.core.annotations.Base.base(this, 'setupByJSON', config, opt_default);
 };
 
 

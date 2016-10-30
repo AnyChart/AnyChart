@@ -2778,8 +2778,8 @@ anychart.core.ChartWithSeries.prototype.setupByJSONWithScales = function(config,
 /**
  * @inheritDoc
  */
-anychart.core.ChartWithSeries.prototype.setupByJSON = function(config) {
-  anychart.core.ChartWithSeries.base(this, 'setupByJSON', config);
+anychart.core.ChartWithSeries.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.ChartWithSeries.base(this, 'setupByJSON', config, opt_default);
 
   var type = this.getType();
   var i, json, scale;

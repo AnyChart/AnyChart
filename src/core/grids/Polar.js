@@ -826,8 +826,8 @@ anychart.core.grids.Polar.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.grids.Polar.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.grids.Polar.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.isMinor(config['isMinor']);
   this.layout(config['layout']);
   this.drawLastLine(config['drawLastLine']);

@@ -470,8 +470,8 @@ anychart.core.ui.Paginator.prototype.draw = function() {
     var nextButtonX;
     var nextButtonY;
 
-    var padTop = anychart.utils.normalizeSize(/** @type {number|string} */ (this.padding().getSafeOption(anychart.opt.TOP)), this.backgroundHeight_);
-    var padLeft = anychart.utils.normalizeSize(/** @type {number|string} */ (this.padding().getSafeOption(anychart.opt.LEFT)), this.backgroundWidth_);
+    var padTop = anychart.utils.normalizeSize(/** @type {number|string} */ (this.padding().getOption(anychart.opt.TOP)), this.backgroundHeight_);
+    var padLeft = anychart.utils.normalizeSize(/** @type {number|string} */ (this.padding().getOption(anychart.opt.LEFT)), this.backgroundWidth_);
 
     var availWidth = this.padding().tightenWidth(this.backgroundWidth_);
     var availHeight = this.padding().tightenHeight(this.backgroundHeight_);
@@ -613,8 +613,8 @@ anychart.core.ui.Paginator.prototype.calculatePaginatorBounds_ = function() {
 
   var widthWithMargin = margin.widenWidth(this.backgroundWidth_);
   var heightWithMargin = margin.widenHeight(this.backgroundHeight_);
-  var leftMargin = parentBounds ? anychart.utils.normalizeSize(margin.getSafeOption(anychart.opt.LEFT), this.backgroundWidth_) : 0;
-  var topMargin = parentBounds ? anychart.utils.normalizeSize(margin.getSafeOption(anychart.opt.TOP), this.backgroundHeight_) : 0;
+  var leftMargin = parentBounds ? anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption(anychart.opt.LEFT)), this.backgroundWidth_) : 0;
+  var topMargin = parentBounds ? anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption(anychart.opt.TOP)), this.backgroundHeight_) : 0;
 
   if (parentBounds) {
     switch (this.orientation_) {
@@ -803,12 +803,17 @@ anychart.core.ui.Paginator.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.Paginator.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.ui.Paginator.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
-  this.background(config[anychart.opt.BACKGROUND]);
-  this.margin(config[anychart.opt.MARGIN]);
-  this.padding(config[anychart.opt.PADDING]);
+  if (anychart.opt.BACKGROUND in config)
+    this.background(config[anychart.opt.BACKGROUND]);
+
+  if (anychart.opt.PADDING in config)
+    this.padding(config[anychart.opt.PADDING]);
+
+  if (anychart.opt.MARGIN in config)
+    this.margin(config[anychart.opt.MARGIN]);
 
   this.orientation(config['orientation']);
   this.layout(config['layout']);

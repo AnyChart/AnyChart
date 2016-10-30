@@ -620,7 +620,7 @@ anychart.core.ui.Scroller.prototype.draw = function() {
     this.endThumb_.zIndex(100);
 
     this.nonSelectedBackground_ = this.rootLayer.rect();
-    this.nonSelectedBackground_.zIndex(0);
+    this.nonSelectedBackground_.zIndex(1);
 
     this.nonSelectedClipRect = acgraph.clip();
     this.nonSelectedBackground_.clip(this.nonSelectedClipRect);
@@ -688,6 +688,8 @@ anychart.core.ui.Scroller.prototype.draw = function() {
     // a bit redundant, but allows clearing BOUNDS state without initializing visual components (see getRemainingBounds())
     this.nonSelectedBackground_.setBounds(this.pixelBoundsCache);
     this.selectedBackground_.setBounds(this.pixelBoundsCache);
+
+    this.nonSelectedClipRect.shape(this.pixelBoundsCache);
 
     this.nonSelectedBackground_.fill(this.nonSelectedFill_ == 'none' ?
         anychart.color.TRANSPARENT_HANDLER : this.nonSelectedFill_).stroke(null);
@@ -978,16 +980,17 @@ anychart.core.ui.Scroller.prototype.updateBoundsCache = function() {
   if (this.absolutePadding_ || this.isHorizontal()) {
     this.pixelBoundsCache = this.padding().tightenBounds(this.fullPixelBoundsCache);
   } else {
+    var padding = this.padding();
     if (this.orientation_ == anychart.enums.Orientation.LEFT) {
-      top = anychart.utils.normalizeSize(this.padding().getSafeOption(anychart.opt.LEFT), this.fullPixelBoundsCache.width);
-      right = anychart.utils.normalizeSize(this.padding().getSafeOption(anychart.opt.TOP), this.fullPixelBoundsCache.height);
-      bottom = anychart.utils.normalizeSize(this.padding().getSafeOption(anychart.opt.RIGHT), this.fullPixelBoundsCache.width);
-      left = anychart.utils.normalizeSize(this.padding().getSafeOption(anychart.opt.BOTTOM), this.fullPixelBoundsCache.height);
+      top = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.LEFT)), this.fullPixelBoundsCache.width);
+      right = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.TOP)), this.fullPixelBoundsCache.height);
+      bottom = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.RIGHT)), this.fullPixelBoundsCache.width);
+      left = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.BOTTOM)), this.fullPixelBoundsCache.height);
     } else {
-      top = anychart.utils.normalizeSize(this.padding().getSafeOption(anychart.opt.RIGHT), this.fullPixelBoundsCache.width);
-      right = anychart.utils.normalizeSize(this.padding().getSafeOption(anychart.opt.BOTTOM), this.fullPixelBoundsCache.height);
-      bottom = anychart.utils.normalizeSize(this.padding().getSafeOption(anychart.opt.LEFT), this.fullPixelBoundsCache.width);
-      left = anychart.utils.normalizeSize(this.padding().getSafeOption(anychart.opt.TOP), this.fullPixelBoundsCache.height);
+      top = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.RIGHT)), this.fullPixelBoundsCache.width);
+      right = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.BOTTOM)), this.fullPixelBoundsCache.height);
+      bottom = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.LEFT)), this.fullPixelBoundsCache.width);
+      left = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.TOP)), this.fullPixelBoundsCache.height);
 
     }
     this.pixelBoundsCache.left = this.fullPixelBoundsCache.left + left;
@@ -1540,8 +1543,8 @@ anychart.core.ui.Scroller.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.Scroller.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.ui.Scroller.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.orientation(config['orientation']);
   this.autoHide(config['autoHide']);
   this.allowRangeChange(config['allowRangeChange']);

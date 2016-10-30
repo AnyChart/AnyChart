@@ -1725,8 +1725,8 @@ anychart.charts.HeatMap.prototype.drawSeries_ = function() {
             var mergedSettings = label.getMergedSettings();
             var padding = mergedSettings['padding'];
 
-            var width = cellBounds.width - padding.getSafeOption(anychart.opt.LEFT) - padding.getSafeOption(anychart.opt.RIGHT);
-            var height = cellBounds.height - padding.getSafeOption(anychart.opt.TOP) - padding.getSafeOption(anychart.opt.BOTTOM);
+            var width = cellBounds.width - padding.getOption(anychart.opt.LEFT) - padding.getOption(anychart.opt.RIGHT);
+            var height = cellBounds.height - padding.getOption(anychart.opt.TOP) - padding.getOption(anychart.opt.BOTTOM);
 
             var needAdjust = (mergedSettings['adjustByHeight'] || mergedSettings['adjustByHeight']);
             if (needAdjust && this.labels().adjustFontSizeMode() == anychart.enums.AdjustFontSizeMode.SAME) {
@@ -1753,8 +1753,8 @@ anychart.charts.HeatMap.prototype.drawSeries_ = function() {
             var mergedSettings = label.getMergedSettings();
             var padding = mergedSettings['padding'];
 
-            var width = cellBounds.width - padding.getSafeOption(anychart.opt.LEFT) - padding.getSafeOption(anychart.opt.RIGHT);
-            var height = cellBounds.height - padding.getSafeOption(anychart.opt.TOP) - padding.getSafeOption(anychart.opt.BOTTOM);
+            var width = cellBounds.width - padding.getOption(anychart.opt.LEFT) - padding.getOption(anychart.opt.RIGHT);
+            var height = cellBounds.height - padding.getOption(anychart.opt.TOP) - padding.getOption(anychart.opt.BOTTOM);
 
             var needAdjust = (mergedSettings['adjustByHeight'] || mergedSettings['adjustByHeight']);
             if (needAdjust && this.labels().adjustFontSizeMode() == anychart.enums.AdjustFontSizeMode.SAME) {
@@ -1781,8 +1781,8 @@ anychart.charts.HeatMap.prototype.drawSeries_ = function() {
             var mergedSettings = label.getMergedSettings();
             var padding = mergedSettings['padding'];
 
-            var width = cellBounds.width - padding.getSafeOption(anychart.opt.LEFT) - padding.getSafeOption(anychart.opt.RIGHT);
-            var height = cellBounds.height - padding.getSafeOption(anychart.opt.TOP) - padding.getSafeOption(anychart.opt.BOTTOM);
+            var width = cellBounds.width - padding.getOption(anychart.opt.LEFT) - padding.getOption(anychart.opt.RIGHT);
+            var height = cellBounds.height - padding.getOption(anychart.opt.TOP) - padding.getOption(anychart.opt.BOTTOM);
 
             var needAdjust = (mergedSettings['adjustByHeight'] || mergedSettings['adjustByHeight']);
             if (needAdjust && this.labels().adjustFontSizeMode() == anychart.enums.AdjustFontSizeMode.SAME) {
@@ -2160,8 +2160,8 @@ anychart.charts.HeatMap.prototype.select = function(opt_indexOrIndexes) {
 /**
  * @inheritDoc
  */
-anychart.charts.HeatMap.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.charts.HeatMap.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   if ('defaultXAxisSettings' in config)
     this.defaultXAxisSettings(config['defaultXAxisSettings']);

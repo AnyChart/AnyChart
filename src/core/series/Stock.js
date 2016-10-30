@@ -569,8 +569,8 @@ anychart.core.series.Stock.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.core.series.Stock.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.series.Stock.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 };
 
 

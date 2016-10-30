@@ -139,6 +139,20 @@ anychart.scales.GanttDateTime = function() {
    */
   this.consistent = false;
 
+  /**
+   * Min for empty data.
+   * @type {number}
+   * @private
+   */
+  this.emptyMin_ = NaN;
+
+  /**
+   * Max for empty data.
+   * @type {number}
+   * @private
+   */
+  this.emptyMax_ = NaN;
+
 };
 goog.inherits(anychart.scales.GanttDateTime, anychart.core.Base);
 
@@ -272,8 +286,36 @@ anychart.scales.GanttDateTime.LOW_INTERVALS = [
  * @return {boolean} - Whether scale is not configured.
  */
 anychart.scales.GanttDateTime.prototype.isEmpty = function() {
-  var totalRange = this.getTotalRange();
-  return isNaN(this.min_) && isNaN(this.max_) && isNaN(totalRange['min'] && isNaN(totalRange['max']));
+  return isNaN(this.min_) && isNaN(this.max_) &&
+      isNaN(this.dataMin_) && isNaN(this.dataMax_);
+};
+
+
+/**
+ * Resets values.
+ */
+anychart.scales.GanttDateTime.prototype.reset = function() {
+  this.min_ = NaN;
+  this.max_ = NaN;
+  this.totalMin_ = NaN;
+  this.totalMax_ = NaN;
+  this.dataMin_ = NaN;
+  this.dataMax_ = NaN;
+  this.consistent = false;
+};
+
+
+/**
+ * Gets data range for empty data.
+ * @return {{min: number, max: number}}
+ */
+anychart.scales.GanttDateTime.prototype.getEmptyRange = function() {
+  var now = new Date();
+  if (isNaN(this.emptyMin_))
+    this.emptyMin_ = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  if (isNaN(this.emptyMax_))
+    this.emptyMax_ = this.emptyMin_ + anychart.scales.GanttDateTime.MILLISECONDS_IN_DAY;
+  return {'min': this.emptyMin_, 'max': this.emptyMax_};
 };
 
 
@@ -327,26 +369,8 @@ anychart.scales.GanttDateTime.prototype.setDataRange = function(min, max) {
  */
 anychart.scales.GanttDateTime.prototype.getRange = function() {
   this.calculate();
-  return {'min': this.min_, 'max': this.max_};
+  return this.isEmpty() ? this.getEmptyRange() : {'min': this.min_, 'max': this.max_};
 };
-
-
-// /**
-//  * Gets minimum and maximum data dates set for scale.
-//  * @return {{min: number, max: number}}
-//  */
-// anychart.scales.GanttDateTime.prototype.getDataRange = function() {
-//   return {'min': this.dataMin_, 'max': this.dataMax_};
-// };
-//
-//
-// /**
-//  * Gets minimum and maximum dates manually set for scale.
-//  * @return {{min: number, max: number}}
-//  */
-// anychart.scales.GanttDateTime.prototype.getManualRange = function() {
-//   return {'min': this.manualMin_, 'max': this.manualMax_};
-// };
 
 
 /**
@@ -385,7 +409,7 @@ anychart.scales.GanttDateTime.prototype.getTotalRange = function() {
     }
   }
 
-  return {'min': this.totalMin_, 'max': this.totalMax_};
+  return this.isEmpty() ? this.getEmptyRange() : {'min': this.totalMin_, 'max': this.totalMax_};
 };
 
 
@@ -393,7 +417,7 @@ anychart.scales.GanttDateTime.prototype.getTotalRange = function() {
  * Calculates and fits values.
  */
 anychart.scales.GanttDateTime.prototype.calculate = function() {
-  if (!this.consistent) {
+  if (!this.consistent && !this.isEmpty()) {
     this.consistent = true;
     var totalRange = this.getTotalRange();
     var tMin = totalRange['min'];
@@ -427,7 +451,6 @@ anychart.scales.GanttDateTime.prototype.calculate = function() {
       this.min_ = Math.max(this.max_, tMin);
       this.max_ = Math.min(this.min_ + range, tMax);
     }
-
   }
 };
 
@@ -437,8 +460,11 @@ anychart.scales.GanttDateTime.prototype.calculate = function() {
  * @return {anychart.scales.GanttDateTime} - Itself for method chaining.
  */
 anychart.scales.GanttDateTime.prototype.fitAll = function() {
-  var totalRange = this.getTotalRange();
-  return this.setRange(totalRange['min'], totalRange['max']);
+  if (!this.isEmpty()) {
+    var range = this.getTotalRange();
+    return this.setRange(range['min'], range['max']);
+  }
+  return this;
 };
 
 
@@ -565,11 +591,10 @@ anychart.scales.GanttDateTime.prototype.maximumGap = function(opt_value) {
  * @return {Array.<number>} - Array of ticks.
  */
 anychart.scales.GanttDateTime.prototype.getTicks = function(anchorDate, interval) {
-  this.calculate();
   var anchor = anychart.utils.normalizeTimestamp(anchorDate);
-
-  if (isNaN(this.min_) || isNaN(this.max_))
-    this.setRange(anychart.core.gantt.Controller.GANTT_BIRTH_DATE, anychart.core.gantt.Controller.GANTT_DEATH_DATE);
+  var range = this.getRange();
+  var min = range['min'];
+  var max = range['max'];
 
   if (interval.years || interval.months) {
     /*
@@ -584,17 +609,17 @@ anychart.scales.GanttDateTime.prototype.getTicks = function(anchorDate, interval
         3) Anchor point is righter than scale's maximum.
      */
 
-    if (anchor <= this.min_) {
+    if (anchor <= min) {
       return this.seek_(anchorDate, interval);
     }
 
-    if (anchor > this.min_ && anchor < this.max_) {
+    if (anchor > min && anchor < max) {
       var foundLeft = this.seek_(anchorDate, interval, true);
       var foundRight = this.seek_(anchorDate, interval, false, true);
       return goog.array.concat(foundLeft, foundRight);
     }
 
-    if (anchor >= this.max_) {
+    if (anchor >= max) {
       return this.seek_(anchorDate, interval, true);
     }
   } else {
@@ -612,11 +637,11 @@ anychart.scales.GanttDateTime.prototype.getTicks = function(anchorDate, interval
         interval.seconds * anychart.scales.GanttDateTime.MILLISECONDS_IN_SECOND;
 
     var minAnchor, delta;
-    if (anchor <= this.min_) {
-      delta = Math.floor((this.min_ - anchor) / intervalLength) * intervalLength;
+    if (anchor <= min) {
+      delta = Math.floor((min - anchor) / intervalLength) * intervalLength;
       minAnchor = anchor + delta;
     } else {
-      delta = Math.ceil((anchor - this.min_) / intervalLength) * intervalLength;
+      delta = Math.ceil((anchor - min) / intervalLength) * intervalLength;
       minAnchor = anchor - delta;
     }
 
@@ -637,11 +662,10 @@ anychart.scales.GanttDateTime.prototype.getTicks = function(anchorDate, interval
  * @private
  */
 anychart.scales.GanttDateTime.prototype.seek_ = function(startDate, interval, opt_inverted, opt_ignoreFirstFoundValue) {
-  //if (goog.isNumber(startDate)) startDate = new goog.date.UtcDateTime(new Date(startDate));
-  //if (startDate instanceof Date) startDate = new goog.date.UtcDateTime(startDate);
-
-  //startDate = new goog.date.UtcDateTime(anychart.format.parseDateTime(startDate));
   startDate = new goog.date.UtcDateTime(anychart.format.parseDateTime(startDate));
+  var range = this.getRange();
+  var min = range['min'];
+  var max = range['max'];
 
   var result = [];
 
@@ -660,7 +684,7 @@ anychart.scales.GanttDateTime.prototype.seek_ = function(startDate, interval, op
       newAnchorMs = anychart.utils.normalizeTimestamp(newAnchorDate);
 
       if (!firstFound) {
-        if (newAnchorMs < this.max_) { // newAnchorMs <= this.max_ < anchorMs
+        if (newAnchorMs < max) { // newAnchorMs <= max < anchorMs
           firstFound = true;
           if (!opt_ignoreFirstFoundValue) result.push(anchorMs);
         }
@@ -668,7 +692,7 @@ anychart.scales.GanttDateTime.prototype.seek_ = function(startDate, interval, op
         goog.array.insertAt(result, anchorMs, 0);
       }
 
-      secondFound = newAnchorMs <= this.min_;
+      secondFound = newAnchorMs <= min;
       if (secondFound) result.push(newAnchorMs);
       anchorDate = newAnchorDate.clone();
 
@@ -681,7 +705,7 @@ anychart.scales.GanttDateTime.prototype.seek_ = function(startDate, interval, op
       newAnchorMs = anychart.utils.normalizeTimestamp(newAnchorDate);
 
       if (!firstFound) {
-        if (this.min_ < newAnchorMs) { // anchorMs <= this.min_ < newAnchorMs
+        if (min < newAnchorMs) { // anchorMs <= this.min_ < newAnchorMs
           firstFound = true;
           if (!opt_ignoreFirstFoundValue) result.push(anchorMs);
         }
@@ -689,7 +713,7 @@ anychart.scales.GanttDateTime.prototype.seek_ = function(startDate, interval, op
         result.push(anchorMs);
       }
 
-      secondFound = this.max_ <= newAnchorMs;
+      secondFound = max <= newAnchorMs;
       if (secondFound) result.push(newAnchorMs);
       anchorDate = newAnchorDate.clone();
     }
@@ -736,11 +760,12 @@ anychart.scales.GanttDateTime.prototype.timestampToRatio = function(value) {
 
   val = goog.isDefAndNotNull(val) ? val : anychart.utils.normalizeTimestamp(value);
 
-  if (isNaN(this.min_) || isNaN(this.max_))
-    this.setRange(anychart.core.gantt.Controller.GANTT_BIRTH_DATE, anychart.core.gantt.Controller.GANTT_DEATH_DATE);
+  var range = this.getRange();
+  var min = range['min'];
+  var max = range['max'];
 
   //You will get this return expression if you draw a time axis and mark a values there.
-  return (val - this.min_) / (this.max_ - this.min_);
+  return (val - min) / (max - min);
 };
 
 
@@ -763,11 +788,12 @@ anychart.scales.GanttDateTime.prototype.transform = function(value, opt_subRange
  * @return {number} - Timestamp.
  */
 anychart.scales.GanttDateTime.prototype.ratioToTimestamp = function(value) {
-  if (isNaN(this.min_) || isNaN(this.max_))
-    this.setRange(anychart.core.gantt.Controller.GANTT_BIRTH_DATE, anychart.core.gantt.Controller.GANTT_DEATH_DATE);
+  var range = this.getRange();
+  var min = range['min'];
+  var max = range['max'];
 
   //You will get this return expression if you draw a time axis and mark a values there.
-  return Math.round(value * (this.max_ - this.min_) + this.min_);
+  return Math.round(value * (max - min) + min);
 };
 
 
@@ -780,11 +806,12 @@ anychart.scales.GanttDateTime.prototype.ratioToTimestamp = function(value) {
  */
 anychart.scales.GanttDateTime.prototype.makeLevelData_ = function(level, opt_parentLevel) {
   var interval = anychart.utils.getIntervalFromInfo(level.unit, level.count);
-
+  var range = this.getRange();
   var intervalId = anychart.format.getIntervalIdentifier(level.unit, opt_parentLevel && opt_parentLevel.unit, 'timelineHeader');
   var format = anychart.format.getDateTimeFormat(intervalId, 0);
+
   return {
-    'anchor': anychart.utils.alignDateLeft(this.min_, interval, 0),
+    'anchor': anychart.utils.alignDateLeft(range['min'], interval, 0),
     'interval': interval,
     'formatter': anychart.scales.GanttDateTime.createTextFormatter_(format)
   };
@@ -796,11 +823,12 @@ anychart.scales.GanttDateTime.prototype.makeLevelData_ = function(level, opt_par
  * @return {Array|number}
  */
 anychart.scales.GanttDateTime.prototype.getLevelsData = function() {
-  if (isNaN(this.min_) || isNaN(this.max_))
-    this.setRange(anychart.core.gantt.Controller.GANTT_BIRTH_DATE, anychart.core.gantt.Controller.GANTT_DEATH_DATE);
-
   this.calculate();
-  var range = this.max_ - this.min_;
+  var r = this.getRange();
+  var min = r['min'];
+  var max = r['max'];
+
+  var range = max - min;
   var ranges = anychart.scales.GanttDateTime.RANGES;
   var index = -1;
   for (var i = 0; i < ranges.length; i++) {
@@ -827,10 +855,12 @@ anychart.scales.GanttDateTime.prototype.getLevelsData = function() {
  * @return {boolean}
  */
 anychart.scales.GanttDateTime.prototype.minReached = function() {
-  if (isNaN(this.min_) || isNaN(this.max_))
-    this.setRange(anychart.core.gantt.Controller.GANTT_BIRTH_DATE, anychart.core.gantt.Controller.GANTT_DEATH_DATE);
-  var totalRange = this.getTotalRange();
-  return this.min_ <= totalRange['min'];
+  if (this.isEmpty())
+    return true;
+  else {
+    var totalRange = this.getTotalRange();
+    return this.min_ <= totalRange['min'];
+  }
 };
 
 
@@ -839,10 +869,12 @@ anychart.scales.GanttDateTime.prototype.minReached = function() {
  * @return {boolean}
  */
 anychart.scales.GanttDateTime.prototype.maxReached = function() {
-  if (isNaN(this.min_) || isNaN(this.max_))
-    this.setRange(anychart.core.gantt.Controller.GANTT_BIRTH_DATE, anychart.core.gantt.Controller.GANTT_DEATH_DATE);
-  var totalRange = this.getTotalRange();
-  return this.max_ >= totalRange['max'];
+  if (this.isEmpty())
+    return true;
+  else {
+    var totalRange = this.getTotalRange();
+    return this.max_ >= totalRange['max'];
+  }
 };
 
 
@@ -852,20 +884,19 @@ anychart.scales.GanttDateTime.prototype.maxReached = function() {
  * @return {anychart.scales.GanttDateTime} - Itself for method chaining.
  */
 anychart.scales.GanttDateTime.prototype.zoomIn = function(opt_zoomFactor) {
-  if (isNaN(this.min_) || isNaN(this.max_))
-    this.setRange(anychart.core.gantt.Controller.GANTT_BIRTH_DATE, anychart.core.gantt.Controller.GANTT_DEATH_DATE);
-
-  opt_zoomFactor = opt_zoomFactor ? (1 / opt_zoomFactor) : (1 / anychart.scales.GanttDateTime.DEFAULT_ZOOM_FACTOR);
-  var range = this.max_ - this.min_;
-  var msInterval = Math.round(range * (opt_zoomFactor - 1) / 2);
-  var newMin = this.min_ - msInterval;
-  var newMax = this.max_ + msInterval;
-  if (Math.abs(newMin - newMax) <= anychart.scales.GanttDateTime.MILLISECONDS_IN_MINUTE) {
-    var middle = (this.min_ + this.max_) / 2;
-    newMin = middle - anychart.scales.GanttDateTime.MILLISECONDS_IN_MINUTE / 2;
-    newMax = middle + anychart.scales.GanttDateTime.MILLISECONDS_IN_MINUTE / 2;
+  if (!this.isEmpty()) {
+    opt_zoomFactor = opt_zoomFactor ? (1 / opt_zoomFactor) : (1 / anychart.scales.GanttDateTime.DEFAULT_ZOOM_FACTOR);
+    var range = this.max_ - this.min_;
+    var msInterval = Math.round(range * (opt_zoomFactor - 1) / 2);
+    var newMin = this.min_ - msInterval;
+    var newMax = this.max_ + msInterval;
+    if (Math.abs(newMin - newMax) <= anychart.scales.GanttDateTime.MILLISECONDS_IN_MINUTE) {
+      var middle = (this.min_ + this.max_) / 2;
+      newMin = middle - anychart.scales.GanttDateTime.MILLISECONDS_IN_MINUTE / 2;
+      newMax = middle + anychart.scales.GanttDateTime.MILLISECONDS_IN_MINUTE / 2;
+    }
+    this.setRange(newMin, newMax);
   }
-  this.setRange(newMin, newMax);
 
   return this;
 };
@@ -878,9 +909,6 @@ anychart.scales.GanttDateTime.prototype.zoomIn = function(opt_zoomFactor) {
  */
 anychart.scales.GanttDateTime.prototype.zoomOut = function(opt_zoomFactor) {
   if (!this.minReached() || !this.maxReached()) {
-    if (isNaN(this.min_) || isNaN(this.max_))
-      this.setRange(anychart.core.gantt.Controller.GANTT_BIRTH_DATE, anychart.core.gantt.Controller.GANTT_DEATH_DATE);
-
     opt_zoomFactor = opt_zoomFactor || anychart.scales.GanttDateTime.DEFAULT_ZOOM_FACTOR;
     var msInterval = Math.round((this.max_ - this.min_) * (opt_zoomFactor - 1) / 2);
 
@@ -1001,12 +1029,8 @@ anychart.scales.GanttDateTime.prototype.zoomTo = function(startOrUnit, opt_endOr
  * @return {anychart.scales.GanttDateTime} - Itself for method chaining.
  */
 anychart.scales.GanttDateTime.prototype.ratioScroll = function(ratio) {
-  if (ratio) {
-    if (isNaN(this.min_) || isNaN(this.max_))
-      this.setRange(anychart.core.gantt.Controller.GANTT_BIRTH_DATE, anychart.core.gantt.Controller.GANTT_DEATH_DATE);
-
+  if (ratio && !this.isEmpty()) {
     var totalRange = this.getTotalRange();
-
     var msInterval = Math.round((this.max_ - this.min_) * ratio);
     var interval = 0;
     if (msInterval >= 0) {
@@ -1027,10 +1051,7 @@ anychart.scales.GanttDateTime.prototype.ratioScroll = function(ratio) {
  * @return {anychart.scales.GanttDateTime} - Itself for method chaining.
  */
 anychart.scales.GanttDateTime.prototype.ratioForceScroll = function(ratio) {
-  if (ratio) {
-    if (isNaN(this.min_) || isNaN(this.max_))
-      this.setRange(anychart.core.gantt.Controller.GANTT_BIRTH_DATE, anychart.core.gantt.Controller.GANTT_DEATH_DATE);
-
+  if (ratio && !this.isEmpty()) {
     this.getTotalRange();
 
     var msInterval = Math.round((this.max_ - this.min_) * ratio);
@@ -1073,6 +1094,12 @@ anychart.scales.GanttDateTime.prototype.serialize = function() {
   if (!isNaN(this.softMax_))
     json['softMaximum'] = this.softMax_;
 
+  if (!isNaN(this.dataMin_))
+    json['dataMinimum'] = this.dataMin_;
+
+  if (!isNaN(this.dataMax_))
+    json['dataMaximum'] = this.dataMax_;
+
   json['minimumGap'] = this.minimumGap_;
   json['maximumGap'] = this.maximumGap_;
 
@@ -1081,8 +1108,8 @@ anychart.scales.GanttDateTime.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.scales.GanttDateTime.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.scales.GanttDateTime.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   this.minimumGap(config['minimumGap']);
   this.maximumGap(config['maximumGap']);
@@ -1100,6 +1127,16 @@ anychart.scales.GanttDateTime.prototype.setupByJSON = function(config) {
     this.softMaximum(config['softMaximum']);
 
   var recalc = false;
+  if ('dataMinimum' in config) {
+    this.dataMin_ = config['dataMinimum'];
+    recalc = true;
+  }
+
+  if ('dataMaximum' in config) {
+    this.dataMax_ = config['dataMaximum'];
+    recalc = true;
+  }
+
   if ('visibleMinimum' in config) {
     this.min_ = config['visibleMinimum'];
     recalc = true;

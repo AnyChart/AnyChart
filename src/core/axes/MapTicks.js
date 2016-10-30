@@ -46,6 +46,13 @@ anychart.core.axes.MapTicks = function() {
   this.parent_ = null;
 
   /**
+   * Resolution chain cache.
+   * @type {Array.<Object|null|undefined>|null}
+   * @private
+   */
+  this.resolutionChainCache_ = null;
+
+  /**
    * Path with ticks.
    * @type {!acgraph.vector.Path}
    * @protected
@@ -112,6 +119,15 @@ anychart.core.axes.MapTicks.prototype.check = function(flags) {
 //endregion
 //region --- IResolvable implementation
 /** @inheritDoc */
+anychart.core.axes.MapTicks.prototype.resolutionChainCache = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.resolutionChainCache_ = opt_value;
+  }
+  return this.resolutionChainCache_;
+};
+
+
+/** @inheritDoc */
 anychart.core.axes.MapTicks.prototype.getResolutionChain = anychart.core.settings.getResolutionChain;
 
 
@@ -172,6 +188,8 @@ anychart.core.axes.MapTicks.prototype.parentInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
+
+  this.resolutionChainCache_ = null;
 
   this.dispatchSignal(signal);
 };

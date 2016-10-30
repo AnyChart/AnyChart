@@ -868,8 +868,8 @@ anychart.core.VisualBase.prototype.specialSetupByVal = function(value) {
 
 
 /** @inheritDoc */
-anychart.core.VisualBase.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.VisualBase.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   var enabled = config['enabled'];
   this.enabled(goog.isDefAndNotNull(enabled) ? enabled : !goog.isDef(enabled) ? true : undefined);

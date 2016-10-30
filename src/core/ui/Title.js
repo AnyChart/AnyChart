@@ -188,6 +188,13 @@ anychart.core.ui.Title = function() {
    * @private
    */
   this.autoText_;
+
+  /**
+   * Resolution chain cache.
+   * @type {Array.<Object|null|undefined>|null}
+   * @private
+   */
+  this.resolutionChainCache_ = null;
 };
 goog.inherits(anychart.core.ui.Title, anychart.core.VisualBase);
 
@@ -285,6 +292,15 @@ anychart.core.settings.populate(anychart.core.ui.Title, anychart.core.ui.Title.p
 
 
 //region -- IResolvable implementation
+/** @inheritDoc */
+anychart.core.ui.Title.prototype.resolutionChainCache = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.resolutionChainCache_ = opt_value;
+  }
+  return this.resolutionChainCache_;
+};
+
+
 /** @inheritDoc */
 anychart.core.ui.Title.prototype.getResolutionChain = anychart.core.settings.getResolutionChain;
 
@@ -399,6 +415,8 @@ anychart.core.ui.Title.prototype.parentInvalidated_ = function(e) {
     state |= anychart.ConsistencyState.ENABLED;
     signal |= anychart.Signal.ENABLED_STATE_CHANGED | anychart.Signal.NEEDS_REDRAW;
   }
+
+  this.resolutionChainCache_ = null;
 
   this.invalidate(state, signal);
 };
@@ -520,7 +538,7 @@ anychart.core.ui.Title.prototype.textSettings = function(opt_objectOrName, opt_v
   if (goog.isDef(opt_objectOrName)) {
     if (goog.isString(opt_objectOrName)) {
       if (goog.isDef(opt_value)) {
-        if (opt_value in this.TEXT_DESCRIPTORS) {
+        if (opt_objectOrName in this.TEXT_DESCRIPTORS) {
           this[opt_objectOrName](opt_value);
         }
         return this;
@@ -642,8 +660,8 @@ anychart.core.ui.Title.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calcActualBounds_();
     // settings text offset for
-    this.text_.x(anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().getSafeOption(anychart.opt.LEFT)), this.backgroundWidth_));
-    this.text_.y(anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().getSafeOption(anychart.opt.TOP)), this.backgroundHeight_));
+    this.text_.x(anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().getOption(anychart.opt.LEFT)), this.backgroundWidth_));
+    this.text_.y(anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().getOption(anychart.opt.TOP)), this.backgroundHeight_));
 
     this.layer_.setTransformationMatrix(
         this.transformation_.getScaleX(),
@@ -900,10 +918,10 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
   /** @type {!anychart.math.Rect} */
   var bounds = acgraph.math.getBoundsOfRectWithTransform(this.pixelBounds_, transform);
 
-  var leftMargin = anychart.utils.normalizeSize(margin.getSafeOption(anychart.opt.LEFT), this.backgroundWidth_);
-  var rightMargin = anychart.utils.normalizeSize(margin.getSafeOption(anychart.opt.RIGHT), this.backgroundWidth_);
-  var topMargin = anychart.utils.normalizeSize(margin.getSafeOption(anychart.opt.TOP), this.backgroundHeight_);
-  var bottomMargin = anychart.utils.normalizeSize(margin.getSafeOption(anychart.opt.BOTTOM), this.backgroundHeight_);
+  var leftMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption(anychart.opt.LEFT)), this.backgroundWidth_);
+  var rightMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption(anychart.opt.RIGHT)), this.backgroundWidth_);
+  var topMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption(anychart.opt.TOP)), this.backgroundHeight_);
+  var bottomMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption(anychart.opt.BOTTOM)), this.backgroundHeight_);
 
   var wHalf = bounds.width / 2;
   var hHalf = bounds.height / 2;
@@ -1106,14 +1124,21 @@ anychart.core.ui.Title.prototype.serialize = function() {
   if (!goog.isDef(enabled)) {
     enabled = this.getThemeOption(anychart.opt.ENABLED);
   }
-  json['enabled'] = goog.isDef(enabled) ? enabled : null;
+  if (goog.isDef(enabled))
+    json['enabled'] = enabled;
 
   anychart.core.settings.serialize(this, this.TEXT_DESCRIPTORS, json, 'Title text');
   anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Title props');
 
-  json['margin'] = this.margin().serialize();
-  json['padding'] = this.padding().serialize();
-  json['background'] = this.background().serialize();
+  var val = this.margin().serialize();
+  if (!goog.object.isEmpty(val))
+    json['margin'] = val;
+  val = this.padding().serialize();
+  if (!goog.object.isEmpty(val))
+    json['padding'] = val;
+  val = this.background().serialize();
+  if (!goog.object.isEmpty(val))
+    json['background'] = val;
 
   return json;
 };
@@ -1151,9 +1176,14 @@ anychart.core.ui.Title.prototype.setupByJSON = function(config, opt_default) {
     anychart.core.ui.Title.base(this, 'setupByJSON', config);
   }
 
-  this.margin().setupByVal(config[anychart.opt.MARGIN], opt_default);
-  this.padding().setupByVal(config[anychart.opt.PADDING], opt_default);
-  this.background().setupByVal(config[anychart.opt.BACKGROUND], opt_default);
+  if (anychart.opt.BACKGROUND in config)
+    this.background(config[anychart.opt.BACKGROUND]);
+
+  if (anychart.opt.PADDING in config)
+    this.padding(config[anychart.opt.PADDING]);
+
+  if (anychart.opt.MARGIN in config)
+    this.margin(config[anychart.opt.MARGIN]);
 };
 //endregion
 

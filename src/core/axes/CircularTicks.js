@@ -444,8 +444,8 @@ anychart.core.axes.CircularTicks.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.axes.CircularTicks.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.axes.CircularTicks.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   this.length(config['length']);
   this.type(config['type']);

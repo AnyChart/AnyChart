@@ -736,8 +736,8 @@ anychart.core.grids.Stock.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.grids.Stock.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.grids.Stock.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.isMinor(config['isMinor']);
   this.layout(config['layout']);
   this.drawFirstLine(config['drawFirstLine']);

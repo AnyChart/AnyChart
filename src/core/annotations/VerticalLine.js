@@ -120,12 +120,12 @@ anychart.core.annotations.VerticalLine.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.annotations.VerticalLine.prototype.setupByJSON = function(config) {
+anychart.core.annotations.VerticalLine.prototype.setupByJSON = function(config, opt_default) {
 
   anychart.core.settings.deserialize(this, anychart.core.annotations.STROKE_DESCRIPTORS, config);
   anychart.core.settings.deserialize(this, anychart.core.annotations.X_ANCHOR_DESCRIPTORS, config);
 
-  anychart.core.annotations.VerticalLine.base(this, 'setupByJSON', config);
+  anychart.core.annotations.VerticalLine.base(this, 'setupByJSON', config, opt_default);
 };
 
 

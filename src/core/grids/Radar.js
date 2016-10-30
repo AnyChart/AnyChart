@@ -879,8 +879,8 @@ anychart.core.grids.Radar.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.grids.Radar.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.grids.Radar.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.isMinor(config['isMinor']);
   this.layout(config['layout']);
   this.drawLastLine(config['drawLastLine']);

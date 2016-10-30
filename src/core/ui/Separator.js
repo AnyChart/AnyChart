@@ -84,6 +84,13 @@ anychart.core.ui.Separator = function() {
    */
   this.forceInvalidate = false;
 
+  /**
+   * Resolution chain cache.
+   * @type {Array.<Object|null|undefined>|null}
+   * @private
+   */
+  this.resolutionChainCache_ = null;
+
   var drawer = goog.bind(function(path, bounds) {
     bounds = bounds.clone().round();
 
@@ -214,6 +221,15 @@ anychart.core.ui.Separator.prototype.check = function(flags) {
 
 
 //region -- IResolvable implementation
+/** @inheritDoc */
+anychart.core.ui.Separator.prototype.resolutionChainCache = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.resolutionChainCache_ = opt_value;
+  }
+  return this.resolutionChainCache_;
+};
+
+
 /** @inheritDoc */
 anychart.core.ui.Separator.prototype.getResolutionChain = anychart.core.settings.getResolutionChain;
 
@@ -496,8 +512,8 @@ anychart.core.ui.Separator.prototype.calculateSeparatorBounds_ = function() {
   var widthWithMargin = margin.widenWidth(separatorWidth);
   var heightWithMargin = margin.widenHeight(separatorHeight);
 
-  var leftMargin = anychart.utils.normalizeSize(margin.getSafeOption(anychart.opt.LEFT), parentWidth);
-  var topMargin = anychart.utils.normalizeSize(margin.getSafeOption(anychart.opt.TOP), parentHeight);
+  var leftMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption(anychart.opt.LEFT)), parentWidth);
+  var topMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption(anychart.opt.TOP)), parentHeight);
 
   var orientation = this.getOption(anychart.opt.ORIENTATION) || anychart.enums.Orientation.TOP;
   if (parentBounds) {
@@ -628,7 +644,27 @@ anychart.core.ui.Separator.prototype.enabled = function(opt_value) {
 
 /** @inheritDoc */
 anychart.core.ui.Separator.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = {};
+
+  var zIndex;
+  if (this.hasOwnOption(anychart.opt.Z_INDEX)) {
+    zIndex = this.getOwnOption(anychart.opt.Z_INDEX);
+  }
+  if (!goog.isDef(zIndex)) {
+    zIndex = this.getThemeOption(anychart.opt.Z_INDEX);
+  }
+  if (goog.isDef(zIndex)) json['zIndex'] = zIndex;
+
+  var enabled;
+  if (this.hasOwnOption(anychart.opt.ENABLED)) {
+    enabled = this.getOwnOption(anychart.opt.ENABLED);
+  }
+  if (!goog.isDef(enabled)) {
+    enabled = this.getThemeOption(anychart.opt.ENABLED);
+  }
+  if (goog.isDef(enabled))
+    json['enabled'] = enabled;
+
   anychart.core.settings.serialize(this, this.SIMPLE_SEPARATOR_DESCRIPTORS, json, 'Separator');
 
   var marginConfig = this.margin().serialize();
@@ -640,9 +676,9 @@ anychart.core.ui.Separator.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.Separator.prototype.setupByJSON = function(config) {
+anychart.core.ui.Separator.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.settings.deserialize(this, this.SIMPLE_SEPARATOR_DESCRIPTORS, config);
-  this.margin(config['margin']);
+  this.margin().setupByVal(config['margin'], opt_default);
   this.zIndex(config['zIndex']);
   this.enabled(config[anychart.opt.ENABLED]);
 };

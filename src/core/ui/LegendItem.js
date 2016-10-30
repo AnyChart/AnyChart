@@ -1217,8 +1217,8 @@ anychart.core.ui.LegendItem.prototype.applyMarkerFillAndStroke_ = function(hover
 
 
 /** @inheritDoc */
-anychart.core.ui.LegendItem.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.ui.LegendItem.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.iconEnabled(config['iconEnabled']);
   this.iconType(config['iconType']);
   this.iconStroke(config['iconStroke']);

@@ -153,8 +153,8 @@ anychart.scales.DateTime.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.scales.DateTime.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.scales.DateTime.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
 };
@@ -189,6 +189,7 @@ anychart.scales.DateTime.prototype['getType'] = anychart.scales.DateTime.prototy
 anychart.scales.DateTime.prototype['ticks'] = anychart.scales.DateTime.prototype.ticks;//doc|ex
 anychart.scales.DateTime.prototype['minorTicks'] = anychart.scales.DateTime.prototype.minorTicks;//doc|ex
 anychart.scales.DateTime.prototype['transform'] = anychart.scales.DateTime.prototype.transform;//inherited
+anychart.scales.DateTime.prototype['inverseTransform'] = anychart.scales.DateTime.prototype.inverseTransform;//doc|ex
 anychart.scales.DateTime.prototype['extendDataRange'] = anychart.scales.DateTime.prototype.extendDataRange;//inherited
 anychart.scales.DateTime.prototype['softMinimum'] = anychart.scales.DateTime.prototype.softMinimum;
 anychart.scales.DateTime.prototype['softMaximum'] = anychart.scales.DateTime.prototype.softMaximum;

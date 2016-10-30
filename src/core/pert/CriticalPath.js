@@ -86,8 +86,8 @@ anychart.core.pert.CriticalPath.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.pert.CriticalPath.prototype.setupByJSON = function(config) {
-  anychart.core.pert.CriticalPath.base(this, 'setupByJSON', config);
+anychart.core.pert.CriticalPath.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.pert.CriticalPath.base(this, 'setupByJSON', config, opt_default);
   if ('milestones' in config) this.milestones().setupByJSON(config['milestones']);
   if ('tasks' in config) this.tasks().setupByJSON(config['tasks']);
 };

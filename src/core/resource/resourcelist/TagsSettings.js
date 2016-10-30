@@ -1,28 +1,28 @@
-goog.provide('anychart.core.ui.resourceList.TagsSettings');
+goog.provide('anychart.core.resource.resourceList.TagsSettings');
+goog.require('anychart.core.resource.resourceList.TextSettings');
 goog.require('anychart.core.ui.Background');
-goog.require('anychart.core.ui.resourceList.TextSettings');
 goog.require('anychart.core.utils.Padding');
 
 
 
 /**
  * Tags settings class.
- * @extends {anychart.core.ui.resourceList.TextSettings}
+ * @extends {anychart.core.resource.resourceList.TextSettings}
  * @constructor
  */
-anychart.core.ui.resourceList.TagsSettings = function() {
-  anychart.core.ui.resourceList.TagsSettings.base(this, 'constructor');
+anychart.core.resource.resourceList.TagsSettings = function() {
+  anychart.core.resource.resourceList.TagsSettings.base(this, 'constructor');
 };
-goog.inherits(anychart.core.ui.resourceList.TagsSettings, anychart.core.ui.resourceList.TextSettings);
+goog.inherits(anychart.core.resource.resourceList.TagsSettings, anychart.core.resource.resourceList.TextSettings);
 
 
 //region --- OWN API ---
 /**
  * Getter/setter for background.
  * @param {Object=} opt_value background.
- * @return {anychart.core.ui.Background|anychart.core.ui.resourceList.TagsSettings} background or self for chaining.
+ * @return {anychart.core.ui.Background|anychart.core.resource.resourceList.TagsSettings} background or self for chaining.
  */
-anychart.core.ui.resourceList.TagsSettings.prototype.background = function(opt_value) {
+anychart.core.resource.resourceList.TagsSettings.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.core.ui.Background();
     this.background_.listenSignals(this.backgroundInvalidated_, this);
@@ -42,7 +42,7 @@ anychart.core.ui.resourceList.TagsSettings.prototype.background = function(opt_v
  * @param {anychart.SignalEvent} event Event.
  * @private
  */
-anychart.core.ui.resourceList.TagsSettings.prototype.backgroundInvalidated_ = function(event) {
+anychart.core.resource.resourceList.TagsSettings.prototype.backgroundInvalidated_ = function(event) {
   this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
 };
 
@@ -54,9 +54,9 @@ anychart.core.ui.resourceList.TagsSettings.prototype.backgroundInvalidated_ = fu
  * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
  * @param {(string|number)=} opt_bottom Bottom space.
  * @param {(string|number)=} opt_left Left space.
- * @return {!(anychart.core.ui.resourceList.TagsSettings|anychart.core.utils.Padding)} Padding or self for method chaining.
+ * @return {!(anychart.core.resource.resourceList.TagsSettings|anychart.core.utils.Padding)} Padding or self for method chaining.
  */
-anychart.core.ui.resourceList.TagsSettings.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
+anychart.core.resource.resourceList.TagsSettings.prototype.padding = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.padding_) {
     this.padding_ = new anychart.core.utils.Padding();
     this.padding_.listenSignals(this.paddingInvalidated_, this);
@@ -74,7 +74,7 @@ anychart.core.ui.resourceList.TagsSettings.prototype.padding = function(opt_spac
  * @param {anychart.SignalEvent} event
  * @private
  */
-anychart.core.ui.resourceList.TagsSettings.prototype.paddingInvalidated_ = function(event) {
+anychart.core.resource.resourceList.TagsSettings.prototype.paddingInvalidated_ = function(event) {
   this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
 };
 //endregion
@@ -82,8 +82,8 @@ anychart.core.ui.resourceList.TagsSettings.prototype.paddingInvalidated_ = funct
 
 //region --- SETUP/DISPOSE ---
 /** @inheritDoc */
-anychart.core.ui.resourceList.TagsSettings.prototype.setupByJSON = function(config, opt_default) {
-  anychart.core.ui.resourceList.TagsSettings.base(this, 'setupByJSON', config, opt_default);
+anychart.core.resource.resourceList.TagsSettings.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.resource.resourceList.TagsSettings.base(this, 'setupByJSON', config, opt_default);
   if (goog.isDef(config['padding']))
     this.padding().setupByJSON(config['padding'], opt_default);
   if (goog.isDef(config['background']))
@@ -92,8 +92,8 @@ anychart.core.ui.resourceList.TagsSettings.prototype.setupByJSON = function(conf
 
 
 /** @inheritDoc */
-anychart.core.ui.resourceList.TagsSettings.prototype.serialize = function() {
-  var json = anychart.core.ui.resourceList.TagsSettings.base(this, 'serialize');
+anychart.core.resource.resourceList.TagsSettings.prototype.serialize = function() {
+  var json = anychart.core.resource.resourceList.TagsSettings.base(this, 'serialize');
   json['padding'] = this.padding().serialize();
   json['background'] = this.background().serialize();
   // settings for core.ui.Label in resourceList.Item class. They cant be changed from the outside.
@@ -105,14 +105,14 @@ anychart.core.ui.resourceList.TagsSettings.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.resourceList.TagsSettings.prototype.disposeInternal = function() {
+anychart.core.resource.resourceList.TagsSettings.prototype.disposeInternal = function() {
   goog.dispose(this.padding_);
   goog.dispose(this.background_);
-  anychart.core.ui.resourceList.TagsSettings.base(this, 'disposeInternal');
+  anychart.core.resource.resourceList.TagsSettings.base(this, 'disposeInternal');
 };
 //endregion
 
 
 //exports
-anychart.core.ui.resourceList.TagsSettings.prototype['background'] = anychart.core.ui.resourceList.TagsSettings.prototype.background;
-anychart.core.ui.resourceList.TagsSettings.prototype['padding'] = anychart.core.ui.resourceList.TagsSettings.prototype.padding;
+anychart.core.resource.resourceList.TagsSettings.prototype['background'] = anychart.core.resource.resourceList.TagsSettings.prototype.background;
+anychart.core.resource.resourceList.TagsSettings.prototype['padding'] = anychart.core.resource.resourceList.TagsSettings.prototype.padding;

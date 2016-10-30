@@ -465,8 +465,8 @@ anychart.scales.Base.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.scales.Base.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.scales.Base.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.inverted(config['inverted']);
 };
 

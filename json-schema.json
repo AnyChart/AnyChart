@@ -4058,6 +4058,8 @@
       "properties": {
         "visibleMinimum": {"type": "number"},
         "visibleMaximum": {"type": "number"},
+        "dataMinimum": {"type": "number"},
+        "dataMaximum": {"type": "number"},
         "minimum": {"type": "number"},
         "maximum": {"type": "number"},
         "softMinimum": {"type": "number"},
@@ -4659,8 +4661,8 @@
           },
           "items": {"type": "boolean"}
         },
-        "width": {"type": ["number", "string"]},
-        "height": {"type": ["number", "string"]},
+        "width": {"type": ["number", "string", "null"]},
+        "height": {"type": ["number", "string", "null"]},
         "zIndex": {"type": "number"},
 
         "minFontSize": {"type": ["number", "string"]},

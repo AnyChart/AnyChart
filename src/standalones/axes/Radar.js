@@ -15,8 +15,8 @@ anychart.core.makeStandalone(anychart.standalones.axes.Radar, anychart.core.axes
 
 
 /** @inheritDoc */
-anychart.standalones.axes.Radar.prototype.setupByJSON = function(config) {
-  anychart.standalones.axes.Radar.base(this, 'setupByJSON', config);
+anychart.standalones.axes.Radar.prototype.setupByJSON = function(config, opt_default) {
+  anychart.standalones.axes.Radar.base(this, 'setupByJSON', config, opt_default);
   this.startAngle(config['startAngle']);
 };
 

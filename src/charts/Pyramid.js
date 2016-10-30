@@ -40,10 +40,10 @@ anychart.charts.Pyramid.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.charts.Pyramid.prototype.setupByJSON = function(config) {
+anychart.charts.Pyramid.prototype.setupByJSON = function(config, opt_default) {
   this.reversed(config['reversed']);
 
-  goog.base(this, 'setupByJSON', config);
+  goog.base(this, 'setupByJSON', config, opt_default);
 };
 
 

@@ -91,8 +91,8 @@ anychart.core.pert.Milestones.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.pert.Milestones.prototype.setupByJSON = function(config) {
-  anychart.core.pert.Milestones.base(this, 'setupByJSON', config);
+anychart.core.pert.Milestones.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.pert.Milestones.base(this, 'setupByJSON', config, opt_default);
   this.shape(config['shape']);
   this.size(config['size']);
 };

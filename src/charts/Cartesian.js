@@ -320,8 +320,7 @@ anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.charts.Cartesi
  */
 anychart.cartesian = function(opt_barChartMode) {
   var chart = new anychart.charts.Cartesian(opt_barChartMode);
-  chart.setup(anychart.getFullTheme()['cartesian']);
-
+  chart.setupByVal(anychart.getFullTheme()['cartesian'], true);
   return chart;
 };
 anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN] = anychart.cartesian;

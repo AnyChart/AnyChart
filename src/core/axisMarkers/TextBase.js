@@ -698,8 +698,8 @@ anychart.core.axisMarkers.TextBase.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.axisMarkers.TextBase.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.axisMarkers.TextBase.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.anchor(config['anchor']);
   this.align(config['align']);
   if ('layout' in config && config['layout']) this.layout(config['layout']);

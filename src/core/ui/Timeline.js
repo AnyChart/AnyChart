@@ -3947,11 +3947,13 @@ anychart.core.ui.Timeline.prototype.initScale = function() {
   this.scale_.trackedDataMin = dataMin;
   this.scale_.trackedDataMax = dataMax;
 
-  if (newScale) {
+  if (newScale && !isNaN(dataMin) && !isNaN(dataMax)) {
     var totalRange = this.scale_.getTotalRange();
     var newRange = Math.round((totalRange['max'] - totalRange['min']) / 10);
     this.scale_.zoomTo(totalRange['min'], totalRange['min'] + newRange); // Initial visible range: 10% of total range.
-  } else {
+  }
+
+  if (!newScale) {
     var max = range['max'];
     var min = range['min'];
     var delta = max - min;
@@ -4348,8 +4350,8 @@ anychart.core.ui.Timeline.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.Timeline.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.ui.Timeline.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   if ('scale' in config) this.scale_.setup(config['scale']);
   if ('labels' in config) this.labels(config['labels']);

@@ -10,3 +10,4 @@ goog.require('anychart.modules.anygantt');
 goog.require('anychart.modules.anymap');
 goog.require('anychart.modules.anystock');
 goog.require('anychart.modules.base');
+goog.require('anychart.modules.resource');

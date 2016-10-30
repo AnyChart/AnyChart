@@ -51,6 +51,13 @@ anychart.core.grids.MapSettings = function(map) {
    */
   this.grids_ = [];
 
+  /**
+   * Resolution chain cache.
+   * @type {Array.<Object|null|undefined>|null}
+   * @private
+   */
+  this.resolutionChainCache_ = null;
+
   this.markConsistent(anychart.ConsistencyState.ALL);
 };
 goog.inherits(anychart.core.grids.MapSettings, anychart.core.Base);
@@ -121,6 +128,15 @@ anychart.core.grids.MapSettings.prototype.check = function(flags) {
 //endregion
 //region --- IResolvable implementation
 /** @inheritDoc */
+anychart.core.grids.MapSettings.prototype.resolutionChainCache = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.resolutionChainCache_ = opt_value;
+  }
+  return this.resolutionChainCache_;
+};
+
+
+/** @inheritDoc */
 anychart.core.grids.MapSettings.prototype.getResolutionChain = anychart.core.settings.getResolutionChain;
 
 
@@ -170,14 +186,14 @@ anychart.core.grids.MapSettings.prototype.SIMPLE_PROPS_DESCRIPTORS = (function()
   map[anychart.opt.ODD_FILL] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.ODD_FILL,
-      anychart.core.settings.fillOrFunctionNormalizer,
+      anychart.core.settings.fillNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW);
 
   map[anychart.opt.EVEN_FILL] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       anychart.opt.EVEN_FILL,
-      anychart.core.settings.fillOrFunctionNormalizer,
+      anychart.core.settings.fillNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW);
 

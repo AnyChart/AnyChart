@@ -1263,8 +1263,8 @@ anychart.charts.LinearGauge.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.charts.LinearGauge.prototype.setupByJSON = function(config) {
-  anychart.charts.LinearGauge.base(this, 'setupByJSON', config);
+anychart.charts.LinearGauge.prototype.setupByJSON = function(config, opt_default) {
+  anychart.charts.LinearGauge.base(this, 'setupByJSON', config, opt_default);
 
   if ('defaultAxisSettings' in config)
     this.defaultAxisSettings(config['defaultAxisSettings']);

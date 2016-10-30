@@ -236,8 +236,8 @@ anychart.core.axisMarkers.Range.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.axisMarkers.Range.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.axisMarkers.Range.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.from(config['from']);
   this.to(config['to']);
   this.fill(config['fill']);

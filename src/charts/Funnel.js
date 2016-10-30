@@ -50,11 +50,11 @@ anychart.charts.Funnel.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.charts.Funnel.prototype.setupByJSON = function(config) {
+anychart.charts.Funnel.prototype.setupByJSON = function(config, opt_default) {
   this.neckHeight(config['neckHeight']);
   this.neckWidth(config['neckWidth']);
 
-  goog.base(this, 'setupByJSON', config);
+  goog.base(this, 'setupByJSON', config, opt_default);
 };
 
 

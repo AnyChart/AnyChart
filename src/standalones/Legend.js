@@ -39,7 +39,7 @@ anychart.standalones.Legend.prototype.unlistenStockPlots_ = function() {
   var source;
   for (var i = 0; i < this.itemsSourceInternal.length; i++) {
     source = this.itemsSourceInternal[i];
-    if (source instanceof anychart.core.stock.Plot) {
+    if (source.needsInteractiveLegendUpdate && source.needsInteractiveLegendUpdate()) {
       source.unlistenSignals(this.onStockPlotSignal_, source);
     }
   }
@@ -55,7 +55,7 @@ anychart.standalones.Legend.prototype.listenStockPlots_ = function() {
   var source;
   for (var i = 0; i < this.itemsSourceInternal.length; i++) {
     source = this.itemsSourceInternal[i];
-    if (source instanceof anychart.core.stock.Plot) {
+    if (source.needsInteractiveLegendUpdate && source.needsInteractiveLegendUpdate()) {
       source.listenSignals(this.onStockPlotSignal_, this);
     }
   }

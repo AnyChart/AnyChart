@@ -1480,8 +1480,8 @@ anychart.core.heatMap.series.Base.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.core.heatMap.series.Base.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.heatMap.series.Base.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.clip(config['clip']);
   this.markers().setup(config['markers']);
   this.hoverMarkers().setup(config['hoverMarkers']);

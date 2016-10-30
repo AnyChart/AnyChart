@@ -120,6 +120,34 @@ goog.exportSymbol('anychart.format.locales.default.dateTimeLocale', {
     'full_year_minute': 'dd MMM yyyy, HH:mm',
     'full_year_second': 'dd MMM yyyy, HH:mm:ss',
     'full_year_millisecond': 'dd MMM yyyy, HH:mm:ss.SSS',
+    'timeline_year': ['yyyy', 'yy'],
+    'timeline_year_semester': ['MMMM yyyy', 'MMM \'\'yyyy', 'MMM \'\'yy', 'MM \'\'yy'],
+    'timeline_year_quarter': ['MMMM yyyy', 'MMM \'\'yyyy', 'MMM \'\'yy', 'MM \'\'yy'],
+    'timeline_year_month': ['MMMM yyyy', 'MMM \'\'yyyy', 'MMM \'\'yy', 'MM \'\'yy'],
+    'timeline_year_third_of_month': ['EEEE, dd MMMM yyyy', 'EE, dd MMM yyyy', 'EE, dd MMM yy', 'dd MMM yyyy', 'dd MMMM yy', 'MM.dd.yyyy', 'MM.dd.yy'],
+    'timeline_year_week': ['EEEE, dd MMMM yyyy', 'EE, dd MMM yyyy', 'EE, dd MMM yy', 'dd MMM yyyy', 'dd MMMM yy', 'MM.dd.yyyy', 'MM.dd.yy'],
+    'timeline_year_day': ['EEEE, dd MMMM yyyy', 'EE, dd MMM yyyy', 'EE, dd MMM yy', 'dd MMM yyyy', 'dd MMMM yy', 'MM.dd.yyyy', 'MM.dd.yy'],
+    'timeline_semester': ['MMMM', 'MMM', 'MM'],
+    'timeline_semester_quarter': ['MMMM', 'MMM', 'MM'],
+    'timeline_semester_month': ['MMMM', 'MMM', 'MM'],
+    'timeline_semester_third_of_month': ['EEEE, dd MMMM', 'EE, dd MMM', 'EE, dd MMM', 'dd MMM', 'dd MMMM', 'MM.dd', 'MM.dd'],
+    'timeline_semester_week': ['EEEE, dd MMMM', 'EE, dd MMM', 'EE, dd MMM', 'dd MMM', 'dd MMMM', 'MM.dd', 'MM.dd'],
+    'timeline_semester_day': ['EEEE, dd MMMM', 'EE, dd MMM', 'EE, dd MMM', 'dd MMM', 'dd MMMM', 'MM.dd', 'MM.dd'],
+    'timeline_quarter': ['MMMM', 'MMM', 'MM'],
+    'timeline_quarter_month': ['MMMM', 'MMM', 'MM'],
+    'timeline_quarter_third_of_month': ['EEEE, dd MMMM', 'EE, dd MMM', 'EE, dd MMM', 'dd MMM', 'dd MMMM', 'MM.dd', 'MM.dd'],
+    'timeline_quarter_week': ['EEEE, dd MMMM', 'EE, dd MMM', 'EE, dd MMM', 'dd MMM', 'dd MMMM', 'MM.dd', 'MM.dd'],
+    'timeline_quarter_day': ['EEEE, dd MMMM', 'EE, dd MMM', 'EE, dd MMM', 'dd MMM', 'dd MMMM', 'MM.dd', 'MM.dd'],
+    'timeline_month': ['MMMM', 'MMM', 'MM'],
+    'timeline_month_third_of_month': ['EEEE, dd MMMM', 'EE, dd MMM', 'EE, dd MMM', 'dd MMM', 'dd MMMM', 'MM.dd', 'MM.dd'],
+    'timeline_month_week': ['EEEE, dd MMMM', 'EE, dd MMM', 'EE, dd MMM', 'dd MMM', 'dd MMMM', 'MM.dd', 'MM.dd'],
+    'timeline_month_day': ['EEEE, dd MMMM', 'EE, dd MMM', 'EE, dd MMM', 'dd MMM', 'dd MMMM', 'MM.dd', 'MM.dd'],
+    'timeline_third_of_month': ['dd'],
+    'timeline_third_of_month_week': ['dd'],
+    'timeline_third_of_month_day': ['EEEE, dd', 'EE, dd', 'dd'],
+    'timeline_week': ['dd'],
+    'timeline_week_day': ['EEEE, dd', 'EE, dd', 'dd'],
+    'timeline_day': ['EEEE, dd', 'EEEE', 'EE, dd', 'EE', 'dd'],
     'year': 'yyyy',
     'year_semester': 'yyyy MMM',
     'year_quarter': 'yyyy MMM',
@@ -347,9 +375,8 @@ anychart.format.dateTimeSymbolsCache_ = {};
  * Normalizes locale or locale name to locale.
  * @param {string|anychart.format.Locale|*} locale
  * @return {?anychart.format.Locale}
- * @private
  */
-anychart.format.getLocale_ = function(locale) {
+anychart.format.getLocale = function(locale) {
   if (!goog.isObject(locale)) {
     locale = goog.global['anychart']['format']['locales'][String(locale)];
   }
@@ -361,10 +388,9 @@ anychart.format.getLocale_ = function(locale) {
  * Normalizes locale or locale name to dateTime locale.
  * @param {string|anychart.format.Locale|*} locale
  * @return {?anychart.format.DateTimeLocale}
- * @private
  */
-anychart.format.getDateTimeLocale_ = function(locale) {
-  var loc = anychart.format.getLocale_(locale);
+anychart.format.getDateTimeLocale = function(locale) {
+  var loc = anychart.format.getLocale(locale);
   return loc && loc[anychart.opt.DATE_TIME_LOCALE] || null;
 };
 
@@ -373,10 +399,9 @@ anychart.format.getDateTimeLocale_ = function(locale) {
  * Normalizes locale or locale name to number locale.
  * @param {string|anychart.format.Locale|*} locale
  * @return {?anychart.format.NumberLocale}
- * @private
  */
-anychart.format.getNumberLocale_ = function(locale) {
-  var loc = anychart.format.getLocale_(locale);
+anychart.format.getNumberLocale = function(locale) {
+  var loc = anychart.format.getLocale(locale);
   return loc && loc[anychart.opt.NUMBER_LOCALE] || null;
 };
 
@@ -389,7 +414,7 @@ anychart.format.getNumberLocale_ = function(locale) {
  * @private
  */
 anychart.format.getOutputDateTimeFormat_ = function(locale, opt_formatName) {
-  var loc = anychart.format.getDateTimeLocale_(locale);
+  var loc = anychart.format.getDateTimeLocale(locale);
   return loc && loc[opt_formatName || 'dateTimeFormat'] || null;
 };
 
@@ -623,9 +648,9 @@ anychart.format.parseDateTime = function(value, opt_format, opt_baseDate, opt_lo
   } else if (goog.isString(value)) {
     var format = (goog.isDef(opt_format) ? opt_format : anychart.format.inputDateTimeFormat_) || null;
     if (format) {
-      var locale = anychart.format.getDateTimeLocale_(opt_locale) ||
-          anychart.format.getDateTimeLocale_(anychart.format.inputLocale_) ||
-          anychart.format.getDateTimeLocale_(anychart.opt.DEFAULT);
+      var locale = anychart.format.getDateTimeLocale(opt_locale) ||
+          anychart.format.getDateTimeLocale(anychart.format.inputLocale_) ||
+          anychart.format.getDateTimeLocale(anychart.opt.DEFAULT);
       var localeHash = goog.getUid(locale);
       var parserCacheKey = format + localeHash;
       /** @type {goog.i18n.DateTimeParse} */
@@ -672,9 +697,9 @@ anychart.format.parseDateTime = function(value, opt_format, opt_baseDate, opt_lo
  * @return {number} - Parsed value. NaN if value could not be parsed.
  */
 anychart.format.parseNumber = function(value, opt_locale) {
-  var locale = anychart.format.getNumberLocale_(opt_locale) ||
-      anychart.format.getNumberLocale_(anychart.format.inputLocale_) ||
-      anychart.format.getNumberLocale_(anychart.opt.DEFAULT);
+  var locale = anychart.format.getNumberLocale(opt_locale) ||
+      anychart.format.getNumberLocale(anychart.format.inputLocale_) ||
+      anychart.format.getNumberLocale(anychart.opt.DEFAULT);
   var sign = 1;
   if (goog.isString(value)) {
     if (locale['useBracketsForNegative']) { //replacing brackets
@@ -751,7 +776,7 @@ anychart.format.subs = goog.string.subs;
  * @return {string}
  */
 anychart.format.getMessage = function(keyword) {
-  var locale = anychart.format.getLocale_(anychart.format.outputLocale_);
+  var locale = anychart.format.getLocale(anychart.format.outputLocale_);
   var messages = locale && locale[anychart.opt.MESSAGES];
   return (messages && (keyword in messages)) ? messages[keyword] : keyword;
 };
@@ -782,9 +807,9 @@ anychart.format.getIntervalIdentifier = function(intervalUnit, opt_parentInterva
  * @return {string}
  */
 anychart.format.getDateTimeFormat = function(identifier, opt_index, opt_locale) {
-  var locale = anychart.format.getDateTimeLocale_(opt_locale) ||
-      anychart.format.getDateTimeLocale_(anychart.format.outputLocale_) ||
-      anychart.format.getDateTimeLocale_(anychart.opt.DEFAULT);
+  var locale = anychart.format.getDateTimeLocale(opt_locale) ||
+      anychart.format.getDateTimeLocale(anychart.format.outputLocale_) ||
+      anychart.format.getDateTimeLocale(anychart.opt.DEFAULT);
   var formats = locale && locale['formats'] && locale['formats'][identifier];
   var format = goog.isArray(formats) ?
       formats[Math.min(formats.length - 1, opt_index || 0)] :
@@ -802,9 +827,9 @@ anychart.format.getDateTimeFormat = function(identifier, opt_index, opt_locale) 
  * @return {Array.<string>}
  */
 anychart.format.getDateTimeFormats = function(identifier, opt_locale) {
-  var locale = anychart.format.getDateTimeLocale_(opt_locale) ||
-      anychart.format.getDateTimeLocale_(anychart.format.outputLocale_) ||
-      anychart.format.getDateTimeLocale_(anychart.opt.DEFAULT);
+  var locale = anychart.format.getDateTimeLocale(opt_locale) ||
+      anychart.format.getDateTimeLocale(anychart.format.outputLocale_) ||
+      anychart.format.getDateTimeLocale(anychart.opt.DEFAULT);
   var formats = locale && locale['formats'] && locale['formats'][identifier];
   return goog.isArray(formats) ?
       formats :
@@ -853,9 +878,9 @@ anychart.format.dateTime = function(date, opt_format, opt_timeZone, opt_locale) 
   date = (date instanceof Date) ? date : new Date(date);
   if (isNaN(date.getTime())) return String(date);
 
-  var locale = anychart.format.getDateTimeLocale_(opt_locale) ||
-      anychart.format.getDateTimeLocale_(anychart.format.outputLocale_) ||
-      anychart.format.getDateTimeLocale_(anychart.opt.DEFAULT);
+  var locale = anychart.format.getDateTimeLocale(opt_locale) ||
+      anychart.format.getDateTimeLocale(anychart.format.outputLocale_) ||
+      anychart.format.getDateTimeLocale(anychart.opt.DEFAULT);
   var pattern = opt_format ||
       anychart.format.outputDateTimeFormat_ ||
       anychart.format.outputDateTimeFormat() ||
@@ -893,9 +918,9 @@ anychart.format.dateTime = function(date, opt_format, opt_timeZone, opt_locale) 
  */
 anychart.format.number = function(number, opt_decimalsCountOrLocale, opt_decimalPoint, opt_groupsSeparator,
     opt_scale, opt_zeroFillDecimals, opt_scaleSuffixSeparator, opt_useBracketsForNegative) {
-  var obj = anychart.format.getNumberLocale_(opt_decimalsCountOrLocale);
-  var locale = anychart.format.getNumberLocale_(anychart.format.outputLocale_) ||
-      anychart.format.getNumberLocale_(anychart.opt.DEFAULT);
+  var obj = anychart.format.getNumberLocale(opt_decimalsCountOrLocale);
+  var locale = anychart.format.getNumberLocale(anychart.format.outputLocale_) ||
+      anychart.format.getNumberLocale(anychart.opt.DEFAULT);
 
   var decimalsCount = goog.isNumber(opt_decimalsCountOrLocale) ?
       opt_decimalsCountOrLocale :

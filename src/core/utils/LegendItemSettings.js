@@ -419,9 +419,9 @@ anychart.core.utils.LegendItemSettings.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.utils.LegendItemSettings.prototype.setupByJSON = function(config) {
+anychart.core.utils.LegendItemSettings.prototype.setupByJSON = function(config, opt_default) {
   this.suspendSignalsDispatching();
-  goog.base(this, 'setupByJSON', config);
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.iconTextSpacing(config['iconTextSpacing']);
   this.iconEnabled(config['iconEnabled']);
   this.iconType(config['iconType']);

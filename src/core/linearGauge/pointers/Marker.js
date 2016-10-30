@@ -93,8 +93,8 @@ anychart.core.linearGauge.pointers.Marker.prototype.autoType = function(opt_valu
 
 //region --- SETUP/DISPOSING ---
 /** @inheritDoc */
-anychart.core.linearGauge.pointers.Marker.prototype.setupByJSON = function(config) {
-  anychart.core.linearGauge.pointers.Marker.base(this, 'setupByJSON', config);
+anychart.core.linearGauge.pointers.Marker.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.linearGauge.pointers.Marker.base(this, 'setupByJSON', config, opt_default);
   this.type(config['type']);
 };
 

@@ -384,8 +384,8 @@ anychart.core.linearGauge.pointers.Led.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.linearGauge.pointers.Led.prototype.setupByJSON = function(config) {
-  anychart.core.linearGauge.pointers.Led.base(this, 'setupByJSON', config);
+anychart.core.linearGauge.pointers.Led.prototype.setupByJSON = function(config, opt_default) {
+  anychart.core.linearGauge.pointers.Led.base(this, 'setupByJSON', config, opt_default);
 
   this.gap(config['gap']);
   this.size(config['size']);

@@ -274,8 +274,8 @@ anychart.core.gauge.Cap.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.gauge.Cap.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.gauge.Cap.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   this.fill(config['fill']);
   this.stroke(config['stroke']);

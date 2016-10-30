@@ -6,4 +6,5 @@ contrib/compiler/
 out/*
 src/deps.js
 *.swo
+*.pyc
 demos-local

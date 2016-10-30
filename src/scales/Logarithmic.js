@@ -128,8 +128,8 @@ anychart.scales.Logarithmic.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.scales.Logarithmic.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.scales.Logarithmic.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.logBase(config['logBase']);
 };
 

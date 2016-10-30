@@ -470,7 +470,7 @@ anychart.core.series.Base.prototype.applyConfig = function(config) {
   this.autoSettings[anychart.opt.X_POINT_POSITION] = 0.5;
 
   this.suspendSignalsDispatching();
-  this.applyDefaultsToElements(this.defaultSettings, true);
+  this.applyDefaultsToElements(this.defaultSettings, true, true);
   this.resumeSignalsDispatching(false);
   // here should markers/labels/errors/outliers setup be
 };
@@ -479,8 +479,9 @@ anychart.core.series.Base.prototype.applyConfig = function(config) {
 /**
  * @param {Object} defaults
  * @param {boolean=} opt_resetLegendItem Temporary flag.
+ * @param {boolean=} opt_default
  */
-anychart.core.series.Base.prototype.applyDefaultsToElements = function(defaults, opt_resetLegendItem) {
+anychart.core.series.Base.prototype.applyDefaultsToElements = function(defaults, opt_resetLegendItem, opt_default) {
   if (this.supportsLabels()) {
     this.labels().setup(defaults['labels']);
     this.hoverLabels().setup(defaults['hoverLabels']);
@@ -507,7 +508,7 @@ anychart.core.series.Base.prototype.applyDefaultsToElements = function(defaults,
   this.legendItem().setup(defaults[anychart.opt.LEGEND_ITEM]);
 
   if (anychart.opt.TOOLTIP in defaults)
-    this.tooltip().setupByJSON(defaults[anychart.opt.TOOLTIP], true);
+    this.tooltip().setupByVal(defaults[anychart.opt.TOOLTIP], opt_default);
 
   this.clip(defaults[anychart.opt.CLIP]);
   this.zIndex(defaults[anychart.opt.Z_INDEX]);
@@ -3812,8 +3813,8 @@ anychart.core.series.Base.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.core.series.Base.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.series.Base.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   this.id(config['id']);
   this.autoIndex(config['autoIndex']);
@@ -3824,7 +3825,7 @@ anychart.core.series.Base.prototype.setupByJSON = function(config) {
 
   anychart.core.settings.deserialize(this, anychart.core.series.Base.PROPERTY_DESCRIPTORS, config);
 
-  this.applyDefaultsToElements(config);
+  this.applyDefaultsToElements(config, false, opt_default);
 };
 
 

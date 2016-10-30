@@ -772,8 +772,8 @@ anychart.charts.Bullet.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.charts.Bullet.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.charts.Bullet.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   if ('defaultRangeMarkerSettings' in config)
     this.defaultRangeSettings(config['defaultRangeMarkerSettings']);

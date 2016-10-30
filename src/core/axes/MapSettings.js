@@ -54,6 +54,13 @@ anychart.core.axes.MapSettings = function(map) {
    */
   this.parent_ = null;
 
+  /**
+   * Resolution chain cache.
+   * @type {Array.<Object|null|undefined>|null}
+   * @private
+   */
+  this.resolutionChainCache_ = null;
+
   this.markConsistent(anychart.ConsistencyState.ALL);
 };
 goog.inherits(anychart.core.axes.MapSettings, anychart.core.Base);
@@ -122,6 +129,15 @@ anychart.core.axes.MapSettings.prototype.check = function(flags) {
 
 //endregion
 //region --- IResolvable implementation
+/** @inheritDoc */
+anychart.core.axes.MapSettings.prototype.resolutionChainCache = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.resolutionChainCache_ = opt_value;
+  }
+  return this.resolutionChainCache_;
+};
+
+
 /** @inheritDoc */
 anychart.core.axes.MapSettings.prototype.getResolutionChain = anychart.core.settings.getResolutionChain;
 

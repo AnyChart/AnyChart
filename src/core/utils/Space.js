@@ -24,8 +24,6 @@ goog.require('anychart.utils');
  */
 anychart.core.utils.Space = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   anychart.core.utils.Space.base(this, 'constructor');
-  if (arguments.length)
-    this.set.apply(this, arguments);
 
   /**
    * Theme settings.
@@ -48,6 +46,15 @@ anychart.core.utils.Space = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRi
    */
   this.parent_ = null;
 
+  /**
+   * Resolution chain cache.
+   * @type {Array.<Object|null|undefined>|null}
+   * @private
+   */
+  this.resolutionChainCache_ = null;
+
+  if (goog.isDef(opt_spaceOrTopOrTopAndBottom) || goog.isDef(opt_rightOrRightAndLeft) || goog.isDef(opt_bottom) || goog.isDef(opt_left))
+    this.set.apply(this, arguments);
 };
 goog.inherits(anychart.core.utils.Space, anychart.core.Base);
 
@@ -76,7 +83,7 @@ anychart.core.utils.Space.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_RE
  * Space descriptors.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.core.utils.Space.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
+anychart.core.utils.Space.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
   map[anychart.opt.LEFT] = anychart.core.settings.createDescriptor(
@@ -109,7 +116,7 @@ anychart.core.utils.Space.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
 
   return map;
 })();
-anychart.core.settings.populate(anychart.core.utils.Space, anychart.core.utils.Space.prototype.SIMPLE_PROPS_DESCRIPTORS);
+anychart.core.settings.populate(anychart.core.utils.Space, anychart.core.utils.Space.SIMPLE_PROPS_DESCRIPTORS);
 //endregion
 
 
@@ -133,7 +140,9 @@ anychart.core.utils.Space.prototype.getThemeOption = function(name) {
 
 
 /** @inheritDoc */
-anychart.core.utils.Space.prototype.getOption = anychart.core.settings.getOption;
+anychart.core.utils.Space.prototype.getOption = function(name) {
+  return anychart.core.settings.getOption.call(this, name) || 0;
+};
 
 
 /** @inheritDoc */
@@ -151,7 +160,16 @@ anychart.core.utils.Space.prototype.check = function(flags) {
 
 //region -- IResolvable implementation
 /** @inheritDoc */
-anychart.core.utils.Space.prototype.getResolutionChain = goog.partial(anychart.core.settings.getResolutionChain);
+anychart.core.utils.Space.prototype.resolutionChainCache = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.resolutionChainCache_ = opt_value;
+  }
+  return this.resolutionChainCache_;
+};
+
+
+/** @inheritDoc */
+anychart.core.utils.Space.prototype.getResolutionChain = anychart.core.settings.getResolutionChain;
 
 
 /** @inheritDoc */
@@ -207,6 +225,7 @@ anychart.core.utils.Space.prototype.parent = function(opt_value) {
  * @private
  */
 anychart.core.utils.Space.prototype.parentInvalidated_ = function(e) {
+  this.resolutionChainCache_ = null;
   this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
 };
 //endregion
@@ -303,23 +322,17 @@ anychart.core.utils.Space.normalizeSpace = function(var_args) {
  */
 anychart.core.utils.Space.prototype.set = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   var normalizedSpace = /** @type {anychart.core.utils.Space.NormalizedSpace} */ (anychart.core.utils.Space.normalizeSpace.apply(this, arguments));
-  this.suspendSignalsDispatching();
-  this[anychart.opt.LEFT](normalizedSpace.left);
-  this[anychart.opt.TOP](normalizedSpace.top);
-  this[anychart.opt.RIGHT](normalizedSpace.right);
-  this[anychart.opt.BOTTOM](normalizedSpace.bottom);
-  this.resumeSignalsDispatching(true);
+  if ((this.getOption(anychart.opt.TOP) !== normalizedSpace.top) ||
+      (this.getOption(anychart.opt.RIGHT) !== normalizedSpace.right) ||
+      (this.getOption(anychart.opt.BOTTOM) !== normalizedSpace.bottom) ||
+      (this.getOption(anychart.opt.LEFT) !== normalizedSpace.left)) {
+    this.setOption(anychart.opt.TOP, normalizedSpace.top);
+    this.setOption(anychart.opt.RIGHT, normalizedSpace.right);
+    this.setOption(anychart.opt.BOTTOM, normalizedSpace.bottom);
+    this.setOption(anychart.opt.LEFT, normalizedSpace.left);
+    this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+  }
   return this;
-};
-
-
-/**
- * Gets option anf turn it to number or string even if value is unacceptable. Default is 0.
- * @param {string} name - option name.
- * @return {number|string}
- */
-anychart.core.utils.Space.prototype.getSafeOption = function(name) {
-  return anychart.core.settings.numberOrZeroNormalizer(this.getOption(name));
 };
 
 
@@ -329,10 +342,10 @@ anychart.core.utils.Space.prototype.getSafeOption = function(name) {
  * @return {!anychart.math.Rect} New rectangle with applied margin.
  */
 anychart.core.utils.Space.prototype.tightenBounds = function(boundsRect) {
-  var left = anychart.utils.normalizeSize(this.getSafeOption(anychart.opt.LEFT), boundsRect.width);
-  var right = anychart.utils.normalizeSize(this.getSafeOption(anychart.opt.RIGHT), boundsRect.width);
-  var top = anychart.utils.normalizeSize(this.getSafeOption(anychart.opt.TOP), boundsRect.height);
-  var bottom = anychart.utils.normalizeSize(this.getSafeOption(anychart.opt.BOTTOM), boundsRect.height);
+  var left = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption(anychart.opt.LEFT)), boundsRect.width);
+  var right = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption(anychart.opt.RIGHT)), boundsRect.width);
+  var top = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption(anychart.opt.TOP)), boundsRect.height);
+  var bottom = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption(anychart.opt.BOTTOM)), boundsRect.height);
   return new anychart.math.Rect(
       boundsRect.left + left,
       boundsRect.top + top,
@@ -348,8 +361,8 @@ anychart.core.utils.Space.prototype.tightenBounds = function(boundsRect) {
  * @return {number} New width.
  */
 anychart.core.utils.Space.prototype.tightenWidth = function(initialWidth) {
-  var left = anychart.utils.normalizeSize(this.getSafeOption(anychart.opt.LEFT), initialWidth);
-  var right = anychart.utils.normalizeSize(this.getSafeOption(anychart.opt.RIGHT), initialWidth);
+  var left = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption(anychart.opt.LEFT)), initialWidth);
+  var right = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption(anychart.opt.RIGHT)), initialWidth);
   return initialWidth - left - right;
 };
 
@@ -360,8 +373,8 @@ anychart.core.utils.Space.prototype.tightenWidth = function(initialWidth) {
  * @return {number} New height.
  */
 anychart.core.utils.Space.prototype.tightenHeight = function(initialHeight) {
-  var top = anychart.utils.normalizeSize(this.getSafeOption(anychart.opt.TOP), initialHeight);
-  var bottom = anychart.utils.normalizeSize(this.getSafeOption(anychart.opt.BOTTOM), initialHeight);
+  var top = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption(anychart.opt.TOP)), initialHeight);
+  var bottom = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption(anychart.opt.BOTTOM)), initialHeight);
   return initialHeight - top - bottom;
 };
 
@@ -372,10 +385,10 @@ anychart.core.utils.Space.prototype.tightenHeight = function(initialHeight) {
  * @return {!anychart.math.Rect} New rectangle.
  */
 anychart.core.utils.Space.prototype.widenBounds = function(boundsRect) {
-  var left = anychart.utils.normalizeSize(this.getSafeOption(anychart.opt.LEFT), boundsRect.width);
-  var right = anychart.utils.normalizeSize(this.getSafeOption(anychart.opt.RIGHT), boundsRect.width);
-  var top = anychart.utils.normalizeSize(this.getSafeOption(anychart.opt.TOP), boundsRect.height);
-  var bottom = anychart.utils.normalizeSize(this.getSafeOption(anychart.opt.BOTTOM), boundsRect.height);
+  var left = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption(anychart.opt.LEFT)), boundsRect.width);
+  var right = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption(anychart.opt.RIGHT)), boundsRect.width);
+  var top = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption(anychart.opt.TOP)), boundsRect.height);
+  var bottom = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption(anychart.opt.BOTTOM)), boundsRect.height);
   return new anychart.math.Rect(
       boundsRect.left - left,
       boundsRect.top - top,
@@ -391,8 +404,8 @@ anychart.core.utils.Space.prototype.widenBounds = function(boundsRect) {
  * @return {number} New width.
  */
 anychart.core.utils.Space.prototype.widenWidth = function(initialWidth) {
-  var left = anychart.utils.normalizeSize(this.getSafeOption(anychart.opt.LEFT), initialWidth);
-  var right = anychart.utils.normalizeSize(this.getSafeOption(anychart.opt.RIGHT), initialWidth);
+  var left = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption(anychart.opt.LEFT)), initialWidth);
+  var right = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption(anychart.opt.RIGHT)), initialWidth);
   return initialWidth + left + right;
 };
 
@@ -403,8 +416,8 @@ anychart.core.utils.Space.prototype.widenWidth = function(initialWidth) {
  * @return {number} New height.
  */
 anychart.core.utils.Space.prototype.widenHeight = function(initialHeight) {
-  var top = anychart.utils.normalizeSize(this.getSafeOption(anychart.opt.TOP), initialHeight);
-  var bottom = anychart.utils.normalizeSize(this.getSafeOption(anychart.opt.BOTTOM), initialHeight);
+  var top = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption(anychart.opt.TOP)), initialHeight);
+  var bottom = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption(anychart.opt.BOTTOM)), initialHeight);
   return initialHeight + top + bottom;
 };
 
@@ -416,7 +429,7 @@ anychart.core.utils.Space.prototype.widenHeight = function(initialHeight) {
  * @param {!Object} config
  */
 anychart.core.utils.Space.prototype.setThemeSettings = function(config) {
-  for (var name in this.SIMPLE_PROPS_DESCRIPTORS) {
+  for (var name in anychart.core.utils.Space.SIMPLE_PROPS_DESCRIPTORS) {
     var val = config[name];
     if (goog.isDef(val))
       this.themeSettings[name] = val;
@@ -427,7 +440,7 @@ anychart.core.utils.Space.prototype.setThemeSettings = function(config) {
 /** @inheritDoc */
 anychart.core.utils.Space.prototype.serialize = function() {
   var json = goog.base(this, 'serialize');
-  anychart.core.settings.serialize(this, this.SIMPLE_PROPS_DESCRIPTORS, json, 'Space');
+  anychart.core.settings.serialize(this, anychart.core.utils.Space.SIMPLE_PROPS_DESCRIPTORS, json, 'Space');
   return json;
 };
 
@@ -463,7 +476,7 @@ anychart.core.utils.Space.prototype.setupByJSON = function(config, opt_default) 
   if (opt_default) {
     this.setThemeSettings(config);
   } else {
-    anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config);
+    anychart.core.settings.deserialize(this, anychart.core.utils.Space.SIMPLE_PROPS_DESCRIPTORS, config);
   }
 
   this.resumeSignalsDispatching(true);

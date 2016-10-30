@@ -293,12 +293,12 @@ anychart.core.annotations.FibonacciFan.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.annotations.FibonacciFan.prototype.setupByJSON = function(config) {
+anychart.core.annotations.FibonacciFan.prototype.setupByJSON = function(config, opt_default) {
 
   this.timeLevels(config['timeLevels']);
   anychart.core.settings.deserialize(this, anychart.core.annotations.GRID_DESCRIPTORS, config);
 
-  anychart.core.annotations.FibonacciFan.base(this, 'setupByJSON', config);
+  anychart.core.annotations.FibonacciFan.base(this, 'setupByJSON', config, opt_default);
 };
 
 

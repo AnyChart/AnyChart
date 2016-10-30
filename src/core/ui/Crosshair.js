@@ -835,8 +835,8 @@ anychart.core.ui.Crosshair.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.Crosshair.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.ui.Crosshair.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.displayMode(config['displayMode']);
   this.xStroke(config['xStroke']);
   this.yStroke(config['yStroke']);

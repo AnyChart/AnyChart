@@ -2149,6 +2149,8 @@
         <xsd:attribute name="visible_maximum" type="xsd:double"/>
         <xsd:attribute name="soft_minimum" type="xsd:double"/>
         <xsd:attribute name="soft_maximum" type="xsd:double"/>
+        <xsd:attribute name="data_minimum" type="xsd:double"/>
+        <xsd:attribute name="data_maximum" type="xsd:double"/>
         <xsd:attribute name="minimum" type="xsd:double"/>
         <xsd:attribute name="maximum" type="xsd:double"/>
         <xsd:attribute name="minimum_gap" type="xsd:double"/>

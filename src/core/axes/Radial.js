@@ -1228,8 +1228,8 @@ anychart.core.axes.Radial.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.axes.Radial.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.axes.Radial.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.labels().setup(config['labels']);
   this.minorLabels().setup(config['minorLabels']);
   this.ticks(config['ticks']);

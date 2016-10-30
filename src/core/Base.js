@@ -314,12 +314,49 @@ anychart.ConsistencyState = {
   RESOURCE_LIST_SCROLL: 1 << 7,
   RESOURCE_LIST_ITEMS: 1 << 8,
   RESOURCE_LIST_DATA: 1 << 9,
-  RESOURCE_LIST_ITEMS_SETTINGS: 1 << 10,
-  RESOURCE_LIST_IMAGES_SETTINGS: 1 << 11,
-  RESOURCE_LIST_NAMES_SETTINGS: 1 << 12,
-  RESOURCE_LIST_TYPES_SETTINGS: 1 << 13,
-  RESOURCE_LIST_DESCRIPTIONS_SETTINGS: 1 << 14,
-  RESOURCE_LIST_TAGS_SETTINGS: 1 << 15,
+  RESOURCE_LIST_IMAGES_SETTINGS: 1 << 10,
+  RESOURCE_LIST_NAMES_SETTINGS: 1 << 11,
+  RESOURCE_LIST_TYPES_SETTINGS: 1 << 12,
+  RESOURCE_LIST_DESCRIPTIONS_SETTINGS: 1 << 13,
+  RESOURCE_LIST_TAGS_SETTINGS: 1 << 14,
+  RESOURCE_LIST_OVERLAY: 1 << 15,
+  //---------------------------------- RESOURCE (CHART) ----------------------------------
+  RESOURCE_RESOURCE_LIST: 1 << 12,
+  RESOURCE_TIME_LINE: 1 << 13,
+  RESOURCE_X_SCROLL: 1 << 14,
+  RESOURCE_Y_SCROLL: 1 << 15,
+  RESOURCE_GRID: 1 << 16,
+  RESOURCE_X_SCALE_RANGE: 1 << 17,
+  RESOURCE_X_SCALE_POSITION: 1 << 18,
+  RESOURCE_DATA: 1 << 19,
+  RESOURCE_Y_RANGE: 1 << 20,
+  RESOURCE_RESOURCES: 1 << 21,
+  RESOURCE_LOGO: 1 << 22,
+  RESOURCE_OVERLAY: 1 << 23,
+  RESOURCE_SPLITTER: 1 << 24,
+  RESOURCE_CONFLICTS: 1 << 25,
+  //---------------------------------- RESOURCE GRID (VB) ----------------------------------
+  RESOURCE_GRID_BACKGROUND: 1 << 6,
+  RESOURCE_GRID_TICKS: 1 << 7,
+  RESOURCE_GRID_POSITION: 1 << 8,
+  RESOURCE_GRID_OVERLAY: 1 << 9,
+  //---------------------------------- RESOURCE TIMELINE (VB) ----------------------------------
+  RESOURCE_TIMELINE_BACKGROUND: 1 << 6,
+  RESOURCE_TIMELINE_TICKS: 1 << 7,
+  RESOURCE_TIMELINE_LABELS: 1 << 8,
+  RESOURCE_TIMELINE_LEVELS: 1 << 9,
+  RESOURCE_TIMELINE_OVERLAY: 1 << 10,
+  //---------------------------------- RESOURCE LOGO (BACKGROUND) ----------------------------------
+  RESOURCE_LOGO_OVERLAY: 1 << 7,
+  //---------------------------------- RESOURCE RESOURCE (B) -----------------------------
+  RESOURCE_RESOURCE_DATA: 1 << 0,
+  RESOURCE_RESOURCE_SCHEDULE: 1 << 1,
+  //---------------------------------- RESOURCE CONFLICTS (VB) -----------------------------
+  RESOURCE_CONFLICTS_LABELS: 1 << 6,
+  RESOURCE_CONFLICTS_CONFLICTS: 1 << 7,
+  //---------------------------------- DATE TIME WITH CALENDAR -----------------------------
+  DTWC_TS_GRID: 1 << 0,
+  DTWC_TS_GRID_ZERO: 1 << 1,
   /**
    * Combination of all states.
    */

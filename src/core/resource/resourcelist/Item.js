@@ -1,7 +1,6 @@
-goog.provide('anychart.core.ui.resourceList.Item');
+goog.provide('anychart.core.resource.resourceList.Item');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.settings');
-goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.Label');
 goog.require('anychart.opt');
 
@@ -9,12 +8,20 @@ goog.require('anychart.opt');
 
 /**
  * Class representing item in resource list.
+ * @param {anychart.core.resource.ResourceList} resourceList
  * @constructor
  * @implements {anychart.core.settings.IObjectWithSettings}
  * @extends {anychart.core.VisualBase}
  */
-anychart.core.ui.resourceList.Item = function() {
-  anychart.core.ui.resourceList.Item.base(this, 'constructor');
+anychart.core.resource.resourceList.Item = function(resourceList) {
+  anychart.core.resource.resourceList.Item.base(this, 'constructor');
+
+  /**
+   * Resource list reference
+   * @type {anychart.core.resource.ResourceList}
+   * @private
+   */
+  this.resourceList_ = resourceList;
 
   /**
    * Settings storage.
@@ -32,7 +39,7 @@ anychart.core.ui.resourceList.Item = function() {
 
   /**
    * Root layer of resource item.
-   * Contains all resource elements such as background,
+   * Contains all resource elements such as
    * image, name, type, description and tags.
    * @type {acgraph.vector.Layer}
    */
@@ -101,8 +108,14 @@ anychart.core.ui.resourceList.Item = function() {
     'fontDecoration': 'decoration',
     'textDirection': 'direction'
   };
+
+  /**
+   * Index.
+   * @type {number}
+   */
+  this.index = NaN;
 };
-goog.inherits(anychart.core.ui.resourceList.Item, anychart.core.VisualBase);
+goog.inherits(anychart.core.resource.resourceList.Item, anychart.core.VisualBase);
 
 
 //region --- STATES/SIGNALS ---
@@ -110,7 +123,7 @@ goog.inherits(anychart.core.ui.resourceList.Item, anychart.core.VisualBase);
  * Supported signals.
  * @type {number}
  */
-anychart.core.ui.resourceList.Item.prototype.SUPPORTED_SIGNALS =
+anychart.core.resource.resourceList.Item.prototype.SUPPORTED_SIGNALS =
     anychart.core.VisualBase.prototype.SUPPORTED_SIGNALS;
 
 
@@ -118,44 +131,44 @@ anychart.core.ui.resourceList.Item.prototype.SUPPORTED_SIGNALS =
  * Supported consistence states.
  * @type {number}
  */
-anychart.core.ui.resourceList.Item.prototype.SUPPORTED_CONSISTENCY_STATES =
+anychart.core.resource.resourceList.Item.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES;
 //endregion
 
 
 //region --- IObjectWithSettings IMPLEMENTATION ---
 /** @inheritDoc */
-anychart.core.ui.resourceList.Item.prototype.check = function(flags) {
+anychart.core.resource.resourceList.Item.prototype.check = function(flags) {
   return true;
 };
 
 
 /** @inheritDoc */
-anychart.core.ui.resourceList.Item.prototype.getOption = function(name) {
+anychart.core.resource.resourceList.Item.prototype.getOption = function(name) {
   return goog.isDef(this.settings[name]) ? this.settings[name] : this.defaultSettings[name];
 };
 
 
 /** @inheritDoc */
-anychart.core.ui.resourceList.Item.prototype.getOwnOption = function(name) {
+anychart.core.resource.resourceList.Item.prototype.getOwnOption = function(name) {
   return this.settings[name];
 };
 
 
 /** @inheritDoc */
-anychart.core.ui.resourceList.Item.prototype.getThemeOption = function(name) {
+anychart.core.resource.resourceList.Item.prototype.getThemeOption = function(name) {
   return this.defaultSettings[name];
 };
 
 
 /** @inheritDoc */
-anychart.core.ui.resourceList.Item.prototype.hasOwnOption = function(name) {
+anychart.core.resource.resourceList.Item.prototype.hasOwnOption = function(name) {
   return goog.isDef(this.settings[name]);
 };
 
 
 /** @inheritDoc */
-anychart.core.ui.resourceList.Item.prototype.setOption = function(name, value) {
+anychart.core.resource.resourceList.Item.prototype.setOption = function(name, value) {
   this.settings[name] = value;
 };
 //endregion
@@ -167,7 +180,7 @@ anychart.core.ui.resourceList.Item.prototype.setOption = function(name, value) {
  * @param {string} name
  * @param {*} value
  */
-anychart.core.ui.resourceList.Item.prototype.setThemeOption = function(name, value) {
+anychart.core.resource.resourceList.Item.prototype.setThemeOption = function(name, value) {
   this.defaultSettings[name] = value;
 };
 
@@ -222,7 +235,7 @@ anychart.core.ui.resourceList.Item.prototype.setThemeOption = function(name, val
  * @param {Array.<string>|string} path Path to get value from.
  * @return {*} Value of an option.
  */
-anychart.core.ui.resourceList.Item.prototype.getComplexOption = function(name, path) {
+anychart.core.resource.resourceList.Item.prototype.getComplexOption = function(name, path) {
   var own = this.getOption(name);
   var def = this.getThemeOption(name);
   var rv;
@@ -275,7 +288,7 @@ anychart.core.ui.resourceList.Item.prototype.getComplexOption = function(name, p
 /**
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.core.ui.resourceList.Item.PROPERTY_DESCRIPTORS = (function() {
+anychart.core.resource.resourceList.Item.PROPERTY_DESCRIPTORS = (function() {
   var map = {};
 
   map[anychart.opt.WIDTH] = anychart.core.settings.createDescriptor(
@@ -322,28 +335,7 @@ anychart.core.ui.resourceList.Item.PROPERTY_DESCRIPTORS = (function() {
 
   return map;
 })();
-anychart.core.settings.populate(anychart.core.ui.resourceList.Item, anychart.core.ui.resourceList.Item.PROPERTY_DESCRIPTORS);
-//endregion
-
-
-//region --- OWN API ---
-/**
- * Getter/setter for background.
- * @param {Object=} opt_value background.
- * @return {anychart.core.ui.Background|anychart.core.ui.resourceList.Item} background or self for chaining.
- */
-anychart.core.ui.resourceList.Item.prototype.background = function(opt_value) {
-  if (!this.background_) {
-    this.background_ = new anychart.core.ui.Background();
-  }
-
-  if (goog.isDef(opt_value)) {
-    this.background_.setup(opt_value);
-    return this;
-  } else {
-    return this.background_;
-  }
-};
+anychart.core.settings.populate(anychart.core.resource.resourceList.Item, anychart.core.resource.resourceList.Item.PROPERTY_DESCRIPTORS);
 //endregion
 
 
@@ -353,7 +345,7 @@ anychart.core.ui.resourceList.Item.prototype.background = function(opt_value) {
  * @param {acgraph.vector.Text|acgraph.vector.Image} element
  * @param {Object} settings Settings.
  */
-anychart.core.ui.resourceList.Item.prototype.applySettings = function(element, settings) {
+anychart.core.resource.resourceList.Item.prototype.applySettings = function(element, settings) {
   var key, value;
   for (key in settings) {
     value = settings[key];
@@ -369,7 +361,7 @@ anychart.core.ui.resourceList.Item.prototype.applySettings = function(element, s
  * Default tag label settings.
  * @type {Object}
  */
-anychart.core.ui.resourceList.Item.DEFAULT_TAG_LABEL_SETTINGS = {
+anychart.core.resource.resourceList.Item.DEFAULT_TAG_LABEL_SETTINGS = {
   'position': 'leftTop',
   'anchor': 'leftTop',
   'rotation': 0
@@ -382,9 +374,9 @@ anychart.core.ui.resourceList.Item.DEFAULT_TAG_LABEL_SETTINGS = {
 /**
  * Getter/setter for offsetY.
  * @param {string=} opt_value offsetY.
- * @return {string|anychart.core.ui.resourceList.Item} offsetY or self for chaining.
+ * @return {string|anychart.core.resource.resourceList.Item} offsetY or self for chaining.
  */
-anychart.core.ui.resourceList.Item.prototype.offsetY = function(opt_value) {
+anychart.core.resource.resourceList.Item.prototype.offsetY = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.offsetY_ != opt_value) {
       this.offsetY_ = opt_value;
@@ -399,7 +391,7 @@ anychart.core.ui.resourceList.Item.prototype.offsetY = function(opt_value) {
  * Gets calculated height of an item.
  * @return {number}
  */
-anychart.core.ui.resourceList.Item.prototype.getActualHeight = function() {
+anychart.core.resource.resourceList.Item.prototype.getActualHeight = function() {
   if (!this.enabled()) return 0;
   return this.actualHeight_;
 };
@@ -410,7 +402,7 @@ anychart.core.ui.resourceList.Item.prototype.getActualHeight = function() {
  * @return {acgraph.vector.Rect}
  * @private
  */
-anychart.core.ui.resourceList.Item.prototype.createClipForImage_ = function() {
+anychart.core.resource.resourceList.Item.prototype.createClipForImage_ = function() {
   var width = /** @type {number} */ (this.imageElement.width());
   if (!this.rect_)
     this.rect_ = acgraph.rect(0, 0);
@@ -464,7 +456,7 @@ anychart.core.ui.resourceList.Item.prototype.createClipForImage_ = function() {
  * @param {Object} margin Margin of element.
  * @param {number} height Height of resource item if present.
  */
-anychart.core.ui.resourceList.Item.prototype.calculateCoordinates = function(element, coords, fullImageWidth, margin, height) {
+anychart.core.resource.resourceList.Item.prototype.calculateCoordinates = function(element, coords, fullImageWidth, margin, height) {
   var width = /** @type {number} */ (this.getOption(anychart.opt.WIDTH));
   var marginTop = anychart.utils.normalizeSize(margin.top, height) || 0;
   var marginRight = anychart.utils.normalizeSize(margin.right, width) || 0;
@@ -487,7 +479,7 @@ anychart.core.ui.resourceList.Item.prototype.calculateCoordinates = function(ele
  * @return {boolean}
  * @private
  */
-anychart.core.ui.resourceList.Item.prototype.handleMouseClick_ = function(event) {
+anychart.core.resource.resourceList.Item.prototype.handleMouseClick_ = function(event) {
   var newEvent = {};
   if (event) {
     var label = /** @type {anychart.core.ui.Label} */ (event.target);
@@ -505,17 +497,17 @@ anychart.core.ui.resourceList.Item.prototype.handleMouseClick_ = function(event)
 
 //region --- DRAWING ---
 /** @inheritDoc */
-anychart.core.ui.resourceList.Item.prototype.remove = function() {
+anychart.core.resource.resourceList.Item.prototype.remove = function() {
   if (this.rootLayer) this.rootLayer.parent(null);
 };
 
 
 /**
  * Draws resource item.
- * @return {anychart.core.ui.resourceList.Item} Self for chaining.
+ * @return {anychart.core.resource.resourceList.Item} Self for chaining.
  */
-anychart.core.ui.resourceList.Item.prototype.draw = function() {
-  if (!this.checkDrawingNeeded() && this.background().isConsistent())
+anychart.core.resource.resourceList.Item.prototype.draw = function() {
+  if (!this.checkDrawingNeeded())
     return this;
 
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
@@ -609,8 +601,6 @@ anychart.core.ui.resourceList.Item.prototype.draw = function() {
     this.tagsElements.push(tag);
   }
 
-  var background = /** @type {anychart.core.ui.Background} */(this.background());
-
   /**
    * @type {Object}
    */
@@ -620,21 +610,22 @@ anychart.core.ui.resourceList.Item.prototype.draw = function() {
   var itemHeight, itemMinHeight, itemMaxHeight;
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     var listHeight = /** @type {number} */ (this.getOption(anychart.opt.HEIGHT));
-    itemHeight = /** @type {number|string} */ (this.getComplexOption('itemSettings', anychart.opt.HEIGHT));
-    itemHeight = anychart.utils.normalizeSize(itemHeight, listHeight);
+    itemHeight = this.resourceList_.getItemHeight(this, listHeight);
 
-    itemMinHeight = /** @type {number|string} */ (this.getComplexOption('itemSettings', anychart.opt.MIN_HEIGHT));
-    itemMinHeight = anychart.utils.normalizeSize(itemMinHeight, listHeight);
-
-    itemMaxHeight = /** @type {number|string} */ (this.getComplexOption('itemSettings', anychart.opt.MAX_HEIGHT));
-    itemMaxHeight = anychart.utils.normalizeSize(itemMaxHeight, listHeight);
+    itemMinHeight = this.resourceList_.getMinItemHeight(this, listHeight);
+    itemMaxHeight = this.resourceList_.getMaxItemHeight(this, listHeight);
 
     width = /** @type {number} */ (this.getOption(anychart.opt.WIDTH));
-    var height = Math.max(itemMinHeight, itemHeight);
+    if (!isNaN(itemHeight)) {
+      if (!isNaN(itemMaxHeight))
+        itemHeight = Math.min(itemHeight, itemMaxHeight);
+      if (!isNaN(itemMinHeight))
+        itemHeight = Math.max(itemHeight, itemMinHeight);
+    }
     margin = /** @type {Object} */ (this.getComplexOption('imageSettings', anychart.opt.MARGIN));
     this.coords.image[anychart.opt.X] = anychart.utils.normalizeSize(margin.left, width) || 0;
     marginRight = anychart.utils.normalizeSize(margin.right, width) || 0;
-    this.coords.image[anychart.opt.Y] = anychart.utils.normalizeSize(margin.top, height) || 0;
+    this.coords.image[anychart.opt.Y] = anychart.utils.normalizeSize(margin.top, itemHeight) || 0;
 
     var imageWidth = anychart.utils.normalizeSize(/** @type {number|string} */ (this.getComplexOption('imageSettings', anychart.opt.SIZE)), width) || 0;
     this.imageElement.width(imageWidth);
@@ -644,7 +635,7 @@ anychart.core.ui.resourceList.Item.prototype.draw = function() {
     if (imageSrc != '') {
       this.imageElement.clip(this.createClipForImage_());
       fullImageWidth = this.coords.image[anychart.opt.X] + imageWidth + marginRight;
-      fullImageHeight = this.coords.image[anychart.opt.Y] + imageWidth + anychart.utils.normalizeSize(margin.bottom, height) || 0;
+      fullImageHeight = this.coords.image[anychart.opt.Y] + imageWidth + anychart.utils.normalizeSize(margin.bottom, itemHeight) || 0;
     }
 
     this.coords.name[anychart.opt.X] = 0;
@@ -652,19 +643,19 @@ anychart.core.ui.resourceList.Item.prototype.draw = function() {
     this.coords.name[anychart.opt.HEIGHT] = 0;
     if (goog.isDefAndNotNull(this.getOption(anychart.opt.NAME))) {
       margin = /** @type {Object} */ (this.getComplexOption('nameSettings', anychart.opt.MARGIN));
-      this.calculateCoordinates(this.nameElement, this.coords.name, fullImageWidth, margin, height);
+      this.calculateCoordinates(this.nameElement, this.coords.name, fullImageWidth, margin, itemHeight);
     }
 
     this.coords.type[anychart.opt.Y] = this.coords.name[anychart.opt.Y] + this.coords.name[anychart.opt.HEIGHT];
     if (goog.isDefAndNotNull(this.getOption(anychart.opt.TYPE))) {
       margin = /** @type {Object} */ (this.getComplexOption('typeSettings', anychart.opt.MARGIN));
-      this.calculateCoordinates(this.typeElement, this.coords.type, fullImageWidth, margin, height);
+      this.calculateCoordinates(this.typeElement, this.coords.type, fullImageWidth, margin, itemHeight);
     }
 
     this.coords.description[anychart.opt.Y] = this.coords.type[anychart.opt.Y] + this.coords.type[anychart.opt.HEIGHT];
     if (goog.isDefAndNotNull(this.getOption(anychart.opt.DESCRIPTION))) {
       margin = /** @type {Object} */ (this.getComplexOption('descriptionSettings', anychart.opt.MARGIN));
-      this.calculateCoordinates(this.descriptionElement, this.coords.description, fullImageWidth, margin, height);
+      this.calculateCoordinates(this.descriptionElement, this.coords.description, fullImageWidth, margin, itemHeight);
     }
 
     var availableWidth = width - fullImageWidth;
@@ -675,8 +666,8 @@ anychart.core.ui.resourceList.Item.prototype.draw = function() {
       margin = /** @type {Object} */ (this.getComplexOption('tagSettings', anychart.opt.MARGIN));
       marginLeft = anychart.utils.normalizeSize(margin.left, width);
       marginRight = anychart.utils.normalizeSize(margin.right, width);
-      marginBottom = anychart.utils.normalizeSize(margin.bottom, height) || 0;
-      marginTop = anychart.utils.normalizeSize(margin.top, height) || 0;
+      marginBottom = anychart.utils.normalizeSize(margin.bottom, itemHeight) || 0;
+      marginTop = anychart.utils.normalizeSize(margin.top, itemHeight) || 0;
       offsetX = fullImageWidth + marginLeft;
       offsetY += marginTop;
 
@@ -701,16 +692,15 @@ anychart.core.ui.resourceList.Item.prototype.draw = function() {
       tagsHeight = offsetY + tagBounds.height + marginBottom;
     }
 
-    this.actualHeight_ = Math.max(fullImageHeight, tagsHeight);
-    if (itemHeight) {
-      this.actualHeight_ = Math.max(this.actualHeight_, itemHeight);
+    if (isNaN(itemHeight)) {
+      this.actualHeight_ = Math.max(fullImageHeight, tagsHeight);
+      if (!isNaN(itemMaxHeight))
+        this.actualHeight_ = Math.min(this.actualHeight_, itemMaxHeight);
+      if (!isNaN(itemMinHeight))
+        this.actualHeight_ = Math.max(this.actualHeight_, itemMinHeight);
+    } else {
+      this.actualHeight_ = itemHeight;
     }
-
-    if (itemMinHeight && (this.actualHeight_ < itemMinHeight))
-      this.actualHeight_ = itemMinHeight;
-
-    if (itemMaxHeight && (this.actualHeight_ > itemMaxHeight))
-      this.actualHeight_ = itemMaxHeight;
 
     this.bounds_ = anychart.math.rect(0, 0, width, this.actualHeight_);
 
@@ -721,16 +711,7 @@ anychart.core.ui.resourceList.Item.prototype.draw = function() {
 
     this.rootLayer.clip(this.bounds_);
 
-    background.parentBounds(this.bounds_.clone());
-
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
-  }
-
-  if (!background.isConsistent()) {
-    background.zIndex(0);
-    if (this.enabled())
-      background.container(this.rootLayer);
-    background.draw();
   }
 
   this.rootLayer.setTransformationMatrix(1, 0, 0, 1, 0, this.offsetY_);
@@ -743,22 +724,21 @@ anychart.core.ui.resourceList.Item.prototype.draw = function() {
 
 //region --- SETUP/DISPOSE ---
 /** @inheritDoc */
-anychart.core.ui.resourceList.Item.prototype.serialize = function() {
-  var json = anychart.core.ui.resourceList.Item.base(this, 'serialize');
-  json['background'] = this.background().serialize();
-  return json;
+anychart.core.resource.resourceList.Item.prototype.serialize = function() {
+  return anychart.core.resource.resourceList.Item.base(this, 'serialize');
 };
 
 
 /** @inheritDoc */
-anychart.core.ui.resourceList.Item.prototype.setupByJSON = function(json) {
-  anychart.core.ui.resourceList.Item.base(this, 'setupByJSON', json);
-  this.background(json['background']);
+anychart.core.resource.resourceList.Item.prototype.setupByJSON = function(json, opt_default) {
+  anychart.core.resource.resourceList.Item.base(this, 'setupByJSON', json, opt_default);
 };
 
 
 /** @inheritDoc */
-anychart.core.ui.resourceList.Item.prototype.disposeInternal = function() {
+anychart.core.resource.resourceList.Item.prototype.disposeInternal = function() {
+  this.resourceList_ = null;
+
   // dispose all tags elements.
   goog.disposeAll(this.tagsElements);
   this.tagsElements = null;
@@ -779,14 +759,10 @@ anychart.core.ui.resourceList.Item.prototype.disposeInternal = function() {
   goog.dispose(this.imageElement);
   this.imageElement = null;
 
-  // dispose background
-  goog.dispose(this.background_);
-  this.background_ = null;
-
   // dispose root layer
   goog.dispose(this.rootLayer);
   this.rootLayer = null;
 
-  anychart.core.ui.resourceList.Item.base(this, 'disposeInternal');
+  anychart.core.resource.resourceList.Item.base(this, 'disposeInternal');
 };
 //endregion

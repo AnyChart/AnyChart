@@ -129,6 +129,13 @@ anychart.core.ui.Tooltip = function(capability) {
    */
   this.boundsProvider = null;
 
+  /**
+   * Resolution chain cache.
+   * @type {Array.<Object|null|undefined>|null}
+   * @private
+   */
+  this.resolutionChainCache_ = null;
+
   this.rootLayer_ = acgraph.layer();
   this.registerDisposable(this.rootLayer_);
   this.bindHandlersToGraphics(this.rootLayer_);
@@ -251,6 +258,13 @@ anychart.core.ui.Tooltip.prototype.TOOLTIP_SIMPLE_DESCRIPTORS = (function() {
   map[anychart.opt.TEXT_FORMATTER] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       anychart.opt.TEXT_FORMATTER,
+      anychart.core.settings.asIsNormalizer,
+      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
+      anychart.Signal.NEEDS_REDRAW);
+
+  map[anychart.opt.UNION_TEXT_FORMATTER] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.UNION_TEXT_FORMATTER,
       anychart.core.settings.asIsNormalizer,
       anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
       anychart.Signal.NEEDS_REDRAW);
@@ -727,7 +741,7 @@ anychart.core.ui.Tooltip.prototype.showAsSingle_ = function(points, clientX, cli
   contextProvider['clientX'] = clientX;
   contextProvider['clientY'] = clientY;
   this.tooltipInUse_.title().autoText(this.tooltipInUse_.getFormattedTitle(contextProvider));
-  this.tooltipInUse_.contentInternal().text(this.tooltipInUse_.getFormattedContent(contextProvider));
+  this.tooltipInUse_.contentInternal().text(this.tooltipInUse_.getFormattedContent_(contextProvider));
 
   // this.hideChildTooltips_();
   if (this.tooltipInUse_ == this) {
@@ -889,7 +903,7 @@ anychart.core.ui.Tooltip.prototype.showAsUnion_ = function(points, clientX, clie
         }
 
         var contextProvider = series.createTooltipContextProvider();
-        unionContext['formattedValues'].push(tooltip.getFormattedContent(contextProvider));
+        unionContext['formattedValues'].push(tooltip.getFormattedContent_(contextProvider));
         unionContext['points'].push(contextProvider);
 
         if (goog.isArray(point['points'])) {
@@ -924,7 +938,7 @@ anychart.core.ui.Tooltip.prototype.showAsUnion_ = function(points, clientX, clie
       'clientY': anychart.enums.TokenType.NUMBER
     }, statisticsSource);
 
-    this.tooltipInUse_.contentInternal().text(this.getFormattedContent(unionContextProvider));
+    this.tooltipInUse_.contentInternal().text(this.getFormattedContent_(unionContextProvider, true));
     this.tooltipInUse_.title().autoText(this.getFormattedTitle(unionContextProvider));
 
     this.tooltipInUse_.hideChildTooltips_();
@@ -962,7 +976,7 @@ anychart.core.ui.Tooltip.prototype.showSeparatedChildren_ = function(points, cli
     contextProvider['clientX'] = clientX;
     contextProvider['clientY'] = clientY;
     tooltip.title().autoText(tooltip.getFormattedTitle(contextProvider));
-    tooltip.contentInternal().text(tooltip.getFormattedContent(contextProvider));
+    tooltip.contentInternal().text(tooltip.getFormattedContent_(contextProvider));
 
     this.setContainerToTooltip_(tooltip);
     this.setPositionForSeparated_(tooltip, clientX, clientY, series);
@@ -1047,7 +1061,7 @@ anychart.core.ui.Tooltip.prototype.showFloat = function(clientX, clientY, opt_co
     opt_contextProvider['clientX'] = clientX;
     opt_contextProvider['clientY'] = clientY;
     this.title().autoText(this.getFormattedTitle(opt_contextProvider));
-    this.contentInternal().text(this.getFormattedContent(opt_contextProvider));
+    this.contentInternal().text(this.getFormattedContent_(opt_contextProvider));
   }
 
   this.setContainerToTooltip_(this);
@@ -1101,13 +1115,17 @@ anychart.core.ui.Tooltip.prototype.getFormattedTitle = function(contextProvider)
 /**
  * Get formatted content.
  * @param {Object} contextProvider
+ * @param {boolean=} opt_useUnionFormatter - Whether to use tooltip's union text formatter.
  * @return {string}
+ * @private
  */
-anychart.core.ui.Tooltip.prototype.getFormattedContent = function(contextProvider) {
+anychart.core.ui.Tooltip.prototype.getFormattedContent_ = function(contextProvider, opt_useUnionFormatter) {
   contextProvider = goog.object.clone(contextProvider);
   contextProvider['valuePrefix'] = this.getOption(anychart.opt.VALUE_PREFIX) || '';
   contextProvider['valuePostfix'] = this.getOption(anychart.opt.VALUE_POSTFIX) || '';
-  var formatter = this.getOption(anychart.opt.TEXT_FORMATTER);
+  var formatter = opt_useUnionFormatter ?
+      this.getOption(anychart.opt.UNION_TEXT_FORMATTER) :
+      this.getOption(anychart.opt.TEXT_FORMATTER);
   if (goog.isString(formatter))
     formatter = anychart.core.utils.TokenParser.getInstance().getTextFormatter(formatter);
 
@@ -1885,6 +1903,7 @@ anychart.core.ui.Tooltip.prototype.parentInvalidated_ = function(e) {
     signal |= anychart.Signal.NEEDS_REDRAW;
   }
 
+  this.resolutionChainCache_ = null;
   this.invalidate(state, signal);
 };
 //endregion
@@ -1955,6 +1974,15 @@ anychart.core.ui.Tooltip.prototype.check = function(flags) {
 
 
 //region -- IResolvable implementation
+/** @inheritDoc */
+anychart.core.ui.Tooltip.prototype.resolutionChainCache = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.resolutionChainCache_ = opt_value;
+  }
+  return this.resolutionChainCache_;
+};
+
+
 /** @inheritDoc */
 anychart.core.ui.Tooltip.prototype.getResolutionChain = anychart.core.settings.getResolutionChain;
 
@@ -2065,6 +2093,9 @@ anychart.core.ui.Tooltip.prototype.serialize = function() {
   anychart.core.settings.serialize(this, this.TEXT_PROPERTY_DESCRIPTORS, json);
   anychart.core.settings.serialize(this, this.TOOLTIP_SIMPLE_DESCRIPTORS, json);
 
+  delete json[anychart.opt.X];
+  delete json[anychart.opt.Y];
+
   var titleConfig = this.title().serialize();
   if (!goog.object.isEmpty(titleConfig))
     json[anychart.opt.TITLE] = titleConfig;
@@ -2083,7 +2114,7 @@ anychart.core.ui.Tooltip.prototype.serialize = function() {
 
   if (goog.isDef(this.hideDelay_))
     json['hideDelay'] = this.hideDelay_;
-  json['content'] = this.contentInternal().serialize();
+  // json['content'] = this.contentInternal().serialize();
 
   if (goog.isDef(this.zIndex()))
     json['zIndex'] = this.zIndex();
@@ -2097,13 +2128,17 @@ anychart.core.ui.Tooltip.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.ui.Tooltip.prototype.setupByJSON = function(config, opt_default) {
-  anychart.core.settings.deserialize(this, this.TEXT_PROPERTY_DESCRIPTORS, config);
-  anychart.core.settings.deserialize(this, this.TOOLTIP_SIMPLE_DESCRIPTORS, config);
+  if (opt_default) {
+    this.setThemeSettings(config);
+  } else {
+    anychart.core.settings.deserialize(this, this.TEXT_PROPERTY_DESCRIPTORS, config);
+    anychart.core.settings.deserialize(this, this.TOOLTIP_SIMPLE_DESCRIPTORS, config);
+  }
 
-  this.title(config['title']);
-  this.separator(config['separator']);
-  this.background(config['background']);
-  this.padding(config['padding']);
+  this.title().setupByVal(config['title'], opt_default);
+  this.separator().setupByVal(config['separator'], opt_default);
+  this.background().setupByVal(config['background'], opt_default);
+  this.padding().setupByVal(config['padding'], opt_default);
   this.hideDelay(config['hideDelay']);
 
   /*

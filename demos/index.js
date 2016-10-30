@@ -1,37 +1,21 @@
-anychart.onDocumentReady(function() {
-  // create data tree on our data
-  var treeData = anychart.data.tree(getData(), anychart.enums.TreeFillingMethod.AS_TABLE);
+anychart.onDocumentReady(function(){
+  var tree = anychart.data.tree([
+    {'name': 'January', 'id': '1', 'year 2004': '12000', 'year 2005': '18000'},
+    {'name': 'Parent Node', 'id': '2', 'year 2004': '15000', 'year 2005': '10000'},
+    {'name': 'Child Node 1', 'parent': '2', 'id': '3', 'year 2004': '16000', 'year 2005': '18000'},
+    {'name': 'Child Node 2', 'parent': '2', 'id': '4', meta: 'MyMeta', 'year 2004': '15000', 'year 2005': '11000'},
+    {'name': 'Node 2', 'id': '5', 'year 2004': '14000', 'year 2005': '9000'}
+  ], anychart.enums.TreeFillingMethod.AS_TABLE);
 
-  // create project gantt chart
-  chart = anychart.ganttProject();
+  treeDataGrid = anychart.standalones.dataGrid();
+  treeDataGrid.data(tree).titleHeight(20);
+  rightTreeDataGrid = anychart.standalones.dataGrid();
+  rightTreeDataGrid.data(tree).titleHeight(20);
+  treeDataGrid.top(37).width('50%');
+  rightTreeDataGrid.top(37).left('50%').width('50%');
+  rightTreeDataGrid.tooltip(null);
+  treeDataGrid.container('container').draw();
 
-  // set container id for the chart
-  chart.container('container');
 
-  // set data for the chart
-  chart.data(treeData);
-
-  // set start splitter position settings
-  chart.splitterPosition(370);
-
-  // chart.getTimeline()
-  //     .header()
-  //     .lowLevel()
-  //     .tilesSeparationStroke('4 red');
-
-  // initiate chart drawing
-  chart.draw();
-  chart.fitAll();
 
 });
-function getData() {
-  return [
-    {
-      "id": "1",
-      "name": "Phase 1 - Strategic Plan",
-      "progressValue": "14%",
-      "actualStart": Date.UTC(2005, 0, 1),
-      "actualEnd": Date.UTC(2016, 0, 1)
-    }
-  ];
-}

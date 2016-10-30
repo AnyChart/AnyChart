@@ -650,27 +650,7 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
           scene.zoomOut();
           break;
         case 'zoom_full_out':
-          if (!this.drillingInAction) {
-            if (scene.zoomAnimation)
-              scene.zoomAnimation.stop();
-            this.doAfterAnimation(scene, function() {
-              this.goingToHome = true;
-              this.zoomDuration = anychart.charts.Map.TIMINGS.ZOOM_TO_HOME_DURATION;
-              if (scene.zoomLevel() != this.minZoomLevel_) {
-                this.zoomTo(this.minZoomLevel_);
-              } else {
-                var tx = scene.getMapLayer().getSelfTransformation();
-                dx = tx.getTranslateX();
-                dy = tx.getTranslateY();
-
-                scene.zoomAnimation = new anychart.animations.MapMoveAnimation(scene, [dx, dy], [0, 0], anychart.charts.Map.TIMINGS.ZOOM_TO_FEATURE_DURATION);
-                scene.zoomAnimation.play();
-              }
-              this.doAfterAnimation(this, function() {
-                this.goingToHome = false;
-              });
-            });
-          }
+          scene.fitAll();
           break;
         case 'move_up':
           dx = 0;
@@ -1049,6 +1029,78 @@ anychart.charts.Map.prototype.onMouseDown = function(event) {
     }
   } else {
     anychart.charts.Map.base(this, 'onMouseDown', event);
+  }
+};
+
+
+/**
+ * Handler for mouseOut event.
+ * @param {anychart.core.MouseEvent} event Event object.
+ */
+anychart.charts.Map.prototype.handleMouseOut = function(event) {
+  var scene = this.getCurrentScene();
+  var hoverMode = scene.interactivity().hoverMode();
+
+  var tag = anychart.utils.extractTag(event['domTarget']);
+  var forbidTooltip = false;
+
+  var series, index;
+  if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
+    var parent = event['target'].getParentEventTarget();
+    if (parent.isSeries && parent.isSeries())
+      series = parent;
+    index = tag;
+  } else if (event['target'] instanceof anychart.core.ui.Legend || scene.checkIfColorRange(event['target'])) {
+    if (tag) {
+      if (tag.points_) {
+        series = tag.points_.series;
+        index = tag.points_.points;
+        if (goog.isArray(index) && index.length == 0) index = NaN;
+      } else {
+        // I don't understand, why it is like this here.
+        //series = tag.series_;
+        //index = tag.index_;
+        series = tag.series;
+        index = tag.index;
+      }
+    }
+    forbidTooltip = true;
+  } else {
+    series = tag && tag.series;
+    index = goog.isNumber(tag.index) ? tag.index : event['pointIndex'];
+  }
+
+  if (series && !series.isDisposed() && series.enabled() &&
+      goog.isFunction(series.makePointEvent)) {
+    var evt = series.makePointEvent(event);
+    if (evt) {
+      var prevTag = anychart.utils.extractTag(event['relatedDomTarget']);
+      var prevIndex = anychart.utils.toNumber(goog.isObject(prevTag) ? prevTag.index : prevTag);
+
+      var ifParent = anychart.utils.checkIfParent(/** @type {!goog.events.EventTarget} */(series), event['relatedTarget']);
+
+      if ((!ifParent || (prevIndex != index)) && series.dispatchEvent(evt)) {
+        if (hoverMode == anychart.enums.HoverMode.SINGLE && (!isNaN(index) || goog.isArray(index))) {
+          series.unhover();
+          scene.doAdditionActionsOnMouseOut();
+          scene.dispatchEvent(scene.makeInteractivityPointEvent('hovered', event, [{
+            series: series,
+            points: [],
+            nearestPointToCursor: {index: (goog.isArray(index) ? index[0] : index), distance: 0}
+          }], false, forbidTooltip));
+        }
+      }
+    }
+  }
+
+  if (hoverMode != anychart.enums.HoverMode.SINGLE) {
+    if (!anychart.utils.checkIfParent(scene, event['relatedTarget'])) {
+      scene.unhover();
+      scene.doAdditionActionsOnMouseOut();
+      if (scene.prevHoverSeriesStatus)
+        scene.dispatchEvent(scene.makeInteractivityPointEvent('hovered', event, scene.prevHoverSeriesStatus, true, forbidTooltip));
+      scene.prevHoverSeriesStatus = null;
+    }
   }
 };
 
@@ -4915,6 +4967,36 @@ anychart.charts.Map.prototype.zoomOut = function() {
 
 
 /**
+ * Fit all.
+ * @return {anychart.charts.Map}
+ */
+anychart.charts.Map.prototype.fitAll = function() {
+  if (!this.drillingInAction) {
+    if (this.zoomAnimation)
+      this.zoomAnimation.stop();
+    this.doAfterAnimation(this, function() {
+      this.goingToHome = true;
+      this.zoomDuration = anychart.charts.Map.TIMINGS.ZOOM_TO_HOME_DURATION;
+      if (this.zoomLevel() != this.minZoomLevel_) {
+        this.zoomTo(this.minZoomLevel_);
+      } else {
+        var tx = this.getMapLayer().getSelfTransformation();
+        var dx = tx.getTranslateX();
+        var dy = tx.getTranslateY();
+
+        this.zoomAnimation = new anychart.animations.MapMoveAnimation(this, [dx, dy], [0, 0], anychart.charts.Map.TIMINGS.ZOOM_TO_FEATURE_DURATION);
+        this.zoomAnimation.play();
+      }
+      this.doAfterAnimation(this, function() {
+        this.goingToHome = false;
+      });
+    });
+  }
+  return this;
+};
+
+
+/**
  * It increases map zoom on passed value.
  * @param {number} value Zoom value.
  * @param {number=} opt_cx Center X value.
@@ -5236,7 +5318,7 @@ anychart.charts.Map.prototype.toGeoJSON = function() {
 
 /** @inheritDoc */
 anychart.charts.Map.prototype.setupByJSON = function(config, opt_default) {
-  anychart.charts.Map.base(this, 'setupByJSON', config);
+  anychart.charts.Map.base(this, 'setupByJSON', config, opt_default);
 
   if ('defaultSeriesSettings' in config)
     this.defaultSeriesSettings(config['defaultSeriesSettings']);

@@ -752,8 +752,8 @@ anychart.core.axes.StockDateTime.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.axes.StockDateTime.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.axes.StockDateTime.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.height(config['height']);
   this.labels().setup(config['labels']);
   this.minorLabels().setup(config['minorLabels']);

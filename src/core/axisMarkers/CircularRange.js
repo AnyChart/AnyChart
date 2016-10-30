@@ -777,8 +777,8 @@ anychart.core.axisMarkers.CircularRange.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.axisMarkers.CircularRange.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.axisMarkers.CircularRange.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   this.axisIndex(config['axisIndex']);
   this.from(config['from']);

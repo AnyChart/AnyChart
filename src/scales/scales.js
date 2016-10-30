@@ -5,6 +5,7 @@
 
 goog.provide('anychart.scales');
 
+goog.require('anychart.scales.Calendar');
 goog.require('anychart.scales.DateTime');
 goog.require('anychart.scales.Linear');
 goog.require('anychart.scales.LinearColor');

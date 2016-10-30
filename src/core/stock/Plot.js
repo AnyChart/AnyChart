@@ -1582,6 +1582,15 @@ anychart.core.stock.Plot.prototype.legendItemOut = function(item, event) {
     series.unhover();
   }
 };
+
+
+/**
+ * Returns true, if it is a stock plot. Used in standalone legend.
+ * @return {boolean}
+ */
+anychart.core.stock.Plot.prototype.needsInteractiveLegendUpdate = function() {
+  return true;
+};
 //endregion
 
 
@@ -2134,8 +2143,8 @@ anychart.core.stock.Plot.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.stock.Plot.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.stock.Plot.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   var i, json, scale;
 
   this.defaultSeriesType(config['defaultSeriesType']);

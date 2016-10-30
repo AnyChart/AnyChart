@@ -352,8 +352,8 @@ anychart.scales.LinearColor.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.scales.LinearColor.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.scales.LinearColor.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
   this.colors(config['colors']);

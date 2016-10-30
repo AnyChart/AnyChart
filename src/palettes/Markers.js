@@ -150,8 +150,8 @@ anychart.palettes.Markers.prototype.setupSpecial = function(var_args) {
 /**
  * @inheritDoc
  */
-anychart.palettes.Markers.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.palettes.Markers.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
   this.items(config['items']);
 };
 

@@ -2260,8 +2260,8 @@ anychart.charts.Sparkline.prototype.invalidateSeries_ = function() {
 
 
 /** @inheritDoc */
-anychart.charts.Sparkline.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.charts.Sparkline.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   if ('defaultLabelSettings' in config)
     this.defaultLabelSettings(config['defaultLabelSettings']);

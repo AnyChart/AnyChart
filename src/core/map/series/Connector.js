@@ -784,8 +784,8 @@ anychart.core.map.series.Connector.prototype.serialize = function() {
 /**
  * @inheritDoc
  */
-anychart.core.map.series.Connector.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+anychart.core.map.series.Connector.prototype.setupByJSON = function(config, opt_default) {
+  goog.base(this, 'setupByJSON', config, opt_default);
 
   this.endSize(config['endSize']);
   this.startSize(config['startSize']);
