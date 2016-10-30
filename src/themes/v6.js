@@ -7249,7 +7249,7 @@ goog.provide('anychart.themes.v6');
         },
         'types': {
           'fontSize': 10,
-          'fontColor': fontColorDark
+          'fontColor': '#212121'
         },
         'descriptions': {
           'fontSize': 12,
@@ -7258,7 +7258,7 @@ goog.provide('anychart.themes.v6');
         },
         'tags': {
           'fontSize': 9,
-          'fontColor': fontColorDark,
+          'fontColor': '#212121',
           'background': {
             'enabled': true,
             'fill': '#eee',
