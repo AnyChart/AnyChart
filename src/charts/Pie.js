@@ -3265,10 +3265,11 @@ anychart.charts.Pie.prototype.getPoint = function(index) {
   var iter = this.getIterator();
   var value;
   if (iter.select(index) &&
-      point.exists() &&
-      !this.isMissing_(value = /** @type {number} */(point.get('value')))) {
+      point.exists() && !this.isMissing_(value = /** @type {number} */(point.get('value')))) {
 
-    point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_TOTAL] = value / /** @type {number} */(this.getStat(anychart.enums.Statistics.SUM)) * 100;
+    point.statistics[anychart.enums.Statistics.PERCENT_VALUE] =
+        point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_TOTAL] =
+            value / /** @type {number} */(this.getStat(anychart.enums.Statistics.SUM)) * 100;
   }
 
   return point;
@@ -4737,7 +4738,7 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.calcDomain = function() {
 
     // 3d pie hard fix (but works fine). (y - cy) should not be less than 'b' by equation below.
     if (Math.abs(y - cy) > b) {
-      b += Math.abs(y - cy) - b;
+      b = Math.abs(y - cy);
     }
     // use canonical equation of ellipse for solve X coord
     // https://www.wolframalpha.com/input/?i=solve+x%5E2%2Fa%5E2%2By%5E2%2Fb%5E2%3D1+for+x

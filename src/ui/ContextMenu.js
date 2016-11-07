@@ -3,6 +3,7 @@ goog.provide('anychart.ui.ContextMenu.ActionContext');
 goog.provide('anychart.ui.ContextMenu.Item');
 goog.provide('anychart.ui.ContextMenu.PrepareItemsContext');
 
+goog.require('anychart.enums');
 goog.require('anychart.ui.menu.Item');
 goog.require('anychart.ui.menu.SubMenu');
 goog.require('goog.dom.classlist');
@@ -83,6 +84,13 @@ anychart.ui.ContextMenu = function() {
 
   // Set default empty menu.
   this.setModel([]);
+
+  /**
+   * Wrapper for method .show() for async usage.
+   * @type {!Function}
+   */
+  this.acyncShow = goog.bind(this.show, this);
+
 
   this.listen(goog.ui.Component.EventType.ACTION, function(e) {
     var menuItem = /** @type {anychart.ui.menu.Item} */ (e.target);
@@ -278,7 +286,12 @@ anychart.ui.ContextMenu.prototype.handleContextMenu_ = function(e) {
   if (!goog.isArray(this.items()) || !this.items().length) return;
   goog.isFunction(e['getOriginalEvent']) ? e['getOriginalEvent']().preventDefault() : e.preventDefault();
 
-  this.show(e['clientX'], e['clientY']);
+  if (this.chart_['getType']() == anychart.enums.MapTypes.MAP) {
+    //because Map has async interactivity model
+    setTimeout(this.acyncShow, 0, e['clientX'], e['clientY']);
+  } else {
+    this.show(e['clientX'], e['clientY']);
+  }
 };
 
 

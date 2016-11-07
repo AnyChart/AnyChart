@@ -298,6 +298,12 @@ anychart.scales.DateTimeWithCalendar.prototype.startDate = function(opt_value) {
 };
 
 
+/** @inheritDoc */
+anychart.scales.DateTimeWithCalendar.prototype.getType = function() {
+  return anychart.enums.ScaleTypes.DATE_TIME_WITH_CALENDAR;
+};
+
+
 //endregion
 //region --- Transformation functions
 //------------------------------------------------------------------------------

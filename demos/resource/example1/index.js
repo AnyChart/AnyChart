@@ -228,5 +228,12 @@ anychart.onDocumentReady(function() {
 
   ]);
 
+  // chart.timeLine()
+  //     .stroke('1 red')
+  //     .drawTopLine(true)
+  //     .drawRightLine(true)
+  //     .drawBottomLine(true)
+  //     .drawLeftLine(true);
+
   chart.container('container').draw();
 });

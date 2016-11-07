@@ -1717,7 +1717,18 @@ anychart.core.PyramidFunnelBase.prototype.makePointEvent = function(event) {
 
 /** @inheritDoc */
 anychart.core.PyramidFunnelBase.prototype.getPoint = function(index) {
-  return new anychart.core.Point(this, index);
+  var point = new anychart.core.Point(this, index);
+  var iter = this.getIterator();
+  var value;
+  if (iter.select(index) &&
+      point.exists() && !this.isMissing_(value = /** @type {number} */(point.get('value')))) {
+
+    point.statistics[anychart.enums.Statistics.PERCENT_VALUE] =
+        point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_TOTAL] =
+            value / /** @type {number} */(this.getStat(anychart.enums.Statistics.SUM)) * 100;
+  }
+
+  return point;
 };
 
 

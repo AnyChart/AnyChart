@@ -357,7 +357,7 @@ anychart.core.resource.TimeLine.prototype.padding = function(opt_spaceOrTopOrTop
 
 /**
  * Background getter/setter
- * @param {(string|Object|null|boolean)=} opt_value
+ * @param {Object=} opt_value
  * @return {anychart.core.resource.TimeLineLevelHolidaysSettings|anychart.core.resource.TimeLine}
  */
 anychart.core.resource.TimeLine.prototype.holidays = function(opt_value) {
@@ -1063,6 +1063,8 @@ anychart.core.resource.TimeLine.prototype.draw = function() {
     var drawRight = !!this.getOption(anychart.opt.DRAW_RIGHT_LINE);
     var drawBottom = !!this.getOption(anychart.opt.DRAW_BOTTOM_LINE);
     var drawLeft = !!this.getOption(anychart.opt.DRAW_LEFT_LINE);
+    var pixelShiftFrom = 0;
+    var pixelShiftTo = 0;
 
     for (var row = 0; row < rowCount; row++) {
       var isLastRow = row == lastRow;
@@ -1084,8 +1086,12 @@ anychart.core.resource.TimeLine.prototype.draw = function() {
 
       var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(weekdaysStrokePath.stroke()));
 
-      from = anychart.utils.applyPixelShift(from - (row == 0 ? thickness : 0), thickness);
-      to = anychart.utils.applyPixelShift(from - levelHeight + (row == rowCount - 1 ? thickness : 0), thickness);
+      pixelShiftFrom = !row && drawBottom ? thickness / 2 : row ? Math.ceil(thickness / 2) : 0;
+      from = anychart.utils.applyPixelShift(from - pixelShiftFrom, thickness);
+
+      pixelShiftTo = isLastRow && drawTop ? thickness / 2 : !isLastRow ? Math.floor(thickness / 2) : 0;
+      levelHeight -= (row ? pixelShiftFrom / 2 : pixelShiftFrom) + (isLastRow ? pixelShiftTo : pixelShiftTo / 2);
+      to = anychart.utils.applyPixelShift(from - levelHeight, thickness, true);
 
       this.formatIndex_ = 0;
       for (var col = 0; col < colsCount; col++) {
@@ -1099,10 +1105,10 @@ anychart.core.resource.TimeLine.prototype.draw = function() {
         var left = anychart.utils.applyPixelShift(this.xScale_.dateToPix(tick['start']) + this.pixelBoundsCache_.left, thickness);
         var right = anychart.utils.applyPixelShift(this.xScale_.dateToPix(tick['end']) + this.pixelBoundsCache_.left, thickness);
 
-        var l = (drawLeft && !col) ? Math.ceil(left) : Math.floor(left);
-        var r = (drawRight || !isLastCol) ? Math.floor(right) : Math.ceil(right);
-        var t = (drawTop && !isLastRow) ? Math.ceil(to) : Math.floor(to);
-        var b = (drawBottom || !row) ? Math.floor(from) : Math.ceil(from);
+        var l = Math.floor(left);
+        var r = Math.ceil(right);
+        var t = (drawTop || !isLastRow) ? Math.ceil(to) : Math.floor(to);
+        var b = (drawBottom && !row) ? Math.floor(from) : Math.ceil(from);
 
         if (drawLeft && !col)
           strokePath
@@ -1112,11 +1118,11 @@ anychart.core.resource.TimeLine.prototype.draw = function() {
           strokePath
               .moveTo(right, t)
               .lineTo(right, b);
-        if (drawTop && !lastRow)
+        if (drawTop || !isLastRow)
           strokePath
               .moveTo(l, to)
               .lineTo(r, to);
-        if (drawBottom || !row)
+        if (drawBottom && !row)
           strokePath
               .moveTo(l, from)
               .lineTo(r, from);
@@ -1249,13 +1255,14 @@ anychart.core.resource.TimeLine.prototype.disposeInternal = function() {
 //
 //------------------------------------------------------------------------------
 //exports
-// anychart.core.resource.TimeLine.prototype['fill'] = anychart.core.resource.TimeLine.prototype.fill;
-// anychart.core.resource.TimeLine.prototype['stroke'] = anychart.core.resource.TimeLine.prototype.stroke;
-// anychart.core.resource.TimeLine.prototype['levelHeight'] = anychart.core.resource.TimeLine.prototype.levelHeight;
 anychart.core.resource.TimeLine.prototype['background'] = anychart.core.resource.TimeLine.prototype.background;
 anychart.core.resource.TimeLine.prototype['padding'] = anychart.core.resource.TimeLine.prototype.padding;
 anychart.core.resource.TimeLine.prototype['holidays'] = anychart.core.resource.TimeLine.prototype.holidays;
 anychart.core.resource.TimeLine.prototype['overlay'] = anychart.core.resource.TimeLine.prototype.overlay;
+// descriptors
+// anychart.core.resource.TimeLine.prototype['fill'] = anychart.core.resource.TimeLine.prototype.fill;
+// anychart.core.resource.TimeLine.prototype['stroke'] = anychart.core.resource.TimeLine.prototype.stroke;
+// anychart.core.resource.TimeLine.prototype['levelHeight'] = anychart.core.resource.TimeLine.prototype.levelHeight;
 
 
 //endregion

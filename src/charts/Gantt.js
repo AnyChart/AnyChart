@@ -343,6 +343,18 @@ anychart.charts.Gantt.prototype.data = function(opt_value, opt_fillMethod) {
 
 
 /**
+ * @inheritDoc
+ */
+anychart.charts.Gantt.prototype.defaultRowHeight = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.controller_.defaultRowHeight(opt_value);
+    return this;
+  }
+  return /** @type {number} */ (this.controller_.defaultRowHeight());
+};
+
+
+/**
  * Gets/sets header height.
  * @param {number=} opt_value - Value to be set.
  * @return {(anychart.charts.Gantt|number)} - Current value or itself for method chaining.
@@ -853,21 +865,20 @@ anychart.charts.Gantt.prototype.editStructureHighlight = function(opt_index, opt
  * @param {Object} event - Dispatched event object.
  */
 anychart.charts.Gantt.prototype.rowMouseMove = function(event) {
-  this.highlight(event['hoveredIndex'], event['startY'], event['endY']);
+  var target = event['target'];
+  if (!target.dragging) {
+    this.highlight(event['hoveredIndex'], event['startY'], event['endY']);
 
-  var tooltip;
+    var tooltip;
+    if (target instanceof anychart.core.ui.DataGrid) {
+      tooltip = /** @type {anychart.core.ui.Tooltip} */(this.dg_.tooltip());
+    } else {
+      tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tl_.tooltip());
+    }
 
-  if (event['target'] instanceof anychart.core.ui.DataGrid) {
-    tooltip = /** @type {anychart.core.ui.Tooltip} */(this.dg_.tooltip());
-  } else {
-    tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tl_.tooltip());
+    var formatProvider = this.createFormatProvider(event['item'], event['period'], event['periodIndex']);
+    tooltip.showFloat(event['originalEvent']['clientX'], event['originalEvent']['clientY'], formatProvider);
   }
-  // var position = tooltip.isFloating() ?
-  //     new acgraph.math.Coordinate(event['originalEvent']['clientX'], event['originalEvent']['clientY']) :
-  //     new acgraph.math.Coordinate(0, 0);
-
-  var formatProvider = this.createFormatProvider(event['item'], event['period'], event['periodIndex']);
-  tooltip.showFloat(event['originalEvent']['clientX'], event['originalEvent']['clientY'], formatProvider);
 };
 
 
@@ -1055,6 +1066,7 @@ anychart.charts.Gantt.prototype.serialize = function() {
   json['type'] = this.getType();
 
   json['headerHeight'] = this.headerHeight();
+  json['defaultRowHeight'] = this.defaultRowHeight();
   json['rowHoverFill'] = anychart.color.serialize(this.hoverFill_);
   json['rowSelectedFill'] = anychart.color.serialize(this.rowSelectedFill_);
   json['splitterPosition'] = this.splitterPosition();
@@ -1076,6 +1088,7 @@ anychart.charts.Gantt.prototype.setupByJSON = function(config, opt_default) {
   this.data(/** @type {anychart.data.Tree} */ (this.controller_.data()));
 
   this.headerHeight(config['headerHeight']);
+  this.defaultRowHeight(config['defaultRowHeight']);
   this.rowHoverFill(config['rowHoverFill']);
   this.rowSelectedFill(config['rowSelectedFill']);
   this.splitterPosition(config['splitterPosition']);
@@ -1113,3 +1126,4 @@ anychart.charts.Gantt.prototype['getType'] = anychart.charts.Gantt.prototype.get
 anychart.charts.Gantt.prototype['editing'] = anychart.charts.Gantt.prototype.editing;
 anychart.charts.Gantt.prototype['toCsv'] = anychart.charts.Gantt.prototype.toCsv;
 anychart.charts.Gantt.prototype['xScale'] = anychart.charts.Gantt.prototype.xScale;
+anychart.charts.Gantt.prototype['defaultRowHeight'] = anychart.charts.Gantt.prototype.defaultRowHeight;

@@ -39,6 +39,13 @@ anychart.ui.RangePicker = function() {
   this.fromLabel_ = null;
 
   /**
+   * Label text for fromLabel.
+   * @type {string}
+   * @private
+   */
+  this.fromLabelText_ = 'From:';
+
+  /**
    * Field "from".
    * @type {goog.ui.LabelInput}
    * @private
@@ -50,6 +57,13 @@ anychart.ui.RangePicker = function() {
    * @private
    */
   this.toLabel_ = null;
+
+  /**
+   * Label text for toLabel.
+   * @type {string}
+   * @private
+   */
+  this.toLabelText_ = 'To:';
 
   /**
    * Field "to".
@@ -168,7 +182,7 @@ anychart.ui.RangePicker.prototype.createDomInternal_ = function() {
         goog.ui.INLINE_BLOCK_CLASSNAME,
         goog.getCssName('anychart-input-label')
       ],
-      'From:');
+      window['anychart']['format']['getMessage'](this.fromLabelText_));
   goog.dom.appendChild(element, this.fromLabel_);
 
   this.fromInput_ = new goog.ui.LabelInput(/*'From date'*/);
@@ -186,7 +200,7 @@ anychart.ui.RangePicker.prototype.createDomInternal_ = function() {
         goog.ui.INLINE_BLOCK_CLASSNAME,
         goog.getCssName('anychart-input-label')
       ],
-      'To:');
+      window['anychart']['format']['getMessage'](this.toLabelText_));
   goog.dom.appendChild(element, this.toLabel_);
 
   this.toInput_ = new goog.ui.LabelInput(/*'To date'*/);
@@ -257,6 +271,42 @@ anychart.ui.RangePicker.prototype.decorateInternal = function(element) {
   }
   anychart.ui.RangePicker.base(this, 'decorateInternal', element);
   this.createDomInternal_();
+};
+
+
+/**
+ * Gets/sets text for 'from'-label.
+ * @param {string=} opt_value - Value to set.
+ * @return {string|anychart.ui.RangePicker} - Current value or itself for chaining.
+ */
+anychart.ui.RangePicker.prototype.fromLabelText = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.fromLabelText_ != opt_value) {
+      this.fromLabelText_ = opt_value;
+      if (this.fromLabel_)
+        goog.dom.setTextContent(this.fromLabel_, window['anychart']['format']['getMessage'](this.fromLabelText_));
+    }
+    return this;
+  }
+  return this.fromLabelText_;
+};
+
+
+/**
+ * Gets/sets text for 'to'-label.
+ * @param {string=} opt_value - Value to set.
+ * @return {string|anychart.ui.RangePicker} - Current value or itself for chaining.
+ */
+anychart.ui.RangePicker.prototype.toLabelText = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.toLabelText_ != opt_value) {
+      this.toLabelText_ = opt_value;
+      if (this.toLabel_)
+        goog.dom.setTextContent(this.toLabel_, window['anychart']['format']['getMessage'](this.toLabelText_));
+    }
+    return this;
+  }
+  return this.toLabelText_;
 };
 
 
@@ -421,3 +471,5 @@ anychart.ui.RangePicker.prototype['target'] = anychart.ui.RangePicker.prototype.
 anychart.ui.RangePicker.prototype['format'] = anychart.ui.RangePicker.prototype.format;
 anychart.ui.RangePicker.prototype['dispose'] = anychart.ui.RangePicker.prototype.dispose;
 anychart.ui.RangePicker.prototype['getElement'] = anychart.ui.RangePicker.prototype.getElement;
+anychart.ui.RangePicker.prototype['toLabelText'] = anychart.ui.RangePicker.prototype.toLabelText;
+anychart.ui.RangePicker.prototype['fromLabelText'] = anychart.ui.RangePicker.prototype.fromLabelText;

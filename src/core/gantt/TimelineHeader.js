@@ -299,8 +299,12 @@ anychart.core.gantt.TimelineHeader.prototype.draw = function() {
       this.pixelBoundsCache_ = /** @type {anychart.math.Rect} */ (this.getPixelBounds());
       this.bgRect_.setBounds(/** @type {anychart.math.Rect} */ (this.pixelBoundsCache_));
 
+      var lastVisibleLevel = -1;
       for (i = 0, l = this.levels_.length; i < l; i++) {
-        if (this.levels_[i].enabled()) counter++;
+        if (this.levels_[i].enabled()) {
+          counter++;
+          lastVisibleLevel = i;
+        }
       }
 
       var sepHeight = anychart.utils.extractThickness(this.levelsSeparationStroke_);
@@ -322,7 +326,7 @@ anychart.core.gantt.TimelineHeader.prototype.draw = function() {
       for (i = 0, l = this.levels_.length; i < l; i++) {
         level = this.levels_[i];
         if (level.enabled()) {
-          if (i == counter - 1) { //lowest level
+          if (i == lastVisibleLevel) { //lowest level
             height = this.pixelBoundsCache_.height - actualHeight;
           }
           level.bounds().set(this.pixelBoundsCache_.left, top, this.pixelBoundsCache_.width, height);

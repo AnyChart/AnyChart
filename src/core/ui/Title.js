@@ -614,9 +614,10 @@ anychart.core.ui.Title.prototype.initDom_ = function() {
   if (!this.layer_) {
     isInitial = true;
     this.layer_ = acgraph.layer();
+    this.background().container(this.layer_);
     this.text_ = this.layer_.text();
+    this.text_.zIndex(.1);
     this.text_.attr('aria-hidden', 'true');
-    this.text_.zIndex(1);
     this.registerDisposable(this.layer_);
     this.bindHandlersToGraphics(this.layer_);
   }
@@ -679,8 +680,6 @@ anychart.core.ui.Title.prototype.draw = function() {
     var background = this.background();
     background.suspendSignalsDispatching();
     background.parentBounds(0, 0, this.backgroundWidth_, this.backgroundHeight_);
-    background.container(this.layer_);
-    background.zIndex(0);
     background.draw();
     background.resumeSignalsDispatching(false);
     this.markConsistent(anychart.ConsistencyState.TITLE_BACKGROUND);

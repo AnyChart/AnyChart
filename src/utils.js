@@ -619,14 +619,15 @@ anychart.utils.getIntervalFromInfo = function(unit, count) {
  * Returns closest aligned pixel.
  * @param {number} value
  * @param {number|boolean} thickness
+ * @param {boolean=} opt_invert
  * @return {number}
  */
-anychart.utils.applyPixelShift = function(value, thickness) {
+anychart.utils.applyPixelShift = function(value, thickness, opt_invert) {
   var shift = (thickness & 1) / 2;
   if (value % 1 >= 0.5)
-    return Math.ceil(value) - shift;
+    return Math.ceil(value) - (opt_invert ? -shift : shift);
   else
-    return Math.floor(value) + shift;
+    return Math.floor(value) + (opt_invert ? -shift : shift);
 };
 
 

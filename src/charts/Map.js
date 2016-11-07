@@ -1443,7 +1443,7 @@ anychart.charts.Map.prototype.updateSeriesOnZoomOrMove = function() {
 };
 
 
-//endregion
+//endregion                                                  1
 //region --- Animaions
 //----------------------------------------------------------------------------------------------------------------------
 //

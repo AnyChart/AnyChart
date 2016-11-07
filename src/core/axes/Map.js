@@ -1727,6 +1727,7 @@ anychart.core.axes.Map.prototype.serialize = function() {
   var titleConfig = this.title().serialize();
   if (!goog.object.isEmpty(titleConfig))
     json['title'] = titleConfig;
+
   json['ticks'] = this.ticks().serialize();
   json['minorTicks'] = this.minorTicks().serialize();
 

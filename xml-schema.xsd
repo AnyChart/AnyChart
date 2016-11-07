@@ -337,6 +337,7 @@
         <xsd:attribute name="row_hover_fill" type="xsd:string"/>
         <xsd:attribute name="row_selected_fill" type="xsd:string"/>
         <xsd:attribute name="splitter_position" type="simple.NumberOrPercent"/>
+        <xsd:attribute name="default_row_height" type="xsd:double"/>
     </xsd:complexType>
 
     <xsd:complexType name="Map">
@@ -1464,6 +1465,7 @@
         <xsd:attribute name="hover_fill" type="xsd:string"/>
         <xsd:attribute name="row_selected_fill" type="xsd:string"/>
         <xsd:attribute name="horizontal_offset" type="xsd:double" default="0"/>
+        <xsd:attribute name="default_row_height" type="xsd:double"/>
         <xsd:attribute name="edit_structure_preview_fill" type="xsd:string"/>
         <xsd:attribute name="edit_structure_preview_stroke" type="xsd:string"/>
         <xsd:attribute name="edit_structure_preview_dash_stroke" type="xsd:string"/>
@@ -1542,6 +1544,7 @@
         <xsd:attribute name="header_height" type="xsd:double"/>
         <xsd:attribute name="baseline_above" type="simple.Bool"/>
         <xsd:attribute name="editing" type="simple.Bool"/>
+        <xsd:attribute name="default_row_height" type="xsd:double"/>
         <xsd:attribute name="row_stroke" type="xsd:string"/>
         <xsd:attribute name="column_stroke" type="xsd:string"/>
         <xsd:attribute name="background_fill" type="xsd:string"/>

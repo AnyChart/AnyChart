@@ -721,7 +721,7 @@ def __build_release():
     export_server_project_path = arguments['export_server_path']
 
     # bundle
-    print "Compile AnyChart Bundle"
+    print "\nCompile AnyChart Bundle"
     arguments = dev_options
     __build_project(['anychart_bundle'])
 
@@ -729,7 +729,7 @@ def __build_release():
     __build_project(['anychart_bundle'])
 
     #charts
-    print "Compile AnyChart"
+    print "\nCompile AnyChart"
     arguments = prod_options
     __build_project(['anychart'])
 
@@ -737,7 +737,7 @@ def __build_release():
     __build_project(['anychart'])
 
     # map
-    print "Compile AnyMap"
+    print "\nCompile AnyMap"
     arguments = prod_options
     __build_project(['anymap'])
 
@@ -745,7 +745,7 @@ def __build_release():
     __build_project(['anymap'])
 
     # stock
-    print "Compile AnyStock"
+    print "\nCompile AnyStock"
     arguments = prod_options
     __build_project(['anystock'])
 
@@ -753,7 +753,7 @@ def __build_release():
     __build_project(['anystock'])
 
     # gantt
-    print "Compile AnyGantt"
+    print "\nCompile AnyGantt"
     arguments = prod_options
     __build_project(['anygantt'])
 
@@ -761,7 +761,7 @@ def __build_release():
     __build_project(['anygantt'])
 
     # data adapter
-    print "Compile Data Adapter"
+    print "\nCompile Data Adapter"
     arguments = prod_options
     __build_project(['data_adapter'])
 
@@ -769,15 +769,15 @@ def __build_release():
     __build_project(['data_adapter'])
 
     # ui
-    print "Compile AnyChart UI"
-    __call_console_commands(['./build compile -m anychart_ui -gz'])
-    __call_console_commands(['./build compile -m anychart_ui -gz -d'])
+    print "\nCompile AnyChart UI"
+    __call_console_commands(['python build compile -m anychart_ui -gz'])
+    __call_console_commands(['python build compile -m anychart_ui -gz -d'])
 
-    print "Compile Themes"
+    print "\nCompile Themes"
     __build_themes()
 
     # install packages
-    print "Build install packages"
+    print "\nBuild install packages"
     print "    Download demos from PG"
     if os.path.exists(os.path.join(OUT_PATH, 'gallery_demos')):
         shutil.rmtree(os.path.join(OUT_PATH, 'gallery_demos'))
@@ -820,7 +820,7 @@ def __build_release():
     shutil.rmtree(os.path.join(OUT_PATH, 'gallery_demos'))
 
     # export server
-    print "Build export-server"
+    print "\nBuild export-server"
     if os.path.exists(export_server_project_path):
         # define version
         export_server_version, export_server_bundle_version = __get_export_server_version(export_server_project_path)
@@ -836,7 +836,7 @@ def __build_release():
     else:
         print "Error: Unable to build export server, there is no project at path: %s" % export_server_project_path
 
-    print "Release build complete! Build time: {:.3f} sec".format(time.time() - t)
+    print "\nRelease build complete! Build time: {:.3f} sec".format(time.time() - t)
 
 
 def __build_product_package(output_dir, binary_name, gallery_pass_func=None):

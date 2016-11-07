@@ -1930,6 +1930,7 @@
       "properties": {
         "type": {"enum": ["ganttResource"]},
         "headerHeight": {"type": "number"},
+        "defaultRowHeight": {"type": "number"},
         "rowHoverFill": {"$ref": "#/definitions/fill"},
         "rowSelectedFill": {"$ref": "#/definitions/fill"},
         "splitterPosition": {
@@ -1952,6 +1953,7 @@
       "properties": {
         "type": {"enum": ["ganttProject"]},
         "headerHeight": {"type": "number"},
+        "defaultRowHeight": {"type": "number"},
         "rowHoverFill": {"$ref": "#/definitions/fill"},
         "rowSelectedFill": {"$ref": "#/definitions/fill"},
         "splitterPosition": {
@@ -3741,6 +3743,7 @@
         "editing": {"type": "boolean"},
         "baselineAbove": {"type": "boolean"},
         "headerHeight": {"type": "number"},
+        "defaultRowHeight": {"type": "number"},
         "lineAxesMarkers": {
           "type": "array",
           "items": {
@@ -4758,6 +4761,7 @@
         },
         "isStandalone": {"type": "boolean"},
         "headerHeight": {"type": "number"},
+        "defaultRowHeight": {"type": "number"},
         "horizontalOffset": {"type": "number"},
         "backgroundFill": {"$ref": "#/definitions/fill"},
         "rowOddFill": {"$ref": "#/definitions/fill"},

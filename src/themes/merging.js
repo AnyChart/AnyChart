@@ -524,7 +524,7 @@ anychart.themes.merging.mergingMap_ = [
       'chart.defaultAnnotationSettings.base.labels',
       'chart.defaultSeriesSettings.base.labels',
       'pieFunnelPyramidBase.labels',
-      'ganttBase.timeline.labels',
+      'defaultTimeline.labels',
       'defaultDataGrid.defaultColumnSettings.cellTextSettings',
       'standalones.labelsFactory',
       'heatMap.labels',
@@ -537,9 +537,9 @@ anychart.themes.merging.mergingMap_ = [
       'pert.milestones.labels',
       'pert.tasks.upperLabels',
       'pert.tasks.lowerLabels',
-      'ganttBase.timeline.header.topLevel.labels',
-      'ganttBase.timeline.header.midLevel.labels',
-      'ganttBase.timeline.header.lowLevel.labels',
+      'defaultTimeline.header.topLevel.labels',
+      'defaultTimeline.header.midLevel.labels',
+      'defaultTimeline.header.lowLevel.labels',
       'resource.activities.labels',
       'resource.conflicts.labels'
     ]
@@ -561,7 +561,7 @@ anychart.themes.merging.mergingMap_ = [
       'chart.defaultAnnotationSettings.base.markers',
       'chart.defaultSeriesSettings.base.markers',
       'pieFunnelPyramidBase.markers',
-      'ganttBase.timeline.markers',
+      'defaultTimeline.markers',
       'standalones.markersFactory',
       'heatMap.markers',
       'map.defaultSeriesSettings.base.markers',
@@ -594,7 +594,7 @@ anychart.themes.merging.mergingMap_ = [
       'chart.tooltip',
       'pieFunnelPyramidBase.tooltip',
       'defaultDataGrid.tooltip',
-      'ganttBase.timeline.tooltip',
+      'defaultTimeline.tooltip',
       'pert.milestones.tooltip',
       'pert.tasks.tooltip'
     ]
@@ -662,7 +662,7 @@ anychart.themes.merging.mergingMap_ = [
       'scatter.defaultLineMarkerSettings',
       'sparkline.defaultLineMarkerSettings',
       'standalones.lineAxisMarker',
-      'ganttBase.timeline.defaultLineMarkerSettings'
+      'defaultTimeline.defaultLineMarkerSettings'
     ]
   },
   {
@@ -672,7 +672,7 @@ anychart.themes.merging.mergingMap_ = [
       'scatter.defaultTextMarkerSettings',
       'sparkline.defaultTextMarkerSettings',
       'standalones.textAxisMarker',
-      'ganttBase.timeline.defaultTextMarkerSettings'
+      'defaultTimeline.defaultTextMarkerSettings'
     ]
   },
   {
@@ -682,7 +682,7 @@ anychart.themes.merging.mergingMap_ = [
       'scatter.defaultRangeMarkerSettings',
       'sparkline.defaultRangeMarkerSettings',
       'standalones.rangeAxisMarker',
-      'ganttBase.timeline.defaultRangeMarkerSettings'
+      'defaultTimeline.defaultRangeMarkerSettings'
     ]
   },
   {
@@ -715,7 +715,8 @@ anychart.themes.merging.mergingMap_ = [
     defaultObj: 'defaultColorRange',
     targets: [
       'map.colorRange',
-      'treeMap.colorRange'
+      'treeMap.colorRange',
+      'standalones.colorRange'
     ]
   },
   {
@@ -1120,8 +1121,8 @@ anychart.themes.merging.mergingMap_ = [
       'defaultDataGrid.verticalScrollBar',
       'standalones.timeline.horizontalScrollBar',
       'standalones.timeline.verticalScrollBar',
-      'ganttBase.timeline.horizontalScrollBar',
-      'ganttBase.timeline.verticalScrollBar'
+      'defaultTimeline.horizontalScrollBar',
+      'defaultTimeline.verticalScrollBar'
     ]
   },
   {
@@ -1129,6 +1130,14 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'ganttBase.dataGrid',
       'standalones.dataGrid'
+    ]
+  },
+  {
+    defaultObj: 'defaultTimeline',
+    targets: [
+      'ganttBase.timeline',
+      'standalones.projectTimeline',
+      'standalones.resourceTimeline'
     ]
   },
   {
