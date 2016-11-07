@@ -118,3 +118,12 @@ anychart.core.ui.IInteractiveGrid.prototype.deleteKeyHandler = function(e) {};
  * @return {!anychart.core.utils.GanttContextProvider} - Gantt context provider.
  */
 anychart.core.ui.IInteractiveGrid.prototype.createFormatProvider = function(dataItem, opt_period, opt_periodIndex) {};
+
+
+/**
+ * Gets/sets default row height.
+ * @param {number=} opt_value - Default row height to set.
+ * @return {number|anychart.core.ui.IInteractiveGrid} - Current value or itself for chaining.
+ */
+anychart.core.ui.IInteractiveGrid.prototype.defaultRowHeight = function(opt_value) {};
+

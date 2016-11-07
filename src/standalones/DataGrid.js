@@ -78,3 +78,4 @@ anychart.standalones.DataGrid.prototype['backgroundFill'] = anychart.standalones
 anychart.standalones.DataGrid.prototype['titleHeight'] = anychart.standalones.DataGrid.prototype.titleHeight; //deprecated
 anychart.standalones.DataGrid.prototype['headerHeight'] = anychart.standalones.DataGrid.prototype.headerHeight;
 anychart.standalones.DataGrid.prototype['verticalScrollBar'] = anychart.standalones.DataGrid.prototype.verticalScrollBar;
+anychart.standalones.DataGrid.prototype['defaultRowHeight'] = anychart.standalones.DataGrid.prototype.defaultRowHeight;

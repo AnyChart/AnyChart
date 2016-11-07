@@ -177,18 +177,15 @@ anychart.core.gantt.Controller = function(opt_isResources) {
    */
   this.verticalScrollBar_ = null;
 
+  /**
+   * Default row height.
+   * @type {number}
+   * @private
+   */
+  this.defaultRowHeight_ = 20;
+
 };
 goog.inherits(anychart.core.gantt.Controller, anychart.core.Base);
-
-
-/**
- * Correctly calculates data item pixel height.
- * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} item - Tree data item.
- * @return {number} - Data item height.
- */
-anychart.core.gantt.Controller.getItemHeight = function(item) {
-  return anychart.utils.toNumber(item.get(anychart.enums.GanttDataFields.ROW_HEIGHT)) || anychart.core.gantt.Controller.DEFAULT_ROW_HEIGHT;
-};
 
 
 /**
@@ -217,6 +214,33 @@ anychart.core.gantt.Controller.prototype.SUPPORTED_CONSISTENCY_STATES =
  * @type {number}
  */
 anychart.core.gantt.Controller.DEFAULT_ROW_HEIGHT = 20;
+
+
+/**
+ * Gets/sets default row height.
+ * @param {number=} opt_value - Default row height to set.
+ * @return {anychart.core.gantt.Controller|number} - Current value or itself for chaining.
+ */
+anychart.core.gantt.Controller.prototype.defaultRowHeight = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.defaultRowHeight_ != opt_value) {
+      this.defaultRowHeight_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.CONTROLLER_VISIBILITY, anychart.Signal.NEEDS_REAPPLICATION);
+      return this;
+    }
+  }
+  return this.defaultRowHeight_;
+};
+
+
+/**
+ * Correctly calculates data item pixel height.
+ * @param {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} item - Tree data item.
+ * @return {number} - Data item height.
+ */
+anychart.core.gantt.Controller.prototype.getItemHeight = function(item) {
+  return anychart.utils.toNumber(item.get(anychart.enums.GanttDataFields.ROW_HEIGHT)) || this.defaultRowHeight_;
+};
 
 
 /**
@@ -507,7 +531,7 @@ anychart.core.gantt.Controller.prototype.getVisibleData_ = function() {
   while (this.expandedItemsTraverser_.advance()) {
     item = /** @type {(anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem)} */ (this.expandedItemsTraverser_.current());
     this.visibleItems_.push(item);
-    height += (anychart.core.gantt.Controller.getItemHeight(item) + this.rowStrokeThickness_);
+    height += (this.getItemHeight(item) + this.rowStrokeThickness_);
     this.heightCache_.push(height);
 
     var itemId = item.get(anychart.enums.GanttDataFields.ID);

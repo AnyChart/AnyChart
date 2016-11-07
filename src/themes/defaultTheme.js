@@ -51,7 +51,26 @@ goog.provide('anychart.themes.defaultTheme');
   /**
    * @const {string}
    */
-  var Y_PERCENT_OF_TOTAL_TOKEN = '{%YPercentOfTotal}{decimalsCount:1,zeroFillDecimals:true}';
+  var PERCENT_VALUE_TOKEN = '{%PercentValue}{decimalsCount:1,zeroFillDecimals:true}';
+
+
+  /**
+   * @param {*} val - Value to localize.
+   * @param {(number|string)=} opt_decimalsCountOrLocale
+   * @param {string=} opt_decimalPoint
+   * @param {string=} opt_groupsSeparator
+   * @param {({factors:Array.<number>,suffixes:Array.<string>}|boolean)=} opt_scale
+   * @param {boolean=} opt_zeroFillDecimals
+   * @param {string=} opt_scaleSuffixSeparator
+   * @param {boolean=} opt_useBracketsForNegative
+   * @return {*}
+   */
+  var locNum = function(val, opt_decimalsCountOrLocale, opt_decimalPoint, opt_groupsSeparator,
+                        opt_scale, opt_zeroFillDecimals, opt_scaleSuffixSeparator, opt_useBracketsForNegative) {
+    var val_ = (val === null) || (typeof val == 'boolean') || (val == '') ? NaN : +/** @type {number} */(val);
+    return isNaN(val_) ? val : window['anychart']['format']['number'](val_, opt_decimalsCountOrLocale, opt_decimalPoint, opt_groupsSeparator,
+        opt_scale, opt_zeroFillDecimals, opt_scaleSuffixSeparator, opt_useBracketsForNegative);
+  };
 
 
   /**
@@ -59,7 +78,16 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnValue = function() {
-    return this['value'];
+    return locNum(this['value']);
+  };
+
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
+  var notRoundedValue = function() {
+    return locNum(this['value'], 10);
   };
 
 
@@ -86,7 +114,7 @@ goog.provide('anychart.themes.defaultTheme');
    */
   var returnNameWithValue = function() {
     var name = this['name'] || this['getDataValue']('id');
-    return name + '\n' + parseFloat(this['value']).toFixed(2);
+    return name + '\n' + locNum(this['value']);
   };
 
 
@@ -95,7 +123,7 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnValueWithPrefixPostfix = function() {
-    return this['valuePrefix'] + this['value'] + this['valuePostfix'];
+    return this['valuePrefix'] + locNum(this['value']) + this['valuePostfix'];
   };
 
 
@@ -238,8 +266,8 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnRangeTooltipContentFormatter = function() {
-    return 'High: ' + parseFloat(this['high']).toFixed(2) + '\n' +
-        'Low: ' + parseFloat(this['low']).toFixed(2);
+    return 'High: ' + locNum(this['high']) + '\n' +
+        'Low: ' + locNum(this['low']);
   };
 
 
@@ -248,7 +276,7 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnRangeLabelsContentFormatter = function() {
-    return parseFloat(this['high']).toFixed(2);
+    return locNum(this['high']);
   };
 
 
@@ -257,10 +285,10 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var OHLCTooltipFormatter = function() {
-    return 'Open: ' + parseFloat(this['open']).toFixed(2) + '\n' +
-        'High: ' + parseFloat(this['high']).toFixed(2) + '\n' +
-        'Low: ' + parseFloat(this['low']).toFixed(2) + '\n' +
-        'Close: ' + parseFloat(this['close']).toFixed(2);
+    return 'Open: ' + locNum(this['open']) + '\n' +
+        'High: ' + locNum(this['high']) + '\n' +
+        'Low: ' + locNum(this['low']) + '\n' +
+        'Close: ' + locNum(this['close']);
   };
 
 
@@ -269,7 +297,7 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var StockSimpleTooltipFormatter = function() {
-    var val = parseFloat(this['value']).toFixed(2);
+    var val = locNum(this['value']);
     return this['seriesName'] + ': ' + this['valuePrefix'] + val + this['valuePostfix'];
   };
 
@@ -280,8 +308,8 @@ goog.provide('anychart.themes.defaultTheme');
    */
   var StockRangeTooltipFormatter = function() {
     return this['seriesName'] + ':\n' +
-        '  High: ' + parseFloat(this['high']).toFixed(2) + '\n' +
-        '  Low: ' + parseFloat(this['low']).toFixed(2);
+        '  High: ' + locNum(this['high']) + '\n' +
+        '  Low: ' + locNum(this['low']);
   };
 
 
@@ -291,10 +319,10 @@ goog.provide('anychart.themes.defaultTheme');
    */
   var StockOHLCTooltipFormatter = function() {
     return this['seriesName'] + ':\n' +
-        '  Open: ' + parseFloat(this['open']).toFixed(2) + '\n' +
-        '  High: ' + parseFloat(this['high']).toFixed(2) + '\n' +
-        '  Low: ' + parseFloat(this['low']).toFixed(2) + '\n' +
-        '  Close: ' + parseFloat(this['close']).toFixed(2);
+        '  Open: ' + locNum(this['open']) + '\n' +
+        '  High: ' + locNum(this['high']) + '\n' +
+        '  Low: ' + locNum(this['low']) + '\n' +
+        '  Close: ' + locNum(this['close']);
   };
 
 
@@ -717,14 +745,14 @@ goog.provide('anychart.themes.defaultTheme');
       },
       'labels': {
         'enabled': true,
-        'textFormatter': returnValue,
+        'textFormatter': notRoundedValue,
         'positionFormatter': returnValue,
         'zIndex': 35
       },
       'minorLabels': {
         'enabled': false,
         'fontSize': 9,
-        'textFormatter': returnValue,
+        'textFormatter': notRoundedValue,
         'positionFormatter': returnValue,
         'zIndex': 35
       },
@@ -1094,14 +1122,14 @@ goog.provide('anychart.themes.defaultTheme');
              * @return {*}
              */
             'titleFormatter': function() {
-              return this['x'];
+              return locNum(this['x']);
             },
             /**
              * @this {*}
              * @return {*}
              */
             'textFormatter': function() {
-              return this['seriesName'] + ': ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
+              return this['seriesName'] + ': ' + this['valuePrefix'] + locNum(this['value']) + this['valuePostfix'];
             },
             'zIndex': 0
           },
@@ -1698,9 +1726,9 @@ goog.provide('anychart.themes.defaultTheme');
              * @return {*}
              */
             'textFormatter': function() {
-              return 'Highest: ' + parseFloat(this['highest']).toFixed(2) + '\n' +
-                  'Median: ' + parseFloat(this['median']).toFixed(2) + '\n' +
-                  'Lowest: ' + parseFloat(this['lowest']).toFixed(2);
+              return 'Highest: ' + locNum(this['highest']) + '\n' +
+                  'Median: ' + locNum(this['median']) + '\n' +
+                  'Lowest: ' + locNum(this['lowest']);
             }
           },
           'tooltip': {
@@ -1716,11 +1744,11 @@ goog.provide('anychart.themes.defaultTheme');
              * @return {*}
              */
             'textFormatter': function() {
-              return 'Lowest: ' + this['valuePrefix'] + parseFloat(this['lowest']).toFixed(2) + this['valuePostfix'] + '\n' +
-                  'Q1: ' + this['valuePrefix'] + parseFloat(this['q1']).toFixed(2) + this['valuePostfix'] + '\n' +
-                  'Median: ' + this['valuePrefix'] + parseFloat(this['median']).toFixed(2) + this['valuePostfix'] + '\n' +
-                  'Q3: ' + this['valuePrefix'] + parseFloat(this['q3']).toFixed(2) + this['valuePostfix'] + '\n' +
-                  'Highest: ' + this['valuePrefix'] + parseFloat(this['highest']).toFixed(2) + this['valuePostfix'];
+              return 'Lowest: ' + this['valuePrefix'] + locNum(this['lowest']) + this['valuePostfix'] + '\n' +
+                  'Q1: ' + this['valuePrefix'] + locNum(this['q1']) + this['valuePostfix'] + '\n' +
+                  'Median: ' + this['valuePrefix'] + locNum(this['median']) + this['valuePostfix'] + '\n' +
+                  'Q3: ' + this['valuePrefix'] + locNum(this['q3']) + this['valuePostfix'] + '\n' +
+                  'Highest: ' + this['valuePrefix'] + locNum(this['highest']) + this['valuePostfix'];
             }
           }
         }
@@ -2124,7 +2152,7 @@ goog.provide('anychart.themes.defaultTheme');
          * @return {*}
          */
         'textFormatter': function() {
-          return 'Value: ' + this['value'] + '\nPercent Value: ' + (this['value'] * 100 / this['getStat']('sum')).toFixed(1) + '%';
+          return 'Value: ' + locNum(this['value']) + '\nPercent Value: ' + (this['value'] * 100 / this['getStat']('sum')).toFixed(1) + '%';
         }
       },
       'interactivity': {
@@ -2149,7 +2177,7 @@ goog.provide('anychart.themes.defaultTheme');
       'outsideLabelsSpace': 30,
       'insideLabelsOffset': '50%',
       'labels': {
-        'textFormatter': Y_PERCENT_OF_TOTAL_TOKEN + '%'
+        'textFormatter': PERCENT_VALUE_TOKEN + '%'
       },
       'a11y': {
         'titleFormatter': pieA11yTitleFormatter
@@ -2216,7 +2244,7 @@ goog.provide('anychart.themes.defaultTheme');
              * @return {*}
              */
             'textFormatter': function() {
-              return 'x: ' + this['x'] + '\ny: ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
+              return 'x: ' + this['x'] + '\ny: ' + this['valuePrefix'] + locNum(this['value']) + this['valuePostfix'];
             }
           },
           'xScale': null,
@@ -2241,7 +2269,7 @@ goog.provide('anychart.themes.defaultTheme');
              * @return {*}
              */
             'textFormatter': function() {
-              return 'X: ' + this['x'] + '\nY: ' + this['valuePrefix'] + this['value'] + this['valuePostfix'] + '\nSize: ' + this['size'];
+              return 'X: ' + this['x'] + '\nY: ' + this['valuePrefix'] + locNum(this['value']) + this['valuePostfix'] + '\nSize: ' + locNum(this['size']);
             }
           }
         },
@@ -2679,7 +2707,7 @@ goog.provide('anychart.themes.defaultTheme');
          * @return {*}
          */
         'textFormatter': function() {
-          return 'x: ' + this['x'] + '\ny: ' + this['value'];
+          return 'x: ' + this['x'] + '\ny: ' + locNum(this['value']);
         }
       },
 
@@ -2830,7 +2858,7 @@ goog.provide('anychart.themes.defaultTheme');
              * @return {*}
              */
             'textFormatter': function() {
-              return 'Id: ' + this['id'] + '\nValue: ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
+              return 'Id: ' + this['id'] + '\nValue: ' + this['valuePrefix'] + locNum(this['value']) + this['valuePostfix'];
             }
           },
           'xScale': null,
@@ -2911,7 +2939,7 @@ goog.provide('anychart.themes.defaultTheme');
              * @return {*}
              */
             'textFormatter': function() {
-              return 'Id: ' + this['id'] + '\nValue: ' + this['valuePrefix'] + this['size'] + this['valuePostfix'];
+              return 'Id: ' + this['id'] + '\nValue: ' + this['valuePrefix'] + locNum(this['size']) + this['valuePostfix'];
             }
           }
         },
@@ -2938,7 +2966,7 @@ goog.provide('anychart.themes.defaultTheme');
                 result = 'lat: ' + this['lat'] + '\nlong: ' + this['long'];
               }
               if (this['value'])
-                result += '\nValue: ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
+                result += '\nValue: ' + this['valuePrefix'] + locNum(this['value']) + this['valuePostfix'];
               return result;
             }
           }
@@ -2990,39 +3018,7 @@ goog.provide('anychart.themes.defaultTheme');
         },
         'drawFirstLabel': true,
         'drawLastLabel': true,
-        'stroke': colorStrokeNormal,
-        'top': {
-          'title': {
-            'background': {
-              'enabled': false,
-              'zIndex': 0
-            }
-          }
-        },
-        'bottom': {
-          'title': {
-            'background': {
-              'enabled': false,
-              'zIndex': 0
-            }
-          }
-        },
-        'left': {
-          'title': {
-            'background': {
-              'enabled': false,
-              'zIndex': 0
-            }
-          }
-        },
-        'right': {
-          'title': {
-            'background': {
-              'enabled': false,
-              'zIndex': 0
-            }
-          }
-        }
+        'stroke': colorStrokeNormal
       },
       'gridsSettings': {
         'enabled': false,
@@ -3200,7 +3196,7 @@ goog.provide('anychart.themes.defaultTheme');
          * @return {*}
          */
         'textFormatter': function() {
-          return 'Value: ' + this['value'];
+          return 'Value: ' + locNum(this['value']);
         }
       }
     },
@@ -3219,7 +3215,7 @@ goog.provide('anychart.themes.defaultTheme');
           if (this['high'])
             return returnRangeTooltipContentFormatter.call(this);
           else
-            return 'Value: ' + this['value'];
+            return 'Value: ' + locNum(this['value']);
         }
       },
       'scales': [
@@ -3313,7 +3309,7 @@ goog.provide('anychart.themes.defaultTheme');
         'rangeBar': {
           'label': {
             'textFormatter': function() {
-              return this['high'];
+              return locNum(this['high']);
             }
           }
         },
@@ -3514,7 +3510,7 @@ goog.provide('anychart.themes.defaultTheme');
          * @return {*}
          */
         'textFormatter': function() {
-          return this['heat'];
+          return locNum(this['heat']);
         },
         'positionFormatter': returnValue
       },
@@ -3810,6 +3806,205 @@ goog.provide('anychart.themes.defaultTheme');
       ]
     },
 
+    'defaultTimeline': {
+      'isStandalone': true,
+      'columnStroke': '#cecece',
+      'rowStroke': '#cecece',
+      'backgroundFill': 'none',
+      'rowOddFill': '#fff',
+      'rowEvenFill': '#fff',
+      'rowFill': '#fff',
+
+      'hoverFill': '#F8FAFB',
+      'rowSelectedFill': '#ebf1f4',
+
+      'zIndex': 5,
+      'headerHeight': 70,
+      'editing': false,
+
+      'connectorPreviewStroke': {
+        'color': '#545f69',
+        'dash': '3 3'
+      },
+
+      'editPreviewFill': {
+        'color': '#fff',
+        'opacity': 0.00001
+      },
+
+      'editPreviewStroke': {
+        'color': '#aaa',
+        'dash': '3 3'
+      },
+
+      'editProgressFill': '#EAEAEA',
+      'editProgressStroke': '#545f69',
+      'editIntervalThumbFill': '#EAEAEA',
+      'editIntervalThumbStroke': '#545f69',
+      'editConnectorThumbFill': '#EAEAEA',
+      'editConnectorThumbStroke': '#545f69',
+
+      'editStructurePreviewFill': {
+        'color': '#4285F4',
+        'opacity': 0.2
+      },
+
+      'editStructurePreviewStroke': {
+        'color': '#4285F4',
+        'thickness': 2
+      },
+
+      'editStructurePreviewDashStroke': {
+        'color': '#4285F4',
+        'dash': '4 4'
+      },
+
+      'baseFill': '#7ec1f5',
+      'baseStroke': '#74b2e2',
+      'progressFill': '#1976d2',
+      'progressStroke': {
+        'color': '#fff',
+        'opacity': 0.00001
+      },
+
+      'baselineFill': '#d5ebfc',
+      'baselineStroke': '#bfd1e0',
+      'parentFill': '#455a64',
+      'parentStroke': '#2f3f46',
+      'milestoneFill': '#ffa000',
+      'milestoneStroke': '#d26104',
+      'connectorFill': '#545f69',
+      'connectorStroke': '#545f69',
+      'selectedElementFill': '#ef6c00',
+      'selectedElementStroke': '#bc5704',
+      'selectedConnectorStroke': '2 #bc5704',
+      'minimumGap': 0.1,
+      'maximumGap': 0.1,
+      'baselineAbove': false,
+      'tooltip': {
+        'padding': {'top': 5, 'right': 5, 'bottom': 5, 'left': 5},
+        'title': {
+          'enabled': true,
+          'fontSize': '14px',
+          'fontWeight': 'normal',
+          'fontColor': '#e5e5e5'
+        },
+        'separator': {
+          'enabled': true
+        },
+        'anchor': 'leftTop',
+        'content': {
+          'hAlign': 'left'
+        },
+        'zIndex': 100,
+        'allowLeaveChart': true
+      },
+      'labels': {
+        'enabled': true,
+        'anchor': 'leftCenter',
+        'position': 'rightCenter',
+        'padding': {
+          'top': 3,
+          'right': 5,
+          'bottom': 3,
+          'left': 5
+        },
+        'vAlign': 'middle',
+        'textWrap': 'noWrap',
+        'background': null,
+        'rotation': 0,
+        'width': null,
+        'height': null,
+        'fontSize': 11,
+        'minFontSize': 8,
+        'maxFontSize': 72,
+        'zIndex': 40,
+        'disablePointerEvents': true
+      },
+      'markers': {
+        'anchor': 'centerTop',
+        'zIndex': 50,
+        'type': 'star5',
+        'fill': '#ff0',
+        'stroke': '2 red'
+      },
+      'defaultLineMarkerSettings': {
+        'layout': 'vertical',
+        'zIndex': 1.5
+      },
+      'defaultRangeMarkerSettings': {
+        'layout': 'vertical',
+        'zIndex': 1
+      },
+      'defaultTextMarkerSettings': {
+        'layout': 'vertical',
+        'zIndex': 2,
+        'textWrap': 'byLetter'
+      },
+      'header': {
+        'backgroundFill': '#cecece',
+        'levelsSeparationStroke': '#cecece',
+
+        'topLevel': {
+          'tileFill': '#f7f7f7',
+          'tilesSeparationStroke': '#cecece',
+          'labels': {
+            'enabled': true,
+            'anchor': 'leftTop',
+            'fontSize': 10,
+            'vAlign': 'middle',
+            'padding': {
+              'top': 0,
+              'right': 5,
+              'bottom': 0,
+              'left': 5
+            },
+            'background': null,
+            'disablePointerEvents': true
+          }
+        },
+
+        'midLevel': {
+          'tileFill': '#f7f7f7',
+          'tilesSeparationStroke': '#cecece',
+          'labels': {
+            'enabled': true,
+            'anchor': 'leftTop',
+            'fontSize': 10,
+            'vAlign': 'middle',
+            'padding': {
+              'top': 0,
+              'right': 5,
+              'bottom': 0,
+              'left': 5
+            },
+            'background': null,
+            'disablePointerEvents': true
+          }
+        },
+
+        'lowLevel': {
+          'tileFill': '#f7f7f7',
+          'tilesSeparationStroke': '#cecece',
+          'labels': {
+            'enabled': true,
+            'anchor': 'leftTop',
+            'fontSize': 10,
+            'vAlign': 'middle',
+            'padding': {
+              'top': 0,
+              'right': 5,
+              'bottom': 0,
+              'left': 5
+            },
+            'background': null,
+            'disablePointerEvents': true
+          }
+        }
+
+      }
+    },
+
     // merge with chart
     'ganttBase': {
       'splitterPosition': '30%',
@@ -3848,201 +4043,7 @@ goog.provide('anychart.themes.defaultTheme');
         }
       },
       'timeline': {
-        'columnStroke': '#cecece',
-        'rowStroke': '#cecece',
-        'backgroundFill': 'none',
-        'rowOddFill': '#fff',
-        'rowEvenFill': '#fff',
-        'rowFill': '#fff',
-
-        'hoverFill': '#F8FAFB',
-        'rowSelectedFill': '#ebf1f4',
-
-        'zIndex': 5,
-        'headerHeight': 70,
-        'editing': false,
-
-        'connectorPreviewStroke': {
-          'color': '#545f69',
-          'dash': '3 3'
-        },
-
-        'editPreviewFill': {
-          'color': '#fff',
-          'opacity': 0.00001
-        },
-
-        'editPreviewStroke': {
-          'color': '#aaa',
-          'dash': '3 3'
-        },
-
-        'editProgressFill': '#EAEAEA',
-        'editProgressStroke': '#545f69',
-        'editIntervalThumbFill': '#EAEAEA',
-        'editIntervalThumbStroke': '#545f69',
-        'editConnectorThumbFill': '#EAEAEA',
-        'editConnectorThumbStroke': '#545f69',
-
-        'editStructurePreviewFill': {
-          'color': '#4285F4',
-          'opacity': 0.2
-        },
-
-        'editStructurePreviewStroke': {
-          'color': '#4285F4',
-          'thickness': 2
-        },
-
-        'editStructurePreviewDashStroke': {
-          'color': '#4285F4',
-          'dash': '4 4'
-        },
-
-        'baseFill': '#7ec1f5',
-        'baseStroke': '#74b2e2',
-        'progressFill': '#1976d2',
-        'progressStroke': {
-          'color': '#fff',
-          'opacity': 0.00001
-        },
-
-        'baselineFill': '#d5ebfc',
-        'baselineStroke': '#bfd1e0',
-        'parentFill': '#455a64',
-        'parentStroke': '#2f3f46',
-        'milestoneFill': '#ffa000',
-        'milestoneStroke': '#d26104',
-        'connectorFill': '#545f69',
-        'connectorStroke': '#545f69',
-        'selectedElementFill': '#ef6c00',
-        'selectedElementStroke': '#bc5704',
-        'selectedConnectorStroke': '2 #bc5704',
-        'minimumGap': 0.1,
-        'maximumGap': 0.1,
-        'baselineAbove': false,
-        'tooltip': {
-          'padding': {'top': 5, 'right': 5, 'bottom': 5, 'left': 5},
-          'title': {
-            'enabled': true,
-            'fontSize': '14px',
-            'fontWeight': 'normal',
-            'fontColor': '#e5e5e5'
-          },
-          'separator': {
-            'enabled': true
-          },
-          'anchor': 'leftTop',
-          'content': {
-            'hAlign': 'left'
-          },
-          'zIndex': 100,
-          'allowLeaveChart': true
-        },
-        'labels': {
-          'enabled': true,
-          'anchor': 'leftCenter',
-          'position': 'rightCenter',
-          'padding': {
-            'top': 3,
-            'right': 5,
-            'bottom': 3,
-            'left': 5
-          },
-          'vAlign': 'middle',
-          'textWrap': 'noWrap',
-          'background': null,
-          'rotation': 0,
-          'width': null,
-          'height': null,
-          'fontSize': 11,
-          'minFontSize': 8,
-          'maxFontSize': 72,
-          'zIndex': 40,
-          'disablePointerEvents': true
-        },
-        'markers': {
-          'anchor': 'centerTop',
-          'zIndex': 50,
-          'type': 'star5',
-          'fill': '#ff0',
-          'stroke': '2 red'
-        },
-        'defaultLineMarkerSettings': {
-          'layout': 'vertical',
-          'zIndex': 1.5
-        },
-        'defaultRangeMarkerSettings': {
-          'layout': 'vertical',
-          'zIndex': 1
-        },
-        'defaultTextMarkerSettings': {
-          'layout': 'vertical',
-          'zIndex': 2,
-          'textWrap': 'byLetter'
-        },
-        'header': {
-          'backgroundFill': '#cecece',
-          'levelsSeparationStroke': '#cecece',
-
-          'topLevel': {
-            'tileFill': '#f7f7f7',
-            'tilesSeparationStroke': '#cecece',
-            'labels': {
-              'enabled': true,
-              'anchor': 'leftTop',
-              'fontSize': 10,
-              'vAlign': 'middle',
-              'padding': {
-                'top': 0,
-                'right': 5,
-                'bottom': 0,
-                'left': 5
-              },
-              'background': null,
-              'disablePointerEvents': true
-            }
-          },
-
-          'midLevel': {
-            'tileFill': '#f7f7f7',
-            'tilesSeparationStroke': '#cecece',
-            'labels': {
-              'enabled': true,
-              'anchor': 'leftTop',
-              'fontSize': 10,
-              'vAlign': 'middle',
-              'padding': {
-                'top': 0,
-                'right': 5,
-                'bottom': 0,
-                'left': 5
-              },
-              'background': null,
-              'disablePointerEvents': true
-            }
-          },
-
-          'lowLevel': {
-            'tileFill': '#f7f7f7',
-            'tilesSeparationStroke': '#cecece',
-            'labels': {
-              'enabled': true,
-              'anchor': 'leftTop',
-              'fontSize': 10,
-              'vAlign': 'middle',
-              'padding': {
-                'top': 0,
-                'right': 5,
-                'bottom': 0,
-                'left': 5
-              },
-              'background': null,
-              'disablePointerEvents': true
-            }
-          }
-
-        }
+        'isStandalone': false
       }
     },
 
@@ -4744,7 +4745,7 @@ goog.provide('anychart.themes.defaultTheme');
            * @return {*}
            */
           'textFormatter': function() {
-            return 't: ' + this['duration'];
+            return 't: ' + locNum(this['duration']);
           }
         },
         'hoverLowerLabels': {'fontWeight': 'bold'},
@@ -4764,9 +4765,9 @@ goog.provide('anychart.themes.defaultTheme');
            * @return {*}
            */
           'textFormatter': function() {
-            var result = 'Earliest start: ' + this['earliestStart'] + '\nEarliest finish: ' + this['earliestFinish'] +
-                '\nLatest start: ' + this['latestStart'] + '\nLatest finish: ' + this['latestFinish'] +
-                '\nDuration: ' + this['duration'] + '\nSlack: ' + this['slack'];
+            var result = 'Earliest start: ' + locNum(this['earliestStart']) + '\nEarliest finish: ' + locNum(this['earliestFinish']) +
+                '\nLatest start: ' + locNum(this['latestStart']) + '\nLatest finish: ' + locNum(this['latestFinish']) +
+                '\nDuration: ' + locNum(this['duration']) + '\nSlack: ' + locNum(this['slack']);
             if (!isNaN(this['variance'])) result += '\nStandard deviation: ' + Math.round(this['variance'] * 100) / 100;
             return result;
           }
@@ -5285,6 +5286,61 @@ goog.provide('anychart.themes.defaultTheme');
             'right': 0,
             'bottom': 3,
             'left': 5
+          }
+        }
+      },
+      'colorRange': {
+        'enabled': true,
+        'zIndex': 50
+      },
+      'projectTimeline': {
+        'tooltip': {
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'titleFormatter': function() {
+            return this['name'] || '';
+          },
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'textFormatter': function() {
+            var startDate = this['actualStart'] || this['autoStart'];
+            var endDate = this['actualEnd'] || this['autoEnd'];
+            var progress = this['progressValue'];
+
+            if (progress === void 0) {
+              var auto = this['autoProgress'] * 100;
+              progress = (Math.round(auto * 100) / 100 || 0) + '%';
+            }
+
+            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '') +
+                (progress ? '\nComplete: ' + progress : '');
+
+          }
+        }
+      },
+      'resourceTimeline': {
+        'tooltip': {
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'titleFormatter': function() {
+            return this['name'] || '';
+          },
+          /**
+           * @this {*}
+           * @return {string}
+           */
+          'textFormatter': function() {
+            var startDate = this['periodStart'] || this['minPeriodDate'];
+            var endDate = this['periodEnd'] || this['maxPeriodDate'];
+            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '');
           }
         }
       }

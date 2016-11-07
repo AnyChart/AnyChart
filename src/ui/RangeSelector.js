@@ -41,6 +41,8 @@ anychart.ui.RangeSelector = function() {
    */
   this.zoomLabel_ = null;
 
+  this.zoomLabelText_ = 'Zoom:';
+
   /**
    *
    * @type {Array<anychart.ui.RangeSelector.Range>}
@@ -218,7 +220,7 @@ anychart.ui.RangeSelector.prototype.createDomInternal_ = function() {
         goog.ui.INLINE_BLOCK_CLASSNAME,
         goog.getCssName('anychart-input-label')
       ],
-      'Zoom:');
+      window['anychart']['format']['getMessage'](this.zoomLabelText_));
   goog.dom.appendChild(element, this.zoomLabel_);
 };
 
@@ -272,6 +274,24 @@ anychart.ui.RangeSelector.prototype.update = function() {
 
     this.addChild(button, true);
   }, this);
+};
+
+
+/**
+ * Gets/sets text for 'zoom'-label.
+ * @param {string=} opt_value - Value to set.
+ * @return {string|anychart.ui.RangeSelector} - Current value or itself for chaining.
+ */
+anychart.ui.RangeSelector.prototype.zoomLabelText = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.zoomLabelText_ != opt_value) {
+      this.zoomLabelText_ = opt_value;
+      if (this.zoomLabel_)
+        goog.dom.setTextContent(this.zoomLabel_, window['anychart']['format']['getMessage'](this.zoomLabelText_));
+    }
+    return this;
+  }
+  return this.zoomLabelText_;
 };
 
 
@@ -430,3 +450,4 @@ anychart.ui.RangeSelector.prototype['target'] = anychart.ui.RangeSelector.protot
 anychart.ui.RangeSelector.prototype['ranges'] = anychart.ui.RangeSelector.prototype.ranges;
 anychart.ui.RangeSelector.prototype['dispose'] = anychart.ui.RangeSelector.prototype.dispose;
 anychart.ui.RangeSelector.prototype['getElement'] = anychart.ui.RangeSelector.prototype.getElement;
+anychart.ui.RangeSelector.prototype['zoomLabelText'] = anychart.ui.RangeSelector.prototype.zoomLabelText;

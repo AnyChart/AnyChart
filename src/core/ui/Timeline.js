@@ -1890,7 +1890,7 @@ anychart.core.ui.Timeline.prototype.editPreviewEnd_ = function(e) {
     var dragger = e.target;
     var el = /** @type {anychart.core.ui.Timeline.LiveEditControl} */ (dragger.element);
     var dataItem = el.item;
-    var tree = dataItem.tree();
+    var tree = this.controller.data();//this.controller.data() can be Tree or TreeView.
 
     tree.suspendSignalsDispatching();
 
@@ -2206,7 +2206,7 @@ anychart.core.ui.Timeline.prototype.editThumbDragEnd_ = function(e) {
     var el = dragger.element;
     var dataItem = el.item;
     var periodIndex = el.periodIndex;
-    var tree = dataItem.tree();
+    var tree = this.controller.data();//this.controller.data() can be Tree or TreeView.
 
     tree.suspendSignalsDispatching();
 
@@ -2789,11 +2789,11 @@ anychart.core.ui.Timeline.prototype.selectTimelineRow = function(item, opt_perio
   var periodSelected = false;
 
   if (item && item != this.selectedItem) {
-    item.tree().suspendSignalsDispatching();
+    this.controller.data().suspendSignalsDispatching();//this.controller.data() can be Tree or TreeView.
     item.meta('selected', true);
     if (this.selectedItem) this.selectedItem.meta('selected', false); //selectedItem has the same tree as item.
     this.selectedItem = item;
-    item.tree().resumeSignalsDispatching(false);
+    this.controller.data().resumeSignalsDispatching(false);
     itemSelected = true;
   }
 
@@ -2945,9 +2945,9 @@ anychart.core.ui.Timeline.prototype.drawBar_ = function(bounds, item, type, opt_
       //Label belongs to "actual" bar, not to "baseline" bar.
       isActualBaseline = (isTreeDataItem && item.get(anychart.enums.GanttDataFields.BASELINE_START) && item.get(anychart.enums.GanttDataFields.BASELINE_END));
       if (isTreeDataItem) {
-        item.tree().suspendSignalsDispatching();
+        this.controller.data().suspendSignalsDispatching();//this.controller.data() can be Tree or TreeView.
         item.meta('relBounds', bounds);
-        item.tree().resumeSignalsDispatching(false);
+        this.controller.data().resumeSignalsDispatching(false);
       }
   }
 
@@ -2990,9 +2990,9 @@ anychart.core.ui.Timeline.prototype.drawBar_ = function(bounds, item, type, opt_
     }
     if (rawLabel) label.setup(rawLabel);
     if (isTreeDataItem) {
-      item.tree().suspendSignalsDispatching();
+      this.controller.data().suspendSignalsDispatching();//this.controller.data() can be Tree or TreeView.
       item.meta('labelBounds', this.labels().measure(label, positionProvider, rawLabel));
-      item.tree().resumeSignalsDispatching(false);
+      this.controller.data().resumeSignalsDispatching(false);
     }
   }
 
@@ -3116,7 +3116,7 @@ anychart.core.ui.Timeline.prototype.drawResourceTimeline_ = function() {
     var item = visibleItems[i];
     if (!item) break;
 
-    var itemHeight = anychart.core.gantt.Controller.getItemHeight(item);
+    var itemHeight = this.controller.getItemHeight(item);
     var newTop = /** @type {number} */ (totalTop + itemHeight);
 
     this.drawAsPeriods_(item, totalTop, itemHeight);
@@ -3139,7 +3139,7 @@ anychart.core.ui.Timeline.prototype.drawProjectTimeline_ = function() {
     var item = visibleItems[i];
     if (!item) break;
 
-    var itemHeight = anychart.core.gantt.Controller.getItemHeight(item);
+    var itemHeight = this.controller.getItemHeight(item);
     var newTop = /** @type {number} */ (totalTop + itemHeight);
 
     var baselineStart = item.get(anychart.enums.GanttDataFields.BASELINE_START);
@@ -3402,9 +3402,9 @@ anychart.core.ui.Timeline.prototype.drawAsMilestone_ = function(dataItem, totalT
     var bounds = new anychart.math.Rect(left, top, diagonal, diagonal);
     milestone.currBounds = bounds;
 
-    dataItem.tree().suspendSignalsDispatching();
+    this.controller.data().suspendSignalsDispatching();//this.controller.data() can be Tree or TreeView.
     dataItem.meta('relBounds', bounds);
-    dataItem.tree().resumeSignalsDispatching(false);
+    this.controller.data().resumeSignalsDispatching(false);
 
     var rawLabel = settings ? settings[anychart.enums.GanttDataFields.LABEL] : void 0;
     var textValue;
@@ -3421,9 +3421,9 @@ anychart.core.ui.Timeline.prototype.drawAsMilestone_ = function(dataItem, totalT
       var formatProvider = {'value': textValue};
       var label = this.labels().add(formatProvider, positionProvider);
       if (rawLabel) label.setup(rawLabel);
-      dataItem.tree().suspendSignalsDispatching();
+      this.controller.data().suspendSignalsDispatching();//this.controller.data() can be Tree or TreeView.
       dataItem.meta('labelBounds', this.labels().measure(label));
-      dataItem.tree().resumeSignalsDispatching(false);
+      this.controller.data().resumeSignalsDispatching(false);
     }
 
     var isSelected = dataItem == this.selectedItem;
@@ -3478,7 +3478,7 @@ anychart.core.ui.Timeline.prototype.getItemBounds_ = function(index, opt_period,
   var relativeTop = index ? heightCache[index - 1] : 0;
 
   var actualTop = (relativeTop - relativeHeight) + totalTop;
-  var rowHeight = anychart.core.gantt.Controller.getItemHeight(item);
+  var rowHeight = this.controller.getItemHeight(item);
 
   var actStart = goog.isNumber(item.meta(anychart.enums.GanttDataFields.ACTUAL_START)) ?
       item.meta(anychart.enums.GanttDataFields.ACTUAL_START) :

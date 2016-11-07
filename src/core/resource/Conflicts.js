@@ -615,7 +615,7 @@ anychart.core.resource.Conflicts.prototype.disposeInternal = function() {
 //anychart.core.resource.Conflicts.prototype['stroke'] = anychart.core.resource.Conflicts.prototype.stroke;
 //anychart.core.resource.Conflicts.prototype['fill'] = anychart.core.resource.Conflicts.prototype.fill;
 //anychart.core.resource.Conflicts.prototype['hatchFill'] = anychart.core.resource.Conflicts.prototype.hatchFill;
-//anychart.core.resource.Conflicts.prototype['labels'] = anychart.core.resource.Conflicts.prototype.labels;
+anychart.core.resource.Conflicts.prototype['labels'] = anychart.core.resource.Conflicts.prototype.labels;
 
 
 //endregion

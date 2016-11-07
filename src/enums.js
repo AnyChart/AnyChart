@@ -2809,6 +2809,7 @@ anychart.enums.ScaleTypes = {
   LINEAR: 'linear',
   LOG: 'log',
   DATE_TIME: 'dateTime',
+  DATE_TIME_WITH_CALENDAR: 'dateTimeWithCalendar',
   ORDINAL: 'ordinal',
   ORDINAL_COLOR: 'ordinalColor',
   LINEAR_COLOR: 'linearColor'
@@ -4386,6 +4387,10 @@ anychart.enums.StringToken = {
    The y value of this point.
    */
   VALUE: '%Value',
+  /**
+   The percent y value of this point.
+   */
+  PERCENT_VALUE: '%PercentValue',
   ///**
   // The average x value of all points in series.
   // */
@@ -4973,6 +4978,10 @@ anychart.enums.Statistics = {
    The y value of this point.
    */
   VALUE: 'value',
+  /**
+   The percent y value of this point.
+   */
+  PERCENT_VALUE: 'percentValue',
   ///**
   // The average x value of all points in series.
   // */
@@ -6077,6 +6086,7 @@ goog.exportSymbol('anychart.enums.StringToken.SERIES_Y_RANGE_MIN', anychart.enum
 goog.exportSymbol('anychart.enums.StringToken.SERIES_Y_RANGE_SUM', anychart.enums.StringToken.SERIES_Y_RANGE_SUM);
 goog.exportSymbol('anychart.enums.StringToken.SERIES_Y_SUM', anychart.enums.StringToken.SERIES_Y_SUM);
 goog.exportSymbol('anychart.enums.StringToken.VALUE', anychart.enums.StringToken.VALUE);
+goog.exportSymbol('anychart.enums.StringToken.PERCENT_VALUE', anychart.enums.StringToken.PERCENT_VALUE);
 //goog.exportSymbol('anychart.enums.StringToken.X_AXIS_AVERAGE', anychart.enums.StringToken.X_AXIS_AVERAGE);
 //goog.exportSymbol('anychart.enums.StringToken.X_AXIS_BUBBLE_SIZE_MAX', anychart.enums.StringToken.X_AXIS_BUBBLE_SIZE_MAX);
 //goog.exportSymbol('anychart.enums.StringToken.X_AXIS_BUBBLE_SIZE_MIN', anychart.enums.StringToken.X_AXIS_BUBBLE_SIZE_MIN);
@@ -6223,6 +6233,7 @@ goog.exportSymbol('anychart.enums.Statistics.SERIES_Y_RANGE_SUM', anychart.enums
 goog.exportSymbol('anychart.enums.Statistics.SERIES_Y_SUM', anychart.enums.Statistics.SERIES_Y_SUM);
 goog.exportSymbol('anychart.enums.Statistics.SUM', anychart.enums.Statistics.SUM);
 goog.exportSymbol('anychart.enums.Statistics.VALUE', anychart.enums.Statistics.VALUE);
+goog.exportSymbol('anychart.enums.Statistics.PERCENT_VALUE', anychart.enums.Statistics.PERCENT_VALUE);
 //goog.exportSymbol('anychart.enums.Statistics.X_AXIS_AVERAGE', anychart.enums.Statistics.X_AXIS_AVERAGE);
 //goog.exportSymbol('anychart.enums.Statistics.X_AXIS_BUBBLE_SIZE_MAX', anychart.enums.Statistics.X_AXIS_BUBBLE_SIZE_MAX);
 //goog.exportSymbol('anychart.enums.Statistics.X_AXIS_BUBBLE_SIZE_MIN', anychart.enums.Statistics.X_AXIS_BUBBLE_SIZE_MIN);

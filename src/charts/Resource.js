@@ -20,6 +20,7 @@ goog.require('goog.fx.Dragger');
 goog.require('goog.userAgent');
 
 
+
 /**
  * Resource chart class.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Resource Chart data.
@@ -1356,7 +1357,7 @@ anychart.charts.Resource.prototype.drawContent = function(bounds) {
   this.initMouseWheel_();
 
   if (this.hasInvalidationState(
-          anychart.ConsistencyState.BOUNDS |
+      anychart.ConsistencyState.BOUNDS |
           anychart.ConsistencyState.RESOURCE_X_SCALE_POSITION |
           anychart.ConsistencyState.RESOURCE_X_SCALE_RANGE)) {
     this.resourcesClip_.shape(bounds);
@@ -1644,6 +1645,7 @@ anychart.charts.Resource.prototype.disposeInternal = function() {
 
   goog.base(this, 'disposeInternal');
 };
+
 
 
 //endregion

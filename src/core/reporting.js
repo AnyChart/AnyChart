@@ -213,7 +213,8 @@ anychart.core.reporting.getWarningDescription_ = function(code, opt_arguments) {
       return 'No chart is assigned for toolbar. Please set a target chart using toolbar.target() method.';
 
     case anychart.enums.WarningCode.DEPRECATED:
-      return 'Method ' + opt_arguments[0] + ' is deprecated. Use ' + opt_arguments[1] + ' instead.';
+      return 'Method ' + opt_arguments[0] + ' is deprecated. Use ' + opt_arguments[1] + ' instead' +
+          (opt_arguments[2] ? (opt_arguments[2] + '.') : '.');
 
     case anychart.enums.WarningCode.DATA_ITEM_SET_PATH:
       return 'Incorrect arguments passed to treeDataItem.set() method. You try to set a value by path in complex structure, ' +

@@ -1584,7 +1584,7 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
         var item = data[i];
         if (!item) break;
 
-        var height = anychart.core.gantt.Controller.getItemHeight(item);
+        var height = this.dataGrid_.controller.getItemHeight(item);
         var depth = item.meta('depth') || 0;
         var padding = paddingLeft + this.depthPaddingMultiplier_ * /** @type {number} */ (depth);
         var addButton = 0;

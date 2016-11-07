@@ -528,23 +528,33 @@ anychart.core.series.Stock.prototype.getLegendIconType = function(type, context)
 };
 
 
+/**
+ * Formats number.
+ * @param {*} val - Value to format.
+ * @return {*} - Result.
+ */
+anychart.core.series.Stock.prototype.localizeNumber = function(val) {
+  return (typeof val == 'number') ? anychart.format.number(val) : val;
+};
+
+
 /** @inheritDoc */
 anychart.core.series.Stock.prototype.getLegendItemText = function(context) {
   var missing;
   var result;
   if (this.check(anychart.core.drawers.Capabilities.IS_OHLC_BASED)) {
     missing = isNaN(context['high']) || isNaN(context['low']) || isNaN(context['open']) || isNaN(context['close']);
-    result = ': (O: ' + Number(context['open']).toFixed(2) +
-        '; H: ' + Number(context['high']).toFixed(2) +
-        '; L: ' + Number(context['low']).toFixed(2) +
-        '; C: ' + Number(context['close']).toFixed(2) + ')';
+    result = ': (O: ' + this.localizeNumber(context['open']) +
+        '; H: ' + this.localizeNumber(context['high']) +
+        '; L: ' + this.localizeNumber(context['low']) +
+        '; C: ' + this.localizeNumber(context['close']) + ')';
   } else if (this.check(anychart.core.drawers.Capabilities.IS_RANGE_BASED)) {
     missing = isNaN(context['high']) || isNaN(context['low']);
-    result = ': (H: ' + Number(context['high']).toFixed(2) +
-        '; L: ' + Number(context['low']).toFixed(2) + ')';
+    result = ': (H: ' + this.localizeNumber(context['high']) +
+        '; L: ' + this.localizeNumber(context['low']) + ')';
   } else {
     missing = isNaN(context['value']);
-    result = ': ' + Number(context['value']).toFixed(2);
+    result = ': ' + this.localizeNumber(context['value']);
   }
   return this.name() + (missing ? '' : result);
 };

@@ -33,7 +33,7 @@ anychart.core.makeStandalone(anychart.standalones.ResourceTimeline, anychart.cor
  */
 anychart.standalones.projectTimeline = function() {
   var timeline = new anychart.standalones.ProjectTimeline();
-  timeline.setup(anychart.getFullTheme()['standalones']['timeline']);
+  timeline.setup(anychart.getFullTheme()['standalones']['projectTimeline']);
   return timeline;
 };
 
@@ -44,7 +44,7 @@ anychart.standalones.projectTimeline = function() {
  */
 anychart.standalones.resourceTimeline = function() {
   var timeline = new anychart.standalones.ResourceTimeline();
-  timeline.setup(anychart.getFullTheme()['standalones']['timeline']);
+  timeline.setup(anychart.getFullTheme()['standalones']['resourceTimeline']);
   return timeline;
 };
 
@@ -77,15 +77,19 @@ goog.exportSymbol('anychart.ui.resourceTimeline', anychart.ui.resourceTimeline);
 goog.exportSymbol('anychart.standalones.projectTimeline', anychart.standalones.projectTimeline);
 goog.exportSymbol('anychart.standalones.resourceTimeline', anychart.standalones.resourceTimeline);
 anychart.standalones.ResourceTimeline.prototype['draw'] = anychart.standalones.ResourceTimeline.prototype.draw;
+anychart.standalones.ResourceTimeline.prototype['data'] = anychart.standalones.ResourceTimeline.prototype.data;
 anychart.standalones.ResourceTimeline.prototype['parentBounds'] = anychart.standalones.ResourceTimeline.prototype.parentBounds;
 anychart.standalones.ResourceTimeline.prototype['container'] = anychart.standalones.ResourceTimeline.prototype.container;
 anychart.standalones.ResourceTimeline.prototype['rowStroke'] = anychart.standalones.ResourceTimeline.prototype.rowStroke;
 anychart.standalones.ResourceTimeline.prototype['backgroundFill'] = anychart.standalones.ResourceTimeline.prototype.backgroundFill;
 anychart.standalones.ResourceTimeline.prototype['headerHeight'] = anychart.standalones.ResourceTimeline.prototype.headerHeight;
+anychart.standalones.ResourceTimeline.prototype['defaultRowHeight'] = anychart.standalones.ResourceTimeline.prototype.defaultRowHeight;
 
 anychart.standalones.ProjectTimeline.prototype['draw'] = anychart.standalones.ProjectTimeline.prototype.draw;
+anychart.standalones.ProjectTimeline.prototype['data'] = anychart.standalones.ProjectTimeline.prototype.data;
 anychart.standalones.ProjectTimeline.prototype['parentBounds'] = anychart.standalones.ProjectTimeline.prototype.parentBounds;
 anychart.standalones.ProjectTimeline.prototype['container'] = anychart.standalones.ProjectTimeline.prototype.container;
 anychart.standalones.ProjectTimeline.prototype['rowStroke'] = anychart.standalones.ProjectTimeline.prototype.rowStroke;
 anychart.standalones.ProjectTimeline.prototype['backgroundFill'] = anychart.standalones.ProjectTimeline.prototype.backgroundFill;
 anychart.standalones.ProjectTimeline.prototype['headerHeight'] = anychart.standalones.ProjectTimeline.prototype.headerHeight;
+anychart.standalones.ProjectTimeline.prototype['defaultRowHeight'] = anychart.standalones.ProjectTimeline.prototype.defaultRowHeight;

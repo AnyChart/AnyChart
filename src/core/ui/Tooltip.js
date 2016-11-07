@@ -1166,7 +1166,8 @@ anychart.core.ui.Tooltip.prototype.contentInternal = function(opt_value) {
  * @return {!(anychart.core.ui.Label|anychart.core.ui.Tooltip)} .
  */
 anychart.core.ui.Tooltip.prototype.content = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.content()', 'method directly'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.content()', 'the following behaviour',
+    ': the method called through the .content()-method should be applied to the .tooltip()-method directly'], true);
   return this.contentInternal(opt_value);
 };
 

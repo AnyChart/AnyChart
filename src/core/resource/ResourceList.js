@@ -1124,6 +1124,15 @@ anychart.core.resource.ResourceList.prototype.disposeInternal = function() {
 //endregion
 //region --- Exports
 //exports
+anychart.core.resource.ResourceList.prototype['target'] = anychart.core.resource.ResourceList.prototype.target;
+anychart.core.resource.ResourceList.prototype['background'] = anychart.core.resource.ResourceList.prototype.background;
+anychart.core.resource.ResourceList.prototype['images'] = anychart.core.resource.ResourceList.prototype.images;
+anychart.core.resource.ResourceList.prototype['names'] = anychart.core.resource.ResourceList.prototype.names;
+anychart.core.resource.ResourceList.prototype['types'] = anychart.core.resource.ResourceList.prototype.types;
+anychart.core.resource.ResourceList.prototype['descriptions'] = anychart.core.resource.ResourceList.prototype.descriptions;
+anychart.core.resource.ResourceList.prototype['tags'] = anychart.core.resource.ResourceList.prototype.tags;
+anychart.core.resource.ResourceList.prototype['overlay'] = anychart.core.resource.ResourceList.prototype.overlay;
+// descriptors
 // anychart.core.resource.ResourceList.prototype['stroke'] = anychart.core.resource.ResourceList.prototype.stroke;
 // anychart.core.resource.ResourceList.prototype['evenFill'] = anychart.core.resource.ResourceList.prototype.evenFill;
 // anychart.core.resource.ResourceList.prototype['oddFill'] = anychart.core.resource.ResourceList.prototype.oddFill;
@@ -1131,14 +1140,4 @@ anychart.core.resource.ResourceList.prototype.disposeInternal = function() {
 // anychart.core.resource.ResourceList.prototype['drawRightLine'] = anychart.core.resource.ResourceList.prototype.drawRightLine;
 // anychart.core.resource.ResourceList.prototype['drawBottomLine'] = anychart.core.resource.ResourceList.prototype.drawBottomLine;
 // anychart.core.resource.ResourceList.prototype['drawLeftLine'] = anychart.core.resource.ResourceList.prototype.drawLeftLine;
-// anychart.core.resource.ResourceList.prototype['data'] = anychart.core.resource.ResourceList.prototype.data;
-anychart.core.resource.ResourceList.prototype['target'] = anychart.core.resource.ResourceList.prototype.target;
-anychart.core.resource.ResourceList.prototype['background'] = anychart.core.resource.ResourceList.prototype.background;
-// anychart.core.resource.ResourceList.prototype['items'] = anychart.core.resource.ResourceList.prototype.items;
-anychart.core.resource.ResourceList.prototype['images'] = anychart.core.resource.ResourceList.prototype.images;
-anychart.core.resource.ResourceList.prototype['names'] = anychart.core.resource.ResourceList.prototype.names;
-anychart.core.resource.ResourceList.prototype['types'] = anychart.core.resource.ResourceList.prototype.types;
-anychart.core.resource.ResourceList.prototype['descriptions'] = anychart.core.resource.ResourceList.prototype.descriptions;
-anychart.core.resource.ResourceList.prototype['tags'] = anychart.core.resource.ResourceList.prototype.tags;
-anychart.core.resource.ResourceList.prototype['overlay'] = anychart.core.resource.ResourceList.prototype.overlay;
 //endregion

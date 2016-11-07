@@ -463,7 +463,7 @@ anychart.core.ui.ColorRange.prototype.drawLine = function() {
   }
 
   var stroke = this.stroke();
-  var lineThickness = anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(this.stroke()['thickness']) : 1;
+  var lineThickness = !stroke || anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(this.stroke()['thickness']) : 1;
   var pixelShift = lineThickness % 2 == 0 ? 0 : 0.5;
   var bounds = this.getPixelBounds();
   var markerSize = this.getMarkerSpace_();
@@ -666,7 +666,8 @@ anychart.core.ui.ColorRange.prototype.calcSize = function(maxLabelSize, maxMinor
     }
   }
 
-  var lineThickness = anychart.utils.isNone(this.stroke()) ? 0 : this.stroke()['thickness'] ? parseFloat(this.stroke()['thickness']) : 1;
+  var stroke = this.stroke();
+  var lineThickness = !stroke || anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
   var colorLineSizePx = Math.round(this.colorLineSize_) + lineThickness;
 
   return outsideSize + insideSize + colorLineSizePx;

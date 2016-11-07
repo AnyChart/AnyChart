@@ -6922,7 +6922,7 @@ goog.provide('anychart.themes.v6');
           'fontSize': 12,
           'fontOpacity': 1,
           'textWrap': 'noWrap',
-          'contColor': '#333',
+          'fontColor': '#333',
           'padding': {
             'top': 1,
             'right': 0,
@@ -6948,7 +6948,7 @@ goog.provide('anychart.themes.v6');
           'fontSize': 12,
           'fontOpacity': 1,
           'textWrap': 'noWrap',
-          'contColor': '#333',
+          'fontColor': '#333',
           'padding': {
             'top': 1,
             'right': 0,
@@ -7082,7 +7082,7 @@ goog.provide('anychart.themes.v6');
             'fontSize': 12,
             'fontOpacity': 1,
             'textWrap': 'noWrap',
-            'contColor': '#333',
+            'fontColor': '#333',
             'padding': {
               'top': 1,
               'right': 0,
@@ -7108,7 +7108,7 @@ goog.provide('anychart.themes.v6');
             'fontSize': 12,
             'fontOpacity': 1,
             'textWrap': 'noWrap',
-            'contColor': '#333',
+            'fontColor': '#333',
             'padding': {
               'top': 1,
               'right': 0,
@@ -7249,7 +7249,7 @@ goog.provide('anychart.themes.v6');
         },
         'types': {
           'fontSize': 10,
-          'fontColor': fontColorDark
+          'fontColor': '#333'
         },
         'descriptions': {
           'fontSize': 12,
@@ -7258,7 +7258,7 @@ goog.provide('anychart.themes.v6');
         },
         'tags': {
           'fontSize': 9,
-          'fontColor': fontColorDark,
+          'fontColor': '#333',
           'background': {
             'enabled': true,
             'fill': '#eee',

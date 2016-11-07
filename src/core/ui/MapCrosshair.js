@@ -2,6 +2,7 @@
 goog.provide('anychart.core.ui.MapCrosshair');
 goog.require('anychart.core.ui.Crosshair');
 goog.require('anychart.core.ui.CrosshairLabel');
+goog.require('anychart.core.utils.MapAxisLabelsContextProvider');
 //endregion
 
 
@@ -344,44 +345,6 @@ anychart.core.ui.MapCrosshair.prototype.getLabelRotation_ = function(axis, tickA
 
 /** @inheritDoc */
 anychart.core.ui.MapCrosshair.prototype.getLabelsFormatProvider = function(axis, value) {
-  if (!axis) return null;
-
-  var scale = axis.scale();
-
-  var labelText, sideOfTheWorld;
-  value = +parseFloat(value);
-
-  var value_ = Math.abs(value);
-
-  var grad, minutes, seconds;
-  var decimal = value_ % 1;
-
-  grad = Math.floor(value_);
-  minutes = Math.floor(60 * decimal);
-  seconds = Math.floor(60 * ((60 * decimal) % 1));
-
-  labelText = grad + '\u00B0 ';
-  minutes += '';
-  if (minutes.length == 1) minutes = '0' + minutes;
-  labelText += minutes + '\' ';
-  seconds += '';
-  if (seconds.length == 1) seconds = '0' + seconds;
-  labelText += seconds + '\'\' ';
-
-  if (axis.isHorizontal()) {
-    sideOfTheWorld = value > 0 ? 'E' : 'W';
-  } else {
-    sideOfTheWorld = value > 0 ? 'S' : 'N';
-  }
-
-  labelText += sideOfTheWorld;
-
-  return {
-    'value': labelText,
-    'rawValue': value,
-    // 'max': scale.max ? scale.max : null,
-    // 'min': scale.min ? scale.min : null,
-    'scale': scale
-  };
+  return new anychart.core.utils.MapAxisLabelsContextProvider(/** @type {anychart.core.axes.Map} */(axis), NaN, value);
 };
 //endregion
