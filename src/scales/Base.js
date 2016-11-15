@@ -188,7 +188,7 @@ anychart.scales.Base.prototype.startAutoCalc = function() {
  */
 anychart.scales.Base.prototype.finishAutoCalc = function(opt_silently) {
   this.autoCalcs_ = Math.max(this.autoCalcs_ - 1, 0);
-  if (this.autoCalcs_ == 0) {
+  if (!this.autoCalcs_) {
     return this.checkScaleChanged(!!opt_silently);
   } else
     return true; // todo: additional stuff when calculating shared scales!

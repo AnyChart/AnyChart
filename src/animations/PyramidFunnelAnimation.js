@@ -29,13 +29,13 @@ anychart.animations.PyramidFunnelAnimation.prototype.update = function() {
   var iterator = this.chart.getDetachedIterator();
   while (iterator.advance()) {
     if (!iterator.meta(anychart.opt.MISSING)) {
-      var x1 = iterator.meta('x1');
-      var x2 = iterator.meta('x2');
-      var x3 = iterator.meta('x3');
-      var x4 = iterator.meta('x4');
-      var y1 = iterator.meta('y1');
-      var y2 = iterator.meta('y2');
-      var y3 = iterator.meta('y3');
+      var x1 = /** @type {number} */(iterator.meta('x1'));
+      var x2 = /** @type {number} */(iterator.meta('x2'));
+      var x3 = /** @type {number} */(iterator.meta('x3'));
+      var x4 = /** @type {number} */(iterator.meta('x4'));
+      var y1 = /** @type {number} */(iterator.meta('y1'));
+      var y2 = /** @type {number} */(iterator.meta('y2'));
+      var y3 = /** @type {number} */(iterator.meta('y3'));
       iterator.meta('neck', !!y3);
       this.startPoint.push(x1, x2, x3, x4, 0, 0, 0);
       this.endPoint.push(x1, x2, x3, x4, y1, y2, y3 ? y3 : 0);

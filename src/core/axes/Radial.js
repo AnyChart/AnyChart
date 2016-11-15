@@ -588,7 +588,7 @@ anychart.core.axes.Radial.prototype.getOverlappedLabels_ = function(opt_bounds) 
               else
                 bounds3 = null;
 
-              if (i == 0) {
+              if (!i) {
                 if (this.drawFirstLabel()) {
                   prevDrawableLabel = i;
                   labels.push(true);
@@ -721,7 +721,7 @@ anychart.core.axes.Radial.prototype.getLabelPositionOffsetForAngle_ = function(a
   var scale = this.scale();
   var offset = {x: 0, y: 0};
   if (scale instanceof anychart.scales.ScatterBase) {
-    if (angle == 0) {
+    if (!angle) {
       offset.x -= width / 2;
     } else if (angle > 0 && angle < 90) {
       offset.x -= width / 2;
@@ -743,7 +743,7 @@ anychart.core.axes.Radial.prototype.getLabelPositionOffsetForAngle_ = function(a
       offset.x -= width / 2;
     }
   } else if (scale instanceof anychart.scales.Ordinal) {
-    if (angle == 0) {
+    if (!angle) {
       offset.x -= width / 2;
     } else if (angle > 0 && angle < 45) {
       offset.x -= width / 2;
@@ -850,7 +850,7 @@ anychart.core.axes.Radial.prototype.drawLine_ = function() {
   var yPixelShift = 0;
 
   var lineThickness = this.stroke()['thickness'] ? parseFloat(this.stroke()['thickness']) : 1;
-  if (angle == 0) {
+  if (!angle) {
     yPixelShift = lineThickness % 2 == 0 ? 0 : -.5;
   } else if (angle == 90) {
     xPixelShift = lineThickness % 2 == 0 ? 0 : -.5;
@@ -896,7 +896,7 @@ anychart.core.axes.Radial.prototype.drawTick_ = function(ratio, isMajor) {
   var xPixelShift = 0;
   var yPixelShift = 0;
 
-  if (angle == 0) {
+  if (!angle) {
     xPixelShift = ticksThickness % 2 == 0 ? 0 : -.5;
   } else if (angle == 90) {
     yPixelShift = ticksThickness % 2 == 0 ? 0 : -.5;
@@ -906,7 +906,7 @@ anychart.core.axes.Radial.prototype.drawTick_ = function(ratio, isMajor) {
     yPixelShift = ticksThickness % 2 == 0 ? 0 : .5;
   }
 
-  if (ratio == 0) {
+  if (!ratio) {
     xPixelShift *= -1;
     yPixelShift *= -1;
   }

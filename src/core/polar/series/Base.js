@@ -232,13 +232,13 @@ anychart.core.polar.series.Base.prototype.approximateCurve = function(startPoint
   var rounded2Pi = anychart.math.round(Math.PI * 2, 4);
   var roundedARZ = anychart.math.round(AaRZ, 4);
 
-  if (roundedARZ == rounded2Pi || roundedARZ == 0)
+  if (roundedARZ == rounded2Pi || !roundedARZ)
     AaRZ = 0;
 
   //Angle of point D relative zero angle.
   var DaRZ = goog.math.modulo(Da - zeroAngle, Math.PI * 2);
   var roundedDRZ = anychart.math.round(DaRZ, 4);
-  if (roundedDRZ == rounded2Pi || roundedDRZ == 0)
+  if (roundedDRZ == rounded2Pi || !roundedDRZ)
     DaRZ = 0;
 
   var isAcrossZeroLine = xScale.inverted() ? AaRZ < DaRZ && AaRZ > 0 : AaRZ > DaRZ && DaRZ > 0;
@@ -253,7 +253,7 @@ anychart.core.polar.series.Base.prototype.approximateCurve = function(startPoint
   }
 
   sweep = isNaN(sweep) ? sweep : anychart.math.round(sweep, 4);
-  if (sweep == 0) return null;
+  if (!sweep && !isNaN(sweep)) return null;
 
   var a90 = Math.PI / 2;
   a90 = anychart.math.round(a90, 4);
@@ -290,7 +290,7 @@ anychart.core.polar.series.Base.prototype.approximateCurve = function(startPoint
       angleStep = (i == parts - 1 && secondSweep % a90 != 0) ? secondSweep % a90 : a90;
       angle = xScale.inverted() ? -angleStep : angleStep;
       angles.push(angle);
-      segments.push(i == 0);
+      segments.push(!i);
     }
   } else if (isSegmentOverA90) {
     angles = [];

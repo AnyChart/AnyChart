@@ -643,7 +643,7 @@ anychart.core.grids.Polar.prototype.draw = function() {
 
         xPixelShift = 0;
         yPixelShift = 0;
-        if (angle == 0) {
+        if (!angle) {
           yPixelShift = lineThickness % 2 == 0 ? 0 : -.5;
         } else if (angle == 90) {
           xPixelShift = lineThickness % 2 == 0 ? 0 : -.5;
@@ -658,7 +658,7 @@ anychart.core.grids.Polar.prototype.draw = function() {
         layer = i % 2 == 0 ? this.evenFillElement_ : this.oddFillElement_;
 
         drawInterlace.call(this, angle, sweep, x, y, prevX, prevY, layer);
-        if (i == 0) {
+        if (!i) {
           if (this.drawLastLine_) drawLine.call(this, x, y, xPixelShift, yPixelShift);
         } else
           drawLine.call(this, x, y, xPixelShift, yPixelShift);

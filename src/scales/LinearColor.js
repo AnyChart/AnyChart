@@ -102,7 +102,7 @@ anychart.scales.LinearColor.prototype.normalizeColors_ = function(var_args) {
   for (var i = 0, len = keys.length; i < len; i++) {
     var key = keys[i];
     if (!goog.isDef(key['offset']))
-      key['offset'] = i == 0 ? 0 : i == len - 1 ? 1 : i / (len - 1);
+      key['offset'] = !i ? 0 : i == len - 1 ? 1 : i / (len - 1);
     var color = key['color'];
     if (goog.isArray(color)) {
       key['color'] = goog.array.clone(color);

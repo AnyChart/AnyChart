@@ -693,7 +693,7 @@ anychart.core.axes.Linear.prototype.getOverlappedLabels_ = function(opt_bounds) 
             if (nextDrawableLabel == -1 && isLabels) {
               k = i;
               while (nextDrawableLabel == -1 && k < ticksArrLen) {
-                if ((k == 0 && this.drawFirstLabel()) || (k == ticksArrLen - 1 && this.drawLastLabel()) || (k != 0 && k != ticksArrLen - 1))
+                if ((!k && this.drawFirstLabel()) || (k == ticksArrLen - 1 && this.drawLastLabel()) || (k != 0 && k != ticksArrLen - 1))
                   bounds1 = this.getLabelBounds_(k, true, scaleTicksArr, opt_bounds);
                 else
                   bounds1 = null;
@@ -781,7 +781,7 @@ anychart.core.axes.Linear.prototype.getOverlappedLabels_ = function(opt_bounds) 
         } else if (scale instanceof anychart.scales.Base) {
           for (i = 0; i < ticksArrLen; i++) {
             if (isLabels) {
-              if ((i == 0 && this.drawFirstLabel()) || (i == ticksArrLen - 1 && this.drawLastLabel()) || (i != 0 && i != ticksArrLen - 1))
+              if ((!i && this.drawFirstLabel()) || (i == ticksArrLen - 1 && this.drawLastLabel()) || (i != 0 && i != ticksArrLen - 1))
                 bounds1 = this.getLabelBounds_(i, true, scaleTicksArr, opt_bounds);
               else
                 bounds1 = null;
@@ -796,7 +796,7 @@ anychart.core.axes.Linear.prototype.getOverlappedLabels_ = function(opt_bounds) 
               else
                 bounds3 = null;
 
-              if (i == 0) {
+              if (!i) {
                 if (this.drawFirstLabel()) {
                   prevDrawableLabel = i;
                   labels.push(true);
@@ -911,7 +911,7 @@ anychart.core.axes.Linear.prototype.applyStaggerMode_ = function(opt_bounds) {
           else
             bounds3 = null;
 
-          if (i == 0) {
+          if (!i) {
             if (this.drawFirstLabel()) {
               prevDrawableLabel = i;
               states[i] = true;
@@ -941,7 +941,7 @@ anychart.core.axes.Linear.prototype.applyStaggerMode_ = function(opt_bounds) {
       if (!this.drawFirstLabel() || !this.drawLastLabel()) {
         states = [];
         for (i = 0; i < ticksArrLen; i++) {
-          if (i == 0 && !this.drawFirstLabel()) states[i] = false;
+          if (!i && !this.drawFirstLabel()) states[i] = false;
           else if (i == ticksArrLen - 1 && !this.drawLastLabel()) states[i] = false;
           else states[i] = true;
         }
@@ -967,7 +967,10 @@ anychart.core.axes.Linear.prototype.applyStaggerMode_ = function(opt_bounds) {
         if (!this.linesSize_[k] || this.linesSize_[k] < size) this.linesSize_[k] = size;
         if (!this.staggerLabelslines_[k]) this.staggerLabelslines_[k] = [];
         this.staggerLabelslines_[k].push(i);
-        (k + 1) % this.currentStageLines_ == 0 ? k = 0 : k++;
+        if (!((k + 1) % this.currentStageLines_))
+          k = 0;
+        else
+          k++;
       }
     }
 

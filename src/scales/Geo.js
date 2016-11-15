@@ -498,7 +498,7 @@ anychart.scales.Geo.prototype.precision = function(opt_precisionOrXPrecision, op
     }
     if (opt_yPrecision) {
       opt_yPrecision = anychart.utils.toNumber(opt_yPrecision);
-      if (this.yPrecision_ != opt_yPrecision && !(opt_yPrecision == 0 || isNaN(opt_yPrecision))) {
+      if (opt_yPrecision && this.yPrecision_ != opt_yPrecision) {
         this.yPrecision_ = opt_yPrecision;
         signal = anychart.Signal.NEEDS_REAPPLICATION;
       }
@@ -864,7 +864,7 @@ anychart.scales.Geo.prototype.startAutoCalc = function(opt_calcLatLon) {
  */
 anychart.scales.Geo.prototype.finishAutoCalc = function(opt_silently) {
   this.autoCalcs_ = Math.max(this.autoCalcs_ - 1, 0);
-  if (this.autoCalcs_ == 0) {
+  if (!this.autoCalcs_) {
     return this.checkScaleChanged(!!opt_silently);
   } else
     return true; // todo: additional stuff when calculating shared scales!

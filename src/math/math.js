@@ -243,7 +243,7 @@ anychart.math.checkPointsRelativeLine = function(p1x, p1y, p2x, p2y, pointsArr) 
  */
 anychart.math.isPointOnLine = function(p1x, p1y, p2x, p2y, p3x, p3y) {
   var result = (p1y - p2y) * p3x + (p2x - p1x) * p3y + (p1x * p2y - p2x * p1y);
-  return result == 0 ? 0 : result > 0 ? 1 : -1;
+  return !result ? 0 : result > 0 ? 1 : -1;
 };
 
 
@@ -388,7 +388,7 @@ anychart.math.clipLineByRect = function(x1, y1, x2, y2, rect) {
       rx1 = rx2 = x1;
       ry1 = ry2 = y1;
     }
-  } else if (k == 0) { // horizontal line
+  } else if (!k) { // horizontal line
     if (y1 < rect.top || y1 > rectBottom) {
       // missing rect
       missing = true;

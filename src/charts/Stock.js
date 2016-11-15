@@ -435,7 +435,7 @@ anychart.charts.Stock.prototype.plot = function(opt_indexOrValue, opt_value) {
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var plot = this.plots_[index];

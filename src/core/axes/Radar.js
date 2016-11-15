@@ -548,7 +548,7 @@ anychart.core.axes.Radar.prototype.getLabelPositionOffsetForAngle_ = function(an
   var width = bounds.width, height = bounds.height;
 
   var offset = {x: 0, y: 0};
-  if (angle == 0) {
+  if (!angle) {
     offset.x += width / 2;
   } else if (angle > 0 && angle < 90) {
     offset.x += width / 2;
@@ -620,7 +620,7 @@ anychart.core.axes.Radar.prototype.getLabelBounds_ = function(index) {
  * @private
  */
 anychart.core.axes.Radar.prototype.drawLine_ = function(index, x, y) {
-  if (index == 0)
+  if (!index)
     this.line_.moveTo(x, y);
   else
     this.line_.lineTo(x, y);
@@ -771,7 +771,7 @@ anychart.core.axes.Radar.prototype.draw = function() {
         var ticksThickness = this.ticks().stroke()['thickness'] ? parseFloat(this.ticks().stroke()['thickness']) : 1;
         var xPixelShift = 0;
         var yPixelShift = 0;
-        if (angle == 0) {
+        if (!angle) {
           yPixelShift = ticksThickness % 2 == 0 ? 0 : -.5;
         } else if (angle == 90) {
           xPixelShift = ticksThickness % 2 == 0 ? 0 : -.5;

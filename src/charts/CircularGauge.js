@@ -385,7 +385,7 @@ anychart.charts.CircularGauge.prototype.onCapSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
     state |= anychart.ConsistencyState.BOUNDS;
   }
-  // if there are no signals, state == 0 and nothing happens.
+  // if there are no signals, !state and nothing happens.
   this.invalidate(state, signal);
 };
 
@@ -403,7 +403,7 @@ anychart.charts.CircularGauge.prototype.range = function(opt_indexOrValue, opt_v
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var circularRange = this.ranges_[index];
@@ -454,7 +454,7 @@ anychart.charts.CircularGauge.prototype.bar = function(opt_indexOrValue, opt_val
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var bar = this.bars_[index];
@@ -496,7 +496,7 @@ anychart.charts.CircularGauge.prototype.marker = function(opt_indexOrValue, opt_
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var marker = this.markers_[index];
@@ -537,7 +537,7 @@ anychart.charts.CircularGauge.prototype.needle = function(opt_indexOrValue, opt_
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var needle = this.needles_[index];
@@ -578,7 +578,7 @@ anychart.charts.CircularGauge.prototype.knob = function(opt_indexOrValue, opt_va
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var knob = this.knobs_[index];
@@ -636,7 +636,7 @@ anychart.charts.CircularGauge.prototype.onPointersSignal_ = function(event) {
     signal |= anychart.Signal.NEEDS_REDRAW | anychart.Signal.NEEDS_RECALCULATION;
   }
 
-  // if there are no signals, state == 0 and nothing happens.
+  // if there are no signals, !state and nothing happens.
   this.invalidate(state, signal);
 };
 
@@ -654,7 +654,7 @@ anychart.charts.CircularGauge.prototype.axis = function(opt_indexOrValue, opt_va
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var axis = this.axes_[index];
@@ -697,7 +697,7 @@ anychart.charts.CircularGauge.prototype.onAxisSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     state |= anychart.ConsistencyState.GAUGE_SCALE | anychart.ConsistencyState.BOUNDS;
   }
-  // if there are no signals, state == 0 and nothing happens.
+  // if there are no signals, !state and nothing happens.
   this.invalidate(state, signal);
 };
 

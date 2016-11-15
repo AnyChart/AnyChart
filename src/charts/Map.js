@@ -677,7 +677,7 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
           dx = tx.getTranslateX();
           dy = tx.getTranslateY();
 
-          if (scene.zoomLevel() == this.minZoomLevel_ && dx == 0 && dy == 0) {
+          if (scene.zoomLevel() == this.minZoomLevel_ && !dx && !dy) {
             this.drillUp();
           } else {
             if (!this.drillingInAction) {
@@ -1055,7 +1055,7 @@ anychart.charts.Map.prototype.handleMouseOut = function(event) {
       if (tag.points_) {
         series = tag.points_.series;
         index = tag.points_.points;
-        if (goog.isArray(index) && index.length == 0) index = NaN;
+        if (goog.isArray(index) && !index.length) index = NaN;
       } else {
         // I don't understand, why it is like this here.
         //series = tag.series_;
@@ -1530,7 +1530,7 @@ anychart.charts.Map.prototype.colorRangeInvalidated_ = function(event) {
     state |= anychart.ConsistencyState.MAP_COLOR_RANGE;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
-  // if there are no signals, state == 0 and nothing happens.
+  // if there are no signals, !state and nothing happens.
   this.invalidate(state, signal);
 };
 
@@ -1559,7 +1559,7 @@ anychart.charts.Map.prototype.callout = function(opt_indexOrValue, opt_value) {
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var callout = this.callouts_[index];
@@ -1598,7 +1598,7 @@ anychart.charts.Map.prototype.onCalloutSignal_ = function(event) {
     state |= anychart.ConsistencyState.BOUNDS;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
-  // if there are no signals, state == 0 and nothing happens.
+  // if there are no signals, !state and nothing happens.
   this.invalidate(state, signal);
 };
 
@@ -1674,7 +1674,7 @@ anychart.charts.Map.prototype.grids = function(opt_value) {
  * @param {anychart.SignalEvent} event Invalidation event.
  */
 anychart.charts.Map.prototype.onGridsSettingsSignal = function(event) {
-  var state = state = anychart.ConsistencyState.MAP_GRIDS;
+  var state = anychart.ConsistencyState.MAP_GRIDS;
   var signal = anychart.Signal.NEEDS_REDRAW;
 
   this.invalidate(state, signal);
@@ -2884,7 +2884,7 @@ anychart.charts.Map.prototype.drawGeom_ = function(coords, index, geom) {
   if (goog.object.containsKey(geom, 'coordinates')) {
     geom.domElement.moveTo(x, y).lineTo(x, y);
   } else {
-    if (index == 0) geom.domElement.moveTo(x, y);
+    if (!index) geom.domElement.moveTo(x, y);
     else geom.domElement.lineTo(x, y);
   }
 };
@@ -3647,7 +3647,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
 
     if (this.mapLayer_) {
       //todo (blackart) this is harcode! remove this shit when we to kill world map
-      if (this.mapTX['default'].xoffset == 0) {
+      if (!this.mapTX['default'].xoffset) {
         this.mapLayer_.clip(scale.getViewSpace());
       }
     }
@@ -4295,7 +4295,7 @@ anychart.charts.Map.prototype.featureCrs_ = function(feature, opt_crs) {
         x = scaledCoord[0];
         y = scaledCoord[1];
 
-        if (j == 0)
+        if (!j)
           feature.domElement.moveTo(x, y);
         else
           feature.domElement.lineTo(x, y);
@@ -4316,7 +4316,7 @@ anychart.charts.Map.prototype.featureCrs_ = function(feature, opt_crs) {
         x = scaledCoord[0];
         y = scaledCoord[1];
 
-        if (j == 0)
+        if (!j)
           feature.domElement.moveTo(x, y);
         else
           feature.domElement.lineTo(x, y);

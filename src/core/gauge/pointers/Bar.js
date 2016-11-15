@@ -188,7 +188,7 @@ anychart.core.gauge.pointers.Bar.prototype.draw = function() {
     var startAngle = goog.math.standardAngle(axisStartAngle + fromRatio * axisSweepAngle);
     var endAngle = goog.math.standardAngle(axisStartAngle + toRatio * axisSweepAngle);
     var sweepAngle = goog.math.standardAngle(endAngle - startAngle);
-    if (sweepAngle == 0) sweepAngle = valueRatio == zeroRatio ? 0 : 360;
+    if (!sweepAngle) sweepAngle = valueRatio == zeroRatio ? 0 : 360;
 
     this.contextProvider['cx'] = cx;
     this.contextProvider['cy'] = cy;

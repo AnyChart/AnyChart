@@ -767,7 +767,7 @@ anychart.core.grids.Map.prototype.draw = function() {
 
       drawInterlace.call(this, tickVal, prevTickVal, fill, path, pixelShift, precision);
 
-      if ((i == 0 && this.getOption(anychart.opt.DRAW_FIRST_LINE)) || (i == count - 1 && this.getOption(anychart.opt.DRAW_LAST_LINE)) || (i != 0 && i != count - 1)) {
+      if ((!i && this.getOption(anychart.opt.DRAW_FIRST_LINE)) || (i == count - 1 && this.getOption(anychart.opt.DRAW_LAST_LINE)) || (i != 0 && i != count - 1)) {
         drawLine.call(this, tickVal, majorLineElement, pixelShift, precision);
       }
 

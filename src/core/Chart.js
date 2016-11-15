@@ -418,7 +418,7 @@ anychart.core.Chart.prototype.onTitleSignal_ = function(event) {
     state |= anychart.ConsistencyState.BOUNDS;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
-  // If there are no signals - state == 0 and nothing will happen.
+  // If there are no signals - !state and nothing will happen.
   this.invalidate(state, signal);
 };
 
@@ -736,7 +736,7 @@ anychart.core.Chart.prototype.contextMenuItemsProvider = function(context) {
 
   if (anychart.DEVELOP) {
     // prepare version link (specific to each product)
-    var versionHistoryItem = anychart.utils.recursiveClone(anychart.core.Chart.contextMenuItems.versionHistory);
+    var versionHistoryItem = /** @type {anychart.ui.ContextMenu.Item} */(anychart.utils.recursiveClone(anychart.core.Chart.contextMenuItems.versionHistory));
     versionHistoryItem['href'] = context['chart'].getVersionHistoryLink() + '?version=' + anychart.VERSION;
 
     items.push(
@@ -1017,7 +1017,7 @@ anychart.core.Chart.prototype.onCreditsSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     state |= anychart.ConsistencyState.CHART_CREDITS;
   }
-  // If there are no signals - state == 0 and nothing will happen.
+  // If there are no signals - !state and nothing will happen.
   this.invalidate(state, signal);
 };
 
@@ -1787,7 +1787,12 @@ anychart.core.Chart.prototype.getPoint = goog.abstractMethod;
 /**
  * Returns points by event.
  * @param {anychart.core.MouseEvent} event
- * @return {?Array.<{series: (anychart.core.series.Base|anychart.core.SeriesBase), points: Array.<number>, lastPoint: number, nearestPointToCursor: Object.<number>}>}
+ * @return {?Array.<{
+ *    series: (anychart.core.series.Base|anychart.core.SeriesBase|anychart.core.linearGauge.pointers.Base),
+ *    points: Array.<number>,
+ *    lastPoint: (number|undefined),
+ *    nearestPointToCursor: (Object.<number>|undefined)
+ * }>}
  */
 anychart.core.Chart.prototype.getSeriesStatus;
 
@@ -1824,7 +1829,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
       if (tag.points_) {
         series = tag.points_.series;
         index = tag.points_.points;
-        if (goog.isArray(index) && index.length == 0) index = NaN;
+        if (goog.isArray(index) && !index.length) index = NaN;
       } else {
         // I don't understand, why it is like this here.
         //series = tag.series_;
@@ -1955,7 +1960,7 @@ anychart.core.Chart.prototype.handleMouseOut = function(event) {
       if (tag.points_) {
         series = tag.points_.series;
         index = tag.points_.points;
-        if (goog.isArray(index) && index.length == 0) index = NaN;
+        if (goog.isArray(index) && !index.length) index = NaN;
       } else {
         // I don't understand, why it is like this here.
         //series = tag.series_;

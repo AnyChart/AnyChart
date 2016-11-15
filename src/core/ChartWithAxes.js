@@ -260,7 +260,7 @@ anychart.core.ChartWithAxes.prototype.grid = function(opt_indexOrValue, opt_valu
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var grid = this.grids_[index];
@@ -297,7 +297,7 @@ anychart.core.ChartWithAxes.prototype.minorGrid = function(opt_indexOrValue, opt
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var grid = this.minorGrids_[index];
@@ -351,7 +351,7 @@ anychart.core.ChartWithAxes.prototype.xAxis = function(opt_indexOrValue, opt_val
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var axis = this.xAxes_[index];
@@ -387,7 +387,7 @@ anychart.core.ChartWithAxes.prototype.yAxis = function(opt_indexOrValue, opt_val
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var axis = this.yAxes_[index];
@@ -441,7 +441,7 @@ anychart.core.ChartWithAxes.prototype.onAxisSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
     state |= anychart.ConsistencyState.BOUNDS;
   }
-  // if there are no signals, state == 0 and nothing happens.
+  // if there are no signals, !state and nothing happens.
   this.invalidate(state, signal);
 };
 
@@ -487,7 +487,7 @@ anychart.core.ChartWithAxes.prototype.lineMarker = function(opt_indexOrValue, op
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var lineMarker = this.lineAxesMarkers_[index];
@@ -534,7 +534,7 @@ anychart.core.ChartWithAxes.prototype.rangeMarker = function(opt_indexOrValue, o
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var rangeMarker = this.rangeAxesMarkers_[index];
@@ -581,7 +581,7 @@ anychart.core.ChartWithAxes.prototype.textMarker = function(opt_indexOrValue, op
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var textMarker = this.textAxesMarkers_[index];
@@ -1041,8 +1041,8 @@ anychart.core.ChartWithAxes.prototype.drawContent = function(bounds) {
     crosshair.parentBounds(this.dataBounds);
     crosshair.container(this.rootElement);
     crosshair.barChartMode(this.barChartMode);
-    crosshair.xAxis(this.xAxes_[this.crosshair_.xLabel().axisIndex()]);
-    crosshair.yAxis(this.yAxes_[this.crosshair_.yLabel().axisIndex()]);
+    crosshair.xAxis(this.xAxes_[/** @type {number} */(this.crosshair_.xLabel().axisIndex())]);
+    crosshair.yAxis(this.yAxes_[/** @type {number} */(this.crosshair_.yLabel().axisIndex())]);
     crosshair.draw();
     crosshair.resumeSignalsDispatching(false);
 

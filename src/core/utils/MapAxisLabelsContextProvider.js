@@ -28,7 +28,7 @@ anychart.core.utils.MapAxisLabelsContextProvider = function(axis, index, value) 
   seconds = Math.floor(60 * ((60 * decimal) % 1));
 
   labelText = grad + '\u00B0';
-  if (seconds != 0 || (seconds == 0 && minutes != 0)) {
+  if (seconds != 0 || (!seconds && minutes != 0)) {
     minutes += '';
     if (minutes.length == 1) minutes = '0' + minutes;
     labelText += minutes + '\'';

@@ -1064,7 +1064,7 @@ anychart.core.ui.Table.prototype.cellPadding = function(opt_spaceOrTopOrTopAndBo
       argsLen = tmp.length;
     } else
       argsLen = arguments.length;
-    if (argsLen == 0) {
+    if (!argsLen) {
       left = bottom = right = top = 0;
     } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
       top = anychart.utils.toNumberOrString(opt_spaceOrTopOrTopAndBottom['top']) || 0;
@@ -1585,8 +1585,8 @@ anychart.core.ui.Table.prototype.getCellHorizontalBorder_ = function(topCell, bo
     if (stroke) return /** @type {acgraph.vector.Stroke} */(stroke);
 
     if (this.rows_) {
-      var topRow = this.rows_[topCell && topCell.getRowNum()];
-      var botRow = this.rows_[bottomCell && bottomCell.getRowNum()];
+      var topRow = this.rows_[(topCell || NaN) && topCell.getRowNum()];
+      var botRow = this.rows_[(bottomCell || NaN) && bottomCell.getRowNum()];
 
       // checking if specific border settings are set for the rows
       stroke = topRow && topRow.settings(bottomBorder);
@@ -1714,8 +1714,8 @@ anychart.core.ui.Table.prototype.getCellVerticalBorder_ = function(leftCell, rig
     }
 
     if (this.cols_) {
-      var leftCol = this.cols_[leftCell && leftCell.getColNum()];
-      var rightCol = this.cols_[rightCell && rightCell.getColNum()];
+      var leftCol = this.cols_[(leftCell || NaN) && leftCell.getColNum()];
+      var rightCol = this.cols_[(rightCell || NaN) && rightCell.getColNum()];
 
       // checking if specific border settings are set for the rows
       stroke = leftCol && leftCol.settings(rightBorder);

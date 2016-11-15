@@ -612,7 +612,7 @@ anychart.core.axes.Circular.prototype.getOverlappedLabels_ = function() {
           k = i;
           while (nextDrawableLabel == -1 && k < ticksArrLen) {
             //bounds of current label
-            if ((k == 0 && this.drawFirstLabel()) || (k == ticksArrLen - 1 && this.drawLastLabel()) || (k != 0 && k != ticksArrLen - 1))
+            if ((!k && this.drawFirstLabel()) || (k == ticksArrLen - 1 && this.drawLastLabel()) || (k != 0 && k != ticksArrLen - 1))
               bounds1 = this.getLabelBounds_(k, true);
             else
               bounds1 = null;
@@ -889,7 +889,7 @@ anychart.core.axes.Circular.prototype.getAnchorForLabel_ = function(angle) {
   var position = anychart.enums.normalizeGaugeSidePosition(this.labels().position());
 
   if (position == 'inside') {
-    if (angle == 0) {
+    if (!angle) {
       anchor = anychart.enums.Anchor.RIGHT_CENTER;
     } else if (angle > 0 && angle < 90) {
       anchor = anychart.enums.Anchor.RIGHT_BOTTOM;
@@ -907,7 +907,7 @@ anychart.core.axes.Circular.prototype.getAnchorForLabel_ = function(angle) {
       anchor = anychart.enums.Anchor.RIGHT_TOP;
     }
   } else if (position == 'outside') {
-    if (angle == 0) {
+    if (!angle) {
       anchor = anychart.enums.Anchor.LEFT_CENTER;
     } else if (angle > 0 && angle < 90) {
       anchor = anychart.enums.Anchor.LEFT_TOP;

@@ -149,7 +149,7 @@ anychart.palettes.RangeColors.prototype.colorAt = function(index, opt_color) {
  */
 anychart.palettes.RangeColors.prototype.itemAt = function(index, opt_item) {
   if (!this.colors_ || this.colors_.length < 1) return null;
-  if (this.count_ == 0) return null;
+  if (!this.count_) return null;
 
   if (goog.isDef(opt_item)) {
     this.colorPalette_[index] = opt_item;
@@ -172,7 +172,7 @@ anychart.palettes.RangeColors.prototype.processColorRange_ = function() {
   if (this.colors_ && this.count_ != 0) {
     var gradientKeys = [];
     var colors = goog.isArray(this.colors_) ? this.colors_ : this.colors_.keys;
-    if (!goog.isArray(colors) || colors.length == 0) return;
+    if (!goog.isArray(colors) || !colors.length) return;
     if (isNaN(this.count_)) this.count_ = colors.length;
 
 

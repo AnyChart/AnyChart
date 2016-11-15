@@ -260,7 +260,7 @@ anychart.data.TableStorage.prototype.selectFast = function(startKey, endKey, pre
       if (isNaN(postLastIndex)) { // full range selection
         firstIndex = 0;
         lastIndex = storageLength - 1;
-      } else if (postLastIndex == 0) { // whole selection is to the left of the data
+      } else if (!postLastIndex) { // whole selection is to the left of the data
         firstIndex = lastIndex = NaN;
       } else { // normal selection stuck to the left end of data
         firstIndex = 0;
@@ -480,7 +480,7 @@ anychart.data.TableStorage.prototype.searchIndex = function(key, opt_mode) {
       index = index > 0 ? index - 1 : NaN;
     else if (mode == anychart.enums.TableSearchMode.NEAREST) {
       var length = this.storage.length;
-      if (index == 0)
+      if (!index)
         return length ? 0 : NaN;
       else if (index < length) {
         var item = this.storage[index];
@@ -1104,7 +1104,7 @@ anychart.data.TableMainStorage.prototype.removeFirst = function(opt_count) {
     }
   }
 
-  if (this.removesStatus_ == 0) this.removesStatus_ = 1;
+  if (!this.removesStatus_) this.removesStatus_ = 1;
 
   if (!this.inTransaction_)
     this.commit();

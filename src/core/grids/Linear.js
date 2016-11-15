@@ -644,7 +644,7 @@ anychart.core.grids.Linear.prototype.draw = function() {
         drawInterlace.call(this, ratio, prevRatio, fill, path, pixelShift);
       }
 
-      if (i == 0) {
+      if (!i) {
         if (this.drawFirstLine_)
           drawLine.call(this, ratio, pixelShift);
       } else if (i == count - 1) {

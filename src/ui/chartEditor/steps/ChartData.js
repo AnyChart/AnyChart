@@ -124,7 +124,7 @@ anychart.ui.chartEditor.steps.Data.prototype.updateDataPreview_ = function(index
   var dataSet = sharedModel.dataSets[index];
   var dataSetData = dataSet.instance.data();
 
-  var settings = new goog.format.JsonPrettyPrinter.HtmlDelimiters();
+  var settings = new goog.format.JsonPrettyPrinter.SafeHtmlDelimiters();
   settings.lineBreak = '';
   settings.objectStart = '\n{';
   settings.arrayStart = '\n[';

@@ -258,13 +258,16 @@ anychart.charts.Pie.prototype.getType = function() {
  * @typedef {{
  *   index: number,
  *   type: anychart.charts.Pie.Side3DType,
- *   start: number,
- *   end: number,
- *   sweep: number,
  *   angle: number,
  *   ex: number,
- *   ey: number,
- *   isInFront: boolean
+ *   ey: number
+ * }|{
+ *   index: number,
+ *   type: anychart.charts.Pie.Side3DType,
+ *   start: number,
+ *   sweep: number,
+ *   ex: number,
+ *   ey: number
  * }}
  */
 anychart.charts.Pie.Side3D;
@@ -1834,7 +1837,7 @@ anychart.charts.Pie.prototype.prepare3DSlice_ = function() {
   var sweep = /** @type {number} */ (iterator.meta('sweep'));
   var end = start + sweep;
   // if no information about slice in meta (e.g. no slice has drawn: call explodeSlice(_, _) before chart.draw()).
-  if (!goog.isDef(start) || !goog.isDef(sweep) || sweep == 0) return;
+  if (!goog.isDef(start) || !goog.isDef(sweep) || !sweep) return;
 
   var angle = start + sweep / 2;
   var cos = Math.cos(goog.math.toRadians(angle));
@@ -2281,7 +2284,7 @@ anychart.charts.Pie.prototype.hasStartSide_ = function(startAngle) {
   var startSin = anychart.math.round(Math.sin(startAngle), 7);
 
   var startQuadrant = this.getQuadrant_(startCos, startSin);
-  return ((!(startCos == 0 && Math.abs(startSin) == 1) && startQuadrant == 3) || startQuadrant == 2);
+  return ((!(!startCos && Math.abs(startSin) == 1) && startQuadrant == 3) || startQuadrant == 2);
 };
 
 
@@ -2296,7 +2299,7 @@ anychart.charts.Pie.prototype.hasEndSide_ = function(endAngle) {
   var endCos = anychart.math.round(Math.cos(endAngle), 7);
   var endSin = anychart.math.round(Math.sin(endAngle), 7);
   var endQuadrant = this.getQuadrant_(endCos, endSin);
-  return ((!(endCos == 0 && Math.abs(endSin) == 1) && endQuadrant == 1) || endQuadrant == 4);
+  return ((!(!endCos && Math.abs(endSin) == 1) && endQuadrant == 1) || endQuadrant == 4);
 };
 
 
@@ -2344,7 +2347,7 @@ anychart.charts.Pie.prototype.hasFrontSide_ = function(startAngle, endAngle) {
  * @private
  */
 anychart.charts.Pie.prototype.hasBackSide_ = function(startAngle, endAngle) {
-  if (startAngle == endAngle || this.innerRadiusValue_ == 0) return false;
+  if (startAngle == endAngle || !this.innerRadiusValue_) return false;
 
   startAngle = goog.math.toRadians(startAngle);
   endAngle = goog.math.toRadians(endAngle);
@@ -2881,7 +2884,7 @@ anychart.charts.Pie.prototype.drawLabel_ = function(pointState, opt_updateConnec
 
     var bounds = this.labels().measureWithTransform(this.measureLabel_, null, null, index);
 
-    var singlePiePoint = ((iterator.getRowsCount() == 1 || sweep == 360) && this.innerRadiusValue_ == 0);
+    var singlePiePoint = ((iterator.getRowsCount() == 1 || sweep == 360) && !this.innerRadiusValue_);
     var notIntersectStartLine = singlePiePoint || !anychart.math.checkRectIntersectionWithSegment(ax, ay, cx, cy, bounds);
     var notIntersectEndLine = singlePiePoint || !anychart.math.checkRectIntersectionWithSegment(cx, cy, bx, by, bounds);
     var notIntersectPieOuterRadius = !anychart.math.checkForRectIsOutOfCircleBounds(cx, cy, this.radiusValue_, bounds);
@@ -3052,7 +3055,7 @@ anychart.charts.Pie.prototype.clickSlice = function(opt_explode) {
   var start = /** @type {number} */ (iterator.meta('start'));
   var sweep = /** @type {number} */ (iterator.meta('sweep'));
   // if no information about slice in meta (e.g. no slice has drawn: call explodeSlice(_, _) before chart.draw()).
-  if (!goog.isDef(start) || !goog.isDef(sweep) || sweep == 0) return;
+  if (!goog.isDef(start) || !goog.isDef(sweep) || !sweep) return;
 
   var index = iterator.getIndex();
   if (this.mode3d_) {
@@ -3676,7 +3679,7 @@ anychart.charts.Pie.prototype.calculate = function() {
 
     var count = iterator.getRowsCount() - missingPoints; // do not count missing points
     var avg;
-    if (count == 0) min = max = sum = avg = undefined;
+    if (!count) min = max = sum = avg = undefined;
     else avg = sum / count;
     this.statistics[anychart.enums.Statistics.COUNT] = count;
     this.statistics[anychart.enums.Statistics.MIN] = min;
@@ -4249,7 +4252,7 @@ anychart.charts.Pie.prototype.createPositionProvider = function() {
       innerXR = this.innerRadiusValue_;
       innerYR = this.get3DYRadius(this.innerRadiusValue_);
 
-      if (singlePoint && innerXR == 0) {
+      if (singlePoint && !innerXR) {
         xRadius = 0;
         yRadius = 0;
       } else {
@@ -4790,9 +4793,9 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.calcDomain = function() {
       angle_ = goog.math.toDegrees(Math.atan(y_ / x_)) + 360;
     } else if (x_ < 0) {
       angle_ = goog.math.toDegrees(Math.atan(y_ / x_)) + 180;
-    } else if (x_ == 0 && y_ > 0) {
+    } else if (!x_ && y_ > 0) {
       angle_ = 90;
-    } else if (x_ == 0 && y_ < 0) {
+    } else if (!x_ && y_ < 0) {
       angle_ = 270;
     }
 

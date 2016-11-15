@@ -628,7 +628,7 @@ anychart.core.utils.GeoSVGParser.prototype.convertPolygon = function(node, opt_t
 
   var commands = [];
   for (var i = 0, size = points.length - 1; i < size; i += 2) {
-    if (i == 0)
+    if (!i)
       commands.push({type: 'M', values: [+points[i], +points[i + 1]]});
     else
       commands.push({type: 'L', values: [+points[i], +points[i + 1]]});
@@ -650,7 +650,7 @@ anychart.core.utils.GeoSVGParser.prototype.convertPolyline = function(node, opt_
 
   var commands = [];
   for (var i = 0, len = points.length - 1; i < len; i += 2) {
-    if (i == 0)
+    if (!i)
       commands.push({type: 'M', values: [+points[i], +points[i + 1]]});
     else
       commands.push({type: 'L', values: [+points[i], +points[i + 1]]});

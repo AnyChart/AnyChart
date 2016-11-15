@@ -5732,7 +5732,7 @@ goog.provide('anychart.themes.v6');
           var result = '';
           for (var i = 0, len = seriesStatus.length; i < len; i++) {
             var status = seriesStatus[i];
-            if (status['points'].length == 0) continue;
+            if (!status['points'].length) continue;
             result += 'Series ' + status['series'].index() + ':\n';
             for (var j = 0, len_ = status['points'].length; j < len_; j++) {
               var point = status['points'][j];

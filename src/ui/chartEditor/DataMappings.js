@@ -186,7 +186,7 @@ anychart.ui.chartEditor.DataMappings.prototype.handleWheel_ = function(e) {
   var originalEvent = e.getBrowserEvent();
   var delta = originalEvent.deltaY || originalEvent.detail || originalEvent.wheelDelta;
 
-  if (delta < 0 && element.scrollTop == 0) {
+  if (delta < 0 && !element.scrollTop) {
     e.preventDefault();
   }
 

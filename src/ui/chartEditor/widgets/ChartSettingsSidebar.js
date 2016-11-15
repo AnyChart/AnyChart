@@ -89,7 +89,7 @@ anychart.ui.chartEditor.ChartSettingsSideBar.prototype.update = function(list, m
         } else {
           goog.dispose(instance);
           instance = /** @type {anychart.ui.chartEditor.group.Base} */(new cls(model));
-          instance.setExpanded(i == 0); // set in only then create new instance
+          instance.setExpanded(!i); // set in only then create new instance
           this.instances_[i] = instance;
           this.addChildAt(instance, i, true);
           instance.update(model);

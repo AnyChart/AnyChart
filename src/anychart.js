@@ -71,95 +71,6 @@ acgraph.vector.Stage.prototype.credits = function(opt_value) {
 acgraph.vector.Stage.prototype['credits'] = acgraph.vector.Stage.prototype.credits;
 
 
-//region --- goog.events.KeyHandler#handleEvent patch ---
-/**
- * TODO(AntonKagakin): remove this code when library and compiler will be updated to latest versions.
- * https://www.chromestatus.com/features/5316065118650368 for more information
- * code for patching was taken from https://github.com/google/closure-library/commit/e5c0972a63c6bb1c5e06d8762da58868d2e60d7c
- * Handles the events on the element.
- * @param {goog.events.BrowserEvent} e  The keyboard event sent from the
- *     browser.
- * @suppress {duplicate}
- */
-goog.events.KeyHandler.prototype.handleEvent = function(e) {
-  var be = e.getBrowserEvent();
-  var keyCode, charCode;
-  var altKey = be.altKey;
-
-  // IE reports the character code in the keyCode field for keypress events.
-  // There are two exceptions however, Enter and Escape.
-  if (goog.userAgent.IE && e.type == goog.events.EventType.KEYPRESS) {
-    keyCode = this.keyCode_;
-    charCode = keyCode != goog.events.KeyCodes.ENTER &&
-        keyCode != goog.events.KeyCodes.ESC ?
-            be.keyCode : 0;
-
-  // Safari reports the character code in the keyCode field for keypress
-  // events but also has a charCode field.
-  } else if ((goog.userAgent.WEBKIT || goog.userAgent.EDGE) &&
-      e.type == goog.events.EventType.KEYPRESS) {
-    keyCode = this.keyCode_;
-    charCode = be.charCode >= 0 && be.charCode < 63232 &&
-        goog.events.KeyCodes.isCharacterKey(keyCode) ?
-            be.charCode : 0;
-
-  // Opera reports the keycode or the character code in the keyCode field.
-  } else if (goog.userAgent.OPERA && !goog.userAgent.WEBKIT) {
-    keyCode = this.keyCode_;
-    charCode = goog.events.KeyCodes.isCharacterKey(keyCode) ?
-        be.keyCode : 0;
-
-  // Mozilla reports the character code in the charCode field.
-  } else {
-    keyCode = be.keyCode || this.keyCode_;
-    charCode = be.charCode || 0;
-    if (goog.events.KeyHandler.SAVE_ALT_FOR_KEYPRESS_) {
-      altKey = this.altKey_;
-    }
-    // On the Mac, shift-/ triggers a question mark char code and no key code
-    // (normalized to WIN_KEY), so we synthesize the latter.
-    if (goog.userAgent.MAC &&
-        charCode == goog.events.KeyCodes.QUESTION_MARK &&
-        keyCode == goog.events.KeyCodes.WIN_KEY) {
-      keyCode = goog.events.KeyCodes.SLASH;
-    }
-  }
-
-  keyCode = goog.events.KeyCodes.normalizeKeyCode(keyCode);
-  var key = keyCode;
-
-  // Correct the key value for certain browser-specific quirks.
-  if (keyCode) {
-    if (keyCode >= 63232 && keyCode in goog.events.KeyHandler.safariKey_) {
-      // NOTE(nicksantos): Safari 3 has fixed this problem,
-      // this is only needed for Safari 2.
-      key = goog.events.KeyHandler.safariKey_[keyCode];
-    } else {
-
-      // Safari returns 25 for Shift+Tab instead of 9.
-      if (keyCode == 25 && e.shiftKey) {
-        key = 9;
-      }
-    }
-  } else if (be.keyIdentifier &&
-             be.keyIdentifier in goog.events.KeyHandler.keyIdentifier_) {
-    // This is needed for Safari Windows because it currently doesn't give a
-    // keyCode/which for non printable keys.
-    key = goog.events.KeyHandler.keyIdentifier_[be.keyIdentifier];
-  }
-
-  // If we get the same keycode as a keydown/keypress without having seen a
-  // keyup event, then this event was caused by key repeat.
-  var repeat = key == this.lastKey_;
-  this.lastKey_ = key;
-
-  var event = new goog.events.KeyEvent(key, charCode, repeat, be);
-  event.altKey = altKey;
-  this.dispatchEvent(event);
-};
-//endregion
-
-
 /**
  Sets and returns an address export server script, which is used to export to an image
  or PDF.
@@ -699,7 +610,7 @@ anychart.getFullTheme = function() {
 
 
 // we execute it here to move load from first chart drawing to library initialization phase.
-anychart.getFullTheme();
+setTimeout(anychart.getFullTheme, 0);
 
 
 //region --- Patches for missing features

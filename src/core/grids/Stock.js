@@ -621,7 +621,7 @@ anychart.core.grids.Stock.prototype.draw = function() {
         drawInterlace.call(this, ratio, prevRatio, fill, path, needsShift);
       }
 
-      if (i == 0) {
+      if (!i) {
         if (this.drawFirstLine_)
           drawLine.call(this, ratio, needsShift);
       } else if (i == count - 1) {

@@ -505,7 +505,7 @@ anychart.core.ui.Paginator.prototype.draw = function() {
       'y': nextButtonY
     });
 
-    this.previousButton_.disabled(this.currentPage_ == 0);
+    this.previousButton_.disabled(!this.currentPage_);
     this.nextButton_.disabled(this.currentPage_ + 1 == this.pageCount_);
 
     this.previousButton_.draw();

@@ -189,7 +189,7 @@ goog.inherits(anychart.data.PieView.Mapping_, anychart.data.Mapping);
 
 /** @inheritDoc */
 anychart.data.PieView.Mapping_.prototype.row = function(rowIndex, opt_value) {
-  if (rowIndex == 0) {
+  if (!rowIndex) {
     var res = this.row_;
     if (arguments.length > 1) {
       this.row_ = opt_value;
@@ -204,7 +204,7 @@ anychart.data.PieView.Mapping_.prototype.row = function(rowIndex, opt_value) {
  * @inheritDoc
  */
 anychart.data.PieView.Mapping_.prototype.meta = function(index, name, opt_value) {
-  if (index == 0) {
+  if (!index) {
     return anychart.data.View.prototype.meta.apply(this, arguments);
   }
 };

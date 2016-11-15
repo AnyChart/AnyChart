@@ -92,7 +92,7 @@ anychart.data.ScatterView.prototype.search_ = function(fieldValue) {
     }
   }
 
-  if (found || left == 0)
+  if (found || !left)
     return left;
   else if (left == length)
     return left - 1;

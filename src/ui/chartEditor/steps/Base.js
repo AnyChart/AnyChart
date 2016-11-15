@@ -398,7 +398,7 @@ anychart.ui.chartEditor.steps.Base.prototype.createDom = function() {
   this.prevBtn_ = new anychart.ui.button.Secondary();
   this.prevBtn_.addClassName(previousBtnClass);
   this.prevBtn_.setCaption('Previous');
-  if (this.sharedModel_.currentStep.index == 0) {
+  if (!this.sharedModel_.currentStep.index) {
     this.prevBtn_.setState(goog.ui.Component.State.DISABLED, true);
   }
   this.prevBtn_.render(this.progressEl_);
@@ -568,7 +568,7 @@ anychart.ui.chartEditor.steps.Base.prototype.handleWheel = function(e) {
   var originalEvent = e.getBrowserEvent();
   var delta = originalEvent.deltaY || originalEvent.detail || originalEvent.wheelDelta;
 
-  if (delta < 0 && element.scrollTop == 0) {
+  if (delta < 0 && !element.scrollTop) {
     e.preventDefault();
   }
 

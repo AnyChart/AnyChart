@@ -854,7 +854,7 @@ anychart.core.Base.prototype.dispatchEvent = function(e) {
  *     (defaults to false).
  * @param {SCOPE=} opt_listenerScope Object in whose scope to call the
  *     listener.
- * @return {goog.events.ListenableKey} Unique key for the listener.
+ * @return {!goog.events.ListenableKey} Unique key for the listener.
  * @template SCOPE,EVENTOBJ
  */
 anychart.core.Base.prototype.listen = function(type, listener, opt_useCapture, opt_listenerScope) {
@@ -885,7 +885,7 @@ anychart.core.Base.prototype.listen = function(type, listener, opt_useCapture, o
  *     (defaults to false).
  * @param {SCOPE=} opt_listenerScope Object in whose scope to call the
  *     listener.
- * @return {goog.events.ListenableKey} Unique key for the listener.
+ * @return {!goog.events.ListenableKey} Unique key for the listener.
  * @template SCOPE,EVENTOBJ
  */
 anychart.core.Base.prototype.listenOnce = function(type, listener, opt_useCapture, opt_listenerScope) {
@@ -905,7 +905,7 @@ anychart.core.Base.prototype.listenOnce = function(type, listener, opt_useCaptur
  * function customListener(e){
  *     counter--;
  *     title.text('Click on line series. You have ' + counter + ' clicks.');
- *     if (counter == 0) {
+ *     if (!counter) {
  *         line.unlisten(anychart.enums.EventType.POINT_CLICK, customListener);
  *         title.text('You have no more clicks');
  *     }
@@ -937,12 +937,12 @@ anychart.core.Base.prototype.unlisten = function(type, listener, opt_useCapture,
  * function customListener(e){
  *     counter--;
  *     title.text('Click on line series. You have ' + counter + ' clicks.');
- *     if (counter == 0) {
+ *     if (!counter) {
  *         line.unlistenByKey(listenKey);
  *         title.text('You have no more clicks');
  *     }
  * }
- * @param {goog.events.ListenableKey} key The key returned by
+ * @param {!goog.events.ListenableKey} key The key returned by
  *     listen() or listenOnce().
  * @return {boolean} Whether any listener was removed.
  */

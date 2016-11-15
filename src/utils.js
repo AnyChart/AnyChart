@@ -245,7 +245,7 @@ anychart.utils.normalizeToPercent = function(value) {
  * @return {number}
  */
 anychart.utils.toNumber = function(value) {
-  if (goog.isNull(value) || goog.isBoolean(value))
+  if (!goog.isDefAndNotNull(value) || goog.isBoolean(value))
     return NaN;
   return +value;
 };
@@ -314,7 +314,7 @@ anychart.utils.normalizeToNaturalNumber = function(value, opt_default, opt_allow
     value = parseFloat(value);
   value = Math.round(value);
   // value > 0 also checks for NaN, because NaN > 0 == false.
-  return ((value > 0) || (opt_allowZero && value == 0)) ?
+  return (!isNaN(value) && ((value > 0) || (opt_allowZero && !value))) ?
       value :
       (goog.isDef(opt_default) ? opt_default : opt_allowZero ? 0 : 1);
 };
@@ -333,7 +333,7 @@ anychart.utils.normalizeTimestamp = function(value) {
     result = +new Date(value);
     if (isNaN(result))
       result = +value;
-  } else if (goog.isNull(value)) {
+  } else if (!goog.isDefAndNotNull(value)) {
     result = NaN;
   } else { // also accepts Date
     result = Number(value);
@@ -434,7 +434,7 @@ anychart.utils.alignRight = function(value, interval, opt_base) {
   var mod = anychart.math.round((value - opt_base) % interval, 7);
   if (mod >= interval) // ECMAScript float representation... try (0.5 % 0.1).
     mod -= interval;
-  if (mod == 0)
+  if (!mod)
     return anychart.math.round(value, 7);
   else if (mod < 0)
     mod += interval;

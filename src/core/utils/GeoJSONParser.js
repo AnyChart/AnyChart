@@ -172,7 +172,7 @@ anychart.core.utils.GeoJSONParser.prototype.parseGeometry_ = function(geojsonGeo
         geoCoords = polygon[i];
         for (j = 0, len_ = geoCoords.length; j < len_; j++) {
           coord = geoCoords[j];
-          if (i == 0) {
+          if (!i) {
             outerPath.push(coord[0], coord[1]);
           } else {
             hole.push(coord[0], coord[1]);
@@ -196,7 +196,7 @@ anychart.core.utils.GeoJSONParser.prototype.parseGeometry_ = function(geojsonGeo
           geoCoords = polygon[j];
           for (var k = 0, len__ = geoCoords.length; k < len__; k++) {
             coord = geoCoords[k];
-            if (j == 0) {
+            if (!j) {
               outerPath.push(coord[0], coord[1]);
             } else {
               hole.push(coord[0], coord[1]);
@@ -805,7 +805,7 @@ anychart.core.utils.GeoJSONParser.prototype.transform_ = function(coord) {
 
 
 /**
- * @param {Array} properties
+ * @param {Object} properties
  * @param {Array.<Object>} donor
  * @param {string} acFieldName
  * @param {string} hcFieldName

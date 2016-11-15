@@ -243,7 +243,7 @@ anychart.core.map.series.Connector.prototype.createPositionProvider = function(p
 
         iterator.meta('labelAnchor', this.getAnchorForLabel(goog.math.standardAngle(anglePathNormal + 90)));
         iterator.meta('markerRotation', anglePathNormal);
-        iterator.meta('markerAnchor', normalizedPosition == 1 ? anychart.enums.Anchor.RIGHT_CENTER : normalizedPosition == 0 ? anychart.enums.Anchor.LEFT_CENTER : anychart.enums.Anchor.CENTER);
+        iterator.meta('markerAnchor', normalizedPosition == 1 ? anychart.enums.Anchor.RIGHT_CENTER : !normalizedPosition ? anychart.enums.Anchor.LEFT_CENTER : anychart.enums.Anchor.CENTER);
 
         //todo (blackart) shapes for debug, don't remove.
         //if (!this['q0' + this.getIterator().getIndex()]) this['q0' + this.getIterator().getIndex()] = this.container().circle().zIndex(1000).stroke('red');

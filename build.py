@@ -31,8 +31,9 @@ GRAPHICS_PATH = os.path.join(CONTRIB_PATH, 'graphicsjs')
 GRAPHICS_SRC_PATH = os.path.join(CONTRIB_PATH, GRAPHICS_PATH, 'src')
 
 #closure tools
+COMPILER_VERSION = '20161024'
+COMPILER_PATH = os.path.join(CONTRIB_PATH, 'compiler', 'closure-compiler-v%s.jar' % COMPILER_VERSION)
 EXTERNS_PATH = os.path.join(PROJECT_PATH, 'externs.js')
-COMPILER_PATH = os.path.join(CONTRIB_PATH, 'compiler', 'compiler.jar')
 CLOSURE_LIBRARY_PATH = os.path.join(CONTRIB_PATH, 'closure-library')
 CLOSURE_SOURCE_PATH = os.path.join(CLOSURE_LIBRARY_PATH, 'closure', 'goog')
 CLOSURE_LINTER_WRAPPER_PATH = os.path.join(CONTRIB_PATH, 'closure-linter-wrapper')
@@ -74,7 +75,7 @@ def __sync_contrib():
     if not os.path.exists(COMPILER_PATH):
         print 'Download closure compiler'
         __download_and_unzip_from_http(
-            'http://dl.google.com/closure-compiler/compiler-20151015.zip',
+            "http://dl.google.com/closure-compiler/compiler-%s.zip" % COMPILER_VERSION,
             CONTRIB_PATH,
             'compiler'
         )
@@ -178,7 +179,7 @@ def __get_output_file_arg(output_file):
 def __get_name_spaces(modules):
     result = []
     for module in modules:
-        result.append("--closure_entry_point anychart.modules.%s" % module)
+        result.append("--entry_point anychart.modules.%s" % module)
     return result
 
 
@@ -212,52 +213,53 @@ def __get_performance_monitoring_compiler_args(is_performance_monitoring):
 
 def __get_optimized_compiler_args():
     compiler_args = [
+        '--hide_warnings_for="closure-library"',
+        # '--new_type_inf',
         '--warning_level VERBOSE',
         '--jscomp_warning accessControls',
         '--jscomp_warning ambiguousFunctionDecl',
-        '--jscomp_warning checkDebuggerStatement',
         '--jscomp_warning checkEventfulObjectDisposal',
         '--jscomp_warning checkRegExp',
         '--jscomp_warning checkTypes',
         '--jscomp_warning checkVars',
-        '--jscomp_warning closureDepMethodUsageChecks',
+        '--jscomp_warning commonJsModuleLoad',
         '--jscomp_warning conformanceViolations',
         '--jscomp_warning const',
         '--jscomp_warning constantProperty',
         '--jscomp_warning deprecated',
         '--jscomp_warning deprecatedAnnotations',
-        '--jscomp_warning duplicate',
         '--jscomp_warning duplicateMessage',
         '--jscomp_warning es3',
         '--jscomp_warning es5Strict',
         '--jscomp_warning externsValidation',
-        '--jscomp_warning extraRequire',
         '--jscomp_warning fileoverviewTags',
+        '--jscomp_warning functionParams',
         '--jscomp_warning globalThis',
-        '--jscomp_warning inferredConstCheck',
         '--jscomp_warning internetExplorerChecks',
         '--jscomp_warning invalidCasts',
         '--jscomp_warning misplacedTypeAnnotation',
         '--jscomp_warning missingGetCssName',
+        # '--jscomp_warning missingOverride',
+        '--jscomp_warning missingPolyfill',
         '--jscomp_warning missingProperties',
         '--jscomp_warning missingProvide',
         '--jscomp_warning missingRequire',
         '--jscomp_warning missingReturn',
+        '--jscomp_warning msgDescriptions',
         '--jscomp_warning newCheckTypes',
-        #'--jscomp_warning msgDescriptionsNewCheckTypes',
         '--jscomp_warning nonStandardJsDocs',
-        #'--jscomp_warning reportUnknownTypes',
+        # '--jscomp_warning reportUnknownTypes',
         '--jscomp_warning suspiciousCode',
         '--jscomp_warning strictModuleDepCheck',
-        '--jscomp_warning tweakValidation',
         '--jscomp_warning typeInvalidation',
         '--jscomp_warning undefinedNames',
         '--jscomp_warning undefinedVars',
         '--jscomp_warning unknownDefines',
-        #+'--jscomp_warning unnecessaryCasts',
+        # '--jscomp_warning unusedLocalVariables',
+        # '--jscomp_warning unusedPrivateMembers',
         '--jscomp_warning uselessCode',
-        #+'--jscomp_warning useOfGoogBase',
-        '--jscomp_warning violatedModuleDep',
+        # '--jscomp_warning useOfGoogBase',
+        '--jscomp_warning underscore',
         '--jscomp_warning visibility',
     ]
     __set_optimization_level(compiler_args, OptimizationLevel.ADVANCED)
@@ -270,10 +272,7 @@ def __get_default_compiler_args(theme, modules):
         COMPILER_PATH,
         '--charset UTF-8',
         '--define "anychart.VERSION=\'%s\'"' % __get_version(True),
-        '--only_closure_dependencies',
-        #'--process_closure_primitives',
-        #'--use_types_for_optimization',
-        #'--use_only_custom_externs',
+        '--dependency_mode=STRICT',
         #'--externs ' + EXTERNS_PATH,
         '--extra_annotation_name "includeDoc"',
         '--extra_annotation_name "illustration"',
@@ -290,7 +289,7 @@ def __get_default_compiler_args(theme, modules):
         if not os.path.exists(os.path.join(SRC_PATH, 'themes', theme + '.js')):
             theme = 'defaultTheme'
         result = result + ['--define "anychart.DEFAULT_THEME=\'%s\'"' % theme]
-        result = result + ['--closure_entry_point "%s"' % 'anychart.themes.' + theme]
+        result = result + ['--entry_point "%s"' % 'anychart.themes.' + theme]
     return result
 
 
@@ -358,7 +357,7 @@ def __build_project(develop, modules, sources, theme, debug, gzip, perf_monitori
                    __get_name_spaces(modules),
                    __get_roots(),
                    __get_output_file_arg(output_file),
-                   ['--output_wrapper "' + copyright + wrapper + '"']], [])
+                   ['--output_wrapper "' + copyright + wrapper + '"', '--assume_function_wrapper']], [])
 
     #debug info
     if debug and not sources:
@@ -374,7 +373,7 @@ def __build_project(develop, modules, sources, theme, debug, gzip, perf_monitori
         __compile_css()
 
     # build binary file
-    __call_console_commands(commands)
+    __call_console_commands(commands, module=modules[0])
 
     #include proj4js for maps and bundle in binary file
     if __should_include_proj4js(modules):
@@ -400,7 +399,7 @@ def __include_proj4js(output_file):
 
 
 def __log_compilation(output_file, args):
-    print "Compile %s file for modules: %s\n" \
+    print "\nCompile %s file for modules: %s\n" \
           "Output: %s\n" \
           "Version: %s\n" \
           "Developers edition: %s\n" \
@@ -432,7 +431,7 @@ def __apply_specific_file_name_rule(file_name, modules):
     return file_name
 
 
-def __call_console_commands(commands, cwd=None):
+def __call_console_commands(commands, cwd=None, module=None):
     commands = " ".join(commands).replace('\\', '\\\\')
     commands = shlex.split(commands)
     #print commands
@@ -440,7 +439,7 @@ def __call_console_commands(commands, cwd=None):
     (output, err) = p.communicate()
     retcode = p.poll()
     if len(output) > 0:
-        print output
+        print '({}) {}'.format(module, output)
 
 
 def __get_copyrigth(modules):
@@ -668,11 +667,16 @@ def __exec_build_theme(theme, is_source):
     commands = ['java -jar',
                 COMPILER_PATH,
                 '--charset UTF-8',
-                '--only_closure_dependencies',
-                '--warning_level VERBOSE',
-                '--compilation_level ADVANCED_OPTIMIZATIONS',
-                "--closure_entry_point anychart.themes.%s" % theme,
+                '--dependency_mode=STRICT',
+                "--entry_point anychart.themes.%s" % theme,
+                '--extra_annotation_name "includeDoc"',
+                '--extra_annotation_name "illustration"',
+                '--extra_annotation_name "illustrationDesc"',
+                '--extra_annotation_name "ignoreDoc"',
+                '--extra_annotation_name "propertyDoc"',
+                '--extra_annotation_name "shortDescription"',
                 "--js_output_file %s" % os.path.join(OUT_PATH, theme + output_file_postfix)]
+    commands += __get_optimized_compiler_args()
 
     commands += __get_roots()
 

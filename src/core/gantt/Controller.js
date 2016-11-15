@@ -687,7 +687,7 @@ anychart.core.gantt.Controller.prototype.recalculate = function() {
           this.endIndex_ = this.heightCache_.length - 1;
           this.verticalOffset_ = this.getHeightByIndexes(this.startIndex_, this.endIndex_) - this.availableHeight_;
         } else {
-          var height = this.startIndex_ == 0 ? 0 : this.heightCache_[this.startIndex_ - 1];
+          var height = !this.startIndex_ ? 0 : this.heightCache_[this.startIndex_ - 1];
           this.endIndex_ = this.getIndexByHeight(height + this.availableHeight_ + this.verticalOffset_);
         }
       } else { //End index is set, start index must be NaN here.
@@ -1022,7 +1022,7 @@ anychart.core.gantt.Controller.prototype.getScrollBar = function() {
 
       controller.suspendSignalsDispatching();
 
-      if (startRatio == 0) { //This fixes JS rounding.
+      if (!startRatio) { //This fixes JS rounding.
         controller
             .startIndex(0)
             .verticalOffset(0);

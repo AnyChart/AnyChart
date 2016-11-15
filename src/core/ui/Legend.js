@@ -504,7 +504,7 @@ anychart.core.ui.Legend.prototype.titleInvalidated_ = function(event) {
     state |= anychart.ConsistencyState.BOUNDS;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
-  // If there are no signals, the state == 0 and nothing happens.
+  // If there are no signals, the !state and nothing happens.
   this.invalidate(state, signal);
 };
 
@@ -563,7 +563,7 @@ anychart.core.ui.Legend.prototype.titleSeparatorInvalidated_ = function(event) {
     state |= anychart.ConsistencyState.BOUNDS;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
-  // If there are no signals, state == 0 and nothing happens.
+  // If there are no signals, !state and nothing happens.
   this.invalidate(state, signal);
 };
 
@@ -605,7 +605,7 @@ anychart.core.ui.Legend.prototype.paginatorInvalidated_ = function(event) {
     state |= anychart.ConsistencyState.BOUNDS;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
-  // If there are no signals, state == 0 and nothing happens.
+  // If there are no signals, !state and nothing happens.
   this.invalidate(state, signal);
 };
 
@@ -862,7 +862,7 @@ anychart.core.ui.Legend.prototype.createItemsFromSource_ = function() {
 
 /**
  * Prepare items to initialization.
- * @param {!Array.<Object>} items Items.
+ * @param {Array.<Object>} items Items.
  * @return {!Array.<Object>} Items prepared to initialization.
  * @private
  */
@@ -1005,7 +1005,7 @@ anychart.core.ui.Legend.prototype.calculateContentWidth_ = function() {
     fullWidth += width + this.itemsSpacing_;
     maxWidth = Math.max(maxWidth, width);
   }
-  if (fullWidth == 0 || maxWidth < 0)
+  if (!fullWidth || maxWidth < 0)
     return 0;
   fullWidth -= this.itemsSpacing_;
 
@@ -1035,7 +1035,7 @@ anychart.core.ui.Legend.prototype.calculateContentHeight_ = function() {
     fullHeight += height + this.itemsSpacing_;
     maxHeight = Math.max(maxHeight, height);
   }
-  if (fullHeight == 0 || maxHeight < 0)
+  if (!fullHeight || maxHeight < 0)
     return 0;
   fullHeight -= this.itemsSpacing_;
 

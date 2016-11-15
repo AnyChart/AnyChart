@@ -182,7 +182,7 @@ anychart.core.map.series.Base.prototype.geoData;
 
 
 /**
- * @type {Array.<String>}
+ * @type {Array.<string>}
  */
 anychart.core.map.series.Base.prototype.seriesPoints;
 
@@ -381,7 +381,7 @@ anychart.core.map.series.Base.prototype.configureLabel = function(pointState, op
 anychart.core.map.series.Base.prototype.getAnchorForLabel = function(angle) {
   angle = goog.math.standardAngle(angle);
   var anchor = anychart.enums.Anchor.CENTER;
-  if (angle == 0) {
+  if (!angle) {
     anchor = anychart.enums.Anchor.CENTER_BOTTOM;
   } else if (angle < 90) {
     anchor = anychart.enums.Anchor.LEFT_BOTTOM;

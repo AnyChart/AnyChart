@@ -802,17 +802,17 @@ anychart.core.ui.BaseGrid.prototype.rowMouseDown = goog.nullFunction;
   Illustration for this method:
   (Grid is rectangle in center)
 
-    offsetX < 0  |  offsetX == 0  |  offsetX > 0
+    offsetX < 0  |  !offsetX  |  offsetX > 0
     offsetY < 0  |  offsetY < 0   |  offsetY < 0
 
     ------------ +----------------+ --------------
                  |                |
-    offsetX < 0  |  offsetX == 0  |  offsetX > 0
-    offsetY == 0 |  offsetX == 0  |  offsetY == 0
+    offsetX < 0  |  !offsetX  |  offsetX > 0
+    !offsetY |  !offsetX  |  !offsetY
                  |                |
     ------------ +----------------+ --------------
 
-    offsetX < 0  |  offsetX == 0  |  offsetX > 0
+    offsetX < 0  |  !offsetX  |  offsetX > 0
     offsetY > 0  |  offsetY > 0   |  offsetY > 0
 
  */
@@ -840,7 +840,7 @@ anychart.core.ui.BaseGrid.prototype.rowSelect = function(event) {
 anychart.core.ui.BaseGrid.prototype.getInteractivityEvent = function(event) {
   if (this.gridHeightCache_.length) {
     var visibleItems = this.controller.getVisibleItems();
-    var startIndex = this.controller.startIndex();
+    var startIndex = /** @type {number} */(this.controller.startIndex());
     var item;
     var type = event.type;
     switch (type) {
@@ -1564,8 +1564,8 @@ anychart.core.ui.BaseGrid.prototype.drawRowFills_ = function() {
   var header = this.pixelBoundsCache.top + this.headerHeight_ + 1; //1px line always separates header from content
 
   var verticalOffset = this.controller.verticalOffset();
-  var startIndex = this.controller.startIndex();
-  var endIndex = this.controller.endIndex();
+  var startIndex = /** @type {number} */(this.controller.startIndex());
+  var endIndex = /** @type {number} */(this.controller.endIndex());
   var visibleItems = this.controller.getVisibleItems();
 
   var totalTop = (header - verticalOffset);
@@ -1677,9 +1677,9 @@ anychart.core.ui.BaseGrid.prototype.mouseWheelHandler_ = function(e) {
     scrollsUp = dy < 0;
     var vStart = verticalScroll.startRatio();
     var vEnd = verticalScroll.endRatio();
-    preventVertically = (vStart == 0 && vEnd == 1) ? false :
+    preventVertically = (!vStart && vEnd == 1) ? false :
         ((vStart > 0 && vEnd < 1) ||
-        (vStart == 0 && !scrollsUp && vEnd != 1) ||
+        (!vStart && !scrollsUp && vEnd != 1) ||
         (vEnd == 1 && scrollsUp && vStart != 0));
   }
 
@@ -1688,14 +1688,14 @@ anychart.core.ui.BaseGrid.prototype.mouseWheelHandler_ = function(e) {
     var hStart = horizontalScroll.startRatio();
     var hEnd = horizontalScroll.endRatio();
     if (scrollsLeft) {
-      preventHorizontally = (hStart == 0 && hEnd == 1) ? denyBodyScrollLeft :
+      preventHorizontally = (!hStart && hEnd == 1) ? denyBodyScrollLeft :
           (hStart > 0 && hEnd < 1) ||
           (hEnd == 1 && hStart != 0) ||
-          (hStart == 0 && denyBodyScrollLeft);
+          (!hStart && denyBodyScrollLeft);
     } else {
-      preventHorizontally = (hStart == 0 && hEnd == 1) ? false :
+      preventHorizontally = (!hStart && hEnd == 1) ? false :
           (hStart > 0 && hEnd < 1) ||
-          (hStart == 0 && hEnd != 1);
+          (!hStart && hEnd != 1);
     }
   }
 

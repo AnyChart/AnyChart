@@ -107,7 +107,7 @@ anychart.core.annotations.AndrewsPitchfork.prototype.drawThreePointsShape = func
   var dx = (x2 + x3) / 2 - x1;
   var dy = (y2 + y3) / 2 - y1;
   // if the vector is zero, let the fork go right horizontal
-  if (dx == 0 && dy == 0) {
+  if (!dx && !dy) {
     dx = 10;
   }
   var line1 = anychart.math.clipRayByRect(x1, y1, x1 + dx, y1 + dy, this.pixelBoundsCache);

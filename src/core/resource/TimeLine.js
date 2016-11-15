@@ -725,7 +725,7 @@ anychart.core.resource.TimeLine.prototype.drawLabels = function(row) {
     var tickValue = label.formatProvider()['tickValue'];
     label.formatProvider(this.getLabelsFormatProvider_(tickValue, format));
 
-    if (i == 0 || i == len - 1) {
+    if (!i || i == len - 1) {
       var settings = label.getMergedSettings();
       settings[anychart.opt.WIDTH] = null;
       settings[anychart.opt.HEIGHT] = null;

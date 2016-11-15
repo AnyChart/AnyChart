@@ -429,7 +429,7 @@ anychart.core.ui.table.Base.prototype.paddingInternal = function(opt_spaceOrTopO
       argsLen = tmp.length;
     } else
       argsLen = arguments.length;
-    if (argsLen == 0) {
+    if (!argsLen) {
       left = bottom = right = top = 0;
     } else if (goog.isObject(opt_spaceOrTopOrTopAndBottom)) {
       top = anychart.utils.toNumberOrString(opt_spaceOrTopOrTopAndBottom['top']) || 0;

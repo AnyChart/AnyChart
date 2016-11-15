@@ -195,7 +195,7 @@ anychart.ui.ContextMenu.prototype.removeClassName = function(className) {
       goog.dom.classlist.remove(this.getElement(), className);
     }
 
-    if (this.extraClassNames_.length == 0) {
+    if (!this.extraClassNames_.length) {
       this.extraClassNames_ = null;
     }
   }

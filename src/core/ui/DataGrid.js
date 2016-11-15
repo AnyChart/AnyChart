@@ -477,7 +477,7 @@ anychart.core.ui.DataGrid.prototype.column = function(opt_indexOrValue, opt_valu
     index = 0;
     value = /** @type {Object} */ (opt_indexOrValue);
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = /** @type {Object} */ (opt_value);
   }
 
@@ -1561,8 +1561,8 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
       this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_TITLE);
 
       var data = this.dataGrid_.getVisibleItems();
-      var startIndex = this.dataGrid_.startIndex();
-      var endIndex = this.dataGrid_.endIndex();
+      var startIndex = /** @type {number} */(this.dataGrid_.startIndex());
+      var endIndex = /** @type {number} */(this.dataGrid_.endIndex());
       var verticalOffset = this.dataGrid_.verticalOffset();
 
       var totalTop = this.pixelBoundsCache_.top + headerHeight + 1 - verticalOffset;

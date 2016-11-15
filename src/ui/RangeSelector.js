@@ -264,7 +264,7 @@ anychart.ui.RangeSelector.prototype.update = function() {
     button.setAutoStates(goog.ui.Component.State.CHECKED, false);
     this.selectionModel_.addItem(button);
 
-    if (index == 0) {
+    if (!index) {
       button.setCollapsed(goog.ui.ButtonSide.END);
     } else if (index == this.ranges_.length - 1) {
       button.setCollapsed(goog.ui.ButtonSide.START);

@@ -682,7 +682,7 @@ anychart.charts.Sparkline.prototype.lineMarker = function(opt_indexOrValue, opt_
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var lineMarker = this.lineAxesMarkers_[index];
@@ -717,7 +717,7 @@ anychart.charts.Sparkline.prototype.rangeMarker = function(opt_indexOrValue, opt
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var rangeMarker = this.rangeAxesMarkers_[index];
@@ -752,7 +752,7 @@ anychart.charts.Sparkline.prototype.textMarker = function(opt_indexOrValue, opt_
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var textMarker = this.textAxesMarkers_[index];
@@ -1242,7 +1242,7 @@ anychart.charts.Sparkline.prototype.getFinalFill = function(usePointSettings) {
   } else if (index == iterator.getRowsCount() - 1 && goog.isDef(this.lastFill())) {
     //last point
     finalFill = this.lastFill();
-  } else if (index == 0 && goog.isDef(this.firstFill())) {
+  } else if (!index && goog.isDef(this.firstFill())) {
     //first point
     finalFill = this.firstFill();
   } else if (val == this.getStat(anychart.enums.Statistics.MAX) && goog.isDef(this.maxFill())) {
@@ -1497,7 +1497,7 @@ anychart.charts.Sparkline.prototype.getFinalHatchFill = function(usePointSetting
   } else if (index == iterator.getRowsCount() - 1 && goog.isDef(this.lastHatchFill())) {
     //last point
     finalHatchFill = this.lastHatchFill();
-  } else if (index == 0 && goog.isDef(this.firstHatchFill())) {
+  } else if (!index && goog.isDef(this.firstHatchFill())) {
     //first point
     finalHatchFill = this.firstHatchFill();
   } else if (val == this.getStat(anychart.enums.Statistics.MAX) && goog.isDef(this.maxHatchFill())) {
@@ -1749,7 +1749,7 @@ anychart.charts.Sparkline.prototype.getFinalMarker = function(usePointSettings) 
     //last point
     firstOrLastMarkers = this.lastMarkers();
     defaultFirstOrLastMarkers = this.seriesDefaults_['lastMarkers'];
-  } else if (index == 0) {
+  } else if (!index) {
     //first point
     firstOrLastMarkers = this.firstMarkers();
     defaultFirstOrLastMarkers = this.seriesDefaults_['firstMarkers'];
@@ -1996,7 +1996,7 @@ anychart.charts.Sparkline.prototype.getFinalLabel = function(usePointSettings) {
     //last point
     firstOrLastLabels = this.lastLabels();
     defaultFirstOrLastLabels = this.seriesDefaults_['lastLabels'];
-  } else if (index == 0) {
+  } else if (!index) {
     //first point
     firstOrLastLabels = this.firstLabels();
     defaultFirstOrLastLabels = this.seriesDefaults_['firstLabels'];

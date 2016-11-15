@@ -1155,7 +1155,7 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
       }
 
       var height = anychart.math.round(bounds.height / (100 + countMissing * paddingPercent) * percent, 2);
-      if (height == 0) {
+      if (!height) {
         height = this.minHeightOfPoint_;
       }
 
@@ -1370,7 +1370,7 @@ anychart.core.PyramidFunnelBase.prototype.calculatePoint_ = function() {
 
   if (pointsPadding) {
     // first point
-    if (index == 0) {
+    if (!index) {
       y2 = y2 - pointsPadding / 2;
 
       // catch error
@@ -3569,7 +3569,7 @@ anychart.core.PyramidFunnelBase.prototype.calculate = function() {
 
     var count = iterator.getRowsCount() - missingPoints; // do not count missing points
     var avg;
-    if (count == 0) min = max = sum = avg = undefined;
+    if (!count) min = max = sum = avg = undefined;
     else avg = sum / count;
     this.statistics[anychart.enums.Statistics.COUNT] = count;
     this.statistics[anychart.enums.Statistics.MIN] = min;
@@ -4007,7 +4007,7 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.recalculateLabelsPosition
     labelPointPath = this.chart.data().meta(label.getIndex(), 'point');
     labelPointBounds = labelPointPath.getBounds();
 
-    if (i == 0) {
+    if (!i) {
       firstPointTop = labelPointBounds.top;
     }
 

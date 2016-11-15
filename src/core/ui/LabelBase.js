@@ -633,7 +633,7 @@ anychart.core.ui.LabelBase.prototype.calculateFontSize_ = function(originWidth, 
     }
   }
 
-  if (checked == 0) {
+  if (!checked) {
     // size is exactly ok for the bounds set
     goog.dispose(text);
     return fontSize;

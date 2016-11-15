@@ -311,7 +311,7 @@ anychart.charts.Bullet.prototype.onAxisSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
     state |= anychart.ConsistencyState.BOUNDS;
   }
-  // if there are no signals, state == 0 and nothing happens.
+  // if there are no signals, !state and nothing happens.
   this.invalidate(state, signal);
 };
 
@@ -329,7 +329,7 @@ anychart.charts.Bullet.prototype.range = function(opt_indexOrValue, opt_value) {
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var range = this.ranges_[index];

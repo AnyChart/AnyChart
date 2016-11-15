@@ -93,10 +93,10 @@ anychart.math.rsi.calculationFunction = function(row, context) {
       else if (curr < prev)
         context.downwardChange += prev - curr;
     }
-    if (down == 0)
-      result = 100;
-    else
+    if (context.downwardChange)
       result = 100 - 100 / (1 + context.upwardChange / context.downwardChange);
+    else
+      result = 100;
   }
   row.set('result', result);
 };

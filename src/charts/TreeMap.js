@@ -1475,7 +1475,7 @@ anychart.charts.TreeMap.prototype.colorRangeInvalidated_ = function(event) {
     state |= anychart.ConsistencyState.BOUNDS;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
-  // if there are no signals, state == 0 and nothing happens.
+  // if there are no signals, !state and nothing happens.
   this.invalidate(state, signal);
 };
 
@@ -1703,7 +1703,7 @@ anychart.charts.TreeMap.prototype.getNodeType_ = function(node, depth) {
     if (depth < this.maxDepth_)
       type = anychart.charts.TreeMap.NodeType.HEADER;
     else if (depth == this.maxDepth_) {
-      if (this.hintDepth_ == 0)
+      if (!this.hintDepth_)
         type = anychart.charts.TreeMap.NodeType.LEAF;
       else
         type = anychart.charts.TreeMap.NodeType.RECT;
@@ -2538,14 +2538,14 @@ anychart.charts.TreeMap.prototype.drawNode_ = function(node, bounds, depth) {
 anychart.charts.TreeMap.prototype.calculateNodeTypes_ = function(node, depth) {
   if (depth > this.maxDepth_ + this.hintDepth_) return;
   var type = this.getNodeType_(node, depth);
-  this.drawingNodes_[node.meta('index')] = node;
+  this.drawingNodes_[/** @type {number} */(node.meta('index'))] = node;
   var numChildren = node.numChildren();
   if (numChildren) {
     for (var i = 0; i < numChildren; i++) {
       this.calculateNodeTypes_(/** @type {anychart.data.Tree.DataItem} */ (node.getChildAt(i)), depth + 1);
     }
   }
-  var value = node.meta(anychart.charts.TreeMap.DataFields.VALUE);
+  var value = /** @type {number} */(node.meta(anychart.charts.TreeMap.DataFields.VALUE));
   if (type == anychart.charts.TreeMap.NodeType.LEAF || type == anychart.charts.TreeMap.NodeType.RECT)
     this.nodeValues_.push(value);
   else if (type == anychart.charts.TreeMap.NodeType.HINT_LEAF)
@@ -2567,7 +2567,7 @@ anychart.charts.TreeMap.prototype.ensureDataPrepared = function() {
       if (numChildren > 1)
         anychart.core.reporting.warning(anychart.enums.WarningCode.TREEMAP_MANY_ROOTS);
       // no data case
-      else if (numChildren == 0)
+      else if (!numChildren)
         return;
       if (!this.rootNode_)
         this.rootNode_ = data.getChildAt(0);
@@ -2752,7 +2752,7 @@ anychart.charts.TreeMap.prototype.specificContextMenuItems = function(items, con
   var tag = anychart.utils.extractTag(context['event']['domTarget']);
   var node;
   if (context['target'] instanceof anychart.core.ui.LabelsFactory || context['target'] instanceof anychart.core.ui.MarkersFactory) {
-    node = this.linearNodes_[tag];
+    node = this.linearNodes_[/** @type {number} */(tag)];
   } else {
     node = tag['node'];
   }

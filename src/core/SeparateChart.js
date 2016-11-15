@@ -85,7 +85,7 @@ anychart.core.SeparateChart.prototype.onLegendSignal_ = function(event) {
     state |= anychart.ConsistencyState.BOUNDS;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
-  // If there are no signals - state == 0 and nothing will happen.
+  // If there are no signals - !state and nothing will happen.
   this.invalidate(state, signal);
 };
 

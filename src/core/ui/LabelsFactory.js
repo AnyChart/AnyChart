@@ -2042,7 +2042,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.calculateFontSize = function(orig
     }
   }
 
-  if (checked == 0) {
+  if (!checked) {
     // size is exactly ok for the bounds set
     return fontSize;
   }

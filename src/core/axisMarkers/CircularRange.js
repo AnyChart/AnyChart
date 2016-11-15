@@ -468,7 +468,7 @@ anychart.core.axisMarkers.CircularRange.prototype.drawGradientBlock_ = function(
   this.drawDynamicArc_(path, startAngle, centerAngle, startBaseR, centerBaseRadius, true);
   this.drawDynamicArc_(path, centerAngle, startAngle, centerR, startR, false);
 
-  if ((index == 0) && cornersRoundingPixStart) {
+  if ((!index) && cornersRoundingPixStart) {
     x = cx + goog.math.angleDx(startAngle, startBaseR);
     y = cy + goog.math.angleDy(startAngle, startBaseR);
     if (cornersRoundingPixStart < startWidth / 2)
@@ -569,7 +569,7 @@ anychart.core.axisMarkers.CircularRange.prototype.draw = function() {
       var endAngle = axisStartAngle + toRatio * axisSweepAngle;
 
       var sweepAngle = endAngle - startAngle;
-      if (sweepAngle == 0) sweepAngle = fromRatio == toRatio ? 0 : 360;
+      if (!sweepAngle) sweepAngle = fromRatio == toRatio ? 0 : 360;
 
       var startAngleRad = goog.math.toRadians(startAngle);
       var endAngleRad = goog.math.toRadians(endAngle);

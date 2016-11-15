@@ -258,7 +258,7 @@ anychart.core.utils.Space.normalizeSpace = function(var_args) {
     argsLen = arguments.length;
   // else if branches sorted a bit like by usage frequency
 
-  if (argsLen == 0) {
+  if (!argsLen) {
     return {};
   } else if (goog.typeOf(spaceOrTopOrTopAndBottom) == 'object') {
     top = spaceOrTopOrTopAndBottom['top'] || 0;

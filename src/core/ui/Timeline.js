@@ -1328,7 +1328,7 @@ anychart.core.ui.Timeline.prototype.lineMarker = function(opt_indexOrValue, opt_
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var lineMarker = this.lineMarkers_[index];
@@ -1364,7 +1364,7 @@ anychart.core.ui.Timeline.prototype.rangeMarker = function(opt_indexOrValue, opt
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var rangeMarker = this.rangeMarkers_[index];
@@ -1399,7 +1399,7 @@ anychart.core.ui.Timeline.prototype.textMarker = function(opt_indexOrValue, opt_
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var textMarker = this.textMarkers_[index];
@@ -3112,7 +3112,7 @@ anychart.core.ui.Timeline.prototype.drawMarkers_ = function(dataItem, totalTop, 
 anychart.core.ui.Timeline.prototype.drawResourceTimeline_ = function() {
   var totalTop = /** @type {number} */ (this.pixelBoundsCache.top + this.headerHeight() + 1 - this.controller.verticalOffset());
   var visibleItems = this.controller.getVisibleItems();
-  for (var i = this.controller.startIndex(); i <= this.controller.endIndex(); i++) {
+  for (var i = /** @type {number} */(this.controller.startIndex()); i <= /** @type {number} */(this.controller.endIndex()); i++) {
     var item = visibleItems[i];
     if (!item) break;
 
@@ -3135,7 +3135,7 @@ anychart.core.ui.Timeline.prototype.drawProjectTimeline_ = function() {
   var totalTop = /** @type {number} */ (this.pixelBoundsCache.top + this.headerHeight() + 1 - this.controller.verticalOffset());
   var visibleItems = this.controller.getVisibleItems();
 
-  for (var i = this.controller.startIndex(); i <= this.controller.endIndex(); i++) {
+  for (var i = /** @type {number} */(this.controller.startIndex()); i <= /** @type {number} */(this.controller.endIndex()); i++) {
     var item = visibleItems[i];
     if (!item) break;
 

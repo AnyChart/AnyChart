@@ -49,7 +49,7 @@ anychart.core.utils.Margin.prototype.tightenHeight = function(initialHeight) {
     ratio += parseFloat(bottom) / 100;
   else
     initialHeight -= goog.isNumber(bottom) ? bottom : parseFloat(bottom);
-  if (ratio == 0) ratio = 1e-7;
+  if (!ratio) ratio = 1e-7;
   return initialHeight / ratio;
 };
 
@@ -67,6 +67,6 @@ anychart.core.utils.Margin.prototype.tightenWidth = function(initialWidth) {
     ratio += parseFloat(right) / 100;
   else
     initialWidth -= goog.isNumber(right) ? right : parseFloat(right);
-  if (ratio == 0) ratio = 1e-7;
+  if (!ratio) ratio = 1e-7;
   return initialWidth / ratio;
 };

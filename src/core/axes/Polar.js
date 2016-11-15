@@ -731,7 +731,7 @@ anychart.core.axes.Polar.prototype.getLabelPositionOffsetForAngle_ = function(an
   var width = bounds.width, height = bounds.height;
 
   var offset = {x: 0, y: 0};
-  if (angle == 0) {
+  if (!angle) {
     offset.x += width / 2;
   } else if (angle > 0 && angle < 90) {
     offset.x += width / 2;
@@ -1135,7 +1135,7 @@ anychart.core.axes.Polar.prototype.draw = function() {
           yPixelShift = 0;
 
           halfThickness = Math.floor(lineThickness / 2);
-          if (angle == 0) {
+          if (!angle) {
             yPixelShift = tickThickness % 2 == 0 ? 0 : -.5;
           } else if (angle == 90) {
             xPixelShift = tickThickness % 2 == 0 ? 0 : -.5;
@@ -1186,7 +1186,7 @@ anychart.core.axes.Polar.prototype.draw = function() {
           yPixelShift = 0;
 
           halfThickness = Math.floor(lineThickness / 2);
-          if (minorAngle == 0) {
+          if (!minorAngle) {
             yPixelShift = minorTickThickness % 2 == 0 ? 0 : -.5;
           } else if (minorAngle == 90) {
             xPixelShift = minorTickThickness % 2 == 0 ? 0 : -.5;

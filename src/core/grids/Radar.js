@@ -481,7 +481,7 @@ anychart.core.grids.Radar.prototype.drawLineCircuit = function(ratio) {
       x = Math.round(this.cx_ + radius * Math.cos(angleRad));
       y = Math.round(this.cy_ + radius * Math.sin(angleRad));
 
-      if (i == 0)
+      if (!i)
         this.lineElement_.moveTo(x, y);
       else
         this.lineElement_.lineTo(x, y);
@@ -551,7 +551,7 @@ anychart.core.grids.Radar.prototype.drawInterlaceCircuit = function(ratio, prevR
         x = Math.round(this.cx_ + radius * Math.cos(angleRad));
         y = Math.round(this.cy_ + radius * Math.sin(angleRad));
 
-        if (i == 0)
+        if (!i)
           element.moveTo(x, y);
         else
           element.lineTo(x, y);
@@ -694,7 +694,7 @@ anychart.core.grids.Radar.prototype.draw = function() {
 
         xPixelShift = 0;
         yPixelShift = 0;
-        if (angle == 0) {
+        if (!angle) {
           yPixelShift = lineThickness % 2 == 0 ? 0 : -.5;
         } else if (angle == 90) {
           xPixelShift = lineThickness % 2 == 0 ? 0 : -.5;
@@ -710,7 +710,7 @@ anychart.core.grids.Radar.prototype.draw = function() {
 
         drawInterlace.call(this, x, y, prevX, prevY, layer);
 
-        if (i == 0) {
+        if (!i) {
           if (this.drawLastLine_) drawLine.call(this, x, y, xPixelShift, yPixelShift);
         } else {
           drawLine.call(this, x, y, xPixelShift, yPixelShift);

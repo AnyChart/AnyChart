@@ -997,7 +997,7 @@ anychart.core.stock.Plot.prototype.yAxis = function(opt_indexOrValue, opt_value)
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var axis = this.yAxes_[index];
@@ -1065,7 +1065,7 @@ anychart.core.stock.Plot.prototype.grid = function(opt_indexOrValue, opt_value) 
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var grid = this.grids_[index];
@@ -1101,7 +1101,7 @@ anychart.core.stock.Plot.prototype.minorGrid = function(opt_indexOrValue, opt_va
     index = 0;
     value = opt_indexOrValue;
   } else {
-    index = opt_indexOrValue;
+    index = /** @type {number} */(opt_indexOrValue);
     value = opt_value;
   }
   var grid = this.minorGrids_[index];
@@ -1493,7 +1493,7 @@ anychart.core.stock.Plot.prototype.onLegendSignal_ = function(event) {
     state |= anychart.ConsistencyState.BOUNDS;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
-  // If there are no signals state == 0 and nothing will happen.
+  // If there are no signals !state and nothing will happen.
   this.invalidate(state, signal);
 };
 

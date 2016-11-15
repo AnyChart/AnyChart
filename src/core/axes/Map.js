@@ -740,7 +740,7 @@ anychart.core.axes.Map.prototype.getOverlappedLabels_ = function() {
           if (nextDrawableLabel == -1 && isLabels) {
             k = i;
             while (nextDrawableLabel == -1 && k < ticksArrLen) {
-              if ((k == 0 && drawFirstLabel) || (k == ticksArrLen - 1 && drawLastLabel) || (k != 0 && k != ticksArrLen - 1))
+              if ((!k && drawFirstLabel) || (k == ticksArrLen - 1 && drawLastLabel) || (k != 0 && k != ticksArrLen - 1))
                 bounds1 = this.getLabelBounds_(k, true, scaleTicksArr);
               else
                 bounds1 = null;
@@ -1603,7 +1603,7 @@ anychart.core.axes.Map.prototype.draw = function() {
         // var majorPixelShift = tickThickness % 2 == 0 ? 0 : -.5;
         drawLabel = goog.isArray(needDrawLabels) ? needDrawLabels[i] : needDrawLabels;
         if (goog.isBoolean(needDrawLabels)) {
-          if (i == 0) drawLabel = drawLabel && this.getOption(anychart.opt.DRAW_FIRST_LABEL);
+          if (!i) drawLabel = drawLabel && this.getOption(anychart.opt.DRAW_FIRST_LABEL);
           if (i == ticksArrLen - 1) drawLabel = drawLabel && this.getOption(anychart.opt.DRAW_LAST_LABEL);
         }
         drawTick = (goog.isArray(needDrawLabels) && needDrawLabels[i]) || goog.isBoolean(needDrawLabels);

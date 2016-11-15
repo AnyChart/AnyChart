@@ -41,7 +41,7 @@ anychart.data.csv.DefaultItemsProcessor.prototype.getData = function() {
  * Processes the row.
  */
 anychart.data.csv.DefaultItemsProcessor.prototype.processRow = function() {
-  this.data_.push(this.row_);
+  this.data_.push(this.row_ || []);
   this.row_ = [];
 };
 
