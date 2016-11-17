@@ -603,6 +603,37 @@ anychart.core.stock.Plot.prototype.getAllSeries = function() {
 
 
 /**
+ * Creates AMA indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {number=} opt_fastPeriod
+ * @param {number=} opt_slowPeriod
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.AMA}
+ */
+anychart.core.stock.Plot.prototype.ama = function(mapping, opt_period, opt_fastPeriod, opt_slowPeriod, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.AMA(this, mapping, opt_period, opt_fastPeriod, opt_slowPeriod, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates Aroon indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {anychart.enums.StockSeriesType=} opt_upSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_downSeriesType
+ * @return {anychart.core.stock.indicators.Aroon}
+ */
+anychart.core.stock.Plot.prototype.aroon = function(mapping, opt_period, opt_upSeriesType, opt_downSeriesType) {
+  var result = new anychart.core.stock.indicators.Aroon(this, mapping, opt_period, opt_upSeriesType, opt_downSeriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
  * Creates EMA indicator on the chart.
  * @param {!anychart.data.TableMapping} mapping
  * @param {number=} opt_period
@@ -631,6 +662,20 @@ anychart.core.stock.Plot.prototype.macd = function(mapping, opt_fastPeriod, opt_
     opt_macdSeriesType, opt_signalSeriesType, opt_histogramSeriesType) {
   var result = new anychart.core.stock.indicators.MACD(this, mapping, opt_fastPeriod, opt_slowPeriod, opt_signalPeriod,
       opt_macdSeriesType, opt_signalSeriesType, opt_histogramSeriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates MMA indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.MMA}
+ */
+anychart.core.stock.Plot.prototype.mma = function(mapping, opt_period, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.MMA(this, mapping, opt_period, opt_seriesType);
   this.indicators_.push(result);
   return result;
 };
@@ -673,21 +718,6 @@ anychart.core.stock.Plot.prototype.rsi = function(mapping, opt_period, opt_serie
  */
 anychart.core.stock.Plot.prototype.sma = function(mapping, opt_period, opt_seriesType) {
   var result = new anychart.core.stock.indicators.SMA(this, mapping, opt_period, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates Aroon indicator on the chart.
- * @param {!anychart.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_upSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_downSeriesType
- * @return {anychart.core.stock.indicators.Aroon}
- */
-anychart.core.stock.Plot.prototype.aroon = function(mapping, opt_period, opt_upSeriesType, opt_downSeriesType) {
-  var result = new anychart.core.stock.indicators.Aroon(this, mapping, opt_period, opt_upSeriesType, opt_downSeriesType);
   this.indicators_.push(result);
   return result;
 };
@@ -2417,12 +2447,14 @@ anychart.core.stock.Plot.prototype['getSeriesCount'] = anychart.core.stock.Plot.
 anychart.core.stock.Plot.prototype['removeSeries'] = anychart.core.stock.Plot.prototype.removeSeries;
 anychart.core.stock.Plot.prototype['removeSeriesAt'] = anychart.core.stock.Plot.prototype.removeSeriesAt;
 anychart.core.stock.Plot.prototype['removeAllSeries'] = anychart.core.stock.Plot.prototype.removeAllSeries;
+anychart.core.stock.Plot.prototype['ama'] = anychart.core.stock.Plot.prototype.ama;
+anychart.core.stock.Plot.prototype['aroon'] = anychart.core.stock.Plot.prototype.aroon;
 anychart.core.stock.Plot.prototype['ema'] = anychart.core.stock.Plot.prototype.ema;
 anychart.core.stock.Plot.prototype['macd'] = anychart.core.stock.Plot.prototype.macd;
+anychart.core.stock.Plot.prototype['mma'] = anychart.core.stock.Plot.prototype.mma;
 anychart.core.stock.Plot.prototype['roc'] = anychart.core.stock.Plot.prototype.roc;
 anychart.core.stock.Plot.prototype['rsi'] = anychart.core.stock.Plot.prototype.rsi;
 anychart.core.stock.Plot.prototype['sma'] = anychart.core.stock.Plot.prototype.sma;
-anychart.core.stock.Plot.prototype['aroon'] = anychart.core.stock.Plot.prototype.aroon;
 anychart.core.stock.Plot.prototype['palette'] = anychart.core.stock.Plot.prototype.palette;
 // anychart.core.stock.Plot.prototype['markerPalette'] = anychart.core.stock.Plot.prototype.markerPalette;
 anychart.core.stock.Plot.prototype['hatchFillPalette'] = anychart.core.stock.Plot.prototype.hatchFillPalette;

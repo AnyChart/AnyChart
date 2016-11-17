@@ -247,6 +247,7 @@ anychart.data.Table.prototype.deregisterComputer = function(computer) {
     for (i = 0; i < itemsToRemove.length; i++)
       delete this.computedColumnsAliases_[itemsToRemove[i]];
 
+    minField--;
     this.storage_.lastComputedColumn = Math.min(this.storage_.lastComputedColumn, minField);
     for (var hash in this.aggregates_)
       this.aggregates_[hash].lastComputedColumn = Math.min(this.aggregates_[hash].lastComputedColumn, minField);

@@ -756,6 +756,37 @@ anychart.core.stock.Scroller.prototype.getAllSeries = function() {
 
 
 /**
+ * Creates AMA indicator on the scroller.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {number=} opt_fastPeriod
+ * @param {number=} opt_slowPeriod
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.AMA}
+ */
+anychart.core.stock.Scroller.prototype.ama = function(mapping, opt_period, opt_fastPeriod, opt_slowPeriod, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.AMA(this, mapping, opt_period, opt_fastPeriod, opt_slowPeriod, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates Aroon indicator on the scroller.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {anychart.enums.StockSeriesType=} opt_upSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_downSeriesType
+ * @return {anychart.core.stock.indicators.Aroon}
+ */
+anychart.core.stock.Scroller.prototype.aroon = function(mapping, opt_period, opt_upSeriesType, opt_downSeriesType) {
+  var result = new anychart.core.stock.indicators.Aroon(this, mapping, opt_period, opt_upSeriesType, opt_downSeriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
  * Creates EMA indicator on the chart.
  * @param {!anychart.data.TableMapping} mapping
  * @param {number=} opt_period
@@ -784,6 +815,20 @@ anychart.core.stock.Scroller.prototype.macd = function(mapping, opt_fastPeriod, 
     opt_macdSeriesType, opt_signalSeriesType, opt_histogramSeriesType) {
   var result = new anychart.core.stock.indicators.MACD(this, mapping, opt_fastPeriod, opt_slowPeriod, opt_signalPeriod,
       opt_macdSeriesType, opt_signalSeriesType, opt_histogramSeriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates MMA indicator on the scroller.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.MMA}
+ */
+anychart.core.stock.Scroller.prototype.mma = function(mapping, opt_period, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.MMA(this, mapping, opt_period, opt_seriesType);
   this.indicators_.push(result);
   return result;
 };
@@ -826,21 +871,6 @@ anychart.core.stock.Scroller.prototype.rsi = function(mapping, opt_period, opt_s
  */
 anychart.core.stock.Scroller.prototype.sma = function(mapping, opt_period, opt_seriesType) {
   var result = new anychart.core.stock.indicators.SMA(this, mapping, opt_period, opt_seriesType);
-  this.indicators_.push(result);
-  return result;
-};
-
-
-/**
- * Creates Aroon indicator on the scroller.
- * @param {!anychart.data.TableMapping} mapping
- * @param {number=} opt_period
- * @param {anychart.enums.StockSeriesType=} opt_upSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_downSeriesType
- * @return {anychart.core.stock.indicators.Aroon}
- */
-anychart.core.stock.Scroller.prototype.aroon = function(mapping, opt_period, opt_upSeriesType, opt_downSeriesType) {
-  var result = new anychart.core.stock.indicators.Aroon(this, mapping, opt_period, opt_upSeriesType, opt_downSeriesType);
   this.indicators_.push(result);
   return result;
 };
@@ -1376,9 +1406,11 @@ anychart.core.stock.Scroller.prototype['getSeriesCount'] = anychart.core.stock.S
 anychart.core.stock.Scroller.prototype['removeSeries'] = anychart.core.stock.Scroller.prototype.removeSeries;
 anychart.core.stock.Scroller.prototype['removeSeriesAt'] = anychart.core.stock.Scroller.prototype.removeSeriesAt;
 anychart.core.stock.Scroller.prototype['removeAllSeries'] = anychart.core.stock.Scroller.prototype.removeAllSeries;
+anychart.core.stock.Scroller.prototype['ama'] = anychart.core.stock.Scroller.prototype.ama;
+anychart.core.stock.Scroller.prototype['aroon'] = anychart.core.stock.Scroller.prototype.aroon;
 anychart.core.stock.Scroller.prototype['ema'] = anychart.core.stock.Scroller.prototype.ema;
 anychart.core.stock.Scroller.prototype['macd'] = anychart.core.stock.Scroller.prototype.macd;
+anychart.core.stock.Scroller.prototype['mma'] = anychart.core.stock.Scroller.prototype.mma;
 anychart.core.stock.Scroller.prototype['roc'] = anychart.core.stock.Scroller.prototype.roc;
 anychart.core.stock.Scroller.prototype['rsi'] = anychart.core.stock.Scroller.prototype.rsi;
 anychart.core.stock.Scroller.prototype['sma'] = anychart.core.stock.Scroller.prototype.sma;
-anychart.core.stock.Scroller.prototype['aroon'] = anychart.core.stock.Scroller.prototype.aroon;
