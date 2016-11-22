@@ -18,6 +18,9 @@ import multiprocessing
 #=======================================================================================================================
 #           Project paths
 #=======================================================================================================================
+#java heap size in Mb
+JAVA_HEAP_SIZE = 1024
+
 #project
 PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 CONTRIB_PATH = os.path.join(PROJECT_PATH, 'contrib')
@@ -268,7 +271,7 @@ def __get_optimized_compiler_args():
 
 def __get_default_compiler_args(theme, modules):
     result = [
-        'java -jar',
+        'java -Xmx%sM -jar' % JAVA_HEAP_SIZE,
         COMPILER_PATH,
         '--charset UTF-8',
         '--define "anychart.VERSION=\'%s\'"' % __get_version(True),
@@ -664,7 +667,7 @@ def __build_themes():
 
 def __exec_build_theme(theme, is_source):
     output_file_postfix = '.js' if is_source else '.min.js'
-    commands = ['java -jar',
+    commands = ['java -Xmx%sM -jar' % JAVA_HEAP_SIZE,
                 COMPILER_PATH,
                 '--charset UTF-8',
                 '--dependency_mode=STRICT',
