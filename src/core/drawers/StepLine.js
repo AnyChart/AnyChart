@@ -42,7 +42,16 @@ anychart.core.drawers.StepLine.prototype.flags = (
     // anychart.core.drawers.Capabilities.IS_OHLC_BASED |
     anychart.core.drawers.Capabilities.IS_LINE_BASED |
     // anychart.core.drawers.Capabilities.IS_RANGE_BASED |
+    anychart.core.drawers.Capabilities.SUPPORTS_STEP_DIRECTION |
+    // anychart.core.drawers.Capabilities.SUPPORTS_DISTRIBUTION |
     0);
+
+
+/** @inheritDoc */
+anychart.core.drawers.StepLine.prototype.startDrawing = function(shapeManager) {
+  anychart.core.drawers.StepLine.base(this, 'startDrawing', shapeManager);
+  this.direction_ = /** @type {anychart.enums.StepDirection} */ (this.series.getOption(anychart.opt.STEP_DIRECTION) || anychart.enums.StepDirection.CENTER);
+};
 
 
 /** @inheritDoc */
@@ -71,12 +80,21 @@ anychart.core.drawers.StepLine.prototype.drawSubsequentPoint = function(point, s
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
   var x = /** @type {number} */(point.meta(anychart.opt.X));
   var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
+  var line = shapes[anychart.opt.STROKE];
 
-  var midX = (x + this.prevX_) / 2;
-  shapes[anychart.opt.STROKE]
-      .lineTo(midX, this.prevY_)
-      .lineTo(midX, y)
-      .lineTo(x, y);
+  switch (this.direction_) {
+    case anychart.enums.StepDirection.FORWARD:
+      line.lineTo(x, this.prevY_);
+      break;
+    case anychart.enums.StepDirection.BACKWARD:
+      line.lineTo(this.prevX_, y);
+      break;
+    default:
+      var midX = (x + this.prevX_) / 2;
+      line.lineTo(midX, this.prevY_).lineTo(midX, y);
+  }
+
+  line.lineTo(x, y);
 
   this.prevX_ = x;
   this.prevY_ = y;

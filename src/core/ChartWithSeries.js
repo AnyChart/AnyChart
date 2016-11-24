@@ -1983,29 +1983,31 @@ anychart.core.ChartWithSeries.prototype.distributeSeries = function() {
         aSeries = drawingPlansOfScale[i].series;
         scale = /** @type {anychart.scales.Base} */(aSeries.yScale());
         id = goog.getUid(scale);
-        if (aSeries.isBarBased()) {
-          if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
-            numBarClusters++;
-          } else {
-            if (!(id in seenScalesWithBars)) {
+        if (aSeries.isWidthDistributed()) {
+          if (aSeries.isBarBased()) {
+            if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
               numBarClusters++;
-              seenScalesWithBars[id] = true;
+            } else {
+              if (!(id in seenScalesWithBars)) {
+                numBarClusters++;
+                seenScalesWithBars[id] = true;
+              }
             }
-          }
-        } else if (aSeries.isWidthBased()) {
-          if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
-            numColumnClusters++;
           } else {
-            if (!(id in seenScalesWithColumns)) {
+            if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
               numColumnClusters++;
-              seenScalesWithColumns[id] = true;
+            } else {
+              if (!(id in seenScalesWithColumns)) {
+                numColumnClusters++;
+                seenScalesWithColumns[id] = true;
+              }
             }
           }
         }
       }
 
-      this.distributeColumnClusters(numColumnClusters, drawingPlansOfScale);
-      this.distributeBarClusters(numBarClusters, drawingPlansOfScale);
+      this.distributeClusters(numColumnClusters, drawingPlansOfScale, true);
+      this.distributeClusters(numBarClusters, drawingPlansOfScale, false);
     }
   }
 };
@@ -2013,11 +2015,12 @@ anychart.core.ChartWithSeries.prototype.distributeSeries = function() {
 
 /**
  * Distribute column clusters.
- * @param {number} numColumnClusters
+ * @param {number} numClusters
  * @param {Array.<Object>} drawingPlansOfScale
+ * @param {boolean} horizontal
  * @protected
  */
-anychart.core.ChartWithSeries.prototype.distributeColumnClusters = function(numColumnClusters, drawingPlansOfScale) {
+anychart.core.ChartWithSeries.prototype.distributeClusters = function(numClusters, drawingPlansOfScale, horizontal) {
   var scale;
   var id;
   var wSeries;
@@ -2025,59 +2028,14 @@ anychart.core.ChartWithSeries.prototype.distributeColumnClusters = function(numC
   var currPosition;
   var barWidthRatio;
 
-  if (numColumnClusters > 0) {
-    numColumnClusters = numColumnClusters + (numColumnClusters - 1) * this.barsPadding_ + this.barGroupsPadding_;
-    barWidthRatio = 1 / numColumnClusters;
+  if (numClusters > 0) {
+    numClusters = numClusters + (numClusters - 1) * this.barsPadding_ + this.barGroupsPadding_;
+    barWidthRatio = 1 / numClusters;
     currPosition = barWidthRatio * this.barGroupsPadding_ / 2;
     seenScales = {};
     for (var i = 0; i < drawingPlansOfScale.length; i++) {
       wSeries = drawingPlansOfScale[i].series;
-      if (wSeries.isWidthBased() && !wSeries.isBarBased()) {
-        scale = /** @type {anychart.scales.Base} */(wSeries.yScale());
-        if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
-          wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
-          wSeries.setAutoPointWidth(barWidthRatio);
-          currPosition += barWidthRatio * (1 + this.barsPadding_);
-        } else {
-          id = goog.getUid(scale);
-          if (id in seenScales) {
-            wSeries.setAutoXPointPosition(seenScales[id] + barWidthRatio / 2);
-            wSeries.setAutoPointWidth(barWidthRatio);
-          } else {
-            wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
-            wSeries.setAutoPointWidth(barWidthRatio);
-            seenScales[id] = currPosition;
-            currPosition += barWidthRatio * (1 + this.barsPadding_);
-          }
-        }
-      }
-    }
-  }
-};
-
-
-/**
- * Distribute bar clusters.
- * @param {number} numBarClusters
- * @param {Array.<Object>} drawingPlansOfScale
- * @protected
- */
-anychart.core.ChartWithSeries.prototype.distributeBarClusters = function(numBarClusters, drawingPlansOfScale) {
-  var scale;
-  var id;
-  var wSeries;
-  var seenScales;
-  var currPosition;
-  var barWidthRatio;
-
-  if (numBarClusters > 0) {
-    numBarClusters = numBarClusters + (numBarClusters - 1) * this.barsPadding_ + this.barGroupsPadding_;
-    barWidthRatio = 1 / numBarClusters;
-    currPosition = barWidthRatio * this.barGroupsPadding_ / 2;
-    seenScales = {};
-    for (var i = 0; i < drawingPlansOfScale.length; i++) {
-      wSeries = drawingPlansOfScale[i].series;
-      if (wSeries.isBarBased()) {
+      if (wSeries.isWidthDistributed() && (horizontal ^ wSeries.isBarBased())) {
         scale = /** @type {anychart.scales.Base} */(wSeries.yScale());
         if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
           wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
@@ -2137,6 +2095,8 @@ anychart.core.ChartWithSeries.seriesReferenceValues = {
   'stepArea': [anychart.opt.VALUE],
   'stepLine:': [anychart.opt.VALUE],
   'splineArea': [anychart.opt.VALUE],
+  'jumpLine': [anychart.opt.VALUE],
+  'stick': [anychart.opt.VALUE],
   'bubble': [anychart.opt.VALUE, anychart.opt.SIZE],
   'rangeBar': [anychart.opt.HIGH, anychart.opt.LOW],
   'rangeArea': [anychart.opt.HIGH, anychart.opt.LOW],

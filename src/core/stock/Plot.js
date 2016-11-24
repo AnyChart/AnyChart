@@ -284,6 +284,42 @@ anychart.core.stock.Plot.prototype.column = function(opt_data, opt_mappingSettin
 
 
 /**
+ * Creates and returns a new jumpLine series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.Stock}
+ */
+anychart.core.stock.Plot.prototype.jumpLine = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.JUMP_LINE, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new stick series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.Stock}
+ */
+anychart.core.stock.Plot.prototype.stick = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.STICK, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
  * Creates and returns a new line series.
  * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
  * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
@@ -2422,6 +2458,8 @@ anychart.core.stock.Plot.prototype['legend'] = anychart.core.stock.Plot.prototyp
 anychart.core.stock.Plot.prototype['area'] = anychart.core.stock.Plot.prototype.area;
 anychart.core.stock.Plot.prototype['candlestick'] = anychart.core.stock.Plot.prototype.candlestick;
 anychart.core.stock.Plot.prototype['column'] = anychart.core.stock.Plot.prototype.column;
+anychart.core.stock.Plot.prototype['jumpLine'] = anychart.core.stock.Plot.prototype.jumpLine;
+anychart.core.stock.Plot.prototype['stick'] = anychart.core.stock.Plot.prototype.stick;
 anychart.core.stock.Plot.prototype['line'] = anychart.core.stock.Plot.prototype.line;
 anychart.core.stock.Plot.prototype['marker'] = anychart.core.stock.Plot.prototype.marker;
 anychart.core.stock.Plot.prototype['ohlc'] = anychart.core.stock.Plot.prototype.ohlc;

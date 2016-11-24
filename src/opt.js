@@ -1084,6 +1084,13 @@ anychart.opt.SELECTED_SIZE = 'selectedSize';
 
 
 /**
+ * Constant replacer for "stepDirection" string.
+ * @const {string}
+ */
+anychart.opt.STEP_DIRECTION = 'stepDirection';
+
+
+/**
  * Constant replacer for "error" string.
  * @const {string}
  */

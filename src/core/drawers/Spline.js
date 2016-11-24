@@ -49,6 +49,8 @@ anychart.core.drawers.Spline.prototype.flags = (
     // anychart.core.drawers.Capabilities.IS_OHLC_BASED |
     anychart.core.drawers.Capabilities.IS_LINE_BASED |
     // anychart.core.drawers.Capabilities.IS_RANGE_BASED |
+    // anychart.core.drawers.Capabilities.SUPPORTS_STEP_DIRECTION |
+    // anychart.core.drawers.Capabilities.SUPPORTS_DISTRIBUTION |
     0);
 
 

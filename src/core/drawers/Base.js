@@ -51,6 +51,8 @@ anychart.core.drawers.Base.prototype.flags = (
     //anychart.core.drawers.Capabilities.IS_3D_BASED |
     //anychart.core.drawers.Capabilities.USES_STROKE_AS_FILL |
     //anychart.core.drawers.Capabilities.IS_RANGE_BASED |
+    //anychart.core.drawers.Capabilities.SUPPORTS_STEP_DIRECTION |
+    //anychart.core.drawers.Capabilities.SUPPORTS_DISTRIBUTION |
     0);
 
 

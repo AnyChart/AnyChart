@@ -45,7 +45,9 @@ anychart.enums.ChartTypes = {
   PERT: 'pert',
   GANTT_RESOURCE: 'ganttResource',
   GANTT_PROJECT: 'ganttProject',
-  RESOURCE: 'resource'
+  RESOURCE: 'resource',
+  JUMP_LINE: 'jumpLine',
+  STICK: 'stick'
 };
 
 
@@ -2207,7 +2209,9 @@ anychart.enums.CartesianSeriesType = {
   SPLINE: 'spline',
   SPLINE_AREA: 'splineArea',
   STEP_AREA: 'stepArea',
-  STEP_LINE: 'stepLine'
+  STEP_LINE: 'stepLine',
+  JUMP_LINE: 'jumpLine',
+  STICK: 'stick'
 };
 
 
@@ -2232,6 +2236,10 @@ anychart.enums.normalizeCartesianSeriesType = function(value, opt_default) {
       return anychart.enums.CartesianSeriesType.CANDLESTICK;
     case 'column':
       return anychart.enums.CartesianSeriesType.COLUMN;
+    case 'jumpline':
+      return anychart.enums.CartesianSeriesType.JUMP_LINE;
+    case 'stick':
+      return anychart.enums.CartesianSeriesType.STICK;
     case 'line':
       return anychart.enums.CartesianSeriesType.LINE;
     case 'marker':
@@ -2324,7 +2332,9 @@ anychart.enums.StockSeriesType = {
   SPLINE: 'spline',
   SPLINE_AREA: 'splineArea',
   STEP_AREA: 'stepArea',
-  STEP_LINE: 'stepLine'
+  STEP_LINE: 'stepLine',
+  JUMP_LINE: 'jumpLine',
+  STICK: 'stick'
 };
 
 
@@ -2349,6 +2359,10 @@ anychart.enums.normalizeStockSeriesType = function(value, opt_default) {
       return anychart.enums.StockSeriesType.CANDLESTICK;
     case 'column':
       return anychart.enums.StockSeriesType.COLUMN;
+    case 'jumpline':
+      return anychart.enums.StockSeriesType.JUMP_LINE;
+    case 'stick':
+      return anychart.enums.StockSeriesType.STICK;
     case 'line':
       return anychart.enums.StockSeriesType.LINE;
     case 'marker':
@@ -3978,6 +3992,38 @@ anychart.enums.normalizeAdjustFontSizeMode = function(value, opt_default) {
 
 
 /**
+ * @enum {string}
+ */
+anychart.enums.StepDirection = {
+  CENTER: 'center',
+  FORWARD: 'forward',
+  BACKWARD: 'backward'
+};
+
+
+/**
+ * Normalizes step direction.
+ * @param {*} value - Value to normalize.
+ * @param {anychart.enums.StepDirection=} opt_default - Custom default value (defaults to CENTER).
+ * @return {anychart.enums.StepDirection}
+ */
+anychart.enums.normalizeStepDirection = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'forward':
+    case 'fwd':
+    case 'f':
+      return anychart.enums.StepDirection.FORWARD;
+    case 'backward':
+    case 'bwd':
+    case 'b':
+      return anychart.enums.StepDirection.BACKWARD;
+  }
+  return opt_default || anychart.enums.StepDirection.CENTER;
+};
+
+
+/**
  * Token types enum.
  * @enum {string}
  */
@@ -5169,7 +5215,9 @@ anychart.enums.SeriesDrawerTypes = {
   SPLINE: 18,
   SPLINE_AREA: 19,
   STEP_AREA: 20,
-  STEP_LINE: 21
+  STEP_LINE: 21,
+  JUMP_LINE: 22,
+  STICK: 23
 };
 
 
@@ -5985,6 +6033,10 @@ goog.exportSymbol('anychart.enums.ChartScrollerPosition.BEFORE_AXES', anychart.e
 goog.exportSymbol('anychart.enums.LabelsDisplayMode.ALWAYS_SHOW', anychart.enums.LabelsDisplayMode.ALWAYS_SHOW);
 goog.exportSymbol('anychart.enums.LabelsDisplayMode.DROP', anychart.enums.LabelsDisplayMode.DROP);
 goog.exportSymbol('anychart.enums.LabelsDisplayMode.CLIP', anychart.enums.LabelsDisplayMode.CLIP);
+
+goog.exportSymbol('anychart.enums.StepDirection.CENTER', anychart.enums.StepDirection.CENTER);
+goog.exportSymbol('anychart.enums.StepDirection.FORWARD', anychart.enums.StepDirection.FORWARD);
+goog.exportSymbol('anychart.enums.StepDirection.BACKWARD', anychart.enums.StepDirection.BACKWARD);
 
 goog.exportSymbol('anychart.enums.TokenType.UNKNOWN', anychart.enums.TokenType.UNKNOWN);
 goog.exportSymbol('anychart.enums.TokenType.NUMBER', anychart.enums.TokenType.NUMBER);

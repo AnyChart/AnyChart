@@ -843,7 +843,9 @@ anychart.themes.merging.mergingMap_ = [
       'cartesianBase.defaultSeriesSettings.line',
       'cartesianBase.defaultSeriesSettings.spline',
       'cartesianBase.defaultSeriesSettings.stepLine',
-      'cartesianBase.defaultSeriesSettings.ohlc'
+      'cartesianBase.defaultSeriesSettings.ohlc',
+      'cartesianBase.defaultSeriesSettings.jumpLine',
+      'cartesianBase.defaultSeriesSettings.stick'
     ]
   },
   {
@@ -855,7 +857,9 @@ anychart.themes.merging.mergingMap_ = [
       'box',
       'column',
       'financial',
-      'line'
+      'line',
+      'jumpLine',
+      'stick'
     ]
   },
   {
@@ -1069,7 +1073,9 @@ anychart.themes.merging.mergingMap_ = [
       'stock.defaultPlotSettings.defaultSeriesSettings.line',
       'stock.defaultPlotSettings.defaultSeriesSettings.spline',
       'stock.defaultPlotSettings.defaultSeriesSettings.stepLine',
-      'stock.defaultPlotSettings.defaultSeriesSettings.ohlc'
+      'stock.defaultPlotSettings.defaultSeriesSettings.ohlc',
+      'stock.defaultPlotSettings.defaultSeriesSettings.jumpLine',
+      'stock.defaultPlotSettings.defaultSeriesSettings.stick'
     ]
   },
   {
@@ -1111,7 +1117,9 @@ anychart.themes.merging.mergingMap_ = [
       'stock.scroller.defaultSeriesSettings.line',
       'stock.scroller.defaultSeriesSettings.spline',
       'stock.scroller.defaultSeriesSettings.stepLine',
-      'stock.scroller.defaultSeriesSettings.ohlc'
+      'stock.scroller.defaultSeriesSettings.ohlc',
+      'stock.scroller.defaultSeriesSettings.jumpLine',
+      'stock.scroller.defaultSeriesSettings.stick'
     ]
   },
   {

@@ -197,7 +197,7 @@
         {"$ref": "#/definitions/anychart.core.SeparateChart"}
       ],
       "properties": {
-        "type": {"enum": ["cartesian", "cartesian3d", "area", "area3d", "bar", "bar3d", "box", "bubble", "column", "column3d", "financial", "line", "marker"]},
+        "type": {"enum": ["cartesian", "cartesian3d", "area", "area3d", "bar", "bar3d", "box", "bubble", "column", "column3d", "financial", "line", "marker", "jumpLine", "stick"]},
         "grids": {
           "type": "array",
           "items": {
@@ -2398,7 +2398,9 @@
             "spline",
             "splineArea",
             "stepArea",
-            "stepLine"
+            "stepLine",
+            "jumpLine",
+            "stick"
           ]
         },
         "id": {
@@ -2558,6 +2560,13 @@
         },
         "selectSize": {
           "type": "number"
+        },
+        "stepDirection": {
+          "enum": [
+            "center",
+            "forward",
+            "backward"
+          ]
         }
       }
     },

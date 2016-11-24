@@ -181,6 +181,34 @@ anychart.core.stock.Scroller.prototype.seriesConfig = (function() {
     anchoredPositionTop: anychart.opt.VALUE,
     anchoredPositionBottom: anychart.opt.ZERO
   };
+  res[anychart.enums.CartesianSeriesType.JUMP_LINE] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.JUMP_LINE,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathStrokeConfig
+    ],
+    secondaryShapesConfig: [
+      anychart.core.shapeManagers.pathScrollerSelectStrokeConfig
+    ],
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.VALUE
+  };
+  res[anychart.enums.CartesianSeriesType.STICK] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.STICK,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathStrokeConfig
+    ],
+    secondaryShapesConfig: [
+      anychart.core.shapeManagers.pathScrollerSelectStrokeConfig
+    ],
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.ZERO
+  };
   res[anychart.enums.StockSeriesType.LINE] = {
     drawerType: anychart.enums.SeriesDrawerTypes.LINE,
     shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
@@ -437,6 +465,42 @@ anychart.core.stock.Scroller.prototype.candlestick = function(opt_data, opt_mapp
  */
 anychart.core.stock.Scroller.prototype.column = function(opt_data, opt_mappingSettings, opt_csvSettings) {
   return this.createSeriesByType(anychart.enums.StockSeriesType.COLUMN, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new jump line series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.StockScroller}
+ */
+anychart.core.stock.Scroller.prototype.jumpLine = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.JUMP_LINE, opt_data, opt_mappingSettings, opt_csvSettings);
+};
+
+
+/**
+ * Creates and returns a new stick series.
+ * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
+ * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings
+ *   An object where keys are field names and values are objects with fields:
+ *      - 'column': number - Column index, that the field should get values from;
+ *      - 'type': anychart.enums.AggregationType - How to group values for the field. Defaults to 'close'.
+ *      - 'weights': number - Column to get weights from for 'weightedAverage' grouping type. Note: If type set to
+ *          'weightedAverage', but opt_weightsColumn is not passed - uses 'average' grouping instead.
+ *   or numbers - just the column index to get values from. In this case the grouping type will be set to 'close'.
+ * @param {Object=} opt_csvSettings CSV parser settings if the string is passed.
+ * @return {anychart.core.series.StockScroller}
+ */
+anychart.core.stock.Scroller.prototype.stick = function(opt_data, opt_mappingSettings, opt_csvSettings) {
+  return this.createSeriesByType(anychart.enums.StockSeriesType.STICK, opt_data, opt_mappingSettings, opt_csvSettings);
 };
 
 
@@ -1385,6 +1449,8 @@ anychart.core.stock.Scroller.prototype.setupByJSON = function(config, opt_defaul
 anychart.core.stock.Scroller.prototype['area'] = anychart.core.stock.Scroller.prototype.area;
 anychart.core.stock.Scroller.prototype['candlestick'] = anychart.core.stock.Scroller.prototype.candlestick;
 anychart.core.stock.Scroller.prototype['column'] = anychart.core.stock.Scroller.prototype.column;
+anychart.core.stock.Scroller.prototype['stick'] = anychart.core.stock.Scroller.prototype.stick;
+anychart.core.stock.Scroller.prototype['jumpLine'] = anychart.core.stock.Scroller.prototype.jumpLine;
 anychart.core.stock.Scroller.prototype['line'] = anychart.core.stock.Scroller.prototype.line;
 anychart.core.stock.Scroller.prototype['marker'] = anychart.core.stock.Scroller.prototype.marker;
 anychart.core.stock.Scroller.prototype['ohlc'] = anychart.core.stock.Scroller.prototype.ohlc;

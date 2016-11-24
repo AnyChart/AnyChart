@@ -42,11 +42,20 @@ anychart.core.drawers.RangeStepArea.prototype.flags = (
     // anychart.core.drawers.Capabilities.IS_OHLC_BASED |
     // anychart.core.drawers.Capabilities.IS_LINE_BASED |
     anychart.core.drawers.Capabilities.IS_RANGE_BASED |
+    anychart.core.drawers.Capabilities.SUPPORTS_STEP_DIRECTION |
+    // anychart.core.drawers.Capabilities.SUPPORTS_DISTRIBUTION |
     0);
 
 
 /** @inheritDoc */
 anychart.core.drawers.RangeStepArea.prototype.yValueNames = ([anychart.opt.HIGH, anychart.opt.LOW]);
+
+
+/** @inheritDoc */
+anychart.core.drawers.RangeStepArea.prototype.startDrawing = function(shapeManager) {
+  anychart.core.drawers.RangeStepArea.base(this, 'startDrawing', shapeManager);
+  this.direction_ = /** @type {anychart.enums.StepDirection} */ (this.series.getOption(anychart.opt.STEP_DIRECTION) || anychart.enums.StepDirection.CENTER);
+};
 
 
 /** @inheritDoc */
@@ -81,19 +90,31 @@ anychart.core.drawers.RangeStepArea.prototype.drawSubsequentPoint = function(poi
   var high = /** @type {number} */(point.meta(anychart.opt.HIGH));
   var low = /** @type {number} */(point.meta(anychart.opt.LOW));
 
-  var midX = (x + this.prevX_) / 2;
-  shapes[anychart.opt.FILL]
-      .lineTo(midX, this.prevY_)
-      .lineTo(midX, high)
-      .lineTo(x, high);
-  shapes[anychart.opt.HATCH_FILL]
-      .lineTo(midX, this.prevY_)
-      .lineTo(midX, high)
-      .lineTo(x, high);
-  shapes[anychart.opt.HIGH]
-      .lineTo(midX, this.prevY_)
-      .lineTo(midX, high)
-      .lineTo(x, high);
+  var fill = shapes[anychart.opt.FILL];
+  var hatchFill = shapes[anychart.opt.HATCH_FILL];
+  var highShape = shapes[anychart.opt.HIGH];
+
+  switch (this.direction_) {
+    case anychart.enums.StepDirection.FORWARD:
+      fill.lineTo(x, this.prevY_);
+      hatchFill.lineTo(x, this.prevY_);
+      highShape.lineTo(x, this.prevY_);
+      break;
+    case anychart.enums.StepDirection.BACKWARD:
+      fill.lineTo(this.prevX_, high);
+      hatchFill.lineTo(this.prevX_, high);
+      highShape.lineTo(this.prevX_, high);
+      break;
+    default:
+      var midX = (x + this.prevX_) / 2;
+      fill.lineTo(midX, this.prevY_).lineTo(midX, high);
+      hatchFill.lineTo(midX, this.prevY_).lineTo(midX, high);
+      highShape.lineTo(midX, this.prevY_).lineTo(midX, high);
+  }
+
+  fill.lineTo(x, high);
+  hatchFill.lineTo(x, high);
+  highShape.lineTo(x, high);
 
   this.prevX_ = x;
   this.prevY_ = high;
@@ -107,6 +128,10 @@ anychart.core.drawers.RangeStepArea.prototype.finalizeSegment = function() {
   if (!this.prevPointDrawn) return;
   if (this.lowsStack) {
     var shapes = this.shapesManager.getShapesGroup(this.seriesState);
+    var fill = shapes[anychart.opt.FILL];
+    var hatchFill = shapes[anychart.opt.HATCH_FILL];
+    var low = shapes[anychart.opt.LOW];
+
     /** @type {number} */
     var prevX = NaN;
     /** @type {number} */
@@ -116,28 +141,35 @@ anychart.core.drawers.RangeStepArea.prototype.finalizeSegment = function() {
       var x = this.lowsStack[i - 1];
       var y = this.lowsStack[i];
       if (first) {
-        shapes[anychart.opt.LOW].moveTo(x, y);
+        low.moveTo(x, y);
         first = false;
       } else {
-        var midX = (x + prevX) / 2;
-        shapes[anychart.opt.FILL]
-            .lineTo(midX, prevY)
-            .lineTo(midX, y);
-        shapes[anychart.opt.HATCH_FILL]
-            .lineTo(midX, prevY)
-            .lineTo(midX, y);
-        shapes[anychart.opt.LOW]
-            .lineTo(midX, prevY)
-            .lineTo(midX, y);
+        switch (this.direction_) {
+          case anychart.enums.StepDirection.FORWARD:
+            fill.lineTo(prevX, y);
+            hatchFill.lineTo(prevX, y);
+            low.lineTo(prevX, y);
+            break;
+          case anychart.enums.StepDirection.BACKWARD:
+            fill.lineTo(x, prevY);
+            hatchFill.lineTo(x, prevY);
+            low.lineTo(x, prevY);
+            break;
+          default:
+            var midX = (x + prevX) / 2;
+            fill.lineTo(midX, prevY).lineTo(midX, y);
+            hatchFill.lineTo(midX, prevY).lineTo(midX, y);
+            low.lineTo(midX, prevY).lineTo(midX, y);
+        }
       }
-      shapes[anychart.opt.FILL].lineTo(x, y);
-      shapes[anychart.opt.HATCH_FILL].lineTo(x, y);
-      shapes[anychart.opt.LOW].lineTo(x, y);
+      fill.lineTo(x, y);
+      hatchFill.lineTo(x, y);
+      low.lineTo(x, y);
       prevX = x;
       prevY = y;
     }
-    shapes[anychart.opt.FILL].close();
-    shapes[anychart.opt.HATCH_FILL].close();
+    fill.close();
+    hatchFill.close();
     this.lowsStack = null;
   }
 };

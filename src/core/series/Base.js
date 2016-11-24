@@ -741,6 +741,15 @@ anychart.core.series.Base.prototype.isWidthBased = function() {
 
 
 /**
+ * Tester if the series should be distributed by width.
+ * @return {boolean}
+ */
+anychart.core.series.Base.prototype.isWidthDistributed = function() {
+  return this.check(anychart.core.drawers.Capabilities.SUPPORTS_DISTRIBUTION);
+};
+
+
+/**
  * Tester if the series is discrete based.
  * @return {boolean}
  */
@@ -3690,6 +3699,14 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       0,
       0,
       anychart.core.drawers.Capabilities.IS_MARKER_BASED);
+
+  map[anychart.opt.STEP_DIRECTION] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.STEP_DIRECTION,
+      anychart.enums.normalizeStepDirection,
+      anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_REDRAW,
+      anychart.core.drawers.Capabilities.SUPPORTS_STEP_DIRECTION);
 
   return map;
 })();

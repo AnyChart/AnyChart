@@ -30,6 +30,8 @@ anychart.core.drawers.Capabilities = {
   IS_OHLC_BASED: 1 << 14,
   IS_LINE_BASED: 1 << 15,
   IS_RANGE_BASED: 1 << 16,
+  SUPPORTS_STEP_DIRECTION: 1 << 17,
+  SUPPORTS_DISTRIBUTION: 1 << 18,
   /**
    * Combination of all states.
    */

@@ -6,6 +6,7 @@
 goog.provide('anychart.modules.line');
 
 goog.require('anychart.charts.Cartesian');
+goog.require('anychart.core.drawers.JumpLine');
 goog.require('anychart.core.drawers.Line');
 goog.require('anychart.core.drawers.Spline');
 goog.require('anychart.core.drawers.StepLine');

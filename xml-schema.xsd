@@ -579,6 +579,8 @@
         <xsd:attribute name="outlier_markers" type="simple.MarkerType"/>
         <xsd:attribute name="hover_outlier_markers" type="simple.MarkerType"/>
         <xsd:attribute name="select_outlier_markers" type="simple.MarkerType"/>
+        <!-- Step series -->
+        <xsd:attribute name="step_direction" type="enums.StepDirection"/>
     </xsd:complexType>
 
     <xsd:complexType name="Series_list">
@@ -2897,6 +2899,8 @@
             <xsd:enumeration value="ganttProject"/>
             <xsd:enumeration value="map"/>
             <xsd:enumeration value="pert"/>
+            <xsd:enumeration value="jumpLine"/>
+            <xsd:enumeration value="stick"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -3121,6 +3125,16 @@
             <xsd:enumeration value="splineArea"/>
             <xsd:enumeration value="stepArea"/>
             <xsd:enumeration value="stepLine"/>
+            <xsd:enumeration value="jumpLine"/>
+            <xsd:enumeration value="stick"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="enums.StepDirection">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="center"/>
+            <xsd:enumeration value="forward"/>
+            <xsd:enumeration value="backward"/>
         </xsd:restriction>
     </xsd:simpleType>
 

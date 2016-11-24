@@ -230,6 +230,15 @@ goog.provide('anychart.themes.defaultTheme');
    * @this {*}
    * @return {*}
    */
+  var returnStrokeSourceColor1 = function() {
+    return window['anychart']['color']['setThickness'](this['sourceColor'], 1);
+  };
+
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
   var returnLightenStrokeSourceColor = function() {
     return window['anychart']['color']['setThickness'](window['anychart']['color']['lighten'](this['sourceColor']), 1.5);
   };
@@ -1311,7 +1320,8 @@ goog.provide('anychart.themes.defaultTheme');
           },
           'labels': {
             'anchor': 'leftBottom'
-          }
+          },
+          'stepDirection': 'center'
         },
         'barLike': {
           'fill': returnSourceColor85,
@@ -1333,7 +1343,8 @@ goog.provide('anychart.themes.defaultTheme');
           },
           'selectMarkers': {
             'enabled': true
-          }
+          },
+          'stepDirection': 'center'
         },
         'rangeArea': {
           'labels': {
@@ -1456,6 +1467,26 @@ goog.provide('anychart.themes.defaultTheme');
               return this['x'];
             }
           }
+        },
+        'stick': {
+          'labels': {
+            'anchor': 'bottom',
+            'position': 'top'
+          },
+          'markers': {
+            'position': 'top'
+          },
+          'stroke': returnStrokeSourceColor1
+        },
+        'jumpLine': {
+          'labels': {
+            'anchor': 'bottom',
+            'position': 'top'
+          },
+          'markers': {
+            'position': 'top'
+          },
+          'pointWidth': '100%'
         }
       },
       'defaultLabelSettings': {

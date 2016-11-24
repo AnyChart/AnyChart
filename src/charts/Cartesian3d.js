@@ -769,45 +769,23 @@ anychart.charts.Cartesian3d.prototype.getContentAreaBounds = function(bounds) {
 
 
 /** @inheritDoc */
-anychart.charts.Cartesian3d.prototype.distributeColumnClusters = function(numColumnClusters, drawingPlansOfScale) {
+anychart.charts.Cartesian3d.prototype.distributeClusters = function(numClusters, drawingPlansOfScale, horizontal) {
   var wSeries;
 
   if (!this.hasStackedSeries && this.zDistribution()) {
-    if (numColumnClusters > 0) {
-      numColumnClusters = 1 + /** @type {number} */(this.barGroupsPadding());
-      var barWidthRatio = 1 / numColumnClusters;
+    if (numClusters > 0) {
+      numClusters = 1 + /** @type {number} */(this.barGroupsPadding());
+      var barWidthRatio = 1 / numClusters;
       for (var i = 0; i < drawingPlansOfScale.length; i++) {
         wSeries = drawingPlansOfScale[i].series;
-        if (wSeries.isWidthBased() && !wSeries.isBarBased()) {
+        if (wSeries.isWidthDistributed() && (horizontal ^ wSeries.isBarBased())) {
           wSeries.setAutoXPointPosition(0.5);
           wSeries.setAutoPointWidth(barWidthRatio);
         }
       }
     }
   } else {
-    anychart.charts.Cartesian3d.base(this, 'distributeColumnClusters', numColumnClusters, drawingPlansOfScale);
-  }
-};
-
-
-/** @inheritDoc */
-anychart.charts.Cartesian3d.prototype.distributeBarClusters = function(numBarClusters, drawingPlansOfScale) {
-  var wSeries;
-
-  if (!this.hasStackedSeries && this.zDistribution()) {
-    if (numBarClusters > 0) {
-      numBarClusters = 1 + /** @type {number} */(this.barGroupsPadding());
-      var barWidthRatio = 1 / numBarClusters;
-      for (var i = 0; i < drawingPlansOfScale.length; i++) {
-        wSeries = drawingPlansOfScale[i].series;
-        if (wSeries.isBarBased()) {
-          wSeries.setAutoXPointPosition(0.5);
-          wSeries.setAutoPointWidth(barWidthRatio);
-        }
-      }
-    }
-  } else {
-    anychart.charts.Cartesian3d.base(this, 'distributeBarClusters', numBarClusters, drawingPlansOfScale);
+    anychart.charts.Cartesian3d.base(this, 'distributeClusters', numClusters, drawingPlansOfScale, horizontal);
   }
 };
 
