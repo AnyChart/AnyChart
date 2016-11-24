@@ -50,7 +50,7 @@ anychart.core.drawers.Stick.prototype.flags = (
 /** @inheritDoc */
 anychart.core.drawers.Stick.prototype.startDrawing = function(shapeManager) {
   anychart.core.drawers.Stick.base(this, 'startDrawing', shapeManager);
-  this.crispEdges = this.pointWidth > 3;
+  this.crispEdges = this.pointWidth > 2;
 };
 
 

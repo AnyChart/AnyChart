@@ -4529,6 +4529,10 @@ goog.provide('anychart.themes.defaultTheme');
             'fallingStroke': stockScrollerUnselected,
             'selectRisingStroke': risingColor,
             'selectFallingStroke': fallingColor
+          },
+          'stick': {
+            'stroke': stockScrollerUnselected,
+            'selectStroke': returnStrokeSourceColor1
           }
         },
         'enabled': true,
