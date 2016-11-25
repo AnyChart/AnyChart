@@ -670,6 +670,52 @@ anychart.core.stock.Plot.prototype.aroon = function(mapping, opt_period, opt_upS
 
 
 /**
+ * Creates BBands indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period [20] Sets moving average period value.
+ * @param {number=} opt_deviation [2] Sets the multiplier applied to the moving average to compute upper and lower bands of the indicator.
+ * @param {anychart.enums.StockSeriesType=} opt_upSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_downSeriesType
+ * @return {anychart.core.stock.indicators.BBands}
+ */
+anychart.core.stock.Plot.prototype.bbands = function(mapping, opt_period, opt_deviation, opt_upSeriesType, opt_downSeriesType) {
+  var result = new anychart.core.stock.indicators.BBands(this, mapping, opt_period, opt_deviation, opt_upSeriesType, opt_downSeriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates BBands %B indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period [20] Sets moving average period value.
+ * @param {number=} opt_deviation [2] Sets the multiplier applied to the moving average to compute upper and lower bands of the indicator.
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.BBandsB}
+ */
+anychart.core.stock.Plot.prototype.bbandsB = function(mapping, opt_period, opt_deviation, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.BBandsB(this, mapping, opt_period, opt_deviation, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates BBands Width indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period [20] Sets moving average period value.
+ * @param {number=} opt_deviation [2] Sets the multiplier applied to the moving average to compute upper and lower bands of the indicator.
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.BBandsWidth}
+ */
+anychart.core.stock.Plot.prototype.bbandsWidth = function(mapping, opt_period, opt_deviation, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.BBandsWidth(this, mapping, opt_period, opt_deviation, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
  * Creates EMA indicator on the chart.
  * @param {!anychart.data.TableMapping} mapping
  * @param {number=} opt_period
@@ -2487,6 +2533,9 @@ anychart.core.stock.Plot.prototype['removeSeriesAt'] = anychart.core.stock.Plot.
 anychart.core.stock.Plot.prototype['removeAllSeries'] = anychart.core.stock.Plot.prototype.removeAllSeries;
 anychart.core.stock.Plot.prototype['ama'] = anychart.core.stock.Plot.prototype.ama;
 anychart.core.stock.Plot.prototype['aroon'] = anychart.core.stock.Plot.prototype.aroon;
+anychart.core.stock.Plot.prototype['bbands'] = anychart.core.stock.Plot.prototype.bbands;
+anychart.core.stock.Plot.prototype['bbandsB'] = anychart.core.stock.Plot.prototype.bbandsB;
+anychart.core.stock.Plot.prototype['bbandsWidth'] = anychart.core.stock.Plot.prototype.bbandsWidth;
 anychart.core.stock.Plot.prototype['ema'] = anychart.core.stock.Plot.prototype.ema;
 anychart.core.stock.Plot.prototype['macd'] = anychart.core.stock.Plot.prototype.macd;
 anychart.core.stock.Plot.prototype['mma'] = anychart.core.stock.Plot.prototype.mma;

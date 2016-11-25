@@ -2117,3 +2117,45 @@ anychart.opt.MIN_ROW_HEIGHT = 'minRowHeight';
  * @const {string}
  */
 anychart.opt.MAX_ROW_HEIGHT = 'maxRowHeight';
+
+
+/**
+ * Constant replacer for "upperResult" string.
+ * @const {string}
+ */
+anychart.opt.UP_RESULT = 'upResult';
+
+
+/**
+ * Constant replacer for "lowerResult" string.
+ * @const {string}
+ */
+anychart.opt.DOWN_RESULT = 'downResult';
+
+
+/**
+ * Constant replacer for "upper" string.
+ * @const {string}
+ */
+anychart.opt.UP = 'up';
+
+
+/**
+ * Constant replacer for "lower" string.
+ * @const {string}
+ */
+anychart.opt.DOWN = 'down';
+
+
+/**
+ * Constant replacer for "main" string.
+ * @const {string}
+ */
+anychart.opt.MAIN = 'main';
+
+
+/**
+ * Constant replacer for "result" string.
+ * @const {string}
+ */
+anychart.opt.RESULT = 'result';
