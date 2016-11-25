@@ -108,8 +108,8 @@ anychart.math.ama.calculationFunction = function(row, context) {
       }
       result = context.prevResult + SSC * SSC * (lastValue - context.prevResult);
     }
+    context.prevResult = result;
   }
-  context.prevResult = result;
   row.set('result', result);
 };
 

@@ -81,21 +81,27 @@ anychart.math.macd.startFunction = function(context) {
  * @this {anychart.math.macd.Context}
  */
 anychart.math.macd.calculationFunction = function(row, context) {
-  var currValue = row.get('value');
-  context.slowResult = anychart.math.ema.calculate(currValue, context.slowPeriod, context.slowQueue, context.slowResult);
-  context.fastResult = anychart.math.ema.calculate(currValue, context.fastPeriod, context.fastQueue, context.fastResult);
-  context.signalResult = anychart.math.ema.calculate(context.fastResult - context.slowResult, context.signalPeriod, context.signalQueue, context.signalResult);
-
-  // we write the result only when all three values are ready, instead of individual readiness
-  if (context.signalQueue.getLength() == context.signalPeriod) {
-    row.set('macdResult', context.fastResult - context.slowResult);
-    row.set('signalResult', context.signalResult);
-    row.set('histogramResult', context.fastResult - context.slowResult - context.signalResult);
+  var currValue = anychart.utils.toNumber(row.get('value'));
+  var macdResult, signalResult, histogramResult;
+  if (isNaN(currValue)) {
+    macdResult = signalResult = histogramResult = NaN;
   } else {
-    row.set('macdResult', NaN);
-    row.set('signalResult', NaN);
-    row.set('histogramResult', NaN);
+    context.fastResult = anychart.math.ema.calculate(currValue, context.fastPeriod, context.fastQueue, context.fastResult);
+    context.slowResult = anychart.math.ema.calculate(currValue, context.slowPeriod, context.slowQueue, context.slowResult);
+    if (!isNaN(context.fastResult) && !isNaN(context.slowResult))
+      context.signalResult = anychart.math.ema.calculate(context.fastResult - context.slowResult, context.signalPeriod, context.signalQueue, context.signalResult);
+    if (context.signalQueue.getLength() == context.signalPeriod) {
+      macdResult = context.fastResult - context.slowResult;
+      signalResult = context.signalResult;
+      histogramResult = context.fastResult - context.slowResult - context.signalResult;
+    } else {
+      macdResult = signalResult = histogramResult = NaN;
+    }
   }
+
+  row.set('macdResult', macdResult);
+  row.set('signalResult', signalResult);
+  row.set('histogramResult', histogramResult);
 };
 
 

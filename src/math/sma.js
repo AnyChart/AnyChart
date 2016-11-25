@@ -53,8 +53,14 @@ anychart.math.sma.startFunction = function(context) {
  * @this {anychart.math.sma.Context}
  */
 anychart.math.sma.calculationFunction = function(row, context) {
-  var result = anychart.math.sma.calculate(row.get('value'), context.period, context.queue, context.prevResult);
-  context.prevResult = result;
+  var value = anychart.utils.toNumber(row.get('value'));
+  var result;
+  if (isNaN(value)) {
+    result = NaN;
+  } else {
+    result = anychart.math.sma.calculate(value, context.period, context.queue, context.prevResult);
+    context.prevResult = result;
+  }
   row.set('result', result);
 };
 
@@ -79,22 +85,17 @@ anychart.math.sma.createComputer = function(mapping, opt_period) {
  * Calculates next SMA value based on a previous SMA value and current data value.
  * To use this function you need a setup queue with length equal to period.
  * On first calculation pass NaN or nothing as a opt_prevResult.
- * @param {*} value
+ * @param {number} value
  * @param {number} period
  * @param {anychart.math.CycledQueue} queue
- * @param {number=} opt_prevResult
+ * @param {number} prevResult
  * @return {number}
  */
-anychart.math.sma.calculate = function(value, period, queue, opt_prevResult) {
-  var prevResult = anychart.utils.toNumber(opt_prevResult);
-  var currValue = anychart.utils.toNumber(value);
-  var missing = isNaN(currValue);
-  var firstValue;
-  if (!missing)
-    firstValue = /** @type {number|undefined} */(queue.enqueue(currValue));
+anychart.math.sma.calculate = function(value, period, queue, prevResult) {
+  var firstValue = /** @type {number} */(queue.enqueue(value));
   /** @type {number} */
   var result;
-  if (missing || queue.getLength() < period) {
+  if (queue.getLength() < period) {
     result = NaN;
   } else if (isNaN(prevResult)) {
     result = 0;

@@ -104,6 +104,7 @@ anychart.core.stock.indicators.Aroon.prototype.period = function(opt_value) {
 };
 
 
+//exports
 anychart.core.stock.indicators.Aroon.prototype['period'] = anychart.core.stock.indicators.Aroon.prototype.period;
 anychart.core.stock.indicators.Aroon.prototype['upSeries'] = anychart.core.stock.indicators.Aroon.prototype.upSeries;
 anychart.core.stock.indicators.Aroon.prototype['downSeries'] = anychart.core.stock.indicators.Aroon.prototype.downSeries;

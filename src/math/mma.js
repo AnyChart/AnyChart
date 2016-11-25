@@ -53,8 +53,14 @@ anychart.math.mma.startFunction = function(context) {
  * @this {anychart.math.mma.Context}
  */
 anychart.math.mma.calculationFunction = function(row, context) {
-  var result = anychart.math.mma.calculate(row.get('value'), context.period, context.queue, context.prevResult);
-  context.prevResult = result;
+  var value = anychart.utils.toNumber(row.get('value'));
+  var result;
+  if (isNaN(value)) {
+    result = NaN;
+  } else {
+    result = anychart.math.mma.calculate(value, context.period, context.queue, context.prevResult);
+    context.prevResult = result;
+  }
   row.set('result', result);
 };
 
@@ -79,21 +85,17 @@ anychart.math.mma.createComputer = function(mapping, opt_period) {
  * Calculates next MMA value based on a previous MMA value and current data value.
  * To use this function you need a setup queue with length equal to period.
  * On first calculation pass NaN or nothing as a opt_prevResult.
- * @param {*} value
+ * @param {number} value
  * @param {number} period
  * @param {anychart.math.CycledQueue} queue
- * @param {number=} opt_prevResult
+ * @param {number} prevResult
  * @return {number}
  */
-anychart.math.mma.calculate = function(value, period, queue, opt_prevResult) {
-  var prevResult = anychart.utils.toNumber(opt_prevResult);
-  var currValue = anychart.utils.toNumber(value);
-  var missing = isNaN(currValue);
-  if (!missing)
-    queue.enqueue(currValue);
+anychart.math.mma.calculate = function(value, period, queue, prevResult) {
+  queue.enqueue(value);
   /** @type {number} */
   var result;
-  if (missing || queue.getLength() < period) {
+  if (queue.getLength() < period) {
     result = NaN;
   } else if (isNaN(prevResult)) {
     result = 0;
