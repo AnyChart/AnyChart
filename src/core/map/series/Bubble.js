@@ -721,7 +721,7 @@ anychart.core.map.series.Bubble.prototype.drawPoint = function(pointState) {
     this.getIterator().meta('x', x).meta('value', y).meta('size', size).meta('shape', circle);
 
     var radius = Math.abs(size);
-    circle.moveTo(x + radius, y).arcTo(radius, radius, 0, 360);
+    circle.moveTo(x + radius, y).arcToAsCurves(radius, radius, 0, 360);
 
     this.colorizeShape(pointState | this.state.getSeriesState());
     this.makeInteractive(circle);
