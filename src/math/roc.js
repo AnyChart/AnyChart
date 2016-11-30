@@ -56,7 +56,7 @@ anychart.math.roc.calculationFunction = function(row, context) {
     context.queue.enqueue(currValue);
   /** @type {number} */
   var result;
-  if (missing || context.queue.getLength() < context.period) {
+  if (missing || context.queue.getLength() <= context.period) {
     result = NaN;
   } else {
     var firstValue = /** @type {number} */(context.queue.get(0));
