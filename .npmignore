@@ -13,3 +13,6 @@ update-submodule
 build*
 gjslint.cfg
 modules.edn
+cat.config
+update-submodules
+tests
