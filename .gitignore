@@ -7,3 +7,4 @@ contrib/compiler/
 out/
 src/deps.js
 *.swo
+*.log
