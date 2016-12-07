@@ -1211,7 +1211,7 @@ anychart.core.series.Base.prototype.error = function(opt_value) {
  * @private
  */
 anychart.core.series.Base.prototype.onErrorSignal_ = function(event) {
-  var state = anychart.ConsistencyState.APPEARANCE;
+  var state = anychart.ConsistencyState.SERIES_POINTS;
   var signal = 0;
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     signal |= anychart.Signal.NEEDS_REDRAW;

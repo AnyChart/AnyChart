@@ -649,7 +649,10 @@ anychart.core.utils.Error.prototype.setupSpecial = function(var_args) {
  */
 anychart.core.utils.Error.prototype.setupByJSON = function(config, opt_default) {
   goog.base(this, 'setupByJSON', config, opt_default);
-  this.mode(config['mode']);
+
+  var mode = (!goog.isDef(config['mode']) && this.mode_ == anychart.enums.ErrorMode.NONE) ? anychart.enums.ErrorMode.BOTH : config['mode'];
+  this.mode(mode);
+
   this.xError(config['xError']);
   this.xUpperError(config['xUpperError']);
   this.xLowerError(config['xLowerError']);
