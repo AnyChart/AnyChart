@@ -2,7 +2,7 @@
   "name": "anychart",
   "version": "7.0.0",
   "description": "Robust JavaScript/HTML5 Chart library for any project",
-  "main": "dist/anychart.min.js",
+  "main": "dist/anychart-bundle.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
