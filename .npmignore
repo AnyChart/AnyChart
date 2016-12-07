@@ -9,7 +9,6 @@ src/deps.js
 *.pyc
 **/.*
 npm-debug.log
-update-submodule
 build*
 gjslint.cfg
 modules.edn
