@@ -613,6 +613,9 @@ anychart.core.Chart.prototype.showTooltip_ = function(event) {
         points = goog.array.filter(points, function(point) {
           var series = point['series'];
           var iterator = series.getIterator();
+          if (goog.isDef(iterator.meta(anychart.opt.MISSING))) {
+            return !iterator.meta(anychart.opt.MISSING);
+          }
           return !anychart.utils.isNaN(iterator.get('value'));
         });
       }
