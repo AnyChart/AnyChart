@@ -739,9 +739,10 @@ anychart.core.utils.ISeriesWithError.prototype.supportsError = function() {};
 
 /**
  * Draws an error.
+ * @param {anychart.data.IRowInfo} point
  * @protected
  */
-anychart.core.utils.ISeriesWithError.prototype.drawError = function() {};
+anychart.core.utils.ISeriesWithError.prototype.drawError = function(point) {};
 
 
 /**

@@ -1299,9 +1299,10 @@ anychart.core.series.Base.prototype.getErrorStroke = function(horizontal) {
 
 /**
  * Draws an error.
+ * @param {anychart.data.IRowInfo} point
  */
-anychart.core.series.Base.prototype.drawError = function() {
-  if (this.error().hasAnyErrorValues()) {
+anychart.core.series.Base.prototype.drawError = function(point) {
+  if (!point.meta(anychart.opt.MISSING) && this.error().hasAnyErrorValues()) {
     var error = this.error();
     var errorMode = error.mode();
     var isBarBased = this.isBarBased();
