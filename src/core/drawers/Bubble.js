@@ -47,20 +47,15 @@ anychart.core.drawers.Bubble.prototype.flags = (
     0);
 
 
-/**
- * Reference list that are required by this drawer.
- * @type {Array.<string>}
- */
-anychart.core.drawers.Bubble.prototype.referenceNames = ([anychart.opt.VALUE, anychart.opt.SIZE]);
-
-
-/**
- * Returns reference value names. Needed to include bubble size.
- * @return {Array.<string>}
- */
-anychart.core.drawers.Bubble.prototype.getReferenceNames = function() {
-  return this.referenceNames;
-};
+/** @inheritDoc */
+anychart.core.drawers.Bubble.prototype.requiredShapes = (function() {
+  var res = {};
+  res[anychart.opt.CIRCLE] = anychart.enums.ShapeType.CIRCLE;
+  res[anychart.opt.HATCH_FILL] = anychart.enums.ShapeType.CIRCLE;
+  res[anychart.opt.NEGATIVE] = anychart.enums.ShapeType.CIRCLE;
+  res[anychart.opt.NEGATIVE_HATCH_FILL] = anychart.enums.ShapeType.CIRCLE;
+  return res;
+})();
 
 
 /** @inheritDoc */

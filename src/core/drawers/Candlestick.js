@@ -48,6 +48,17 @@ anychart.core.drawers.Candlestick.prototype.flags = (
 
 
 /** @inheritDoc */
+anychart.core.drawers.Candlestick.prototype.requiredShapes = (function() {
+  var res = {};
+  res[anychart.opt.RISING] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.RISING_HATCH_FILL] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.FALLING] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.FALLING_HATCH_FILL] = anychart.enums.ShapeType.PATH;
+  return res;
+})();
+
+
+/** @inheritDoc */
 anychart.core.drawers.Candlestick.prototype.yValueNames = ([anychart.opt.OPEN, anychart.opt.HIGH, anychart.opt.LOW, anychart.opt.CLOSE]);
 
 

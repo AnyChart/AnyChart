@@ -69,6 +69,8 @@ anychart.core.utils.SeriesPointContextProvider.prototype.applyReferenceValuesInt
   }
   if (this['series'].name)
     this['seriesName'] = this['series'].name() || 'Series ' + this['series'].getIndex();
+  if (this[anychart.opt.SERIES].isSizeBased())
+    this[anychart.opt.SIZE] = point ? point.get(anychart.opt.SIZE) : undefined;
   if (this.errorAvailable) {
     /** @type {anychart.core.utils.ISeriesWithError} */
     var series = /** @type {anychart.core.utils.ISeriesWithError} */(this['series']);

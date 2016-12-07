@@ -48,6 +48,17 @@ anychart.core.drawers.RangeArea.prototype.flags = (
 
 
 /** @inheritDoc */
+anychart.core.drawers.RangeArea.prototype.requiredShapes = (function() {
+  var res = {};
+  res[anychart.opt.FILL] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.HATCH_FILL] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.LOW] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.HIGH] = anychart.enums.ShapeType.PATH;
+  return res;
+})();
+
+
+/** @inheritDoc */
 anychart.core.drawers.RangeArea.prototype.yValueNames = ([anychart.opt.HIGH, anychart.opt.LOW]);
 
 

@@ -81,6 +81,15 @@ anychart.core.reporting.getErrorDescription_ = function(code, opt_arguments) {
     case anychart.enums.ErrorCode.TABLE_COMPUTER_OUTPUT_FIELD_DUPLICATE:
       return 'Cannot create output field "' + opt_arguments[0] + '" on the computer - field with this name already exists';
 
+    case anychart.enums.ErrorCode.WRONG_SHAPES_CONFIG:
+      var req = opt_arguments[2];
+      var shapes = [];
+      for (var i in req)
+        shapes.push(i + ' (' + req[i] + ')');
+      return ['Series "', opt_arguments[0], '" of type "', opt_arguments[1],
+        '" cannot be drawn, because it requires ', req.length,
+        ' shapes with the following names: ', shapes.join(', ')].join('');
+
     default:
       return 'Unknown error occurred. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report.';

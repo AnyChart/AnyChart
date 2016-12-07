@@ -355,6 +355,15 @@ anychart.core.PyramidFunnelBase.prototype.isDiscreteBased = function() {
 
 
 /**
+ * Tester if the series is size based.
+ * @return {boolean}
+ */
+anychart.core.PyramidFunnelBase.prototype.isSizeBased = function() {
+  return false;
+};
+
+
+/**
  * @inheritDoc
  */
 anychart.core.PyramidFunnelBase.prototype.isSeries = function() {

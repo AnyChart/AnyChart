@@ -8,6 +8,7 @@ goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.series');
+goog.require('anychart.core.series.RenderingSettings');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.shapeManagers.PerPoint');
 goog.require('anychart.core.shapeManagers.PerSeries');
@@ -131,6 +132,14 @@ anychart.core.series.Base = function(chart, plot, type, config) {
    */
   this.a11y_ = null;
 
+  /**
+   * Renderer.
+   * @type {anychart.core.series.RenderingSettings}
+   * @private
+   */
+  this.renderingSettings_ = new anychart.core.series.RenderingSettings(this);
+  this.renderingSettings_.listenSignals(this.rendererInvalidated_, this);
+
   this.applyConfig(config);
 };
 goog.inherits(anychart.core.series.Base, anychart.core.VisualBaseWithBounds);
@@ -150,6 +159,7 @@ anychart.core.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.SERIES_COLOR |
     anychart.ConsistencyState.SERIES_CLIP |
     anychart.ConsistencyState.SERIES_POINTS |
+    anychart.ConsistencyState.SERIES_SHAPE_MANAGER |
     anychart.ConsistencyState.A11Y;
 
 
@@ -205,7 +215,6 @@ anychart.core.series.Base.prototype.canBeInteractive = true;
 /**
  * Series config.
  * @type {!anychart.core.series.TypeConfig}
- * @protected
  */
 anychart.core.series.Base.prototype.config;
 
@@ -428,7 +437,12 @@ anychart.core.series.Base.prototype.seriesType = function(opt_value) {
       this.type_ = /** @type {string} */(info[0]); // normalized type
       this.applyConfig(/** @type {anychart.core.series.TypeConfig} */(info[1]));
       // since we are changing entire series - we should recalculate and redraw everything
-      this.invalidate(anychart.ConsistencyState.ALL, this.SUPPORTED_SIGNALS);
+      this.invalidate(
+          anychart.ConsistencyState.SERIES_POINTS |
+          anychart.ConsistencyState.SERIES_CLIP |
+          anychart.ConsistencyState.SERIES_DATA |
+          anychart.ConsistencyState.A11Y,
+          this.SUPPORTED_SIGNALS);
     }
     return this;
   }
@@ -441,8 +455,6 @@ anychart.core.series.Base.prototype.seriesType = function(opt_value) {
  * @param {anychart.core.series.TypeConfig} config
  */
 anychart.core.series.Base.prototype.applyConfig = function(config) {
-  goog.dispose(this.drawer);
-  goog.dispose(this.shapeManager);
   if (this.config) {
     if (this.rootLayer) {
       // if prev config used own root and the next one doesn't - we should dispose the root layer
@@ -454,17 +466,18 @@ anychart.core.series.Base.prototype.applyConfig = function(config) {
     }
   }
   this.config = config;
+
+  goog.dispose(this.drawer);
   this.drawer = /** @type {!anychart.core.drawers.Base} */(new anychart.core.drawers.AvailableDrawers[config.drawerType](this));
-  var interactive = !!(config.capabilities & anychart.core.series.Capabilities.ALLOW_INTERACTIVITY);
-  var smc = (config.shapeManagerType == anychart.enums.ShapeManagerTypes.PER_POINT) ?
-      anychart.core.shapeManagers.PerPoint :
-      anychart.core.shapeManagers.PerSeries;
-  this.shapeManager = new smc(this, config.shapesConfig, interactive, null, config.postProcessor);
+
+  this.recreateShapeManager();
 
   this.defaultSettings = this.plot.defaultSeriesSettings()[this.type_] || {};
 
   if (this.supportsOutliers()) {
     this.indexToMarkerIndexes_ = {};
+  } else if (this.indexToMarkerIndexes_) {
+    delete this.indexToMarkerIndexes_;
   }
 
   this.autoSettings[anychart.opt.X_POINT_POSITION] = 0.5;
@@ -473,6 +486,25 @@ anychart.core.series.Base.prototype.applyConfig = function(config) {
   this.applyDefaultsToElements(this.defaultSettings, true, true);
   this.resumeSignalsDispatching(false);
   // here should markers/labels/errors/outliers setup be
+
+  this.renderingSettings_.setDefaults();
+};
+
+
+/**
+ * Recreates shape manager.
+ */
+anychart.core.series.Base.prototype.recreateShapeManager = function() {
+  goog.dispose(this.shapeManager);
+  var smc = (this.config.shapeManagerType == anychart.enums.ShapeManagerTypes.PER_POINT) ?
+      anychart.core.shapeManagers.PerPoint :
+      anychart.core.shapeManagers.PerSeries;
+  this.shapeManager = new smc(
+      this,
+      this.renderingSettings_.getShapesConfig(),
+      this.check(anychart.core.series.Capabilities.ALLOW_INTERACTIVITY),
+      null,
+      this.config.postProcessor);
 };
 
 
@@ -523,6 +555,22 @@ anychart.core.series.Base.prototype.applyDefaultsToElements = function(defaults,
  */
 anychart.core.series.Base.prototype.getAnimationType = function() {
   return this.type_;
+};
+
+
+/**
+ * Renderer settings invalidation handler.
+ * @param {anychart.SignalEvent} e
+ * @private
+ */
+anychart.core.series.Base.prototype.rendererInvalidated_ = function(e) {
+  var state = anychart.ConsistencyState.SERIES_POINTS;
+  var signal = anychart.Signal.NEEDS_REDRAW;
+  if (e.hasSignal(anychart.Signal.NEEDS_RECALCULATION))
+    signal |= anychart.Signal.NEEDS_RECALCULATION;
+  if (e.hasSignal(anychart.Signal.NEEDS_REAPPLICATION))
+    state |= anychart.ConsistencyState.SERIES_SHAPE_MANAGER;
+  this.invalidate(state, signal);
 };
 
 
@@ -736,7 +784,16 @@ anychart.core.series.Base.prototype.isSizeBased = function() {
  * @return {boolean}
  */
 anychart.core.series.Base.prototype.isWidthBased = function() {
-  return this.check(anychart.core.drawers.Capabilities.IS_WIDTH_BASED);
+  return !!this.renderingSettings_.getOption(anychart.opt.NEEDS_WIDTH);
+};
+
+
+/**
+ * Tester if the series needs zero.
+ * @return {boolean}
+ */
+anychart.core.series.Base.prototype.needsZero = function() {
+  return !!this.renderingSettings_.getOption(anychart.opt.NEEDS_ZERO);
 };
 
 
@@ -1034,7 +1091,7 @@ anychart.core.series.Base.prototype.getScalesPairIdentifier = function() {
  * @return {Array.<string>}
  */
 anychart.core.series.Base.prototype.getYValueNames = function() {
-  return this.drawer.yValueNames;
+  return (/** @type {?Array.<string>} */(this.renderingSettings_.getOption(anychart.opt.Y_VALUES)));
 };
 
 
@@ -1174,6 +1231,20 @@ anychart.core.series.Base.prototype.transformY = function(value, opt_subRangeRat
   return this.applyRatioToBounds(
       (/** @type {anychart.scales.Base} */(this.yScale())).transform(value, opt_subRangeRatio),
       false);
+};
+
+
+/**
+ * Series rendering settings getter/setter.
+ * @param {(Object|Function|string)=} opt_value
+ * @return {anychart.core.series.Base|anychart.core.series.RenderingSettings}
+ */
+anychart.core.series.Base.prototype.rendering = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.renderingSettings_.setup(opt_value);
+    return this;
+  }
+  return this.renderingSettings_;
 };
 
 
@@ -2496,6 +2567,11 @@ anychart.core.series.Base.prototype.draw = function() {
 
   this.suspendSignalsDispatching();
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_SHAPE_MANAGER)) {
+    this.recreateShapeManager();
+    this.markConsistent(anychart.ConsistencyState.SERIES_SHAPE_MANAGER);
+  }
+
   // resolving bounds
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.pixelBoundsCache = this.getPixelBounds();
@@ -2594,7 +2670,7 @@ anychart.core.series.Base.prototype.draw = function() {
     var columns = this.retrieveDataColumns();
     var iterator;
     if (columns) {
-      if (this.check(anychart.core.drawers.Capabilities.NEEDS_ZERO)) {
+      if (this.needsZero()) {
         var scale = /** @type {anychart.scales.Base} */(this.yScale());
         this.zeroY = this.applyAxesLinesSpace(
             this.applyRatioToBounds(
@@ -2607,7 +2683,7 @@ anychart.core.series.Base.prototype.draw = function() {
       // Cartesian processes preFirst point as a regular point in iterator
       var point = this.getPreFirstPoint();
       if (point) {
-        this.makePointMeta(point, this.drawer.yValueNames, columns);
+        this.makePointMeta(point, this.getYValueNames(), columns);
         this.drawPoint(point, this.getPointState(point.getIndex()));
       }
 
@@ -2615,7 +2691,7 @@ anychart.core.series.Base.prototype.draw = function() {
       iterator = this.getResetIterator();
       while (iterator.advance()) {
         state = this.getPointState(iterator.getIndex());
-        this.makePointMeta(iterator, this.drawer.yValueNames, columns);
+        this.makePointMeta(iterator, this.getYValueNames(), columns);
         this.drawPoint(iterator, state);
         for (i = 0; i < elementsDrawersLength; i++)
           elementsDrawers[i].call(this, iterator, state);
@@ -2625,7 +2701,7 @@ anychart.core.series.Base.prototype.draw = function() {
       // Cartesian processes preFirst point as a regular point in iterator
       point = this.getPostLastPoint();
       if (point) {
-        this.makePointMeta(point, this.drawer.yValueNames, columns);
+        this.makePointMeta(point, this.getYValueNames(), columns);
         this.drawPoint(point, this.getPointState(point.getIndex()));
       }
 
@@ -2633,7 +2709,7 @@ anychart.core.series.Base.prototype.draw = function() {
     } else {
       iterator = this.getResetIterator();
       while (iterator.advance()) {
-        this.makeMissing(iterator, this.drawer.yValueNames);
+        this.makeMissing(iterator, this.getYValueNames());
       }
     }
     this.markConsistent(anychart.ConsistencyState.SERIES_COLOR | anychart.ConsistencyState.Z_INDEX);
@@ -2861,7 +2937,7 @@ anychart.core.series.Base.prototype.prepareData = function() {
  * @protected
  */
 anychart.core.series.Base.prototype.retrieveDataColumns = function() {
-  return this.drawer.yValueNames;
+  return this.getYValueNames();
 };
 
 
@@ -2995,7 +3071,7 @@ anychart.core.series.Base.prototype.makePointMeta = function(rowInfo, yNames, yC
       rowInfo.meta(anychart.opt.NEXT_VALUE, this.applyRatioToBounds(yScale.transform(rowInfo.meta(anychart.opt.STACKED_VALUE_NEXT), 0.5), false));
       rowInfo.meta(anychart.opt.NEXT_ZERO, this.applyRatioToBounds(yScale.transform(rowInfo.meta(anychart.opt.STACKED_ZERO_NEXT), 0.5), false));
     } else {
-      if (this.check(anychart.core.drawers.Capabilities.NEEDS_ZERO)) {
+      if (this.needsZero()) {
         rowInfo.meta(anychart.opt.ZERO, this.zeroY);
         rowInfo.meta(anychart.opt.ZERO_MISSING, false);
       }
@@ -3059,7 +3135,7 @@ anychart.core.series.Base.prototype.makeMissing = function(rowInfo, yNames) {
  * @protected
  */
 anychart.core.series.Base.prototype.createLabelsContextProvider = function() {
-  var provider = new anychart.core.utils.SeriesPointContextProvider(this, this.drawer.getReferenceNames(), this.supportsError());
+  var provider = new anychart.core.utils.SeriesPointContextProvider(this, this.getYValueNames(), this.supportsError());
   provider.applyReferenceValues();
   return provider;
 };
@@ -3076,7 +3152,7 @@ anychart.core.series.Base.prototype.createTooltipContextProvider = function() {
      * @type {anychart.core.utils.SeriesPointContextProvider}
      * @protected
      */
-    this.tooltipContext = new anychart.core.utils.SeriesPointContextProvider(this, this.drawer.getReferenceNames(), this.supportsError());
+    this.tooltipContext = new anychart.core.utils.SeriesPointContextProvider(this, this.getYValueNames(), this.supportsError());
   }
   this.tooltipContext.applyReferenceValues();
   return this.tooltipContext;
@@ -4011,3 +4087,5 @@ anychart.core.series.Base.prototype['getPixelBounds'] = anychart.core.series.Bas
 anychart.core.series.Base.prototype['getPixelPointWidth'] = anychart.core.series.Base.prototype.getPixelPointWidth;
 
 anychart.core.series.Base.prototype['getStat'] = anychart.core.series.Base.prototype.getStat;
+
+anychart.core.series.Base.prototype['rendering'] = anychart.core.series.Base.prototype.rendering;

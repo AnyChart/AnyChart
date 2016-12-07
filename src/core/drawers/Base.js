@@ -25,6 +25,22 @@ goog.inherits(anychart.core.drawers.Base, goog.Disposable);
 
 
 /**
+ * Draws passed point.
+ * @param {anychart.data.IRowInfo} point
+ * @param {anychart.PointState|number} state
+ */
+anychart.core.drawers.Base.prototype.drawPoint;
+
+
+/**
+ * Updates passed point.
+ * @param {anychart.data.IRowInfo} point
+ * @param {anychart.PointState|number} state
+ */
+anychart.core.drawers.Base.prototype.updatePoint = goog.nullFunction;
+
+
+/**
  * Type of the drawer.
  * @type {anychart.enums.SeriesDrawerTypes}
  */
@@ -36,23 +52,24 @@ anychart.core.drawers.Base.prototype.type = anychart.enums.SeriesDrawerTypes.BAS
  * @type {number|anychart.core.drawers.Capabilities}
  */
 anychart.core.drawers.Base.prototype.flags = (
-    //anychart.core.drawers.Capabilities.NEEDS_ZERO |
-    //anychart.core.drawers.Capabilities.IS_WIDTH_BASED |
-    //anychart.core.drawers.Capabilities.NEEDS_SIZE_SCALE |
-    //anychart.core.drawers.Capabilities.SUPPORTS_CONNECTING_MISSING |
-    //anychart.core.drawers.Capabilities.SUPPORTS_STACK |
-    //anychart.core.drawers.Capabilities.SUPPORTS_COMPARISON |
-    //anychart.core.drawers.Capabilities.SUPPORTS_ERROR |
-    //anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS |
-    //anychart.core.drawers.Capabilities.IS_DISCRETE_BASED |
-    //anychart.core.drawers.Capabilities.IS_BAR_BASED |
-    //anychart.core.drawers.Capabilities.IS_AREA_BASED |
-    //anychart.core.drawers.Capabilities.IS_LINE_BASED |
-    //anychart.core.drawers.Capabilities.IS_3D_BASED |
-    //anychart.core.drawers.Capabilities.USES_STROKE_AS_FILL |
-    //anychart.core.drawers.Capabilities.IS_RANGE_BASED |
-    //anychart.core.drawers.Capabilities.SUPPORTS_STEP_DIRECTION |
-    //anychart.core.drawers.Capabilities.SUPPORTS_DISTRIBUTION |
+    // anychart.core.drawers.Capabilities.NEEDS_ZERO |
+    // anychart.core.drawers.Capabilities.NEEDS_SIZE_SCALE |
+    // anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT |
+    // anychart.core.drawers.Capabilities.USES_STROKE_AS_FILL |
+    // anychart.core.drawers.Capabilities.SUPPORTS_CONNECTING_MISSING |
+    // anychart.core.drawers.Capabilities.SUPPORTS_STACK |
+    // anychart.core.drawers.Capabilities.SUPPORTS_COMPARISON |
+    // anychart.core.drawers.Capabilities.SUPPORTS_ERROR |
+    // anychart.core.drawers.Capabilities.SUPPORTS_OUTLIERS |
+    // anychart.core.drawers.Capabilities.IS_DISCRETE_BASED |
+    // anychart.core.drawers.Capabilities.IS_WIDTH_BASED |
+    // anychart.core.drawers.Capabilities.IS_3D_BASED |
+    // anychart.core.drawers.Capabilities.IS_BAR_BASED |
+    // anychart.core.drawers.Capabilities.IS_MARKER_BASED |
+    // anychart.core.drawers.Capabilities.IS_OHLC_BASED |
+    // anychart.core.drawers.Capabilities.IS_LINE_BASED |
+    // anychart.core.drawers.Capabilities.IS_RANGE_BASED |
+    // anychart.core.drawers.Capabilities.SUPPORTS_DISTRIBUTION |
     0);
 
 
@@ -64,10 +81,18 @@ anychart.core.drawers.Base.prototype.yValueNames = ([anychart.opt.VALUE]);
 
 
 /**
- * Returns reference value names. Needed to include bubble size.
+ * A set of shapes with types that are required by the drawer.
+ * This is checked before on drawing start.
+ * @type {Object.<string, anychart.enums.ShapeType>}
+ */
+anychart.core.drawers.Base.prototype.requiredShapes = ({});
+
+
+/**
+ * Returns y value names. Used for Y scale calculations.
  * @return {Array.<string>}
  */
-anychart.core.drawers.Base.prototype.getReferenceNames = function() {
+anychart.core.drawers.Base.prototype.getYValueNames = function() {
   return this.yValueNames;
 };
 
@@ -77,10 +102,21 @@ anychart.core.drawers.Base.prototype.getReferenceNames = function() {
  * @param {anychart.core.shapeManagers.Base} shapeManager
  */
 anychart.core.drawers.Base.prototype.startDrawing = function(shapeManager) {
+  if (this.series.rendering().needsCustomPointDrawer()) {
+    this.drawPoint = this.drawPointCustom_;
+    this.updatePoint = this.updatePointCustom_;
+  } else if (shapeManager.checkRequirements(this.requiredShapes)) {
+    this.drawPoint = this.drawPointInternal_;
+    this.updatePoint = this.updatePointInternal;
+  } else {
+    anychart.core.reporting.error(anychart.enums.ErrorCode.WRONG_SHAPES_CONFIG, null, [this.series.name(), this.series.seriesType(), this.requiredShapes]);
+    this.drawPoint = goog.nullFunction;
+    return;
+  }
+
   /**
    * Shape manager provided by the series.
    * @type {anychart.core.shapeManagers.Base}
-   * @protected
    */
   this.shapesManager = shapeManager;
   /**
@@ -99,13 +135,11 @@ anychart.core.drawers.Base.prototype.startDrawing = function(shapeManager) {
   /**
    * Series state.
    * @type {anychart.PointState|number}
-   * @protected
    */
   this.seriesState = this.series.getSeriesState();
   /**
    * Point width.
    * @type {number}
-   * @protected
    */
   this.pointWidth = this.series.pointWidthCache;
   /**
@@ -114,15 +148,29 @@ anychart.core.drawers.Base.prototype.startDrawing = function(shapeManager) {
    * @protected
    */
   this.crispEdges = (this.series.categoryWidthCache - this.pointWidth) > 2.5 && this.pointWidth > 10;
+
+  this.series.rendering().callStart(this.series);
 };
 
 
 /**
- * Draws passed point.
+ * Draws passed point using custom drawing function.
  * @param {anychart.data.IRowInfo} point
  * @param {anychart.PointState|number} state
+ * @private
  */
-anychart.core.drawers.Base.prototype.drawPoint = function(point, state) {
+anychart.core.drawers.Base.prototype.drawPointCustom_ = function(point, state) {
+  this.series.rendering().callPoint(this.series, point, state);
+};
+
+
+/**
+ * Draws passed point in non-custom way.
+ * @param {anychart.data.IRowInfo} point
+ * @param {anychart.PointState|number} state
+ * @private
+ */
+anychart.core.drawers.Base.prototype.drawPointInternal_ = function(point, state) {
   if (point.meta(anychart.opt.MISSING)) {
     this.drawMissingPoint(point, state | this.seriesState);
     this.prevPointDrawn = this.prevPointDrawn && this.connectMissing;
@@ -140,7 +188,11 @@ anychart.core.drawers.Base.prototype.drawPoint = function(point, state) {
  * Finalizes series drawing.
  */
 anychart.core.drawers.Base.prototype.finalizeDrawing = function() {
-  this.finalizeSegment();
+  if (this.drawPoint != goog.nullFunction) {
+    if (!this.series.rendering().needsCustomPointDrawer())
+      this.finalizeSegment();
+    this.series.rendering().callFinish(this.series);
+  }
 };
 
 
@@ -187,8 +239,20 @@ anychart.core.drawers.Base.prototype.finalizeSegment = function() {};
  * Updates point.
  * @param {anychart.data.IRowInfo} point
  * @param {anychart.PointState|number} state
+ * @protected
  */
-anychart.core.drawers.Base.prototype.updatePoint = function(point, state) {};
+anychart.core.drawers.Base.prototype.updatePointInternal = function(point, state) {};
+
+
+/**
+ * Updates point.
+ * @param {anychart.data.IRowInfo} point
+ * @param {anychart.PointState|number} state
+ * @private
+ */
+anychart.core.drawers.Base.prototype.updatePointCustom_ = function(point, state) {
+  this.series.rendering().callUpdate(this.series, point, state);
+};
 
 
 /**

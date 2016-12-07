@@ -352,3 +352,4 @@ anychart.data.TableIterator.prototype['advance'] = anychart.data.TableIterator.p
 anychart.data.TableIterator.prototype['get'] = anychart.data.TableIterator.prototype.get;
 anychart.data.TableIterator.prototype['getKey'] = anychart.data.TableIterator.prototype.getKey;
 anychart.data.TableIterator.prototype['getIndex'] = anychart.data.TableIterator.prototype.getIndex;
+anychart.data.TableIterator.prototype['meta'] = anychart.data.TableIterator.prototype.meta;

@@ -2159,3 +2159,80 @@ anychart.opt.MAIN = 'main';
  * @const {string}
  */
 anychart.opt.RESULT = 'result';
+
+
+/**
+ * Constant replacer for "point" string.
+ * @const {string}
+ */
+anychart.opt.POINT = 'point';
+
+
+/**
+ * Constant replacer for "finish" string.
+ * @const {string}
+ */
+anychart.opt.FINISH = 'finish';
+
+
+/**
+ * Constant replacer for "needsZero" string.
+ * @const {string}
+ */
+anychart.opt.NEEDS_ZERO = 'needsZero';
+
+
+/**
+ * Constant replacer for "needsWidth" string.
+ * @const {string}
+ */
+anychart.opt.NEEDS_WIDTH = 'needsWidth';
+
+
+/**
+ * Constant replacer for "series" string.
+ * @const {string}
+ */
+anychart.opt.SERIES = 'series';
+
+
+/**
+ * Constant replacer for "seriesState" string.
+ * @const {string}
+ */
+anychart.opt.SERIES_STATE = 'seriesState';
+
+
+/**
+ * Constant replacer for "pointState" string.
+ * @const {string}
+ */
+anychart.opt.POINT_STATE = 'pointState';
+
+
+/**
+ * Constant replacer for "yValues" string.
+ * @const {string}
+ */
+anychart.opt.Y_VALUES = 'yValues';
+
+
+/**
+ * Constant replacer for "categoryWidth" string.
+ * @const {string}
+ */
+anychart.opt.CATEGORY_WIDTH = 'categoryWidth';
+
+
+/**
+ * Constant replacer for "shapesGroupPerPoint" string.
+ * @const {string}
+ */
+anychart.opt.SHAPES_GROUP_PER_POINT = 'shapesGroupPerPoint';
+
+
+/**
+ * Constant replacer for "updatePoint" string.
+ * @const {string}
+ */
+anychart.opt.UPDATE_POINT = 'updatePoint';

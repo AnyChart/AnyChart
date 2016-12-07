@@ -444,6 +444,12 @@ anychart.charts.Sparkline.prototype.isDiscreteBased = function() {
 
 
 /** @inheritDoc */
+anychart.charts.Sparkline.prototype.isSizeBased = function() {
+  return false;
+};
+
+
+/** @inheritDoc */
 anychart.charts.Sparkline.prototype.applyAppearanceToSeries = goog.nullFunction;
 
 

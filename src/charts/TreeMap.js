@@ -152,6 +152,12 @@ anychart.charts.TreeMap.prototype.isDiscreteBased = function() {
 
 
 /** @inheritDoc */
+anychart.charts.TreeMap.prototype.isSizeBased = function() {
+  return false;
+};
+
+
+/** @inheritDoc */
 anychart.charts.TreeMap.prototype.applyAppearanceToPoint = function(pointState) {
   var node = /** @type {anychart.data.Tree.DataItem|anychart.data.TreeView.DataItem} */ (this.getIterator().getItem());
   var missing = !goog.isDef(node) || node.meta(anychart.charts.TreeMap.DataFields.MISSING);

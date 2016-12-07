@@ -655,6 +655,16 @@ anychart.core.settings.arrayNormalizer = function(args) {
   else
     return args;
 };
+
+
+/**
+ * Single arg normalizer for function params.
+ * @param {*} val
+ * @return {?Function}
+ */
+anychart.core.settings.functionNormalizer = function(val) {
+  return goog.isFunction(val) ? val : null;
+};
 //endregion
 
 

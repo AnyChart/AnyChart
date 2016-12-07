@@ -48,6 +48,18 @@ anychart.core.drawers.Box.prototype.flags = (
 
 
 /** @inheritDoc */
+anychart.core.drawers.Box.prototype.requiredShapes = (function() {
+  var res = {};
+  res[anychart.opt.PATH] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.HATCH_FILL] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.MEDIAN] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.STEM] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.WHISKER] = anychart.enums.ShapeType.PATH;
+  return res;
+})();
+
+
+/** @inheritDoc */
 anychart.core.drawers.Box.prototype.yValueNames = ([anychart.opt.LOWEST, anychart.opt.Q1, anychart.opt.MEDIAN, anychart.opt.Q3, anychart.opt.HIGHEST]);
 
 
@@ -93,7 +105,7 @@ anychart.core.drawers.Box.prototype.drawSubsequentPoint = function(point, state)
 
 
 /** @inheritDoc */
-anychart.core.drawers.Box.prototype.updatePoint = function(point, state) {
+anychart.core.drawers.Box.prototype.updatePointInternal = function(point, state) {
   var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta(anychart.opt.SHAPES));
   // this can happen before first draw in Cartesian.prepareData()
   if (shapes) {

@@ -141,7 +141,7 @@ anychart.core.shapeManagers.MARKERS_ZINDEX = 11 * anychart.core.shapeManagers.ZI
  */
 anychart.core.shapeManagers.pathFillConfig = {
   name: anychart.opt.FILL,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.FILL, anychart.opt.HOVER_FILL, anychart.opt.SELECT_FILL],
   strokeNames: null,
   isHatchFill: false,
@@ -155,7 +155,7 @@ anychart.core.shapeManagers.pathFillConfig = {
  */
 anychart.core.shapeManagers.pathStrokeConfig = {
   name: anychart.opt.STROKE,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.STROKE, anychart.opt.HOVER_STROKE, anychart.opt.SELECT_STROKE],
   isHatchFill: false,
@@ -169,7 +169,7 @@ anychart.core.shapeManagers.pathStrokeConfig = {
  */
 anychart.core.shapeManagers.pathHatchConfig = {
   name: anychart.opt.HATCH_FILL,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.HATCH_FILL, anychart.opt.HOVER_HATCH_FILL, anychart.opt.SELECT_HATCH_FILL],
   strokeNames: null,
   isHatchFill: true,
@@ -183,7 +183,7 @@ anychart.core.shapeManagers.pathHatchConfig = {
  */
 anychart.core.shapeManagers.circleFillStrokeConfig = {
   name: anychart.opt.CIRCLE,
-  shapeType: anychart.opt.CIRCLE,
+  shapeType: anychart.enums.ShapeType.CIRCLE,
   fillNames: [anychart.opt.FILL, anychart.opt.HOVER_FILL, anychart.opt.SELECT_FILL],
   strokeNames: [anychart.opt.STROKE, anychart.opt.HOVER_STROKE, anychart.opt.SELECT_STROKE],
   isHatchFill: false,
@@ -197,7 +197,7 @@ anychart.core.shapeManagers.circleFillStrokeConfig = {
  */
 anychart.core.shapeManagers.circleHatchConfig = {
   name: anychart.opt.HATCH_FILL,
-  shapeType: anychart.opt.CIRCLE,
+  shapeType: anychart.enums.ShapeType.CIRCLE,
   fillNames: [anychart.opt.HATCH_FILL, anychart.opt.HOVER_HATCH_FILL, anychart.opt.SELECT_HATCH_FILL],
   strokeNames: null,
   isHatchFill: true,
@@ -211,7 +211,7 @@ anychart.core.shapeManagers.circleHatchConfig = {
  */
 anychart.core.shapeManagers.circleNegativeFillStrokeConfig = {
   name: anychart.opt.NEGATIVE,
-  shapeType: anychart.opt.CIRCLE,
+  shapeType: anychart.enums.ShapeType.CIRCLE,
   fillNames: [anychart.opt.NEGATIVE_FILL, anychart.opt.HOVER_NEGATIVE_FILL, anychart.opt.SELECT_NEGATIVE_FILL],
   strokeNames: [anychart.opt.NEGATIVE_STROKE, anychart.opt.HOVER_NEGATIVE_STROKE, anychart.opt.SELECT_NEGATIVE_STROKE],
   isHatchFill: false,
@@ -225,7 +225,7 @@ anychart.core.shapeManagers.circleNegativeFillStrokeConfig = {
  */
 anychart.core.shapeManagers.circleNegativeHatchConfig = {
   name: anychart.opt.NEGATIVE_HATCH_FILL,
-  shapeType: anychart.opt.CIRCLE,
+  shapeType: anychart.enums.ShapeType.CIRCLE,
   fillNames: [anychart.opt.NEGATIVE_HATCH_FILL, anychart.opt.HOVER_NEGATIVE_HATCH_FILL, anychart.opt.SELECT_NEGATIVE_HATCH_FILL],
   strokeNames: null,
   isHatchFill: true,
@@ -239,7 +239,7 @@ anychart.core.shapeManagers.circleNegativeHatchConfig = {
  */
 anychart.core.shapeManagers.pathRisingFillStrokeConfig = {
   name: anychart.opt.RISING,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.RISING_FILL, anychart.opt.HOVER_RISING_FILL, anychart.opt.SELECT_RISING_FILL],
   strokeNames: [anychart.opt.RISING_STROKE, anychart.opt.HOVER_RISING_STROKE, anychart.opt.SELECT_RISING_STROKE],
   isHatchFill: false,
@@ -253,7 +253,7 @@ anychart.core.shapeManagers.pathRisingFillStrokeConfig = {
  */
 anychart.core.shapeManagers.pathRisingStrokeConfig = {
   name: anychart.opt.RISING,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.RISING_STROKE, anychart.opt.HOVER_RISING_STROKE, anychart.opt.SELECT_RISING_STROKE],
   isHatchFill: false,
@@ -267,7 +267,7 @@ anychart.core.shapeManagers.pathRisingStrokeConfig = {
  */
 anychart.core.shapeManagers.pathRisingHatchConfig = {
   name: anychart.opt.RISING_HATCH_FILL,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.RISING_HATCH_FILL, anychart.opt.HOVER_RISING_HATCH_FILL, anychart.opt.SELECT_RISING_HATCH_FILL],
   strokeNames: null,
   isHatchFill: true,
@@ -281,7 +281,7 @@ anychart.core.shapeManagers.pathRisingHatchConfig = {
  */
 anychart.core.shapeManagers.pathFallingFillStrokeConfig = {
   name: anychart.opt.FALLING,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.FALLING_FILL, anychart.opt.HOVER_FALLING_FILL, anychart.opt.SELECT_FALLING_FILL],
   strokeNames: [anychart.opt.FALLING_STROKE, anychart.opt.HOVER_FALLING_STROKE, anychart.opt.SELECT_FALLING_STROKE],
   isHatchFill: false,
@@ -295,7 +295,7 @@ anychart.core.shapeManagers.pathFallingFillStrokeConfig = {
  */
 anychart.core.shapeManagers.pathFallingStrokeConfig = {
   name: anychart.opt.FALLING,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.FALLING_STROKE, anychart.opt.HOVER_FALLING_STROKE, anychart.opt.SELECT_FALLING_STROKE],
   isHatchFill: false,
@@ -309,7 +309,7 @@ anychart.core.shapeManagers.pathFallingStrokeConfig = {
  */
 anychart.core.shapeManagers.pathFallingHatchConfig = {
   name: anychart.opt.FALLING_HATCH_FILL,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.FALLING_HATCH_FILL, anychart.opt.HOVER_FALLING_HATCH_FILL, anychart.opt.SELECT_FALLING_HATCH_FILL],
   strokeNames: null,
   isHatchFill: true,
@@ -323,7 +323,7 @@ anychart.core.shapeManagers.pathFallingHatchConfig = {
  */
 anychart.core.shapeManagers.pathHighStrokeConfig = {
   name: anychart.opt.HIGH,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.HIGH_STROKE, anychart.opt.HOVER_HIGH_STROKE, anychart.opt.SELECT_HIGH_STROKE],
   isHatchFill: false,
@@ -337,7 +337,7 @@ anychart.core.shapeManagers.pathHighStrokeConfig = {
  */
 anychart.core.shapeManagers.pathLowStrokeConfig = {
   name: anychart.opt.LOW,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.LOW_STROKE, anychart.opt.HOVER_LOW_STROKE, anychart.opt.SELECT_LOW_STROKE],
   isHatchFill: false,
@@ -351,7 +351,7 @@ anychart.core.shapeManagers.pathLowStrokeConfig = {
  */
 anychart.core.shapeManagers.pathFillStrokeConfig = {
   name: anychart.opt.PATH,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.FILL, anychart.opt.HOVER_FILL, anychart.opt.SELECT_FILL],
   strokeNames: [anychart.opt.STROKE, anychart.opt.HOVER_STROKE, anychart.opt.SELECT_STROKE],
   isHatchFill: false,
@@ -365,7 +365,7 @@ anychart.core.shapeManagers.pathFillStrokeConfig = {
  */
 anychart.core.shapeManagers.pathMedianStrokeConfig = {
   name: anychart.opt.MEDIAN,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.MEDIAN_STROKE, anychart.opt.HOVER_MEDIAN_STROKE, anychart.opt.SELECT_MEDIAN_STROKE],
   isHatchFill: false,
@@ -379,7 +379,7 @@ anychart.core.shapeManagers.pathMedianStrokeConfig = {
  */
 anychart.core.shapeManagers.pathStemStrokeConfig = {
   name: anychart.opt.STEM,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.STEM_STROKE, anychart.opt.HOVER_STEM_STROKE, anychart.opt.SELECT_STEM_STROKE],
   isHatchFill: false,
@@ -393,7 +393,7 @@ anychart.core.shapeManagers.pathStemStrokeConfig = {
  */
 anychart.core.shapeManagers.pathWhiskerStrokeConfig = {
   name: anychart.opt.WHISKER,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.WHISKER_STROKE, anychart.opt.HOVER_WHISKER_STROKE, anychart.opt.SELECT_WHISKER_STROKE],
   isHatchFill: false,
@@ -407,7 +407,7 @@ anychart.core.shapeManagers.pathWhiskerStrokeConfig = {
  */
 anychart.core.shapeManagers.pathTopArea3DConfig = {
   name: anychart.opt.TOP,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: null,
   isHatchFill: false,
@@ -421,7 +421,7 @@ anychart.core.shapeManagers.pathTopArea3DConfig = {
  */
 anychart.core.shapeManagers.pathTop3DConfig = {
   name: anychart.opt.TOP,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.STROKE, anychart.opt.HOVER_STROKE, anychart.opt.SELECT_STROKE],
   isHatchFill: false,
@@ -435,7 +435,7 @@ anychart.core.shapeManagers.pathTop3DConfig = {
  */
 anychart.core.shapeManagers.pathBottom3DConfig = {
   name: anychart.opt.BOTTOM,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.STROKE, anychart.opt.HOVER_STROKE, anychart.opt.SELECT_STROKE],
   isHatchFill: false,
@@ -449,7 +449,7 @@ anychart.core.shapeManagers.pathBottom3DConfig = {
  */
 anychart.core.shapeManagers.pathLeft3DConfig = {
   name: anychart.opt.LEFT,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.STROKE, anychart.opt.HOVER_STROKE, anychart.opt.SELECT_STROKE],
   isHatchFill: false,
@@ -463,7 +463,7 @@ anychart.core.shapeManagers.pathLeft3DConfig = {
  */
 anychart.core.shapeManagers.pathRight3DConfig = {
   name: anychart.opt.RIGHT,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.STROKE, anychart.opt.HOVER_STROKE, anychart.opt.SELECT_STROKE],
   isHatchFill: false,
@@ -477,7 +477,7 @@ anychart.core.shapeManagers.pathRight3DConfig = {
  */
 anychart.core.shapeManagers.pathBack3DConfig = {
   name: anychart.opt.BACK,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.STROKE, anychart.opt.HOVER_STROKE, anychart.opt.SELECT_STROKE],
   isHatchFill: false,
@@ -491,7 +491,7 @@ anychart.core.shapeManagers.pathBack3DConfig = {
  */
 anychart.core.shapeManagers.pathFront3DConfig = {
   name: anychart.opt.FRONT,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.STROKE, anychart.opt.HOVER_STROKE, anychart.opt.SELECT_STROKE],
   isHatchFill: false,
@@ -505,7 +505,7 @@ anychart.core.shapeManagers.pathFront3DConfig = {
  */
 anychart.core.shapeManagers.pathFront3DHatchConfig = {
   name: anychart.opt.FRONT_HATCH,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.HATCH_FILL, anychart.opt.HOVER_HATCH_FILL, anychart.opt.SELECT_HATCH_FILL],
   strokeNames: null,
   isHatchFill: true,
@@ -519,7 +519,7 @@ anychart.core.shapeManagers.pathFront3DHatchConfig = {
  */
 anychart.core.shapeManagers.pathRight3DHatchConfig = {
   name: anychart.opt.RIGHT_HATCH,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.HATCH_FILL, anychart.opt.HOVER_HATCH_FILL, anychart.opt.SELECT_HATCH_FILL],
   strokeNames: null,
   isHatchFill: true,
@@ -533,7 +533,7 @@ anychart.core.shapeManagers.pathRight3DHatchConfig = {
  */
 anychart.core.shapeManagers.pathTop3DHatchConfig = {
   name: anychart.opt.TOP_HATCH,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.HATCH_FILL, anychart.opt.HOVER_HATCH_FILL, anychart.opt.SELECT_HATCH_FILL],
   strokeNames: null,
   isHatchFill: true,
@@ -547,7 +547,7 @@ anychart.core.shapeManagers.pathTop3DHatchConfig = {
  */
 anychart.core.shapeManagers.pathScrollerFillConfig = {
   name: anychart.opt.FILL,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.FILL],
   strokeNames: null,
   isHatchFill: false,
@@ -561,7 +561,7 @@ anychart.core.shapeManagers.pathScrollerFillConfig = {
  */
 anychart.core.shapeManagers.pathScrollerStrokeConfig = {
   name: anychart.opt.STROKE,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.STROKE],
   isHatchFill: false,
@@ -575,7 +575,7 @@ anychart.core.shapeManagers.pathScrollerStrokeConfig = {
  */
 anychart.core.shapeManagers.pathScrollerHatchConfig = {
   name: anychart.opt.HATCH_FILL,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.HATCH_FILL],
   strokeNames: null,
   isHatchFill: true,
@@ -589,7 +589,7 @@ anychart.core.shapeManagers.pathScrollerHatchConfig = {
  */
 anychart.core.shapeManagers.pathScrollerRisingFillStrokeConfig = {
   name: anychart.opt.RISING,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.RISING_FILL],
   strokeNames: [anychart.opt.RISING_STROKE],
   isHatchFill: false,
@@ -603,7 +603,7 @@ anychart.core.shapeManagers.pathScrollerRisingFillStrokeConfig = {
  */
 anychart.core.shapeManagers.pathScrollerRisingStrokeConfig = {
   name: anychart.opt.RISING,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.RISING_STROKE],
   isHatchFill: false,
@@ -617,7 +617,7 @@ anychart.core.shapeManagers.pathScrollerRisingStrokeConfig = {
  */
 anychart.core.shapeManagers.pathScrollerRisingHatchConfig = {
   name: anychart.opt.RISING_HATCH_FILL,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.RISING_HATCH_FILL],
   strokeNames: null,
   isHatchFill: true,
@@ -631,7 +631,7 @@ anychart.core.shapeManagers.pathScrollerRisingHatchConfig = {
  */
 anychart.core.shapeManagers.pathScrollerFallingFillStrokeConfig = {
   name: anychart.opt.FALLING,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.FALLING_FILL],
   strokeNames: [anychart.opt.FALLING_STROKE],
   isHatchFill: false,
@@ -645,7 +645,7 @@ anychart.core.shapeManagers.pathScrollerFallingFillStrokeConfig = {
  */
 anychart.core.shapeManagers.pathScrollerFallingStrokeConfig = {
   name: anychart.opt.FALLING,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.FALLING_STROKE],
   isHatchFill: false,
@@ -659,7 +659,7 @@ anychart.core.shapeManagers.pathScrollerFallingStrokeConfig = {
  */
 anychart.core.shapeManagers.pathScrollerFallingHatchConfig = {
   name: anychart.opt.FALLING_HATCH_FILL,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.FALLING_HATCH_FILL],
   strokeNames: null,
   isHatchFill: true,
@@ -673,7 +673,7 @@ anychart.core.shapeManagers.pathScrollerFallingHatchConfig = {
  */
 anychart.core.shapeManagers.pathScrollerHighStrokeConfig = {
   name: anychart.opt.HIGH,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.HIGH_STROKE],
   isHatchFill: false,
@@ -687,7 +687,7 @@ anychart.core.shapeManagers.pathScrollerHighStrokeConfig = {
  */
 anychart.core.shapeManagers.pathScrollerLowStrokeConfig = {
   name: anychart.opt.LOW,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.LOW_STROKE],
   isHatchFill: false,
@@ -701,7 +701,7 @@ anychart.core.shapeManagers.pathScrollerLowStrokeConfig = {
  */
 anychart.core.shapeManagers.pathScrollerFillStrokeConfig = {
   name: anychart.opt.PATH,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.FILL],
   strokeNames: [anychart.opt.STROKE],
   isHatchFill: false,
@@ -715,7 +715,7 @@ anychart.core.shapeManagers.pathScrollerFillStrokeConfig = {
  */
 anychart.core.shapeManagers.pathScrollerSelectFillConfig = {
   name: anychart.opt.FILL,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.SELECT_FILL],
   strokeNames: null,
   isHatchFill: false,
@@ -729,7 +729,7 @@ anychart.core.shapeManagers.pathScrollerSelectFillConfig = {
  */
 anychart.core.shapeManagers.pathScrollerSelectStrokeConfig = {
   name: anychart.opt.STROKE,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.SELECT_STROKE],
   isHatchFill: false,
@@ -743,7 +743,7 @@ anychart.core.shapeManagers.pathScrollerSelectStrokeConfig = {
  */
 anychart.core.shapeManagers.pathScrollerSelectHatchConfig = {
   name: anychart.opt.HATCH_FILL,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.SELECT_HATCH_FILL],
   strokeNames: null,
   isHatchFill: true,
@@ -757,7 +757,7 @@ anychart.core.shapeManagers.pathScrollerSelectHatchConfig = {
  */
 anychart.core.shapeManagers.pathScrollerSelectRisingFillStrokeConfig = {
   name: anychart.opt.RISING,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.SELECT_RISING_FILL],
   strokeNames: [anychart.opt.SELECT_RISING_STROKE],
   isHatchFill: false,
@@ -771,7 +771,7 @@ anychart.core.shapeManagers.pathScrollerSelectRisingFillStrokeConfig = {
  */
 anychart.core.shapeManagers.pathScrollerSelectRisingStrokeConfig = {
   name: anychart.opt.RISING,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.SELECT_RISING_STROKE],
   isHatchFill: false,
@@ -785,7 +785,7 @@ anychart.core.shapeManagers.pathScrollerSelectRisingStrokeConfig = {
  */
 anychart.core.shapeManagers.pathScrollerSelectRisingHatchConfig = {
   name: anychart.opt.RISING_HATCH_FILL,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.SELECT_RISING_HATCH_FILL],
   strokeNames: null,
   isHatchFill: true,
@@ -799,7 +799,7 @@ anychart.core.shapeManagers.pathScrollerSelectRisingHatchConfig = {
  */
 anychart.core.shapeManagers.pathScrollerSelectFallingFillStrokeConfig = {
   name: anychart.opt.FALLING,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.SELECT_FALLING_FILL],
   strokeNames: [anychart.opt.SELECT_FALLING_STROKE],
   isHatchFill: false,
@@ -813,7 +813,7 @@ anychart.core.shapeManagers.pathScrollerSelectFallingFillStrokeConfig = {
  */
 anychart.core.shapeManagers.pathScrollerSelectFallingStrokeConfig = {
   name: anychart.opt.FALLING,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.SELECT_FALLING_STROKE],
   isHatchFill: false,
@@ -827,7 +827,7 @@ anychart.core.shapeManagers.pathScrollerSelectFallingStrokeConfig = {
  */
 anychart.core.shapeManagers.pathScrollerSelectFallingHatchConfig = {
   name: anychart.opt.FALLING_HATCH_FILL,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.SELECT_FALLING_HATCH_FILL],
   strokeNames: null,
   isHatchFill: true,
@@ -841,7 +841,7 @@ anychart.core.shapeManagers.pathScrollerSelectFallingHatchConfig = {
  */
 anychart.core.shapeManagers.pathScrollerSelectHighStrokeConfig = {
   name: anychart.opt.HIGH,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.SELECT_HIGH_STROKE],
   isHatchFill: false,
@@ -855,7 +855,7 @@ anychart.core.shapeManagers.pathScrollerSelectHighStrokeConfig = {
  */
 anychart.core.shapeManagers.pathScrollerSelectLowStrokeConfig = {
   name: anychart.opt.LOW,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: null,
   strokeNames: [anychart.opt.SELECT_LOW_STROKE],
   isHatchFill: false,
@@ -869,7 +869,7 @@ anychart.core.shapeManagers.pathScrollerSelectLowStrokeConfig = {
  */
 anychart.core.shapeManagers.pathScrollerSelectFillStrokeConfig = {
   name: anychart.opt.PATH,
-  shapeType: anychart.opt.PATH,
+  shapeType: anychart.enums.ShapeType.PATH,
   fillNames: [anychart.opt.SELECT_FILL],
   strokeNames: [anychart.opt.SELECT_STROKE],
   isHatchFill: false,

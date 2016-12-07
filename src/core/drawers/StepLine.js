@@ -48,6 +48,14 @@ anychart.core.drawers.StepLine.prototype.flags = (
 
 
 /** @inheritDoc */
+anychart.core.drawers.StepLine.prototype.requiredShapes = (function() {
+  var res = {};
+  res[anychart.opt.STROKE] = anychart.enums.ShapeType.PATH;
+  return res;
+})();
+
+
+/** @inheritDoc */
 anychart.core.drawers.StepLine.prototype.startDrawing = function(shapeManager) {
   anychart.core.drawers.StepLine.base(this, 'startDrawing', shapeManager);
   this.direction_ = /** @type {anychart.enums.StepDirection} */ (this.series.getOption(anychart.opt.STEP_DIRECTION) || anychart.enums.StepDirection.CENTER);

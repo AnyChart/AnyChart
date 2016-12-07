@@ -42,6 +42,13 @@ anychart.core.utils.IInteractiveSeries.prototype.isDiscreteBased = function() {}
 
 
 /**
+ * @return {boolean}
+ */
+anychart.core.utils.IInteractiveSeries.prototype.isSizeBased = function() {
+};
+
+
+/**
  * Apply appearance to series.
  * @param {anychart.PointState|number} pointState .
  */

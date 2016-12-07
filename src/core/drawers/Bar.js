@@ -48,6 +48,15 @@ anychart.core.drawers.Bar.prototype.flags = (
 
 
 /** @inheritDoc */
+anychart.core.drawers.Bar.prototype.requiredShapes = (function() {
+  var res = {};
+  res[anychart.opt.PATH] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.HATCH_FILL] = anychart.enums.ShapeType.PATH;
+  return res;
+})();
+
+
+/** @inheritDoc */
 anychart.core.drawers.Bar.prototype.drawSubsequentPoint = function(point, state) {
   var shapes = /** @type {Object.<acgraph.vector.Path>} */(this.shapesManager.getShapesGroup(state));
   this.drawPoint_(point, shapes);

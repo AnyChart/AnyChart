@@ -55,6 +55,14 @@ anychart.core.drawers.Spline.prototype.flags = (
 
 
 /** @inheritDoc */
+anychart.core.drawers.Spline.prototype.requiredShapes = (function() {
+  var res = {};
+  res[anychart.opt.STROKE] = anychart.enums.ShapeType.PATH;
+  return res;
+})();
+
+
+/** @inheritDoc */
 anychart.core.drawers.Spline.prototype.startDrawing = function(shapeManager) {
   anychart.core.drawers.Spline.base(this, 'startDrawing', shapeManager);
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);

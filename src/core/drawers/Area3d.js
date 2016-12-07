@@ -48,6 +48,22 @@ anychart.core.drawers.Area3d.prototype.flags = (
 
 
 /** @inheritDoc */
+anychart.core.drawers.Area3d.prototype.requiredShapes = (function() {
+  var res = {};
+  res[anychart.opt.TOP] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.BOTTOM] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.LEFT] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.RIGHT] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.BACK] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.FRONT] = anychart.enums.ShapeType.PATH;
+  // res[anychart.opt.RIGHT_HATCH] = anychart.enums.ShapeType.PATH;
+  // res[anychart.opt.TOP_HATCH] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.FRONT_HATCH] = anychart.enums.ShapeType.PATH;
+  return res;
+})();
+
+
+/** @inheritDoc */
 anychart.core.drawers.Area3d.prototype.startDrawing = function(shapeManager) {
   anychart.core.drawers.Area3d.base(this, 'startDrawing', shapeManager);
   /**

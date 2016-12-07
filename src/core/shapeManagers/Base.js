@@ -75,7 +75,6 @@ anychart.core.shapeManagers.Base = function(series, config, interactive, opt_sha
   /**
    * Shape definitions storage.
    * @type {Object.<anychart.core.shapeManagers.Base.ShapeDescriptor>}
-   * @protected
    */
   this.defs = {};
 
@@ -84,19 +83,21 @@ anychart.core.shapeManagers.Base = function(series, config, interactive, opt_sha
     var fill = anychart.core.series.Base.getColorResolver(shapeConfig.fillNames,
         shapeConfig.isHatchFill ? anychart.enums.ColorType.HATCH_FILL : anychart.enums.ColorType.FILL);
     var stroke = anychart.core.series.Base.getColorResolver(shapeConfig.strokeNames, anychart.enums.ColorType.STROKE);
-    var cls;
-    // currently only paths and circles are usable (circles - for bubbles, paths - for everything else)
-    // but a switch and a string shape type is used for an emergency case.
     var type = shapeConfig.shapeType;
-    switch (type) {
-      case anychart.opt.CIRCLE:
-        cls = acgraph.circle;
-        break;
-      case anychart.opt.RECT:
+    var val = String(type).toLowerCase();
+    var cls;
+    switch (val) {
+      case anychart.enums.ShapeType.RECT:
         cls = acgraph.rect;
         break;
+      case anychart.enums.ShapeType.CIRCLE:
+        cls = acgraph.circle;
+        break;
+      case anychart.enums.ShapeType.ELLIPSE:
+        cls = acgraph.ellipse;
+        break;
+        // case 'path':
       default:
-        type = anychart.opt.PATH;
         cls = acgraph.path;
         break;
     }
@@ -129,6 +130,21 @@ goog.inherits(anychart.core.shapeManagers.Base, goog.Disposable);
  * }}
  */
 anychart.core.shapeManagers.Base.ShapeDescriptor;
+
+
+/**
+ * Checks if current shapeManager shapes configuration conforms passed shape requirements.
+ * @param {Object.<string, anychart.enums.ShapeType>} requiredShapes
+ * @return {boolean}
+ */
+anychart.core.shapeManagers.Base.prototype.checkRequirements = function(requiredShapes) {
+  for (var i in requiredShapes) {
+    var def = this.defs[i];
+    if (!def || def.shapeType != requiredShapes[i])
+      return false;
+  }
+  return true;
+};
 
 
 /**
@@ -332,4 +348,3 @@ anychart.core.shapeManagers.Base.prototype.disposeInternal = function() {
   this.defs = null;
   anychart.core.shapeManagers.Base.base(this, 'disposeInternal');
 };
-

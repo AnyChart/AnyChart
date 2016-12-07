@@ -48,6 +48,14 @@ anychart.core.drawers.Stick.prototype.flags = (
 
 
 /** @inheritDoc */
+anychart.core.drawers.Stick.prototype.requiredShapes = (function() {
+  var res = {};
+  res[anychart.opt.STROKE] = anychart.enums.ShapeType.PATH;
+  return res;
+})();
+
+
+/** @inheritDoc */
 anychart.core.drawers.Stick.prototype.startDrawing = function(shapeManager) {
   anychart.core.drawers.Stick.base(this, 'startDrawing', shapeManager);
   this.crispEdges = this.pointWidth > 2;

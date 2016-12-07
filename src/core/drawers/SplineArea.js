@@ -55,6 +55,16 @@ anychart.core.drawers.SplineArea.prototype.flags = (
 
 
 /** @inheritDoc */
+anychart.core.drawers.SplineArea.prototype.requiredShapes = (function() {
+  var res = {};
+  res[anychart.opt.FILL] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.HATCH_FILL] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.STROKE] = anychart.enums.ShapeType.PATH;
+  return res;
+})();
+
+
+/** @inheritDoc */
 anychart.core.drawers.SplineArea.prototype.startDrawing = function(shapeManager) {
   anychart.core.drawers.SplineArea.base(this, 'startDrawing', shapeManager);
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);

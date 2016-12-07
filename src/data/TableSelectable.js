@@ -563,6 +563,7 @@ anychart.data.TableSelectable.prototype['select'] = anychart.data.TableSelectabl
 anychart.data.TableSelectable.prototype['selectAll'] = anychart.data.TableSelectable.prototype.selectAll;
 anychart.data.TableSelectable.prototype['getIterator'] = anychart.data.TableSelectable.prototype.getIterator;
 
+anychart.data.TableSelectable.RowProxy.prototype['meta'] = anychart.data.TableSelectable.RowProxy.prototype.meta;
 anychart.data.TableSelectable.RowProxy.prototype['get'] = anychart.data.TableSelectable.RowProxy.prototype.get;
 anychart.data.TableSelectable.RowProxy.prototype['getKey'] = anychart.data.TableSelectable.RowProxy.prototype.getKey;
 anychart.data.TableSelectable.RowProxy.prototype['getColumn'] = anychart.data.TableSelectable.RowProxy.prototype.getColumn;

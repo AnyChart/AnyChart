@@ -142,6 +142,15 @@ anychart.core.sparkline.series.Base.prototype.getChart = function() {
 
 
 /**
+ * Interface function.
+ * @return {boolean}
+ */
+anychart.core.sparkline.series.Base.prototype.isSizeBased = function() {
+  return false;
+};
+
+
+/**
  * Gets an array of reference 'y' fields from the row iterator point to
  * and gets pixel values. Reference fields are defined using referenceValueNames and referenceValueMeanings.
  * If there is only one field - a value is returned.

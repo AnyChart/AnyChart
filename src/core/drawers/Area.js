@@ -48,6 +48,16 @@ anychart.core.drawers.Area.prototype.flags = (
     0);
 
 
+/** @inheritDoc */
+anychart.core.drawers.Area.prototype.requiredShapes = (function() {
+  var res = {};
+  res[anychart.opt.FILL] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.HATCH_FILL] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.STROKE] = anychart.enums.ShapeType.PATH;
+  return res;
+})();
+
+
 /**
  * Draws area start.
  * @param {Object.<string, acgraph.vector.Shape>} shapes

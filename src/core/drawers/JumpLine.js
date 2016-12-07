@@ -49,6 +49,14 @@ anychart.core.drawers.JumpLine.prototype.flags = (
 
 
 /** @inheritDoc */
+anychart.core.drawers.JumpLine.prototype.requiredShapes = (function() {
+  var res = {};
+  res[anychart.opt.STROKE] = anychart.enums.ShapeType.PATH;
+  return res;
+})();
+
+
+/** @inheritDoc */
 anychart.core.drawers.JumpLine.prototype.drawSubsequentPoint = function(point, state) {
   var shapes = /** @type {Object.<acgraph.vector.Path>} */(this.shapesManager.getShapesGroup(state));
   this.drawPoint_(point, shapes);

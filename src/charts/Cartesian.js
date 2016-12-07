@@ -141,18 +141,6 @@ anychart.charts.Cartesian.prototype.seriesConfig = (function() {
     anchoredPositionTop: anychart.opt.VALUE,
     anchoredPositionBottom: anychart.opt.VALUE
   };
-  res[anychart.enums.CartesianSeriesType.STICK] = {
-    drawerType: anychart.enums.SeriesDrawerTypes.STICK,
-    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
-    shapesConfig: [
-      anychart.core.shapeManagers.pathStrokeConfig
-    ],
-    secondaryShapesConfig: null,
-    postProcessor: null,
-    capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.ZERO
-  };
   res[anychart.enums.CartesianSeriesType.LINE] = {
     drawerType: anychart.enums.SeriesDrawerTypes.LINE,
     shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
@@ -319,6 +307,18 @@ anychart.charts.Cartesian.prototype.seriesConfig = (function() {
     capabilities: capabilities,
     anchoredPositionTop: anychart.opt.VALUE,
     anchoredPositionBottom: anychart.opt.VALUE
+  };
+  res[anychart.enums.CartesianSeriesType.STICK] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.STICK,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathStrokeConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: anychart.opt.VALUE,
+    anchoredPositionBottom: anychart.opt.ZERO
   };
   return res;
 })();

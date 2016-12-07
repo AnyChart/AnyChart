@@ -440,7 +440,7 @@ anychart.core.series.Stock.prototype.unhover = function() {
 /** @inheritDoc */
 anychart.core.series.Stock.prototype.createTooltipContextProvider = function() {
   if (!this.tooltipContext) {
-    this.tooltipContext = new anychart.core.utils.StockHighlightContextProvider(this, this.drawer.yValueNames, false);
+    this.tooltipContext = new anychart.core.utils.StockHighlightContextProvider(this, this.getYValueNames(), false);
   }
   this.tooltipContext.applyReferenceValues();
   return this.tooltipContext;
@@ -454,7 +454,7 @@ anychart.core.series.Stock.prototype.createTooltipContextProvider = function() {
  */
 anychart.core.series.Stock.prototype.createLegendContextProvider = function() {
   if (!this.legendProvider)
-    this.legendProvider = new anychart.core.utils.StockHighlightContextProvider(this, this.drawer.yValueNames, false);
+    this.legendProvider = new anychart.core.utils.StockHighlightContextProvider(this, this.getYValueNames(), false);
   this.legendProvider.applyReferenceValues();
   return this.legendProvider;
 };

@@ -2971,7 +2971,9 @@ anychart.enums.ErrorCode = {
 
   TABLE_MAPPING_DIFFERENT_TABLE: 200,
   TABLE_FIELD_NAME_DUPLICATE: 201,
-  TABLE_COMPUTER_OUTPUT_FIELD_DUPLICATE: 202
+  TABLE_COMPUTER_OUTPUT_FIELD_DUPLICATE: 202,
+
+  WRONG_SHAPES_CONFIG: 300
 };
 
 
@@ -5232,6 +5234,18 @@ anychart.enums.ShapeManagerTypes = {
 
 
 /**
+ * Shape type enum.
+ * @enum {string}
+ */
+anychart.enums.ShapeType = {
+  PATH: 'path',
+  CIRCLE: 'circle',
+  RECT: 'rect',
+  ELLIPSE: 'ellipse'
+};
+
+
+/**
  * Color type.
  * @enum {number}
  */
@@ -6485,3 +6499,8 @@ goog.exportSymbol('anychart.enums.TimeTrackingMode.AVAILABILITY_PER_RESOURCE', a
 goog.exportSymbol('anychart.enums.TimeTrackingMode.ACTIVITY_PER_CHART', anychart.enums.TimeTrackingMode.ACTIVITY_PER_CHART);
 goog.exportSymbol('anychart.enums.TimeTrackingMode.ACTIVITY_PER_RESOURCE', anychart.enums.TimeTrackingMode.ACTIVITY_PER_RESOURCE);
 
+
+goog.exportSymbol('anychart.enums.ShapeType.PATH', anychart.enums.ShapeType.PATH);
+goog.exportSymbol('anychart.enums.ShapeType.CIRCLE', anychart.enums.ShapeType.CIRCLE);
+goog.exportSymbol('anychart.enums.ShapeType.ELLIPSE', anychart.enums.ShapeType.ELLIPSE);
+goog.exportSymbol('anychart.enums.ShapeType.RECT', anychart.enums.ShapeType.RECT);

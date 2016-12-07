@@ -1331,6 +1331,12 @@ anychart.core.linearGauge.pointers.Base.prototype.isDiscreteBased = function() {
 
 
 /** @inheritDoc */
+anychart.core.linearGauge.pointers.Base.prototype.isSizeBased = function() {
+  return false;
+};
+
+
+/** @inheritDoc */
 anychart.core.linearGauge.pointers.Base.prototype.applyAppearanceToSeries = function(pointState) {
   this.colorizePointer(pointState);
 };

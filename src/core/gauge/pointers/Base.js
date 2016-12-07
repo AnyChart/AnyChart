@@ -108,6 +108,15 @@ anychart.core.gauge.pointers.Base.prototype.isDiscreteBased = function() {
 
 
 /**
+ * Interface tester.
+ * @return {boolean}
+ */
+anychart.core.gauge.pointers.Base.prototype.isSizeBased = function() {
+  return false;
+};
+
+
+/**
  * Tester if it is series.
  * @return {boolean}
  */

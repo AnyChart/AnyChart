@@ -165,6 +165,7 @@ anychart.ConsistencyState = {
   SERIES_CLIP: 1 << 12, //
   SERIES_ERROR: 1 << 13, //
   SERIES_OUTLIERS: 1 << 14, //
+  SERIES_SHAPE_MANAGER: 1 << 15,
   //---------------------------------- AXES STATES (VB) ---------------------------------
   CALLOUT_TITLE: 1 << 6,
   CALLOUT_LABELS: 1 << 7,
@@ -991,3 +992,6 @@ anychart.SignalEvent.prototype['targetDataChanged'] = anychart.SignalEvent.proto
 anychart.SignalEvent.prototype['targetMetaChanged'] = anychart.SignalEvent.prototype.targetMetaChanged;//doc
 anychart.SignalEvent.prototype['targetNeedsReapplication'] = anychart.SignalEvent.prototype.targetNeedsReapplication;//doc
 anychart.SignalEvent.prototype['targetNeedsRecalculation'] = anychart.SignalEvent.prototype.targetNeedsRecalculation;//doc
+goog.exportSymbol('anychart.PointState.NORMAL', anychart.PointState.NORMAL);
+goog.exportSymbol('anychart.PointState.HOVER', anychart.PointState.HOVER);
+goog.exportSymbol('anychart.PointState.SELECT', anychart.PointState.SELECT);

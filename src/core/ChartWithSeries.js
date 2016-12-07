@@ -2351,9 +2351,11 @@ anychart.core.ChartWithSeries.prototype.doAnimation = function() {
       var duration = /** @type {number} */(this.animation().duration());
       for (var i = 0; i < this.seriesList.length; i++) {
         var series = this.seriesList[i];
-        var ctl = anychart.animations.AnimationBySeriesType[series.getAnimationType()];
-        if (ctl)
-          this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (new ctl(series, duration)));
+        if (!series.rendering().needsCustomPointDrawer()) {
+          var ctl = anychart.animations.AnimationBySeriesType[series.getAnimationType()];
+          if (ctl)
+            this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (new ctl(series, duration)));
+        }
       }
       this.animationQueue_.listen(goog.fx.Transition.EventType.BEGIN, function() {
         this.dispatchDetachedEvent({

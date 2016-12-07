@@ -446,6 +446,15 @@ anychart.charts.Pie.prototype.isDiscreteBased = function() {
 
 
 /**
+ * Tester if the series is discrete based.
+ * @return {boolean}
+ */
+anychart.charts.Pie.prototype.isSizeBased = function() {
+  return false;
+};
+
+
+/**
  * @inheritDoc
  */
 anychart.charts.Pie.prototype.isSeries = function() {

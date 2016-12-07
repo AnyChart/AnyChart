@@ -48,6 +48,15 @@ anychart.core.drawers.OHLC.prototype.flags = (
 
 
 /** @inheritDoc */
+anychart.core.drawers.OHLC.prototype.requiredShapes = (function() {
+  var res = {};
+  res[anychart.opt.RISING] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.FALLING] = anychart.enums.ShapeType.PATH;
+  return res;
+})();
+
+
+/** @inheritDoc */
 anychart.core.drawers.OHLC.prototype.yValueNames = ([anychart.opt.OPEN, anychart.opt.HIGH, anychart.opt.LOW, anychart.opt.CLOSE]);
 
 

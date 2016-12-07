@@ -64,7 +64,16 @@ anychart.core.drawers.Marker.prototype.flags = (
 
 
 /** @inheritDoc */
-anychart.core.drawers.Marker.prototype.updatePoint = function(point, state) {
+anychart.core.drawers.Marker.prototype.requiredShapes = (function() {
+  var res = {};
+  res[anychart.opt.PATH] = anychart.enums.ShapeType.PATH;
+  res[anychart.opt.HATCH_FILL] = anychart.enums.ShapeType.PATH;
+  return res;
+})();
+
+
+/** @inheritDoc */
+anychart.core.drawers.Marker.prototype.updatePointInternal = function(point, state) {
   var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta(anychart.opt.SHAPES));
   // this can happen before first draw in Cartesian.prepareData()
   if (shapes) {

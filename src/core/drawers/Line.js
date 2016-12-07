@@ -48,6 +48,14 @@ anychart.core.drawers.Line.prototype.flags = (
 
 
 /** @inheritDoc */
+anychart.core.drawers.Line.prototype.requiredShapes = (function() {
+  var res = {};
+  res[anychart.opt.STROKE] = anychart.enums.ShapeType.PATH;
+  return res;
+})();
+
+
+/** @inheritDoc */
 anychart.core.drawers.Line.prototype.drawFirstPoint = function(point, state) {
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
   var x = /** @type {number} */(point.meta(anychart.opt.X));
