@@ -1,0 +1,48 @@
+{
+  "name": "anychart",
+  "version": "7.11.1",
+  "description": "Robust JavaScript/HTML5 Chart library for any project",
+  "main": "dist/anychart-bundle.min.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AnyChart/AnyChart.git"
+  },
+    "bugs": {
+    "url": "https://github.com/AnyChart/AnyChart/issues"
+  },
+  "keywords": [
+    "anychart",
+    "anystock",
+    "anygantt",
+    "anymap",
+    "charts",
+    "javascript charts",
+    "ajax charts",
+    "plots",
+    "line charts",
+    "bar charts",
+    "pie charts",
+    "javascript plots",
+    "ajax plots",
+    "javascript",
+    "SVG",
+    "HTML5",
+    "framework",
+    "VML"
+  ],
+  "author": "AnyChart <contact@anychart.com> (http://anychart.com)",
+  "license": "SEE LICENSE IN <http://www.anychart.com/buy>",
+  "homepage": "https://anychart.com",
+  "contributors": [
+    "Roman Lubushkin <roman.lubushkin@anychart.com>",
+    "Alexander Kudryavtsev <alexander.kudryavtsev@anychart.com>",
+    "Anton Kagakin <anton.kagakin@anychart.com>",
+    "Anton Saukh <anton.saukh@anychart.com>",
+    "Sergey Medvedev <sergey.medvedev@anychart.com>",
+    "Vitaly Radionov <vitaly.radionov@anychart.com>",
+    "Eugene Averchenko <eugene.averchenko@anychart.com>"
+  ]
+}
