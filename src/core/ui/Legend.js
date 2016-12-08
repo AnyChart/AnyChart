@@ -910,7 +910,10 @@ anychart.core.ui.Legend.prototype.initializeLegendItems_ = function(items) {
         item = this.items_[j];
         var itemSourceUid = item.sourceUid();
         var itemSourceKey = item.sourceKey();
-        if ((goog.isDef(itemSourceUid) && goog.isDef(itemSourceKey) && itemSourceUid == items[i]['sourceUid'] && itemSourceKey == items[i]['sourceKey'])) {
+        if (goog.isDef(itemSourceUid) &&
+            goog.isDef(itemSourceKey) &&
+            itemSourceUid == items[i]['sourceUid'] &&
+            itemSourceKey == items[i]['sourceKey']) {
           item.setup(items[i]);
           item.applyTextSettings(item.getTextElement(), false);
           item.setItemIndexToLayer(this.inverted_ ? items.length - 1 - i : i);

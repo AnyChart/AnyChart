@@ -297,6 +297,15 @@ anychart.core.ui.Paginator.prototype.pageCount = function(opt_value) {
 
 
 /**
+ * Returns current paginator pages count.
+ * @return {number}
+ */
+anychart.core.ui.Paginator.prototype.getPagesCount = function() {
+  return this.pageCount_;
+};
+
+
+/**
  * Getter/setter for currentPage.
  * @param {(number|string)=} opt_value Paginator page count to set.
  * @return {(number|anychart.core.ui.Paginator)} Current page or self for chaining.
@@ -830,3 +839,4 @@ anychart.core.ui.Paginator.prototype['padding'] = anychart.core.ui.Paginator.pro
 anychart.core.ui.Paginator.prototype['margin'] = anychart.core.ui.Paginator.prototype.margin;
 anychart.core.ui.Paginator.prototype['layout'] = anychart.core.ui.Paginator.prototype.layout;
 anychart.core.ui.Paginator.prototype['currentPage'] = anychart.core.ui.Paginator.prototype.currentPage;
+anychart.core.ui.Paginator.prototype['getPagesCount'] = anychart.core.ui.Paginator.prototype.getPagesCount;
