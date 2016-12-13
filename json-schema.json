@@ -3000,6 +3000,14 @@
         "hoverHatchFill": {"$ref": "#/definitions/hatchFillSet"},
         "selectHatchFill": {"$ref": "#/definitions/hatchFillSet"},
 
+        "emptyFill": {"$ref": "#/definitions/fill"},
+        "hoverEmptyFill": {"$ref": "#/definitions/fill"},
+        "selectEmptyFill": {"$ref": "#/definitions/fill"},
+
+        "emptyHatchFill": {"$ref": "#/definitions/hatchFillSet"},
+        "hoverEmptyHatchFill": {"$ref": "#/definitions/hatchFillSet"},
+        "selectEmptyHatchFill": {"$ref": "#/definitions/hatchFillSet"},
+
         "type": {
           "$ref": "#/definitions/anychart.enums.MarkerType"
         },

@@ -3345,7 +3345,14 @@ goog.provide('anychart.themes.defaultTheme');
           }
         },
         'marker': {'width': '3%'},
-        'tank': {},
+        'tank': {
+          'emptyFill': '#fff 0.3',
+          'hoverEmptyFill': returnSourceColor,
+          'selectEmptyFill': returnSourceColor,
+          'emptyHatchFill': null
+          //'hoverEmptyHatchFill': null,
+          //'selectEmptyHatchFill': null
+        },
         'thermometer': {
           /**
            * @this {*}

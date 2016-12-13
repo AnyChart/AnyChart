@@ -2321,12 +2321,18 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill" />
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_fill" type="Fill" />
             <xsd:element minOccurs="0" maxOccurs="1" name="select_fill" type="Fill" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="empty_fill" type="Fill" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="hover_empty_fill" type="Fill" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="select_empty_fill" type="Fill" />
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke" />
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_stroke" type="Stroke" />
             <xsd:element minOccurs="0" maxOccurs="1" name="select_stroke" type="Stroke" />
             <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill" type="HatchFill" />
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_hatch_fill" type="HatchFill" />
             <xsd:element minOccurs="0" maxOccurs="1" name="select_hatch_fill" type="HatchFill" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="empty_hatch_fill" type="HatchFill" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="hover_empty_hatch_fill" type="HatchFill" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="select_empty_hatch_fill" type="HatchFill" />
             <xsd:element minOccurs="0" maxOccurs="1" name="legend_item" type="utils.LegendItemSettings" />
             <xsd:element minOccurs="0" maxOccurs="1" name="label" type="core.LabelsFactory" />
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_label" type="core.LabelsFactory" />
@@ -2338,12 +2344,18 @@
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="hover_fill" type="xsd:string"/>
         <xsd:attribute name="select_fill" type="xsd:string"/>
+        <xsd:attribute name="empty_fill" type="xsd:string"/>
+        <xsd:attribute name="hover_empty_fill" type="xsd:string"/>
+        <xsd:attribute name="select_empty_fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
         <xsd:attribute name="hover_stroke" type="xsd:string"/>
         <xsd:attribute name="select_stroke" type="xsd:string"/>
         <xsd:attribute name="hatch_fill" type="simple.HatchFill"/>
         <xsd:attribute name="hover_hatch_fill" type="simple.HatchFill"/>
         <xsd:attribute name="select_hatch_fill" type="simple.HatchFill"/>
+        <xsd:attribute name="empty_hatch_fill" type="simple.HatchFill"/>
+        <xsd:attribute name="hover_empty_hatch_fill" type="simple.HatchFill"/>
+        <xsd:attribute name="select_empty_hatch_fill" type="simple.HatchFill"/>
         <xsd:attribute name="pointer_type" type="enums.LinearGaugePointerType" />
         <xsd:attribute name="id" type="xsd:string"/>
         <xsd:attribute name="auto_index" type="xsd:unsignedInt"/>
