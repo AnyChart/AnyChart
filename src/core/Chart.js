@@ -26,6 +26,7 @@ goog.require('anychart.performance');
 goog.require('anychart.themes.merging');
 goog.require('anychart.utils');
 goog.require('goog.dom');
+goog.require('goog.dom.classlist');
 goog.require('goog.json.hybrid');
 
 goog.forwardDeclare('anychart.ui.ContextMenu');
@@ -796,31 +797,31 @@ anychart.core.Chart.contextMenuItems = {
   // Item 'Export as ...'.
   exportAs: {
     'text': 'Save chart as...',
-    'iconClass': 'fa fa-floppy-o',
+    'iconClass': 'ac ac-folder',
     'subMenu': [{
       'text': '.png',
-      'iconClass': 'fa fa-file-image-o',
+      'iconClass': 'ac ac-file-image-o',
       'eventType': 'anychart.saveAsPng',
       'action': function(context) {
         context['chart'].saveAsPng();
       }
     }, {
       'text': '.jpg',
-      'iconClass': 'fa fa-file-image-o',
+      'iconClass': 'ac ac-file-image-o',
       'eventType': 'anychart.saveAsJpg',
       'action': function(context) {
         context['chart'].saveAsJpg();
       }
     }, {
       'text': '.pdf',
-      'iconClass': 'fa fa-file-pdf-o',
+      'iconClass': 'ac ac-file-pdf-o',
       'eventType': 'anychart.saveAsPdf',
       'action': function(context) {
         context['chart'].saveAsPdf();
       }
     }, {
       'text': '.svg',
-      'iconClass': 'fa fa-file-code-o',
+      'iconClass': 'ac ac-file-code-o',
       'eventType': 'anychart.saveAsSvg',
       'action': function(context) {
         context['chart'].saveAsSvg();
@@ -831,17 +832,17 @@ anychart.core.Chart.contextMenuItems = {
   // Item 'Save data as...'.
   saveDataAs: {
     'text': 'Save data as...',
-    'iconClass': 'fa fa-floppy-o',
+    'iconClass': 'ac ac-folder',
     'subMenu': [{
       'text': '.csv',
-      'iconClass': 'fa fa-file-excel-o',
+      'iconClass': 'ac ac-file-excel-o',
       'eventType': 'anychart.saveAsCsv',
       'action': function(context) {
         context['chart'].saveAsCsv();
       }
     }, {
       'text': '.xslx',
-      'iconClass': 'fa fa-file-excel-o',
+      'iconClass': 'ac ac-file-excel-o',
       'eventType': 'anychart.saveAsXlsx',
       'action': function(context) {
         context['chart'].saveAsXlsx();
@@ -849,20 +850,55 @@ anychart.core.Chart.contextMenuItems = {
     }]
   },
 
+  // Item 'Share with...'.
+  shareWith: {
+    'text': 'Share with...',
+    'iconClass': 'ac ac-share',
+    'subMenu': [{
+      'text': 'Facebook',
+      'iconClass': 'ac ac-facebook',
+      'eventType': 'anychart.shareWithFacebook',
+      'action': function(context) {
+        context['chart'].shareWithFacebook();
+      }
+    }, {
+      'text': 'Twitter',
+      'iconClass': 'ac ac-twitter',
+      'eventType': 'anychart.shareWithTwitter',
+      'action': function(context) {
+        context['chart'].shareWithTwitter();
+      }
+    }, {
+      'text': 'LinkedIn',
+      'iconClass': 'ac ac-linkedin',
+      'eventType': 'anychart.shareWithLinkedIn',
+      'action': function(context) {
+        context['chart'].shareWithLinkedIn();
+      }
+    }, {
+      'text': 'Pinterest',
+      'iconClass': 'ac ac-pinterest',
+      'eventType': 'anychart.shareWithPinterest',
+      'action': function(context) {
+        context['chart'].shareWithPinterest();
+      }
+    }]
+  },
+
   // Item 'Save config as..'.
   saveConfigAs: {
     'text': 'Save config as...',
-    'iconClass': 'fa fa-floppy-o',
+    'iconClass': 'ac ac-folder',
     'subMenu': [{
       'text': '.json',
-      'iconClass': 'fa fa-file-code-o',
+      'iconClass': 'ac ac-file-code-o',
       'eventType': 'anychart.saveAsJson',
       'action': function(context) {
         context['chart'].saveAsJson();
       }
     }, {
       'text': '.xml',
-      'iconClass': 'fa fa-file-code-o',
+      'iconClass': 'ac ac-file-code-o',
       'eventType': 'anychart.saveAsXml',
       'action': function(context) {
         context['chart'].saveAsXml();
@@ -873,7 +909,7 @@ anychart.core.Chart.contextMenuItems = {
   // Item 'Print Chart'.
   printChart: {
     'text': 'Print',
-    'iconClass': 'fa fa-print',
+    'iconClass': 'ac ac-print',
     'eventType': 'anychart.print',
     'action': function(context) {
       context['chart'].print();
@@ -896,6 +932,7 @@ anychart.core.Chart.contextMenuItems = {
 
   // Item 'Link to help'.
   linkToHelp: {
+    //'iconClass': 'ac ac-question-circle-o',
     'text': 'Need help? Go to support center!',
     'href': 'http://anychart.com/support'
   }
@@ -911,6 +948,7 @@ anychart.core.Chart.contextMenuMap = {
   main: [
     anychart.core.Chart.contextMenuItems.exportAs,
     anychart.core.Chart.contextMenuItems.saveDataAs,
+    anychart.core.Chart.contextMenuItems.shareWith,
     anychart.core.Chart.contextMenuItems.printChart,
     null,
     anychart.core.Chart.contextMenuItems.about
@@ -2895,6 +2933,188 @@ anychart.core.Chart.prototype.saveAsXlsx = function(opt_chartDataExportMode, opt
   }
 };
 
+
+/**
+ * Opens Facebook sharing dialog.
+ * @param {string=} opt_caption Caption for main link. If not set hostname will be used.
+ * @param {string=} opt_link Url of the link attached to publication.
+ * @param {string=} opt_name Title for the attached link. If not set hostname of opt_link url will be used.
+ * @param {string=} opt_description Description for the attached link.
+ */
+anychart.core.Chart.prototype.shareWithFacebook = function(opt_caption, opt_link, opt_name, opt_description) {
+  var imageWidth = 1200;
+  var imageHeight = 630;
+  var w = 550;
+  var h = 550;
+  var left = Number((screen.width / 2) - (w / 2));
+  var top = Number((screen.height / 2) - (h / 2));
+  var window = goog.dom.getWindow();
+  var popup = window.open('', '_blank', 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+
+  var onSuccess = function(imgUrl) {
+    var urlBase = 'https://www.facebook.com/dialog/feed';
+    var appIdDev = 1977415532485286;
+    var appId = 1167712323282103;
+
+    // Dialog options described here https://developers.facebook.com/docs/sharing/reference/feed-dialog
+    var urlOptions = {
+      'app_id': appIdDev,
+      'display': 'popup',
+      'picture': imgUrl
+    };
+
+    urlOptions['caption'] = goog.isDef(opt_caption) ? opt_caption : window['location']['hostname'];
+
+    if (goog.isDef(opt_link)) {
+      urlOptions['link'] = opt_link;
+      if (goog.isDef(opt_name)) urlOptions['name'] = opt_name;
+      if (goog.isDef(opt_description)) urlOptions['description'] = opt_description;
+    }
+
+    var options = '';
+    for (var k in urlOptions) {
+      options += options ? '&' : '';
+      options += k + '=' + urlOptions[k];
+    }
+    popup.location.href = urlBase + '?' + options;
+  };
+
+  this.shareAsPng(onSuccess, undefined, false, imageWidth, imageHeight);
+};
+
+
+/**
+ * Opens Twitter sharing dialog.
+ */
+anychart.core.Chart.prototype.shareWithTwitter = function() {
+  var w = 600;
+  var h = 520;
+  var left = Number((screen.width / 2) - (w / 2));
+  var top = Number((screen.height / 2) - (h / 2));
+  var formClass = 'ac-share-twitter-form';
+  var dataInputClass = 'ac-share-twitter-data-input';
+
+  var mapForm;
+  var dataInput;
+  var el = goog.dom.getElementsByTagNameAndClass(goog.dom.TagName.INPUT, dataInputClass);
+  if (el.length > 0) {
+    dataInput = el[0];
+    mapForm = goog.dom.getElementsByTagNameAndClass(goog.dom.TagName.FORM, formClass)[0];
+  } else {
+    mapForm = goog.dom.createElement(goog.dom.TagName.FORM);
+    goog.dom.classlist.add(mapForm, formClass);
+    mapForm.target = 'Map';
+    mapForm.method = 'POST';
+    mapForm.action = 'http://export.anychart.stg/sharing/twitter';
+
+    dataInput = goog.dom.createElement(goog.dom.TagName.INPUT);
+    goog.dom.classlist.add(dataInput, dataInputClass);
+    dataInput.type = 'hidden';
+    dataInput.name = 'data';
+
+    var dataTypeInput = goog.dom.createElement(goog.dom.TagName.INPUT);
+    dataTypeInput.type = 'hidden';
+    dataTypeInput.name = 'dataType';
+    dataTypeInput.value = 'svg';
+
+    goog.dom.appendChild(mapForm, dataInput);
+    goog.dom.appendChild(mapForm, dataTypeInput);
+    goog.dom.appendChild(goog.dom.getElementsByTagName(goog.dom.TagName.BODY)[0], mapForm);
+  }
+
+  if (goog.isDef(mapForm) && goog.isDef(dataInput)) {
+    var imageWidth = 1024;
+    dataInput.value = this.toSvg(imageWidth);
+    var window = goog.dom.getWindow();
+    var mapWindow = window.open('', 'Map', 'status=0,title=0,height=520,width=600,scrollbars=1, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+    if (mapWindow) mapForm.submit();
+  }
+};
+
+
+/**
+ * Opens LinkedIn sharing dialog.
+ * @param {string=} opt_caption Caption for publication. If not set 'AnyChart' will be used.
+ * @param {string=} opt_description Description. If not set opt_caption will be used.
+ */
+anychart.core.Chart.prototype.shareWithLinkedIn = function(opt_caption, opt_description) {
+  var imageWidth = 1200;
+  var imageHeight = 630;
+  var w = 550;
+  var h = 520;
+  var left = Number((screen.width / 2) - (w / 2));
+  var top = Number((screen.height / 2) - (h / 2));
+  var window = goog.dom.getWindow();
+  var popup = window.open('', '_blank', 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+
+  var onSuccess = function(imgUrl) {
+    var urlBase = 'https://www.linkedin.com/shareArticle';
+
+    // Dialog options described here https://developer.linkedin.com/docs/share-on-linkedin
+    var urlOptions = {
+      'mini': 'true',
+      'url' : imgUrl
+    };
+
+    urlOptions['title'] = goog.isDef(opt_caption) ? opt_caption : 'AnyChart';
+
+    if (goog.isDef(opt_description)) {
+      urlOptions['summary'] = opt_description;
+    }
+
+    var options = '';
+    for (var k in urlOptions) {
+      options += options ? '&' : '';
+      options += k + '=' + urlOptions[k];
+    }
+    popup.location.href = urlBase + '?' + options;
+  };
+
+  this.shareAsPng(onSuccess, undefined, false, imageWidth, imageHeight);
+};
+
+
+/**
+ * Opens Pinterest sharing dialog.
+ * @param {string=} opt_link Attached link. If not set, the image url will be used.
+ * @param {string=} opt_description Description.
+ */
+anychart.core.Chart.prototype.shareWithPinterest = function(opt_link, opt_description) {
+  var imageWidth = 1200;
+  var imageHeight = 800;
+  var w = 550;
+  var h = 520;
+  var left = Number((screen.width / 2) - (w / 2));
+  var top = Number((screen.height / 2) - (h / 2));
+  var window = goog.dom.getWindow();
+  var popup = window.open('', '_blank', 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+
+  var onSuccess = function(imgUrl) {
+    var urlBase = 'http://pinterest.com/pin/create/link';
+    var urlOptions = {
+      'media' : imgUrl
+    };
+
+    if (goog.isDef(opt_link)) {
+      urlOptions['url'] = opt_link;
+    }
+
+    if (goog.isDef(opt_description)) {
+      urlOptions['description'] = opt_description;
+    }
+
+    var options = '';
+    for (var k in urlOptions) {
+      options += options ? '&' : '';
+      options += k + '=' + urlOptions[k];
+    }
+
+    popup.location.href = urlBase + '?' + options;
+  };
+
+  this.shareAsPng(onSuccess, undefined, false, imageWidth, imageHeight);
+};
+
 //exports
 anychart.core.Chart.prototype['a11y'] = anychart.core.Chart.prototype.a11y;
 anychart.core.Chart.prototype['animation'] = anychart.core.Chart.prototype.animation;
@@ -2936,4 +3156,8 @@ anychart.core.Chart.prototype['globalToLocal'] = anychart.core.Chart.prototype.g
 anychart.core.Chart.prototype['getStat'] = anychart.core.Chart.prototype.getStat;
 anychart.core.Chart.prototype['getSelectedPoints'] = anychart.core.Chart.prototype.getSelectedPoints;
 anychart.core.Chart.prototype['credits'] = anychart.core.Chart.prototype.credits;
+anychart.core.Chart.prototype['shareWithFacebook'] = anychart.core.Chart.prototype.shareWithFacebook;
+anychart.core.Chart.prototype['shareWithTwitter'] = anychart.core.Chart.prototype.shareWithTwitter;
+anychart.core.Chart.prototype['shareWithLinkedIn'] = anychart.core.Chart.prototype.shareWithLinkedIn;
+anychart.core.Chart.prototype['shareWithPinterest'] = anychart.core.Chart.prototype.shareWithPinterest;
 
