@@ -364,6 +364,7 @@ anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
       this.min;
   var range = max - min;
 
+  if (Math.abs(range) < 1e-4 && !this.minimumModeAuto && !this.maximumModeAuto) this.max += 1e-4;
 
   if (this.minimumModeAuto) {
     this.min = this.dataRangeMin - range * this.minimumRangeBasedGap;
