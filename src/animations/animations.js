@@ -4,7 +4,6 @@
  */
 goog.provide('anychart.animations');
 goog.require('anychart.animations.AnimationParallelQueue');
-goog.require('anychart.animations.BarAnimation');
 goog.require('anychart.animations.BubbleAnimation');
 goog.require('anychart.animations.ClipAnimation');
 goog.require('anychart.animations.ColumnAnimation');
@@ -16,7 +15,7 @@ goog.require('anychart.animations.ColumnAnimation');
  */
 anychart.animations.AnimationBySeriesType = {};
 
-anychart.animations.AnimationBySeriesType['bar'] = anychart.animations.BarAnimation;
+anychart.animations.AnimationBySeriesType['bar'] = anychart.animations.ColumnAnimation;
 anychart.animations.AnimationBySeriesType['bubble'] = anychart.animations.BubbleAnimation;
 anychart.animations.AnimationBySeriesType['area'] = anychart.animations.ClipAnimation;
 anychart.animations.AnimationBySeriesType['line'] = anychart.animations.ClipAnimation;

@@ -37,7 +37,7 @@ anychart.core.drawers.Column3d.prototype.flags = (
     anychart.core.drawers.Capabilities.IS_DISCRETE_BASED |
     anychart.core.drawers.Capabilities.IS_WIDTH_BASED |
     anychart.core.drawers.Capabilities.IS_3D_BASED |
-    // anychart.core.drawers.Capabilities.IS_BAR_BASED |
+    // anychart.core.drawers.Capabilities.IS_VERTICAL |
     // anychart.core.drawers.Capabilities.IS_MARKER_BASED |
     // anychart.core.drawers.Capabilities.IS_OHLC_BASED |
     // anychart.core.drawers.Capabilities.IS_LINE_BASED |
@@ -122,9 +122,14 @@ anychart.core.drawers.Column3d.prototype.updatePointOnAnimate = function(point) 
  * @private
  */
 anychart.core.drawers.Column3d.prototype.drawPoint_ = function(point, shapes) {
-  var x = /** @type {number} */(point.meta(anychart.opt.X)) + this.x3dSeriesShift_;
-  var zero = /** @type {number} */(point.meta(anychart.opt.ZERO)) - this.y3dSeriesShift_;
-  var y = /** @type {number} */(point.meta(anychart.opt.VALUE)) - this.y3dSeriesShift_;
+  var x = /** @type {number} */(point.meta(anychart.opt.X));
+  var zero = /** @type {number} */(point.meta(anychart.opt.ZERO));
+  var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
+  if (!this.isVertical) {
+    x += this.x3dSeriesShift_;
+    zero -= this.y3dSeriesShift_;
+    y -= this.y3dSeriesShift_;
+  }
 
   var bottomSide = shapes[anychart.opt.BOTTOM];
   var backSide = shapes[anychart.opt.BACK];
@@ -140,12 +145,22 @@ anychart.core.drawers.Column3d.prototype.drawPoint_ = function(point, shapes) {
   var y3dShift = this.y3dShift_;
 
   // width in barMode is height
-  var width = this.pointWidth;
-  var x_ = x - width / 2;
-  var y_ = Math.min(zero, y);
-  var height = Math.abs(zero - y);
-
+  var x_, y_, width, height, leftShift, rightShift;
   var pixelShift = (frontSide.stroke()['thickness'] % 2 / 2) || 0;
+  if (this.isVertical) {
+    height = this.pointWidth;
+    x_ = Math.min(zero, y) + this.x3dSeriesShift_;
+    y_ = x - height / 2 - this.y3dSeriesShift_;
+    width = Math.abs(zero - y);
+    leftShift = pixelShift;
+    rightShift = 0;
+  } else {
+    width = this.pointWidth;
+    x_ = x - width / 2;
+    y_ = Math.min(zero, y);
+    height = Math.abs(zero - y);
+    rightShift = leftShift = -pixelShift;
+  }
 
   bottomSide
       .moveTo(x_ + pixelShift, y_ + height)
@@ -163,20 +178,20 @@ anychart.core.drawers.Column3d.prototype.drawPoint_ = function(point, shapes) {
 
   leftSide
       .moveTo(x_, y_)
-      .lineTo(x_ + x3dShift - pixelShift, y_ - y3dShift + pixelShift)
+      .lineTo(x_ + x3dShift + leftShift, y_ - y3dShift + pixelShift)
       .lineTo(x_ + x3dShift, y_ + height - y3dShift)
       .lineTo(x_, y_ + height - pixelShift)
       .close();
 
   rightSide
       .moveTo(x_ + width, y_)
-      .lineTo(x_ + width + x3dShift - pixelShift, y_ - y3dShift + pixelShift)
+      .lineTo(x_ + width + x3dShift + rightShift, y_ - y3dShift + pixelShift)
       .lineTo(x_ + width + x3dShift, y_ + height - y3dShift)
       .lineTo(x_ + width, y_ + height - pixelShift)
       .close();
   rightHatchSide
       .moveTo(x_ + width, y_)
-      .lineTo(x_ + width + x3dShift - pixelShift, y_ - y3dShift + pixelShift)
+      .lineTo(x_ + width + x3dShift + rightShift, y_ - y3dShift + pixelShift)
       .lineTo(x_ + width + x3dShift, y_ + height - y3dShift)
       .lineTo(x_ + width, y_ + height - pixelShift)
       .close();

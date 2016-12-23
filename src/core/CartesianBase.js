@@ -15,11 +15,9 @@ goog.require('anychart.enums');
  * @extends {anychart.core.ChartWithAxes}
  * @implements {anychart.core.utils.IZoomableChart}
  * @constructor
- * @param {boolean=} opt_barChartMode If true, sets the chart to Bar Chart mode, swapping default chart elements
- *    behaviour to horizontal-oriented (setting default layout to VERTICAL, swapping axes, etc).
  */
-anychart.core.CartesianBase = function(opt_barChartMode) {
-  anychart.core.CartesianBase.base(this, 'constructor', true, opt_barChartMode);
+anychart.core.CartesianBase = function() {
+  anychart.core.CartesianBase.base(this, 'constructor', true);
 
   /**
    * Zoom settings.

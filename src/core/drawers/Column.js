@@ -37,7 +37,7 @@ anychart.core.drawers.Column.prototype.flags = (
     anychart.core.drawers.Capabilities.IS_DISCRETE_BASED |
     anychart.core.drawers.Capabilities.IS_WIDTH_BASED |
     // anychart.core.drawers.Capabilities.IS_3D_BASED |
-    // anychart.core.drawers.Capabilities.IS_BAR_BASED |
+    // anychart.core.drawers.Capabilities.IS_VERTICAL |
     // anychart.core.drawers.Capabilities.IS_MARKER_BASED |
     // anychart.core.drawers.Capabilities.IS_OHLC_BASED |
     // anychart.core.drawers.Capabilities.IS_LINE_BASED |
@@ -95,16 +95,12 @@ anychart.core.drawers.Column.prototype.drawPoint_ = function(point, shapes) {
   y = anychart.utils.applyPixelShift(y, thickness);
   zero = anychart.utils.applyPixelShift(zero, thickness);
 
-  shapes[anychart.opt.PATH]
-      .moveTo(leftX, y)
-      .lineTo(rightX, y)
-      .lineTo(rightX, zero)
-      .lineTo(leftX, zero)
-      .close();
-  shapes[anychart.opt.HATCH_FILL]
-      .moveTo(leftX, y)
-      .lineTo(rightX, y)
-      .lineTo(rightX, zero)
-      .lineTo(leftX, zero)
-      .close();
+  var path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.PATH]);
+  anychart.core.drawers.move(path, this.isVertical, leftX, y);
+  anychart.core.drawers.line(path, this.isVertical, rightX, y, rightX, zero, leftX, zero);
+  path.close();
+  path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]);
+  anychart.core.drawers.move(path, this.isVertical, leftX, y);
+  anychart.core.drawers.line(path, this.isVertical, rightX, y, rightX, zero, leftX, zero);
+  path.close();
 };

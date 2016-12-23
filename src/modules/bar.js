@@ -6,8 +6,8 @@
 goog.provide('anychart.modules.bar');
 
 goog.require('anychart.charts.Cartesian');
-goog.require('anychart.core.drawers.Bar');
-goog.require('anychart.core.drawers.RangeBar');
+goog.require('anychart.core.drawers.Column');
+goog.require('anychart.core.drawers.RangeColumn');
 goog.require('anychart.modules.base');
 
 
@@ -21,7 +21,7 @@ goog.require('anychart.modules.base');
  * @return {anychart.charts.Cartesian} Chart with defaults for bar series.
  */
 anychart.bar = function(var_args) {
-  var chart = new anychart.charts.Cartesian(true);
+  var chart = new anychart.charts.Cartesian();
   var theme = anychart.getFullTheme();
 
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.BAR);

@@ -135,6 +135,7 @@
         <xsd:attribute name="axis" type="simple.BoolOrNull" default="true"/>
         <!-- charts.Cartesian attrs -->
         <xsd:attribute name="bar_chart_mode" type="simple.Bool" default="false"/>
+        <xsd:attribute name="is_vertical" type="simple.Bool" default="false"/>
         <xsd:attribute name="bar_groups_padding" type="xsd:double" default="0.5"/>
         <xsd:attribute name="bars_padding" type="xsd:double" default="0.1"/>
         <xsd:attribute name="min_bubble_size" type="simple.NumberOrPercent" default="5%"/>
@@ -481,6 +482,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="select_outlier_markers" type="core.MarkersFactory"/>
         </xsd:all>
         <!-- Base series -->
+        <xsd:attribute name="is_vertical" type="simple.BoolOrNull"/>
         <xsd:attribute name="series_type" type="enums.SeriesTypes"/>
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="hover_fill" type="xsd:string"/>
@@ -2884,6 +2886,7 @@
     <xsd:simpleType name="enums.ChartTypes">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="area"/>
+            <xsd:enumeration value="verticalArea"/>
             <xsd:enumeration value="area3d"/>
             <xsd:enumeration value="bar"/>
             <xsd:enumeration value="bar3d"/>
@@ -2899,6 +2902,7 @@
             <xsd:enumeration value="heatMap"/>
             <xsd:enumeration value="treeMap"/>
             <xsd:enumeration value="line"/>
+            <xsd:enumeration value="verticalLine"/>
             <xsd:enumeration value="marker"/>
             <xsd:enumeration value="pie"/>
             <xsd:enumeration value="pie3d"/>
@@ -3120,25 +3124,39 @@
     <xsd:simpleType name="enums.SeriesTypes">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="area"/>
+            <xsd:enumeration value="verticalArea"/>
             <xsd:enumeration value="bar"/>
             <xsd:enumeration value="box"/>
+            <xsd:enumeration value="verticalBox"/>
             <xsd:enumeration value="bubble"/>
+            <xsd:enumeration value="verticalBubble"/>
             <xsd:enumeration value="candlestick"/>
             <xsd:enumeration value="column"/>
             <xsd:enumeration value="line"/>
+            <xsd:enumeration value="verticalLine"/>
             <xsd:enumeration value="marker"/>
+            <xsd:enumeration value="verticalMarker"/>
             <xsd:enumeration value="ohlc"/>
             <xsd:enumeration value="rangeArea"/>
+            <xsd:enumeration value="verticalRangeArea"/>
             <xsd:enumeration value="rangeBar"/>
             <xsd:enumeration value="rangeColumn"/>
             <xsd:enumeration value="rangeSplineArea"/>
+            <xsd:enumeration value="verticalRangeSplineArea"/>
             <xsd:enumeration value="rangeStepArea"/>
+            <xsd:enumeration value="verticalRangeStepArea"/>
             <xsd:enumeration value="spline"/>
+            <xsd:enumeration value="verticalSpline"/>
             <xsd:enumeration value="splineArea"/>
+            <xsd:enumeration value="verticalSplineArea"/>
             <xsd:enumeration value="stepArea"/>
+            <xsd:enumeration value="verticalStepArea"/>
             <xsd:enumeration value="stepLine"/>
+            <xsd:enumeration value="verticalStepLine"/>
             <xsd:enumeration value="jumpLine"/>
+            <xsd:enumeration value="verticalJumpLine"/>
             <xsd:enumeration value="stick"/>
+            <xsd:enumeration value="verticalStick"/>
         </xsd:restriction>
     </xsd:simpleType>
 

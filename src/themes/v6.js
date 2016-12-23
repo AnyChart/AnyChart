@@ -2088,7 +2088,7 @@ goog.provide('anychart.themes.v6');
       'defaultGridSettings': {
         'enabled': true,
         'isMinor': false,
-        //'layout': null, //depends on barChartMode
+        //'layout': null, //depends on isVertical
         'drawFirstLine': true,
         'drawLastLine': true,
         'oddFill': '#fff',
@@ -2100,7 +2100,7 @@ goog.provide('anychart.themes.v6');
       'defaultMinorGridSettings': {
         'enabled': true,
         'isMinor': true,
-        //'layout': null, //depends on barChartMode
+        //'layout': null, //depends on isVertical
         'drawFirstLine': true,
         'drawLastLine': true,
         'oddFill': '#fff',
@@ -2255,7 +2255,7 @@ goog.provide('anychart.themes.v6');
       'barGroupsPadding': 0.5,
       'maxBubbleSize': '20%',
       'minBubbleSize': '5%',
-      'barChartMode': false,
+      'isVertical': false,
       'crosshair': {
         'enabled': false,
         'displayMode': 'float',
@@ -2427,7 +2427,7 @@ goog.provide('anychart.themes.v6');
       'background': {
         'enabled': true
       },
-      'barChartMode': true,
+      'isVertical': true,
       'defaultXAxisSettings': {
         'orientation': 'left'
       },
@@ -2715,7 +2715,7 @@ goog.provide('anychart.themes.v6');
       'defaultGridSettings': {
         'enabled': true,
         'isMinor': false,
-        //'layout': null, //depends on barChartMode
+        //'layout': null, //depends on isVertical
         'drawFirstLine': true,
         'drawLastLine': true,
         'oddFill': '#fff',
@@ -2727,7 +2727,7 @@ goog.provide('anychart.themes.v6');
       'defaultMinorGridSettings': {
         'enabled': true,
         'isMinor': true,
-        //'layout': null, //depends on barChartMode
+        //'layout': null, //depends on isVertical
         'drawFirstLine': true,
         'drawLastLine': true,
         'oddFill': '#fff',

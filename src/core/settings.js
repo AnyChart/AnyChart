@@ -545,6 +545,16 @@ anychart.core.settings.booleanNormalizer = function(val) {
 
 
 /**
+ * Single arg normalizer for boolean or null params.
+ * @param {*} val
+ * @return {?boolean}
+ */
+anychart.core.settings.boolOrNullNormalizer = function(val) {
+  return goog.isNull(val) ? val : !!val;
+};
+
+
+/**
  * Single arg normalizer for number params.
  * @param {*} val
  * @return {number}

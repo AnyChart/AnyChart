@@ -72,6 +72,7 @@ anychart.core.series.Base = function(chart, plot, type, config) {
    */
   this.autoSettings = {};
   this.autoSettings[anychart.opt.POINT_WIDTH] = '90%';
+  this.autoSettings[anychart.opt.IS_VERTICAL] = this.chart.isVertical();
 
   /**
    * Default (theme) settings holder.
@@ -816,15 +817,6 @@ anychart.core.series.Base.prototype.isDiscreteBased = function() {
 
 
 /**
- * Tester if the series is bar based (horizontal).
- * @return {boolean}
- */
-anychart.core.series.Base.prototype.isBarBased = function() {
-  return this.check(anychart.core.drawers.Capabilities.IS_BAR_BASED);
-};
-
-
-/**
  * Tester if the series is area based (area, area3d).
  * @return {boolean}
  */
@@ -1376,20 +1368,20 @@ anychart.core.series.Base.prototype.drawError = function(point) {
   if (!point.meta(anychart.opt.MISSING) && this.error().hasAnyErrorValues()) {
     var error = this.error();
     var errorMode = error.mode();
-    var isBarBased = this.isBarBased();
+    var isVertical = /** @type {boolean} */(this.getOption(anychart.opt.IS_VERTICAL));
 
     switch (errorMode) {
       case anychart.enums.ErrorMode.NONE:
         break;
       case anychart.enums.ErrorMode.X:
-        error.draw(true, isBarBased);
+        error.draw(true, isVertical);
         break;
       case anychart.enums.ErrorMode.VALUE:
-        error.draw(false, isBarBased);
+        error.draw(false, isVertical);
         break;
       case anychart.enums.ErrorMode.BOTH:
-        error.draw(true, isBarBased);
-        error.draw(false, isBarBased);
+        error.draw(true, isVertical);
+        error.draw(false, isVertical);
         break;
     }
   }
@@ -1979,10 +1971,18 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(factoryGetters
     var formatProvider = isLabel ? this.createLabelsContextProvider() : null;
     if (positionYs) {
       var x = point.meta(anychart.opt.X);
-      for (i = 0; i < positionYs.length; i++) {
-        positionProvider = {'value': {'x': x, 'y': positionYs[i]}};
-        indexes[i] = this.drawSingleFactoryElement(mainFactory, indexes[i], positionProvider, formatProvider,
-            stateFactory, pointOverride, statePointOverride).getIndex();
+      if (/** @type {boolean} */(this.getOption(anychart.opt.IS_VERTICAL))) {
+        for (i = 0; i < positionYs.length; i++) {
+          positionProvider = {'value': {'x': positionYs[i], 'y': x}};
+          indexes[i] = this.drawSingleFactoryElement(mainFactory, indexes[i], positionProvider, formatProvider,
+              stateFactory, pointOverride, statePointOverride).getIndex();
+        }
+      } else {
+        for (i = 0; i < positionYs.length; i++) {
+          positionProvider = {'value': {'x': x, 'y': positionYs[i]}};
+          indexes[i] = this.drawSingleFactoryElement(mainFactory, indexes[i], positionProvider, formatProvider,
+              stateFactory, pointOverride, statePointOverride).getIndex();
+        }
       }
     } else {
       var position = (statePointOverride && statePointOverride[anychart.opt.POSITION]) ||
@@ -3007,7 +3007,7 @@ anychart.core.series.Base.prototype.getPostLastPoint = function() {
  */
 anychart.core.series.Base.prototype.applyRatioToBounds = function(ratio, xDirection) {
   var min, range;
-  if (!!(xDirection ^ this.isBarBased())) {
+  if (!!(xDirection ^ /** @type {boolean} */(this.getOption(anychart.opt.IS_VERTICAL)))) {
     min = this.pixelBoundsCache.left;
     range = this.pixelBoundsCache.width;
   } else {
@@ -3025,7 +3025,7 @@ anychart.core.series.Base.prototype.applyRatioToBounds = function(ratio, xDirect
  */
 anychart.core.series.Base.prototype.applyAxesLinesSpace = function(value) {
   var max, min;
-  if (this.isBarBased()) {
+  if (/** @type {boolean} */(this.getOption(anychart.opt.IS_VERTICAL))) {
     min = this.boundsWithoutAxes.left;
     max = min + this.boundsWithoutAxes.width;
   } else {
@@ -3205,7 +3205,7 @@ anychart.core.series.Base.prototype.createPositionProvider = function(position, 
         bounds.width += size + size;
         bounds.height += size + size;
       }
-      if (this.isBarBased()) {
+      if (/** @type {boolean} */(this.getOption(anychart.opt.IS_VERTICAL))) {
         var tmp = bounds.left;
         bounds.left = bounds.top;
         bounds.top = tmp;
@@ -3227,7 +3227,7 @@ anychart.core.series.Base.prototype.createPositionProvider = function(position, 
           val = NaN;
         }
       }
-      if (this.isBarBased())
+      if (/** @type {boolean} */(this.getOption(anychart.opt.IS_VERTICAL)))
         point = {'x': val, 'y': x};
       else
         point = {'x': x, 'y': val};
@@ -3784,6 +3784,14 @@ anychart.core.series.Base.PROPERTY_DESCRIPTORS = (function() {
       anychart.ConsistencyState.SERIES_POINTS,
       anychart.Signal.NEEDS_REDRAW,
       anychart.core.drawers.Capabilities.SUPPORTS_STEP_DIRECTION);
+
+  map[anychart.opt.IS_VERTICAL] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      anychart.opt.IS_VERTICAL,
+      anychart.core.settings.boolOrNullNormalizer,
+      anychart.ConsistencyState.SERIES_POINTS,
+      anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW,
+      anychart.core.drawers.Capabilities.ANY);
 
   return map;
 })();

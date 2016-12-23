@@ -37,7 +37,7 @@ anychart.core.drawers.Box.prototype.flags = (
     anychart.core.drawers.Capabilities.IS_DISCRETE_BASED |
     anychart.core.drawers.Capabilities.IS_WIDTH_BASED |
     // anychart.core.drawers.Capabilities.IS_3D_BASED |
-    // anychart.core.drawers.Capabilities.IS_BAR_BASED |
+    // anychart.core.drawers.Capabilities.IS_VERTICAL |
     // anychart.core.drawers.Capabilities.IS_MARKER_BASED |
     // anychart.core.drawers.Capabilities.IS_OHLC_BASED |
     // anychart.core.drawers.Capabilities.IS_LINE_BASED |
@@ -76,31 +76,33 @@ anychart.core.drawers.Box.prototype.drawSubsequentPoint = function(point, state)
   var whiskerWidthHalf = this.series.getWhiskerWidth(point, state) / 2;
   var halfPointWidth = this.pointWidth / 2;
 
-  shapes[anychart.opt.PATH]
-      .moveTo(x - halfPointWidth, q1)
-      .lineTo(x + halfPointWidth, q1)
-      .lineTo(x + halfPointWidth, q3)
-      .lineTo(x - halfPointWidth, q3)
-      .close();
-  shapes[anychart.opt.HATCH_FILL]
-      .moveTo(x - halfPointWidth, q1)
-      .lineTo(x + halfPointWidth, q1)
-      .lineTo(x + halfPointWidth, q3)
-      .lineTo(x - halfPointWidth, q3)
-      .close();
-  shapes[anychart.opt.MEDIAN]
-      .moveTo(x - halfPointWidth, median)
-      .lineTo(x + halfPointWidth, median);
-  shapes[anychart.opt.STEM]
-      .moveTo(x, low)
-      .lineTo(x, q1)
-      .moveTo(x, q3)
-      .lineTo(x, high);
-  shapes[anychart.opt.WHISKER]
-      .moveTo(x - whiskerWidthHalf, low)
-      .lineTo(x + whiskerWidthHalf, low)
-      .moveTo(x - whiskerWidthHalf, high)
-      .lineTo(x + whiskerWidthHalf, high);
+  var path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.PATH]);
+  anychart.core.drawers.move(path, this.isVertical, x - halfPointWidth, q1);
+  anychart.core.drawers.line(path, this.isVertical,
+      x + halfPointWidth, q1,
+      x + halfPointWidth, q3,
+      x - halfPointWidth, q3);
+  path.close();
+  path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]);
+  anychart.core.drawers.move(path, this.isVertical, x - halfPointWidth, q1);
+  anychart.core.drawers.line(path, this.isVertical,
+      x + halfPointWidth, q1,
+      x + halfPointWidth, q3,
+      x - halfPointWidth, q3);
+  path.close();
+  path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.MEDIAN]);
+  anychart.core.drawers.move(path, this.isVertical, x - halfPointWidth, median);
+  anychart.core.drawers.line(path, this.isVertical, x + halfPointWidth, median);
+  path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.STEM]);
+  anychart.core.drawers.move(path, this.isVertical, x, low);
+  anychart.core.drawers.line(path, this.isVertical, x, q1);
+  anychart.core.drawers.move(path, this.isVertical, x, q3);
+  anychart.core.drawers.line(path, this.isVertical, x, high);
+  path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.WHISKER]);
+  anychart.core.drawers.move(path, this.isVertical, x - whiskerWidthHalf, low);
+  anychart.core.drawers.line(path, this.isVertical, x + whiskerWidthHalf, low);
+  anychart.core.drawers.move(path, this.isVertical, x - whiskerWidthHalf, high);
+  anychart.core.drawers.line(path, this.isVertical, x + whiskerWidthHalf, high);
 };
 
 
@@ -113,11 +115,11 @@ anychart.core.drawers.Box.prototype.updatePointInternal = function(point, state)
     var low = /** @type {number} */(point.meta(anychart.opt.LOWEST));
     var high = /** @type {number} */(point.meta(anychart.opt.HIGHEST));
     var whiskerWidthHalf = this.series.getWhiskerWidth(point, state) / 2;
-    shapes[anychart.opt.WHISKER]
-        .clear()
-        .moveTo(x - whiskerWidthHalf, low)
-        .lineTo(x + whiskerWidthHalf, low)
-        .moveTo(x - whiskerWidthHalf, high)
-        .lineTo(x + whiskerWidthHalf, high);
+    var path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.WHISKER]);
+    path.clear();
+    anychart.core.drawers.move(path, this.isVertical, x - whiskerWidthHalf, low);
+    anychart.core.drawers.line(path, this.isVertical, x + whiskerWidthHalf, low);
+    anychart.core.drawers.move(path, this.isVertical, x - whiskerWidthHalf, high);
+    anychart.core.drawers.line(path, this.isVertical, x + whiskerWidthHalf, high);
   }
 };

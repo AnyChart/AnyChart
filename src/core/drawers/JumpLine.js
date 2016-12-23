@@ -38,7 +38,7 @@ anychart.core.drawers.JumpLine.prototype.flags = (
     anychart.core.drawers.Capabilities.IS_DISCRETE_BASED |
     anychart.core.drawers.Capabilities.IS_WIDTH_BASED |
     // anychart.core.drawers.Capabilities.IS_3D_BASED |
-    // anychart.core.drawers.Capabilities.IS_BAR_BASED |
+    // anychart.core.drawers.Capabilities.IS_VERTICAL |
     // anychart.core.drawers.Capabilities.IS_MARKER_BASED |
     // anychart.core.drawers.Capabilities.IS_OHLC_BASED |
     // anychart.core.drawers.Capabilities.IS_LINE_BASED |
@@ -90,5 +90,7 @@ anychart.core.drawers.JumpLine.prototype.drawPoint_ = function(point, shapes) {
   rightX = anychart.utils.applyPixelShift(rightX, thickness);
   y = anychart.utils.applyPixelShift(y, thickness);
 
-  shapes[anychart.opt.STROKE].moveTo(leftX, y).lineTo(rightX, y);
+  var path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.STROKE]);
+  anychart.core.drawers.move(path, this.isVertical, leftX, y);
+  anychart.core.drawers.line(path, this.isVertical, rightX, y);
 };

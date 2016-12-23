@@ -47,6 +47,12 @@ anychart.core.series.Cartesian = function(chart, plot, type, config, sortedMode)
 goog.inherits(anychart.core.series.Cartesian, anychart.core.series.Base);
 
 
+//region --- Typedefs
+//------------------------------------------------------------------------------
+//
+//  Typedefs
+//
+//------------------------------------------------------------------------------
 /**
  * @typedef {{
  *   series: anychart.core.series.Cartesian,
@@ -65,7 +71,8 @@ goog.inherits(anychart.core.series.Cartesian, anychart.core.series.Base);
 anychart.core.series.Cartesian.DrawingPlan;
 
 
-//region Properties
+//endregion
+//region --- Properties
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Properties
@@ -137,10 +144,10 @@ anychart.core.series.Cartesian.prototype.hoverMode_;
  * @private
  */
 anychart.core.series.Cartesian.prototype.pointProvider_;
+
+
 //endregion
-
-
-//region Series setup
+//region --- Series setup
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Series setup
@@ -192,10 +199,10 @@ anychart.core.series.Cartesian.prototype.applyDefaultsToElements = function(defa
   }
   this.selectionMode(defaults['selectionMode']);
 };
+
+
 //endregion
-
-
-//region Infrastructure
+//region --- Infrastructure
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Infrastructure
@@ -204,7 +211,7 @@ anychart.core.series.Cartesian.prototype.applyDefaultsToElements = function(defa
 /** @inheritDoc */
 anychart.core.series.Cartesian.prototype.getCategoryWidth = function() {
   return (this.xScale().getPointWidthRatio() || (this.xScale().getZoomFactor() / this.getIterator().getRowsCount())) *
-      (this.isBarBased() ? this.pixelBoundsCache.height : this.pixelBoundsCache.width);
+      (this.getOption(anychart.opt.IS_VERTICAL) ? this.pixelBoundsCache.height : this.pixelBoundsCache.width);
 };
 
 
@@ -255,10 +262,10 @@ anychart.core.series.Cartesian.prototype.getSeriesState = function() {
     return anychart.PointState.HOVER;
   return anychart.PointState.NORMAL;
 };
+
+
 //endregion
-
-
-//region Drawing data
+//region --- Drawing data
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Drawing data
@@ -277,10 +284,10 @@ anychart.core.series.Cartesian.prototype.prepareData = function() {
   }
   anychart.core.series.Cartesian.base(this, 'prepareData');
 };
+
+
 //endregion
-
-
-//region Path manager interface methods
+//region --- Path manager interface methods
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Path manager interface methods
@@ -318,10 +325,10 @@ anychart.core.series.Cartesian.prototype.getHatchFillResolutionContext = functio
     'sourceHatchFill': source
   };
 };
+
+
 //endregion
-
-
-//region Working with data
+//region --- Working with data
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Working with data
@@ -569,10 +576,10 @@ anychart.core.series.Cartesian.prototype.includeAllPoints = function() {
   }
   return false;
 };
+
+
 //endregion
-
-
-//region Drawing plan related checkers
+//region --- Drawing plan related checkers
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Drawing plan -related checkers
@@ -619,10 +626,10 @@ anychart.core.series.Cartesian.prototype.isPointVisible = function(point) {
   var index = point.getIndex();
   return (index >= this.drawingPlan.firstIndex && index <= this.drawingPlan.lastIndex);
 };
+
+
 //endregion
-
-
-//region Drawing plan generation
+//region --- Drawing plan generation
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Drawing plan generation
@@ -969,10 +976,10 @@ anychart.core.series.Cartesian.prototype.findInRangeByX = function(minValue, max
     return this.dataInternal.findInRangeByX(/** @type {number} */(minValue), /** @type {number} */(maxValue), isOrdinal);
   }
 };
+
+
 //endregion
-
-
-//region Interactivity
+//region --- Interactivity
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Interactivity
@@ -1215,10 +1222,10 @@ anychart.core.series.Cartesian.prototype.selectSeries = function() {
 
   return this;
 };
+
+
 //endregion
-
-
-//region Events
+//region --- Events
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Events
@@ -1233,14 +1240,19 @@ anychart.core.series.Cartesian.prototype.makeBrowserEvent = function(e) {
     res['pointIndex'] = anychart.utils.toNumber(anychart.utils.extractTag(res['domTarget']).index);
   } else if (this.sortedMode_) {
     var bounds = this.pixelBoundsCache || anychart.math.rect(0, 0, 0, 0);
-    var x = res['clientX'];
-    var min, range;
+    var x, min, range;
     var value, index;
 
-    min = bounds.left + goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x;
-    range = bounds.width;
-    var ratio = (x - min) / range;
-    value = this.xScale().inverseTransform(ratio);
+    if (/** @type {boolean} */(this.getOption(anychart.opt.IS_VERTICAL))) {
+      x = res['clientY'];
+      min = bounds.top + goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).y + bounds.height;
+      range = -bounds.height;
+    } else {
+      x = res['clientX'];
+      min = bounds.left + goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x;
+      range = bounds.width;
+    }
+    value = this.xScale().inverseTransform((x - min) / range);
 
     index = this.findX(value);
 
@@ -1324,10 +1336,10 @@ anychart.core.series.Cartesian.prototype.makePointEvent = function(event) {
     'point': this.getPoint(pointIndex)
   };
 };
+
+
 //endregion
-
-
-//region Different public methods
+//region --- Different public methods
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Different public methods
@@ -1431,10 +1443,10 @@ anychart.core.series.Cartesian.prototype.getPoint = function(index) {
 
   return point;
 };
+
+
 //endregion
-
-
-//region Serialization/Deserialization/Disposing
+//region --- Serialization/Deserialization/Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Serialization/Deserialization/Disposing
@@ -1500,9 +1512,15 @@ anychart.core.series.Cartesian.prototype.disposeInternal = function() {
 
   goog.base(this, 'disposeInternal');
 };
+
+
 //endregion
-
-
+//region --- Exports
+//------------------------------------------------------------------------------
+//
+//  Exports
+//
+//------------------------------------------------------------------------------
 //exports
 anychart.core.series.Cartesian.prototype['data'] = anychart.core.series.Cartesian.prototype.data;
 anychart.core.series.Cartesian.prototype['xScale'] = anychart.core.series.Cartesian.prototype.xScale;
@@ -1520,3 +1538,4 @@ anychart.core.series.Cartesian.prototype['includePoint'] = anychart.core.series.
 anychart.core.series.Cartesian.prototype['keepOnlyPoints'] = anychart.core.series.Cartesian.prototype.keepOnlyPoints;
 anychart.core.series.Cartesian.prototype['includeAllPoints'] = anychart.core.series.Cartesian.prototype.includeAllPoints;
 anychart.core.series.Cartesian.prototype['getExcludedPoints'] = anychart.core.series.Cartesian.prototype.getExcludedPoints;
+//endregion

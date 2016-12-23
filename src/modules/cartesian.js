@@ -15,3 +15,5 @@ goog.require('anychart.modules.box');
 goog.require('anychart.modules.column');
 goog.require('anychart.modules.finance');
 goog.require('anychart.modules.line');
+goog.require('anychart.modules.verticalArea');
+goog.require('anychart.modules.verticalLine');

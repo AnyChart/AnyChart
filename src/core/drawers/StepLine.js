@@ -37,7 +37,7 @@ anychart.core.drawers.StepLine.prototype.flags = (
     // anychart.core.drawers.Capabilities.IS_DISCRETE_BASED |
     // anychart.core.drawers.Capabilities.IS_WIDTH_BASED |
     // anychart.core.drawers.Capabilities.IS_3D_BASED |
-    // anychart.core.drawers.Capabilities.IS_BAR_BASED |
+    // anychart.core.drawers.Capabilities.IS_VERTICAL |
     // anychart.core.drawers.Capabilities.IS_MARKER_BASED |
     // anychart.core.drawers.Capabilities.IS_OHLC_BASED |
     anychart.core.drawers.Capabilities.IS_LINE_BASED |
@@ -68,7 +68,7 @@ anychart.core.drawers.StepLine.prototype.drawFirstPoint = function(point, state)
   var x = /** @type {number} */(point.meta(anychart.opt.X));
   var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
 
-  shapes[anychart.opt.STROKE].moveTo(x, y);
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.STROKE]), this.isVertical, x, y);
 
   /**
    * @type {number}
@@ -88,21 +88,21 @@ anychart.core.drawers.StepLine.prototype.drawSubsequentPoint = function(point, s
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
   var x = /** @type {number} */(point.meta(anychart.opt.X));
   var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
-  var line = shapes[anychart.opt.STROKE];
+  var line = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.STROKE]);
 
   switch (this.direction_) {
     case anychart.enums.StepDirection.FORWARD:
-      line.lineTo(x, this.prevY_);
+      anychart.core.drawers.line(line, this.isVertical, x, this.prevY_);
       break;
     case anychart.enums.StepDirection.BACKWARD:
-      line.lineTo(this.prevX_, y);
+      anychart.core.drawers.line(line, this.isVertical, this.prevX_, y);
       break;
     default:
       var midX = (x + this.prevX_) / 2;
-      line.lineTo(midX, this.prevY_).lineTo(midX, y);
+      anychart.core.drawers.line(line, this.isVertical, midX, this.prevY_, midX, y);
   }
 
-  line.lineTo(x, y);
+  anychart.core.drawers.line(line, this.isVertical, x, y);
 
   this.prevX_ = x;
   this.prevY_ = y;

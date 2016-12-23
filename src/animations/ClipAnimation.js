@@ -26,27 +26,53 @@ anychart.animations.ClipAnimation.prototype.update = function() {
    */
   this.clipBounds_ = this.series.calcFullClipBounds();
 
-  this.startPoint[0] = this.clipBounds_.left;
-  if (this.series.xScale().inverted())
-    this.startPoint[0] += this.clipBounds_.width;
-  this.startPoint[1] = 0;
+  /**
+   * If the series is vertical.
+   * @type {boolean}
+   */
+  this.isVertical = /** @type {boolean} */(this.series.getOption(anychart.opt.IS_VERTICAL));
 
-  this.endPoint[0] = this.clipBounds_.left;
-  this.endPoint[1] = this.clipBounds_.width;
+  if (this.isVertical) {
+    this.startPoint[0] = this.clipBounds_.top;
+    if (!this.series.xScale().inverted())
+      this.startPoint[0] += this.clipBounds_.height;
+    this.startPoint[1] = 0;
+
+    this.endPoint[0] = this.clipBounds_.top;
+    this.endPoint[1] = this.clipBounds_.height;
+  } else {
+    this.startPoint[0] = this.clipBounds_.left;
+    if (this.series.xScale().inverted())
+      this.startPoint[0] += this.clipBounds_.width;
+    this.startPoint[1] = 0;
+
+    this.endPoint[0] = this.clipBounds_.left;
+    this.endPoint[1] = this.clipBounds_.width;
+  }
 };
 
 
 /** @inheritDoc */
 anychart.animations.ClipAnimation.prototype.onAnimate = function() {
-  this.clipBounds_.left = this.coords[0];
-  this.clipBounds_.width = this.coords[1];
+  if (this.isVertical) {
+    this.clipBounds_.top = this.coords[0];
+    this.clipBounds_.height = this.coords[1];
+  } else {
+    this.clipBounds_.left = this.coords[0];
+    this.clipBounds_.width = this.coords[1];
+  }
   this.series.applyClip(this.clipBounds_);
 };
 
 
 /** @inheritDoc */
 anychart.animations.ClipAnimation.prototype.onEnd = function() {
-  this.clipBounds_.left = this.endPoint[0];
-  this.clipBounds_.width = this.endPoint[1];
+  if (this.isVertical) {
+    this.clipBounds_.top = this.coords[0];
+    this.clipBounds_.height = this.coords[1];
+  } else {
+    this.clipBounds_.left = this.coords[0];
+    this.clipBounds_.width = this.coords[1];
+  }
   this.series.applyClip(this.clipBounds_);
 };

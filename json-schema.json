@@ -197,7 +197,7 @@
         {"$ref": "#/definitions/anychart.core.SeparateChart"}
       ],
       "properties": {
-        "type": {"enum": ["cartesian", "cartesian3d", "area", "area3d", "bar", "bar3d", "box", "bubble", "column", "column3d", "financial", "line", "marker", "jumpLine", "stick"]},
+        "type": {"enum": ["cartesian", "cartesian3d", "area", "verticalArea", "area3d", "bar", "bar3d", "box", "bubble", "column", "column3d", "financial", "line", "verticalLine", "marker", "jumpLine", "stick"]},
         "grids": {
           "type": "array",
           "items": {
@@ -272,6 +272,9 @@
         },
         "crosshair": {"$ref": "#/definitions/anychart.core.ui.Crosshair"},
         "barChartMode": {
+          "type": "boolean"
+        },
+        "isVertical": {
           "type": "boolean"
         },
         "barGroupsPadding": {
@@ -2382,25 +2385,39 @@
         "seriesType": {
           "enum": [
             "area",
+            "verticalArea",
             "bar",
             "box",
+            "verticalBox",
             "bubble",
+            "verticalBubble",
             "candlestick",
             "column",
             "line",
+            "verticalLine",
             "marker",
+            "verticalMarker",
             "ohlc",
             "rangeArea",
+            "verticalRangeArea",
             "rangeBar",
             "rangeColumn",
             "rangeSplineArea",
+            "verticalRangeSplineArea",
             "rangeStepArea",
+            "verticalRangeStepArea",
             "spline",
+            "verticalSpline",
             "splineArea",
+            "verticalSplineArea",
             "stepArea",
+            "verticalStepArea",
             "stepLine",
+            "verticalStepLine",
             "jumpLine",
-            "stick"
+            "verticalJumpLine",
+            "stick",
+            "verticalStick"
           ]
         },
         "id": {
@@ -2408,6 +2425,12 @@
         },
         "autoIndex": {
           "type": "number"
+        },
+        "isVertical": {
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "xPointPosition": {
           "type": [

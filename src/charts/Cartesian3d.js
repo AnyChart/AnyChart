@@ -9,7 +9,6 @@ goog.require('anychart.core.axisMarkers.Line3d');
 goog.require('anychart.core.axisMarkers.Range3d');
 goog.require('anychart.core.axisMarkers.Text3d');
 goog.require('anychart.core.drawers.Area3d');
-goog.require('anychart.core.drawers.Bar3d');
 goog.require('anychart.core.drawers.Column3d');
 goog.require('anychart.core.grids.Linear3d');
 goog.require('anychart.core.reporting');
@@ -31,11 +30,9 @@ goog.require('goog.color');
  * @constructor
  * @extends {anychart.core.CartesianBase}
  * @implements {anychart.core.I3DProvider}
- * @param {boolean=} opt_barChartMode If true, sets the chart to Bar Chart mode, swapping default chart elements
- *    behaviour to horizontal-oriented (setting default layout to VERTICAL, swapping axes, etc).
  */
-anychart.charts.Cartesian3d = function(opt_barChartMode) {
-  anychart.charts.Cartesian3d.base(this, 'constructor', opt_barChartMode);
+anychart.charts.Cartesian3d = function() {
+  anychart.charts.Cartesian3d.base(this, 'constructor');
 
   /**
    * @type {number|string}
@@ -218,7 +215,7 @@ anychart.charts.Cartesian3d.barColumnPostProcessor = function(series, shapes, po
     var softDarkBlendedColor = goog.color.rgbArrayToHex(goog.color.blend(rgbColor, rgbDarken, .1));
 
     frontFill = {
-      'angle': series.isBarBased() ? 0 : 90,
+      'angle': (/** @type {boolean} */(series.getOption(anychart.opt.IS_VERTICAL))) ? 0 : 90,
       'opacity': opacity,
       'keys': [
         anychart.color.lighten(darkBlendedColor, .2),
@@ -275,7 +272,7 @@ anychart.charts.Cartesian3d.prototype.seriesConfig = (function() {
     anchoredPositionBottom: anychart.opt.ZERO
   };
   res[anychart.enums.Cartesian3dSeriesType.BAR] = {
-    drawerType: anychart.enums.SeriesDrawerTypes.BAR_3D,
+    drawerType: anychart.enums.SeriesDrawerTypes.COLUMN_3D,
     shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
     shapesConfig: [
       anychart.core.shapeManagers.pathTop3DConfig,
@@ -330,13 +327,15 @@ anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.charts.Cartesi
  * @example
  * var chart = anychart.cartesian3d();
  * chart.area([20, 7, 10, 14]);
- * @param {boolean=} opt_barChartMode If true, sets the chart to Bar Chart mode, swapping default chart elements
+ * @param {boolean=} opt_isVertical If true, sets the chart to Bar Chart mode, swapping default chart elements
  *    behaviour to horizontal-oriented (setting default layout to VERTICAL, swapping axes, etc).
  * @return {!anychart.charts.Cartesian3d} Empty chart.
  */
-anychart.cartesian3d = function(opt_barChartMode) {
-  var chart = new anychart.charts.Cartesian3d(opt_barChartMode);
+anychart.cartesian3d = function(opt_isVertical) {
+  var chart = new anychart.charts.Cartesian3d();
   chart.setupByVal(anychart.getFullTheme()['cartesian3d'], true);
+  if (goog.isDef(opt_isVertical))
+    chart.barChartMode = !!opt_isVertical;
 
   return chart;
 };
@@ -604,7 +603,7 @@ anychart.charts.Cartesian3d.prototype.setSeriesPointZIndex_ = function(series) {
   var zIndex = anychart.core.ChartWithSeries.ZINDEX_SERIES;
 
   if (value > 0) {
-    if (series.isBarBased()) {
+    if (/** @type {boolean} */(series.getOption(anychart.opt.IS_VERTICAL))) {
       if (!series.planIsStacked()) {
         if (this.zDistribution()) {
           zIndex += inc;
@@ -619,7 +618,7 @@ anychart.charts.Cartesian3d.prototype.setSeriesPointZIndex_ = function(series) {
     }
 
   } else if (value < 0) {
-    if (series.isBarBased()) {
+    if (/** @type {boolean} */(series.getOption(anychart.opt.IS_VERTICAL))) {
       zIndex -= inc;
     } else {
       if (!series.planIsStacked()) {
@@ -778,7 +777,7 @@ anychart.charts.Cartesian3d.prototype.distributeClusters = function(numClusters,
       var barWidthRatio = 1 / numClusters;
       for (var i = 0; i < drawingPlansOfScale.length; i++) {
         wSeries = drawingPlansOfScale[i].series;
-        if (wSeries.isWidthDistributed() && (horizontal ^ wSeries.isBarBased())) {
+        if (wSeries.isWidthDistributed() && (horizontal ^ /** @type {boolean} */(wSeries.getOption(anychart.opt.IS_VERTICAL)))) {
           wSeries.setAutoXPointPosition(0.5);
           wSeries.setAutoPointWidth(barWidthRatio);
         }

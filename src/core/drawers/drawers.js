@@ -25,7 +25,6 @@ anychart.core.drawers.Capabilities = {
   IS_DISCRETE_BASED: 1 << 9,
   IS_WIDTH_BASED: 1 << 10,
   IS_3D_BASED: 1 << 11,
-  IS_BAR_BASED: 1 << 12,
   IS_MARKER_BASED: 1 << 13,
   IS_OHLC_BASED: 1 << 14,
   IS_LINE_BASED: 1 << 15,
@@ -36,4 +35,43 @@ anychart.core.drawers.Capabilities = {
    * Combination of all states.
    */
   ANY: 0xFFFFFFFF
+};
+
+
+/**
+ * Draws the line in the path. If xIsVertical, than x and y coords are swapped.
+ * If closed, closes the path at the end.
+ * @param {acgraph.vector.Path} path
+ * @param {boolean} xIsVertical
+ * @param {number} x
+ * @param {number} y
+ */
+anychart.core.drawers.move = function(path, xIsVertical, x, y) {
+  if (xIsVertical) {
+    path.moveTo(y, x);
+  } else {
+    path.moveTo(x, y);
+  }
+};
+
+
+/**
+ * Draws the line in the path. If xIsVertical, than x and y coords are swapped.
+ * If closed, closes the path at the end.
+ * @param {acgraph.vector.Path} path
+ * @param {boolean} xIsVertical
+ * @param {...number} var_args
+ */
+anychart.core.drawers.line = function(path, xIsVertical, var_args) {
+  var xShift, yShift;
+  if (xIsVertical) {
+    xShift = 1;
+    yShift = 0;
+  } else {
+    xShift = 0;
+    yShift = 1;
+  }
+  for (var i = 2; i < arguments.length; i += 2) {
+    path.lineTo(arguments[i + xShift], arguments[i + yShift]);
+  }
 };

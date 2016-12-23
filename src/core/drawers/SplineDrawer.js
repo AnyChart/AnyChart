@@ -43,6 +43,11 @@ anychart.core.drawers.SplineDrawer = function(opt_rtl) {
    * @type {boolean}
    * @private
    */
+  this.isVertical_ = false;
+  /**
+   * @type {boolean}
+   * @private
+   */
   this.rtl_ = !!opt_rtl;
   /**
    * @type {!Array.<number>}
@@ -83,6 +88,20 @@ anychart.core.drawers.SplineDrawer.prototype.rtl = function(opt_rtl) {
     return this;
   }
   return this.rtl_;
+};
+
+
+/**
+ * If the drawer is vertical.
+ * @param {boolean=} opt_value .
+ * @return {!anychart.core.drawers.SplineDrawer|boolean} .
+ */
+anychart.core.drawers.SplineDrawer.prototype.isVertical = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.isVertical_ = opt_value;
+    return this;
+  }
+  return this.isVertical_;
 };
 
 
@@ -163,7 +182,7 @@ anychart.core.drawers.SplineDrawer.prototype.setPaths = function(paths) {
  * @param {boolean} backward If the drawing is going to start rtl.
  */
 anychart.core.drawers.SplineDrawer.prototype.resetDrawer = function(backward) {
-  if (this.rtl_) backward = !backward;
+  if (this.rtl_ ^ this.isVertical_) backward = !backward;
   /**
    * @type {number}
    * @private
@@ -243,8 +262,14 @@ anychart.core.drawers.SplineDrawer.prototype.startSplineDrawing_ = function(p1x,
     // this.paths_[0].getStage().pie(p2x + tx, p2y + ty, 5, 0, 360).fill(this.paths_[0].fill()).stroke('black').zIndex(1000);
     // console.log(tx, ty);
 
-    for (var i = 0; i < this.paths_.length; i++)
-      this.paths_[i].quadraticCurveTo(p2x + tx, p2y + ty, p2x, p2y);
+    var i;
+    if (this.isVertical_) {
+      for (i = 0; i < this.paths_.length; i++)
+        this.paths_[i].quadraticCurveTo(p2y + ty, p2x + tx, p2y, p2x);
+    } else {
+      for (i = 0; i < this.paths_.length; i++)
+        this.paths_[i].quadraticCurveTo(p2x + tx, p2y + ty, p2x, p2y);
+    }
   }
 
   this.tanLen_ = (p3x - p2x) * this.tangentLengthPercent_;
@@ -282,10 +307,18 @@ anychart.core.drawers.SplineDrawer.prototype.drawNextSplinePoint_ = function(p1x
     // this.paths_[0].getStage().pie(c2x, c2y, 5, 0, 360).fill(this.paths_[0].fill()).stroke('black').zIndex(1000);
     // console.log(this.tangent_[0], this.tangent_[1], c2x - p2x, c2y - p2y);
 
-    for (var i = 0; i < this.paths_.length; i++)
-      this.paths_[i]
-          .quadraticCurveTo(c1x, c1y, mpx, mpy)
-          .quadraticCurveTo(c2x, c2y, p2x, p2y);
+    var i;
+    if (this.isVertical_) {
+      for (i = 0; i < this.paths_.length; i++)
+        this.paths_[i]
+            .quadraticCurveTo(c1y, c1x, mpy, mpx)
+            .quadraticCurveTo(c2y, c2x, p2y, p2x);
+    } else {
+      for (i = 0; i < this.paths_.length; i++)
+        this.paths_[i]
+            .quadraticCurveTo(c1x, c1y, mpx, mpy)
+            .quadraticCurveTo(c2x, c2y, p2x, p2y);
+    }
   }
 
   this.tanLen_ = (p3x - p2x) * this.tangentLengthPercent_;
@@ -307,8 +340,14 @@ anychart.core.drawers.SplineDrawer.prototype.finalizeSplineDrawing_ = function(p
   // this.paths_[0].getStage().path().moveTo(p1x, p1y).lineTo(p2x, p2y, p1x + this.tangent_[0], p1y + this.tangent_[1], p1x, p1y).fill(null).stroke('5 black').zIndex(1000);
   // console.log(this.tangent_[0], this.tangent_[1]);
 
-  for (var i = 0; i < this.paths_.length; i++)
-    this.paths_[i].quadraticCurveTo(p1x + this.tangent_[0], p1y + this.tangent_[1], p2x, p2y);
+  var i;
+  if (this.isVertical_) {
+    for (i = 0; i < this.paths_.length; i++)
+      this.paths_[i].quadraticCurveTo(p1y + this.tangent_[1], p1x + this.tangent_[0], p2y, p2x);
+  } else {
+    for (i = 0; i < this.paths_.length; i++)
+      this.paths_[i].quadraticCurveTo(p1x + this.tangent_[0], p1y + this.tangent_[1], p2x, p2y);
+  }
 };
 
 
@@ -331,6 +370,12 @@ anychart.core.drawers.SplineDrawer.prototype.drawSingleSplinePoint_ = function(x
  * @private
  */
 anychart.core.drawers.SplineDrawer.prototype.drawDummySpline_ = function(p1x, p1y, p2x, p2y) {
-  for (var i = 0; i < this.paths_.length; i++)
-    this.paths_[i].lineTo(p2x, p2y);
+  var i;
+  if (this.isVertical_) {
+    for (i = 0; i < this.paths_.length; i++)
+      this.paths_[i].lineTo(p2y, p2x);
+  } else {
+    for (i = 0; i < this.paths_.length; i++)
+      this.paths_[i].lineTo(p2x, p2y);
+  }
 };

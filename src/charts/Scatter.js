@@ -13,7 +13,7 @@ goog.require('anychart.enums');
  * @constructor
  */
 anychart.charts.Scatter = function() {
-  anychart.charts.Scatter.base(this, 'constructor', false, false);
+  anychart.charts.Scatter.base(this, 'constructor', false);
 
   this.defaultSeriesType(anychart.enums.ScatterSeriesType.MARKER);
 };

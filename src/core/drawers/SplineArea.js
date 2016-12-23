@@ -44,7 +44,7 @@ anychart.core.drawers.SplineArea.prototype.flags = (
     // anychart.core.drawers.Capabilities.IS_DISCRETE_BASED |
     // anychart.core.drawers.Capabilities.IS_WIDTH_BASED |
     // anychart.core.drawers.Capabilities.IS_3D_BASED |
-    // anychart.core.drawers.Capabilities.IS_BAR_BASED |
+    // anychart.core.drawers.Capabilities.IS_VERTICAL |
     // anychart.core.drawers.Capabilities.IS_MARKER_BASED |
     // anychart.core.drawers.Capabilities.IS_OHLC_BASED |
     // anychart.core.drawers.Capabilities.IS_LINE_BASED |
@@ -68,6 +68,7 @@ anychart.core.drawers.SplineArea.prototype.requiredShapes = (function() {
 anychart.core.drawers.SplineArea.prototype.startDrawing = function(shapeManager) {
   anychart.core.drawers.SplineArea.base(this, 'startDrawing', shapeManager);
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
+  this.queue_.isVertical(this.isVertical);
   this.queue_.rtl(this.series.planIsXScaleInverted());
   /**
    * @type {Array.<acgraph.vector.Path>}
@@ -112,14 +113,11 @@ anychart.core.drawers.SplineArea.prototype.drawFirstPoint = function(point, stat
 
   this.queue_.setPaths(this.forwardPaths_);
   this.queue_.resetDrawer(false);
-  (/** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]))
-      .moveTo(x, zero)
-      .lineTo(x, y);
-  (/** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]))
-      .moveTo(x, zero)
-      .lineTo(x, y);
-  (/** @type {acgraph.vector.Path} */(shapes[anychart.opt.STROKE]))
-      .moveTo(x, y);
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]), this.isVertical, x, zero);
+  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]), this.isVertical, x, y);
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]), this.isVertical, x, zero);
+  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]), this.isVertical, x, y);
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.STROKE]), this.isVertical, x, y);
   this.queue_.processPoint(x, y);
 
   if (this.series.planIsStacked()) {
@@ -156,12 +154,10 @@ anychart.core.drawers.SplineArea.prototype.finalizeSegment = function() {
   if (!this.prevPointDrawn) return;
   this.queue_.finalizeProcessing();
   if (!isNaN(this.lastDrawnX)) {
-    this.backwardPaths_[0]
-        .lineTo(this.lastDrawnX, this.zeroY)
-        .close();
-    this.backwardPaths_[1]
-        .lineTo(this.lastDrawnX, this.zeroY)
-        .close();
+    anychart.core.drawers.line(this.backwardPaths_[0], this.isVertical, this.lastDrawnX, this.zeroY);
+    this.backwardPaths_[0].close();
+    anychart.core.drawers.line(this.backwardPaths_[1], this.isVertical, this.lastDrawnX, this.zeroY);
+    this.backwardPaths_[1].close();
   } else if (this.zeroesStack) {
     this.queue_.setPaths(this.backwardPaths_);
     this.queue_.resetDrawer(true);
@@ -181,30 +177,22 @@ anychart.core.drawers.SplineArea.prototype.finalizeSegment = function() {
       /** @type {boolean} */
       var isMissing = /** @type {boolean} */(this.zeroesStack[i]);
       if (firstPoint) {
-        this.backwardPaths_[0].lineTo(x, y);
-        this.backwardPaths_[1].lineTo(x, y);
+        anychart.core.drawers.line(this.backwardPaths_[0], this.isVertical, x, y);
+        anychart.core.drawers.line(this.backwardPaths_[1], this.isVertical, x, y);
         if (!isMissing)
           this.queue_.processPoint(x, y);
         firstPoint = false;
       } else if (isMissing && prevWasMissing) {
-        this.backwardPaths_[0].lineTo(x, y);
-        this.backwardPaths_[1].lineTo(x, y);
+        anychart.core.drawers.line(this.backwardPaths_[0], this.isVertical, x, y);
+        anychart.core.drawers.line(this.backwardPaths_[1], this.isVertical, x, y);
       } else if (isMissing) {
         this.queue_.finalizeProcessing();
         this.queue_.resetDrawer(true);
-        this.backwardPaths_[0]
-            .lineTo(prevX, y)
-            .lineTo(x, y);
-        this.backwardPaths_[1]
-            .lineTo(prevX, y)
-            .lineTo(x, y);
+        anychart.core.drawers.line(this.backwardPaths_[0], this.isVertical, prevX, y, x, y);
+        anychart.core.drawers.line(this.backwardPaths_[1], this.isVertical, prevX, y, x, y);
       } else if (prevWasMissing) {
-        this.backwardPaths_[0]
-            .lineTo(x, prevY)
-            .lineTo(x, y);
-        this.backwardPaths_[1]
-            .lineTo(x, prevY)
-            .lineTo(x, y);
+        anychart.core.drawers.line(this.backwardPaths_[0], this.isVertical, x, prevY, x, y);
+        anychart.core.drawers.line(this.backwardPaths_[1], this.isVertical, x, prevY, x, y);
         this.queue_.processPoint(x, y);
       } else {
         this.queue_.processPoint(x, y);

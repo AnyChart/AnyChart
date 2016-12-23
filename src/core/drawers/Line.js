@@ -37,7 +37,7 @@ anychart.core.drawers.Line.prototype.flags = (
     // anychart.core.drawers.Capabilities.IS_DISCRETE_BASED |
     // anychart.core.drawers.Capabilities.IS_WIDTH_BASED |
     // anychart.core.drawers.Capabilities.IS_3D_BASED |
-    // anychart.core.drawers.Capabilities.IS_BAR_BASED |
+    // anychart.core.drawers.Capabilities.IS_VERTICAL |
     // anychart.core.drawers.Capabilities.IS_MARKER_BASED |
     // anychart.core.drawers.Capabilities.IS_OHLC_BASED |
     anychart.core.drawers.Capabilities.IS_LINE_BASED |
@@ -60,7 +60,7 @@ anychart.core.drawers.Line.prototype.drawFirstPoint = function(point, state) {
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
   var x = /** @type {number} */(point.meta(anychart.opt.X));
   var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
-  shapes[anychart.opt.STROKE].moveTo(x, y);
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.STROKE]), this.isVertical, x, y);
 };
 
 
@@ -69,5 +69,5 @@ anychart.core.drawers.Line.prototype.drawSubsequentPoint = function(point, state
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
   var x = /** @type {number} */(point.meta(anychart.opt.X));
   var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
-  shapes[anychart.opt.STROKE].lineTo(x, y);
+  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.STROKE]), this.isVertical, x, y);
 };

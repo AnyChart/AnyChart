@@ -18,6 +18,7 @@ goog.provide('anychart.enums');
  */
 anychart.enums.ChartTypes = {
   AREA: 'area',
+  VERTICAL_AREA: 'verticalArea',
   AREA_3D: 'area3d',
   BAR: 'bar',
   BAR_3D: 'bar3d',
@@ -31,6 +32,7 @@ anychart.enums.ChartTypes = {
   FINANCIAL: 'financial',
   FUNNEL: 'funnel',
   LINE: 'line',
+  VERTICAL_LINE: 'verticalLine',
   MARKER: 'marker',
   PIE: 'pie',
   PIE_3D: 'pie3d',
@@ -2198,6 +2200,7 @@ anychart.enums.CartesianSeriesType = {
   BUBBLE: 'bubble',
   CANDLESTICK: 'candlestick',
   COLUMN: 'column',
+  JUMP_LINE: 'jumpLine',
   LINE: 'line',
   MARKER: 'marker',
   OHLC: 'ohlc',
@@ -2210,7 +2213,6 @@ anychart.enums.CartesianSeriesType = {
   SPLINE_AREA: 'splineArea',
   STEP_AREA: 'stepArea',
   STEP_LINE: 'stepLine',
-  JUMP_LINE: 'jumpLine',
   STICK: 'stick'
 };
 

@@ -21,17 +21,9 @@ goog.require('goog.array');
  * @implements {anychart.core.IChartWithAnnotations}
  * @constructor
  * @param {boolean} joinData If series data should be sorted and joined.
- * @param {boolean=} opt_barChartMode If true, sets the chart to Bar Chart mode, swapping default chart elements
- *    behaviour to horizontal-oriented (setting default layout to VERTICAL, swapping axes, etc).
  */
-anychart.core.ChartWithAxes = function(joinData, opt_barChartMode) {
+anychart.core.ChartWithAxes = function(joinData) {
   anychart.core.ChartWithAxes.base(this, 'constructor', joinData);
-
-  /**
-   * If true, all default chart elements layout is swapped.
-   * @type {boolean}
-   */
-  this.barChartMode = !!opt_barChartMode;
 
   /**
    * @type {anychart.core.ui.Crosshair}
@@ -1076,8 +1068,11 @@ anychart.core.ChartWithAxes.prototype.drawContent = function(bounds) {
 anychart.core.ChartWithAxes.prototype.setupByJSONWithScales = function(config, scalesInstances) {
   anychart.core.ChartWithAxes.base(this, 'setupByJSONWithScales', config, scalesInstances);
 
+  // barChartMode is deprecated
   if ('barChartMode' in config)
-    this.barChartMode = config['barChartMode'];
+    this.barChartMode = !!config['barChartMode'];
+  if ('isVertical' in config)
+    this.barChartMode = !!config['isVertical'];
 
   this.defaultXAxisSettings(config['defaultXAxisSettings']);
   this.defaultYAxisSettings(config['defaultYAxisSettings']);
@@ -1124,7 +1119,7 @@ anychart.core.ChartWithAxes.prototype.setupElements_ = function(items, itemConst
 anychart.core.ChartWithAxes.prototype.serializeWithScales = function(json, scales, scaleIds) {
   anychart.core.ChartWithAxes.base(this, 'serializeWithScales', json, scales, scaleIds);
 
-  json['barChartMode'] = this.barChartMode;
+  json['isVertical'] = this.barChartMode;
 
   var axesIds = [];
   this.serializeElements_(json, 'xAxes', this.xAxes_, this.serializeAxis_, scales, scaleIds, axesIds);

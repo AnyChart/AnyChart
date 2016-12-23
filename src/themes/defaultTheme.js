@@ -1124,6 +1124,7 @@ goog.provide('anychart.themes.defaultTheme');
       'defaultSeriesSettings': {
         'base': {
           'enabled': true,
+          'isVertical': null,
           'background': {'enabled': true},
           'tooltip': {
             /**
@@ -1147,14 +1148,14 @@ goog.provide('anychart.themes.defaultTheme');
           'selectHatchFill': null,
           'labels': {
             'anchor': 'centerBottom',
-            'position': 'centerTop'
+            'position': 'value'
           },
           'hoverLabels': {'enabled': null},
           'selectLabels': {'enabled': null},
           'markers': {
             'enabled': false,
             'disablePointerEvents': false,
-            'position': 'center',
+            'position': 'value',
             'positionFormatter': returnValue,
             'size': 4
           },
@@ -1229,9 +1230,6 @@ goog.provide('anychart.themes.defaultTheme');
         'bubble': {
           'fill': returnSourceColor70,
           'hoverFill': returnSourceColor50,
-          'hoverMarkers': {
-            'position': 'center'
-          },
           'displayNegative': false,
           /**
            * @this {*}
@@ -1299,16 +1297,12 @@ goog.provide('anychart.themes.defaultTheme');
             'iconStroke': 'none'
           },
           'labels': {
-            'position': 'center',
             'anchor': 'center'
           }
         },
         'areaLike': {
           'fill': returnSourceColor65,
           'hoverFill': returnSourceColor65,
-          'markers': {
-            'position': 'centerTop'
-          },
           'hoverMarkers': {
             'enabled': true
           },
@@ -1328,10 +1322,6 @@ goog.provide('anychart.themes.defaultTheme');
           'hoverFill': returnSourceColor65,
           'legendItem': {
             'iconStroke': 'none'
-          },
-          'labels': {
-            'anchor': 'centerBottom',
-            'position': 'centerTop'
           }
         },
         'lineLike': {
@@ -1346,30 +1336,16 @@ goog.provide('anychart.themes.defaultTheme');
           },
           'stepDirection': 'center'
         },
-        'rangeArea': {
+        'rangeLike': {
           'labels': {
-            'textFormatter': returnRangeLabelsContentFormatter
+            'textFormatter': returnRangeLabelsContentFormatter,
+            'position': 'high'
+          },
+          'markers': {
+            'position': 'high'
           },
           'tooltip': {
-            'titleFormatter': returnX,
-            'textFormatter': returnRangeTooltipContentFormatter
-          }
-        },
-        'rangeSplineArea': {
-          'labels': {
-            'textFormatter': returnRangeLabelsContentFormatter
-          },
-          'tooltip': {
-            'titleFormatter': returnX,
-            'textFormatter': returnRangeTooltipContentFormatter
-          }
-        },
-        'rangeStepArea': {
-          'labels': {
-            'textFormatter': returnRangeLabelsContentFormatter
-          },
-          'tooltip': {
-            'titleFormatter': returnX,
+            // 'titleFormatter': returnX,
             'textFormatter': returnRangeTooltipContentFormatter
           }
         },
@@ -1397,42 +1373,18 @@ goog.provide('anychart.themes.defaultTheme');
             'textFormatter': OHLCTooltipFormatter
           },
           'markers': {
-            'position': 'centerTop'
+            'position': 'high'
           },
           'labels': {
-            'position': 'centerTop',
+            'position': 'high',
             'anchor': 'centerBottom',
             'textFormatter': returnX
           }
         },
         'column': {
-          'markers': {
-            'position': 'centerTop'
-          },
-          'hoverMarkers': {
-            'position': 'centerTop'
-          },
+          'isVertical': false,
           'labels': {
-            'offsetY': 3,
-            'anchor': 'centerBottom'
-          }
-        },
-        'rangeColumn': {
-          'markers': {
-            'position': 'centerTop'
-          },
-          'hoverMarkers': {
-            'position': 'centerTop'
-          },
-          'labels': {
-            'position': 'centerTop',
-            'anchor': 'centerBottom',
-            'textFormatter': returnRangeLabelsContentFormatter
-          },
-          'tooltip': {
-            'textFormatter': returnRangeTooltipContentFormatter,
-            'anchor': 'leftTop',
-            'offsetX': 10
+            'offsetY': 3
           }
         },
         'ohlc': {
@@ -1446,45 +1398,23 @@ goog.provide('anychart.themes.defaultTheme');
             'textFormatter': OHLCTooltipFormatter
           },
           'markers': {
-            'position': 'centerTop'
-          },
-          'hoverMarkers': {
-            'enabled': null,
-            'position': 'centerTop'
-          },
-          'selectMarkers': {
-            'enabled': null,
-            'position': 'centerTop'
+            'position': 'high'
           },
           'labels': {
-            'position': 'centerTop',
+            'position': 'high',
             'anchor': 'centerBottom',
-            /**
-             * @this {*}
-             * @return {*}
-             */
-            'textFormatter': function() {
-              return this['x'];
-            }
+            'textFormatter': returnX
           }
         },
         'stick': {
           'labels': {
-            'anchor': 'bottom',
-            'position': 'top'
-          },
-          'markers': {
-            'position': 'top'
+            'anchor': 'centerBottom'
           },
           'stroke': returnStrokeSourceColor1
         },
         'jumpLine': {
           'labels': {
-            'anchor': 'bottom',
-            'position': 'top'
-          },
-          'markers': {
-            'position': 'top'
+            'anchor': 'centerBottom'
           },
           'pointWidth': '100%'
         }
@@ -1679,16 +1609,10 @@ goog.provide('anychart.themes.defaultTheme');
           }
         },
         'bar': {
-          'markers': {
-            'position': 'rightCenter'
-          },
-          'hoverMarkers': {
-            'position': 'rightCenter'
-          },
+          'isVertical': true,
           'labels': {
             'offsetX': 3,
-            'anchor': 'leftCenter',
-            'position': 'rightCenter'
+            'anchor': 'leftCenter'
           },
           'tooltip': {
             'anchor': 'leftTop'
@@ -1699,21 +1623,18 @@ goog.provide('anychart.themes.defaultTheme');
             'anchor': 'leftTop'
           }
         },
-        'rangeBar': {
-          'markers': {
-            'position': 'rightCenter'
-          },
-          'hoverMarkers': {
-            'position': 'rightCenter'
-          },
-          'labels': {
-            'anchor': 'leftCenter',
-            'offsetX': 3,
-            'textFormatter': returnRangeLabelsContentFormatter,
-            'position': 'rightCenter'
-          },
+        'rangeColumn': {
+          'isVertical': false,
           'tooltip': {
-            'textFormatter': returnRangeTooltipContentFormatter
+            'anchor': 'leftTop',
+            'offsetX': 10
+          }
+        },
+        'rangeBar': {
+          'isVertical': true,
+          'labels': {
+            'offsetX': 3,
+            'anchor': 'leftCenter'
           }
         },
         'box': {
@@ -1751,7 +1672,11 @@ goog.provide('anychart.themes.defaultTheme');
             'fill': defaultSelectColor,
             'stroke': defaultSelectStroke
           },
+          'markers': {
+            'position': 'median'
+          },
           'labels': {
+            'position': 'highest',
             /**
              * @this {*}
              * @return {*}
@@ -1825,7 +1750,7 @@ goog.provide('anychart.themes.defaultTheme');
       'barGroupsPadding': 0.8,
       'maxBubbleSize': '20%',
       'minBubbleSize': '5%',
-      'barChartMode': false,
+      'isVertical': false,
       'scales': [
         {
           'type': 'ordinal',
@@ -1879,6 +1804,7 @@ goog.provide('anychart.themes.defaultTheme');
     // merge with defaultCartesian
     'cartesian': {
       'defaultSeriesType': 'line',
+      'isVertical': false,
       'xAxes': [],
       'yAxes': []
     },
@@ -1894,7 +1820,7 @@ goog.provide('anychart.themes.defaultTheme');
       }
     },
     'bar': {
-      'barChartMode': true,
+      'isVertical': true,
       'defaultSeriesType': 'bar',
       'defaultXAxisSettings': {
         'orientation': 'left'
@@ -2037,6 +1963,110 @@ goog.provide('anychart.themes.defaultTheme');
           'stickToZero': true
         }
       ]
+    },
+    'verticalLine': {
+      'isVertical': true,
+      'defaultSeriesType': 'line',
+      'defaultXAxisSettings': {
+        'orientation': 'left'
+      },
+      'defaultYAxisSettings': {
+        'orientation': 'bottom'
+      },
+      'scales': [
+        {
+          'type': 'ordinal',
+          'inverted': true,
+          'names': [],
+          'ticks': {
+            'interval': 1
+          }
+        },
+        {
+          'type': 'linear',
+          'inverted': false,
+          'maximum': null,
+          'minimum': null,
+          'minimumGap': 0.1,
+          'maximumGap': 0.1,
+          'softMinimum': null,
+          'softMaximum': null,
+          'ticks': {
+            'mode': 'linear',
+            'base': 0,
+            'minCount': 4,
+            'maxCount': 6
+          },
+          'minorTicks': {
+            'mode': 'linear',
+            'base': 0,
+            'count': 5
+          },
+          'stackMode': 'none',
+          'stickToZero': true
+        }
+      ],
+      'tooltip': {
+        'displayMode': 'union'
+      },
+      'interactivity': {
+        'hoverMode': 'byX'
+      },
+      'xScroller': {
+        'orientation': 'left'
+      }
+    },
+    'verticalArea': {
+      'isVertical': true,
+      'defaultSeriesType': 'area',
+      'defaultXAxisSettings': {
+        'orientation': 'left'
+      },
+      'defaultYAxisSettings': {
+        'orientation': 'bottom'
+      },
+      'scales': [
+        {
+          'type': 'ordinal',
+          'inverted': true,
+          'names': [],
+          'ticks': {
+            'interval': 1
+          }
+        },
+        {
+          'type': 'linear',
+          'inverted': false,
+          'maximum': null,
+          'minimum': null,
+          'minimumGap': 0.1,
+          'maximumGap': 0.1,
+          'softMinimum': null,
+          'softMaximum': null,
+          'ticks': {
+            'mode': 'linear',
+            'base': 0,
+            'minCount': 4,
+            'maxCount': 6
+          },
+          'minorTicks': {
+            'mode': 'linear',
+            'base': 0,
+            'count': 5
+          },
+          'stackMode': 'none',
+          'stickToZero': true
+        }
+      ],
+      'tooltip': {
+        'displayMode': 'union'
+      },
+      'interactivity': {
+        'hoverMode': 'byX'
+      },
+      'xScroller': {
+        'orientation': 'left'
+      }
     },
 
     // merge with cartesian
@@ -4253,17 +4283,7 @@ goog.provide('anychart.themes.defaultTheme');
             },
             'legendItem': {'iconStroke': 'none'}
           },
-          'rangeArea': {
-            'tooltip': {
-              'textFormatter': StockRangeTooltipFormatter
-            }
-          },
-          'rangeSplineArea': {
-            'tooltip': {
-              'textFormatter': StockRangeTooltipFormatter
-            }
-          },
-          'rangeStepArea': {
+          'rangeLike': {
             'tooltip': {
               'textFormatter': StockRangeTooltipFormatter
             }
@@ -4277,10 +4297,7 @@ goog.provide('anychart.themes.defaultTheme');
             'stroke': 'none'
           },
           'rangeColumn': {
-            'stroke': 'none',
-            'tooltip': {
-              'textFormatter': StockRangeTooltipFormatter
-            }
+            'stroke': 'none'
           },
           'ohlc': {
             'tooltip': {
@@ -4538,6 +4555,10 @@ goog.provide('anychart.themes.defaultTheme');
             'selectFallingStroke': fallingColor
           },
           'stick': {
+            'stroke': stockScrollerUnselected,
+            'selectStroke': returnStrokeSourceColor1
+          },
+          'jumpLine': {
             'stroke': stockScrollerUnselected,
             'selectStroke': returnStrokeSourceColor1
           }

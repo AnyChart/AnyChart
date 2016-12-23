@@ -805,6 +805,16 @@ anychart.themes.merging.mergingMap_ = [
     ]
   },
   {
+    defaultObj: 'cartesianBase.defaultSeriesSettings.rangeLike',
+    targets: [
+      'cartesianBase.defaultSeriesSettings.rangeArea',
+      'cartesianBase.defaultSeriesSettings.rangeBar',
+      'cartesianBase.defaultSeriesSettings.rangeColumn',
+      'cartesianBase.defaultSeriesSettings.rangeSplineArea',
+      'cartesianBase.defaultSeriesSettings.rangeStepArea'
+    ]
+  },
+  {
     defaultObj: 'cartesianBase.defaultSeriesSettings.base',
     targets: [
       'cartesianBase.defaultSeriesSettings.areaLike',
@@ -853,11 +863,13 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'cartesian',
       'area',
+      'verticalArea',
       'bar',
       'box',
       'column',
       'financial',
       'line',
+      'verticalLine',
       'jumpLine',
       'stick'
     ]
@@ -1035,6 +1047,15 @@ anychart.themes.merging.mergingMap_ = [
     ]
   },
   {
+    defaultObj: 'stock.defaultPlotSettings.defaultSeriesSettings.rangeLike',
+    targets: [
+      'stock.defaultPlotSettings.defaultSeriesSettings.rangeArea',
+      'stock.defaultPlotSettings.defaultSeriesSettings.rangeColumn',
+      'stock.defaultPlotSettings.defaultSeriesSettings.rangeSplineArea',
+      'stock.defaultPlotSettings.defaultSeriesSettings.rangeStepArea'
+    ]
+  },
+  {
     defaultObj: 'stock.defaultPlotSettings.defaultSeriesSettings.base',
     targets: [
       'stock.defaultPlotSettings.defaultSeriesSettings.areaLike',
@@ -1120,6 +1141,15 @@ anychart.themes.merging.mergingMap_ = [
       'stock.scroller.defaultSeriesSettings.ohlc',
       'stock.scroller.defaultSeriesSettings.jumpLine',
       'stock.scroller.defaultSeriesSettings.stick'
+    ]
+  },
+  {
+    defaultObj: 'stock.scroller.defaultSeriesSettings.rangeLike',
+    targets: [
+      'stock.scroller.defaultSeriesSettings.rangeArea',
+      'stock.scroller.defaultSeriesSettings.rangeColumn',
+      'stock.scroller.defaultSeriesSettings.rangeSplineArea',
+      'stock.scroller.defaultSeriesSettings.rangeStepArea'
     ]
   },
   {

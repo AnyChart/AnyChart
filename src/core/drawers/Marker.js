@@ -53,7 +53,7 @@ anychart.core.drawers.Marker.prototype.flags = (
     anychart.core.drawers.Capabilities.IS_DISCRETE_BASED |
     // anychart.core.drawers.Capabilities.IS_WIDTH_BASED |
     // anychart.core.drawers.Capabilities.IS_3D_BASED |
-    // anychart.core.drawers.Capabilities.IS_BAR_BASED |
+    // anychart.core.drawers.Capabilities.IS_VERTICAL |
     anychart.core.drawers.Capabilities.IS_MARKER_BASED |
     // anychart.core.drawers.Capabilities.IS_OHLC_BASED |
     // anychart.core.drawers.Capabilities.IS_LINE_BASED |
@@ -104,6 +104,11 @@ anychart.core.drawers.Marker.prototype.drawPoint_ = function(point, state, shape
   var type = /** @type {anychart.enums.MarkerType|Function} */(this.typeGetter_(this.series, point, state));
   var size = /** @type {number} */(this.sizeGetter_(this.series, point, state));
   var drawer = goog.isFunction(type) ? type : anychart.utils.getMarkerDrawer(type);
+  if (this.isVertical) {
+    var tmp = x;
+    x = y;
+    y = tmp;
+  }
 
   drawer(shapes[anychart.opt.PATH], x, y, size);
   drawer(shapes[anychart.opt.HATCH_FILL], x, y, size);

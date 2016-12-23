@@ -37,7 +37,7 @@ anychart.core.drawers.Bubble.prototype.flags = (
     anychart.core.drawers.Capabilities.IS_DISCRETE_BASED |
     // anychart.core.drawers.Capabilities.IS_WIDTH_BASED |
     // anychart.core.drawers.Capabilities.IS_3D_BASED |
-    // anychart.core.drawers.Capabilities.IS_BAR_BASED |
+    // anychart.core.drawers.Capabilities.IS_VERTICAL |
     // anychart.core.drawers.Capabilities.IS_MARKER_BASED |
     // anychart.core.drawers.Capabilities.IS_OHLC_BASED |
     // anychart.core.drawers.Capabilities.IS_LINE_BASED |
@@ -96,6 +96,12 @@ anychart.core.drawers.Bubble.prototype.drawPoint_ = function(point, shapes) {
   var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
   var size = /** @type {number} */(point.meta(anychart.opt.SIZE));
   size = Math.abs(size);
+
+  if (this.isVertical) {
+    var tmp = x;
+    x = y;
+    y = tmp;
+  }
 
   for (var i in shapes)
     shapes[i]

@@ -13,17 +13,14 @@ goog.require('anychart.animations.Animation');
  */
 anychart.animations.ColumnAnimation = function(series, duration, opt_acc) {
   anychart.animations.ColumnAnimation.base(this, 'constructor', series, [], [], duration, opt_acc);
-  /**
-   * If this animation is rotated (as for bar).
-   * @type {boolean}
-   */
-  this.isBarAnimation = false;
 };
 goog.inherits(anychart.animations.ColumnAnimation, anychart.animations.Animation);
 
 
 /** @inheritDoc */
 anychart.animations.ColumnAnimation.prototype.update = function() {
+  /** @type {boolean} */
+  this.isBarAnimation = /** @type {boolean} */(this.series.getOption(anychart.opt.IS_VERTICAL));
   this.startPoint.length = this.endPoint.length = 0;
   var iterator = this.series.getDetachedIterator();
   // we would use variable number of arguments per point - from zero to five

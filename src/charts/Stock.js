@@ -206,7 +206,7 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
     anchoredPositionTop: anychart.opt.VALUE,
     anchoredPositionBottom: anychart.opt.ZERO
   };
-  res[anychart.enums.CartesianSeriesType.JUMP_LINE] = {
+  res[anychart.enums.StockSeriesType.JUMP_LINE] = {
     drawerType: anychart.enums.SeriesDrawerTypes.JUMP_LINE,
     shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
     shapesConfig: [
@@ -218,7 +218,7 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
     anchoredPositionTop: anychart.opt.VALUE,
     anchoredPositionBottom: anychart.opt.VALUE
   };
-  res[anychart.enums.CartesianSeriesType.STICK] = {
+  res[anychart.enums.StockSeriesType.STICK] = {
     drawerType: anychart.enums.SeriesDrawerTypes.STICK,
     shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
     shapesConfig: [
@@ -417,6 +417,14 @@ anychart.charts.Stock.prototype.getConfigByType = function(type) {
     res = null;
   }
   return res;
+};
+
+
+/**
+ * @return {boolean}
+ */
+anychart.charts.Stock.prototype.isVertical = function() {
+  return false;
 };
 //endregion
 

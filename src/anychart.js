@@ -692,6 +692,14 @@ anychart.line = anychart.line || anychart.createNFIMError('Line chart');
 
 
 /** @ignoreDoc */
+anychart.verticalLine = anychart.verticalLine || anychart.createNFIMError('Vertical Line chart');
+
+
+/** @ignoreDoc */
+anychart.verticalArea = anychart.verticalArea || anychart.createNFIMError('Vertical Area chart');
+
+
+/** @ignoreDoc */
 anychart.marker = anychart.marker || anychart.createNFIMError('Marker chart');
 
 
@@ -1031,6 +1039,7 @@ goog.exportSymbol('anychart.onDocumentLoad', anychart.onDocumentLoad);//doc|need
 goog.exportSymbol('anychart.onDocumentReady', anychart.onDocumentReady);//doc|ex
 goog.exportSymbol('anychart.licenseKey', anychart.licenseKey);//doc|ex
 goog.exportSymbol('anychart.area', anychart.area);//linkedFromModule
+goog.exportSymbol('anychart.verticalArea', anychart.verticalArea);//linkedFromModule
 goog.exportSymbol('anychart.area3d', anychart.area3d);
 goog.exportSymbol('anychart.bar', anychart.bar);//linkedFromModule
 goog.exportSymbol('anychart.bar3d', anychart.bar3d);
@@ -1044,6 +1053,7 @@ goog.exportSymbol('anychart.column3d', anychart.column3d);
 goog.exportSymbol('anychart.financial', anychart.financial);//linkedFromModule
 goog.exportSymbol('anychart.funnel', anychart.funnel);//linkedFromModule
 goog.exportSymbol('anychart.line', anychart.line);//linkedFromModule
+goog.exportSymbol('anychart.verticalLine', anychart.verticalLine);//linkedFromModule
 goog.exportSymbol('anychart.marker', anychart.marker);//linkedFromModule
 goog.exportSymbol('anychart.pie', anychart.pie);//linkedFromModule
 goog.exportSymbol('anychart.pie3d', anychart.pie3d);//linkedFromModule

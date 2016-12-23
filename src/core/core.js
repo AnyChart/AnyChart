@@ -69,6 +69,13 @@ anychart.core.IChart.prototype.calculate = function() {};
  */
 anychart.core.IChart.prototype.supportsTooltip = function() {};
 
+
+/**
+ * Getter for an isVertical property.
+ * @return {boolean}
+ */
+anychart.core.IChart.prototype.isVertical = function() {};
+
 //endregion
 
 

@@ -25,6 +25,12 @@ anychart.core.ChartWithSeries = function(categorizeData) {
   anychart.core.ChartWithSeries.base(this, 'constructor');
 
   /**
+   * If true, all default chart elements layout is swapped.
+   * @type {boolean}
+   */
+  this.barChartMode = false;
+
+  /**
    * If series data should be sorted and joined
    * @type {boolean}
    */
@@ -525,6 +531,15 @@ anychart.core.ChartWithSeries.prototype.invalidateSizeBasedSeries = function() {
     if (this.seriesList[i].isSizeBased())
       this.seriesList[i].invalidate(anychart.ConsistencyState.SERIES_POINTS);
   }
+};
+
+
+/**
+ * Returns if the chart is vertical.
+ * @return {boolean}
+ */
+anychart.core.ChartWithSeries.prototype.isVertical = function() {
+  return this.barChartMode;
 };
 
 
@@ -1984,7 +1999,7 @@ anychart.core.ChartWithSeries.prototype.distributeSeries = function() {
         scale = /** @type {anychart.scales.Base} */(aSeries.yScale());
         id = goog.getUid(scale);
         if (aSeries.isWidthDistributed()) {
-          if (aSeries.isBarBased()) {
+          if (aSeries.getOption(anychart.opt.IS_VERTICAL)) {
             if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
               numBarClusters++;
             } else {
@@ -2035,7 +2050,7 @@ anychart.core.ChartWithSeries.prototype.distributeClusters = function(numCluster
     seenScales = {};
     for (var i = 0; i < drawingPlansOfScale.length; i++) {
       wSeries = drawingPlansOfScale[i].series;
-      if (wSeries.isWidthDistributed() && (horizontal ^ wSeries.isBarBased())) {
+      if (wSeries.isWidthDistributed() && (horizontal ^ (/** @type {boolean} */(wSeries.getOption(anychart.opt.IS_VERTICAL))))) {
         scale = /** @type {anychart.scales.Base} */(wSeries.yScale());
         if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
           wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
@@ -2643,7 +2658,7 @@ anychart.core.ChartWithSeries.prototype.getSeriesStatus = function(event) {
       }
     }
   } else if (this.interactivity().hoverMode() == anychart.enums.HoverMode.BY_X) {
-    var ratio = ((this.getType() == anychart.enums.ChartTypes.BAR || this.getType() == anychart.enums.ChartTypes.BAR_3D) ?
+    var ratio = ((this.barChartMode) ?
         ((rangeY - (y - minY)) / rangeY) :
         ((x - minX) / rangeX));
 

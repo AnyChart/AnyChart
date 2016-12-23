@@ -37,7 +37,7 @@ anychart.core.drawers.RangeArea.prototype.flags = (
     // anychart.core.drawers.Capabilities.IS_DISCRETE_BASED |
     // anychart.core.drawers.Capabilities.IS_WIDTH_BASED |
     // anychart.core.drawers.Capabilities.IS_3D_BASED |
-    // anychart.core.drawers.Capabilities.IS_BAR_BASED |
+    // anychart.core.drawers.Capabilities.IS_VERTICAL |
     // anychart.core.drawers.Capabilities.IS_MARKER_BASED |
     // anychart.core.drawers.Capabilities.IS_OHLC_BASED |
     // anychart.core.drawers.Capabilities.IS_LINE_BASED |
@@ -69,14 +69,11 @@ anychart.core.drawers.RangeArea.prototype.drawFirstPoint = function(point, state
   var high = /** @type {number} */(point.meta(anychart.opt.HIGH));
   var low = /** @type {number} */(point.meta(anychart.opt.LOW));
 
-  shapes[anychart.opt.FILL]
-      .moveTo(x, low)
-      .lineTo(x, high);
-  shapes[anychart.opt.HATCH_FILL]
-      .moveTo(x, low)
-      .lineTo(x, high);
-  shapes[anychart.opt.HIGH]
-      .moveTo(x, high);
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]), this.isVertical, x, low);
+  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]), this.isVertical, x, high);
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]), this.isVertical, x, low);
+  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]), this.isVertical, x, high);
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.HIGH]), this.isVertical, x, high);
 
   /**
    * @type {Array.<number>}
@@ -92,9 +89,9 @@ anychart.core.drawers.RangeArea.prototype.drawSubsequentPoint = function(point, 
   var high = /** @type {number} */(point.meta(anychart.opt.HIGH));
   var low = /** @type {number} */(point.meta(anychart.opt.LOW));
 
-  shapes[anychart.opt.FILL].lineTo(x, high);
-  shapes[anychart.opt.HATCH_FILL].lineTo(x, high);
-  shapes[anychart.opt.HIGH].lineTo(x, high);
+  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]), this.isVertical, x, high);
+  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]), this.isVertical, x, high);
+  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.HIGH]), this.isVertical, x, high);
 
   this.lowsStack.push(x, low);
 };
@@ -109,13 +106,13 @@ anychart.core.drawers.RangeArea.prototype.finalizeSegment = function() {
     for (var i = this.lowsStack.length - 1; i >= 0; i -= 2) {
       var x = this.lowsStack[i - 1];
       var y = this.lowsStack[i];
-      shapes[anychart.opt.FILL].lineTo(x, y);
-      shapes[anychart.opt.HATCH_FILL].lineTo(x, y);
+      anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]), this.isVertical, x, y);
+      anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]), this.isVertical, x, y);
       if (first) {
-        shapes[anychart.opt.LOW].moveTo(x, y);
+        anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.LOW]), this.isVertical, x, y);
         first = false;
       } else {
-        shapes[anychart.opt.LOW].lineTo(x, y);
+        anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.LOW]), this.isVertical, x, y);
       }
     }
     shapes[anychart.opt.FILL].close();

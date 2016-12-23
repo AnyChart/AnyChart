@@ -21,11 +21,9 @@ goog.require('anychart.enums');
  * Each series is interactive, you can customize click and hover behavior and other params.
  * @extends {anychart.core.CartesianBase}
  * @constructor
- * @param {boolean=} opt_barChartMode If true, sets the chart to Bar Chart mode, swapping default chart elements
- *    behaviour to horizontal-oriented (setting default layout to VERTICAL, swapping axes, etc).
  */
-anychart.charts.Cartesian = function(opt_barChartMode) {
-  anychart.charts.Cartesian.base(this, 'constructor', opt_barChartMode);
+anychart.charts.Cartesian = function() {
+  anychart.charts.Cartesian.base(this, 'constructor');
 };
 goog.inherits(anychart.charts.Cartesian, anychart.core.CartesianBase);
 
@@ -58,7 +56,7 @@ anychart.charts.Cartesian.prototype.seriesConfig = (function() {
     anchoredPositionBottom: anychart.opt.ZERO
   };
   res[anychart.enums.CartesianSeriesType.BAR] = {
-    drawerType: anychart.enums.SeriesDrawerTypes.BAR,
+    drawerType: anychart.enums.SeriesDrawerTypes.COLUMN,
     shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
     shapesConfig: [
       anychart.core.shapeManagers.pathFillStrokeConfig,
@@ -201,7 +199,7 @@ anychart.charts.Cartesian.prototype.seriesConfig = (function() {
     anchoredPositionBottom: anychart.opt.LOW
   };
   res[anychart.enums.CartesianSeriesType.RANGE_BAR] = {
-    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_BAR,
+    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_COLUMN,
     shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
     shapesConfig: [
       anychart.core.shapeManagers.pathFillStrokeConfig,
@@ -338,13 +336,15 @@ anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.charts.Cartesi
  * @example
  * var chart = anychart.cartesian();
  * chart.line([20, 7, 10, 14]);
- * @param {boolean=} opt_barChartMode If true, sets the chart to Bar Chart mode, swapping default chart elements
+ * @param {boolean=} opt_isVertical If true, sets the chart to Bar Chart mode, swapping default chart elements
  *    behaviour to horizontal-oriented (setting default layout to VERTICAL, swapping axes, etc).
  * @return {!anychart.charts.Cartesian} Empty chart.
  */
-anychart.cartesian = function(opt_barChartMode) {
-  var chart = new anychart.charts.Cartesian(opt_barChartMode);
+anychart.cartesian = function(opt_isVertical) {
+  var chart = new anychart.charts.Cartesian();
   chart.setupByVal(anychart.getFullTheme()['cartesian'], true);
+  if (goog.isDef(opt_isVertical))
+    chart.barChartMode = !!opt_isVertical;
   return chart;
 };
 anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN] = anychart.cartesian;
@@ -363,7 +363,7 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN] = anychart.cartesian
  * @example
  * var chart = anychart.cartesian();
  * chart.line([20, 7, 10, 14]);
- * @param {boolean=} opt_barChartMode If true, sets the chart to Bar Chart mode, swapping default chart elements
+ * @param {boolean=} opt_isVertical If true, sets the chart to Bar Chart mode, swapping default chart elements
  *    behaviour to horizontal-oriented (setting default layout to VERTICAL, swapping axes, etc).
  * @return {!anychart.core.CartesianBase} Empty chart.
  * @deprecated Use anychart.cartesian() instead.
@@ -406,6 +406,8 @@ anychart.charts.Cartesian.prototype['getSeries'] = anychart.charts.Cartesian.pro
 // anychart.charts.Cartesian.prototype['splineArea'] = anychart.charts.Cartesian.prototype.splineArea;
 // anychart.charts.Cartesian.prototype['stepLine'] = anychart.charts.Cartesian.prototype.stepLine;
 // anychart.charts.Cartesian.prototype['stepArea'] = anychart.charts.Cartesian.prototype.stepArea;
+// anychart.charts.Cartesian.prototype['stick'] = anychart.charts.Cartesian.prototype.stick;
+// anychart.charts.Cartesian.prototype['jumpLine'] = anychart.charts.Cartesian.prototype.jumpLine;
 anychart.charts.Cartesian.prototype['lineMarker'] = anychart.charts.Cartesian.prototype.lineMarker;
 anychart.charts.Cartesian.prototype['rangeMarker'] = anychart.charts.Cartesian.prototype.rangeMarker;
 anychart.charts.Cartesian.prototype['textMarker'] = anychart.charts.Cartesian.prototype.textMarker;

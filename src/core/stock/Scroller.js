@@ -1176,6 +1176,14 @@ anychart.core.stock.Scroller.prototype.getCurrentMinDistance = function() {
 anychart.core.stock.Scroller.prototype.grouping = function() {
   return /** @type {anychart.core.stock.Grouping} */(this.chart_.scrollerGrouping());
 };
+
+
+/**
+ * @return {boolean}
+ */
+anychart.core.stock.Scroller.prototype.isVertical = function() {
+  return false;
+};
 //endregion
 
 

@@ -64,7 +64,6 @@ anychart.core.drawers.Base.prototype.flags = (
     // anychart.core.drawers.Capabilities.IS_DISCRETE_BASED |
     // anychart.core.drawers.Capabilities.IS_WIDTH_BASED |
     // anychart.core.drawers.Capabilities.IS_3D_BASED |
-    // anychart.core.drawers.Capabilities.IS_BAR_BASED |
     // anychart.core.drawers.Capabilities.IS_MARKER_BASED |
     // anychart.core.drawers.Capabilities.IS_OHLC_BASED |
     // anychart.core.drawers.Capabilities.IS_LINE_BASED |
@@ -142,6 +141,11 @@ anychart.core.drawers.Base.prototype.startDrawing = function(shapeManager) {
    * @type {number}
    */
   this.pointWidth = this.series.pointWidthCache;
+  /**
+   * If the series has vertical X.
+   * @type {boolean}
+   */
+  this.isVertical = /** @type {boolean} */(this.series.getOption(anychart.opt.IS_VERTICAL));
   /**
    * If crisp edges should be applied if possible.
    * @type {boolean}

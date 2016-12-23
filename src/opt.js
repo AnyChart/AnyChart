@@ -2162,6 +2162,13 @@ anychart.opt.RESULT = 'result';
 
 
 /**
+ * Constant replacer for "isVertical" string.
+ * @const {string}
+ */
+anychart.opt.IS_VERTICAL = 'isVertical';
+
+
+/**
  * Constant replacer for "point" string.
  * @const {string}
  */

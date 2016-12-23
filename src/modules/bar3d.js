@@ -6,7 +6,7 @@
 goog.provide('anychart.modules.bar3d');
 
 goog.require('anychart.charts.Cartesian3d');
-goog.require('anychart.core.drawers.Bar3d');
+goog.require('anychart.core.drawers.Column3d');
 goog.require('anychart.modules.base');
 
 
@@ -20,7 +20,7 @@ goog.require('anychart.modules.base');
  * @return {anychart.charts.Cartesian3d} Chart with defaults for bar series.
  */
 anychart.bar3d = function(var_args) {
-  var chart = new anychart.charts.Cartesian3d(true);
+  var chart = new anychart.charts.Cartesian3d();
   var theme = anychart.getFullTheme();
 
   chart.defaultSeriesType(anychart.enums.Cartesian3dSeriesType.BAR);
