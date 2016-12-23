@@ -1431,6 +1431,7 @@ anychart.core.stock.Plot.prototype.ensureVisualReady_ = function() {
     this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.MOUSEOVER, this.handlePlotMouseOverAndMove_);
     this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.MOUSEMOVE, this.handlePlotMouseOverAndMove_);
     this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.MOUSEOUT, this.handlePlotMouseOut_);
+    this.eventsHandler.listen(this.eventsInterceptor_, acgraph.events.EventType.MOUSEDOWN, this.handlePlotMouseDown_);
   }
 };
 
@@ -1844,6 +1845,16 @@ anychart.core.stock.Plot.prototype.handlePlotMouseOut_ = function(e) {
   this.frameHighlightRatio_ = NaN;
   if (!goog.isDef(this.frame_))
     this.frame_ = window.requestAnimationFrame(this.frameAction_);
+};
+
+
+/**
+ * Handles mouseDown event on the series plot area.
+ * @param {acgraph.events.BrowserEvent} e
+ * @private
+ */
+anychart.core.stock.Plot.prototype.handlePlotMouseDown_ = function(e) {
+  this.annotations().unselect();
 };
 //endregion
 
