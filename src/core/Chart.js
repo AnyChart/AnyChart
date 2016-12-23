@@ -1758,7 +1758,7 @@ anychart.core.Chart.prototype.makeCurrentPoint = function(seriesStatus, event, o
     var status = seriesStatus[i];
     if (status.nearestPointToCursor) {
       var nearestPoint = status.nearestPointToCursor;
-      if (minDistance > nearestPoint.distance) {
+      if (minDistance > nearestPoint.distance || !series) {
         series = status.series;
         pointIndex = nearestPoint.index;
         pointStatus = goog.array.contains(status.points, nearestPoint.index);
