@@ -16,3 +16,4 @@ modules.edn
 cat.config
 update-submodules
 tests
+src
