@@ -1,0 +1,969 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://www.anychart.com/anychart"
+        xmlns="http://www.anychart.com/anychart"
+        elementFormDefault="qualified">
+
+    <xsd:annotation>
+        <xsd:documentation xml:lang="ru">
+            FIX: Description here.
+        </xsd:documentation>
+    </xsd:annotation>
+
+    <!-- ================================= SIMPLE TYPES, COMPLEX TYPES, ATTRIBUTES ================================= -->
+
+    <!-- ATTRIBUTE GROUPS (class properties) -->
+
+    <xsd:attributeGroup name="BaseAttributes">
+        <xsd:attribute name="enabled" type="xsd:boolean"/>
+        <xsd:attribute name="z_index" type="xsd:integer"/>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="TextAttributes">
+        <xsd:attribute name="font_size" type="xsd:string"/>
+        <xsd:attribute name="font_family" type="xsd:string"/>
+        <xsd:attribute name="font_color" type="xsd:string"/>
+        <xsd:attribute name="font_opacity" type="xsd:string"/>
+        <xsd:attribute name="font_decoration" type="xsd:string"/>
+        <xsd:attribute name="font_style" type="xsd:string"/>
+        <xsd:attribute name="font_variant" type="xsd:string"/>
+        <xsd:attribute name="font_weight" type="xsd:string"/>
+        <xsd:attribute name="letter_spacing" type="xsd:string"/>
+        <xsd:attribute name="direction" type="xsd:string"/>
+        <xsd:attribute name="line_height" type="xsd:string"/>
+        <xsd:attribute name="text_indent" type="xsd:string"/>
+        <xsd:attribute name="v_align" type="xsd:string"/>
+        <xsd:attribute name="h_align" type="xsd:string"/>
+        <xsd:attribute name="text_wrap" type="xsd:string"/>
+        <xsd:attribute name="text_overflow" type="xsd:string"/>
+        <xsd:attribute name="selectable" type="xsd:string"/>
+        <xsd:attribute name="use_html" type="xsd:string"/>
+        <xsd:attribute name="text" type="xsd:string"/>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="StringFillStroke">
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+    </xsd:attributeGroup>
+
+    <!-- Attributes presented in all BASE series classes -->
+    <xsd:attributeGroup name="BaseSeriesAttributes">
+        <!-- Base -->
+        <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="series_type" type="SeriesType" default="line"/>
+        <xsd:attribute name="color" type="xsd:string"/>
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="hover_fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="hover_stroke" type="xsd:string"/>
+        <!-- ContinuousBase -->
+        <xsd:attribute name="connect_missing" type="xsd:boolean"/>
+        <!-- ContinuousRangeBase -->
+        <xsd:attribute name="high_stroke" type="xsd:string"/>
+        <xsd:attribute name="hover_high_stroke" type="xsd:string"/>
+        <xsd:attribute name="low_stroke" type="xsd:string"/>
+        <xsd:attribute name="hover_low_stroke" type="xsd:string"/>
+        <!-- WidthBased -->
+        <xsd:attribute name="point_width" type="xsd:string" />
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="BubbleSeriesAttributes">
+        <xsd:attribute name="minimum_size" type="xsd:string"/>
+        <xsd:attribute name="maximum_size" type="xsd:string"/>
+        <xsd:attribute name="display_negative" type="xsd:boolean"/>
+        <xsd:attribute name="negative_fill" type="xsd:string"/>
+        <xsd:attribute name="hover_negative_fill" type="xsd:string"/>
+        <xsd:attribute name="negative_stroke" type="xsd:string"/>
+        <xsd:attribute name="hover_negative_stroke" type="xsd:string"/>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="CandlestickSeriesAttributes">
+        <xsd:attribute name="rising_fill" type="xsd:string"/>
+        <xsd:attribute name="hover_rising_fill" type="xsd:string"/>
+        <xsd:attribute name="falling_fill" type="xsd:string"/>
+        <xsd:attribute name="hover_falling_fill" type="xsd:string"/>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="MarkerSeriesAttributes">
+        <xsd:attribute name="type" type="xsd:string"/>
+        <xsd:attribute name="hover_type" type="xsd:string"/>
+        <xsd:attribute name="size" type="xsd:float"/>
+        <xsd:attribute name="hover_size" type="xsd:float"/>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="OHLCSeriesAttributes">
+        <xsd:attribute name="rising_stroke" type="xsd:string"/>
+        <xsd:attribute name="hover_rising_stroke" type="xsd:string"/>
+        <xsd:attribute name="falling_stroke" type="xsd:string"/>
+        <xsd:attribute name="hover_falling_stroke" type="xsd:string"/>
+    </xsd:attributeGroup>
+
+    <!-- SIMPLE TYPES -->
+    <xsd:simpleType name="Ratio">
+        <xsd:restriction base="xsd:float">
+            <xsd:minInclusive value="0"/>
+            <xsd:maxInclusive value="1"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <!-- ENUMERATIONS -->
+    <xsd:simpleType name="SeriesType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="area"/>
+            <xsd:enumeration value="bar"/>
+            <xsd:enumeration value="bubble"/>
+            <xsd:enumeration value="candlestick"/>
+            <xsd:enumeration value="column"/>
+            <xsd:enumeration value="line"/>
+            <xsd:enumeration value="marker"/>
+            <xsd:enumeration value="ohlc"/>
+            <xsd:enumeration value="rangeArea"/>
+            <xsd:enumeration value="rangeBar"/>
+            <xsd:enumeration value="rangeColumn"/>
+            <xsd:enumeration value="rangeSplineArea"/>
+            <xsd:enumeration value="rangeStepArea"/>
+            <xsd:enumeration value="spline"/>
+            <xsd:enumeration value="splineArea"/>
+            <xsd:enumeration value="stepLine"/>
+            <xsd:enumeration value="stepArea"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="Align">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="center"/>
+            <xsd:enumeration value="left"/>
+            <xsd:enumeration value="right"/>
+            <xsd:enumeration value="top"/>
+            <xsd:enumeration value="bottom"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="Orientation">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="left"/>
+            <xsd:enumeration value="right"/>
+            <xsd:enumeration value="top"/>
+            <xsd:enumeration value="bottom"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="Direction">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="vertical"/>
+            <xsd:enumeration value="horizontal"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="NinePositions">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="lefttop"/>
+            <xsd:enumeration value="top"/>
+            <xsd:enumeration value="righttop"/>
+            <xsd:enumeration value="leftcenter"/>
+            <xsd:enumeration value="center"/>
+            <xsd:enumeration value="rightcenter"/>
+            <xsd:enumeration value="leftbottom"/>
+            <xsd:enumeration value="bottom"/>
+            <xsd:enumeration value="rightbottom"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="Sort">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="asc"/>
+            <xsd:enumeration value="desc"/>
+            <xsd:enumeration value="none"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <!-- COMPLEX TYPES -->
+    <xsd:complexType name="RectangleBounds">
+        <xsd:all>
+            <xsd:element minOccurs="0" type="xsd:string" name="left"/>
+            <xsd:element minOccurs="0" type="xsd:string" name="top"/>
+            <xsd:element minOccurs="0" type="xsd:string" name="width"/>
+            <xsd:element minOccurs="0" type="xsd:string" name="height"/>
+        </xsd:all>
+        <xsd:attribute name="left" type="xsd:string"/>
+        <xsd:attribute name="top" type="xsd:string"/>
+        <xsd:attribute name="width" type="xsd:string"/>
+        <xsd:attribute name="height" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Bounds">
+        <xsd:all>
+            <xsd:element minOccurs="0" type="xsd:string" name="left"/>
+            <xsd:element minOccurs="0" type="xsd:string" name="top"/>
+            <xsd:element minOccurs="0" type="xsd:string" name="width"/>
+            <xsd:element minOccurs="0" type="xsd:string" name="height"/>
+            <xsd:element minOccurs="0" type="xsd:string" name="right"/>
+            <xsd:element minOccurs="0" type="xsd:string" name="bottom"/>
+        </xsd:all>
+        <xsd:attribute type="xsd:string" name="left"/>
+        <xsd:attribute type="xsd:string" name="top"/>
+        <xsd:attribute type="xsd:string" name="width"/>
+        <xsd:attribute type="xsd:string" name="height"/>
+        <xsd:attribute type="xsd:string" name="right"/>
+        <xsd:attribute type="xsd:string" name="bottom"/>
+    </xsd:complexType>
+
+    <!-- GRADIENT -->
+    <xsd:complexType name="GradientKey">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="color" type="xsd:string"/>
+                <xsd:attribute name="opacity" type="Ratio"/>
+                <xsd:attribute name="offset" type="Ratio"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="Fill">
+        <xsd:sequence>
+            <xsd:element name="mode" minOccurs="0" type="RectangleBounds"/>
+            <xsd:element name="bounds" minOccurs="0" type="RectangleBounds"/> <!-- for pattern fill -->
+            <xsd:element name="key" minOccurs="0" maxOccurs="unbounded" type="GradientKey"/>
+        </xsd:sequence>
+        <xsd:attribute name="type" type="xsd:string"/>
+        <xsd:attribute name="color" type="xsd:string"/>
+        <xsd:attribute name="opacity" type="Ratio"/>
+        <xsd:attribute name="angle" type="xsd:float"/>
+        <xsd:attribute name="cx" type="xsd:float"/>
+        <xsd:attribute name="cy" type="xsd:float"/>
+        <xsd:attribute name="fx" type="xsd:float"/>
+        <xsd:attribute name="fy" type="xsd:float"/>
+        <xsd:attribute name="src" type="xsd:string"/>
+        <xsd:attribute name="mode" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Stroke">
+        <xsd:sequence>
+            <xsd:element name="mode" minOccurs="0" type="RectangleBounds"/>
+            <xsd:element name="key" minOccurs="0" maxOccurs="unbounded" type="GradientKey"/>
+        </xsd:sequence>
+        <xsd:attribute name="color" type="xsd:string"/>
+        <xsd:attribute name="opacity" type="Ratio"/>
+        <xsd:attribute name="thickness" type="xsd:float"/>
+        <xsd:attribute name="dash" type="xsd:string"/>
+        <xsd:attribute name="line_join" type="xsd:string"/>
+        <xsd:attribute name="line_cap" type="xsd:string"/>
+        <xsd:attribute name="angle" type="xsd:float"/>
+        <xsd:attribute name="cx" type="xsd:float"/>
+        <xsd:attribute name="cy" type="xsd:float"/>
+        <xsd:attribute name="fx" type="xsd:float"/>
+        <xsd:attribute name="fy" type="xsd:float"/>
+    </xsd:complexType>
+
+    <!-- END GRADIENT -->
+
+    <xsd:complexType name="Space">
+        <xsd:attribute name="top" type="xsd:string"/>
+        <xsd:attribute name="right" type="xsd:string"/>
+        <xsd:attribute name="bottom" type="xsd:string"/>
+        <xsd:attribute name="left" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Base">
+        <xsd:attributeGroup ref="BaseAttributes"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="BaseWithBounds">
+        <xsd:complexContent>
+            <xsd:extension base="Base"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="Background">
+        <xsd:complexContent>
+            <xsd:extension base="Base">
+                <xsd:sequence>
+                    <xsd:element name="fill" minOccurs="0" type="Fill"/>
+                    <xsd:element name="stroke" minOccurs="0" type="Stroke"/>
+                </xsd:sequence>
+                <!-- background specific properties -->
+                <xsd:attribute name="corner_type" default="round">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                            <xsd:enumeration value="round"/>
+                            <xsd:enumeration value="cut"/>
+                            <xsd:enumeration value="roundInner"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <!-- case of string fill and stroke -->
+                <xsd:attributeGroup ref="StringFillStroke"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="Text">
+        <xsd:complexContent>
+            <xsd:extension base="Base">
+                <xsd:attributeGroup ref="TextAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="Title">
+        <xsd:complexContent>
+            <xsd:extension base="Text">
+                <xsd:all>
+                    <xsd:element minOccurs="0" name="padding" type="Space"/>
+                    <xsd:element minOccurs="0" name="margin" type="Space"/>
+                    <xsd:element minOccurs="0" name="background" type="Background"/>
+                </xsd:all>
+                <xsd:attribute name="width" type="xsd:string"/>
+                <xsd:attribute name="height" type="xsd:string"/>
+                <xsd:attribute name="align" type="Align"/>
+                <xsd:attribute name="orientation" type="Orientation"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="Ticks">
+        <xsd:all>
+            <xsd:element minOccurs="0" name="stroke" type="Stroke"/>
+        </xsd:all>
+        <xsd:attribute name="length" type="xsd:float"/>
+        <xsd:attribute name="position">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="inside"/>
+                    <xsd:enumeration value="outside"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="enabled" type="xsd:boolean"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="LabelsFactory">
+        <xsd:complexContent>
+            <xsd:extension base="Text">
+                <xsd:all>
+                    <xsd:element minOccurs="0" name="padding" type="Space"/>
+                    <xsd:element minOccurs="0" name="background" type="Background"/>
+                </xsd:all>
+                <xsd:attribute name="width" type="xsd:string"/>
+                <xsd:attribute name="height" type="xsd:string"/>
+                <xsd:attribute name="rotation" type="xsd:float"/>
+                <xsd:attribute name="position" type="NinePositions"/>
+                <xsd:attribute name="anchor" type="NinePositions"/>
+                <xsd:attribute name="offsetX" type="xsd:string"/>
+                <xsd:attribute name="offsetY" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="Axis">
+        <xsd:complexContent>
+            <xsd:extension base="Base">
+                <xsd:all>
+                    <xsd:element minOccurs="0" name="stroke" type="Stroke"/>
+                    <xsd:element minOccurs="0" name="title" type="Title"/>
+                    <xsd:element minOccurs="0" name="labels" type="LabelsFactory"/>
+                    <xsd:element minOccurs="0" name="minor_labels" type="LabelsFactory"/>
+                    <xsd:element minOccurs="0" name="ticks" type="Ticks"/>
+                    <xsd:element minOccurs="0" name="minor_ticks" type="Ticks"/>
+                    <xsd:element minOccurs="0" name="parent_bounds" type="RectangleBounds"/>
+                </xsd:all>
+
+                <xsd:attribute name="stroke" type="xsd:string"/>
+                <xsd:attribute name="name" type="xsd:string"/>
+                <xsd:attribute name="length" type="xsd:float"/>
+                <xsd:attribute name="offset_x" type="xsd:float"/>
+                <xsd:attribute name="offset_y" type="xsd:float"/>
+                <xsd:attribute name="orientation" type="Orientation"/>
+                <xsd:attribute name="draw_first_label" type="xsd:boolean"/>
+                <xsd:attribute name="draw_last_label" type="xsd:boolean"/>
+                <xsd:attribute name="overlap_mode">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                            <xsd:enumeration value="overlap"/>
+                            <xsd:enumeration value="nooverlap"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="Button">
+        <xsd:complexContent>
+            <xsd:extension base="Text">
+                <xsd:all>
+                    <xsd:element minOccurs="0" name="padding" type="Space"/>
+                    <xsd:element minOccurs="0" name="position">
+                        <xsd:complexType>
+                            <xsd:attribute use="required" name="x" type="xsd:string"/>
+                            <xsd:attribute use="required" name="y" type="xsd:string"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <!--  TODO: DECIDE WHAT TO DO WITH STATE SETTINGS!! -->
+                </xsd:all>
+                <xsd:attribute name="width" type="xsd:string"/>
+                <xsd:attribute name="height" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="Grid">
+        <xsd:complexContent>
+            <xsd:extension base="Base">
+                <xsd:all>
+                    <xsd:element minOccurs="0" name="stroke" type="Stroke"/>
+                    <xsd:element minOccurs="0" name="parent_bounds" type="RectangleBounds"/>
+                    <xsd:element minOccurs="0" name="odd_fill" type="Fill"/>
+                    <xsd:element minOccurs="0" name="even_fill" type="Fill"/>
+                </xsd:all>
+                <xsd:attribute name="stroke" type="xsd:string"/>
+                <xsd:attribute name="direction" type="Direction"/>
+                <xsd:attribute name="draw_first_line" type="xsd:boolean"/>
+                <xsd:attribute name="draw_last_line" type="xsd:boolean"/>
+                <xsd:attribute name="minor" type="xsd:boolean"/>
+                <xsd:attribute name="invert" type="xsd:boolean"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="Label">
+        <xsd:complexContent>
+            <xsd:extension base="Text">
+                <xsd:all>
+                    <xsd:element minOccurs="0" name="padding" type="Space"/>
+                    <xsd:element minOccurs="0" name="background" type="Background"/>
+                    <xsd:element minOccurs="0" name="parent_bounds" type="RectangleBounds"/>
+                </xsd:all>
+                <xsd:attribute name="width" type="xsd:string"/>
+                <xsd:attribute name="height" type="xsd:string"/>
+                <xsd:attribute name="rotation" type="xsd:float"/>
+                <xsd:attribute name="position" type="NinePositions"/>
+                <xsd:attribute name="anchor" type="NinePositions"/>
+                <xsd:attribute name="offset_x" type="xsd:string"/>
+                <xsd:attribute name="offset_y" type="xsd:string"/>
+                <xsd:attribute name="min_font_size" type="xsd:positiveInteger"/>
+                <xsd:attribute name="max_font_size" type="xsd:positiveInteger"/>
+                <xsd:attribute name="adjust_font_size">
+                    <xsd:simpleType>
+                        <xsd:restriction>
+                            <xsd:simpleType>
+                                <xsd:list itemType="xsd:boolean"/>
+                            </xsd:simpleType>
+                            <xsd:minLength value="1"/>
+                            <xsd:maxLength value="2"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="LineMarker">
+        <xsd:complexContent>
+            <xsd:extension base="Base">
+                <xsd:all>
+                    <xsd:element minOccurs="0" name="parent_bounds" type="RectangleBounds"/>
+                    <xsd:element minOccurs="0" name="stroke" type="Stroke"/>
+                </xsd:all>
+                <xsd:attribute name="direction" type="Direction"/>
+                <xsd:attribute name="value" type="xsd:float"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="Marker">
+        <xsd:complexContent>
+            <xsd:extension base="Base">
+                <xsd:all>
+                    <xsd:element minOccurs="0" name="fill" type="Fill"/>
+                    <xsd:element minOccurs="0" name="stroke" type="Stroke"/>
+                    <xsd:element minOccurs="0" name="parent_bounds" type="RectangleBounds"/>
+                    <xsd:element minOccurs="0" name="position">
+                        <xsd:complexType>
+                            <xsd:attribute name="x" type="xsd:string"/>
+                            <xsd:attribute name="y" type="xsd:string"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:all>
+                <xsd:attribute name="anchor" type="NinePositions"/>
+                <xsd:attribute name="offset_x" type="xsd:float"/>
+                <xsd:attribute name="offset_y" type="xsd:float"/>
+                <xsd:attribute name="size" type="xsd:float"/>
+                <xsd:attribute name="fill" type="xsd:string"/>
+                <xsd:attribute name="stroke" type="xsd:string"/>
+                <xsd:attribute name="type">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                            <xsd:enumeration value="star4"/>
+                            <xsd:enumeration value="star5"/>
+                            <xsd:enumeration value="star6"/>
+                            <xsd:enumeration value="star7"/>
+                            <xsd:enumeration value="star10"/>
+                            <xsd:enumeration value="triangleup"/>
+                            <xsd:enumeration value="triangledown"/>
+                            <xsd:enumeration value="cross"/>
+                            <xsd:enumeration value="diamond"/>
+                            <xsd:enumeration value="diagonalcross"/>
+                            <xsd:enumeration value="circle"/>
+                            <xsd:enumeration value="square"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="MultiMarker">
+        <xsd:complexContent>
+            <xsd:extension base="Base">
+                <xsd:all>
+                    <xsd:element minOccurs="0" name="fill" type="Fill"/>
+                    <xsd:element minOccurs="0" name="stroke" type="Stroke"/>
+                    <xsd:element minOccurs="0" name="parent_bounds" type="RectangleBounds"/>
+                </xsd:all>
+                <xsd:attribute name="size" type="xsd:float"/>
+                <xsd:attribute name="fill" type="xsd:string"/>
+                <xsd:attribute name="stroke" type="xsd:string"/>
+                <xsd:attribute name="anchor" type="NinePositions"/>
+                <xsd:attribute name="position" type="NinePositions"/>
+                <xsd:attribute name="offset_x" type="xsd:float"/>
+                <xsd:attribute name="offset_y" type="xsd:float"/>
+                <xsd:attribute name="type">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                            <xsd:enumeration value="star4"/>
+                            <xsd:enumeration value="star5"/>
+                            <xsd:enumeration value="star6"/>
+                            <xsd:enumeration value="star7"/>
+                            <xsd:enumeration value="star10"/>
+                            <xsd:enumeration value="triangleup"/>
+                            <xsd:enumeration value="triangledown"/>
+                            <xsd:enumeration value="cross"/>
+                            <xsd:enumeration value="diamond"/>
+                            <xsd:enumeration value="diagonalcross"/>
+                            <xsd:enumeration value="circle"/>
+                            <xsd:enumeration value="square"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="Paginator">
+        <xsd:complexContent>
+            <xsd:extension base="Text">
+                <xsd:all>
+                    <xsd:element minOccurs="0" maxOccurs="1" name="margin" type="Space"/>
+                    <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="Space"/>
+                    <xsd:element minOccurs="0" maxOccurs="1" name="background" type="Background"/>
+                </xsd:all>
+                <xsd:attribute name="orientation" type="Orientation"/>
+                <xsd:attribute name="layout" type="Direction"/>
+                <xsd:attribute name="page_count" type="xsd:nonNegativeInteger"/>
+                <xsd:attribute name="current_page" type="xsd:nonNegativeInteger"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="RangeMarker">
+        <xsd:complexContent>
+            <xsd:extension base="Base">
+                <xsd:all>
+                    <xsd:element minOccurs="0" name="fill" type="Fill"/>
+                    <xsd:element minOccurs="0" name="parent_bounds" type="RectangleBounds"/>
+                </xsd:all>
+                <xsd:attribute name="direction" type="Direction"/>
+                <xsd:attribute name="from" type="xsd:float"/>
+                <xsd:attribute name="to" type="xsd:float"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="Separator">
+        <xsd:complexContent>
+            <xsd:extension base="Base">
+                <xsd:all>
+                    <xsd:element minOccurs="0" name="fill" type="Fill"/>
+                    <xsd:element minOccurs="0" name="stroke" type="Stroke"/>
+                    <xsd:element minOccurs="0" name="margin" type="Space"/>
+                    <xsd:element minOccurs="0" name="parent_bounds" type="RectangleBounds"/>
+                </xsd:all>
+                <xsd:attribute name="width" type="xsd:string"/>
+                <xsd:attribute name="height" type="xsd:string"/>
+                <xsd:attribute name="orientation" type="Orientation"/>
+                <xsd:attribute name="fill" type="xsd:string"/>
+                <xsd:attribute name="stroke" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="Legend">
+        <xsd:complexContent>
+            <xsd:extension base="Text">
+                <xsd:all>
+                    <xsd:element minOccurs="0" name="margin" type="Space"/>
+                    <xsd:element minOccurs="0" name="padding" type="Space"/>
+                    <xsd:element minOccurs="0" name="background" type="Background"/>
+                    <xsd:element minOccurs="0" name="title" type="Title"/>
+                    <xsd:element minOccurs="0" name="title_separator" type="Separator"/>
+                    <xsd:element minOccurs="0" name="paginator" type="Paginator"/>
+                    <xsd:element minOccurs="0" maxOccurs="1" name="items">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element minOccurs="0" maxOccurs="unbounded" name="item"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:all>
+                <xsd:attribute name="position" type="Orientation"/>
+                <xsd:attribute name="align">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                            <xsd:enumeration value="left"/>
+                            <xsd:enumeration value="center"/>
+                            <xsd:enumeration value="right"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="items_spacing" type="xsd:nonNegativeInteger"/>
+                <xsd:attribute name="icon_text_spacing" type="xsd:nonNegativeInteger"/>
+                <xsd:attribute name="width" type="xsd:string"/>
+                <xsd:attribute name="height" type="xsd:string"/>
+                <xsd:attribute name="items_layout">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                            <xsd:enumeration value="vertical"/>
+                            <xsd:enumeration value="horizontal"/>
+                            <!-- only in advanced legend  <xsd:enumeration value="table"/> -->
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="TextMarker">
+        <xsd:complexContent>
+            <xsd:extension base="Text">
+                <xsd:all>
+                    <xsd:element minOccurs="0" name="parent_bounds" type="RectangleBounds"/>
+                </xsd:all>
+                <xsd:attribute name="orientation" type="Orientation"/>
+                <xsd:attribute name="anchor" type="NinePositions"/>
+                <xsd:attribute name="value" type="xsd:float"/>
+                <xsd:attribute name="offset_x" type="xsd:string"/>
+                <xsd:attribute name="offset_y" type="xsd:string"/>
+                <xsd:attribute name="width" type="xsd:string"/>
+                <xsd:attribute name="height" type="xsd:string"/>
+                <xsd:attribute name="align">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                            <xsd:enumeration value="near"/>
+                            <xsd:enumeration value="center"/>
+                            <xsd:enumeration value="far"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="TooltipItem">
+        <xsd:complexContent>
+            <xsd:extension base="Base">
+                <xsd:all>
+                    <xsd:element minOccurs="0" name="title" type="Title"/>
+                    <xsd:element minOccurs="0" name="separator" type="Separator"/>
+                    <xsd:element minOccurs="0" name="label" type="Label"/>
+                    <xsd:element minOccurs="0" name="background" type="Background"/>
+                    <xsd:element minOccurs="0" name="padding" type="Space"/>
+                </xsd:all>
+                <xsd:attribute name="x" type="xsd:float"/>
+                <xsd:attribute name="y" type="xsd:float"/>
+                <xsd:attribute name="anchor" type="NinePositions"/>
+                <xsd:attribute name="visible" type="xsd:boolean"/>
+                <xsd:attribute name="hide_delay" type="xsd:float"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="Tooltip">
+        <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="1" name="tooltip_item" type="TooltipItem"/>
+        </xsd:sequence>
+        <xsd:attribute name="allow_leave_screen" type="xsd:boolean"/>
+        <xsd:attribute name="is_floating" type="xsd:boolean"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Palette">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="unbounded" name="color" type="xsd:string"/>
+        </xsd:sequence>
+        <xsd:attribute use="optional" name="type" default="distinct">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="distinct"/>
+                    <xsd:enumeration value="range"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute use="optional" name="count" type="xsd:nonNegativeInteger"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Data">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="unbounded" name="point" type="xsd:anyType"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="Series">
+        <xsd:all>
+            <xsd:element minOccurs="0" name="color" type="Fill"/>
+            <xsd:element minOccurs="0" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" name="hover_fill" type="Fill"/>
+            <xsd:element minOccurs="0" name="stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" name="hover_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" name="tooltip" type="Tooltip"/>
+            <xsd:element minOccurs="0" name="data" type="Data"/>
+            <xsd:element minOccurs="0" name="bounds" type="Bounds"/>
+            <xsd:element minOccurs="0" name="labels" type="LabelsFactory" />
+
+            <!-- BaseWithMarkers -->
+            <xsd:element minOccurs="0" name="markers" type="MultiMarker"/>
+            <xsd:element minOccurs="0" name="multi_markers" type="MultiMarker"/>
+
+            <!-- BubbleSeries -->
+            <xsd:element minOccurs="0" name="negative_fill" type="Fill"/>
+            <xsd:element minOccurs="0" name="negative_hover_fill" type="Fill"/>
+            <xsd:element minOccurs="0" name="negative_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" name="negative_hover_stroke" type="Stroke"/>
+
+            <!-- CandlestickSeries -->
+            <xsd:element minOccurs="0" name="rising_fill" type="Fill"/>
+            <xsd:element minOccurs="0" name="hover_rising_fill" type="Fill"/>
+            <xsd:element minOccurs="0" name="falling_fill" type="Fill"/>
+            <xsd:element minOccurs="0" name="hover_falling_fill" type="Fill"/>
+
+            <!-- ContinuousRangeBase -->
+            <xsd:element minOccurs="0" name="high_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" name="hover_high_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" name="low_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" name="hover_low_stroke" type="Stroke"/>
+
+            <!-- OHLCSeries -->
+            <xsd:element minOccurs="0" name="rising_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" name="hover_rising_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" name="falling_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" name="hover_falling_stroke" type="Stroke"/>
+        </xsd:all>
+        <xsd:attributeGroup ref="BaseSeriesAttributes"/>
+        <xsd:attributeGroup ref="BubbleSeriesAttributes"/>
+        <xsd:attributeGroup ref="CandlestickSeriesAttributes"/>
+        <xsd:attributeGroup ref="MarkerSeriesAttributes"/>
+        <xsd:attributeGroup ref="OHLCSeriesAttributes"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="ScaleTicks">
+        <xsd:all>
+            <xsd:element name="explicit" type="ScaleTicks" />
+        </xsd:all>
+        <xsd:attribute name="mode">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="linear"/>
+                    <xsd:enumeration value="logarithmic"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="base" type="xsd:float"/>
+        <xsd:attribute name="count" type="xsd:nonNegativeInteger"/>
+        <xsd:attribute name="interval" type="xsd:nonNegativeInteger"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Scale">
+        <xsd:all>
+            <!-- Linear -->
+            <xsd:element minOccurs="0" name="ticks" type="ScaleTicks" />
+            <xsd:element minOccurs="0" name="minor_ticks" type="ScaleTicks" />
+
+            <!-- Ordinal -->
+            <xsd:element minOccurs="0" name="values" type="xsd:string"/>
+        </xsd:all>
+        <xsd:attribute name="type">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="linear"/>
+                    <xsd:enumeration value="logarithmic"/>
+                    <xsd:enumeration value="ordinal"/>
+                    <xsd:enumeration value="datetime"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <!-- Base  -->
+        <xsd:attribute name="inverted" type="xsd:boolean" />
+        <xsd:attribute name="stack_mode">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="none"/>
+                    <xsd:enumeration value="value"/>
+                    <xsd:enumeration value="percent"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <!-- ScatterBase -->
+        <xsd:attribute name="minimum" type="xsd:float"/>
+        <xsd:attribute name="maximum" type="xsd:float"/>
+        <xsd:attribute name="minimum_gap" type="xsd:float"/>
+        <xsd:attribute name="maximum_gap" type="xsd:float"/>
+        <!-- Linear -->
+    </xsd:complexType>
+
+    <xsd:complexType name="Chart">
+        <xsd:all>
+            <xsd:element minOccurs="0" name="margin" type="Space"/>
+            <xsd:element minOccurs="0" name="padding" type="Space"/>
+            <xsd:element minOccurs="0" name="background" type="Background"/>
+            <xsd:element minOccurs="0" name="title" type="Title"/>
+            <xsd:element minOccurs="0" name="legend" type="Legend"/>
+
+            <!-- PIE SPECIFIC ELEMENTS -->
+            <xsd:element minOccurs="0" name="palette" type="Palette"/>
+            <xsd:element minOccurs="0" name="fill" type="Fill"/>
+            <xsd:element minOccurs="0" name="hover_fill" type="Fill"/>
+            <xsd:element minOccurs="0" name="stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" name="hover_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" name="labels" type="LabelsFactory"/>
+            <xsd:element minOccurs="0" name="data" type="Data"/>
+            <!-- PIE SPECIFIC ELEMENTS END-->
+
+            <!-- CARTESIAN SPECIFIC ELEMENTS -->
+            <xsd:element minOccurs="0" name="grids">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" maxOccurs="unbounded" name="grid" type="Grid"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element minOccurs="0" name="minor_grids">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" maxOccurs="unbounded" name="grid" type="Grid"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element minOccurs="0" name="x_axes">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" maxOccurs="unbounded" name="axis" type="Axis"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element minOccurs="0" name="y_axes">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" maxOccurs="unbounded" name="axis" type="Axis"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element minOccurs="0" name="line_axes_markers">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" maxOccurs="unbounded" name="line_marker" type="LineMarker"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element minOccurs="0" name="range_axes_markers">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" maxOccurs="unbounded" name="range_marker" type="RangeMarker"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element minOccurs="0" name="text_axes_markers">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" maxOccurs="unbounded" name="text_marker" type="TextMarker"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element minOccurs="0" name="series_list">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" maxOccurs="unbounded" name="series" type="Series"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <!-- CARTESIAN SPECIFIC ELEMENTS END-->
+            <xsd:element minOccurs="0" name="scales">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" maxOccurs="unbounded" name="scale" type="Scale" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:all>
+
+        <!-- CARTESIAN SPECIFIX ATTRIBUTES -->
+        <xsd:attribute name="bar_groups_padding" type="xsd:string"/>
+        <xsd:attribute name="bars_padding" type="xsd:string"/>
+        <!-- CARTESIAN SPECIFIX ATTRIBUTES END -->
+
+        <!-- PIE SPECIFIX ATTRIBUTES -->
+        <xsd:attribute name="other_point_type">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="drop"/>
+                    <xsd:enumeration value="group"/>
+                    <xsd:enumeration value="none"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="start_angle" type="xsd:string"/>
+        <xsd:attribute name="radius" type="xsd:string"/>
+        <xsd:attribute name="inner_radius" type="xsd:string"/>
+        <xsd:attribute name="explode" type="xsd:string"/>
+        <xsd:attribute name="sort" type="Sort"/>
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="hover_fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="hover_stroke" type="xsd:string"/>
+        <!-- PIE SPECIFIC ATTRIBUTES END-->
+
+        <xsd:attributeGroup ref="BaseAttributes"/>
+        <xsd:attribute use="required" name="type">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="pie"/>
+                    <xsd:enumeration value="cartesian"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="auto_resize" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="Root">
+        <xsd:all>
+            <!-- we can specify here our elements that can be xmlized-->
+            <xsd:element minOccurs="0" name="chart" type="Chart"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <!--
+
+    http://www.utilities-online.info/xsdvalidation/
+    for validation XSD 1.0 and XML-XSD validation
+
+    -->
+    <!-- root element -->
+    <xsd:element name="xml" type="Root"/>
+</xsd:schema>
