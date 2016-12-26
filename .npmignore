@@ -16,3 +16,7 @@ cat.config
 update-submodules
 externs.js
 tests
+src
+css
+proj4.js
+.travis.yml
