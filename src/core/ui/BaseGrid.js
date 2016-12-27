@@ -1551,6 +1551,7 @@ anychart.core.ui.BaseGrid.prototype.dragEndHandler_ = function(e) {
   }
   this.scrollDragger.reset();
   this.dragging = false;
+  this.interactive = true;
   clearInterval(this.scrollInterval);
   this.scrollInterval = null;
 };
