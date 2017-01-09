@@ -42,7 +42,7 @@ goog.require('goog.json.hybrid');
  * @namespace
  * @name anychart.graphics
  */
-anychart.graphics = window['acgraph'];
+anychart.graphics = goog.global['acgraph'];
 
 
 /**
@@ -81,7 +81,7 @@ acgraph.vector.Stage.prototype['credits'] = acgraph.vector.Stage.prototype.credi
  @param {string=} opt_address Export server script URL.
  @return {string} Export server script URL.
  */
-anychart.server = window['acgraph']['server'];
+anychart.server = goog.global['acgraph']['server'];
 
 
 //----------------------------------------------------------------------------------------------------------------------

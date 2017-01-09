@@ -155,10 +155,17 @@ anychart.core.utils.TooltipsContainer.prototype.selectable = function(opt_value)
 anychart.core.utils.TooltipsContainer.prototype.disposeInternal = function() {
   //todo this method is never called
 
+  if (this.vsm_) {
+    goog.dispose(this.vsm_);
+    this.vsm_ = null;
+  }
+
   if (goog.isDef(this.bufferedVsm_)) {
     goog.events.unlisten(this.bufferedVsm_, goog.events.EventType.RESIZE, this.updateStageSize_, false, this);
+    goog.dispose(this.bufferedVsm_);
+    this.bufferedVsm_ = null;
   }
-  this.stage_.dispose();
+  goog.dispose(this.stage_);
   this.stage_ = null;
   goog.dom.removeNode(this.root_);
   this.root_ = null;

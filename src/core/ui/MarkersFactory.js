@@ -830,6 +830,17 @@ anychart.core.ui.MarkersFactory.prototype.setupByJSON = function(config, opt_def
 
 
 /** @inheritDoc */
+anychart.core.ui.MarkersFactory.prototype.disposeInternal = function() {
+  goog.disposeAll(this.markers_, this.freeToUseMarkersPool_, this.layer_);
+
+  this.markers_ = null;
+  this.freeToUseMarkersPool_ = null;
+
+  goog.base(this, 'disposeInternal');
+};
+
+
+/** @inheritDoc */
 anychart.core.ui.MarkersFactory.prototype.makeBrowserEvent = function(e) {
   var res = goog.base(this, 'makeBrowserEvent', e);
   var target = res['domTarget'];

@@ -2899,6 +2899,10 @@ anychart.core.ChartWithSeries.prototype.disposeInternal = function() {
   this.suspendSignalsDispatching();
   this.removeAllSeries();
   this.resumeSignalsDispatching(false);
+
+  goog.dispose(this.hatchFillPalette_);
+  this.hatchFillPalette_ = null;
+
   anychart.core.ChartWithSeries.base(this, 'disposeInternal');
 };
 

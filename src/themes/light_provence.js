@@ -2,6 +2,7 @@ goog.provide('anychart.themes.light_provence');
 
 
 (function() {
+  var global = this;
   var stockScrollerUnselected = '#999 0.6';
 
 
@@ -19,7 +20,7 @@ goog.provide('anychart.themes.light_provence');
    * @return {*}
    */
   var returnDarkenSourceColor = function() {
-    return window['anychart']['color']['darken'](this['sourceColor']);
+    return global['anychart']['color']['darken'](this['sourceColor']);
   };
 
 
@@ -28,20 +29,20 @@ goog.provide('anychart.themes.light_provence');
    * @return {*}
    */
   var returnLightenSourceColor = function() {
-    return window['anychart']['color']['lighten'](this['sourceColor']);
+    return global['anychart']['color']['lighten'](this['sourceColor']);
   };
 
 
-  window['anychart'] = window['anychart'] || {};
-  window['anychart']['themes'] = window['anychart']['themes'] || {};
-  window['anychart']['themes']['lightProvence'] = {
+  global['anychart'] = global['anychart'] || {};
+  global['anychart']['themes'] = global['anychart']['themes'] || {};
+  global['anychart']['themes']['lightProvence'] = {
     'palette': {
       'type': 'distinct',
       'items': ['#aa8ab3', '#b7cbe2', '#cdd18e', '#938d9c', '#6f5264', '#96246a', '#519790', '#6aabcc', '#61687d', '#7b8030']
     },
     'defaultOrdinalColorScale': {
       'autoColors': function(rangesCount) {
-        return window['anychart']['color']['blendedHueProgression']('#b7cbe2', '#574774', rangesCount);
+        return global['anychart']['color']['blendedHueProgression']('#b7cbe2', '#574774', rangesCount);
       }
     },
     'defaultLinearColorScale': {'colors': ['#b7cbe2', '#574774']},
@@ -291,4 +292,4 @@ goog.provide('anychart.themes.light_provence');
       }
     }
   };
-})();
+}).call(this);

@@ -2028,17 +2028,14 @@ anychart.core.axes.Linear.prototype.disposeInternal = function() {
   this.minorLabelsBounds_ = null;
 
   this.title_ = null;
+
+  goog.disposeAll(this.padding_, this.line, this.labels_, this.minorLabels_);
+
   this.padding_ = null;
-
-  goog.dispose(this.line);
   this.line = null;
-
   this.ticks_ = null;
-
   this.minorTicks_ = null;
-
   this.pixelBounds = null;
-
   this.labels_ = null;
   this.minorLabels_ = null;
 };

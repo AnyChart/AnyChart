@@ -86,7 +86,6 @@ anychart.core.ui.Tooltip = function(capability) {
    */
   this.title_;
 
-
   /**
    * @type {anychart.core.ui.Separator}
    * @private
@@ -2198,7 +2197,14 @@ anychart.core.ui.Tooltip.prototype.disposeInternal = function() {
     }
     anychart.core.utils.TooltipsContainer.getInstance().release(this);
   }
-  goog.disposeAll(this.title_, this.separator_, this.content_, this.background_, this.padding_, this.rootLayer_);
+  goog.disposeAll(this.title_, this.separator_, this.content_, this.background_, this.padding_, this.rootLayer_, this.delay_);
+
+  delete this.title_;
+  delete this.separator_;
+  delete this.content_;
+  delete this.background_;
+  delete this.padding_;
+  delete this.delay_;
 
   anychart.core.ui.Tooltip.base(this, 'disposeInternal');
 };

@@ -153,6 +153,17 @@ anychart.palettes.HatchFills.prototype.setupByJSON = function(config, opt_defaul
 
 
 /**
+ * @inheritDoc
+ */
+anychart.palettes.HatchFills.prototype.disposeInternal = function() {
+  goog.disposeAll(this.hatchFills_);
+  this.hatchFills_ = null;
+
+  anychart.palettes.HatchFills.base(this, 'disposeInternal');
+};
+
+
+/**
  * Constructor function.
  * @param {(Array.<acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill>|
  * acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill)=} opt_value Array of hatch fills.

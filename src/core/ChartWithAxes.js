@@ -1256,4 +1256,27 @@ anychart.core.ChartWithAxes.prototype.serializeAxisMarker_ = function(item, scal
 };
 
 
+/** @inheritDoc */
+anychart.core.ChartWithAxes.prototype.disposeInternal = function() {
+  goog.disposeAll(
+      this.xAxes_,
+      this.yAxes_,
+      this.lineAxesMarkers_,
+      this.rangeAxesMarkers_,
+      this.textAxesMarkers_,
+      this.grids_,
+      this.minorGrids_);
+
+  delete this.xAxes_;
+  delete this.yAxes_;
+  this.lineAxesMarkers_ = null;
+  this.rangeAxesMarkers_ = null;
+  this.textAxesMarkers_ = null;
+  this.grids_ = null;
+  this.minorGrids_ = null;
+
+  anychart.core.ChartWithAxes.base(this, 'disposeInternal');
+};
+
+
 //endregion

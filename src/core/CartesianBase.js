@@ -369,4 +369,14 @@ anychart.core.CartesianBase.prototype.serialize = function() {
 };
 
 
+/**
+ * @inheritDoc
+ */
+anychart.core.CartesianBase.prototype.disposeInternal = function() {
+  anychart.core.CartesianBase.base(this, 'disposeInternal');
+  goog.dispose(this.xScroller_);
+  this.xScroller_ = null;
+};
+
+
 //endregion

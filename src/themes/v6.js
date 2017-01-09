@@ -2,6 +2,7 @@ goog.provide('anychart.themes.v6');
 
 
 (function() {
+  var global = this;
   /**
    * @this {*}
    * @return {*}
@@ -15,7 +16,7 @@ goog.provide('anychart.themes.v6');
    * @return {*}
    */
   var returnDarkenSourceColor = function() {
-    return window['anychart']['color']['darken'](this['sourceColor']);
+    return global['anychart']['color']['darken'](this['sourceColor']);
   };
 
 
@@ -24,7 +25,7 @@ goog.provide('anychart.themes.v6');
    * @return {*}
    */
   var returnLightenSourceColor = function() {
-    return window['anychart']['color']['lighten'](this['sourceColor']);
+    return global['anychart']['color']['lighten'](this['sourceColor']);
   };
 
 
@@ -33,7 +34,7 @@ goog.provide('anychart.themes.v6');
    * @return {*}
    */
   var returnStrokeSourceColor = function() {
-    return window['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
+    return global['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
   };
 
 
@@ -42,7 +43,7 @@ goog.provide('anychart.themes.v6');
    * @return {*}
    */
   var returnLightenStrokeSourceColor = function() {
-    return window['anychart']['color']['setThickness'](window['anychart']['color']['lighten'](this['sourceColor']), 1.5);
+    return global['anychart']['color']['setThickness'](global['anychart']['color']['lighten'](this['sourceColor']), 1.5);
   };
 
 
@@ -51,7 +52,7 @@ goog.provide('anychart.themes.v6');
    * @return {*}
    */
   var returnLightenSourceColor20 = function() {
-    return window['anychart']['color']['lighten'](this['sourceColor'], 0.2);
+    return global['anychart']['color']['lighten'](this['sourceColor'], 0.2);
   };
 
 
@@ -60,7 +61,7 @@ goog.provide('anychart.themes.v6');
    * @return {*}
    */
   var returnLightenSourceColor30 = function() {
-    return window['anychart']['color']['lighten'](this['sourceColor'], 0.3);
+    return global['anychart']['color']['lighten'](this['sourceColor'], 0.3);
   };
 
   /**
@@ -68,7 +69,7 @@ goog.provide('anychart.themes.v6');
    * @return {*}
    */
   var returnSourceColor85 = function() {
-    return window['anychart']['color']['setOpacity'](this['sourceColor'], 0.85, true);
+    return global['anychart']['color']['setOpacity'](this['sourceColor'], 0.85, true);
   };
 
   /**
@@ -84,7 +85,7 @@ goog.provide('anychart.themes.v6');
    * @return {*}
    */
   var returnThickenedStrokeSourceColor = function() {
-    return window['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
+    return global['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
   };
 
 
@@ -208,8 +209,8 @@ goog.provide('anychart.themes.v6');
       }
       res += '. ';
     } else if (yType == 'dateTime') {
-      res += 'Y-scale minimum value is ' + window['anychart']['format']['dateTime'](yScale['minimum']()) +
-          ' , maximum value is ' + window['anychart']['format']['dateTime'](yScale['maximum']()) + '. ';
+      res += 'Y-scale minimum value is ' + global['anychart']['format']['dateTime'](yScale['minimum']()) +
+          ' , maximum value is ' + global['anychart']['format']['dateTime'](yScale['maximum']()) + '. ';
     } else { // log/linear.
       res += 'Y-scale minimum value is ' + yScale['minimum']() + ' , maximum value is ' + yScale['maximum']() + '. ';
     }
@@ -222,8 +223,8 @@ goog.provide('anychart.themes.v6');
       }
       res += '. ';
     } else if (xType == 'dateTime') {
-      res += 'X-scale minimum value is ' + window['anychart']['format']['dateTime'](xScale['minimum']()) +
-          ' , maximum value is ' + window['anychart']['format']['dateTime'](xScale['maximum']()) + '. ';
+      res += 'X-scale minimum value is ' + global['anychart']['format']['dateTime'](xScale['minimum']()) +
+          ' , maximum value is ' + global['anychart']['format']['dateTime'](xScale['maximum']()) + '. ';
     } else { // log/linear.
       res += 'X-scale minimum value is ' + xScale['minimum']() + ' , maximum value is ' + xScale['maximum']() + '. ';
     }
@@ -260,8 +261,8 @@ goog.provide('anychart.themes.v6');
 
     var xScale = chart['xScale']();
 
-    res += 'X-scale minimum value is ' + window['anychart']['format']['dateTime'](xScale['getMinimum']()) +
-        ' , maximum value is ' + window['anychart']['format']['dateTime'](xScale['getMaximum']()) + '. ';
+    res += 'X-scale minimum value is ' + global['anychart']['format']['dateTime'](xScale['getMinimum']()) +
+        ' , maximum value is ' + global['anychart']['format']['dateTime'](xScale['getMaximum']()) + '. ';
 
     return res;
   };
@@ -306,8 +307,8 @@ goog.provide('anychart.themes.v6');
       }
       res += '. ';
     } else if (yType == 'dateTime') {
-      res += 'Y-scale minimum value is ' + window['anychart']['format']['dateTime'](yScale['minimum']()) +
-          ' , maximum value is ' + window['anychart']['format']['dateTime'](yScale['maximum']()) + '. ';
+      res += 'Y-scale minimum value is ' + global['anychart']['format']['dateTime'](yScale['minimum']()) +
+          ' , maximum value is ' + global['anychart']['format']['dateTime'](yScale['maximum']()) + '. ';
     } else { // log/linear.
       res += 'Y-scale minimum value is ' + yScale['minimum']() + ' , maximum value is ' + yScale['maximum']() + '. ';
     }
@@ -320,8 +321,8 @@ goog.provide('anychart.themes.v6');
       }
       res += '. ';
     } else if (xType == 'dateTime') {
-      res += 'X-scale minimum value is ' + window['anychart']['format']['dateTime'](xScale['minimum']()) +
-          ' , maximum value is ' + window['anychart']['format']['dateTime'](xScale['maximum']()) + '. ';
+      res += 'X-scale minimum value is ' + global['anychart']['format']['dateTime'](xScale['minimum']()) +
+          ' , maximum value is ' + global['anychart']['format']['dateTime'](xScale['maximum']()) + '. ';
     } else { // log/linear.
       res += 'X-scale minimum value is ' + xScale['minimum']() + ' , maximum value is ' + xScale['maximum']() + '. ';
     }
@@ -339,9 +340,9 @@ goog.provide('anychart.themes.v6');
   };
 
 
-  window['anychart'] = window['anychart'] || {};
-  window['anychart']['themes'] = window['anychart']['themes'] || {};
-  window['anychart']['themes']['v6'] = {
+  global['anychart'] = global['anychart'] || {};
+  global['anychart']['themes'] = global['anychart']['themes'] || {};
+  global['anychart']['themes']['v6'] = {
     // default font settings
     'defaultFontSettings': {
       'fontSize': 10,
@@ -379,7 +380,7 @@ goog.provide('anychart.themes.v6');
 
     'defaultOrdinalColorScale': {
       'autoColors': function(rangesCount) {
-        return window['anychart']['color']['blendedHueProgression']('#ffd54f', '#ef6c00', rangesCount);
+        return global['anychart']['color']['blendedHueProgression']('#ffd54f', '#ef6c00', rangesCount);
       }
     },
 
@@ -1007,8 +1008,7 @@ goog.provide('anychart.themes.v6');
         },
         'zIndex': 20
       },
-      'credits': {
-      },
+      'credits': {},
       'defaultLabelSettings': {
         'enabled': true,
         'fontSize': 11,
@@ -1264,7 +1264,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverFill': function() {
-            return window['anychart']['color']['lighten'](this['sourceColor']);
+            return global['anychart']['color']['lighten'](this['sourceColor']);
           },
           /**
            * @this {*}
@@ -1272,21 +1272,21 @@ goog.provide('anychart.themes.v6');
            */
           'selectFill': function() {
             //todo need define cool color.
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'stroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
@@ -1294,7 +1294,7 @@ goog.provide('anychart.themes.v6');
            */
           'selectStroke': function() {
             //todo need define cool color.
-            return window['anychart']['color']['darken']('red');
+            return global['anychart']['color']['darken']('red');
           },
           'hatchFill': false,
           //'hoverHatchFill': null,
@@ -1449,8 +1449,8 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'fill': function() {
-            return window['anychart']['color']['lighten'](
-                window['anychart']['color']['lighten'](
+            return global['anychart']['color']['lighten'](
+                global['anychart']['color']['lighten'](
                     this['sourceColor']));
           },
           /**
@@ -1465,7 +1465,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverMedianStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
@@ -1479,7 +1479,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverStemStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
@@ -1493,7 +1493,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverWhiskerStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           'whiskerWidth': '20%',
           'hoverWhiskerWidth': '20%',
@@ -1552,40 +1552,40 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'negativeFill': function() {
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](
-                    window['anychart']['color']['darken'](this['sourceColor'])));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](
+                    global['anychart']['color']['darken'](this['sourceColor'])));
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverNegativeFill': function() {
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](
-                    window['anychart']['color']['darken'](
-                        window['anychart']['color']['darken'](this['sourceColor']))));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](
+                    global['anychart']['color']['darken'](
+                        global['anychart']['color']['darken'](this['sourceColor']))));
           },
           /**
            * @this {*}
            * @return {*}
            */
           'negativeStroke': function() {
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](
-                    window['anychart']['color']['darken'](
-                        window['anychart']['color']['darken'](this['sourceColor']))));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](
+                    global['anychart']['color']['darken'](
+                        global['anychart']['color']['darken'](this['sourceColor']))));
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverNegativeStroke': function() {
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](
-                    window['anychart']['color']['darken'](
-                        window['anychart']['color']['darken'](
-                            window['anychart']['color']['darken'](this['sourceColor'])))));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](
+                    global['anychart']['color']['darken'](
+                        global['anychart']['color']['darken'](
+                            global['anychart']['color']['darken'](this['sourceColor'])))));
           },
           'negativeHatchFill': null,
           'hoverNegativeHatchFill': null,
@@ -1608,15 +1608,15 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'risingFill': function() {
-            return window['anychart']['color']['lighten'](this['sourceColor']);
+            return global['anychart']['color']['lighten'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverRisingFill': function() {
-            return window['anychart']['color']['lighten'](
-                window['anychart']['color']['lighten'](this['sourceColor']));
+            return global['anychart']['color']['lighten'](
+                global['anychart']['color']['lighten'](this['sourceColor']));
           },
           /**
            * @this {*}
@@ -1624,23 +1624,23 @@ goog.provide('anychart.themes.v6');
            */
           'selectRisingFill': function() {
             //todo need define cool color.
-            return window['anychart']['color']['lighten'](
-                window['anychart']['color']['lighten']('red'));
+            return global['anychart']['color']['lighten'](
+                global['anychart']['color']['lighten']('red'));
           },
           /**
            * @this {*}
            * @return {*}
            */
           'fallingFill': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverFallingFill': function() {
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](this['sourceColor']));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](this['sourceColor']));
           },
           /**
            * @this {*}
@@ -1648,8 +1648,8 @@ goog.provide('anychart.themes.v6');
            */
           'selectFallingFill': function() {
             //todo need define cool color.
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken']('blue'));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken']('blue'));
           },
           'risingHatchFill': null,
           'hoverRisingHatchFill': null,
@@ -1667,7 +1667,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverRisingStroke': function() {
-            return window['anychart']['color']['lighten'](this['sourceColor']);
+            return global['anychart']['color']['lighten'](this['sourceColor']);
           },
           /**
            * @this {*}
@@ -1675,24 +1675,24 @@ goog.provide('anychart.themes.v6');
            */
           'selectRisingStroke': function() {
             //todo need define cool color.
-            return window['anychart']['color']['lighten']('red');
+            return global['anychart']['color']['lighten']('red');
           },
           /**
            * @this {*}
            * @return {*}
            */
           'fallingStroke': function() {
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](this['sourceColor']));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](this['sourceColor']));
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverFallingStroke': function() {
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](
-                    window['anychart']['color']['darken'](this['sourceColor'])));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](
+                    global['anychart']['color']['darken'](this['sourceColor'])));
           },
           /**
            * @this {*}
@@ -1700,9 +1700,9 @@ goog.provide('anychart.themes.v6');
            */
           'selectFallingStroke': function() {
             //todo need define cool color.
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](
-                    window['anychart']['color']['darken']('blue')));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](
+                    global['anychart']['color']['darken']('blue')));
           },
           'tooltip': {
             'content': {
@@ -1758,7 +1758,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverStroke': function() {
-            return window['anychart']['color']['lighten'](this['sourceColor']);
+            return global['anychart']['color']['lighten'](this['sourceColor']);
           }
         },
         'marker': {
@@ -1789,7 +1789,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverRisingStroke': function() {
-            return window['anychart']['color']['lighten'](this['sourceColor']);
+            return global['anychart']['color']['lighten'](this['sourceColor']);
           },
           /**
            * @this {*}
@@ -1797,24 +1797,24 @@ goog.provide('anychart.themes.v6');
            */
           'selectRisingStroke': function() {
             //todo need define cool color.
-            return window['anychart']['color']['darken']('red');
+            return global['anychart']['color']['darken']('red');
           },
           /**
            * @this {*}
            * @return {*}
            */
           'fallingStroke': function() {
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](this['sourceColor']));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](this['sourceColor']));
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverFallingStroke': function() {
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](
-                    window['anychart']['color']['darken'](this['sourceColor'])));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](
+                    global['anychart']['color']['darken'](this['sourceColor'])));
           },
           /**
            * @this {*}
@@ -1822,7 +1822,7 @@ goog.provide('anychart.themes.v6');
            */
           'selectFallingStroke': function() {
             //todo need define cool color.
-            return window['anychart']['color']['darken']('blue');
+            return global['anychart']['color']['darken']('blue');
           },
           'tooltip': {
             'content': {
@@ -1859,28 +1859,28 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'highStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverHighStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'lowStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverLowStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           'tooltip': {
             'content': {
@@ -1941,28 +1941,28 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'highStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverHighStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'lowStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverLowStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           'tooltip': {
             'content': {
@@ -1987,28 +1987,28 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'highStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverHighStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'lowStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverLowStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           'tooltip': {
             'content': {
@@ -2046,7 +2046,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverStroke': function() {
-            return window['anychart']['color']['lighten'](this['sourceColor']);
+            return global['anychart']['color']['lighten'](this['sourceColor']);
           }
         },
         'splineArea': {
@@ -2076,7 +2076,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverStroke': function() {
-            return window['anychart']['color']['lighten'](this['sourceColor']);
+            return global['anychart']['color']['lighten'](this['sourceColor']);
           }
         },
         'stepArea': {
@@ -2848,7 +2848,7 @@ goog.provide('anychart.themes.v6');
           var value = this['iterator']['get']('heat');
           color = this['colorScale']['valueToColor'](value);
         } else {
-          color = window['anychart']['color']['setOpacity'](this['sourceColor'], 0.85, true);
+          color = global['anychart']['color']['setOpacity'](this['sourceColor'], 0.85, true);
         }
         return color;
       },
@@ -2866,14 +2866,14 @@ goog.provide('anychart.themes.v6');
         } else {
           color = this['sourceColor'];
         }
-        return window['anychart']['color']['setThickness'](color, 1, .85);
+        return global['anychart']['color']['setThickness'](color, 1, .85);
       },
       /**
        * @this {*}
        * @return {*}
        */
       'hoverStroke': function() {
-        return window['anychart']['color']['setThickness'](this['sourceColor'], 1, .85);
+        return global['anychart']['color']['setThickness'](this['sourceColor'], 1, .85);
       },
       'selectStroke': null,
 
@@ -3164,7 +3164,7 @@ goog.provide('anychart.themes.v6');
         if (this['colorScale']) {
           color = this['colorScale']['valueToColor'](this['value']);
         } else {
-          color = window['anychart']['color']['setOpacity'](this['sourceColor'], 0.85, true);
+          color = global['anychart']['color']['setOpacity'](this['sourceColor'], 0.85, true);
         }
         return color;
       },
@@ -3191,14 +3191,14 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverFill': function() {
-            return window['anychart']['color']['lighten'](this['sourceColor']);
+            return global['anychart']['color']['lighten'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'stroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           'hoverStroke': null,
           /**
@@ -3327,7 +3327,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'negativeFill': function() {
-            var darken = window['anychart']['color']['darken'];
+            var darken = global['anychart']['color']['darken'];
             return darken(darken(darken(this['sourceColor'])));
           },
           /**
@@ -3335,7 +3335,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverNegativeFill': function() {
-            var darken = window['anychart']['color']['darken'];
+            var darken = global['anychart']['color']['darken'];
             return darken(darken(darken(darken(this['sourceColor']))));
           },
           /**
@@ -3343,7 +3343,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'negativeStroke': function() {
-            var darken = window['anychart']['color']['darken'];
+            var darken = global['anychart']['color']['darken'];
             return darken(darken(darken(darken(this['sourceColor']))));
           },
           /**
@@ -3351,7 +3351,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverNegativeStroke': function() {
-            var darken = window['anychart']['color']['darken'];
+            var darken = global['anychart']['color']['darken'];
             return darken(darken(darken(darken(darken(this['sourceColor'])))));
           },
           'negativeHatchFill': null,
@@ -3385,7 +3385,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverStroke': function() {
-            return window['anychart']['color']['lighten'](this['sourceColor']);
+            return global['anychart']['color']['lighten'](this['sourceColor']);
           },
           'labels': {
             'anchor': 'bottom'
@@ -3823,21 +3823,21 @@ goog.provide('anychart.themes.v6');
        * @return {*}
        */
       'hoverFill': function() {
-        return window['anychart']['color']['lighten'](this['sourceColor']);
+        return global['anychart']['color']['lighten'](this['sourceColor']);
       },
       /**
        * @this {*}
        * @return {*}
        */
       'stroke': function() {
-        return window['anychart']['color']['darken'](this['sourceColor'], .2);
+        return global['anychart']['color']['darken'](this['sourceColor'], .2);
       },
       /**
        * @this {*}
        * @return {*}
        */
       'hoverStroke': function() {
-        return window['anychart']['color']['darken'](this['sourceColor']);
+        return global['anychart']['color']['darken'](this['sourceColor']);
       },
       'hatchFill': null,
       //'hoverHatchFill': undefined,
@@ -4019,21 +4019,21 @@ goog.provide('anychart.themes.v6');
        * @return {*}
        */
       'hoverFill': function() {
-        return window['anychart']['color']['lighten'](this['sourceColor']);
+        return global['anychart']['color']['lighten'](this['sourceColor']);
       },
       /**
        * @this {*}
        * @return {*}
        */
       'stroke': function() {
-        return window['anychart']['color']['darken'](this['sourceColor'], .2);
+        return global['anychart']['color']['darken'](this['sourceColor'], .2);
       },
       /**
        * @this {*}
        * @return {*}
        */
       'hoverStroke': function() {
-        return window['anychart']['color']['darken'](this['sourceColor']);
+        return global['anychart']['color']['darken'](this['sourceColor']);
       },
       'hatchFill': null,
       //'hoverHatchFill': undefined,
@@ -4190,7 +4190,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverFill': function() {
-            return window['anychart']['color']['lighten'](this['sourceColor']);
+            return global['anychart']['color']['lighten'](this['sourceColor']);
           },
           /**
            * @this {*}
@@ -4198,21 +4198,21 @@ goog.provide('anychart.themes.v6');
            */
           'selectFill': function() {
             //todo need define cool color.
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'stroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
@@ -4220,7 +4220,7 @@ goog.provide('anychart.themes.v6');
            */
           'selectStroke': function() {
             //todo need define cool color.
-            return window['anychart']['color']['darken']('red');
+            return global['anychart']['color']['darken']('red');
           },
           'labels': {
             'enabled': false,
@@ -4281,14 +4281,14 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverStroke': function() {
-            return window['anychart']['color']['lighten'](this['sourceColor']);
+            return global['anychart']['color']['lighten'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'selectStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           }
         },
         'marker': {
@@ -4304,7 +4304,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverFill': function() {
-            return window['anychart']['color']['lighten'](this['sourceColor']);
+            return global['anychart']['color']['lighten'](this['sourceColor']);
           },
           /**
            * @this {*}
@@ -4312,21 +4312,21 @@ goog.provide('anychart.themes.v6');
            */
           'selectFill': function() {
             //todo need define cool color.
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'stroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
@@ -4334,7 +4334,7 @@ goog.provide('anychart.themes.v6');
            */
           'selectStroke': function() {
             //todo need define cool color.
-            return window['anychart']['color']['darken']('red');
+            return global['anychart']['color']['darken']('red');
           },
           'size': 10,
           'hoverSize': 12,
@@ -4467,7 +4467,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverFill': function() {
-            return window['anychart']['color']['lighten'](this['sourceColor']);
+            return global['anychart']['color']['lighten'](this['sourceColor']);
           },
           /**
            * @this {*}
@@ -4475,21 +4475,21 @@ goog.provide('anychart.themes.v6');
            */
           'selectFill': function() {
             //todo need define cool color.
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'stroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
@@ -4497,7 +4497,7 @@ goog.provide('anychart.themes.v6');
            */
           'selectStroke': function() {
             //todo need define cool color.
-            return window['anychart']['color']['darken']('red');
+            return global['anychart']['color']['darken']('red');
           },
           'markers': {
             'enabled': false,
@@ -4552,14 +4552,14 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverStroke': function() {
-            return window['anychart']['color']['lighten'](this['sourceColor']);
+            return global['anychart']['color']['lighten'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'selectStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           }
         },
         'marker': {
@@ -4575,7 +4575,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverFill': function() {
-            return window['anychart']['color']['lighten'](this['sourceColor']);
+            return global['anychart']['color']['lighten'](this['sourceColor']);
           },
           /**
            * @this {*}
@@ -4583,21 +4583,21 @@ goog.provide('anychart.themes.v6');
            */
           'selectFill': function() {
             //todo need define cool color.
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'stroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverStroke': function() {
-            return window['anychart']['color']['darken'](this['sourceColor']);
+            return global['anychart']['color']['darken'](this['sourceColor']);
           },
           /**
            * @this {*}
@@ -4605,7 +4605,7 @@ goog.provide('anychart.themes.v6');
            */
           'selectStroke': function() {
             //todo need define cool color.
-            return window['anychart']['color']['darken']('red');
+            return global['anychart']['color']['darken']('red');
           },
           'size': 10,
           'hoverSize': 12,
@@ -5091,7 +5091,7 @@ goog.provide('anychart.themes.v6');
            */
           'fill': function() {
             var sourceColor = this['sourceColor'];
-            var darken = window['anychart']['color']['darken'](sourceColor);
+            var darken = global['anychart']['color']['darken'](sourceColor);
             var key1 = {
               'color': darken
             };
@@ -5117,7 +5117,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'dimmer': function(color) {
-            return window['anychart']['color']['darken'](color);
+            return global['anychart']['color']['darken'](color);
           },
           'gap': '1%',
           'size': '2%',
@@ -5308,7 +5308,7 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'hoverFill': function() {
-            return window['anychart']['color']['lighten'](this['sourceColor']);
+            return global['anychart']['color']['lighten'](this['sourceColor']);
           },
           'selectFill': {
             'color': '#64b5f6'
@@ -5399,28 +5399,28 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'fill': function() {
-            return window['anychart']['color']['setOpacity'](this['sourceColor'], 0.7, true);
+            return global['anychart']['color']['setOpacity'](this['sourceColor'], 0.7, true);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverFill': function() {
-            return window['anychart']['color']['setOpacity'](this['sourceColor'], 0.7, true);
+            return global['anychart']['color']['setOpacity'](this['sourceColor'], 0.7, true);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'stroke': function() {
-            return window['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
+            return global['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverStroke': function() {
-            return window['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
+            return global['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
           },
           'legendItem': {
             'iconStroke': null
@@ -5430,40 +5430,40 @@ goog.provide('anychart.themes.v6');
            * @return {*}
            */
           'negativeFill': function() {
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](
-                    window['anychart']['color']['darken'](this['sourceColor'])));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](
+                    global['anychart']['color']['darken'](this['sourceColor'])));
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverNegativeFill': function() {
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](
-                    window['anychart']['color']['darken'](
-                        window['anychart']['color']['darken'](this['sourceColor']))));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](
+                    global['anychart']['color']['darken'](
+                        global['anychart']['color']['darken'](this['sourceColor']))));
           },
           /**
            * @this {*}
            * @return {*}
            */
           'negativeStroke': function() {
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](
-                    window['anychart']['color']['darken'](
-                        window['anychart']['color']['darken'](this['sourceColor']))));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](
+                    global['anychart']['color']['darken'](
+                        global['anychart']['color']['darken'](this['sourceColor']))));
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverNegativeStroke': function() {
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](
-                    window['anychart']['color']['darken'](
-                        window['anychart']['color']['darken'](
-                            window['anychart']['color']['darken'](this['sourceColor'])))));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](
+                    global['anychart']['color']['darken'](
+                        global['anychart']['color']['darken'](
+                            global['anychart']['color']['darken'](this['sourceColor'])))));
           },
           'negativeHatchFill': null,
           'hoverNegativeHatchFill': null,
@@ -6109,8 +6109,8 @@ goog.provide('anychart.themes.v6');
           'textFormatter': function() {
             var startDate = this['minPeriodDate'];
             var endDate = this['maxPeriodDate'];
-            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
-                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '');
+            return (startDate ? 'Start Date: ' + global['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + global['anychart']['format']['dateTime'](endDate) : '');
           }
         }
       },
@@ -6131,8 +6131,8 @@ goog.provide('anychart.themes.v6');
           'textFormatter': function() {
             var startDate = this['periodStart'] || this['minPeriodDate'];
             var endDate = this['periodEnd'] || this['maxPeriodDate'];
-            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
-                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '');
+            return (startDate ? 'Start Date: ' + global['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + global['anychart']['format']['dateTime'](endDate) : '');
           }
         }
       }
@@ -6161,8 +6161,8 @@ goog.provide('anychart.themes.v6');
               progress = (Math.round(auto * 100) / 100 || 0) + '%';
             }
 
-            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
-                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '') +
+            return (startDate ? 'Start Date: ' + global['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + global['anychart']['format']['dateTime'](endDate) : '') +
                 (progress ? '\nComplete: ' + progress : '');
           }
         }
@@ -6191,8 +6191,8 @@ goog.provide('anychart.themes.v6');
               progress = (Math.round(auto * 100) / 100 || 0) + '%';
             }
 
-            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
-                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '') +
+            return (startDate ? 'Start Date: ' + global['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + global['anychart']['format']['dateTime'](endDate) : '') +
                 (progress ? '\nComplete: ' + progress : '');
 
           }
@@ -6359,25 +6359,25 @@ goog.provide('anychart.themes.v6');
               var date = this['tickValue'];
               switch (this['majorIntervalUnit']) {
                 case 'year':
-                  return window['anychart']['format']['dateTime'](date, 'yyyy');
+                  return global['anychart']['format']['dateTime'](date, 'yyyy');
                 case 'semester':
                 case 'quarter':
                 case 'month':
-                  return window['anychart']['format']['dateTime'](date, 'yyyy MMM');
+                  return global['anychart']['format']['dateTime'](date, 'yyyy MMM');
                 case 'thirdOfMonth':
                 case 'week':
                 case 'day':
-                  return window['anychart']['format']['dateTime'](date, 'MMM dd');
+                  return global['anychart']['format']['dateTime'](date, 'MMM dd');
                 case 'hour':
-                  return window['anychart']['format']['dateTime'](date, 'MMM-dd HH');
+                  return global['anychart']['format']['dateTime'](date, 'MMM-dd HH');
                 case 'minute':
-                  return window['anychart']['format']['dateTime'](date, 'dd HH:mm');
+                  return global['anychart']['format']['dateTime'](date, 'dd HH:mm');
                 case 'second':
-                  return window['anychart']['format']['dateTime'](date, 'HH:mm:ss');
+                  return global['anychart']['format']['dateTime'](date, 'HH:mm:ss');
                 case 'millisecond':
-                  return window['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
+                  return global['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
               }
-              return window['anychart']['format']['dateTime'](date, 'yyyy MMM dd');
+              return global['anychart']['format']['dateTime'](date, 'yyyy MMM dd');
             }
           },
           'minorLabels': {
@@ -6398,25 +6398,25 @@ goog.provide('anychart.themes.v6');
               var date = this['tickValue'];
               switch (this['majorIntervalUnit']) {
                 case 'year':
-                  return window['anychart']['format']['dateTime'](date, 'yyyy');
+                  return global['anychart']['format']['dateTime'](date, 'yyyy');
                 case 'semester':
                 case 'quarter':
                 case 'month':
-                  return window['anychart']['format']['dateTime'](date, 'MMM');
+                  return global['anychart']['format']['dateTime'](date, 'MMM');
                 case 'thirdOfMonth':
                 case 'week':
                 case 'day':
-                  return window['anychart']['format']['dateTime'](date, 'dd');
+                  return global['anychart']['format']['dateTime'](date, 'dd');
                 case 'hour':
-                  return window['anychart']['format']['dateTime'](date, 'HH');
+                  return global['anychart']['format']['dateTime'](date, 'HH');
                 case 'minute':
-                  return window['anychart']['format']['dateTime'](date, 'HH:mm');
+                  return global['anychart']['format']['dateTime'](date, 'HH:mm');
                 case 'second':
-                  return window['anychart']['format']['dateTime'](date, 'HH:mm:ss');
+                  return global['anychart']['format']['dateTime'](date, 'HH:mm:ss');
                 case 'millisecond':
-                  return window['anychart']['format']['dateTime'](date, 'SSS');
+                  return global['anychart']['format']['dateTime'](date, 'SSS');
               }
-              return window['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
+              return global['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
             }
           }
         },
@@ -6446,24 +6446,24 @@ goog.provide('anychart.themes.v6');
             var date = /** @type {number} */(this['value']);
             switch (this['dataIntervalUnit']) {
               case 'year':
-                return window['anychart']['format']['dateTime'](date, 'yyyy');
+                return global['anychart']['format']['dateTime'](date, 'yyyy');
               case 'semester':
               case 'quarter':
               case 'month':
-                return window['anychart']['format']['dateTime'](date, 'MMM yyyy');
+                return global['anychart']['format']['dateTime'](date, 'MMM yyyy');
               case 'thirdofmonth':
               case 'week':
               case 'day':
-                return window['anychart']['format']['dateTime'](date, 'dd MMM yyyy');
+                return global['anychart']['format']['dateTime'](date, 'dd MMM yyyy');
               case 'hour':
               case 'minute':
-                return window['anychart']['format']['dateTime'](date, 'HH:mm, dd MMM');
+                return global['anychart']['format']['dateTime'](date, 'HH:mm, dd MMM');
               case 'second':
-                return window['anychart']['format']['dateTime'](date, 'HH:mm:ss');
+                return global['anychart']['format']['dateTime'](date, 'HH:mm:ss');
               case 'millisecond':
-                return window['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
+                return global['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
             }
-            return window['anychart']['format']['dateTime'](date, 'dd MMM yyyy');
+            return global['anychart']['format']['dateTime'](date, 'dd MMM yyyy');
           },
           'align': 'center',
           'margin': {
@@ -6693,25 +6693,25 @@ goog.provide('anychart.themes.v6');
               var date = this['tickValue'];
               switch (this['majorIntervalUnit']) {
                 case 'year':
-                  return window['anychart']['format']['dateTime'](date, 'yyyy');
+                  return global['anychart']['format']['dateTime'](date, 'yyyy');
                 case 'semester':
                 case 'quarter':
                 case 'month':
-                  return window['anychart']['format']['dateTime'](date, 'yyyy MMM');
+                  return global['anychart']['format']['dateTime'](date, 'yyyy MMM');
                 case 'thirdOfMonth':
                 case 'week':
                 case 'day':
-                  return window['anychart']['format']['dateTime'](date, 'MMM dd');
+                  return global['anychart']['format']['dateTime'](date, 'MMM dd');
                 case 'hour':
-                  return window['anychart']['format']['dateTime'](date, 'MMM-dd HH');
+                  return global['anychart']['format']['dateTime'](date, 'MMM-dd HH');
                 case 'minute':
-                  return window['anychart']['format']['dateTime'](date, 'dd HH:mm');
+                  return global['anychart']['format']['dateTime'](date, 'dd HH:mm');
                 case 'second':
-                  return window['anychart']['format']['dateTime'](date, 'HH:mm:ss');
+                  return global['anychart']['format']['dateTime'](date, 'HH:mm:ss');
                 case 'millisecond':
-                  return window['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
+                  return global['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
               }
-              return window['anychart']['format']['dateTime'](date, 'yyyy MMM dd');
+              return global['anychart']['format']['dateTime'](date, 'yyyy MMM dd');
             }
           },
           'minorLabels': {
@@ -6732,25 +6732,25 @@ goog.provide('anychart.themes.v6');
               var date = this['tickValue'];
               switch (this['majorIntervalUnit']) {
                 case 'year':
-                  return window['anychart']['format']['dateTime'](date, 'yyyy');
+                  return global['anychart']['format']['dateTime'](date, 'yyyy');
                 case 'semester':
                 case 'quarter':
                 case 'month':
-                  return window['anychart']['format']['dateTime'](date, 'MMM');
+                  return global['anychart']['format']['dateTime'](date, 'MMM');
                 case 'thirdOfMonth':
                 case 'week':
                 case 'day':
-                  return window['anychart']['format']['dateTime'](date, 'dd');
+                  return global['anychart']['format']['dateTime'](date, 'dd');
                 case 'hour':
-                  return window['anychart']['format']['dateTime'](date, 'HH');
+                  return global['anychart']['format']['dateTime'](date, 'HH');
                 case 'minute':
-                  return window['anychart']['format']['dateTime'](date, 'HH:mm');
+                  return global['anychart']['format']['dateTime'](date, 'HH:mm');
                 case 'second':
-                  return window['anychart']['format']['dateTime'](date, 'HH:mm:ss');
+                  return global['anychart']['format']['dateTime'](date, 'HH:mm:ss');
                 case 'millisecond':
-                  return window['anychart']['format']['dateTime'](date, 'SSS');
+                  return global['anychart']['format']['dateTime'](date, 'SSS');
               }
-              return window['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
+              return global['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
             }
           },
           'zIndex': 75
@@ -6774,24 +6774,24 @@ goog.provide('anychart.themes.v6');
           var date = /** @type {number} */(this['hoveredDate']);
           switch (this['dataIntervalUnit']) {
             case 'year':
-              return window['anychart']['format']['dateTime'](date, 'yyyy');
+              return global['anychart']['format']['dateTime'](date, 'yyyy');
             case 'semester':
             case 'quarter':
             case 'month':
-              return window['anychart']['format']['dateTime'](date, 'MMM yyyy');
+              return global['anychart']['format']['dateTime'](date, 'MMM yyyy');
             case 'thirdofmonth':
             case 'week':
             case 'day':
-              return window['anychart']['format']['dateTime'](date, 'dd MMM yyyy');
+              return global['anychart']['format']['dateTime'](date, 'dd MMM yyyy');
             case 'hour':
             case 'minute':
-              return window['anychart']['format']['dateTime'](date, 'HH:mm, dd MMM');
+              return global['anychart']['format']['dateTime'](date, 'HH:mm, dd MMM');
             case 'second':
-              return window['anychart']['format']['dateTime'](date, 'HH:mm:ss');
+              return global['anychart']['format']['dateTime'](date, 'HH:mm:ss');
             case 'millisecond':
-              return window['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
+              return global['anychart']['format']['dateTime'](date, 'HH:mm:ss.SSS');
           }
-          return window['anychart']['format']['dateTime'](date, 'dd MMM yyyy');
+          return global['anychart']['format']['dateTime'](date, 'dd MMM yyyy');
         },
         /**
          * @this {*}
@@ -7871,4 +7871,4 @@ goog.provide('anychart.themes.v6');
       }
     }
   };
-})();
+}).call(this);

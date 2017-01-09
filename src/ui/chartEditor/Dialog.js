@@ -336,6 +336,7 @@ anychart.ui.chartEditor.Dialog = function(opt_class, opt_useIframeMask, opt_domH
   this.preloader_ = new anychart.ui.Preloader();
   this.imagesLoaded_ = false;
   var imageLoader = new goog.net.ImageLoader();
+  this.registerDisposable(imageLoader);
 
   goog.events.listen(imageLoader, goog.net.EventType.COMPLETE, function() {
     this.imagesLoaded_ = true;

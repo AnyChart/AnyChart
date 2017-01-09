@@ -1890,6 +1890,17 @@ anychart.core.ui.Legend.prototype.setupByJSON = function(config, opt_default) {
 };
 
 
+/** @inheritDoc */
+anychart.core.ui.Legend.prototype.disposeInternal = function() {
+  anychart.core.ui.Legend.base(this, 'disposeInternal');
+
+  goog.disposeAll(this.tooltip_, this.paginator_);
+
+  this.tooltip_ = null;
+  this.paginator_ = null;
+};
+
+
 /**
  * Type definition for legend item provider.
  * @includeDoc

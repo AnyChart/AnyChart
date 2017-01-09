@@ -881,8 +881,12 @@ anychart.core.VisualBase.prototype.setupByJSON = function(config, opt_default) {
 anychart.core.VisualBase.prototype.disposeInternal = function() {
   goog.dispose(this.eventsHandler);
   this.eventsHandler = null;
-
   this.parentBounds_ = null;
+
+  if (this.stageOwn_ && this.container_) {
+    goog.dispose(this.container_);
+    this.container_ = null;
+  }
 
   goog.base(this, 'disposeInternal');
 };

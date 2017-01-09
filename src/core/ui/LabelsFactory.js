@@ -1214,11 +1214,19 @@ anychart.core.ui.LabelsFactory.prototype.makeBrowserEvent = function(e) {
 
 /** @inheritDoc */
 anychart.core.ui.LabelsFactory.prototype.disposeInternal = function() {
-  goog.dispose(this.layer_);
+  goog.disposeAll(
+      this.labels_,
+      this.freeToUseLabelsPool_,
+      this.measureCustomLabel_,
+      this.layer_,
+      this.background_,
+      this.padding_);
+
+  this.labels_ = null;
+  this.freeToUseLabelsPool_ = null;
+  this.measureCustomLabel_ = null;
   this.layer_ = null;
-  goog.dispose(this.background_);
   this.background_ = null;
-  goog.dispose(this.padding_);
   this.padding_ = null;
 
   goog.base(this, 'disposeInternal');
@@ -2692,9 +2700,16 @@ anychart.core.ui.LabelsFactory.Label.prototype.setupByJSON = function(config, op
 
 /** @inheritDoc */
 anychart.core.ui.LabelsFactory.Label.prototype.disposeInternal = function() {
-  goog.dispose(this.settingsObj['background']);
+  goog.disposeAll(
+      this.settingsObj['background'],
+      this.settingsObj['padding'],
+      this.backgroundElement_,
+      this.textElement,
+      this.layer_);
+
+  this.backgroundElement_ = null;
+  this.textElement = null;
   this.settingsObj['background'] = null;
-  goog.dispose(this.settingsObj['padding']);
   this.settingsObj['padding'] = null;
 
   goog.base(this, 'disposeInternal');

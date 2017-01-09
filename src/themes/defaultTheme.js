@@ -2,6 +2,8 @@ goog.provide('anychart.themes.defaultTheme');
 
 
 (function() {
+  var global = this;
+
   //region --- Aux functions
   //------------------------------------------------------------------------------
   //
@@ -68,7 +70,7 @@ goog.provide('anychart.themes.defaultTheme');
   var locNum = function(val, opt_decimalsCountOrLocale, opt_decimalPoint, opt_groupsSeparator,
                         opt_scale, opt_zeroFillDecimals, opt_scaleSuffixSeparator, opt_useBracketsForNegative) {
     var val_ = (val === null) || (typeof val == 'boolean') || (val == '') ? NaN : +/** @type {number} */(val);
-    return isNaN(val_) ? val : window['anychart']['format']['number'](val_, opt_decimalsCountOrLocale, opt_decimalPoint, opt_groupsSeparator,
+    return isNaN(val_) ? val : global['anychart']['format']['number'](val_, opt_decimalsCountOrLocale, opt_decimalPoint, opt_groupsSeparator,
         opt_scale, opt_zeroFillDecimals, opt_scaleSuffixSeparator, opt_useBracketsForNegative);
   };
 
@@ -141,7 +143,7 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnDateTimeX = function() {
-    return window['anychart']['format']['date'](this['x']);
+    return global['anychart']['format']['date'](this['x']);
   };
 
 
@@ -150,7 +152,7 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnDateTimeTickValue = function() {
-    return window['anychart']['format']['date'](this['tickValue']);
+    return global['anychart']['format']['date'](this['tickValue']);
   };
 
 
@@ -168,7 +170,7 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnSourceColor70 = function() {
-    return window['anychart']['color']['setOpacity'](this['sourceColor'], 0.7, true);
+    return global['anychart']['color']['setOpacity'](this['sourceColor'], 0.7, true);
   };
 
 
@@ -177,7 +179,7 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnSourceColor65 = function() {
-    return window['anychart']['color']['setOpacity'](this['sourceColor'], 0.65, true);
+    return global['anychart']['color']['setOpacity'](this['sourceColor'], 0.65, true);
   };
 
 
@@ -186,7 +188,7 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnSourceColor50 = function() {
-    return window['anychart']['color']['setOpacity'](this['sourceColor'], 0.50, true);
+    return global['anychart']['color']['setOpacity'](this['sourceColor'], 0.50, true);
   };
 
 
@@ -195,7 +197,7 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnSourceColor85 = function() {
-    return window['anychart']['color']['setOpacity'](this['sourceColor'], 0.85, true);
+    return global['anychart']['color']['setOpacity'](this['sourceColor'], 0.85, true);
   };
 
 
@@ -204,7 +206,7 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnDarkenSourceColor = function() {
-    return window['anychart']['color']['darken'](this['sourceColor']);
+    return global['anychart']['color']['darken'](this['sourceColor']);
   };
 
 
@@ -213,7 +215,7 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnLightenSourceColor = function() {
-    return window['anychart']['color']['lighten'](this['sourceColor']);
+    return global['anychart']['color']['lighten'](this['sourceColor']);
   };
 
 
@@ -222,7 +224,7 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnStrokeSourceColor = function() {
-    return window['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
+    return global['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
   };
 
 
@@ -231,7 +233,7 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnStrokeSourceColor1 = function() {
-    return window['anychart']['color']['setThickness'](this['sourceColor'], 1);
+    return global['anychart']['color']['setThickness'](this['sourceColor'], 1);
   };
 
 
@@ -240,7 +242,7 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnLightenStrokeSourceColor = function() {
-    return window['anychart']['color']['setThickness'](window['anychart']['color']['lighten'](this['sourceColor']), 1.5);
+    return global['anychart']['color']['setThickness'](global['anychart']['color']['lighten'](this['sourceColor']), 1.5);
   };
 
   /**
@@ -248,7 +250,7 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnThickenedStrokeSourceColor = function() {
-    return window['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
+    return global['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
   };
 
 
@@ -340,7 +342,7 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnStrokeWithThickness = function() {
-    return window['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
+    return global['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
   };
 
 
@@ -420,8 +422,8 @@ goog.provide('anychart.themes.defaultTheme');
       }
       res += '. ';
     } else if (yType == 'dateTime') {
-      res += 'Y-scale minimum value is ' + window['anychart']['format']['dateTime'](yScale['minimum']()) +
-          ' , maximum value is ' + window['anychart']['format']['dateTime'](yScale['maximum']()) + '. ';
+      res += 'Y-scale minimum value is ' + global['anychart']['format']['dateTime'](yScale['minimum']()) +
+          ' , maximum value is ' + global['anychart']['format']['dateTime'](yScale['maximum']()) + '. ';
     } else { // log/linear.
       res += 'Y-scale minimum value is ' + yScale['minimum']() + ' , maximum value is ' + yScale['maximum']() + '. ';
     }
@@ -434,8 +436,8 @@ goog.provide('anychart.themes.defaultTheme');
       }
       res += '. ';
     } else if (xType == 'dateTime') {
-      res += 'X-scale minimum value is ' + window['anychart']['format']['dateTime'](xScale['minimum']()) +
-          ' , maximum value is ' + window['anychart']['format']['dateTime'](xScale['maximum']()) + '. ';
+      res += 'X-scale minimum value is ' + global['anychart']['format']['dateTime'](xScale['minimum']()) +
+          ' , maximum value is ' + global['anychart']['format']['dateTime'](xScale['maximum']()) + '. ';
     } else { // log/linear.
       res += 'X-scale minimum value is ' + xScale['minimum']() + ' , maximum value is ' + xScale['maximum']() + '. ';
     }
@@ -472,8 +474,8 @@ goog.provide('anychart.themes.defaultTheme');
 
     var xScale = chart['xScale']();
 
-    res += 'X-scale minimum value is ' + window['anychart']['format']['dateTime'](xScale['getMinimum']()) +
-        ' , maximum value is ' + window['anychart']['format']['dateTime'](xScale['getMaximum']()) + '. ';
+    res += 'X-scale minimum value is ' + global['anychart']['format']['dateTime'](xScale['getMinimum']()) +
+        ' , maximum value is ' + global['anychart']['format']['dateTime'](xScale['getMaximum']()) + '. ';
 
     return res;
   };
@@ -518,8 +520,8 @@ goog.provide('anychart.themes.defaultTheme');
       }
       res += '. ';
     } else if (yType == 'dateTime') {
-      res += 'Y-scale minimum value is ' + window['anychart']['format']['dateTime'](yScale['minimum']()) +
-          ' , maximum value is ' + window['anychart']['format']['dateTime'](yScale['maximum']()) + '. ';
+      res += 'Y-scale minimum value is ' + global['anychart']['format']['dateTime'](yScale['minimum']()) +
+          ' , maximum value is ' + global['anychart']['format']['dateTime'](yScale['maximum']()) + '. ';
     } else { // log/linear.
       res += 'Y-scale minimum value is ' + yScale['minimum']() + ' , maximum value is ' + yScale['maximum']() + '. ';
     }
@@ -532,8 +534,8 @@ goog.provide('anychart.themes.defaultTheme');
       }
       res += '. ';
     } else if (xType == 'dateTime') {
-      res += 'X-scale minimum value is ' + window['anychart']['format']['dateTime'](xScale['minimum']()) +
-          ' , maximum value is ' + window['anychart']['format']['dateTime'](xScale['maximum']()) + '. ';
+      res += 'X-scale minimum value is ' + global['anychart']['format']['dateTime'](xScale['minimum']()) +
+          ' , maximum value is ' + global['anychart']['format']['dateTime'](xScale['maximum']()) + '. ';
     } else { // log/linear.
       res += 'X-scale minimum value is ' + xScale['minimum']() + ' , maximum value is ' + xScale['maximum']() + '. ';
     }
@@ -542,10 +544,9 @@ goog.provide('anychart.themes.defaultTheme');
   };
   //endregion
 
-
-  window['anychart'] = window['anychart'] || {};
-  window['anychart']['themes'] = window['anychart']['themes'] || {};
-  window['anychart']['themes']['defaultTheme'] = {
+  global['anychart'] = global['anychart'] || {};
+  global['anychart']['themes'] = global['anychart']['themes'] || {};
+  global['anychart']['themes']['defaultTheme'] = {
     'palette': {
       'type': 'distinct',
       'items': ['#64b5f6', '#1976d2', '#ef6c00', '#ffd54f', '#455a64', '#96a6a6', '#dd2c00', '#00838f', '#00bfa5', '#ffa000']
@@ -562,8 +563,8 @@ goog.provide('anychart.themes.defaultTheme');
 
     'defaultOrdinalColorScale': {
       'autoColors': function(rangesCount) {
-        return window['anychart']['color']['blendedHueProgression']('#90caf9', '#01579b', rangesCount);
-        //return window['anychart']['color']['blendedHueProgression']('#ffd54f', '#ef6c00', rangesCount); //todo: delete after final choice
+        return global['anychart']['color']['blendedHueProgression']('#90caf9', '#01579b', rangesCount);
+        //return global['anychart']['color']['blendedHueProgression']('#ffd54f', '#ef6c00', rangesCount); //todo: delete after final choice
       }
     },
 
@@ -1236,59 +1237,59 @@ goog.provide('anychart.themes.defaultTheme');
            * @return {*}
            */
           'negativeFill': function() {
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](
-                    window['anychart']['color']['darken'](this['sourceColor'])));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](
+                    global['anychart']['color']['darken'](this['sourceColor'])));
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverNegativeFill': function() {
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](
-                    window['anychart']['color']['darken'](
-                        window['anychart']['color']['darken'](this['sourceColor']))));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](
+                    global['anychart']['color']['darken'](
+                        global['anychart']['color']['darken'](this['sourceColor']))));
           },
           /**
            * @this {*}
            * @return {*}
            */
           'selectNegativeFill': function() {
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](
-                    window['anychart']['color']['darken'](this['sourceColor'])));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](
+                    global['anychart']['color']['darken'](this['sourceColor'])));
           },
           /**
            * @this {*}
            * @return {*}
            */
           'negativeStroke': function() {
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](
-                    window['anychart']['color']['darken'](
-                        window['anychart']['color']['darken'](this['sourceColor']))));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](
+                    global['anychart']['color']['darken'](
+                        global['anychart']['color']['darken'](this['sourceColor']))));
           },
           /**
            * @this {*}
            * @return {*}
            */
           'hoverNegativeStroke': function() {
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](
-                    window['anychart']['color']['darken'](
-                        window['anychart']['color']['darken'](
-                            window['anychart']['color']['darken'](this['sourceColor'])))));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](
+                    global['anychart']['color']['darken'](
+                        global['anychart']['color']['darken'](
+                            global['anychart']['color']['darken'](this['sourceColor'])))));
           },
           /**
            * @this {*}
            * @return {*}
            */
           'selectNegativeStroke': function() {
-            return window['anychart']['color']['darken'](
-                window['anychart']['color']['darken'](
-                    window['anychart']['color']['darken'](
-                        window['anychart']['color']['darken'](this['sourceColor']))));
+            return global['anychart']['color']['darken'](
+                global['anychart']['color']['darken'](
+                    global['anychart']['color']['darken'](
+                        global['anychart']['color']['darken'](this['sourceColor']))));
           },
           'negativeHatchFill': false,
           'hoverNegativeHatchFill': null,
@@ -3390,7 +3391,7 @@ goog.provide('anychart.themes.defaultTheme');
            */
           'fill': function() {
             var sourceColor = this['sourceColor'];
-            var darken = window['anychart']['color']['darken'](sourceColor);
+            var darken = global['anychart']['color']['darken'](sourceColor);
             var key1 = {
               'color': darken
             };
@@ -3416,7 +3417,7 @@ goog.provide('anychart.themes.defaultTheme');
            * @return {*}
            */
           'dimmer': function(color) {
-            return window['anychart']['color']['darken'](color);
+            return global['anychart']['color']['darken'](color);
           },
           'gap': '1%',
           'size': '2%',
@@ -3533,7 +3534,7 @@ goog.provide('anychart.themes.defaultTheme');
           var value = this['iterator']['get']('heat');
           color = this['colorScale']['valueToColor'](value);
         } else {
-          color = window['anychart']['color']['setOpacity'](this['sourceColor'], 0.85, true);
+          color = global['anychart']['color']['setOpacity'](this['sourceColor'], 0.85, true);
         }
         return color;
       },
@@ -3713,7 +3714,7 @@ goog.provide('anychart.themes.defaultTheme');
         if (this['colorScale']) {
           color = this['colorScale']['valueToColor'](this['value']);
         } else {
-          color = window['anychart']['color']['setOpacity'](this['sourceColor'], 0.85, true);
+          color = global['anychart']['color']['setOpacity'](this['sourceColor'], 0.85, true);
         }
         return color;
       },
@@ -4132,8 +4133,8 @@ goog.provide('anychart.themes.defaultTheme');
           'textFormatter': function() {
             var startDate = this['minPeriodDate'];
             var endDate = this['maxPeriodDate'];
-            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
-                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '');
+            return (startDate ? 'Start Date: ' + global['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + global['anychart']['format']['dateTime'](endDate) : '');
           }
         }
       },
@@ -4153,8 +4154,8 @@ goog.provide('anychart.themes.defaultTheme');
           'textFormatter': function() {
             var startDate = this['periodStart'] || this['minPeriodDate'];
             var endDate = this['periodEnd'] || this['maxPeriodDate'];
-            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
-                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '');
+            return (startDate ? 'Start Date: ' + global['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + global['anychart']['format']['dateTime'](endDate) : '');
           }
         }
       }
@@ -4183,8 +4184,8 @@ goog.provide('anychart.themes.defaultTheme');
               progress = (Math.round(auto * 100) / 100 || 0) + '%';
             }
 
-            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
-                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '') +
+            return (startDate ? 'Start Date: ' + global['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + global['anychart']['format']['dateTime'](endDate) : '') +
                 (progress ? '\nComplete: ' + progress : '');
           }
         }
@@ -4212,8 +4213,8 @@ goog.provide('anychart.themes.defaultTheme');
               progress = (Math.round(auto * 100) / 100 || 0) + '%';
             }
 
-            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
-                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '') +
+            return (startDate ? 'Start Date: ' + global['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + global['anychart']['format']['dateTime'](endDate) : '') +
                 (progress ? '\nComplete: ' + progress : '');
 
           }
@@ -4372,9 +4373,9 @@ goog.provide('anychart.themes.defaultTheme');
              */
             'textFormatter': function() {
               var date = this['tickValue'];
-              return window['anychart']['format']['dateTime'](date,
-                  window['anychart']['format']['getDateTimeFormat'](
-                      window['anychart']['format']['getIntervalIdentifier'](this['majorIntervalUnit'])));
+              return global['anychart']['format']['dateTime'](date,
+                  global['anychart']['format']['getDateTimeFormat'](
+                      global['anychart']['format']['getIntervalIdentifier'](this['majorIntervalUnit'])));
             }
           },
           'minorLabels': {
@@ -4393,9 +4394,9 @@ goog.provide('anychart.themes.defaultTheme');
              */
             'textFormatter': function() {
               var date = this['tickValue'];
-              return window['anychart']['format']['dateTime'](date,
-                  window['anychart']['format']['getDateTimeFormat'](
-                      window['anychart']['format']['getIntervalIdentifier'](
+              return global['anychart']['format']['dateTime'](date,
+                  global['anychart']['format']['getDateTimeFormat'](
+                      global['anychart']['format']['getIntervalIdentifier'](
                           this['minorIntervalUnit'],
                           this['majorIntervalUnit']
                       )));
@@ -4414,9 +4415,9 @@ goog.provide('anychart.themes.defaultTheme');
            */
           'titleFormatter': function() {
             var date = this['value'];
-            return window['anychart']['format']['dateTime'](date,
-                window['anychart']['format']['getDateTimeFormat'](
-                    window['anychart']['format']['getIntervalIdentifier'](
+            return global['anychart']['format']['dateTime'](date,
+                global['anychart']['format']['getDateTimeFormat'](
+                    global['anychart']['format']['getIntervalIdentifier'](
                         this['dataIntervalUnit'], null, 'full'
                     )));
           },
@@ -4595,9 +4596,9 @@ goog.provide('anychart.themes.defaultTheme');
              */
             'textFormatter': function() {
               var date = this['tickValue'];
-              return window['anychart']['format']['dateTime'](date,
-                  window['anychart']['format']['getDateTimeFormat'](
-                      window['anychart']['format']['getIntervalIdentifier'](this['majorIntervalUnit'])));
+              return global['anychart']['format']['dateTime'](date,
+                  global['anychart']['format']['getDateTimeFormat'](
+                      global['anychart']['format']['getIntervalIdentifier'](this['majorIntervalUnit'])));
             }
           },
           'minorLabels': {
@@ -4616,9 +4617,9 @@ goog.provide('anychart.themes.defaultTheme');
              */
             'textFormatter': function() {
               var date = this['tickValue'];
-              return window['anychart']['format']['dateTime'](date,
-                  window['anychart']['format']['getDateTimeFormat'](
-                      window['anychart']['format']['getIntervalIdentifier'](
+              return global['anychart']['format']['dateTime'](date,
+                  global['anychart']['format']['getDateTimeFormat'](
+                      global['anychart']['format']['getIntervalIdentifier'](
                           this['minorIntervalUnit'],
                           this['majorIntervalUnit']
                       )));
@@ -4643,9 +4644,9 @@ goog.provide('anychart.themes.defaultTheme');
          */
         'titleFormatter': function() {
           var date = this['hoveredDate'];
-          return window['anychart']['format']['dateTime'](date,
-              window['anychart']['format']['getDateTimeFormat'](
-                  window['anychart']['format']['getIntervalIdentifier'](
+          return global['anychart']['format']['dateTime'](date,
+              global['anychart']['format']['getDateTimeFormat'](
+                  global['anychart']['format']['getIntervalIdentifier'](
                       this['dataIntervalUnit'], null, 'full'
                   )));
         }
@@ -4851,8 +4852,7 @@ goog.provide('anychart.themes.defaultTheme');
     },
 
     'resource': {
-      'calendar': {
-      },
+      'calendar': {},
       'conflicts': {
         'labels': {
           'enabled': true,
@@ -4864,7 +4864,7 @@ goog.provide('anychart.themes.defaultTheme');
           'textFormatter': '{%hours}h ({%percent}%)'
         },
         'fill': '#dd2c00',
-        'stroke' : 'none',
+        'stroke': 'none',
         'hatchFill': null,
         'height': 15,
         'zIndex': 100
@@ -5379,8 +5379,8 @@ goog.provide('anychart.themes.defaultTheme');
               progress = (Math.round(auto * 100) / 100 || 0) + '%';
             }
 
-            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
-                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '') +
+            return (startDate ? 'Start Date: ' + global['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + global['anychart']['format']['dateTime'](endDate) : '') +
                 (progress ? '\nComplete: ' + progress : '');
 
           }
@@ -5402,11 +5402,11 @@ goog.provide('anychart.themes.defaultTheme');
           'textFormatter': function() {
             var startDate = this['periodStart'] || this['minPeriodDate'];
             var endDate = this['periodEnd'] || this['maxPeriodDate'];
-            return (startDate ? 'Start Date: ' + window['anychart']['format']['dateTime'](startDate) : '') +
-                (endDate ? '\nEnd Date: ' + window['anychart']['format']['dateTime'](endDate) : '');
+            return (startDate ? 'Start Date: ' + global['anychart']['format']['dateTime'](startDate) : '') +
+                (endDate ? '\nEnd Date: ' + global['anychart']['format']['dateTime'](endDate) : '');
           }
         }
       }
     }
   };
-})();
+}).call(this);
