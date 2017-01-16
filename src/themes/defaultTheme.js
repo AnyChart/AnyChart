@@ -3600,13 +3600,19 @@ goog.provide('anychart.themes.defaultTheme');
         'offsetX': 0,
         'offsetY': 0,
         'size': 4,
-        'positionFormatter': returnValue
+        'positionFormatter': returnValue,
+        'fill': '#dd2c00',
+        'type': 'circle'
       },
       'hoverMarkers': {
-        'enabled': null
+        'enabled': null,
+        'size': 6
       },
       'selectMarkers': {
-        'enabled': null
+        'enabled': null,
+        'size': 6,
+        'fill': defaultSelectColor,
+        'stroke': defaultSelectStroke
       },
       'labelsDisplayMode': 'drop',
       'hatchFill': false,
@@ -3695,7 +3701,9 @@ goog.provide('anychart.themes.defaultTheme');
       'markers': {
         'enabled': false,
         'position': 'center',
-        'size': 6
+        'size': 6,
+        'fill': '#dd2c00',
+        'type': 'circle'
       },
       'hoverMarkers': {
         'enabled': null,
@@ -3703,7 +3711,9 @@ goog.provide('anychart.themes.defaultTheme');
       },
       'selectMarkers': {
         'enabled': null,
-        'size': 8
+        'size': 8,
+        'fill': defaultSelectColor,
+        'stroke': defaultSelectStroke
       },
       /**
        * @this {*}
