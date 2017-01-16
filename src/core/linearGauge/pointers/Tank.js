@@ -187,19 +187,19 @@ anychart.core.linearGauge.pointers.Tank.prototype.drawMain = function(path, boun
     var right = bounds.left + bounds.width;
     var bottom = bounds.top + bounds.height;
     path
-      .moveTo(bounds.left, bounds.top)
-      .arcToByEndPoint(right, bounds.top, rx, ry, false, true)
-      .lineTo(right, bottom)
-      .arcToByEndPoint(bounds.left, bottom, rx, ry, false, true);
+        .moveTo(bounds.left, bounds.top)
+        .arcToByEndPoint(right, bounds.top, rx, ry, false, true)
+        .lineTo(right, bottom)
+        .arcToByEndPoint(bounds.left, bottom, rx, ry, false, true);
   } else {
     var xR = bounds.height * anychart.core.linearGauge.pointers.Tank.MULTIPLIER;
     var yR = bounds.height / 2;
 
     var yStart = bounds.top + bounds.height / 2 + this.getPointY(yR, 90);
     path.moveTo(bounds.left + this.getPointX(xR, 90), yStart)
-      .arcToByEndPoint(bounds.left, bounds.top, xR, yR, true, true)
-      .lineTo(bounds.left + bounds.width, bounds.top)
-      .arcToByEndPoint(bounds.left + bounds.width, yStart, xR, yR, false, true);
+        .arcToByEndPoint(bounds.left, bounds.top, xR, yR, true, true)
+        .lineTo(bounds.left + bounds.width, bounds.top)
+        .arcToByEndPoint(bounds.left + bounds.width, yStart, xR, yR, false, true);
   }
 };
 

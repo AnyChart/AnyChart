@@ -1470,7 +1470,7 @@ anychart.core.axes.Linear.prototype.staggerMode = function(opt_value) {
 
 /**
  * Getter/setter for staggerLines.
- * @param {(number|null)=} opt_value Fixed/auto.
+ * @param {?number=} opt_value Fixed/auto.
  * @return {null|number|!anychart.core.axes.Linear} .
  */
 anychart.core.axes.Linear.prototype.staggerLines = function(opt_value) {
@@ -1490,7 +1490,7 @@ anychart.core.axes.Linear.prototype.staggerLines = function(opt_value) {
 
 /**
  * Getter/setter for staggerMaxLines.
- * @param {(number|null)=} opt_value .
+ * @param {?number=} opt_value .
  * @return {null|number|!anychart.core.axes.Linear} .
  */
 anychart.core.axes.Linear.prototype.staggerMaxLines = function(opt_value) {

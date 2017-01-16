@@ -61,7 +61,7 @@ goog.inherits(anychart.core.ui.CircularLabelsFactory, anychart.core.ui.LabelsFac
 
 /**
  * Pix X coord of center.
- * @param {(number|null)=} opt_value Pixel value of radial center.
+ * @param {?(number)=} opt_value Pixel value of radial center.
  * @return {!anychart.core.ui.CircularLabelsFactory|number} Pix X coord of center or itself for chaining.
  */
 anychart.core.ui.CircularLabelsFactory.prototype.cx = function(opt_value) {
@@ -81,7 +81,7 @@ anychart.core.ui.CircularLabelsFactory.prototype.cx = function(opt_value) {
 
 /**
  * Pix Y coord of center.
- * @param {(number|null)=} opt_value Pixel value of radial center.
+ * @param {?(number)=} opt_value Pixel value of radial center.
  * @return {!anychart.core.ui.CircularLabelsFactory|number} Pix Y coord of center or itself for chaining.
  */
 anychart.core.ui.CircularLabelsFactory.prototype.cy = function(opt_value) {
@@ -101,7 +101,7 @@ anychart.core.ui.CircularLabelsFactory.prototype.cy = function(opt_value) {
 
 /**
  * Parent radius.
- * @param {(number|null)=} opt_value Parent radius.
+ * @param {?(number)=} opt_value Parent radius.
  * @return {!anychart.core.ui.CircularLabelsFactory|number} Parent radius or itself for chaining.
  */
 anychart.core.ui.CircularLabelsFactory.prototype.parentRadius = function(opt_value) {

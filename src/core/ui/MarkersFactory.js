@@ -238,7 +238,7 @@ anychart.core.ui.MarkersFactory.HANDLED_EVENT_TYPES_CAPTURE_SHIFT_ = 12;
 
 /**
  * Getter/setter for enabled.
- * @param {(null|boolean)=} opt_value Value to set.
+ * @param {?boolean=} opt_value Value to set.
  * @return {!anychart.core.ui.MarkersFactory|boolean|null} .
  */
 anychart.core.ui.MarkersFactory.prototype.enabled = function(opt_value) {

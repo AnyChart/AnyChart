@@ -40,7 +40,7 @@ anychart.charts.LinearGauge = function(opt_data, opt_csvSettings) {
 
   /**
    * Array of pointers.
-   * @type {!Array.<anychart.core.linearGauge.pointers.Base|null>}
+   * @type {!Array.<?anychart.core.linearGauge.pointers.Base>}
    * @private
    */
   this.pointers_ = [];

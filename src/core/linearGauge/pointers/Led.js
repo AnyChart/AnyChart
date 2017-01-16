@@ -65,9 +65,9 @@ anychart.core.linearGauge.pointers.Led.prototype.createShapes = function() {
    */
   if (!this.interactiveLayer_) {
     this.interactiveLayer_ = this.rootLayer.rect()
-      .zIndex(100)
-      .stroke('none')
-      .fill(anychart.color.TRANSPARENT_HANDLER);
+        .zIndex(100)
+        .stroke('none')
+        .fill(anychart.color.TRANSPARENT_HANDLER);
   }
   this.makeInteractive(this.interactiveLayer_);
 };
@@ -187,18 +187,18 @@ anychart.core.linearGauge.pointers.Led.prototype.drawVertical = function() {
     }
 
     path
-      .moveTo(left, top)
-      .lineTo(right, top)
-      .lineTo(right, bottom)
-      .lineTo(left, bottom)
-      .lineTo(left, top);
-    if (!criteria)
-      this.hatch
         .moveTo(left, top)
         .lineTo(right, top)
         .lineTo(right, bottom)
         .lineTo(left, bottom)
         .lineTo(left, top);
+    if (!criteria)
+      this.hatch
+          .moveTo(left, top)
+          .lineTo(right, top)
+          .lineTo(right, bottom)
+          .lineTo(left, bottom)
+          .lineTo(left, top);
 
     if (isVertical) {
       bottom = top - gap;

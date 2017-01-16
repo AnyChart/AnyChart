@@ -1207,8 +1207,8 @@ anychart.charts.CircularGauge.prototype.drawContent = function(bounds) {
   if (this.hasInvalidationState(anychart.ConsistencyState.GAUGE_CAP)) {
     if (this.cap_)
       this.cap_
-        .container(this.rootElement)
-        .draw();
+          .container(this.rootElement)
+          .draw();
 
     this.markConsistent(anychart.ConsistencyState.GAUGE_CAP);
   }

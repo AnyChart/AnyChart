@@ -123,7 +123,7 @@ anychart.ui.chartEditor.steps.Base.Preset;
 
 
 /**
- * @typedef {{
+ * @typedef {?{
  *  window: Window,
  *  anychart: Object,
  *
@@ -132,7 +132,7 @@ anychart.ui.chartEditor.steps.Base.Preset;
  *
  *  dataSets: Array<anychart.ui.chartEditor.steps.Base.DataSet>,
  *  dataMappings: Array<anychart.data.Mapping>,
- *  seriesMappings: Object<string, {type: (string|null), mapping: number}>,
+ *  seriesMappings: Object<string, {type:? (string), mapping: number}>,
  *  chartMapping: number,
  *  lastSeriesId: number,
  *
@@ -147,7 +147,7 @@ anychart.ui.chartEditor.steps.Base.Preset;
  *  chartContainer: (Element|string),
  *  chartConstructor: string,
  *  seriesType: string
- * }|null}
+ * }}
  */
 anychart.ui.chartEditor.steps.Base.Model;
 

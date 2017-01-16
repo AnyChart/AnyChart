@@ -1020,10 +1020,10 @@ anychart.core.ui.LegendItem.prototype.draw = function() {
 
   if (!this.rectTheListener_) {
     this.rectTheListener_ = this.layer_
-      .rect()
-      .zIndex(5)
-      .stroke(null)
-      .fill('#FFFFFF 0.00001');
+        .rect()
+        .zIndex(5)
+        .stroke(null)
+        .fill('#FFFFFF 0.00001');
 
     this.registerDisposable(/** @type {goog.disposable.IDisposable} */ (this.rectTheListener_));
   }

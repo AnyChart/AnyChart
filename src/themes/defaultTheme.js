@@ -542,6 +542,19 @@ goog.provide('anychart.themes.defaultTheme');
 
     return res;
   };
+
+  /**
+   * @param {*} contextProvider
+   * @return {*}
+   */
+  var tooltipTitleFormatter = function(contextProvider) {
+    switch (contextProvider['xScaleType']) {
+      case 'dateTime':
+        return window['anychart']['format']['date'](contextProvider['x']);
+      default:
+        return locNum(contextProvider['x']);
+    }
+  };
   //endregion
 
   global['anychart'] = global['anychart'] || {};
@@ -1099,7 +1112,7 @@ goog.provide('anychart.themes.defaultTheme');
          * @return {*}
          */
         'titleFormatter': function() {
-          return this['points'][0]['x'];
+          return tooltipTitleFormatter(this['points'][0]);
         },
         /**
          * @this {*}
@@ -1133,7 +1146,7 @@ goog.provide('anychart.themes.defaultTheme');
              * @return {*}
              */
             'titleFormatter': function() {
-              return locNum(this['x']);
+              return tooltipTitleFormatter(this);
             },
             /**
              * @this {*}

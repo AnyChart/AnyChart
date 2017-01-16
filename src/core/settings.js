@@ -800,7 +800,7 @@ anychart.core.settings.IResolvable.prototype.getHighPriorityResolutionChain = fu
  * Getter/setter for resolution chain cache.
  * General idea of this cache is to avoid array re-concatenation on every getOption() call.
  * @param {Array.<Object|null|undefined>=} opt_value - Value to set.
- * @return {Array.<Object|null|undefined>|null} - Chain of settings.
+ * @return {?Array.<Object|null|undefined>} - Chain of settings.
  */
 anychart.core.settings.IResolvable.prototype.resolutionChainCache = function(opt_value) {};
 

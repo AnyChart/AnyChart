@@ -110,7 +110,7 @@ anychart.core.map.series.Connector.prototype.createFormatProvider = function(opt
  * If there are several - array.
  * If any of the two is undefined - returns null.
  *
- * @return {Array.<number>|null} Array with values or null, any of the two is undefined.
+ * @return {?Array.<number>} Array with values or null, any of the two is undefined.
  *    (we do so to avoid reiterating to check on missing).
  * @protected
  */

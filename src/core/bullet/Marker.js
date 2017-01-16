@@ -415,7 +415,7 @@ anychart.core.bullet.Marker.getDrawer = function(layout, type) {
           var rx = ry / 1.5;
 
           path.clear()
-          //left line
+              //left line
               .moveTo(x - rx - 1, y - ry)
               .lineTo(x + rx - 1, y + ry)
               .lineTo(x + rx + 1, y + ry)
@@ -501,7 +501,7 @@ anychart.core.bullet.Marker.getDrawer = function(layout, type) {
           var ry = rx / 1.5;
 
           path.clear()
-          //left line
+              //left line
               .moveTo(x - rx - 1, y - ry)
               .lineTo(x + rx - 1, y + ry)
               .lineTo(x + rx + 1, y + ry)

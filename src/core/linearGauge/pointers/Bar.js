@@ -63,13 +63,13 @@ anychart.core.linearGauge.pointers.Bar.prototype.drawVertical = function() {
   }
 
   this.path
-    .clear()
-    .moveTo(left, top)
-    .lineTo(right, top)
-    .lineTo(right, bottom)
-    .lineTo(left, bottom)
-    .lineTo(left, top)
-    .close();
+      .clear()
+      .moveTo(left, top)
+      .lineTo(right, top)
+      .lineTo(right, bottom)
+      .lineTo(left, bottom)
+      .lineTo(left, top)
+      .close();
 
   this.hatch.deserialize(this.path.serialize());
 };

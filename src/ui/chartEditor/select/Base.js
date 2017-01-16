@@ -67,7 +67,7 @@ anychart.ui.chartEditor.select.Base.prototype.setOptions = function(value) {
 
 /**
  * Set caption for options.
- * @param {Array.<string|null>} value
+ * @param {Array.<?string>} value
  */
 anychart.ui.chartEditor.select.Base.prototype.setCaptions = function(value) {
   this.captions_ = value;

@@ -32,12 +32,12 @@ anychart.core.linearGauge.pointers.Thermometer.prototype.drawVertical = function
   this.pointerBounds.height = Math.abs(bottom - top);
 
   this.path.clear()
-    .moveTo(left, top)
-    .lineTo(right, top)
-    .lineTo(right, bottom)
-    .arcToByEndPoint(left, bottom, this.pixRadius_, this.pixRadius_, true, !inverted)
-    .lineTo(left, top)
-    .close();
+      .moveTo(left, top)
+      .lineTo(right, top)
+      .lineTo(right, bottom)
+      .arcToByEndPoint(left, bottom, this.pixRadius_, this.pixRadius_, true, !inverted)
+      .lineTo(left, top)
+      .close();
 
   this.hatch.deserialize(this.path.serialize());
 };
@@ -58,12 +58,12 @@ anychart.core.linearGauge.pointers.Thermometer.prototype.drawHorizontal = functi
   this.pointerBounds.height = Math.abs(right - left);
 
   this.path.clear()
-    .moveTo(top, left)
-    .lineTo(top, right)
-    .lineTo(bottom, right)
-    .arcToByEndPoint(bottom, left, this.pixRadius_, this.pixRadius_, true, !inverted)
-    .lineTo(top, left)
-    .close();
+      .moveTo(top, left)
+      .lineTo(top, right)
+      .lineTo(bottom, right)
+      .arcToByEndPoint(bottom, left, this.pixRadius_, this.pixRadius_, true, !inverted)
+      .lineTo(top, left)
+      .close();
 
   this.hatch.deserialize(this.path.serialize());
 };

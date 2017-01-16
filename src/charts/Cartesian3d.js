@@ -389,7 +389,7 @@ anychart.charts.Cartesian3d.prototype.zAspect = function(opt_value) {
 
 /**
  * Getter/setter for zDepth.
- * @param {(number|null)=} opt_value
+ * @param {?(number)=} opt_value
  * @return {number|null|anychart.charts.Cartesian3d}
  * @deprecated Deprecated since 7.10.0. Use chart.zAspect instead.
  */

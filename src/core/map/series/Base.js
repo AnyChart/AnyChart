@@ -877,7 +877,7 @@ anychart.core.map.series.Base.prototype.getPositionByRegion = function() {
  * If there are several - array.
  * If any of the two is undefined - returns null.
  *
- * @return {Array.<*>|null} Fetches significant scale values from current data row.
+ * @return {?Array.<*>} Fetches significant scale values from current data row.
  */
 anychart.core.map.series.Base.prototype.getReferenceScaleValues = function() {
   if (!this.enabled()) return null;

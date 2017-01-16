@@ -130,7 +130,7 @@ anychart.core.ui.Tooltip = function(capability) {
 
   /**
    * Resolution chain cache.
-   * @type {Array.<Object|null|undefined>|null}
+   * @type {?Array.<Object|null|undefined>}
    * @private
    */
   this.resolutionChainCache_ = null;
@@ -1652,7 +1652,7 @@ anychart.core.ui.Tooltip.prototype.setContainerToTooltip_ = function(tooltip) {
  * Create triangle trajectory for selectable.
  * @param {number} x3
  * @param {number} y3
- * @return {Array.<number>|null}
+ * @return {?Array.<number>}
  * @private
  */
 anychart.core.ui.Tooltip.prototype.createTriangle_ = function(x3, y3) {

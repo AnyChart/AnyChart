@@ -625,11 +625,11 @@ anychart.core.axisMarkers.CircularRange.prototype.draw = function() {
           else
             path = this.paths_[i];
           path
-            .clear()
-            .stroke('none')
-            .fill('none')
-            .parent(/** @type {acgraph.vector.ILayer} */(this.container()))
-            .zIndex(/** @type {number} */(this.zIndex()));
+              .clear()
+              .stroke('none')
+              .fill('none')
+              .parent(/** @type {acgraph.vector.ILayer} */(this.container()))
+              .zIndex(/** @type {number} */(this.zIndex()));
         }
         for (i = 0; i < keysCount - 1; i++) {
           var k1 = keys[i];

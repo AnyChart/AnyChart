@@ -234,7 +234,7 @@ anychart.data.csv.Parser.prototype.ignoreTrailingSpaces = function(opt_value) {
  *    processor.
  * @param {boolean=} opt_async Indicates async processing. Async processing can be activated only if a custom items
  *    processor passed.
- * @return {Array.<Array>|null} If no items processor passed, returns parsed data as an array of rows. Each row is an
+ * @return {?Array.<Array>} If no items processor passed, returns parsed data as an array of rows. Each row is an
  *    array of strings in that case.
  */
 anychart.data.csv.Parser.prototype.parse = function(data, opt_itemsProcessor, opt_async) {

@@ -100,7 +100,7 @@ anychart.ui.chartEditor.Controller.prototype.onChangeModel_ = function(evt) {
 
 
 /**
- * @param {{seriesType: (string|null), mapping: number, rebuild: boolean}} evt
+ * @param {{seriesType:? (string), mapping: number, rebuild: boolean}} evt
  * @private
  */
 anychart.ui.chartEditor.Controller.prototype.onAddSeries_ = function(evt) {

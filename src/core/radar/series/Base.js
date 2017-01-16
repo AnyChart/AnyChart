@@ -239,7 +239,7 @@ anychart.core.radar.series.Base.prototype.getReferenceScaleValues = function() {
  * If there are several - array.
  * If any of the two is undefined - returns null.
  *
- * @return {Array.<number>|null} Array with values or null, any of the two is undefined.
+ * @return {?Array.<number>} Array with values or null, any of the two is undefined.
  *    (we do so to avoid reiterating to check on missing).
  * @protected
  */
@@ -307,7 +307,7 @@ anychart.core.radar.series.Base.prototype.transformXY = function(xVal, yVal, opt
 
 
 /**
- * @return {Array.<number>|null} .
+ * @return {?Array.<number>} .
  * @protected
  */
 anychart.core.radar.series.Base.prototype.getZeroPointCoords = function() {

@@ -587,7 +587,7 @@ anychart.core.ui.LabelsFactory.prototype.height = function(opt_value) {
 
 /**
  * LabelsFactory clip settings.
- * @param {(anychart.math.Rect|null)=} opt_value Height clip to set.
+ * @param {?anychart.math.Rect=} opt_value Height clip to set.
  * @return {!anychart.core.ui.LabelsFactory|anychart.math.Rect|null} LabelsFactory clip or itself for chaining.
  */
 anychart.core.ui.LabelsFactory.prototype.clip = function(opt_value) {
@@ -1743,7 +1743,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.maxFontSize = function(opt_value)
 
 /**
  * Labels clip settings.
- * @param {(anychart.math.Rect|null)=} opt_value Height clip to set.
+ * @param {?anychart.math.Rect=} opt_value Height clip to set.
  * @return {!anychart.core.ui.LabelsFactory.Label|anychart.math.Rect|null} LabelsFactory clip or itself for chaining.
  */
 anychart.core.ui.LabelsFactory.Label.prototype.clip = function(opt_value) {

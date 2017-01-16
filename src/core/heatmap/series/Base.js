@@ -287,7 +287,7 @@ anychart.core.heatMap.series.Base.prototype.categoriseData = function(categories
  * If there are several - array.
  * If any of the two is undefined - returns null.
  *
- * @return {Array.<*>|null} Fetches significant scale values from current data row.
+ * @return {?Array.<*>} Fetches significant scale values from current data row.
  */
 anychart.core.heatMap.series.Base.prototype.getReferenceScaleValues = function() {
   if (!this.enabled()) return null;
@@ -312,7 +312,7 @@ anychart.core.heatMap.series.Base.prototype.getReferenceScaleValues = function()
  * If there are several - array.
  * If any of the two is undefined - returns null.
  *
- * @return {Array.<number>|null} Array with values or null, any of the two is undefined.
+ * @return {?Array.<number>} Array with values or null, any of the two is undefined.
  *    (we do so to avoid reiterating to check on missing).
  * @protected
  */

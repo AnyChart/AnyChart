@@ -912,8 +912,8 @@ anychart.charts.Stock.prototype.drawContent = function(bounds) {
       var plot = this.plots_[i];
       if (plot) {
         plot
-          .container(this.rootElement)
-          .draw();
+            .container(this.rootElement)
+            .draw();
       }
     }
     this.markConsistent(anychart.ConsistencyState.STOCK_PLOTS_APPEARANCE);

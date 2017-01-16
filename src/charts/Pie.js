@@ -43,7 +43,7 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
   /**
    * Filter function that should accept a field value and return true if the row
    *    should be included into the resulting view as and false otherwise.
-   * @type {(null|function(*):boolean)}
+   * @type {?function(*):boolean}
    * @private
    */
   this.groupedPointFilter_ = null;

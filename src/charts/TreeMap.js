@@ -920,8 +920,8 @@ anychart.charts.TreeMap.prototype.isMissing = function(value) {
  */
 anychart.charts.TreeMap.prototype.calculateNodeSize = function(node, depth) {
   node
-    .meta('index', this.linearIndex_++)
-    .meta('depth', depth);
+      .meta('index', this.linearIndex_++)
+      .meta('depth', depth);
   this.linearNodes_.push(node);
   var size;
   var value;

@@ -1630,13 +1630,13 @@ anychart.core.ui.Legend.prototype.drawLegendContent_ = function(pageNumber, cont
             // fixes ellipsis applying when change content page throughout paginator
             item.invalidate(anychart.ConsistencyState.BOUNDS);
             item
-              .suspendSignalsDispatching()
-              .parentBounds(contentBounds)
-              .x(x)
-              .y(y)
-              .enabled(true)
-              .resumeSignalsDispatching(false)
-              .draw();
+                .suspendSignalsDispatching()
+                .parentBounds(contentBounds)
+                .x(x)
+                .y(y)
+                .enabled(true)
+                .resumeSignalsDispatching(false)
+                .draw();
             x += items[i].getWidth() + this.itemsSpacing_;
           }
           break;
@@ -1646,13 +1646,13 @@ anychart.core.ui.Legend.prototype.drawLegendContent_ = function(pageNumber, cont
             // fixes ellipsis applying when change content page throughout paginator
             item.invalidate(anychart.ConsistencyState.BOUNDS);
             item
-              .suspendSignalsDispatching()
-              .parentBounds(contentBounds)
-              .x(x)
-              .y(y)
-              .enabled(true)
-              .resumeSignalsDispatching(false)
-              .draw();
+                .suspendSignalsDispatching()
+                .parentBounds(contentBounds)
+                .x(x)
+                .y(y)
+                .enabled(true)
+                .resumeSignalsDispatching(false)
+                .draw();
             y += items[i].getHeight() + this.itemsSpacing_;
           }
           break;

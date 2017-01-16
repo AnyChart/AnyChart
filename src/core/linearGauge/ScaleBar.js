@@ -547,12 +547,12 @@ anychart.core.linearGauge.ScaleBar.prototype.draw = function() {
         fill['angle'] = 0;
       path = this.paths[0] ? this.paths[0] : this.paths[0] = this.rootLayer.path();
       path
-        .moveTo(left, top)
-        .lineTo(right, top)
-        .lineTo(right, bottom)
-        .lineTo(left, bottom)
-        .lineTo(left, top)
-        .close();
+          .moveTo(left, top)
+          .lineTo(right, top)
+          .lineTo(right, bottom)
+          .lineTo(left, bottom)
+          .lineTo(left, top)
+          .close();
       path.fill(fill).stroke('none');
       path.clip(this.clipPath_);
     } else if (colorScale instanceof anychart.scales.OrdinalColor) {
@@ -573,20 +573,20 @@ anychart.core.linearGauge.ScaleBar.prototype.draw = function() {
           pos = inverted ? i : (ranges.length - 1 - i);
           y = top + partLength * pos;
           path
-            .moveTo(left, y)
-            .lineTo(left, y + partLength + shift)
-            .lineTo(right, y + partLength + shift)
-            .lineTo(right, y)
-            .close();
+              .moveTo(left, y)
+              .lineTo(left, y + partLength + shift)
+              .lineTo(right, y + partLength + shift)
+              .lineTo(right, y)
+              .close();
         } else {
           pos = inverted ? (ranges.length - 1 - i) : i;
           x = left + partLength * pos;
           path
-            .moveTo(x, top)
-            .lineTo(x + partLength + shift, top)
-            .lineTo(x + partLength + shift, bottom)
-            .lineTo(x, bottom)
-            .close();
+              .moveTo(x, top)
+              .lineTo(x + partLength + shift, top)
+              .lineTo(x + partLength + shift, bottom)
+              .lineTo(x, bottom)
+              .close();
         }
         path.fill(color).stroke('none');
       }
@@ -596,12 +596,12 @@ anychart.core.linearGauge.ScaleBar.prototype.draw = function() {
       stroke = this.stroke();
       path = this.paths[0] ? this.paths[0] : this.paths[0] = this.rootLayer.path();
       path
-        .moveTo(left, top)
-        .lineTo(right, top)
-        .lineTo(right, bottom)
-        .lineTo(left, bottom)
-        .lineTo(left, top)
-        .close();
+          .moveTo(left, top)
+          .lineTo(right, top)
+          .lineTo(right, bottom)
+          .lineTo(left, bottom)
+          .lineTo(left, top)
+          .close();
       path.fill(fill).stroke(stroke).clip(this.clipPath_);
     }
 
