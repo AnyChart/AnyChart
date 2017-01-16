@@ -518,7 +518,7 @@ anychart.format.inputBaseDate = function(opt_value) {
   if (isNaN(anychart.format.inputBaseDate_)) {
     // we recalculate current year and month on each request for persistent apps
     var currDate = new Date();
-    currDate.setTime(Date.UTC(currDate.getFullYear(), currDate.getUTCMonth()));
+    currDate.setTime(Date.UTC(currDate.getUTCFullYear(), currDate.getUTCMonth()));
     return currDate;
   }
   return new Date(anychart.format.inputBaseDate_);
@@ -663,10 +663,20 @@ anychart.format.parseDateTime = function(value, opt_format, opt_baseDate, opt_lo
 
       var date = goog.isDateLike(opt_baseDate) ? /** @type {Date} */ (opt_baseDate) : anychart.format.inputBaseDate();
 
+      var timezoneOffset = (format.replace(/'.+?'/g, '').search(/z+/i) == -1) ? date.getTimezoneOffset() * 60000 : 0;
+      if (timezoneOffset) {
+        var localTime = date.getTime() + timezoneOffset;
+        date.setTime(localTime);
+      }
+
       var valueLength = value.length;
       var resultLength = parser.parse(value, date);
 
       if (valueLength == resultLength) {//parsing successful.
+        if (timezoneOffset) {
+          var utcTime = date.getTime() - timezoneOffset;
+          date.setTime(utcTime);
+        }
         return /** @type {Date} */ (date);
       } else {
         // anychart.core.reporting.warning(anychart.enums.WarningCode.PARSE_DATETIME, void 0, [value, resultLength], true);
