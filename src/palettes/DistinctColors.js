@@ -20,7 +20,7 @@ goog.require('goog.array');
  * @extends {anychart.core.Base}
  */
 anychart.palettes.DistinctColors = function() {
-  goog.base(this);
+  anychart.palettes.DistinctColors.base(this, 'constructor');
 
   /**
    * Color palette colors list.
@@ -122,7 +122,7 @@ anychart.palettes.DistinctColors.prototype.restoreDefaults = function(opt_doNotD
 
 /** @inheritDoc */
 anychart.palettes.DistinctColors.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.palettes.DistinctColors.base(this, 'serialize');
   json['type'] = 'distinct';
   var res = [];
   for (var i = 0; i < this.colors_.length; i++) {
@@ -150,7 +150,7 @@ anychart.palettes.DistinctColors.prototype.setupSpecial = function(var_args) {
 
 /** @inheritDoc */
 anychart.palettes.DistinctColors.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.palettes.DistinctColors.base(this, 'setupByJSON', config, opt_default);
   this.items(config['items']);
 };
 
@@ -171,8 +171,12 @@ anychart.palettes.distinctColors = function(opt_value, var_args) {
 
 
 //exports
-goog.exportSymbol('anychart.palettes.distinctColors', anychart.palettes.distinctColors);
-anychart.palettes.DistinctColors.prototype['colorAt'] = anychart.palettes.DistinctColors.prototype.colorAt;
-anychart.palettes.DistinctColors.prototype['itemAt'] = anychart.palettes.DistinctColors.prototype.itemAt;
-anychart.palettes.DistinctColors.prototype['colors'] = anychart.palettes.DistinctColors.prototype.colors;
-anychart.palettes.DistinctColors.prototype['items'] = anychart.palettes.DistinctColors.prototype.items;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.palettes.DistinctColors.prototype;
+  goog.exportSymbol('anychart.palettes.distinctColors', anychart.palettes.distinctColors);
+  proto['colorAt'] = proto.colorAt;
+  proto['itemAt'] = proto.itemAt;
+  proto['colors'] = proto.colors;
+  proto['items'] = proto.items;
+})();

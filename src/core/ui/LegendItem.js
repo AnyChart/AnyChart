@@ -14,7 +14,7 @@ goog.require('anychart.utils');
  * @constructor
  */
 anychart.core.ui.LegendItem = function() {
-  goog.base(this);
+  anychart.core.ui.LegendItem.base(this, 'constructor');
 
   /**
    * LegendItem element.
@@ -848,7 +848,7 @@ anychart.core.ui.LegendItem.prototype.applyTextSettings = function(textElement, 
     else
       textElement.text(this.settingsObj['text']);
   }
-  goog.base(this, 'applyTextSettings', textElement, isInitial);
+  anychart.core.ui.LegendItem.base(this, 'applyTextSettings', textElement, isInitial);
   this.changedSettings = {};
 };
 
@@ -1090,7 +1090,7 @@ anychart.core.ui.LegendItem.prototype.fontColor = function(opt_value) {
   if (goog.isDef(opt_value))
     this.originalFontColor_ = opt_value;
 
-  return goog.base(this, 'fontColor', opt_value);
+  return anychart.core.ui.LegendItem.base(this, 'fontColor', opt_value);
 };
 
 
@@ -1218,7 +1218,7 @@ anychart.core.ui.LegendItem.prototype.applyMarkerFillAndStroke_ = function(hover
 
 /** @inheritDoc */
 anychart.core.ui.LegendItem.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.ui.LegendItem.base(this, 'setupByJSON', config, opt_default);
   this.iconEnabled(config['iconEnabled']);
   this.iconType(config['iconType']);
   this.iconStroke(config['iconStroke']);

@@ -31,7 +31,7 @@ goog.require('anychart.utils');
  */
 anychart.core.axes.Linear = function() {
   this.suspendSignalsDispatching();
-  goog.base(this);
+  anychart.core.axes.Linear.base(this, 'constructor');
 
   this.labelsBounds_ = [];
   this.minorLabelsBounds_ = [];
@@ -1975,7 +1975,7 @@ anychart.core.axes.Linear.prototype.remove = function() {
 
 /** @inheritDoc */
 anychart.core.axes.Linear.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.axes.Linear.base(this, 'serialize');
   json['title'] = this.title().serialize();
   json['labels'] = this.labels().serialize();
   json['minorLabels'] = this.minorLabels().serialize();
@@ -1996,7 +1996,7 @@ anychart.core.axes.Linear.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.axes.Linear.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.axes.Linear.base(this, 'setupByJSON', config, opt_default);
 
   if (anychart.opt.TITLE in config)
     this.title(config[anychart.opt.TITLE]);
@@ -2019,7 +2019,7 @@ anychart.core.axes.Linear.prototype.setupByJSON = function(config, opt_default) 
 
 /** @inheritDoc */
 anychart.core.axes.Linear.prototype.disposeInternal = function() {
-  goog.base(this, 'disposeInternal');
+  anychart.core.axes.Linear.base(this, 'disposeInternal');
 
   if (this.internalScale)
     this.internalScale.unlistenSignals(this.scaleInvalidated_, this);
@@ -2042,21 +2042,24 @@ anychart.core.axes.Linear.prototype.disposeInternal = function() {
 
 
 //exports
-anychart.core.axes.Linear.prototype['staggerMode'] = anychart.core.axes.Linear.prototype.staggerMode;
-anychart.core.axes.Linear.prototype['staggerLines'] = anychart.core.axes.Linear.prototype.staggerLines;
-anychart.core.axes.Linear.prototype['staggerMaxLines'] = anychart.core.axes.Linear.prototype.staggerMaxLines;
-anychart.core.axes.Linear.prototype['title'] = anychart.core.axes.Linear.prototype.title;
-anychart.core.axes.Linear.prototype['labels'] = anychart.core.axes.Linear.prototype.labels;
-anychart.core.axes.Linear.prototype['minorLabels'] = anychart.core.axes.Linear.prototype.minorLabels;
-anychart.core.axes.Linear.prototype['ticks'] = anychart.core.axes.Linear.prototype.ticks;
-anychart.core.axes.Linear.prototype['minorTicks'] = anychart.core.axes.Linear.prototype.minorTicks;
-anychart.core.axes.Linear.prototype['stroke'] = anychart.core.axes.Linear.prototype.stroke;
-anychart.core.axes.Linear.prototype['orientation'] = anychart.core.axes.Linear.prototype.orientation;
-anychart.core.axes.Linear.prototype['scale'] = anychart.core.axes.Linear.prototype.scale;
-anychart.core.axes.Linear.prototype['width'] = anychart.core.axes.Linear.prototype.width;
-anychart.core.axes.Linear.prototype['getRemainingBounds'] = anychart.core.axes.Linear.prototype.getRemainingBounds;
-anychart.core.axes.Linear.prototype['drawFirstLabel'] = anychart.core.axes.Linear.prototype.drawFirstLabel;
-anychart.core.axes.Linear.prototype['drawLastLabel'] = anychart.core.axes.Linear.prototype.drawLastLabel;
-anychart.core.axes.Linear.prototype['overlapMode'] = anychart.core.axes.Linear.prototype.overlapMode;
-anychart.core.axes.Linear.prototype['isHorizontal'] = anychart.core.axes.Linear.prototype.isHorizontal;
-anychart.core.axes.Linear.prototype['padding'] = anychart.core.axes.Linear.prototype.padding;
+(function() {
+  var proto = anychart.core.axes.Linear.prototype;
+  proto['staggerMode'] = proto.staggerMode;
+  proto['staggerLines'] = proto.staggerLines;
+  proto['staggerMaxLines'] = proto.staggerMaxLines;
+  proto['title'] = proto.title;
+  proto['labels'] = proto.labels;
+  proto['minorLabels'] = proto.minorLabels;
+  proto['ticks'] = proto.ticks;
+  proto['minorTicks'] = proto.minorTicks;
+  proto['stroke'] = proto.stroke;
+  proto['orientation'] = proto.orientation;
+  proto['scale'] = proto.scale;
+  proto['width'] = proto.width;
+  proto['getRemainingBounds'] = proto.getRemainingBounds;
+  proto['drawFirstLabel'] = proto.drawFirstLabel;
+  proto['drawLastLabel'] = proto.drawLastLabel;
+  proto['overlapMode'] = proto.overlapMode;
+  proto['isHorizontal'] = proto.isHorizontal;
+  proto['padding'] = proto.padding;
+})();

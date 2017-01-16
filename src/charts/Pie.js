@@ -30,7 +30,7 @@ goog.require('anychart.palettes');
  * @constructor
  */
 anychart.charts.Pie = function(opt_data, opt_csvSettings) {
-  goog.base(this);
+  anychart.charts.Pie.base(this, 'constructor');
   this.suspendSignalsDispatching();
 
   /**
@@ -3636,7 +3636,7 @@ anychart.charts.Pie.prototype.showTooltip = function(opt_event) {
   // if (tooltip.isFloating() && opt_event) {
   //   tooltip.show(
   //       formatProvider,
-  //       new acgraph.math.Coordinate(opt_event['clientX'], opt_event['clientY']));
+  //       new goog.math.Coordinate(opt_event['clientX'], opt_event['clientY']));
   //
   //   // for float
   //   this.listen(goog.events.EventType.MOUSEMOVE, this.showTooltip);
@@ -3644,7 +3644,7 @@ anychart.charts.Pie.prototype.showTooltip = function(opt_event) {
   // } else {
   //   tooltip.show(
   //       formatProvider,
-  //       new acgraph.math.Coordinate(0, 0));
+  //       new goog.math.Coordinate(0, 0));
   // }
 };
 
@@ -4298,7 +4298,7 @@ anychart.charts.Pie.prototype.createPositionProvider = function() {
 
 /** @inheritDoc */
 anychart.charts.Pie.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.charts.Pie.base(this, 'serialize');
   json['type'] = this.getType();
   json['data'] = this.data().serialize();
   json['labels'] = this.labels().serialize();
@@ -4429,7 +4429,7 @@ anychart.charts.Pie.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.charts.Pie.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.charts.Pie.base(this, 'setupByJSON', config, opt_default);
   this.group(config['group']);
   this.data(config['data']);
   this.labels().setup(config['labels']);
@@ -4848,39 +4848,42 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.calculate = function() {
 
 
 //exports
-anychart.charts.Pie.prototype['data'] = anychart.charts.Pie.prototype.data;//doc|ex|
-anychart.charts.Pie.prototype['group'] = anychart.charts.Pie.prototype.group;//doc|ex|non-tr
-anychart.charts.Pie.prototype['labels'] = anychart.charts.Pie.prototype.labels;//doc|ex
-anychart.charts.Pie.prototype['hoverLabels'] = anychart.charts.Pie.prototype.hoverLabels;//doc|ex
-anychart.charts.Pie.prototype['radius'] = anychart.charts.Pie.prototype.radius;//doc|ex
-anychart.charts.Pie.prototype['innerRadius'] = anychart.charts.Pie.prototype.innerRadius;//doc|ex
-anychart.charts.Pie.prototype['startAngle'] = anychart.charts.Pie.prototype.startAngle;//doc|ex
-anychart.charts.Pie.prototype['explode'] = anychart.charts.Pie.prototype.explode;//doc/ex
-anychart.charts.Pie.prototype['sort'] = anychart.charts.Pie.prototype.sort;//doc|ex
-anychart.charts.Pie.prototype['getCenterPoint'] = anychart.charts.Pie.prototype.getCenterPoint;//doc|ex
-anychart.charts.Pie.prototype['getPixelRadius'] = anychart.charts.Pie.prototype.getPixelRadius;//doc|need-ex
-anychart.charts.Pie.prototype['getPixelInnerRadius'] = anychart.charts.Pie.prototype.getPixelInnerRadius;//doc|need-ex
-anychart.charts.Pie.prototype['getPixelExplode'] = anychart.charts.Pie.prototype.getPixelExplode;
-anychart.charts.Pie.prototype['palette'] = anychart.charts.Pie.prototype.palette;//doc|ex
-anychart.charts.Pie.prototype['fill'] = anychart.charts.Pie.prototype.fill;//doc|ex
-anychart.charts.Pie.prototype['stroke'] = anychart.charts.Pie.prototype.stroke;//doc|ex
-anychart.charts.Pie.prototype['hoverFill'] = anychart.charts.Pie.prototype.hoverFill;//doc|ex
-anychart.charts.Pie.prototype['hoverStroke'] = anychart.charts.Pie.prototype.hoverStroke;//doc|ex
-anychart.charts.Pie.prototype['hatchFill'] = anychart.charts.Pie.prototype.hatchFill;//doc|ex
-anychart.charts.Pie.prototype['hoverHatchFill'] = anychart.charts.Pie.prototype.hoverHatchFill;//doc|ex
-anychart.charts.Pie.prototype['explodeSlice'] = anychart.charts.Pie.prototype.explodeSlice;//doc|ex
-anychart.charts.Pie.prototype['explodeSlices'] = anychart.charts.Pie.prototype.explodeSlices;
-anychart.charts.Pie.prototype['tooltip'] = anychart.charts.Pie.prototype.tooltip;//doc|ex
-anychart.charts.Pie.prototype['outsideLabelsSpace'] = anychart.charts.Pie.prototype.outsideLabelsSpace;//doc|ewx
-anychart.charts.Pie.prototype['overlapMode'] = anychart.charts.Pie.prototype.overlapMode;
-anychart.charts.Pie.prototype['insideLabelsOffset'] = anychart.charts.Pie.prototype.insideLabelsOffset;//doc|ewx
-anychart.charts.Pie.prototype['connectorLength'] = anychart.charts.Pie.prototype.connectorLength;//doc|ex
-anychart.charts.Pie.prototype['outsideLabelsCriticalAngle'] = anychart.charts.Pie.prototype.outsideLabelsCriticalAngle;//doc|ex
-anychart.charts.Pie.prototype['connectorStroke'] = anychart.charts.Pie.prototype.connectorStroke;//doc|ex
-anychart.charts.Pie.prototype['hatchFillPalette'] = anychart.charts.Pie.prototype.hatchFillPalette;
-anychart.charts.Pie.prototype['getType'] = anychart.charts.Pie.prototype.getType;
-anychart.charts.Pie.prototype['hover'] = anychart.charts.Pie.prototype.hover;
-anychart.charts.Pie.prototype['unhover'] = anychart.charts.Pie.prototype.unhover;
-anychart.charts.Pie.prototype['forceHoverLabels'] = anychart.charts.Pie.prototype.forceHoverLabels;
-anychart.charts.Pie.prototype['getPoint'] = anychart.charts.Pie.prototype.getPoint;
-anychart.charts.Pie.prototype['toCsv'] = anychart.charts.Pie.prototype.toCsv;
+(function() {
+  var proto = anychart.charts.Pie.prototype;
+  proto['data'] = proto.data;//doc|ex|
+  proto['group'] = proto.group;//doc|ex|non-tr
+  proto['labels'] = proto.labels;//doc|ex
+  proto['hoverLabels'] = proto.hoverLabels;//doc|ex
+  proto['radius'] = proto.radius;//doc|ex
+  proto['innerRadius'] = proto.innerRadius;//doc|ex
+  proto['startAngle'] = proto.startAngle;//doc|ex
+  proto['explode'] = proto.explode;//doc/ex
+  proto['sort'] = proto.sort;//doc|ex
+  proto['getCenterPoint'] = proto.getCenterPoint;//doc|ex
+  proto['getPixelRadius'] = proto.getPixelRadius;//doc|need-ex
+  proto['getPixelInnerRadius'] = proto.getPixelInnerRadius;//doc|need-ex
+  proto['getPixelExplode'] = proto.getPixelExplode;
+  proto['palette'] = proto.palette;//doc|ex
+  proto['fill'] = proto.fill;//doc|ex
+  proto['stroke'] = proto.stroke;//doc|ex
+  proto['hoverFill'] = proto.hoverFill;//doc|ex
+  proto['hoverStroke'] = proto.hoverStroke;//doc|ex
+  proto['hatchFill'] = proto.hatchFill;//doc|ex
+  proto['hoverHatchFill'] = proto.hoverHatchFill;//doc|ex
+  proto['explodeSlice'] = proto.explodeSlice;//doc|ex
+  proto['explodeSlices'] = proto.explodeSlices;
+  proto['tooltip'] = proto.tooltip;//doc|ex
+  proto['outsideLabelsSpace'] = proto.outsideLabelsSpace;//doc|ewx
+  proto['overlapMode'] = proto.overlapMode;
+  proto['insideLabelsOffset'] = proto.insideLabelsOffset;//doc|ewx
+  proto['connectorLength'] = proto.connectorLength;//doc|ex
+  proto['outsideLabelsCriticalAngle'] = proto.outsideLabelsCriticalAngle;//doc|ex
+  proto['connectorStroke'] = proto.connectorStroke;//doc|ex
+  proto['hatchFillPalette'] = proto.hatchFillPalette;
+  proto['getType'] = proto.getType;
+  proto['hover'] = proto.hover;
+  proto['unhover'] = proto.unhover;
+  proto['forceHoverLabels'] = proto.forceHoverLabels;
+  proto['getPoint'] = proto.getPoint;
+  proto['toCsv'] = proto.toCsv;
+})();

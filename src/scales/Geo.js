@@ -11,7 +11,7 @@ goog.require('anychart.scales.GeoTicks');
  * @extends {anychart.core.Base}
  */
 anychart.scales.Geo = function() {
-  goog.base(this);
+  anychart.scales.Geo.base(this, 'constructor');
   /**
    * Scale input domain minimum.
    * @type {number}
@@ -1424,7 +1424,7 @@ anychart.scales.Geo.prototype.latLonToScale = function(lon, lat, opt_txName) {
 //region --- Serialization
 /** @inheritDoc */
 anychart.scales.Geo.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.scales.Geo.base(this, 'serialize');
   json['type'] = this.getType();
   // json['inverted'] = this.inverted();
   if (!this.maximumLongModeAuto) json['maximumX'] = this.maxLong;
@@ -1444,7 +1444,7 @@ anychart.scales.Geo.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.scales.Geo.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.scales.Geo.base(this, 'setupByJSON', config, opt_default);
   // this.inverted(config['inverted']);
   this.minimumX(config['minimumX']);
   this.minimumY(config['minimumY']);
@@ -1463,15 +1463,18 @@ anychart.scales.Geo.prototype.setupByJSON = function(config, opt_default) {
 //endregion
 //region --- Exports
 //exports
-anychart.scales.Geo.prototype['gap'] = anychart.scales.Geo.prototype.gap;
-anychart.scales.Geo.prototype['xTicks'] = anychart.scales.Geo.prototype.xTicks;
-anychart.scales.Geo.prototype['xMinorTicks'] = anychart.scales.Geo.prototype.xMinorTicks;
-anychart.scales.Geo.prototype['yTicks'] = anychart.scales.Geo.prototype.yTicks;
-anychart.scales.Geo.prototype['yMinorTicks'] = anychart.scales.Geo.prototype.yMinorTicks;
-anychart.scales.Geo.prototype['extendDataRange'] = anychart.scales.Geo.prototype.extendDataRange;
-anychart.scales.Geo.prototype['minimumX'] = anychart.scales.Geo.prototype.minimumX;
-anychart.scales.Geo.prototype['maximumX'] = anychart.scales.Geo.prototype.maximumX;
-anychart.scales.Geo.prototype['minimumY'] = anychart.scales.Geo.prototype.minimumY;
-anychart.scales.Geo.prototype['maximumY'] = anychart.scales.Geo.prototype.maximumY;
-anychart.scales.Geo.prototype['precision'] = anychart.scales.Geo.prototype.precision;
+(function() {
+  var proto = anychart.scales.Geo.prototype;
+  proto['gap'] = proto.gap;
+  proto['xTicks'] = proto.xTicks;
+  proto['xMinorTicks'] = proto.xMinorTicks;
+  proto['yTicks'] = proto.yTicks;
+  proto['yMinorTicks'] = proto.yMinorTicks;
+  proto['extendDataRange'] = proto.extendDataRange;
+  proto['minimumX'] = proto.minimumX;
+  proto['maximumX'] = proto.maximumX;
+  proto['minimumY'] = proto.minimumY;
+  proto['maximumY'] = proto.maximumY;
+  proto['precision'] = proto.precision;
+})();
 //endregion

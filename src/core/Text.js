@@ -10,7 +10,7 @@ goog.require('anychart.core.VisualBase');
  * @extends {anychart.core.VisualBase}
  */
 anychart.core.Text = function() {
-  goog.base(this);
+  anychart.core.Text.base(this, 'constructor');
 
   /**
    * Settings object.
@@ -365,7 +365,7 @@ anychart.core.Text.prototype.applyTextSettings = function(textElement, isInitial
 
 /** @inheritDoc */
 anychart.core.Text.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.Text.base(this, 'serialize');
   if (goog.isDef(this.fontSize())) json['fontSize'] = this.fontSize();
   if (goog.isDef(this.fontFamily())) json['fontFamily'] = this.fontFamily();
   if (goog.isDef(this.fontColor())) json['fontColor'] = this.fontColor();
@@ -391,7 +391,7 @@ anychart.core.Text.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.Text.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.Text.base(this, 'setupByJSON', config, opt_default);
   this.fontSize(config['fontSize']);
   this.fontFamily(config['fontFamily']);
   this.fontColor(config['fontColor']);
@@ -415,23 +415,26 @@ anychart.core.Text.prototype.setupByJSON = function(config, opt_default) {
 
 
 //exports
-anychart.core.Text.prototype['fontSize'] = anychart.core.Text.prototype.fontSize;//in docs/final
-anychart.core.Text.prototype['fontFamily'] = anychart.core.Text.prototype.fontFamily;//in docs/final
-anychart.core.Text.prototype['fontColor'] = anychart.core.Text.prototype.fontColor;//in docs/final
-anychart.core.Text.prototype['fontOpacity'] = anychart.core.Text.prototype.fontOpacity;//in docs/final
-anychart.core.Text.prototype['fontDecoration'] = anychart.core.Text.prototype.fontDecoration;//in docs/final
-anychart.core.Text.prototype['fontStyle'] = anychart.core.Text.prototype.fontStyle;//in docs/final
-anychart.core.Text.prototype['fontVariant'] = anychart.core.Text.prototype.fontVariant;//in docs/final
-anychart.core.Text.prototype['fontWeight'] = anychart.core.Text.prototype.fontWeight;//in docs/final
-anychart.core.Text.prototype['letterSpacing'] = anychart.core.Text.prototype.letterSpacing;//in docs/final
-anychart.core.Text.prototype['textDirection'] = anychart.core.Text.prototype.textDirection;//in docs/final
-anychart.core.Text.prototype['lineHeight'] = anychart.core.Text.prototype.lineHeight;//in docs/final
-anychart.core.Text.prototype['textIndent'] = anychart.core.Text.prototype.textIndent;//in docs/final
-anychart.core.Text.prototype['vAlign'] = anychart.core.Text.prototype.vAlign;//in docs/final
-anychart.core.Text.prototype['hAlign'] = anychart.core.Text.prototype.hAlign;//in docs/final
-anychart.core.Text.prototype['textWrap'] = anychart.core.Text.prototype.textWrap;//in docs/final
-anychart.core.Text.prototype['textOverflow'] = anychart.core.Text.prototype.textOverflow;//in docs/final
-anychart.core.Text.prototype['selectable'] = anychart.core.Text.prototype.selectable;//in docs/final
-anychart.core.Text.prototype['disablePointerEvents'] = anychart.core.Text.prototype.disablePointerEvents;//in docs/final
-anychart.core.Text.prototype['useHtml'] = anychart.core.Text.prototype.useHtml;//in docs/final
-anychart.core.Text.prototype['textSettings'] = anychart.core.Text.prototype.textSettings;//in docs/final
+(function() {
+  var proto = anychart.core.Text.prototype;
+  proto['fontSize'] = proto.fontSize;//in docs/final
+  proto['fontFamily'] = proto.fontFamily;//in docs/final
+  proto['fontColor'] = proto.fontColor;//in docs/final
+  proto['fontOpacity'] = proto.fontOpacity;//in docs/final
+  proto['fontDecoration'] = proto.fontDecoration;//in docs/final
+  proto['fontStyle'] = proto.fontStyle;//in docs/final
+  proto['fontVariant'] = proto.fontVariant;//in docs/final
+  proto['fontWeight'] = proto.fontWeight;//in docs/final
+  proto['letterSpacing'] = proto.letterSpacing;//in docs/final
+  proto['textDirection'] = proto.textDirection;//in docs/final
+  proto['lineHeight'] = proto.lineHeight;//in docs/final
+  proto['textIndent'] = proto.textIndent;//in docs/final
+  proto['vAlign'] = proto.vAlign;//in docs/final
+  proto['hAlign'] = proto.hAlign;//in docs/final
+  proto['textWrap'] = proto.textWrap;//in docs/final
+  proto['textOverflow'] = proto.textOverflow;//in docs/final
+  proto['selectable'] = proto.selectable;//in docs/final
+  proto['disablePointerEvents'] = proto.disablePointerEvents;//in docs/final
+  proto['useHtml'] = proto.useHtml;//in docs/final
+  proto['textSettings'] = proto.textSettings;//in docs/final
+})();

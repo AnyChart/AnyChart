@@ -12,7 +12,7 @@ goog.require('anychart.core.sparkline.series.ContinuousBase');
  * @extends {anychart.core.sparkline.series.ContinuousBase}
  */
 anychart.core.sparkline.series.Area = function(chart) {
-  goog.base(this, chart);
+  anychart.core.sparkline.series.Area.base(this, 'constructor', chart);
 
   /**
    * @type {!acgraph.vector.Path}
@@ -39,7 +39,7 @@ anychart.core.sparkline.series.Area.prototype.lastDrawnX;
  * @inheritDoc
  */
 anychart.core.sparkline.series.Area.prototype.startDrawing = function() {
-  goog.base(this, 'startDrawing');
+  anychart.core.sparkline.series.Area.base(this, 'startDrawing');
 
   // No points were drawn before
   this.lastDrawnX = NaN;
@@ -131,7 +131,7 @@ anychart.core.sparkline.series.Area.prototype.finalizeSegment = function() {
 
 /** @inheritDoc */
 anychart.core.sparkline.series.Area.prototype.getDefaults = function() {
-  var settings = goog.base(this, 'getDefaults');
+  var settings = anychart.core.sparkline.series.Area.base(this, 'getDefaults');
 
   settings['stroke'] = {
     'color': '#64b5f6',

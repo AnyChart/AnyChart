@@ -136,10 +136,13 @@ anychart.math.cycledQueue = function(opt_lengthLimit) {
 
 
 //exports
-goog.exportSymbol('anychart.math.cycledQueue', anychart.math.cycledQueue);
-goog.exportSymbol('anychart.calculations.cycledQueue', anychart.math.cycledQueue);
-anychart.math.CycledQueue.prototype['enqueue'] = anychart.math.CycledQueue.prototype.enqueue;
-anychart.math.CycledQueue.prototype['dequeue'] = anychart.math.CycledQueue.prototype.dequeue;
-anychart.math.CycledQueue.prototype['get'] = anychart.math.CycledQueue.prototype.get;
-anychart.math.CycledQueue.prototype['getLength'] = anychart.math.CycledQueue.prototype.getLength;
-anychart.math.CycledQueue.prototype['clear'] = anychart.math.CycledQueue.prototype.clear;
+(function() {
+  var proto = anychart.math.CycledQueue.prototype;
+  goog.exportSymbol('anychart.math.cycledQueue', anychart.math.cycledQueue);
+  goog.exportSymbol('anychart.calculations.cycledQueue', anychart.math.cycledQueue);
+  proto['enqueue'] = proto.enqueue;
+  proto['dequeue'] = proto.dequeue;
+  proto['get'] = proto.get;
+  proto['getLength'] = proto.getLength;
+  proto['clear'] = proto.clear;
+})();

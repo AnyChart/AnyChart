@@ -17,7 +17,7 @@ goog.require('anychart.utils');
  * @implements {anychart.core.settings.IResolvable}
  */
 anychart.core.ui.Separator = function() {
-  goog.base(this);
+  anychart.core.ui.Separator.base(this, 'constructor');
 
   /**
    * Path of the separator.
@@ -684,13 +684,16 @@ anychart.core.ui.Separator.prototype.setupByJSON = function(config, opt_default)
 };
 
 
-//anychart.core.ui.Separator.prototype['drawer'] = anychart.core.ui.Separator.prototype.drawer;
-//anychart.core.ui.Separator.prototype['draw'] = anychart.core.ui.Separator.prototype.draw;
+//proto['drawer'] = proto.drawer;
+//proto['draw'] = proto.draw;
 //exports
-// anychart.core.ui.Separator.prototype['width'] = anychart.core.ui.Separator.prototype.width;
-// anychart.core.ui.Separator.prototype['height'] = anychart.core.ui.Separator.prototype.height;
-anychart.core.ui.Separator.prototype['margin'] = anychart.core.ui.Separator.prototype.margin;
-// anychart.core.ui.Separator.prototype['orientation'] = anychart.core.ui.Separator.prototype.orientation;
-// anychart.core.ui.Separator.prototype['fill'] = anychart.core.ui.Separator.prototype.fill;
-// anychart.core.ui.Separator.prototype['stroke'] = anychart.core.ui.Separator.prototype.stroke;
-anychart.core.ui.Separator.prototype['getRemainingBounds'] = anychart.core.ui.Separator.prototype.getRemainingBounds;
+(function() {
+  var proto = anychart.core.ui.Separator.prototype;
+  // proto['width'] = proto.width;
+  // proto['height'] = proto.height;
+  proto['margin'] = proto.margin;
+  // proto['orientation'] = proto.orientation;
+  // proto['fill'] = proto.fill;
+  // proto['stroke'] = proto.stroke;
+  proto['getRemainingBounds'] = proto.getRemainingBounds;
+})();

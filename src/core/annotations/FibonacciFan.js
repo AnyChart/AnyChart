@@ -314,4 +314,7 @@ anychart.core.annotations.FibonacciFan.prototype.disposeInternal = function() {
 
 
 //export
-anychart.core.annotations.FibonacciFan.prototype['timeLevels'] = anychart.core.annotations.FibonacciFan.prototype.timeLevels;
+(function() {
+  var proto = anychart.core.annotations.FibonacciFan.prototype;
+  proto['timeLevels'] = proto.timeLevels;
+})();

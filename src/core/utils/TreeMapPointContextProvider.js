@@ -63,6 +63,9 @@ anychart.core.utils.TreeMapPointContextProvider.prototype.getTokenValue = functi
 
 
 //exports
-anychart.core.utils.TreeMapPointContextProvider.prototype['getStat'] = anychart.core.utils.TreeMapPointContextProvider.prototype.getStat;
-anychart.core.utils.TreeMapPointContextProvider.prototype['getDataValue'] = anychart.core.utils.TreeMapPointContextProvider.prototype.getDataValue;
-anychart.core.utils.TreeMapPointContextProvider.prototype['getTokenValue'] = anychart.core.utils.TreeMapPointContextProvider.prototype.getTokenValue;
+(function() {
+  var proto = anychart.core.utils.TreeMapPointContextProvider.prototype;
+  proto['getStat'] = proto.getStat;
+  proto['getDataValue'] = proto.getDataValue;
+  proto['getTokenValue'] = proto.getTokenValue;
+})();

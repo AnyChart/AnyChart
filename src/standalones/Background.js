@@ -36,11 +36,14 @@ anychart.ui.background = function() {
 };
 
 
-//anychart.ui.Background.prototype['getRemainingBounds'] = anychart.ui.Background.prototype.getRemainingBounds;
-
 //exports
-goog.exportSymbol('anychart.standalones.background', anychart.standalones.background);
-goog.exportSymbol('anychart.ui.background', anychart.ui.background);
-anychart.standalones.Background.prototype['draw'] = anychart.standalones.Background.prototype.draw;
-anychart.standalones.Background.prototype['parentBounds'] = anychart.standalones.Background.prototype.parentBounds;
-anychart.standalones.Background.prototype['container'] = anychart.standalones.Background.prototype.container;
+//proto['getRemainingBounds'] = proto.getRemainingBounds;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.standalones.Background.prototype;
+  goog.exportSymbol('anychart.standalones.background', anychart.standalones.background);
+  goog.exportSymbol('anychart.ui.background', anychart.ui.background);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+})();

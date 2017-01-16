@@ -13,7 +13,7 @@ goog.require('anychart.core.ui.table.Border');
  * @extends {anychart.core.ui.table.Base}
  */
 anychart.core.ui.table.Column = function(table, columnIndex) {
-  goog.base(this, table);
+  anychart.core.ui.table.Column.base(this, 'constructor', table);
   /**
    * Column index.
    * @type {number}
@@ -153,11 +153,14 @@ anychart.core.ui.table.Column.prototype.cellPadding = function(opt_spaceOrTopOrT
 
 
 //exports
-anychart.core.ui.table.Column.prototype['width'] = anychart.core.ui.table.Column.prototype.width;
-anychart.core.ui.table.Column.prototype['maxWidth'] = anychart.core.ui.table.Column.prototype.maxWidth;
-anychart.core.ui.table.Column.prototype['minWidth'] = anychart.core.ui.table.Column.prototype.minWidth;
-anychart.core.ui.table.Column.prototype['getCell'] = anychart.core.ui.table.Column.prototype.getCell;
-anychart.core.ui.table.Column.prototype['getColNum'] = anychart.core.ui.table.Column.prototype.getColNum;
-anychart.core.ui.table.Column.prototype['cellFill'] = anychart.core.ui.table.Column.prototype.cellFill;
-anychart.core.ui.table.Column.prototype['cellBorder'] = anychart.core.ui.table.Column.prototype.cellBorder;
-anychart.core.ui.table.Column.prototype['cellPadding'] = anychart.core.ui.table.Column.prototype.cellPadding;
+(function() {
+  var proto = anychart.core.ui.table.Column.prototype;
+  proto['width'] = proto.width;
+  proto['maxWidth'] = proto.maxWidth;
+  proto['minWidth'] = proto.minWidth;
+  proto['getCell'] = proto.getCell;
+  proto['getColNum'] = proto.getColNum;
+  proto['cellFill'] = proto.cellFill;
+  proto['cellBorder'] = proto.cellBorder;
+  proto['cellPadding'] = proto.cellPadding;
+})();

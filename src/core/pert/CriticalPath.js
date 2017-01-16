@@ -94,5 +94,8 @@ anychart.core.pert.CriticalPath.prototype.setupByJSON = function(config, opt_def
 
 
 //exports
-anychart.core.pert.CriticalPath.prototype['tasks'] = anychart.core.pert.CriticalPath.prototype.tasks;
-anychart.core.pert.CriticalPath.prototype['milestones'] = anychart.core.pert.CriticalPath.prototype.milestones;
+(function() {
+  var proto = anychart.core.pert.CriticalPath.prototype;
+  proto['tasks'] = proto.tasks;
+  proto['milestones'] = proto.milestones;
+})();

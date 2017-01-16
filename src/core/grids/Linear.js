@@ -740,7 +740,7 @@ anychart.core.grids.Linear.prototype.evenFillElement = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.grids.Linear.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.grids.Linear.base(this, 'serialize');
   json['isMinor'] = this.isMinor();
   if (this.layout_) json['layout'] = this.layout_;
   json['drawFirstLine'] = this.drawFirstLine();
@@ -754,7 +754,7 @@ anychart.core.grids.Linear.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.grids.Linear.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.grids.Linear.base(this, 'setupByJSON', config, opt_default);
   this.isMinor(config['isMinor']);
   if ('layout' in config && config['layout']) this.layout(config['layout']);
   this.drawFirstLine(config['drawFirstLine']);
@@ -783,18 +783,21 @@ anychart.core.grids.Linear.prototype.disposeInternal = function() {
   delete this.stroke_;
   this.axis_ = null;
   this.chart_ = null;
-  goog.base(this, 'disposeInternal');
+  anychart.core.grids.Linear.base(this, 'disposeInternal');
 };
 
 
 //exports
-anychart.core.grids.Linear.prototype['isMinor'] = anychart.core.grids.Linear.prototype.isMinor;
-anychart.core.grids.Linear.prototype['oddFill'] = anychart.core.grids.Linear.prototype.oddFill;
-anychart.core.grids.Linear.prototype['evenFill'] = anychart.core.grids.Linear.prototype.evenFill;
-anychart.core.grids.Linear.prototype['layout'] = anychart.core.grids.Linear.prototype.layout;
-anychart.core.grids.Linear.prototype['isHorizontal'] = anychart.core.grids.Linear.prototype.isHorizontal;
-anychart.core.grids.Linear.prototype['scale'] = anychart.core.grids.Linear.prototype.scale;
-anychart.core.grids.Linear.prototype['stroke'] = anychart.core.grids.Linear.prototype.stroke;
-anychart.core.grids.Linear.prototype['drawFirstLine'] = anychart.core.grids.Linear.prototype.drawFirstLine;
-anychart.core.grids.Linear.prototype['drawLastLine'] = anychart.core.grids.Linear.prototype.drawLastLine;
-anychart.core.grids.Linear.prototype['axis'] = anychart.core.grids.Linear.prototype.axis;
+(function() {
+  var proto = anychart.core.grids.Linear.prototype;
+  proto['isMinor'] = proto.isMinor;
+  proto['oddFill'] = proto.oddFill;
+  proto['evenFill'] = proto.evenFill;
+  proto['layout'] = proto.layout;
+  proto['isHorizontal'] = proto.isHorizontal;
+  proto['scale'] = proto.scale;
+  proto['stroke'] = proto.stroke;
+  proto['drawFirstLine'] = proto.drawFirstLine;
+  proto['drawLastLine'] = proto.drawLastLine;
+  proto['axis'] = proto.axis;
+})();

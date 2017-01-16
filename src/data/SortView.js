@@ -17,7 +17,7 @@ goog.require('goog.array');
  * @extends {anychart.data.View}
  */
 anychart.data.SortView = function(parentView, fieldName, opt_comparatorOrSort) {
-  goog.base(this, parentView);
+  anychart.data.SortView.base(this, 'constructor', parentView);
 
   /**
    * Field name to categorize by. Stored for data change events.

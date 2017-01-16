@@ -281,15 +281,18 @@ anychart.data.Traverser.prototype.getItemsSet_ = function() {
 
 
 //exports
-anychart.data.Traverser.prototype['reset'] = anychart.data.Traverser.prototype.reset;
-anychart.data.Traverser.prototype['current'] = anychart.data.Traverser.prototype.current;
-anychart.data.Traverser.prototype['get'] = anychart.data.Traverser.prototype.get;
-anychart.data.Traverser.prototype['set'] = anychart.data.Traverser.prototype.set;
-anychart.data.Traverser.prototype['meta'] = anychart.data.Traverser.prototype.meta;
-anychart.data.Traverser.prototype['getDepth'] = anychart.data.Traverser.prototype.getDepth;
-anychart.data.Traverser.prototype['advance'] = anychart.data.Traverser.prototype.advance;
-anychart.data.Traverser.prototype['toArray'] = anychart.data.Traverser.prototype.toArray;
-anychart.data.Traverser.prototype['nodeYieldCondition'] = anychart.data.Traverser.prototype.nodeYieldCondition;
-anychart.data.Traverser.prototype['traverseChildrenCondition'] = anychart.data.Traverser.prototype.traverseChildrenCondition;
+(function() {
+  var proto = anychart.data.Traverser.prototype;
+  proto['reset'] = proto.reset;
+  proto['current'] = proto.current;
+  proto['get'] = proto.get;
+  proto['set'] = proto.set;
+  proto['meta'] = proto.meta;
+  proto['getDepth'] = proto.getDepth;
+  proto['advance'] = proto.advance;
+  proto['toArray'] = proto.toArray;
+  proto['nodeYieldCondition'] = proto.nodeYieldCondition;
+  proto['traverseChildrenCondition'] = proto.traverseChildrenCondition;
+})();
 
 

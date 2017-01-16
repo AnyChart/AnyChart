@@ -101,5 +101,8 @@ anychart.core.utils.MapAxisLabelsContextProvider.prototype.getDataValue = functi
 
 
 //exports
-anychart.core.utils.MapAxisLabelsContextProvider.prototype['getTokenValue'] = anychart.core.utils.MapAxisLabelsContextProvider.prototype.getTokenValue;
-anychart.core.utils.MapAxisLabelsContextProvider.prototype['getTokenType'] = anychart.core.utils.MapAxisLabelsContextProvider.prototype.getTokenType;
+(function() {
+  var proto = anychart.core.utils.MapAxisLabelsContextProvider.prototype;
+  proto['getTokenValue'] = proto.getTokenValue;
+  proto['getTokenType'] = proto.getTokenType;
+})();

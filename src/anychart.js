@@ -68,7 +68,6 @@ acgraph.vector.Stage.prototype.credits = function(opt_value) {
   }
   return this.credits_;
 };
-acgraph.vector.Stage.prototype['credits'] = acgraph.vector.Stage.prototype.credits;
 
 
 /**
@@ -1148,4 +1147,7 @@ goog.exportSymbol('anychart.ui.ganttToolbar', anychart.ui.ganttToolbar);
 goog.exportSymbol('anychart.ui.preloader', anychart.ui.preloader);
 goog.exportSymbol('anychart.ui.rangePicker', anychart.ui.rangePicker);
 goog.exportSymbol('anychart.ui.rangeSelector', anychart.ui.rangeSelector);
-
+(function() {
+  var proto = acgraph.vector.Stage.prototype;
+  proto['credits'] = proto.credits;
+})();

@@ -257,12 +257,16 @@ anychart.data.TableComputer.RowProxy.prototype.setColumn = function(index, value
 
 
 //exports
-anychart.data.TableComputer.prototype['addOutputField'] = anychart.data.TableComputer.prototype.addOutputField;
-anychart.data.TableComputer.prototype['getFieldIndex'] = anychart.data.TableComputer.prototype.getFieldIndex;
-anychart.data.TableComputer.prototype['setContext'] = anychart.data.TableComputer.prototype.setContext;
-anychart.data.TableComputer.prototype['setStartFunction'] = anychart.data.TableComputer.prototype.setStartFunction;
-anychart.data.TableComputer.prototype['setCalculationFunction'] = anychart.data.TableComputer.prototype.setCalculationFunction;
-anychart.data.TableComputer.prototype['dispose'] = anychart.data.TableComputer.prototype.dispose;
+(function() {
+  var proto = anychart.data.TableComputer.prototype;
+  proto['addOutputField'] = proto.addOutputField;
+  proto['getFieldIndex'] = proto.getFieldIndex;
+  proto['setContext'] = proto.setContext;
+  proto['setStartFunction'] = proto.setStartFunction;
+  proto['setCalculationFunction'] = proto.setCalculationFunction;
+  proto['dispose'] = proto.dispose;
 
-anychart.data.TableComputer.RowProxy.prototype['set'] = anychart.data.TableComputer.RowProxy.prototype.set;
-anychart.data.TableComputer.RowProxy.prototype['setColumn'] = anychart.data.TableComputer.RowProxy.prototype.setColumn;
+  proto = anychart.data.TableComputer.RowProxy.prototype;
+  proto['set'] = proto.set;
+  proto['setColumn'] = proto.setColumn;
+})();

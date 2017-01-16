@@ -12,7 +12,7 @@ goog.require('anychart.scales.OrdinalColorTicks');
  * @extends {anychart.scales.Base}
  */
 anychart.scales.OrdinalColor = function() {
-  goog.base(this);
+  anychart.scales.OrdinalColor.base(this, 'constructor');
 
   /**
    * Colors.
@@ -618,7 +618,7 @@ anychart.scales.ordinalColor = function(opt_value) {
 
 /** @inheritDoc */
 anychart.scales.OrdinalColor.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.scales.OrdinalColor.base(this, 'serialize');
   json['ticks'] = this.ticks().serialize();
   if (this.ranges_ && this.ranges_.length)
     json['ranges'] = this.ranges_;
@@ -632,7 +632,7 @@ anychart.scales.OrdinalColor.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.scales.OrdinalColor.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.scales.OrdinalColor.base(this, 'setupByJSON', config, opt_default);
   this.ticks(config['ticks']);
   this.colors(config['colors']);
   this.ranges(config['ranges']);
@@ -641,17 +641,20 @@ anychart.scales.OrdinalColor.prototype.setupByJSON = function(config, opt_defaul
 
 
 //exports
-goog.exportSymbol('anychart.scales.ordinalColor', anychart.scales.ordinalColor);
-anychart.scales.OrdinalColor.prototype['getType'] = anychart.scales.OrdinalColor.prototype.getType;
-anychart.scales.OrdinalColor.prototype['colors'] = anychart.scales.OrdinalColor.prototype.colors;
-anychart.scales.OrdinalColor.prototype['ranges'] = anychart.scales.OrdinalColor.prototype.ranges;
-anychart.scales.OrdinalColor.prototype['names'] = anychart.scales.OrdinalColor.prototype.names;
-anychart.scales.OrdinalColor.prototype['ticks'] = anychart.scales.OrdinalColor.prototype.ticks;
-anychart.scales.OrdinalColor.prototype['inverted'] = anychart.scales.OrdinalColor.prototype.inverted;
-anychart.scales.OrdinalColor.prototype['getRangeByValue'] = anychart.scales.OrdinalColor.prototype.getRangeByValue;
-anychart.scales.OrdinalColor.prototype['getProcessedRanges'] = anychart.scales.OrdinalColor.prototype.getProcessedRanges;
-anychart.scales.OrdinalColor.prototype['valueToColor'] = anychart.scales.OrdinalColor.prototype.valueToColor;
-anychart.scales.OrdinalColor.prototype['colorToValue'] = anychart.scales.OrdinalColor.prototype.colorToValue;
-anychart.scales.OrdinalColor.prototype['getIndexByValue'] = anychart.scales.OrdinalColor.prototype.getIndexByValue;
-anychart.scales.OrdinalColor.prototype['transform'] = anychart.scales.OrdinalColor.prototype.transform;
-anychart.scales.OrdinalColor.prototype['inverseTransform'] = anychart.scales.OrdinalColor.prototype.inverseTransform;
+(function() {
+  var proto = anychart.scales.OrdinalColor.prototype;
+  goog.exportSymbol('anychart.scales.ordinalColor', anychart.scales.ordinalColor);
+  proto['getType'] = proto.getType;
+  proto['colors'] = proto.colors;
+  proto['ranges'] = proto.ranges;
+  proto['names'] = proto.names;
+  proto['ticks'] = proto.ticks;
+  proto['inverted'] = proto.inverted;
+  proto['getRangeByValue'] = proto.getRangeByValue;
+  proto['getProcessedRanges'] = proto.getProcessedRanges;
+  proto['valueToColor'] = proto.valueToColor;
+  proto['colorToValue'] = proto.colorToValue;
+  proto['getIndexByValue'] = proto.getIndexByValue;
+  proto['transform'] = proto.transform;
+  proto['inverseTransform'] = proto.inverseTransform;
+})();

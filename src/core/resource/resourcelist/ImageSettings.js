@@ -83,9 +83,9 @@ anychart.core.resource.resourceList.ImageSettings.prototype.serialize = function
 
 //region --- EXPORTS ---
 //exports
-//anychart.core.resource.resourceList.ImageSettings.prototype['size'] = anychart.core.resource.resourceList.ImageSettings.prototype.size;
-//anychart.core.resource.resourceList.ImageSettings.prototype['borderRadius'] = anychart.core.resource.resourceList.ImageSettings.prototype.borderRadius;
-//anychart.core.resource.resourceList.ImageSettings.prototype['opacity'] = anychart.core.resource.resourceList.ImageSettings.prototype.opacity;
-//anychart.core.resource.resourceList.ImageSettings.prototype['align'] = anychart.core.resource.resourceList.ImageSettings.prototype.align;
-//anychart.core.resource.resourceList.ImageSettings.prototype['fittingMode'] = anychart.core.resource.resourceList.ImageSettings.prototype.fittingMode;
+//proto['size'] = proto.size;
+//proto['borderRadius'] = proto.borderRadius;
+//proto['opacity'] = proto.opacity;
+//proto['align'] = proto.align;
+//proto['fittingMode'] = proto.fittingMode;
 //endregion

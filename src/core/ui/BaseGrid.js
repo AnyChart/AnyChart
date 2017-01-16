@@ -31,7 +31,7 @@ goog.require('goog.labs.userAgent.device');
  * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.ui.BaseGrid = function(opt_controller, opt_isResource) {
-  goog.base(this);
+  anychart.core.ui.BaseGrid.base(this, 'constructor');
 
   /**
    * Mouse wheel handler object.
@@ -2401,14 +2401,14 @@ anychart.core.ui.BaseGrid.prototype.verticalOffset = function(opt_value) {
  * @inheritDoc
  */
 anychart.core.ui.BaseGrid.prototype.disposeInternal = function() {
-  goog.base(this, 'disposeInternal');
+  anychart.core.ui.BaseGrid.base(this, 'disposeInternal');
   goog.events.unlisten(document, goog.events.EventType.MOUSEMOVE, this.docMouseMoveListener_, false, this);
 };
 
 
 /** @inheritDoc */
 anychart.core.ui.BaseGrid.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.ui.BaseGrid.base(this, 'serialize');
 
   json['isStandalone'] = this.isStandalone;
 
@@ -2443,7 +2443,7 @@ anychart.core.ui.BaseGrid.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.ui.BaseGrid.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.ui.BaseGrid.base(this, 'setupByJSON', config, opt_default);
 
   this.isStandalone = ('isStandalone' in config) ? config['isStandalone'] : ('controller' in config);
 
@@ -2481,7 +2481,7 @@ anychart.core.ui.BaseGrid.prototype.setupByJSON = function(config, opt_default) 
  * @extends {goog.fx.Dragger}
  */
 anychart.core.ui.BaseGrid.Dragger = function(target, grid) {
-  goog.base(this, target.domElement());
+  anychart.core.ui.BaseGrid.Dragger.base(this, 'constructor', target.domElement());
 
   this.grid = grid;
 
@@ -2550,7 +2550,7 @@ anychart.core.ui.BaseGrid.Dragger.prototype.reset = function() {
  * @suppress {accessControls} - TODO Add another mechanism (fix this inheritance).
  */
 anychart.core.ui.BaseGrid.KeyHandler = function(grid, opt_element, opt_capture) {
-  goog.base(this, opt_element, opt_capture);
+  anychart.core.ui.BaseGrid.KeyHandler.base(this, 'constructor', opt_element, opt_capture);
 
   /**
    * @type {anychart.core.ui.IInteractiveGrid}
@@ -2562,7 +2562,7 @@ goog.inherits(anychart.core.ui.BaseGrid.KeyHandler, goog.events.KeyHandler);
 
 /** @inheritDoc */
 anychart.core.ui.BaseGrid.KeyHandler.prototype.resetState = function() {
-  goog.base(this, 'resetState');
+  anychart.core.ui.BaseGrid.KeyHandler.base(this, 'resetState');
   this.grid.altKey = false;
 };
 
@@ -2575,7 +2575,7 @@ anychart.core.ui.BaseGrid.KeyHandler.prototype.resetState = function() {
  * @extends {acgraph.vector.Path}
  */
 anychart.core.ui.BaseGrid.Element = function() {
-  goog.base(this);
+  anychart.core.ui.BaseGrid.Element.base(this, 'constructor');
 
   /**
    * Meta information. Used for inner purposes only.

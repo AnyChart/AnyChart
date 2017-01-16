@@ -12,7 +12,7 @@ goog.require('anychart.core.utils.MapConnectorPointContextProvider');
  * @extends {anychart.core.map.series.DiscreteBase}
  */
 anychart.core.map.series.Connector = function(opt_data, opt_csvSettings) {
-  goog.base(this, opt_data, opt_csvSettings);
+  anychart.core.map.series.Connector.base(this, 'constructor', opt_data, opt_csvSettings);
 
   // Define reference fields for a series
   this.referenceValueNames = ['points'];
@@ -298,7 +298,7 @@ anychart.core.map.series.Connector.prototype.createPositionProvider = function(p
 
 /** @inheritDoc */
 anychart.core.map.series.Connector.prototype.startDrawing = function() {
-  goog.base(this, 'startDrawing');
+  anychart.core.map.series.Connector.base(this, 'startDrawing');
 
   this.pixelBoundsCache = this.map.scale().getBounds();
 };
@@ -713,7 +713,7 @@ anychart.core.map.series.Connector.prototype.drawPoint = function(pointState) {
     }
   }
 
-  goog.base(this, 'drawPoint', pointState);
+  anychart.core.map.series.Connector.base(this, 'drawPoint', pointState);
 
   this.applyZoomMoveTransform();
 };
@@ -771,7 +771,7 @@ anychart.core.map.series.Connector.prototype.applyHatchFill = function(pointStat
  * @inheritDoc
  */
 anychart.core.map.series.Connector.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.map.series.Connector.base(this, 'serialize');
 
   json['endSize'] = this.endSize();
   json['startSize'] = this.startSize();
@@ -785,7 +785,7 @@ anychart.core.map.series.Connector.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.core.map.series.Connector.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.map.series.Connector.base(this, 'setupByJSON', config, opt_default);
 
   this.endSize(config['endSize']);
   this.startSize(config['startSize']);
@@ -794,18 +794,21 @@ anychart.core.map.series.Connector.prototype.setupByJSON = function(config, opt_
 
 
 //exports
-anychart.core.map.series.Connector.prototype['fill'] = anychart.core.map.series.Connector.prototype.fill;//inherited
-anychart.core.map.series.Connector.prototype['hoverFill'] = anychart.core.map.series.Connector.prototype.hoverFill;//inherited
-anychart.core.map.series.Connector.prototype['selectFill'] = anychart.core.map.series.Connector.prototype.selectFill;//inherited
+(function() {
+  var proto = anychart.core.map.series.Connector.prototype;
+  proto['fill'] = proto.fill;//inherited
+  proto['hoverFill'] = proto.hoverFill;//inherited
+  proto['selectFill'] = proto.selectFill;//inherited
 
-anychart.core.map.series.Connector.prototype['stroke'] = anychart.core.map.series.Connector.prototype.stroke;//inherited
-anychart.core.map.series.Connector.prototype['hoverStroke'] = anychart.core.map.series.Connector.prototype.hoverStroke;//inherited
-anychart.core.map.series.Connector.prototype['selectStroke'] = anychart.core.map.series.Connector.prototype.selectStroke;//inherited
+  proto['stroke'] = proto.stroke;//inherited
+  proto['hoverStroke'] = proto.hoverStroke;//inherited
+  proto['selectStroke'] = proto.selectStroke;//inherited
 
-anychart.core.map.series.Connector.prototype['hatchFill'] = anychart.core.map.series.Connector.prototype.hatchFill;//inherited
-anychart.core.map.series.Connector.prototype['hoverHatchFill'] = anychart.core.map.series.Connector.prototype.hoverHatchFill;//inherited
-anychart.core.map.series.Connector.prototype['selectHatchFill'] = anychart.core.map.series.Connector.prototype.selectHatchFill;//inherited
+  proto['hatchFill'] = proto.hatchFill;//inherited
+  proto['hoverHatchFill'] = proto.hoverHatchFill;//inherited
+  proto['selectHatchFill'] = proto.selectHatchFill;//inherited
 
-anychart.core.map.series.Connector.prototype['endSize'] = anychart.core.map.series.Connector.prototype.endSize;
-anychart.core.map.series.Connector.prototype['startSize'] = anychart.core.map.series.Connector.prototype.startSize;
-anychart.core.map.series.Connector.prototype['curvature'] = anychart.core.map.series.Connector.prototype.curvature;
+  proto['endSize'] = proto.endSize;
+  proto['startSize'] = proto.startSize;
+  proto['curvature'] = proto.curvature;
+})();

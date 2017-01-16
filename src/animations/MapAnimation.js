@@ -29,7 +29,7 @@ anychart.animations.MapAnimation = function(map, start, end, duration, opt_silen
    */
   this.silentMode = !!opt_silentMode;
 
-  goog.base(this, start, end, duration, opt_acc);
+  anychart.animations.MapAnimation.base(this, 'constructor', start, end, duration, opt_acc);
 };
 goog.inherits(anychart.animations.MapAnimation, goog.fx.Animation);
 

@@ -18,7 +18,7 @@ goog.require('anychart.math.Rect');
  * @extends {anychart.core.VisualBase}
  */
 anychart.core.ui.Callout = function() {
-  goog.base(this);
+  anychart.core.ui.Callout.base(this, 'constructor');
 
   /**
    * @type {?number}
@@ -1170,7 +1170,7 @@ anychart.core.ui.Callout.prototype.remove = function() {
 //region --- Setup and dispose
 /** @inheritDoc */
 anychart.core.ui.Callout.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.ui.Callout.base(this, 'serialize');
   json['title'] = this.title().serialize();
   json['background'] = this.background().serialize();
 
@@ -1202,7 +1202,7 @@ anychart.core.ui.Callout.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.ui.Callout.prototype.setupByJSON = function(config, opt_default) {
   this.suspendSignalsDispatching();
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.ui.Callout.base(this, 'setupByJSON', config, opt_default);
 
 
   if (anychart.opt.TITLE in config)
@@ -1235,7 +1235,7 @@ anychart.core.ui.Callout.prototype.setupByJSON = function(config, opt_default) {
 
 /** @inheritDoc */
 anychart.core.ui.Callout.prototype.disposeInternal = function() {
-  goog.base(this, 'disposeInternal');
+  anychart.core.ui.Callout.base(this, 'disposeInternal');
 
   this.title_ = null;
   this.padding_ = null;
@@ -1249,16 +1249,19 @@ anychart.core.ui.Callout.prototype.disposeInternal = function() {
 //endregion
 //region --- Exports
 //exports
-anychart.core.ui.Callout.prototype['title'] = anychart.core.ui.Callout.prototype.title;
-anychart.core.ui.Callout.prototype['labels'] = anychart.core.ui.Callout.prototype.labels;
-anychart.core.ui.Callout.prototype['hoverLabels'] = anychart.core.ui.Callout.prototype.hoverLabels;
-anychart.core.ui.Callout.prototype['selectLabels'] = anychart.core.ui.Callout.prototype.selectLabels;
-anychart.core.ui.Callout.prototype['background'] = anychart.core.ui.Callout.prototype.background;
-anychart.core.ui.Callout.prototype['padding'] = anychart.core.ui.Callout.prototype.padding;
-anychart.core.ui.Callout.prototype['margin'] = anychart.core.ui.Callout.prototype.margin;
-anychart.core.ui.Callout.prototype['length'] = anychart.core.ui.Callout.prototype.length;
-anychart.core.ui.Callout.prototype['width'] = anychart.core.ui.Callout.prototype.width;
-anychart.core.ui.Callout.prototype['align'] = anychart.core.ui.Callout.prototype.align;
-anychart.core.ui.Callout.prototype['items'] = anychart.core.ui.Callout.prototype.items;
-anychart.core.ui.Callout.prototype['orientation'] = anychart.core.ui.Callout.prototype.orientation;
+(function() {
+  var proto = anychart.core.ui.Callout.prototype;
+  proto['title'] = proto.title;
+  proto['labels'] = proto.labels;
+  proto['hoverLabels'] = proto.hoverLabels;
+  proto['selectLabels'] = proto.selectLabels;
+  proto['background'] = proto.background;
+  proto['padding'] = proto.padding;
+  proto['margin'] = proto.margin;
+  proto['length'] = proto.length;
+  proto['width'] = proto.width;
+  proto['align'] = proto.align;
+  proto['items'] = proto.items;
+  proto['orientation'] = proto.orientation;
+})();
 //endregion

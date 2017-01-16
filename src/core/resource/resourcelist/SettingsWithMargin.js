@@ -74,4 +74,7 @@ anychart.core.resource.resourceList.SettingsWithMargin.prototype.disposeInternal
 
 
 //exports
-anychart.core.resource.resourceList.SettingsWithMargin.prototype['margin'] = anychart.core.resource.resourceList.SettingsWithMargin.prototype.margin;
+(function() {
+  var proto = anychart.core.resource.resourceList.SettingsWithMargin.prototype;
+  proto['margin'] = proto.margin;
+})();

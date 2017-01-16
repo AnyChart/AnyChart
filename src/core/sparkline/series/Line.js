@@ -12,7 +12,7 @@ goog.require('anychart.core.sparkline.series.ContinuousBase');
  * @extends {anychart.core.sparkline.series.ContinuousBase}
  */
 anychart.core.sparkline.series.Line = function(chart) {
-  goog.base(this, chart);
+  anychart.core.sparkline.series.Line.base(this, 'constructor', chart);
 };
 goog.inherits(anychart.core.sparkline.series.Line, anychart.core.sparkline.series.ContinuousBase);
 anychart.core.sparkline.series.Base.SeriesTypesMap[anychart.enums.SparklineSeriesType.LINE] = anychart.core.sparkline.series.Line;
@@ -70,7 +70,7 @@ anychart.core.sparkline.series.Line.prototype.getMarkerStroke = function() {
 
 /** @inheritDoc */
 anychart.core.sparkline.series.Line.prototype.getDefaults = function() {
-  var settings = goog.base(this, 'getDefaults');
+  var settings = anychart.core.sparkline.series.Line.base(this, 'getDefaults');
 
   settings['stroke'] = {
     'color': '#64b5f6',

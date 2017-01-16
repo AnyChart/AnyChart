@@ -11,7 +11,7 @@ goog.require('anychart.core.SeriesPoint');
  * @extends {anychart.core.SeriesPoint}
  */
 anychart.core.ChoroplethPoint = function(series, index) {
-  goog.base(this, series, index);
+  anychart.core.ChoroplethPoint.base(this, 'constructor', series, index);
 };
 goog.inherits(anychart.core.ChoroplethPoint, anychart.core.SeriesPoint);
 
@@ -149,11 +149,14 @@ anychart.core.ChoroplethPoint.prototype.scaleFactor = function(opt_scale) {
 
 
 //exports
-anychart.core.ChoroplethPoint.prototype['getFeatureProp'] = anychart.core.ChoroplethPoint.prototype.getFeatureProp;
-anychart.core.ChoroplethPoint.prototype['getFeatureBounds'] = anychart.core.ChoroplethPoint.prototype.getFeatureBounds;
-anychart.core.ChoroplethPoint.prototype['middleX'] = anychart.core.ChoroplethPoint.prototype.middleX;
-anychart.core.ChoroplethPoint.prototype['middleY'] = anychart.core.ChoroplethPoint.prototype.middleY;
-anychart.core.ChoroplethPoint.prototype['translation'] = anychart.core.ChoroplethPoint.prototype.translation;
-anychart.core.ChoroplethPoint.prototype['translate'] = anychart.core.ChoroplethPoint.prototype.translate;
-anychart.core.ChoroplethPoint.prototype['crs'] = anychart.core.ChoroplethPoint.prototype.crs;
-anychart.core.ChoroplethPoint.prototype['scaleFactor'] = anychart.core.ChoroplethPoint.prototype.scaleFactor;
+(function() {
+  var proto = anychart.core.ChoroplethPoint.prototype;
+  proto['getFeatureProp'] = proto.getFeatureProp;
+  proto['getFeatureBounds'] = proto.getFeatureBounds;
+  proto['middleX'] = proto.middleX;
+  proto['middleY'] = proto.middleY;
+  proto['translation'] = proto.translation;
+  proto['translate'] = proto.translate;
+  proto['crs'] = proto.crs;
+  proto['scaleFactor'] = proto.scaleFactor;
+})();

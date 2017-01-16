@@ -645,7 +645,7 @@ anychart.core.axes.Map.prototype.isHorizontal = function() {
 //region --- Interactivity
 /**
  * Update grid on zoom or move.
- * @param {goog.graphics.AffineTransform} tx .
+ * @param {goog.math.AffineTransform} tx .
  */
 anychart.core.axes.Map.prototype.updateOnZoomOrMove = function(tx) {
   if (this.rootLayer_) this.rootLayer_.setTransformationMatrix(tx.getScaleX(), tx.getShearX(), tx.getShearY(), tx.getScaleY(), tx.getTranslateX(), tx.getTranslateY());
@@ -1786,14 +1786,17 @@ anychart.core.axes.Map.prototype.disposeInternal = function() {
 //region --- Exports
 
 //exports
-anychart.core.axes.Map.prototype['title'] = anychart.core.axes.Map.prototype.title;
-anychart.core.axes.Map.prototype['labels'] = anychart.core.axes.Map.prototype.labels;
-anychart.core.axes.Map.prototype['minorLabels'] = anychart.core.axes.Map.prototype.minorLabels;
-anychart.core.axes.Map.prototype['ticks'] = anychart.core.axes.Map.prototype.ticks;
-anychart.core.axes.Map.prototype['minorTicks'] = anychart.core.axes.Map.prototype.minorTicks;
-anychart.core.axes.Map.prototype['enabled'] = anychart.core.axes.Map.prototype.enabled;
-// anychart.core.axes.Map.prototype['stroke'] = anychart.core.axes.Map.prototype.stroke;
-// anychart.core.axes.Map.prototype['drawFirstLabel'] = anychart.core.axes.Map.prototype.drawFirstLabel;
-// anychart.core.axes.Map.prototype['drawLastLabel'] = anychart.core.axes.Map.prototype.drawLastLabel;
-// anychart.core.axes.Map.prototype['overlapMode'] = anychart.core.axes.Map.prototype.overlapMode;
+(function() {
+  var proto = anychart.core.axes.Map.prototype;
+  proto['title'] = proto.title;
+  proto['labels'] = proto.labels;
+  proto['minorLabels'] = proto.minorLabels;
+  proto['ticks'] = proto.ticks;
+  proto['minorTicks'] = proto.minorTicks;
+  proto['enabled'] = proto.enabled;
+  // proto['stroke'] = proto.stroke;
+  // proto['drawFirstLabel'] = proto.drawFirstLabel;
+  // proto['drawLastLabel'] = proto.drawLastLabel;
+  // proto['overlapMode'] = proto.overlapMode;
+})();
 //endregion

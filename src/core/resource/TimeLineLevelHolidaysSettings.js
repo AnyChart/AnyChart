@@ -329,5 +329,10 @@ anychart.core.resource.TimeLineLevelHolidaysSettings.prototype.disposeInternal =
 //endregion
 //region --- Exports
 //exports
-anychart.core.resource.TimeLineLevelHolidaysSettings.prototype['padding'] = anychart.core.resource.TimeLineLevelHolidaysSettings.prototype.padding;
+(function() {
+  var proto = anychart.core.resource.TimeLineLevelHolidaysSettings.prototype;
+  proto['padding'] = proto.padding;
+})();
+
+
 //endregion

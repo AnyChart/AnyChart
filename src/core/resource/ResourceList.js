@@ -1124,20 +1124,23 @@ anychart.core.resource.ResourceList.prototype.disposeInternal = function() {
 //endregion
 //region --- Exports
 //exports
-anychart.core.resource.ResourceList.prototype['target'] = anychart.core.resource.ResourceList.prototype.target;
-anychart.core.resource.ResourceList.prototype['background'] = anychart.core.resource.ResourceList.prototype.background;
-anychart.core.resource.ResourceList.prototype['images'] = anychart.core.resource.ResourceList.prototype.images;
-anychart.core.resource.ResourceList.prototype['names'] = anychart.core.resource.ResourceList.prototype.names;
-anychart.core.resource.ResourceList.prototype['types'] = anychart.core.resource.ResourceList.prototype.types;
-anychart.core.resource.ResourceList.prototype['descriptions'] = anychart.core.resource.ResourceList.prototype.descriptions;
-anychart.core.resource.ResourceList.prototype['tags'] = anychart.core.resource.ResourceList.prototype.tags;
-anychart.core.resource.ResourceList.prototype['overlay'] = anychart.core.resource.ResourceList.prototype.overlay;
-// descriptors
-// anychart.core.resource.ResourceList.prototype['stroke'] = anychart.core.resource.ResourceList.prototype.stroke;
-// anychart.core.resource.ResourceList.prototype['evenFill'] = anychart.core.resource.ResourceList.prototype.evenFill;
-// anychart.core.resource.ResourceList.prototype['oddFill'] = anychart.core.resource.ResourceList.prototype.oddFill;
-// anychart.core.resource.ResourceList.prototype['drawTopLine'] = anychart.core.resource.ResourceList.prototype.drawTopLine;
-// anychart.core.resource.ResourceList.prototype['drawRightLine'] = anychart.core.resource.ResourceList.prototype.drawRightLine;
-// anychart.core.resource.ResourceList.prototype['drawBottomLine'] = anychart.core.resource.ResourceList.prototype.drawBottomLine;
-// anychart.core.resource.ResourceList.prototype['drawLeftLine'] = anychart.core.resource.ResourceList.prototype.drawLeftLine;
+(function() {
+  var proto = anychart.core.resource.ResourceList.prototype;
+  proto['target'] = proto.target;
+  proto['background'] = proto.background;
+  proto['images'] = proto.images;
+  proto['names'] = proto.names;
+  proto['types'] = proto.types;
+  proto['descriptions'] = proto.descriptions;
+  proto['tags'] = proto.tags;
+  proto['overlay'] = proto.overlay;
+  // descriptors
+  // proto['stroke'] = proto.stroke;
+  // proto['evenFill'] = proto.evenFill;
+  // proto['oddFill'] = proto.oddFill;
+  // proto['drawTopLine'] = proto.drawTopLine;
+  // proto['drawRightLine'] = proto.drawRightLine;
+  // proto['drawBottomLine'] = proto.drawBottomLine;
+  // proto['drawLeftLine'] = proto.drawLeftLine;
+})();
 //endregion

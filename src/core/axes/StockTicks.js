@@ -14,7 +14,7 @@ goog.require('anychart.utils');
  * @extends {anychart.core.VisualBase}
  */
 anychart.core.axes.StockTicks = function() {
-  goog.base(this);
+  anychart.core.axes.StockTicks.base(this, 'constructor');
 
   /**
    * Ticks length.
@@ -301,7 +301,7 @@ anychart.core.axes.StockTicks.prototype.drawLeftTick = function(ratio, bounds, l
 
 /** @inheritDoc */
 anychart.core.axes.StockTicks.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.axes.StockTicks.base(this, 'serialize');
   json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
   return json;
 };
@@ -309,10 +309,13 @@ anychart.core.axes.StockTicks.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.axes.StockTicks.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.axes.StockTicks.base(this, 'setupByJSON', config, opt_default);
   this.stroke(config['stroke']);
 };
 
 
 //exports
-anychart.core.axes.StockTicks.prototype['stroke'] = anychart.core.axes.StockTicks.prototype.stroke;//in docs/
+(function() {
+  var proto = anychart.core.axes.StockTicks.prototype;
+  proto['stroke'] = proto.stroke;//in docs/
+})();

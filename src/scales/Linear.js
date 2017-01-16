@@ -14,7 +14,7 @@ goog.require('anychart.scales.ScatterTicks');
  * @extends {anychart.scales.ScatterBase}
  */
 anychart.scales.Linear = function() {
-  goog.base(this);
+  anychart.scales.Linear.base(this, 'constructor');
 
   /**
    * Major ticks for the scale.
@@ -136,7 +136,7 @@ anychart.scales.Linear.prototype.stickToZero = function(opt_value) {
 anychart.scales.Linear.prototype.calculate = function() {
   if (this.consistent) return;
 
-  goog.base(this, 'calculate');
+  anychart.scales.Linear.base(this, 'calculate');
 
   var setupResult = this.ticks().setupAsMajor(this.min, this.max,
       this.minimumModeAuto && this.min != this.softMin,
@@ -275,7 +275,7 @@ anychart.scales.Linear.prototype.makePercentComparison_ = function(value, compar
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.scales.Linear.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.scales.Linear.base(this, 'serialize');
   json['ticks'] = this.ticks().serialize();
   json['minorTicks'] = this.minorTicks().serialize();
   json['stackMode'] = this.stackMode();
@@ -286,7 +286,7 @@ anychart.scales.Linear.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.scales.Linear.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.scales.Linear.base(this, 'setupByJSON', config, opt_default);
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
   this.stackMode(config['stackMode']);
@@ -315,18 +315,21 @@ anychart.scales.linear = function() {
 
 
 //exports
-goog.exportSymbol('anychart.scales.linear', anychart.scales.linear);//doc|ex
-anychart.scales.Linear.prototype['transform'] = anychart.scales.Linear.prototype.transform;//doc|ex
-anychart.scales.Linear.prototype['inverseTransform'] = anychart.scales.Linear.prototype.inverseTransform;//doc|ex
-anychart.scales.Linear.prototype['getType'] = anychart.scales.Linear.prototype.getType;
-anychart.scales.Linear.prototype['ticks'] = anychart.scales.Linear.prototype.ticks;//doc|ex
-anychart.scales.Linear.prototype['minorTicks'] = anychart.scales.Linear.prototype.minorTicks;//doc|ex
-anychart.scales.Linear.prototype['stackMode'] = anychart.scales.Linear.prototype.stackMode;//inherited
-anychart.scales.Linear.prototype['stickToZero'] = anychart.scales.Linear.prototype.stickToZero;
-anychart.scales.Linear.prototype['softMinimum'] = anychart.scales.Linear.prototype.softMinimum;
-anychart.scales.Linear.prototype['softMaximum'] = anychart.scales.Linear.prototype.softMaximum;
-anychart.scales.Linear.prototype['minimumGap'] = anychart.scales.Linear.prototype.minimumGap;//doc|ex
-anychart.scales.Linear.prototype['maximumGap'] = anychart.scales.Linear.prototype.maximumGap;//doc|ex
-anychart.scales.Linear.prototype['comparisonMode'] = anychart.scales.Linear.prototype.comparisonMode;
-anychart.scales.Linear.prototype['compareWith'] = anychart.scales.Linear.prototype.compareWith;
+(function() {
+  var proto = anychart.scales.Linear.prototype;
+  goog.exportSymbol('anychart.scales.linear', anychart.scales.linear);//doc|ex
+  proto['transform'] = proto.transform;//doc|ex
+  proto['inverseTransform'] = proto.inverseTransform;//doc|ex
+  proto['getType'] = proto.getType;
+  proto['ticks'] = proto.ticks;//doc|ex
+  proto['minorTicks'] = proto.minorTicks;//doc|ex
+  proto['stackMode'] = proto.stackMode;//inherited
+  proto['stickToZero'] = proto.stickToZero;
+  proto['softMinimum'] = proto.softMinimum;
+  proto['softMaximum'] = proto.softMaximum;
+  proto['minimumGap'] = proto.minimumGap;//doc|ex
+  proto['maximumGap'] = proto.maximumGap;//doc|ex
+  proto['comparisonMode'] = proto.comparisonMode;
+  proto['compareWith'] = proto.compareWith;
+})();
 

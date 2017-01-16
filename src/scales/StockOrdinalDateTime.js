@@ -12,7 +12,7 @@ goog.require('anychart.utils');
  * @extends {anychart.scales.StockScatterDateTime}
  */
 anychart.scales.StockOrdinalDateTime = function(chartOrScroller) {
-  goog.base(this, chartOrScroller);
+  anychart.scales.StockOrdinalDateTime.base(this, 'constructor', chartOrScroller);
 };
 goog.inherits(anychart.scales.StockOrdinalDateTime, anychart.scales.StockScatterDateTime);
 
@@ -50,5 +50,8 @@ anychart.scales.StockOrdinalDateTime.prototype.ensureTicksIteratorCreated = func
 
 
 //exports
-anychart.scales.StockOrdinalDateTime.prototype['transform'] = anychart.scales.StockOrdinalDateTime.prototype.transform;
-anychart.scales.StockOrdinalDateTime.prototype['inverseTransform'] = anychart.scales.StockOrdinalDateTime.prototype.inverseTransform;
+(function() {
+  var proto = anychart.scales.StockOrdinalDateTime.prototype;
+  proto['transform'] = proto.transform;
+  proto['inverseTransform'] = proto.inverseTransform;
+})();

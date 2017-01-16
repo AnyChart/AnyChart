@@ -443,11 +443,14 @@ anychart.ui.rangeSelector = function() {
 
 
 //exports
-goog.exportSymbol('anychart.ui.rangeSelector', anychart.ui.rangeSelector);
-anychart.ui.RangeSelector.prototype['render'] = anychart.ui.RangeSelector.prototype.render;
-anychart.ui.RangeSelector.prototype['decorate'] = anychart.ui.RangeSelector.prototype.decorate;
-anychart.ui.RangeSelector.prototype['target'] = anychart.ui.RangeSelector.prototype.target;
-anychart.ui.RangeSelector.prototype['ranges'] = anychart.ui.RangeSelector.prototype.ranges;
-anychart.ui.RangeSelector.prototype['dispose'] = anychart.ui.RangeSelector.prototype.dispose;
-anychart.ui.RangeSelector.prototype['getElement'] = anychart.ui.RangeSelector.prototype.getElement;
-anychart.ui.RangeSelector.prototype['zoomLabelText'] = anychart.ui.RangeSelector.prototype.zoomLabelText;
+(function() {
+  var proto = anychart.ui.RangeSelector.prototype;
+  goog.exportSymbol('anychart.ui.rangeSelector', anychart.ui.rangeSelector);
+  proto['render'] = proto.render;
+  proto['decorate'] = proto.decorate;
+  proto['target'] = proto.target;
+  proto['ranges'] = proto.ranges;
+  proto['dispose'] = proto.dispose;
+  proto['getElement'] = proto.getElement;
+  proto['zoomLabelText'] = proto.zoomLabelText;
+})();

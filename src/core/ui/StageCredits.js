@@ -517,8 +517,11 @@ anychart.core.ui.StageCredits.prototype.disposeInternal = function() {
 
 
 //exports
-anychart.core.ui.StageCredits.prototype['text'] = anychart.core.ui.StageCredits.prototype.text;
-anychart.core.ui.StageCredits.prototype['url'] = anychart.core.ui.StageCredits.prototype.url;
-anychart.core.ui.StageCredits.prototype['alt'] = anychart.core.ui.StageCredits.prototype.alt;
-anychart.core.ui.StageCredits.prototype['logoSrc'] = anychart.core.ui.StageCredits.prototype.logoSrc;
-anychart.core.ui.StageCredits.prototype['enabled'] = anychart.core.ui.StageCredits.prototype.enabled;
+(function() {
+  var proto = anychart.core.ui.StageCredits.prototype;
+  proto['text'] = proto.text;
+  proto['url'] = proto.url;
+  proto['alt'] = proto.alt;
+  proto['logoSrc'] = proto.logoSrc;
+  proto['enabled'] = proto.enabled;
+})();

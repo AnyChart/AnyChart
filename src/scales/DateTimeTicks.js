@@ -14,7 +14,7 @@ goog.require('goog.date.UtcDateTime');
  * @extends {anychart.core.Base}
  */
 anychart.scales.DateTimeTicks = function(scale) {
-  goog.base(this);
+  anychart.scales.DateTimeTicks.base(this, 'constructor');
 
   /**
    * Scale reference to get setup from in emergency situations.
@@ -523,7 +523,7 @@ anychart.scales.DateTimeTicks.prototype.calculateIntervals_ = function(min, max,
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.scales.DateTimeTicks.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.scales.DateTimeTicks.base(this, 'serialize');
   if (this.explicit_)
     json['explicit'] = this.explicit_;
   else if (this.interval_)
@@ -547,7 +547,7 @@ anychart.scales.DateTimeTicks.prototype.setupSpecial = function(var_args) {
 
 /** @inheritDoc */
 anychart.scales.DateTimeTicks.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.scales.DateTimeTicks.base(this, 'setupByJSON', config, opt_default);
   this.explicit_ = config['explicit'] || null;
   this.count_ = goog.isNull(config['count']) ? NaN : Math.max(2, Math.ceil(config['count']));
   this.interval_ = goog.isString(config['interval']) ? goog.date.Interval.fromIsoString(config['interval']) : null;
@@ -556,7 +556,10 @@ anychart.scales.DateTimeTicks.prototype.setupByJSON = function(config, opt_defau
 
 
 //exports
-anychart.scales.DateTimeTicks.prototype['interval'] = anychart.scales.DateTimeTicks.prototype.interval;//doc|ex
-anychart.scales.DateTimeTicks.prototype['count'] = anychart.scales.DateTimeTicks.prototype.count;//doc|ex
-anychart.scales.DateTimeTicks.prototype['set'] = anychart.scales.DateTimeTicks.prototype.set;//doc|ex
-anychart.scales.DateTimeTicks.prototype['get'] = anychart.scales.DateTimeTicks.prototype.get;//doc|ex
+(function() {
+  var proto = anychart.scales.DateTimeTicks.prototype;
+  proto['interval'] = proto.interval;//doc|ex
+  proto['count'] = proto.count;//doc|ex
+  proto['set'] = proto.set;//doc|ex
+  proto['get'] = proto.get;//doc|ex
+})();

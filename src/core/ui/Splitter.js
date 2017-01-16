@@ -19,7 +19,7 @@ goog.require('goog.math');
  * @extends {anychart.core.VisualBaseWithBounds}
  */
 anychart.core.ui.Splitter = function() {
-  goog.base(this);
+  anychart.core.ui.Splitter.base(this, 'constructor');
 
 
   /**
@@ -1163,7 +1163,7 @@ anychart.core.ui.Splitter.prototype.remove = function() {
  * @extends {anychart.core.VisualBaseWithBounds}
  */
 anychart.core.ui.SimpleSplitter = function() {
-  goog.base(this);
+  anychart.core.ui.SimpleSplitter.base(this, 'constructor');
 
   /**
    * Layer that contains all visual elements.
@@ -1703,25 +1703,25 @@ anychart.core.ui.SimpleSplitter.prototype.draw = function() {
 
 
 
-//anychart.core.ui.Splitter.prototype['layout'] = anychart.core.ui.Splitter.prototype.layout;
-//anychart.core.ui.Splitter.prototype['position'] = anychart.core.ui.Splitter.prototype.position;
-//anychart.core.ui.Splitter.prototype['dragAreaLength'] = anychart.core.ui.Splitter.prototype.dragAreaLength;
-//anychart.core.ui.Splitter.prototype['stroke'] = anychart.core.ui.Splitter.prototype.stroke;
-//anychart.core.ui.Splitter.prototype['fill'] = anychart.core.ui.Splitter.prototype.fill;
-//anychart.core.ui.Splitter.prototype['dragPreviewStroke'] = anychart.core.ui.Splitter.prototype.dragPreviewStroke;
-//anychart.core.ui.Splitter.prototype['dragPreviewFill'] = anychart.core.ui.Splitter.prototype.dragPreviewFill;
-//anychart.core.ui.Splitter.prototype['dragAreaStroke'] = anychart.core.ui.Splitter.prototype.dragAreaStroke;
-//anychart.core.ui.Splitter.prototype['dragAreaFill'] = anychart.core.ui.Splitter.prototype.dragAreaFill;
-//anychart.core.ui.Splitter.prototype['handlePositionChange'] = anychart.core.ui.Splitter.prototype.handlePositionChange;
-//anychart.core.ui.Splitter.prototype['considerSplitterWidth'] = anychart.core.ui.Splitter.prototype.considerSplitterWidth;
-//anychart.core.ui.Splitter.prototype['splitterWidth'] = anychart.core.ui.Splitter.prototype.splitterWidth;
-//anychart.core.ui.Splitter.prototype['leftLimitSize'] = anychart.core.ui.Splitter.prototype.leftLimitSize;
-//anychart.core.ui.Splitter.prototype['topLimitSize'] = anychart.core.ui.Splitter.prototype.topLimitSize;
-//anychart.core.ui.Splitter.prototype['rightLimitSize'] = anychart.core.ui.Splitter.prototype.rightLimitSize;
-//anychart.core.ui.Splitter.prototype['bottomLimitSize'] = anychart.core.ui.Splitter.prototype.bottomLimitSize;
-//anychart.core.ui.Splitter.prototype['getLeftBounds'] = anychart.core.ui.Splitter.prototype.getLeftBounds;
-//anychart.core.ui.Splitter.prototype['getTopBounds'] = anychart.core.ui.Splitter.prototype.getTopBounds;
-//anychart.core.ui.Splitter.prototype['getRightBounds'] = anychart.core.ui.Splitter.prototype.getRightBounds;
-//anychart.core.ui.Splitter.prototype['getBottomBounds'] = anychart.core.ui.Splitter.prototype.getBottomBounds;
-//anychart.core.ui.Splitter.prototype['draw'] = anychart.core.ui.Splitter.prototype.draw;
+//proto['layout'] = proto.layout;
+//proto['position'] = proto.position;
+//proto['dragAreaLength'] = proto.dragAreaLength;
+//proto['stroke'] = proto.stroke;
+//proto['fill'] = proto.fill;
+//proto['dragPreviewStroke'] = proto.dragPreviewStroke;
+//proto['dragPreviewFill'] = proto.dragPreviewFill;
+//proto['dragAreaStroke'] = proto.dragAreaStroke;
+//proto['dragAreaFill'] = proto.dragAreaFill;
+//proto['handlePositionChange'] = proto.handlePositionChange;
+//proto['considerSplitterWidth'] = proto.considerSplitterWidth;
+//proto['splitterWidth'] = proto.splitterWidth;
+//proto['leftLimitSize'] = proto.leftLimitSize;
+//proto['topLimitSize'] = proto.topLimitSize;
+//proto['rightLimitSize'] = proto.rightLimitSize;
+//proto['bottomLimitSize'] = proto.bottomLimitSize;
+//proto['getLeftBounds'] = proto.getLeftBounds;
+//proto['getTopBounds'] = proto.getTopBounds;
+//proto['getRightBounds'] = proto.getRightBounds;
+//proto['getBottomBounds'] = proto.getBottomBounds;
+//proto['draw'] = proto.draw;
 //exports

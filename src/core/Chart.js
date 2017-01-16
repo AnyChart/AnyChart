@@ -43,7 +43,7 @@ goog.forwardDeclare('anychart.ui.ContextMenu.Item');
 anychart.core.Chart = function() {
   //todo: this suspend can be replaced with a flag for the chart if it will not be needed anywhere else.
   this.suspendSignalsDispatching();
-  goog.base(this);
+  anychart.core.Chart.base(this, 'constructor');
 
   /**
    * @type {acgraph.vector.Layer}
@@ -1527,7 +1527,7 @@ anychart.core.Chart.prototype.getDefaultThemeObj = function() {
 
 /** @inheritDoc */
 anychart.core.Chart.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.Chart.base(this, 'serialize');
   json['title'] = this.title().serialize();
   json['background'] = this.background().serialize();
   json['margin'] = this.margin().serialize();
@@ -1555,7 +1555,7 @@ anychart.core.Chart.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.Chart.base(this, 'setupByJSON', config, opt_default);
 
   if ('defaultLabelSettings' in config)
     this.defaultLabelSettings(config['defaultLabelSettings']);
@@ -1607,7 +1607,8 @@ anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
 
 /** @inheritDoc */
 anychart.core.Chart.prototype.disposeInternal = function() {
-  goog.base(this, 'disposeInternal');
+  goog.disposeAll(this.animation_, this.a11y_);
+  anychart.core.Chart.base(this, 'disposeInternal');
 
   goog.disposeAll(this.animation_, this.a11y_, this.tooltip_);
   this.animation_ = null;
@@ -1703,7 +1704,7 @@ anychart.core.Chart.prototype.handleMouseEvent = function(event) {
 /** @inheritDoc */
 anychart.core.Chart.prototype.makeBrowserEvent = function(e) {
   //this method is invoked only for events from data layer
-  var res = goog.base(this, 'makeBrowserEvent', e);
+  var res = anychart.core.Chart.base(this, 'makeBrowserEvent', e);
   var tag = anychart.utils.extractTag(res['relatedDomTarget']);
 
   var series = tag && tag.series;
@@ -3120,48 +3121,51 @@ anychart.core.Chart.prototype.shareWithPinterest = function(opt_link, opt_descri
 };
 
 //exports
-anychart.core.Chart.prototype['a11y'] = anychart.core.Chart.prototype.a11y;
-anychart.core.Chart.prototype['animation'] = anychart.core.Chart.prototype.animation;
-anychart.core.Chart.prototype['title'] = anychart.core.Chart.prototype.title;//doc|ex
-anychart.core.Chart.prototype['background'] = anychart.core.Chart.prototype.background;//doc|ex
-anychart.core.Chart.prototype['margin'] = anychart.core.Chart.prototype.margin;//doc|ex
-anychart.core.Chart.prototype['padding'] = anychart.core.Chart.prototype.padding;//doc|ex
-anychart.core.Chart.prototype['label'] = anychart.core.Chart.prototype.label;//doc|ex
-anychart.core.Chart.prototype['container'] = anychart.core.Chart.prototype.container;//doc
-anychart.core.Chart.prototype['contextMenu'] = anychart.core.Chart.prototype.contextMenu;
-anychart.core.Chart.prototype['draw'] = anychart.core.Chart.prototype.draw;//doc
-anychart.core.Chart.prototype['toJson'] = anychart.core.Chart.prototype.toJson;//|need-ex
-anychart.core.Chart.prototype['toXml'] = anychart.core.Chart.prototype.toXml;//|need-ex
-anychart.core.Chart.prototype['legend'] = anychart.core.Chart.prototype.legend;//dummy DO NOT USE
-anychart.core.Chart.prototype['credits'] = anychart.core.Chart.prototype.credits;//dummy DO NOT USE
-anychart.core.Chart.prototype['tooltip'] = anychart.core.Chart.prototype.tooltip;
-anychart.core.Chart.prototype['saveAsPng'] = anychart.core.Chart.prototype.saveAsPng;//inherited
-anychart.core.Chart.prototype['saveAsJpg'] = anychart.core.Chart.prototype.saveAsJpg;//inherited
-anychart.core.Chart.prototype['saveAsPdf'] = anychart.core.Chart.prototype.saveAsPdf;//inherited
-anychart.core.Chart.prototype['saveAsSvg'] = anychart.core.Chart.prototype.saveAsSvg;//inherited
-anychart.core.Chart.prototype['shareAsPng'] = anychart.core.Chart.prototype.shareAsPng;//inherited
-anychart.core.Chart.prototype['shareAsJpg'] = anychart.core.Chart.prototype.shareAsJpg;//inherited
-anychart.core.Chart.prototype['shareAsPdf'] = anychart.core.Chart.prototype.shareAsPdf;//inherited
-anychart.core.Chart.prototype['shareAsSvg'] = anychart.core.Chart.prototype.shareAsSvg;//inherited
-anychart.core.Chart.prototype['getPngBase64String'] = anychart.core.Chart.prototype.getPngBase64String;//inherited
-anychart.core.Chart.prototype['getJpgBase64String'] = anychart.core.Chart.prototype.getJpgBase64String;//inherited
-anychart.core.Chart.prototype['getSvgBase64String'] = anychart.core.Chart.prototype.getSvgBase64String;//inherited
-anychart.core.Chart.prototype['getPdfBase64String'] = anychart.core.Chart.prototype.getPdfBase64String;//inherited
-anychart.core.Chart.prototype['toSvg'] = anychart.core.Chart.prototype.toSvg;//inherited
-anychart.core.Chart.prototype['saveAsCsv'] = anychart.core.Chart.prototype.saveAsCsv;
-anychart.core.Chart.prototype['saveAsXlsx'] = anychart.core.Chart.prototype.saveAsXlsx;
-anychart.core.Chart.prototype['saveAsXml'] = anychart.core.Chart.prototype.saveAsXml;
-anychart.core.Chart.prototype['saveAsJson'] = anychart.core.Chart.prototype.saveAsJson;
-anychart.core.Chart.prototype['toCsv'] = anychart.core.Chart.prototype.toCsv;
-anychart.core.Chart.prototype['toA11yTable'] = anychart.core.Chart.prototype.toA11yTable;
-anychart.core.Chart.prototype['toHtmlTable'] = anychart.core.Chart.prototype.toHtmlTable;
-anychart.core.Chart.prototype['localToGlobal'] = anychart.core.Chart.prototype.localToGlobal;
-anychart.core.Chart.prototype['globalToLocal'] = anychart.core.Chart.prototype.globalToLocal;
-anychart.core.Chart.prototype['getStat'] = anychart.core.Chart.prototype.getStat;
-anychart.core.Chart.prototype['getSelectedPoints'] = anychart.core.Chart.prototype.getSelectedPoints;
-anychart.core.Chart.prototype['credits'] = anychart.core.Chart.prototype.credits;
-anychart.core.Chart.prototype['shareWithFacebook'] = anychart.core.Chart.prototype.shareWithFacebook;
-anychart.core.Chart.prototype['shareWithTwitter'] = anychart.core.Chart.prototype.shareWithTwitter;
-anychart.core.Chart.prototype['shareWithLinkedIn'] = anychart.core.Chart.prototype.shareWithLinkedIn;
-anychart.core.Chart.prototype['shareWithPinterest'] = anychart.core.Chart.prototype.shareWithPinterest;
+(function() {
+  var proto = anychart.core.Chart.prototype;
+  proto['a11y'] = proto.a11y;
+  proto['animation'] = proto.animation;
+  proto['title'] = proto.title;//doc|ex
+  proto['background'] = proto.background;//doc|ex
+  proto['margin'] = proto.margin;//doc|ex
+  proto['padding'] = proto.padding;//doc|ex
+  proto['label'] = proto.label;//doc|ex
+  proto['container'] = proto.container;//doc
+  proto['contextMenu'] = proto.contextMenu;
+  proto['draw'] = proto.draw;//doc
+  proto['toJson'] = proto.toJson;//|need-ex
+  proto['toXml'] = proto.toXml;//|need-ex
+  proto['legend'] = proto.legend;//dummy DO NOT USE
+  proto['credits'] = proto.credits;//dummy DO NOT USE
+  proto['tooltip'] = proto.tooltip;
+  proto['saveAsPng'] = proto.saveAsPng;//inherited
+  proto['saveAsJpg'] = proto.saveAsJpg;//inherited
+  proto['saveAsPdf'] = proto.saveAsPdf;//inherited
+  proto['saveAsSvg'] = proto.saveAsSvg;//inherited
+  proto['shareAsPng'] = proto.shareAsPng;//inherited
+  proto['shareAsJpg'] = proto.shareAsJpg;//inherited
+  proto['shareAsPdf'] = proto.shareAsPdf;//inherited
+  proto['shareAsSvg'] = proto.shareAsSvg;//inherited
+  proto['getPngBase64String'] = proto.getPngBase64String;//inherited
+  proto['getJpgBase64String'] = proto.getJpgBase64String;//inherited
+  proto['getSvgBase64String'] = proto.getSvgBase64String;//inherited
+  proto['getPdfBase64String'] = proto.getPdfBase64String;//inherited
+  proto['toSvg'] = proto.toSvg;//inherited
+  proto['saveAsCsv'] = proto.saveAsCsv;
+  proto['saveAsXlsx'] = proto.saveAsXlsx;
+  proto['saveAsXml'] = proto.saveAsXml;
+  proto['saveAsJson'] = proto.saveAsJson;
+  proto['toCsv'] = proto.toCsv;
+  proto['toA11yTable'] = proto.toA11yTable;
+  proto['toHtmlTable'] = proto.toHtmlTable;
+  proto['localToGlobal'] = proto.localToGlobal;
+  proto['globalToLocal'] = proto.globalToLocal;
+  proto['getStat'] = proto.getStat;
+  proto['getSelectedPoints'] = proto.getSelectedPoints;
+  proto['credits'] = proto.credits;
+  proto['shareWithFacebook'] = proto.shareWithFacebook;
+  proto['shareWithTwitter'] = proto.shareWithTwitter;
+  proto['shareWithLinkedIn'] = proto.shareWithLinkedIn;
+  proto['shareWithPinterest'] = proto.shareWithPinterest;
+})();
 

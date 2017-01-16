@@ -55,12 +55,16 @@ anychart.ui.labelsFactory = function() {
 
 
 //exports
-goog.exportSymbol('anychart.ui.labelsFactory', anychart.ui.labelsFactory);
-goog.exportSymbol('anychart.standalones.labelsFactory', anychart.standalones.labelsFactory);
-anychart.standalones.LabelsFactory.prototype['draw'] = anychart.standalones.LabelsFactory.prototype.draw;
-anychart.standalones.LabelsFactory.prototype['parentBounds'] = anychart.standalones.LabelsFactory.prototype.parentBounds;
-anychart.standalones.LabelsFactory.prototype['container'] = anychart.standalones.LabelsFactory.prototype.container;
-anychart.standalones.LabelsFactory.prototype['add'] = anychart.standalones.LabelsFactory.prototype.add;
-anychart.standalones.LabelsFactory.prototype['clear'] = anychart.standalones.LabelsFactory.prototype.clear;
-anychart.standalones.LabelsFactory.prototype['measure'] = anychart.standalones.LabelsFactory.prototype.measure;
-anychart.standalones.LabelsFactory.prototype['measureWithTransform'] = anychart.standalones.LabelsFactory.prototype.measureWithTransform;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.standalones.LabelsFactory.prototype;
+  goog.exportSymbol('anychart.ui.labelsFactory', anychart.ui.labelsFactory);
+  goog.exportSymbol('anychart.standalones.labelsFactory', anychart.standalones.labelsFactory);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+  proto['add'] = proto.add;
+  proto['clear'] = proto.clear;
+  proto['measure'] = proto.measure;
+  proto['measureWithTransform'] = proto.measureWithTransform;
+})();

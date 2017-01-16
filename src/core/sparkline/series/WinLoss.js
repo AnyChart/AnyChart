@@ -10,7 +10,7 @@ goog.require('anychart.core.sparkline.series.Column');
  * @extends {anychart.core.sparkline.series.Column}
  */
 anychart.core.sparkline.series.WinLoss = function(chart) {
-  goog.base(this, chart);
+  anychart.core.sparkline.series.WinLoss.base(this, 'constructor', chart);
 };
 goog.inherits(anychart.core.sparkline.series.WinLoss, anychart.core.sparkline.series.Column);
 anychart.core.sparkline.series.Base.SeriesTypesMap[anychart.enums.SparklineSeriesType.WIN_LOSS] = anychart.core.sparkline.series.WinLoss;
@@ -18,7 +18,7 @@ anychart.core.sparkline.series.Base.SeriesTypesMap[anychart.enums.SparklineSerie
 
 /** @inheritDoc */
 anychart.core.sparkline.series.WinLoss.prototype.startDrawing = function() {
-  goog.base(this, 'startDrawing');
+  anychart.core.sparkline.series.WinLoss.base(this, 'startDrawing');
 
   this.zeroY = Math.round(this.applyRatioToBounds(.5, false));
 };
@@ -55,7 +55,7 @@ anychart.core.sparkline.series.WinLoss.prototype.getReferenceCoords = function()
 
 /** @inheritDoc */
 anychart.core.sparkline.series.WinLoss.prototype.getDefaults = function() {
-  var settings = goog.base(this, 'getDefaults');
+  var settings = anychart.core.sparkline.series.WinLoss.base(this, 'getDefaults');
 
   if (!settings['markers']) settings['markers'] = {};
   settings['markers']['position'] = anychart.enums.Position.CENTER_TOP;

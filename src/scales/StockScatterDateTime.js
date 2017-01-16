@@ -17,7 +17,7 @@ goog.require('goog.math');
  * @implements {anychart.scales.IXScale}
  */
 anychart.scales.StockScatterDateTime = function(chartOrScroller) {
-  goog.base(this);
+  anychart.scales.StockScatterDateTime.base(this, 'constructor');
   /**
    * Chart reference. Used for key<->index transformations.
    * @type {!anychart.core.stock.IKeyIndexTransformer}
@@ -556,18 +556,23 @@ anychart.scales.StockScatterDateTime.MAJOR_INTERVALS_ = [
 ];
 
 
-//anychart.scales.StockScatterDateTime.prototype['getTicks'] = anychart.scales.StockScatterDateTime.prototype.getTicks;
-//anychart.scales.StockScatterDateTime.prototype['getMajorIntervalUnit'] = anychart.scales.StockScatterDateTime.prototype.getMajorIntervalUnit;
-//anychart.scales.StockScatterDateTime.prototype['getMajorIntervalUnitCount'] = anychart.scales.StockScatterDateTime.prototype.getMajorIntervalUnitCount;
-//anychart.scales.StockScatterDateTime.prototype['getMinorIntervalUnit'] = anychart.scales.StockScatterDateTime.prototype.getMinorIntervalUnit;
-//anychart.scales.StockScatterDateTime.prototype['getMinorIntervalUnitCount'] = anychart.scales.StockScatterDateTime.prototype.getMinorIntervalUnitCount;
+//proto['getTicks'] = proto.getTicks;
+//proto['getMajorIntervalUnit'] = proto.getMajorIntervalUnit;
+//proto['getMajorIntervalUnitCount'] = proto.getMajorIntervalUnitCount;
+//proto['getMinorIntervalUnit'] = proto.getMinorIntervalUnit;
+//proto['getMinorIntervalUnitCount'] = proto.getMinorIntervalUnitCount;
+
 
 //exports
-anychart.scales.StockScatterDateTime.prototype['getFullMinimum'] = anychart.scales.StockScatterDateTime.prototype.getFullMinimum;
-anychart.scales.StockScatterDateTime.prototype['getFullMaximum'] = anychart.scales.StockScatterDateTime.prototype.getFullMaximum;
-anychart.scales.StockScatterDateTime.prototype['getMinimum'] = anychart.scales.StockScatterDateTime.prototype.getMinimum;
-anychart.scales.StockScatterDateTime.prototype['getMaximum'] = anychart.scales.StockScatterDateTime.prototype.getMaximum;
-anychart.scales.StockScatterDateTime.prototype['transform'] = anychart.scales.StockScatterDateTime.prototype.transform;
-anychart.scales.StockScatterDateTime.prototype['inverseTransform'] = anychart.scales.StockScatterDateTime.prototype.inverseTransform;
-anychart.scales.StockScatterDateTime.prototype['getGroupingUnit'] = anychart.scales.StockScatterDateTime.prototype.getGroupingUnit;
-anychart.scales.StockScatterDateTime.prototype['getGroupingUnitCount'] = anychart.scales.StockScatterDateTime.prototype.getGroupingUnitCount;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.scales.StockScatterDateTime.prototype;
+  proto['getFullMinimum'] = proto.getFullMinimum;
+  proto['getFullMaximum'] = proto.getFullMaximum;
+  proto['getMinimum'] = proto.getMinimum;
+  proto['getMaximum'] = proto.getMaximum;
+  proto['transform'] = proto.transform;
+  proto['inverseTransform'] = proto.inverseTransform;
+  proto['getGroupingUnit'] = proto.getGroupingUnit;
+  proto['getGroupingUnitCount'] = proto.getGroupingUnitCount;
+})();

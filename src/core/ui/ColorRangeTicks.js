@@ -10,7 +10,7 @@ goog.require('anychart.core.axes.Ticks');
  * @extends {anychart.core.axes.Ticks}
  */
 anychart.core.ui.ColorRangeTicks = function() {
-  goog.base(this);
+  anychart.core.ui.ColorRangeTicks.base(this, 'constructor');
 };
 goog.inherits(anychart.core.ui.ColorRangeTicks, anychart.core.axes.Ticks);
 

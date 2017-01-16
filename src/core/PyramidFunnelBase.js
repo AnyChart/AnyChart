@@ -31,7 +31,7 @@ goog.require('anychart.utils');
  * @constructor
  */
 anychart.core.PyramidFunnelBase = function(opt_data, opt_csvSettings) {
-  goog.base(this);
+  anychart.core.PyramidFunnelBase.base(this, 'constructor');
   this.suspendSignalsDispatching();
 
   /**
@@ -1076,7 +1076,7 @@ anychart.core.PyramidFunnelBase.prototype.remove = function() {
 
   if (this.dataLayer_) this.dataLayer_.parent(null);
 
-  goog.base(this, 'remove');
+  anychart.core.PyramidFunnelBase.base(this, 'remove');
 };
 
 
@@ -3522,7 +3522,7 @@ anychart.core.PyramidFunnelBase.prototype.showTooltip = function(opt_event) {
   // if (tooltip.isFloating() && opt_event) {
   //   tooltip.show(
   //       formatProvider,
-  //       new acgraph.math.Coordinate(opt_event['clientX'], opt_event['clientY']));
+  //       new goog.math.Coordinate(opt_event['clientX'], opt_event['clientY']));
   //
   //   // for float
   //   this.listen(goog.events.EventType.MOUSEMOVE, this.showTooltip);
@@ -3530,7 +3530,7 @@ anychart.core.PyramidFunnelBase.prototype.showTooltip = function(opt_event) {
   // } else {
   //   tooltip.show(
   //       formatProvider,
-  //       new acgraph.math.Coordinate(0, 0));
+  //       new goog.math.Coordinate(0, 0));
   // }
 };
 
@@ -3740,7 +3740,7 @@ anychart.core.PyramidFunnelBase.prototype.hoverMode = function(opt_value) {
  * @inheritDoc
  */
 anychart.core.PyramidFunnelBase.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.PyramidFunnelBase.base(this, 'serialize');
 
   json['type'] = anychart.enums.ChartTypes.PYRAMID;
   json['data'] = this.data().serialize();
@@ -3893,7 +3893,7 @@ anychart.core.PyramidFunnelBase.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.core.PyramidFunnelBase.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.PyramidFunnelBase.base(this, 'setupByJSON', config, opt_default);
 
   this.baseWidth(config['baseWidth']);
   this.connectorLength(config['connectorLength']);

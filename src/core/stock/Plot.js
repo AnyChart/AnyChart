@@ -34,7 +34,7 @@ goog.require('goog.fx.Dragger');
  * @implements {anychart.core.IPlot}
  */
 anychart.core.stock.Plot = function(chart) {
-  goog.base(this);
+  anychart.core.stock.Plot.base(this, 'constructor');
 
   /**
    * Parent chart reference.
@@ -2105,13 +2105,13 @@ anychart.core.stock.Plot.prototype.disposeInternal = function() {
   goog.disposeAll(this.palette_, this.markerPalette_, this.hatchFillPalette_);
   this.palette_ = this.markerPalette_ = this.hatchFillPalette_ = null;
 
-  goog.base(this, 'disposeInternal');
+  anychart.core.stock.Plot.base(this, 'disposeInternal');
 };
 
 
 /** @inheritDoc */
 anychart.core.stock.Plot.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.stock.Plot.base(this, 'serialize');
   var scalesIds = {};
   var scales = [];
   var axesIds = [];
@@ -2267,7 +2267,7 @@ anychart.core.stock.Plot.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.stock.Plot.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.stock.Plot.base(this, 'setupByJSON', config, opt_default);
   var i, json, scale;
 
   this.defaultSeriesType(config['defaultSeriesType']);
@@ -2401,7 +2401,7 @@ anychart.core.stock.Plot.prototype.setupByJSON = function(config, opt_default) {
  * @extends {goog.fx.Dragger}
  */
 anychart.core.stock.Plot.Dragger = function(plot, target) {
-  goog.base(this, target.domElement());
+  anychart.core.stock.Plot.Dragger.base(this, 'constructor', target.domElement());
 
   /**
    * Plot reference.
@@ -2510,50 +2510,53 @@ anychart.core.stock.Plot.Dragger.prototype.limitY = function(y) {
 
 
 //exports
-anychart.core.stock.Plot.prototype['background'] = anychart.core.stock.Plot.prototype.background;
-anychart.core.stock.Plot.prototype['legend'] = anychart.core.stock.Plot.prototype.legend;
-anychart.core.stock.Plot.prototype['area'] = anychart.core.stock.Plot.prototype.area;
-anychart.core.stock.Plot.prototype['candlestick'] = anychart.core.stock.Plot.prototype.candlestick;
-anychart.core.stock.Plot.prototype['column'] = anychart.core.stock.Plot.prototype.column;
-anychart.core.stock.Plot.prototype['jumpLine'] = anychart.core.stock.Plot.prototype.jumpLine;
-anychart.core.stock.Plot.prototype['stick'] = anychart.core.stock.Plot.prototype.stick;
-anychart.core.stock.Plot.prototype['line'] = anychart.core.stock.Plot.prototype.line;
-anychart.core.stock.Plot.prototype['marker'] = anychart.core.stock.Plot.prototype.marker;
-anychart.core.stock.Plot.prototype['ohlc'] = anychart.core.stock.Plot.prototype.ohlc;
-anychart.core.stock.Plot.prototype['rangeArea'] = anychart.core.stock.Plot.prototype.rangeArea;
-anychart.core.stock.Plot.prototype['rangeColumn'] = anychart.core.stock.Plot.prototype.rangeColumn;
-anychart.core.stock.Plot.prototype['rangeSplineArea'] = anychart.core.stock.Plot.prototype.rangeSplineArea;
-anychart.core.stock.Plot.prototype['rangeStepArea'] = anychart.core.stock.Plot.prototype.rangeStepArea;
-anychart.core.stock.Plot.prototype['spline'] = anychart.core.stock.Plot.prototype.spline;
-anychart.core.stock.Plot.prototype['splineArea'] = anychart.core.stock.Plot.prototype.splineArea;
-anychart.core.stock.Plot.prototype['stepArea'] = anychart.core.stock.Plot.prototype.stepArea;
-anychart.core.stock.Plot.prototype['stepLine'] = anychart.core.stock.Plot.prototype.stepLine;
-anychart.core.stock.Plot.prototype['getSeries'] = anychart.core.stock.Plot.prototype.getSeries;
-anychart.core.stock.Plot.prototype['yScale'] = anychart.core.stock.Plot.prototype.yScale;
-anychart.core.stock.Plot.prototype['yAxis'] = anychart.core.stock.Plot.prototype.yAxis;
-anychart.core.stock.Plot.prototype['xAxis'] = anychart.core.stock.Plot.prototype.xAxis;
-anychart.core.stock.Plot.prototype['grid'] = anychart.core.stock.Plot.prototype.grid;
-anychart.core.stock.Plot.prototype['minorGrid'] = anychart.core.stock.Plot.prototype.minorGrid;
-anychart.core.stock.Plot.prototype['dateTimeHighlighter'] = anychart.core.stock.Plot.prototype.dateTimeHighlighter;
-anychart.core.stock.Plot.prototype['defaultSeriesType'] = anychart.core.stock.Plot.prototype.defaultSeriesType;
-anychart.core.stock.Plot.prototype['addSeries'] = anychart.core.stock.Plot.prototype.addSeries;
-anychart.core.stock.Plot.prototype['getSeriesAt'] = anychart.core.stock.Plot.prototype.getSeriesAt;
-anychart.core.stock.Plot.prototype['getSeriesCount'] = anychart.core.stock.Plot.prototype.getSeriesCount;
-anychart.core.stock.Plot.prototype['removeSeries'] = anychart.core.stock.Plot.prototype.removeSeries;
-anychart.core.stock.Plot.prototype['removeSeriesAt'] = anychart.core.stock.Plot.prototype.removeSeriesAt;
-anychart.core.stock.Plot.prototype['removeAllSeries'] = anychart.core.stock.Plot.prototype.removeAllSeries;
-anychart.core.stock.Plot.prototype['ama'] = anychart.core.stock.Plot.prototype.ama;
-anychart.core.stock.Plot.prototype['aroon'] = anychart.core.stock.Plot.prototype.aroon;
-anychart.core.stock.Plot.prototype['bbands'] = anychart.core.stock.Plot.prototype.bbands;
-anychart.core.stock.Plot.prototype['bbandsB'] = anychart.core.stock.Plot.prototype.bbandsB;
-anychart.core.stock.Plot.prototype['bbandsWidth'] = anychart.core.stock.Plot.prototype.bbandsWidth;
-anychart.core.stock.Plot.prototype['ema'] = anychart.core.stock.Plot.prototype.ema;
-anychart.core.stock.Plot.prototype['macd'] = anychart.core.stock.Plot.prototype.macd;
-anychart.core.stock.Plot.prototype['mma'] = anychart.core.stock.Plot.prototype.mma;
-anychart.core.stock.Plot.prototype['roc'] = anychart.core.stock.Plot.prototype.roc;
-anychart.core.stock.Plot.prototype['rsi'] = anychart.core.stock.Plot.prototype.rsi;
-anychart.core.stock.Plot.prototype['sma'] = anychart.core.stock.Plot.prototype.sma;
-anychart.core.stock.Plot.prototype['palette'] = anychart.core.stock.Plot.prototype.palette;
-// anychart.core.stock.Plot.prototype['markerPalette'] = anychart.core.stock.Plot.prototype.markerPalette;
-anychart.core.stock.Plot.prototype['hatchFillPalette'] = anychart.core.stock.Plot.prototype.hatchFillPalette;
-anychart.core.stock.Plot.prototype['annotations'] = anychart.core.stock.Plot.prototype.annotations;
+(function() {
+  var proto = anychart.core.stock.Plot.prototype;
+  proto['background'] = proto.background;
+  proto['legend'] = proto.legend;
+  proto['area'] = proto.area;
+  proto['candlestick'] = proto.candlestick;
+  proto['column'] = proto.column;
+  proto['jumpLine'] = proto.jumpLine;
+  proto['stick'] = proto.stick;
+  proto['line'] = proto.line;
+  proto['marker'] = proto.marker;
+  proto['ohlc'] = proto.ohlc;
+  proto['rangeArea'] = proto.rangeArea;
+  proto['rangeColumn'] = proto.rangeColumn;
+  proto['rangeSplineArea'] = proto.rangeSplineArea;
+  proto['rangeStepArea'] = proto.rangeStepArea;
+  proto['spline'] = proto.spline;
+  proto['splineArea'] = proto.splineArea;
+  proto['stepArea'] = proto.stepArea;
+  proto['stepLine'] = proto.stepLine;
+  proto['getSeries'] = proto.getSeries;
+  proto['yScale'] = proto.yScale;
+  proto['yAxis'] = proto.yAxis;
+  proto['xAxis'] = proto.xAxis;
+  proto['grid'] = proto.grid;
+  proto['minorGrid'] = proto.minorGrid;
+  proto['dateTimeHighlighter'] = proto.dateTimeHighlighter;
+  proto['defaultSeriesType'] = proto.defaultSeriesType;
+  proto['addSeries'] = proto.addSeries;
+  proto['getSeriesAt'] = proto.getSeriesAt;
+  proto['getSeriesCount'] = proto.getSeriesCount;
+  proto['removeSeries'] = proto.removeSeries;
+  proto['removeSeriesAt'] = proto.removeSeriesAt;
+  proto['removeAllSeries'] = proto.removeAllSeries;
+  proto['ama'] = proto.ama;
+  proto['aroon'] = proto.aroon;
+  proto['bbands'] = proto.bbands;
+  proto['bbandsB'] = proto.bbandsB;
+  proto['bbandsWidth'] = proto.bbandsWidth;
+  proto['ema'] = proto.ema;
+  proto['macd'] = proto.macd;
+  proto['mma'] = proto.mma;
+  proto['roc'] = proto.roc;
+  proto['rsi'] = proto.rsi;
+  proto['sma'] = proto.sma;
+  proto['palette'] = proto.palette;
+  // proto['markerPalette'] = proto.markerPalette;
+  proto['hatchFillPalette'] = proto.hatchFillPalette;
+  proto['annotations'] = proto.annotations;
+})();

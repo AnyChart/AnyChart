@@ -110,7 +110,10 @@ anychart.core.ui.table.Border.prototype.left = function(opt_strokeOrFill, opt_th
 
 
 //exports
-anychart.core.ui.table.Border.prototype['top'] = anychart.core.ui.table.Border.prototype.top;
-anychart.core.ui.table.Border.prototype['right'] = anychart.core.ui.table.Border.prototype.right;
-anychart.core.ui.table.Border.prototype['bottom'] = anychart.core.ui.table.Border.prototype.bottom;
-anychart.core.ui.table.Border.prototype['left'] = anychart.core.ui.table.Border.prototype.left;
+(function() {
+  var proto = anychart.core.ui.table.Border.prototype;
+  proto['top'] = proto.top;
+  proto['right'] = proto.right;
+  proto['bottom'] = proto.bottom;
+  proto['left'] = proto.left;
+})();

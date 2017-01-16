@@ -616,18 +616,21 @@ anychart.ui.contextMenu = function() {
 
 
 //exports
-goog.exportSymbol('anychart.ui.contextMenu', anychart.ui.contextMenu);
-anychart.ui.ContextMenu.prototype['serialize'] = anychart.ui.ContextMenu.prototype.serialize;
-anychart.ui.ContextMenu.prototype['setup'] = anychart.ui.ContextMenu.prototype.setup;
-anychart.ui.ContextMenu.prototype['enabled'] = anychart.ui.ContextMenu.prototype.enabled;
-anychart.ui.ContextMenu.prototype['addClassName'] = anychart.ui.ContextMenu.prototype.addClassName;
-anychart.ui.ContextMenu.prototype['removeClassName'] = anychart.ui.ContextMenu.prototype.removeClassName;
-anychart.ui.ContextMenu.prototype['attach'] = anychart.ui.ContextMenu.prototype.attach;
-anychart.ui.ContextMenu.prototype['detach'] = anychart.ui.ContextMenu.prototype.detach;
-anychart.ui.ContextMenu.prototype['listen'] = anychart.ui.ContextMenu.prototype.listen;
-anychart.ui.ContextMenu.prototype['unlisten'] = anychart.ui.ContextMenu.prototype.unlisten;
-anychart.ui.ContextMenu.prototype['show'] = anychart.ui.ContextMenu.prototype.show;
-anychart.ui.ContextMenu.prototype['hide'] = anychart.ui.ContextMenu.prototype.hide;
-anychart.ui.ContextMenu.prototype['items'] = anychart.ui.ContextMenu.prototype.items;
-anychart.ui.ContextMenu.prototype['itemsProvider'] = anychart.ui.ContextMenu.prototype.itemsProvider;
-anychart.ui.ContextMenu.prototype['itemsFormatter'] = anychart.ui.ContextMenu.prototype.itemsFormatter;
+(function() {
+  var proto = anychart.ui.ContextMenu.prototype;
+  goog.exportSymbol('anychart.ui.contextMenu', anychart.ui.contextMenu);
+  proto['serialize'] = proto.serialize;
+  proto['setup'] = proto.setup;
+  proto['enabled'] = proto.enabled;
+  proto['addClassName'] = proto.addClassName;
+  proto['removeClassName'] = proto.removeClassName;
+  proto['attach'] = proto.attach;
+  proto['detach'] = proto.detach;
+  proto['listen'] = proto.listen;
+  proto['unlisten'] = proto.unlisten;
+  proto['show'] = proto.show;
+  proto['hide'] = proto.hide;
+  proto['items'] = proto.items;
+  proto['itemsProvider'] = proto.itemsProvider;
+  proto['itemsFormatter'] = proto.itemsFormatter;
+})();

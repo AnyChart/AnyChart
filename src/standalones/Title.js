@@ -49,8 +49,12 @@ anychart.ui.title = function() {
 
 
 //exports
-goog.exportSymbol('anychart.standalones.title', anychart.standalones.title);
-goog.exportSymbol('anychart.ui.title', anychart.ui.title);
-anychart.standalones.Title.prototype['draw'] = anychart.standalones.Title.prototype.draw;
-anychart.standalones.Title.prototype['parentBounds'] = anychart.standalones.Title.prototype.parentBounds;
-anychart.standalones.Title.prototype['container'] = anychart.standalones.Title.prototype.container;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.standalones.Title.prototype;
+  goog.exportSymbol('anychart.standalones.title', anychart.standalones.title);
+  goog.exportSymbol('anychart.ui.title', anychart.ui.title);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+})();

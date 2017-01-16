@@ -9,7 +9,7 @@ goog.require('goog.fx.AnimationParallelQueue');
  * @extends {goog.fx.AnimationParallelQueue}
  */
 anychart.animations.AnimationParallelQueue = function() {
-  goog.base(this);
+  anychart.animations.AnimationParallelQueue.base(this, 'constructor');
 };
 goog.inherits(anychart.animations.AnimationParallelQueue, goog.fx.AnimationParallelQueue);
 

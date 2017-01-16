@@ -14,7 +14,7 @@ goog.require('anychart.utils');
  * @extends {anychart.core.gauge.pointers.Base}
  */
 anychart.core.gauge.pointers.Marker = function() {
-  goog.base(this);
+  anychart.core.gauge.pointers.Marker.base(this, 'constructor');
 
   /**
    * Pointer size.
@@ -249,7 +249,7 @@ anychart.core.gauge.pointers.Marker.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
-  goog.base(this, 'draw');
+  anychart.core.gauge.pointers.Marker.base(this, 'draw');
 
   this.domElement.draw();
   if (this.hatchFillElement) this.hatchFillElement.draw();
@@ -267,7 +267,7 @@ anychart.core.gauge.pointers.Marker.prototype.draw = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.gauge.pointers.Marker.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.gauge.pointers.Marker.base(this, 'serialize');
 
   json['position'] = this.position();
   json['size'] = this.size();
@@ -288,7 +288,7 @@ anychart.core.gauge.pointers.Marker.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.gauge.pointers.Marker.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.gauge.pointers.Marker.base(this, 'setupByJSON', config, opt_default);
 
   this.size(config['size']);
   this.position(config['position']);
@@ -298,7 +298,10 @@ anychart.core.gauge.pointers.Marker.prototype.setupByJSON = function(config, opt
 
 
 //exports
-anychart.core.gauge.pointers.Marker.prototype['size'] = anychart.core.gauge.pointers.Marker.prototype.size;
-anychart.core.gauge.pointers.Marker.prototype['position'] = anychart.core.gauge.pointers.Marker.prototype.position;
-anychart.core.gauge.pointers.Marker.prototype['radius'] = anychart.core.gauge.pointers.Marker.prototype.radius;
-anychart.core.gauge.pointers.Marker.prototype['type'] = anychart.core.gauge.pointers.Marker.prototype.type;
+(function() {
+  var proto = anychart.core.gauge.pointers.Marker.prototype;
+  proto['size'] = proto.size;
+  proto['position'] = proto.position;
+  proto['radius'] = proto.radius;
+  proto['type'] = proto.type;
+})();

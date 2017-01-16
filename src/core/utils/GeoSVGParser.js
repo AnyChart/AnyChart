@@ -1,6 +1,6 @@
 goog.provide('anychart.core.utils.GeoSVGParser');
 goog.require('anychart.core.utils.SVGPathDataParser');
-goog.require('goog.graphics.AffineTransform');
+goog.require('goog.math.AffineTransform');
 
 
 
@@ -58,7 +58,7 @@ anychart.core.utils.GeoSVGParser.prototype.parse = function(data) {
  * Parsing svg to internal format.
  * @param {Element} node .
  * @param {(Object|boolean)=} opt_parent .
- * @param {goog.graphics.AffineTransform=} opt_tx .
+ * @param {goog.math.AffineTransform=} opt_tx .
  * @return {!Array}
  * @private
  */
@@ -120,7 +120,7 @@ anychart.core.utils.GeoSVGParser.prototype.parseGeoSVGFeatures_ = function(node,
  * Parse svg element.
  * @param {Element} svgDomElement .
  * @param {Object=} opt_parent .
- * @param {goog.graphics.AffineTransform=} opt_tx .
+ * @param {goog.math.AffineTransform=} opt_tx .
  * @return {Object}
  * @private
  */
@@ -430,7 +430,7 @@ anychart.core.utils.GeoSVGParser.prototype.getGradientStops = function(node) {
 /**
  * Converts clip path dom element to internal represent.
  * @param {Element} node Source svg dom element.
- * @param {goog.graphics.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
+ * @param {goog.math.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
  * @return {Object}
  */
 anychart.core.utils.GeoSVGParser.prototype.convertClipPath = function(node, opt_tx) {
@@ -449,7 +449,7 @@ anychart.core.utils.GeoSVGParser.prototype.convertClipPath = function(node, opt_
 /**
  * Converts text dom element to internal represent.
  * @param {Element} node Source svg dom element.
- * @param {goog.graphics.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
+ * @param {goog.math.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
  * @return {Object}
  */
 anychart.core.utils.GeoSVGParser.prototype.convertImage = function(node, opt_tx) {
@@ -495,7 +495,7 @@ anychart.core.utils.GeoSVGParser.prototype.convertImage = function(node, opt_tx)
 /**
  * Converts text dom element to internal represent.
  * @param {Element} node Source svg dom element.
- * @param {goog.graphics.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
+ * @param {goog.math.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
  * @return {Object}
  */
 anychart.core.utils.GeoSVGParser.prototype.convertText = function(node, opt_tx) {
@@ -535,7 +535,7 @@ anychart.core.utils.GeoSVGParser.prototype.convertText = function(node, opt_tx) 
 /**
  * Converts rect dom element to internal represent.
  * @param {Element} node Source svg dom element.
- * @param {goog.graphics.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
+ * @param {goog.math.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
  * @return {Object}
  */
 anychart.core.utils.GeoSVGParser.prototype.convertRect = function(node, opt_tx) {
@@ -561,7 +561,7 @@ anychart.core.utils.GeoSVGParser.prototype.convertRect = function(node, opt_tx) 
 /**
  * Converts circle dom element to internal represent.
  * @param {Element} node Source svg dom element.
- * @param {goog.graphics.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
+ * @param {goog.math.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
  * @return {Object}
  */
 anychart.core.utils.GeoSVGParser.prototype.convertCircle = function(node, opt_tx) {
@@ -590,7 +590,7 @@ anychart.core.utils.GeoSVGParser.prototype.convertCircle = function(node, opt_tx
 /**
  * Converts ellipse dom element to internal represent.
  * @param {Element} node Source svg dom element.
- * @param {goog.graphics.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
+ * @param {goog.math.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
  * @return {Object}
  */
 anychart.core.utils.GeoSVGParser.prototype.convertEllipse = function(node, opt_tx) {
@@ -620,7 +620,7 @@ anychart.core.utils.GeoSVGParser.prototype.convertEllipse = function(node, opt_t
 /**
  * Converts polygon dom element to internal represent.
  * @param {Element} node Source svg dom element.
- * @param {goog.graphics.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
+ * @param {goog.math.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
  * @return {Object}
  */
 anychart.core.utils.GeoSVGParser.prototype.convertPolygon = function(node, opt_tx) {
@@ -642,7 +642,7 @@ anychart.core.utils.GeoSVGParser.prototype.convertPolygon = function(node, opt_t
 /**
  * Converts polyline dom element to internal represent.
  * @param {Element} node Source svg dom element.
- * @param {goog.graphics.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
+ * @param {goog.math.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
  * @return {Object}
  */
 anychart.core.utils.GeoSVGParser.prototype.convertPolyline = function(node, opt_tx) {
@@ -663,7 +663,7 @@ anychart.core.utils.GeoSVGParser.prototype.convertPolyline = function(node, opt_
 /**
  * Converts line dom element to internal represent.
  * @param {Element} node Source svg dom element.
- * @param {goog.graphics.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
+ * @param {goog.math.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
  * @return {Object}
  */
 anychart.core.utils.GeoSVGParser.prototype.convertLine = function(node, opt_tx) {
@@ -684,7 +684,7 @@ anychart.core.utils.GeoSVGParser.prototype.convertLine = function(node, opt_tx) 
 /**
  * Converts path dom element to internal represent.
  * @param {Element} node Source svg dom element.
- * @param {goog.graphics.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
+ * @param {goog.math.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
  * @return {Object}
  */
 anychart.core.utils.GeoSVGParser.prototype.convertPath = function(node, opt_tx) {
@@ -734,8 +734,8 @@ anychart.core.utils.GeoSVGParser.prototype.createPathByCommands = function(comma
 /**
  * Returns full transformation for passed element. Self element tx is concatenated with passed opt_tx.
  * @param {Element} node Source svg dom element.
- * @param {goog.graphics.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
- * @return {!Object.<string, goog.graphics.AffineTransform>}
+ * @param {goog.math.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
+ * @return {!Object.<string, goog.math.AffineTransform>}
  */
 anychart.core.utils.GeoSVGParser.prototype.getTransformation = function(node, opt_tx) {
   var tagName = node.tagName.toLowerCase();
@@ -891,7 +891,7 @@ anychart.core.utils.GeoSVGParser.prototype.getProperties = function(node) {
  * Returns final internal represent of svg element.
  * @param {Element} node Source svg dom element.
  * @param {Array} commands Array of svg path commands for creating path element.
- * @param {goog.graphics.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
+ * @param {goog.math.AffineTransform=} opt_tx Transformation that was accumulated in one object for passed svg Element.
  * @return {Object}
  */
 anychart.core.utils.GeoSVGParser.prototype.createResult = function(node, commands, opt_tx) {

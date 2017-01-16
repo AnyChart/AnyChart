@@ -439,7 +439,7 @@ anychart.core.utils.Space.prototype.setThemeSettings = function(config) {
 
 /** @inheritDoc */
 anychart.core.utils.Space.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.utils.Space.base(this, 'serialize');
   anychart.core.settings.serialize(this, anychart.core.utils.Space.SIMPLE_PROPS_DESCRIPTORS, json, 'Space');
   return json;
 };
@@ -486,9 +486,12 @@ anychart.core.utils.Space.prototype.setupByJSON = function(config, opt_default) 
 //endregion
 //region --- Exports
 //exports
-// anychart.core.utils.Space.prototype['top'] = anychart.core.utils.Space.prototype.top;
-// anychart.core.utils.Space.prototype['right'] = anychart.core.utils.Space.prototype.right;
-// anychart.core.utils.Space.prototype['bottom'] = anychart.core.utils.Space.prototype.bottom;
-// anychart.core.utils.Space.prototype['left'] = anychart.core.utils.Space.prototype.left;
-anychart.core.utils.Space.prototype['set'] = anychart.core.utils.Space.prototype.set;
+(function() {
+  var proto = anychart.core.utils.Space.prototype;
+  // proto['top'] = proto.top;
+  // proto['right'] = proto.right;
+  // proto['bottom'] = proto.bottom;
+  // proto['left'] = proto.left;
+  proto['set'] = proto.set;
+})();
 //endregion

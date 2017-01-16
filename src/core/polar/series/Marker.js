@@ -17,7 +17,7 @@ goog.require('anychart.enums');
  * @extends {anychart.core.polar.series.Base}
  */
 anychart.core.polar.series.Marker = function(opt_data, opt_csvSettings) {
-  goog.base(this, opt_data, opt_csvSettings);
+  anychart.core.polar.series.Marker.base(this, 'constructor', opt_data, opt_csvSettings);
   /**
    * @type {anychart.core.ui.MarkersFactory}
    * @private
@@ -228,7 +228,7 @@ anychart.core.polar.series.Marker.prototype.createPositionProvider = function(po
 
 /** @inheritDoc */
 anychart.core.polar.series.Marker.prototype.startDrawing = function() {
-  goog.base(this, 'startDrawing');
+  anychart.core.polar.series.Marker.base(this, 'startDrawing');
   if (this.isConsistent() || !this.enabled()) return;
 
   this.marker_.suspendSignalsDispatching();
@@ -313,7 +313,7 @@ anychart.core.polar.series.Marker.prototype.finalizeDrawing = function() {
     );
   }
 
-  goog.base(this, 'finalizeDrawing');
+  anychart.core.polar.series.Marker.base(this, 'finalizeDrawing');
 };
 
 
@@ -485,7 +485,7 @@ anychart.core.polar.series.Marker.prototype.getType = function() {
  * @inheritDoc
  */
 anychart.core.polar.series.Marker.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.polar.series.Marker.base(this, 'serialize');
 
   if (goog.isFunction(this.type())) {
     anychart.core.reporting.warning(
@@ -528,7 +528,7 @@ anychart.core.polar.series.Marker.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.core.polar.series.Marker.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.polar.series.Marker.base(this, 'setupByJSON', config, opt_default);
   this.size(config['size']);
   this.hoverSize(config['hoverSize']);
   this.selectSize(config['selectSize']);
@@ -538,27 +538,30 @@ anychart.core.polar.series.Marker.prototype.setupByJSON = function(config, opt_d
 };
 
 
-//anychart.core.polar.series.Marker.prototype['startDrawing'] = anychart.core.polar.series.Marker.prototype.startDrawing;
-//anychart.core.polar.series.Marker.prototype['finalizeDrawing'] = anychart.core.polar.series.Marker.prototype.finalizeDrawing;
+//proto['startDrawing'] = proto.startDrawing;
+//proto['finalizeDrawing'] = proto.finalizeDrawing;
 //exports
-anychart.core.polar.series.Marker.prototype['stroke'] = anychart.core.polar.series.Marker.prototype.stroke;//inherited
-anychart.core.polar.series.Marker.prototype['hoverStroke'] = anychart.core.polar.series.Marker.prototype.hoverStroke;//inherited
-anychart.core.polar.series.Marker.prototype['selectStroke'] = anychart.core.polar.series.Marker.prototype.selectStroke;//inherited
+(function() {
+  var proto = anychart.core.polar.series.Marker.prototype;
+  proto['stroke'] = proto.stroke;//inherited
+  proto['hoverStroke'] = proto.hoverStroke;//inherited
+  proto['selectStroke'] = proto.selectStroke;//inherited
 
-anychart.core.polar.series.Marker.prototype['fill'] = anychart.core.polar.series.Marker.prototype.fill;//inherited
-anychart.core.polar.series.Marker.prototype['hoverFill'] = anychart.core.polar.series.Marker.prototype.hoverFill;//inherited
-anychart.core.polar.series.Marker.prototype['selectFill'] = anychart.core.polar.series.Marker.prototype.selectFill;//inherited
+  proto['fill'] = proto.fill;//inherited
+  proto['hoverFill'] = proto.hoverFill;//inherited
+  proto['selectFill'] = proto.selectFill;//inherited
 
-anychart.core.polar.series.Marker.prototype['size'] = anychart.core.polar.series.Marker.prototype.size;//doc|ex
-anychart.core.polar.series.Marker.prototype['hoverSize'] = anychart.core.polar.series.Marker.prototype.hoverSize;//doc|ex
-anychart.core.polar.series.Marker.prototype['selectSize'] = anychart.core.polar.series.Marker.prototype.selectSize;
+  proto['size'] = proto.size;//doc|ex
+  proto['hoverSize'] = proto.hoverSize;//doc|ex
+  proto['selectSize'] = proto.selectSize;
 
-anychart.core.polar.series.Marker.prototype['type'] = anychart.core.polar.series.Marker.prototype.type;//doc|ex
-anychart.core.polar.series.Marker.prototype['hoverType'] = anychart.core.polar.series.Marker.prototype.hoverType;//doc|ex
-anychart.core.polar.series.Marker.prototype['selectType'] = anychart.core.polar.series.Marker.prototype.selectType;
+  proto['type'] = proto.type;//doc|ex
+  proto['hoverType'] = proto.hoverType;//doc|ex
+  proto['selectType'] = proto.selectType;
 
-anychart.core.polar.series.Marker.prototype['hatchFill'] = anychart.core.polar.series.Marker.prototype.hatchFill;//inherited
-anychart.core.polar.series.Marker.prototype['hoverHatchFill'] = anychart.core.polar.series.Marker.prototype.hoverHatchFill;//inherited
-anychart.core.polar.series.Marker.prototype['selectHatchFill'] = anychart.core.polar.series.Marker.prototype.selectHatchFill;//inherited
-anychart.core.polar.series.Marker.prototype['getType'] = anychart.core.polar.series.Marker.prototype.getType;
+  proto['hatchFill'] = proto.hatchFill;//inherited
+  proto['hoverHatchFill'] = proto.hoverHatchFill;//inherited
+  proto['selectHatchFill'] = proto.selectHatchFill;//inherited
+  proto['getType'] = proto.getType;
 
+})();

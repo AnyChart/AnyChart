@@ -62,7 +62,7 @@ anychart.ui.chartEditor.group.Legend.prototype.disposeInternal = function() {
   this.itemsAlign_ = null;
   this.title_ = null;
   this.items_ = null;
-  goog.base(this, 'disposeInternal');
+  anychart.ui.chartEditor.group.Legend.base(this, 'disposeInternal');
 };
 
 

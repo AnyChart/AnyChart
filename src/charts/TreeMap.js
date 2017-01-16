@@ -3023,47 +3023,50 @@ anychart.charts.TreeMap.prototype.disposeInternal = function() {
 
 
 //exports
-anychart.charts.TreeMap.prototype['getType'] = anychart.charts.TreeMap.prototype.getType;
+(function() {
+  var proto = anychart.charts.TreeMap.prototype;
+  proto['getType'] = proto.getType;
 
-anychart.charts.TreeMap.prototype['data'] = anychart.charts.TreeMap.prototype.data;
-anychart.charts.TreeMap.prototype['maxDepth'] = anychart.charts.TreeMap.prototype.maxDepth;
-anychart.charts.TreeMap.prototype['hintDepth'] = anychart.charts.TreeMap.prototype.hintDepth;
-anychart.charts.TreeMap.prototype['hintOpacity'] = anychart.charts.TreeMap.prototype.hintOpacity;
-anychart.charts.TreeMap.prototype['sort'] = anychart.charts.TreeMap.prototype.sort;
+  proto['data'] = proto.data;
+  proto['maxDepth'] = proto.maxDepth;
+  proto['hintDepth'] = proto.hintDepth;
+  proto['hintOpacity'] = proto.hintOpacity;
+  proto['sort'] = proto.sort;
 
-anychart.charts.TreeMap.prototype['selectionMode'] = anychart.charts.TreeMap.prototype.selectionMode;
-anychart.charts.TreeMap.prototype['hoverMode'] = anychart.charts.TreeMap.prototype.hoverMode;
+  proto['selectionMode'] = proto.selectionMode;
+  proto['hoverMode'] = proto.hoverMode;
 
-anychart.charts.TreeMap.prototype['headers'] = anychart.charts.TreeMap.prototype.headers;
-anychart.charts.TreeMap.prototype['hoverHeaders'] = anychart.charts.TreeMap.prototype.hoverHeaders;
-anychart.charts.TreeMap.prototype['headersDisplayMode'] = anychart.charts.TreeMap.prototype.headersDisplayMode;
-anychart.charts.TreeMap.prototype['maxHeadersHeight'] = anychart.charts.TreeMap.prototype.maxHeadersHeight;
+  proto['headers'] = proto.headers;
+  proto['hoverHeaders'] = proto.hoverHeaders;
+  proto['headersDisplayMode'] = proto.headersDisplayMode;
+  proto['maxHeadersHeight'] = proto.maxHeadersHeight;
 
-anychart.charts.TreeMap.prototype['labels'] = anychart.charts.TreeMap.prototype.labels;
-anychart.charts.TreeMap.prototype['hoverLabels'] = anychart.charts.TreeMap.prototype.hoverLabels;
-anychart.charts.TreeMap.prototype['selectLabels'] = anychart.charts.TreeMap.prototype.selectLabels;
+  proto['labels'] = proto.labels;
+  proto['hoverLabels'] = proto.hoverLabels;
+  proto['selectLabels'] = proto.selectLabels;
 
-anychart.charts.TreeMap.prototype['markers'] = anychart.charts.TreeMap.prototype.markers;
-anychart.charts.TreeMap.prototype['hoverMarkers'] = anychart.charts.TreeMap.prototype.hoverMarkers;
-anychart.charts.TreeMap.prototype['selectMarkers'] = anychart.charts.TreeMap.prototype.selectMarkers;
+  proto['markers'] = proto.markers;
+  proto['hoverMarkers'] = proto.hoverMarkers;
+  proto['selectMarkers'] = proto.selectMarkers;
 
-anychart.charts.TreeMap.prototype['colorScale'] = anychart.charts.TreeMap.prototype.colorScale;
-anychart.charts.TreeMap.prototype['colorRange'] = anychart.charts.TreeMap.prototype.colorRange;
+  proto['colorScale'] = proto.colorScale;
+  proto['colorRange'] = proto.colorRange;
 
-anychart.charts.TreeMap.prototype['fill'] = anychart.charts.TreeMap.prototype.fill;
-anychart.charts.TreeMap.prototype['hoverFill'] = anychart.charts.TreeMap.prototype.hoverFill;
-anychart.charts.TreeMap.prototype['selectFill'] = anychart.charts.TreeMap.prototype.selectFill;
+  proto['fill'] = proto.fill;
+  proto['hoverFill'] = proto.hoverFill;
+  proto['selectFill'] = proto.selectFill;
 
-anychart.charts.TreeMap.prototype['stroke'] = anychart.charts.TreeMap.prototype.stroke;
-anychart.charts.TreeMap.prototype['hoverStroke'] = anychart.charts.TreeMap.prototype.hoverStroke;
-anychart.charts.TreeMap.prototype['selectStroke'] = anychart.charts.TreeMap.prototype.selectStroke;
+  proto['stroke'] = proto.stroke;
+  proto['hoverStroke'] = proto.hoverStroke;
+  proto['selectStroke'] = proto.selectStroke;
 
-anychart.charts.TreeMap.prototype['hatchFill'] = anychart.charts.TreeMap.prototype.hatchFill;
-anychart.charts.TreeMap.prototype['hoverHatchFill'] = anychart.charts.TreeMap.prototype.hoverHatchFill;
-anychart.charts.TreeMap.prototype['selectHatchFill'] = anychart.charts.TreeMap.prototype.selectHatchFill;
+  proto['hatchFill'] = proto.hatchFill;
+  proto['hoverHatchFill'] = proto.hoverHatchFill;
+  proto['selectHatchFill'] = proto.selectHatchFill;
 
-anychart.charts.TreeMap.prototype['drillTo'] = anychart.charts.TreeMap.prototype.drillTo;
-anychart.charts.TreeMap.prototype['drillUp'] = anychart.charts.TreeMap.prototype.drillUp;
-anychart.charts.TreeMap.prototype['getDrilldownPath'] = anychart.charts.TreeMap.prototype.getDrilldownPath;
+  proto['drillTo'] = proto.drillTo;
+  proto['drillUp'] = proto.drillUp;
+  proto['getDrilldownPath'] = proto.getDrilldownPath;
 
-anychart.charts.TreeMap.prototype['toCsv'] = anychart.charts.TreeMap.prototype.toCsv;
+  proto['toCsv'] = proto.toCsv;
+})();

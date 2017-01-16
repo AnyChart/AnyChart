@@ -276,7 +276,7 @@ anychart.core.series.StockScroller.prototype.updateColors = function() {
  * @inheritDoc
  */
 anychart.core.series.StockScroller.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.series.StockScroller.base(this, 'setupByJSON', config, opt_default);
 
   // Legacy
   this[anychart.opt.SELECTED_FILL](config[anychart.opt.SELECT_FILL]);

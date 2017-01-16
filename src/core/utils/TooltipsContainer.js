@@ -15,7 +15,7 @@ goog.require('goog.userAgent');
  * @extends {goog.Disposable}
  */
 anychart.core.utils.TooltipsContainer = function() {
-  goog.base(this);
+  anychart.core.utils.TooltipsContainer.base(this, 'constructor');
 
   /**
    * @type {boolean}

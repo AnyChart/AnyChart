@@ -117,7 +117,10 @@ anychart.core.utils.PertPointContextProvider.prototype.getDataValue = function(k
 
 
 //exports
-anychart.core.utils.PertPointContextProvider.prototype['getStat'] = anychart.core.utils.PertPointContextProvider.prototype.getStat;
-anychart.core.utils.PertPointContextProvider.prototype['getTokenValue'] = anychart.core.utils.PertPointContextProvider.prototype.getTokenValue;
-anychart.core.utils.PertPointContextProvider.prototype['getDataValue'] = anychart.core.utils.PertPointContextProvider.prototype.getDataValue;
+(function() {
+  var proto = anychart.core.utils.PertPointContextProvider.prototype;
+  proto['getStat'] = proto.getStat;
+  proto['getTokenValue'] = proto.getTokenValue;
+  proto['getDataValue'] = proto.getDataValue;
+})();
 

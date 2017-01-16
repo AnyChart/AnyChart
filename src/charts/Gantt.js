@@ -23,7 +23,7 @@ goog.require('anychart.data.Tree');
  * @implements {anychart.core.ui.IInteractiveGrid}
  */
 anychart.charts.Gantt = function(opt_isResourcesChart) {
-  goog.base(this);
+  anychart.charts.Gantt.base(this, 'constructor');
 
   /**
    * Flag if chart must be created as resource chart.
@@ -1101,29 +1101,32 @@ anychart.charts.Gantt.prototype.setupByJSON = function(config, opt_default) {
 
 
 //exports
-anychart.charts.Gantt.prototype['data'] = anychart.charts.Gantt.prototype.data;
-anychart.charts.Gantt.prototype['dataGrid'] = anychart.charts.Gantt.prototype.dataGrid;
-anychart.charts.Gantt.prototype['getTimeline'] = anychart.charts.Gantt.prototype.getTimeline;
-anychart.charts.Gantt.prototype['rowHoverFill'] = anychart.charts.Gantt.prototype.rowHoverFill;
-anychart.charts.Gantt.prototype['rowSelectedFill'] = anychart.charts.Gantt.prototype.rowSelectedFill;
-anychart.charts.Gantt.prototype['columnStroke'] = anychart.charts.Gantt.prototype.columnStroke;
-anychart.charts.Gantt.prototype['rowStroke'] = anychart.charts.Gantt.prototype.rowStroke;
-anychart.charts.Gantt.prototype['zoomIn'] = anychart.charts.Gantt.prototype.zoomIn;
-anychart.charts.Gantt.prototype['zoomOut'] = anychart.charts.Gantt.prototype.zoomOut;
-anychart.charts.Gantt.prototype['zoomTo'] = anychart.charts.Gantt.prototype.zoomTo;
-anychart.charts.Gantt.prototype['headerHeight'] = anychart.charts.Gantt.prototype.headerHeight;
-anychart.charts.Gantt.prototype['fitAll'] = anychart.charts.Gantt.prototype.fitAll;
-anychart.charts.Gantt.prototype['fitToTask'] = anychart.charts.Gantt.prototype.fitToTask;
-anychart.charts.Gantt.prototype['scrollTo'] = anychart.charts.Gantt.prototype.scrollTo;
-anychart.charts.Gantt.prototype['scrollToRow'] = anychart.charts.Gantt.prototype.scrollToRow;
-anychart.charts.Gantt.prototype['scrollToEnd'] = anychart.charts.Gantt.prototype.scrollToEnd;
-anychart.charts.Gantt.prototype['collapseAll'] = anychart.charts.Gantt.prototype.collapseAll;
-anychart.charts.Gantt.prototype['expandAll'] = anychart.charts.Gantt.prototype.expandAll;
-anychart.charts.Gantt.prototype['expandTask'] = anychart.charts.Gantt.prototype.expandTask;
-anychart.charts.Gantt.prototype['collapseTask'] = anychart.charts.Gantt.prototype.collapseTask;
-anychart.charts.Gantt.prototype['splitterPosition'] = anychart.charts.Gantt.prototype.splitterPosition;
-anychart.charts.Gantt.prototype['getType'] = anychart.charts.Gantt.prototype.getType;
-anychart.charts.Gantt.prototype['editing'] = anychart.charts.Gantt.prototype.editing;
-anychart.charts.Gantt.prototype['toCsv'] = anychart.charts.Gantt.prototype.toCsv;
-anychart.charts.Gantt.prototype['xScale'] = anychart.charts.Gantt.prototype.xScale;
-anychart.charts.Gantt.prototype['defaultRowHeight'] = anychart.charts.Gantt.prototype.defaultRowHeight;
+(function() {
+  var proto = anychart.charts.Gantt.prototype;
+  proto['data'] = proto.data;
+  proto['dataGrid'] = proto.dataGrid;
+  proto['getTimeline'] = proto.getTimeline;
+  proto['rowHoverFill'] = proto.rowHoverFill;
+  proto['rowSelectedFill'] = proto.rowSelectedFill;
+  proto['columnStroke'] = proto.columnStroke;
+  proto['rowStroke'] = proto.rowStroke;
+  proto['zoomIn'] = proto.zoomIn;
+  proto['zoomOut'] = proto.zoomOut;
+  proto['zoomTo'] = proto.zoomTo;
+  proto['headerHeight'] = proto.headerHeight;
+  proto['fitAll'] = proto.fitAll;
+  proto['fitToTask'] = proto.fitToTask;
+  proto['scrollTo'] = proto.scrollTo;
+  proto['scrollToRow'] = proto.scrollToRow;
+  proto['scrollToEnd'] = proto.scrollToEnd;
+  proto['collapseAll'] = proto.collapseAll;
+  proto['expandAll'] = proto.expandAll;
+  proto['expandTask'] = proto.expandTask;
+  proto['collapseTask'] = proto.collapseTask;
+  proto['splitterPosition'] = proto.splitterPosition;
+  proto['getType'] = proto.getType;
+  proto['editing'] = proto.editing;
+  proto['toCsv'] = proto.toCsv;
+  proto['xScale'] = proto.xScale;
+  proto['defaultRowHeight'] = proto.defaultRowHeight;
+})();

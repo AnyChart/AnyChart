@@ -571,7 +571,7 @@ anychart.core.series.Stock.prototype.getLegendItemText = function(context) {
  * @inheritDoc
  */
 anychart.core.series.Stock.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.series.Stock.base(this, 'serialize');
   return json;
 };
 
@@ -580,7 +580,7 @@ anychart.core.series.Stock.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.core.series.Stock.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.series.Stock.base(this, 'setupByJSON', config, opt_default);
 };
 
 
@@ -596,10 +596,13 @@ anychart.core.series.Stock.prototype.disposeInternal = function() {
   this.highlightedRow_ = null;
   this.lastRow_ = null;
 
-  goog.base(this, 'disposeInternal');
+  anychart.core.series.Stock.base(this, 'disposeInternal');
 };
 //endregion
 
 
 //exports
-anychart.core.series.Stock.prototype['data'] = anychart.core.series.Stock.prototype.data;
+(function() {
+  var proto = anychart.core.series.Stock.prototype;
+  proto['data'] = proto.data;
+})();

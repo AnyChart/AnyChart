@@ -25,7 +25,7 @@ goog.require('anychart.scales');
  * @constructor
  */
 anychart.charts.Polar = function() {
-  goog.base(this);
+  anychart.charts.Polar.base(this, 'constructor');
 
   /**
    * Start angle for the first slice of a pie chart.
@@ -1438,7 +1438,7 @@ anychart.charts.Polar.prototype.getSeriesStatus = function(event) {
 
 /** @inheritDoc */
 anychart.charts.Polar.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.charts.Polar.base(this, 'serialize');
   var i;
   var scalesIds = {};
   var scales = [];
@@ -1646,7 +1646,7 @@ anychart.charts.Polar.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.charts.Polar.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.charts.Polar.base(this, 'setupByJSON', config, opt_default);
 
   if ('defaultSeriesSettings' in config)
     this.defaultSeriesSettings(config['defaultSeriesSettings']);
@@ -1777,26 +1777,29 @@ anychart.charts.Polar.prototype.setupByJSON = function(config, opt_default) {
 
 
 //exports
-anychart.charts.Polar.prototype['xScale'] = anychart.charts.Polar.prototype.xScale;//doc|ex
-anychart.charts.Polar.prototype['yScale'] = anychart.charts.Polar.prototype.yScale;//doc|ex
-anychart.charts.Polar.prototype['grid'] = anychart.charts.Polar.prototype.grid;//doc|ex
-anychart.charts.Polar.prototype['minorGrid'] = anychart.charts.Polar.prototype.minorGrid;//doc|ex
-anychart.charts.Polar.prototype['xAxis'] = anychart.charts.Polar.prototype.xAxis;//doc|ex
-anychart.charts.Polar.prototype['yAxis'] = anychart.charts.Polar.prototype.yAxis;//doc|ex
-anychart.charts.Polar.prototype['getSeries'] = anychart.charts.Polar.prototype.getSeries;//doc|ex
-anychart.charts.Polar.prototype['area'] = anychart.charts.Polar.prototype.area;//doc|ex
-anychart.charts.Polar.prototype['line'] = anychart.charts.Polar.prototype.line;//doc|ex
-anychart.charts.Polar.prototype['marker'] = anychart.charts.Polar.prototype.marker;//doc|ex
-anychart.charts.Polar.prototype['palette'] = anychart.charts.Polar.prototype.palette;//doc|ex
-anychart.charts.Polar.prototype['markerPalette'] = anychart.charts.Polar.prototype.markerPalette;//doc|ex
-anychart.charts.Polar.prototype['hatchFillPalette'] = anychart.charts.Polar.prototype.hatchFillPalette;
-anychart.charts.Polar.prototype['startAngle'] = anychart.charts.Polar.prototype.startAngle;//doc|ex
-anychart.charts.Polar.prototype['getType'] = anychart.charts.Polar.prototype.getType;
-anychart.charts.Polar.prototype['defaultSeriesType'] = anychart.charts.Polar.prototype.defaultSeriesType;
-anychart.charts.Polar.prototype['addSeries'] = anychart.charts.Polar.prototype.addSeries;
-anychart.charts.Polar.prototype['getSeriesAt'] = anychart.charts.Polar.prototype.getSeriesAt;
-anychart.charts.Polar.prototype['getSeriesCount'] = anychart.charts.Polar.prototype.getSeriesCount;
-anychart.charts.Polar.prototype['removeSeries'] = anychart.charts.Polar.prototype.removeSeries;
-anychart.charts.Polar.prototype['removeSeriesAt'] = anychart.charts.Polar.prototype.removeSeriesAt;
-anychart.charts.Polar.prototype['removeAllSeries'] = anychart.charts.Polar.prototype.removeAllSeries;
-anychart.charts.Polar.prototype['getPlotBounds'] = anychart.charts.Polar.prototype.getPlotBounds;
+(function() {
+  var proto = anychart.charts.Polar.prototype;
+  proto['xScale'] = proto.xScale;//doc|ex
+  proto['yScale'] = proto.yScale;//doc|ex
+  proto['grid'] = proto.grid;//doc|ex
+  proto['minorGrid'] = proto.minorGrid;//doc|ex
+  proto['xAxis'] = proto.xAxis;//doc|ex
+  proto['yAxis'] = proto.yAxis;//doc|ex
+  proto['getSeries'] = proto.getSeries;//doc|ex
+  proto['area'] = proto.area;//doc|ex
+  proto['line'] = proto.line;//doc|ex
+  proto['marker'] = proto.marker;//doc|ex
+  proto['palette'] = proto.palette;//doc|ex
+  proto['markerPalette'] = proto.markerPalette;//doc|ex
+  proto['hatchFillPalette'] = proto.hatchFillPalette;
+  proto['startAngle'] = proto.startAngle;//doc|ex
+  proto['getType'] = proto.getType;
+  proto['defaultSeriesType'] = proto.defaultSeriesType;
+  proto['addSeries'] = proto.addSeries;
+  proto['getSeriesAt'] = proto.getSeriesAt;
+  proto['getSeriesCount'] = proto.getSeriesCount;
+  proto['removeSeries'] = proto.removeSeries;
+  proto['removeSeriesAt'] = proto.removeSeriesAt;
+  proto['removeAllSeries'] = proto.removeAllSeries;
+  proto['getPlotBounds'] = proto.getPlotBounds;
+})();

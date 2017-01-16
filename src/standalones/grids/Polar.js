@@ -37,9 +37,13 @@ anychart.grids.polar = function() {
 
 
 //exports
-goog.exportSymbol('anychart.grids.polar', anychart.grids.polar);
-goog.exportSymbol('anychart.standalones.grids.polar', anychart.standalones.grids.polar);
-anychart.standalones.grids.Polar.prototype['draw'] = anychart.standalones.grids.Polar.prototype.draw;
-anychart.standalones.grids.Polar.prototype['parentBounds'] = anychart.standalones.grids.Polar.prototype.parentBounds;
-anychart.standalones.grids.Polar.prototype['container'] = anychart.standalones.grids.Polar.prototype.container;
-anychart.standalones.grids.Polar.prototype['startAngle'] = anychart.standalones.grids.Polar.prototype.startAngle;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.standalones.grids.Polar.prototype;
+  goog.exportSymbol('anychart.grids.polar', anychart.grids.polar);
+  goog.exportSymbol('anychart.standalones.grids.polar', anychart.standalones.grids.polar);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+  proto['startAngle'] = proto.startAngle;
+})();

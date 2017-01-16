@@ -21,7 +21,7 @@ goog.require('goog.color');
  * @extends {anychart.core.Base}
  */
 anychart.palettes.RangeColors = function() {
-  goog.base(this);
+  anychart.palettes.RangeColors.base(this, 'constructor');
 
   /**
    * Color palette colors list.
@@ -294,7 +294,7 @@ anychart.palettes.RangeColors.prototype.restoreDefaults = function(opt_doNotDisp
 
 /** @inheritDoc */
 anychart.palettes.RangeColors.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.palettes.RangeColors.base(this, 'serialize');
   json['type'] = 'range';
   var res = [];
   for (var i = 0; i < this.colors_.length; i++) {
@@ -325,7 +325,7 @@ anychart.palettes.RangeColors.prototype.setupSpecial = function(var_args) {
 
 /** @inheritDoc */
 anychart.palettes.RangeColors.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.palettes.RangeColors.base(this, 'setupByJSON', config, opt_default);
   this.items(config['items']);
   this.count(config['count']);
 };
@@ -348,9 +348,13 @@ anychart.palettes.rangeColors = function(opt_value, var_args) {
 
 
 //exports
-goog.exportSymbol('anychart.palettes.rangeColors', anychart.palettes.rangeColors);
-anychart.palettes.RangeColors.prototype['colorAt'] = anychart.palettes.RangeColors.prototype.colorAt;
-anychart.palettes.RangeColors.prototype['itemAt'] = anychart.palettes.RangeColors.prototype.itemAt;
-anychart.palettes.RangeColors.prototype['colors'] = anychart.palettes.RangeColors.prototype.colors;
-anychart.palettes.RangeColors.prototype['items'] = anychart.palettes.RangeColors.prototype.items;
-anychart.palettes.RangeColors.prototype['count'] = anychart.palettes.RangeColors.prototype.count;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.palettes.RangeColors.prototype;
+  goog.exportSymbol('anychart.palettes.rangeColors', anychart.palettes.rangeColors);
+  proto['colorAt'] = proto.colorAt;
+  proto['itemAt'] = proto.itemAt;
+  proto['colors'] = proto.colors;
+  proto['items'] = proto.items;
+  proto['count'] = proto.count;
+})();

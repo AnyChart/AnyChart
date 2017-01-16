@@ -1189,7 +1189,7 @@ anychart.core.resource.TimeLine.prototype.setThemeSettings = function(config) {
 
 /** @inheritDoc */
 anychart.core.resource.TimeLine.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.resource.TimeLine.base(this, 'serialize');
   anychart.core.settings.serialize(this, anychart.core.resource.TimeLine.DESCRIPTORS, json, 'Resource Timeline');
   anychart.core.settings.serialize(this, anychart.core.resource.TimeLine.TEXT_DESCRIPTORS, json, 'Resource Timeline text settings');
 
@@ -1203,7 +1203,7 @@ anychart.core.resource.TimeLine.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.resource.TimeLine.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.resource.TimeLine.base(this, 'setupByJSON', config, opt_default);
   if (opt_default) {
     this.setThemeSettings(config);
   } else {
@@ -1243,7 +1243,7 @@ anychart.core.resource.TimeLine.prototype.disposeInternal = function() {
   this.levelsLayer_ = null;
   this.labelsLayer_ = null;
 
-  goog.base(this, 'disposeInternal');
+  anychart.core.resource.TimeLine.base(this, 'disposeInternal');
 };
 
 
@@ -1255,14 +1255,17 @@ anychart.core.resource.TimeLine.prototype.disposeInternal = function() {
 //
 //------------------------------------------------------------------------------
 //exports
-anychart.core.resource.TimeLine.prototype['background'] = anychart.core.resource.TimeLine.prototype.background;
-anychart.core.resource.TimeLine.prototype['padding'] = anychart.core.resource.TimeLine.prototype.padding;
-anychart.core.resource.TimeLine.prototype['holidays'] = anychart.core.resource.TimeLine.prototype.holidays;
-anychart.core.resource.TimeLine.prototype['overlay'] = anychart.core.resource.TimeLine.prototype.overlay;
-// descriptors
-// anychart.core.resource.TimeLine.prototype['fill'] = anychart.core.resource.TimeLine.prototype.fill;
-// anychart.core.resource.TimeLine.prototype['stroke'] = anychart.core.resource.TimeLine.prototype.stroke;
-// anychart.core.resource.TimeLine.prototype['levelHeight'] = anychart.core.resource.TimeLine.prototype.levelHeight;
+(function() {
+  var proto = anychart.core.resource.TimeLine.prototype;
+  proto['background'] = proto.background;
+  proto['padding'] = proto.padding;
+  proto['holidays'] = proto.holidays;
+  proto['overlay'] = proto.overlay;
+  // descriptors
+  // proto['fill'] = proto.fill;
+  // proto['stroke'] = proto.stroke;
+  // proto['levelHeight'] = proto.levelHeight;
+})();
 
 
 //endregion

@@ -344,12 +344,15 @@ anychart.data.TableIterator.ICoIterator.prototype.advance = function() {};
 anychart.data.TableIterator.ICoIterator.prototype.reset = function() {};
 
 
-//anychart.data.TableIterator.prototype['getColumn'] = anychart.data.TableIterator.prototype.getColumn;
+//proto['getColumn'] = proto.getColumn;
 
 //exports
-anychart.data.TableIterator.prototype['reset'] = anychart.data.TableIterator.prototype.reset;
-anychart.data.TableIterator.prototype['advance'] = anychart.data.TableIterator.prototype.advance;
-anychart.data.TableIterator.prototype['get'] = anychart.data.TableIterator.prototype.get;
-anychart.data.TableIterator.prototype['getKey'] = anychart.data.TableIterator.prototype.getKey;
-anychart.data.TableIterator.prototype['getIndex'] = anychart.data.TableIterator.prototype.getIndex;
-anychart.data.TableIterator.prototype['meta'] = anychart.data.TableIterator.prototype.meta;
+(function() {
+  var proto = anychart.data.TableIterator.prototype;
+  proto['reset'] = proto.reset;
+  proto['advance'] = proto.advance;
+  proto['get'] = proto.get;
+  proto['getKey'] = proto.getKey;
+  proto['getIndex'] = proto.getIndex;
+  proto['meta'] = proto.meta;
+})();

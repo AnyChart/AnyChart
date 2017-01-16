@@ -11,7 +11,7 @@ goog.require('anychart.scales.OrdinalTicks');
  * @extends {anychart.scales.OrdinalTicks}
  */
 anychart.scales.OrdinalColorTicks = function(scale) {
-  goog.base(this, scale);
+  anychart.scales.OrdinalColorTicks.base(this, 'constructor', scale);
 };
 goog.inherits(anychart.scales.OrdinalColorTicks, anychart.scales.OrdinalTicks);
 

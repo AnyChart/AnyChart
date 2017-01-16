@@ -37,8 +37,12 @@ anychart.grids.linear = function() {
 
 
 //exports
-goog.exportSymbol('anychart.grids.linear', anychart.grids.linear);
-goog.exportSymbol('anychart.standalones.grids.linear', anychart.standalones.grids.linear);
-anychart.standalones.grids.Linear.prototype['draw'] = anychart.standalones.grids.Linear.prototype.draw;
-anychart.standalones.grids.Linear.prototype['parentBounds'] = anychart.standalones.grids.Linear.prototype.parentBounds;
-anychart.standalones.grids.Linear.prototype['container'] = anychart.standalones.grids.Linear.prototype.container;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.standalones.grids.Linear.prototype;
+  goog.exportSymbol('anychart.grids.linear', anychart.grids.linear);
+  goog.exportSymbol('anychart.standalones.grids.linear', anychart.standalones.grids.linear);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+})();

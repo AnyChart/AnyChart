@@ -26,7 +26,7 @@ anychart.data.aggregators.CustomFunction = function(valuesColumn, func, opt_cont
    */
   this.context_ = opt_context;
 
-  goog.base(this, valuesColumn);
+  anychart.data.aggregators.CustomFunction.base(this, 'constructor', valuesColumn);
 };
 goog.inherits(anychart.data.aggregators.CustomFunction, anychart.data.aggregators.Base);
 

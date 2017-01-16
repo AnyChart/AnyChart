@@ -8,7 +8,7 @@ goog.require('anychart.ui.chartEditor.select.Base');
  * @extends {anychart.ui.chartEditor.select.Base}
  */
 anychart.ui.chartEditor.select.Align = function() {
-  goog.base(this);
+  anychart.ui.chartEditor.select.Align.base(this, 'constructor');
   this.setCaptions([null, null, null]);
   this.setOptions(['left', 'center', 'right']);
 };
@@ -53,5 +53,5 @@ anychart.ui.chartEditor.select.Align.prototype.update = function(model) {
   }
   goog.events.listen(this, goog.ui.Component.EventType.CHANGE, this.onChange, false, this);
 
-  goog.base(this, 'update', model);
+  anychart.ui.chartEditor.select.Align.base(this, 'update', model);
 };

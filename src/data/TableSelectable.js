@@ -550,21 +550,25 @@ anychart.data.TableSelectable.RowProxy.prototype.getKey = function() {
 };
 
 
-//anychart.data.TableSelectable.prototype['getFieldColumn'] = anychart.data.TableSelectable.prototype.getFieldColumn;
-//anychart.data.TableSelectable.prototype['getMin'] = anychart.data.TableSelectable.prototype.getMin;
-//anychart.data.TableSelectable.prototype['getMax'] = anychart.data.TableSelectable.prototype.getMax;
-//anychart.data.TableSelectable.prototype['getColumnMin'] = anychart.data.TableSelectable.prototype.getColumnMin;
-//anychart.data.TableSelectable.prototype['getColumnMax'] = anychart.data.TableSelectable.prototype.getColumnMax;
-//anychart.data.TableSelectable.prototype['getMapping'] = anychart.data.TableSelectable.prototype.getMapping;
+//proto['getFieldColumn'] = proto.getFieldColumn;
+//proto['getMin'] = proto.getMin;
+//proto['getMax'] = proto.getMax;
+//proto['getColumnMin'] = proto.getColumnMin;
+//proto['getColumnMax'] = proto.getColumnMax;
+//proto['getMapping'] = proto.getMapping;
 
 //exports
-anychart.data.TableSelectable.prototype['search'] = anychart.data.TableSelectable.prototype.search;
-anychart.data.TableSelectable.prototype['select'] = anychart.data.TableSelectable.prototype.select;
-anychart.data.TableSelectable.prototype['selectAll'] = anychart.data.TableSelectable.prototype.selectAll;
-anychart.data.TableSelectable.prototype['getIterator'] = anychart.data.TableSelectable.prototype.getIterator;
+(function() {
+  var proto = anychart.data.TableSelectable.prototype;
+  proto['search'] = proto.search;
+  proto['select'] = proto.select;
+  proto['selectAll'] = proto.selectAll;
+  proto['getIterator'] = proto.getIterator;
 
-anychart.data.TableSelectable.RowProxy.prototype['meta'] = anychart.data.TableSelectable.RowProxy.prototype.meta;
-anychart.data.TableSelectable.RowProxy.prototype['get'] = anychart.data.TableSelectable.RowProxy.prototype.get;
-anychart.data.TableSelectable.RowProxy.prototype['getKey'] = anychart.data.TableSelectable.RowProxy.prototype.getKey;
-anychart.data.TableSelectable.RowProxy.prototype['getColumn'] = anychart.data.TableSelectable.RowProxy.prototype.getColumn;
-anychart.data.TableSelectable.RowProxy.prototype['getIndex'] = anychart.data.TableSelectable.RowProxy.prototype.getIndex;
+  proto = anychart.data.TableSelectable.RowProxy.prototype;
+  proto['meta'] = proto.meta;
+  proto['get'] = proto.get;
+  proto['getKey'] = proto.getKey;
+  proto['getColumn'] = proto.getColumn;
+  proto['getIndex'] = proto.getIndex;
+})();

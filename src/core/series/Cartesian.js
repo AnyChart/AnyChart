@@ -1234,7 +1234,7 @@ anychart.core.series.Cartesian.prototype.selectSeries = function() {
 /** @inheritDoc */
 anychart.core.series.Cartesian.prototype.makeBrowserEvent = function(e) {
   //this method is invoked only for events from data layer
-  var res = goog.base(this, 'makeBrowserEvent', e);
+  var res = anychart.core.series.Cartesian.base(this, 'makeBrowserEvent', e);
 
   if (this.isDiscreteBased()) {
     res['pointIndex'] = anychart.utils.toNumber(anychart.utils.extractTag(res['domTarget']).index);
@@ -1456,7 +1456,7 @@ anychart.core.series.Cartesian.prototype.getPoint = function(index) {
  * @inheritDoc
  */
 anychart.core.series.Cartesian.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.series.Cartesian.base(this, 'serialize');
 
   if (this.drawingPlan) {
     var arr = [];
@@ -1486,7 +1486,7 @@ anychart.core.series.Cartesian.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.core.series.Cartesian.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.series.Cartesian.base(this, 'setupByJSON', config, opt_default);
 
   if ('data' in config)
     this.data(config['data'] || null);
@@ -1510,7 +1510,7 @@ anychart.core.series.Cartesian.prototype.disposeInternal = function() {
 
   this.xScale_ = this.drawingPlan = this.state = null;
 
-  goog.base(this, 'disposeInternal');
+  anychart.core.series.Cartesian.base(this, 'disposeInternal');
 };
 
 
@@ -1522,20 +1522,24 @@ anychart.core.series.Cartesian.prototype.disposeInternal = function() {
 //
 //------------------------------------------------------------------------------
 //exports
-anychart.core.series.Cartesian.prototype['data'] = anychart.core.series.Cartesian.prototype.data;
-anychart.core.series.Cartesian.prototype['xScale'] = anychart.core.series.Cartesian.prototype.xScale;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.core.series.Cartesian.prototype;
+  proto['data'] = proto.data;
+  proto['xScale'] = proto.xScale;
 
-anychart.core.series.Cartesian.prototype['hover'] = anychart.core.series.Cartesian.prototype.hover;
-anychart.core.series.Cartesian.prototype['unhover'] = anychart.core.series.Cartesian.prototype.unhover;
-anychart.core.series.Cartesian.prototype['select'] = anychart.core.series.Cartesian.prototype.select;
-anychart.core.series.Cartesian.prototype['unselect'] = anychart.core.series.Cartesian.prototype.unselect;
-anychart.core.series.Cartesian.prototype['selectionMode'] = anychart.core.series.Cartesian.prototype.selectionMode;
-anychart.core.series.Cartesian.prototype['allowPointsSelect'] = anychart.core.series.Cartesian.prototype.allowPointsSelect;
+  proto['hover'] = proto.hover;
+  proto['unhover'] = proto.unhover;
+  proto['select'] = proto.select;
+  proto['unselect'] = proto.unselect;
+  proto['selectionMode'] = proto.selectionMode;
+  proto['allowPointsSelect'] = proto.allowPointsSelect;
 
-anychart.core.series.Cartesian.prototype['getPoint'] = anychart.core.series.Cartesian.prototype.getPoint;
-anychart.core.series.Cartesian.prototype['excludePoint'] = anychart.core.series.Cartesian.prototype.excludePoint;
-anychart.core.series.Cartesian.prototype['includePoint'] = anychart.core.series.Cartesian.prototype.includePoint;
-anychart.core.series.Cartesian.prototype['keepOnlyPoints'] = anychart.core.series.Cartesian.prototype.keepOnlyPoints;
-anychart.core.series.Cartesian.prototype['includeAllPoints'] = anychart.core.series.Cartesian.prototype.includeAllPoints;
-anychart.core.series.Cartesian.prototype['getExcludedPoints'] = anychart.core.series.Cartesian.prototype.getExcludedPoints;
+  proto['getPoint'] = proto.getPoint;
+  proto['excludePoint'] = proto.excludePoint;
+  proto['includePoint'] = proto.includePoint;
+  proto['keepOnlyPoints'] = proto.keepOnlyPoints;
+  proto['includeAllPoints'] = proto.includeAllPoints;
+  proto['getExcludedPoints'] = proto.getExcludedPoints;
+})();
 //endregion

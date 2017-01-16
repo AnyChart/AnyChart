@@ -13,7 +13,7 @@ goog.require('goog.array');
  * @extends {anychart.core.Base}
  */
 anychart.scales.GeoTicks = function(scale) {
-  goog.base(this);
+  anychart.scales.GeoTicks.base(this, 'constructor');
 
   /**
    * Scale reference to get setup from in emergency situations.
@@ -407,7 +407,7 @@ anychart.scales.GeoTicks.prototype.addMinorLinearTicksPortion_ = function(min, m
 //region --- Serialize & Deserialize
 /** @inheritDoc */
 anychart.scales.GeoTicks.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.scales.GeoTicks.base(this, 'serialize');
   // json['base'] = this.base_;
   if (this.explicit_)
     json['explicit'] = this.explicit_;
@@ -437,7 +437,7 @@ anychart.scales.GeoTicks.prototype.setupSpecial = function(var_args) {
 
 /** @inheritDoc */
 anychart.scales.GeoTicks.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.scales.GeoTicks.base(this, 'setupByJSON', config, opt_default);
   // this.base(config['base']);
   this.explicit_ = config['explicit'] || null;
   if (this.explicit_) {
@@ -464,8 +464,11 @@ anychart.scales.GeoTicks.prototype.setupByJSON = function(config, opt_default) {
 
 //endregion
 //region --- Exports
-anychart.scales.GeoTicks.prototype['interval'] = anychart.scales.GeoTicks.prototype.interval;
-anychart.scales.GeoTicks.prototype['count'] = anychart.scales.GeoTicks.prototype.count;
-anychart.scales.GeoTicks.prototype['set'] = anychart.scales.GeoTicks.prototype.set;
-anychart.scales.GeoTicks.prototype['get'] = anychart.scales.GeoTicks.prototype.get;
+(function() {
+  var proto = anychart.scales.GeoTicks.prototype;
+  proto['interval'] = proto.interval;
+  proto['count'] = proto.count;
+  proto['set'] = proto.set;
+  proto['get'] = proto.get;
+})();
 //endregion

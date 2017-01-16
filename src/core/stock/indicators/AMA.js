@@ -125,8 +125,11 @@ anychart.core.stock.indicators.AMA.prototype.slowPeriod = function(opt_value) {
 
 
 //exports
-anychart.core.stock.indicators.AMA.prototype['series'] = anychart.core.stock.indicators.AMA.prototype.series;
-anychart.core.stock.indicators.AMA.prototype['period'] = anychart.core.stock.indicators.AMA.prototype.period;
-anychart.core.stock.indicators.AMA.prototype['fastPeriod'] = anychart.core.stock.indicators.AMA.prototype.fastPeriod;
-anychart.core.stock.indicators.AMA.prototype['slowPeriod'] = anychart.core.stock.indicators.AMA.prototype.slowPeriod;
+(function() {
+  var proto = anychart.core.stock.indicators.AMA.prototype;
+  proto['series'] = proto.series;
+  proto['period'] = proto.period;
+  proto['fastPeriod'] = proto.fastPeriod;
+  proto['slowPeriod'] = proto.slowPeriod;
+})();
 

@@ -18,7 +18,7 @@ goog.require('anychart.utils');
  * @constructor
  */
 anychart.core.axes.Circular = function() {
-  goog.base(this);
+  anychart.core.axes.Circular.base(this, 'constructor');
 
   /**
    * @type {Array.<Array.<number>>}
@@ -856,7 +856,7 @@ anychart.core.axes.Circular.prototype.getLabelBounds_ = function(index, isMajor)
   bounds.top -= anchorCoordinate.y;
 
   var point = anychart.utils.getCoordinateByAnchor(bounds, /** @type {anychart.enums.Anchor} */(anchor));
-  var tx = goog.graphics.AffineTransform.getRotateInstance(goog.math.toRadians(/** @type {number} */(rotation)), point.x, point.y);
+  var tx = goog.math.AffineTransform.getRotateInstance(goog.math.toRadians(/** @type {number} */(rotation)), point.x, point.y);
 
   var arr = bounds.toCoordinateBox();
   tx.transform(arr, 0, arr, 0, 4);
@@ -1217,7 +1217,7 @@ anychart.core.axes.Circular.prototype.draw = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.axes.Circular.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.axes.Circular.base(this, 'serialize');
 
   json['scale'] = this.scale().serialize();
 
@@ -1250,7 +1250,7 @@ anychart.core.axes.Circular.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.axes.Circular.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.axes.Circular.base(this, 'setupByJSON', config, opt_default);
 
   var scale;
   var json = config['scale'];
@@ -1286,25 +1286,28 @@ anychart.core.axes.Circular.prototype.setupByJSON = function(config, opt_default
 
 
 //exports
-anychart.core.axes.Circular.prototype['scale'] = anychart.core.axes.Circular.prototype.scale;
+(function() {
+  var proto = anychart.core.axes.Circular.prototype;
+  proto['scale'] = proto.scale;
 
-anychart.core.axes.Circular.prototype['overlapMode'] = anychart.core.axes.Circular.prototype.overlapMode;
+  proto['overlapMode'] = proto.overlapMode;
 
-anychart.core.axes.Circular.prototype['ticks'] = anychart.core.axes.Circular.prototype.ticks;
-anychart.core.axes.Circular.prototype['minorTicks'] = anychart.core.axes.Circular.prototype.minorTicks;
+  proto['ticks'] = proto.ticks;
+  proto['minorTicks'] = proto.minorTicks;
 
-anychart.core.axes.Circular.prototype['labels'] = anychart.core.axes.Circular.prototype.labels;
-anychart.core.axes.Circular.prototype['minorLabels'] = anychart.core.axes.Circular.prototype.minorLabels;
+  proto['labels'] = proto.labels;
+  proto['minorLabels'] = proto.minorLabels;
 
-anychart.core.axes.Circular.prototype['startAngle'] = anychart.core.axes.Circular.prototype.startAngle;
-anychart.core.axes.Circular.prototype['sweepAngle'] = anychart.core.axes.Circular.prototype.sweepAngle;
+  proto['startAngle'] = proto.startAngle;
+  proto['sweepAngle'] = proto.sweepAngle;
 
-anychart.core.axes.Circular.prototype['fill'] = anychart.core.axes.Circular.prototype.fill;
-anychart.core.axes.Circular.prototype['width'] = anychart.core.axes.Circular.prototype.width;
-anychart.core.axes.Circular.prototype['radius'] = anychart.core.axes.Circular.prototype.radius;
-anychart.core.axes.Circular.prototype['cornersRounding'] = anychart.core.axes.Circular.prototype.cornersRounding;
+  proto['fill'] = proto.fill;
+  proto['width'] = proto.width;
+  proto['radius'] = proto.radius;
+  proto['cornersRounding'] = proto.cornersRounding;
 
-anychart.core.axes.Circular.prototype['drawFirstLabel'] = anychart.core.axes.Circular.prototype.drawFirstLabel;
-anychart.core.axes.Circular.prototype['drawLastLabel'] = anychart.core.axes.Circular.prototype.drawLastLabel;
+  proto['drawFirstLabel'] = proto.drawFirstLabel;
+  proto['drawLastLabel'] = proto.drawLastLabel;
+})();
 
 

@@ -12,7 +12,7 @@ goog.require('anychart.utils');
  * @extends {anychart.data.aggregators.Base}
  */
 anychart.data.aggregators.WeightedAverage = function(valuesColumn, opt_weightsColumn) {
-  goog.base(this, valuesColumn, opt_weightsColumn);
+  anychart.data.aggregators.WeightedAverage.base(this, 'constructor', valuesColumn, opt_weightsColumn);
 };
 goog.inherits(anychart.data.aggregators.WeightedAverage, anychart.data.aggregators.Base);
 

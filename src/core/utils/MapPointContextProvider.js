@@ -57,4 +57,7 @@ anychart.core.utils.MapPointContextProvider.prototype.applyReferenceValues = fun
 
 
 //exports
-anychart.core.utils.MapPointContextProvider.prototype['getTokenValue'] = anychart.core.utils.MapPointContextProvider.prototype.getTokenValue;
+(function() {
+  var proto = anychart.core.utils.MapPointContextProvider.prototype;
+  proto['getTokenValue'] = proto.getTokenValue;
+})();

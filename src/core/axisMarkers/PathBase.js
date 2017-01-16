@@ -459,7 +459,7 @@ anychart.core.axisMarkers.PathBase.prototype.markerElement = function() {
 
 /** @inheritDoc */
 anychart.core.axisMarkers.PathBase.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.axisMarkers.PathBase.base(this, 'setupByJSON', config, opt_default);
   if ('layout' in config && config['layout']) this.layout(config['layout']);
   if ('axis' in config) {
     var ax = config['axis'];
@@ -478,5 +478,5 @@ anychart.core.axisMarkers.PathBase.prototype.setupByJSON = function(config, opt_
 anychart.core.axisMarkers.PathBase.prototype.disposeInternal = function() {
   this.axis_ = null;
   this.chart_ = null;
-  goog.base(this, 'disposeInternal');
+  anychart.core.axisMarkers.PathBase.base(this, 'disposeInternal');
 };

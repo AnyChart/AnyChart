@@ -99,19 +99,22 @@ anychart.core.pert.Milestones.prototype.setupByJSON = function(config, opt_defau
 
 
 //exports
-anychart.core.pert.Milestones.prototype['color'] = anychart.core.pert.Milestones.prototype.color;
+(function() {
+  var proto = anychart.core.pert.Milestones.prototype;
+  proto['color'] = proto.color;
 
-anychart.core.pert.Milestones.prototype['fill'] = anychart.core.pert.Milestones.prototype.fill;
-anychart.core.pert.Milestones.prototype['hoverFill'] = anychart.core.pert.Milestones.prototype.hoverFill;
-anychart.core.pert.Milestones.prototype['selectFill'] = anychart.core.pert.Milestones.prototype.selectFill;
+  proto['fill'] = proto.fill;
+  proto['hoverFill'] = proto.hoverFill;
+  proto['selectFill'] = proto.selectFill;
 
-anychart.core.pert.Milestones.prototype['stroke'] = anychart.core.pert.Milestones.prototype.stroke;
-anychart.core.pert.Milestones.prototype['hoverStroke'] = anychart.core.pert.Milestones.prototype.hoverStroke;
-anychart.core.pert.Milestones.prototype['selectStroke'] = anychart.core.pert.Milestones.prototype.selectStroke;
+  proto['stroke'] = proto.stroke;
+  proto['hoverStroke'] = proto.hoverStroke;
+  proto['selectStroke'] = proto.selectStroke;
 
-anychart.core.pert.Milestones.prototype['labels'] = anychart.core.pert.Milestones.prototype.labels;
-anychart.core.pert.Milestones.prototype['selectLabels'] = anychart.core.pert.Milestones.prototype.selectLabels;
-anychart.core.pert.Milestones.prototype['hoverLabels'] = anychart.core.pert.Milestones.prototype.hoverLabels;
-anychart.core.pert.Milestones.prototype['tooltip'] = anychart.core.pert.Milestones.prototype.tooltip;
-anychart.core.pert.Milestones.prototype['shape'] = anychart.core.pert.Milestones.prototype.shape;
-anychart.core.pert.Milestones.prototype['size'] = anychart.core.pert.Milestones.prototype.size;
+  proto['labels'] = proto.labels;
+  proto['selectLabels'] = proto.selectLabels;
+  proto['hoverLabels'] = proto.hoverLabels;
+  proto['tooltip'] = proto.tooltip;
+  proto['shape'] = proto.shape;
+  proto['size'] = proto.size;
+})();

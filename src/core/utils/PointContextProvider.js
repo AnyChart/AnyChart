@@ -76,6 +76,9 @@ anychart.core.utils.PointContextProvider.prototype.getTokenValue = function(name
 
 
 //exports
-anychart.core.utils.PointContextProvider.prototype['getStat'] = anychart.core.utils.PointContextProvider.prototype.getStat;
-anychart.core.utils.PointContextProvider.prototype['getDataValue'] = anychart.core.utils.PointContextProvider.prototype.getDataValue;
-anychart.core.utils.PointContextProvider.prototype['getTokenValue'] = anychart.core.utils.PointContextProvider.prototype.getTokenValue;
+(function() {
+  var proto = anychart.core.utils.PointContextProvider.prototype;
+  proto['getStat'] = proto.getStat;
+  proto['getDataValue'] = proto.getDataValue;
+  proto['getTokenValue'] = proto.getTokenValue;
+})();

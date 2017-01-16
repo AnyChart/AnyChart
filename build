@@ -216,6 +216,7 @@ def __get_performance_monitoring_compiler_args():
 def __get_optimized_compiler_args():
     compiler_args = [
         '--hide_warnings_for="closure-library"',
+        # '--output_manifest out/files.txt',
         # '--new_type_inf',
         '--warning_level VERBOSE',
         '--jscomp_warning accessControls',

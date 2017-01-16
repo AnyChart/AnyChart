@@ -125,7 +125,7 @@ goog.require('goog.array');
  * @extends {anychart.core.Base}
  */
 anychart.data.Set = function(opt_data, opt_csvSettings) {
-  goog.base(this);
+  anychart.data.Set.base(this, 'constructor');
   this.data(opt_data || null, opt_csvSettings);
 };
 goog.inherits(anychart.data.Set, anychart.core.Base);
@@ -451,11 +451,14 @@ anychart.data.set = function(opt_data, opt_csvSettings) {
 
 
 //exports
-goog.exportSymbol('anychart.data.set', anychart.data.set);//doc|ex
-anychart.data.Set.prototype['data'] = anychart.data.Set.prototype.data;//doc|ex
-anychart.data.Set.prototype['mapAs'] = anychart.data.Set.prototype.mapAs;//doc|ex
-anychart.data.Set.prototype['row'] = anychart.data.Set.prototype.row;//doc|ex
-anychart.data.Set.prototype['append'] = anychart.data.Set.prototype.append;//doc|ex
-anychart.data.Set.prototype['insert'] = anychart.data.Set.prototype.insert;//doc|ex
-anychart.data.Set.prototype['remove'] = anychart.data.Set.prototype.remove;//doc|ex
-anychart.data.Set.prototype['getRowsCount'] = anychart.data.Set.prototype.getRowsCount;//doc|ex
+(function() {
+  var proto = anychart.data.Set.prototype;
+  goog.exportSymbol('anychart.data.set', anychart.data.set);//doc|ex
+  proto['data'] = proto.data;//doc|ex
+  proto['mapAs'] = proto.mapAs;//doc|ex
+  proto['row'] = proto.row;//doc|ex
+  proto['append'] = proto.append;//doc|ex
+  proto['insert'] = proto.insert;//doc|ex
+  proto['remove'] = proto.remove;//doc|ex
+  proto['getRowsCount'] = proto.getRowsCount;//doc|ex
+})();

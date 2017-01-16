@@ -12,7 +12,7 @@ goog.require('acgraph.vector.Layer');
  * @extends {acgraph.vector.Layer}
  */
 anychart.core.utils.TypedLayer = function(constructChild, opt_cleanChild, opt_layer, opt_context) {
-  goog.base(this);
+  anychart.core.utils.TypedLayer.base(this, 'constructor');
 
   /**
    * @return {!acgraph.vector.Element} .
@@ -83,5 +83,5 @@ anychart.core.utils.TypedLayer.prototype.disposeInternal = function() {
   delete this.cleanChild_;
   this.context_ = null;
 
-  goog.base(this, 'disposeInternal');
+  anychart.core.utils.TypedLayer.base(this, 'disposeInternal');
 };

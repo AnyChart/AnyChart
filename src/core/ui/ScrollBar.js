@@ -19,7 +19,7 @@ goog.require('goog.math');
  * @extends {anychart.core.VisualBaseWithBounds}
  */
 anychart.core.ui.ScrollBar = function() {
-  goog.base(this);
+  anychart.core.ui.ScrollBar.base(this, 'constructor');
 
 
   /**
@@ -1543,7 +1543,7 @@ anychart.core.ui.ScrollBar.prototype.setupByJSON = function(config, opt_default)
  * @extends {goog.events.Event}
  */
 anychart.core.ui.ScrollBar.ScrollEvent = function(opt_target) {
-  goog.base(this, anychart.enums.EventType.SCROLL_CHANGE, opt_target);
+  anychart.core.ui.ScrollBar.ScrollEvent.base(this, 'constructor', anychart.enums.EventType.SCROLL_CHANGE, opt_target);
 };
 goog.inherits(anychart.core.ui.ScrollBar.ScrollEvent, goog.events.Event);
 
@@ -1578,29 +1578,32 @@ anychart.core.ui.ScrollBar.ScrollEvent.prototype['source'] = '';
 
 
 //exports
-//goog.exportSymbol('anychart.core.ui.ScrollBar.SCROLL_PIXEL_STEP', anychart.core.ui.ScrollBar.SCROLL_PIXEL_STEP);
-//goog.exportSymbol('anychart.core.ui.ScrollBar.SCROLL_RATIO_STEP', anychart.core.ui.ScrollBar.SCROLL_RATIO_STEP);
-goog.exportSymbol('anychart.core.ui.ScrollBar', anychart.core.ui.ScrollBar);
-anychart.core.ui.ScrollBar.prototype['barSize'] = anychart.core.ui.ScrollBar.prototype.barSize;
-//anychart.core.ui.ScrollBar.prototype['layout'] = anychart.core.ui.ScrollBar.prototype.layout;
-anychart.core.ui.ScrollBar.prototype['backgroundStroke'] = anychart.core.ui.ScrollBar.prototype.backgroundStroke;
-//anychart.core.ui.ScrollBar.prototype['handlePositionChange'] = anychart.core.ui.ScrollBar.prototype.handlePositionChange;
-anychart.core.ui.ScrollBar.prototype['backgroundFill'] = anychart.core.ui.ScrollBar.prototype.backgroundFill;
-anychart.core.ui.ScrollBar.prototype['sliderStroke'] = anychart.core.ui.ScrollBar.prototype.sliderStroke;
-anychart.core.ui.ScrollBar.prototype['sliderFill'] = anychart.core.ui.ScrollBar.prototype.sliderFill;
-anychart.core.ui.ScrollBar.prototype['mouseOutOpacity'] = anychart.core.ui.ScrollBar.prototype.mouseOutOpacity;
-anychart.core.ui.ScrollBar.prototype['mouseOverOpacity'] = anychart.core.ui.ScrollBar.prototype.mouseOverOpacity;
-//anychart.core.ui.ScrollBar.prototype['contentBounds'] = anychart.core.ui.ScrollBar.prototype.contentBounds;
-//anychart.core.ui.ScrollBar.prototype['visibleBounds'] = anychart.core.ui.ScrollBar.prototype.visibleBounds;
-//anychart.core.ui.ScrollBar.prototype['startRatio'] = anychart.core.ui.ScrollBar.prototype.startRatio;
-//anychart.core.ui.ScrollBar.prototype['endRatio'] = anychart.core.ui.ScrollBar.prototype.endRatio;
-//anychart.core.ui.ScrollBar.prototype['setRatio'] = anychart.core.ui.ScrollBar.prototype.setRatio;
-//anychart.core.ui.ScrollBar.prototype['scrollPixelStartTo'] = anychart.core.ui.ScrollBar.prototype.scrollPixelStartTo;
-//anychart.core.ui.ScrollBar.prototype['scrollStartTo'] = anychart.core.ui.ScrollBar.prototype.scrollStartTo;
-//anychart.core.ui.ScrollBar.prototype['scrollPixelEndTo'] = anychart.core.ui.ScrollBar.prototype.scrollPixelEndTo;
-//anychart.core.ui.ScrollBar.prototype['scrollEndTo'] = anychart.core.ui.ScrollBar.prototype.scrollEndTo;
-//anychart.core.ui.ScrollBar.prototype['scrollPixel'] = anychart.core.ui.ScrollBar.prototype.scrollPixel;
-//anychart.core.ui.ScrollBar.prototype['scroll'] = anychart.core.ui.ScrollBar.prototype.scroll;
-anychart.core.ui.ScrollBar.prototype['buttonsVisible'] = anychart.core.ui.ScrollBar.prototype.buttonsVisible;
-//anychart.core.ui.ScrollBar.prototype['container'] = anychart.core.ui.ScrollBar.prototype.container;
-//anychart.core.ui.ScrollBar.prototype['draw'] = anychart.core.ui.ScrollBar.prototype.draw;
+(function() {
+  var proto = anychart.core.ui.ScrollBar.prototype;
+  //goog.exportSymbol('anychart.core.ui.ScrollBar.SCROLL_PIXEL_STEP', anychart.core.ui.ScrollBar.SCROLL_PIXEL_STEP);
+  //goog.exportSymbol('anychart.core.ui.ScrollBar.SCROLL_RATIO_STEP', anychart.core.ui.ScrollBar.SCROLL_RATIO_STEP);
+  goog.exportSymbol('anychart.core.ui.ScrollBar', anychart.core.ui.ScrollBar);
+  proto['barSize'] = proto.barSize;
+  //proto['layout'] = proto.layout;
+  proto['backgroundStroke'] = proto.backgroundStroke;
+  //proto['handlePositionChange'] = proto.handlePositionChange;
+  proto['backgroundFill'] = proto.backgroundFill;
+  proto['sliderStroke'] = proto.sliderStroke;
+  proto['sliderFill'] = proto.sliderFill;
+  proto['mouseOutOpacity'] = proto.mouseOutOpacity;
+  proto['mouseOverOpacity'] = proto.mouseOverOpacity;
+  //proto['contentBounds'] = proto.contentBounds;
+  //proto['visibleBounds'] = proto.visibleBounds;
+  //proto['startRatio'] = proto.startRatio;
+  //proto['endRatio'] = proto.endRatio;
+  //proto['setRatio'] = proto.setRatio;
+  //proto['scrollPixelStartTo'] = proto.scrollPixelStartTo;
+  //proto['scrollStartTo'] = proto.scrollStartTo;
+  //proto['scrollPixelEndTo'] = proto.scrollPixelEndTo;
+  //proto['scrollEndTo'] = proto.scrollEndTo;
+  //proto['scrollPixel'] = proto.scrollPixel;
+  //proto['scroll'] = proto.scroll;
+  proto['buttonsVisible'] = proto.buttonsVisible;
+  //proto['container'] = proto.container;
+  //proto['draw'] = proto.draw;
+})();

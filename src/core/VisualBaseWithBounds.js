@@ -11,7 +11,7 @@ goog.require('anychart.core.utils.Bounds');
  * @extends {anychart.core.VisualBase}
  */
 anychart.core.VisualBaseWithBounds = function() {
-  goog.base(this);
+  anychart.core.VisualBaseWithBounds.base(this, 'constructor');
 };
 goog.inherits(anychart.core.VisualBaseWithBounds, anychart.core.VisualBase);
 
@@ -238,20 +238,23 @@ anychart.core.VisualBaseWithBounds.prototype.disposeInternal = function() {
   this.bounds_ = null;
   this.pixelBounds_ = null;
 
-  goog.base(this, 'disposeInternal');
+  anychart.core.VisualBaseWithBounds.base(this, 'disposeInternal');
 };
 
 
 //exports
-anychart.core.VisualBaseWithBounds.prototype['bounds'] = anychart.core.VisualBaseWithBounds.prototype.bounds;//doc|ex
-anychart.core.VisualBaseWithBounds.prototype['top'] = anychart.core.VisualBaseWithBounds.prototype.top;//doc|ex
-anychart.core.VisualBaseWithBounds.prototype['right'] = anychart.core.VisualBaseWithBounds.prototype.right;//doc|ex
-anychart.core.VisualBaseWithBounds.prototype['bottom'] = anychart.core.VisualBaseWithBounds.prototype.bottom;//doc|ex
-anychart.core.VisualBaseWithBounds.prototype['left'] = anychart.core.VisualBaseWithBounds.prototype.left;//doc|ex
-anychart.core.VisualBaseWithBounds.prototype['width'] = anychart.core.VisualBaseWithBounds.prototype.width;//doc|ex
-anychart.core.VisualBaseWithBounds.prototype['height'] = anychart.core.VisualBaseWithBounds.prototype.height;//doc|ex
-anychart.core.VisualBaseWithBounds.prototype['minWidth'] = anychart.core.VisualBaseWithBounds.prototype.minWidth;
-anychart.core.VisualBaseWithBounds.prototype['minHeight'] = anychart.core.VisualBaseWithBounds.prototype.minHeight;
-anychart.core.VisualBaseWithBounds.prototype['maxWidth'] = anychart.core.VisualBaseWithBounds.prototype.maxWidth;
-anychart.core.VisualBaseWithBounds.prototype['maxHeight'] = anychart.core.VisualBaseWithBounds.prototype.maxHeight;
-anychart.core.VisualBaseWithBounds.prototype['getPixelBounds'] = anychart.core.VisualBaseWithBounds.prototype.getPixelBounds;
+(function() {
+  var proto = anychart.core.VisualBaseWithBounds.prototype;
+  proto['bounds'] = proto.bounds;//doc|ex
+  proto['top'] = proto.top;//doc|ex
+  proto['right'] = proto.right;//doc|ex
+  proto['bottom'] = proto.bottom;//doc|ex
+  proto['left'] = proto.left;//doc|ex
+  proto['width'] = proto.width;//doc|ex
+  proto['height'] = proto.height;//doc|ex
+  proto['minWidth'] = proto.minWidth;
+  proto['minHeight'] = proto.minHeight;
+  proto['maxWidth'] = proto.maxWidth;
+  proto['maxHeight'] = proto.maxHeight;
+  proto['getPixelBounds'] = proto.getPixelBounds;
+})();

@@ -13,7 +13,7 @@ goog.require('anychart.core.PyramidFunnelBase');
  * @constructor
  */
 anychart.charts.Funnel = function(opt_data, opt_csvSettings) {
-  goog.base(this, opt_data, opt_csvSettings);
+  anychart.charts.Funnel.base(this, 'constructor', opt_data, opt_csvSettings);
 
   // Funnel looks like reversed pyramid
   this.reversed(true);
@@ -37,7 +37,7 @@ anychart.charts.Funnel.prototype.getProperThemePart = function() {
  * @inheritDoc
  */
 anychart.charts.Funnel.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.charts.Funnel.base(this, 'serialize');
 
   json['type'] = anychart.enums.ChartTypes.FUNNEL;
   json['neckHeight'] = this.neckHeight();
@@ -54,51 +54,54 @@ anychart.charts.Funnel.prototype.setupByJSON = function(config, opt_default) {
   this.neckHeight(config['neckHeight']);
   this.neckWidth(config['neckWidth']);
 
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.charts.Funnel.base(this, 'setupByJSON', config, opt_default);
 };
 
 
 //exports
-anychart.charts.Funnel.prototype['neckHeight'] = anychart.charts.Funnel.prototype.neckHeight;
-anychart.charts.Funnel.prototype['neckWidth'] = anychart.charts.Funnel.prototype.neckWidth;
+(function() {
+  var proto = anychart.charts.Funnel.prototype;
+  proto['neckHeight'] = proto.neckHeight;
+  proto['neckWidth'] = proto.neckWidth;
 
-// from PyramidFunnelBase
-anychart.charts.Funnel.prototype['baseWidth'] = anychart.charts.Funnel.prototype.baseWidth;
-anychart.charts.Funnel.prototype['connectorLength'] = anychart.charts.Funnel.prototype.connectorLength;
-anychart.charts.Funnel.prototype['connectorStroke'] = anychart.charts.Funnel.prototype.connectorStroke;
-anychart.charts.Funnel.prototype['data'] = anychart.charts.Funnel.prototype.data;
-anychart.charts.Funnel.prototype['getType'] = anychart.charts.Funnel.prototype.getType;
-anychart.charts.Funnel.prototype['overlapMode'] = anychart.charts.Funnel.prototype.overlapMode;
-anychart.charts.Funnel.prototype['palette'] = anychart.charts.Funnel.prototype.palette;
-anychart.charts.Funnel.prototype['pointsPadding'] = anychart.charts.Funnel.prototype.pointsPadding;
-anychart.charts.Funnel.prototype['tooltip'] = anychart.charts.Funnel.prototype.tooltip;
+  // from PyramidFunnelBase
+  proto['baseWidth'] = proto.baseWidth;
+  proto['connectorLength'] = proto.connectorLength;
+  proto['connectorStroke'] = proto.connectorStroke;
+  proto['data'] = proto.data;
+  proto['getType'] = proto.getType;
+  proto['overlapMode'] = proto.overlapMode;
+  proto['palette'] = proto.palette;
+  proto['pointsPadding'] = proto.pointsPadding;
+  proto['tooltip'] = proto.tooltip;
 
-anychart.charts.Funnel.prototype['hatchFillPalette'] = anychart.charts.Funnel.prototype.hatchFillPalette;
-anychart.charts.Funnel.prototype['markerPalette'] = anychart.charts.Funnel.prototype.markerPalette;
+  proto['hatchFillPalette'] = proto.hatchFillPalette;
+  proto['markerPalette'] = proto.markerPalette;
 
-anychart.charts.Funnel.prototype['fill'] = anychart.charts.Funnel.prototype.fill;
-anychart.charts.Funnel.prototype['hoverFill'] = anychart.charts.Funnel.prototype.hoverFill;
-anychart.charts.Funnel.prototype['selectFill'] = anychart.charts.Funnel.prototype.selectFill;
+  proto['fill'] = proto.fill;
+  proto['hoverFill'] = proto.hoverFill;
+  proto['selectFill'] = proto.selectFill;
 
-anychart.charts.Funnel.prototype['hatchFill'] = anychart.charts.Funnel.prototype.hatchFill;
-anychart.charts.Funnel.prototype['hoverHatchFill'] = anychart.charts.Funnel.prototype.hoverHatchFill;
-anychart.charts.Funnel.prototype['selectHatchFill'] = anychart.charts.Funnel.prototype.selectHatchFill;
+  proto['hatchFill'] = proto.hatchFill;
+  proto['hoverHatchFill'] = proto.hoverHatchFill;
+  proto['selectHatchFill'] = proto.selectHatchFill;
 
-anychart.charts.Funnel.prototype['labels'] = anychart.charts.Funnel.prototype.labels;
-anychart.charts.Funnel.prototype['hoverLabels'] = anychart.charts.Funnel.prototype.hoverLabels;
-anychart.charts.Funnel.prototype['selectLabels'] = anychart.charts.Funnel.prototype.selectLabels;
+  proto['labels'] = proto.labels;
+  proto['hoverLabels'] = proto.hoverLabels;
+  proto['selectLabels'] = proto.selectLabels;
 
-anychart.charts.Funnel.prototype['markers'] = anychart.charts.Funnel.prototype.markers;
-anychart.charts.Funnel.prototype['hoverMarkers'] = anychart.charts.Funnel.prototype.hoverMarkers;
-anychart.charts.Funnel.prototype['selectMarkers'] = anychart.charts.Funnel.prototype.selectMarkers;
+  proto['markers'] = proto.markers;
+  proto['hoverMarkers'] = proto.hoverMarkers;
+  proto['selectMarkers'] = proto.selectMarkers;
 
-anychart.charts.Funnel.prototype['stroke'] = anychart.charts.Funnel.prototype.stroke;
-anychart.charts.Funnel.prototype['hoverStroke'] = anychart.charts.Funnel.prototype.hoverStroke;
-anychart.charts.Funnel.prototype['selectStroke'] = anychart.charts.Funnel.prototype.selectStroke;
+  proto['stroke'] = proto.stroke;
+  proto['hoverStroke'] = proto.hoverStroke;
+  proto['selectStroke'] = proto.selectStroke;
 
-anychart.charts.Funnel.prototype['unhover'] = anychart.charts.Funnel.prototype.unhover;
-anychart.charts.Funnel.prototype['hover'] = anychart.charts.Funnel.prototype.hover;
+  proto['unhover'] = proto.unhover;
+  proto['hover'] = proto.hover;
 
-anychart.charts.Funnel.prototype['unselect'] = anychart.charts.Funnel.prototype.unselect;
-anychart.charts.Funnel.prototype['select'] = anychart.charts.Funnel.prototype.select;
-anychart.charts.Funnel.prototype['getPoint'] = anychart.charts.Funnel.prototype.getPoint;
+  proto['unselect'] = proto.unselect;
+  proto['select'] = proto.select;
+  proto['getPoint'] = proto.getPoint;
+})();

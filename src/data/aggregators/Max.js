@@ -11,7 +11,7 @@ goog.require('anychart.utils');
  * @extends {anychart.data.aggregators.Base}
  */
 anychart.data.aggregators.Max = function(valuesColumn) {
-  goog.base(this, valuesColumn);
+  anychart.data.aggregators.Max.base(this, 'constructor', valuesColumn);
 };
 goog.inherits(anychart.data.aggregators.Max, anychart.data.aggregators.Base);
 

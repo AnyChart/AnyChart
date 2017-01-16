@@ -1,7 +1,7 @@
 goog.provide('anychart.core.utils.GeoJSONParser');
 goog.require('anychart.core.map.geom');
 goog.require('anychart.core.reporting');
-//goog.require('goog.math.Coordinate');
+//goog.require('acgraph.math');
 
 
 

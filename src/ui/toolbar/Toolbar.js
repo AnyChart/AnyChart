@@ -96,9 +96,12 @@ anychart.toolbar = function() {
 };
 
 
-
 //exports
-goog.exportSymbol('anychart.toolbar', anychart.toolbar);
-anychart.ui.toolbar.Toolbar.prototype['container'] = anychart.ui.toolbar.Toolbar.prototype.container;
-anychart.ui.toolbar.Toolbar.prototype['target'] = anychart.ui.toolbar.Toolbar.prototype.target;
-anychart.ui.toolbar.Toolbar.prototype['draw'] = anychart.ui.toolbar.Toolbar.prototype.draw;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.ui.toolbar.Toolbar.prototype;
+  goog.exportSymbol('anychart.toolbar', anychart.toolbar);
+  proto['container'] = proto.container;
+  proto['target'] = proto.target;
+  proto['draw'] = proto.draw;
+})();

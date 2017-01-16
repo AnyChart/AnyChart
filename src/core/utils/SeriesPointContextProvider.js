@@ -158,7 +158,10 @@ anychart.core.utils.SeriesPointContextProvider.prototype.getTokenValue = functio
 
 
 //exports
-anychart.core.utils.SeriesPointContextProvider.prototype['getStat'] = anychart.core.utils.SeriesPointContextProvider.prototype.getStat;
-anychart.core.utils.SeriesPointContextProvider.prototype['getDataValue'] = anychart.core.utils.SeriesPointContextProvider.prototype.getDataValue;
-anychart.core.utils.SeriesPointContextProvider.prototype['getSeriesMeta'] = anychart.core.utils.SeriesPointContextProvider.prototype.getSeriesMeta;
-anychart.core.utils.SeriesPointContextProvider.prototype['getTokenValue'] = anychart.core.utils.SeriesPointContextProvider.prototype.getTokenValue;
+(function() {
+  var proto = anychart.core.utils.SeriesPointContextProvider.prototype;
+  proto['getStat'] = proto.getStat;
+  proto['getDataValue'] = proto.getDataValue;
+  proto['getSeriesMeta'] = proto.getSeriesMeta;
+  proto['getTokenValue'] = proto.getTokenValue;
+})();

@@ -15,7 +15,7 @@ goog.require('anychart.core.utils.TypedLayer');
  * @extends {anychart.core.polar.series.ContinuousBase}
  */
 anychart.core.polar.series.Area = function(opt_data, opt_csvSettings) {
-  goog.base(this, opt_data, opt_csvSettings);
+  anychart.core.polar.series.Area.base(this, 'constructor', opt_data, opt_csvSettings);
 
   /**
    * @type {acgraph.vector.Path}
@@ -53,7 +53,7 @@ anychart.core.polar.series.Base.SeriesTypesMap[anychart.enums.PolarSeriesType.AR
 
 /** @inheritDoc */
 anychart.core.polar.series.Area.prototype.startDrawing = function() {
-  goog.base(this, 'startDrawing');
+  anychart.core.polar.series.Area.base(this, 'startDrawing');
 
   this.currentStrokePath = null;
   this.currentFillPath = null;
@@ -223,7 +223,7 @@ anychart.core.polar.series.Area.prototype.finalizeDrawing = function() {
     }
   }
 
-  goog.base(this, 'finalizeDrawing');
+  anychart.core.polar.series.Area.base(this, 'finalizeDrawing');
 };
 
 
@@ -281,19 +281,22 @@ anychart.core.polar.series.Area.prototype.applyHatchFill = function(pointState) 
  * @inheritDoc
  */
 anychart.core.polar.series.Area.prototype.setupByJSON = function(config, opt_default) {
-  return goog.base(this, 'setupByJSON', config, opt_default);
+  return anychart.core.polar.series.Area.base(this, 'setupByJSON', config, opt_default);
 };
 
 
 //exports
-anychart.core.polar.series.Area.prototype['fill'] = anychart.core.polar.series.Area.prototype.fill;//inherited
-anychart.core.polar.series.Area.prototype['hoverFill'] = anychart.core.polar.series.Area.prototype.hoverFill;//inherited
-anychart.core.polar.series.Area.prototype['selectFill'] = anychart.core.polar.series.Area.prototype.selectFill;//inherited
-anychart.core.polar.series.Area.prototype['stroke'] = anychart.core.polar.series.Area.prototype.stroke;//inherited
-anychart.core.polar.series.Area.prototype['hoverStroke'] = anychart.core.polar.series.Area.prototype.hoverStroke;//inherited
-anychart.core.polar.series.Area.prototype['selectStroke'] = anychart.core.polar.series.Area.prototype.selectStroke;//inherited
-anychart.core.polar.series.Area.prototype['hatchFill'] = anychart.core.polar.series.Area.prototype.hatchFill;//inherited
-anychart.core.polar.series.Area.prototype['hoverHatchFill'] = anychart.core.polar.series.Area.prototype.hoverHatchFill;//inherited
-anychart.core.polar.series.Area.prototype['selectHatchFill'] = anychart.core.polar.series.Area.prototype.selectHatchFill;//inherited
-anychart.core.polar.series.Area.prototype['finalizeDrawing'] = anychart.core.polar.series.Area.prototype.finalizeDrawing;//inherited
-anychart.core.polar.series.Area.prototype['getType'] = anychart.core.polar.series.Area.prototype.getType;
+(function() {
+  var proto = anychart.core.polar.series.Area.prototype;
+  proto['fill'] = proto.fill;//inherited
+  proto['hoverFill'] = proto.hoverFill;//inherited
+  proto['selectFill'] = proto.selectFill;//inherited
+  proto['stroke'] = proto.stroke;//inherited
+  proto['hoverStroke'] = proto.hoverStroke;//inherited
+  proto['selectStroke'] = proto.selectStroke;//inherited
+  proto['hatchFill'] = proto.hatchFill;//inherited
+  proto['hoverHatchFill'] = proto.hoverHatchFill;//inherited
+  proto['selectHatchFill'] = proto.selectHatchFill;//inherited
+  proto['finalizeDrawing'] = proto.finalizeDrawing;//inherited
+  proto['getType'] = proto.getType;
+})();

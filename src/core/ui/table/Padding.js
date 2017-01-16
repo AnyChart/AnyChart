@@ -76,7 +76,10 @@ anychart.core.ui.table.Padding.prototype.left = function(opt_value) {
 
 
 //exports
-anychart.core.ui.table.Padding.prototype['top'] = anychart.core.ui.table.Padding.prototype.top;
-anychart.core.ui.table.Padding.prototype['right'] = anychart.core.ui.table.Padding.prototype.right;
-anychart.core.ui.table.Padding.prototype['bottom'] = anychart.core.ui.table.Padding.prototype.bottom;
-anychart.core.ui.table.Padding.prototype['left'] = anychart.core.ui.table.Padding.prototype.left;
+(function() {
+  var proto = anychart.core.ui.table.Padding.prototype;
+  proto['top'] = proto.top;
+  proto['right'] = proto.right;
+  proto['bottom'] = proto.bottom;
+  proto['left'] = proto.left;
+})();

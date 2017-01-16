@@ -22,7 +22,7 @@ goog.require('goog.array');
  */
 anychart.data.Mapping = function(parentSet, opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps,
     opt_writeToFirstFieldByMapping) {
-  goog.base(this, parentSet);
+  anychart.data.Mapping.base(this, 'constructor', parentSet);
   this.initMappingInfo(opt_arrayMapping, opt_objectMapping, opt_defaultProps, opt_indexProps, opt_writeToFirstFieldByMapping);
 };
 goog.inherits(anychart.data.Mapping, anychart.data.View);
@@ -322,14 +322,17 @@ anychart.data.Mapping.prototype.getIndexMapping = function() {
 
 
 //exports
-goog.exportSymbol('anychart.data.Mapping.DEFAULT_ARRAY_MAPPING', anychart.data.Mapping.DEFAULT_ARRAY_MAPPING);
-goog.exportSymbol('anychart.data.Mapping.DEFAULT_OBJECT_MAPPING', anychart.data.Mapping.DEFAULT_OBJECT_MAPPING);
-goog.exportSymbol('anychart.data.Mapping.DEFAULT_SIMPLE_ROW_MAPPING', anychart.data.Mapping.DEFAULT_SIMPLE_ROW_MAPPING);
-goog.exportSymbol('anychart.data.Mapping.DEFAULT_INDEX_MAPPING', anychart.data.Mapping.DEFAULT_INDEX_MAPPING);
-anychart.data.Mapping.prototype['getRowsCount'] = anychart.data.Mapping.prototype.getRowsCount;
-anychart.data.Mapping.prototype['getIterator'] = anychart.data.Mapping.prototype.getIterator;
-anychart.data.Mapping.prototype['row'] = anychart.data.Mapping.prototype.row;
-anychart.data.Mapping.prototype['getArrayMapping'] = anychart.data.Mapping.prototype.getArrayMapping;
-anychart.data.Mapping.prototype['getObjectMapping'] = anychart.data.Mapping.prototype.getObjectMapping;
-anychart.data.Mapping.prototype['getSimpleRowMapping'] = anychart.data.Mapping.prototype.getSimpleRowMapping;
-anychart.data.Mapping.prototype['getIndexMapping'] = anychart.data.Mapping.prototype.getIndexMapping;
+(function() {
+  var proto = anychart.data.Mapping.prototype;
+  goog.exportSymbol('anychart.data.Mapping.DEFAULT_ARRAY_MAPPING', anychart.data.Mapping.DEFAULT_ARRAY_MAPPING);
+  goog.exportSymbol('anychart.data.Mapping.DEFAULT_OBJECT_MAPPING', anychart.data.Mapping.DEFAULT_OBJECT_MAPPING);
+  goog.exportSymbol('anychart.data.Mapping.DEFAULT_SIMPLE_ROW_MAPPING', anychart.data.Mapping.DEFAULT_SIMPLE_ROW_MAPPING);
+  goog.exportSymbol('anychart.data.Mapping.DEFAULT_INDEX_MAPPING', anychart.data.Mapping.DEFAULT_INDEX_MAPPING);
+  proto['getRowsCount'] = proto.getRowsCount;
+  proto['getIterator'] = proto.getIterator;
+  proto['row'] = proto.row;
+  proto['getArrayMapping'] = proto.getArrayMapping;
+  proto['getObjectMapping'] = proto.getObjectMapping;
+  proto['getSimpleRowMapping'] = proto.getSimpleRowMapping;
+  proto['getIndexMapping'] = proto.getIndexMapping;
+})();

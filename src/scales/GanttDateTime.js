@@ -25,7 +25,7 @@ goog.require('goog.string.format');
  * @extends {anychart.core.Base}
  */
 anychart.scales.GanttDateTime = function() {
-  goog.base(this);
+  anychart.scales.GanttDateTime.base(this, 'constructor');
 
   /**
    * Currently visible min value.
@@ -1074,7 +1074,7 @@ anychart.scales.GanttDateTime.prototype.ratioForceScroll = function(ratio) {
 
 /** @inheritDoc */
 anychart.scales.GanttDateTime.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.scales.GanttDateTime.base(this, 'serialize');
 
   if (!isNaN(this.min_))
     json['visibleMinimum'] = this.min_;
@@ -1109,7 +1109,7 @@ anychart.scales.GanttDateTime.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.scales.GanttDateTime.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.scales.GanttDateTime.base(this, 'setupByJSON', config, opt_default);
 
   this.minimumGap(config['minimumGap']);
   this.maximumGap(config['maximumGap']);
@@ -1156,13 +1156,16 @@ anychart.scales.GanttDateTime.prototype.setupByJSON = function(config, opt_defau
 
 
 //exports
-anychart.scales.GanttDateTime.prototype['minimumGap'] = anychart.scales.GanttDateTime.prototype.minimumGap;
-anychart.scales.GanttDateTime.prototype['maximumGap'] = anychart.scales.GanttDateTime.prototype.maximumGap;
-anychart.scales.GanttDateTime.prototype['minimum'] = anychart.scales.GanttDateTime.prototype.minimum;
-anychart.scales.GanttDateTime.prototype['maximum'] = anychart.scales.GanttDateTime.prototype.maximum;
-anychart.scales.GanttDateTime.prototype['softMinimum'] = anychart.scales.GanttDateTime.prototype.softMinimum;
-anychart.scales.GanttDateTime.prototype['softMaximum'] = anychart.scales.GanttDateTime.prototype.softMaximum;
-// anychart.scales.GanttDateTime.prototype['zoomIn'] = anychart.scales.GanttDateTime.prototype.zoomIn;
-// anychart.scales.GanttDateTime.prototype['zoomOut'] = anychart.scales.GanttDateTime.prototype.zoomOut;
-// anychart.scales.GanttDateTime.prototype['zoomTo'] = anychart.scales.GanttDateTime.prototype.zoomTo;
-// anychart.scales.GanttDateTime.prototype['fitAll'] = anychart.scales.GanttDateTime.prototype.fitAll;
+(function() {
+  var proto = anychart.scales.GanttDateTime.prototype;
+  proto['minimumGap'] = proto.minimumGap;
+  proto['maximumGap'] = proto.maximumGap;
+  proto['minimum'] = proto.minimum;
+  proto['maximum'] = proto.maximum;
+  proto['softMinimum'] = proto.softMinimum;
+  proto['softMaximum'] = proto.softMaximum;
+  // proto['zoomIn'] = proto.zoomIn;
+  // proto['zoomOut'] = proto.zoomOut;
+  // proto['zoomTo'] = proto.zoomTo;
+  // proto['fitAll'] = proto.fitAll;
+})();

@@ -252,10 +252,13 @@ anychart.data.Iterator.prototype.meta = function(name, opt_value) {
 
 
 //exports
-anychart.data.Iterator.prototype['select'] = anychart.data.Iterator.prototype.select;//doc|ex
-anychart.data.Iterator.prototype['reset'] = anychart.data.Iterator.prototype.reset;//doc|ex
-anychart.data.Iterator.prototype['advance'] = anychart.data.Iterator.prototype.advance;//doc|ex
-anychart.data.Iterator.prototype['get'] = anychart.data.Iterator.prototype.get;//doc|ex
-anychart.data.Iterator.prototype['meta'] = anychart.data.Iterator.prototype.meta;//doc|need-ex
-anychart.data.Iterator.prototype['getIndex'] = anychart.data.Iterator.prototype.getIndex;//doc|need-ex
-anychart.data.Iterator.prototype['getRowsCount'] = anychart.data.Iterator.prototype.getRowsCount;//doc|ex
+(function() {
+  var proto = anychart.data.Iterator.prototype;
+  proto['select'] = proto.select;//doc|ex
+  proto['reset'] = proto.reset;//doc|ex
+  proto['advance'] = proto.advance;//doc|ex
+  proto['get'] = proto.get;//doc|ex
+  proto['meta'] = proto.meta;//doc|need-ex
+  proto['getIndex'] = proto.getIndex;//doc|need-ex
+  proto['getRowsCount'] = proto.getRowsCount;//doc|ex
+})();

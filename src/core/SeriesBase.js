@@ -1546,7 +1546,7 @@ anychart.core.SeriesBase.prototype.createTooltipContextProvider = function() {
 /** @inheritDoc */
 anychart.core.SeriesBase.prototype.makeBrowserEvent = function(e) {
   //this method is invoked only for events from data layer
-  var res = goog.base(this, 'makeBrowserEvent', e);
+  var res = anychart.core.SeriesBase.base(this, 'makeBrowserEvent', e);
   res['pointIndex'] = this.getIndexByEvent(res);
   return res;
 };
@@ -2036,7 +2036,7 @@ anychart.core.SeriesBase.prototype.serializeData = function() {
  * @inheritDoc
  */
 anychart.core.SeriesBase.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.SeriesBase.base(this, 'serialize');
   if (this.color_)
     json['color'] = anychart.color.serialize(/** @type {acgraph.vector.Fill}*/(this.color_));
   if (goog.isDef(this.name()))
@@ -2171,7 +2171,7 @@ anychart.core.SeriesBase.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.core.SeriesBase.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.SeriesBase.base(this, 'setupByJSON', config, opt_default);
   if (goog.isFunction(this['fill']))
     this.fill(config['fill']);
 
@@ -2226,29 +2226,33 @@ anychart.core.SeriesBase.prototype.setupByJSON = function(config, opt_default) {
 
 
 //exports
-anychart.core.SeriesBase.prototype['a11y'] = anychart.core.SeriesBase.prototype.a11y;//doc|ex
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.core.SeriesBase.prototype;
+  proto['a11y'] = proto.a11y;//doc|ex
 
-anychart.core.SeriesBase.prototype['color'] = anychart.core.SeriesBase.prototype.color;//doc|ex
-anychart.core.SeriesBase.prototype['name'] = anychart.core.SeriesBase.prototype.name;//doc|ex
-anychart.core.SeriesBase.prototype['id'] = anychart.core.SeriesBase.prototype.id;
-anychart.core.SeriesBase.prototype['meta'] = anychart.core.SeriesBase.prototype.meta;//doc|ex
-anychart.core.SeriesBase.prototype['data'] = anychart.core.SeriesBase.prototype.data;//doc|ex
-anychart.core.SeriesBase.prototype['tooltip'] = anychart.core.SeriesBase.prototype.tooltip;
+  proto['color'] = proto.color;//doc|ex
+  proto['name'] = proto.name;//doc|ex
+  proto['id'] = proto.id;
+  proto['meta'] = proto.meta;//doc|ex
+  proto['data'] = proto.data;//doc|ex
+  proto['tooltip'] = proto.tooltip;
 
-anychart.core.SeriesBase.prototype['labels'] = anychart.core.SeriesBase.prototype.labels;//doc|ex
-anychart.core.SeriesBase.prototype['hoverLabels'] = anychart.core.SeriesBase.prototype.hoverLabels;
-anychart.core.SeriesBase.prototype['selectLabels'] = anychart.core.SeriesBase.prototype.selectLabels;
+  proto['labels'] = proto.labels;//doc|ex
+  proto['hoverLabels'] = proto.hoverLabels;
+  proto['selectLabels'] = proto.selectLabels;
 
-anychart.core.SeriesBase.prototype['unhover'] = anychart.core.SeriesBase.prototype.unhover;
-anychart.core.SeriesBase.prototype['unselect'] = anychart.core.SeriesBase.prototype.unselect;
+  proto['unhover'] = proto.unhover;
+  proto['unselect'] = proto.unselect;
 
-anychart.core.SeriesBase.prototype['hover'] = anychart.core.SeriesBase.prototype.hover;
-anychart.core.SeriesBase.prototype['select'] = anychart.core.SeriesBase.prototype.select;
-anychart.core.SeriesBase.prototype['selectionMode'] = anychart.core.SeriesBase.prototype.selectionMode;
-anychart.core.SeriesBase.prototype['allowPointsSelect'] = anychart.core.SeriesBase.prototype.allowPointsSelect;
+  proto['hover'] = proto.hover;
+  proto['select'] = proto.select;
+  proto['selectionMode'] = proto.selectionMode;
+  proto['allowPointsSelect'] = proto.allowPointsSelect;
 
-anychart.core.SeriesBase.prototype['legendItem'] = anychart.core.SeriesBase.prototype.legendItem;
-anychart.core.SeriesBase.prototype['getPixelBounds'] = anychart.core.SeriesBase.prototype.getPixelBounds;
-anychart.core.SeriesBase.prototype['getPoint'] = anychart.core.SeriesBase.prototype.getPoint;
+  proto['legendItem'] = proto.legendItem;
+  proto['getPixelBounds'] = proto.getPixelBounds;
+  proto['getPoint'] = proto.getPoint;
 
-anychart.core.SeriesBase.prototype['getStat'] = anychart.core.SeriesBase.prototype.getStat;
+  proto['getStat'] = proto.getStat;
+})();

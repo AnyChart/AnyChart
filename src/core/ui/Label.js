@@ -25,7 +25,7 @@ goog.require('anychart.core.ui.LabelBase');
  * @extends {anychart.core.ui.LabelBase}
  */
 anychart.core.ui.Label = function() {
-  goog.base(this);
+  anychart.core.ui.Label.base(this, 'constructor');
 };
 goog.inherits(anychart.core.ui.Label, anychart.core.ui.LabelBase);
 
@@ -37,7 +37,7 @@ goog.inherits(anychart.core.ui.Label, anychart.core.ui.LabelBase);
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.ui.Label.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.ui.Label.base(this, 'serialize');
   if (goog.isDef(this.position()))
     json['position'] = this.position();
   return json;
@@ -46,28 +46,31 @@ anychart.core.ui.Label.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.ui.Label.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.ui.Label.base(this, 'setupByJSON', config, opt_default);
   this.position(config['position']);
 };
 
 
 /** @inheritDoc */
 anychart.core.ui.Label.prototype.disposeInternal = function() {
-  goog.base(this, 'disposeInternal');
+  anychart.core.ui.Label.base(this, 'disposeInternal');
 };
 
 
 //exports
-anychart.core.ui.Label.prototype['position'] = anychart.core.ui.Label.prototype.position;
-anychart.core.ui.Label.prototype['background'] = anychart.core.ui.Label.prototype.background;
-anychart.core.ui.Label.prototype['padding'] = anychart.core.ui.Label.prototype.padding;
-anychart.core.ui.Label.prototype['width'] = anychart.core.ui.Label.prototype.width;
-anychart.core.ui.Label.prototype['height'] = anychart.core.ui.Label.prototype.height;
-anychart.core.ui.Label.prototype['anchor'] = anychart.core.ui.Label.prototype.anchor;
-anychart.core.ui.Label.prototype['offsetX'] = anychart.core.ui.Label.prototype.offsetX;
-anychart.core.ui.Label.prototype['offsetY'] = anychart.core.ui.Label.prototype.offsetY;
-anychart.core.ui.Label.prototype['text'] = anychart.core.ui.Label.prototype.text;
-anychart.core.ui.Label.prototype['minFontSize'] = anychart.core.ui.Label.prototype.minFontSize;
-anychart.core.ui.Label.prototype['maxFontSize'] = anychart.core.ui.Label.prototype.maxFontSize;
-anychart.core.ui.Label.prototype['adjustFontSize'] = anychart.core.ui.Label.prototype.adjustFontSize;
-anychart.core.ui.Label.prototype['rotation'] = anychart.core.ui.Label.prototype.rotation;
+(function() {
+  var proto = anychart.core.ui.Label.prototype;
+  proto['position'] = proto.position;
+  proto['background'] = proto.background;
+  proto['padding'] = proto.padding;
+  proto['width'] = proto.width;
+  proto['height'] = proto.height;
+  proto['anchor'] = proto.anchor;
+  proto['offsetX'] = proto.offsetX;
+  proto['offsetY'] = proto.offsetY;
+  proto['text'] = proto.text;
+  proto['minFontSize'] = proto.minFontSize;
+  proto['maxFontSize'] = proto.maxFontSize;
+  proto['adjustFontSize'] = proto.adjustFontSize;
+  proto['rotation'] = proto.rotation;
+})();

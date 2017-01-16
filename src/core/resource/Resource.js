@@ -487,14 +487,14 @@ anychart.core.resource.Resource.prototype.drawActivity_ = function(index, activi
 //------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.resource.Resource.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.resource.Resource.base(this, 'serialize');
   return json;
 };
 
 
 /** @inheritDoc */
 anychart.core.resource.Resource.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+  anychart.core.resource.Resource.base(this, 'setupByJSON', config);
 };
 
 
@@ -505,7 +505,7 @@ anychart.core.resource.Resource.prototype.disposeInternal = function() {
   this.chart_ = null;
   this.calendar_ = null;
   this.schedule_ = null;
-  goog.base(this, 'disposeInternal');
+  anychart.core.resource.Resource.base(this, 'disposeInternal');
 };
 
 

@@ -17,7 +17,7 @@ goog.require('anychart.scales');
  * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.grids.Polar = function() {
-  goog.base(this);
+  anychart.core.grids.Polar.base(this, 'constructor');
 
   /**
    * @type {anychart.core.utils.TypedLayer}
@@ -813,7 +813,7 @@ anychart.core.grids.Polar.prototype.evenFillElement = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.grids.Polar.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.grids.Polar.base(this, 'serialize');
   json['isMinor'] = this.isMinor();
   if (this.layout_) json['layout'] = this.layout_;
   json['drawLastLine'] = this.drawLastLine();
@@ -827,7 +827,7 @@ anychart.core.grids.Polar.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.grids.Polar.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.grids.Polar.base(this, 'setupByJSON', config, opt_default);
   this.isMinor(config['isMinor']);
   this.layout(config['layout']);
   this.drawLastLine(config['drawLastLine']);
@@ -856,20 +856,22 @@ anychart.core.grids.Polar.prototype.disposeInternal = function() {
   delete this.stroke_;
   this.axis_ = null;
   this.chart_ = null;
-  goog.base(this, 'disposeInternal');
+  anychart.core.grids.Polar.base(this, 'disposeInternal');
 };
 
 
-//anychart.core.grids.Polar.prototype['startAngle'] = anychart.core.grids.Polar.prototype.startAngle;
+//proto['startAngle'] = proto.startAngle;
 //exports
-anychart.core.grids.Polar.prototype['isMinor'] = anychart.core.grids.Polar.prototype.isMinor;
-anychart.core.grids.Polar.prototype['oddFill'] = anychart.core.grids.Polar.prototype.oddFill;
-anychart.core.grids.Polar.prototype['evenFill'] = anychart.core.grids.Polar.prototype.evenFill;
-anychart.core.grids.Polar.prototype['layout'] = anychart.core.grids.Polar.prototype.layout;
-anychart.core.grids.Polar.prototype['isRadial'] = anychart.core.grids.Polar.prototype.isRadial;
-anychart.core.grids.Polar.prototype['yScale'] = anychart.core.grids.Polar.prototype.yScale;
-anychart.core.grids.Polar.prototype['xScale'] = anychart.core.grids.Polar.prototype.xScale;
-anychart.core.grids.Polar.prototype['stroke'] = anychart.core.grids.Polar.prototype.stroke;
-anychart.core.grids.Polar.prototype['drawLastLine'] = anychart.core.grids.Polar.prototype.drawLastLine;
-anychart.core.grids.Polar.prototype['axis'] = anychart.core.grids.Polar.prototype.axis;
-
+(function() {
+  var proto = anychart.core.grids.Polar.prototype;
+  proto['isMinor'] = proto.isMinor;
+  proto['oddFill'] = proto.oddFill;
+  proto['evenFill'] = proto.evenFill;
+  proto['layout'] = proto.layout;
+  proto['isRadial'] = proto.isRadial;
+  proto['yScale'] = proto.yScale;
+  proto['xScale'] = proto.xScale;
+  proto['stroke'] = proto.stroke;
+  proto['drawLastLine'] = proto.drawLastLine;
+  proto['axis'] = proto.axis;
+})();

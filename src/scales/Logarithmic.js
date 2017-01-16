@@ -13,7 +13,7 @@ goog.require('anychart.scales.Linear');
  * @extends {anychart.scales.Linear}
  */
 anychart.scales.Logarithmic = function() {
-  goog.base(this);
+  anychart.scales.Logarithmic.base(this, 'constructor');
 };
 goog.inherits(anychart.scales.Logarithmic, anychart.scales.Linear);
 
@@ -63,7 +63,7 @@ anychart.scales.Logarithmic.prototype.inverseTransform = function(ratio) {
 /** @inheritDoc */
 anychart.scales.Logarithmic.prototype.calculate = function() {
   if (this.consistent) return;
-  goog.base(this, 'calculate');
+  anychart.scales.Logarithmic.base(this, 'calculate');
   this.transformedMin_ = anychart.math.log(this.min, this.logBaseVal);
   this.transformedMax_ = anychart.math.log(this.max, this.logBaseVal);
   this.range = this.transformedMax_ - this.transformedMin_;
@@ -108,7 +108,7 @@ anychart.scales.Logarithmic.prototype.determineScaleMinMax = function() {
 
 /** @inheritDoc */
 anychart.scales.Logarithmic.prototype.createTicks = function() {
-  var ticks = goog.base(this, 'createTicks');
+  var ticks = anychart.scales.Logarithmic.base(this, 'createTicks');
   ticks.suspendSignalsDispatching();
   ticks.mode(anychart.enums.ScatterTicksMode.LOGARITHMIC);
   ticks.resumeSignalsDispatching(false);
@@ -121,7 +121,7 @@ anychart.scales.Logarithmic.prototype.createTicks = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.scales.Logarithmic.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.scales.Logarithmic.base(this, 'serialize');
   json['logBase'] = this.logBase();
   return json;
 };
@@ -129,7 +129,7 @@ anychart.scales.Logarithmic.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.scales.Logarithmic.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.scales.Logarithmic.base(this, 'setupByJSON', config, opt_default);
   this.logBase(config['logBase']);
 };
 
@@ -150,8 +150,11 @@ anychart.scales.log = function() {
 
 
 //exports
-goog.exportSymbol('anychart.scales.log', anychart.scales.log);//doc|ex
-anychart.scales.Logarithmic.prototype['getType'] = anychart.scales.Logarithmic.prototype.getType;//inherited
-anychart.scales.Logarithmic.prototype['transform'] = anychart.scales.Logarithmic.prototype.transform;//inherited
-anychart.scales.Logarithmic.prototype['inverseTransform'] = anychart.scales.Logarithmic.prototype.inverseTransform;//inherited
-anychart.scales.Logarithmic.prototype['logBase'] = anychart.scales.Logarithmic.prototype.logBase;//doc|ex
+(function() {
+  var proto = anychart.scales.Logarithmic.prototype;
+  goog.exportSymbol('anychart.scales.log', anychart.scales.log);//doc|ex
+  proto['getType'] = proto.getType;//inherited
+  proto['transform'] = proto.transform;//inherited
+  proto['inverseTransform'] = proto.inverseTransform;//inherited
+  proto['logBase'] = proto.logBase;//doc|ex
+})();

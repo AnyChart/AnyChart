@@ -1335,12 +1335,15 @@ anychart.core.annotations.Base.prototype.disposeInternal = function() {
 
 
 //exports
-anychart.core.annotations.Base.prototype['getType'] = anychart.core.annotations.Base.prototype.getType;
-anychart.core.annotations.Base.prototype['getChart'] = anychart.core.annotations.Base.prototype.getChart;
-anychart.core.annotations.Base.prototype['getPlot'] = anychart.core.annotations.Base.prototype.getPlot;
-anychart.core.annotations.Base.prototype['yScale'] = anychart.core.annotations.Base.prototype.yScale;
-anychart.core.annotations.Base.prototype['xScale'] = anychart.core.annotations.Base.prototype.xScale;
-anychart.core.annotations.Base.prototype['select'] = anychart.core.annotations.Base.prototype.select;
-anychart.core.annotations.Base.prototype['markers'] = anychart.core.annotations.Base.prototype.markers;
-anychart.core.annotations.Base.prototype['hoverMarkers'] = anychart.core.annotations.Base.prototype.hoverMarkers;
-anychart.core.annotations.Base.prototype['selectMarkers'] = anychart.core.annotations.Base.prototype.selectMarkers;
+(function() {
+  var proto = anychart.core.annotations.Base.prototype;
+  proto['getType'] = proto.getType;
+  proto['getChart'] = proto.getChart;
+  proto['getPlot'] = proto.getPlot;
+  proto['yScale'] = proto.yScale;
+  proto['xScale'] = proto.xScale;
+  proto['select'] = proto.select;
+  proto['markers'] = proto.markers;
+  proto['hoverMarkers'] = proto.hoverMarkers;
+  proto['selectMarkers'] = proto.selectMarkers;
+})();

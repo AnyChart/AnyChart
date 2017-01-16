@@ -12,7 +12,7 @@ goog.require('anychart.utils');
  * @extends {anychart.core.VisualBase}
  */
 anychart.core.axisMarkers.CircularRange = function() {
-  goog.base(this);
+  anychart.core.axisMarkers.CircularRange.base(this, 'constructor');
 
   /**
    * @type {number}
@@ -760,7 +760,7 @@ anychart.core.axisMarkers.CircularRange.prototype.draw = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.axisMarkers.CircularRange.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.axisMarkers.CircularRange.base(this, 'serialize');
 
   json['axisIndex'] = this.axisIndex();
   json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
@@ -778,7 +778,7 @@ anychart.core.axisMarkers.CircularRange.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.axisMarkers.CircularRange.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.axisMarkers.CircularRange.base(this, 'setupByJSON', config, opt_default);
 
   this.axisIndex(config['axisIndex']);
   this.from(config['from']);
@@ -805,12 +805,15 @@ anychart.core.axisMarkers.CircularRange.prototype.disposeInternal = function() {
 
 
 //exports
-anychart.core.axisMarkers.CircularRange.prototype['fill'] = anychart.core.axisMarkers.CircularRange.prototype.fill;
-anychart.core.axisMarkers.CircularRange.prototype['axisIndex'] = anychart.core.axisMarkers.CircularRange.prototype.axisIndex;
-anychart.core.axisMarkers.CircularRange.prototype['position'] = anychart.core.axisMarkers.CircularRange.prototype.position;
-anychart.core.axisMarkers.CircularRange.prototype['startSize'] = anychart.core.axisMarkers.CircularRange.prototype.startSize;
-anychart.core.axisMarkers.CircularRange.prototype['endSize'] = anychart.core.axisMarkers.CircularRange.prototype.endSize;
-anychart.core.axisMarkers.CircularRange.prototype['from'] = anychart.core.axisMarkers.CircularRange.prototype.from;
-anychart.core.axisMarkers.CircularRange.prototype['to'] = anychart.core.axisMarkers.CircularRange.prototype.to;
-anychart.core.axisMarkers.CircularRange.prototype['radius'] = anychart.core.axisMarkers.CircularRange.prototype.radius;
-anychart.core.axisMarkers.CircularRange.prototype['cornersRounding'] = anychart.core.axisMarkers.CircularRange.prototype.cornersRounding;
+(function() {
+  var proto = anychart.core.axisMarkers.CircularRange.prototype;
+  proto['fill'] = proto.fill;
+  proto['axisIndex'] = proto.axisIndex;
+  proto['position'] = proto.position;
+  proto['startSize'] = proto.startSize;
+  proto['endSize'] = proto.endSize;
+  proto['from'] = proto.from;
+  proto['to'] = proto.to;
+  proto['radius'] = proto.radius;
+  proto['cornersRounding'] = proto.cornersRounding;
+})();

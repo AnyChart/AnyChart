@@ -133,11 +133,14 @@ anychart.core.Point.prototype.getStat = function(key) {
 
 
 //exports
-anychart.core.Point.prototype['getIndex'] = anychart.core.Point.prototype.getIndex;
-anychart.core.Point.prototype['getChart'] = anychart.core.Point.prototype.getChart;
-anychart.core.Point.prototype['get'] = anychart.core.Point.prototype.get;
-anychart.core.Point.prototype['set'] = anychart.core.Point.prototype.set;
-anychart.core.Point.prototype['hovered'] = anychart.core.Point.prototype.hovered;
-anychart.core.Point.prototype['selected'] = anychart.core.Point.prototype.selected;
-anychart.core.Point.prototype['exists'] = anychart.core.Point.prototype.exists;
-anychart.core.Point.prototype['getStat'] = anychart.core.Point.prototype.getStat;
+(function() {
+  var proto = anychart.core.Point.prototype;
+  proto['getIndex'] = proto.getIndex;
+  proto['getChart'] = proto.getChart;
+  proto['get'] = proto.get;
+  proto['set'] = proto.set;
+  proto['hovered'] = proto.hovered;
+  proto['selected'] = proto.selected;
+  proto['exists'] = proto.exists;
+  proto['getStat'] = proto.getStat;
+})();

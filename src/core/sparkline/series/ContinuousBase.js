@@ -11,7 +11,7 @@ goog.require('anychart.core.sparkline.series.Base');
  * @extends {anychart.core.sparkline.series.Base}
  */
 anychart.core.sparkline.series.ContinuousBase = function(chart) {
-  goog.base(this, chart);
+  anychart.core.sparkline.series.ContinuousBase.base(this, 'constructor', chart);
 
   /**
    * @type {!acgraph.vector.Path}
@@ -57,7 +57,7 @@ anychart.core.sparkline.series.ContinuousBase.prototype.drawPoint = function() {
 
 /** @inheritDoc */
 anychart.core.sparkline.series.ContinuousBase.prototype.startDrawing = function() {
-  goog.base(this, 'startDrawing');
+  anychart.core.sparkline.series.ContinuousBase.base(this, 'startDrawing');
   if (this.isConsistent() || !this.enabled()) return;
 
   /** @type {anychart.scales.Base} */
@@ -119,7 +119,7 @@ anychart.core.sparkline.series.ContinuousBase.prototype.startDrawing = function(
 /** @inheritDoc */
 anychart.core.sparkline.series.ContinuousBase.prototype.drawMissing = function() {
   if (!this.chart.connectMissingPoints()) {
-    goog.base(this, 'drawMissing');
+    anychart.core.sparkline.series.ContinuousBase.base(this, 'drawMissing');
     this.finalizeSegment();
   }
 };
@@ -129,7 +129,7 @@ anychart.core.sparkline.series.ContinuousBase.prototype.drawMissing = function()
 anychart.core.sparkline.series.ContinuousBase.prototype.finalizeDrawing = function() {
   this.finalizeSegment();
   this.finalizeHatchFill();
-  goog.base(this, 'finalizeDrawing');
+  anychart.core.sparkline.series.ContinuousBase.base(this, 'finalizeDrawing');
 };
 
 
@@ -186,5 +186,5 @@ anychart.core.sparkline.series.ContinuousBase.prototype.applyHatchFill = functio
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.sparkline.series.ContinuousBase.prototype.getDefaults = function() {
-  return goog.base(this, 'getDefaults');
+  return anychart.core.sparkline.series.ContinuousBase.base(this, 'getDefaults');
 };

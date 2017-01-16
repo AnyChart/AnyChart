@@ -96,8 +96,11 @@ anychart.core.utils.DrawingPlanIterator.prototype.meta = function(name, opt_valu
 
 
 //exports
-anychart.core.utils.DrawingPlanIterator.prototype['reset'] = anychart.core.utils.DrawingPlanIterator.prototype.reset;//doc|ex
-anychart.core.utils.DrawingPlanIterator.prototype['advance'] = anychart.core.utils.DrawingPlanIterator.prototype.advance;//doc|ex
-anychart.core.utils.DrawingPlanIterator.prototype['get'] = anychart.core.utils.DrawingPlanIterator.prototype.get;//doc|ex
-anychart.core.utils.DrawingPlanIterator.prototype['meta'] = anychart.core.utils.DrawingPlanIterator.prototype.meta;//doc|need-ex
-anychart.core.utils.DrawingPlanIterator.prototype['getRowsCount'] = anychart.core.utils.DrawingPlanIterator.prototype.getRowsCount;//doc|ex
+(function() {
+  var proto = anychart.core.utils.DrawingPlanIterator.prototype;
+  proto['reset'] = proto.reset;//doc|ex
+  proto['advance'] = proto.advance;//doc|ex
+  proto['get'] = proto.get;//doc|ex
+  proto['meta'] = proto.meta;//doc|need-ex
+  proto['getRowsCount'] = proto.getRowsCount;//doc|ex
+})();

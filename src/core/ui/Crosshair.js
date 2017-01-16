@@ -10,7 +10,7 @@ goog.require('anychart.core.ui.CrosshairLabel');
  * @extends {anychart.core.VisualBase}
  */
 anychart.core.ui.Crosshair = function() {
-  goog.base(this);
+  anychart.core.ui.Crosshair.base(this, 'constructor');
 
   /**
    * @type {anychart.core.ChartWithAxes|anychart.charts.Map}
@@ -818,13 +818,13 @@ anychart.core.ui.Crosshair.prototype.disposeInternal = function() {
   goog.dispose(this.yLabel_);
   this.yLabel_ = null;
 
-  goog.base(this, 'disposeInternal');
+  anychart.core.ui.Crosshair.base(this, 'disposeInternal');
 };
 
 
 /** @inheritDoc */
 anychart.core.ui.Crosshair.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.ui.Crosshair.base(this, 'serialize');
   json['displayMode'] = this.displayMode();
   json['xStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.xStroke()));
   json['yStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke}*/(this.yStroke()));
@@ -836,7 +836,7 @@ anychart.core.ui.Crosshair.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.ui.Crosshair.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.ui.Crosshair.base(this, 'setupByJSON', config, opt_default);
   this.displayMode(config['displayMode']);
   this.xStroke(config['xStroke']);
   this.yStroke(config['yStroke']);
@@ -846,8 +846,11 @@ anychart.core.ui.Crosshair.prototype.setupByJSON = function(config, opt_default)
 
 
 //exports
-anychart.core.ui.Crosshair.prototype['displayMode'] = anychart.core.ui.Crosshair.prototype.displayMode;
-anychart.core.ui.Crosshair.prototype['xStroke'] = anychart.core.ui.Crosshair.prototype.xStroke;
-anychart.core.ui.Crosshair.prototype['yStroke'] = anychart.core.ui.Crosshair.prototype.yStroke;
-anychart.core.ui.Crosshair.prototype['xLabel'] = anychart.core.ui.Crosshair.prototype.xLabel;
-anychart.core.ui.Crosshair.prototype['yLabel'] = anychart.core.ui.Crosshair.prototype.yLabel;
+(function() {
+  var proto = anychart.core.ui.Crosshair.prototype;
+  proto['displayMode'] = proto.displayMode;
+  proto['xStroke'] = proto.xStroke;
+  proto['yStroke'] = proto.yStroke;
+  proto['xLabel'] = proto.xLabel;
+  proto['yLabel'] = proto.yLabel;
+})();

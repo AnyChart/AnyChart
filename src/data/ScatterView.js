@@ -14,7 +14,7 @@ goog.require('goog.array');
  * @extends {anychart.data.View}
  */
 anychart.data.ScatterView = function(parentView, fieldName, isDateTime) {
-  goog.base(this, parentView);
+  anychart.data.ScatterView.base(this, 'constructor', parentView);
 
   /**
    * Field name to categorize by. Stored for data change events.
@@ -130,7 +130,7 @@ anychart.data.ScatterView.prototype.findInRangeByX = function(minValue, maxValue
  */
 anychart.data.ScatterView.prototype.find = function(fieldName, fieldValue) {
   if (fieldName != 'x')
-    return goog.base(this, 'find', fieldName, fieldValue);
+    return anychart.data.ScatterView.base(this, 'find', fieldName, fieldValue);
 
   this.ensureConsistent();
   return this.search_(/** @type {number} */ (fieldValue));

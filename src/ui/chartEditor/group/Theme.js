@@ -15,7 +15,7 @@ goog.require('goog.ui.Component');
  * @extends {anychart.ui.chartEditor.group.Base}
  */
 anychart.ui.chartEditor.group.Theme = function(model) {
-  goog.base(this, model);
+  anychart.ui.chartEditor.group.Theme.base(this, 'constructor', model);
 
   this.setHeader('General Theming');
 };
@@ -66,7 +66,7 @@ anychart.ui.chartEditor.group.Theme.prototype.paletteSelect_ = null;
 anychart.ui.chartEditor.group.Theme.prototype.disposeInternal = function() {
   this.themeSelect_ = null;
   this.paletteSelect_ = null;
-  goog.base(this, 'disposeInternal');
+  anychart.ui.chartEditor.group.Theme.base(this, 'disposeInternal');
 };
 
 
@@ -105,7 +105,7 @@ anychart.ui.chartEditor.group.Theme.parsePalettes_ = function() {
 
 /** @inheritDoc */
 anychart.ui.chartEditor.group.Theme.prototype.createDom = function() {
-  goog.base(this, 'createDom');
+  anychart.ui.chartEditor.group.Theme.base(this, 'createDom');
 
   anychart.ui.chartEditor.group.Theme.parseThemes_();
   anychart.ui.chartEditor.group.Theme.parsePalettes_();
@@ -174,7 +174,7 @@ anychart.ui.chartEditor.group.Theme.prototype.createDom = function() {
 
 /** @inheritDoc */
 anychart.ui.chartEditor.group.Theme.prototype.enterDocument = function() {
-  goog.base(this, 'enterDocument');
+  anychart.ui.chartEditor.group.Theme.base(this, 'enterDocument');
   goog.events.listen(this.themeSelect_, goog.ui.Component.EventType.CHANGE, this.onThemeSelectChange_, false, this);
   goog.events.listen(this.paletteSelect_, goog.ui.Component.EventType.CHANGE, this.onPaletteSelectChange_, false, this);
 };
@@ -184,7 +184,7 @@ anychart.ui.chartEditor.group.Theme.prototype.enterDocument = function() {
 anychart.ui.chartEditor.group.Theme.prototype.exitDocument = function() {
   goog.events.unlisten(this.themeSelect_, goog.ui.Component.EventType.CHANGE, this.onThemeSelectChange_, false, this);
   goog.events.unlisten(this.paletteSelect_, goog.ui.Component.EventType.CHANGE, this.onPaletteSelectChange_, false, this);
-  goog.base(this, 'exitDocument');
+  anychart.ui.chartEditor.group.Theme.base(this, 'exitDocument');
 };
 
 

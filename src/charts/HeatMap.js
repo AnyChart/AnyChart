@@ -24,7 +24,7 @@ goog.require('anychart.scales.OrdinalColor');
  * @constructor
  */
 anychart.charts.HeatMap = function(opt_data, opt_csvSettings) {
-  goog.base(this);
+  anychart.charts.HeatMap.base(this, 'constructor');
 
   /**
    * @type {!anychart.scales.Ordinal}
@@ -916,7 +916,7 @@ anychart.charts.HeatMap.prototype.createEventSeriesStatus = function(seriesStatu
 
 /** @inheritDoc */
 anychart.charts.HeatMap.prototype.makeCurrentPoint = function(seriesStatus, event, opt_empty) {
-  var currentPoint = goog.base(this, 'makeCurrentPoint', seriesStatus, event, opt_empty);
+  var currentPoint = anychart.charts.HeatMap.base(this, 'makeCurrentPoint', seriesStatus, event, opt_empty);
 
   currentPoint['series'] = this;
 
@@ -2161,7 +2161,7 @@ anychart.charts.HeatMap.prototype.select = function(opt_indexOrIndexes) {
  * @inheritDoc
  */
 anychart.charts.HeatMap.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.charts.HeatMap.base(this, 'setupByJSON', config, opt_default);
 
   if ('defaultXAxisSettings' in config)
     this.defaultXAxisSettings(config['defaultXAxisSettings']);
@@ -2342,7 +2342,7 @@ anychart.charts.HeatMap.prototype.setupByJSON = function(config, opt_default) {
  * @inheritDoc
  */
 anychart.charts.HeatMap.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.charts.HeatMap.base(this, 'serialize');
   var i;
   var scalesIds = {};
   var scales = [];
@@ -2625,49 +2625,52 @@ anychart.charts.HeatMap.prototype.labelsDisplayMode = function(opt_value) {
 
 
 //exports
-anychart.charts.HeatMap.prototype['getType'] = anychart.charts.HeatMap.prototype.getType;
+(function() {
+  var proto = anychart.charts.HeatMap.prototype;
+  proto['getType'] = proto.getType;
 
-anychart.charts.HeatMap.prototype['grid'] = anychart.charts.HeatMap.prototype.grid;
+  proto['grid'] = proto.grid;
 
-anychart.charts.HeatMap.prototype['xAxis'] = anychart.charts.HeatMap.prototype.xAxis;
-anychart.charts.HeatMap.prototype['yAxis'] = anychart.charts.HeatMap.prototype.yAxis;
+  proto['xAxis'] = proto.xAxis;
+  proto['yAxis'] = proto.yAxis;
 
-anychart.charts.HeatMap.prototype['xScale'] = anychart.charts.HeatMap.prototype.xScale;
-anychart.charts.HeatMap.prototype['yScale'] = anychart.charts.HeatMap.prototype.yScale;
+  proto['xScale'] = proto.xScale;
+  proto['yScale'] = proto.yScale;
 
-anychart.charts.HeatMap.prototype['labelsDisplayMode'] = anychart.charts.HeatMap.prototype.labelsDisplayMode;
+  proto['labelsDisplayMode'] = proto.labelsDisplayMode;
 
-anychart.charts.HeatMap.prototype['fill'] = anychart.charts.HeatMap.prototype.fill;
-anychart.charts.HeatMap.prototype['hoverFill'] = anychart.charts.HeatMap.prototype.hoverFill;
-anychart.charts.HeatMap.prototype['selectFill'] = anychart.charts.HeatMap.prototype.selectFill;
+  proto['fill'] = proto.fill;
+  proto['hoverFill'] = proto.hoverFill;
+  proto['selectFill'] = proto.selectFill;
 
-anychart.charts.HeatMap.prototype['stroke'] = anychart.charts.HeatMap.prototype.stroke;
-anychart.charts.HeatMap.prototype['hoverStroke'] = anychart.charts.HeatMap.prototype.hoverStroke;
-anychart.charts.HeatMap.prototype['selectStroke'] = anychart.charts.HeatMap.prototype.selectStroke;
+  proto['stroke'] = proto.stroke;
+  proto['hoverStroke'] = proto.hoverStroke;
+  proto['selectStroke'] = proto.selectStroke;
 
-anychart.charts.HeatMap.prototype['hatchFill'] = anychart.charts.HeatMap.prototype.hatchFill;
-anychart.charts.HeatMap.prototype['hoverHatchFill'] = anychart.charts.HeatMap.prototype.hoverHatchFill;
-anychart.charts.HeatMap.prototype['selectHatchFill'] = anychart.charts.HeatMap.prototype.selectHatchFill;
+  proto['hatchFill'] = proto.hatchFill;
+  proto['hoverHatchFill'] = proto.hoverHatchFill;
+  proto['selectHatchFill'] = proto.selectHatchFill;
 
-anychart.charts.HeatMap.prototype['labels'] = anychart.charts.HeatMap.prototype.labels;
-anychart.charts.HeatMap.prototype['hoverLabels'] = anychart.charts.HeatMap.prototype.hoverLabels;
-anychart.charts.HeatMap.prototype['selectLabels'] = anychart.charts.HeatMap.prototype.selectLabels;
+  proto['labels'] = proto.labels;
+  proto['hoverLabels'] = proto.hoverLabels;
+  proto['selectLabels'] = proto.selectLabels;
 
-anychart.charts.HeatMap.prototype['markers'] = anychart.charts.HeatMap.prototype.markers;
-anychart.charts.HeatMap.prototype['hoverMarkers'] = anychart.charts.HeatMap.prototype.hoverMarkers;
-anychart.charts.HeatMap.prototype['selectMarkers'] = anychart.charts.HeatMap.prototype.selectMarkers;
+  proto['markers'] = proto.markers;
+  proto['hoverMarkers'] = proto.hoverMarkers;
+  proto['selectMarkers'] = proto.selectMarkers;
 
-anychart.charts.HeatMap.prototype['hover'] = anychart.charts.HeatMap.prototype.hover;
-anychart.charts.HeatMap.prototype['select'] = anychart.charts.HeatMap.prototype.select;
+  proto['hover'] = proto.hover;
+  proto['select'] = proto.select;
 
-anychart.charts.HeatMap.prototype['unhover'] = anychart.charts.HeatMap.prototype.unhover;
-anychart.charts.HeatMap.prototype['unselect'] = anychart.charts.HeatMap.prototype.unselect;
+  proto['unhover'] = proto.unhover;
+  proto['unselect'] = proto.unselect;
 
-anychart.charts.HeatMap.prototype['data'] = anychart.charts.HeatMap.prototype.data;
+  proto['data'] = proto.data;
 
-anychart.charts.HeatMap.prototype['colorScale'] = anychart.charts.HeatMap.prototype.colorScale;
+  proto['colorScale'] = proto.colorScale;
 
-anychart.charts.HeatMap.prototype['xZoom'] = anychart.charts.HeatMap.prototype.xZoom;
-anychart.charts.HeatMap.prototype['yZoom'] = anychart.charts.HeatMap.prototype.yZoom;
-anychart.charts.HeatMap.prototype['xScroller'] = anychart.charts.HeatMap.prototype.xScroller;
-anychart.charts.HeatMap.prototype['yScroller'] = anychart.charts.HeatMap.prototype.yScroller;
+  proto['xZoom'] = proto.xZoom;
+  proto['yZoom'] = proto.yZoom;
+  proto['xScroller'] = proto.xScroller;
+  proto['yScroller'] = proto.yScroller;
+})();

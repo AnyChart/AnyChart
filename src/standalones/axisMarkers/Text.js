@@ -38,8 +38,12 @@ anychart.axisMarkers.text = function() {
 
 
 //exports
-goog.exportSymbol('anychart.axisMarkers.text', anychart.axisMarkers.text);
-goog.exportSymbol('anychart.standalones.axisMarkers.text', anychart.standalones.axisMarkers.text);
-anychart.standalones.axisMarkers.Text.prototype['draw'] = anychart.standalones.axisMarkers.Text.prototype.draw;
-anychart.standalones.axisMarkers.Text.prototype['parentBounds'] = anychart.standalones.axisMarkers.Text.prototype.parentBounds;
-anychart.standalones.axisMarkers.Text.prototype['container'] = anychart.standalones.axisMarkers.Text.prototype.container;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.standalones.axisMarkers.Text.prototype;
+  goog.exportSymbol('anychart.axisMarkers.text', anychart.axisMarkers.text);
+  goog.exportSymbol('anychart.standalones.axisMarkers.text', anychart.standalones.axisMarkers.text);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+})();

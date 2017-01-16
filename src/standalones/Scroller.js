@@ -78,13 +78,17 @@ anychart.ui.scroller = function() {
 
 
 //exports
-goog.exportSymbol('anychart.ui.scroller', anychart.ui.scroller);
-goog.exportSymbol('anychart.standalones.scroller', anychart.standalones.scroller);
-anychart.standalones.Scroller.prototype['setRange'] = anychart.standalones.Scroller.prototype.setRange;
-anychart.standalones.Scroller.prototype['startRatio'] = anychart.standalones.Scroller.prototype.startRatio;
-anychart.standalones.Scroller.prototype['endRatio'] = anychart.standalones.Scroller.prototype.endRatio;
-anychart.standalones.Scroller.prototype['parentBounds'] = anychart.standalones.Scroller.prototype.parentBounds;
-anychart.standalones.Scroller.prototype['getRemainingBounds'] = anychart.standalones.Scroller.prototype.getRemainingBounds;
-anychart.standalones.Scroller.prototype['container'] = anychart.standalones.Scroller.prototype.container;
-anychart.standalones.Scroller.prototype['padding'] = anychart.standalones.Scroller.prototype.padding;
-anychart.standalones.Scroller.prototype['draw'] = anychart.standalones.Scroller.prototype.draw;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.standalones.Scroller.prototype;
+  goog.exportSymbol('anychart.ui.scroller', anychart.ui.scroller);
+  goog.exportSymbol('anychart.standalones.scroller', anychart.standalones.scroller);
+  proto['setRange'] = proto.setRange;
+  proto['startRatio'] = proto.startRatio;
+  proto['endRatio'] = proto.endRatio;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['getRemainingBounds'] = proto.getRemainingBounds;
+  proto['container'] = proto.container;
+  proto['padding'] = proto.padding;
+  proto['draw'] = proto.draw;
+})();

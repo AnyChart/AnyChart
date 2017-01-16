@@ -26,7 +26,7 @@ goog.require('anychart.scales');
  * @constructor
  */
 anychart.charts.Radar = function() {
-  goog.base(this);
+  anychart.charts.Radar.base(this, 'constructor');
 
   /**
    * Start angle for the first slice of a pie chart.
@@ -1725,7 +1725,7 @@ anychart.charts.Radar.prototype.getSeriesStatus = function(event) {
 
 /** @inheritDoc */
 anychart.charts.Radar.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.charts.Radar.base(this, 'serialize');
   var i;
   var scalesIds = {};
   var scales = [];
@@ -1961,7 +1961,7 @@ anychart.charts.Radar.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.charts.Radar.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.charts.Radar.base(this, 'setupByJSON', config, opt_default);
 
   if ('defaultSeriesSettings' in config)
     this.defaultSeriesSettings(config['defaultSeriesSettings']);
@@ -2088,25 +2088,28 @@ anychart.charts.Radar.prototype.setupByJSON = function(config, opt_default) {
 
 
 //exports
-anychart.charts.Radar.prototype['xScale'] = anychart.charts.Radar.prototype.xScale;//doc|ex
-anychart.charts.Radar.prototype['yScale'] = anychart.charts.Radar.prototype.yScale;//doc|ex
-anychart.charts.Radar.prototype['grid'] = anychart.charts.Radar.prototype.grid;//doc|ex
-anychart.charts.Radar.prototype['minorGrid'] = anychart.charts.Radar.prototype.minorGrid;//doc|ex
-anychart.charts.Radar.prototype['xAxis'] = anychart.charts.Radar.prototype.xAxis;//doc|ex
-anychart.charts.Radar.prototype['yAxis'] = anychart.charts.Radar.prototype.yAxis;//doc|ex
-anychart.charts.Radar.prototype['getSeries'] = anychart.charts.Radar.prototype.getSeries;//doc|ex
-anychart.charts.Radar.prototype['area'] = anychart.charts.Radar.prototype.area;//doc|ex
-anychart.charts.Radar.prototype['line'] = anychart.charts.Radar.prototype.line;//doc|ex
-anychart.charts.Radar.prototype['marker'] = anychart.charts.Radar.prototype.marker;//doc|ex
-anychart.charts.Radar.prototype['palette'] = anychart.charts.Radar.prototype.palette;//doc|ex
-anychart.charts.Radar.prototype['markerPalette'] = anychart.charts.Radar.prototype.markerPalette;//doc|ex
-anychart.charts.Radar.prototype['startAngle'] = anychart.charts.Radar.prototype.startAngle;//doc|ex
-anychart.charts.Radar.prototype['getType'] = anychart.charts.Radar.prototype.getType;
-anychart.charts.Radar.prototype['defaultSeriesType'] = anychart.charts.Radar.prototype.defaultSeriesType;
-anychart.charts.Radar.prototype['addSeries'] = anychart.charts.Radar.prototype.addSeries;
-anychart.charts.Radar.prototype['getSeriesAt'] = anychart.charts.Radar.prototype.getSeriesAt;
-anychart.charts.Radar.prototype['getSeriesCount'] = anychart.charts.Radar.prototype.getSeriesCount;
-anychart.charts.Radar.prototype['removeSeries'] = anychart.charts.Radar.prototype.removeSeries;
-anychart.charts.Radar.prototype['removeSeriesAt'] = anychart.charts.Radar.prototype.removeSeriesAt;
-anychart.charts.Radar.prototype['removeAllSeries'] = anychart.charts.Radar.prototype.removeAllSeries;
-anychart.charts.Radar.prototype['getPlotBounds'] = anychart.charts.Radar.prototype.getPlotBounds;
+(function() {
+  var proto = anychart.charts.Radar.prototype;
+  proto['xScale'] = proto.xScale;//doc|ex
+  proto['yScale'] = proto.yScale;//doc|ex
+  proto['grid'] = proto.grid;//doc|ex
+  proto['minorGrid'] = proto.minorGrid;//doc|ex
+  proto['xAxis'] = proto.xAxis;//doc|ex
+  proto['yAxis'] = proto.yAxis;//doc|ex
+  proto['getSeries'] = proto.getSeries;//doc|ex
+  proto['area'] = proto.area;//doc|ex
+  proto['line'] = proto.line;//doc|ex
+  proto['marker'] = proto.marker;//doc|ex
+  proto['palette'] = proto.palette;//doc|ex
+  proto['markerPalette'] = proto.markerPalette;//doc|ex
+  proto['startAngle'] = proto.startAngle;//doc|ex
+  proto['getType'] = proto.getType;
+  proto['defaultSeriesType'] = proto.defaultSeriesType;
+  proto['addSeries'] = proto.addSeries;
+  proto['getSeriesAt'] = proto.getSeriesAt;
+  proto['getSeriesCount'] = proto.getSeriesCount;
+  proto['removeSeries'] = proto.removeSeries;
+  proto['removeSeriesAt'] = proto.removeSeriesAt;
+  proto['removeAllSeries'] = proto.removeAllSeries;
+  proto['getPlotBounds'] = proto.getPlotBounds;
+})();

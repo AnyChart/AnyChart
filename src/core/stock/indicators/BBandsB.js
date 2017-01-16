@@ -100,6 +100,9 @@ anychart.core.stock.indicators.BBandsB.prototype.deviation = function(opt_value)
 
 
 //exports
-anychart.core.stock.indicators.BBandsB.prototype['period'] = anychart.core.stock.indicators.BBandsB.prototype.period;
-anychart.core.stock.indicators.BBandsB.prototype['deviation'] = anychart.core.stock.indicators.BBandsB.prototype.deviation;
-anychart.core.stock.indicators.BBandsB.prototype['series'] = anychart.core.stock.indicators.BBandsB.prototype.series;
+(function() {
+  var proto = anychart.core.stock.indicators.BBandsB.prototype;
+  proto['period'] = proto.period;
+  proto['deviation'] = proto.deviation;
+  proto['series'] = proto.series;
+})();

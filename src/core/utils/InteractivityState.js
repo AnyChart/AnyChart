@@ -500,7 +500,7 @@ anychart.core.utils.InteractivityState.clarifyState = function(state) {
  * @extends {anychart.core.utils.InteractivityState}
  */
 anychart.core.utils.PieInteractivityState = function(target) {
-  goog.base(this, target);
+  anychart.core.utils.PieInteractivityState.base(this, 'constructor', target);
 };
 goog.inherits(anychart.core.utils.PieInteractivityState, anychart.core.utils.InteractivityState);
 

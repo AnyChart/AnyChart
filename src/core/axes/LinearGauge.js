@@ -86,4 +86,7 @@ anychart.core.axes.LinearGauge.prototype.setupByJSON = function(config, opt_defa
 //endregion
 
 //exports
-anychart.core.axes.LinearGauge.prototype['offset'] = anychart.core.axes.LinearGauge.prototype.offset;
+(function() {
+  var proto = anychart.core.axes.LinearGauge.prototype;
+  proto['offset'] = proto.offset;
+})();

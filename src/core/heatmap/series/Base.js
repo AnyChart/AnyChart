@@ -22,7 +22,7 @@ goog.require('anychart.utils');
  * @extends {anychart.core.SeriesBase}
  */
 anychart.core.heatMap.series.Base = function(opt_data, opt_csvSettings) {
-  goog.base(this, opt_data, opt_csvSettings);
+  anychart.core.heatMap.series.Base.base(this, 'constructor', opt_data, opt_csvSettings);
 
   this.referenceValueNames = ['x', 'y', 'heat'];
   this.referenceValueMeanings = ['x', 'y', 'n'];
@@ -842,7 +842,7 @@ anychart.core.heatMap.series.Base.prototype.remove = function() {
   this.labels().container(null);
   this.markers().container(null);
 
-  goog.base(this, 'remove');
+  anychart.core.heatMap.series.Base.base(this, 'remove');
 };
 
 
@@ -1213,7 +1213,7 @@ anychart.core.heatMap.series.Base.prototype.calculateStatistics = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.heatMap.series.Base.prototype.getEnableChangeSignals = function() {
-  return goog.base(this, 'getEnableChangeSignals') | anychart.Signal.DATA_CHANGED | anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEED_UPDATE_LEGEND;
+  return anychart.core.heatMap.series.Base.base(this, 'getEnableChangeSignals') | anychart.Signal.DATA_CHANGED | anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEED_UPDATE_LEGEND;
 };
 
 
@@ -1442,7 +1442,7 @@ anychart.core.heatMap.series.Base.prototype.getMarkerStroke = function() {
  * @inheritDoc
  */
 anychart.core.heatMap.series.Base.prototype.getLegendItemData = function(itemsTextFormatter) {
-  var data = goog.base(this, 'getLegendItemData', itemsTextFormatter);
+  var data = anychart.core.heatMap.series.Base.base(this, 'getLegendItemData', itemsTextFormatter);
   var markers = this.markers();
   markers.setAutoFill(this.getMarkerFill());
   markers.setAutoStroke(/** @type {acgraph.vector.Stroke} */(this.getMarkerStroke()));
@@ -1468,7 +1468,7 @@ anychart.core.heatMap.series.Base.prototype.getLegendItemData = function(itemsTe
  * @inheritDoc
  */
 anychart.core.heatMap.series.Base.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.heatMap.series.Base.base(this, 'serialize');
   json['clip'] = (this.clip_ instanceof anychart.math.Rect) ? this.clip_.serialize() : this.clip_;
   json['markers'] = this.markers().serialize();
   json['hoverMarkers'] = this.hoverMarkers().serialize();
@@ -1481,7 +1481,7 @@ anychart.core.heatMap.series.Base.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.core.heatMap.series.Base.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.heatMap.series.Base.base(this, 'setupByJSON', config, opt_default);
   this.clip(config['clip']);
   this.markers().setup(config['markers']);
   this.hoverMarkers().setup(config['hoverMarkers']);

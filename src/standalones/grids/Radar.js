@@ -37,9 +37,13 @@ anychart.grids.radar = function() {
 
 
 //exports
-goog.exportSymbol('anychart.grids.radar', anychart.grids.radar);
-goog.exportSymbol('anychart.standalones.grids.radar', anychart.standalones.grids.radar);
-anychart.standalones.grids.Radar.prototype['draw'] = anychart.standalones.grids.Radar.prototype.draw;
-anychart.standalones.grids.Radar.prototype['parentBounds'] = anychart.standalones.grids.Radar.prototype.parentBounds;
-anychart.standalones.grids.Radar.prototype['container'] = anychart.standalones.grids.Radar.prototype.container;
-anychart.standalones.grids.Radar.prototype['startAngle'] = anychart.standalones.grids.Radar.prototype.startAngle;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.standalones.grids.Radar.prototype;
+  goog.exportSymbol('anychart.grids.radar', anychart.grids.radar);
+  goog.exportSymbol('anychart.standalones.grids.radar', anychart.standalones.grids.radar);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+  proto['startAngle'] = proto.startAngle;
+})();

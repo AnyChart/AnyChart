@@ -15,7 +15,7 @@ goog.require('anychart.utils');
  * @extends {anychart.core.VisualBase}
  */
 anychart.core.axes.CircularTicks = function() {
-  goog.base(this);
+  anychart.core.axes.CircularTicks.base(this, 'constructor');
 
   /**
    * Ticks length.
@@ -408,7 +408,7 @@ anychart.core.axes.CircularTicks.prototype.setAxis = function(axis) {
 
 /** @inheritDoc */
 anychart.core.axes.CircularTicks.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.axes.CircularTicks.base(this, 'serialize');
 
   if (goog.isDef(this.length())) json['length'] = this.length();
   if (goog.isFunction(this['type'])) {
@@ -445,7 +445,7 @@ anychart.core.axes.CircularTicks.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.axes.CircularTicks.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.axes.CircularTicks.base(this, 'setupByJSON', config, opt_default);
 
   this.length(config['length']);
   this.type(config['type']);
@@ -457,9 +457,12 @@ anychart.core.axes.CircularTicks.prototype.setupByJSON = function(config, opt_de
 
 
 //exports
-anychart.core.axes.CircularTicks.prototype['length'] = anychart.core.axes.CircularTicks.prototype.length;
-anychart.core.axes.CircularTicks.prototype['type'] = anychart.core.axes.CircularTicks.prototype.type;
-anychart.core.axes.CircularTicks.prototype['stroke'] = anychart.core.axes.CircularTicks.prototype.stroke;
-anychart.core.axes.CircularTicks.prototype['fill'] = anychart.core.axes.CircularTicks.prototype.fill;
-anychart.core.axes.CircularTicks.prototype['hatchFill'] = anychart.core.axes.CircularTicks.prototype.hatchFill;
-anychart.core.axes.CircularTicks.prototype['position'] = anychart.core.axes.CircularTicks.prototype.position;
+(function() {
+  var proto = anychart.core.axes.CircularTicks.prototype;
+  proto['length'] = proto.length;
+  proto['type'] = proto.type;
+  proto['stroke'] = proto.stroke;
+  proto['fill'] = proto.fill;
+  proto['hatchFill'] = proto.hatchFill;
+  proto['position'] = proto.position;
+})();

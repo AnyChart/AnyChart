@@ -73,6 +73,8 @@ anychart.core.stock.indicators.MMA.prototype.period = function(opt_value) {
 
 
 //exports
-anychart.core.stock.indicators.MMA.prototype['series'] = anychart.core.stock.indicators.MMA.prototype.series;
-anychart.core.stock.indicators.MMA.prototype['period'] = anychart.core.stock.indicators.MMA.prototype.period;
-
+(function() {
+  var proto = anychart.core.stock.indicators.MMA.prototype;
+  proto['series'] = proto.series;
+  proto['period'] = proto.period;
+})();

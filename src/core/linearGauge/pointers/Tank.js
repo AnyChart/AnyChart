@@ -818,9 +818,12 @@ anychart.core.linearGauge.pointers.Tank.prototype.disposeInternal = function() {
 //endregion
 
 //exports
-anychart.core.linearGauge.pointers.Tank.prototype['emptyFill'] = anychart.core.linearGauge.pointers.Tank.prototype.emptyFill;
-anychart.core.linearGauge.pointers.Tank.prototype['hoverEmptyFill'] = anychart.core.linearGauge.pointers.Tank.prototype.hoverEmptyFill;
-anychart.core.linearGauge.pointers.Tank.prototype['selectEmptyFill'] = anychart.core.linearGauge.pointers.Tank.prototype.selectEmptyFill;
-anychart.core.linearGauge.pointers.Tank.prototype['emptyHatchFill'] = anychart.core.linearGauge.pointers.Tank.prototype.emptyHatchFill;
-anychart.core.linearGauge.pointers.Tank.prototype['hoverEmptyHatchFill'] = anychart.core.linearGauge.pointers.Tank.prototype.hoverEmptyHatchFill;
-anychart.core.linearGauge.pointers.Tank.prototype['selectEmptyHatchFill'] = anychart.core.linearGauge.pointers.Tank.prototype.selectEmptyHatchFill;
+(function() {
+  var proto = anychart.core.linearGauge.pointers.Tank.prototype;
+  proto['emptyFill'] = proto.emptyFill;
+  proto['hoverEmptyFill'] = proto.hoverEmptyFill;
+  proto['selectEmptyFill'] = proto.selectEmptyFill;
+  proto['emptyHatchFill'] = proto.emptyHatchFill;
+  proto['hoverEmptyHatchFill'] = proto.hoverEmptyHatchFill;
+  proto['selectEmptyHatchFill'] = proto.selectEmptyHatchFill;
+})();

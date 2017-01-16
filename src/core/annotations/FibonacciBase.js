@@ -497,4 +497,7 @@ anychart.core.annotations.FibonacciBase.prototype.disposeInternal = function() {
 
 
 //export
-anychart.core.annotations.FibonacciBase.prototype['levels'] = anychart.core.annotations.FibonacciBase.prototype.levels;
+(function() {
+  var proto = anychart.core.annotations.FibonacciBase.prototype;
+  proto['levels'] = proto.levels;
+})();

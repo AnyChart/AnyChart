@@ -73,6 +73,8 @@ anychart.core.stock.indicators.RSI.prototype.period = function(opt_value) {
 
 
 //exports
-anychart.core.stock.indicators.RSI.prototype['series'] = anychart.core.stock.indicators.RSI.prototype.series;
-anychart.core.stock.indicators.RSI.prototype['period'] = anychart.core.stock.indicators.RSI.prototype.period;
-
+(function() {
+  var proto = anychart.core.stock.indicators.RSI.prototype;
+  proto['series'] = proto.series;
+  proto['period'] = proto.period;
+})();

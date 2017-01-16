@@ -13,7 +13,7 @@ goog.require('goog.Disposable');
  * @extends {goog.Disposable}
  */
 anychart.data.csv.Parser = function() {
-  goog.base(this);
+  anychart.data.csv.Parser.base(this, 'constructor');
   this.rowsSepLen_ = this.rowsSeparator_.length - 1;
   this.colsSepLen_ = this.colsSeparator_.length - 1;
   this.processBlock_ = goog.bind(this.processBlock_, this);
@@ -612,7 +612,7 @@ anychart.data.csv.Parser.prototype.disposeInternal = function() {
   this.rowsSepPrefixFunc_ = null;
 
   this.colsSepPrefixFunc_ = null;
-  goog.base(this, 'disposeInternal');
+  anychart.data.csv.Parser.base(this, 'disposeInternal');
 };
 
 
@@ -706,9 +706,12 @@ anychart.data.csv.parser = function() {
 
 
 //exports
-goog.exportSymbol('anychart.data.csv.parser', anychart.data.csv.parser);
-anychart.data.csv.Parser.prototype['parse'] = anychart.data.csv.Parser.prototype.parse;
-anychart.data.csv.Parser.prototype['rowsSeparator'] = anychart.data.csv.Parser.prototype.rowsSeparator;
-anychart.data.csv.Parser.prototype['columnsSeparator'] = anychart.data.csv.Parser.prototype.columnsSeparator;
-anychart.data.csv.Parser.prototype['ignoreTrailingSpaces'] = anychart.data.csv.Parser.prototype.ignoreTrailingSpaces;
-anychart.data.csv.Parser.prototype['ignoreFirstRow'] = anychart.data.csv.Parser.prototype.ignoreFirstRow;
+(function() {
+  var proto = anychart.data.csv.Parser.prototype;
+  goog.exportSymbol('anychart.data.csv.parser', anychart.data.csv.parser);
+  proto['parse'] = proto.parse;
+  proto['rowsSeparator'] = proto.rowsSeparator;
+  proto['columnsSeparator'] = proto.columnsSeparator;
+  proto['ignoreTrailingSpaces'] = proto.ignoreTrailingSpaces;
+  proto['ignoreFirstRow'] = proto.ignoreFirstRow;
+})();

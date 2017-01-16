@@ -89,5 +89,8 @@ anychart.core.utils.AxisLabelsContextProvider.prototype.getDataValue = function(
 
 
 //exports
-anychart.core.utils.AxisLabelsContextProvider.prototype['getTokenValue'] = anychart.core.utils.AxisLabelsContextProvider.prototype.getTokenValue;
-anychart.core.utils.AxisLabelsContextProvider.prototype['getTokenType'] = anychart.core.utils.AxisLabelsContextProvider.prototype.getTokenType;
+(function() {
+  var proto = anychart.core.utils.AxisLabelsContextProvider.prototype;
+  proto['getTokenValue'] = proto.getTokenValue;
+  proto['getTokenType'] = proto.getTokenType;
+})();

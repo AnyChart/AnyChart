@@ -412,7 +412,7 @@ anychart.PointState = {
  * @extends {goog.events.EventTarget}
  */
 anychart.core.Base = function() {
-  goog.base(this);
+  anychart.core.Base.base(this, 'constructor');
 };
 goog.inherits(anychart.core.Base, goog.events.EventTarget);
 
@@ -733,7 +733,7 @@ anychart.core.Base.resumeSignalsDispatchingFalse = function(var_args) {
  * @extends {goog.events.Event}
  */
 anychart.SignalEvent = function(target, invalidatedStates) {
-  goog.base(this, anychart.enums.EventType.SIGNAL, target);
+  anychart.SignalEvent.base(this, 'constructor', anychart.enums.EventType.SIGNAL, target);
 
   /**
    * Aspects of the object that were hasSignal.
@@ -829,7 +829,7 @@ anychart.core.Base.prototype.dispatchEvent = function(e) {
   } else if ('type' in e) {
     e.type = String(e.type).toLowerCase();
   }
-  return goog.base(this, 'dispatchEvent', e);
+  return anychart.core.Base.base(this, 'dispatchEvent', e);
 };
 
 
@@ -859,7 +859,7 @@ anychart.core.Base.prototype.dispatchEvent = function(e) {
  * @template SCOPE,EVENTOBJ
  */
 anychart.core.Base.prototype.listen = function(type, listener, opt_useCapture, opt_listenerScope) {
-  return goog.base(this, 'listen', String(type).toLowerCase(), listener, opt_useCapture, opt_listenerScope);
+  return anychart.core.Base.base(this, 'listen', String(type).toLowerCase(), listener, opt_useCapture, opt_listenerScope);
 };
 
 
@@ -890,7 +890,7 @@ anychart.core.Base.prototype.listen = function(type, listener, opt_useCapture, o
  * @template SCOPE,EVENTOBJ
  */
 anychart.core.Base.prototype.listenOnce = function(type, listener, opt_useCapture, opt_listenerScope) {
-  return goog.base(this, 'listenOnce', String(type).toLowerCase(), listener, opt_useCapture, opt_listenerScope);
+  return anychart.core.Base.base(this, 'listenOnce', String(type).toLowerCase(), listener, opt_useCapture, opt_listenerScope);
 };
 
 
@@ -922,7 +922,7 @@ anychart.core.Base.prototype.listenOnce = function(type, listener, opt_useCaptur
  * @template SCOPE,EVENTOBJ
  */
 anychart.core.Base.prototype.unlisten = function(type, listener, opt_useCapture, opt_listenerScope) {
-  return goog.base(this, 'unlisten', String(type).toLowerCase(), listener, opt_useCapture, opt_listenerScope);
+  return anychart.core.Base.base(this, 'unlisten', String(type).toLowerCase(), listener, opt_useCapture, opt_listenerScope);
 };
 
 
@@ -948,7 +948,7 @@ anychart.core.Base.prototype.unlisten = function(type, listener, opt_useCapture,
  * @return {boolean} Whether any listener was removed.
  */
 anychart.core.Base.prototype.unlistenByKey = function(key) {
-  return goog.base(this, 'unlistenByKey', key);
+  return anychart.core.Base.base(this, 'unlistenByKey', key);
 };
 
 
@@ -975,23 +975,27 @@ anychart.core.Base.prototype.unlistenByKey = function(key) {
  */
 anychart.core.Base.prototype.removeAllListeners = function(opt_type) {
   if (goog.isDef(opt_type)) opt_type = String(opt_type).toLowerCase();
-  return goog.base(this, 'removeAllListeners', opt_type);
+  return anychart.core.Base.base(this, 'removeAllListeners', opt_type);
 };
 
 
 //exports
-anychart.core.Base.prototype['listen'] = anychart.core.Base.prototype.listen;//doc|ex
-anychart.core.Base.prototype['listenOnce'] = anychart.core.Base.prototype.listenOnce;//doc|ex
-anychart.core.Base.prototype['unlisten'] = anychart.core.Base.prototype.unlisten;//doc|ex
-anychart.core.Base.prototype['unlistenByKey'] = anychart.core.Base.prototype.unlistenByKey;//doc|ex
-anychart.core.Base.prototype['removeAllListeners'] = anychart.core.Base.prototype.removeAllListeners;//doc|ex
-anychart.core.Base.prototype['dispose'] = anychart.core.Base.prototype.dispose;
-anychart.SignalEvent.prototype['targetNeedsRedraw'] = anychart.SignalEvent.prototype.targetNeedsRedraw;//doc
-anychart.SignalEvent.prototype['targetBoundsChanged'] = anychart.SignalEvent.prototype.targetBoundsChanged;//doc
-anychart.SignalEvent.prototype['targetDataChanged'] = anychart.SignalEvent.prototype.targetDataChanged;//doc
-anychart.SignalEvent.prototype['targetMetaChanged'] = anychart.SignalEvent.prototype.targetMetaChanged;//doc
-anychart.SignalEvent.prototype['targetNeedsReapplication'] = anychart.SignalEvent.prototype.targetNeedsReapplication;//doc
-anychart.SignalEvent.prototype['targetNeedsRecalculation'] = anychart.SignalEvent.prototype.targetNeedsRecalculation;//doc
-goog.exportSymbol('anychart.PointState.NORMAL', anychart.PointState.NORMAL);
-goog.exportSymbol('anychart.PointState.HOVER', anychart.PointState.HOVER);
-goog.exportSymbol('anychart.PointState.SELECT', anychart.PointState.SELECT);
+(function() {
+  var proto = anychart.core.Base.prototype;
+  proto['listen'] = proto.listen;//doc|ex
+  proto['listenOnce'] = proto.listenOnce;//doc|ex
+  proto['unlisten'] = proto.unlisten;//doc|ex
+  proto['unlistenByKey'] = proto.unlistenByKey;//doc|ex
+  proto['removeAllListeners'] = proto.removeAllListeners;//doc|ex
+  proto['dispose'] = proto.dispose;
+  proto = anychart.SignalEvent.prototype;
+  proto['targetNeedsRedraw'] = proto.targetNeedsRedraw;//doc
+  proto['targetBoundsChanged'] = proto.targetBoundsChanged;//doc
+  proto['targetDataChanged'] = proto.targetDataChanged;//doc
+  proto['targetMetaChanged'] = proto.targetMetaChanged;//doc
+  proto['targetNeedsReapplication'] = proto.targetNeedsReapplication;//doc
+  proto['targetNeedsRecalculation'] = proto.targetNeedsRecalculation;//doc
+  goog.exportSymbol('anychart.PointState.NORMAL', anychart.PointState.NORMAL);
+  goog.exportSymbol('anychart.PointState.HOVER', anychart.PointState.HOVER);
+  goog.exportSymbol('anychart.PointState.SELECT', anychart.PointState.SELECT);
+})();

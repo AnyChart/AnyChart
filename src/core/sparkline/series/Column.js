@@ -11,7 +11,7 @@ goog.require('anychart.core.utils.TypedLayer');
  * @extends {anychart.core.sparkline.series.Base}
  */
 anychart.core.sparkline.series.Column = function(chart) {
-  goog.base(this, chart);
+  anychart.core.sparkline.series.Column.base(this, 'constructor', chart);
 };
 goog.inherits(anychart.core.sparkline.series.Column, anychart.core.sparkline.series.Base);
 anychart.core.sparkline.series.Base.SeriesTypesMap[anychart.enums.SparklineSeriesType.COLUMN] = anychart.core.sparkline.series.Column;
@@ -95,7 +95,7 @@ anychart.core.sparkline.series.Column.prototype.getPixelPointWidth = function(op
 
 /** @inheritDoc */
 anychart.core.sparkline.series.Column.prototype.startDrawing = function() {
-  goog.base(this, 'startDrawing');
+  anychart.core.sparkline.series.Column.base(this, 'startDrawing');
 
   /** @type {anychart.scales.Base} */
   var scale = /** @type {anychart.scales.Base} */(this.chart.yScale());
@@ -232,7 +232,7 @@ anychart.core.sparkline.series.Column.prototype.drawSubsequentPoint = function()
 
 /** @inheritDoc */
 anychart.core.sparkline.series.Column.prototype.getDefaults = function() {
-  var settings = goog.base(this, 'getDefaults');
+  var settings = anychart.core.sparkline.series.Column.base(this, 'getDefaults');
 
   if (!settings['markers']) settings['markers'] = {};
   settings['markers']['position'] = anychart.enums.Position.CENTER_TOP;

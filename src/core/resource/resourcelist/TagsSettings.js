@@ -114,5 +114,8 @@ anychart.core.resource.resourceList.TagsSettings.prototype.disposeInternal = fun
 
 
 //exports
-anychart.core.resource.resourceList.TagsSettings.prototype['background'] = anychart.core.resource.resourceList.TagsSettings.prototype.background;
-anychart.core.resource.resourceList.TagsSettings.prototype['padding'] = anychart.core.resource.resourceList.TagsSettings.prototype.padding;
+(function() {
+  var proto = anychart.core.resource.resourceList.TagsSettings.prototype;
+  proto['background'] = proto.background;
+  proto['padding'] = proto.padding;
+})();

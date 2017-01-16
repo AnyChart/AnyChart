@@ -13,7 +13,7 @@ goog.require('anychart.data.TableSelectable');
  * @extends {anychart.core.Base}
  */
 anychart.core.stock.Controller = function() {
-  goog.base(this);
+  anychart.core.stock.Controller.base(this, 'constructor');
 
   /**
    * TableSelectable hash map by mapping GUID.

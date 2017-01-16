@@ -27,7 +27,7 @@ goog.require('anychart.utils');
  * @extends {anychart.core.Base}
  */
 anychart.data.TableMapping = function(table, opt_fields) {
-  goog.base(this);
+  anychart.data.TableMapping.base(this, 'constructor');
 
   /**
    * Table reference.
@@ -198,10 +198,13 @@ anychart.data.TableMapping.prototype.getTable = function() {
 };
 
 
-//anychart.data.TableMapping.prototype['getAggregateColumn'] = anychart.data.TableMapping.prototype.getAggregateColumn;
-//anychart.data.TableMapping.prototype['getSourceColumn'] = anychart.data.TableMapping.prototype.getSourceColumn;
-//anychart.data.TableMapping.prototype['getTable'] = anychart.data.TableMapping.prototype.getTable;
+//proto['getAggregateColumn'] = proto.getAggregateColumn;
+//proto['getSourceColumn'] = proto.getSourceColumn;
+//proto['getTable'] = proto.getTable;
 
 //exports
-anychart.data.TableMapping.prototype['addField'] = anychart.data.TableMapping.prototype.addField;
-anychart.data.TableMapping.prototype['createSelectable'] = anychart.data.TableMapping.prototype.createSelectable;
+(function() {
+  var proto = anychart.data.TableMapping.prototype;
+  proto['addField'] = proto.addField;
+  proto['createSelectable'] = proto.createSelectable;
+})();

@@ -224,5 +224,8 @@ anychart.core.SeparateChart.prototype.setupByJSON = function(config, opt_default
 
 
 //exports
-anychart.core.SeparateChart.prototype['legend'] = anychart.core.SeparateChart.prototype.legend;//doc|ex
-anychart.core.SeparateChart.prototype['interactivity'] = anychart.core.SeparateChart.prototype.interactivity;
+(function() {
+  var proto = anychart.core.SeparateChart.prototype;
+  proto['legend'] = proto.legend;//doc|ex
+  proto['interactivity'] = proto.interactivity;
+})();

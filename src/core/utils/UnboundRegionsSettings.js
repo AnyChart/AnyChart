@@ -136,8 +136,9 @@ anychart.core.utils.UnboundRegionsSettings.prototype.serialize = function() {
 
 
 //exports
-anychart.core.utils.UnboundRegionsSettings.prototype['stroke'] = anychart.core.utils.UnboundRegionsSettings.prototype.stroke;
-anychart.core.utils.UnboundRegionsSettings.prototype['fill'] = anychart.core.utils.UnboundRegionsSettings.prototype.fill;
-anychart.core.utils.UnboundRegionsSettings.prototype['enabled'] = anychart.core.utils.UnboundRegionsSettings.prototype.enabled;
-
-
+(function() {
+  var proto = anychart.core.utils.UnboundRegionsSettings.prototype;
+  proto['stroke'] = proto.stroke;
+  proto['fill'] = proto.fill;
+  proto['enabled'] = proto.enabled;
+})();

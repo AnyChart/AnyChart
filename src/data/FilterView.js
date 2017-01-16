@@ -14,7 +14,7 @@ goog.require('anychart.data.View');
  * @extends {anychart.data.View}
  */
 anychart.data.FilterView = function(parentView, fieldName, func) {
-  goog.base(this, parentView);
+  anychart.data.FilterView.base(this, 'constructor', parentView);
 
   /**
    * Field name to categorize by. Stored for data change events.

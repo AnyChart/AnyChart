@@ -703,12 +703,15 @@ anychart.core.linearGauge.ScaleBar.prototype.disposeInternal = function() {
 //endregion
 
 //exports
-anychart.core.linearGauge.ScaleBar.prototype['from'] = anychart.core.linearGauge.ScaleBar.prototype.from;
-anychart.core.linearGauge.ScaleBar.prototype['to'] = anychart.core.linearGauge.ScaleBar.prototype.to;
-anychart.core.linearGauge.ScaleBar.prototype['width'] = anychart.core.linearGauge.ScaleBar.prototype.width;
-anychart.core.linearGauge.ScaleBar.prototype['offset'] = anychart.core.linearGauge.ScaleBar.prototype.offset;
-anychart.core.linearGauge.ScaleBar.prototype['scale'] = anychart.core.linearGauge.ScaleBar.prototype.scale;
-anychart.core.linearGauge.ScaleBar.prototype['colorScale'] = anychart.core.linearGauge.ScaleBar.prototype.colorScale;
-anychart.core.linearGauge.ScaleBar.prototype['fill'] = anychart.core.linearGauge.ScaleBar.prototype.fill;
-anychart.core.linearGauge.ScaleBar.prototype['stroke'] = anychart.core.linearGauge.ScaleBar.prototype.stroke;
-anychart.core.linearGauge.ScaleBar.prototype['points'] = anychart.core.linearGauge.ScaleBar.prototype.points;
+(function() {
+  var proto = anychart.core.linearGauge.ScaleBar.prototype;
+  proto['from'] = proto.from;
+  proto['to'] = proto.to;
+  proto['width'] = proto.width;
+  proto['offset'] = proto.offset;
+  proto['scale'] = proto.scale;
+  proto['colorScale'] = proto.colorScale;
+  proto['fill'] = proto.fill;
+  proto['stroke'] = proto.stroke;
+  proto['points'] = proto.points;
+})();

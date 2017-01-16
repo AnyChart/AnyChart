@@ -24,7 +24,7 @@ goog.require('goog.array');
  * @implements {anychart.core.settings.IResolvable}
  */
 anychart.core.ui.Background = function() {
-  goog.base(this);
+  anychart.core.ui.Background.base(this, 'constructor');
 
   /**
    * Theme settings.
@@ -869,11 +869,14 @@ anychart.core.ui.Background.prototype.disposeInternal = function() {
 
 
 //exports
-// anychart.core.ui.Background.prototype['fill'] = anychart.core.ui.Background.prototype.fill;//in docs/final
-// anychart.core.ui.Background.prototype['stroke'] = anychart.core.ui.Background.prototype.stroke;//in docs/final
-// anychart.core.ui.Background.prototype['topStroke'] = anychart.core.ui.Background.prototype.topStroke;
-// anychart.core.ui.Background.prototype['rightStroke'] = anychart.core.ui.Background.prototype.rightStroke;
-// anychart.core.ui.Background.prototype['bottomStroke'] = anychart.core.ui.Background.prototype.bottomStroke;
-// anychart.core.ui.Background.prototype['leftStroke'] = anychart.core.ui.Background.prototype.leftStroke;
-// anychart.core.ui.Background.prototype['cornerType'] = anychart.core.ui.Background.prototype.cornerType;//in docs/final
-anychart.core.ui.Background.prototype['corners'] = anychart.core.ui.Background.prototype.corners;//in docs/final
+(function() {
+  var proto = anychart.core.ui.Background.prototype;
+  // proto['fill'] = proto.fill;//in docs/final
+  // proto['stroke'] = proto.stroke;//in docs/final
+  // proto['topStroke'] = proto.topStroke;
+  // proto['rightStroke'] = proto.rightStroke;
+  // proto['bottomStroke'] = proto.bottomStroke;
+  // proto['leftStroke'] = proto.leftStroke;
+  // proto['cornerType'] = proto.cornerType;//in docs/final
+  proto['corners'] = proto.corners;//in docs/final
+})();

@@ -36,7 +36,7 @@ goog.require('anychart.scales.Geo');
 goog.require('anychart.scales.LinearColor');
 goog.require('anychart.scales.OrdinalColor');
 goog.require('goog.dom');
-goog.require('goog.graphics.AffineTransform');
+goog.require('goog.math.AffineTransform');
 goog.require('goog.ui.KeyboardShortcutHandler');
 //endregion
 
@@ -509,7 +509,17 @@ anychart.charts.Map.prototype.minZoomLevel_ = anychart.charts.Map.ZOOM_MIN_FACTO
 
 /**
  * Map transformations object.
- * @type {Object.<string, Object.<{scale: number, src: string, xoffset: number, yoffset: number, heatZone: Object.<{left: number, top: number, width: number, height: number}>}>>}
+ * @type {Object.<string, Object.<{
+ *    scale: number,
+ *    crs: (Object|string|Function),
+ *    srcCrs: (Object|string|Function),
+ *    currProj: anychart.core.map.projections.Base,
+ *    srcProj: anychart.core.map.projections.Base,
+ *    src: string,
+ *    xoffset: number,
+ *    yoffset: number,
+ *    heatZone: Object.<{left: number, top: number, width: number, height: number}>
+ *    }>>}
  */
 anychart.charts.Map.prototype.mapTX = null;
 
@@ -3322,9 +3332,9 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
       scale.setTxMap(this.mapTX);
 
       if (this.mapLayer_) {
-        tx = this.mapLayer_.getSelfTransformation();
-        scale.setMapZoom(tx.getScaleX());
-        scale.setOffsetFocusPoint(tx.getTranslateX(), tx.getTranslateY());
+        var mtx = this.mapLayer_.getSelfTransformation();
+        scale.setMapZoom(mtx.getScaleX());
+        scale.setOffsetFocusPoint(mtx.getTranslateX(), mtx.getTranslateY());
 
         //if (this.zoomLevel() != this.minZoomLevel_) {
         //scene.zoomInc = this.minZoomLevel_;
@@ -3394,11 +3404,15 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
               tx,
               /** @type {number} */(this.crsAnimation_.duration()),
               this != this.getCurrentScene());
-          this.crsMapAnimation.listenOnce(goog.fx.Transition.EventType.END, function(e) {
-            this.crsMapAnimation.stop();
-            this.crsMapAnimation.dispose();
-            tx.curProj = tx.curProj.destProjection;
-          }, true, this);
+          this.crsMapAnimation.listenOnce(goog.fx.Transition.EventType.END,
+              /**
+               * @this {{map: anychart.charts.Map, tx: Object}}
+               */
+              function() {
+                this.map.crsMapAnimation.stop();
+                this.map.crsMapAnimation.dispose();
+                this.tx.curProj = this.tx.curProj.destProjection;
+              }, true, {map: this, tx: /** @type {Object} */(tx)});
           this.crsMapAnimation.play();
 
         } else {
@@ -3661,7 +3675,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
       this.svgRootLayer_.scale(scale.ratio, scale.ratio, 0, 0);
 
       var xy = scale.scaleToPx(0, 0);
-      tx = new goog.graphics.AffineTransform(1, 0, 0, 1, xy[0], xy[1]);
+      tx = new goog.math.AffineTransform(1, 0, 0, 1, xy[0], xy[1]);
 
       tx.concatenate(this.svgRootLayer_.getSelfTransformation());
       this.svgRootLayer_.setTransformationMatrix(tx.getScaleX(), tx.getShearY(), tx.getShearX(), tx.getScaleY(), tx.getTranslateX(), tx.getTranslateY());
@@ -5566,62 +5580,66 @@ anychart.charts.Map.prototype.disposeInternal = function() {
 //endregion
 //region --- Exports
 //exports
-goog.exportSymbol('anychart.charts.Map.DEFAULT_TX', anychart.charts.Map.DEFAULT_TX);
-anychart.charts.Map.prototype['getType'] = anychart.charts.Map.prototype.getType;
-anychart.charts.Map.prototype['geoData'] = anychart.charts.Map.prototype.geoData;
-anychart.charts.Map.prototype['choropleth'] = anychart.charts.Map.prototype.choropleth;
-anychart.charts.Map.prototype['bubble'] = anychart.charts.Map.prototype.bubble;
-anychart.charts.Map.prototype['marker'] = anychart.charts.Map.prototype.marker;
-anychart.charts.Map.prototype['connector'] = anychart.charts.Map.prototype.connector;
-anychart.charts.Map.prototype['unboundRegions'] = anychart.charts.Map.prototype.unboundRegions;
-anychart.charts.Map.prototype['colorRange'] = anychart.charts.Map.prototype.colorRange;
-anychart.charts.Map.prototype['callout'] = anychart.charts.Map.prototype.callout;
-anychart.charts.Map.prototype['palette'] = anychart.charts.Map.prototype.palette;
-anychart.charts.Map.prototype['markerPalette'] = anychart.charts.Map.prototype.markerPalette;
-anychart.charts.Map.prototype['hatchFillPalette'] = anychart.charts.Map.prototype.hatchFillPalette;
-anychart.charts.Map.prototype['getSeries'] = anychart.charts.Map.prototype.getSeries;
-anychart.charts.Map.prototype['allowPointsSelect'] = anychart.charts.Map.prototype.allowPointsSelect;
-anychart.charts.Map.prototype['minBubbleSize'] = anychart.charts.Map.prototype.minBubbleSize;
-anychart.charts.Map.prototype['maxBubbleSize'] = anychart.charts.Map.prototype.maxBubbleSize;
-anychart.charts.Map.prototype['geoIdField'] = anychart.charts.Map.prototype.geoIdField;
-anychart.charts.Map.prototype['defaultSeriesType'] = anychart.charts.Map.prototype.defaultSeriesType;
-anychart.charts.Map.prototype['addSeries'] = anychart.charts.Map.prototype.addSeries;
-anychart.charts.Map.prototype['getSeriesAt'] = anychart.charts.Map.prototype.getSeriesAt;
-anychart.charts.Map.prototype['getSeriesCount'] = anychart.charts.Map.prototype.getSeriesCount;
-anychart.charts.Map.prototype['removeSeries'] = anychart.charts.Map.prototype.removeSeries;
-anychart.charts.Map.prototype['removeSeriesAt'] = anychart.charts.Map.prototype.removeSeriesAt;
-anychart.charts.Map.prototype['removeAllSeries'] = anychart.charts.Map.prototype.removeAllSeries;
-anychart.charts.Map.prototype['getPlotBounds'] = anychart.charts.Map.prototype.getPlotBounds;
-anychart.charts.Map.prototype['overlapMode'] = anychart.charts.Map.prototype.overlapMode;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.charts.Map.prototype;
+  goog.exportSymbol('anychart.charts.Map.DEFAULT_TX', anychart.charts.Map.DEFAULT_TX);
+  proto['getType'] = proto.getType;
+  proto['geoData'] = proto.geoData;
+  proto['choropleth'] = proto.choropleth;
+  proto['bubble'] = proto.bubble;
+  proto['marker'] = proto.marker;
+  proto['connector'] = proto.connector;
+  proto['unboundRegions'] = proto.unboundRegions;
+  proto['colorRange'] = proto.colorRange;
+  proto['callout'] = proto.callout;
+  proto['palette'] = proto.palette;
+  proto['markerPalette'] = proto.markerPalette;
+  proto['hatchFillPalette'] = proto.hatchFillPalette;
+  proto['getSeries'] = proto.getSeries;
+  proto['allowPointsSelect'] = proto.allowPointsSelect;
+  proto['minBubbleSize'] = proto.minBubbleSize;
+  proto['maxBubbleSize'] = proto.maxBubbleSize;
+  proto['geoIdField'] = proto.geoIdField;
+  proto['defaultSeriesType'] = proto.defaultSeriesType;
+  proto['addSeries'] = proto.addSeries;
+  proto['getSeriesAt'] = proto.getSeriesAt;
+  proto['getSeriesCount'] = proto.getSeriesCount;
+  proto['removeSeries'] = proto.removeSeries;
+  proto['removeSeriesAt'] = proto.removeSeriesAt;
+  proto['removeAllSeries'] = proto.removeAllSeries;
+  proto['getPlotBounds'] = proto.getPlotBounds;
+  proto['overlapMode'] = proto.overlapMode;
 
-anychart.charts.Map.prototype['interactivity'] = anychart.charts.Map.prototype.interactivity;
+  proto['interactivity'] = proto.interactivity;
 
-anychart.charts.Map.prototype['axes'] = anychart.charts.Map.prototype.axes;
-anychart.charts.Map.prototype['grids'] = anychart.charts.Map.prototype.grids;
-anychart.charts.Map.prototype['crosshair'] = anychart.charts.Map.prototype.crosshair;
+  proto['axes'] = proto.axes;
+  proto['grids'] = proto.grids;
+  proto['crosshair'] = proto.crosshair;
 
-anychart.charts.Map.prototype['crsAnimation'] = anychart.charts.Map.prototype.crsAnimation;
+  proto['crsAnimation'] = proto.crsAnimation;
 
-anychart.charts.Map.prototype['toGeoJSON'] = anychart.charts.Map.prototype.toGeoJSON;
-anychart.charts.Map.prototype['featureTranslation'] = anychart.charts.Map.prototype.featureTranslation;
-anychart.charts.Map.prototype['translateFeature'] = anychart.charts.Map.prototype.translateFeature;
-anychart.charts.Map.prototype['featureScaleFactor'] = anychart.charts.Map.prototype.featureScaleFactor;
-anychart.charts.Map.prototype['featureCrs'] = anychart.charts.Map.prototype.featureCrs;
-anychart.charts.Map.prototype['crs'] = anychart.charts.Map.prototype.crs;
+  proto['toGeoJSON'] = proto.toGeoJSON;
+  proto['featureTranslation'] = proto.featureTranslation;
+  proto['translateFeature'] = proto.translateFeature;
+  proto['featureScaleFactor'] = proto.featureScaleFactor;
+  proto['featureCrs'] = proto.featureCrs;
+  proto['crs'] = proto.crs;
 
-anychart.charts.Map.prototype['zoom'] = anychart.charts.Map.prototype.zoom;
-anychart.charts.Map.prototype['move'] = anychart.charts.Map.prototype.move;
+  proto['zoom'] = proto.zoom;
+  proto['move'] = proto.move;
 
-anychart.charts.Map.prototype['transform'] = anychart.charts.Map.prototype.transform;
-anychart.charts.Map.prototype['inverseTransform'] = anychart.charts.Map.prototype.inverseTransform;
+  proto['transform'] = proto.transform;
+  proto['inverseTransform'] = proto.inverseTransform;
 
-anychart.charts.Map.prototype['zoomToFeature'] = anychart.charts.Map.prototype.zoomToFeature;
-anychart.charts.Map.prototype['zoomTo'] = anychart.charts.Map.prototype.zoomTo;
-// anychart.charts.Map.prototype['maxZoomLevel'] = anychart.charts.Map.prototype.maxZoomLevel;
-// anychart.charts.Map.prototype['minZoomLevel'] = anychart.charts.Map.prototype.minZoomLevel;
+  proto['zoomToFeature'] = proto.zoomToFeature;
+  proto['zoomTo'] = proto.zoomTo;
+  // proto['maxZoomLevel'] = proto.maxZoomLevel;
+  // proto['minZoomLevel'] = proto.minZoomLevel;
 
-anychart.charts.Map.prototype['drillTo'] = anychart.charts.Map.prototype.drillTo;
-anychart.charts.Map.prototype['drillUp'] = anychart.charts.Map.prototype.drillUp;
-anychart.charts.Map.prototype['drillDownMap'] = anychart.charts.Map.prototype.drillDownMap;
-anychart.charts.Map.prototype['getDrilldownPath'] = anychart.charts.Map.prototype.getDrilldownPath;
+  proto['drillTo'] = proto.drillTo;
+  proto['drillUp'] = proto.drillUp;
+  proto['drillDownMap'] = proto.drillDownMap;
+  proto['getDrilldownPath'] = proto.getDrilldownPath;
+})();
 //endregion

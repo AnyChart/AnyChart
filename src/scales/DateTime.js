@@ -13,7 +13,7 @@ goog.require('anychart.scales.ScatterBase');
  * @extends {anychart.scales.ScatterBase}
  */
 anychart.scales.DateTime = function() {
-  goog.base(this);
+  anychart.scales.DateTime.base(this, 'constructor');
   /**
    * Major ticks for the scale.
    * @type {anychart.scales.DateTimeTicks}
@@ -28,7 +28,7 @@ anychart.scales.DateTime = function() {
    */
   this.minorTicksObj = null;
 
-  goog.base(this);
+  anychart.scales.DateTime.base(this, 'constructor');
 };
 goog.inherits(anychart.scales.DateTime, anychart.scales.ScatterBase);
 
@@ -88,7 +88,7 @@ anychart.scales.DateTime.prototype.minorTicks = function(opt_value) {
 /** @inheritDoc */
 anychart.scales.DateTime.prototype.extendDataRange = function(var_args) {
   for (var i = 0; i < arguments.length; i++) {
-    goog.base(this, 'extendDataRange', anychart.format.parseDateTime(arguments[i]));
+    anychart.scales.DateTime.base(this, 'extendDataRange', anychart.format.parseDateTime(arguments[i]));
   }
   return this;
 };
@@ -96,13 +96,13 @@ anychart.scales.DateTime.prototype.extendDataRange = function(var_args) {
 
 /** @inheritDoc */
 anychart.scales.DateTime.prototype.transform = function(value, opt_subRangeRatio) {
-  return goog.base(this, 'transform', anychart.format.parseDateTime(value), opt_subRangeRatio);
+  return anychart.scales.DateTime.base(this, 'transform', anychart.format.parseDateTime(value), opt_subRangeRatio);
 };
 
 
 /** @inheritDoc */
 anychart.scales.DateTime.prototype.inverseTransform = function(ratio) {
-  return Math.round(goog.base(this, 'inverseTransform', ratio));
+  return Math.round(anychart.scales.DateTime.base(this, 'inverseTransform', ratio));
 };
 
 
@@ -110,7 +110,7 @@ anychart.scales.DateTime.prototype.inverseTransform = function(ratio) {
 anychart.scales.DateTime.prototype.calculate = function() {
   if (this.consistent) return;
 
-  goog.base(this, 'calculate');
+  anychart.scales.DateTime.base(this, 'calculate');
 
   var newRange = this.ticks().setupAsMajor(this.min, this.max, this.minimumModeAuto, this.maximumModeAuto);
   this.minorTicks().setupAsMinor(this.min, this.max, newRange[0], newRange[1]);
@@ -145,7 +145,7 @@ anychart.scales.DateTime.prototype.ticksInvalidated_ = function(event) {
 
 /** @inheritDoc */
 anychart.scales.DateTime.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.scales.DateTime.base(this, 'serialize');
   json['ticks'] = this.ticks().serialize();
   json['minorTicks'] = this.minorTicks().serialize();
   return json;
@@ -154,7 +154,7 @@ anychart.scales.DateTime.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.scales.DateTime.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.scales.DateTime.base(this, 'setupByJSON', config, opt_default);
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
 };
@@ -184,14 +184,17 @@ anychart.scales.dateTime = function() {
 
 
 //exports
-goog.exportSymbol('anychart.scales.dateTime', anychart.scales.dateTime);//doc|ex
-anychart.scales.DateTime.prototype['getType'] = anychart.scales.DateTime.prototype.getType;
-anychart.scales.DateTime.prototype['ticks'] = anychart.scales.DateTime.prototype.ticks;//doc|ex
-anychart.scales.DateTime.prototype['minorTicks'] = anychart.scales.DateTime.prototype.minorTicks;//doc|ex
-anychart.scales.DateTime.prototype['transform'] = anychart.scales.DateTime.prototype.transform;//inherited
-anychart.scales.DateTime.prototype['inverseTransform'] = anychart.scales.DateTime.prototype.inverseTransform;//doc|ex
-anychart.scales.DateTime.prototype['extendDataRange'] = anychart.scales.DateTime.prototype.extendDataRange;//inherited
-anychart.scales.DateTime.prototype['softMinimum'] = anychart.scales.DateTime.prototype.softMinimum;
-anychart.scales.DateTime.prototype['softMaximum'] = anychart.scales.DateTime.prototype.softMaximum;
-anychart.scales.DateTime.prototype['minimumGap'] = anychart.scales.DateTime.prototype.minimumGap;//doc|ex
-anychart.scales.DateTime.prototype['maximumGap'] = anychart.scales.DateTime.prototype.maximumGap;//doc|ex
+(function() {
+  var proto = anychart.scales.DateTime.prototype;
+  goog.exportSymbol('anychart.scales.dateTime', anychart.scales.dateTime);//doc|ex
+  proto['getType'] = proto.getType;
+  proto['ticks'] = proto.ticks;//doc|ex
+  proto['minorTicks'] = proto.minorTicks;//doc|ex
+  proto['transform'] = proto.transform;//inherited
+  proto['inverseTransform'] = proto.inverseTransform;//doc|ex
+  proto['extendDataRange'] = proto.extendDataRange;//inherited
+  proto['softMinimum'] = proto.softMinimum;
+  proto['softMaximum'] = proto.softMaximum;
+  proto['minimumGap'] = proto.minimumGap;//doc|ex
+  proto['maximumGap'] = proto.maximumGap;//doc|ex
+})();

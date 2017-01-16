@@ -52,7 +52,7 @@ anychart.scales.Ordinal = function() {
    */
   this.ticks_ = null;
 
-  goog.base(this);
+  anychart.scales.Ordinal.base(this, 'constructor');
 };
 goog.inherits(anychart.scales.Ordinal, anychart.scales.Base);
 
@@ -348,7 +348,7 @@ anychart.scales.Ordinal.prototype.ticksInvalidated_ = function(event) {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.scales.Ordinal.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.scales.Ordinal.base(this, 'serialize');
   if (!this.autoDomain_)
     json['values'] = this.values();
   if (this.names_)
@@ -360,7 +360,7 @@ anychart.scales.Ordinal.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.scales.Ordinal.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.scales.Ordinal.base(this, 'setupByJSON', config, opt_default);
   this.values(config['values']);
   this.ticks(config['ticks']);
   this.names(config['names']);
@@ -388,11 +388,14 @@ anychart.scales.ordinal = function() {
 
 
 //exports
-goog.exportSymbol('anychart.scales.ordinal', anychart.scales.ordinal);//doc|ex
-anychart.scales.Ordinal.prototype['getType'] = anychart.scales.Ordinal.prototype.getType;
-anychart.scales.Ordinal.prototype['transform'] = anychart.scales.Ordinal.prototype.transform;//doc|ex
-anychart.scales.Ordinal.prototype['inverseTransform'] = anychart.scales.Ordinal.prototype.inverseTransform;//doc|ex
-anychart.scales.Ordinal.prototype['ticks'] = anychart.scales.Ordinal.prototype.ticks;//doc|ex
-anychart.scales.Ordinal.prototype['values'] = anychart.scales.Ordinal.prototype.values;//doc|ex
-anychart.scales.Ordinal.prototype['names'] = anychart.scales.Ordinal.prototype.names;//doc|ex
-anychart.scales.Ordinal.prototype['extendDataRange'] = anychart.scales.Ordinal.prototype.extendDataRange;//doc|need-ex
+(function() {
+  var proto = anychart.scales.Ordinal.prototype;
+  goog.exportSymbol('anychart.scales.ordinal', anychart.scales.ordinal);//doc|ex
+  proto['getType'] = proto.getType;
+  proto['transform'] = proto.transform;//doc|ex
+  proto['inverseTransform'] = proto.inverseTransform;//doc|ex
+  proto['ticks'] = proto.ticks;//doc|ex
+  proto['values'] = proto.values;//doc|ex
+  proto['names'] = proto.names;//doc|ex
+  proto['extendDataRange'] = proto.extendDataRange;//doc|need-ex
+})();

@@ -177,9 +177,12 @@ anychart.core.stock.indicators.MACD.prototype.signalPeriod = function(opt_value)
 
 
 //exports
-anychart.core.stock.indicators.MACD.prototype['macdSeries'] = anychart.core.stock.indicators.MACD.prototype.macdSeries;
-anychart.core.stock.indicators.MACD.prototype['signalSeries'] = anychart.core.stock.indicators.MACD.prototype.signalSeries;
-anychart.core.stock.indicators.MACD.prototype['histogramSeries'] = anychart.core.stock.indicators.MACD.prototype.histogramSeries;
-anychart.core.stock.indicators.MACD.prototype['fastPeriod'] = anychart.core.stock.indicators.MACD.prototype.fastPeriod;
-anychart.core.stock.indicators.MACD.prototype['slowPeriod'] = anychart.core.stock.indicators.MACD.prototype.slowPeriod;
-anychart.core.stock.indicators.MACD.prototype['signalPeriod'] = anychart.core.stock.indicators.MACD.prototype.signalPeriod;
+(function() {
+  var proto = anychart.core.stock.indicators.MACD.prototype;
+  proto['macdSeries'] = proto.macdSeries;
+  proto['signalSeries'] = proto.signalSeries;
+  proto['histogramSeries'] = proto.histogramSeries;
+  proto['fastPeriod'] = proto.fastPeriod;
+  proto['slowPeriod'] = proto.slowPeriod;
+  proto['signalPeriod'] = proto.signalPeriod;
+})();

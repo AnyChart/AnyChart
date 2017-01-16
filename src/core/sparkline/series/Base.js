@@ -27,7 +27,7 @@ anychart.core.sparkline.series.Base = function(chart) {
    * @private
    */
   this.pointProvider_;
-  goog.base(this);
+  anychart.core.sparkline.series.Base.base(this, 'constructor');
 
   /**
    * Chart instance.
@@ -247,7 +247,7 @@ anychart.core.sparkline.series.Base.prototype.remove = function() {
 
   this.chart.labels().container(null);
 
-  goog.base(this, 'remove');
+  anychart.core.sparkline.series.Base.base(this, 'remove');
 };
 
 

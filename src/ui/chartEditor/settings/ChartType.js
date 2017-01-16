@@ -9,7 +9,7 @@ goog.require('goog.ui.Control');
  * @extends {goog.ui.Control}
  */
 anychart.ui.chartEditor.settings.ChartType = function() {
-  goog.base(this);
+  anychart.ui.chartEditor.settings.ChartType.base(this, 'constructor');
 
   this.setSupportedState(goog.ui.Component.State.CHECKED, true);
   this.setAutoStates(goog.ui.Component.State.CHECKED, false);
@@ -23,7 +23,7 @@ anychart.ui.chartEditor.settings.ChartType.CSS_CLASS = goog.getCssName('anychart
 
 /** @inheritDoc */
 anychart.ui.chartEditor.settings.ChartType.prototype.createDom = function() {
-  goog.base(this, 'createDom');
+  anychart.ui.chartEditor.settings.ChartType.base(this, 'createDom');
 
   var element = this.getElement();
   goog.dom.classlist.add(element, goog.ui.INLINE_BLOCK_CLASSNAME);
@@ -37,7 +37,7 @@ anychart.ui.chartEditor.settings.ChartType.prototype.createDom = function() {
 
 /** @inheritDoc */
 anychart.ui.chartEditor.settings.ChartType.prototype.enterDocument = function() {
-  goog.base(this, 'enterDocument');
+  anychart.ui.chartEditor.settings.ChartType.base(this, 'enterDocument');
   goog.events.listen(this, goog.ui.Component.EventType.ACTION, this.onAction_, false, this);
 };
 
@@ -45,7 +45,7 @@ anychart.ui.chartEditor.settings.ChartType.prototype.enterDocument = function() 
 /** @inheritDoc */
 anychart.ui.chartEditor.settings.ChartType.prototype.exitDocument = function() {
   goog.events.listen(this, goog.ui.Component.EventType.ACTION, this.onAction_, false, this);
-  goog.base(this, 'exitDocument');
+  anychart.ui.chartEditor.settings.ChartType.base(this, 'exitDocument');
 };
 
 

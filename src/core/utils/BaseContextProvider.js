@@ -154,5 +154,8 @@ anychart.core.utils.BaseContextProvider.prototype.getTokenType = function(name) 
 
 
 //exports
-anychart.core.utils.BaseContextProvider.prototype['getTokenValue'] = anychart.core.utils.BaseContextProvider.prototype.getTokenValue;
-anychart.core.utils.BaseContextProvider.prototype['getTokenType'] = anychart.core.utils.BaseContextProvider.prototype.getTokenType;
+(function() {
+  var proto = anychart.core.utils.BaseContextProvider.prototype;
+  proto['getTokenValue'] = proto.getTokenValue;
+  proto['getTokenType'] = proto.getTokenType;
+})();

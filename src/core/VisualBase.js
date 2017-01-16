@@ -42,7 +42,7 @@ anychart.core.MouseEvent;
  * @extends {anychart.core.Base}
  */
 anychart.core.VisualBase = function() {
-  goog.base(this);
+  anychart.core.VisualBase.base(this, 'constructor');
 
   /**
    * Handler to manage browser event listeners.
@@ -416,7 +416,7 @@ anychart.core.VisualBase.prototype.resumeSignalsDispatching = function(doDispatc
     this.suspendedDispatching = this.getEnableChangeSignals();
     this.doubleSuspension = false;
   }
-  goog.base(this, 'resumeSignalsDispatching', doDispatch);
+  anychart.core.VisualBase.base(this, 'resumeSignalsDispatching', doDispatch);
   if (doSpecial) {
     this.suspendSignalsDispatching();
     if (realSignals)
@@ -849,7 +849,7 @@ anychart.core.VisualBase.prototype.toSVG = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.VisualBase.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.VisualBase.base(this, 'serialize');
   json['enabled'] = this.enabled();
   if (goog.isDef(this.zIndex_))
     json['zIndex'] = this.zIndex();
@@ -869,7 +869,7 @@ anychart.core.VisualBase.prototype.specialSetupByVal = function(value) {
 
 /** @inheritDoc */
 anychart.core.VisualBase.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.VisualBase.base(this, 'setupByJSON', config, opt_default);
 
   var enabled = config['enabled'];
   this.enabled(goog.isDefAndNotNull(enabled) ? enabled : !goog.isDef(enabled) ? true : undefined);
@@ -888,17 +888,21 @@ anychart.core.VisualBase.prototype.disposeInternal = function() {
     this.container_ = null;
   }
 
-  goog.base(this, 'disposeInternal');
+  anychart.core.VisualBase.base(this, 'disposeInternal');
 };
 
 
 //exports
-anychart.core.VisualBase.prototype['saveAsPNG'] = anychart.core.VisualBase.prototype.saveAsPNG;//deprecated
-anychart.core.VisualBase.prototype['saveAsJPG'] = anychart.core.VisualBase.prototype.saveAsJPG;//deprecated
-anychart.core.VisualBase.prototype['saveAsSVG'] = anychart.core.VisualBase.prototype.saveAsSVG;//deprecated
-anychart.core.VisualBase.prototype['saveAsPDF'] = anychart.core.VisualBase.prototype.saveAsPDF;//deprecated
-anychart.core.VisualBase.prototype['toSVG'] = anychart.core.VisualBase.prototype.toSVG;//deprecated
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.core.VisualBase.prototype;
+  proto['saveAsPNG'] = proto.saveAsPNG;//deprecated
+  proto['saveAsJPG'] = proto.saveAsJPG;//deprecated
+  proto['saveAsSVG'] = proto.saveAsSVG;//deprecated
+  proto['saveAsPDF'] = proto.saveAsPDF;//deprecated
+  proto['toSVG'] = proto.toSVG;//deprecated
 
-anychart.core.VisualBase.prototype['zIndex'] = anychart.core.VisualBase.prototype.zIndex;//in docs/final
-anychart.core.VisualBase.prototype['enabled'] = anychart.core.VisualBase.prototype.enabled;//doc|ex
-anychart.core.VisualBase.prototype['print'] = anychart.core.VisualBase.prototype.print;
+  proto['zIndex'] = proto.zIndex;//in docs/final
+  proto['enabled'] = proto.enabled;//doc|ex
+  proto['print'] = proto.print;
+})();

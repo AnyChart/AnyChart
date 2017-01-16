@@ -9,7 +9,7 @@ goog.require('anychart.ui.chartEditor.select.Base');
  * @extends {anychart.ui.chartEditor.select.Base}
  */
 anychart.ui.chartEditor.settings.MappingSelect = function() {
-  goog.base(this);
+  anychart.ui.chartEditor.settings.MappingSelect.base(this, 'constructor');
 };
 goog.inherits(anychart.ui.chartEditor.settings.MappingSelect, anychart.ui.chartEditor.select.Base);
 

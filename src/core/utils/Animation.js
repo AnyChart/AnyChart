@@ -8,7 +8,7 @@ goog.require('anychart.core.Base');
  * @extends {anychart.core.Base}
  */
 anychart.core.utils.Animation = function() {
-  goog.base(this);
+  anychart.core.utils.Animation.base(this, 'constructor');
 
   /**
    * @type {boolean}
@@ -113,10 +113,8 @@ anychart.core.utils.Animation.prototype.setupSpecial = function(var_args) {
 
 
 //exports
-anychart.core.utils.Animation.prototype['enabled'] = anychart.core.utils.Animation.prototype.enabled;
-anychart.core.utils.Animation.prototype['duration'] = anychart.core.utils.Animation.prototype.duration;
-
-
-
-
-
+(function() {
+  var proto = anychart.core.utils.Animation.prototype;
+  proto['enabled'] = proto.enabled;
+  proto['duration'] = proto.duration;
+})();

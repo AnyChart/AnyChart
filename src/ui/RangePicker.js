@@ -464,12 +464,15 @@ anychart.ui.rangePicker = function() {
 
 
 //exports
-goog.exportSymbol('anychart.ui.rangePicker', anychart.ui.rangePicker);
-anychart.ui.RangePicker.prototype['render'] = anychart.ui.RangePicker.prototype.render;
-anychart.ui.RangePicker.prototype['decorate'] = anychart.ui.RangePicker.prototype.decorate;
-anychart.ui.RangePicker.prototype['target'] = anychart.ui.RangePicker.prototype.target;
-anychart.ui.RangePicker.prototype['format'] = anychart.ui.RangePicker.prototype.format;
-anychart.ui.RangePicker.prototype['dispose'] = anychart.ui.RangePicker.prototype.dispose;
-anychart.ui.RangePicker.prototype['getElement'] = anychart.ui.RangePicker.prototype.getElement;
-anychart.ui.RangePicker.prototype['toLabelText'] = anychart.ui.RangePicker.prototype.toLabelText;
-anychart.ui.RangePicker.prototype['fromLabelText'] = anychart.ui.RangePicker.prototype.fromLabelText;
+(function() {
+  var proto = anychart.ui.RangePicker.prototype;
+  goog.exportSymbol('anychart.ui.rangePicker', anychart.ui.rangePicker);
+  proto['render'] = proto.render;
+  proto['decorate'] = proto.decorate;
+  proto['target'] = proto.target;
+  proto['format'] = proto.format;
+  proto['dispose'] = proto.dispose;
+  proto['getElement'] = proto.getElement;
+  proto['toLabelText'] = proto.toLabelText;
+  proto['fromLabelText'] = proto.fromLabelText;
+})();

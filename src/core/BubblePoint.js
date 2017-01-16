@@ -11,7 +11,7 @@ goog.require('anychart.core.SeriesPoint');
  * @extends {anychart.core.SeriesPoint}
  */
 anychart.core.BubblePoint = function(series, index) {
-  goog.base(this, series, index);
+  anychart.core.BubblePoint.base(this, 'constructor', series, index);
 };
 goog.inherits(anychart.core.BubblePoint, anychart.core.SeriesPoint);
 
@@ -29,4 +29,7 @@ anychart.core.BubblePoint.prototype.getPixelRadius = function() {
 
 
 //exports
-anychart.core.BubblePoint.prototype['getPixelRadius'] = anychart.core.BubblePoint.prototype.getPixelRadius;
+(function() {
+  var proto = anychart.core.BubblePoint.prototype;
+  proto['getPixelRadius'] = proto.getPixelRadius;
+})();

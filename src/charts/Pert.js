@@ -2928,7 +2928,7 @@ anychart.charts.Pert.prototype.disposeInternal = function() {
   goog.disposeAll(this.workPathInteractivityLayer_, this.workLablesInteractivityLayer_,
       this.milestonesLayer_, this.activitiesLayer_, this.labelsLayer_);
 
-  goog.base(this, 'disposeInternal');
+  anychart.charts.Pert.base(this, 'disposeInternal');
 };
 
 
@@ -2953,7 +2953,7 @@ anychart.charts.Pert.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.charts.Pert.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.charts.Pert.base(this, 'setupByJSON', config, opt_default);
 
   this.defaultTooltipSettings_ = anychart.getFullTheme()['defaultTooltip'];
 
@@ -2971,15 +2971,18 @@ anychart.charts.Pert.prototype.setupByJSON = function(config, opt_default) {
 
 
 //exports
-anychart.charts.Pert.prototype['getType'] = anychart.charts.Pert.prototype.getType;
-anychart.charts.Pert.prototype['tasks'] = anychart.charts.Pert.prototype.tasks;
-anychart.charts.Pert.prototype['milestones'] = anychart.charts.Pert.prototype.milestones;
-anychart.charts.Pert.prototype['criticalPath'] = anychart.charts.Pert.prototype.criticalPath;
-anychart.charts.Pert.prototype['data'] = anychart.charts.Pert.prototype.data;
-anychart.charts.Pert.prototype['getType'] = anychart.charts.Pert.prototype.getType;
-anychart.charts.Pert.prototype['expectedTimeCalculator'] = anychart.charts.Pert.prototype.expectedTimeCalculator;
-anychart.charts.Pert.prototype['verticalSpacing'] = anychart.charts.Pert.prototype.verticalSpacing;
-anychart.charts.Pert.prototype['horizontalSpacing'] = anychart.charts.Pert.prototype.horizontalSpacing;
-anychart.charts.Pert.prototype['toCsv'] = anychart.charts.Pert.prototype.toCsv;
+(function() {
+  var proto = anychart.charts.Pert.prototype;
+  proto['getType'] = proto.getType;
+  proto['tasks'] = proto.tasks;
+  proto['milestones'] = proto.milestones;
+  proto['criticalPath'] = proto.criticalPath;
+  proto['data'] = proto.data;
+  proto['getType'] = proto.getType;
+  proto['expectedTimeCalculator'] = proto.expectedTimeCalculator;
+  proto['verticalSpacing'] = proto.verticalSpacing;
+  proto['horizontalSpacing'] = proto.horizontalSpacing;
+  proto['toCsv'] = proto.toCsv;
+})();
 
 

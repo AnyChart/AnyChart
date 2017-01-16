@@ -13,7 +13,7 @@ goog.require('anychart.utils');
  * @extends {anychart.core.VisualBase}
  */
 anychart.core.gauge.Cap = function() {
-  goog.base(this);
+  anychart.core.gauge.Cap.base(this, 'constructor');
 
   /**
    * Cap radius.
@@ -262,7 +262,7 @@ anychart.core.gauge.Cap.prototype.draw = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.gauge.Cap.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.gauge.Cap.base(this, 'serialize');
 
   json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
   json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
@@ -275,7 +275,7 @@ anychart.core.gauge.Cap.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.gauge.Cap.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.gauge.Cap.base(this, 'setupByJSON', config, opt_default);
 
   this.fill(config['fill']);
   this.stroke(config['stroke']);
@@ -285,9 +285,10 @@ anychart.core.gauge.Cap.prototype.setupByJSON = function(config, opt_default) {
 
 
 //exports
-anychart.core.gauge.Cap.prototype['radius'] = anychart.core.gauge.Cap.prototype.radius;
-anychart.core.gauge.Cap.prototype['stroke'] = anychart.core.gauge.Cap.prototype.stroke;
-anychart.core.gauge.Cap.prototype['fill'] = anychart.core.gauge.Cap.prototype.fill;
-anychart.core.gauge.Cap.prototype['hatchFill'] = anychart.core.gauge.Cap.prototype.hatchFill;
-
-
+(function() {
+  var proto = anychart.core.gauge.Cap.prototype;
+  proto['radius'] = proto.radius;
+  proto['stroke'] = proto.stroke;
+  proto['fill'] = proto.fill;
+  proto['hatchFill'] = proto.hatchFill;
+})();

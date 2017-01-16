@@ -13,7 +13,7 @@ goog.require('anychart.core.Point');
  * @extends {anychart.core.Point}
  */
 anychart.core.MapPoint = function(parentMap, currentMap, properties, id) {
-  goog.base(this, parentMap, NaN);
+  anychart.core.MapPoint.base(this, 'constructor', parentMap, NaN);
 
   /**
    * Feature geo id.
@@ -82,8 +82,11 @@ anychart.core.MapPoint.prototype.getParentChart = function() {
 
 
 //exports
-anychart.core.MapPoint.prototype['getId'] = anychart.core.MapPoint.prototype.getId;
-anychart.core.MapPoint.prototype['getProperties'] = anychart.core.MapPoint.prototype.getProperties;
-anychart.core.MapPoint.prototype['getCurrentChart'] = anychart.core.MapPoint.prototype.getCurrentChart;
-anychart.core.MapPoint.prototype['getParentChart'] = anychart.core.MapPoint.prototype.getParentChart;
-anychart.core.MapPoint.prototype['get'] = anychart.core.MapPoint.prototype.get; // dummy
+(function() {
+  var proto = anychart.core.MapPoint.prototype;
+  proto['getId'] = proto.getId;
+  proto['getProperties'] = proto.getProperties;
+  proto['getCurrentChart'] = proto.getCurrentChart;
+  proto['getParentChart'] = proto.getParentChart;
+  proto['get'] = proto.get; // dummy
+})();

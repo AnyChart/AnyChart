@@ -22,7 +22,7 @@ goog.require('anychart.enums');
  * @extends {anychart.core.Base}
  */
 anychart.data.View = function(parentView) {
-  goog.base(this);
+  anychart.data.View.base(this, 'constructor');
 
   /**
    * The parent view to ask data from.
@@ -764,15 +764,18 @@ anychart.data.View.prototype.serialize = function() {
 
 
 //exports
-anychart.data.View.prototype['derive'] = anychart.data.View.prototype.derive;//doc|ex
-anychart.data.View.prototype['filter'] = anychart.data.View.prototype.filter;//doc|ex
-anychart.data.View.prototype['sort'] = anychart.data.View.prototype.sort;//doc|ex
-anychart.data.View.prototype['concat'] = anychart.data.View.prototype.concat;//doc|ex
-anychart.data.View.prototype['row'] = anychart.data.View.prototype.row;//doc|ex
-anychart.data.View.prototype['getRowsCount'] = anychart.data.View.prototype.getRowsCount;//doc|ex
-anychart.data.View.prototype['getIterator'] = anychart.data.View.prototype.getIterator;//doc|ex
-anychart.data.View.prototype['getDataSets'] = anychart.data.View.prototype.getDataSets;//doc|ex
-anychart.data.View.prototype['meta'] = anychart.data.View.prototype.meta;//doc|need-ex
-anychart.data.View.prototype['get'] = anychart.data.View.prototype.get;//doc|ex
-anychart.data.View.prototype['set'] = anychart.data.View.prototype.set;//doc|ex
-anychart.data.View.prototype['find'] = anychart.data.View.prototype.find;//doc|ex
+(function() {
+  var proto = anychart.data.View.prototype;
+  proto['derive'] = proto.derive;//doc|ex
+  proto['filter'] = proto.filter;//doc|ex
+  proto['sort'] = proto.sort;//doc|ex
+  proto['concat'] = proto.concat;//doc|ex
+  proto['row'] = proto.row;//doc|ex
+  proto['getRowsCount'] = proto.getRowsCount;//doc|ex
+  proto['getIterator'] = proto.getIterator;//doc|ex
+  proto['getDataSets'] = proto.getDataSets;//doc|ex
+  proto['meta'] = proto.meta;//doc|need-ex
+  proto['get'] = proto.get;//doc|ex
+  proto['set'] = proto.set;//doc|ex
+  proto['find'] = proto.find;//doc|ex
+})();

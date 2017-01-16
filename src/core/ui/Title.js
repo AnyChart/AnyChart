@@ -8,7 +8,7 @@ goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
-goog.require('goog.graphics.AffineTransform');
+goog.require('goog.math.AffineTransform');
 
 
 
@@ -149,7 +149,7 @@ anychart.core.ui.Title = function() {
 
   /**
    * Title transformation matrix.
-   * @type {goog.graphics.AffineTransform}
+   * @type {goog.math.AffineTransform}
    * @private
    */
   this.transformation_ = null;
@@ -913,7 +913,7 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
     this.text_.height(this.textHeight_);
 
   this.pixelBounds_ = new anychart.math.Rect(-this.backgroundWidth_ / 2, -this.backgroundHeight_ / 2, this.backgroundWidth_, this.backgroundHeight_);
-  var transform = goog.graphics.AffineTransform.getRotateInstance(goog.math.toRadians(this.getRotation()), 0, 0);
+  var transform = goog.math.AffineTransform.getRotateInstance(goog.math.toRadians(this.getRotation()), 0, 0);
   /** @type {!anychart.math.Rect} */
   var bounds = acgraph.math.getBoundsOfRectWithTransform(this.pixelBounds_, transform);
 
@@ -1187,36 +1187,39 @@ anychart.core.ui.Title.prototype.setupByJSON = function(config, opt_default) {
 //endregion
 
 //exports
-anychart.core.ui.Title.prototype['enabled'] = anychart.core.ui.Title.prototype.enabled;
+(function() {
+  var proto = anychart.core.ui.Title.prototype;
+  proto['enabled'] = proto.enabled;
 
-// anychart.core.ui.Title.prototype['fontSize'] = anychart.core.ui.Title.prototype.fontSize;
-// anychart.core.ui.Title.prototype['fontFamily'] = anychart.core.ui.Title.prototype.fontFamily;
-// anychart.core.ui.Title.prototype['fontColor'] = anychart.core.ui.Title.prototype.fontColor;
-// anychart.core.ui.Title.prototype['fontOpacity'] = anychart.core.ui.Title.prototype.fontOpacity;
-// anychart.core.ui.Title.prototype['fontDecoration'] = anychart.core.ui.Title.prototype.fontDecoration;
-// anychart.core.ui.Title.prototype['fontStyle'] = anychart.core.ui.Title.prototype.fontStyle;
-// anychart.core.ui.Title.prototype['fontVariant'] = anychart.core.ui.Title.prototype.fontVariant;
-// anychart.core.ui.Title.prototype['fontWeight'] = anychart.core.ui.Title.prototype.fontWeight;
-// anychart.core.ui.Title.prototype['letterSpacing'] = anychart.core.ui.Title.prototype.letterSpacing;
-// anychart.core.ui.Title.prototype['textDirection'] = anychart.core.ui.Title.prototype.textDirection;
-// anychart.core.ui.Title.prototype['lineHeight'] = anychart.core.ui.Title.prototype.lineHeight;
-// anychart.core.ui.Title.prototype['textIndent'] = anychart.core.ui.Title.prototype.textIndent;
-// anychart.core.ui.Title.prototype['vAlign'] = anychart.core.ui.Title.prototype.vAlign;
-// anychart.core.ui.Title.prototype['hAlign'] = anychart.core.ui.Title.prototype.hAlign;
-// anychart.core.ui.Title.prototype['textWrap'] = anychart.core.ui.Title.prototype.textWrap;
-// anychart.core.ui.Title.prototype['textOverflow'] = anychart.core.ui.Title.prototype.textOverflow;
-// anychart.core.ui.Title.prototype['selectable'] = anychart.core.ui.Title.prototype.selectable;
-// anychart.core.ui.Title.prototype['disablePointerEvents'] = anychart.core.ui.Title.prototype.disablePointerEvents;
-// anychart.core.ui.Title.prototype['useHtml'] = anychart.core.ui.Title.prototype.useHtml;
-anychart.core.ui.Title.prototype['textSettings'] = anychart.core.ui.Title.prototype.textSettings;
+  // proto['fontSize'] = proto.fontSize;
+  // proto['fontFamily'] = proto.fontFamily;
+  // proto['fontColor'] = proto.fontColor;
+  // proto['fontOpacity'] = proto.fontOpacity;
+  // proto['fontDecoration'] = proto.fontDecoration;
+  // proto['fontStyle'] = proto.fontStyle;
+  // proto['fontVariant'] = proto.fontVariant;
+  // proto['fontWeight'] = proto.fontWeight;
+  // proto['letterSpacing'] = proto.letterSpacing;
+  // proto['textDirection'] = proto.textDirection;
+  // proto['lineHeight'] = proto.lineHeight;
+  // proto['textIndent'] = proto.textIndent;
+  // proto['vAlign'] = proto.vAlign;
+  // proto['hAlign'] = proto.hAlign;
+  // proto['textWrap'] = proto.textWrap;
+  // proto['textOverflow'] = proto.textOverflow;
+  // proto['selectable'] = proto.selectable;
+  // proto['disablePointerEvents'] = proto.disablePointerEvents;
+  // proto['useHtml'] = proto.useHtml;
+  proto['textSettings'] = proto.textSettings;
 
-// anychart.core.ui.Title.prototype['text'] = anychart.core.ui.Title.prototype.text;
-anychart.core.ui.Title.prototype['background'] = anychart.core.ui.Title.prototype.background;
-anychart.core.ui.Title.prototype['rotation'] = anychart.core.ui.Title.prototype.rotation;
-anychart.core.ui.Title.prototype['width'] = anychart.core.ui.Title.prototype.width;
-anychart.core.ui.Title.prototype['height'] = anychart.core.ui.Title.prototype.height;
-anychart.core.ui.Title.prototype['margin'] = anychart.core.ui.Title.prototype.margin;
-anychart.core.ui.Title.prototype['padding'] = anychart.core.ui.Title.prototype.padding;
-// anychart.core.ui.Title.prototype['align'] = anychart.core.ui.Title.prototype.align;
-// anychart.core.ui.Title.prototype['orientation'] = anychart.core.ui.Title.prototype.orientation;
-anychart.core.ui.Title.prototype['getRemainingBounds'] = anychart.core.ui.Title.prototype.getRemainingBounds;
+  // proto['text'] = proto.text;
+  proto['background'] = proto.background;
+  proto['rotation'] = proto.rotation;
+  proto['width'] = proto.width;
+  proto['height'] = proto.height;
+  proto['margin'] = proto.margin;
+  proto['padding'] = proto.padding;
+  // proto['align'] = proto.align;
+  // proto['orientation'] = proto.orientation;
+  proto['getRemainingBounds'] = proto.getRemainingBounds;
+})();

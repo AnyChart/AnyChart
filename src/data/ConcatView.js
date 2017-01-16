@@ -14,7 +14,7 @@ goog.require('anychart.enums');
  * @extends {anychart.data.View}
  */
 anychart.data.ConcatView = function(parentView, secondView) {
-  goog.base(this, parentView);
+  anychart.data.ConcatView.base(this, 'constructor', parentView);
 
   /**
    * The second parent view to ask for data from.

@@ -1701,13 +1701,13 @@ anychart.charts.Stock.prototype.disposeInternal = function() {
   delete this.dataController_;
   delete this.defaultAnnotationSettings_;
 
-  goog.base(this, 'disposeInternal');
+  anychart.charts.Stock.base(this, 'disposeInternal');
 };
 
 
 /** @inheritDoc */
 anychart.charts.Stock.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.charts.Stock.base(this, 'serialize');
   json['grouping'] = this.grouping().serialize();
   json['scrollerGrouping'] = this.scrollerGrouping().serialize();
   json['xScale'] = this.xScale().serialize();
@@ -1719,7 +1719,7 @@ anychart.charts.Stock.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.charts.Stock.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.charts.Stock.base(this, 'setupByJSON', config, opt_default);
   var json;
 
   if ('xScale' in config)
@@ -2039,15 +2039,18 @@ anychart.charts.Stock.prototype.toCsv = function(opt_chartDataExportMode, opt_cs
 
 
 //exports
-goog.exportSymbol('anychart.stock', anychart.stock);
-anychart.charts.Stock.prototype['plot'] = anychart.charts.Stock.prototype.plot;
-anychart.charts.Stock.prototype['scroller'] = anychart.charts.Stock.prototype.scroller;
-anychart.charts.Stock.prototype['xScale'] = anychart.charts.Stock.prototype.xScale;
-anychart.charts.Stock.prototype['selectRange'] = anychart.charts.Stock.prototype.selectRange;
-anychart.charts.Stock.prototype['getSelectedRange'] = anychart.charts.Stock.prototype.getSelectedRange;
-anychart.charts.Stock.prototype['getType'] = anychart.charts.Stock.prototype.getType;
-anychart.charts.Stock.prototype['legend'] = anychart.charts.Stock.prototype.legend;
-anychart.charts.Stock.prototype['toCsv'] = anychart.charts.Stock.prototype.toCsv;
-anychart.charts.Stock.prototype['grouping'] = anychart.charts.Stock.prototype.grouping;
-anychart.charts.Stock.prototype['scrollerGrouping'] = anychart.charts.Stock.prototype.scrollerGrouping;
-anychart.charts.Stock.prototype['annotations'] = anychart.charts.Stock.prototype.annotations;
+(function() {
+  var proto = anychart.charts.Stock.prototype;
+  goog.exportSymbol('anychart.stock', anychart.stock);
+  proto['plot'] = proto.plot;
+  proto['scroller'] = proto.scroller;
+  proto['xScale'] = proto.xScale;
+  proto['selectRange'] = proto.selectRange;
+  proto['getSelectedRange'] = proto.getSelectedRange;
+  proto['getType'] = proto.getType;
+  proto['legend'] = proto.legend;
+  proto['toCsv'] = proto.toCsv;
+  proto['grouping'] = proto.grouping;
+  proto['scrollerGrouping'] = proto.scrollerGrouping;
+  proto['annotations'] = proto.annotations;
+})();

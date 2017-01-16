@@ -1,5 +1,5 @@
 goog.provide('anychart.core.ui.LabelBase');
-goog.require('acgraph.math.Coordinate');
+goog.require('acgraph.math');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.Text');
 goog.require('anychart.core.ui.Background');
@@ -7,6 +7,7 @@ goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
+goog.require('goog.math.Coordinate');
 
 
 
@@ -17,7 +18,7 @@ goog.require('anychart.utils');
  * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.ui.LabelBase = function() {
-  goog.base(this);
+  anychart.core.ui.LabelBase.base(this, 'constructor');
 
   /**
    * Label background.
@@ -520,7 +521,7 @@ anychart.core.ui.LabelBase.prototype.disablePointerEvents = function(opt_value) 
     opt_value = !!opt_value;
     if (opt_value != this.disablePointerEvents_) {
       this.disablePointerEvents_ = opt_value;
-      goog.base(this, 'disablePointerEvents', opt_value);
+      anychart.core.ui.LabelBase.base(this, 'disablePointerEvents', opt_value);
       this.background()[anychart.opt.DISABLE_POINTER_EVENTS](opt_value);
     }
     return this;
@@ -794,7 +795,7 @@ anychart.core.ui.LabelBase.prototype.drawLabel = function() {
   var backgroundBounds = new anychart.math.Rect(0, 0, this.backgroundWidth, this.backgroundHeight);
 
   // calculate position
-  var position = new acgraph.math.Coordinate(0, 0);
+  var position = new goog.math.Coordinate(0, 0);
 
   if (this.parentBounds()) {
     switch (this.position_) {
@@ -961,7 +962,7 @@ anychart.core.ui.LabelBase.prototype.applyTextSettings = function(textElement, i
     else
       textElement.text(this.settingsObj['text']);
   }
-  goog.base(this, 'applyTextSettings', textElement, isInitial);
+  anychart.core.ui.LabelBase.base(this, 'applyTextSettings', textElement, isInitial);
   this.changedSettings = {};
 };
 
@@ -1007,7 +1008,7 @@ anychart.core.ui.LabelBase.prototype.getContentBounds = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.ui.LabelBase.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.ui.LabelBase.base(this, 'serialize');
   json['background'] = this.background().serialize();
   json['padding'] = this.padding().serialize();
   if (goog.isDefAndNotNull(this.width_))

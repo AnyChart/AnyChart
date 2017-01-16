@@ -164,5 +164,8 @@ anychart.core.linearGauge.pointers.Thermometer.prototype.serialize = function() 
 //endregion
 
 //exports
-anychart.core.linearGauge.pointers.Thermometer.prototype['bulbRadius'] = anychart.core.linearGauge.pointers.Thermometer.prototype.bulbRadius;
-anychart.core.linearGauge.pointers.Thermometer.prototype['bulbPadding'] = anychart.core.linearGauge.pointers.Thermometer.prototype.bulbPadding;
+(function() {
+  var proto = anychart.core.linearGauge.pointers.Thermometer.prototype;
+  proto['bulbRadius'] = proto.bulbRadius;
+  proto['bulbPadding'] = proto.bulbPadding;
+})();

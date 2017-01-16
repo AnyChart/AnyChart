@@ -338,10 +338,13 @@ anychart.core.annotations.ChartController.prototype.disposeInternal = function()
 
 
 //exports
-anychart.core.annotations.ChartController.prototype['startDrawing'] = anychart.core.annotations.ChartController.prototype.startDrawing;
-anychart.core.annotations.ChartController.prototype['cancelDrawing'] = anychart.core.annotations.ChartController.prototype.cancelDrawing;
-anychart.core.annotations.ChartController.prototype['getSelectedAnnotation'] = anychart.core.annotations.ChartController.prototype.getSelectedAnnotation;
-anychart.core.annotations.ChartController.prototype['removeAnnotation'] = anychart.core.annotations.ChartController.prototype.removeAnnotation;
-anychart.core.annotations.ChartController.prototype['removeAllAnnotations'] = anychart.core.annotations.ChartController.prototype.removeAllAnnotations;
-anychart.core.annotations.ChartController.prototype['select'] = anychart.core.annotations.ChartController.prototype.select;
-anychart.core.annotations.ChartController.prototype['unselect'] = anychart.core.annotations.ChartController.prototype.unselect;
+(function() {
+  var proto = anychart.core.annotations.ChartController.prototype;
+  proto['startDrawing'] = proto.startDrawing;
+  proto['cancelDrawing'] = proto.cancelDrawing;
+  proto['getSelectedAnnotation'] = proto.getSelectedAnnotation;
+  proto['removeAnnotation'] = proto.removeAnnotation;
+  proto['removeAllAnnotations'] = proto.removeAllAnnotations;
+  proto['select'] = proto.select;
+  proto['unselect'] = proto.unselect;
+})();

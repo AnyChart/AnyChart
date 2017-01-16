@@ -11,7 +11,7 @@ goog.require('anychart.utils');
  * @extends {anychart.data.aggregators.Base}
  */
 anychart.data.aggregators.Average = function(valuesColumn) {
-  goog.base(this, valuesColumn);
+  anychart.data.aggregators.Average.base(this, 'constructor', valuesColumn);
 };
 goog.inherits(anychart.data.aggregators.Average, anychart.data.aggregators.Base);
 

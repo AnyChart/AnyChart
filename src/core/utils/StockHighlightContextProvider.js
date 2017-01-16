@@ -33,4 +33,7 @@ anychart.core.utils.StockHighlightContextProvider.prototype.getDataValue = funct
 
 
 //exports
-anychart.core.utils.StockHighlightContextProvider.prototype['getDataValue'] = anychart.core.utils.StockHighlightContextProvider.prototype.getDataValue;
+(function() {
+  var proto = anychart.core.utils.StockHighlightContextProvider.prototype;
+  proto['getDataValue'] = proto.getDataValue;
+})();

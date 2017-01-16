@@ -21,7 +21,7 @@ goog.require('goog.math');
  * @extends {anychart.core.Base}
  */
 anychart.core.gantt.Controller = function(opt_isResources) {
-  goog.base(this);
+  anychart.core.gantt.Controller.base(this, 'constructor');
 
   /**
    * Resource chart works with resources.
@@ -1142,7 +1142,7 @@ anychart.core.gantt.Controller.prototype.collapseAll = function() {
 
 /** @inheritDoc */
 anychart.core.gantt.Controller.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.gantt.Controller.base(this, 'serialize');
 
   json['isResourceChart'] = this.isResources_;
   json['treeData'] = this.data().serialize();
@@ -1158,7 +1158,7 @@ anychart.core.gantt.Controller.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.gantt.Controller.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.gantt.Controller.base(this, 'setupByJSON', config, opt_default);
 
   this.isResources_ = config['isResourceChart']; //Direct setup. I don't want to believe that it is kind of hack.
   if ('treeData' in config) this.data(anychart.data.Tree.fromJson(config['treeData']));

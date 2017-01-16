@@ -12,7 +12,7 @@ goog.require('anychart.utils');
  * @extends {anychart.core.gauge.pointers.Base}
  */
 anychart.core.gauge.pointers.Bar = function() {
-  goog.base(this);
+  anychart.core.gauge.pointers.Bar.base(this, 'constructor');
 
   /**
    * Pointer width.
@@ -245,7 +245,7 @@ anychart.core.gauge.pointers.Bar.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
-  goog.base(this, 'draw');
+  anychart.core.gauge.pointers.Bar.base(this, 'draw');
 
   return this;
 };
@@ -256,7 +256,7 @@ anychart.core.gauge.pointers.Bar.prototype.draw = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.gauge.pointers.Bar.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.gauge.pointers.Bar.base(this, 'serialize');
 
   json['position'] = this.position();
   if (goog.isDef(this.width())) json['width'] = this.width();
@@ -268,7 +268,7 @@ anychart.core.gauge.pointers.Bar.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.gauge.pointers.Bar.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.gauge.pointers.Bar.base(this, 'setupByJSON', config, opt_default);
 
   this.position(config['position']);
   this.width(config['width']);
@@ -277,6 +277,9 @@ anychart.core.gauge.pointers.Bar.prototype.setupByJSON = function(config, opt_de
 
 
 //exports
-anychart.core.gauge.pointers.Bar.prototype['width'] = anychart.core.gauge.pointers.Bar.prototype.width;
-anychart.core.gauge.pointers.Bar.prototype['position'] = anychart.core.gauge.pointers.Bar.prototype.position;
-anychart.core.gauge.pointers.Bar.prototype['radius'] = anychart.core.gauge.pointers.Bar.prototype.radius;
+(function() {
+  var proto = anychart.core.gauge.pointers.Bar.prototype;
+  proto['width'] = proto.width;
+  proto['position'] = proto.position;
+  proto['radius'] = proto.radius;
+})();

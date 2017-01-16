@@ -10,7 +10,7 @@ goog.require('anychart.core.utils.Interactivity');
  * @extends {anychart.core.utils.Interactivity}
  */
 anychart.core.utils.MapInteractivity = function(parent) {
-  goog.base(this, parent);
+  anychart.core.utils.MapInteractivity.base(this, 'constructor', parent);
 
   /**
    * @type {boolean}
@@ -175,10 +175,14 @@ anychart.core.utils.MapInteractivity.prototype.serialize = function() {
 //endregion
 //region --- Export
 //exports
-anychart.core.utils.MapInteractivity.prototype['mouseWheel'] = anychart.core.utils.MapInteractivity.prototype.mouseWheel;               //deprecated
-anychart.core.utils.MapInteractivity.prototype['zoomOnMouseWheel'] = anychart.core.utils.MapInteractivity.prototype.zoomOnMouseWheel;
-anychart.core.utils.MapInteractivity.prototype['keyboardZoomAndMove'] = anychart.core.utils.MapInteractivity.prototype.keyboardZoomAndMove;
-anychart.core.utils.MapInteractivity.prototype['zoomOnDoubleClick'] = anychart.core.utils.MapInteractivity.prototype.zoomOnDoubleClick;
-anychart.core.utils.MapInteractivity.prototype['drag'] = anychart.core.utils.MapInteractivity.prototype.drag;
-anychart.core.utils.MapInteractivity.prototype['copyFormatter'] = anychart.core.utils.MapInteractivity.prototype.copyFormatter;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.core.utils.MapInteractivity.prototype;
+  proto['mouseWheel'] = proto.mouseWheel;               //deprecated
+  proto['zoomOnMouseWheel'] = proto.zoomOnMouseWheel;
+  proto['keyboardZoomAndMove'] = proto.keyboardZoomAndMove;
+  proto['zoomOnDoubleClick'] = proto.zoomOnDoubleClick;
+  proto['drag'] = proto.drag;
+  proto['copyFormatter'] = proto.copyFormatter;
+})();
 //endregion

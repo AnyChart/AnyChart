@@ -14,7 +14,7 @@ goog.require('anychart.core.utils.TypedLayer');
  * @extends {anychart.core.map.series.BaseWithMarkers}
  */
 anychart.core.map.series.DiscreteBase = function(opt_data, opt_csvSettings) {
-  goog.base(this, opt_data, opt_csvSettings);
+  anychart.core.map.series.DiscreteBase.base(this, 'constructor', opt_data, opt_csvSettings);
   this.markers().position(anychart.enums.Position.CENTER_TOP);
   this.labels().position(anychart.enums.Position.CENTER_TOP);
 
@@ -56,7 +56,7 @@ anychart.core.map.series.DiscreteBase.prototype.rootTypedLayerInitializer = func
 
 /** @inheritDoc */
 anychart.core.map.series.DiscreteBase.prototype.startDrawing = function() {
-  goog.base(this, 'startDrawing');
+  anychart.core.map.series.DiscreteBase.base(this, 'startDrawing');
 
   if (this.isConsistent() || !this.enabled()) return;
 

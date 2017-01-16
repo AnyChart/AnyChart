@@ -1,8 +1,9 @@
 goog.provide('anychart.core.ui.CircularLabel');
-goog.require('acgraph.math.Coordinate');
+goog.require('acgraph.math');
 goog.require('anychart.core.ui.Label');
 goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
+goog.require('goog.math.Coordinate');
 
 
 
@@ -12,7 +13,7 @@ goog.require('anychart.utils');
  * @extends {anychart.core.ui.Label}
  */
 anychart.core.ui.CircularLabel = function() {
-  goog.base(this);
+  anychart.core.ui.CircularLabel.base(this, 'constructor');
 
   /**
    * X coord of circular center.
@@ -161,7 +162,7 @@ anychart.core.ui.CircularLabel.prototype.drawLabel = function() {
   var backgroundBounds = new anychart.math.Rect(0, 0, this.backgroundWidth, this.backgroundHeight);
 
   // calculate position
-  var position = new acgraph.math.Coordinate(0, 0);
+  var position = new goog.math.Coordinate(0, 0);
 
   if (this.parentBounds() || (!isNaN(this.cx_) && !isNaN(this.cy_))) {
     var offsetX = /** @type {number|string} */(this.offsetX());

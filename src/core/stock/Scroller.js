@@ -25,7 +25,7 @@ goog.require('anychart.scales.StockScatterDateTime');
  * @implements {anychart.core.stock.IKeyIndexTransformer}
  */
 anychart.core.stock.Scroller = function(chart) {
-  goog.base(this);
+  anychart.core.stock.Scroller.base(this, 'constructor');
 
   /**
    * Stock chart reference.
@@ -1155,7 +1155,7 @@ anychart.core.stock.Scroller.prototype.setRangeByValues = function(start, end) {
 
 /** @inheritDoc */
 anychart.core.stock.Scroller.prototype.updateBoundsCache = function() {
-  goog.base(this, 'updateBoundsCache');
+  anychart.core.stock.Scroller.base(this, 'updateBoundsCache');
   this.invalidateScaleDependend();
 };
 
@@ -1288,7 +1288,7 @@ anychart.core.stock.Scroller.prototype.invalidateScaleDependend = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.stock.Scroller.prototype.draw = function() {
-  goog.base(this, 'draw');
+  anychart.core.stock.Scroller.base(this, 'draw');
 
   if (!this.checkDrawingNeeded())
     return this;
@@ -1410,13 +1410,13 @@ anychart.core.stock.Scroller.prototype.disposeInternal = function() {
 
   delete this.chart_;
 
-  goog.base(this, 'disposeInternal');
+  anychart.core.stock.Scroller.base(this, 'disposeInternal');
 };
 
 
 /** @inheritDoc */
 anychart.core.stock.Scroller.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.stock.Scroller.base(this, 'serialize');
 
   json['defaultSeriesType'] = this.defaultSeriesType();
 
@@ -1426,7 +1426,7 @@ anychart.core.stock.Scroller.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.stock.Scroller.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.stock.Scroller.base(this, 'setupByJSON', config, opt_default);
 
   var i, json, scale;
 
@@ -1500,40 +1500,43 @@ anychart.core.stock.Scroller.prototype.setupByJSON = function(config, opt_defaul
 
 
 //exports
-anychart.core.stock.Scroller.prototype['area'] = anychart.core.stock.Scroller.prototype.area;
-anychart.core.stock.Scroller.prototype['candlestick'] = anychart.core.stock.Scroller.prototype.candlestick;
-anychart.core.stock.Scroller.prototype['column'] = anychart.core.stock.Scroller.prototype.column;
-anychart.core.stock.Scroller.prototype['stick'] = anychart.core.stock.Scroller.prototype.stick;
-anychart.core.stock.Scroller.prototype['jumpLine'] = anychart.core.stock.Scroller.prototype.jumpLine;
-anychart.core.stock.Scroller.prototype['line'] = anychart.core.stock.Scroller.prototype.line;
-anychart.core.stock.Scroller.prototype['marker'] = anychart.core.stock.Scroller.prototype.marker;
-anychart.core.stock.Scroller.prototype['ohlc'] = anychart.core.stock.Scroller.prototype.ohlc;
-anychart.core.stock.Scroller.prototype['rangeArea'] = anychart.core.stock.Scroller.prototype.rangeArea;
-anychart.core.stock.Scroller.prototype['rangeColumn'] = anychart.core.stock.Scroller.prototype.rangeColumn;
-anychart.core.stock.Scroller.prototype['rangeSplineArea'] = anychart.core.stock.Scroller.prototype.rangeSplineArea;
-anychart.core.stock.Scroller.prototype['rangeStepArea'] = anychart.core.stock.Scroller.prototype.rangeStepArea;
-anychart.core.stock.Scroller.prototype['spline'] = anychart.core.stock.Scroller.prototype.spline;
-anychart.core.stock.Scroller.prototype['splineArea'] = anychart.core.stock.Scroller.prototype.splineArea;
-anychart.core.stock.Scroller.prototype['stepArea'] = anychart.core.stock.Scroller.prototype.stepArea;
-anychart.core.stock.Scroller.prototype['stepLine'] = anychart.core.stock.Scroller.prototype.stepLine;
-anychart.core.stock.Scroller.prototype['getSeries'] = anychart.core.stock.Scroller.prototype.getSeries;
-anychart.core.stock.Scroller.prototype['yScale'] = anychart.core.stock.Scroller.prototype.yScale;
-anychart.core.stock.Scroller.prototype['xAxis'] = anychart.core.stock.Scroller.prototype.xAxis;
-anychart.core.stock.Scroller.prototype['defaultSeriesType'] = anychart.core.stock.Scroller.prototype.defaultSeriesType;
-anychart.core.stock.Scroller.prototype['addSeries'] = anychart.core.stock.Scroller.prototype.addSeries;
-anychart.core.stock.Scroller.prototype['getSeriesAt'] = anychart.core.stock.Scroller.prototype.getSeriesAt;
-anychart.core.stock.Scroller.prototype['getSeriesCount'] = anychart.core.stock.Scroller.prototype.getSeriesCount;
-anychart.core.stock.Scroller.prototype['removeSeries'] = anychart.core.stock.Scroller.prototype.removeSeries;
-anychart.core.stock.Scroller.prototype['removeSeriesAt'] = anychart.core.stock.Scroller.prototype.removeSeriesAt;
-anychart.core.stock.Scroller.prototype['removeAllSeries'] = anychart.core.stock.Scroller.prototype.removeAllSeries;
-anychart.core.stock.Scroller.prototype['ama'] = anychart.core.stock.Scroller.prototype.ama;
-anychart.core.stock.Scroller.prototype['aroon'] = anychart.core.stock.Scroller.prototype.aroon;
-anychart.core.stock.Scroller.prototype['bbands'] = anychart.core.stock.Scroller.prototype.bbands;
-anychart.core.stock.Scroller.prototype['bbandsB'] = anychart.core.stock.Scroller.prototype.bbandsB;
-anychart.core.stock.Scroller.prototype['bbandsWidth'] = anychart.core.stock.Scroller.prototype.bbandsWidth;
-anychart.core.stock.Scroller.prototype['ema'] = anychart.core.stock.Scroller.prototype.ema;
-anychart.core.stock.Scroller.prototype['macd'] = anychart.core.stock.Scroller.prototype.macd;
-anychart.core.stock.Scroller.prototype['mma'] = anychart.core.stock.Scroller.prototype.mma;
-anychart.core.stock.Scroller.prototype['roc'] = anychart.core.stock.Scroller.prototype.roc;
-anychart.core.stock.Scroller.prototype['rsi'] = anychart.core.stock.Scroller.prototype.rsi;
-anychart.core.stock.Scroller.prototype['sma'] = anychart.core.stock.Scroller.prototype.sma;
+(function() {
+  var proto = anychart.core.stock.Scroller.prototype;
+  proto['area'] = proto.area;
+  proto['candlestick'] = proto.candlestick;
+  proto['column'] = proto.column;
+  proto['stick'] = proto.stick;
+  proto['jumpLine'] = proto.jumpLine;
+  proto['line'] = proto.line;
+  proto['marker'] = proto.marker;
+  proto['ohlc'] = proto.ohlc;
+  proto['rangeArea'] = proto.rangeArea;
+  proto['rangeColumn'] = proto.rangeColumn;
+  proto['rangeSplineArea'] = proto.rangeSplineArea;
+  proto['rangeStepArea'] = proto.rangeStepArea;
+  proto['spline'] = proto.spline;
+  proto['splineArea'] = proto.splineArea;
+  proto['stepArea'] = proto.stepArea;
+  proto['stepLine'] = proto.stepLine;
+  proto['getSeries'] = proto.getSeries;
+  proto['yScale'] = proto.yScale;
+  proto['xAxis'] = proto.xAxis;
+  proto['defaultSeriesType'] = proto.defaultSeriesType;
+  proto['addSeries'] = proto.addSeries;
+  proto['getSeriesAt'] = proto.getSeriesAt;
+  proto['getSeriesCount'] = proto.getSeriesCount;
+  proto['removeSeries'] = proto.removeSeries;
+  proto['removeSeriesAt'] = proto.removeSeriesAt;
+  proto['removeAllSeries'] = proto.removeAllSeries;
+  proto['ama'] = proto.ama;
+  proto['aroon'] = proto.aroon;
+  proto['bbands'] = proto.bbands;
+  proto['bbandsB'] = proto.bbandsB;
+  proto['bbandsWidth'] = proto.bbandsWidth;
+  proto['ema'] = proto.ema;
+  proto['macd'] = proto.macd;
+  proto['mma'] = proto.mma;
+  proto['roc'] = proto.roc;
+  proto['rsi'] = proto.rsi;
+  proto['sma'] = proto.sma;
+})();

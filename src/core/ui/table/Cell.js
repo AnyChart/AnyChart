@@ -15,7 +15,7 @@ goog.require('anychart.utils');
  * @extends {anychart.core.ui.table.Base}
  */
 anychart.core.ui.table.Cell = function(table, row, col) {
-  goog.base(this, table);
+  anychart.core.ui.table.Cell.base(this, 'constructor', table);
 
   this.reset(row, col);
 };
@@ -227,18 +227,21 @@ anychart.core.ui.table.Cell.prototype.padding = function(opt_spaceOrTopOrTopAndB
 anychart.core.ui.table.Cell.prototype.disposeInternal = function() {
   if (goog.isNumber(this.content_) || goog.isString(this.content_))
     goog.dispose(this.realContent);
-  goog.base(this, 'disposeInternal');
+  anychart.core.ui.table.Cell.base(this, 'disposeInternal');
 };
 
 
 //exports
-anychart.core.ui.table.Cell.prototype['content'] = anychart.core.ui.table.Cell.prototype.content;//doc|ex|need-tr
-anychart.core.ui.table.Cell.prototype['rowSpan'] = anychart.core.ui.table.Cell.prototype.rowSpan;//doc|ex
-anychart.core.ui.table.Cell.prototype['colSpan'] = anychart.core.ui.table.Cell.prototype.colSpan;//doc|ex
-anychart.core.ui.table.Cell.prototype['padding'] = anychart.core.ui.table.Cell.prototype.padding;//doc|ex
-anychart.core.ui.table.Cell.prototype['getBounds'] = anychart.core.ui.table.Cell.prototype.getBounds;//doc|ex
-anychart.core.ui.table.Cell.prototype['getRowNum'] = anychart.core.ui.table.Cell.prototype.getRowNum;//doc
-anychart.core.ui.table.Cell.prototype['getColNum'] = anychart.core.ui.table.Cell.prototype.getColNum;//doc
-anychart.core.ui.table.Cell.prototype['getRow'] = anychart.core.ui.table.Cell.prototype.getRow;
-anychart.core.ui.table.Cell.prototype['getCol'] = anychart.core.ui.table.Cell.prototype.getCol;
-anychart.core.ui.table.Cell.prototype['fill'] = anychart.core.ui.table.Cell.prototype.fill;
+(function() {
+  var proto = anychart.core.ui.table.Cell.prototype;
+  proto['content'] = proto.content;//doc|ex|need-tr
+  proto['rowSpan'] = proto.rowSpan;//doc|ex
+  proto['colSpan'] = proto.colSpan;//doc|ex
+  proto['padding'] = proto.padding;//doc|ex
+  proto['getBounds'] = proto.getBounds;//doc|ex
+  proto['getRowNum'] = proto.getRowNum;//doc
+  proto['getColNum'] = proto.getColNum;//doc
+  proto['getRow'] = proto.getRow;
+  proto['getCol'] = proto.getCol;
+  proto['fill'] = proto.fill;
+})();

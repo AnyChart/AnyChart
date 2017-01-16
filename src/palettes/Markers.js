@@ -11,7 +11,7 @@ goog.require('goog.array');
  * @extends {anychart.core.Base}
  */
 anychart.palettes.Markers = function() {
-  goog.base(this);
+  anychart.palettes.Markers.base(this, 'constructor');
 
   /**
    * Marker palette.
@@ -126,7 +126,7 @@ anychart.palettes.Markers.prototype.items = function(opt_items, var_args) {
  * @inheritDoc
  */
 anychart.palettes.Markers.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.palettes.Markers.base(this, 'serialize');
   json['items'] = this.items();
   return json;
 };
@@ -151,7 +151,7 @@ anychart.palettes.Markers.prototype.setupSpecial = function(var_args) {
  * @inheritDoc
  */
 anychart.palettes.Markers.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.palettes.Markers.base(this, 'setupByJSON', config, opt_default);
   this.items(config['items']);
 };
 
@@ -172,8 +172,12 @@ anychart.palettes.markers = function(opt_value, var_args) {
 
 
 //exports
-goog.exportSymbol('anychart.palettes.markers', anychart.palettes.markers);
-anychart.palettes.Markers.prototype['markerAt'] = anychart.palettes.Markers.prototype.markerAt;
-anychart.palettes.Markers.prototype['itemAt'] = anychart.palettes.Markers.prototype.itemAt;
-anychart.palettes.Markers.prototype['markers'] = anychart.palettes.Markers.prototype.markers;
-anychart.palettes.Markers.prototype['items'] = anychart.palettes.Markers.prototype.items;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.palettes.Markers.prototype;
+  goog.exportSymbol('anychart.palettes.markers', anychart.palettes.markers);
+  proto['markerAt'] = proto.markerAt;
+  proto['itemAt'] = proto.itemAt;
+  proto['markers'] = proto.markers;
+  proto['items'] = proto.items;
+})();

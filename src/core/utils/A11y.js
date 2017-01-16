@@ -372,10 +372,14 @@ anychart.core.utils.SeriesA11y.prototype.disposeInternal = function() {
 
 
 //exports
-anychart.core.utils.ChartA11y.prototype['enabled'] = anychart.core.utils.ChartA11y.prototype.enabled;
-anychart.core.utils.ChartA11y.prototype['titleFormatter'] = anychart.core.utils.ChartA11y.prototype.titleFormatter;
-anychart.core.utils.ChartA11y.prototype['mode'] = anychart.core.utils.ChartA11y.prototype.mode;
+(function() {
+  var proto = anychart.core.utils.ChartA11y.prototype;
+  proto['enabled'] = proto.enabled;
+  proto['titleFormatter'] = proto.titleFormatter;
+  proto['mode'] = proto.mode;
 
-anychart.core.utils.SeriesA11y.prototype['enabled'] = anychart.core.utils.SeriesA11y.prototype.enabled;
-anychart.core.utils.SeriesA11y.prototype['titleFormatter'] = anychart.core.utils.SeriesA11y.prototype.titleFormatter;
+  proto = anychart.core.utils.SeriesA11y.prototype;
+  proto['enabled'] = proto.enabled;
+  proto['titleFormatter'] = proto.titleFormatter;
+})();
 

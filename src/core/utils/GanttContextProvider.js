@@ -93,6 +93,9 @@ anychart.core.utils.GanttContextProvider.prototype.getMetaValue = function(key) 
 };
 
 //exports
-anychart.core.utils.GanttContextProvider.prototype['getDataValue'] = anychart.core.utils.GanttContextProvider.prototype.getDataValue;
-anychart.core.utils.GanttContextProvider.prototype['getStat'] = anychart.core.utils.GanttContextProvider.prototype.getStat;
-anychart.core.utils.GanttContextProvider.prototype['getMetaValue'] = anychart.core.utils.GanttContextProvider.prototype.getMetaValue;
+(function() {
+  var proto = anychart.core.utils.GanttContextProvider.prototype;
+  proto['getDataValue'] = proto.getDataValue;
+  proto['getStat'] = proto.getStat;
+  proto['getMetaValue'] = proto.getMetaValue;
+})();

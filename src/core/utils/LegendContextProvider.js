@@ -50,7 +50,10 @@ anychart.core.utils.LegendContextProvider.prototype.getTokenType = function(name
 
 
 //exports
-anychart.core.utils.LegendContextProvider.prototype['getStat'] = anychart.core.utils.LegendContextProvider.prototype.getStat;
-anychart.core.utils.LegendContextProvider.prototype['getMeta'] = anychart.core.utils.LegendContextProvider.prototype.getMeta;
-anychart.core.utils.LegendContextProvider.prototype['getTokenType'] = anychart.core.utils.LegendContextProvider.prototype.getTokenType;
-anychart.core.utils.LegendContextProvider.prototype['getTokenValue'] = anychart.core.utils.LegendContextProvider.prototype.getTokenValue;
+(function() {
+  var proto = anychart.core.utils.LegendContextProvider.prototype;
+  proto['getStat'] = proto.getStat;
+  proto['getMeta'] = proto.getMeta;
+  proto['getTokenType'] = proto.getTokenType;
+  proto['getTokenValue'] = proto.getTokenValue;
+})();

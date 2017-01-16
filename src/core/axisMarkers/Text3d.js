@@ -16,7 +16,7 @@ goog.inherits(anychart.core.axisMarkers.Text3d, anychart.core.axisMarkers.Text);
 
 /** @inheritDoc */
 anychart.core.axisMarkers.Text3d.prototype.parentBounds = function(opt_boundsOrLeft, opt_top, opt_width, opt_height) {
-  var parentBounds = goog.base(this, 'parentBounds', opt_boundsOrLeft, opt_top, opt_width, opt_height);
+  var parentBounds = anychart.core.axisMarkers.Text3d.base(this, 'parentBounds', opt_boundsOrLeft, opt_top, opt_width, opt_height);
 
   if (!goog.isDef(opt_boundsOrLeft)) {
     var x3dShift = this.getChart().x3dShift;

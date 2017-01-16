@@ -16,7 +16,7 @@ goog.require('anychart.animations.MapAnimation');
  * @extends {anychart.animations.MapAnimation}
  */
 anychart.animations.MapCrsAnimation = function(map, geoData, srcProjection, tx, duration, opt_silentMode, opt_acc) {
-  goog.base(this, map, [], [], duration, opt_silentMode, opt_acc);
+  anychart.animations.MapCrsAnimation.base(this, 'constructor', map, [], [], duration, opt_silentMode, opt_acc);
 
   /**
    * Map geo data.

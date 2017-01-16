@@ -11,7 +11,7 @@ goog.require('anychart.core.Point');
  * @extends {anychart.core.Point}
  */
 anychart.core.PiePoint = function(chart, index) {
-  goog.base(this, chart, index);
+  anychart.core.PiePoint.base(this, 'constructor', chart, index);
 };
 goog.inherits(anychart.core.PiePoint, anychart.core.Point);
 
@@ -55,8 +55,11 @@ anychart.core.PiePoint.prototype.exploded = anychart.core.PiePoint.prototype.sel
 
 
 //exports
-anychart.core.PiePoint.prototype['getStartAngle'] = anychart.core.PiePoint.prototype.getStartAngle;
-anychart.core.PiePoint.prototype['getEndAngle'] = anychart.core.PiePoint.prototype.getEndAngle;
-anychart.core.PiePoint.prototype['hovered'] = anychart.core.PiePoint.prototype.hovered;
-anychart.core.PiePoint.prototype['selected'] = anychart.core.PiePoint.prototype.selected;
-anychart.core.PiePoint.prototype['exploded'] = anychart.core.PiePoint.prototype.exploded;
+(function() {
+  var proto = anychart.core.PiePoint.prototype;
+  proto['getStartAngle'] = proto.getStartAngle;
+  proto['getEndAngle'] = proto.getEndAngle;
+  proto['hovered'] = proto.hovered;
+  proto['selected'] = proto.selected;
+  proto['exploded'] = proto.exploded;
+})();

@@ -144,13 +144,13 @@ anychart.core.axisMarkers.GanttLine.prototype.appearanceInvalidated = function()
 /** @inheritDoc */
 anychart.core.axisMarkers.GanttLine.prototype.disposeInternal = function() {
   delete this.stroke_;
-  goog.base(this, 'disposeInternal');
+  anychart.core.axisMarkers.GanttLine.base(this, 'disposeInternal');
 };
 
 
 /** @inheritDoc */
 anychart.core.axisMarkers.GanttLine.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.axisMarkers.GanttLine.base(this, 'serialize');
   json['value'] = this.value();
   json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
   return json;
@@ -159,15 +159,18 @@ anychart.core.axisMarkers.GanttLine.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.axisMarkers.GanttLine.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.axisMarkers.GanttLine.base(this, 'setupByJSON', config, opt_default);
   this.value(config['value']);
   this.stroke(config['stroke']);
 };
 
 
 //exports
-anychart.core.axisMarkers.GanttLine.prototype['value'] = anychart.core.axisMarkers.GanttLine.prototype.value;
-anychart.core.axisMarkers.GanttLine.prototype['scale'] = anychart.core.axisMarkers.GanttLine.prototype.scale;
-anychart.core.axisMarkers.GanttLine.prototype['layout'] = anychart.core.axisMarkers.GanttLine.prototype.layout;
-anychart.core.axisMarkers.GanttLine.prototype['stroke'] = anychart.core.axisMarkers.GanttLine.prototype.stroke;
-anychart.core.axisMarkers.GanttLine.prototype['isHorizontal'] = anychart.core.axisMarkers.GanttLine.prototype.isHorizontal;
+(function() {
+  var proto = anychart.core.axisMarkers.GanttLine.prototype;
+  proto['value'] = proto.value;
+  proto['scale'] = proto.scale;
+  proto['layout'] = proto.layout;
+  proto['stroke'] = proto.stroke;
+  proto['isHorizontal'] = proto.isHorizontal;
+})();

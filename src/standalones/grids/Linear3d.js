@@ -37,8 +37,12 @@ anychart.grids.linear3d = function() {
 
 
 //exports
-goog.exportSymbol('anychart.grids.linear3d', anychart.grids.linear3d);
-goog.exportSymbol('anychart.standalones.grids.linear3d', anychart.standalones.grids.linear3d);
-anychart.standalones.grids.Linear3d.prototype['draw'] = anychart.standalones.grids.Linear3d.prototype.draw;
-anychart.standalones.grids.Linear3d.prototype['parentBounds'] = anychart.standalones.grids.Linear3d.prototype.parentBounds;
-anychart.standalones.grids.Linear3d.prototype['container'] = anychart.standalones.grids.Linear3d.prototype.container;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.standalones.grids.Linear3d.prototype;
+  goog.exportSymbol('anychart.grids.linear3d', anychart.grids.linear3d);
+  goog.exportSymbol('anychart.standalones.grids.linear3d', anychart.standalones.grids.linear3d);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+})();

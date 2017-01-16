@@ -181,23 +181,23 @@ anychart.core.resource.resourceList.TextSettings.prototype.serialize = function(
 
 //region --- EXPORTS ---
 //exports
-//anychart.core.resource.resourceList.TextSettings.prototype['fontSize'] = anychart.core.resource.resourceList.TextSettings.prototype.fontSize;
-//anychart.core.resource.resourceList.TextSettings.prototype['fontFamily'] = anychart.core.resource.resourceList.TextSettings.prototype.fontFamily;
-//anychart.core.resource.resourceList.TextSettings.prototype['fontColor'] = anychart.core.resource.resourceList.TextSettings.prototype.fontColor;
-//anychart.core.resource.resourceList.TextSettings.prototype['fontOpacity'] = anychart.core.resource.resourceList.TextSettings.prototype.fontOpacity;
-//anychart.core.resource.resourceList.TextSettings.prototype['fontDecoration'] = anychart.core.resource.resourceList.TextSettings.prototype.fontDecoration;
-//anychart.core.resource.resourceList.TextSettings.prototype['fontStyle'] = anychart.core.resource.resourceList.TextSettings.prototype.fontStyle;
-//anychart.core.resource.resourceList.TextSettings.prototype['fontVariant'] = anychart.core.resource.resourceList.TextSettings.prototype.fontVariant;
-//anychart.core.resource.resourceList.TextSettings.prototype['fontWeight'] = anychart.core.resource.resourceList.TextSettings.prototype.fontWeight;
-//anychart.core.resource.resourceList.TextSettings.prototype['letterSpacing'] = anychart.core.resource.resourceList.TextSettings.prototype.letterSpacing;
-//anychart.core.resource.resourceList.TextSettings.prototype['textDirection'] = anychart.core.resource.resourceList.TextSettings.prototype.textDirection;
-//anychart.core.resource.resourceList.TextSettings.prototype['lineHeight'] = anychart.core.resource.resourceList.TextSettings.prototype.lineHeight;
-//anychart.core.resource.resourceList.TextSettings.prototype['textIndent'] = anychart.core.resource.resourceList.TextSettings.prototype.textIndent;
-//anychart.core.resource.resourceList.TextSettings.prototype['vAlign'] = anychart.core.resource.resourceList.TextSettings.prototype.vAlign;
-//anychart.core.resource.resourceList.TextSettings.prototype['hAlign'] = anychart.core.resource.resourceList.TextSettings.prototype.hAlign;
-//anychart.core.resource.resourceList.TextSettings.prototype['textWrap'] = anychart.core.resource.resourceList.TextSettings.prototype.textWrap;
-//anychart.core.resource.resourceList.TextSettings.prototype['textOverflow'] = anychart.core.resource.resourceList.TextSettings.prototype.textOverflow;
-//anychart.core.resource.resourceList.TextSettings.prototype['selectable'] = anychart.core.resource.resourceList.TextSettings.prototype.selectable;
-//anychart.core.resource.resourceList.TextSettings.prototype['useHtml'] = anychart.core.resource.resourceList.TextSettings.prototype.useHtml;
-//anychart.core.resource.resourceList.TextSettings.prototype['disablePointerEvents'] = anychart.core.resource.resourceList.TextSettings.prototype.disablePointerEvents;
+//proto['fontSize'] = proto.fontSize;
+//proto['fontFamily'] = proto.fontFamily;
+//proto['fontColor'] = proto.fontColor;
+//proto['fontOpacity'] = proto.fontOpacity;
+//proto['fontDecoration'] = proto.fontDecoration;
+//proto['fontStyle'] = proto.fontStyle;
+//proto['fontVariant'] = proto.fontVariant;
+//proto['fontWeight'] = proto.fontWeight;
+//proto['letterSpacing'] = proto.letterSpacing;
+//proto['textDirection'] = proto.textDirection;
+//proto['lineHeight'] = proto.lineHeight;
+//proto['textIndent'] = proto.textIndent;
+//proto['vAlign'] = proto.vAlign;
+//proto['hAlign'] = proto.hAlign;
+//proto['textWrap'] = proto.textWrap;
+//proto['textOverflow'] = proto.textOverflow;
+//proto['selectable'] = proto.selectable;
+//proto['useHtml'] = proto.useHtml;
+//proto['disablePointerEvents'] = proto.disablePointerEvents;
 //endregion

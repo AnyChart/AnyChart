@@ -47,9 +47,13 @@ anychart.axes.linear = function() {
 
 
 //exports
-goog.exportSymbol('anychart.axes.linear', anychart.axes.linear);
-goog.exportSymbol('anychart.standalones.axes.linear', anychart.standalones.axes.linear);
-anychart.standalones.axes.Linear.prototype['padding'] = anychart.standalones.axes.Linear.prototype.padding;
-anychart.standalones.axes.Linear.prototype['draw'] = anychart.standalones.axes.Linear.prototype.draw;
-anychart.standalones.axes.Linear.prototype['parentBounds'] = anychart.standalones.axes.Linear.prototype.parentBounds;
-anychart.standalones.axes.Linear.prototype['container'] = anychart.standalones.axes.Linear.prototype.container;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.standalones.axes.Linear.prototype;
+  goog.exportSymbol('anychart.axes.linear', anychart.axes.linear);
+  goog.exportSymbol('anychart.standalones.axes.linear', anychart.standalones.axes.linear);
+  proto['padding'] = proto.padding;
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+})();

@@ -1,6 +1,6 @@
 goog.provide('anychart.core.ui.Tooltip');
 
-goog.require('acgraph.math.Coordinate');
+goog.require('acgraph.math');
 goog.require('anychart.compatibility');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.settings');
@@ -14,6 +14,7 @@ goog.require('anychart.math.Rect');
 goog.require('anychart.opt');
 
 goog.require('goog.async.Delay');
+goog.require('goog.math.Coordinate');
 goog.require('goog.object');
 
 
@@ -1205,7 +1206,7 @@ anychart.core.ui.Tooltip.prototype.hideSelf = function(opt_force, opt_event) {
     var clientX = opt_event['originalEvent']['clientX'];
     var clientY = opt_event['originalEvent']['clientY'];
     var pixelBounds = this.getPixelBounds();
-    var distance = pixelBounds.distance(new acgraph.math.Coordinate(clientX, clientY));
+    var distance = pixelBounds.distance(new goog.math.Coordinate(clientX, clientY));
     var domElement = this.rootLayer_.domElement();
 
     // cursor inside the tooltip
@@ -1507,8 +1508,8 @@ anychart.core.ui.Tooltip.prototype.calculatePosition_ = function() {
 
   if (!this.instantPosition_) {
     var anch = /** @type {?string} */ (this.getOption(anychart.opt.ANCHOR));
-    /** @type {acgraph.math.Coordinate} */
-    var position = new acgraph.math.Coordinate(
+    /** @type {goog.math.Coordinate} */
+    var position = new goog.math.Coordinate(
         /** @type {number} */ (this.getOption(anychart.opt.X)),
         /** @type {number} */ (this.getOption(anychart.opt.Y)));
 
@@ -2211,20 +2212,24 @@ anychart.core.ui.Tooltip.prototype.disposeInternal = function() {
 
 
 //exports
-anychart.core.ui.Tooltip.prototype['title'] = anychart.core.ui.Tooltip.prototype.title;
-anychart.core.ui.Tooltip.prototype['separator'] = anychart.core.ui.Tooltip.prototype.separator;
-anychart.core.ui.Tooltip.prototype['background'] = anychart.core.ui.Tooltip.prototype.background;
-anychart.core.ui.Tooltip.prototype['padding'] = anychart.core.ui.Tooltip.prototype.padding;
-anychart.core.ui.Tooltip.prototype['enabled'] = anychart.core.ui.Tooltip.prototype.enabled;
-anychart.core.ui.Tooltip.prototype['hide'] = anychart.core.ui.Tooltip.prototype.hide;
-anychart.core.ui.Tooltip.prototype['hideDelay'] = anychart.core.ui.Tooltip.prototype.hideDelay;
-anychart.core.ui.Tooltip.prototype['textSettings'] = anychart.core.ui.Tooltip.prototype.textSettings;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.core.ui.Tooltip.prototype;
+  proto['title'] = proto.title;
+  proto['separator'] = proto.separator;
+  proto['background'] = proto.background;
+  proto['padding'] = proto.padding;
+  proto['enabled'] = proto.enabled;
+  proto['hide'] = proto.hide;
+  proto['hideDelay'] = proto.hideDelay;
+  proto['textSettings'] = proto.textSettings;
 
 
-//deprecated
-anychart.core.ui.Tooltip.prototype['content'] = anychart.core.ui.Tooltip.prototype.content;
-anychart.core.ui.Tooltip.prototype['contentFormatter'] = anychart.core.ui.Tooltip.prototype.contentFormatter;
-anychart.core.ui.Tooltip.prototype['isFloating'] = anychart.core.ui.Tooltip.prototype.isFloating;
+  //deprecated
+  proto['content'] = proto.content;
+  proto['contentFormatter'] = proto.contentFormatter;
+  proto['isFloating'] = proto.isFloating;
+})();
 
 //endregion
 

@@ -20,7 +20,7 @@ anychart.core.ui.ChartCredits = function(chart) {
    */
   this.chart_ = chart;
 
-  goog.base(this);
+  anychart.core.ui.ChartCredits.base(this, 'constructor');
 };
 goog.inherits(anychart.core.ui.ChartCredits, anychart.core.Base);
 
@@ -201,8 +201,11 @@ anychart.core.ui.ChartCredits.prototype.setupByJSON = function(config) {
 
 
 //exports
-anychart.core.ui.ChartCredits.prototype['text'] = anychart.core.ui.ChartCredits.prototype.text;//doc|ex
-anychart.core.ui.ChartCredits.prototype['url'] = anychart.core.ui.ChartCredits.prototype.url;//doc|ex
-anychart.core.ui.ChartCredits.prototype['alt'] = anychart.core.ui.ChartCredits.prototype.alt;//doc|ex
-anychart.core.ui.ChartCredits.prototype['logoSrc'] = anychart.core.ui.ChartCredits.prototype.logoSrc;//doc|ex
-anychart.core.ui.ChartCredits.prototype['enabled'] = anychart.core.ui.ChartCredits.prototype.enabled;//doc|ex
+(function() {
+  var proto = anychart.core.ui.ChartCredits.prototype;
+  proto['text'] = proto.text;//doc|ex
+  proto['url'] = proto.url;//doc|ex
+  proto['alt'] = proto.alt;//doc|ex
+  proto['logoSrc'] = proto.logoSrc;//doc|ex
+  proto['enabled'] = proto.enabled;//doc|ex
+})();

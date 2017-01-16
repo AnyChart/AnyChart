@@ -273,9 +273,12 @@ anychart.core.utils.OrdinalZoom.prototype.serialize = function() {
 
 
 //exports
-anychart.core.utils.OrdinalZoom.prototype['setTo'] = anychart.core.utils.OrdinalZoom.prototype.setTo;
-anychart.core.utils.OrdinalZoom.prototype['setToValues'] = anychart.core.utils.OrdinalZoom.prototype.setToValues;
-anychart.core.utils.OrdinalZoom.prototype['setToPointsCount'] = anychart.core.utils.OrdinalZoom.prototype.setToPointsCount;
-anychart.core.utils.OrdinalZoom.prototype['getStartRatio'] = anychart.core.utils.OrdinalZoom.prototype.getStartRatio;
-anychart.core.utils.OrdinalZoom.prototype['getEndRatio'] = anychart.core.utils.OrdinalZoom.prototype.getEndRatio;
-anychart.core.utils.OrdinalZoom.prototype['continuous'] = anychart.core.utils.OrdinalZoom.prototype.continuous;
+(function() {
+  var proto = anychart.core.utils.OrdinalZoom.prototype;
+  proto['setTo'] = proto.setTo;
+  proto['setToValues'] = proto.setToValues;
+  proto['setToPointsCount'] = proto.setToPointsCount;
+  proto['getStartRatio'] = proto.getStartRatio;
+  proto['getEndRatio'] = proto.getEndRatio;
+  proto['continuous'] = proto.continuous;
+})();

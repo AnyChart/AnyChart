@@ -31,7 +31,7 @@ goog.require('anychart.math.Rect');
  */
 anychart.charts.CircularGauge = function(opt_data, opt_csvSettings) {
   this.suspendSignalsDispatching();
-  goog.base(this);
+  anychart.charts.CircularGauge.base(this, 'constructor');
 
   /**
    * @type {!Array.<anychart.core.axes.Circular>}
@@ -1260,7 +1260,7 @@ anychart.charts.CircularGauge.prototype.drawContent = function(bounds) {
 
 /** @inheritDoc */
 anychart.charts.CircularGauge.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.charts.CircularGauge.base(this, 'setupByJSON', config, opt_default);
 
   if ('defaultAxisSettings' in config)
     this.defaultAxisSettings(config['defaultAxisSettings']);
@@ -1335,7 +1335,7 @@ anychart.charts.CircularGauge.prototype.setupByJSON = function(config, opt_defau
 
 /** @inheritDoc */
 anychart.charts.CircularGauge.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.charts.CircularGauge.base(this, 'serialize');
 
   json['type'] = anychart.enums.GaugeTypes.CIRCULAR;
 
@@ -1408,24 +1408,27 @@ anychart.charts.CircularGauge.prototype.getDefaultThemeObj = function() {
 
 
 //exports
-anychart.charts.CircularGauge.prototype['stroke'] = anychart.charts.CircularGauge.prototype.stroke;
-anychart.charts.CircularGauge.prototype['fill'] = anychart.charts.CircularGauge.prototype.fill;
+(function() {
+  var proto = anychart.charts.CircularGauge.prototype;
+  proto['stroke'] = proto.stroke;
+  proto['fill'] = proto.fill;
 
-anychart.charts.CircularGauge.prototype['startAngle'] = anychart.charts.CircularGauge.prototype.startAngle;
-anychart.charts.CircularGauge.prototype['sweepAngle'] = anychart.charts.CircularGauge.prototype.sweepAngle;
+  proto['startAngle'] = proto.startAngle;
+  proto['sweepAngle'] = proto.sweepAngle;
 
-anychart.charts.CircularGauge.prototype['data'] = anychart.charts.CircularGauge.prototype.data;
+  proto['data'] = proto.data;
 
-anychart.charts.CircularGauge.prototype['cap'] = anychart.charts.CircularGauge.prototype.cap;
-anychart.charts.CircularGauge.prototype['axis'] = anychart.charts.CircularGauge.prototype.axis;
+  proto['cap'] = proto.cap;
+  proto['axis'] = proto.axis;
 
-anychart.charts.CircularGauge.prototype['bar'] = anychart.charts.CircularGauge.prototype.bar;
-anychart.charts.CircularGauge.prototype['marker'] = anychart.charts.CircularGauge.prototype.marker;
-anychart.charts.CircularGauge.prototype['needle'] = anychart.charts.CircularGauge.prototype.needle;
-anychart.charts.CircularGauge.prototype['knob'] = anychart.charts.CircularGauge.prototype.knob;
+  proto['bar'] = proto.bar;
+  proto['marker'] = proto.marker;
+  proto['needle'] = proto.needle;
+  proto['knob'] = proto.knob;
 
-anychart.charts.CircularGauge.prototype['range'] = anychart.charts.CircularGauge.prototype.range;
+  proto['range'] = proto.range;
 
-anychart.charts.CircularGauge.prototype['circularPadding'] = anychart.charts.CircularGauge.prototype.circularPadding;
-anychart.charts.CircularGauge.prototype['encloseWithStraightLine'] = anychart.charts.CircularGauge.prototype.encloseWithStraightLine;
-anychart.charts.CircularGauge.prototype['getType'] = anychart.charts.CircularGauge.prototype.getType;
+  proto['circularPadding'] = proto.circularPadding;
+  proto['encloseWithStraightLine'] = proto.encloseWithStraightLine;
+  proto['getType'] = proto.getType;
+})();

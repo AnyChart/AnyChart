@@ -423,8 +423,11 @@ anychart.core.linearGauge.pointers.Led.prototype.disposeInternal = function() {
 
 
 //exports
-anychart.core.linearGauge.pointers.Led.prototype['dimmer'] = anychart.core.linearGauge.pointers.Led.prototype.dimmer;
-anychart.core.linearGauge.pointers.Led.prototype['gap'] = anychart.core.linearGauge.pointers.Led.prototype.gap;
-anychart.core.linearGauge.pointers.Led.prototype['size'] = anychart.core.linearGauge.pointers.Led.prototype.size;
-anychart.core.linearGauge.pointers.Led.prototype['count'] = anychart.core.linearGauge.pointers.Led.prototype.count;
-anychart.core.linearGauge.pointers.Led.prototype['colorScale'] = anychart.core.linearGauge.pointers.Led.prototype.colorScale;
+(function() {
+  var proto = anychart.core.linearGauge.pointers.Led.prototype;
+  proto['dimmer'] = proto.dimmer;
+  proto['gap'] = proto.gap;
+  proto['size'] = proto.size;
+  proto['count'] = proto.count;
+  proto['colorScale'] = proto.colorScale;
+})();

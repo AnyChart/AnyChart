@@ -16,7 +16,7 @@ goog.require('anychart.scales.GanttDateTime');
  * @extends {anychart.core.VisualBaseWithBounds}
  */
 anychart.core.gantt.TimelineHeader = function() {
-  goog.base(this);
+  anychart.core.gantt.TimelineHeader.base(this, 'constructor');
 
   /**
    * Pixel bounds cache.
@@ -383,7 +383,7 @@ anychart.core.gantt.TimelineHeader.prototype.draw = function() {
 
 /** @inheritDoc */
 anychart.core.gantt.TimelineHeader.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.gantt.TimelineHeader.base(this, 'serialize');
 
   json['backgroundFill'] = anychart.color.serialize(this.backgroundFill_);
   json['levelsSeparationStroke'] = anychart.color.serialize(this.levelsSeparationStroke_);
@@ -397,7 +397,7 @@ anychart.core.gantt.TimelineHeader.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.gantt.TimelineHeader.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+  anychart.core.gantt.TimelineHeader.base(this, 'setupByJSON', config);
 
   this.backgroundFill(config['backgroundFill']);
   this.levelsSeparationStroke(config['levelsSeparationStroke']);
@@ -423,7 +423,7 @@ anychart.core.gantt.TimelineHeader.prototype.setupByJSON = function(config) {
  * @extends {anychart.core.VisualBaseWithBounds}
  */
 anychart.core.gantt.TimelineHeader.Level = function(header) {
-  goog.base(this);
+  anychart.core.gantt.TimelineHeader.Level.base(this, 'constructor');
 
   /**
    * Related scale.
@@ -848,7 +848,7 @@ anychart.core.gantt.TimelineHeader.Level.prototype.remove = function() {
 
 /** @inheritDoc */
 anychart.core.gantt.TimelineHeader.Level.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.gantt.TimelineHeader.Level.base(this, 'serialize');
 
   json['tileFill'] = anychart.color.serialize(this.tileFill_);
   json['tilesSeparationStroke'] = anychart.color.serialize(this.tilesSeparationStroke_);
@@ -860,7 +860,7 @@ anychart.core.gantt.TimelineHeader.Level.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.gantt.TimelineHeader.Level.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+  anychart.core.gantt.TimelineHeader.Level.base(this, 'setupByJSON', config);
 
   this.tileFill(config['tileFill']);
   this.tilesSeparationStroke(config['tilesSeparationStroke']);
@@ -871,13 +871,17 @@ anychart.core.gantt.TimelineHeader.Level.prototype.setupByJSON = function(config
 
 
 //exports
-anychart.core.gantt.TimelineHeader.prototype['backgroundFill'] = anychart.core.gantt.TimelineHeader.prototype.backgroundFill;
-anychart.core.gantt.TimelineHeader.prototype['levelsSeparationStroke'] = anychart.core.gantt.TimelineHeader.prototype.levelsSeparationStroke;
-anychart.core.gantt.TimelineHeader.prototype['topLevel'] = anychart.core.gantt.TimelineHeader.prototype.topLevel;
-anychart.core.gantt.TimelineHeader.prototype['midLevel'] = anychart.core.gantt.TimelineHeader.prototype.midLevel;
-anychart.core.gantt.TimelineHeader.prototype['lowLevel'] = anychart.core.gantt.TimelineHeader.prototype.lowLevel;
+(function() {
+  var proto = anychart.core.gantt.TimelineHeader.prototype;
+  proto['backgroundFill'] = proto.backgroundFill;
+  proto['levelsSeparationStroke'] = proto.levelsSeparationStroke;
+  proto['topLevel'] = proto.topLevel;
+  proto['midLevel'] = proto.midLevel;
+  proto['lowLevel'] = proto.lowLevel;
 
-anychart.core.gantt.TimelineHeader.Level.prototype['tileFill'] = anychart.core.gantt.TimelineHeader.Level.prototype.tileFill;
-anychart.core.gantt.TimelineHeader.Level.prototype['labels'] = anychart.core.gantt.TimelineHeader.Level.prototype.labels;
-anychart.core.gantt.TimelineHeader.Level.prototype['tilesSeparationStroke'] = anychart.core.gantt.TimelineHeader.Level.prototype.tilesSeparationStroke;
+  proto = anychart.core.gantt.TimelineHeader.Level.prototype;
+  proto['tileFill'] = proto.tileFill;
+  proto['labels'] = proto.labels;
+  proto['tilesSeparationStroke'] = proto.tilesSeparationStroke;
 
+})();

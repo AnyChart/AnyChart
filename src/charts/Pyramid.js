@@ -13,7 +13,7 @@ goog.require('anychart.core.PyramidFunnelBase');
  * @constructor
  */
 anychart.charts.Pyramid = function(opt_data, opt_csvSettings) {
-  goog.base(this, opt_data, opt_csvSettings);
+  anychart.charts.Pyramid.base(this, 'constructor', opt_data, opt_csvSettings);
 };
 goog.inherits(anychart.charts.Pyramid, anychart.core.PyramidFunnelBase);
 
@@ -28,7 +28,7 @@ anychart.charts.Pyramid.prototype.getType = function() {
  * @inheritDoc
  */
 anychart.charts.Pyramid.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.charts.Pyramid.base(this, 'serialize');
 
   json['type'] = anychart.enums.ChartTypes.PYRAMID;
   json['reversed'] = this.reversed();
@@ -43,49 +43,51 @@ anychart.charts.Pyramid.prototype.serialize = function() {
 anychart.charts.Pyramid.prototype.setupByJSON = function(config, opt_default) {
   this.reversed(config['reversed']);
 
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.charts.Pyramid.base(this, 'setupByJSON', config, opt_default);
 };
 
 
 //exports
-anychart.charts.Pyramid.prototype['reversed'] = anychart.charts.Pyramid.prototype.reversed;
-
 // from PyramidFunnelBase
-anychart.charts.Pyramid.prototype['baseWidth'] = anychart.charts.Pyramid.prototype.baseWidth;
-anychart.charts.Pyramid.prototype['connectorLength'] = anychart.charts.Pyramid.prototype.connectorLength;//doc
-anychart.charts.Pyramid.prototype['connectorStroke'] = anychart.charts.Pyramid.prototype.connectorStroke;//doc
-anychart.charts.Pyramid.prototype['data'] = anychart.charts.Pyramid.prototype.data;//doc|ex
-anychart.charts.Pyramid.prototype['getType'] = anychart.charts.Pyramid.prototype.getType;
-anychart.charts.Pyramid.prototype['overlapMode'] = anychart.charts.Pyramid.prototype.overlapMode;//doc
-anychart.charts.Pyramid.prototype['palette'] = anychart.charts.Pyramid.prototype.palette;//doc|ex
-anychart.charts.Pyramid.prototype['pointsPadding'] = anychart.charts.Pyramid.prototype.pointsPadding;//doc
-anychart.charts.Pyramid.prototype['tooltip'] = anychart.charts.Pyramid.prototype.tooltip;
-anychart.charts.Pyramid.prototype['hatchFillPalette'] = anychart.charts.Pyramid.prototype.hatchFillPalette;//doc|ex
-anychart.charts.Pyramid.prototype['markerPalette'] = anychart.charts.Pyramid.prototype.markerPalette;//doc|ex
+(function() {
+  var proto = anychart.charts.Pyramid.prototype;
+  proto['reversed'] = proto.reversed;
+  proto['baseWidth'] = proto.baseWidth;
+  proto['connectorLength'] = proto.connectorLength;//doc
+  proto['connectorStroke'] = proto.connectorStroke;//doc
+  proto['data'] = proto.data;//doc|ex
+  proto['getType'] = proto.getType;
+  proto['overlapMode'] = proto.overlapMode;//doc
+  proto['palette'] = proto.palette;//doc|ex
+  proto['pointsPadding'] = proto.pointsPadding;//doc
+  proto['tooltip'] = proto.tooltip;
+  proto['hatchFillPalette'] = proto.hatchFillPalette;//doc|ex
+  proto['markerPalette'] = proto.markerPalette;//doc|ex
 
-anychart.charts.Pyramid.prototype['fill'] = anychart.charts.Pyramid.prototype.fill;//doc|ex
-anychart.charts.Pyramid.prototype['hoverFill'] = anychart.charts.Pyramid.prototype.hoverFill;//doc|ex
-anychart.charts.Pyramid.prototype['selectFill'] = anychart.charts.Pyramid.prototype.selectFill;//doc|ex
+  proto['fill'] = proto.fill;//doc|ex
+  proto['hoverFill'] = proto.hoverFill;//doc|ex
+  proto['selectFill'] = proto.selectFill;//doc|ex
 
-anychart.charts.Pyramid.prototype['hatchFill'] = anychart.charts.Pyramid.prototype.hatchFill;//doc|ex
-anychart.charts.Pyramid.prototype['hoverHatchFill'] = anychart.charts.Pyramid.prototype.hoverHatchFill;//doc|ex
-anychart.charts.Pyramid.prototype['selectHatchFill'] = anychart.charts.Pyramid.prototype.selectHatchFill;//doc|ex
+  proto['hatchFill'] = proto.hatchFill;//doc|ex
+  proto['hoverHatchFill'] = proto.hoverHatchFill;//doc|ex
+  proto['selectHatchFill'] = proto.selectHatchFill;//doc|ex
 
-anychart.charts.Pyramid.prototype['labels'] = anychart.charts.Pyramid.prototype.labels;//doc|ex
-anychart.charts.Pyramid.prototype['hoverLabels'] = anychart.charts.Pyramid.prototype.hoverLabels;//doc|ex
-anychart.charts.Pyramid.prototype['selectLabels'] = anychart.charts.Pyramid.prototype.selectLabels;//doc|ex
+  proto['labels'] = proto.labels;//doc|ex
+  proto['hoverLabels'] = proto.hoverLabels;//doc|ex
+  proto['selectLabels'] = proto.selectLabels;//doc|ex
 
-anychart.charts.Pyramid.prototype['stroke'] = anychart.charts.Pyramid.prototype.stroke;//doc|ex
-anychart.charts.Pyramid.prototype['hoverStroke'] = anychart.charts.Pyramid.prototype.hoverStroke;//doc|ex
-anychart.charts.Pyramid.prototype['selectStroke'] = anychart.charts.Pyramid.prototype.selectStroke;//doc|ex
+  proto['stroke'] = proto.stroke;//doc|ex
+  proto['hoverStroke'] = proto.hoverStroke;//doc|ex
+  proto['selectStroke'] = proto.selectStroke;//doc|ex
 
-anychart.charts.Pyramid.prototype['markers'] = anychart.charts.Pyramid.prototype.markers;
-anychart.charts.Pyramid.prototype['hoverMarkers'] = anychart.charts.Pyramid.prototype.hoverMarkers;
-anychart.charts.Pyramid.prototype['selectMarkers'] = anychart.charts.Pyramid.prototype.selectMarkers;
+  proto['markers'] = proto.markers;
+  proto['hoverMarkers'] = proto.hoverMarkers;
+  proto['selectMarkers'] = proto.selectMarkers;
 
-anychart.charts.Pyramid.prototype['hover'] = anychart.charts.Pyramid.prototype.hover;
-anychart.charts.Pyramid.prototype['unhover'] = anychart.charts.Pyramid.prototype.unhover;
+  proto['hover'] = proto.hover;
+  proto['unhover'] = proto.unhover;
 
-anychart.charts.Pyramid.prototype['select'] = anychart.charts.Pyramid.prototype.select;
-anychart.charts.Pyramid.prototype['unselect'] = anychart.charts.Pyramid.prototype.unselect;
-anychart.charts.Pyramid.prototype['getPoint'] = anychart.charts.Pyramid.prototype.getPoint;
+  proto['select'] = proto.select;
+  proto['unselect'] = proto.unselect;
+  proto['getPoint'] = proto.getPoint;
+})();

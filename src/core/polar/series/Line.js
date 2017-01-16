@@ -15,7 +15,7 @@ goog.require('anychart.core.utils.TypedLayer');
  * @extends {anychart.core.polar.series.ContinuousBase}
  */
 anychart.core.polar.series.Line = function(opt_data, opt_csvSettings) {
-  goog.base(this, opt_data, opt_csvSettings);
+  anychart.core.polar.series.Line.base(this, 'constructor', opt_data, opt_csvSettings);
   // legacy
   this.stroke(function() {
     return this['sourceColor'];
@@ -43,7 +43,7 @@ anychart.core.polar.series.Base.SeriesTypesMap[anychart.enums.PolarSeriesType.LI
 
 /** @inheritDoc */
 anychart.core.polar.series.Line.prototype.startDrawing = function() {
-  goog.base(this, 'startDrawing');
+  anychart.core.polar.series.Line.base(this, 'startDrawing');
 
   this.currentStrokePath = null;
 
@@ -164,7 +164,7 @@ anychart.core.polar.series.Line.prototype.finalizeDrawing = function() {
     }
   }
 
-  goog.base(this, 'finalizeDrawing');
+  anychart.core.polar.series.Line.base(this, 'finalizeDrawing');
 };
 
 
@@ -199,9 +199,12 @@ anychart.core.polar.series.Line.prototype.getType = function() {
 };
 
 
-//anychart.core.polar.series.Line.prototype['finalizeDrawing'] = anychart.core.polar.series.Line.prototype.finalizeDrawing;
+//proto['finalizeDrawing'] = proto.finalizeDrawing;
 //exports
-anychart.core.polar.series.Line.prototype['stroke'] = anychart.core.polar.series.Line.prototype.stroke;//inherited
-anychart.core.polar.series.Line.prototype['hoverStroke'] = anychart.core.polar.series.Line.prototype.hoverStroke;//inherited
-anychart.core.polar.series.Line.prototype['selectStroke'] = anychart.core.polar.series.Line.prototype.selectStroke;//inherited
-anychart.core.polar.series.Line.prototype['getType'] = anychart.core.polar.series.Line.prototype.getType;
+(function() {
+  var proto = anychart.core.polar.series.Line.prototype;
+  proto['stroke'] = proto.stroke;//inherited
+  proto['hoverStroke'] = proto.hoverStroke;//inherited
+  proto['selectStroke'] = proto.selectStroke;//inherited
+  proto['getType'] = proto.getType;
+})();

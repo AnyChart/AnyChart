@@ -163,7 +163,10 @@ anychart.ui.preloader = function() {
 
 
 //exports
-goog.exportSymbol('anychart.ui.preloader', anychart.ui.preloader);
-anychart.ui.Preloader.prototype['render'] = anychart.ui.Preloader.prototype.render;
-anychart.ui.Preloader.prototype['decorate'] = anychart.ui.Preloader.prototype.decorate;
-anychart.ui.Preloader.prototype['visible'] = anychart.ui.Preloader.prototype.visible;
+(function() {
+  var proto = anychart.ui.Preloader.prototype;
+  goog.exportSymbol('anychart.ui.preloader', anychart.ui.preloader);
+  proto['render'] = proto.render;
+  proto['decorate'] = proto.decorate;
+  proto['visible'] = proto.visible;
+})();

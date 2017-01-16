@@ -547,7 +547,7 @@ anychart.data.TableStorage.prototype.getStorageInternal = function() {
  * @extends {anychart.data.TableStorage}
  */
 anychart.data.TableAggregatedStorage = function(table, opt_interval) {
-  goog.base(this, table);
+  anychart.data.TableAggregatedStorage.base(this, 'constructor', table);
 
   /**
    * Interval generator for the aggregate if any.
@@ -830,7 +830,7 @@ anychart.data.TableAggregatedStorage.prototype.createAggregate_ = function(table
  * @extends {anychart.data.TableStorage}
  */
 anychart.data.TableMainStorage = function(table, opt_keyColumn, opt_dateTimePattern, opt_timeOffset, opt_baseDate, opt_locale) {
-  goog.base(this, table);
+  anychart.data.TableMainStorage.base(this, 'constructor', table);
 
   /**
    * Storage to hold appended items that are not committed to the main storage yet.

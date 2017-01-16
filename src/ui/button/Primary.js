@@ -11,7 +11,7 @@ goog.require('anychart.ui.button.Base');
  * @extends {anychart.ui.button.Base}
  */
 anychart.ui.button.Primary = function(opt_content, opt_renderer, opt_domHelper) {
-  goog.base(this, opt_content, opt_renderer, opt_domHelper);
+  anychart.ui.button.Primary.base(this, 'constructor', opt_content, opt_renderer, opt_domHelper);
   this.addClassName(anychart.ui.button.Primary.CSS_CLASS);
 };
 goog.inherits(anychart.ui.button.Primary, anychart.ui.button.Base);

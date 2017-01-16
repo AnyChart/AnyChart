@@ -557,7 +557,7 @@ anychart.core.axes.MapTicks.prototype.disposeInternal = function() {
 //region --- Exports
 //exports
 //descriptors
-// anychart.core.axes.MapTicks.prototype['length'] = anychart.core.axes.MapTicks.prototype.length;
-// anychart.core.axes.MapTicks.prototype['stroke'] = anychart.core.axes.MapTicks.prototype.stroke;
-// anychart.core.axes.MapTicks.prototype['position'] = anychart.core.axes.MapTicks.prototype.position;
+// proto['length'] = proto.length;
+// proto['stroke'] = proto.stroke;
+// proto['position'] = proto.position;
 //endregion

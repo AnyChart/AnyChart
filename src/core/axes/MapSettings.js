@@ -592,20 +592,23 @@ anychart.core.axes.MapSettings.prototype.disposeInternal = function() {
 //endregion
 //region --- Exports
 //exports
-anychart.core.axes.MapSettings.prototype['left'] = anychart.core.axes.MapSettings.prototype.left;
-anychart.core.axes.MapSettings.prototype['top'] = anychart.core.axes.MapSettings.prototype.top;
-anychart.core.axes.MapSettings.prototype['right'] = anychart.core.axes.MapSettings.prototype.right;
-anychart.core.axes.MapSettings.prototype['bottom'] = anychart.core.axes.MapSettings.prototype.bottom;
+(function() {
+  var proto = anychart.core.axes.MapSettings.prototype;
+  proto['left'] = proto.left;
+  proto['top'] = proto.top;
+  proto['right'] = proto.right;
+  proto['bottom'] = proto.bottom;
 
-anychart.core.axes.MapSettings.prototype['title'] = anychart.core.axes.MapSettings.prototype.title;
-anychart.core.axes.MapSettings.prototype['ticks'] = anychart.core.axes.MapSettings.prototype.ticks;
-anychart.core.axes.MapSettings.prototype['minorTicks'] = anychart.core.axes.MapSettings.prototype.minorTicks;
-anychart.core.axes.MapSettings.prototype['labels'] = anychart.core.axes.MapSettings.prototype.labels;
-anychart.core.axes.MapSettings.prototype['minorLabels'] = anychart.core.axes.MapSettings.prototype.minorLabels;
+  proto['title'] = proto.title;
+  proto['ticks'] = proto.ticks;
+  proto['minorTicks'] = proto.minorTicks;
+  proto['labels'] = proto.labels;
+  proto['minorLabels'] = proto.minorLabels;
 
-// anychart.core.axes.MapSettings.prototype['enabled'] = anychart.core.axes.MapSettings.prototype.enabled;
-// anychart.core.axes.MapSettings.prototype['stroke'] = anychart.core.axes.MapSettings.prototype.stroke;
-// anychart.core.axes.MapSettings.prototype['drawFirstLabel'] = anychart.core.axes.MapSettings.prototype.drawFirstLabel;
-// anychart.core.axes.MapSettings.prototype['drawLastLabel'] = anychart.core.axes.MapSettings.prototype.drawLastLabel;
-// anychart.core.axes.MapSettings.prototype['overlapMode'] = anychart.core.axes.MapSettings.prototype.overlapMode;
+  // proto['enabled'] = proto.enabled;
+  // proto['stroke'] = proto.stroke;
+  // proto['drawFirstLabel'] = proto.drawFirstLabel;
+  // proto['drawLastLabel'] = proto.drawLastLabel;
+  // proto['overlapMode'] = proto.overlapMode;
+})();
 //endregion

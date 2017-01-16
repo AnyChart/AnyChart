@@ -445,11 +445,14 @@ anychart.core.stock.Grouping.prototype.setupByJSON = function(config, opt_defaul
 
 
 //exports
-anychart.core.stock.Grouping.prototype['enabled'] = anychart.core.stock.Grouping.prototype.enabled;
-anychart.core.stock.Grouping.prototype['forced'] = anychart.core.stock.Grouping.prototype.forced;
-anychart.core.stock.Grouping.prototype['levels'] = anychart.core.stock.Grouping.prototype.levels;
-// anychart.core.stock.Grouping.prototype['xMode'] = anychart.core.stock.Grouping.prototype.xMode;
-anychart.core.stock.Grouping.prototype['maxVisiblePoints'] = anychart.core.stock.Grouping.prototype.maxVisiblePoints;
-anychart.core.stock.Grouping.prototype['minPixPerPoint'] = anychart.core.stock.Grouping.prototype.minPixPerPoint;
-anychart.core.stock.Grouping.prototype['getCurrentDataInterval'] = anychart.core.stock.Grouping.prototype.getCurrentDataInterval;
-anychart.core.stock.Grouping.prototype['isGrouped'] = anychart.core.stock.Grouping.prototype.isGrouped;
+(function() {
+  var proto = anychart.core.stock.Grouping.prototype;
+  proto['enabled'] = proto.enabled;
+  proto['forced'] = proto.forced;
+  proto['levels'] = proto.levels;
+  // proto['xMode'] = proto.xMode;
+  proto['maxVisiblePoints'] = proto.maxVisiblePoints;
+  proto['minPixPerPoint'] = proto.minPixPerPoint;
+  proto['getCurrentDataInterval'] = proto.getCurrentDataInterval;
+  proto['isGrouped'] = proto.isGrouped;
+})();

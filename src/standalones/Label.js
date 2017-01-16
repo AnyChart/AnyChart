@@ -37,8 +37,12 @@ anychart.ui.label = function() {
 
 
 //exports
-goog.exportSymbol('anychart.ui.label', anychart.ui.label);
-goog.exportSymbol('anychart.standalones.label', anychart.standalones.label);
-anychart.standalones.Label.prototype['draw'] = anychart.standalones.Label.prototype.draw;
-anychart.standalones.Label.prototype['parentBounds'] = anychart.standalones.Label.prototype.parentBounds;
-anychart.standalones.Label.prototype['container'] = anychart.standalones.Label.prototype.container;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.standalones.Label.prototype;
+  goog.exportSymbol('anychart.ui.label', anychart.ui.label);
+  goog.exportSymbol('anychart.standalones.label', anychart.standalones.label);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+})();

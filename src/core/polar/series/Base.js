@@ -29,7 +29,7 @@ goog.require('anychart.enums');
  * @extends {anychart.core.SeriesBase}
  */
 anychart.core.polar.series.Base = function(opt_data, opt_csvSettings) {
-  goog.base(this, opt_data, opt_csvSettings);
+  anychart.core.polar.series.Base.base(this, 'constructor', opt_data, opt_csvSettings);
   /**
    * @type {anychart.core.utils.SeriesPointContextProvider}
    * @private
@@ -507,7 +507,7 @@ anychart.core.polar.series.Base.prototype.remove = function() {
 
   this.labels().container(null);
 
-  goog.base(this, 'remove');
+  anychart.core.polar.series.Base.base(this, 'remove');
 };
 
 
@@ -755,7 +755,7 @@ anychart.core.polar.series.Base.prototype.setAutoMarkerType = function(value) {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.polar.series.Base.prototype.getEnableChangeSignals = function() {
-  return goog.base(this, 'getEnableChangeSignals') | anychart.Signal.DATA_CHANGED | anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEED_UPDATE_LEGEND;
+  return anychart.core.polar.series.Base.base(this, 'getEnableChangeSignals') | anychart.Signal.DATA_CHANGED | anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEED_UPDATE_LEGEND;
 };
 
 
@@ -768,7 +768,7 @@ anychart.core.polar.series.Base.prototype.getEnableChangeSignals = function() {
  * @inheritDoc
  */
 anychart.core.polar.series.Base.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.polar.series.Base.base(this, 'serialize');
   json['seriesType'] = this.getType();
   return json;
 };
@@ -778,16 +778,19 @@ anychart.core.polar.series.Base.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.core.polar.series.Base.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.polar.series.Base.base(this, 'setupByJSON', config, opt_default);
 };
 
 
-//anychart.core.polar.series.Base.prototype['drawPoint'] = anychart.core.polar.series.Base.prototype.drawPoint;
-//anychart.core.polar.series.Base.prototype['startDrawing'] = anychart.core.polar.series.Base.prototype.startDrawing;
-//anychart.core.polar.series.Base.prototype['finalizeDrawing'] = anychart.core.polar.series.Base.prototype.finalizeDrawing;
-//anychart.core.polar.series.Base.prototype['getIterator'] = anychart.core.polar.series.Base.prototype.getIterator;
-//anychart.core.polar.series.Base.prototype['getResetIterator'] = anychart.core.polar.series.Base.prototype.getResetIterator;
+//proto['drawPoint'] = proto.drawPoint;
+//proto['startDrawing'] = proto.startDrawing;
+//proto['finalizeDrawing'] = proto.finalizeDrawing;
+//proto['getIterator'] = proto.getIterator;
+//proto['getResetIterator'] = proto.getResetIterator;
 //exports
-anychart.core.polar.series.Base.prototype['xScale'] = anychart.core.polar.series.Base.prototype.xScale;//need-ex
-anychart.core.polar.series.Base.prototype['yScale'] = anychart.core.polar.series.Base.prototype.yScale;//need-ex
-anychart.core.polar.series.Base.prototype['transformXY'] = anychart.core.polar.series.Base.prototype.transformXY;
+(function() {
+  var proto = anychart.core.polar.series.Base.prototype;
+  proto['xScale'] = proto.xScale;//need-ex
+  proto['yScale'] = proto.yScale;//need-ex
+  proto['transformXY'] = proto.transformXY;
+})();

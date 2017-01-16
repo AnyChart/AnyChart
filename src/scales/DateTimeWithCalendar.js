@@ -479,7 +479,7 @@ anychart.scales.DateTimeWithCalendar.prototype.handleCalendarSignal_ = function(
 //------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.scales.DateTimeWithCalendar.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.scales.DateTimeWithCalendar.base(this, 'serialize');
   json['skipHolidays'] = this.skipHolidays_;
   return json;
 };
@@ -487,7 +487,7 @@ anychart.scales.DateTimeWithCalendar.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.scales.DateTimeWithCalendar.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+  anychart.scales.DateTimeWithCalendar.base(this, 'setupByJSON', config);
   this.skipHolidays(config['skipHolidays']);
 };
 
@@ -496,7 +496,7 @@ anychart.scales.DateTimeWithCalendar.prototype.setupByJSON = function(config) {
 anychart.scales.DateTimeWithCalendar.prototype.disposeInternal = function() {
   goog.dispose(this.calendar_);
   this.calendar_ = null;
-  goog.base(this, 'disposeInternal');
+  anychart.scales.DateTimeWithCalendar.base(this, 'disposeInternal');
 };
 
 
@@ -899,24 +899,27 @@ anychart.scales.DateTimeWithCalendar.TSGrid.prototype.ensureUnitHandled_ = funct
 //  Exports
 //
 //------------------------------------------------------------------------------
-// anychart.scales.DateTimeWithCalendar.prototype['pixStart'] = anychart.scales.DateTimeWithCalendar.prototype.pixStart;
-// anychart.scales.DateTimeWithCalendar.prototype['pixEnd'] = anychart.scales.DateTimeWithCalendar.prototype.pixEnd;
+// proto['pixStart'] = proto.pixStart;
+// proto['pixEnd'] = proto.pixEnd;
 //exports
-anychart.scales.DateTimeWithCalendar.prototype['dateToPix'] = anychart.scales.DateTimeWithCalendar.prototype.dateToPix;
-anychart.scales.DateTimeWithCalendar.prototype['pixToDate'] = anychart.scales.DateTimeWithCalendar.prototype.pixToDate;
-anychart.scales.DateTimeWithCalendar.prototype['calendar'] = anychart.scales.DateTimeWithCalendar.prototype.calendar;
-anychart.scales.DateTimeWithCalendar.prototype['skipHolidays'] = anychart.scales.DateTimeWithCalendar.prototype.skipHolidays;
-anychart.scales.DateTimeWithCalendar.prototype['unitPixSize'] = anychart.scales.DateTimeWithCalendar.prototype.unitPixSize;
-anychart.scales.DateTimeWithCalendar.prototype['unit'] = anychart.scales.DateTimeWithCalendar.prototype.unit;
-anychart.scales.DateTimeWithCalendar.prototype['count'] = anychart.scales.DateTimeWithCalendar.prototype.count;
-anychart.scales.DateTimeWithCalendar.prototype['startDate'] = anychart.scales.DateTimeWithCalendar.prototype.startDate;
-anychart.scales.DateTimeWithCalendar.prototype['getTicks'] = anychart.scales.DateTimeWithCalendar.prototype.getTicks;
-anychart.scales.DateTimeWithCalendar.prototype['softMinimum'] = anychart.scales.DateTimeWithCalendar.prototype.softMinimum;
-anychart.scales.DateTimeWithCalendar.prototype['softMaximum'] = anychart.scales.DateTimeWithCalendar.prototype.softMaximum;
-anychart.scales.DateTimeWithCalendar.prototype['minimumGap'] = anychart.scales.DateTimeWithCalendar.prototype.minimumGap;
-anychart.scales.DateTimeWithCalendar.prototype['maximumGap'] = anychart.scales.DateTimeWithCalendar.prototype.maximumGap;
-anychart.scales.DateTimeWithCalendar.prototype['minimum'] = anychart.scales.DateTimeWithCalendar.prototype.minimum;
-anychart.scales.DateTimeWithCalendar.prototype['maximum'] = anychart.scales.DateTimeWithCalendar.prototype.maximum;
+(function() {
+  var proto = anychart.scales.DateTimeWithCalendar.prototype;
+  proto['dateToPix'] = proto.dateToPix;
+  proto['pixToDate'] = proto.pixToDate;
+  proto['calendar'] = proto.calendar;
+  proto['skipHolidays'] = proto.skipHolidays;
+  proto['unitPixSize'] = proto.unitPixSize;
+  proto['unit'] = proto.unit;
+  proto['count'] = proto.count;
+  proto['startDate'] = proto.startDate;
+  proto['getTicks'] = proto.getTicks;
+  proto['softMinimum'] = proto.softMinimum;
+  proto['softMaximum'] = proto.softMaximum;
+  proto['minimumGap'] = proto.minimumGap;
+  proto['maximumGap'] = proto.maximumGap;
+  proto['minimum'] = proto.minimum;
+  proto['maximum'] = proto.maximum;
+})();
 
 
 //endregion

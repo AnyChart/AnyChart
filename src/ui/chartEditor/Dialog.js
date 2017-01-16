@@ -742,17 +742,20 @@ anychart.ui.chartEditorDialog = function() {
 
 
 //exports
-goog.exportSymbol('anychart.ui.chartEditorDialog', anychart.ui.chartEditorDialog);
-anychart.ui.chartEditor.Dialog.prototype['data'] = anychart.ui.chartEditor.Dialog.prototype.data;
-anychart.ui.chartEditor.Dialog.prototype['render'] = anychart.ui.chartEditor.Dialog.prototype.render;
-anychart.ui.chartEditor.Dialog.prototype['decorate'] = anychart.ui.chartEditor.Dialog.prototype.decorate;
-anychart.ui.chartEditor.Dialog.prototype['visible'] = anychart.ui.chartEditor.Dialog.prototype.visible;
-anychart.ui.chartEditor.Dialog.prototype['listen'] = anychart.ui.chartEditor.Dialog.prototype.listen;
-anychart.ui.chartEditor.Dialog.prototype['listenOnce'] = anychart.ui.chartEditor.Dialog.prototype.listenOnce;
-anychart.ui.chartEditor.Dialog.prototype['unlisten'] = anychart.ui.chartEditor.Dialog.prototype.unlisten;
-anychart.ui.chartEditor.Dialog.prototype['unlistenByKey'] = anychart.ui.chartEditor.Dialog.prototype.unlistenByKey;
-anychart.ui.chartEditor.Dialog.prototype['removeAllListeners'] = anychart.ui.chartEditor.Dialog.prototype.removeAllListeners;
-anychart.ui.chartEditor.Dialog.prototype['dispose'] = anychart.ui.chartEditor.Dialog.prototype.dispose;
-anychart.ui.chartEditor.Dialog.prototype['getResultJson'] = anychart.ui.chartEditor.Dialog.prototype.getResultJson;
-anychart.ui.chartEditor.Dialog.prototype['getResultXml'] = anychart.ui.chartEditor.Dialog.prototype.getResultXml;
-anychart.ui.chartEditor.Dialog.prototype['getResultCode'] = anychart.ui.chartEditor.Dialog.prototype.getResultCode;
+(function() {
+  var proto = anychart.ui.chartEditor.Dialog.prototype;
+  goog.exportSymbol('anychart.ui.chartEditorDialog', anychart.ui.chartEditorDialog);
+  proto['data'] = proto.data;
+  proto['render'] = proto.render;
+  proto['decorate'] = proto.decorate;
+  proto['visible'] = proto.visible;
+  proto['listen'] = proto.listen;
+  proto['listenOnce'] = proto.listenOnce;
+  proto['unlisten'] = proto.unlisten;
+  proto['unlistenByKey'] = proto.unlistenByKey;
+  proto['removeAllListeners'] = proto.removeAllListeners;
+  proto['dispose'] = proto.dispose;
+  proto['getResultJson'] = proto.getResultJson;
+  proto['getResultXml'] = proto.getResultXml;
+  proto['getResultCode'] = proto.getResultCode;
+})();

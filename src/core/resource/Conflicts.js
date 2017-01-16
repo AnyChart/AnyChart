@@ -581,7 +581,7 @@ anychart.core.resource.Conflicts.prototype.resolveOption = function(name, interv
 //------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.resource.Conflicts.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.resource.Conflicts.base(this, 'serialize');
   anychart.core.settings.serialize(this, anychart.core.resource.Conflicts.DESCRIPTORS, json, 'Resource Conflicts');
   return json;
 };
@@ -589,7 +589,7 @@ anychart.core.resource.Conflicts.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.resource.Conflicts.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+  anychart.core.resource.Conflicts.base(this, 'setupByJSON', config);
   anychart.core.settings.deserialize(this, anychart.core.resource.Conflicts.DESCRIPTORS, config);
   this.labels(config['labels']);
 };
@@ -599,7 +599,7 @@ anychart.core.resource.Conflicts.prototype.setupByJSON = function(config) {
 anychart.core.resource.Conflicts.prototype.disposeInternal = function() {
   goog.disposeAll(this.conflictsLayer_, this.hatchLayer_, this.clip_);
   this.conflictsLayer_ = this.hatchLayer_ = this.clip_ = null;
-  goog.base(this, 'disposeInternal');
+  anychart.core.resource.Conflicts.base(this, 'disposeInternal');
 };
 
 
@@ -611,11 +611,14 @@ anychart.core.resource.Conflicts.prototype.disposeInternal = function() {
 //
 //------------------------------------------------------------------------------
 //exports
-//anychart.core.resource.Conflicts.prototype['height'] = anychart.core.resource.Conflicts.prototype.height;
-//anychart.core.resource.Conflicts.prototype['stroke'] = anychart.core.resource.Conflicts.prototype.stroke;
-//anychart.core.resource.Conflicts.prototype['fill'] = anychart.core.resource.Conflicts.prototype.fill;
-//anychart.core.resource.Conflicts.prototype['hatchFill'] = anychart.core.resource.Conflicts.prototype.hatchFill;
-anychart.core.resource.Conflicts.prototype['labels'] = anychart.core.resource.Conflicts.prototype.labels;
+(function() {
+  var proto = anychart.core.resource.Conflicts.prototype;
+  //proto['height'] = proto.height;
+  //proto['stroke'] = proto.stroke;
+  //proto['fill'] = proto.fill;
+  //proto['hatchFill'] = proto.hatchFill;
+  proto['labels'] = proto.labels;
+})();
 
 
 //endregion

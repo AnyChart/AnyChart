@@ -834,41 +834,45 @@ anychart.charts.Cartesian3d.prototype.serialize = function() {
 
 
 //exports
-goog.exportSymbol('anychart.cartesian3d', anychart.cartesian3d);
-anychart.charts.Cartesian3d.prototype['xScale'] = anychart.charts.Cartesian3d.prototype.xScale;
-anychart.charts.Cartesian3d.prototype['yScale'] = anychart.charts.Cartesian3d.prototype.yScale;
-anychart.charts.Cartesian3d.prototype['barsPadding'] = anychart.charts.Cartesian3d.prototype.barsPadding;
-anychart.charts.Cartesian3d.prototype['barGroupsPadding'] = anychart.charts.Cartesian3d.prototype.barGroupsPadding;
-anychart.charts.Cartesian3d.prototype['crosshair'] = anychart.charts.Cartesian3d.prototype.crosshair;
-anychart.charts.Cartesian3d.prototype['grid'] = anychart.charts.Cartesian3d.prototype.grid;
-anychart.charts.Cartesian3d.prototype['minorGrid'] = anychart.charts.Cartesian3d.prototype.minorGrid;
-anychart.charts.Cartesian3d.prototype['xAxis'] = anychart.charts.Cartesian3d.prototype.xAxis;
-anychart.charts.Cartesian3d.prototype['yAxis'] = anychart.charts.Cartesian3d.prototype.yAxis;
-anychart.charts.Cartesian3d.prototype['getSeries'] = anychart.charts.Cartesian3d.prototype.getSeries;
-// generated automatically
-// anychart.charts.Cartesian3d.prototype['area'] = anychart.charts.Cartesian3d.prototype.area;
-// anychart.charts.Cartesian3d.prototype['bar'] = anychart.charts.Cartesian3d.prototype.bar;
-// anychart.charts.Cartesian3d.prototype['column'] = anychart.charts.Cartesian3d.prototype.column;
-anychart.charts.Cartesian3d.prototype['lineMarker'] = anychart.charts.Cartesian3d.prototype.lineMarker;
-anychart.charts.Cartesian3d.prototype['rangeMarker'] = anychart.charts.Cartesian3d.prototype.rangeMarker;
-anychart.charts.Cartesian3d.prototype['textMarker'] = anychart.charts.Cartesian3d.prototype.textMarker;
-anychart.charts.Cartesian3d.prototype['palette'] = anychart.charts.Cartesian3d.prototype.palette;
-anychart.charts.Cartesian3d.prototype['markerPalette'] = anychart.charts.Cartesian3d.prototype.markerPalette;
-anychart.charts.Cartesian3d.prototype['hatchFillPalette'] = anychart.charts.Cartesian3d.prototype.hatchFillPalette;
-anychart.charts.Cartesian3d.prototype['getType'] = anychart.charts.Cartesian3d.prototype.getType;
-anychart.charts.Cartesian3d.prototype['defaultSeriesType'] = anychart.charts.Cartesian3d.prototype.defaultSeriesType;
-anychart.charts.Cartesian3d.prototype['addSeries'] = anychart.charts.Cartesian3d.prototype.addSeries;
-anychart.charts.Cartesian3d.prototype['getSeriesAt'] = anychart.charts.Cartesian3d.prototype.getSeriesAt;
-anychart.charts.Cartesian3d.prototype['getSeriesCount'] = anychart.charts.Cartesian3d.prototype.getSeriesCount;
-anychart.charts.Cartesian3d.prototype['removeSeries'] = anychart.charts.Cartesian3d.prototype.removeSeries;
-anychart.charts.Cartesian3d.prototype['removeSeriesAt'] = anychart.charts.Cartesian3d.prototype.removeSeriesAt;
-anychart.charts.Cartesian3d.prototype['removeAllSeries'] = anychart.charts.Cartesian3d.prototype.removeAllSeries;
-anychart.charts.Cartesian3d.prototype['getPlotBounds'] = anychart.charts.Cartesian3d.prototype.getPlotBounds;
-anychart.charts.Cartesian3d.prototype['xZoom'] = anychart.charts.Cartesian3d.prototype.xZoom;
-anychart.charts.Cartesian3d.prototype['xScroller'] = anychart.charts.Cartesian3d.prototype.xScroller;
-anychart.charts.Cartesian3d.prototype['zAspect'] = anychart.charts.Cartesian3d.prototype.zAspect;
-anychart.charts.Cartesian3d.prototype['zAngle'] = anychart.charts.Cartesian3d.prototype.zAngle;
-anychart.charts.Cartesian3d.prototype['zDistribution'] = anychart.charts.Cartesian3d.prototype.zDistribution;
-anychart.charts.Cartesian3d.prototype['zPadding'] = anychart.charts.Cartesian3d.prototype.zPadding;
-anychart.charts.Cartesian3d.prototype['getStat'] = anychart.charts.Cartesian3d.prototype.getStat;
-anychart.charts.Cartesian3d.prototype['zDepth'] = anychart.charts.Cartesian3d.prototype.zDepth; // deprecated
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.charts.Cartesian3d.prototype;
+  goog.exportSymbol('anychart.cartesian3d', anychart.cartesian3d);
+  proto['xScale'] = proto.xScale;
+  proto['yScale'] = proto.yScale;
+  proto['barsPadding'] = proto.barsPadding;
+  proto['barGroupsPadding'] = proto.barGroupsPadding;
+  proto['crosshair'] = proto.crosshair;
+  proto['grid'] = proto.grid;
+  proto['minorGrid'] = proto.minorGrid;
+  proto['xAxis'] = proto.xAxis;
+  proto['yAxis'] = proto.yAxis;
+  proto['getSeries'] = proto.getSeries;
+  // generated automatically
+  // proto['area'] = proto.area;
+  // proto['bar'] = proto.bar;
+  // proto['column'] = proto.column;
+  proto['lineMarker'] = proto.lineMarker;
+  proto['rangeMarker'] = proto.rangeMarker;
+  proto['textMarker'] = proto.textMarker;
+  proto['palette'] = proto.palette;
+  proto['markerPalette'] = proto.markerPalette;
+  proto['hatchFillPalette'] = proto.hatchFillPalette;
+  proto['getType'] = proto.getType;
+  proto['defaultSeriesType'] = proto.defaultSeriesType;
+  proto['addSeries'] = proto.addSeries;
+  proto['getSeriesAt'] = proto.getSeriesAt;
+  proto['getSeriesCount'] = proto.getSeriesCount;
+  proto['removeSeries'] = proto.removeSeries;
+  proto['removeSeriesAt'] = proto.removeSeriesAt;
+  proto['removeAllSeries'] = proto.removeAllSeries;
+  proto['getPlotBounds'] = proto.getPlotBounds;
+  proto['xZoom'] = proto.xZoom;
+  proto['xScroller'] = proto.xScroller;
+  proto['zAspect'] = proto.zAspect;
+  proto['zAngle'] = proto.zAngle;
+  proto['zDistribution'] = proto.zDistribution;
+  proto['zPadding'] = proto.zPadding;
+  proto['getStat'] = proto.getStat;
+  proto['zDepth'] = proto.zDepth; // deprecated
+})();

@@ -217,11 +217,14 @@ anychart.ui.zoom = function() {
 
 //region --- Exports
 //exports
-goog.exportSymbol('anychart.ui.zoom', anychart.ui.zoom);
-anychart.ui.Zoom.prototype['render'] = anychart.ui.Zoom.prototype.render;
-anychart.ui.Zoom.prototype['decorate'] = anychart.ui.Zoom.prototype.decorate;
-anychart.ui.Zoom.prototype['target'] = anychart.ui.Zoom.prototype.target;
-anychart.ui.Zoom.prototype['dispose'] = anychart.ui.Zoom.prototype.dispose;
+(function() {
+  var proto = anychart.ui.Zoom.prototype;
+  goog.exportSymbol('anychart.ui.zoom', anychart.ui.zoom);
+  proto['render'] = proto.render;
+  proto['decorate'] = proto.decorate;
+  proto['target'] = proto.target;
+  proto['dispose'] = proto.dispose;
+})();
 
 
 //endregion

@@ -17,7 +17,7 @@ goog.require('anychart.scales');
  * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.grids.Radar = function() {
-  goog.base(this);
+  anychart.core.grids.Radar.base(this, 'constructor');
 
   /**
    * @type {anychart.core.utils.TypedLayer}
@@ -866,7 +866,7 @@ anychart.core.grids.Radar.prototype.evenFillElement = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.grids.Radar.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.grids.Radar.base(this, 'serialize');
   json['isMinor'] = this.isMinor();
   if (this.layout_) json['layout'] = this.layout_;
   json['drawLastLine'] = this.drawLastLine();
@@ -880,7 +880,7 @@ anychart.core.grids.Radar.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.grids.Radar.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.grids.Radar.base(this, 'setupByJSON', config, opt_default);
   this.isMinor(config['isMinor']);
   this.layout(config['layout']);
   this.drawLastLine(config['drawLastLine']);
@@ -909,19 +909,22 @@ anychart.core.grids.Radar.prototype.disposeInternal = function() {
   delete this.stroke_;
   this.axis_ = null;
   this.chart_ = null;
-  goog.base(this, 'disposeInternal');
+  anychart.core.grids.Radar.base(this, 'disposeInternal');
 };
 
 
-//anychart.core.grids.Radar.prototype['startAngle'] = anychart.core.grids.Radar.prototype.startAngle;
+//proto['startAngle'] = proto.startAngle;
 //exports
-anychart.core.grids.Radar.prototype['isMinor'] = anychart.core.grids.Radar.prototype.isMinor;
-anychart.core.grids.Radar.prototype['oddFill'] = anychart.core.grids.Radar.prototype.oddFill;
-anychart.core.grids.Radar.prototype['evenFill'] = anychart.core.grids.Radar.prototype.evenFill;
-anychart.core.grids.Radar.prototype['layout'] = anychart.core.grids.Radar.prototype.layout;
-anychart.core.grids.Radar.prototype['isRadial'] = anychart.core.grids.Radar.prototype.isRadial;
-anychart.core.grids.Radar.prototype['yScale'] = anychart.core.grids.Radar.prototype.yScale;
-anychart.core.grids.Radar.prototype['xScale'] = anychart.core.grids.Radar.prototype.xScale;
-anychart.core.grids.Radar.prototype['stroke'] = anychart.core.grids.Radar.prototype.stroke;
-anychart.core.grids.Radar.prototype['drawLastLine'] = anychart.core.grids.Radar.prototype.drawLastLine;
-anychart.core.grids.Radar.prototype['axis'] = anychart.core.grids.Radar.prototype.axis;
+(function() {
+  var proto = anychart.core.grids.Radar.prototype;
+  proto['isMinor'] = proto.isMinor;
+  proto['oddFill'] = proto.oddFill;
+  proto['evenFill'] = proto.evenFill;
+  proto['layout'] = proto.layout;
+  proto['isRadial'] = proto.isRadial;
+  proto['yScale'] = proto.yScale;
+  proto['xScale'] = proto.xScale;
+  proto['stroke'] = proto.stroke;
+  proto['drawLastLine'] = proto.drawLastLine;
+  proto['axis'] = proto.axis;
+})();

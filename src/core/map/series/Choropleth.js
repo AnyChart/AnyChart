@@ -15,7 +15,7 @@ goog.require('anychart.core.utils.TypedLayer');
  * @extends {anychart.core.map.series.BaseWithMarkers}
  */
 anychart.core.map.series.Choropleth = function(opt_data, opt_csvSettings) {
-  goog.base(this, opt_data, opt_csvSettings);
+  anychart.core.map.series.Choropleth.base(this, 'constructor', opt_data, opt_csvSettings);
 
   // Define reference fields for a series
   this.referenceValueNames = ['id', 'value'];
@@ -167,7 +167,7 @@ anychart.core.map.series.Choropleth.prototype.colorScaleInvalidated_ = function(
 //region --- Providers
 /** @inheritDoc */
 anychart.core.map.series.Choropleth.prototype.createFormatProvider = function(opt_force) {
-  this.pointProvider = goog.base(this, 'createFormatProvider', opt_force);
+  this.pointProvider = anychart.core.map.series.Choropleth.base(this, 'createFormatProvider', opt_force);
 
   var iterator = this.getIterator();
   var value = iterator.get(this.referenceValueNames[1]);
@@ -307,7 +307,7 @@ anychart.core.map.series.Choropleth.prototype.applyHatchFill = function(pointSta
 /** @inheritDoc */
 anychart.core.map.series.Choropleth.prototype.remove = function() {
   this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-  goog.base(this, 'remove');
+  anychart.core.map.series.Choropleth.base(this, 'remove');
 };
 
 
@@ -508,7 +508,7 @@ anychart.core.map.series.Choropleth.prototype.calculate = function() {
 
 /** @inheritDoc */
 anychart.core.map.series.Choropleth.prototype.startDrawing = function() {
-  goog.base(this, 'startDrawing');
+  anychart.core.map.series.Choropleth.base(this, 'startDrawing');
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_HATCH_FILL)) {
     var needHatchFill = this.needDrawHatchFill();
@@ -569,7 +569,7 @@ anychart.core.map.series.Choropleth.prototype.drawPoint = function(pointState) {
     }
   }
 
-  goog.base(this, 'drawPoint', pointState);
+  anychart.core.map.series.Choropleth.base(this, 'drawPoint', pointState);
 };
 
 
@@ -586,6 +586,9 @@ anychart.core.map.series.Choropleth.prototype.draw = function() {
 //endregion
 //region --- Exports
 //exports
-anychart.core.map.series.Choropleth.prototype['colorScale'] = anychart.core.map.series.Choropleth.prototype.colorScale;
-anychart.core.map.series.Choropleth.prototype['getPoint'] = anychart.core.map.series.Choropleth.prototype.getPoint;
+(function() {
+  var proto = anychart.core.map.series.Choropleth.prototype;
+  proto['colorScale'] = proto.colorScale;
+  proto['getPoint'] = proto.getPoint;
+})();
 //endregion

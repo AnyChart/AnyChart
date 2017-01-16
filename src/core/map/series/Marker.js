@@ -15,7 +15,7 @@ goog.require('anychart.enums');
  * @extends {anychart.core.map.series.Base}
  */
 anychart.core.map.series.Marker = function(opt_data, opt_csvSettings) {
-  goog.base(this, opt_data, opt_csvSettings);
+  anychart.core.map.series.Marker.base(this, 'constructor', opt_data, opt_csvSettings);
 
   // Define reference fields for a series
   this.referenceValueNames = ['id', 'long', 'lat'];
@@ -211,13 +211,13 @@ anychart.core.map.series.Marker.prototype.remove = function() {
   if (this.markers_)
     this.markers_.container(null);
 
-  goog.base(this, 'remove');
+  anychart.core.map.series.Marker.base(this, 'remove');
 };
 
 
 /** @inheritDoc */
 anychart.core.map.series.Marker.prototype.startDrawing = function() {
-  goog.base(this, 'startDrawing');
+  anychart.core.map.series.Marker.base(this, 'startDrawing');
   if (this.isConsistent() || !this.enabled()) return;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.Z_INDEX)) {
@@ -333,7 +333,7 @@ anychart.core.map.series.Marker.prototype.drawPoint = function(pointState) {
     this.applyHatchFill(pointState);
   }
 
-  goog.base(this, 'drawPoint', pointState);
+  anychart.core.map.series.Marker.base(this, 'drawPoint', pointState);
 };
 
 
@@ -358,7 +358,7 @@ anychart.core.map.series.Marker.prototype.finalizeDrawing = function() {
     );
   }
 
-  goog.base(this, 'finalizeDrawing');
+  anychart.core.map.series.Marker.base(this, 'finalizeDrawing');
 };
 
 
@@ -557,7 +557,7 @@ anychart.core.map.series.Marker.prototype.applyAppearanceToSeries = function(poi
  * @inheritDoc
  */
 anychart.core.map.series.Marker.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.map.series.Marker.base(this, 'serialize');
 
   if (goog.isFunction(this.type())) {
     anychart.core.reporting.warning(
@@ -600,7 +600,7 @@ anychart.core.map.series.Marker.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.core.map.series.Marker.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.map.series.Marker.base(this, 'setupByJSON', config, opt_default);
   this.size(config['size']);
   this.hoverSize(config['hoverSize']);
   this.selectSize(config['selectSize']);
@@ -611,23 +611,26 @@ anychart.core.map.series.Marker.prototype.setupByJSON = function(config, opt_def
 
 
 //exports
-anychart.core.map.series.Marker.prototype['stroke'] = anychart.core.map.series.Marker.prototype.stroke;//inherited
-anychart.core.map.series.Marker.prototype['hoverStroke'] = anychart.core.map.series.Marker.prototype.hoverStroke;//inherited
-anychart.core.map.series.Marker.prototype['selectStroke'] = anychart.core.map.series.Marker.prototype.selectStroke;//inherited
+(function() {
+  var proto = anychart.core.map.series.Marker.prototype;
+  proto['stroke'] = proto.stroke;//inherited
+  proto['hoverStroke'] = proto.hoverStroke;//inherited
+  proto['selectStroke'] = proto.selectStroke;//inherited
 
-anychart.core.map.series.Marker.prototype['fill'] = anychart.core.map.series.Marker.prototype.fill;//inherited
-anychart.core.map.series.Marker.prototype['hoverFill'] = anychart.core.map.series.Marker.prototype.hoverFill;//inherited
-anychart.core.map.series.Marker.prototype['selectFill'] = anychart.core.map.series.Marker.prototype.selectFill;//inherited
+  proto['fill'] = proto.fill;//inherited
+  proto['hoverFill'] = proto.hoverFill;//inherited
+  proto['selectFill'] = proto.selectFill;//inherited
 
-anychart.core.map.series.Marker.prototype['size'] = anychart.core.map.series.Marker.prototype.size;//doc|ex
-anychart.core.map.series.Marker.prototype['hoverSize'] = anychart.core.map.series.Marker.prototype.hoverSize;//doc|ex
-anychart.core.map.series.Marker.prototype['selectSize'] = anychart.core.map.series.Marker.prototype.selectSize;
+  proto['size'] = proto.size;//doc|ex
+  proto['hoverSize'] = proto.hoverSize;//doc|ex
+  proto['selectSize'] = proto.selectSize;
 
-anychart.core.map.series.Marker.prototype['type'] = anychart.core.map.series.Marker.prototype.type;//doc|ex
-anychart.core.map.series.Marker.prototype['hoverType'] = anychart.core.map.series.Marker.prototype.hoverType;//doc|ex
-anychart.core.map.series.Marker.prototype['selectType'] = anychart.core.map.series.Marker.prototype.selectType;
+  proto['type'] = proto.type;//doc|ex
+  proto['hoverType'] = proto.hoverType;//doc|ex
+  proto['selectType'] = proto.selectType;
 
-anychart.core.map.series.Marker.prototype['hatchFill'] = anychart.core.map.series.Marker.prototype.hatchFill;//inherited
-anychart.core.map.series.Marker.prototype['hoverHatchFill'] = anychart.core.map.series.Marker.prototype.hoverHatchFill;//inherited
-anychart.core.map.series.Marker.prototype['selectHatchFill'] = anychart.core.map.series.Marker.prototype.selectHatchFill;//inherited
+  proto['hatchFill'] = proto.hatchFill;//inherited
+  proto['hoverHatchFill'] = proto.hoverHatchFill;//inherited
+  proto['selectHatchFill'] = proto.selectHatchFill;//inherited
 
+})();

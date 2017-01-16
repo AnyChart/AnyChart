@@ -10,7 +10,7 @@ goog.require('anychart.core.Base');
  * @extends {anychart.core.Base}
  */
 anychart.core.utils.Interactivity = function(parent) {
-  goog.base(this);
+  anychart.core.utils.Interactivity.base(this, 'constructor');
 
   /**
    * @type {anychart.core.Chart}
@@ -148,9 +148,10 @@ anychart.core.utils.Interactivity.prototype.serialize = function() {
 
 
 //exports
-//anychart.core.utils.Interactivity.prototype['allowMultiSeriesSelection'] = anychart.core.utils.Interactivity.prototype.allowMultiSeriesSelection;
-anychart.core.utils.Interactivity.prototype['hoverMode'] = anychart.core.utils.Interactivity.prototype.hoverMode;
-anychart.core.utils.Interactivity.prototype['selectionMode'] = anychart.core.utils.Interactivity.prototype.selectionMode;
-anychart.core.utils.Interactivity.prototype['spotRadius'] = anychart.core.utils.Interactivity.prototype.spotRadius;
-
-
+(function() {
+  var proto = anychart.core.utils.Interactivity.prototype;
+  //proto['allowMultiSeriesSelection'] = proto.allowMultiSeriesSelection;
+  proto['hoverMode'] = proto.hoverMode;
+  proto['selectionMode'] = proto.selectionMode;
+  proto['spotRadius'] = proto.spotRadius;
+})();

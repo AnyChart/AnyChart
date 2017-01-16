@@ -184,13 +184,13 @@ anychart.core.axisMarkers.GanttRange.prototype.appearanceInvalidated = function(
 /** @inheritDoc */
 anychart.core.axisMarkers.GanttRange.prototype.disposeInternal = function() {
   delete this.fill_;
-  goog.base(this, 'disposeInternal');
+  anychart.core.axisMarkers.GanttRange.base(this, 'disposeInternal');
 };
 
 
 /** @inheritDoc */
 anychart.core.axisMarkers.GanttRange.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.axisMarkers.GanttRange.base(this, 'serialize');
   json['from'] = this.from();
   json['to'] = this.to();
   json['fill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.fill()));
@@ -200,7 +200,7 @@ anychart.core.axisMarkers.GanttRange.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.axisMarkers.GanttRange.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.axisMarkers.GanttRange.base(this, 'setupByJSON', config, opt_default);
   this.from(config['from']);
   this.to(config['to']);
   this.fill(config['fill']);
@@ -208,9 +208,12 @@ anychart.core.axisMarkers.GanttRange.prototype.setupByJSON = function(config, op
 
 
 //exports
-anychart.core.axisMarkers.GanttRange.prototype['from'] = anychart.core.axisMarkers.GanttRange.prototype.from;
-anychart.core.axisMarkers.GanttRange.prototype['to'] = anychart.core.axisMarkers.GanttRange.prototype.to;
-anychart.core.axisMarkers.GanttRange.prototype['scale'] = anychart.core.axisMarkers.GanttRange.prototype.scale;
-anychart.core.axisMarkers.GanttRange.prototype['layout'] = anychart.core.axisMarkers.GanttRange.prototype.layout;
-anychart.core.axisMarkers.GanttRange.prototype['fill'] = anychart.core.axisMarkers.GanttRange.prototype.fill;
-anychart.core.axisMarkers.GanttRange.prototype['isHorizontal'] = anychart.core.axisMarkers.GanttRange.prototype.isHorizontal;
+(function() {
+  var proto = anychart.core.axisMarkers.GanttRange.prototype;
+  proto['from'] = proto.from;
+  proto['to'] = proto.to;
+  proto['scale'] = proto.scale;
+  proto['layout'] = proto.layout;
+  proto['fill'] = proto.fill;
+  proto['isHorizontal'] = proto.isHorizontal;
+})();

@@ -14,7 +14,7 @@ goog.require('anychart.utils');
  * @extends {anychart.core.VisualBase}
  */
 anychart.core.axes.Ticks = function() {
-  goog.base(this);
+  anychart.core.axes.Ticks.base(this, 'constructor');
 
   /**
    * Ticks length.
@@ -355,7 +355,7 @@ anychart.core.axes.Ticks.prototype.drawLeftTick = function(ratio, bounds, lineBo
 
 /** @inheritDoc */
 anychart.core.axes.Ticks.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.axes.Ticks.base(this, 'serialize');
   json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
   json['length'] = this.length();
   json['position'] = this.position();
@@ -365,7 +365,7 @@ anychart.core.axes.Ticks.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.axes.Ticks.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.axes.Ticks.base(this, 'setupByJSON', config, opt_default);
   this.length(config['length']);
   this.stroke(config['stroke']);
   this.position(config['position']);
@@ -373,6 +373,9 @@ anychart.core.axes.Ticks.prototype.setupByJSON = function(config, opt_default) {
 
 
 //exports
-anychart.core.axes.Ticks.prototype['length'] = anychart.core.axes.Ticks.prototype.length;//in docs/
-anychart.core.axes.Ticks.prototype['stroke'] = anychart.core.axes.Ticks.prototype.stroke;//in docs/
-anychart.core.axes.Ticks.prototype['position'] = anychart.core.axes.Ticks.prototype.position;//in docs/
+(function() {
+  var proto = anychart.core.axes.Ticks.prototype;
+  proto['length'] = proto.length;//in docs/
+  proto['stroke'] = proto.stroke;//in docs/
+  proto['position'] = proto.position;//in docs/
+})();

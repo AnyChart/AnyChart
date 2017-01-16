@@ -138,11 +138,14 @@ anychart.core.TreeMapPoint.prototype.exists = function() {
 
 
 //exports
-anychart.core.TreeMapPoint.prototype['getIndex'] = anychart.core.TreeMapPoint.prototype.getIndex;
-anychart.core.TreeMapPoint.prototype['getChart'] = anychart.core.TreeMapPoint.prototype.getChart;
-anychart.core.TreeMapPoint.prototype['getNode'] = anychart.core.TreeMapPoint.prototype.getNode;
-anychart.core.TreeMapPoint.prototype['get'] = anychart.core.TreeMapPoint.prototype.get;
-anychart.core.TreeMapPoint.prototype['set'] = anychart.core.TreeMapPoint.prototype.set;
-anychart.core.TreeMapPoint.prototype['hovered'] = anychart.core.TreeMapPoint.prototype.hovered;
-anychart.core.TreeMapPoint.prototype['selected'] = anychart.core.TreeMapPoint.prototype.selected;
-anychart.core.TreeMapPoint.prototype['exists'] = anychart.core.TreeMapPoint.prototype.exists;
+(function() {
+  var proto = anychart.core.TreeMapPoint.prototype;
+  proto['getIndex'] = proto.getIndex;
+  proto['getChart'] = proto.getChart;
+  proto['getNode'] = proto.getNode;
+  proto['get'] = proto.get;
+  proto['set'] = proto.set;
+  proto['hovered'] = proto.hovered;
+  proto['selected'] = proto.selected;
+  proto['exists'] = proto.exists;
+})();

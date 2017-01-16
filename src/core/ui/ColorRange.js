@@ -18,7 +18,7 @@ goog.forwardDeclare('anychart.charts.TreeMap');
  * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.ui.ColorRange = function() {
-  goog.base(this);
+  anychart.core.ui.ColorRange.base(this, 'constructor');
 
   /**
    * Size of color range line. Height in horizontal orientation.
@@ -748,7 +748,7 @@ anychart.core.ui.ColorRange.prototype.scale = function(opt_value) {
     if (this.lines)
       this.lines.length = 0;
   }
-  return goog.base(this, 'scale', opt_value) || this.getTempScale();
+  return anychart.core.ui.ColorRange.base(this, 'scale', opt_value) || this.getTempScale();
 };
 
 
@@ -792,7 +792,7 @@ anychart.core.ui.ColorRange.prototype.draw = function() {
     }
   }
 
-  return goog.base(this, 'draw');
+  return anychart.core.ui.ColorRange.base(this, 'draw');
 };
 
 
@@ -1001,14 +1001,14 @@ anychart.core.ui.ColorRange.prototype.handleMouseOut = function(event) {
 
 /** @inheritDoc */
 anychart.core.ui.ColorRange.prototype.remove = function() {
-  goog.base(this, 'remove');
+  anychart.core.ui.ColorRange.base(this, 'remove');
   if (this.marker_) this.marker_.remove();
 };
 
 
 /** @inheritDoc */
 anychart.core.ui.ColorRange.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.ui.ColorRange.base(this, 'serialize');
   json['marker'] = this.marker().serialize();
   json['colorLineSize'] = this.colorLineSize();
   json['length'] = this.length();
@@ -1019,7 +1019,7 @@ anychart.core.ui.ColorRange.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.ui.ColorRange.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.ui.ColorRange.base(this, 'setupByJSON', config, opt_default);
   this.marker(config['marker']);
   this.colorLineSize(config['colorLineSize']);
   this.length(config['length']);
@@ -1028,8 +1028,11 @@ anychart.core.ui.ColorRange.prototype.setupByJSON = function(config, opt_default
 
 
 //exports
-anychart.core.ui.ColorRange.prototype['marker'] = anychart.core.ui.ColorRange.prototype.marker;
-anychart.core.ui.ColorRange.prototype['colorLineSize'] = anychart.core.ui.ColorRange.prototype.colorLineSize;
-anychart.core.ui.ColorRange.prototype['length'] = anychart.core.ui.ColorRange.prototype.length;
-anychart.core.ui.ColorRange.prototype['align'] = anychart.core.ui.ColorRange.prototype.align;
+(function() {
+  var proto = anychart.core.ui.ColorRange.prototype;
+  proto['marker'] = proto.marker;
+  proto['colorLineSize'] = proto.colorLineSize;
+  proto['length'] = proto.length;
+  proto['align'] = proto.align;
+})();
 

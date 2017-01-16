@@ -11,7 +11,7 @@ goog.require('anychart.utils');
  * @extends {anychart.data.aggregators.Base}
  */
 anychart.data.aggregators.Min = function(valuesColumn) {
-  goog.base(this, valuesColumn);
+  anychart.data.aggregators.Min.base(this, 'constructor', valuesColumn);
 };
 goog.inherits(anychart.data.aggregators.Min, anychart.data.aggregators.Base);
 

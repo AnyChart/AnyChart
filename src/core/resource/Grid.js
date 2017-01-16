@@ -695,7 +695,7 @@ anychart.core.resource.Grid.prototype.check = function(flags) {
 //------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.resource.Grid.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.resource.Grid.base(this, 'serialize');
   anychart.core.settings.serialize(this, anychart.core.resource.Grid.DESCRIPTORS, json, 'Resource Grid');
 
   json['background'] = this.background_.serialize();
@@ -706,7 +706,7 @@ anychart.core.resource.Grid.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.resource.Grid.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.resource.Grid.base(this, 'setupByJSON', config, opt_default);
   //todo(Anton Saukh): Add opt_default support.
   anychart.core.settings.deserialize(this, anychart.core.resource.Grid.DESCRIPTORS, config);
 
@@ -747,23 +747,26 @@ anychart.core.resource.Grid.prototype.disposeInternal = function() {
 //
 //------------------------------------------------------------------------------
 //exports
-anychart.core.resource.Grid.prototype['background'] = anychart.core.resource.Grid.prototype.background;
-anychart.core.resource.Grid.prototype['overlay'] = anychart.core.resource.Grid.prototype.overlay;
-// descriptors
-// anychart.core.resource.Grid.prototype['horizontalStroke'] = anychart.core.resource.Grid.prototype.horizontalStroke;
-// anychart.core.resource.Grid.prototype['verticalStroke'] = anychart.core.resource.Grid.prototype.verticalStroke;
-// anychart.core.resource.Grid.prototype['oddFill'] = anychart.core.resource.Grid.prototype.oddFill;
-// anychart.core.resource.Grid.prototype['evenFill'] = anychart.core.resource.Grid.prototype.evenFill;
-// anychart.core.resource.Grid.prototype['oddHolidayFill'] = anychart.core.resource.Grid.prototype.oddHolidayFill;
-// anychart.core.resource.Grid.prototype['evenHolidayFill'] = anychart.core.resource.Grid.prototype.evenHolidayFill;
-// anychart.core.resource.Grid.prototype['oddHatchFill'] = anychart.core.resource.Grid.prototype.oddHatchFill;
-// anychart.core.resource.Grid.prototype['evenHatchFill'] = anychart.core.resource.Grid.prototype.evenHatchFill;
-// anychart.core.resource.Grid.prototype['oddHolidayHatchFill'] = anychart.core.resource.Grid.prototype.oddHolidayHatchFill;
-// anychart.core.resource.Grid.prototype['evenHolidayHatchFill'] = anychart.core.resource.Grid.prototype.evenHolidayHatchFill;
-// anychart.core.resource.Grid.prototype['drawTopLine'] = anychart.core.resource.Grid.prototype.drawTopLine;
-// anychart.core.resource.Grid.prototype['drawRightLine'] = anychart.core.resource.Grid.prototype.drawRightLine;
-// anychart.core.resource.Grid.prototype['drawBottomLine'] = anychart.core.resource.Grid.prototype.drawBottomLine;
-// anychart.core.resource.Grid.prototype['drawLeftLine'] = anychart.core.resource.Grid.prototype.drawLeftLine;
+(function() {
+  var proto = anychart.core.resource.Grid.prototype;
+  proto['background'] = proto.background;
+  proto['overlay'] = proto.overlay;
+  // descriptors
+  // proto['horizontalStroke'] = proto.horizontalStroke;
+  // proto['verticalStroke'] = proto.verticalStroke;
+  // proto['oddFill'] = proto.oddFill;
+  // proto['evenFill'] = proto.evenFill;
+  // proto['oddHolidayFill'] = proto.oddHolidayFill;
+  // proto['evenHolidayFill'] = proto.evenHolidayFill;
+  // proto['oddHatchFill'] = proto.oddHatchFill;
+  // proto['evenHatchFill'] = proto.evenHatchFill;
+  // proto['oddHolidayHatchFill'] = proto.oddHolidayHatchFill;
+  // proto['evenHolidayHatchFill'] = proto.evenHolidayHatchFill;
+  // proto['drawTopLine'] = proto.drawTopLine;
+  // proto['drawRightLine'] = proto.drawRightLine;
+  // proto['drawBottomLine'] = proto.drawBottomLine;
+  // proto['drawLeftLine'] = proto.drawLeftLine;
+})();
 
 
 //endregion

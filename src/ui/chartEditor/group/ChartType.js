@@ -11,7 +11,7 @@ goog.require('anychart.ui.chartEditor.settings.ChartType');
  * @extends {anychart.ui.chartEditor.group.Base}
  */
 anychart.ui.chartEditor.group.ChartType = function(model) {
-  goog.base(this, model);
+  anychart.ui.chartEditor.group.ChartType.base(this, 'constructor', model);
 
   this.setHeader('Chart Type');
 };
@@ -26,13 +26,13 @@ anychart.ui.chartEditor.group.ChartType.CssClass = {};
 anychart.ui.chartEditor.group.ChartType.prototype.disposeInternal = function() {
 
 
-  goog.base(this, 'disposeInternal');
+  anychart.ui.chartEditor.group.ChartType.base(this, 'disposeInternal');
 };
 
 
 /** @override */
 anychart.ui.chartEditor.group.ChartType.prototype.createDom = function() {
-  goog.base(this, 'createDom');
+  anychart.ui.chartEditor.group.ChartType.base(this, 'createDom');
 
 
 };

@@ -11,7 +11,7 @@ goog.require('goog.date.UtcDateTime');
  * @extends {anychart.scales.StockScatterTicksIterator}
  */
 anychart.scales.StockOrdinalTicksIterator = function(scale) {
-  goog.base(this);
+  anychart.scales.StockOrdinalTicksIterator.base(this, 'constructor');
 
   /**
    * @type {anychart.scales.StockScatterDateTime}

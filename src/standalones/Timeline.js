@@ -72,24 +72,28 @@ anychart.ui.resourceTimeline = function() {
 
 
 //exports
-goog.exportSymbol('anychart.ui.projectTimeline', anychart.ui.projectTimeline);
-goog.exportSymbol('anychart.ui.resourceTimeline', anychart.ui.resourceTimeline);
-goog.exportSymbol('anychart.standalones.projectTimeline', anychart.standalones.projectTimeline);
-goog.exportSymbol('anychart.standalones.resourceTimeline', anychart.standalones.resourceTimeline);
-anychart.standalones.ResourceTimeline.prototype['draw'] = anychart.standalones.ResourceTimeline.prototype.draw;
-anychart.standalones.ResourceTimeline.prototype['data'] = anychart.standalones.ResourceTimeline.prototype.data;
-anychart.standalones.ResourceTimeline.prototype['parentBounds'] = anychart.standalones.ResourceTimeline.prototype.parentBounds;
-anychart.standalones.ResourceTimeline.prototype['container'] = anychart.standalones.ResourceTimeline.prototype.container;
-anychart.standalones.ResourceTimeline.prototype['rowStroke'] = anychart.standalones.ResourceTimeline.prototype.rowStroke;
-anychart.standalones.ResourceTimeline.prototype['backgroundFill'] = anychart.standalones.ResourceTimeline.prototype.backgroundFill;
-anychart.standalones.ResourceTimeline.prototype['headerHeight'] = anychart.standalones.ResourceTimeline.prototype.headerHeight;
-anychart.standalones.ResourceTimeline.prototype['defaultRowHeight'] = anychart.standalones.ResourceTimeline.prototype.defaultRowHeight;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.standalones.ProjectTimeline.prototype;
+  goog.exportSymbol('anychart.ui.projectTimeline', anychart.ui.projectTimeline);
+  goog.exportSymbol('anychart.ui.resourceTimeline', anychart.ui.resourceTimeline);
+  goog.exportSymbol('anychart.standalones.projectTimeline', anychart.standalones.projectTimeline);
+  goog.exportSymbol('anychart.standalones.resourceTimeline', anychart.standalones.resourceTimeline);
+  proto['draw'] = proto.draw;
+  proto['data'] = proto.data;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+  proto['rowStroke'] = proto.rowStroke;
+  proto['backgroundFill'] = proto.backgroundFill;
+  proto['headerHeight'] = proto.headerHeight;
+  proto['defaultRowHeight'] = proto.defaultRowHeight;
 
-anychart.standalones.ProjectTimeline.prototype['draw'] = anychart.standalones.ProjectTimeline.prototype.draw;
-anychart.standalones.ProjectTimeline.prototype['data'] = anychart.standalones.ProjectTimeline.prototype.data;
-anychart.standalones.ProjectTimeline.prototype['parentBounds'] = anychart.standalones.ProjectTimeline.prototype.parentBounds;
-anychart.standalones.ProjectTimeline.prototype['container'] = anychart.standalones.ProjectTimeline.prototype.container;
-anychart.standalones.ProjectTimeline.prototype['rowStroke'] = anychart.standalones.ProjectTimeline.prototype.rowStroke;
-anychart.standalones.ProjectTimeline.prototype['backgroundFill'] = anychart.standalones.ProjectTimeline.prototype.backgroundFill;
-anychart.standalones.ProjectTimeline.prototype['headerHeight'] = anychart.standalones.ProjectTimeline.prototype.headerHeight;
-anychart.standalones.ProjectTimeline.prototype['defaultRowHeight'] = anychart.standalones.ProjectTimeline.prototype.defaultRowHeight;
+  proto['draw'] = proto.draw;
+  proto['data'] = proto.data;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+  proto['rowStroke'] = proto.rowStroke;
+  proto['backgroundFill'] = proto.backgroundFill;
+  proto['headerHeight'] = proto.headerHeight;
+  proto['defaultRowHeight'] = proto.defaultRowHeight;
+})();

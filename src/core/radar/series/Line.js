@@ -14,7 +14,7 @@ goog.require('anychart.core.radar.series.ContinuousBase');
  * @extends {anychart.core.radar.series.ContinuousBase}
  */
 anychart.core.radar.series.Line = function(opt_data, opt_csvSettings) {
-  goog.base(this, opt_data, opt_csvSettings);
+  anychart.core.radar.series.Line.base(this, 'constructor', opt_data, opt_csvSettings);
 
   this.referenceValuesSupportStack = false;
   // legacy
@@ -90,7 +90,7 @@ anychart.core.radar.series.Line.prototype.finalizeDrawing = function() {
         this.path.lineTo(this.firstDrawnPoint.x, this.firstDrawnPoint.y);
     }
   }
-  goog.base(this, 'finalizeDrawing');
+  anychart.core.radar.series.Line.base(this, 'finalizeDrawing');
 };
 
 
@@ -100,7 +100,7 @@ anychart.core.radar.series.Line.prototype.finalizeDrawing = function() {
 anychart.core.radar.series.Line.prototype.startDrawing = function() {
   this.prevPointIsMissing = false;
 
-  goog.base(this, 'startDrawing');
+  anychart.core.radar.series.Line.base(this, 'startDrawing');
 };
 
 
@@ -124,12 +124,15 @@ anychart.core.radar.series.Line.prototype.getType = function() {
 };
 
 
-//anychart.core.radar.series.Line.prototype['finalizeDrawing'] = anychart.core.radar.series.Line.prototype.finalizeDrawing;
-//anychart.core.radar.series.Line.prototype['startDrawing'] = anychart.core.radar.series.Line.prototype.startDrawing;
+//proto['finalizeDrawing'] = proto.finalizeDrawing;
+//proto['startDrawing'] = proto.startDrawing;
 //exports
-anychart.core.radar.series.Line.prototype['stroke'] = anychart.core.radar.series.Line.prototype.stroke;//inherited
-anychart.core.radar.series.Line.prototype['hoverStroke'] = anychart.core.radar.series.Line.prototype.hoverStroke;//inherited
-anychart.core.radar.series.Line.prototype['selectStroke'] = anychart.core.radar.series.Line.prototype.selectStroke;//inherited
-anychart.core.radar.series.Line.prototype['finalizeDrawing'] = anychart.core.radar.series.Line.prototype.finalizeDrawing;//inherited
-anychart.core.radar.series.Line.prototype['startDrawing'] = anychart.core.radar.series.Line.prototype.startDrawing;//inherited
-anychart.core.radar.series.Line.prototype['getType'] = anychart.core.radar.series.Line.prototype.getType;
+(function() {
+  var proto = anychart.core.radar.series.Line.prototype;
+  proto['stroke'] = proto.stroke;//inherited
+  proto['hoverStroke'] = proto.hoverStroke;//inherited
+  proto['selectStroke'] = proto.selectStroke;//inherited
+  proto['finalizeDrawing'] = proto.finalizeDrawing;//inherited
+  proto['startDrawing'] = proto.startDrawing;//inherited
+  proto['getType'] = proto.getType;
+})();

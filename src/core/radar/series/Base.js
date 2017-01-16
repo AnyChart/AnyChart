@@ -29,7 +29,7 @@ goog.require('anychart.enums');
  * @extends {anychart.core.SeriesBase}
  */
 anychart.core.radar.series.Base = function(opt_data, opt_csvSettings) {
-  goog.base(this, opt_data, opt_csvSettings);
+  anychart.core.radar.series.Base.base(this, 'constructor', opt_data, opt_csvSettings);
   /**
    * @type {anychart.core.utils.SeriesPointContextProvider}
    * @private
@@ -448,7 +448,7 @@ anychart.core.radar.series.Base.prototype.remove = function() {
 
   this.labels().container(null);
 
-  goog.base(this, 'remove');
+  anychart.core.radar.series.Base.base(this, 'remove');
 };
 
 
@@ -705,7 +705,7 @@ anychart.core.radar.series.Base.prototype.setAutoMarkerType = function(value) {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.radar.series.Base.prototype.getEnableChangeSignals = function() {
-  return goog.base(this, 'getEnableChangeSignals') | anychart.Signal.DATA_CHANGED | anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEED_UPDATE_LEGEND;
+  return anychart.core.radar.series.Base.base(this, 'getEnableChangeSignals') | anychart.Signal.DATA_CHANGED | anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEED_UPDATE_LEGEND;
 };
 
 
@@ -718,7 +718,7 @@ anychart.core.radar.series.Base.prototype.getEnableChangeSignals = function() {
  * @inheritDoc
  */
 anychart.core.radar.series.Base.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.radar.series.Base.base(this, 'serialize');
   json['seriesType'] = this.getType();
   return json;
 };
@@ -728,24 +728,27 @@ anychart.core.radar.series.Base.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.core.radar.series.Base.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.radar.series.Base.base(this, 'setupByJSON', config, opt_default);
 };
 
 
-//anychart.core.radar.series.Base.prototype['drawPoint'] = anychart.core.radar.series.Base.prototype.drawPoint;
-//anychart.core.radar.series.Base.prototype['drawMissing'] = anychart.core.radar.series.Base.prototype.drawMissing;
-//anychart.core.radar.series.Base.prototype['startDrawing'] = anychart.core.radar.series.Base.prototype.startDrawing;
-//anychart.core.radar.series.Base.prototype['finalizeDrawing'] = anychart.core.radar.series.Base.prototype.finalizeDrawing;
-//anychart.core.radar.series.Base.prototype['getIterator'] = anychart.core.radar.series.Base.prototype.getIterator;
-//anychart.core.radar.series.Base.prototype['getResetIterator'] = anychart.core.radar.series.Base.prototype.getResetIterator;
+//proto['drawPoint'] = proto.drawPoint;
+//proto['drawMissing'] = proto.drawMissing;
+//proto['startDrawing'] = proto.startDrawing;
+//proto['finalizeDrawing'] = proto.finalizeDrawing;
+//proto['getIterator'] = proto.getIterator;
+//proto['getResetIterator'] = proto.getResetIterator;
 //exports
-anychart.core.radar.series.Base.prototype['color'] = anychart.core.radar.series.Base.prototype.color;//doc|ex
-anychart.core.radar.series.Base.prototype['name'] = anychart.core.radar.series.Base.prototype.name;//doc|ex
-anychart.core.radar.series.Base.prototype['meta'] = anychart.core.radar.series.Base.prototype.meta;//doc|ex
-anychart.core.radar.series.Base.prototype['data'] = anychart.core.radar.series.Base.prototype.data;//doc|ex
-anychart.core.radar.series.Base.prototype['labels'] = anychart.core.radar.series.Base.prototype.labels;//doc|ex
-anychart.core.radar.series.Base.prototype['hoverLabels'] = anychart.core.radar.series.Base.prototype.hoverLabels;
-anychart.core.radar.series.Base.prototype['xScale'] = anychart.core.radar.series.Base.prototype.xScale;//need-ex
-anychart.core.radar.series.Base.prototype['yScale'] = anychart.core.radar.series.Base.prototype.yScale;//need-ex
-anychart.core.radar.series.Base.prototype['hover'] = anychart.core.radar.series.Base.prototype.hover;
-anychart.core.radar.series.Base.prototype['transformXY'] = anychart.core.radar.series.Base.prototype.transformXY;
+(function() {
+  var proto = anychart.core.radar.series.Base.prototype;
+  proto['color'] = proto.color;//doc|ex
+  proto['name'] = proto.name;//doc|ex
+  proto['meta'] = proto.meta;//doc|ex
+  proto['data'] = proto.data;//doc|ex
+  proto['labels'] = proto.labels;//doc|ex
+  proto['hoverLabels'] = proto.hoverLabels;
+  proto['xScale'] = proto.xScale;//need-ex
+  proto['yScale'] = proto.yScale;//need-ex
+  proto['hover'] = proto.hover;
+  proto['transformXY'] = proto.transformXY;
+})();

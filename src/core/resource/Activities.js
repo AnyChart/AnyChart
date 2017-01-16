@@ -646,7 +646,7 @@ anychart.core.resource.Activities.prototype.resolveOption = function(name, dataO
 //------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.resource.Activities.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.resource.Activities.base(this, 'serialize');
   anychart.core.settings.serialize(this, anychart.core.resource.Activities.DESCRIPTORS, json, 'Activities');
   json['labels'] = this.labels().serialize();
   return json;
@@ -655,7 +655,7 @@ anychart.core.resource.Activities.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.resource.Activities.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config);
+  anychart.core.resource.Activities.base(this, 'setupByJSON', config);
   anychart.core.settings.deserialize(this, anychart.core.resource.Activities.DESCRIPTORS, config);
   this.labels().setup(config['labels']);
 };
@@ -666,7 +666,7 @@ anychart.core.resource.Activities.prototype.disposeInternal = function() {
   this.settings = this.defaultSettings = this.strokeResolver_ = this.fillResolver_ = this.hatchFillResolver_ = null;
   goog.disposeAll(this.labels_, this.clip_);
   this.labels_ = this.clip_ = null;
-  goog.base(this, 'disposeInternal');
+  anychart.core.resource.Activities.base(this, 'disposeInternal');
 };
 
 
@@ -678,11 +678,14 @@ anychart.core.resource.Activities.prototype.disposeInternal = function() {
 //
 //------------------------------------------------------------------------------
 //exports
-//anychart.core.resource.Activities.prototype['color'] = anychart.core.resource.Activities.prototype.color;
-//anychart.core.resource.Activities.prototype['stroke'] = anychart.core.resource.Activities.prototype.stroke;
-//anychart.core.resource.Activities.prototype['fill'] = anychart.core.resource.Activities.prototype.fill;
-//anychart.core.resource.Activities.prototype['hatchFill'] = anychart.core.resource.Activities.prototype.hatchFill;
-anychart.core.resource.Activities.prototype['labels'] = anychart.core.resource.Activities.prototype.labels;
+(function() {
+  var proto = anychart.core.resource.Activities.prototype;
+  //proto['color'] = proto.color;
+  //proto['stroke'] = proto.stroke;
+  //proto['fill'] = proto.fill;
+  //proto['hatchFill'] = proto.hatchFill;
+  proto['labels'] = proto.labels;
+})();
 
 
 //endregion

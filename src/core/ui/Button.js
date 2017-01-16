@@ -13,7 +13,7 @@ goog.require('anychart.math');
  * @extends {anychart.core.Text}
  */
 anychart.core.ui.Button = function() {
-  goog.base(this);
+  anychart.core.ui.Button.base(this, 'constructor');
 
   /**
    * Button cursor.
@@ -283,7 +283,7 @@ anychart.core.ui.Button.prototype.applyTextSettings = function(textElement, isIn
     else
       textElement.text(this.settingsObj['text']);
   }
-  goog.base(this, 'applyTextSettings', textElement, isInitial);
+  anychart.core.ui.Button.base(this, 'applyTextSettings', textElement, isInitial);
   this.changedSettings = {};
 };
 
@@ -858,16 +858,16 @@ anychart.core.ui.Button.prototype.cursor = function(opt_value) {
 };
 
 
-//anychart.core.ui.Button.prototype['text'] = anychart.core.ui.Button.prototype.text;
-//anychart.core.ui.Button.prototype['padding'] = anychart.core.ui.Button.prototype.padding;
-//anychart.core.ui.Button.prototype['position'] = anychart.core.ui.Button.prototype.position;
-//anychart.core.ui.Button.prototype['width'] = anychart.core.ui.Button.prototype.width;
-//anychart.core.ui.Button.prototype['height'] = anychart.core.ui.Button.prototype.height;
-//anychart.core.ui.Button.prototype['setOnClickListener'] = anychart.core.ui.Button.prototype.setOnClickListener;
-//anychart.core.ui.Button.prototype['normal'] = anychart.core.ui.Button.prototype.normal;
-//anychart.core.ui.Button.prototype['hover'] = anychart.core.ui.Button.prototype.hover;
-//anychart.core.ui.Button.prototype['pushed'] = anychart.core.ui.Button.prototype.pushed;
-//anychart.core.ui.Button.prototype['checked'] = anychart.core.ui.Button.prototype.checked;
-//anychart.core.ui.Button.prototype['disabled'] = anychart.core.ui.Button.prototype.disabled;
+//proto['text'] = proto.text;
+//proto['padding'] = proto.padding;
+//proto['position'] = proto.position;
+//proto['width'] = proto.width;
+//proto['height'] = proto.height;
+//proto['setOnClickListener'] = proto.setOnClickListener;
+//proto['normal'] = proto.normal;
+//proto['hover'] = proto.hover;
+//proto['pushed'] = proto.pushed;
+//proto['checked'] = proto.checked;
+//proto['disabled'] = proto.disabled;
 
 //exports

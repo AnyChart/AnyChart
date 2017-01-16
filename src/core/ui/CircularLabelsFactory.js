@@ -9,7 +9,7 @@ goog.require('anychart.math.Rect');
  * @extends {anychart.core.ui.LabelsFactory}
  */
 anychart.core.ui.CircularLabelsFactory = function() {
-  goog.base(this);
+  anychart.core.ui.CircularLabelsFactory.base(this, 'constructor');
 
   /**
    * X coord of circular center.
@@ -341,7 +341,7 @@ anychart.core.ui.CircularLabelsFactory.prototype.createLabel = function() {
 
 /** @inheritDoc */
 anychart.core.ui.CircularLabelsFactory.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.ui.CircularLabelsFactory.base(this, 'serialize');
   if (this.changedSettings['autoRotate']) json['autoRotate'] = this.autoRotate();
   return json;
 };
@@ -349,7 +349,7 @@ anychart.core.ui.CircularLabelsFactory.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.ui.CircularLabelsFactory.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.ui.CircularLabelsFactory.base(this, 'setupByJSON', config, opt_default);
   this.autoRotate(config['autoRotate']);
 };
 
@@ -360,7 +360,7 @@ anychart.core.ui.CircularLabelsFactory.prototype.setupByJSON = function(config, 
  * @extends {anychart.core.ui.LabelsFactory.Label}
  */
 anychart.core.ui.CircularLabelsFactory.Label = function() {
-  goog.base(this);
+  anychart.core.ui.CircularLabelsFactory.Label.base(this, 'constructor');
 };
 goog.inherits(anychart.core.ui.CircularLabelsFactory.Label, anychart.core.ui.LabelsFactory.Label);
 
@@ -466,7 +466,7 @@ anychart.core.ui.CircularLabelsFactory.Label.prototype.drawLabel = function(boun
 
 /** @inheritDoc */
 anychart.core.ui.CircularLabelsFactory.Label.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.ui.CircularLabelsFactory.Label.base(this, 'serialize');
   if (goog.isDef(this.autoRotate())) json['autoRotate'] = this.autoRotate();
   return json;
 };
@@ -474,10 +474,15 @@ anychart.core.ui.CircularLabelsFactory.Label.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.ui.CircularLabelsFactory.Label.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.ui.CircularLabelsFactory.Label.base(this, 'setupByJSON', config, opt_default);
   this.autoRotate(config['autoRotate']);
 };
 
 
-anychart.core.ui.CircularLabelsFactory.prototype['autoRotate'] = anychart.core.ui.CircularLabelsFactory.prototype.autoRotate;
-anychart.core.ui.CircularLabelsFactory.Label.prototype['autoRotate'] = anychart.core.ui.CircularLabelsFactory.Label.prototype.autoRotate;
+//exports
+(function() {
+  var proto = anychart.core.ui.CircularLabelsFactory.prototype;
+  proto['autoRotate'] = proto.autoRotate;
+  proto = anychart.core.ui.CircularLabelsFactory.Label.prototype;
+  proto['autoRotate'] = proto.autoRotate;
+})();

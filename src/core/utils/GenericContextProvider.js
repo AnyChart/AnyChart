@@ -163,6 +163,9 @@ anychart.core.utils.GenericContextProvider.prototype.getStat = function(name) {
 
 
 //exports
-anychart.core.utils.GenericContextProvider.prototype['getTokenValue'] = anychart.core.utils.GenericContextProvider.prototype.getTokenValue;
-anychart.core.utils.GenericContextProvider.prototype['getTokenType'] = anychart.core.utils.GenericContextProvider.prototype.getTokenType;
-anychart.core.utils.GenericContextProvider.prototype['getStat'] = anychart.core.utils.GenericContextProvider.prototype.getStat;
+(function() {
+  var proto = anychart.core.utils.GenericContextProvider.prototype;
+  proto['getTokenValue'] = proto.getTokenValue;
+  proto['getTokenType'] = proto.getTokenType;
+  proto['getStat'] = proto.getStat;
+})();

@@ -10,7 +10,7 @@ goog.require('goog.ui.Component');
  * @extends {goog.ui.Component}
  */
 anychart.ui.chartEditor.ChartTypeSideBar = function() {
-  goog.base(this);
+  anychart.ui.chartEditor.ChartTypeSideBar.base(this, 'constructor');
 
 };
 goog.inherits(anychart.ui.chartEditor.ChartTypeSideBar, goog.ui.Component);
@@ -22,7 +22,7 @@ anychart.ui.chartEditor.ChartTypeSideBar.CSS_CLASS = goog.getCssName('anychart-c
 
 /** @inheritDoc */
 anychart.ui.chartEditor.ChartTypeSideBar.prototype.disposeInternal = function() {
-  goog.base(this, 'disposeInternal');
+  anychart.ui.chartEditor.ChartTypeSideBar.base(this, 'disposeInternal');
 };
 
 

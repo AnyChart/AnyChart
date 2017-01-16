@@ -29,7 +29,7 @@ goog.require('anychart.utils');
  * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.ui.Table = function(opt_rowsCount, opt_colsCount) {
-  goog.base(this);
+  anychart.core.ui.Table.base(this, 'constructor');
 
   /**
    * Cells array.
@@ -2316,70 +2316,73 @@ anychart.core.ui.Table.prototype.disposeInternal = function() {
   goog.dispose(this.layer_);
   goog.dispose(this.contentLayer_);
   delete this.settingsObj;
-  goog.base(this, 'disposeInternal');
+  anychart.core.ui.Table.base(this, 'disposeInternal');
 };
 
 
 //exports
-anychart.core.ui.Table.prototype['rowsCount'] = anychart.core.ui.Table.prototype.rowsCount;//doc|ex
-anychart.core.ui.Table.prototype['colsCount'] = anychart.core.ui.Table.prototype.colsCount;//doc|ex
+(function() {
+  var proto = anychart.core.ui.Table.prototype;
+  proto['rowsCount'] = proto.rowsCount;//doc|ex
+  proto['colsCount'] = proto.colsCount;//doc|ex
 
-anychart.core.ui.Table.prototype['getCell'] = anychart.core.ui.Table.prototype.getCell;//doc|ex
-anychart.core.ui.Table.prototype['getRow'] = anychart.core.ui.Table.prototype.getRow;
-anychart.core.ui.Table.prototype['getCol'] = anychart.core.ui.Table.prototype.getCol;
+  proto['getCell'] = proto.getCell;//doc|ex
+  proto['getRow'] = proto.getRow;
+  proto['getCol'] = proto.getCol;
 
-anychart.core.ui.Table.prototype['rowsHeight'] = anychart.core.ui.Table.prototype.rowsHeight;
-anychart.core.ui.Table.prototype['rowsMinHeight'] = anychart.core.ui.Table.prototype.rowsMinHeight;
-anychart.core.ui.Table.prototype['rowsMaxHeight'] = anychart.core.ui.Table.prototype.rowsMaxHeight;
-anychart.core.ui.Table.prototype['colsWidth'] = anychart.core.ui.Table.prototype.colsWidth;
-anychart.core.ui.Table.prototype['colsMinWidth'] = anychart.core.ui.Table.prototype.colsMinWidth;
-anychart.core.ui.Table.prototype['colsMaxWidth'] = anychart.core.ui.Table.prototype.colsMaxWidth;
+  proto['rowsHeight'] = proto.rowsHeight;
+  proto['rowsMinHeight'] = proto.rowsMinHeight;
+  proto['rowsMaxHeight'] = proto.rowsMaxHeight;
+  proto['colsWidth'] = proto.colsWidth;
+  proto['colsMinWidth'] = proto.colsMinWidth;
+  proto['colsMaxWidth'] = proto.colsMaxWidth;
 
-anychart.core.ui.Table.prototype['border'] = anychart.core.ui.Table.prototype.border;
+  proto['border'] = proto.border;
 
-anychart.core.ui.Table.prototype['contents'] = anychart.core.ui.Table.prototype.contents;//doc|ex
+  proto['contents'] = proto.contents;//doc|ex
 
-anychart.core.ui.Table.prototype['draw'] = anychart.core.ui.Table.prototype.draw;//doc
+  proto['draw'] = proto.draw;//doc
 
-anychart.core.ui.Table.prototype['fontSize'] = anychart.core.ui.Table.prototype.fontSize;
-anychart.core.ui.Table.prototype['fontFamily'] = anychart.core.ui.Table.prototype.fontFamily;
-anychart.core.ui.Table.prototype['fontColor'] = anychart.core.ui.Table.prototype.fontColor;
-anychart.core.ui.Table.prototype['fontOpacity'] = anychart.core.ui.Table.prototype.fontOpacity;
-anychart.core.ui.Table.prototype['fontDecoration'] = anychart.core.ui.Table.prototype.fontDecoration;
-anychart.core.ui.Table.prototype['fontStyle'] = anychart.core.ui.Table.prototype.fontStyle;
-anychart.core.ui.Table.prototype['fontVariant'] = anychart.core.ui.Table.prototype.fontVariant;
-anychart.core.ui.Table.prototype['fontWeight'] = anychart.core.ui.Table.prototype.fontWeight;
-anychart.core.ui.Table.prototype['letterSpacing'] = anychart.core.ui.Table.prototype.letterSpacing;
-anychart.core.ui.Table.prototype['textDirection'] = anychart.core.ui.Table.prototype.textDirection;
-anychart.core.ui.Table.prototype['lineHeight'] = anychart.core.ui.Table.prototype.lineHeight;
-anychart.core.ui.Table.prototype['textIndent'] = anychart.core.ui.Table.prototype.textIndent;
-anychart.core.ui.Table.prototype['vAlign'] = anychart.core.ui.Table.prototype.vAlign;
-anychart.core.ui.Table.prototype['hAlign'] = anychart.core.ui.Table.prototype.hAlign;
-anychart.core.ui.Table.prototype['textWrap'] = anychart.core.ui.Table.prototype.textWrap;
-anychart.core.ui.Table.prototype['textOverflow'] = anychart.core.ui.Table.prototype.textOverflow;
-anychart.core.ui.Table.prototype['selectable'] = anychart.core.ui.Table.prototype.selectable;
-anychart.core.ui.Table.prototype['disablePointerEvents'] = anychart.core.ui.Table.prototype.disablePointerEvents;
-anychart.core.ui.Table.prototype['useHtml'] = anychart.core.ui.Table.prototype.useHtml;
+  proto['fontSize'] = proto.fontSize;
+  proto['fontFamily'] = proto.fontFamily;
+  proto['fontColor'] = proto.fontColor;
+  proto['fontOpacity'] = proto.fontOpacity;
+  proto['fontDecoration'] = proto.fontDecoration;
+  proto['fontStyle'] = proto.fontStyle;
+  proto['fontVariant'] = proto.fontVariant;
+  proto['fontWeight'] = proto.fontWeight;
+  proto['letterSpacing'] = proto.letterSpacing;
+  proto['textDirection'] = proto.textDirection;
+  proto['lineHeight'] = proto.lineHeight;
+  proto['textIndent'] = proto.textIndent;
+  proto['vAlign'] = proto.vAlign;
+  proto['hAlign'] = proto.hAlign;
+  proto['textWrap'] = proto.textWrap;
+  proto['textOverflow'] = proto.textOverflow;
+  proto['selectable'] = proto.selectable;
+  proto['disablePointerEvents'] = proto.disablePointerEvents;
+  proto['useHtml'] = proto.useHtml;
 
-anychart.core.ui.Table.prototype['cellFill'] = anychart.core.ui.Table.prototype.cellFill;//doc|ex
+  proto['cellFill'] = proto.cellFill;//doc|ex
 
-anychart.core.ui.Table.prototype['rowEvenFill'] = anychart.core.ui.Table.prototype.rowEvenFill;
-anychart.core.ui.Table.prototype['rowOddFill'] = anychart.core.ui.Table.prototype.rowOddFill;
+  proto['rowEvenFill'] = proto.rowEvenFill;
+  proto['rowOddFill'] = proto.rowOddFill;
 
-anychart.core.ui.Table.prototype['cellBorder'] = anychart.core.ui.Table.prototype.cellBorder;
+  proto['cellBorder'] = proto.cellBorder;
 
-anychart.core.ui.Table.prototype['cellPadding'] = anychart.core.ui.Table.prototype.cellPadding;
+  proto['cellPadding'] = proto.cellPadding;
 
-anychart.core.ui.Table.prototype['saveAsPng'] = anychart.core.ui.Table.prototype.saveAsPng;//inherited
-anychart.core.ui.Table.prototype['saveAsJpg'] = anychart.core.ui.Table.prototype.saveAsJpg;//inherited
-anychart.core.ui.Table.prototype['saveAsPdf'] = anychart.core.ui.Table.prototype.saveAsPdf;//inherited
-anychart.core.ui.Table.prototype['saveAsSvg'] = anychart.core.ui.Table.prototype.saveAsSvg;//inherited
-anychart.core.ui.Table.prototype['shareAsPng'] = anychart.core.ui.Table.prototype.shareAsPng;//inherited
-anychart.core.ui.Table.prototype['shareAsJpg'] = anychart.core.ui.Table.prototype.shareAsJpg;//inherited
-anychart.core.ui.Table.prototype['shareAsPdf'] = anychart.core.ui.Table.prototype.shareAsPdf;//inherited
-anychart.core.ui.Table.prototype['shareAsSvg'] = anychart.core.ui.Table.prototype.shareAsSvg;//inherited
-anychart.core.ui.Table.prototype['getPngBase64String'] = anychart.core.ui.Table.prototype.getPngBase64String;//inherited
-anychart.core.ui.Table.prototype['getJpgBase64String'] = anychart.core.ui.Table.prototype.getJpgBase64String;//inherited
-anychart.core.ui.Table.prototype['getSvgBase64String'] = anychart.core.ui.Table.prototype.getSvgBase64String;//inherited
-anychart.core.ui.Table.prototype['getPdfBase64String'] = anychart.core.ui.Table.prototype.getPdfBase64String;//inherited
-anychart.core.ui.Table.prototype['toSvg'] = anychart.core.ui.Table.prototype.toSvg;//inherited
+  proto['saveAsPng'] = proto.saveAsPng;//inherited
+  proto['saveAsJpg'] = proto.saveAsJpg;//inherited
+  proto['saveAsPdf'] = proto.saveAsPdf;//inherited
+  proto['saveAsSvg'] = proto.saveAsSvg;//inherited
+  proto['shareAsPng'] = proto.shareAsPng;//inherited
+  proto['shareAsJpg'] = proto.shareAsJpg;//inherited
+  proto['shareAsPdf'] = proto.shareAsPdf;//inherited
+  proto['shareAsSvg'] = proto.shareAsSvg;//inherited
+  proto['getPngBase64String'] = proto.getPngBase64String;//inherited
+  proto['getJpgBase64String'] = proto.getJpgBase64String;//inherited
+  proto['getSvgBase64String'] = proto.getSvgBase64String;//inherited
+  proto['getPdfBase64String'] = proto.getPdfBase64String;//inherited
+  proto['toSvg'] = proto.toSvg;//inherited
+})();

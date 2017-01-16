@@ -44,7 +44,7 @@ anychart.core.ui.table.IProxyUser.prototype.settings = function(opt_name, opt_va
  * @implements {anychart.core.ui.table.IProxyUser}
  */
 anychart.core.ui.table.Base = function(table) {
-  goog.base(this);
+  anychart.core.ui.table.Base.base(this, 'constructor');
 
   /**
    * Table instance that created this instance.
@@ -465,7 +465,7 @@ anychart.core.ui.table.Base.prototype.paddingInternal = function(opt_spaceOrTopO
 
 ///** @inheritDoc */
 //anychart.core.ui.table.Base.prototype.serialize = function() {
-//  var json = goog.base(this, 'serialize');
+//  var json = anychart.core.ui.table.Base.base(this, 'serialize');
 //  if (goog.isDef(this.fontSize())) json['fontSize'] = this.fontSize();
 //  if (goog.isDef(this.fontFamily())) json['fontFamily'] = this.fontFamily();
 //  if (goog.isDef(this.fontColor())) json['fontColor'] = this.fontColor();
@@ -491,7 +491,7 @@ anychart.core.ui.table.Base.prototype.paddingInternal = function(opt_spaceOrTopO
 //
 ///** @inheritDoc */
 //anychart.core.ui.table.Base.prototype.setupByJSON = function(config) {
-//  goog.base(this, 'setupByJSON', config);
+//  anychart.core.ui.table.Base.base(this, 'setupByJSON', config);
 //  this.fontSize(config['fontSize']);
 //  this.fontFamily(config['fontFamily']);
 //  this.fontColor(config['fontColor']);
@@ -515,24 +515,27 @@ anychart.core.ui.table.Base.prototype.paddingInternal = function(opt_spaceOrTopO
 
 
 //exports
-anychart.core.ui.table.Base.prototype['fontSize'] = anychart.core.ui.table.Base.prototype.fontSize;//in docs/final
-anychart.core.ui.table.Base.prototype['fontFamily'] = anychart.core.ui.table.Base.prototype.fontFamily;//in docs/final
-anychart.core.ui.table.Base.prototype['fontColor'] = anychart.core.ui.table.Base.prototype.fontColor;//in docs/final
-anychart.core.ui.table.Base.prototype['fontOpacity'] = anychart.core.ui.table.Base.prototype.fontOpacity;//in docs/final
-anychart.core.ui.table.Base.prototype['fontDecoration'] = anychart.core.ui.table.Base.prototype.fontDecoration;//in docs/final
-anychart.core.ui.table.Base.prototype['fontStyle'] = anychart.core.ui.table.Base.prototype.fontStyle;//in docs/final
-anychart.core.ui.table.Base.prototype['fontVariant'] = anychart.core.ui.table.Base.prototype.fontVariant;//in docs/final
-anychart.core.ui.table.Base.prototype['fontWeight'] = anychart.core.ui.table.Base.prototype.fontWeight;//in docs/final
-anychart.core.ui.table.Base.prototype['letterSpacing'] = anychart.core.ui.table.Base.prototype.letterSpacing;//in docs/final
-anychart.core.ui.table.Base.prototype['textDirection'] = anychart.core.ui.table.Base.prototype.textDirection;//in docs/final
-anychart.core.ui.table.Base.prototype['lineHeight'] = anychart.core.ui.table.Base.prototype.lineHeight;//in docs/final
-anychart.core.ui.table.Base.prototype['textIndent'] = anychart.core.ui.table.Base.prototype.textIndent;//in docs/final
-anychart.core.ui.table.Base.prototype['vAlign'] = anychart.core.ui.table.Base.prototype.vAlign;//in docs/final
-anychart.core.ui.table.Base.prototype['hAlign'] = anychart.core.ui.table.Base.prototype.hAlign;//in docs/final
-anychart.core.ui.table.Base.prototype['textWrap'] = anychart.core.ui.table.Base.prototype.textWrap;//in docs/final
-anychart.core.ui.table.Base.prototype['textOverflow'] = anychart.core.ui.table.Base.prototype.textOverflow;//in docs/final
-anychart.core.ui.table.Base.prototype['selectable'] = anychart.core.ui.table.Base.prototype.selectable;//in docs/final
-anychart.core.ui.table.Base.prototype['disablePointerEvents'] = anychart.core.ui.table.Base.prototype.disablePointerEvents;//in docs/final
-anychart.core.ui.table.Base.prototype['useHtml'] = anychart.core.ui.table.Base.prototype.useHtml;//in docs/final
-anychart.core.ui.table.Base.prototype['border'] = anychart.core.ui.table.Base.prototype.border;//doc|ex
+(function() {
+  var proto = anychart.core.ui.table.Base.prototype;
+  proto['fontSize'] = proto.fontSize;//in docs/final
+  proto['fontFamily'] = proto.fontFamily;//in docs/final
+  proto['fontColor'] = proto.fontColor;//in docs/final
+  proto['fontOpacity'] = proto.fontOpacity;//in docs/final
+  proto['fontDecoration'] = proto.fontDecoration;//in docs/final
+  proto['fontStyle'] = proto.fontStyle;//in docs/final
+  proto['fontVariant'] = proto.fontVariant;//in docs/final
+  proto['fontWeight'] = proto.fontWeight;//in docs/final
+  proto['letterSpacing'] = proto.letterSpacing;//in docs/final
+  proto['textDirection'] = proto.textDirection;//in docs/final
+  proto['lineHeight'] = proto.lineHeight;//in docs/final
+  proto['textIndent'] = proto.textIndent;//in docs/final
+  proto['vAlign'] = proto.vAlign;//in docs/final
+  proto['hAlign'] = proto.hAlign;//in docs/final
+  proto['textWrap'] = proto.textWrap;//in docs/final
+  proto['textOverflow'] = proto.textOverflow;//in docs/final
+  proto['selectable'] = proto.selectable;//in docs/final
+  proto['disablePointerEvents'] = proto.disablePointerEvents;//in docs/final
+  proto['useHtml'] = proto.useHtml;//in docs/final
+  proto['border'] = proto.border;//doc|ex
+})();
 

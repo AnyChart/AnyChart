@@ -15,7 +15,7 @@ goog.require('anychart.enums');
  * @extends {anychart.core.radar.series.Base}
  */
 anychart.core.radar.series.ContinuousBase = function(opt_data, opt_csvSettings) {
-  goog.base(this, opt_data, opt_csvSettings);
+  anychart.core.radar.series.ContinuousBase.base(this, 'constructor', opt_data, opt_csvSettings);
 
   /**
    * @type {!acgraph.vector.Path}
@@ -195,7 +195,7 @@ anychart.core.radar.series.ContinuousBase.prototype.drawPoint = function(pointSt
 
 /** @inheritDoc */
 anychart.core.radar.series.ContinuousBase.prototype.startDrawing = function() {
-  goog.base(this, 'startDrawing');
+  anychart.core.radar.series.ContinuousBase.base(this, 'startDrawing');
 
   this.firstDrawnPoint = null;
 
@@ -271,7 +271,7 @@ anychart.core.radar.series.ContinuousBase.prototype.startDrawing = function() {
 /** @inheritDoc */
 anychart.core.radar.series.ContinuousBase.prototype.drawMissing = function() {
   if (!this.connectMissing) {
-    goog.base(this, 'drawMissing');
+    anychart.core.radar.series.ContinuousBase.base(this, 'drawMissing');
     this.finalizeSegment();
   }
 };
@@ -291,7 +291,7 @@ anychart.core.radar.series.ContinuousBase.prototype.finalizeDrawing = function()
   this.hoverMarkers().markConsistent(anychart.ConsistencyState.ALL);
 
 
-  goog.base(this, 'finalizeDrawing');
+  anychart.core.radar.series.ContinuousBase.base(this, 'finalizeDrawing');
 };
 
 
@@ -299,7 +299,7 @@ anychart.core.radar.series.ContinuousBase.prototype.finalizeDrawing = function()
 anychart.core.radar.series.ContinuousBase.prototype.remove = function() {
   this.markers().container(null);
 
-  goog.base(this, 'remove');
+  anychart.core.radar.series.ContinuousBase.base(this, 'remove');
 };
 
 
@@ -523,7 +523,7 @@ anychart.core.radar.series.ContinuousBase.prototype.getMarkerType = function() {
  * @inheritDoc
  */
 anychart.core.radar.series.ContinuousBase.prototype.getLegendItemData = function(itemsTextFormatter) {
-  var data = goog.base(this, 'getLegendItemData', itemsTextFormatter);
+  var data = anychart.core.radar.series.ContinuousBase.base(this, 'getLegendItemData', itemsTextFormatter);
 
   var markers = this.markers();
   markers.setAutoFill(this.getMarkerFill(anychart.PointState.NORMAL));
@@ -574,7 +574,7 @@ anychart.core.radar.series.ContinuousBase.prototype.applyAppearanceToSeries = fu
  * @inheritDoc
  */
 anychart.core.radar.series.ContinuousBase.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.radar.series.ContinuousBase.base(this, 'serialize');
   json['markers'] = this.markers().serialize();
   json['hoverMarkers'] = this.hoverMarkers().serialize();
   json['selectMarkers'] = this.selectMarkers().serialize();
@@ -587,7 +587,7 @@ anychart.core.radar.series.ContinuousBase.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.core.radar.series.ContinuousBase.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.radar.series.ContinuousBase.base(this, 'setupByJSON', config, opt_default);
   this.markers().setup(config['markers']);
   this.hoverMarkers().setup(config['hoverMarkers']);
   this.selectMarkers().setup(config['selectMarkers']);
@@ -595,12 +595,15 @@ anychart.core.radar.series.ContinuousBase.prototype.setupByJSON = function(confi
 };
 
 
-//anychart.core.radar.series.ContinuousBase.prototype['startDrawing'] = anychart.core.radar.series.ContinuousBase.prototype.startDrawing;
-//anychart.core.radar.series.ContinuousBase.prototype['drawPoint'] = anychart.core.radar.series.ContinuousBase.prototype.drawPoint;
-//anychart.core.radar.series.ContinuousBase.prototype['finalizeDrawing'] = anychart.core.radar.series.ContinuousBase.prototype.finalizeDrawing;
-//anychart.core.radar.series.ContinuousBase.prototype['drawMissing'] = anychart.core.radar.series.ContinuousBase.prototype.drawMissing;
+//proto['startDrawing'] = proto.startDrawing;
+//proto['drawPoint'] = proto.drawPoint;
+//proto['finalizeDrawing'] = proto.finalizeDrawing;
+//proto['drawMissing'] = proto.drawMissing;
 //exports
-anychart.core.radar.series.ContinuousBase.prototype['markers'] = anychart.core.radar.series.ContinuousBase.prototype.markers;//doc|ex
-anychart.core.radar.series.ContinuousBase.prototype['hoverMarkers'] = anychart.core.radar.series.ContinuousBase.prototype.hoverMarkers;//doc|ex
-anychart.core.radar.series.ContinuousBase.prototype['selectMarkers'] = anychart.core.radar.series.ContinuousBase.prototype.selectMarkers;
-anychart.core.radar.series.ContinuousBase.prototype['connectMissingPoints'] = anychart.core.radar.series.ContinuousBase.prototype.connectMissingPoints;//doc|ex
+(function() {
+  var proto = anychart.core.radar.series.ContinuousBase.prototype;
+  proto['markers'] = proto.markers;//doc|ex
+  proto['hoverMarkers'] = proto.hoverMarkers;//doc|ex
+  proto['selectMarkers'] = proto.selectMarkers;
+  proto['connectMissingPoints'] = proto.connectMissingPoints;//doc|ex
+})();

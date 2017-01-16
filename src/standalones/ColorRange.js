@@ -37,11 +37,15 @@ anychart.ui.colorRange = function() {
 
 
 //exports
-goog.exportSymbol('anychart.ui.colorRange', anychart.ui.colorRange);
-goog.exportSymbol('anychart.standalones.colorRange', anychart.standalones.colorRange);
-anychart.standalones.ColorRange.prototype['padding'] = anychart.standalones.ColorRange.prototype.padding;
-anychart.standalones.ColorRange.prototype['draw'] = anychart.standalones.ColorRange.prototype.draw;
-anychart.standalones.ColorRange.prototype['parentBounds'] = anychart.standalones.ColorRange.prototype.parentBounds;
-anychart.standalones.ColorRange.prototype['container'] = anychart.standalones.ColorRange.prototype.container;
-anychart.standalones.ColorRange.prototype['colorLineSize'] = anychart.standalones.ColorRange.prototype.colorLineSize;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.standalones.ColorRange.prototype;
+  goog.exportSymbol('anychart.ui.colorRange', anychart.ui.colorRange);
+  goog.exportSymbol('anychart.standalones.colorRange', anychart.standalones.colorRange);
+  proto['padding'] = proto.padding;
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+  proto['colorLineSize'] = proto.colorLineSize;
+})();
 

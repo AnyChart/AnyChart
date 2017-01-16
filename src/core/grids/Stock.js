@@ -14,7 +14,7 @@ goog.require('anychart.enums');
  * @extends {anychart.core.VisualBase}
  */
 anychart.core.grids.Stock = function() {
-  goog.base(this);
+  anychart.core.grids.Stock.base(this, 'constructor');
 
   /**
    * @type {acgraph.vector.Path}
@@ -723,7 +723,7 @@ anychart.core.grids.Stock.prototype.evenFillElement = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.grids.Stock.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.grids.Stock.base(this, 'serialize');
   json['isMinor'] = this.isMinor();
   if (this.layout_) json['layout'] = this.layout_;
   json['drawFirstLine'] = this.drawFirstLine();
@@ -737,7 +737,7 @@ anychart.core.grids.Stock.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.grids.Stock.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.grids.Stock.base(this, 'setupByJSON', config, opt_default);
   this.isMinor(config['isMinor']);
   this.layout(config['layout']);
   this.drawFirstLine(config['drawFirstLine']);
@@ -766,18 +766,21 @@ anychart.core.grids.Stock.prototype.disposeInternal = function() {
   delete this.stroke_;
   this.axis_ = null;
   this.plot_ = null;
-  goog.base(this, 'disposeInternal');
+  anychart.core.grids.Stock.base(this, 'disposeInternal');
 };
 
 
 //exports
-anychart.core.grids.Stock.prototype['isMinor'] = anychart.core.grids.Stock.prototype.isMinor;
-anychart.core.grids.Stock.prototype['oddFill'] = anychart.core.grids.Stock.prototype.oddFill;
-anychart.core.grids.Stock.prototype['evenFill'] = anychart.core.grids.Stock.prototype.evenFill;
-anychart.core.grids.Stock.prototype['layout'] = anychart.core.grids.Stock.prototype.layout;
-anychart.core.grids.Stock.prototype['isHorizontal'] = anychart.core.grids.Stock.prototype.isHorizontal;
-anychart.core.grids.Stock.prototype['scale'] = anychart.core.grids.Stock.prototype.scale;
-anychart.core.grids.Stock.prototype['stroke'] = anychart.core.grids.Stock.prototype.stroke;
-anychart.core.grids.Stock.prototype['drawFirstLine'] = anychart.core.grids.Stock.prototype.drawFirstLine;
-anychart.core.grids.Stock.prototype['drawLastLine'] = anychart.core.grids.Stock.prototype.drawLastLine;
-anychart.core.grids.Stock.prototype['axis'] = anychart.core.grids.Stock.prototype.axis;
+(function() {
+  var proto = anychart.core.grids.Stock.prototype;
+  proto['isMinor'] = proto.isMinor;
+  proto['oddFill'] = proto.oddFill;
+  proto['evenFill'] = proto.evenFill;
+  proto['layout'] = proto.layout;
+  proto['isHorizontal'] = proto.isHorizontal;
+  proto['scale'] = proto.scale;
+  proto['stroke'] = proto.stroke;
+  proto['drawFirstLine'] = proto.drawFirstLine;
+  proto['drawLastLine'] = proto.drawLastLine;
+  proto['axis'] = proto.axis;
+})();

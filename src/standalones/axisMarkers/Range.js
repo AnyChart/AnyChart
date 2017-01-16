@@ -37,8 +37,12 @@ anychart.axisMarkers.range = function() {
 
 
 //exports
-goog.exportSymbol('anychart.axisMarkers.range', anychart.axisMarkers.range);
-goog.exportSymbol('anychart.standalones.axisMarkers.range', anychart.standalones.axisMarkers.range);
-anychart.standalones.axisMarkers.Range.prototype['draw'] = anychart.standalones.axisMarkers.Range.prototype.draw;
-anychart.standalones.axisMarkers.Range.prototype['parentBounds'] = anychart.standalones.axisMarkers.Range.prototype.parentBounds;
-anychart.standalones.axisMarkers.Range.prototype['container'] = anychart.standalones.axisMarkers.Range.prototype.container;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.standalones.axisMarkers.Range.prototype;
+  goog.exportSymbol('anychart.axisMarkers.range', anychart.axisMarkers.range);
+  goog.exportSymbol('anychart.standalones.axisMarkers.range', anychart.standalones.axisMarkers.range);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+})();

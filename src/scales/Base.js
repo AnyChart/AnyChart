@@ -12,7 +12,7 @@ goog.require('anychart.scales.IXScale');
  * @implements {anychart.scales.IXScale}
  */
 anychart.scales.Base = function() {
-  goog.base(this);
+  anychart.scales.Base.base(this, 'constructor');
 
   /**
    * The number of current calculation sessions. Each chart starts a calculation session in its calculate() method and
@@ -457,7 +457,7 @@ anychart.scales.Base.prototype.getType = goog.abstractMethod;
 
 /** @inheritDoc */
 anychart.scales.Base.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.scales.Base.base(this, 'serialize');
   json['type'] = this.getType();
   json['inverted'] = this.inverted();
   return json;
@@ -466,7 +466,7 @@ anychart.scales.Base.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.scales.Base.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.scales.Base.base(this, 'setupByJSON', config, opt_default);
   this.inverted(config['inverted']);
 };
 
@@ -508,6 +508,9 @@ anychart.scales.Base.fromString = function(type, defaultIsOrdinal) {
 
 
 //exports
-anychart.scales.Base.prototype['inverted'] = anychart.scales.Base.prototype.inverted;//doc|ex
-anychart.scales.Base.prototype['startAutoCalc'] = anychart.scales.Base.prototype.startAutoCalc;//doc|need-ex
-anychart.scales.Base.prototype['finishAutoCalc'] = anychart.scales.Base.prototype.finishAutoCalc;//doc|need-ex
+(function() {
+  var proto = anychart.scales.Base.prototype;
+  proto['inverted'] = proto.inverted;//doc|ex
+  proto['startAutoCalc'] = proto.startAutoCalc;//doc|need-ex
+  proto['finishAutoCalc'] = proto.finishAutoCalc;//doc|need-ex
+})();

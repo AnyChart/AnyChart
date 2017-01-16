@@ -4,7 +4,7 @@ goog.require('anychart.core.SeriesBase');
 goog.require('anychart.core.map.geom');
 goog.require('anychart.core.utils.MapPointContextProvider');
 goog.require('anychart.enums');
-goog.require('goog.graphics.AffineTransform');
+goog.require('goog.math.AffineTransform');
 //endregion
 
 
@@ -19,7 +19,7 @@ goog.require('goog.graphics.AffineTransform');
 anychart.core.map.series.Base = function(opt_data, opt_csvSettings) {
   this.suspendSignalsDispatching();
 
-  goog.base(this, opt_data, opt_csvSettings);
+  anychart.core.map.series.Base.base(this, 'constructor', opt_data, opt_csvSettings);
 
   this.geoData = [];
   this.needSelfLayer = true;
@@ -568,7 +568,7 @@ anychart.core.map.series.Base.prototype.applyZoomMoveTransformToLabel = function
     dx = tx.getTranslateX();
     dy = tx.getTranslateY();
 
-    tx = new goog.graphics.AffineTransform(scale, 0, 0, scale, dx, dy);
+    tx = new goog.math.AffineTransform(scale, 0, 0, scale, dx, dy);
     tx.preConcatenate(domElement.getSelfTransformation().createInverse());
 
     scale = tx.getScaleX();
@@ -901,13 +901,13 @@ anychart.core.map.series.Base.prototype.remove = function() {
   this.labels().container(null);
   this.labels().draw();
 
-  goog.base(this, 'remove');
+  anychart.core.map.series.Base.base(this, 'remove');
 };
 
 
 /** @inheritDoc */
 anychart.core.map.series.Base.prototype.getEnableChangeSignals = function() {
-  return goog.base(this, 'getEnableChangeSignals') | anychart.Signal.DATA_CHANGED |
+  return anychart.core.map.series.Base.base(this, 'getEnableChangeSignals') | anychart.Signal.DATA_CHANGED |
       anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEED_UPDATE_LEGEND;
 };
 
@@ -927,7 +927,7 @@ anychart.core.map.series.Base.prototype.getPointById = function(value) {
 //region --- Setup
 /** @inheritDoc */
 anychart.core.map.series.Base.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.map.series.Base.base(this, 'serialize');
 
   json['seriesType'] = this.getType();
   json['overlapMode'] = this.overlapMode_;
@@ -941,7 +941,7 @@ anychart.core.map.series.Base.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.map.series.Base.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.map.series.Base.base(this, 'setupByJSON', config, opt_default);
 
   this.overlapMode(config['overlapMode']);
   this.geoIdField(config['geoIdField']);
@@ -951,21 +951,24 @@ anychart.core.map.series.Base.prototype.setupByJSON = function(config, opt_defau
 //endregion
 //region --- Exports
 //exports
-anychart.core.map.series.Base.prototype['color'] = anychart.core.map.series.Base.prototype.color;
+(function() {
+  var proto = anychart.core.map.series.Base.prototype;
+  proto['color'] = proto.color;
 
-anychart.core.map.series.Base.prototype['selectFill'] = anychart.core.map.series.Base.prototype.selectFill;
-anychart.core.map.series.Base.prototype['hoverFill'] = anychart.core.map.series.Base.prototype.hoverFill;
-anychart.core.map.series.Base.prototype['fill'] = anychart.core.map.series.Base.prototype.fill;
+  proto['selectFill'] = proto.selectFill;
+  proto['hoverFill'] = proto.hoverFill;
+  proto['fill'] = proto.fill;
 
-anychart.core.map.series.Base.prototype['selectStroke'] = anychart.core.map.series.Base.prototype.selectStroke;
-anychart.core.map.series.Base.prototype['hoverStroke'] = anychart.core.map.series.Base.prototype.hoverStroke;
-anychart.core.map.series.Base.prototype['stroke'] = anychart.core.map.series.Base.prototype.stroke;
+  proto['selectStroke'] = proto.selectStroke;
+  proto['hoverStroke'] = proto.hoverStroke;
+  proto['stroke'] = proto.stroke;
 
-anychart.core.map.series.Base.prototype['selectHatchFill'] = anychart.core.map.series.Base.prototype.selectHatchFill;
-anychart.core.map.series.Base.prototype['hoverHatchFill'] = anychart.core.map.series.Base.prototype.hoverHatchFill;
-anychart.core.map.series.Base.prototype['hatchFill'] = anychart.core.map.series.Base.prototype.hatchFill;
+  proto['selectHatchFill'] = proto.selectHatchFill;
+  proto['hoverHatchFill'] = proto.hoverHatchFill;
+  proto['hatchFill'] = proto.hatchFill;
 
-anychart.core.map.series.Base.prototype['geoIdField'] = anychart.core.map.series.Base.prototype.geoIdField;
-anychart.core.map.series.Base.prototype['overlapMode'] = anychart.core.map.series.Base.prototype.overlapMode;
-anychart.core.map.series.Base.prototype['transformXY'] = anychart.core.map.series.Base.prototype.transformXY;
+  proto['geoIdField'] = proto.geoIdField;
+  proto['overlapMode'] = proto.overlapMode;
+  proto['transformXY'] = proto.transformXY;
+})();
 //endregion

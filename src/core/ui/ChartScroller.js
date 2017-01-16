@@ -10,7 +10,7 @@ goog.require('anychart.enums');
  * @extends {anychart.core.ui.Scroller}
  */
 anychart.core.ui.ChartScroller = function() {
-  goog.base(this, true);
+  anychart.core.ui.ChartScroller.base(this, 'constructor', true);
 
   /**
    * Position.
@@ -44,7 +44,7 @@ anychart.core.ui.ChartScroller.prototype.position = function(opt_value) {
 
 /** @inheritDoc */
 anychart.core.ui.ChartScroller.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.ui.ChartScroller.base(this, 'serialize');
   json['position'] = this.position();
   json['inverted'] = this.inverted();
   return json;
@@ -53,12 +53,15 @@ anychart.core.ui.ChartScroller.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.ui.ChartScroller.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.ui.ChartScroller.base(this, 'setupByJSON', config, opt_default);
   this.position(config['position']);
   this.inverted(config['inverted']);
 };
 
 
 //exports
-anychart.core.ui.ChartScroller.prototype['position'] = anychart.core.ui.ChartScroller.prototype.position;
-anychart.core.ui.ChartScroller.prototype['inverted'] = anychart.core.ui.ChartScroller.prototype.inverted;
+(function() {
+  var proto = anychart.core.ui.ChartScroller.prototype;
+  proto['position'] = proto.position;
+  proto['inverted'] = proto.inverted;
+})();

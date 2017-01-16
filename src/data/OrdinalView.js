@@ -15,7 +15,7 @@ goog.require('goog.array');
  * @extends {anychart.data.View}
  */
 anychart.data.OrdinalView = function(parentView, fieldName, categories) {
-  goog.base(this, parentView);
+  anychart.data.OrdinalView.base(this, 'constructor', parentView);
 
   /**
    * Field name to categorize by. Stored for data change events.

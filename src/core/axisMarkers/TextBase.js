@@ -1,6 +1,6 @@
 goog.provide('anychart.core.axisMarkers.TextBase');
 
-goog.require('acgraph.math.Coordinate');
+goog.require('acgraph.math');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.Text');
 goog.require('anychart.core.axes.Linear');
@@ -480,7 +480,7 @@ anychart.core.axisMarkers.TextBase.prototype.applyTextSettings = function(textEl
     else
       textElement.text(this.settingsObj['text']);
   }
-  goog.base(this, 'applyTextSettings', textElement, isInitial);
+  anychart.core.axisMarkers.TextBase.base(this, 'applyTextSettings', textElement, isInitial);
   this.changedSettings = {};
 };
 
@@ -548,7 +548,7 @@ anychart.core.axisMarkers.TextBase.prototype.draw = function() {
           textElementBounds.height;
       if (isHeightSet) textElement.height(height);
 
-      var position = /** @type {acgraph.math.Coordinate}*/(this.getTextPosition_(ratio, shift));
+      var position = /** @type {goog.math.Coordinate}*/(this.getTextPosition_(ratio, shift));
 
       var angle = anychart.utils.toNumber(this.rotation_);
       var rotation = isNaN(angle) ?
@@ -556,7 +556,7 @@ anychart.core.axisMarkers.TextBase.prototype.draw = function() {
               0 : -90 :
           angle;
 
-      var transform = goog.graphics.AffineTransform.getRotateInstance(goog.math.toRadians(rotation), 0, 0);
+      var transform = goog.math.AffineTransform.getRotateInstance(goog.math.toRadians(rotation), 0, 0);
       var rotatedBounds = acgraph.math.getBoundsOfRectWithTransform(textElementBounds, transform);
 
       var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
@@ -637,7 +637,7 @@ anychart.core.axisMarkers.TextBase.prototype.getTextPosition_ = function(ratio, 
         break;
     }
   }
-  return new acgraph.math.Coordinate(x, y);
+  return new goog.math.Coordinate(x, y);
 };
 
 
@@ -677,13 +677,13 @@ anychart.core.axisMarkers.TextBase.prototype.disposeInternal = function() {
   this.markerElement_ = null;
   this.chart_ = null;
   this.axis_ = null;
-  goog.base(this, 'disposeInternal');
+  anychart.core.axisMarkers.TextBase.base(this, 'disposeInternal');
 };
 
 
 /** @inheritDoc */
 anychart.core.axisMarkers.TextBase.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.axisMarkers.TextBase.base(this, 'serialize');
   json['anchor'] = this.anchor();
   json['align'] = this.align();
   if (this.layout_) json['layout'] = this.layout_;
@@ -699,7 +699,7 @@ anychart.core.axisMarkers.TextBase.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.axisMarkers.TextBase.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.axisMarkers.TextBase.base(this, 'setupByJSON', config, opt_default);
   this.anchor(config['anchor']);
   this.align(config['align']);
   if ('layout' in config && config['layout']) this.layout(config['layout']);

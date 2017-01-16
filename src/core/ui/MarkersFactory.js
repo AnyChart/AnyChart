@@ -1,12 +1,13 @@
 goog.provide('anychart.core.ui.MarkersFactory');
 goog.provide('anychart.core.ui.MarkersFactory.Marker');
-goog.require('acgraph.math.Coordinate');
+goog.require('acgraph.math');
 goog.require('anychart.color');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
+goog.require('goog.math.Coordinate');
 
 
 
@@ -38,7 +39,7 @@ goog.require('anychart.utils');
  */
 anychart.core.ui.MarkersFactory = function(opt_isNonInteractive, opt_crispEdges) {
   this.suspendSignalsDispatching();
-  goog.base(this);
+  anychart.core.ui.MarkersFactory.base(this, 'constructor');
 
 
   /**
@@ -248,9 +249,9 @@ anychart.core.ui.MarkersFactory.prototype.enabled = function(opt_value) {
     }
     this.enabledState_ = opt_value;
     if (!goog.isNull(opt_value)) {
-      goog.base(this, 'enabled', /** @type {boolean} */(opt_value));
+      anychart.core.ui.MarkersFactory.base(this, 'enabled', /** @type {boolean} */(opt_value));
     } else {
-      goog.base(this, 'enabled', true);
+      anychart.core.ui.MarkersFactory.base(this, 'enabled', true);
     }
     return this;
   }
@@ -583,7 +584,7 @@ anychart.core.ui.MarkersFactory.prototype.measure = function(positionProvider) {
 
   var markerBounds = /** @type {anychart.math.Rect} */(this.measureMarkerElement_.getBounds());
   var formattedPosition = goog.object.clone(this.positionFormatter_.call(positionProvider, positionProvider));
-  var position = new acgraph.math.Coordinate(formattedPosition['x'], formattedPosition['y']);
+  var position = new goog.math.Coordinate(formattedPosition['x'], formattedPosition['y']);
   var anchorCoordinate = anychart.utils.getCoordinateByAnchor(
       new anychart.math.Rect(0, 0, markerBounds.width, markerBounds.height),
       anchor);
@@ -780,7 +781,7 @@ anychart.core.ui.MarkersFactory.prototype.getRootLayer = function() {
 
 /** @inheritDoc */
 anychart.core.ui.MarkersFactory.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.ui.MarkersFactory.base(this, 'serialize');
   if (goog.isNull(json['enabled'])) delete json['enabled'];
   if (goog.isDef(this.disablePointerEvents())) json['disablePointerEvents'] = this.disablePointerEvents();
   if (this.changedSettings['position']) json['position'] = this.position();
@@ -813,7 +814,7 @@ anychart.core.ui.MarkersFactory.prototype.setupSpecial = function() {
 /** @inheritDoc */
 anychart.core.ui.MarkersFactory.prototype.setupByJSON = function(config, opt_default) {
   var enabledState = this.enabled();
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.ui.MarkersFactory.base(this, 'setupByJSON', config, opt_default);
   this.disablePointerEvents(config['disablePointerEvents']);
   this.position(config['position']);
   this.rotation(config['rotation']);
@@ -842,7 +843,7 @@ anychart.core.ui.MarkersFactory.prototype.disposeInternal = function() {
 
 /** @inheritDoc */
 anychart.core.ui.MarkersFactory.prototype.makeBrowserEvent = function(e) {
-  var res = goog.base(this, 'makeBrowserEvent', e);
+  var res = anychart.core.ui.MarkersFactory.base(this, 'makeBrowserEvent', e);
   var target = res['domTarget'];
   var tag;
   while (target instanceof acgraph.vector.Element) {
@@ -863,7 +864,7 @@ anychart.core.ui.MarkersFactory.prototype.makeBrowserEvent = function(e) {
  * @extends {anychart.core.VisualBase}
  */
 anychart.core.ui.MarkersFactory.Marker = function() {
-  goog.base(this);
+  anychart.core.ui.MarkersFactory.Marker.base(this, 'constructor');
 
   /**
    * Label index.
@@ -1419,7 +1420,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.draw = function() {
 
     var positionProvider = this.positionProvider();
     var formattedPosition = goog.object.clone(settings['positionFormatter'].call(positionProvider, positionProvider));
-    var position = new acgraph.math.Coordinate(formattedPosition['x'], formattedPosition['y']);
+    var position = new goog.math.Coordinate(formattedPosition['x'], formattedPosition['y']);
     var anchorCoordinate = anychart.utils.getCoordinateByAnchor(new anychart.math.Rect(0, 0, markerBounds.width, markerBounds.height), anchor);
 
     position.x -= anchorCoordinate.x;
@@ -1479,7 +1480,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.applyDefaultsForSingle_ = funct
 
 /** @inheritDoc */
 anychart.core.ui.MarkersFactory.Marker.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.ui.MarkersFactory.Marker.base(this, 'serialize');
   if (goog.isDef(this.position())) json['position'] = this.position();
   if (goog.isDef(this.rotation())) json['rotation'] = isNaN(this.rotation()) ? null : this.rotation();
   if (goog.isDef(this.anchor())) json['anchor'] = this.anchor();
@@ -1498,7 +1499,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.serialize = function() {
 /** @inheritDoc */
 anychart.core.ui.MarkersFactory.Marker.prototype.setupByJSON = function(config, opt_default) {
   var enabledState = this.enabled();
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.ui.MarkersFactory.Marker.base(this, 'setupByJSON', config, opt_default);
   this.position(config['position']);
   this.rotation(config['rotation']);
   this.anchor(config['anchor']);
@@ -1515,27 +1516,31 @@ anychart.core.ui.MarkersFactory.Marker.prototype.setupByJSON = function(config, 
 
 
 //exports
-anychart.core.ui.MarkersFactory.prototype['positionFormatter'] = anychart.core.ui.MarkersFactory.prototype.positionFormatter;
-anychart.core.ui.MarkersFactory.prototype['position'] = anychart.core.ui.MarkersFactory.prototype.position;
-anychart.core.ui.MarkersFactory.prototype['anchor'] = anychart.core.ui.MarkersFactory.prototype.anchor;
-anychart.core.ui.MarkersFactory.prototype['offsetX'] = anychart.core.ui.MarkersFactory.prototype.offsetX;
-anychart.core.ui.MarkersFactory.prototype['offsetY'] = anychart.core.ui.MarkersFactory.prototype.offsetY;
-anychart.core.ui.MarkersFactory.prototype['rotation'] = anychart.core.ui.MarkersFactory.prototype.rotation;
-anychart.core.ui.MarkersFactory.prototype['type'] = anychart.core.ui.MarkersFactory.prototype.type;
-anychart.core.ui.MarkersFactory.prototype['size'] = anychart.core.ui.MarkersFactory.prototype.size;
-anychart.core.ui.MarkersFactory.prototype['fill'] = anychart.core.ui.MarkersFactory.prototype.fill;
-anychart.core.ui.MarkersFactory.prototype['stroke'] = anychart.core.ui.MarkersFactory.prototype.stroke;
-anychart.core.ui.MarkersFactory.prototype['disablePointerEvents'] = anychart.core.ui.MarkersFactory.prototype.disablePointerEvents;
-anychart.core.ui.MarkersFactory.prototype['enabled'] = anychart.core.ui.MarkersFactory.prototype.enabled;
+(function() {
+  var proto = anychart.core.ui.MarkersFactory.prototype;
+  proto['positionFormatter'] = proto.positionFormatter;
+  proto['position'] = proto.position;
+  proto['anchor'] = proto.anchor;
+  proto['offsetX'] = proto.offsetX;
+  proto['offsetY'] = proto.offsetY;
+  proto['rotation'] = proto.rotation;
+  proto['type'] = proto.type;
+  proto['size'] = proto.size;
+  proto['fill'] = proto.fill;
+  proto['stroke'] = proto.stroke;
+  proto['disablePointerEvents'] = proto.disablePointerEvents;
+  proto['enabled'] = proto.enabled;
 
-anychart.core.ui.MarkersFactory.Marker.prototype['positionFormatter'] = anychart.core.ui.MarkersFactory.Marker.prototype.positionFormatter;
-anychart.core.ui.MarkersFactory.Marker.prototype['position'] = anychart.core.ui.MarkersFactory.Marker.prototype.position;
-anychart.core.ui.MarkersFactory.Marker.prototype['anchor'] = anychart.core.ui.MarkersFactory.Marker.prototype.anchor;
-anychart.core.ui.MarkersFactory.Marker.prototype['offsetX'] = anychart.core.ui.MarkersFactory.Marker.prototype.offsetX;
-anychart.core.ui.MarkersFactory.Marker.prototype['offsetY'] = anychart.core.ui.MarkersFactory.Marker.prototype.offsetY;
-anychart.core.ui.MarkersFactory.Marker.prototype['rotation'] = anychart.core.ui.MarkersFactory.Marker.prototype.rotation;
-anychart.core.ui.MarkersFactory.Marker.prototype['type'] = anychart.core.ui.MarkersFactory.Marker.prototype.type;
-anychart.core.ui.MarkersFactory.Marker.prototype['size'] = anychart.core.ui.MarkersFactory.Marker.prototype.size;
-anychart.core.ui.MarkersFactory.Marker.prototype['fill'] = anychart.core.ui.MarkersFactory.Marker.prototype.fill;
-anychart.core.ui.MarkersFactory.Marker.prototype['stroke'] = anychart.core.ui.MarkersFactory.Marker.prototype.stroke;
+  proto = anychart.core.ui.MarkersFactory.Marker.prototype;
+  proto['positionFormatter'] = proto.positionFormatter;
+  proto['position'] = proto.position;
+  proto['anchor'] = proto.anchor;
+  proto['offsetX'] = proto.offsetX;
+  proto['offsetY'] = proto.offsetY;
+  proto['rotation'] = proto.rotation;
+  proto['type'] = proto.type;
+  proto['size'] = proto.size;
+  proto['fill'] = proto.fill;
+  proto['stroke'] = proto.stroke;
+})();
 

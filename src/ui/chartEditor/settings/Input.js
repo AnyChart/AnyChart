@@ -76,13 +76,13 @@ anychart.ui.chartEditor.settings.Input.prototype.disposeInternal = function() {
     this.keyHandler_ = null;
   }
 
-  goog.base(this, 'disposeInternal');
+  anychart.ui.chartEditor.settings.Input.base(this, 'disposeInternal');
 };
 
 
 /** @inheritDoc */
 anychart.ui.chartEditor.settings.Input.prototype.enterDocument = function() {
-  goog.base(this, 'enterDocument');
+  anychart.ui.chartEditor.settings.Input.base(this, 'enterDocument');
 
   if (!this.keyHandler_) {
     this.keyHandler_ = new goog.events.KeyHandler(this.getElement());

@@ -34,5 +34,8 @@ anychart.core.utils.ChartContextProvider.prototype.getStat = function(opt_key) {
 
 
 //exports
-anychart.core.utils.ChartContextProvider.prototype['getStat'] = anychart.core.utils.ChartContextProvider.prototype.getStat;
+(function() {
+  var proto = anychart.core.utils.ChartContextProvider.prototype;
+  proto['getStat'] = proto.getStat;
+})();
 

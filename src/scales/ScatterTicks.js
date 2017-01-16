@@ -12,7 +12,7 @@ goog.require('goog.array');
  * @extends {anychart.core.Base}
  */
 anychart.scales.ScatterTicks = function(scale) {
-  goog.base(this);
+  anychart.scales.ScatterTicks.base(this, 'constructor');
 
   /**
    * Scale reference to get setup from in emergency situations.
@@ -558,7 +558,7 @@ anychart.scales.ScatterTicks.prototype.addMinorLogarithmicTicksPortion_ = functi
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.scales.ScatterTicks.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.scales.ScatterTicks.base(this, 'serialize');
   json['mode'] = this.mode_;
   json['base'] = this.base_;
   if (this.explicit_)
@@ -589,7 +589,7 @@ anychart.scales.ScatterTicks.prototype.setupSpecial = function(var_args) {
 
 /** @inheritDoc */
 anychart.scales.ScatterTicks.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.scales.ScatterTicks.base(this, 'setupByJSON', config, opt_default);
   this.mode(config['mode']);
   this.base(config['base']);
   this.explicit_ = config['explicit'] || null;
@@ -611,9 +611,12 @@ anychart.scales.ScatterTicks.prototype.setupByJSON = function(config, opt_defaul
 
 
 //exports
-anychart.scales.ScatterTicks.prototype['interval'] = anychart.scales.ScatterTicks.prototype.interval;//doc|ex
-anychart.scales.ScatterTicks.prototype['count'] = anychart.scales.ScatterTicks.prototype.count;//doc|ex
-anychart.scales.ScatterTicks.prototype['base'] = anychart.scales.ScatterTicks.prototype.base;//doc|ex
-anychart.scales.ScatterTicks.prototype['set'] = anychart.scales.ScatterTicks.prototype.set;//doc|ex
-anychart.scales.ScatterTicks.prototype['get'] = anychart.scales.ScatterTicks.prototype.get;//doc|ex
-anychart.scales.ScatterTicks.prototype['mode'] = anychart.scales.ScatterTicks.prototype.mode;//doc|ex
+(function() {
+  var proto = anychart.scales.ScatterTicks.prototype;
+  proto['interval'] = proto.interval;//doc|ex
+  proto['count'] = proto.count;//doc|ex
+  proto['base'] = proto.base;//doc|ex
+  proto['set'] = proto.set;//doc|ex
+  proto['get'] = proto.get;//doc|ex
+  proto['mode'] = proto.mode;//doc|ex
+})();

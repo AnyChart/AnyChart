@@ -940,7 +940,7 @@ anychart.scales.Calendar.AStorage.prototype.toElement_ = function(str, maxVal, d
 //------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.scales.Calendar.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.scales.Calendar.base(this, 'serialize');
   if (!this.weekendRangeIsDefault_)
     json['weekendRange'] = this.weekendRange_ ?
         [this.weekendRange_[0], this.weekendRange_[1]] : null;
@@ -952,7 +952,7 @@ anychart.scales.Calendar.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.scales.Calendar.prototype.setupByJSON = function(config) {
-  goog.base(this, 'setupByJSON', config);
+  anychart.scales.Calendar.base(this, 'setupByJSON', config);
   this.weekendRange(config['weekendRange']);
   this.timezoneOffset(config['timezoneOffset']);
   this.availabilities(config['availabilities']);
@@ -965,7 +965,7 @@ anychart.scales.Calendar.prototype.disposeInternal = function() {
   if (this.parent_)
     this.parent_.unlistenSignals(this.handleParentSignals_, this);
   this.parent_ = null;
-  goog.base(this, 'disposeInternal');
+  anychart.scales.Calendar.base(this, 'disposeInternal');
 };
 
 
@@ -983,8 +983,11 @@ anychart.scales.calendar = function(opt_parentCalendar) {
 
 
 //exports
-goog.exportSymbol('anychart.scales.calendar', anychart.scales.calendar);
-anychart.scales.Calendar.prototype['weekendRange'] = anychart.scales.Calendar.prototype.weekendRange;
-anychart.scales.Calendar.prototype['timezoneOffset'] = anychart.scales.Calendar.prototype.timezoneOffset;
-anychart.scales.Calendar.prototype['availabilities'] = anychart.scales.Calendar.prototype.availabilities;
-anychart.scales.Calendar.prototype['getWorkingSchedule'] = anychart.scales.Calendar.prototype.getWorkingSchedule;
+(function() {
+  var proto = anychart.scales.Calendar.prototype;
+  goog.exportSymbol('anychart.scales.calendar', anychart.scales.calendar);
+  proto['weekendRange'] = proto.weekendRange;
+  proto['timezoneOffset'] = proto.timezoneOffset;
+  proto['availabilities'] = proto.availabilities;
+  proto['getWorkingSchedule'] = proto.getWorkingSchedule;
+})();

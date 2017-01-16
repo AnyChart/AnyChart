@@ -1,7 +1,8 @@
 goog.provide('anychart.core.ui.CrosshairLabel');
-goog.require('acgraph.math.Coordinate');
+goog.require('acgraph.math');
 goog.require('anychart.core.ui.LabelBase');
 goog.require('anychart.math.Rect');
+goog.require('goog.math.Coordinate');
 
 
 
@@ -11,7 +12,7 @@ goog.require('anychart.math.Rect');
  * @extends {anychart.core.ui.LabelBase}
  */
 anychart.core.ui.CrosshairLabel = function() {
-  goog.base(this);
+  anychart.core.ui.CrosshairLabel.base(this, 'constructor');
 
   /**
    * @type {number}
@@ -159,7 +160,7 @@ anychart.core.ui.CrosshairLabel.prototype.drawLabel = function() {
   var backgroundBounds = new anychart.math.Rect(0, 0, this.backgroundWidth, this.backgroundHeight);
 
   // calculate position
-  var position = new acgraph.math.Coordinate(0, 0);
+  var position = new goog.math.Coordinate(0, 0);
 
   position.x = this.x_;
   position.y = this.y_;
@@ -199,7 +200,7 @@ anychart.core.ui.CrosshairLabel.prototype.drawLabel = function() {
 
 /** @inheritDoc */
 anychart.core.ui.CrosshairLabel.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.ui.CrosshairLabel.base(this, 'serialize');
   json['axisIndex'] = this.axisIndex_;
   return json;
 };
@@ -207,24 +208,27 @@ anychart.core.ui.CrosshairLabel.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.ui.CrosshairLabel.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.ui.CrosshairLabel.base(this, 'setupByJSON', config, opt_default);
   this.axisIndex(config['axisIndex']);
   this.anchor(config['anchor']);
   this.textFormatter(config['textFormatter']);
 };
 
 
-//exports
-anychart.core.ui.CrosshairLabel.prototype['axisIndex'] = anychart.core.ui.CrosshairLabel.prototype.axisIndex;
-anychart.core.ui.CrosshairLabel.prototype['textFormatter'] = anychart.core.ui.CrosshairLabel.prototype.textFormatter;
-anychart.core.ui.CrosshairLabel.prototype['background'] = anychart.core.ui.CrosshairLabel.prototype.background;
-anychart.core.ui.CrosshairLabel.prototype['padding'] = anychart.core.ui.CrosshairLabel.prototype.padding;
-anychart.core.ui.CrosshairLabel.prototype['width'] = anychart.core.ui.CrosshairLabel.prototype.width;
-anychart.core.ui.CrosshairLabel.prototype['height'] = anychart.core.ui.CrosshairLabel.prototype.height;
-anychart.core.ui.CrosshairLabel.prototype['anchor'] = anychart.core.ui.CrosshairLabel.prototype.anchor;
-anychart.core.ui.CrosshairLabel.prototype['offsetX'] = anychart.core.ui.CrosshairLabel.prototype.offsetX;
-anychart.core.ui.CrosshairLabel.prototype['offsetY'] = anychart.core.ui.CrosshairLabel.prototype.offsetY;
-anychart.core.ui.CrosshairLabel.prototype['minFontSize'] = anychart.core.ui.CrosshairLabel.prototype.minFontSize;
-anychart.core.ui.CrosshairLabel.prototype['maxFontSize'] = anychart.core.ui.CrosshairLabel.prototype.maxFontSize;
-anychart.core.ui.CrosshairLabel.prototype['adjustFontSize'] = anychart.core.ui.CrosshairLabel.prototype.adjustFontSize;
-anychart.core.ui.CrosshairLabel.prototype['rotation'] = anychart.core.ui.CrosshairLabel.prototype.rotation;
+(function() {
+  var proto = anychart.core.ui.CrosshairLabel.prototype;
+  //exports
+  proto['axisIndex'] = proto.axisIndex;
+  proto['textFormatter'] = proto.textFormatter;
+  proto['background'] = proto.background;
+  proto['padding'] = proto.padding;
+  proto['width'] = proto.width;
+  proto['height'] = proto.height;
+  proto['anchor'] = proto.anchor;
+  proto['offsetX'] = proto.offsetX;
+  proto['offsetY'] = proto.offsetY;
+  proto['minFontSize'] = proto.minFontSize;
+  proto['maxFontSize'] = proto.maxFontSize;
+  proto['adjustFontSize'] = proto.adjustFontSize;
+  proto['rotation'] = proto.rotation;
+})();

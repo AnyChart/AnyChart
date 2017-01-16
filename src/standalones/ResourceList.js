@@ -185,9 +185,13 @@ anychart.standalones.resourceList = function(opt_data) {
 
 
 //exports
-goog.exportSymbol('anychart.standalones.resourceList', anychart.standalones.resourceList);
-anychart.standalones.ResourceList.prototype['data'] = anychart.standalones.ResourceList.prototype.data;
-anychart.standalones.ResourceList.prototype['draw'] = anychart.standalones.ResourceList.prototype.draw;
-anychart.standalones.ResourceList.prototype['parentBounds'] = anychart.standalones.ResourceList.prototype.parentBounds;
-anychart.standalones.ResourceList.prototype['container'] = anychart.standalones.ResourceList.prototype.container;
-anychart.standalones.ResourceList.prototype['verticalScrollBarPosition'] = anychart.standalones.ResourceList.prototype.verticalScrollBarPosition;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.standalones.ResourceList.prototype;
+  goog.exportSymbol('anychart.standalones.resourceList', anychart.standalones.resourceList);
+  proto['data'] = proto.data;
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+  proto['verticalScrollBarPosition'] = proto.verticalScrollBarPosition;
+})();

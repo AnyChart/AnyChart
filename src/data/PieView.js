@@ -24,7 +24,7 @@ goog.require('goog.array');
  * @extends {anychart.data.View}
  */
 anychart.data.PieView = function(parentView, fieldName, opt_func, opt_other, opt_otherInitialConstructor) {
-  goog.base(this, parentView);
+  anychart.data.PieView.base(this, 'constructor', parentView);
 
   /**
    * Field name to categorize by. Stored for data change events.
@@ -217,5 +217,8 @@ anychart.data.PieView.Mapping_.prototype.getRowsCount = function() {
 
 
 //exports
-anychart.data.PieView.prototype['row'] = anychart.data.PieView.prototype.row;
-anychart.data.PieView.prototype['getRowsCount'] = anychart.data.PieView.prototype.getRowsCount;
+(function() {
+  var proto = anychart.data.PieView.Mapping_.prototype;
+  proto['row'] = proto.row;
+  proto['getRowsCount'] = proto.getRowsCount;
+})();

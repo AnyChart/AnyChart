@@ -27,7 +27,7 @@ goog.require('anychart.scales');
  * @constructor
  */
 anychart.charts.Sparkline = function(opt_data, opt_csvSettings) {
-  goog.base(this);
+  anychart.charts.Sparkline.base(this, 'constructor');
 
   /**
    * Interactivity state.
@@ -189,7 +189,7 @@ anychart.charts.Sparkline.ZINDEX_LABEL = 40;
 /** @inheritDoc */
 anychart.charts.Sparkline.prototype.makeBrowserEvent = function(e) {
   //this method is invoked only for events from data layer
-  var res = goog.base(this, 'makeBrowserEvent', e);
+  var res = anychart.charts.Sparkline.base(this, 'makeBrowserEvent', e);
   res['pointIndex'] = this.getIndexByEvent_(res);
   return res;
 };
@@ -2267,7 +2267,7 @@ anychart.charts.Sparkline.prototype.invalidateSeries_ = function() {
 
 /** @inheritDoc */
 anychart.charts.Sparkline.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.charts.Sparkline.base(this, 'setupByJSON', config, opt_default);
 
   if ('defaultLabelSettings' in config)
     this.defaultLabelSettings(config['defaultLabelSettings']);
@@ -2418,7 +2418,7 @@ anychart.charts.Sparkline.prototype.setupByJSON = function(config, opt_default) 
  * @inheritDoc
  */
 anychart.charts.Sparkline.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.charts.Sparkline.base(this, 'serialize');
   var i;
   var scalesIds = {};
   var scales = [];
@@ -2619,51 +2619,54 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.SPARKLINE] = anychart.sparkline
 
 
 //exports
-goog.exportSymbol('anychart.sparkline', anychart.sparkline);
-anychart.charts.Sparkline.prototype['xScale'] = anychart.charts.Sparkline.prototype.xScale;
-anychart.charts.Sparkline.prototype['yScale'] = anychart.charts.Sparkline.prototype.yScale;
+(function() {
+  var proto = anychart.charts.Sparkline.prototype;
+  goog.exportSymbol('anychart.sparkline', anychart.sparkline);
+  proto['xScale'] = proto.xScale;
+  proto['yScale'] = proto.yScale;
 
-anychart.charts.Sparkline.prototype['lineMarker'] = anychart.charts.Sparkline.prototype.lineMarker;
-anychart.charts.Sparkline.prototype['rangeMarker'] = anychart.charts.Sparkline.prototype.rangeMarker;
-anychart.charts.Sparkline.prototype['textMarker'] = anychart.charts.Sparkline.prototype.textMarker;
+  proto['lineMarker'] = proto.lineMarker;
+  proto['rangeMarker'] = proto.rangeMarker;
+  proto['textMarker'] = proto.textMarker;
 
-anychart.charts.Sparkline.prototype['type'] = anychart.charts.Sparkline.prototype.type;
-anychart.charts.Sparkline.prototype['data'] = anychart.charts.Sparkline.prototype.data;
-anychart.charts.Sparkline.prototype['clip'] = anychart.charts.Sparkline.prototype.clip;
+  proto['type'] = proto.type;
+  proto['data'] = proto.data;
+  proto['clip'] = proto.clip;
 
-anychart.charts.Sparkline.prototype['connectMissingPoints'] = anychart.charts.Sparkline.prototype.connectMissingPoints;
-anychart.charts.Sparkline.prototype['pointWidth'] = anychart.charts.Sparkline.prototype.pointWidth;
+  proto['connectMissingPoints'] = proto.connectMissingPoints;
+  proto['pointWidth'] = proto.pointWidth;
 
-anychart.charts.Sparkline.prototype['lastFill'] = anychart.charts.Sparkline.prototype.lastFill;
-anychart.charts.Sparkline.prototype['lastHatchFill'] = anychart.charts.Sparkline.prototype.lastHatchFill;
-anychart.charts.Sparkline.prototype['lastMarkers'] = anychart.charts.Sparkline.prototype.lastMarkers;
-anychart.charts.Sparkline.prototype['lastLabels'] = anychart.charts.Sparkline.prototype.lastLabels;
+  proto['lastFill'] = proto.lastFill;
+  proto['lastHatchFill'] = proto.lastHatchFill;
+  proto['lastMarkers'] = proto.lastMarkers;
+  proto['lastLabels'] = proto.lastLabels;
 
-anychart.charts.Sparkline.prototype['firstFill'] = anychart.charts.Sparkline.prototype.firstFill;
-anychart.charts.Sparkline.prototype['firstHatchFill'] = anychart.charts.Sparkline.prototype.firstHatchFill;
-anychart.charts.Sparkline.prototype['firstMarkers'] = anychart.charts.Sparkline.prototype.firstMarkers;
-anychart.charts.Sparkline.prototype['firstLabels'] = anychart.charts.Sparkline.prototype.firstLabels;
+  proto['firstFill'] = proto.firstFill;
+  proto['firstHatchFill'] = proto.firstHatchFill;
+  proto['firstMarkers'] = proto.firstMarkers;
+  proto['firstLabels'] = proto.firstLabels;
 
-anychart.charts.Sparkline.prototype['maxFill'] = anychart.charts.Sparkline.prototype.maxFill;
-anychart.charts.Sparkline.prototype['maxHatchFill'] = anychart.charts.Sparkline.prototype.maxHatchFill;
-anychart.charts.Sparkline.prototype['maxMarkers'] = anychart.charts.Sparkline.prototype.maxMarkers;
-anychart.charts.Sparkline.prototype['maxLabels'] = anychart.charts.Sparkline.prototype.maxLabels;
+  proto['maxFill'] = proto.maxFill;
+  proto['maxHatchFill'] = proto.maxHatchFill;
+  proto['maxMarkers'] = proto.maxMarkers;
+  proto['maxLabels'] = proto.maxLabels;
 
-anychart.charts.Sparkline.prototype['minFill'] = anychart.charts.Sparkline.prototype.minFill;
-anychart.charts.Sparkline.prototype['minHatchFill'] = anychart.charts.Sparkline.prototype.minHatchFill;
-anychart.charts.Sparkline.prototype['minMarkers'] = anychart.charts.Sparkline.prototype.minMarkers;
-anychart.charts.Sparkline.prototype['minLabels'] = anychart.charts.Sparkline.prototype.minLabels;
+  proto['minFill'] = proto.minFill;
+  proto['minHatchFill'] = proto.minHatchFill;
+  proto['minMarkers'] = proto.minMarkers;
+  proto['minLabels'] = proto.minLabels;
 
-anychart.charts.Sparkline.prototype['negativeFill'] = anychart.charts.Sparkline.prototype.negativeFill;
-anychart.charts.Sparkline.prototype['negativeHatchFill'] = anychart.charts.Sparkline.prototype.negativeHatchFill;
-anychart.charts.Sparkline.prototype['negativeMarkers'] = anychart.charts.Sparkline.prototype.negativeMarkers;
-anychart.charts.Sparkline.prototype['negativeLabels'] = anychart.charts.Sparkline.prototype.negativeLabels;
+  proto['negativeFill'] = proto.negativeFill;
+  proto['negativeHatchFill'] = proto.negativeHatchFill;
+  proto['negativeMarkers'] = proto.negativeMarkers;
+  proto['negativeLabels'] = proto.negativeLabels;
 
-anychart.charts.Sparkline.prototype['fill'] = anychart.charts.Sparkline.prototype.fill;
-anychart.charts.Sparkline.prototype['hatchFill'] = anychart.charts.Sparkline.prototype.hatchFill;
-anychart.charts.Sparkline.prototype['markers'] = anychart.charts.Sparkline.prototype.markers;
-anychart.charts.Sparkline.prototype['labels'] = anychart.charts.Sparkline.prototype.labels;
+  proto['fill'] = proto.fill;
+  proto['hatchFill'] = proto.hatchFill;
+  proto['markers'] = proto.markers;
+  proto['labels'] = proto.labels;
 
-anychart.charts.Sparkline.prototype['stroke'] = anychart.charts.Sparkline.prototype.stroke;
+  proto['stroke'] = proto.stroke;
 
-anychart.charts.Sparkline.prototype['getType'] = anychart.charts.Sparkline.prototype.getType;
+  proto['getType'] = proto.getType;
+})();

@@ -10,7 +10,7 @@ goog.require('anychart.core.ui.Button');
  * @extends {anychart.core.ui.Button}
  */
 anychart.core.ui.PaginatorButton = function() {
-  goog.base(this);
+  anychart.core.ui.PaginatorButton.base(this, 'constructor');
 
   /**
    * Drawer for the button background.

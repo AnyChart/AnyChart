@@ -1557,7 +1557,7 @@ anychart.charts.Resource.prototype.drawContent = function(bounds) {
 //------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.charts.Resource.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.charts.Resource.base(this, 'serialize');
   json['data'] = this.data_ ? this.data_.serialize() : null;
   json['zoomLevels'] = this.zoomLevels();
   json['zoomLevel'] = this.zoomLevel();
@@ -1582,7 +1582,7 @@ anychart.charts.Resource.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.charts.Resource.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config);
+  anychart.charts.Resource.base(this, 'setupByJSON', config);
   if ('cellPadding' in config)
     this.cellPadding_.setup(config['cellPadding']);
   this.activities_.setupByVal(config['activities'], opt_default);
@@ -1643,7 +1643,7 @@ anychart.charts.Resource.prototype.disposeInternal = function() {
                                                       this.overlay_ =
                                                           this.conflicts_ = null;
 
-  goog.base(this, 'disposeInternal');
+  anychart.charts.Resource.base(this, 'disposeInternal');
 };
 
 
@@ -1777,30 +1777,33 @@ anychart.charts.Resource.Dragger.prototype.defaultAction = function(x, y) {
 //
 //------------------------------------------------------------------------------
 //exports
-anychart.charts.Resource.prototype['getType'] = anychart.charts.Resource.prototype.getType;
-anychart.charts.Resource.prototype['data'] = anychart.charts.Resource.prototype.data;
-anychart.charts.Resource.prototype['timeTrackingMode'] = anychart.charts.Resource.prototype.timeTrackingMode;
-anychart.charts.Resource.prototype['pixPerHour'] = anychart.charts.Resource.prototype.pixPerHour;
-anychart.charts.Resource.prototype['cellPadding'] = anychart.charts.Resource.prototype.cellPadding;
-anychart.charts.Resource.prototype['minRowHeight'] = anychart.charts.Resource.prototype.minRowHeight;
-anychart.charts.Resource.prototype['zoomLevels'] = anychart.charts.Resource.prototype.zoomLevels;
-anychart.charts.Resource.prototype['zoomLevel'] = anychart.charts.Resource.prototype.zoomLevel;
-anychart.charts.Resource.prototype['xScale'] = anychart.charts.Resource.prototype.xScale;
-anychart.charts.Resource.prototype['horizontalScrollBar'] = anychart.charts.Resource.prototype.horizontalScrollBar;
-anychart.charts.Resource.prototype['verticalScrollBar'] = anychart.charts.Resource.prototype.verticalScrollBar;
-anychart.charts.Resource.prototype['grid'] = anychart.charts.Resource.prototype.grid;
-anychart.charts.Resource.prototype['logo'] = anychart.charts.Resource.prototype.logo;
-anychart.charts.Resource.prototype['timeLine'] = anychart.charts.Resource.prototype.timeLine;
-anychart.charts.Resource.prototype['calendar'] = anychart.charts.Resource.prototype.calendar;
-anychart.charts.Resource.prototype['resourceListWidth'] = anychart.charts.Resource.prototype.resourceListWidth;
-anychart.charts.Resource.prototype['timeLineHeight'] = anychart.charts.Resource.prototype.timeLineHeight;
-anychart.charts.Resource.prototype['defaultMinutesPerDay'] = anychart.charts.Resource.prototype.defaultMinutesPerDay;
-anychart.charts.Resource.prototype['overlay'] = anychart.charts.Resource.prototype.overlay;
-anychart.charts.Resource.prototype['activities'] = anychart.charts.Resource.prototype.activities;
-anychart.charts.Resource.prototype['conflicts'] = anychart.charts.Resource.prototype.conflicts;
-anychart.charts.Resource.prototype['resourceList'] = anychart.charts.Resource.prototype.resourceList;
-anychart.charts.Resource.prototype['splitterStroke'] = anychart.charts.Resource.prototype.splitterStroke;
-anychart.charts.Resource.prototype['currentStartDate'] = anychart.charts.Resource.prototype.currentStartDate;
+(function() {
+  var proto = anychart.charts.Resource.prototype;
+  proto['getType'] = proto.getType;
+  proto['data'] = proto.data;
+  proto['timeTrackingMode'] = proto.timeTrackingMode;
+  proto['pixPerHour'] = proto.pixPerHour;
+  proto['cellPadding'] = proto.cellPadding;
+  proto['minRowHeight'] = proto.minRowHeight;
+  proto['zoomLevels'] = proto.zoomLevels;
+  proto['zoomLevel'] = proto.zoomLevel;
+  proto['xScale'] = proto.xScale;
+  proto['horizontalScrollBar'] = proto.horizontalScrollBar;
+  proto['verticalScrollBar'] = proto.verticalScrollBar;
+  proto['grid'] = proto.grid;
+  proto['logo'] = proto.logo;
+  proto['timeLine'] = proto.timeLine;
+  proto['calendar'] = proto.calendar;
+  proto['resourceListWidth'] = proto.resourceListWidth;
+  proto['timeLineHeight'] = proto.timeLineHeight;
+  proto['defaultMinutesPerDay'] = proto.defaultMinutesPerDay;
+  proto['overlay'] = proto.overlay;
+  proto['activities'] = proto.activities;
+  proto['conflicts'] = proto.conflicts;
+  proto['resourceList'] = proto.resourceList;
+  proto['splitterStroke'] = proto.splitterStroke;
+  proto['currentStartDate'] = proto.currentStartDate;
+})();
 
 
 //endregion

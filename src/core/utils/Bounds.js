@@ -32,7 +32,7 @@ anychart.utils.RectObj;
  * @extends {anychart.core.Base}
  */
 anychart.core.utils.Bounds = function(opt_xOrRect, opt_y, opt_width, opt_height) {
-  goog.base(this);
+  anychart.core.utils.Bounds.base(this, 'constructor');
   if (arguments.length)
     this.set.apply(this, arguments);
 };
@@ -594,7 +594,7 @@ anychart.core.utils.Bounds.prototype.dependsOnContainerSize = function() {
 
 /** @inheritDoc */
 anychart.core.utils.Bounds.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.utils.Bounds.base(this, 'serialize');
   if (!goog.isNull(this.top_))
     json['top'] = this.top_;
   if (!goog.isNull(this.right_))
@@ -628,15 +628,18 @@ anychart.core.utils.Bounds.prototype.setup = function(var_args) {
 
 
 //exports
-anychart.core.utils.Bounds.prototype['top'] = anychart.core.utils.Bounds.prototype.top;
-anychart.core.utils.Bounds.prototype['right'] = anychart.core.utils.Bounds.prototype.right;
-anychart.core.utils.Bounds.prototype['bottom'] = anychart.core.utils.Bounds.prototype.bottom;
-anychart.core.utils.Bounds.prototype['left'] = anychart.core.utils.Bounds.prototype.left;
-anychart.core.utils.Bounds.prototype['width'] = anychart.core.utils.Bounds.prototype.width;
-anychart.core.utils.Bounds.prototype['height'] = anychart.core.utils.Bounds.prototype.height;
-anychart.core.utils.Bounds.prototype['minWidth'] = anychart.core.utils.Bounds.prototype.minWidth;
-anychart.core.utils.Bounds.prototype['minHeight'] = anychart.core.utils.Bounds.prototype.minHeight;
-anychart.core.utils.Bounds.prototype['maxWidth'] = anychart.core.utils.Bounds.prototype.maxWidth;
-anychart.core.utils.Bounds.prototype['maxHeight'] = anychart.core.utils.Bounds.prototype.maxHeight;
-anychart.core.utils.Bounds.prototype['set'] = anychart.core.utils.Bounds.prototype.set;
-anychart.core.utils.Bounds.prototype['toRect'] = anychart.core.utils.Bounds.prototype.toRect;
+(function() {
+  var proto = anychart.core.utils.Bounds.prototype;
+  proto['top'] = proto.top;
+  proto['right'] = proto.right;
+  proto['bottom'] = proto.bottom;
+  proto['left'] = proto.left;
+  proto['width'] = proto.width;
+  proto['height'] = proto.height;
+  proto['minWidth'] = proto.minWidth;
+  proto['minHeight'] = proto.minHeight;
+  proto['maxWidth'] = proto.maxWidth;
+  proto['maxHeight'] = proto.maxHeight;
+  proto['set'] = proto.set;
+  proto['toRect'] = proto.toRect;
+})();

@@ -24,7 +24,7 @@ goog.require('goog.array');
  * @extends {anychart.core.Base}
  */
 anychart.data.Table = function(opt_keyColumn, opt_dateTimePattern, opt_timeOffset, opt_baseDate, opt_locale) {
-  goog.base(this);
+  anychart.data.Table.base(this, 'constructor');
 
   /**
    * Main table storage.
@@ -409,7 +409,7 @@ anychart.data.Table.prototype.disposeInternal = function() {
   delete this.computers_;
   this.resumeSignalsDispatching(false);
 
-  goog.base(this, 'disposeInternal');
+  anychart.data.Table.base(this, 'disposeInternal');
 };
 
 
@@ -427,14 +427,17 @@ anychart.data.table = function(opt_keyColumnIndex, opt_dateTimePattern, opt_time
 };
 
 
-//anychart.data.Table.prototype['startTransaction'] = anychart.data.Table.prototype.startTransaction;
-//anychart.data.Table.prototype['rollback'] = anychart.data.Table.prototype.rollback;
-//anychart.data.Table.prototype['commit'] = anychart.data.Table.prototype.commit;
+//proto['startTransaction'] = proto.startTransaction;
+//proto['rollback'] = proto.rollback;
+//proto['commit'] = proto.commit;
 
 //exports
-goog.exportSymbol('anychart.data.table', anychart.data.table);
-anychart.data.Table.prototype['addData'] = anychart.data.Table.prototype.addData;
-anychart.data.Table.prototype['remove'] = anychart.data.Table.prototype.remove;
-anychart.data.Table.prototype['removeFirst'] = anychart.data.Table.prototype.removeFirst;
-anychart.data.Table.prototype['mapAs'] = anychart.data.Table.prototype.mapAs;
-anychart.data.Table.prototype['createComputer'] = anychart.data.Table.prototype.createComputer;
+(function() {
+  var proto = anychart.data.Table.prototype;
+  goog.exportSymbol('anychart.data.table', anychart.data.table);
+  proto['addData'] = proto.addData;
+  proto['remove'] = proto.remove;
+  proto['removeFirst'] = proto.removeFirst;
+  proto['mapAs'] = proto.mapAs;
+  proto['createComputer'] = proto.createComputer;
+})();

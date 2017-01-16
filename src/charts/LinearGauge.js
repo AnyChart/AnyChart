@@ -1461,33 +1461,36 @@ anychart.charts.LinearGauge.prototype.thermometer = function(dataIndex) {
 //endregion
 
 //exports
-anychart.charts.LinearGauge.prototype['getType'] = anychart.charts.LinearGauge.prototype.getType;
-anychart.charts.LinearGauge.prototype['defaultPointerType'] = anychart.charts.LinearGauge.prototype.defaultPointerType;
+(function() {
+  var proto = anychart.charts.LinearGauge.prototype;
+  proto['getType'] = proto.getType;
+  proto['defaultPointerType'] = proto.defaultPointerType;
 
-anychart.charts.LinearGauge.prototype['globalOffset'] = anychart.charts.LinearGauge.prototype.globalOffset;
-anychart.charts.LinearGauge.prototype['layout'] = anychart.charts.LinearGauge.prototype.layout;
-anychart.charts.LinearGauge.prototype['palette'] = anychart.charts.LinearGauge.prototype.palette;
-anychart.charts.LinearGauge.prototype['markerPalette'] = anychart.charts.LinearGauge.prototype.markerPalette;
-anychart.charts.LinearGauge.prototype['hatchFillPalette'] = anychart.charts.LinearGauge.prototype.hatchFillPalette;
-anychart.charts.LinearGauge.prototype['isVertical'] = anychart.charts.LinearGauge.prototype.isVertical;
+  proto['globalOffset'] = proto.globalOffset;
+  proto['layout'] = proto.layout;
+  proto['palette'] = proto.palette;
+  proto['markerPalette'] = proto.markerPalette;
+  proto['hatchFillPalette'] = proto.hatchFillPalette;
+  proto['isVertical'] = proto.isVertical;
 
-anychart.charts.LinearGauge.prototype['addPointer'] = anychart.charts.LinearGauge.prototype.addPointer;
-anychart.charts.LinearGauge.prototype['removePointer'] = anychart.charts.LinearGauge.prototype.removePointer;
-anychart.charts.LinearGauge.prototype['removePointerAt'] = anychart.charts.LinearGauge.prototype.removePointerAt;
-anychart.charts.LinearGauge.prototype['removeAllPointers'] = anychart.charts.LinearGauge.prototype.removeAllPointers;
-anychart.charts.LinearGauge.prototype['getPointer'] = anychart.charts.LinearGauge.prototype.getPointer;
-anychart.charts.LinearGauge.prototype['getPointerAt'] = anychart.charts.LinearGauge.prototype.getPointerAt;
-anychart.charts.LinearGauge.prototype['getPointersCount'] = anychart.charts.LinearGauge.prototype.getPointersCount;
-anychart.charts.LinearGauge.prototype['getSelectedPoints'] = anychart.charts.LinearGauge.prototype.getSelectedPoints;
+  proto['addPointer'] = proto.addPointer;
+  proto['removePointer'] = proto.removePointer;
+  proto['removePointerAt'] = proto.removePointerAt;
+  proto['removeAllPointers'] = proto.removeAllPointers;
+  proto['getPointer'] = proto.getPointer;
+  proto['getPointerAt'] = proto.getPointerAt;
+  proto['getPointersCount'] = proto.getPointersCount;
+  proto['getSelectedPoints'] = proto.getSelectedPoints;
 
-anychart.charts.LinearGauge.prototype['data'] = anychart.charts.LinearGauge.prototype.data;
-anychart.charts.LinearGauge.prototype['axis'] = anychart.charts.LinearGauge.prototype.axis;
-anychart.charts.LinearGauge.prototype['scaleBar'] = anychart.charts.LinearGauge.prototype.scaleBar;
-anychart.charts.LinearGauge.prototype['scale'] = anychart.charts.LinearGauge.prototype.scale;
+  proto['data'] = proto.data;
+  proto['axis'] = proto.axis;
+  proto['scaleBar'] = proto.scaleBar;
+  proto['scale'] = proto.scale;
 
-anychart.charts.LinearGauge.prototype['bar'] = anychart.charts.LinearGauge.prototype.bar;
-anychart.charts.LinearGauge.prototype['led'] = anychart.charts.LinearGauge.prototype.led;
-anychart.charts.LinearGauge.prototype['marker'] = anychart.charts.LinearGauge.prototype.marker;
-anychart.charts.LinearGauge.prototype['rangeBar'] = anychart.charts.LinearGauge.prototype.rangeBar;
-anychart.charts.LinearGauge.prototype['tank'] = anychart.charts.LinearGauge.prototype.tank;
-anychart.charts.LinearGauge.prototype['thermometer'] = anychart.charts.LinearGauge.prototype.thermometer;
+  proto['bar'] = proto.bar;
+  proto['led'] = proto.led;
+  proto['marker'] = proto.marker;
+  proto['rangeBar'] = proto.rangeBar;
+  proto['tank'] = proto.tank;
+  proto['thermometer'] = proto.thermometer;
+})();

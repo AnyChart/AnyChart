@@ -12,7 +12,7 @@ goog.require('goog.array');
  * @extends {anychart.core.Base}
  */
 anychart.scales.OrdinalTicks = function(scale) {
-  goog.base(this);
+  anychart.scales.OrdinalTicks.base(this, 'constructor');
 
   /**
    * Scale reference to get setup from in emergency situations.
@@ -293,7 +293,7 @@ anychart.scales.OrdinalTicks.prototype.markInvalid = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.scales.OrdinalTicks.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.scales.OrdinalTicks.base(this, 'serialize');
   if (this.explicitIndexes_)
     json['explicit'] = this.explicitIndexes_;
   else if (!isNaN(this.interval_))
@@ -317,7 +317,7 @@ anychart.scales.OrdinalTicks.prototype.setupSpecial = function(var_args) {
 
 /** @inheritDoc */
 anychart.scales.OrdinalTicks.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.scales.OrdinalTicks.base(this, 'setupByJSON', config, opt_default);
   if ('explicit' in config)
     this.set(config['explicit']);
   else if ('interval' in config)
@@ -329,7 +329,10 @@ anychart.scales.OrdinalTicks.prototype.setupByJSON = function(config, opt_defaul
 
 
 //exports
-anychart.scales.OrdinalTicks.prototype['interval'] = anychart.scales.OrdinalTicks.prototype.interval;//doc|ex
-anychart.scales.OrdinalTicks.prototype['set'] = anychart.scales.OrdinalTicks.prototype.set;//doc|ex
-anychart.scales.OrdinalTicks.prototype['get'] = anychart.scales.OrdinalTicks.prototype.get;//doc|ex
-anychart.scales.OrdinalTicks.prototype['names'] = anychart.scales.OrdinalTicks.prototype.names;//doc|ex
+(function() {
+  var proto = anychart.scales.OrdinalTicks.prototype;
+  proto['interval'] = proto.interval;//doc|ex
+  proto['set'] = proto.set;//doc|ex
+  proto['get'] = proto.get;//doc|ex
+  proto['names'] = proto.names;//doc|ex
+})();

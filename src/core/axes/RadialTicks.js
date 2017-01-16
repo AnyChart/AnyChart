@@ -12,7 +12,7 @@ goog.require('anychart.core.VisualBase');
  * @extends {anychart.core.VisualBase}
  */
 anychart.core.axes.RadialTicks = function() {
-  goog.base(this);
+  anychart.core.axes.RadialTicks.base(this, 'constructor');
 
   /**
    * Ticks length.
@@ -146,7 +146,7 @@ anychart.core.axes.RadialTicks.prototype.drawTick = function(x, y, x1, y1) {
 
 /** @inheritDoc */
 anychart.core.axes.RadialTicks.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.axes.RadialTicks.base(this, 'serialize');
   json['length'] = this.length();
   json['stroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.stroke()));
   return json;
@@ -155,12 +155,15 @@ anychart.core.axes.RadialTicks.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.axes.RadialTicks.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.axes.RadialTicks.base(this, 'setupByJSON', config, opt_default);
   this.length(config['length']);
   this.stroke(config['stroke']);
 };
 
 
 //exports
-anychart.core.axes.RadialTicks.prototype['length'] = anychart.core.axes.RadialTicks.prototype.length;
-anychart.core.axes.RadialTicks.prototype['stroke'] = anychart.core.axes.RadialTicks.prototype.stroke;
+(function() {
+  var proto = anychart.core.axes.RadialTicks.prototype;
+  proto['length'] = proto.length;
+  proto['stroke'] = proto.stroke;
+})();

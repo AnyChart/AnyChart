@@ -100,6 +100,9 @@ anychart.core.stock.indicators.BBandsWidth.prototype.deviation = function(opt_va
 
 
 //exports
-anychart.core.stock.indicators.BBandsWidth.prototype['period'] = anychart.core.stock.indicators.BBandsWidth.prototype.period;
-anychart.core.stock.indicators.BBandsWidth.prototype['deviation'] = anychart.core.stock.indicators.BBandsWidth.prototype.deviation;
-anychart.core.stock.indicators.BBandsWidth.prototype['series'] = anychart.core.stock.indicators.BBandsWidth.prototype.series;
+(function() {
+  var proto = anychart.core.stock.indicators.BBandsWidth.prototype;
+  proto['period'] = proto.period;
+  proto['deviation'] = proto.deviation;
+  proto['series'] = proto.series;
+})();

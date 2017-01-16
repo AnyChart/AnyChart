@@ -548,17 +548,24 @@ anychart.core.series.RenderingSettings.PointContext.prototype.getStackedZero = f
 //
 //------------------------------------------------------------------------------
 //exports
-//anychart.core.series.RenderingSettings.prototype['start'] = anychart.core.series.RenderingSettings.prototype.start;
-//anychart.core.series.RenderingSettings.prototype['point'] = anychart.core.series.RenderingSettings.prototype.point;
-//anychart.core.series.RenderingSettings.prototype['finish'] = anychart.core.series.RenderingSettings.prototype.finish;
-//anychart.core.series.RenderingSettings.prototype['needsZero'] = anychart.core.series.RenderingSettings.prototype.needsZero;
-//anychart.core.series.RenderingSettings.prototype['needsWidth'] = anychart.core.series.RenderingSettings.prototype.needsWidth;
-//anychart.core.series.RenderingSettings.prototype['yValues'] = anychart.core.series.RenderingSettings.prototype.yValues;
-anychart.core.series.RenderingSettings.prototype['shapes'] = anychart.core.series.RenderingSettings.prototype.shapes;
-anychart.core.series.RenderingSettings.Context.prototype['getShapesGroup'] = anychart.core.series.RenderingSettings.Context.prototype.getShapesGroup;
-anychart.core.series.RenderingSettings.Context.prototype['getStat'] = anychart.core.series.RenderingSettings.Context.prototype.getStat;
-anychart.core.series.RenderingSettings.PointContext.prototype['getDataValue'] = anychart.core.series.RenderingSettings.PointContext.prototype.getDataValue;
-anychart.core.series.RenderingSettings.PointContext.prototype['getStackedValue'] = anychart.core.series.RenderingSettings.PointContext.prototype.getStackedValue;
-anychart.core.series.RenderingSettings.PointContext.prototype['getStackedZero'] = anychart.core.series.RenderingSettings.PointContext.prototype.getStackedZero;
+(function() {
+  var proto = anychart.core.series.RenderingSettings.prototype;
+  //proto['start'] = proto.start;
+  //proto['point'] = proto.point;
+  //proto['finish'] = proto.finish;
+  //proto['needsZero'] = proto.needsZero;
+  //proto['needsWidth'] = proto.needsWidth;
+  //proto['yValues'] = proto.yValues;
+  proto['shapes'] = proto.shapes;
+
+  proto = anychart.core.series.RenderingSettings.Context.prototype;
+  proto['getShapesGroup'] = proto.getShapesGroup;
+  proto['getStat'] = proto.getStat;
+
+  proto = anychart.core.series.RenderingSettings.PointContext.prototype;
+  proto['getDataValue'] = proto.getDataValue;
+  proto['getStackedValue'] = proto.getStackedValue;
+  proto['getStackedZero'] = proto.getStackedZero;
+})();
 
 //endregion

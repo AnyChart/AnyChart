@@ -91,7 +91,7 @@ anychart.core.axisMarkers.GanttText.prototype.value = function(opt_newValue) {
 
 /** @inheritDoc */
 anychart.core.axisMarkers.GanttText.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.axisMarkers.GanttText.base(this, 'serialize');
   json['value'] = this.value();
   return json;
 };
@@ -99,21 +99,24 @@ anychart.core.axisMarkers.GanttText.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.axisMarkers.GanttText.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.axisMarkers.GanttText.base(this, 'setupByJSON', config, opt_default);
   this.value(config['value']);
 };
 
 
 //exports
-anychart.core.axisMarkers.GanttText.prototype['value'] = anychart.core.axisMarkers.GanttText.prototype.value;
-anychart.core.axisMarkers.GanttText.prototype['scale'] = anychart.core.axisMarkers.GanttText.prototype.scale;
-anychart.core.axisMarkers.GanttText.prototype['anchor'] = anychart.core.axisMarkers.GanttText.prototype.anchor;
-anychart.core.axisMarkers.GanttText.prototype['align'] = anychart.core.axisMarkers.GanttText.prototype.align;
-anychart.core.axisMarkers.GanttText.prototype['layout'] = anychart.core.axisMarkers.GanttText.prototype.layout;
-anychart.core.axisMarkers.GanttText.prototype['rotation'] = anychart.core.axisMarkers.GanttText.prototype.rotation;
-anychart.core.axisMarkers.GanttText.prototype['offsetX'] = anychart.core.axisMarkers.GanttText.prototype.offsetX;
-anychart.core.axisMarkers.GanttText.prototype['offsetY'] = anychart.core.axisMarkers.GanttText.prototype.offsetY;
-anychart.core.axisMarkers.GanttText.prototype['text'] = anychart.core.axisMarkers.GanttText.prototype.text;
-anychart.core.axisMarkers.GanttText.prototype['height'] = anychart.core.axisMarkers.GanttText.prototype.height;
-anychart.core.axisMarkers.GanttText.prototype['width'] = anychart.core.axisMarkers.GanttText.prototype.width;
-anychart.core.axisMarkers.GanttText.prototype['isHorizontal'] = anychart.core.axisMarkers.GanttText.prototype.isHorizontal;
+(function() {
+  var proto = anychart.core.axisMarkers.GanttText.prototype;
+  proto['value'] = proto.value;
+  proto['scale'] = proto.scale;
+  proto['anchor'] = proto.anchor;
+  proto['align'] = proto.align;
+  proto['layout'] = proto.layout;
+  proto['rotation'] = proto.rotation;
+  proto['offsetX'] = proto.offsetX;
+  proto['offsetY'] = proto.offsetY;
+  proto['text'] = proto.text;
+  proto['height'] = proto.height;
+  proto['width'] = proto.width;
+  proto['isHorizontal'] = proto.isHorizontal;
+})();

@@ -363,17 +363,20 @@ anychart.core.grids.MapSettings.prototype.disposeInternal = function() {
 //endregion
 //region --- Exports
 //exports
-anychart.core.grids.MapSettings.prototype['horizontal'] = anychart.core.grids.MapSettings.prototype.horizontal;
-anychart.core.grids.MapSettings.prototype['vertical'] = anychart.core.grids.MapSettings.prototype.vertical;
-//descriptors
-// anychart.core.grids.MapSettings.prototype['enabled'] = anychart.core.grids.MapSettings.prototype.enabled;
-// anychart.core.grids.MapSettings.prototype['zIndex'] = anychart.core.grids.MapSettings.prototype.zIndex;
-// anychart.core.grids.MapSettings.prototype['stroke'] = anychart.core.grids.MapSettings.prototype.stroke;
-// anychart.core.grids.MapSettings.prototype['minorStroke'] = anychart.core.grids.MapSettings.prototype.minorStroke;
-// anychart.core.grids.MapSettings.prototype['drawFirstLine'] = anychart.core.grids.MapSettings.prototype.drawFirstLine;
-// anychart.core.grids.MapSettings.prototype['drawLastLine'] = anychart.core.grids.MapSettings.prototype.drawLastLine;
-// anychart.core.grids.MapSettings.prototype['oddFill'] = anychart.core.grids.MapSettings.prototype.oddFill;
-// anychart.core.grids.MapSettings.prototype['evenFill'] = anychart.core.grids.MapSettings.prototype.evenFill;
+(function() {
+  var proto = anychart.core.grids.MapSettings.prototype;
+  proto['horizontal'] = proto.horizontal;
+  proto['vertical'] = proto.vertical;
+  //descriptors
+  // proto['enabled'] = proto.enabled;
+  // proto['zIndex'] = proto.zIndex;
+  // proto['stroke'] = proto.stroke;
+  // proto['minorStroke'] = proto.minorStroke;
+  // proto['drawFirstLine'] = proto.drawFirstLine;
+  // proto['drawLastLine'] = proto.drawLastLine;
+  // proto['oddFill'] = proto.oddFill;
+  // proto['evenFill'] = proto.evenFill;
+})();
 //endregion
 
 

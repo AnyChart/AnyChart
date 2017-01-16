@@ -27,7 +27,7 @@ goog.require('goog.object');
  * @extends {anychart.core.Text}
  */
 anychart.core.ui.Legend = function() {
-  goog.base(this);
+  anychart.core.ui.Legend.base(this, 'constructor');
 
   /**
    * Position of the legend.
@@ -1670,7 +1670,7 @@ anychart.core.ui.Legend.prototype.drawLegendContent_ = function(pageNumber, cont
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.ui.Legend.prototype.makeBrowserEvent = function(e) {
-  var res = goog.base(this, 'makeBrowserEvent', e);
+  var res = anychart.core.ui.Legend.base(this, 'makeBrowserEvent', e);
   var tag = anychart.utils.extractTag(res['domTarget']);
   tag = anychart.utils.toNumber(tag && tag.index);
   if (!isNaN(tag))
@@ -1825,7 +1825,7 @@ anychart.core.ui.Legend.prototype.makePointEvent_ = function(event) {
 
 /** @inheritDoc */
 anychart.core.ui.Legend.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.ui.Legend.base(this, 'serialize');
   json['margin'] = this.margin().serialize();
   json['padding'] = this.padding().serialize();
   json['background'] = this.background().serialize();
@@ -1853,7 +1853,7 @@ anychart.core.ui.Legend.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.ui.Legend.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.ui.Legend.base(this, 'setupByJSON', config, opt_default);
 
   if (anychart.opt.TITLE in config)
     this.title(config[anychart.opt.TITLE]);
@@ -1924,26 +1924,29 @@ anychart.core.ui.Legend.LegendItemProvider;
 
 
 //exports
-anychart.core.ui.Legend.prototype['itemsLayout'] = anychart.core.ui.Legend.prototype.itemsLayout;
-anychart.core.ui.Legend.prototype['itemsSpacing'] = anychart.core.ui.Legend.prototype.itemsSpacing;
-anychart.core.ui.Legend.prototype['items'] = anychart.core.ui.Legend.prototype.items;
-anychart.core.ui.Legend.prototype['itemsFormatter'] = anychart.core.ui.Legend.prototype.itemsFormatter;
-anychart.core.ui.Legend.prototype['itemsTextFormatter'] = anychart.core.ui.Legend.prototype.itemsTextFormatter;
-anychart.core.ui.Legend.prototype['itemsSourceMode'] = anychart.core.ui.Legend.prototype.itemsSourceMode;
-anychart.core.ui.Legend.prototype['inverted'] = anychart.core.ui.Legend.prototype.inverted;
-anychart.core.ui.Legend.prototype['hoverCursor'] = anychart.core.ui.Legend.prototype.hoverCursor;
-anychart.core.ui.Legend.prototype['iconTextSpacing'] = anychart.core.ui.Legend.prototype.iconTextSpacing;
-anychart.core.ui.Legend.prototype['iconSize'] = anychart.core.ui.Legend.prototype.iconSize;
-anychart.core.ui.Legend.prototype['margin'] = anychart.core.ui.Legend.prototype.margin;
-anychart.core.ui.Legend.prototype['padding'] = anychart.core.ui.Legend.prototype.padding;
-anychart.core.ui.Legend.prototype['background'] = anychart.core.ui.Legend.prototype.background;
-anychart.core.ui.Legend.prototype['title'] = anychart.core.ui.Legend.prototype.title;
-anychart.core.ui.Legend.prototype['titleFormatter'] = anychart.core.ui.Legend.prototype.titleFormatter;
-anychart.core.ui.Legend.prototype['titleSeparator'] = anychart.core.ui.Legend.prototype.titleSeparator;
-anychart.core.ui.Legend.prototype['paginator'] = anychart.core.ui.Legend.prototype.paginator;
-anychart.core.ui.Legend.prototype['tooltip'] = anychart.core.ui.Legend.prototype.tooltip;
-anychart.core.ui.Legend.prototype['width'] = anychart.core.ui.Legend.prototype.width;
-anychart.core.ui.Legend.prototype['height'] = anychart.core.ui.Legend.prototype.height;
-anychart.core.ui.Legend.prototype['position'] = anychart.core.ui.Legend.prototype.position;
-anychart.core.ui.Legend.prototype['align'] = anychart.core.ui.Legend.prototype.align;
-anychart.core.ui.Legend.prototype['getRemainingBounds'] = anychart.core.ui.Legend.prototype.getRemainingBounds;
+(function() {
+  var proto = anychart.core.ui.Legend.prototype;
+  proto['itemsLayout'] = proto.itemsLayout;
+  proto['itemsSpacing'] = proto.itemsSpacing;
+  proto['items'] = proto.items;
+  proto['itemsFormatter'] = proto.itemsFormatter;
+  proto['itemsTextFormatter'] = proto.itemsTextFormatter;
+  proto['itemsSourceMode'] = proto.itemsSourceMode;
+  proto['inverted'] = proto.inverted;
+  proto['hoverCursor'] = proto.hoverCursor;
+  proto['iconTextSpacing'] = proto.iconTextSpacing;
+  proto['iconSize'] = proto.iconSize;
+  proto['margin'] = proto.margin;
+  proto['padding'] = proto.padding;
+  proto['background'] = proto.background;
+  proto['title'] = proto.title;
+  proto['titleFormatter'] = proto.titleFormatter;
+  proto['titleSeparator'] = proto.titleSeparator;
+  proto['paginator'] = proto.paginator;
+  proto['tooltip'] = proto.tooltip;
+  proto['width'] = proto.width;
+  proto['height'] = proto.height;
+  proto['position'] = proto.position;
+  proto['align'] = proto.align;
+  proto['getRemainingBounds'] = proto.getRemainingBounds;
+})();

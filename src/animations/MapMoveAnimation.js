@@ -15,7 +15,7 @@ goog.require('anychart.animations.MapAnimation');
  * @extends {anychart.animations.MapAnimation}
  */
 anychart.animations.MapMoveAnimation = function(map, start, end, duration, opt_silentMode, opt_acc) {
-  goog.base(this, map, start, end, duration, opt_silentMode, opt_acc);
+  anychart.animations.MapMoveAnimation.base(this, 'constructor', map, start, end, duration, opt_silentMode, opt_acc);
 };
 goog.inherits(anychart.animations.MapMoveAnimation, anychart.animations.MapAnimation);
 

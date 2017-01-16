@@ -51,5 +51,8 @@ anychart.core.GaugePointer.prototype.selected = function(opt_value) {
 
 
 //exports
-anychart.core.GaugePointer.prototype['hovered'] = anychart.core.GaugePointer.prototype.hovered;
-anychart.core.GaugePointer.prototype['selected'] = anychart.core.GaugePointer.prototype.selected;
+(function() {
+  var proto = anychart.core.GaugePointer.prototype;
+  proto['hovered'] = proto.hovered;
+  proto['selected'] = proto.selected;
+})();

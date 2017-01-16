@@ -19,7 +19,7 @@ anychart.data.aggregators.CustomCalculator = function(valuesColumn, calculator) 
    */
   this.calculator_ = calculator;
 
-  goog.base(this, valuesColumn);
+  anychart.data.aggregators.CustomCalculator.base(this, 'constructor', valuesColumn);
 };
 goog.inherits(anychart.data.aggregators.CustomCalculator, anychart.data.aggregators.Base);
 

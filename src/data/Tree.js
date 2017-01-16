@@ -49,7 +49,7 @@ goog.require('goog.object');
  * @extends {anychart.core.Base}
  */
 anychart.data.Tree = function(opt_data, opt_fillMethodOrCsvMapping, opt_csvSettingsOrDeps) {
-  goog.base(this);
+  anychart.data.Tree.base(this, 'constructor');
 
 
   /**
@@ -214,7 +214,7 @@ anychart.data.Tree.prototype.dispatchEvents = function(opt_val) {
 anychart.data.Tree.prototype.dispatchSignal = function(value) {
   if (!this.suspendedDispatching && !!(value & anychart.Signal.DATA_CHANGED))
     this.traverserToArrayCache_ = null;
-  goog.base(this, 'dispatchSignal', value);
+  anychart.data.Tree.base(this, 'dispatchSignal', value);
 };
 
 
@@ -927,7 +927,7 @@ anychart.data.Tree.prototype.removeChildren = function() {
  * @inheritDoc
  */
 anychart.data.Tree.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.data.Tree.base(this, 'serialize');
   json['children'] = [];
   for (var i = 0; i < this.numChildren(); i++) {
     var root = this.getChildAt(i);
@@ -2012,42 +2012,46 @@ anychart.data.tree = function(opt_data, opt_fillMethodOrCsvMapping, opt_csvSetti
 
 
 //exports
-goog.exportSymbol('anychart.data.tree', anychart.data.tree);
-anychart.data.Tree.prototype['getTraverser'] = anychart.data.Tree.prototype.getTraverser;
-anychart.data.Tree.prototype['dispatchEvents'] = anychart.data.Tree.prototype.dispatchEvents;
-anychart.data.Tree.prototype['addData'] = anychart.data.Tree.prototype.addData;
-anychart.data.Tree.prototype['createIndexOn'] = anychart.data.Tree.prototype.createIndexOn;
-anychart.data.Tree.prototype['removeIndexOn'] = anychart.data.Tree.prototype.removeIndexOn;
-anychart.data.Tree.prototype['search'] = anychart.data.Tree.prototype.search;
-anychart.data.Tree.prototype['searchItems'] = anychart.data.Tree.prototype.searchItems;
-anychart.data.Tree.prototype['addChild'] = anychart.data.Tree.prototype.addChild;
-anychart.data.Tree.prototype['addChildAt'] = anychart.data.Tree.prototype.addChildAt;
-anychart.data.Tree.prototype['getChildren'] = anychart.data.Tree.prototype.getChildren;
-anychart.data.Tree.prototype['numChildren'] = anychart.data.Tree.prototype.numChildren;
-anychart.data.Tree.prototype['getChildAt'] = anychart.data.Tree.prototype.getChildAt;
-anychart.data.Tree.prototype['removeChild'] = anychart.data.Tree.prototype.removeChild;
-anychart.data.Tree.prototype['removeChildAt'] = anychart.data.Tree.prototype.removeChildAt;
-anychart.data.Tree.prototype['removeChildren'] = anychart.data.Tree.prototype.removeChildren;
-anychart.data.Tree.prototype['indexOfChild'] = anychart.data.Tree.prototype.indexOfChild;
-anychart.data.Tree.prototype['mapAs'] = anychart.data.Tree.prototype.mapAs;
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  anychart.data.Tree.DataItem
-//  NOTE: instance is not exported.
-//
-//----------------------------------------------------------------------------------------------------------------------
-anychart.data.Tree.DataItem.prototype['get'] = anychart.data.Tree.DataItem.prototype.get;
-anychart.data.Tree.DataItem.prototype['set'] = anychart.data.Tree.DataItem.prototype.set;
-anychart.data.Tree.DataItem.prototype['meta'] = anychart.data.Tree.DataItem.prototype.meta;
-anychart.data.Tree.DataItem.prototype['del'] = anychart.data.Tree.DataItem.prototype.del;
-anychart.data.Tree.DataItem.prototype['getParent'] = anychart.data.Tree.DataItem.prototype.getParent;
-anychart.data.Tree.DataItem.prototype['addChild'] = anychart.data.Tree.DataItem.prototype.addChild;
-anychart.data.Tree.DataItem.prototype['addChildAt'] = anychart.data.Tree.DataItem.prototype.addChildAt;
-anychart.data.Tree.DataItem.prototype['getChildren'] = anychart.data.Tree.DataItem.prototype.getChildren;
-anychart.data.Tree.DataItem.prototype['numChildren'] = anychart.data.Tree.DataItem.prototype.numChildren;
-anychart.data.Tree.DataItem.prototype['getChildAt'] = anychart.data.Tree.DataItem.prototype.getChildAt;
-anychart.data.Tree.DataItem.prototype['remove'] = anychart.data.Tree.DataItem.prototype.remove;
-anychart.data.Tree.DataItem.prototype['removeChild'] = anychart.data.Tree.DataItem.prototype.removeChild;
-anychart.data.Tree.DataItem.prototype['removeChildAt'] = anychart.data.Tree.DataItem.prototype.removeChildAt;
-anychart.data.Tree.DataItem.prototype['removeChildren'] = anychart.data.Tree.DataItem.prototype.removeChildren;
-anychart.data.Tree.DataItem.prototype['indexOfChild'] = anychart.data.Tree.DataItem.prototype.indexOfChild;
+(function() {
+  var proto = anychart.data.Tree.prototype;
+  goog.exportSymbol('anychart.data.tree', anychart.data.tree);
+  proto['getTraverser'] = proto.getTraverser;
+  proto['dispatchEvents'] = proto.dispatchEvents;
+  proto['addData'] = proto.addData;
+  proto['createIndexOn'] = proto.createIndexOn;
+  proto['removeIndexOn'] = proto.removeIndexOn;
+  proto['search'] = proto.search;
+  proto['searchItems'] = proto.searchItems;
+  proto['addChild'] = proto.addChild;
+  proto['addChildAt'] = proto.addChildAt;
+  proto['getChildren'] = proto.getChildren;
+  proto['numChildren'] = proto.numChildren;
+  proto['getChildAt'] = proto.getChildAt;
+  proto['removeChild'] = proto.removeChild;
+  proto['removeChildAt'] = proto.removeChildAt;
+  proto['removeChildren'] = proto.removeChildren;
+  proto['indexOfChild'] = proto.indexOfChild;
+  proto['mapAs'] = proto.mapAs;
+  //----------------------------------------------------------------------------------------------------------------------
+  //
+  //  anychart.data.Tree.DataItem
+  //  NOTE: instance is not exported.
+  //
+  //----------------------------------------------------------------------------------------------------------------------
+  proto = anychart.data.Tree.DataItem.prototype;
+  proto['get'] = proto.get;
+  proto['set'] = proto.set;
+  proto['meta'] = proto.meta;
+  proto['del'] = proto.del;
+  proto['getParent'] = proto.getParent;
+  proto['addChild'] = proto.addChild;
+  proto['addChildAt'] = proto.addChildAt;
+  proto['getChildren'] = proto.getChildren;
+  proto['numChildren'] = proto.numChildren;
+  proto['getChildAt'] = proto.getChildAt;
+  proto['remove'] = proto.remove;
+  proto['removeChild'] = proto.removeChild;
+  proto['removeChildAt'] = proto.removeChildAt;
+  proto['removeChildren'] = proto.removeChildren;
+  proto['indexOfChild'] = proto.indexOfChild;
+})();

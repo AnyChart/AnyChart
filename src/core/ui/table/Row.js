@@ -13,7 +13,7 @@ goog.require('anychart.core.ui.table.Border');
  * @extends {anychart.core.ui.table.Base}
  */
 anychart.core.ui.table.Row = function(table, rowIndex) {
-  goog.base(this, table);
+  anychart.core.ui.table.Row.base(this, 'constructor', table);
   /**
    * Row index.
    * @type {number}
@@ -152,11 +152,14 @@ anychart.core.ui.table.Row.prototype.cellPadding = function(opt_spaceOrTopOrTopA
 
 
 //exports
-anychart.core.ui.table.Row.prototype['height'] = anychart.core.ui.table.Row.prototype.height;
-anychart.core.ui.table.Row.prototype['maxHeight'] = anychart.core.ui.table.Row.prototype.maxHeight;
-anychart.core.ui.table.Row.prototype['minHeight'] = anychart.core.ui.table.Row.prototype.minHeight;
-anychart.core.ui.table.Row.prototype['getCell'] = anychart.core.ui.table.Row.prototype.getCell;
-anychart.core.ui.table.Row.prototype['getRowNum'] = anychart.core.ui.table.Row.prototype.getRowNum;
-anychart.core.ui.table.Row.prototype['cellFill'] = anychart.core.ui.table.Row.prototype.cellFill;
-anychart.core.ui.table.Row.prototype['cellBorder'] = anychart.core.ui.table.Row.prototype.cellBorder;
-anychart.core.ui.table.Row.prototype['cellPadding'] = anychart.core.ui.table.Row.prototype.cellPadding;
+(function() {
+  var proto = anychart.core.ui.table.Row.prototype;
+  proto['height'] = proto.height;
+  proto['maxHeight'] = proto.maxHeight;
+  proto['minHeight'] = proto.minHeight;
+  proto['getCell'] = proto.getCell;
+  proto['getRowNum'] = proto.getRowNum;
+  proto['cellFill'] = proto.cellFill;
+  proto['cellBorder'] = proto.cellBorder;
+  proto['cellPadding'] = proto.cellPadding;
+})();

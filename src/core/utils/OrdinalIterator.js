@@ -22,7 +22,7 @@ anychart.core.utils.OrdinalIterator = function(series, categories, opt_pointCall
    */
   this.categories = goog.array.slice(categories, 0);
 
-  goog.base(this, series, false, opt_pointCallback, opt_missingCallback, opt_beforePointCallback, opt_afterPointCallback);
+  anychart.core.utils.OrdinalIterator.base(this, 'constructor', series, false, opt_pointCallback, opt_missingCallback, opt_beforePointCallback, opt_afterPointCallback);
 };
 goog.inherits(anychart.core.utils.OrdinalIterator, anychart.core.utils.ScatterIterator);
 

@@ -28,7 +28,7 @@ goog.require('goog.fx.Dragger');
  * @implements {anychart.core.IStandaloneBackend}
  */
 anychart.core.ui.Timeline = function(opt_controller, opt_isResources) {
-  goog.base(this, opt_controller, opt_isResources);
+  anychart.core.ui.Timeline.base(this, 'constructor', opt_controller, opt_isResources);
 
   /**
    * Cell border settings.
@@ -2747,7 +2747,7 @@ anychart.core.ui.Timeline.prototype.checkRowSelection = function(event) {
 anychart.core.ui.Timeline.prototype.rowUnselect = function(event) {
   if (this.selectedItem || goog.isDefAndNotNull(this.selectedPeriodId_)) {
     this.selectedPeriodId_ = void 0;
-    goog.base(this, 'rowUnselect', event);
+    anychart.core.ui.Timeline.base(this, 'rowUnselect', event);
   }
 };
 
@@ -2756,7 +2756,7 @@ anychart.core.ui.Timeline.prototype.rowUnselect = function(event) {
  * @inheritDoc
  */
 anychart.core.ui.Timeline.prototype.getInteractivityEvent = function(event) {
-  var evt = goog.base(this, 'getInteractivityEvent', event);
+  var evt = anychart.core.ui.Timeline.base(this, 'getInteractivityEvent', event);
   var target = (evt && evt['originalEvent']) ? evt['originalEvent']['domTarget'] : null;
 
   if (evt && target && this.controller.isResources()) {
@@ -4280,7 +4280,7 @@ anychart.core.ui.Timeline.prototype.scale = function(opt_value) {
 
 /** @inheritDoc */
 anychart.core.ui.Timeline.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.ui.Timeline.base(this, 'serialize');
 
   json['scale'] = this.scale_.serialize();
   json['labels'] = this.labels().serialize();
@@ -4351,7 +4351,7 @@ anychart.core.ui.Timeline.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.ui.Timeline.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.ui.Timeline.base(this, 'setupByJSON', config, opt_default);
 
   if ('scale' in config) this.scale_.setup(config['scale']);
   if ('labels' in config) this.labels(config['labels']);
@@ -4444,7 +4444,7 @@ anychart.core.ui.Timeline.prototype.disposeInternal = function() {
  * @extends {acgraph.vector.Path}
  */
 anychart.core.ui.Timeline.LiveEditControl = function(parent) {
-  goog.base(this);
+  anychart.core.ui.Timeline.LiveEditControl.base(this, 'constructor');
 
   this.parent(parent);
 };
@@ -4517,7 +4517,7 @@ anychart.core.ui.Timeline.LiveEditControl.prototype.drawAsCircle = function(cx, 
  * @extends {goog.fx.Dragger}
  */
 anychart.core.ui.Timeline.BarDragger = function(target) {
-  goog.base(this, target.domElement());
+  anychart.core.ui.Timeline.BarDragger.base(this, 'constructor', target.domElement());
 
   this.element = target;
 
@@ -4569,7 +4569,7 @@ anychart.core.ui.Timeline.BarDragger.prototype.limitY = function(y) {
  * @extends {goog.fx.Dragger}
  */
 anychart.core.ui.Timeline.ProgressDragger = function(target) {
-  goog.base(this, target.domElement());
+  anychart.core.ui.Timeline.ProgressDragger.base(this, 'constructor', target.domElement());
 
   /**
    * Element.
@@ -4642,7 +4642,7 @@ anychart.core.ui.Timeline.ProgressDragger.prototype.limitY = function(y) {
  * @extends {goog.fx.Dragger}
  */
 anychart.core.ui.Timeline.ThumbDragger = function(target, opt_isLeft) {
-  goog.base(this, target.domElement());
+  anychart.core.ui.Timeline.ThumbDragger.base(this, 'constructor', target.domElement());
 
   /**
    * Element.
@@ -4678,7 +4678,7 @@ anychart.core.ui.Timeline.ThumbDragger.prototype.limitY = function(y) {
  * @extends {goog.fx.Dragger}
  */
 anychart.core.ui.Timeline.ConnectorDragger = function(timeline, target, opt_isStart) {
-  goog.base(this, target.domElement());
+  anychart.core.ui.Timeline.ConnectorDragger.base(this, 'constructor', target.domElement());
 
   /**
    * Related TL.
@@ -4725,58 +4725,62 @@ anychart.core.ui.Timeline.ConnectorDragger.prototype.computeInitialPosition = fu
 
 
 //exports
-anychart.core.ui.Timeline.prototype['backgroundFill'] = anychart.core.ui.Timeline.prototype.backgroundFill;
-anychart.core.ui.Timeline.prototype['cellOddFill'] = anychart.core.ui.Timeline.prototype.cellOddFill; //deprecated
-anychart.core.ui.Timeline.prototype['cellEvenFill'] = anychart.core.ui.Timeline.prototype.cellEvenFill; //deprecated
-anychart.core.ui.Timeline.prototype['cellFill'] = anychart.core.ui.Timeline.prototype.cellFill; //deprecated
-anychart.core.ui.Timeline.prototype['columnStroke'] = anychart.core.ui.Timeline.prototype.columnStroke;
-anychart.core.ui.Timeline.prototype['rowFill'] = anychart.core.ui.Timeline.prototype.rowFill;
-anychart.core.ui.Timeline.prototype['rowEvenFill'] = anychart.core.ui.Timeline.prototype.rowEvenFill;
-anychart.core.ui.Timeline.prototype['rowOddFill'] = anychart.core.ui.Timeline.prototype.rowOddFill;
-anychart.core.ui.Timeline.prototype['rowHoverFill'] = anychart.core.ui.Timeline.prototype.rowHoverFill;
-anychart.core.ui.Timeline.prototype['rowSelectedFill'] = anychart.core.ui.Timeline.prototype.rowSelectedFill;
-anychart.core.ui.Timeline.prototype['editing'] = anychart.core.ui.Timeline.prototype.editing;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.core.ui.Timeline.prototype;
+  proto['backgroundFill'] = proto.backgroundFill;
+  proto['cellOddFill'] = proto.cellOddFill; //deprecated
+  proto['cellEvenFill'] = proto.cellEvenFill; //deprecated
+  proto['cellFill'] = proto.cellFill; //deprecated
+  proto['columnStroke'] = proto.columnStroke;
+  proto['rowFill'] = proto.rowFill;
+  proto['rowEvenFill'] = proto.rowEvenFill;
+  proto['rowOddFill'] = proto.rowOddFill;
+  proto['rowHoverFill'] = proto.rowHoverFill;
+  proto['rowSelectedFill'] = proto.rowSelectedFill;
+  proto['editing'] = proto.editing;
 
-anychart.core.ui.Timeline.prototype['baselineAbove'] = anychart.core.ui.Timeline.prototype.baselineAbove;
+  proto['baselineAbove'] = proto.baselineAbove;
 
-anychart.core.ui.Timeline.prototype['horizontalScrollBar'] = anychart.core.ui.Timeline.prototype.horizontalScrollBar;
-anychart.core.ui.Timeline.prototype['verticalScrollBar'] = anychart.core.ui.Timeline.prototype.verticalScrollBar;
-anychart.core.ui.Timeline.prototype['baseFill'] = anychart.core.ui.Timeline.prototype.baseFill;
-anychart.core.ui.Timeline.prototype['baseStroke'] = anychart.core.ui.Timeline.prototype.baseStroke;
-anychart.core.ui.Timeline.prototype['baselineFill'] = anychart.core.ui.Timeline.prototype.baselineFill;
-anychart.core.ui.Timeline.prototype['baselineStroke'] = anychart.core.ui.Timeline.prototype.baselineStroke;
-anychart.core.ui.Timeline.prototype['milestoneFill'] = anychart.core.ui.Timeline.prototype.milestoneFill;
-anychart.core.ui.Timeline.prototype['milestoneStroke'] = anychart.core.ui.Timeline.prototype.milestoneStroke;
-anychart.core.ui.Timeline.prototype['parentFill'] = anychart.core.ui.Timeline.prototype.parentFill;
-anychart.core.ui.Timeline.prototype['parentStroke'] = anychart.core.ui.Timeline.prototype.parentStroke;
-anychart.core.ui.Timeline.prototype['progressFill'] = anychart.core.ui.Timeline.prototype.progressFill;
-anychart.core.ui.Timeline.prototype['progressStroke'] = anychart.core.ui.Timeline.prototype.progressStroke;
-anychart.core.ui.Timeline.prototype['connectorFill'] = anychart.core.ui.Timeline.prototype.connectorFill;
-anychart.core.ui.Timeline.prototype['connectorStroke'] = anychart.core.ui.Timeline.prototype.connectorStroke;
-anychart.core.ui.Timeline.prototype['selectedElementFill'] = anychart.core.ui.Timeline.prototype.selectedElementFill;
-anychart.core.ui.Timeline.prototype['selectedElementStroke'] = anychart.core.ui.Timeline.prototype.selectedElementStroke;
-anychart.core.ui.Timeline.prototype['tooltip'] = anychart.core.ui.Timeline.prototype.tooltip;
-anychart.core.ui.Timeline.prototype['minimumGap'] = anychart.core.ui.Timeline.prototype.minimumGap;
-anychart.core.ui.Timeline.prototype['maximumGap'] = anychart.core.ui.Timeline.prototype.maximumGap;
-anychart.core.ui.Timeline.prototype['labels'] = anychart.core.ui.Timeline.prototype.labels;
-anychart.core.ui.Timeline.prototype['markers'] = anychart.core.ui.Timeline.prototype.markers;
-anychart.core.ui.Timeline.prototype['scale'] = anychart.core.ui.Timeline.prototype.scale;
+  proto['horizontalScrollBar'] = proto.horizontalScrollBar;
+  proto['verticalScrollBar'] = proto.verticalScrollBar;
+  proto['baseFill'] = proto.baseFill;
+  proto['baseStroke'] = proto.baseStroke;
+  proto['baselineFill'] = proto.baselineFill;
+  proto['baselineStroke'] = proto.baselineStroke;
+  proto['milestoneFill'] = proto.milestoneFill;
+  proto['milestoneStroke'] = proto.milestoneStroke;
+  proto['parentFill'] = proto.parentFill;
+  proto['parentStroke'] = proto.parentStroke;
+  proto['progressFill'] = proto.progressFill;
+  proto['progressStroke'] = proto.progressStroke;
+  proto['connectorFill'] = proto.connectorFill;
+  proto['connectorStroke'] = proto.connectorStroke;
+  proto['selectedElementFill'] = proto.selectedElementFill;
+  proto['selectedElementStroke'] = proto.selectedElementStroke;
+  proto['tooltip'] = proto.tooltip;
+  proto['minimumGap'] = proto.minimumGap;
+  proto['maximumGap'] = proto.maximumGap;
+  proto['labels'] = proto.labels;
+  proto['markers'] = proto.markers;
+  proto['scale'] = proto.scale;
 
-anychart.core.ui.Timeline.prototype['connectorPreviewStroke'] = anychart.core.ui.Timeline.prototype.connectorPreviewStroke;
-anychart.core.ui.Timeline.prototype['editPreviewFill'] = anychart.core.ui.Timeline.prototype.editPreviewFill;
-anychart.core.ui.Timeline.prototype['editPreviewStroke'] = anychart.core.ui.Timeline.prototype.editPreviewStroke;
-anychart.core.ui.Timeline.prototype['editProgressFill'] = anychart.core.ui.Timeline.prototype.editProgressFill;
-anychart.core.ui.Timeline.prototype['editProgressStroke'] = anychart.core.ui.Timeline.prototype.editProgressStroke;
-anychart.core.ui.Timeline.prototype['editIntervalThumbFill'] = anychart.core.ui.Timeline.prototype.editIntervalThumbFill;
-anychart.core.ui.Timeline.prototype['editIntervalThumbStroke'] = anychart.core.ui.Timeline.prototype.editIntervalThumbStroke;
-anychart.core.ui.Timeline.prototype['editConnectorThumbFill'] = anychart.core.ui.Timeline.prototype.editConnectorThumbFill;
-anychart.core.ui.Timeline.prototype['editConnectorThumbStroke'] = anychart.core.ui.Timeline.prototype.editConnectorThumbStroke;
-anychart.core.ui.Timeline.prototype['editStructurePreviewFill'] = anychart.core.ui.Timeline.prototype.editStructurePreviewFill;
-anychart.core.ui.Timeline.prototype['editStructurePreviewStroke'] = anychart.core.ui.Timeline.prototype.editStructurePreviewStroke;
-anychart.core.ui.Timeline.prototype['editStructurePreviewDashStroke'] = anychart.core.ui.Timeline.prototype.editStructurePreviewDashStroke;
+  proto['connectorPreviewStroke'] = proto.connectorPreviewStroke;
+  proto['editPreviewFill'] = proto.editPreviewFill;
+  proto['editPreviewStroke'] = proto.editPreviewStroke;
+  proto['editProgressFill'] = proto.editProgressFill;
+  proto['editProgressStroke'] = proto.editProgressStroke;
+  proto['editIntervalThumbFill'] = proto.editIntervalThumbFill;
+  proto['editIntervalThumbStroke'] = proto.editIntervalThumbStroke;
+  proto['editConnectorThumbFill'] = proto.editConnectorThumbFill;
+  proto['editConnectorThumbStroke'] = proto.editConnectorThumbStroke;
+  proto['editStructurePreviewFill'] = proto.editStructurePreviewFill;
+  proto['editStructurePreviewStroke'] = proto.editStructurePreviewStroke;
+  proto['editStructurePreviewDashStroke'] = proto.editStructurePreviewDashStroke;
 
-anychart.core.ui.Timeline.prototype['textMarker'] = anychart.core.ui.Timeline.prototype.textMarker;
-anychart.core.ui.Timeline.prototype['lineMarker'] = anychart.core.ui.Timeline.prototype.lineMarker;
-anychart.core.ui.Timeline.prototype['rangeMarker'] = anychart.core.ui.Timeline.prototype.rangeMarker;
+  proto['textMarker'] = proto.textMarker;
+  proto['lineMarker'] = proto.lineMarker;
+  proto['rangeMarker'] = proto.rangeMarker;
 
-anychart.core.ui.Timeline.prototype['header'] = anychart.core.ui.Timeline.prototype.header;
+  proto['header'] = proto.header;
+})();

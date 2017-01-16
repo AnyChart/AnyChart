@@ -17,7 +17,7 @@ goog.require('anychart.math.Rect');
  * @extends {anychart.core.Text}
  */
 anychart.core.ui.Paginator = function() {
-  goog.base(this);
+  anychart.core.ui.Paginator.base(this, 'constructor');
 
   /**
    * TODO(AntonKagakin): make it able to set?
@@ -538,7 +538,7 @@ anychart.core.ui.Paginator.prototype.applyTextSettings = function(textElement, i
     else
       textElement.text(this.settingsObj['text']);
   }
-  goog.base(this, 'applyTextSettings', textElement, isInitial);
+  anychart.core.ui.Paginator.base(this, 'applyTextSettings', textElement, isInitial);
   this.changedSettings = {};
 };
 
@@ -801,7 +801,7 @@ anychart.core.ui.Paginator.DOWN_ARROW_DRAWER_ = function(path, buttonBounds) {
 
 /** @inheritDoc */
 anychart.core.ui.Paginator.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.ui.Paginator.base(this, 'serialize');
   json['background'] = this.background().serialize();
   json['padding'] = this.padding().serialize();
   json['margin'] = this.margin().serialize();
@@ -813,7 +813,7 @@ anychart.core.ui.Paginator.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.core.ui.Paginator.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.ui.Paginator.base(this, 'setupByJSON', config, opt_default);
 
   if (anychart.opt.BACKGROUND in config)
     this.background(config[anychart.opt.BACKGROUND]);
@@ -829,14 +829,17 @@ anychart.core.ui.Paginator.prototype.setupByJSON = function(config, opt_default)
 };
 
 
-//anychart.core.ui.Paginator.prototype['pageCount'] = anychart.core.ui.Paginator.prototype.pageCount;
-//anychart.core.ui.Paginator.prototype['draw'] = anychart.core.ui.Paginator.prototype.draw;
+//proto['pageCount'] = proto.pageCount;
+//proto['draw'] = proto.draw;
 
 //exports
-anychart.core.ui.Paginator.prototype['background'] = anychart.core.ui.Paginator.prototype.background;
-anychart.core.ui.Paginator.prototype['orientation'] = anychart.core.ui.Paginator.prototype.orientation;
-anychart.core.ui.Paginator.prototype['padding'] = anychart.core.ui.Paginator.prototype.padding;
-anychart.core.ui.Paginator.prototype['margin'] = anychart.core.ui.Paginator.prototype.margin;
-anychart.core.ui.Paginator.prototype['layout'] = anychart.core.ui.Paginator.prototype.layout;
-anychart.core.ui.Paginator.prototype['currentPage'] = anychart.core.ui.Paginator.prototype.currentPage;
-anychart.core.ui.Paginator.prototype['getPagesCount'] = anychart.core.ui.Paginator.prototype.getPagesCount;
+(function() {
+  var proto = anychart.core.ui.Paginator.prototype;
+  proto['background'] = proto.background;
+  proto['orientation'] = proto.orientation;
+  proto['padding'] = proto.padding;
+  proto['margin'] = proto.margin;
+  proto['layout'] = proto.layout;
+  proto['currentPage'] = proto.currentPage;
+  proto['getPagesCount'] = proto.getPagesCount;
+})();

@@ -72,6 +72,9 @@ anychart.core.utils.LinearGaugePointerContextProvider.prototype.getTokenValue = 
 
 
 //exports
-anychart.core.utils.LinearGaugePointerContextProvider.prototype['getStat'] = anychart.core.utils.LinearGaugePointerContextProvider.prototype.getStat;
-anychart.core.utils.LinearGaugePointerContextProvider.prototype['getDataValue'] = anychart.core.utils.LinearGaugePointerContextProvider.prototype.getDataValue;
-anychart.core.utils.LinearGaugePointerContextProvider.prototype['getTokenValue'] = anychart.core.utils.LinearGaugePointerContextProvider.prototype.getTokenValue;
+(function() {
+  var proto = anychart.core.utils.LinearGaugePointerContextProvider.prototype;
+  proto['getStat'] = proto.getStat;
+  proto['getDataValue'] = proto.getDataValue;
+  proto['getTokenValue'] = proto.getTokenValue;
+})();

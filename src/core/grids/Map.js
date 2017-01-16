@@ -438,7 +438,7 @@ anychart.core.grids.Map.prototype.evenFillElement = function() {
 //region --- Interactivity
 /**
  * Update grid on zoom or move.
- * @param {goog.graphics.AffineTransform} tx .
+ * @param {goog.math.AffineTransform} tx .
  */
 anychart.core.grids.Map.prototype.updateOnZoomOrMove = function(tx) {
   if (this.rootLayer_)
@@ -937,19 +937,22 @@ anychart.core.grids.Map.prototype.setupByJSON = function(config, opt_default) {
 anychart.core.grids.Map.prototype.disposeInternal = function() {
   this.axis_ = null;
   this.chart_ = null;
-  goog.base(this, 'disposeInternal');
+  anychart.core.grids.Map.base(this, 'disposeInternal');
 };
 
 
 //endregion
 //region --- Exports
 //exports
-anychart.core.grids.Map.prototype['enabled'] = anychart.core.grids.Map.prototype.enabled;
-// anychart.core.grids.Map.prototype['zIndex'] = anychart.core.grids.Map.prototype.zIndex;
-// anychart.core.grids.Map.prototype['stroke'] = anychart.core.grids.Map.prototype.stroke;
-// anychart.core.grids.Map.prototype['minorStroke'] = anychart.core.grids.Map.prototype.minorStroke;
-// anychart.core.grids.Map.prototype['drawFirstLine'] = anychart.core.grids.Map.prototype.drawFirstLine;
-// anychart.core.grids.Map.prototype['drawLastLine'] = anychart.core.grids.Map.prototype.drawLastLine;
-// anychart.core.grids.Map.prototype['oddFill'] = anychart.core.grids.Map.prototype.oddFill;
-// anychart.core.grids.Map.prototype['evenFill'] = anychart.core.grids.Map.prototype.evenFill;
+(function() {
+  var proto = anychart.core.grids.Map.prototype;
+  proto['enabled'] = proto.enabled;
+  // proto['zIndex'] = proto.zIndex;
+  // proto['stroke'] = proto.stroke;
+  // proto['minorStroke'] = proto.minorStroke;
+  // proto['drawFirstLine'] = proto.drawFirstLine;
+  // proto['drawLastLine'] = proto.drawLastLine;
+  // proto['oddFill'] = proto.oddFill;
+  // proto['evenFill'] = proto.evenFill;
+})();
 //endregion

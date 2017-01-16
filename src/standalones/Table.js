@@ -41,8 +41,12 @@ anychart.ui.table = function(opt_rowsCount, opt_colsCount) {
 
 
 //exports
-goog.exportSymbol('anychart.ui.table', anychart.ui.table);
-goog.exportSymbol('anychart.standalones.table', anychart.standalones.table);
-anychart.standalones.Table.prototype['draw'] = anychart.standalones.Table.prototype.draw;
-anychart.standalones.Table.prototype['parentBounds'] = anychart.standalones.Table.prototype.parentBounds;
-anychart.standalones.Table.prototype['container'] = anychart.standalones.Table.prototype.container;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.standalones.Table.prototype;
+  goog.exportSymbol('anychart.ui.table', anychart.ui.table);
+  goog.exportSymbol('anychart.standalones.table', anychart.standalones.table);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+})();

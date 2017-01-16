@@ -110,4 +110,7 @@ anychart.core.linearGauge.pointers.Marker.prototype.serialize = function() {
 
 
 //exports
-anychart.core.linearGauge.pointers.Marker.prototype['type'] = anychart.core.linearGauge.pointers.Marker.prototype.type;
+(function() {
+  var proto = anychart.core.linearGauge.pointers.Marker.prototype;
+  proto['type'] = proto.type;
+})();

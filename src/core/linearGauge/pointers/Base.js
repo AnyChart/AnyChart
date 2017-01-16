@@ -1737,27 +1737,30 @@ anychart.core.linearGauge.pointers.Base.prototype.disposeInternal = function() {
 //endregion
 
 //exports
-anychart.core.linearGauge.pointers.Base.prototype['scale'] = anychart.core.linearGauge.pointers.Base.prototype.scale;
-anychart.core.linearGauge.pointers.Base.prototype['legendItem'] = anychart.core.linearGauge.pointers.Base.prototype.legendItem;
-anychart.core.linearGauge.pointers.Base.prototype['name'] = anychart.core.linearGauge.pointers.Base.prototype.name;
-anychart.core.linearGauge.pointers.Base.prototype['dataIndex'] = anychart.core.linearGauge.pointers.Base.prototype.dataIndex;
-anychart.core.linearGauge.pointers.Base.prototype['getGauge'] = anychart.core.linearGauge.pointers.Base.prototype.getGauge;
-anychart.core.linearGauge.pointers.Base.prototype['color'] = anychart.core.linearGauge.pointers.Base.prototype.color;
-anychart.core.linearGauge.pointers.Base.prototype['fill'] = anychart.core.linearGauge.pointers.Base.prototype.fill;
-anychart.core.linearGauge.pointers.Base.prototype['hoverFill'] = anychart.core.linearGauge.pointers.Base.prototype.hoverFill;
-anychart.core.linearGauge.pointers.Base.prototype['selectFill'] = anychart.core.linearGauge.pointers.Base.prototype.selectFill;
-anychart.core.linearGauge.pointers.Base.prototype['stroke'] = anychart.core.linearGauge.pointers.Base.prototype.stroke;
-anychart.core.linearGauge.pointers.Base.prototype['hoverStroke'] = anychart.core.linearGauge.pointers.Base.prototype.hoverStroke;
-anychart.core.linearGauge.pointers.Base.prototype['selectStroke'] = anychart.core.linearGauge.pointers.Base.prototype.selectStroke;
-anychart.core.linearGauge.pointers.Base.prototype['hatchFill'] = anychart.core.linearGauge.pointers.Base.prototype.hatchFill;
-anychart.core.linearGauge.pointers.Base.prototype['hoverHatchFill'] = anychart.core.linearGauge.pointers.Base.prototype.hoverHatchFill;
-anychart.core.linearGauge.pointers.Base.prototype['selectHatchFill'] = anychart.core.linearGauge.pointers.Base.prototype.selectHatchFill;
-anychart.core.linearGauge.pointers.Base.prototype['label'] = anychart.core.linearGauge.pointers.Base.prototype.label;
-anychart.core.linearGauge.pointers.Base.prototype['hoverLabel'] = anychart.core.linearGauge.pointers.Base.prototype.hoverLabel;
-anychart.core.linearGauge.pointers.Base.prototype['selectLabel'] = anychart.core.linearGauge.pointers.Base.prototype.selectLabel;
-anychart.core.linearGauge.pointers.Base.prototype['width'] = anychart.core.linearGauge.pointers.Base.prototype.width;
-anychart.core.linearGauge.pointers.Base.prototype['offset'] = anychart.core.linearGauge.pointers.Base.prototype.offset;
-anychart.core.linearGauge.pointers.Base.prototype['hover'] = anychart.core.linearGauge.pointers.Base.prototype.hoverPoint;
-anychart.core.linearGauge.pointers.Base.prototype['unhover'] = anychart.core.linearGauge.pointers.Base.prototype.unhover;
-anychart.core.linearGauge.pointers.Base.prototype['select'] = anychart.core.linearGauge.pointers.Base.prototype.selectPoint;
-anychart.core.linearGauge.pointers.Base.prototype['unselect'] = anychart.core.linearGauge.pointers.Base.prototype.unselect;
+(function() {
+  var proto = anychart.core.linearGauge.pointers.Base.prototype;
+  proto['scale'] = proto.scale;
+  proto['legendItem'] = proto.legendItem;
+  proto['name'] = proto.name;
+  proto['dataIndex'] = proto.dataIndex;
+  proto['getGauge'] = proto.getGauge;
+  proto['color'] = proto.color;
+  proto['fill'] = proto.fill;
+  proto['hoverFill'] = proto.hoverFill;
+  proto['selectFill'] = proto.selectFill;
+  proto['stroke'] = proto.stroke;
+  proto['hoverStroke'] = proto.hoverStroke;
+  proto['selectStroke'] = proto.selectStroke;
+  proto['hatchFill'] = proto.hatchFill;
+  proto['hoverHatchFill'] = proto.hoverHatchFill;
+  proto['selectHatchFill'] = proto.selectHatchFill;
+  proto['label'] = proto.label;
+  proto['hoverLabel'] = proto.hoverLabel;
+  proto['selectLabel'] = proto.selectLabel;
+  proto['width'] = proto.width;
+  proto['offset'] = proto.offset;
+  anychart.core.linearGauge.pointers.Base.prototype['hover'] = anychart.core.linearGauge.pointers.Base.prototype.hoverPoint;
+  proto['unhover'] = proto.unhover;
+  anychart.core.linearGauge.pointers.Base.prototype['select'] = anychart.core.linearGauge.pointers.Base.prototype.selectPoint;
+  proto['unselect'] = proto.unselect;
+})();

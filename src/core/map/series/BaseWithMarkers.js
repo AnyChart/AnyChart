@@ -15,7 +15,7 @@ goog.require('anychart.enums');
  * @extends {anychart.core.map.series.Base}
  */
 anychart.core.map.series.BaseWithMarkers = function(opt_data, opt_csvSettings) {
-  goog.base(this, opt_data, opt_csvSettings);
+  anychart.core.map.series.BaseWithMarkers.base(this, 'constructor', opt_data, opt_csvSettings);
 };
 goog.inherits(anychart.core.map.series.BaseWithMarkers, anychart.core.map.series.Base);
 
@@ -163,13 +163,13 @@ anychart.core.map.series.BaseWithMarkers.prototype.remove = function() {
   if (this.markers_)
     this.markers_.container(null);
 
-  goog.base(this, 'remove');
+  anychart.core.map.series.BaseWithMarkers.base(this, 'remove');
 };
 
 
 /** @inheritDoc */
 anychart.core.map.series.BaseWithMarkers.prototype.startDrawing = function() {
-  goog.base(this, 'startDrawing');
+  anychart.core.map.series.BaseWithMarkers.base(this, 'startDrawing');
 
   if (this.markers_ || this.hoverMarkers_ || this.selectMarkers_) {
     this.markers().suspendSignalsDispatching();
@@ -285,7 +285,7 @@ anychart.core.map.series.BaseWithMarkers.prototype.applyZoomMoveTransform = func
 
 /** @inheritDoc */
 anychart.core.map.series.BaseWithMarkers.prototype.drawPoint = function(pointState) {
-  goog.base(this, 'drawPoint', pointState);
+  anychart.core.map.series.BaseWithMarkers.base(this, 'drawPoint', pointState);
   this.configureMarker(pointState, true);
 };
 
@@ -308,7 +308,7 @@ anychart.core.map.series.BaseWithMarkers.prototype.finalizeDrawing = function() 
     this.selectMarkers_.markConsistent(anychart.ConsistencyState.ALL);
   }
 
-  goog.base(this, 'finalizeDrawing');
+  anychart.core.map.series.BaseWithMarkers.base(this, 'finalizeDrawing');
 };
 
 
@@ -440,7 +440,7 @@ anychart.core.map.series.BaseWithMarkers.prototype.configureMarker = function(po
  * @inheritDoc
  */
 anychart.core.map.series.BaseWithMarkers.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.map.series.BaseWithMarkers.base(this, 'serialize');
   if (this.markers_)
     json['markers'] = this.markers_.serialize();
   if (this.hoverMarkers_)
@@ -455,7 +455,7 @@ anychart.core.map.series.BaseWithMarkers.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.core.map.series.BaseWithMarkers.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.map.series.BaseWithMarkers.base(this, 'setupByJSON', config, opt_default);
   if (config['markers'])
     this.markers().setup(config['markers']);
   if (config['hoverMarkers'])
@@ -493,7 +493,7 @@ anychart.core.map.series.BaseWithMarkers.prototype.getMarkerType = function() {
  * @inheritDoc
  */
 anychart.core.map.series.BaseWithMarkers.prototype.getLegendItemData = function(itemsTextFormatter) {
-  var data = goog.base(this, 'getLegendItemData', itemsTextFormatter);
+  var data = anychart.core.map.series.BaseWithMarkers.base(this, 'getLegendItemData', itemsTextFormatter);
   var markers = this.markers();
   markers.setAutoFill(this.getMarkerFill());
   markers.setAutoStroke(/** @type {acgraph.vector.Stroke} */(this.getMarkerStroke()));
@@ -526,10 +526,13 @@ anychart.core.map.series.BaseWithMarkers.prototype.finalizePointAppearance = fun
 };
 
 
-//anychart.core.map.series.BaseWithMarkers.prototype['startDrawing'] = anychart.core.map.series.BaseWithMarkers.prototype.startDrawing;//inherited
-//anychart.core.map.series.BaseWithMarkers.prototype['drawPoint'] = anychart.core.map.series.BaseWithMarkers.prototype.drawPoint;//inherited
-//anychart.core.map.series.BaseWithMarkers.prototype['finalizeDrawing'] = anychart.core.map.series.BaseWithMarkers.prototype.finalizeDrawing;//inherited
+//proto['startDrawing'] = proto.startDrawing;//inherited
+//proto['drawPoint'] = proto.drawPoint;//inherited
+//proto['finalizeDrawing'] = proto.finalizeDrawing;//inherited
 //exports
-anychart.core.map.series.BaseWithMarkers.prototype['markers'] = anychart.core.map.series.BaseWithMarkers.prototype.markers;//doc|ex
-anychart.core.map.series.BaseWithMarkers.prototype['hoverMarkers'] = anychart.core.map.series.BaseWithMarkers.prototype.hoverMarkers;//doc|ex
-anychart.core.map.series.BaseWithMarkers.prototype['selectMarkers'] = anychart.core.map.series.BaseWithMarkers.prototype.selectMarkers;//doc|ex
+(function() {
+  var proto = anychart.core.map.series.BaseWithMarkers.prototype;
+  proto['markers'] = proto.markers;//doc|ex
+  proto['hoverMarkers'] = proto.hoverMarkers;//doc|ex
+  proto['selectMarkers'] = proto.selectMarkers;//doc|ex
+})();

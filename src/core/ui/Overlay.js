@@ -328,7 +328,7 @@ anychart.core.ui.Overlay.prototype.setThemeSettings = function(config) {
 
 /** @inheritDoc */
 anychart.core.ui.Overlay.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.ui.Overlay.base(this, 'serialize');
   anychart.core.settings.serialize(this, anychart.core.ui.Overlay.DESCRIPTORS, json, 'Overlay ui element');
 
   var enabled;
@@ -364,10 +364,14 @@ anychart.core.ui.Overlay.prototype.disposeInternal = function() {
 
 //endregion
 //region --- Exports
-// anychart.core.ui.Overlay.prototype['id'] = anychart.core.ui.Overlay.prototype.id;
-// anychart.core.ui.Overlay.prototype['className'] = anychart.core.ui.Overlay.prototype.className;
-anychart.core.ui.Overlay.prototype['getElement'] = anychart.core.ui.Overlay.prototype.getElement;
-anychart.core.ui.Overlay.prototype['enabled'] = anychart.core.ui.Overlay.prototype.enabled;
+//exports
+(function() {
+  var proto = anychart.core.ui.Overlay.prototype;
+  // proto['id'] = proto.id;
+  // proto['className'] = proto.className;
+  proto['getElement'] = proto.getElement;
+  proto['enabled'] = proto.enabled;
+})();
 
 
 //endregion

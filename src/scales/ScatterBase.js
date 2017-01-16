@@ -11,7 +11,7 @@ goog.require('anychart.scales.Base');
  * @extends {anychart.scales.Base}
  */
 anychart.scales.ScatterBase = function() {
-  goog.base(this);
+  anychart.scales.ScatterBase.base(this, 'constructor');
   /**
    * Scale input domain minimum.
    * @type {number}
@@ -244,7 +244,7 @@ anychart.scales.ScatterBase.prototype.stackMode = function(opt_stackMode) {
     this.minimumGap(0);
     this.maximumGap(0);
   }
-  var result = goog.base(this, 'stackMode', opt_stackMode);
+  var result = anychart.scales.ScatterBase.base(this, 'stackMode', opt_stackMode);
   this.resumeSignalsDispatching(true);
   return result;
 };
@@ -413,7 +413,7 @@ anychart.scales.ScatterBase.prototype.inverseTransform = function(ratio) {
 
 /** @inheritDoc */
 anychart.scales.ScatterBase.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.scales.ScatterBase.base(this, 'serialize');
   json['maximum'] = this.maximumModeAuto ? null : this.max;
   json['minimum'] = this.minimumModeAuto ? null : this.min;
   json['minimumGap'] = this.minimumGap();
@@ -426,7 +426,7 @@ anychart.scales.ScatterBase.prototype.serialize = function() {
 
 /** @inheritDoc */
 anychart.scales.ScatterBase.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.scales.ScatterBase.base(this, 'setupByJSON', config, opt_default);
   this.minimumGap(config['minimumGap']);
   this.maximumGap(config['maximumGap']);
   this.softMinimum(config['softMinimum']);
@@ -461,6 +461,9 @@ anychart.scales.ScatterBase.fromString = function(type, opt_canReturnNull) {
 
 
 //exports
-anychart.scales.ScatterBase.prototype['minimum'] = anychart.scales.ScatterBase.prototype.minimum;//doc|ex
-anychart.scales.ScatterBase.prototype['maximum'] = anychart.scales.ScatterBase.prototype.maximum;//doc|ex
-anychart.scales.ScatterBase.prototype['extendDataRange'] = anychart.scales.ScatterBase.prototype.extendDataRange;//doc|need-ex
+(function() {
+  var proto = anychart.scales.ScatterBase.prototype;
+  proto['minimum'] = proto.minimum;//doc|ex
+  proto['maximum'] = proto.maximum;//doc|ex
+  proto['extendDataRange'] = proto.extendDataRange;//doc|need-ex
+})();

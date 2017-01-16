@@ -10,7 +10,7 @@ goog.require('goog.array');
  * @extends {anychart.core.Base}
  */
 anychart.palettes.HatchFills = function() {
-  goog.base(this);
+  anychart.palettes.HatchFills.base(this, 'constructor');
 
   /**
    * HatchFills palette.
@@ -118,7 +118,7 @@ anychart.palettes.HatchFills.prototype.items = function(opt_hatchFills, var_args
  * @inheritDoc
  */
 anychart.palettes.HatchFills.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.palettes.HatchFills.base(this, 'serialize');
   var res = [];
   for (var i = 0; i < this.hatchFills_.length; i++) {
     res.push(anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.hatchFills_[i])));
@@ -147,7 +147,7 @@ anychart.palettes.HatchFills.prototype.setupSpecial = function(var_args) {
  * @inheritDoc
  */
 anychart.palettes.HatchFills.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.palettes.HatchFills.base(this, 'setupByJSON', config, opt_default);
   this.items(config['items']);
 };
 
@@ -180,8 +180,12 @@ anychart.palettes.hatchFills = function(opt_value, var_args) {
 
 
 //exports
-goog.exportSymbol('anychart.palettes.hatchFills', anychart.palettes.hatchFills);
-anychart.palettes.HatchFills.prototype['hatchFillAt'] = anychart.palettes.HatchFills.prototype.hatchFillAt;
-anychart.palettes.HatchFills.prototype['itemAt'] = anychart.palettes.HatchFills.prototype.itemAt;
-anychart.palettes.HatchFills.prototype['hatchFills'] = anychart.palettes.HatchFills.prototype.hatchFills;
-anychart.palettes.HatchFills.prototype['items'] = anychart.palettes.HatchFills.prototype.items;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.palettes.HatchFills.prototype;
+  goog.exportSymbol('anychart.palettes.hatchFills', anychart.palettes.hatchFills);
+  proto['hatchFillAt'] = proto.hatchFillAt;
+  proto['itemAt'] = proto.itemAt;
+  proto['hatchFills'] = proto.hatchFills;
+  proto['items'] = proto.items;
+})();

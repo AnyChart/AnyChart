@@ -234,7 +234,7 @@ anychart.ui.GanttToolbar.prototype.draw = function() {
       this.printMenu_.addChild(printItem, true);
     }
 
-    return goog.base(this, 'draw');
+    return anychart.ui.GanttToolbar.base(this, 'draw');
   }
 
   return this;
@@ -262,7 +262,11 @@ anychart.ganttToolbar = function() {
 
 
 //exports
-goog.exportSymbol('anychart.ui.ganttToolbar', anychart.ui.ganttToolbar);
-goog.exportSymbol('anychart.ganttToolbar', anychart.ganttToolbar);
-anychart.ui.GanttToolbar.prototype['draw'] = anychart.ui.GanttToolbar.prototype.draw;
-anychart.ui.GanttToolbar.prototype['printPaperSizes'] = anychart.ui.GanttToolbar.prototype.printPaperSizes;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.ui.GanttToolbar.prototype;
+  goog.exportSymbol('anychart.ui.ganttToolbar', anychart.ui.ganttToolbar);
+  goog.exportSymbol('anychart.ganttToolbar', anychart.ganttToolbar);
+  proto['draw'] = proto.draw;
+  proto['printPaperSizes'] = proto.printPaperSizes;
+})();

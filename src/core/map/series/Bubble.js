@@ -11,7 +11,7 @@ goog.require('anychart.core.map.series.DiscreteBase');
  * @extends {anychart.core.map.series.DiscreteBase}
  */
 anychart.core.map.series.Bubble = function(opt_data, opt_csvSettings) {
-  goog.base(this, opt_data, opt_csvSettings);
+  anychart.core.map.series.Bubble.base(this, 'constructor', opt_data, opt_csvSettings);
 
   // Define reference fields for a series
   this.referenceValueNames = ['id', 'long', 'lat', 'size'];
@@ -647,7 +647,7 @@ anychart.core.map.series.Bubble.prototype.getReferenceCoords = function() {
  * @inheritDoc
  */
 anychart.core.map.series.Bubble.prototype.startDrawing = function() {
-  goog.base(this, 'startDrawing');
+  anychart.core.map.series.Bubble.base(this, 'startDrawing');
 
   this.pixelBoundsCache = this.map.scale().getBounds();
 
@@ -740,7 +740,7 @@ anychart.core.map.series.Bubble.prototype.drawPoint = function(pointState) {
     this.applyHatchFill(pointState | this.state.getSeriesState());
   }
 
-  goog.base(this, 'drawPoint', pointState);
+  anychart.core.map.series.Bubble.base(this, 'drawPoint', pointState);
 };
 
 
@@ -796,7 +796,7 @@ anychart.core.map.series.Bubble.prototype.applyHatchFill = function(pointState) 
  * @inheritDoc
  */
 anychart.core.map.series.Bubble.prototype.serialize = function() {
-  var json = goog.base(this, 'serialize');
+  var json = anychart.core.map.series.Bubble.base(this, 'serialize');
   json['displayNegative'] = this.displayNegative();
 
   if (goog.isFunction(this.negativeFill())) {
@@ -891,7 +891,7 @@ anychart.core.map.series.Bubble.prototype.serialize = function() {
  * @inheritDoc
  */
 anychart.core.map.series.Bubble.prototype.setupByJSON = function(config, opt_default) {
-  goog.base(this, 'setupByJSON', config, opt_default);
+  anychart.core.map.series.Bubble.base(this, 'setupByJSON', config, opt_default);
   this.displayNegative(config['displayNegative']);
 
   this.negativeFill(config['negativeFill']);
@@ -909,28 +909,31 @@ anychart.core.map.series.Bubble.prototype.setupByJSON = function(config, opt_def
 
 
 //exports
-anychart.core.map.series.Bubble.prototype['displayNegative'] = anychart.core.map.series.Bubble.prototype.displayNegative;//doc|ex
+(function() {
+  var proto = anychart.core.map.series.Bubble.prototype;
+  proto['displayNegative'] = proto.displayNegative;//doc|ex
 
-anychart.core.map.series.Bubble.prototype['negativeFill'] = anychart.core.map.series.Bubble.prototype.negativeFill;//doc|ex
-anychart.core.map.series.Bubble.prototype['hoverNegativeFill'] = anychart.core.map.series.Bubble.prototype.hoverNegativeFill;//doc|ex
-anychart.core.map.series.Bubble.prototype['selectNegativeFill'] = anychart.core.map.series.Bubble.prototype.selectNegativeFill;
+  proto['negativeFill'] = proto.negativeFill;//doc|ex
+  proto['hoverNegativeFill'] = proto.hoverNegativeFill;//doc|ex
+  proto['selectNegativeFill'] = proto.selectNegativeFill;
 
-anychart.core.map.series.Bubble.prototype['negativeStroke'] = anychart.core.map.series.Bubble.prototype.negativeStroke;//doc|ex
-anychart.core.map.series.Bubble.prototype['hoverNegativeStroke'] = anychart.core.map.series.Bubble.prototype.hoverNegativeStroke;//doc|ex
-anychart.core.map.series.Bubble.prototype['selectNegativeStroke'] = anychart.core.map.series.Bubble.prototype.selectNegativeStroke;
+  proto['negativeStroke'] = proto.negativeStroke;//doc|ex
+  proto['hoverNegativeStroke'] = proto.hoverNegativeStroke;//doc|ex
+  proto['selectNegativeStroke'] = proto.selectNegativeStroke;
 
-anychart.core.map.series.Bubble.prototype['negativeHatchFill'] = anychart.core.map.series.Bubble.prototype.negativeHatchFill;
-anychart.core.map.series.Bubble.prototype['hoverNegativeHatchFill'] = anychart.core.map.series.Bubble.prototype.hoverNegativeHatchFill;
-anychart.core.map.series.Bubble.prototype['selectNegativeHatchFill'] = anychart.core.map.series.Bubble.prototype.selectNegativeHatchFill;
+  proto['negativeHatchFill'] = proto.negativeHatchFill;
+  proto['hoverNegativeHatchFill'] = proto.hoverNegativeHatchFill;
+  proto['selectNegativeHatchFill'] = proto.selectNegativeHatchFill;
 
-anychart.core.map.series.Bubble.prototype['fill'] = anychart.core.map.series.Bubble.prototype.fill;//inherited
-anychart.core.map.series.Bubble.prototype['hoverFill'] = anychart.core.map.series.Bubble.prototype.hoverFill;//inherited
-anychart.core.map.series.Bubble.prototype['selectFill'] = anychart.core.map.series.Bubble.prototype.selectFill;//inherited
+  proto['fill'] = proto.fill;//inherited
+  proto['hoverFill'] = proto.hoverFill;//inherited
+  proto['selectFill'] = proto.selectFill;//inherited
 
-anychart.core.map.series.Bubble.prototype['stroke'] = anychart.core.map.series.Bubble.prototype.stroke;//inherited
-anychart.core.map.series.Bubble.prototype['hoverStroke'] = anychart.core.map.series.Bubble.prototype.hoverStroke;//inherited
-anychart.core.map.series.Bubble.prototype['selectStroke'] = anychart.core.map.series.Bubble.prototype.selectStroke;//inherited
+  proto['stroke'] = proto.stroke;//inherited
+  proto['hoverStroke'] = proto.hoverStroke;//inherited
+  proto['selectStroke'] = proto.selectStroke;//inherited
 
-anychart.core.map.series.Bubble.prototype['hatchFill'] = anychart.core.map.series.Bubble.prototype.hatchFill;//inherited
-anychart.core.map.series.Bubble.prototype['hoverHatchFill'] = anychart.core.map.series.Bubble.prototype.hoverHatchFill;//inherited
-anychart.core.map.series.Bubble.prototype['selectHatchFill'] = anychart.core.map.series.Bubble.prototype.selectHatchFill;//inherited
+  proto['hatchFill'] = proto.hatchFill;//inherited
+  proto['hoverHatchFill'] = proto.hoverHatchFill;//inherited
+  proto['selectHatchFill'] = proto.selectHatchFill;//inherited
+})();

@@ -164,33 +164,36 @@ anychart.charts.Scatter.prototype.serialize = function() {
 
 
 //exports
-anychart.charts.Scatter.prototype['crosshair'] = anychart.charts.Scatter.prototype.crosshair;
-anychart.charts.Scatter.prototype['xScale'] = anychart.charts.Scatter.prototype.xScale;//doc|ex
-anychart.charts.Scatter.prototype['yScale'] = anychart.charts.Scatter.prototype.yScale;//doc|ex
-anychart.charts.Scatter.prototype['grid'] = anychart.charts.Scatter.prototype.grid;//doc|ex
-anychart.charts.Scatter.prototype['minorGrid'] = anychart.charts.Scatter.prototype.minorGrid;//doc|ex
-anychart.charts.Scatter.prototype['xAxis'] = anychart.charts.Scatter.prototype.xAxis;//doc|ex
-anychart.charts.Scatter.prototype['yAxis'] = anychart.charts.Scatter.prototype.yAxis;//doc|ex
-anychart.charts.Scatter.prototype['getSeries'] = anychart.charts.Scatter.prototype.getSeries;//doc|ex
-// autoexport
-// anychart.charts.Scatter.prototype['bubble'] = anychart.charts.Scatter.prototype.bubble;//doc|ex
-// anychart.charts.Scatter.prototype['line'] = anychart.charts.Scatter.prototype.line;//doc|ex
-// anychart.charts.Scatter.prototype['marker'] = anychart.charts.Scatter.prototype.marker;//doc|ex
-anychart.charts.Scatter.prototype['lineMarker'] = anychart.charts.Scatter.prototype.lineMarker;//doc|ex
-anychart.charts.Scatter.prototype['rangeMarker'] = anychart.charts.Scatter.prototype.rangeMarker;//doc|ex
-anychart.charts.Scatter.prototype['textMarker'] = anychart.charts.Scatter.prototype.textMarker;//doc|ex
-anychart.charts.Scatter.prototype['palette'] = anychart.charts.Scatter.prototype.palette;//doc|ex
-anychart.charts.Scatter.prototype['markerPalette'] = anychart.charts.Scatter.prototype.markerPalette;
-anychart.charts.Scatter.prototype['hatchFillPalette'] = anychart.charts.Scatter.prototype.hatchFillPalette;
-anychart.charts.Scatter.prototype['getType'] = anychart.charts.Scatter.prototype.getType;
-anychart.charts.Scatter.prototype['maxBubbleSize'] = anychart.charts.Scatter.prototype.maxBubbleSize;
-anychart.charts.Scatter.prototype['minBubbleSize'] = anychart.charts.Scatter.prototype.minBubbleSize;
-anychart.charts.Scatter.prototype['defaultSeriesType'] = anychart.charts.Scatter.prototype.defaultSeriesType;
-anychart.charts.Scatter.prototype['addSeries'] = anychart.charts.Scatter.prototype.addSeries;
-anychart.charts.Scatter.prototype['getSeriesAt'] = anychart.charts.Scatter.prototype.getSeriesAt;
-anychart.charts.Scatter.prototype['getSeriesCount'] = anychart.charts.Scatter.prototype.getSeriesCount;
-anychart.charts.Scatter.prototype['removeSeries'] = anychart.charts.Scatter.prototype.removeSeries;
-anychart.charts.Scatter.prototype['removeSeriesAt'] = anychart.charts.Scatter.prototype.removeSeriesAt;
-anychart.charts.Scatter.prototype['removeAllSeries'] = anychart.charts.Scatter.prototype.removeAllSeries;
-anychart.charts.Scatter.prototype['getPlotBounds'] = anychart.charts.Scatter.prototype.getPlotBounds;
-anychart.charts.Scatter.prototype['annotations'] = anychart.charts.Scatter.prototype.annotations;
+(function() {
+  var proto = anychart.charts.Scatter.prototype;
+  proto['crosshair'] = proto.crosshair;
+  proto['xScale'] = proto.xScale;//doc|ex
+  proto['yScale'] = proto.yScale;//doc|ex
+  proto['grid'] = proto.grid;//doc|ex
+  proto['minorGrid'] = proto.minorGrid;//doc|ex
+  proto['xAxis'] = proto.xAxis;//doc|ex
+  proto['yAxis'] = proto.yAxis;//doc|ex
+  proto['getSeries'] = proto.getSeries;//doc|ex
+  // autoexport
+  // proto['bubble'] = proto.bubble;//doc|ex
+  // proto['line'] = proto.line;//doc|ex
+  // proto['marker'] = proto.marker;//doc|ex
+  proto['lineMarker'] = proto.lineMarker;//doc|ex
+  proto['rangeMarker'] = proto.rangeMarker;//doc|ex
+  proto['textMarker'] = proto.textMarker;//doc|ex
+  proto['palette'] = proto.palette;//doc|ex
+  proto['markerPalette'] = proto.markerPalette;
+  proto['hatchFillPalette'] = proto.hatchFillPalette;
+  proto['getType'] = proto.getType;
+  proto['maxBubbleSize'] = proto.maxBubbleSize;
+  proto['minBubbleSize'] = proto.minBubbleSize;
+  proto['defaultSeriesType'] = proto.defaultSeriesType;
+  proto['addSeries'] = proto.addSeries;
+  proto['getSeriesAt'] = proto.getSeriesAt;
+  proto['getSeriesCount'] = proto.getSeriesCount;
+  proto['removeSeries'] = proto.removeSeries;
+  proto['removeSeriesAt'] = proto.removeSeriesAt;
+  proto['removeAllSeries'] = proto.removeAllSeries;
+  proto['getPlotBounds'] = proto.getPlotBounds;
+  proto['annotations'] = proto.annotations;
+})();

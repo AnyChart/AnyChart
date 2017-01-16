@@ -8,7 +8,7 @@ goog.require('anychart.ui.chartEditor.select.Base');
  * @extends {anychart.ui.chartEditor.select.Base}
  */
 anychart.ui.chartEditor.select.FontFamily = function() {
-  goog.base(this);
+  anychart.ui.chartEditor.select.FontFamily.base(this, 'constructor');
 
   this.setOptions([
     'Arial, Helvetica, sans-serif',

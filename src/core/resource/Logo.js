@@ -128,7 +128,10 @@ anychart.core.resource.Logo.prototype.disposeInternal = function() {
 
 //endregion
 //region --- Exports
-anychart.core.resource.Logo.prototype['overlay'] = anychart.core.resource.Logo.prototype.overlay;
+(function() {
+  var proto = anychart.core.resource.Logo.prototype;
+  proto['overlay'] = proto.overlay;
+})();
 
 
 //endregion

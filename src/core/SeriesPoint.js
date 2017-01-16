@@ -11,7 +11,7 @@ goog.require('anychart.core.Point');
  * @extends {anychart.core.Point}
  */
 anychart.core.SeriesPoint = function(series, index) {
-  goog.base(this, series.getChart(), index);
+  anychart.core.SeriesPoint.base(this, 'constructor', series.getChart(), index);
 
   /**
    * Series point belongs to.
@@ -107,11 +107,14 @@ anychart.core.SeriesPoint.prototype.exists = function() {
 
 
 //exports
-anychart.core.SeriesPoint.prototype['get'] = anychart.core.SeriesPoint.prototype.get;
-anychart.core.SeriesPoint.prototype['set'] = anychart.core.SeriesPoint.prototype.set;
-anychart.core.SeriesPoint.prototype['hovered'] = anychart.core.SeriesPoint.prototype.hovered;
-anychart.core.SeriesPoint.prototype['selected'] = anychart.core.SeriesPoint.prototype.selected;
-anychart.core.SeriesPoint.prototype['getSeries'] = anychart.core.SeriesPoint.prototype.getSeries;
-anychart.core.SeriesPoint.prototype['getStackValue'] = anychart.core.SeriesPoint.prototype.getStackValue;
-anychart.core.SeriesPoint.prototype['getStackZero'] = anychart.core.SeriesPoint.prototype.getStackZero;
-anychart.core.SeriesPoint.prototype['exists'] = anychart.core.SeriesPoint.prototype.exists;
+(function() {
+  var proto = anychart.core.SeriesPoint.prototype;
+  proto['get'] = proto.get;
+  proto['set'] = proto.set;
+  proto['hovered'] = proto.hovered;
+  proto['selected'] = proto.selected;
+  proto['getSeries'] = proto.getSeries;
+  proto['getStackValue'] = proto.getStackValue;
+  proto['getStackZero'] = proto.getStackZero;
+  proto['exists'] = proto.exists;
+})();

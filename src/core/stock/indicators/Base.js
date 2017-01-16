@@ -209,4 +209,7 @@ anychart.core.stock.indicators.Base.prototype.disposeInternal = function() {
 
 
 //exports
-anychart.core.stock.indicators.Base.prototype['dispose'] = anychart.core.stock.indicators.Base.prototype.dispose;
+(function() {
+  var proto = anychart.core.stock.indicators.Base.prototype;
+  proto['dispose'] = proto.dispose;
+})();

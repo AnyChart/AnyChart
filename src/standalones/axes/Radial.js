@@ -54,9 +54,13 @@ anychart.axes.radial = function() {
 
 
 //exports
-goog.exportSymbol('anychart.axes.radial', anychart.axes.radial);
-goog.exportSymbol('anychart.standalones.axes.radial', anychart.standalones.axes.radial);
-anychart.standalones.axes.Radial.prototype['draw'] = anychart.standalones.axes.Radial.prototype.draw;
-anychart.standalones.axes.Radial.prototype['parentBounds'] = anychart.standalones.axes.Radial.prototype.parentBounds;
-anychart.standalones.axes.Radial.prototype['container'] = anychart.standalones.axes.Radial.prototype.container;
-anychart.standalones.axes.Radial.prototype['startAngle'] = anychart.standalones.axes.Radial.prototype.startAngle;
+/** @suppress {deprecated} */
+(function() {
+  var proto = anychart.standalones.axes.Radial.prototype;
+  goog.exportSymbol('anychart.axes.radial', anychart.axes.radial);
+  goog.exportSymbol('anychart.standalones.axes.radial', anychart.standalones.axes.radial);
+  proto['draw'] = proto.draw;
+  proto['parentBounds'] = proto.parentBounds;
+  proto['container'] = proto.container;
+  proto['startAngle'] = proto.startAngle;
+})();
