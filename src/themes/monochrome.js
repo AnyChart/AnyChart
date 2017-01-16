@@ -1,7 +1,8 @@
 goog.provide('anychart.themes.monochrome');
 
 
-(function() {   var global = this;
+(function() {
+  var global = this;
   var stockScrollerUnselected = '#999 0.6';
 
 

@@ -465,18 +465,25 @@ anychart.core.grids.Map.prototype.drawLineHorizontal = function(value, line, shi
 
   // shift = value == maximumX ? -shift : shift;
 
-  var currLong = minimumX;
-  while (currLong < maximumX) {
-    xy = scale.transform(currLong, value, null);
-    if (currLong == minimumX) {
-      line.moveTo(xy[0], xy[1]);
-    } else {
-      line.lineTo(xy[0], xy[1]);
+  if (anychart.core.map.projections.isBaseProjection(scale.tx['default'].crs)) {
+    xy = scale.transform(minimumX, value, null);
+    line.moveTo(xy[0], xy[1]);
+    xy = scale.transform(maximumX, value, null);
+    line.lineTo(xy[0], xy[1]);
+  } else {
+    var currLong = minimumX;
+    while (currLong < maximumX) {
+      xy = scale.transform(currLong, value, null);
+      if (currLong == minimumX) {
+        line.moveTo(xy[0], xy[1]);
+      } else {
+        line.lineTo(xy[0], xy[1]);
+      }
+      currLong += precision;
     }
-    currLong += precision;
+    xy = scale.transform(maximumX, value, null);
+    line.lineTo(xy[0], xy[1]);
   }
-  xy = scale.transform(maximumX, value, null);
-  line.lineTo(xy[0], xy[1] + shift);
 };
 
 
@@ -496,19 +503,25 @@ anychart.core.grids.Map.prototype.drawLineVertical = function(value, line, shift
   var maximumY = /** @type {number} */(scale.maximumY());
 
   // shift = value == maximumY ? shift : -shift;
-
-  var currLat = minimumY;
-  while (currLat < maximumY) {
-    xy = scale.transform(value, currLat, null);
-    if (currLat == minimumY) {
-      line.moveTo(xy[0], xy[1]);
-    } else {
-      line.lineTo(xy[0], xy[1]);
+  if (anychart.core.map.projections.isBaseProjection(scale.tx['default'].crs)) {
+    xy = scale.transform(value, minimumY, null);
+    line.moveTo(xy[0], xy[1]);
+    xy = scale.transform(value, maximumY, null);
+    line.lineTo(xy[0], xy[1]);
+  } else {
+    var currLat = minimumY;
+    while (currLat < maximumY) {
+      xy = scale.transform(value, currLat, null);
+      if (currLat == minimumY) {
+        line.moveTo(xy[0], xy[1]);
+      } else {
+        line.lineTo(xy[0], xy[1]);
+      }
+      currLat += precision;
     }
-    currLat += precision;
+    xy = scale.transform(value, maximumY, null);
+    line.lineTo(xy[0], xy[1]);
   }
-  xy = scale.transform(value, maximumY, null);
-  line.lineTo(xy[0], xy[1]);
 };
 
 
@@ -548,49 +561,72 @@ anychart.core.grids.Map.prototype.drawInterlaceHorizontal = function(value, prev
     shift = value == maximumX ? -shift : shift;
     var prevShift = prevValue == maximumX ? -shift : shift;
 
-    currLong = minimumX;
-    while (currLong < maximumX) {
-      xy = scale.transform(currLong, value, null);
-      if (currLong == minimumX) {
-        path.moveTo(xy[0], xy[1] + prevShift);
-      } else {
-        path.lineTo(xy[0], xy[1] + prevShift);
+    if (anychart.core.map.projections.isBaseProjection(scale.tx['default'].crs)) {
+      xy = scale.transform(minimumX, value, null);
+      path.moveTo(xy[0], xy[1]);
+      xy = scale.transform(maximumX, value, null);
+      path.lineTo(xy[0], xy[1]);
+
+      xy = scale.transform(maximumX, value, null);
+      path.lineTo(xy[0], xy[1]);
+      xy = scale.transform(maximumX, prevValue, null);
+      path.lineTo(xy[0], xy[1]);
+
+      xy = scale.transform(maximumX, prevValue, null);
+      path.lineTo(xy[0], xy[1]);
+      xy = scale.transform(minimumX, prevValue, null);
+      path.lineTo(xy[0], xy[1]);
+
+      xy = scale.transform(minimumX, prevValue, null);
+      path.lineTo(xy[0], xy[1]);
+      xy = scale.transform(minimumX, value, null);
+      path.lineTo(xy[0], xy[1]);
+      path.close();
+    } else {
+      currLong = minimumX;
+      while (currLong < maximumX) {
+        xy = scale.transform(currLong, value, null);
+        if (currLong == minimumX) {
+          path.moveTo(xy[0], xy[1]);
+        } else {
+          path.lineTo(xy[0], xy[1]);
+        }
+        currLong += precision;
       }
-      currLong += precision;
+      xy = scale.transform(maximumX, value, null);
+      path.lineTo(xy[0], xy[1]);
+
+
+      currLat = value;
+      while (currLat > prevValue) {
+        xy = scale.transform(maximumX, currLat, null);
+        path.lineTo(xy[0], xy[1]);
+        currLat -= precision;
+      }
+      xy = scale.transform(maximumX, prevValue, null);
+      path.lineTo(xy[0], xy[1]);
+
+
+      currLong = maximumX;
+      while (currLong > minimumX) {
+        xy = scale.transform(currLong, prevValue, null);
+        path.lineTo(xy[0], xy[1]);
+        currLong -= precision;
+      }
+      xy = scale.transform(minimumX, prevValue, null);
+      path.lineTo(xy[0], xy[1]);
+
+
+      currLat = prevValue;
+      while (currLat < value) {
+        xy = scale.transform(minimumX, currLat, null);
+        path.lineTo(xy[0], xy[1]);
+        currLat += precision;
+      }
+      xy = scale.transform(minimumX, value, null);
+      path.lineTo(xy[0], xy[1]);
+      path.close();
     }
-    xy = scale.transform(maximumX, value, null);
-    path.lineTo(xy[0], xy[1] + shift);
-
-
-    currLat = value;
-    while (currLat > prevValue) {
-      xy = scale.transform(maximumX, currLat, null);
-      path.lineTo(xy[0], xy[1] + shift);
-      currLat -= precision;
-    }
-    xy = scale.transform(maximumX, prevValue, null);
-    path.lineTo(xy[0], xy[1]);
-
-
-    currLong = maximumX;
-    while (currLong > minimumX) {
-      xy = scale.transform(currLong, prevValue, null);
-      path.lineTo(xy[0], xy[1] + shift);
-      currLong -= precision;
-    }
-    xy = scale.transform(minimumX, prevValue, null);
-    path.lineTo(xy[0], xy[1]);
-
-
-    currLat = prevValue;
-    while (currLat < value) {
-      xy = scale.transform(minimumX, currLat, null);
-      path.lineTo(xy[0], xy[1] + shift);
-      currLat += precision;
-    }
-    xy = scale.transform(minimumX, value, null);
-    path.lineTo(xy[0], xy[1]);
-    path.close();
   }
 };
 
@@ -622,49 +658,72 @@ anychart.core.grids.Map.prototype.drawInterlaceVertical = function(value, prevVa
     shift = value == maximumY ? shift : -shift;
     var prevShift = prevValue == maximumY ? shift : -shift;
 
-    currLong = prevValue;
-    while (currLong < value) {
-      xy = scale.transform(currLong, minimumY, null);
-      if (currLong == prevValue) {
-        path.moveTo(xy[0], xy[1] + prevShift);
-      } else {
-        path.lineTo(xy[0], xy[1] + prevShift);
+    if (anychart.core.map.projections.isBaseProjection(scale.tx['default'].crs)) {
+      xy = scale.transform(prevValue, minimumY, null);
+      path.moveTo(xy[0], xy[1]);
+      xy = scale.transform(value, minimumY, null);
+      path.lineTo(xy[0], xy[1]);
+
+      xy = scale.transform(value, minimumY, null);
+      path.lineTo(xy[0], xy[1]);
+      xy = scale.transform(value, maximumY, null);
+      path.lineTo(xy[0], xy[1]);
+
+      xy = scale.transform(value, maximumY, null);
+      path.lineTo(xy[0], xy[1]);
+      xy = scale.transform(prevValue, maximumY, null);
+      path.lineTo(xy[0], xy[1]);
+
+      xy = scale.transform(prevValue, maximumY, null);
+      path.lineTo(xy[0], xy[1]);
+      xy = scale.transform(prevValue, minimumY, null);
+      path.lineTo(xy[0], xy[1]);
+      path.close();
+    } else {
+      currLong = prevValue;
+      while (currLong < value) {
+        xy = scale.transform(currLong, minimumY, null);
+        if (currLong == prevValue) {
+          path.moveTo(xy[0], xy[1]);
+        } else {
+          path.lineTo(xy[0], xy[1]);
+        }
+        currLong += precision;
       }
-      currLong += precision;
+      xy = scale.transform(value, minimumY, null);
+      path.lineTo(xy[0], xy[1]);
+
+
+      currLat = minimumY;
+      while (currLat < maximumY) {
+        xy = scale.transform(value, currLat, null);
+        path.lineTo(xy[0], xy[1]);
+        currLat += precision;
+      }
+      xy = scale.transform(value, maximumY, null);
+      path.lineTo(xy[0], xy[1]);
+
+
+      currLong = value;
+      while (currLong > prevValue) {
+        xy = scale.transform(currLong, maximumY, null);
+        path.lineTo(xy[0], xy[1]);
+        currLong -= precision;
+      }
+      xy = scale.transform(prevValue, maximumY, null);
+      path.lineTo(xy[0], xy[1]);
+
+
+      currLat = maximumY;
+      while (currLat > minimumY) {
+        xy = scale.transform(prevValue, currLat);
+        path.lineTo(xy[0], xy[1]);
+        currLat -= precision;
+      }
+      xy = scale.transform(prevValue, minimumY, null);
+      path.lineTo(xy[0], xy[1]);
+      path.close();
     }
-    xy = scale.transform(value, minimumY, null);
-    path.lineTo(xy[0], xy[1] + shift);
-
-
-    currLat = minimumY;
-    while (currLat < maximumY) {
-      xy = scale.transform(value, currLat, null);
-      path.lineTo(xy[0], xy[1] + shift);
-      currLat += precision;
-    }
-    xy = scale.transform(value, maximumY, null);
-    path.lineTo(xy[0], xy[1]);
-
-
-    currLong = value;
-    while (currLong > prevValue) {
-      xy = scale.transform(currLong, maximumY, null);
-      path.lineTo(xy[0], xy[1] + shift);
-      currLong -= precision;
-    }
-    xy = scale.transform(prevValue, maximumY, null);
-    path.lineTo(xy[0], xy[1]);
-
-
-    currLat = maximumY;
-    while (currLat > minimumY) {
-      xy = scale.transform(prevValue, currLat);
-      path.lineTo(xy[0], xy[1] + shift);
-      currLat -= precision;
-    }
-    xy = scale.transform(prevValue, minimumY, null);
-    path.lineTo(xy[0], xy[1]);
-    path.close();
   }
 };
 

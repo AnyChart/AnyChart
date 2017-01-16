@@ -1233,26 +1233,33 @@ anychart.core.axes.Map.prototype.drawTopLine = function() {
   var currLong = minimumX;
   if (isNaN(currLong)) return;
 
-  while (currLong < maximumX) {
-    xy = scale.transform(currLong, maximumY, null);
-    // x = Math.round(xy[0]);
-    // y = Math.round(xy[1]) + lineThickness / 2;
+  if (anychart.core.map.projections.isBaseProjection(scale.tx['default'].crs)) {
+    xy = scale.transform(minimumX, maximumY, null);
+    this.line.moveTo(xy[0], xy[1]);
+    xy = scale.transform(maximumX, maximumY, null);
+    this.line.lineTo(xy[0], xy[1]);
+  } else {
+    while (currLong < maximumX) {
+      xy = scale.transform(currLong, maximumY, null);
+      // x = Math.round(xy[0]);
+      // y = Math.round(xy[1]) + lineThickness / 2;
 
-    x = xy[0];
-    y = xy[1];
+      x = xy[0];
+      y = xy[1];
 
-    if (currLong == minimumX) {
-      this.line.moveTo(x, y);
-    } else {
-      this.line.lineTo(x, y);
+      if (currLong == minimumX) {
+        this.line.moveTo(x, y);
+      } else {
+        this.line.lineTo(x, y);
+      }
+      currLong += precision;
     }
-    currLong += precision;
-  }
-  xy = scale.transform(maximumX, maximumY, null);
-  x = Math.round(xy[0]);
-  y = Math.round(xy[1]);
+    xy = scale.transform(maximumX, maximumY, null);
+    x = Math.round(xy[0]);
+    y = Math.round(xy[1]);
 
-  this.line.lineTo(x, y);
+    this.line.lineTo(x, y);
+  }
 };
 
 
@@ -1275,26 +1282,34 @@ anychart.core.axes.Map.prototype.drawRightLine = function() {
 
   var currLat = minimumY;
   if (isNaN(currLat)) return;
-  while (currLat < maximumY) {
-    xy = scale.transform(maximumX, currLat, null);
-    // x = Math.round(xy[0]) - lineThickness / 2;
-    // y = Math.round(xy[1]);
 
-    x = xy[0];
-    y = xy[1];
+  if (anychart.core.map.projections.isBaseProjection(scale.tx['default'].crs)) {
+    xy = scale.transform(maximumX, minimumY, null);
+    this.line.moveTo(xy[0], xy[1]);
+    xy = scale.transform(maximumX, maximumY, null);
+    this.line.lineTo(xy[0], xy[1]);
+  } else {
+    while (currLat < maximumY) {
+      xy = scale.transform(maximumX, currLat, null);
+      // x = Math.round(xy[0]) - lineThickness / 2;
+      // y = Math.round(xy[1]);
 
-    if (currLat == minimumY) {
-      this.line.moveTo(x, y);
-    } else {
-      this.line.lineTo(x, y);
+      x = xy[0];
+      y = xy[1];
+
+      if (currLat == minimumY) {
+        this.line.moveTo(x, y);
+      } else {
+        this.line.lineTo(x, y);
+      }
+      currLat += precision;
     }
-    currLat += precision;
-  }
-  xy = scale.transform(maximumX, maximumY, null);
-  x = Math.round(xy[0]);
-  y = Math.round(xy[1]);
+    xy = scale.transform(maximumX, maximumY, null);
+    x = Math.round(xy[0]);
+    y = Math.round(xy[1]);
 
-  this.line.lineTo(x, y);
+    this.line.lineTo(x, y);
+  }
 };
 
 
@@ -1317,27 +1332,35 @@ anychart.core.axes.Map.prototype.drawBottomLine = function() {
 
   var currLong = minimumX;
   if (isNaN(currLong)) return;
-  while (currLong < maximumX) {
-    xy = scale.transform(currLong, minimumY, null);
 
-    // x = Math.round(xy[0]);
-    // y = Math.round(xy[1]);
+  if (anychart.core.map.projections.isBaseProjection(scale.tx['default'].crs)) {
+    xy = scale.transform(minimumX, minimumY, null);
+    this.line.moveTo(xy[0], xy[1]);
+    xy = scale.transform(maximumX, minimumY, null);
+    this.line.lineTo(xy[0], xy[1]);
+  } else {
+    while (currLong < maximumX) {
+      xy = scale.transform(currLong, minimumY, null);
 
-    x = xy[0];
-    y = xy[1];
+      // x = Math.round(xy[0]);
+      // y = Math.round(xy[1]);
 
-    if (currLong == minimumX) {
-      this.line.moveTo(x, y);
-    } else {
-      this.line.lineTo(x, y);
+      x = xy[0];
+      y = xy[1];
+
+      if (currLong == minimumX) {
+        this.line.moveTo(x, y);
+      } else {
+        this.line.lineTo(x, y);
+      }
+      currLong += precision;
     }
-    currLong += precision;
-  }
-  xy = scale.transform(maximumX, minimumY, null);
-  x = Math.round(xy[0]);
-  y = Math.round(xy[1]);
+    xy = scale.transform(maximumX, minimumY, null);
+    x = Math.round(xy[0]);
+    y = Math.round(xy[1]);
 
-  this.line.lineTo(x, y);
+    this.line.lineTo(x, y);
+  }
 };
 
 
@@ -1360,26 +1383,34 @@ anychart.core.axes.Map.prototype.drawLeftLine = function() {
 
   var currLat = minimumY;
   if (isNaN(currLat)) return;
-  while (currLat < maximumY) {
-    xy = scale.transform(minimumX, currLat, null);
-    // x = Math.round(xy[0]) + lineThickness / 2;
-    // y = Math.round(xy[1]);
 
-    x = xy[0];
-    y = xy[1];
+  if (anychart.core.map.projections.isBaseProjection(scale.tx['default'].crs)) {
+    xy = scale.transform(minimumX, minimumY, null);
+    this.line.moveTo(xy[0], xy[1]);
+    xy = scale.transform(minimumX, maximumY, null);
+    this.line.lineTo(xy[0], xy[1]);
+  } else {
+    while (currLat < maximumY) {
+      xy = scale.transform(minimumX, currLat, null);
+      // x = Math.round(xy[0]) + lineThickness / 2;
+      // y = Math.round(xy[1]);
 
-    if (currLat == minimumY) {
-      this.line.moveTo(x, y);
-    } else {
-      this.line.lineTo(x, y);
+      x = xy[0];
+      y = xy[1];
+
+      if (currLat == minimumY) {
+        this.line.moveTo(x, y);
+      } else {
+        this.line.lineTo(x, y);
+      }
+      currLat += precision;
     }
-    currLat += precision;
-  }
-  xy = scale.transform(minimumX, maximumY, null);
-  x = Math.round(xy[0]);
-  y = Math.round(xy[1]);
+    xy = scale.transform(minimumX, maximumY, null);
+    x = Math.round(xy[0]);
+    y = Math.round(xy[1]);
 
-  this.line.lineTo(x, y);
+    this.line.lineTo(x, y);
+  }
 };
 
 

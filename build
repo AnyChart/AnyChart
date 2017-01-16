@@ -359,10 +359,6 @@ def __build_project_sources(modules):
     # build binary file
     __call_console_commands(commands)
 
-    #include proj4js for maps and bundle in binary file
-    if __should_include_proj4js(modules):
-        __include_proj4js(output_file)
-
     # gzip binary file
     if __should_gen_gzip():
         __gzip_file(output_file)
@@ -405,27 +401,9 @@ def __build_project(modules):
     # build binary file
     __call_console_commands(commands)
 
-    #include proj4js for maps and bundle in binary file
-    if __should_include_proj4js(modules):
-        __include_proj4js(output_file)
-
     # gzip binary file
     if __should_gen_gzip():
         __gzip_file(output_file)
-
-
-def __include_proj4js(output_file):
-    f = open(output_file, 'r')
-    ac_binaries = f.read()
-    f.close()
-
-    f = open(os.path.join(SRC_PATH, '..', 'proj4.js'), 'r')
-    proj4js_binaries = f.read()
-    f.close()
-
-    f = open(output_file, 'w')
-    f.write(ac_binaries + proj4js_binaries)
-    f.close()
 
 
 def __log_compilation(is_binary, modules, output_file):
@@ -437,8 +415,7 @@ def __log_compilation(is_binary, modules, output_file):
           "Debug files: %s\n" \
           "Gzip: %s \n" \
           "Theme: %s\n" \
-          "Performance monitoring: %s\n" \
-          "Proj4js included: %s" % (
+          "Performance monitoring: %s" % (
               "binary" if is_binary else "source",
               ', '.join(modules),
               output_file,
@@ -447,8 +424,7 @@ def __log_compilation(is_binary, modules, output_file):
               str(arguments['debug_files']),
               str(arguments['gzip']),
               str(arguments['theme']),
-              str(arguments['performance_monitoring']),
-              str(__should_include_proj4js(modules))
+              str(arguments['performance_monitoring'])
           )
 
 
@@ -1237,10 +1213,6 @@ def __should_gen_debug_files():
 def __should_gen_gzip():
     global arguments
     return 'gzip' in arguments and str(arguments['gzip']) == 'True'
-
-
-def __should_include_proj4js(modules):
-    return 'connector' in modules or 'bubbleMap' in modules or 'anymap' in modules or 'anychart_bundle' in modules
 
 
 #=======================================================================================================================

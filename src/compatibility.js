@@ -19,3 +19,10 @@ var userAgentString = goog.userAgent.getUserAgentString();
  */
 anychart.compatibility.ALLOW_GLOBAL_TOOLTIP_CONTAINER = !(goog.userAgent.SAFARI && userAgentString.indexOf('PhantomJS') == -1 &&
     goog.userAgent.isVersionOrHigher('534') && !goog.userAgent.isVersionOrHigher('536'));
+
+
+/**
+ * Flag for throw warning only once about using Porj4 projection without including Proj4 lib.
+ * @type {boolean}
+ */
+anychart.compatibility.threwProj4Warn = false;

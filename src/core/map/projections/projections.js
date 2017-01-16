@@ -122,9 +122,18 @@ anychart.core.map.projections.getProjection = function(projection) {
       break;
     default:
       try {
-        projection_ = new anychart.core.map.projections.Proj4Wrapper(/** @type {string} */(projection));
+        if (window['proj4']) {
+          projection_ = new anychart.core.map.projections.Proj4Wrapper(/** @type {string} */(projection));
+        } else {
+          projection_ = new anychart.core.map.projections.Base();
+
+          if (!anychart.compatibility.threwProj4Warn) {
+            anychart.core.reporting.warning(anychart.enums.WarningCode.MISSING_PROJ4, null, null, true);
+            anychart.compatibility.threwProj4Warn = true;
+          }
+        }
       } catch (e) {
-        projection_ = null;
+        projection_ = new anychart.core.map.projections.Base();
       }
   }
 
@@ -139,5 +148,26 @@ anychart.core.map.projections.getProjection = function(projection) {
  */
 anychart.core.map.projections.isBaseProjection = function(projectionStr) {
   projectionStr = String(projectionStr).toLowerCase();
-  return projectionStr == 'undefined' || projectionStr == 'null' || projectionStr == 'none' || projectionStr == 'wsg84';
+  switch (projectionStr) {
+    case 'undefined':
+    case 'null':
+    case 'none':
+    case anychart.enums.MapProjections.WSG84:
+      return true;
+    case anychart.enums.MapProjections.BONNE:
+    case anychart.enums.MapProjections.ECKERT1:
+    case anychart.enums.MapProjections.ECKERT3:
+    case anychart.enums.MapProjections.FAHEY:
+    case anychart.enums.MapProjections.HAMMER:
+    case anychart.enums.MapProjections.AITOFF:
+    case anychart.enums.MapProjections.MERCATOR:
+    case anychart.enums.MapProjections.ORTHOGRAPHIC:
+    case anychart.enums.MapProjections.ROBINSON:
+    case anychart.enums.MapProjections.WAGNER6:
+    case anychart.enums.MapProjections.EQUIRECTANGULAR:
+    case anychart.enums.MapProjections.AUGUST:
+      return false;
+    default:
+      return !window['proj4'];
+  }
 };

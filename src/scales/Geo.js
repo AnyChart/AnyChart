@@ -314,47 +314,62 @@ anychart.scales.Geo.prototype.calculateViewSpace = function() {
   var maxLat = /** @type {number} */(this.maximumY());
 
   this.viewSpace.clear();
-  var xy = this.transformWithoutTx(minLong, minLat, null);
-
-  if (isNaN(xy[0]) || isNaN(xy[1])) return;
-
-  this.viewSpace.moveTo(xy[0], xy[1]);
-  var currLat = minLat;
-  while (currLat < maxLat) {
-    xy = this.transformWithoutTx(minLong, currLat, null);
+  var xy;
+  if (this.tx && anychart.core.map.projections.isBaseProjection(this.tx['default'].crs)) {
+    xy = this.transformWithoutTx(minLong, minLat, null);
+    this.viewSpace.moveTo(xy[0], xy[1]);
+    xy = this.transformWithoutTx(minLong, maxLat, null);
     this.viewSpace.lineTo(xy[0], xy[1]);
-    currLat += yPrecision;
-  }
-  xy = this.transformWithoutTx(minLong, maxLat, null);
-  this.viewSpace.lineTo(xy[0], xy[1]);
-
-  var currLong = minLong;
-  while (currLong < maxLong) {
-    xy = this.transformWithoutTx(currLong, maxLat, null);
+    xy = this.transformWithoutTx(maxLong, maxLat, null);
     this.viewSpace.lineTo(xy[0], xy[1]);
-    currLong += xPrecision;
-  }
-  xy = this.transformWithoutTx(maxLong, maxLat, null);
-  this.viewSpace.lineTo(xy[0], xy[1]);
-
-  currLat = maxLat;
-  while (currLat > minLat) {
-    xy = this.transformWithoutTx(maxLong, currLat, null);
+    xy = this.transformWithoutTx(maxLong, minLat, null);
     this.viewSpace.lineTo(xy[0], xy[1]);
-    currLat -= yPrecision;
-  }
-  xy = this.transformWithoutTx(maxLong, minLat, null);
-  this.viewSpace.lineTo(xy[0], xy[1]);
-
-  currLong = maxLong;
-  while (currLong > minLong) {
-    xy = this.transformWithoutTx(currLong, minLat, null);
+    xy = this.transformWithoutTx(minLong, minLat, null);
     this.viewSpace.lineTo(xy[0], xy[1]);
-    currLong -= xPrecision;
+    this.viewSpace.close();
+  } else {
+    xy = this.transformWithoutTx(minLong, minLat, null);
+
+    if (isNaN(xy[0]) || isNaN(xy[1])) return;
+
+    this.viewSpace.moveTo(xy[0], xy[1]);
+    var currLat = minLat;
+    while (currLat < maxLat) {
+      xy = this.transformWithoutTx(minLong, currLat, null);
+      this.viewSpace.lineTo(xy[0], xy[1]);
+      currLat += yPrecision;
+    }
+    xy = this.transformWithoutTx(minLong, maxLat, null);
+    this.viewSpace.lineTo(xy[0], xy[1]);
+
+    var currLong = minLong;
+    while (currLong < maxLong) {
+      xy = this.transformWithoutTx(currLong, maxLat, null);
+      this.viewSpace.lineTo(xy[0], xy[1]);
+      currLong += xPrecision;
+    }
+    xy = this.transformWithoutTx(maxLong, maxLat, null);
+    this.viewSpace.lineTo(xy[0], xy[1]);
+
+    currLat = maxLat;
+    while (currLat > minLat) {
+      xy = this.transformWithoutTx(maxLong, currLat, null);
+      this.viewSpace.lineTo(xy[0], xy[1]);
+      currLat -= yPrecision;
+    }
+    xy = this.transformWithoutTx(maxLong, minLat, null);
+    this.viewSpace.lineTo(xy[0], xy[1]);
+
+    currLong = maxLong;
+    while (currLong > minLong) {
+      xy = this.transformWithoutTx(currLong, minLat, null);
+      this.viewSpace.lineTo(xy[0], xy[1]);
+      currLong -= xPrecision;
+    }
+    xy = this.transformWithoutTx(minLong, minLat, null);
+    this.viewSpace.lineTo(xy[0], xy[1]);
+    this.viewSpace.close();
   }
-  xy = this.transformWithoutTx(minLong, minLat, null);
-  this.viewSpace.lineTo(xy[0], xy[1]);
-  this.viewSpace.close();
 };
 
 
@@ -956,24 +971,37 @@ anychart.scales.Geo.prototype.getExtremesForDimension = function(dimensionValue,
     minLat = this.minLat;
     maxLat = this.maxLat;
 
-    currValue = minLat;
-    while (currValue < maxLat) {
-      xy = this.latLonToScale(dimensionValue, currValue, null);
-      // xy = this.transformWithoutTx(dimensionValue, currValue, null);
+    if (this.tx && anychart.core.map.projections.isBaseProjection(this.tx['default'].crs)) {
+      xy = this.latLonToScale(dimensionValue, minLat, null);
+      if (xy[0] < minX) minX = xy[0];
+      if (xy[0] > maxX) maxX = xy[0];
+      if (xy[1] < minY) minY = xy[1];
+      if (xy[1] > maxY) maxY = xy[1];
+      xy = this.latLonToScale(dimensionValue, maxLat, null);
+      if (xy[0] < minX) minX = xy[0];
+      if (xy[0] > maxX) maxX = xy[0];
+      if (xy[1] < minY) minY = xy[1];
+      if (xy[1] > maxY) maxY = xy[1];
+    } else {
+      currValue = minLat;
+      while (currValue < maxLat) {
+        xy = this.latLonToScale(dimensionValue, currValue, null);
+        // xy = this.transformWithoutTx(dimensionValue, currValue, null);
+        // xy = this.pxToScale(xy[0], xy[1]);
+        if (xy[0] < minX) minX = xy[0];
+        if (xy[0] > maxX) maxX = xy[0];
+        if (xy[1] < minY) minY = xy[1];
+        if (xy[1] > maxY) maxY = xy[1];
+        currValue += yPrecision;
+      }
+      xy = this.latLonToScale(dimensionValue, maxLat, null);
+      // xy = this.transformWithoutTx(dimensionValue, this.maxLat, null);
       // xy = this.pxToScale(xy[0], xy[1]);
       if (xy[0] < minX) minX = xy[0];
       if (xy[0] > maxX) maxX = xy[0];
       if (xy[1] < minY) minY = xy[1];
       if (xy[1] > maxY) maxY = xy[1];
-      currValue += yPrecision;
     }
-    xy = this.latLonToScale(dimensionValue, maxLat, null);
-    // xy = this.transformWithoutTx(dimensionValue, this.maxLat, null);
-    // xy = this.pxToScale(xy[0], xy[1]);
-    if (xy[0] < minX) minX = xy[0];
-    if (xy[0] > maxX) maxX = xy[0];
-    if (xy[1] < minY) minY = xy[1];
-    if (xy[1] > maxY) maxY = xy[1];
   } else {
     // latLon = this.scaleToLatLon(this.minLong, dimensionValue, null);
     // dimensionValue = latLon[1];
@@ -983,51 +1011,65 @@ anychart.scales.Geo.prototype.getExtremesForDimension = function(dimensionValue,
     minLong = this.minLong;
     maxLong = this.maxLong;
 
-    if (minLong > maxLong) {
-      currValue = minLong;
-      while (currValue < 180) {
-        xy = this.latLonToScale(currValue, dimensionValue, null);
-        // xy = this.transformWithoutTx(currValue, dimensionValue, null);
-        // xy = this.pxToScale(xy[0], xy[1]);
-        if (xy[0] < minX) minX = xy[0];
-        if (xy[0] > maxX) maxX = xy[0];
-        if (xy[1] < minY) minY = xy[1];
-        if (xy[1] > maxY) maxY = xy[1];
-        currValue += xPrecision;
-      }
-
-      currValue = -180;
-      while (currValue < minLong) {
-        xy = this.latLonToScale(currValue, dimensionValue, null);
-        // xy = this.transformWithoutTx(currValue, dimensionValue, null);
-        // xy = this.pxToScale(xy[0], xy[1]);
-        if (xy[0] < minX) minX = xy[0];
-        if (xy[0] > maxX) maxX = xy[0];
-        if (xy[1] < minY) minY = xy[1];
-        if (xy[1] > maxY) maxY = xy[1];
-        currValue += xPrecision;
-      }
+    if (this.tx && anychart.core.map.projections.isBaseProjection(this.tx['default'].crs)) {
+      xy = this.latLonToScale(minLong, dimensionValue, null);
+      if (xy[0] < minX) minX = xy[0];
+      if (xy[0] > maxX) maxX = xy[0];
+      if (xy[1] < minY) minY = xy[1];
+      if (xy[1] > maxY) maxY = xy[1];
+      xy = this.latLonToScale(maxLong, dimensionValue, null);
+      if (xy[0] < minX) minX = xy[0];
+      if (xy[0] > maxX) maxX = xy[0];
+      if (xy[1] < minY) minY = xy[1];
+      if (xy[1] > maxY) maxY = xy[1];
     } else {
-      currValue = minLong;
-      while (currValue < maxLong) {
-        xy = this.latLonToScale(currValue, dimensionValue, null);
-        // xy = this.transformWithoutTx(currValue, dimensionValue, null);
-        // xy = this.pxToScale(xy[0], xy[1]);
-        if (xy[0] < minX) minX = xy[0];
-        if (xy[0] > maxX) maxX = xy[0];
-        if (xy[1] < minY) minY = xy[1];
-        if (xy[1] > maxY) maxY = xy[1];
-        currValue += xPrecision;
-      }
-    }
 
-    xy = this.latLonToScale(maxLong, dimensionValue, null);
-    // xy = this.transformWithoutTx(this.maxLong, dimensionValue, null);
-    // xy = this.pxToScale(xy[0], xy[1]);
-    if (xy[0] < minX) minX = xy[0];
-    if (xy[0] > maxX) maxX = xy[0];
-    if (xy[1] < minY) minY = xy[1];
-    if (xy[1] > maxY) maxY = xy[1];
+      if (minLong > maxLong) {
+        currValue = minLong;
+        while (currValue < 180) {
+          xy = this.latLonToScale(currValue, dimensionValue, null);
+          // xy = this.transformWithoutTx(currValue, dimensionValue, null);
+          // xy = this.pxToScale(xy[0], xy[1]);
+          if (xy[0] < minX) minX = xy[0];
+          if (xy[0] > maxX) maxX = xy[0];
+          if (xy[1] < minY) minY = xy[1];
+          if (xy[1] > maxY) maxY = xy[1];
+          currValue += xPrecision;
+        }
+
+        currValue = -180;
+        while (currValue < minLong) {
+          xy = this.latLonToScale(currValue, dimensionValue, null);
+          // xy = this.transformWithoutTx(currValue, dimensionValue, null);
+          // xy = this.pxToScale(xy[0], xy[1]);
+          if (xy[0] < minX) minX = xy[0];
+          if (xy[0] > maxX) maxX = xy[0];
+          if (xy[1] < minY) minY = xy[1];
+          if (xy[1] > maxY) maxY = xy[1];
+          currValue += xPrecision;
+        }
+      } else {
+        currValue = minLong;
+        while (currValue < maxLong) {
+          xy = this.latLonToScale(currValue, dimensionValue, null);
+          // xy = this.transformWithoutTx(currValue, dimensionValue, null);
+          // xy = this.pxToScale(xy[0], xy[1]);
+          if (xy[0] < minX) minX = xy[0];
+          if (xy[0] > maxX) maxX = xy[0];
+          if (xy[1] < minY) minY = xy[1];
+          if (xy[1] > maxY) maxY = xy[1];
+          currValue += xPrecision;
+        }
+      }
+
+      xy = this.latLonToScale(maxLong, dimensionValue, null);
+      // xy = this.transformWithoutTx(this.maxLong, dimensionValue, null);
+      // xy = this.pxToScale(xy[0], xy[1]);
+      if (xy[0] < minX) minX = xy[0];
+      if (xy[0] > maxX) maxX = xy[0];
+      if (xy[1] < minY) minY = xy[1];
+      if (xy[1] > maxY) maxY = xy[1];
+    }
   }
 
   return {minX: minX, minY: minY, maxX: maxX, maxY: maxY};
@@ -1140,6 +1182,8 @@ anychart.scales.Geo.prototype.pxToScale = function(x, y) {
  * @return {Object}
  */
 anychart.scales.Geo.prototype.pickTx = function(lon, lat) {
+  if (!this.tx) return null;
+
   var defaultTx = this.tx['default'];
 
   var txName = goog.object.findKey(this.tx, function(value, key) {
@@ -1304,6 +1348,8 @@ anychart.scales.Geo.prototype.transformY = function(value) {
  * @return {Array.<number>} .
  */
 anychart.scales.Geo.prototype.scaleToLatLon = function(x, y, opt_txName) {
+  if (!this.tx) return [];
+
   var defaultTx = this.tx['default'];
 
   var txName;

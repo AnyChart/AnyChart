@@ -378,27 +378,9 @@ def __build_project(develop, modules, sources, theme, debug, gzip, perf_monitori
     # build binary file
     __call_console_commands(commands, module=modules[0])
 
-    #include proj4js for maps and bundle in binary file
-    if __should_include_proj4js(modules):
-        __include_proj4js(output_file)
-
     # gzip binary file
     if gzip:
         __gzip_file(output_file)
-
-
-def __include_proj4js(output_file):
-    f = open(output_file, 'r')
-    ac_binaries = f.read()
-    f.close()
-
-    f = open(os.path.join(SRC_PATH, '..', 'proj4.js'), 'r')
-    proj4js_binaries = f.read()
-    f.close()
-
-    f = open(output_file, 'w')
-    f.write(ac_binaries[:len(ac_binaries)-3] + proj4js_binaries + '});')
-    f.close()
 
 
 def __log_compilation(output_file, args):
@@ -409,8 +391,7 @@ def __log_compilation(output_file, args):
           "Debug files: %s\n" \
           "Gzip: %s \n" \
           "Theme: %s\n" \
-          "Performance monitoring: %s\n" \
-          "Proj4js included: %s" % (
+          "Performance monitoring: %s" % (
               "source" if args['sources'] else "binary",
               ', '.join(args['modules']),
               output_file,
@@ -419,8 +400,7 @@ def __log_compilation(output_file, args):
               str(args['debug']),
               str(args['gzip']),
               str(args['theme']),
-              str(args['perf_monitoring']),
-              str(__should_include_proj4js(args['modules']))
+              str(args['perf_monitoring'])
           )
 
 
@@ -1173,10 +1153,6 @@ def __should_gen_debug_files():
 def __should_gen_gzip():
     global arguments
     return 'gzip' in arguments and str(arguments['gzip']) == 'True'
-
-
-def __should_include_proj4js(modules):
-    return 'connector' in modules or 'bubbleMap' in modules or 'anymap' in modules or 'anychart_bundle' in modules
 
 
 #=======================================================================================================================
