@@ -918,17 +918,10 @@ anychart.data.TableMainStorage = function(table, opt_keyColumn, opt_dateTimePatt
 
   /**
    * Known source fields seen. Used to determine how much columns we know about.
-   * @type {!Object.<boolean>}
+   * @type {?Object.<boolean>}
    * @private
    */
-  this.objectFieldsSeen_ = {};
-
-  /**
-   * If we have seen any objects in data.
-   * @type {boolean}
-   * @private
-   */
-  this.objectsSeen_ = false;
+  this.objectFieldsSeen_ = null;
 };
 goog.inherits(anychart.data.TableMainStorage, anychart.data.TableStorage);
 
@@ -1115,9 +1108,7 @@ anychart.data.TableMainStorage.prototype.removeFirst = function(opt_count) {
 
 /** @inheritDoc */
 anychart.data.TableMainStorage.prototype.getKnownFields = function() {
-  if (this.objectsSeen_)
-    return this.objectFieldsSeen_;
-  return this.largestSeenRowLength_;
+  return this.objectFieldsSeen_ || this.largestSeenRowLength_;
 };
 
 
@@ -1204,7 +1195,7 @@ anychart.data.TableMainStorage.prototype.fillStorage_ = function(iterator) {
       if (goog.isArray(item.values)) {
         var valuesLength = item.values.length;
         if (this.largestSeenRowLength_ < valuesLength) {
-          if (this.objectsSeen_) {
+          if (this.objectFieldsSeen_) {
             // if we have seen objects, than we have converted the largestSeenRowLength_ representation to the fields
             // map already and now we should add fields to that representation
             for (i = this.largestSeenRowLength_; i < valuesLength; i++) {
@@ -1214,11 +1205,11 @@ anychart.data.TableMainStorage.prototype.fillStorage_ = function(iterator) {
           this.largestSeenRowLength_ = valuesLength;
         }
       } else { // we are sure that this is object in this case so we can avoid double checking
-        if (!this.objectsSeen_) {
+        if (!this.objectFieldsSeen_) {
+          this.objectFieldsSeen_ = {};
           for (i = 0; i < this.largestSeenRowLength_; i++) {
             this.objectFieldsSeen_[i] = true;
           }
-          this.objectsSeen_ = true;
         }
         for (i in item.values) {
           this.objectFieldsSeen_[i] = true;

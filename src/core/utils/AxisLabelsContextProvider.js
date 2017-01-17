@@ -9,30 +9,35 @@ goog.require('anychart.enums');
  * @param {anychart.core.axes.Linear|anychart.core.axes.Circular|anychart.core.axes.Polar|anychart.core.axes.Radar|anychart.core.axes.Radial} axis Axis.
  * @param {number} index Label index.
  * @param {string|number} value Label value.
+ * @param {*=} opt_rightValue
  * @extends {anychart.core.utils.BaseContextProvider}
  * @constructor
  */
-anychart.core.utils.AxisLabelsContextProvider = function(axis, index, value) {
+anychart.core.utils.AxisLabelsContextProvider = function(axis, index, value, opt_rightValue) {
   anychart.core.utils.AxisLabelsContextProvider.base(this, 'constructor');
   this['axis'] = axis;
   var scale = axis.scale();
 
   var labelText, labelValue;
-  if (scale instanceof anychart.scales.Linear) {
-    labelText = parseFloat(value);
-    labelValue = parseFloat(value);
-  } else if (scale instanceof anychart.scales.Ordinal) {
+  var addRange = true;
+  if (scale instanceof anychart.scales.Ordinal) {
     labelText = scale.ticks().names()[index];
     labelValue = value;
+    addRange = false;
   } else if (scale instanceof anychart.scales.DateTime) {
     labelText = anychart.format.date(/** @type {number} */(value));
     labelValue = value;
+  } else {
+    labelText = parseFloat(value);
+    labelValue = parseFloat(value);
   }
   this['index'] = index;
   this['value'] = labelText;
   this['tickValue'] = labelValue;
-  this['max'] = goog.isDef(scale.max) ? scale.max : null;
-  this['min'] = goog.isDef(scale.min) ? scale.min : null;
+  if (addRange) {
+    this['max'] = goog.isDef(scale.max) ? scale.max : null;
+    this['min'] = goog.isDef(scale.min) ? scale.min : null;
+  }
   this['scale'] = scale;
   //TODO as soon as it is possible:
   //sum -- the sum data values from series bound to this axis (depends on orientation)

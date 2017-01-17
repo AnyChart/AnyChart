@@ -146,6 +146,30 @@ anychart.data.Set.prototype.storage_;
 
 
 /**
+ * The largest array seen as a row.
+ * @type {number}
+ * @private
+ */
+anychart.data.Set.prototype.largestSeenRowLength_ = 0;
+
+
+/**
+ * If null - now row objects seen, if object - contains all seen field names.
+ * @type {Object.<string, boolean>}
+ * @private
+ */
+anychart.data.Set.prototype.objectFieldsSeen_ = null;
+
+
+/**
+ * If non-array and non-object rows were seen.
+ * @type {boolean}
+ * @private
+ */
+anychart.data.Set.prototype.simpleValuesSeen_ = false;
+
+
+/**
  * Getter/setter for data.
  * @param {(Array|string)=} opt_value .
  * @param {Object.<string, (string|boolean|undefined)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
@@ -176,11 +200,40 @@ anychart.data.Set.prototype.data = function(opt_value, opt_csvSettings) {
       }
     }
     if (goog.isArrayLike(opt_value)) {
-      /** @type {!Array} */
-      var data = goog.array.slice(opt_value, 0);
-      for (/** @type {number} */ var i = data.length; i--;) {
-        if (goog.isArrayLike(data[i]))
-          data[i] = goog.array.slice(data[i], 0);
+      var data = [];
+      for (var i = 0; i < opt_value.length; i++) {
+        var row = opt_value[i];
+        var dataRow;
+        if (goog.isArray(row)) {
+          var valuesLength = row.length;
+          if (this.largestSeenRowLength_ < valuesLength) {
+            // if (this.objectFieldsSeen_) {
+            //   // if we have seen objects, than we have converted the largestSeenRowLength_ representation to the fields
+            //   // map already and now we should add fields to that representation
+            //   for (i = this.largestSeenRowLength_; i < valuesLength; i++) {
+            //     this.objectFieldsSeen_[i] = true;
+            //   }
+            // }
+            this.largestSeenRowLength_ = valuesLength;
+          }
+          dataRow = goog.array.slice(row, 0);
+        } else if (goog.isObject(row)) { // we are sure that this is object in this case so we can avoid double checking
+          if (!this.objectFieldsSeen_) {
+            this.objectFieldsSeen_ = {};
+            // for (i = 0; i < this.largestSeenRowLength_; i++) {
+            //   this.objectFieldsSeen_[i] = true;
+            // }
+          }
+          dataRow = {};
+          for (var j in row) {
+            dataRow[j] = row[j];
+            this.objectFieldsSeen_[j] = true;
+          }
+        } else {
+          this.simpleValuesSeen_ = true;
+          dataRow = row;
+        }
+        data.push(dataRow);
       }
       this.storage_ = data;
       this.dispatchSignal(anychart.Signal.DATA_CHANGED);
@@ -406,6 +459,36 @@ anychart.data.Set.prototype.getRowsCount = function() {
  */
 anychart.data.Set.prototype.getRowMapping = function(rowIndex) {
   throw new Error('Wrong usage of the data Set');
+};
+
+
+/**
+ * Returns all mappings that are related to the view.
+ * @return {Array.<anychart.data.Mapping>}
+ */
+anychart.data.Set.prototype.getMappings = function() {
+  throw new Error('Wrong usage of the data Set');
+};
+
+
+/**
+ * Checks if there exists at least one row in the view, that returns defined value for that name.
+ * @param {string|number} nameOrColumn
+ * @return {boolean}
+ */
+anychart.data.Set.prototype.checkFieldExist = function(nameOrColumn) {
+  if (goog.isNumber(nameOrColumn))
+    return this.largestSeenRowLength_ > nameOrColumn;
+  return !!(this.objectFieldsSeen_ && this.objectFieldsSeen_[nameOrColumn]);
+};
+
+
+/**
+ * Checks whether the view has non-object and non-array rows.
+ * @return {boolean}
+ */
+anychart.data.Set.prototype.hasSimpleRows = function() {
+  return this.simpleValuesSeen_;
 };
 
 

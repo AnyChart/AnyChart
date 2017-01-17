@@ -502,12 +502,20 @@ anychart.core.Chart.prototype.calculate = goog.nullFunction;
 
 
 /**
+ * Ensures that statistics is ready.
+ */
+anychart.core.Chart.prototype.ensureStatisticsReady = function() {
+  this.calculate();
+};
+
+
+/**
  * Gets statistics value by key.
  * @param {string} key - Key.
  * @return {*} - Statistics value.
  */
 anychart.core.Chart.prototype.getStat = function(key) {
-  this.calculate();
+  this.ensureStatisticsReady();
   return this.statistics[key];
 };
 

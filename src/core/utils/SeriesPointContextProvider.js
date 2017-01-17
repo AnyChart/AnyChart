@@ -103,7 +103,9 @@ anychart.core.utils.SeriesPointContextProvider.prototype.applyReferenceValuesInt
  * @return {*}
  */
 anychart.core.utils.SeriesPointContextProvider.prototype.getStat = function(opt_key) {
-  return (/** @type {anychart.core.series.Base|anychart.core.SeriesBase} */ (this['series'])).statistics(opt_key);
+  var series = (/** @type {anychart.core.series.Base|anychart.core.SeriesBase} */ (this['series']));
+  series.chart.ensureStatisticsReady();
+  return series.statistics(opt_key);
 };
 
 

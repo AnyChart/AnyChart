@@ -2570,6 +2570,7 @@ anychart.core.series.Base.prototype.draw = function() {
   if (!this.checkDrawingNeeded())
     return this;
 
+  anychart.performance.start('Series draw()');
   this.suspendSignalsDispatching();
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_SHAPE_MANAGER)) {
@@ -2672,6 +2673,7 @@ anychart.core.series.Base.prototype.draw = function() {
   var elementsDrawersLength = elementsDrawers.length;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_POINTS)) {
+    anychart.performance.start('Series drawing points');
     var columns = this.retrieveDataColumns();
     var iterator;
     if (columns) {
@@ -2722,6 +2724,7 @@ anychart.core.series.Base.prototype.draw = function() {
     if (this.check(anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT)) {
       this.invalidate(anychart.ConsistencyState.SERIES_CLIP);
     }
+    anychart.performance.end('Series drawing points');
   } else if (elementsDrawersLength) {
     iterator = this.getResetIterator();
     while (iterator.advance()) {
@@ -2762,6 +2765,8 @@ anychart.core.series.Base.prototype.draw = function() {
   }
 
   this.resumeSignalsDispatching(false);
+
+  anychart.performance.end('Series draw()');
 
   return this;
 };
@@ -3845,7 +3850,7 @@ anychart.core.series.Base.prototype.calculateStatistics = goog.nullFunction;
  * @return {*} - Statistics value.
  */
 anychart.core.series.Base.prototype.getStat = function(key) {
-  this.chart.calculate();
+  this.chart.ensureStatisticsReady();
   return this.statistics_[key];
 };
 

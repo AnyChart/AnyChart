@@ -348,10 +348,10 @@ anychart.core.SeriesBase.prototype.isSizeBased = function() {
  * @param {anychart.core.SeparateChart} chart Chart instance.
  */
 anychart.core.SeriesBase.prototype.setChart = function(chart) {
-  this.chart_ = chart;
-  this.a11y().parentA11y(/** @type {anychart.core.utils.A11y} */ (/** @type {anychart.core.Chart} */ (this.chart_).a11y()));
+  this.chart = chart;
+  this.a11y().parentA11y(/** @type {anychart.core.utils.A11y} */ (/** @type {anychart.core.Chart} */ (this.chart).a11y()));
   this.a11y().parentA11y().applyChangesInChildA11y();
-  this.tooltip().parent(/** @type {anychart.core.ui.Tooltip} */ (this.chart_.tooltip()));
+  this.tooltip().parent(/** @type {anychart.core.ui.Tooltip} */ (this.chart.tooltip()));
 };
 
 
@@ -360,7 +360,7 @@ anychart.core.SeriesBase.prototype.setChart = function(chart) {
  * @return {anychart.core.SeparateChart}
  */
 anychart.core.SeriesBase.prototype.getChart = function() {
-  return this.chart_;
+  return this.chart;
 };
 
 
@@ -631,7 +631,7 @@ anychart.core.SeriesBase.prototype.calculateStatistics = goog.nullFunction;
  * @return {*} - Statistics value.
  */
 anychart.core.SeriesBase.prototype.getStat = function(key) {
-  if (this.chart_) this.chart_.calculate();
+  if (this.chart) this.chart.calculate();
   return this.statistics_[key];
 };
 
@@ -650,7 +650,7 @@ anychart.core.SeriesBase.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
     this.tooltip_ = new anychart.core.ui.Tooltip(0);
     this.registerDisposable(this.tooltip_);
-    this.tooltip_.chart(this.chart_);
+    this.tooltip_.chart(this.chart);
   }
   if (goog.isDef(opt_value)) {
     this.tooltip_.setup(opt_value);
@@ -1628,9 +1628,9 @@ anychart.core.SeriesBase.prototype.getPoint = function(index) {
     point = new anychart.core.SeriesPoint(this, index);
   }
 
-  if (this.chart_) {
-    this.chart_.calculate();
-    var chartStat = this.chart_.statistics;
+  if (this.chart) {
+    this.chart.calculate();
+    var chartStat = this.chart.statistics;
     var val = /** @type {number} */ (point.get(anychart.opt.VALUE));
     var size = /** @type {number} */ (point.get(anychart.opt.SIZE)); //Bubble.
 

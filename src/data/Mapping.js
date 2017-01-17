@@ -130,6 +130,12 @@ anychart.data.Mapping.prototype.getRowMapping = function(rowIndex) {
 
 
 /** @inheritDoc */
+anychart.data.Mapping.prototype.getMappings = function() {
+  return [this];
+};
+
+
+/** @inheritDoc */
 anychart.data.Mapping.prototype.row = function(rowIndex, opt_value) {
   return this.parentView.row.apply(this.parentView, arguments);
 };
@@ -146,6 +152,41 @@ anychart.data.Mapping.prototype.parentViewChangedHandler = function(event) {
   this.cachedValues = null;
   if (event.hasSignal(anychart.Signal.DATA_CHANGED))
     this.dispatchSignal(anychart.Signal.DATA_CHANGED);
+};
+
+
+/** @inheritDoc */
+anychart.data.Mapping.prototype.checkFieldExist = function(name) {
+  if (this.parentView.checkFieldExist(name))
+    return true;
+  var i;
+  var mapping = this.indexProps_;
+  for (i = 0; i < mapping.length; i++) {
+    if (mapping[i] == name)
+      return true;
+  }
+  if (this.parentView.hasSimpleRows()) {
+    mapping = this.defaultProps_;
+    for (i = 0; i < mapping.length; i++) {
+      if (mapping[i] == name)
+        return true;
+    }
+  }
+  mapping = this.objectMapping_[name];
+  if (mapping) {
+    for (i = 0; i < mapping.length; i++) {
+      if (this.parentView.checkFieldExist(mapping[i]))
+        return true;
+    }
+  }
+  mapping = this.arrayMapping_[name];
+  if (mapping) {
+    for (i = 0; i < mapping.length; i++) {
+      if (this.parentView.checkFieldExist(mapping[i]))
+        return true;
+    }
+  }
+  return false;
 };
 
 

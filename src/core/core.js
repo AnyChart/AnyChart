@@ -64,6 +64,12 @@ anychart.core.IChart.prototype.calculate = function() {};
 
 
 /**
+ * Ensures that all statistics is ready.
+ */
+anychart.core.IChart.prototype.ensureStatisticsReady = function() {};
+
+
+/**
  * Whether IChart supports tooltip.
  * @return {boolean}
  */

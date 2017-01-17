@@ -36,7 +36,7 @@ anychart.scales.OrdinalTicks.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS
  * @type {number}
  * @private
  */
-anychart.scales.OrdinalTicks.prototype.interval_ = 1;
+anychart.scales.OrdinalTicks.prototype.interval_ = NaN;
 
 
 /**
@@ -80,6 +80,14 @@ anychart.scales.OrdinalTicks.prototype.autoNames_ = null;
 
 
 /**
+ * Max ticks count.
+ * @type {number}
+ * @private
+ */
+anychart.scales.OrdinalTicks.prototype.maxCount_ = 100;
+
+
+/**
  * Getter/setter for interval.
  * Gets or sets ticks interval value.
  * @param {number=} opt_value Ticks interval value if used as a getter.
@@ -87,9 +95,10 @@ anychart.scales.OrdinalTicks.prototype.autoNames_ = null;
  */
 anychart.scales.OrdinalTicks.prototype.interval = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = Math.round(opt_value) || 1;
-    if (this.interval_ != opt_value) {
-      this.interval_ = opt_value;
+    var value = anychart.utils.normalizeToNaturalNumber(opt_value, NaN);
+    if (!isNaN(value) && this.interval_ != value) {
+      this.interval_ = value;
+      this.maxCount_ = NaN;
       this.explicit_ = null;
       this.explicitIndexes_ = null;
       this.autoTicks_ = null;
@@ -99,6 +108,29 @@ anychart.scales.OrdinalTicks.prototype.interval = function(opt_value) {
     return this;
   }
   return this.interval_;
+};
+
+
+/**
+ * Getter/setter for max ticks count.
+ * @param {number=} opt_value
+ * @return {(number|anychart.scales.OrdinalTicks)}
+ */
+anychart.scales.OrdinalTicks.prototype.maxCount = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var value = anychart.utils.normalizeToNaturalNumber(opt_value, NaN);
+    if (!isNaN(value) && this.maxCount_ != value) {
+      this.maxCount_ = value;
+      this.interval_ = NaN;
+      this.explicit_ = null;
+      this.explicitIndexes_ = null;
+      this.autoTicks_ = null;
+      this.autoNames_ = null;
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+    }
+    return this;
+  }
+  return this.maxCount_;
 };
 
 
@@ -243,8 +275,15 @@ anychart.scales.OrdinalTicks.prototype.getInternal = function() {
  * @return {!Array.<number>}
  */
 anychart.scales.OrdinalTicks.prototype.calcAutoTicks = function() {
+  var interval;
+  var len = this.scale.values().length;
+  if (isNaN(this.interval_)) {
+    interval = Math.ceil(len / this.maxCount_) || 1;
+  } else {
+    interval = this.interval_;
+  }
   var res = [];
-  for (var i = 0, len = this.scale.values().length; i < len; i += this.interval_) {
+  for (var i = 0; i < len; i += interval) {
     res.push(i);
   }
   return res;
@@ -296,6 +335,8 @@ anychart.scales.OrdinalTicks.prototype.serialize = function() {
   var json = anychart.scales.OrdinalTicks.base(this, 'serialize');
   if (this.explicitIndexes_)
     json['explicit'] = this.explicitIndexes_;
+  else if (!isNaN(this.maxCount_))
+    json[anychart.opt.MAX_COUNT] = this.maxCount_;
   else if (!isNaN(this.interval_))
     json['interval'] = this.interval_;
   if (this.names_)
@@ -322,6 +363,8 @@ anychart.scales.OrdinalTicks.prototype.setupByJSON = function(config, opt_defaul
     this.set(config['explicit']);
   else if ('interval' in config)
     this.interval(config['interval']);
+  else if (anychart.opt.MAX_COUNT in config)
+    this.maxCount(config[anychart.opt.MAX_COUNT]);
   this.names_ = config['names'] || null;
   this.autoTicks_ = null;
   this.autoNames_ = null;
@@ -332,6 +375,7 @@ anychart.scales.OrdinalTicks.prototype.setupByJSON = function(config, opt_defaul
 (function() {
   var proto = anychart.scales.OrdinalTicks.prototype;
   proto['interval'] = proto.interval;//doc|ex
+  proto['maxCount'] = proto.maxCount;
   proto['set'] = proto.set;//doc|ex
   proto['get'] = proto.get;//doc|ex
   proto['names'] = proto.names;//doc|ex

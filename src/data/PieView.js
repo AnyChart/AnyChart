@@ -134,6 +134,12 @@ anychart.data.PieView.prototype.getRowMapping = function(rowIndex) {
 
 
 /** @inheritDoc */
+anychart.data.PieView.prototype.getMappings = function() {
+  return goog.array.concat(this.parentView.getMappings(), this.otherPointView_);
+};
+
+
+/** @inheritDoc */
 anychart.data.PieView.prototype.row = function(rowIndex, opt_value) {
   this.ensureConsistent();
   var len = (this.mask ? this.mask.length : this.parentView.getRowsCount());

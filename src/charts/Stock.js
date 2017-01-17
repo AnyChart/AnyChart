@@ -874,6 +874,7 @@ anychart.charts.Stock.prototype.drawContent = function(bounds) {
 
   // means that stock selection range needs to be updated
   if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_DATA)) {
+    anychart.performance.start('Stock data calc');
     var xScale = /** @type {anychart.scales.StockScatterDateTime} */(this.xScale());
     var scrollerXScale = /** @type {anychart.scales.StockScatterDateTime} */(this.scroller().xScale());
     var changed = this.dataController_.refreshSelection(this.minPlotsDrawingWidth_);
@@ -889,14 +890,18 @@ anychart.charts.Stock.prototype.drawContent = function(bounds) {
       this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER);
     }
     this.markConsistent(anychart.ConsistencyState.STOCK_DATA);
+    anychart.performance.end('Stock data calc');
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_SCALES)) {
+    anychart.performance.start('Stock scales calc');
     this.calculateScales_();
     this.markConsistent(anychart.ConsistencyState.STOCK_SCALES);
+    anychart.performance.end('Stock scales calc');
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_SCROLLER)) {
+    anychart.performance.start('Stock drawing scroller');
     // we created scroller at least at STOCK_DATA this.scroller().xScale() call
     this.scroller()
         .setRangeByValues(
@@ -905,9 +910,11 @@ anychart.charts.Stock.prototype.drawContent = function(bounds) {
         .container(this.rootElement)
         .draw();
     this.markConsistent(anychart.ConsistencyState.STOCK_SCROLLER);
+    anychart.performance.end('Stock drawing scroller');
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.STOCK_PLOTS_APPEARANCE)) {
+    anychart.performance.start('Stock drawing plots');
     for (var i = 0; i < this.plots_.length; i++) {
       var plot = this.plots_[i];
       if (plot) {
@@ -917,6 +924,7 @@ anychart.charts.Stock.prototype.drawContent = function(bounds) {
       }
     }
     this.markConsistent(anychart.ConsistencyState.STOCK_PLOTS_APPEARANCE);
+    anychart.performance.end('Stock drawing plots');
   }
 
   this.refreshHighlight_();

@@ -1219,7 +1219,7 @@ goog.provide('anychart.themes.defaultTheme');
           'pointWidth': null,
           'connectMissingPoints': false,
           'a11y': {
-            'enabled': true,
+            'enabled': false,
             'titleFormatter': 'Series named {%SeriesName} with {%SeriesPointsCount} points. Min value is {%SeriesYMin}, max value is {%SeriesYMax}'
           }
         },
@@ -1771,7 +1771,8 @@ goog.provide('anychart.themes.defaultTheme');
           'inverted': false,
           'names': [],
           'ticks': {
-            'interval': 1
+            // 'interval': 1,
+            'maxCount': 100
           }
         },
         {
@@ -1848,7 +1849,8 @@ goog.provide('anychart.themes.defaultTheme');
           'inverted': true,
           'names': [],
           'ticks': {
-            'interval': 1
+            // 'interval': 1,
+            'maxCount': 100
           }
         },
         {
@@ -1993,7 +1995,8 @@ goog.provide('anychart.themes.defaultTheme');
           'inverted': true,
           'names': [],
           'ticks': {
-            'interval': 1
+            // 'interval': 1,
+            'maxCount': 100
           }
         },
         {
@@ -2045,7 +2048,8 @@ goog.provide('anychart.themes.defaultTheme');
           'inverted': true,
           'names': [],
           'ticks': {
-            'interval': 1
+            // 'interval': 1,
+            'maxCount': 100
           }
         },
         {
@@ -2345,7 +2349,7 @@ goog.provide('anychart.themes.defaultTheme');
           'xScale': null,
           'yScale': null,
           'a11y': {
-            'enabled': true,
+            'enabled': false,
             'titleFormatter': 'Series named {%SeriesName} with {%SeriesPointsCount} points. Min value is {%SeriesYMin}, max value is {%SeriesYMax}'
           }
         },
@@ -2479,7 +2483,7 @@ goog.provide('anychart.themes.defaultTheme');
           'enabled': true,
           'hatchFill': null,
           'a11y': {
-            'enabled': true,
+            'enabled': false,
             'titleFormatter': 'Series named {%SeriesName} with {%SeriesPointsCount} points. Min value is {%SeriesYMin}, max value is {%SeriesYMax}'
           }
         },
@@ -2500,7 +2504,8 @@ goog.provide('anychart.themes.defaultTheme');
           'inverted': false,
           'names': [],
           'ticks': {
-            'interval': 1
+            // 'interval': 1,
+            'maxCount': 100
           }
         },
         {
@@ -2753,7 +2758,8 @@ goog.provide('anychart.themes.defaultTheme');
           'inverted': false,
           'names': [],
           'ticks': {
-            'interval': 1
+            // 'interval': 1,
+            'maxCount': 100
           }
         },
         {
@@ -3354,7 +3360,8 @@ goog.provide('anychart.themes.defaultTheme');
           'type': 'ordinalColor',
           'inverted': false,
           'ticks': {
-            'interval': 1
+            // 'interval': 1,
+            'maxCount': 100
           }
         },
         'points': [
@@ -3459,7 +3466,8 @@ goog.provide('anychart.themes.defaultTheme');
             'type': 'ordinalColor',
             'inverted': false,
             'ticks': {
-              'interval': 1
+              // 'interval': 1,
+              'maxCount': 100
             }
           }
         }
@@ -3478,7 +3486,8 @@ goog.provide('anychart.themes.defaultTheme');
           'inverted': false,
           'names': [],
           'ticks': {
-            'interval': 1
+            // 'interval': 1,
+            'maxCount': 100
           }
         },
         {
@@ -3486,7 +3495,8 @@ goog.provide('anychart.themes.defaultTheme');
           'inverted': true,
           'names': [],
           'ticks': {
-            'interval': 1
+            // 'interval': 1,
+            'maxCount': 100
           }
         },
         {

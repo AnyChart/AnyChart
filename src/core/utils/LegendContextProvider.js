@@ -21,8 +21,11 @@ anychart.core.utils.LegendContextProvider = function(opt_source) {
  * @return {*}
  */
 anychart.core.utils.LegendContextProvider.prototype.getStat = function(opt_key) {
-  if (this.source_.statistics)
+  if (this.source_.statistics) {
+    if (this.source_.chart)
+      this.source_.chart.ensureStatisticsReady();
     return this.source_.statistics(opt_key);
+  }
 };
 
 

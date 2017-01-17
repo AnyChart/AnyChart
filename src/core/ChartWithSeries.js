@@ -162,7 +162,8 @@ anychart.core.ChartWithSeries.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.SERIES_CHART_SCALES |
     anychart.ConsistencyState.SERIES_CHART_SCALE_MAPS |
     anychart.ConsistencyState.SERIES_CHART_Y_SCALES |
-    anychart.ConsistencyState.SERIES_CHART_SERIES;
+    anychart.ConsistencyState.SERIES_CHART_SERIES |
+    anychart.ConsistencyState.SERIES_CHART_STATISTICS;
 
 
 /**
@@ -937,10 +938,18 @@ anychart.core.ChartWithSeries.prototype.hatchFillPaletteInvalidated_ = function(
 //  Calculations
 //
 //----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.core.ChartWithSeries.prototype.ensureStatisticsReady = function() {
+  this.calculate();
+  this.calculateStatistics();
+};
+
+
 /**
  * Performs full calculations of drawing plans and statistics.
  */
 anychart.core.ChartWithSeries.prototype.calculate = function() {
+  anychart.performance.start('Scale calculations');
   this.suspendSignalsDispatching();
   this.makeScaleMaps();
   if (this.categorizeData) {
@@ -951,6 +960,7 @@ anychart.core.ChartWithSeries.prototype.calculate = function() {
     this.calculateXYScales();
   }
   this.resumeSignalsDispatching(false);
+  anychart.performance.end('Scale calculations');
 };
 
 
@@ -959,6 +969,7 @@ anychart.core.ChartWithSeries.prototype.calculate = function() {
  */
 anychart.core.ChartWithSeries.prototype.makeScaleMaps = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_CHART_SCALE_MAPS)) {
+    anychart.performance.start('Scale maps gathering');
     anychart.core.Base.suspendSignalsDispatching(this.seriesList);
     var i, series;
     var seriesCount = this.seriesList.length;
@@ -993,6 +1004,7 @@ anychart.core.ChartWithSeries.prototype.makeScaleMaps = function() {
     }
     anychart.core.Base.resumeSignalsDispatchingFalse(this.seriesList);
     this.markConsistent(anychart.ConsistencyState.SERIES_CHART_SCALE_MAPS);
+    anychart.performance.end('Scale maps gathering');
   }
 };
 
@@ -1002,8 +1014,7 @@ anychart.core.ChartWithSeries.prototype.makeScaleMaps = function() {
  */
 anychart.core.ChartWithSeries.prototype.calculateXScales = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_CHART_SCALES)) {
-    this.statistics = {};
-    anychart.performance.start('x scales calculation');
+    anychart.performance.start('X scales and drawing plan calculation');
     var i, j, series;
     var xScale;
     var seriesCount = this.seriesList.length;
@@ -1288,7 +1299,7 @@ anychart.core.ChartWithSeries.prototype.calculateXScales = function() {
         xScale.finishAutoCalc();
     }
     this.markConsistent(anychart.ConsistencyState.SERIES_CHART_SCALES);
-    anychart.performance.end('x scales calculation');
+    anychart.performance.end('X scales and drawing plan calculation');
   }
 };
 
@@ -1298,7 +1309,7 @@ anychart.core.ChartWithSeries.prototype.calculateXScales = function() {
  */
 anychart.core.ChartWithSeries.prototype.calculateYScales = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_CHART_Y_SCALES)) {
-    anychart.performance.start('y scales calculation');
+    anychart.performance.start('Y scales calculation');
     var i, j, series;
     var yScale;
     var drawingPlan, drawingPlans, drawingPlansByYScale, uid, point;
@@ -1534,10 +1545,10 @@ anychart.core.ChartWithSeries.prototype.calculateYScales = function() {
         yScale.finishAutoCalc();
     }
 
-    anychart.performance.end('y scales calculation');
 
-    this.calculateStatistics();
+    this.invalidate(anychart.ConsistencyState.SERIES_CHART_STATISTICS);
     this.markConsistent(anychart.ConsistencyState.SERIES_CHART_Y_SCALES);
+    anychart.performance.end('Y scales calculation');
   }
 };
 
@@ -1549,6 +1560,7 @@ anychart.core.ChartWithSeries.prototype.calculateXYScales = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_CHART_SCALES |
           anychart.ConsistencyState.SERIES_CHART_Y_SCALES)) {
 
+    anychart.performance.start('X scales, drawing plans and Y scales calculation');
     anychart.core.Base.suspendSignalsDispatching(this.seriesList);
     var i, j, k, series;
     var xScale, yScale;
@@ -1627,10 +1639,11 @@ anychart.core.ChartWithSeries.prototype.calculateXYScales = function() {
         yScale.finishAutoCalc();
     }
 
-    this.calculateStatistics();
+    this.invalidate(anychart.ConsistencyState.SERIES_CHART_STATISTICS);
 
     anychart.core.Base.resumeSignalsDispatchingFalse(this.seriesList);
     this.markConsistent(anychart.ConsistencyState.SERIES_CHART_SCALES | anychart.ConsistencyState.SERIES_CHART_Y_SCALES);
+    anychart.performance.end('X scales, drawing plans and Y scales calculation');
   }
 };
 
@@ -1639,301 +1652,310 @@ anychart.core.ChartWithSeries.prototype.calculateXYScales = function() {
  * Calculates all statistics for the chart.
  */
 anychart.core.ChartWithSeries.prototype.calculateStatistics = function() {
-  anychart.performance.start('statistics calculation');
+  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_CHART_STATISTICS)) {
+    anychart.performance.start('Statistics calculation');
 
-  this.statistics = {};
-  //category statistics calculation.
-  var totalPointsCount = 0;
-  var totalYSum = 0;
-  var totalYMax = -Infinity;
-  var totalYMin = Infinity;
-  var totalMaxYSum = -Infinity;
-  var totalMinYSum = Infinity;
-  var maxYSeriesName, minYSeriesName;
-  var maxYSumSeriesName, minYSumSeriesName;
-  var totalXSum = 0;
-  var totalXMax = -Infinity;
-  var totalXMin = Infinity;
-  var totalMaxXSum = -Infinity;
-  var totalMinXSum = Infinity;
-  var maxXSeriesName, minXSeriesName;
-  var maxXSumSeriesName, minXSumSeriesName;
-  var totalSizeSum = 0;
-  var totalSizeMax = -Infinity;
-  var totalSizeMin = Infinity;
-  var hasBubbleSeries = false;
+    this.statistics = {};
+    //category statistics calculation.
+    var totalPointsCount = 0;
+    var totalYSum = 0;
+    var totalYMax = -Infinity;
+    var totalYMin = Infinity;
+    var totalMaxYSum = -Infinity;
+    var totalMinYSum = Infinity;
+    var maxYSeriesName, minYSeriesName;
+    var maxYSumSeriesName, minYSumSeriesName;
+    var totalXSum = 0;
+    var totalXMax = -Infinity;
+    var totalXMin = Infinity;
+    var totalMaxXSum = -Infinity;
+    var totalMinXSum = Infinity;
+    var maxXSeriesName, minXSeriesName;
+    var maxXSumSeriesName, minXSumSeriesName;
+    var totalSizeSum = 0;
+    var totalSizeMax = -Infinity;
+    var totalSizeMin = Infinity;
+    var hasBubbleSeries = false;
 
-  for (var i in this.drawingPlansByXScale_) { //iterating by scales.
-    var plans = this.drawingPlansByXScale_[i];
+    for (var i in this.drawingPlansByXScale_) { //iterating by scales.
+      var plans = this.drawingPlansByXScale_[i];
 
-    var len, valsArr;
-    if (this.categorizeData) {
-      len = plans[0].data.length;
-      valsArr = new Array(len);
-      for (var ii = 0; ii < len; ii++) valsArr[ii] = [];
-    }
-
-    var plan, ser;
-    var isRangeSeries, isBubbleSeries;
-
-    //iterating by plans for each series.
-    for (var j = 0; j < plans.length; j++) {
-      plan = plans[j];
-      ser = plan.series;
-      if (!ser || !ser.enabled()) continue;
-
-      var sName = ser.name();
-      var seriesValues = [];
-      var seriesXes = [];
-      var seriesSizes = [];
-      isRangeSeries = ser.check(anychart.core.drawers.Capabilities.IS_RANGE_BASED | anychart.core.drawers.Capabilities.IS_OHLC_BASED);
-      isBubbleSeries = ser.isSizeBased();
-      if (isBubbleSeries) hasBubbleSeries = true;
-
-      var pointsCount = 0;
-      var seriesYMin = Infinity;
-      var seriesYMax = -Infinity;
-      var seriesYSum = 0;
-      var seriesRangeMin = Infinity;
-      var seriesRangeMax = -Infinity;
-      var seriesXMin = Infinity;
-      var seriesXMax = -Infinity;
-      var seriesXSum = 0;
-      var seriesSizeMin = Infinity;
-      var seriesSizeMax = -Infinity;
-      var seriesSizeSum = 0;
-
-      for (var d = 0; d < plan.data.length; d++) { //iterating by points in series.
-        var pointObj = plan.data[d];
-        var pointVal = NaN;
-
-        if (!anychart.core.series.filterPointAbsenceReason(pointObj.meta[anychart.opt.MISSING],
-            anychart.core.series.PointAbsenceReason.ARTIFICIAL_POINT))
-          pointsCount++;
-        if (!anychart.core.series.filterPointAbsenceReason(pointObj.meta[anychart.opt.MISSING],
-            anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
-          if (isRangeSeries) {
-            pointVal = anychart.utils.toNumber(pointObj.data[anychart.opt.OPEN]);
-            if (!isNaN(pointVal)) {
-              seriesYMax = Math.max(pointVal, seriesYMax);
-              seriesYMin = Math.min(pointVal, seriesYMin);
-            }
-            pointVal = anychart.utils.toNumber(pointObj.data[anychart.opt.CLOSE]);
-            if (!isNaN(pointVal)) {
-              seriesYMax = Math.max(pointVal, seriesYMax);
-              seriesYMin = Math.min(pointVal, seriesYMin);
-            }
-            var h = anychart.utils.toNumber(pointObj.data[anychart.opt.HIGH]);
-            var l = anychart.utils.toNumber(pointObj.data[anychart.opt.LOW]);
-            seriesYMax = Math.max(h, l, seriesYMax);
-            seriesYMin = Math.min(h, l, seriesYMin);
-            pointVal = h - l;
-            seriesRangeMax = Math.max(pointVal, seriesRangeMax);
-            seriesRangeMin = Math.min(pointVal, seriesRangeMin);
-          } else {
-            if (isBubbleSeries) {
-              pointVal = anychart.utils.toNumber(pointObj.data[anychart.opt.SIZE]);
-              seriesSizeMax = Math.max(pointVal, seriesSizeMax);
-              seriesSizeMin = Math.min(pointVal, seriesSizeMin);
-              seriesSizeSum += pointVal;
-              seriesSizes.push(pointVal);
-            }
-            pointVal = anychart.utils.toNumber(pointObj.data[anychart.opt.VALUE]);
-            seriesYMax = Math.max(pointVal, seriesYMax);
-            seriesYMin = Math.min(pointVal, seriesYMin);
-          }
-
-          seriesYSum += pointVal;
-          seriesValues.push(pointVal);
-          if (this.categorizeData) {
-            valsArr[d].push(pointVal);
-          } else {
-            pointVal = anychart.utils.toNumber(pointObj.data[anychart.opt.X]);
-            seriesXMax = Math.max(pointVal, seriesXMax);
-            seriesXMin = Math.min(pointVal, seriesXMin);
-            seriesXSum += pointVal;
-            seriesXes.push(pointVal);
-          }
-        }
+      var len, valsArr;
+      if (this.categorizeData) {
+        anychart.performance.start('Statistics categorize init cycle');
+        len = plans[0].data.length;
+        valsArr = new Array(len);
+        for (var ii = 0; ii < len; ii++) valsArr[ii] = [];
+        anychart.performance.end('Statistics categorize init cycle');
       }
 
-      totalPointsCount += pointsCount;
-      totalYSum += seriesYSum;
-      if (seriesYMax > totalYMax) {
-        totalYMax = seriesYMax;
-        maxYSeriesName = sName;
-      }
-      if (seriesYMin < totalYMin) {
-        totalYMin = seriesYMin;
-        minYSeriesName = sName;
-      }
-      if (seriesYSum > totalMaxYSum) {
-        totalMaxYSum = seriesYSum;
-        maxYSumSeriesName = sName;
-      }
-      if (seriesYSum < totalMinYSum) {
-        totalMinYSum = seriesYSum;
-        minYSumSeriesName = sName;
-      }
-      totalXSum += seriesXSum;
-      if (seriesXMax > totalXMax) {
-        totalXMax = seriesXMax;
-        maxXSeriesName = sName;
-      }
-      if (seriesXMin < totalXMin) {
-        totalXMin = seriesXMin;
-        minXSeriesName = sName;
-      }
-      if (seriesXSum > totalMaxXSum) {
-        totalMaxXSum = seriesXSum;
-        maxXSumSeriesName = sName;
-      }
-      if (seriesXSum < totalMinXSum) {
-        totalMinXSum = seriesXSum;
-        minXSumSeriesName = sName;
-      }
+      var plan, ser;
+      var isRangeSeries, isBubbleSeries;
 
-      var avg = pointsCount ? seriesYSum / pointsCount : 0;
-      ser.statistics(anychart.enums.Statistics.SERIES_SUM, seriesYSum);
-      ser.statistics(anychart.enums.Statistics.SERIES_MIN, seriesYMin);
-      ser.statistics(anychart.enums.Statistics.SERIES_MAX, seriesYMax);
-      ser.statistics(anychart.enums.Statistics.SERIES_AVERAGE, avg);
-      ser.statistics(anychart.enums.Statistics.SERIES_POINTS_COUNT, pointsCount);
-      ser.statistics(anychart.enums.Statistics.SERIES_POINT_COUNT, pointsCount);
-
-      ser.statistics(anychart.enums.Statistics.SUM, seriesYSum);
-      ser.statistics(anychart.enums.Statistics.MAX, seriesYMax);
-      ser.statistics(anychart.enums.Statistics.MIN, seriesYMin);
-      ser.statistics(anychart.enums.Statistics.AVERAGE, avg);
-      ser.statistics(anychart.enums.Statistics.POINTS_COUNT, pointsCount);
-
-      if (isRangeSeries) {
-        ser.statistics(anychart.enums.Statistics.SERIES_Y_RANGE_MAX, seriesRangeMax);
-        ser.statistics(anychart.enums.Statistics.SERIES_Y_RANGE_MIN, seriesRangeMin);
-        ser.statistics(anychart.enums.Statistics.SERIES_Y_RANGE_SUM, seriesYSum);
-        ser.statistics(anychart.enums.Statistics.SERIES_Y_RANGE_AVERAGE, avg);
-        ser.statistics(anychart.enums.Statistics.SERIES_Y_RANGE_MODE, anychart.math.mode(seriesValues));
-        ser.statistics(anychart.enums.Statistics.SERIES_Y_RANGE_MEDIAN, anychart.math.median(seriesValues));
-      } else {
-        if (isBubbleSeries) {
-          ser.statistics(anychart.enums.Statistics.SERIES_BUBBLE_MAX_SIZE, seriesSizeMax);
-          ser.statistics(anychart.enums.Statistics.SERIES_BUBBLE_MIN_SIZE, seriesSizeMin);
-          ser.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_SUM, seriesSizeSum);
-          ser.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_AVERAGE, pointsCount ? seriesSizeSum / pointsCount : 0);
-          ser.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_MODE, anychart.math.mode(seriesSizes));
-          ser.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_MEDIAN, anychart.math.median(seriesSizes));
-          totalSizeSum += seriesSizeSum;
-          totalSizeMax = Math.max(totalSizeMax, seriesSizeMax);
-          totalSizeMin = Math.min(totalSizeMin, seriesSizeMin);
-        }
-        ser.statistics(anychart.enums.Statistics.SERIES_Y_MAX, seriesYMax);
-        ser.statistics(anychart.enums.Statistics.SERIES_Y_MIN, seriesYMin);
-        ser.statistics(anychart.enums.Statistics.SERIES_Y_SUM, seriesYSum);
-        ser.statistics(anychart.enums.Statistics.SERIES_FIRST_Y_VALUE, seriesValues[0]);
-        ser.statistics(anychart.enums.Statistics.SERIES_LAST_Y_VALUE, seriesValues[seriesValues.length - 1]);
-        ser.statistics(anychart.enums.Statistics.SERIES_Y_AVERAGE, avg);
-        ser.statistics(anychart.enums.Statistics.SERIES_Y_MODE, anychart.math.mode(seriesValues));
-        ser.statistics(anychart.enums.Statistics.SERIES_Y_MEDIAN, anychart.math.median(seriesValues));
-      }
-
-      if (!this.categorizeData) {
-        ser.statistics(anychart.enums.Statistics.SERIES_X_MAX, seriesXMax);
-        ser.statistics(anychart.enums.Statistics.SERIES_X_MIN, seriesXMin);
-        ser.statistics(anychart.enums.Statistics.SERIES_X_SUM, seriesXSum);
-        ser.statistics(anychart.enums.Statistics.SERIES_FIRST_X_VALUE, seriesXes[0]);
-        ser.statistics(anychart.enums.Statistics.SERIES_LAST_X_VALUE, seriesXes[seriesValues.length - 1]);
-        ser.statistics(anychart.enums.Statistics.SERIES_X_AVERAGE, pointsCount ? seriesXSum / pointsCount : 0);
-        ser.statistics(anychart.enums.Statistics.SERIES_X_MODE, anychart.math.mode(seriesXes));
-        ser.statistics(anychart.enums.Statistics.SERIES_X_MEDIAN, anychart.math.median(seriesXes));
-      }
-    }
-
-    if (this.categorizeData) {
-      var catSumArr = new Array(len);
-      var catYMinArr = new Array(len);
-      var catYMaxArr = new Array(len);
-
-      var catYAvgArr = new Array(len);
-      var catYMedArr = new Array(len);
-      var catYModArr = new Array(len);
-
-      for (d = 0; d < len; d++) {
-        var catValues = valsArr[d];
-        var catYSum = 0;
-        var catYMin = Infinity;
-        var catYMax = -Infinity;
-
-        for (var v = 0; v < catValues.length; v++) {
-          var temp = catValues[v];
-          catYSum += temp;
-          catYMin = Math.min(catYMin, temp);
-          catYMax = Math.max(catYMax, temp);
-        }
-
-        catSumArr[d] = catYSum;
-        catYMinArr[d] = catYMin;
-        catYMaxArr[d] = catYMax;
-        catYAvgArr[d] = catYSum / catValues.length;
-        catYMedArr[d] = anychart.math.median(catValues);
-        catYModArr[d] = anychart.math.mode(catValues);
-      }
-
-      for (j = 0; j < plans.length; j++) {
+      //iterating by plans for each series.
+      for (var j = 0; j < plans.length; j++) {
         plan = plans[j];
         ser = plan.series;
         if (!ser || !ser.enabled()) continue;
+
+        var sName = ser.name();
+        var seriesValues = [];
+        var seriesXes = [];
+        var seriesSizes = [];
         isRangeSeries = ser.check(anychart.core.drawers.Capabilities.IS_RANGE_BASED | anychart.core.drawers.Capabilities.IS_OHLC_BASED);
+        isBubbleSeries = ser.isSizeBased();
+        if (isBubbleSeries) hasBubbleSeries = true;
+
+        var pointsCount = 0;
+        var seriesYMin = Infinity;
+        var seriesYMax = -Infinity;
+        var seriesYSum = 0;
+        var seriesRangeMin = Infinity;
+        var seriesRangeMax = -Infinity;
+        var seriesXMin = Infinity;
+        var seriesXMax = -Infinity;
+        var seriesXSum = 0;
+        var seriesSizeMin = Infinity;
+        var seriesSizeMax = -Infinity;
+        var seriesSizeSum = 0;
+
+        anychart.performance.start('Statistics main cycle');
+        for (var d = 0; d < plan.data.length; d++) { //iterating by points in series.
+          var pointObj = plan.data[d];
+          var pointVal = NaN;
+
+          if (!anychart.core.series.filterPointAbsenceReason(pointObj.meta[anychart.opt.MISSING],
+              anychart.core.series.PointAbsenceReason.ARTIFICIAL_POINT))
+            pointsCount++;
+          if (!anychart.core.series.filterPointAbsenceReason(pointObj.meta[anychart.opt.MISSING],
+              anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
+            if (isRangeSeries) {
+              pointVal = anychart.utils.toNumber(pointObj.data[anychart.opt.OPEN]);
+              if (!isNaN(pointVal)) {
+                seriesYMax = Math.max(pointVal, seriesYMax);
+                seriesYMin = Math.min(pointVal, seriesYMin);
+              }
+              pointVal = anychart.utils.toNumber(pointObj.data[anychart.opt.CLOSE]);
+              if (!isNaN(pointVal)) {
+                seriesYMax = Math.max(pointVal, seriesYMax);
+                seriesYMin = Math.min(pointVal, seriesYMin);
+              }
+              var h = anychart.utils.toNumber(pointObj.data[anychart.opt.HIGH]);
+              var l = anychart.utils.toNumber(pointObj.data[anychart.opt.LOW]);
+              seriesYMax = Math.max(h, l, seriesYMax);
+              seriesYMin = Math.min(h, l, seriesYMin);
+              pointVal = h - l;
+              seriesRangeMax = Math.max(pointVal, seriesRangeMax);
+              seriesRangeMin = Math.min(pointVal, seriesRangeMin);
+            } else {
+              if (isBubbleSeries) {
+                pointVal = anychart.utils.toNumber(pointObj.data[anychart.opt.SIZE]);
+                seriesSizeMax = Math.max(pointVal, seriesSizeMax);
+                seriesSizeMin = Math.min(pointVal, seriesSizeMin);
+                seriesSizeSum += pointVal;
+                seriesSizes.push(pointVal);
+              }
+              pointVal = anychart.utils.toNumber(pointObj.data[anychart.opt.VALUE]);
+              seriesYMax = Math.max(pointVal, seriesYMax);
+              seriesYMin = Math.min(pointVal, seriesYMin);
+            }
+
+            seriesYSum += pointVal;
+            seriesValues.push(pointVal);
+            if (this.categorizeData) {
+              valsArr[d].push(pointVal);
+            } else {
+              pointVal = anychart.utils.toNumber(pointObj.data[anychart.opt.X]);
+              seriesXMax = Math.max(pointVal, seriesXMax);
+              seriesXMin = Math.min(pointVal, seriesXMin);
+              seriesXSum += pointVal;
+              seriesXes.push(pointVal);
+            }
+          }
+        }
+        anychart.performance.end('Statistics main cycle');
+
+        totalPointsCount += pointsCount;
+        totalYSum += seriesYSum;
+        if (seriesYMax > totalYMax) {
+          totalYMax = seriesYMax;
+          maxYSeriesName = sName;
+        }
+        if (seriesYMin < totalYMin) {
+          totalYMin = seriesYMin;
+          minYSeriesName = sName;
+        }
+        if (seriesYSum > totalMaxYSum) {
+          totalMaxYSum = seriesYSum;
+          maxYSumSeriesName = sName;
+        }
+        if (seriesYSum < totalMinYSum) {
+          totalMinYSum = seriesYSum;
+          minYSumSeriesName = sName;
+        }
+        totalXSum += seriesXSum;
+        if (seriesXMax > totalXMax) {
+          totalXMax = seriesXMax;
+          maxXSeriesName = sName;
+        }
+        if (seriesXMin < totalXMin) {
+          totalXMin = seriesXMin;
+          minXSeriesName = sName;
+        }
+        if (seriesXSum > totalMaxXSum) {
+          totalMaxXSum = seriesXSum;
+          maxXSumSeriesName = sName;
+        }
+        if (seriesXSum < totalMinXSum) {
+          totalMinXSum = seriesXSum;
+          minXSumSeriesName = sName;
+        }
+
+        var avg = pointsCount ? seriesYSum / pointsCount : 0;
+        ser.statistics(anychart.enums.Statistics.SERIES_SUM, seriesYSum);
+        ser.statistics(anychart.enums.Statistics.SERIES_MIN, seriesYMin);
+        ser.statistics(anychart.enums.Statistics.SERIES_MAX, seriesYMax);
+        ser.statistics(anychart.enums.Statistics.SERIES_AVERAGE, avg);
+        ser.statistics(anychart.enums.Statistics.SERIES_POINTS_COUNT, pointsCount);
+        ser.statistics(anychart.enums.Statistics.SERIES_POINT_COUNT, pointsCount);
+
+        ser.statistics(anychart.enums.Statistics.SUM, seriesYSum);
+        ser.statistics(anychart.enums.Statistics.MAX, seriesYMax);
+        ser.statistics(anychart.enums.Statistics.MIN, seriesYMin);
+        ser.statistics(anychart.enums.Statistics.AVERAGE, avg);
+        ser.statistics(anychart.enums.Statistics.POINTS_COUNT, pointsCount);
 
         if (isRangeSeries) {
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_SUM_ARR_, catSumArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MIN_ARR_, catYMinArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MAX_ARR_, catYMaxArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_AVG_ARR_, catYAvgArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MEDIAN_ARR_, catYMedArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MODE_ARR_, catYModArr);
+          ser.statistics(anychart.enums.Statistics.SERIES_Y_RANGE_MAX, seriesRangeMax);
+          ser.statistics(anychart.enums.Statistics.SERIES_Y_RANGE_MIN, seriesRangeMin);
+          ser.statistics(anychart.enums.Statistics.SERIES_Y_RANGE_SUM, seriesYSum);
+          ser.statistics(anychart.enums.Statistics.SERIES_Y_RANGE_AVERAGE, avg);
+          ser.statistics(anychart.enums.Statistics.SERIES_Y_RANGE_MODE, anychart.math.mode(seriesValues));
+          ser.statistics(anychart.enums.Statistics.SERIES_Y_RANGE_MEDIAN, anychart.math.median(seriesValues));
         } else {
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_SUM_ARR_, catSumArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_MIN_ARR_, catYMinArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_MAX_ARR_, catYMaxArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_AVG_ARR_, catYAvgArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_MEDIAN_ARR_, catYMedArr);
-          ser.statistics(anychart.enums.Statistics.CATEGORY_Y_MODE_ARR_, catYModArr);
+          if (isBubbleSeries) {
+            ser.statistics(anychart.enums.Statistics.SERIES_BUBBLE_MAX_SIZE, seriesSizeMax);
+            ser.statistics(anychart.enums.Statistics.SERIES_BUBBLE_MIN_SIZE, seriesSizeMin);
+            ser.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_SUM, seriesSizeSum);
+            ser.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_AVERAGE, pointsCount ? seriesSizeSum / pointsCount : 0);
+            ser.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_MODE, anychart.math.mode(seriesSizes));
+            ser.statistics(anychart.enums.Statistics.SERIES_BUBBLE_SIZE_MEDIAN, anychart.math.median(seriesSizes));
+            totalSizeSum += seriesSizeSum;
+            totalSizeMax = Math.max(totalSizeMax, seriesSizeMax);
+            totalSizeMin = Math.min(totalSizeMin, seriesSizeMin);
+          }
+          ser.statistics(anychart.enums.Statistics.SERIES_Y_MAX, seriesYMax);
+          ser.statistics(anychart.enums.Statistics.SERIES_Y_MIN, seriesYMin);
+          ser.statistics(anychart.enums.Statistics.SERIES_Y_SUM, seriesYSum);
+          ser.statistics(anychart.enums.Statistics.SERIES_FIRST_Y_VALUE, seriesValues[0]);
+          ser.statistics(anychart.enums.Statistics.SERIES_LAST_Y_VALUE, seriesValues[seriesValues.length - 1]);
+          ser.statistics(anychart.enums.Statistics.SERIES_Y_AVERAGE, avg);
+          ser.statistics(anychart.enums.Statistics.SERIES_Y_MODE, anychart.math.mode(seriesValues));
+          ser.statistics(anychart.enums.Statistics.SERIES_Y_MEDIAN, anychart.math.median(seriesValues));
+        }
+
+        if (!this.categorizeData) {
+          ser.statistics(anychart.enums.Statistics.SERIES_X_MAX, seriesXMax);
+          ser.statistics(anychart.enums.Statistics.SERIES_X_MIN, seriesXMin);
+          ser.statistics(anychart.enums.Statistics.SERIES_X_SUM, seriesXSum);
+          ser.statistics(anychart.enums.Statistics.SERIES_FIRST_X_VALUE, seriesXes[0]);
+          ser.statistics(anychart.enums.Statistics.SERIES_LAST_X_VALUE, seriesXes[seriesValues.length - 1]);
+          ser.statistics(anychart.enums.Statistics.SERIES_X_AVERAGE, pointsCount ? seriesXSum / pointsCount : 0);
+          ser.statistics(anychart.enums.Statistics.SERIES_X_MODE, anychart.math.mode(seriesXes));
+          ser.statistics(anychart.enums.Statistics.SERIES_X_MEDIAN, anychart.math.median(seriesXes));
         }
       }
+
+      if (this.categorizeData) {
+        anychart.performance.start('Statistics categorize cycle');
+        var catSumArr = new Array(len);
+        var catYMinArr = new Array(len);
+        var catYMaxArr = new Array(len);
+
+        var catYAvgArr = new Array(len);
+        var catYMedArr = new Array(len);
+        var catYModArr = new Array(len);
+
+        for (d = 0; d < len; d++) {
+          var catValues = valsArr[d];
+          var catYSum = 0;
+          var catYMin = Infinity;
+          var catYMax = -Infinity;
+
+          for (var v = 0; v < catValues.length; v++) {
+            var temp = catValues[v];
+            catYSum += temp;
+            catYMin = Math.min(catYMin, temp);
+            catYMax = Math.max(catYMax, temp);
+          }
+
+          catSumArr[d] = catYSum;
+          catYMinArr[d] = catYMin;
+          catYMaxArr[d] = catYMax;
+          catYAvgArr[d] = catYSum / catValues.length;
+          catYMedArr[d] = anychart.math.median(catValues);
+          catYModArr[d] = anychart.math.mode(catValues);
+        }
+
+        for (j = 0; j < plans.length; j++) {
+          plan = plans[j];
+          ser = plan.series;
+          if (!ser || !ser.enabled()) continue;
+          isRangeSeries = ser.check(anychart.core.drawers.Capabilities.IS_RANGE_BASED | anychart.core.drawers.Capabilities.IS_OHLC_BASED);
+
+          if (isRangeSeries) {
+            ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_SUM_ARR_, catSumArr);
+            ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MIN_ARR_, catYMinArr);
+            ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MAX_ARR_, catYMaxArr);
+            ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_AVG_ARR_, catYAvgArr);
+            ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MEDIAN_ARR_, catYMedArr);
+            ser.statistics(anychart.enums.Statistics.CATEGORY_Y_RANGE_MODE_ARR_, catYModArr);
+          } else {
+            ser.statistics(anychart.enums.Statistics.CATEGORY_Y_SUM_ARR_, catSumArr);
+            ser.statistics(anychart.enums.Statistics.CATEGORY_Y_MIN_ARR_, catYMinArr);
+            ser.statistics(anychart.enums.Statistics.CATEGORY_Y_MAX_ARR_, catYMaxArr);
+            ser.statistics(anychart.enums.Statistics.CATEGORY_Y_AVG_ARR_, catYAvgArr);
+            ser.statistics(anychart.enums.Statistics.CATEGORY_Y_MEDIAN_ARR_, catYMedArr);
+            ser.statistics(anychart.enums.Statistics.CATEGORY_Y_MODE_ARR_, catYModArr);
+          }
+        }
+      }
+      anychart.performance.end('Statistics categorize cycle');
     }
-  }
 
-  this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_SUM] = totalYSum;
-  this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_RANGE_SUM] = totalYSum;
-  this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_MAX] = totalYMax;
-  this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_RANGE_MAX] = totalYMax;
-  this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_MIN] = totalYMin;
-  this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_RANGE_MIN] = totalYMin;
-  this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_AVERAGE] = totalPointsCount ? totalYSum / totalPointsCount : 0;
-  this.statistics[anychart.enums.Statistics.DATA_PLOT_SERIES_COUNT] = this.drawingPlans_.length;
-  this.statistics[anychart.enums.Statistics.DATA_PLOT_POINT_COUNT] = totalPointsCount;
-  this.statistics[anychart.enums.Statistics.DATA_PLOT_MAX_Y_VALUE_POINT_SERIES_NAME] = maxYSeriesName;
-  this.statistics[anychart.enums.Statistics.DATA_PLOT_MIN_Y_VALUE_POINT_SERIES_NAME] = minYSeriesName;
-  this.statistics[anychart.enums.Statistics.DATA_PLOT_MAX_Y_SUM_SERIES_NAME] = maxYSumSeriesName;
-  this.statistics[anychart.enums.Statistics.DATA_PLOT_MIN_Y_SUM_SERIES_NAME] = minYSumSeriesName;
-  if (hasBubbleSeries) {
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_BUBBLE_SIZE_SUM] = totalSizeSum;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_BUBBLE_MIN_SIZE] = totalSizeMin;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_BUBBLE_MAX_SIZE] = totalSizeMax;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_BUBBLE_SIZE_AVERAGE] = totalPointsCount ? totalSizeSum / totalPointsCount : 0;
-  }
-  if (!this.categorizeData) {
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_X_SUM] = totalXSum;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_X_MAX] = totalXMax;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_X_MIN] = totalXMin;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_X_AVERAGE] = totalPointsCount ? totalXSum / totalPointsCount : 0;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_MAX_X_VALUE_POINT_SERIES_NAME] = maxXSeriesName;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_MIN_X_VALUE_POINT_SERIES_NAME] = minXSeriesName;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_MAX_X_SUM_SERIES_NAME] = maxXSumSeriesName;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_MIN_X_SUM_SERIES_NAME] = minXSumSeriesName;
-  }
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_SUM] = totalYSum;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_RANGE_SUM] = totalYSum;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_MAX] = totalYMax;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_RANGE_MAX] = totalYMax;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_MIN] = totalYMin;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_RANGE_MIN] = totalYMin;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_AVERAGE] = totalPointsCount ? totalYSum / totalPointsCount : 0;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_SERIES_COUNT] = this.drawingPlans_.length;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_POINT_COUNT] = totalPointsCount;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_MAX_Y_VALUE_POINT_SERIES_NAME] = maxYSeriesName;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_MIN_Y_VALUE_POINT_SERIES_NAME] = minYSeriesName;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_MAX_Y_SUM_SERIES_NAME] = maxYSumSeriesName;
+    this.statistics[anychart.enums.Statistics.DATA_PLOT_MIN_Y_SUM_SERIES_NAME] = minYSumSeriesName;
+    if (hasBubbleSeries) {
+      this.statistics[anychart.enums.Statistics.DATA_PLOT_BUBBLE_SIZE_SUM] = totalSizeSum;
+      this.statistics[anychart.enums.Statistics.DATA_PLOT_BUBBLE_MIN_SIZE] = totalSizeMin;
+      this.statistics[anychart.enums.Statistics.DATA_PLOT_BUBBLE_MAX_SIZE] = totalSizeMax;
+      this.statistics[anychart.enums.Statistics.DATA_PLOT_BUBBLE_SIZE_AVERAGE] = totalPointsCount ? totalSizeSum / totalPointsCount : 0;
+    }
+    if (!this.categorizeData) {
+      this.statistics[anychart.enums.Statistics.DATA_PLOT_X_SUM] = totalXSum;
+      this.statistics[anychart.enums.Statistics.DATA_PLOT_X_MAX] = totalXMax;
+      this.statistics[anychart.enums.Statistics.DATA_PLOT_X_MIN] = totalXMin;
+      this.statistics[anychart.enums.Statistics.DATA_PLOT_X_AVERAGE] = totalPointsCount ? totalXSum / totalPointsCount : 0;
+      this.statistics[anychart.enums.Statistics.DATA_PLOT_MAX_X_VALUE_POINT_SERIES_NAME] = maxXSeriesName;
+      this.statistics[anychart.enums.Statistics.DATA_PLOT_MIN_X_VALUE_POINT_SERIES_NAME] = minXSeriesName;
+      this.statistics[anychart.enums.Statistics.DATA_PLOT_MAX_X_SUM_SERIES_NAME] = maxXSumSeriesName;
+      this.statistics[anychart.enums.Statistics.DATA_PLOT_MIN_X_SUM_SERIES_NAME] = minXSumSeriesName;
+    }
 
-  anychart.performance.end('statistics calculation');
+    this.markConsistent(anychart.ConsistencyState.SERIES_CHART_STATISTICS);
+    anychart.performance.end('Statistics calculation');
+  }
 };
 
 
@@ -2257,11 +2279,10 @@ anychart.core.ChartWithSeries.prototype.beforeDraw = function() {
  * @param {number=} opt_leftAxisPadding
  */
 anychart.core.ChartWithSeries.prototype.drawSeries = function(opt_topAxisPadding, opt_rightAxisPadding, opt_bottomAxisPadding, opt_leftAxisPadding) {
-  anychart.performance.start('Cartesian series drawing');
+  anychart.performance.start('Series drawing');
   var i, count;
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_CHART_SERIES)) {
     anychart.core.Base.suspendSignalsDispatching(this.seriesList);
-    anychart.performance.start('Preparation');
     for (i = 0, count = this.seriesList.length; i < count; i++) {
       var series = this.seriesList[i];
       series.container(this.rootElement);
@@ -2276,18 +2297,14 @@ anychart.core.ChartWithSeries.prototype.drawSeries = function(opt_topAxisPadding
     this.prepare3d();
     this.distributeSeries();
     this.calcBubbleSizes();
-    anychart.performance.end('Preparation');
-
-    anychart.performance.start('Series drawing');
     for (i = 0; i < this.seriesList.length; i++) {
       this.seriesList[i].draw();
     }
-    anychart.performance.end('Series drawing');
 
     this.markConsistent(anychart.ConsistencyState.SERIES_CHART_SERIES);
     anychart.core.Base.resumeSignalsDispatchingFalse(this.seriesList);
   }
-  anychart.performance.end('Cartesian series drawing');
+  anychart.performance.end('Series drawing');
 };
 
 

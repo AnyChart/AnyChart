@@ -2243,3 +2243,10 @@ anychart.opt.SHAPES_GROUP_PER_POINT = 'shapesGroupPerPoint';
  * @const {string}
  */
 anychart.opt.UPDATE_POINT = 'updatePoint';
+
+
+/**
+ * Constant replacer for "maxCount" string.
+ * @const {string}
+ */
+anychart.opt.MAX_COUNT = 'maxCount';

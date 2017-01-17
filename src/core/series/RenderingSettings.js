@@ -457,7 +457,9 @@ anychart.core.series.RenderingSettings.Context.prototype.getShapesGroup = functi
  * @return {*}
  */
 anychart.core.series.RenderingSettings.Context.prototype.getStat = function(opt_key) {
-  return this[anychart.opt.SERIES].statistics(opt_key);
+  var series = this[anychart.opt.SERIES];
+  series.chart.ensureStatisticsReady();
+  return series.statistics(opt_key);
 };
 
 

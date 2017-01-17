@@ -79,20 +79,6 @@ anychart.core.series.Cartesian.DrawingPlan;
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Error names to be fetched.
- * @type {!Array.<string>}
- */
-anychart.core.series.Cartesian.prototype.xErrorNames = ([anychart.opt.X_ERROR, anychart.opt.X_LOWER_ERROR, anychart.opt.X_UPPER_ERROR]);
-
-
-/**
- * Error names to be fetched.
- * @type {!Array.<string>}
- */
-anychart.core.series.Cartesian.prototype.yErrorNames = ([anychart.opt.VALUE_ERROR, anychart.opt.VALUE_LOWER_ERROR, anychart.opt.VALUE_UPPER_ERROR]);
-
-
-/**
  * Link to incoming raw data.
  * Used to avoid data reapplication on same data sets.
  * NOTE: If is disposable entity, should be disposed from the source, not from this class.
@@ -153,39 +139,6 @@ anychart.core.series.Cartesian.prototype.pointProvider_;
 //  Series setup
 //
 //----------------------------------------------------------------------------------------------------------------------
-/** @inheritDoc */
-anychart.core.series.Cartesian.prototype.applyConfig = function(config, opt_default) {
-  anychart.core.series.Cartesian.base(this, 'applyConfig', config, opt_default);
-  /**
-   * Additional names to fetch to a drawing plan.
-   * @type {Array.<string>}
-   */
-  this.additionalNames = [];
-  if (this.supportsLabels()) {
-    this.additionalNames.push(
-        anychart.opt.LABEL,
-        anychart.opt.HOVER_LABEL,
-        anychart.opt.SELECT_LABEL);
-  }
-  if (this.supportsMarkers()) {
-    this.additionalNames.push(
-        anychart.opt.MARKER,
-        anychart.opt.HOVER_MARKER,
-        anychart.opt.SELECT_MARKER);
-  }
-  if (this.supportsOutliers()) {
-    this.additionalNames.push(
-        anychart.opt.OUTLIERS,
-        anychart.opt.OUTLIER_MARKER,
-        anychart.opt.HOVER_OUTLIER_MARKER,
-        anychart.opt.SELECT_OUTLIER_MARKER);
-  }
-  if (this.isSizeBased()) {
-    this.additionalNames.push(anychart.opt.SIZE);
-  }
-};
-
-
 /** @inheritDoc */
 anychart.core.series.Cartesian.prototype.applyDefaultsToElements = function(defaults, opt_resetLegendItem, opt_default) {
   anychart.core.series.Cartesian.base(this, 'applyDefaultsToElements', defaults, opt_resetLegendItem, opt_default);
@@ -273,14 +226,16 @@ anychart.core.series.Cartesian.prototype.getSeriesState = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.series.Cartesian.prototype.prepareData = function() {
-  var iterator = this.getDetachedIterator();
-  var indexes = [];
-  while (iterator.advance()) {
-    if (iterator.get('selected'))
-      indexes.push(iterator.getIndex());
-  }
-  if (indexes.length) {
-    this.selectPoint(indexes);
+  if (this.data().checkFieldExist('selected')) {
+    var iterator = this.getDetachedIterator();
+    var indexes = [];
+    while (iterator.advance()) {
+      if (iterator.get('selected'))
+        indexes.push(iterator.getIndex());
+    }
+    if (indexes.length) {
+      this.selectPoint(indexes);
+    }
   }
   anychart.core.series.Cartesian.base(this, 'prepareData');
 };
@@ -371,7 +326,8 @@ anychart.core.series.Cartesian.prototype.data = function(opt_value, opt_csvSetti
  */
 anychart.core.series.Cartesian.prototype.dataInvalidated_ = function(e) {
   if (e.hasSignal(anychart.Signal.DATA_CHANGED)) {
-    this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.DATA_CHANGED);
+    this.invalidate(anychart.ConsistencyState.SERIES_POINTS | anychart.ConsistencyState.SERIES_DATA,
+        anychart.Signal.NEEDS_RECALCULATION | anychart.Signal.NEEDS_REDRAW | anychart.Signal.DATA_CHANGED);
   }
 };
 
@@ -645,14 +601,53 @@ anychart.core.series.Cartesian.prototype.isPointVisible = function(point) {
  * @private
  */
 anychart.core.series.Cartesian.prototype.getDrawingData_ = function(data, dataPusher, xNormalizer, xMissingChecker, opt_nameField) {
-  anychart.performance.start('Drawing plan calc');
-  var iterator = this.data().getIterator();
+  // anychart.performance.start('Drawing plan calc');
+  var dataSource = /** @type {anychart.data.IView} */(this.data());
+  var iterator = dataSource.getIterator();
   var yScale = /** @type {anychart.scales.Base} */ (this.yScale());
-  var pointLabelsCount = 0;
-  var pointMarkersCount = 0;
-  var pointOutliersCount = 0;
   var hasXErrors = false;
   var hasYErrors = false;
+  var checkSize = this.isSizeBased();
+
+  var additionalNames = [];
+  if (checkSize) {
+    additionalNames.push(anychart.opt.SIZE);
+  }
+  if (this.supportsOutliers()) {
+    additionalNames.push(anychart.opt.OUTLIERS);
+  }
+  if (this.supportsError()) {
+    if (anychart.core.utils.Error.supportsErrorForScale(/** @type {anychart.scales.Base} */(this.xScale()))) {
+      if (dataSource.checkFieldExist(anychart.opt.X_ERROR)) {
+        additionalNames.push(anychart.opt.X_ERROR);
+        hasXErrors = true;
+      }
+      if (dataSource.checkFieldExist(anychart.opt.X_LOWER_ERROR)) {
+        additionalNames.push(anychart.opt.X_LOWER_ERROR);
+        hasXErrors = true;
+      }
+      if (dataSource.checkFieldExist(anychart.opt.X_UPPER_ERROR)) {
+        additionalNames.push(anychart.opt.X_UPPER_ERROR);
+        hasXErrors = true;
+      }
+    }
+    if (anychart.core.utils.Error.supportsErrorForScale(/** @type {anychart.scales.Base} */(this.yScale()))) {
+      if (dataSource.checkFieldExist(anychart.opt.VALUE_ERROR)) {
+        additionalNames.push(anychart.opt.VALUE_ERROR);
+        hasYErrors = true;
+      }
+      if (dataSource.checkFieldExist(anychart.opt.VALUE_LOWER_ERROR)) {
+        additionalNames.push(anychart.opt.VALUE_LOWER_ERROR);
+        hasYErrors = true;
+      }
+      if (dataSource.checkFieldExist(anychart.opt.VALUE_UPPER_ERROR)) {
+        additionalNames.push(anychart.opt.VALUE_UPPER_ERROR);
+        hasYErrors = true;
+      }
+    }
+  }
+  if (opt_nameField && dataSource.checkFieldExist(opt_nameField))
+    additionalNames.push(opt_nameField);
 
   while (iterator.advance()) {
     var xValue = xNormalizer(iterator.get(anychart.opt.X));
@@ -668,94 +663,51 @@ anychart.core.series.Cartesian.prototype.getDrawingData_ = function(data, dataPu
       missing = missing || yScale.isMissing(val);
       pointData[name] = val;
     }
-    for (i = 0, len = this.additionalNames.length; i < len; i++) {
-      name = this.additionalNames[i];
-      val = iterator.get(name);
-      pointData[name] = val;
+    for (i = 0, len = additionalNames.length; i < len; i++) {
+      name = additionalNames[i];
+      pointData[name] = iterator.get(name);
     }
-    if (this.isSizeBased()) {
-      var size = Number(pointData[anychart.opt.SIZE]);
+    if (checkSize) {
+      var size = anychart.utils.toNumber(pointData[anychart.opt.SIZE] = iterator.get(anychart.opt.SIZE));
       if (isNaN(size) || (size < 0 && !this.getOption(anychart.opt.DISPLAY_NEGATIVE)))
         missing = true;
     }
-    if (this.supportsError()) {
-      if (anychart.core.utils.Error.supportsErrorForScale(/** @type {anychart.scales.Base} */(this.xScale()))) {
-        for (i = 0, len = this.xErrorNames.length; i < len; i++) {
-          name = this.xErrorNames[i];
-          val = iterator.get(name);
-          if (goog.isDef(val))
-            hasXErrors = true;
-          pointData[name] = val;
-        }
-      }
-      if (anychart.core.utils.Error.supportsErrorForScale(/** @type {anychart.scales.Base} */(this.yScale()))) {
-        for (i = 0, len = this.yErrorNames.length; i < len; i++) {
-          name = this.yErrorNames[i];
-          val = iterator.get(name);
-          if (goog.isDef(val))
-            hasYErrors = true;
-          pointData[name] = val;
-        }
-      }
-    }
-    if (goog.isDef(opt_nameField))
-      pointData[opt_nameField] = iterator.get(opt_nameField);
 
     var meta = {};
     meta[anychart.opt.MISSING] = missing ? anychart.core.series.PointAbsenceReason.VALUE_FIELD_MISSING : 0;
     meta[anychart.opt.RAW_INDEX] = iterator.getIndex();
 
-    if (!missing) {
-      // we count marker pointData settings
-      if (this.supportsMarkers() && (
-          pointData[anychart.opt.MARKER] ||
-          pointData[anychart.opt.HOVER_MARKER] ||
-          pointData[anychart.opt.SELECT_MARKER])) {
-        meta[anychart.opt.HAS_POINT_MARKER] = true;
-        pointMarkersCount++;
-      }
-      // we count label pointData settings
-      if (this.supportsLabels() && (
-          pointData[anychart.opt.LABEL] ||
-          pointData[anychart.opt.HOVER_LABEL] ||
-          pointData[anychart.opt.SELECT_LABEL])) {
-        meta[anychart.opt.HAS_POINT_LABEL] = true;
-        pointLabelsCount++;
-      }
-      // we count label pointData settings
-      if (this.supportsOutliers() && (
-          pointData[anychart.opt.OUTLIERS] ||
-          pointData[anychart.opt.OUTLIER_MARKER] ||
-          pointData[anychart.opt.HOVER_OUTLIER_MARKER] ||
-          pointData[anychart.opt.SELECT_OUTLIER_MARKER])) {
-        meta[anychart.opt.HAS_POINT_OUTLIER] = true;
-        pointOutliersCount++;
-      }
-    }
     var point = {
       data: pointData,
       meta: meta
     };
-    point = dataPusher(data, point);
-    // if the new pointData replaced a pointData, we should decrease labels and markers counters
-    if (point && !point.meta[anychart.opt.MISSING]) {
-      if (point.meta[anychart.opt.HAS_POINT_MARKER])
-        pointMarkersCount--;
-      if (point.meta[anychart.opt.HAS_POINT_LABEL])
-        pointLabelsCount--;
-      if (point.meta[anychart.opt.HAS_POINT_OUTLIER])
-        pointOutliersCount--;
-    }
+    dataPusher(data, point);
   }
 
-  anychart.performance.end('Drawing plan calc');
+  // anychart.performance.end('Drawing plan calc');
   this.invalidate(anychart.ConsistencyState.SERIES_DATA);
   return this.drawingPlan = {
     data: data,
     series: this,
-    hasPointLabels: pointLabelsCount > 0,
-    hasPointMarkers: pointMarkersCount > 0,
-    hasPointOutliers: pointOutliersCount > 0,
+    hasPointLabels: this.supportsLabels() &&
+        (
+            dataSource.checkFieldExist(anychart.opt.LABEL) ||
+            dataSource.checkFieldExist(anychart.opt.HOVER_LABEL) ||
+            dataSource.checkFieldExist(anychart.opt.SELECT_LABEL)
+        ),
+    hasPointMarkers: this.supportsMarkers() &&
+        (
+            dataSource.checkFieldExist(anychart.opt.MARKER) ||
+            dataSource.checkFieldExist(anychart.opt.HOVER_MARKER) ||
+            dataSource.checkFieldExist(anychart.opt.SELECT_MARKER)
+        ),
+    hasPointOutliers: this.supportsOutliers() &&
+        (
+            dataSource.checkFieldExist(anychart.opt.OUTLIERS) ||
+            dataSource.checkFieldExist(anychart.opt.OUTLIER_MARKER) ||
+            dataSource.checkFieldExist(anychart.opt.HOVER_OUTLIER_MARKER) ||
+            dataSource.checkFieldExist(anychart.opt.SELECT_OUTLIER_MARKER)
+        ),
     hasPointXErrors: hasXErrors,
     hasPointYErrors: hasYErrors,
     hasPointErrors: hasXErrors || hasYErrors
@@ -1358,7 +1310,7 @@ anychart.core.series.Cartesian.prototype.getPoint = function(index) {
     point = new anychart.core.SeriesPoint(this, index);
   }
 
-  this.chart.calculate();
+  this.chart.ensureStatisticsReady();
   var chartStat = (/** @type {anychart.core.CartesianBase} */ (this.chart)).statistics;
   var isRangeSeries = this.check(anychart.core.drawers.Capabilities.IS_RANGE_BASED | anychart.core.drawers.Capabilities.IS_OHLC_BASED);
 

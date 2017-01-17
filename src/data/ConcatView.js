@@ -45,6 +45,18 @@ anychart.data.ConcatView.prototype.getRowMapping = function(rowIndex) {
 
 
 /** @inheritDoc */
+anychart.data.ConcatView.prototype.getMappings = function() {
+  return goog.array.concat(this.parentView.getMappings(), this.secondView_.getMappings());
+};
+
+
+/** @inheritDoc */
+anychart.data.ConcatView.prototype.hasSimpleRows = function() {
+  return this.parentView.hasSimpleRows() || this.secondView_.hasSimpleRows();
+};
+
+
+/** @inheritDoc */
 anychart.data.ConcatView.prototype.getDataSets = function() {
   var dataSet1 = this.parentView.getDataSets();
   var dataSet2 = this.secondView_.getDataSets();

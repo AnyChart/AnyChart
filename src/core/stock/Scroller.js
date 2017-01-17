@@ -1027,6 +1027,12 @@ anychart.core.stock.Scroller.prototype.calculate = goog.nullFunction;
 
 
 /**
+ * @inheritDoc
+ */
+anychart.core.stock.Scroller.prototype.ensureStatisticsReady = goog.nullFunction;
+
+
+/**
  * @param {string} type Series type.
  * @param {(anychart.data.TableMapping|anychart.data.Table|Array.<Array.<*>>|string)=} opt_data
  * @param {Object.<({column: number, type: anychart.enums.AggregationType, weights: number}|number)>=} opt_mappingSettings

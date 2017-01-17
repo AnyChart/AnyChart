@@ -208,14 +208,19 @@ anychart.core.shapeManagers.Base.prototype.createShape = function(name, state, i
   }
   this.shapePoolPointers[shapeType]++;
   this.usedShapes[shapeType].push(shape);
-  shape.fill(/** @type {acgraph.vector.Fill|acgraph.vector.PatternFill} */(descriptor.fill(this.series, state)));
+  var fill = /** @type {acgraph.vector.Fill|acgraph.vector.PatternFill} */(descriptor.fill(this.series, state));
+  shape.fill(fill);
   shape.stroke(/** @type {acgraph.vector.Stroke} */(descriptor.stroke(this.series, state)));
   shape.zIndex(descriptor.zIndex + baseZIndex);
   if (this.addInterctivityInfo)
     this.setupInteractivity(shape, descriptor.isHatchFill, indexOrGlobal);
 
   // we want to avoid adding invisible hatchFill shapes to the layer.
-  if (descriptor.isHatchFill && !(descriptor.fill(this.series, 0) || descriptor.fill(this.series, 1) || descriptor.fill(this.series, 2))) {
+  if (descriptor.isHatchFill && !(
+      fill ||
+      (state != anychart.PointState.NORMAL && descriptor.fill(this.series, anychart.PointState.NORMAL)) ||
+      (state != anychart.PointState.HOVER && descriptor.fill(this.series, anychart.PointState.HOVER)) ||
+      (state != anychart.PointState.SELECT && descriptor.fill(this.series, anychart.PointState.SELECT)))) {
     shape.parent(null);
   } else {
     shape.parent(this.layer);

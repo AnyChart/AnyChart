@@ -62,6 +62,13 @@ anychart.data.View.prototype.mask = null;
 
 
 /**
+ * Mappings cache.
+ * @type {Array.<!anychart.data.Mapping>}
+ */
+anychart.data.View.prototype.mappingsCache = null;
+
+
+/**
  * Metadata storage.
  * @type {Array.<Object>}
  * @private
@@ -85,6 +92,7 @@ anychart.data.View.prototype.ensureConsistent = function() {
     return;
   if (this.metadata_)
     this.metadata_.length = 0;
+  this.mappingsCache = null;
   this.mask = this.buildMask();
   this.markConsistent(anychart.ConsistencyState.DATA_MASK);
 };
@@ -340,6 +348,11 @@ anychart.data.View.prototype.getRowsCount = function() {
 */
 anychart.data.View.prototype.getRowMapping = function(rowIndex) {
   this.ensureConsistent();
+  if (!this.mappingsCache) {
+    this.mappingsCache = this.getMappings();
+  }
+  if (this.mappingsCache.length == 1)
+    return this.mappingsCache[0];
   return this.parentView.getRowMapping(this.mask ? this.mask[rowIndex] : rowIndex);
 };
 
@@ -658,6 +671,42 @@ anychart.data.View.prototype.parentMeta = function(index, name, opt_value) {
  */
 anychart.data.View.prototype.transitionMeta = function(on) {
   this.transitMeta_ = !!on;
+};
+
+
+/**
+ * Checks if there exists at least one row in the view, that returns defined value for that name.
+ * @param {string|number} nameOrColumn
+ * @return {boolean}
+ */
+anychart.data.View.prototype.checkFieldExist = function(nameOrColumn) {
+  if (!this.mappingsCache) {
+    this.mappingsCache = this.getMappings();
+  }
+  for (var i = 0; i < this.mappingsCache.length; i++) {
+    var mapping = this.mappingsCache[i];
+    if (mapping.checkFieldExist(nameOrColumn))
+      return true;
+  }
+  return false;
+};
+
+
+/**
+ * Checks whether the view has non-object and non-array rows.
+ * @return {boolean}
+ */
+anychart.data.View.prototype.hasSimpleRows = function() {
+  return this.parentView.hasSimpleRows();
+};
+
+
+/**
+ * Returns all mappings that are related to the view.
+ * @return {Array.<!anychart.data.Mapping>}
+ */
+anychart.data.View.prototype.getMappings = function() {
+  return this.parentView.getMappings();
 };
 
 

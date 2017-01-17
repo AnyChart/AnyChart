@@ -42,6 +42,28 @@ anychart.data.IView.prototype.getRowMapping = function(rowIndex) {};
 
 
 /**
+ * Returns all mappings that are related to the view.
+ * @return {Array.<anychart.data.Mapping>}
+ */
+anychart.data.IView.prototype.getMappings = function() {};
+
+
+/**
+ * Checks whether the field exists.
+ * @param {string|number} nameOrColumn
+ * @return {boolean}
+ */
+anychart.data.IView.prototype.checkFieldExist = function(nameOrColumn) {};
+
+
+/**
+ * Checks whether the view has non-object and non-array rows.
+ * @return {boolean}
+ */
+anychart.data.IView.prototype.hasSimpleRows = function() {};
+
+
+/**
  * Getter/setter for meta.
  * @param {number} rowIndex .
  * @param {string} name .

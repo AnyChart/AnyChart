@@ -23,7 +23,14 @@ anychart.scales.OrdinalColorTicks.prototype.calcAutoTicks = function() {
   if (!ranges.length)
     ranges = this.scale.getProcessedRanges();
   if (ranges) {
-    for (var i = 0, len = ranges.length; i < len; i += this.interval()) {
+    var interval;
+    var len = ranges.length;
+    if (isNaN(this.interval())) {
+      interval = Math.ceil(len / this.maxCount()) || 1;
+    } else {
+      interval = this.interval();
+    }
+    for (var i = 0; i < len; i += interval) {
       res.push(i);
     }
   }
