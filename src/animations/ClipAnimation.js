@@ -32,6 +32,10 @@ anychart.animations.ClipAnimation.prototype.update = function() {
    */
   this.isVertical = /** @type {boolean} */(this.series.getOption(anychart.opt.IS_VERTICAL));
 
+  var clip = this.series.clip();
+  if (goog.isBoolean(clip) && !clip) {
+    this.clipBounds_ = this.series.getChart().getPixelBounds();
+  }
   if (this.isVertical) {
     this.startPoint[0] = this.clipBounds_.top;
     if (!this.series.xScale().inverted())

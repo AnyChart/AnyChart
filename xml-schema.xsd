@@ -2917,6 +2917,7 @@
             <xsd:enumeration value="pert"/>
             <xsd:enumeration value="jumpLine"/>
             <xsd:enumeration value="stick"/>
+            <xsd:enumeration value="pareto"/>
         </xsd:restriction>
     </xsd:simpleType>
 

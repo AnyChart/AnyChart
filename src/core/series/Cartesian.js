@@ -154,8 +154,8 @@ anychart.core.series.Cartesian.prototype.pointProvider_;
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.core.series.Cartesian.prototype.applyConfig = function(config) {
-  anychart.core.series.Cartesian.base(this, 'applyConfig', config);
+anychart.core.series.Cartesian.prototype.applyConfig = function(config, opt_default) {
+  anychart.core.series.Cartesian.base(this, 'applyConfig', config, opt_default);
   /**
    * Additional names to fetch to a drawing plan.
    * @type {Array.<string>}
@@ -294,10 +294,10 @@ anychart.core.series.Cartesian.prototype.prepareData = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.core.series.Cartesian.prototype.getColorResolutionContext = function(opt_baseColor) {
+anychart.core.series.Cartesian.prototype.getColorResolutionContext = function(opt_baseColor, opt_ignorePointSettings) {
   var source = opt_baseColor || this.getOption(anychart.opt.COLOR) || 'blue';
   if (this.supportsPointSettings()) {
-    var iterator = this.getIterator();
+    var iterator = !!opt_ignorePointSettings ? this.getDetachedIterator() : this.getIterator();
     return {
       'index': iterator.getIndex(),
       'sourceColor': source,
@@ -311,10 +311,10 @@ anychart.core.series.Cartesian.prototype.getColorResolutionContext = function(op
 
 
 /** @inheritDoc */
-anychart.core.series.Cartesian.prototype.getHatchFillResolutionContext = function() {
+anychart.core.series.Cartesian.prototype.getHatchFillResolutionContext = function(opt_ignorePointSettings) {
   var source = this.getAutoHatchFill();
   if (this.supportsPointSettings()) {
-    var iterator = this.getIterator();
+    var iterator = !!opt_ignorePointSettings ? this.getDetachedIterator() : this.getIterator();
     return {
       'index': iterator.getIndex(),
       'sourceHatchFill': source,

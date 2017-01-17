@@ -321,7 +321,6 @@ anychart.core.ChartWithSeries.prototype.createSeriesByType = function(type, data
     series.autoIndex(index);
     series.data(data, opt_csvSettings);
     series.setAutoZIndex(seriesZIndex);
-    series.clip(true);
     series.setAutoColor(this.palette().itemAt(index));
     series.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(this.markerPalette().itemAt(index)));
     series.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(this.hatchFillPalette().itemAt(index)));
@@ -641,13 +640,21 @@ anychart.core.ChartWithSeries.prototype.allowLegendCategoriesMode = function() {
 
 
 /**
- * Checks scale type.
+ * Checks x scale type.
  * @param {*} scale
  * @return {boolean}
  */
-anychart.core.ChartWithSeries.prototype.checkScaleType = function(scale) {
+anychart.core.ChartWithSeries.prototype.checkXScaleType = function(scale) {
   return scale instanceof anychart.scales.Base;
 };
+
+
+/**
+ * Checks y scale type.
+ * @param {*} scale
+ * @return {boolean}
+ */
+anychart.core.ChartWithSeries.prototype.checkYScaleType = anychart.core.ChartWithSeries.prototype.checkXScaleType;
 
 
 /**
@@ -672,7 +679,7 @@ anychart.core.ChartWithSeries.prototype.xScale = function(opt_value) {
     if (goog.isString(opt_value)) {
       opt_value = this.createScaleByType(opt_value, true, false);
     }
-    if (this.checkScaleType(opt_value) && this.xScale_ != opt_value) {
+    if (this.checkXScaleType(opt_value) && this.xScale_ != opt_value) {
       if (this.xScale_)
         this.xScale_.unlistenSignals(this.xScaleInvalidated, this);
       this.xScale_ = opt_value;
@@ -732,7 +739,7 @@ anychart.core.ChartWithSeries.prototype.yScale = function(opt_value) {
     if (goog.isString(opt_value)) {
       opt_value = this.createScaleByType(opt_value, false, false);
     }
-    if (this.checkScaleType(opt_value) && this.yScale_ != opt_value) {
+    if (this.checkYScaleType(opt_value) && this.yScale_ != opt_value) {
       if (this.yScale_)
         this.yScale_.unlistenSignals(this.yScaleInvalidated, this);
       this.yScale_ = opt_value;

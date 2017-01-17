@@ -8,8 +8,8 @@ goog.require('goog.array');
 
 
 /**
- * Soecial View which allows to map anychart.data.Set storages.
- * @param {!anychart.data.Set} parentSet The data set to map.
+ * Special View which allows to map anychart.data.Set storages.
+ * @param {!(anychart.data.Set|anychart.data.IView)} parentSet The data set to map.
  * @param {!Object.<Array.<number>>=} opt_arrayMapping Mapping for array rows.
  * @param {!Object.<Array.<string>>=} opt_objectMapping Mapping for object rows.
  * @param {!Array.<string>=} opt_defaultProps Mapping for rows which are string, number or a function.
@@ -29,7 +29,7 @@ goog.inherits(anychart.data.Mapping, anychart.data.View);
 
 
 /**
- * Conistency states supported by this object.
+ * Consistency states supported by this object.
  * @type {number}
  */
 anychart.data.Mapping.prototype.SUPPORTED_SIGNALS = anychart.Signal.DATA_CHANGED;

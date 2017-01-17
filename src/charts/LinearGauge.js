@@ -845,7 +845,7 @@ anychart.charts.LinearGauge.prototype.scale = function(opt_value) {
       opt_value = /** @type {anychart.scales.ScatterBase} */ (anychart.scales.Base.fromString(opt_value, false));
     }
     if (!(opt_value instanceof anychart.scales.ScatterBase)) {
-      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Linear gauge scale']);
+      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Linear gauge scale', 'scatter', 'linear, log']);
       return this;
     }
     if (this.scale_ != opt_value) {

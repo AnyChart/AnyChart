@@ -110,12 +110,16 @@ anychart.charts.Scatter.prototype.allowLegendCategoriesMode = function() {
 
 
 /** @inheritDoc */
-anychart.charts.Scatter.prototype.checkScaleType = function(scale) {
+anychart.charts.Scatter.prototype.checkXScaleType = function(scale) {
   var res = (scale instanceof anychart.scales.ScatterBase);
   if (!res)
-    anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Scatter chart scales']);
+    anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Scatter chart scales', 'scatter', 'linear, log']);
   return res;
 };
+
+
+/** @inheritDoc */
+anychart.charts.Scatter.prototype.checkYScaleType = anychart.charts.Scatter.prototype.checkXScaleType;
 
 
 /** @inheritDoc */

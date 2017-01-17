@@ -141,7 +141,7 @@ anychart.core.series.Base = function(chart, plot, type, config) {
   this.renderingSettings_ = new anychart.core.series.RenderingSettings(this);
   this.renderingSettings_.listenSignals(this.rendererInvalidated_, this);
 
-  this.applyConfig(config);
+  this.applyConfig(config, true);
 };
 goog.inherits(anychart.core.series.Base, anychart.core.VisualBaseWithBounds);
 
@@ -436,7 +436,7 @@ anychart.core.series.Base.prototype.seriesType = function(opt_value) {
     var info = this.chart.getConfigByType(opt_value);
     if (info && /** @type {string} */(info[0]) != this.type_) {
       this.type_ = /** @type {string} */(info[0]); // normalized type
-      this.applyConfig(/** @type {anychart.core.series.TypeConfig} */(info[1]));
+      this.applyConfig(/** @type {anychart.core.series.TypeConfig} */(info[1]), false);
       // since we are changing entire series - we should recalculate and redraw everything
       this.invalidate(
           anychart.ConsistencyState.SERIES_POINTS |
@@ -454,8 +454,9 @@ anychart.core.series.Base.prototype.seriesType = function(opt_value) {
 /**
  * Getter/Setter for series type.
  * @param {anychart.core.series.TypeConfig} config
+ * @param {boolean=} opt_default Apply default config.
  */
-anychart.core.series.Base.prototype.applyConfig = function(config) {
+anychart.core.series.Base.prototype.applyConfig = function(config, opt_default) {
   if (this.config) {
     if (this.rootLayer) {
       // if prev config used own root and the next one doesn't - we should dispose the root layer
@@ -484,7 +485,7 @@ anychart.core.series.Base.prototype.applyConfig = function(config) {
   this.autoSettings[anychart.opt.X_POINT_POSITION] = 0.5;
 
   this.suspendSignalsDispatching();
-  this.applyDefaultsToElements(this.defaultSettings, true, true);
+  this.applyDefaultsToElements(this.defaultSettings, true, opt_default);
   this.resumeSignalsDispatching(false);
   // here should markers/labels/errors/outliers setup be
 
@@ -543,8 +544,10 @@ anychart.core.series.Base.prototype.applyDefaultsToElements = function(defaults,
   if (anychart.opt.TOOLTIP in defaults)
     this.tooltip().setupByVal(defaults[anychart.opt.TOOLTIP], opt_default);
 
-  this.clip(defaults[anychart.opt.CLIP]);
-  this.zIndex(defaults[anychart.opt.Z_INDEX]);
+  if (!!opt_default) {
+    this.clip(defaults[anychart.opt.CLIP]);
+    this.zIndex(defaults[anychart.opt.Z_INDEX]);
+  }
 
   this.a11y(defaults['a11y'] || this.plot.defaultSeriesSettings()['a11y']);
 };
@@ -1684,7 +1687,7 @@ anychart.core.series.Base.getColor_ = function(colorNames, normalizer, isHatchFi
       if (!goog.isFunction(stateColor))
         return /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(stateColor);
       else if (isHatchFill) { // hatch fills set as function some why cannot nest by initial implementation
-        context = series.getHatchFillResolutionContext();
+        context = series.getHatchFillResolutionContext(opt_ignorePointSettings);
         return /** @type {acgraph.vector.PatternFill} */(normalizer(stateColor.call(context, context)));
       }
     }
@@ -1697,12 +1700,12 @@ anychart.core.series.Base.getColor_ = function(colorNames, normalizer, isHatchFi
     color = normalizer(series.getAutoHatchFill());
   if (goog.isFunction(color)) {
     context = isHatchFill ?
-        series.getHatchFillResolutionContext() :
-        series.getColorResolutionContext();
+        series.getHatchFillResolutionContext(opt_ignorePointSettings) :
+        series.getColorResolutionContext(void 0, opt_ignorePointSettings);
     color = /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(normalizer(color.call(context, context)));
   }
   if (stateColor) { // it is a function and not a hatch fill here
-    context = series.getColorResolutionContext(/** @type {acgraph.vector.Fill|acgraph.vector.Stroke} */(color));
+    context = series.getColorResolutionContext(/** @type {acgraph.vector.Fill|acgraph.vector.Stroke} */(color), opt_ignorePointSettings);
     color = normalizer(stateColor.call(context, context));
   }
   return /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(color);
@@ -1723,6 +1726,7 @@ anychart.core.series.Base.getNullColor_ = function() {
  * Returns color resolution context.
  * This context is used to resolve a fill or stroke set as a function for current point.
  * @param {(acgraph.vector.Fill|acgraph.vector.Stroke)=} opt_baseColor
+ * @param {boolean=} opt_ignorePointSettings Whether should take detached iterator.
  * @return {Object}
  */
 anychart.core.series.Base.prototype.getColorResolutionContext = goog.abstractMethod;
@@ -1731,6 +1735,7 @@ anychart.core.series.Base.prototype.getColorResolutionContext = goog.abstractMet
 /**
  * Returns hatch fill resolution context.
  * This context is used to resolve a hatch fill set as a function for current point.
+ * @param {boolean=} opt_ignorePointSettings Whether should take detached iterator.
  * @return {Object}
  */
 anychart.core.series.Base.prototype.getHatchFillResolutionContext = goog.abstractMethod;

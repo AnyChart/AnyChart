@@ -871,7 +871,8 @@ anychart.themes.merging.mergingMap_ = [
       'line',
       'verticalLine',
       'jumpLine',
-      'stick'
+      'stick',
+      'pareto'
     ]
   },
   {

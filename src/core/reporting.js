@@ -49,7 +49,7 @@ anychart.core.reporting.getErrorDescription_ = function(code, opt_arguments) {
       return 'Feature "' + opt_arguments[0] + '" is not supported in this module. See modules list for details.';
 
     case anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE:
-      return opt_arguments[0] + ' should be only scatter type (linear, log).';
+      return opt_arguments[0] + ' should be only ' + opt_arguments[1] + ' type' + (opt_arguments[2] ? ' (' + opt_arguments[2] + ').' : '.');
 
     case anychart.enums.ErrorCode.EMPTY_CONFIG:
       return 'Empty config passed to anychart.fromJson() or anychart.fromXml() method.';

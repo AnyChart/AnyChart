@@ -1204,7 +1204,7 @@ anychart.core.stock.Scroller.prototype.yScale = function(opt_value) {
       this.registerDisposable(opt_value = anychart.scales.ScatterBase.fromString(opt_value, false));
     }
     if (!(opt_value instanceof anychart.scales.ScatterBase)) {
-      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Scatter chart scales']);
+      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Scatter chart scales', 'scatter', 'linear, log']);
       return this;
     }
     if (this.yScale_ != opt_value) {

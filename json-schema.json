@@ -197,7 +197,7 @@
         {"$ref": "#/definitions/anychart.core.SeparateChart"}
       ],
       "properties": {
-        "type": {"enum": ["cartesian", "cartesian3d", "area", "verticalArea", "area3d", "bar", "bar3d", "box", "bubble", "column", "column3d", "financial", "line", "verticalLine", "marker", "jumpLine", "stick"]},
+        "type": {"enum": ["cartesian", "cartesian3d", "area", "verticalArea", "area3d", "bar", "bar3d", "box", "bubble", "column", "column3d", "financial", "line", "verticalLine", "marker", "jumpLine", "stick", "pareto"]},
         "grids": {
           "type": "array",
           "items": {

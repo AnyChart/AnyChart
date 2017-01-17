@@ -278,7 +278,7 @@ anychart.core.series.Stock.prototype.getDetachedIterator = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.core.series.Stock.prototype.getColorResolutionContext = function(opt_baseColor) {
+anychart.core.series.Stock.prototype.getColorResolutionContext = function(opt_baseColor, opt_ignorePointSettings) {
   return {
     'sourceColor': opt_baseColor || this.getOption(anychart.opt.COLOR) || 'blue'
   };
@@ -286,7 +286,7 @@ anychart.core.series.Stock.prototype.getColorResolutionContext = function(opt_ba
 
 
 /** @inheritDoc */
-anychart.core.series.Stock.prototype.getHatchFillResolutionContext = function() {
+anychart.core.series.Stock.prototype.getHatchFillResolutionContext = function(opt_ignorePointSettings) {
   return {
     'sourceHatchFill': this.getAutoHatchFill()
   };

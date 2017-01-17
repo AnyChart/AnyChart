@@ -98,7 +98,7 @@ anychart.core.linearGauge.ScaleBar.prototype.to = function(opt_value) {
 anychart.core.linearGauge.ScaleBar.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (!(opt_value instanceof anychart.scales.ScatterBase)) {
-      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['ScaleBar scale']);
+      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['ScaleBar scale', 'scatter', 'linear, log']);
       return this;
     }
     if (this.scale_ != opt_value) {

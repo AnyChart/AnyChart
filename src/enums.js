@@ -49,7 +49,8 @@ anychart.enums.ChartTypes = {
   GANTT_PROJECT: 'ganttProject',
   RESOURCE: 'resource',
   JUMP_LINE: 'jumpLine',
-  STICK: 'stick'
+  STICK: 'stick',
+  PARETO: 'pareto'
 };
 
 
@@ -4565,7 +4566,17 @@ anychart.enums.StringToken = {
   Y_PERCENT_OF_TOTAL: '%YPercentOfTotal',
   /**
    The y value of this point.*/
-  Y_VALUE: '%YValue'
+  Y_VALUE: '%YValue',
+
+  /**
+   * Cumulative frequency of the point. Used in pareto series.
+   */
+  CUMULATIVE_FREQUENCY: '%CF',
+
+  /**
+   * Relative frequency of the point. Used in pareto series.
+   */
+  RELATIVE_FREQUENCY: '%RF'
 };
 
 

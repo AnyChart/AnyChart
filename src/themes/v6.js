@@ -2709,6 +2709,26 @@ goog.provide('anychart.themes.v6');
         'hoverMode': 'byX'
       }
     },
+    'pareto': {
+      'defaultSeriesType': 'column',
+      'tooltip': {
+        'displayMode': 'union'
+      },
+      'interactivity': {
+        'hoverMode': 'byX'
+      },
+      'yAxes': [
+        {
+          'orientation': 'left'
+        },
+        {
+          'orientation': 'right',
+          'labels': {
+            'textFormatter': '{%Value}%'
+          }
+        }
+      ]
+    },
 
     // merge with chart
     'heatMap': {

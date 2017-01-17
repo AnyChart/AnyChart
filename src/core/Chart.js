@@ -2627,6 +2627,29 @@ anychart.core.Chart.prototype.toTreeDataCsv_ = function(opt_csvSettings) {
 
 
 /**
+ * Creates additional headers for specific csv.
+ * @param {Object} headers Headers.
+ * @param {number} headersLength Current length.
+ * @param {boolean} scatterPolar Scatter or polar.
+ * @return {number} Headers length.
+ */
+anychart.core.Chart.prototype.createSpecificCsvHeaders = function(headers, headersLength, scatterPolar) {
+  return headersLength;
+};
+
+
+/**
+ * Method called each iteration over each series data when generating specific csv.
+ * @param {anychart.data.View} seriesData
+ * @param {Object} csvRows
+ * @param {Object} headers
+ * @param {number} rowIndex
+ * @param {string|number} groupingField
+ */
+anychart.core.Chart.prototype.onBeforeRowsValuesSpreading = function(seriesData, csvRows, headers, rowIndex, groupingField) {};
+
+
+/**
  * Returns CSV string with series data.
  * @param {(string|anychart.enums.ChartDataExportMode)=} opt_chartDataExportMode CSV mode.
  * @param {Object.<string, (string|boolean|undefined)>=} opt_csvSettings CSV settings.
@@ -2742,6 +2765,7 @@ anychart.core.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvS
     if (!scatterPolar) {
       headers['x'] = headersLength++;
     }
+    headersLength = this.createSpecificCsvHeaders(headers, headersLength, scatterPolar);
     var seriesPrefix;
     var csvRows = {};
     var iterator;
@@ -2755,12 +2779,15 @@ anychart.core.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvS
       iterator = seriesData.getIterator();
       while (iterator.advance()) {
         k = iterator.getIndex();
-        groupingField = scatterPolar ? k : iterator.get('x');
+        groupingField = /** @type {number|string} */ (scatterPolar ? k : iterator.get('x'));
+
         if (!csvRows[groupingField]) {
           csvRows[groupingField] = [];
           if (!scatterPolar)
             csvRows[groupingField][0] = groupingField;
         }
+
+        this.onBeforeRowsValuesSpreading(seriesData, csvRows, headers, k, groupingField);
 
         row = seriesData.row(k);
 

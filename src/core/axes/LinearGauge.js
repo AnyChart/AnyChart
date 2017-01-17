@@ -60,7 +60,7 @@ anychart.core.axes.LinearGauge.prototype.width = function(opt_value) {
 anychart.core.axes.LinearGauge.prototype.scale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (!(opt_value instanceof anychart.scales.ScatterBase)) {
-      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Linear gauge axis scale']);
+      anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Linear gauge axis scale', 'scatter', 'linear, log']);
       return this;
     }
   }

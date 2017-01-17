@@ -1815,7 +1815,7 @@ goog.provide('anychart.themes.defaultTheme');
       }
     },
 
-    // merge with defaultCartesian
+    // merge with cartesianBase
     'cartesian': {
       'defaultSeriesType': 'line',
       'isVertical': false,
@@ -1823,7 +1823,7 @@ goog.provide('anychart.themes.defaultTheme');
       'yAxes': []
     },
 
-    // merge with cartesian
+    // merge with cartesianBase
     'area': {
       'defaultSeriesType': 'area',
       'tooltip': {
@@ -2081,6 +2081,26 @@ goog.provide('anychart.themes.defaultTheme');
       'xScroller': {
         'orientation': 'left'
       }
+    },
+    'pareto': {
+      'defaultSeriesType': 'column',
+      'tooltip': {
+        'displayMode': 'union'
+      },
+      'interactivity': {
+        'hoverMode': 'byX'
+      },
+      'yAxes': [
+        {
+          'orientation': 'left'
+        },
+        {
+          'orientation': 'right',
+          'labels': {
+            'textFormatter': '{%Value}%'
+          }
+        }
+      ]
     },
 
     // merge with cartesian
