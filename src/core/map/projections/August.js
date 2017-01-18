@@ -38,7 +38,7 @@ anychart.core.map.projections.August.prototype.forward = function(x, y) {
 anychart.core.map.projections.August.prototype.invert = function(x, y) {
   x *= 3 / 8;
   y *= 3 / 8;
-  if (!x && Math.abs(y) > 1) return null;
+  if (!x && Math.abs(y) > 1) return [NaN, NaN];
   var x2 = x * x;
   var y2 = y * y;
   var s = 1 + x2 + y2;

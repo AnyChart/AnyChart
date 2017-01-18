@@ -88,6 +88,7 @@ anychart.ui.resourceTimeline = function() {
   proto['headerHeight'] = proto.headerHeight;
   proto['defaultRowHeight'] = proto.defaultRowHeight;
 
+  proto = anychart.standalones.ResourceTimeline.prototype;
   proto['draw'] = proto.draw;
   proto['data'] = proto.data;
   proto['parentBounds'] = proto.parentBounds;
