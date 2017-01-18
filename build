@@ -22,9 +22,10 @@ JAVA_HEAP_SIZE = 1024
 
 #project
 PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
-CONTRIB_PATH = os.path.join(PROJECT_PATH, 'contrib')
+CONTRIB_PATH = os.path.join(PROJECT_PATH, 'libs')
 SRC_PATH = os.path.join(PROJECT_PATH, 'src')
 OUT_PATH = os.path.join(PROJECT_PATH, 'out')
+DIST_PATH = os.path.join(PROJECT_PATH, 'out')
 MODULES_PATH = os.path.join(SRC_PATH, 'modules')
 THEMES_PATH = os.path.join(SRC_PATH, 'themes')
 
@@ -38,7 +39,6 @@ COMPILER_PATH = os.path.join(CONTRIB_PATH, 'compiler', 'closure-compiler-v%s.jar
 EXTERNS_PATH = os.path.join(PROJECT_PATH, 'externs.js')
 CLOSURE_LIBRARY_PATH = os.path.join(CONTRIB_PATH, 'closure-library')
 CLOSURE_SOURCE_PATH = os.path.join(CLOSURE_LIBRARY_PATH, 'closure', 'goog')
-CLOSURE_LINTER_WRAPPER_PATH = os.path.join(CONTRIB_PATH, 'closure-linter-wrapper')
 CLOSURE_BIN_PATH = os.path.join(CLOSURE_LIBRARY_PATH, 'closure', 'bin')
 DEPS_WRITER_PATH = os.path.join(CLOSURE_BIN_PATH, 'build', 'depswriter.py')
 CLOSURE_BUILDER_PATH = os.path.join(CLOSURE_BIN_PATH, 'build', 'closurebuilder.py')
@@ -130,8 +130,9 @@ def __download_and_unzip_from_http(from_url, path, dri_name):
 def __install_closure_linter():
     print 'Install closure linter'
     commands = [] if platform.system() == 'Windows' else ['sudo']
-    commands.append('easy_install')
-    commands.append('https://closure-linter.googlecode.com/files/closure_linter-2.3.9.tar.gz')
+    commands.append('pip')
+    commands.append('install')
+    commands.append('git+git://github.com/google/closure-linter.git@v2.3.19')
     try:
         subprocess.call(commands)
     except StandardError:
@@ -568,8 +569,7 @@ def __build_deps():
 def __lint_project():
     print 'Search for lint errors\n'
     subprocess.call([
-        'python',
-        os.path.join(CLOSURE_LINTER_WRAPPER_PATH, 'gjslint.py'),
+        'gjslint',
         '--flagfile',
         'gjslint.cfg',
         '-r',
@@ -599,8 +599,7 @@ def __lint_project():
 def __autofix_project():
     print 'Trying to autofix lint errors\n'
     subprocess.call([
-        'python',
-        os.path.join(CLOSURE_LINTER_WRAPPER_PATH, 'fixjsstyle.py'),
+        'fixjsstyle',
         '--flagfile',
         'gjslint.cfg',
         '-r',
@@ -643,7 +642,7 @@ def __js_beautifier(path):
         with open(path, 'w') as f:
             f.write(res)
     except ImportError:
-        raise ImportError('You need install jsbeautifier. Run `./build contrib`')
+        raise ImportError('You need install jsbeautifier. Run `./build libs`')
 
 
 @sync_required
@@ -849,8 +848,8 @@ def __build_product_package(output_dir, binary_name, gallery_pass_func=None):
     shutil.copyfile(os.path.join(OUT_PATH, '%s.dev.min.js.gz' % binary_name), os.path.join(output_dir, 'js', '%s.dev.min.js.gz' % binary_name))
 
     # copy schemas
-    shutil.copyfile(os.path.join(PROJECT_PATH, 'xml-schema.xsd'), os.path.join(output_dir, 'schemas', 'xml-schema.xsd'))
-    shutil.copyfile(os.path.join(PROJECT_PATH, 'json-schema.json'), os.path.join(output_dir, 'schemas', 'json-schema.json'))
+    shutil.copyfile(os.path.join(DIST_PATH, 'xml-schema.xsd'), os.path.join(output_dir, 'schemas', 'xml-schema.xsd'))
+    shutil.copyfile(os.path.join(DIST_PATH, 'json-schema.json'), os.path.join(output_dir, 'schemas', 'json-schema.json'))
 
     # copy UI CSS
     shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.css'), os.path.join(output_dir, 'css', 'anychart-ui.css'))
@@ -1115,7 +1114,7 @@ def __compile_css():
     try:
         import lesscpy
     except ImportError:
-        raise ImportError('You need install lesscpy. Run `./build contrib`')
+        raise ImportError('You need install lesscpy. Run `./build libs`')
 
     __create_dir_if_not_exists(OUT_PATH)
 
@@ -1258,7 +1257,12 @@ def __exec_main_script():
                                      default='defaultTheme')
 
     # create the parser for the "contrib" command
-    contrib_parser = subparsers.add_parser('contrib', help='Synchronize project dependencies')
+    contrib_parser = subparsers.add_parser('contrib', help='Synchronize project dependencies. Deprecated. Use "./build.py libs" instead')
+    contrib_parser.add_argument('-l', '--linter', action='store_true',
+                                help='Install closure linter with others contributions.')
+
+    # create the parser for the "libs" command
+    contrib_parser = subparsers.add_parser('libs', help='Synchronize project dependencies')
     contrib_parser.add_argument('-l', '--linter', action='store_true',
                                 help='Install closure linter with others contributions.')
 
@@ -1268,7 +1272,7 @@ def __exec_main_script():
     # create the parser for the "lint" command
     subparsers.add_parser('lint', help='Exec linter check for whole project')
 
-    # create the parser for the "contrib" command
+    # create the parser for the "autofix" command
     subparsers.add_parser('autofix', help='Try to autofix linter warnings and errors')
 
     # create the parser for the "theme" command
@@ -1304,7 +1308,7 @@ def __exec_main_script():
 
     command = sys.argv[1]
 
-    if command == 'contrib':
+    if command == 'contrib' or command == 'libs':
         __sync_contrib()
     elif command == 'compile':
         __compile_project()

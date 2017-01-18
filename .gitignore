@@ -2,9 +2,8 @@
 *.swp
 .idea
 *.pid
-contrib/compiler/
+libs/compiler/
 out/*
-src/deps.js
 *.swo
 *.pyc
 demos-local
