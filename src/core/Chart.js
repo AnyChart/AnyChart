@@ -2976,14 +2976,20 @@ anychart.core.Chart.prototype.saveAsXlsx = function(opt_chartDataExportMode, opt
 
 /**
  * Opens Facebook sharing dialog.
- * @param {string=} opt_caption Caption for main link. If not set hostname will be used.
+ * @param {(string|Object)=} opt_captionOrOptions Caption for main link. If not set hostname will be used. Or object with options.
  * @param {string=} opt_link Url of the link attached to publication.
- * @param {string=} opt_name Title for the attached link. If not set hostname of opt_link url will be used.
+ * @param {string=} opt_name Title for the attached link. If not set hostname or opt_link url will be used.
  * @param {string=} opt_description Description for the attached link.
  */
-anychart.core.Chart.prototype.shareWithFacebook = function(opt_caption, opt_link, opt_name, opt_description) {
-  var imageWidth = 1200;
-  var imageHeight = 630;
+anychart.core.Chart.prototype.shareWithFacebook = function(opt_captionOrOptions, opt_link, opt_name, opt_description) {
+  var exportOptions = anychart.exports.facebook();
+  var args = anychart.utils.decomposeArguments({
+    'caption': opt_captionOrOptions,
+    'link': opt_link,
+    'name': opt_name,
+    'description': opt_description
+  }, opt_captionOrOptions, exportOptions);
+
   var w = 550;
   var h = 550;
   var left = Number((screen.width / 2) - (w / 2));
@@ -2993,22 +2999,25 @@ anychart.core.Chart.prototype.shareWithFacebook = function(opt_caption, opt_link
 
   var onSuccess = function(imgUrl) {
     var urlBase = 'https://www.facebook.com/dialog/feed';
-    var appIdDev = 1977415532485286;
-    var appId = 1167712323282103;
 
     // Dialog options described here https://developers.facebook.com/docs/sharing/reference/feed-dialog
     var urlOptions = {
-      'app_id': appIdDev,
+      'app_id': exportOptions['appId'],
       'display': 'popup',
       'picture': imgUrl
     };
 
-    urlOptions['caption'] = goog.isDef(opt_caption) ? opt_caption : window['location']['hostname'];
+    urlOptions['caption'] = args['caption'];
 
-    if (goog.isDef(opt_link)) {
-      urlOptions['link'] = opt_link;
-      if (goog.isDef(opt_name)) urlOptions['name'] = opt_name;
-      if (goog.isDef(opt_description)) urlOptions['description'] = opt_description;
+    if (args['link']) {
+      urlOptions['link'] = args['link'];
+
+      if (args['name']) {
+        urlOptions['name'] = args['name'];
+      }
+      if (args['description']) {
+        urlOptions['description'] = args['description'];
+      }
     }
 
     var options = '';
@@ -3019,6 +3028,8 @@ anychart.core.Chart.prototype.shareWithFacebook = function(opt_caption, opt_link
     popup.location.href = urlBase + '?' + options;
   };
 
+  var imageWidth = exportOptions['width'];
+  var imageHeight = exportOptions['height'];
   this.shareAsPng(onSuccess, undefined, false, imageWidth, imageHeight);
 };
 
@@ -3027,6 +3038,7 @@ anychart.core.Chart.prototype.shareWithFacebook = function(opt_caption, opt_link
  * Opens Twitter sharing dialog.
  */
 anychart.core.Chart.prototype.shareWithTwitter = function() {
+  var exportOptions = anychart.exports.twitter();
   var w = 600;
   var h = 520;
   var left = Number((screen.width / 2) - (w / 2));
@@ -3045,7 +3057,7 @@ anychart.core.Chart.prototype.shareWithTwitter = function() {
     goog.dom.classlist.add(mapForm, formClass);
     mapForm.target = 'Map';
     mapForm.method = 'POST';
-    mapForm.action = 'http://export.anychart.stg/sharing/twitter';
+    mapForm.action = exportOptions['url'];
 
     dataInput = goog.dom.createElement(goog.dom.TagName.INPUT);
     goog.dom.classlist.add(dataInput, dataInputClass);
@@ -3063,8 +3075,7 @@ anychart.core.Chart.prototype.shareWithTwitter = function() {
   }
 
   if (goog.isDef(mapForm) && goog.isDef(dataInput)) {
-    var imageWidth = 1024;
-    dataInput.value = this.toSvg(imageWidth);
+    dataInput.value = this.toSvg(exportOptions['width'], exportOptions['height']);
     var window = goog.dom.getWindow();
     var mapWindow = window.open('', 'Map', 'status=0,title=0,height=520,width=600,scrollbars=1, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
     if (mapWindow) mapForm.submit();
@@ -3074,12 +3085,16 @@ anychart.core.Chart.prototype.shareWithTwitter = function() {
 
 /**
  * Opens LinkedIn sharing dialog.
- * @param {string=} opt_caption Caption for publication. If not set 'AnyChart' will be used.
+ * @param {(string|Object)=} opt_captionOrOptions Caption for publication. If not set 'AnyChart' will be used. Or object with options.
  * @param {string=} opt_description Description. If not set opt_caption will be used.
  */
-anychart.core.Chart.prototype.shareWithLinkedIn = function(opt_caption, opt_description) {
-  var imageWidth = 1200;
-  var imageHeight = 630;
+anychart.core.Chart.prototype.shareWithLinkedIn = function(opt_captionOrOptions, opt_description) {
+  var exportOptions = anychart.exports.linkedin();
+  var args = anychart.utils.decomposeArguments({
+    'caption': opt_captionOrOptions,
+    'description': opt_description
+  }, opt_captionOrOptions, exportOptions);
+
   var w = 550;
   var h = 520;
   var left = Number((screen.width / 2) - (w / 2));
@@ -3096,10 +3111,9 @@ anychart.core.Chart.prototype.shareWithLinkedIn = function(opt_caption, opt_desc
       'url' : imgUrl
     };
 
-    urlOptions['title'] = goog.isDef(opt_caption) ? opt_caption : 'AnyChart';
-
-    if (goog.isDef(opt_description)) {
-      urlOptions['summary'] = opt_description;
+    urlOptions['title'] = args['caption'];
+    if (args['description']) {
+      urlOptions['summary'] = args['description'];
     }
 
     var options = '';
@@ -3110,18 +3124,22 @@ anychart.core.Chart.prototype.shareWithLinkedIn = function(opt_caption, opt_desc
     popup.location.href = urlBase + '?' + options;
   };
 
-  this.shareAsPng(onSuccess, undefined, false, imageWidth, imageHeight);
+  this.shareAsPng(onSuccess, undefined, false, exportOptions['width'], exportOptions['height']);
 };
 
 
 /**
  * Opens Pinterest sharing dialog.
- * @param {string=} opt_link Attached link. If not set, the image url will be used.
+ * @param {(string|Object)=} opt_linkOrOptions Attached link. If not set, the image url will be used. Or object with options.
  * @param {string=} opt_description Description.
  */
-anychart.core.Chart.prototype.shareWithPinterest = function(opt_link, opt_description) {
-  var imageWidth = 1200;
-  var imageHeight = 800;
+anychart.core.Chart.prototype.shareWithPinterest = function(opt_linkOrOptions, opt_description) {
+  var exportOptions = anychart.exports.pinterest();
+  var args = anychart.utils.decomposeArguments({
+    'link': opt_linkOrOptions,
+    'description': opt_description
+  }, opt_linkOrOptions, exportOptions);
+
   var w = 550;
   var h = 520;
   var left = Number((screen.width / 2) - (w / 2));
@@ -3135,12 +3153,12 @@ anychart.core.Chart.prototype.shareWithPinterest = function(opt_link, opt_descri
       'media' : imgUrl
     };
 
-    if (goog.isDef(opt_link)) {
-      urlOptions['url'] = opt_link;
+    if (args['link']) {
+      urlOptions['url'] = args['link'];
     }
 
-    if (goog.isDef(opt_description)) {
-      urlOptions['description'] = opt_description;
+    if (args['description']) {
+      urlOptions['description'] = args['description'];
     }
 
     var options = '';
@@ -3152,7 +3170,7 @@ anychart.core.Chart.prototype.shareWithPinterest = function(opt_link, opt_descri
     popup.location.href = urlBase + '?' + options;
   };
 
-  this.shareAsPng(onSuccess, undefined, false, imageWidth, imageHeight);
+  this.shareAsPng(onSuccess, undefined, false, exportOptions['width'], exportOptions['height']);
 };
 
 //exports

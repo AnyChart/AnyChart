@@ -13,6 +13,7 @@ goog.require('goog.dom');
 goog.require('goog.dom.xml');
 goog.require('goog.i18n.DateTimeFormat');
 goog.require('goog.json.hybrid');
+goog.require('goog.object');
 
 
 /**
@@ -1987,6 +1988,44 @@ anychart.utils.printUtilsBoolean = function() {
   return anychart.isValidKey();
 };
 
+
+/**
+ * Decomposes function arguments.
+ * Converts list of arguments from mixed format, where first argument can be either simple option, or object with named options,
+ * to array of arguments that can be applied with apply() function.
+ * @param {Object} namedArguments Object that maps option names to function arguments.
+ * <code>
+ *   // Example
+ *   {
+ *   'paperSize': opt_paperSizeOrWidthOrOptions,
+ *   'width': opt_paperSizeOrWidthOrOptions,
+ *   'landscape': opt_landscapeOrHeight,
+ *   'height': opt_landscapeOrHeight,
+ *   'filename': opt_filename
+ *   }
+ * </code>
+ * @param {(Object|*)=} opt_options Object of options (usually first argument of function).
+ * @param {Object=} opt_defaults Default option values in the same format as 'namedArguments'.
+ * @return {Object} Result arguments as object in the same format as 'namedArguments'.
+ */
+anychart.utils.decomposeArguments = function(namedArguments, opt_options, opt_defaults) {
+  var result = {};
+  opt_options = goog.typeOf(opt_options) == 'object' ? opt_options : null;
+
+  goog.object.forEach(namedArguments, function(arg, name) {
+    if (opt_options) {
+      result[name] = goog.isDef(opt_options[name]) ? opt_options[name] : undefined;
+    } else {
+      result[name] = arg;
+    }
+
+    if (goog.isDef(opt_defaults)) {
+      result[name] = result[name] || opt_defaults[name];
+    }
+  });
+
+  return result;
+};
 
 //exports
 goog.exportSymbol('anychart.utils.printUtilsBoolean', anychart.utils.printUtilsBoolean);

@@ -80,7 +80,10 @@ acgraph.vector.Stage.prototype.credits = function(opt_value) {
  @param {string=} opt_address Export server script URL.
  @return {string} Export server script URL.
  */
-anychart.server = goog.global['acgraph']['server'];
+anychart.server = function(opt_address) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.server', 'anychart.exports.server'], true);
+  return anychart.exports.server(opt_address);
+};
 
 
 //----------------------------------------------------------------------------------------------------------------------
