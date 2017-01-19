@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#coding=utf-8
+# coding=utf-8
 
 import os
 import sys
@@ -15,13 +15,13 @@ import gzip
 import shutil
 import multiprocessing
 
-#=======================================================================================================================
+# =======================================================================================================================
 #           Project paths
-#=======================================================================================================================
-#java heap size in Mb
+# =======================================================================================================================
+# java heap size in Mb
 JAVA_HEAP_SIZE = 1024
 
-#project
+# project
 PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 CONTRIB_PATH = os.path.join(PROJECT_PATH, 'libs')
 SRC_PATH = os.path.join(PROJECT_PATH, 'src')
@@ -30,11 +30,11 @@ DIST_PATH = os.path.join(PROJECT_PATH, 'out')
 MODULES_PATH = os.path.join(SRC_PATH, 'modules')
 THEMES_PATH = os.path.join(SRC_PATH, 'themes')
 
-#graphics
+# graphics
 GRAPHICS_PATH = os.path.join(CONTRIB_PATH, 'graphicsjs')
 GRAPHICS_SRC_PATH = os.path.join(CONTRIB_PATH, GRAPHICS_PATH, 'src')
 
-#closure tools
+# closure tools
 COMPILER_VERSION = '20161024'
 COMPILER_PATH = os.path.join(CONTRIB_PATH, 'compiler', 'closure-compiler-v%s.jar' % COMPILER_VERSION)
 EXTERNS_PATH = os.path.join(PROJECT_PATH, 'externs.js')
@@ -45,17 +45,17 @@ DEPS_WRITER_PATH = os.path.join(CLOSURE_BIN_PATH, 'build', 'depswriter.py')
 CLOSURE_BUILDER_PATH = os.path.join(CLOSURE_BIN_PATH, 'build', 'closurebuilder.py')
 
 
-#=======================================================================================================================
+# =======================================================================================================================
 #                            Utils
-#=======================================================================================================================
+# =======================================================================================================================
 def __create_dir_if_not_exists(path):
     if not os.path.exists(path):
         os.mkdir(path)
 
 
-#=======================================================================================================================
+# =======================================================================================================================
 #                            Synchronize contributions.
-#=======================================================================================================================
+# =======================================================================================================================
 def __has_closure_compiler():
     return os.path.exists(COMPILER_PATH)
 
@@ -74,7 +74,7 @@ def __sync_contrib():
     subprocess.call(['rm', '-f', '.git/hooks/post-checkout'])
     subprocess.call(['ln', '-s', '../../update-submodules', '.git/hooks/post-checkout'])
 
-    #Download closure compiler
+    # Download closure compiler
     if not os.path.exists(COMPILER_PATH):
         print 'Download closure compiler'
         __download_and_unzip_from_http(
@@ -83,7 +83,7 @@ def __sync_contrib():
             'compiler'
         )
 
-    #Install lesscpy
+    # Install lesscpy
     print 'Install lesscpy'
     commands = [] if platform.system() == 'Windows' else ['sudo']
     commands.append('easy_install')
@@ -98,7 +98,7 @@ def __sync_contrib():
     commands += ['easy_install', 'jsbeautifier==1.6.2']
     subprocess.call(commands)
 
-    #Install closure linter
+    # Install closure linter
     global arguments
     if 'linter' in arguments and arguments['linter']:
         __install_closure_linter()
@@ -149,9 +149,9 @@ def sync_required(func):
     return wrapper
 
 
-#=======================================================================================================================
+# =======================================================================================================================
 #                            Compiler flags generation.
-#=======================================================================================================================
+# =======================================================================================================================
 class OptimizationLevel:
     NONE = 0
     SIMPLE = 1
@@ -167,7 +167,7 @@ def __set_pretty_print(flags):
 
 
 def __set_optimization_level(flags, level):
-    #set compiler level
+    # set compiler level
     if level == OptimizationLevel.NONE:
         __add_option(flags, 'compilation_level', 'WHITESPACE_ONLY')
     elif level == OptimizationLevel.SIMPLE:
@@ -277,7 +277,7 @@ def __get_default_compiler_args(theme, modules):
         '--charset UTF-8',
         '--define "anychart.VERSION=\'%s\'"' % __get_version(True),
         '--dependency_mode=STRICT',
-        #'--externs ' + EXTERNS_PATH,
+        # '--externs ' + EXTERNS_PATH,
         '--extra_annotation_name "includeDoc"',
         '--extra_annotation_name "illustration"',
         '--extra_annotation_name "illustrationDesc"',
@@ -297,9 +297,9 @@ def __get_default_compiler_args(theme, modules):
     return result
 
 
-#=======================================================================================================================
+# =======================================================================================================================
 #           Build project
-#=======================================================================================================================
+# =======================================================================================================================
 @sync_required
 def __compile_project_each():
     t = time.time()
@@ -347,41 +347,89 @@ def __build_project(develop, modules, sources, theme, debug, gzip, perf_monitori
     perf_postfix = '.perf' if perf_monitoring else ''
     file_name = "%s%s%s%s" % ('_'.join(modules), dev_postfix, perf_postfix, '.min.js')
     __optimized_compiler_args = __get_optimized_compiler_args()
+
     if sources:
-        file_name = "%s%s%s%s" % ('_'.join(modules), dev_postfix, perf_postfix, '.js')
+        file_name = ("%s%s%s%s" % ('-'.join(modules), dev_postfix, perf_postfix, '.js')).replace('_', '-')
+        output_file = os.path.join(OUT_PATH, file_name)
+
+        tmp_file_name = "%s%s%s%s" % ('_'.join(modules), dev_postfix, perf_postfix, '_tmp.js')
+        tmp_output_file = os.path.join(OUT_PATH, tmp_file_name)
+
+        copyright = __get_copyrigth(modules)
+        wrapper = __get_wrapper(file_name)
+
+        deps_manifest_file = os.path.join(OUT_PATH, 'deps.mf')
+
         __optimized_compiler_args = __get_not_optimized_compiler_args()
-    file_name = __apply_specific_file_name_rule(file_name, modules)
-    output_file = os.path.join(OUT_PATH, file_name)
-    copyright = __get_copyrigth(modules)
-    wrapper = __get_wrapper(file_name)
-    commands = sum([__get_default_compiler_args(theme, modules),
-                   __optimized_compiler_args,
-                   __get_developers_edition_compiler_args(develop),
-                   __get_performance_monitoring_compiler_args(perf_monitoring),
-                   __get_name_spaces(modules),
-                   __get_roots(),
-                   __get_output_file_arg(output_file),
-                   ['--output_wrapper "' + copyright + wrapper + '"', '--assume_function_wrapper']], [])
+        commands = sum([
+            __get_default_compiler_args(theme, modules),
+            __optimized_compiler_args,
+            __get_name_spaces(modules),
+            __get_roots(),
+            __get_output_file_arg(tmp_output_file),
+            ['--output_manifest ' + deps_manifest_file],
+        ], [])
 
-    #debug info
-    if debug and not sources:
-        path = PROJECT_PATH.replace('\\', '/')
-        commands += ['--property_renaming_report %s' % output_file + '_prop_out.txt',
-                     '--variable_renaming_report %s' % output_file + '_var_out.txt',
-                     '--create_source_map %s' % output_file + '.map',
-                     '--source_map_location_mapping \"%s|http://localhost:63341/ACDVF\"' % path]
+        # print build log
+        __log_compilation(output_file, args)
+        if 'anychart_ui' in modules or 'anychart_bundle' in modules:
+            __compile_css()
 
-    # print build log
-    __log_compilation(output_file, args)
-    if 'anychart_ui' in modules or 'anychart_bundle' in modules:
-        __compile_css()
+        __call_console_commands(commands, module=modules[0])
 
-    # build binary file
-    __call_console_commands(commands, module=modules[0])
+        output = ''
+        f = open(deps_manifest_file, 'r')
+        for line in f:
+            output += open(line.replace('\n', ''), 'r').read()
+        f.close()
 
-    # gzip binary file
-    if gzip:
-        __gzip_file(output_file)
+        output = output\
+            .replace('var COMPILED = false;', 'var COMPILED = true;')\
+            .replace('var goog = goog || {};', 'this.goog = this.goog || {};\nvar goog = this.goog;\nthis.anychart = this.anychart || {};\nvar anychart = this.anychart')
+        wrapper = wrapper.replace('%output%', output)
+
+        open(output_file, 'w').write(copyright + wrapper)
+
+        os.remove(tmp_output_file)
+        os.remove(deps_manifest_file)
+
+
+        # gzip binary file
+        if gzip:
+            __gzip_file(output_file)
+    else:
+        file_name = __apply_specific_file_name_rule(file_name, modules)
+        output_file = os.path.join(OUT_PATH, file_name)
+        copyright = __get_copyrigth(modules)
+        wrapper = __get_wrapper(file_name)
+        commands = sum([__get_default_compiler_args(theme, modules),
+                        __optimized_compiler_args,
+                        __get_developers_edition_compiler_args(develop),
+                        __get_performance_monitoring_compiler_args(perf_monitoring),
+                        __get_name_spaces(modules),
+                        __get_roots(),
+                        __get_output_file_arg(output_file),
+                        ['--output_wrapper "' + copyright + wrapper + '"', '--assume_function_wrapper']], [])
+
+        # debug info
+        if debug and not sources:
+            path = PROJECT_PATH.replace('\\', '/')
+            commands += ['--property_renaming_report %s' % output_file + '_prop_out.txt',
+                         '--variable_renaming_report %s' % output_file + '_var_out.txt',
+                         '--create_source_map %s' % output_file + '.map',
+                         '--source_map_location_mapping \"%s|http://localhost:63341/ACDVF\"' % path]
+
+        # print build log
+        __log_compilation(output_file, args)
+        if 'anychart_ui' in modules or 'anychart_bundle' in modules:
+            __compile_css()
+
+        # build binary file
+        __call_console_commands(commands, module=modules[0])
+
+        # gzip binary file
+        if gzip:
+            __gzip_file(output_file)
 
 
 def __log_compilation(output_file, args):
@@ -418,7 +466,7 @@ def __apply_specific_file_name_rule(file_name, modules):
 def __call_console_commands(commands, cwd=None, module=None):
     commands = " ".join(commands).replace('\\', '\\\\')
     commands = shlex.split(commands)
-    #print commands
+    # print commands
     p = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=cwd)
     (output, err) = p.communicate()
     retcode = p.poll()
@@ -433,7 +481,8 @@ def __get_copyrigth(modules):
     version = __get_version(True)
     url = 'http://anychart.com'
 
-    if len(modules) == 1 and modules[0] in ['anychart_bundle', 'anychart', 'anymap', 'anygantt', 'anystock', 'anychart_ui', 'data_adapter']:
+    if len(modules) == 1 and modules[0] in ['anychart_bundle', 'anychart', 'anymap', 'anygantt', 'anystock',
+                                            'anychart_ui', 'data_adapter']:
         module = modules[0]
 
         if module == 'anychart_bundle':
@@ -480,7 +529,8 @@ def __get_wrapper(file_name):
                          '(window.anychart_init_start=(typeof window.performance==\'object\')' + \
                          '&&(typeof window.performance.now==\'function\')?window.performance.now():+new Date()-window.anychart_init_start).toFixed(5),\'ms\');delete window.anychart_init_start'
     sourceMapping = ('//# sourceMappingURL=%s.map' % file_name) if __should_gen_debug_files() else ''
-    return '(function(global,factory){if(typeof module===\'object\'&&typeof module.exports===\'object\'){module.exports=function(w){if(!w.document){throw new Error(\'AnyChart requires a window with a document\');}factory.call(w,w,w.document);w.anychart.getGlobal=function(){return w;};return w.anychart;};}else{factory.call(global,window,document)}})(typeof window!==\'undefined\'?window:this,function(window,document){%s%s%s})%s' % (performanceStart, '%output%', performanceEnd, sourceMapping)
+    return '(function(global,factory){if(typeof module===\'object\'&&typeof module.exports===\'object\'){module.exports=function(w){if(!w.document){throw new Error(\'AnyChart requires a window with a document\');}factory.call(w,w,w.document);w.anychart.getGlobal=function(){return w;};return w.anychart;};}else{factory.call(global,window,document)}})(typeof window!==\'undefined\'?window:this,function(window,document){%s%s%s})%s' % (
+        performanceStart, '%output%', performanceEnd, sourceMapping)
 
 
 def __is_allowed_modules(modules):
@@ -521,9 +571,9 @@ def __gzip_dir(input_path, output_path):
     archive.close()
 
 
-#=======================================================================================================================
+# =======================================================================================================================
 #           Build deps
-#=======================================================================================================================
+# =======================================================================================================================
 @sync_required
 def __build_deps():
     output_file = os.path.join(SRC_PATH, 'deps.js')
@@ -537,9 +587,9 @@ def __build_deps():
     ])
 
 
-#=======================================================================================================================
+# =======================================================================================================================
 #                            Linter.
-#=======================================================================================================================
+# =======================================================================================================================
 @sync_required
 def __lint_project():
     print 'Search for lint errors\n'
@@ -567,9 +617,9 @@ def __lint_project():
     print file_with_errors.replace(' ', '\n') + 'RUN AUTOFIX to fix this\n' if (len(file_with_errors) > 0) else 'ok'
 
 
-#=======================================================================================================================
+# =======================================================================================================================
 #                            Linter Autofix.
-#=======================================================================================================================
+# =======================================================================================================================
 @sync_required
 def __autofix_project():
     print 'Trying to autofix lint errors\n'
@@ -598,9 +648,9 @@ def __autofix_project():
             print 'fixed ' + path
 
 
-#=======================================================================================================================
+# =======================================================================================================================
 #                            Themes.
-#=======================================================================================================================
+# =======================================================================================================================
 def __get_themes_list():
     themes_list = []
     for f in os.listdir(THEMES_PATH):
@@ -668,9 +718,9 @@ def __exec_build_theme(theme, is_source):
         __js_beautifier(os.path.join(OUT_PATH, theme + output_file_postfix))
 
 
-#=======================================================================================================================
+# =======================================================================================================================
 #                            Build release.
-#=======================================================================================================================
+# =======================================================================================================================
 @sync_required
 def __build_release():
     global arguments
@@ -680,8 +730,10 @@ def __build_release():
     short_version = __get_version(False)
     print "Build release for version: %s" % full_version
 
-    dev_options = {'develop': False, 'modules': None, 'sources': False, 'theme': 'defaultTheme', 'debug_files': False, 'gzip': True, 'performance_monitoring': False}
-    prod_options = {'develop': True, 'modules': None, 'sources': False, 'theme': 'defaultTheme', 'debug_files': False, 'gzip': True, 'performance_monitoring': False}
+    dev_options = {'develop': False, 'modules': None, 'sources': False, 'theme': 'defaultTheme', 'debug_files': False,
+                   'gzip': True, 'performance_monitoring': False}
+    prod_options = {'develop': True, 'modules': None, 'sources': False, 'theme': 'defaultTheme', 'debug_files': False,
+                    'gzip': True, 'performance_monitoring': False}
     export_server_project_path = arguments['export_server_path']
 
     mods = ['anychart_bundle', 'anychart',
@@ -756,13 +808,17 @@ def __build_release():
         export_server_version, export_server_bundle_version = __get_export_server_version(export_server_project_path)
 
         # build export server
-        shutil.copyfile(os.path.join(OUT_PATH, 'anychart-bundle.min.js'), os.path.join(export_server_project_path, 'resources', 'js', 'anychart-bundle.min.js'))
+        shutil.copyfile(os.path.join(OUT_PATH, 'anychart-bundle.min.js'),
+                        os.path.join(export_server_project_path, 'resources', 'js', 'anychart-bundle.min.js'))
         p = subprocess.Popen(['lein', 'uberjar'], cwd=export_server_project_path)
         p.wait()
 
         # copy to out
-        shutil.copyfile(os.path.join(export_server_project_path, 'target', 'export-server-standalone.jar'), os.path.join(OUT_PATH, 'export-server.jar'))
-        shutil.copyfile(os.path.join(export_server_project_path, 'target', 'export-server-standalone.jar'), os.path.join(OUT_PATH, 'export-server-%s-bundle-%s.jar' % (export_server_version, export_server_bundle_version)))
+        shutil.copyfile(os.path.join(export_server_project_path, 'target', 'export-server-standalone.jar'),
+                        os.path.join(OUT_PATH, 'export-server.jar'))
+        shutil.copyfile(os.path.join(export_server_project_path, 'target', 'export-server-standalone.jar'),
+                        os.path.join(OUT_PATH, 'export-server-%s-bundle-%s.jar' % (
+                        export_server_version, export_server_bundle_version)))
     else:
         print "Error: Unable to build export server, there is no project at path: %s" % export_server_project_path
 
@@ -781,10 +837,14 @@ def __build_product_package(output_dir, binary_name, gallery_pass_func=None):
     os.mkdir(os.path.join(output_dir, 'schemas'))
 
     # copy binaries
-    shutil.copyfile(os.path.join(OUT_PATH, '%s.min.js' % binary_name), os.path.join(output_dir, 'js', '%s.min.js' % binary_name))
-    shutil.copyfile(os.path.join(OUT_PATH, '%s.min.js.gz' % binary_name), os.path.join(output_dir, 'js', '%s.min.js.gz' % binary_name))
-    shutil.copyfile(os.path.join(OUT_PATH, '%s.dev.min.js' % binary_name), os.path.join(output_dir, 'js', '%s.dev.min.js' % binary_name))
-    shutil.copyfile(os.path.join(OUT_PATH, '%s.dev.min.js.gz' % binary_name), os.path.join(output_dir, 'js', '%s.dev.min.js.gz' % binary_name))
+    shutil.copyfile(os.path.join(OUT_PATH, '%s.min.js' % binary_name),
+                    os.path.join(output_dir, 'js', '%s.min.js' % binary_name))
+    shutil.copyfile(os.path.join(OUT_PATH, '%s.min.js.gz' % binary_name),
+                    os.path.join(output_dir, 'js', '%s.min.js.gz' % binary_name))
+    shutil.copyfile(os.path.join(OUT_PATH, '%s.dev.min.js' % binary_name),
+                    os.path.join(output_dir, 'js', '%s.dev.min.js' % binary_name))
+    shutil.copyfile(os.path.join(OUT_PATH, '%s.dev.min.js.gz' % binary_name),
+                    os.path.join(output_dir, 'js', '%s.dev.min.js.gz' % binary_name))
 
     # copy schemas
     shutil.copyfile(os.path.join(DIST_PATH, 'xml-schema.xsd'), os.path.join(output_dir, 'schemas', 'xml-schema.xsd'))
@@ -793,25 +853,35 @@ def __build_product_package(output_dir, binary_name, gallery_pass_func=None):
     # copy UI CSS
     shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.css'), os.path.join(output_dir, 'css', 'anychart-ui.css'))
     shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.css.gz'), os.path.join(output_dir, 'css', 'anychart-ui.css.gz'))
-    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.min.css'), os.path.join(output_dir, 'css', 'anychart-ui.min.css'))
-    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.min.css.gz'), os.path.join(output_dir, 'css', 'anychart-ui.min.css.gz'))
+    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.min.css'),
+                    os.path.join(output_dir, 'css', 'anychart-ui.min.css'))
+    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.min.css.gz'),
+                    os.path.join(output_dir, 'css', 'anychart-ui.min.css.gz'))
 
     # copy UI JS
     shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.min.js'), os.path.join(output_dir, 'js', 'anychart-ui.min.js'))
-    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.min.js.gz'), os.path.join(output_dir, 'js', 'anychart-ui.min.js.gz'))
-    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.dev.min.js'), os.path.join(output_dir, 'js', 'anychart-ui.dev.min.js'))
-    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.dev.min.js.gz'), os.path.join(output_dir, 'js', 'anychart-ui.dev.min.js.gz'))
+    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.min.js.gz'),
+                    os.path.join(output_dir, 'js', 'anychart-ui.min.js.gz'))
+    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.dev.min.js'),
+                    os.path.join(output_dir, 'js', 'anychart-ui.dev.min.js'))
+    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-ui.dev.min.js.gz'),
+                    os.path.join(output_dir, 'js', 'anychart-ui.dev.min.js.gz'))
 
     # copy data adapter
-    shutil.copyfile(os.path.join(OUT_PATH, 'data-adapter.min.js'), os.path.join(output_dir, 'js', 'data-adapter.min.js'))
-    shutil.copyfile(os.path.join(OUT_PATH, 'data-adapter.min.js.gz'), os.path.join(output_dir, 'js', 'data-adapter.min.js.gz'))
-    shutil.copyfile(os.path.join(OUT_PATH, 'data-adapter.dev.min.js'), os.path.join(output_dir, 'js', 'data-adapter.dev.min.js'))
-    shutil.copyfile(os.path.join(OUT_PATH, 'data-adapter.dev.min.js.gz'), os.path.join(output_dir, 'js', 'data-adapter.dev.min.js.gz'))
+    shutil.copyfile(os.path.join(OUT_PATH, 'data-adapter.min.js'),
+                    os.path.join(output_dir, 'js', 'data-adapter.min.js'))
+    shutil.copyfile(os.path.join(OUT_PATH, 'data-adapter.min.js.gz'),
+                    os.path.join(output_dir, 'js', 'data-adapter.min.js.gz'))
+    shutil.copyfile(os.path.join(OUT_PATH, 'data-adapter.dev.min.js'),
+                    os.path.join(output_dir, 'js', 'data-adapter.dev.min.js'))
+    shutil.copyfile(os.path.join(OUT_PATH, 'data-adapter.dev.min.js.gz'),
+                    os.path.join(output_dir, 'js', 'data-adapter.dev.min.js.gz'))
 
     # copy themes
     for theme in __get_themes_list():
         shutil.copyfile(os.path.join(OUT_PATH, theme + '.js'), os.path.join(output_dir, 'js', 'themes', theme + '.js'))
-        shutil.copyfile(os.path.join(OUT_PATH, theme + '.min.js'), os.path.join(output_dir, 'js', 'themes', theme + '.min.js'))
+        shutil.copyfile(os.path.join(OUT_PATH, theme + '.min.js'),
+                        os.path.join(output_dir, 'js', 'themes', theme + '.min.js'))
 
     # copy demos
     for name in os.listdir(os.path.join(OUT_PATH, 'gallery_demos')):
@@ -828,10 +898,12 @@ def __build_product_package(output_dir, binary_name, gallery_pass_func=None):
                 f = open(filepath, 'w')
 
                 # replace binary name and add link to anychart-ui-.min.js
-                text = text.replace('<script src="./../js/anychart.min.js"></script>', '<script src="../../js/%s.min.js"></script>\n        <script src="../../js/anychart-ui.min.js"></script>' % binary_name)
+                text = text.replace('<script src="./../js/anychart.min.js"></script>',
+                                    '<script src="../../js/%s.min.js"></script>\n        <script src="../../js/anychart-ui.min.js"></script>' % binary_name)
 
                 # replace cdn link, to local link
-                text = text.replace('https://cdn.anychart.com/css/latest/anychart-ui.min.css', '../../css/anychart-ui.min.css')
+                text = text.replace('https://cdn.anychart.com/css/latest/anychart-ui.min.css',
+                                    '../../css/anychart-ui.min.css')
 
                 f.write(text)
                 f.close()
@@ -850,7 +922,8 @@ def __build_product_package(output_dir, binary_name, gallery_pass_func=None):
         __call_console_commands(cls_zip_command, './out')
         shutil.rmtree(output_dir)
     except Exception as e:
-        print "Can't zip packages because of an Error:\n" + e.message + "\n" + "You have to zip it by your self.\nRecommended command is:\n" + ' '.join(cls_zip_command)
+        print "Can't zip packages because of an Error:\n" + e.message + "\n" + "You have to zip it by your self.\nRecommended command is:\n" + ' '.join(
+            cls_zip_command)
 
 
 def __print_gz_stat():
@@ -963,7 +1036,8 @@ def __upload_release():
     # export server
     export_server_version, export_server_bundle_version = __get_export_server_version(export_server_project_path)
     upload_list.append({'source_file': '%s/export-server.jar' % OUT_PATH, 'target': '/export-server/'})
-    upload_list.append({'source_file': '%s/export-server-%s-bundle-%s.jar' % (OUT_PATH, export_server_version, export_server_bundle_version), 'target': '/export-server/'})
+    upload_list.append({'source_file': '%s/export-server-%s-bundle-%s.jar' % (
+    OUT_PATH, export_server_version, export_server_bundle_version), 'target': '/export-server/'})
 
     # check all files exists
     should_exit = False
@@ -975,7 +1049,7 @@ def __upload_release():
     if should_exit:
         sys.exit(1)
 
-    #errors list
+    # errors list
     errors = []
 
     # upload and invalidate
@@ -1046,9 +1120,9 @@ def safe_index_of(string, substring):
     return index_value
 
 
-#=======================================================================================================================
+# =======================================================================================================================
 #                            Less css.
-#=======================================================================================================================
+# =======================================================================================================================
 def __compile_css():
     try:
         import lesscpy
@@ -1079,9 +1153,9 @@ def __compile_css():
     print "CSS compiled"
 
 
-#=======================================================================================================================
+# =======================================================================================================================
 #                            Logging.
-#=======================================================================================================================
+# =======================================================================================================================
 warnings_list = []
 
 
@@ -1095,11 +1169,11 @@ def __print_warnings_list():
         print msg
 
 
-#=======================================================================================================================
+# =======================================================================================================================
 #                            Version.
-#=======================================================================================================================
+# =======================================================================================================================
 def __get_version(opt_commits_count=False):
-    #get global, major, minor versions from version.ini
+    # get global, major, minor versions from version.ini
     version_file = os.path.join(PROJECT_PATH, 'version.ini')
     f = open(version_file, 'r')
     lines = f.readlines()
@@ -1110,7 +1184,7 @@ def __get_version(opt_commits_count=False):
     patch = lines[2].split('=')[1].strip()
 
     if opt_commits_count:
-        #get commits count from git repo
+        # get commits count from git repo
         p = subprocess.Popen(
             ['git', 'rev-list', 'HEAD', '--count'],
             stdout=subprocess.PIPE,
@@ -1125,13 +1199,13 @@ def __get_version(opt_commits_count=False):
 
 
 def __get_export_server_version(export_server_project_path):
-        f = open(os.path.join(export_server_project_path, 'project.clj'), 'r')
-        export_server_project_text = f.read()
-        f.close()
-        return (
-            export_server_project_text.split('defproject export-server "')[1].split('"')[0].strip(),
-            export_server_project_text.split('AnyChart Bundle version')[1].split('"')[0].strip()
-        )
+    f = open(os.path.join(export_server_project_path, 'project.clj'), 'r')
+    export_server_project_text = f.read()
+    f.close()
+    return (
+        export_server_project_text.split('defproject export-server "')[1].split('"')[0].strip(),
+        export_server_project_text.split('AnyChart Bundle version')[1].split('"')[0].strip()
+    )
 
 
 def __is_develop():
@@ -1156,12 +1230,12 @@ def __should_gen_gzip():
 
 #=======================================================================================================================
 #           Main
-#=======================================================================================================================
+# =======================================================================================================================
 arguments = {}
 
 
 def __exec_main_script():
-    #root parser
+    # root parser
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(help='AnyChart framework build script commands:')
 
@@ -1228,7 +1302,8 @@ def __exec_main_script():
 
     # create files for release
     release_parser = subparsers.add_parser('release', help='Creates release files in output directory.')
-    release_parser.add_argument('-esp', '--export-server-path', dest='export_server_path', action='store', default=os.path.join(PROJECT_PATH, '..', 'export-server'))
+    release_parser.add_argument('-esp', '--export-server-path', dest='export_server_path', action='store',
+                                default=os.path.join(PROJECT_PATH, '..', 'export-server'))
     release_parser.add_argument('-p', '--process', action='store', type=int,
                                 help="Specify the number of parallel processes to compile. By default 2 process",
                                 default=4)
@@ -1241,11 +1316,16 @@ def __exec_main_script():
     css_parser = subparsers.add_parser('css', help='Compile AnyChart UI css')
     css_parser.add_argument('-gz', '--gzip', action='store_true', help='Create gzip copy of output files.')
 
-    upload_release_parser = subparsers.add_parser('upload_release', help='Uploads release related files from /out folder to static.anychart.com and cdn.anychart.com. Invalidates CDN cache.')
-    upload_release_parser.add_argument('-v', '--version', action='store', help="Version of the release, affects only folder on the remote server. Doesn't affect code version, export server version or wherever else version. ")
-    upload_release_parser.add_argument('-nl', '--not-latest', dest='is_latest', action='store_false', help="Prevent to upload release files to 'latest' directory")
-    upload_release_parser.add_argument('-dr', '--dry-run', dest='dry_run', action='store_true', help="Print what will happen, don't really upload files.")
-    upload_release_parser.add_argument('-esp', '--export-server-path', dest='export_server_path', action='store', default=os.path.join(PROJECT_PATH, '..', 'export-server'))
+    upload_release_parser = subparsers.add_parser('upload_release',
+                                                  help='Uploads release related files from /out folder to static.anychart.com and cdn.anychart.com. Invalidates CDN cache.')
+    upload_release_parser.add_argument('-v', '--version', action='store',
+                                       help="Version of the release, affects only folder on the remote server. Doesn't affect code version, export server version or wherever else version. ")
+    upload_release_parser.add_argument('-nl', '--not-latest', dest='is_latest', action='store_false',
+                                       help="Prevent to upload release files to 'latest' directory")
+    upload_release_parser.add_argument('-dr', '--dry-run', dest='dry_run', action='store_true',
+                                       help="Print what will happen, don't really upload files.")
+    upload_release_parser.add_argument('-esp', '--export-server-path', dest='export_server_path', action='store',
+                                       default=os.path.join(PROJECT_PATH, '..', 'export-server'))
     upload_release_parser.set_defaults(is_latest=True, version=__get_version(False))
 
     global arguments
