@@ -3,7 +3,6 @@ goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
 goog.require('anychart.core.drawers.SplineDrawer');
 goog.require('anychart.enums');
-goog.require('anychart.opt');
 
 
 
@@ -57,9 +56,9 @@ anychart.core.drawers.SplineArea.prototype.flags = (
 /** @inheritDoc */
 anychart.core.drawers.SplineArea.prototype.requiredShapes = (function() {
   var res = {};
-  res[anychart.opt.FILL] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.HATCH_FILL] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.STROKE] = anychart.enums.ShapeType.PATH;
+  res['fill'] = anychart.enums.ShapeType.PATH;
+  res['hatchFill'] = anychart.enums.ShapeType.PATH;
+  res['stroke'] = anychart.enums.ShapeType.PATH;
   return res;
 })();
 
@@ -75,16 +74,16 @@ anychart.core.drawers.SplineArea.prototype.startDrawing = function(shapeManager)
    * @private
    */
   this.forwardPaths_ = [
-    /** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]),
-    /** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]),
-    /** @type {acgraph.vector.Path} */(shapes[anychart.opt.STROKE])];
+    /** @type {acgraph.vector.Path} */(shapes['fill']),
+    /** @type {acgraph.vector.Path} */(shapes['hatchFill']),
+    /** @type {acgraph.vector.Path} */(shapes['stroke'])];
   /**
    * @type {Array.<acgraph.vector.Path>}
    * @private
    */
   this.backwardPaths_ = [
-    /** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]),
-    /** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL])];
+    /** @type {acgraph.vector.Path} */(shapes['fill']),
+    /** @type {acgraph.vector.Path} */(shapes['hatchFill'])];
 };
 
 
@@ -92,9 +91,9 @@ anychart.core.drawers.SplineArea.prototype.startDrawing = function(shapeManager)
 anychart.core.drawers.SplineArea.prototype.drawMissingPoint = function(point, state) {
   if (this.connectMissing) {
     if (this.series.planIsStacked()) {
-      var x = /** @type {number} */(point.meta(anychart.opt.X));
-      var zero = /** @type {number} */(point.meta(anychart.opt.ZERO));
-      var zeroMissing = /** @type {boolean} */(point.meta(anychart.opt.ZERO_MISSING));
+      var x = /** @type {number} */(point.meta('x'));
+      var zero = /** @type {number} */(point.meta('zero'));
+      var zeroMissing = /** @type {boolean} */(point.meta('zeroMissing'));
       this.zeroesStack.push(x, zero, zeroMissing);
     }
   } else {
@@ -106,18 +105,18 @@ anychart.core.drawers.SplineArea.prototype.drawMissingPoint = function(point, st
 /** @inheritDoc */
 anychart.core.drawers.SplineArea.prototype.drawFirstPoint = function(point, state) {
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var zero = /** @type {number} */(point.meta(anychart.opt.ZERO));
-  var zeroMissing = /** @type {boolean} */(point.meta(anychart.opt.ZERO_MISSING));
-  var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
+  var x = /** @type {number} */(point.meta('x'));
+  var zero = /** @type {number} */(point.meta('zero'));
+  var zeroMissing = /** @type {boolean} */(point.meta('zeroMissing'));
+  var y = /** @type {number} */(point.meta('value'));
 
   this.queue_.setPaths(this.forwardPaths_);
   this.queue_.resetDrawer(false);
-  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]), this.isVertical, x, zero);
-  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]), this.isVertical, x, y);
-  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]), this.isVertical, x, zero);
-  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]), this.isVertical, x, y);
-  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.STROKE]), this.isVertical, x, y);
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes['fill']), this.isVertical, x, zero);
+  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes['fill']), this.isVertical, x, y);
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes['hatchFill']), this.isVertical, x, zero);
+  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes['hatchFill']), this.isVertical, x, y);
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes['stroke']), this.isVertical, x, y);
   this.queue_.processPoint(x, y);
 
   if (this.series.planIsStacked()) {
@@ -134,10 +133,10 @@ anychart.core.drawers.SplineArea.prototype.drawFirstPoint = function(point, stat
 
 /** @inheritDoc */
 anychart.core.drawers.SplineArea.prototype.drawSubsequentPoint = function(point, state) {
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var zero = /** @type {number} */(point.meta(anychart.opt.ZERO));
-  var zeroMissing = /** @type {boolean} */(point.meta(anychart.opt.ZERO_MISSING));
-  var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
+  var x = /** @type {number} */(point.meta('x'));
+  var zero = /** @type {number} */(point.meta('zero'));
+  var zeroMissing = /** @type {boolean} */(point.meta('zeroMissing'));
+  var y = /** @type {number} */(point.meta('value'));
 
   this.queue_.processPoint(x, y);
 

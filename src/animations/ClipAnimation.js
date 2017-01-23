@@ -30,7 +30,7 @@ anychart.animations.ClipAnimation.prototype.update = function() {
    * If the series is vertical.
    * @type {boolean}
    */
-  this.isVertical = /** @type {boolean} */(this.series.getOption(anychart.opt.IS_VERTICAL));
+  this.isVertical = /** @type {boolean} */(this.series.getOption('isVertical'));
 
   var clip = this.series.clip();
   if (goog.isBoolean(clip) && !clip) {

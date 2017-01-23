@@ -151,7 +151,7 @@ anychart.core.pert.PertVisualElements.prototype.color = function(opt_fillOrColor
     }
     return this;
   }
-  return this.color_ || (this.parent_ ? this.parent_.color() : anychart.opt.NONE);
+  return this.color_ || (this.parent_ ? this.parent_.color() : 'none');
 };
 
 
@@ -177,7 +177,7 @@ anychart.core.pert.PertVisualElements.prototype.fill = function(opt_fillOrColorO
     }
     return this;
   }
-  return this.fill_ || (this.parent_ ? this.parent_.fill() : anychart.opt.NONE);
+  return this.fill_ || (this.parent_ ? this.parent_.fill() : 'none');
 };
 
 
@@ -203,7 +203,7 @@ anychart.core.pert.PertVisualElements.prototype.hoverFill = function(opt_fillOrC
     }
     return this;
   }
-  return this.hoverFill_ || (this.parent_ ? this.parent_.hoverFill() : anychart.opt.NONE);
+  return this.hoverFill_ || (this.parent_ ? this.parent_.hoverFill() : 'none');
 };
 
 
@@ -229,7 +229,7 @@ anychart.core.pert.PertVisualElements.prototype.selectFill = function(opt_fillOr
     }
     return this;
   }
-  return this.selectFill_ || (this.parent_ ? this.parent_.selectFill() : anychart.opt.NONE);
+  return this.selectFill_ || (this.parent_ ? this.parent_.selectFill() : 'none');
 };
 
 
@@ -286,7 +286,7 @@ anychart.core.pert.PertVisualElements.prototype.stroke = function(opt_strokeOrFi
     }
     return this;
   }
-  return this.stroke_ || (this.parent_ ? this.parent_.stroke() : anychart.opt.NONE);
+  return this.stroke_ || (this.parent_ ? this.parent_.stroke() : 'none');
 };
 
 
@@ -311,7 +311,7 @@ anychart.core.pert.PertVisualElements.prototype.hoverStroke = function(opt_strok
     }
     return this;
   }
-  return this.hoverStroke_ || (this.parent_ ? this.parent_.hoverStroke() : anychart.opt.NONE);
+  return this.hoverStroke_ || (this.parent_ ? this.parent_.hoverStroke() : 'none');
 };
 
 
@@ -336,7 +336,7 @@ anychart.core.pert.PertVisualElements.prototype.selectStroke = function(opt_stro
     }
     return this;
   }
-  return this.selectStroke_ || (this.parent_ ? this.parent_.selectStroke() : anychart.opt.NONE);
+  return this.selectStroke_ || (this.parent_ ? this.parent_.selectStroke() : 'none');
 };
 
 
@@ -385,8 +385,8 @@ anychart.core.pert.PertVisualElements.prototype.labels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !(anychart.opt.ENABLED in opt_value))
-      opt_value[anychart.opt.ENABLED] = true;
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.labels_.setup(opt_value);
     return this;
   }
@@ -407,8 +407,8 @@ anychart.core.pert.PertVisualElements.prototype.selectLabels = function(opt_valu
   }
 
   if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !(anychart.opt.ENABLED in opt_value))
-      opt_value[anychart.opt.ENABLED] = true;
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.selectLabels_.setup(opt_value);
     return this;
   }
@@ -429,8 +429,8 @@ anychart.core.pert.PertVisualElements.prototype.hoverLabels = function(opt_value
   }
 
   if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !(anychart.opt.ENABLED in opt_value))
-      opt_value[anychart.opt.ENABLED] = true;
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.hoverLabels_.setup(opt_value);
     return this;
   }
@@ -483,8 +483,8 @@ anychart.core.pert.PertVisualElements.prototype.onTooltipSignal_ = function(even
  */
 anychart.core.pert.PertVisualElements.prototype.getCurrentTooltipConfig = function() {
   var config = this.tooltip().serialize();
-  var titleFormatter = this.tooltip().getOption(anychart.opt.TITLE_FORMATTER);
-  var textFormatter = this.tooltip().getOption(anychart.opt.TEXT_FORMATTER);
+  var titleFormatter = this.tooltip().getOption('titleFormatter');
+  var textFormatter = this.tooltip().getOption('textFormatter');
   if (titleFormatter && titleFormatter != anychart.utils.DEFAULT_FORMATTER)
     config['titleFormatter'] = titleFormatter;
   if (textFormatter && textFormatter != anychart.utils.DEFAULT_FORMATTER)
@@ -677,6 +677,6 @@ anychart.core.pert.PertVisualElements.prototype.setupByJSON = function(config, o
   this.selectLabels(config['selectLabels']);
   this.hoverLabels(config['hoverLabels']);
 
-  if (anychart.opt.TOOLTIP in config)
+  if ('tooltip' in config)
     this.tooltip().setupByVal(config['tooltip'], opt_default);
 };

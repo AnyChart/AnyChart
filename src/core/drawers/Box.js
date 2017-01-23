@@ -2,7 +2,6 @@ goog.provide('anychart.core.drawers.Box');
 goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
 goog.require('anychart.enums');
-goog.require('anychart.opt');
 
 
 
@@ -50,55 +49,55 @@ anychart.core.drawers.Box.prototype.flags = (
 /** @inheritDoc */
 anychart.core.drawers.Box.prototype.requiredShapes = (function() {
   var res = {};
-  res[anychart.opt.PATH] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.HATCH_FILL] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.MEDIAN] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.STEM] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.WHISKER] = anychart.enums.ShapeType.PATH;
+  res['path'] = anychart.enums.ShapeType.PATH;
+  res['hatchFill'] = anychart.enums.ShapeType.PATH;
+  res['median'] = anychart.enums.ShapeType.PATH;
+  res['stem'] = anychart.enums.ShapeType.PATH;
+  res['whisker'] = anychart.enums.ShapeType.PATH;
   return res;
 })();
 
 
 /** @inheritDoc */
-anychart.core.drawers.Box.prototype.yValueNames = ([anychart.opt.LOWEST, anychart.opt.Q1, anychart.opt.MEDIAN, anychart.opt.Q3, anychart.opt.HIGHEST]);
+anychart.core.drawers.Box.prototype.yValueNames = (['lowest', 'q1', 'median', 'q3', 'highest']);
 
 
 /** @inheritDoc */
 anychart.core.drawers.Box.prototype.drawSubsequentPoint = function(point, state) {
   var shapes = this.shapesManager.getShapesGroup(state);
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var low = /** @type {number} */(point.meta(anychart.opt.LOWEST));
-  var q1 = /** @type {number} */(point.meta(anychart.opt.Q1));
-  var median = /** @type {number} */(point.meta(anychart.opt.MEDIAN));
-  var q3 = /** @type {number} */(point.meta(anychart.opt.Q3));
-  var high = /** @type {number} */(point.meta(anychart.opt.HIGHEST));
+  var x = /** @type {number} */(point.meta('x'));
+  var low = /** @type {number} */(point.meta('lowest'));
+  var q1 = /** @type {number} */(point.meta('q1'));
+  var median = /** @type {number} */(point.meta('median'));
+  var q3 = /** @type {number} */(point.meta('q3'));
+  var high = /** @type {number} */(point.meta('highest'));
 
   var whiskerWidthHalf = this.series.getWhiskerWidth(point, state) / 2;
   var halfPointWidth = this.pointWidth / 2;
 
-  var path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.PATH]);
+  var path = /** @type {acgraph.vector.Path} */(shapes['path']);
   anychart.core.drawers.move(path, this.isVertical, x - halfPointWidth, q1);
   anychart.core.drawers.line(path, this.isVertical,
       x + halfPointWidth, q1,
       x + halfPointWidth, q3,
       x - halfPointWidth, q3);
   path.close();
-  path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]);
+  path = /** @type {acgraph.vector.Path} */(shapes['hatchFill']);
   anychart.core.drawers.move(path, this.isVertical, x - halfPointWidth, q1);
   anychart.core.drawers.line(path, this.isVertical,
       x + halfPointWidth, q1,
       x + halfPointWidth, q3,
       x - halfPointWidth, q3);
   path.close();
-  path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.MEDIAN]);
+  path = /** @type {acgraph.vector.Path} */(shapes['median']);
   anychart.core.drawers.move(path, this.isVertical, x - halfPointWidth, median);
   anychart.core.drawers.line(path, this.isVertical, x + halfPointWidth, median);
-  path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.STEM]);
+  path = /** @type {acgraph.vector.Path} */(shapes['stem']);
   anychart.core.drawers.move(path, this.isVertical, x, low);
   anychart.core.drawers.line(path, this.isVertical, x, q1);
   anychart.core.drawers.move(path, this.isVertical, x, q3);
   anychart.core.drawers.line(path, this.isVertical, x, high);
-  path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.WHISKER]);
+  path = /** @type {acgraph.vector.Path} */(shapes['whisker']);
   anychart.core.drawers.move(path, this.isVertical, x - whiskerWidthHalf, low);
   anychart.core.drawers.line(path, this.isVertical, x + whiskerWidthHalf, low);
   anychart.core.drawers.move(path, this.isVertical, x - whiskerWidthHalf, high);
@@ -108,14 +107,14 @@ anychart.core.drawers.Box.prototype.drawSubsequentPoint = function(point, state)
 
 /** @inheritDoc */
 anychart.core.drawers.Box.prototype.updatePointInternal = function(point, state) {
-  var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta(anychart.opt.SHAPES));
+  var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta('shapes'));
   // this can happen before first draw in Cartesian.prepareData()
   if (shapes) {
-    var x = /** @type {number} */(point.meta(anychart.opt.X));
-    var low = /** @type {number} */(point.meta(anychart.opt.LOWEST));
-    var high = /** @type {number} */(point.meta(anychart.opt.HIGHEST));
+    var x = /** @type {number} */(point.meta('x'));
+    var low = /** @type {number} */(point.meta('lowest'));
+    var high = /** @type {number} */(point.meta('highest'));
     var whiskerWidthHalf = this.series.getWhiskerWidth(point, state) / 2;
-    var path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.WHISKER]);
+    var path = /** @type {acgraph.vector.Path} */(shapes['whisker']);
     path.clear();
     anychart.core.drawers.move(path, this.isVertical, x - whiskerWidthHalf, low);
     anychart.core.drawers.line(path, this.isVertical, x + whiskerWidthHalf, low);

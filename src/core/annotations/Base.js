@@ -73,13 +73,13 @@ anychart.core.annotations.Base = function(chartController) {
    * A name of X coord that is vacant for last point value.
    * @type {?string}
    */
-  this.lastPointXName = !!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.X) ? anychart.opt.X_ANCHOR : null;
+  this.lastPointXName = !!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.X) ? 'xAnchor' : null;
 
   /**
    * A name of Y coord that is vacant for last point value.
    * @type {?string}
    */
-  this.lastPointYName = !!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.VALUE) ? anychart.opt.VALUE_ANCHOR : null;
+  this.lastPointYName = !!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.VALUE) ? 'valueAnchor' : null;
 
   /**
    * If the dragging draw available in current state.
@@ -98,12 +98,12 @@ anychart.core.annotations.Base = function(chartController) {
    * @type {Object.<number>}
    */
   this.coords = {};
-  this.coords[anychart.opt.X_ANCHOR] = NaN;
-  this.coords[anychart.opt.VALUE_ANCHOR] = NaN;
-  this.coords[anychart.opt.SECOND_X_ANCHOR] = NaN;
-  this.coords[anychart.opt.SECOND_VALUE_ANCHOR] = NaN;
-  this.coords[anychart.opt.THIRD_X_ANCHOR] = NaN;
-  this.coords[anychart.opt.THIRD_VALUE_ANCHOR] = NaN;
+  this.coords['xAnchor'] = NaN;
+  this.coords['valueAnchor'] = NaN;
+  this.coords['secondXAnchor'] = NaN;
+  this.coords['secondValueAnchor'] = NaN;
+  this.coords['thirdXAnchor'] = NaN;
+  this.coords['thirdValueAnchor'] = NaN;
 
   /**
    * Secured coords for dragging.
@@ -422,28 +422,28 @@ anychart.core.annotations.Base.prototype.moveAnchor = function(anchorId, dx, dy)
     case -1: // moving whole annotation
       if (!!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.ONE_POINT)) {
         this.moveAnchor_(
-            !!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.X) ? anychart.opt.X_ANCHOR : null,
-            !!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.VALUE) ? anychart.opt.VALUE_ANCHOR : null,
+            !!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.X) ? 'xAnchor' : null,
+            !!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.VALUE) ? 'valueAnchor' : null,
             dx, dy);
         if (!!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.TWO_POINTS)) {
-          this.moveAnchor_(anychart.opt.SECOND_X_ANCHOR, anychart.opt.SECOND_VALUE_ANCHOR, dx, dy);
+          this.moveAnchor_('secondXAnchor', 'secondValueAnchor', dx, dy);
           if (!!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.THREE_POINTS)) {
-            this.moveAnchor_(anychart.opt.THIRD_X_ANCHOR, anychart.opt.THIRD_VALUE_ANCHOR, dx, dy);
+            this.moveAnchor_('thirdXAnchor', 'thirdValueAnchor', dx, dy);
           }
         }
       }
       break;
     case 0:
       this.moveAnchor_(
-          !!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.X) ? anychart.opt.X_ANCHOR : null,
-          !!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.VALUE) ? anychart.opt.VALUE_ANCHOR : null,
+          !!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.X) ? 'xAnchor' : null,
+          !!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.VALUE) ? 'valueAnchor' : null,
           dx, dy);
       break;
     case 1:
-      this.moveAnchor_(anychart.opt.SECOND_X_ANCHOR, anychart.opt.SECOND_VALUE_ANCHOR, dx, dy);
+      this.moveAnchor_('secondXAnchor', 'secondValueAnchor', dx, dy);
       break;
     case 2:
-      this.moveAnchor_(anychart.opt.THIRD_X_ANCHOR, anychart.opt.THIRD_VALUE_ANCHOR, dx, dy);
+      this.moveAnchor_('thirdXAnchor', 'thirdValueAnchor', dx, dy);
       break;
   }
   this.invalidate(anychart.ConsistencyState.ANNOTATIONS_SHAPES | anychart.ConsistencyState.ANNOTATIONS_MARKERS);
@@ -527,30 +527,30 @@ anychart.core.annotations.Base.prototype.calculate = function() {
     var availableCoords = 0;
     var missingCoords = 0;
     if (!!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.X)) {
-      firstX = this.xRatioToPix(xScale.transform(this.getOwnOption(anychart.opt.X_ANCHOR), 0.5));
+      firstX = this.xRatioToPix(xScale.transform(this.getOwnOption('xAnchor'), 0.5));
       if (isNaN(firstX))
         missingCoords |= anychart.core.annotations.AnchorSupport.X;
       else
         availableCoords |= anychart.core.annotations.AnchorSupport.X;
     }
     if (!!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.VALUE)) {
-      firstY = this.yRatioToPix(yScale.transform(this.getOwnOption(anychart.opt.VALUE_ANCHOR), 0.5));
+      firstY = this.yRatioToPix(yScale.transform(this.getOwnOption('valueAnchor'), 0.5));
       if (isNaN(firstY))
         missingCoords |= anychart.core.annotations.AnchorSupport.VALUE;
       else
         availableCoords |= anychart.core.annotations.AnchorSupport.VALUE;
     }
     if (!!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.SECOND_POINT)) {
-      secondX = this.xRatioToPix(xScale.transform(this.getOwnOption(anychart.opt.SECOND_X_ANCHOR), 0.5));
-      secondY = this.yRatioToPix(yScale.transform(this.getOwnOption(anychart.opt.SECOND_VALUE_ANCHOR), 0.5));
+      secondX = this.xRatioToPix(xScale.transform(this.getOwnOption('secondXAnchor'), 0.5));
+      secondY = this.yRatioToPix(yScale.transform(this.getOwnOption('secondValueAnchor'), 0.5));
       if (isNaN(secondX) || isNaN(secondY))
         missingCoords |= anychart.core.annotations.AnchorSupport.SECOND_POINT;
       else
         availableCoords |= anychart.core.annotations.AnchorSupport.SECOND_POINT;
     }
     if (!!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.THIRD_POINT)) {
-      thirdX = this.xRatioToPix(xScale.transform(this.getOwnOption(anychart.opt.THIRD_X_ANCHOR), 0.5));
-      thirdY = this.yRatioToPix(yScale.transform(this.getOwnOption(anychart.opt.THIRD_VALUE_ANCHOR), 0.5));
+      thirdX = this.xRatioToPix(xScale.transform(this.getOwnOption('thirdXAnchor'), 0.5));
+      thirdY = this.yRatioToPix(yScale.transform(this.getOwnOption('thirdValueAnchor'), 0.5));
       if (isNaN(thirdX) || isNaN(thirdY))
         missingCoords |= anychart.core.annotations.AnchorSupport.THIRD_POINT;
       else
@@ -562,29 +562,29 @@ anychart.core.annotations.Base.prototype.calculate = function() {
     var lastPointXName = null;
     var lastPointYName = null;
     if (!!(missingCoords & anychart.core.annotations.AnchorSupport.ONE_POINT)) {
-      lastPointXName = !!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.X) ? anychart.opt.X_ANCHOR : null;
-      lastPointYName = !!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.VALUE) ? anychart.opt.VALUE_ANCHOR : null;
+      lastPointXName = !!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.X) ? 'xAnchor' : null;
+      lastPointYName = !!(this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.VALUE) ? 'valueAnchor' : null;
       dragDrawingAvailable = this.SUPPORTED_ANCHORS > anychart.core.annotations.AnchorSupport.ONE_POINT;
       this.lastPointAnchor = this.SUPPORTED_ANCHORS & anychart.core.annotations.AnchorSupport.ONE_POINT;
     } else if (!!(missingCoords & anychart.core.annotations.AnchorSupport.SECOND_POINT)) {
-      lastPointXName = anychart.opt.SECOND_X_ANCHOR;
-      lastPointYName = anychart.opt.SECOND_VALUE_ANCHOR;
+      lastPointXName = 'secondXAnchor';
+      lastPointYName = 'secondValueAnchor';
       dragDrawingAvailable = this.SUPPORTED_ANCHORS > anychart.core.annotations.AnchorSupport.TWO_POINTS;
       this.lastPointAnchor = anychart.core.annotations.AnchorSupport.SECOND_POINT;
     } else if (!!(missingCoords & anychart.core.annotations.AnchorSupport.THIRD_POINT)) {
-      lastPointXName = anychart.opt.THIRD_X_ANCHOR;
-      lastPointYName = anychart.opt.THIRD_VALUE_ANCHOR;
+      lastPointXName = 'thirdXAnchor';
+      lastPointYName = 'thirdValueAnchor';
       this.lastPointAnchor = anychart.core.annotations.AnchorSupport.THIRD_POINT;
     } else {
       this.lastPointAnchor = anychart.core.annotations.AnchorSupport.NONE;
     }
 
-    this.coords[anychart.opt.X_ANCHOR] = firstX;
-    this.coords[anychart.opt.VALUE_ANCHOR] = firstY;
-    this.coords[anychart.opt.SECOND_X_ANCHOR] = secondX;
-    this.coords[anychart.opt.SECOND_VALUE_ANCHOR] = secondY;
-    this.coords[anychart.opt.THIRD_X_ANCHOR] = thirdX;
-    this.coords[anychart.opt.THIRD_VALUE_ANCHOR] = thirdY;
+    this.coords['xAnchor'] = firstX;
+    this.coords['valueAnchor'] = firstY;
+    this.coords['secondXAnchor'] = secondX;
+    this.coords['secondValueAnchor'] = secondY;
+    this.coords['thirdXAnchor'] = thirdX;
+    this.coords['thirdValueAnchor'] = thirdY;
 
     this.anchorsAvailable = availableCoords;
     this.lastPointXName = lastPointXName;
@@ -631,13 +631,13 @@ anychart.core.annotations.Base.prototype.checkVisible = function() {
   var coord;
   var bounds = this.pixelBoundsCache;
   if (this.SUPPORTED_ANCHORS == anychart.core.annotations.AnchorSupport.VALUE) {
-    coord = this.coords[anychart.opt.VALUE_ANCHOR];
+    coord = this.coords['valueAnchor'];
     return coord >= bounds.top && coord <= (bounds.getBottom());
   } else {
     var coords = [];
-    coords.push(this.coords[anychart.opt.X_ANCHOR]);
-    coords.push(this.coords[anychart.opt.SECOND_X_ANCHOR]);
-    coords.push(this.coords[anychart.opt.THIRD_X_ANCHOR]);
+    coords.push(this.coords['xAnchor']);
+    coords.push(this.coords['secondXAnchor']);
+    coords.push(this.coords['thirdXAnchor']);
     var allLeft = true;
     var allRight = true;
     for (var i = 0; i < coords.length; i++) {
@@ -712,25 +712,25 @@ anychart.core.annotations.Base.prototype.draw = function() {
       if (this.SUPPORTED_ANCHORS == anychart.core.annotations.AnchorSupport.THREE_POINTS &&
           this.anchorsWithLastPoint == anychart.core.annotations.AnchorSupport.THREE_POINTS) {
         this.drawThreePointsShape(
-            this.coords[anychart.opt.X_ANCHOR],
-            this.coords[anychart.opt.VALUE_ANCHOR],
-            this.coords[anychart.opt.SECOND_X_ANCHOR],
-            this.coords[anychart.opt.SECOND_VALUE_ANCHOR],
-            this.coords[anychart.opt.THIRD_X_ANCHOR],
-            this.coords[anychart.opt.THIRD_VALUE_ANCHOR]);
+            this.coords['xAnchor'],
+            this.coords['valueAnchor'],
+            this.coords['secondXAnchor'],
+            this.coords['secondValueAnchor'],
+            this.coords['thirdXAnchor'],
+            this.coords['thirdValueAnchor']);
       } else if (this.SUPPORTED_ANCHORS >= anychart.core.annotations.AnchorSupport.TWO_POINTS &&
           this.anchorsWithLastPoint >= anychart.core.annotations.AnchorSupport.TWO_POINTS) {
         this.drawTwoPointsShape(
-            this.coords[anychart.opt.X_ANCHOR],
-            this.coords[anychart.opt.VALUE_ANCHOR],
-            this.coords[anychart.opt.SECOND_X_ANCHOR],
-            this.coords[anychart.opt.SECOND_VALUE_ANCHOR]);
+            this.coords['xAnchor'],
+            this.coords['valueAnchor'],
+            this.coords['secondXAnchor'],
+            this.coords['secondValueAnchor']);
       } else if (this.SUPPORTED_ANCHORS >= anychart.core.annotations.AnchorSupport.ONE_POINT &&
           this.anchorsWithLastPoint >= anychart.core.annotations.AnchorSupport.ONE_POINT ||
           this.anchorsWithLastPoint == this.SUPPORTED_ANCHORS) {
         this.drawOnePointShape(
-            this.coords[anychart.opt.X_ANCHOR],
-            this.coords[anychart.opt.VALUE_ANCHOR]);
+            this.coords['xAnchor'],
+            this.coords['valueAnchor']);
       }
     } else {
       this.remove();
@@ -743,7 +743,7 @@ anychart.core.annotations.Base.prototype.draw = function() {
 
 
   if (this.hasInvalidationState(anychart.ConsistencyState.ANNOTATIONS_INTERACTIVITY)) {
-    this.rootLayer.disablePointerEvents(!this.getOption(anychart.opt.ALLOW_EDIT));
+    this.rootLayer.disablePointerEvents(!this.getOption('allowEdit'));
     this.markConsistent(anychart.ConsistencyState.ANNOTATIONS_INTERACTIVITY);
   }
 
@@ -964,7 +964,7 @@ anychart.core.annotations.Base.getColor_ = function(colorNames, normalizer, isHa
  * @private
  */
 anychart.core.annotations.Base.getNullColor_ = function() {
-  return anychart.opt.NONE;
+  return 'none';
 };
 
 
@@ -977,7 +977,7 @@ anychart.core.annotations.Base.getNullColor_ = function() {
  */
 anychart.core.annotations.Base.prototype.getColorResolutionContext = function(opt_baseColor, opt_level) {
   return {
-    'sourceColor': opt_baseColor || this.getOption(anychart.opt.COLOR) || 'blue'
+    'sourceColor': opt_baseColor || this.getOption('color') || 'blue'
   };
 };
 
@@ -1042,8 +1042,8 @@ anychart.core.annotations.Base.prototype.markers = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !(anychart.opt.ENABLED in opt_value))
-      opt_value[anychart.opt.ENABLED] = true;
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.markers_.setup(opt_value);
     return this;
   }
@@ -1063,8 +1063,8 @@ anychart.core.annotations.Base.prototype.hoverMarkers = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !(anychart.opt.ENABLED in opt_value))
-      opt_value[anychart.opt.ENABLED] = true;
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.hoverMarkers_.setup(opt_value);
     return this;
   }
@@ -1083,8 +1083,8 @@ anychart.core.annotations.Base.prototype.selectMarkers = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !(anychart.opt.ENABLED in opt_value))
-      opt_value[anychart.opt.ENABLED] = true;
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.selectMarkers_.setup(opt_value);
     return this;
   }
@@ -1160,21 +1160,21 @@ anychart.core.annotations.Base.prototype.drawMarkers_ = function(state) {
 anychart.core.annotations.Base.prototype.createPositionProviders = function() {
   var res = [];
   if (this.SUPPORTED_ANCHORS == anychart.core.annotations.AnchorSupport.X) {
-    var firstX = this.coords[anychart.opt.X_ANCHOR];
+    var firstX = this.coords['xAnchor'];
     if (!isNaN(firstX)) {
       res.push({'x': firstX, 'y': this.pixelBoundsCache.top + this.pixelBoundsCache.height / 2});
     }
   } else if (this.SUPPORTED_ANCHORS == anychart.core.annotations.AnchorSupport.VALUE) {
-    var firstY = this.coords[anychart.opt.VALUE_ANCHOR];
+    var firstY = this.coords['valueAnchor'];
     if (!isNaN(firstY)) {
       res.push({'x': this.pixelBoundsCache.left + this.pixelBoundsCache.width / 2, 'y': firstY});
     }
   } else if (!!(this.SUPPORTED_ANCHORS & this.anchorsWithLastPoint & anychart.core.annotations.AnchorSupport.ONE_POINT)) {
-    res.push({'x': this.coords[anychart.opt.X_ANCHOR], 'y': this.coords[anychart.opt.VALUE_ANCHOR]});
+    res.push({'x': this.coords['xAnchor'], 'y': this.coords['valueAnchor']});
     if (!!(this.SUPPORTED_ANCHORS & this.anchorsWithLastPoint & anychart.core.annotations.AnchorSupport.SECOND_POINT)) {
-      res.push({'x': this.coords[anychart.opt.SECOND_X_ANCHOR], 'y': this.coords[anychart.opt.SECOND_VALUE_ANCHOR]});
+      res.push({'x': this.coords['secondXAnchor'], 'y': this.coords['secondValueAnchor']});
       if (!!(this.SUPPORTED_ANCHORS & this.anchorsWithLastPoint & anychart.core.annotations.AnchorSupport.THIRD_POINT)) {
-        res.push({'x': this.coords[anychart.opt.THIRD_X_ANCHOR], 'y': this.coords[anychart.opt.THIRD_VALUE_ANCHOR]});
+        res.push({'x': this.coords['thirdXAnchor'], 'y': this.coords['thirdValueAnchor']});
       }
     }
   }

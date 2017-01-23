@@ -239,44 +239,44 @@ anychart.core.grids.Map.prototype.parentInvalidated_ = function(e) {
 anychart.core.grids.Map.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.STROKE] = anychart.core.settings.createDescriptor(
+  map['stroke'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.STROKE,
+      'stroke',
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.MINOR_STROKE] = anychart.core.settings.createDescriptor(
+  map['minorStroke'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.MINOR_STROKE,
+      'minorStroke',
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.ODD_FILL] = anychart.core.settings.createDescriptor(
+  map['oddFill'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.ODD_FILL,
+      'oddFill',
       anychart.core.settings.fillNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.EVEN_FILL] = anychart.core.settings.createDescriptor(
+  map['evenFill'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.EVEN_FILL,
+      'evenFill',
       anychart.core.settings.fillNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.DRAW_FIRST_LINE] = anychart.core.settings.createDescriptor(
+  map['drawFirstLine'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.DRAW_FIRST_LINE,
+      'drawFirstLine',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.GRIDS_POSITION,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.DRAW_LAST_LINE] = anychart.core.settings.createDescriptor(
+  map['drawLastLine'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.DRAW_LAST_LINE,
+      'drawLastLine',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.GRIDS_POSITION,
       anychart.Signal.NEEDS_REDRAW);
@@ -314,13 +314,13 @@ anychart.core.grids.Map.prototype.enabled = function(opt_value) {
 anychart.core.grids.Map.prototype.zIndex = function(opt_value) {
   if (goog.isDef(opt_value)) {
     var val = +opt_value || 0;
-    if (this.ownSettings[anychart.opt.Z_INDEX] != val) {
-      this.ownSettings[anychart.opt.Z_INDEX] = val;
+    if (this.ownSettings['zIndex'] != val) {
+      this.ownSettings['zIndex'] = val;
       this.invalidate(anychart.ConsistencyState.Z_INDEX, anychart.Signal.NEEDS_REDRAW | anychart.Signal.Z_INDEX_STATE_CHANGED);
     }
     return this;
   }
-  return /** @type {number} */(goog.isDef(this.getOwnOption(anychart.opt.Z_INDEX)) ? this.getOwnOption(anychart.opt.Z_INDEX) : goog.isDef(this.autoZIndex) ? this.autoZIndex : this.getOption(anychart.opt.Z_INDEX));
+  return /** @type {number} */(goog.isDef(this.getOwnOption('zIndex')) ? this.getOwnOption('zIndex') : goog.isDef(this.autoZIndex) ? this.autoZIndex : this.getOption('zIndex'));
 };
 
 
@@ -773,10 +773,10 @@ anychart.core.grids.Map.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    majorLineElement.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption(anychart.opt.STROKE)));
-    minorLineElement.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption(anychart.opt.MINOR_STROKE)));
-    this.oddFillElement().fill(/** @type {acgraph.vector.Fill} */(this.getOption(anychart.opt.ODD_FILL)));
-    this.evenFillElement().fill(/** @type {acgraph.vector.Fill} */(this.getOption(anychart.opt.EVEN_FILL)));
+    majorLineElement.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
+    minorLineElement.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('minorStroke')));
+    this.oddFillElement().fill(/** @type {acgraph.vector.Fill} */(this.getOption('oddFill')));
+    this.evenFillElement().fill(/** @type {acgraph.vector.Fill} */(this.getOption('evenFill')));
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
@@ -826,7 +826,7 @@ anychart.core.grids.Map.prototype.draw = function() {
 
       drawInterlace.call(this, tickVal, prevTickVal, fill, path, pixelShift, precision);
 
-      if ((!i && this.getOption(anychart.opt.DRAW_FIRST_LINE)) || (i == count - 1 && this.getOption(anychart.opt.DRAW_LAST_LINE)) || (i != 0 && i != count - 1)) {
+      if ((!i && this.getOption('drawFirstLine')) || (i == count - 1 && this.getOption('drawLastLine')) || (i != 0 && i != count - 1)) {
         drawLine.call(this, tickVal, majorLineElement, pixelShift, precision);
       }
 
@@ -873,8 +873,8 @@ anychart.core.grids.Map.prototype.setThemeSettings = function(config) {
     if (goog.isDef(val))
       this.themeSettings[name] = val;
   }
-  if (anychart.opt.ENABLED in config) this.themeSettings[anychart.opt.ENABLED] = config[anychart.opt.ENABLED];
-  if (anychart.opt.Z_INDEX in config) this.themeSettings[anychart.opt.Z_INDEX] = config[anychart.opt.Z_INDEX];
+  if ('enabled' in config) this.themeSettings['enabled'] = config['enabled'];
+  if ('zIndex' in config) this.themeSettings['zIndex'] = config['zIndex'];
 };
 
 
@@ -883,20 +883,20 @@ anychart.core.grids.Map.prototype.serialize = function() {
   var json = {};
 
   var zIndex;
-  if (this.hasOwnOption(anychart.opt.Z_INDEX)) {
-    zIndex = this.getOwnOption(anychart.opt.Z_INDEX);
+  if (this.hasOwnOption('zIndex')) {
+    zIndex = this.getOwnOption('zIndex');
   }
   if (!goog.isDef(zIndex)) {
-    zIndex = this.getThemeOption(anychart.opt.Z_INDEX);
+    zIndex = this.getThemeOption('zIndex');
   }
   if (goog.isDef(zIndex)) json['zIndex'] = zIndex;
 
   var enabled;
-  if (this.hasOwnOption(anychart.opt.ENABLED)) {
-    enabled = this.getOwnOption(anychart.opt.ENABLED);
+  if (this.hasOwnOption('enabled')) {
+    enabled = this.getOwnOption('enabled');
   }
   if (!goog.isDef(enabled)) {
-    enabled = this.getThemeOption(anychart.opt.ENABLED);
+    enabled = this.getThemeOption('enabled');
   }
   json['enabled'] = goog.isDef(enabled) ? enabled : null;
 
@@ -910,7 +910,7 @@ anychart.core.grids.Map.prototype.serialize = function() {
 anychart.core.grids.Map.prototype.specialSetupByVal = function(value, opt_default) {
   if (goog.isBoolean(value) || goog.isNull(value)) {
     if (opt_default)
-      this.themeSettings[anychart.opt.ENABLED] = !!value;
+      this.themeSettings['enabled'] = !!value;
     else
       this.enabled(!!value);
     return true;

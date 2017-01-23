@@ -1,6 +1,5 @@
 goog.provide('anychart.data.ParetoMapping');
 goog.require('anychart.data.Mapping');
-goog.require('anychart.opt');
 
 
 
@@ -56,7 +55,7 @@ anychart.data.ParetoMapping.prototype.SUPPORTED_CONSISTENCY_STATES = anychart.Co
 /** @inheritDoc */
 anychart.data.ParetoMapping.prototype.getInternal = function(row, rowIndex, fieldName) {
   var rv = anychart.data.ParetoMapping.base(this, 'getInternal', row, rowIndex, fieldName);
-  if (fieldName == anychart.opt.VALUE) {
+  if (fieldName == 'value') {
     rv = anychart.utils.toNumber(rv);
     if (isNaN(rv) || rv < 0)
       rv = 0;
@@ -76,7 +75,7 @@ anychart.data.ParetoMapping.prototype.buildMask = function() {
 
   var value;
   while (iterator.advance()) {
-    value = /** @type {number} */ (iterator.get(anychart.opt.VALUE));
+    value = /** @type {number} */ (iterator.get('value'));
     this.values_.push(value);
     this.sum_ += value;
   }

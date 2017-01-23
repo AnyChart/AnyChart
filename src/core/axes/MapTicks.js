@@ -204,23 +204,23 @@ anychart.core.axes.MapTicks.prototype.parentInvalidated_ = function(e) {
 anychart.core.axes.MapTicks.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.STROKE] = anychart.core.settings.createDescriptor(
+  map['stroke'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.STROKE,
+      'stroke',
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.LENGTH] = anychart.core.settings.createDescriptor(
+  map['length'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.LENGTH,
+      'length',
       anychart.utils.toNumber,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map[anychart.opt.POSITION] = anychart.core.settings.createDescriptor(
+  map['position'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.POSITION,
+      'position',
       anychart.enums.normalizeSidePosition,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
@@ -389,8 +389,8 @@ anychart.core.axes.MapTicks.prototype.calcTick = function(value) {
   this.scale_.calculate();
   value = parseFloat(value);
   var geoLine = this.getGeoLine();
-  var position = /** @type {anychart.enums.Position} */(this.getOption(anychart.opt.POSITION));
-  var length = /** @type {number} */(this.getOption(anychart.opt.LENGTH));
+  var position = /** @type {anychart.enums.Position} */(this.getOption('position'));
+  var length = /** @type {number} */(this.getOption('length'));
 
   if (this.isHorizontal()) {
     centerPos = this.scale_.transform(value, geoLine, null);
@@ -447,7 +447,7 @@ anychart.core.axes.MapTicks.prototype.draw = function() {
   this.getGeoLine();
 
   this.path.clear();
-  this.path.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption(anychart.opt.STROKE)));
+  this.path.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
 
   if (!this.checkDrawingNeeded())
     return this;
@@ -490,8 +490,8 @@ anychart.core.axes.MapTicks.prototype.setThemeSettings = function(config) {
     if (goog.isDef(val))
       this.themeSettings[name] = val;
   }
-  if (anychart.opt.ENABLED in config) this.themeSettings[anychart.opt.ENABLED] = config[anychart.opt.ENABLED];
-  if (anychart.opt.Z_INDEX in config) this.themeSettings[anychart.opt.Z_INDEX] = config[anychart.opt.Z_INDEX];
+  if ('enabled' in config) this.themeSettings['enabled'] = config['enabled'];
+  if ('zIndex' in config) this.themeSettings['zIndex'] = config['zIndex'];
 };
 
 
@@ -499,7 +499,7 @@ anychart.core.axes.MapTicks.prototype.setThemeSettings = function(config) {
 anychart.core.axes.MapTicks.prototype.specialSetupByVal = function(value, opt_default) {
   if (goog.isBoolean(value) || goog.isNull(value)) {
     if (opt_default)
-      this.themeSettings[anychart.opt.ENABLED] = !!value;
+      this.themeSettings['enabled'] = !!value;
     else
       this.enabled(!!value);
     return true;
@@ -524,20 +524,20 @@ anychart.core.axes.MapTicks.prototype.serialize = function() {
   var json = {};
 
   var zIndex;
-  if (this.hasOwnOption(anychart.opt.Z_INDEX)) {
-    zIndex = this.getOwnOption(anychart.opt.Z_INDEX);
+  if (this.hasOwnOption('zIndex')) {
+    zIndex = this.getOwnOption('zIndex');
   }
   if (!goog.isDef(zIndex)) {
-    zIndex = this.getThemeOption(anychart.opt.Z_INDEX);
+    zIndex = this.getThemeOption('zIndex');
   }
   if (goog.isDef(zIndex)) json['zIndex'] = zIndex;
 
   var enabled;
-  if (this.hasOwnOption(anychart.opt.ENABLED)) {
-    enabled = this.getOwnOption(anychart.opt.ENABLED);
+  if (this.hasOwnOption('enabled')) {
+    enabled = this.getOwnOption('enabled');
   }
   if (!goog.isDef(enabled)) {
-    enabled = this.getThemeOption(anychart.opt.ENABLED);
+    enabled = this.getThemeOption('enabled');
   }
   json['enabled'] = goog.isDef(enabled) ? enabled : null;
 

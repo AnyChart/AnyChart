@@ -1,6 +1,5 @@
 goog.provide('anychart.animations.PyramidFunnelAnimation');
 goog.require('anychart.animations.Animation');
-goog.require('anychart.opt');
 
 
 
@@ -28,7 +27,7 @@ anychart.animations.PyramidFunnelAnimation.prototype.update = function() {
   this.startPoint.length = this.endPoint.length = 0;
   var iterator = this.chart.getDetachedIterator();
   while (iterator.advance()) {
-    if (!iterator.meta(anychart.opt.MISSING)) {
+    if (!iterator.meta('missing')) {
       var x1 = /** @type {number} */(iterator.meta('x1'));
       var x2 = /** @type {number} */(iterator.meta('x2'));
       var x3 = /** @type {number} */(iterator.meta('x3'));
@@ -55,7 +54,7 @@ anychart.animations.PyramidFunnelAnimation.prototype.onAnimate = function() {
   var iterator = this.chart.getDetachedIterator();
   var currentCoordIndex = 0;
   while (iterator.advance()) {
-    if (!iterator.meta(anychart.opt.MISSING)) {
+    if (!iterator.meta('missing')) {
       iterator.meta('x1', this.coords[currentCoordIndex++]);
       iterator.meta('x2', this.coords[currentCoordIndex++]);
       iterator.meta('x3', this.coords[currentCoordIndex++]);

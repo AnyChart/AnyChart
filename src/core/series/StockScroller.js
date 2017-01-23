@@ -2,7 +2,6 @@ goog.provide('anychart.core.series.StockScroller');
 goog.require('anychart.core.series.Stock');
 goog.require('anychart.core.shapeManagers.PerPoint');
 goog.require('anychart.core.shapeManagers.PerSeries');
-goog.require('anychart.opt');
 
 
 
@@ -57,25 +56,25 @@ goog.inherits(anychart.core.series.StockScroller, anychart.core.series.Stock);
 /**
  * @type {Function}
  */
-anychart.core.series.StockScroller.prototype[anychart.opt.SELECTED_FILL] = anychart.core.series.Base.prototype[anychart.opt.SELECT_FILL];
+anychart.core.series.StockScroller.prototype['selectedFill'] = anychart.core.series.Base.prototype['selectFill'];
 
 
 /**
  * @type {Function}
  */
-anychart.core.series.StockScroller.prototype[anychart.opt.SELECTED_STROKE] = anychart.core.series.Base.prototype[anychart.opt.SELECT_STROKE];
+anychart.core.series.StockScroller.prototype['selectedStroke'] = anychart.core.series.Base.prototype['selectStroke'];
 
 
 /**
  * @type {Function}
  */
-anychart.core.series.StockScroller.prototype[anychart.opt.SELECTED_RISING_STROKE] = anychart.core.series.Base.prototype[anychart.opt.SELECT_RISING_STROKE];
+anychart.core.series.StockScroller.prototype['selectedRisingStroke'] = anychart.core.series.Base.prototype['selectRisingStroke'];
 
 
 /**
  * @type {Function}
  */
-anychart.core.series.StockScroller.prototype[anychart.opt.SELECTED_FALLING_STROKE] = anychart.core.series.Base.prototype[anychart.opt.SELECT_FALLING_STROKE];
+anychart.core.series.StockScroller.prototype['selectedFallingStroke'] = anychart.core.series.Base.prototype['selectFallingStroke'];
 //endregion
 
 
@@ -102,7 +101,7 @@ anychart.core.series.StockScroller.prototype.applyConfig = function(config, opt_
       anychart.core.shapeManagers.PerSeries;
   this.secondaryShapeManager_ = new smc(this,
       /** @type {!Array.<anychart.core.shapeManagers.ShapeConfig>} */(config.secondaryShapesConfig),
-      interactive, anychart.opt.SECONDARY_SHAPES, config.postProcessor);
+      interactive, 'secondaryShapes', config.postProcessor);
 
   anychart.core.series.StockScroller.base(this, 'applyConfig', config, opt_default);
 };
@@ -257,7 +256,7 @@ anychart.core.series.StockScroller.prototype.updateColors = function() {
     var iterator = this.getResetIterator();
     while (iterator.advance()) {
       this.shapeManager.updateColors(this.getPointState(iterator.getIndex()),
-          /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta(anychart.opt.SHAPES)));
+          /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes')));
     }
   } else {
     this.shapeManager.updateColors(this.getSeriesState());
@@ -279,9 +278,9 @@ anychart.core.series.StockScroller.prototype.setupByJSON = function(config, opt_
   anychart.core.series.StockScroller.base(this, 'setupByJSON', config, opt_default);
 
   // Legacy
-  this[anychart.opt.SELECTED_FILL](config[anychart.opt.SELECT_FILL]);
-  this[anychart.opt.SELECTED_STROKE](config[anychart.opt.SELECT_STROKE]);
-  this[anychart.opt.SELECTED_RISING_STROKE](config[anychart.opt.SELECT_RISING_STROKE]);
-  this[anychart.opt.SELECTED_FALLING_STROKE](config[anychart.opt.SELECT_FALLING_STROKE]);
+  this['selectedFill'](config['selectFill']);
+  this['selectedStroke'](config['selectStroke']);
+  this['selectedRisingStroke'](config['selectRisingStroke']);
+  this['selectedFallingStroke'](config['selectFallingStroke']);
 };
 //endregion

@@ -1,7 +1,6 @@
 goog.provide('anychart.core.series.RenderingSettings');
 goog.require('anychart.core.Base');
 goog.require('anychart.core.settings');
-goog.require('anychart.opt');
 
 
 
@@ -100,7 +99,7 @@ anychart.core.series.RenderingSettings.prototype.SUPPORTED_SIGNALS =
  * @return {boolean}
  */
 anychart.core.series.RenderingSettings.prototype.needsCustomPointDrawer = function() {
-  return this.hasOwnOption(anychart.opt.POINT);
+  return this.hasOwnOption('point');
 };
 
 
@@ -109,7 +108,7 @@ anychart.core.series.RenderingSettings.prototype.needsCustomPointDrawer = functi
  * @param {anychart.core.series.Base} series
  */
 anychart.core.series.RenderingSettings.prototype.callStart = function(series) {
-  this.callFunc_(/** @type {Function} */(this.getOption(anychart.opt.START)), series);
+  this.callFunc_(/** @type {Function} */(this.getOption('start')), series);
 };
 
 
@@ -120,7 +119,7 @@ anychart.core.series.RenderingSettings.prototype.callStart = function(series) {
  * @param {number} pointState
  */
 anychart.core.series.RenderingSettings.prototype.callPoint = function(series, point, pointState) {
-  this.callFunc_(/** @type {Function} */(this.getOption(anychart.opt.POINT)), series, point, pointState);
+  this.callFunc_(/** @type {Function} */(this.getOption('point')), series, point, pointState);
 };
 
 
@@ -131,7 +130,7 @@ anychart.core.series.RenderingSettings.prototype.callPoint = function(series, po
  * @param {number} pointState
  */
 anychart.core.series.RenderingSettings.prototype.callUpdate = function(series, point, pointState) {
-  this.callFunc_(/** @type {Function} */(this.getOption(anychart.opt.UPDATE_POINT)), series, point, pointState, true);
+  this.callFunc_(/** @type {Function} */(this.getOption('updatePoint')), series, point, pointState, true);
 };
 
 
@@ -140,7 +139,7 @@ anychart.core.series.RenderingSettings.prototype.callUpdate = function(series, p
  * @param {anychart.core.series.Base} series
  */
 anychart.core.series.RenderingSettings.prototype.callFinish = function(series) {
-  this.callFunc_(/** @type {Function} */(this.getOption(anychart.opt.FINISH)), series);
+  this.callFunc_(/** @type {Function} */(this.getOption('finish')), series);
 };
 
 
@@ -157,7 +156,7 @@ anychart.core.series.RenderingSettings.prototype.callFunc_ = function(func, seri
   if (func) {
     var shapes = undefined;
     if (opt_update) {
-      shapes = /** @type {Object} */(opt_point.meta(anychart.opt.SHAPES));
+      shapes = /** @type {Object} */(opt_point.meta('shapes'));
       if (!shapes) return;
     }
     var context = opt_point ?
@@ -225,9 +224,9 @@ anychart.core.series.RenderingSettings.prototype.getShapesConfig = function() {
  * Resets rendering settings to default values.
  */
 anychart.core.series.RenderingSettings.prototype.setDefaults = function() {
-  this.defaultSettings[anychart.opt.NEEDS_ZERO] = this.series_.check(anychart.core.drawers.Capabilities.NEEDS_ZERO);
-  this.defaultSettings[anychart.opt.NEEDS_WIDTH] = this.series_.check(anychart.core.drawers.Capabilities.IS_WIDTH_BASED);
-  this.defaultSettings[anychart.opt.Y_VALUES] = goog.array.slice(this.series_.drawer.getYValueNames(), 0);
+  this.defaultSettings['needsZero'] = this.series_.check(anychart.core.drawers.Capabilities.NEEDS_ZERO);
+  this.defaultSettings['needsWidth'] = this.series_.check(anychart.core.drawers.Capabilities.IS_WIDTH_BASED);
+  this.defaultSettings['yValues'] = goog.array.slice(this.series_.drawer.getYValueNames(), 0);
 };
 
 
@@ -238,51 +237,51 @@ anychart.core.series.RenderingSettings.prototype.setDefaults = function() {
 anychart.core.series.RenderingSettings.DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.START] = anychart.core.settings.createDescriptor(
+  map['start'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.START,
+      'start',
       anychart.core.settings.functionNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.POINT] = anychart.core.settings.createDescriptor(
+  map['point'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.POINT,
+      'point',
       anychart.core.settings.functionNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.UPDATE_POINT] = anychart.core.settings.createDescriptor(
+  map['updatePoint'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.UPDATE_POINT,
+      'updatePoint',
       anychart.core.settings.functionNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.FINISH] = anychart.core.settings.createDescriptor(
+  map['finish'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.FINISH,
+      'finish',
       anychart.core.settings.functionNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.NEEDS_ZERO] = anychart.core.settings.createDescriptor(
+  map['needsZero'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.NEEDS_ZERO,
+      'needsZero',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_RECALCULATION);
 
-  map[anychart.opt.NEEDS_WIDTH] = anychart.core.settings.createDescriptor(
+  map['needsWidth'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.NEEDS_WIDTH,
+      'needsWidth',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_RECALCULATION);
 
-  map[anychart.opt.Y_VALUES] = anychart.core.settings.createDescriptor(
+  map['yValues'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.Y_VALUES,
+      'yValues',
       anychart.core.settings.arrayNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_RECALCULATION);
@@ -371,7 +370,7 @@ anychart.core.series.RenderingSettings.prototype.serialize = function() {
   var json = anychart.core.series.RenderingSettings.base(this, 'serialize');
   anychart.core.settings.serialize(this, anychart.core.series.RenderingSettings.DESCRIPTORS, json, 'Series Rendering Settings');
   if (this.shapes_)
-    json[anychart.opt.SHAPES] = this.shapes();
+    json['shapes'] = this.shapes();
   return json;
 };
 
@@ -380,7 +379,7 @@ anychart.core.series.RenderingSettings.prototype.serialize = function() {
 anychart.core.series.RenderingSettings.prototype.setupByJSON = function(config) {
   anychart.core.series.RenderingSettings.base(this, 'setupByJSON', config);
   anychart.core.settings.deserialize(this, anychart.core.series.RenderingSettings.DESCRIPTORS, config);
-  var shapes = config[anychart.opt.SHAPES];
+  var shapes = config['shapes'];
   if (goog.isDef(shapes))
     this.shapes(shapes);
 };
@@ -389,7 +388,7 @@ anychart.core.series.RenderingSettings.prototype.setupByJSON = function(config) 
 /** @inheritDoc */
 anychart.core.series.RenderingSettings.prototype.specialSetupByVal = function(value, opt_default) {
   if (goog.isFunction(value)) {
-    this[anychart.opt.POINT](value);
+    this['point'](value);
     return true;
   }
   return false;
@@ -423,13 +422,13 @@ anychart.core.series.RenderingSettings.Context = function(series) {
    * Series reference.
    * @type {anychart.core.series.Base}
    */
-  this[anychart.opt.SERIES] = series;
+  this['series'] = series;
 
   /**
    * Series state.
    * @type {anychart.PointState}
    */
-  this[anychart.opt.SERIES_STATE] = series.getSeriesState();
+  this['seriesState'] = series.getSeriesState();
 };
 
 
@@ -447,7 +446,7 @@ anychart.core.series.RenderingSettings.Context.prototype.getShapesGroup = functi
     for (var i = 0; i < opt_restrictShapes.length; i++)
       only[opt_restrictShapes[i]] = true;
   }
-  return this[anychart.opt.SERIES].shapeManager.getShapesGroup(opt_state || anychart.PointState.NORMAL, only, opt_baseZIndex);
+  return this['series'].shapeManager.getShapesGroup(opt_state || anychart.PointState.NORMAL, only, opt_baseZIndex);
 };
 
 
@@ -457,7 +456,7 @@ anychart.core.series.RenderingSettings.Context.prototype.getShapesGroup = functi
  * @return {*}
  */
 anychart.core.series.RenderingSettings.Context.prototype.getStat = function(opt_key) {
-  var series = this[anychart.opt.SERIES];
+  var series = this['series'];
   series.chart.ensureStatisticsReady();
   return series.statistics(opt_key);
 };
@@ -497,17 +496,17 @@ anychart.core.series.RenderingSettings.PointContext = function(series, point, po
     this[name] = point.meta(name);
   }
   if (series.check(anychart.core.drawers.Capabilities.NEEDS_SIZE_SCALE))
-    this[anychart.opt.SIZE] = point.meta(anychart.opt.SIZE);
-  this[anychart.opt.X] = point.meta(anychart.opt.X);
-  this[anychart.opt.POINT_STATE] = pointState;
-  this[anychart.opt.MISSING] = !!point.meta(anychart.opt.MISSING);
-  this[anychart.opt.CATEGORY_WIDTH] = series.categoryWidthCache;
+    this['size'] = point.meta('size');
+  this['x'] = point.meta('x');
+  this['pointState'] = pointState;
+  this['missing'] = !!point.meta('missing');
+  this['categoryWidth'] = series.categoryWidthCache;
   if (series.isWidthBased())
-    this[anychart.opt.POINT_WIDTH] = series.pointWidthCache;
+    this['pointWidth'] = series.pointWidthCache;
   if (series.needsZero())
-    this[anychart.opt.ZERO] = point.meta(anychart.opt.ZERO);
+    this['zero'] = point.meta('zero');
   if (opt_updateShapes)
-    this[anychart.opt.SHAPES] = opt_updateShapes;
+    this['shapes'] = opt_updateShapes;
 };
 goog.inherits(anychart.core.series.RenderingSettings.PointContext, anychart.core.series.RenderingSettings.Context);
 
@@ -527,8 +526,8 @@ anychart.core.series.RenderingSettings.PointContext.prototype.getDataValue = fun
  * @return {*}
  */
 anychart.core.series.RenderingSettings.PointContext.prototype.getStackedValue = function() {
-  var val = this.point_.meta(anychart.opt.STACKED_VALUE);
-  return goog.isDef(val) ? val : this.point_.get(anychart.opt.VALUE);
+  var val = this.point_.meta('stackedValue');
+  return goog.isDef(val) ? val : this.point_.get('value');
 };
 
 
@@ -537,7 +536,7 @@ anychart.core.series.RenderingSettings.PointContext.prototype.getStackedValue = 
  * @return {*}
  */
 anychart.core.series.RenderingSettings.PointContext.prototype.getStackedZero = function() {
-  var val = this.point_.meta(anychart.opt.STACKED_ZERO);
+  var val = this.point_.meta('stackedZero');
   return goog.isDef(val) ? val : 0;
 };
 

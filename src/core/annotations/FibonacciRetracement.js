@@ -38,10 +38,10 @@ anychart.core.annotations.FibonacciRetracement.prototype.type = anychart.enums.A
 /** @inheritDoc */
 anychart.core.annotations.FibonacciRetracement.prototype.drawLevel = function(levelIndex, levelValue, path, hoverPath,
                                                                               mainFactory, stateFactory, drawLabels, strokeThickness) {
-  var x1 = this.coords[anychart.opt.X_ANCHOR];
-  var y1 = this.coords[anychart.opt.VALUE_ANCHOR];
-  var x2 = this.coords[anychart.opt.SECOND_X_ANCHOR];
-  var y2 = this.coords[anychart.opt.SECOND_VALUE_ANCHOR];
+  var x1 = this.coords['xAnchor'];
+  var y1 = this.coords['valueAnchor'];
+  var x2 = this.coords['secondXAnchor'];
+  var y2 = this.coords['secondValueAnchor'];
   var sx = Math.min(x1, x2);
   var baseHeight = y1 - y2;
   var y = anychart.utils.applyPixelShift(y2 + baseHeight * levelValue, strokeThickness);
@@ -62,8 +62,8 @@ anychart.core.annotations.FibonacciRetracement.prototype.drawLevel = function(le
 anychart.core.annotations.FibonacciRetracement.prototype.checkVisible = function() {
   var res = anychart.core.annotations.FibonacciRetracement.base(this, 'checkVisible');
   if (!res) {
-    var x1 = this.coords[anychart.opt.X_ANCHOR];
-    var x2 = this.coords[anychart.opt.SECOND_X_ANCHOR];
+    var x1 = this.coords['xAnchor'];
+    var x2 = this.coords['secondXAnchor'];
     var x = Math.min(x1, x2);
     res = !isNaN(x) && (x <= this.pixelBoundsCache.getRight());
   }

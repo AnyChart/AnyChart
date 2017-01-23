@@ -968,7 +968,7 @@ anychart.core.annotations.PlotController.prototype.annotationInvalidated_ = func
 anychart.core.annotations.PlotController.prototype.serialize = function() {
   var json = anychart.core.annotations.PlotController.base(this, 'serialize');
 
-  json[anychart.opt.ANNOTATIONS_LIST] = this.annotationsJson_();
+  json['annotationsList'] = this.annotationsJson_();
 
   return json;
 };
@@ -989,7 +989,7 @@ anychart.core.annotations.PlotController.prototype.setupSpecial = function(var_a
 anychart.core.annotations.PlotController.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.annotations.PlotController.base(this, 'setupByJSON', config, opt_default);
 
-  var list = config[anychart.opt.ANNOTATIONS_LIST];
+  var list = config['annotationsList'];
   if (goog.isArray(list)) {
     this.annotationsJson_(list);
   }

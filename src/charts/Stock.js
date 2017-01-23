@@ -175,8 +175,8 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.ZERO
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'zero'
   };
   res[anychart.enums.StockSeriesType.CANDLESTICK] = {
     drawerType: anychart.enums.SeriesDrawerTypes.CANDLESTICK,
@@ -190,8 +190,8 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.HIGH,
-    anchoredPositionBottom: anychart.opt.LOW
+    anchoredPositionTop: 'high',
+    anchoredPositionBottom: 'low'
   };
   res[anychart.enums.StockSeriesType.COLUMN] = {
     drawerType: anychart.enums.SeriesDrawerTypes.COLUMN,
@@ -203,8 +203,8 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.ZERO
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'zero'
   };
   res[anychart.enums.StockSeriesType.JUMP_LINE] = {
     drawerType: anychart.enums.SeriesDrawerTypes.JUMP_LINE,
@@ -215,8 +215,8 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.VALUE
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'value'
   };
   res[anychart.enums.StockSeriesType.STICK] = {
     drawerType: anychart.enums.SeriesDrawerTypes.STICK,
@@ -227,8 +227,8 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.ZERO
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'zero'
   };
   res[anychart.enums.StockSeriesType.LINE] = {
     drawerType: anychart.enums.SeriesDrawerTypes.LINE,
@@ -239,8 +239,8 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.VALUE
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'value'
   };
   res[anychart.enums.StockSeriesType.MARKER] = {
     drawerType: anychart.enums.SeriesDrawerTypes.MARKER,
@@ -252,8 +252,8 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.VALUE
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'value'
   };
   res[anychart.enums.StockSeriesType.OHLC] = {
     drawerType: anychart.enums.SeriesDrawerTypes.OHLC,
@@ -265,8 +265,8 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.HIGH,
-    anchoredPositionBottom: anychart.opt.LOW
+    anchoredPositionTop: 'high',
+    anchoredPositionBottom: 'low'
   };
   res[anychart.enums.StockSeriesType.RANGE_AREA] = {
     drawerType: anychart.enums.SeriesDrawerTypes.RANGE_AREA,
@@ -280,8 +280,8 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.HIGH,
-    anchoredPositionBottom: anychart.opt.LOW
+    anchoredPositionTop: 'high',
+    anchoredPositionBottom: 'low'
   };
   res[anychart.enums.StockSeriesType.RANGE_COLUMN] = {
     drawerType: anychart.enums.SeriesDrawerTypes.RANGE_COLUMN,
@@ -293,8 +293,8 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.HIGH,
-    anchoredPositionBottom: anychart.opt.LOW
+    anchoredPositionTop: 'high',
+    anchoredPositionBottom: 'low'
   };
   res[anychart.enums.StockSeriesType.RANGE_SPLINE_AREA] = {
     drawerType: anychart.enums.SeriesDrawerTypes.RANGE_SPLINE_AREA,
@@ -308,8 +308,8 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.HIGH,
-    anchoredPositionBottom: anychart.opt.LOW
+    anchoredPositionTop: 'high',
+    anchoredPositionBottom: 'low'
   };
   res[anychart.enums.StockSeriesType.RANGE_STEP_AREA] = {
     drawerType: anychart.enums.SeriesDrawerTypes.RANGE_STEP_AREA,
@@ -323,8 +323,8 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.HIGH,
-    anchoredPositionBottom: anychart.opt.LOW
+    anchoredPositionTop: 'high',
+    anchoredPositionBottom: 'low'
   };
   res[anychart.enums.StockSeriesType.SPLINE] = {
     drawerType: anychart.enums.SeriesDrawerTypes.SPLINE,
@@ -335,8 +335,8 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.VALUE
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'value'
   };
   res[anychart.enums.StockSeriesType.SPLINE_AREA] = {
     drawerType: anychart.enums.SeriesDrawerTypes.SPLINE_AREA,
@@ -349,8 +349,8 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.ZERO
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'zero'
   };
   res[anychart.enums.StockSeriesType.STEP_AREA] = {
     drawerType: anychart.enums.SeriesDrawerTypes.STEP_AREA,
@@ -363,8 +363,8 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.ZERO
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'zero'
   };
   res[anychart.enums.StockSeriesType.STEP_LINE] = {
     drawerType: anychart.enums.SeriesDrawerTypes.STEP_LINE,
@@ -375,8 +375,8 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.VALUE
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'value'
   };
   return res;
 })();
@@ -1436,8 +1436,8 @@ anychart.charts.Stock.prototype.highlightAtRatio_ = function(ratio, clientX, cli
    * @type {!anychart.core.ui.Tooltip}
    */
   var tooltip = /** @type {!anychart.core.ui.Tooltip} */(this.tooltip());
-  if (tooltip.getOption(anychart.opt.DISPLAY_MODE) == anychart.enums.TooltipDisplayMode.UNION &&
-      tooltip.getOption(anychart.opt.POSITION_MODE) != anychart.enums.TooltipPositionMode.POINT) {
+  if (tooltip.getOption('displayMode') == anychart.enums.TooltipDisplayMode.UNION &&
+      tooltip.getOption('positionMode') != anychart.enums.TooltipPositionMode.POINT) {
     var points = [];
     var info = eventInfo['infoByPlots'];
     for (i = 0; i < info.length; i++) {

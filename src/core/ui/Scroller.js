@@ -982,15 +982,15 @@ anychart.core.ui.Scroller.prototype.updateBoundsCache = function() {
   } else {
     var padding = this.padding();
     if (this.orientation_ == anychart.enums.Orientation.LEFT) {
-      top = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.LEFT)), this.fullPixelBoundsCache.width);
-      right = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.TOP)), this.fullPixelBoundsCache.height);
-      bottom = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.RIGHT)), this.fullPixelBoundsCache.width);
-      left = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.BOTTOM)), this.fullPixelBoundsCache.height);
+      top = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('left')), this.fullPixelBoundsCache.width);
+      right = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('top')), this.fullPixelBoundsCache.height);
+      bottom = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('right')), this.fullPixelBoundsCache.width);
+      left = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('bottom')), this.fullPixelBoundsCache.height);
     } else {
-      top = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.RIGHT)), this.fullPixelBoundsCache.width);
-      right = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.BOTTOM)), this.fullPixelBoundsCache.height);
-      bottom = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.LEFT)), this.fullPixelBoundsCache.width);
-      left = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.TOP)), this.fullPixelBoundsCache.height);
+      top = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('right')), this.fullPixelBoundsCache.width);
+      right = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('bottom')), this.fullPixelBoundsCache.height);
+      bottom = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('left')), this.fullPixelBoundsCache.width);
+      left = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('top')), this.fullPixelBoundsCache.height);
 
     }
     this.pixelBoundsCache.left = this.fullPixelBoundsCache.left + left;

@@ -1197,8 +1197,8 @@ anychart.core.ChartWithSeries.prototype.calculateXScales = function() {
           for (j = 0; j < seriesExcludes.length; j++) {
             var index = seriesExcludes[j];
             excludesMap[index] = true;
-            drawingPlan.data[index].meta[anychart.opt.MISSING] = anychart.core.series.mixPointAbsenceReason(
-                drawingPlan.data[index].meta[anychart.opt.MISSING],
+            drawingPlan.data[index].meta['missing'] = anychart.core.series.mixPointAbsenceReason(
+                drawingPlan.data[index].meta['missing'],
                 anychart.core.series.PointAbsenceReason.EXCLUDED_POINT);
           }
         }
@@ -1208,7 +1208,7 @@ anychart.core.ChartWithSeries.prototype.calculateXScales = function() {
           for (var i = 0; i < drawingPlans.length; i++) {
             var drawingPlan = drawingPlans[i];
             var meta = drawingPlan.data[+index].meta;
-            if (!anychart.core.series.filterPointAbsenceReason(meta[anychart.opt.MISSING],
+            if (!anychart.core.series.filterPointAbsenceReason(meta['missing'],
                 anychart.core.series.PointAbsenceReason.EXCLUDED_OR_ARTIFICIAL))
               return false;
           }
@@ -1223,7 +1223,7 @@ anychart.core.ChartWithSeries.prototype.calculateXScales = function() {
             xArray = [];
             for (i = 0; i < drawingPlan.data.length; i++) {
               if (!(i in excludesMap)) {
-                var xValue = drawingPlan.data[i].data[anychart.opt.X];
+                var xValue = drawingPlan.data[i].data['x'];
                 xHashMap[anychart.utils.hash(xValue)] = xArray.length;
                 xArray.push(xValue);
               }
@@ -1237,13 +1237,13 @@ anychart.core.ChartWithSeries.prototype.calculateXScales = function() {
           if (hasExcludes) {
             for (i = 0; i < drawingPlan.data.length; i++) {
               if (!(i in excludesMap)) {
-                xScale.extendDataRange(drawingPlan.data[i].data[anychart.opt.X]);
+                xScale.extendDataRange(drawingPlan.data[i].data['x']);
               }
             }
           } else {
             xScale.extendDataRange(
-                drawingPlan.data[0].data[anychart.opt.X],
-                drawingPlan.data[drawingPlan.data.length - 1].data[anychart.opt.X]);
+                drawingPlan.data[0].data['x'],
+                drawingPlan.data[drawingPlan.data.length - 1].data['x']);
           }
           if (drawingPlan.series.supportsError()) {
             var iterator;
@@ -1251,10 +1251,10 @@ anychart.core.ChartWithSeries.prototype.calculateXScales = function() {
             if (drawingPlan.hasPointXErrors) {
               iterator = drawingPlan.series.getResetIterator();
               while (iterator.advance()) { // we need iterator to make error work :(
-                if (!anychart.core.series.filterPointAbsenceReason(iterator.meta(anychart.opt.MISSING),
+                if (!anychart.core.series.filterPointAbsenceReason(iterator.meta('missing'),
                         anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
                   error = drawingPlan.series.error().getErrorValues(true);
-                  val = iterator.get(anychart.opt.X);
+                  val = iterator.get('x');
                   xScale.extendDataRange(val - error[0], val + error[1]);
                 }
               }
@@ -1262,11 +1262,11 @@ anychart.core.ChartWithSeries.prototype.calculateXScales = function() {
               iterator = drawingPlan.series.getResetIterator();
               iterator.select(0);
               error = drawingPlan.series.error().getErrorValues(true);
-              val = iterator.get(anychart.opt.X);
+              val = iterator.get('x');
               xScale.extendDataRange(val - error[0], val + error[1]);
               iterator.select(drawingPlan.data.length - 1);
               error = drawingPlan.series.error().getErrorValues(true);
-              val = iterator.get(anychart.opt.X);
+              val = iterator.get('x');
               xScale.extendDataRange(val - error[0], val + error[1]);
             }
           }
@@ -1393,56 +1393,56 @@ anychart.core.ChartWithSeries.prototype.calculateYScales = function() {
             for (j = firstIndex; j <= lastIndex; j++) {
               point = data[j];
               stackVal = stack[j - firstIndex];
-              point.meta[anychart.opt.STACKED_MISSING] = stackVal.missing;
-              if (anychart.core.series.filterPointAbsenceReason(point.meta[anychart.opt.MISSING],
+              point.meta['stackedMissing'] = stackVal.missing;
+              if (anychart.core.series.filterPointAbsenceReason(point.meta['missing'],
                   anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
                 stackVal.missing = true;
               } else {
-                val = +point.data[anychart.opt.VALUE];
+                val = +point.data['value'];
                 if (val >= 0) {
-                  point.meta[anychart.opt.STACKED_ZERO] = stackVal.positive;
+                  point.meta['stackedZero'] = stackVal.positive;
                   stackVal.positive += val;
-                  point.meta[anychart.opt.STACKED_VALUE] = stackVal.positive;
+                  point.meta['stackedValue'] = stackVal.positive;
                   if (!yScalePercentStacked) {
                     if (!stackVal.prevMissing) {
-                      point.meta[anychart.opt.STACKED_ZERO_PREV] = point.meta[anychart.opt.STACKED_VALUE_PREV] = NaN;
+                      point.meta['stackedZeroPrev'] = point.meta['stackedValuePrev'] = NaN;
                     } else {
-                      point.meta[anychart.opt.STACKED_ZERO_PREV] = stackVal.prevPositive;
-                      point.meta[anychart.opt.STACKED_VALUE_PREV] = stackVal.prevPositive + val;
+                      point.meta['stackedZeroPrev'] = stackVal.prevPositive;
+                      point.meta['stackedValuePrev'] = stackVal.prevPositive + val;
                     }
                     if (!stackVal.nextMissing) {
-                      point.meta[anychart.opt.STACKED_ZERO_NEXT] = point.meta[anychart.opt.STACKED_VALUE_NEXT] = NaN;
+                      point.meta['stackedZeroNext'] = point.meta['stackedValueNext'] = NaN;
                     } else {
-                      point.meta[anychart.opt.STACKED_ZERO_NEXT] = stackVal.nextPositive;
-                      point.meta[anychart.opt.STACKED_VALUE_NEXT] = stackVal.nextPositive + val;
+                      point.meta['stackedZeroNext'] = stackVal.nextPositive;
+                      point.meta['stackedValueNext'] = stackVal.nextPositive + val;
                     }
                   }
                 } else {
-                  point.meta[anychart.opt.STACKED_ZERO] = stackVal.negative;
+                  point.meta['stackedZero'] = stackVal.negative;
                   stackVal.negative += val;
-                  point.meta[anychart.opt.STACKED_VALUE] = stackVal.negative;
+                  point.meta['stackedValue'] = stackVal.negative;
                   if (!yScalePercentStacked) {
                     if (!stackVal.prevMissing) {
-                      point.meta[anychart.opt.STACKED_ZERO_PREV] = point.meta[anychart.opt.STACKED_VALUE_PREV] = NaN;
+                      point.meta['stackedZeroPrev'] = point.meta['stackedValuePrev'] = NaN;
                     } else {
-                      point.meta[anychart.opt.STACKED_ZERO_PREV] = stackVal.prevNegative;
-                      point.meta[anychart.opt.STACKED_VALUE_PREV] = stackVal.prevNegative + val;
+                      point.meta['stackedZeroPrev'] = stackVal.prevNegative;
+                      point.meta['stackedValuePrev'] = stackVal.prevNegative + val;
                     }
                     if (!stackVal.nextMissing) {
-                      point.meta[anychart.opt.STACKED_ZERO_NEXT] = point.meta[anychart.opt.STACKED_VALUE_NEXT] = NaN;
+                      point.meta['stackedZeroNext'] = point.meta['stackedValueNext'] = NaN;
                     } else {
-                      point.meta[anychart.opt.STACKED_ZERO_NEXT] = stackVal.nextNegative;
-                      point.meta[anychart.opt.STACKED_VALUE_NEXT] = stackVal.nextNegative + val;
+                      point.meta['stackedZeroNext'] = stackVal.nextNegative;
+                      point.meta['stackedValueNext'] = stackVal.nextNegative + val;
                     }
                   }
                 }
                 if (!yScalePercentStacked) {
-                  yScale.extendDataRange(point.meta[anychart.opt.STACKED_VALUE_PREV]);
-                  yScale.extendDataRange(point.meta[anychart.opt.STACKED_VALUE]);
-                  yScale.extendDataRange(point.meta[anychart.opt.STACKED_VALUE_NEXT]);
+                  yScale.extendDataRange(point.meta['stackedValuePrev']);
+                  yScale.extendDataRange(point.meta['stackedValue']);
+                  yScale.extendDataRange(point.meta['stackedValueNext']);
                   point = data[j - 1];
                   if (point) {
-                    if (anychart.core.series.filterPointAbsenceReason(point.meta[anychart.opt.MISSING],
+                    if (anychart.core.series.filterPointAbsenceReason(point.meta['missing'],
                         anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
                       stackVal.prevMissing = true;
                     } else {
@@ -1455,7 +1455,7 @@ anychart.core.ChartWithSeries.prototype.calculateYScales = function() {
                   }
                   point = data[j + 1];
                   if (point) {
-                    if (anychart.core.series.filterPointAbsenceReason(point.meta[anychart.opt.MISSING],
+                    if (anychart.core.series.filterPointAbsenceReason(point.meta['missing'],
                         anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
                       stackVal.nextMissing = true;
                     } else {
@@ -1475,7 +1475,7 @@ anychart.core.ChartWithSeries.prototype.calculateYScales = function() {
             var k;
             for (j = firstIndex; j <= lastIndex; j++) {
               point = data[j];
-              if (!anychart.core.series.filterPointAbsenceReason(point.meta[anychart.opt.MISSING],
+              if (!anychart.core.series.filterPointAbsenceReason(point.meta['missing'],
                   anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
                 for (k = 0; k < names.length; k++) {
                   yScale.extendDataRange(point.data[names[k]]);
@@ -1485,8 +1485,8 @@ anychart.core.ChartWithSeries.prototype.calculateYScales = function() {
             if (drawingPlan.series.supportsOutliers()) {
               for (j = firstIndex; j <= lastIndex; j++) {
                 point = data[j];
-                var outliers = point.data[anychart.opt.OUTLIERS];
-                if (!anychart.core.series.filterPointAbsenceReason(point.meta[anychart.opt.MISSING],
+                var outliers = point.data['outliers'];
+                if (!anychart.core.series.filterPointAbsenceReason(point.meta['missing'],
                     anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE) && goog.isArray(outliers)) {
                   for (k = 0; k < outliers.length; k++) {
                     yScale.extendDataRange(outliers[k]);
@@ -1499,10 +1499,10 @@ anychart.core.ChartWithSeries.prototype.calculateYScales = function() {
                 drawingPlan.hasPointYErrors)) {
               var iterator = drawingPlan.series.getResetIterator();
               while (iterator.advance()) { // we need iterator to make error work :(
-                if (!anychart.core.series.filterPointAbsenceReason(iterator.meta(anychart.opt.MISSING),
+                if (!anychart.core.series.filterPointAbsenceReason(iterator.meta('missing'),
                         anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
                   var error = drawingPlan.series.error().getErrorValues(false);
-                  val = anychart.utils.toNumber(iterator.get(anychart.opt.VALUE));
+                  val = anychart.utils.toNumber(iterator.get('value'));
                   yScale.extendDataRange(val - error[0], val + error[1]);
                 }
               }
@@ -1517,12 +1517,12 @@ anychart.core.ChartWithSeries.prototype.calculateYScales = function() {
             for (j = firstIndex; j <= lastIndex; j++) {
               point = data[j];
               stackVal = stack[j - firstIndex];
-              if (anychart.core.series.filterPointAbsenceReason(point.meta[anychart.opt.MISSING],
+              if (anychart.core.series.filterPointAbsenceReason(point.meta['missing'],
                   anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
                 point.meta['stackedPositiveZero'] = (point.meta['stackedPositiveZero'] / stackVal.positive * 100) || 0;
                 point.meta['stackedNegativeZero'] = (point.meta['stackedNegativeZero'] / stackVal.negative * 100) || 0;
               } else {
-                val = point.meta[anychart.opt.STACKED_VALUE];
+                val = point.meta['stackedValue'];
                 var sum;
                 if (val >= 0) {
                   sum = stackVal.positive;
@@ -1531,8 +1531,8 @@ anychart.core.ChartWithSeries.prototype.calculateYScales = function() {
                   sum = -stackVal.negative;
                   yScale.extendDataRange(-100);
                 }
-                point.meta[anychart.opt.STACKED_ZERO] = (point.meta[anychart.opt.STACKED_ZERO] / sum * 100) || 0;
-                point.meta[anychart.opt.STACKED_VALUE] = (point.meta[anychart.opt.STACKED_VALUE] / sum * 100) || 0;
+                point.meta['stackedZero'] = (point.meta['stackedZero'] / sum * 100) || 0;
+                point.meta['stackedValue'] = (point.meta['stackedValue'] / sum * 100) || 0;
               }
             }
           }
@@ -1589,8 +1589,8 @@ anychart.core.ChartWithSeries.prototype.calculateXYScales = function() {
       if (seriesExcludes.length) {
         for (j = 0; j < seriesExcludes.length; j++) {
           var meta = drawingPlan.data[seriesExcludes[j]].meta;
-          meta[anychart.opt.MISSING] = anychart.core.series.mixPointAbsenceReason(
-              meta[anychart.opt.MISSING],
+          meta['missing'] = anychart.core.series.mixPointAbsenceReason(
+              meta['missing'],
               anychart.core.series.PointAbsenceReason.EXCLUDED_POINT);
         }
       }
@@ -1600,16 +1600,16 @@ anychart.core.ChartWithSeries.prototype.calculateXYScales = function() {
       var names = series.getYValueNames();
       while (iterator.advance()) { // we need iterator to make error work :(
         if (!anychart.core.series.filterPointAbsenceReason(
-            iterator.meta(anychart.opt.MISSING),
+            iterator.meta('missing'),
             anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
-          val = iterator.get(anychart.opt.X);
+          val = iterator.get('x');
           xScale.extendDataRange(val);
           if (hasError) {
             error = drawingPlan.series.error().getErrorValues(true);
             val = anychart.utils.toNumber(val);
             xScale.extendDataRange(val - error[0], val + error[1]);
             error = drawingPlan.series.error().getErrorValues(false);
-            val = anychart.utils.toNumber(iterator.get(anychart.opt.VALUE));
+            val = anychart.utils.toNumber(iterator.get('value'));
             yScale.extendDataRange(val - error[0], val + error[1]);
           } else {
             for (k = 0; k < names.length; k++) {
@@ -1724,24 +1724,24 @@ anychart.core.ChartWithSeries.prototype.calculateStatistics = function() {
           var pointObj = plan.data[d];
           var pointVal = NaN;
 
-          if (!anychart.core.series.filterPointAbsenceReason(pointObj.meta[anychart.opt.MISSING],
+          if (!anychart.core.series.filterPointAbsenceReason(pointObj.meta['missing'],
               anychart.core.series.PointAbsenceReason.ARTIFICIAL_POINT))
             pointsCount++;
-          if (!anychart.core.series.filterPointAbsenceReason(pointObj.meta[anychart.opt.MISSING],
+          if (!anychart.core.series.filterPointAbsenceReason(pointObj.meta['missing'],
               anychart.core.series.PointAbsenceReason.ANY_BUT_RANGE)) {
             if (isRangeSeries) {
-              pointVal = anychart.utils.toNumber(pointObj.data[anychart.opt.OPEN]);
+              pointVal = anychart.utils.toNumber(pointObj.data['open']);
               if (!isNaN(pointVal)) {
                 seriesYMax = Math.max(pointVal, seriesYMax);
                 seriesYMin = Math.min(pointVal, seriesYMin);
               }
-              pointVal = anychart.utils.toNumber(pointObj.data[anychart.opt.CLOSE]);
+              pointVal = anychart.utils.toNumber(pointObj.data['close']);
               if (!isNaN(pointVal)) {
                 seriesYMax = Math.max(pointVal, seriesYMax);
                 seriesYMin = Math.min(pointVal, seriesYMin);
               }
-              var h = anychart.utils.toNumber(pointObj.data[anychart.opt.HIGH]);
-              var l = anychart.utils.toNumber(pointObj.data[anychart.opt.LOW]);
+              var h = anychart.utils.toNumber(pointObj.data['high']);
+              var l = anychart.utils.toNumber(pointObj.data['low']);
               seriesYMax = Math.max(h, l, seriesYMax);
               seriesYMin = Math.min(h, l, seriesYMin);
               pointVal = h - l;
@@ -1749,13 +1749,13 @@ anychart.core.ChartWithSeries.prototype.calculateStatistics = function() {
               seriesRangeMin = Math.min(pointVal, seriesRangeMin);
             } else {
               if (isBubbleSeries) {
-                pointVal = anychart.utils.toNumber(pointObj.data[anychart.opt.SIZE]);
+                pointVal = anychart.utils.toNumber(pointObj.data['size']);
                 seriesSizeMax = Math.max(pointVal, seriesSizeMax);
                 seriesSizeMin = Math.min(pointVal, seriesSizeMin);
                 seriesSizeSum += pointVal;
                 seriesSizes.push(pointVal);
               }
-              pointVal = anychart.utils.toNumber(pointObj.data[anychart.opt.VALUE]);
+              pointVal = anychart.utils.toNumber(pointObj.data['value']);
               seriesYMax = Math.max(pointVal, seriesYMax);
               seriesYMin = Math.min(pointVal, seriesYMin);
             }
@@ -1765,7 +1765,7 @@ anychart.core.ChartWithSeries.prototype.calculateStatistics = function() {
             if (this.categorizeData) {
               valsArr[d].push(pointVal);
             } else {
-              pointVal = anychart.utils.toNumber(pointObj.data[anychart.opt.X]);
+              pointVal = anychart.utils.toNumber(pointObj.data['x']);
               seriesXMax = Math.max(pointVal, seriesXMax);
               seriesXMin = Math.min(pointVal, seriesXMin);
               seriesXSum += pointVal;
@@ -2028,7 +2028,7 @@ anychart.core.ChartWithSeries.prototype.distributeSeries = function() {
         scale = /** @type {anychart.scales.Base} */(aSeries.yScale());
         id = goog.getUid(scale);
         if (aSeries.isWidthDistributed()) {
-          if (aSeries.getOption(anychart.opt.IS_VERTICAL)) {
+          if (aSeries.getOption('isVertical')) {
             if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
               numBarClusters++;
             } else {
@@ -2079,7 +2079,7 @@ anychart.core.ChartWithSeries.prototype.distributeClusters = function(numCluster
     seenScales = {};
     for (var i = 0; i < drawingPlansOfScale.length; i++) {
       wSeries = drawingPlansOfScale[i].series;
-      if (wSeries.isWidthDistributed() && (horizontal ^ (/** @type {boolean} */(wSeries.getOption(anychart.opt.IS_VERTICAL))))) {
+      if (wSeries.isWidthDistributed() && (horizontal ^ (/** @type {boolean} */(wSeries.getOption('isVertical'))))) {
         scale = /** @type {anychart.scales.Base} */(wSeries.yScale());
         if (scale.stackMode() == anychart.enums.ScaleStackMode.NONE) {
           wSeries.setAutoXPointPosition(currPosition + barWidthRatio / 2);
@@ -2130,26 +2130,26 @@ anychart.core.ChartWithSeries.prototype.calcBubbleSizes = function() {
 //----------------------------------------------------------------------------------------------------------------------
 /** @type {Object.<string, Array.<string>>} */
 anychart.core.ChartWithSeries.seriesReferenceValues = {
-  'bar': [anychart.opt.VALUE],
-  'line': [anychart.opt.VALUE],
-  'area': [anychart.opt.VALUE],
-  'column': [anychart.opt.VALUE],
-  'spline': [anychart.opt.VALUE],
-  'marker': [anychart.opt.VALUE],
-  'stepArea': [anychart.opt.VALUE],
-  'stepLine:': [anychart.opt.VALUE],
-  'splineArea': [anychart.opt.VALUE],
-  'jumpLine': [anychart.opt.VALUE],
-  'stick': [anychart.opt.VALUE],
-  'bubble': [anychart.opt.VALUE, anychart.opt.SIZE],
-  'rangeBar': [anychart.opt.HIGH, anychart.opt.LOW],
-  'rangeArea': [anychart.opt.HIGH, anychart.opt.LOW],
-  'rangeColumn': [anychart.opt.HIGH, anychart.opt.LOW],
-  'rangeStepArea': [anychart.opt.HIGH, anychart.opt.LOW],
-  'rangeSplineArea': [anychart.opt.HIGH, anychart.opt.LOW],
-  'ohlc': [anychart.opt.OPEN, anychart.opt.HIGH, anychart.opt.LOW, anychart.opt.CLOSE],
-  'candlestick': [anychart.opt.OPEN, anychart.opt.HIGH, anychart.opt.LOW, anychart.opt.CLOSE],
-  'box': [anychart.opt.LOWEST, anychart.opt.Q1, anychart.opt.MEDIAN, anychart.opt.Q3, anychart.opt.HIGHEST]
+  'bar': ['value'],
+  'line': ['value'],
+  'area': ['value'],
+  'column': ['value'],
+  'spline': ['value'],
+  'marker': ['value'],
+  'stepArea': ['value'],
+  'stepLine:': ['value'],
+  'splineArea': ['value'],
+  'jumpLine': ['value'],
+  'stick': ['value'],
+  'bubble': ['value', 'size'],
+  'rangeBar': ['high', 'low'],
+  'rangeArea': ['high', 'low'],
+  'rangeColumn': ['high', 'low'],
+  'rangeStepArea': ['high', 'low'],
+  'rangeSplineArea': ['high', 'low'],
+  'ohlc': ['open', 'high', 'low', 'close'],
+  'candlestick': ['open', 'high', 'low', 'close'],
+  'box': ['lowest', 'q1', 'median', 'q3', 'highest']
 };
 
 
@@ -2652,7 +2652,7 @@ anychart.core.ChartWithSeries.prototype.getSeriesStatus = function(event) {
         for (var j = 0; j < indexes.length; j++) {
           index = indexes[j];
           if (iterator.select(index)) {
-            if (!iterator.meta(anychart.opt.MISSING)) {
+            if (!iterator.meta('missing')) {
               var pixX = /** @type {number} */(iterator.meta('x'));
               var pickValue = false;
               names = series.getYValueNames();

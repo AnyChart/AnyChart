@@ -4437,7 +4437,7 @@ anychart.charts.Pie.prototype.setupByJSON = function(config, opt_default) {
   this.palette(config['palette']);
   this.hatchFillPalette(config['hatchFillPalette']);
 
-  if (anychart.opt.TOOLTIP in config)
+  if ('tooltip' in config)
     this.tooltip().setupByVal(config['tooltip'], opt_default);
 
   this.sort(config['sort']);

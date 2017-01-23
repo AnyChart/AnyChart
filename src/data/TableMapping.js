@@ -2,7 +2,6 @@ goog.provide('anychart.data.TableMapping');
 goog.require('anychart.core.Base');
 goog.require('anychart.data.TableSelectable');
 goog.require('anychart.enums');
-goog.require('anychart.opt');
 goog.require('anychart.utils');
 
 
@@ -127,9 +126,9 @@ anychart.data.TableMapping.prototype.addField = function(name, column, opt_typeO
     if (typeIsCalculator &&
         !goog.isFunction(opt_typeOrCalculator) &&
         !(
-            (anychart.opt.RESET in opt_typeOrCalculator) &&
-            (anychart.opt.CONSIDER_ITEM in opt_typeOrCalculator) &&
-            (anychart.opt.GET_RESULT in opt_typeOrCalculator)
+            ('reset' in opt_typeOrCalculator) &&
+            ('considerItem' in opt_typeOrCalculator) &&
+            ('getResult' in opt_typeOrCalculator)
         )) {
       return this; // an object wannabe calculator with wrong fields - ignoring.
     }

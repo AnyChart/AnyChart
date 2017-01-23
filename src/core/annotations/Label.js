@@ -31,7 +31,7 @@
 //    */
 //   this.strokeResolver_ = /** @type {function(anychart.core.annotations.Base,number):acgraph.vector.Stroke} */(
 //       anychart.core.annotations.Base.getColorResolver(
-//           [anychart.opt.STROKE, anychart.opt.HOVER_STROKE, anychart.opt.SELECT_STROKE],
+//           ['stroke', 'hoverStroke', 'selectStroke'],
 //           anychart.enums.ColorType.STROKE));
 //
 //   /**
@@ -43,7 +43,7 @@
 //    */
 //   this.fillResolver_ = /** @type {function(anychart.core.annotations.Base,number):acgraph.vector.Fill} */(
 //       anychart.core.annotations.Base.getColorResolver(
-//           [anychart.opt.FILL, anychart.opt.HOVER_FILL, anychart.opt.SELECT_FILL],
+//           ['fill', 'hoverFill', 'selectFill'],
 //           anychart.enums.ColorType.FILL));
 //
 //   /**
@@ -55,7 +55,7 @@
 //    */
 //   this.hatchFillResolver_ = /** @type {function(anychart.core.annotations.Base,number):acgraph.vector.PatternFill} */(
 //       anychart.core.annotations.Base.getColorResolver(
-//           [anychart.opt.HATCH_FILL, anychart.opt.HOVER_HATCH_FILL, anychart.opt.SELECT_HATCH_FILL],
+//           ['hatchFill', 'hoverHatchFill', 'selectHatchFill'],
 //           anychart.enums.ColorType.HATCH_FILL));
 // };
 // goog.inherits(anychart.core.annotations.Label, anychart.core.annotations.Base);
@@ -146,7 +146,7 @@
 //       .fill(this.hatchFillResolver_(this, state));
 //   this.paths_[2]
 //       .fill(anychart.color.TRANSPARENT_HANDLER)
-//       .stroke(/** @type {acgraph.vector.SolidFill} */(anychart.color.TRANSPARENT_HANDLER), this[anychart.opt.HOVER_GAP]() * 2);
+//       .stroke(/** @type {acgraph.vector.SolidFill} */(anychart.color.TRANSPARENT_HANDLER), this['hoverGap']() * 2);
 // };
 // //endregion
 //

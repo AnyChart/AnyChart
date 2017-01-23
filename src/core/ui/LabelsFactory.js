@@ -1272,11 +1272,11 @@ anychart.core.ui.LabelsFactory.prototype.setupByJSON = function(config, opt_defa
   var enabledState = this.enabled();
   anychart.core.ui.LabelsFactory.base(this, 'setupByJSON', config, opt_default);
 
-  if (anychart.opt.BACKGROUND in config)
-    this.background(config[anychart.opt.BACKGROUND]);
+  if ('background' in config)
+    this.background(config['background']);
 
-  if (anychart.opt.PADDING in config)
-    this.padding(config[anychart.opt.PADDING]);
+  if ('padding' in config)
+    this.padding(config['padding']);
 
   this.position(config['position']);
   this.anchor(config['anchor']);
@@ -2513,7 +2513,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
       width = Math.ceil(anychart.utils.normalizeSize(/** @type {number|string} */(mergedSettings['width']), parentWidth));
       if (padding) {
         textWidth = padding.tightenWidth(width);
-        this.textX = anychart.utils.normalizeSize(padding.getOption(anychart.opt.LEFT), width);
+        this.textX = anychart.utils.normalizeSize(padding.getOption('left'), width);
       } else {
         this.textX = 0;
         textWidth = width;
@@ -2526,7 +2526,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
       width = textElementBounds.width;
       if (padding) {
         outerBounds.width = padding.widenWidth(width);
-        this.textX = anychart.utils.normalizeSize(padding.getOption(anychart.opt.LEFT), outerBounds.width);
+        this.textX = anychart.utils.normalizeSize(padding.getOption('left'), outerBounds.width);
       } else {
         this.textX = 0;
         outerBounds.width = width;
@@ -2541,7 +2541,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
       height = Math.ceil(anychart.utils.normalizeSize(/** @type {number|string} */(mergedSettings['height']), parentHeight));
       if (padding) {
         textHeight = padding.tightenHeight(height);
-        this.textY = anychart.utils.normalizeSize(padding.getOption(anychart.opt.TOP), height);
+        this.textY = anychart.utils.normalizeSize(padding.getOption('top'), height);
       } else {
         this.textY = 0;
         textHeight = height;
@@ -2554,7 +2554,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
       height = textElementBounds.height;
       if (padding) {
         outerBounds.height = padding.widenHeight(height);
-        this.textY = anychart.utils.normalizeSize(padding.getOption(anychart.opt.TOP), outerBounds.height);
+        this.textY = anychart.utils.normalizeSize(padding.getOption('top'), outerBounds.height);
       } else {
         this.textY = 0;
         outerBounds.height = height;
@@ -2675,11 +2675,11 @@ anychart.core.ui.LabelsFactory.Label.prototype.setupByJSON = function(config, op
   anychart.core.ui.LabelsFactory.Label.base(this, 'setupByJSON', config, opt_default);
 
 
-  if (anychart.opt.BACKGROUND in config)
-    this.background(config[anychart.opt.BACKGROUND]);
+  if ('background' in config)
+    this.background(config['background']);
 
-  if (anychart.opt.PADDING in config)
-    this.padding(config[anychart.opt.PADDING]);
+  if ('padding' in config)
+    this.padding(config['padding']);
 
   this.position(config['position']);
   this.anchor(config['anchor']);

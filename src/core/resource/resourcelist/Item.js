@@ -2,7 +2,6 @@ goog.provide('anychart.core.resource.resourceList.Item');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.Label');
-goog.require('anychart.opt');
 
 
 
@@ -291,44 +290,44 @@ anychart.core.resource.resourceList.Item.prototype.getComplexOption = function(n
 anychart.core.resource.resourceList.Item.PROPERTY_DESCRIPTORS = (function() {
   var map = {};
 
-  map[anychart.opt.WIDTH] = anychart.core.settings.createDescriptor(
+  map['width'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.WIDTH,
+      'width',
       anychart.core.settings.numberOrPercentNormalizer,
       0,
       0);
 
-  map[anychart.opt.IMAGE_SRC] = anychart.core.settings.createDescriptor(
+  map['imageSrc'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.IMAGE_SRC,
+      'imageSrc',
       anychart.core.settings.stringNormalizer,
       0,
       0);
 
-  map[anychart.opt.NAME] = anychart.core.settings.createDescriptor(
+  map['name'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.NAME,
+      'name',
       anychart.core.settings.asIsNormalizer,
       0,
       0);
 
-  map[anychart.opt.TYPE] = anychart.core.settings.createDescriptor(
+  map['type'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.TYPE,
+      'type',
       anychart.core.settings.asIsNormalizer,
       0,
       0);
 
-  map[anychart.opt.DESCRIPTION] = anychart.core.settings.createDescriptor(
+  map['description'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.DESCRIPTION,
+      'description',
       anychart.core.settings.asIsNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.TAGS] = anychart.core.settings.createDescriptor(
+  map['tags'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.TAGS,
+      'tags',
       anychart.core.settings.arrayNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
@@ -413,7 +412,7 @@ anychart.core.resource.resourceList.Item.prototype.createClipForImage_ = functio
   var rightBottom = 0;
   var leftBottom = 0;
 
-  var borderRadius = this.getComplexOption('imageSettings', anychart.opt.BORDER_RADIUS);
+  var borderRadius = this.getComplexOption('imageSettings', 'borderRadius');
   if (!goog.isArray(borderRadius))
     borderRadius = [borderRadius];
   if (borderRadius && borderRadius.length) {
@@ -457,17 +456,17 @@ anychart.core.resource.resourceList.Item.prototype.createClipForImage_ = functio
  * @param {number} height Height of resource item if present.
  */
 anychart.core.resource.resourceList.Item.prototype.calculateCoordinates = function(element, coords, fullImageWidth, margin, height) {
-  var width = /** @type {number} */ (this.getOption(anychart.opt.WIDTH));
+  var width = /** @type {number} */ (this.getOption('width'));
   var marginTop = anychart.utils.normalizeSize(margin.top, height) || 0;
   var marginRight = anychart.utils.normalizeSize(margin.right, width) || 0;
   var marginBottom = anychart.utils.normalizeSize(margin.bottom, height) || 0;
   var marginLeft = anychart.utils.normalizeSize(margin.left, width) || 0;
 
-  coords[anychart.opt.X] = fullImageWidth + marginLeft;
-  coords[anychart.opt.Y] += marginTop;
-  var textWidth = width - coords[anychart.opt.X] - marginRight;
+  coords['x'] = fullImageWidth + marginLeft;
+  coords['y'] += marginTop;
+  var textWidth = width - coords['x'] - marginRight;
   element.width(textWidth);
-  coords[anychart.opt.HEIGHT] = element.getHeight() + marginBottom;
+  coords['height'] = element.getHeight() + marginBottom;
 };
 //endregion
 
@@ -550,33 +549,33 @@ anychart.core.resource.resourceList.Item.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 
-  var imageSrc = /** @type {string} */ (this.getOption(anychart.opt.IMAGE_SRC));
+  var imageSrc = /** @type {string} */ (this.getOption('imageSrc'));
   this.imageElement.src(imageSrc);
 
   this.applySettings(this.imageElement, /** @type {Object} */ (this.getComplexOption('imageSettings', [])));
 
-  var name = /** @type {string} */ (this.getOption(anychart.opt.NAME));
-  if (!!this.getComplexOption('nameSettings', anychart.opt.USE_HTML))
+  var name = /** @type {string} */ (this.getOption('name'));
+  if (!!this.getComplexOption('nameSettings', 'useHtml'))
     this.nameElement.htmlText(name);
   else
     this.nameElement.text(name);
   this.applySettings(this.nameElement, /** @type {Object} */ (this.getComplexOption('nameSettings', [])));
 
-  var type = /** @type {string} */ (this.getOption(anychart.opt.TYPE));
-  if (!!this.getComplexOption('typeSettings', anychart.opt.USE_HTML))
+  var type = /** @type {string} */ (this.getOption('type'));
+  if (!!this.getComplexOption('typeSettings', 'useHtml'))
     this.typeElement.htmlText(type);
   else
     this.typeElement.text(type);
   this.applySettings(this.typeElement, /** @type {Object} */ (this.getComplexOption('typeSettings', [])));
 
-  var description = /** @type {string} */ (this.getOption(anychart.opt.DESCRIPTION));
-  if (!!this.getComplexOption('descriptionSettings', anychart.opt.USE_HTML))
+  var description = /** @type {string} */ (this.getOption('description'));
+  if (!!this.getComplexOption('descriptionSettings', 'useHtml'))
     this.descriptionElement.htmlText(description);
   else
     this.descriptionElement.text(description);
   this.applySettings(this.descriptionElement, /** @type {Object} */ (this.getComplexOption('descriptionSettings', [])));
 
-  var tags = /** @type {Array} */ (this.getOption(anychart.opt.TAGS));
+  var tags = /** @type {Array} */ (this.getOption('tags'));
   var tag, i;
   if (this.tagsElements.length) {
     for (i = 0; i < this.tagsElements.length; i++) {
@@ -609,61 +608,61 @@ anychart.core.resource.resourceList.Item.prototype.draw = function() {
   var width;
   var itemHeight, itemMinHeight, itemMaxHeight;
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    var listHeight = /** @type {number} */ (this.getOption(anychart.opt.HEIGHT));
+    var listHeight = /** @type {number} */ (this.getOption('height'));
     itemHeight = this.resourceList_.getItemHeight(this, listHeight);
 
     itemMinHeight = this.resourceList_.getMinItemHeight(this, listHeight);
     itemMaxHeight = this.resourceList_.getMaxItemHeight(this, listHeight);
 
-    width = /** @type {number} */ (this.getOption(anychart.opt.WIDTH));
+    width = /** @type {number} */ (this.getOption('width'));
     if (!isNaN(itemHeight)) {
       if (!isNaN(itemMaxHeight))
         itemHeight = Math.min(itemHeight, itemMaxHeight);
       if (!isNaN(itemMinHeight))
         itemHeight = Math.max(itemHeight, itemMinHeight);
     }
-    margin = /** @type {Object} */ (this.getComplexOption('imageSettings', anychart.opt.MARGIN));
-    this.coords.image[anychart.opt.X] = anychart.utils.normalizeSize(margin.left, width) || 0;
+    margin = /** @type {Object} */ (this.getComplexOption('imageSettings', 'margin'));
+    this.coords.image['x'] = anychart.utils.normalizeSize(margin.left, width) || 0;
     marginRight = anychart.utils.normalizeSize(margin.right, width) || 0;
-    this.coords.image[anychart.opt.Y] = anychart.utils.normalizeSize(margin.top, itemHeight) || 0;
+    this.coords.image['y'] = anychart.utils.normalizeSize(margin.top, itemHeight) || 0;
 
-    var imageWidth = anychart.utils.normalizeSize(/** @type {number|string} */ (this.getComplexOption('imageSettings', anychart.opt.SIZE)), width) || 0;
+    var imageWidth = anychart.utils.normalizeSize(/** @type {number|string} */ (this.getComplexOption('imageSettings', 'size')), width) || 0;
     this.imageElement.width(imageWidth);
     this.imageElement.height(imageWidth);
     var fullImageWidth = 0;
     var fullImageHeight = 0;
     if (imageSrc != '') {
       this.imageElement.clip(this.createClipForImage_());
-      fullImageWidth = this.coords.image[anychart.opt.X] + imageWidth + marginRight;
-      fullImageHeight = this.coords.image[anychart.opt.Y] + imageWidth + anychart.utils.normalizeSize(margin.bottom, itemHeight) || 0;
+      fullImageWidth = this.coords.image['x'] + imageWidth + marginRight;
+      fullImageHeight = this.coords.image['y'] + imageWidth + anychart.utils.normalizeSize(margin.bottom, itemHeight) || 0;
     }
 
-    this.coords.name[anychart.opt.X] = 0;
-    this.coords.name[anychart.opt.Y] = 0;
-    this.coords.name[anychart.opt.HEIGHT] = 0;
-    if (goog.isDefAndNotNull(this.getOption(anychart.opt.NAME))) {
-      margin = /** @type {Object} */ (this.getComplexOption('nameSettings', anychart.opt.MARGIN));
+    this.coords.name['x'] = 0;
+    this.coords.name['y'] = 0;
+    this.coords.name['height'] = 0;
+    if (goog.isDefAndNotNull(this.getOption('name'))) {
+      margin = /** @type {Object} */ (this.getComplexOption('nameSettings', 'margin'));
       this.calculateCoordinates(this.nameElement, this.coords.name, fullImageWidth, margin, itemHeight);
     }
 
-    this.coords.type[anychart.opt.Y] = this.coords.name[anychart.opt.Y] + this.coords.name[anychart.opt.HEIGHT];
-    if (goog.isDefAndNotNull(this.getOption(anychart.opt.TYPE))) {
-      margin = /** @type {Object} */ (this.getComplexOption('typeSettings', anychart.opt.MARGIN));
+    this.coords.type['y'] = this.coords.name['y'] + this.coords.name['height'];
+    if (goog.isDefAndNotNull(this.getOption('type'))) {
+      margin = /** @type {Object} */ (this.getComplexOption('typeSettings', 'margin'));
       this.calculateCoordinates(this.typeElement, this.coords.type, fullImageWidth, margin, itemHeight);
     }
 
-    this.coords.description[anychart.opt.Y] = this.coords.type[anychart.opt.Y] + this.coords.type[anychart.opt.HEIGHT];
-    if (goog.isDefAndNotNull(this.getOption(anychart.opt.DESCRIPTION))) {
-      margin = /** @type {Object} */ (this.getComplexOption('descriptionSettings', anychart.opt.MARGIN));
+    this.coords.description['y'] = this.coords.type['y'] + this.coords.type['height'];
+    if (goog.isDefAndNotNull(this.getOption('description'))) {
+      margin = /** @type {Object} */ (this.getComplexOption('descriptionSettings', 'margin'));
       this.calculateCoordinates(this.descriptionElement, this.coords.description, fullImageWidth, margin, itemHeight);
     }
 
     var availableWidth = width - fullImageWidth;
     var offsetX = 0;
-    var offsetY = this.coords.description[anychart.opt.Y] + this.coords.description[anychart.opt.HEIGHT];
+    var offsetY = this.coords.description['y'] + this.coords.description['height'];
     var tagsHeight = offsetY;
     if (this.tagsElements.length) {
-      margin = /** @type {Object} */ (this.getComplexOption('tagSettings', anychart.opt.MARGIN));
+      margin = /** @type {Object} */ (this.getComplexOption('tagSettings', 'margin'));
       marginLeft = anychart.utils.normalizeSize(margin.left, width);
       marginRight = anychart.utils.normalizeSize(margin.right, width);
       marginBottom = anychart.utils.normalizeSize(margin.bottom, itemHeight) || 0;
@@ -704,10 +703,10 @@ anychart.core.resource.resourceList.Item.prototype.draw = function() {
 
     this.bounds_ = anychart.math.rect(0, 0, width, this.actualHeight_);
 
-    this.imageElement.setTransformationMatrix(1, 0, 0, 1, this.coords.image[anychart.opt.X], this.coords.image[anychart.opt.Y]);
-    this.nameElement.setTransformationMatrix(1, 0, 0, 1, this.coords.name[anychart.opt.X], this.coords.name[anychart.opt.Y]);
-    this.typeElement.setTransformationMatrix(1, 0, 0, 1, this.coords.type[anychart.opt.X], this.coords.type[anychart.opt.Y]);
-    this.descriptionElement.setTransformationMatrix(1, 0, 0, 1, this.coords.description[anychart.opt.X], this.coords.description[anychart.opt.Y]);
+    this.imageElement.setTransformationMatrix(1, 0, 0, 1, this.coords.image['x'], this.coords.image['y']);
+    this.nameElement.setTransformationMatrix(1, 0, 0, 1, this.coords.name['x'], this.coords.name['y']);
+    this.typeElement.setTransformationMatrix(1, 0, 0, 1, this.coords.type['x'], this.coords.type['y']);
+    this.descriptionElement.setTransformationMatrix(1, 0, 0, 1, this.coords.description['x'], this.coords.description['y']);
 
     this.rootLayer.clip(this.bounds_);
 

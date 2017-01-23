@@ -3209,7 +3209,7 @@ anychart.charts.Map.prototype.getBoundsWithoutAxes = function(bounds) {
     var axis;
     for (var i = 0; i < axes.length; i++) {
       axis = axes[i];
-      if (axis.getOption(anychart.opt.ENABLED)) {
+      if (axis.getOption('enabled')) {
         axis.parentBounds(bounds);
 
         var remainingBounds = axis.getRemainingBounds();

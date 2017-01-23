@@ -26,8 +26,8 @@ goog.inherits(anychart.core.utils.Margin, anychart.core.utils.Space);
 anychart.core.utils.Margin.prototype.tightenBounds = function(boundsRect) {
   var width = this.tightenWidth(boundsRect.width);
   var height = this.tightenHeight(boundsRect.height);
-  var left = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption(anychart.opt.LEFT)), width);
-  var top = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption(anychart.opt.TOP)), height);
+  var left = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption('left')), width);
+  var top = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOption('top')), height);
   return new anychart.math.Rect(
       boundsRect.left + left,
       boundsRect.top + top,
@@ -38,8 +38,8 @@ anychart.core.utils.Margin.prototype.tightenBounds = function(boundsRect) {
 
 /** @inheritDoc */
 anychart.core.utils.Margin.prototype.tightenHeight = function(initialHeight) {
-  var top = /** @type {number|string} */(this.getOption(anychart.opt.TOP));
-  var bottom = /** @type {number|string} */(this.getOption(anychart.opt.BOTTOM));
+  var top = /** @type {number|string} */(this.getOption('top'));
+  var bottom = /** @type {number|string} */(this.getOption('bottom'));
   var ratio = 1;
   if (anychart.utils.isPercent(top))
     ratio += parseFloat(top) / 100;
@@ -56,8 +56,8 @@ anychart.core.utils.Margin.prototype.tightenHeight = function(initialHeight) {
 
 /** @inheritDoc */
 anychart.core.utils.Margin.prototype.tightenWidth = function(initialWidth) {
-  var left = /** @type {number|string} */(this.getOption(anychart.opt.LEFT));
-  var right = /** @type {number|string} */(this.getOption(anychart.opt.RIGHT));
+  var left = /** @type {number|string} */(this.getOption('left'));
+  var right = /** @type {number|string} */(this.getOption('right'));
   var ratio = 1;
   if (anychart.utils.isPercent(left))
     ratio += parseFloat(left) / 100;

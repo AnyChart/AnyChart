@@ -1,6 +1,5 @@
 goog.provide('anychart.math.bbandsB');
 goog.require('anychart.math.CycledQueue');
-goog.require('anychart.opt');
 goog.require('anychart.utils');
 
 /**
@@ -67,7 +66,7 @@ anychart.math.bbandsB.startFunction = function(context) {
 anychart.math.bbandsB.calculationFunction = function(row, context) {
   var queue = context.queue;
   var period = context.period;
-  var currValue = /** @type {number} */ (row.get(anychart.opt.VALUE));
+  var currValue = /** @type {number} */ (row.get('value'));
   currValue = anychart.utils.toNumber(currValue);
   var missing = isNaN(currValue);
   var dequeuedValue;
@@ -130,7 +129,7 @@ anychart.math.bbandsB.calculationFunction = function(row, context) {
     }
   }
 
-  row.set(anychart.opt.RESULT, result);
+  row.set('result', result);
 };
 
 
@@ -146,7 +145,7 @@ anychart.math.bbandsB.createComputer = function(mapping, opt_period, opt_deviati
   result.setContext(anychart.math.bbandsB.initContext(opt_period, opt_deviation));
   result.setStartFunction(anychart.math.bbandsB.startFunction);
   result.setCalculationFunction(anychart.math.bbandsB.calculationFunction);
-  result.addOutputField(anychart.opt.RESULT);
+  result.addOutputField('result');
   return result;
 };
 

@@ -1,6 +1,5 @@
 goog.provide('anychart.animations.PieAnimation');
 goog.require('anychart.animations.Animation');
-goog.require('anychart.opt');
 
 
 
@@ -29,7 +28,7 @@ anychart.animations.PieAnimation.prototype.update = function() {
   var iterator = this.chart.getDetachedIterator();
   // we would use variable number of arguments per point - from zero to five
   while (iterator.advance()) {
-    if (!iterator.meta(anychart.opt.MISSING)) {
+    if (!iterator.meta('missing')) {
       var start = /** @type {number} */(iterator.meta('start'));
       var sweep = /** @type {number} */(iterator.meta('sweep'));
       var radius = this.chart.getPixelRadius();
@@ -53,7 +52,7 @@ anychart.animations.PieAnimation.prototype.onAnimate = function() {
   var iterator = this.chart.getDetachedIterator();
   var currentCoordIndex = 0;
   while (iterator.advance()) {
-    if (!iterator.meta(anychart.opt.MISSING)) {
+    if (!iterator.meta('missing')) {
       iterator.meta('start', this.coords[currentCoordIndex++]);
       iterator.meta('sweep', this.coords[currentCoordIndex++]);
       iterator.meta('radius', this.coords[currentCoordIndex++]);

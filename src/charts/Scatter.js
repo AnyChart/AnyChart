@@ -57,8 +57,8 @@ anychart.charts.Scatter.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.VALUE
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'value'
   };
   res[anychart.enums.CartesianSeriesType.LINE] = {
     drawerType: anychart.enums.SeriesDrawerTypes.LINE,
@@ -69,8 +69,8 @@ anychart.charts.Scatter.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.VALUE
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'value'
   };
   res[anychart.enums.CartesianSeriesType.MARKER] = {
     drawerType: anychart.enums.SeriesDrawerTypes.MARKER,
@@ -88,8 +88,8 @@ anychart.charts.Scatter.prototype.seriesConfig = (function() {
         // anychart.core.series.Capabilities.SUPPORTS_MARKERS |
         anychart.core.series.Capabilities.SUPPORTS_LABELS |
         0),
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.VALUE
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'value'
   };
   return res;
 })();

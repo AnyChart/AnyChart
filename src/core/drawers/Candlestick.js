@@ -2,7 +2,6 @@ goog.provide('anychart.core.drawers.Candlestick');
 goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
 goog.require('anychart.enums');
-goog.require('anychart.opt');
 
 
 
@@ -50,39 +49,39 @@ anychart.core.drawers.Candlestick.prototype.flags = (
 /** @inheritDoc */
 anychart.core.drawers.Candlestick.prototype.requiredShapes = (function() {
   var res = {};
-  res[anychart.opt.RISING] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.RISING_HATCH_FILL] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.FALLING] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.FALLING_HATCH_FILL] = anychart.enums.ShapeType.PATH;
+  res['rising'] = anychart.enums.ShapeType.PATH;
+  res['risingHatchFill'] = anychart.enums.ShapeType.PATH;
+  res['falling'] = anychart.enums.ShapeType.PATH;
+  res['fallingHatchFill'] = anychart.enums.ShapeType.PATH;
   return res;
 })();
 
 
 /** @inheritDoc */
-anychart.core.drawers.Candlestick.prototype.yValueNames = ([anychart.opt.OPEN, anychart.opt.HIGH, anychart.opt.LOW, anychart.opt.CLOSE]);
+anychart.core.drawers.Candlestick.prototype.yValueNames = (['open', 'high', 'low', 'close']);
 
 
 /** @inheritDoc */
 anychart.core.drawers.Candlestick.prototype.drawSubsequentPoint = function(point, state) {
-  var rising = Number(point.get(anychart.opt.OPEN)) < Number(point.get(anychart.opt.CLOSE));
+  var rising = Number(point.get('open')) < Number(point.get('close'));
   var name, hatchName;
   if (rising) {
-    name = anychart.opt.RISING;
-    hatchName = anychart.opt.RISING_HATCH_FILL;
+    name = 'rising';
+    hatchName = 'risingHatchFill';
   } else {
-    name = anychart.opt.FALLING;
-    hatchName = anychart.opt.FALLING_HATCH_FILL;
+    name = 'falling';
+    hatchName = 'fallingHatchFill';
   }
   var shapeNames = {};
   shapeNames[name] = true;
   shapeNames[hatchName] = true;
   var shapes = this.shapesManager.getShapesGroup(state, shapeNames);
 
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var open = /** @type {number} */(point.meta(anychart.opt.OPEN));
-  var high = /** @type {number} */(point.meta(anychart.opt.HIGH));
-  var low = /** @type {number} */(point.meta(anychart.opt.LOW));
-  var close = /** @type {number} */(point.meta(anychart.opt.CLOSE));
+  var x = /** @type {number} */(point.meta('x'));
+  var open = /** @type {number} */(point.meta('open'));
+  var high = /** @type {number} */(point.meta('high'));
+  var low = /** @type {number} */(point.meta('low'));
+  var close = /** @type {number} */(point.meta('close'));
 
   var widthHalf = this.pointWidth / 2;
 

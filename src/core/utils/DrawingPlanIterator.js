@@ -46,7 +46,7 @@ anychart.core.utils.DrawingPlanIterator.prototype.advance = function() {
  * @return {number}
  */
 anychart.core.utils.DrawingPlanIterator.prototype.getRawDataIndex = function() {
-  return /** @type {number} */(this.meta(anychart.opt.RAW_INDEX));
+  return /** @type {number} */(this.meta('rawIndex'));
 };
 
 
@@ -58,7 +58,7 @@ anychart.core.utils.DrawingPlanIterator.prototype.get = function(fieldName) {
       res = this.currentPoint_.data[fieldName];
     } else {
       //anychart.core.utils.DrawingPlanIterator.misses[fieldName] = true;
-      var rawIndex = this.currentPoint_.meta[anychart.opt.RAW_INDEX];
+      var rawIndex = this.currentPoint_.meta['rawIndex'];
       if (!this.currentRow) {
         if (goog.isDef(rawIndex))
           this.currentRow = this.view.row(rawIndex);

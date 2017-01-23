@@ -1,6 +1,5 @@
 goog.provide('anychart.data.ParetoSeriesMapping');
 goog.require('anychart.data.Mapping');
-goog.require('anychart.opt');
 
 
 
@@ -18,7 +17,7 @@ goog.inherits(anychart.data.ParetoSeriesMapping, anychart.data.Mapping);
 
 /** @inheritDoc */
 anychart.data.ParetoSeriesMapping.prototype.getInternal = function(row, rowIndex, fieldName) {
-  if (fieldName == anychart.opt.VALUE) {
+  if (fieldName == 'value') {
     return this.parentView.getCumulativeFrequency(rowIndex);
   } else {
     return anychart.data.ParetoSeriesMapping.base(this, 'getInternal', row, rowIndex, fieldName);

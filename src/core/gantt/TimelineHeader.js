@@ -635,8 +635,8 @@ anychart.core.gantt.TimelineHeader.Level.prototype.labels = function(opt_value) 
   }
 
   if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !(anychart.opt.ENABLED in opt_value))
-      opt_value[anychart.opt.ENABLED] = true;
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.labelsFactory_.setup(opt_value);
     return this;
   }

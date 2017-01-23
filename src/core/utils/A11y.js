@@ -248,8 +248,8 @@ anychart.core.utils.ChartA11y.prototype.applyA11y = function(textInfo) {
     }
 
     var title = this.chart.title();
-    if (!titleText && title.getOption(anychart.opt.TEXT) && title.enabled())
-      titleText = title.getOption(anychart.opt.TEXT);
+    if (!titleText && title.getOption('text') && title.enabled())
+      titleText = title.getOption('text');
 
     if (this.mode_ == anychart.enums.A11yMode.DATA_TABLE) {
       this.relatedHtmlTable_ = /** @type {Element} */ (this.chart.toA11yTable(/** @type {string} */ (titleText)));

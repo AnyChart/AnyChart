@@ -2,7 +2,6 @@ goog.provide('anychart.core.resource.Resource');
 goog.require('anychart.core.Base');
 goog.require('anychart.format');
 goog.require('anychart.math.Rect');
-goog.require('anychart.opt');
 goog.require('anychart.scales.Calendar');
 goog.require('anychart.utils');
 
@@ -200,12 +199,12 @@ anychart.core.resource.Resource.prototype.draw = function(index, from, to, typed
     }
     // finalize
     conflicts.evaluate(k * anychart.core.resource.Resource.DAY, null, this, bounds.top);
-    var statusHeight = /** @type {number} */(conflicts.getOption(anychart.opt.HEIGHT)) + anychart.core.resource.Resource.ACTIVITIES_SPACING;
+    var statusHeight = /** @type {number} */(conflicts.getOption('height')) + anychart.core.resource.Resource.ACTIVITIES_SPACING;
     bounds.top += statusHeight;
     bounds.height -= statusHeight;
   }
   var vLineThickness = acgraph.vector.getThickness(
-      /** @type {acgraph.vector.Stroke} */(this.chart_.grid().getOption(anychart.opt.VERTICAL_STROKE)));
+      /** @type {acgraph.vector.Stroke} */(this.chart_.grid().getOption('verticalStroke')));
   for (var i = 0; i < this.activities_.length; i++) {
     index = this.drawActivity_(index, this.activities_[i], from, to, typedLayer, bounds, vLineThickness);
   }
@@ -258,7 +257,7 @@ anychart.core.resource.Resource.prototype.calculate = function() {
     this.activities_.length = 0;
     var row = this.chart_.getIterator();
     var rawActivities;
-    if (!row.select(this.index_) || !(rawActivities = row.get(anychart.opt.ACTIVITIES)) || !goog.isArray(rawActivities))
+    if (!row.select(this.index_) || !(rawActivities = row.get('activities')) || !goog.isArray(rawActivities))
       return;
     for (i = 0; i < rawActivities.length; i++) {
       activity = this.activityFromData_(rawActivities[i]);
@@ -343,7 +342,7 @@ anychart.core.resource.Resource.prototype.calculate = function() {
 anychart.core.resource.Resource.prototype.activityFromData_ = function(dataObj) {
   if (!goog.isObject(dataObj))
     return null;
-  var rawIntervals = dataObj[anychart.opt.INTERVALS];
+  var rawIntervals = dataObj['intervals'];
   if (!goog.isArray(rawIntervals)) {
     rawIntervals = [dataObj];
   }
@@ -352,8 +351,8 @@ anychart.core.resource.Resource.prototype.activityFromData_ = function(dataObj) 
   for (var i = 0; i < rawIntervals.length; i++) {
     var interval = rawIntervals[i];
     if (interval) {
-      var startDate = anychart.format.parseDateTime(interval[anychart.opt.START]);
-      var endDate = anychart.format.parseDateTime(interval[anychart.opt.END]);
+      var startDate = anychart.format.parseDateTime(interval['start']);
+      var endDate = anychart.format.parseDateTime(interval['end']);
       if (startDate && endDate) {
         if (startDate.getTime() > endDate.getTime()) {
           var tmp = startDate;
@@ -363,10 +362,10 @@ anychart.core.resource.Resource.prototype.activityFromData_ = function(dataObj) 
         var start = Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate());
         var end = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate());
         var minutesPerDay;
-        var total = anychart.utils.normalizeToNaturalNumber(interval[anychart.opt.TOTAL_MINUTES], NaN, false);
+        var total = anychart.utils.normalizeToNaturalNumber(interval['totalMinutes'], NaN, false);
         if (isNaN(total)) {
           minutesPerDay = anychart.utils.normalizeToNaturalNumber(
-              interval[anychart.opt.MINUTES_PER_DAY], defaultMPDValue, false);
+              interval['minutesPerDay'], defaultMPDValue, false);
         } else {
           var daysCount = (end - start) / anychart.core.resource.Resource.DAY + 1;
           minutesPerDay = total / daysCount;
@@ -461,7 +460,7 @@ anychart.core.resource.Resource.prototype.drawActivity_ = function(index, activi
 
     if (hatchFill) {
       hatchPath.fill(hatchFill);
-      hatchPath.stroke(anychart.opt.NONE);
+      hatchPath.stroke('none');
       hatchPath.moveTo(left, top)
           .lineTo(right, top)
           .lineTo(right, bottom)
@@ -472,7 +471,7 @@ anychart.core.resource.Resource.prototype.drawActivity_ = function(index, activi
     settings.drawLabel(index++,
         settings.createFormatProvider(interval, activity.data),
         new anychart.math.Rect(left, top, right - left, bottom - top),
-        activity.data[anychart.opt.LABEL]);
+        activity.data['label']);
   }
   return index;
 };

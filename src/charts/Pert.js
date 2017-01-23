@@ -498,13 +498,13 @@ anychart.charts.Pert.prototype.onTooltipSignal_ = function(event) {
 anychart.charts.Pert.prototype.applyTooltipSettings_ = function(opt_settings1, opt_settings2) {
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
   var enabled = true;
-  if (goog.isBoolean(this.defaultTooltipSettings_[anychart.opt.ENABLED])) enabled = this.defaultTooltipSettings_[anychart.opt.ENABLED];
+  if (goog.isBoolean(this.defaultTooltipSettings_['enabled'])) enabled = this.defaultTooltipSettings_['enabled'];
   tooltip.setup(this.defaultTooltipSettings_);
 
-  if (opt_settings1 && goog.isBoolean(opt_settings1[anychart.opt.ENABLED])) enabled = opt_settings1[anychart.opt.ENABLED];
+  if (opt_settings1 && goog.isBoolean(opt_settings1['enabled'])) enabled = opt_settings1['enabled'];
   tooltip.setup(opt_settings1);
 
-  if (opt_settings2 && goog.isBoolean(opt_settings2[anychart.opt.ENABLED])) enabled = opt_settings2[anychart.opt.ENABLED];
+  if (opt_settings2 && goog.isBoolean(opt_settings2['enabled'])) enabled = opt_settings2['enabled'];
   tooltip.setup(opt_settings2);
 
   tooltip.enabled(enabled);

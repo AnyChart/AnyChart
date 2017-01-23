@@ -2,7 +2,6 @@ goog.provide('anychart.core.drawers.Column3d');
 goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
 goog.require('anychart.enums');
-goog.require('anychart.opt');
 
 
 
@@ -50,15 +49,15 @@ anychart.core.drawers.Column3d.prototype.flags = (
 /** @inheritDoc */
 anychart.core.drawers.Column3d.prototype.requiredShapes = (function() {
   var res = {};
-  res[anychart.opt.TOP] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.BOTTOM] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.LEFT] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.RIGHT] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.BACK] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.FRONT] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.FRONT_HATCH] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.RIGHT_HATCH] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.TOP_HATCH] = anychart.enums.ShapeType.PATH;
+  res['top'] = anychart.enums.ShapeType.PATH;
+  res['bottom'] = anychart.enums.ShapeType.PATH;
+  res['left'] = anychart.enums.ShapeType.PATH;
+  res['right'] = anychart.enums.ShapeType.PATH;
+  res['back'] = anychart.enums.ShapeType.PATH;
+  res['front'] = anychart.enums.ShapeType.PATH;
+  res['frontHatch'] = anychart.enums.ShapeType.PATH;
+  res['rightHatch'] = anychart.enums.ShapeType.PATH;
+  res['topHatch'] = anychart.enums.ShapeType.PATH;
   return res;
 })();
 
@@ -108,7 +107,7 @@ anychart.core.drawers.Column3d.prototype.drawSubsequentPoint = function(point, s
 /** @inheritDoc */
 anychart.core.drawers.Column3d.prototype.updatePointOnAnimate = function(point) {
   // this code can currently work with Bar series created with PerPoint shape managers.
-  var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta(anychart.opt.SHAPES));
+  var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta('shapes'));
   for (var i in shapes)
     shapes[i].clear();
   this.drawPoint_(point, shapes);
@@ -122,24 +121,24 @@ anychart.core.drawers.Column3d.prototype.updatePointOnAnimate = function(point) 
  * @private
  */
 anychart.core.drawers.Column3d.prototype.drawPoint_ = function(point, shapes) {
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var zero = /** @type {number} */(point.meta(anychart.opt.ZERO));
-  var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
+  var x = /** @type {number} */(point.meta('x'));
+  var zero = /** @type {number} */(point.meta('zero'));
+  var y = /** @type {number} */(point.meta('value'));
   if (!this.isVertical) {
     x += this.x3dSeriesShift_;
     zero -= this.y3dSeriesShift_;
     y -= this.y3dSeriesShift_;
   }
 
-  var bottomSide = shapes[anychart.opt.BOTTOM];
-  var backSide = shapes[anychart.opt.BACK];
-  var leftSide = shapes[anychart.opt.LEFT];
-  var rightSide = shapes[anychart.opt.RIGHT];
-  var frontSide = shapes[anychart.opt.FRONT];
-  var topSide = shapes[anychart.opt.TOP];
-  var rightHatchSide = shapes[anychart.opt.RIGHT_HATCH];
-  var frontHatchSide = shapes[anychart.opt.FRONT_HATCH];
-  var topHatchSide = shapes[anychart.opt.TOP_HATCH];
+  var bottomSide = shapes['bottom'];
+  var backSide = shapes['back'];
+  var leftSide = shapes['left'];
+  var rightSide = shapes['right'];
+  var frontSide = shapes['front'];
+  var topSide = shapes['top'];
+  var rightHatchSide = shapes['rightHatch'];
+  var frontHatchSide = shapes['frontHatch'];
+  var topHatchSide = shapes['topHatch'];
 
   var x3dShift = this.x3dShift_;
   var y3dShift = this.y3dShift_;

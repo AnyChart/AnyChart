@@ -142,8 +142,8 @@ anychart.core.stock.Scroller.prototype.seriesConfig = (function() {
     ],
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.ZERO
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'zero'
   };
   res[anychart.enums.StockSeriesType.CANDLESTICK] = {
     drawerType: anychart.enums.SeriesDrawerTypes.CANDLESTICK,
@@ -162,8 +162,8 @@ anychart.core.stock.Scroller.prototype.seriesConfig = (function() {
     ],
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.HIGH,
-    anchoredPositionBottom: anychart.opt.LOW
+    anchoredPositionTop: 'high',
+    anchoredPositionBottom: 'low'
   };
   res[anychart.enums.StockSeriesType.COLUMN] = {
     drawerType: anychart.enums.SeriesDrawerTypes.COLUMN,
@@ -178,8 +178,8 @@ anychart.core.stock.Scroller.prototype.seriesConfig = (function() {
     ],
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.ZERO
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'zero'
   };
   res[anychart.enums.CartesianSeriesType.JUMP_LINE] = {
     drawerType: anychart.enums.SeriesDrawerTypes.JUMP_LINE,
@@ -192,8 +192,8 @@ anychart.core.stock.Scroller.prototype.seriesConfig = (function() {
     ],
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.VALUE
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'value'
   };
   res[anychart.enums.CartesianSeriesType.STICK] = {
     drawerType: anychart.enums.SeriesDrawerTypes.STICK,
@@ -206,8 +206,8 @@ anychart.core.stock.Scroller.prototype.seriesConfig = (function() {
     ],
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.ZERO
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'zero'
   };
   res[anychart.enums.StockSeriesType.LINE] = {
     drawerType: anychart.enums.SeriesDrawerTypes.LINE,
@@ -220,8 +220,8 @@ anychart.core.stock.Scroller.prototype.seriesConfig = (function() {
     ],
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.VALUE
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'value'
   };
   res[anychart.enums.StockSeriesType.MARKER] = {
     drawerType: anychart.enums.SeriesDrawerTypes.MARKER,
@@ -236,8 +236,8 @@ anychart.core.stock.Scroller.prototype.seriesConfig = (function() {
     ],
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.VALUE
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'value'
   };
   res[anychart.enums.StockSeriesType.OHLC] = {
     drawerType: anychart.enums.SeriesDrawerTypes.OHLC,
@@ -252,8 +252,8 @@ anychart.core.stock.Scroller.prototype.seriesConfig = (function() {
     ],
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.HIGH,
-    anchoredPositionBottom: anychart.opt.LOW
+    anchoredPositionTop: 'high',
+    anchoredPositionBottom: 'low'
   };
   res[anychart.enums.StockSeriesType.RANGE_AREA] = {
     drawerType: anychart.enums.SeriesDrawerTypes.RANGE_AREA,
@@ -272,8 +272,8 @@ anychart.core.stock.Scroller.prototype.seriesConfig = (function() {
     ],
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.HIGH,
-    anchoredPositionBottom: anychart.opt.LOW
+    anchoredPositionTop: 'high',
+    anchoredPositionBottom: 'low'
   };
   res[anychart.enums.StockSeriesType.RANGE_COLUMN] = {
     drawerType: anychart.enums.SeriesDrawerTypes.RANGE_COLUMN,
@@ -288,8 +288,8 @@ anychart.core.stock.Scroller.prototype.seriesConfig = (function() {
     ],
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.HIGH,
-    anchoredPositionBottom: anychart.opt.LOW
+    anchoredPositionTop: 'high',
+    anchoredPositionBottom: 'low'
   };
   res[anychart.enums.StockSeriesType.RANGE_SPLINE_AREA] = {
     drawerType: anychart.enums.SeriesDrawerTypes.RANGE_SPLINE_AREA,
@@ -308,8 +308,8 @@ anychart.core.stock.Scroller.prototype.seriesConfig = (function() {
     ],
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.HIGH,
-    anchoredPositionBottom: anychart.opt.LOW
+    anchoredPositionTop: 'high',
+    anchoredPositionBottom: 'low'
   };
   res[anychart.enums.StockSeriesType.RANGE_STEP_AREA] = {
     drawerType: anychart.enums.SeriesDrawerTypes.RANGE_STEP_AREA,
@@ -328,8 +328,8 @@ anychart.core.stock.Scroller.prototype.seriesConfig = (function() {
     ],
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.HIGH,
-    anchoredPositionBottom: anychart.opt.LOW
+    anchoredPositionTop: 'high',
+    anchoredPositionBottom: 'low'
   };
   res[anychart.enums.StockSeriesType.SPLINE] = {
     drawerType: anychart.enums.SeriesDrawerTypes.SPLINE,
@@ -342,8 +342,8 @@ anychart.core.stock.Scroller.prototype.seriesConfig = (function() {
     ],
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.VALUE
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'value'
   };
   res[anychart.enums.StockSeriesType.SPLINE_AREA] = {
     drawerType: anychart.enums.SeriesDrawerTypes.SPLINE_AREA,
@@ -360,8 +360,8 @@ anychart.core.stock.Scroller.prototype.seriesConfig = (function() {
     ],
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.ZERO
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'zero'
   };
   res[anychart.enums.StockSeriesType.STEP_AREA] = {
     drawerType: anychart.enums.SeriesDrawerTypes.STEP_AREA,
@@ -378,8 +378,8 @@ anychart.core.stock.Scroller.prototype.seriesConfig = (function() {
     ],
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.ZERO
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'zero'
   };
   res[anychart.enums.StockSeriesType.STEP_LINE] = {
     drawerType: anychart.enums.SeriesDrawerTypes.STEP_LINE,
@@ -392,8 +392,8 @@ anychart.core.stock.Scroller.prototype.seriesConfig = (function() {
     ],
     postProcessor: null,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.VALUE
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'value'
   };
   return res;
 })();

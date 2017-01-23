@@ -2461,8 +2461,8 @@ anychart.core.ui.BaseGrid.prototype.setupByJSON = function(config, opt_default) 
   this.rowHoverFill(config['hoverFill']);
   this.rowSelectedFill(config['rowSelectedFill']);
 
-  if (anychart.opt.TOOLTIP in config)
-    this.tooltip().setupByVal(config[anychart.opt.TOOLTIP], opt_default);
+  if ('tooltip' in config)
+    this.tooltip().setupByVal(config['tooltip'], opt_default);
 
   this.headerHeight(config['headerHeight']);
   this.editStructurePreviewFill(config['editStructurePreviewFill']);

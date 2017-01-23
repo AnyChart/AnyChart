@@ -37,7 +37,7 @@ anychart.core.annotations.FibonacciFan = function(chartController) {
    */
   this.gridResolver = /** @type {function(anychart.core.annotations.Base,number,number=):acgraph.vector.Stroke} */(
       anychart.core.annotations.Base.getColorResolver(
-          [anychart.opt.GRID, anychart.opt.HOVER_GRID, anychart.opt.SELECT_GRID],
+          ['grid', 'hoverGrid', 'selectGrid'],
           anychart.enums.ColorType.STROKE));
 };
 goog.inherits(anychart.core.annotations.FibonacciFan, anychart.core.annotations.FibonacciBase);
@@ -108,10 +108,10 @@ anychart.core.annotations.FibonacciFan.prototype.drawLevels = function(mainFacto
 anychart.core.annotations.FibonacciFan.prototype.drawLevel = function(levelIndex, levelValue, path, hoverPath,
                                                                       mainFactory, stateFactory, drawLabels,
                                                                       strokeThickness) {
-  var x1 = this.coords[anychart.opt.X_ANCHOR];
-  var y1 = this.coords[anychart.opt.VALUE_ANCHOR];
-  var x2 = this.coords[anychart.opt.SECOND_X_ANCHOR];
-  var y2 = this.coords[anychart.opt.SECOND_VALUE_ANCHOR];
+  var x1 = this.coords['xAnchor'];
+  var y1 = this.coords['valueAnchor'];
+  var x2 = this.coords['secondXAnchor'];
+  var y2 = this.coords['secondValueAnchor'];
   var baseHeight = y2 - y1;
   var y = y1 + baseHeight * levelValue;
   var gridPath = this.gridPaths_[levelIndex];
@@ -156,10 +156,10 @@ anychart.core.annotations.FibonacciFan.prototype.drawLevel = function(levelIndex
 anychart.core.annotations.FibonacciFan.prototype.drawTimeLevel = function(levelIndex, levelValue, path, hoverPath,
                                                                           mainFactory, stateFactory, drawLabels,
                                                                           strokeThickness) {
-  var x1 = this.coords[anychart.opt.X_ANCHOR];
-  var y1 = this.coords[anychart.opt.VALUE_ANCHOR];
-  var x2 = this.coords[anychart.opt.SECOND_X_ANCHOR];
-  var y2 = this.coords[anychart.opt.SECOND_VALUE_ANCHOR];
+  var x1 = this.coords['xAnchor'];
+  var y1 = this.coords['valueAnchor'];
+  var x2 = this.coords['secondXAnchor'];
+  var y2 = this.coords['secondValueAnchor'];
   var baseWidth = x2 - x1;
   var x = x1 + baseWidth * levelValue;
   var gridPath = this.gridPaths_[levelIndex];
@@ -194,8 +194,8 @@ anychart.core.annotations.FibonacciFan.prototype.drawTimeLevel = function(levelI
 anychart.core.annotations.FibonacciFan.prototype.checkVisible = function() {
   var res = anychart.core.annotations.FibonacciFan.base(this, 'checkVisible');
   if (!res) {
-    var x1 = this.coords[anychart.opt.X_ANCHOR];
-    var x2 = this.coords[anychart.opt.SECOND_X_ANCHOR];
+    var x1 = this.coords['xAnchor'];
+    var x2 = this.coords['secondXAnchor'];
     var dx = x2 - x1;
     res = !isNaN(dx) && !((x1 < this.pixelBoundsCache.left && dx <= 0) ||
         (x1 > this.pixelBoundsCache.getRight() && dx >= 0));
@@ -222,7 +222,7 @@ anychart.core.annotations.FibonacciFan.prototype.colorize = function(state) {
 /** @inheritDoc */
 anychart.core.annotations.FibonacciFan.prototype.getColorResolutionContext = function(opt_baseColor, opt_level) {
   var res = {
-    'sourceColor': opt_baseColor || this.getOption(anychart.opt.COLOR) || 'blue'
+    'sourceColor': opt_baseColor || this.getOption('color') || 'blue'
   };
   if (goog.isDef(opt_level)) {
     if (opt_level >= this.levelsInternal.length) {

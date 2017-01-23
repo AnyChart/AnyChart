@@ -1,6 +1,5 @@
 goog.provide('anychart.animations.BubbleAnimation');
 goog.require('anychart.animations.Animation');
-goog.require('anychart.opt');
 
 
 
@@ -24,25 +23,25 @@ anychart.animations.BubbleAnimation.prototype.update = function() {
   var iterator = this.series.getDetachedIterator();
   // we would use variable number of arguments per point - from zero to five
   while (iterator.advance()) {
-    if (!iterator.meta(anychart.opt.MISSING)) {
-      var size = /** @type {number} */(iterator.meta(anychart.opt.SIZE));
+    if (!iterator.meta('missing')) {
+      var size = /** @type {number} */(iterator.meta('size'));
       // we need this to make the drawer choose appropriate shape.
       this.startPoint.push(size < 0 ? -1e-5 : 0);
       this.endPoint.push(size);
-      var centerX = /** @type {number} */(iterator.meta(anychart.opt.X));
-      var centerY = /** @type {number} */(iterator.meta(anychart.opt.VALUE));
+      var centerX = /** @type {number} */(iterator.meta('x'));
+      var centerY = /** @type {number} */(iterator.meta('value'));
       var positionProvider;
-      var label = /** @type {anychart.core.ui.LabelsFactory.Label} */(iterator.meta(anychart.opt.LABEL));
+      var label = /** @type {anychart.core.ui.LabelsFactory.Label} */(iterator.meta('label'));
       if (label) {
-        positionProvider = label.positionProvider()[anychart.opt.VALUE];
+        positionProvider = label.positionProvider()['value'];
         this.startPoint.push(centerX, centerY);
-        this.endPoint.push(positionProvider[anychart.opt.X], positionProvider[anychart.opt.Y]);
+        this.endPoint.push(positionProvider['x'], positionProvider['y']);
       }
-      var marker = /** @type {anychart.core.ui.MarkersFactory.Marker} */(iterator.meta(anychart.opt.MARKER));
+      var marker = /** @type {anychart.core.ui.MarkersFactory.Marker} */(iterator.meta('marker'));
       if (marker) {
-        positionProvider = marker.positionProvider()[anychart.opt.VALUE];
+        positionProvider = marker.positionProvider()['value'];
         this.startPoint.push(centerX, centerY);
-        this.endPoint.push(positionProvider[anychart.opt.X], positionProvider[anychart.opt.Y]);
+        this.endPoint.push(positionProvider['x'], positionProvider['y']);
       }
     }
   }
@@ -54,10 +53,10 @@ anychart.animations.BubbleAnimation.prototype.onAnimate = function() {
   var iterator = this.series.getDetachedIterator();
   var currentCoordIndex = 0;
   while (iterator.advance()) {
-    if (!iterator.meta(anychart.opt.MISSING)) {
-      iterator.meta(anychart.opt.SIZE, this.coords[currentCoordIndex++]);
+    if (!iterator.meta('missing')) {
+      iterator.meta('size', this.coords[currentCoordIndex++]);
       this.series.drawer.updatePointOnAnimate(iterator);
-      var label = /** @type {anychart.core.ui.LabelsFactory.Label} */(iterator.meta(anychart.opt.LABEL));
+      var label = /** @type {anychart.core.ui.LabelsFactory.Label} */(iterator.meta('label'));
       if (label) {
         label.positionProvider({'value': {
           'x': this.coords[currentCoordIndex++],
@@ -65,7 +64,7 @@ anychart.animations.BubbleAnimation.prototype.onAnimate = function() {
         }});
         label.draw();
       }
-      var marker = /** @type {anychart.core.ui.MarkersFactory.Marker} */(iterator.meta(anychart.opt.MARKER));
+      var marker = /** @type {anychart.core.ui.MarkersFactory.Marker} */(iterator.meta('marker'));
       if (marker) {
         marker.positionProvider({'value': {
           'x': this.coords[currentCoordIndex++],

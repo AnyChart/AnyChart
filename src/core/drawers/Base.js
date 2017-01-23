@@ -1,7 +1,6 @@
 goog.provide('anychart.core.drawers.Base');
 goog.require('anychart.core.drawers');
 goog.require('anychart.enums');
-goog.require('anychart.opt');
 goog.require('goog.Disposable');
 
 
@@ -76,7 +75,7 @@ anychart.core.drawers.Base.prototype.flags = (
  * Y values list that are required by this drawer.
  * @type {Array.<string>}
  */
-anychart.core.drawers.Base.prototype.yValueNames = ([anychart.opt.VALUE]);
+anychart.core.drawers.Base.prototype.yValueNames = (['value']);
 
 
 /**
@@ -130,7 +129,7 @@ anychart.core.drawers.Base.prototype.startDrawing = function(shapeManager) {
    * @protected
    */
   this.connectMissing = !!(this.flags & anychart.core.drawers.Capabilities.SUPPORTS_CONNECTING_MISSING) &&
-          !!this.series.getOption(anychart.opt.CONNECT_MISSING_POINTS);
+          !!this.series.getOption('connectMissingPoints');
   /**
    * Series state.
    * @type {anychart.PointState|number}
@@ -145,7 +144,7 @@ anychart.core.drawers.Base.prototype.startDrawing = function(shapeManager) {
    * If the series has vertical X.
    * @type {boolean}
    */
-  this.isVertical = /** @type {boolean} */(this.series.getOption(anychart.opt.IS_VERTICAL));
+  this.isVertical = /** @type {boolean} */(this.series.getOption('isVertical'));
   /**
    * If crisp edges should be applied if possible.
    * @type {boolean}
@@ -175,7 +174,7 @@ anychart.core.drawers.Base.prototype.drawPointCustom_ = function(point, state) {
  * @private
  */
 anychart.core.drawers.Base.prototype.drawPointInternal_ = function(point, state) {
-  if (point.meta(anychart.opt.MISSING)) {
+  if (point.meta('missing')) {
     this.drawMissingPoint(point, state | this.seriesState);
     this.prevPointDrawn = this.prevPointDrawn && this.connectMissing;
   } else {

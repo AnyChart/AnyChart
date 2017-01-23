@@ -2,7 +2,6 @@ goog.provide('anychart.core.drawers.Area');
 goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
 goog.require('anychart.enums');
-goog.require('anychart.opt');
 
 
 
@@ -51,9 +50,9 @@ anychart.core.drawers.Area.prototype.flags = (
 /** @inheritDoc */
 anychart.core.drawers.Area.prototype.requiredShapes = (function() {
   var res = {};
-  res[anychart.opt.FILL] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.HATCH_FILL] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.STROKE] = anychart.enums.ShapeType.PATH;
+  res['fill'] = anychart.enums.ShapeType.PATH;
+  res['hatchFill'] = anychart.enums.ShapeType.PATH;
+  res['stroke'] = anychart.enums.ShapeType.PATH;
   return res;
 })();
 
@@ -67,11 +66,11 @@ anychart.core.drawers.Area.prototype.requiredShapes = (function() {
  * @private
  */
 anychart.core.drawers.Area.prototype.drawSegmentStart_ = function(shapes, x, y, zero) {
-  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]), this.isVertical, x, zero);
-  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]), this.isVertical, x, y);
-  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]), this.isVertical, x, zero);
-  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]), this.isVertical, x, y);
-  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.STROKE]), this.isVertical, x, y);
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes['fill']), this.isVertical, x, zero);
+  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes['fill']), this.isVertical, x, y);
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes['hatchFill']), this.isVertical, x, zero);
+  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes['hatchFill']), this.isVertical, x, y);
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes['stroke']), this.isVertical, x, y);
 };
 
 
@@ -83,25 +82,25 @@ anychart.core.drawers.Area.prototype.drawSegmentStart_ = function(shapes, x, y, 
  * @private
  */
 anychart.core.drawers.Area.prototype.drawSegmentContinuation_ = function(shapes, x, y) {
-  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]), this.isVertical, x, y);
-  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]), this.isVertical, x, y);
-  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.STROKE]), this.isVertical, x, y);
+  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes['fill']), this.isVertical, x, y);
+  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes['hatchFill']), this.isVertical, x, y);
+  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes['stroke']), this.isVertical, x, y);
 };
 
 
 /** @inheritDoc */
 anychart.core.drawers.Area.prototype.drawFirstPoint = function(point, state) {
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var zero = /** @type {number} */(point.meta(anychart.opt.ZERO));
-  var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
+  var x = /** @type {number} */(point.meta('x'));
+  var zero = /** @type {number} */(point.meta('zero'));
+  var y = /** @type {number} */(point.meta('value'));
 
 
   if (this.series.planIsStacked()) {
-    var nextZero = /** @type {number} */(point.meta(anychart.opt.NEXT_ZERO));
-    var nextY = /** @type {number} */(point.meta(anychart.opt.NEXT_VALUE));
+    var nextZero = /** @type {number} */(point.meta('nextZero'));
+    var nextY = /** @type {number} */(point.meta('nextValue'));
     if (!isNaN(nextZero) && !isNaN(nextY)) {
-      shapes[anychart.opt.STROKE].moveTo(x, y).lineTo(x, y);
+      shapes['stroke'].moveTo(x, y).lineTo(x, y);
       this.drawSegmentStart_(shapes, x, nextY, nextZero);
       this.zeroesStack = [x, nextZero];
     } else {
@@ -121,15 +120,15 @@ anychart.core.drawers.Area.prototype.drawFirstPoint = function(point, state) {
 /** @inheritDoc */
 anychart.core.drawers.Area.prototype.drawSubsequentPoint = function(point, state) {
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var zero = /** @type {number} */(point.meta(anychart.opt.ZERO));
-  var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
+  var x = /** @type {number} */(point.meta('x'));
+  var zero = /** @type {number} */(point.meta('zero'));
+  var y = /** @type {number} */(point.meta('value'));
 
   if (this.series.planIsStacked()) {
-    var prevZero = /** @type {number} */(point.meta(anychart.opt.PREV_ZERO));
-    var prevY = /** @type {number} */(point.meta(anychart.opt.PREV_VALUE));
-    var nextZero = /** @type {number} */(point.meta(anychart.opt.NEXT_ZERO));
-    var nextY = /** @type {number} */(point.meta(anychart.opt.NEXT_VALUE));
+    var prevZero = /** @type {number} */(point.meta('prevZero'));
+    var prevY = /** @type {number} */(point.meta('prevValue'));
+    var nextZero = /** @type {number} */(point.meta('nextZero'));
+    var nextY = /** @type {number} */(point.meta('nextValue'));
     if (!isNaN(prevZero) && !isNaN(prevY)) {
       this.drawSegmentContinuation_(shapes, x, prevY);
       this.zeroesStack.push(x, prevZero);
@@ -155,8 +154,8 @@ anychart.core.drawers.Area.prototype.drawSubsequentPoint = function(point, state
 anychart.core.drawers.Area.prototype.finalizeSegment = function() {
   if (!this.prevPointDrawn) return;
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
-  var path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]);
-  var hatchPath = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]);
+  var path = /** @type {acgraph.vector.Path} */(shapes['fill']);
+  var hatchPath = /** @type {acgraph.vector.Path} */(shapes['hatchFill']);
   if (this.zeroesStack) {
     for (var i = this.zeroesStack.length - 1; i >= 0; i -= 2) {
       /** @type {number} */

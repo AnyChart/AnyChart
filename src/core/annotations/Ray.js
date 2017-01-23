@@ -31,7 +31,7 @@ anychart.core.annotations.Ray = function(chartController) {
    */
   this.strokeResolver_ = /** @type {function(anychart.core.annotations.Base,number):acgraph.vector.Stroke} */(
       anychart.core.annotations.Base.getColorResolver(
-          [anychart.opt.STROKE, anychart.opt.HOVER_STROKE, anychart.opt.SELECT_STROKE],
+          ['stroke', 'hoverStroke', 'selectStroke'],
           anychart.enums.ColorType.STROKE));
 };
 goog.inherits(anychart.core.annotations.Ray, anychart.core.annotations.Base);
@@ -117,7 +117,7 @@ anychart.core.annotations.Ray.prototype.colorize = function(state) {
       .stroke(this.strokeResolver_(this, state));
   this.paths_[1]
       .fill(anychart.color.TRANSPARENT_HANDLER)
-      .stroke(/** @type {acgraph.vector.SolidFill} */(anychart.color.TRANSPARENT_HANDLER), this[anychart.opt.HOVER_GAP]() * 2);
+      .stroke(/** @type {acgraph.vector.SolidFill} */(anychart.color.TRANSPARENT_HANDLER), this['hoverGap']() * 2);
 };
 
 
@@ -125,8 +125,8 @@ anychart.core.annotations.Ray.prototype.colorize = function(state) {
 anychart.core.annotations.Ray.prototype.checkVisible = function() {
   var res = anychart.core.annotations.Ray.base(this, 'checkVisible');
   if (!res) {
-    var x1 = this.coords[anychart.opt.X_ANCHOR];
-    var x2 = this.coords[anychart.opt.SECOND_X_ANCHOR];
+    var x1 = this.coords['xAnchor'];
+    var x2 = this.coords['secondXAnchor'];
     var dx = x2 - x1;
     res = !isNaN(dx) && !((x1 < this.pixelBoundsCache.left && dx <= 0) ||
         (x1 > this.pixelBoundsCache.getRight() && dx >= 0));

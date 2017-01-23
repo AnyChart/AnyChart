@@ -1,6 +1,5 @@
 goog.provide('anychart.data.aggregators.CustomCalculator');
 goog.require('anychart.data.aggregators.Base');
-goog.require('anychart.opt');
 
 
 
@@ -26,19 +25,19 @@ goog.inherits(anychart.data.aggregators.CustomCalculator, anychart.data.aggregat
 
 /** @inheritDoc */
 anychart.data.aggregators.CustomCalculator.prototype.clear = function() {
-  this.calculator_[anychart.opt.RESET]();
+  this.calculator_['reset']();
 };
 
 
 /** @inheritDoc */
 anychart.data.aggregators.CustomCalculator.prototype.process = function(value, weight, row) {
-  this.calculator_[anychart.opt.CONSIDER_ITEM](value, row);
+  this.calculator_['considerItem'](value, row);
 };
 
 
 /** @inheritDoc */
 anychart.data.aggregators.CustomCalculator.prototype.getValueAndClear = function() {
-  var res = this.calculator_[anychart.opt.GET_RESULT]();
+  var res = this.calculator_['getResult']();
   this.clear();
   return res;
 };

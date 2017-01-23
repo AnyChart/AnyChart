@@ -581,7 +581,7 @@ anychart.core.Chart.prototype.showTooltip_ = function(event) {
   var toShowSeriesStatus = [];
   goog.array.forEach(event['seriesStatus'], function(status) {
     if (goog.array.isEmpty(status['points'])) {
-      if (this.tooltip_.getOption(anychart.opt.POSITION_MODE) == anychart.enums.TooltipPositionMode.FLOAT) {
+      if (this.tooltip_.getOption('positionMode') == anychart.enums.TooltipPositionMode.FLOAT) {
         this.unlisten(goog.events.EventType.MOUSEMOVE, this.updateTooltip);
       }
       this.tooltip_.hide(false, event);
@@ -592,14 +592,14 @@ anychart.core.Chart.prototype.showTooltip_ = function(event) {
   }, this);
 
   if (!goog.array.isEmpty(toShowSeriesStatus)) {
-    if (this.tooltip_.getOption(anychart.opt.POSITION_MODE) == anychart.enums.TooltipPositionMode.FLOAT) {
+    if (this.tooltip_.getOption('positionMode') == anychart.enums.TooltipPositionMode.FLOAT) {
       this.listen(goog.events.EventType.MOUSEMOVE, this.updateTooltip);
     }
 
     var interactivity = this.interactivity();
     if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
       var points = [];
-      if (this.tooltip_.getOption(anychart.opt.DISPLAY_MODE) == anychart.enums.TooltipDisplayMode.SINGLE) {
+      if (this.tooltip_.getOption('displayMode') == anychart.enums.TooltipDisplayMode.SINGLE) {
         points = event['seriesStatus'];
       } else {
         var pointIndex = event['seriesStatus'][0]['points'][0];
@@ -622,8 +622,8 @@ anychart.core.Chart.prototype.showTooltip_ = function(event) {
         points = goog.array.filter(points, function(point) {
           var series = point['series'];
           var iterator = series.getIterator();
-          if (goog.isDef(iterator.meta(anychart.opt.MISSING))) {
-            return !iterator.meta(anychart.opt.MISSING);
+          if (goog.isDef(iterator.meta('missing'))) {
+            return !iterator.meta('missing');
           }
           return !anychart.utils.isNaN(iterator.get('value'));
         });
@@ -647,7 +647,7 @@ anychart.core.Chart.prototype.showTooltip_ = function(event) {
         }
       });
 
-      if (this.tooltip_.getOption(anychart.opt.DISPLAY_MODE) == anychart.enums.TooltipDisplayMode.SINGLE) {
+      if (this.tooltip_.getOption('displayMode') == anychart.enums.TooltipDisplayMode.SINGLE) {
         // show nearest hovered point to cursor
         this.tooltip_.showForSeriesPoints([nearestSeriesStatus],
             event['originalEvent']['clientX'],
@@ -1262,7 +1262,7 @@ anychart.core.Chart.prototype.drawInternal = function() {
 
   // used for crosshair
   var background = this.background();
-  var fill = background.getOption(anychart.opt.FILL);
+  var fill = background.getOption('fill');
   if ((!background.enabled() || !fill || fill == 'none')) {
     if (!this.shadowRect_) {
       this.shadowRect_ = this.rootElement.rect();
@@ -1568,17 +1568,17 @@ anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
   if ('defaultLabelSettings' in config)
     this.defaultLabelSettings(config['defaultLabelSettings']);
 
-  if (anychart.opt.TITLE in config)
-    this.title(config[anychart.opt.TITLE]);
+  if ('title' in config)
+    this.title(config['title']);
 
-  if (anychart.opt.BACKGROUND in config)
-    this.background(config[anychart.opt.BACKGROUND]);
+  if ('background' in config)
+    this.background(config['background']);
 
-  if (anychart.opt.PADDING in config)
-    this.padding(config[anychart.opt.PADDING]);
+  if ('padding' in config)
+    this.padding(config['padding']);
 
-  if (anychart.opt.MARGIN in config)
-    this.margin(config[anychart.opt.MARGIN]);
+  if ('margin' in config)
+    this.margin(config['margin']);
 
 
   var labels = config['chartLabels'];
@@ -1601,7 +1601,7 @@ anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
   this.bottom(config['bottom']);
   this.animation(config['animation']);
 
-  if (anychart.opt.TOOLTIP in config)
+  if ('tooltip' in config)
     this.tooltip().setupByVal(config['tooltip'], opt_default);
 
   this.a11y(config['a11y']);

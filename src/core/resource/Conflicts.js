@@ -191,11 +191,11 @@ anychart.core.resource.Conflicts.prototype.finalizeCurrent_ = function(date) {
 anychart.core.resource.Conflicts.prototype.drawConflict_ = function(conflict) {
   var start = conflict.start;
   var end = conflict.end;
-  var stroke = /** @type {acgraph.vector.Stroke} */(this.getOption(anychart.opt.STROKE));
+  var stroke = /** @type {acgraph.vector.Stroke} */(this.getOption('stroke'));
   var xScale = /** @type {anychart.scales.DateTimeWithCalendar} */(this.chart_.xScale());
   var thickness = acgraph.vector.getThickness(stroke);
   var vLineThickness = acgraph.vector.getThickness(
-      /** @type {acgraph.vector.Stroke} */(this.chart_.grid().getOption(anychart.opt.VERTICAL_STROKE)));
+      /** @type {acgraph.vector.Stroke} */(this.chart_.grid().getOption('verticalStroke')));
   var hDiff = vLineThickness / 2 + thickness / 2;
   var left = goog.math.clamp(
       anychart.utils.applyPixelShift(xScale.dateToPix(start) + this.boundsCache_.left, vLineThickness) + hDiff,
@@ -204,16 +204,16 @@ anychart.core.resource.Conflicts.prototype.drawConflict_ = function(conflict) {
       anychart.utils.applyPixelShift(xScale.dateToPix(end) + this.boundsCache_.left, vLineThickness) - hDiff,
       this.boundsCache_.left, this.boundsCache_.getRight());
   var top = anychart.utils.applyPixelShift(conflict.top + thickness / 2, thickness);
-  var bottom = anychart.utils.applyPixelShift(conflict.top + this.getOption(anychart.opt.HEIGHT) - thickness / 2, thickness);
+  var bottom = anychart.utils.applyPixelShift(conflict.top + this.getOption('height') - thickness / 2, thickness);
   var rect = /** @type {acgraph.vector.Rect} */(this.conflictsLayer_.genNextChild());
   rect
       .setX(left)
       .setY(top)
       .setWidth(right - left)
       .setHeight(bottom - top)
-      .fill(/** @type {acgraph.vector.Fill} */(this.getOption(anychart.opt.FILL)))
+      .fill(/** @type {acgraph.vector.Fill} */(this.getOption('fill')))
       .stroke(stroke);
-  var hatchFill = /** @type {acgraph.vector.HatchFill} */(this.getOption(anychart.opt.HATCH_FILL));
+  var hatchFill = /** @type {acgraph.vector.HatchFill} */(this.getOption('hatchFill'));
   if (hatchFill) {
     rect = /** @type {acgraph.vector.Rect} */(this.conflictsLayer_.genNextChild());
     rect
@@ -265,13 +265,13 @@ anychart.core.resource.Conflicts.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var fill = this.getOption(anychart.opt.FILL);
-    var stroke = this.getOption(anychart.opt.STROKE);
+    var fill = this.getOption('fill');
+    var stroke = this.getOption('stroke');
     this.conflictsLayer_.forEachChild(function(child) {
       child.fill(fill);
       child.stroke(stroke);
     });
-    var hatchFill = this.getOption(anychart.opt.HATCH_FILL);
+    var hatchFill = this.getOption('hatchFill');
     this.hatchLayer_.forEachChild(function(child) {
       child.fill(hatchFill);
       child.stroke(null);
@@ -313,8 +313,8 @@ anychart.core.resource.Conflicts.prototype.labels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !(anychart.opt.ENABLED in opt_value))
-      opt_value[anychart.opt.ENABLED] = true;
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.labels_.setup(opt_value);
     return this;
   }
@@ -334,8 +334,8 @@ anychart.core.resource.Conflicts.prototype.labels = function(opt_value) {
 //   }
 //
 //   if (goog.isDef(opt_value)) {
-//     if (goog.isObject(opt_value) && !(anychart.opt.ENABLED in opt_value))
-//       opt_value[anychart.opt.ENABLED] = true;
+//     if (goog.isObject(opt_value) && !('enabled' in opt_value))
+//       opt_value['enabled'] = true;
 //     this.hoverLabels_.setup(opt_value);
 //     return this;
 //   }
@@ -354,8 +354,8 @@ anychart.core.resource.Conflicts.prototype.labels = function(opt_value) {
 //   }
 //
 //   if (goog.isDef(opt_value)) {
-//     if (goog.isObject(opt_value) && !(anychart.opt.ENABLED in opt_value))
-//       opt_value[anychart.opt.ENABLED] = true;
+//     if (goog.isObject(opt_value) && !('enabled' in opt_value))
+//       opt_value['enabled'] = true;
 //     this.selectLabels_.setup(opt_value);
 //     return this;
 //   }
@@ -452,27 +452,27 @@ anychart.core.resource.Conflicts.prototype.drawLabel = function(index, formatPro
 anychart.core.resource.Conflicts.DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.FILL] = anychart.core.settings.createDescriptor(
+  map['fill'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.FILL,
+      'fill',
       anychart.core.settings.fillNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  map[anychart.opt.STROKE] = anychart.core.settings.createDescriptor(
+  map['stroke'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.STROKE,
+      'stroke',
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  map[anychart.opt.HATCH_FILL] = anychart.core.settings.createDescriptor(
+  map['hatchFill'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.HATCH_FILL,
+      'hatchFill',
       anychart.core.settings.hatchFillNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  map[anychart.opt.HEIGHT] = anychart.core.settings.createDescriptor(
+  map['height'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.HEIGHT,
+      'height',
       anychart.core.settings.numberNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REAPPLICATION);

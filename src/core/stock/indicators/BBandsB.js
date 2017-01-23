@@ -2,7 +2,6 @@ goog.provide('anychart.core.stock.indicators.BBandsB');
 goog.require('anychart.core.stock.indicators.Base');
 goog.require('anychart.enums');
 goog.require('anychart.math.bbandsB');
-goog.require('anychart.opt');
 goog.require('anychart.utils');
 
 
@@ -34,7 +33,7 @@ anychart.core.stock.indicators.BBandsB = function(plot, mapping, opt_period, opt
    */
   this.deviation_ = anychart.utils.normalizeToNaturalNumber(opt_deviation, 2, false);
 
-  this.declareSeries(anychart.opt.MAIN, opt_seriesType);
+  this.declareSeries('main', opt_seriesType);
   this.init();
 };
 goog.inherits(anychart.core.stock.indicators.BBandsB, anychart.core.stock.indicators.Base);
@@ -59,7 +58,7 @@ anychart.core.stock.indicators.BBandsB.prototype.createNameForSeries = function(
  */
 anychart.core.stock.indicators.BBandsB.prototype.series = function(opt_type) {
   return /** @type {anychart.core.stock.indicators.BBandsB|anychart.core.series.Stock} */(
-      this.seriesInternal(anychart.opt.MAIN, opt_type));
+      this.seriesInternal('main', opt_type));
 };
 
 

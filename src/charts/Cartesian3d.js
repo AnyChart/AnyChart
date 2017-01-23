@@ -138,7 +138,7 @@ anychart.charts.Cartesian3d.prototype.handleMouseEvent = function(event) {
 anychart.charts.Cartesian3d.areaPostProcessor = function(series, shapes, pointState) {
   var frontFill, topFill, rightFill, bottomFill, backFill, leftFill;
   var resolver = anychart.core.series.Base.getColorResolver(
-      [anychart.opt.FILL, anychart.opt.HOVER_FILL, anychart.opt.SELECT_FILL], anychart.enums.ColorType.FILL);
+      ['fill', 'hoverFill', 'selectFill'], anychart.enums.ColorType.FILL);
   var fill = resolver(series, pointState);
   var opacity = goog.isObject(fill) ? fill['opacity'] : 1;
   var color = goog.isObject(fill) ? fill['color'] : fill;
@@ -173,15 +173,15 @@ anychart.charts.Cartesian3d.areaPostProcessor = function(series, shapes, pointSt
 
   }
 
-  shapes[anychart.opt.BOTTOM].fill({'color': bottomFill, 'opacity': opacity});
-  shapes[anychart.opt.BACK].fill({'color': backFill, 'opacity': opacity});
-  shapes[anychart.opt.LEFT].fill({'color': leftFill, 'opacity': opacity});
-  shapes[anychart.opt.RIGHT].fill({'color': rightFill, 'opacity': opacity});
-  shapes[anychart.opt.TOP].fill({'color': topFill, 'opacity': opacity});
-  shapes[anychart.opt.FRONT].fill(frontFill);
+  shapes['bottom'].fill({'color': bottomFill, 'opacity': opacity});
+  shapes['back'].fill({'color': backFill, 'opacity': opacity});
+  shapes['left'].fill({'color': leftFill, 'opacity': opacity});
+  shapes['right'].fill({'color': rightFill, 'opacity': opacity});
+  shapes['top'].fill({'color': topFill, 'opacity': opacity});
+  shapes['front'].fill(frontFill);
 
   // fix for batik (DVF-2068)
-  shapes[anychart.opt.TOP].stroke({'color': topFill, 'thickness': 0.8});
+  shapes['top'].stroke({'color': topFill, 'thickness': 0.8});
 };
 
 
@@ -194,7 +194,7 @@ anychart.charts.Cartesian3d.areaPostProcessor = function(series, shapes, pointSt
 anychart.charts.Cartesian3d.barColumnPostProcessor = function(series, shapes, pointState) {
   var frontFill, topFill, rightFill, bottomFill, backFill, leftFill;
   var resolver = anychart.core.series.Base.getColorResolver(
-      [anychart.opt.FILL, anychart.opt.HOVER_FILL, anychart.opt.SELECT_FILL], anychart.enums.ColorType.FILL);
+      ['fill', 'hoverFill', 'selectFill'], anychart.enums.ColorType.FILL);
   var fill = resolver(series, pointState);
   var opacity = goog.isObject(fill) ? fill['opacity'] : 1;
   var color = goog.isObject(fill) ? fill['color'] : fill;
@@ -215,7 +215,7 @@ anychart.charts.Cartesian3d.barColumnPostProcessor = function(series, shapes, po
     var softDarkBlendedColor = goog.color.rgbArrayToHex(goog.color.blend(rgbColor, rgbDarken, .1));
 
     frontFill = {
-      'angle': (/** @type {boolean} */(series.getOption(anychart.opt.IS_VERTICAL))) ? 0 : 90,
+      'angle': (/** @type {boolean} */(series.getOption('isVertical'))) ? 0 : 90,
       'opacity': opacity,
       'keys': [
         anychart.color.lighten(darkBlendedColor, .2),
@@ -229,12 +229,12 @@ anychart.charts.Cartesian3d.barColumnPostProcessor = function(series, shapes, po
 
   }
 
-  shapes[anychart.opt.BOTTOM].fill(/** @type {!acgraph.vector.Fill} */({'color': bottomFill, 'opacity': opacity}));
-  shapes[anychart.opt.BACK].fill(/** @type {!acgraph.vector.Fill} */({'color': backFill, 'opacity': opacity}));
-  shapes[anychart.opt.LEFT].fill(/** @type {!acgraph.vector.Fill} */({'color': leftFill, 'opacity': opacity}));
-  shapes[anychart.opt.RIGHT].fill(/** @type {!acgraph.vector.Fill} */({'color': rightFill, 'opacity': opacity}));
-  shapes[anychart.opt.TOP].fill(/** @type {!acgraph.vector.Fill} */({'color': topFill, 'opacity': opacity}));
-  shapes[anychart.opt.FRONT].fill(/** @type {!acgraph.vector.Fill} */(frontFill));
+  shapes['bottom'].fill(/** @type {!acgraph.vector.Fill} */({'color': bottomFill, 'opacity': opacity}));
+  shapes['back'].fill(/** @type {!acgraph.vector.Fill} */({'color': backFill, 'opacity': opacity}));
+  shapes['left'].fill(/** @type {!acgraph.vector.Fill} */({'color': leftFill, 'opacity': opacity}));
+  shapes['right'].fill(/** @type {!acgraph.vector.Fill} */({'color': rightFill, 'opacity': opacity}));
+  shapes['top'].fill(/** @type {!acgraph.vector.Fill} */({'color': topFill, 'opacity': opacity}));
+  shapes['front'].fill(/** @type {!acgraph.vector.Fill} */(frontFill));
 };
 
 
@@ -268,8 +268,8 @@ anychart.charts.Cartesian3d.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: anychart.charts.Cartesian3d.areaPostProcessor,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.ZERO
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'zero'
   };
   res[anychart.enums.Cartesian3dSeriesType.BAR] = {
     drawerType: anychart.enums.SeriesDrawerTypes.COLUMN_3D,
@@ -288,8 +288,8 @@ anychart.charts.Cartesian3d.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: anychart.charts.Cartesian3d.barColumnPostProcessor,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.ZERO
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'zero'
   };
   res[anychart.enums.Cartesian3dSeriesType.COLUMN] = {
     drawerType: anychart.enums.SeriesDrawerTypes.COLUMN_3D,
@@ -308,8 +308,8 @@ anychart.charts.Cartesian3d.prototype.seriesConfig = (function() {
     secondaryShapesConfig: null,
     postProcessor: anychart.charts.Cartesian3d.barColumnPostProcessor,
     capabilities: capabilities,
-    anchoredPositionTop: anychart.opt.VALUE,
-    anchoredPositionBottom: anychart.opt.ZERO
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'zero'
   };
   return res;
 })();
@@ -603,7 +603,7 @@ anychart.charts.Cartesian3d.prototype.setSeriesPointZIndex_ = function(series) {
   var zIndex = anychart.core.ChartWithSeries.ZINDEX_SERIES;
 
   if (value > 0) {
-    if (/** @type {boolean} */(series.getOption(anychart.opt.IS_VERTICAL))) {
+    if (/** @type {boolean} */(series.getOption('isVertical'))) {
       if (!series.planIsStacked()) {
         if (this.zDistribution()) {
           zIndex += inc;
@@ -618,7 +618,7 @@ anychart.charts.Cartesian3d.prototype.setSeriesPointZIndex_ = function(series) {
     }
 
   } else if (value < 0) {
-    if (/** @type {boolean} */(series.getOption(anychart.opt.IS_VERTICAL))) {
+    if (/** @type {boolean} */(series.getOption('isVertical'))) {
       zIndex -= inc;
     } else {
       if (!series.planIsStacked()) {
@@ -777,7 +777,7 @@ anychart.charts.Cartesian3d.prototype.distributeClusters = function(numClusters,
       var barWidthRatio = 1 / numClusters;
       for (var i = 0; i < drawingPlansOfScale.length; i++) {
         wSeries = drawingPlansOfScale[i].series;
-        if (wSeries.isWidthDistributed() && (horizontal ^ /** @type {boolean} */(wSeries.getOption(anychart.opt.IS_VERTICAL)))) {
+        if (wSeries.isWidthDistributed() && (horizontal ^ /** @type {boolean} */(wSeries.getOption('isVertical')))) {
           wSeries.setAutoXPointPosition(0.5);
           wSeries.setAutoPointWidth(barWidthRatio);
         }

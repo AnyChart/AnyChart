@@ -1396,10 +1396,10 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
           if (isNaN(cell.overlapper)) {
             bounds = this.getCellBounds(row, col,
                 /** @type {number} */(cell.rowSpan()), /** @type {number} */(cell.colSpan()), bounds);
-            padding[anychart.opt.TOP](this.getPaddingProp_('topPadding', cell, rowObj, colObj, this));
-            padding[anychart.opt.RIGHT](this.getPaddingProp_('rightPadding', cell, rowObj, colObj, this));
-            padding[anychart.opt.BOTTOM](this.getPaddingProp_('bottomPadding', cell, rowObj, colObj, this));
-            padding[anychart.opt.LEFT](this.getPaddingProp_('leftPadding', cell, rowObj, colObj, this));
+            padding['top'](this.getPaddingProp_('topPadding', cell, rowObj, colObj, this));
+            padding['right'](this.getPaddingProp_('rightPadding', cell, rowObj, colObj, this));
+            padding['bottom'](this.getPaddingProp_('bottomPadding', cell, rowObj, colObj, this));
+            padding['left'](this.getPaddingProp_('leftPadding', cell, rowObj, colObj, this));
             bounds = padding.tightenBounds(bounds);
             content.container(this.contentLayer_);
             if (content instanceof anychart.core.ui.LabelsFactory.Label) {

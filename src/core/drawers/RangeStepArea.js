@@ -2,7 +2,6 @@ goog.provide('anychart.core.drawers.RangeStepArea');
 goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
 goog.require('anychart.enums');
-goog.require('anychart.opt');
 
 
 
@@ -50,37 +49,37 @@ anychart.core.drawers.RangeStepArea.prototype.flags = (
 /** @inheritDoc */
 anychart.core.drawers.RangeStepArea.prototype.requiredShapes = (function() {
   var res = {};
-  res[anychart.opt.FILL] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.HATCH_FILL] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.LOW] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.HIGH] = anychart.enums.ShapeType.PATH;
+  res['fill'] = anychart.enums.ShapeType.PATH;
+  res['hatchFill'] = anychart.enums.ShapeType.PATH;
+  res['low'] = anychart.enums.ShapeType.PATH;
+  res['high'] = anychart.enums.ShapeType.PATH;
   return res;
 })();
 
 
 /** @inheritDoc */
-anychart.core.drawers.RangeStepArea.prototype.yValueNames = ([anychart.opt.HIGH, anychart.opt.LOW]);
+anychart.core.drawers.RangeStepArea.prototype.yValueNames = (['high', 'low']);
 
 
 /** @inheritDoc */
 anychart.core.drawers.RangeStepArea.prototype.startDrawing = function(shapeManager) {
   anychart.core.drawers.RangeStepArea.base(this, 'startDrawing', shapeManager);
-  this.direction_ = /** @type {anychart.enums.StepDirection} */ (this.series.getOption(anychart.opt.STEP_DIRECTION) || anychart.enums.StepDirection.CENTER);
+  this.direction_ = /** @type {anychart.enums.StepDirection} */ (this.series.getOption('stepDirection') || anychart.enums.StepDirection.CENTER);
 };
 
 
 /** @inheritDoc */
 anychart.core.drawers.RangeStepArea.prototype.drawFirstPoint = function(point, state) {
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var high = /** @type {number} */(point.meta(anychart.opt.HIGH));
-  var low = /** @type {number} */(point.meta(anychart.opt.LOW));
+  var x = /** @type {number} */(point.meta('x'));
+  var high = /** @type {number} */(point.meta('high'));
+  var low = /** @type {number} */(point.meta('low'));
 
-  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]), this.isVertical, x, low);
-  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]), this.isVertical, x, high);
-  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]), this.isVertical, x, low);
-  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]), this.isVertical, x, high);
-  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.HIGH]), this.isVertical, x, high);
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes['fill']), this.isVertical, x, low);
+  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes['fill']), this.isVertical, x, high);
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes['hatchFill']), this.isVertical, x, low);
+  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes['hatchFill']), this.isVertical, x, high);
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes['high']), this.isVertical, x, high);
 
   /** @type {number} */
   this.prevX_ = x;
@@ -94,13 +93,13 @@ anychart.core.drawers.RangeStepArea.prototype.drawFirstPoint = function(point, s
 /** @inheritDoc */
 anychart.core.drawers.RangeStepArea.prototype.drawSubsequentPoint = function(point, state) {
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var high = /** @type {number} */(point.meta(anychart.opt.HIGH));
-  var low = /** @type {number} */(point.meta(anychart.opt.LOW));
+  var x = /** @type {number} */(point.meta('x'));
+  var high = /** @type {number} */(point.meta('high'));
+  var low = /** @type {number} */(point.meta('low'));
 
-  var fill = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]);
-  var hatchFill = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]);
-  var highShape = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.HIGH]);
+  var fill = /** @type {acgraph.vector.Path} */(shapes['fill']);
+  var hatchFill = /** @type {acgraph.vector.Path} */(shapes['hatchFill']);
+  var highShape = /** @type {acgraph.vector.Path} */(shapes['high']);
 
   switch (this.direction_) {
     case anychart.enums.StepDirection.FORWARD:
@@ -136,9 +135,9 @@ anychart.core.drawers.RangeStepArea.prototype.finalizeSegment = function() {
   if (!this.prevPointDrawn) return;
   if (this.lowsStack) {
     var shapes = this.shapesManager.getShapesGroup(this.seriesState);
-    var fill = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]);
-    var hatchFill = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]);
-    var low = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.LOW]);
+    var fill = /** @type {acgraph.vector.Path} */(shapes['fill']);
+    var hatchFill = /** @type {acgraph.vector.Path} */(shapes['hatchFill']);
+    var low = /** @type {acgraph.vector.Path} */(shapes['low']);
 
     /** @type {number} */
     var prevX = NaN;

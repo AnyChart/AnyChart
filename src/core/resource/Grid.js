@@ -194,87 +194,87 @@ anychart.core.resource.Grid.prototype.SUPPORTED_SIGNALS =
 anychart.core.resource.Grid.DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.HORIZONTAL_STROKE] = anychart.core.settings.createDescriptor(
+  map['horizontalStroke'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.HORIZONTAL_STROKE,
+      'horizontalStroke',
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  map[anychart.opt.VERTICAL_STROKE] = anychart.core.settings.createDescriptor(
+  map['verticalStroke'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.VERTICAL_STROKE,
+      'verticalStroke',
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  map[anychart.opt.ODD_FILL] = anychart.core.settings.createDescriptor(
+  map['oddFill'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.ODD_FILL,
+      'oddFill',
       anychart.core.settings.fillNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  map[anychart.opt.EVEN_FILL] = anychart.core.settings.createDescriptor(
+  map['evenFill'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.EVEN_FILL,
+      'evenFill',
       anychart.core.settings.fillNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  map[anychart.opt.ODD_HOLIDAY_FILL] = anychart.core.settings.createDescriptor(
+  map['oddHolidayFill'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.ODD_HOLIDAY_FILL,
+      'oddHolidayFill',
       anychart.core.settings.fillNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  map[anychart.opt.EVEN_HOLIDAY_FILL] = anychart.core.settings.createDescriptor(
+  map['evenHolidayFill'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.EVEN_HOLIDAY_FILL,
+      'evenHolidayFill',
       anychart.core.settings.fillNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  map[anychart.opt.ODD_HATCH_FILL] = anychart.core.settings.createDescriptor(
+  map['oddHatchFill'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.ODD_HATCH_FILL,
+      'oddHatchFill',
       anychart.core.settings.hatchFillNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  map[anychart.opt.EVEN_HATCH_FILL] = anychart.core.settings.createDescriptor(
+  map['evenHatchFill'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.EVEN_HATCH_FILL,
+      'evenHatchFill',
       anychart.core.settings.hatchFillNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  map[anychart.opt.ODD_HOLIDAY_HATCH_FILL] = anychart.core.settings.createDescriptor(
+  map['oddHolidayHatchFill'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.ODD_HOLIDAY_HATCH_FILL,
+      'oddHolidayHatchFill',
       anychart.core.settings.hatchFillNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  map[anychart.opt.EVEN_HOLIDAY_HATCH_FILL] = anychart.core.settings.createDescriptor(
+  map['evenHolidayHatchFill'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.EVEN_HOLIDAY_HATCH_FILL,
+      'evenHolidayHatchFill',
       anychart.core.settings.hatchFillNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  map[anychart.opt.DRAW_TOP_LINE] = anychart.core.settings.createDescriptor(
+  map['drawTopLine'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.DRAW_TOP_LINE,
+      'drawTopLine',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.RESOURCE_GRID_TICKS,
       anychart.Signal.NEEDS_REDRAW);
-  map[anychart.opt.DRAW_RIGHT_LINE] = anychart.core.settings.createDescriptor(
+  map['drawRightLine'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.DRAW_RIGHT_LINE,
+      'drawRightLine',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.RESOURCE_GRID_TICKS,
       anychart.Signal.NEEDS_REDRAW);
-  map[anychart.opt.DRAW_BOTTOM_LINE] = anychart.core.settings.createDescriptor(
+  map['drawBottomLine'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.DRAW_BOTTOM_LINE,
+      'drawBottomLine',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.RESOURCE_GRID_TICKS,
       anychart.Signal.NEEDS_REDRAW);
-  map[anychart.opt.DRAW_LEFT_LINE] = anychart.core.settings.createDescriptor(
+  map['drawLeftLine'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.DRAW_LEFT_LINE,
+      'drawLeftLine',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.RESOURCE_GRID_TICKS,
       anychart.Signal.NEEDS_REDRAW);
@@ -479,16 +479,16 @@ anychart.core.resource.Grid.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    this.oddPath_.fill(/** @type {acgraph.vector.Fill} */(this.getOption(anychart.opt.ODD_FILL)));
-    this.evenPath_.fill(/** @type {acgraph.vector.Fill} */(this.getOption(anychart.opt.EVEN_FILL)));
-    this.oddHolidayPath_.fill(/** @type {acgraph.vector.Fill} */(this.getOption(anychart.opt.ODD_HOLIDAY_FILL)));
-    this.evenHolidayPath_.fill(/** @type {acgraph.vector.Fill} */(this.getOption(anychart.opt.EVEN_HOLIDAY_FILL)));
-    this.oddHFPath_.fill(/** @type {acgraph.vector.Fill} */(this.getOption(anychart.opt.ODD_HATCH_FILL)));
-    this.evenHFPath_.fill(/** @type {acgraph.vector.Fill} */(this.getOption(anychart.opt.EVEN_HATCH_FILL)));
-    this.oddHolidayHFPath_.fill(/** @type {acgraph.vector.Fill} */(this.getOption(anychart.opt.ODD_HOLIDAY_HATCH_FILL)));
-    this.evenHolidayHFPath_.fill(/** @type {acgraph.vector.Fill} */(this.getOption(anychart.opt.EVEN_HOLIDAY_HATCH_FILL)));
-    this.hStrokePath_.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption(anychart.opt.HORIZONTAL_STROKE)));
-    this.vStrokePath_.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption(anychart.opt.VERTICAL_STROKE)));
+    this.oddPath_.fill(/** @type {acgraph.vector.Fill} */(this.getOption('oddFill')));
+    this.evenPath_.fill(/** @type {acgraph.vector.Fill} */(this.getOption('evenFill')));
+    this.oddHolidayPath_.fill(/** @type {acgraph.vector.Fill} */(this.getOption('oddHolidayFill')));
+    this.evenHolidayPath_.fill(/** @type {acgraph.vector.Fill} */(this.getOption('evenHolidayFill')));
+    this.oddHFPath_.fill(/** @type {acgraph.vector.Fill} */(this.getOption('oddHatchFill')));
+    this.evenHFPath_.fill(/** @type {acgraph.vector.Fill} */(this.getOption('evenHatchFill')));
+    this.oddHolidayHFPath_.fill(/** @type {acgraph.vector.Fill} */(this.getOption('oddHolidayHatchFill')));
+    this.evenHolidayHFPath_.fill(/** @type {acgraph.vector.Fill} */(this.getOption('evenHolidayHatchFill')));
+    this.hStrokePath_.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('horizontalStroke')));
+    this.vStrokePath_.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('verticalStroke')));
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 
@@ -511,10 +511,10 @@ anychart.core.resource.Grid.prototype.draw = function() {
       var vThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.vStrokePath_.stroke()));
       var from = anychart.utils.applyPixelShift(0, hThickness);
       var to = 0;
-      var drawTop = !!this.getOption(anychart.opt.DRAW_TOP_LINE);
-      var drawRight = !!this.getOption(anychart.opt.DRAW_RIGHT_LINE);
-      var drawBottom = !!this.getOption(anychart.opt.DRAW_BOTTOM_LINE);
-      var drawLeft = !!this.getOption(anychart.opt.DRAW_LEFT_LINE);
+      var drawTop = !!this.getOption('drawTopLine');
+      var drawRight = !!this.getOption('drawRightLine');
+      var drawBottom = !!this.getOption('drawBottomLine');
+      var drawLeft = !!this.getOption('drawLeftLine');
       for (var row = 0; row <= lastRow; row++) {
         var isLastRow = row == lastRow;
         to = anychart.utils.applyPixelShift(from + this.heights_[row] - (isLastRow ? hThickness : 0), hThickness);

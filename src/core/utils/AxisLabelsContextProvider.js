@@ -52,7 +52,7 @@ goog.inherits(anychart.core.utils.AxisLabelsContextProvider, anychart.core.utils
 anychart.core.utils.AxisLabelsContextProvider.prototype.getTokenValue = function(name) {
   switch (name) {
     case anychart.enums.StringToken.AXIS_NAME:
-      return this['axis'].title()[anychart.opt.TEXT]();
+      return this['axis'].title()['text']();
     case anychart.enums.StringToken.AXIS_SCALE_MAX:
       return this['max'];
     case anychart.enums.StringToken.AXIS_SCALE_MIN:

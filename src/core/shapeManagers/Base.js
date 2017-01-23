@@ -1,7 +1,6 @@
 goog.provide('anychart.core.shapeManagers.Base');
 goog.require('acgraph');
 goog.require('anychart.core.shapeManagers');
-goog.require('anychart.opt');
 goog.require('goog.Disposable');
 
 
@@ -24,7 +23,7 @@ anychart.core.shapeManagers.Base = function(series, config, interactive, opt_sha
    * @type {string}
    * @protected
    */
-  this.shapesFieldName = opt_shapesFieldName || anychart.opt.SHAPES;
+  this.shapesFieldName = opt_shapesFieldName || 'shapes';
 
   /**
    * A post processor function to make complex coloring on shapes.
@@ -304,7 +303,7 @@ anychart.core.shapeManagers.Base.prototype.updateColors = function(state, opt_sh
       shape.stroke(/** @type {acgraph.vector.Stroke} */(descriptor.stroke(this.series, state)));
       // we want to avoid adding invisible hatchFill shapes to the layer.
       if (descriptor.isHatchFill) {
-        if (shape.fill() == anychart.opt.NONE && shape.stroke() == anychart.opt.NONE) {
+        if (shape.fill() == 'none' && shape.stroke() == 'none') {
           shape.visible(false);
         } else {
           shape.visible(true);

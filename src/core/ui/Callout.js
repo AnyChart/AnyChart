@@ -620,7 +620,7 @@ anychart.core.ui.Callout.prototype.getPixelBounds = function() {
           titleLength = title.getContentBounds().height;
         }
 
-        var titleOrientation = title.getOption(anychart.opt.ORIENTATION) || title.defaultOrientation();
+        var titleOrientation = title.getOption('orientation') || title.defaultOrientation();
         if (titleOrientation == anychart.enums.Orientation.TOP || titleOrientation == anychart.enums.Orientation.BOTTOM) {
           affectSize = this.isHorizontal();
           affectLength = !this.isHorizontal();
@@ -633,16 +633,16 @@ anychart.core.ui.Callout.prototype.getPixelBounds = function() {
 
       var x, y;
       var padding = this.padding();
-      var topPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.TOP)), parentBounds.height);
-      var rightPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.RIGHT)), parentBounds.width);
-      var bottomPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.BOTTOM)), parentBounds.height);
-      var leftPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.LEFT)), parentBounds.width);
+      var topPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('top')), parentBounds.height);
+      var rightPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('right')), parentBounds.width);
+      var bottomPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('bottom')), parentBounds.height);
+      var leftPad = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('left')), parentBounds.width);
 
       var margin = this.margin();
-      var topMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption(anychart.opt.TOP)), parentBounds.height);
-      var rightMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption(anychart.opt.RIGHT)), parentBounds.width);
-      var bottomMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption(anychart.opt.BOTTOM)), parentBounds.height);
-      var leftMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption(anychart.opt.LEFT)), parentBounds.width);
+      var topMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption('top')), parentBounds.height);
+      var rightMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption('right')), parentBounds.width);
+      var bottomMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption('bottom')), parentBounds.height);
+      var leftMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption('left')), parentBounds.width);
 
       var itemSize;
       if (autoLength && !autoSize) {
@@ -735,7 +735,7 @@ anychart.core.ui.Callout.prototype.getPixelBounds = function() {
       }
 
       if (title.enabled()) {
-        var titleOrientation = title.getOption(anychart.opt.ORIENTATION) || title.defaultOrientation();
+        var titleOrientation = title.getOption('orientation') || title.defaultOrientation();
         switch (titleOrientation) {
           case anychart.enums.Orientation.TOP:
             this.labelSpace.left = x;
@@ -1205,17 +1205,17 @@ anychart.core.ui.Callout.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.Callout.base(this, 'setupByJSON', config, opt_default);
 
 
-  if (anychart.opt.TITLE in config)
-    this.title(config[anychart.opt.TITLE]);
+  if ('title' in config)
+    this.title(config['title']);
 
-  if (anychart.opt.BACKGROUND in config)
-    this.background(config[anychart.opt.BACKGROUND]);
+  if ('background' in config)
+    this.background(config['background']);
 
-  if (anychart.opt.PADDING in config)
-    this.padding(config[anychart.opt.PADDING]);
+  if ('padding' in config)
+    this.padding(config['padding']);
 
-  if (anychart.opt.MARGIN in config)
-    this.margin(config[anychart.opt.MARGIN]);
+  if ('margin' in config)
+    this.margin(config['margin']);
 
   this.labels().setup(config['labels']);
   this.hoverLabels().setup(config['hoverLabels']);

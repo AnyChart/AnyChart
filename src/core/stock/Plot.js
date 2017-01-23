@@ -2276,7 +2276,7 @@ anychart.core.stock.Plot.prototype.setupByJSON = function(config, opt_default) {
   // this.markerPalette(config['markerPalette']);
   this.hatchFillPalette(config['hatchFillPalette']);
 
-  this.background(config[anychart.opt.BACKGROUND]);
+  this.background(config['background']);
 
   this.xAxis(config['xAxis']);
   this.dateTimeHighlighter(config['dateTimeHighlighter']);

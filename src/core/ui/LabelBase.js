@@ -522,7 +522,7 @@ anychart.core.ui.LabelBase.prototype.disablePointerEvents = function(opt_value) 
     if (opt_value != this.disablePointerEvents_) {
       this.disablePointerEvents_ = opt_value;
       anychart.core.ui.LabelBase.base(this, 'disablePointerEvents', opt_value);
-      this.background()[anychart.opt.DISABLE_POINTER_EVENTS](opt_value);
+      this.background()['disablePointerEvents'](opt_value);
     }
     return this;
   } else {
@@ -775,8 +775,8 @@ anychart.core.ui.LabelBase.prototype.calculateLabelBounds_ = function() {
   }
   this.resumeSignalsDispatching(false);
 
-  this.textX = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.LEFT)), this.backgroundWidth);
-  this.textY = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption(anychart.opt.TOP)), this.backgroundHeight);
+  this.textX = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('left')), this.backgroundWidth);
+  this.textY = anychart.utils.normalizeSize(/** @type {number|string} */(padding.getOption('top')), this.backgroundHeight);
 };
 
 
@@ -1050,11 +1050,11 @@ anychart.core.ui.LabelBase.prototype.setupSpecial = function(var_args) {
 anychart.core.ui.LabelBase.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.LabelBase.base(this, 'setupByJSON', config, opt_default);
 
-  if (anychart.opt.BACKGROUND in config)
-    this.background(config[anychart.opt.BACKGROUND]);
+  if ('background' in config)
+    this.background(config['background']);
 
-  if (anychart.opt.PADDING in config)
-    this.padding(config[anychart.opt.PADDING]);
+  if ('padding' in config)
+    this.padding(config['padding']);
 
   this.width(config['width']);
   this.height(config['height']);

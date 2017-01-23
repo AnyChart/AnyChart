@@ -2,7 +2,6 @@ goog.provide('anychart.core.drawers.OHLC');
 goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
 goog.require('anychart.enums');
-goog.require('anychart.opt');
 
 
 
@@ -50,29 +49,29 @@ anychart.core.drawers.OHLC.prototype.flags = (
 /** @inheritDoc */
 anychart.core.drawers.OHLC.prototype.requiredShapes = (function() {
   var res = {};
-  res[anychart.opt.RISING] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.FALLING] = anychart.enums.ShapeType.PATH;
+  res['rising'] = anychart.enums.ShapeType.PATH;
+  res['falling'] = anychart.enums.ShapeType.PATH;
   return res;
 })();
 
 
 /** @inheritDoc */
-anychart.core.drawers.OHLC.prototype.yValueNames = ([anychart.opt.OPEN, anychart.opt.HIGH, anychart.opt.LOW, anychart.opt.CLOSE]);
+anychart.core.drawers.OHLC.prototype.yValueNames = (['open', 'high', 'low', 'close']);
 
 
 /** @inheritDoc */
 anychart.core.drawers.OHLC.prototype.drawSubsequentPoint = function(point, state) {
   var rising = Number(point.get('open')) < Number(point.get('close'));
-  var name = rising ? anychart.opt.RISING : anychart.opt.FALLING;
+  var name = rising ? 'rising' : 'falling';
   var shapeNames = {};
   shapeNames[name] = true;
   var shapes = this.shapesManager.getShapesGroup(state, shapeNames);
 
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var open = /** @type {number} */(point.meta(anychart.opt.OPEN));
-  var high = /** @type {number} */(point.meta(anychart.opt.HIGH));
-  var low = /** @type {number} */(point.meta(anychart.opt.LOW));
-  var close = /** @type {number} */(point.meta(anychart.opt.CLOSE));
+  var x = /** @type {number} */(point.meta('x'));
+  var open = /** @type {number} */(point.meta('open'));
+  var high = /** @type {number} */(point.meta('high'));
+  var low = /** @type {number} */(point.meta('low'));
+  var close = /** @type {number} */(point.meta('close'));
 
   var widthHalf = this.pointWidth / 2;
 

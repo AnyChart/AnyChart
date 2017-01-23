@@ -38,10 +38,10 @@ anychart.core.annotations.FibonacciArc.prototype.type = anychart.enums.Annotatio
 /** @inheritDoc */
 anychart.core.annotations.FibonacciArc.prototype.drawLevel = function(levelIndex, levelValue, path, hoverPath,
                                                                       mainFactory, stateFactory, drawLabels, strokeThickness) {
-  var sx = this.coords[anychart.opt.X_ANCHOR];
-  var sy = this.coords[anychart.opt.VALUE_ANCHOR];
-  var ex = this.coords[anychart.opt.SECOND_X_ANCHOR];
-  var ey = this.coords[anychart.opt.SECOND_VALUE_ANCHOR];
+  var sx = this.coords['xAnchor'];
+  var sy = this.coords['valueAnchor'];
+  var ex = this.coords['secondXAnchor'];
+  var ey = this.coords['secondValueAnchor'];
   var lx = ex + levelValue * (sx - ex);
   var ly = ey + levelValue * (sy - ey);
   var r = Math.sqrt((lx - ex) * (lx - ex) + (ly - ey) * (ly - ey));
@@ -71,10 +71,10 @@ anychart.core.annotations.FibonacciArc.prototype.drawLevel = function(levelIndex
 anychart.core.annotations.FibonacciArc.prototype.checkVisible = function() {
   var res = anychart.core.annotations.FibonacciArc.base(this, 'checkVisible');
   if (!res) {
-    var sx = this.coords[anychart.opt.X_ANCHOR];
-    var sy = this.coords[anychart.opt.VALUE_ANCHOR];
-    var ex = this.coords[anychart.opt.SECOND_X_ANCHOR];
-    var ey = this.coords[anychart.opt.SECOND_VALUE_ANCHOR];
+    var sx = this.coords['xAnchor'];
+    var sy = this.coords['valueAnchor'];
+    var ex = this.coords['secondXAnchor'];
+    var ey = this.coords['secondValueAnchor'];
     var maxLevel = Math.max.apply(Math, this.levelsInternal);
     var lx = ex + maxLevel * (sx - ex);
     var ly = ey + maxLevel * (sy - ey);

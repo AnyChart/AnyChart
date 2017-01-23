@@ -1257,7 +1257,7 @@ anychart.charts.Resource.prototype.calculate = function() {
     this.maxOccupation_ = maxOccupation;
     this.heights_ = [];
     this.fullPixHeight_ = 0;
-    var statusHeight = this.conflicts_.getOption(anychart.opt.HEIGHT);
+    var statusHeight = this.conflicts_.getOption('height');
     for (i = 0; i < this.resources_.length; i++) {
       resource = this.resources_[i];
       var occupation = this.yScalePerChart_ ? maxOccupation : resource.getMaxOccupation();
@@ -1513,7 +1513,7 @@ anychart.charts.Resource.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.RESOURCE_RESOURCES | anychart.ConsistencyState.RESOURCE_CONFLICTS)) {
-    var hT = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.grid_.getOption(anychart.opt.HORIZONTAL_STROKE)));
+    var hT = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(this.grid_.getOption('horizontalStroke')));
     var b = bounds.clone();
     var l = this.xScale_.pixToDate(0);
     var r = this.xScale_.pixToDate(bounds.width);
@@ -1530,8 +1530,8 @@ anychart.charts.Resource.prototype.drawContent = function(bounds) {
       var h = this.heights_[i];
       from = to;
       to = anychart.utils.applyPixelShift(to + h, hT);
-      var tp = anychart.utils.normalizeSize(/** @type {number|string} */(this.cellPadding_.getOption(anychart.opt.TOP)), h);
-      var bp = anychart.utils.normalizeSize(/** @type {number|string} */(this.cellPadding_.getOption(anychart.opt.BOTTOM)), h);
+      var tp = anychart.utils.normalizeSize(/** @type {number|string} */(this.cellPadding_.getOption('top')), h);
+      var bp = anychart.utils.normalizeSize(/** @type {number|string} */(this.cellPadding_.getOption('bottom')), h);
       b.top = from + hT / 2 + tp;
       b.height = to - hT / 2 - bp - b.top;
       index = resource.draw(index, l, r, this.resourcesLayer_, b);

@@ -295,16 +295,16 @@ anychart.core.axes.Map.prototype.parentInvalidated_ = function(e) {
 anychart.core.axes.Map.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.STROKE] = anychart.core.settings.createDescriptor(
+  map['stroke'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.STROKE,
+      'stroke',
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.OVERLAP_MODE] = anychart.core.settings.createDescriptor(
+  map['overlapMode'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.OVERLAP_MODE,
+      'overlapMode',
       anychart.enums.normalizeLabelsOverlapMode,
       anychart.ConsistencyState.APPEARANCE |
       anychart.ConsistencyState.AXIS_TITLE |
@@ -314,9 +314,9 @@ anychart.core.axes.Map.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
       anychart.ConsistencyState.AXIS_OVERLAP,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map[anychart.opt.DRAW_FIRST_LABEL] = anychart.core.settings.createDescriptor(
+  map['drawFirstLabel'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.DRAW_FIRST_LABEL,
+      'drawFirstLabel',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.APPEARANCE |
       anychart.ConsistencyState.AXIS_TITLE |
@@ -326,9 +326,9 @@ anychart.core.axes.Map.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
       anychart.ConsistencyState.AXIS_OVERLAP,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map[anychart.opt.DRAW_LAST_LABEL] = anychart.core.settings.createDescriptor(
+  map['drawLastLabel'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.DRAW_LAST_LABEL,
+      'drawLastLabel',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.APPEARANCE |
       anychart.ConsistencyState.AXIS_TITLE |
@@ -346,8 +346,8 @@ anychart.core.settings.populate(anychart.core.axes.Map, anychart.core.axes.Map.p
 /** @inheritDoc */
 anychart.core.axes.Map.prototype.enabled = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.ownSettings[anychart.opt.ENABLED] != opt_value) {
-      var enabled = this.ownSettings[anychart.opt.ENABLED] = opt_value;
+    if (this.ownSettings['enabled'] != opt_value) {
+      var enabled = this.ownSettings['enabled'] = opt_value;
       this.invalidate(anychart.ConsistencyState.ENABLED, this.getEnableChangeSignals());
       if (enabled) {
         this.doubleSuspension = false;
@@ -362,7 +362,7 @@ anychart.core.axes.Map.prototype.enabled = function(opt_value) {
     }
     return this;
   } else {
-    return /** @type {boolean} */(this.getOption(anychart.opt.ENABLED));
+    return /** @type {boolean} */(this.getOption('enabled'));
   }
 };
 
@@ -662,7 +662,7 @@ anychart.core.axes.Map.prototype.updateOnZoomOrMove = function(tx) {
  */
 anychart.core.axes.Map.prototype.getOverlappedLabels_ = function() {
   if (!this.overlappedLabels_ || this.hasInvalidationState(anychart.ConsistencyState.AXIS_OVERLAP)) {
-    var overlapMode = this.getOption(anychart.opt.OVERLAP_MODE);
+    var overlapMode = this.getOption('overlapMode');
     if (overlapMode == anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP) {
       return false;
     } else {
@@ -713,8 +713,8 @@ anychart.core.axes.Map.prototype.getOverlappedLabels_ = function() {
           scaleMinorTicks = this.scale().yMinorTicks();
         }
 
-        var drawFirstLabel = this.getOption(anychart.opt.DRAW_FIRST_LABEL);
-        var drawLastLabel = this.getOption(anychart.opt.DRAW_LAST_LABEL);
+        var drawFirstLabel = this.getOption('drawFirstLabel');
+        var drawLastLabel = this.getOption('drawLastLabel');
 
         var scaleMinorTicksArr = scaleMinorTicks.get();
         i = 0;
@@ -898,7 +898,7 @@ anychart.core.axes.Map.prototype.getLabelRotation_ = function(tickAngle, isMajor
   }
 
   var ticks = isMajor ? this.ticks() : this.minorTicks();
-  var tickPosition = ticks.getOption(anychart.opt.POSITION);
+  var tickPosition = ticks.getOption('position');
 
   if (tickPosition == anychart.enums.SidePosition.INSIDE || tickPosition == anychart.enums.SidePosition.CENTER) {
     angle += 180;
@@ -929,7 +929,7 @@ anychart.core.axes.Map.prototype.getLabelBounds_ = function(index, isMajor, tick
 
   var value = parseFloat(ticksArray[index]);
   var coords = ticks.calcTick(value);
-  var tickPosition = ticks.getOption(anychart.opt.POSITION);
+  var tickPosition = ticks.getOption('position');
 
   if (ticks.enabled()) {
     if (tickPosition == anychart.enums.SidePosition.OUTSIDE) {
@@ -1031,7 +1031,7 @@ anychart.core.axes.Map.prototype.getAffectingBounds = function(opt_bounds) {
           resultBounds.boundingRect(labelBounds);
         }
       }
-    } else if (axisTicks.enabled() && axisTicks.getOption(anychart.opt.POSITION) == anychart.enums.SidePosition.OUTSIDE) {
+    } else if (axisTicks.enabled() && axisTicks.getOption('position') == anychart.enums.SidePosition.OUTSIDE) {
       for (i = 0, len = ticksArr.length; i < len; i++) {
         tickBounds = axisTicks.getTickBounds(parseFloat(ticksArr[i]));
         if (!resultBounds) {
@@ -1052,7 +1052,7 @@ anychart.core.axes.Map.prototype.getAffectingBounds = function(opt_bounds) {
           resultBounds.boundingRect(labelBounds);
         }
       }
-    } else if (axisMinorTicks.enabled() && axisMinorTicks.getOption(anychart.opt.POSITION) == anychart.enums.SidePosition.OUTSIDE) {
+    } else if (axisMinorTicks.enabled() && axisMinorTicks.getOption('position') == anychart.enums.SidePosition.OUTSIDE) {
       for (i = 0, len = minorTicksArr.length; i < len; i++) {
         tickBounds = axisMinorTicks.getTickBounds(minorTicksArr[i]);
         if (!resultBounds) {
@@ -1127,7 +1127,7 @@ anychart.core.axes.Map.prototype.getRemainingBounds = function() {
 
   if (parentBounds) {
     var remainingBounds;
-    if (this.scale() && this.getOption(anychart.opt.ENABLED)) {
+    if (this.scale() && this.getOption('enabled')) {
       remainingBounds = this.getAffectingBounds(parentBounds);
     } else {
       remainingBounds = parentBounds.clone();
@@ -1181,7 +1181,7 @@ anychart.core.axes.Map.prototype.drawLabel_ = function(value, isMajor, index) {
   var parentLabels = isMajor ? this.parent().labels() : this.parent().minorLabels();
 
   var coords = ticks.calcTick(value);
-  var tickPosition = ticks.getOption(anychart.opt.POSITION);
+  var tickPosition = ticks.getOption('position');
 
   var x, y;
   if (ticks.enabled()) {
@@ -1222,7 +1222,7 @@ anychart.core.axes.Map.prototype.drawTopLine = function() {
   var xy, x, y;
   var precision = scale.precision()[0];
 
-  // var stroke = this.getOption(anychart.opt.STROKE);
+  // var stroke = this.getOption('stroke');
   // var lineThickness = anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
   // var pixelShift = lineThickness % 2 == 0 ? 0 : .5;
 
@@ -1272,7 +1272,7 @@ anychart.core.axes.Map.prototype.drawRightLine = function() {
   var xy, x, y;
   var precision = scale.precision()[1];
 
-  // var stroke = this.getOption(anychart.opt.STROKE);
+  // var stroke = this.getOption('stroke');
   // var lineThickness = anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
   // var pixelShift = lineThickness % 2 == 0 ? 0 : .5;
 
@@ -1322,7 +1322,7 @@ anychart.core.axes.Map.prototype.drawBottomLine = function() {
   var xy, x, y;
   var precision = scale.precision()[0];
 
-  // var stroke = this.getOption(anychart.opt.STROKE);
+  // var stroke = this.getOption('stroke');
   // var lineThickness = anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
   // var pixelShift = lineThickness % 2 == 0 ? 0 : .5;
 
@@ -1373,7 +1373,7 @@ anychart.core.axes.Map.prototype.drawLeftLine = function() {
   var xy, x, y;
   var precision = scale.precision()[1];
 
-  // var stroke = this.getOption(anychart.opt.STROKE);
+  // var stroke = this.getOption('stroke');
   // var lineThickness = anychart.utils.isNone(stroke) ? 0 : stroke['thickness'] ? parseFloat(stroke['thickness']) : 1;
   // var pixelShift = lineThickness % 2 == 0 ? 0 : .5;
 
@@ -1440,7 +1440,7 @@ anychart.core.axes.Map.prototype.drawLine = function() {
   }
 
   lineDrawer.call(this);
-  this.line.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption(anychart.opt.STROKE)));
+  this.line.stroke(/** @type {acgraph.vector.Stroke} */(this.getOption('stroke')));
 };
 
 
@@ -1455,7 +1455,7 @@ anychart.core.axes.Map.prototype.checkDrawingNeeded = function() {
   if (this.isConsistent())
     return false;
 
-  if (!this.getOption(anychart.opt.ENABLED)) {
+  if (!this.getOption('enabled')) {
     if (this.hasInvalidationState(anychart.ConsistencyState.ENABLED)) {
       this.remove();
       this.markConsistent(anychart.ConsistencyState.ENABLED);
@@ -1540,7 +1540,7 @@ anychart.core.axes.Map.prototype.draw = function() {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.AXIS_TITLE)) {
     var title = this.title();
-    if (title.getOption(anychart.opt.ENABLED))
+    if (title.getOption('enabled'))
       title.parentBounds(this.getAffectingBounds());
     title.defaultOrientation(orientation);
     title.draw();
@@ -1634,8 +1634,8 @@ anychart.core.axes.Map.prototype.draw = function() {
         // var majorPixelShift = tickThickness % 2 == 0 ? 0 : -.5;
         drawLabel = goog.isArray(needDrawLabels) ? needDrawLabels[i] : needDrawLabels;
         if (goog.isBoolean(needDrawLabels)) {
-          if (!i) drawLabel = drawLabel && this.getOption(anychart.opt.DRAW_FIRST_LABEL);
-          if (i == ticksArrLen - 1) drawLabel = drawLabel && this.getOption(anychart.opt.DRAW_LAST_LABEL);
+          if (!i) drawLabel = drawLabel && this.getOption('drawFirstLabel');
+          if (i == ticksArrLen - 1) drawLabel = drawLabel && this.getOption('drawLastLabel');
         }
         drawTick = (goog.isArray(needDrawLabels) && needDrawLabels[i]) || goog.isBoolean(needDrawLabels);
 
@@ -1696,8 +1696,8 @@ anychart.core.axes.Map.prototype.setThemeSettings = function(config) {
     if (goog.isDef(val))
       this.themeSettings[name] = val;
   }
-  if (anychart.opt.ENABLED in config) this.themeSettings[anychart.opt.ENABLED] = config[anychart.opt.ENABLED];
-  if (anychart.opt.Z_INDEX in config) this.themeSettings[anychart.opt.Z_INDEX] = config[anychart.opt.Z_INDEX];
+  if ('enabled' in config) this.themeSettings['enabled'] = config['enabled'];
+  if ('zIndex' in config) this.themeSettings['zIndex'] = config['zIndex'];
 };
 
 
@@ -1705,7 +1705,7 @@ anychart.core.axes.Map.prototype.setThemeSettings = function(config) {
 anychart.core.axes.Map.prototype.specialSetupByVal = function(value, opt_default) {
   if (goog.isBoolean(value) || goog.isNull(value)) {
     if (opt_default)
-      this.themeSettings[anychart.opt.ENABLED] = !!value;
+      this.themeSettings['enabled'] = !!value;
     else
       this.enabled(!!value);
     return true;
@@ -1738,20 +1738,20 @@ anychart.core.axes.Map.prototype.serialize = function() {
   var json = {};
 
   var zIndex;
-  if (this.hasOwnOption(anychart.opt.Z_INDEX)) {
-    zIndex = this.getOwnOption(anychart.opt.Z_INDEX);
+  if (this.hasOwnOption('zIndex')) {
+    zIndex = this.getOwnOption('zIndex');
   }
   if (!goog.isDef(zIndex)) {
-    zIndex = this.getThemeOption(anychart.opt.Z_INDEX);
+    zIndex = this.getThemeOption('zIndex');
   }
   if (goog.isDef(zIndex)) json['zIndex'] = zIndex;
 
   var enabled;
-  if (this.hasOwnOption(anychart.opt.ENABLED)) {
-    enabled = this.getOwnOption(anychart.opt.ENABLED);
+  if (this.hasOwnOption('enabled')) {
+    enabled = this.getOwnOption('enabled');
   }
   if (!goog.isDef(enabled)) {
-    enabled = this.getThemeOption(anychart.opt.ENABLED);
+    enabled = this.getThemeOption('enabled');
   }
   json['enabled'] = goog.isDef(enabled) ? enabled : null;
 

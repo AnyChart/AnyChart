@@ -2,7 +2,6 @@ goog.provide('anychart.core.drawers.Area3d');
 goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
 goog.require('anychart.enums');
-goog.require('anychart.opt');
 
 
 
@@ -50,15 +49,15 @@ anychart.core.drawers.Area3d.prototype.flags = (
 /** @inheritDoc */
 anychart.core.drawers.Area3d.prototype.requiredShapes = (function() {
   var res = {};
-  res[anychart.opt.TOP] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.BOTTOM] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.LEFT] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.RIGHT] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.BACK] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.FRONT] = anychart.enums.ShapeType.PATH;
-  // res[anychart.opt.RIGHT_HATCH] = anychart.enums.ShapeType.PATH;
-  // res[anychart.opt.TOP_HATCH] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.FRONT_HATCH] = anychart.enums.ShapeType.PATH;
+  res['top'] = anychart.enums.ShapeType.PATH;
+  res['bottom'] = anychart.enums.ShapeType.PATH;
+  res['left'] = anychart.enums.ShapeType.PATH;
+  res['right'] = anychart.enums.ShapeType.PATH;
+  res['back'] = anychart.enums.ShapeType.PATH;
+  res['front'] = anychart.enums.ShapeType.PATH;
+  // res['rightHatch'] = anychart.enums.ShapeType.PATH;
+  // res['topHatch'] = anychart.enums.ShapeType.PATH;
+  res['frontHatch'] = anychart.enums.ShapeType.PATH;
   return res;
 })();
 
@@ -108,19 +107,19 @@ anychart.core.drawers.Area3d.prototype.startDrawing = function(shapeManager) {
   this.y3dShift_ = provider.getY3DShift(stacked);
 
   if (provider.xInverted()) {
-    this.shapesManager.replaceZIndex(anychart.opt.LEFT, anychart.core.shapeManagers.RIGHT_SHAPES_ZINDEX);
-    this.shapesManager.replaceZIndex(anychart.opt.RIGHT, anychart.core.shapeManagers.LEFT_SHAPES_ZINDEX);
+    this.shapesManager.replaceZIndex('left', anychart.core.shapeManagers.RIGHT_SHAPES_ZINDEX);
+    this.shapesManager.replaceZIndex('right', anychart.core.shapeManagers.LEFT_SHAPES_ZINDEX);
   } else {
-    this.shapesManager.replaceZIndex(anychart.opt.LEFT, anychart.core.shapeManagers.LEFT_SHAPES_ZINDEX);
-    this.shapesManager.replaceZIndex(anychart.opt.RIGHT, anychart.core.shapeManagers.RIGHT_SHAPES_ZINDEX);
+    this.shapesManager.replaceZIndex('left', anychart.core.shapeManagers.LEFT_SHAPES_ZINDEX);
+    this.shapesManager.replaceZIndex('right', anychart.core.shapeManagers.RIGHT_SHAPES_ZINDEX);
   }
 
   if (provider.yInverted()) {
-    this.shapesManager.replaceZIndex(anychart.opt.TOP, anychart.core.shapeManagers.BOTTOM_SHAPES_ZINDEX);
-    this.shapesManager.replaceZIndex(anychart.opt.BOTTOM, anychart.core.shapeManagers.TOP_SHAPES_ZINDEX);
+    this.shapesManager.replaceZIndex('top', anychart.core.shapeManagers.BOTTOM_SHAPES_ZINDEX);
+    this.shapesManager.replaceZIndex('bottom', anychart.core.shapeManagers.TOP_SHAPES_ZINDEX);
   } else {
-    this.shapesManager.replaceZIndex(anychart.opt.TOP, anychart.core.shapeManagers.TOP_SHAPES_ZINDEX);
-    this.shapesManager.replaceZIndex(anychart.opt.BOTTOM, anychart.core.shapeManagers.BOTTOM_SHAPES_ZINDEX);
+    this.shapesManager.replaceZIndex('top', anychart.core.shapeManagers.TOP_SHAPES_ZINDEX);
+    this.shapesManager.replaceZIndex('bottom', anychart.core.shapeManagers.BOTTOM_SHAPES_ZINDEX);
   }
 };
 
@@ -128,15 +127,15 @@ anychart.core.drawers.Area3d.prototype.startDrawing = function(shapeManager) {
 /** @inheritDoc */
 anychart.core.drawers.Area3d.prototype.drawFirstPoint = function(point, state) {
   var shapes = this.shapesManager.getShapesGroup(this.seriesState, null, /** @type {number} */(this.series.zIndex()));
-  var x = /** @type {number} */(point.meta(anychart.opt.X)) + this.x3dSeriesShift_;
-  var zero = /** @type {number} */(point.meta(anychart.opt.ZERO)) - this.y3dSeriesShift_;
-  var zeroMissing = /** @type {boolean} */(point.meta(anychart.opt.ZERO_MISSING));
-  var y = /** @type {number} */(point.meta(anychart.opt.VALUE)) - this.y3dSeriesShift_;
+  var x = /** @type {number} */(point.meta('x')) + this.x3dSeriesShift_;
+  var zero = /** @type {number} */(point.meta('zero')) - this.y3dSeriesShift_;
+  var zeroMissing = /** @type {boolean} */(point.meta('zeroMissing'));
+  var y = /** @type {number} */(point.meta('value')) - this.y3dSeriesShift_;
 
-  shapes[anychart.opt.FRONT]
+  shapes['front']
       .moveTo(x, zero)
       .lineTo(x, y);
-  shapes[anychart.opt.FRONT_HATCH]
+  shapes['frontHatch']
       .moveTo(x, zero)
       .lineTo(x, y);
 
@@ -146,15 +145,15 @@ anychart.core.drawers.Area3d.prototype.drawFirstPoint = function(point, state) {
      */
     this.zeroesStack = [x, zero, zeroMissing];
   } else {
-    shapes[anychart.opt.BACK]
+    shapes['back']
         .moveTo(x + this.x3dShift_, zero - this.y3dShift_)
         .lineTo(x + this.x3dShift_, y - this.y3dShift_);
 
-    shapes[anychart.opt.BOTTOM]
+    shapes['bottom']
         .moveTo(x, zero)
         .lineTo(x + this.x3dShift_, zero - this.y3dShift_);
 
-    shapes[anychart.opt.LEFT]
+    shapes['left']
         .moveTo(x, zero)
         .lineTo(x, y)
         .lineTo(x + this.x3dShift_, y - this.y3dShift_)
@@ -184,28 +183,28 @@ anychart.core.drawers.Area3d.prototype.drawFirstPoint = function(point, state) {
 /** @inheritDoc */
 anychart.core.drawers.Area3d.prototype.drawSubsequentPoint = function(point, state) {
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
-  var x = /** @type {number} */(point.meta(anychart.opt.X)) + this.x3dSeriesShift_;
-  var zero = /** @type {number} */(point.meta(anychart.opt.ZERO)) - this.y3dSeriesShift_;
-  var zeroMissing = /** @type {boolean} */(point.meta(anychart.opt.ZERO_MISSING));
-  var y = /** @type {number} */(point.meta(anychart.opt.VALUE)) - this.y3dSeriesShift_;
+  var x = /** @type {number} */(point.meta('x')) + this.x3dSeriesShift_;
+  var zero = /** @type {number} */(point.meta('zero')) - this.y3dSeriesShift_;
+  var zeroMissing = /** @type {boolean} */(point.meta('zeroMissing'));
+  var y = /** @type {number} */(point.meta('value')) - this.y3dSeriesShift_;
 
   if (this.series.planIsStacked()) {
     this.zeroesStack.push(x, zero, zeroMissing);
   } else {
-    shapes[anychart.opt.BOTTOM].lineTo(x + this.x3dShift_, zero - this.y3dShift_);
-    shapes[anychart.opt.BACK].lineTo(x + this.x3dShift_, y - this.y3dShift_);
+    shapes['bottom'].lineTo(x + this.x3dShift_, zero - this.y3dShift_);
+    shapes['back'].lineTo(x + this.x3dShift_, y - this.y3dShift_);
   }
 
   if (this.isNeedDrawTopSide_) {
-    var currentPoint = shapes[anychart.opt.FRONT].getCurrentPoint();
+    var currentPoint = shapes['front'].getCurrentPoint();
     if (this.evenTopSide_) {
-      shapes[anychart.opt.TOP]
+      shapes['top']
           .moveTo(currentPoint.x, currentPoint.y)
           .lineTo(currentPoint.x + this.x3dShift_, currentPoint.y - this.y3dShift_)
           .lineTo(x + this.x3dShift_, y - this.y3dShift_)
           .lineTo(x, y)
           .close();
-      // shapes[anychart.opt.TOP_HATCH]
+      // shapes['topHatch']
       //     .moveTo(currentPoint.x, currentPoint.y)
       //     .lineTo(currentPoint.x + this.x3dShift_, currentPoint.y - this.y3dShift_)
       //     .lineTo(x + this.x3dShift_, y - this.y3dShift_)
@@ -213,13 +212,13 @@ anychart.core.drawers.Area3d.prototype.drawSubsequentPoint = function(point, sta
       //     .close();
     } else {
       // reverse drawing
-      shapes[anychart.opt.TOP]
+      shapes['top']
           .moveTo(currentPoint.x, currentPoint.y)
           .lineTo(x, y)
           .lineTo(x + this.x3dShift_, y - this.y3dShift_)
           .lineTo(currentPoint.x + this.x3dShift_, currentPoint.y - this.y3dShift_)
           .close();
-      // shapes[anychart.opt.TOP_HATCH]
+      // shapes['topHatch']
       //     .moveTo(currentPoint.x, currentPoint.y)
       //     .lineTo(x, y)
       //     .lineTo(x + this.x3dShift_, y - this.y3dShift_)
@@ -230,8 +229,8 @@ anychart.core.drawers.Area3d.prototype.drawSubsequentPoint = function(point, sta
     this.evenTopSide_ = !this.evenTopSide_;
   }
 
-  shapes[anychart.opt.FRONT].lineTo(x, y);
-  shapes[anychart.opt.FRONT_HATCH].lineTo(x, y);
+  shapes['front'].lineTo(x, y);
+  shapes['frontHatch'].lineTo(x, y);
 
   this.lastDrawnX = x;
   this.lastDrawnY = y;
@@ -243,8 +242,8 @@ anychart.core.drawers.Area3d.prototype.drawSubsequentPoint = function(point, sta
 anychart.core.drawers.Area3d.prototype.finalizeSegment = function() {
   if (!this.prevPointDrawn) return;
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
-  var front = shapes[anychart.opt.FRONT];
-  var frontHatch = shapes[anychart.opt.FRONT_HATCH];
+  var front = shapes['front'];
+  var frontHatch = shapes['frontHatch'];
   if (this.zeroesStack) {
     /** @type {number} */
     var prevX = NaN;
@@ -283,23 +282,23 @@ anychart.core.drawers.Area3d.prototype.finalizeSegment = function() {
         .lineTo(this.lastDrawnX, this.zeroY)
         .close();
 
-    shapes[anychart.opt.BACK]
+    shapes['back']
         .lineTo(this.lastDrawnX + this.x3dShift_, this.zeroY - this.y3dShift_)
         .close();
 
-    shapes[anychart.opt.BOTTOM]
+    shapes['bottom']
         .lineTo(this.lastDrawnX, this.zeroY)
         .close();
   }
 
   if (!isNaN(this.lastDrawnX)) {
-    shapes[anychart.opt.RIGHT]
+    shapes['right']
         .moveTo(this.lastDrawnX, this.lastDrawnZero)
         .lineTo(this.lastDrawnX, this.lastDrawnY)
         .lineTo(this.lastDrawnX + this.x3dShift_, this.lastDrawnY - this.y3dShift_)
         .lineTo(this.lastDrawnX + this.x3dShift_, this.lastDrawnZero - this.y3dShift_)
         .close();
-    // shapes[anychart.opt.RIGHT_HATCH]
+    // shapes['rightHatch']
     //     .moveTo(this.lastDrawnX, this.lastDrawnZero)
     //     .lineTo(this.lastDrawnX, this.lastDrawnY)
     //     .lineTo(this.lastDrawnX + this.x3dShift_, this.lastDrawnY - this.y3dShift_)

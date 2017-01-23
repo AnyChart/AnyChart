@@ -336,7 +336,7 @@ anychart.scales.OrdinalTicks.prototype.serialize = function() {
   if (this.explicitIndexes_)
     json['explicit'] = this.explicitIndexes_;
   else if (!isNaN(this.maxCount_))
-    json[anychart.opt.MAX_COUNT] = this.maxCount_;
+    json['maxCount'] = this.maxCount_;
   else if (!isNaN(this.interval_))
     json['interval'] = this.interval_;
   if (this.names_)
@@ -363,8 +363,8 @@ anychart.scales.OrdinalTicks.prototype.setupByJSON = function(config, opt_defaul
     this.set(config['explicit']);
   else if ('interval' in config)
     this.interval(config['interval']);
-  else if (anychart.opt.MAX_COUNT in config)
-    this.maxCount(config[anychart.opt.MAX_COUNT]);
+  else if ('maxCount' in config)
+    this.maxCount(config['maxCount']);
   this.names_ = config['names'] || null;
   this.autoTicks_ = null;
   this.autoNames_ = null;

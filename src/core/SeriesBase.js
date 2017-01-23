@@ -1631,8 +1631,8 @@ anychart.core.SeriesBase.prototype.getPoint = function(index) {
   if (this.chart) {
     this.chart.calculate();
     var chartStat = this.chart.statistics;
-    var val = /** @type {number} */ (point.get(anychart.opt.VALUE));
-    var size = /** @type {number} */ (point.get(anychart.opt.SIZE)); //Bubble.
+    var val = /** @type {number} */ (point.get('value'));
+    var size = /** @type {number} */ (point.get('size')); //Bubble.
 
     point.statistics[anychart.enums.Statistics.INDEX] = index;
     if (goog.isDef(val)) point.statistics[anychart.enums.Statistics.VALUE] = val;
@@ -1657,7 +1657,7 @@ anychart.core.SeriesBase.prototype.getPoint = function(index) {
     }
 
     var chartSumArr = chartStat[anychart.enums.Statistics.CATEGORY_Y_SUM_ARR_];
-    var x = /** @type {number} */ (point.get(anychart.opt.X));
+    var x = /** @type {number} */ (point.get('x'));
 
     if (chartSumArr) {
       point.statistics[anychart.enums.Statistics.CATEGORY_NAME] = x;
@@ -2208,7 +2208,7 @@ anychart.core.SeriesBase.prototype.setupByJSON = function(config, opt_default) {
   this.hoverLabels().setup(config['hoverLabels']);
   this.selectLabels().setup(config['selectLabels']);
 
-  if (anychart.opt.TOOLTIP in config)
+  if ('tooltip' in config)
     this.tooltip().setupByVal(config['tooltip'], opt_default);
 
   this.legendItem(config['legendItem']);

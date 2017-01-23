@@ -1120,7 +1120,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
   var title = /** @type {anychart.core.ui.Title} */(this.title());
 
   var legendIsHorizontal = this.position() == anychart.enums.Orientation.BOTTOM || this.position() == anychart.enums.Orientation.TOP;
-  var titleOrientation = title.getOption(anychart.opt.ORIENTATION) || title.defaultOrientation();
+  var titleOrientation = title.getOption('orientation') || title.defaultOrientation();
   var titleIsHorizontal = titleOrientation == anychart.enums.Orientation.TOP ||
       titleOrientation == anychart.enums.Orientation.BOTTOM;
   var separatorIsHorizontal = separator.isHorizontal();
@@ -1141,7 +1141,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
 
   if (title.enabled()) {
     title.parentBounds(null);
-    var orientation = /** @type {anychart.enums.Orientation} */ (title.getOption(anychart.opt.ORIENTATION) || title.defaultOrientation());
+    var orientation = /** @type {anychart.enums.Orientation} */ (title.getOption('orientation') || title.defaultOrientation());
     title.setAutoWidth(null);
     titleBounds = title.getContentBounds();
 
@@ -1161,12 +1161,12 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
     titleBounds = null;
 
   if (separator.enabled()) {
-    var orientation = separator.getOption(anychart.opt.ORIENTATION);
+    var orientation = separator.getOption('orientation');
     separator.parentBounds(null);
     if (titleBounds)
-      separator[anychart.opt.WIDTH](titleBounds.width);
+      separator['width'](titleBounds.width);
     else
-      separator[anychart.opt.WIDTH](separator.isHorizontal() ? contentWidth : contentHeight);
+      separator['width'](separator.isHorizontal() ? contentWidth : contentHeight);
     separatorBounds = separator.getContentBounds();
   } else
     separatorBounds = null;
@@ -1226,7 +1226,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
     var titleIsRLYHorizontal = title.getRotation() % 180 == 0;
     var titleWidth = titleBounds.width;
     var titleHeight = titleBounds.height;
-    orientation = /** @type {anychart.enums.Orientation} */ (title.getOption(anychart.opt.ORIENTATION) || title.defaultOrientation());
+    orientation = /** @type {anychart.enums.Orientation} */ (title.getOption('orientation') || title.defaultOrientation());
     if (titleIsHorizontal || titleIsRLYHorizontal) {
       if (titleIsRLYHorizontal && !titleIsHorizontal) {
         var minimalContentAreaWidth;
@@ -1262,7 +1262,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
             title.margin().tightenWidth(contentAreaWidth)));
       }
       titleBounds = title.getContentBounds();
-      separator[anychart.opt.WIDTH](width);
+      separator['width'](width);
       separatorBounds = separator.getContentBounds();
       if (titleBounds.height != titleHeight) {
         title.height(/** @type {null|number|string} */(goog.isDefAndNotNull(title.height()) ?
@@ -1275,7 +1275,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
           title.width() :
           title.margin().tightenWidth(contentAreaHeight)));
       titleBounds = title.getContentBounds();
-      separator[anychart.opt.WIDTH](height);
+      separator['width'](height);
       separatorBounds = separator.getContentBounds();
       if (titleBounds.width != titleWidth) {
         title.height(/** @type {null|number|string} */(goog.isDefAndNotNull(title.height()) ?
@@ -1286,7 +1286,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
     }
   }
   if (title.enabled()) {
-    orientation = /** @type {anychart.enums.Orientation} */ (title.getOption(anychart.opt.ORIENTATION) || title.defaultOrientation());
+    orientation = /** @type {anychart.enums.Orientation} */ (title.getOption('orientation') || title.defaultOrientation());
     if (orientation == anychart.enums.Orientation.TOP || orientation == anychart.enums.Orientation.BOTTOM) contentAreaHeight -= titleBounds.height;
     else contentAreaWidth -= titleBounds.width;
   }
@@ -1358,8 +1358,8 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
         break;
     }
   } else {
-    left = anychart.utils.normalizeSize(/** @type {string|number} */ (margin.getOption(anychart.opt.LEFT)), 0);
-    top = anychart.utils.normalizeSize(/** @type {string|number} */ (margin.getOption(anychart.opt.TOP)), 0);
+    left = anychart.utils.normalizeSize(/** @type {string|number} */ (margin.getOption('left')), 0);
+    top = anychart.utils.normalizeSize(/** @type {string|number} */ (margin.getOption('top')), 0);
   }
 
   this.pixelBounds_ = new anychart.math.Rect(left, top, width, height);
@@ -1855,23 +1855,23 @@ anychart.core.ui.Legend.prototype.serialize = function() {
 anychart.core.ui.Legend.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.Legend.base(this, 'setupByJSON', config, opt_default);
 
-  if (anychart.opt.TITLE in config)
-    this.title(config[anychart.opt.TITLE]);
+  if ('title' in config)
+    this.title(config['title']);
 
-  if (anychart.opt.BACKGROUND in config)
-    this.background(config[anychart.opt.BACKGROUND]);
+  if ('background' in config)
+    this.background(config['background']);
 
-  if (anychart.opt.PADDING in config)
-    this.padding(config[anychart.opt.PADDING]);
+  if ('padding' in config)
+    this.padding(config['padding']);
 
-  if (anychart.opt.MARGIN in config)
-    this.margin(config[anychart.opt.MARGIN]);
+  if ('margin' in config)
+    this.margin(config['margin']);
 
   this.titleFormatter(config['titleFormatter']);
   this.titleSeparator(config['titleSeparator']);
   this.paginator(config['paginator']);
 
-  this.tooltip().setupByVal(config[anychart.opt.TOOLTIP], opt_default);
+  this.tooltip().setupByVal(config['tooltip'], opt_default);
 
   this.itemsLayout(config['itemsLayout']);
   this.itemsSpacing(config['itemsSpacing']);

@@ -4,7 +4,6 @@ goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.utils.GenericContextProvider');
 goog.require('anychart.enums');
-goog.require('anychart.opt');
 
 
 
@@ -116,8 +115,8 @@ anychart.core.resource.Activities.prototype.labels = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value) && !(anychart.opt.ENABLED in opt_value))
-      opt_value[anychart.opt.ENABLED] = true;
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
     this.labels_.setup(opt_value);
     return this;
   }
@@ -137,8 +136,8 @@ anychart.core.resource.Activities.prototype.labels = function(opt_value) {
 //   }
 //
 //   if (goog.isDef(opt_value)) {
-//     if (goog.isObject(opt_value) && !(anychart.opt.ENABLED in opt_value))
-//       opt_value[anychart.opt.ENABLED] = true;
+//     if (goog.isObject(opt_value) && !('enabled' in opt_value))
+//       opt_value['enabled'] = true;
 //     this.hoverLabels_.setup(opt_value);
 //     return this;
 //   }
@@ -157,8 +156,8 @@ anychart.core.resource.Activities.prototype.labels = function(opt_value) {
 //   }
 //
 //   if (goog.isDef(opt_value)) {
-//     if (goog.isObject(opt_value) && !(anychart.opt.ENABLED in opt_value))
-//       opt_value[anychart.opt.ENABLED] = true;
+//     if (goog.isObject(opt_value) && !('enabled' in opt_value))
+//       opt_value['enabled'] = true;
 //     this.selectLabels_.setup(opt_value);
 //     return this;
 //   }
@@ -191,8 +190,8 @@ anychart.core.resource.Activities.prototype.createFormatProvider = function(inte
     'minutesPerDay': interval.minutesPerDay,
     'hoursPerDay': interval.minutesPerDay / 60,
     'hoursPerDayRounded': Math.ceil(interval.minutesPerDay / 30) / 2,
-    'name': dataObj[anychart.opt.NAME] || 'Unnamed Activity',
-    'activityName': dataObj[anychart.opt.NAME],
+    'name': dataObj['name'] || 'Unnamed Activity',
+    'activityName': dataObj['name'],
     'activityInfo': dataObj
   }, {
     'start': anychart.enums.TokenType.DATE_TIME,
@@ -289,66 +288,66 @@ anychart.core.resource.Activities.prototype.drawLabels = function() {
 anychart.core.resource.Activities.DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.COLOR] = anychart.core.settings.createDescriptor(
+  map['color'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.COLOR,
+      'color',
       anychart.core.settings.colorNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.FILL] = anychart.core.settings.createDescriptor(
+  map['fill'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.FILL,
+      'fill',
       anychart.core.settings.fillOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  // map[anychart.opt.HOVER_FILL] = anychart.core.settings.createDescriptor(
+  // map['hoverFill'] = anychart.core.settings.createDescriptor(
   //     anychart.enums.PropertyHandlerType.MULTI_ARG,
-  //     anychart.opt.HOVER_FILL,
+  //     'hoverFill',
   //     anychart.core.settings.fillOrFunctionNormalizer,
   //     0,
   //     0);
-  // map[anychart.opt.SELECT_FILL] = anychart.core.settings.createDescriptor(
+  // map['selectFill'] = anychart.core.settings.createDescriptor(
   //     anychart.enums.PropertyHandlerType.MULTI_ARG,
-  //     anychart.opt.SELECT_FILL,
+  //     'selectFill',
   //     anychart.core.settings.fillOrFunctionNormalizer,
   //     0,
   //     0);
 
-  map[anychart.opt.STROKE] = anychart.core.settings.createDescriptor(
+  map['stroke'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.STROKE,
+      'stroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  // map[anychart.opt.HOVER_STROKE] = anychart.core.settings.createDescriptor(
+  // map['hoverStroke'] = anychart.core.settings.createDescriptor(
   //     anychart.enums.PropertyHandlerType.MULTI_ARG,
-  //     anychart.opt.HOVER_STROKE,
+  //     'hoverStroke',
   //     anychart.core.settings.strokeOrFunctionNormalizer,
   //     0,
   //     0);
-  // map[anychart.opt.SELECT_STROKE] = anychart.core.settings.createDescriptor(
+  // map['selectStroke'] = anychart.core.settings.createDescriptor(
   //     anychart.enums.PropertyHandlerType.MULTI_ARG,
-  //     anychart.opt.SELECT_STROKE,
+  //     'selectStroke',
   //     anychart.core.settings.strokeOrFunctionNormalizer,
   //     0,
   //     0);
 
-  map[anychart.opt.HATCH_FILL] = anychart.core.settings.createDescriptor(
+  map['hatchFill'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.HATCH_FILL,
+      'hatchFill',
       anychart.core.settings.hatchFillOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  // map[anychart.opt.HOVER_HATCH_FILL] = anychart.core.settings.createDescriptor(
+  // map['hoverHatchFill'] = anychart.core.settings.createDescriptor(
   //     anychart.enums.PropertyHandlerType.MULTI_ARG,
-  //     anychart.opt.HOVER_HATCH_FILL,
+  //     'hoverHatchFill',
   //     anychart.core.settings.hatchFillOrFunctionNormalizer,
   //     0,
   //     0);
-  // map[anychart.opt.SELECT_HATCH_FILL] = anychart.core.settings.createDescriptor(
+  // map['selectHatchFill'] = anychart.core.settings.createDescriptor(
   //     anychart.enums.PropertyHandlerType.MULTI_ARG,
-  //     anychart.opt.SELECT_HATCH_FILL,
+  //     'selectHatchFill',
   //     anychart.core.settings.hatchFillOrFunctionNormalizer,
   //     0,
   //     0);
@@ -457,7 +456,7 @@ anychart.core.resource.Activities.getColor_ = function(colorNames, normalizer, i
  * @private
  */
 anychart.core.resource.Activities.getNullColor_ = function() {
-  return anychart.opt.NONE;
+  return 'none';
 };
 
 
@@ -470,13 +469,13 @@ anychart.core.resource.Activities.getNullColor_ = function() {
  * @return {Object}
  */
 anychart.core.resource.Activities.prototype.getColorResolutionContext = function(interval, dataObj, opt_baseColor) {
-  var source = opt_baseColor || this.getOption(anychart.opt.COLOR) || anychart.core.resource.Activities.DEFAULT_COLOR;
+  var source = opt_baseColor || this.getOption('color') || anychart.core.resource.Activities.DEFAULT_COLOR;
   return {
     'sourceColor': source,
     'start': interval.start,
     'end': interval.end,
     'minutesPerDay': interval.minutesPerDay,
-    'activityName': dataObj[anychart.opt.NAME],
+    'activityName': dataObj['name'],
     'activityInfo': dataObj
   };
 };
@@ -496,7 +495,7 @@ anychart.core.resource.Activities.prototype.getHatchFillResolutionContext = func
     'start': interval.start,
     'end': interval.end,
     'minutesPerDay': interval.minutesPerDay,
-    'activityName': dataObj[anychart.opt.NAME],
+    'activityName': dataObj['name'],
     'activityInfo': dataObj
   };
 };
@@ -512,7 +511,7 @@ anychart.core.resource.Activities.prototype.getHatchFillResolutionContext = func
 anychart.core.resource.Activities.prototype.resolveStroke = function(dataObj, interval, state) {
   if (!this.strokeResolver_)
     this.strokeResolver_ = anychart.core.resource.Activities.getColorResolver(
-        [anychart.opt.STROKE], anychart.enums.ColorType.STROKE);
+        ['stroke'], anychart.enums.ColorType.STROKE);
   return /** @type {acgraph.vector.Stroke} */(this.strokeResolver_(this, dataObj, interval, state));
 };
 
@@ -527,7 +526,7 @@ anychart.core.resource.Activities.prototype.resolveStroke = function(dataObj, in
 anychart.core.resource.Activities.prototype.resolveFill = function(dataObj, interval, state) {
   if (!this.fillResolver_)
     this.fillResolver_ = anychart.core.resource.Activities.getColorResolver(
-        [anychart.opt.FILL], anychart.enums.ColorType.FILL);
+        ['fill'], anychart.enums.ColorType.FILL);
   return /** @type {acgraph.vector.Fill} */(this.fillResolver_(this, dataObj, interval, state));
 };
 
@@ -542,7 +541,7 @@ anychart.core.resource.Activities.prototype.resolveFill = function(dataObj, inte
 anychart.core.resource.Activities.prototype.resolveHatchFill = function(dataObj, interval, state) {
   if (!this.hatchFillResolver_)
     this.hatchFillResolver_ = anychart.core.resource.Activities.getColorResolver(
-        [anychart.opt.HATCH_FILL], anychart.enums.ColorType.HATCH_FILL);
+        ['hatchFill'], anychart.enums.ColorType.HATCH_FILL);
   return /** @type {acgraph.vector.HatchFill} */(this.hatchFillResolver_(this, dataObj, interval, state));
 };
 

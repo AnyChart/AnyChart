@@ -2,7 +2,6 @@ goog.provide('anychart.core.drawers.RangeColumn');
 goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
 goog.require('anychart.enums');
-goog.require('anychart.opt');
 
 
 
@@ -50,27 +49,27 @@ anychart.core.drawers.RangeColumn.prototype.flags = (
 /** @inheritDoc */
 anychart.core.drawers.RangeColumn.prototype.requiredShapes = (function() {
   var res = {};
-  res[anychart.opt.PATH] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.HATCH_FILL] = anychart.enums.ShapeType.PATH;
+  res['path'] = anychart.enums.ShapeType.PATH;
+  res['hatchFill'] = anychart.enums.ShapeType.PATH;
   return res;
 })();
 
 
 /** @inheritDoc */
-anychart.core.drawers.RangeColumn.prototype.yValueNames = ([anychart.opt.HIGH, anychart.opt.LOW]);
+anychart.core.drawers.RangeColumn.prototype.yValueNames = (['high', 'low']);
 
 
 /** @inheritDoc */
 anychart.core.drawers.RangeColumn.prototype.drawSubsequentPoint = function(point, state) {
   var shapes = this.shapesManager.getShapesGroup(state);
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var high = /** @type {number} */(point.meta(anychart.opt.HIGH));
-  var low = /** @type {number} */(point.meta(anychart.opt.LOW));
+  var x = /** @type {number} */(point.meta('x'));
+  var high = /** @type {number} */(point.meta('high'));
+  var low = /** @type {number} */(point.meta('low'));
 
   var leftX = x - this.pointWidth / 2;
   var rightX = leftX + this.pointWidth;
 
-  var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(shapes[anychart.opt.PATH].stroke()));
+  var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(shapes['path'].stroke()));
   if (this.crispEdges) {
     leftX = anychart.utils.applyPixelShift(leftX, thickness);
     rightX = anychart.utils.applyPixelShift(rightX, thickness);
@@ -78,13 +77,13 @@ anychart.core.drawers.RangeColumn.prototype.drawSubsequentPoint = function(point
   high = anychart.utils.applyPixelShift(high, thickness);
   low = anychart.utils.applyPixelShift(low, thickness);
 
-  var path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.PATH]);
+  var path = /** @type {acgraph.vector.Path} */(shapes['path']);
   anychart.core.drawers.move(path, this.isVertical, leftX, low);
   anychart.core.drawers.line(path, this.isVertical, rightX, low);
   anychart.core.drawers.line(path, this.isVertical, rightX, high);
   anychart.core.drawers.line(path, this.isVertical, leftX, high);
   path.close();
-  path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]);
+  path = /** @type {acgraph.vector.Path} */(shapes['hatchFill']);
   anychart.core.drawers.move(path, this.isVertical, leftX, low);
   anychart.core.drawers.line(path, this.isVertical, rightX, low);
   anychart.core.drawers.line(path, this.isVertical, rightX, high);

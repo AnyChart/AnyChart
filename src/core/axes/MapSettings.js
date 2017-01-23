@@ -171,37 +171,37 @@ anychart.core.axes.MapSettings.prototype.getHighPriorityResolutionChain = functi
 anychart.core.axes.MapSettings.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map[anychart.opt.STROKE] = anychart.core.settings.createDescriptor(
+  map['stroke'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      anychart.opt.STROKE,
+      'stroke',
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.OVERLAP_MODE] = anychart.core.settings.createDescriptor(
+  map['overlapMode'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.OVERLAP_MODE,
+      'overlapMode',
       anychart.enums.normalizeLabelsOverlapMode,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map[anychart.opt.DRAW_FIRST_LABEL] = anychart.core.settings.createDescriptor(
+  map['drawFirstLabel'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.DRAW_FIRST_LABEL,
+      'drawFirstLabel',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map[anychart.opt.DRAW_LAST_LABEL] = anychart.core.settings.createDescriptor(
+  map['drawLastLabel'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.DRAW_LAST_LABEL,
+      'drawLastLabel',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map[anychart.opt.ENABLED] = anychart.core.settings.createDescriptor(
+  map['enabled'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.ENABLED,
+      'enabled',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.ENABLED_STATE_CHANGED);
@@ -518,7 +518,7 @@ anychart.core.axes.MapSettings.prototype.setThemeSettings = function(config) {
 anychart.core.axes.MapSettings.prototype.specialSetupByVal = function(value, opt_default) {
   if (goog.isBoolean(value) || goog.isNull(value)) {
     if (opt_default)
-      this.themeSettings[anychart.opt.ENABLED] = !!value;
+      this.themeSettings['enabled'] = !!value;
     else
       this.enabled(!!value);
     return true;
@@ -535,7 +535,7 @@ anychart.core.axes.MapSettings.prototype.setupByJSON = function(config, opt_defa
     this.setThemeSettings(config);
   } else {
     anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config);
-    this.setOption(anychart.opt.ENABLED, anychart.opt.ENABLED in config ? config[anychart.opt.ENABLED] : true);
+    this.setOption('enabled', 'enabled' in config ? config['enabled'] : true);
   }
 
   this.title().setupByVal(config['title'], opt_default);

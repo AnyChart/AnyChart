@@ -33,7 +33,7 @@ anychart.core.annotations.Marker = function(chartController) {
    */
   this.strokeResolver_ = /** @type {function(anychart.core.annotations.Base,number):acgraph.vector.Stroke} */(
       anychart.core.annotations.Base.getColorResolver(
-          [anychart.opt.STROKE, anychart.opt.HOVER_STROKE, anychart.opt.SELECT_STROKE],
+          ['stroke', 'hoverStroke', 'selectStroke'],
           anychart.enums.ColorType.STROKE));
 
   /**
@@ -45,7 +45,7 @@ anychart.core.annotations.Marker = function(chartController) {
    */
   this.fillResolver_ = /** @type {function(anychart.core.annotations.Base,number):acgraph.vector.Fill} */(
       anychart.core.annotations.Base.getColorResolver(
-          [anychart.opt.FILL, anychart.opt.HOVER_FILL, anychart.opt.SELECT_FILL],
+          ['fill', 'hoverFill', 'selectFill'],
           anychart.enums.ColorType.FILL));
 
   /**
@@ -57,7 +57,7 @@ anychart.core.annotations.Marker = function(chartController) {
    */
   this.hatchFillResolver_ = /** @type {function(anychart.core.annotations.Base,number):acgraph.vector.PatternFill} */(
       anychart.core.annotations.Base.getColorResolver(
-          [anychart.opt.HATCH_FILL, anychart.opt.HOVER_HATCH_FILL, anychart.opt.SELECT_HATCH_FILL],
+          ['hatchFill', 'hoverHatchFill', 'selectHatchFill'],
           anychart.enums.ColorType.HATCH_FILL));
 };
 goog.inherits(anychart.core.annotations.Marker, anychart.core.annotations.Base);
@@ -125,17 +125,17 @@ anychart.core.annotations.Marker.prototype.ensureCreated = function() {
 anychart.core.annotations.Marker.prototype.drawOnePointShape = function(x, y) {
   var size;
   if (!!(this.state & anychart.PointState.SELECT)) {
-    size = this.getOption(anychart.opt.SELECT_SIZE);
+    size = this.getOption('selectSize');
   } else if (!!(this.state & anychart.PointState.HOVER)) {
-    size = this.getOption(anychart.opt.HOVER_SIZE);
+    size = this.getOption('hoverSize');
   }
-  size = /** @type {number} */(isNaN(size) ? this.getOption(anychart.opt.SIZE) : size);
-  var drawer = anychart.utils.getMarkerDrawer(this.getOption(anychart.opt.MARKER_TYPE));
-  var anchor = /** @type {anychart.enums.Anchor} */(this.getOption(anychart.opt.ANCHOR));
+  size = /** @type {number} */(isNaN(size) ? this.getOption('size') : size);
+  var drawer = anychart.utils.getMarkerDrawer(this.getOption('markerType'));
+  var anchor = /** @type {anychart.enums.Anchor} */(this.getOption('anchor'));
   var position = {x: x, y: y};
   anychart.utils.applyOffsetByAnchor(position, anchor,
-      /** @type {number} */(this.getOption(anychart.opt.OFFSET_X)),
-      /** @type {number} */(this.getOption(anychart.opt.OFFSET_Y)));
+      /** @type {number} */(this.getOption('offsetX')),
+      /** @type {number} */(this.getOption('offsetY')));
   var d = size / 2;
   switch (anchor) {
     case anychart.enums.Anchor.LEFT_TOP:
@@ -180,7 +180,7 @@ anychart.core.annotations.Marker.prototype.colorize = function(state) {
       .fill(this.hatchFillResolver_(this, state));
   this.paths_[2]
       .fill(anychart.color.TRANSPARENT_HANDLER)
-      .stroke(/** @type {acgraph.vector.SolidFill} */(anychart.color.TRANSPARENT_HANDLER), this[anychart.opt.HOVER_GAP]() * 2);
+      .stroke(/** @type {acgraph.vector.SolidFill} */(anychart.color.TRANSPARENT_HANDLER), this['hoverGap']() * 2);
 };
 //endregion
 

@@ -789,29 +789,29 @@ anychart.core.ChartWithAxes.prototype.getBoundsWithoutAxes = function(contentAre
         axisStrokeThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(axis.stroke()));
 
         if (orientation == anychart.enums.Orientation.TOP) {
-          axis.padding()[anychart.opt.TOP](offsets[0]);
-          axis.padding()[anychart.opt.BOTTOM](0);
+          axis.padding()['top'](offsets[0]);
+          axis.padding()['bottom'](0);
           remainingBounds = axis.getRemainingBounds();
           offsets[0] = contentAreaBounds.height - remainingBounds.height;
           if (isNaN(this.topAxisPadding_))
             this.topAxisPadding_ = axisStrokeThickness;
         } else if (orientation == anychart.enums.Orientation.BOTTOM) {
-          axis.padding()[anychart.opt.BOTTOM](offsets[2]);
-          axis.padding()[anychart.opt.TOP](0);
+          axis.padding()['bottom'](offsets[2]);
+          axis.padding()['top'](0);
           remainingBounds = axis.getRemainingBounds();
           offsets[2] = contentAreaBounds.height - remainingBounds.height;
           if (isNaN(this.bottomAxisPadding_))
             this.bottomAxisPadding_ = axisStrokeThickness;
         } else if (orientation == anychart.enums.Orientation.LEFT) {
-          axis.padding()[anychart.opt.LEFT](offsets[3]);
-          axis.padding()[anychart.opt.RIGHT](0);
+          axis.padding()['left'](offsets[3]);
+          axis.padding()['right'](0);
           remainingBounds = axis.getRemainingBounds();
           offsets[3] = contentAreaBounds.width - remainingBounds.width;
           if (isNaN(this.leftAxisPadding_))
             this.leftAxisPadding_ = axisStrokeThickness;
         } else if (orientation == anychart.enums.Orientation.RIGHT) {
-          axis.padding()[anychart.opt.RIGHT](offsets[1]);
-          axis.padding()[anychart.opt.LEFT](0);
+          axis.padding()['right'](offsets[1]);
+          axis.padding()['left'](0);
           remainingBounds = axis.getRemainingBounds();
           offsets[1] = contentAreaBounds.width - remainingBounds.width;
           if (isNaN(this.rightAxisPadding_))
@@ -833,15 +833,15 @@ anychart.core.ChartWithAxes.prototype.getBoundsWithoutAxes = function(contentAre
         var remainingBoundsBeforeSetPadding = axis.getRemainingBounds();
 
         if (axis.isHorizontal()) {
-          axis.padding()[anychart.opt.LEFT](offsets[3]);
-          axis.padding()[anychart.opt.RIGHT](offsets[1]);
+          axis.padding()['left'](offsets[3]);
+          axis.padding()['right'](offsets[1]);
           remainingBounds = axis.getRemainingBounds();
           if (remainingBounds.height != remainingBoundsBeforeSetPadding.height) {
             complete = false;
           }
         } else {
-          axis.padding()[anychart.opt.TOP](offsets[0]);
-          axis.padding()[anychart.opt.BOTTOM](offsets[2]);
+          axis.padding()['top'](offsets[0]);
+          axis.padding()['bottom'](offsets[2]);
           remainingBounds = axis.getRemainingBounds();
           if (remainingBounds.width != remainingBoundsBeforeSetPadding.width) {
             complete = false;

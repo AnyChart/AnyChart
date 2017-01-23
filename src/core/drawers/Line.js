@@ -2,7 +2,6 @@ goog.provide('anychart.core.drawers.Line');
 goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
 goog.require('anychart.enums');
-goog.require('anychart.opt');
 
 
 
@@ -50,7 +49,7 @@ anychart.core.drawers.Line.prototype.flags = (
 /** @inheritDoc */
 anychart.core.drawers.Line.prototype.requiredShapes = (function() {
   var res = {};
-  res[anychart.opt.STROKE] = anychart.enums.ShapeType.PATH;
+  res['stroke'] = anychart.enums.ShapeType.PATH;
   return res;
 })();
 
@@ -58,16 +57,16 @@ anychart.core.drawers.Line.prototype.requiredShapes = (function() {
 /** @inheritDoc */
 anychart.core.drawers.Line.prototype.drawFirstPoint = function(point, state) {
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
-  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.STROKE]), this.isVertical, x, y);
+  var x = /** @type {number} */(point.meta('x'));
+  var y = /** @type {number} */(point.meta('value'));
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes['stroke']), this.isVertical, x, y);
 };
 
 
 /** @inheritDoc */
 anychart.core.drawers.Line.prototype.drawSubsequentPoint = function(point, state) {
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
-  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.STROKE]), this.isVertical, x, y);
+  var x = /** @type {number} */(point.meta('x'));
+  var y = /** @type {number} */(point.meta('value'));
+  anychart.core.drawers.line(/** @type {acgraph.vector.Path} */(shapes['stroke']), this.isVertical, x, y);
 };

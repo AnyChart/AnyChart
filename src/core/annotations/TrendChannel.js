@@ -31,7 +31,7 @@ anychart.core.annotations.TrendChannel = function(chartController) {
    */
   this.strokeResolver_ = /** @type {function(anychart.core.annotations.Base,number):acgraph.vector.Stroke} */(
       anychart.core.annotations.Base.getColorResolver(
-          [anychart.opt.STROKE, anychart.opt.HOVER_STROKE, anychart.opt.SELECT_STROKE],
+          ['stroke', 'hoverStroke', 'selectStroke'],
           anychart.enums.ColorType.STROKE));
 
   /**
@@ -43,7 +43,7 @@ anychart.core.annotations.TrendChannel = function(chartController) {
    */
   this.fillResolver_ = /** @type {function(anychart.core.annotations.Base,number):acgraph.vector.Fill} */(
       anychart.core.annotations.Base.getColorResolver(
-          [anychart.opt.FILL, anychart.opt.HOVER_FILL, anychart.opt.SELECT_FILL],
+          ['fill', 'hoverFill', 'selectFill'],
           anychart.enums.ColorType.FILL));
 
   /**
@@ -55,7 +55,7 @@ anychart.core.annotations.TrendChannel = function(chartController) {
    */
   this.hatchFillResolver_ = /** @type {function(anychart.core.annotations.Base,number):acgraph.vector.PatternFill} */(
       anychart.core.annotations.Base.getColorResolver(
-          [anychart.opt.HATCH_FILL, anychart.opt.HOVER_HATCH_FILL, anychart.opt.SELECT_HATCH_FILL],
+          ['hatchFill', 'hoverHatchFill', 'selectHatchFill'],
           anychart.enums.ColorType.HATCH_FILL));
 };
 goog.inherits(anychart.core.annotations.TrendChannel, anychart.core.annotations.Base);
@@ -270,7 +270,7 @@ anychart.core.annotations.TrendChannel.prototype.colorize = function(state) {
       .fill(this.hatchFillResolver_(this, state));
   this.paths_[3]
       .fill(anychart.color.TRANSPARENT_HANDLER)
-      .stroke(/** @type {acgraph.vector.SolidFill} */(anychart.color.TRANSPARENT_HANDLER), this[anychart.opt.HOVER_GAP]() * 2);
+      .stroke(/** @type {acgraph.vector.SolidFill} */(anychart.color.TRANSPARENT_HANDLER), this['hoverGap']() * 2);
 };
 
 
@@ -278,9 +278,9 @@ anychart.core.annotations.TrendChannel.prototype.colorize = function(state) {
 anychart.core.annotations.TrendChannel.prototype.checkVisible = function() {
   var res = anychart.core.annotations.TrendChannel.base(this, 'checkVisible');
   if (!res && this.anchorsAvailable == anychart.core.annotations.AnchorSupport.THREE_POINTS) {
-    var x1 = this.coords[anychart.opt.X_ANCHOR];
-    var x2 = this.coords[anychart.opt.SECOND_X_ANCHOR];
-    var x3 = this.coords[anychart.opt.THIRD_X_ANCHOR];
+    var x1 = this.coords['xAnchor'];
+    var x2 = this.coords['secondXAnchor'];
+    var x3 = this.coords['thirdXAnchor'];
     if (x1 != x2) { // in other case we can just check by anchors, that is already done
       var sx = x2 > x1 ? Math.min(x1, x3) : Math.max(x1, x3);
       var ex = x2;

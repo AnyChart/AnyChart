@@ -38,8 +38,8 @@ anychart.core.annotations.FibonacciTimezones.prototype.type = anychart.enums.Ann
 /** @inheritDoc */
 anychart.core.annotations.FibonacciTimezones.prototype.drawLevel = function(levelIndex, levelValue, path, hoverPath,
                                                                             mainFactory, stateFactory, drawLabels, strokeThickness) {
-  var x1 = this.coords[anychart.opt.X_ANCHOR];
-  var x2 = this.coords[anychart.opt.SECOND_X_ANCHOR];
+  var x1 = this.coords['xAnchor'];
+  var x2 = this.coords['secondXAnchor'];
   var baseWidth = Math.abs(x1 - x2);
   var x = anychart.utils.applyPixelShift(x2 + baseWidth * levelValue, strokeThickness);
   if (this.pixelBoundsCache.left <= x && x <= this.pixelBoundsCache.getRight()) {
@@ -60,8 +60,8 @@ anychart.core.annotations.FibonacciTimezones.prototype.drawLevel = function(leve
 anychart.core.annotations.FibonacciTimezones.prototype.checkVisible = function() {
   var res = anychart.core.annotations.FibonacciTimezones.base(this, 'checkVisible');
   if (!res) {
-    var x1 = this.coords[anychart.opt.X_ANCHOR];
-    var x2 = this.coords[anychart.opt.SECOND_X_ANCHOR];
+    var x1 = this.coords['xAnchor'];
+    var x2 = this.coords['secondXAnchor'];
     var x = Math.min(x1, x2);
     res = !isNaN(x) && (x <= this.pixelBoundsCache.getRight());
   }

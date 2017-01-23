@@ -3,7 +3,6 @@ goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
 goog.require('anychart.core.drawers.SplineDrawer');
 goog.require('anychart.enums');
-goog.require('anychart.opt');
 
 
 
@@ -57,16 +56,16 @@ anychart.core.drawers.RangeSplineArea.prototype.flags = (
 /** @inheritDoc */
 anychart.core.drawers.RangeSplineArea.prototype.requiredShapes = (function() {
   var res = {};
-  res[anychart.opt.FILL] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.HATCH_FILL] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.LOW] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.HIGH] = anychart.enums.ShapeType.PATH;
+  res['fill'] = anychart.enums.ShapeType.PATH;
+  res['hatchFill'] = anychart.enums.ShapeType.PATH;
+  res['low'] = anychart.enums.ShapeType.PATH;
+  res['high'] = anychart.enums.ShapeType.PATH;
   return res;
 })();
 
 
 /** @inheritDoc */
-anychart.core.drawers.RangeSplineArea.prototype.yValueNames = ([anychart.opt.HIGH, anychart.opt.LOW]);
+anychart.core.drawers.RangeSplineArea.prototype.yValueNames = (['high', 'low']);
 
 
 /** @inheritDoc */
@@ -80,25 +79,25 @@ anychart.core.drawers.RangeSplineArea.prototype.startDrawing = function(shapeMan
    * @private
    */
   this.forwardPaths_ = [
-    /** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]),
-    /** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]),
-    /** @type {acgraph.vector.Path} */(shapes[anychart.opt.HIGH])];
+    /** @type {acgraph.vector.Path} */(shapes['fill']),
+    /** @type {acgraph.vector.Path} */(shapes['hatchFill']),
+    /** @type {acgraph.vector.Path} */(shapes['high'])];
   /**
    * @type {Array.<acgraph.vector.Path>}
    * @private
    */
   this.backwardPaths_ = [
-    /** @type {acgraph.vector.Path} */(shapes[anychart.opt.FILL]),
-    /** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]),
-    /** @type {acgraph.vector.Path} */(shapes[anychart.opt.LOW])];
+    /** @type {acgraph.vector.Path} */(shapes['fill']),
+    /** @type {acgraph.vector.Path} */(shapes['hatchFill']),
+    /** @type {acgraph.vector.Path} */(shapes['low'])];
 };
 
 
 /** @inheritDoc */
 anychart.core.drawers.RangeSplineArea.prototype.drawFirstPoint = function(point, state) {
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var high = /** @type {number} */(point.meta(anychart.opt.HIGH));
-  var low = /** @type {number} */(point.meta(anychart.opt.LOW));
+  var x = /** @type {number} */(point.meta('x'));
+  var high = /** @type {number} */(point.meta('high'));
+  var low = /** @type {number} */(point.meta('low'));
 
   this.queue_.setPaths(this.forwardPaths_);
   this.queue_.resetDrawer(false);
@@ -116,9 +115,9 @@ anychart.core.drawers.RangeSplineArea.prototype.drawFirstPoint = function(point,
 
 /** @inheritDoc */
 anychart.core.drawers.RangeSplineArea.prototype.drawSubsequentPoint = function(point, state) {
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var high = /** @type {number} */(point.meta(anychart.opt.HIGH));
-  var low = /** @type {number} */(point.meta(anychart.opt.LOW));
+  var x = /** @type {number} */(point.meta('x'));
+  var high = /** @type {number} */(point.meta('high'));
+  var low = /** @type {number} */(point.meta('low'));
 
   this.queue_.processPoint(x, high);
 

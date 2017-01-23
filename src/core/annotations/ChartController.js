@@ -309,7 +309,7 @@ anychart.core.annotations.ChartController.prototype.createAnnotationByType = fun
     type = typeOrConfig;
     config = undefined;
   } else if (goog.isObject(typeOrConfig)) {
-    type = typeOrConfig[anychart.opt.TYPE];
+    type = typeOrConfig['type'];
     config = typeOrConfig;
   }
   type = anychart.enums.normalizeAnnotationType(type);

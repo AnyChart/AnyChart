@@ -162,7 +162,7 @@ anychart.core.series.Stock.prototype.updateComparisonZero = function() {
   }
   // if we have found a row to get value from - we cast it to number
   // if anything went wrong - we get 0 value and fail to make a comparison, which is a good result
-  this.comparisonZero = Number(row && row.get(anychart.opt.VALUE)) || 0;
+  this.comparisonZero = Number(row && row.get('value')) || 0;
 };
 //endregion
 
@@ -280,7 +280,7 @@ anychart.core.series.Stock.prototype.getDetachedIterator = function() {
 /** @inheritDoc */
 anychart.core.series.Stock.prototype.getColorResolutionContext = function(opt_baseColor, opt_ignorePointSettings) {
   return {
-    'sourceColor': opt_baseColor || this.getOption(anychart.opt.COLOR) || 'blue'
+    'sourceColor': opt_baseColor || this.getOption('color') || 'blue'
   };
 };
 
@@ -494,17 +494,17 @@ anychart.core.series.Stock.prototype.getLegendIconColor = function(legendItemJso
     var name;
     var rising = context['open'] < context['close'];
     if (colorType == anychart.enums.ColorType.STROKE) {
-      name = rising ? anychart.opt.RISING_STROKE : anychart.opt.FALLING_STROKE;
+      name = rising ? 'risingStroke' : 'fallingStroke';
     } else if (colorType == anychart.enums.ColorType.HATCH_FILL) {
       if (this.check(anychart.core.drawers.Capabilities.USES_STROKE_AS_FILL))
         return null;
-      name = rising ? anychart.opt.RISING_HATCH_FILL : anychart.opt.FALLING_HATCH_FILL;
+      name = rising ? 'risingHatchFill' : 'fallingHatchFill';
     } else {
       if (this.check(anychart.core.drawers.Capabilities.USES_STROKE_AS_FILL)) {
-        name = rising ? anychart.opt.RISING_STROKE : anychart.opt.FALLING_STROKE;
+        name = rising ? 'risingStroke' : 'fallingStroke';
         colorType = anychart.enums.ColorType.STROKE;
       } else {
-        name = rising ? anychart.opt.RISING_FILL : anychart.opt.FALLING_FILL;
+        name = rising ? 'risingFill' : 'fallingFill';
       }
     }
     var resolver = anychart.core.series.Base.getColorResolver([name], colorType);
@@ -519,7 +519,7 @@ anychart.core.series.Stock.prototype.getLegendIconColor = function(legendItemJso
 anychart.core.series.Stock.prototype.getLegendIconType = function(type, context) {
   if (String(type).toLowerCase() == anychart.enums.LegendItemIconType.RISING_FALLING) {
     if (this.check(anychart.core.drawers.Capabilities.IS_OHLC_BASED)) {
-      return (context[anychart.opt.OPEN] < context[anychart.opt.CLOSE]) ?
+      return (context['open'] < context['close']) ?
           anychart.enums.LegendItemIconType.TRIANGLE_UP :
           anychart.enums.LegendItemIconType.TRIANGLE_DOWN;
     }

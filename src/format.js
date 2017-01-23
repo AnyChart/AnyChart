@@ -2,7 +2,6 @@ goog.provide('anychart.format');
 
 goog.require('anychart.enums');
 goog.require('anychart.math');
-goog.require('anychart.opt');
 goog.require('anychart.utils');
 goog.require('goog.i18n.DateTimeFormat');
 goog.require('goog.i18n.DateTimeParse');
@@ -273,7 +272,7 @@ anychart.format.DEFAULT_SCALE_ = {
  * @type {!(string|anychart.format.Locale)}
  * @private
  */
-anychart.format.inputLocale_ = anychart.opt.DEFAULT;
+anychart.format.inputLocale_ = 'default';
 
 
 /**
@@ -297,7 +296,7 @@ anychart.format.inputBaseDate_ = NaN;
  * @type {!(string|anychart.format.Locale)}
  * @private
  */
-anychart.format.outputLocale_ = anychart.opt.DEFAULT;
+anychart.format.outputLocale_ = 'default';
 
 
 /**
@@ -391,7 +390,7 @@ anychart.format.getLocale = function(locale) {
  */
 anychart.format.getDateTimeLocale = function(locale) {
   var loc = anychart.format.getLocale(locale);
-  return loc && loc[anychart.opt.DATE_TIME_LOCALE] || null;
+  return loc && loc['dateTimeLocale'] || null;
 };
 
 
@@ -402,7 +401,7 @@ anychart.format.getDateTimeLocale = function(locale) {
  */
 anychart.format.getNumberLocale = function(locale) {
   var loc = anychart.format.getLocale(locale);
-  return loc && loc[anychart.opt.NUMBER_LOCALE] || null;
+  return loc && loc['numberLocale'] || null;
 };
 
 
@@ -477,7 +476,7 @@ anychart.format.inputLocale = function(opt_value) {
     if (goog.isString(opt_value) || goog.isObject(opt_value)) {
       anychart.format.inputLocale_ = opt_value;
     } else {
-      anychart.format.inputLocale_ = anychart.opt.DEFAULT;
+      anychart.format.inputLocale_ = 'default';
     }
   }
   return anychart.format.inputLocale_;
@@ -535,7 +534,7 @@ anychart.format.outputLocale = function(opt_value) {
     if (goog.isString(opt_value) || goog.isObject(opt_value)) {
       anychart.format.outputLocale_ = opt_value;
     } else {
-      anychart.format.outputLocale_ = anychart.opt.DEFAULT;
+      anychart.format.outputLocale_ = 'default';
     }
   }
   return anychart.format.outputLocale_;
@@ -557,7 +556,7 @@ anychart.format.outputDateTimeFormat = function(opt_value) {
   }
   return anychart.format.outputDateTimeFormat_ ||
       anychart.format.getOutputDateTimeFormat_(anychart.format.outputLocale_) ||
-      anychart.format.getOutputDateTimeFormat_(anychart.opt.DEFAULT) ||
+      anychart.format.getOutputDateTimeFormat_('default') ||
       'yyyy.MM.dd';
 };
 
@@ -577,7 +576,7 @@ anychart.format.outputDateFormat = function(opt_value) {
   }
   return anychart.format.outputDateFormat_ ||
       anychart.format.getOutputDateTimeFormat_(anychart.format.outputLocale_, 'dateFormat') ||
-      anychart.format.getOutputDateTimeFormat_(anychart.opt.DEFAULT, 'dateFormat') ||
+      anychart.format.getOutputDateTimeFormat_('default', 'dateFormat') ||
       'yyyy.MM.dd';
 };
 
@@ -597,7 +596,7 @@ anychart.format.outputTimeFormat = function(opt_value) {
   }
   return anychart.format.outputTimeFormat_ ||
       anychart.format.getOutputDateTimeFormat_(anychart.format.outputLocale_, 'timeFormat') ||
-      anychart.format.getOutputDateTimeFormat_(anychart.opt.DEFAULT, 'timeFormat') ||
+      anychart.format.getOutputDateTimeFormat_('default', 'timeFormat') ||
       'HH:mm:ss';
 };
 
@@ -650,7 +649,7 @@ anychart.format.parseDateTime = function(value, opt_format, opt_baseDate, opt_lo
     if (format) {
       var locale = anychart.format.getDateTimeLocale(opt_locale) ||
           anychart.format.getDateTimeLocale(anychart.format.inputLocale_) ||
-          anychart.format.getDateTimeLocale(anychart.opt.DEFAULT);
+          anychart.format.getDateTimeLocale('default');
       var localeHash = goog.getUid(locale);
       var parserCacheKey = format + localeHash;
       /** @type {goog.i18n.DateTimeParse} */
@@ -709,7 +708,7 @@ anychart.format.parseDateTime = function(value, opt_format, opt_baseDate, opt_lo
 anychart.format.parseNumber = function(value, opt_locale) {
   var locale = anychart.format.getNumberLocale(opt_locale) ||
       anychart.format.getNumberLocale(anychart.format.inputLocale_) ||
-      anychart.format.getNumberLocale(anychart.opt.DEFAULT);
+      anychart.format.getNumberLocale('default');
   var sign = 1;
   if (goog.isString(value)) {
     if (locale['useBracketsForNegative']) { //replacing brackets
@@ -787,7 +786,7 @@ anychart.format.subs = goog.string.subs;
  */
 anychart.format.getMessage = function(keyword) {
   var locale = anychart.format.getLocale(anychart.format.outputLocale_);
-  var messages = locale && locale[anychart.opt.MESSAGES];
+  var messages = locale && locale['messages'];
   return (messages && (keyword in messages)) ? messages[keyword] : keyword;
 };
 
@@ -819,7 +818,7 @@ anychart.format.getIntervalIdentifier = function(intervalUnit, opt_parentInterva
 anychart.format.getDateTimeFormat = function(identifier, opt_index, opt_locale) {
   var locale = anychart.format.getDateTimeLocale(opt_locale) ||
       anychart.format.getDateTimeLocale(anychart.format.outputLocale_) ||
-      anychart.format.getDateTimeLocale(anychart.opt.DEFAULT);
+      anychart.format.getDateTimeLocale('default');
   var formats = locale && locale['formats'] && locale['formats'][identifier];
   var format = goog.isArray(formats) ?
       formats[Math.min(formats.length - 1, opt_index || 0)] :
@@ -839,7 +838,7 @@ anychart.format.getDateTimeFormat = function(identifier, opt_index, opt_locale) 
 anychart.format.getDateTimeFormats = function(identifier, opt_locale) {
   var locale = anychart.format.getDateTimeLocale(opt_locale) ||
       anychart.format.getDateTimeLocale(anychart.format.outputLocale_) ||
-      anychart.format.getDateTimeLocale(anychart.opt.DEFAULT);
+      anychart.format.getDateTimeLocale('default');
   var formats = locale && locale['formats'] && locale['formats'][identifier];
   return goog.isArray(formats) ?
       formats :
@@ -890,7 +889,7 @@ anychart.format.dateTime = function(date, opt_format, opt_timeZone, opt_locale) 
 
   var locale = anychart.format.getDateTimeLocale(opt_locale) ||
       anychart.format.getDateTimeLocale(anychart.format.outputLocale_) ||
-      anychart.format.getDateTimeLocale(anychart.opt.DEFAULT);
+      anychart.format.getDateTimeLocale('default');
   var pattern = opt_format ||
       anychart.format.outputDateTimeFormat_ ||
       anychart.format.outputDateTimeFormat() ||
@@ -930,7 +929,7 @@ anychart.format.number = function(number, opt_decimalsCountOrLocale, opt_decimal
     opt_scale, opt_zeroFillDecimals, opt_scaleSuffixSeparator, opt_useBracketsForNegative) {
   var obj = anychart.format.getNumberLocale(opt_decimalsCountOrLocale);
   var locale = anychart.format.getNumberLocale(anychart.format.outputLocale_) ||
-      anychart.format.getNumberLocale(anychart.opt.DEFAULT);
+      anychart.format.getNumberLocale('default');
 
   var decimalsCount = goog.isNumber(opt_decimalsCountOrLocale) ?
       opt_decimalsCountOrLocale :

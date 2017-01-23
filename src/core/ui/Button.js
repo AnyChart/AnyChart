@@ -551,14 +551,14 @@ anychart.core.ui.Button.prototype.calculateButtonBounds_ = function() {
     } else { // in other case - calculating using parent width
       width = anychart.utils.normalizeSize(/** @type {number|string} */ (this.width_), parentWidth);
     }
-    if (hasText) this.textX = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.getOption(anychart.opt.LEFT)), width);
+    if (hasText) this.textX = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.getOption('left')), width);
   } else { // if width is not set  - it is either the same as text width, or 0
     if (hasText) {// if there is text - adjust
       width = textWidth;
     } else { // or set to 0
       width = 0;
     }
-    if (hasText) this.textX = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.getOption(anychart.opt.LEFT)), width);
+    if (hasText) this.textX = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.getOption('left')), width);
     // if width is not set - use padding
     width = padding.widenWidth(width);
   }
@@ -580,14 +580,14 @@ anychart.core.ui.Button.prototype.calculateButtonBounds_ = function() {
     } else { // in other case - calculating using parent height
       height = anychart.utils.normalizeSize(/** @type {number|string} */ (this.height_), parentHeight);
     }
-    if (hasText) this.textY = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.getOption(anychart.opt.TOP)), height);
+    if (hasText) this.textY = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.getOption('top')), height);
   } else { // if height is not set  - it is either the same as text height, or 0
     if (hasText) { // if there is text - adjust
       height = textHeight;
     } else { // or set to 0
       height = 0;
     }
-    if (hasText) this.textY = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.getOption(anychart.opt.TOP)), height);
+    if (hasText) this.textY = anychart.utils.normalizeSize(/** @type {number|string} */ (padding.getOption('top')), height);
     // if height is not set - use padding
     height = padding.widenHeight(height);
   }

@@ -243,44 +243,44 @@ anychart.core.ui.Title.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  map[anychart.opt.WIDTH] = anychart.core.settings.createDescriptor(
+  map['width'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.WIDTH,
+      'width',
       anychart.core.settings.asIsNormalizer,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map[anychart.opt.HEIGHT] = anychart.core.settings.createDescriptor(
+  map['height'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.HEIGHT,
+      'height',
       anychart.core.settings.asIsNormalizer,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map[anychart.opt.ALIGN] = anychart.core.settings.createDescriptor(
+  map['align'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.ALIGN,
+      'align',
       anychart.enums.normalizeAlign,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map[anychart.opt.ORIENTATION] = anychart.core.settings.createDescriptor(
+  map['orientation'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.ORIENTATION,
+      'orientation',
       anychart.enums.normalizeOrientation,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map[anychart.opt.ROTATION] = anychart.core.settings.createDescriptor(
+  map['rotation'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.ROTATION,
+      'rotation',
       anychart.core.settings.numberNormalizer,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map[anychart.opt.TEXT] = anychart.core.settings.createDescriptor(
+  map['text'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.TEXT,
+      'text',
       anychart.core.settings.stringNormalizer,
       anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
@@ -507,7 +507,7 @@ anychart.core.ui.Title.prototype.padding = function(opt_spaceOrTopOrTopAndBottom
  */
 anychart.core.ui.Title.prototype.defaultOrientation = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var needInvalidate = !this.getOption(anychart.opt.ORIENTATION) && this.defaultOrientation_ != opt_value;
+    var needInvalidate = !this.getOption('orientation') && this.defaultOrientation_ != opt_value;
     this.defaultOrientation_ = opt_value;
     if (needInvalidate)
       this.invalidate(anychart.ConsistencyState.BOUNDS);
@@ -521,7 +521,7 @@ anychart.core.ui.Title.prototype.defaultOrientation = function(opt_value) {
  * @param {number} value .
  */
 anychart.core.ui.Title.prototype.setDefaultRotation = function(value) {
-  var needInvalidate = !this.getOption(anychart.opt.ROTATION) && this.defaultRotation_ != value;
+  var needInvalidate = !this.getOption('rotation') && this.defaultRotation_ != value;
   this.defaultRotation_ = value;
   if (needInvalidate)
     this.invalidate(anychart.ConsistencyState.BOUNDS);
@@ -661,8 +661,8 @@ anychart.core.ui.Title.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     this.calcActualBounds_();
     // settings text offset for
-    this.text_.x(anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().getOption(anychart.opt.LEFT)), this.backgroundWidth_));
-    this.text_.y(anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().getOption(anychart.opt.TOP)), this.backgroundHeight_));
+    this.text_.x(anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().getOption('left')), this.backgroundWidth_));
+    this.text_.y(anychart.utils.normalizeSize(/** @type {number|string} */(this.padding().getOption('top')), this.backgroundHeight_));
 
     this.layer_.setTransformationMatrix(
         this.transformation_.getScaleX(),
@@ -729,7 +729,7 @@ anychart.core.ui.Title.prototype.getRemainingBounds = function() {
     return parentBounds;
   if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
     this.calcActualBounds_();
-  var orient = this.getOption(anychart.opt.ORIENTATION) || this.defaultOrientation_;
+  var orient = this.getOption('orientation') || this.defaultOrientation_;
   switch (orient) {
     case anychart.enums.Orientation.TOP:
       parentBounds.top += this.pixelBounds_.height;
@@ -778,9 +778,9 @@ anychart.core.ui.Title.prototype.getContentBounds = function() {
  * @param {boolean} isInitial - Whether is initial operation.
  */
 anychart.core.ui.Title.prototype.applyTextSettings = function(isInitial) {
-  var textVal = this.getOption(anychart.opt.TEXT);
+  var textVal = this.getOption('text');
   var autoText = /** @type {string} */ (this.autoText());
-  var useHtml = this.getOption(anychart.opt.USE_HTML);
+  var useHtml = this.getOption('useHtml');
 
   if (isInitial || goog.isDef(textVal) || goog.isDef(autoText) || goog.isDef(useHtml)) {
     var text = /** @type {string} */ (!textVal && goog.isDef(autoText) ? autoText : textVal);
@@ -790,24 +790,24 @@ anychart.core.ui.Title.prototype.applyTextSettings = function(isInitial) {
       this.text_.text(text);
     }
   }
-  this.text_.fontSize(/** @type {number|string} */ (this.getOption(anychart.opt.FONT_SIZE)));
-  this.text_.fontFamily(/** @type {string} */ (this.getOption(anychart.opt.FONT_FAMILY)));
-  this.text_.color(/** @type {string} */ (this.getOption(anychart.opt.FONT_COLOR)));
-  this.text_.direction(/** @type {string} */ (this.getOption(anychart.opt.TEXT_DIRECTION)));
-  this.text_.textWrap(/** @type {string} */ (this.getOption(anychart.opt.TEXT_WRAP)));
-  this.text_.opacity(/** @type {number} */ (this.getOption(anychart.opt.FONT_OPACITY)));
-  this.text_.decoration(/** @type {string} */ (this.getOption(anychart.opt.FONT_DECORATION)));
-  this.text_.fontStyle(/** @type {string} */ (this.getOption(anychart.opt.FONT_STYLE)));
-  this.text_.fontVariant(/** @type {string} */ (this.getOption(anychart.opt.FONT_VARIANT)));
-  this.text_.fontWeight(/** @type {number|string} */ (this.getOption(anychart.opt.FONT_WEIGHT)));
-  this.text_.letterSpacing(/** @type {number|string} */ (this.getOption(anychart.opt.LETTER_SPACING)));
-  this.text_.lineHeight(/** @type {number|string} */ (this.getOption(anychart.opt.LINE_HEIGHT)));
-  this.text_.textIndent(/** @type {number} */ (this.getOption(anychart.opt.TEXT_INDENT)));
-  this.text_.vAlign(/** @type {string} */ (this.getOption(anychart.opt.V_ALIGN)));
-  this.text_.hAlign(/** @type {string} */ (this.getOption(anychart.opt.H_ALIGN)));
-  this.text_.textOverflow(/** @type {string} */ (this.getOption(anychart.opt.TEXT_OVERFLOW)));
-  this.text_.selectable(/** @type {boolean} */ (this.getOption(anychart.opt.SELECTABLE)));
-  this.text_.disablePointerEvents(/** @type {boolean} */ (this.getOption(anychart.opt.DISABLE_POINTER_EVENTS)));
+  this.text_.fontSize(/** @type {number|string} */ (this.getOption('fontSize')));
+  this.text_.fontFamily(/** @type {string} */ (this.getOption('fontFamily')));
+  this.text_.color(/** @type {string} */ (this.getOption('fontColor')));
+  this.text_.direction(/** @type {string} */ (this.getOption('textDirection')));
+  this.text_.textWrap(/** @type {string} */ (this.getOption('textWrap')));
+  this.text_.opacity(/** @type {number} */ (this.getOption('fontOpacity')));
+  this.text_.decoration(/** @type {string} */ (this.getOption('fontDecoration')));
+  this.text_.fontStyle(/** @type {string} */ (this.getOption('fontStyle')));
+  this.text_.fontVariant(/** @type {string} */ (this.getOption('fontVariant')));
+  this.text_.fontWeight(/** @type {number|string} */ (this.getOption('fontWeight')));
+  this.text_.letterSpacing(/** @type {number|string} */ (this.getOption('letterSpacing')));
+  this.text_.lineHeight(/** @type {number|string} */ (this.getOption('lineHeight')));
+  this.text_.textIndent(/** @type {number} */ (this.getOption('textIndent')));
+  this.text_.vAlign(/** @type {string} */ (this.getOption('vAlign')));
+  this.text_.hAlign(/** @type {string} */ (this.getOption('hAlign')));
+  this.text_.textOverflow(/** @type {string} */ (this.getOption('textOverflow')));
+  this.text_.selectable(/** @type {boolean} */ (this.getOption('selectable')));
+  this.text_.disablePointerEvents(/** @type {boolean} */ (this.getOption('disablePointerEvents')));
 };
 
 
@@ -816,10 +816,10 @@ anychart.core.ui.Title.prototype.applyTextSettings = function(isInitial) {
  * @return {number} Rotation degree.
  */
 anychart.core.ui.Title.prototype.getRotation = function() {
-  var ownRotation = this.getOwnOption(anychart.opt.ROTATION);
-  var rotation = goog.isDef(ownRotation) ? ownRotation : this.getOption(anychart.opt.ROTATION);
+  var ownRotation = this.getOwnOption('rotation');
+  var rotation = goog.isDef(ownRotation) ? ownRotation : this.getOption('rotation');
   if (!goog.isDef(rotation)) {
-    var orientation = this.getOption(anychart.opt.ORIENTATION) || this.defaultOrientation_;
+    var orientation = this.getOption('orientation') || this.defaultOrientation_;
     switch (orientation) {
       case anychart.enums.Orientation.LEFT:
         return -90;
@@ -846,7 +846,7 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
   var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
 
   var parentWidth, parentHeight;
-  var orientation = this.getOption(anychart.opt.ORIENTATION) || this.defaultOrientation_;
+  var orientation = this.getOption('orientation') || this.defaultOrientation_;
 
   var isRLYHorizontal = this.getRotation() % 180 == 0;
   if (parentBounds) {
@@ -877,7 +877,7 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
   textBounds = this.text_.getBounds();
 
 
-  var width = this.hasOwnOption(anychart.opt.WIDTH) ? this.getOwnOption(anychart.opt.WIDTH) : (this.autoWidth_ || null);
+  var width = this.hasOwnOption('width') ? this.getOwnOption('width') : (this.autoWidth_ || null);
   if (goog.isNull(width)) {
     this.textWidth_ = textBounds.width;
     this.backgroundWidth_ = padding.widenWidth(this.textWidth_);
@@ -897,8 +897,8 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
   this.text_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
   textBounds = this.text_.getBounds();
 
-  if (this.hasOwnOption(anychart.opt.HEIGHT)) {
-    this.backgroundHeight_ = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOwnOption(anychart.opt.HEIGHT)), parentHeight);
+  if (this.hasOwnOption('height')) {
+    this.backgroundHeight_ = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOwnOption('height')), parentHeight);
     this.textHeight_ = padding.tightenHeight(this.backgroundHeight_);
   } else {
     this.textHeight_ = textBounds.height;
@@ -909,7 +909,7 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
     this.backgroundHeight_ = margin.tightenHeight(parentHeight);
     this.textHeight_ = padding.tightenHeight(this.backgroundHeight_);
     this.text_.height(this.textHeight_);
-  } else if (this.hasOwnOption(anychart.opt.HEIGHT))
+  } else if (this.hasOwnOption('height'))
     this.text_.height(this.textHeight_);
 
   this.pixelBounds_ = new anychart.math.Rect(-this.backgroundWidth_ / 2, -this.backgroundHeight_ / 2, this.backgroundWidth_, this.backgroundHeight_);
@@ -917,10 +917,10 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
   /** @type {!anychart.math.Rect} */
   var bounds = acgraph.math.getBoundsOfRectWithTransform(this.pixelBounds_, transform);
 
-  var leftMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption(anychart.opt.LEFT)), this.backgroundWidth_);
-  var rightMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption(anychart.opt.RIGHT)), this.backgroundWidth_);
-  var topMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption(anychart.opt.TOP)), this.backgroundHeight_);
-  var bottomMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption(anychart.opt.BOTTOM)), this.backgroundHeight_);
+  var leftMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption('left')), this.backgroundWidth_);
+  var rightMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption('right')), this.backgroundWidth_);
+  var topMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption('top')), this.backgroundHeight_);
+  var bottomMargin = anychart.utils.normalizeSize(/** @type {number|string} */(margin.getOption('bottom')), this.backgroundHeight_);
 
   var wHalf = bounds.width / 2;
   var hHalf = bounds.height / 2;
@@ -933,7 +933,7 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
   if (parentBounds) {
     if (isHorizontal || isRLYHorizontal) {
       if (isHorizontal) {
-        switch (this.getOption(anychart.opt.ALIGN)) {
+        switch (this.getOption('align')) {
           case anychart.enums.Align.LEFT:
             x = parentBounds.getLeft() + leftMargin + wHalf;
             break;
@@ -955,7 +955,7 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
         } else if (orientation == anychart.enums.Orientation.LEFT) {
           x = parentBounds.getLeft() + leftMargin + wHalf;
         }
-        switch (this.getOption(anychart.opt.ALIGN)) {
+        switch (this.getOption('align')) {
           case anychart.enums.Align.TOP:
           case anychart.enums.Align.LEFT:
             y = parentBounds.getTop() + topMargin + hHalf;
@@ -970,7 +970,7 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
         }
       }
     } else if (orientation == anychart.enums.Orientation.LEFT) {
-      switch (this.getOption(anychart.opt.ALIGN)) {
+      switch (this.getOption('align')) {
         case anychart.enums.Align.TOP:
         case anychart.enums.Align.RIGHT:
           y = parentBounds.getTop() + rightMargin + hHalf;
@@ -985,7 +985,7 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
       }
       x = parentBounds.getLeft() + topMargin + wHalf;
     } else {
-      switch (this.getOption(anychart.opt.ALIGN)) {
+      switch (this.getOption('align')) {
         case anychart.enums.Align.TOP:
         case anychart.enums.Align.LEFT:
           y = parentBounds.getTop() + leftMargin + hHalf;
@@ -1061,11 +1061,11 @@ anychart.core.ui.Title.prototype.clear = function() {
 /** @inheritDoc */
 anychart.core.ui.Title.prototype.enabled = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.ownSettings[anychart.opt.ENABLED] != opt_value) {
-      this.ownSettings[anychart.opt.ENABLED] = opt_value;
+    if (this.ownSettings['enabled'] != opt_value) {
+      this.ownSettings['enabled'] = opt_value;
       this.invalidate(anychart.ConsistencyState.ENABLED,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED | anychart.Signal.ENABLED_STATE_CHANGED);
-      if (this.ownSettings[anychart.opt.ENABLED]) {
+      if (this.ownSettings['enabled']) {
         this.doubleSuspension = false;
         this.resumeSignalsDispatching(true);
       } else {
@@ -1078,7 +1078,7 @@ anychart.core.ui.Title.prototype.enabled = function(opt_value) {
     }
     return this;
   } else {
-    return /** @type {boolean} */(this.getOption(anychart.opt.ENABLED));
+    return /** @type {boolean} */(this.getOption('enabled'));
   }
 };
 
@@ -1098,8 +1098,8 @@ anychart.core.ui.Title.prototype.setThemeSettings = function(config) {
     if (goog.isDef(val))
       this.themeSettings[name] = val;
   }
-  if (anychart.opt.ENABLED in config) this.themeSettings[anychart.opt.ENABLED] = config[anychart.opt.ENABLED];
-  if (anychart.opt.Z_INDEX in config) this.themeSettings[anychart.opt.Z_INDEX] = config[anychart.opt.Z_INDEX];
+  if ('enabled' in config) this.themeSettings['enabled'] = config['enabled'];
+  if ('zIndex' in config) this.themeSettings['zIndex'] = config['zIndex'];
 };
 
 
@@ -1108,20 +1108,20 @@ anychart.core.ui.Title.prototype.serialize = function() {
   var json = {};
 
   var zIndex;
-  if (this.hasOwnOption(anychart.opt.Z_INDEX)) {
-    zIndex = this.getOwnOption(anychart.opt.Z_INDEX);
+  if (this.hasOwnOption('zIndex')) {
+    zIndex = this.getOwnOption('zIndex');
   }
   if (!goog.isDef(zIndex)) {
-    zIndex = this.getThemeOption(anychart.opt.Z_INDEX);
+    zIndex = this.getThemeOption('zIndex');
   }
   if (goog.isDef(zIndex)) json['zIndex'] = zIndex;
 
   var enabled;
-  if (this.hasOwnOption(anychart.opt.ENABLED)) {
-    enabled = this.getOwnOption(anychart.opt.ENABLED);
+  if (this.hasOwnOption('enabled')) {
+    enabled = this.getOwnOption('enabled');
   }
   if (!goog.isDef(enabled)) {
-    enabled = this.getThemeOption(anychart.opt.ENABLED);
+    enabled = this.getThemeOption('enabled');
   }
   if (goog.isDef(enabled))
     json['enabled'] = enabled;
@@ -1147,16 +1147,16 @@ anychart.core.ui.Title.prototype.serialize = function() {
 anychart.core.ui.Title.prototype.specialSetupByVal = function(value, opt_default) {
   if (goog.isString(value)) {
     if (opt_default) {
-      this.themeSettings[anychart.opt.TEXT] = value;
-      this.themeSettings[anychart.opt.ENABLED] = true;
+      this.themeSettings['text'] = value;
+      this.themeSettings['enabled'] = true;
     } else {
-      this[anychart.opt.TEXT](value);
+      this['text'](value);
       this.enabled(true);
     }
     return true;
   } else if (goog.isBoolean(value) || goog.isNull(value)) {
     if (opt_default)
-      this.themeSettings[anychart.opt.ENABLED] = !!value;
+      this.themeSettings['enabled'] = !!value;
     else
       this.enabled(!!value);
     return true;
@@ -1175,14 +1175,14 @@ anychart.core.ui.Title.prototype.setupByJSON = function(config, opt_default) {
     anychart.core.ui.Title.base(this, 'setupByJSON', config);
   }
 
-  if (anychart.opt.BACKGROUND in config)
-    this.background(config[anychart.opt.BACKGROUND]);
+  if ('background' in config)
+    this.background(config['background']);
 
-  if (anychart.opt.PADDING in config)
-    this.padding(config[anychart.opt.PADDING]);
+  if ('padding' in config)
+    this.padding(config['padding']);
 
-  if (anychart.opt.MARGIN in config)
-    this.margin(config[anychart.opt.MARGIN]);
+  if ('margin' in config)
+    this.margin(config['margin']);
 };
 //endregion
 

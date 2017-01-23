@@ -339,8 +339,8 @@ anychart.core.stock.Grouping.prototype.parseLevels_ = function(intervals) {
         unit = intervalObj;
         count = 1;
       } else if (goog.isObject(intervalObj)) {
-        unit = String(intervalObj[anychart.opt.UNIT]);
-        count = anychart.utils.normalizeToNaturalNumber(intervalObj[anychart.opt.COUNT], 1, false);
+        unit = String(intervalObj['unit']);
+        count = anychart.utils.normalizeToNaturalNumber(intervalObj['count'], 1, false);
       }
       if (unit) {
         var interval = new anychart.core.utils.DateTimeIntervalGenerator(unit, /** @type {number} */(count));
@@ -396,11 +396,11 @@ anychart.core.stock.Grouping.prototype.disposeInternal = function() {
 anychart.core.stock.Grouping.prototype.serialize = function() {
   var json = anychart.core.stock.Grouping.base(this, 'serialize');
 
-  json[anychart.opt.ENABLED] = this.enabled_;
-  json[anychart.opt.FORCED] = this.forced_;
-  json[anychart.opt.LEVELS] = this.exportLevels_();
-  json[anychart.opt.MAX_VISIBLE_POINTS] = isNaN(this.maxPoints_) ? null : this.maxPoints_;
-  json[anychart.opt.MIN_PIX_PER_POINT] = isNaN(this.minPixels_) ? null : this.minPixels_;
+  json['enabled'] = this.enabled_;
+  json['forced'] = this.forced_;
+  json['levels'] = this.exportLevels_();
+  json['maxVisiblePoints'] = isNaN(this.maxPoints_) ? null : this.maxPoints_;
+  json['minPixPerPoint'] = isNaN(this.minPixels_) ? null : this.minPixels_;
   // if (goog.isFunction(this.xMode_)) {
   //   anychart.core.reporting.warning(
   //       anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
@@ -408,7 +408,7 @@ anychart.core.stock.Grouping.prototype.serialize = function() {
   //       ['Stock grouping xMode']
   //   );
   // } else {
-  //   json[anychart.opt.X_MODE] = this.xMode_;
+  //   json['x'_MODE] = this.xMode_;
   // }
 
   return json;
@@ -435,12 +435,12 @@ anychart.core.stock.Grouping.prototype.setupSpecial = function(var_args) {
 anychart.core.stock.Grouping.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.stock.Grouping.base(this, 'setupByJSON', config, opt_default);
 
-  this.enabled(config[anychart.opt.ENABLED]);
-  this.forced(config[anychart.opt.FORCED]);
-  this.levels(config[anychart.opt.LEVELS]);
-  this.maxVisiblePoints(config[anychart.opt.MAX_VISIBLE_POINTS]);
-  this.minPixPerPoint(config[anychart.opt.MIN_PIX_PER_POINT]);
-  // this.xMode(config[anychart.opt.X_MODE]);
+  this.enabled(config['enabled']);
+  this.forced(config['forced']);
+  this.levels(config['levels']);
+  this.maxVisiblePoints(config['maxVisiblePoints']);
+  this.minPixPerPoint(config['minPixPerPoint']);
+  // this.xMode(config['x'_MODE]);
 };
 
 

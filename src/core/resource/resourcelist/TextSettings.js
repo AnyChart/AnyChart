@@ -22,135 +22,135 @@ goog.inherits(anychart.core.resource.resourceList.TextSettings, anychart.core.re
 anychart.core.resource.resourceList.TextSettings.PROPERTY_DESCRIPTORS = (function() {
   var map = {};
 
-  map[anychart.opt.FONT_SIZE] = anychart.core.settings.createDescriptor(
+  map['fontSize'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.FONT_SIZE,
+      'fontSize',
       anychart.core.settings.stringNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.FONT_FAMILY] = anychart.core.settings.createDescriptor(
+  map['fontFamily'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.FONT_FAMILY,
+      'fontFamily',
       anychart.core.settings.stringNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.FONT_COLOR] = anychart.core.settings.createDescriptor(
+  map['fontColor'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.FONT_COLOR,
+      'fontColor',
       anychart.core.settings.stringNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.FONT_OPACITY] = anychart.core.settings.createDescriptor(
+  map['fontOpacity'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.FONT_OPACITY,
+      'fontOpacity',
       anychart.core.settings.ratioNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.FONT_DECORATION] = anychart.core.settings.createDescriptor(
+  map['fontDecoration'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.FONT_DECORATION,
+      'fontDecoration',
       anychart.core.settings.asIsNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.FONT_STYLE] = anychart.core.settings.createDescriptor(
+  map['fontStyle'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.FONT_STYLE,
+      'fontStyle',
       anychart.core.settings.asIsNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.FONT_VARIANT] = anychart.core.settings.createDescriptor(
+  map['fontVariant'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.FONT_VARIANT,
+      'fontVariant',
       anychart.core.settings.asIsNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.FONT_WEIGHT] = anychart.core.settings.createDescriptor(
+  map['fontWeight'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.FONT_WEIGHT,
+      'fontWeight',
       anychart.core.settings.numberOrStringNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.LETTER_SPACING] = anychart.core.settings.createDescriptor(
+  map['letterSpacing'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.LETTER_SPACING,
+      'letterSpacing',
       anychart.core.settings.numberOrStringNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.TEXT_DIRECTION] = anychart.core.settings.createDescriptor(
+  map['textDirection'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.TEXT_DIRECTION,
+      'textDirection',
       anychart.core.settings.asIsNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.LINE_HEIGHT] = anychart.core.settings.createDescriptor(
+  map['lineHeight'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.LINE_HEIGHT,
+      'lineHeight',
       anychart.core.settings.numberOrStringNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.TEXT_INDENT] = anychart.core.settings.createDescriptor(
+  map['textIndent'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.TEXT_INDENT,
+      'textIndent',
       anychart.core.settings.numberNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.V_ALIGN] = anychart.core.settings.createDescriptor(
+  map['vAlign'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.V_ALIGN,
+      'vAlign',
       anychart.core.settings.asIsNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.H_ALIGN] = anychart.core.settings.createDescriptor(
+  map['hAlign'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.H_ALIGN,
+      'hAlign',
       anychart.core.settings.asIsNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.TEXT_WRAP] = anychart.core.settings.createDescriptor(
+  map['textWrap'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.TEXT_WRAP,
+      'textWrap',
       anychart.core.settings.asIsNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.TEXT_OVERFLOW] = anychart.core.settings.createDescriptor(
+  map['textOverflow'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.TEXT_OVERFLOW,
+      'textOverflow',
       anychart.core.settings.asIsNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.SELECTABLE] = anychart.core.settings.createDescriptor(
+  map['selectable'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.SELECTABLE,
+      'selectable',
       anychart.core.settings.booleanNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.USE_HTML] = anychart.core.settings.createDescriptor(
+  map['useHtml'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.USE_HTML,
+      'useHtml',
       anychart.core.settings.booleanNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.DISABLE_POINTER_EVENTS] = anychart.core.settings.createDescriptor(
+  map['disablePointerEvents'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.DISABLE_POINTER_EVENTS,
+      'disablePointerEvents',
       anychart.core.settings.booleanNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);

@@ -2,7 +2,6 @@ goog.provide('anychart.core.drawers.Column');
 goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
 goog.require('anychart.enums');
-goog.require('anychart.opt');
 
 
 
@@ -50,8 +49,8 @@ anychart.core.drawers.Column.prototype.flags = (
 /** @inheritDoc */
 anychart.core.drawers.Column.prototype.requiredShapes = (function() {
   var res = {};
-  res[anychart.opt.PATH] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.HATCH_FILL] = anychart.enums.ShapeType.PATH;
+  res['path'] = anychart.enums.ShapeType.PATH;
+  res['hatchFill'] = anychart.enums.ShapeType.PATH;
   return res;
 })();
 
@@ -66,7 +65,7 @@ anychart.core.drawers.Column.prototype.drawSubsequentPoint = function(point, sta
 /** @inheritDoc */
 anychart.core.drawers.Column.prototype.updatePointOnAnimate = function(point) {
   // this code can currently work with Bar series created with PerPoint shape managers.
-  var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta(anychart.opt.SHAPES));
+  var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta('shapes'));
   for (var i in shapes)
     shapes[i].clear();
   this.drawPoint_(point, shapes);
@@ -80,14 +79,14 @@ anychart.core.drawers.Column.prototype.updatePointOnAnimate = function(point) {
  * @private
  */
 anychart.core.drawers.Column.prototype.drawPoint_ = function(point, shapes) {
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var zero = /** @type {number} */(point.meta(anychart.opt.ZERO));
-  var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
+  var x = /** @type {number} */(point.meta('x'));
+  var zero = /** @type {number} */(point.meta('zero'));
+  var y = /** @type {number} */(point.meta('value'));
 
   var leftX = x - this.pointWidth / 2;
   var rightX = leftX + this.pointWidth;
 
-  var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(shapes[anychart.opt.PATH].stroke()));
+  var thickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(shapes['path'].stroke()));
   if (this.crispEdges) {
     leftX = anychart.utils.applyPixelShift(leftX, thickness);
     rightX = anychart.utils.applyPixelShift(rightX, thickness);
@@ -95,11 +94,11 @@ anychart.core.drawers.Column.prototype.drawPoint_ = function(point, shapes) {
   y = anychart.utils.applyPixelShift(y, thickness);
   zero = anychart.utils.applyPixelShift(zero, thickness);
 
-  var path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.PATH]);
+  var path = /** @type {acgraph.vector.Path} */(shapes['path']);
   anychart.core.drawers.move(path, this.isVertical, leftX, y);
   anychart.core.drawers.line(path, this.isVertical, rightX, y, rightX, zero, leftX, zero);
   path.close();
-  path = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.HATCH_FILL]);
+  path = /** @type {acgraph.vector.Path} */(shapes['hatchFill']);
   anychart.core.drawers.move(path, this.isVertical, leftX, y);
   anychart.core.drawers.line(path, this.isVertical, rightX, y, rightX, zero, leftX, zero);
   path.close();

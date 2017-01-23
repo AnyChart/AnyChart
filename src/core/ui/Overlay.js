@@ -68,16 +68,16 @@ anychart.core.ui.Overlay.DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  map[anychart.opt.ID] = anychart.core.settings.createDescriptor(
+  map['id'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.ID,
+      'id',
       anychart.core.settings.asIsNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.CLASS_NAME] = anychart.core.settings.createDescriptor(
+  map['className'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.CLASS_NAME,
+      'className',
       anychart.core.settings.asIsNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
@@ -94,8 +94,8 @@ anychart.core.settings.populate(anychart.core.ui.Overlay, anychart.core.ui.Overl
  */
 anychart.core.ui.Overlay.prototype.enabled = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.settings[anychart.opt.ENABLED] != opt_value) {
-      var enabled = this.settings[anychart.opt.ENABLED] = opt_value;
+    if (this.settings['enabled'] != opt_value) {
+      var enabled = this.settings['enabled'] = opt_value;
       this.invalidate(anychart.ConsistencyState.ENABLED, anychart.Signal.NEEDS_REDRAW);
       if (enabled) {
         this.doubleSuspension = false;
@@ -110,7 +110,7 @@ anychart.core.ui.Overlay.prototype.enabled = function(opt_value) {
     }
     return this;
   } else {
-    return /** @type {boolean} */(this.getOption(anychart.opt.ENABLED));
+    return /** @type {boolean} */(this.getOption('enabled'));
   }
 };
 
@@ -264,11 +264,11 @@ anychart.core.ui.Overlay.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var id = this.getOption(anychart.opt.ID);
+    var id = this.getOption('id');
     if (goog.isDef(id))
       this.domElement_.setAttribute('id', id);
 
-    var className = this.getOption(anychart.opt.CLASS_NAME);
+    var className = this.getOption('className');
     if (goog.isDef(className))
       goog.dom.classlist.set(this.domElement_, /** @type {string} */(className));
 
@@ -305,7 +305,7 @@ anychart.core.ui.Overlay.prototype.remove = function() {
 anychart.core.ui.Overlay.prototype.specialSetupByVal = function(value, opt_default) {
   if (goog.isBoolean(value) || goog.isNull(value)) {
     if (opt_default) {
-      this.defaultSettings[anychart.opt.ENABLED] = !!value;
+      this.defaultSettings['enabled'] = !!value;
     } else {
       this.enabled(!!value);
     }
@@ -321,8 +321,8 @@ anychart.core.ui.Overlay.prototype.specialSetupByVal = function(value, opt_defau
  */
 anychart.core.ui.Overlay.prototype.setThemeSettings = function(config) {
   anychart.core.settings.copy(this.defaultSettings, anychart.core.ui.Overlay.DESCRIPTORS, config);
-  if (anychart.opt.ENABLED in config)
-    this.defaultSettings[anychart.opt.ENABLED] = config[anychart.opt.ENABLED];
+  if ('enabled' in config)
+    this.defaultSettings['enabled'] = config['enabled'];
 };
 
 
@@ -332,11 +332,11 @@ anychart.core.ui.Overlay.prototype.serialize = function() {
   anychart.core.settings.serialize(this, anychart.core.ui.Overlay.DESCRIPTORS, json, 'Overlay ui element');
 
   var enabled;
-  if (this.hasOwnOption(anychart.opt.ENABLED)) {
-    enabled = this.getOwnOption(anychart.opt.ENABLED);
+  if (this.hasOwnOption('enabled')) {
+    enabled = this.getOwnOption('enabled');
   }
   if (!goog.isDef(enabled)) {
-    enabled = this.getThemeOption(anychart.opt.ENABLED);
+    enabled = this.getThemeOption('enabled');
   }
   json['enabled'] = goog.isDef(enabled) ? enabled : null;
 

@@ -2,7 +2,6 @@ goog.provide('anychart.core.drawers.Bubble');
 goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
 goog.require('anychart.enums');
-goog.require('anychart.opt');
 
 
 
@@ -50,24 +49,24 @@ anychart.core.drawers.Bubble.prototype.flags = (
 /** @inheritDoc */
 anychart.core.drawers.Bubble.prototype.requiredShapes = (function() {
   var res = {};
-  res[anychart.opt.CIRCLE] = anychart.enums.ShapeType.CIRCLE;
-  res[anychart.opt.HATCH_FILL] = anychart.enums.ShapeType.CIRCLE;
-  res[anychart.opt.NEGATIVE] = anychart.enums.ShapeType.CIRCLE;
-  res[anychart.opt.NEGATIVE_HATCH_FILL] = anychart.enums.ShapeType.CIRCLE;
+  res['circle'] = anychart.enums.ShapeType.CIRCLE;
+  res['hatchFill'] = anychart.enums.ShapeType.CIRCLE;
+  res['negative'] = anychart.enums.ShapeType.CIRCLE;
+  res['negativeHatchFill'] = anychart.enums.ShapeType.CIRCLE;
   return res;
 })();
 
 
 /** @inheritDoc */
 anychart.core.drawers.Bubble.prototype.drawSubsequentPoint = function(point, state) {
-  var size = /** @type {number} */(point.meta(anychart.opt.SIZE));
+  var size = /** @type {number} */(point.meta('size'));
   var name, hatchName;
   if (size < 0) {
-    name = anychart.opt.NEGATIVE;
-    hatchName = anychart.opt.NEGATIVE_HATCH_FILL;
+    name = 'negative';
+    hatchName = 'negativeHatchFill';
   } else {
-    name = anychart.opt.CIRCLE;
-    hatchName = anychart.opt.HATCH_FILL;
+    name = 'circle';
+    hatchName = 'hatchFill';
   }
   var shapeNames = {};
   shapeNames[name] = true;
@@ -80,7 +79,7 @@ anychart.core.drawers.Bubble.prototype.drawSubsequentPoint = function(point, sta
 /** @inheritDoc */
 anychart.core.drawers.Bubble.prototype.updatePointOnAnimate = function(point) {
   // this code can currently work with Bar series created with PerPoint shape managers.
-  var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta(anychart.opt.SHAPES));
+  var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta('shapes'));
   this.drawPoint_(point, shapes);
 };
 
@@ -92,9 +91,9 @@ anychart.core.drawers.Bubble.prototype.updatePointOnAnimate = function(point) {
  * @private
  */
 anychart.core.drawers.Bubble.prototype.drawPoint_ = function(point, shapes) {
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
-  var size = /** @type {number} */(point.meta(anychart.opt.SIZE));
+  var x = /** @type {number} */(point.meta('x'));
+  var y = /** @type {number} */(point.meta('value'));
+  var size = /** @type {number} */(point.meta('size'));
   size = Math.abs(size);
 
   if (this.isVertical) {

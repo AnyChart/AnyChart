@@ -2,7 +2,6 @@ goog.provide('anychart.core.stock.indicators.BBands');
 goog.require('anychart.core.stock.indicators.Base');
 goog.require('anychart.enums');
 goog.require('anychart.math.bbands');
-goog.require('anychart.opt');
 goog.require('anychart.utils');
 
 
@@ -35,8 +34,8 @@ anychart.core.stock.indicators.BBands = function(plot, mapping, opt_period, opt_
    */
   this.deviation_ = anychart.utils.normalizeToNaturalNumber(opt_deviation, 2, false);
 
-  this.declareSeries(anychart.opt.UP, opt_upSeriesType);
-  this.declareSeries(anychart.opt.DOWN, opt_downSeriesType);
+  this.declareSeries('up', opt_upSeriesType);
+  this.declareSeries('down', opt_downSeriesType);
   this.init();
 };
 goog.inherits(anychart.core.stock.indicators.BBands, anychart.core.stock.indicators.Base);
@@ -51,9 +50,9 @@ anychart.core.stock.indicators.BBands.prototype.createComputer = function(mappin
 /** @inheritDoc */
 anychart.core.stock.indicators.BBands.prototype.createNameForSeries = function(seriesId, series) {
   switch (seriesId) {
-    case anychart.opt.UP:
+    case 'up':
       return 'BBands U';
-    case anychart.opt.DOWN:
+    case 'down':
       return 'BBands L';
   }
   return '';
@@ -63,11 +62,11 @@ anychart.core.stock.indicators.BBands.prototype.createNameForSeries = function(s
 /** @inheritDoc */
 anychart.core.stock.indicators.BBands.prototype.setupMapping = function(mapping, computer, seriesId, series) {
   switch (seriesId) {
-    case anychart.opt.UP:
-      mapping.addField(anychart.opt.VALUE, computer.getFieldIndex(anychart.opt.UP_RESULT));
+    case 'up':
+      mapping.addField('value', computer.getFieldIndex('upResult'));
       break;
-    case anychart.opt.DOWN:
-      mapping.addField(anychart.opt.VALUE, computer.getFieldIndex(anychart.opt.DOWN_RESULT));
+    case 'down':
+      mapping.addField('value', computer.getFieldIndex('downResult'));
       break;
   }
 };
@@ -80,7 +79,7 @@ anychart.core.stock.indicators.BBands.prototype.setupMapping = function(mapping,
  */
 anychart.core.stock.indicators.BBands.prototype.upSeries = function(opt_type) {
   return /** @type {anychart.core.stock.indicators.BBands|anychart.core.series.Stock} */(
-      this.seriesInternal(anychart.opt.UP, opt_type));
+      this.seriesInternal('up', opt_type));
 };
 
 
@@ -91,7 +90,7 @@ anychart.core.stock.indicators.BBands.prototype.upSeries = function(opt_type) {
  */
 anychart.core.stock.indicators.BBands.prototype.downSeries = function(opt_type) {
   return /** @type {anychart.core.stock.indicators.BBands|anychart.core.series.Stock} */(
-      this.seriesInternal(anychart.opt.DOWN, opt_type));
+      this.seriesInternal('down', opt_type));
 };
 
 

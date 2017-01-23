@@ -3927,7 +3927,7 @@ anychart.core.PyramidFunnelBase.prototype.setupByJSON = function(config, opt_def
   this.palette(config['palette']);
   this.pointsPadding(config['pointsPadding']);
 
-  if (anychart.opt.TOOLTIP in config)
+  if ('tooltip' in config)
     this.tooltip().setupByVal(config['tooltip'], opt_default);
 };
 

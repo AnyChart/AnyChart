@@ -31,7 +31,7 @@ anychart.core.annotations.VerticalLine = function(chartController) {
    */
   this.strokeResolver_ = /** @type {function(anychart.core.annotations.Base,number):acgraph.vector.Stroke} */(
       anychart.core.annotations.Base.getColorResolver(
-          [anychart.opt.STROKE, anychart.opt.HOVER_STROKE, anychart.opt.SELECT_STROKE],
+          ['stroke', 'hoverStroke', 'selectStroke'],
           anychart.enums.ColorType.STROKE));
 };
 goog.inherits(anychart.core.annotations.VerticalLine, anychart.core.annotations.Base);
@@ -97,7 +97,7 @@ anychart.core.annotations.VerticalLine.prototype.colorize = function(state) {
       .stroke(this.strokeResolver_(this, state));
   this.paths_[1]
       .fill(anychart.color.TRANSPARENT_HANDLER)
-      .stroke(/** @type {acgraph.vector.SolidFill} */(anychart.color.TRANSPARENT_HANDLER), this[anychart.opt.HOVER_GAP]() * 2);
+      .stroke(/** @type {acgraph.vector.SolidFill} */(anychart.color.TRANSPARENT_HANDLER), this['hoverGap']() * 2);
 };
 //endregion
 

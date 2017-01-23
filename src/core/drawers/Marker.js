@@ -2,7 +2,6 @@ goog.provide('anychart.core.drawers.Marker');
 goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
 goog.require('anychart.enums');
-goog.require('anychart.opt');
 
 
 
@@ -20,16 +19,16 @@ anychart.core.drawers.Marker = function(series) {
    * @private
    */
   this.typeGetter_ = anychart.core.series.Base.getSettingsResolver(
-      [anychart.opt.TYPE, anychart.opt.HOVER_TYPE, anychart.opt.SELECT_TYPE],
+      ['type', 'hoverType', 'selectType'],
       anychart.core.settings.markerTypeNormalizer);
   /**
    * @type {function(anychart.core.series.Base, anychart.data.IRowInfo, number):*}
    * @private
    */
   this.sizeGetter_ = anychart.core.series.Base.getSettingsResolver(
-      [anychart.opt.MARKER_SIZE, anychart.opt.HOVER_MARKER_SIZE, anychart.opt.SELECT_MARKER_SIZE],
+      ['markerSize', 'hoverMarkerSize', 'selectMarkerSize'],
       anychart.core.settings.numberNormalizer,
-      [anychart.opt.SIZE, anychart.opt.HOVER_SIZE, anychart.opt.SELECT_SIZE]);
+      ['size', 'hoverSize', 'selectSize']);
 };
 goog.inherits(anychart.core.drawers.Marker, anychart.core.drawers.Base);
 anychart.core.drawers.AvailableDrawers[anychart.enums.SeriesDrawerTypes.MARKER] = anychart.core.drawers.Marker;
@@ -66,19 +65,19 @@ anychart.core.drawers.Marker.prototype.flags = (
 /** @inheritDoc */
 anychart.core.drawers.Marker.prototype.requiredShapes = (function() {
   var res = {};
-  res[anychart.opt.PATH] = anychart.enums.ShapeType.PATH;
-  res[anychart.opt.HATCH_FILL] = anychart.enums.ShapeType.PATH;
+  res['path'] = anychart.enums.ShapeType.PATH;
+  res['hatchFill'] = anychart.enums.ShapeType.PATH;
   return res;
 })();
 
 
 /** @inheritDoc */
 anychart.core.drawers.Marker.prototype.updatePointInternal = function(point, state) {
-  var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta(anychart.opt.SHAPES));
+  var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta('shapes'));
   // this can happen before first draw in Cartesian.prepareData()
   if (shapes) {
-    shapes[anychart.opt.PATH].clear();
-    shapes[anychart.opt.HATCH_FILL].clear();
+    shapes['path'].clear();
+    shapes['hatchFill'].clear();
     this.drawPoint_(point, state, shapes);
   }
 };
@@ -99,8 +98,8 @@ anychart.core.drawers.Marker.prototype.drawSubsequentPoint = function(point, sta
  * @private
  */
 anychart.core.drawers.Marker.prototype.drawPoint_ = function(point, state, shapes) {
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
+  var x = /** @type {number} */(point.meta('x'));
+  var y = /** @type {number} */(point.meta('value'));
   var type = /** @type {anychart.enums.MarkerType|Function} */(this.typeGetter_(this.series, point, state));
   var size = /** @type {number} */(this.sizeGetter_(this.series, point, state));
   var drawer = goog.isFunction(type) ? type : anychart.utils.getMarkerDrawer(type);
@@ -110,6 +109,6 @@ anychart.core.drawers.Marker.prototype.drawPoint_ = function(point, state, shape
     y = tmp;
   }
 
-  drawer(shapes[anychart.opt.PATH], x, y, size);
-  drawer(shapes[anychart.opt.HATCH_FILL], x, y, size);
+  drawer(shapes['path'], x, y, size);
+  drawer(shapes['hatchFill'], x, y, size);
 };

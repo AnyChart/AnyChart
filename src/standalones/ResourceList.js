@@ -25,23 +25,23 @@ anychart.core.makeStandalone(anychart.standalones.ResourceList, anychart.core.re
 anychart.standalones.ResourceList.PROPERTY_DESCRIPTORS = (function() {
   var map = {};
 
-  map[anychart.opt.ROW_HEIGHT] = anychart.core.settings.createDescriptor(
+  map['rowHeight'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.ROW_HEIGHT,
+      'rowHeight',
       anychart.core.settings.numberOrPercentNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.MIN_ROW_HEIGHT] = anychart.core.settings.createDescriptor(
+  map['minRowHeight'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.MIN_ROW_HEIGHT,
+      'minRowHeight',
       anychart.core.settings.numberOrPercentNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map[anychart.opt.MAX_ROW_HEIGHT] = anychart.core.settings.createDescriptor(
+  map['maxRowHeight'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      anychart.opt.MAX_ROW_HEIGHT,
+      'maxRowHeight',
       anychart.core.settings.numberOrPercentNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
@@ -124,7 +124,7 @@ anychart.standalones.ResourceList.prototype.getIterator = function() {
 
 /** @inheritDoc */
 anychart.standalones.ResourceList.prototype.getItemHeight = function(item, listHeight) {
-  var result = this.getOption(anychart.opt.ROW_HEIGHT);
+  var result = this.getOption('rowHeight');
   result = anychart.utils.normalizeSize(/** @type {number} */(result), listHeight);
   return result;
 };
@@ -132,7 +132,7 @@ anychart.standalones.ResourceList.prototype.getItemHeight = function(item, listH
 
 /** @inheritDoc */
 anychart.standalones.ResourceList.prototype.getMinItemHeight = function(item, listHeight) {
-  var result = this.getOption(anychart.opt.MIN_ROW_HEIGHT);
+  var result = this.getOption('minRowHeight');
   result = anychart.utils.normalizeSize(/** @type {number} */(result), listHeight);
   return result;
 };
@@ -140,7 +140,7 @@ anychart.standalones.ResourceList.prototype.getMinItemHeight = function(item, li
 
 /** @inheritDoc */
 anychart.standalones.ResourceList.prototype.getMaxItemHeight = function(item, listHeight) {
-  var result = this.getOption(anychart.opt.MAX_ROW_HEIGHT);
+  var result = this.getOption('maxRowHeight');
   result = anychart.utils.normalizeSize(/** @type {number} */(result), listHeight);
   return result;
 };

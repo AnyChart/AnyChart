@@ -2,7 +2,6 @@ goog.provide('anychart.core.drawers.StepLine');
 goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
 goog.require('anychart.enums');
-goog.require('anychart.opt');
 
 
 
@@ -50,7 +49,7 @@ anychart.core.drawers.StepLine.prototype.flags = (
 /** @inheritDoc */
 anychart.core.drawers.StepLine.prototype.requiredShapes = (function() {
   var res = {};
-  res[anychart.opt.STROKE] = anychart.enums.ShapeType.PATH;
+  res['stroke'] = anychart.enums.ShapeType.PATH;
   return res;
 })();
 
@@ -58,17 +57,17 @@ anychart.core.drawers.StepLine.prototype.requiredShapes = (function() {
 /** @inheritDoc */
 anychart.core.drawers.StepLine.prototype.startDrawing = function(shapeManager) {
   anychart.core.drawers.StepLine.base(this, 'startDrawing', shapeManager);
-  this.direction_ = /** @type {anychart.enums.StepDirection} */ (this.series.getOption(anychart.opt.STEP_DIRECTION) || anychart.enums.StepDirection.CENTER);
+  this.direction_ = /** @type {anychart.enums.StepDirection} */ (this.series.getOption('stepDirection') || anychart.enums.StepDirection.CENTER);
 };
 
 
 /** @inheritDoc */
 anychart.core.drawers.StepLine.prototype.drawFirstPoint = function(point, state) {
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
+  var x = /** @type {number} */(point.meta('x'));
+  var y = /** @type {number} */(point.meta('value'));
 
-  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes[anychart.opt.STROKE]), this.isVertical, x, y);
+  anychart.core.drawers.move(/** @type {acgraph.vector.Path} */(shapes['stroke']), this.isVertical, x, y);
 
   /**
    * @type {number}
@@ -86,9 +85,9 @@ anychart.core.drawers.StepLine.prototype.drawFirstPoint = function(point, state)
 /** @inheritDoc */
 anychart.core.drawers.StepLine.prototype.drawSubsequentPoint = function(point, state) {
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
-  var x = /** @type {number} */(point.meta(anychart.opt.X));
-  var y = /** @type {number} */(point.meta(anychart.opt.VALUE));
-  var line = /** @type {acgraph.vector.Path} */(shapes[anychart.opt.STROKE]);
+  var x = /** @type {number} */(point.meta('x'));
+  var y = /** @type {number} */(point.meta('value'));
+  var line = /** @type {acgraph.vector.Path} */(shapes['stroke']);
 
   switch (this.direction_) {
     case anychart.enums.StepDirection.FORWARD:
