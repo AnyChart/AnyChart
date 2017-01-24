@@ -129,7 +129,7 @@ The `-df` option generates **property renaming report**, **variable renaming rep
 
 `./build.py compile -df`
 
-Source map maps minified code to source code. Read more about using  [source maps in Chrome](https://developers.google.com/web/tools/chrome-devtools/javascript/source-maps) or [source maps in Firefox](https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map).
+Source map maps minified code to source code. Read more about using [source maps in Chrome](https://developers.google.com/web/tools/chrome-devtools/javascript/source-maps) or [source maps in Firefox](https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map).
 
 ## Contribution guide
 
@@ -142,6 +142,10 @@ To contribute to AnyChart project please:
 
 [GitHub documentation: Forking repositories](https://help.github.com/articles/fork-a-repo/).  
 [GitHub documentation: Collaborating using pull requests](https://help.github.com/categories/collaborating-with-issues-and-pull-requests/).
+
+Please, note:  
+1. AnyChart bears no responsibility for the code written by third-party developers until pull request is accepted.  
+2. After pull request is accepted the author of pull request sign over all rights to the code to AnyChart.  
 
 ## Package directory
 
