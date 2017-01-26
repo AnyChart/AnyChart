@@ -10,16 +10,14 @@ script:
 - ls -lah /home/travis/build/AnyChart/AnyChart/out/
 
 after_success:
-- echo -e "Host static.anychart.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-- ssh root@static.anychart.com "mkdir -p /apps/static/js/$TRAVIS_BRANCH"
-- ssh root@static.anychart.com "mkdir -p /apps/static/css/$TRAVIS_BRANCH"
+- echo -e "Host $STATIC_HOST\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+- ssh $STATIC_HOST_SSH_STRING "mkdir -p /apps/static/js/$TRAVIS_BRANCH"
+- ssh $STATIC_HOST_SSH_STRING "mkdir -p /apps/static/css/$TRAVIS_BRANCH"
 - git rev-parse HEAD >> ./out/commit-hash.txt
-- scp /home/travis/build/AnyChart/AnyChart/out/anychart-bundle.min.js root@static.anychart.com:/apps/static/js/$TRAVIS_BRANCH/anychart-bundle.min.js
-- scp /home/travis/build/AnyChart/AnyChart/out/anychart-ui.min.css root@static.anychart.com:/apps/static/css/$TRAVIS_BRANCH/anychart-ui.min.css
-- scp /home/travis/build/AnyChart/AnyChart/out/commit-hash.txt root@static.anychart.com:/apps/static/js/$TRAVIS_BRANCH/commit-hash.txt
-- curl -X POST http://tests.anychart.com/ci_test --data "branch=$TRAVIS_BRANCH&commit=$TRAVIS_COMMIT"
+- scp /home/travis/build/AnyChart/AnyChart/out/anychart-bundle.min.js $STATIC_HOST_SSH_STRING:/apps/static/js/$TRAVIS_BRANCH/anychart-bundle.min.js
+- scp /home/travis/build/AnyChart/AnyChart/out/anychart-ui.min.css $STATIC_HOST_SSH_STRING:/apps/static/css/$TRAVIS_BRANCH/anychart-ui.min.css
+- scp /home/travis/build/AnyChart/AnyChart/out/commit-hash.txt $STATIC_HOST_SSH_STRING:/apps/static/js/$TRAVIS_BRANCH/commit-hash.txt
+- curl -X POST $TESTS_HOST/ci_test --data "branch=$TRAVIS_BRANCH&commit=$TRAVIS_COMMIT"
 
 notifications:
-  slack: anychart-team:sJRPhNn8Ur8yVdhvhgp6EbDM
-  webhooks:
-    - https://integram.org/hkwgksh3usqogp7j4 
+  slack: anychart-team:$SLACK_CHAT_KEY

@@ -946,12 +946,21 @@ def __upload_release():
     from fabric.api import env
     from maxcdn import MaxCDN
 
-    # define build argumets
+    # define build arguments
     global arguments
     version = arguments['version']
     is_latest = arguments['is_latest']
     dry_run = arguments['dry_run']
     export_server_project_path = arguments['export_server_path']
+
+    host_string = arguments['host_string']
+    max_cdn_alias = arguments['max_cdn_alias']
+    max_cdn_key = arguments['max_cdn_key']
+    max_cdn_secret = arguments['max_cdn_secret']
+    max_cdn_zone = arguments['max_cdn_zone']
+
+    if not host_string or not max_cdn_alias or not max_cdn_key or not max_cdn_secret or not max_cdn_zone:
+        raise Exception('Wrong max cdn credits')
 
     print "Uploading release"
     print "version: %s" % version
@@ -960,12 +969,11 @@ def __upload_release():
     print "dry-run: %s" % dry_run
 
     # static.anychart.com
-    env.user = "root"
-    env.host_string = 'root@static.anychart.com'
+    env.host_string = host_string
+    env.user = host_string.split('@')[0]
 
     # max cdn
-    api = MaxCDN("anychart", "d1c5e7b52794d69649497f1f51eaf656055d57304", "922b800fdfe54f6fee002b7110464dc3")
-    zone_id = 416666
+    api = MaxCDN(max_cdn_alias, max_cdn_key, max_cdn_secret)
 
     # create release upload list
     upload_list = []
@@ -1054,9 +1062,9 @@ def __upload_release():
 
     # upload and invalidate
     for item in upload_list:
-        errors += __upload_release_item(item, version, api, zone_id, dry_run)
+        errors += __upload_release_item(item, version, api, max_cdn_zone, dry_run)
         if is_latest:
-            errors += __upload_release_item(item, 'latest', api, zone_id, dry_run)
+            errors += __upload_release_item(item, 'latest', api, max_cdn_zone, dry_run)
 
     # print errors if any
     for error in errors:
@@ -1316,16 +1324,16 @@ def __exec_main_script():
     css_parser = subparsers.add_parser('css', help='Compile AnyChart UI css')
     css_parser.add_argument('-gz', '--gzip', action='store_true', help='Create gzip copy of output files.')
 
-    upload_release_parser = subparsers.add_parser('upload_release',
-                                                  help='Uploads release related files from /out folder to static.anychart.com and cdn.anychart.com. Invalidates CDN cache.')
-    upload_release_parser.add_argument('-v', '--version', action='store',
-                                       help="Version of the release, affects only folder on the remote server. Doesn't affect code version, export server version or wherever else version. ")
-    upload_release_parser.add_argument('-nl', '--not-latest', dest='is_latest', action='store_false',
-                                       help="Prevent to upload release files to 'latest' directory")
-    upload_release_parser.add_argument('-dr', '--dry-run', dest='dry_run', action='store_true',
-                                       help="Print what will happen, don't really upload files.")
-    upload_release_parser.add_argument('-esp', '--export-server-path', dest='export_server_path', action='store',
-                                       default=os.path.join(PROJECT_PATH, '..', 'export-server'))
+    upload_release_parser = subparsers.add_parser('upload_release', help='Uploads release related files from /out folder to static.anychart.com and cdn.anychart.com. Invalidates CDN cache.')
+    upload_release_parser.add_argument('-v', '--version', action='store', help="Version of the release, affects only folder on the remote server. Doesn't affect code version, export server version or wherever else version. ")
+    upload_release_parser.add_argument('-nl', '--not-latest', dest='is_latest', action='store_false', help="Prevent to upload release files to 'latest' directory")
+    upload_release_parser.add_argument('-dr', '--dry-run', dest='dry_run', action='store_true', help="Print what will happen, don't really upload files.")
+    upload_release_parser.add_argument('-esp', '--export-server-path', dest='export_server_path', action='store', default=os.path.join(PROJECT_PATH, '..', 'export-server'))
+    upload_release_parser.add_argument('-hs', '--host_string', dest='host_string', action='store')
+    upload_release_parser.add_argument('-ma', '--max_cdn_alias', dest='max_cdn_alias', action='store')
+    upload_release_parser.add_argument('-mk', '--max_cdn_key', dest='max_cdn_key', action='store')
+    upload_release_parser.add_argument('-ms', '--max_cdn_secret', dest='max_cdn_secret', action='store')
+    upload_release_parser.add_argument('-mz', '--max_cdn_zone', dest='max_cdn_zone', action='store')
     upload_release_parser.set_defaults(is_latest=True, version=__get_version(False))
 
     global arguments
