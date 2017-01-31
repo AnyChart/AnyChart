@@ -417,7 +417,7 @@ def __build_project(develop, modules, sources, theme, debug, gzip, perf_monitori
             commands += ['--property_renaming_report %s' % output_file + '_prop_out.txt',
                          '--variable_renaming_report %s' % output_file + '_var_out.txt',
                          '--create_source_map %s' % output_file + '.map',
-                         '--source_map_location_mapping \"%s|http://localhost:63341/ACDVF\"' % path]
+                         '--source_map_location_mapping \"%s|./../\"' % path]
 
         # print build log
         __log_compilation(output_file, args)
