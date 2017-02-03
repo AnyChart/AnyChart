@@ -670,6 +670,20 @@ anychart.core.stock.Plot.prototype.aroon = function(mapping, opt_period, opt_upS
 
 
 /**
+ * Creates ATR indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_period
+ * @param {anychart.enums.StockSeriesType=} opt_seriesType
+ * @return {anychart.core.stock.indicators.ATR}
+ */
+anychart.core.stock.Plot.prototype.atr = function(mapping, opt_period, opt_seriesType) {
+  var result = new anychart.core.stock.indicators.ATR(this, mapping, opt_period, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
  * Creates BBands indicator on the chart.
  * @param {!anychart.data.TableMapping} mapping
  * @param {number=} opt_period [20] Sets moving average period value.
@@ -724,6 +738,28 @@ anychart.core.stock.Plot.prototype.bbandsWidth = function(mapping, opt_period, o
  */
 anychart.core.stock.Plot.prototype.ema = function(mapping, opt_period, opt_seriesType) {
   var result = new anychart.core.stock.indicators.EMA(this, mapping, opt_period, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates KDJ indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_kPeriod [14] Indicator period. Defaults to 14.
+ * @param {number=} opt_kMAPeriod [5] Indicator K smoothing period. Defaults to 5.
+ * @param {number=} opt_dPeriod [5] Indicator D period. Defaults to 5.
+ * @param {anychart.enums.MovingAverageType=} opt_kMAType [EMA] Indicator K smoothing type. Defaults to EMA.
+ * @param {anychart.enums.MovingAverageType=} opt_dMAType [EMA] Indicator D smoothing type. Defaults to EMA.
+ * @param {number=} opt_kMultiplier [-2] K multiplier.
+ * @param {number=} opt_dMultiplier [3] D multiplier.
+ * @param {anychart.enums.StockSeriesType=} opt_kSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_dSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_jSeriesType
+ * @return {anychart.core.stock.indicators.KDJ}
+ */
+anychart.core.stock.Plot.prototype.kdj = function(mapping, opt_kPeriod, opt_kMAPeriod, opt_dPeriod, opt_kMAType, opt_dMAType, opt_kMultiplier, opt_dMultiplier, opt_kSeriesType, opt_dSeriesType, opt_jSeriesType) {
+  var result = new anychart.core.stock.indicators.KDJ(this, mapping, opt_kPeriod, opt_kMAPeriod, opt_dPeriod, opt_kMAType, opt_dMAType, opt_kMultiplier, opt_dMultiplier, opt_kSeriesType, opt_dSeriesType, opt_jSeriesType);
   this.indicators_.push(result);
   return result;
 };
@@ -800,6 +836,25 @@ anychart.core.stock.Plot.prototype.rsi = function(mapping, opt_period, opt_serie
  */
 anychart.core.stock.Plot.prototype.sma = function(mapping, opt_period, opt_seriesType) {
   var result = new anychart.core.stock.indicators.SMA(this, mapping, opt_period, opt_seriesType);
+  this.indicators_.push(result);
+  return result;
+};
+
+
+/**
+ * Creates Stochastic indicator on the chart.
+ * @param {!anychart.data.TableMapping} mapping
+ * @param {number=} opt_kPeriod [14] Indicator period. Defaults to 14.
+ * @param {number=} opt_kMAPeriod [1] Indicator K smoothing period. Defaults to 1.
+ * @param {number=} opt_dPeriod [3] Indicator D period. Defaults to 3.
+ * @param {anychart.enums.MovingAverageType=} opt_kMAType [SMA] Indicator K smoothing type. Defaults to SMA.
+ * @param {anychart.enums.MovingAverageType=} opt_dMAType [SMA] Indicator D smoothing type. Defaults to SMA.
+ * @param {anychart.enums.StockSeriesType=} opt_kSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_dSeriesType
+ * @return {anychart.core.stock.indicators.Stochastic}
+ */
+anychart.core.stock.Plot.prototype.stochastic = function(mapping, opt_kPeriod, opt_kMAPeriod, opt_dPeriod, opt_kMAType, opt_dMAType, opt_kSeriesType, opt_dSeriesType) {
+  var result = new anychart.core.stock.indicators.Stochastic(this, mapping, opt_kPeriod, opt_kMAPeriod, opt_dPeriod, opt_kMAType, opt_dMAType, opt_kSeriesType, opt_dSeriesType);
   this.indicators_.push(result);
   return result;
 };
@@ -2546,15 +2601,18 @@ anychart.core.stock.Plot.Dragger.prototype.limitY = function(y) {
   proto['removeAllSeries'] = proto.removeAllSeries;
   proto['ama'] = proto.ama;
   proto['aroon'] = proto.aroon;
+  proto['atr'] = proto.atr;
   proto['bbands'] = proto.bbands;
   proto['bbandsB'] = proto.bbandsB;
   proto['bbandsWidth'] = proto.bbandsWidth;
   proto['ema'] = proto.ema;
+  proto['kdj'] = proto.kdj;
   proto['macd'] = proto.macd;
   proto['mma'] = proto.mma;
   proto['roc'] = proto.roc;
   proto['rsi'] = proto.rsi;
   proto['sma'] = proto.sma;
+  proto['stochastic'] = proto.stochastic;
   proto['palette'] = proto.palette;
   // proto['markerPalette'] = proto.markerPalette;
   proto['hatchFillPalette'] = proto.hatchFillPalette;

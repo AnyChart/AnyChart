@@ -54,14 +54,7 @@ anychart.math.sma.startFunction = function(context) {
  */
 anychart.math.sma.calculationFunction = function(row, context) {
   var value = anychart.utils.toNumber(row.get('value'));
-  var result;
-  if (isNaN(value)) {
-    result = NaN;
-  } else {
-    result = anychart.math.sma.calculate(value, context.period, context.queue, context.prevResult);
-    context.prevResult = result;
-  }
-  row.set('result', result);
+  row.set('result', anychart.math.sma.calculate(context, value));
 };
 
 
@@ -85,28 +78,29 @@ anychart.math.sma.createComputer = function(mapping, opt_period) {
  * Calculates next SMA value based on a previous SMA value and current data value.
  * To use this function you need a setup queue with length equal to period.
  * On first calculation pass NaN or nothing as a opt_prevResult.
+ * @param {anychart.math.sma.Context} context
  * @param {number} value
- * @param {number} period
- * @param {anychart.math.CycledQueue} queue
- * @param {number} prevResult
  * @return {number}
  */
-anychart.math.sma.calculate = function(value, period, queue, prevResult) {
-  var firstValue = /** @type {number} */(queue.enqueue(value));
+anychart.math.sma.calculate = function(context, value) {
+  if (isNaN(value))
+    return NaN;
+  var firstValue = /** @type {number} */(context.queue.enqueue(value));
   /** @type {number} */
   var result;
-  if (queue.getLength() < period) {
-    result = NaN;
-  } else if (isNaN(prevResult)) {
+  if (context.queue.getLength() < context.period) {
+    return NaN;
+  } else if (isNaN(context.prevResult)) {
     result = 0;
-    for (var i = 0; i < period; i++) {
-      result += /** @type {number} */(queue.get(i));
+    for (var i = 0; i < context.period; i++) {
+      result += /** @type {number} */(context.queue.get(i));
     }
-    result /= period;
+    result /= context.period;
   } else { // firstValue should not be undefined here
-    var lastValue = /** @type {number} */(queue.get(-1));
-    result = prevResult + (lastValue - firstValue) / period;
+    var lastValue = /** @type {number} */(context.queue.get(-1));
+    result = context.prevResult + (lastValue - firstValue) / context.period;
   }
+  context.prevResult = result;
   return result;
 };
 

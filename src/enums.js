@@ -2397,6 +2397,39 @@ anychart.enums.normalizeStockSeriesType = function(value, opt_default) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  MovingAverageType enum.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all smoothing types.
+ * @enum {string}
+ */
+anychart.enums.MovingAverageType = {
+  SMA: 'sma',
+  EMA: 'ema'
+};
+
+
+/**
+ * Normalizes smoothing type.
+ * @param {*} value Smoothing value to normalize.
+ * @param {anychart.enums.MovingAverageType=} opt_default Custom default value (defaults to SMA).
+ * @return {anychart.enums.MovingAverageType}
+ */
+anychart.enums.normalizeMovingAverageType = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'sma':
+      return anychart.enums.MovingAverageType.SMA;
+    case 'ema':
+      return anychart.enums.MovingAverageType.EMA;
+  }
+  return opt_default || anychart.enums.MovingAverageType.SMA;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  SparklineSeriesTypes
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -6402,6 +6435,9 @@ goog.exportSymbol('anychart.enums.StockSeriesType.SPLINE', anychart.enums.StockS
 goog.exportSymbol('anychart.enums.StockSeriesType.SPLINE_AREA', anychart.enums.StockSeriesType.SPLINE_AREA);
 goog.exportSymbol('anychart.enums.StockSeriesType.STEP_AREA', anychart.enums.StockSeriesType.STEP_AREA);
 goog.exportSymbol('anychart.enums.StockSeriesType.STEP_LINE', anychart.enums.StockSeriesType.STEP_LINE);
+
+goog.exportSymbol('anychart.enums.MovingAverageType.SMA', anychart.enums.MovingAverageType.SMA);
+goog.exportSymbol('anychart.enums.MovingAverageType.EMA', anychart.enums.MovingAverageType.EMA);
 
 goog.exportSymbol('anychart.enums.RadarSeriesType.AREA', anychart.enums.RadarSeriesType.AREA);
 goog.exportSymbol('anychart.enums.RadarSeriesType.LINE', anychart.enums.RadarSeriesType.LINE);

@@ -54,14 +54,7 @@ anychart.math.ema.startFunction = function(context) {
  */
 anychart.math.ema.calculationFunction = function(row, context) {
   var value = anychart.utils.toNumber(row.get('value'));
-  var result;
-  if (isNaN(value)) {
-    result = NaN;
-  } else {
-    result = anychart.math.ema.calculate(value, context.period, context.queue, context.prevResult);
-    context.prevResult = result;
-  }
-  row.set('result', result);
+  row.set('result', anychart.math.ema.calculate(context, value));
 };
 
 
@@ -85,29 +78,30 @@ anychart.math.ema.createComputer = function(mapping, opt_period) {
  * Calculates next EMA value based on a previous EMA value and current data value.
  * To use this function you need a setup queue with length equal to period.
  * On first calculation pass NaN or nothing as a opt_prevResult.
+ * @param {anychart.math.ema.Context} context
  * @param {number} value
- * @param {number} period
- * @param {anychart.math.CycledQueue} queue
- * @param {number} prevResult
  * @return {number}
  */
-anychart.math.ema.calculate = function(value, period, queue, prevResult) {
-  queue.enqueue(value);
+anychart.math.ema.calculate = function(context, value) {
+  if (isNaN(value))
+    return NaN;
+  context.queue.enqueue(value);
   /** @type {number} */
   var result;
-  if (queue.getLength() < period) {
-    result = NaN;
-  } else if (isNaN(prevResult)) {
+  if (context.queue.getLength() < context.period) {
+    return NaN;
+  } else if (isNaN(context.prevResult)) {
     result = 0;
-    for (var i = 0; i < period; i++) {
-      result += /** @type {number} */(queue.get(i));
+    for (var i = 0; i < context.period; i++) {
+      result += /** @type {number} */(context.queue.get(i));
     }
-    result /= period;
+    result /= context.period;
   } else {
-    var lastValue = /** @type {number} */(queue.get(-1));
-    var alpha = 2 / (period + 1);
-    result = prevResult + alpha * (lastValue - prevResult);
+    var lastValue = /** @type {number} */(context.queue.get(-1));
+    var alpha = 2 / (context.period + 1);
+    result = context.prevResult + alpha * (lastValue - context.prevResult);
   }
+  context.prevResult = result;
   return result;
 };
 
