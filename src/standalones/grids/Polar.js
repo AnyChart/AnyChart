@@ -31,7 +31,7 @@ anychart.standalones.grids.polar = function() {
  * @deprecated Since 7.12.0. Use anychart.standalones.grids.polar instead.
  */
 anychart.grids.polar = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.grids.polar', 'anychart.standalones.grids.polar'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.grids.polar()', 'anychart.standalones.grids.polar()', null, 'Constructor'], true);
   return anychart.standalones.grids.polar();
 };
 

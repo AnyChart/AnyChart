@@ -43,7 +43,7 @@ anychart.standalones.title = function() {
  * @return {!anychart.standalones.Title}
  */
 anychart.ui.title = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.title', 'anychart.standalones.title'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.title()', 'anychart.standalones.title()', null, 'Constructor'], true);
   return anychart.standalones.title();
 };
 

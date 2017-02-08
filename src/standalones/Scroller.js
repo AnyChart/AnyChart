@@ -72,7 +72,7 @@ anychart.standalones.scroller = function() {
  * @deprecated Since 7.12.0. Use anychart.standalones.scroller instead.
  */
 anychart.ui.scroller = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.scroller', 'anychart.standalones.scroller'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.scroller()', 'anychart.standalones.scroller()', null, 'Constructor'], true);
   return anychart.standalones.scroller();
 };
 

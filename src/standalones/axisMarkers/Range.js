@@ -31,7 +31,7 @@ anychart.standalones.axisMarkers.range = function() {
  * @return {!anychart.standalones.axisMarkers.Range}
  */
 anychart.axisMarkers.range = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.axisMarkers.range', 'anychart.standalones.axisMarkers.range'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.axisMarkers.range()', 'anychart.standalones.axisMarkers.range()', null, 'Constructor'], true);
   return anychart.standalones.axisMarkers.range();
 };
 

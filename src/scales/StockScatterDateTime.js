@@ -419,9 +419,10 @@ anychart.scales.StockScatterDateTime.prototype.ticksInvalidated_ = function(even
 /**
  * Gets current grouping unit.
  * @return {anychart.enums.Interval}
- * @deprecated Use stockChart.grouping().getEstimatedDataInterval() instead.
+ * @deprecated Since 7.10.0. Use stockChart.grouping().getCurrentDataInterval() instead.
  */
 anychart.scales.StockScatterDateTime.prototype.getGroupingUnit = function() {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['getGroupingUnit()', 'stockChart.grouping().getCurrentDataInterval()'], true);
   return this.unit;
 };
 
@@ -429,9 +430,10 @@ anychart.scales.StockScatterDateTime.prototype.getGroupingUnit = function() {
 /**
  * Gets current grouping unit count.
  * @return {number}
- * @deprecated Use stockChart.grouping().getEstimatedDataInterval() instead.
+ * @deprecated Since 7.10.0. Use stockChart.grouping().getCurrentDataInterval() instead.
  */
 anychart.scales.StockScatterDateTime.prototype.getGroupingUnitCount = function() {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['getGroupingUnitCount()', 'stockChart.grouping().getCurrentDataInterval()'], true);
   return this.count;
 };
 

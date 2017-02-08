@@ -222,7 +222,7 @@ anychart.core.reporting.getWarningDescription_ = function(code, opt_arguments) {
       return 'No chart is assigned for toolbar. Please set a target chart using toolbar.target() method.';
 
     case anychart.enums.WarningCode.DEPRECATED:
-      return 'Method ' + opt_arguments[0] + ' is deprecated. Use ' + opt_arguments[1] + ' instead' +
+      return (opt_arguments[3] || 'Method') + ' ' + opt_arguments[0] + ' is deprecated. Use ' + opt_arguments[1] + ' instead' +
           (opt_arguments[2] ? (opt_arguments[2] + '.') : '.');
 
     case anychart.enums.WarningCode.MISSING_PROJ4:

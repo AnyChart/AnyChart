@@ -110,9 +110,6 @@ goog.provide('anychart.themes.morning');
         'padding': {'bottom': 8},
         'fontSize': 18
       },
-      'content': {
-        'fontColor': '#78909c'
-      },
       'separator': {
         'enabled': false,
         'padding': {'bottom': 8}

@@ -4,6 +4,7 @@ goog.require('acgraph.vector.Path');
 goog.require('anychart.core.IStandaloneBackend');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.gantt.Controller');
+goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.IInteractiveGrid');
 goog.require('anychart.core.ui.ScrollBar');
 goog.require('anychart.core.ui.Tooltip');
@@ -1176,9 +1177,12 @@ anychart.core.ui.BaseGrid.prototype.rowFill = function(opt_fillOrColorOrKeys, op
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
  * @return {acgraph.vector.Fill|anychart.core.ui.BaseGrid|string} - Current value or itself for method chaining.
- * @deprecated - Use {@link rowFill} instead.
+ * @deprecated Since 7.7.0. Use rowFill() instead.
  */
-anychart.core.ui.BaseGrid.prototype.cellFill = anychart.core.ui.BaseGrid.prototype.rowFill;
+anychart.core.ui.BaseGrid.prototype.cellFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['cellFill()', 'rowFill()'], true);
+  return this.rowFill(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy);
+};
 
 
 /**
@@ -1215,9 +1219,12 @@ anychart.core.ui.BaseGrid.prototype.rowOddFill = function(opt_fillOrColorOrKeys,
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
  * @return {acgraph.vector.Fill|anychart.core.ui.BaseGrid|string} - Current value or itself for method chaining.
- * @deprecated - Use {@link rowOddFill} instead.
+ * @deprecated Since 7.7.0. Use rowOddFill() instead.
  */
-anychart.core.ui.BaseGrid.prototype.cellOddFill = anychart.core.ui.BaseGrid.prototype.rowOddFill;
+anychart.core.ui.BaseGrid.prototype.cellOddFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['cellOddFill()', 'rowOddFill()'], true);
+  return this.rowOddFill(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy);
+};
 
 
 /**
@@ -1254,9 +1261,12 @@ anychart.core.ui.BaseGrid.prototype.rowEvenFill = function(opt_fillOrColorOrKeys
  * @param {number=} opt_fx .
  * @param {number=} opt_fy .
  * @return {acgraph.vector.Fill|anychart.core.ui.BaseGrid|string} - Current value or itself for method chaining.
- * @deprecated - Use {@link rowEvenFill} instead.
+ * @deprecated Since 7.7.0. Use rowEvenFill() instead.
  */
-anychart.core.ui.BaseGrid.prototype.cellEvenFill = anychart.core.ui.BaseGrid.prototype.rowEvenFill;
+anychart.core.ui.BaseGrid.prototype.cellEvenFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['cellEvenFill()', 'rowEvenFill()'], true);
+  return this.rowEvenFill(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy);
+};
 
 
 /**
@@ -2356,10 +2366,13 @@ anychart.core.ui.BaseGrid.prototype.headerHeight = function(opt_value) {
 /**
  * Gets/sets header height.
  * @param {number=} opt_value - Value to be set.
- * @deprecated - Use headerHeight instead.
+ * @deprecated Since 7.7.0. Use headerHeight() instead.
  * @return {(number|anychart.core.ui.BaseGrid)} - Current value or itself for method chaining.
  */
-anychart.core.ui.BaseGrid.prototype.titleHeight = anychart.core.ui.BaseGrid.prototype.headerHeight;
+anychart.core.ui.BaseGrid.prototype.titleHeight = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['titleHeight()', 'headerHeight()'], true);
+  return this.headerHeight(opt_value);
+};
 
 
 /**
@@ -2441,7 +2454,10 @@ anychart.core.ui.BaseGrid.prototype.serialize = function() {
 };
 
 
-/** @inheritDoc */
+/**
+ * @inheritDoc
+ * @suppress {deprecated}
+ */
 anychart.core.ui.BaseGrid.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.BaseGrid.base(this, 'setupByJSON', config, opt_default);
 
@@ -2453,6 +2469,13 @@ anychart.core.ui.BaseGrid.prototype.setupByJSON = function(config, opt_default) 
     this.defaultRowHeight(config['defaultRowHeight']);
   }
 
+  if (goog.isDef(config['cellFill']))
+    this.cellFill(config['cellFill']);
+  if (goog.isDef(config['cellOddFill']))
+    this.cellOddFill(config['cellOddFill']);
+  if (goog.isDef(config['cellEvenFill']))
+    this.cellEvenFill(config['cellEvenFill']);
+
   this.backgroundFill(config['backgroundFill']);
   this.rowStroke(config['rowStroke']);
   this.rowFill(config['rowFill']);
@@ -2463,6 +2486,9 @@ anychart.core.ui.BaseGrid.prototype.setupByJSON = function(config, opt_default) 
 
   if ('tooltip' in config)
     this.tooltip().setupByVal(config['tooltip'], opt_default);
+
+  if (goog.isDef(config['titleHeight']))
+    this.titleHeight(config['titleHeight']);
 
   this.headerHeight(config['headerHeight']);
   this.editStructurePreviewFill(config['editStructurePreviewFill']);

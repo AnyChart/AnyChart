@@ -1068,9 +1068,11 @@ anychart.core.ChartWithAxes.prototype.drawContent = function(bounds) {
 anychart.core.ChartWithAxes.prototype.setupByJSONWithScales = function(config, scalesInstances) {
   anychart.core.ChartWithAxes.base(this, 'setupByJSONWithScales', config, scalesInstances);
 
-  // barChartMode is deprecated
-  if ('barChartMode' in config)
+  // barChartMode is @deprecated Since 7.13.0.
+  if ('barChartMode' in config) {
+    anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['barChartMode', 'isVertical', null, 'JSON property'], true);
     this.barChartMode = !!config['barChartMode'];
+  }
   if ('isVertical' in config)
     this.barChartMode = !!config['isVertical'];
 

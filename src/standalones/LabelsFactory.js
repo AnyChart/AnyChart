@@ -49,7 +49,7 @@ anychart.standalones.labelsFactory = function() {
  * @deprecated Since 7.12.0. Use anychart.standalones.labelsFactory instead.
  */
 anychart.ui.labelsFactory = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.labelsFactory', 'anychart.standalones.labelsFactory'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.labelsFactory()', 'anychart.standalones.labelsFactory()', null, 'Constructor'], true);
   return anychart.standalones.labelsFactory();
 };
 

@@ -81,13 +81,10 @@ goog.provide('anychart.themes.dark_blue');
         'corners': 3
       },
       'fontColor': '#90a4ae',
+      'fontSize': 12,
       'title': {
         'align': 'center',
         'fontSize': 14
-      },
-      'content': {
-        'fontColor': '#90a4ae',
-        'fontSize': 12
       },
       'padding': {'top': 10, 'right': 15, 'bottom': 10, 'left': 15},
       'separator': {

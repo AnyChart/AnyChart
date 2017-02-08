@@ -79,9 +79,6 @@ goog.provide('anychart.themes.sea');
       'title': {
         'fontColor': '#616161'
       },
-      'content': {
-        'fontColor': '#757575'
-      },
       'fontColor': '#757575',
       'fontSize': 12,
       'background': {

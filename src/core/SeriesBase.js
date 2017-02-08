@@ -2001,9 +2001,10 @@ anychart.core.SeriesBase.prototype.hoverMode = function(opt_value) {
  * Allows to select points of the series.
  * @param {?boolean=} opt_value Allow or not.
  * @return {null|boolean|anychart.core.SeriesBase} Returns allow points select state or current series instance for chaining.
- * @deprecated Use this.selectionMode().
+ * @deprecated Since 7.13.0 in Map series and was never introduced in public API of other series, but was exported. Use this.selectionMode() instead.
  */
 anychart.core.SeriesBase.prototype.allowPointsSelect = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['allowPointsSelect()', 'selectionMode()'], true);
   if (goog.isDef(opt_value)) {
     this.selectionMode(goog.isBoolean(opt_value) ?
         (opt_value ?
@@ -2169,6 +2170,7 @@ anychart.core.SeriesBase.prototype.serialize = function() {
 
 /**
  * @inheritDoc
+ * @suppress {deprecated}
  */
 anychart.core.SeriesBase.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.SeriesBase.base(this, 'setupByJSON', config, opt_default);
@@ -2213,11 +2215,7 @@ anychart.core.SeriesBase.prototype.setupByJSON = function(config, opt_default) {
 
   this.legendItem(config['legendItem']);
   if (goog.isDef(config['allowPointsSelect'])) {
-    this.selectionMode(goog.isBoolean(config['allowPointsSelect']) ?
-        (config['allowPointsSelect'] ?
-            anychart.enums.SelectionMode.MULTI_SELECT :
-            anychart.enums.SelectionMode.NONE) :
-        config['allowPointsSelect']);
+    this.allowPointsSelect(config['allowPointsSelect']);
   }
   this.selectionMode(config['selectionMode']);
   this.a11y(config['a11y']);

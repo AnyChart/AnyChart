@@ -43,9 +43,10 @@ anychart.palettes.HatchFills.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS
  * @param {number=} opt_thickness Thickness.
  * @param {number=} opt_size Pattern size.
  * @return {acgraph.vector.HatchFill|acgraph.vector.PatternFill|anychart.palettes.HatchFills} HatchFill by index or self for chaining.
- * @deprecated use itemAt.
+ * @deprecated Since 7.7.0. Use itemAt() method instead.
  */
 anychart.palettes.HatchFills.prototype.hatchFillAt = function(index, opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['hatchFillAt()', 'itemAt()'], true);
   return this.itemAt(index, opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size);
 };
 
@@ -85,9 +86,10 @@ anychart.palettes.HatchFills.prototype.itemAt = function(index, opt_patternFillO
  * acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill)=} opt_hatchFills .
  * @param {...(acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill)} var_args .
  * @return {Array.<acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|acgraph.vector.PatternFill>|anychart.palettes.HatchFills} HatchFills list or self for method chaining.
- * @deprecated use items.
+ * @deprecated Since 7.7.0. Use items() method instead.
  */
 anychart.palettes.HatchFills.prototype.hatchFills = function(opt_hatchFills, var_args) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['hatchFills()', 'items()'], true);
   return this.items.apply(this, arguments);
 };
 
@@ -145,9 +147,12 @@ anychart.palettes.HatchFills.prototype.setupSpecial = function(var_args) {
 
 /**
  * @inheritDoc
+ * @suppress {deprecated}
  */
 anychart.palettes.HatchFills.prototype.setupByJSON = function(config, opt_default) {
   anychart.palettes.HatchFills.base(this, 'setupByJSON', config, opt_default);
+  if (goog.isDef(config['hatchFills']))
+    this.hatchFills(config['hatchFills']);
   this.items(config['items']);
 };
 

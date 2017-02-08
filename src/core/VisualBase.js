@@ -997,6 +997,7 @@ anychart.core.VisualBase.prototype.print = function(opt_paperSizeOrOptions, opt_
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Saves the current visual state into PNG file.
+ * @deprecated Since 7.6.0. Use saveAsPng() method instead.
  */
 anychart.core.VisualBase.prototype.saveAsPNG = function() {
   anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsPNG()', 'saveAsPng()'], true);
@@ -1006,6 +1007,7 @@ anychart.core.VisualBase.prototype.saveAsPNG = function() {
 
 /**
  * Saves the current visual state into JPEG file.
+ * @deprecated Since 7.6.0. Use saveAsJpg() method instead.
  */
 anychart.core.VisualBase.prototype.saveAsJPG = function() {
   anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsJPG()', 'saveAsJpg()'], true);
@@ -1015,6 +1017,7 @@ anychart.core.VisualBase.prototype.saveAsJPG = function() {
 
 /**
  * Saves the current visual state into PDF file.
+ * @deprecated Since 7.6.0. Use saveAsPdf() method instead.
  */
 anychart.core.VisualBase.prototype.saveAsPDF = function() {
   anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsPDF()', 'saveAsPdf()'], true);
@@ -1024,6 +1027,7 @@ anychart.core.VisualBase.prototype.saveAsPDF = function() {
 
 /**
  * Saves the current visual state into SVG file.
+ * @deprecated Since 7.6.0. Use saveAsSvg() method instead.
  */
 anychart.core.VisualBase.prototype.saveAsSVG = function() {
   anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['saveAsSVG()', 'saveAsSvg()'], true);
@@ -1033,6 +1037,7 @@ anychart.core.VisualBase.prototype.saveAsSVG = function() {
 
 /**
  * Returns SVG string if type of content SVG otherwise returns empty string.
+ * @deprecated Since 7.6.0. Use toSvg() method instead.
  * @return {string}
  */
 anychart.core.VisualBase.prototype.toSVG = function() {

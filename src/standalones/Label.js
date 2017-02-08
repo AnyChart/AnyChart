@@ -31,7 +31,7 @@ anychart.standalones.label = function() {
  * @deprecated Since 7.12.0. Use anychart.standalones.label instead.
  */
 anychart.ui.label = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.label', 'anychart.standalones.label'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.label()', 'anychart.standalones.label()', null, 'Constructor'], true);
   return anychart.standalones.label();
 };
 

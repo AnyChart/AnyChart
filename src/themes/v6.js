@@ -534,7 +534,7 @@ goog.provide('anychart.themes.v6');
         'stroke': 'none',
         'zIndex': 1
       },
-      'content': {
+      'contentInternal': {
         'enabled': true,
         'fontSize': 10,
         'fontFamily': 'Verdana, Helvetica, Arial, sans-serif',
@@ -1522,7 +1522,7 @@ goog.provide('anychart.themes.v6');
             'size': 6
           },
           'tooltip': {
-            'content': {
+            'contentInternal': {
               'hAlign': 'left'
             },
             /**
@@ -1705,7 +1705,7 @@ goog.provide('anychart.themes.v6');
                     global['anychart']['color']['darken']('blue')));
           },
           'tooltip': {
-            'content': {
+            'contentInternal': {
               'hAlign': 'left'
             },
             /**
@@ -1825,7 +1825,7 @@ goog.provide('anychart.themes.v6');
             return global['anychart']['color']['darken']('blue');
           },
           'tooltip': {
-            'content': {
+            'contentInternal': {
               'hAlign': 'left'
             },
             /**
@@ -1883,7 +1883,7 @@ goog.provide('anychart.themes.v6');
             return global['anychart']['color']['darken'](this['sourceColor']);
           },
           'tooltip': {
-            'content': {
+            'contentInternal': {
               'hAlign': 'left'
             },
             /**
@@ -1904,7 +1904,7 @@ goog.provide('anychart.themes.v6');
             'position': 'rightCenter'
           },
           'tooltip': {
-            'content': {
+            'contentInternal': {
               'hAlign': 'left'
             },
             /**
@@ -1919,7 +1919,7 @@ goog.provide('anychart.themes.v6');
         },
         'rangeColumn': {
           'tooltip': {
-            'content': {
+            'contentInternal': {
               'hAlign': 'left'
             },
             /**
@@ -1965,7 +1965,7 @@ goog.provide('anychart.themes.v6');
             return global['anychart']['color']['darken'](this['sourceColor']);
           },
           'tooltip': {
-            'content': {
+            'contentInternal': {
               'hAlign': 'left'
             },
             /**
@@ -2011,7 +2011,7 @@ goog.provide('anychart.themes.v6');
             return global['anychart']['color']['darken'](this['sourceColor']);
           },
           'tooltip': {
-            'content': {
+            'contentInternal': {
               'hAlign': 'left'
             },
             /**
@@ -2813,7 +2813,7 @@ goog.provide('anychart.themes.v6');
           'fontSize': 13,
           'fontWeight': 'normal'
         },
-        'content': {'fontSize': 11},
+        'contentInternal': {'fontSize': 11},
         'separator': {'enabled': true},
         /**
          * @this {*}
@@ -4135,7 +4135,7 @@ goog.provide('anychart.themes.v6');
         'size': 12
       },
       'tooltip': {
-        'content': {
+        'contentInternal': {
           'hAlign': 'center'
         },
         'hAlign': 'center',
@@ -5817,7 +5817,7 @@ goog.provide('anychart.themes.v6');
       },
       'tooltip': {
         'anchor': 'leftTop',
-        'content': {
+        'contentInternal': {
           'hAlign': 'left'
         },
         /**
@@ -6002,7 +6002,7 @@ goog.provide('anychart.themes.v6');
         'baselineAbove': false,
         'tooltip': {
           'anchor': 'leftTop',
-          'content': {
+          'contentInternal': {
             'hAlign': 'left'
           }
         },

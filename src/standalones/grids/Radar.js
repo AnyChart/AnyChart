@@ -31,7 +31,7 @@ anychart.standalones.grids.radar = function() {
  * @deprecated Since 7.12.0. Use anychart.standalones.grids.radar instead.
  */
 anychart.grids.radar = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.grids.radar', 'anychart.standalones.grids.radar'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.grids.radar()', 'anychart.standalones.grids.radar()', null, 'Constructor'], true);
   return anychart.standalones.grids.radar();
 };
 

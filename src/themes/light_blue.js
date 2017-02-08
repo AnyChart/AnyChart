@@ -86,10 +86,6 @@ goog.provide('anychart.themes.light_blue');
         'align': 'center',
         'fontSize': 14
       },
-      'content': {
-        'fontColor': '#78909c',
-        'fontSize': 12
-      },
       'padding': {'top': 10, 'right': 15, 'bottom': 10, 'left': 15},
       'separator': {
         'margin': {'top': 10, 'right': 10, 'bottom': 10, 'left': 10}

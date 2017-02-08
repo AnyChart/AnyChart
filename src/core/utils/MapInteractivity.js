@@ -67,10 +67,10 @@ anychart.core.utils.MapInteractivity.prototype.zoomOnMouseWheel = function(opt_v
  * Allows use mouse wheel
  * @param {boolean=} opt_value Whether will use mouse wheel.
  * @return {anychart.core.utils.Interactivity|boolean} .
- * @deprecated Use {@link anychart.core.utils.MapInteractivity.zoomOnMouseWheel} instead.
+ * @deprecated Since 7.11.0. Use zoomOnMouseWheel() method instead.
  */
 anychart.core.utils.MapInteractivity.prototype.mouseWheel = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.mouseWheel()', '.zoomOnMouseWheel()'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['mouseWheel()', 'zoomOnMouseWheel()'], true);
   return this.zoomOnMouseWheel(opt_value);
 };
 
@@ -144,10 +144,15 @@ anychart.core.utils.MapInteractivity.prototype.copyFormatter = function(opt_valu
 
 //endregion
 //region --- Setup and serialize
-/** @inheritDoc */
+/**
+ * @inheritDoc
+ * @suppress {deprecated}
+ */
 anychart.core.utils.MapInteractivity.prototype.setupByJSON = function(value, opt_default) {
   anychart.core.utils.MapInteractivity.base(this, 'setupByJSON', value, opt_default);
 
+  if (goog.isDef(value['mouseWheel']))
+    this.mouseWheel(value['mouseWheel']);
   this.zoomOnMouseWheel(value['zoomOnMouseWheel']);
   this.keyboardZoomAndMove(value['keyboardZoomAndMove']);
   this.zoomOnDoubleClick(value['zoomOnDoubleClick']);

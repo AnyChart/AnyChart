@@ -185,7 +185,7 @@ anychart.charts.Pareto.prototype.seriesConfig = (function() {
     anchoredPositionBottom: 'zero'
   };
   res[anychart.enums.CartesianSeriesType.BAR] = {
-    drawerType: anychart.enums.SeriesDrawerTypes.BAR,
+    drawerType: anychart.enums.SeriesDrawerTypes.COLUMN,
     shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
     shapesConfig: [
       anychart.core.shapeManagers.pathFillStrokeConfig,
@@ -340,7 +340,7 @@ anychart.charts.Pareto.prototype.seriesConfig = (function() {
     anchoredPositionBottom: 'low'
   };
   res[anychart.enums.CartesianSeriesType.RANGE_BAR] = {
-    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_BAR,
+    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_COLUMN,
     shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
     shapesConfig: [
       anychart.core.shapeManagers.pathFillStrokeConfig,

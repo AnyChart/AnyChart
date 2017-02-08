@@ -481,7 +481,7 @@ anychart.themes.merging.mergingMap_ = [
       'defaultLabelFactory',
       'defaultCrosshairLabel',
       'defaultTooltip',
-      'defaultTooltip.content',
+      'defaultTooltip.contentInternal',
       'defaultLegend',
       'defaultLegend.paginator',
       'chart.defaultLabelSettings',
@@ -499,7 +499,7 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'defaultTitle.background',
       'defaultTooltip.background',
-      'defaultTooltip.content.background',
+      'defaultTooltip.contentInternal.background',
       'defaultLabelFactory.background',
       'defaultCrosshairLabel.background',
       'chart.background',

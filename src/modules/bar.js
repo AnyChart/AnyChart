@@ -35,23 +35,8 @@ anychart.bar = function(var_args) {
 
   return chart;
 };
-
-
 anychart.chartTypesMap[anychart.enums.ChartTypes.BAR] = anychart.bar;
 
 
-/**
- * Default bar chart.<br/>
- * <b>Note:</b> Contains predefined settings for axes and grids.
- * @example
- * anychart.bar([1.3, 2, 1.4], [1.1, 1.6, 1.3])
- *   .container(stage).draw();
- * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Bar chart data.
- * @return {anychart.charts.Cartesian} Chart with defaults for bar series.
- * @deprecated Use anychart.bar() instead.
- */
-anychart.barChart = anychart.bar;
-
 //exports
 goog.exportSymbol('anychart.bar', anychart.bar);
-goog.exportSymbol('anychart.barChart', anychart.barChart);

@@ -142,13 +142,6 @@ anychart.core.series.Cartesian.prototype.pointProvider_;
 anychart.core.series.Cartesian.prototype.applyDefaultsToElements = function(defaults, opt_resetLegendItem, opt_default) {
   anychart.core.series.Cartesian.base(this, 'applyDefaultsToElements', defaults, opt_resetLegendItem, opt_default);
 
-  if (goog.isDef(defaults['allowPointsSelect'])) {
-    this.selectionMode(goog.isBoolean(defaults['allowPointsSelect']) ?
-        (defaults['allowPointsSelect'] ?
-            anychart.enums.SelectionMode.MULTI_SELECT :
-            anychart.enums.SelectionMode.NONE) :
-        defaults['allowPointsSelect']);
-  }
   this.selectionMode(defaults['selectionMode']);
 };
 
@@ -1005,25 +998,6 @@ anychart.core.series.Cartesian.prototype.hoverMode = function(opt_value) {
 
 
 /**
- * Allows to select points of the series.
- * @param {?boolean=} opt_value Allow or not.
- * @return {null|boolean|anychart.core.series.Cartesian} Returns allow points select state or current series instance for chaining.
- * @deprecated Use this.selectionMode().
- */
-anychart.core.series.Cartesian.prototype.allowPointsSelect = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.selectionMode(goog.isBoolean(opt_value) ?
-        (opt_value ?
-            anychart.enums.SelectionMode.MULTI_SELECT :
-            anychart.enums.SelectionMode.NONE) :
-        opt_value);
-    return this;
-  }
-  return goog.isNull(this.selectionMode()) ? null : this.selectionMode() != anychart.enums.SelectionMode.NONE;
-};
-
-
-/**
  * If index is passed, hovers a point of the series by its index, else hovers all points of the series.
  * @param {(number|Array<number>)=} opt_indexOrIndexes Point index or array of indexes.
  * @return {!anychart.core.series.Cartesian}  {@link anychart.core.series.Cartesian} instance for method chaining.
@@ -1442,13 +1416,6 @@ anychart.core.series.Cartesian.prototype.setupByJSON = function(config, opt_defa
   if ('data' in config)
     this.data(config['data'] || null);
 
-  if (goog.isDef(config['allowPointsSelect'])) {
-    this.selectionMode(goog.isBoolean(config['allowPointsSelect']) ?
-        (config['allowPointsSelect'] ?
-            anychart.enums.SelectionMode.MULTI_SELECT :
-            anychart.enums.SelectionMode.NONE) :
-        config['allowPointsSelect']);
-  }
   this.selectionMode(config['selectionMode']);
 };
 
@@ -1484,7 +1451,6 @@ anychart.core.series.Cartesian.prototype.disposeInternal = function() {
   proto['select'] = proto.select;
   proto['unselect'] = proto.unselect;
   proto['selectionMode'] = proto.selectionMode;
-  proto['allowPointsSelect'] = proto.allowPointsSelect;
 
   proto['getPoint'] = proto.getPoint;
   proto['excludePoint'] = proto.excludePoint;

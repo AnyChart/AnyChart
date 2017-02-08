@@ -35,7 +35,7 @@ anychart.standalones.table = function(opt_rowsCount, opt_colsCount) {
  * @deprecated Since 7.12.0. Use anychart.standalones.table instead.
  */
 anychart.ui.table = function(opt_rowsCount, opt_colsCount) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.table', 'anychart.standalones.table'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.table()', 'anychart.standalones.table()', null, 'Constructor'], true);
   return anychart.standalones.table(opt_rowsCount, opt_colsCount);
 };
 

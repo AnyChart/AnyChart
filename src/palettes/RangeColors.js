@@ -73,9 +73,10 @@ anychart.palettes.RangeColors.prototype.colorPalette_;
  * @param {...(acgraph.vector.SolidFill|string)} var_args .
  * @return {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|
  * Array.<acgraph.vector.GradientKey>|Array.<string>|anychart.palettes.RangeColors} .
- * @deprecated use items.
+ * @deprecated Since 7.7.0. Use items() method instead.
  */
 anychart.palettes.RangeColors.prototype.colors = function(opt_value, var_args) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['colors()', 'items()'], true);
   return this.items.apply(this, arguments);
 };
 
@@ -134,9 +135,10 @@ anychart.palettes.RangeColors.prototype.count = function(opt_value) {
  * @param {number} index .
  * @param {acgraph.vector.SolidFill=} opt_color .
  * @return {acgraph.vector.SolidFill|anychart.palettes.RangeColors} .
- * @deprecated use itemAt.
+ * @deprecated Since 7.7.0. Use itemAt() method instead.
  */
 anychart.palettes.RangeColors.prototype.colorAt = function(index, opt_color) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['colorAt()', 'itemAt()'], true);
   return this.itemAt(index, opt_color);
 };
 
@@ -323,9 +325,14 @@ anychart.palettes.RangeColors.prototype.setupSpecial = function(var_args) {
 };
 
 
-/** @inheritDoc */
+/**
+ * @inheritDoc
+ * @suppress {deprecated}
+ */
 anychart.palettes.RangeColors.prototype.setupByJSON = function(config, opt_default) {
   anychart.palettes.RangeColors.base(this, 'setupByJSON', config, opt_default);
+  if (goog.isDef(config['colors']))
+    this.colors(config['colors']);
   this.items(config['items']);
   this.count(config['count']);
 };

@@ -77,9 +77,6 @@ goog.provide('anychart.themes.monochrome');
         'padding': {'bottom': 10},
         'fontSize': 14
       },
-      'content': {
-        'fontColor': '#464646'
-      },
       'separator': {
         'enabled': false
       },

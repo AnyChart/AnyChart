@@ -685,7 +685,7 @@ goog.provide('anychart.themes.defaultTheme');
           'stroke': 'none'
         }
       },
-      'content': {
+      'contentInternal': {
         'enabled': true,
         'fontSize': 12,
         'minFontSize': 9,
@@ -2945,7 +2945,6 @@ goog.provide('anychart.themes.defaultTheme');
           'hoverMarkers': {'enabled': null},
           'selectMarkers': {'enabled': null},
           'color': null,
-          'allowPointsSelect': null,
           'tooltip': {
             /**
              * @this {*}
@@ -3178,7 +3177,7 @@ goog.provide('anychart.themes.defaultTheme');
       'legend': {
         'enabled': false,
         'tooltip': {
-          'content': {
+          'contentInternal': {
             'background': {
               'disablePointerEvents': false
             }
@@ -3521,7 +3520,7 @@ goog.provide('anychart.themes.defaultTheme');
           'fontSize': 13,
           'fontWeight': 'normal'
         },
-        'content': {'fontSize': 11},
+        'contentInternal': {'fontSize': 11},
         'separator': {'enabled': true},
         /**
          * @this {*}
@@ -3833,7 +3832,7 @@ goog.provide('anychart.themes.defaultTheme');
           'enabled': true
         },
         'anchor': 'leftTop',
-        'content': {
+        'contentInternal': {
           'hAlign': 'left'
         },
         /**
@@ -4000,8 +3999,6 @@ goog.provide('anychart.themes.defaultTheme');
       'selectedElementFill': '#ef6c00',
       'selectedElementStroke': '#bc5704',
       'selectedConnectorStroke': '2 #bc5704',
-      'minimumGap': 0.1,
-      'maximumGap': 0.1,
       'baselineAbove': false,
       'tooltip': {
         'padding': {'top': 5, 'right': 5, 'bottom': 5, 'left': 5},
@@ -4015,7 +4012,7 @@ goog.provide('anychart.themes.defaultTheme');
           'enabled': true
         },
         'anchor': 'leftTop',
-        'content': {
+        'contentInternal': {
           'hAlign': 'left'
         },
         'zIndex': 100,

@@ -39,4 +39,3 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.RADAR] = anychart.radar;
 
 //exports
 goog.exportSymbol('anychart.radar', anychart.radar);
-goog.exportSymbol('anychart.radarChart', anychart.radar);

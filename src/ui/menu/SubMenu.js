@@ -572,16 +572,6 @@ anychart.ui.menu.SubMenu.prototype.getItemCount = function() {
 
 
 /**
- * Returns the menu items contained in the sub menu.
- * @return {!Array<!goog.ui.MenuItem>} An array of menu items.
- * @deprecated Use getItemAt/getItemCount instead.
- */
-anychart.ui.menu.SubMenu.prototype.getItems = function() {
-  return this.getMenu().getItems();
-};
-
-
-/**
  * Gets a reference to the submenu's actual menu.
  * @return {!goog.ui.Menu} - Reference to the object representing the sub menu.
  */

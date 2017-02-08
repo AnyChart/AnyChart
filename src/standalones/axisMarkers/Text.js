@@ -32,7 +32,7 @@ anychart.standalones.axisMarkers.text = function() {
  * @return {!anychart.standalones.axisMarkers.Text}
  */
 anychart.axisMarkers.text = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.axisMarkers.text', 'anychart.standalones.axisMarkers.text'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.axisMarkers.text()', 'anychart.standalones.axisMarkers.text()', null, 'Constructor'], true);
   return anychart.standalones.axisMarkers.text();
 };
 

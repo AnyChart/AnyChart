@@ -41,7 +41,7 @@ anychart.standalones.axes.linear = function() {
  * @deprecated Since 7.12.0. Use anychart.standalones.axes.linear instead.
  */
 anychart.axes.linear = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.axes.linear', 'anychart.standalones.axes.linear'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.axes.linear()', 'anychart.standalones.axes.linear()', null, 'Constructor'], true);
   return anychart.standalones.axes.linear();
 };
 

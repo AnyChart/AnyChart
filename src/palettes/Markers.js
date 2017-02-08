@@ -40,9 +40,10 @@ anychart.palettes.Markers.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_RE
  * @param {number} index Index of marker to get/set.
  * @param {string=} opt_marker Type of the marker to set.
  * @return {anychart.enums.MarkerType|anychart.enums.BulletMarkerType|anychart.palettes.Markers} Marker by index or self for chaining.
- * @deprecated use itemAt.
+ * @deprecated Since 7.7.0. Use itemAt() method instead.
  */
 anychart.palettes.Markers.prototype.markerAt = function(index, opt_marker) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['markerAt()', 'itemAt()'], true);
   return this.itemAt(index, opt_marker);
 };
 
@@ -88,9 +89,10 @@ anychart.palettes.Markers.prototype.itemAt = function(index, opt_item) {
  * @param {(Array.<string>|string)=} opt_markers
  * @param {...string} var_args .
  * @return {Array.<string>|anychart.palettes.Markers} Markers list or self for method chaining.
- * @deprecated use items.
+ * @deprecated Since 7.7.0. Use items() method instead.
  */
 anychart.palettes.Markers.prototype.markers = function(opt_markers, var_args) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['markers()', 'items()'], true);
   return this.items.apply(this, arguments);
 };
 
@@ -149,9 +151,12 @@ anychart.palettes.Markers.prototype.setupSpecial = function(var_args) {
 
 /**
  * @inheritDoc
+ * @suppress {deprecated}
  */
 anychart.palettes.Markers.prototype.setupByJSON = function(config, opt_default) {
   anychart.palettes.Markers.base(this, 'setupByJSON', config, opt_default);
+  if (goog.isDef(config['markers']))
+    this.markers(config['markers']);
   this.items(config['items']);
 };
 

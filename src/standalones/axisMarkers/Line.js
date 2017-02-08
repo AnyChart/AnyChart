@@ -31,7 +31,7 @@ anychart.standalones.axisMarkers.line = function() {
  * @return {!anychart.standalones.axisMarkers.Line}
  */
 anychart.axisMarkers.line = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.axisMarkers.line', 'anychart.standalones.axisMarkers.line'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.axisMarkers.line()', 'anychart.standalones.axisMarkers.line()', null, 'Constructor'], true);
   return anychart.standalones.axisMarkers.line();
 };
 

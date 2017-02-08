@@ -48,7 +48,7 @@ anychart.standalones.axes.polar = function() {
  * @deprecated Since 7.12.0. Use anychart.standalones.axes.polar instead.
  */
 anychart.axes.polar = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.axes.polar', 'anychart.standalones.axes.polar'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.axes.polar()', 'anychart.standalones.axes.polar()', null, 'Constructor'], true);
   return anychart.standalones.axes.polar();
 };
 

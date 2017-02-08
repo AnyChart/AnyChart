@@ -28,24 +28,8 @@ anychart.bullet = function(opt_data, opt_csvSettings) {
 
   return chart;
 };
-
-
 anychart.chartTypesMap[anychart.enums.ChartTypes.BULLET] = anychart.bullet;
 
 
-/**
- * Creates a bullet chart.
- * @example <t>simple-h100</t>
- * var bulletChart = anychart.bullet([17]);
- * bulletChart.range().from(0).to(10);
- * bulletChart.range(1).from(10).to(20);
- * bulletChart.container(stage).draw();
- * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Bullet Chart data.
- * @return {!anychart.charts.Bullet} Bullet chart.
- * @deprecated Use anychart.bullet() instead.
- */
-anychart.bulletChart = anychart.bullet;
-
 //exports
 goog.exportSymbol('anychart.bullet', anychart.bullet);
-goog.exportSymbol('anychart.bulletChart', anychart.bulletChart);

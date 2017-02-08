@@ -46,9 +46,10 @@ anychart.palettes.DistinctColors.prototype.SUPPORTED_SIGNALS = anychart.Signal.N
  * @param {number} index .
  * @param {acgraph.vector.Fill=} opt_color .
  * @return {acgraph.vector.Fill|!anychart.palettes.DistinctColors} .
- * @deprecated use itemAt.
+ * @deprecated Since 7.7.0. Use itemAt() method instead.
  */
 anychart.palettes.DistinctColors.prototype.colorAt = function(index, opt_color) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['colorAt()', 'itemAt()'], true);
   return this.itemAt(index, opt_color);
 };
 
@@ -81,9 +82,10 @@ anychart.palettes.DistinctColors.prototype.itemAt = function(index, opt_item) {
  * @param {(Array.<acgraph.vector.Fill>|acgraph.vector.Fill)=} opt_value .
  * @param {...acgraph.vector.Fill} var_args .
  * @return {Array.<acgraph.vector.Fill>|!anychart.palettes.DistinctColors} .
- * @deprecated use items.
+ * @deprecated Since 7.7.0. Use items() method instead.
  */
 anychart.palettes.DistinctColors.prototype.colors = function(opt_value, var_args) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['colors()', 'items()'], true);
   return this.items.apply(this, arguments);
 };
 
@@ -148,9 +150,14 @@ anychart.palettes.DistinctColors.prototype.setupSpecial = function(var_args) {
 };
 
 
-/** @inheritDoc */
+/**
+ * @inheritDoc
+ * @suppress {deprecated}
+ */
 anychart.palettes.DistinctColors.prototype.setupByJSON = function(config, opt_default) {
   anychart.palettes.DistinctColors.base(this, 'setupByJSON', config, opt_default);
+  if (goog.isDef(config['colors']))
+    this.colors(config['colors']);
   this.items(config['items']);
 };
 

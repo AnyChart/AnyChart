@@ -31,7 +31,7 @@ anychart.standalones.grids.linear3d = function() {
  * @deprecated Since 7.12.0. Use anychart.standalones.grids.linear3d instead.
  */
 anychart.grids.linear3d = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.grids.linear3d', 'anychart.standalones.grids.linear3d'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.grids.linear3d()', 'anychart.standalones.grids.linear3d()', null, 'Constructor'], true);
   return anychart.standalones.grids.linear3d();
 };
 

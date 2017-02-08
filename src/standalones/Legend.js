@@ -138,7 +138,7 @@ anychart.standalones.legend = function() {
  * @deprecated Since 7.12.0. Use anychart.standalones.legend instead.
  */
 anychart.ui.legend = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.legend', 'anychart.standalones.legend'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ui.legend()', 'anychart.standalones.legend()', null, 'Constructor'], true);
   return anychart.standalones.legend();
 };
 

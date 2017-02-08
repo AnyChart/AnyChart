@@ -36,14 +36,10 @@ anychart.gaugeTypesMap[anychart.enums.GaugeTypes.CIRCULAR] = anychart.gauges.cir
  * @deprecated Since 7.11.0. Use anychart.gauges.circular instead.
  */
 anychart.circularGauge = function(opt_data, opt_csvSettings) {
-  var gauge = new anychart.charts.CircularGauge(opt_data, opt_csvSettings);
-  var theme = anychart.getFullTheme();
-
-  gauge.setupByVal(theme['circularGauge'], true);
-
-  return gauge;
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.circularGauge()', 'anychart.gauges.circular()', null, 'Constructor'], true);
+  return anychart.gauges.circular(opt_data, opt_csvSettings);
 };
-anychart.gaugeTypesMap[anychart.enums.GaugeTypes.CIRCULAR] = anychart.circularGauge;
+
 
 //exports
 goog.exportSymbol('anychart.gauges.circular', anychart.gauges.circular);

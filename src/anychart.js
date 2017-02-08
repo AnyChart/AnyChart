@@ -79,9 +79,10 @@ acgraph.vector.Stage.prototype.credits = function(opt_value) {
  @see acgraph.vector.Stage#saveAsSvg
  @param {string=} opt_address Export server script URL.
  @return {string} Export server script URL.
+ @deprecated Since 7.10.1. Use anychart.exports.server() instead.
  */
 anychart.server = function(opt_address) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.server', 'anychart.exports.server'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.server()', 'anychart.exports.server()', null, 'Function'], true);
   return anychart.exports.server(opt_address);
 };
 
@@ -1075,19 +1076,6 @@ goog.exportSymbol('anychart.bubbleMap', anychart.bubbleMap);
 goog.exportSymbol('anychart.markerMap', anychart.markerMap);
 goog.exportSymbol('anychart.seatMap', anychart.seatMap);
 goog.exportSymbol('anychart.connector', anychart.connector);
-goog.exportSymbol('anychart.areaChart', anychart.area);
-goog.exportSymbol('anychart.barChart', anychart.bar);
-goog.exportSymbol('anychart.bubbleChart', anychart.bubble);
-goog.exportSymbol('anychart.bulletChart', anychart.bullet);
-goog.exportSymbol('anychart.cartesianChart', anychart.cartesian);
-goog.exportSymbol('anychart.columnChart', anychart.column);
-goog.exportSymbol('anychart.financialChart', anychart.financial);
-goog.exportSymbol('anychart.lineChart', anychart.line);
-goog.exportSymbol('anychart.markerChart', anychart.marker);
-goog.exportSymbol('anychart.pieChart', anychart.pie);
-goog.exportSymbol('anychart.radarChart', anychart.radar);
-goog.exportSymbol('anychart.polarChart', anychart.polar);
-goog.exportSymbol('anychart.scatterChart', anychart.scatter);
 goog.exportSymbol('anychart.circularGauge', anychart.circularGauge);
 goog.exportSymbol('anychart.gauges.circular', anychart.gauges.circular);
 goog.exportSymbol('anychart.gauges.linear', anychart.gauges.linear);

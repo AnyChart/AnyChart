@@ -1160,9 +1160,9 @@ anychart.core.ui.Tooltip.prototype.contentInternal = function(opt_value) {
 
 /**
  * Tooltip content.
- * @deprecated Use methods directly.
  * @param {(Object|boolean|null|string)=} opt_value Content settings.
  * @return {!(anychart.core.ui.Label|anychart.core.ui.Tooltip)} .
+ * @deprecated Since 7.7.0. Use methods directly instead.
  */
 anychart.core.ui.Tooltip.prototype.content = function(opt_value) {
   anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.content()', 'the following behaviour',
@@ -2013,23 +2013,29 @@ anychart.core.ui.Tooltip.prototype.getHighPriorityResolutionChain = function() {
  * Function to format content text.
  * @param {Function=} opt_value - Function to format content text.
  * @return {Function|anychart.core.ui.Tooltip} - Function to format content text or itself for method chaining.
- * @deprecated Use {@link #textFormatter} instead.
+ * @deprecated Since 7.7.0. Use textFormatter() method instead.
  */
 anychart.core.ui.Tooltip.prototype.contentFormatter = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.contentFormatter()', '.textFormatter()'], true);
-  return /** @type {Function} */ (this['textFormatter'](opt_value));
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['contentFormatter()', 'textFormatter()'], true);
+  return /** @type {Function|anychart.core.ui.Tooltip} */ (this['textFormatter'](opt_value));
 };
 
 
 /**
  * Enabled 'float' position mode for all tooltips.
  * @param {boolean=} opt_value
- * @return {boolean}
- * @deprecated Use tooltip().positionMode('float') instead.
+ * @return {boolean|anychart.core.ui.Tooltip}
+ * @deprecated Since 7.7.0. Use tooltip().positionMode('float') instead.
  */
 anychart.core.ui.Tooltip.prototype.isFloating = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['.isFloating()', '.positionMode()'], true);
-  return this.getOption('positionMode') == anychart.enums.TooltipPositionMode.FLOAT;
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['isFloating()', 'positionMode()'], true);
+  var currValue = this.getOption('positionMode');
+  if (goog.isDef(opt_value)) {
+    if ((currValue == anychart.enums.TooltipPositionMode.FLOAT) != opt_value)
+    this.setOption('positionMode', opt_value ? anychart.enums.TooltipPositionMode.FLOAT : anychart.enums.TooltipPositionMode.CHART);
+    return this;
+  }
+  return currValue == anychart.enums.TooltipPositionMode.FLOAT;
 };
 
 //endregion
@@ -2126,8 +2132,21 @@ anychart.core.ui.Tooltip.prototype.serialize = function() {
 };
 
 
-/** @inheritDoc */
+/**
+ * @inheritDoc
+ * @suppress {deprecated}
+ */
 anychart.core.ui.Tooltip.prototype.setupByJSON = function(config, opt_default) {
+  if (config['content']) {
+    this.content(config['content']);
+  }
+  if (config['contentFormatter']) {
+    this.contentFormatter(config['contentFormatter']);
+  }
+  if (config['isFloating']) {
+    this.isFloating(config['isFloating']);
+  }
+
   if (opt_default) {
     this.setThemeSettings(config);
   } else {
@@ -2146,7 +2165,7 @@ anychart.core.ui.Tooltip.prototype.setupByJSON = function(config, opt_default) {
           to get access to label's methods like label.anchor() and label.position().
           That' why we have to set these values manually even for new implementation of tooltip.
    */
-  var contentConfig = config['content'];
+  var contentConfig = config['contentInternal'];
   if (!contentConfig || !('anchor' in config) || !('position' in config)) {
     var position;
     var anchor;

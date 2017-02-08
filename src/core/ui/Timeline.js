@@ -1435,9 +1435,10 @@ anychart.core.ui.Timeline.prototype.onMarkersSignal_ = function(event) {
  * Gets/sets minimum gap.
  * @param {number=} opt_value - Value to be set.
  * @return {number|anychart.core.ui.Timeline} - Current value or itself for method chaining.
- * @deprecated Use this.scale().minimumGap() instead.
+ * @deprecated Since 7.12.0. Use this.scale().minimumGap() instead.
  */
 anychart.core.ui.Timeline.prototype.minimumGap = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['minimumGap()', 'scale().minimumGap()'], true);
   if (goog.isDef(opt_value)) {
     this.scale_.minimumGap(opt_value);
     return this;
@@ -1450,9 +1451,10 @@ anychart.core.ui.Timeline.prototype.minimumGap = function(opt_value) {
  * Gets/sets maximum gap.
  * @param {number=} opt_value - Value to be set.
  * @return {number|anychart.core.ui.Timeline} - Current value or itself for method chaining.
- * @deprecated Use this.scale().maximumGap() instead.
+ * @deprecated Since 7.12.0. Use this.scale().maximumGap() instead.
  */
 anychart.core.ui.Timeline.prototype.maximumGap = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['maximumGap()', 'scale().maximumGap()'], true);
   if (goog.isDef(opt_value)) {
     this.scale_.maximumGap(opt_value);
     return this;
@@ -4349,10 +4351,19 @@ anychart.core.ui.Timeline.prototype.serialize = function() {
 };
 
 
-/** @inheritDoc */
+/**
+ * @inheritDoc
+ * @suppress {deprecated}
+ */
 anychart.core.ui.Timeline.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.Timeline.base(this, 'setupByJSON', config, opt_default);
 
+  if (goog.isDef(config['minimumGap'])) {
+    this.minimumGap(config['minimumGap']);
+  }
+  if (goog.isDef(config['maximumGap'])) {
+    this.maximumGap(config['maximumGap']);
+  }
   if ('scale' in config) this.scale_.setup(config['scale']);
   if ('labels' in config) this.labels(config['labels']);
   if ('markers' in config) this.markers(config['markers']);
@@ -4729,9 +4740,9 @@ anychart.core.ui.Timeline.ConnectorDragger.prototype.computeInitialPosition = fu
 (function() {
   var proto = anychart.core.ui.Timeline.prototype;
   proto['backgroundFill'] = proto.backgroundFill;
-  proto['cellOddFill'] = proto.cellOddFill; //deprecated
-  proto['cellEvenFill'] = proto.cellEvenFill; //deprecated
-  proto['cellFill'] = proto.cellFill; //deprecated
+  proto['cellOddFill'] = proto.cellOddFill; //deprecated since 7.7.0
+  proto['cellEvenFill'] = proto.cellEvenFill; //deprecated since 7.7.0
+  proto['cellFill'] = proto.cellFill; //deprecated since 7.7.0
   proto['columnStroke'] = proto.columnStroke;
   proto['rowFill'] = proto.rowFill;
   proto['rowEvenFill'] = proto.rowEvenFill;

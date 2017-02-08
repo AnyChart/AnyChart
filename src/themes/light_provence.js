@@ -84,9 +84,6 @@ goog.provide('anychart.themes.light_provence');
         'padding': {'bottom': 5},
         'fontSize': 15
       },
-      'content': {
-        'fontColor': '#997f89'
-      },
       'separator': {
         'enabled': false
       },

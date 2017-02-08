@@ -498,7 +498,7 @@ anychart.core.PyramidFunnelBase.prototype.normalizeColor = function(color, var_a
   if (goog.isFunction(color)) {
     sourceColor = arguments.length > 1 ?
         this.normalizeColor.apply(this, goog.array.slice(arguments, 1)) :
-        this.palette().colorAt(index);
+        this.palette().itemAt(index);
     scope = {
       'index': index,
       'sourceColor': sourceColor,

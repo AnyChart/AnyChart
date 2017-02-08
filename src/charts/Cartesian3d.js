@@ -391,7 +391,7 @@ anychart.charts.Cartesian3d.prototype.zAspect = function(opt_value) {
  * Getter/setter for zDepth.
  * @param {?(number)=} opt_value
  * @return {number|null|anychart.charts.Cartesian3d}
- * @deprecated Deprecated since 7.10.0. Use chart.zAspect instead.
+ * @deprecated Since 7.10.0. Use chart.zAspect instead.
  */
 anychart.charts.Cartesian3d.prototype.zDepth = function(opt_value) {
   anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['chart.zDepth', 'chart.zAspect with chart.zPadding'], true);
@@ -809,7 +809,7 @@ anychart.charts.Cartesian3d.prototype.setupByJSON = function(config, opt_default
   anychart.charts.Cartesian3d.base(this, 'setupByJSON', config, opt_default);
 
   this.zAngle(config['zAngle']);
-  if (config['zDepth']) this.zDepth(config['zDepth']);
+  if (goog.isDef(config['zDepth'])) this.zDepth(config['zDepth']);
   this.zAspect(config['zAspect']);
   this.zDistribution(config['zDistribution']);
   this.zPadding(config['zPadding']);
@@ -824,7 +824,10 @@ anychart.charts.Cartesian3d.prototype.serialize = function() {
   var json = anychart.charts.Cartesian3d.base(this, 'serialize');
 
   json['chart']['zAngle'] = this.zAngle();
-  if (goog.isDefAndNotNull(this.zDepth_)) json['chart']['zDepth'] = this.zDepth();
+  if (goog.isDefAndNotNull(this.zDepth_)) {
+    // we should not place warning here on serialization.
+    json['chart']['zDepth'] = this.zDepth_;
+  }
   json['chart']['zAspect'] = this.zAspect();
   json['chart']['zDistribution'] = this.zDistribution();
   json['chart']['zPadding'] = this.zPadding();

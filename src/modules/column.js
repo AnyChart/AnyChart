@@ -36,23 +36,8 @@ anychart.column = function(var_args) {
 
   return chart;
 };
-
-
 anychart.chartTypesMap[anychart.enums.ChartTypes.COLUMN] = anychart.column;
 
 
-/**
- * Default column chart.<br/>
- * <b>Note:</b> Contains predefined settings for axes and grids.
- * @example
- * anychart.column([1.3, 2, 1.4], [1.1, 1.6, 1.3])
- *   .container(stage).draw();
- * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Column chart data.
- * @return {anychart.charts.Cartesian} Chart with defaults for column series.
- * @deprecated Use anychart.column() instead.
- */
-anychart.columnChart = anychart.column;
-
 //exports
 goog.exportSymbol('anychart.column', anychart.column);
-goog.exportSymbol('anychart.columnChart', anychart.columnChart);

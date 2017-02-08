@@ -1119,9 +1119,10 @@ anychart.charts.Map.prototype.handleMouseOut = function(event) {
  * Allows to select points of the Map.
  * @param {boolean=} opt_value Allow or not.
  * @return {boolean|anychart.charts.Map} Returns allow points select state or current map instance for chaining.
- * @deprecated use chart.interactivity().selectionMode().
+ * @deprecated Since 7.8.0. Use chart.interactivity().selectionMode().
  */
 anychart.charts.Map.prototype.allowPointsSelect = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['allowPointsSelect()', 'interactivity().selectionMode()'], true);
   if (goog.isDef(opt_value)) {
     this.interactivity().selectionMode(opt_value ?
         anychart.enums.SelectionMode.MULTI_SELECT :
@@ -5330,7 +5331,10 @@ anychart.charts.Map.prototype.toGeoJSON = function() {
 };
 
 
-/** @inheritDoc */
+/**
+ * @inheritDoc
+ * @suppress {deprecated}
+ */
 anychart.charts.Map.prototype.setupByJSON = function(config, opt_default) {
   anychart.charts.Map.base(this, 'setupByJSON', config, opt_default);
 
@@ -5356,8 +5360,7 @@ anychart.charts.Map.prototype.setupByJSON = function(config, opt_default) {
     this.geoData(/** @type {string} */(goog.string.startsWith(geoData, '{') ? JSON.parse(geoData) : geoData));
   }
   if (goog.isDef(config['allowPointsSelect'])) {
-    this.interactivity().selectionMode(
-        config['allowPointsSelect'] ? anychart.enums.SelectionMode.MULTI_SELECT : anychart.enums.SelectionMode.NONE);
+    this.allowPointsSelect(config['allowPointsSelect']);
   }
 
   this.crsAnimation(config['crsAnimation']);

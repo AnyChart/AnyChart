@@ -251,12 +251,12 @@ anychart.ui.ganttToolbar = function() {
 
 
 /**
- * Deprecated constructor function for gantt toolbar.
+ * Constructor function for gantt toolbar.
  * @return {anychart.ui.GanttToolbar}
- * @deprecated Use anychart.ui.ganttToolbar() instead.
+ * @deprecated Since 7.10.0. Use anychart.ui.ganttToolbar() instead.
  */
 anychart.ganttToolbar = function() {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ganttToolbar()', 'anychart.ui.ganttToolbar()'], true);
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.ganttToolbar()', 'anychart.ui.ganttToolbar()', null, 'Constructor'], true);
   return new anychart.ui.GanttToolbar();
 };
 

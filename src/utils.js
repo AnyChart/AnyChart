@@ -347,7 +347,7 @@ anychart.utils.normalizeTimestamp = function(value) {
  * Formats incoming timestamp as 'yyyy.MM.dd'.
  * @param {number|string} timestamp - Timestamp.
  * @return {string} - Formatted date.
- * @deprecated Deprecated since 7.9.0. Use anychart.format.dateTime instead.
+ * @deprecated Since 7.9.0. Use anychart.format.dateTime instead.
  */
 anychart.utils.defaultDateFormatter = function(timestamp) {
   anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.utils.defaultDateFormatter', 'anychart.format.dateTime'], true);
@@ -1416,7 +1416,7 @@ anychart.utils.UTCTimeZoneCache_;
  * @param {number|Date} date UTC timestamp or Date object.
  * @param {string} pattern
  * @return {string}
- * @deprecated Deprecated since 7.9.0. Use anychart.format.dateTime instead.
+ * @deprecated Since 7.9.0. Use anychart.format.dateTime instead.
  */
 anychart.utils.formatDateTime = function(date, pattern) {
   anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['anychart.utils.formatDateTime', 'anychart.format.dateTime'], true);

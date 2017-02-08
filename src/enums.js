@@ -2565,7 +2565,7 @@ anychart.enums.GanttDataFields = {
   HOVER_FILL: 'hoverFill',
   HOVER_STROKE: 'hoverStroke',
   CONNECTOR: 'connector',
-  CONNECT_TO: 'connectTo',
+  CONNECT_TO: 'connectTo', // deprecated since 7.7.0
   CONNECTOR_TYPE: 'connectorType',
   START_MARKER: 'startMarker',
   END_MARKER: 'endMarker',
@@ -5247,27 +5247,24 @@ anychart.enums.SeriesDrawerTypes = {
   BASE: 0,
   AREA: 1,
   AREA_3D: 2,
-  BAR: 3,
-  BAR_3D: 4,
-  BOX: 5,
-  BUBBLE: 6,
-  CANDLESTICK: 7,
-  COLUMN: 8,
-  COLUMN_3D: 9,
-  LINE: 10,
-  MARKER: 11,
-  OHLC: 12,
-  RANGE_AREA: 13,
-  RANGE_BAR: 14,
-  RANGE_COLUMN: 15,
-  RANGE_SPLINE_AREA: 16,
-  RANGE_STEP_AREA: 17,
-  SPLINE: 18,
-  SPLINE_AREA: 19,
-  STEP_AREA: 20,
-  STEP_LINE: 21,
-  JUMP_LINE: 22,
-  STICK: 23
+  BOX: 3,
+  BUBBLE: 4,
+  CANDLESTICK: 5,
+  COLUMN: 6,
+  COLUMN_3D: 7,
+  LINE: 8,
+  MARKER: 9,
+  OHLC: 10,
+  RANGE_AREA: 11,
+  RANGE_COLUMN: 12,
+  RANGE_SPLINE_AREA: 13,
+  RANGE_STEP_AREA: 14,
+  SPLINE: 15,
+  SPLINE_AREA: 16,
+  STEP_AREA: 17,
+  STEP_LINE: 18,
+  JUMP_LINE: 19,
+  STICK: 20
 };
 
 
@@ -6010,12 +6007,12 @@ goog.exportSymbol('anychart.enums.DataField.TO', anychart.enums.DataField.TO);
 goog.exportSymbol('anychart.enums.DataField.ID', anychart.enums.DataField.ID);
 goog.exportSymbol('anychart.enums.DataField.NAME', anychart.enums.DataField.NAME);
 
-goog.exportSymbol('anychart.enums.Interval.YEARS', anychart.enums.Interval.YEAR);//deprecated since >7.6.0
-goog.exportSymbol('anychart.enums.Interval.MONTHS', anychart.enums.Interval.MONTH);//deprecated since >7.6.0
-goog.exportSymbol('anychart.enums.Interval.DAYS', anychart.enums.Interval.DAY);//deprecated since >7.6.0
-goog.exportSymbol('anychart.enums.Interval.HOURS', anychart.enums.Interval.HOUR);//deprecated since >7.6.0
-goog.exportSymbol('anychart.enums.Interval.MINUTES', anychart.enums.Interval.MINUTE);//deprecated since >7.6.0
-goog.exportSymbol('anychart.enums.Interval.SECONDS', anychart.enums.Interval.SECOND);//deprecated since >7.6.0
+goog.exportSymbol('anychart.enums.Interval.YEARS', anychart.enums.Interval.YEAR);//deprecated since 7.7.0
+goog.exportSymbol('anychart.enums.Interval.MONTHS', anychart.enums.Interval.MONTH);//deprecated since 7.7.0
+goog.exportSymbol('anychart.enums.Interval.DAYS', anychart.enums.Interval.DAY);//deprecated since 7.7.0
+goog.exportSymbol('anychart.enums.Interval.HOURS', anychart.enums.Interval.HOUR);//deprecated since 7.7.0
+goog.exportSymbol('anychart.enums.Interval.MINUTES', anychart.enums.Interval.MINUTE);//deprecated since 7.7.0
+goog.exportSymbol('anychart.enums.Interval.SECONDS', anychart.enums.Interval.SECOND);//deprecated since 7.7.0
 
 goog.exportSymbol('anychart.enums.Interval.YEAR', anychart.enums.Interval.YEAR);
 goog.exportSymbol('anychart.enums.Interval.SEMESTER', anychart.enums.Interval.SEMESTER);
