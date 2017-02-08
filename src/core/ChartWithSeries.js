@@ -1097,7 +1097,7 @@ anychart.core.ChartWithSeries.prototype.calculateXScales = function() {
           current0 = 0;
           current1 = 0;
           val0 = current0 < dataLength0 ? data0[current0].data['x'] : NaN;
-          val1 = current1 < dataLength1 ? data0[current1].data['x'] : NaN;
+          val1 = current1 < dataLength1 ? data1[current1].data['x'] : NaN;
           while (!isNaN(val0) && !isNaN(val1)) {
             inc0 = val0 <= val1;
             inc1 = val0 >= val1;
