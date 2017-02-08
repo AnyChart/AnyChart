@@ -1425,6 +1425,9 @@ anychart.core.ui.Scroller.prototype.moveHandleTo_ = function(handle, position) {
   }
   startRatio = this.toInternalRatio_(startRatio);
   endRatio = this.toInternalRatio_(endRatio);
+  if (startRatio == endRatio) {
+    endRatio += endRatio < anychart.core.ui.Scroller.MAX_RATIO ? 1 : -1;
+  }
   if (startRatio > endRatio) {
     var tmp = this.startThumb_;
     this.startThumb_ = this.endThumb_;
