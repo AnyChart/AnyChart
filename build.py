@@ -214,6 +214,12 @@ def __get_performance_monitoring_compiler_args(is_performance_monitoring):
         '--define "anychart.PERFORMANCE_MONITORING=%s"' % flag,
     ]
 
+def is_not_theme_build(modules):
+    return modules and len(modules) == 1 and \
+    ('anychart_ui' in modules or \
+     'chart_editor' in modules or \
+     'data_adapter' in modules)
+
 
 def __get_optimized_compiler_args():
     compiler_args = [
@@ -287,7 +293,7 @@ def __get_default_compiler_args(theme, modules):
     ]
 
     # Build AnyChart UI without theme.
-    if modules and len(modules) == 1 and 'anychart_ui' in modules:
+    if is_not_theme_build(modules):
         theme = 'none'
     if not (theme == 'none'):
         if not os.path.exists(os.path.join(SRC_PATH, 'themes', theme + '.js')):
