@@ -2032,7 +2032,7 @@ anychart.core.ui.Tooltip.prototype.isFloating = function(opt_value) {
   var currValue = this.getOption('positionMode');
   if (goog.isDef(opt_value)) {
     if ((currValue == anychart.enums.TooltipPositionMode.FLOAT) != opt_value)
-    this.setOption('positionMode', opt_value ? anychart.enums.TooltipPositionMode.FLOAT : anychart.enums.TooltipPositionMode.CHART);
+      this.setOption('positionMode', opt_value ? anychart.enums.TooltipPositionMode.FLOAT : anychart.enums.TooltipPositionMode.CHART);
     return this;
   }
   return currValue == anychart.enums.TooltipPositionMode.FLOAT;
