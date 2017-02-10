@@ -2390,7 +2390,7 @@ anychart.core.ChartWithSeries.prototype.doAnimation = function() {
       var duration = /** @type {number} */(this.animation().duration());
       for (var i = 0; i < this.seriesList.length; i++) {
         var series = this.seriesList[i];
-        if (!series.rendering().needsCustomPointDrawer()) {
+        if (series.enabled() && !series.rendering().needsCustomPointDrawer()) {
           var ctl = anychart.animations.AnimationBySeriesType[series.getAnimationType()];
           if (ctl)
             this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (new ctl(series, duration)));
