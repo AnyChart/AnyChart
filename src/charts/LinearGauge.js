@@ -699,7 +699,7 @@ anychart.charts.LinearGauge.prototype.getSelectedPoints = function() {
 
   for (var i = 0; i < allPointers.length; i++) {
     pointer = allPointers[i];
-    if (!pointer || !pointer.state) continue;
+    if (!pointer || !pointer.state || !pointer.enabled()) continue;
     selected = !!pointer.state.getIndexByPointState(anychart.PointState.SELECT).length;
     if (selected)
       selectedPointers.push(this.getWrappedPointer(/** @type {number} */ (pointer.autoIndex())));

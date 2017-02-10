@@ -786,7 +786,7 @@ anychart.core.Chart.prototype.getSelectedPoints = function() {
   var allSeries = this.getAllSeries();
   for (i = 0; i < allSeries.length; i++) {
     series = allSeries[i];
-    if (!series || !series.state || !series.getPoint) continue;
+    if (!series || !series.state || !series.getPoint || !series.enabled()) continue;
     selectedPointsIndexes = series.state.getIndexByPointState(anychart.PointState.SELECT);
     for (j = 0; j < selectedPointsIndexes.length; j++) {
       selectedPoints.push(series.getPoint(selectedPointsIndexes[j]));
@@ -2189,7 +2189,9 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
       }
     }
   } else if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
-    this.unselect();
+    if (!isTargetLegendOrColorRange)
+      this.unselect();
+
     if (this.prevSelectSeriesStatus)
       this.dispatchEvent(this.makeInteractivityPointEvent('selected', event, this.prevSelectSeriesStatus, true));
     this.prevSelectSeriesStatus = null;
@@ -2344,7 +2346,9 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
         this.prevSelectSeriesStatus = eventSeriesStatus.length ? eventSeriesStatus : null;
       }
     } else {
-      this.unselect();
+      if (!isTargetLegendOrColorRange)
+        this.unselect();
+
       if (this.prevSelectSeriesStatus)
         this.dispatchEvent(this.makeInteractivityPointEvent('selected', event, this.prevSelectSeriesStatus, true));
       this.prevSelectSeriesStatus = null;
