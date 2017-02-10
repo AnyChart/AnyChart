@@ -1740,7 +1740,6 @@ anychart.core.ui.BaseGrid.prototype.needsReapplicationHandler_ = function(event)
 anychart.core.ui.BaseGrid.prototype.onTooltipSignal_ = function(event) {
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
   tooltip.draw();
-  // tooltip.redraw();
 };
 
 

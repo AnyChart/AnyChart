@@ -111,6 +111,14 @@ anychart.core.ui.Timeline = function(opt_controller, opt_isResources) {
   this.editConnectorPreviewPath_ = null;
 
   /**
+   * Tooltip enabled state storage.
+   * @type {boolean|undefined}
+   * @private
+   */
+  this.tooltipEnabledBackup_;
+
+
+  /**
    * Edit connector preview stroke.
    * @type {acgraph.vector.Stroke}
    * @private
@@ -1739,7 +1747,8 @@ anychart.core.ui.Timeline.prototype.clearEdit_ = function() {
   this.getEditFinishConnectorPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
   this.getEditStartConnectorPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
   this.getEditConnectorPreviewPath_().clear();
-  this.tooltip().enabled(true);
+  this.tooltip().enabled(this.tooltipEnabledBackup_);
+  this.tooltipEnabledBackup_ = void 0;
 };
 
 
@@ -1852,6 +1861,7 @@ anychart.core.ui.Timeline.prototype.editFinishConnectorMouseDown_ = function(e) 
  */
 anychart.core.ui.Timeline.prototype.editPreviewDragStart_ = function(e) {
   if (this.scrollDragger) this.scrollDragger.setEnabled(false);
+  this.tooltipEnabledBackup_ = /** @type {boolean} */ (this.tooltip().enabled());
   this.tooltip().hide();
   this.tooltip().enabled(false);
   this.interactivityHandler.highlight();
@@ -1984,6 +1994,7 @@ anychart.core.ui.Timeline.prototype.editPreviewEnd_ = function(e) {
 anychart.core.ui.Timeline.prototype.editProgressDragStart_ = function(e) {
   if (this.scrollDragger) this.scrollDragger.setEnabled(false);
   this.draggingProgress = true;
+  this.tooltipEnabledBackup_ = /** @type {boolean} */ (this.tooltip().enabled());
   this.tooltip().hide();
   this.tooltip().enabled(false);
   this.getEditLeftThumbPath_().clear();
@@ -2037,6 +2048,7 @@ anychart.core.ui.Timeline.prototype.editProgressDragEnd_ = function(e) {
  */
 anychart.core.ui.Timeline.prototype.editRightThumbDragStart_ = function(e) {
   if (this.scrollDragger) this.scrollDragger.setEnabled(false);
+  this.tooltipEnabledBackup_ = /** @type {boolean} */ (this.tooltip().enabled());
   this.tooltip().hide();
   this.tooltip().enabled(false);
   this.getEditProgressPath_().clear();
@@ -2057,6 +2069,7 @@ anychart.core.ui.Timeline.prototype.editRightThumbDragStart_ = function(e) {
  */
 anychart.core.ui.Timeline.prototype.editLeftThumbDragStart_ = function(e) {
   if (this.scrollDragger) this.scrollDragger.setEnabled(false);
+  this.tooltipEnabledBackup_ = /** @type {boolean} */ (this.tooltip().enabled());
   this.tooltip().hide();
   this.tooltip().enabled(false);
   this.getEditProgressPath_().clear();
@@ -2261,6 +2274,7 @@ anychart.core.ui.Timeline.prototype.editThumbDragEnd_ = function(e) {
  */
 anychart.core.ui.Timeline.prototype.editConnectorDragStart_ = function(e) {
   if (this.scrollDragger) this.scrollDragger.setEnabled(false);
+  this.tooltipEnabledBackup_ = /** @type {boolean} */ (this.tooltip().enabled());
   this.tooltip().hide();
   this.tooltip().enabled(false);
   this.interactivityHandler.highlight();
@@ -2289,7 +2303,8 @@ anychart.core.ui.Timeline.prototype.editConnectorDrag_ = function(e) {
 anychart.core.ui.Timeline.prototype.editConnectorDragEnd_ = function(e) {
   if (this.dragging) {
     if (this.scrollDragger) this.scrollDragger.setEnabled(true);
-    this.tooltip().enabled(true);
+    this.tooltip().enabled(this.tooltipEnabledBackup_);
+    this.tooltipEnabledBackup_ = void 0;
     this.getEditConnectorPreviewPath_().clear();
     this.dragging = false;
     clearInterval(this.scrollInterval);
