@@ -145,9 +145,19 @@
     transition: none; /* fix for anychart gallery (there used transition all for any A element) */
   }
 
-  &.anychart-menuitem-highlight a {
-    padding-bottom: 5px;
-    padding-top: 5px;
+  i {
+    padding-top: 7px;
+    pointer-events: none;
+  }
+
+  &.anychart-menuitem-highlight {
+    a {
+      padding-bottom: 5px;
+      padding-top: 5px;
+    }
+    i {
+      padding-top: 6px;
+    }
   }
 }
 

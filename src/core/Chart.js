@@ -805,7 +805,7 @@ anychart.core.Chart.contextMenuItems = {
   // Item 'Export as ...'.
   exportAs: {
     'text': 'Save chart as...',
-    'iconClass': 'ac ac-folder',
+    'iconClass': 'ac ac-file-image-o',
     'subMenu': [{
       'text': '.png',
       'iconClass': 'ac ac-file-image-o',
@@ -840,7 +840,7 @@ anychart.core.Chart.contextMenuItems = {
   // Item 'Save data as...'.
   saveDataAs: {
     'text': 'Save data as...',
-    'iconClass': 'ac ac-folder',
+    'iconClass': 'ac ac-save',
     'subMenu': [{
       'text': '.csv',
       'iconClass': 'ac ac-file-excel-o',
@@ -861,7 +861,7 @@ anychart.core.Chart.contextMenuItems = {
   // Item 'Share with...'.
   shareWith: {
     'text': 'Share with...',
-    'iconClass': 'ac ac-share',
+    'iconClass': 'ac ac-net',
     'subMenu': [{
       'text': 'Facebook',
       'iconClass': 'ac ac-facebook',
@@ -896,7 +896,7 @@ anychart.core.Chart.contextMenuItems = {
   // Item 'Save config as..'.
   saveConfigAs: {
     'text': 'Save config as...',
-    'iconClass': 'ac ac-folder',
+    'iconClass': 'ac ac-save',
     'subMenu': [{
       'text': '.json',
       'iconClass': 'ac ac-file-code-o',
@@ -932,6 +932,7 @@ anychart.core.Chart.contextMenuItems = {
 
   // Item-link to our site.
   about: {
+    'iconClass': 'ac ac-cog',
     'text': 'AnyChart ' + (anychart.VERSION ?
         goog.string.subs.apply(null, ['v%s.%s.%s'].concat(anychart.VERSION.split('.'))) :
         ' develop version'),
@@ -940,7 +941,7 @@ anychart.core.Chart.contextMenuItems = {
 
   // Item 'Link to help'.
   linkToHelp: {
-    //'iconClass': 'ac ac-question-circle-o',
+    'iconClass': 'ac ac-question',
     'text': 'Need help? Go to support center!',
     'href': 'http://anychart.com/support'
   }

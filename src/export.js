@@ -23,8 +23,8 @@ anychart.exports.filename_ = 'anychart';
  * @private
  */
 anychart.exports.image_ = {
-  width: undefined,
-  height: undefined
+  'width': undefined,
+  'height': undefined
 };
 
 
@@ -34,13 +34,13 @@ anychart.exports.image_ = {
  * @private
  */
 anychart.exports.facebook_ = {
-  caption: window['location']['hostname'],
-  link: undefined,
-  name: undefined,
-  description: undefined,
-  appId: 1167712323282103,
-  width: 1200,
-  height: 630
+  'caption': window['location']['hostname'],
+  'link': undefined,
+  'name': undefined,
+  'description': undefined,
+  'appId': 1167712323282103,
+  'width': 1200,
+  'height': 630
 };
 
 
@@ -50,9 +50,9 @@ anychart.exports.facebook_ = {
  * @private
  */
 anychart.exports.twitter_ = {
-  url: 'http://export.anychart.stg/sharing/twitter',
-  width: 1024,
-  height: 800
+  'url': 'http://export.anychart.stg/sharing/twitter',
+  'width': 1024,
+  'height': 800
 };
 
 
@@ -62,10 +62,10 @@ anychart.exports.twitter_ = {
  * @private
  */
 anychart.exports.linkedIn_ = {
-  caption: 'AnyChart',
-  description: undefined,
-  width: 1200,
-  height: 630
+  'caption': 'AnyChart',
+  'description': undefined,
+  'width': 1200,
+  'height': 630
 };
 
 
@@ -75,10 +75,10 @@ anychart.exports.linkedIn_ = {
  * @private
  */
 anychart.exports.pinterest_ = {
-  link: undefined,
-  description: undefined,
-  width: 1200,
-  height: 800
+  'link': undefined,
+  'description': undefined,
+  'width': 1200,
+  'height': 800
 };
 
 
