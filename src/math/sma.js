@@ -8,6 +8,7 @@ goog.require('anychart.utils');
  *    queue: !anychart.math.CycledQueue,
  *    period: number,
  *    prevResult: number,
+ *    dequeuedValue: number,
  *    dispose: Function
  * }}
  */
@@ -25,6 +26,7 @@ anychart.math.sma.initContext = function(opt_period) {
     queue: anychart.math.cycledQueue(period),
     period: period,
     prevResult: NaN,
+    dequeuedValue: NaN,
     /**
      * @this {anychart.math.sma.Context}
      */
@@ -43,6 +45,7 @@ anychart.math.sma.initContext = function(opt_period) {
 anychart.math.sma.startFunction = function(context) {
   context.queue.clear();
   context.prevResult = NaN;
+  context.dequeuedValue = NaN;
 };
 
 
@@ -54,7 +57,8 @@ anychart.math.sma.startFunction = function(context) {
  */
 anychart.math.sma.calculationFunction = function(row, context) {
   var value = anychart.utils.toNumber(row.get('value'));
-  row.set('result', anychart.math.sma.calculate(context, value));
+  var result = anychart.math.sma.calculate(context, value);
+  row.set('result', result);
 };
 
 
@@ -83,9 +87,12 @@ anychart.math.sma.createComputer = function(mapping, opt_period) {
  * @return {number}
  */
 anychart.math.sma.calculate = function(context, value) {
-  if (isNaN(value))
+  if (isNaN(value)) {
+    context.dequeuedValue = NaN;
     return NaN;
+  }
   var firstValue = /** @type {number} */(context.queue.enqueue(value));
+  context.dequeuedValue = firstValue;
   /** @type {number} */
   var result;
   if (context.queue.getLength() < context.period) {
@@ -108,5 +115,6 @@ anychart.math.sma.calculate = function(context, value) {
 //exports
 goog.exportSymbol('anychart.math.sma.initContext', anychart.math.sma.initContext);
 goog.exportSymbol('anychart.math.sma.startFunction', anychart.math.sma.startFunction);
+goog.exportSymbol('anychart.math.sma.calculate', anychart.math.sma.calculate);
 goog.exportSymbol('anychart.math.sma.calculationFunction', anychart.math.sma.calculationFunction);
 goog.exportSymbol('anychart.math.sma.createComputer', anychart.math.sma.createComputer);

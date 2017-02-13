@@ -72,9 +72,12 @@ anychart.math.macd.startFunction = function(context) {
 anychart.math.macd.calculationFunction = function(row, context) {
   var value = anychart.utils.toNumber(row.get('value'));
   var rv = anychart.math.macd.calculate(context, value);
-  row.set('macdResult', rv[0]);
-  row.set('signalResult', rv[1]);
-  row.set('histogramResult', rv[2]);
+  var macdResult = rv[0];
+  var signalResult = rv[1];
+  var histogramResult = rv[2];
+  row.set('macdResult', macdResult);
+  row.set('signalResult', signalResult);
+  row.set('histogramResult', histogramResult);
 };
 
 
@@ -125,5 +128,6 @@ anychart.math.macd.createComputer = function(mapping, opt_fastPeriod, opt_slowPe
 //exports
 goog.exportSymbol('anychart.math.macd.initContext', anychart.math.macd.initContext);
 goog.exportSymbol('anychart.math.macd.startFunction', anychart.math.macd.startFunction);
+goog.exportSymbol('anychart.math.macd.calculate', anychart.math.macd.calculate);
 goog.exportSymbol('anychart.math.macd.calculationFunction', anychart.math.macd.calculationFunction);
 goog.exportSymbol('anychart.math.macd.createComputer', anychart.math.macd.createComputer);

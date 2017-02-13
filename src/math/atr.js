@@ -10,6 +10,7 @@ goog.require('anychart.utils');
  *    period: number,
  *    prevResult: number,
  *    prevClose: number,
+ *    dequeuedValue: number,
  *    dispose: Function
  * }}
  */
@@ -70,8 +71,8 @@ anychart.math.atr.calculationFunction = function(row, context) {
   var close = anychart.utils.toNumber(row.get('close'));
   var high = anychart.utils.toNumber(row.get('high'));
   var low = anychart.utils.toNumber(row.get('low'));
-  var rv = anychart.math.atr.calculate(context, close, high, low);
-  row.set('result', rv);
+  var result = anychart.math.atr.calculate(context, close, high, low);
+  row.set('result', result);
 };
 
 
@@ -94,5 +95,6 @@ anychart.math.atr.createComputer = function(mapping, opt_period) {
 //exports
 goog.exportSymbol('anychart.math.atr.initContext', anychart.math.atr.initContext);
 goog.exportSymbol('anychart.math.atr.startFunction', anychart.math.atr.startFunction);
+goog.exportSymbol('anychart.math.atr.calculate', anychart.math.atr.calculate);
 goog.exportSymbol('anychart.math.atr.calculationFunction', anychart.math.atr.calculationFunction);
 goog.exportSymbol('anychart.math.atr.createComputer', anychart.math.atr.createComputer);

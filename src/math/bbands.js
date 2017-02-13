@@ -1,5 +1,6 @@
 goog.provide('anychart.math.bbands');
 goog.require('anychart.math.CycledQueue');
+goog.require('anychart.math.sma');
 goog.require('anychart.utils');
 
 /**
@@ -14,6 +15,7 @@ goog.require('anychart.utils');
  *    deviation: number,
  *    prevResult: number,
  *    prevDeviation: number,
+ *    dequeuedValue: number,
  *    dispose: Function
  * }}
  */
@@ -29,19 +31,10 @@ anychart.math.bbands.Context;
 anychart.math.bbands.initContext = function(opt_period, opt_deviation) {
   var period = anychart.utils.normalizeToNaturalNumber(opt_period, 20, false);
   var deviation = anychart.utils.normalizeToNaturalNumber(opt_deviation, 2, false);
-  return {
-    queue: anychart.math.cycledQueue(period),
-    period: period,
-    deviation: deviation,
-    prevResult: NaN,
-    prevDeviation: NaN,
-    /**
-     * @this {anychart.math.bbands.Context}
-     */
-    'dispose': function() {
-      this.queue.clear();
-    }
-  };
+  var context = anychart.math.sma.initContext(period);
+  context.deviation = deviation;
+  context.prevDeviation = NaN;
+  return /** @type {anychart.math.bbands.Context} */ (context);
 };
 
 
@@ -51,9 +44,53 @@ anychart.math.bbands.initContext = function(opt_period, opt_deviation) {
  * @this {anychart.math.bbands.Context}
  */
 anychart.math.bbands.startFunction = function(context) {
-  context.queue.clear();
-  context.prevResult = NaN;
+  anychart.math.sma.startFunction(context);
   context.prevDeviation = NaN;
+};
+
+
+/**
+ * BBands calculation.
+ * @param {anychart.math.bbands.Context} context BBands Width context.
+ * @param {number} value Current value.
+ * @return {Array.<number>}
+ */
+anychart.math.bbands.calculate = function(context, value) {
+  var prevResult = context.prevResult;
+  var sma = anychart.math.sma.calculate(context, value);
+  if (isNaN(sma))
+    return [NaN, NaN, NaN];
+  var i, dist, result;
+  var queue = context.queue;
+  var period = context.period;
+  if (isNaN(prevResult)) {
+    // init calculations
+    result = 0;
+    for (i = 0; i < period; i++) {
+      dist = /** @type {number} */ (queue.get(i)) - sma;
+      result += dist * dist;
+    }
+  } else {
+    // process calculations
+    var distPrev = context.dequeuedValue - prevResult;
+    dist = /** @type {number} */ (queue.get(-1)) - sma;
+    var diff = prevResult - sma;
+    result =
+        context.prevDeviation +
+        period * diff * diff +
+        diff * (sma + prevResult) -
+        2 * context.dequeuedValue * diff +
+        dist * dist -
+        distPrev * distPrev;
+  }
+  if (result < 0) result = 0;
+  context.prevDeviation = result;
+  result = Math.sqrt(result / period) * context.deviation;
+  return [
+    sma, // middle
+    sma + result, // upper
+    sma - result  // lower
+  ];
 };
 
 
@@ -64,73 +101,14 @@ anychart.math.bbands.startFunction = function(context) {
  * @this {anychart.math.bbands.Context}
  */
 anychart.math.bbands.calculationFunction = function(row, context) {
-  var queue = context.queue;
-  var period = context.period;
-  var currValue = /** @type {number} */ (row.get('value'));
-  currValue = anychart.utils.toNumber(currValue);
-  var missing = isNaN(currValue);
-  var dequeuedValue;
-  if (!missing)
-    // add value to queue
-    dequeuedValue = /** @type {number} */ (queue.enqueue(currValue));
-
-  var upperResult;
-  var lowerResult;
-  var result = 0;
-  var i;
-  if (missing || queue.getLength() < period) {
-    // queue doesn't filled
-    upperResult = NaN;
-    lowerResult = NaN;
-  } else {
-    if (isNaN(context.prevResult)) {
-      // init calculations
-      for (i = 0; i < period; i++) {
-        result += /** @type {number} */ (queue.get(i));
-      }
-      result /= period;
-      context.prevResult = result;
-
-      result = 0;
-      for (i = 0; i < period; i++) {
-        dist = /** @type {number} */ (queue.get(i)) - context.prevResult;
-        result += dist * dist;
-      }
-
-      if (result < 0) result = 0;
-      context.prevDeviation = Math.sqrt(result / period);
-      result = context.prevDeviation * context.deviation;
-      upperResult = context.prevResult + result;
-      lowerResult = context.prevResult - result;
-
-    } else {
-      // process calculations
-      result = (/** @type {number} */ (queue.get(-1)) - dequeuedValue) / period;
-      var prevResult = context.prevResult;
-      var prevDeviation = context.prevDeviation;
-      context.prevResult = prevResult + result;
-      result = prevDeviation * prevDeviation * period;
-      var distPrev = dequeuedValue - prevResult;
-      var dist = /** @type {number} */ (queue.get(-1)) - context.prevResult;
-      var diff = prevResult - context.prevResult;
-      result =
-          result +
-          period * diff * diff +
-          diff * (context.prevResult + prevResult) -
-          2 * dequeuedValue * diff +
-          dist * dist - distPrev * distPrev;
-
-      if (result < 0) result = 0;
-      prevDeviation = Math.sqrt(result / period);
-      context.prevDeviation = prevDeviation;
-      result = prevDeviation * context.deviation;
-      upperResult = context.prevResult + result;
-      lowerResult = context.prevResult - result;
-    }
-  }
-
-  row.set('upResult', upperResult);
-  row.set('downResult', lowerResult);
+  var value = anychart.utils.toNumber(row.get('value'));
+  var rv = anychart.math.bbands.calculate(context, value);
+  var middle = rv[0];
+  var upper = rv[1];
+  var lower = rv[2];
+  row.set('middleResult', middle);
+  row.set('upperResult', upper);
+  row.set('lowerResult', lower);
 };
 
 
@@ -146,8 +124,9 @@ anychart.math.bbands.createComputer = function(mapping, opt_period, opt_deviatio
   result.setContext(anychart.math.bbands.initContext(opt_period, opt_deviation));
   result.setStartFunction(anychart.math.bbands.startFunction);
   result.setCalculationFunction(anychart.math.bbands.calculationFunction);
-  result.addOutputField('upResult');
-  result.addOutputField('downResult');
+  result.addOutputField('upperResult');
+  result.addOutputField('lowerResult');
+  result.addOutputField('middleResult');
   return result;
 };
 
@@ -155,5 +134,6 @@ anychart.math.bbands.createComputer = function(mapping, opt_period, opt_deviatio
 //exports
 goog.exportSymbol('anychart.math.bbands.initContext', anychart.math.bbands.initContext);
 goog.exportSymbol('anychart.math.bbands.startFunction', anychart.math.bbands.startFunction);
+goog.exportSymbol('anychart.math.bbands.calculate', anychart.math.bbands.calculate);
 goog.exportSymbol('anychart.math.bbands.calculationFunction', anychart.math.bbands.calculationFunction);
 goog.exportSymbol('anychart.math.bbands.createComputer', anychart.math.bbands.createComputer);

@@ -95,9 +95,12 @@ anychart.math.kdj.calculationFunction = function(row, context) {
   var high = anychart.utils.toNumber(row.get('high'));
   var low = anychart.utils.toNumber(row.get('low'));
   var rv = anychart.math.kdj.calculate(context, close, high, low);
-  row.set('kResult', rv[0]);
-  row.set('dResult', rv[1]);
-  row.set('jResult', rv[2]);
+  var kResult = rv[0];
+  var dResult = rv[1];
+  var jResult = rv[2];
+  row.set('kResult', kResult);
+  row.set('dResult', dResult);
+  row.set('jResult', jResult);
 };
 
 
@@ -128,5 +131,6 @@ anychart.math.kdj.createComputer = function(mapping, opt_kPeriod, opt_kMAPeriod,
 //exports
 goog.exportSymbol('anychart.math.kdj.initContext', anychart.math.kdj.initContext);
 goog.exportSymbol('anychart.math.kdj.startFunction', anychart.math.kdj.startFunction);
+goog.exportSymbol('anychart.math.kdj.calculate', anychart.math.kdj.calculate);
 goog.exportSymbol('anychart.math.kdj.calculationFunction', anychart.math.kdj.calculationFunction);
 goog.exportSymbol('anychart.math.kdj.createComputer', anychart.math.kdj.createComputer);

@@ -165,8 +165,10 @@ anychart.math.stochastic.calculationFunction = function(row, context) {
   var high = anychart.utils.toNumber(row.get('high'));
   var low = anychart.utils.toNumber(row.get('low'));
   var rv = anychart.math.stochastic.calculate(context, close, high, low);
-  row.set('kResult', rv[0]);
-  row.set('dResult', rv[1]);
+  var kResult = rv[0];
+  var dResult = rv[1];
+  row.set('kResult', kResult);
+  row.set('dResult', dResult);
 };
 
 
@@ -194,5 +196,6 @@ anychart.math.stochastic.createComputer = function(mapping, opt_kPeriod, opt_kMA
 //exports
 goog.exportSymbol('anychart.math.stochastic.initContext', anychart.math.stochastic.initContext);
 goog.exportSymbol('anychart.math.stochastic.startFunction', anychart.math.stochastic.startFunction);
+goog.exportSymbol('anychart.math.stochastic.calculate', anychart.math.stochastic.calculate);
 goog.exportSymbol('anychart.math.stochastic.calculationFunction', anychart.math.stochastic.calculationFunction);
 goog.exportSymbol('anychart.math.stochastic.createComputer', anychart.math.stochastic.createComputer);

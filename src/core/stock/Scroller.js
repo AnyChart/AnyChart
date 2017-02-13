@@ -869,12 +869,13 @@ anychart.core.stock.Scroller.prototype.atr = function(mapping, opt_period, opt_s
  * @param {!anychart.data.TableMapping} mapping
  * @param {number=} opt_period [20] Sets moving average period value.
  * @param {number=} opt_deviation [2] Sets the multiplier applied to the moving average to compute upper and lower bands of the indicator.
- * @param {anychart.enums.StockSeriesType=} opt_upSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_downSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_middleSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_upperSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_lowerSeriesType
  * @return {anychart.core.stock.indicators.BBands}
  */
-anychart.core.stock.Scroller.prototype.bbands = function(mapping, opt_period, opt_deviation, opt_upSeriesType, opt_downSeriesType) {
-  var result = new anychart.core.stock.indicators.BBands(this, mapping, opt_period, opt_deviation, opt_upSeriesType, opt_downSeriesType);
+anychart.core.stock.Scroller.prototype.bbands = function(mapping, opt_period, opt_deviation, opt_middleSeriesType, opt_upperSeriesType, opt_lowerSeriesType) {
+  var result = new anychart.core.stock.indicators.BBands(this, mapping, opt_period, opt_deviation, opt_middleSeriesType, opt_upperSeriesType, opt_lowerSeriesType);
   this.indicators_.push(result);
   return result;
 };

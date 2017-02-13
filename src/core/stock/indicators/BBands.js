@@ -12,12 +12,13 @@ goog.require('anychart.utils');
  * @param {!anychart.data.TableMapping} mapping
  * @param {number=} opt_period
  * @param {number=} opt_deviation
- * @param {anychart.enums.StockSeriesType=} opt_upSeriesType
- * @param {anychart.enums.StockSeriesType=} opt_downSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_middleSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_upperSeriesType
+ * @param {anychart.enums.StockSeriesType=} opt_lowerSeriesType
  * @constructor
  * @extends {anychart.core.stock.indicators.Base}
  */
-anychart.core.stock.indicators.BBands = function(plot, mapping, opt_period, opt_deviation, opt_upSeriesType, opt_downSeriesType) {
+anychart.core.stock.indicators.BBands = function(plot, mapping, opt_period, opt_deviation, opt_middleSeriesType, opt_upperSeriesType, opt_lowerSeriesType) {
   anychart.core.stock.indicators.BBands.base(this, 'constructor', plot, mapping);
 
   /**
@@ -34,8 +35,9 @@ anychart.core.stock.indicators.BBands = function(plot, mapping, opt_period, opt_
    */
   this.deviation_ = anychart.utils.normalizeToNaturalNumber(opt_deviation, 2, false);
 
-  this.declareSeries('up', opt_upSeriesType);
-  this.declareSeries('down', opt_downSeriesType);
+  this.declareSeries('middle', opt_middleSeriesType);
+  this.declareSeries('upper', opt_upperSeriesType);
+  this.declareSeries('lower', opt_lowerSeriesType);
   this.init();
 };
 goog.inherits(anychart.core.stock.indicators.BBands, anychart.core.stock.indicators.Base);
@@ -50,10 +52,12 @@ anychart.core.stock.indicators.BBands.prototype.createComputer = function(mappin
 /** @inheritDoc */
 anychart.core.stock.indicators.BBands.prototype.createNameForSeries = function(seriesId, series) {
   switch (seriesId) {
-    case 'up':
+    case 'upper':
       return 'BBands U';
-    case 'down':
+    case 'lower':
       return 'BBands L';
+    case 'middle':
+      return 'BBands M';
   }
   return '';
 };
@@ -62,35 +66,49 @@ anychart.core.stock.indicators.BBands.prototype.createNameForSeries = function(s
 /** @inheritDoc */
 anychart.core.stock.indicators.BBands.prototype.setupMapping = function(mapping, computer, seriesId, series) {
   switch (seriesId) {
-    case 'up':
-      mapping.addField('value', computer.getFieldIndex('upResult'));
+    case 'upper':
+      mapping.addField('value', computer.getFieldIndex('upperResult'));
       break;
-    case 'down':
-      mapping.addField('value', computer.getFieldIndex('downResult'));
+    case 'lower':
+      mapping.addField('value', computer.getFieldIndex('lowerResult'));
+      break;
+    case 'middle':
+      mapping.addField('value', computer.getFieldIndex('middleResult'));
       break;
   }
 };
 
 
 /**
- * Getter for the indicator Aroon series or setter for it's type. If passed - recreates the series.
+ * Getter for the indicator BBands up series or setter for it's type. If passed - recreates the series.
  * @param {anychart.enums.StockSeriesType=} opt_type
  * @return {anychart.core.stock.indicators.BBands|anychart.core.series.Stock}
  */
-anychart.core.stock.indicators.BBands.prototype.upSeries = function(opt_type) {
+anychart.core.stock.indicators.BBands.prototype.upperSeries = function(opt_type) {
   return /** @type {anychart.core.stock.indicators.BBands|anychart.core.series.Stock} */(
-      this.seriesInternal('up', opt_type));
+      this.seriesInternal('upper', opt_type));
 };
 
 
 /**
- * Getter for the indicator signal series or setter for it's type. If passed - recreates the series.
+ * Getter for the indicator BBands down series or setter for it's type. If passed - recreates the series.
  * @param {anychart.enums.StockSeriesType=} opt_type
  * @return {anychart.core.stock.indicators.BBands|anychart.core.series.Stock}
  */
-anychart.core.stock.indicators.BBands.prototype.downSeries = function(opt_type) {
+anychart.core.stock.indicators.BBands.prototype.lowerSeries = function(opt_type) {
   return /** @type {anychart.core.stock.indicators.BBands|anychart.core.series.Stock} */(
-      this.seriesInternal('down', opt_type));
+      this.seriesInternal('lower', opt_type));
+};
+
+
+/**
+ * Getter for the indicator BBands middle series or setter for it's type. If passed - recreates the series.
+ * @param {anychart.enums.StockSeriesType=} opt_type
+ * @return {anychart.core.stock.indicators.BBands|anychart.core.series.Stock}
+ */
+anychart.core.stock.indicators.BBands.prototype.middleSeries = function(opt_type) {
+  return /** @type {anychart.core.stock.indicators.BBands|anychart.core.series.Stock} */(
+      this.seriesInternal('middle', opt_type));
 };
 
 
@@ -135,6 +153,7 @@ anychart.core.stock.indicators.BBands.prototype.deviation = function(opt_value) 
   var proto = anychart.core.stock.indicators.BBands.prototype;
   proto['period'] = proto.period;
   proto['deviation'] = proto.deviation;
-  proto['upSeries'] = proto.upSeries;
-  proto['downSeries'] = proto.downSeries;
+  proto['upperSeries'] = proto.upperSeries;
+  proto['lowerSeries'] = proto.lowerSeries;
+  proto['middleSeries'] = proto.middleSeries;
 })();

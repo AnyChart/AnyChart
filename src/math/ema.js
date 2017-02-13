@@ -54,7 +54,8 @@ anychart.math.ema.startFunction = function(context) {
  */
 anychart.math.ema.calculationFunction = function(row, context) {
   var value = anychart.utils.toNumber(row.get('value'));
-  row.set('result', anychart.math.ema.calculate(context, value));
+  var result = anychart.math.ema.calculate(context, value);
+  row.set('result', result);
 };
 
 
@@ -109,5 +110,6 @@ anychart.math.ema.calculate = function(context, value) {
 //exports
 goog.exportSymbol('anychart.math.ema.initContext', anychart.math.ema.initContext);
 goog.exportSymbol('anychart.math.ema.startFunction', anychart.math.ema.startFunction);
+goog.exportSymbol('anychart.math.ema.calculate', anychart.math.ema.calculate);
 goog.exportSymbol('anychart.math.ema.calculationFunction', anychart.math.ema.calculationFunction);
 goog.exportSymbol('anychart.math.ema.createComputer', anychart.math.ema.createComputer);
