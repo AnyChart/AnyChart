@@ -3258,28 +3258,7 @@ anychart.enums.normalizeErrorMode = function(value, opt_default) {
  * Horizontal align enum.
  * @enum {string}
  */
-anychart.enums.HAlign = {
-  /**
-   Aligns the text to the left.
-   */
-  LEFT: 'left',
-  /**
-   The same as left if direction is left-to-right and right if direction is right-to-left.
-   */
-  START: 'start',
-  /**
-   The inline contents are centered within the line box.
-   */
-  CENTER: 'center',
-  /**
-   The same as right if direction is left-to-right and left if direction is right-to-left.
-   */
-  END: 'end',
-  /**
-   Aligns the text to the right.
-   */
-  RIGHT: 'right'
-};
+anychart.enums.HAlign = acgraph.vector.Text.HAlign;
 
 
 /**
@@ -3316,19 +3295,7 @@ anychart.enums.normalizeHAlign = function(value) {
  * Vertical align enum.
  * @enum {string}
  */
-anychart.enums.VAlign = {
-  /**
-   vAlign top.
-   */
-  TOP: 'top',
-  /**
-   */
-  MIDDLE: 'middle',
-  /**
-   vAlign bottom.
-   */
-  BOTTOM: 'bottom'
-};
+anychart.enums.VAlign = acgraph.vector.Text.VAlign;
 
 
 /**
@@ -3421,20 +3388,7 @@ anychart.enums.normalizeFontDecoration = function(value) {
  * Font style enumeration.
  * @enum {string}
  */
-anychart.enums.FontStyle = {
-  /**
-   Normal.
-   */
-  NORMAL: 'normal',
-  /**
-   Italic.
-   */
-  ITALIC: 'italic',
-  /**
-   Oblique.
-   */
-  OBLIQUE: 'oblique'
-};
+anychart.enums.FontStyle = acgraph.vector.Text.FontStyle;
 
 
 /**
@@ -3463,16 +3417,7 @@ anychart.enums.normalizeFontStyle = function(value) {
  * Font variant enumeration.
  * @enum {string}
  */
-anychart.enums.FontVariant = {
-  /**
-   Leave lovercase as is.
-   */
-  NORMAL: 'normal',
-  /**
-   Make lowercase smaller.
-   */
-  SMALL_CAP: 'small-caps'
-};
+anychart.enums.FontVariant = acgraph.vector.Text.FontVariant;
 
 
 /**
@@ -3539,16 +3484,7 @@ anychart.enums.normalizeTextDirection = function(value) {
  * Text wrap settings enumeration.
  * @enum {string}
  */
-anychart.enums.TextWrap = {
-  /**
-   No wrap.
-   */
-  NO_WRAP: 'noWrap',
-  /**
-   Wrap by symbol.
-   */
-  BY_LETTER: 'byLetter'
-};
+anychart.enums.TextWrap = acgraph.vector.Text.TextWrap;
 
 
 /**
@@ -6552,3 +6488,28 @@ goog.exportSymbol('anychart.enums.ShapeType.PATH', anychart.enums.ShapeType.PATH
 goog.exportSymbol('anychart.enums.ShapeType.CIRCLE', anychart.enums.ShapeType.CIRCLE);
 goog.exportSymbol('anychart.enums.ShapeType.ELLIPSE', anychart.enums.ShapeType.ELLIPSE);
 goog.exportSymbol('anychart.enums.ShapeType.RECT', anychart.enums.ShapeType.RECT);
+
+goog.exportSymbol('anychart.enums.FontStyle.NORMAL', anychart.enums.FontStyle.NORMAL);
+goog.exportSymbol('anychart.enums.FontStyle.ITALIC', anychart.enums.FontStyle.ITALIC);
+goog.exportSymbol('anychart.enums.FontStyle.OBLIQUE', anychart.enums.FontStyle.OBLIQUE);
+
+goog.exportSymbol('anychart.enums.FontVariant.NORMAL', anychart.enums.FontVariant.NORMAL);
+goog.exportSymbol('anychart.enums.FontVariant.SMALL_CAP', anychart.enums.FontVariant.SMALL_CAP);
+
+goog.exportSymbol('anychart.enums.HAlign.LEFT', anychart.enums.HAlign.LEFT);
+goog.exportSymbol('anychart.enums.HAlign.START', anychart.enums.HAlign.START);
+goog.exportSymbol('anychart.enums.HAlign.CENTER', anychart.enums.HAlign.CENTER);
+goog.exportSymbol('anychart.enums.HAlign.END', anychart.enums.HAlign.END);
+goog.exportSymbol('anychart.enums.HAlign.RIGHT', anychart.enums.HAlign.RIGHT);
+
+goog.exportSymbol('anychart.enums.VAlign.TOP', anychart.enums.VAlign.TOP);
+goog.exportSymbol('anychart.enums.VAlign.MIDDLE', anychart.enums.VAlign.MIDDLE);
+goog.exportSymbol('anychart.enums.VAlign.BOTTOM', anychart.enums.VAlign.BOTTOM);
+
+goog.exportSymbol('anychart.enums.TextWrap.NO_WRAP', anychart.enums.TextWrap.NO_WRAP);
+goog.exportSymbol('anychart.enums.TextWrap.BY_LETTER', anychart.enums.TextWrap.BY_LETTER);
+
+
+
+
+
