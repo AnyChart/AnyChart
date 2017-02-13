@@ -136,6 +136,13 @@ anychart.charts.Map = function() {
   this.minBubbleSize_;
 
   /**
+   * Max stroke thickness of series/unbound regions.
+   * @type {number}
+   * @private
+   */
+  this.maxStrokeThickness_ = 0;
+
+  /**
    * @type {boolean}
    */
   this.isDesktop = true;
@@ -3475,7 +3482,6 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
       //----------------------------------calc statistics for series
       //todo (Roman Lubushikin): to avoid this loop on series we can store this info in the chart instance and provide it to all series
 
-      this.maxStrokeThickness_ = 0;
       var average = sum / pointsCount;
       for (i = 0; i < this.series_.length; i++) {
         series = this.series_[i];
