@@ -31,7 +31,7 @@ If you don't want to download and host AnyChart yourself, you can include it fro
 
 ```html
 <head>
-<script src="https://cdn.anychart.com/js/latest/anychart.min.js"></script>
+<script src="https://cdn.anychart.com/js/latest/anychart-bundle.min.js"></script>
 </head>
 ```
 
@@ -51,7 +51,7 @@ The fastest way to start with AnyChart is to include framework into a webpage an
 <!doctype html>
 <body>
 <div id="container" style="width: 500px; height: 400px;"></div>
-<script src="https://cdn.anychart.com/js/latest/anychart.min.js" type="text/javascript"></script> 
+<script src="https://cdn.anychart.com/js/latest/anychart-bundle.min.js" type="text/javascript"></script>
 <script>
     anychart.onDocumentReady(function() {
         // create a pie chart
