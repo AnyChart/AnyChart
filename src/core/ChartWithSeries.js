@@ -2601,7 +2601,7 @@ anychart.core.ChartWithSeries.prototype.getSeriesStatus = function(event) {
 
   var value, index, iterator;
 
-  var containerOffset = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+  var containerOffset = this.container().getStage().getClientPosition();
 
   var x = clientX - containerOffset.x;
   var y = clientY - containerOffset.y;

@@ -1123,7 +1123,7 @@ anychart.charts.Resource.prototype.initMouseWheel_ = function() {
   var stage;
   if (c && (stage = c.getStage())) {
     this.mouseInited_ = true;
-    this.mouseWheelHandler_ = new goog.events.MouseWheelHandler(/** @type {Element} */(stage.container()));
+    this.mouseWheelHandler_ = new goog.events.MouseWheelHandler(stage.getDomWrapper());
     this.eventsHandler.listen(this.mouseWheelHandler_, goog.events.MouseWheelHandler.EventType.MOUSEWHEEL, this.handleMouseWheel_);
   } else if (!this.boundInitMouseWheel_) {
     this.boundInitMouseWheel_ = goog.bind(this.initMouseWheel_, this);
@@ -1490,7 +1490,7 @@ anychart.charts.Resource.prototype.drawContent = function(bounds) {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.RESOURCE_OVERLAY)) {
-    this.overlay_.target(/** @type {Element} */(this.container().getStage().container()));
+    this.overlay_.target(this.container().getStage().getDomWrapper());
     this.overlay_.setBounds(this.getPixelBounds());
     this.overlay_.draw();
     this.markConsistent(anychart.ConsistencyState.RESOURCE_OVERLAY);

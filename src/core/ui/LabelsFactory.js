@@ -765,7 +765,6 @@ anychart.core.ui.LabelsFactory.prototype.setAutoColor = function(value) {
 
 /** @inheritDoc */
 anychart.core.ui.LabelsFactory.prototype.remove = function() {
-  this.container(null);
   if (this.layer_) this.layer_.parent(null);
 };
 
@@ -1451,7 +1450,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.background = function(opt_value) 
   var makeDefault = goog.isNull(opt_value);
   if (!makeDefault && !this.settingsObj['background']) {
     this.settingsObj['background'] = new anychart.core.ui.Background();
-    this.settingsObj['background'].setup(anychart.getFullTheme()['standalones']['labelsFactory']['background']);
+    this.settingsObj['background'].setup(anychart.getFullTheme('standalones.labelsFactory.background'));
     this.settingsObj['background'].listenSignals(this.backgroundInvalidated_, this);
   }
 

@@ -62,6 +62,74 @@ goog.inherits(anychart.core.ui.StageCredits, goog.Disposable);
 anychart.core.ui.StageCredits.DOMAIN_REGEXP = /^(.*\.)?anychart\.(com|stg|dev)$/i;
 
 
+//region --- Styles
+//------------------------------------------------------------------------------
+//
+//  Styles
+//
+//------------------------------------------------------------------------------
+/**
+ * A flag to install styles only one time.
+ * @type {boolean}
+ * @private
+ */
+anychart.core.ui.StageCredits.stylesInstalled_ = false;
+
+
+/**
+ * Installing default css.
+ * @private
+ */
+anychart.core.ui.StageCredits.installStyles_ = function() {
+  var styles = '';
+  var css = goog.dom.createDom(goog.dom.TagName.STYLE);
+  css.type = 'text/css';
+
+  styles += '.' + anychart.core.ui.StageCredits.CssClass_.CREDITS + '{' +
+      'position:absolute;' +
+      'overflow:hidden;' +
+      'right:9px;' +
+      'bottom:6px;' +
+      'height:10px;' +
+      '}';
+
+  styles += '.' + anychart.core.ui.StageCredits.CssClass_.CREDITS + ' a {' +
+      'text-decoration:none;' +
+      '}';
+
+  styles += '.' + anychart.core.ui.StageCredits.CssClass_.LOGO + '{' +
+      'border:none;' +
+      'margin-right:2px;' +
+      'height:10px;' +
+      'width:10px;' +
+      'display:inline-block;' +
+      'vertical-align:top;' +
+      '}';
+
+  styles += '.' + anychart.core.ui.StageCredits.CssClass_.TEXT + '{' +
+      'font-size:10px;' +
+      'line-height:9px;' +
+      'display:inline-block;' +
+      'vertical-align:top;' +
+      'text-decoration:none;' +
+      'font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;' +
+      'color:#929292;' +
+      'height:10px;' +
+      '}';
+
+  if (css.styleSheet)
+    css['styleSheet']['cssText'] = styles;
+  else
+    goog.dom.appendChild(css, goog.dom.createTextNode(styles));
+
+  goog.dom.insertChildAt(
+      goog.dom.getElementsByTagNameAndClass('head')[0],
+      css, 0
+  );
+};
+
+
+//endregion
 //region --- WORKING WITH STATES ---
 /**
  * States enum
@@ -251,62 +319,7 @@ anychart.core.ui.StageCredits.CssClass_ = {
 };
 
 
-/**
- * Creates and return style node.
- * @return {!Element}
- * @private
- */
-anychart.core.ui.StageCredits.prototype.createCssElement_ = function() {
-  var styles = '';
-  var css = goog.dom.createDom(goog.dom.TagName.STYLE);
-  css.type = 'text/css';
-
-  styles += '.' + anychart.core.ui.StageCredits.CssClass_.CREDITS + '{' +
-      'position:absolute;' +
-      'overflow:hidden;' +
-      'right:9px;' +
-      'bottom:6px;' +
-      'height:10px;' +
-      '}';
-
-  styles += '.' + anychart.core.ui.StageCredits.CssClass_.CREDITS + ' a {' +
-      'text-decoration:none;' +
-      '}';
-
-  styles += '.' + anychart.core.ui.StageCredits.CssClass_.LOGO + '{' +
-      'border:none;' +
-      'margin-right:2px;' +
-      'height:10px;' +
-      'width:10px;' +
-      'display:inline-block;' +
-      'vertical-align:top;' +
-      '}';
-
-  styles += '.' + anychart.core.ui.StageCredits.CssClass_.TEXT + '{' +
-      'font-size:10px;' +
-      'line-height:9px;' +
-      'display:inline-block;' +
-      'vertical-align:top;' +
-      'text-decoration:none;' +
-      'font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;' +
-      'color:#929292;' +
-      'height:10px;' +
-      '}';
-
-  if (css.styleSheet)
-    css['styleSheet']['cssText'] = styles;
-  else
-    goog.dom.appendChild(css, goog.dom.createTextNode(styles));
-
-  goog.dom.insertChildAt(
-      goog.dom.getElementsByTagNameAndClass('head')[0],
-      css, 0
-  );
-  return css;
-};
 //endregion
-
-
 //region --- DRAWING ---
 /**
  * Renders credits.
@@ -331,8 +344,9 @@ anychart.core.ui.StageCredits.prototype.render = function() {
     return this;
   }
 
-  if (!anychart.core.ui.StageCredits.creditsCss_) {
-    anychart.core.ui.StageCredits.creditsCss_ = this.createCssElement_();
+  if (!anychart.core.ui.StageCredits.stylesInstalled_) {
+    anychart.core.ui.StageCredits.installStyles_();
+    anychart.core.ui.StageCredits.stylesInstalled_ = true;
   }
 
   if (!this.domElement_) {
@@ -347,7 +361,7 @@ anychart.core.ui.StageCredits.prototype.render = function() {
     goog.dom.appendChild(this.domElement_, this.a_);
   }
 
-  var containerElement = /** @type {Element} */(this.stage_.container());
+  var containerElement = this.stage_.getDomWrapper();
   if (this.hasInvalidationState(anychart.core.ui.StageCredits.States.ENABLED)) {
     if (containerElement)
       goog.dom.appendChild(containerElement, this.domElement_);
@@ -458,7 +472,7 @@ anychart.core.ui.StageCredits.prototype.onImageErrorHandler_ = function(e) {
 //region --- SETUP/DISPOSE ---
 /**
  * Setup.
- * @param {Object|null|boolean|string} config Config.
+ * @param {*} config Config.
  */
 anychart.core.ui.StageCredits.prototype.setup = function(config) {
   this.stage_.suspend();

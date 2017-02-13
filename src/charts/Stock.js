@@ -1764,7 +1764,7 @@ anychart.charts.Stock.prototype.setupByJSON = function(config, opt_default) {
  */
 anychart.stock = function() {
   var result = new anychart.charts.Stock();
-  result.setupByVal(anychart.getFullTheme()['stock'], true);
+  result.setupByVal(anychart.getFullTheme('stock'), true);
   return result;
 };
 

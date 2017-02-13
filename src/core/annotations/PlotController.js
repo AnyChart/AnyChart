@@ -473,8 +473,7 @@ anychart.core.annotations.PlotController.prototype.handleDrawingMouseMove_ = fun
  * @private
  */
 anychart.core.annotations.PlotController.prototype.updateLastCoords_ = function(e) {
-  var stageReferencePoint = goog.style.getClientPosition(/** @type {Element} */
-      (this.container().getStage().container()));
+  var stageReferencePoint = this.container().getStage().getClientPosition();
   this.lastX = e['clientX'] - stageReferencePoint.x;
   this.lastY = e['clientY'] - stageReferencePoint.y;
 };

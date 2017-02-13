@@ -2124,7 +2124,7 @@ anychart.core.ui.Timeline.prototype.drawThumbPreview_ = function(event, opt_scro
         }
     }
 
-    var left = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x;
+    var left = this.container().getStage().getClientPosition().x;
 
     var mouseLeft;
     if (opt_scrolling) {
@@ -2163,8 +2163,9 @@ anychart.core.ui.Timeline.prototype.drawConnectorPreview_ = function(event, opt_
     var period = circle.period;
     var periodIndex = circle.periodIndex;
 
-    var containerLeft = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x;
-    var containerTop = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).y;
+    var containerPosition = this.container().getStage().getClientPosition();
+    var containerLeft = containerPosition.x;
+    var containerTop = containerPosition.y;
 
     var mouseLeft, mouseTop;
 
@@ -2467,7 +2468,7 @@ anychart.core.ui.Timeline.prototype.addMouseMoveAndOver = function(evt) {
           }
 
           var originalEvent = evt['originalEvent'];
-          var left = originalEvent.clientX - goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x;
+          var left = originalEvent.clientX - this.container().getStage().getClientPosition().x;
           var elBounds = el.currBounds;
           var dropRatio = (left - elBounds.left) / elBounds.width;
           var startStart = this.currentConnectorDragger_.isStart;
@@ -2670,7 +2671,7 @@ anychart.core.ui.Timeline.prototype.addMouseUp = function(evt) {
       var originalEvent = evt['originalEvent'];
       var domTarget = originalEvent['domTarget'];
       if (domTarget instanceof anychart.core.ui.BaseGrid.Element && domTarget.type != anychart.enums.TLElementTypes.BASELINE) {
-        var left = originalEvent.clientX - goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x;
+        var left = originalEvent.clientX - this.container().getStage().getClientPosition().x;
         var elBounds = domTarget.currBounds;
         var dropRatio = (left - elBounds.left) / elBounds.width;
 

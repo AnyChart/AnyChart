@@ -20,7 +20,7 @@ anychart.core.makeStandalone(anychart.standalones.Label, anychart.core.ui.Label)
  */
 anychart.standalones.label = function() {
   var label = new anychart.standalones.Label();
-  label.setup(anychart.getFullTheme()['standalones']['label']);
+  label.setup(anychart.getFullTheme('standalones.label'));
   return label;
 };
 

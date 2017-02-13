@@ -127,7 +127,7 @@ goog.inherits(anychart.standalones.LegendItem, anychart.core.ui.LegendItem);
  */
 anychart.standalones.legend = function() {
   var legend = new anychart.standalones.Legend();
-  legend.setup(anychart.getFullTheme()['standalones']['legend']);
+  legend.setup(anychart.getFullTheme('standalones.legend'));
   return legend;
 };
 

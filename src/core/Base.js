@@ -598,7 +598,7 @@ anychart.core.Base.prototype.serialize = function() {
  * instances of descendant classes.
  * Note: this method only changes element properties if they are supposed to be changed by the config value -
  * it doesn't reset other properties to their defaults.
- * @param {...(Object|Array|number|string|undefined|boolean|null)} var_args Arguments to setup the instance.
+ * @param {...*} var_args Arguments to setup the instance.
  * @return {anychart.core.Base} Returns itself for chaining.
  */
 anychart.core.Base.prototype.setup = function(var_args) {
@@ -621,7 +621,7 @@ anychart.core.Base.prototype.setup = function(var_args) {
  * instances of descendant classes.
  * Note: this method only changes element properties if they are supposed to be changed by the config value -
  * it doesn't reset other properties to their defaults.
- * @param {Object|Array|number|string|undefined|boolean|null} value Arguments to setup the instance.
+ * @param {*} value Arguments to setup the instance.
  * @param {boolean=} opt_default .
  * @return {anychart.core.Base} Returns itself for chaining.
  */

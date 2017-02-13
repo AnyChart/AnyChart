@@ -927,8 +927,8 @@ anychart.core.resource.TimeLine.prototype.draw = function() {
         if (labels) {
           labels.clear();
         } else {
-          var defaultTextFormatter = anychart.getFullTheme()['defaultLabelFactory']['textFormatter'];
-          var defaultPositionFormatter = anychart.getFullTheme()['defaultLabelFactory']['positionFormatter'];
+          var defaultTextFormatter = /** @type {Function} */(anychart.getFullTheme('defaultLabelFactory.textFormatter'));
+          var defaultPositionFormatter = /** @type {Function} */(anychart.getFullTheme('defaultLabelFactory.positionFormatter'));
 
           labels = new anychart.core.ui.LabelsFactory();
           labels
@@ -968,7 +968,7 @@ anychart.core.resource.TimeLine.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
-    var themeLabelsSettings = anychart.getFullTheme()['defaultLabelFactory'];
+    var themeLabelsSettings = /** @type {Object} */(anychart.getFullTheme('defaultLabelFactory'));
     var timeLineWeekdaysLabelsSettings = {};
     anychart.core.settings.serialize(this, anychart.core.resource.TimeLine.TEXT_DESCRIPTORS, timeLineWeekdaysLabelsSettings);
     timeLineWeekdaysLabelsSettings['padding'] = this.padding();
@@ -1047,7 +1047,7 @@ anychart.core.resource.TimeLine.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.RESOURCE_TIMELINE_OVERLAY)) {
-    this.overlay_.target(/** @type {Element} */(this.container().getStage().container()));
+    this.overlay_.target(this.container().getStage().getDomWrapper());
     this.overlay_.setBounds(this.getPixelBounds());
     this.overlay_.draw();
     this.markConsistent(anychart.ConsistencyState.RESOURCE_TIMELINE_OVERLAY);

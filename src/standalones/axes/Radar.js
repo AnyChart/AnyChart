@@ -36,7 +36,7 @@ anychart.standalones.axes.Radar.prototype.serialize = function() {
  */
 anychart.standalones.axes.radar = function() {
   var axis = new anychart.standalones.axes.Radar();
-  axis.setup(anychart.getFullTheme()['standalones']['radarAxis']);
+  axis.setup(anychart.getFullTheme('standalones.radarAxis'));
   return axis;
 };
 

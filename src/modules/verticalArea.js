@@ -23,12 +23,11 @@ goog.require('anychart.modules.base');
  */
 anychart.verticalArea = function(var_args) {
   var chart = new anychart.charts.Cartesian();
-  var theme = anychart.getFullTheme();
 
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.AREA);
   chart.setType(anychart.enums.ChartTypes.VERTICAL_AREA);
 
-  chart.setupByVal(theme[anychart.enums.ChartTypes.VERTICAL_AREA], true);
+  chart.setupByVal(anychart.getFullTheme('verticalArea'), true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart[anychart.enums.CartesianSeriesType.AREA](arguments[i]);

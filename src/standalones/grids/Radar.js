@@ -20,7 +20,7 @@ anychart.core.makeStandalone(anychart.standalones.grids.Radar, anychart.core.gri
  */
 anychart.standalones.grids.radar = function() {
   var grid = new anychart.standalones.grids.Radar();
-  grid.setup(anychart.getFullTheme()['standalones']['radarGrid']);
+  grid.setup(anychart.getFullTheme('standalones.radarGrid'));
   return grid;
 };
 

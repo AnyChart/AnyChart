@@ -25,12 +25,12 @@ goog.require('anychart.modules.base');
 anychart.line = function(var_args) {
   anychart.performance.start('anychart.line()');
   var chart = new anychart.charts.Cartesian();
-  var theme = anychart.getFullTheme();
+  var theme = anychart.getFullTheme('line');
 
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.LINE);
   chart.setType(anychart.enums.ChartTypes.LINE);
 
-  chart.setupByVal(theme['line'], true);
+  chart.setupByVal(anychart.getFullTheme('line'), true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['line'](arguments[i]);

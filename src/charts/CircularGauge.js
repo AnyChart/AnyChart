@@ -1403,7 +1403,7 @@ anychart.charts.CircularGauge.prototype.serialize = function() {
  * @return {Object}
  */
 anychart.charts.CircularGauge.prototype.getDefaultThemeObj = function() {
-  return {'gauge': anychart.getFullTheme()['circularGauge']};
+  return {'gauge': anychart.getFullTheme('circularGauge')};
 };
 
 

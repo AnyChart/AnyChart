@@ -94,9 +94,7 @@ anychart.core.utils.TooltipsContainer.prototype.stage_ = null;
  */
 anychart.core.utils.TooltipsContainer.prototype.updateStageSize_ = function() {
   var newSize = this.bufferedVsm_.getSize();
-
-  this.stage_.width(newSize.width);
-  this.stage_.height(newSize.height);
+  this.stage_.resize(newSize.width, newSize.height);
 };
 
 

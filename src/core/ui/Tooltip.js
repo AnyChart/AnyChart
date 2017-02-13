@@ -773,7 +773,7 @@ anychart.core.ui.Tooltip.prototype.setPositionForSingle_ = function(tooltip, cli
 
   var boundsProvider = manager.chart() || this.boundsProvider;
   var chartPixelBounds = boundsProvider.getPixelBounds();
-  var chartOffset = goog.style.getClientPosition(/** @type {Element} */(boundsProvider.container().getStage().container()));
+  var chartOffset = boundsProvider.container().getStage().getClientPosition();
   var allowGlobalCont = anychart.compatibility.ALLOW_GLOBAL_TOOLTIP_CONTAINER;
   var position = /** @type {anychart.enums.Position} */(tooltip.getOption('position'));
 
@@ -1537,9 +1537,8 @@ anychart.core.ui.Tooltip.prototype.setPositionForSeparated_ = function(tooltip, 
   var chartPixelBounds, pixelBounds, position, anchoredPositionCoordinate;
   var positionMode = this.getOption('positionMode') || anychart.enums.TooltipPositionMode.FLOAT;
   var displayMode = this.getOption('displayMode');
-  var chartOffset = this.chart() ?
-      goog.style.getClientPosition(/** @type {Element} */(this.chart().container().getStage().container())) :
-      goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+  var container = this.chart() ? this.chart().container() : this.container();
+  var chartOffset = container.getStage().getClientPosition();
 
   if (positionMode == anychart.enums.TooltipPositionMode.FLOAT) {
     if (!anychart.compatibility.ALLOW_GLOBAL_TOOLTIP_CONTAINER) {
@@ -1603,7 +1602,7 @@ anychart.core.ui.Tooltip.prototype.setPositionForSeparated_ = function(tooltip, 
     chartPixelBounds = boundsProvider.getPixelBounds();
 
     if (!chartOffset) {
-      chartOffset = goog.style.getClientPosition(/** @type {Element} */(boundsProvider.container().getStage().container()));
+      chartOffset = boundsProvider.container().getStage().getClientPosition();
     }
 
     if (pixelBounds.left < chartOffset.x + chartPixelBounds.left) {

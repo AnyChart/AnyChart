@@ -88,7 +88,7 @@ anychart.core.resource.Logo.prototype.draw = function() {
   anychart.core.resource.Logo.base(this, 'draw');
 
   if (this.hasInvalidationState(anychart.ConsistencyState.RESOURCE_LOGO_OVERLAY)) {
-    this.overlay_.target(/** @type {Element} */(this.container().getStage().container()));
+    this.overlay_.target(this.container().getStage().getDomWrapper());
     this.overlay_.setBounds(this.getPixelBounds());
     this.overlay_.draw();
     this.markConsistent(anychart.ConsistencyState.RESOURCE_LOGO_OVERLAY);

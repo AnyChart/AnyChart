@@ -882,7 +882,7 @@ anychart.core.ui.BaseGrid.prototype.getInteractivityEvent = function(event) {
     var initialTop = /** @type {number} */ (this.pixelBoundsCache.top + this.headerHeight_ + 1);
 
     var min = this.pixelBoundsCache.top +
-        goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).y +
+        this.container().getStage().getClientPosition().y +
         this.headerHeight_;
 
     var mouseHeight = event.clientY - min;
@@ -2094,7 +2094,7 @@ anychart.core.ui.BaseGrid.prototype.initMouseFeatures = function() {
  */
 anychart.core.ui.BaseGrid.prototype.docMouseMoveListener_ = function(e) {
   var l = anychart.core.ui.BaseGrid.SCROLL_MOUSE_OUT_INSIDE_LENGTH;
-  var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+  var containerPosition = this.container().getStage().getClientPosition();
   var top = this.pixelBoundsCache.top + containerPosition.y + this.headerHeight_ + l;
   var bottom = containerPosition.y + this.pixelBoundsCache.height - l - l;
   var left = containerPosition.x + this.pixelBoundsCache.left + l;

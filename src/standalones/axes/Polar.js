@@ -36,7 +36,7 @@ anychart.standalones.axes.Polar.prototype.serialize = function() {
  */
 anychart.standalones.axes.polar = function() {
   var axis = new anychart.standalones.axes.Polar();
-  axis.setup(anychart.getFullTheme()['standalones']['polarAxis']);
+  axis.setup(anychart.getFullTheme('standalones.polarAxis'));
   return axis;
 };
 

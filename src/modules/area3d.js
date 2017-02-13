@@ -21,12 +21,11 @@ goog.require('anychart.modules.base');
  */
 anychart.area3d = function(var_args) {
   var chart = new anychart.charts.Cartesian3d();
-  var theme = anychart.getFullTheme();
 
   chart.defaultSeriesType(anychart.enums.Cartesian3dSeriesType.AREA);
   chart.setType(anychart.enums.ChartTypes.AREA_3D);
 
-  chart.setupByVal(theme['area3d'], true);
+  chart.setupByVal(anychart.getFullTheme('area3d'), true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['area'](arguments[i]);

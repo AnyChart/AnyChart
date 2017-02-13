@@ -2107,8 +2107,8 @@ goog.provide('anychart.themes.defaultTheme');
       ]
     },
 
-    // merge with cartesian
-    'cartesian3d': {
+    // merges with nothing
+    'cartesian3dBase': {
       'defaultSeriesType': 'column',
       'zAngle': 45,
       'zAspect': '50%',
@@ -2167,6 +2167,8 @@ goog.provide('anychart.themes.defaultTheme');
         }
       ]
     },
+    // merge with cartesian
+    'cartesian3d': {},
 
     // merge with chart
     'pieFunnelPyramidBase': {
@@ -2483,7 +2485,7 @@ goog.provide('anychart.themes.defaultTheme');
           'enabled': true,
           'hatchFill': null,
           'a11y': {
-            'enabled': false,
+            'enabled': true,
             'titleFormatter': 'Series named {%SeriesName} with {%SeriesPointsCount} points. Min value is {%SeriesYMin}, max value is {%SeriesYMax}'
           }
         },

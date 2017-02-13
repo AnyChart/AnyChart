@@ -2403,8 +2403,7 @@ anychart.charts.TreeMap.prototype.normalizeColor = function(node, color, var_arg
         args.push(arguments[i]);
       sourceColor = this.normalizeColor.apply(this, args);
     } else {
-      var theme = anychart.getFullTheme();
-      sourceColor = theme['palette']['items'][0];
+      sourceColor = anychart.getFullTheme('palette.items.0');
     }
     var scope = {
       'value': node.meta(anychart.charts.TreeMap.DataFields.VALUE),
@@ -2429,7 +2428,7 @@ anychart.charts.TreeMap.prototype.normalizeHatchFill = function(hatchFill) {
   var index = this.getIterator().getIndex();
   var autoHatch;
   if (goog.isFunction(hatchFill)) {
-    autoHatch = anychart.getFullTheme()['hatchFillPalette']['items'][0];
+    autoHatch = /** @type {string} */(anychart.getFullTheme('hatchFillPalette.items.0'));
     var sourceHatchFill = acgraph.vector.normalizeHatchFill(autoHatch);
     var scope = {
       'index': index,
@@ -2437,7 +2436,7 @@ anychart.charts.TreeMap.prototype.normalizeHatchFill = function(hatchFill) {
     };
     fill = acgraph.vector.normalizeHatchFill(hatchFill.call(scope));
   } else if (goog.isBoolean(hatchFill)) {
-    autoHatch = anychart.getFullTheme()['hatchFillPalette']['items'][0];
+    autoHatch = /** @type {string} */(anychart.getFullTheme('hatchFillPalette.items.0'));
     fill = hatchFill ? acgraph.vector.normalizeHatchFill(autoHatch) : null;
   } else
     fill = acgraph.vector.normalizeHatchFill(hatchFill);

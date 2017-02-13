@@ -16,8 +16,7 @@ goog.require('anychart.modules.base');
 anychart.pert = function() {
   var chart = new anychart.charts.Pert();
 
-  var theme = anychart.getFullTheme();
-  chart.setupByVal(theme['pert'], true);
+  chart.setupByVal(anychart.getFullTheme('pert'), true);
 
   return chart;
 };

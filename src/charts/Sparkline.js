@@ -209,7 +209,7 @@ anychart.charts.Sparkline.prototype.getSeriesStatus = function(event) {
   var clientY = event['clientY'];
   var value, index;
 
-  var containerOffset = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+  var containerOffset = this.container().getStage().getClientPosition();
 
   var x = clientX - containerOffset.x;
   var y = clientY - containerOffset.y;
@@ -299,7 +299,7 @@ anychart.charts.Sparkline.prototype.getIndexByEvent_ = function(event) {
   var min, range;
   var value, index;
 
-  min = bounds.left + goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x;
+  min = bounds.left + this.container().getStage().getClientPosition().x;
   range = bounds.width;
   var ratio = (x - min) / range;
   value = this.xScale().inverseTransform(ratio);

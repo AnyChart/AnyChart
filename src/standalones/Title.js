@@ -32,7 +32,7 @@ anychart.standalones.Title.prototype.dependsOnContainerSize = function() {
  */
 anychart.standalones.title = function() {
   var title = new anychart.standalones.Title();
-  title.setupByVal(anychart.getFullTheme()['standalones']['title'], true);
+  title.setupByVal(anychart.getFullTheme('standalones.title'), true);
   return title;
 };
 

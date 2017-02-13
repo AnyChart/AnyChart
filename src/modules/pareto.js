@@ -25,12 +25,11 @@ goog.require('anychart.modules.base');
 anychart.pareto = function(opt_data) {
   anychart.performance.start('anychart.pareto()');
   var chart = new anychart.charts.Pareto();
-  var theme = anychart.getFullTheme();
 
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.COLUMN);
   chart.setType(anychart.enums.ChartTypes.PARETO);
 
-  chart.setupByVal(theme['pareto'], true);
+  chart.setupByVal(anychart.getFullTheme('pareto'), true);
   chart.data(opt_data);
 
   anychart.performance.end('anychart.pareto()');

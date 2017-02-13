@@ -21,9 +21,7 @@ goog.require('anychart.modules.base');
  */
 anychart.funnel = function(opt_data, opt_csvSettings) {
   var chart = new anychart.charts.Funnel(opt_data, opt_csvSettings);
-  var theme = anychart.getFullTheme();
-
-  chart.setupByVal(theme['funnel'], true);
+  chart.setupByVal(anychart.getFullTheme('funnel'), true);
 
   return chart;
 };

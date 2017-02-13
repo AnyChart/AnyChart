@@ -1874,8 +1874,7 @@ anychart.core.stock.Plot.prototype.initDragger_ = function(e) {
  */
 anychart.core.stock.Plot.prototype.handlePlotMouseOverAndMove_ = function(e) {
   if (this.seriesBounds_) {
-    var stageReferencePoint = goog.style.getClientPosition(/** @type {Element} */
-        (this.container().getStage().container()));
+    var stageReferencePoint = this.container().getStage().getClientPosition();
     var x = e['clientX'] - stageReferencePoint.x - this.seriesBounds_.left;
     var y = e['clientY'] - stageReferencePoint.y - this.seriesBounds_.top;
     // testing that the point is inside series area

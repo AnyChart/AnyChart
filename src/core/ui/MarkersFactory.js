@@ -725,6 +725,7 @@ anychart.core.ui.MarkersFactory.prototype.createMarker = function() {
  * @return {anychart.core.ui.MarkersFactory} Returns self for method chaining.
  */
 anychart.core.ui.MarkersFactory.prototype.draw = function() {
+  if (this.isDisposed()) return this;
   if (!this.layer_) {
     this.layer_ = acgraph.layer();
     if (this.isInteractive)
@@ -1321,6 +1322,7 @@ anychart.core.ui.MarkersFactory.Marker.prototype.getFinalSettings = function(val
  * @return {anychart.core.ui.MarkersFactory.Marker}
  */
 anychart.core.ui.MarkersFactory.Marker.prototype.draw = function() {
+  if (this.isDisposed()) return this;
   var parentMarkersFactory = this.parentMarkersFactory();
   var currentMarkersFactory = this.currentMarkersFactory() ? this.currentMarkersFactory() : parentMarkersFactory;
   var isSingleMarker = !(parentMarkersFactory && currentMarkersFactory);

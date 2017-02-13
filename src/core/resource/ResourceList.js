@@ -856,7 +856,7 @@ anychart.core.resource.ResourceList.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.RESOURCE_LIST_OVERLAY)) {
-    this.overlay_.target(/** @type {Element} */(this.container().getStage().container()));
+    this.overlay_.target(this.container().getStage().getDomWrapper());
     this.overlay_.setBounds(this.getPixelBounds());
     this.overlay_.draw();
     this.markConsistent(anychart.ConsistencyState.RESOURCE_LIST_OVERLAY);

@@ -3,21 +3,56 @@ goog.require('anychart.color');
 
 
 /**
- * Propagates all default values to their end-point targets.
- * @param {*} theme
- * @return {*}
+ * Compiles target root in the theme. If the target is already compiled returns null.
+ * Note: expects the theme to be a clone of the actual theme, so it can be edited in place.
+ * @param {!Object} theme
+ * @param {string} path
+ * @param {number} themeIndex
+ * @return {boolean}
  */
-anychart.themes.merging.compileTheme = function(theme) {
-  var result = anychart.utils.recursiveClone(theme);
-  var i;
-  for (i = 0; i < anychart.themes.merging.mergingMap_.length; i++) {
-    var obj = anychart.themes.merging.mergingMap_[i];
-    var defaultsObj = obj.defaultObj;
-    for (var j = 0; j < obj.targets.length; j++) {
-      result = anychart.themes.merging.mergeThemePart_(result, obj.targets[j].split('.'), defaultsObj.split('.'));
+anychart.themes.merging.compileTheme = function(theme, path, themeIndex) {
+  var rootParts = path.split('.');
+  var descriptor = anychart.themes.merging.mergingMapInverse_[rootParts[0]];
+  var needsCompilation = !!(descriptor && descriptor.mergedIn <= themeIndex);
+  if (needsCompilation) {
+    descriptor.mergedIn = themeIndex + 1;
+    var requires = descriptor.requires;
+    for (var i = 0; i < requires.length; i++) {
+      var req = requires[i];
+      // ensure the default object is merged first
+      anychart.themes.merging.compileTheme(theme, req.defaultObj, themeIndex);
+      var targets = req.targets;
+      var defObjSplit = req.defaultObj.split('.');
+      for (var j = 0; j < targets.length; j++) {
+        // the theme is always an object, so the reference remains correct
+        anychart.themes.merging.mergeThemePart_(theme, targets[j].split('.'), defObjSplit);
+      }
     }
   }
-  return result || {};
+  return needsCompilation;
+};
+
+
+/**
+ * Clears themes cache.
+ */
+anychart.themes.merging.clearCache = function() {
+  for (var i in anychart.themes.merging.mergingMapInverse_) {
+    var descriptor = anychart.themes.merging.mergingMapInverse_[i];
+    // we want to keep default theme cache
+    descriptor.mergedIn = Math.min(descriptor.mergedIn, 1);
+  }
+};
+
+
+/**
+ * Returns theme part denoted be a string where parts are separated with a point.
+ * @param {*} theme
+ * @param {string} path
+ * @return {*}
+ */
+anychart.themes.merging.getThemePart = function(theme, path) {
+  return anychart.themes.merging.getThemePart_(theme, path.split('.'));
 };
 
 
@@ -48,8 +83,8 @@ anychart.themes.merging.getThemePart_ = function(theme, path) {
  * @return {Object} - Clone of original scale json object with type.
  */
 anychart.themes.merging.mergeScale = function(scaleObj, index, chartType) {
-  var theme = anychart.getFullTheme();
-  var themeScale = anychart.themes.merging.getThemePart_(theme, [chartType, 'scales', index]);
+  var theme = anychart.getFullTheme(chartType);
+  var themeScale = anychart.themes.merging.getThemePart_(theme, ['scales', index]);
 
   if (themeScale) {
     var scaleType = scaleObj['type'];
@@ -470,7 +505,7 @@ anychart.themes.merging.checkEquality_ = function(target, defaultObj, opt_arrayT
 
 /**
  * Map used by merger, that explains how to merge. It is an array to ensure merging order.
- * @type {Array.<{defaultObj:string, targets:Array.<string>}>}
+ * @const {Array.<{defaultObj:string, targets:Array.<string>}>}
  * @private
  */
 anychart.themes.merging.mergingMap_ = [
@@ -621,7 +656,7 @@ anychart.themes.merging.mergingMap_ = [
   {
     defaultObj: 'hatchFillPaletteFor3D',
     targets: [
-      'cartesian3d.hatchFillPalette'
+      'cartesian3dBase.hatchFillPalette'
     ]
   },
   {
@@ -876,19 +911,20 @@ anychart.themes.merging.mergingMap_ = [
     ]
   },
   {
-    defaultObj: 'cartesian3d.defaultSeriesSettings.base',
+    defaultObj: 'cartesian3dBase.defaultSeriesSettings.base',
     targets: [
-      'cartesian3d.defaultSeriesSettings.bar',
-      'cartesian3d.defaultSeriesSettings.column',
-      'cartesian3d.defaultSeriesSettings.area'
+      'cartesian3dBase.defaultSeriesSettings.bar',
+      'cartesian3dBase.defaultSeriesSettings.column',
+      'cartesian3dBase.defaultSeriesSettings.area'
     ]
   },
   {
-    defaultObj: 'cartesian3d',
+    defaultObj: 'cartesian3dBase',
     targets: [
       'area3d',
       'bar3d',
-      'column3d'
+      'column3d',
+      'cartesian3d'
     ]
   },
   {
@@ -1232,6 +1268,48 @@ anychart.themes.merging.mergingMap_ = [
     ]
   }
 ];
+
+
+/**
+ * @const {Object.<string, Object.<{
+ *    requires: Array.<{
+ *        defaultObj:string,
+ *        targets:Array.<string>
+ *    }>,
+ *    mergedIn: number
+ * }>>}
+ * @private
+ */
+anychart.themes.merging.mergingMapInverse_ = (function() {
+  var mergingMap = anychart.themes.merging.mergingMap_;
+  var res = {};
+  for (var i = 0; i < mergingMap.length; i++) {
+    var defObj = mergingMap[i].defaultObj;
+    var targets = mergingMap[i].targets;
+    for (var j = 0; j < targets.length; j++) {
+      var target = targets[j];
+      var targetSplit = target.split('.');
+      var root = targetSplit[0];
+      var obj = res[root];
+      if (!obj) {
+        res[root] = obj = {
+          requires: [],
+          mergedIn: 0
+        };
+      }
+      var last = obj.requires[obj.requires.length - 1];
+      if (last && last.defaultObj == defObj) {
+        last.targets.push(target);
+      } else {
+        obj.requires.push({
+          defaultObj: defObj,
+          targets: [target]
+        });
+      }
+    }
+  }
+  return res;
+})();
 
 
 /**

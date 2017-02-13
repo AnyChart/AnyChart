@@ -28,12 +28,11 @@ goog.require('anychart.modules.base');
  */
 anychart.box = function(var_args) {
   var chart = new anychart.charts.Cartesian();
-  var theme = anychart.getFullTheme();
 
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.BOX);
   chart.setType(anychart.enums.ChartTypes.BOX);
 
-  chart.setupByVal(theme['box'], true);
+  chart.setupByVal(anychart.getFullTheme('box'), true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['box'](arguments[i]);

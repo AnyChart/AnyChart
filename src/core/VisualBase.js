@@ -64,6 +64,16 @@ anychart.core.VisualBase.prototype.container_ = null;
 
 
 /**
+ * Original container. Used to allow containers comparison on container change.
+ * If it is an ILayer, an Element or boolean true, the container considered valid.
+ * If it is false - the container was not set yet, or invalid.
+ * @type {!(acgraph.vector.ILayer|Element|boolean)}
+ * @private
+ */
+anychart.core.VisualBase.prototype.originalContainer_ = false;
+
+
+/**
  * Parent bounds storage.
  * @type {anychart.math.Rect}
  * @private
@@ -101,14 +111,6 @@ anychart.core.VisualBase.prototype.autoZIndex = 0;
  * @private
  */
 anychart.core.VisualBase.prototype.enabled_ = true;
-
-
-/**
- * Double signals dispatching for enabled state signals special treatment.
- * @type {boolean}
- * @private
- */
-anychart.core.VisualBase.prototype.doubleSuspension_ = false;
 
 
 /**
@@ -281,46 +283,44 @@ anychart.core.VisualBase.prototype.getOwnerElement = function(target) {
  */
 anychart.core.VisualBase.prototype.container = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.originalContainer_ != opt_value) {
-      this.prevContainer_ = this.container_;
-      this.originalContainer_ = opt_value;
-      var containerBounds = this.container_ && this.container_.getStage() && this.container_.getStage().getBounds();
-
-      if (goog.isString(opt_value) || goog.dom.isElement(opt_value)) {
-        if (this.stageOwn_) {
-          this.container_.container(opt_value);
-        } else {
-          this.container_ = this.createStage();
-          this.registerDisposable(this.container_);
-          if (acgraph.type() != acgraph.StageType.VML)
-            this.container_.domElement().setAttribute('role', 'presentation');
-          this.container_.container(/** @type {Element} */(opt_value));
-
-          //if graphics engine can't recognize passed container
-          //we should destroy stage to avoid uncontrolled behaviour
-          if (!this.container_.container()) {
-            this.container_.dispose();
-            this.container_ = null;
-            return this;
-          }
-          this.stageOwn_ = true;
-        }
-      } else if (!opt_value || !/** @type {acgraph.vector.Element} */(opt_value).isDisposed()) {
-        this.container_ = /** @type {acgraph.vector.ILayer} */(opt_value);
-      }
-
+    /** @type {?(acgraph.vector.ILayer|Element)} */
+    var value = (goog.isString(opt_value) ? goog.dom.getElement(opt_value || null) : opt_value);
+    var validContainer = value || goog.isNull(opt_value);
+    if (this.originalContainer_ != validContainer) {
+      this.originalContainer_ = validContainer;
+      var toDispose = this.stageOwn_ ? this.container_ : null;
+      this.suspendSignalsDispatching();
       var state = anychart.ConsistencyState.CONTAINER;
-      var newContainerBounds = this.container_ && this.container_.getStage() && this.container_.getStage().getBounds();
-      if (!goog.math.Rect.equals(containerBounds, newContainerBounds))
-        state |= anychart.ConsistencyState.BOUNDS;
-
-      this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
-
-      if (this.stageOwn_ && this.originalContainer_ instanceof acgraph.vector.Stage) {
-        if (this.prevContainer_.dispose)
-          this.prevContainer_.dispose();
+      if (value) {
+        var prevContainerBounds = this.container_ && this.container_.getStage() && this.container_.getStage().getBounds();
         this.stageOwn_ = false;
+        if (goog.dom.isElement(value)) {
+          if (this.stageOwn_) {
+            this.container_.container(value);
+          } else {
+            this.container_ = this.createStage();
+            if (acgraph.type() != acgraph.StageType.VML)
+              this.container_.domElement().setAttribute('role', 'presentation');
+            this.container_.container(/** @type {Element} */(value));
+            this.stageOwn_ = true;
+          }
+        } else {
+          this.container_ = /** @type {acgraph.vector.ILayer} */(value);
+        }
+        var newContainerBounds = this.container_ && this.container_.getStage() && this.container_.getStage().getBounds();
+        if (!goog.math.Rect.equals(prevContainerBounds, newContainerBounds))
+          state |= anychart.ConsistencyState.BOUNDS;
+      } else {
+        this.container_ = null;
       }
+      this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
+      this.resumeSignalsDispatching(true);
+
+      // we dispose old stage here, because we want everything to be transfered from it to the new stage.
+      if (toDispose)
+        anychart.globalLock.onUnlock(function() {
+          goog.dispose(toDispose);
+        });
     }
     return this;
   }
@@ -444,8 +444,9 @@ anychart.core.VisualBase.prototype.checkDrawingNeeded = function() {
     return false;
   } else if (!this.container()) {
     this.remove(); // It should be removed if it was drawn.
-    this.invalidate(anychart.ConsistencyState.CONTAINER);
-    anychart.core.reporting.error(anychart.enums.ErrorCode.CONTAINER_NOT_SET);
+    this.markConsistent(anychart.ConsistencyState.CONTAINER);
+    if (!this.originalContainer_)
+      anychart.core.reporting.error(anychart.enums.ErrorCode.CONTAINER_NOT_SET);
     return false;
   }
   this.markConsistent(anychart.ConsistencyState.ENABLED);
@@ -566,7 +567,7 @@ anychart.core.VisualBase.prototype.dependsOnContainerSize = function() {
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.VisualBase.prototype.saveAsPng = function(opt_widthOrOptions, opt_height, opt_quality, opt_filename) {
-  var stage = this.container() ? this.container().getStage() : null;
+  var stage = this.container_ ? this.container_.getStage() : null;
   if (stage) {
     var args = anychart.utils.decomposeArguments({
       'width': opt_widthOrOptions,
@@ -600,7 +601,7 @@ anychart.core.VisualBase.prototype.saveAsPng = function(opt_widthOrOptions, opt_
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.VisualBase.prototype.saveAsJpg = function(opt_widthOrOptions, opt_height, opt_quality, opt_forceTransparentWhite, opt_filename) {
-  var stage = this.container() ? this.container().getStage() : null;
+  var stage = this.container_ ? this.container_.getStage() : null;
   if (stage) {
     var args = anychart.utils.decomposeArguments(
         {
@@ -637,7 +638,7 @@ anychart.core.VisualBase.prototype.saveAsJpg = function(opt_widthOrOptions, opt_
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.VisualBase.prototype.saveAsPdf = function(opt_paperSizeOrWidthOrOptions, opt_landscapeOrHeight, opt_x, opt_y, opt_filename) {
-  var stage = this.container() ? this.container().getStage() : null;
+  var stage = this.container_ ? this.container_.getStage() : null;
   if (stage) {
     var args = anychart.utils.decomposeArguments(
         {
@@ -674,7 +675,7 @@ anychart.core.VisualBase.prototype.saveAsPdf = function(opt_paperSizeOrWidthOrOp
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.VisualBase.prototype.saveAsSvg = function(opt_paperSizeOrWidthOrOptions, opt_landscapeOrHeight, opt_filename) {
-  var stage = this.container() ? this.container().getStage() : null;
+  var stage = this.container_ ? this.container_.getStage() : null;
   if (stage) {
     var args = anychart.utils.decomposeArguments(
         {
@@ -698,7 +699,7 @@ anychart.core.VisualBase.prototype.saveAsSvg = function(opt_paperSizeOrWidthOrOp
  * @return {string}
  */
 anychart.core.VisualBase.prototype.toSvg = function(opt_paperSizeOrWidthOrOptions, opt_landscapeOrHeight) {
-  var stage = this.container() ? this.container().getStage() : null;
+  var stage = this.container_ ? this.container_.getStage() : null;
   if (stage) {
     var args = anychart.utils.decomposeArguments(
         {
@@ -727,7 +728,7 @@ anychart.core.VisualBase.prototype.toSvg = function(opt_paperSizeOrWidthOrOption
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.VisualBase.prototype.shareAsPng = function(onSuccessOrOptions, opt_onError, opt_asBase64, opt_width, opt_height, opt_quality, opt_filename) {
-  var stage = this.container() ? this.container().getStage() : null;
+  var stage = this.container_ ? this.container_.getStage() : null;
   if (stage) {
     var args = anychart.utils.decomposeArguments(
         {
@@ -758,7 +759,7 @@ anychart.core.VisualBase.prototype.shareAsPng = function(onSuccessOrOptions, opt
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.VisualBase.prototype.shareAsJpg = function(onSuccessOrOptions, opt_onError, opt_asBase64, opt_width, opt_height, opt_quality, opt_forceTransparentWhite, opt_filename) {
-  var stage = this.container() ? this.container().getStage() : null;
+  var stage = this.container_ ? this.container_.getStage() : null;
 
   if (stage) {
     var args = anychart.utils.decomposeArguments(
@@ -789,7 +790,7 @@ anychart.core.VisualBase.prototype.shareAsJpg = function(onSuccessOrOptions, opt
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.VisualBase.prototype.shareAsSvg = function(onSuccessOrOptions, opt_onError, opt_asBase64, opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_filename) {
-  var stage = this.container() ? this.container().getStage() : null;
+  var stage = this.container_ ? this.container_.getStage() : null;
 
   if (stage) {
     var args = anychart.utils.decomposeArguments(
@@ -822,7 +823,7 @@ anychart.core.VisualBase.prototype.shareAsSvg = function(onSuccessOrOptions, opt
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.VisualBase.prototype.shareAsPdf = function(onSuccessOrOptions, opt_onError, opt_asBase64, opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_x, opt_y, opt_filename) {
-  var stage = this.container() ? this.container().getStage() : null;
+  var stage = this.container_ ? this.container_.getStage() : null;
 
   if (stage) {
     var args = anychart.utils.decomposeArguments(
@@ -861,7 +862,7 @@ anychart.core.VisualBase.prototype.shareAsPdf = function(onSuccessOrOptions, opt
  * @param {number=} opt_quality Image quality in ratio 0-1.
  */
 anychart.core.VisualBase.prototype.getPngBase64String = function(onSuccessOrOptions, opt_onError, opt_width, opt_height, opt_quality) {
-  var stage = this.container() ? this.container().getStage() : null;
+  var stage = this.container_ ? this.container_.getStage() : null;
 
   if (stage) {
     var args = anychart.utils.decomposeArguments(
@@ -889,7 +890,7 @@ anychart.core.VisualBase.prototype.getPngBase64String = function(onSuccessOrOpti
  * @param {boolean=} opt_forceTransparentWhite Define, should we force transparent to white background.
  */
 anychart.core.VisualBase.prototype.getJpgBase64String = function(onSuccessOrOptions, opt_onError, opt_width, opt_height, opt_quality, opt_forceTransparentWhite) {
-  var stage = this.container() ? this.container().getStage() : null;
+  var stage = this.container_ ? this.container_.getStage() : null;
 
   if (stage) {
     var args = anychart.utils.decomposeArguments(
@@ -916,7 +917,7 @@ anychart.core.VisualBase.prototype.getJpgBase64String = function(onSuccessOrOpti
  * @param {(boolean|string)=} opt_landscapeOrHeight Landscape or height.
  */
 anychart.core.VisualBase.prototype.getSvgBase64String = function(onSuccessOrOptions, opt_onError, opt_paperSizeOrWidth, opt_landscapeOrHeight) {
-  var stage = this.container() ? this.container().getStage() : null;
+  var stage = this.container_ ? this.container_.getStage() : null;
 
   if (stage) {
     var args = anychart.utils.decomposeArguments(
@@ -945,7 +946,7 @@ anychart.core.VisualBase.prototype.getSvgBase64String = function(onSuccessOrOpti
  * @param {number=} opt_y Offset Y.
  */
 anychart.core.VisualBase.prototype.getPdfBase64String = function(onSuccessOrOptions, opt_onError, opt_paperSizeOrWidth, opt_landscapeOrHeight, opt_x, opt_y) {
-  var stage = this.container() ? this.container().getStage() : null;
+  var stage = this.container_ ? this.container_.getStage() : null;
 
   if (stage) {
     /**
@@ -976,7 +977,7 @@ anychart.core.VisualBase.prototype.getPdfBase64String = function(onSuccessOrOpti
  * @param {boolean=} opt_landscape
  */
 anychart.core.VisualBase.prototype.print = function(opt_paperSizeOrOptions, opt_landscape) {
-  var stage = this.container() && this.container().getStage();
+  var stage = this.container_ ? this.container_.getStage() : null;
   if (stage) {
     var args = anychart.utils.decomposeArguments(
         {
@@ -1087,10 +1088,11 @@ anychart.core.VisualBase.prototype.disposeInternal = function() {
   this.eventsHandler = null;
   this.parentBounds_ = null;
 
-  if (this.stageOwn_ && this.container_) {
+  if (this.stageOwn_) {
     goog.dispose(this.container_);
-    this.container_ = null;
   }
+  this.container_ = null;
+  this.originalContainer_ = false;
 
   anychart.core.VisualBase.base(this, 'disposeInternal');
 };

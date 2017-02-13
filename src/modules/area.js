@@ -26,12 +26,10 @@ goog.require('anychart.modules.base');
  */
 anychart.area = function(var_args) {
   var chart = new anychart.charts.Cartesian();
-  var theme = anychart.getFullTheme();
-
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.AREA);
   chart.setType(anychart.enums.ChartTypes.AREA);
 
-  chart.setupByVal(theme['area'], true);
+  chart.setupByVal(anychart.getFullTheme('area'), true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['area'](arguments[i]);

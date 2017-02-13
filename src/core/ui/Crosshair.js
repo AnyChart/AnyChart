@@ -524,7 +524,7 @@ anychart.core.ui.Crosshair.prototype.handleMouseOverAndMove = function(e) {
 
   var container = /** @type {acgraph.vector.ILayer} */(this.container());
   var bounds = this.parentBounds();
-  var chartOffset = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+  var chartOffset = this.container().getStage().getClientPosition();
 
   var mouseX = e['clientX'] - chartOffset.x;
   var mouseY = e['clientY'] - chartOffset.y;

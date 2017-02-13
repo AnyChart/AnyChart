@@ -376,7 +376,7 @@ anychart.core.radar.series.ContinuousBase.prototype.getIndexByEvent = function(e
   var y = event['clientY'];
   var value, index;
 
-  var stageClientPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+  var stageClientPosition = this.container().getStage().getClientPosition();
   var cx = stageClientPosition.x + this.cx;
   var cy = stageClientPosition.y + this.cy;
 

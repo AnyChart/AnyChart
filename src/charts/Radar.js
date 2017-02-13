@@ -1578,7 +1578,7 @@ anychart.charts.Radar.prototype.getSeriesStatus = function(event) {
   var clientY = event['clientY'];
   var xValue, yValue, index;
 
-  var containerOffset = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+  var containerOffset = this.container().getStage().getClientPosition();
 
 
   var x = clientX - containerOffset.x;

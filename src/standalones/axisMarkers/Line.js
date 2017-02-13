@@ -20,7 +20,7 @@ anychart.core.makeStandalone(anychart.standalones.axisMarkers.Line, anychart.cor
  */
 anychart.standalones.axisMarkers.line = function() {
   var line = new anychart.standalones.axisMarkers.Line();
-  line.setup(anychart.getFullTheme()['standalones']['lineAxisMarker']);
+  line.setup(anychart.getFullTheme('standalones.lineAxisMarker'));
   return line;
 };
 

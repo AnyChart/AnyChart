@@ -19,8 +19,7 @@ goog.require('anychart.modules.base');
 anychart.treeMap = function(opt_data, opt_fillMethod) {
   var chart = new anychart.charts.TreeMap(opt_data, opt_fillMethod);
 
-  var theme = anychart.getFullTheme();
-  chart.setupByVal(theme['treeMap'], true);
+  chart.setupByVal(anychart.getFullTheme('treeMap'), true);
 
   return chart;
 };

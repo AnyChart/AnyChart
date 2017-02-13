@@ -342,7 +342,7 @@ anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.charts.Cartesi
  */
 anychart.cartesian = function(opt_isVertical) {
   var chart = new anychart.charts.Cartesian();
-  chart.setupByVal(anychart.getFullTheme()['cartesian'], true);
+  chart.setupByVal(anychart.getFullTheme('cartesian'), true);
   if (goog.isDef(opt_isVertical))
     chart.barChartMode = !!opt_isVertical;
   return chart;

@@ -18,11 +18,9 @@ goog.require('anychart.modules.base');
  */
 anychart.choropleth = function(var_args) {
   var map = new anychart.charts.Map();
-  var theme = anychart.getFullTheme();
-
   map.defaultSeriesType(anychart.enums.MapSeriesType.CHOROPLETH);
 
-  map.setupByVal(theme['choropleth'], true);
+  map.setupByVal(anychart.getFullTheme('choropleth'), true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     map.choropleth(arguments[i]);

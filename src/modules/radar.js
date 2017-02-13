@@ -23,9 +23,7 @@ goog.require('anychart.modules.base');
  */
 anychart.radar = function(var_args) {
   var chart = new anychart.charts.Radar();
-  var theme = anychart.getFullTheme();
-
-  chart.setupByVal(theme['radar'], true);
+  chart.setupByVal(anychart.getFullTheme('radar'), true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart.line(arguments[i]);

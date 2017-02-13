@@ -938,7 +938,7 @@ anychart.charts.HeatMap.prototype.getSeriesStatus = function(event) {
   var clientY = event['clientY'];
   var value, index;
 
-  var containerOffset = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+  var containerOffset = this.container().getStage().getClientPosition();
 
   var x = clientX - containerOffset.x;
   var y = clientY - containerOffset.y;
@@ -1055,10 +1055,9 @@ anychart.charts.HeatMap.prototype.createSeries_ = function(data, opt_csvSettings
   instance.labels().setAutoZIndex(seriesZIndex + anychart.charts.HeatMap.ZINDEX_INCREMENT_MULTIPLIER / 2);
   instance.clip(true);
 
-  var theme = anychart.getFullTheme();
-  instance.setAutoColor(theme['palette']['items'][0]);
-  instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(theme['markerPalette']['items'][0]));
-  instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(theme['hatchFillPalette']['items'][0]));
+  instance.setAutoColor(/** @type {acgraph.vector.Fill} */(anychart.getFullTheme('palette.items.0')));
+  instance.setAutoMarkerType(/** @type {anychart.enums.MarkerType} */(anychart.getFullTheme('markerPalette.items.0')));
+  instance.setAutoHatchFill(/** @type {acgraph.vector.HatchFill|acgraph.vector.PatternFill} */(anychart.getFullTheme('hatchFillPalette.items.0')));
 
   instance.markers().setAutoZIndex(seriesZIndex + anychart.charts.HeatMap.ZINDEX_INCREMENT_MULTIPLIER / 2);
   instance.markers().setAutoFill((/** @type {anychart.core.heatMap.series.Base} */ (instance)).getMarkerFill());
@@ -1067,7 +1066,7 @@ anychart.charts.HeatMap.prototype.createSeries_ = function(data, opt_csvSettings
   if (anychart.DEFAULT_THEME != 'v6')
     instance.labels().setAutoColor(anychart.color.darken(/** @type {(acgraph.vector.Fill|acgraph.vector.Stroke)} */(instance.color())));
 
-  instance.a11y(theme[this.getType()]['defaultSeriesSettings']['base']['a11y']);
+  instance.a11y(/** @type {boolean|Object|undefined} */(anychart.getFullTheme(this.getType() + '.defaultSeriesSettings.base.a11y')));
 
   instance.listenSignals(this.seriesInvalidated_, this);
 

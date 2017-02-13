@@ -20,7 +20,7 @@ anychart.core.makeStandalone(anychart.standalones.grids.Linear3d, anychart.core.
  */
 anychart.standalones.grids.linear3d = function() {
   var grid = new anychart.standalones.grids.Linear3d();
-  grid.setup(anychart.getFullTheme()['standalones']['linearGrid']);
+  grid.setup(anychart.getFullTheme('standalones.linearGrid'));
   return grid;
 };
 

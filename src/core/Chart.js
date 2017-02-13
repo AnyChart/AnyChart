@@ -1235,7 +1235,7 @@ anychart.core.Chart.prototype.drawInternal = function() {
     //can be null if you add chart to tooltip container on hover (Vitalya :) )
     if (stage) {
       //listen resize event
-      stage.resize(stage.originalWidth, stage.originalHeight);
+      // stage.resize(stage.originalWidth, stage.originalHeight);
       stage.listen(
           acgraph.vector.Stage.EventType.STAGE_RESIZE,
           this.resizeHandler,
@@ -1327,7 +1327,7 @@ anychart.core.Chart.prototype.drawInternal = function() {
  * @return {anychart.core.Chart} An instance of {@link anychart.core.Chart} class for method chaining.
  */
 anychart.core.Chart.prototype.draw = function(opt_async) {
-  if (!!opt_async) {
+  if (opt_async) {
     if (!this.bindedDraw_)
       this.bindedDraw_ = goog.bind(this.draw, this);
     setTimeout(this.bindedDraw_, 0);
@@ -1409,12 +1409,13 @@ anychart.core.Chart.prototype.getPlotBounds = function() {
  * @return {Object.<string, number>} .
  */
 anychart.core.Chart.prototype.localToGlobal = function(xCoord, yCoord) {
-  var containerPosition;
-  if (this.container() && this.container().getStage() && this.container().getStage().container()) {
-    containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+  var result = {'x': xCoord, 'y': yCoord};
+  if (this.container() && this.container().getStage()) {
+    var containerPosition = this.container().getStage().getClientPosition();
+    result['x'] += containerPosition.x;
+    result['y'] += containerPosition.y;
   }
-
-  return containerPosition ? {'x': xCoord + containerPosition.x, 'y': yCoord + containerPosition.y} : {'x': xCoord, 'y': yCoord};
+  return result;
 };
 
 
@@ -1425,12 +1426,13 @@ anychart.core.Chart.prototype.localToGlobal = function(xCoord, yCoord) {
  * @return {Object.<string, number>} .
  */
 anychart.core.Chart.prototype.globalToLocal = function(xCoord, yCoord) {
-  var containerPosition;
-  if (this.container() && this.container().getStage() && this.container().getStage().container()) {
-    containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+  var result = {'x': xCoord, 'y': yCoord};
+  if (this.container() && this.container().getStage()) {
+    var containerPosition = this.container().getStage().getClientPosition();
+    result['x'] -= containerPosition.x;
+    result['y'] -= containerPosition.y;
   }
-
-  return containerPosition ? {'x': xCoord - containerPosition.x, 'y': yCoord - containerPosition.y} : {'x': xCoord, 'y': yCoord};
+  return result;
 };
 
 
@@ -1528,7 +1530,7 @@ anychart.core.Chart.prototype.getNormalizedType_ = function() {
  */
 anychart.core.Chart.prototype.getDefaultThemeObj = function() {
   var result = {};
-  result[this.getNormalizedType_()] = anychart.getFullTheme()[this.getType()];
+  result[this.getNormalizedType_()] = anychart.getFullTheme(this.getType());
   return result;
 };
 
@@ -2903,16 +2905,13 @@ anychart.core.Chart.prototype.toA11yTable = function(opt_title, opt_asString) {
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.Chart.prototype.saveAsXml = function(opt_includeTheme, opt_filename) {
-  var stage = this.container() ? this.container().getStage() : null;
-  if (stage) {
-    var xml = /** @type {string} */(this.toXml(false, opt_includeTheme));
-    var options = {};
-    options['file-name'] = opt_filename || anychart.exports.filename();
-    options['data'] = xml;
-    options['dataType'] = 'xml';
-    options['responseType'] = 'file';
-    stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/xml', options);
-  }
+  var xml = /** @type {string} */(this.toXml(false, opt_includeTheme));
+  var options = {};
+  options['file-name'] = opt_filename || anychart.exports.filename();
+  options['data'] = xml;
+  options['dataType'] = 'xml';
+  options['responseType'] = 'file';
+  acgraph.sendRequestToExportServer(acgraph.exportServer + '/xml', options);
 };
 
 
@@ -2922,16 +2921,13 @@ anychart.core.Chart.prototype.saveAsXml = function(opt_includeTheme, opt_filenam
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.Chart.prototype.saveAsJson = function(opt_includeTheme, opt_filename) {
-  var stage = this.container() ? this.container().getStage() : null;
-  if (stage) {
-    var json = /** @type {string} */(this.toJson(true, opt_includeTheme));
-    var options = {};
-    options['file-name'] = opt_filename || anychart.exports.filename();
-    options['data'] = json;
-    options['dataType'] = 'json';
-    options['responseType'] = 'file';
-    stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/json', options);
-  }
+  var json = /** @type {string} */(this.toJson(true, opt_includeTheme));
+  var options = {};
+  options['file-name'] = opt_filename || anychart.exports.filename();
+  options['data'] = json;
+  options['dataType'] = 'json';
+  options['responseType'] = 'file';
+  acgraph.sendRequestToExportServer(acgraph.exportServer + '/json', options);
 };
 
 
@@ -2942,16 +2938,13 @@ anychart.core.Chart.prototype.saveAsJson = function(opt_includeTheme, opt_filena
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.Chart.prototype.saveAsCsv = function(opt_chartDataExportMode, opt_csvSettings, opt_filename) {
-  var stage = this.container() ? this.container().getStage() : null;
-  if (stage) {
-    var csv = this.toCsv(opt_chartDataExportMode, opt_csvSettings);
-    var options = {};
-    options['file-name'] = opt_filename || anychart.exports.filename();
-    options['data'] = csv;
-    options['dataType'] = 'csv';
-    options['responseType'] = 'file';
-    stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/csv', options);
-  }
+  var csv = this.toCsv(opt_chartDataExportMode, opt_csvSettings);
+  var options = {};
+  options['file-name'] = opt_filename || anychart.exports.filename();
+  options['data'] = csv;
+  options['dataType'] = 'csv';
+  options['responseType'] = 'file';
+  acgraph.sendRequestToExportServer(acgraph.exportServer + '/csv', options);
 };
 
 
@@ -2961,20 +2954,17 @@ anychart.core.Chart.prototype.saveAsCsv = function(opt_chartDataExportMode, opt_
  * @param {string=} opt_filename file name to save.
  */
 anychart.core.Chart.prototype.saveAsXlsx = function(opt_chartDataExportMode, opt_filename) {
-  var stage = this.container() ? this.container().getStage() : null;
-  if (stage) {
-    var csv = this.toCsv(opt_chartDataExportMode, {
-      'rowsSeparator': '\n',
-      'columnsSeparator': ',',
-      'ignoreFirstRow': false
-    });
-    var options = {};
-    options['file-name'] = opt_filename || anychart.exports.filename();
-    options['data'] = csv;
-    options['dataType'] = 'xlsx';
-    options['responseType'] = 'file';
-    stage.getHelperElement().sendRequestToExportServer(acgraph.exportServer + '/xlsx', options);
-  }
+  var csv = this.toCsv(opt_chartDataExportMode, {
+    'rowsSeparator': '\n',
+    'columnsSeparator': ',',
+    'ignoreFirstRow': false
+  });
+  var options = {};
+  options['file-name'] = opt_filename || anychart.exports.filename();
+  options['data'] = csv;
+  options['dataType'] = 'xlsx';
+  options['responseType'] = 'file';
+  acgraph.sendRequestToExportServer(acgraph.exportServer + '/xlsx', options);
 };
 
 

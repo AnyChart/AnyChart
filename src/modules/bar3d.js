@@ -21,12 +21,11 @@ goog.require('anychart.modules.base');
  */
 anychart.bar3d = function(var_args) {
   var chart = new anychart.charts.Cartesian3d();
-  var theme = anychart.getFullTheme();
 
   chart.defaultSeriesType(anychart.enums.Cartesian3dSeriesType.BAR);
   chart.setType(anychart.enums.ChartTypes.BAR_3D);
 
-  chart.setupByVal(theme['bar3d'], true);
+  chart.setupByVal(anychart.getFullTheme('bar3d'), true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['bar'](arguments[i]);

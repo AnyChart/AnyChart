@@ -128,7 +128,7 @@ anychart.core.axes.StockDateTime.prototype.height = function(opt_value) {
 anychart.core.axes.StockDateTime.prototype.background = function(opt_value) {
   if (!this.background_) {
     this.background_ = new anychart.core.ui.Background();
-    this.background_.setThemeSettings(anychart.getFullTheme()['defaultBackground']);
+    this.background_.setThemeSettings(/** @type {!Object} */(anychart.getFullTheme('defaultBackground')));
     this.background_.listenSignals(this.backgroundInvalidated_, this);
   }
   if (goog.isDef(opt_value)) {

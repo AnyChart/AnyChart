@@ -2955,7 +2955,7 @@ anychart.charts.Pert.prototype.serialize = function() {
 anychart.charts.Pert.prototype.setupByJSON = function(config, opt_default) {
   anychart.charts.Pert.base(this, 'setupByJSON', config, opt_default);
 
-  this.defaultTooltipSettings_ = anychart.getFullTheme()['defaultTooltip'];
+  this.defaultTooltipSettings_ = /** @type {Object} */(anychart.getFullTheme('defaultTooltip'));
 
   if ('treeData' in config) this.data(anychart.data.Tree.fromJson(config['treeData']));
   if ('milestones' in config) this.milestones().setupByJSON(config['milestones']);

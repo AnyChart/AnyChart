@@ -36,7 +36,7 @@ anychart.standalones.axes.Radial.prototype.serialize = function() {
  */
 anychart.standalones.axes.radial = function() {
   var axis = new anychart.standalones.axes.Radial();
-  axis.setup(anychart.getFullTheme()['standalones']['radialAxis']);
+  axis.setup(anychart.getFullTheme('standalones.radialAxis'));
   return axis;
 };
 

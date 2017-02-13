@@ -25,7 +25,7 @@ anychart.core.makeStandalone(anychart.standalones.axes.Linear, anychart.core.axe
  */
 anychart.standalones.axes.linear = function() {
   var axis = new anychart.standalones.axes.Linear();
-  axis.setup(anychart.getFullTheme()['standalones']['linearAxis']);
+  axis.setup(anychart.getFullTheme('standalones.linearAxis'));
   return axis;
 };
 

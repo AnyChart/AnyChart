@@ -19,12 +19,10 @@ goog.require('anychart.modules.base');
 anychart.gauges.linear = function(opt_data, opt_csvSettings) {
   var gauge = new anychart.charts.LinearGauge();
   gauge.data(opt_data, opt_csvSettings);
-  var theme = anychart.getFullTheme();
-
   gauge.defaultPointerType(anychart.enums.LinearGaugePointerType.BAR);
   gauge.setType(anychart.enums.GaugeTypes.LINEAR);
 
-  gauge.setupByVal(theme[anychart.enums.GaugeTypes.LINEAR], true);
+  gauge.setupByVal(anychart.getFullTheme('linearGauge'), true);
 
   return gauge;
 };
@@ -41,12 +39,10 @@ anychart.gaugeTypesMap[anychart.enums.GaugeTypes.LINEAR] = anychart.gauges.linea
 anychart.gauges.bullet = function(opt_data, opt_csvSettings) {
   var gauge = new anychart.charts.LinearGauge();
   gauge.data(opt_data, opt_csvSettings);
-  var theme = anychart.getFullTheme();
-
   gauge.defaultPointerType(anychart.enums.LinearGaugePointerType.BAR);
   gauge.setType(anychart.enums.GaugeTypes.BULLET);
 
-  gauge.setupByVal(theme[anychart.enums.GaugeTypes.BULLET], true);
+  gauge.setupByVal(anychart.getFullTheme('bullet'), true);
 
   return gauge;
 };
@@ -63,12 +59,10 @@ anychart.gaugeTypesMap[anychart.enums.GaugeTypes.BULLET] = anychart.gauges.bulle
 anychart.gauges.thermometer = function(opt_data, opt_csvSettings) {
   var gauge = new anychart.charts.LinearGauge();
   gauge.data(opt_data, opt_csvSettings);
-  var theme = anychart.getFullTheme();
-
   gauge.defaultPointerType(anychart.enums.LinearGaugePointerType.THERMOMETER);
   gauge.setType(anychart.enums.GaugeTypes.THERMOMETER);
 
-  gauge.setupByVal(theme[anychart.enums.GaugeTypes.THERMOMETER], true);
+  gauge.setupByVal(anychart.getFullTheme('thermometerGauge'), true);
 
   return gauge;
 };
@@ -85,12 +79,10 @@ anychart.gaugeTypesMap[anychart.enums.GaugeTypes.THERMOMETER] = anychart.gauges.
 anychart.gauges.tank = function(opt_data, opt_csvSettings) {
   var gauge = new anychart.charts.LinearGauge();
   gauge.data(opt_data, opt_csvSettings);
-  var theme = anychart.getFullTheme();
-
   gauge.defaultPointerType(anychart.enums.LinearGaugePointerType.TANK);
   gauge.setType(anychart.enums.GaugeTypes.TANK);
 
-  gauge.setupByVal(theme[anychart.enums.GaugeTypes.TANK], true);
+  gauge.setupByVal(anychart.getFullTheme('tankGauge'), true);
 
   return gauge;
 };
@@ -107,12 +99,10 @@ anychart.gaugeTypesMap[anychart.enums.GaugeTypes.TANK] = anychart.gauges.tank;
 anychart.gauges.led = function(opt_data, opt_csvSettings) {
   var gauge = new anychart.charts.LinearGauge();
   gauge.data(opt_data, opt_csvSettings);
-  var theme = anychart.getFullTheme();
-
   gauge.defaultPointerType(anychart.enums.LinearGaugePointerType.LED);
   gauge.setType(anychart.enums.GaugeTypes.LED);
 
-  gauge.setupByVal(theme[anychart.enums.GaugeTypes.LED], true);
+  gauge.setupByVal(anychart.getFullTheme('ledGauge'), true);
 
   return gauge;
 };

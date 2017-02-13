@@ -1285,7 +1285,7 @@ anychart.charts.Polar.prototype.getSeriesStatus = function(event) {
   var clientY = event['clientY'];
   var xValue, index;
 
-  var containerOffset = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+  var containerOffset = this.container().getStage().getClientPosition();
 
   var x = clientX - containerOffset.x;
   var y = clientY - containerOffset.y;

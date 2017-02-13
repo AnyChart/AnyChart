@@ -50,7 +50,7 @@ anychart.standalones.DataGrid.prototype.setupByJSON = function(config) {
  */
 anychart.standalones.dataGrid = function() {
   var dataGrid = new anychart.standalones.DataGrid();
-  dataGrid.setup(anychart.getFullTheme()['standalones']['dataGrid']);
+  dataGrid.setup(anychart.getFullTheme('standalones.dataGrid'));
   return dataGrid;
 };
 

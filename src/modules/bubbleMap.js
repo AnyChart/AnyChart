@@ -18,11 +18,10 @@ goog.require('anychart.modules.base');
  */
 anychart.bubbleMap = function(var_args) {
   var map = new anychart.charts.Map();
-  var theme = anychart.getFullTheme();
 
   map.defaultSeriesType(anychart.enums.MapSeriesType.BUBBLE);
 
-  map.setupByVal(theme['bubbleMap'], true);
+  map.setupByVal(anychart.getFullTheme('bubbleMap'), true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     map.bubble(arguments[i]);

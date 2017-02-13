@@ -582,8 +582,12 @@ anychart.charts.Map.prototype.defaultSeriesType = function(opt_value) {
  * @private
  */
 anychart.charts.Map.prototype.controlsInteractivity_ = function() {
-  if (this.container().getStage() && this.container().getStage().container() && this.getPlotBounds()) {
-    var container = /** @type {Node} */(this.container().getStage().container());
+  if (this.isDisposed())
+    return;
+  var cnt = this.container();
+  var stage = cnt ? cnt.getStage() : null;
+  if (stage && this.getPlotBounds()) {
+    var container = stage.getDomWrapper();
 
     if (goog.userAgent.IE)
       container.style['-ms-touch-action'] = 'none';
@@ -713,7 +717,7 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
     }, false, this);
 
     var isPreventDefault = goog.bind(function(e) {
-      var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+      var containerPosition = this.container().getStage().getClientPosition();
       var be = e.getBrowserEvent();
 
       var scene = this.getCurrentScene();
@@ -733,7 +737,7 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
     }, this);
 
     this.mouseWheelHandler = new acgraph.events.MouseWheelHandler(
-        /** @type {Element} */(this.container().getStage().container()),
+        container,
         false,
         isPreventDefault);
 
@@ -742,7 +746,7 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
       var mapLayer = scene.getMapLayer();
 
       this.isDesktop = true;
-      var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+      var containerPosition = this.container().getStage().getClientPosition();
       var bounds = this.getPlotBounds();
 
       var insideBounds = bounds &&
@@ -792,7 +796,7 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
 
 
     this.mapClickHandler_ = function(e) {
-      var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+      var containerPosition = this.container().getStage().getClientPosition();
       var bounds = this.getPixelBounds();
 
       var insideBounds = bounds &&
@@ -811,7 +815,7 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
     this.mapDbClickHandler_ = function(e) {
       if (this.interactivity_.zoomOnDoubleClick()) {
         var scene = this.getCurrentScene();
-        var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+        var containerPosition = this.container().getStage().getClientPosition();
         var bounds = scene.getPlotBounds();
 
         var insideBounds = bounds &&
@@ -846,16 +850,16 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
       }
     };
 
-    goog.events.listen(this.container().getStage().container(), goog.events.EventType.CLICK, this.mapClickHandler_, false, this);
+    goog.events.listen(container, goog.events.EventType.CLICK, this.mapClickHandler_, false, this);
 
-    goog.events.listen(this.container().getStage().container(), goog.events.EventType.DBLCLICK, this.mapDbClickHandler_, false, this);
+    goog.events.listen(container, goog.events.EventType.DBLCLICK, this.mapDbClickHandler_, false, this);
 
     this.touchDist = 0;
-    goog.events.listen(this.container().getStage().container(), [goog.events.EventType.POINTERUP, goog.events.EventType.TOUCHEND], this.mapTouchEndHandler_, false, this);
+    goog.events.listen(container, [goog.events.EventType.POINTERUP, goog.events.EventType.TOUCHEND], this.mapTouchEndHandler_, false, this);
 
     var startX, startY;
     this.listen(goog.events.EventType.MOUSEDOWN, function(e) {
-      var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+      var containerPosition = this.container().getStage().getClientPosition();
       var bounds = this.getPlotBounds();
 
       var insideBounds = bounds &&
@@ -904,7 +908,7 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
       goog.events.unlisten(document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, true, this);
     };
 
-    goog.events.listen(this.container().getStage().container(), goog.events.EventType.MOUSELEAVE, this.mapMouseLeaveHandler_, false, this);
+    goog.events.listen(container, goog.events.EventType.MOUSELEAVE, this.mapMouseLeaveHandler_, false, this);
   } else {
     setTimeout(this.initControlsInteractivity_, 100);
   }
@@ -919,7 +923,7 @@ anychart.charts.Map.prototype.tapHandler = function(event) {
   // showing tooltip like on mouseOver
   this.handleMouseOverAndMove(event);
   this.isDesktop = false;
-  var containerPosition = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+  var containerPosition = this.container().getStage().getClientPosition();
   var bounds = this.getPlotBounds();
 
   var insideBounds = bounds &&
@@ -1232,7 +1236,7 @@ anychart.charts.Map.prototype.getSeriesStatus = function(event) {
 
   var value, index;
 
-  var containerOffset = goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container()));
+  var containerOffset = this.container().getStage().getClientPosition();
 
   var x = clientX - containerOffset.x;
   var y = clientY - containerOffset.y;
@@ -4626,7 +4630,7 @@ anychart.charts.Map.prototype.drillDown_ = function(id, target) {
   }
 
   var json = newScene.serialize();
-  var theme = anychart.getFullTheme();
+  var theme = {'map': anychart.getFullTheme('map')};
   var diff = anychart.themes.merging.demerge(json, theme);
   var mapDiff = diff['map'];
   var series = mapDiff['series'];
@@ -5562,8 +5566,8 @@ anychart.charts.Map.prototype.disposeInternal = function() {
   goog.dispose(this.mouseWheelHandler);
   this.mouseWheelHandler = null;
 
-  if (this.container() && this.container().getStage() && this.container().getStage().container()) {
-    var container = this.container().getStage().container();
+  if (this.container() && this.container().getStage()) {
+    var container = this.container().getStage().getDomWrapper();
     if (this.mapClickHandler_) goog.events.unlisten(container, goog.events.EventType.CLICK, this.mapClickHandler_, false, this);
     if (this.mapDbClickHandler_) goog.events.unlisten(container, goog.events.EventType.DBLCLICK, this.mapDbClickHandler_, false, this);
     if (this.mapTouchEndHandler_) goog.events.unlisten(container, goog.events.EventType.POINTERUP, this.mapTouchEndHandler_, false, this);

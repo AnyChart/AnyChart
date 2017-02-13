@@ -808,11 +808,11 @@ anychart.core.ui.ColorRange.prototype.handleMouseClick = function(event) {
     var x, y, min, ratio, value;
     if (this.isHorizontal()) {
       x = event['clientX'];
-      min = lineBounds.left + goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x;
+      min = lineBounds.left + this.container().getStage().getClientPosition().x;
       ratio = (x - min) / lineBounds.width;
     } else {
       y = event['clientY'];
-      min = lineBounds.top + goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).y;
+      min = lineBounds.top + this.container().getStage().getClientPosition().y;
       ratio = (lineBounds.height - (y - min)) / lineBounds.height;
     }
 
@@ -897,11 +897,11 @@ anychart.core.ui.ColorRange.prototype.handleMouseOverAndMove = function(event) {
     var x, y, min, ratio, value;
     if (this.isHorizontal()) {
       x = event['clientX'];
-      min = lineBounds.left + goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x;
+      min = lineBounds.left + this.container().getStage().getClientPosition().x;
       ratio = (x - min) / lineBounds.width;
     } else {
       y = event['clientY'];
-      min = lineBounds.top + goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).y;
+      min = lineBounds.top + this.container().getStage().getClientPosition().y;
       ratio = (lineBounds.height - (y - min)) / lineBounds.height;
     }
 

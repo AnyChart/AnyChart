@@ -29,7 +29,7 @@ anychart.charts.Funnel.prototype.getType = function() {
 
 /** @inheritDoc */
 anychart.charts.Funnel.prototype.getProperThemePart = function() {
-  return anychart.getFullTheme()['funnel'];
+  return anychart.getFullTheme('funnel');
 };
 
 

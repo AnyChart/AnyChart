@@ -21,12 +21,10 @@ goog.require('anychart.modules.base');
  */
 anychart.column3d = function(var_args) {
   var chart = new anychart.charts.Cartesian3d();
-  var theme = anychart.getFullTheme();
-
   chart.defaultSeriesType(anychart.enums.Cartesian3dSeriesType.COLUMN);
   chart.setType(anychart.enums.ChartTypes.COLUMN_3D);
 
-  chart.setupByVal(theme['column3d'], true);
+  chart.setupByVal(anychart.getFullTheme('column3d'), true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['column'](arguments[i]);

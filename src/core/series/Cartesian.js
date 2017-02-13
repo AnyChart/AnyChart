@@ -1170,11 +1170,11 @@ anychart.core.series.Cartesian.prototype.makeBrowserEvent = function(e) {
 
     if (/** @type {boolean} */(this.getOption('isVertical'))) {
       x = res['clientY'];
-      min = bounds.top + goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).y + bounds.height;
+      min = bounds.top + this.container().getStage().getClientPosition().y + bounds.height;
       range = -bounds.height;
     } else {
       x = res['clientX'];
-      min = bounds.left + goog.style.getClientPosition(/** @type {Element} */(this.container().getStage().container())).x;
+      min = bounds.left + this.container().getStage().getClientPosition().x;
       range = bounds.width;
     }
     value = this.xScale().inverseTransform((x - min) / range);

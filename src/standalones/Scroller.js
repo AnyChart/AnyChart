@@ -61,7 +61,7 @@ anychart.standalones.Scroller.prototype.endRatio = function(opt_value) {
  */
 anychart.standalones.scroller = function() {
   var scroller = new anychart.standalones.Scroller();
-  scroller.setup(anychart.getFullTheme()['standalones']['scroller']);
+  scroller.setup(anychart.getFullTheme('standalones.scroller'));
   return scroller;
 };
 

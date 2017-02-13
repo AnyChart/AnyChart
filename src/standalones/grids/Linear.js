@@ -20,7 +20,7 @@ anychart.core.makeStandalone(anychart.standalones.grids.Linear, anychart.core.gr
  */
 anychart.standalones.grids.linear = function() {
   var grid = new anychart.standalones.grids.Linear();
-  grid.setup(anychart.getFullTheme()['standalones']['linearGrid']);
+  grid.setup(anychart.getFullTheme('standalones.linearGrid'));
   return grid;
 };
 

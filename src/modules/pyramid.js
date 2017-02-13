@@ -21,9 +21,7 @@ goog.require('anychart.modules.base');
  */
 anychart.pyramid = function(opt_data, opt_csvSettings) {
   var chart = new anychart.charts.Pyramid(opt_data, opt_csvSettings);
-  var theme = anychart.getFullTheme();
-
-  chart.setupByVal(theme['pyramid'], true);
+  chart.setupByVal(anychart.getFullTheme('pyramid'), true);
 
   return chart;
 };
