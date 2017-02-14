@@ -152,6 +152,13 @@ anychart.core.Chart = function() {
    */
   this.credits_ = null;
 
+  /**
+   * Rect that serves as an overlay for ignore mouse events mode.
+   * @type {acgraph.vector.Rect}
+   * @private
+   */
+  this.lockOverlayRect_ = null;
+
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
 };
@@ -2382,6 +2389,28 @@ anychart.core.Chart.prototype.unhover = function(opt_indexOrIndexes) {
   var series = this.getAllSeries();
   for (i = 0, len = series.length; i < len; i++) {
     if (series[i]) series[i].unhover(opt_indexOrIndexes);
+  }
+};
+
+
+/**
+ * Enables or disables mouse events processing by creating overlay rectangle.
+ * @param {boolean} ignore Set 'true' to ignore
+ */
+anychart.core.Chart.prototype.ignoreMouseEvents = function(ignore) {
+  if (!this.lockOverlayRect_) {
+    this.lockOverlayRect_ = acgraph.rect(0, 0, 0, 0);
+    this.lockOverlayRect_.cursor(acgraph.vector.Cursor.WAIT);
+    this.lockOverlayRect_.fill(anychart.color.TRANSPARENT_HANDLER);
+    this.lockOverlayRect_.stroke(null);
+  }
+
+  if (ignore) {
+    this.lockOverlayRect_.setBounds(/** @type {anychart.math.Rect} */(this.getPixelBounds()));
+    this.lockOverlayRect_.zIndex(10000);
+    this.lockOverlayRect_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+  } else {
+    this.lockOverlayRect_.remove();
   }
 };
 

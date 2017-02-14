@@ -1538,6 +1538,7 @@ anychart.core.PyramidFunnelBase.prototype.doAnimation = function() {
       this.animationQueue_.add(/** @type {goog.fx.TransitionBase} */ (pyramidFunnelLabelAnimation));
 
       this.animationQueue_.listen(goog.fx.Transition.EventType.BEGIN, function() {
+        this.ignoreMouseEvents(true);
         this.dispatchDetachedEvent({
           'type': anychart.enums.EventType.ANIMATION_START,
           'chart': this
@@ -1545,6 +1546,7 @@ anychart.core.PyramidFunnelBase.prototype.doAnimation = function() {
       }, false, this);
 
       this.animationQueue_.listen(goog.fx.Transition.EventType.END, function() {
+        this.ignoreMouseEvents(false);
         this.dispatchDetachedEvent({
           'type': anychart.enums.EventType.ANIMATION_END,
           'chart': this
