@@ -334,7 +334,7 @@ anychart.charts.Radar.prototype.yScale = function(opt_value) {
     if (goog.isString(opt_value)) {
       opt_value = anychart.scales.Base.fromString(opt_value, false);
     }
-    if (this.yScale_ != opt_value) {
+    if (opt_value instanceof anychart.scales.Base && this.yScale_ != opt_value) {
       this.yScale_ = opt_value;
       this.invalidate(anychart.ConsistencyState.RADAR_SCALES, anychart.Signal.NEEDS_REDRAW);
     }
