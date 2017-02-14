@@ -813,10 +813,20 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
           e.clientY <= bounds.top + containerPosition.y + bounds.height;
 
       if (insideBounds) {
-        var scrollX = window.scrollX;
-        var scrollY = window.scrollY;
+        var scrollEl = goog.dom.getDomHelper(this.mapTextarea).getDocumentScrollElement();
+        var scrollX = scrollEl.scrollLeft;
+        var scrollY = scrollEl.scrollTop;
         this.mapTextarea.focus();
-        window.scrollTo(scrollX, scrollY);
+        if (goog.userAgent.GECKO) {
+          var newScrollX = scrollEl.scrollLeft;
+          var newScrollY = scrollEl.scrollTop;
+          setTimeout(function() {
+            if (scrollEl.scrollLeft == newScrollX && scrollEl.scrollTop == newScrollY)
+              window.scrollTo(scrollX, scrollY);
+          }, 0);
+        } else {
+          window.scrollTo(scrollX, scrollY);
+        }
       }
     };
     this.mapDbClickHandler_ = function(e) {
