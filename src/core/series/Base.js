@@ -2572,6 +2572,15 @@ anychart.core.series.Base.prototype.draw = function() {
   anychart.performance.start('Series draw()');
   this.suspendSignalsDispatching();
 
+  // DVF-2334 - reapplying auto colors to elements to ensure color consistency
+  // maybe we will be able to remove this in future refactorings
+  if (goog.isDef(this.autoSettings['color']) &&
+      this.hasInvalidationState(
+          anychart.ConsistencyState.SERIES_MARKERS |
+          anychart.ConsistencyState.SERIES_LABELS |
+          anychart.ConsistencyState.SERIES_OUTLIERS))
+    this.setAutoColor(this.autoSettings['color']);
+
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_SHAPE_MANAGER)) {
     this.recreateShapeManager();
     this.markConsistent(anychart.ConsistencyState.SERIES_SHAPE_MANAGER);
