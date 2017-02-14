@@ -26,12 +26,152 @@ anychart.core.CartesianBase = function() {
    */
   this.xZoom_ = new anychart.core.utils.OrdinalZoom(this, true);
 
+  /**
+   * @type {number|string}
+   * @protected
+   */
+  this.zAspectInternal = 0;
+
+  /**
+   * @type {number}
+   * @protected
+   */
+  this.zAngleInternal = 0;
+
+  /**
+   * @type {?number}
+   * @protected
+   */
+  this.zDepthInternal = null;
+
+  /**
+   * @type {boolean}
+   * @protected
+   */
+  this.zDistributionInternal = false;
+
+  /**
+   * @type {number}
+   * @protected
+   */
+  this.zPaddingInternal = 0;
+
   this.defaultSeriesType(anychart.enums.CartesianSeriesType.LINE);
   this.setType(anychart.enums.ChartTypes.CARTESIAN);
 };
 goog.inherits(anychart.core.CartesianBase, anychart.core.ChartWithAxes);
 
 
+//region --- 3D
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  3D
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter/setter for zAngle.
+ * From 0 to 90.
+ * @param {number=} opt_value
+ * @return {number|anychart.core.CartesianBase}
+ */
+anychart.core.CartesianBase.prototype.zAngle = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.zAngleInternal != opt_value) {
+      this.zAngleInternal = goog.math.clamp(anychart.utils.toNumber(opt_value), 0, 90);
+      this.invalidate(anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  } else {
+    return this.zAngleInternal;
+  }
+};
+
+
+/**
+ * Getter/setter for zAspect.
+ * @param {(number|string)=} opt_value
+ * @return {number|string|anychart.core.CartesianBase}
+ */
+anychart.core.CartesianBase.prototype.zAspect = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.zAspectInternal != opt_value) {
+      this.zAspectInternal = goog.isNumber(opt_value) ? Math.max(opt_value, 0) : opt_value;
+      this.invalidate(anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  } else {
+    return this.zAspectInternal;
+  }
+};
+
+
+/**
+ * Getter/setter for zDepth.
+ * @param {?(number)=} opt_value
+ * @return {number|null|anychart.core.CartesianBase}
+ * @deprecated Since 7.10.0. Use chart.zAspect instead.
+ */
+anychart.core.CartesianBase.prototype.zDepth = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['chart.zDepth', 'chart.zAspect with chart.zPadding'], true);
+  if (goog.isDef(opt_value)) {
+    if (this.zDepthInternal != opt_value) {
+      this.zDepthInternal = goog.isNull(opt_value) ? opt_value : anychart.utils.toNumber(opt_value);
+      this.invalidate(anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  } else {
+    return this.zDepthInternal;
+  }
+};
+
+
+/**
+ * Getter/setter for distributing series on the z-axis.
+ * @param {boolean=} opt_value
+ * @return {boolean|anychart.core.CartesianBase}
+ */
+anychart.core.CartesianBase.prototype.zDistribution = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = !!opt_value;
+    if (this.zDistributionInternal != opt_value) {
+      this.zDistributionInternal = opt_value;
+      this.invalidate(
+          anychart.ConsistencyState.BOUNDS |
+          anychart.ConsistencyState.SERIES_CHART_SCALE_MAPS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  } else {
+    return this.zDistributionInternal;
+  }
+};
+
+
+/**
+ * Getter/setter for zPadding.
+ * Value must be more than zero.
+ * @param {(number)=} opt_value
+ * @return {number|anychart.core.CartesianBase}
+ */
+anychart.core.CartesianBase.prototype.zPadding = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.toNumber(opt_value);
+    if (this.zPaddingInternal !== opt_value) {
+      this.zPaddingInternal = Math.max(opt_value, 0);
+      this.invalidate(anychart.ConsistencyState.BOUNDS,
+          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  } else {
+    return this.zPaddingInternal;
+  }
+};
+
+
+//endregion
 //region --- Infrastructure
 //----------------------------------------------------------------------------------------------------------------------
 //

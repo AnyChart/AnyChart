@@ -35,40 +35,10 @@ anychart.charts.Cartesian3d = function() {
   anychart.charts.Cartesian3d.base(this, 'constructor');
 
   /**
-   * @type {number|string}
-   * @private
-   */
-  this.zAspect_ = 0;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this.zAngle_ = 0;
-
-  /**
-   * @type {?number}
-   * @private
-   */
-  this.zDepth_ = null;
-
-  /**
    * @type {number}
    * @private
    */
   this.zDepthValue_ = 0;
-
-  /**
-   * @type {boolean}
-   * @private
-   */
-  this.zDistribution_ = false;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this.zPadding_ = 0;
 
   this.setType(anychart.enums.ChartTypes.CARTESIAN_3D);
 };
@@ -349,109 +319,6 @@ anychart.charts.Cartesian3d.prototype.isMode3d = true;
 
 
 /**
- * Getter/setter for zAngle.
- * From 0 to 90.
- * @param {number=} opt_value
- * @return {number|anychart.charts.Cartesian3d}
- */
-anychart.charts.Cartesian3d.prototype.zAngle = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.zAngle_ != opt_value) {
-      this.zAngle_ = goog.math.clamp(anychart.utils.toNumber(opt_value), 0, 90);
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.zAngle_;
-  }
-};
-
-
-/**
- * Getter/setter for zAspect.
- * @param {(number|string)=} opt_value
- * @return {number|string|anychart.charts.Cartesian3d}
- */
-anychart.charts.Cartesian3d.prototype.zAspect = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.zAspect_ != opt_value) {
-      this.zAspect_ = goog.isNumber(opt_value) ? Math.max(opt_value, 0) : opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.zAspect_;
-  }
-};
-
-
-/**
- * Getter/setter for zDepth.
- * @param {?(number)=} opt_value
- * @return {number|null|anychart.charts.Cartesian3d}
- * @deprecated Since 7.10.0. Use chart.zAspect instead.
- */
-anychart.charts.Cartesian3d.prototype.zDepth = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['chart.zDepth', 'chart.zAspect with chart.zPadding'], true);
-  if (goog.isDef(opt_value)) {
-    if (this.zDepth_ != opt_value) {
-      this.zDepth_ = goog.isNull(opt_value) ? opt_value : anychart.utils.toNumber(opt_value);
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.zDepth_;
-  }
-};
-
-
-/**
- * Getter/setter for distributing series on the z-axis.
- * @param {boolean=} opt_value
- * @return {boolean|anychart.charts.Cartesian3d}
- */
-anychart.charts.Cartesian3d.prototype.zDistribution = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = !!opt_value;
-    if (this.zDistribution_ != opt_value) {
-      this.zDistribution_ = opt_value;
-      this.invalidate(
-          anychart.ConsistencyState.BOUNDS |
-          anychart.ConsistencyState.SERIES_CHART_SCALE_MAPS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.zDistribution_;
-  }
-};
-
-
-/**
- * Getter/setter for zPadding.
- * Value must be more than zero.
- * @param {(number)=} opt_value
- * @return {number|anychart.charts.Cartesian3d}
- */
-anychart.charts.Cartesian3d.prototype.zPadding = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.toNumber(opt_value);
-    if (this.zPadding_ !== opt_value) {
-      this.zPadding_ = Math.max(opt_value, 0);
-      this.invalidate(anychart.ConsistencyState.BOUNDS,
-          anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.zPadding_;
-  }
-};
-
-
-/**
  * @param {number} seriesIndex
  * @param {boolean} seriesIsStacked
  * @return {number}
@@ -665,17 +532,17 @@ anychart.charts.Cartesian3d.prototype.getContentAreaBounds = function(bounds) {
   var contentAreaBounds = bounds.clone().round();
   var boundsWithoutAxes = this.getBoundsWithoutAxes(contentAreaBounds);
 
-  var needAspectCalc = !goog.isDefAndNotNull(this.zDepth_) && anychart.utils.isPercent(this.zAspect_);
+  var needAspectCalc = !goog.isDefAndNotNull(this.zDepthInternal) && anychart.utils.isPercent(this.zAspectInternal);
   var seriesCount = this.getSeriesCount();
 
-  var angleRad = goog.math.toRadians(this.zAngle_);
-  var secondAngle = 90 - this.zAngle_;
+  var angleRad = goog.math.toRadians(this.zAngleInternal);
+  var secondAngle = 90 - this.zAngleInternal;
   var secondAngleRad = goog.math.toRadians(secondAngle);
 
-  var zPaddingValue = this.zPadding_;
+  var zPaddingValue = this.zPaddingInternal;
 
   if (needAspectCalc) {
-    var aspectRatio = parseFloat(this.zAspect_) / 100;
+    var aspectRatio = parseFloat(this.zAspectInternal) / 100;
     var xAspectRatio = aspectRatio * Math.sin(secondAngleRad);
     var yAspectRatio = aspectRatio * Math.sin(angleRad);
     var x3dShiftRatio = 0;
@@ -728,15 +595,15 @@ anychart.charts.Cartesian3d.prototype.getContentAreaBounds = function(bounds) {
     this.y3dShift = Math.round(this.y3dShift);
 
   } else {
-    if (goog.isDefAndNotNull(this.zDepth_)) {
-      this.zDepthValue_ = this.zDepth_;
+    if (goog.isDefAndNotNull(this.zDepthInternal)) {
+      this.zDepthValue_ = this.zDepthInternal;
 
     // not needAspectCalc
     } else {
       if (!this.hasStackedSeries && this.zDistribution()) {
-        this.zDepthValue_ = this.zAspect_ * seriesCount + this.zPadding_ * (seriesCount - 1);
+        this.zDepthValue_ = this.zAspectInternal * seriesCount + this.zPaddingInternal * (seriesCount - 1);
       } else {
-        this.zDepthValue_ = anychart.utils.toNumber(this.zAspect_);
+        this.zDepthValue_ = anychart.utils.toNumber(this.zAspectInternal);
       }
     }
 
@@ -824,9 +691,9 @@ anychart.charts.Cartesian3d.prototype.serialize = function() {
   var json = anychart.charts.Cartesian3d.base(this, 'serialize');
 
   json['chart']['zAngle'] = this.zAngle();
-  if (goog.isDefAndNotNull(this.zDepth_)) {
+  if (goog.isDefAndNotNull(this.zDepthInternal)) {
     // we should not place warning here on serialization.
-    json['chart']['zDepth'] = this.zDepth_;
+    json['chart']['zDepth'] = this.zDepthInternal;
   }
   json['chart']['zAspect'] = this.zAspect();
   json['chart']['zDistribution'] = this.zDistribution();

@@ -407,6 +407,11 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN] = anychart.cartesian
   proto['getPlotBounds'] = proto.getPlotBounds;
   proto['xZoom'] = proto.xZoom;
   proto['xScroller'] = proto.xScroller;
+  proto['zAspect'] = proto.zAspect;
+  proto['zAngle'] = proto.zAngle;
+  proto['zDistribution'] = proto.zDistribution;
+  proto['zPadding'] = proto.zPadding;
   proto['getStat'] = proto.getStat;
+  proto['zDepth'] = proto.zDepth; // deprecated
   proto['annotations'] = proto.annotations;
 })();
