@@ -3314,29 +3314,28 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
 
         this.mapTX[key] = tx_;
       }, this);
-
-      if (!this.mapLayer_) {
-        this.mapLayer_ = this.createMapLayer(/** @type {acgraph.vector.ILayer} */(this.rootElement));
-        this.mapLayer_.zIndex(anychart.charts.Map.ZINDEX_MAP);
-        if (this.getRootScene() == this)
-          this.initControlsInteractivity_();
-
-      } else {
-        this.clear();
-      }
-
-      if (this.isSvgGeoData() && !this.svgRootLayer_) {
-        this.svgRootLayer_ = this.createMapLayer(/** @type {acgraph.vector.ILayer} */(this.mapLayer_));
-      }
-
-      if (!this.dataLayer_) {
-        this.dataLayer_ = this.rootElement.layer();
-        this.dataLayer_.zIndex(anychart.charts.Map.ZINDEX_SERIES);
-      }
-
-      needRecalculateLatLonScaleRange = true;
-      this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.MAP_SCALE);
     }
+
+    if (!this.mapLayer_) {
+      this.mapLayer_ = this.createMapLayer(/** @type {acgraph.vector.ILayer} */(this.rootElement));
+      this.mapLayer_.zIndex(anychart.charts.Map.ZINDEX_MAP);
+      if (this.getRootScene() == this)
+        this.initControlsInteractivity_();
+    } else {
+      this.clear();
+    }
+
+    if (this.isSvgGeoData() && !this.svgRootLayer_) {
+      this.svgRootLayer_ = this.createMapLayer(/** @type {acgraph.vector.ILayer} */(this.mapLayer_));
+    }
+
+    if (!this.dataLayer_) {
+      this.dataLayer_ = this.rootElement.layer();
+      this.dataLayer_.zIndex(anychart.charts.Map.ZINDEX_SERIES);
+    }
+
+    needRecalculateLatLonScaleRange = true;
+    this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.MAP_SCALE);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_SCALE)) {
@@ -3670,11 +3669,9 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
       }
     }
 
-    if (this.mapLayer_) {
-      //todo (blackart) this is harcode! remove this shit when we to kill world map
-      if (!this.mapTX['default'].xoffset) {
-        this.mapLayer_.clip(scale.getViewSpace());
-      }
+    //todo (blackart) this is harcode! remove this shit when we to kill world map
+    if (this.mapLayer_ && this.mapTX && !this.mapTX['default'].xoffset) {
+      this.mapLayer_.clip(scale.getViewSpace());
     }
 
     this.clear();

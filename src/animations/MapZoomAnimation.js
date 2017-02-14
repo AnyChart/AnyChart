@@ -26,6 +26,7 @@ goog.inherits(anychart.animations.MapZoomAnimation, anychart.animations.MapAnima
  * @private
  */
 anychart.animations.MapZoomAnimation.prototype.doZoom_ = function(zoom) {
+  if (!this.map.geoData()) return;
   var mapLayer = this.map.getMapLayer();
   var viewSpacePath = this.map.scale().getViewSpace();
 
@@ -84,25 +85,27 @@ anychart.animations.MapZoomAnimation.prototype.onAnimate = function() {
 
 /** @inheritDoc */
 anychart.animations.MapZoomAnimation.prototype.onFinish = function() {
-  var currZoom = this.coords[0];
+  if (this.map.geoData()) {
+    var currZoom = this.coords[0];
 
-  var tx = this.map.getMapLayer().getSelfTransformation();
-  if (!this.map.unlimitedZoom && currZoom <= anychart.charts.Map.ZOOM_MIN_FACTOR && !tx.isIdentity() || this.map.zoomDest == anychart.charts.Map.ZOOM_MIN_FACTOR) {
-    var minZoom = anychart.charts.Map.ZOOM_MIN_FACTOR;
+    var tx = this.map.getMapLayer().getSelfTransformation();
+    if (!this.map.unlimitedZoom && currZoom <= anychart.charts.Map.ZOOM_MIN_FACTOR && !tx.isIdentity() || this.map.zoomDest == anychart.charts.Map.ZOOM_MIN_FACTOR) {
+      var minZoom = anychart.charts.Map.ZOOM_MIN_FACTOR;
 
-    this.map.getMapLayer().setTransformationMatrix(minZoom, 0, 0, minZoom, 0, 0);
-    this.map.fullZoom = minZoom;
+      this.map.getMapLayer().setTransformationMatrix(minZoom, 0, 0, minZoom, 0, 0);
+      this.map.fullZoom = minZoom;
 
-    this.map.scale().setMapZoom(minZoom);
-    this.map.scale().setOffsetFocusPoint(0, 0);
+      this.map.scale().setMapZoom(minZoom);
+      this.map.scale().setOffsetFocusPoint(0, 0);
 
-    if (this.map.isDesktop) {
-      this.map.updateSeriesOnZoomOrMove();
+      if (this.map.isDesktop) {
+        this.map.updateSeriesOnZoomOrMove();
+      } else {
+        this.map.getDataLayer().setTransformationMatrix(minZoom, 0, 0, minZoom, 0, 0);
+      }
     } else {
-      this.map.getDataLayer().setTransformationMatrix(minZoom, 0, 0, minZoom, 0, 0);
+      this.doZoom_(currZoom);
     }
-  } else {
-    this.doZoom_(currZoom);
   }
 
   this.map.lastZoomIsUnlimited = this.map.unlimitedZoom;
