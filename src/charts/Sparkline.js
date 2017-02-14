@@ -227,12 +227,12 @@ anychart.charts.Sparkline.prototype.getSeriesStatus = function(event) {
 
   var ratio = (x - minX) / rangeX;
   value = this.xScale().inverseTransform(ratio);
-  index = this.data().find('x', value);
-  if (index < 0) index = NaN;
+  var indexes = this.data().findInUnsortedDataByX(anychart.utils.toNumber(value));
+  index = indexes.length ? indexes[0] : NaN;
 
   var iterator = this.getIterator();
 
-  if (iterator.select(index)) {
+  if (iterator.select(/** @type {number} */ (index))) {
     var pixX = /** @type {number} */(iterator.meta('x'));
     var pixY = /** @type {number} */(iterator.meta('value'));
     var length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
@@ -413,6 +413,12 @@ anychart.charts.Sparkline.prototype.hoverPoint = function(index, opt_event) {
 anychart.charts.Sparkline.prototype.getAllSeries = function() {
   return [this];
 };
+
+
+/**
+ * @inheritDoc
+ */
+anychart.charts.Sparkline.prototype.unselect = goog.nullFunction;
 
 
 /**
