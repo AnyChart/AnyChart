@@ -2,6 +2,7 @@ goog.provide('anychart.ui.RangePicker');
 
 goog.require('anychart.enums');
 
+goog.require('goog.dom.selection');
 goog.require('goog.events.KeyHandler');
 goog.require('goog.ui.Component');
 goog.require('goog.ui.LabelInput');

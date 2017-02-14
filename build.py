@@ -378,7 +378,7 @@ def __build_project(develop, modules, sources, theme, debug, gzip, perf_monitori
 
         # print build log
         __log_compilation(output_file, args)
-        if 'anychart_ui' in modules or 'anychart_bundle' in modules:
+        if 'anychart_ui' in modules or 'anychart_bundle' or 'chart_editor' in modules:
             __compile_css()
 
         __call_console_commands(commands, module=modules[0])
@@ -404,7 +404,7 @@ def __build_project(develop, modules, sources, theme, debug, gzip, perf_monitori
         if gzip:
             __gzip_file(output_file)
     else:
-        file_name = __apply_specific_file_name_rule(file_name, modules)
+        file_name = file_name.replace('_', '-')
         output_file = os.path.join(OUT_PATH, file_name)
         copyright = __get_copyrigth(modules)
         wrapper = __get_wrapper(file_name)
@@ -457,16 +457,6 @@ def __log_compilation(output_file, args):
               str(args['theme']),
               str(args['perf_monitoring'])
           )
-
-
-def __apply_specific_file_name_rule(file_name, modules):
-    if modules == ['anychart_bundle']:
-        file_name = file_name.replace('anychart_bundle', 'anychart-bundle')
-    elif modules == ['anychart_ui']:
-        file_name = file_name.replace('anychart_ui', 'anychart-ui')
-    elif modules == ['data_adapter']:
-        file_name = file_name.replace('data_adapter', 'data-adapter')
-    return file_name
 
 
 def __call_console_commands(commands, cwd=None, module=None):
@@ -743,7 +733,7 @@ def __build_release():
     export_server_project_path = arguments['export_server_path']
 
     mods = ['anychart_bundle', 'anychart',
-            'anymap', 'anystock', 'anygantt', 'data_adapter']
+            'anymap', 'anystock', 'anygantt', 'data_adapter', 'anychart_ui', 'chart_editor']
 
     args = []
     for module in mods:
@@ -755,11 +745,6 @@ def __build_release():
     pool.map_async(__compile_project_from_map, args).get(99999)
     pool.close()
     pool.join()
-
-    # ui
-    print "Compile AnyChart UI"
-    __call_console_commands(['./build.py compile -m anychart_ui -gz'])
-    __call_console_commands(['./build.py compile -m anychart_ui -gz -d'])
 
     print "Compile Themes"
     __build_themes()
@@ -796,12 +781,14 @@ def __build_release():
     __build_product_package(
         os.path.join(OUT_PATH, 'AnyChart' + '-' + short_version),
         'anychart',
-        lambda name: not name.startswith('Gantt') and
-                     not name.startswith('Maps') and
-                     not name.startswith('Stock') and
+        lambda name: not name.startswith('Stock') and
+                     not name.startswith('Gantt') and
                      not name.startswith('Pert') and
-                     not name.startswith('Graphics') and
-                     not name.startswith('Seat')
+                     not name.startswith('Resource') and
+                     not name.startswith('Maps') and
+                     not name.startswith('Seat') and
+                     not name.startswith('Graphics')
+
     )
 
     # rm gallery demos dir
@@ -882,6 +869,17 @@ def __build_product_package(output_dir, binary_name, gallery_pass_func=None):
                     os.path.join(output_dir, 'js', 'data-adapter.dev.min.js'))
     shutil.copyfile(os.path.join(OUT_PATH, 'data-adapter.dev.min.js.gz'),
                     os.path.join(output_dir, 'js', 'data-adapter.dev.min.js.gz'))
+
+    # copy chart editor (anychart install package only)
+    if binary_name == 'anychart':
+            shutil.copyfile(os.path.join(OUT_PATH, 'chart-editor.min.js'),
+                            os.path.join(output_dir, 'js', ' chart-editor.min.js'))
+            shutil.copyfile(os.path.join(OUT_PATH, ' chart-editor.min.js.gz'),
+                            os.path.join(output_dir, 'js', ' chart-editor.min.js.gz'))
+            shutil.copyfile(os.path.join(OUT_PATH, ' chart-editor.dev.min.js'),
+                            os.path.join(output_dir, 'js', ' chart-editor.dev.min.js'))
+            shutil.copyfile(os.path.join(OUT_PATH, ' chart-editor.dev.min.js.gz'),
+                            os.path.join(output_dir, 'js', ' chart-editor.dev.min.js.gz'))
 
     # copy themes
     for theme in __get_themes_list():
@@ -1025,6 +1023,12 @@ def __upload_release():
     upload_list.append({'source_file': '%s/data-adapter.min.js.gz' % OUT_PATH, 'target': '/js/%s/'})
     upload_list.append({'source_file': '%s/data-adapter.dev.min.js' % OUT_PATH, 'target': '/js/%s/'})
     upload_list.append({'source_file': '%s/data-adapter.dev.min.js.gz' % OUT_PATH, 'target': '/js/%s/'})
+
+    # chart editor
+    upload_list.append({'source_file': '%s/chart-editor.min.js' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/chart-editor.min.js.gz' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/chart-editor.dev.min.js' % OUT_PATH, 'target': '/js/%s/'})
+    upload_list.append({'source_file': '%s/chart-editor.dev.min.js.gz' % OUT_PATH, 'target': '/js/%s/'})
 
     # css
     upload_list.append({'source_file': '%s/anychart-ui.css' % OUT_PATH, 'target': '/css/%s/'})
