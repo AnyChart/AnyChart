@@ -239,7 +239,10 @@ anychart.data.csv.Parser.prototype.ignoreTrailingSpaces = function(opt_value) {
  */
 anychart.data.csv.Parser.prototype.parse = function(data, opt_itemsProcessor, opt_async) {
   this.itemsProcessor_ = opt_itemsProcessor || new anychart.data.csv.DefaultItemsProcessor();
-  opt_async = !!(opt_async || opt_itemsProcessor);
+  // commented here for the best future. Caused by DVF-2583
+  // stock uses own itemsProcessor to parse csv, so parser automatically goes async. That's why
+  // large csv isn't parsed completely in stock (restricted with ASYNC_ROWS_COUNT)
+  opt_async = !!(opt_async/* || opt_itemsProcessor*/);
 
   //aggregate the data and calculate its length
   this.content_ = data || '';
