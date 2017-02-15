@@ -1809,8 +1809,6 @@ anychart.core.ui.Table.prototype.resetFillPaths_ = function() {
  * @private
  */
 anychart.core.ui.Table.prototype.getBorderPath_ = function(stroke) {
-  if (goog.isObject(stroke) && ('keys' in stroke) && !goog.isObject(stroke['mode']))
-    stroke['mode'] = this.getPixelBounds();
   var hash = anychart.utils.hash(stroke);
   if (hash in this.borderPaths_)
     return this.borderPaths_[hash];
@@ -1819,6 +1817,10 @@ anychart.core.ui.Table.prototype.getBorderPath_ = function(stroke) {
         /** @type {!acgraph.vector.Path} */(this.pathsPool_.pop()) :
         acgraph.path();
     this.layer_.addChild(path);
+    if (goog.isObject(stroke) && ('keys' in stroke) && !goog.isObject(stroke['mode'])) {
+      stroke = /** @type {acgraph.vector.Stroke} */(anychart.utils.recursiveClone(stroke));
+      stroke['mode'] = this.getPixelBounds();
+    }
     path.stroke(stroke);
     path.fill(null);
     this.borderPaths_[hash] = path;

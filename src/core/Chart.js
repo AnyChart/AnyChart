@@ -1390,7 +1390,7 @@ anychart.core.Chart.prototype.autoRedraw = function(opt_value) {
  */
 anychart.core.Chart.prototype.resizeHandler = function(evt) {
   if (this.bounds().dependsOnContainerSize()) {
-    this.invalidate(anychart.ConsistencyState.ALL & ~anychart.ConsistencyState.CHART_ANIMATION,
+    this.invalidate(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.CHART_LEGEND,
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
   }
 };

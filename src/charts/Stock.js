@@ -1178,7 +1178,7 @@ anychart.charts.Stock.prototype.scrollerInvalidated_ = function(e) {
   var state = anychart.ConsistencyState.STOCK_SCROLLER;
   var signal = anychart.Signal.NEEDS_REDRAW;
   if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED)) {
-    state |= anychart.ConsistencyState.BOUNDS;
+    state |= anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.STOCK_SCALES;
     signal |= anychart.Signal.BOUNDS_CHANGED;
   }
   if (e.hasSignal(anychart.Signal.NEEDS_RECALCULATION))

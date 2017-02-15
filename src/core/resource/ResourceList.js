@@ -956,6 +956,8 @@ anychart.core.resource.ResourceList.prototype.draw = function() {
     var rowCount = this.items_.length;
     var lastRow = rowCount - 1;
     this.itemsStrokePath.clear();
+    this.itemsEvenPath.clear();
+    this.itemsOddPath.clear();
 
     for (row = 0; row < rowCount; row++) {
       var isLastRow = row == lastRow;
