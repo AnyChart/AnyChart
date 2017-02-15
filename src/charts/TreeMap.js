@@ -726,9 +726,7 @@ anychart.charts.TreeMap.prototype.drillTo = function(target) {
     data = this.data();
     // suppose user have only one root, or id in first root of tree
     if (data && data.numChildren()) {
-      node = data.searchItems('id', target);
-      if (node.length > 0)
-        node = node[0];
+      node = data.searchItems('id', target)[0];
     }
   }
   this.setRootNode(node);
