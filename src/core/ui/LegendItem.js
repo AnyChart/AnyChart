@@ -1,3 +1,4 @@
+//region --- Requiring and Providing
 goog.provide('anychart.core.ui.LegendItem');
 goog.require('acgraph');
 goog.require('acgraph.vector.Text.TextOverflow');
@@ -5,6 +6,7 @@ goog.require('anychart.core.Text');
 goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
+//endregion
 
 
 
@@ -18,20 +20,18 @@ anychart.core.ui.LegendItem = function() {
 
   /**
    * LegendItem element.
-   * @type {!acgraph.vector.Layer}
+   * @type {acgraph.vector.Layer}
    * @private
    */
   this.layer_ = acgraph.layer();
-  this.registerDisposable(this.layer_);
 
   /**
    * Legend icon text element.
-   * @type {!acgraph.vector.Text}
+   * @type {acgraph.vector.Text}
    * @private
    */
   this.textElement_ = this.layer_.text();
   this.textElement_.attr('aria-hidden', 'true');
-  this.registerDisposable(this.textElement_);
 
   /**
    * Object with default stroke for icon type that should always be with stroke.
@@ -59,34 +59,6 @@ anychart.core.ui.LegendItem = function() {
   };
 
   /**
-   * Legend item x coordinate.
-   * @type {(number|string)}
-   * @private
-   */
-  this.x_ = 0;
-
-  /**
-   * Legend item y cordinate.
-   * @type {(number|string)}
-   * @private
-   */
-  this.y_ = 0;
-
-  /**
-   * Whether icon enabled or not.
-   * @type {boolean}
-   * @private
-   */
-  this.iconEnabled_ = true;
-
-  /**
-   * Shows whether legend item in disabled state.
-   * @type {boolean}
-   * @private
-   */
-  this.disabled_ = false;
-
-  /**
    * Appearance settings for disabled state
    * @type {Object}
    * @private
@@ -100,68 +72,12 @@ anychart.core.ui.LegendItem = function() {
     'fontColor': '#999'
   };
 
-  /**
-   * Legend item icon type.
-   * @type {(anychart.enums.LegendItemIconType|string|function(acgraph.vector.Path, number))}
-   * @private
-   */
-  this.iconType_ = anychart.enums.LegendItemIconType.SQUARE;
-
-  /**
-   * Legend item icon fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.iconFill_ = 'black';
-
-  /**
-   * Legend item icon stroke.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.iconStroke_ = 'none';
-
-  /**
-   * Legend item icon hatch fill.
-   * @type {?(acgraph.vector.PatternFill|acgraph.vector.HatchFill.HatchFillType|string)}
-   * @private
-   */
-  this.iconHatchFill_ = null;
-
-  /**
-   * Legend item icon marker type
-   * @type {?(string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)}
-   * @private
-   */
-  this.iconMarkerType_ = null;
-
-  /**
-   * Legend item icon marker fill.
-   * @type {acgraph.vector.Fill}
-   * @private
-   */
-  this.iconMarkerFill_ = 'none';
-
-  /**
-   * Legend item icon marker stroke.
-   * @type {acgraph.vector.Stroke}
-   * @private
-   */
-  this.iconMarkerStroke_ = 'none';
-
-  /**
-   * Space between icon and text.
-   * @type {number}
-   * @private
-   */
-  this.iconTextSpacing_ = 5;
-
-  // legend item default text
-  this.settingsObj['text'] = 'Legend Item';
+  this.applyDefaults();
 };
 goog.inherits(anychart.core.ui.LegendItem, anychart.core.Text);
 
 
+//region --- Class definitions
 /**
  * Supported signals.
  * @type {number}
@@ -178,6 +94,413 @@ anychart.core.ui.LegendItem.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.Text.prototype.SUPPORTED_CONSISTENCY_STATES; //ENABLED CONTAINER Z_INDEX APPEARANCE BOUNDS
 
 
+//endregion
+//region --- Settings (API)
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  LegendItem API.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter/setter for X coordinate of legend item.
+ * @param {(number|string)=} opt_value New x coordinate.
+ * @return {(number|string|anychart.core.ui.LegendItem)} X coordinate or self for method chaining.
+ */
+anychart.core.ui.LegendItem.prototype.x = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.x_ != opt_value) {
+      this.x_ = opt_value;
+      this.dropPixelBounds();
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.x_;
+};
+
+
+/**
+ * Getter/setter for Y coordinate of legend item.
+ * @param {(number|string)=} opt_value New y coordinate.
+ * @return {(number|string|anychart.core.ui.LegendItem)} Y coordinate or self for method chaining.
+ */
+anychart.core.ui.LegendItem.prototype.y = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.y_ != opt_value) {
+      this.y_ = opt_value;
+      this.dropPixelBounds();
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.y_;
+};
+
+
+/**
+ * Getter/setter for iconEnabled setting
+ * @param {boolean=} opt_value Whether to show item icon or not.
+ * @return {(boolean|anychart.core.ui.LegendItem)} iconEnabled setting or self for method chaining.
+ */
+anychart.core.ui.LegendItem.prototype.iconEnabled = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = !!opt_value;
+    if (this.iconEnabled_ != opt_value) {
+      this.iconEnabled_ = opt_value;
+      this.redrawIcon_ = true;
+      this.dropPixelBounds();
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.iconEnabled_;
+};
+
+
+/**
+ * Getter/setter for disabled setting.
+ * @param {boolean=} opt_value Is this item disabled.
+ * @return {(boolean|anychart.core.ui.LegendItem)} Disabled setting or self for chaining.
+ */
+anychart.core.ui.LegendItem.prototype.disabled = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.disabled_ != opt_value) {
+      this.disabled_ = opt_value;
+      this.redrawIcon_ = true;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE);
+      this.draw();
+    }
+    return this;
+  }
+  return this.disabled_;
+};
+
+
+/**
+ * Getter/setter for icon type.
+ * @param {(string|function(acgraph.vector.Path, number))=} opt_value Icon type or custom drawer function.
+ * @return {(string|function(acgraph.vector.Path, number)|anychart.core.ui.LegendItem)} icon type or drawer function or self for method chaining.
+ */
+anychart.core.ui.LegendItem.prototype.iconType = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (goog.isString(opt_value))
+      opt_value = anychart.enums.normalizeLegendItemIconType(opt_value);
+    if (this.iconType_ != opt_value) {
+      this.iconType_ = opt_value;
+      this.redrawIcon_ = true;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.iconType_;
+};
+
+
+/**
+ * Getter/setter for legend item icon fill setting.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.ui.LegendItem} .
+ */
+anychart.core.ui.LegendItem.prototype.iconFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var fill = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (fill != this.iconFill_) {
+      this.iconFill_ = fill;
+      this.redrawIcon_ = true;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.iconFill_;
+};
+
+
+/**
+ * Getter/setter for legend item icon stroke setting.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.core.ui.LegendItem|acgraph.vector.Stroke} .
+ */
+anychart.core.ui.LegendItem.prototype.iconStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (stroke != this.iconStroke_) {
+      this.iconStroke_ = stroke;
+      this.redrawIcon_ = true;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.iconStroke_;
+};
+
+
+/**
+ * Getter/setter for iconHatchFill.
+ * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|
+ * string)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
+ * @param {string=} opt_color Color.
+ * @param {number=} opt_thickness Thickness.
+ * @param {number=} opt_size Pattern size.
+ * @return {acgraph.vector.PatternFill|anychart.core.ui.LegendItem} Hatch fill.
+ */
+anychart.core.ui.LegendItem.prototype.iconHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
+  if (goog.isDef(opt_patternFillOrTypeOrState)) {
+    var hatchFill = acgraph.vector.normalizeHatchFill.apply(null, arguments);
+    if (hatchFill != this.iconHatchFill_) {
+      this.iconHatchFill_ = hatchFill;
+      this.redrawIcon_ = true;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return /** @type {acgraph.vector.PatternFill} */ (this.iconHatchFill_);
+};
+
+
+/**
+ * Getter/setter for marker type.
+ * @param {(null|string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
+ * @return {!anychart.core.ui.LegendItem|null|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path|string} .
+ */
+anychart.core.ui.LegendItem.prototype.iconMarkerType = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (!goog.isFunction(opt_value))
+      opt_value = goog.isNull(opt_value) ? null : anychart.enums.normalizeMarkerType(opt_value);
+    if (this.iconMarkerType_ != opt_value) {
+      this.iconMarkerType_ = opt_value;
+      this.redrawIcon_ = true;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.iconMarkerType_;
+};
+
+
+/**
+ * Getter/setter for icon marker fill setting.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.ui.LegendItem} .
+ */
+anychart.core.ui.LegendItem.prototype.iconMarkerFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var color = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (this.iconMarkerFill_ != color) {
+      this.iconMarkerFill_ = color;
+      this.redrawIcon_ = true;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  } else {
+    return this.iconMarkerFill_;
+  }
+};
+
+
+/**
+ * Getter/setter for icon marker stroke setting.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke settings,
+ *    if used as a setter.
+ * @param {number=} opt_thickness Line thickness. If empty - set to 1.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
+ *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
+ *    repeated to yield an even number of values. Thus, stroke dashpattern: 5,3,2 is equivalent to dashpattern: 5,3,2,5,3,2.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
+ * @return {acgraph.vector.Stroke|anychart.core.ui.LegendItem} .
+ */
+anychart.core.ui.LegendItem.prototype.iconMarkerStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var color = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (this.iconMarkerStroke_ != color) {
+      this.iconMarkerStroke_ = color;
+      this.redrawIcon_ = true;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  } else {
+    return this.iconMarkerStroke_;
+  }
+};
+
+
+/**
+ * Getter/setter for iconTextSpacing setting.
+ * @param {number=} opt_value Value of spacing between icon and text.
+ * @return {(anychart.core.ui.LegendItem|number)} Spacing between icon and text or self for method chaining.
+ */
+anychart.core.ui.LegendItem.prototype.iconTextSpacing = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = !anychart.utils.isNaN(opt_value) ? +opt_value : 5;
+    if (this.iconTextSpacing_ != opt_value) {
+      this.iconTextSpacing_ = opt_value;
+      this.dropPixelBounds();
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.iconTextSpacing_;
+};
+
+
+/**
+ * Getter/setter for legend item source uid.
+ * @param {number=} opt_value source uid.
+ * @return {(number|anychart.core.ui.LegendItem)} Source uid or self for chaining.
+ */
+anychart.core.ui.LegendItem.prototype.sourceUid = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.sourceUid_ = anychart.utils.toNumber(opt_value);
+    return this;
+  }
+  return this.sourceUid_;
+};
+
+
+/**
+ * Getter/setter for legend item source key.
+ * @param {*=} opt_value source key.
+ * @return {(*|anychart.core.ui.LegendItem)} Source key or self for chaining.
+ */
+anychart.core.ui.LegendItem.prototype.sourceKey = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.sourceKey_ = opt_value;
+    return this;
+  }
+  return this.sourceKey_;
+};
+
+
+/**
+ * Getter/setter for legend item meta data.
+ * @param {*=} opt_value Meta data.
+ * @return {(*|anychart.core.ui.LegendItem)} Meta data or self for chaining.
+ */
+anychart.core.ui.LegendItem.prototype.meta = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.meta_ = opt_value;
+    return this;
+  }
+  return this.meta_;
+};
+
+
+/**
+ * Getter/Setter for hover cursor setting.
+ * @param {anychart.enums.Cursor=} opt_value Hover cursor setting.
+ * @return {(anychart.enums.Cursor|anychart.core.ui.LegendItem)} Hover cursor setting or self for chaining.
+ */
+anychart.core.ui.LegendItem.prototype.hoverCursor = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.hoverCursor_ = opt_value;
+    return this;
+  }
+  return this.hoverCursor_;
+};
+
+
+/**
+ * Getter/setter for max width of legend item.
+ * @param {(number|string)=} opt_value Max width setting.
+ * @return {(number|string|anychart.core.ui.LegendItem)} Max width or self for method chaining.
+ */
+anychart.core.ui.LegendItem.prototype.maxWidth = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.maxWidth_ != opt_value) {
+      this.maxWidth_ = opt_value;
+      this.dropPixelBounds();
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.maxWidth_;
+};
+
+
+/**
+ * Getter/setter for max height of legend item.
+ * @param {(number|string)=} opt_value Max height setting.
+ * @return {(number|string|anychart.core.ui.LegendItem)} Max height or self for method chaining.
+ */
+anychart.core.ui.LegendItem.prototype.maxHeight = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.maxHeight_ != opt_value) {
+      this.maxHeight_ = opt_value;
+      this.dropPixelBounds();
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.maxHeight_;
+};
+
+
+/**
+ * Getter/setter for icon size of legend item.
+ * @param {(number|string)=} opt_value Icon size setting.
+ * @return {(number|anychart.core.ui.LegendItem)} Icon size or self for method chaining.
+ */
+anychart.core.ui.LegendItem.prototype.iconSize = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.toNumber(opt_value);
+    if (this.iconSize_ != opt_value) {
+      this.iconSize_ = /** @type {number} */ (opt_value);
+      this.dropPixelBounds();
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.iconSize_;
+};
+
+
+/**
+ * Getter/setter for legend item text.
+ * @param {string=} opt_value Legend item text.
+ * @return {(string|anychart.core.ui.LegendItem)} Legend item text or self for method chaining.
+ */
+anychart.core.ui.LegendItem.prototype.text = function(opt_value) {
+  return /** @type {!anychart.core.ui.LegendItem|string} */(this.textSettings('text', opt_value));
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.LegendItem.prototype.fontColor = function(opt_value) {
+  if (goog.isDef(opt_value))
+    this.originalFontColor_ = opt_value;
+
+  return anychart.core.ui.LegendItem.base(this, 'fontColor', opt_value);
+};
+
+
+//endregion
+//region --- Drawing
+/**
+ * @inheritDoc
+ */
+anychart.core.ui.LegendItem.prototype.remove = function() {
+  if (this.layer_) this.layer_.parent(null);
+};
+
+
 /**
  * Draws icon marker.
  * @param {acgraph.vector.Path} path Path of icon.
@@ -187,7 +510,6 @@ anychart.core.ui.LegendItem.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.core.ui.LegendItem.prototype.drawIconMarker_ = function(path, size) {
   if (!this.marker_) {
     this.marker_ = path.parent().path();
-    this.registerDisposable(this.marker_);
   } else
     this.marker_.clear();
   if (this.iconMarkerType_) {
@@ -448,536 +770,6 @@ anychart.core.ui.LegendItem.prototype.getIconDrawer = function(opt_iconType) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  LegendItem API.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter/setter for X coordinate of legend item.
- * @param {(number|string)=} opt_value New x coordinate.
- * @return {(number|string|anychart.core.ui.LegendItem)} X coordinate or self for method chaining.
- */
-anychart.core.ui.LegendItem.prototype.x = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.x_ != opt_value) {
-      this.x_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.x_;
-};
-
-
-/**
- * Getter/setter for Y coordinate of legend item.
- * @param {(number|string)=} opt_value New y coordinate.
- * @return {(number|string|anychart.core.ui.LegendItem)} Y coordinate or self for method chaining.
- */
-anychart.core.ui.LegendItem.prototype.y = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.y_ != opt_value) {
-      this.y_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.y_;
-};
-
-
-/**
- * Return legend item content bounds.
- * @return {anychart.math.Rect} Content bounds.
- */
-anychart.core.ui.LegendItem.prototype.getContentBounds = function() {
-  if (!this.enabled())
-    return new anychart.math.Rect(0, 0, 0, 0);
-  if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
-    this.calculateBounds_();
-  return this.pixelBounds_;
-};
-
-
-/**
- * Getter/setter for iconEnabled setting
- * @param {boolean=} opt_value Whether to show item icon or not.
- * @return {(boolean|anychart.core.ui.LegendItem)} iconEnabled setting or self for method chaining.
- */
-anychart.core.ui.LegendItem.prototype.iconEnabled = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = !!opt_value;
-    if (this.iconEnabled_ != opt_value) {
-      this.iconEnabled_ = opt_value;
-      this.redrawIcon_ = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.iconEnabled_;
-};
-
-
-/**
- * Getter/setter for disabled setting.
- * @param {boolean=} opt_value Is this item disabled.
- * @return {(boolean|anychart.core.ui.LegendItem)} Disabled setting or self for chaining.
- */
-anychart.core.ui.LegendItem.prototype.disabled = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.disabled_ != opt_value) {
-      this.disabled_ = opt_value;
-      this.redrawIcon_ = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE);
-      this.draw();
-    }
-    return this;
-  }
-  return this.disabled_;
-};
-
-
-/**
- * Getter/setter for icon type.
- * @param {(string|function(acgraph.vector.Path, number))=} opt_value Icon type or custom drawer function.
- * @return {(string|function(acgraph.vector.Path, number)|anychart.core.ui.LegendItem)} icon type or drawer function or self for method chaining.
- */
-anychart.core.ui.LegendItem.prototype.iconType = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (goog.isString(opt_value))
-      opt_value = anychart.enums.normalizeLegendItemIconType(opt_value);
-    if (this.iconType_ != opt_value) {
-      this.iconType_ = opt_value;
-      this.redrawIcon_ = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.iconType_;
-};
-
-
-/**
- * Getter/setter for legend item icon fill setting.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.ui.LegendItem} .
- */
-anychart.core.ui.LegendItem.prototype.iconFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var fill = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (fill != this.iconFill_) {
-      this.iconFill_ = fill;
-      this.redrawIcon_ = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.iconFill_;
-};
-
-
-/**
- * Getter/setter for legend item icon stroke setting.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
- *    or stroke settings.
- * @param {number=} opt_thickness [1] Line thickness.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
- * @return {anychart.core.ui.LegendItem|acgraph.vector.Stroke} .
- */
-anychart.core.ui.LegendItem.prototype.iconStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (stroke != this.iconStroke_) {
-      this.iconStroke_ = stroke;
-      this.redrawIcon_ = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.iconStroke_;
-};
-
-
-/**
- * Getter/setter for iconHatchFill.
- * @param {(acgraph.vector.PatternFill|acgraph.vector.HatchFill|acgraph.vector.HatchFill.HatchFillType|
- * string)=} opt_patternFillOrTypeOrState PatternFill or HatchFill instance or type of hatch fill.
- * @param {string=} opt_color Color.
- * @param {number=} opt_thickness Thickness.
- * @param {number=} opt_size Pattern size.
- * @return {acgraph.vector.PatternFill|anychart.core.ui.LegendItem} Hatch fill.
- */
-anychart.core.ui.LegendItem.prototype.iconHatchFill = function(opt_patternFillOrTypeOrState, opt_color, opt_thickness, opt_size) {
-  if (goog.isDef(opt_patternFillOrTypeOrState)) {
-    var hatchFill = acgraph.vector.normalizeHatchFill.apply(null, arguments);
-    if (hatchFill != this.iconHatchFill_) {
-      this.iconHatchFill_ = hatchFill;
-      this.redrawIcon_ = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return /** @type {acgraph.vector.PatternFill} */ (this.iconHatchFill_);
-};
-
-
-/**
- * Getter/setter for marker type.
- * @param {(null|string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)=} opt_value .
- * @return {!anychart.core.ui.LegendItem|null|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path|string} .
- */
-anychart.core.ui.LegendItem.prototype.iconMarkerType = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (!goog.isFunction(opt_value))
-      opt_value = goog.isNull(opt_value) ? null : anychart.enums.normalizeMarkerType(opt_value);
-    if (this.iconMarkerType_ != opt_value) {
-      this.iconMarkerType_ = opt_value;
-      this.redrawIcon_ = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  }
-  return this.iconMarkerType_;
-};
-
-
-/**
- * Getter/setter for icon marker fill setting.
- * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
- * @param {number=} opt_opacityOrAngleOrCx .
- * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
- * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
- * @param {number=} opt_opacity .
- * @param {number=} opt_fx .
- * @param {number=} opt_fy .
- * @return {acgraph.vector.Fill|anychart.core.ui.LegendItem} .
- */
-anychart.core.ui.LegendItem.prototype.iconMarkerFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
-  if (goog.isDef(opt_fillOrColorOrKeys)) {
-    var color = acgraph.vector.normalizeFill.apply(null, arguments);
-    if (this.iconMarkerFill_ != color) {
-      this.iconMarkerFill_ = color;
-      this.redrawIcon_ = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return this.iconMarkerFill_;
-  }
-};
-
-
-/**
- * Getter/setter for icon marker stroke setting.
- * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Stroke settings,
- *    if used as a setter.
- * @param {number=} opt_thickness Line thickness. If empty - set to 1.
- * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
- *    Dash array contains a list of comma and/or white space separated lengths and percentages that specify the
- *    lengths of alternating dashes and gaps. If an odd number of values is provided, then the list of values is
- *    repeated to yield an even number of values. Thus, stroke dashpattern: 5,3,2 is equivalent to dashpattern: 5,3,2,5,3,2.
- * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line join style.
- * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Style of line cap.
- * @return {acgraph.vector.Stroke|anychart.core.ui.LegendItem} .
- */
-anychart.core.ui.LegendItem.prototype.iconMarkerStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
-  if (goog.isDef(opt_strokeOrFill)) {
-    var color = acgraph.vector.normalizeStroke.apply(null, arguments);
-    if (this.iconMarkerStroke_ != color) {
-      this.iconMarkerStroke_ = color;
-      this.redrawIcon_ = true;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
-    }
-    return this;
-  } else {
-    return this.iconMarkerStroke_;
-  }
-};
-
-
-/**
- * Getter/setter for iconTextSpacing setting.
- * @param {number=} opt_value Value of spacing between icon and text.
- * @return {(anychart.core.ui.LegendItem|number)} Spacing between icon and text or self for method chaining.
- */
-anychart.core.ui.LegendItem.prototype.iconTextSpacing = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = !anychart.utils.isNaN(opt_value) ? +opt_value : 5;
-    if (this.iconTextSpacing_ != opt_value) {
-      this.iconTextSpacing_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.iconTextSpacing_;
-};
-
-
-/**
- * Getter/setter for legend item source uid.
- * @param {number=} opt_value source uid.
- * @return {(number|anychart.core.ui.LegendItem)} Source uid or self for chaining.
- */
-anychart.core.ui.LegendItem.prototype.sourceUid = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.sourceUid_ = anychart.utils.toNumber(opt_value);
-    return this;
-  }
-  return this.sourceUid_;
-};
-
-
-/**
- * Getter/setter for legend item source key.
- * @param {*=} opt_value source key.
- * @return {(*|anychart.core.ui.LegendItem)} Source key or self for chaining.
- */
-anychart.core.ui.LegendItem.prototype.sourceKey = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.sourceKey_ = opt_value;
-    return this;
-  }
-  return this.sourceKey_;
-};
-
-
-/**
- * Getter/setter for legend item meta data.
- * @param {*=} opt_value Meta data.
- * @return {(*|anychart.core.ui.LegendItem)} Meta data or self for chaining.
- */
-anychart.core.ui.LegendItem.prototype.meta = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.meta_ = opt_value;
-    return this;
-  }
-  return this.meta_;
-};
-
-
-/**
- * Getter/Setter for hover cursor setting.
- * @param {anychart.enums.Cursor=} opt_value Hover cursor setting.
- * @return {(anychart.enums.Cursor|anychart.core.ui.LegendItem)} Hover cursor setting or self for chaining.
- */
-anychart.core.ui.LegendItem.prototype.hoverCursor = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.hoverCursor_ = opt_value;
-    return this;
-  }
-  return this.hoverCursor_;
-};
-
-
-/**
- * Getter/setter for max width of legend item.
- * @param {(number|string)=} opt_value Max width setting.
- * @return {(number|string|anychart.core.ui.LegendItem)} Max width or self for method chaining.
- */
-anychart.core.ui.LegendItem.prototype.maxWidth = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.maxWidth_ != opt_value) {
-      this.maxWidth_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.maxWidth_;
-};
-
-
-/**
- * Getter/setter for max height of legend item.
- * @param {(number|string)=} opt_value Max height setting.
- * @return {(number|string|anychart.core.ui.LegendItem)} Max height or self for method chaining.
- */
-anychart.core.ui.LegendItem.prototype.maxHeight = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.maxHeight_ != opt_value) {
-      this.maxHeight_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.maxHeight_;
-};
-
-
-/**
- * Getter/setter for icon size of legend item.
- * @param {(number|string)=} opt_value Icon size setting.
- * @return {(number|anychart.core.ui.LegendItem)} Icon size or self for method chaining.
- */
-anychart.core.ui.LegendItem.prototype.iconSize = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.toNumber(opt_value);
-    if (this.iconSize_ != opt_value) {
-      this.iconSize_ = /** @type {number} */ (opt_value);
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  }
-  return this.iconSize_;
-};
-
-
-/**
- * Getter/setter for legend item text.
- * @param {string=} opt_value Legend item text.
- * @return {(string|anychart.core.ui.LegendItem)} Legend item text or self for method chaining.
- */
-anychart.core.ui.LegendItem.prototype.text = function(opt_value) {
-  return /** @type {!anychart.core.ui.LegendItem|string} */(this.textSettings('text', opt_value));
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.LegendItem.prototype.applyTextSettings = function(textElement, isInitial) {
-  if (isInitial || 'text' in this.changedSettings || 'useHtml' in this.changedSettings) {
-    if (!!this.settingsObj['useHtml'])
-      textElement.htmlText(this.settingsObj['text']);
-    else
-      textElement.text(this.settingsObj['text']);
-  }
-  anychart.core.ui.LegendItem.base(this, 'applyTextSettings', textElement, isInitial);
-  this.changedSettings = {};
-};
-
-
-/**
- * Legend item text element.
- * @return {!acgraph.vector.Text} Text element.
- */
-anychart.core.ui.LegendItem.prototype.getTextElement = function() {
-  return this.textElement_;
-};
-
-
-/**
- * Sets item index to root layer tag.
- * @param {number} index
- */
-anychart.core.ui.LegendItem.prototype.setItemIndexToLayer = function(index) {
-  this.layer_.tag = {index: index};
-};
-
-
-/**
- * Calculating actual width of legend item independently of enabled state.
- * @return {number} Width.
- */
-anychart.core.ui.LegendItem.prototype.getWidth = function() {
-  if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
-    this.calculateBounds_();
-  return (this.iconEnabled_ ? this.iconSize_ + this.iconTextSpacing_ : 0) + this.textElement_.getBounds().width;
-};
-
-
-/**
- * Calculating actual height of legend item independently of enabled state.
- * @return {number} Height.
- */
-anychart.core.ui.LegendItem.prototype.getHeight = function() {
-  if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
-    this.calculateBounds_();
-  return this.textElement_.getBounds().height;
-};
-
-
-/**
- * Calculate bounds of legend item
- * @private
- * @return {anychart.math.Rect} pixelBounds of legend item.
- */
-anychart.core.ui.LegendItem.prototype.calculateBounds_ = function() {
-  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
-  var parentWidth, parentHeight;
-  /** @type {anychart.math.Rect} */
-  var textBounds = this.textElement_.getBounds();
-
-  if (parentBounds) {
-    parentWidth = parentBounds.width;
-    parentHeight = parentBounds.height;
-  } else {
-    parentWidth = parentHeight = undefined;
-  }
-
-  var legendItemMaxWidth = anychart.utils.normalizeSize(this.maxWidth_, parentWidth);
-  var legendItemMaxHeight = anychart.utils.normalizeSize(this.maxHeight_, parentHeight);
-
-  var x = parentWidth ? anychart.utils.normalizeSize(this.x_, parentWidth) : 0;
-  var y = parentHeight ? anychart.utils.normalizeSize(this.y_, parentHeight) : 0;
-  if (legendItemMaxWidth) {
-    var maxTextWidth = legendItemMaxWidth - (this.iconEnabled_ ? this.iconSize_ + this.iconTextSpacing_ : 0);
-    this.textElement_.width(maxTextWidth);
-  } else if (this.textElement_.textOverflow() == acgraph.vector.Text.TextOverflow.ELLIPSIS) {
-    var overflowWidth;
-    // DVF-2119
-    overflowWidth = parentWidth ? Math.min(parentWidth - (this.iconEnabled_ ? this.iconSize_ + this.iconTextSpacing_ : 0), textBounds.width) : textBounds.width;
-
-    // in the context of DVF-2184
-    // Anton Kagakin:
-    // we do need this because of width=0 or width=null set to textElement works the same, so for the ellipsis
-    // width should be more than a zero
-    overflowWidth = Math.max(overflowWidth, 0.00001);
-    this.textElement_.width(overflowWidth);
-    // in the context of DVF-2184
-    // so as we want ellipsis we would also want an non-null height for proper text calculation
-    this.textElement_.height(legendItemMaxHeight ? legendItemMaxHeight : textBounds.height);
-  }
-  if (legendItemMaxHeight)
-    this.textElement_.height(legendItemMaxHeight);
-
-  textBounds = this.textElement_.getBounds();
-  var width = (this.iconEnabled_ ? this.iconSize_ + this.iconTextSpacing_ : 0) + textBounds.width;
-  var height = textBounds.height;
-
-  if (parentBounds) {
-    this.pixelBounds_ = new anychart.math.Rect(
-        parentBounds.getLeft() + x,
-        parentBounds.getTop() + y,
-        width, height);
-  } else {
-    this.pixelBounds_ = new anychart.math.Rect(x, y, width, height);
-  }
-  return this.pixelBounds_;
-};
-
-
-/**
- * @inheritDoc
- */
-anychart.core.ui.LegendItem.prototype.remove = function() {
-  if (this.layer_) this.layer_.parent(null);
-};
-
-
-/**
- * Applies hover settings to item. Used by the Legend.
- * @param {boolean} hover Whether item is hovered.
- */
-anychart.core.ui.LegendItem.prototype.applyHover = function(hover) {
-  /**
-   * If item is hovered.
-   * @type {boolean}
-   * @private
-   */
-  this.hovered_ = hover;
-  this.applyFillAndStroke_(hover);
-  this.applyMarkerFillAndStroke_(hover);
-  this.applyFontColor_(hover);
-};
-
-
 /**
  * Draws an icon.
  * @param {Function} drawer Icon drawer.
@@ -1014,7 +806,6 @@ anychart.core.ui.LegendItem.prototype.draw = function() {
      * @private
      */
     this.icon_ = this.layer_.path();
-    this.registerDisposable(this.icon_);
     this.icon_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
   }
 
@@ -1024,8 +815,6 @@ anychart.core.ui.LegendItem.prototype.draw = function() {
         .zIndex(5)
         .stroke(null)
         .fill('#FFFFFF 0.00001');
-
-    this.registerDisposable(/** @type {goog.disposable.IDisposable} */ (this.rectTheListener_));
   }
 
   // if it is not changed - nothing will happen
@@ -1039,7 +828,6 @@ anychart.core.ui.LegendItem.prototype.draw = function() {
      * @private
      */
     this.hatch_ = this.layer_.path();
-    this.registerDisposable(this.hatch_);
     this.hatch_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
     this.hatch_.stroke('none');
   }
@@ -1070,14 +858,32 @@ anychart.core.ui.LegendItem.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
-    this.calculateBounds_();
+    this.getContentBounds();
     this.drawIcon_(drawer);
     this.rectTheListener_.setBounds(anychart.math.rect(0, 0, this.pixelBounds_.width, this.pixelBounds_.height));
     this.redrawIcon_ = false;
+
+    var textLines = this.textElement_.getLines();
+    var textY, horizontalAxis;
     this.textElement_.x(/** @type {number} */(this.iconEnabled_ ? this.iconSize_ + this.iconTextSpacing_ : 0));
-    this.textElement_.y(0);
-    this.layer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
-    this.layer_.translate(/** @type {number} */(this.pixelBounds_.left), /** @type {number} */(this.pixelBounds_.top));
+
+    if (textLines.length > 1) {
+      var maxTextSegmentHeight = 0;
+      var firstTextLine = textLines[0];
+      for (var i = 0, len = firstTextLine.length; i < len; i++) {
+        maxTextSegmentHeight = Math.max(maxTextSegmentHeight, firstTextLine[i].height);
+      }
+
+      horizontalAxis = Math.max(maxTextSegmentHeight, this.iconSize_) / 2;
+      textY = horizontalAxis - maxTextSegmentHeight / 2;
+    } else {
+      horizontalAxis = this.pixelBounds_.height / 2;
+      textY = horizontalAxis - this.textElement_.getBounds().height / 2;
+    }
+    this.textElement_.y(textY);
+    this.icon_.setTransformationMatrix(1, 0, 0, 1, 0, horizontalAxis - this.iconSize_ / 2);
+    this.layer_.setTransformationMatrix(1, 0, 0, 1, this.pixelBounds_.left, this.pixelBounds_.top);
+
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
   }
 
@@ -1085,12 +891,35 @@ anychart.core.ui.LegendItem.prototype.draw = function() {
 };
 
 
+//endregion
+//region --- Aplying appearance
 /** @inheritDoc */
-anychart.core.ui.LegendItem.prototype.fontColor = function(opt_value) {
-  if (goog.isDef(opt_value))
-    this.originalFontColor_ = opt_value;
+anychart.core.ui.LegendItem.prototype.applyTextSettings = function(textElement, isInitial) {
+  if (isInitial || 'text' in this.changedSettings || 'useHtml' in this.changedSettings) {
+    if (!!this.settingsObj['useHtml'])
+      textElement.htmlText(this.settingsObj['text']);
+    else
+      textElement.text(this.settingsObj['text']);
+  }
+  anychart.core.ui.LegendItem.base(this, 'applyTextSettings', textElement, isInitial);
+  this.changedSettings = {};
+};
 
-  return anychart.core.ui.LegendItem.base(this, 'fontColor', opt_value);
+
+/**
+ * Applies hover settings to item. Used by the Legend.
+ * @param {boolean} hover Whether item is hovered.
+ */
+anychart.core.ui.LegendItem.prototype.applyHover = function(hover) {
+  /**
+   * If item is hovered.
+   * @type {boolean}
+   * @private
+   */
+  this.hovered_ = hover;
+  this.applyFillAndStroke_(hover);
+  this.applyMarkerFillAndStroke_(hover);
+  this.applyFontColor_(hover);
 };
 
 
@@ -1109,7 +938,291 @@ anychart.core.ui.LegendItem.prototype.applyFontColor_ = function(hover, opt_isIn
   } else {
     this.textSettings('fontColor', this.disabledState_['fontColor']);
   }
-  this.applyTextSettings(this.textElement_, !!opt_isInitial);
+  this.applyTextSettings(/** @type {!acgraph.vector.Text} */(this.textElement_), !!opt_isInitial);
+};
+
+
+/**
+ * Applies fill and stroke to icon.
+ * @param {boolean} hover Whether item hovered.
+ * @private
+ */
+anychart.core.ui.LegendItem.prototype.applyFillAndStroke_ = function(hover) {
+  this.icon_.stroke(this.getIconStroke_(hover));
+  this.icon_.fill(this.getIconFill_(hover));
+
+  if (this.hatch_)
+    this.hatch_.fill(this.getIconHatchFill_(hover));
+};
+
+
+/**
+ * Applies fill and stroke to icon marker
+ * @param {boolean} hover Whether item hovered.
+ * @private
+ */
+anychart.core.ui.LegendItem.prototype.applyMarkerFillAndStroke_ = function(hover) {
+  if (this.marker_) {
+    this.marker_.fill(this.getMarkerFill_(hover));
+    this.marker_.stroke(this.getMarkerStroke_(hover));
+  }
+};
+
+
+//endregion
+//region --- Bounds
+/**
+ * Return legend item content bounds.
+ * @return {anychart.math.Rect} Content bounds.
+ */
+anychart.core.ui.LegendItem.prototype.getContentBounds = function() {
+  if (!this.enabled())
+    return new anychart.math.Rect(0, 0, 0, 0);
+  if (!this.pixelBounds_)
+    this.calculateBounds_();
+  return this.pixelBounds_;
+};
+
+
+/**
+ * Return legend item pixel bounds.
+ * @return {anychart.math.Rect} Content bounds.
+ */
+anychart.core.ui.LegendItem.prototype.getPixelBounds = function() {
+  if (!this.pixelBounds_)
+    this.calculateBounds_();
+  return this.pixelBounds_;
+};
+
+
+/**
+ * Drop pixel bounds.
+ */
+anychart.core.ui.LegendItem.prototype.dropPixelBounds = function() {
+  this.pixelBounds_ = null;
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.LegendItem.prototype.invalidateParentBounds = function() {
+  this.dropPixelBounds();
+  anychart.core.ui.LegendItem.base(this, 'invalidateParentBounds');
+};
+
+
+/**
+ * Calculate bounds of legend item
+ * @private
+ * @return {anychart.math.Rect} pixelBounds of legend item.
+ */
+anychart.core.ui.LegendItem.prototype.calculateBounds_ = function() {
+  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
+  var parentWidth, parentHeight;
+  /** @type {anychart.math.Rect} */
+  var textBounds = this.textElement_.getBounds();
+  var strokeThickness = acgraph.vector.getThickness(this.iconStroke_);
+  var iconSize = this.iconSize_ + strokeThickness;
+
+  if (parentBounds) {
+    parentWidth = parentBounds.width;
+    parentHeight = parentBounds.height;
+  } else {
+    parentWidth = parentHeight = undefined;
+  }
+
+  var legendItemMaxWidth = anychart.utils.normalizeSize(this.maxWidth_, parentWidth);
+  var legendItemMaxHeight = anychart.utils.normalizeSize(this.maxHeight_, parentHeight);
+
+  var x = parentWidth ? anychart.utils.normalizeSize(this.x_, parentWidth) : 0;
+  var y = parentHeight ? anychart.utils.normalizeSize(this.y_, parentHeight) : 0;
+
+  if (legendItemMaxWidth) {
+    var maxTextWidth = legendItemMaxWidth - (this.iconEnabled_ ? iconSize + this.iconTextSpacing_ : 0);
+    this.textElement_.width(maxTextWidth);
+  } else if (this.textElement_.textOverflow() == acgraph.vector.Text.TextOverflow.ELLIPSIS) {
+    var overflowWidth;
+    // DVF-2119
+    overflowWidth = parentWidth ? Math.min(parentWidth - (this.iconEnabled_ ? iconSize + this.iconTextSpacing_ : 0), textBounds.width) : textBounds.width;
+
+    // in the context of DVF-2184
+    // Anton Kagakin:
+    // we do need this because of width=0 or width=null set to textElement works the same, so for the ellipsis
+    // width should be more than a zero
+    overflowWidth = Math.max(overflowWidth, 0.00001);
+
+    this.textElement_.width(overflowWidth);
+
+    // in the context of DVF-2184
+    // so as we want ellipsis we would also want an non-null height for proper text calculation
+    this.textElement_.height(legendItemMaxHeight ? legendItemMaxHeight : textBounds.height);
+  }
+
+  textBounds = this.textElement_.getBounds();
+  var width = (this.iconEnabled_ ? iconSize + this.iconTextSpacing_ : 0) + textBounds.width;
+  var height;
+
+  var textLines = this.textElement_.getLines();
+  if (textLines.length > 1) {
+    var maxTextSegmentHeight = 0;
+    var firstTextLine = textLines[0];
+    for (var i = 0, len = firstTextLine.length; i < len; i++) {
+      maxTextSegmentHeight = Math.max(maxTextSegmentHeight, firstTextLine[i].height);
+    }
+
+    var h2 = textBounds.height - maxTextSegmentHeight / 2;
+    height = Math.max(maxTextSegmentHeight / 2, this.iconSize_ / 2) + Math.max(h2, this.iconSize_ / 2);
+  } else {
+    height = Math.max((this.iconEnabled_ ? iconSize : 0), textBounds.height);
+  }
+
+  if (parentBounds) {
+    this.pixelBounds_ = new anychart.math.Rect(
+        parentBounds.getLeft() + x,
+        parentBounds.getTop() + y,
+        width, height);
+  } else {
+    this.pixelBounds_ = new anychart.math.Rect(x, y, width, height);
+  }
+
+  return this.pixelBounds_;
+};
+
+
+/**
+ * Calculating actual width of legend item independently of enabled state.
+ * @return {number} Width.
+ */
+anychart.core.ui.LegendItem.prototype.getWidth = function() {
+  return this.getPixelBounds().width;
+};
+
+
+/**
+ * Calculating actual height of legend item independently of enabled state.
+ * @return {number} Height.
+ */
+anychart.core.ui.LegendItem.prototype.getHeight = function() {
+  return this.getPixelBounds().height;
+};
+
+
+//endregion
+//region --- Utilities
+/**
+ * Applying defaults.
+ */
+anychart.core.ui.LegendItem.prototype.applyDefaults = function() {
+  /**
+   * Legend item x coordinate.
+   * @type {(number|string)}
+   * @private
+   */
+  this.x_ = 0;
+
+  /**
+   * Legend item y cordinate.
+   * @type {(number|string)}
+   * @private
+   */
+  this.y_ = 0;
+
+  /**
+   * Whether icon enabled or not.
+   * @type {boolean}
+   * @private
+   */
+  this.iconEnabled_ = true;
+
+  /**
+   * Shows whether legend item in disabled state.
+   * @type {boolean}
+   * @private
+   */
+  this.disabled_ = false;
+
+  /**
+   * Legend item icon type.
+   * @type {(anychart.enums.LegendItemIconType|string|function(acgraph.vector.Path, number))}
+   * @private
+   */
+  this.iconType_ = anychart.enums.LegendItemIconType.SQUARE;
+
+  /**
+   * Legend item icon fill.
+   * @type {acgraph.vector.Fill}
+   * @private
+   */
+  this.iconFill_ = 'black';
+
+  /**
+   * Legend item icon stroke.
+   * @type {acgraph.vector.Stroke}
+   * @private
+   */
+  this.iconStroke_ = 'none';
+
+  /**
+   * Legend item icon hatch fill.
+   * @type {?(acgraph.vector.PatternFill|acgraph.vector.HatchFill.HatchFillType|string)}
+   * @private
+   */
+  this.iconHatchFill_ = null;
+
+  /**
+   * Legend item icon marker type
+   * @type {?(string|anychart.enums.MarkerType|function(acgraph.vector.Path, number, number, number):acgraph.vector.Path)}
+   * @private
+   */
+  this.iconMarkerType_ = null;
+
+  /**
+   * Legend item icon marker fill.
+   * @type {acgraph.vector.Fill}
+   * @private
+   */
+  this.iconMarkerFill_ = 'none';
+
+  /**
+   * Legend item icon marker stroke.
+   * @type {acgraph.vector.Stroke}
+   * @private
+   */
+  this.iconMarkerStroke_ = 'none';
+
+  /**
+   * Space between icon and text.
+   * @type {number}
+   * @private
+   */
+  this.iconTextSpacing_ = 5;
+
+  // legend item default text
+  this.settingsObj['text'] = 'Legend Item';
+};
+
+
+/**
+ * Clearing item.
+ * @return {anychart.core.ui.LegendItem} .
+ */
+anychart.core.ui.LegendItem.prototype.clear = function() {
+  this.suspendSignalsDispatching();
+  this.dropPixelBounds();
+  this.applyDefaults();
+  this.settingsObj = {};
+  this.changedSettings = {};
+  this.prevSourceKey = this.sourceKey();
+  this.prevSourceUid = this.sourceUid();
+  this.sourceUid(NaN);
+  this.sourceKey(NaN);
+  this.meta(null);
+  delete this.maxWidth_;
+  delete this.maxHeight_;
+  this.remove();
+  this.invalidate(anychart.ConsistencyState.ALL);
+  this.resumeSignalsDispatching(false);
+
+  return this;
 };
 
 
@@ -1190,32 +1303,25 @@ anychart.core.ui.LegendItem.prototype.getMarkerFill_ = function(hover) {
 
 
 /**
- * Applies fill and stroke to icon.
- * @param {boolean} hover Whether item hovered.
- * @private
+ * Legend item text element.
+ * @return {!acgraph.vector.Text} Text element.
  */
-anychart.core.ui.LegendItem.prototype.applyFillAndStroke_ = function(hover) {
-  this.icon_.stroke(this.getIconStroke_(hover));
-  this.icon_.fill(this.getIconFill_(hover));
-
-  if (this.hatch_)
-    this.hatch_.fill(this.getIconHatchFill_(hover));
+anychart.core.ui.LegendItem.prototype.getTextElement = function() {
+  return /** @type {!acgraph.vector.Text} */(this.textElement_);
 };
 
 
 /**
- * Applies fill and stroke to icon marker
- * @param {boolean} hover Whether item hovered.
- * @private
+ * Sets item index to root layer tag.
+ * @param {number} index
  */
-anychart.core.ui.LegendItem.prototype.applyMarkerFillAndStroke_ = function(hover) {
-  if (this.marker_) {
-    this.marker_.fill(this.getMarkerFill_(hover));
-    this.marker_.stroke(this.getMarkerStroke_(hover));
-  }
+anychart.core.ui.LegendItem.prototype.setItemIndexToLayer = function(index) {
+  this.layer_.tag = {index: index};
 };
 
 
+//endregion
+//region --- Setup and Dispose
 /** @inheritDoc */
 anychart.core.ui.LegendItem.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.LegendItem.base(this, 'setupByJSON', config, opt_default);
@@ -1240,4 +1346,28 @@ anychart.core.ui.LegendItem.prototype.setupByJSON = function(config, opt_default
 };
 
 
+/** @inheritDoc */
+anychart.core.ui.LegendItem.prototype.disposeInternal = function() {
+  anychart.core.ui.LegendItem.base(this, 'disposeInternal');
+
+  goog.disposeAll(
+      this.layer_,
+      this.textElement_,
+      this.marker_,
+      this.icon_,
+      this.rectTheListener_,
+      this.hatch_);
+
+  this.layer_ = null;
+  this.textElement_ = null;
+  this.marker_ = null;
+  this.icon_ = null;
+  this.rectTheListener_ = null;
+  this.hatch_ = null;
+};
+
+
+//endregion
+//region --- Exports
 //exports
+//endregion

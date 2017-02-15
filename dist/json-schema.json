@@ -4455,8 +4455,9 @@
           "type": "boolean"
         },
         "position": {"$ref": "#/definitions/anychart.enums.Orientation"},
+        "positionMode": {"$ref": "#/definitions/anychart.enums.LegendPositionMode"},
         "align": {"$ref": "#/definitions/anychart.enums.Align"},
-        "itemsLayout": {"$ref": "#/definitions/anychart.enums.Layout"},
+        "itemsLayout": {"$ref": "#/definitions/anychart.enums.LegendLayout"},
         "items": {
           "type": "array",
           "items": {"$ref": "#/definitions/anychart.core.utils.LegendItemSettings"}
@@ -4487,6 +4488,23 @@
             {"$ref": "#/definitions/disable"},
             {"$ref": "#/definitions/anychart.core.ui.Paginator"}
           ]
+        },
+        "maxWidth": {
+          "type": [
+            "string",
+            "number",
+            "null"
+          ]
+        },
+        "maxHeight": {
+          "type": [
+            "string",
+            "number",
+            "null"
+          ]
+        },
+        "drag": {
+          "type": "boolean"
         }
       }
     },
@@ -5309,6 +5327,12 @@
         "bottom"
       ]
     },
+    "anychart.enums.LegendPositionMode": {
+      "enum": [
+        "inside",
+        "outside"
+      ]
+    },
     "anychart.enums.ChartScrollerPosition": {
       "enum": [
         "afterAxes",
@@ -5362,6 +5386,14 @@
       "enum": [
         "vertical",
         "horizontal"
+      ]
+    },
+    "anychart.enums.LegendLayout": {
+      "enum": [
+        "vertical",
+        "verticalexpandable",
+        "horizontal",
+        "horizontalexpandable"
       ]
     },
     "anychart.enums.RadialGridLayout": {

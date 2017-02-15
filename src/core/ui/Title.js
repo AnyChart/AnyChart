@@ -77,6 +77,14 @@ anychart.core.ui.Title = function() {
 
 
   /**
+   * Auto height settings for the title.
+   * @type {number|string|null}
+   * @private
+   */
+  this.autoHeight_ = null;
+
+
+  /**
    * Actual width of the title.
    * @type {number}
    * @private
@@ -133,21 +141,6 @@ anychart.core.ui.Title = function() {
 
 
   /**
-   * Title default orientation.
-   * @type {anychart.enums.Orientation}
-   * @private
-   */
-  this.defaultOrientation_ = anychart.enums.Orientation.TOP;
-
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this.defaultRotation_;
-
-
-  /**
    * Title transformation matrix.
    * @type {goog.math.AffineTransform}
    * @private
@@ -167,6 +160,14 @@ anychart.core.ui.Title = function() {
    * @type {Object}
    */
   this.ownSettings = {};
+
+
+  /**
+   * Auto values of settings set by external controller.
+   * @type {!Object}
+   */
+  this.autoSettings = {};
+  this.autoSettings['orientation'] = anychart.enums.Orientation.TOP;
 
 
   /**
@@ -301,15 +302,38 @@ anychart.core.ui.Title.prototype.resolutionChainCache = function(opt_value) {
 };
 
 
-/** @inheritDoc */
-anychart.core.ui.Title.prototype.getResolutionChain = anychart.core.settings.getResolutionChain;
+/**
+ * Resolution chain getter.
+ * @return {Array.<Object|null|undefined>} - Chain of settings.
+ */
+anychart.core.ui.Title.prototype.getResolutionChain = function() {
+  var chain = this.resolutionChainCache();
+  if (!chain) {
+    chain = goog.array.concat(this.getHighPriorityResolutionChain(), this.getMidPriorityResolutionChain(), this.getLowPriorityResolutionChain());
+    this.resolutionChainCache(chain);
+  }
+  return chain;
+};
 
 
 /** @inheritDoc */
 anychart.core.ui.Title.prototype.getLowPriorityResolutionChain = function() {
-  var sett = [this.themeSettings];
+  var sett = [this.autoSettings];
   if (this.parent_) {
     sett = goog.array.concat(sett, this.parent_.getLowPriorityResolutionChain());
+  }
+  return sett;
+};
+
+
+/**
+ * Gets chain of middle priority settings.
+ * @return {Array.<Object|null|undefined>} - Chain of settings.
+ */
+anychart.core.ui.Title.prototype.getMidPriorityResolutionChain = function() {
+  var sett = [this.themeSettings];
+  if (this.parent_) {
+    sett = goog.array.concat(sett, this.parent_.getMidPriorityResolutionChain());
   }
   return sett;
 };
@@ -453,6 +477,20 @@ anychart.core.ui.Title.prototype.setAutoWidth = function(width) {
   // cause in case of negative width and without own width option
   // background will draw in the negative coords
   this.autoWidth_ = width < 0 ? null : width;
+
+  if (!goog.isDef(this.width()))
+    this.invalidate(anychart.ConsistencyState.BOUNDS);
+};
+
+
+/**
+ * @param {number|string|null} height
+ */
+anychart.core.ui.Title.prototype.setAutoHeight = function(height) {
+  this.autoHeight_ = height < 0 ? null : height;
+
+  if (!goog.isDef(this.height()))
+    this.invalidate(anychart.ConsistencyState.BOUNDS);
 };
 
 
@@ -507,13 +545,13 @@ anychart.core.ui.Title.prototype.padding = function(opt_spaceOrTopOrTopAndBottom
  */
 anychart.core.ui.Title.prototype.defaultOrientation = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var needInvalidate = !this.getOption('orientation') && this.defaultOrientation_ != opt_value;
-    this.defaultOrientation_ = opt_value;
+    var needInvalidate = this.getOption('orientation') != opt_value;
+    this.autoSettings['orientation'] = opt_value;
     if (needInvalidate)
       this.invalidate(anychart.ConsistencyState.BOUNDS);
     return this;
   }
-  return this.defaultOrientation_;
+  return this.autoSettings['orientation'];
 };
 
 
@@ -521,8 +559,8 @@ anychart.core.ui.Title.prototype.defaultOrientation = function(opt_value) {
  * @param {number} value .
  */
 anychart.core.ui.Title.prototype.setDefaultRotation = function(value) {
-  var needInvalidate = !this.getOption('rotation') && this.defaultRotation_ != value;
-  this.defaultRotation_ = value;
+  var needInvalidate = this.getOption('rotation') != value;
+  this.autoSettings['rotation'] = value;
   if (needInvalidate)
     this.invalidate(anychart.ConsistencyState.BOUNDS);
 };
@@ -729,7 +767,7 @@ anychart.core.ui.Title.prototype.getRemainingBounds = function() {
     return parentBounds;
   if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
     this.calcActualBounds_();
-  var orient = this.getOption('orientation') || this.defaultOrientation_;
+  var orient = this.getOption('orientation');
   switch (orient) {
     case anychart.enums.Orientation.TOP:
       parentBounds.top += this.pixelBounds_.height;
@@ -769,7 +807,7 @@ anychart.core.ui.Title.prototype.getContentBounds = function() {
     return new anychart.math.Rect(0, 0, 0, 0);
   if (!this.pixelBounds_ || this.hasInvalidationState(anychart.ConsistencyState.BOUNDS))
     this.calcActualBounds_();
-  return this.pixelBounds_;
+  return this.pixelBounds_.clone();
 };
 
 
@@ -817,18 +855,19 @@ anychart.core.ui.Title.prototype.applyTextSettings = function(isInitial) {
  */
 anychart.core.ui.Title.prototype.getRotation = function() {
   var ownRotation = this.getOwnOption('rotation');
+  delete this.autoSettings['rotation'];
   var rotation = goog.isDef(ownRotation) ? ownRotation : this.getOption('rotation');
   if (!goog.isDef(rotation)) {
-    var orientation = this.getOption('orientation') || this.defaultOrientation_;
+    var orientation = this.getOption('orientation');
     switch (orientation) {
       case anychart.enums.Orientation.LEFT:
-        return -90;
+        return this.autoSettings['rotation'] = -90;
       case anychart.enums.Orientation.RIGHT:
-        return 90;
+        return this.autoSettings['rotation'] = 90;
         //case anychart.enums.Orientation.TOP:
         //case anychart.enums.Orientation.BOTTOM:
       default:
-        return 0;
+        return this.autoSettings['rotation'] = 0;
     }
   } else
     return /** @type {number} */ (rotation);
@@ -846,18 +885,17 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
   var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
 
   var parentWidth, parentHeight;
-  var orientation = this.getOption('orientation') || this.defaultOrientation_;
+  var orientation = this.getOption('orientation');
 
   var isRLYHorizontal = this.getRotation() % 180 == 0;
+  var isRLYVertical = (this.getRotation() + 90) % 180 == 0;
   if (parentBounds) {
-    if (orientation == anychart.enums.Orientation.TOP ||
-        orientation == anychart.enums.Orientation.BOTTOM ||
-        isRLYHorizontal) {
-      parentWidth = parentBounds.width;
-      parentHeight = parentBounds.height;
-    } else {
+    if (isRLYVertical) {
       parentWidth = parentBounds.height;
       parentHeight = parentBounds.width;
+    } else {
+      parentWidth = parentBounds.width;
+      parentHeight = parentBounds.height;
     }
   } else {
     parentWidth = parentHeight = undefined;
@@ -897,19 +935,20 @@ anychart.core.ui.Title.prototype.calcActualBounds_ = function() {
   this.text_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
   textBounds = this.text_.getBounds();
 
-  if (this.hasOwnOption('height')) {
-    this.backgroundHeight_ = anychart.utils.normalizeSize(/** @type {number|string} */(this.getOwnOption('height')), parentHeight);
-    this.textHeight_ = padding.tightenHeight(this.backgroundHeight_);
-  } else {
+  var height = this.hasOwnOption('height') ? this.getOwnOption('height') : (this.autoHeight_ || null);
+  if (goog.isNull(height)) {
     this.textHeight_ = textBounds.height;
     this.backgroundHeight_ = padding.widenHeight(this.textHeight_);
+  } else {
+    this.backgroundHeight_ = anychart.utils.normalizeSize(/** @type {number|string} */(height), parentHeight);
+    this.textHeight_ = padding.tightenHeight(this.backgroundHeight_);
   }
 
   if (parentBounds && parentHeight < margin.widenHeight(this.backgroundHeight_)) {
     this.backgroundHeight_ = margin.tightenHeight(parentHeight);
     this.textHeight_ = padding.tightenHeight(this.backgroundHeight_);
     this.text_.height(this.textHeight_);
-  } else if (this.hasOwnOption('height'))
+  } else if (!goog.isNull(height))
     this.text_.height(this.textHeight_);
 
   this.pixelBounds_ = new anychart.math.Rect(-this.backgroundWidth_ / 2, -this.backgroundHeight_ / 2, this.backgroundWidth_, this.backgroundHeight_);

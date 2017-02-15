@@ -223,6 +223,7 @@ anychart.ConsistencyState = {
   LEGEND_SEPARATOR: 1 << 8,
   LEGEND_PAGINATOR: 1 << 9,
   LEGEND_RECREATE_ITEMS: 1 << 10,
+  LEGEND_DRAG: 1 << 11,
   //---------------------------------- MARKERS FACTORY STATES (VB) ---------------------------------
   MARKERS_FACTORY_HANDLERS: 1 << 6,
   //---------------------------------- PAGINATOR STATES (VB) ---------------------------------
@@ -387,7 +388,8 @@ anychart.Signal = {
   NEEDS_REDRAW_APPEARANCE: 1 << 13,
   NEEDS_UPDATE_TOOLTIP: 1 << 14,
   ENABLED_STATE_CHANGED: 1 << 15,
-  Z_INDEX_STATE_CHANGED: 1 << 16
+  Z_INDEX_STATE_CHANGED: 1 << 16,
+  NEED_RECALCULATE_LEGEND: 1 << 17
 };
 
 

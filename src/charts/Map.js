@@ -853,9 +853,8 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
       }
     };
     this.mapTouchEndHandler_ = function(e) {
-      goog.style.setStyle(document['body'], 'cursor', '');
       this.touchDist = 0;
-      this.drag = false;
+      this.endDrag();
       goog.events.unlisten(document, [goog.events.EventType.POINTERMOVE, goog.events.EventType.TOUCHMOVE], this.touchMoveHandler, false, this);
       this.updateSeriesOnZoomOrMove();
     };
@@ -866,6 +865,13 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
         goog.events.unlisten(document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, false, this);
       }
     };
+
+    goog.events.listen(this.legend(), [anychart.enums.EventType.DRAG, anychart.enums.EventType.DRAG_START], function(e) {
+      this.legendDragInProcess = true;
+    }, false, this);
+    goog.events.listen(this.legend(), [anychart.enums.EventType.DRAG_END], function(e) {
+      this.legendDragInProcess = false;
+    }, false, this);
 
     goog.events.listen(container, goog.events.EventType.CLICK, this.mapClickHandler_, false, this);
 
@@ -889,7 +895,6 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
         this.isDesktop = true;
         startX = e.clientX;
         startY = e.clientY;
-        this.drag = true;
 
         goog.events.listen(document, goog.events.EventType.MOUSEMOVE, this.mouseMoveHandler, true, this);
         goog.events.listen(document, goog.events.EventType.MOUSEUP, this.mouseUpHandler, true, this);
@@ -898,21 +903,21 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
     this.mouseMoveHandler = function(e) {
       var scene = this.getCurrentScene();
 
-      if (this.drag && this.interactivity_.drag() && scene.zoomLevel() != 1) {
-        goog.style.setStyle(document['body'], 'cursor', acgraph.vector.Cursor.MOVE);
+      if (this.interactivity_.drag() && scene.zoomLevel() != 1 && !this.legendDragInProcess) {
+        scene.startDrag();
+
         scene.move(e.clientX - startX, e.clientY - startY);
+
+        this.dispatchEvent(anychart.enums.EventType.DRAG);
 
         startX = e.clientX;
         startY = e.clientY;
-      } else {
-        goog.style.setStyle(document['body'], 'cursor', '');
       }
     };
     this.mouseUpHandler = function(e) {
-      goog.style.setStyle(document['body'], 'cursor', '');
-      this.drag = false;
-
       if (this.itWasDrag) {
+        this.endDrag();
+
         this.mapTx = this.getMapLayer().getFullTransformation().clone();
         for (var i = this.series_.length; i--;) {
           var series = this.series_[i];
@@ -928,6 +933,33 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
     goog.events.listen(container, goog.events.EventType.MOUSELEAVE, this.mapMouseLeaveHandler_, false, this);
   } else {
     setTimeout(this.initControlsInteractivity_, 100);
+  }
+};
+
+
+/**
+ * Start drag.
+ */
+anychart.charts.Map.prototype.startDrag = function() {
+  if (!this.drag) {
+    this.drag = true;
+    this.dispatchEvent(anychart.enums.EventType.DRAG_START);
+  }
+};
+
+
+/**
+ * Drag end.
+ */
+anychart.charts.Map.prototype.endDrag = function() {
+  if (this.drag) {
+    this.drag = false;
+
+    if (this.interactivity_.drag() &&
+        this.getCurrentScene().zoomLevel() != 1 &&
+        !this.legendDragInProcess) {
+      this.dispatchEvent(anychart.enums.EventType.DRAG_END);
+    }
   }
 };
 
@@ -1003,7 +1035,7 @@ anychart.charts.Map.prototype.handleMouseDown = function(event) {
     setTimeout(this.acyncMouseDown, 0, event);
   } else if (!this.mouseMoveTesting) {
     this.testDragHandler = this.eventsHandler.listenOnce(this, acgraph.events.EventType.MOUSEMOVE, function(e) {
-      this.itWasDrag = true;
+      this.itWasDrag = !this.legendDragInProcess;
     });
 
     this.mouseMoveTesting = true;

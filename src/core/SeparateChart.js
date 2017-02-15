@@ -167,14 +167,16 @@ anychart.core.SeparateChart.prototype.calculateContentAreaSpace = function(total
   var legend = /** @type {anychart.core.ui.Legend} */(this.legend());
   if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND | anychart.ConsistencyState.BOUNDS)) {
     legend.suspendSignalsDispatching();
-    if (!legend.container() && legend.enabled()) legend.container(this.rootElement);
+    if (!legend.container() && legend.enabled())
+      legend.container(this.rootElement);
     legend.parentBounds(bounds);
     if (!legend.itemsSource())
       legend.itemsSource(this);
     legend.resumeSignalsDispatching(false);
     legend.invalidate(anychart.ConsistencyState.APPEARANCE);
-    if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND))
+    if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND)) {
       legend.invalidate(anychart.ConsistencyState.LEGEND_RECREATE_ITEMS);
+    }
     legend.draw();
 
     // DVF-1518

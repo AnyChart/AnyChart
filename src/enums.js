@@ -687,6 +687,67 @@ anychart.enums.normalizeLayout = function(value, opt_default) {
 
 
 /**
+ * Legend layout enumeration.
+ * @enum {string}
+ */
+anychart.enums.LegendLayout = {
+  /**
+   * Vertical layout.
+   */
+  VERTICAL: 'vertical',
+  /**
+   * Horizontal layout.
+   */
+  HORIZONTAL: 'horizontal',
+  /**
+   * Places legend items one by one in vertical columns.
+   */
+  VERTICAL_EXPANDABLE: 'verticalexpandable',
+  /**
+   * Places legend items one by one in horizontal rows.
+   */
+  HORIZONTAL_EXPANDABLE: 'horizontalexpandable'
+};
+
+
+/**
+ * Normalizes user input legend layout to its enumeration values. Also accepts null. Defaults to opt_default or 'vertical'.
+ *
+ * @param {*} value - Layout to normalize.
+ * @param {anychart.enums.LegendLayout=} opt_default Orientation to normalize.
+ * @return {anychart.enums.LegendLayout} Normalized orientation.
+ */
+anychart.enums.normalizeLegendLayout = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'vertical':
+    case 'v':
+    case 'vert':
+      return anychart.enums.LegendLayout.VERTICAL;
+    case 'horizontal':
+    case 'h':
+    case 'horz':
+    case 'horiz':
+      return anychart.enums.LegendLayout.HORIZONTAL;
+    case 'verticalexpandable':
+    case 'vexpandable':
+    case 'evertical':
+    case 've':
+    case 'vertical_expandable':
+      return anychart.enums.LegendLayout.VERTICAL_EXPANDABLE;
+    case 'horizontalexpandable':
+    case 'expandable':
+    case 'hexpandable':
+    case 'ehorizontal':
+    case 'he':
+    case 'horizontal_expandable':
+      return anychart.enums.LegendLayout.HORIZONTAL_EXPANDABLE;
+  }
+  return opt_default || anychart.enums.LegendLayout.VERTICAL;
+};
+
+
+/**
  * Polar layout enumeration.
  * @enum {string}
  */
@@ -790,6 +851,46 @@ anychart.enums.normalizeOrientation = function(value, opt_default) {
       return anychart.enums.Orientation.LEFT;
   }
   return opt_default || anychart.enums.Orientation.TOP;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Position mode.
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Position mode enumeration.
+ * @enum {string}
+ */
+anychart.enums.LegendPositionMode = {
+  /**
+   * Left orientation.
+   */
+  INSIDE: 'inside',
+  /**
+   * Right orientation.
+   */
+  OUTSIDE: 'outside'
+};
+
+
+/**
+ * Normalizes user input position mode to its enumeration values. Also accepts null. Defaults to opt_default or 'outside'.
+ *
+ * @param {*} value Position mode to normalize.
+ * @param {anychart.enums.LegendPositionMode=} opt_default Position mode to normalize.
+ * @return {anychart.enums.LegendPositionMode} Normalized position mode.
+ */
+anychart.enums.normalizeLegendPositionMode = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'inside':
+      return anychart.enums.LegendPositionMode.INSIDE;
+    case 'outside':
+      return anychart.enums.LegendPositionMode.OUTSIDE;
+  }
+  return opt_default || anychart.enums.LegendPositionMode.OUTSIDE;
 };
 
 
@@ -1860,6 +1961,10 @@ anychart.enums.EventType = {
   LEGEND_ITEM_MOUSE_UP: 'legenditemmouseup',
   LEGEND_ITEM_CLICK: 'legenditemclick',
   LEGEND_ITEM_DBLCLICK: 'legenditemdblclick',
+
+  DRAG: 'drag',
+  DRAG_START: 'dragstart',
+  DRAG_END: 'dragend',
 
   SCROLL_CHANGE: 'scrollchange',
 
@@ -5719,6 +5824,15 @@ goog.exportSymbol('anychart.enums.Orientation.BOTTOM', anychart.enums.Orientatio
 goog.exportSymbol('anychart.enums.Layout.HORIZONTAL', anychart.enums.Layout.HORIZONTAL);
 goog.exportSymbol('anychart.enums.Layout.VERTICAL', anychart.enums.Layout.VERTICAL);
 
+goog.exportSymbol('anychart.enums.LegendLayout.HORIZONTAL', anychart.enums.LegendLayout.HORIZONTAL);
+goog.exportSymbol('anychart.enums.LegendLayout.VERTICAL', anychart.enums.LegendLayout.VERTICAL);
+goog.exportSymbol('anychart.enums.LegendLayout.HORIZONTAL_EXPANDABLE', anychart.enums.LegendLayout.HORIZONTAL_EXPANDABLE);
+goog.exportSymbol('anychart.enums.LegendLayout.VERTICAL_EXPANDABLE', anychart.enums.LegendLayout.VERTICAL_EXPANDABLE);
+
+
+goog.exportSymbol('anychart.enums.LegendPositionMode.INSIDE', anychart.enums.LegendPositionMode.INSIDE);
+goog.exportSymbol('anychart.enums.LegendPositionMode.OUTSIDE', anychart.enums.LegendPositionMode.OUTSIDE);
+
 goog.exportSymbol('anychart.enums.Sort.NONE', anychart.enums.Sort.NONE);
 goog.exportSymbol('anychart.enums.Sort.ASC', anychart.enums.Sort.ASC);
 goog.exportSymbol('anychart.enums.Sort.DESC', anychart.enums.Sort.DESC);
@@ -5846,6 +5960,11 @@ goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_MOUSE_DOWN', anychart.en
 goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_MOUSE_UP', anychart.enums.EventType.LEGEND_ITEM_MOUSE_UP);
 goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_CLICK', anychart.enums.EventType.LEGEND_ITEM_CLICK);
 goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_DBLCLICK', anychart.enums.EventType.LEGEND_ITEM_DBLCLICK);
+
+goog.exportSymbol('anychart.enums.EventType.DRAG_START', anychart.enums.EventType.DRAG_START);
+goog.exportSymbol('anychart.enums.EventType.DRAG', anychart.enums.EventType.DRAG);
+goog.exportSymbol('anychart.enums.EventType.DRAG_END', anychart.enums.EventType.DRAG_END);
+
 goog.exportSymbol('anychart.enums.EventType.SCROLL_CHANGE', anychart.enums.EventType.SCROLL_CHANGE);
 goog.exportSymbol('anychart.enums.EventType.SPLITTER_CHANGE', anychart.enums.EventType.SPLITTER_CHANGE);
 goog.exportSymbol('anychart.enums.EventType.SIGNAL', anychart.enums.EventType.SIGNAL);

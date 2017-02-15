@@ -69,7 +69,6 @@ anychart.core.ui.Paginator = function() {
    */
   this.layout_;
 
-
   /**
    * Paginator previous button.
    * @type {anychart.core.ui.Button}
@@ -460,8 +459,11 @@ anychart.core.ui.Paginator.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
+    this.suspendSignalsDispatching();
     this.textSettings('text', this.createTextString_());
+    this.resumeSignalsDispatching(false);
     this.applyTextSettings(this.text_, isInitial);
+    this.invalidate(anychart.ConsistencyState.BOUNDS);
     this.markConsistent(anychart.ConsistencyState.APPEARANCE);
   }
 

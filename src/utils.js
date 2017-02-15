@@ -151,6 +151,7 @@ anychart.utils.extractTag = function(target) {
  * @return {boolean}
  */
 anychart.utils.checkIfParent = function(parent, target) {
+  if (!parent) return false;
   while (target instanceof goog.events.EventTarget && target != parent) {
     target = target.getParentEventTarget();
   }

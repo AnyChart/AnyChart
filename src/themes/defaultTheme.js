@@ -862,6 +862,7 @@ goog.provide('anychart.themes.defaultTheme');
       'fontSize': 12,
       'textOverflow': '...',
       'itemsLayout': 'horizontal',
+      'positionMode': 'outside',
       'itemsSpacing': 15,
       'items': null,
       'itemsFormatter': null,
@@ -877,7 +878,9 @@ goog.provide('anychart.themes.defaultTheme');
       'align': 'center',
       'padding': {'top': 0, 'right': 10, 'bottom': 10, 'left': 10},
       'margin': {'top': 0, 'right': 0, 'bottom': 0, 'left': 0},
-      'title': {'fontSize': 15},
+      'title': {
+        'fontSize': 15
+      },
       'paginator': {
         'enabled': true,
         'fontSize': 12,
@@ -913,7 +916,10 @@ goog.provide('anychart.themes.defaultTheme');
         'allowLeaveChart': true,
         'title': {'enabled': false}
       },
-      'zIndex': 20
+      'drag': false,
+      'maxWidth': null,
+      'maxHeight': null,
+      'zIndex': 200
     },
 
     'defaultCrosshairLabel': {

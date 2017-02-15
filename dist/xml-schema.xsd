@@ -1303,15 +1303,19 @@
         <xsd:attribute name="title_separator" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="paginator" type="simple.BoolOrNull" default="false"/>
         <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
-        <xsd:attribute name="items_layout" type="enums.Layout" default="horizontal"/>
+        <xsd:attribute name="items_layout" type="enums.LegendLayout" default="horizontal"/>
         <xsd:attribute name="items_spacing" type="xsd:string" default="15"/>
         <xsd:attribute name="icon_text_spacing" type="xsd:string" default="5"/>
         <xsd:attribute name="icon_size" type="xsd:double"/>
         <xsd:attribute name="width" type="simple.NumberOrPercentOrNull" default="null"/>
         <xsd:attribute name="height" type="simple.NumberOrPercentOrNull" default="null"/>
+        <xsd:attribute name="max_width" type="simple.NumberOrPercentOrNull" default="null"/>
+        <xsd:attribute name="max_height" type="simple.NumberOrPercentOrNull" default="null"/>
         <xsd:attribute name="position" type="enums.Orientation" default="bottom"/>
+        <xsd:attribute name="position_mode" type="enums.LegendPositionMode" default="outside"/>
         <xsd:attribute name="align" type="enums.Align" default="center"/>
         <xsd:attribute name="inverted" type="simple.Bool" default="false"/>
+        <xsd:attribute name="drag" type="simple.Bool" default="false"/>
         <xsd:attribute name="items_source_mode" type="enums.LegendItemsSourceMode" default="default"/>
         <xsd:attribute name="hover_cursor" type="enums.Cursor" default="pointer"/>
         <xsd:attributeGroup ref="attrs.TextSettings"/>
@@ -2996,6 +3000,22 @@
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="vertical"/>
             <xsd:enumeration value="horizontal"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="enums.LegendLayout">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="vertical"/>
+            <xsd:enumeration value="verticalexpandable"/>
+            <xsd:enumeration value="horizontal"/>
+            <xsd:enumeration value="horizontalexpandable"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="enums.LegendPositionMode">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="inside"/>
+            <xsd:enumeration value="outside"/>
         </xsd:restriction>
     </xsd:simpleType>
 

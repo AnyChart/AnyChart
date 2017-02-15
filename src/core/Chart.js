@@ -59,9 +59,9 @@ anychart.core.Chart = function() {
 
   /**
    * @type {acgraph.vector.Rect}
-   * @private
+   * @protected
    */
-  this.shadowRect_ = null;
+  this.shadowRect = null;
 
   /**
    * @type {anychart.core.utils.Margin}
@@ -1272,11 +1272,11 @@ anychart.core.Chart.prototype.drawInternal = function() {
   var background = this.background();
   var fill = background.getOption('fill');
   if ((!background.enabled() || !fill || fill == 'none')) {
-    if (!this.shadowRect_) {
-      this.shadowRect_ = this.rootElement.rect();
-      this.shadowRect_.fill(anychart.color.TRANSPARENT_HANDLER).stroke(null);
+    if (!this.shadowRect) {
+      this.shadowRect = this.rootElement.rect();
+      this.shadowRect.fill(anychart.color.TRANSPARENT_HANDLER).stroke(null);
     }
-    this.shadowRect_.setBounds(this.contentBounds);
+    this.shadowRect.setBounds(this.contentBounds);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LABELS | anychart.ConsistencyState.BOUNDS)) {
