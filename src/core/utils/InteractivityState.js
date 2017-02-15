@@ -42,6 +42,7 @@ anychart.core.utils.InteractivityState = function(target) {
  * @param {anychart.PointState|number} state .
  * @param {number} index .
  * @param {(anychart.PointState|number)=} opt_stateToChange .
+ * @protected
  */
 anychart.core.utils.InteractivityState.prototype.setPointStateInternal = function(state, index, opt_stateToChange) {
   if (isNaN(index)) return;
@@ -92,6 +93,7 @@ anychart.core.utils.InteractivityState.prototype.setPointStateInternal = functio
  * @param {anychart.PointState|number} state .
  * @param {number=} opt_index .
  * @return {boolean}
+ * @protected
  */
 anychart.core.utils.InteractivityState.prototype.updateRules = function(state, opt_index) {
   var stateToCheck;
@@ -112,6 +114,7 @@ anychart.core.utils.InteractivityState.prototype.updateRules = function(state, o
 /**
  * Returns series state relative points states.
  * @return {anychart.PointState|number}
+ * @protected
  */
 anychart.core.utils.InteractivityState.prototype.getSeriesStateForUpdate = function() {
   if (this.hasPointState(anychart.PointState.SELECT)) {
@@ -275,6 +278,7 @@ anychart.core.utils.InteractivityState.prototype.addPointState = function(state,
  * @param {anychart.PointState|number} state State to exclude from current point state.
  * @param {number} index Index of array of states to exclude.
  * @return {boolean} Returns true if state is clear.
+ * @protected
  */
 anychart.core.utils.InteractivityState.prototype.removePointStateByIndex = function(state, index) {
   return !(this.stateValue[index] &= ~state);
@@ -285,6 +289,7 @@ anychart.core.utils.InteractivityState.prototype.removePointStateByIndex = funct
  * Apply appearance to target.
  * @param {anychart.PointState|number} state
  * @param {number} arrIndex
+ * @protected
  */
 anychart.core.utils.InteractivityState.prototype.doRemovePointStateInternal = function(state, arrIndex) {
   var pointIndex = this.stateIndex[arrIndex];
@@ -307,6 +312,7 @@ anychart.core.utils.InteractivityState.prototype.doRemovePointStateInternal = fu
  * Removes state by index.
  * @param {anychart.PointState|number} state
  * @param {number} index
+ * @protected
  */
 anychart.core.utils.InteractivityState.prototype.removePointStateInternal = function(state, index) {
   if (isNaN(index)) return;
@@ -390,19 +396,6 @@ anychart.core.utils.InteractivityState.prototype.getIndexByPointState = function
 
 
 /**
- * Returns last point index with passed state.
- * @param {anychart.PointState|number} state Point state.
- * @return {number}
- */
-anychart.core.utils.InteractivityState.prototype.getLastIndexByPointState = function(state) {
-  var lastHoveredArrIndex = goog.array.findIndexRight(this.stateValue, function(item) {
-    return !!(item & state);
-  });
-  return lastHoveredArrIndex >= 0 ? this.stateIndex[lastHoveredArrIndex] : NaN;
-};
-
-
-/**
  * Returns point state for index.
  * @param {number} index Point index.
  * @return {anychart.PointState|number}
@@ -434,6 +427,7 @@ anychart.core.utils.InteractivityState.prototype.hasPointStateByPointIndex = fun
  * @param {anychart.PointState|number} state
  * @param {number} index
  * @return {boolean}
+ * @protected
  */
 anychart.core.utils.InteractivityState.prototype.hasPointStateByIndex = function(state, index) {
   return !!(state & this.stateValue[index]);

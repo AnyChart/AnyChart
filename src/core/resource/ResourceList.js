@@ -542,7 +542,7 @@ anychart.core.resource.ResourceList.prototype.overlaySignal_ = function(e) {
  * @protected
  */
 anychart.core.resource.ResourceList.prototype.getIterator = function() {
-  return this.target_ ? this.target_.getIterator() : null;
+  return this.target_ ? this.target_.getDataIterator() : null;
 };
 
 

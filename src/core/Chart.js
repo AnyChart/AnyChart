@@ -1858,7 +1858,7 @@ anychart.core.Chart.prototype.getPoint = goog.abstractMethod;
  *    nearestPointToCursor: (Object.<number>|undefined)
  * }>}
  */
-anychart.core.Chart.prototype.getSeriesStatus;
+anychart.core.Chart.prototype.getSeriesStatus = goog.abstractMethod;
 
 
 /**

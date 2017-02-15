@@ -94,7 +94,7 @@ anychart.data.Iterator.prototype.select = function(index) {
  * // after reset current index -1, so get returns undefined.
  * chart.title().text(iterator.get('x') + ' - ' + iterator.get('value'))
  * chart.line(data);
- * @return {anychart.data.Iterator} {@link anychart.data.Iterator} class instance for method chaining.
+ * @return {!anychart.data.Iterator} {@link anychart.data.Iterator} class instance for method chaining.
  */
 anychart.data.Iterator.prototype.reset = function() {
   this.currentIndex = -1;

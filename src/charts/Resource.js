@@ -9,9 +9,13 @@ goog.require('anychart.core.resource.ResourceList');
 goog.require('anychart.core.resource.TimeLine');
 goog.require('anychart.core.ui.Overlay');
 goog.require('anychart.core.ui.Scroller');
+goog.require('anychart.core.utils.IInteractiveSeries');
+goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.Padding');
+goog.require('anychart.core.utils.ResourceChartContextProvider');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.data');
+goog.require('anychart.data.Iterator');
 goog.require('anychart.math.Rect');
 goog.require('anychart.scales.Calendar');
 goog.require('anychart.scales.DateTimeWithCalendar');
@@ -27,9 +31,19 @@ goog.require('goog.userAgent');
  * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @constructor
  * @extends {anychart.core.Chart}
+ * @implements {anychart.core.utils.IInteractiveSeries}
  */
 anychart.charts.Resource = function(opt_data, opt_csvSettings) {
   anychart.charts.Resource.base(this, 'constructor');
+
+  // it doesn't support other options
+  this.interactivity().hoverMode('single').selectionMode('multiSelect');
+
+  /**
+   * Interactivity state.
+   * @type {anychart.core.utils.InteractivityState}
+   */
+  this.state = new anychart.core.utils.InteractivityState(this);
 
   /**
    * Dummy resource list bounds.
@@ -167,6 +181,13 @@ anychart.charts.Resource = function(opt_data, opt_csvSettings) {
   this.heights_ = null;
 
   /**
+   * Array of bottom coords of rows. Effectively - a partial sum of heights_.
+   * @type {?Array.<number>}
+   * @private
+   */
+  this.bottoms_ = null;
+
+  /**
    * Total pix height of all items.
    * @type {number}
    * @private
@@ -221,6 +242,21 @@ anychart.charts.Resource = function(opt_data, opt_csvSettings) {
    * @private
    */
   this.resources_ = [];
+
+  /**
+   * A list of activities cumulative count per resource.
+   * E.g.: [n1, n1 + n2, n1 + n2 + n3, ...]
+   * where ni-th is a number of activities in i-th resource.
+   * @type {Array.<number>}
+   */
+  this.activitiesRegistry = [];
+
+  /**
+   * A map of interval visible index (also a label index) -> to activity global index.
+   * @type {Array.<number>}
+   * @private
+   */
+  this.intervalsRegistry_ = [];
 
   /**
    * Layer for resources.
@@ -291,7 +327,7 @@ anychart.charts.Resource = function(opt_data, opt_csvSettings) {
    * @type {anychart.core.resource.Activities}
    * @private
    */
-  this.activities_ = new anychart.core.resource.Activities();
+  this.activities_ = new anychart.core.resource.Activities(this);
   this.activities_.listenSignals(this.handleActivitiesSignals_, this);
 
   /**
@@ -303,6 +339,8 @@ anychart.charts.Resource = function(opt_data, opt_csvSettings) {
   this.conflicts_.listenSignals(this.handleConflictsSignals_, this);
 
   this.data(opt_data || null, opt_csvSettings);
+
+  this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove, null, this.handleMouseDown);
 };
 goog.inherits(anychart.charts.Resource, anychart.core.Chart);
 
@@ -1108,7 +1146,7 @@ anychart.charts.Resource.prototype.handleMouseWheel_ = function(e) {
  * @private
  */
 anychart.charts.Resource.prototype.initDragger_ = function(e) {
-  this.dragger_ = new anychart.charts.Resource.Dragger(this, this.eventsInterceptor_);
+  this.dragger_ = new anychart.charts.Resource.Dragger(this, this.plotLayer_, this.eventsInterceptor_);
   this.dragger_.startDrag(e.getOriginalEvent());
 };
 
@@ -1194,11 +1232,31 @@ anychart.charts.Resource.prototype.setZoomLevel_ = function(level) {
 //
 //------------------------------------------------------------------------------
 /**
- * Returns data iterator for the chart data.
- * @return {?anychart.data.Iterator}
+ * Returns iterator that cannot read for the chart data.
+ * @return {!anychart.charts.Resource.ActivityIterator}
  */
 anychart.charts.Resource.prototype.getIterator = function() {
-  return this.data_ ? this.data_.getIterator() : null;
+  if (!this.interactivityIterator_)
+    this.interactivityIterator_ = new anychart.charts.Resource.ActivityIterator(this);
+  return this.interactivityIterator_;
+};
+
+
+/**
+ * Returns attached reset data iterator.
+ * @return {!anychart.data.Iterator}
+ */
+anychart.charts.Resource.prototype.getResetIterator = function() {
+  return this.getIterator().reset();
+};
+
+
+/**
+ * Returns data iterator for the chart data.
+ * @return {!anychart.data.Iterator}
+ */
+anychart.charts.Resource.prototype.getDataIterator = function() {
+  return this.data_.getIterator();
 };
 
 
@@ -1234,7 +1292,7 @@ anychart.charts.Resource.prototype.hasSharedYScale = function() {
 anychart.charts.Resource.prototype.calculate = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.RESOURCE_DATA)) {
     this.xScale_.startAutoCalc();
-    var iterator = this.getIterator();
+    var iterator = this.getDataIterator();
     iterator.reset();
     var i = 0;
     var resource;
@@ -1256,18 +1314,23 @@ anychart.charts.Resource.prototype.calculate = function() {
     this.xScale_.finishAutoCalc();
     this.maxOccupation_ = maxOccupation;
     this.heights_ = [];
+    this.bottoms_ = [];
     this.fullPixHeight_ = 0;
+    this.activitiesRegistry.length = 0;
+    var activitiesCount = 0;
     var statusHeight = this.conflicts_.getOption('height');
     for (i = 0; i < this.resources_.length; i++) {
-      resource = this.resources_[i];
+      resource = /** @type {anychart.core.resource.Resource} */(this.resources_[i]);
       var occupation = this.yScalePerChart_ ? maxOccupation : resource.getMaxOccupation();
       var height = Math.max(this.pixPerHour_ * occupation / 60, this.minRowHeight_);
       height = this.cellPadding_.widenHeight(height);
       if (resource.hasConflicts) {
         height += statusHeight + anychart.core.resource.Resource.ACTIVITIES_SPACING;
       }
-      this.heights_.push(height);
       this.fullPixHeight_ += height;
+      this.heights_.push(height);
+      this.bottoms_.push(this.fullPixHeight_);
+      this.activitiesRegistry.push(activitiesCount += resource.getActivitiesCount());
     }
     this.resourceList_.setHeightsInternal(this.heights_);
     this.resourceList_.invalidate(anychart.ConsistencyState.RESOURCE_LIST_DATA);
@@ -1325,18 +1388,20 @@ anychart.charts.Resource.prototype.drawContent = function(bounds) {
   anychart.core.Base.suspendSignalsDispatching(this.xScroll_,
       this.yScroll_, this.timeLine_, this.resourceList_, this.grid_, this.conflicts_);
 
-  if (!this.eventsInterceptor_) {
-    this.eventsInterceptor_ = this.rootElement.rect();
-    this.eventsInterceptor_.zIndex(1000);
-    //this.eventsInterceptor_.cursor(acgraph.vector.Cursor.EW_RESIZE);
+  if (!this.plotLayer_) {
+    this.plotLayer_ = this.rootElement.layer();
+    this.plotLayer_.zIndex(3);
+    this.eventsHandler.listenOnce(this.plotLayer_, acgraph.events.EventType.MOUSEDOWN, this.initDragger_);
+    this.eventsHandler.listenOnce(this.plotLayer_, acgraph.events.EventType.TOUCHSTART, this.initDragger_);
+
+    this.resourcesClip_ = acgraph.clip();
+    this.plotLayer_.clip(this.resourcesClip_);
+
+    this.eventsInterceptor_ = this.plotLayer_.rect();
+    this.eventsInterceptor_.zIndex(-1);
     this.eventsInterceptor_.fill(anychart.color.TRANSPARENT_HANDLER);
     this.eventsInterceptor_.stroke(null);
-    this.eventsHandler.listenOnce(this.eventsInterceptor_, acgraph.events.EventType.MOUSEDOWN, this.initDragger_);
-    this.eventsHandler.listenOnce(this.eventsInterceptor_, acgraph.events.EventType.TOUCHSTART, this.initDragger_);
-  }
 
-  if (!this.resourcesLayer_) {
-    this.resourcesClip_ = acgraph.clip();
     this.resourcesLayer_ = new anychart.core.utils.TypedLayer(
         function() {
           return acgraph.path();
@@ -1344,12 +1409,9 @@ anychart.charts.Resource.prototype.drawContent = function(bounds) {
         function(path) {
           (/** @type {acgraph.vector.Path} */(path)).clear();
         });
-    this.resourcesLayer_.parent(this.rootElement);
+    this.resourcesLayer_.parent(this.plotLayer_);
     this.resourcesLayer_.zIndex(3);
-    this.resourcesLayer_.clip(this.resourcesClip_);
-  }
 
-  if (!this.splitterLine_) {
     this.splitterLine_ = this.rootElement.path();
     this.splitterLine_.zIndex(3);
   }
@@ -1424,10 +1486,10 @@ anychart.charts.Resource.prototype.drawContent = function(bounds) {
         endPosition = this.fullPixHeight_;
       }
     }
-    this.currentYStartRatio_ = startPosition / this.fullPixHeight_;
+    this.currentYStartRatio_ = startPosition / this.fullPixHeight_ || 0;
     this.resourceList_.verticalScrollBarPosition(this.currentYStartRatio_);
     this.grid_.verticalScrollBarPosition(this.currentYStartRatio_);
-    this.yScroll_.setRangeInternal(this.currentYStartRatio_, endPosition / this.fullPixHeight_);
+    this.yScroll_.setRangeInternal(this.currentYStartRatio_, endPosition / this.fullPixHeight_ || 0);
     this.invalidate(
         anychart.ConsistencyState.RESOURCE_RESOURCE_LIST |
         anychart.ConsistencyState.RESOURCE_Y_SCROLL |
@@ -1505,7 +1567,7 @@ anychart.charts.Resource.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.RESOURCE_GRID)) {
     this.grid_.xScale(/** @type {anychart.scales.DateTimeWithCalendar} */(this.xScale()));
-    this.grid_.container(this.rootElement);
+    this.grid_.container(this.plotLayer_);
     this.grid_.parentBounds(bounds);
     this.grid_.heights(this.heights_);
     this.grid_.draw();
@@ -1523,10 +1585,15 @@ anychart.charts.Resource.prototype.drawContent = function(bounds) {
         hT);
     this.resourcesLayer_.clear();
     this.conflicts_.clear();
-    this.activities_.prepareLabels(this.rootElement, bounds);
-    var index = 0;
+    this.activities_.prepareLabels(this.plotLayer_, bounds);
+    this.intervalsRegistry_.length = 0;
+    var index = {
+      globalIndex: 0,
+      registry: this.intervalsRegistry_
+    };
+    var vLineThickness = acgraph.vector.getThickness(
+        /** @type {acgraph.vector.Stroke} */(this.grid_.getOption('verticalStroke')));
     for (var i = 0; i < this.resources_.length; i++) {
-      var resource = this.resources_[i];
       var h = this.heights_[i];
       from = to;
       to = anychart.utils.applyPixelShift(to + h, hT);
@@ -1534,10 +1601,10 @@ anychart.charts.Resource.prototype.drawContent = function(bounds) {
       var bp = anychart.utils.normalizeSize(/** @type {number|string} */(this.cellPadding_.getOption('bottom')), h);
       b.top = from + hT / 2 + tp;
       b.height = to - hT / 2 - bp - b.top;
-      index = resource.draw(index, l, r, this.resourcesLayer_, b);
+      index = (/** @type {anychart.core.resource.Resource} */(this.resources_[i])).draw(index, l, r, this.resourcesLayer_, b.clone(), vLineThickness);
     }
     this.activities_.drawLabels();
-    this.conflicts_.container(this.rootElement);
+    this.conflicts_.container(this.plotLayer_);
     this.conflicts_.parentBounds(bounds);
     this.conflicts_.draw();
     this.markConsistent(anychart.ConsistencyState.RESOURCE_RESOURCES | anychart.ConsistencyState.RESOURCE_CONFLICTS);
@@ -1545,6 +1612,350 @@ anychart.charts.Resource.prototype.drawContent = function(bounds) {
 
   anychart.core.Base.resumeSignalsDispatchingFalse(this.xScroll_,
       this.yScroll_, this.timeLine_, this.resourceList_, this.grid_, this.conflicts_);
+};
+
+
+/**
+ * Returns global activity index by the resource index and the activity index.
+ * @param {number} resourceIndex
+ * @param {number} activityIndex
+ * @return {number}
+ */
+anychart.charts.Resource.prototype.getGlobalActivityIndex = function(resourceIndex, activityIndex) {
+  return (this.activitiesRegistry[resourceIndex - 1] || 0) + activityIndex;
+};
+
+
+//endregion
+//region --- Interactivity methods
+//------------------------------------------------------------------------------
+//
+//  IInteractiveSeries methods
+//
+//------------------------------------------------------------------------------
+/**
+ * Internal dummy getter/setter for Resource chart hover mode.
+ * @param {anychart.enums.HoverMode=} opt_value Hover mode.
+ * @return {anychart.charts.Resource|anychart.enums.HoverMode} .
+ */
+anychart.charts.Resource.prototype.hoverMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeHoverMode(opt_value);
+    if (opt_value != this.hoverMode_) {
+      this.hoverMode_ = opt_value;
+    }
+    return this;
+  }
+  return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
+};
+
+
+/**
+ * Internal dummy getter/setter for Resource chart selection mode.
+ * @param {anychart.enums.SelectionMode=} opt_value Hover mode.
+ * @return {anychart.charts.Resource|anychart.enums.SelectionMode} .
+ */
+anychart.charts.Resource.prototype.selectionMode = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.enums.normalizeSelectMode(opt_value);
+    if (opt_value != this.selectMode_) {
+      this.selectMode_ = opt_value;
+    }
+    return this;
+  }
+  return /** @type {anychart.enums.SelectionMode}*/(this.selectMode_);
+};
+
+
+/** @inheritDoc */
+anychart.charts.Resource.prototype.isSeries = function() {
+  return true;
+};
+
+
+/**
+ * Interface method.
+ * @return {boolean}
+ */
+anychart.charts.Resource.prototype.isDiscreteBased = function() {
+  return true;
+};
+
+
+/**
+ * Interface method.
+ * @return {boolean}
+ */
+anychart.charts.Resource.prototype.isSizeBased = function() {
+  return false;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Resource.prototype.getPoint = function(index) {
+  return null;
+};
+
+
+/**
+ * Apply appearance to series.
+ * @param {anychart.PointState|number} pointState .
+ */
+anychart.charts.Resource.prototype.applyAppearanceToSeries = function(pointState) {
+  var iter = this.getIterator();
+  var resourceIndex = iter.getResourceIndex();
+  var activityIndex = iter.getActivityIndex();
+  var vLineThickness = acgraph.vector.getThickness(
+      /** @type {acgraph.vector.Stroke} */(this.grid_.getOption('verticalStroke')));
+  this.resources_[resourceIndex].updateActivity(activityIndex, /** @type {anychart.PointState} */(pointState), this.resourcesLayer_, vLineThickness);
+};
+
+
+/**
+ * Apply appearance to point.
+ * @param {anychart.PointState|number} pointState
+ */
+anychart.charts.Resource.prototype.applyAppearanceToPoint = function(pointState) {
+  var iter = this.getIterator();
+  var resourceIndex = iter.getResourceIndex();
+  var activityIndex = iter.getActivityIndex();
+  var vLineThickness = acgraph.vector.getThickness(
+      /** @type {acgraph.vector.Stroke} */(this.grid_.getOption('verticalStroke')));
+  this.resources_[resourceIndex].updateActivity(activityIndex, /** @type {anychart.PointState} */(pointState), this.resourcesLayer_, vLineThickness);
+};
+
+
+/**
+ * Finalization point appearance. For drawing labels and markers.
+ */
+anychart.charts.Resource.prototype.finalizePointAppearance = function() {
+};
+
+
+/** @inheritDoc */
+anychart.charts.Resource.prototype.makeBrowserEvent = function(e) {
+  var res = {
+    'type': e['type'],
+    'target': this,
+    'relatedTarget': this.getOwnerElement(e['relatedTarget']) || e['relatedTarget'],
+    'domTarget': e['target'],
+    'relatedDomTarget': e['relatedTarget'],
+    'offsetX': e['offsetX'],
+    'offsetY': e['offsetY'],
+    'clientX': e['clientX'],
+    'clientY': e['clientY'],
+    'screenX': e['screenX'],
+    'screenY': e['screenY'],
+    'button': e['button'],
+    'keyCode': e['keyCode'],
+    'charCode': e['charCode'],
+    'ctrlKey': e['ctrlKey'],
+    'altKey': e['altKey'],
+    'shiftKey': e['shiftKey'],
+    'metaKey': e['metaKey'],
+    'platformModifierKey': e['platformModifierKey'],
+    'state': e['state']
+  };
+
+  var tag = anychart.utils.extractTag(res['domTarget']);
+  var pointIndex = anychart.utils.toNumber(tag.index);
+  if (!isNaN(pointIndex)) {
+    res['pointIndex'] = pointIndex;
+  }
+  return res;
+};
+
+
+/**
+ * This method also has a side effect - it patches the original source event to maintain pointIndex support for
+ * browser events.
+ * @param {anychart.core.MouseEvent} event
+ * @return {Object} An object of event to dispatch. If null - unrecognized type was found.
+ */
+anychart.charts.Resource.prototype.makePointEvent = function(event) {
+  var type = event['type'];
+  switch (type) {
+    case acgraph.events.EventType.MOUSEOUT:
+      type = anychart.enums.EventType.POINT_MOUSE_OUT;
+      break;
+    case acgraph.events.EventType.MOUSEOVER:
+      type = anychart.enums.EventType.POINT_MOUSE_OVER;
+      break;
+    case acgraph.events.EventType.MOUSEMOVE:
+      type = anychart.enums.EventType.POINT_MOUSE_MOVE;
+      break;
+    case acgraph.events.EventType.MOUSEDOWN:
+      type = anychart.enums.EventType.POINT_MOUSE_DOWN;
+      break;
+    case acgraph.events.EventType.MOUSEUP:
+      type = anychart.enums.EventType.POINT_MOUSE_UP;
+      break;
+    case acgraph.events.EventType.CLICK:
+    case acgraph.events.EventType.TOUCHSTART:
+      type = anychart.enums.EventType.POINT_CLICK;
+      break;
+    case acgraph.events.EventType.DBLCLICK:
+      type = anychart.enums.EventType.POINT_DBLCLICK;
+      break;
+    default:
+      return null;
+  }
+
+  var pointIndex = NaN;
+  if ('pointIndex' in event) {
+    pointIndex = anychart.utils.toNumber(event['pointIndex']);
+  } else {
+    if ('labelIndex' in event) {
+      pointIndex = event['labelIndex'];
+    } else if ('markerIndex' in event) {
+      pointIndex = event['markerIndex'];
+    }
+    pointIndex = this.intervalsRegistry_[anychart.utils.toNumber(pointIndex)];
+  }
+  event['pointIndex'] = pointIndex;
+
+  var iter = this.getIterator();
+  var resourceIndex, activityIndex, activity;
+  if (iter.select(pointIndex)) {
+    resourceIndex = iter.getResourceIndex();
+    activityIndex = iter.getActivityIndex();
+    activity = this.resources_[resourceIndex].getActivity(activityIndex);
+  } else {
+    resourceIndex = activityIndex = NaN;
+    activity = null;
+  }
+
+  return {
+    'type': type,
+    'actualTarget': event['target'],
+    'target': this,
+    'originalEvent': event,
+    'resourceIndex': resourceIndex,
+    'activityIndex': activityIndex,
+    'pointIndex': pointIndex,
+    'data': activity.data,
+    'chart': this
+  };
+};
+
+
+/**
+ * Hovers an activity determined by the resourceIndex and the activityIndex.
+ * @param {number} resourceIndex
+ * @param {number} activityIndex
+ * @return {anychart.charts.Resource}
+ */
+anychart.charts.Resource.prototype.hover = function(resourceIndex, activityIndex) {
+  this.hoverPoint(this.getGlobalActivityIndex(resourceIndex, activityIndex));
+  return this;
+};
+
+
+/**
+ * Hovers activity by its global index.
+ * @param {number} globalIndex
+ * @return {anychart.charts.Resource}
+ */
+anychart.charts.Resource.prototype.hoverPoint = function(globalIndex) {
+  this.unhover();
+  this.state.addPointState(anychart.PointState.HOVER, globalIndex);
+  return this;
+};
+
+
+/**
+ * Removes hover from the series or activity by index.
+ * @param {(number|Array.<number>)=} opt_resourceIndex
+ * @param {number=} opt_activityIndex
+ */
+anychart.charts.Resource.prototype.unhover = function(opt_resourceIndex, opt_activityIndex) {
+  var index;
+  if (goog.isDef(opt_resourceIndex))
+    index = this.getGlobalActivityIndex(+opt_resourceIndex, +opt_activityIndex);
+  else
+    index = NaN;
+  this.state.removePointState(anychart.PointState.HOVER, index);
+};
+
+
+/**
+ * Selects an activity determined by the resourceIndex and the activityIndex.
+ * @param {number} resourceIndex
+ * @param {number} activityIndex
+ * @return {anychart.charts.Resource}
+ */
+anychart.charts.Resource.prototype.select = function(resourceIndex, activityIndex) {
+  this.selectPoint(this.getGlobalActivityIndex(resourceIndex, activityIndex));
+  return this;
+};
+
+
+/**
+ * Selects activity by its global index.
+ * @param {number} globalIndex
+ * @param {anychart.core.MouseEvent=} opt_event
+ * @return {anychart.charts.Resource}
+ */
+anychart.charts.Resource.prototype.selectPoint = function(globalIndex, opt_event) {
+  var unselect = !(opt_event && opt_event.shiftKey);
+  this.state.setPointState(anychart.PointState.SELECT, globalIndex, unselect ? anychart.PointState.HOVER : undefined);
+  return this;
+};
+
+
+/**
+ * Removes select from the series or activity by index.
+ * @param {(number|Array.<number>)=} opt_resourceIndex
+ * @param {number=} opt_activityIndex
+ */
+anychart.charts.Resource.prototype.unselect = function(opt_resourceIndex, opt_activityIndex) {
+  var index;
+  if (goog.isDef(opt_resourceIndex))
+    index = this.getGlobalActivityIndex(+opt_resourceIndex, +opt_activityIndex);
+  else
+    index = NaN;
+  this.state.removePointState(anychart.PointState.SELECT, index);
+};
+
+
+//endregion
+//region --- Working with tooltip
+//------------------------------------------------------------------------------
+//
+//  Working with tooltip
+//
+//------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.charts.Resource.prototype.useUnionTooltipAsSingle = function() {
+  return true;
+};
+
+
+/**
+ * Creates tooltip context provider.
+ * @return {!anychart.core.utils.ResourceChartContextProvider}
+ */
+anychart.charts.Resource.prototype.createTooltipContextProvider = function() {
+  if (!this.tooltipContext) {
+    /**
+     * Tooltip context cache.
+     * @type {anychart.core.utils.ResourceChartContextProvider}
+     * @protected
+     */
+    this.tooltipContext = new anychart.core.utils.ResourceChartContextProvider(this);
+  }
+  this.tooltipContext.applyReferenceValues();
+  return this.tooltipContext;
+};
+
+
+/**
+ * Returns resource by index.
+ * @param {number} index
+ * @return {anychart.core.resource.Resource}
+ */
+anychart.charts.Resource.prototype.getResource = function(index) {
+  return this.resources_[index] || null;
 };
 
 
@@ -1658,11 +2069,12 @@ anychart.charts.Resource.prototype.disposeInternal = function() {
 /**
  * Dragger for Resource Chart.
  * @param {anychart.charts.Resource} chart
- * @param {acgraph.vector.Rect} target
+ * @param {acgraph.vector.Element} target
+ * @param {acgraph.vector.Rect} boundsProvider
  * @constructor
  * @extends {goog.fx.Dragger}
  */
-anychart.charts.Resource.Dragger = function(chart, target) {
+anychart.charts.Resource.Dragger = function(chart, target, boundsProvider) {
   anychart.charts.Resource.Dragger.base(this, 'constructor', target.domElement());
 
   /**
@@ -1670,7 +2082,7 @@ anychart.charts.Resource.Dragger = function(chart, target) {
    * @type {acgraph.vector.Rect}
    * @private
    */
-  this.rect_ = target;
+  this.rect_ = boundsProvider;
 
   /**
    * Chart reference.
@@ -1769,6 +2181,121 @@ anychart.charts.Resource.Dragger.prototype.defaultAction = function(x, y) {
 };
 
 
+
+//endregion
+//region --- ActivityIterator
+//------------------------------------------------------------------------------
+//
+//  ActivityIterator
+//
+//------------------------------------------------------------------------------
+/**
+ * Iterator for array with interface common to data.Iterator.
+ * Need mostly to keep in with InteractivityState.
+ * @param {anychart.charts.Resource} chart
+ * @extends {anychart.data.Iterator}
+ * @constructor
+ */
+anychart.charts.Resource.ActivityIterator = function(chart) {
+  /**
+   * Chart reference.
+   * @type {anychart.charts.Resource}
+   * @private
+   */
+  this.chart_ = chart;
+
+  this.reset();
+};
+goog.inherits(anychart.charts.Resource.ActivityIterator, anychart.data.Iterator);
+
+
+/** @inheritDoc */
+anychart.charts.Resource.ActivityIterator.prototype.reset = function() {
+  /**
+   * Current resource index.
+   * @type {number}
+   */
+  this.currResource = 0;
+  this.currentActivityIndex = this.currentIndex = -1;
+  return this;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Resource.ActivityIterator.prototype.select = function(index) {
+  this.currentIndex = index;
+  var ind = goog.array.binarySearch(this.chart_.activitiesRegistry, index);
+  if (ind < 0) {
+    this.currResource = ~ind;
+  } else {
+    while (this.chart_.activitiesRegistry[++ind] == index) {}
+    this.currResource = ind;
+  }
+  var cutOff = this.chart_.activitiesRegistry[this.currResource - 1] || 0;
+  this.currentActivityIndex = this.currentIndex - cutOff;
+  return this.currResource < this.chart_.activitiesRegistry.length;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Resource.ActivityIterator.prototype.advance = function() {
+  this.currentIndex++;
+  var rowsCount = this.chart_.activitiesRegistry.length;
+  var limit, cutOff = NaN;
+  while (this.currResource < rowsCount &&
+      this.currentIndex >= (limit = this.chart_.activitiesRegistry[this.currResource])) {
+    cutOff = limit;
+    this.currResource++;
+  }
+  if (isNaN(cutOff))
+    cutOff = this.chart_.activitiesRegistry[this.currResource - 1] || 0;
+  this.currentActivityIndex = this.currentIndex - cutOff;
+  return this.currResource < rowsCount;
+};
+
+
+/**
+ * Returns current resource index.
+ * @return {number}
+ */
+anychart.charts.Resource.ActivityIterator.prototype.getResourceIndex = function() {
+  return +this.currResource;
+};
+
+
+/**
+ * Returns current activity index of the current resource
+ * @return {number}
+ */
+anychart.charts.Resource.ActivityIterator.prototype.getActivityIndex = function() {
+  return this.currentActivityIndex;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Resource.ActivityIterator.prototype.getIndex = function() {
+  return this.currentIndex;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Resource.ActivityIterator.prototype.getRowsCount = function() {
+  return this.chart_.activitiesRegistry[this.chart_.activitiesRegistry.length - 1] || 0;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Resource.ActivityIterator.prototype.get = function() {
+  throw 'Cannot use get on ActivityIterator';
+};
+
+
+/** @inheritDoc */
+anychart.charts.Resource.ActivityIterator.prototype.meta = function(name, opt_value) {
+  throw 'Cannot use meta on ActivityIterator';
+};
+
+
 //endregion
 //region --- Exports
 //------------------------------------------------------------------------------
@@ -1803,6 +2330,12 @@ anychart.charts.Resource.Dragger.prototype.defaultAction = function(x, y) {
   proto['resourceList'] = proto.resourceList;
   proto['splitterStroke'] = proto.splitterStroke;
   proto['currentStartDate'] = proto.currentStartDate;
+  proto['hover'] = proto.hover;
+  proto['hoverPoint'] = proto.hoverPoint;
+  proto['unhover'] = proto.unhover;
+  proto['select'] = proto.select;
+  proto['selectPoint'] = proto.selectPoint;
+  proto['unselect'] = proto.unselect;
 })();
 
 

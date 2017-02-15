@@ -370,7 +370,8 @@ anychart.utils.defaultDateFormatter = function(timestamp) {
 anychart.utils.getCoordinateByAnchor = function(bounds, anchor) {
   var x = bounds.left;
   var y = bounds.top;
-  switch (anychart.enums.normalizeAnchor(anchor)) {
+  var anchorVal = anychart.enums.normalizeAnchor(anchor);
+  switch (anchorVal) {
     case anychart.enums.Anchor.LEFT_TOP:
       break;
     case anychart.enums.Anchor.LEFT_CENTER:

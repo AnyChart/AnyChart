@@ -4660,7 +4660,32 @@ anychart.enums.StringToken = {
   /**
    * Relative frequency of the point. Used in pareto series.
    */
-  RELATIVE_FREQUENCY: '%RF'
+  RELATIVE_FREQUENCY: '%RF',
+
+  /**
+   * Resource index that holds the activity. Used in Resource charts.
+   */
+  RESOURCE_INDEX: 'resourceIndex',
+
+  /**
+   * Activity index. Used in Resource charts.
+   */
+  ACTIVITY_INDEX: 'activityIndex',
+
+  /**
+   * Activity start date. Used in Resource charts.
+   */
+  START: 'start',
+
+  /**
+   * Activity end date. Used in Resource charts.
+   */
+  END: 'end',
+
+  /**
+   * Activity minutes per day. Used in Resource charts.
+   */
+  MINUTES_PER_DAY: 'minutesPerDay'
 };
 
 
@@ -6304,6 +6329,11 @@ goog.exportSymbol('anychart.enums.StringToken.Y_PERCENT_OF_CATEGORY', anychart.e
 goog.exportSymbol('anychart.enums.StringToken.Y_PERCENT_OF_SERIES', anychart.enums.StringToken.Y_PERCENT_OF_SERIES);
 goog.exportSymbol('anychart.enums.StringToken.Y_PERCENT_OF_TOTAL', anychart.enums.StringToken.Y_PERCENT_OF_TOTAL);
 goog.exportSymbol('anychart.enums.StringToken.Y_VALUE', anychart.enums.StringToken.Y_VALUE);
+goog.exportSymbol('anychart.enums.StringToken.RESOURCE_INDEX', anychart.enums.StringToken.RESOURCE_INDEX);//7.13.0
+goog.exportSymbol('anychart.enums.StringToken.ACTIVITY_INDEX', anychart.enums.StringToken.ACTIVITY_INDEX);//7.13.0
+goog.exportSymbol('anychart.enums.StringToken.START', anychart.enums.StringToken.START);//7.13.0
+goog.exportSymbol('anychart.enums.StringToken.END', anychart.enums.StringToken.END);//7.13.0
+goog.exportSymbol('anychart.enums.StringToken.MINUTES_PER_DAY', anychart.enums.StringToken.MINUTES_PER_DAY);//7.13.0
 
 goog.exportSymbol('anychart.enums.Statistics.AVERAGE', anychart.enums.Statistics.AVERAGE);
 //goog.exportSymbol('anychart.enums.Statistics.AXIS_AVERAGE', anychart.enums.Statistics.AXIS_AVERAGE);

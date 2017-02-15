@@ -4945,18 +4945,20 @@ goog.provide('anychart.themes.defaultTheme');
           'enabled': true,
           'anchor': 'leftTop',
           'fontColor': '#F4F4F4',
-          'textFormatter': '{%name} ({%hoursPerDayRounded}h)'
+          'textFormatter': '{%name} ({%hoursPerDayRounded}h)',
+          'position': 'leftTop'
         },
+        'hoverLabels': {'enabled': null},
+        'selectLabels': {'enabled': null},
         'fill': '#1976d2',
-        // 'fill': '#0095D8',
-        // 'hoverFill': returnSourceColor,
-        // 'selectFill': returnSourceColor,
+        'hoverFill': returnLightenSourceColor,
+        'selectFill': defaultSelectSolidColor,
         'stroke': null,
-        // 'hoverStroke': returnSourceColor,
-        // 'selectStroke': returnSourceColor,
-        'hatchFill': false
-        // 'hoverHatchFill': null,
-        // 'selectHatchFill': null
+        'hoverStroke': returnSourceColor,
+        'selectStroke': returnSourceColor,
+        'hatchFill': false,
+        'hoverHatchFill': null,
+        'selectHatchFill': null
       },
       'resourceList': {
         'oddFill': 'none',
@@ -5227,6 +5229,24 @@ goog.provide('anychart.themes.defaultTheme');
       'background': {
         'enabled': true,
         'stroke': '#ccc'
+      },
+      'tooltip': {
+        'allowLeaveScreen': false,
+        'allowLeaveChart': true,
+        'displayMode': 'single',
+        'positionMode': 'float',
+        'title': {
+          'enabled': true,
+          'fontSize': 13
+        },
+        'separator': {'enabled': true},
+        'titleFormatter': '{%name}',
+        /** @this {*} */
+        'textFormatter': function() {
+          var format = window['anychart']['format']['date'];
+          return 'Starts: ' + format(this['start']) +
+              '\nEnds: ' + format(this['end']);
+        }
       }
     },
 

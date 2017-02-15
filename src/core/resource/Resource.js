@@ -65,6 +65,13 @@ anychart.core.resource.Resource = function(chart, index) {
    */
   this.hasConflicts = false;
 
+  /**
+   * Bounds cache.
+   * @type {anychart.math.Rect}
+   * @private
+   */
+  this.bounds_ = null;
+
   this.invalidate(anychart.ConsistencyState.ALL);
 };
 goog.inherits(anychart.core.resource.Resource, anychart.core.Base);
@@ -124,7 +131,11 @@ anychart.core.resource.Resource.Activity;
  *   start: number,
  *   end: number,
  *   minutesPerDay: number,
- *   top: (number|undefined)
+ *   top: (number|undefined),
+ *   shape: ?acgraph.vector.Path,
+ *   hfShape: ?acgraph.vector.Path,
+ *   visibleIndex: number,
+ *   globalIndex: number
  * }}
  */
 anychart.core.resource.Resource.ActivityInterval;
@@ -179,14 +190,15 @@ anychart.core.resource.Resource.prototype.calendar = function(opt_value) {
 
 /**
  * Draws the resource.
- * @param {number} index
+ * @param {{globalIndex: number, registry: Array.<number>}} index
  * @param {number} from
  * @param {number} to
  * @param {anychart.core.utils.TypedLayer} typedLayer
  * @param {anychart.math.Rect} bounds
- * @return {number}
+ * @param {number} vLineThickness
+ * @return {{globalIndex: number, registry: Array.<number>}}
  */
-anychart.core.resource.Resource.prototype.draw = function(index, from, to, typedLayer, bounds) {
+anychart.core.resource.Resource.prototype.draw = function(index, from, to, typedLayer, bounds, vLineThickness) {
   this.calculate();
 
   if (this.hasConflicts) {
@@ -203,12 +215,33 @@ anychart.core.resource.Resource.prototype.draw = function(index, from, to, typed
     bounds.top += statusHeight;
     bounds.height -= statusHeight;
   }
-  var vLineThickness = acgraph.vector.getThickness(
-      /** @type {acgraph.vector.Stroke} */(this.chart_.grid().getOption('verticalStroke')));
+  this.bounds_ = bounds;
+
   for (var i = 0; i < this.activities_.length; i++) {
-    index = this.drawActivity_(index, this.activities_[i], from, to, typedLayer, bounds, vLineThickness);
+    index = this.drawActivity_(index, this.activities_[i], from, to, typedLayer, vLineThickness);
   }
+
   return index;
+};
+
+
+/**
+ * Updates activity appearance.
+ * @param {number} index
+ * @param {anychart.PointState} state
+ * @param {anychart.core.utils.TypedLayer} typedLayer
+ * @param {number} vLineThickness
+ */
+anychart.core.resource.Resource.prototype.updateActivity = function(index, state, typedLayer, vLineThickness) {
+  var activity = this.activities_[index];
+  if (activity) {
+    for (var i = 0; i < activity.intervals.length; i++) {
+      var interval = activity.intervals[i];
+      if (!isNaN(interval.visibleIndex)) {
+        this.drawInterval_(activity, interval, state, typedLayer, vLineThickness);
+      }
+    }
+  }
 };
 
 
@@ -249,13 +282,22 @@ anychart.core.resource.Resource.prototype.getActivity = function(index) {
 
 
 /**
+ * Returns activities count.
+ * @return {number}
+ */
+anychart.core.resource.Resource.prototype.getActivitiesCount = function() {
+  return this.activities_.length;
+};
+
+
+/**
  * Calculates resource activities and schedule.
  */
 anychart.core.resource.Resource.prototype.calculate = function() {
   var i, activity;
   if (this.hasInvalidationState(anychart.ConsistencyState.RESOURCE_RESOURCE_DATA)) {
     this.activities_.length = 0;
-    var row = this.chart_.getIterator();
+    var row = this.chart_.getDataIterator();
     var rawActivities;
     if (!row.select(this.index_) || !(rawActivities = row.get('activities')) || !goog.isArray(rawActivities))
       return;
@@ -373,7 +415,10 @@ anychart.core.resource.Resource.prototype.activityFromData_ = function(dataObj) 
         intervals.push({
           start: start,
           end: end,
-          minutesPerDay: minutesPerDay
+          minutesPerDay: minutesPerDay,
+          shape: null,
+          hfShape: null,
+          visibleIndex: NaN
         });
       }
     }
@@ -408,72 +453,126 @@ anychart.core.resource.Resource.prototype.calcDaySchedule_ = function(date) {
 /**
  * Draws the activity in passed range.
  * Returns new index for the next activity to be drawn.
- * @param {number} index
+ * @param {{globalIndex: number, registry: Array.<number>}} index
  * @param {anychart.core.resource.Resource.Activity} activity
  * @param {number} from
  * @param {number} to
  * @param {anychart.core.utils.TypedLayer} typedLayer
- * @param {anychart.math.Rect} bounds
  * @param {number} vLineThickness
- * @return {number}
+ * @return {{globalIndex: number, registry: Array.<number>}}
  * @private
  */
-anychart.core.resource.Resource.prototype.drawActivity_ = function(index, activity, from, to, typedLayer, bounds, vLineThickness) {
+anychart.core.resource.Resource.prototype.drawActivity_ = function(index, activity, from, to, typedLayer, vLineThickness) {
+  var globalIndex = index.globalIndex++;
+  for (var i = 0; i < activity.intervals.length; i++) {
+    var interval = activity.intervals[i];
+    interval.shape = null;
+    interval.hfShape = null;
+    interval.globalIndex = globalIndex;
+    if (interval.end + anychart.core.resource.Resource.DAY < from || interval.start > to) {
+      interval.visibleIndex = NaN;
+    } else {
+      interval.visibleIndex = index.registry.length;
+      index.registry.push(globalIndex);
+      this.drawInterval_(activity, interval, this.chart_.state.getPointStateByIndex(index.globalIndex), typedLayer, vLineThickness);
+    }
+  }
+  return index;
+};
+
+
+/**
+ * Draws particular activity interval.
+ * @param {anychart.core.resource.Resource.Activity} activity
+ * @param {anychart.core.resource.Resource.ActivityInterval} interval
+ * @param {anychart.PointState|number} state
+ * @param {anychart.core.utils.TypedLayer} typedLayer
+ * @param {number} vLineThickness
+ * @private
+ */
+anychart.core.resource.Resource.prototype.drawInterval_ = function(activity, interval, state, typedLayer, vLineThickness) {
   var settings = /** @type {anychart.core.resource.Activities} */(this.chart_.activities());
+  var path = interval.shape;
+  var hatchPath = interval.hfShape;
+  var fill = settings.resolveFill(activity.data, interval, state);
+  var stroke = settings.resolveStroke(activity.data, interval, state);
+  var hatchFill = settings.resolveHatchFill(activity.data, interval, state);
+
+  var thickness = acgraph.vector.getThickness(stroke);
+  var needsDrawing;
+  if (path) {
+    var oldThickness = acgraph.vector.getThickness(/** @type {acgraph.vector.Stroke} */(path.stroke()));
+    needsDrawing = oldThickness == thickness;
+  } else {
+    path = interval.shape = /** @type {!acgraph.vector.Path} */(typedLayer.genNextChild());
+    needsDrawing = true;
+  }
+  path.fill(fill);
+  path.stroke(stroke);
+
+  var needsHatchFillDrawing = false;
+  if (hatchFill) {
+    if (!hatchPath) {
+      hatchPath = interval.hfShape = /** @type {acgraph.vector.Path} */(typedLayer.genNextChild());
+      hatchPath.disablePointerEvents(true);
+      needsHatchFillDrawing = true;
+    }
+    hatchPath.fill(hatchFill);
+    hatchPath.stroke('none');
+  } else if (hatchPath) { // we cannot clear here, because than we won't to have a way to know when to redraw
+    hatchPath.fill('none');
+  }
+
+  var bounds = this.bounds_;
   var xScale = /** @type {anychart.scales.DateTimeWithCalendar} */(this.chart_.xScale());
   var maxOccupation = this.chart_.hasSharedYScale() ?
       this.chart_.getMaxOccupation() :
       this.maxOccupation_;
-  for (var i = 0; i < activity.intervals.length; i++) {
-    var interval = activity.intervals[i];
-    if (interval.end + anychart.core.resource.Resource.DAY < from || interval.start > to) {
-      continue;
-    }
-    var topVal = goog.isDef(interval.top) ? interval.top : activity.top;
-    var stroke = settings.resolveStroke(activity.data, interval, anychart.PointState.NORMAL);
-    var thickness = acgraph.vector.getThickness(stroke);
-    var hDiff = vLineThickness / 2 + thickness / 2;
-    var path = typedLayer.genNextChild();
-    path.fill(settings.resolveFill(activity.data, interval, anychart.PointState.NORMAL));
-    path.stroke(stroke);
-    var hatchFill = settings.resolveHatchFill(activity.data, interval, anychart.PointState.NORMAL);
-    var hatchPath = hatchFill ? typedLayer.genNextChild() : null;
-    var left = anychart.utils.applyPixelShift(
-        xScale.dateToPix(interval.start) + bounds.left,
-        vLineThickness) + hDiff;
-    var right = anychart.utils.applyPixelShift(
-        xScale.dateToPix(interval.end + anychart.core.resource.Resource.DAY) + bounds.left,
-        vLineThickness) - hDiff;
-    var top = anychart.utils.applyPixelShift(
-        topVal / maxOccupation * bounds.height + bounds.top + thickness / 2,
-        thickness);
-    if (topVal)
-      top++;
-    var bottom = anychart.utils.applyPixelShift(
-        (topVal + interval.minutesPerDay) / maxOccupation * bounds.height + bounds.top - thickness / 2,
-        thickness);
-    path.moveTo(left, top)
+
+  var topVal = goog.isDef(interval.top) ? interval.top : activity.top;
+  var hDiff = vLineThickness / 2 + thickness / 2;
+  var left = anychart.utils.applyPixelShift(
+      xScale.dateToPix(interval.start) + bounds.left,
+      vLineThickness) + hDiff;
+  var right = anychart.utils.applyPixelShift(
+      xScale.dateToPix(interval.end + anychart.core.resource.Resource.DAY) + bounds.left,
+      vLineThickness) - hDiff;
+  var top = anychart.utils.applyPixelShift(
+      topVal / maxOccupation * bounds.height + bounds.top + thickness / 2,
+      thickness);
+  if (topVal)
+    top++;
+  var bottom = anychart.utils.applyPixelShift(
+      (topVal + interval.minutesPerDay) / maxOccupation * bounds.height + bounds.top - thickness / 2,
+      thickness);
+
+  if (needsDrawing) {
+    path
+        .clear()
+        .moveTo(left, top)
+        .lineTo(right, top)
+        .lineTo(right, bottom)
+        .lineTo(left, bottom)
+        .close();
+    path.tag = {
+      series: this.chart_,
+      index: interval.globalIndex
+    };
+  }
+
+  if (needsHatchFillDrawing)
+    hatchPath
+        .clear()
+        .moveTo(left, top)
         .lineTo(right, top)
         .lineTo(right, bottom)
         .lineTo(left, bottom)
         .close();
 
-    if (hatchFill) {
-      hatchPath.fill(hatchFill);
-      hatchPath.stroke('none');
-      hatchPath.moveTo(left, top)
-          .lineTo(right, top)
-          .lineTo(right, bottom)
-          .lineTo(left, bottom)
-          .close();
-    }
-
-    settings.drawLabel(index++,
-        settings.createFormatProvider(interval, activity.data),
-        new anychart.math.Rect(left, top, right - left, bottom - top),
-        activity.data['label']);
-  }
-  return index;
+  settings.drawLabel(interval.visibleIndex, state,
+      settings.createFormatProvider(interval, activity.data),
+      new anychart.math.Rect(left, top, right - left, bottom - top),
+      activity.data);
 };
 
 
