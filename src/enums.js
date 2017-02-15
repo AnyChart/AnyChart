@@ -1891,6 +1891,16 @@ anychart.enums.EventType = {
   BEFORE_CREATE_CONNECTOR: 'beforeCreateConnector',
   ROW_COLLAPSE_EXPAND: 'rowcollapseexpand',
 
+  //Connectors events.
+  CONNECTOR_SELECT: 'connectorselect',
+  CONNECTOR_CLICK: 'connectorclick',
+  CONNECTOR_DBL_CLICK: 'connectordblclick',
+  CONNECTOR_MOUSE_OVER: 'connectormouseover',
+  CONNECTOR_MOUSE_OUT: 'connectormouseout',
+  CONNECTOR_MOUSE_MOVE: 'connectormousemove',
+  CONNECTOR_MOUSE_DOWN: 'connectormousedown',
+  CONNECTOR_MOUSE_UP: 'connectormouseup',
+
   //Data tree CRUD events.
   TREE_ITEM_MOVE: 'treeItemMove',
   TREE_ITEM_UPDATE: 'treeItemUpdate',
@@ -5847,6 +5857,16 @@ goog.exportSymbol('anychart.enums.EventType.ROW_MOUSE_OUT', anychart.enums.Event
 goog.exportSymbol('anychart.enums.EventType.ROW_MOUSE_MOVE', anychart.enums.EventType.ROW_MOUSE_MOVE);
 goog.exportSymbol('anychart.enums.EventType.ROW_MOUSE_DOWN', anychart.enums.EventType.ROW_MOUSE_DOWN);
 goog.exportSymbol('anychart.enums.EventType.ROW_MOUSE_UP', anychart.enums.EventType.ROW_MOUSE_UP);
+
+goog.exportSymbol('anychart.enums.EventType.CONNECTOR_SELECT', anychart.enums.EventType.CONNECTOR_SELECT);
+goog.exportSymbol('anychart.enums.EventType.CONNECTOR_CLICK', anychart.enums.EventType.CONNECTOR_CLICK);
+goog.exportSymbol('anychart.enums.EventType.CONNECTOR_DBL_CLICK', anychart.enums.EventType.CONNECTOR_DBL_CLICK);
+goog.exportSymbol('anychart.enums.EventType.CONNECTOR_MOUSE_OVER', anychart.enums.EventType.CONNECTOR_MOUSE_OVER);
+goog.exportSymbol('anychart.enums.EventType.CONNECTOR_MOUSE_OUT', anychart.enums.EventType.CONNECTOR_MOUSE_OUT);
+goog.exportSymbol('anychart.enums.EventType.CONNECTOR_MOUSE_MOVE', anychart.enums.EventType.CONNECTOR_MOUSE_MOVE);
+goog.exportSymbol('anychart.enums.EventType.CONNECTOR_MOUSE_DOWN', anychart.enums.EventType.CONNECTOR_MOUSE_DOWN);
+goog.exportSymbol('anychart.enums.EventType.CONNECTOR_MOUSE_UP', anychart.enums.EventType.CONNECTOR_MOUSE_UP);
+
 goog.exportSymbol('anychart.enums.EventType.ROW_COLLAPSE_EXPAND', anychart.enums.EventType.ROW_COLLAPSE_EXPAND);
 goog.exportSymbol('anychart.enums.EventType.BEFORE_CREATE_CONNECTOR', anychart.enums.EventType.BEFORE_CREATE_CONNECTOR);
 goog.exportSymbol('anychart.enums.EventType.TREE_ITEM_CREATE', anychart.enums.EventType.TREE_ITEM_CREATE);

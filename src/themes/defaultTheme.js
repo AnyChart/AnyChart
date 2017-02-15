@@ -3990,6 +3990,16 @@ goog.provide('anychart.themes.defaultTheme');
         'opacity': 0.00001
       },
 
+      'editStartConnectorMarkerType': 'circle',
+      'editStartConnectorMarkerSize': 10,
+      'editStartConnectorMarkerHorizontalOffset': 0,
+      'editStartConnectorMarkerVerticalOffset': 0,
+      'editFinishConnectorMarkerType': 'circle',
+      'editFinishConnectorMarkerSize': 10,
+      'editFinishConnectorMarkerHorizontalOffset': 0,
+      'editFinishConnectorMarkerVerticalOffset': 0,
+      'editIntervalWidth': 3,
+
       'baselineFill': '#d5ebfc',
       'baselineStroke': '#bfd1e0',
       'parentFill': '#455a64',

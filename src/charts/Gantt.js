@@ -831,18 +831,7 @@ anychart.charts.Gantt.prototype.rowClick = function(event) {
  * @param {Object} event - Dispatched event object.
  */
 anychart.charts.Gantt.prototype.rowDblClick = function(event) {
-  var item = event['item'];
-  if (item && item.numChildren()) {
-    var value = !item.meta(anychart.enums.GanttDataFields.COLLAPSED);
-    var evtObj = {
-      'type': anychart.enums.EventType.ROW_COLLAPSE_EXPAND,
-      'item': item,
-      'collapsed': value
-    };
-
-    if (this.dispatchEvent(evtObj))
-      item.meta(anychart.enums.GanttDataFields.COLLAPSED, value);
-  }
+  this.rowExpandCollapse(event);
 };
 
 
@@ -907,6 +896,7 @@ anychart.charts.Gantt.prototype.rowMouseOut = function(event) {
  */
 anychart.charts.Gantt.prototype.rowSelect = function(event) {
   if (!this.tl_.checkRowSelection(event)) {
+    this.tl_.connectorUnselect(event);
     var item = event['item'];
     var period = event['period'];
     var periodId = period ? period[anychart.enums.GanttDataFields.ID] : void 0;
@@ -917,6 +907,28 @@ anychart.charts.Gantt.prototype.rowSelect = function(event) {
       };
       if (goog.isDef(period)) eventObj['period'] = period;
       this.dispatchEvent(eventObj);
+    }
+  }
+};
+
+
+/**
+ * Handles row selection.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.charts.Gantt.prototype.rowExpandCollapse = function(event) {
+  if (event && !this.tl_.checkConnectorDblClick(event)) {
+    var item = event['item'];
+    if (item && item.numChildren()) {
+      var value = !item.meta(anychart.enums.GanttDataFields.COLLAPSED);
+      var evtObj = {
+        'type': anychart.enums.EventType.ROW_COLLAPSE_EXPAND,
+        'item': item,
+        'collapsed': value
+      };
+
+      if (this.dispatchEvent(evtObj))
+        item.meta(anychart.enums.GanttDataFields.COLLAPSED, value);
     }
   }
 };

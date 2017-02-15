@@ -1586,6 +1586,15 @@
         <xsd:attribute name="edit_structure_preview_fill" type="xsd:string"/>
         <xsd:attribute name="edit_structure_preview_stroke" type="xsd:string"/>
         <xsd:attribute name="edit_structure_preview_dash_stroke" type="xsd:string"/>
+        <xsd:attribute name="edit_start_connector_marker_type" type="xsd:string"/>
+        <xsd:attribute name="edit_finish_connector_marker_type" type="xsd:string"/>
+        <xsd:attribute name="edit_start_connector_marker_size" type="xsd:double"/>
+        <xsd:attribute name="edit_finish_connector_marker_size" type="xsd:double"/>
+        <xsd:attribute name="edit_start_connector_marker_horizontal_offset" type="xsd:double"/>
+        <xsd:attribute name="edit_finish_connector_marker_horizontal_offset" type="xsd:double"/>
+        <xsd:attribute name="edit_start_connector_marker_vertical_offset" type="xsd:double"/>
+        <xsd:attribute name="edit_finish_connector_marker_vertical_offset" type="xsd:double"/>
+        <xsd:attribute name="edit_interval_width" type="xsd:double"/>
     </xsd:complexType>
 
     <xsd:complexType name="core.ColorRange">

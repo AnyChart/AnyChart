@@ -310,6 +310,24 @@ anychart.core.ui.Timeline = function(opt_controller, opt_isResources) {
   this.selectedConnectorData_ = null;
 
   /**
+   * This value sets to ID of hovered item when mouse moves over the bar of item on timeline
+   * in live edit mode.
+   * It is used to correctly remove live edit controls on hovered row change.
+   * @type {number|string|undefined}
+   * @private
+   */
+  this.lastHoveredBarItemId_ = void 0;
+
+  /**
+   * This value sets to index of hovered period when mouse moves over the bar of item on timeline
+   * in live edit mode.
+   * It is used to correctly remove live edit controls on hovered row change.
+   * @type {number}
+   * @private
+   */
+  this.lastHoveredPeriodIndex_ = NaN;
+
+  /**
    * Whether baseline bar must be placed above the actual interval bar.
    * @type {boolean}
    * @private
@@ -427,6 +445,77 @@ anychart.core.ui.Timeline = function(opt_controller, opt_isResources) {
    * @private
    */
   this.textMarkers_ = [];
+
+  /**
+   * Hovered connector data.
+   * We use it to correctly dispatch connector mouse out event.
+   * @type {?Object}
+   * @private
+   */
+  this.hoveredConnector_ = null;
+
+  /**
+   *
+   * @type {anychart.enums.MarkerType}
+   * @private
+   */
+  this.editStartConnectorMarkerType_;
+
+  /**
+   *
+   * @type {number}
+   * @private
+   */
+  this.editStartConnectorMarkerSize_;
+
+  /**
+   *
+   * @type {number}
+   * @private
+   */
+  this.editStartConnectorMarkerHorizontalOffset_;
+
+  /**
+   *
+   * @type {number}
+   * @private
+   */
+  this.editStartConnectorMarkerVerticalOffset_;
+
+  /**
+   *
+   * @type {anychart.enums.MarkerType}
+   * @private
+   */
+  this.editFinishConnectorMarkerType_;
+
+  /**
+   *
+   * @type {number}
+   * @private
+   */
+  this.editFinishConnectorMarkerSize_;
+
+  /**
+   *
+   * @type {number}
+   * @private
+   */
+  this.editFinishConnectorMarkerHorizontalOffset_;
+
+  /**
+   *
+   * @type {number}
+   * @private
+   */
+  this.editFinishConnectorMarkerVerticalOffset_;
+
+  /**
+   *
+   * @type {number}
+   * @private
+   */
+  this.editIntervalWidth_;
 
   /**
    * Date time scale.
@@ -612,13 +701,6 @@ anychart.core.ui.Timeline.EDIT_CONNECTOR_PREVIEW_Z_INDEX = 60;
  * @type {number}
  */
 anychart.core.ui.Timeline.EDIT_CORNER_HEIGHT = 5;
-
-
-/**
- * Pixel width of edit-interval-thumb.
- * @type {number}
- */
-anychart.core.ui.Timeline.EDIT_INTERVAL_WIDTH = 3;
 
 
 /**
@@ -1718,6 +1800,132 @@ anychart.core.ui.Timeline.prototype.getEditFinishConnectorPath_ = function() {
 
 
 /**
+ * Gets/sets start edit connector control type.
+ * @param {anychart.enums.MarkerType=} opt_value - Value to set.
+ * @return {anychart.enums.MarkerType|anychart.core.ui.Timeline} - Current value or itself for method chaining.
+ */
+anychart.core.ui.Timeline.prototype.editStartConnectorMarkerType = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.editStartConnectorMarkerType_ = opt_value;
+    return this;
+  }
+  return this.editStartConnectorMarkerType_;
+};
+
+
+/**
+ * Gets/sets start edit connector control size.
+ * @param {number=} opt_value - Value to set.
+ * @return {number|anychart.core.ui.Timeline} - Current value or itself for method chaining.
+ */
+anychart.core.ui.Timeline.prototype.editStartConnectorMarkerSize = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.editStartConnectorMarkerSize_ = opt_value;
+    return this;
+  }
+  return this.editStartConnectorMarkerSize_;
+};
+
+
+/**
+ * Gets/sets start edit connector control horizontal offset.
+ * @param {number=} opt_value - Value to set.
+ * @return {number|anychart.core.ui.Timeline} - Current value or itself for method chaining.
+ */
+anychart.core.ui.Timeline.prototype.editStartConnectorMarkerHorizontalOffset = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.editStartConnectorMarkerHorizontalOffset_ = opt_value;
+    return this;
+  }
+  return this.editStartConnectorMarkerHorizontalOffset_;
+};
+
+
+/**
+ * Gets/sets start edit connector control vertical offset.
+ * @param {number=} opt_value - Value to set.
+ * @return {number|anychart.core.ui.Timeline} - Current value or itself for method chaining.
+ */
+anychart.core.ui.Timeline.prototype.editStartConnectorMarkerVerticalOffset = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.editStartConnectorMarkerVerticalOffset_ = opt_value;
+    return this;
+  }
+  return this.editStartConnectorMarkerVerticalOffset_;
+};
+
+
+/**
+ * Gets/sets finish edit connector control type.
+ * @param {anychart.enums.MarkerType=} opt_value - Value to set.
+ * @return {anychart.enums.MarkerType|anychart.core.ui.Timeline} - Current value or itself for method chaining.
+ */
+anychart.core.ui.Timeline.prototype.editFinishConnectorMarkerType = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.editFinishConnectorMarkerType_ = opt_value;
+    return this;
+  }
+  return this.editFinishConnectorMarkerType_;
+};
+
+
+/**
+ * Gets/sets finish edit connector control size.
+ * @param {number=} opt_value - Value to set.
+ * @return {number|anychart.core.ui.Timeline} - Current value or itself for method chaining.
+ */
+anychart.core.ui.Timeline.prototype.editFinishConnectorMarkerSize = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.editFinishConnectorMarkerSize_ = opt_value;
+    return this;
+  }
+  return this.editFinishConnectorMarkerSize_;
+};
+
+
+/**
+ * Gets/sets finish edit connector control horizontal offset.
+ * @param {number=} opt_value - Value to set.
+ * @return {number|anychart.core.ui.Timeline} - Current value or itself for method chaining.
+ */
+anychart.core.ui.Timeline.prototype.editFinishConnectorMarkerHorizontalOffset = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.editFinishConnectorMarkerHorizontalOffset_ = opt_value;
+    return this;
+  }
+  return this.editFinishConnectorMarkerHorizontalOffset_;
+};
+
+
+/**
+ * Gets/sets finish edit connector control vertical offset.
+ * @param {number=} opt_value - Value to set.
+ * @return {number|anychart.core.ui.Timeline} - Current value or itself for method chaining.
+ */
+anychart.core.ui.Timeline.prototype.editFinishConnectorMarkerVerticalOffset = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.editFinishConnectorMarkerVerticalOffset_ = opt_value;
+    return this;
+  }
+  return this.editFinishConnectorMarkerVerticalOffset_;
+};
+
+
+/**
+ * Gets/sets interval edit control width.
+ * @param {number=} opt_value - Value to set.
+ * @return {number|anychart.core.ui.Timeline} - Current value or itself for method chaining.
+ */
+anychart.core.ui.Timeline.prototype.editIntervalWidth = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.editIntervalWidth_ = opt_value;
+    return this;
+  }
+  return this.editIntervalWidth_;
+};
+
+
+/**
  * Getter for this.editConnectorPreviewPath_.
  * @return {acgraph.vector.Path}
  * @private
@@ -1737,18 +1945,30 @@ anychart.core.ui.Timeline.prototype.getEditConnectorPreviewPath_ = function() {
 
 /**
  * Clears edit controls.
+ * @param {boolean=} opt_ignoreTooltip - Whether to try to restore tooltip visibility.
  * @private
  */
-anychart.core.ui.Timeline.prototype.clearEdit_ = function() {
-  this.getEditPreviewPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
-  this.getEditProgressPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
-  this.getEditRightThumbPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
-  this.getEditLeftThumbPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
-  this.getEditFinishConnectorPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
-  this.getEditStartConnectorPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
-  this.getEditConnectorPreviewPath_().clear();
-  this.tooltip().enabled(this.tooltipEnabledBackup_);
-  this.tooltipEnabledBackup_ = void 0;
+anychart.core.ui.Timeline.prototype.clearEdit_ = function(opt_ignoreTooltip) {
+  //This conditions allow to avoid multiple path operations.
+  if (!this.getEditPreviewPath_().isEmpty())
+    this.getEditPreviewPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  if (!this.getEditProgressPath_().isEmpty())
+    this.getEditProgressPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  if (!this.getEditRightThumbPath_().isEmpty())
+    this.getEditRightThumbPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  if (!this.getEditLeftThumbPath_().isEmpty())
+    this.getEditLeftThumbPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  if (!this.getEditFinishConnectorPath_().isEmpty())
+    this.getEditFinishConnectorPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  if (!this.getEditStartConnectorPath_().isEmpty())
+    this.getEditStartConnectorPath_().clear().setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  if (!this.getEditConnectorPreviewPath_().isEmpty())
+    this.getEditConnectorPreviewPath_().clear();
+
+  if (!opt_ignoreTooltip) {
+    this.tooltip().enabled(this.tooltipEnabledBackup_);
+    this.tooltipEnabledBackup_ = void 0;
+  }
 };
 
 
@@ -2275,12 +2495,12 @@ anychart.core.ui.Timeline.prototype.editThumbDragEnd_ = function(e) {
  */
 anychart.core.ui.Timeline.prototype.editConnectorDragStart_ = function(e) {
   if (this.scrollDragger) this.scrollDragger.setEnabled(false);
-  this.tooltipEnabledBackup_ = /** @type {boolean} */ (this.tooltip().enabled());
-  this.tooltip().hide();
-  this.tooltip().enabled(false);
   this.interactivityHandler.highlight();
   this.currentConnectorDragger_ = /** @type {anychart.core.ui.Timeline.ConnectorDragger} */ (e.target);
   this.clearEdit_();
+  this.tooltipEnabledBackup_ = /** @type {boolean} */ (this.tooltip().enabled());
+  this.tooltip().hide();
+  this.tooltip().enabled(false);
 };
 
 
@@ -2316,189 +2536,318 @@ anychart.core.ui.Timeline.prototype.editConnectorDragEnd_ = function(e) {
 
 
 /**
+ * Creates connector interactivity event.
+ * @param {anychart.core.MouseEvent} event - Incoming original event. By idea, can't be null.
+ * @private
+ * @return {Object} - New event object to be dispatched.
+ */
+anychart.core.ui.Timeline.prototype.getConnectorInteractivityEvent_ = function(event) {
+  var type = event.type;
+  switch (type) {
+    case acgraph.events.EventType.MOUSEOUT:
+      type = anychart.enums.EventType.CONNECTOR_MOUSE_OUT;
+      break;
+    case acgraph.events.EventType.MOUSEOVER:
+      type = anychart.enums.EventType.CONNECTOR_MOUSE_OVER;
+      break;
+    case acgraph.events.EventType.MOUSEMOVE:
+    case acgraph.events.EventType.TOUCHMOVE:
+      type = anychart.enums.EventType.CONNECTOR_MOUSE_MOVE;
+      break;
+    case acgraph.events.EventType.MOUSEDOWN:
+    case acgraph.events.EventType.TOUCHSTART:
+      type = anychart.enums.EventType.CONNECTOR_MOUSE_DOWN;
+      break;
+    case acgraph.events.EventType.MOUSEUP:
+    case acgraph.events.EventType.TOUCHEND:
+      type = anychart.enums.EventType.CONNECTOR_MOUSE_UP;
+      break;
+    case acgraph.events.EventType.CLICK:
+      type = anychart.enums.EventType.CONNECTOR_CLICK;
+      break;
+    case acgraph.events.EventType.DBLCLICK:
+      type = anychart.enums.EventType.CONNECTOR_DBL_CLICK;
+      break;
+  }
+
+  return {
+    'type': type,
+    'actualTarget': event.target,
+    'target': this,
+    'originalEvent': event
+  };
+};
+
+
+/**
+ * Patches connector interactivity events.
+ * @param {Object} evt - Event object.
+ * @private
+ * @return {?Object} - Patched event or null.
+ */
+anychart.core.ui.Timeline.prototype.patchConnectorEvent_ = function(evt) {
+  if (evt && evt['originalEvent']) {
+    var orig = evt['originalEvent'];
+    var domTarget = (orig instanceof acgraph.events.BrowserEvent) ? orig['target'] : orig['domTarget'];
+    if (domTarget && domTarget instanceof anychart.core.ui.BaseGrid.Element && domTarget.type == anychart.enums.TLElementTypes.CONNECTOR) {
+      var connector = /** @type {anychart.core.ui.BaseGrid.Element} */ (domTarget);
+      var connEvent = this.getConnectorInteractivityEvent_(orig);
+      for (var key in connector.meta)
+        connEvent[key] = connector.meta[key];
+      return connEvent;
+    }
+  }
+  return null;
+};
+
+
+/**
+ * Patches connector mouse out event.
+ * @param {Object} evt - Event object.
+ * @private
+ * @return {?Object} - Patched event or null.
+ */
+anychart.core.ui.Timeline.prototype.patchConnectorMouseOutEvent_ = function(evt) {
+  if (evt && evt['originalEvent']) {
+    var connEvent = {
+      'type': anychart.enums.EventType.CONNECTOR_MOUSE_OUT,
+      'actualTarget': evt['originalEvent'].target,
+      'target': this,
+      'originalEvent': evt['originalEvent']
+    };
+
+    //Make sure that this.hoveredConnector_ is not null!
+    for (var key in this.hoveredConnector_)
+      connEvent[key] = this.hoveredConnector_[key];
+    return connEvent;
+  }
+  return null;
+};
+
+
+/**
  * @inheritDoc
  */
 anychart.core.ui.Timeline.prototype.addMouseMoveAndOver = function(evt) {
-  if (this.editable && evt) {
-    var el;
-    if (evt['originalEvent']['domTarget'] && evt['originalEvent']['domTarget'] instanceof anychart.core.ui.BaseGrid.Element) {
-      el = /** @type {anychart.core.ui.BaseGrid.Element} */ (evt['originalEvent']['domTarget']);
-      var dataItem = evt['item'];
-      var period = evt['period'];
-      var periodIndex = evt['periodIndex'];
+  if (evt && evt['originalEvent']) {
+    var orig = evt['originalEvent'];
+    var domTarget = orig['domTarget'];
+    if (this.editable) {
+      var el;
+      if (domTarget && domTarget instanceof anychart.core.ui.BaseGrid.Element) {
+        el = /** @type {anychart.core.ui.BaseGrid.Element} */ (domTarget);
+        var dataItem = evt['item'];
+        var id = dataItem.get(anychart.enums.GanttDataFields.ID);
+        if (!goog.isDef(this.lastHoveredBarItemId_))
+          this.lastHoveredBarItemId_ = id;
 
-      if (el.currBounds && !this.dragging) {
-        var b = el.currBounds;
+        var period = evt['period'];
+        var periodIndex = evt['periodIndex'];
+        if (goog.isDef(periodIndex) && isNaN(this.lastHoveredPeriodIndex_))
+          this.lastHoveredPeriodIndex_ = periodIndex;
 
-        this.getEditPreviewPath_()
-            .clear()
-            .moveTo(b.left, b.top)
-            .lineTo(b.left + b.width, b.top)
-            .lineTo(b.left + b.width, b.top + b.height)
-            .lineTo(b.left, b.top + b.height)
-            .close();
-
-        this.editPreviewPath_.item = dataItem;
-        this.editPreviewPath_.type = el.type;
-
-        if (period) this.editPreviewPath_.period = period;
-
-        if (goog.isDef(periodIndex)) this.editPreviewPath_.periodIndex = periodIndex;
-
-        // ------ Drawing progress ------
-        if (dataItem && (el.type == anychart.enums.TLElementTypes.BASE || el.type == anychart.enums.TLElementTypes.PARENT ||
-            el.type == anychart.enums.TLElementTypes.PROGRESS)) {
-          var progressValue = goog.isDef(dataItem.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)) ?
-              (parseFloat(dataItem.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)) / 100) :
-              anychart.math.round(/** @type {number} */ (dataItem.meta('autoProgress')), 2);
-
-          progressValue = progressValue || 0;
-          var progressLeft = b.left + progressValue * b.width;
-          var top = b.top + b.height;
-
-          this.getEditProgressPath_()
-              .clear()
-              .moveTo(progressLeft, top - anychart.core.ui.Timeline.EDIT_CORNER_HEIGHT)
-              .lineTo(progressLeft + anychart.core.ui.Timeline.EDIT_CORNER_HEIGHT, top)
-              .lineTo(progressLeft + anychart.core.ui.Timeline.EDIT_CORNER_HEIGHT, top + anychart.core.ui.Timeline.EDIT_CORNER_HEIGHT)
-              .lineTo(progressLeft - anychart.core.ui.Timeline.EDIT_CORNER_HEIGHT, top + anychart.core.ui.Timeline.EDIT_CORNER_HEIGHT)
-              .lineTo(progressLeft - anychart.core.ui.Timeline.EDIT_CORNER_HEIGHT, top)
-              .close();
-
-          this.editProgressPath_.bounds = b;
-          this.editProgressPath_.item = dataItem;
-
-        } else {
-          this.getEditProgressPath_().clear();
+        //this condition fixes multiple edit controls appearance on quick mouse move.
+        if (this.lastHoveredBarItemId_ != id && this.lastHoveredPeriodIndex_ != periodIndex) {
+          this.clearEdit_(true);
+          this.lastHoveredBarItemId_ = id;
+          if (goog.isDef(periodIndex))
+            this.lastHoveredPeriodIndex_ = periodIndex;
         }
 
-        var right = b.left + b.width;
+        if (el.currBounds && !this.dragging) {
+          var b = el.currBounds;
 
-        // ------ Drawing any resizeable bar ------
-        if (dataItem && el.type != anychart.enums.TLElementTypes.MILESTONE) {
-          this.getEditRightThumbPath_()
+          this.getEditPreviewPath_()
               .clear()
-              .moveTo(right + 1, b.top)
-              .lineTo(right + 1 - anychart.core.ui.Timeline.EDIT_INTERVAL_WIDTH, b.top)
-              .lineTo(right + 1 - anychart.core.ui.Timeline.EDIT_INTERVAL_WIDTH, b.top + b.height)
-              .lineTo(right + 1, b.top + b.height)
+              .moveTo(b.left, b.top)
+              .lineTo(b.left + b.width, b.top)
+              .lineTo(b.left + b.width, b.top + b.height)
+              .lineTo(b.left, b.top + b.height)
               .close();
 
-          this.getEditLeftThumbPath_()
-              .clear()
-              .moveTo(b.left - 1, b.top)
-              .lineTo(b.left - 1 + anychart.core.ui.Timeline.EDIT_INTERVAL_WIDTH, b.top)
-              .lineTo(b.left - 1 + anychart.core.ui.Timeline.EDIT_INTERVAL_WIDTH, b.top + b.height)
-              .lineTo(b.left - 1, b.top + b.height)
-              .close();
+          this.editPreviewPath_.item = dataItem;
+          this.editPreviewPath_.type = el.type;
 
-          this.editRightThumbPath_.bounds = b;
-          this.editRightThumbPath_.item = dataItem;
-          this.editRightThumbPath_.type = el.type;
-          this.editLeftThumbPath_.bounds = b;
-          this.editLeftThumbPath_.item = dataItem;
-          this.editLeftThumbPath_.type = el.type;
+          if (period) this.editPreviewPath_.period = period;
 
-          if (period) {
-            this.editRightThumbPath_.period = period;
-            this.editLeftThumbPath_.period = period;
-          }
+          if (goog.isDef(periodIndex)) this.editPreviewPath_.periodIndex = periodIndex;
 
-          if (goog.isDef(periodIndex)) {
-            this.editRightThumbPath_.periodIndex = periodIndex;
-            this.editLeftThumbPath_.periodIndex = periodIndex;
-          }
+          // ------ Drawing progress ------
+          if (dataItem && (el.type == anychart.enums.TLElementTypes.BASE || el.type == anychart.enums.TLElementTypes.PARENT ||
+              el.type == anychart.enums.TLElementTypes.PROGRESS)) {
+            var progressValue = goog.isDef(dataItem.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)) ?
+                (parseFloat(dataItem.get(anychart.enums.GanttDataFields.PROGRESS_VALUE)) / 100) :
+                anychart.math.round(/** @type {number} */ (dataItem.meta('autoProgress')), 2);
 
-        } else {
-          this.getEditLeftThumbPath_().clear();
-          this.getEditRightThumbPath_().clear();
-        }
+            progressValue = progressValue || 0;
+            var progressLeft = b.left + progressValue * b.width;
+            var top = b.top + b.height;
 
-        if (dataItem && el.type != anychart.enums.TLElementTypes.BASELINE) {
-          var rTop = b.top + b.height / 2;
-          this.getEditFinishConnectorPath_()
-              .drawAsCircle(right + anychart.core.ui.Timeline.EDIT_CONNECTOR_RADIUS, rTop, anychart.core.ui.Timeline.EDIT_CONNECTOR_RADIUS);
+            this.getEditProgressPath_()
+                .clear()
+                .moveTo(progressLeft, top - anychart.core.ui.Timeline.EDIT_CORNER_HEIGHT)
+                .lineTo(progressLeft + anychart.core.ui.Timeline.EDIT_CORNER_HEIGHT, top)
+                .lineTo(progressLeft + anychart.core.ui.Timeline.EDIT_CORNER_HEIGHT, top + anychart.core.ui.Timeline.EDIT_CORNER_HEIGHT)
+                .lineTo(progressLeft - anychart.core.ui.Timeline.EDIT_CORNER_HEIGHT, top + anychart.core.ui.Timeline.EDIT_CORNER_HEIGHT)
+                .lineTo(progressLeft - anychart.core.ui.Timeline.EDIT_CORNER_HEIGHT, top)
+                .close();
 
-          this.getEditStartConnectorPath_()
-              .drawAsCircle(b.left - anychart.core.ui.Timeline.EDIT_CONNECTOR_RADIUS, rTop, anychart.core.ui.Timeline.EDIT_CONNECTOR_RADIUS);
+            this.editProgressPath_.bounds = b;
+            this.editProgressPath_.item = dataItem;
 
-          this.editFinishConnectorPath_.item = dataItem;
-          this.editFinishConnectorPath_.type = el.type;
-          this.editFinishConnectorPath_.index = evt['hoveredIndex'] + this.controller.startIndex();
-          this.editStartConnectorPath_.item = dataItem;
-          this.editStartConnectorPath_.type = el.type;
-          this.editStartConnectorPath_.index = evt['hoveredIndex'] + this.controller.startIndex();
-
-          if (period) {
-            this.editStartConnectorPath_.period = period;
-            this.editFinishConnectorPath_.period = period;
-          }
-
-          if (goog.isDef(periodIndex)) {
-            this.editStartConnectorPath_.periodIndex = periodIndex;
-            this.editFinishConnectorPath_.periodIndex = periodIndex;
-          }
-        } else {
-          this.getEditFinishConnectorPath_().clear();
-          this.getEditStartConnectorPath_().clear();
-        }
-      } else if (this.draggingConnector && dataItem) {//dataItem here is destination item.
-        var path = this.currentConnectorDragger_.isStart ? this.editStartConnectorPath_ : this.editFinishConnectorPath_;
-
-        var startItem = path.item;
-        var startIndex = path.index;
-
-        if (el.type != anychart.enums.TLElementTypes.BASELINE &&
-            el.type != anychart.enums.TLElementTypes.CONNECTOR) {
-
-          var from, to;
-
-          if (period) {
-            var startPeriod = path.period;
-            var startPeriodIndex = path.periodIndex;
-            from = {'period': startPeriod, 'index': startIndex, 'periodIndex': startPeriodIndex};
-            to = {
-              'period': period,
-              'index': evt['hoveredIndex'] + this.controller.startIndex(),
-              'periodIndex': periodIndex
-            };
           } else {
-            from = {'item': startItem, 'index': startIndex};
-            to = {'item': dataItem, 'index': evt['hoveredIndex'] + this.controller.startIndex()};
+            this.getEditProgressPath_().clear();
           }
 
-          var originalEvent = evt['originalEvent'];
-          var left = originalEvent.clientX - this.container().getStage().getClientPosition().x;
-          var elBounds = el.currBounds;
-          var dropRatio = (left - elBounds.left) / elBounds.width;
-          var startStart = this.currentConnectorDragger_.isStart;
-          var dropStart = dropRatio < .5;
-          var connType;
-          if (startStart) {
-            connType = dropStart ? anychart.enums.ConnectorType.START_START : anychart.enums.ConnectorType.START_FINISH;
+          var right = b.left + b.width;
+
+          // ------ Drawing any resizeable bar ------
+          if (dataItem && el.type != anychart.enums.TLElementTypes.MILESTONE) {
+            this.getEditRightThumbPath_()
+                .clear()
+                .moveTo(right + 1, b.top)
+                .lineTo(right + 1 - this.editIntervalWidth_, b.top)
+                .lineTo(right + 1 - this.editIntervalWidth_, b.top + b.height)
+                .lineTo(right + 1, b.top + b.height)
+                .close();
+
+            this.getEditLeftThumbPath_()
+                .clear()
+                .moveTo(b.left - 1, b.top)
+                .lineTo(b.left - 1 + this.editIntervalWidth_, b.top)
+                .lineTo(b.left - 1 + this.editIntervalWidth_, b.top + b.height)
+                .lineTo(b.left - 1, b.top + b.height)
+                .close();
+
+            this.editRightThumbPath_.bounds = b;
+            this.editRightThumbPath_.item = dataItem;
+            this.editRightThumbPath_.type = el.type;
+            this.editLeftThumbPath_.bounds = b;
+            this.editLeftThumbPath_.item = dataItem;
+            this.editLeftThumbPath_.type = el.type;
+
+            if (period) {
+              this.editRightThumbPath_.period = period;
+              this.editLeftThumbPath_.period = period;
+            }
+
+            if (goog.isDef(periodIndex)) {
+              this.editRightThumbPath_.periodIndex = periodIndex;
+              this.editLeftThumbPath_.periodIndex = periodIndex;
+            }
+
           } else {
-            connType = dropStart ? anychart.enums.ConnectorType.FINISH_START : anychart.enums.ConnectorType.FINISH_FINISH;
+            this.getEditLeftThumbPath_().clear();
+            this.getEditRightThumbPath_().clear();
           }
 
+          if (dataItem && el.type != anychart.enums.TLElementTypes.BASELINE) {
+            var rTop = b.top + b.height / 2;
+            var finishDrawer = anychart.utils.getMarkerDrawer(this.editFinishConnectorMarkerType_);
+            var finishSize = this.editFinishConnectorMarkerSize_ / 2;
+            finishDrawer.call(null,
+                /** @type {!acgraph.vector.Path} */ (this.getEditFinishConnectorPath_()),
+                right + finishSize + this.editFinishConnectorMarkerHorizontalOffset_,
+                rTop + this.editFinishConnectorMarkerVerticalOffset_,
+                finishSize);
 
-          this.getEditConnectorPreviewPath_().clear();
-          this.connectItems_(from, to, connType, void 0, this.editConnectorPreviewPath_);
-        } else {
-          this.drawConnectorPreview_(evt['originalEvent']);
+            var startDrawer = anychart.utils.getMarkerDrawer(this.editStartConnectorMarkerType_);
+            var startSize = this.editStartConnectorMarkerSize_ / 2;
+            startDrawer.call(null,
+                /** @type {!acgraph.vector.Path} */ (this.getEditStartConnectorPath_()),
+                b.left - startSize + this.editStartConnectorMarkerHorizontalOffset_,
+                rTop + this.editStartConnectorMarkerVerticalOffset_,
+                startSize);
+
+            this.editFinishConnectorPath_.item = dataItem;
+            this.editFinishConnectorPath_.type = el.type;
+            this.editFinishConnectorPath_.index = evt['hoveredIndex'] + this.controller.startIndex();
+            this.editStartConnectorPath_.item = dataItem;
+            this.editStartConnectorPath_.type = el.type;
+            this.editStartConnectorPath_.index = evt['hoveredIndex'] + this.controller.startIndex();
+
+            if (period) {
+              this.editStartConnectorPath_.period = period;
+              this.editFinishConnectorPath_.period = period;
+            }
+
+            if (goog.isDef(periodIndex)) {
+              this.editStartConnectorPath_.periodIndex = periodIndex;
+              this.editFinishConnectorPath_.periodIndex = periodIndex;
+            }
+          } else {
+            this.getEditFinishConnectorPath_().clear();
+            this.getEditStartConnectorPath_().clear();
+          }
+        } else if (this.draggingConnector && dataItem) {//dataItem here is destination item.
+          var path = this.currentConnectorDragger_.isStart ? this.editStartConnectorPath_ : this.editFinishConnectorPath_;
+
+          var startItem = path.item;
+          var startIndex = path.index;
+
+          if (el.type != anychart.enums.TLElementTypes.BASELINE &&
+              el.type != anychart.enums.TLElementTypes.CONNECTOR) {
+
+            var from, to;
+
+            if (period) {
+              var startPeriod = path.period;
+              var startPeriodIndex = path.periodIndex;
+              from = {'item': startItem, 'period': startPeriod, 'index': startIndex, 'periodIndex': startPeriodIndex};
+              to = {
+                'item': dataItem,
+                'period': period,
+                'index': evt['hoveredIndex'] + this.controller.startIndex(),
+                'periodIndex': periodIndex
+              };
+            } else {
+              from = {'item': startItem, 'index': startIndex};
+              to = {'item': dataItem, 'index': evt['hoveredIndex'] + this.controller.startIndex()};
+            }
+
+            var originalEvent = evt['originalEvent'];
+            var left = originalEvent.clientX - this.container().getStage().getClientPosition().x;
+            var elBounds = el.currBounds;
+            var dropRatio = (left - elBounds.left) / elBounds.width;
+            var startStart = this.currentConnectorDragger_.isStart;
+            var dropStart = dropRatio < .5;
+            var connType;
+            if (startStart) {
+              connType = dropStart ? anychart.enums.ConnectorType.START_START : anychart.enums.ConnectorType.START_FINISH;
+            } else {
+              connType = dropStart ? anychart.enums.ConnectorType.FINISH_START : anychart.enums.ConnectorType.FINISH_FINISH;
+            }
+
+
+            this.getEditConnectorPreviewPath_().clear();
+            this.connectItems_(from, to, connType, void 0, this.editConnectorPreviewPath_);
+          } else {
+            this.drawConnectorPreview_(orig);
+          }
         }
+      } else if (domTarget != this.getEditPreviewPath_() &&
+          domTarget != this.getEditProgressPath_() &&
+          domTarget != this.getEditRightThumbPath_() &&
+          domTarget != this.getEditLeftThumbPath_() &&
+          domTarget != this.getEditFinishConnectorPath_() &&
+          domTarget != this.getEditStartConnectorPath_() && !this.dragging) {
+        this.clearEdit_(true);
+      } else if (this.draggingConnector) {
+        this.drawConnectorPreview_(orig);
       }
-    } else if (evt['originalEvent']['domTarget'] != this.getEditPreviewPath_() &&
-        evt['originalEvent']['domTarget'] != this.getEditProgressPath_() &&
-        evt['originalEvent']['domTarget'] != this.getEditRightThumbPath_() &&
-        evt['originalEvent']['domTarget'] != this.getEditLeftThumbPath_() &&
-        evt['originalEvent']['domTarget'] != this.getEditFinishConnectorPath_() &&
-        evt['originalEvent']['domTarget'] != this.getEditStartConnectorPath_() && !this.dragging) {
-      this.clearEdit_();
-    } else if (this.draggingConnector) {
-      this.drawConnectorPreview_(evt['originalEvent']);
+    }
+
+
+    var connEvent = this.patchConnectorEvent_(evt);
+    if (connEvent) {
+      this.interactivityHandler.dispatchEvent(connEvent);
+      this.hoveredConnector_ = domTarget.meta;
+    } else if (this.hoveredConnector_) {
+      connEvent = this.patchConnectorMouseOutEvent_(evt);
+      this.interactivityHandler.dispatchEvent(connEvent);
+      this.hoveredConnector_ = null;
     }
   }
-
 };
 
 
@@ -2663,6 +3012,19 @@ anychart.core.ui.Timeline.prototype.addConnector = function(startItem, targetIte
 /**
  * @inheritDoc
  */
+anychart.core.ui.Timeline.prototype.addMouseDown = function(evt) {
+  if (evt) {
+    var connEvent = this.patchConnectorEvent_(evt);
+    if (connEvent) {
+      this.interactivityHandler.dispatchEvent(connEvent);
+    }
+  }
+};
+
+
+/**
+ * @inheritDoc
+ */
 anychart.core.ui.Timeline.prototype.addMouseUp = function(evt) {
   if (this.editable && this.draggingConnector) {
     if (evt) {
@@ -2694,6 +3056,12 @@ anychart.core.ui.Timeline.prototype.addMouseUp = function(evt) {
     }
     this.draggingConnector = false;
   }
+
+  var connEvent = this.patchConnectorEvent_(evt);
+  if (connEvent) {
+    this.interactivityHandler.dispatchEvent(connEvent);
+  }
+
   this.currentConnectorDragger_ = null;
   this.interactive = true;
 };
@@ -2719,12 +3087,53 @@ anychart.core.ui.Timeline.prototype.mouseOutMove = function(e) {
 
 
 /**
+ * Handles row collapse/expand.
+ * @param {Object} event - Dispatched event object.
+ * @override
+ */
+anychart.core.ui.Timeline.prototype.rowExpandCollapse = function(event) {
+  if (!this.checkConnectorDblClick(event)) {
+    var item = event['item'];
+    if (item && item.numChildren()) {
+      var value = !item.meta(anychart.enums.GanttDataFields.COLLAPSED);
+      var evtObj = {
+        'type': anychart.enums.EventType.ROW_COLLAPSE_EXPAND,
+        'item': item,
+        'collapsed': value
+      };
+
+      if (this.interactivityHandler.dispatchEvent(evtObj))
+        item.meta(anychart.enums.GanttDataFields.COLLAPSED, value);
+    }
+  }
+};
+
+
+/**
+ * Checks connector dbl click.
+ * Used to double click the connector instead the row.
+ * @param {Object} event - Dispatched event object.
+ * @return {boolean} - Whether to dispatch event.
+ */
+anychart.core.ui.Timeline.prototype.checkConnectorDblClick = function(event) {
+  var connEvent = this.patchConnectorEvent_(event);
+  if (connEvent) {
+    this.clearEdit_();
+    this.interactivityHandler.dispatchEvent(connEvent);
+    return true;
+  }
+  return false;
+};
+
+
+/**
  * Handles row selection.
  * @param {Object} event - Dispatched event object.
  * @override
  */
 anychart.core.ui.Timeline.prototype.rowSelect = function(event) {
   if (!this.checkRowSelection(event)) {
+    this.connectorUnselect(event);
     var item = event['item'];
     var period = event['period'];
     var periodId = period ? period[anychart.enums.GanttDataFields.ID] : void 0;
@@ -2733,6 +3142,7 @@ anychart.core.ui.Timeline.prototype.rowSelect = function(event) {
       eventObj['type'] = anychart.enums.EventType.ROW_SELECT;
       (/** @type {anychart.core.ui.IInteractiveGrid} */ (this.interactivityHandler)).dispatchEvent(eventObj);
     }
+    this.selectedConnectorData_ = null;
   }
 };
 
@@ -2747,11 +3157,19 @@ anychart.core.ui.Timeline.prototype.checkRowSelection = function(event) {
   var domTarget = (event && event['originalEvent']) ? event['originalEvent']['domTarget'] : null;
   if (domTarget && domTarget.type == anychart.enums.TLElementTypes.CONNECTOR) {
     this.clearEdit_();
-    //Pretty light comparison (8 or less iterations).
-    if (!this.selectedConnectorData_ || (goog.isObject(this.selectedConnectorData_) && !goog.object.equals(this.selectedConnectorData_, domTarget.meta))) {
-      this.interactivityHandler.rowUnselect(event['originalEvent']);
-      this.selectedConnectorData_ = goog.object.clone(domTarget.meta); //Pretty light operation (copying 4 or less primitive values).
-      this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
+    var connClickEvent = this.patchConnectorEvent_(event);
+    if (this.interactivityHandler.dispatchEvent(connClickEvent)) {
+      var connSelectEvent = this.patchConnectorEvent_(event);
+      connSelectEvent.type = anychart.enums.EventType.CONNECTOR_SELECT;
+
+      if (this.selectedConnectorData_)
+        this.connectorUnselect(event['originalEvent']);
+
+      if (this.interactivityHandler.dispatchEvent(connSelectEvent)) {
+        this.interactivityHandler.rowUnselect(event['originalEvent']);
+        this.selectedConnectorData_ = domTarget.meta;
+        this.invalidate(anychart.ConsistencyState.BASE_GRID_REDRAW, anychart.Signal.NEEDS_REDRAW);
+      }
     }
     return true;
   }
@@ -2766,6 +3184,19 @@ anychart.core.ui.Timeline.prototype.rowUnselect = function(event) {
   if (this.selectedItem || goog.isDefAndNotNull(this.selectedPeriodId_)) {
     this.selectedPeriodId_ = void 0;
     anychart.core.ui.Timeline.base(this, 'rowUnselect', event);
+  }
+};
+
+
+/**
+ * Connector unselect handler.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.core.ui.Timeline.prototype.connectorUnselect = function(event) {
+  if (this.selectedConnectorData_) {
+    var connEvent = this.getConnectorInteractivityEvent_(/** @type {anychart.core.MouseEvent} */ (event)); //empty event.
+    connEvent.type = anychart.enums.EventType.CONNECTOR_SELECT;
+    this.interactivityHandler.dispatchEvent(connEvent);
   }
 };
 
@@ -3567,6 +3998,9 @@ anychart.core.ui.Timeline.prototype.connectItems_ = function(from, to, opt_connT
   var toIndex = to['index'];
   var fromPeriodIndex = from['periodIndex'];
   var toPeriodIndex = to['periodIndex'];
+  var visibleItems = this.controller.getVisibleItems();
+  var fromItem = visibleItems[fromIndex];
+  var toItem = visibleItems[toIndex];
 
   var fromBounds = this.getItemBounds_(fromIndex, from['period'], from['periodIndex']);
   var toBounds = this.getItemBounds_(toIndex, to['period'], to['periodIndex']);
@@ -3709,22 +4143,25 @@ anychart.core.ui.Timeline.prototype.connectItems_ = function(from, to, opt_connT
         }
     }
 
-    var editConnectorHighlight = false;
-    var meta;
-    if (this.editable) {
-      meta = {
-        'fromItemIndex': fromIndex,
-        'toItemIndex': toIndex,
-        'connType': opt_connType
-      };
+    var meta = {
+      'fromItemIndex': fromIndex,
+      'toItemIndex': toIndex,
+      'connType': opt_connType,
+      'fromItem': fromItem,
+      'toItem': toItem
+    };
 
-      if (this.controller.isResources()) {
-        meta['fromPeriodIndex'] = fromPeriodIndex;
-        meta['toPeriodIndex'] = toPeriodIndex;
-        if (opt_connType) meta['connType'] = opt_connType;
+    var connectorHighlight = !goog.isNull(this.selectedConnectorData_) &&
+        this.selectedConnectorData_['fromItemIndex'] == meta['fromItemIndex'] &&
+        this.selectedConnectorData_['toItemIndex'] == meta['toItemIndex'] &&
+        this.selectedConnectorData_['connType'] == meta['connType'];
+
+    if (this.controller.isResources()) {
+      meta['fromPeriodIndex'] = fromPeriodIndex;
+      meta['toPeriodIndex'] = toPeriodIndex;
+      if (this.selectedConnectorData_) {
+        connectorHighlight &= (this.selectedConnectorData_['fromPeriodIndex'] == meta['fromPeriodIndex'] && this.selectedConnectorData_['toPeriodIndex'] == meta['toPeriodIndex']);
       }
-
-      editConnectorHighlight = (goog.isObject(this.selectedConnectorData_) && goog.object.equals(this.selectedConnectorData_, meta));
     }
 
     if (path && !drawPreview) {
@@ -3733,9 +4170,9 @@ anychart.core.ui.Timeline.prototype.connectItems_ = function(from, to, opt_connT
       path.type = anychart.enums.TLElementTypes.CONNECTOR;
       path.currBounds = null;
       path.cursor(this.editable ? acgraph.vector.Cursor.POINTER : acgraph.vector.Cursor.DEFAULT);
-
-      path.meta = meta; //Yes, it cam become void 0.
-      path.stroke(editConnectorHighlight ? this.selectedConnectorStroke_ : /** @type {acgraph.vector.Stroke} */ (stroke));
+      meta['path'] = path;
+      path.meta = meta;
+      path.stroke(connectorHighlight ? this.selectedConnectorStroke_ : /** @type {acgraph.vector.Stroke} */ (stroke));
     }
     if (arrow && !drawPreview) {
       arrow.fill(/** @type {acgraph.vector.Fill} */ (fill)).stroke(/** @type {acgraph.vector.Stroke} */ (stroke));
@@ -3743,9 +4180,9 @@ anychart.core.ui.Timeline.prototype.connectItems_ = function(from, to, opt_connT
       arrow.type = anychart.enums.TLElementTypes.CONNECTOR;
       arrow.currBounds = null;
       arrow.cursor(this.editable ? acgraph.vector.Cursor.POINTER : acgraph.vector.Cursor.DEFAULT);
-
-      arrow.meta = meta; //Yes, it cam become void 0.
-      arrow.stroke(editConnectorHighlight ? this.selectedConnectorStroke_ : /** @type {acgraph.vector.Stroke} */ (stroke));
+      meta['arrow'] = arrow;
+      arrow.meta = meta;
+      arrow.stroke(connectorHighlight ? this.selectedConnectorStroke_ : /** @type {acgraph.vector.Stroke} */ (stroke));
     }
   }
 };
@@ -4336,6 +4773,16 @@ anychart.core.ui.Timeline.prototype.serialize = function() {
   json['editConnectorThumbFill'] = anychart.color.serialize(this.editConnectorThumbFill_);
   json['editConnectorThumbStroke'] = anychart.color.serialize(this.editConnectorThumbStroke_);
 
+  json['editStartConnectorMarkerType'] = this.editStartConnectorMarkerType_;
+  json['editStartConnectorMarkerSize'] = this.editStartConnectorMarkerSize_;
+  json['editStartConnectorMarkerHorizontalOffset'] = this.editStartConnectorMarkerHorizontalOffset_;
+  json['editStartConnectorMarkerVerticalOffset'] = this.editStartConnectorMarkerVerticalOffset_;
+  json['editFinishConnectorMarkerType'] = this.editFinishConnectorMarkerType_;
+  json['editFinishConnectorMarkerSize'] = this.editFinishConnectorMarkerSize_;
+  json['editFinishConnectorMarkerHorizontalOffset'] = this.editFinishConnectorMarkerHorizontalOffset_;
+  json['editFinishConnectorMarkerVerticalOffset'] = this.editFinishConnectorMarkerVerticalOffset_;
+  json['editIntervalWidth'] = this.editIntervalWidth_;
+
   var i = 0;
   var lineMarkers = [];
   for (i = 0; i < this.lineMarkers_.length; i++) {
@@ -4414,6 +4861,16 @@ anychart.core.ui.Timeline.prototype.setupByJSON = function(config, opt_default) 
   this.editIntervalThumbStroke(config['editIntervalThumbStroke']);
   this.editConnectorThumbFill(config['editConnectorThumbFill']);
   this.editConnectorThumbStroke(config['editConnectorThumbStroke']);
+
+  this.editStartConnectorMarkerType(config['editStartConnectorMarkerType']);
+  this.editStartConnectorMarkerSize(config['editStartConnectorMarkerSize']);
+  this.editStartConnectorMarkerHorizontalOffset(config['editStartConnectorMarkerHorizontalOffset']);
+  this.editStartConnectorMarkerVerticalOffset(config['editStartConnectorMarkerVerticalOffset']);
+  this.editFinishConnectorMarkerType(config['editFinishConnectorMarkerType']);
+  this.editFinishConnectorMarkerSize(config['editFinishConnectorMarkerSize']);
+  this.editFinishConnectorMarkerHorizontalOffset(config['editFinishConnectorMarkerHorizontalOffset']);
+  this.editFinishConnectorMarkerVerticalOffset(config['editFinishConnectorMarkerVerticalOffset']);
+  this.editIntervalWidth(config['editIntervalWidth']);
 
   if ('defaultLineMarkerSettings' in config)
     this.defaultLineMarkerSettings(config['defaultLineMarkerSettings']);
@@ -4804,6 +5261,16 @@ anychart.core.ui.Timeline.ConnectorDragger.prototype.computeInitialPosition = fu
   proto['editStructurePreviewFill'] = proto.editStructurePreviewFill;
   proto['editStructurePreviewStroke'] = proto.editStructurePreviewStroke;
   proto['editStructurePreviewDashStroke'] = proto.editStructurePreviewDashStroke;
+
+  proto['editStartConnectorMarkerSize'] = proto.editStartConnectorMarkerSize;
+  proto['editStartConnectorMarkerType'] = proto.editStartConnectorMarkerType;
+  proto['editStartConnectorMarkerHorizontalOffset'] = proto.editStartConnectorMarkerHorizontalOffset;
+  proto['editStartConnectorMarkerVerticalOffset'] = proto.editStartConnectorMarkerVerticalOffset;
+  proto['editFinishConnectorMarkerSize'] = proto.editFinishConnectorMarkerSize;
+  proto['editFinishConnectorMarkerType'] = proto.editFinishConnectorMarkerType;
+  proto['editFinishConnectorMarkerHorizontalOffset'] = proto.editFinishConnectorMarkerHorizontalOffset;
+  proto['editFinishConnectorMarkerVerticalOffset'] = proto.editFinishConnectorMarkerVerticalOffset;
+  proto['editIntervalWidth'] = proto.editIntervalWidth;
 
   proto['textMarker'] = proto.textMarker;
   proto['lineMarker'] = proto.lineMarker;

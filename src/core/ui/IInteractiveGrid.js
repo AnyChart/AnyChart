@@ -76,6 +76,13 @@ anychart.core.ui.IInteractiveGrid.prototype.rowUnselect = function(event) {};
 
 
 /**
+ * Row expand/collapse handler.
+ * @param {Object} event - Dispatched event object.
+ */
+anychart.core.ui.IInteractiveGrid.prototype.rowExpandCollapse = function(event) {};
+
+
+/**
  * Enables/disables live edit mode.
  * @param {boolean=} opt_value - Value to be set.
  * @return {anychart.core.ui.IInteractiveGrid|boolean} - Itself for method chaining or current value.

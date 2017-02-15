@@ -3812,7 +3812,16 @@
           }
         },
         "horizontalScrollBar": {"$ref": "#/definitions/anychart.core.ui.ScrollBar"},
-        "verticalScrollBar": {"$ref": "#/definitions/anychart.core.ui.ScrollBar"}
+        "verticalScrollBar": {"$ref": "#/definitions/anychart.core.ui.ScrollBar"},
+        "editStartConnectorMarkerType": {"type": "string"},
+        "editFinishConnectorMarkerType": {"type": "string"},
+        "editStartConnectorMarkerSize": {"type": "number"},
+        "editFinishConnectorMarkerSize": {"type": "number"},
+        "editStartConnectorMarkerHorizontalOffset": {"type": "number"},
+        "editFinishConnectorMarkerHorizontalOffset": {"type": "number"},
+        "editStartConnectorMarkerVerticalOffset": {"type": "number"},
+        "editFinishConnectorMarkerVerticalOffset": {"type": "number"},
+        "editIntervalWidth": {"type": "number"}
       }
     },
 

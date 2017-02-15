@@ -627,10 +627,24 @@ anychart.core.ui.BaseGrid.prototype.addMouseMoveAndOver = goog.nullFunction;
 
 
 /**
+ * Additional actions for inherited classes on mouse down.
+ * @param {?Object} evt - Event object.
+ */
+anychart.core.ui.BaseGrid.prototype.addMouseDown = goog.nullFunction;
+
+
+/**
  * Additional actions for inherited classes on mouse up.
  * @param {?Object} evt - Event object.
  */
 anychart.core.ui.BaseGrid.prototype.addMouseUp = goog.nullFunction;
+
+
+/**
+ * Additional actions for inherited classes on mouse double click.
+ * @param {?Object} evt - Event object.
+ */
+anychart.core.ui.BaseGrid.prototype.addMouseDblClick = goog.nullFunction;
 
 
 /**
@@ -678,11 +692,10 @@ anychart.core.ui.BaseGrid.prototype.handleAll_ = function(event) {
  * @private
  */
 anychart.core.ui.BaseGrid.prototype.handleDblMouseClick_ = function(event) {
+  var evt = this.getInteractivityEvent(event);
+  this.addMouseDblClick(evt);
   if (this.interactive) {
-    var evt = this.getInteractivityEvent(event);
-    if (evt && this.interactivityHandler.dispatchEvent(evt)) {
-      this.interactivityHandler.rowDblClick(evt);
-    }
+    this.interactivityHandler.rowDblClick(evt);
   } else {
     this.interactive = true;
   }
@@ -710,9 +723,10 @@ anychart.core.ui.BaseGrid.prototype.handleMouseOut_ = function(event) {
  * @private
  */
 anychart.core.ui.BaseGrid.prototype.handleMouseDown_ = function(event) {
+  var evt = this.getInteractivityEvent(event);
+  this.addMouseDown(evt);
   if (this.interactive) {
     event.preventDefault();
-    var evt = this.getInteractivityEvent(event);
     if (evt && this.interactivityHandler.dispatchEvent(evt)) {
       this.interactivityHandler.rowMouseDown(evt);
     }
@@ -750,6 +764,25 @@ anychart.core.ui.BaseGrid.prototype.rowClick = function(event) {
 
 /** @inheritDoc */
 anychart.core.ui.BaseGrid.prototype.rowDblClick = function(event) {
+  this.rowExpandCollapse(event);
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.BaseGrid.prototype.rowSelect = function(event) {
+  if (this.interactive) {
+    var item = event['item'];
+    if (this.selectRow(item)) {
+      var eventObj = goog.object.clone(event);
+      eventObj['type'] = anychart.enums.EventType.ROW_SELECT;
+      this.interactivityHandler.dispatchEvent(eventObj);
+    }
+  }
+};
+
+
+/** @inheritDoc */
+anychart.core.ui.BaseGrid.prototype.rowExpandCollapse = function(event) {
   var item = event['item'];
   if (item && item.numChildren()) {
     var value = !item.meta(anychart.enums.GanttDataFields.COLLAPSED);
@@ -803,34 +836,21 @@ anychart.core.ui.BaseGrid.prototype.rowMouseDown = goog.nullFunction;
   Illustration for this method:
   (Grid is rectangle in center)
 
-    offsetX < 0  |  !offsetX  |  offsetX > 0
+    offsetX < 0  |  !offsetX      |  offsetX > 0
     offsetY < 0  |  offsetY < 0   |  offsetY < 0
 
     ------------ +----------------+ --------------
                  |                |
-    offsetX < 0  |  !offsetX  |  offsetX > 0
-    !offsetY |  !offsetX  |  !offsetY
+    offsetX < 0  |  !offsetX      |  offsetX > 0
+    !offsetY     |  !offsetX      |  !offsetY
                  |                |
     ------------ +----------------+ --------------
 
-    offsetX < 0  |  !offsetX  |  offsetX > 0
+    offsetX < 0  |  !offsetX      |  offsetX > 0
     offsetY > 0  |  offsetY > 0   |  offsetY > 0
 
  */
 anychart.core.ui.BaseGrid.prototype.mouseOutMove = goog.nullFunction;
-
-
-/** @inheritDoc */
-anychart.core.ui.BaseGrid.prototype.rowSelect = function(event) {
-  if (this.interactive) {
-    var item = event['item'];
-    if (this.selectRow(item)) {
-      var eventObj = goog.object.clone(event);
-      eventObj['type'] = anychart.enums.EventType.ROW_SELECT;
-      this.interactivityHandler.dispatchEvent(eventObj);
-    }
-  }
-};
 
 
 /**
