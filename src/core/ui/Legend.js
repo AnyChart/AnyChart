@@ -2377,8 +2377,6 @@ anychart.core.ui.Legend.prototype.serialize = function() {
 anychart.core.ui.Legend.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.Legend.base(this, 'setupByJSON', config, opt_default);
 
-  debugger;
-
   if ('title' in config)
     this.title(config['title']);
 
