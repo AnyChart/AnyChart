@@ -13,6 +13,13 @@ goog.require('anychart.scales.Base');
 anychart.scales.ScatterBase = function() {
   anychart.scales.ScatterBase.base(this, 'constructor');
   /**
+   * Threshold ticks count.
+   * @type {number}
+   * @private
+   */
+  this.maxTicksCount_ = 1000;
+
+  /**
    * Scale input domain minimum.
    * @type {number}
    * @protected
@@ -97,6 +104,25 @@ anychart.scales.ScatterBase = function() {
   this.stickToZeroFlag = false;
 };
 goog.inherits(anychart.scales.ScatterBase, anychart.scales.Base);
+
+
+/**
+ * Max ticks count for interval-mode ticks calculation.
+ * @param {number=} opt_value
+ * @return {number|anychart.scales.ScatterBase}
+ */
+anychart.scales.ScatterBase.prototype.maxTicksCount = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = anychart.utils.normalizeToNaturalNumber(opt_value, 1000, false);
+    if (this.maxTicksCount_ != val) {
+      this.maxTicksCount_ = val;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+    }
+    return this;
+  }
+  return this.maxTicksCount_;
+};
 
 
 /**
@@ -420,6 +446,7 @@ anychart.scales.ScatterBase.prototype.serialize = function() {
   json['maximumGap'] = this.maximumGap();
   json['softMinimum'] = isNaN(this.softMin) ? null : this.softMin;
   json['softMaximum'] = isNaN(this.softMax) ? null : this.softMax;
+  json['maxTicksCount'] = this.maxTicksCount_;
   return json;
 };
 
@@ -433,6 +460,7 @@ anychart.scales.ScatterBase.prototype.setupByJSON = function(config, opt_default
   this.softMaximum(config['softMaximum']);
   this.minimum(config['minimum']);
   this.maximum(config['maximum']);
+  this.maxTicksCount(config['maxTicksCount']);
 };
 
 
@@ -463,6 +491,7 @@ anychart.scales.ScatterBase.fromString = function(type, opt_canReturnNull) {
 //exports
 (function() {
   var proto = anychart.scales.ScatterBase.prototype;
+  proto['maxTicksCount'] = proto.maxTicksCount;
   proto['minimum'] = proto.minimum;//doc|ex
   proto['maximum'] = proto.maximum;//doc|ex
   proto['extendDataRange'] = proto.extendDataRange;//doc|need-ex

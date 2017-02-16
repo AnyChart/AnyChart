@@ -96,7 +96,7 @@ anychart.scales.ScatterTicks.prototype.interval = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.interval_ != opt_value) {
       opt_value = anychart.utils.toNumber(opt_value);
-      if (opt_value < 0) {
+      if (opt_value <= 0) {
         this.minCount_ = 4;
         this.maxCount_ = 6;
         this.interval_ = NaN;
@@ -285,10 +285,27 @@ anychart.scales.ScatterTicks.prototype.setupAsMinor = function(values, opt_logBa
       this.autoTicks_ = [];
     if (values.length < 2) return;
     opt_logBase = opt_logBase || 10;
-    var adder = (this.mode_ == anychart.enums.ScatterTicksMode.LOGARITHMIC) ?
+    var logMode = (this.mode_ == anychart.enums.ScatterTicksMode.LOGARITHMIC);
+    var adder = logMode ?
         this.addMinorLogarithmicTicksPortion_ :
         this.addMinorLinearTicksPortion_;
     var min, max;
+    var end = values.length - 1;
+    var backupInterval = this.interval_;
+    var backupMinCount = this.minCount_;
+    if (!isNaN(this.interval_)) {
+      max = values[end];
+      min = values[0];
+      if (logMode) {
+        min = anychart.math.log(min, opt_logBase);
+        max = anychart.math.log(max, opt_logBase);
+      }
+      if ((max - min) / this.interval_ > this.scale_.maxTicksCount()) {
+        anychart.core.reporting.warning(anychart.enums.WarningCode.TOO_MANY_TICKS, null, [max - min, this.interval_]);
+        this.interval_ = NaN;
+        this.minCount_ = 4;
+      }
+    }
     var start;
     if (goog.isDef(opt_majorDesiredMin)) {
       min = values[0];
@@ -297,7 +314,6 @@ anychart.scales.ScatterTicks.prototype.setupAsMinor = function(values, opt_logBa
       start = 1;
     } else
       start = 0;
-    var end = values.length - 1;
     if (goog.isDef(opt_majorDesiredMax))
       end--;
     for (var i = start; i <= end - 1; i++) {
@@ -310,6 +326,8 @@ anychart.scales.ScatterTicks.prototype.setupAsMinor = function(values, opt_logBa
       max = values[end + 1];
       adder.call(this, min, max, min, opt_majorDesiredMax, opt_logBase);
     }
+    this.interval_ = backupInterval;
+    this.minCount_ = backupMinCount;
   }
 };
 
@@ -336,9 +354,17 @@ anychart.scales.ScatterTicks.prototype.setupLinear_ = function(min, max, opt_can
   } else {
     var ticks = [];
     var interval = this.interval_;
+    var minCount = this.minCount_;
+    var maxCount = this.maxCount_;
+    if (!isNaN(interval) && ((max - min) / interval) > /** @type {number} */(this.scale_.maxTicksCount())) {
+      anychart.core.reporting.warning(anychart.enums.WarningCode.TOO_MANY_TICKS, null, [max - min, interval]);
+      interval = NaN;
+      minCount = 4;
+      maxCount = 6;
+    }
     if (isNaN(interval)) {
       var currentInterval = NaN, currentDiff = NaN;
-      for (var q = this.minCount_; q <= this.maxCount_; q++) {
+      for (var q = minCount; q <= maxCount; q++) {
         var count = q - 1; // it should be valid here
         var range = max - min;
         currentInterval = range / count;
@@ -428,11 +454,19 @@ anychart.scales.ScatterTicks.prototype.setupLogarithmic_ = function(min, max, lo
     max = anychart.math.log(max, logBase);
     var ticks = [];
     var interval = this.interval_;
+    var minCount = this.minCount_;
+    var maxCount = this.maxCount_;
+    if (!isNaN(interval) && ((max - min) / interval) > /** @type {number} */(this.scale_.maxTicksCount())) {
+      anychart.core.reporting.warning(anychart.enums.WarningCode.TOO_MANY_TICKS, null, [max - min, interval]);
+      interval = NaN;
+      minCount = 4;
+      maxCount = 6;
+    }
     if (isNaN(interval)) {
       var currentInterval = NaN, currentDiff = NaN;
-      for (var q = this.minCount_; q <= this.maxCount_; q++) {
+      for (var q = minCount; q <= maxCount; q++) {
         // calculating the interval here
-        var count = this.minCount_ - 1; // it should be valid here
+        var count = q - 1; // it should be valid here
         var range = max - min;
         currentInterval = range / count;
         // Here we can add other interval rounding options and choose the best

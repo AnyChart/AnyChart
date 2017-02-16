@@ -13,6 +13,13 @@ goog.require('anychart.scales.GeoTicks');
 anychart.scales.Geo = function() {
   anychart.scales.Geo.base(this, 'constructor');
   /**
+   * Threshold ticks count.
+   * @type {number}
+   * @private
+   */
+  this.maxTicksCount_ = 1000;
+
+  /**
    * Scale input domain minimum.
    * @type {number}
    * @protected
@@ -500,6 +507,25 @@ anychart.scales.Geo.prototype.createTicks = function() {
 
 //endregion
 //region --- Scale settings
+/**
+ * Max ticks count for interval-mode ticks calculation.
+ * @param {number=} opt_value
+ * @return {number|anychart.scales.Geo}
+ */
+anychart.scales.Geo.prototype.maxTicksCount = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = anychart.utils.normalizeToNaturalNumber(opt_value, 1000, false);
+    if (this.maxTicksCount_ != val) {
+      this.maxTicksCount_ = val;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+    }
+    return this;
+  }
+  return this.maxTicksCount_;
+};
+
+
 /**
  * Precision.
  * @param {(number|Array.<number>)=} opt_precisionOrXPrecision .
@@ -1546,6 +1572,7 @@ anychart.scales.Geo.prototype.serialize = function() {
   json['xMinorTicks'] = this.xMinorTicks().serialize();
   json['yTicks'] = this.yTicks().serialize();
   json['yMinorTicks'] = this.yMinorTicks().serialize();
+  json['maxTicksCount'] = this.maxTicksCount_;
   return json;
 };
 
@@ -1565,6 +1592,7 @@ anychart.scales.Geo.prototype.setupByJSON = function(config, opt_default) {
   this.xMinorTicks(config['xMinorTicks']);
   this.yTicks(config['yTicks']);
   this.yMinorTicks(config['yMinorTicks']);
+  this.maxTicksCount(config['maxTicksCount']);
 };
 
 
@@ -1573,6 +1601,7 @@ anychart.scales.Geo.prototype.setupByJSON = function(config, opt_default) {
 //exports
 (function() {
   var proto = anychart.scales.Geo.prototype;
+  proto['maxTicksCount'] = proto.maxTicksCount;
   proto['gap'] = proto.gap;
   proto['xTicks'] = proto.xTicks;
   proto['xMinorTicks'] = proto.xMinorTicks;

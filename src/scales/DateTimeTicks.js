@@ -299,12 +299,22 @@ anychart.scales.DateTimeTicks.prototype.setupAsMinor = function(min, max, adjust
   this.autoTicks_ = null;
   if (!this.explicit_) {
     var ticks = [];
-    var interval = this.interval_ || this.calculateIntervals_(min, max, true);
+    var interval = this.interval_;
+    var backupCount = this.count_;
+    if (interval && (adjustedMax - adjustedMin) / anychart.utils.getIntervalApproxDuration(interval) > this.scale.maxTicksCount()) {
+      anychart.core.reporting.warning(anychart.enums.WarningCode.TOO_MANY_TICKS, null,
+          [adjustedMax - adjustedMin, anychart.utils.getIntervalApproxDuration(interval)]);
+      interval = null;
+      this.count_ = 4;
+    }
+    if (!interval)
+      interval = this.calculateIntervals_(min, max, true);
     var date = new goog.date.UtcDateTime(new Date(adjustedMin));
     var endDate = new goog.date.UtcDateTime(new Date(adjustedMax));
     for (var i = 0; goog.date.Date.compare(date, endDate) <= 0 && i < 150; date.add(interval), i++)
       ticks.push(date.getTime());
     this.autoTicks_ = ticks;
+    this.count_ = backupCount;
   }
 };
 
@@ -323,7 +333,16 @@ anychart.scales.DateTimeTicks.prototype.setupAsMajor = function(min, max, opt_ca
   var result = [min, max];
   if (!this.explicit_) {
     var ticks = [];
-    var interval = this.interval_ || this.calculateIntervals_(min, max, false);
+    var interval = this.interval_;
+    var backupCount = this.count_;
+    if (interval && (max - min) / anychart.utils.getIntervalApproxDuration(interval) > this.scale.maxTicksCount()) {
+      anychart.core.reporting.warning(anychart.enums.WarningCode.TOO_MANY_TICKS, null,
+          [max - min, anychart.utils.getIntervalApproxDuration(interval)]);
+      interval = null;
+      this.count_ = 4;
+    }
+    if (!interval)
+      interval = this.calculateIntervals_(min, max, false);
     if (opt_canModifyMin)
       result[0] = min = anychart.utils.alignDateLeft(min, interval, 0);
     var date = new goog.date.UtcDateTime(new Date(min));
@@ -333,6 +352,7 @@ anychart.scales.DateTimeTicks.prototype.setupAsMajor = function(min, max, opt_ca
     if (opt_canModifyMax && goog.date.Date.compare(date, endDate) > 0)
       ticks.push(result[1] = date.getTime());
     this.autoTicks_ = ticks;
+    this.count_ = backupCount;
   }
   return result;
 };

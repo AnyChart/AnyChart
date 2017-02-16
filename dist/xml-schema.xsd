@@ -1967,6 +1967,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="colors" type="OrdinalOrLinearScaleColors"/>
         </xsd:all>
         <xsd:attribute name="type" type="enums.ScaleTypes" default="linear"/>
+        <xsd:attribute name="max_ticks_count" type="xsd:integer" default="1000"/>
         <xsd:attribute name="inverted" type="simple.Bool" default="false"/>
         <xsd:attribute name="stick_to_zero" type="simple.Bool"/>
         <xsd:attribute name="stack_mode" type="enums.ScaleStackMode" default="none"/>
@@ -1989,6 +1990,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="names" type="OrdinalScaleNames"/>
         </xsd:all>
         <xsd:attribute name="type" type="enums.ScaleTypes" default="ordinalColor"/>
+        <xsd:attribute name="max_ticks_count" type="xsd:integer" default="1000"/>
         <xsd:attribute name="inverted" type="simple.Bool" default="false"/>
         <xsd:attribute name="names" type="xsd:string" default="name"/>
         <xsd:attribute name="stick_to_zero" type="simple.Bool"/>
@@ -2023,6 +2025,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="y_minor_ticks" type="GeoScaleTicks"/>
         </xsd:all>
         <xsd:attribute name="type" type="enums.ScaleTypes" default="geo"/>
+        <xsd:attribute name="max_ticks_count" type="xsd:integer" default="1000"/>
         <xsd:attribute name="minimum_x" type="simple.NumberOrPercentOrNull"/>
         <xsd:attribute name="minimum_y" type="simple.NumberOrPercentOrNull"/>
         <xsd:attribute name="maximum_x" type="simple.NumberOrPercentOrNull"/>
@@ -2043,6 +2046,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="minor_ticks" type="ScaleTicks"/>
         </xsd:all>
         <xsd:attribute name="type" type="enums.GaugeScaleTypes" default="linear"/>
+        <xsd:attribute name="max_ticks_count" type="xsd:integer" default="1000"/>
         <xsd:attribute name="inverted" type="simple.Bool" default="false"/>
         <xsd:attribute name="stick_to_zero" type="simple.Bool"/>
         <xsd:attribute name="stack_mode" type="enums.ScaleStackMode" default="none"/>
@@ -2063,6 +2067,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="ranges" type="OrdinalColorScaleRanges"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="names" type="OrdinalScaleNames"/>
         </xsd:all>
+        <xsd:attribute name="max_ticks_count" type="xsd:integer" default="1000"/>
         <xsd:attribute name="inverted" type="simple.Bool" default="false"/>
         <xsd:attribute name="stick_to_zero" type="simple.Bool"/>
         <xsd:attribute name="stack_mode" type="enums.ScaleStackMode" default="none"/>

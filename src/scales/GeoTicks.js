@@ -100,7 +100,7 @@ anychart.scales.GeoTicks.prototype.interval = function(opt_value) {
   if (goog.isDefAndNotNull(opt_value)) {
     if (this.interval_ != opt_value) {
       opt_value = anychart.utils.toNumber(opt_value);
-      if (opt_value < 0) {
+      if (opt_value <= 0) {
         this.minCount_ = 4;
         this.maxCount_ = 6;
         this.interval_ = NaN;
@@ -233,72 +233,6 @@ anychart.scales.GeoTicks.prototype.getInternal = function() {
  * @return {!Array} Array of two values: [newMin, newMax].
  */
 anychart.scales.GeoTicks.prototype.setupAsMajor = function(min, max, opt_canModifyMin, opt_canModifyMax) {
-  return this.setupLinear_(min, max, opt_canModifyMin, opt_canModifyMax);
-};
-
-
-/**
- * Calculates ticks sequence and adjusts passed min and max to fit to it better if allowed. Returns an array of new
- * min and max values for the scale to adjust.
- * @param {!Array} values Values array. Should contain 2 values if this is major ticks object and an array of major
- *    ticks if this is a minor ticks object.
- * @param {number=} opt_majorDesiredMin If major minimum was explicit and interval was auto, there could be a situation,
- *    when minimum doesn't contain interval. We need to know the value that major interval calculator desired to be the
- *    minimum in that case, to correctly calculate the interval on the part from explicit minimum (which is values[0] in
- *    that case) and first aligned tick (values[1]), as there should be less than this.minCount_ minor ticks.
- * @param {number=} opt_majorDesiredMax If major maximum was explicit and interval was auto, there could be a situation,
- *    when maximum doesn't contain interval. We need to know the value that major interval calculator desired to be the
- *    maximum in that case, to correctly calculate the interval on the part from last aligned tick (which is
- *    values[values.length - 2] in that case) and the explicit maximum (which is the last value in values).
- */
-anychart.scales.GeoTicks.prototype.setupAsMinor = function(values, opt_majorDesiredMin, opt_majorDesiredMax) {
-  if (this.explicit_) {
-    this.autoTicks_ = null;
-  } else {
-    if (this.autoTicks_)
-      this.autoTicks_.length = 0;
-    else
-      this.autoTicks_ = [];
-    if (values.length < 2) return;
-    var adder = this.addMinorLinearTicksPortion_;
-    var min, max;
-    var start;
-    if (goog.isDef(opt_majorDesiredMin)) {
-      min = values[0];
-      max = values[1];
-      adder.call(this, min, max, opt_majorDesiredMin, max);
-      start = 1;
-    } else
-      start = 0;
-    var end = values.length - 1;
-    if (goog.isDef(opt_majorDesiredMax))
-      end--;
-    for (var i = start; i <= end - 1; i++) {
-      min = values[i];
-      max = values[i + 1];
-      adder.call(this, min, max, min, max);
-    }
-    if (goog.isDef(opt_majorDesiredMax)) {
-      min = values[end];
-      max = values[end + 1];
-      adder.call(this, min, max, min, opt_majorDesiredMax);
-    }
-  }
-};
-
-
-/**
- * Calculates ticks sequence and adjusts passed min and max to fit to it better if allowed. Returns an array of new
- * min and max values for the scale to adjust.
- * @param {number} min Minimum.
- * @param {number} max Maximum.
- * @param {boolean=} opt_canModifyMin If the minimum can be modified.
- * @param {boolean=} opt_canModifyMax If the maximum can be modified.
- * @return {!Array} Array of two to four values: [newMin, newMax, opt_desiredMin, opt_desiredMax]. Desired values can
- *    be absent.
- * @private
- */
-anychart.scales.GeoTicks.prototype.setupLinear_ = function(min, max, opt_canModifyMin, opt_canModifyMax) {
   this.autoTicks_ = null;
   var result = [min, max];
   if (this.explicit_) {
@@ -309,9 +243,20 @@ anychart.scales.GeoTicks.prototype.setupLinear_ = function(min, max, opt_canModi
   } else {
     var ticks = [];
     var interval = this.interval_;
+    var minCount = this.minCount_;
+    var maxCount = this.maxCount_;
+    if (!isNaN(interval) && ((max - min) / interval) > /** @type {number} */(this.scale_.maxTicksCount())) {
+      if (!this.scale_.threwTooManyTicksWarning_) {
+        anychart.core.reporting.warning(anychart.enums.WarningCode.TOO_MANY_TICKS, null, [max - min, interval]);
+        this.scale_.threwTooManyTicksWarning_ = true;
+      }
+      interval = NaN;
+      minCount = 4;
+      maxCount = 6;
+    }
     if (isNaN(interval)) {
       var currentInterval = NaN, currentDiff = NaN;
-      for (var q = this.minCount_; q <= this.maxCount_; q++) {
+      for (var q = minCount; q <= maxCount; q++) {
         var count = q - 1; // it should be valid here
         var range = max - min;
         currentInterval = range / count;
@@ -375,6 +320,69 @@ anychart.scales.GeoTicks.prototype.setupLinear_ = function(min, max, opt_canModi
     this.autoTicks_ = ticks;
   }
   return result;
+};
+
+
+/**
+ * Calculates ticks sequence and adjusts passed min and max to fit to it better if allowed. Returns an array of new
+ * min and max values for the scale to adjust.
+ * @param {!Array} values Values array. Should contain 2 values if this is major ticks object and an array of major
+ *    ticks if this is a minor ticks object.
+ * @param {number=} opt_majorDesiredMin If major minimum was explicit and interval was auto, there could be a situation,
+ *    when minimum doesn't contain interval. We need to know the value that major interval calculator desired to be the
+ *    minimum in that case, to correctly calculate the interval on the part from explicit minimum (which is values[0] in
+ *    that case) and first aligned tick (values[1]), as there should be less than this.minCount_ minor ticks.
+ * @param {number=} opt_majorDesiredMax If major maximum was explicit and interval was auto, there could be a situation,
+ *    when maximum doesn't contain interval. We need to know the value that major interval calculator desired to be the
+ *    maximum in that case, to correctly calculate the interval on the part from last aligned tick (which is
+ *    values[values.length - 2] in that case) and the explicit maximum (which is the last value in values).
+ */
+anychart.scales.GeoTicks.prototype.setupAsMinor = function(values, opt_majorDesiredMin, opt_majorDesiredMax) {
+  if (this.explicit_) {
+    this.autoTicks_ = null;
+  } else {
+    if (this.autoTicks_)
+      this.autoTicks_.length = 0;
+    else
+      this.autoTicks_ = [];
+    if (values.length < 2) return;
+    var adder = this.addMinorLinearTicksPortion_;
+    var min, max;
+    var end = values.length - 1;
+    var backupInterval = this.interval_;
+    var backupMinCount = this.minCount_;
+    if (!isNaN(this.interval_)) {
+      max = values[end];
+      min = values[0];
+      if ((max - min) / this.interval_ > this.scale_.maxTicksCount()) {
+        anychart.core.reporting.warning(anychart.enums.WarningCode.TOO_MANY_TICKS, null, [max - min, this.interval_]);
+        this.interval_ = NaN;
+        this.minCount_ = 4;
+      }
+    }
+    var start;
+    if (goog.isDef(opt_majorDesiredMin)) {
+      min = values[0];
+      max = values[1];
+      adder.call(this, min, max, opt_majorDesiredMin, max);
+      start = 1;
+    } else
+      start = 0;
+    if (goog.isDef(opt_majorDesiredMax))
+      end--;
+    for (var i = start; i <= end - 1; i++) {
+      min = values[i];
+      max = values[i + 1];
+      adder.call(this, min, max, min, max);
+    }
+    if (goog.isDef(opt_majorDesiredMax)) {
+      min = values[end];
+      max = values[end + 1];
+      adder.call(this, min, max, min, opt_majorDesiredMax);
+    }
+    this.interval_ = backupInterval;
+    this.minCount_ = backupMinCount;
+  }
 };
 
 

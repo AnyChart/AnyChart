@@ -3879,6 +3879,9 @@
         {"$ref": "#/definitions/anychart.scales.Base"}
       ],
       "properties": {
+        "maxTicksCount": {
+          "type": "number"
+        },
         "minimumGap": {
           "type": "number"
         },
@@ -4124,6 +4127,9 @@
       "type": "object",
       "properties": {
         "type": {"enum": ["geo"]},
+        "maxTicksCount": {
+          "type": "number"
+        },
         "minimumX": {
           "type": ["number", "string", "null"]
         },

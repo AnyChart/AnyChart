@@ -1554,6 +1554,22 @@ anychart.utils.estimateInterval = function(interval) {
 
 
 /**
+ * Returns approximate interval duration in milliseconds.
+ * @param {goog.date.Interval} interval
+ * @return {number}
+ */
+anychart.utils.getIntervalApproxDuration = function(interval) {
+  var result = interval.years; // years
+  result = result * 365.25 + interval.months; // months
+  result = result * 365.25 / 12 + interval.days; // days
+  result = result * 24 + interval.hours; // hours
+  result = result * 60 + interval.minutes; // minutes
+  result = result * 60 + interval.seconds; // seconds
+  return result * 1000; // milliseconds
+};
+
+
+/**
  * @type {Array.<number>}
  */
 anychart.utils.PENTAGON_COS = [

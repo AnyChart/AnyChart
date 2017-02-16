@@ -938,6 +938,7 @@ goog.provide('anychart.themes.defaultTheme');
       'text': 'Label text',
       'background': {
         'enabled': true,
+        'disablePointerEvents': true,
         'fill': colorFillBackgroundReversed + opacityStrong,
         'corners': 3,
         'zIndex': 0
@@ -1783,6 +1784,7 @@ goog.provide('anychart.themes.defaultTheme');
         },
         {
           'type': 'linear',
+          'maxTicksCount': 1000,
           'inverted': false,
           'maximum': null,
           'minimum': null,
@@ -1861,6 +1863,7 @@ goog.provide('anychart.themes.defaultTheme');
         },
         {
           'type': 'linear',
+          'maxTicksCount': 1000,
           'inverted': false,
           'maximum': null,
           'minimum': null,
@@ -1947,6 +1950,7 @@ goog.provide('anychart.themes.defaultTheme');
       'scales': [
         {
           'type': 'dateTime',
+          'maxTicksCount': 1000,
           'inverted': false,
           'maximum': null,
           'minimum': null,
@@ -1963,6 +1967,7 @@ goog.provide('anychart.themes.defaultTheme');
         },
         {
           'type': 'linear',
+          'maxTicksCount': 1000,
           'inverted': false,
           'maximum': null,
           'minimum': null,
@@ -2007,6 +2012,7 @@ goog.provide('anychart.themes.defaultTheme');
         },
         {
           'type': 'linear',
+          'maxTicksCount': 1000,
           'inverted': false,
           'maximum': null,
           'minimum': null,
@@ -2060,6 +2066,7 @@ goog.provide('anychart.themes.defaultTheme');
         },
         {
           'type': 'linear',
+          'maxTicksCount': 1000,
           'inverted': false,
           'maximum': null,
           'minimum': null,
@@ -2415,6 +2422,7 @@ goog.provide('anychart.themes.defaultTheme');
       'scales': [
         {
           'type': 'linear',
+          'maxTicksCount': 1000,
           'inverted': false,
           'maximum': null,
           'minimum': null,
@@ -2438,6 +2446,7 @@ goog.provide('anychart.themes.defaultTheme');
         },
         {
           'type': 'linear',
+          'maxTicksCount': 1000,
           'inverted': false,
           'maximum': null,
           'minimum': null,
@@ -2518,6 +2527,7 @@ goog.provide('anychart.themes.defaultTheme');
         },
         {
           'type': 'linear',
+          'maxTicksCount': 1000,
           'inverted': false,
           'maximum': null,
           'minimum': null,
@@ -2569,6 +2579,7 @@ goog.provide('anychart.themes.defaultTheme');
       'scales': [
         {
           'type': 'linear',
+          'maxTicksCount': 1000,
           'inverted': false,
           'maximum': null,
           'minimum': null,
@@ -2592,6 +2603,7 @@ goog.provide('anychart.themes.defaultTheme');
         },
         {
           'type': 'linear',
+          'maxTicksCount': 1000,
           'inverted': false,
           'maximum': null,
           'minimum': null,
@@ -2772,6 +2784,7 @@ goog.provide('anychart.themes.defaultTheme');
         },
         {
           'type': 'linear',
+          'maxTicksCount': 1000,
           'inverted': false,
           'maximum': null,
           'minimum': null,
@@ -3084,6 +3097,7 @@ goog.provide('anychart.themes.defaultTheme');
         'zIndex': 50
       },
       'geoScale': {
+        'maxTicksCount': 1000,
         'precision': 2
       },
       'callouts': [],
@@ -3331,6 +3345,7 @@ goog.provide('anychart.themes.defaultTheme');
       'scales': [
         {
           'type': 'linear',
+          'maxTicksCount': 1000,
           'inverted': false,
           'maximum': null,
           'minimum': null,
@@ -4553,6 +4568,7 @@ goog.provide('anychart.themes.defaultTheme');
         'scales': [
           {
             'type': 'linear',
+            'maxTicksCount': 1000,
             'inverted': false,
             'maximum': null,
             'minimum': null,

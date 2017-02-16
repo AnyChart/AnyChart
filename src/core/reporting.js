@@ -259,6 +259,11 @@ anychart.core.reporting.getWarningDescription_ = function(code, opt_arguments) {
     case anychart.enums.WarningCode.FEATURE_ID_NOT_FOUND:
       return 'Feature with id "' + opt_arguments[0] + '" not found';
 
+    case anychart.enums.WarningCode.TOO_MANY_TICKS:
+      var interval = /** @type {number} */(opt_arguments[1]);
+      var count = /** @type {number} */(opt_arguments[0]) / interval;
+      return 'Current scale ticks settings resulted in too many ticks: trying to generate about ' + count + ' ticks with interval ' + interval;
+
     default:
       return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report!';
