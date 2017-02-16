@@ -2694,6 +2694,7 @@ anychart.core.series.Base.prototype.draw = function() {
       }
       this.startDrawing();
 
+      iterator = this.getResetIterator();
       // currently this section is actual only for Stock, because
       // Cartesian processes preFirst point as a regular point in iterator
       var point = this.getPreFirstPoint();
@@ -2703,7 +2704,7 @@ anychart.core.series.Base.prototype.draw = function() {
       }
 
       // main points drawing cycle
-      iterator = this.getResetIterator();
+      iterator.reset();
       while (iterator.advance()) {
         state = this.getPointState(iterator.getIndex());
         this.makePointMeta(iterator, this.getYValueNames(), columns);

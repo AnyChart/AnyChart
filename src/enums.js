@@ -3724,6 +3724,30 @@ anychart.enums.normalizeAggregationType = function(value) {
     case 'lastval':
     case 'closevalue':
     case 'closeval':
+    case 'fill':
+    case 'hoverfill':
+    case 'risingfill':
+    case 'hoverrisingfill':
+    case 'fallingfill':
+    case 'hoverfallingfill':
+    case 'stroke':
+    case 'hoverstroke':
+    case 'lowstroke':
+    case 'hoverlowstroke':
+    case 'highstroke':
+    case 'hoverhighstroke':
+    case 'risingstroke':
+    case 'hoverrisingstroke':
+    case 'fallingstroke':
+    case 'hoverfallingstroke':
+    case 'hatchfill':
+    case 'hoverhatchfill':
+    case 'risinghatchfill':
+    case 'hoverrisinghatchfill':
+    case 'fallinghatchfill':
+    case 'hoverfallinghatchfill':
+    case 'marker':
+    case 'hovermarker':
       return anychart.enums.AggregationType.LAST_VALUE;
     case 'sum':
     case 'add':

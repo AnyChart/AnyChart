@@ -450,7 +450,6 @@ anychart.data.TableSelectable.IController.prototype.getGlobalPointsCountForCurre
 anychart.data.TableSelectable.RowProxy = function(row, mapping, aggregated, index, metaObj) {
   /**
    * @type {!anychart.data.TableRow}
-   * @protected
    */
   this.row = row;
 

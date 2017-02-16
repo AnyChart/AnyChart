@@ -153,6 +153,18 @@ anychart.data.TableIterator.prototype.current = function() {
 
 
 /**
+ * "Selects" iterator to row.
+ * @param {anychart.data.TableRow} row Row to select to.
+ */
+anychart.data.TableIterator.prototype.specialSelect = function(row) {
+  if (goog.isDef(row)) {
+    this.current_ = row;
+    this.currentExists_ = true;
+  }
+};
+
+
+/**
  * Returns current field values.
  * @param {string} field
  * @return {*}

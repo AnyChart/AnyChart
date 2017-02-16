@@ -165,6 +165,21 @@ anychart.core.series.StockScroller.prototype.getDetachedIterator = function() {
 //endregion
 
 
+//region Interactivity
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Interactivity
+//
+//----------------------------------------------------------------------------------------------------------------------
+
+
+/** @inheritDoc */
+anychart.core.series.StockScroller.prototype.getPointState = function(index) {
+  return anychart.PointState.NORMAL;
+};
+//endregion
+
+
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -224,20 +239,6 @@ anychart.core.series.StockScroller.prototype.applyZIndex = function() {
   var zIndex = /** @type {number} */(this.zIndex());
   this.rootLayer.zIndex(zIndex);
   this.secondaryRootLayer_.zIndex(zIndex);
-};
-
-
-/** @inheritDoc */
-anychart.core.series.StockScroller.prototype.updateColors = function() {
-  if (this.shapeManager instanceof anychart.core.shapeManagers.PerPoint) {
-    var iterator = this.getResetIterator();
-    while (iterator.advance()) {
-      this.shapeManager.updateColors(this.getPointState(iterator.getIndex()),
-          /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes')));
-    }
-  } else {
-    this.shapeManager.updateColors(this.getSeriesState());
-  }
 };
 //endregion
 

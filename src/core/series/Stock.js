@@ -120,13 +120,19 @@ anychart.core.series.Stock.prototype.getPointOption = function(name) {
 
 /** @inheritDoc */
 anychart.core.series.Stock.prototype.getPreFirstPoint = function() {
-  return this.data_.getPreFirstRow();
+  var row = this.data_.getPreFirstRow();
+  if (row)
+    this.getIterator().specialSelect(row.row);
+  return row;
 };
 
 
 /** @inheritDoc */
 anychart.core.series.Stock.prototype.getPostLastPoint = function() {
-  return this.data_.getPostLastRow();
+  var row = this.data_.getPostLastRow();
+  if (row)
+    this.getIterator().specialSelect(row.row);
+  return row;
 };
 
 
@@ -350,6 +356,13 @@ anychart.core.series.Stock.prototype.getScaleReferenceValues = function() {
   }
   return res;
 };
+
+
+/** @inheritDoc */
+anychart.core.series.Stock.prototype.planHasPointMarkers = function() {
+  var column = this.data_.getFieldColumn('marker');
+  return (goog.isString(column) || !isNaN(column));
+};
 //endregion
 
 
@@ -410,7 +423,7 @@ anychart.core.series.Stock.prototype.getSeriesState = function() {
 anychart.core.series.Stock.prototype.hoverSeries = function() {
   if (!(this.seriesState & anychart.PointState.HOVER)) {
     this.seriesState = anychart.PointState.HOVER;
-    this.invalidate(anychart.ConsistencyState.SERIES_COLOR, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SERIES_COLOR | anychart.ConsistencyState.SERIES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
   return this;
 };
@@ -424,9 +437,15 @@ anychart.core.series.Stock.prototype.hoverSeries = function() {
 anychart.core.series.Stock.prototype.unhover = function() {
   if (this.seriesState != anychart.PointState.NORMAL) {
     this.seriesState = anychart.PointState.NORMAL;
-    this.invalidate(anychart.ConsistencyState.SERIES_COLOR, anychart.Signal.NEEDS_REDRAW);
+    this.invalidate(anychart.ConsistencyState.SERIES_COLOR | anychart.ConsistencyState.SERIES_MARKERS, anychart.Signal.NEEDS_REDRAW);
   }
   return this;
+};
+
+
+/** @inheritDoc */
+anychart.core.series.Stock.prototype.getPointState = function(index) {
+  return this.getSeriesState();
 };
 //endregion
 

@@ -25,8 +25,9 @@ goog.require('anychart.utils');
  * @implements {anychart.core.IChartWithAnnotations}
  * @implements {anychart.core.IGroupingProvider}
  * @implements {anychart.core.stock.IKeyIndexTransformer}
+ * @param {boolean=} opt_allowPointSettings Allows to set point settings from data.
  */
-anychart.charts.Stock = function() {
+anychart.charts.Stock = function(opt_allowPointSettings) {
   // See SeparateChart
   this.supportsBaseHighlight = false;
 
@@ -116,6 +117,12 @@ anychart.charts.Stock = function() {
    * @private
    */
   this.defaultAnnotationSettings_ = {};
+
+  /**
+   * Series config.
+   * @type {Object.<string, anychart.core.series.TypeConfig>}
+   */
+  this.seriesConfig = this.createSeriesConfig(!!opt_allowPointSettings);
 };
 goog.inherits(anychart.charts.Stock, anychart.core.Chart);
 
@@ -152,10 +159,11 @@ anychart.charts.Stock.prototype.getType = function() {
 
 
 /**
- * Series config for the chart.
- * @type {Object.<string, anychart.core.series.TypeConfig>}
+ * Creates series config for the chart.
+ * @param {boolean} allowColoring
+ * @return {Object.<string, anychart.core.series.TypeConfig>}
  */
-anychart.charts.Stock.prototype.seriesConfig = (function() {
+anychart.charts.Stock.prototype.createSeriesConfig = function(allowColoring) {
   var res = {};
   var capabilities = (
       // anychart.core.series.Capabilities.ALLOW_INTERACTIVITY |
@@ -164,6 +172,8 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
       anychart.core.series.Capabilities.SUPPORTS_MARKERS |
       // anychart.core.series.Capabilities.SUPPORTS_LABELS |
       0);
+  capabilities |= (allowColoring && anychart.core.series.Capabilities.ALLOW_POINT_SETTINGS);
+  var discreteShapeManager = allowColoring ? anychart.enums.ShapeManagerTypes.PER_POINT : anychart.enums.ShapeManagerTypes.PER_SERIES;
   res[anychart.enums.StockSeriesType.AREA] = {
     drawerType: anychart.enums.SeriesDrawerTypes.AREA,
     shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
@@ -180,7 +190,7 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
   };
   res[anychart.enums.StockSeriesType.CANDLESTICK] = {
     drawerType: anychart.enums.SeriesDrawerTypes.CANDLESTICK,
-    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapeManagerType: discreteShapeManager,
     shapesConfig: [
       anychart.core.shapeManagers.pathRisingFillStrokeConfig,
       anychart.core.shapeManagers.pathRisingHatchConfig,
@@ -195,7 +205,7 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
   };
   res[anychart.enums.StockSeriesType.COLUMN] = {
     drawerType: anychart.enums.SeriesDrawerTypes.COLUMN,
-    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapeManagerType: discreteShapeManager,
     shapesConfig: [
       anychart.core.shapeManagers.pathFillStrokeConfig,
       anychart.core.shapeManagers.pathHatchConfig
@@ -244,7 +254,7 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
   };
   res[anychart.enums.StockSeriesType.MARKER] = {
     drawerType: anychart.enums.SeriesDrawerTypes.MARKER,
-    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapeManagerType: discreteShapeManager,
     shapesConfig: [
       anychart.core.shapeManagers.pathFillStrokeConfig,
       anychart.core.shapeManagers.pathHatchConfig
@@ -257,7 +267,7 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
   };
   res[anychart.enums.StockSeriesType.OHLC] = {
     drawerType: anychart.enums.SeriesDrawerTypes.OHLC,
-    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapeManagerType: discreteShapeManager,
     shapesConfig: [
       anychart.core.shapeManagers.pathRisingStrokeConfig,
       anychart.core.shapeManagers.pathFallingStrokeConfig
@@ -285,7 +295,7 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
   };
   res[anychart.enums.StockSeriesType.RANGE_COLUMN] = {
     drawerType: anychart.enums.SeriesDrawerTypes.RANGE_COLUMN,
-    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapeManagerType: discreteShapeManager,
     shapesConfig: [
       anychart.core.shapeManagers.pathFillStrokeConfig,
       anychart.core.shapeManagers.pathHatchConfig
@@ -379,7 +389,7 @@ anychart.charts.Stock.prototype.seriesConfig = (function() {
     anchoredPositionBottom: 'value'
   };
   return res;
-})();
+};
 
 
 /** @inheritDoc */
@@ -1760,10 +1770,11 @@ anychart.charts.Stock.prototype.setupByJSON = function(config, opt_default) {
 
 /**
  * Stock chart constructor function.
+ * @param {boolean=} opt_allowPointSettings Allows to set point settings from data.
  * @return {anychart.charts.Stock}
  */
-anychart.stock = function() {
-  var result = new anychart.charts.Stock();
+anychart.stock = function(opt_allowPointSettings) {
+  var result = new anychart.charts.Stock(opt_allowPointSettings);
   result.setupByVal(anychart.getFullTheme('stock'), true);
   return result;
 };
