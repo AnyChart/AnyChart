@@ -251,7 +251,7 @@ anychart.core.linearGauge.ScaleBar.prototype.points = function(opt_value) {
  */
 anychart.core.linearGauge.ScaleBar.prototype.width = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeToPercent(opt_value);
+    opt_value = /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.width_ != opt_value) {
       this.width_ = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
@@ -269,7 +269,7 @@ anychart.core.linearGauge.ScaleBar.prototype.width = function(opt_value) {
  */
 anychart.core.linearGauge.ScaleBar.prototype.offset = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeToPercent(opt_value);
+    opt_value = /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.offset_ != opt_value) {
       this.offset_ = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);

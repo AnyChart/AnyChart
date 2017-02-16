@@ -196,7 +196,7 @@ anychart.utils.normalizeSize = function(value, opt_containerSize, opt_invert) {
  * @return {boolean} Is value set in percent.
  */
 anychart.utils.isPercent = function(value) {
-  return goog.isString(value) && goog.string.endsWith(value, '%');
+  return goog.isString(value) && goog.string.endsWith(value, '%') && !isNaN(parseFloat(value));
 };
 
 
@@ -219,17 +219,18 @@ anychart.utils.normalizeNumberOrPercent = function(value, opt_default) {
 /**
  * Normalizes passed value to a percent format string.
  * @param {*} value Value to normalize.
- * @return {string} Normalized to percent format value. If source value doesn't like percent format then trying to
+ * @param {boolean=} opt_canReturnNaN Can return NaN or normalize to '0%'
+ * @return {(string|number)} Normalized to percent format value. If source value doesn't like percent format then trying to
  * convert it. If convert was failed then returns default value ['0%'].
  */
-anychart.utils.normalizeToPercent = function(value) {
+anychart.utils.normalizeToPercent = function(value, opt_canReturnNaN) {
   if (anychart.utils.isPercent(value))
     return /** @type {string} */(value);
 
   if (!goog.isNumber(value))
     value = parseFloat(value);
 
-  if (isNaN(value)) return '0%';
+  if (isNaN(value)) return opt_canReturnNaN ? NaN : '0%';
   return value + '%';
 };
 

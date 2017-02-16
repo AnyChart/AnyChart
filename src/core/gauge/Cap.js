@@ -77,7 +77,7 @@ anychart.core.gauge.Cap.prototype.SUPPORTED_CONSISTENCY_STATES =
  */
 anychart.core.gauge.Cap.prototype.radius = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
+    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.radius_ != opt_value) {
       this.radius_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,

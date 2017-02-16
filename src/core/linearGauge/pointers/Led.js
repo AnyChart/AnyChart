@@ -39,6 +39,13 @@ anychart.core.linearGauge.pointers.Led = function(gauge, dataIndex) {
 
   /** @inheritDoc */
   this.BOUNDS_DEPENDENT_STATES |= anychart.ConsistencyState.GAUGE_COLOR_SCALE;
+
+  /**
+   * Current state of 'gap-size-count' finite automation
+   * @type {string}
+   * @private
+   */
+  this.gscState_ = '';
 };
 goog.inherits(anychart.core.linearGauge.pointers.Led, anychart.core.linearGauge.pointers.Base);
 
@@ -131,8 +138,10 @@ anychart.core.linearGauge.pointers.Led.prototype.drawVertical = function() {
 
     size = size * ratio;
     gap = gap * ratio;
+
   } else if (!isNaN(gap) && !isNaN(count)) {
     size = (height - (count - 1) * gap) / count;
+
   } else if (!isNaN(size) && !isNaN(count)) {
     gap = (height - count * size) / (count - 1);
   }
@@ -273,16 +282,50 @@ anychart.core.linearGauge.pointers.Led.prototype.dimmer = function(opt_value) {
 
 
 /**
+ * Finite automation for gap, size and count settings. Allows to exist only two of these three settings.
+ * @param {string} propLetter Property letter.
+ */
+anychart.core.linearGauge.pointers.Led.prototype.updateGscState = function(propLetter) {
+  if (this.gscState_.length < 2) {
+    // Initialization before first render
+    this.gscState_ += propLetter;
+
+  } else if (this.gscState_.charAt(1) != propLetter) {
+    var pop = this.gscState_.charAt(0);
+    this.gscState_ = (this.gscState_ + propLetter).slice(1);
+
+    if (pop != propLetter) {
+      switch (pop) {
+        case 'g':
+          this.gap_ = null;
+          break;
+        case 's':
+          this.size_ = null;
+          break;
+        case 'c':
+          this.count_ = null;
+          break;
+      }
+    }
+  }
+};
+
+
+/**
  * Getter/setter for led gap.
  * @param {number|string=} opt_value Led gap.
  * @return {number|string|anychart.core.linearGauge.pointers.Led} Gap or self for chaining.
  */
 anychart.core.linearGauge.pointers.Led.prototype.gap = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
-    if (this.gap_ != opt_value) {
-      this.gap_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    opt_value = anychart.utils.normalizeToPercent(opt_value, true);
+    if (opt_value) {
+      this.updateGscState('g');
+
+      if (this.gap_ != opt_value) {
+        this.gap_ = opt_value;
+        this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      }
     }
     return this;
   }
@@ -297,10 +340,14 @@ anychart.core.linearGauge.pointers.Led.prototype.gap = function(opt_value) {
  */
 anychart.core.linearGauge.pointers.Led.prototype.size = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
-    if (this.size_ != opt_value) {
-      this.size_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    opt_value = anychart.utils.normalizeToPercent(opt_value, true);
+    if (opt_value) {
+      this.updateGscState('s');
+
+      if (this.size_ != opt_value) {
+        this.size_ = opt_value;
+        this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      }
     }
     return this;
   }
@@ -315,9 +362,14 @@ anychart.core.linearGauge.pointers.Led.prototype.size = function(opt_value) {
  */
 anychart.core.linearGauge.pointers.Led.prototype.count = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.count_ != opt_value) {
-      this.count_ = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    opt_value = anychart.utils.normalizeToNaturalNumber(opt_value, NaN);
+    if (!isNaN(opt_value)) {
+      this.updateGscState('c');
+
+      if (this.count_ != opt_value) {
+        this.count_ = opt_value;
+        this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+      }
     }
     return this;
   }
@@ -363,9 +415,15 @@ anychart.core.linearGauge.pointers.Led.prototype.colorScaleInvalidated_ = functi
 /** @inheritDoc */
 anychart.core.linearGauge.pointers.Led.prototype.serialize = function() {
   var json = anychart.core.linearGauge.pointers.Led.base(this, 'serialize');
-  json['gap'] = this.gap();
-  json['size'] = this.size();
-  json['count'] = this.count();
+
+  if (this.gscState_.indexOf('g') != -1)
+    json['gap'] = this.gap_;
+
+  if (this.gscState_.indexOf('s') != -1)
+    json['size'] = this.size_;
+
+  if (this.gscState_.indexOf('c') != -1)
+    json['count'] = this.count_;
 
   json['colorScale'] = this.colorScale().serialize();
 

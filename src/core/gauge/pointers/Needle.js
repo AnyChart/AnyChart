@@ -64,7 +64,7 @@ goog.inherits(anychart.core.gauge.pointers.Needle, anychart.core.gauge.pointers.
  */
 anychart.core.gauge.pointers.Needle.prototype.startWidth = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
+    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.startWidth_ != opt_value) {
       this.startWidth_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -83,7 +83,7 @@ anychart.core.gauge.pointers.Needle.prototype.startWidth = function(opt_value) {
  */
 anychart.core.gauge.pointers.Needle.prototype.startRadius = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
+    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.startRadius_ != opt_value) {
       this.startRadius_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -103,7 +103,7 @@ anychart.core.gauge.pointers.Needle.prototype.startRadius = function(opt_value) 
  */
 anychart.core.gauge.pointers.Needle.prototype.middleWidth = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
+    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.middleWidth_ != opt_value) {
       this.middleWidth_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -122,7 +122,7 @@ anychart.core.gauge.pointers.Needle.prototype.middleWidth = function(opt_value) 
  */
 anychart.core.gauge.pointers.Needle.prototype.middleRadius = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
+    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.middleRadius_ != opt_value) {
       this.middleRadius_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -142,7 +142,7 @@ anychart.core.gauge.pointers.Needle.prototype.middleRadius = function(opt_value)
  */
 anychart.core.gauge.pointers.Needle.prototype.endWidth = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
+    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.endWidth_ != opt_value) {
       this.endWidth_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -161,7 +161,7 @@ anychart.core.gauge.pointers.Needle.prototype.endWidth = function(opt_value) {
  */
 anychart.core.gauge.pointers.Needle.prototype.endRadius = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
+    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.endRadius_ != opt_value) {
       this.endRadius_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,

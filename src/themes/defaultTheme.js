@@ -3400,12 +3400,10 @@ goog.provide('anychart.themes.defaultTheme');
             'anchor': 'center'
           },
           'hoverLabel': {
-            'enabled': false,
-            'fontColor': 'yellow'
+            'enabled': null
           },
           'selectLabel': {
-            'enabled': false,
-            'fontColor': 'pink'
+            'enabled': null
           },
           'stroke': returnStrokeSourceColor,
           'hoverStroke': returnLightenStrokeSourceColor,

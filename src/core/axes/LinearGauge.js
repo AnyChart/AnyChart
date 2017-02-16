@@ -36,7 +36,7 @@ anychart.core.axes.LinearGauge.prototype.calculateSize = function(parentSize, le
  */
 anychart.core.axes.LinearGauge.prototype.offset = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeToPercent(opt_value);
+    opt_value = /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.offset_ != opt_value) {
       this.offset_ = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);

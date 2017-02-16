@@ -119,7 +119,7 @@ anychart.core.axisMarkers.CircularRange.prototype.fill = function(opt_value) {
  */
 anychart.core.axisMarkers.CircularRange.prototype.radius = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
+    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.radius_ != opt_value) {
       this.radius_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
@@ -253,7 +253,7 @@ anychart.core.axisMarkers.CircularRange.prototype.position = function(opt_value)
  */
 anychart.core.axisMarkers.CircularRange.prototype.startSize = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
+    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.startSize_ != opt_value) {
       this.startSize_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -273,7 +273,7 @@ anychart.core.axisMarkers.CircularRange.prototype.startSize = function(opt_value
  */
 anychart.core.axisMarkers.CircularRange.prototype.endSize = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
+    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.endSize_ != opt_value) {
       this.endSize_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,

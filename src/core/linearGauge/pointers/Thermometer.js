@@ -114,7 +114,7 @@ anychart.core.linearGauge.pointers.Thermometer.prototype.getReservedBounds = fun
  */
 anychart.core.linearGauge.pointers.Thermometer.prototype.bulbRadius = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeToPercent(opt_value);
+    opt_value = /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.bulbRadius_ != opt_value) {
       this.bulbRadius_ = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
@@ -132,7 +132,7 @@ anychart.core.linearGauge.pointers.Thermometer.prototype.bulbRadius = function(o
  */
 anychart.core.linearGauge.pointers.Thermometer.prototype.bulbPadding = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeToPercent(opt_value);
+    opt_value = /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.bulbPadding_ != opt_value) {
       this.bulbPadding_ = opt_value;
       this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);

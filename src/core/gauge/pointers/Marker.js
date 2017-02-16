@@ -64,7 +64,7 @@ goog.inherits(anychart.core.gauge.pointers.Marker, anychart.core.gauge.pointers.
  */
 anychart.core.gauge.pointers.Marker.prototype.size = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = anychart.utils.normalizeToPercent(opt_value);
+    opt_value = /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.size_ != opt_value) {
       this.size_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -101,7 +101,7 @@ anychart.core.gauge.pointers.Marker.prototype.position = function(opt_value) {
  */
 anychart.core.gauge.pointers.Marker.prototype.radius = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
+    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.radius_ != opt_value) {
       this.radius_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,

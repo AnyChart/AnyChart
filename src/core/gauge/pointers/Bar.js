@@ -45,7 +45,7 @@ goog.inherits(anychart.core.gauge.pointers.Bar, anychart.core.gauge.pointers.Bas
  */
 anychart.core.gauge.pointers.Bar.prototype.width = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
+    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.width_ != opt_value) {
       this.width_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -83,7 +83,7 @@ anychart.core.gauge.pointers.Bar.prototype.position = function(opt_value) {
  */
 anychart.core.gauge.pointers.Bar.prototype.radius = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
+    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.radius_ != opt_value) {
       this.radius_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,

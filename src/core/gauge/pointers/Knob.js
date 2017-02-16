@@ -129,7 +129,7 @@ anychart.core.gauge.pointers.Knob.prototype.bottomRatio = function(opt_value) {
  */
 anychart.core.gauge.pointers.Knob.prototype.topRadius = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
+    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.topRadius_ != opt_value) {
       this.topRadius_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,
@@ -147,7 +147,7 @@ anychart.core.gauge.pointers.Knob.prototype.topRadius = function(opt_value) {
  */
 anychart.core.gauge.pointers.Knob.prototype.bottomRadius = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
+    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.bottomRadius_ != opt_value) {
       this.bottomRadius_ = opt_value;
       this.invalidate(anychart.ConsistencyState.BOUNDS,

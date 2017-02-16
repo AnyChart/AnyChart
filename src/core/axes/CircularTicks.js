@@ -111,7 +111,7 @@ anychart.core.axes.CircularTicks.prototype.SUPPORTED_CONSISTENCY_STATES =
  */
 anychart.core.axes.CircularTicks.prototype.length = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    opt_value = goog.isNull(opt_value) ? opt_value : anychart.utils.normalizeToPercent(opt_value);
+    opt_value = goog.isNull(opt_value) ? opt_value : /** @type {string} */ (anychart.utils.normalizeToPercent(opt_value));
     if (this.length_ != opt_value) {
       this.length_ = opt_value;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
