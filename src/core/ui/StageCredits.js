@@ -438,7 +438,7 @@ anychart.core.ui.StageCredits.prototype.getFinalSrc = function() {
 anychart.core.ui.StageCredits.prototype.onImageLoadHandler_ = function(e) {
   var src = this.tagetSrc;
   if (e.target.id != src) return;
-  if (!this.isDisposed())
+  if (!this.isDisposed() && this.getFinalSrc() == src)
     if (!this.image_.parentNode)
       goog.dom.insertChildAt(this.a_, this.image_, 0);
     goog.dom.setProperties(this.image_, {'src': src});

@@ -81,7 +81,7 @@ anychart.core.ui.ChartCredits.prototype.getStageCreditsValue_ = function(field, 
     return stageCredits[field]();
   } else {
     if (goog.isDef(opt_value)) {
-      if (this[field + '_'] != opt_value) {
+      if (this[field + '_'] !== opt_value) {
         this[field + '_'] = opt_value;
       }
       this.invalidate(anychart.Signal.NEEDS_REAPPLICATION);

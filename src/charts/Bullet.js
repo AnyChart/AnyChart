@@ -47,6 +47,9 @@ anychart.charts.Bullet = function(opt_data, opt_csvSettings) {
    */
   this.layout_;
 
+  /** @inheritDoc */
+  this.allowCreditsDisabling = true;
+
   this.data(opt_data || null, opt_csvSettings);
 };
 goog.inherits(anychart.charts.Bullet, anychart.core.Chart);
@@ -740,16 +743,6 @@ anychart.charts.Bullet.prototype.hoverMode = function(opt_value) {
     return this;
   }
   return /** @type {anychart.enums.HoverMode}*/(this.hoverMode_);
-};
-
-
-/** @inheritDoc */
-anychart.charts.Bullet.prototype.createStage = function() {
-  var stage = acgraph.create();
-  stage.allowCreditsDisabling = true;
-  // forcing credits to be created to apply credits disabling policy
-  stage.credits();
-  return stage;
 };
 
 

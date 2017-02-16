@@ -153,6 +153,12 @@ anychart.core.Chart = function() {
   this.credits_ = null;
 
   /**
+   * @type {boolean}
+   * @protected
+   */
+  this.allowCreditsDisabling = false;
+
+  /**
    * Rect that serves as an overlay for ignore mouse events mode.
    * @type {acgraph.vector.Rect}
    * @private
@@ -233,6 +239,20 @@ anychart.core.Chart.prototype.supportsTooltip = function() {
  */
 anychart.core.Chart.prototype.getRootElement = function() {
   return this.rootElement;
+};
+
+
+/**
+ * Creates Stage and set up stage's credits with chart's credits values.
+ * @return {!acgraph.vector.Stage}
+ * @protected
+ */
+anychart.core.Chart.prototype.createStage = function() {
+  var stage = acgraph.create();
+  stage.allowCreditsDisabling = this.allowCreditsDisabling;
+
+  stage.credits(this.credits().serialize());
+  return stage;
 };
 
 

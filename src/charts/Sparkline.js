@@ -98,6 +98,9 @@ anychart.charts.Sparkline = function(opt_data, opt_csvSettings) {
    */
   this.seriesDefaults_ = {};
 
+  /** @inheritDoc */
+  this.allowCreditsDisabling = true;
+
   /**
    * @type {!anychart.core.ui.MarkersFactory}
    * @private
@@ -2082,16 +2085,6 @@ anychart.charts.Sparkline.prototype.labelsInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
     if (this.series_) this.series_.invalidate(anychart.ConsistencyState.SERIES_LABELS, anychart.Signal.NEEDS_REDRAW);
   }
-};
-
-
-/** @inheritDoc */
-anychart.charts.Sparkline.prototype.createStage = function() {
-  var stage = acgraph.create();
-  stage.allowCreditsDisabling = true;
-  // forcing credits to be created to apply credits disabling policy
-  stage.credits();
-  return stage;
 };
 
 
