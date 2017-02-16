@@ -985,8 +985,9 @@ anychart.core.stock.Plot.prototype.setDefaultGridSettings = function(value) {
 /**
  * Invalidates plot series. Doesn't dispatch anything.
  * @param {boolean} doInvalidateBounds
+ * @param {boolean=} opt_skipLegend
  */
-anychart.core.stock.Plot.prototype.invalidateRedrawable = function(doInvalidateBounds) {
+anychart.core.stock.Plot.prototype.invalidateRedrawable = function(doInvalidateBounds, opt_skipLegend) {
   var i;
 
   var state = anychart.ConsistencyState.SERIES_POINTS;
@@ -1024,7 +1025,8 @@ anychart.core.stock.Plot.prototype.invalidateRedrawable = function(doInvalidateB
   if (doInvalidateBounds) state |= anychart.ConsistencyState.BOUNDS;
   if (this.xAxis_)
     this.xAxis_.invalidate(state);
-  if (this.legend_ && this.legend_.enabled())
+
+  if (!opt_skipLegend && this.legend_ && this.legend_.enabled())
     this.legend_.invalidate(state);
 
   this.invalidate(anychart.ConsistencyState.STOCK_PLOT_SERIES |
@@ -1082,6 +1084,7 @@ anychart.core.stock.Plot.prototype.background = function(opt_value) {
 anychart.core.stock.Plot.prototype.legend = function(opt_value) {
   if (!this.legend_) {
     this.legend_ = new anychart.core.ui.Legend();
+    this.registerDisposable(this.legend_);
     this.legend_.zIndex(200);
     this.legend_.listenSignals(this.onLegendSignal_, this);
     this.legend_.setParentEventTarget(this);
@@ -1576,7 +1579,7 @@ anychart.core.stock.Plot.prototype.ensureBoundsDistributed_ = function() {
 
     this.seriesBounds_ = seriesBounds;
     this.eventsInterceptor_.setBounds(this.seriesBounds_);
-    this.invalidateRedrawable(true);
+    this.invalidateRedrawable(true, true);
     this.markConsistent(anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.STOCK_PLOT_LEGEND);
   }
 };
