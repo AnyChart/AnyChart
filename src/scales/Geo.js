@@ -152,16 +152,30 @@ anychart.scales.Geo = function() {
   /**
    * If the X scale is inverted.
    * @type {boolean}
-   * @protected
+   * @private
    */
-  this.isInvertedX = false;
+  this.isInvertedX_;
+
+  /**
+   * Auto invert x.
+   * @type {boolean}
+   * @private
+   */
+  this.isInvertedXAuto_ = false;
 
   /**
    * If the Y scale is inverted.
    * @type {boolean}
-   * @protected
+   * @private
    */
-  this.isInvertedY = false;
+  this.isInvertedY_;
+
+  /**
+   * Auto invert y.
+   * @type {boolean}
+   * @private
+   */
+  this.isInvertedYAuto_ = false;
 
   /**
    * Scale bounds.
@@ -661,6 +675,17 @@ anychart.scales.Geo.prototype.maximumY = function(opt_value) {
 
 
 /**
+ * Auto invert.
+ * @param {boolean} invertX
+ * @param {boolean} invertY
+ */
+anychart.scales.Geo.prototype.autoInvert = function(invertX, invertY) {
+  this.isInvertedXAuto_ = invertX;
+  this.isInvertedYAuto_ = invertY;
+};
+
+
+/**
  * Getter and setter for scale inversion.
  * @param {(boolean|Array.<boolean>)=} opt_invertedOrInvertedX Common inverted or x inverted state to set.
  * @param {boolean=} opt_invertedY Inverted Y state to set.
@@ -676,22 +701,22 @@ anychart.scales.Geo.prototype.inverted = function(opt_invertedOrInvertedX, opt_i
         opt_invertedOrInvertedX = opt_invertedOrInvertedX[0];
       }
 
-      if (this.isInvertedX != opt_invertedOrInvertedX) {
-        this.isInvertedX = !!opt_invertedOrInvertedX;
+      if (this.isInvertedX_ != opt_invertedOrInvertedX) {
+        this.isInvertedX_ = !!opt_invertedOrInvertedX;
         signal = anychart.Signal.NEEDS_REAPPLICATION;
       }
     }
 
     if (goog.isDef(opt_invertedY)) {
       opt_invertedY = !!opt_invertedY;
-      if (this.isInvertedY != opt_invertedY) {
-        this.isInvertedY = opt_invertedY;
+      if (this.isInvertedY_ != opt_invertedY) {
+        this.isInvertedY_ = opt_invertedY;
         signal = anychart.Signal.NEEDS_REAPPLICATION;
       }
     } else if (arguments.length == 1) {
       opt_invertedOrInvertedX = !!opt_invertedOrInvertedX;
-      if (this.isInvertedY != opt_invertedOrInvertedX) {
-        this.isInvertedY = opt_invertedOrInvertedX;
+      if (this.isInvertedY_ != opt_invertedOrInvertedX) {
+        this.isInvertedY_ = opt_invertedOrInvertedX;
         signal = anychart.Signal.NEEDS_REAPPLICATION;
       }
     }
@@ -699,7 +724,25 @@ anychart.scales.Geo.prototype.inverted = function(opt_invertedOrInvertedX, opt_i
     this.dispatchSignal(signal);
     return this;
   }
-  return [this.isInvertedX, this.isInvertedY];
+  return [this.isInvertedX(), this.isInvertedY()];
+};
+
+
+/**
+ * Returns full invert state of X scale direction.
+ * @return {boolean}
+ */
+anychart.scales.Geo.prototype.isInvertedX = function() {
+  return goog.isDef(this.isInvertedX_) ? this.isInvertedX_ : this.isInvertedXAuto_;
+};
+
+
+/**
+ * Returns full invert state of Y scale direction.
+ * @return {boolean}
+ */
+anychart.scales.Geo.prototype.isInvertedY = function() {
+  return goog.isDef(this.isInvertedY_) ? this.isInvertedY_ : this.isInvertedYAuto_;
 };
 
 
@@ -763,6 +806,7 @@ anychart.scales.Geo.prototype.extendDataRange = function(var_args) {
  */
 anychart.scales.Geo.prototype.extendDataRangeInternal = function(var_args) {
   var coords = arguments;
+
   for (var i = 0; i < coords.length - 1; i = i + 2) {
     var x = +coords[i];
     var y = +coords[i + 1];
@@ -1132,13 +1176,13 @@ anychart.scales.Geo.prototype.scaleToPx = function(x, y) {
   y = anychart.utils.toNumber(y);
 
   var transformX = (x - this.minX) * this.ratio;
-  var transformY = (this.maxY - y) * this.ratio;
+  var transformY = (-y + this.maxY) * this.ratio;
 
-  var resultX = this.isInvertedX ?
+  var resultX = this.isInvertedX() ?
       this.bounds_.getRight() - this.centerOffsetX - transformX :
       this.bounds_.left + this.centerOffsetX + transformX;
 
-  var resultY = this.isInvertedY ?
+  var resultY = this.isInvertedY() ?
       this.bounds_.getBottom() - this.centerOffsetY - transformY :
       this.bounds_.top + this.centerOffsetY + transformY;
 
@@ -1160,11 +1204,11 @@ anychart.scales.Geo.prototype.pxToScale = function(x, y) {
   x = anychart.utils.toNumber(x);
   y = anychart.utils.toNumber(y);
 
-  var transformX = this.isInvertedX ?
+  var transformX = this.isInvertedX() ?
       this.bounds_.getRight() - this.centerOffsetX - x :
       x - this.bounds_.left - this.centerOffsetX;
 
-  var transformY = this.isInvertedY ?
+  var transformY = this.isInvertedY() ?
       this.bounds_.getBottom() - this.centerOffsetY - y :
       y - this.bounds_.top - this.centerOffsetY;
 
@@ -1176,40 +1220,89 @@ anychart.scales.Geo.prototype.pxToScale = function(x, y) {
 
 
 /**
+ * Convert lat and lon to projection with tx.
+ * @param {number} lon .
+ * @param {number} lat .
+ * @param {Object} tx .
+ * @return {Array.<number>}
+ */
+anychart.scales.Geo.prototype.projectLatLon = function(lon, lat, tx) {
+  var projected, result;
+  var defaultTx = this.tx['default'];
+  var proj = tx.curProj || defaultTx.curProj;
+
+  projected = proj.forward(lon, lat);
+
+  projected[0] = projected[0] * (tx.scale || defaultTx.scale);
+  projected[1] = projected[1] * (tx.scale || defaultTx.scale);
+
+  projected[0] += tx.xoffset || 0;
+  projected[1] += tx.yoffset || 0;
+
+  return [projected[0], projected[1]];
+};
+
+
+/**
+ * Test for point in hitZone.
+ * @param {number} x .
+ * @param {number} y .
+ * @param {Array.<Array.<number>>} polygon .
+ * @return {boolean}
+ */
+anychart.scales.Geo.prototype.pointInHitZone = function(x, y, polygon) {
+  var i, j, rel1, rel2, c = false;
+
+  for (i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    rel1 = polygon[i][1] > y;
+    rel2 = polygon[j][1] > y;
+    if (rel1 !== rel2 && (x < (polygon[j][0] - polygon[i][0]) * (y - polygon[i][1]) / (polygon[j][1] - polygon[i][1]) + polygon[i][0])) {
+      c = !c;
+    }
+  }
+
+  return c;
+};
+
+
+/**
  * Returns tx object for passed coords.
  * @param {number} lon Longitude in degrees.
  * @param {number} lat Latitude in degrees.
- * @return {Object}
+ * @return {Array.<Object|number>}
  */
 anychart.scales.Geo.prototype.pickTx = function(lon, lat) {
   if (!this.tx) return null;
 
-  var defaultTx = this.tx['default'];
-
+  var x_ = NaN, y_ = NaN;
   var txName = goog.object.findKey(this.tx, function(value, key) {
     if (key != 'default' && value.heatZone) {
 
-      var proj = value.curProj || defaultTx.curProj;
-      var projected = proj.forward(lon, lat);
-
-      var x = projected[0] * (value.scale || defaultTx.scale);
-      var y = projected[1] * (value.scale || defaultTx.scale);
-
-      x += value.xoffset || 0;
-      y += value.yoffset || 0;
+      var projected = this.projectLatLon(lon, lat, value);
+      var x = projected[0];
+      var y = projected[1];
 
       var heatZone = value.heatZone;
-
-      return x >= heatZone.left &&
+      var isHeatZoneContains = goog.isArray(heatZone) ?
+          this.pointInHitZone(x, y, heatZone) :
+          x >= heatZone.left &&
           x <= heatZone.left + heatZone.width &&
           y <= heatZone.top &&
           y >= heatZone.top - heatZone.height;
+
+
+      if (isHeatZoneContains) {
+        x_ = x;
+        y_ = y;
+      }
+
+      return isHeatZoneContains;
     }
 
     return false;
-  }) || 'default';
+  }, this) || 'default';
 
-  return this.tx[txName];
+  return [this.tx[txName], x_, y_];
 };
 
 
@@ -1225,38 +1318,34 @@ anychart.scales.Geo.prototype.transformWithoutTx = function(lon, lat, opt_txName
   this.calculate();
 
   // var latlon = this.latLonToScale(lon, lat, opt_txName);
-  var tx;
+  var tx, x, y;
   if (goog.isDef(opt_txName)) {
     tx = (!goog.isNull(opt_txName) && opt_txName in this.tx) ? this.tx[opt_txName] : this.tx['default'];
   } else {
-    tx = this.pickTx(lon, lat);
+    var pickResult = this.pickTx(lon, lat);
+    tx = pickResult[0];
+    x = pickResult[1];
+    y = pickResult[2];
   }
 
-  var defaultTx = this.tx['default'];
-  var proj = tx.curProj || defaultTx.curProj;
-  var projected = proj.forward(lon, lat);
-  var scale = tx.scale;
+  if (isNaN(x)) {
+    var projected = this.projectLatLon(lon, lat, tx);
 
-  projected[0] = projected[0] * scale;
-  projected[1] = projected[1] * scale;
+    x = projected[0];
+    y = projected[1];
+  }
 
-  projected[0] += (tx.xoffset || 0);
-  projected[1] += (tx.yoffset || 0);
-
-  lon = projected[0];
-  lat = projected[1];
-
-  if (!this.bounds_ || isNaN(lon) || isNaN(lat))
+  if (!this.bounds_ || isNaN(x) || isNaN(y))
     return [NaN, NaN];
 
-  var transformX = (+(/** @type {number} */(lon)) - this.minX) * this.ratio;
-  var transformY = (-(/** @type {number} */(lat)) + this.maxY) * this.ratio;
+  var transformX = (+(/** @type {number} */(x)) - this.minX) * this.ratio;
+  var transformY = (-(/** @type {number} */(y)) + this.maxY) * this.ratio;
 
-  var resultX = this.isInvertedX ?
+  var resultX = this.isInvertedX() ?
       this.bounds_.getRight() - this.centerOffsetX - transformX :
       this.bounds_.left + this.centerOffsetX + transformX;
 
-  var resultY = this.isInvertedY ?
+  var resultY = this.isInvertedY() ?
       this.bounds_.getBottom() - this.centerOffsetY - transformY :
       this.bounds_.top + this.centerOffsetY + transformY;
 
@@ -1299,11 +1388,14 @@ anychart.scales.Geo.prototype.inverseTransform = function(x, y) {
   x = (x - this.dx_) / this.zoom;
   y = (y - this.dy_) / this.zoom;
 
-  var transformX = this.isInvertedX ?
-      this.bounds_.getRight() - this.centerOffsetX - x : x - this.bounds_.left - this.centerOffsetX;
+  var transformX = this.isInvertedX() ?
+      this.bounds_.getRight() - this.centerOffsetX - x :
+      x - this.bounds_.left - this.centerOffsetX;
 
-  var transformY = this.isInvertedY ?
-      this.bounds_.getBottom() - this.centerOffsetY - y : y - this.bounds_.top - this.centerOffsetY;
+  var transformY = this.isInvertedY() ?
+      this.bounds_.getBottom() - this.centerOffsetY - y :
+      y - this.bounds_.top - this.centerOffsetY;
+
 
   var resultX = +(/** @type {number} */(transformX)) / this.ratio + this.minX;
   var resultY = -(/** @type {number} */(transformY)) / this.ratio + this.maxY;
@@ -1322,7 +1414,7 @@ anychart.scales.Geo.prototype.transformX = function(value) {
   value = anychart.utils.toNumber(value);
   var result = anychart.math.round((value - this.minLong) / this.longRange, 3);
 
-  return this.isInvertedX ? 1 - result : result;
+  return this.isInvertedX() ? 1 - result : result;
 };
 
 
@@ -1336,7 +1428,7 @@ anychart.scales.Geo.prototype.transformY = function(value) {
   value = anychart.utils.toNumber(value);
   var result = anychart.math.round((value - this.minLat) / this.latRange, 3);
 
-  return this.isInvertedY ? 1 - result : result;
+  return this.isInvertedY() ? 1 - result : result;
 };
 
 
@@ -1360,30 +1452,33 @@ anychart.scales.Geo.prototype.scaleToLatLon = function(x, y, opt_txName) {
       if (key != 'default' && value.heatZone) {
         var heatZone = value.heatZone;
 
-        return x >= heatZone.left &&
+        return goog.isArray(heatZone) ?
+            this.pointInHitZone(x, y, heatZone) :
+            x >= heatZone.left &&
             x <= heatZone.left + heatZone.width &&
             y <= heatZone.top &&
             y >= heatZone.top - heatZone.height;
       }
       return false;
-    }) || 'default';
+    }, this) || 'default';
   }
 
   var tx = this.tx[txName];
+
+  var result;
+  var proj = tx.curProj || defaultTx.curProj;
 
   x -= tx.xoffset || defaultTx.xoffset || 0;
   y -= tx.yoffset || defaultTx.yoffset || 0;
 
   var scale = tx.scale || defaultTx.scale;
   var crs = tx.crs || defaultTx.crs;
-  var proj = tx.curProj || defaultTx.curProj;
 
-  var projected = crs ?
+  result = crs ?
       proj.invert(x / scale, y / scale) :
       [x / scale, y / scale];
 
-
-  return [projected[0], projected[1]];
+  return result;
 };
 
 
@@ -1398,25 +1493,38 @@ anychart.scales.Geo.prototype.latLonToScale = function(lon, lat, opt_txName) {
   if (isNaN(lon) || isNaN(lat))
     return [NaN, NaN];
 
-  var tx;
+  var tx, x = NaN, y = NaN;
   if (goog.isDef(opt_txName)) {
     tx = (!goog.isNull(opt_txName) && opt_txName in this.tx) ? this.tx[opt_txName] : this.tx['default'];
   } else {
-    tx = this.pickTx(lon, lat);
+    var pickResult = this.pickTx(lon, lat);
+    tx = pickResult[0];
+    x = pickResult[1];
+    y = pickResult[2];
   }
 
-  var defaultTx = this.tx['default'];
-  var proj = tx.curProj || defaultTx.curProj;
-  var projected = proj.forward(lon, lat);
-  var scale = tx.scale;
+  var coords;
+  if (isNaN(x)) {
+    var defaultTx = this.tx['default'];
+    var proj = tx.curProj || defaultTx.curProj;
 
-  projected[0] = projected[0] * scale;
-  projected[1] = projected[1] * scale;
+    var projected = proj.forward(lon, lat);
 
-  // projected[0] += (tx.xoffset || 0);
-  // projected[1] += (tx.yoffset || 0);
+    projected[0] = projected[0] * (tx.scale || defaultTx.scale);
+    projected[1] = projected[1] * (tx.scale || defaultTx.scale);
 
-  return [projected[0], projected[1]];
+    //todo (blackart) special shit for anychart world map ver 1.2.0
+    if (tx.xoffset != -620.8680523857) {
+      projected[0] += tx.xoffset || 0;
+      projected[1] += tx.yoffset || 0;
+    }
+
+    coords = [projected[0], projected[1]];
+  } else {
+    coords = [x, y];
+  }
+
+  return coords;
 };
 
 

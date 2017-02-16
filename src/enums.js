@@ -1954,6 +1954,10 @@ anychart.enums.EventType = {
   ANIMATION_END: 'animationend',
   DRILL_CHANGE: 'drillchange',
 
+  ZOOM_START: 'zoomstart',
+  ZOOM: 'zoom',
+  ZOOM_END: 'zoomend',
+
   LEGEND_ITEM_MOUSE_OUT: 'legenditemmouseout',
   LEGEND_ITEM_MOUSE_OVER: 'legenditemmouseover',
   LEGEND_ITEM_MOUSE_MOVE: 'legenditemmousemove',
@@ -6002,6 +6006,9 @@ goog.exportSymbol('anychart.enums.EventType.DRILL_CHANGE', anychart.enums.EventT
 goog.exportSymbol('anychart.enums.EventType.CHART_DRAW', anychart.enums.EventType.CHART_DRAW);
 goog.exportSymbol('anychart.enums.EventType.ANIMATION_START', anychart.enums.EventType.ANIMATION_START);
 goog.exportSymbol('anychart.enums.EventType.ANIMATION_END', anychart.enums.EventType.ANIMATION_END);
+goog.exportSymbol('anychart.enums.EventType.ZOOM_START', anychart.enums.EventType.ZOOM_START);
+goog.exportSymbol('anychart.enums.EventType.ZOOM', anychart.enums.EventType.ZOOM);
+goog.exportSymbol('anychart.enums.EventType.ZOOM_END', anychart.enums.EventType.ZOOM_END);
 goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_MOUSE_OUT', anychart.enums.EventType.LEGEND_ITEM_MOUSE_OUT);
 goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_MOUSE_OVER', anychart.enums.EventType.LEGEND_ITEM_MOUSE_OVER);
 goog.exportSymbol('anychart.enums.EventType.LEGEND_ITEM_MOUSE_MOVE', anychart.enums.EventType.LEGEND_ITEM_MOUSE_MOVE);

@@ -321,7 +321,7 @@ anychart.charts.Map.prototype.SUPPORTED_SIGNALS =
  */
 anychart.charts.Map.TIMINGS = {
   ALL_ANIMATION_FINISHED_DELAY: 100,
-  DEFAULT_ZOOM_DURATION: 20,
+  DEFAULT_ZOOM_DURATION: 200,
   ZOOM_TO_FEATURE_DURATION: 500,
   ZOOM_TO_HOME_DURATION: 300,
   TEST_DRAG_DELAY: 70
@@ -430,20 +430,6 @@ anychart.charts.Map.ZINDEX_CALLOUT = 60;
 anychart.charts.Map.ZINDEX_INCREMENT_MULTIPLIER = 0.00001;
 
 
-/**
- * Maximum zoom ratio.
- * @type {number}
- */
-anychart.charts.Map.ZOOM_MAX_FACTOR = 10;
-
-
-/**
- * Minimum zoom ratio.
- * @type {number}
- */
-anychart.charts.Map.ZOOM_MIN_FACTOR = 1;
-
-
 //endregion
 //region --- Class properties
 /**
@@ -504,14 +490,14 @@ anychart.charts.Map.prototype.fullZoom = 1;
  * @type {number}
  * @private
  */
-anychart.charts.Map.prototype.maxZoomLevel_ = anychart.charts.Map.ZOOM_MAX_FACTOR;
+anychart.charts.Map.prototype.maxZoomLevel_;
 
 
 /**
  * @type {number}
  * @private
  */
-anychart.charts.Map.prototype.minZoomLevel_ = anychart.charts.Map.ZOOM_MIN_FACTOR;
+anychart.charts.Map.prototype.minZoomLevel_;
 
 
 /**
@@ -675,30 +661,32 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
           break;
         case 'move_up':
           dx = 0;
-          dy = 10 * scene.zoomLevel();
+          dy = 10 * scene.getZoomLevel();
           scene.move(dx, dy);
           break;
         case 'move_left':
-          dx = 10 * scene.zoomLevel();
+          dx = 10 * scene.getZoomLevel();
           dy = 0;
           scene.move(dx, dy);
           break;
         case 'move_down':
           dx = 0;
-          dy = -10 * scene.zoomLevel();
+          dy = -10 * scene.getZoomLevel();
           scene.move(dx, dy);
           break;
         case 'move_right':
-          dx = -10 * scene.zoomLevel();
+          dx = -10 * scene.getZoomLevel();
           dy = 0;
           scene.move(dx, dy);
           break;
         case 'drill_up':
           var tx = scene.getMapLayer().getSelfTransformation();
-          dx = tx.getTranslateX();
-          dy = tx.getTranslateY();
+          var isDefaultPos = anychart.math.roughlyEqual(scene.getZoomLevel(), this.minZoomLevel_) &&
+              anychart.math.roughlyEqual(tx.getTranslateX(), 0) &&
+              anychart.math.roughlyEqual(tx.getTranslateY(), 0);
 
-          if (scene.zoomLevel() == this.minZoomLevel_ && !dx && !dy) {
+          if (isDefaultPos) {
+            scene.getMapLayer().setTransformationMatrix(this.minZoomLevel_, 0, 0, this.minZoomLevel_, 0, 0);
             this.drillUp();
           } else {
             if (!this.drillingInAction) {
@@ -707,12 +695,8 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
               this.doAfterAnimation(scene, function() {
                 this.goingToHome = true;
                 this.zoomDuration = anychart.charts.Map.TIMINGS.ZOOM_TO_HOME_DURATION;
-                if (scene.zoomLevel() != this.minZoomLevel_) {
-                  this.zoomTo(this.minZoomLevel_);
-                } else {
-                  scene.zoomAnimation = new anychart.animations.MapMoveAnimation(scene, [dx, dy], [0, 0], anychart.charts.Map.TIMINGS.ZOOM_TO_FEATURE_DURATION);
-                  scene.zoomAnimation.play();
-                }
+                this.zoomTo(this.minZoomLevel_);
+
                 this.doAfterAnimation(this, function() {
                   this.goingToHome = false;
                 });
@@ -766,8 +750,8 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
         if (scene.goingToHome) return;
         var zoomFactor = goog.math.clamp(1 - e.deltaY / 120, 0.7, 2);
 
-        var maxZoomFactor = this.maxZoomLevel_;
-        var minZoomFactor = this.minZoomLevel_;
+        var maxZoomLevel = this.maxZoomLevel_;
+        var minZoomLevel = this.minZoomLevel_;
 
         this.prevZoomState_ = this.zoomState_;
         this.zoomState_ = zoomFactor > 1 ? true : zoomFactor == 1 ? !this.prevZoomState_ : false;
@@ -778,25 +762,27 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
           }
         }
 
-        if (zoomFactor < 1 && anychart.math.round(scene.zoomLevel(), 2) == minZoomFactor && !mapLayer.getSelfTransformation().isIdentity()) {
-          mapLayer.setTransformationMatrix(minZoomFactor, 0, 0, minZoomFactor, 0, 0);
-          scene.fullZoom = minZoomFactor;
+        var curZoom = scene.getZoomLevel();
+        if (zoomFactor < 1 && anychart.math.roughlyEqual(curZoom, minZoomLevel) && !mapLayer.getSelfTransformation().isIdentity()) {
+          mapLayer.setTransformationMatrix(minZoomLevel, 0, 0, minZoomLevel, 0, 0);
+          scene.fullZoom = minZoomLevel;
           scene.goingToHome = false;
           if (scene.zoomAnimation && scene.zoomAnimation.isPlaying()) {
             scene.zoomAnimation.stop();
           }
 
-          scene.scale().setMapZoom(minZoomFactor);
+          scene.scale().setMapZoom(minZoomLevel);
           scene.scale().setOffsetFocusPoint(0, 0);
 
           scene.updateSeriesOnZoomOrMove();
-        } else if ((zoomFactor > 1 && scene.zoomLevel() >= maxZoomFactor) || (zoomFactor < 1 && scene.zoomLevel() <= minZoomFactor)) {
+        } else if ((zoomFactor >= 1 && (anychart.math.roughlyEqual(curZoom, maxZoomLevel) || curZoom > maxZoomLevel)) ||
+            (zoomFactor <= 1 && (anychart.math.roughlyEqual(curZoom, minZoomLevel) || curZoom < minZoomLevel))) {
           return;
         } else {
           var x = e.clientX - containerPosition.x;
           var y = e.clientY - containerPosition.y;
 
-          scene.zoom(zoomFactor, x, y);
+          scene.zoom(zoomFactor, x, y, 20);
         }
       }
     }, false, this);
@@ -903,7 +889,7 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
     this.mouseMoveHandler = function(e) {
       var scene = this.getCurrentScene();
 
-      if (this.interactivity_.drag() && scene.zoomLevel() != 1 && !this.legendDragInProcess) {
+      if (this.interactivity_.drag() && scene.getZoomLevel() != 1 && !this.legendDragInProcess) {
         scene.startDrag();
 
         scene.move(e.clientX - startX, e.clientY - startY);
@@ -956,7 +942,7 @@ anychart.charts.Map.prototype.endDrag = function() {
     this.drag = false;
 
     if (this.interactivity_.drag() &&
-        this.getCurrentScene().zoomLevel() != 1 &&
+        this.getCurrentScene().getZoomLevel() != 1 &&
         !this.legendDragInProcess) {
       this.dispatchEvent(anychart.enums.EventType.DRAG_END);
     }
@@ -1031,7 +1017,7 @@ anychart.charts.Map.prototype.handleMouseDown = function(event) {
   this.itWasDrag = false;
   this.originEvent = event;
 
-  if (this.zoomLevel() == this.minZoomLevel_) {
+  if (this.getZoomLevel() == this.minZoomLevel_) {
     setTimeout(this.acyncMouseDown, 0, event);
   } else if (!this.mouseMoveTesting) {
     this.testDragHandler = this.eventsHandler.listenOnce(this, acgraph.events.EventType.MOUSEMOVE, function(e) {
@@ -1235,7 +1221,7 @@ anychart.charts.Map.prototype.touchMoveHandler = function(e) {
         }
       }
 
-      if (zoomFactor < 1 && anychart.math.round(scene.zoomLevel(), 2) == this.minZoomLevel_ && !mapLayer.getSelfTransformation().isIdentity()) {
+      if (zoomFactor < 1 && anychart.math.round(scene.getZoomLevel(), 2) == this.minZoomLevel_ && !mapLayer.getSelfTransformation().isIdentity()) {
         mapLayer.setTransformationMatrix(this.minZoomLevel_, 0, 0, this.minZoomLevel_, 0, 0);
         scene.fullZoom = this.minZoomLevel_;
         scene.goingToHome = false;
@@ -1247,7 +1233,7 @@ anychart.charts.Map.prototype.touchMoveHandler = function(e) {
         scene.scale().setOffsetFocusPoint(0, 0);
 
         scene.updateSeriesOnZoomOrMove();
-      } else if ((zoomFactor > 1 && scene.zoomLevel() >= this.maxZoomLevel_) || (zoomFactor < 1 && scene.zoomLevel() <= this.minZoomLevel_)) {
+      } else if ((zoomFactor > 1 && scene.getZoomLevel() >= this.maxZoomLevel_) || (zoomFactor < 1 && scene.getZoomLevel() <= this.minZoomLevel_)) {
         return;
       } else {
         var bounds = goog.style.getBounds(this.container().domElement());
@@ -1259,7 +1245,7 @@ anychart.charts.Map.prototype.touchMoveHandler = function(e) {
       }
     }
   } else if (touchCount == 1) {
-    if (this.drag && this.interactivity_.drag() && this.zoomLevel() != 1) {
+    if (this.drag && this.interactivity_.drag() && this.getZoomLevel() != 1) {
       goog.style.setStyle(document['body'], 'cursor', acgraph.vector.Cursor.MOVE);
       scene.move(e.clientX - scene.startTouchX, e.clientY - scene.startTouchY);
 
@@ -1507,7 +1493,7 @@ anychart.charts.Map.prototype.updateSeriesOnZoomOrMove = function() {
 };
 
 
-//endregion                                                  1
+//endregion
 //region --- Animaions
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -3302,9 +3288,9 @@ anychart.charts.Map.prototype.getBoundsWithoutAxes = function(bounds) {
 anychart.charts.Map.prototype.drawContent = function(bounds) {
   this.getRootScene();
 
-  var i, series, tx, dx, dy, len, geom, callout;
-  var maxZoomFactor = this.maxZoomLevel_;
-  var minZoomFactor = this.minZoomLevel_;
+  var i, series, tx, dx, dy, cx, cy, len, geom, callout;
+  var maxZoomLevel = this.maxZoomLevel_;
+  var minZoomLevel = this.minZoomLevel_;
   var boundsWithoutTx, boundsWithTx, seriesType;
   var axes, axis, grids, grid;
 
@@ -3338,6 +3324,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
       this.mapTX = {};
 
       var mapTx = geoData['ac-tx'] || {};
+
       var defaultTx = mapTx['default'];
       if (!defaultTx)
         defaultTx = mapTx['default'] = goog.object.clone(anychart.charts.Map.DEFAULT_TX['default']);
@@ -3352,7 +3339,9 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
         tx_.scale = goog.isDef(value['scale']) ? parseFloat(value['scale']) : 1;
         tx_.xoffset = goog.isDef(value['xoffset']) ? parseFloat(value['xoffset']) : 0;
         tx_.yoffset = goog.isDef(value['yoffset']) ? parseFloat(value['yoffset']) : 0;
-        if (goog.isDef(value['heatZone'])) tx_.heatZone = anychart.math.Rect.fromJSON(value['heatZone']);
+        if (goog.isDef(value['heatZone'])) {
+          tx_.heatZone = goog.isArray(value['heatZone']) ? value['heatZone'] : anychart.math.Rect.fromJSON(value['heatZone']);
+        }
 
         this.mapTX[key] = tx_;
       }, this);
@@ -3383,13 +3372,12 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_SCALE)) {
     if (this.mapTX) {
       scale.setTxMap(this.mapTX);
-
       if (this.mapLayer_) {
         var mtx = this.mapLayer_.getSelfTransformation();
         scale.setMapZoom(mtx.getScaleX());
         scale.setOffsetFocusPoint(mtx.getTranslateX(), mtx.getTranslateY());
 
-        //if (this.zoomLevel() != this.minZoomLevel_) {
+        //if (this.getZoomLevel() != this.minZoomLevel_) {
         //scene.zoomInc = this.minZoomLevel_;
         //}
       }
@@ -3491,12 +3479,12 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
           scale.resumeSignalsDispatching(true);
 
           if (this.isSvgGeoData()) {
-            scale.inverted(false, true);
+            scale.autoInvert(false, true);
 
             this.svgRootLayer_.parent(this.getMapLayer());
             this.svgRootLayer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
           } else {
-            scale.inverted(false, false);
+            scale.autoInvert(false, false);
           }
         }
       }
@@ -3579,7 +3567,6 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     this.applyLabelsOverlapState_ = {};
     this.calcBubbleSizes_();
   }
-
 
   if (this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
     for (i = 0, len = this.callouts_.length; i < len; i++) {
@@ -3749,62 +3736,119 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     this.invalidate(state, anychart.Signal.NEEDS_REDRAW);
   }
 
-
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_ZOOM)) {
-    if (!((this.zoomLevel() == minZoomFactor && this.zoomInc * this.zoomLevel() < minZoomFactor) ||
-        (this.zoomLevel() == maxZoomFactor && this.zoomLevel() * this.zoomInc > maxZoomFactor)) && mapLayer || this.unlimitedZoom) {
+    var srcZoom = this.getZoomLevel();
+    var dstZoom = this.zoomInc * srcZoom;
 
+    tx = this.getMapLayer().getFullTransformation();
+    dx = tx.getTranslateX();
+    dy = tx.getTranslateY();
+
+    if (!((srcZoom == minZoomLevel && dstZoom < minZoomLevel) ||
+        (srcZoom == maxZoomLevel && dstZoom > maxZoomLevel)) &&
+        mapLayer || this.unlimitedZoom) {
+
+      var isInit = !(goog.isDef(this.cx) && goog.isDef(this.cy));
       if (isNaN(this.cx) || isNaN(this.cy)) {
-        boundsWithoutTx = this.scale().getViewSpace().getBoundsWithoutTransform();
+        bounds = this.scale().getViewSpace().getBoundsWithoutTransform();
 
-        var defaultCx = boundsWithoutTx.left + boundsWithoutTx.width / 2;
-        var defaultCy = boundsWithoutTx.top + boundsWithoutTx.height / 2;
+        var plotBoundsCx = bounds.left + bounds.width / 2;
+        var plotBoundsCy = bounds.top + bounds.height / 2;
 
-        if (isNaN(this.cx)) this.cx = defaultCx;
-        if (isNaN(this.cy)) this.cy = defaultCy;
+        cx = (plotBoundsCx - dx) / tx.getScaleX();
+        cy = (plotBoundsCy - dy) / tx.getScaleY();
+
+        if (isNaN(this.cx)) this.cx = cx;
+        if (isNaN(this.cy)) this.cy = cy;
       }
 
-      var zoomIn = this.zoomInc > 1;
       var zoomOut = this.zoomInc < 1;
-      var noZoom = this.zoomInc == 1;
 
       if (!this.unlimitedZoom) {
-        if ((this.zoomLevel() > maxZoomFactor && zoomIn) || (this.zoomLevel() < minZoomFactor && zoomOut))
-          noZoom = true;
-        else if ((this.zoomLevel() > maxZoomFactor && zoomOut) || (this.zoomLevel() < minZoomFactor && zoomIn))
-          noZoom = false;
-        else if (this.zoomLevel() * this.zoomInc > maxZoomFactor)
-          this.zoomInc = maxZoomFactor / this.zoomLevel();
-        else if (this.zoomLevel() * this.zoomInc < minZoomFactor && zoomOut)
-          this.zoomInc = minZoomFactor / this.zoomLevel();
+        if (dstZoom > maxZoomLevel) {
+          this.zoomInc = maxZoomLevel / this.getZoomLevel();
+          dstZoom = this.zoomInc * srcZoom;
+        } else if (dstZoom < minZoomLevel && zoomOut) {
+          this.zoomInc = minZoomLevel / this.getZoomLevel();
+          dstZoom = this.zoomInc * srcZoom;
+        }
       }
 
-      if (!noZoom || this.unlimitedZoom) {
-        if (!this.zoomAnimation || this.zoomAnimation.isStopped()) {
-          this.zoomSource = this.zoomLevel();
-          this.zoomDest = this.zoomInc * this.zoomLevel();
 
-          var duration = this.zoomDuration || anychart.charts.Map.TIMINGS.DEFAULT_ZOOM_DURATION;
+      var duration = this.zoomDuration || anychart.charts.Map.TIMINGS.DEFAULT_ZOOM_DURATION;
 
+      if ((!this.zoomAnimation || this.zoomAnimation.isStopped()) && !isInit) {
+        this.zoomSource = srcZoom;
+        this.zoomDest = dstZoom;
+
+        var equalZoom = anychart.math.roughlyEqual(this.zoomSource, this.zoomDest, 0.00001);
+        var allowZoom = (equalZoom && this.allowMoveOnEqualZoomLevels || !equalZoom) &&
+            this != this.getCurrentScene() ? true : this.getRootScene().dispatchEvent(this.createZoomEvent(anychart.enums.EventType.ZOOM_START));
+
+        if (allowZoom) {
           if (goog.global['anychart']['ui']['ContextMenu']) {
             var contextMenu = this.contextMenu();
             if (contextMenu.isVisible()) contextMenu.hide();
           }
 
-          this.zoomAnimation = new anychart.animations.MapZoomAnimation(this, [this.zoomLevel()], [this.zoomDest], duration, this != this.getCurrentScene());
+          viewSpacePath = this.getMapLayer();
+          boundsWithTx = viewSpacePath.getBounds();
+
+          cx = (this.cx - dx) / this.zoomSource;
+          cy = (this.cy - dy) / this.zoomSource;
+
+          if (!this.unlimitedZoom) {
+            if (cx < boundsWithTx.left)
+              cx = boundsWithTx.left;
+            else if (cx > boundsWithTx.getRight())
+              cx = boundsWithTx.getRight();
+
+            if (cy < boundsWithTx.top)
+              cy = boundsWithTx.top;
+            else if (cy > boundsWithTx.getBottom())
+              cy = boundsWithTx.getBottom();
+          }
+
+          var dx_ = cx * (1 - this.zoomSource);
+          var dy_ = cy * (1 - this.zoomSource);
+
+          this.zoomAnimation = new anychart.animations.MapZoomAnimation(
+              this,
+              [srcZoom, dx, dy],
+              [dstZoom, dx_, dy_],
+              duration,
+              this != this.getCurrentScene());
+
           this.zoomAnimation
               .play();
+        } else if (equalZoom) {
+          var scene = this.getCurrentScene();
+          var sceneLayer = scene.getMapLayer();
+          bounds = sceneLayer.getBounds();
+          cx = bounds.left + bounds.width / 2;
+          cy = bounds.top + bounds.height / 2;
+          tx = sceneLayer.getTransformationMatrix();
+          dx = cx * (1 - scene.fullZoom);
+          dy = cy * (1 - scene.fullZoom);
+
+          this.getMapLayer().setTransformationMatrix(scene.fullZoom, 0, 0, scene.fullZoom, dx, dy);
+
+          this.scale().setMapZoom(scene.fullZoom);
+          this.scale().setOffsetFocusPoint(dx, dy);
+
+          this.updateSeriesOnZoomOrMove();
         }
       }
     }
 
+    this.allowMoveOnEqualZoomLevels = false;
     this.zoomDuration = NaN;
     this.zoomInc = 1;
     this.markConsistent(anychart.ConsistencyState.MAP_ZOOM);
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_MOVE)) {
-    if (this.zoomLevel() != minZoomFactor && mapLayer) {
+    if (this.getZoomLevel() != minZoomLevel && mapLayer) {
       var viewSpacePath = this.scale().getViewSpace();
       boundsWithoutTx = viewSpacePath.getBoundsWithoutTransform();
       boundsWithTx = viewSpacePath.getBoundsWithTransform(mapLayer.getFullTransformation());
@@ -3841,8 +3885,8 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
         dy = this.offsetY;
       }
 
-      dx = dx / this.zoomLevel();
-      dy = dy / this.zoomLevel();
+      dx = dx / this.getZoomLevel();
+      dy = dy / this.getZoomLevel();
 
       this.offsetX = 0;
       this.offsetY = 0;
@@ -3857,7 +3901,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
         if (this.isDesktop) {
           this.updateSeriesOnZoomOrMove();
         } else {
-          this.getDataLayer().appendTransformationMatrix(1, 0, 0, 1, dx * this.zoomLevel(), dy * this.zoomLevel());
+          this.getDataLayer().appendTransformationMatrix(1, 0, 0, 1, dx * this.getZoomLevel(), dy * this.getZoomLevel());
         }
       }
     }
@@ -4102,11 +4146,11 @@ anychart.charts.Map.prototype.translateFeature = function(id, dx, dy) {
     latLon = this.scale().inverseTransform(
         bounds.left + bounds.width / 2,
         bounds.top + bounds.height / 2);
-    current_tx = this.scale().pickTx(latLon[0], latLon[1]);
+    current_tx = this.scale().pickTx(latLon[0], latLon[1])[0];
     featureTx = current_tx == this.mapTX['default'] ? (this.mapTX[id] = {}) : current_tx;
 
-    dx = dx / this.zoomLevel();
-    dy = dy / this.zoomLevel();
+    dx = dx / this.getZoomLevel();
+    dy = dy / this.getZoomLevel();
 
     var startCoords_ = this.scale().pxToScale(bounds.left, bounds.top);
     var endCoords_ = this.scale().pxToScale(bounds.left + dx, bounds.top + dy);
@@ -4162,7 +4206,7 @@ anychart.charts.Map.prototype.featureTranslation = function(id, opt_dx, opt_dy) 
     latLon = this.scale().inverseTransform(
         bounds.left + bounds.width / 2,
         bounds.top + bounds.height / 2);
-    current_tx = this.scale().pickTx(latLon[0], latLon[1]);
+    current_tx = this.scale().pickTx(latLon[0], latLon[1])[0];
     featureTx = current_tx == this.mapTX['default'] ? (this.mapTX[id] = {}) : current_tx;
   }
 
@@ -4177,8 +4221,8 @@ anychart.charts.Map.prototype.featureTranslation = function(id, opt_dx, opt_dy) 
       opt_dx = goog.isDef(opt_dx) ? opt_dx : offsetX_px;
       opt_dy = goog.isDef(opt_dy) ? opt_dy : offsetY_px;
 
-      opt_dx = opt_dx / this.zoomLevel();
-      opt_dy = opt_dy / this.zoomLevel();
+      opt_dx = opt_dx / this.getZoomLevel();
+      opt_dy = opt_dy / this.getZoomLevel();
 
       var dx_ = (opt_dx - offsetX_px) / this.scale().ratio;
       var dy_ = (opt_dy - offsetY_px) / this.scale().ratio;
@@ -4234,7 +4278,7 @@ anychart.charts.Map.prototype.featureScaleFactor = function(id, opt_ratio) {
     latLon = scale.inverseTransform(
         bounds.left + bounds.width / 2,
         bounds.top + bounds.height / 2);
-    current_tx = scale.pickTx(latLon[0], latLon[1]);
+    current_tx = scale.pickTx(latLon[0], latLon[1])[0];
     featureTx = current_tx == this.mapTX['default'] ? (this.mapTX[id] = {}) : current_tx;
   }
 
@@ -4318,7 +4362,7 @@ anychart.charts.Map.prototype.featureCrs_ = function(feature, opt_crs) {
       bounds.left + bounds.width / 2,
       bounds.top + bounds.height / 2);
 
-  var current_tx = scale.pickTx(latLon[0], latLon[1]);
+  var current_tx = scale.pickTx(latLon[0], latLon[1])[0];
 
   if (!goog.isDef(opt_crs)) {
     return goog.isDef(current_tx.crs) ? current_tx.crs : this.mapTX['default'].crs;
@@ -4680,6 +4724,14 @@ anychart.charts.Map.prototype.drillDown_ = function(id, target) {
   var mapDiff = diff['map'];
   var series = mapDiff['series'];
 
+  if (!goog.isDef(mapDiff['maxZoomLevel'])) {
+    newScene.maxZoomLevel(/** @type {number} */(scene.maxZoomLevel()));
+  }
+
+  if (!goog.isDef(mapDiff['minZoomLevel'])) {
+    newScene.minZoomLevel(/** @type {number} */(scene.minZoomLevel()));
+  }
+
   if (series && series.length && !goog.isDef(series[0]['colorScale'])) {
     var sourceScale = /** @type {anychart.scales.OrdinalColor|anychart.scales.LinearColor} */(scene.getSeries(0).colorScale());
     newScene.getSeries(0).colorScale(sourceScale);
@@ -4712,7 +4764,7 @@ anychart.charts.Map.prototype.drillDown_ = function(id, target) {
   newScene.setParentEventTarget(root);
 
 
-  var zoomParam = newScene.zoomToBounds(featureBounds);
+  var zoomParam = newScene.zoomToBounds(featureBounds, undefined, true);
   newScene.unlimitedZoom = true;
   newScene.zoomDuration = 0;
   newScene.zoomTo(1 / zoomParam[0], zoomParam[1], zoomParam[2]);
@@ -4733,7 +4785,7 @@ anychart.charts.Map.prototype.drillDown_ = function(id, target) {
     newScene.show();
     newScene.tooltip().hide(null);
 
-    var zoomParam = newScene.zoomToBounds(featureBounds);
+    var zoomParam = newScene.zoomToBounds(featureBounds, undefined, true);
     newScene.zoomDuration = 400;
     newScene.unlimitedZoom = true;
 
@@ -4745,6 +4797,27 @@ anychart.charts.Map.prototype.drillDown_ = function(id, target) {
       setTimeout(goog.bind(function() {this.dispatchEvent(this.createDrillChangeEvent())}, root), 0);
     }, root);
   }, newScene, scene, root, featureBounds, featureProperties);
+};
+
+
+/**
+ * @return {boolean}
+ * @private
+ */
+anychart.charts.Map.prototype.readyForDrillUp_ = function() {
+  var scene = this.getCurrentScene();
+  var sceneLayer = scene.getMapLayer();
+  var minZoom = /** @type {number} */(scene.minZoomLevel());
+  var bounds = sceneLayer.getBounds();
+  var cx = bounds.left + bounds.width / 2;
+  var cy = bounds.top + bounds.height / 2;
+  var tx = sceneLayer.getTransformationMatrix();
+  var dx = cx * (1 - minZoom);
+  var dy = cy * (1 - minZoom);
+
+  return anychart.math.roughlyEqual(scene.getZoomLevel(), minZoom) &&
+      anychart.math.roughlyEqual(tx[4], dx) &&
+      anychart.math.roughlyEqual(tx[5], dy);
 };
 
 
@@ -4763,8 +4836,9 @@ anychart.charts.Map.prototype.drillUp_ = function(target, opt_levels) {
   root.drillingInAction = true;
 
   source.zoomDuration = 700;
-  source.zoomTo(/** @type {number} */(this.minZoomLevel_));
-
+  if (!source.readyForDrillUp_()) {
+    source.zoomTo(/** @type {number} */(this.minZoomLevel_));
+  }
   var levels = opt_levels || 1;
 
   this.doAfterAnimation(source, function(target, root) {
@@ -4840,10 +4914,26 @@ anychart.charts.Map.prototype.drillUp = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * Creates zoom event.
+ * @param {string} type .
+ * @return {Object}
+ */
+anychart.charts.Map.prototype.createZoomEvent = function(type) {
+  return {
+    'type': type,
+    'target': this.getCurrentScene(),
+    'from': this.zoomSource,
+    'current': this.fullZoom,
+    'to': this.zoomDest
+  };
+};
+
+
+/**
  * Current map zoom level.
  * @return {number}
  */
-anychart.charts.Map.prototype.zoomLevel = function() {
+anychart.charts.Map.prototype.getZoomLevel = function() {
   return this.fullZoom;
 };
 
@@ -4889,72 +4979,97 @@ anychart.charts.Map.prototype.minZoomLevel = function(opt_value) {
  * @param {number} value Zoom level for zooming.
  * @param {number=} opt_cx X coord of zoom point.
  * @param {number=} opt_cy Y coord of zoom point.
+ * @param {number=} opt_duration Duration of zoom animation.
  * @return {anychart.charts.Map}
  */
-anychart.charts.Map.prototype.zoomTo = function(value, opt_cx, opt_cy) {
+anychart.charts.Map.prototype.zoomTo = function(value, opt_cx, opt_cy, opt_duration) {
   if (!this.unlimitedZoom)
     value = goog.math.clamp(value, /** @type {number} */(this.minZoomLevel_), /** @type {number} */(this.maxZoomLevel_));
-  return this.zoom(value / this.zoomLevel(), opt_cx, opt_cy);
+  return this.zoom(value / this.getZoomLevel(), opt_cx, opt_cy, opt_duration);
 };
 
 
 /**
  * Zoom to feature for passed id.
- * @param {string} id Feature id.
+ * @param {string|Array.<string>} id Feature id.
+ * @param {number=} opt_duration Duration of zoom animation.
  */
-anychart.charts.Map.prototype.zoomToFeature = function(id) {
-  var feature = this.getFeatureById(id);
-  if (!feature) {
+anychart.charts.Map.prototype.zoomToFeature = function(id, opt_duration) {
+  var scene = this.getCurrentScene();
+  var features = [];
+  if (!goog.isArray(id))
+    id = [id];
+
+  var bounds, domEl, feature;
+  var zoomSessionId = '';
+  for (var i = 0, len = id.length; i < len; i++) {
+    var featureId = id[i];
+    feature = scene.getFeatureById(featureId);
+    if (feature) {
+      zoomSessionId += featureId + ';';
+      features.push(feature);
+    }
+  }
+
+  if (!features.length) {
     anychart.core.reporting.warning(anychart.enums.WarningCode.FEATURE_ID_NOT_FOUND, null, [id]);
     return;
   }
 
-  var domEl = feature.domElement;
-  var tx = domEl.getFullTransformation();
+  var tx = scene.getMapLayer().getFullTransformation();
+  var goToHome = this.prevZoomedFeature && zoomSessionId == this.prevZoomedFeature && this.prevTx && tx.equals(this.prevTx);
 
-  var goToHome = this.prevZoomedFeature && feature == this.prevZoomedFeature && this.prevTx && tx.equals(this.prevTx);
-
-  var featureBounds;
-  if (goToHome) {
-    featureBounds = domEl.getBounds();
-  } else {
-    featureBounds = domEl.getAbsoluteBounds();
+  for (i = 0, len = features.length; i < len; i++) {
+    feature = features[i];
+    domEl = feature.domElement;
+    if (!bounds) {
+      bounds = goToHome ? domEl.getBounds() : domEl.getAbsoluteBounds();
+    } else {
+      bounds.boundingRect(goToHome ? domEl.getBounds() : domEl.getAbsoluteBounds());
+    }
   }
-  var sourceZoom = tx.getScaleX();
-  var zoomParam = this.zoomToBounds(featureBounds);
+
+  var srcZoom = tx.getScaleX();
+  var dx = tx.getTranslateX();
+  var dy = tx.getTranslateY();
+
+  var zoomParam = scene.zoomToBounds(bounds, undefined, goToHome);
   var zoom = zoomParam[0];
   var cx = zoomParam[1];
   var cy = zoomParam[2];
 
-  var dx = tx.getTranslateX();
-  var dy = tx.getTranslateY();
-
-  this.doAfterAnimation(this, function() {
-    this.zoomDuration = isNaN(this.zoomDuration) ? 500 : this.zoomDuration;
+  this.doAfterAnimation(scene, function() {
+    this.allowMoveOnEqualZoomLevels = true;
+    this.zoomDuration = goog.isDef(opt_duration) ? opt_duration : isNaN(this.zoomDuration) ? anychart.charts.Map.TIMINGS.ZOOM_TO_FEATURE_DURATION : this.zoomDuration;
     if (goToHome) {
-      if (anychart.math.roughlyEqual(sourceZoom, zoom, 0.00001)) {
-        this.zoomAnimation = new anychart.animations.MapMoveAnimation(
-            this, [dx, dy], [0, 0], anychart.charts.Map.TIMINGS.ZOOM_TO_FEATURE_DURATION);
-        this.zoomAnimation.play();
+      if (anychart.math.roughlyEqual(srcZoom, zoom, 0.00001)) {
+        if (this.getRootScene().dispatchEvent(this.createZoomEvent(anychart.enums.EventType.ZOOM_START))) {
+          this.zoomAnimation = new anychart.animations.MapZoomAnimation(
+              this, [1, dx, dy], [1, dx + cx, dy + cy], this.zoomDuration);
+          this.zoomAnimation.play();
+        }
       } else {
-        this.zoomTo(this.minZoomLevel_, cx, cy);
+        this.zoomTo(this.minZoomLevel_, cx, cy, this.zoomDuration);
       }
+
       this.prevZoomedFeature = null;
       this.prevTx = null;
     } else {
-      this.unlimitedZoom = true;
-      if (anychart.math.roughlyEqual(sourceZoom, zoom, 0.00001)) {
-        this.zoomAnimation = new anychart.animations.MapMoveAnimation(
-            this, [dx, dy], [dx + cx, dy + cy], anychart.charts.Map.TIMINGS.ZOOM_TO_FEATURE_DURATION);
-        this.zoomAnimation.play();
+      if (anychart.math.roughlyEqual(srcZoom, zoom, 0.00001)) {
+        if (this.getRootScene().dispatchEvent(this.createZoomEvent(anychart.enums.EventType.ZOOM_START))) {
+          this.zoomAnimation = new anychart.animations.MapZoomAnimation(
+              this, [1, dx, dy], [1, dx + cx, dy + cy], this.zoomDuration);
+          this.zoomAnimation.play();
+        }
       } else {
-        this.zoomTo(zoom, cx, cy);
+        this.zoomTo(zoom, cx, cy, this.zoomDuration);
       }
-      this.prevZoomedFeature = feature;
+      this.prevZoomedFeature = zoomSessionId;
+
       if (this.zoomAnimation) {
         this.zoomAnimation.listenOnce(goog.fx.Transition.EventType.END, function(e) {
           if (this.prevZoomedFeature) {
-            this.prevTx = this.prevZoomedFeature.domElement.getFullTransformation().clone();
+            this.prevTx = this.getCurrentScene().getMapLayer().getFullTransformation().clone();
           } else {
             this.prevTx = null;
           }
@@ -4969,13 +5084,15 @@ anychart.charts.Map.prototype.zoomToFeature = function(id) {
  * Zoom to passed bounds.
  * @param {anychart.math.Rect} bounds .
  * @param {anychart.math.Rect=} opt_sourceBounds .
+ * @param {boolean=} opt_fullZoomOut .
  * @return {Array.<number>}
  */
-anychart.charts.Map.prototype.zoomToBounds = function(bounds, opt_sourceBounds) {
+anychart.charts.Map.prototype.zoomToBounds = function(bounds, opt_sourceBounds, opt_fullZoomOut) {
+  var scene = this.getCurrentScene();
   var x = bounds.left + bounds.width / 2;
   var y = bounds.top + bounds.height / 2;
 
-  var sourceBounds = goog.isDef(opt_sourceBounds) ? opt_sourceBounds : this.getPlotBounds();
+  var sourceBounds = goog.isDef(opt_sourceBounds) ? opt_sourceBounds : scene.getPlotBounds();
   var plotBoundsCx = sourceBounds.left + sourceBounds.width / 2;
   var plotBoundsCy = sourceBounds.top + sourceBounds.height / 2;
 
@@ -4984,6 +5101,10 @@ anychart.charts.Map.prototype.zoomToBounds = function(bounds, opt_sourceBounds) 
 
   var cx, cy;
   var zoom = 1 / Math.max(widthRatio, heightRatio);
+
+  if (!opt_fullZoomOut)
+    zoom = Math.max(Math.min(zoom * scene.getZoomLevel(), scene.maxZoomLevel()), scene.minZoomLevel()) / scene.getZoomLevel();
+
   if (anychart.math.roughlyEqual(zoom, 1, 0.0000001)) {
     cx = plotBoundsCx - x;
     cy = plotBoundsCy - y;
@@ -4991,7 +5112,7 @@ anychart.charts.Map.prototype.zoomToBounds = function(bounds, opt_sourceBounds) 
     cx = (plotBoundsCx - zoom * x) / (1 - zoom);
     cy = (plotBoundsCy - zoom * y) / (1 - zoom);
   }
-  zoom *= this.zoomLevel();
+  zoom *= scene.getZoomLevel();
 
   return [zoom, cx, cy];
 };
@@ -5014,19 +5135,21 @@ anychart.charts.Map.prototype.zoomFactor = function(opt_value) {
 
 /**
  * Zoom in.
+ * @param {number=} opt_duration Duration of zoom animation.
  * @return {anychart.charts.Map}
  */
-anychart.charts.Map.prototype.zoomIn = function() {
-  return this.zoom(this.zoomFactor_);
+anychart.charts.Map.prototype.zoomIn = function(opt_duration) {
+  return this.zoom(this.zoomFactor_, undefined, undefined, opt_duration);
 };
 
 
 /**
  * Zoom out.
+ * @param {number=} opt_duration Duration of zoom animation.
  * @return {anychart.charts.Map}
  */
-anychart.charts.Map.prototype.zoomOut = function() {
-  return this.zoom(1 / this.zoomFactor_);
+anychart.charts.Map.prototype.zoomOut = function(opt_duration) {
+  return this.zoom(1 / this.zoomFactor_, undefined, undefined, opt_duration);
 };
 
 
@@ -5041,16 +5164,10 @@ anychart.charts.Map.prototype.fitAll = function() {
     this.doAfterAnimation(this, function() {
       this.goingToHome = true;
       this.zoomDuration = anychart.charts.Map.TIMINGS.ZOOM_TO_HOME_DURATION;
-      if (this.zoomLevel() != this.minZoomLevel_) {
-        this.zoomTo(this.minZoomLevel_);
-      } else {
-        var tx = this.getMapLayer().getSelfTransformation();
-        var dx = tx.getTranslateX();
-        var dy = tx.getTranslateY();
 
-        this.zoomAnimation = new anychart.animations.MapMoveAnimation(this, [dx, dy], [0, 0], anychart.charts.Map.TIMINGS.ZOOM_TO_FEATURE_DURATION);
-        this.zoomAnimation.play();
-      }
+      var scene = this.getCurrentScene();
+      scene.zoomTo(scene.minZoomLevel());
+
       this.doAfterAnimation(this, function() {
         this.goingToHome = false;
       });
@@ -5065,16 +5182,20 @@ anychart.charts.Map.prototype.fitAll = function() {
  * @param {number} value Zoom value.
  * @param {number=} opt_cx Center X value.
  * @param {number=} opt_cy Center Y value.
+ * @param {number=} opt_duration Duration of zoom animation.
  * @return {anychart.charts.Map} Returns itself for chaining.
  */
-anychart.charts.Map.prototype.zoom = function(value, opt_cx, opt_cy) {
+anychart.charts.Map.prototype.zoom = function(value, opt_cx, opt_cy, opt_duration) {
   if (goog.isDef(value)) {
     var state = 0;
     var signal = 0;
 
+    if (goog.isDef(opt_duration))
+      this.zoomDuration = opt_duration;
+
     value = anychart.utils.toNumber(value);
-    if (((this.zoomLevel() == this.minZoomLevel_ && value < 1) ||
-        (this.zoomLevel() == this.maxZoomLevel_ && value > 1)) && !this.unlimitedZoom) {
+    if (((this.getZoomLevel() == this.minZoomLevel_ && value < 1) ||
+        (this.getZoomLevel() == this.maxZoomLevel_ && value > 1)) && !this.unlimitedZoom) {
       return this;
     }
 
@@ -5093,6 +5214,8 @@ anychart.charts.Map.prototype.zoom = function(value, opt_cx, opt_cy) {
       state = anychart.ConsistencyState.MAP_ZOOM;
       signal = anychart.Signal.NEEDS_REDRAW;
     }
+
+    this.allowMoveOnEqualZoomLevels = true;
     this.invalidate(state, signal);
   }
   return this;
@@ -5403,6 +5526,8 @@ anychart.charts.Map.prototype.setupByJSON = function(config, opt_default) {
   this.maxBubbleSize(config['maxBubbleSize']);
   this.geoIdField(config['geoIdField']);
   this.overlapMode(config['overlapMode']);
+  this.minZoomLevel(config['minZoomLevel']);
+  this.maxZoomLevel(config['maxZoomLevel']);
 
   var geoData = config['geoData'];
   if (geoData) {
@@ -5517,6 +5642,8 @@ anychart.charts.Map.prototype.serialize = function() {
   json['maxBubbleSize'] = this.maxBubbleSize();
   json['geoIdField'] = this.geoIdField();
   json['overlapMode'] = this.overlapMode();
+  json['minZoomLevel'] = this.minZoomLevel();
+  json['maxZoomLevel'] = this.maxZoomLevel();
 
   var geoData;
   if (this.geoDataStringName_) {
@@ -5686,8 +5813,9 @@ anychart.charts.Map.prototype.disposeInternal = function() {
 
   proto['zoomToFeature'] = proto.zoomToFeature;
   proto['zoomTo'] = proto.zoomTo;
-  // proto['maxZoomLevel'] = proto.maxZoomLevel;
-  // proto['minZoomLevel'] = proto.minZoomLevel;
+  proto['getZoomLevel'] = proto.getZoomLevel;
+  proto['maxZoomLevel'] = proto.maxZoomLevel;
+  proto['minZoomLevel'] = proto.minZoomLevel;
 
   proto['drillTo'] = proto.drillTo;
   proto['drillUp'] = proto.drillUp;
