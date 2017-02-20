@@ -2257,9 +2257,8 @@
           "type": ["string", "number"]
         },
 
-        "maxZoomLevel": {
-          "type": ["number"]
-        },
+        "maxZoomLevel": {"type": ["number"]},
+        "minZoomLevel": {"type": ["number"]},
 
         "geoIdField": {
           "type": "string"
