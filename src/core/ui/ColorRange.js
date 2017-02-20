@@ -820,12 +820,14 @@ anychart.core.ui.ColorRange.prototype.handleMouseClick = function(event) {
     if (!(event.metaKey || event.shiftKey) && series.map) {
       series.map.unselect();
     }
-    var iterator, pointValue, points;
+    var iterator, pointValue, points, chart, interactivity;
     if (scale instanceof anychart.scales.OrdinalColor) {
       var range = scale.getRangeByValue(/** @type {number} */(value));
       if (scale && series) {
         points = this.rangeRegions_[range.sourceIndex];
-        if (series.getChart().interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
+        chart = /** @type {anychart.core.SeparateChart} */(series.getChart());
+        interactivity = /** @type {anychart.core.utils.Interactivity} */(chart.interactivity());
+        if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
           this.points_ = {
             series: series,
             points: points
@@ -867,7 +869,9 @@ anychart.core.ui.ColorRange.prototype.handleMouseClick = function(event) {
       }
 
       if (scale && series) {
-        if (series.getChart().interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
+        chart = /** @type {anychart.core.SeparateChart} */(series.getChart());
+        interactivity = /** @type {anychart.core.utils.Interactivity} */(chart.interactivity());
+        if (interactivity.hoverMode() ==anychart.enums.HoverMode.SINGLE) {
           this.points_ = {
             series: series,
             points: points
@@ -905,12 +909,14 @@ anychart.core.ui.ColorRange.prototype.handleMouseOverAndMove = function(event) {
       ratio = (lineBounds.height - (y - min)) / lineBounds.height;
     }
 
-    var iterator, pointValue, points;
+    var iterator, pointValue, points, chart, interactivity;
     value = /** @type {number} */(scale.inverseTransform(ratio));
     if (scale instanceof anychart.scales.OrdinalColor) {
       var range = scale.getRangeByValue(/** @type {number} */(value));
       points = this.rangeRegions_[range.sourceIndex];
-      if (series.getChart().interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
+      chart = /** @type {anychart.core.SeparateChart} */(series.getChart());
+      interactivity = /** @type {anychart.core.utils.Interactivity} */(chart.interactivity());
+      if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
         this.points_ = {
           series: series,
           points: points
@@ -951,8 +957,9 @@ anychart.core.ui.ColorRange.prototype.handleMouseOverAndMove = function(event) {
       }
 
       if (scale && series) {
-        var map = /** @type {anychart.charts.Map|anychart.charts.TreeMap} */ (series.getChart());
-        if (map.interactivity().hoverMode() == anychart.enums.HoverMode.SINGLE) {
+        chart = /** @type {anychart.core.SeparateChart} */(series.getChart());
+        interactivity = /** @type {anychart.core.utils.Interactivity} */(chart.interactivity());
+        if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
 
           var dispatchUnhover = this.points_ && !goog.array.every(points, function(el) {
             return goog.array.contains(this.points_.points, el);
@@ -960,7 +967,7 @@ anychart.core.ui.ColorRange.prototype.handleMouseOverAndMove = function(event) {
 
           if (dispatchUnhover) {
             var nearestPointIndex = this.points_.points[this.points_.points.length - 1];
-            map.dispatchEvent(map.makeInteractivityPointEvent('hovered', event, [{
+            chart.dispatchEvent(chart.makeInteractivityPointEvent('hovered', event, [{
               series: series,
               points: [],
               nearestPointToCursor: {index: nearestPointIndex, distance: 0}

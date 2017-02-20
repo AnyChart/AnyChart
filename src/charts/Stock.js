@@ -1383,9 +1383,8 @@ anychart.charts.Stock.prototype.getLastDate = function() {
 
 /**
  * Prevents chart from highlighting points.
- * @private
  */
-anychart.charts.Stock.prototype.preventHighlight_ = function() {
+anychart.charts.Stock.prototype.preventHighlight = function() {
   this.highlightPrevented_ = true;
   this.unhighlight_();
 };
@@ -1393,9 +1392,8 @@ anychart.charts.Stock.prototype.preventHighlight_ = function() {
 
 /**
  * Turns highlight prevention off and refreshes points highlight if necessary.
- * @private
  */
-anychart.charts.Stock.prototype.allowHighlight_ = function() {
+anychart.charts.Stock.prototype.allowHighlight = function() {
   this.highlightPrevented_ = false;
   this.refreshHighlight_();
 };
@@ -1525,7 +1523,7 @@ anychart.charts.Stock.prototype.scrollerChangeStartHandler_ = function(e) {
       anychart.enums.EventType.SELECTED_RANGE_CHANGE_START,
       this.transformScrollerSource_(e['source']));
   if (res)
-    this.preventHighlight_();
+    this.preventHighlight();
   return res;
 };
 
@@ -1560,7 +1558,7 @@ anychart.charts.Stock.prototype.scrollerChangeFinishHandler_ = function(e) {
   this.dispatchRangeChange_(
       anychart.enums.EventType.SELECTED_RANGE_CHANGE_FINISH,
       this.transformScrollerSource_(e['source']));
-  this.allowHighlight_();
+  this.allowHighlight();
 };
 //endregion
 
@@ -1683,7 +1681,7 @@ anychart.charts.Stock.prototype.askDragStart = function() {
       anychart.enums.EventType.SELECTED_RANGE_CHANGE_START,
       anychart.enums.StockRangeChangeSource.PLOT_DRAG);
   if (res) {
-    this.preventHighlight_();
+    this.preventHighlight();
     goog.style.setStyle(document['body'], 'cursor', acgraph.vector.Cursor.EW_RESIZE);
   }
   return res;
@@ -1698,7 +1696,7 @@ anychart.charts.Stock.prototype.dragEnd = function() {
   this.dispatchRangeChange_(
       anychart.enums.EventType.SELECTED_RANGE_CHANGE_FINISH,
       anychart.enums.StockRangeChangeSource.PLOT_DRAG);
-  this.allowHighlight_();
+  this.allowHighlight();
 };
 //endregion
 

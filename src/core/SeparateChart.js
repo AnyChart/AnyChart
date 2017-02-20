@@ -160,37 +160,66 @@ anychart.core.SeparateChart.prototype.legendItemOut = function(item, event) {
 };
 
 
+/**
+ * Draw legend.
+ * @param {anychart.math.Rect} bounds .
+ */
+anychart.core.SeparateChart.prototype.drawLegend = function(bounds) {
+  var legend = /** @type {anychart.core.ui.Legend} */(this.legend());
+
+  legend.suspendSignalsDispatching();
+  if (!legend.container() && legend.enabled())
+    legend.container(this.rootElement);
+  legend.parentBounds(bounds);
+  if (!legend.itemsSource())
+    legend.itemsSource(this);
+  legend.resumeSignalsDispatching(false);
+  legend.invalidate(anychart.ConsistencyState.APPEARANCE);
+  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND)) {
+    legend.invalidate(anychart.ConsistencyState.LEGEND_RECREATE_ITEMS);
+  }
+  legend.draw();
+
+  // DVF-1518
+  var legendBounds = legend.getRemainingBounds();
+  if (!goog.math.Rect.equals(this.legendBoundsCache_, legendBounds)) {
+    this.legendBoundsCache_ = legendBounds;
+    this.invalidate(anychart.ConsistencyState.BOUNDS);
+  }
+
+  this.markConsistent(anychart.ConsistencyState.CHART_LEGEND);
+};
+
+
 /** @inheritDoc */
 anychart.core.SeparateChart.prototype.calculateContentAreaSpace = function(totalBounds) {
   var bounds = anychart.core.SeparateChart.base(this, 'calculateContentAreaSpace', totalBounds);
 
   var legend = /** @type {anychart.core.ui.Legend} */(this.legend());
-  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND | anychart.ConsistencyState.BOUNDS)) {
-    legend.suspendSignalsDispatching();
-    if (!legend.container() && legend.enabled())
-      legend.container(this.rootElement);
-    legend.parentBounds(bounds);
-    if (!legend.itemsSource())
-      legend.itemsSource(this);
-    legend.resumeSignalsDispatching(false);
-    legend.invalidate(anychart.ConsistencyState.APPEARANCE);
-    if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND)) {
-      legend.invalidate(anychart.ConsistencyState.LEGEND_RECREATE_ITEMS);
-    }
-    legend.draw();
-
-    // DVF-1518
-    var legendBounds = legend.getRemainingBounds();
-    if (!goog.math.Rect.equals(this.legendBoundsCache_, legendBounds)) {
-      this.legendBoundsCache_ = legendBounds;
-      this.invalidate(anychart.ConsistencyState.BOUNDS);
-    }
-
-    this.markConsistent(anychart.ConsistencyState.CHART_LEGEND);
+  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND | anychart.ConsistencyState.BOUNDS) &&
+      legend.positionMode() == anychart.enums.LegendPositionMode.OUTSIDE) {
+    this.drawLegend(bounds);
   }
-  bounds = legend.enabled() ? legend.getRemainingBounds() : bounds;
+  bounds = legend.enabled() && legend.positionMode() == anychart.enums.LegendPositionMode.OUTSIDE ?
+      legend.getRemainingBounds() :
+      bounds;
 
   return bounds.clone();
+};
+
+
+/**
+ * Applying parent bounds to legend for inside position.
+ * @param {anychart.math.Rect} bounds .
+ */
+anychart.core.SeparateChart.prototype.specialDraw = function(bounds) {
+  var legend = /** @type {anychart.core.ui.Legend} */(this.legend());
+  if (this.hasInvalidationState(anychart.ConsistencyState.CHART_LEGEND | anychart.ConsistencyState.BOUNDS) &&
+      legend.positionMode() == anychart.enums.LegendPositionMode.INSIDE) {
+
+    this.drawLegend(bounds);
+    this.markConsistent(anychart.ConsistencyState.CHART_LEGEND);
+  }
 };
 
 

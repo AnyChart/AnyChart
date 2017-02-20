@@ -829,6 +829,10 @@ anychart.treeMap = anychart.treeMap || anychart.createNFIMError('TreeMap chart')
 anychart.pareto = anychart.pareto || anychart.createNFIMError('Pareto chart');
 
 
+/** @inheritDoc */
+anychart.resource = anychart.resource || anychart.createNFIMError('Resource chart');
+
+
 //region ------ Standalones
 /** @ignoreDoc */
 anychart.standalones.background = anychart.standalones.background || anychart.createNFIMError('anychart.standalones.Background');
@@ -1110,6 +1114,7 @@ goog.exportSymbol('anychart.toolbar', anychart.toolbar);
 goog.exportSymbol('anychart.ganttToolbar', anychart.ganttToolbar);
 goog.exportSymbol('anychart.treeMap', anychart.treeMap);
 goog.exportSymbol('anychart.pareto', anychart.pareto);
+goog.exportSymbol('anychart.resource', anychart.resource);
 goog.exportSymbol('anychart.standalones.background', anychart.standalones.background);
 goog.exportSymbol('anychart.ui.background', anychart.ui.background);
 goog.exportSymbol('anychart.standalones.colorRange', anychart.standalones.colorRange);

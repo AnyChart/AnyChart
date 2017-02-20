@@ -4504,7 +4504,7 @@ goog.provide('anychart.themes.defaultTheme');
                         this['dataIntervalUnit'], null, 'full'
                     )));
           },
-          'align': 'center',
+          'align': 'left',
           'padding': {
             'top': 10,
             'right': 10,

@@ -1691,10 +1691,10 @@ anychart.core.linearGauge.pointers.Base.prototype.setupByJSON = function(config,
   this.width(config['width']);
   this.offset(config['offset']);
   this.dataIndex(config['dataIndex']);
-  this.label(config['label']);
-  this.hoverLabel(config['hoverLabel']);
-  this.selectLabel(config['selectLabel']);
-  this.legendItem(config['legendItem']);
+  this.label().setup(config['label']);
+  this.hoverLabel().setup(config['hoverLabel']);
+  this.selectLabel().setup(config['selectLabel']);
+  this.legendItem().setup(config['legendItem']);
 
   this.color(config['color']);
   this.fill(config['fill']);
@@ -1759,8 +1759,8 @@ anychart.core.linearGauge.pointers.Base.prototype.disposeInternal = function() {
   proto['selectLabel'] = proto.selectLabel;
   proto['width'] = proto.width;
   proto['offset'] = proto.offset;
-  anychart.core.linearGauge.pointers.Base.prototype['hover'] = anychart.core.linearGauge.pointers.Base.prototype.hoverPoint;
+  proto['hover'] = proto.hoverPoint;
   proto['unhover'] = proto.unhover;
-  anychart.core.linearGauge.pointers.Base.prototype['select'] = anychart.core.linearGauge.pointers.Base.prototype.selectPoint;
+  proto['select'] = proto.selectPoint;
   proto['unselect'] = proto.unselect;
 })();

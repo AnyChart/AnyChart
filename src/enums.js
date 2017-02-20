@@ -3379,7 +3379,28 @@ anychart.enums.normalizeErrorMode = function(value, opt_default) {
  * Horizontal align enum.
  * @enum {string}
  */
-anychart.enums.HAlign = acgraph.vector.Text.HAlign;
+anychart.enums.HAlign = {
+  /**
+   Aligns the text to the left.
+   */
+  LEFT: 'left',
+  /**
+   The same as left if direction is left-to-right and right if direction is right-to-left.
+   */
+  START: 'start',
+  /**
+   The inline contents are centered within the line box.
+   */
+  CENTER: 'center',
+  /**
+   The same as right if direction is left-to-right and left if direction is right-to-left.
+   */
+  END: 'end',
+  /**
+   Aligns the text to the right.
+   */
+  RIGHT: 'right'
+};
 
 
 /**
@@ -3416,7 +3437,19 @@ anychart.enums.normalizeHAlign = function(value) {
  * Vertical align enum.
  * @enum {string}
  */
-anychart.enums.VAlign = acgraph.vector.Text.VAlign;
+anychart.enums.VAlign = {
+  /**
+   vAlign top.
+   */
+  TOP: 'top',
+  /**
+   */
+  MIDDLE: 'middle',
+  /**
+   vAlign bottom.
+   */
+  BOTTOM: 'bottom'
+};
 
 
 /**
@@ -3509,7 +3542,20 @@ anychart.enums.normalizeFontDecoration = function(value) {
  * Font style enumeration.
  * @enum {string}
  */
-anychart.enums.FontStyle = acgraph.vector.Text.FontStyle;
+anychart.enums.FontStyle = {
+  /**
+   Normal.
+   */
+  NORMAL: 'normal',
+  /**
+   Italic.
+   */
+  ITALIC: 'italic',
+  /**
+   Oblique.
+   */
+  OBLIQUE: 'oblique'
+};
 
 
 /**
@@ -3538,7 +3584,16 @@ anychart.enums.normalizeFontStyle = function(value) {
  * Font variant enumeration.
  * @enum {string}
  */
-anychart.enums.FontVariant = acgraph.vector.Text.FontVariant;
+anychart.enums.FontVariant = {
+  /**
+   Leave lovercase as is.
+   */
+  NORMAL: 'normal',
+  /**
+   Make lowercase smaller.
+   */
+  SMALL_CAP: 'small-caps'
+};
 
 
 /**
@@ -3605,7 +3660,16 @@ anychart.enums.normalizeTextDirection = function(value) {
  * Text wrap settings enumeration.
  * @enum {string}
  */
-anychart.enums.TextWrap = acgraph.vector.Text.TextWrap;
+anychart.enums.TextWrap = {
+  /**
+   No wrap.
+   */
+  NO_WRAP: 'noWrap',
+  /**
+   Wrap by symbol.
+   */
+  BY_LETTER: 'byLetter'
+};
 
 
 /**

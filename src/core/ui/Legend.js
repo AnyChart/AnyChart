@@ -1352,7 +1352,7 @@ anychart.core.ui.Legend.prototype.calculateBounds_ = function() {
           } else {
             minimalContentAreaWidth = contentWidth;
           }
-          var widthToSet = Math.max(1, title.margin().tightenWidth(contentAreaWidth - titleWidth <= minimalContentAreaWidth ? contentAreaWidth - minimalContentAreaWidth : titleWidth));
+          var widthToSet = Math.max(Math.min(title.text().length, 1), title.margin().tightenWidth(contentAreaWidth - titleWidth <= minimalContentAreaWidth ? contentAreaWidth - minimalContentAreaWidth : titleWidth));
           title.setAutoWidth(/** @type {null|number|string} */(widthToSet));
         } else if (!titleIsRLYHorizontal) {
           //another cases

@@ -10,6 +10,7 @@ goog.require('anychart.core.ui.ScrollBar');
 goog.require('anychart.core.ui.Splitter');
 goog.require('anychart.modules.base');
 goog.require('anychart.modules.pert');
+goog.require('anychart.modules.resource');
 
 
 /**

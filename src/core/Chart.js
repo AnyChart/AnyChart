@@ -1286,6 +1286,8 @@ anychart.core.Chart.prototype.drawInternal = function() {
   anychart.performance.end('Chart.calculateBounds()');
   anychart.performance.start('Chart.drawContent()');
   this.drawContent(this.contentBounds);
+  this.specialDraw(this.getPlotBounds());
+
   anychart.performance.end('Chart.drawContent()');
 
   // used for crosshair
@@ -1377,6 +1379,13 @@ anychart.core.Chart.prototype.beforeDraw = function() {};
  * @param {anychart.math.Rect} bounds Chart content area bounds.
  */
 anychart.core.Chart.prototype.drawContent = function(bounds) {};
+
+
+/**
+ * Extension point do draw special chart content.
+ * @param {anychart.math.Rect} bounds Chart plot bounds.
+ */
+anychart.core.Chart.prototype.specialDraw = function(bounds) {};
 
 
 //----------------------------------------------------------------------------------------------------------------------
