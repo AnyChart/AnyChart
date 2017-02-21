@@ -686,6 +686,9 @@ anychart.utils.applyOffsetByAnchor = function(position, anchor, offsetX, offsetY
       position.x -= offsetX;
       position.y -= offsetY;
       break;
+
+    default:
+      break;
   }
   return position;
 };

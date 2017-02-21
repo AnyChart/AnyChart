@@ -5325,7 +5325,8 @@
         "centerBottom",
         "rightTop",
         "rightCenter",
-        "rightBottom"
+        "rightBottom",
+        "auto"
       ]
     },
     "anychart.enums.Orientation": {

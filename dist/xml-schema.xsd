@@ -2989,6 +2989,7 @@
             <xsd:enumeration value="rightTop"/>
             <xsd:enumeration value="rightCenter"/>
             <xsd:enumeration value="rightBottom"/>
+            <xsd:enumeration value="auto"/>
             <xsd:enumeration value="null"/>
         </xsd:restriction>
     </xsd:simpleType>

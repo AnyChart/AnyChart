@@ -419,7 +419,10 @@ anychart.enums.Anchor = {
   RIGHT_CENTER: 'rightCenter',
 
   /** The right-bottom anchor of the element. */
-  RIGHT_BOTTOM: 'rightBottom'
+  RIGHT_BOTTOM: 'rightBottom',
+
+  /** Auto anchor of the element. Flips anchor depends on position. */
+  AUTO: 'auto'
 };
 
 
@@ -485,6 +488,8 @@ anychart.enums.normalizeAnchor = function(value, opt_default) {
     case 'rb':
     case 'br':
       return anychart.enums.Anchor.RIGHT_BOTTOM;
+    case 'auto':
+      return anychart.enums.Anchor.AUTO;
   }
   return goog.isDef(opt_default) ? opt_default : anychart.enums.Anchor.LEFT_TOP;
 };
@@ -527,17 +532,46 @@ anychart.enums.normalizeAnchor = function(value, opt_default) {
  * stage.circle(pathBounds.left + pathBounds.width, pathBounds.top + pathBounds.height, 3).fill('blue');
  * @enum {string}
  */
-anychart.enums.Position = anychart.enums.Anchor;
+anychart.enums.Position = {
+  /** The left-top position of the element. */
+  LEFT_TOP: 'leftTop',
+
+  /** The left-center position of the element. */
+  LEFT_CENTER: 'leftCenter',
+
+  /** The left-bottom position of the element. */
+  LEFT_BOTTOM: 'leftBottom',
+
+  /** The center-top position of the element. */
+  CENTER_TOP: 'centerTop',
+
+  /** The center position of the element. */
+  CENTER: 'center',
+
+  /** The center-bottom position of the element. */
+  CENTER_BOTTOM: 'centerBottom',
+
+  /** The right-top position of the element. */
+  RIGHT_TOP: 'rightTop',
+
+  /** The right-center position of the element.*/
+  RIGHT_CENTER: 'rightCenter',
+
+  /** The right-bottom position of the element. */
+  RIGHT_BOTTOM: 'rightBottom'
+};
 
 
 /**
  * Normalizes position to an anychart.enums.Position instance.
  * @param {*} value Input to normalize.
- * @param {anychart.enums.Position=} opt_default Default value, if input cannot be recognized. Defaults to LEFT_TOP.
- * @return {anychart.enums.Position}
+ * @param {T=} opt_default Default value, if input cannot be recognized. Defaults to LEFT_TOP.
+ * @return {anychart.enums.Position|T}
+ * @template T
  */
 anychart.enums.normalizePosition = function(value, opt_default) {
-  return /** @type {anychart.enums.Position} */(anychart.enums.normalizeAnchor(value, opt_default));
+  value = /** @type {anychart.enums.Position} */ (anychart.enums.normalizeAnchor(value, opt_default));
+  return (value == anychart.enums.Anchor.AUTO && goog.isDef(opt_default)) ? opt_default : value;
 };
 
 
@@ -5902,6 +5936,7 @@ goog.exportSymbol('anychart.enums.Anchor.CENTER_BOTTOM', anychart.enums.Anchor.C
 goog.exportSymbol('anychart.enums.Anchor.RIGHT_TOP', anychart.enums.Anchor.RIGHT_TOP);
 goog.exportSymbol('anychart.enums.Anchor.RIGHT_CENTER', anychart.enums.Anchor.RIGHT_CENTER);
 goog.exportSymbol('anychart.enums.Anchor.RIGHT_BOTTOM', anychart.enums.Anchor.RIGHT_BOTTOM);
+goog.exportSymbol('anychart.enums.Anchor.AUTO', anychart.enums.Anchor.AUTO);
 
 goog.exportSymbol('anychart.enums.Cursor.DEFAULT', anychart.enums.Cursor.DEFAULT);
 goog.exportSymbol('anychart.enums.Cursor.CROSSHAIR', anychart.enums.Cursor.CROSSHAIR);

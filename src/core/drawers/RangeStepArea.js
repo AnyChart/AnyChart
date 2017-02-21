@@ -58,7 +58,7 @@ anychart.core.drawers.RangeStepArea.prototype.requiredShapes = (function() {
 
 
 /** @inheritDoc */
-anychart.core.drawers.RangeStepArea.prototype.yValueNames = (['high', 'low']);
+anychart.core.drawers.RangeStepArea.prototype.yValueNames = (['low', 'high']);
 
 
 /** @inheritDoc */

@@ -1616,6 +1616,26 @@ anychart.core.ui.LabelsFactory.Label.prototype.autoAnchor = function(opt_value) 
 
 /**
  * Getter for label anchor settings.
+ * @param {(boolean)=} opt_value .
+ * @return {!anychart.core.ui.LabelsFactory.Label|anychart.enums.Anchor} .
+ */
+anychart.core.ui.LabelsFactory.Label.prototype.autoVertical = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var value = !!opt_value;
+    if (this.settingsObj.autoVertical !== value) {
+      this.settingsObj.autoVertical = value;
+      if (!goog.isDef(this.settingsObj.autoVertical))
+        this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  } else {
+    return this.settingsObj.autoVertical;
+  }
+};
+
+
+/**
+ * Getter for label anchor settings.
  * @param {(anychart.enums.Anchor|string)=} opt_value .
  * @return {!anychart.core.ui.LabelsFactory.Label|anychart.enums.Anchor} .
  */
@@ -2168,6 +2188,12 @@ anychart.core.ui.LabelsFactory.Label.prototype.getFinalSettings_ = function(
 anychart.core.ui.LabelsFactory.Label.prototype.drawLabel = function(bounds, parentBounds) {
   var positionFormatter = this.mergedSettings['positionFormatter'];
   var anchor = this.mergedSettings['anchor'];
+  var isAutoAnchor = anchor === anychart.enums.Anchor.AUTO;
+  var isVertical = false;
+  if (isAutoAnchor) {
+    anchor = this.autoAnchor();
+    isVertical = this.autoVertical();
+  }
   var offsetX = this.mergedSettings['offsetX'];
   var offsetY = this.mergedSettings['offsetY'];
 
@@ -2205,7 +2231,10 @@ anychart.core.ui.LabelsFactory.Label.prototype.drawLabel = function(bounds, pare
   var offsetXNormalized = goog.isDef(offsetX) ? anychart.utils.normalizeSize(/** @type {number|string} */(offsetX), parentWidth) : 0;
   var offsetYNormalized = goog.isDef(offsetY) ? anychart.utils.normalizeSize(/** @type {number|string} */(offsetY), parentHeight) : 0;
 
-  anychart.utils.applyOffsetByAnchor(position, anchor, offsetXNormalized, offsetYNormalized);
+  if (isVertical)
+    anychart.utils.applyOffsetByAnchor(position, anchor, offsetYNormalized, offsetXNormalized);
+  else
+    anychart.utils.applyOffsetByAnchor(position, anchor, offsetXNormalized, offsetYNormalized);
 
   this.textX += position.x;
   this.textY += position.y;

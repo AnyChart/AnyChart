@@ -56,7 +56,7 @@ anychart.core.drawers.RangeColumn.prototype.requiredShapes = (function() {
 
 
 /** @inheritDoc */
-anychart.core.drawers.RangeColumn.prototype.yValueNames = (['high', 'low']);
+anychart.core.drawers.RangeColumn.prototype.yValueNames = (['low', 'high']);
 
 
 /** @inheritDoc */

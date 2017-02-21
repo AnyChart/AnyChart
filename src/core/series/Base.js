@@ -1995,7 +1995,7 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(factoryGetters
           mainFactory.position();
       positionProvider = this.createPositionProvider(/** @type {anychart.enums.Position|string} */(position), true);
       return this.drawSingleFactoryElement(mainFactory, index, positionProvider, formatProvider,
-          stateFactory, pointOverride, statePointOverride);
+          stateFactory, pointOverride, statePointOverride, position);
     }
   } else {
     if (positionYs) {
@@ -2011,6 +2011,86 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(factoryGetters
 
 
 /**
+ *
+ * @param {?anychart.enums.Position} position
+ * @param {boolean} positiveDirection
+ * @param {boolean} isVertical
+ * @return {anychart.enums.Anchor}
+ */
+anychart.core.series.Base.prototype.flipAnchor = function(position, positiveDirection, isVertical) {
+  if (position === null) {
+    if (positiveDirection) {
+      if (isVertical) {
+        return anychart.enums.Anchor.LEFT_CENTER;
+      } else {
+        return anychart.enums.Anchor.CENTER_BOTTOM;
+      }
+    } else {
+      if (isVertical) {
+        return anychart.enums.Anchor.RIGHT_CENTER;
+      } else {
+        return anychart.enums.Anchor.CENTER_TOP;
+      }
+    }
+  } else {
+    switch (position) {
+      case anychart.enums.Position.LEFT_TOP:
+        return anychart.enums.Anchor.RIGHT_BOTTOM;
+
+      case anychart.enums.Position.LEFT_CENTER:
+        return anychart.enums.Anchor.RIGHT_CENTER;
+
+      case anychart.enums.Position.LEFT_BOTTOM:
+        return anychart.enums.Anchor.RIGHT_TOP;
+
+      case anychart.enums.Position.CENTER_TOP:
+        return anychart.enums.Anchor.CENTER_BOTTOM;
+
+      case anychart.enums.Position.CENTER:
+        return anychart.enums.Anchor.CENTER;
+
+      case anychart.enums.Position.CENTER_BOTTOM:
+        return anychart.enums.Anchor.CENTER_TOP;
+
+      case anychart.enums.Position.RIGHT_TOP:
+        return anychart.enums.Anchor.LEFT_BOTTOM;
+
+      case anychart.enums.Position.RIGHT_CENTER:
+        return anychart.enums.Anchor.LEFT_CENTER;
+
+      case anychart.enums.Position.RIGHT_BOTTOM:
+        return anychart.enums.Anchor.LEFT_TOP;
+
+      default:
+        return anychart.enums.Anchor.CENTER;
+    }
+  }
+};
+
+
+/**
+ * Resolves anchor in auto mode.
+ * @param {?anychart.enums.Position|string} position Position.
+ * @param {anychart.core.ui.LabelsFactory.Label} element Label.
+ * @return {anychart.enums.Anchor}
+ */
+anychart.core.series.Base.prototype.resolveAutoAnchor = function(position, element) {
+  var iterator = this.getIterator();
+
+  var normalizedPosition = anychart.enums.normalizePosition(position, null);
+  var valueNames = this.getYValueNames();
+  var value = /** @type {string} */ (normalizedPosition == null ? position : valueNames[valueNames.length - 1]);
+
+  var isVertical = /** @type {boolean} */ (this.getOption('isVertical'));
+  var positiveDirection = (/** @type {number} */ (iterator.get(value)) || 0) >= 0;
+  var flippedAnchor = this.flipAnchor(normalizedPosition, positiveDirection, isVertical);
+  element.autoAnchor(flippedAnchor);
+  element.autoVertical(isVertical);
+  return flippedAnchor;
+};
+
+
+/**
  * Draws one factory element.
  * @param {anychart.core.ui.MarkersFactory|anychart.core.ui.LabelsFactory} factory
  * @param {number|undefined} index
@@ -2019,10 +2099,11 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(factoryGetters
  * @param {anychart.core.ui.MarkersFactory|anychart.core.ui.LabelsFactory|null} stateFactory
  * @param {*} pointOverride
  * @param {*} statePointOverride
+ * @param {(?anychart.enums.Position|string)=} opt_position Position which is needed to calculate label auto anchor.
  * @return {anychart.core.ui.MarkersFactory.Marker|anychart.core.ui.LabelsFactory.Label}
  * @protected
  */
-anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factory, index, positionProvider, formatProvider, stateFactory, pointOverride, statePointOverride) {
+anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factory, index, positionProvider, formatProvider, stateFactory, pointOverride, statePointOverride, opt_position) {
   var element = formatProvider ? factory.getLabel(/** @type {number} */(index)) : factory.getMarker(/** @type {number} */(index));
   if (element) {
     if (formatProvider)
@@ -2035,6 +2116,9 @@ anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factory,
       element = factory.add(positionProvider, index);
   }
   element.resetSettings();
+  if (goog.isDef(opt_position) && formatProvider) {
+    this.resolveAutoAnchor(opt_position, element);
+  }
   if (formatProvider)
     element.currentLabelsFactory(stateFactory || factory);
   else
