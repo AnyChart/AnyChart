@@ -1156,12 +1156,14 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="text" type="simple.Text"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="url" type="simple.Text"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="alt" type="simple.Text"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="img_alt" type="simple.Text"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="logo_src" type="simple.Text"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="in_chart" type="simple.Bool"/>
         </xsd:all>
         <xsd:attribute name="text" type="xsd:string"/>
         <xsd:attribute name="url" type="xsd:string"/>
         <xsd:attribute name="alt" type="xsd:string"/>
+        <xsd:attribute name="img_alt" type="xsd:string"/>
         <xsd:attribute name="logo_src" type="xsd:string"/>
         <xsd:attribute name="in_chart" type="xsd:boolean"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>

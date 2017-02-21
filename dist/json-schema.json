@@ -4819,6 +4819,7 @@
         "text": {"type": "string"},
         "url": {"type": "string"},
         "alt": {"type": "string"},
+        "imgAlt": {"type": "string"},
         "logoSrc": {"type": "string"},
         "isChart": {"type": "boolean"}
       }

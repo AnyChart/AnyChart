@@ -1073,8 +1073,9 @@ goog.provide('anychart.themes.defaultTheme');
 
     'stageCredits': {
       'text': 'AnyChart',
-      'url': 'http://anychart.com',
-      'alt': 'AnyChart.com',
+      'url': 'http://www.anychart.com/?utm_source=registered',
+      'alt': 'AnyChart - JavaScript Charts designed to be embedded and integrated',
+      'imgAlt': 'AnyChart - JavaScript Charts',
       'logoSrc': 'https://static.anychart.com/logo.png'
     },
 

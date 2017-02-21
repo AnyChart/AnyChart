@@ -271,6 +271,24 @@ anychart.core.ui.StageCredits.prototype.alt = function(opt_value) {
 
 
 /**
+ * Getter/setter for image alt.
+ * @param {string=} opt_value alt.
+ * @return {string|anychart.core.ui.StageCredits} alt or self for chaining.
+ */
+anychart.core.ui.StageCredits.prototype.imgAlt = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.imgAlt_ != opt_value) {
+      this.imgAlt_ = opt_value;
+      if (this.isValid())
+        this.invalidate(anychart.core.ui.StageCredits.States.URL_ALT, true);
+    }
+    return this;
+  }
+  return this.imgAlt_;
+};
+
+
+/**
  * Getter/setter for logoSrc.
  * @param {string=} opt_value logoSrc.
  * @return {string|anychart.core.ui.StageCredits} logoSrc or self for chaining.
@@ -370,9 +388,12 @@ anychart.core.ui.StageCredits.prototype.render = function() {
 
   if (this.hasInvalidationState(anychart.core.ui.StageCredits.States.URL_ALT)) {
     goog.dom.setProperties(this.a_, {
-      'href': valid ? this.url() : 'http://anychart.com',
-      'title': valid ? this.alt() : 'AnyChart',
+      'href': valid ? this.url() : 'http://www.anychart.com/?utm_source=trial',
+      'title': valid ? this.alt() : 'AnyChart - JavaScript Charts designed to be embedded and integrated',
       'target': '_blank'
+    });
+    goog.dom.setProperties(this.image_, {
+      'alt': valid ? this.imgAlt() : 'AnyChart - JavaScript Charts'
     });
     this.markConsistent(anychart.core.ui.StageCredits.States.URL_ALT);
   }
@@ -485,6 +506,7 @@ anychart.core.ui.StageCredits.prototype.setup = function(config) {
     this.url(config['url']);
     this.text(config['text']);
     this.alt(config['alt']);
+    this.imgAlt(config['imgAlt']);
     this.logoSrc(config['logoSrc']);
     this.enabled(config['enabled']);
   }
@@ -500,6 +522,7 @@ anychart.core.ui.StageCredits.prototype.serialize = function() {
   var json = {};
   json['url'] = this.url();
   json['alt'] = this.alt();
+  json['imgAlt'] = this.imgAlt();
   json['text'] = this.text();
   json['logoSrc'] = this.logoSrc();
   json['enabled'] = this.enabled();
@@ -536,6 +559,7 @@ anychart.core.ui.StageCredits.prototype.disposeInternal = function() {
   proto['text'] = proto.text;
   proto['url'] = proto.url;
   proto['alt'] = proto.alt;
+  proto['imgAlt'] = proto.imgAlt;
   proto['logoSrc'] = proto.logoSrc;
   proto['enabled'] = proto.enabled;
 })();

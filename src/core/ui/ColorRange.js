@@ -871,7 +871,7 @@ anychart.core.ui.ColorRange.prototype.handleMouseClick = function(event) {
       if (scale && series) {
         chart = /** @type {anychart.core.SeparateChart} */(series.getChart());
         interactivity = /** @type {anychart.core.utils.Interactivity} */(chart.interactivity());
-        if (interactivity.hoverMode() ==anychart.enums.HoverMode.SINGLE) {
+        if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
           this.points_ = {
             series: series,
             points: points

@@ -251,7 +251,7 @@ anychart.core.Chart.prototype.createStage = function() {
   var stage = acgraph.create();
   stage.allowCreditsDisabling = this.allowCreditsDisabling;
 
-  stage.credits(this.credits().serialize());
+  stage.credits(this.credits().serializeDiff());
   return stage;
 };
 
@@ -1112,7 +1112,7 @@ anychart.core.Chart.prototype.drawCredits = function(parentBounds) {
   var stageCredits = stage.credits();
   var chartCredits = this.credits();
 
-  stageCredits.setup(chartCredits.serialize());
+  stageCredits.setup(chartCredits.serializeDiff());
   chartCredits.dropSettings();
 
   this.markConsistent(anychart.ConsistencyState.CHART_CREDITS);
