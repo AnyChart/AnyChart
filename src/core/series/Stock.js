@@ -274,6 +274,12 @@ anychart.core.series.Stock.prototype.getSelectableData = function() {
 anychart.core.series.Stock.prototype.getDetachedIterator = function() {
   return this.data_.getIterator();
 };
+
+
+/** @inheritDoc */
+anychart.core.series.Stock.prototype.considerMetaEmpty = function() {
+  return true;
+};
 //endregion
 
 

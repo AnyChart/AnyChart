@@ -3140,6 +3140,16 @@ anychart.core.series.Base.prototype.applyAxesLinesSpace = function(value) {
 
 
 /**
+ * If the series should consider the meta empty in makePointMeta.
+ * @return {boolean}
+ * @protected
+ */
+anychart.core.series.Base.prototype.considerMetaEmpty = function() {
+  return false;
+};
+
+
+/**
  * Calculates pixel value
  * @param {anychart.data.IRowInfo} rowInfo
  * @param {Array.<string>} yNames
@@ -3147,7 +3157,9 @@ anychart.core.series.Base.prototype.applyAxesLinesSpace = function(value) {
  */
 anychart.core.series.Base.prototype.makePointMeta = function(rowInfo, yNames, yColumns) {
   var i;
-  var pointMissing = (Number(rowInfo.meta('missing')) || 0) & ~anychart.core.series.PointAbsenceReason.OUT_OF_RANGE;
+  var pointMissing = this.considerMetaEmpty() ?
+      0 :
+      (Number(rowInfo.meta('missing')) || 0) & ~anychart.core.series.PointAbsenceReason.OUT_OF_RANGE;
   if (!this.isPointVisible(rowInfo))
     pointMissing |= anychart.core.series.PointAbsenceReason.OUT_OF_RANGE;
   rowInfo.meta('x',

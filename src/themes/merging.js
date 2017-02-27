@@ -305,9 +305,11 @@ anychart.themes.merging.demergeMultiple_ = function(target, defaultObj) {
       var itemDefault = anychart.themes.merging.getThemePart_(defaultObj,
           anychart.themes.merging.multipleEntities_[name].split('.'));
       var success = true;
-      if (goog.isArray(defaultArray) && defaultArray.length == len) {
+      var defaultArrayElement;
+      var defaultArrayLen = goog.isArray(defaultArray) ? defaultArray.length : 0;
+      if (defaultArrayLen == len) {
         for (i = 0; i < len; i++) {
-          var defaultArrayElement = anychart.utils.recursiveClone(defaultArray[i]);
+          defaultArrayElement = anychart.utils.recursiveClone(defaultArray[i]);
           defaultArrayElement = anychart.themes.merging.merge(defaultArrayElement, itemDefault);
           if (!anychart.themes.merging.checkEquality_(targetPart[i], defaultArrayElement)) {
             success = false;
@@ -321,7 +323,13 @@ anychart.themes.merging.demergeMultiple_ = function(target, defaultObj) {
         target = anychart.themes.merging.removeThemePart_(target, namePath);
       } else {
         for (i = 0; i < len; i++) {
-          targetPart[i] = anychart.themes.merging.demerge_(targetPart[i], itemDefault) || {};
+          if (i < defaultArrayLen) {
+            defaultArrayElement = anychart.utils.recursiveClone(defaultArray[i]);
+            defaultArrayElement = anychart.themes.merging.merge(defaultArrayElement, itemDefault);
+          } else {
+            defaultArrayElement = itemDefault;
+          }
+          targetPart[i] = anychart.themes.merging.demerge_(targetPart[i], defaultArrayElement) || {};
         }
       }
     }
@@ -408,8 +416,7 @@ anychart.themes.merging.demerge_ = function(target, defaultObj, opt_nonMergableE
         } else {
           nonMergableEntityType = anychart.themes.merging.NonMergableEntityTypes_.NONE;
         }
-        if (nonMergableEntityType == anychart.themes.merging.NonMergableEntityTypes_.SCALE ||
-            nonMergableEntityType == anychart.themes.merging.NonMergableEntityTypes_.PADDING) {
+        if (nonMergableEntityType != anychart.themes.merging.NonMergableEntityTypes_.NONE) {
           val = anychart.themes.merging.checkEquality_(target[key], defVal, nonMergableEntityType) ?
               undefined : target[key];
         } else {
