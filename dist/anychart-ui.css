@@ -628,13 +628,8 @@
  width: 21px;
 }
 .anychart-menuitem i {
- height: 16px;
- left: 6px;
  position: absolute;
- right: auto;
- vertical-align: middle;
- width: 16px;
- padding-top: 1px;
+ left: 9px;
 }
 .anychart-menuitem-link {
  padding: 0;
@@ -648,9 +643,16 @@
  box-sizing: border-box;
  transition: none;
 }
+.anychart-menuitem-link i {
+ padding-top: 7px;
+ pointer-events: none;
+}
 .anychart-menuitem-link.anychart-menuitem-highlight a {
  padding-bottom: 5px;
  padding-top: 5px;
+}
+.anychart-menuitem-link.anychart-menuitem-highlight i {
+ padding-top: 6px;
 }
 .anychart-menuitem-rtl .anychart-menuitem-checkbox,
 .anychart-menuitem-rtl .anychart-menuitem-icon {

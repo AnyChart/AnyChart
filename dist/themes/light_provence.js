@@ -64,9 +64,6 @@
                 },
                 fontSize: 15
             },
-            content: {
-                fontColor: "#997f89"
-            },
             separator: {
                 enabled: !1
             },
@@ -283,9 +280,7 @@
             selectStroke: "2 #eceff1"
         },
         stock: {
-            padding: [20,
-                30, 20, 60
-            ],
+            padding: [20, 30, 20, 60],
             defaultPlotSettings: {
                 xAxis: {
                     background: {

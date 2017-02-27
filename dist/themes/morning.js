@@ -105,9 +105,6 @@
                 },
                 fontSize: 18
             },
-            content: {
-                fontColor: "#78909c"
-            },
             separator: {
                 enabled: !1,
                 padding: {
