@@ -50,7 +50,7 @@ anychart.exports.facebook_ = {
  * @private
  */
 anychart.exports.twitter_ = {
-  'url': 'http://export.anychart.stg/sharing/twitter',
+  'url': 'http://export.anychart.com/sharing/twitter',
   'width': 1024,
   'height': 800
 };

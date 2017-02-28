@@ -43,7 +43,7 @@
     "*.swp",
     "node_modules",
     "bower_components",
-    "update_submodules",
+    "update-submodules",
     "modules.edn",
     "cat.config",
     "build*",

@@ -26,7 +26,7 @@ PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 CONTRIB_PATH = os.path.join(PROJECT_PATH, 'libs')
 SRC_PATH = os.path.join(PROJECT_PATH, 'src')
 OUT_PATH = os.path.join(PROJECT_PATH, 'out')
-DIST_PATH = os.path.join(PROJECT_PATH, 'out')
+DIST_PATH = os.path.join(PROJECT_PATH, 'dist')
 MODULES_PATH = os.path.join(SRC_PATH, 'modules')
 THEMES_PATH = os.path.join(SRC_PATH, 'themes')
 
@@ -788,32 +788,31 @@ def __build_release():
                      not name.startswith('Maps') and
                      not name.startswith('Seat') and
                      not name.startswith('Graphics')
-
     )
 
     # rm gallery demos dir
     shutil.rmtree(os.path.join(OUT_PATH, 'gallery_demos'))
 
     # export server
-    print "Build export-server"
-    if os.path.exists(export_server_project_path):
-        # define version
-        export_server_version, export_server_bundle_version = __get_export_server_version(export_server_project_path)
-
-        # build export server
-        shutil.copyfile(os.path.join(OUT_PATH, 'anychart-bundle.min.js'),
-                        os.path.join(export_server_project_path, 'resources', 'js', 'anychart-bundle.min.js'))
-        p = subprocess.Popen(['lein', 'uberjar'], cwd=export_server_project_path)
-        p.wait()
-
-        # copy to out
-        shutil.copyfile(os.path.join(export_server_project_path, 'target', 'export-server-standalone.jar'),
-                        os.path.join(OUT_PATH, 'export-server.jar'))
-        shutil.copyfile(os.path.join(export_server_project_path, 'target', 'export-server-standalone.jar'),
-                        os.path.join(OUT_PATH, 'export-server-%s-bundle-%s.jar' % (
-                        export_server_version, export_server_bundle_version)))
-    else:
-        print "Error: Unable to build export server, there is no project at path: %s" % export_server_project_path
+    #print "Build export-server"
+    #if os.path.exists(export_server_project_path):
+    #    # define version
+    #    export_server_version, export_server_bundle_version = __get_export_server_version(export_server_project_path)
+    #
+    #    # build export server
+    #    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-bundle.min.js'),
+    #                    os.path.join(export_server_project_path, 'resources', 'js', 'anychart-bundle.min.js'))
+    #    p = subprocess.Popen(['lein', 'uberjar'], cwd=export_server_project_path)
+    #    p.wait()
+    #
+    #    # copy to out
+    #    shutil.copyfile(os.path.join(export_server_project_path, 'target', 'export-server-standalone.jar'),
+    #                    os.path.join(OUT_PATH, 'export-server.jar'))
+    #    shutil.copyfile(os.path.join(export_server_project_path, 'target', 'export-server-standalone.jar'),
+    #                    os.path.join(OUT_PATH, 'export-server-%s-bundle-%s.jar' % (
+    #                    export_server_version, export_server_bundle_version)))
+    #else:
+    #    print "Error: Unable to build export server, there is no project at path: %s" % export_server_project_path
 
     print "Release build complete! Build time: {:.3f} sec".format(time.time() - t)
 
@@ -873,13 +872,13 @@ def __build_product_package(output_dir, binary_name, gallery_pass_func=None):
     # copy chart editor (anychart install package only)
     if binary_name == 'anychart':
             shutil.copyfile(os.path.join(OUT_PATH, 'chart-editor.min.js'),
-                            os.path.join(output_dir, 'js', ' chart-editor.min.js'))
-            shutil.copyfile(os.path.join(OUT_PATH, ' chart-editor.min.js.gz'),
-                            os.path.join(output_dir, 'js', ' chart-editor.min.js.gz'))
-            shutil.copyfile(os.path.join(OUT_PATH, ' chart-editor.dev.min.js'),
-                            os.path.join(output_dir, 'js', ' chart-editor.dev.min.js'))
-            shutil.copyfile(os.path.join(OUT_PATH, ' chart-editor.dev.min.js.gz'),
-                            os.path.join(output_dir, 'js', ' chart-editor.dev.min.js.gz'))
+                            os.path.join(output_dir, 'js', 'chart-editor.min.js'))
+            shutil.copyfile(os.path.join(OUT_PATH, 'chart-editor.min.js.gz'),
+                            os.path.join(output_dir, 'js', 'chart-editor.min.js.gz'))
+            shutil.copyfile(os.path.join(OUT_PATH, 'chart-editor.dev.min.js'),
+                            os.path.join(output_dir, 'js', 'chart-editor.dev.min.js'))
+            shutil.copyfile(os.path.join(OUT_PATH, 'chart-editor.dev.min.js.gz'),
+                            os.path.join(output_dir, 'js', 'chart-editor.dev.min.js.gz'))
 
     # copy themes
     for theme in __get_themes_list():
@@ -1042,8 +1041,8 @@ def __upload_release():
         upload_list.append({'source_file': '%s/%s%s' % (OUT_PATH, theme, '.min.js'), 'target': '/themes/%s/'})
 
     # schemas
-    upload_list.append({'source_file': '%s/xml-schema.xsd' % PROJECT_PATH, 'target': '/schemas/%s/'})
-    upload_list.append({'source_file': '%s/json-schema.json' % PROJECT_PATH, 'target': '/schemas/%s/'})
+    upload_list.append({'source_file': '%s/xml-schema.xsd' % DIST_PATH, 'target': '/schemas/%s/'})
+    upload_list.append({'source_file': '%s/json-schema.json' % DIST_PATH, 'target': '/schemas/%s/'})
 
     # binaries packages
     upload_list.append({'source_file': '%s/anychart.zip' % OUT_PATH, 'target': '/binaries-package/%s/'})
