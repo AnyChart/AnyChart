@@ -876,7 +876,7 @@ anychart.core.Chart.contextMenuItems = {
         context['chart'].saveAsCsv();
       }
     }, {
-      'text': '.xslx',
+      'text': '.xlsx',
       'iconClass': 'ac ac-file-excel-o',
       'eventType': 'anychart.saveAsXlsx',
       'action': function(context) {

@@ -243,7 +243,7 @@
                 stroke: "none",
                 zIndex: 1
             },
-            content: {
+            contentInternal: {
                 enabled: !0,
                 fontSize: 10,
                 fontFamily: "Verdana, Helvetica, Arial, sans-serif",
@@ -1085,7 +1085,7 @@
                         size: 6
                     },
                     tooltip: {
-                        content: {
+                        contentInternal: {
                             hAlign: "left"
                         },
                         textFormatter: function() {
@@ -1167,7 +1167,7 @@
                         return a.anychart.color.darken(a.anychart.color.darken(a.anychart.color.darken("blue")))
                     },
                     tooltip: {
-                        content: {
+                        contentInternal: {
                             hAlign: "left"
                         },
                         textFormatter: function() {
@@ -1237,7 +1237,7 @@
                         return a.anychart.color.darken("blue")
                     },
                     tooltip: {
-                        content: {
+                        contentInternal: {
                             hAlign: "left"
                         },
                         textFormatter: function() {
@@ -1268,7 +1268,7 @@
                         return a.anychart.color.darken(this.sourceColor)
                     },
                     tooltip: {
-                        content: {
+                        contentInternal: {
                             hAlign: "left"
                         },
                         textFormatter: function() {
@@ -1284,7 +1284,7 @@
                         position: "rightCenter"
                     },
                     tooltip: {
-                        content: {
+                        contentInternal: {
                             hAlign: "left"
                         },
                         textFormatter: function() {
@@ -1294,7 +1294,7 @@
                 },
                 rangeColumn: {
                     tooltip: {
-                        content: {
+                        contentInternal: {
                             hAlign: "left"
                         },
                         textFormatter: function() {
@@ -1319,11 +1319,12 @@
                         return a.anychart.color.darken(this.sourceColor)
                     },
                     tooltip: {
-                        content: {
+                        contentInternal: {
                             hAlign: "left"
                         },
                         textFormatter: function() {
-                            return "High: " + this.valuePrefix + parseFloat(this.high).toFixed(2) + this.valuePostfix + "\nLow: " + this.valuePrefix + parseFloat(this.low).toFixed(2) + this.valuePostfix
+                            return "High: " + this.valuePrefix + parseFloat(this.high).toFixed(2) + this.valuePostfix + "\nLow: " + this.valuePrefix + parseFloat(this.low).toFixed(2) +
+                                this.valuePostfix
                         }
                     }
                 },
@@ -1344,11 +1345,12 @@
                         return a.anychart.color.darken(this.sourceColor)
                     },
                     tooltip: {
-                        content: {
+                        contentInternal: {
                             hAlign: "left"
                         },
                         textFormatter: function() {
-                            return "High: " + this.valuePrefix + parseFloat(this.high).toFixed(2) + this.valuePostfix + "\nLow: " + this.valuePrefix + parseFloat(this.low).toFixed(2) + this.valuePostfix
+                            return "High: " + this.valuePrefix + parseFloat(this.high).toFixed(2) + this.valuePostfix +
+                                "\nLow: " + this.valuePrefix + parseFloat(this.low).toFixed(2) + this.valuePostfix
                         }
                     }
                 },
@@ -1686,18 +1688,18 @@
                     f = d.getType();
                     if ("ordinal" == f) {
                         d = d.values();
-                        c += "Y-scale with " + d.length + " categories: ";
+                        c += "Y-scale with " +
+                            d.length + " categories: ";
                         for (f = 0; f < d.length; f++) c += d[f] + ", ";
                         c += ". "
-                    } else c = "dateTime" == f ? c + ("Y-scale minimum value is " +
-                        a.anychart.format.dateTime(d.minimum()) + " , maximum value is " + a.anychart.format.dateTime(d.maximum()) + ". ") : c + ("Y-scale minimum value is " + d.minimum() + " , maximum value is " + d.maximum() + ". ");
+                    } else c = "dateTime" == f ? c + ("Y-scale minimum value is " + a.anychart.format.dateTime(d.minimum()) + " , maximum value is " + a.anychart.format.dateTime(d.maximum()) + ". ") : c + ("Y-scale minimum value is " + d.minimum() + " , maximum value is " + d.maximum() + ". ");
                     if ("ordinal" == e) {
                         b = b.values();
                         c += "X-scale with " + b.length + " categories: ";
                         for (e = 0; e < b.length; e++) c += b[e] + ", ";
                         c += ". "
-                    } else c = "dateTime" == e ? c + ("X-scale minimum value is " + a.anychart.format.dateTime(b.minimum()) + " , maximum value is " + a.anychart.format.dateTime(b.maximum()) + ". ") : c + ("X-scale minimum value is " +
-                        b.minimum() + " , maximum value is " + b.maximum() + ". ");
+                    } else c = "dateTime" == e ? c + ("X-scale minimum value is " + a.anychart.format.dateTime(b.minimum()) +
+                        " , maximum value is " + a.anychart.format.dateTime(b.maximum()) + ". ") : c + ("X-scale minimum value is " + b.minimum() + " , maximum value is " + b.maximum() + ". ");
                     return c
                 }
             }
@@ -1886,7 +1888,8 @@
                             case 6:
                                 return "Jul" + c;
                             case 7:
-                                return "Aug" + c;
+                                return "Aug" +
+                                    c;
                             case 8:
                                 return "Sep" + c;
                             case 9:
@@ -1985,6 +1988,23 @@
                 hoverMode: "byX"
             }
         },
+        pareto: {
+            defaultSeriesType: "column",
+            tooltip: {
+                displayMode: "union"
+            },
+            interactivity: {
+                hoverMode: "byX"
+            },
+            yAxes: [{
+                orientation: "left"
+            }, {
+                orientation: "right",
+                labels: {
+                    textFormatter: "{%Value}%"
+                }
+            }]
+        },
         heatMap: {
             defaultGridSettings: {
                 enabled: !0,
@@ -2056,7 +2076,7 @@
                     fontSize: 13,
                     fontWeight: "normal"
                 },
-                content: {
+                contentInternal: {
                     fontSize: 11
                 },
                 separator: {
@@ -2066,7 +2086,8 @@
                     return this.name || this.x
                 },
                 textFormatter: function() {
-                    if (void 0 !== this.heat) {
+                    if (void 0 !==
+                        this.heat) {
                         var a = "Value: " + this.valuePrefix + this.heat + this.valuePostfix;
                         isNaN(+this.heat) || (a += "\nPercent Value: " + (100 * this.heat / this.getStat("sum")).toFixed(1) + "%");
                         return a
@@ -2096,7 +2117,8 @@
             },
             fill: function() {
                 var b;
-                this.colorScale ? (b = this.iterator.get("heat"), b = this.colorScale.valueToColor(b)) : b = a.anychart.color.setOpacity(this.sourceColor, .85, !0);
+                this.colorScale ? (b = this.iterator.get("heat"), b = this.colorScale.valueToColor(b)) :
+                    b = a.anychart.color.setOpacity(this.sourceColor, .85, !0);
                 return b
             },
             hoverFill: "#3085be",
@@ -2107,8 +2129,7 @@
                 return a.anychart.color.setThickness(b, 1, .85)
             },
             hoverStroke: function() {
-                return a.anychart.color.setThickness(this.sourceColor,
-                    1, .85)
+                return a.anychart.color.setThickness(this.sourceColor, 1, .85)
             },
             selectStroke: null,
             labels: {
@@ -2360,8 +2381,7 @@
                 stroke: "black"
             },
             fill: function() {
-                return this.colorScale ? this.colorScale.valueToColor(this.value) : a.anychart.color.setOpacity(this.sourceColor,
-                    .85, !0)
+                return this.colorScale ? this.colorScale.valueToColor(this.value) : a.anychart.color.setOpacity(this.sourceColor, .85, !0)
             },
             hoverFill: "#545f69",
             selectFill: "#333",
@@ -2466,8 +2486,7 @@
                         return b(b(b(b(this.sourceColor))))
                     },
                     hoverNegativeStroke: function() {
-                        var b =
-                            a.anychart.color.darken;
+                        var b = a.anychart.color.darken;
                         return b(b(b(b(b(this.sourceColor)))))
                     },
                     negativeHatchFill: null,
@@ -2478,7 +2497,8 @@
                     },
                     tooltip: {
                         textFormatter: function() {
-                            return this.valuePrefix + parseFloat(this.value).toFixed(2) + this.valuePostfix
+                            return this.valuePrefix +
+                                parseFloat(this.value).toFixed(2) + this.valuePostfix
                         }
                     }
                 },
@@ -2501,8 +2521,7 @@
                     hatchFill: !1,
                     tooltip: {
                         textFormatter: function() {
-                            return this.valuePrefix +
-                                parseFloat(this.value).toFixed(2) + this.valuePostfix
+                            return this.valuePrefix + parseFloat(this.value).toFixed(2) + this.valuePostfix
                         }
                     }
                 },
@@ -2953,8 +2972,7 @@
                 },
                 tooltip: {
                     textFormatter: function() {
-                        return this.value + "\n" + this.valuePrefix +
-                            this.meta.pointValue + this.valuePostfix
+                        return this.value + "\n" + this.valuePrefix + this.meta.pointValue + this.valuePostfix
                     }
                 }
             },
@@ -2983,8 +3001,7 @@
                         return a.anychart.color.lighten(this.sourceColor, .2)
                     },
                     selectFill: function() {
-                        return a.anychart.color.lighten(this.sourceColor,
-                            .3)
+                        return a.anychart.color.lighten(this.sourceColor, .3)
                     }
                 }
             }
@@ -3115,7 +3132,7 @@
                 size: 12
             },
             tooltip: {
-                content: {
+                contentInternal: {
                     hAlign: "center"
                 },
                 hAlign: "center",
@@ -3475,8 +3492,7 @@
                     hatchFill: !1,
                     tooltip: {
                         textFormatter: function() {
-                            return this.valuePrefix +
-                                parseFloat(this.value).toFixed(2) + this.valuePostfix
+                            return this.valuePrefix + parseFloat(this.value).toFixed(2) + this.valuePostfix
                         }
                     }
                 }
@@ -3820,8 +3836,7 @@
                     return this.name
                 },
                 textFormatter: function() {
-                    return this.high ? "High: " + parseFloat(this.high).toFixed(2) +
-                        "\nLow: " + parseFloat(this.low).toFixed(2) : "Value: " + this.value
+                    return this.high ? "High: " + parseFloat(this.high).toFixed(2) + "\nLow: " + parseFloat(this.low).toFixed(2) : "Value: " + this.value
                 }
             },
             scales: [{
@@ -3902,7 +3917,8 @@
                         return a.anychart.color.setThickness(this.sourceColor, 1.5)
                     },
                     hoverStroke: function() {
-                        return a.anychart.color.setThickness(a.anychart.color.lighten(this.sourceColor), 1.5)
+                        return a.anychart.color.setThickness(a.anychart.color.lighten(this.sourceColor),
+                            1.5)
                     },
                     selectStroke: n,
                     fill: q,
@@ -4507,7 +4523,7 @@
             },
             tooltip: {
                 anchor: "leftTop",
-                content: {
+                contentInternal: {
                     hAlign: "left"
                 },
                 textFormatter: function() {
@@ -4680,7 +4696,7 @@
                 baselineAbove: !1,
                 tooltip: {
                     anchor: "leftTop",
-                    content: {
+                    contentInternal: {
                         hAlign: "left"
                     }
                 },
@@ -4807,8 +4823,7 @@
                     },
                     textFormatter: function() {
                         var b = this.periodStart || this.minPeriodDate,
-                            c = this.periodEnd ||
-                            this.maxPeriodDate;
+                            c = this.periodEnd || this.maxPeriodDate;
                         return (b ? "Start Date: " + a.anychart.format.dateTime(b) : "") + (c ? "\nEnd Date: " + a.anychart.format.dateTime(c) : "")
                     }
                 }
@@ -4825,8 +4840,8 @@
                             c = this.actualEnd || this.autoEnd,
                             e = this.progressValue;
                         void 0 === e && (e = (Math.round(1E4 * this.autoProgress) / 100 || 0) + "%");
-                        return (b ? "Start Date: " + a.anychart.format.dateTime(b) : "") + (c ? "\nEnd Date: " + a.anychart.format.dateTime(c) : "") +
-                            (e ? "\nComplete: " + e : "")
+                        return (b ? "Start Date: " + a.anychart.format.dateTime(b) : "") + (c ? "\nEnd Date: " + a.anychart.format.dateTime(c) :
+                            "") + (e ? "\nComplete: " + e : "")
                     }
                 }
             },

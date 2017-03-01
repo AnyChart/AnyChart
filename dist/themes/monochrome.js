@@ -61,9 +61,6 @@
                 },
                 fontSize: 14
             },
-            content: {
-                fontColor: "#464646"
-            },
             separator: {
                 enabled: !1
             },

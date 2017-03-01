@@ -4358,6 +4358,14 @@ goog.provide('anychart.themes.defaultTheme');
             },
             'legendItem': {'iconStroke': 'none'}
           },
+          'areaLike': {
+            'hoverMarkers': {
+              'enabled': null
+            },
+            'selectMarkers': {
+              'enabled': null
+            }
+          },
           'lineLike': {
             'hoverMarkers': {
               'enabled': null

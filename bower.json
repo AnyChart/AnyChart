@@ -9,7 +9,8 @@
     "Anton Saukh <anton.saukh@anychart.com>",
     "Sergey Medvedev <sergey.medvedev@anychart.com>",
     "Vitaly Radionov <vitaly.radionov@anychart.com>",
-    "Eugene Averchenko <eugene.averchenko@anychart.com>"
+    "Eugene Averchenko <eugene.averchenko@anychart.com>",
+    "Sergey Chernetsky <sergey.chernetsky@anychart.com>"
   ],
   "license": "SEE LICENSE IN <http://www.anychart.com/buy>",
   "keywords": [
@@ -42,7 +43,7 @@
     "*.swp",
     "node_modules",
     "bower_components",
-    "update_submodules",
+    "update-submodules",
     "modules.edn",
     "cat.config",
     "build*",

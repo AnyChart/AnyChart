@@ -63,10 +63,6 @@
                 },
                 fontSize: 14
             },
-            content: {
-                fontColor: "#5d4037",
-                fontSize: 12
-            },
             separator: {
                 enabled: !1
             },

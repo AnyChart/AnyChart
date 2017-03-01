@@ -59,13 +59,10 @@
                 corners: 3
             },
             fontColor: "#90a4ae",
+            fontSize: 12,
             title: {
                 align: "center",
                 fontSize: 14
-            },
-            content: {
-                fontColor: "#90a4ae",
-                fontSize: 12
             },
             padding: {
                 top: 10,
@@ -277,9 +274,7 @@
                 stroke: "2 #40c4ff"
             },
             rangePalette: {
-                items: ["#b0bec5", "#90a4ae",
-                    "#78909c", "#546e7a", "#455a64"
-                ]
+                items: ["#b0bec5", "#90a4ae", "#78909c", "#546e7a", "#455a64"]
             }
         },
         heatMap: {

@@ -66,14 +66,11 @@
                 corners: 3
             },
             fontColor: "#e0e0e0",
+            fontSize: 12,
             title: {
                 fontColor: "#bdbdbd",
                 align: "center",
                 fontSize: 14
-            },
-            content: {
-                fontColor: "#e0e0e0",
-                fontSize: 12
             },
             padding: {
                 top: 10,

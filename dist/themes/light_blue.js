@@ -67,10 +67,6 @@
                 align: "center",
                 fontSize: 14
             },
-            content: {
-                fontColor: "#78909c",
-                fontSize: 12
-            },
             padding: {
                 top: 10,
                 right: 15,
