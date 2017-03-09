@@ -2794,7 +2794,7 @@ anychart.core.ChartWithSeries.prototype.setupByJSON = function(config, opt_defau
       if (goog.isString(json)) {
         json = {'type': json};
       }
-      json = anychart.themes.merging.mergeScale(json, i, type);
+      json = anychart.themes.merging.mergeScale(json, i, type, anychart.enums.ScaleTypes.LINEAR);
       scale = anychart.scales.Base.fromString(json['type'], false);
       scale.setup(json);
       scalesInstances[i] = scale;
@@ -2806,7 +2806,7 @@ anychart.core.ChartWithSeries.prototype.setupByJSON = function(config, opt_defau
       if (goog.isString(json)) {
         json = {'type': json};
       }
-      json = anychart.themes.merging.mergeScale(json, i, type);
+      json = anychart.themes.merging.mergeScale(json, i, type, anychart.enums.ScaleTypes.LINEAR);
       scale = anychart.scales.Base.fromString(json['type'], false);
       scale.setup(json);
       scalesInstances[i] = scale;

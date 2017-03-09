@@ -80,25 +80,28 @@ anychart.themes.merging.getThemePart_ = function(theme, path) {
  * @param {Object} scaleObj - Scale object.
  * @param {number|string} index - Index or part of path.
  * @param {string} chartType - Chart type.
+ * @param {anychart.enums.ScaleTypes} defaultType - Default scale type.
  * @return {Object} - Clone of original scale json object with type.
  */
-anychart.themes.merging.mergeScale = function(scaleObj, index, chartType) {
+anychart.themes.merging.mergeScale = function(scaleObj, index, chartType, defaultType) {
   var theme = anychart.getFullTheme(chartType);
   var themeScale = anychart.themes.merging.getThemePart_(theme, ['scales', index]);
+  scaleObj = /** @type {Object} */(anychart.themes.merging.deepClone_(scaleObj));
 
+  var scaleType;
   if (themeScale) {
-    var scaleType = scaleObj['type'];
+    scaleType = scaleObj['type'];
     var themeScaleType = themeScale['type'];
 
-    if (goog.isDef(scaleType) && goog.isDef(themeScaleType) && ((themeScaleType == 'ordinal') ^ (scaleType == 'ordinal'))) {
-      return scaleObj;
-    } else {
-      var deepClone = anychart.themes.merging.deepClone_(scaleObj);
-      return /** @type {Object} */ (anychart.themes.merging.merge(deepClone, themeScale));
+    if (!goog.isDef(scaleType) || !goog.isDef(themeScaleType) || !((themeScaleType == 'ordinal') ^ (scaleType == 'ordinal'))) {
+      scaleObj = /** @type {Object} */ (anychart.themes.merging.merge(scaleObj, themeScale));
     }
   }
 
-  return scaleObj;
+  scaleType = scaleObj['type'] || defaultType;
+  var scaleDefault = anychart.themes.merging.getThemePart_(anychart.getFullTheme('defaultScaleSettings'), [scaleType]);
+
+  return /** @type {Object} */ (anychart.themes.merging.merge(scaleObj, scaleDefault));
 };
 
 
@@ -351,8 +354,14 @@ anychart.themes.merging.demergeScales_ = function(target, defaultObj) {
     var namePath = anychart.themes.merging.scaleEntities_[j].split('.');
     var targetPart = anychart.themes.merging.getThemePart_(target, namePath);
     if (goog.isArray(targetPart)) {
-      len = targetPart.length;
       var defaultArray = anychart.themes.merging.getThemePart_(defaultObj, namePath);
+      len = defaultArray.length;
+      for (i = 0; i < len; i++) {
+        var scaleType = defaultArray[i]['type'];
+        var scaleDefault = anychart.themes.merging.getThemePart_(anychart.getFullTheme('defaultScaleSettings'), [scaleType]);
+        defaultArray[i] = anychart.themes.merging.merge(defaultArray[i], scaleDefault);
+      }
+      len = targetPart.length;
       var success = true;
       if (goog.isArray(defaultArray) && defaultArray.length == len) {
         for (i = 0; i < len; i++) {
@@ -516,6 +525,13 @@ anychart.themes.merging.checkEquality_ = function(target, defaultObj, opt_arrayT
  * @private
  */
 anychart.themes.merging.mergingMap_ = [
+  {
+    defaultObj: 'defaultScaleSettings.linear',
+    targets: [
+      'defaultScaleSettings.log',
+      'defaultScaleSettings.dateTime'
+    ]
+  },
   {
     defaultObj: 'defaultFontSettings',
     targets: [

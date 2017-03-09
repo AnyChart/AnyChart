@@ -17,7 +17,7 @@ anychart.scales.Geo = function() {
    * @type {number}
    * @private
    */
-  this.maxTicksCount_ = 1000;
+  this.maxTicksCount_ = NaN;
 
   /**
    * Scale input domain minimum.

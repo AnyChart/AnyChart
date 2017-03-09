@@ -33,8 +33,6 @@ anychart.scales.LinearColor = function() {
    * @protected
    */
   this.logBaseVal = 10;
-
-  this.setupByJSON(/** @type {!Object} */(anychart.getFullTheme('defaultLinearColorScale')));
 };
 goog.inherits(anychart.scales.LinearColor, anychart.scales.ScatterBase);
 
@@ -329,10 +327,12 @@ anychart.scales.LinearColor.prototype.createTicks = function() {
  * @param {...(string|acgraph.vector.SolidFill|acgraph.vector.LinearGradientFill |
       acgraph.vector.RadialGradientFill|Array.<string|acgraph.vector.SolidFill|acgraph.vector.LinearGradientFill |
       acgraph.vector.RadialGradientFill>)} var_args Colors set.
- * @return {anychart.scales.LinearColor}
+ * @return {!anychart.scales.LinearColor}
  */
 anychart.scales.linearColor = function(var_args) {
   var scale = new anychart.scales.LinearColor();
+  scale.setupByJSON(/** @type {!Object} */(anychart.getFullTheme('defaultScaleSettings')['linear']));
+  scale.setupByJSON(/** @type {!Object} */(anychart.getFullTheme('defaultLinearColorScale')));
   scale.colors.apply(scale, arguments);
   return scale;
 };

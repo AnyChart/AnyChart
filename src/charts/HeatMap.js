@@ -30,14 +30,14 @@ anychart.charts.HeatMap = function(opt_data, opt_csvSettings) {
    * @type {!anychart.scales.Ordinal}
    * @private
    */
-  this.xScale_ = new anychart.scales.Ordinal();
+  this.xScale_ = anychart.scales.ordinal();
   this.xScale_.listenSignals(this.scaleInvalidated_, this);
 
   /**
    * @type {!anychart.scales.Ordinal}
    * @private
    */
-  this.yScale_ = new anychart.scales.Ordinal();
+  this.yScale_ = anychart.scales.ordinal();
   this.yScale_.listenSignals(this.scaleInvalidated_, this);
 
   /**
@@ -2185,7 +2185,7 @@ anychart.charts.HeatMap.prototype.setupByJSON = function(config, opt_default) {
       if (goog.isString(json)) {
         json = {'type': json};
       }
-      json = anychart.themes.merging.mergeScale(json, i, type);
+      json = anychart.themes.merging.mergeScale(json, i, type, anychart.enums.ScaleTypes.ORDINAL);
       scale = anychart.scales.Base.fromString(json['type'], false);
       scale.setup(json);
       scalesInstances[i] = scale;
@@ -2197,7 +2197,7 @@ anychart.charts.HeatMap.prototype.setupByJSON = function(config, opt_default) {
       if (goog.isString(json)) {
         json = {'type': json};
       }
-      json = anychart.themes.merging.mergeScale(json, i, type);
+      json = anychart.themes.merging.mergeScale(json, i, type, anychart.enums.ScaleTypes.ORDINAL);
       scale = anychart.scales.Base.fromString(json['type'], false);
       scale.setup(json);
       scalesInstances[i] = scale;

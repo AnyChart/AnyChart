@@ -176,10 +176,12 @@ anychart.scales.DateTime.prototype.setupByJSON = function(config, opt_default) {
  * ]);
  * chart.xScale('dateTime');
  * chart.container(stage).draw();
- * @return {anychart.scales.DateTime} DateTime scale.
+ * @return {!anychart.scales.DateTime} DateTime scale.
  */
 anychart.scales.dateTime = function() {
-  return new anychart.scales.DateTime();
+  var result = new anychart.scales.DateTime();
+  result.setupByJSON(anychart.getFullTheme('defaultScaleSettings')['dateTime']);
+  return result;
 };
 
 

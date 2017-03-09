@@ -106,16 +106,6 @@ anychart.scales.Logarithmic.prototype.determineScaleMinMax = function() {
 };
 
 
-/** @inheritDoc */
-anychart.scales.Logarithmic.prototype.createTicks = function() {
-  var ticks = anychart.scales.Logarithmic.base(this, 'createTicks');
-  ticks.suspendSignalsDispatching();
-  ticks.mode(anychart.enums.ScatterTicksMode.LOGARITHMIC);
-  ticks.resumeSignalsDispatching(false);
-  return ticks;
-};
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //  Serialize & Deserialize
 //----------------------------------------------------------------------------------------------------------------------
@@ -142,10 +132,12 @@ anychart.scales.Logarithmic.prototype.setupByJSON = function(config, opt_default
  * @example <t>lineChart</t>
  * chart.line([2, 16, 4, 64]);
  * chart.yScale(anychart.scales.log());
- * @return {anychart.scales.Logarithmic} Logarithmic scale.
+ * @return {!anychart.scales.Logarithmic} Logarithmic scale.
  */
 anychart.scales.log = function() {
-  return new anychart.scales.Logarithmic();
+  var result = new anychart.scales.Logarithmic();
+  result.setupByJSON(anychart.getFullTheme('defaultScaleSettings')['log']);
+  return result;
 };
 
 

@@ -53,8 +53,6 @@ anychart.scales.OrdinalColor = function() {
    * @private
    */
   this.data_ = [];
-
-  this.setupByJSON(/** @type {!Object} */(anychart.getFullTheme('defaultOrdinalColorScale')));
 };
 goog.inherits(anychart.scales.OrdinalColor, anychart.scales.Base);
 
@@ -607,10 +605,11 @@ anychart.scales.OrdinalColor.prototype.calculate = function() {
 /**
  * Constructor function for linear color scale.
  * @param {Array.<Object>=} opt_value Colors set.
- * @return {anychart.scales.OrdinalColor}
+ * @return {!anychart.scales.OrdinalColor}
  */
 anychart.scales.ordinalColor = function(opt_value) {
   var scale = new anychart.scales.OrdinalColor();
+  scale.setupByJSON(/** @type {!Object} */(anychart.getFullTheme('defaultOrdinalColorScale')));
   scale.ranges(opt_value);
   return scale;
 };

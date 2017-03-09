@@ -5579,13 +5579,13 @@ anychart.charts.Map.prototype.setupByJSON = function(config, opt_default) {
       type = (type + '').toLowerCase();
       switch (type) {
         case 'ordinalcolor':
-          scale = new anychart.scales.OrdinalColor();
+          scale = anychart.scales.ordinalColor();
           break;
         case 'linearcolor':
-          scale = new anychart.scales.LinearColor();
+          scale = anychart.scales.linearColor();
           break;
         default:
-          scale = new anychart.scales.LinearColor();
+          scale = anychart.scales.linearColor();
       }
       if (goog.isObject(json))
         scale.setup(json);

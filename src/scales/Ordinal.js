@@ -380,10 +380,12 @@ anychart.scales.Ordinal.prototype.setupByJSON = function(config, opt_default) {
  *    ['A4', 1.9]
  * ]);
  * chart.xScale(anychart.scales.ordinal());
- * @return {anychart.scales.Ordinal} Ordinal scale.
+ * @return {!anychart.scales.Ordinal} Ordinal scale.
  */
 anychart.scales.ordinal = function() {
-  return new anychart.scales.Ordinal();
+  var result = new anychart.scales.Ordinal();
+  result.setupByJSON(anychart.getFullTheme('defaultScaleSettings')['ordinal']);
+  return result;
 };
 
 

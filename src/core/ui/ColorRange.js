@@ -429,7 +429,7 @@ anychart.core.ui.ColorRange.prototype.drawLine = function() {
   var scale = this.scale();
 
   if (!scale)
-    this.scale(new anychart.scales.LinearColor());
+    this.scale(anychart.scales.linearColor());
 
   if (scale instanceof anychart.scales.LinearColor) {
     line.clear();
@@ -758,7 +758,7 @@ anychart.core.ui.ColorRange.prototype.scale = function(opt_value) {
  */
 anychart.core.ui.ColorRange.prototype.getTempScale = function() {
   if (!this.getTempScale_) {
-    this.getTempScale_ = new anychart.scales.LinearColor();
+    this.getTempScale_ = anychart.scales.linearColor();
     this.getTempScale_.colors('#fff', '#000');
   }
   return this.getTempScale_;

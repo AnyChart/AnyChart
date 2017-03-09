@@ -1132,7 +1132,7 @@ anychart.core.stock.Plot.prototype.yScale = function(opt_value) {
     return this;
   } else {
     if (!this.yScale_) {
-      this.yScale_ = new anychart.scales.Linear();
+      this.yScale_ = anychart.scales.linear();
     }
     return this.yScale_;
   }
@@ -2358,7 +2358,7 @@ anychart.core.stock.Plot.prototype.setupByJSON = function(config, opt_default) {
       if (goog.isString(json)) {
         json = {'type': json};
       }
-      json = anychart.themes.merging.mergeScale(json, i, type);
+      json = anychart.themes.merging.mergeScale(json, i, type, anychart.enums.ScaleTypes.LINEAR);
       scale = anychart.scales.ScatterBase.fromString(json['type'], false);
       scale.setup(json);
       scalesInstances[i] = scale;
@@ -2370,7 +2370,7 @@ anychart.core.stock.Plot.prototype.setupByJSON = function(config, opt_default) {
       if (goog.isString(json)) {
         json = {'type': json};
       }
-      json = anychart.themes.merging.mergeScale(json, i, type);
+      json = anychart.themes.merging.mergeScale(json, i, type, anychart.enums.ScaleTypes.LINEAR);
       scale = anychart.scales.ScatterBase.fromString(json['type'], false);
       scale.setup(json);
       scalesInstances[i] = scale;

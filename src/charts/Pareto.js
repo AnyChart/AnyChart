@@ -22,7 +22,7 @@ anychart.charts.Pareto = function() {
    * Percent scale.
    * @type {anychart.scales.Linear}
    */
-  this.percentScale = new anychart.scales.Linear();
+  this.percentScale = anychart.scales.linear();
   this.percentScale.minimum(0).maximum(100);
 };
 goog.inherits(anychart.charts.Pareto, anychart.core.CartesianBase);

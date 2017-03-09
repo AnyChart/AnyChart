@@ -242,7 +242,7 @@ anychart.charts.Bullet.prototype.isHorizontal = function() {
  */
 anychart.charts.Bullet.prototype.scale = function(opt_value) {
   if (!this.scale_) {
-    this.scale_ = new anychart.scales.Linear();
+    this.scale_ = anychart.scales.linear();
     this.scale_.minimumGap(0);
     this.scale_.maximumGap(0);
     this.scale_.ticks().count(3, 5);

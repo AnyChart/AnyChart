@@ -855,7 +855,7 @@ anychart.charts.LinearGauge.prototype.scale = function(opt_value) {
     return this;
   } else {
     if (!this.scale_) {
-      this.scale_ = new anychart.scales.Linear();
+      this.scale_ = anychart.scales.linear();
     }
     return this.scale_;
   }
@@ -1298,7 +1298,7 @@ anychart.charts.LinearGauge.prototype.setupByJSON = function(config, opt_default
       if (goog.isString(json)) {
         json = {'type': json};
       }
-      json = anychart.themes.merging.mergeScale(json, i, type);
+      json = anychart.themes.merging.mergeScale(json, i, type, anychart.enums.ScaleTypes.LINEAR);
       scale = anychart.scales.Base.fromString(json['type'], false);
       scale.setup(json);
       scalesInstances[i] = scale;
@@ -1310,7 +1310,7 @@ anychart.charts.LinearGauge.prototype.setupByJSON = function(config, opt_default
       if (goog.isString(json)) {
         json = {'type': json};
       }
-      json = anychart.themes.merging.mergeScale(json, i, type);
+      json = anychart.themes.merging.mergeScale(json, i, type, anychart.enums.ScaleTypes.LINEAR);
       scale = anychart.scales.Base.fromString(json['type'], false);
       scale.setup(json);
       scalesInstances[i] = scale;

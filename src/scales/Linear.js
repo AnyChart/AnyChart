@@ -307,10 +307,12 @@ anychart.scales.Linear.prototype.setupByJSON = function(config, opt_default) {
  *    ['A4', 1.9]
  * ]);
  * chart.yScale(anychart.scales.linear());
- * @return {anychart.scales.Linear} Linear scale.
+ * @return {!anychart.scales.Linear} Linear scale.
  */
 anychart.scales.linear = function() {
-  return new anychart.scales.Linear();
+  var result = new anychart.scales.Linear();
+  result.setupByJSON(anychart.getFullTheme('defaultScaleSettings')['linear']);
+  return result;
 };
 
 
