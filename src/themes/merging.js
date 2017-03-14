@@ -99,7 +99,14 @@ anychart.themes.merging.mergeScale = function(scaleObj, index, chartType, defaul
   }
 
   scaleType = scaleObj['type'] || defaultType;
-  var scaleDefault = anychart.themes.merging.getThemePart_(anychart.getFullTheme('defaultScaleSettings'), [scaleType]);
+  var scaleDefault;
+  if (String(scaleType).toLowerCase() == 'ordinalcolor') {
+    anychart.getFullTheme('defaultOrdinalColorScale');
+  } else if (String(scaleType).toLowerCase() == 'linearcolor') {
+    anychart.getFullTheme('defaultLinearColorScale');
+  } else {
+    scaleDefault = anychart.themes.merging.getThemePart_(anychart.getFullTheme('defaultScaleSettings'), [scaleType]);
+  }
 
   return /** @type {Object} */ (anychart.themes.merging.merge(scaleObj, scaleDefault));
 };

@@ -640,7 +640,9 @@ goog.provide('anychart.themes.defaultTheme');
 
     'defaultLinearColorScale': {
       'maxTicksCount': 1000,
-      'colors': ['#90caf9', '#01579b']
+      'colors': ['#90caf9', '#01579b'],
+      'minimumGap': 0,
+      'maximumGap': 0
     },
 
     'defaultFontSettings': {
