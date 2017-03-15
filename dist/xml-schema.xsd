@@ -367,7 +367,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="unbound_regions" type="utils.UnboundRegionsSettings"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="color_range" type="core.ColorRange"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="geo_scale" type="GeoScale"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="series_list" type="Map_series_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="series_list" type="Series_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="color_scales" type="ColorScale_list"/>
 
             <xsd:element minOccurs="0" maxOccurs="1" name="crosshair" type="core.Crosshair"/>
@@ -482,6 +482,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="outlier_markers" type="core.MarkersFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_outlier_markers" type="core.MarkersFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="select_outlier_markers" type="core.MarkersFactory"/>
+            <!-- Choropleth series -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="color_scale" type="ColorScale"/>
         </xsd:all>
         <!-- Base series -->
         <xsd:attribute name="is_vertical" type="simple.BoolOrNull"/>
@@ -585,6 +587,15 @@
         <xsd:attribute name="select_outlier_markers" type="simple.MarkerType"/>
         <!-- Step series -->
         <xsd:attribute name="step_direction" type="enums.StepDirection"/>
+        <!-- Map series -->
+        <xsd:attribute name="overlap_mode" type="simple.StringOrBoolOrNull"/>
+        <xsd:attribute name="geo_id_field" type="xsd:string"/>
+        <!-- Connector series -->
+        <xsd:attribute name="end_size" type="xsd:double"/>
+        <xsd:attribute name="start_size" type="xsd:double"/>
+        <xsd:attribute name="curvature" type="xsd:double"/>
+        <!-- Choropleth series -->
+        <xsd:attribute name="color_scale" type="simple.ScaleRef"/>
     </xsd:complexType>
 
     <xsd:complexType name="Series_list">
@@ -598,118 +609,6 @@
             <xsd:any processContents="skip"/>
         </xsd:sequence>
         <xsd:anyAttribute processContents="skip"/>
-    </xsd:complexType>
-
-    <xsd:complexType name="Map_series">
-        <xsd:all>
-            <!-- Base series -->
-            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_fill" type="Fill"/>
-
-            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_stroke" type="Stroke"/>
-
-            <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill" type="HatchFill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_hatch_fill" type="HatchFill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_hatch_fill" type="HatchFill"/>
-
-            <xsd:element minOccurs="0" maxOccurs="1" name="color" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="meta" type="Meta"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="data" type="Data"/>
-
-            <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_labels" type="core.LabelsFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_labels" type="core.LabelsFactory"/>
-
-            <xsd:element minOccurs="0" maxOccurs="1" name="tooltip" type="core.Tooltip"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="legend_item" type="utils.LegendItemSettings"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="name" type="xsd:string"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="selectionMode" type="enums.SelectionMode"/>
-            <!-- BaseWithMarkers series -->
-            <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_markers" type="core.MarkersFactory"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_markers" type="core.MarkersFactory"/>
-            <!-- Bubble series -->
-            <xsd:element minOccurs="0" maxOccurs="1" name="negative_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_negative_fill" type="Fill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_negative_fill" type="Fill"/>
-
-            <xsd:element minOccurs="0" maxOccurs="1" name="negative_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_negative_stroke" type="Stroke"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_negative_stroke" type="Stroke"/>
-
-            <xsd:element minOccurs="0" maxOccurs="1" name="negative_hatch_fill" type="HatchFill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="hover_negative_hatch_fill" type="HatchFill"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="select_negative_hatch_fill" type="HatchFill"/>
-            <!-- Choropleth series -->
-            <xsd:element minOccurs="0" maxOccurs="1" name="color_scale" type="ColorScale"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="a11y" type="utils.A11y"/>
-        </xsd:all>
-        <!-- Base series -->
-        <xsd:attribute name="series_type" type="enums.MapSeriesTypes"/>
-
-        <xsd:attribute name="geo_id_field" type="xsd:string"/>
-
-        <xsd:attribute name="fill" type="xsd:string"/>
-        <xsd:attribute name="hover_fill" type="xsd:string"/>
-        <xsd:attribute name="select_fill" type="xsd:string"/>
-
-        <xsd:attribute name="stroke" type="xsd:string"/>
-        <xsd:attribute name="hover_stroke" type="xsd:string"/>
-        <xsd:attribute name="select_stroke" type="xsd:string"/>
-
-        <xsd:attribute name="hatch_fill" type="simple.HatchFill"/>
-        <xsd:attribute name="hover_hatch_fill" type="simple.HatchFill"/>
-        <xsd:attribute name="select_hatch_fill" type="simple.HatchFill"/>
-
-        <xsd:attribute name="color" type="xsd:string"/>
-        <xsd:attribute name="name" type="xsd:string"/>
-
-        <xsd:attribute name="labels" type="simple.BoolOrNull" default="false"/>
-        <xsd:attribute name="hover_labels" type="simple.BoolOrNull" default="false"/>
-        <xsd:attribute name="select_labels" type="simple.BoolOrNull" default="false"/>
-
-        <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
-        <xsd:attribute name="overlap_mode" type="simple.StringOrBoolOrNull"/>
-        <!-- BaseWithMarkers series -->
-        <xsd:attribute name="markers" type="simple.MarkerType"/>
-        <xsd:attribute name="hover_markers" type="simple.MarkerType"/>
-        <xsd:attribute name="select_markers" type="simple.MarkerType"/>
-        <!-- Bubble series -->
-        <xsd:attribute name="minimum_size" type="simple.NumberOrPercent" default="10%"/>
-        <xsd:attribute name="maximum_size" type="simple.NumberOrPercent" default="95%"/>
-        <xsd:attribute name="display_negative" type="simple.Bool" default="true"/>
-        <xsd:attribute name="negative_fill" type="xsd:string"/>
-        <xsd:attribute name="hover_negative_fill" type="xsd:string"/>
-        <xsd:attribute name="select_negative_fill" type="xsd:string"/>
-        <xsd:attribute name="negative_stroke" type="xsd:string"/>
-        <xsd:attribute name="hover_negative_stroke" type="xsd:string"/>
-        <xsd:attribute name="select_negative_stroke" type="xsd:string"/>
-        <xsd:attribute name="negative_hatch_fill" type="simple.HatchFill"/>
-        <xsd:attribute name="hover_negative_hatch_fill" type="simple.HatchFill"/>
-        <xsd:attribute name="select_negative_hatch_fill" type="simple.HatchFill"/>
-        <xsd:attributeGroup ref="attrs.VisualBase"/>
-        <!-- Choropleth series -->
-        <xsd:attribute name="color_scale" type="simple.ScaleRef"/>
-        <!-- Marker series -->
-        <xsd:attribute name="size" type="xsd:double"/>
-        <xsd:attribute name="hover_size" type="xsd:double"/>
-        <xsd:attribute name="select_size" type="xsd:double"/>
-        <xsd:attribute name="type" type="enums.MarkerType"/>
-        <xsd:attribute name="hover_type" type="enums.MarkerType"/>
-        <xsd:attribute name="select_type" type="enums.MarkerType"/>
-        <!-- Connector series -->
-        <xsd:attribute name="end_size" type="xsd:double"/>
-        <xsd:attribute name="start_size" type="xsd:double"/>
-        <xsd:attribute name="curvature" type="xsd:double"/>
-    </xsd:complexType>
-
-    <xsd:complexType name="Map_series_list">
-        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-            <xsd:element name="series" type="Map_series"/>
-        </xsd:sequence>
     </xsd:complexType>
 
     <xsd:complexType name="Meta">
@@ -3197,6 +3096,8 @@
             <xsd:enumeration value="verticalJumpLine"/>
             <xsd:enumeration value="stick"/>
             <xsd:enumeration value="verticalStick"/>
+            <xsd:enumeration value="choropleth"/>
+            <xsd:enumeration value="connector"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -3205,15 +3106,6 @@
             <xsd:enumeration value="center"/>
             <xsd:enumeration value="forward"/>
             <xsd:enumeration value="backward"/>
-        </xsd:restriction>
-    </xsd:simpleType>
-
-    <xsd:simpleType name="enums.MapSeriesTypes">
-        <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="bubble"/>
-            <xsd:enumeration value="choropleth"/>
-            <xsd:enumeration value="connector"/>
-            <xsd:enumeration value="marker"/>
         </xsd:restriction>
     </xsd:simpleType>
 

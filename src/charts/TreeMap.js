@@ -756,7 +756,7 @@ anychart.charts.TreeMap.prototype.legendItemOver = function(item, event) {
 
   var sourceMode = this.legend().itemsSourceMode();
   if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
-    series = /** @type {anychart.core.map.series.Base} */(meta.series);
+    series = /** @type {anychart.core.SeriesBase} */(meta.series);
     var scale = meta.scale;
     if (scale && series) {
       var range = meta.range;

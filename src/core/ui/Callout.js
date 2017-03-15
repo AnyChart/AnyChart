@@ -417,7 +417,7 @@ anychart.core.ui.Callout.prototype.updateOnZoomOrMove = function() {
     iterator.select(item.getIndex());
 
     var positionProvider = this.createPositionProvider(label.getIndex())['value'];
-    var middlePoint = series.getMiddlePoint()['value'];
+    var middlePoint = series.getMiddlePoint();
 
     connector
         .clear()
@@ -824,7 +824,7 @@ anychart.core.ui.Callout.prototype.createPositionProvider = function(index) {
 /**
  * Configure label with series labels settings.
  * @param {anychart.core.ui.LabelsFactory.Label} label Label for settings applying.
- * @param {anychart.core.map.series.Base} series Series of label.
+ * @param {anychart.core.series.Map} series Series of label.
  * @param {anychart.PointState|number} index Point index.
  * @param {number} pointState Point state.
  * @return {anychart.core.ui.LabelsFactory.Label}
@@ -873,7 +873,7 @@ anychart.core.ui.Callout.prototype.configureSeriesLabel = function(label, series
 anychart.core.ui.Callout.prototype.configureLabel = function(item, label, opt_pointState) {
   var pointIndex = item.getIndex();
 
-  var series = /** @type {anychart.core.map.series.Base} */(item.getSeries());
+  var series = /** @type {anychart.core.series.Map} */(item.getSeries());
   var iterator = series.getResetIterator();
   iterator.select(pointIndex);
 
@@ -902,7 +902,7 @@ anychart.core.ui.Callout.prototype.configureLabel = function(item, label, opt_po
   label.setSettings(parentSettings, goog.object.extend(label.superSettingsObj, currentSettings));
 
   var positionProvider = this.createPositionProvider(label.getIndex());
-  positionProvider['connectorPoint'] = series.getMiddlePoint();
+  positionProvider['connectorPoint'] = {'value': series.getMiddlePoint()};
   label.positionProvider(positionProvider);
 
   if (this.isHorizontal()) {
@@ -926,13 +926,17 @@ anychart.core.ui.Callout.prototype.configureLabel = function(item, label, opt_po
       break;
   }
 
-  var fill = series.getFinalFill(true, pointState);
-  var stroke = series.getFinalStroke(true, pointState);
 
-  label.background()
-      .enabled(true)
-      .fill(fill)
-      .stroke(stroke);
+  var shapes = iterator.meta('shapes');
+  if (shapes) {
+    var fill = iterator.meta('fill');
+    var stroke = iterator.meta('stroke');
+
+    label.background()
+        .enabled(true)
+        .fill(fill)
+        .stroke(stroke);
+  }
 
   return label;
 };

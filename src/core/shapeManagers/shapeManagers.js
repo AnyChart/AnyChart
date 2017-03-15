@@ -6,8 +6,8 @@ goog.provide('anychart.core.shapeManagers');
  * @typedef {{
  *   name: string,
  *   shapeType: string,
- *   fillNames: ?Array.<string>,
- *   strokeNames: ?Array.<string>,
+ *   fillNames: (Array.<string>|boolean|null),
+ *   strokeNames: (Array.<string>|boolean|null),
  *   isHatchFill: boolean,
  *   zIndex: number
  * }}
@@ -132,6 +132,13 @@ anychart.core.shapeManagers.OUTLIERS_ZINDEX = 10 * anychart.core.shapeManagers.Z
  * @const {number}
  */
 anychart.core.shapeManagers.MARKERS_ZINDEX = 11 * anychart.core.shapeManagers.ZINDEX_STEP;
+
+
+/**
+ * Z index shift for the map labels.
+ * @const {number}
+ */
+anychart.core.shapeManagers.MAP_LABELS_ZINDEX = 12 * anychart.core.shapeManagers.ZINDEX_STEP;
 
 
 /**
@@ -871,6 +878,34 @@ anychart.core.shapeManagers.pathScrollerSelectFillStrokeConfig = {
   shapeType: anychart.enums.ShapeType.PATH,
   fillNames: ['selectFill'],
   strokeNames: ['selectStroke'],
+  isHatchFill: false,
+  zIndex: anychart.core.shapeManagers.FILL_SHAPES_ZINDEX
+};
+
+
+/**
+ * Template shape config for easy reusage.
+ * @const {anychart.core.shapeManagers.ShapeConfig}
+ */
+anychart.core.shapeManagers.pathMapConnectorEventHandlerConfig = {
+  name: 'eventHandler',
+  shapeType: anychart.enums.ShapeType.PATH,
+  fillNames: true,
+  strokeNames: null,
+  isHatchFill: false,
+  zIndex: anychart.core.shapeManagers.FILL_SHAPES_ZINDEX
+};
+
+
+/**
+ * Template shape config for easy reusage.
+ * @const {anychart.core.shapeManagers.ShapeConfig}
+ */
+anychart.core.shapeManagers.foreignPathFillConfig = {
+  name: 'foreignFill',
+  shapeType: anychart.enums.ShapeType.NONE,
+  fillNames: ['fill', 'hoverFill', 'selectFill'],
+  strokeNames: ['stroke', 'hoverStroke', 'selectStroke'],
   isHatchFill: false,
   zIndex: anychart.core.shapeManagers.FILL_SHAPES_ZINDEX
 };

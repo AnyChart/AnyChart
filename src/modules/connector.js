@@ -6,7 +6,7 @@
 goog.provide('anychart.modules.connector');
 
 goog.require('anychart.charts.Map');
-goog.require('anychart.core.map.series.Connector');
+goog.require('anychart.core.drawers.map.Connector');
 goog.require('anychart.modules.base');
 
 
@@ -23,7 +23,7 @@ anychart.connector = function(var_args) {
   map.setupByVal(anychart.getFullTheme('connector'), true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
-    map.connector(arguments[i]);
+    map['connector'](arguments[i]);
   }
 
   return map;

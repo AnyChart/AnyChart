@@ -292,7 +292,7 @@ anychart.core.settings.populate(anychart.core.series.RenderingSettings, anychart
 
 
 //endregion
-//region IObjectWithSettings impl
+//region --- IObjectWithSettings impl
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  IObjectWithSettings impl

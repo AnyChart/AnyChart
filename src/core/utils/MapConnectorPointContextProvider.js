@@ -5,7 +5,7 @@ goog.require('anychart.core.utils.MapPointContextProvider');
 
 /**
  * Series point context provider.
- * @param {(anychart.core.SeriesBase|anychart.core.sparkline.series.Base)} series Series.
+ * @param {(anychart.core.series.Map|anychart.core.sparkline.series.Base)} series Series.
  * @param {Array.<string>} referenceValueNames Reference value names to be applied.
  * @extends {anychart.core.utils.MapPointContextProvider}
  * @constructor

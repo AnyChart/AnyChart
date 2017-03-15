@@ -6,7 +6,7 @@
 goog.provide('anychart.modules.choropleth');
 
 goog.require('anychart.charts.Map');
-goog.require('anychart.core.map.series.Choropleth');
+goog.require('anychart.core.drawers.map.Choropleth');
 goog.require('anychart.modules.base');
 
 
@@ -23,7 +23,7 @@ anychart.choropleth = function(var_args) {
   map.setupByVal(anychart.getFullTheme('choropleth'), true);
 
   for (var i = 0, count = arguments.length; i < count; i++) {
-    map.choropleth(arguments[i]);
+    map['choropleth'](arguments[i]);
   }
 
   return map;

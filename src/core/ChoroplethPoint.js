@@ -5,7 +5,7 @@ goog.require('anychart.core.SeriesPoint');
 
 /**
  * Point representing bubble points that belongs to cartesian or scatter chart.
- * @param {anychart.core.SeriesBase} series Series.
+ * @param {anychart.core.series.Map} series Series.
  * @param {number} index Point index in series.
  * @constructor
  * @extends {anychart.core.SeriesPoint}

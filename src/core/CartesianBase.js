@@ -140,7 +140,7 @@ anychart.core.CartesianBase.prototype.zDistribution = function(opt_value) {
       this.zDistributionInternal = opt_value;
       this.invalidate(
           anychart.ConsistencyState.BOUNDS |
-          anychart.ConsistencyState.SERIES_CHART_SCALE_MAPS,
+          anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS,
           anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -239,7 +239,7 @@ anychart.core.CartesianBase.prototype.getDefaultScale = function(forX) {
  */
 anychart.core.CartesianBase.prototype.ensureScalesReadyForZoom = function() {
   this.makeScaleMaps();
-  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_CHART_SCALES)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SCALE_CHART_SCALES)) {
     if (!!this.xZoom().getSetup())
       this.calculateXScales();
   }
@@ -424,7 +424,7 @@ anychart.core.CartesianBase.prototype.applyXZoom = function() {
     this.xScroller().setRangeInternal(this.xZoom().getStartRatio(), this.xZoom().getEndRatio());
     this.markConsistent(anychart.ConsistencyState.CARTESIAN_ZOOM);
     this.invalidate(
-        anychart.ConsistencyState.SERIES_CHART_Y_SCALES |
+        anychart.ConsistencyState.SCALE_CHART_Y_SCALES |
         anychart.ConsistencyState.CARTESIAN_X_SCROLLER |
         anychart.ConsistencyState.AXES_CHART_ANNOTATIONS);
   }

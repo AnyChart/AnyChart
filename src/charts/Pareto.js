@@ -506,7 +506,7 @@ anychart.charts.Pareto.prototype.onBeforeRowsValuesSpreading = function(seriesDa
 //region --- Drawing
 /** @inheritDoc */
 anychart.charts.Pareto.prototype.drawContent = function(bounds) {
-  if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_CHART_SCALE_MAPS)) {
+  if (this.hasInvalidationState(anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS)) {
     this.updateScales();
   }
   return anychart.charts.Pareto.base(this, 'drawContent', bounds);

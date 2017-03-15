@@ -46,6 +46,22 @@ anychart.core.series.Cartesian = function(chart, plot, type, config, sortedMode)
 goog.inherits(anychart.core.series.Cartesian, anychart.core.series.Base);
 
 
+//region --- Class const
+/**
+ * Supported consistency states.
+ * @type {number}
+ */
+anychart.core.series.Cartesian.prototype.SUPPORTED_CONSISTENCY_STATES = anychart.core.series.Base.prototype.SUPPORTED_CONSISTENCY_STATES;
+
+
+/**
+ * Supported signals.
+ * @type {number}
+ */
+anychart.core.series.Cartesian.prototype.SUPPORTED_SIGNALS = anychart.core.series.Base.prototype.SUPPORTED_SIGNALS;
+
+
+//endregion
 //region --- Typedefs
 //------------------------------------------------------------------------------
 //
@@ -241,7 +257,7 @@ anychart.core.series.Cartesian.prototype.prepareData = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.core.series.Cartesian.prototype.getColorResolutionContext = function(opt_baseColor, opt_ignorePointSettings) {
+anychart.core.series.Cartesian.prototype.getColorResolutionContext = function(opt_baseColor, opt_ignorePointSettings, opt_ignoreColorScale) {
   var source = opt_baseColor || this.getOption('color') || 'blue';
   if (this.supportsPointSettings()) {
     var iterator = !!opt_ignorePointSettings ? this.getDetachedIterator() : this.getIterator();

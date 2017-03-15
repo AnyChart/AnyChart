@@ -49,7 +49,7 @@ anychart.core.series.Pareto.prototype.createTooltipContextProvider = function() 
 
 
 /** @inheritDoc */
-anychart.core.series.Pareto.prototype.getColorResolutionContext = function(opt_baseColor, opt_ignorePointSettings) {
+anychart.core.series.Pareto.prototype.getColorResolutionContext = function(opt_baseColor, opt_ignorePointSettings, opt_ignoreColorScale) {
   var ctx = anychart.core.series.Pareto.base(this, 'getColorResolutionContext', opt_baseColor, opt_ignorePointSettings);
   this.applyCFRFTo(ctx, ctx['index']);
   return ctx;

@@ -33,7 +33,7 @@ anychart.core.utils.SeriesPointContextProvider = function(series, referenceValue
    * @type {string}
    * @private
    */
-  this['xScaleType'] = goog.isFunction(series.xScale) ? series.xScale().getType() : undefined;
+  this['xScaleType'] = goog.isFunction(series.xScale) && series.xScale() ? series.xScale().getType() : undefined;
 
   /**
    * @type {boolean}

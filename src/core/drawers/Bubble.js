@@ -72,7 +72,7 @@ anychart.core.drawers.Bubble.prototype.drawSubsequentPoint = function(point, sta
   shapeNames[name] = true;
   shapeNames[hatchName] = true;
   var shapes = /** @type {Object.<acgraph.vector.Path>} */(this.shapesManager.getShapesGroup(state, shapeNames));
-  this.drawPoint_(point, shapes);
+  this.drawPointInternal(point, shapes);
 };
 
 
@@ -80,7 +80,7 @@ anychart.core.drawers.Bubble.prototype.drawSubsequentPoint = function(point, sta
 anychart.core.drawers.Bubble.prototype.updatePointOnAnimate = function(point) {
   // this code can currently work with Bar series created with PerPoint shape managers.
   var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta('shapes'));
-  this.drawPoint_(point, shapes);
+  this.drawPointInternal(point, shapes);
 };
 
 
@@ -88,9 +88,9 @@ anychart.core.drawers.Bubble.prototype.updatePointOnAnimate = function(point) {
  * Actually draws the point.
  * @param {anychart.data.IRowInfo} point
  * @param {Object.<acgraph.vector.Shape>} shapes
- * @private
+ * @protected
  */
-anychart.core.drawers.Bubble.prototype.drawPoint_ = function(point, shapes) {
+anychart.core.drawers.Bubble.prototype.drawPointInternal = function(point, shapes) {
   var x = /** @type {number} */(point.meta('x'));
   var y = /** @type {number} */(point.meta('value'));
   var size = /** @type {number} */(point.meta('size'));

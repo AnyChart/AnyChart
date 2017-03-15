@@ -2268,10 +2268,7 @@
           "items": {
             "anyOf": [
               {"$ref": "#/definitions/disable"},
-              {"$ref": "#/definitions/anychart.core.map.series.Choropleth"},
-              {"$ref": "#/definitions/anychart.core.map.series.Bubble"},
-              {"$ref": "#/definitions/anychart.core.map.series.Connector"},
-              {"$ref": "#/definitions/anychart.core.map.series.Marker"}
+              {"$ref": "#/definitions/anychart.core.series.Map"}
             ]
           }
         },
@@ -2420,7 +2417,9 @@
             "jumpLine",
             "verticalJumpLine",
             "stick",
-            "verticalStick"
+            "verticalStick",
+            "choropleth",
+            "connector"
           ]
         },
         "id": {
@@ -2592,6 +2591,33 @@
             "center",
             "forward",
             "backward"
+          ]
+        }
+      }
+    },
+
+    "anychart.core.series.Map": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.series.Base"}
+      ],
+      "properties": {
+        "geoIdField": {
+          "type": ["string", "null"]
+        },
+        "endSize": {"type": [ "number", "string"] },
+        "startSize": {"type": [ "number", "string"] },
+        "curvature": {"type": [ "number", "string"] },
+        "colorScale": {
+          "anyOf": [
+            {
+              "type": [
+                "string",
+                "number"
+              ]
+            },
+            {"$ref": "#/definitions/anychart.scales.LinearColor"},
+            {"$ref": "#/definitions/anychart.scales.OrdinalColor"}
           ]
         }
       }
@@ -3093,124 +3119,6 @@
           "items": {
             "type": "object"
           }
-        }
-      }
-    },
-
-    "anychart.core.map.series.Base": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.SeriesBase"}
-      ],
-      "properties": {
-        "geoIdField": {
-          "type": ["string", "null"]
-        }
-      }
-    },
-    "anychart.core.map.series.BaseWithMarkers": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.map.series.Base"}
-      ],
-      "properties": {
-        "markers": {
-          "oneOf": [
-            {"$ref": "#/definitions/disable"},
-            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
-          ]
-        },
-        "hoverMarkers": {
-          "oneOf": [
-            {"$ref": "#/definitions/disable"},
-            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
-          ]
-        },
-        "selectMarkers": {
-          "oneOf": [
-            {"$ref": "#/definitions/disable"},
-            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
-          ]
-        }
-      }
-    },
-    "anychart.core.map.series.Choropleth": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.map.series.BaseWithMarkers"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["choropleth"]},
-        "colorScale": {
-          "anyOf": [
-            {
-              "type": [
-                "string",
-                "number"
-              ]
-            },
-            {"$ref": "#/definitions/anychart.scales.LinearColor"},
-            {"$ref": "#/definitions/anychart.scales.OrdinalColor"}
-          ]
-        }
-      }
-    },
-    "anychart.core.map.series.Bubble": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.map.series.BaseWithMarkers"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["bubble"]},
-
-        "displayNegative": {
-          "type": ["boolean"]
-        },
-        "negativeFill": {"$ref": "#/definitions/fill"},
-        "hoverNegativeFill": {"$ref": "#/definitions/fill"},
-        "selectNegativeFill": {"$ref": "#/definitions/fill"},
-
-        "negativeStroke": {"$ref": "#/definitions/stroke"},
-        "hoverNegativeStroke": {"$ref": "#/definitions/stroke"},
-        "selectNegativeStroke": {"$ref": "#/definitions/stroke"},
-
-        "negativeHatchFill": {"$ref": "#/definitions/hatchFillSet"},
-        "hoverNegativeHatchFill": {"$ref": "#/definitions/hatchFillSet"},
-        "selectNegativeHatchFill": {"$ref": "#/definitions/hatchFillSet"}
-      }
-    },
-    "anychart.core.map.series.Connector": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.map.series.BaseWithMarkers"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["connector"]},
-
-        "endSize": {"type": [ "number", "string"] },
-        "startSize": {"type": [ "number", "string"] },
-        "curvature": {"type": [ "number", "string"] }
-      }
-    },
-    "anychart.core.map.series.Marker": {
-      "type": "object",
-      "allOf": [
-        {"$ref": "#/definitions/anychart.core.map.series.Base"}
-      ],
-      "properties": {
-        "seriesType": {"enum": ["marker"]},
-        "type": {"$ref": "#/definitions/anychart.enums.MarkerType"},
-        "hoverType": {"$ref": "#/definitions/anychart.enums.MarkerType"},
-        "selectType": {"$ref": "#/definitions/anychart.enums.MarkerType"},
-
-        "size": {
-          "type": "number"
-        },
-        "hoverSize": {
-          "type": "number"
-        },
-        "selectSize": {
-          "type": "number"
         }
       }
     },

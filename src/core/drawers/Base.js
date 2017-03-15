@@ -79,6 +79,13 @@ anychart.core.drawers.Base.prototype.yValueNames = (['value']);
 
 
 /**
+ * Field name of series main value.
+ * @type {string}
+ */
+anychart.core.drawers.Base.prototype.valueFieldName = 'value';
+
+
+/**
  * A set of shapes with types that are required by the drawer.
  * This is checked before on drawing start.
  * @type {Object.<string, anychart.enums.ShapeType>}

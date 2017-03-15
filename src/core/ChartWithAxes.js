@@ -1,6 +1,6 @@
 goog.provide('anychart.core.ChartWithAxes');
 
-goog.require('anychart.core.ChartWithSeries');
+goog.require('anychart.core.ChartWithOrthogonalScales');
 goog.require('anychart.core.IChartWithAnnotations');
 goog.require('anychart.core.annotations.ChartController');
 goog.require('anychart.core.annotations.PlotController');
@@ -17,7 +17,7 @@ goog.require('goog.array');
 
 /**
  * ChartWithAxes chart class.
- * @extends {anychart.core.ChartWithSeries}
+ * @extends {anychart.core.ChartWithOrthogonalScales}
  * @implements {anychart.core.IChartWithAnnotations}
  * @constructor
  * @param {boolean} joinData If series data should be sorted and joined.
@@ -73,7 +73,7 @@ anychart.core.ChartWithAxes = function(joinData) {
    */
   this.minorGrids_ = [];
 };
-goog.inherits(anychart.core.ChartWithAxes, anychart.core.ChartWithSeries);
+goog.inherits(anychart.core.ChartWithAxes, anychart.core.ChartWithOrthogonalScales);
 
 
 //region --- Infrastructure
@@ -83,11 +83,11 @@ goog.inherits(anychart.core.ChartWithAxes, anychart.core.ChartWithSeries);
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Supported consistency states. Adds AXES, AXES_MARKERS, GRIDS to anychart.core.ChartWithSeries states.
+ * Supported consistency states. Adds AXES, AXES_MARKERS, GRIDS to anychart.core.ChartWithOrthogonalScales states.
  * @type {number}
  */
 anychart.core.ChartWithAxes.prototype.SUPPORTED_CONSISTENCY_STATES =
-    anychart.core.ChartWithSeries.prototype.SUPPORTED_CONSISTENCY_STATES |
+    anychart.core.ChartWithOrthogonalScales.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.AXES_CHART_AXES |
     anychart.ConsistencyState.AXES_CHART_AXES_MARKERS |
     anychart.ConsistencyState.AXES_CHART_GRIDS |

@@ -5468,7 +5468,11 @@ anychart.enums.SeriesDrawerTypes = {
   STEP_AREA: 17,
   STEP_LINE: 18,
   JUMP_LINE: 19,
-  STICK: 20
+  STICK: 20,
+  CONNECTOR: 21,
+  MAP_MARKER: 22,
+  MAP_BUBBLE: 23,
+  CHOROPLETH: 24
 };
 
 
@@ -5490,7 +5494,8 @@ anychart.enums.ShapeType = {
   PATH: 'path',
   CIRCLE: 'circle',
   RECT: 'rect',
-  ELLIPSE: 'ellipse'
+  ELLIPSE: 'ellipse',
+  NONE: 'none'
 };
 
 

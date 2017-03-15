@@ -78,7 +78,7 @@ anychart.core.drawers.Marker.prototype.updatePointInternal = function(point, sta
   if (shapes) {
     shapes['path'].clear();
     shapes['hatchFill'].clear();
-    this.drawPoint_(point, state, shapes);
+    this.drawPointInternal(point, state, shapes);
   }
 };
 
@@ -86,7 +86,7 @@ anychart.core.drawers.Marker.prototype.updatePointInternal = function(point, sta
 /** @inheritDoc */
 anychart.core.drawers.Marker.prototype.drawSubsequentPoint = function(point, state) {
   var shapes = this.shapesManager.getShapesGroup(state);
-  this.drawPoint_(point, state, shapes);
+  this.drawPointInternal(point, state, shapes);
 };
 
 
@@ -95,9 +95,9 @@ anychart.core.drawers.Marker.prototype.drawSubsequentPoint = function(point, sta
  * @param {anychart.data.IRowInfo} point
  * @param {anychart.PointState|number} state
  * @param {Object.<acgraph.vector.Shape>} shapes
- * @private
+ * @protected
  */
-anychart.core.drawers.Marker.prototype.drawPoint_ = function(point, state, shapes) {
+anychart.core.drawers.Marker.prototype.drawPointInternal = function(point, state, shapes) {
   var x = /** @type {number} */(point.meta('x'));
   var y = /** @type {number} */(point.meta('value'));
   var type = /** @type {anychart.enums.MarkerType|Function} */(this.typeGetter_(this.series, point, state));

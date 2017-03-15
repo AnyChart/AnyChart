@@ -2133,14 +2133,19 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
 
   var tag = anychart.utils.extractTag(event['domTarget']);
 
-  var isTargetLegendOrColorRange = event['target'] instanceof anychart.core.ui.Legend || this.checkIfColorRange(event['target']);
+  var isColorRange = this.checkIfColorRange(event['target']);
+  var isLegend = event['target'] instanceof anychart.core.ui.Legend;
+  var isLabelsFactory = event['target'] instanceof anychart.core.ui.LabelsFactory;
+  var isMarkersFactory = event['target'] instanceof anychart.core.ui.MarkersFactory;
+  var isTargetLegendOrColorRange = isLegend || isColorRange;
 
   var series, s, index;
   if (isTargetLegendOrColorRange) {
     if (tag) {
-      if (tag.points_) {
-        series = tag.points_.series;
-        index = tag.points_.points;
+      points = tag.points_ || tag.points;
+      if (points) {
+        series = points.series;
+        index = points.points;
       } else {
         // I don't understand, why it is like this here.
         //series = tag.series_;
@@ -2149,20 +2154,21 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
         index = tag.index;
       }
     }
-  } else if (event['target'] instanceof anychart.core.ui.LabelsFactory || event['target'] instanceof anychart.core.ui.MarkersFactory) {
+  } else if (isLabelsFactory || isMarkersFactory) {
     var parent = event['target'].getParentEventTarget();
     if (parent.isSeries && parent.isSeries())
       series = parent;
     index = tag;
   } else {
     series = tag && tag.series;
-    index = goog.isNumber(tag.index) ? tag.index : event['pointIndex'];
+    index = tag && goog.isNumber(tag.index) ? tag.index : event['pointIndex'];
   }
 
   if (series && !series.isDisposed() && series.enabled() && goog.isFunction(series.makePointEvent)) {
     var evt = series.makePointEvent(event);
     if (evt && ((anychart.utils.checkIfParent(/** @type {!goog.events.EventTarget} */(series), event['relatedTarget'])) || series.dispatchEvent(evt))) {
-      index = evt['pointIndex'];
+      if (!isColorRange)
+        index = evt['pointIndex'];
       if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
         if (interactivity.selectionMode() == anychart.enums.SelectionMode.NONE || series.selectionMode() == anychart.enums.SelectionMode.NONE)
           return;

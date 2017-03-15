@@ -72,20 +72,23 @@ anychart.ConsistencyState = {
   BULLET_AXES: 1 << 14,
   BULLET_AXES_MARKERS: 1 << 15,
   BULLET_MARKERS: 1 << 16,
-  //---------------------------------- CARTESIAN STATES (CHART) ---------------------------------
+  //---------------------------------- CHART WITH SERIES STATES (CHART) ---------------------------------
   SERIES_CHART_PALETTE: 1 << 12,
   SERIES_CHART_MARKER_PALETTE: 1 << 13,
   SERIES_CHART_HATCH_FILL_PALETTE: 1 << 14,
-  SERIES_CHART_SCALES: 1 << 15,
-  SERIES_CHART_SERIES: 1 << 16,
-  SERIES_CHART_SCALE_MAPS: 1 << 17,
-  SERIES_CHART_Y_SCALES: 1 << 18,
-  SERIES_CHART_STATISTICS: 1 << 19,
+  SERIES_CHART_SERIES: 1 << 15,
+  //---------------------------------- CHART WITH ORTHOGONAL SCALES STATES (SERIES_CHART) ---------------------------------
+  SCALE_CHART_SCALES: 1 << 16,
+  SCALE_CHART_SCALE_MAPS: 1 << 17,
+  SCALE_CHART_Y_SCALES: 1 << 18,
+  SCALE_CHART_STATISTICS: 1 << 19,
+  //---------------------------------- CHART WITH AXES STATES (SCALE_CHART) -------------------------------
   AXES_CHART_AXES: 1 << 20,
   AXES_CHART_AXES_MARKERS: 1 << 21,
   AXES_CHART_GRIDS: 1 << 22,
   AXES_CHART_CROSSHAIR: 1 << 23,
   AXES_CHART_ANNOTATIONS: 1 << 24,
+  //---------------------------------- CARTESIAN STATES (AXES_CHART) ---------------------------------
   CARTESIAN_ZOOM: 1 << 25,
   CARTESIAN_X_SCROLLER: 1 << 26,
   //---------------------------------- PYRAMID/FUNNEL STATES (CHART) ---------------------------------
@@ -129,14 +132,10 @@ anychart.ConsistencyState = {
   SPARK_SCALES: 1 << 12,
   SPARK_SERIES: 1 << 13,
   SPARK_AXES_MARKERS: 1 << 14,
-  //---------------------------------- MAP STATES (CHART) ---------------------------------
-  MAP_SCALE: 1 << 12,
-  MAP_COLOR_SCALE: 1 << 13,
-  MAP_GEO_DATA: 1 << 14,
-  MAP_SERIES: 1 << 15,
-  MAP_PALETTE: 1 << 16,
-  MAP_MARKER_PALETTE: 1 << 17,
-  MAP_HATCH_FILL_PALETTE: 1 << 18,
+  //---------------------------------- MAP STATES (SERIES_CHART) ---------------------------------
+  MAP_SCALE: 1 << 16,
+  MAP_COLOR_SCALE: 1 << 17,
+  MAP_GEO_DATA: 1 << 18,
   MAP_COLOR_RANGE: 1 << 19,
   MAP_MOVE: 1 << 20,
   MAP_ZOOM: 1 << 21,
