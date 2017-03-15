@@ -453,9 +453,9 @@ anychart.core.series.Base.prototype.seriesType = function(opt_value) {
 /**
  * Getter/Setter for series type.
  * @param {anychart.core.series.TypeConfig} config
- * @param {boolean=} opt_default Apply default config.
+ * @param {boolean=} opt_reapplyClip Reapply clip and zIndex config.
  */
-anychart.core.series.Base.prototype.applyConfig = function(config, opt_default) {
+anychart.core.series.Base.prototype.applyConfig = function(config, opt_reapplyClip) {
   if (this.config) {
     if (this.rootLayer) {
       // if prev config used own root and the next one doesn't - we should dispose the root layer
@@ -467,6 +467,9 @@ anychart.core.series.Base.prototype.applyConfig = function(config, opt_default) 
     }
   }
   this.config = config;
+
+  this.tooltipContext = null;
+  this.legendProvider = null;
 
   goog.dispose(this.drawer);
   this.drawer = /** @type {!anychart.core.drawers.Base} */(new anychart.core.drawers.AvailableDrawers[config.drawerType](this));
@@ -484,7 +487,7 @@ anychart.core.series.Base.prototype.applyConfig = function(config, opt_default) 
   this.autoSettings['xPointPosition'] = 0.5;
 
   this.suspendSignalsDispatching();
-  this.applyDefaultsToElements(this.defaultSettings, true, opt_default);
+  this.applyDefaultsToElements(this.defaultSettings, true, true, opt_reapplyClip);
   this.resumeSignalsDispatching(false);
   // here should markers/labels/errors/outliers setup be
 
@@ -513,8 +516,9 @@ anychart.core.series.Base.prototype.recreateShapeManager = function() {
  * @param {Object} defaults
  * @param {boolean=} opt_resetLegendItem Temporary flag.
  * @param {boolean=} opt_default
+ * @param {boolean=} opt_reapplyClip
  */
-anychart.core.series.Base.prototype.applyDefaultsToElements = function(defaults, opt_resetLegendItem, opt_default) {
+anychart.core.series.Base.prototype.applyDefaultsToElements = function(defaults, opt_resetLegendItem, opt_default, opt_reapplyClip) {
   if (this.supportsLabels()) {
     this.labels().setup(defaults['labels']);
     this.hoverLabels().setup(defaults['hoverLabels']);
@@ -540,10 +544,14 @@ anychart.core.series.Base.prototype.applyDefaultsToElements = function(defaults,
     this.legendItem().reset();
   this.legendItem().setup(defaults['legendItem']);
 
-  if ('tooltip' in defaults)
+  if ('tooltip' in defaults) {
     this.tooltip().setupByVal(defaults['tooltip'], opt_default);
+  }
 
-  if (!!opt_default) {
+  if(!goog.isDef(opt_reapplyClip))
+    opt_reapplyClip = opt_default;
+
+  if (!!opt_reapplyClip) {
     this.clip(defaults['clip']);
     this.zIndex(defaults['zIndex']);
   }

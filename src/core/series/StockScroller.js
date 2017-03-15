@@ -85,7 +85,7 @@ anychart.core.series.StockScroller.prototype['selectedFallingStroke'] = anychart
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.core.series.StockScroller.prototype.applyConfig = function(config, opt_default) {
+anychart.core.series.StockScroller.prototype.applyConfig = function(config, opt_reapplyClip) {
   // Scroller series MUST have a secondaryShapesConfig and MUST NOT use container as root.
   if (goog.isNull(config.secondaryShapesConfig) ||
       !!(config.capabilities & anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT))
@@ -103,7 +103,7 @@ anychart.core.series.StockScroller.prototype.applyConfig = function(config, opt_
       /** @type {!Array.<anychart.core.shapeManagers.ShapeConfig>} */(config.secondaryShapesConfig),
       interactive, 'secondaryShapes', config.postProcessor);
 
-  anychart.core.series.StockScroller.base(this, 'applyConfig', config, opt_default);
+  anychart.core.series.StockScroller.base(this, 'applyConfig', config, opt_reapplyClip);
 };
 //endregion
 

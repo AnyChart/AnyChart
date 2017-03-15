@@ -139,8 +139,8 @@ anychart.core.series.Cartesian.prototype.pointProvider_;
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.core.series.Cartesian.prototype.applyDefaultsToElements = function(defaults, opt_resetLegendItem, opt_default) {
-  anychart.core.series.Cartesian.base(this, 'applyDefaultsToElements', defaults, opt_resetLegendItem, opt_default);
+anychart.core.series.Cartesian.prototype.applyDefaultsToElements = function(defaults, opt_resetLegendItem, opt_default, opt_reapplyClip) {
+  anychart.core.series.Cartesian.base(this, 'applyDefaultsToElements', defaults, opt_resetLegendItem, opt_default, opt_reapplyClip);
 
   this.selectionMode(defaults['selectionMode']);
 };
