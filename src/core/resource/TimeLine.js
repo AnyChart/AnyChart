@@ -220,7 +220,7 @@ anychart.core.resource.TimeLine.TEXT_DESCRIPTORS['textFormatter'] =
     anychart.core.settings.createDescriptor(
         anychart.enums.PropertyHandlerType.SINGLE_ARG,
         'textFormatter',
-        anychart.core.settings.asIsNormalizer,
+        anychart.core.settings.stringOrFunctionNormalizer,
         anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 anychart.core.settings.populate(anychart.core.resource.TimeLine, anychart.core.resource.TimeLine.TEXT_DESCRIPTORS);

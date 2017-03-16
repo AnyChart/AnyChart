@@ -72,14 +72,14 @@ anychart.core.settings.createTextPropertiesDescriptors = function(invalidateBoun
   map['minFontSize'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'minFontSize',
-      anychart.core.settings.asIsNormalizer,
+      anychart.core.settings.numberOrStringNormalizer,
       invalidateBoundsState,
       boundsChangedSignal);
 
   map['maxFontSize'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'maxFontSize',
-      anychart.core.settings.asIsNormalizer,
+      anychart.core.settings.numberOrStringNormalizer,
       invalidateBoundsState,
       boundsChangedSignal);
 
@@ -93,7 +93,7 @@ anychart.core.settings.createTextPropertiesDescriptors = function(invalidateBoun
   map['fontSize'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontSize',
-      anychart.core.settings.asIsNormalizer,
+      anychart.core.settings.numberOrStringNormalizer,
       invalidateBoundsState,
       boundsChangedSignal);
 
@@ -142,14 +142,14 @@ anychart.core.settings.createTextPropertiesDescriptors = function(invalidateBoun
   map['fontWeight'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontWeight',
-      anychart.core.settings.asIsNormalizer,
+      anychart.core.settings.numberOrStringNormalizer,
       invalidateBoundsState,
       boundsChangedSignal);
 
   map['letterSpacing'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'letterSpacing',
-      anychart.core.settings.asIsNormalizer,
+      anychart.core.settings.numberOrStringNormalizer,
       invalidateBoundsState,
       boundsChangedSignal);
 
@@ -163,7 +163,7 @@ anychart.core.settings.createTextPropertiesDescriptors = function(invalidateBoun
   map['lineHeight'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'lineHeight',
-      anychart.core.settings.asIsNormalizer,
+      anychart.core.settings.numberOrStringNormalizer,
       invalidateBoundsState,
       boundsChangedSignal);
 
@@ -580,6 +580,16 @@ anychart.core.settings.numberOrZeroNormalizer = function(val) {
  */
 anychart.core.settings.stringNormalizer = function(val) {
   return String(val);
+};
+
+
+/**
+ * Single arg normalizer for string or function params.
+ * @param {*} val
+ * @return {string|Function}
+ */
+anychart.core.settings.stringOrFunctionNormalizer = function(val) {
+  return goog.isFunction(val) ? val : String(val);
 };
 
 

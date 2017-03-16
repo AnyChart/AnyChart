@@ -307,21 +307,21 @@ anychart.core.resource.resourceList.Item.PROPERTY_DESCRIPTORS = (function() {
   map['name'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'name',
-      anychart.core.settings.asIsNormalizer,
+      anychart.core.settings.stringNormalizer,
       0,
       0);
 
   map['type'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'type',
-      anychart.core.settings.asIsNormalizer,
+      anychart.core.settings.stringNormalizer,
       0,
       0);
 
   map['description'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'description',
-      anychart.core.settings.asIsNormalizer,
+      anychart.core.settings.stringNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 

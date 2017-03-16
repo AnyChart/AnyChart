@@ -71,14 +71,14 @@ anychart.core.ui.Overlay.DESCRIPTORS = (function() {
   map['id'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'id',
-      anychart.core.settings.asIsNormalizer,
+      anychart.core.settings.stringNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
   map['className'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'className',
-      anychart.core.settings.asIsNormalizer,
+      anychart.core.settings.stringNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 

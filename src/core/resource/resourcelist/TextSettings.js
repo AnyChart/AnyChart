@@ -53,21 +53,21 @@ anychart.core.resource.resourceList.TextSettings.PROPERTY_DESCRIPTORS = (functio
   map['fontDecoration'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontDecoration',
-      anychart.core.settings.asIsNormalizer,
+      anychart.enums.normalizeFontDecoration,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
   map['fontStyle'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontStyle',
-      anychart.core.settings.asIsNormalizer,
+      anychart.enums.normalizeFontStyle,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
   map['fontVariant'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontVariant',
-      anychart.core.settings.asIsNormalizer,
+      anychart.enums.normalizeFontVariant,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
@@ -88,7 +88,7 @@ anychart.core.resource.resourceList.TextSettings.PROPERTY_DESCRIPTORS = (functio
   map['textDirection'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'textDirection',
-      anychart.core.settings.asIsNormalizer,
+      anychart.enums.normalizeTextDirection,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
@@ -109,28 +109,28 @@ anychart.core.resource.resourceList.TextSettings.PROPERTY_DESCRIPTORS = (functio
   map['vAlign'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'vAlign',
-      anychart.core.settings.asIsNormalizer,
+      anychart.enums.normalizeVAlign,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
   map['hAlign'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'hAlign',
-      anychart.core.settings.asIsNormalizer,
+      anychart.enums.normalizeHAlign,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
   map['textWrap'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'textWrap',
-      anychart.core.settings.asIsNormalizer,
+      anychart.enums.normalizeTextWrap,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
   map['textOverflow'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'textOverflow',
-      anychart.core.settings.asIsNormalizer,
+      anychart.core.settings.stringNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
