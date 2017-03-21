@@ -556,7 +556,7 @@ anychart.core.series.Base.prototype.applyDefaultsToElements = function(defaults,
     this.tooltip().setupByVal(defaults['tooltip'], opt_default);
   }
 
-  if(!goog.isDef(opt_reapplyClip))
+  if (!goog.isDef(opt_reapplyClip))
     opt_reapplyClip = opt_default;
 
   if (!!opt_reapplyClip) {

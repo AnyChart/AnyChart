@@ -3480,7 +3480,7 @@ anychart.core.PyramidFunnelBase.prototype.drawMarker = function(pointState) {
  */
 anychart.core.PyramidFunnelBase.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
-    this.tooltip_ = new anychart.core.ui.Tooltip(anychart.core.ui.Tooltip.Capabilities.SUPPORTS_ALLOW_LEAVE_SCREEN);
+    this.tooltip_ = new anychart.core.ui.Tooltip(0);
     this.tooltip_.chart(this);
     this.registerDisposable(this.tooltip_);
     this.tooltip_.listenSignals(this.onTooltipSignal_, this);

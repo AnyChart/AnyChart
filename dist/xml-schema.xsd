@@ -1308,6 +1308,8 @@
         <xsd:attribute name="position_mode" type="enums.TooltipPositionMode" default="float"/>
         <xsd:attribute name="allow_adjust_position" type="simple.Bool" default="true"/>
         <xsd:attribute name="allow_leave_chart" type="simple.Bool" default="true"/>
+        <xsd:attribute name="allow_leave_stage" type="simple.Bool" default="false"/>
+        <xsd:attribute name="allow_leave_screen" type="simple.Bool" default="false"/>
         <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="false"/>
         <xsd:attribute name="separator" type="simple.BoolOrNull" default="false"/>
         <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
@@ -1317,7 +1319,6 @@
         <xsd:attribute name="adjust_font_size" type="simple.Bool" default="false"/>
         <xsd:attribute name="min_font_size" type="xsd:string"/>
         <xsd:attribute name="max_font_size" type="xsd:string"/>
-        <xsd:attribute name="allow_leave_screen" type="simple.Bool" default="true"/>
         <xsd:attribute name="value_prefix" type="xsd:string" default=""/>
         <xsd:attribute name="value_postfix" type="xsd:string" default=""/>
         <xsd:attribute name="width" type="simple.NumberOrPercentOrNull" default="null"/>

@@ -2404,7 +2404,7 @@ anychart.core.ui.BaseGrid.prototype.tooltip = function(opt_value) {
     this.tooltip_ = new anychart.core.ui.Tooltip(0);
     this.registerDisposable(this.tooltip_);
     this.tooltip_.listenSignals(this.onTooltipSignal_, this);
-    this.tooltip_.boundsProvider = this;
+    this.tooltip_.containerProvider(this);
   }
   if (goog.isDef(opt_value)) {
     this.tooltip_.setup(opt_value);

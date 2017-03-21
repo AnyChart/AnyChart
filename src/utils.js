@@ -1441,11 +1441,24 @@ anychart.utils.formatDateTime = function(date, pattern) {
 
 
 /**
+ * Global tooltips registry. Used to make anychart.utils.hideTooltips() work correctly.
+ * @type {Object.<anychart.core.ui.Tooltip>}
+ */
+anychart.utils.tooltipsRegistry = {};
+
+
+/**
  * Hide all tooltips.
  * @param {boolean=} opt_force Ignore tooltips hide delay.
  */
 anychart.utils.hideTooltips = function(opt_force) {
-  anychart.core.utils.TooltipsContainer.getInstance().hideTooltips(opt_force);
+  for (var key in anychart.utils.tooltipsRegistry) {
+    if (anychart.utils.tooltipsRegistry.hasOwnProperty(key)) {
+      var tooltip = anychart.utils.tooltipsRegistry[key];
+      if (!tooltip.isDisposed())
+        tooltip.hide(opt_force);
+    }
+  }
 };
 
 

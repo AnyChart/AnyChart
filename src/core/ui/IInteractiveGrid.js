@@ -134,3 +134,11 @@ anychart.core.ui.IInteractiveGrid.prototype.createFormatProvider = function(data
  */
 anychart.core.ui.IInteractiveGrid.prototype.defaultRowHeight = function(opt_value) {};
 
+
+/**
+ * Getter/setter for container.
+ * @param {(acgraph.vector.ILayer|string|Element)=} opt_value .
+ * @return {(acgraph.vector.ILayer|!anychart.core.VisualBase)} .
+ */
+anychart.core.ui.IInteractiveGrid.prototype.container = function(opt_value) {};
+

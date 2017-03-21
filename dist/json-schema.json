@@ -4621,6 +4621,7 @@
         "positionMode": {"$ref": "#/definitions/anychart.enums.TooltipPositionMode"},
         "allowAdjustPosition": {"type": "boolean"},
         "allowLeaveChart": {"type": "boolean"},
+        "allowLeaveStage": {"type": "boolean"},
         "title": {
           "oneOf": [
             {"type": "string"},

@@ -462,7 +462,7 @@ anychart.charts.Pert.prototype.createFormatProvider = function(opt_force, opt_wo
  */
 anychart.charts.Pert.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
-    this.tooltip_ = new anychart.core.ui.Tooltip(anychart.core.ui.Tooltip.Capabilities.SUPPORTS_ALLOW_LEAVE_SCREEN);
+    this.tooltip_ = new anychart.core.ui.Tooltip(0);
     this.tooltip_.chart(this);
     this.registerDisposable(this.tooltip_);
     this.tooltip_.listenSignals(this.onTooltipSignal_, this);
@@ -2560,6 +2560,12 @@ anychart.charts.Pert.prototype.drawContent = function(bounds) {
     this.criticalPath().milestones().drawLabels();
     this.criticalPath().tasks().drawLabels();
   }
+
+  this.tooltip().containerProvider(this);
+  this.milestones().tooltip().containerProvider(this);
+  this.tasks().tooltip().containerProvider(this);
+  this.criticalPath().milestones().tooltip().containerProvider(this);
+  this.criticalPath().tasks().tooltip().containerProvider(this);
 
   // if (!this.tooltip().container()) {
   //   this.tooltip().container(/** @type {acgraph.vector.ILayer} */(this.container()));

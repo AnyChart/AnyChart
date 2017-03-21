@@ -695,10 +695,10 @@ anychart.core.ui.Legend.prototype.paginatorInvalidated_ = function(event) {
  */
 anychart.core.ui.Legend.prototype.tooltip = function(opt_value) {
   if (!this.tooltip_) {
-    this.tooltip_ = new anychart.core.ui.Tooltip(anychart.core.ui.Tooltip.Capabilities.SUPPORTS_ALLOW_LEAVE_SCREEN);
+    this.tooltip_ = new anychart.core.ui.Tooltip(0);
     this.registerDisposable(this.tooltip_);
     this.tooltip_.listenSignals(this.onTooltipSignal_, this);
-    this.tooltip_.boundsProvider = this;
+    this.tooltip_.containerProvider(this);
   }
   if (goog.isDef(opt_value)) {
     this.tooltip_.setup(opt_value);

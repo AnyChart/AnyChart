@@ -6,6 +6,7 @@
 goog.provide('anychart.core.Chart');
 
 goog.require('acgraph');
+goog.require('anychart.compatibility');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.Background');
@@ -1221,6 +1222,9 @@ anychart.core.Chart.prototype.drawInternal = function() {
   if (!this.checkDrawingNeeded())
     return;
 
+  if (anychart.compatibility.IS_PHANTOM_JS && this.container() && this.container().getStage())
+    this.container().getStage().getTooltipLayer();
+
   anychart.performance.start('Chart.draw()');
   var startTime;
   if (anychart.DEVELOP) {
@@ -1256,6 +1260,7 @@ anychart.core.Chart.prototype.drawInternal = function() {
       this.rootElement.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
     }
 
+    this.tooltip().containerProvider(this);
     this.markConsistent(anychart.ConsistencyState.CONTAINER);
   }
 

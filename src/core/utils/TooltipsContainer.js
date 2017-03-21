@@ -23,12 +23,6 @@ anychart.core.utils.TooltipsContainer = function() {
    */
   this.selectable_ = false;
 
-  /**
-   * @type {Object.<!string, !anychart.core.ui.Tooltip>}
-   * @private
-   */
-  this.tooltipsMap_ = {};
-
   var document = goog.dom.getDocument();
   if (goog.userAgent.IE && (!goog.userAgent.isVersionOrHigher('7') || document.documentMode && document.documentMode <= 6)) {
     this.root_ = goog.dom.createDom('div', {'style': 'position:absolute; left:0; top:0; z-index: 9999;'});
@@ -104,7 +98,6 @@ anychart.core.utils.TooltipsContainer.prototype.updateStageSize_ = function() {
  */
 anychart.core.utils.TooltipsContainer.prototype.allocTooltip = function(tooltip) {
   tooltip.container(this.stage_);
-  this.tooltipsMap_[goog.getUid(tooltip).toString()] = tooltip;
 };
 
 
@@ -114,21 +107,6 @@ anychart.core.utils.TooltipsContainer.prototype.allocTooltip = function(tooltip)
  */
 anychart.core.utils.TooltipsContainer.prototype.release = function(tooltip) {
   tooltip.container(null);
-  delete this.tooltipsMap_[goog.getUid(tooltip).toString()];
-};
-
-
-/**
- * Hide all tooltips.
- * @param {boolean=} opt_force Ignore tooltips hide delay.
- */
-anychart.core.utils.TooltipsContainer.prototype.hideTooltips = function(opt_force) {
-  if (goog.isNull(this.tooltipsMap_)) return;
-
-  for (var id in this.tooltipsMap_) {
-    if (!this.tooltipsMap_.hasOwnProperty(id)) continue;
-    this.tooltipsMap_[id].hide(opt_force);
-  }
 };
 
 
@@ -139,9 +117,7 @@ anychart.core.utils.TooltipsContainer.prototype.hideTooltips = function(opt_forc
  */
 anychart.core.utils.TooltipsContainer.prototype.selectable = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.selectable_ != opt_value) {
-      this.selectable_ = opt_value;
-    }
+    this.selectable_ = opt_value;
     return this;
   } else {
     return this.selectable_;
@@ -167,5 +143,4 @@ anychart.core.utils.TooltipsContainer.prototype.disposeInternal = function() {
   this.stage_ = null;
   goog.dom.removeNode(this.root_);
   this.root_ = null;
-  this.tooltipsMap_ = null;
 };
