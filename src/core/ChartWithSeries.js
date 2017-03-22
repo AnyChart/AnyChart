@@ -1,6 +1,7 @@
 goog.provide('anychart.core.ChartWithSeries');
 
 goog.require('anychart.core.SeparateChart');
+goog.require('anychart.core.annotations');
 goog.require('anychart.core.reporting');
 goog.require('anychart.palettes.DistinctColors');
 goog.require('anychart.palettes.HatchFills');
@@ -479,7 +480,39 @@ anychart.core.ChartWithSeries.prototype.invalidateSizeBasedSeries = function() {
  * @return {boolean}
  */
 anychart.core.ChartWithSeries.prototype.isVertical = function() {
-  return this.barChartMode;
+  return false;
+};
+
+
+/**
+ * Annotations plot-level controller.
+ * @param {Array.<anychart.enums.AnnotationTypes|anychart.core.annotations.AnnotationJSONFormat>=} opt_annotationsList
+ * @return {anychart.core.ChartWithSeries|anychart.core.annotations.PlotController}
+ */
+anychart.core.ChartWithSeries.prototype.annotations = function(opt_annotationsList) {
+  return null;
+};
+
+
+/**
+ * Calculate for 3d.
+ * @protected
+ */
+anychart.core.ChartWithSeries.prototype.prepare3d = function() {};
+
+
+/**
+ * Spread Column and Bar series to categories width
+ */
+anychart.core.ChartWithSeries.prototype.distributeSeries = function() {};
+
+
+/**
+ * If the legend categories mode should be considered by the scale.
+ * @return {boolean}
+ */
+anychart.core.ChartWithSeries.prototype.allowLegendCategoriesMode = function() {
+  return true;
 };
 
 

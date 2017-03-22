@@ -164,10 +164,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.barsPadding = function(opt_val
 //  Scales
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * If the legend categories mode should be considered by the scale.
- * @return {boolean}
- */
+/** @inheritDoc */
 anychart.core.ChartWithOrthogonalScales.prototype.allowLegendCategoriesMode = function() {
   return true;
 };
@@ -1376,10 +1373,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.getZoomEndRatio = function() {
 };
 
 
-/**
- * Calculate for 3d.
- * @protected
- */
+/** @inheritDoc */
 anychart.core.ChartWithOrthogonalScales.prototype.prepare3d = function() {};
 
 
