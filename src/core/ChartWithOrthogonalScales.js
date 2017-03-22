@@ -388,7 +388,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.makeScaleMaps = function() {
     this.yScales = yScales;
     this.xScales = xScales;
     if (changed) {
-      this.annotations().invalidateAnnotations();
+      this.invalidateAnnotations();
       this.invalidate(
           anychart.ConsistencyState.CARTESIAN_ZOOM |
           anychart.ConsistencyState.AXES_CHART_ANNOTATIONS |
