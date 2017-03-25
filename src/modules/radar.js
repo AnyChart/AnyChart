@@ -6,9 +6,9 @@
 goog.provide('anychart.modules.radar');
 
 goog.require('anychart.charts.Radar');
-goog.require('anychart.core.radar.series.Area');
-goog.require('anychart.core.radar.series.Line');
-goog.require('anychart.core.radar.series.Marker');
+// goog.require('anychart.core.radar.series.Area');
+// goog.require('anychart.core.radar.series.Line');
+// goog.require('anychart.core.radar.series.Marker');
 goog.require('anychart.modules.base');
 
 
@@ -24,11 +24,8 @@ goog.require('anychart.modules.base');
 anychart.radar = function(var_args) {
   var chart = new anychart.charts.Radar();
   chart.setupByVal(anychart.getFullTheme('radar'), true);
-
-  for (var i = 0, count = arguments.length; i < count; i++) {
-    chart.line(arguments[i]);
-  }
-
+  if (arguments.length)
+    chart.addSeries.apply(chart, arguments);
   return chart;
 };
 

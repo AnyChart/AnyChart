@@ -133,6 +133,13 @@ anychart.core.series.Base = function(chart, plot, type, config) {
   this.a11y_ = null;
 
   /**
+   * An array of functions that calculate different parts of meta for the point.
+   * @type {Array.<Function>}
+   * @protected
+   */
+  this.metaMakers = [];
+
+  /**
    * Renderer.
    * @type {anychart.core.series.RenderingSettings}
    * @private
@@ -993,6 +1000,7 @@ anychart.core.series.Base.prototype.setAutoHatchFill = function(value) {
 anychart.core.series.Base.prototype.axesLinesSpace = function(opt_spaceOrTopOrTopAndBottom, opt_rightOrRightAndLeft, opt_bottom, opt_left) {
   if (!this.axesLinesSpace_) {
     this.axesLinesSpace_ = new anychart.core.utils.Padding();
+    this.axesLinesSpace_.set(0);
     this.registerDisposable(this.axesLinesSpace_);
   }
 
@@ -2814,13 +2822,7 @@ anychart.core.series.Base.prototype.draw = function() {
     var columns = this.retrieveDataColumns();
     var iterator;
     if (columns) {
-      if (this.needsZero()) {
-        var scale = /** @type {anychart.scales.Base} */(this.yScale());
-        this.zeroY = this.applyAxesLinesSpace(
-            this.applyRatioToBounds(
-                goog.math.clamp((scale && scale.transform(0, 0.5)) || 0, 0, 1),
-                false));
-      }
+      this.prepareMetaMakers();
       this.startDrawing();
 
       iterator = this.getResetIterator();
@@ -2854,7 +2856,7 @@ anychart.core.series.Base.prototype.draw = function() {
     } else {
       iterator = this.getResetIterator();
       while (iterator.advance()) {
-        this.makeMissing(iterator, this.getYValueNames());
+        this.makeMissing(iterator, this.getYValueNames(), NaN);
       }
     }
     this.markConsistent(anychart.ConsistencyState.SERIES_COLOR | anychart.ConsistencyState.Z_INDEX);
@@ -3169,6 +3171,22 @@ anychart.core.series.Base.prototype.applyRatioToBounds = function(ratio, xDirect
 
 
 /**
+ * Transforms a single X ratio and an array of Y ratios to an array of coord pairs.
+ * @param {number} x
+ * @param {Array.<number>} ys
+ * @return {Array.<number>}
+ */
+anychart.core.series.Base.prototype.ratiosToPixelPairs = function(x, ys) {
+  var result = [];
+  var xPix = this.applyRatioToBounds(x, true);
+  for (var i = 0; i < ys.length; i++) {
+    result.push(xPix, this.applyRatioToBounds(ys[i], false));
+  }
+  return result;
+};
+
+
+/**
  * Applies axes lines info to passed pixel value.
  * @param {number} value
  * @return {number}
@@ -3197,90 +3215,223 @@ anychart.core.series.Base.prototype.considerMetaEmpty = function() {
 
 
 /**
+ * Makes passed row missing.
+ * @param {anychart.data.IRowInfo} rowInfo
+ * @param {Array.<string>} yNames
+ * @param {number} xRatio
+ * @protected
+ */
+anychart.core.series.Base.prototype.makeMissing = function(rowInfo, yNames, xRatio) {
+  var xPix = this.applyRatioToBounds(xRatio, true);
+  rowInfo.meta('x', xPix);
+  for (var i = 0; i < yNames.length; i++) {
+    rowInfo.meta(yNames[i], undefined);
+    rowInfo.meta(yNames[i] + 'X', xPix);
+  }
+};
+
+
+/**
+ * Populates rowInfo meta with points pixel positions.
+ * @param {anychart.data.IRowInfo} rowInfo
+ * @param {Object.<string, number>} map
+ * @param {number} xRatio
+ */
+anychart.core.series.Base.prototype.makePointsMetaFromMap = function(rowInfo, map, xRatio) {
+  var names = [];
+  var ys = [];
+  for (var i in map) {
+    names.push(i);
+    ys.push(map[i]);
+  }
+  var points = this.ratiosToPixelPairs(xRatio, ys);
+  for (var j = 0; j < names.length; j++) {
+    rowInfo.meta(names[j] + 'X', points[j * 2]);
+    rowInfo.meta(names[j], points[j * 2 + 1]);
+  }
+  rowInfo.meta('x', points[0]);
+};
+
+
+/**
+ * Prepares Stacked part of point meta.
+ * @param {anychart.data.IRowInfo} rowInfo
+ * @param {Array.<string>} yNames
+ * @param {Array.<string|number>} yColumns
+ * @param {number} pointMissing
+ * @param {number} xRatio
+ * @return {number} - pointMissing updated value.
+ * @protected
+ */
+anychart.core.series.Base.prototype.makeStackedMeta = function(rowInfo, yNames, yColumns, pointMissing, xRatio) {
+  var yScale = /** @type {anychart.scales.Base} */(this.yScale());
+  var map = {
+    'value': yScale.transform(rowInfo.meta('stackedValue'), 0.5),
+    'zero': goog.math.clamp(yScale.transform(rowInfo.meta('stackedZero'), 0.5), 0, 1),
+    'prevValue': yScale.transform(rowInfo.meta('stackedValuePrev'), 0.5),
+    'prevZero': yScale.transform(rowInfo.meta('stackedZeroPrev'), 0.5),
+    'nextValue': yScale.transform(rowInfo.meta('stackedValueNext'), 0.5),
+    'nextZero': yScale.transform(rowInfo.meta('stackedZeroNext'), 0.5)
+  };
+  this.makePointsMetaFromMap(rowInfo, map, xRatio);
+  rowInfo.meta('zeroMissing', rowInfo.meta('stackedMissing'));
+  return pointMissing;
+};
+
+
+/**
+ * Prepares Unstacked part of point meta.
+ * @param {anychart.data.IRowInfo} rowInfo
+ * @param {Array.<string>} yNames
+ * @param {Array.<string|number>} yColumns
+ * @param {number} pointMissing
+ * @param {number} xRatio
+ * @return {number} - pointMissing updated value.
+ * @protected
+ */
+anychart.core.series.Base.prototype.makeUnstackedMeta = function(rowInfo, yNames, yColumns, pointMissing, xRatio) {
+  var yScale = /** @type {anychart.scales.Base} */(this.yScale());
+  var map = {};
+  for (var i = 0; i < yColumns.length; i++) {
+    var val = yScale.transform(yScale.applyComparison(rowInfo.getColumn(yColumns[i]), this.comparisonZero), 0.5);
+    if (isNaN(val)) pointMissing |= anychart.core.series.PointAbsenceReason.VALUE_FIELD_MISSING;
+    map[yNames[i]] = val;
+  }
+  this.makePointsMetaFromMap(rowInfo, map, xRatio);
+  return pointMissing;
+};
+
+
+/**
+ * Prepares Zero part of point meta.
+ * @param {anychart.data.IRowInfo} rowInfo
+ * @param {Array.<string>} yNames
+ * @param {Array.<string|number>} yColumns
+ * @param {number} pointMissing
+ * @param {number} xRatio
+ * @return {number} - pointMissing updated value.
+ * @protected
+ */
+anychart.core.series.Base.prototype.makeZeroMeta = function(rowInfo, yNames, yColumns, pointMissing, xRatio) {
+  rowInfo.meta('zeroX', rowInfo.meta('x'));
+  rowInfo.meta('zero', this.zeroY);
+  rowInfo.meta('zeroMissing', false);
+  return pointMissing;
+};
+
+
+/**
+ * Prepares outliers part of point meta.
+ * @param {anychart.data.IRowInfo} rowInfo
+ * @param {Array.<string>} yNames
+ * @param {Array.<string|number>} yColumns
+ * @param {number} pointMissing
+ * @param {number} xRatio
+ * @return {number} - pointMissing updated value.
+ * @protected
+ */
+anychart.core.series.Base.prototype.makeSizeMeta = function(rowInfo, yNames, yColumns, pointMissing, xRatio) {
+  // negative sizes should be filtered out on drawing plan calculation stage
+  // by settings missing reason VALUE_FIELD_MISSING
+  rowInfo.meta('size', this.calculateSize(Number(rowInfo.get('size'))));
+  return pointMissing;
+};
+
+
+/**
+ * Prepares outliers part of point meta.
+ * @param {anychart.data.IRowInfo} rowInfo
+ * @param {Array.<string>} yNames
+ * @param {Array.<string|number>} yColumns
+ * @param {number} pointMissing
+ * @param {number} xRatio
+ * @return {number} - pointMissing updated value.
+ * @protected
+ */
+anychart.core.series.Base.prototype.makeOutliersMeta = function(rowInfo, yNames, yColumns, pointMissing, xRatio) {
+  var yScale = /** @type {anychart.scales.Base} */(this.yScale());
+  var outliers = [];
+  var outliersSource = rowInfo.get('outliers');
+  if (goog.isArray(outliersSource)) {
+    for (var i = 0; i < outliersSource.length; i++) {
+      if (!yScale.isMissing(outliersSource[i]))
+        outliers.push(
+            this.applyRatioToBounds(
+                yScale.transform(
+                    yScale.applyComparison(
+                        outliersSource[i],
+                        this.comparisonZero),
+                    0.5),
+                false));
+    }
+  }
+  rowInfo.meta('outliers', outliers);
+  return pointMissing;
+};
+
+
+/**
+ * Prepares meta makers pipe.
+ * @protected
+ */
+anychart.core.series.Base.prototype.prepareMetaMakers = function() {
+  this.metaMakers.length = 0;
+  if (this.planIsStacked()) {
+    this.metaMakers.push(this.makeStackedMeta);
+  } else {
+    this.metaMakers.push(this.makeUnstackedMeta);
+    if (this.needsZero()) {
+      this.metaMakers.push(this.makeZeroMeta);
+    }
+  }
+  if (this.isSizeBased()) {
+    this.metaMakers.push(this.makeSizeMeta);
+  }
+  if (this.supportsOutliers()) {
+    this.metaMakers.push(this.makeOutliersMeta);
+  }
+  if (this.needsZero()) {
+    var scale = /** @type {anychart.scales.Base} */(this.yScale());
+    this.zeroYRatio = goog.math.clamp((scale && scale.transform(0, 0.5)) || 0, 0, 1);
+    this.zeroY = this.applyAxesLinesSpace(this.applyRatioToBounds(this.zeroYRatio, false));
+  }
+};
+
+
+/**
+ * Fetches correct xPointPosition.
+ * @return {number}
+ */
+anychart.core.series.Base.prototype.getXPointPosition = function() {
+  return /** @type {number} */(this.getOption('xPointPosition'));
+};
+
+
+/**
  * Calculates pixel value
  * @param {anychart.data.IRowInfo} rowInfo
  * @param {Array.<string>} yNames
  * @param {Array.<string|number>} yColumns
+ * @protected
  */
 anychart.core.series.Base.prototype.makePointMeta = function(rowInfo, yNames, yColumns) {
-  var i;
   var pointMissing = this.considerMetaEmpty() ?
       0 :
       (Number(rowInfo.meta('missing')) || 0) & ~anychart.core.series.PointAbsenceReason.OUT_OF_RANGE;
   if (!this.isPointVisible(rowInfo))
     pointMissing |= anychart.core.series.PointAbsenceReason.OUT_OF_RANGE;
-  rowInfo.meta('x',
-      this.applyRatioToBounds(
-          this.getXScale().transformInternal(
-              rowInfo.getX(),
-              rowInfo.getIndex(),
-              /** @type {number} */(this.getOption('xPointPosition'))), true));
-  if (!!pointMissing) {
-    this.makeMissing(rowInfo, yNames);
+  var xRatio = this.getXScale().transformInternal(
+      rowInfo.getX(),
+      rowInfo.getIndex(),
+      this.getXPointPosition());
+  if (pointMissing) {
+    this.makeMissing(rowInfo, yNames, xRatio);
   } else {
-    var yScale = /** @type {anychart.scales.Base} */(this.yScale());
-    var val;
-    if (this.planIsStacked()) {
-      val = yScale.transform(rowInfo.meta('stackedValue'), 0.5);
-      if (isNaN(val)) pointMissing = false;
-      rowInfo.meta('value', this.applyRatioToBounds(val, false));
-      val = yScale.transform(rowInfo.meta('stackedZero'), 0.5);
-      if (isNaN(val)) pointMissing = false;
-      rowInfo.meta('zero', this.applyRatioToBounds(goog.math.clamp(val, 0, 1), false));
-      rowInfo.meta('zeroMissing', rowInfo.meta('stackedMissing'));
-      rowInfo.meta('prevValue', this.applyRatioToBounds(yScale.transform(rowInfo.meta('stackedValuePrev'), 0.5), false));
-      rowInfo.meta('prevZero', this.applyRatioToBounds(yScale.transform(rowInfo.meta('stackedZeroPrev'), 0.5), false));
-      rowInfo.meta('nextValue', this.applyRatioToBounds(yScale.transform(rowInfo.meta('stackedValueNext'), 0.5), false));
-      rowInfo.meta('nextZero', this.applyRatioToBounds(yScale.transform(rowInfo.meta('stackedZeroNext'), 0.5), false));
-    } else {
-      if (this.needsZero()) {
-        rowInfo.meta('zero', this.zeroY);
-        rowInfo.meta('zeroMissing', false);
-      }
-      for (i = 0; i < yColumns.length; i++) {
-        val = yScale.transform(yScale.applyComparison(rowInfo.getColumn(yColumns[i]), this.comparisonZero), 0.5);
-        if (isNaN(val)) pointMissing |= anychart.core.series.PointAbsenceReason.VALUE_FIELD_MISSING;
-        rowInfo.meta(yNames[i], this.applyRatioToBounds(val, false));
-      }
-    }
-    if (this.isSizeBased()) {
-      // negative sizes should be filtered out on drawing plan calculation stage
-      // by settings missing reason VALUE_FIELD_MISSING
-      rowInfo.meta('size', this.calculateSize(Number(rowInfo.get('size'))));
-    }
-    if (this.supportsOutliers()) {
-      var outliers = [];
-      var outliersSource = rowInfo.get('outliers');
-      if (goog.isArray(outliersSource)) {
-        for (i = 0; i < outliersSource.length; i++) {
-          if (!yScale.isMissing(outliersSource[i]))
-            outliers.push(
-                this.applyRatioToBounds(
-                    yScale.transform(
-                        yScale.applyComparison(
-                            outliersSource[i],
-                            this.comparisonZero),
-                        0.5),
-                    false));
-        }
-      }
-      rowInfo.meta('outliers', outliers);
+    for (var i = 0; i < this.metaMakers.length; i++) {
+      pointMissing = this.metaMakers[i].call(this, rowInfo, yNames, yColumns, pointMissing, xRatio);
     }
   }
   rowInfo.meta('missing', pointMissing);
-};
-
-
-/**
- * Makes passed row missing.
- * @param {anychart.data.IRowInfo} rowInfo
- * @param {Array.<string>} yNames
- */
-anychart.core.series.Base.prototype.makeMissing = function(rowInfo, yNames) {
-  // rowInfo.meta('x', undefined);
-  for (var i = 0; i < yNames.length; i++) {
-    rowInfo.meta(yNames[i], undefined);
-  }
 };
 
 
@@ -3407,10 +3558,10 @@ anychart.core.series.Base.prototype.createPositionProvider = function(position, 
 
 
 //endregion
-//region --- OptimizedProperties
+//region --- Optimized Properties
 //----------------------------------------------------------------------------------------------------------------------
 //
-//  OptimizedProperties
+//  Optimized Properties
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**

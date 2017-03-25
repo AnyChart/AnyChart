@@ -106,7 +106,7 @@ anychart.core.grids.Polar = function() {
 
   /**
    * Chart instance.
-   * @type {anychart.charts.Polar}
+   * @type {anychart.core.RadarPolarChart}
    * @private
    */
   this.chart_ = null;
@@ -138,7 +138,7 @@ anychart.core.grids.Polar.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 /**
  * Sets the chart series belongs to.
- * @param {anychart.charts.Polar} chart Chart instance.
+ * @param {anychart.core.RadarPolarChart} chart Chart instance.
  */
 anychart.core.grids.Polar.prototype.setChart = function(chart) {
   this.chart_ = chart;
@@ -147,7 +147,7 @@ anychart.core.grids.Polar.prototype.setChart = function(chart) {
 
 /**
  * Get the chart series belongs to.
- * @return {anychart.charts.Polar}
+ * @return {anychart.core.RadarPolarChart}
  */
 anychart.core.grids.Polar.prototype.getChart = function() {
   return this.chart_;
@@ -839,7 +839,7 @@ anychart.core.grids.Polar.prototype.setupByJSON = function(config, opt_default) 
     var ax = config['axis'];
     if (goog.isNumber(ax)) {
       if (this.chart_) {
-        this.axis((/** @type {anychart.charts.Polar} */(this.chart_)).getAxisByIndex(ax));
+        this.axis(/** @type {anychart.core.axes.Polar|anychart.core.axes.Radial} */(this.chart_.getAxisByIndex(ax)));
       }
     } else if (ax instanceof anychart.core.axes.Radial || ax instanceof anychart.core.axes.Polar) {
       this.axis(ax);

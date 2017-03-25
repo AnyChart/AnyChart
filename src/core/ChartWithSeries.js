@@ -175,8 +175,22 @@ anychart.core.ChartWithSeries.prototype.normalizeSeriesType = function(type) {
 
 /**
  * Getter/setter for defaultSeriesType.
- * @param {(string|anychart.enums.CartesianSeriesType|anychart.enums.ScatterSeriesType|anychart.enums.MapSeriesType)=} opt_value Default series type.
- * @return {anychart.core.ChartWithSeries|anychart.enums.CartesianSeriesType|anychart.enums.ScatterSeriesType|anychart.enums.MapSeriesType} Default series type or self for chaining.
+ * @param {(
+ *    string |
+ *    anychart.enums.CartesianSeriesType |
+ *    anychart.enums.ScatterSeriesType |
+ *    anychart.enums.RadarSeriesType |
+ *    anychart.enums.PolarSeriesType |
+ *    anychart.enums.MapSeriesType
+ * )=} opt_value Default series type.
+ * @return {
+ *    anychart.core.ChartWithSeries |
+ *    anychart.enums.CartesianSeriesType |
+ *    anychart.enums.ScatterSeriesType |
+ *    anychart.enums.RadarSeriesType |
+ *    anychart.enums.PolarSeriesType |
+ *    anychart.enums.MapSeriesType
+ * } Default series type or self for chaining.
  */
 anychart.core.ChartWithSeries.prototype.defaultSeriesType = function(opt_value) {
   if (goog.isDef(opt_value)) {
@@ -514,6 +528,12 @@ anychart.core.ChartWithSeries.prototype.distributeSeries = function() {};
 anychart.core.ChartWithSeries.prototype.allowLegendCategoriesMode = function() {
   return true;
 };
+
+
+/**
+ * A hook to invalidate annotations, if needed.
+ */
+anychart.core.ChartWithSeries.prototype.invalidateAnnotations = goog.nullFunction;
 
 
 //endregion
@@ -891,6 +911,33 @@ anychart.core.ChartWithSeries.prototype.beforeDraw = function() {
 
 
 /**
+ * Setups series before series drawing.
+ * @param {anychart.core.series.Base} series
+ * @param {number=} opt_topAxisPadding
+ * @param {number=} opt_rightAxisPadding
+ * @param {number=} opt_bottomAxisPadding
+ * @param {number=} opt_leftAxisPadding
+ */
+anychart.core.ChartWithSeries.prototype.setupSeriesBeforeDraw = function(series, opt_topAxisPadding, opt_rightAxisPadding, opt_bottomAxisPadding, opt_leftAxisPadding) {
+  series.axesLinesSpace(
+      opt_topAxisPadding || 0,
+      opt_rightAxisPadding || 0,
+      opt_bottomAxisPadding || 0,
+      opt_leftAxisPadding || 0);
+};
+
+
+/**
+ * A hook before series drawing cycle.
+ */
+anychart.core.ChartWithSeries.prototype.beforeSeriesDraw = function() {
+  this.prepare3d();
+  this.distributeSeries();
+  this.calcBubbleSizes();
+};
+
+
+/**
  * Draws series.
  * @param {number=} opt_topAxisPadding
  * @param {number=} opt_rightAxisPadding
@@ -905,17 +952,11 @@ anychart.core.ChartWithSeries.prototype.drawSeries = function(opt_topAxisPadding
     for (i = 0, count = this.seriesList.length; i < count; i++) {
       var series = this.seriesList[i];
       series.container(this.rootElement);
-      series.axesLinesSpace(
-          opt_topAxisPadding || 0,
-          opt_rightAxisPadding || 0,
-          opt_bottomAxisPadding || 0,
-          opt_leftAxisPadding || 0);
       series.parentBounds(this.dataBounds);
+      this.setupSeriesBeforeDraw(series, opt_topAxisPadding, opt_rightAxisPadding, opt_bottomAxisPadding, opt_leftAxisPadding);
     }
 
-    this.prepare3d();
-    this.distributeSeries();
-    this.calcBubbleSizes();
+    this.beforeSeriesDraw();
     for (i = 0; i < this.seriesList.length; i++) {
       this.seriesList[i].draw();
     }

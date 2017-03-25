@@ -127,7 +127,9 @@ anychart.core.drawers.StepArea.prototype.drawFirstPoint = function(point, state)
     var nextZero = /** @type {number} */(point.meta('nextZero'));
     var nextY = /** @type {number} */(point.meta('nextValue'));
     if (!isNaN(nextZero) && !isNaN(nextY)) {
-      shapes['stroke'].moveTo(x, y).lineTo(x, y);
+      var shape = /** @type {acgraph.vector.Path} */(shapes['stroke']);
+      anychart.core.drawers.move(shape, this.isVertical, x, y);
+      anychart.core.drawers.line(shape, this.isVertical, x, y);
       this.drawSegmentStart_(shapes, x, nextY, nextZero);
       this.zeroesStack = [x, nextZero];
       this.prevY_ = nextY;

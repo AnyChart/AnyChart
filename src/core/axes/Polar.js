@@ -200,6 +200,17 @@ anychart.core.axes.Polar.prototype.overlapMode = function(opt_value) {
 
 
 /**
+ * Drops labels calls cache.
+ */
+anychart.core.axes.Polar.prototype.dropLabelCallsCache = function() {
+  if (this.labels_)
+    this.labels_.dropCallsCache();
+  if (this.minorLabels_)
+    this.minorLabels_.dropCallsCache();
+};
+
+
+/**
  * @param {(Object|boolean|null)=} opt_value Axis labels.
  * @return {!(anychart.core.ui.LabelsFactory|anychart.core.axes.Polar)} Axis labels of itself for method chaining.
  */

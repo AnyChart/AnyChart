@@ -290,7 +290,7 @@ anychart.core.annotations.GRID_DESCRIPTORS = (function() {
 
   map['selectGrid'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.MULTI_ARG,
-      'selectTrend',
+      'selectGrid',
       anychart.core.settings.strokeOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);

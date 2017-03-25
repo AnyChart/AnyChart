@@ -2206,7 +2206,7 @@ anychart.core.stock.Plot.prototype.serialize = function() {
   json['dateTimeHighlighter'] = anychart.color.serialize(this.dateTimeHighlighterStroke_);
 
   json['palette'] = this.palette().serialize();
-  // json['markerPalette'] = this.markerPalette().serialize();
+  json['markerPalette'] = this.markerPalette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
 
   var yAxes = [];
@@ -2340,7 +2340,7 @@ anychart.core.stock.Plot.prototype.setupByJSON = function(config, opt_default) {
   this.defaultSeriesType(config['defaultSeriesType']);
 
   this.palette(config['palette']);
-  // this.markerPalette(config['markerPalette']);
+  this.markerPalette(config['markerPalette']);
   this.hatchFillPalette(config['hatchFillPalette']);
 
   this.background(config['background']);
@@ -2626,7 +2626,7 @@ anychart.core.stock.Plot.Dragger.prototype.limitY = function(y) {
   proto['sma'] = proto.sma;
   proto['stochastic'] = proto.stochastic;
   proto['palette'] = proto.palette;
-  // proto['markerPalette'] = proto.markerPalette;
+  proto['markerPalette'] = proto.markerPalette;
   proto['hatchFillPalette'] = proto.hatchFillPalette;
   proto['annotations'] = proto.annotations;
 })();

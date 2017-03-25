@@ -17,3 +17,12 @@ anychart.core.shapeManagers.PerPoint = function(series, config, interactive, opt
   anychart.core.shapeManagers.PerPoint.base(this, 'constructor', series, config, interactive, opt_shapesFieldName, opt_postProcessor);
 };
 goog.inherits(anychart.core.shapeManagers.PerPoint, anychart.core.shapeManagers.Base);
+
+
+/** @inheritDoc */
+anychart.core.shapeManagers.PerPoint.prototype.getShapesGroup = function(state, opt_only, opt_baseZIndex, opt_shape) {
+  var res = anychart.core.shapeManagers.PerPoint.base(this, 'getShapesGroup', state, opt_only, opt_baseZIndex, opt_shape);
+  if (this.series.isDiscreteBased())
+    this.series.getIterator().meta(this.shapesFieldName, res);
+  return res;
+};

@@ -1972,9 +1972,55 @@ anychart.core.ChartWithOrthogonalScales.prototype.setupByJSON = function(config,
 
 
 /**
+ * Setups elements defined by an array of json with scale instances map.
+ * @param {*} items
+ * @param {Function} itemConstructor
+ * @param {Object} scaleInstances
+ * @protected
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.setupElementsWithScales = function(items, itemConstructor, scaleInstances) {
+  if (goog.isArray(items)) {
+    for (var i = 0; i < items.length; i++) {
+      var json = items[i];
+      var element = itemConstructor.call(this, i);
+      element.setup(json);
+      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1)
+        element.scale(scaleInstances[json['scale']]);
+    }
+  }
+};
+
+
+/**
+ * Serializes a list of items and writes it to json[propName] if the resulting list is not empty.
+ * @param {!Object} json
+ * @param {string} propName
+ * @param {Array.<T>} list
+ * @param {function(T, Array, Object, Array):Object} serializer
+ * @param {Array} scales
+ * @param {Object} scaleIds
+ * @param {Array} axesIds
+ * @protected
+ * @template T
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.serializeElementsWithScales = function(json, propName, list, serializer, scales, scaleIds, axesIds) {
+  var res = [];
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i];
+    if (item) {
+      res.push(serializer.call(this, item, scales, scaleIds, axesIds));
+    }
+  }
+  if (res.length) {
+    json[propName] = res;
+  }
+};
+
+
+/**
  * Serialization function with scales context.
  * @param {!Object} json
- * @param {Array.<anychart.scales.Base>} scales
+ * @param {Array.<Object>} scales
  * @param {Object} scaleIds
  * @protected
  */

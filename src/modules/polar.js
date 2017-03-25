@@ -6,9 +6,9 @@
 goog.provide('anychart.modules.polar');
 
 goog.require('anychart.charts.Polar');
-goog.require('anychart.core.polar.series.Area');
-goog.require('anychart.core.polar.series.Line');
-goog.require('anychart.core.polar.series.Marker');
+// goog.require('anychart.core.polar.series.Area');
+// goog.require('anychart.core.polar.series.Line');
+// goog.require('anychart.core.polar.series.Marker');
 goog.require('anychart.modules.base');
 
 
@@ -24,11 +24,8 @@ goog.require('anychart.modules.base');
 anychart.polar = function(var_args) {
   var chart = new anychart.charts.Polar();
   chart.setupByVal(anychart.getFullTheme('polar'), true);
-
-  for (var i = 0, count = arguments.length; i < count; i++) {
-    chart.marker(arguments[i]);
-  }
-
+  if (arguments.length)
+    chart.addSeries.apply(chart, arguments);
   return chart;
 };
 

@@ -292,7 +292,7 @@ anychart.core.ChartWithAxes.prototype.grid = function(opt_indexOrValue, opt_valu
  * Getter/setter for minorGrid.
  * @param {(Object|boolean|null|number)=} opt_indexOrValue Minor grid settings.
  * @param {(Object|boolean|null)=} opt_value Minor grid settings to set.
- * @return {!(anychart.core.grids.Linear|anychart.core.ChartWithAxes)} Minor grid instance by index or itself for method chaining.
+ * @return {!(anychart.core.grids.Linear|anychart.core.grids.Linear3d|anychart.core.ChartWithAxes)} Minor grid instance by index or itself for method chaining.
  */
 anychart.core.ChartWithAxes.prototype.minorGrid = function(opt_indexOrValue, opt_value) {
   var index, value;
@@ -1094,34 +1094,14 @@ anychart.core.ChartWithAxes.prototype.setupByJSONWithScales = function(config, s
   this.defaultAnnotationSettings(config['defaultAnnotationSettings']);
   this.annotations(config['annotations']);
 
-  this.setupElements_(config['grids'], this.grid, scalesInstances);
-  this.setupElements_(config['minorGrids'], this.minorGrid, scalesInstances);
-  this.setupElements_(config['xAxes'], this.xAxis, scalesInstances);
-  this.setupElements_(config['yAxes'], this.yAxis, scalesInstances);
-  this.setupElements_(config['lineAxesMarkers'], this.lineMarker, scalesInstances);
-  this.setupElements_(config['rangeAxesMarkers'], this.rangeMarker, scalesInstances);
-  this.setupElements_(config['textAxesMarkers'], this.textMarker, scalesInstances);
+  this.setupElementsWithScales(config['grids'], this.grid, scalesInstances);
+  this.setupElementsWithScales(config['minorGrids'], this.minorGrid, scalesInstances);
+  this.setupElementsWithScales(config['xAxes'], this.xAxis, scalesInstances);
+  this.setupElementsWithScales(config['yAxes'], this.yAxis, scalesInstances);
+  this.setupElementsWithScales(config['lineAxesMarkers'], this.lineMarker, scalesInstances);
+  this.setupElementsWithScales(config['rangeAxesMarkers'], this.rangeMarker, scalesInstances);
+  this.setupElementsWithScales(config['textAxesMarkers'], this.textMarker, scalesInstances);
   this.crosshair(config['crosshair']);
-};
-
-
-/**
- * Setups elements defined by an array of json
- * @param {*} items
- * @param {Function} itemConstructor
- * @param {Object} scaleInstances
- * @private
- */
-anychart.core.ChartWithAxes.prototype.setupElements_ = function(items, itemConstructor, scaleInstances) {
-  if (goog.isArray(items)) {
-    for (var i = 0; i < items.length; i++) {
-      var json = items[i];
-      var element = itemConstructor.call(this, i);
-      element.setup(json);
-      if (goog.isObject(json) && 'scale' in json && json['scale'] > 1)
-        element.scale(scaleInstances[json['scale']]);
-    }
-  }
 };
 
 
@@ -1132,42 +1112,16 @@ anychart.core.ChartWithAxes.prototype.serializeWithScales = function(json, scale
   json['isVertical'] = this.barChartMode;
 
   var axesIds = [];
-  this.serializeElements_(json, 'xAxes', this.xAxes_, this.serializeAxis_, scales, scaleIds, axesIds);
-  this.serializeElements_(json, 'yAxes', this.yAxes_, this.serializeAxis_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'xAxes', this.xAxes_, this.serializeAxis_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'yAxes', this.yAxes_, this.serializeAxis_, scales, scaleIds, axesIds);
 
-  this.serializeElements_(json, 'grids', this.grids_, this.serializeGrid_, scales, scaleIds, axesIds);
-  this.serializeElements_(json, 'minorGrids', this.minorGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
-  this.serializeElements_(json, 'lineAxesMarkers', this.lineAxesMarkers_, this.serializeAxisMarker_, scales, scaleIds, axesIds);
-  this.serializeElements_(json, 'rangeAxesMarkers', this.rangeAxesMarkers_, this.serializeAxisMarker_, scales, scaleIds, axesIds);
-  this.serializeElements_(json, 'textAxesMarkers', this.textAxesMarkers_, this.serializeAxisMarker_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'grids', this.grids_, this.serializeGrid_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'minorGrids', this.minorGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'lineAxesMarkers', this.lineAxesMarkers_, this.serializeAxisMarker_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'rangeAxesMarkers', this.rangeAxesMarkers_, this.serializeAxisMarker_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'textAxesMarkers', this.textAxesMarkers_, this.serializeAxisMarker_, scales, scaleIds, axesIds);
 
   json['crosshair'] = this.crosshair().serialize();
-};
-
-
-/**
- * Serializes a list of items and writes it to json[propName] if the resulting list is not empty.
- * @param {!Object} json
- * @param {string} propName
- * @param {Array.<T>} list
- * @param {function(T, Array, Object, Array):Object} serializer
- * @param {Array} scales
- * @param {Object} scaleIds
- * @param {Array} axesIds
- * @private
- * @template T
- */
-anychart.core.ChartWithAxes.prototype.serializeElements_ = function(json, propName, list, serializer, scales, scaleIds, axesIds) {
-  var res = [];
-  for (var i = 0; i < list.length; i++) {
-    var item = list[i];
-    if (item) {
-      res.push(serializer.call(this, item, scales, scaleIds, axesIds));
-    }
-  }
-  if (res.length) {
-    json[propName] = res;
-  }
 };
 
 

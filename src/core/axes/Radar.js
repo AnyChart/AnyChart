@@ -154,6 +154,15 @@ anychart.core.axes.Radar.prototype.labelsBounds_ = null;
 
 
 /**
+ * Drops labels calls cache.
+ */
+anychart.core.axes.Radar.prototype.dropLabelCallsCache = function() {
+  if (this.labels_)
+    this.labels_.dropCallsCache();
+};
+
+
+/**
  * @param {(Object|boolean|null)=} opt_value Axis labels.
  * @return {!(anychart.core.ui.LabelsFactory|anychart.core.axes.Radar)} Axis labels of itself for method chaining.
  */

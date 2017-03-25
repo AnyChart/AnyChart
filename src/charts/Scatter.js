@@ -119,10 +119,6 @@ anychart.charts.Scatter.prototype.checkXScaleType = function(scale) {
 
 
 /** @inheritDoc */
-anychart.charts.Scatter.prototype.checkYScaleType = anychart.charts.Scatter.prototype.checkXScaleType;
-
-
-/** @inheritDoc */
 anychart.charts.Scatter.prototype.createScaleByType = function(value, isXScale, returnNullOnError) {
   return anychart.scales.ScatterBase.fromString(value, returnNullOnError);
 };

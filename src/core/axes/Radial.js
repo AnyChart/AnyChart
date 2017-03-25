@@ -169,6 +169,17 @@ anychart.core.axes.Radial.prototype.minorLabelsBounds_ = null;
 
 
 /**
+ * Drops labels calls cache.
+ */
+anychart.core.axes.Radial.prototype.dropLabelCallsCache = function() {
+  if (this.labels_)
+    this.labels_.dropCallsCache();
+  if (this.minorLabels_)
+    this.minorLabels_.dropCallsCache();
+};
+
+
+/**
  * Getter/setter for labels.
  * @param {(Object|boolean|null)=} opt_value Axis labels.
  * @return {!(anychart.core.ui.LabelsFactory|anychart.core.axes.Radial)} Axis labels of itself for method chaining.

@@ -22,6 +22,13 @@ anychart.core.shapeManagers.PerSeries = function(series, config, interactive, op
    * @private
    */
   this.shapes_ = null;
+
+  /**
+   * All shape groups, if there are more than one group.
+   * @type {?Array.<Object.<string, acgraph.vector.Shape>>}
+   * @private
+   */
+  this.prevShapes_ = null;
 };
 goog.inherits(anychart.core.shapeManagers.PerSeries, anychart.core.shapeManagers.Base);
 
@@ -36,11 +43,12 @@ anychart.core.shapeManagers.PerSeries.prototype.setupInteractivity = function(sh
 anychart.core.shapeManagers.PerSeries.prototype.clearShapes = function() {
   anychart.core.shapeManagers.PerSeries.base(this, 'clearShapes');
   this.shapes_ = null;
+  this.prevShapes_ = null;
 };
 
 
 /** @inheritDoc */
-anychart.core.shapeManagers.PerSeries.prototype.getShapesGroup = function(state, opt_only, opt_baseZIndex) {
+anychart.core.shapeManagers.PerSeries.prototype.getShapesGroup = function(state, opt_only, opt_baseZIndex, opt_shape) {
   // we generate all shapes for the first time, because we cannot afford to vary the set
   if (!this.shapes_) {
     this.shapes_ = anychart.core.shapeManagers.PerSeries.base(this, 'getShapesGroup', state, null, opt_baseZIndex);
@@ -50,13 +58,37 @@ anychart.core.shapeManagers.PerSeries.prototype.getShapesGroup = function(state,
 
 
 /** @inheritDoc */
+anychart.core.shapeManagers.PerSeries.prototype.addShapesGroup = function(state, opt_baseZIndex) {
+  if (this.shapes_) {
+    if (this.prevShapes_) {
+      this.prevShapes_.push(this.shapes_);
+    } else {
+      this.prevShapes_ = [this.shapes_];
+    }
+    this.shapes_ = null;
+  }
+  return this.getShapesGroup(state, undefined, opt_baseZIndex);
+};
+
+
+/** @inheritDoc */
 anychart.core.shapeManagers.PerSeries.prototype.updateZIndex = function(newBaseZIndex, opt_shapesGroup) {
+  if (this.prevShapes_) {
+    for (var i = 0; i < this.prevShapes_.length; i++) {
+      anychart.core.shapeManagers.PerSeries.base(this, 'updateZIndex', newBaseZIndex, this.prevShapes_[i]);
+    }
+  }
   anychart.core.shapeManagers.PerSeries.base(this, 'updateZIndex', newBaseZIndex, this.shapes_);
 };
 
 
 /** @inheritDoc */
 anychart.core.shapeManagers.PerSeries.prototype.updateColors = function(state, opt_shapesGroup) {
+  if (this.prevShapes_) {
+    for (var i = 0; i < this.prevShapes_.length; i++) {
+      anychart.core.shapeManagers.PerSeries.base(this, 'updateColors', state, this.prevShapes_[i]);
+    }
+  }
   anychart.core.shapeManagers.PerSeries.base(this, 'updateColors', state, this.shapes_);
 };
 
@@ -64,5 +96,6 @@ anychart.core.shapeManagers.PerSeries.prototype.updateColors = function(state, o
 /** @inheritDoc */
 anychart.core.shapeManagers.PerSeries.prototype.disposeInternal = function() {
   this.shapes_ = null;
+  this.prevShapes_ = null;
   anychart.core.shapeManagers.PerSeries.base(this, 'disposeInternal');
 };
