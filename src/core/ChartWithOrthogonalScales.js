@@ -339,6 +339,13 @@ anychart.core.ChartWithOrthogonalScales.prototype.ensureStatisticsReady = functi
 };
 
 
+/** @inheritDoc */
+anychart.core.ChartWithOrthogonalScales.prototype.drawInternal = function() {
+  if (!this.isConsistent(anychart.ConsistencyState.SCALE_CHART_STATISTICS))
+    anychart.core.ChartWithOrthogonalScales.base(this, 'drawInternal');
+};
+
+
 /**
  * Performs full calculations of drawing plans and statistics.
  */

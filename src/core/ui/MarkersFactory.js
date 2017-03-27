@@ -725,7 +725,8 @@ anychart.core.ui.MarkersFactory.prototype.createMarker = function() {
  * @return {anychart.core.ui.MarkersFactory} Returns self for method chaining.
  */
 anychart.core.ui.MarkersFactory.prototype.draw = function() {
-  if (this.isDisposed()) return this;
+  if (this.isDisposed())
+    return this;
   if (!this.layer_) {
     this.layer_ = acgraph.layer();
     if (this.isInteractive)

@@ -489,10 +489,11 @@ anychart.core.Base.prototype.markConsistent = function(state) {
 
 /**
  * Checks if an element has any consistency state set.
+ * @param {number=} opt_allowState
  * @return {boolean} True if it has it.
  */
-anychart.core.Base.prototype.isConsistent = function() {
-  return !this.consistency_;
+anychart.core.Base.prototype.isConsistent = function(opt_allowState) {
+  return !(this.consistency_ & ~(opt_allowState || 0));
 };
 
 

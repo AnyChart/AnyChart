@@ -26,6 +26,13 @@ anychart.ui.ContextMenu = function() {
   anychart.ui.ContextMenu.base(this, 'constructor');
 
   /**
+   * Whether context menu is attached.
+   * @type {boolean}
+   * @private
+   */
+  this.attached_ = false;
+
+  /**
    * Save link to visual target on which triggered CONTEXTMENU event for ACTION event on items.
    * @type {Element|anychart.core.VisualBase}
    * @private
@@ -295,6 +302,15 @@ anychart.ui.ContextMenu.prototype.handleContextMenu_ = function(e) {
 };
 
 
+/** @inheritDoc */
+anychart.ui.ContextMenu.prototype.render = function(opt_parentElement) {
+  anychart.ui.ContextMenu.base(this, 'render', opt_parentElement);
+  if (this.extraClassNames_ && this.extraClassNames_.length) {
+    goog.dom.classlist.addAll(this.getElement(), this.extraClassNames_);
+  }
+};
+
+
 /**
  * Attaches the context menu to a chart or DOM element.  A menu can
  * only be attached to a target once, since attaching the same menu for
@@ -306,12 +322,8 @@ anychart.ui.ContextMenu.prototype.handleContextMenu_ = function(e) {
  * @suppress {checkTypes}
  */
 anychart.ui.ContextMenu.prototype.attach = function(target, opt_capture) {
-  if (!this.isInDocument()) {
-    this.render();
-    if (this.extraClassNames_ && this.extraClassNames_.length) {
-      goog.dom.classlist.addAll(this.getElement(), this.extraClassNames_);
-    }
-
+  if (!this.attached_ && !this.isInDocument()) {
+    this.attached_ = true;
     if (goog.isObject(target) && goog.isFunction(target['listen'])) {
       this.chart_ = target;
       this.chart_['listen'](goog.events.EventType.CONTEXTMENU, this.handleContextMenu_, opt_capture, this);
@@ -331,10 +343,13 @@ anychart.ui.ContextMenu.prototype.attach = function(target, opt_capture) {
  * @suppress {checkTypes}
  */
 anychart.ui.ContextMenu.prototype.detach = function(opt_target, opt_capture) {
-  if (goog.isDefAndNotNull(this.chart_) && goog.isFunction(this.chart_['unlisten'])) {
-    this.chart_['unlisten'](goog.events.EventType.CONTEXTMENU, this.handleContextMenu_, opt_capture, this);
-  } else {
-    this.getHandler().unlisten(opt_target, goog.events.EventType.CONTEXTMENU, this.handleContextMenu_, opt_capture);
+  if (this.attached_) {
+    this.attached_ = false;
+    if (goog.isDefAndNotNull(this.chart_) && goog.isFunction(this.chart_['unlisten'])) {
+      this.chart_['unlisten'](goog.events.EventType.CONTEXTMENU, this.handleContextMenu_, opt_capture, this);
+    } else {
+      this.getHandler().unlisten(opt_target, goog.events.EventType.CONTEXTMENU, this.handleContextMenu_, opt_capture);
+    }
   }
   return this;
 };
@@ -347,6 +362,9 @@ anychart.ui.ContextMenu.prototype.detach = function(opt_target, opt_capture) {
  * @param {number} y The client-Y associated with the show event.
  */
 anychart.ui.ContextMenu.prototype.show = function(x, y) {
+  if (!this.isInDocument()) {
+    this.render();
+  }
   this.makeMenu_();
   this.showMenu({}, x, y);
 };

@@ -1327,7 +1327,7 @@ anychart.core.Chart.prototype.drawInternal = function() {
   this.markConsistent(anychart.ConsistencyState.CHART_ANIMATION);
 
   if (this.hasInvalidationState(anychart.ConsistencyState.A11Y)) {
-    this.a11y().applyA11y(this.createChartContextProvider());
+    this.a11y().applyA11y();
     this.markConsistent(anychart.ConsistencyState.A11Y);
   }
 

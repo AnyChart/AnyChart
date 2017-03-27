@@ -1845,11 +1845,20 @@ anychart.core.SeriesBase.prototype.onA11ySignal_ = function() {
 
 
 /**
+ * Creates a11y text info.
+ * @return {Object}
+ */
+anychart.core.SeriesBase.prototype.createA11yTextInfo = function() {
+  return this.createFormatProvider();
+};
+
+
+/**
  * Draws a11y.
  */
 anychart.core.SeriesBase.prototype.drawA11y = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.A11Y)) {
-    this.a11y().applyA11y(this.createFormatProvider());
+    this.a11y().applyA11y();
     this.markConsistent(anychart.ConsistencyState.A11Y);
   }
 };

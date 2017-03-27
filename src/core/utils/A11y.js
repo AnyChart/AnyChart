@@ -133,9 +133,15 @@ anychart.core.utils.A11y.prototype.applyChangesInChildA11y = function() {
 
 /**
  * Applies accessibility settings.
- * @param {Object} textInfo - Object with info to format title.
  */
 anychart.core.utils.A11y.prototype.applyA11y = goog.abstractMethod;
+
+
+/**
+ * Creates text info to apply a11y.
+ * @return {Object} Text info object.
+ */
+anychart.core.utils.A11y.prototype.createTextInfo = goog.abstractMethod;
 
 
 /** @inheritDoc */
@@ -226,10 +232,16 @@ anychart.core.utils.ChartA11y = function(chart) {
 goog.inherits(anychart.core.utils.ChartA11y, anychart.core.utils.A11y);
 
 
+/** @inheritDoc */
+anychart.core.utils.ChartA11y.prototype.createTextInfo = function() {
+  return this.chart.createChartContextProvider();
+};
+
+
 /**
  * @inheritDoc
  */
-anychart.core.utils.ChartA11y.prototype.applyA11y = function(textInfo) {
+anychart.core.utils.ChartA11y.prototype.applyA11y = function() {
   var rootLayer = this.chart.getRootElement();
   rootLayer.attr('role', null);
   rootLayer.attr('aria-hidden', 'true');
@@ -239,6 +251,7 @@ anychart.core.utils.ChartA11y.prototype.applyA11y = function(textInfo) {
 
   if (this.enabled()) {
     var titleText;
+    var textInfo = this.createTextInfo();
 
     if (this.titleFormatter_) {
       var formatter = this.titleFormatter_;
@@ -342,11 +355,12 @@ goog.inherits(anychart.core.utils.SeriesA11y, anychart.core.utils.A11y);
 /**
  * @inheritDoc
  */
-anychart.core.utils.SeriesA11y.prototype.applyA11y = function(textInfo) {
+anychart.core.utils.SeriesA11y.prototype.applyA11y = function() {
   var titleText = null;
   var role = null;
   var layer = /** @type {acgraph.vector.Layer} */ (this.series_.getRootLayer() || this.forceLayer_);
   if (this.enabled() && this.titleFormatter()) {
+    var textInfo = this.createTextInfo();
     var formatter = this.titleFormatter();
     if (goog.isString(formatter))
       formatter = anychart.core.utils.TokenParser.getInstance().getTextFormatter(formatter);
@@ -360,6 +374,14 @@ anychart.core.utils.SeriesA11y.prototype.applyA11y = function(textInfo) {
   }
   layer.attr('aria-label', titleText);
   layer.attr('role', role);
+};
+
+
+/** @inheritDoc */
+anychart.core.utils.SeriesA11y.prototype.createTextInfo = function() {
+  //TODO(AntonKagakin): Remove this method from series.Base
+  //TODO(AntonKagakin): this method exists only because of SeriesBase rudiment.
+  return this.series_.createA11yTextInfo();
 };
 
 
