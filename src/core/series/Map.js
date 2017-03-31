@@ -299,29 +299,29 @@ anychart.core.series.Map.prototype.getLabelsPosition = function(pointState) {
   var hoverPointLabel = hovered ? iterator.get('hoverLabel') : null;
   var selectPointLabel = selected ? iterator.get('selectLabel') : null;
 
-  var labelPosition = pointLabel && pointLabel['position'] ? pointLabel['position'] : null;
-  var labelHoverPosition = hoverPointLabel && hoverPointLabel['position'] ? hoverPointLabel['position'] : null;
-  var labelSelectPosition = selectPointLabel && selectPointLabel['position'] ? selectPointLabel['position'] : null;
+  var labelPosition = pointLabel && goog.isDef(pointLabel['position']) ? pointLabel['position'] : void 0;
+  var labelHoverPosition = hoverPointLabel && goog.isDef(hoverPointLabel['position']) ? hoverPointLabel['position'] : void 0;
+  var labelSelectPosition = selectPointLabel && goog.isDef(selectPointLabel['position']) ? selectPointLabel['position'] : void 0;
 
-  return hovered || selected ?
+  return /** @type {string} */(hovered || selected ?
       hovered ?
-          labelHoverPosition ?
+          goog.isDef(labelHoverPosition) ?
               labelHoverPosition :
-              this.hoverLabels().position() ?
-                  this.hoverLabels().position() :
-                  labelPosition ?
+              goog.isDef(this.hoverLabels().getOption('position')) ?
+                  this.hoverLabels().getOption('position') :
+                  goog.isDef(labelPosition) ?
                       labelPosition :
-                      this.labels().position() :
-          labelSelectPosition ?
+                      this.labels().getOption('position') :
+          goog.isDef(labelSelectPosition) ?
               labelSelectPosition :
-              this.selectLabels().position() ?
-                  this.selectLabels().position() :
-                  labelPosition ?
+              goog.isDef(this.selectLabels().getOption('position')) ?
+                  this.selectLabels().getOption('position') :
+                  goog.isDef(labelPosition) ?
                       labelPosition :
-                      this.labels().position() :
-      labelPosition ?
+                      this.labels().getOption('position') :
+      goog.isDef(labelPosition) ?
           labelPosition :
-          this.labels().position();
+          this.labels().getOption('position'));
 };
 
 
@@ -1010,7 +1010,7 @@ anychart.core.series.Map.prototype.finalizeDrawing = function() {
 //endregion
 //region --- Legend
 /** @inheritDoc */
-anychart.core.series.Map.prototype.getLegendItemData = function(itemsTextFormatter) {
+anychart.core.series.Map.prototype.getLegendItemData = function(itemsFormat) {
   var legendItem = this.legendItem();
   legendItem.markAllConsistent();
   var json = legendItem.serialize();
@@ -1030,9 +1030,9 @@ anychart.core.series.Map.prototype.getLegendItemData = function(itemsTextFormatt
   }
   var format = this.createLegendContextProvider();
   var itemText;
-  if (goog.isFunction(itemsTextFormatter)) {
+  if (goog.isFunction(itemsFormat)) {
 
-    itemText = itemsTextFormatter.call(format, format);
+    itemText = itemsFormat.call(format, format);
   }
   if (!goog.isString(itemText))
     itemText = goog.isDef(this.name()) ? this.name() : 'Series: ' + this.index();
@@ -1122,7 +1122,7 @@ anychart.core.series.Map.prototype.createFormatProvider = function(opt_force) {
 
 
 /** @inheritDoc */
-anychart.core.series.Map.prototype.drawSingleFactoryElement = function(factory, index, positionProvider, formatProvider, stateFactory, pointOverride, statePointOverride, opt_position) {
+anychart.core.series.Map.prototype.drawSingleFactoryElement = function(factory, index, positionProvider, formatProvider, chartNormalFactory, seriesStateFactory, chartStateFactory, pointOverride, statePointOverride, opt_position) {
   var element = formatProvider ? factory.getLabel(/** @type {number} */(index)) : factory.getMarker(/** @type {number} */(index));
   if (element) {
     if (formatProvider)
@@ -1137,7 +1137,20 @@ anychart.core.series.Map.prototype.drawSingleFactoryElement = function(factory, 
   element.resetSettings();
   if (formatProvider) {
     element.autoAnchor(/** @type {anychart.enums.Anchor} */(this.getIterator().meta('labelAnchor')));
+    element.state('pointState', goog.isDef(statePointOverride) ? statePointOverride : null);
+    element.state('seriesState', seriesStateFactory);
+    element.state('chartState', chartStateFactory);
+    element.state('pointNormal', goog.isDef(pointOverride) ? pointOverride : null);
+    element.state('seriesNormal', factory);
+    element.state('chartNormal', chartNormalFactory);
+    element.state('seriesStateTheme', seriesStateFactory ? seriesStateFactory.themeSettings : null);
+    element.state('chartStateTheme', chartStateFactory ? chartStateFactory.themeSettings : null);
+    element.state('auto', element.autoSettings);
+    element.state('seriesNormalTheme', factory.themeSettings);
+    element.state('chartNormalTheme', chartNormalFactory ? chartNormalFactory.themeSettings : null);
   } else {
+    element.currentMarkersFactory(seriesStateFactory || factory);
+    element.setSettings(/** @type {Object} */(pointOverride), /** @type {Object} */(statePointOverride));
     var rotation = /** @type {number} */(element.getFinalSettings('rotation'));
     if (!goog.isDef(rotation) || goog.isNull(rotation) || isNaN(rotation)) {
       var autoRotation = {'rotation': /** @type {number} */(this.getIterator().meta('markerRotation'))};
@@ -1150,11 +1163,7 @@ anychart.core.series.Map.prototype.drawSingleFactoryElement = function(factory, 
       element.setSettings(autoAnchor, autoAnchor);
     }
   }
-  if (formatProvider)
-    element.currentLabelsFactory(stateFactory || factory);
-  else
-    element.currentMarkersFactory(stateFactory || factory);
-  element.setSettings(/** @type {Object} */(pointOverride), /** @type {Object} */(statePointOverride));
+
   element.draw();
   return element;
 };

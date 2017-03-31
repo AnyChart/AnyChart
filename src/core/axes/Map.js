@@ -704,7 +704,8 @@ anychart.core.axes.Map.prototype.getOverlappedLabels_ = function() {
         var k = -1;
 
         var parentLabels = this.parent().labels();
-        var isLabels = goog.isNull(this.labels().enabled()) ? parentLabels.enabled() : this.labels().enabled();
+        var labelsEnabledState = this.labels().enabled();
+        var isLabels = labelsEnabledState == void 0 ? parentLabels.enabled() : labelsEnabledState;
 
         var scaleMinorTicks;
         if (this.isHorizontal()) {
@@ -723,7 +724,8 @@ anychart.core.axes.Map.prototype.getOverlappedLabels_ = function() {
         var minorTickVal, minorRatio;
 
         var parentMinorLabels = this.parent().minorLabels();
-        var isMinorLabels = goog.isNull(this.minorLabels().enabled()) ? parentMinorLabels.enabled() : this.minorLabels().enabled();
+        var minorLabelsEnabledState = this.minorLabels().enabled();
+        var isMinorLabels = minorLabelsEnabledState == void 0 ? parentMinorLabels.enabled() : minorLabelsEnabledState;
 
         while (i < ticksArrLen || j < minorTicksArrLen) {
           tickVal = parseFloat(scaleTicksArr[i]);
@@ -776,7 +778,7 @@ anychart.core.axes.Map.prototype.getOverlappedLabels_ = function() {
               labels.push(false);
             }
             i++;
-            if (ratio == minorRatio && (this.labels().enabled() || this.ticks().enabled())) {
+            if (ratio == minorRatio && (isLabels || this.ticks().enabled())) {
               minorLabels.push(false);
               j++;
             }
@@ -1005,11 +1007,13 @@ anychart.core.axes.Map.prototype.getAffectingBounds = function(opt_bounds) {
     var title = this.title();
     var labels = this.labels();
     var parentLabels = this.parent().labels();
-    var labelsEnabled = goog.isNull(labels.enabled()) ? parentLabels.enabled() : labels.enabled();
+    var labelsEnabledState = labels.enabled();
+    var labelsEnabled = labelsEnabledState == void 0 ? parentLabels.enabled() : labelsEnabledState;
 
     var minorLabels = this.minorLabels();
     var parentMinorLabels = this.parent().minorLabels();
-    var minorLabelsEnabled = goog.isNull(minorLabels.enabled()) ? parentMinorLabels.enabled() : minorLabels.enabled();
+    var minorLabelsEnabledState = minorLabels.enabled();
+    var minorLabelsEnabled = minorLabelsEnabledState == void 0 ? parentMinorLabels.enabled() : minorLabelsEnabledState;
 
     var axisTicks = this.ticks();
     axisTicks.setScale(scale);
@@ -1208,8 +1212,7 @@ anychart.core.axes.Map.prototype.drawLabel_ = function(value, isMajor, index) {
   if (goog.isDef(labelChangedSettings['enabled']) && labelChangedSettings['enabled'] == null)
     delete labelChangedSettings['enabled'];
 
-  label.setSettings(parentLabels.getChangedSettings(), labelChangedSettings);
-  label.currentLabelsFactory(/** @type {anychart.core.ui.LabelsFactory} */(parentLabels));
+  label.stateOrder([labelChangedSettings, 'auto', parentLabels, labels.themeSettings, parentLabels.themeSettings]);
 };
 
 
@@ -1566,13 +1569,15 @@ anychart.core.axes.Map.prototype.draw = function() {
     if (!labels.container()) labels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     labels.parentBounds(/** @type {anychart.math.Rect} */(this.parentBounds()));
     labels.clear();
-    labelsEnabled = goog.isNull(labels.enabled()) ? this.parent().labels().enabled() : labels.enabled();
+    var labelsEnabledState = this.labels().enabled();
+    labelsEnabled = labelsEnabledState == void 0 ? this.parent().labels().enabled() : labelsEnabledState;
 
     minorLabels = this.minorLabels();
     if (!minorLabels.container()) minorLabels.container(/** @type {acgraph.vector.ILayer} */(this.container()));
     minorLabels.parentBounds(/** @type {anychart.math.Rect} */(this.parentBounds()));
     minorLabels.clear();
-    minorLabelsEnabled = goog.isNull(minorLabels.enabled()) ? this.parent().minorLabels().enabled() : minorLabels.enabled();
+    var minorLabelsEnabledState = this.minorLabels().enabled();
+    minorLabelsEnabled = minorLabelsEnabledState == void 0 ? this.parent().minorLabels().enabled() : minorLabelsEnabledState;
 
     this.markConsistent(anychart.ConsistencyState.AXIS_LABELS);
   }
@@ -1762,6 +1767,7 @@ anychart.core.axes.Map.prototype.serialize = function() {
   json['ticks'] = this.ticks().serialize();
   json['minorTicks'] = this.minorTicks().serialize();
 
+  debugger;
   var labelsConfig = this.labels().getChangedSettings();
   if (!goog.object.isEmpty(labelsConfig))
     json['labels'] = labelsConfig;

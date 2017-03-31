@@ -70,7 +70,7 @@ anychart.standalones.Legend.prototype.onStockPlotSignal_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEED_UPDATE_LEGEND)) {
     this.suspendSignalsDispatching();
     var plot = /** @type {anychart.core.stock.Plot} */ (event.target);
-    var autoText = plot.getLegendAutoText(/** @type {string|Function} */ (this.titleFormatter()));
+    var autoText = plot.getLegendAutoText(/** @type {string|Function} */ (this.titleFormat()));
     if (!goog.isNull(autoText))
       this.title().autoText(autoText);
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.LEGEND_RECREATE_ITEMS);

@@ -458,7 +458,7 @@ goog.provide('anychart.themes.v6');
         'stroke': {'keys': ['0 #DDDDDD 1', '1 #D0D0D0 1'], 'angle': '90'},
         'fill': {'keys': ['0 #FFFFFF 1', '0.5 #F3F3F3 1', '1 #FFFFFF 1'], 'angle': '90'}
       },
-      'textFormatter': returnValue,
+      'format': returnValue,
       /**
        * @this {*}
        * @return {*}
@@ -617,14 +617,14 @@ goog.provide('anychart.themes.v6');
        * @this {*}
        * @return {*}
        */
-      'titleFormatter': function() {
+      'titleFormat': function() {
         return this['value'];
       },
       /**
        * @this {*}
        * @return {*}
        */
-      'textFormatter': function() {
+      'format': function() {
         return this['valuePrefix'] + this['value'] + this['valuePostfix'];
       }
     },
@@ -668,7 +668,7 @@ goog.provide('anychart.themes.v6');
           'stroke': {'keys': ['#ddd', '#d0d0d0'], 'angle': '90'},
           'fill': {'keys': ['#fff', '#f3f3f3', '#fff'], 'angle': '90'}
         },
-        'textFormatter': returnValue,
+        'format': returnValue,
         /**
          * @this {*}
          * @return {*}
@@ -704,7 +704,7 @@ goog.provide('anychart.themes.v6');
          * @this {*}
          * @return {*}
          */
-        'textFormatter': function() {
+        'format': function() {
           return (this['value']);
         },
         /**
@@ -873,8 +873,8 @@ goog.provide('anychart.themes.v6');
         'itemsSpacing': 15,
         'iconSize': 13,
         'items': null,
-        'itemsFormatter': null, // effectively equals current settings
-        'itemsTextFormatter': null,
+        'itemsFormat': null, // effectively equals current settings
+        'itemsFormat': null,
         'itemsSourceMode': 'default',
         'inverted': false,
         'hoverCursor': 'pointer',
@@ -1077,20 +1077,20 @@ goog.provide('anychart.themes.v6');
          * @this {*}
          * @return {*}
          */
-        'titleFormatter': function() {
+        'titleFormat': function() {
           return 'Union Tooltip';
         },
         /**
          * @this {*}
          * @return {*}
          */
-        'textFormatter': function() {
+        'format': function() {
           return this['formattedValues'].join('\n');
         }
       },
       'a11y': {
         'enabled': true,
-        'titleFormatter': chartA11yTitleFormatter,
+        'titleFormat': chartA11yTitleFormatter,
         'mode': 'chartElements'
       },
       'defaultAnnotationSettings': {
@@ -1123,7 +1123,7 @@ goog.provide('anychart.themes.v6');
              * @return {*}
              * @this {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return this['level'];
             }
           },
@@ -1320,7 +1320,7 @@ goog.provide('anychart.themes.v6');
             'rotation': 0,
             'width': null,
             'height': null,
-            'textFormatter': VALUE_TOKEN_DECIMALS_COUNT_2,
+            'format': VALUE_TOKEN_DECIMALS_COUNT_2,
             /**
              * @this {*}
              * @return {*}
@@ -1365,14 +1365,14 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'titleFormatter': function() {
+            'titleFormat': function() {
               return this['name'];
             },
             /**
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return this['x'] + ': ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
             }
           },
@@ -1412,7 +1412,7 @@ goog.provide('anychart.themes.v6');
           'connectMissingPoints': false,
           'a11y': {
             'enabled': true,
-            'titleFormatter': 'Series named {%SeriesName} with {%SeriesPointsCount} points. Min value is {%SeriesYMin}, max value is {%SeriesYMax}'
+            'titleFormat': 'Series named {%SeriesName} with {%SeriesPointsCount} points. Min value is {%SeriesYMin}, max value is {%SeriesYMax}'
           }
         },
         'area': {
@@ -1438,7 +1438,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return 'Highest: ' + parseFloat(this['highest']).toFixed(2) + '\n' +
                   'Median: ' + parseFloat(this['median']).toFixed(2) + '\n' +
                   'Lowest: ' + parseFloat(this['lowest']).toFixed(2);
@@ -1529,7 +1529,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return 'lowest: ' + this['valuePrefix'] + parseFloat(this['lowest']).toFixed(2) + this['valuePostfix'] + '\n' +
                   'q1: ' + this['valuePrefix'] + parseFloat(this['q1']).toFixed(2) + this['valuePostfix'] + '\n' +
                   'median: ' + this['valuePrefix'] + parseFloat(this['median']).toFixed(2) + this['valuePostfix'] + '\n' +
@@ -1594,7 +1594,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return this['valuePrefix'] + parseFloat(this['value']).toFixed(2) + this['valuePostfix'];
             }
           }
@@ -1712,7 +1712,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return 'O: ' + this['valuePrefix'] + parseFloat(this['open']).toFixed(4) + this['valuePostfix'] + '\n' +
                   'H: ' + this['valuePrefix'] + parseFloat(this['high']).toFixed(4) + this['valuePostfix'] + '\n' +
                   'L: ' + this['valuePrefix'] + parseFloat(this['low']).toFixed(4) + this['valuePostfix'] + '\n' +
@@ -1725,7 +1725,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return this['x'];
             },
             'offsetY': -10
@@ -1771,7 +1771,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return this['valuePrefix'] + parseFloat(this['value']).toFixed(2) + this['valuePostfix'];
             }
           }
@@ -1832,7 +1832,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return 'O: ' + this['valuePrefix'] + parseFloat(this['open']).toFixed(4) + this['valuePostfix'] + '\n' +
                   'H: ' + this['valuePrefix'] + parseFloat(this['high']).toFixed(4) + this['valuePostfix'] + '\n' +
                   'L: ' + this['valuePrefix'] + parseFloat(this['low']).toFixed(4) + this['valuePostfix'] + '\n' +
@@ -1844,7 +1844,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return this['x'];
             },
             'offsetY': -10
@@ -1890,7 +1890,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return 'High: ' + this['valuePrefix'] + parseFloat(this['high']).toFixed(2) + this['valuePostfix'] + '\n' +
                   'Low: ' + this['valuePrefix'] + parseFloat(this['low']).toFixed(2) + this['valuePostfix'];
             }
@@ -1911,7 +1911,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return 'High: ' + this['valuePrefix'] + parseFloat(this['high']).toFixed(2) + this['valuePostfix'] + '\n' +
                   'Low: ' + this['valuePrefix'] + parseFloat(this['low']).toFixed(2) + this['valuePostfix'];
             }
@@ -1926,7 +1926,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return 'High: ' + this['valuePrefix'] + parseFloat(this['high']).toFixed(2) + this['valuePostfix'] + '\n' +
                   'Low: ' + this['valuePrefix'] + parseFloat(this['low']).toFixed(2) + this['valuePostfix'];
             }
@@ -1972,7 +1972,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return 'High: ' + this['valuePrefix'] + parseFloat(this['high']).toFixed(2) + this['valuePostfix'] + '\n' +
                   'Low: ' + this['valuePrefix'] + parseFloat(this['low']).toFixed(2) + this['valuePostfix'];
             }
@@ -2018,7 +2018,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return 'High: ' + this['valuePrefix'] + parseFloat(this['high']).toFixed(2) + this['valuePostfix'] + '\n' +
                   'Low: ' + this['valuePrefix'] + parseFloat(this['low']).toFixed(2) + this['valuePostfix'];
             }
@@ -2118,7 +2118,7 @@ goog.provide('anychart.themes.v6');
         },
         'width': null,
         'labels': {
-          'textFormatter': VALUE_TOKEN_DECIMALS_COUNT_10
+          'format': VALUE_TOKEN_DECIMALS_COUNT_10
         },
         'scale': 0
       },
@@ -2134,7 +2134,7 @@ goog.provide('anychart.themes.v6');
         },
         'width': null,
         'labels': {
-          'textFormatter': VALUE_TOKEN_DECIMALS_COUNT_10
+          'format': VALUE_TOKEN_DECIMALS_COUNT_10
         },
         'scale': 1
       },
@@ -2269,7 +2269,7 @@ goog.provide('anychart.themes.v6');
            * @this {*}
            * @return {*}
            */
-          'textFormatter': function() {
+          'format': function() {
             return this['value'];
           },
           'enabled': true,
@@ -2314,7 +2314,7 @@ goog.provide('anychart.themes.v6');
            * @this {*}
            * @return {*}
            */
-          'textFormatter': function() {
+          'format': function() {
             return this['value'];
           },
           'enabled': true,
@@ -2381,7 +2381,7 @@ goog.provide('anychart.themes.v6');
         'zIndex': 35
       },
       'a11y': {
-        'titleFormatter': cartesianBaseA11yTitleFormatter
+        'titleFormat': cartesianBaseA11yTitleFormatter
       }
     },
 
@@ -2574,7 +2574,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               var date = new Date(this['tickValue']);
               var day = date.getUTCDate();
               var month = date.getUTCMonth();
@@ -2724,7 +2724,7 @@ goog.provide('anychart.themes.v6');
         {
           'orientation': 'right',
           'labels': {
-            'textFormatter': '{%Value}%'
+            'format': '{%Value}%'
           }
         }
       ]
@@ -2819,14 +2819,14 @@ goog.provide('anychart.themes.v6');
          * @this {*}
          * @return {*}
          */
-        'titleFormatter': function() {
+        'titleFormat': function() {
           return this['name'] || this['x'];
         },
         /**
          * @this {*}
          * @return {*}
          */
-        'textFormatter': function() {
+        'format': function() {
           if (goog.isDef(this['heat'])) {
             var value = 'Value: ' + this['valuePrefix'] + this['heat'] + this['valuePostfix'];
             if (!isNaN(+this['heat']))
@@ -2933,7 +2933,7 @@ goog.provide('anychart.themes.v6');
          * @this {*}
          * @return {*}
          */
-        'textFormatter': function() {
+        'format': function() {
           return this['heat'];
         },
         /**
@@ -3041,7 +3041,7 @@ goog.provide('anychart.themes.v6');
         'zIndex': 35
       },
       'a11y': {
-        'titleFormatter': chartA11yTitleFormatter
+        'titleFormat': chartA11yTitleFormatter
       }
     },
     'treeMap': {
@@ -3083,7 +3083,7 @@ goog.provide('anychart.themes.v6');
            * @this {*}
            * @return {*}
            */
-          'textFormatter': returnValue,
+          'format': returnValue,
           'offsetX': 0
         },
         'ticks': {
@@ -3103,12 +3103,12 @@ goog.provide('anychart.themes.v6');
          * @this {*}
          * @return {*}
          */
-        'titleFormatter': returnName,
+        'titleFormat': returnName,
         /**
          * @this {*}
          * @return {*}
          */
-        'textFormatter': returnValue
+        'format': returnValue
       },
       'colorScale': 0,
       'legend': {
@@ -3136,7 +3136,7 @@ goog.provide('anychart.themes.v6');
          * @this {*}
          * @return {*}
          */
-        'textFormatter': returnName
+        'format': returnName
       },
       'hoverHeaders': {
         'fontColor': 'cyan'
@@ -3158,7 +3158,7 @@ goog.provide('anychart.themes.v6');
          * @this {*}
          * @return {*}
          */
-        'textFormatter': returnName
+        'format': returnName
       },
       'markers': {
         'enabled': false,
@@ -3253,7 +3253,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return this['value'];
             },
             /**
@@ -3300,14 +3300,14 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'titleFormatter': function() {
+            'titleFormat': function() {
               return this['name'];
             },
             /**
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return this['x'] + ': ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
             }
           },
@@ -3386,7 +3386,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return this['valuePrefix'] + parseFloat(this['value']).toFixed(2) + this['valuePostfix'];
             }
           }
@@ -3421,14 +3421,14 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return this['valuePrefix'] + parseFloat(this['value']).toFixed(2) + this['valuePostfix'];
             }
           }
         },
         'a11y': {
           'enabled': true,
-          'titleFormatter': 'Series named {%SeriesName} with {%SeriesPointsCount} points. Min value is {%SeriesYMin}, max value is {%SeriesYMax}'
+          'titleFormat': 'Series named {%SeriesName} with {%SeriesPointsCount} points. Min value is {%SeriesYMin}, max value is {%SeriesYMax}'
         }
       },
 
@@ -3621,7 +3621,7 @@ goog.provide('anychart.themes.v6');
            * @this {*}
            * @return {*}
            */
-          'textFormatter': function() {
+          'format': function() {
             return this['value'];
           },
           'enabled': true,
@@ -3664,7 +3664,7 @@ goog.provide('anychart.themes.v6');
            * @this {*}
            * @return {*}
            */
-          'textFormatter': function() {
+          'format': function() {
             return this['value'];
           },
           'enabled': true,
@@ -3703,7 +3703,7 @@ goog.provide('anychart.themes.v6');
         }
       },
       'a11y': {
-        'titleFormatter': scatterA11yTitleFormatter
+        'titleFormat': scatterA11yTitleFormatter
       }
     },
 
@@ -3804,7 +3804,7 @@ goog.provide('anychart.themes.v6');
         'rotation': 0
       },
       'a11y': {
-        'titleFormatter': bulletA11yTitleFormatter
+        'titleFormat': bulletA11yTitleFormatter
       }
     },
 
@@ -3884,7 +3884,7 @@ goog.provide('anychart.themes.v6');
         'width': null,
         'height': null,
         'autoRotate': false,
-        'textFormatter': Y_PERCENT_OF_TOTAL_TOKEN + '%',
+        'format': Y_PERCENT_OF_TOTAL_TOKEN + '%',
         /**
          * @this {*}
          * @return {*}
@@ -3904,14 +3904,14 @@ goog.provide('anychart.themes.v6');
          * @this {*}
          * @return {*}
          */
-        'titleFormatter': function() {
+        'titleFormat': function() {
           return this['name'] || this['x'];
         },
         /**
          * @this {*}
          * @return {*}
          */
-        'textFormatter': function() {
+        'format': function() {
           return (this['name'] || this['x']) + '\n' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
         }
       },
@@ -3937,13 +3937,13 @@ goog.provide('anychart.themes.v6');
            * @this {*}
            * @return {*}
            */
-          'textFormatter': function() {
+          'format': function() {
             return (this['value']) + '\n' + this['valuePrefix'] + this['meta']['pointValue'] + this['valuePostfix'];
           }
         }
       },
       'a11y': {
-        'titleFormatter': pieA11yTitleFormatter
+        'titleFormat': pieA11yTitleFormatter
       }
     },
 
@@ -4084,7 +4084,7 @@ goog.provide('anychart.themes.v6');
          * @this {*}
          * @return {*}
          */
-        'textFormatter': function() {
+        'format': function() {
           return this['name'] ? this['name'] : this['x'];
         },
         /**
@@ -4143,14 +4143,14 @@ goog.provide('anychart.themes.v6');
          * @this {*}
          * @return {*}
          */
-        'titleFormatter': function() {
+        'titleFormat': function() {
           return this['name'] || this['x'];
         },
         /**
          * @this {*}
          * @return {*}
          */
-        'textFormatter': function() {
+        'format': function() {
           return (this['name'] || this['x']) + '\n' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
         }
       },
@@ -4166,7 +4166,7 @@ goog.provide('anychart.themes.v6');
            * @this {*}
            * @return {*}
            */
-          'textFormatter': function() {
+          'format': function() {
             return (this['value']) + '\n' + this['valuePrefix'] + this['meta']['pointValue'] + this['valuePostfix'];
           }
         },
@@ -4274,14 +4274,14 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'titleFormatter': function() {
+            'titleFormat': function() {
               return this['name'];
             },
             /**
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return this['x'] + ': ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
             }
           }
@@ -4368,14 +4368,14 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return this['valuePrefix'] + parseFloat(this['value']).toFixed(2) + this['valuePostfix'];
             }
           }
         },
         'a11y': {
           'enabled': true,
-          'titleFormatter': 'Series named {%SeriesName} with {%SeriesPointsCount} points. Min value is {%SeriesYMin}, max value is {%SeriesYMax}'
+          'titleFormat': 'Series named {%SeriesName} with {%SeriesPointsCount} points. Min value is {%SeriesYMin}, max value is {%SeriesYMax}'
         }
       },
       'defaultGridSettings': {
@@ -4463,7 +4463,7 @@ goog.provide('anychart.themes.v6');
       'yScale': 1,
       'background': {'enabled': true, 'fill': {'keys': ['#fff', '#f3f3f3', '#fff'], 'angle': 90}, 'stroke': null},
       'a11y': {
-        'titleFormatter': scatterA11yTitleFormatter
+        'titleFormat': scatterA11yTitleFormatter
       }
     },
 
@@ -4545,14 +4545,14 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'titleFormatter': function() {
+            'titleFormat': function() {
               return this['name'];
             },
             /**
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return this['x'] + ': ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
             }
           }
@@ -4639,7 +4639,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return this['valuePrefix'] + parseFloat(this['value']).toFixed(2) + this['valuePostfix'];
             }
           }
@@ -4745,7 +4745,7 @@ goog.provide('anychart.themes.v6');
       'yScale': 1,
       'background': {'enabled': true, 'fill': {'keys': ['#fff', '#f3f3f3', '#fff'], 'angle': 90}, 'stroke': null},
       'a11y': {
-        'titleFormatter': scatterA11yTitleFormatter
+        'titleFormat': scatterA11yTitleFormatter
       }
     },
 
@@ -4977,14 +4977,14 @@ goog.provide('anychart.themes.v6');
          * @this {*}
          * @return {*}
          */
-        'titleFormatter': function() {
+        'titleFormat': function() {
           return this['x'];
         },
         /**
          * @this {*}
          * @return {*}
          */
-        'textFormatter': function() {
+        'format': function() {
           return 'x: ' + this['x'] + '\ny: ' + this['value'];
         }
       }
@@ -4997,10 +4997,10 @@ goog.provide('anychart.themes.v6');
       'globalOffset': '0%',
       'layout': 'vertical',
       'tooltip': {
-        'titleFormatter': function() {
+        'titleFormat': function() {
           return this['name'];
         },
-        'textFormatter': function() {
+        'format': function() {
           if (this['high'])
             return returnRangeTooltipContentFormatter.call(this);
           else
@@ -5097,7 +5097,7 @@ goog.provide('anychart.themes.v6');
         'bar': {},
         'rangeBar': {
           'label': {
-            'textFormatter': function() {
+            'format': function() {
               return this['high'];
             }
           }
@@ -5290,14 +5290,14 @@ goog.provide('anychart.themes.v6');
          * @this {*}
          * @return {*}
          */
-        'titleFormatter': function() {
+        'titleFormat': function() {
           return this['value'];
         },
         /**
          * @this {*}
          * @return {*}
          */
-        'textFormatter': function() {
+        'format': function() {
           return this['valuePrefix'] + this['value'] + this['valuePostfix'];
         }
       }
@@ -5360,7 +5360,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return this['name'];
             }
           },
@@ -5393,14 +5393,14 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'titleFormatter': function() {
+            'titleFormat': function() {
               return this['name'];
             },
             /**
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return this['id'] + ': ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
             }
           },
@@ -5411,7 +5411,7 @@ goog.provide('anychart.themes.v6');
         'choropleth': {},
         'bubble': {
           'a11y': {
-            'titleFormatter': chartA11yTitleFormatter
+            'titleFormat': chartA11yTitleFormatter
           },
           'displayNegative': false,
           /**
@@ -5492,14 +5492,14 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'titleFormatter': function() {
+            'titleFormat': function() {
               return this['name'] || this['getDataValue']('name');
             },
             /**
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return 'Value: ' + this['valuePrefix'] + this['size'] + this['valuePostfix'];
             }
           }
@@ -5512,7 +5512,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               if (this['id']) {
                 return 'Id: ' + this['id'] + '\nValue: ' + this['valuePrefix'] + this['value'] + this['valuePostfix'];
               } else {
@@ -5539,7 +5539,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return 'from: ' + this['startPoint']['lat'] + ',' + this['startPoint']['long'] + '\nto: ' + this['endPoint']['lat'] + ',' + this['endPoint']['long'];
             }
           },
@@ -5548,7 +5548,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return 'from: ' + this['startPoint']['lat'] + ',' + this['startPoint']['long'] + '\nto: ' + this['endPoint']['lat'] + ',' + this['endPoint']['long'];
             }
           }
@@ -5657,7 +5657,7 @@ goog.provide('anychart.themes.v6');
            * @this {*}
            * @return {*}
            */
-          'textFormatter': function() {
+          'format': function() {
             return this['value'];
           },
           'enabled': true,
@@ -5702,7 +5702,7 @@ goog.provide('anychart.themes.v6');
            * @this {*}
            * @return {*}
            */
-          'textFormatter': function() {
+          'format': function() {
             return this['value'];
           },
           'enabled': true,
@@ -5746,7 +5746,7 @@ goog.provide('anychart.themes.v6');
       'minBubbleSize': '5%',
       'geoIdField': 'id',
       'interactivity': {
-        'copyFormatter': function() {
+        'copyFormat': function() {
           var ths = arguments[0];
           var seriesStatus = ths['seriesStatus'];
           var result = '';
@@ -5824,7 +5824,7 @@ goog.provide('anychart.themes.v6');
          * @this {*}
          * @return {string}
          */
-        'textFormatter': function() {
+        'format': function() {
           var name = this['name'];
           return (name !== void 0) ? name + '' : '';
         }
@@ -5868,14 +5868,14 @@ goog.provide('anychart.themes.v6');
             'enabled': false
           }
         },
-        'textFormatter': function(item) {
+        'format': function(item) {
           return '';
         }
       },
       'columns': [
         {
           'width': 50,
-          'textFormatter': function(item) {
+          'format': function(item) {
             var val = item['meta']('index');
             return (val != null) ? (val + 1) + '' : '';
           },
@@ -5887,7 +5887,7 @@ goog.provide('anychart.themes.v6');
           'width': 170,
           'collapseExpandButtons': true,
           'depthPaddingMultiplier': 15,
-          'textFormatter': function(item) {
+          'format': function(item) {
             var val = item['get']('name');
             return (val != null) ? (val + '') : '';
           },
@@ -6119,14 +6119,14 @@ goog.provide('anychart.themes.v6');
            * @this {*}
            * @return {string}
            */
-          'titleFormatter': function() {
+          'titleFormat': function() {
             return this['name'] || '';
           },
           /**
            * @this {*}
            * @return {string}
            */
-          'textFormatter': function() {
+          'format': function() {
             var startDate = this['minPeriodDate'];
             var endDate = this['maxPeriodDate'];
             return (startDate ? 'Start Date: ' + global['anychart']['format']['dateTime'](startDate) : '') +
@@ -6141,14 +6141,14 @@ goog.provide('anychart.themes.v6');
            * @this {*}
            * @return {string}
            */
-          'titleFormatter': function() {
+          'titleFormat': function() {
             return this['name'] || '';
           },
           /**
            * @this {*}
            * @return {string}
            */
-          'textFormatter': function() {
+          'format': function() {
             var startDate = this['periodStart'] || this['minPeriodDate'];
             var endDate = this['periodEnd'] || this['maxPeriodDate'];
             return (startDate ? 'Start Date: ' + global['anychart']['format']['dateTime'](startDate) : '') +
@@ -6164,14 +6164,14 @@ goog.provide('anychart.themes.v6');
            * @this {*}
            * @return {string}
            */
-          'titleFormatter': function() {
+          'titleFormat': function() {
             return this['name'] || '';
           },
           /**
            * @this {*}
            * @return {string}
            */
-          'textFormatter': function() {
+          'format': function() {
             var startDate = this['actualStart'] || this['autoStart'];
             var endDate = this['actualEnd'] || this['autoEnd'];
             var progress = this['progressValue'];
@@ -6194,14 +6194,14 @@ goog.provide('anychart.themes.v6');
            * @this {*}
            * @return {string}
            */
-          'titleFormatter': function() {
+          'titleFormat': function() {
             return this['name'] || '';
           },
           /**
            * @this {*}
            * @return {string}
            */
-          'textFormatter': function() {
+          'format': function() {
             var startDate = this['actualStart'] || this['autoStart'];
             var endDate = this['actualEnd'] || this['autoEnd'];
             var progress = this['progressValue'];
@@ -6274,7 +6274,7 @@ goog.provide('anychart.themes.v6');
                * @this {*}
                * @return {*}
                */
-              'textFormatter': function() {
+              'format': function() {
                 var val = this['value'];
                 if (val === undefined) val = this['close'];
                 val = parseFloat(val).toFixed(4);
@@ -6375,7 +6375,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {string}
              */
-            'textFormatter': function() {
+            'format': function() {
               var date = this['tickValue'];
               switch (this['majorIntervalUnit']) {
                 case 'year':
@@ -6414,7 +6414,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {string}
              */
-            'textFormatter': function() {
+            'format': function() {
               var date = this['tickValue'];
               switch (this['majorIntervalUnit']) {
                 case 'year':
@@ -6449,8 +6449,8 @@ goog.provide('anychart.themes.v6');
           'itemsSpacing': 15,
           'items': null,
           'iconSize': 13,
-          'itemsFormatter': null, // effectively equals current settings
-          'itemsTextFormatter': null,
+          'itemsFormat': null, // effectively equals current settings
+          'itemsFormat': null,
           'itemsSourceMode': 'default',
           'inverted': false,
           'hoverCursor': 'pointer',
@@ -6462,7 +6462,7 @@ goog.provide('anychart.themes.v6');
            * @this {*}
            * @return {*}
            */
-          'titleFormatter': function() {
+          'titleFormat': function() {
             var date = /** @type {number} */(this['value']);
             switch (this['dataIntervalUnit']) {
               case 'year':
@@ -6709,7 +6709,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {string}
              */
-            'textFormatter': function() {
+            'format': function() {
               var date = this['tickValue'];
               switch (this['majorIntervalUnit']) {
                 case 'year':
@@ -6748,7 +6748,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {string}
              */
-            'textFormatter': function() {
+            'format': function() {
               var date = this['tickValue'];
               switch (this['majorIntervalUnit']) {
                 case 'year':
@@ -6790,7 +6790,7 @@ goog.provide('anychart.themes.v6');
          * @this {*}
          * @return {*}
          */
-        'titleFormatter': function() {
+        'titleFormat': function() {
           var date = /** @type {number} */(this['hoveredDate']);
           switch (this['dataIntervalUnit']) {
             case 'year':
@@ -6817,12 +6817,12 @@ goog.provide('anychart.themes.v6');
          * @this {*}
          * @return {*}
          */
-        'textFormatter': function() {
+        'format': function() {
           return this['formattedValues'].join('\n');
         }
       },
       'a11y': {
-        'titleFormatter': chartA11yTitleFormatter
+        'titleFormat': chartA11yTitleFormatter
       }
     },
 
@@ -6859,7 +6859,7 @@ goog.provide('anychart.themes.v6');
           'hAlign': 'center',
           'fontColor': '#fff',
           'disablePointerEvents': true,
-          'textFormatter': returnMilestoneName
+          'format': returnMilestoneName
         },
         'hoverLabels': {
           'fontColor': '#fff',
@@ -6887,7 +6887,7 @@ goog.provide('anychart.themes.v6');
            * @this {*}
            * @return {*}
            */
-          'titleFormatter': function() {
+          'titleFormat': function() {
             if (this['creator']) {
               return 'Milestone - ' + this['index'];
             } else {
@@ -6898,7 +6898,7 @@ goog.provide('anychart.themes.v6');
            * @this {*}
            * @return {*}
            */
-          'textFormatter': function() {
+          'format': function() {
             var result = '';
             var i = 0;
             if (this['successors'] && this['successors'].length) {
@@ -6953,7 +6953,7 @@ goog.provide('anychart.themes.v6');
            * @this {*}
            * @return {*}
            */
-          'textFormatter': function() {
+          'format': function() {
             return this['name'];
           }
         },
@@ -6979,7 +6979,7 @@ goog.provide('anychart.themes.v6');
            * @this {*}
            * @return {*}
            */
-          'textFormatter': function() {
+          'format': function() {
             return 't: ' + this['duration'];
           }
         },
@@ -6992,14 +6992,14 @@ goog.provide('anychart.themes.v6');
            * @this {*}
            * @return {*}
            */
-          'titleFormatter': function() {
+          'titleFormat': function() {
             return this['name'];
           },
           /**
            * @this {*}
            * @return {*}
            */
-          'textFormatter': function() {
+          'format': function() {
             var result = 'Earliest start: ' + this['earliestStart'] + '\nEarliest finish: ' + this['earliestFinish'] +
                 '\nLatest start: ' + this['latestStart'] + '\nLatest finish: ' + this['latestFinish'] +
                 '\nDuration: ' + this['duration'] + '\nSlack: ' + this['slack'];
@@ -7020,7 +7020,7 @@ goog.provide('anychart.themes.v6');
             'hAlign': 'center',
             'fontColor': '#fff',
             'disablePointerEvents': true,
-            'textFormatter': returnMilestoneName
+            'format': returnMilestoneName
           },
           'hoverLabels': {
             'fontColor': '#fff',
@@ -7047,7 +7047,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'titleFormatter': function() {
+            'titleFormat': function() {
               if (this['creator']) {
                 return 'Milestone - ' + this['index'];
               } else {
@@ -7058,7 +7058,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               var result = '';
               var i = 0;
               if (this['successors'] && this['successors'].length) {
@@ -7113,7 +7113,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return this['name'];
             }
           },
@@ -7139,7 +7139,7 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               return 't: ' + this['duration'];
             }
           },
@@ -7152,14 +7152,14 @@ goog.provide('anychart.themes.v6');
              * @this {*}
              * @return {*}
              */
-            'titleFormatter': function() {
+            'titleFormat': function() {
               return this['name'];
             },
             /**
              * @this {*}
              * @return {*}
              */
-            'textFormatter': function() {
+            'format': function() {
               var result = 'Earliest start: ' + this['earliestStart'] + '\nEarliest finish: ' + this['earliestFinish'] +
                   '\nLatest start: ' + this['latestStart'] + '\nLatest finish: ' + this['latestFinish'] +
                   '\nDuration: ' + this['duration'] + '\nSlack: ' + this['slack'];
@@ -7181,7 +7181,7 @@ goog.provide('anychart.themes.v6');
           'fontSize': '8pt',
           'padding': 0,
           'fontColor': '#F4F4F4',
-          'textFormatter': '{%hours}h ({%percent}%)'
+          'format': '{%hours}h ({%percent}%)'
         },
         'fill': '#dd2c00',
         'stroke': 'none',
@@ -7197,7 +7197,7 @@ goog.provide('anychart.themes.v6');
           'enabled': true,
           'anchor': 'leftTop',
           'fontColor': '#F4F4F4',
-          'textFormatter': '{%name} ({%hoursPerDayRounded}h)'
+          'format': '{%name} ({%hoursPerDayRounded}h)'
         },
         'fill': '#1976d2',
         // 'fill': '#0095D8',
@@ -7396,7 +7396,7 @@ goog.provide('anychart.themes.v6');
                 'MMM\ndd  EEEE'
               ],
               // 'fontColor': '#ABB6BC',
-              'textFormatter': function() {
+              'format': function() {
                 return this['value'].toUpperCase();
               },
               'hAlign': 'left',
@@ -7420,7 +7420,7 @@ goog.provide('anychart.themes.v6');
               'hAlign': 'left',
               'fill': '#fff',
               'fontColor': '#ABB6BC',
-              'textFormatter': function() {
+              'format': function() {
                 return this['value'].toUpperCase();
               },
               'height': 30
@@ -7432,7 +7432,7 @@ goog.provide('anychart.themes.v6');
                 'w MMM'
               ],
               'fill': '#F0F5F8',
-              'textFormatter': function() {
+              'format': function() {
                 return this['value'].toUpperCase();
               }
             }
@@ -7454,7 +7454,7 @@ goog.provide('anychart.themes.v6');
               'hAlign': 'center',
               'padding': [2, 5, 2, 5],
               'fill': '#fff',
-              'textFormatter': function() {
+              'format': function() {
                 return this['value'].toUpperCase();
               },
               'height': 30
@@ -7466,7 +7466,7 @@ goog.provide('anychart.themes.v6');
                 'w MMM'
               ],
               'fill': '#F0F5F8',
-              'textFormatter': function() {
+              'format': function() {
                 return this['value'].toUpperCase();
               }
             }
@@ -7551,7 +7551,7 @@ goog.provide('anychart.themes.v6');
         'inverted': false,
         'items': null,
         'itemsSourceMode': 'default',
-        'itemsFormatter': function(items) {
+        'itemsFormat': function(items) {
           return items;
         },
         'fontColor': '#232323',

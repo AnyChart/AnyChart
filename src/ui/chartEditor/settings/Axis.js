@@ -220,7 +220,7 @@ anychart.ui.chartEditor.settings.Axis.prototype.createDom = function() {
   var labels = new anychart.ui.chartEditor.settings.Title();
   labels.allowEditPosition(false);
   labels.allowEditAlign(false);
-  labels.setTitleKey('textFormatter()');
+  labels.setTitleKey('format()');
   labels.setHeaderText('Labels');
   this.addChild(labels, true);
   //endregion

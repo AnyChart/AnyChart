@@ -483,12 +483,12 @@ anychart.core.pert.PertVisualElements.prototype.onTooltipSignal_ = function(even
  */
 anychart.core.pert.PertVisualElements.prototype.getCurrentTooltipConfig = function() {
   var config = this.tooltip().serialize();
-  var titleFormatter = this.tooltip().getOption('titleFormatter');
-  var textFormatter = this.tooltip().getOption('textFormatter');
-  if (titleFormatter && titleFormatter != anychart.utils.DEFAULT_FORMATTER)
-    config['titleFormatter'] = titleFormatter;
-  if (textFormatter && textFormatter != anychart.utils.DEFAULT_FORMATTER)
-    config['textFormatter'] = textFormatter;
+  var titleFormat = this.tooltip().getOption('titleFormat');
+  var format = this.tooltip().getOption('format');
+  if (titleFormat && titleFormat != anychart.utils.DEFAULT_FORMATTER)
+    config['titleFormat'] = titleFormat;
+  if (format && format != anychart.utils.DEFAULT_FORMATTER)
+    config['format'] = format;
   return config;
 };
 
@@ -673,9 +673,9 @@ anychart.core.pert.PertVisualElements.prototype.setupByJSON = function(config, o
   this.hoverStroke(config['hoverStroke']);
   this.selectStroke(config['selectStroke']);
 
-  this.labels(config['labels']);
-  this.selectLabels(config['selectLabels']);
-  this.hoverLabels(config['hoverLabels']);
+  this.labels().setupByVal(config['labels'], opt_default);
+  this.hoverLabels().setupByVal(config['hoverLabels'], opt_default);
+  this.selectLabels().setupByVal(config['selectLabels'], opt_default);
 
   if ('tooltip' in config)
     this.tooltip().setupByVal(config['tooltip'], opt_default);

@@ -1030,7 +1030,7 @@ anychart.core.ui.DataGrid.Column = function(dataGrid) {
    * @type {function(anychart.data.Tree.DataItem=):string}
    * @private
    */
-  this.textFormatter_ = this.defaultTextFormatter_;
+  this.format_ = this.defaultFormat_;
 
   /**
    * Multiplier to choose a left padding in a cell depending on a tree data item's depth.
@@ -1122,7 +1122,7 @@ anychart.core.ui.DataGrid.Column.prototype.setColumnFormat = function(fieldName,
     var width = settings['width'];
     var textStyle = settings['textStyle'];
 
-    if (goog.isDef(formatter)) this.textFormatter(function() {
+    if (goog.isDef(formatter)) this.format(function() {
       var item = this['item'];
       return formatter(item.get(fieldName));
     });
@@ -1143,7 +1143,7 @@ anychart.core.ui.DataGrid.Column.prototype.setColumnFormat = function(fieldName,
  * @return {string} - Text value.
  * @private
  */
-anychart.core.ui.DataGrid.Column.prototype.defaultTextFormatter_ = function(opt_item) {
+anychart.core.ui.DataGrid.Column.prototype.defaultFormat_ = function(opt_item) {
   return '';
 };
 
@@ -1182,17 +1182,30 @@ anychart.core.ui.DataGrid.Column.prototype.defaultCellTextSettingsOverrider_ = g
  * @return {(function(anychart.data.Tree.DataItem=):string|anychart.core.ui.DataGrid.Column)} - Current function or itself
  *  for method chaining.
  */
-anychart.core.ui.DataGrid.Column.prototype.textFormatter = function(opt_value) {
+anychart.core.ui.DataGrid.Column.prototype.format = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (goog.isFunction(opt_value)) {
-      this.textFormatter_ = opt_value;
+      this.format_ = opt_value;
     } else {
-      this.textFormatter_ = this.defaultTextFormatter_;
+      this.format_ = this.defaultFormat_;
     }
     this.invalidate(anychart.ConsistencyState.DATA_GRID_COLUMN_POSITION, anychart.Signal.NEEDS_REDRAW);
     return this;
   }
-  return this.textFormatter_;
+  return this.format_;
+};
+
+
+/**
+ * Sets cell text value formatter.
+ * @param {(function(anychart.data.Tree.DataItem=):string)=} opt_value - Function to be set.
+ * @return {(function(anychart.data.Tree.DataItem=):string|anychart.core.ui.DataGrid.Column)} - Current function or itself
+ *  for method chaining.
+ * @deprecated Since 7.13.1. Use 'format' instead.
+ */
+anychart.core.ui.DataGrid.Column.prototype.textFormatter = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['textFormatter()', 'format()'], true);
+  return this.format(opt_value);
 };
 
 
@@ -1622,9 +1635,9 @@ anychart.core.ui.DataGrid.Column.prototype.draw = function() {
 
         var newTop = totalTop + height;
 
-        var textFormatter = this.dataGrid_.createFormatProvider(item);
+        var format = this.dataGrid_.createFormatProvider(item);
 
-        var labelText = this.textFormatter_.call(textFormatter, item);
+        var labelText = this.format_.call(format, item);
 
         var label = this.cellTextSettings().add({'value': labelText},
             {'value': {'x': this.pixelBoundsCache_.left, 'y': totalTop}});
@@ -1697,11 +1710,11 @@ anychart.core.ui.DataGrid.Column.prototype.serialize = function() {
   json['title'] = this.title_.serialize();
   json['buttonCursor'] = this.buttonCursor_;
 
-  if (this.textFormatter_ != this.defaultTextFormatter_) {
+  if (this.format_ != this.defaultFormat_) {
     anychart.core.reporting.warning(
         anychart.enums.WarningCode.CANT_SERIALIZE_FUNCTION,
         null,
-        ['Data Grid Column textFormatter']
+        ['Data Grid Column format']
     );
   }
 
@@ -1717,7 +1730,10 @@ anychart.core.ui.DataGrid.Column.prototype.serialize = function() {
 };
 
 
-/** @inheritDoc */
+/**
+ * @inheritDoc
+ * @suppress {deprecated}
+ */
 anychart.core.ui.DataGrid.Column.prototype.setupByJSON = function(json, opt_default) {
   anychart.core.ui.DataGrid.Column.base(this, 'setupByJSON', json, opt_default);
 
@@ -1730,9 +1746,9 @@ anychart.core.ui.DataGrid.Column.prototype.setupByJSON = function(json, opt_defa
 
   this.title(json['title']);
 
-  if ('textFormatter' in json) this.textFormatter(json['textFormatter']);
+  if ('format' in json) this.format(json['format']);
+  if ('textFormatter' in json) this.textFormatter(json['format']);
   if ('cellTextSettingsOverrider' in json) this.cellTextSettingsOverrider(json['cellTextSettingsOverrider']);
-
 };
 
 
@@ -1881,6 +1897,7 @@ anychart.core.ui.DataGrid.Button.prototype.switchState = function() {
   proto['width'] = proto.width;
   proto['defaultWidth'] = proto.defaultWidth;
   proto['enabled'] = proto.enabled;
+  proto['format'] = proto.format;
   proto['textFormatter'] = proto.textFormatter;
   proto['cellTextSettings'] = proto.cellTextSettings;
   proto['cellTextSettingsOverrider'] = proto.cellTextSettingsOverrider;

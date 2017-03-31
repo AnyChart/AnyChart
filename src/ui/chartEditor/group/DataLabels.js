@@ -44,7 +44,7 @@ anychart.ui.chartEditor.group.DataLabels.prototype.createDom = function() {
   title.allowEnabled(false);
   title.allowEditPosition(false);
   title.allowEditAlign(false);
-  title.setTitleKey('textFormatter()');
+  title.setTitleKey('format()');
   this.addChild(title, true);
 
   this.title_ = title;

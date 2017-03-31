@@ -411,6 +411,7 @@ anychart.themes.merging.demerge_ = function(target, defaultObj, opt_nonMergableE
       if (key in defaultObj) {
         var defVal = defaultObj[key];
         var nonMergableEntityType;
+
         if (key in anychart.themes.merging.nonMergableEntities_) {
           nonMergableEntityType = anychart.themes.merging.nonMergableEntities_[key];
           switch (nonMergableEntityType) {
@@ -607,6 +608,12 @@ anychart.themes.merging.mergingMap_ = [
       'defaultTimeline.header.lowLevel.labels',
       'resource.activities.labels',
       'resource.conflicts.labels'
+    ]
+  },
+  {
+    defaultObj: 'chart.labels',
+    targets: [
+      'chart.defaultSeriesSettings.base.labels'
     ]
   },
   {
@@ -1367,6 +1374,7 @@ anychart.themes.merging.NonMergableEntityTypes_ = {
  * @private
  */
 anychart.themes.merging.nonMergableEntities_ = {
+
   'padding': anychart.themes.merging.NonMergableEntityTypes_.PADDING,
 
   'scale': anychart.themes.merging.NonMergableEntityTypes_.SCALE,
@@ -1534,6 +1542,10 @@ anychart.themes.merging.scaleEntities_ = [
 anychart.themes.merging.typedEntities_ = {
   'chart.series': {
     defaults: 'chart.defaultSeriesSettings',
+    typeDescriptor: 'seriesType'
+  },
+  'map.series': {
+    defaults: 'map.defaultSeriesSettings',
     typeDescriptor: 'seriesType'
   },
   'gauge.pointers': {

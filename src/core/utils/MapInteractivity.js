@@ -40,7 +40,7 @@ anychart.core.utils.MapInteractivity = function(parent) {
    * @type {Function}
    * @private
    */
-  this.copyFormatter_;
+  this.copyFormat_;
 };
 goog.inherits(anychart.core.utils.MapInteractivity, anychart.core.utils.Interactivity);
 
@@ -130,15 +130,27 @@ anychart.core.utils.MapInteractivity.prototype.drag = function(opt_value) {
  * Copy formatter. Data formatter for feature copy operation.
  * @param {Function=} opt_value Formatter.
  * @return {anychart.core.utils.Interactivity|Function} .
+ * @deprecated Since 7.13.1. Use 'copyFormat' instead.
  */
 anychart.core.utils.MapInteractivity.prototype.copyFormatter = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['copyFormatter', 'copyFormat'], true);
+  return this.copyFormat(opt_value);
+};
+
+
+/**
+ * Copy formatter. Data formatter for feature copy operation.
+ * @param {Function=} opt_value Formatter.
+ * @return {anychart.core.utils.Interactivity|Function} .
+ */
+anychart.core.utils.MapInteractivity.prototype.copyFormat = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (opt_value != this.copyFormatter_) {
-      this.copyFormatter_ = opt_value;
+    if (opt_value != this.copyFormat_) {
+      this.copyFormat_ = opt_value;
     }
     return this;
   }
-  return /** @type {Function} */(this.copyFormatter_);
+  return /** @type {Function} */(this.copyFormat_);
 };
 
 
@@ -157,7 +169,10 @@ anychart.core.utils.MapInteractivity.prototype.setupByJSON = function(value, opt
   this.keyboardZoomAndMove(value['keyboardZoomAndMove']);
   this.zoomOnDoubleClick(value['zoomOnDoubleClick']);
   this.drag(value['drag']);
-  this.copyFormatter(value['copyFormatter']);
+  if ('copyFormatter' in value) {
+    this.copyFormatter(value['copyFormatter']);
+  }
+  this.copyFormat(value['copyFormat']);
 };
 
 
@@ -171,8 +186,8 @@ anychart.core.utils.MapInteractivity.prototype.serialize = function() {
   json['keyboardZoomAndMove'] = this.keyboardZoomAndMove();
   json['zoomOnDoubleClick'] = this.zoomOnDoubleClick();
   json['drag'] = this.drag();
-  if (!goog.isFunction(this.copyFormatter()))
-    json['copyFormatter'] = this.copyFormatter();
+  if (!goog.isFunction(this.copyFormat()))
+    json['copyFormat'] = this.copyFormat();
   return json;
 };
 
@@ -189,5 +204,6 @@ anychart.core.utils.MapInteractivity.prototype.serialize = function() {
   proto['zoomOnDoubleClick'] = proto.zoomOnDoubleClick;
   proto['drag'] = proto.drag;
   proto['copyFormatter'] = proto.copyFormatter;
+  proto['copyFormat'] = proto.copyFormat;
 })();
 //endregion

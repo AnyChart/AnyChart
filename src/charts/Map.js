@@ -584,7 +584,7 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
 
 
     this.listen('pointsselect', function(e) {
-      this.mapTextarea.innerHTML = this.interactivity().copyFormatter().call(e, e);
+      this.mapTextarea.innerHTML = this.interactivity().copyFormat().call(e, e);
       this.mapTextarea.select();
     }, false, this);
 
@@ -4272,10 +4272,10 @@ anychart.charts.Map.prototype.drillDown_ = function(id, target) {
     newScene.colorRange(sourceColorRange.serialize());
 
     var colorRange = /** @type {anychart.core.ui.ColorRange} */(newScene.colorRange());
-    colorRange.labels().textFormatter(/** @type {Function|string} */(sourceColorRange.labels().textFormatter()));
-    colorRange.labels().positionFormatter(/** @type {Function} */(sourceColorRange.labels().positionFormatter()));
-    colorRange.minorLabels().textFormatter(/** @type {Function|string} */(sourceColorRange.minorLabels().textFormatter()));
-    colorRange.minorLabels().positionFormatter(/** @type {Function} */(sourceColorRange.minorLabels().positionFormatter()));
+    colorRange.labels()['format'](/** @type {Function|string} */(sourceColorRange.labels()['format']));
+    colorRange.labels()['positionFormatter'](/** @type {Function} */(sourceColorRange.labels()['positionFormatter']));
+    colorRange.minorLabels()['format'](/** @type {Function|string} */(sourceColorRange.minorLabels()['format']));
+    colorRange.minorLabels()['positionFormatter'](/** @type {Function} */(sourceColorRange.minorLabels()['positionFormatter']));
   }
 
   if (!mapDiff['legend']) {
@@ -4829,7 +4829,7 @@ anychart.charts.Map.prototype.inverseTransform = function(x, y) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.charts.Map.prototype.createLegendItemsProvider = function(sourceMode, itemsTextFormatter) {
+anychart.charts.Map.prototype.createLegendItemsProvider = function(sourceMode, itemsFormat) {
   var i, count;
   /**
    * @type {!Array.<anychart.core.ui.Legend.LegendItemProvider>}
@@ -4841,7 +4841,7 @@ anychart.charts.Map.prototype.createLegendItemsProvider = function(sourceMode, i
     for (i = 0, count = this.seriesList.length; i < count; i++) {
       series = this.seriesList[i];
       scale = series.colorScale();
-      itemData = series.getLegendItemData(itemsTextFormatter);
+      itemData = series.getLegendItemData(itemsFormat);
       itemData['sourceUid'] = goog.getUid(this);
       itemData['sourceKey'] = series.id();
       itemData['meta'] = {
@@ -5046,7 +5046,7 @@ anychart.charts.Map.prototype.setupByJSON = function(config, opt_default) {
   if ('defaultCalloutSettings' in config)
     this.defaultCalloutSettings(config['defaultCalloutSettings']);
 
-  this.colorRange(config['colorRange']);
+  this.colorRange().setupByVal(config['colorRange'], opt_default);
   this.unboundRegions(config['unboundRegions']);
   this.geoIdField(config['geoIdField']);
   this.overlapMode(config['overlapMode']);

@@ -212,13 +212,23 @@ anychart.core.resource.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS =
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
         anychart.Signal.NEEDS_REDRAW
     );
-anychart.core.resource.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS['textFormatter'] =
+anychart.core.resource.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS['format'] =
     anychart.core.settings.createDescriptor(
         anychart.enums.PropertyHandlerType.SINGLE_ARG,
-        'textFormatter',
+        'format',
         anychart.core.settings.stringOrFunctionNormalizer,
         anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+//@deprecated Since 7.13.1. Use 'format' instead.
+anychart.core.resource.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS['textFormatter'] =
+    anychart.core.settings.createDescriptor(
+        anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED,
+        'format',
+        anychart.core.settings.stringOrFunctionNormalizer,
+        anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
+        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
+        void 0,
+        'textFormatter');
 anychart.core.settings.populate(anychart.core.resource.TimeLineLevelHolidaysSettings, anychart.core.resource.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS);
 
 

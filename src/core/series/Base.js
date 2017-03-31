@@ -535,9 +535,9 @@ anychart.core.series.Base.prototype.recreateShapeManager = function() {
  */
 anychart.core.series.Base.prototype.applyDefaultsToElements = function(defaults, opt_resetLegendItem, opt_default, opt_reapplyClip) {
   if (this.supportsLabels()) {
-    this.labels().setup(defaults['labels']);
-    this.hoverLabels().setup(defaults['hoverLabels']);
-    this.selectLabels().setup(defaults['selectLabels']);
+    this.labels().setupByVal(defaults['labels'], opt_default);
+    this.hoverLabels().setupByVal(defaults['hoverLabels'], opt_default);
+    this.selectLabels().setupByVal(defaults['selectLabels'], opt_default);
   }
 
   if (this.supportsMarkers()) {
@@ -935,7 +935,6 @@ anychart.core.series.Base.prototype.setAutoPointWidth = function(value) {
  */
 anychart.core.series.Base.prototype.setAutoColor = function(value) {
   this.autoSettings['color'] = value;
-  this.labels().setAutoColor(this.getLabelsColor());
   this.markers().setAutoFill(this.getMarkerFill());
   this.markers().setAutoStroke(this.getMarkerStroke());
   this.outlierMarkers().setAutoFill(this.getOutliersFill());
@@ -1485,10 +1484,10 @@ anychart.core.series.Base.prototype.onLegendItemSignal = function(event) {
 
 /**
  * Creates legend item data.
- * @param {Function|string} itemsTextFormatter Items text formatter.
+ * @param {Function|string} itemsFormat Items text formatter.
  * @return {!anychart.core.ui.Legend.LegendItemProvider} Color for legend item.
  */
-anychart.core.series.Base.prototype.getLegendItemData = function(itemsTextFormatter) {
+anychart.core.series.Base.prototype.getLegendItemData = function(itemsFormat) {
   var legendItem = this.legendItem();
   legendItem.markAllConsistent();
 
@@ -1496,9 +1495,9 @@ anychart.core.series.Base.prototype.getLegendItemData = function(itemsTextFormat
   var baseColor = this.getOption('color');
   var context = this.createLegendContextProvider();
 
-  var formatter = json['text'] || itemsTextFormatter;
+  var formatter = json['text'] || itemsFormat;
   if (goog.isString(formatter))
-    formatter = anychart.core.utils.TokenParser.getInstance().getTextFormatter(formatter);
+    formatter = anychart.core.utils.TokenParser.getInstance().getFormat(formatter);
   json['text'] = goog.isFunction(formatter) ?
       formatter.call(context, context) :
       this.getLegendItemText(context);
@@ -1966,7 +1965,8 @@ anychart.core.series.Base.prototype.prepareFactory = function(factory, stateFact
 
 /**
  * Draws element(s) for point.
- * @param {Array.<function(this:anychart.core.series.Base):(anychart.core.ui.LabelsFactory|anychart.core.ui.MarkersFactory)>} factoryGetters
+ * @param {Array.<function(this:anychart.core.series.Base):(anychart.core.ui.LabelsFactory|anychart.core.ui.MarkersFactory)>} seriesFactoryGetters
+ * @param {Array.<function(this:anychart.core.IChart):(anychart.core.ui.LabelsFactory|anychart.core.ui.MarkersFactory)>} chartFactoryGetters
  * @param {Array.<string>} overrideNames
  * @param {boolean} hasPointOverrides
  * @param {boolean} isLabel
@@ -1976,7 +1976,7 @@ anychart.core.series.Base.prototype.prepareFactory = function(factory, stateFact
  * @return {anychart.core.ui.MarkersFactory.Marker|anychart.core.ui.LabelsFactory.Label|null}
  * @protected
  */
-anychart.core.series.Base.prototype.drawFactoryElement = function(factoryGetters, overrideNames, hasPointOverrides, isLabel, positionYs, point, state) {
+anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryGetters, chartFactoryGetters, overrideNames, hasPointOverrides, isLabel, positionYs, point, state) {
   var isDraw, positionProvider, i, indexes;
   var index = point.getIndex();
   if (positionYs) {
@@ -1984,13 +1984,15 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(factoryGetters
     if (!indexes)
       indexes = this.indexToMarkerIndexes_[index] = [];
   }
-  var mainFactory = factoryGetters[0].call(this);
+  var mainFactory = seriesFactoryGetters[0].call(this);
+  var chartNormalFactory = chartFactoryGetters ? chartFactoryGetters[0].call(this.chart) : null;
 
-  var pointOverride, statePointOverride, stateFactory;
+  var pointOverride, statePointOverride, seriesStateFactory, chartStateFactory;
   if (point.meta('missing')) {
     isDraw = false;
     pointOverride = statePointOverride = undefined;
-    stateFactory = null;
+    seriesStateFactory = null;
+    chartStateFactory = null;
   } else {
     state = anychart.core.utils.InteractivityState.clarifyState(state);
 
@@ -2005,14 +2007,20 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(factoryGetters
     var pointOverrideEnabled = pointOverride && goog.isDef(pointOverride['enabled']) ? pointOverride['enabled'] : null;
     var statePointOverrideEnabled = statePointOverride && goog.isDef(statePointOverride['enabled']) ? statePointOverride['enabled'] : null;
 
-    stateFactory = (state == anychart.PointState.NORMAL) ? null : factoryGetters[state].call(this);
+    seriesStateFactory = (state == anychart.PointState.NORMAL) ? null : seriesFactoryGetters[state].call(this);
+    chartStateFactory = (state == anychart.PointState.NORMAL || !chartFactoryGetters) ? null : chartFactoryGetters[state].call(this.chart);
 
     isDraw = goog.isNull(statePointOverrideEnabled) ? // has no state marker or null "enabled" in it ?
-        (!stateFactory || goog.isNull(stateFactory.enabled())) ? // has no state stateFactory or null "enabled" in it ?
-            goog.isNull(pointOverrideEnabled) ? // has no marker in point or null "enabled" in it ?
-                mainFactory.enabled() :
-                pointOverrideEnabled :
-            stateFactory.enabled() :
+        (!seriesStateFactory || goog.isNull(seriesStateFactory.enabled()) || !goog.isDef(seriesStateFactory.enabled())) ? // has no state stateFactory or null "enabled" in it ?
+            (!chartStateFactory || goog.isNull(chartStateFactory.enabled()) || !goog.isDef(chartStateFactory.enabled())) ? // has no state stateFactory or null "enabled" in it ?
+                goog.isNull(pointOverrideEnabled) ? // has no marker in point or null "enabled" in it ?
+                    goog.isNull(mainFactory.enabled()) || !goog.isDef(mainFactory.enabled()) ?
+                        chartNormalFactory ? chartNormalFactory.enabled() :
+                            null :
+                        mainFactory.enabled() :
+                    pointOverrideEnabled :
+                chartStateFactory.enabled() :
+            seriesStateFactory.enabled() :
         statePointOverrideEnabled;
   }
 
@@ -2024,28 +2032,33 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(factoryGetters
         for (i = 0; i < positionYs.length; i++) {
           positionProvider = {'value': {'x': positionYs[i], 'y': x}};
           indexes[i] = this.drawSingleFactoryElement(mainFactory, indexes[i], positionProvider, formatProvider,
-              stateFactory, pointOverride, statePointOverride).getIndex();
+              chartNormalFactory, seriesStateFactory, chartStateFactory, pointOverride, statePointOverride).getIndex();
         }
       } else {
         for (i = 0; i < positionYs.length; i++) {
           positionProvider = {'value': {'x': x, 'y': positionYs[i]}};
           indexes[i] = this.drawSingleFactoryElement(mainFactory, indexes[i], positionProvider, formatProvider,
-              stateFactory, pointOverride, statePointOverride).getIndex();
+              chartNormalFactory, seriesStateFactory, chartStateFactory, pointOverride, statePointOverride).getIndex();
         }
       }
     } else {
       var statePointOverridePos = statePointOverride && goog.isDef(statePointOverride['position']) ? statePointOverride['position'] : void 0;
-      var stateFactoryPos = stateFactory && goog.isDef(stateFactory.position()) ? stateFactory.position() : void 0;
+      var seriesStateFactoryPos = seriesStateFactory && goog.isDef(seriesStateFactory['position']()) ? seriesStateFactory['position']() : void 0;
+      var chartStateFactoryPos = chartStateFactory && goog.isDef(chartStateFactory['position']()) ? chartStateFactory['position']() : void 0;
       var pointOverridePos = pointOverride && goog.isDef(pointOverride['position']) ? pointOverride['position'] : void 0;
+      var seriesNormalFactoryPos = mainFactory && goog.isDef(mainFactory['position']()) ? mainFactory['position']() : void 0;
 
       var position = goog.isDef(statePointOverridePos) ? statePointOverridePos :
-          goog.isDef(stateFactoryPos) ? stateFactoryPos :
-              goog.isDef(pointOverridePos) ? pointOverridePos :
-                  mainFactory.position();
+          goog.isDef(seriesStateFactoryPos) ? seriesStateFactoryPos :
+              goog.isDef(chartStateFactoryPos) ? chartStateFactoryPos :
+                  goog.isDef(pointOverridePos) ? pointOverridePos :
+                      goog.isDef(mainFactory) ? seriesNormalFactoryPos :
+                          goog.isDef(chartNormalFactory) ? chartNormalFactory['position']() :
+                              'auto';
 
       positionProvider = this.createPositionProvider(/** @type {anychart.enums.Position|string} */(position), true);
       return this.drawSingleFactoryElement(mainFactory, index, positionProvider, formatProvider,
-          stateFactory, pointOverride, statePointOverride, position);
+          chartNormalFactory, seriesStateFactory, chartStateFactory, pointOverride, statePointOverride, position);
     }
   } else {
     if (positionYs) {
@@ -2146,14 +2159,16 @@ anychart.core.series.Base.prototype.resolveAutoAnchor = function(position, eleme
  * @param {number|undefined} index
  * @param {*} positionProvider
  * @param {*} formatProvider
- * @param {anychart.core.ui.MarkersFactory|anychart.core.ui.LabelsFactory|null} stateFactory
+ * @param {anychart.core.ui.MarkersFactory|anychart.core.ui.LabelsFactory|null} chartNormalFactory
+ * @param {anychart.core.ui.MarkersFactory|anychart.core.ui.LabelsFactory|null} seriesStateFactory
+ * @param {anychart.core.ui.MarkersFactory|anychart.core.ui.LabelsFactory|null} chartStateFactory
  * @param {*} pointOverride
  * @param {*} statePointOverride
  * @param {(?anychart.enums.Position|string)=} opt_position Position which is needed to calculate label auto anchor.
  * @return {anychart.core.ui.MarkersFactory.Marker|anychart.core.ui.LabelsFactory.Label}
  * @protected
  */
-anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factory, index, positionProvider, formatProvider, stateFactory, pointOverride, statePointOverride, opt_position) {
+anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factory, index, positionProvider, formatProvider, chartNormalFactory, seriesStateFactory, chartStateFactory, pointOverride, statePointOverride, opt_position) {
   var element = formatProvider ? factory.getLabel(/** @type {number} */(index)) : factory.getMarker(/** @type {number} */(index));
   if (element) {
     if (formatProvider)
@@ -2166,14 +2181,31 @@ anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factory,
       element = factory.add(positionProvider, index);
   }
   element.resetSettings();
-  if (goog.isDef(opt_position) && formatProvider) {
-    this.resolveAutoAnchor(opt_position, element);
+  if (formatProvider) {
+    element.state('pointState', goog.isDef(statePointOverride) ? statePointOverride : null);
+    element.state('seriesState', seriesStateFactory);
+    element.state('chartState', chartStateFactory);
+    element.state('pointNormal', goog.isDef(pointOverride) ? pointOverride : null);
+    element.state('seriesNormal', factory);
+    element.state('chartNormal', chartNormalFactory);
+    element.state('seriesStateTheme', seriesStateFactory ? seriesStateFactory.themeSettings : null);
+    element.state('chartStateTheme', chartStateFactory ? chartStateFactory.themeSettings : null);
+    element.state('auto', element.autoSettings);
+    element.state('seriesNormalTheme', factory.themeSettings);
+    element.state('chartNormalTheme', chartNormalFactory ? chartNormalFactory.themeSettings : null);
+
+    var anchor = element.getFinalSettings('anchor');
+    if (goog.isDef(opt_position) && formatProvider && anchor == anychart.enums.Anchor.AUTO) {
+      this.resolveAutoAnchor(opt_position, element);
+    }
+  } else {
+    if (goog.isDef(opt_position) && formatProvider) {
+      this.resolveAutoAnchor(opt_position, element);
+    }
+    element.currentMarkersFactory(seriesStateFactory || factory);
+    element.setSettings(/** @type {Object} */(pointOverride), /** @type {Object} */(statePointOverride));
   }
-  if (formatProvider)
-    element.currentLabelsFactory(stateFactory || factory);
-  else
-    element.currentMarkersFactory(stateFactory || factory);
-  element.setSettings(/** @type {Object} */(pointOverride), /** @type {Object} */(statePointOverride));
+
   element.draw();
   return element;
 };
@@ -2272,6 +2304,7 @@ anychart.core.series.Base.prototype.drawLabel = function(point, pointState) {
   if (this.check(anychart.core.series.Capabilities.SUPPORTS_LABELS))
     point.meta('label', this.drawFactoryElement(
         [this.labels, this.hoverLabels, this.selectLabels],
+        [this.getChart().labels, this.getChart().hoverLabels, this.getChart().selectLabels],
         ['label', 'hoverLabel', 'selectLabel'],
         this.planHasPointLabels(),
         true,
@@ -2391,6 +2424,7 @@ anychart.core.series.Base.prototype.drawMarker = function(point, pointState) {
   if (this.check(anychart.core.series.Capabilities.SUPPORTS_MARKERS))
     point.meta('marker', this.drawFactoryElement(
         [this.markers, this.hoverMarkers, this.selectMarkers],
+        null,
         ['marker', 'hoverMarker', 'selectMarker'],
         this.planHasPointMarkers(),
         false,
@@ -2521,6 +2555,7 @@ anychart.core.series.Base.prototype.drawPointOutliers = function(iterator, point
       outliers.length)
     this.drawFactoryElement(
         [this.outlierMarkers, this.hoverOutlierMarkers, this.selectOutlierMarkers],
+        null,
         ['outlierMarker', 'hoverOutlierMarker', 'selectOutlierMarker'],
         this.planHasPointOutliers(),
         false,
@@ -2725,8 +2760,9 @@ anychart.core.series.Base.prototype.draw = function() {
       this.hasInvalidationState(
           anychart.ConsistencyState.SERIES_MARKERS |
           anychart.ConsistencyState.SERIES_LABELS |
-          anychart.ConsistencyState.SERIES_OUTLIERS))
+          anychart.ConsistencyState.SERIES_OUTLIERS)) {
     this.setAutoColor(this.autoSettings['color']);
+  }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SERIES_SHAPE_MANAGER)) {
     this.recreateShapeManager();
@@ -4246,6 +4282,12 @@ anychart.core.series.Base.prototype.setupByJSON = function(config, opt_default) 
   this.meta(config['meta']);
   this.clip(config['clip']);
   this.a11y(config['a11y']);
+
+  if (this.supportsLabels()) {
+    this.labels().setupByVal(config['labels'], opt_default);
+    this.hoverLabels().setupByVal(config['hoverLabels'], opt_default);
+    this.selectLabels().setupByVal(config['selectLabels'], opt_default);
+  }
 
   anychart.core.settings.deserialize(this, anychart.core.series.Base.PROPERTY_DESCRIPTORS, config);
 

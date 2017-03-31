@@ -636,13 +636,13 @@ anychart.charts.LinearGauge.prototype.getResetIterator = function() {
 
 //region --- LEGEND ---
 /** @inheritDoc */
-anychart.charts.LinearGauge.prototype.createLegendItemsProvider = function(sourceMode, itemsTextFormatter) {
+anychart.charts.LinearGauge.prototype.createLegendItemsProvider = function(sourceMode, itemsFormat) {
   var i, count;
   var data = [];
   for (i = 0, count = this.pointers_.length; i < count; i++) {
     /** @type {anychart.core.linearGauge.pointers.Base} */
     var pointer = this.pointers_[i];
-    var itemData = pointer.getLegendItemData(itemsTextFormatter);
+    var itemData = pointer.getLegendItemData(itemsFormat);
     itemData['sourceUid'] = goog.getUid(this);
     itemData['sourceKey'] = pointer.id();
     data.push(itemData);

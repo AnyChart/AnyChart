@@ -209,7 +209,7 @@ anychart.scales.GanttDateTime.DEFAULT_ZOOM_FACTOR = 1.25;
  * @return {Function} - Formatter function.
  * @private
  */
-anychart.scales.GanttDateTime.createTextFormatter_ = function(pattern, opt_template) {
+anychart.scales.GanttDateTime.createFormat_ = function(pattern, opt_template) {
   if (opt_template) {
     return function(startDate, endDate) {
       return goog.string.format(
@@ -813,7 +813,7 @@ anychart.scales.GanttDateTime.prototype.makeLevelData_ = function(level, opt_par
   return {
     'anchor': anychart.utils.alignDateLeft(range['min'], interval, 0),
     'interval': interval,
-    'formatter': anychart.scales.GanttDateTime.createTextFormatter_(format)
+    'formatter': anychart.scales.GanttDateTime.createFormat_(format)
   };
 };
 

@@ -147,7 +147,7 @@ anychart.core.resource.Conflicts.prototype.clear = function() {
 anychart.core.resource.Conflicts.prototype.evaluate = function(date, allocation, resource, top) {
   if (allocation && allocation.allocated > allocation.vacant) {
     var provider = this.createFormatProvider(date, allocation, resource);
-    var text = this.labels_.callTextFormatter(/** @type {Function} */(this.labels_.textFormatter()), provider, ++this.labelIndex_);
+    var text = this.labels_.callFormat(/** @type {Function} */(this.labels_.getOption('format')), provider, ++this.labelIndex_);
     if (this.current_) {
       if (this.current_.text == text)
         return;
@@ -428,9 +428,9 @@ anychart.core.resource.Conflicts.prototype.drawLabel = function(index, formatPro
     element.resetSettings();
     // element.currentLabelsFactory(/*stateFactory || */mainFactory);
     element.setSettings(opt_settings);
-    element.width(bounds.width);
-    element.height(bounds.height);
-    element.clip(bounds);
+    element['width'](bounds.width);
+    element['height'](bounds.height);
+    element['clip'](bounds);
     element.draw();
   } else {
     mainFactory.clear(index);
@@ -591,7 +591,7 @@ anychart.core.resource.Conflicts.prototype.serialize = function() {
 anychart.core.resource.Conflicts.prototype.setupByJSON = function(config) {
   anychart.core.resource.Conflicts.base(this, 'setupByJSON', config);
   anychart.core.settings.deserialize(this, anychart.core.resource.Conflicts.DESCRIPTORS, config);
-  this.labels(config['labels']);
+  this.labels().setupByVal(config['labels']);
 };
 
 

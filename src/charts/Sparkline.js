@@ -122,15 +122,15 @@ anychart.charts.Sparkline = function(opt_data, opt_csvSettings) {
    */
   this.labelsInternal_ = new anychart.core.ui.LabelsFactory();
   // defaults that was deleted form LabelsFactory
-  this.labelsInternal_.positionFormatter(anychart.utils.DEFAULT_FORMATTER);
-  this.labelsInternal_.textFormatter(anychart.utils.DEFAULT_FORMATTER);
+  this.labelsInternal_['positionFormatter'](anychart.utils.DEFAULT_FORMATTER);
+  this.labelsInternal_['format'](anychart.utils.DEFAULT_FORMATTER);
   this.labelsInternal_.background(null);
-  this.labelsInternal_.rotation(0);
-  this.labelsInternal_.width(null);
-  this.labelsInternal_.height(null);
-  this.labelsInternal_.fontSize(11);
-  this.labelsInternal_.minFontSize(8);
-  this.labelsInternal_.maxFontSize(72);
+  this.labelsInternal_['rotation'](0);
+  this.labelsInternal_['width'](null);
+  this.labelsInternal_['height'](null);
+  this.labelsInternal_['fontSize'](11);
+  this.labelsInternal_['minFontSize'](8);
+  this.labelsInternal_['maxFontSize'](72);
   this.labelsInternal_.setParentEventTarget(this);
   this.labelsInternal_.setAutoZIndex(anychart.charts.Sparkline.ZINDEX_LABEL);
 
@@ -2054,7 +2054,7 @@ anychart.charts.Sparkline.prototype.getFinalLabel = function(usePointSettings) {
   var label = this.labelsInternal_.getLabel(index);
   var res = null;
   if (finalSettings['enabled']) {
-    var position = finalSettings['position'] || this.labelsInternal_.position();
+    var position = finalSettings['position'] || this.labelsInternal_.getOption('position');
     var positionProvider = this.series_.createPositionProvider(/** @type {anychart.enums.Position|string} */(position));
     var formatProvider = this.series_.createFormatProvider();
 
@@ -2066,7 +2066,7 @@ anychart.charts.Sparkline.prototype.getFinalLabel = function(usePointSettings) {
     }
 
     label.resetSettings();
-    label.currentLabelsFactory(this.labelsInternal_);
+    // label.currentLabelsFactory(this.labelsInternal_);
     label.setSettings(/** @type {Object} */(finalSettings));
     res = label;
   } else if (label) {
@@ -2404,12 +2404,12 @@ anychart.charts.Sparkline.prototype.setupByJSON = function(config, opt_default) 
   if (config['minMarkers']) this.minMarkers().setupByJSON(config['minMarkers']);
   if (config['negativeMarkers']) this.negativeMarkers().setupByJSON(config['negativeMarkers']);
   if (config['markers']) this.markers().setupByJSON(config['markers']);
-  if (config['firstLabels']) this.firstLabels().setupByJSON(config['firstLabels']);
-  if (config['lastLabels']) this.lastLabels().setupByJSON(config['lastLabels']);
-  if (config['maxLabels']) this.maxLabels().setupByJSON(config['maxLabels']);
-  if (config['minLabels']) this.minLabels().setupByJSON(config['minLabels']);
-  if (config['negativeLabels']) this.negativeLabels().setupByJSON(config['negativeLabels']);
-  if (config['labels']) this.labels().setup(config['labels']);
+  if (config['firstLabels']) this.firstLabels().setupByVal(config['firstLabels'], opt_default);
+  if (config['lastLabels']) this.lastLabels().setupByVal(config['lastLabels'], opt_default);
+  if (config['maxLabels']) this.maxLabels().setupByVal(config['maxLabels'], opt_default);
+  if (config['minLabels']) this.minLabels().setupByVal(config['minLabels'], opt_default);
+  if (config['negativeLabels']) this.negativeLabels().setupByVal(config['negativeLabels'], opt_default);
+  if (config['labels']) this.labels().setupByVal(config['labels'], opt_default);
 };
 
 

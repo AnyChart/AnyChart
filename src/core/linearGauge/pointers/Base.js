@@ -976,25 +976,25 @@ anychart.core.linearGauge.pointers.Base.prototype.getLabelsPosition = function(p
   var labelHoverPosition = hoverPointLabel && hoverPointLabel['position'] ? hoverPointLabel['position'] : null;
   var labelSelectPosition = selectPointLabel && selectPointLabel['position'] ? selectPointLabel['position'] : null;
 
-  return hovered || selected ?
+  return /** @type {string} */(hovered || selected ?
       hovered ?
           labelHoverPosition ?
               labelHoverPosition :
-              this.hoverLabel().position() ?
-                  this.hoverLabel().position() :
+              this.hoverLabel().getOption('position') ?
+                  this.hoverLabel().getOption('position') :
                   labelPosition ?
                       labelPosition :
-                      this.label().position() :
+                      this.label().getOption('position') :
           labelSelectPosition ?
               labelSelectPosition :
-              this.selectLabel().position() ?
-                  this.selectLabel().position() :
+              this.selectLabel().getOption('position') ?
+                  this.selectLabel().getOption('position') :
                   labelPosition ?
                       labelPosition :
-                      this.label().position() :
+                      this.label().getOption('position') :
       labelPosition ?
           labelPosition :
-          this.label().position();
+          this.label().getOption('position'));
 };
 //endregion
 
@@ -1002,10 +1002,10 @@ anychart.core.linearGauge.pointers.Base.prototype.getLabelsPosition = function(p
 //region --- LEGEND ---
 /**
  * Creates legend item data.
- * @param {Function} itemsTextFormatter Items text formatter.
+ * @param {Function} itemsFormat Items text formatter.
  * @return {!anychart.core.ui.Legend.LegendItemProvider} Color for legend item.
  */
-anychart.core.linearGauge.pointers.Base.prototype.getLegendItemData = function(itemsTextFormatter) {
+anychart.core.linearGauge.pointers.Base.prototype.getLegendItemData = function(itemsFormat) {
   var legendItem = this.legendItem();
   legendItem.markAllConsistent();
   var json = legendItem.serialize();
@@ -1024,9 +1024,9 @@ anychart.core.linearGauge.pointers.Base.prototype.getLegendItemData = function(i
     json['iconHatchFill'] = legendItem.iconHatchFill().call(ctx, ctx);
   }
   var itemText;
-  if (goog.isFunction(itemsTextFormatter)) {
+  if (goog.isFunction(itemsFormat)) {
     var format = this.createLegendContextProvider();
-    itemText = itemsTextFormatter.call(format, format);
+    itemText = itemsFormat.call(format, format);
   }
   if (!goog.isString(itemText))
     itemText = goog.isDef(this.name()) ? this.name() : 'Pointer: ' + this.autoIndex();
@@ -1182,7 +1182,7 @@ anychart.core.linearGauge.pointers.Base.prototype.drawLabel = function(pointerSt
   } else if (hovered) {
     labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabel());
   } else {
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.label());
+    labelsFactory = null;
   }
 
   var label = this.label().getLabel(0);
@@ -1579,8 +1579,8 @@ anychart.core.linearGauge.pointers.Base.prototype.serialize = function() {
   json['offset'] = this.offset();
   json['dataIndex'] = this.dataIndex();
   json['label'] = this.label().serialize();
-  json['hoverLabel'] = this.hoverLabel().serialize();
-  json['selectLabel'] = this.selectLabel().serialize();
+  json['hoverLabel'] = this.hoverLabel().getChangedSettings();
+  json['selectLabel'] = this.selectLabel().getChangedSettings();
   json['legendItem'] = this.legendItem().serialize();
 
   if (this.id_)
@@ -1691,9 +1691,9 @@ anychart.core.linearGauge.pointers.Base.prototype.setupByJSON = function(config,
   this.width(config['width']);
   this.offset(config['offset']);
   this.dataIndex(config['dataIndex']);
-  this.label().setup(config['label']);
-  this.hoverLabel().setup(config['hoverLabel']);
-  this.selectLabel().setup(config['selectLabel']);
+  this.label().setupByVal(config['label'], opt_default);
+  this.hoverLabel().setupByVal(config['hoverLabel'], opt_default);
+  this.selectLabel().setupByVal(config['selectLabel'], opt_default);
   this.legendItem().setup(config['legendItem']);
 
   this.color(config['color']);

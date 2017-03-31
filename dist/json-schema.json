@@ -170,6 +170,25 @@
             {"$ref": "#/definitions/disable"},
             {"$ref": "#/definitions/anychart.ui.ContextMenu"}
           ]
+        },
+
+        "labels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "hoverLabels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "selectLabels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
         }
       }
     },
@@ -4508,7 +4527,7 @@
             "string"
           ]
         },
-        "textFormatter": {
+        "format": {
           "type": "string"
         }
       }
@@ -4629,6 +4648,7 @@
             {"$ref": "#/definitions/anychart.core.ui.Title"}
           ]
         },
+        "format": {"type": ["string"]},
         "content": {
           "oneOf": [
             {"type": "string"},
@@ -5522,7 +5542,7 @@
         "enabled": {
           "type": "boolean"
         },
-        "titleFormatter": {
+        "titleFormat": {
           "type": "string"
         },
         "mode": {

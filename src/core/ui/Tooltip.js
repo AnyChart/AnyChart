@@ -233,26 +233,66 @@ anychart.core.ui.Tooltip.prototype.TOOLTIP_SIMPLE_DESCRIPTORS = (function() {
       anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
+  map['titleFormat'] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'titleFormat',
+      anychart.core.settings.stringOrFunctionNormalizer,
+      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
+      anychart.Signal.NEEDS_REDRAW);
+
+  //@deprecated Since 7.13.1. Use 'titleFormat' instead.
   map['titleFormatter'] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED,
+      'titleFormat',
+      anychart.core.settings.stringOrFunctionNormalizer,
+      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
+      anychart.Signal.NEEDS_REDRAW,
+      void 0,
+      'titleFormatter');
+
+  map['format'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'titleFormatter',
+      'format',
       anychart.core.settings.stringOrFunctionNormalizer,
       anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
       anychart.Signal.NEEDS_REDRAW);
 
+  //@deprecated Since 7.13.1. Use 'format' instead.
   map['textFormatter'] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED,
+      'format',
+      anychart.core.settings.stringOrFunctionNormalizer,
+      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
+      anychart.Signal.NEEDS_REDRAW,
+      void 0,
+      'textFormatter');
+
+  //@deprecated Since 7.7.0. Use format() method instead.
+  map['contentFormatter'] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED,
+      'format',
+      anychart.core.settings.stringOrFunctionNormalizer,
+      anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
+      anychart.Signal.NEEDS_REDRAW,
+      void 0,
+      'contentFormatter');
+
+  map['unionFormat'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'textFormatter',
+      'unionFormat',
       anychart.core.settings.stringOrFunctionNormalizer,
       anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
       anychart.Signal.NEEDS_REDRAW);
 
+  //@deprecated Since 7.7.0. Use unionFormat() method instead.
   map['unionTextFormatter'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
-      'unionTextFormatter',
+      'unionFormat',
       anychart.core.settings.stringOrFunctionNormalizer,
       anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
-      anychart.Signal.NEEDS_REDRAW);
+      anychart.Signal.NEEDS_REDRAW,
+      void 0,
+      'unionTextFormatter');
 
   map['valuePrefix'] = anychart.core.settings.createDescriptor(
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
@@ -1122,9 +1162,9 @@ anychart.core.ui.Tooltip.prototype.updatePosition = function(clientX, clientY) {
 anychart.core.ui.Tooltip.prototype.getFormattedTitle = function(contextProvider) {
   contextProvider = goog.object.clone(contextProvider);
   contextProvider['titleText'] = this.title_.getOption('text');
-  var formatter = this.getOption('titleFormatter');
+  var formatter = this.getOption('titleFormat');
   if (goog.isString(formatter))
-    formatter = anychart.core.utils.TokenParser.getInstance().getTextFormatter(formatter);
+    formatter = anychart.core.utils.TokenParser.getInstance().getFormat(formatter);
 
   return formatter.call(contextProvider, contextProvider);
 };
@@ -1142,10 +1182,10 @@ anychart.core.ui.Tooltip.prototype.getFormattedContent_ = function(contextProvid
   contextProvider['valuePrefix'] = this.getOption('valuePrefix') || '';
   contextProvider['valuePostfix'] = this.getOption('valuePostfix') || '';
   var formatter = opt_useUnionFormatter ?
-      this.getOption('unionTextFormatter') :
-      this.getOption('textFormatter');
+      this.getOption('unionFormat') :
+      this.getOption('format');
   if (goog.isString(formatter))
-    formatter = anychart.core.utils.TokenParser.getInstance().getTextFormatter(formatter);
+    formatter = anychart.core.utils.TokenParser.getInstance().getFormat(formatter);
 
   return formatter.call(contextProvider, contextProvider);
 };
@@ -2110,18 +2150,6 @@ anychart.core.ui.Tooltip.prototype.getHighPriorityResolutionChain = function() {
 
 //region -- Deprecated methods
 /**
- * Function to format content text.
- * @param {Function=} opt_value - Function to format content text.
- * @return {Function|anychart.core.ui.Tooltip} - Function to format content text or itself for method chaining.
- * @deprecated Since 7.7.0. Use textFormatter() method instead.
- */
-anychart.core.ui.Tooltip.prototype.contentFormatter = function(opt_value) {
-  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['contentFormatter()', 'textFormatter()'], true);
-  return /** @type {Function|anychart.core.ui.Tooltip} */ (this['textFormatter'](opt_value));
-};
-
-
-/**
  * Enabled 'float' position mode for all tooltips.
  * @param {boolean=} opt_value
  * @return {boolean|anychart.core.ui.Tooltip}
@@ -2240,9 +2268,6 @@ anychart.core.ui.Tooltip.prototype.setupByJSON = function(config, opt_default) {
   if (config['content']) {
     this.content(config['content']);
   }
-  if (config['contentFormatter']) {
-    this.contentFormatter(config['contentFormatter']);
-  }
   if (config['isFloating']) {
     this.isFloating(config['isFloating']);
   }
@@ -2348,7 +2373,6 @@ anychart.core.ui.Tooltip.prototype.disposeInternal = function() {
 
   //deprecated
   proto['content'] = proto.content;
-  proto['contentFormatter'] = proto.contentFormatter;
   proto['isFloating'] = proto.isFloating;
 })();
 

@@ -1408,9 +1408,9 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
               // if the label is not created by table label factory than we do not modify it's settings - only position
               // it properly due to cell bounds.
               if (label.parentLabelsFactory() == this.labelsFactory_) {
-                label.anchor(anychart.enums.Anchor.LEFT_TOP);
-                label.width(bounds.width);
-                label.height(bounds.height);
+                label['anchor'](anychart.enums.Anchor.LEFT_TOP);
+                label['width'](bounds.width);
+                label['height'](bounds.height);
                 // we apply custom label settings in the next order: table < col < row < cell
                 // keeping in mind, that table-wide settings are already applied to the factory
                 // also we use direct settingsObj reference to avoid unnecessary objects creation
@@ -1423,9 +1423,9 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
                 label.resumeSignalsDispatching(false);
                 continue; // we don't want to listen labels of table labelsFactory_.
               } else {
-                position = /** @type {string} */(label.position() ||
-                    (label.currentLabelsFactory() && label.currentLabelsFactory().position()) ||
-                    (label.parentLabelsFactory() && label.parentLabelsFactory().position()));
+                position = /** @type {string} */(label.getOption('position') ||
+                    (label.currentLabelsFactory() && label.currentLabelsFactory().getOption('position')) ||
+                    (label.parentLabelsFactory() && label.parentLabelsFactory().getOption('position')));
                 positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
                 label.positionProvider(positionProvider);
                 label.draw();
@@ -2270,8 +2270,8 @@ anychart.core.ui.Table.prototype.getLabelsFactory_ = function() {
   if (!this.labelsFactory_) {
     this.labelsFactory_ = new anychart.core.ui.LabelsFactory();
     this.labelsFactory_.setup(anychart.getFullTheme('standalones.labelsFactory'));
-    this.labelsFactory_.anchor(anychart.enums.Anchor.CENTER);
-    this.labelsFactory_.position(anychart.enums.Position.CENTER);
+    this.labelsFactory_['anchor'](anychart.enums.Anchor.CENTER);
+    this.labelsFactory_['position'](anychart.enums.Position.CENTER);
     // we do not register disposable here, cause we dispose it manually in disposeInternal
   }
   return this.labelsFactory_;

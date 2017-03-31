@@ -239,7 +239,7 @@ anychart.core.resource.Activities.prototype.drawLabel = function(index, state, f
           null));
 
   var isDraw = goog.isNull(statePointOverrideEnabled) ? // has no state marker or null "enabled" in it ?
-      (!stateFactory || goog.isNull(stateFactory.enabled())) ? // has no state stateFactory or null "enabled" in it ?
+      (!stateFactory || goog.isNull(stateFactory.enabled()) || !goog.isDef(stateFactory.enabled())) ? // has no state stateFactory or null "enabled" in it ?
           goog.isNull(pointOverrideEnabled) ? // has no marker in point or null "enabled" in it ?
               mainFactory.enabled() :
               pointOverrideEnabled :
@@ -248,9 +248,9 @@ anychart.core.resource.Activities.prototype.drawLabel = function(index, state, f
 
   if (isDraw) {
     var position = (statePointOverride && statePointOverride['position']) ||
-        (stateFactory && stateFactory.position()) ||
+        (stateFactory && stateFactory.getOption('position')) ||
         (pointOverride && pointOverride['position']) ||
-        mainFactory.position();
+        mainFactory.getOption('position');
     var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
 
     var element = mainFactory.getLabel(/** @type {number} */(index));
@@ -261,11 +261,11 @@ anychart.core.resource.Activities.prototype.drawLabel = function(index, state, f
       element = mainFactory.add(formatProvider, positionProvider, index);
     }
     element.resetSettings();
-    element.currentLabelsFactory(stateFactory || mainFactory);
+    element.currentLabelsFactory(stateFactory);
     element.setSettings(pointOverride, statePointOverride);
-    element.width(bounds.width);
-    element.height(bounds.height);
-    element.clip(bounds);
+    element['width'](bounds.width);
+    element['height'](bounds.height);
+    element['clip'](bounds);
     element.draw();
   } else {
     mainFactory.clear(index);
@@ -692,7 +692,7 @@ anychart.core.resource.Activities.prototype.serialize = function() {
 anychart.core.resource.Activities.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.resource.Activities.base(this, 'setupByJSON', config);
   anychart.core.settings.deserialize(this, anychart.core.resource.Activities.DESCRIPTORS, config);
-  this.labels().setup(config['labels']);
+  this.labels().setupByVal(config['labels'], opt_default);
 };
 
 

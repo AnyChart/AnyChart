@@ -359,7 +359,7 @@ anychart.core.utils.TokenParser.parse = function(format) {
  * @param {string} str Format string.
  * @return {Function} Text formatter function.
  */
-anychart.core.utils.TokenParser.prototype.getTextFormatter = function(str) {
+anychart.core.utils.TokenParser.prototype.getFormat = function(str) {
   if (!this.cache_[str]) {
     var terms = anychart.core.utils.TokenParser.parse(str);
     this.cache_[str] = function(provider) {

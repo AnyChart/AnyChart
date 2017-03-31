@@ -277,11 +277,23 @@ anychart.core.utils.LegendItemSettings.prototype.text = function(opt_value) {
 
 
 /**
- * Getter/setter for legend item textFormatter.
+ * Getter/setter for legend item format.
+ * @param {(string|Function)=} opt_value Legend item text.
+ * @return {(string|Function|anychart.core.utils.LegendItemSettings)} Legend item text formatter or self for method chaining.
+ * @deprecated Since 7.13.1. Use 'format' instead.
+ */
+anychart.core.utils.LegendItemSettings.prototype.textFormatter = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['textFormatter()', 'format()'], true);
+  return this.format(opt_value);
+};
+
+
+/**
+ * Getter/setter for legend item format.
  * @param {(string|Function)=} opt_value Legend item text.
  * @return {(string|Function|anychart.core.utils.LegendItemSettings)} Legend item text formatter or self for method chaining.
  */
-anychart.core.utils.LegendItemSettings.prototype.textFormatter = function(opt_value) {
+anychart.core.utils.LegendItemSettings.prototype.format = function(opt_value) {
   return /** @type {!anychart.core.utils.LegendItemSettings|string|Function} */(this.textSettings('text', opt_value));
 };
 
@@ -437,7 +449,9 @@ anychart.core.utils.LegendItemSettings.prototype.setupByJSON = function(config, 
   this.resumeSignalsDispatching(true);
 };
 
+
 //exports
+/** @suppress {deprecated} */
 (function() {
   var proto = anychart.core.utils.LegendItemSettings.prototype;
   proto['iconTextSpacing'] = proto.iconTextSpacing;
@@ -451,6 +465,7 @@ anychart.core.utils.LegendItemSettings.prototype.setupByJSON = function(config, 
   proto['iconMarkerStroke'] = proto.iconMarkerStroke;
   proto['iconSize'] = proto.iconSize;
   proto['text'] = proto.text;
+  proto['format'] = proto.format;
   proto['textFormatter'] = proto.textFormatter;
   proto['disabled'] = proto.disabled;
 })();

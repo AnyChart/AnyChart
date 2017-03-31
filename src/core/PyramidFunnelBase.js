@@ -1226,7 +1226,7 @@ anychart.core.PyramidFunnelBase.prototype.drawContent = function(bounds) {
         anychart.getFullTheme('pie.insideLabels') :
         anychart.getFullTheme('pie.outsideLabels');
     this.labels().setAutoColor(themePart['autoColor']);
-    this.labels().disablePointerEvents(themePart['disablePointerEvents']);
+    this.labels()['disablePointerEvents'](themePart['disablePointerEvents']);
 
     if (!this.isInsideLabels()) {
       this.connectorLengthValue_ = anychart.utils.normalizeSize(
@@ -2298,11 +2298,11 @@ anychart.core.PyramidFunnelBase.prototype.drawLabel_ = function(pointState) {
   var selectPointLabel = selected ? iterator.get('selectLabel') : null;
 
   var index = iterator.getIndex();
-  var labelsFactory;
+  var labelsFactory, stateFactory = null;
   if (selected) {
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels());
+    stateFactory = labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels());
   } else if (hovered) {
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels());
+    stateFactory = labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels());
   } else {
     labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
   }
@@ -2354,11 +2354,11 @@ anychart.core.PyramidFunnelBase.prototype.drawLabel_ = function(pointState) {
       label = this.labels().add(formatProvider, positionProvider, index);
     }
 
-    label.currentLabelsFactory(labelsFactory);
+    label.currentLabelsFactory(stateFactory);
     label.setSettings(/** @type {Object} */(pointLabel), /** @type {Object} */(hovered ? hoverPointLabel : selectPointLabel));
 
     if (iterator.meta('labelWidthForced')) {
-      label.width(anychart.utils.toNumber(iterator.meta('labelWidthForced')));
+      label['width'](anychart.utils.toNumber(iterator.meta('labelWidthForced')));
       // label height is automatically changed - fix label position
       var labelAnchorFromData = pointLabel && pointLabel['anchor'] ? pointLabel['anchor'] : null;
       var labelAnchorFromHoverData = hoverPointLabel && hoverPointLabel['anchor'] ? hoverPointLabel['anchor'] : null;
@@ -2440,7 +2440,7 @@ anychart.core.PyramidFunnelBase.prototype.createLabelsPositionProvider_ = functi
     labelBounds = anychart.math.Rect.fromCoordinateBox(labelBounds);
   }
 
-  var labelAnchor = opt_label && opt_label.anchor() || this.labels().anchor();
+  var labelAnchor = opt_label && opt_label.getOption('anchor') || this.labels().getOption('anchor');
 
   if (opt_label) {
     y = opt_label.positionProvider()['value'].y;
@@ -3058,7 +3058,7 @@ anychart.core.PyramidFunnelBase.prototype.shiftCenterX_ = function() {
  * @return {anychart.enums.PyramidLabelsPosition}
  */
 anychart.core.PyramidFunnelBase.prototype.getLabelsPosition_ = function() {
-  return anychart.enums.normalizePyramidLabelsPosition(this.labels().position());
+  return anychart.enums.normalizePyramidLabelsPosition(this.labels().getOption('position'));
 };
 
 
@@ -3626,7 +3626,7 @@ anychart.core.PyramidFunnelBase.prototype.createTooltipContextProvider = functio
 /**
  * @inheritDoc
  */
-anychart.core.PyramidFunnelBase.prototype.createLegendItemsProvider = function(sourceMode, itemsTextFormatter) {
+anychart.core.PyramidFunnelBase.prototype.createLegendItemsProvider = function(sourceMode, itemsFormat) {
   /**
    * @type {!Array.<anychart.core.ui.Legend.LegendItemProvider>}
    */
@@ -3640,10 +3640,10 @@ anychart.core.PyramidFunnelBase.prototype.createLegendItemsProvider = function(s
 
     var legendItem = /** @type {Object} */ (iterator.get('legendItem') || {});
     var itemText = null;
-    if (goog.isFunction(itemsTextFormatter)) {
+    if (goog.isFunction(itemsFormat)) {
       var format = this.createFormatProvider();
       format.pointInternal = this.getPoint(index);
-      itemText = itemsTextFormatter.call(format, format);
+      itemText = itemsFormat.call(format, format);
     }
     if (!goog.isString(itemText)) {
       itemText = String(goog.isDef(iterator.get('name')) ? iterator.get('name') : iterator.get('x'));
@@ -3913,9 +3913,9 @@ anychart.core.PyramidFunnelBase.prototype.setupByJSON = function(config, opt_def
   this.hoverHatchFill(config['hoverHatchFill']);
   this.selectHatchFill(config['selectHatchFill']);
 
-  this.labels().setup(config['labels']);
-  this.hoverLabels().setup(config['hoverLabels']);
-  this.selectLabels().setup(config['selectLabels']);
+  this.labels().setupByVal(config['labels'], opt_default);
+  this.hoverLabels().setupByVal(config['hoverLabels'], opt_default);
+  this.selectLabels().setupByVal(config['selectLabels'], opt_default);
 
   this.stroke(config['stroke']);
   this.hoverStroke(config['hoverStroke']);
@@ -4069,8 +4069,8 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.applyLabelsPosition_ = fu
 
     // Need to preserve the order of the labels.
     if (prevLabel && prevLabelBounds && prevLabelPosition) {
-      var prevLabelPositionBottom = prevLabelPosition.y + prevLabelBounds.height / 2 + (prevLabel.offsetY() || 0);
-      var currentLabelPositionTop = labelNewY - labelBounds.height / 2 + (label.offsetY() || 0);
+      var prevLabelPositionBottom = prevLabelPosition.y + prevLabelBounds.height / 2 + (prevLabel.getOption('offsetY') || 0);
+      var currentLabelPositionTop = labelNewY - labelBounds.height / 2 + (label.getOption('offsetY') || 0);
 
       if (currentLabelPositionTop < prevLabelPositionBottom) {
         labelNewY += prevLabelPositionBottom - currentLabelPositionTop;
@@ -4083,7 +4083,7 @@ anychart.core.PyramidFunnelBase.LabelsDomain.prototype.applyLabelsPosition_ = fu
     domain.chart.updateConnector(label, pointState);
 
     labelsHeightSum += labelBounds.height;
-    labelsOffsetYSum += label.offsetY() || 0;
+    labelsOffsetYSum += label.getOption('offsetY') || 0;
 
     prevLabel = label;
     prevLabelBounds = labelBounds;

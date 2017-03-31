@@ -38,7 +38,7 @@ goog.inherits(anychart.standalones.LabelsFactory.Label, anychart.core.ui.LabelsF
  */
 anychart.standalones.labelsFactory = function() {
   var factory = new anychart.standalones.LabelsFactory();
-  factory.setup(anychart.getFullTheme('standalones.labelsFactory'));
+  factory.setupByVal(anychart.getFullTheme('standalones.labelsFactory'), true);
   return factory;
 };
 

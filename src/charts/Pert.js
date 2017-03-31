@@ -573,7 +573,7 @@ anychart.charts.Pert.prototype.dataInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.charts.Pert.prototype.createLegendItemsProvider = function(sourceMode, itemsTextFormatter) {
+anychart.charts.Pert.prototype.createLegendItemsProvider = function(sourceMode, itemsFormat) {
   //TODO (A.Kudryavtsev): Implement.
   return [];
 };
@@ -2663,8 +2663,8 @@ anychart.charts.Pert.prototype.drawContent = function(bounds) {
                 }
               });
               label.setSettings(/** @type {Object} */ (labelsSource.labels().textSettings()));
-              label.width(size);
-              label.height(size);
+              label['width'](size);
+              label['height'](size);
               milestone.relatedLabel = label;
             }
             milestone.left = left;
@@ -2807,10 +2807,10 @@ anychart.charts.Pert.prototype.drawContent = function(bounds) {
 
           work.upperLabel = upperLabel;
 
-          upperLabel.width(hyp);
-          upperLabel.height(bounds.height);
+          upperLabel['width'](hyp);
+          upperLabel['height'](bounds.height);
 
-          upperLabel.rotation(work.rotation);
+          upperLabel['rotation'](work.rotation);
           upperLabel.tag = {'w': work};
 
           var lowerLabel = this.tasks().lowerLabels().add(labelContextProvider, {
@@ -2819,10 +2819,10 @@ anychart.charts.Pert.prototype.drawContent = function(bounds) {
               'y': labelTop + pixelShift
             }
           });
-          lowerLabel.width(hyp);
-          lowerLabel.height(bounds.height);
+          lowerLabel['width'](hyp);
+          lowerLabel['height'](bounds.height);
           work.lowerLabel = lowerLabel;
-          lowerLabel.rotation(work.rotation);
+          lowerLabel['rotation'](work.rotation);
           lowerLabel.tag = {'w': work};
 
         }
@@ -2964,9 +2964,9 @@ anychart.charts.Pert.prototype.setupByJSON = function(config, opt_default) {
   this.defaultTooltipSettings_ = /** @type {Object} */(anychart.getFullTheme('defaultTooltip'));
 
   if ('treeData' in config) this.data(anychart.data.Tree.fromJson(config['treeData']));
-  if ('milestones' in config) this.milestones().setupByJSON(config['milestones']);
-  if ('tasks' in config) this.tasks().setupByJSON(config['tasks']);
-  if ('criticalPath' in config) this.criticalPath().setupByJSON(config['criticalPath']);
+  if ('milestones' in config) this.milestones().setupByJSON(config['milestones'], opt_default);
+  if ('tasks' in config) this.tasks().setupByJSON(config['tasks'], opt_default);
+  if ('criticalPath' in config) this.criticalPath().setupByJSON(config['criticalPath'], opt_default);
 
   this.verticalSpacing(config['verticalSpacing']);
   this.horizontalSpacing(config['horizontalSpacing']);

@@ -1,57 +1,20 @@
+//region --- Requiring and Providing
 goog.provide('anychart.core.ui.CircularLabelsFactory');
+goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.math.Rect');
+//endregion
 
 
 
 /**
  * @constructor
+ * @implements {anychart.core.settings.IObjectWithSettings}
+ * @implements {anychart.core.settings.IResolvable}
  * @extends {anychart.core.ui.LabelsFactory}
  */
 anychart.core.ui.CircularLabelsFactory = function() {
   anychart.core.ui.CircularLabelsFactory.base(this, 'constructor');
-
-  /**
-   * X coord of circular center.
-   * @type {number}
-   * @private
-   */
-  this.cx_ = NaN;
-
-  /**
-   * Y coord of circular center..
-   * @type {number}
-   * @private
-   */
-  this.cy_ = NaN;
-
-  /**
-   * Parent radius.
-   * @type {number}
-   * @private
-   */
-  this.parentRadius_;
-
-  /**
-   * Start angle.
-   * @type {?number}
-   * @private
-   */
-  this.startAngle_;
-
-  /**
-   * Sweep angle.
-   * @type {?number}
-   * @private
-   */
-  this.sweepAngle_;
-
-  /**
-   * Auto rotate.
-   * @type {boolean}
-   * @private
-   */
-  this.autoRotate_ = false;
 
   if (!goog.array.contains(this.settingsFieldsForMerge, 'autoRotate'))
     this.settingsFieldsForMerge.push('autoRotate');
@@ -59,6 +22,7 @@ anychart.core.ui.CircularLabelsFactory = function() {
 goog.inherits(anychart.core.ui.CircularLabelsFactory, anychart.core.ui.LabelsFactory);
 
 
+//region --- Settings
 /**
  * Pix X coord of center.
  * @param {?(number)=} opt_value Pixel value of radial center.
@@ -159,154 +123,56 @@ anychart.core.ui.CircularLabelsFactory.prototype.sweepAngle = function(opt_value
 };
 
 
-/**
- * Auto rotates a label around an anchor.
- * @param {boolean=} opt_value Whether label auto rotate.
- * @return {boolean|anychart.core.ui.CircularLabelsFactory} Self for chaining call.
- */
-anychart.core.ui.CircularLabelsFactory.prototype.autoRotate = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = !!opt_value;
-    if (this.autoRotate_ !== opt_value) {
-      this.autoRotate_ = opt_value;
-      this.changedSettings['autoRotate'] = true;
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.autoRotate_;
-  }
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Measurement.
-//
-//----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.core.ui.CircularLabelsFactory.prototype.getDimension = function(formatProviderOrLabel, opt_positionProvider, opt_settings, opt_cacheIndex) {
-  var text;
-  var textElementBounds;
-  var textWidth;
-  var textHeight;
-  /** @type {anychart.math.Rect} */
-  var outerBounds = new anychart.math.Rect(0, 0, 0, 0);
-  var isWidthSet;
-  var isHeightSet;
-  var parentWidth;
-  var parentHeight;
-  var formatProvider;
-  var positionProvider;
+anychart.core.ui.CircularLabelsFactory.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = goog.object.clone(anychart.core.ui.LabelsFactory.prototype.SIMPLE_PROPS_DESCRIPTORS);
 
-  if (!this.measureCustomLabel_) {
-    this.measureCustomLabel_ = new anychart.core.ui.CircularLabelsFactory.Label();
-  } else {
-    this.measureCustomLabel_.clear();
-  }
+  map['autoRotate'] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'autoRotate',
+      anychart.core.settings.booleanNormalizer,
+      anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  if (formatProviderOrLabel instanceof anychart.core.ui.CircularLabelsFactory.Label) {
-    var label = (/** @type {anychart.core.ui.LabelsFactory.Label} */(formatProviderOrLabel));
-    this.measureCustomLabel_.setup(label.serialize());
-    formatProvider = label.formatProvider();
-    positionProvider = opt_positionProvider || label.positionProvider() || {'value' : {'angle': 0, 'radius': 0}};
-  } else {
-    formatProvider = formatProviderOrLabel;
-    positionProvider = opt_positionProvider || {'value' : {'angle': 0, 'radius': 0}};
-  }
-  this.measureCustomLabel_.setSettings(opt_settings);
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.ui.CircularLabelsFactory, anychart.core.ui.CircularLabelsFactory.prototype.SIMPLE_PROPS_DESCRIPTORS);
 
-  var isHtml = goog.isDef(this.measureCustomLabel_.useHtml()) ? this.measureCustomLabel_.useHtml() : this.useHtml();
 
-  //we should ask text element about bounds only after text format and text settings are applied
-
-  //define parent bounds
-  var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
+//endregion
+//region --- Measurement
+/** @inheritDoc */
+anychart.core.ui.CircularLabelsFactory.prototype.getDimensionInternal = function(outerBounds, formattedPosition, parentBounds, offsetX, offsetY, anchor) {
+  var parentWidth, parentHeight;
   if (parentBounds) {
     parentWidth = parentBounds.width;
     parentHeight = parentBounds.height;
   }
 
-  var padding = opt_settings && opt_settings['padding'] ? this.measureCustomLabel_.padding() : this.padding();
-  var widthSettings = this.measureCustomLabel_.width() || this.width();
-  var heightSettings = this.measureCustomLabel_.height() || this.height();
-  var offsetY = /** @type {number|string} */(this.measureCustomLabel_.offsetY() || this.offsetY());
-  if (!goog.isDef(offsetY)) offsetY = 0;
-  var offsetX = /** @type {number|string} */(this.measureCustomLabel_.offsetX() || this.offsetX());
-  if (!goog.isDef(offsetX)) offsetX = 0;
-  var anchor = /** @type {string} */(this.measureCustomLabel_.anchor() || this.anchor());
-
-
-  if (!this.measureTextElement_) {
-    this.measureTextElement_ = acgraph.text();
-    this.measureTextElement_.attr('aria-hidden', 'true');
-  }
-  text = this.callTextFormatter(/** @type {Function} */(this.textFormatter()), formatProvider, opt_cacheIndex);
-  this.measureTextElement_.width(null);
-  this.measureTextElement_.height(null);
-  if (isHtml) {
-    this.measureTextElement_.htmlText(goog.isDefAndNotNull(text) ? String(text) : null);
-  } else {
-    this.measureTextElement_.text(goog.isDefAndNotNull(text) ? String(text) : null);
-  }
-
-  this.applyTextSettings(this.measureTextElement_, true);
-  this.measureCustomLabel_.applyTextSettings(this.measureTextElement_, false);
-
-  //define is width and height set from settings
-  isWidthSet = !goog.isNull(widthSettings);
-  isHeightSet = !goog.isNull(heightSettings);
-
-  textElementBounds = this.measureTextElement_.getBounds();
-
-  //calculate text width and outer width
-  var width;
-  if (isWidthSet) {
-    width = Math.ceil(anychart.utils.normalizeSize(/** @type {number|string} */(widthSettings), parentWidth));
-    textWidth = padding.tightenWidth(width);
-    outerBounds.width = width;
-  } else {
-    width = textElementBounds.width;
-    outerBounds.width = padding.widenWidth(width);
-  }
-
-  if (goog.isDef(textWidth)) this.measureTextElement_.width(textWidth);
-
-  textElementBounds = this.measureTextElement_.getBounds();
-
-  //calculate text height and outer height
-  var height;
-  if (isHeightSet) {
-    height = Math.ceil(anychart.utils.normalizeSize(/** @type {number|string} */(heightSettings), parentHeight));
-    textHeight = padding.tightenHeight(height);
-    outerBounds.height = height;
-  } else {
-    height = textElementBounds.height;
-    outerBounds.height = padding.widenHeight(height);
-  }
-
-  if (goog.isDef(textHeight)) this.measureTextElement_.height(textHeight);
-
-  var formattedPosition = goog.object.clone(this.positionFormatter().call(positionProvider, positionProvider));
   var angle = formattedPosition['angle'];
   var radius = formattedPosition['radius'];
   var radiusY = goog.isDef(formattedPosition['radiusY']) ? formattedPosition['radiusY'] : radius;
 
   var cx = 0;
   var cy = 0;
+  var factoryCx = this.cx();
+  var factoryCy = this.cy();
+  var factorySweepAngle = /** @type {number} */(this.sweepAngle());
+  var factoryParentRadius = /** @type {number} */(this.parentRadius());
 
-  if (parentBounds || (!isNaN(this.cx()) && !isNaN(this.cy()))) {
+  if (parentBounds || (!isNaN(factoryCx) && !isNaN(factoryCy))) {
     //bounds
     var parentX = parentBounds.left;
     var parentY = parentBounds.top;
 
-    cx = isNaN(this.cx()) ? parentX + parentWidth / 2 : this.cx();
-    cy = isNaN(this.cy()) ? parentY + parentHeight / 2 : this.cy();
+    cx = isNaN(factoryCx) ? parentX + parentWidth / 2 : factoryCx;
+    cy = isNaN(factoryCy) ? parentY + parentHeight / 2 : factoryCy;
 
-    var sweepAngle = goog.isDefAndNotNull(this.sweepAngle()) ? /** @type {number} */(this.sweepAngle()) : 360;
+    var sweepAngle = goog.isDefAndNotNull(factorySweepAngle) ? factorySweepAngle : 360;
 
-    var offsetRadius = goog.isDef(this.parentRadius()) && !isNaN(this.parentRadius()) ?
-        anychart.utils.normalizeSize(offsetY, /** @type {number} */(this.parentRadius())) :
+    var offsetRadius = goog.isDef(factoryParentRadius) && !isNaN(factoryParentRadius) ?
+        anychart.utils.normalizeSize(offsetY, factoryParentRadius) :
         parentBounds ?
             anychart.utils.normalizeSize(offsetY, Math.min(parentWidth, parentHeight) / 2) :
             0;
@@ -329,34 +195,24 @@ anychart.core.ui.CircularLabelsFactory.prototype.getDimension = function(formatP
   outerBounds.left = /** @type {number} */(x);
   outerBounds.top = /** @type {number} */(y);
 
-  return /**@type {anychart.math.Rect} */(outerBounds);
+  return /** @type {anychart.math.Rect} */(outerBounds);
 };
 
 
+//endregion
+//region --- Labels management
 /** @inheritDoc */
 anychart.core.ui.CircularLabelsFactory.prototype.createLabel = function() {
   return new anychart.core.ui.CircularLabelsFactory.Label();
 };
-
-
-/** @inheritDoc */
-anychart.core.ui.CircularLabelsFactory.prototype.serialize = function() {
-  var json = anychart.core.ui.CircularLabelsFactory.base(this, 'serialize');
-  if (this.changedSettings['autoRotate']) json['autoRotate'] = this.autoRotate();
-  return json;
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.CircularLabelsFactory.prototype.setupByJSON = function(config, opt_default) {
-  anychart.core.ui.CircularLabelsFactory.base(this, 'setupByJSON', config, opt_default);
-  this.autoRotate(config['autoRotate']);
-};
+//endregion
 
 
 
 /**
  * @constructor
+ * @implements {anychart.core.settings.IObjectWithSettings}
+ * @implements {anychart.core.settings.IResolvable}
  * @extends {anychart.core.ui.LabelsFactory.Label}
  */
 anychart.core.ui.CircularLabelsFactory.Label = function() {
@@ -365,25 +221,25 @@ anychart.core.ui.CircularLabelsFactory.Label = function() {
 goog.inherits(anychart.core.ui.CircularLabelsFactory.Label, anychart.core.ui.LabelsFactory.Label);
 
 
-/**
- * Auto rotates a label around an anchor.
- * @param {boolean=} opt_value Whether label auto rotate.
- * @return {boolean|anychart.core.ui.CircularLabelsFactory.Label} Self for chaining call.
- */
-anychart.core.ui.CircularLabelsFactory.Label.prototype.autoRotate = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = !!opt_value;
-    if (this.settingsObj.autoRotate !== opt_value) {
-      this.settingsObj.autoRotate = opt_value;
-      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-    }
-    return this;
-  } else {
-    return this.settingsObj.autoRotate;
-  }
-};
+//region --- Settings
+/** @inheritDoc */
+anychart.core.ui.CircularLabelsFactory.Label.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
+  /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
+  var map = goog.object.clone(anychart.core.ui.LabelsFactory.Label.prototype.SIMPLE_PROPS_DESCRIPTORS);
+  map['autoRotate'] = anychart.core.settings.createDescriptor(
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'autoRotate',
+      anychart.core.settings.booleanNormalizer,
+      anychart.ConsistencyState.APPEARANCE,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+
+  return map;
+})();
+anychart.core.settings.populate(anychart.core.ui.CircularLabelsFactory.Label, anychart.core.ui.CircularLabelsFactory.Label.prototype.SIMPLE_PROPS_DESCRIPTORS);
 
 
+//endregion
+//region --- Drawing
 /**
  * Returns angle for labels.
  * @param {number} angle Label angle position.
@@ -411,7 +267,7 @@ anychart.core.ui.CircularLabelsFactory.Label.prototype.drawLabel = function(boun
   var offsetX = this.mergedSettings['offsetX'] || 0;
   var offsetY = this.mergedSettings['offsetY'] || 0;
 
-  var parentLabelsFactory = this.parentLabelsFactory();
+  var factory = /** @type {anychart.core.ui.CircularLabelsFactory} */(this.getFactory());
 
   var positionProvider = this.positionProvider();
   var formattedPosition = goog.object.clone(positionFormatter.call(positionProvider, positionProvider));
@@ -420,21 +276,25 @@ anychart.core.ui.CircularLabelsFactory.Label.prototype.drawLabel = function(boun
   var radiusY = goog.isDef(formattedPosition['radiusY']) ? formattedPosition['radiusY'] : radius;
   var cx = 0;
   var cy = 0;
+  var factoryCx = factory.cx();
+  var factoryCy = factory.cy();
+  var factorySweepAngle = /** @type {number} */(factory.sweepAngle());
+  var factoryParentRadius = /** @type {number} */(factory.parentRadius());
 
-  if (parentBounds || (!isNaN(parentLabelsFactory.cx()) && !isNaN(parentLabelsFactory.cy()))) {
+  if (parentBounds || (!isNaN(factoryCx) && !isNaN(factoryCy))) {
     //bounds
     var parentX = parentBounds.left;
     var parentY = parentBounds.top;
     var parentWidth = parentBounds.width;
     var parentHeight = parentBounds.height;
 
-    cx = isNaN(parentLabelsFactory.cx()) ? parentX + parentWidth / 2 : parentLabelsFactory.cx();
-    cy = isNaN(parentLabelsFactory.cy()) ? parentY + parentHeight / 2 : parentLabelsFactory.cy();
+    cx = isNaN(factoryCx) ? parentX + parentWidth / 2 : factoryCx;
+    cy = isNaN(factoryCy) ? parentY + parentHeight / 2 : factoryCy;
 
-    var sweepAngle = goog.isDefAndNotNull(parentLabelsFactory.sweepAngle()) ? parentLabelsFactory.sweepAngle() : 360;
+    var sweepAngle = goog.isDefAndNotNull(factorySweepAngle) ? factorySweepAngle : 360;
 
-    var offsetRadius = goog.isDef(parentLabelsFactory.parentRadius()) && !isNaN(parentLabelsFactory.parentRadius()) ?
-        anychart.utils.normalizeSize(offsetY, parentLabelsFactory.parentRadius()) :
+    var offsetRadius = goog.isDef(factoryParentRadius) && !isNaN(factoryParentRadius) ?
+        anychart.utils.normalizeSize(offsetY, factoryParentRadius) :
         parentBounds ?
             anychart.utils.normalizeSize(offsetY, Math.min(parentWidth, parentHeight) / 2) :
             0;
@@ -456,33 +316,21 @@ anychart.core.ui.CircularLabelsFactory.Label.prototype.drawLabel = function(boun
 
   this.textX += x;
   this.textY += y;
-  bounds.left = x;
-  bounds.top = y;
+  bounds.left = /** @type {number} */(x);
+  bounds.top = /** @type {number} */(y);
 
   this.mergedSettings['rotation'] = this.getRotation_(angle);
   this.textElement.x(/** @type {number} */(this.textX)).y(/** @type {number} */(this.textY));
 };
 
 
-/** @inheritDoc */
-anychart.core.ui.CircularLabelsFactory.Label.prototype.serialize = function() {
-  var json = anychart.core.ui.CircularLabelsFactory.Label.base(this, 'serialize');
-  if (goog.isDef(this.autoRotate())) json['autoRotate'] = this.autoRotate();
-  return json;
-};
-
-
-/** @inheritDoc */
-anychart.core.ui.CircularLabelsFactory.Label.prototype.setupByJSON = function(config, opt_default) {
-  anychart.core.ui.CircularLabelsFactory.Label.base(this, 'setupByJSON', config, opt_default);
-  this.autoRotate(config['autoRotate']);
-};
-
-
+//endregion
+//region --- Exports
 //exports
 (function() {
-  var proto = anychart.core.ui.CircularLabelsFactory.prototype;
-  proto['autoRotate'] = proto.autoRotate;
-  proto = anychart.core.ui.CircularLabelsFactory.Label.prototype;
-  proto['autoRotate'] = proto.autoRotate;
+  // var proto = anychart.core.ui.CircularLabelsFactory.prototype;
+  // proto['autoRotate'] = proto.autoRotate;
+  // proto = anychart.core.ui.CircularLabelsFactory.Label.prototype;
+  // proto['autoRotate'] = proto.autoRotate;
 })();
+//endregion

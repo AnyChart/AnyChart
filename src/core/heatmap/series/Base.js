@@ -613,7 +613,7 @@ anychart.core.heatMap.series.Base.prototype.configureLabel = function(pointState
   } else if (hovered) {
     labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels());
   } else {
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.labels());
+    labelsFactory = null;
   }
 
   var label = this.labels().getLabel(index);
@@ -660,7 +660,7 @@ anychart.core.heatMap.series.Base.prototype.configureLabel = function(pointState
     if (opt_reset) {
       label.resetSettings();
       label.currentLabelsFactory(labelsFactory);
-      label.setSettings(/** @type {Object} */(pointLabel), /** @type {Object} */(hovered ? hoverPointLabel : selectPointLabel));
+      label.setSettings(/** @type {Object} */(pointLabel), /** @type {Object} */(hovered ? hoverPointLabel : selected ? selectPointLabel : null));
     }
 
     return label;
@@ -700,7 +700,7 @@ anychart.core.heatMap.series.Base.prototype.drawLabels = function() {
         mergedSettings['width'] = null;
         mergedSettings['height'] = null;
         if (mergedSettings['adjustByWidth'] || mergedSettings['adjustByHeight'])
-          mergedSettings['fontSize'] = label.parentLabelsFactory().adjustFontSizeValue;
+          mergedSettings['fontSize'] = label.parentLabelsFactory().autoSettings['fontSize'];
 
         var bounds = this.labels().measure(label.formatProvider(), label.positionProvider(), mergedSettings);
 
@@ -714,19 +714,21 @@ anychart.core.heatMap.series.Base.prototype.drawLabels = function() {
           if (chart.labelsDisplayMode() == anychart.enums.LabelsDisplayMode.DROP) {
             this.labels().clear(index);
           } else {
-            if (label.width() != bounds.width || label.height() != bounds.height) {
+            if (label['width'] != bounds.width || label['height'] != bounds.height) {
               label.dropMergedSettings();
-              label.width(bounds.width).height(bounds.height);
+              label['width'](bounds.width);
+              label['height'](bounds.height);
             }
           }
         } else {
-          label.width(cellBounds.width).height(cellBounds.height);
+          label['width'](cellBounds.width);
+          label['height'](cellBounds.height);
         }
 
         if (chart.labelsDisplayMode() != anychart.enums.LabelsDisplayMode.ALWAYS_SHOW) {
-          label.clip(cellBounds);
+          label['clip'](cellBounds);
         } else {
-          label.clip(null);
+          label['clip'](null);
         }
       }
     }
@@ -750,14 +752,15 @@ anychart.core.heatMap.series.Base.prototype.drawLabel = function(pointState) {
           /** @type {number} */(iterator.meta('y')) + thickness,
           /** @type {number} */(iterator.meta('width')) - thickness * 2,
           /** @type {number} */(iterator.meta('height')) - thickness * 2);
-      label.width(cellBounds.width).height(cellBounds.height);
+      label['width'](cellBounds.width);
+      label['height'](cellBounds.height);
 
       var padding = mergedSettings['padding'];
 
       mergedSettings['width'] = null;
       mergedSettings['height'] = null;
       if (mergedSettings['adjustByWidth'] || mergedSettings['adjustByHeight'])
-        mergedSettings['fontSize'] = label.parentLabelsFactory().adjustFontSizeValue;
+        mergedSettings['fontSize'] = label.parentLabelsFactory().autoSettings['fontSize'];
 
       var bounds = this.labels().measure(label.formatProvider(), label.positionProvider(), mergedSettings);
 
@@ -768,18 +771,19 @@ anychart.core.heatMap.series.Base.prototype.drawLabel = function(pointState) {
 
       var chart = this.getChart();
       if (chart.labelsDisplayMode() != anychart.enums.LabelsDisplayMode.ALWAYS_SHOW) {
-        label.clip(cellBounds);
+        label['clip'](cellBounds);
       } else {
-        label.clip(null);
+        label['clip'](null);
       }
 
       if (!notOutOfCellBounds) {
         if (chart.labelsDisplayMode() == anychart.enums.LabelsDisplayMode.DROP) {
           this.labels().clear(label.getIndex());
         } else {
-          if (label.width() != bounds.width || label.height() != bounds.height) {
+          if (label['width'] != bounds.width || label['height'] != bounds.height) {
             label.dropMergedSettings();
-            label.width(bounds.width).height(bounds.height);
+            label['width'](bounds.width);
+            label['height'](bounds.height);
           }
         }
       }
@@ -1441,8 +1445,8 @@ anychart.core.heatMap.series.Base.prototype.getMarkerStroke = function() {
 /**
  * @inheritDoc
  */
-anychart.core.heatMap.series.Base.prototype.getLegendItemData = function(itemsTextFormatter) {
-  var data = anychart.core.heatMap.series.Base.base(this, 'getLegendItemData', itemsTextFormatter);
+anychart.core.heatMap.series.Base.prototype.getLegendItemData = function(itemsFormat) {
+  var data = anychart.core.heatMap.series.Base.base(this, 'getLegendItemData', itemsFormat);
   var markers = this.markers();
   markers.setAutoFill(this.getMarkerFill());
   markers.setAutoStroke(/** @type {acgraph.vector.Stroke} */(this.getMarkerStroke()));

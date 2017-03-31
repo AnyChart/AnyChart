@@ -740,7 +740,7 @@ anychart.charts.HeatMap.prototype.colorScaleInvalidated_ = function(event) {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.charts.HeatMap.prototype.createLegendItemsProvider = function(sourceMode, itemsTextFormatter) {
+anychart.charts.HeatMap.prototype.createLegendItemsProvider = function(sourceMode, itemsFormat) {
   var i, count;
   /**
    * @type {!Array.<anychart.core.ui.Legend.LegendItemProvider>}
@@ -1062,9 +1062,6 @@ anychart.charts.HeatMap.prototype.createSeries_ = function(data, opt_csvSettings
   instance.markers().setAutoZIndex(seriesZIndex + anychart.charts.HeatMap.ZINDEX_INCREMENT_MULTIPLIER / 2);
   instance.markers().setAutoFill((/** @type {anychart.core.heatMap.series.Base} */ (instance)).getMarkerFill());
   instance.markers().setAutoStroke(/** @type {acgraph.vector.Stroke} */((/** @type {anychart.core.heatMap.series.Base} */ (instance)).getMarkerStroke()));
-
-  if (anychart.DEFAULT_THEME != 'v6')
-    instance.labels().setAutoColor(anychart.color.darken(/** @type {(acgraph.vector.Fill|acgraph.vector.Stroke)} */(instance.color())));
 
   instance.a11y(/** @type {boolean|Object|undefined} */(anychart.getFullTheme(this.getType() + '.defaultSeriesSettings.base.a11y')));
 
@@ -1677,14 +1674,14 @@ anychart.charts.HeatMap.prototype.drawSeries_ = function() {
   hoverLabels = this.hoverLabels();
   selectLabels = this.selectLabels();
 
-  adjustFontSize = labels.adjustFontSize();
-  hoverAdjustFontSize = hoverLabels.adjustFontSize();
-  selectAdjustFontSize = selectLabels.adjustFontSize();
+  adjustFontSize = labels['adjustFontSize']();
+  hoverAdjustFontSize = hoverLabels['adjustFontSize']();
+  selectAdjustFontSize = selectLabels['adjustFontSize']();
 
-  var normalAdjustFontSizeSetting = (adjustFontSize['width'] || adjustFontSize['height']);
+  var normalAdjustFontSizeSetting = (!!adjustFontSize && (adjustFontSize['width'] || adjustFontSize['height']));
   needAdjustFontSize = normalAdjustFontSizeSetting && labels.enabled();
-  hoverNeedAdjustFontSize = (normalAdjustFontSizeSetting || hoverAdjustFontSize['width'] || hoverAdjustFontSize['height']) && (labels.enabled() || hoverLabels.enabled());
-  selectNeedAdjustFontSize = (normalAdjustFontSizeSetting || selectAdjustFontSize['width'] || selectAdjustFontSize['height']) && (labels.enabled() || selectLabels.enabled());
+  hoverNeedAdjustFontSize = (normalAdjustFontSizeSetting || (hoverAdjustFontSize && (hoverAdjustFontSize['width'] || hoverAdjustFontSize['height']))) && (labels.enabled() || hoverLabels.enabled());
+  selectNeedAdjustFontSize = (normalAdjustFontSizeSetting || (selectAdjustFontSize && (selectAdjustFontSize['width'] || selectAdjustFontSize['height']))) && (labels.enabled() || selectLabels.enabled());
 
   iterator = series.getResetIterator();
   var minFontSize, hoverMinFontSize, selectMinFontSize;
@@ -2301,9 +2298,9 @@ anychart.charts.HeatMap.prototype.setupByJSON = function(config, opt_default) {
   if ('data' in config)
     this.data(config['data'] || null);
 
-  this.labels().setup(config['labels']);
-  this.hoverLabels().setup(config['hoverLabels']);
-  this.selectLabels().setup(config['selectLabels']);
+  this.labels().setupByVal(config['labels'], opt_default);
+  this.hoverLabels().setupByVal(config['hoverLabels'], opt_default);
+  this.selectLabels().setupByVal(config['selectLabels'], opt_default);
 
   this.markers().setup(config['markers']);
   this.hoverMarkers().setup(config['hoverMarkers']);

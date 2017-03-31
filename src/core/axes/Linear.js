@@ -341,7 +341,7 @@ anychart.core.axes.Linear.prototype.minorLabels = function(opt_value) {
   if (!this.minorLabels_) {
     this.minorLabels_ = new anychart.core.ui.LabelsFactory();
     this.minorLabels_.setParentEventTarget(this);
-    this.isHorizontal() ? this.minorLabels_.rotation(0) : this.minorLabels_.rotation(-90);
+    this.isHorizontal() ? this.minorLabels_['rotation'](0) : this.minorLabels_['rotation'](-90);
     this.minorLabels_.listenSignals(this.minorLabelsInvalidated_, this);
     this.registerDisposable(this.minorLabels_);
   }
@@ -2001,8 +2001,8 @@ anychart.core.axes.Linear.prototype.setupByJSON = function(config, opt_default) 
   if ('title' in config)
     this.title(config['title']);
 
-  this.labels().setup(config['labels']);
-  this.minorLabels().setup(config['minorLabels']);
+  this.labels().setupByVal(config['labels'], opt_default);
+  this.minorLabels().setupByVal(config['minorLabels'], opt_default);
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
   this.staggerMode(config['staggerMode']);

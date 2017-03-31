@@ -3421,7 +3421,7 @@ anychart.core.ui.Timeline.prototype.drawBar_ = function(bounds, item, type, opt_
     if (rawLabel && rawLabel['position']) {
       position = rawLabel['position'];
     } else {
-      position = this.labels().position();
+      position = this.labels()['position']();
       if (isActualBaseline) {
         position = anychart.enums.Position.CENTER;
       } else if (isParent) {
@@ -3434,8 +3434,8 @@ anychart.core.ui.Timeline.prototype.drawBar_ = function(bounds, item, type, opt_
     var formatProvider = {'value': textValue};
     var label = this.labels().add(formatProvider, positionProvider);
     if (isActualBaseline) {
-      label.fontColor('#fff');
-      label.anchor(anychart.enums.Anchor.CENTER);
+      label['fontColor']('#fff');
+      label['anchor'](anychart.enums.Anchor.CENTER);
     }
     if (rawLabel) label.setup(rawLabel);
     if (isTreeDataItem) {
@@ -3864,7 +3864,7 @@ anychart.core.ui.Timeline.prototype.drawAsMilestone_ = function(dataItem, totalT
     }
 
     if (textValue) {
-      var position = (rawLabel && rawLabel['position']) ? rawLabel['position'] : this.labels().position();
+      var position = (rawLabel && rawLabel['position']) ? rawLabel['position'] : this.labels().getOption('position');
       position = anychart.enums.normalizeAnchor(position);
       var positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
       var formatProvider = {'value': textValue};

@@ -5,7 +5,7 @@ goog.require('anychart.enums');
 
 
 /**
- * Context provider for legend itemsTextFormatter function
+ * Context provider for legend itemsFormat function
  * @implements {anychart.core.utils.ITokenProvider}
  * @param {(anychart.core.series.Base|anychart.core.SeriesBase|anychart.core.linearGauge.pointers.Base)=} opt_source Source for statistics and meta.
  * @constructor

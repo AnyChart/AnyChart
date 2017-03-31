@@ -3,6 +3,7 @@ goog.provide('anychart.core.ChartWithSeries');
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.annotations');
 goog.require('anychart.core.reporting');
+goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.palettes.DistinctColors');
 goog.require('anychart.palettes.HatchFills');
 goog.require('anychart.palettes.Markers');
@@ -580,6 +581,21 @@ anychart.core.ChartWithSeries.prototype.minBubbleSize = function(opt_value) {
 
 
 //endregion
+//region --- Series interaction
+/**
+ * Invalidates SERIES_LABEL for all series that support labels.
+ */
+anychart.core.ChartWithSeries.prototype.invalidateSeriesLabels = function() {
+  for (var i = this.seriesList.length; i--;) {
+    var series = this.seriesList[i];
+    if (series.check(anychart.core.series.Capabilities.SUPPORTS_LABELS)) {
+      series.invalidate(anychart.ConsistencyState.SERIES_LABELS);
+    }
+  }
+};
+
+
+//endregion
 //region --- Palettes
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -711,6 +727,89 @@ anychart.core.ChartWithSeries.prototype.markerPaletteInvalidated_ = function(eve
 anychart.core.ChartWithSeries.prototype.hatchFillPaletteInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
     this.invalidate(anychart.ConsistencyState.SERIES_CHART_HATCH_FILL_PALETTE | anychart.ConsistencyState.CHART_LEGEND, anychart.Signal.NEEDS_REDRAW);
+  }
+};
+
+
+//endregion
+//region --- Labels
+//----------------------------------------------------------------------------------------------------------------------
+//
+//  Labels
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Getter/setter for current series data labels.
+ * @param {(Object|boolean|null)=} opt_value Series data labels settings.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.core.ChartWithSeries)} Labels instance or itself for chaining call.
+ */
+anychart.core.ChartWithSeries.prototype.labels = function(opt_value) {
+  if (!this.labels_) {
+    this.labels_ = new anychart.core.ui.LabelsFactory();
+    this.labels_.markConsistent(anychart.ConsistencyState.ALL);
+    this.labels_.listenSignals(this.labelsInvalidated_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
+    this.labels_.setup(opt_value);
+    return this;
+  }
+  return this.labels_;
+};
+
+
+/**
+ * Gets or sets series hover data labels.
+ * @param {(Object|boolean|null)=} opt_value Series data labels settings.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.core.ChartWithSeries)} Labels instance or itself for chaining call.
+ */
+anychart.core.ChartWithSeries.prototype.hoverLabels = function(opt_value) {
+  if (!this.hoverLabels_) {
+    this.hoverLabels_ = new anychart.core.ui.LabelsFactory();
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
+    this.hoverLabels_.setup(opt_value);
+    return this;
+  }
+  return this.hoverLabels_;
+};
+
+
+/**
+ * Gets or sets series select data labels.
+ * @param {(Object|boolean|null)=} opt_value Series data labels settings.
+ * @return {!(anychart.core.ui.LabelsFactory|anychart.core.ChartWithSeries)} Labels instance or itself for chaining call.
+ */
+anychart.core.ChartWithSeries.prototype.selectLabels = function(opt_value) {
+  if (!this.selectLabels_) {
+    this.selectLabels_ = new anychart.core.ui.LabelsFactory();
+  }
+
+  if (goog.isDef(opt_value)) {
+    if (goog.isObject(opt_value) && !('enabled' in opt_value))
+      opt_value['enabled'] = true;
+    this.selectLabels_.setup(opt_value);
+    return this;
+  }
+  return this.selectLabels_;
+};
+
+
+/**
+ * Listener for labels invalidation.
+ * @param {anychart.SignalEvent} event Invalidation event.
+ * @private
+ */
+anychart.core.ChartWithSeries.prototype.labelsInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.NEEDS_REDRAW)) {
+    this.labels_.markConsistent(anychart.ConsistencyState.ALL);
+    this.invalidateSeriesLabels();
+    this.invalidate(anychart.ConsistencyState.SERIES_CHART_SERIES, anychart.Signal.NEEDS_REDRAW);
   }
 };
 
@@ -976,7 +1075,7 @@ anychart.core.ChartWithSeries.prototype.drawSeries = function(opt_topAxisPadding
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.core.ChartWithSeries.prototype.createLegendItemsProvider = function(sourceMode, itemsTextFormatter) {
+anychart.core.ChartWithSeries.prototype.createLegendItemsProvider = function(sourceMode, itemsFormat) {
   var i, count;
   /**
    * @type {!Array.<anychart.core.ui.Legend.LegendItemProvider>}
@@ -989,7 +1088,7 @@ anychart.core.ChartWithSeries.prototype.createLegendItemsProvider = function(sou
       (this.xScale() instanceof anychart.scales.Ordinal)) {
     var names = this.xScale().names();
 
-    if (goog.isFunction(itemsTextFormatter)) {
+    if (goog.isFunction(itemsFormat)) {
       var values = this.xScale().values();
       var itemText;
       var format;
@@ -998,7 +1097,7 @@ anychart.core.ChartWithSeries.prototype.createLegendItemsProvider = function(sou
           'value': values[i],
           'name': names[i]
         };
-        itemText = itemsTextFormatter.call(format, format);
+        itemText = itemsFormat.call(format, format);
         if (!goog.isString(itemText))
           itemText = String(names[i]);
         data.push({
@@ -1022,7 +1121,7 @@ anychart.core.ChartWithSeries.prototype.createLegendItemsProvider = function(sou
     for (i = 0, count = this.seriesList.length; i < count; i++) {
       /** @type {anychart.core.series.Cartesian} */
       var series = this.seriesList[i];
-      var itemData = series.getLegendItemData(itemsTextFormatter);
+      var itemData = series.getLegendItemData(itemsFormat);
       itemData['sourceUid'] = goog.getUid(this);
       itemData['sourceKey'] = series.id();
       data.push(itemData);
@@ -1052,6 +1151,9 @@ anychart.core.ChartWithSeries.prototype.setupByJSON = function(config, opt_defau
   this.markerPalette(config['markerPalette']);
   this.hatchFillPalette(config['hatchFillPalette']);
   this.defaultSeriesSettings(config['defaultSeriesSettings']);
+  this.labels().setupByVal(config['labels'], opt_default);
+  this.hoverLabels().setupByVal(config['hoverLabels'], opt_default);
+  this.selectLabels().setupByVal(config['selectLabels'], opt_default);
 };
 
 
@@ -1068,6 +1170,16 @@ anychart.core.ChartWithSeries.prototype.serialize = function() {
   json['markerPalette'] = this.markerPalette().serialize();
   json['hatchFillPalette'] = this.hatchFillPalette().serialize();
 
+  json['labels'] = this.labels().serialize();
+  json['hoverLabels'] = this.hoverLabels().getChangedSettings();
+  json['selectLabels'] = this.selectLabels().getChangedSettings();
+  if (goog.isNull(json['hoverLabels']['enabled'])) {
+    delete json['hoverLabels']['enabled'];
+  }
+  if (goog.isNull(json['selectLabels']['enabled'])) {
+    delete json['selectLabels']['enabled'];
+  }
+
   return json;
 };
 
@@ -1081,10 +1193,21 @@ anychart.core.ChartWithSeries.prototype.disposeInternal = function() {
   goog.dispose(this.hatchFillPalette_);
   this.hatchFillPalette_ = null;
 
+  goog.disposeAll(this.labels_, this.hoverLabels_, this.selectLabels_);
+
   anychart.core.ChartWithSeries.base(this, 'disposeInternal');
 };
 
 
 //endregion
+
+//exports
+(function() {
+  var proto = anychart.core.ChartWithSeries.prototype;
+
+  proto['labels'] = proto.labels;
+  proto['hoverLabels'] = proto.hoverLabels;
+  proto['selectLabels'] = proto.selectLabels;
+})();
 
 

@@ -535,15 +535,15 @@ anychart.core.axes.MapSettings.prototype.setupByJSON = function(config, opt_defa
     this.setThemeSettings(config);
   } else {
     anychart.core.settings.deserialize(this, this.SIMPLE_PROPS_DESCRIPTORS, config);
-    this.setOption('enabled', 'enabled' in config ? config['enabled'] : true);
+    this['enabled']('enabled' in config ? config['enabled'] : true);
   }
 
   this.title().setupByVal(config['title'], opt_default);
   this.ticks().setupByVal(config['ticks'], opt_default);
   this.minorTicks().setupByVal(config['minorTicks'], opt_default);
 
-  this.labels().setup(config['labels']);
-  this.minorLabels().setup(config['minorLabels']);
+  this.labels().setupByVal(config['labels'], opt_default);
+  this.minorLabels().setupByVal(config['minorLabels'], opt_default);
 
   this.left().setupByVal(config['left'], opt_default);
   this.top().setupByVal(config['top'], opt_default);

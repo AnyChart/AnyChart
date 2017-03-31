@@ -489,6 +489,7 @@ anychart.enums.normalizeAnchor = function(value, opt_default) {
     case 'br':
       return anychart.enums.Anchor.RIGHT_BOTTOM;
     case 'auto':
+    case 'null':
       return anychart.enums.Anchor.AUTO;
   }
   return goog.isDef(opt_default) ? opt_default : anychart.enums.Anchor.LEFT_TOP;
@@ -5518,7 +5519,9 @@ anychart.enums.ColorType = {
  */
 anychart.enums.PropertyHandlerType = {
   SINGLE_ARG: 0,
-  MULTI_ARG: 1
+  MULTI_ARG: 1,
+  SINGLE_ARG_DEPRECATED: 2,
+  MULTI_ARG_DEPRECATED: 3
 };
 //endregion
 

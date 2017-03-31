@@ -137,7 +137,7 @@ goog.inherits(anychart.core.resource.TimeLine, anychart.core.VisualBaseWithBound
  *      selectable: (boolean|undefined),
  *      disablePointerEvents: (boolean|undefined),
  *      useHtml: (boolean|undefined),
- *      textFormatter: (Function|undefined)
+ *      format: (Function|undefined)
  *   }>,
  *   fill: (acgraph.vector.Fill|undefined),
  *   padding: (Object|Array|number|string|null|undefined),
@@ -163,7 +163,7 @@ goog.inherits(anychart.core.resource.TimeLine, anychart.core.VisualBaseWithBound
  *   selectable: (boolean|undefined),
  *   disablePointerEvents: (boolean|undefined),
  *   useHtml: (boolean|undefined),
- *   textFormatter: (Function|undefined)
+ *   format: (Function|undefined)
  * }}
  */
 anychart.core.resource.TimeLine.Level;
@@ -216,13 +216,23 @@ anychart.core.resource.TimeLine.TEXT_DESCRIPTORS =
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
         anychart.Signal.NEEDS_REDRAW
     );
-anychart.core.resource.TimeLine.TEXT_DESCRIPTORS['textFormatter'] =
+anychart.core.resource.TimeLine.TEXT_DESCRIPTORS['format'] =
     anychart.core.settings.createDescriptor(
         anychart.enums.PropertyHandlerType.SINGLE_ARG,
-        'textFormatter',
+        'format',
         anychart.core.settings.stringOrFunctionNormalizer,
         anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+//@deprecated Since 7.13.1. Use 'format' instead.
+anychart.core.resource.TimeLine.TEXT_DESCRIPTORS['textFormatter'] =
+    anychart.core.settings.createDescriptor(
+        anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED,
+        'format',
+        anychart.core.settings.stringOrFunctionNormalizer,
+        anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
+        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
+        void 0,
+        'textFormatter');
 anychart.core.settings.populate(anychart.core.resource.TimeLine, anychart.core.resource.TimeLine.TEXT_DESCRIPTORS);
 
 
@@ -696,7 +706,7 @@ anychart.core.resource.TimeLine.prototype.labelsConfiguration = function(row, co
   label.cellBounds = bounds;
   label.sourceBounds = sourceBounds;
 
-  label.clip(bounds);
+  label['clip'](bounds);
   label.setSettings(settings);
 
   if (!this.choosenFormats_[row] && this.formatIndex_ != this.sourceFormats_[row].length - 1) {
@@ -757,7 +767,7 @@ anychart.core.resource.TimeLine.prototype.drawLabels = function(row) {
         y = bounds.top + bounds.height / 2;
 
         label.positionProvider({'value': {'x': x, 'y': y}});
-        label.settingsObj['width'] = labelBounds.width;
+        label.setOption('width', labelBounds.width);
       } else if (labelBounds.getRight() > parentBounds.getRight()) {
         bounds = labelBounds;
 
@@ -771,7 +781,7 @@ anychart.core.resource.TimeLine.prototype.drawLabels = function(row) {
         y = bounds.top + bounds.height / 2;
 
         label.positionProvider({'value': {'x': x, 'y': y}});
-        label.settingsObj['width'] = labelBounds.width;
+        label.setOption('width', labelBounds.width);
       } else if (hAlign != 'center') {
         x = bounds.left + bounds.width / 2;
         y = bounds.top + bounds.height / 2;
@@ -779,7 +789,7 @@ anychart.core.resource.TimeLine.prototype.drawLabels = function(row) {
         label.positionProvider({'value': {'x': x, 'y': y}});
       }
 
-      label.clip(label.cellBoundsWithPadding);
+      label['clip'](label.cellBoundsWithPadding);
     }
   }
   labels.dropCallsCache();
@@ -927,13 +937,12 @@ anychart.core.resource.TimeLine.prototype.draw = function() {
         if (labels) {
           labels.clear();
         } else {
-          var defaultTextFormatter = /** @type {Function} */(anychart.getFullTheme('defaultLabelFactory.textFormatter'));
+          var defaultFormat = /** @type {Function} */(anychart.getFullTheme('defaultLabelFactory.format'));
           var defaultPositionFormatter = /** @type {Function} */(anychart.getFullTheme('defaultLabelFactory.positionFormatter'));
 
           labels = new anychart.core.ui.LabelsFactory();
-          labels
-              .textFormatter(defaultTextFormatter)
-              .positionFormatter(defaultPositionFormatter);
+          labels['format'](defaultFormat);
+          labels['positionFormatter'](defaultPositionFormatter);
 
           labels.enabled(true);
           labels.container(this.labelsLayer_);

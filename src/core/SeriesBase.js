@@ -680,10 +680,10 @@ anychart.core.SeriesBase.prototype.createLegendContextProvider = function() {
 
 /**
  * Return color for legend item.
- * @param {Function} itemsTextFormatter Items text formatter.
+ * @param {Function} itemsFormat Items text formatter.
  * @return {!anychart.core.ui.Legend.LegendItemProvider} Color for legend item.
  */
-anychart.core.SeriesBase.prototype.getLegendItemData = function(itemsTextFormatter) {
+anychart.core.SeriesBase.prototype.getLegendItemData = function(itemsFormat) {
   var legendItem = this.legendItem();
   legendItem.markAllConsistent();
   var json = legendItem.serialize();
@@ -702,9 +702,9 @@ anychart.core.SeriesBase.prototype.getLegendItemData = function(itemsTextFormatt
     json['iconHatchFill'] = legendItem.iconHatchFill().call(ctx, ctx);
   }
   var itemText;
-  if (goog.isFunction(itemsTextFormatter)) {
+  if (goog.isFunction(itemsFormat)) {
     var format = this.createLegendContextProvider();
-    itemText = itemsTextFormatter.call(format, format);
+    itemText = itemsFormat.call(format, format);
   }
   if (!goog.isString(itemText))
     itemText = goog.isDef(this.name()) ? this.name() : 'Series: ' + this.index();
@@ -855,7 +855,6 @@ anychart.core.SeriesBase.prototype.getLabelsColor = function() {
  */
 anychart.core.SeriesBase.prototype.setAutoColor = function(value) {
   this.autoColor_ = value;
-  this.labels().setAutoColor(this.getLabelsColor());
   this.setAutoMarkerColor();
 };
 
@@ -1370,25 +1369,25 @@ anychart.core.SeriesBase.prototype.getLabelsPosition = function(pointState) {
   var labelHoverPosition = hoverPointLabel && hoverPointLabel['position'] ? hoverPointLabel['position'] : null;
   var labelSelectPosition = selectPointLabel && selectPointLabel['position'] ? selectPointLabel['position'] : null;
 
-  return hovered || selected ?
+  return /** @type {string} */(hovered || selected ?
       hovered ?
           labelHoverPosition ?
               labelHoverPosition :
-              this.hoverLabels().position() ?
-                  this.hoverLabels().position() :
+              this.hoverLabels().getOption('position') ?
+                  this.hoverLabels().getOption('position') :
                   labelPosition ?
                       labelPosition :
-                      this.labels().position() :
+                      this.labels().getOption('position') :
           labelSelectPosition ?
               labelSelectPosition :
-              this.selectLabels().position() ?
-                  this.selectLabels().position() :
+              this.selectLabels().getOption('position') ?
+                  this.selectLabels().getOption('position') :
                   labelPosition ?
                       labelPosition :
-                      this.labels().position() :
+                      this.labels().getOption('position') :
       labelPosition ?
           labelPosition :
-          this.labels().position();
+          this.labels().getOption('position'));
 };
 
 
@@ -1423,21 +1422,22 @@ anychart.core.SeriesBase.prototype.configureLabel = function(pointState, opt_res
 
   var selected = this.state.isStateContains(pointState, anychart.PointState.SELECT);
   var hovered = !selected && this.state.isStateContains(pointState, anychart.PointState.HOVER);
-  var isDraw, labelsFactory, pointLabel, stateLabel, labelEnabledState, stateLabelEnabledState;
+  var isDraw, labelsFactory, stateLabelsFactory, pointLabel, stateLabel, labelEnabledState, stateLabelEnabledState;
 
   pointLabel = iterator.get('label');
   labelEnabledState = pointLabel && goog.isDef(pointLabel['enabled']) ? pointLabel['enabled'] : null;
   if (selected) {
     stateLabel = iterator.get('selectLabel');
     stateLabelEnabledState = stateLabel && goog.isDef(stateLabel['enabled']) ? stateLabel['enabled'] : null;
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels());
+    stateLabelsFactory = labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels());
   } else if (hovered) {
     stateLabel = iterator.get('hoverLabel');
     stateLabelEnabledState = stateLabel && goog.isDef(stateLabel['enabled']) ? stateLabel['enabled'] : null;
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels());
+    stateLabelsFactory = labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels());
   } else {
     stateLabel = null;
     labelsFactory = this.labels_;
+    stateLabelsFactory = null;
   }
 
   if (selected || hovered) {
@@ -1470,7 +1470,7 @@ anychart.core.SeriesBase.prototype.configureLabel = function(pointState, opt_res
 
     if (opt_reset) {
       label.resetSettings();
-      label.currentLabelsFactory(labelsFactory);
+      label.currentLabelsFactory(stateLabelsFactory);
       label.setSettings(/** @type {Object} */(pointLabel), /** @type {Object} */(stateLabel));
     }
 
@@ -2215,9 +2215,9 @@ anychart.core.SeriesBase.prototype.setupByJSON = function(config, opt_default) {
   this.meta(config['meta']);
   if ('data' in config)
     this.data(config['data'] || null);
-  this.labels().setup(config['labels']);
-  this.hoverLabels().setup(config['hoverLabels']);
-  this.selectLabels().setup(config['selectLabels']);
+  this.labels().setupByVal(config['labels'], opt_default);
+  this.hoverLabels().setupByVal(config['hoverLabels'], opt_default);
+  this.selectLabels().setupByVal(config['selectLabels'], opt_default);
 
   if ('tooltip' in config)
     this.tooltip().setupByVal(config['tooltip'], opt_default);

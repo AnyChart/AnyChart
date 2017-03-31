@@ -37,7 +37,7 @@ anychart.core.ui.CrosshairLabel = function() {
    * @type {Function}
    * @private
    */
-  this.textFormatter_ = null;
+  this.format_ = null;
 };
 goog.inherits(anychart.core.ui.CrosshairLabel, anychart.core.ui.LabelBase);
 
@@ -92,15 +92,27 @@ anychart.core.ui.CrosshairLabel.prototype.formatProvider = function(opt_value) {
  * @param {Function=} opt_value Labels text formatter function.
  * @return {Function|anychart.core.ui.CrosshairLabel} Labels text formatter function or Labels instance for chaining call.
  */
-anychart.core.ui.CrosshairLabel.prototype.textFormatter = function(opt_value) {
+anychart.core.ui.CrosshairLabel.prototype.format = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    this.textFormatter_ = opt_value;
+    this.format_ = opt_value;
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
         anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     return this;
   } else {
-    return this.textFormatter_;
+    return this.format_;
   }
+};
+
+
+/**
+ * Gets or sets labels text formatter function.
+ * @param {Function=} opt_value Labels text formatter function.
+ * @return {Function|anychart.core.ui.CrosshairLabel} Labels text formatter function or Labels instance for chaining call.
+ * @deprecated Since 7.13.1. Use 'format' instead.
+ */
+anychart.core.ui.CrosshairLabel.prototype.textFormatter = function(opt_value) {
+  anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, ['textFormatter()', 'format()'], true);
+  return this.format(opt_value);
 };
 
 
@@ -206,19 +218,27 @@ anychart.core.ui.CrosshairLabel.prototype.serialize = function() {
 };
 
 
-/** @inheritDoc */
+/**
+ * @inheritDoc
+ * @suppress {deprecated}
+ */
 anychart.core.ui.CrosshairLabel.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.ui.CrosshairLabel.base(this, 'setupByJSON', config, opt_default);
   this.axisIndex(config['axisIndex']);
   this.anchor(config['anchor']);
-  this.textFormatter(config['textFormatter']);
+  if ('textFormatter' in config) {
+    this.textFormatter(config['textFormatter']);
+  }
+  this.format(config['format']);
 };
 
 
+/** @suppress {deprecated} */
 (function() {
   var proto = anychart.core.ui.CrosshairLabel.prototype;
   //exports
   proto['axisIndex'] = proto.axisIndex;
+  proto['format'] = proto.format;
   proto['textFormatter'] = proto.textFormatter;
   proto['background'] = proto.background;
   proto['padding'] = proto.padding;

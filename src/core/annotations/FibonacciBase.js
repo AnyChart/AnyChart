@@ -427,7 +427,7 @@ anychart.core.annotations.FibonacciBase.prototype.drawLabel = function(index, ma
       element = mainFactory.add(formatProvider, positionProvider, index);
     }
     element.resetSettings();
-    element.currentLabelsFactory(stateFactory || mainFactory);
+    element.currentLabelsFactory(stateFactory);
     element.setSettings(opt_settings);
     element.draw();
   } else {

@@ -688,18 +688,8 @@ anychart.core.ui.Background.prototype.draw = function() {
 
 /** @inheritDoc */
 anychart.core.ui.Background.prototype.remove = function() {
-  if (this.strokePath_)
-    this.strokePath_.parent(null);
-
-  if (this.strokePaths_) {
-    for (var i = 0, len = this.strokePaths_.length; i < len; i++) {
-      var path = this.strokePaths_[i];
-      path.parent(null);
-    }
-  }
-
-  if (this.fillPath_)
-    this.fillPath_.parent(null);
+  if (this.rootElement_)
+    this.rootElement_.parent(null);
 };
 
 
