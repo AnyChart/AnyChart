@@ -484,6 +484,17 @@ anychart.data.Set.prototype.checkFieldExist = function(nameOrColumn) {
 
 
 /**
+ * Set field as seen.
+ * @param {string} fieldName Field name.
+ */
+anychart.data.Set.prototype.addSeenField = function(fieldName) {
+  if (!this.objectFieldsSeen_)
+    this.objectFieldsSeen_ = {};
+  this.objectFieldsSeen_[fieldName] = true;
+};
+
+
+/**
  * Checks whether the view has non-object and non-array rows.
  * @return {boolean}
  */

@@ -110,8 +110,12 @@ anychart.data.Mapping.prototype.setInternal = function(row, fieldName, value) {
     }
     anychart.core.reporting.warning(anychart.enums.WarningCode.NOT_MAPPED_FIELD, null, [fieldName]);
   } else if (rowType == 'object') {
-    anychart.utils.mapObject(/** @type {!Object} */(row), fieldName, this.objectMapping_[fieldName], value,
+    var result = anychart.utils.mapObject(/** @type {!Object} */(row), fieldName, this.objectMapping_[fieldName], value,
         this.writeToFirstFieldByMapping_);
+    // result will be undefined if there no such field in row, but row will have property because it will be set.
+    if ((result === void 0) && row.hasOwnProperty(fieldName)) {
+      this.parentView.addSeenField(fieldName);
+    }
   } else if (goog.array.indexOf(this.defaultProps_, fieldName) > -1) {
     if (anychart.DEVELOP && (goog.isArray(value) || goog.isObject(value)))
       anychart.core.reporting.warning(anychart.enums.WarningCode.COMPLEX_VALUE_TO_DEFAULT_FIELD, null, [fieldName]);
