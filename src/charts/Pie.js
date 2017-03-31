@@ -3627,8 +3627,11 @@ anychart.charts.Pie.prototype.showTooltip = function(opt_event) {
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
   var formatProvider = this.createFormatProvider();
   if (opt_event) {
+    tooltip.suspendSignalsDispatching();
     tooltip.showFloat(opt_event['clientX'], opt_event['clientY'], formatProvider);
-    this.listen(goog.events.EventType.MOUSEMOVE, this.showTooltip);
+    tooltip.resumeSignalsDispatching(false);
+    this.listen(goog.labs.userAgent.device.isDesktop() ?
+        goog.events.EventType.MOUSEMOVE : goog.events.EventType.TOUCHSTART, this.showTooltip);
   }
   // if (tooltip.isFloating() && opt_event) {
   //   tooltip.show(
@@ -3652,7 +3655,8 @@ anychart.charts.Pie.prototype.showTooltip = function(opt_event) {
  */
 anychart.charts.Pie.prototype.hideTooltip = function() {
   var tooltip = /** @type {anychart.core.ui.Tooltip} */(this.tooltip());
-  this.unlisten(goog.events.EventType.MOUSEMOVE, this.showTooltip);
+  this.unlisten(goog.labs.userAgent.device.isDesktop() ?
+      goog.events.EventType.MOUSEMOVE : goog.events.EventType.TOUCHSTART, this.showTooltip);
   tooltip.hide();
 };
 

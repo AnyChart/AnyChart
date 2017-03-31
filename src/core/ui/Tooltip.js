@@ -1089,11 +1089,12 @@ anychart.core.ui.Tooltip.prototype.showForPosition_ = function(clientX, clientY)
   if (this.delay_ && this.delay_.isActive()) this.delay_.stop();
   this.draw();
 
-  var domElement = this.getRootLayer_().domElement();
+  var rootLayer = this.getRootLayer_();
+  var domElement = rootLayer.domElement();
 
   // like selectable && enabled
   if (this.getOption('selectable') && domElement) {
-    domElement.style['pointer-events'] = 'all';
+    rootLayer.disablePointerEvents(false);
 
     this.createTriangle_(clientX, clientY);
 
@@ -1101,7 +1102,7 @@ anychart.core.ui.Tooltip.prototype.showForPosition_ = function(clientX, clientY)
     goog.events.unlisten(goog.dom.getDocument(), goog.events.EventType.MOUSEMOVE, this.movementOutsideThePoint_, false, this);
 
   } else if (domElement) {
-    domElement.style['pointer-events'] = 'none';
+    rootLayer.disablePointerEvents(true);
   }
 };
 
