@@ -403,25 +403,29 @@ anychart.scales.ScatterTicks.prototype.setupLinear_ = function(min, max, opt_can
         }
       }
     }
+
     interval = Math.max(interval, 1e-7);
-    var desiredMin = anychart.math.specialRound(anychart.utils.alignLeft(min, interval, this.base_));
+    var precision = anychart.math.getPrecision(interval);
+    var desiredMin = anychart.math.specialRound(anychart.utils.alignLeft(min, interval, this.base_), precision);
     if (opt_canModifyMin)
       result[0] = min = desiredMin;
     else if (min - desiredMin > 1e-7) {
       ticks.push(min);
       result[2] = desiredMin;
     }
-    var desiredMax = anychart.math.specialRound(anychart.utils.alignRight(max, interval, this.base_));
+    var desiredMax = anychart.math.specialRound(anychart.utils.alignRight(max, interval, this.base_), precision);
     if (opt_canModifyMax)
       result[1] = max = desiredMax;
     else if (desiredMax - max > 1e-7) {
       result[3] = desiredMax;
     }
-    for (var j = anychart.math.specialRound(anychart.utils.alignRight(min, interval, this.base_));
+
+    for (var j = anychart.math.specialRound(anychart.utils.alignRight(min, interval, this.base_), precision);
          j <= max;
-         j = anychart.math.specialRound(j + interval)) {
+         j = anychart.math.specialRound(j + interval, precision)) {
       ticks.push(j);
     }
+
     if (3 in result)
       ticks.push(max);
     this.autoTicks_ = ticks;

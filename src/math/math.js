@@ -68,12 +68,29 @@ anychart.math.round = function(num, opt_digitsCount) {
 
 
 /**
- * Rounds a given number to a certain number of decimal places.
+ * Rounds a given number to a certain number of decimal places (precision).
  * @param {number} num The number to be rounded.
+ * @param {number=} opt_precision
  * @return {number} The rounded number.
  */
-anychart.math.specialRound = function(num) {
-  return anychart.math.round(num, 13 - Math.max(Math.floor(Math.log(Math.abs(num)) * Math.LOG10E), 8));
+anychart.math.specialRound = function(num, opt_precision) {
+  return anychart.math.round(num, opt_precision ? opt_precision : 13 - Math.max(Math.floor(Math.log(Math.abs(num)) * Math.LOG10E), 7));
+};
+
+
+/**
+ * Gets given number's precision (number of decimal places).
+ * @param {number} num
+ * @return {number} Number of decimal places.
+ */
+anychart.math.getPrecision = function(num) {
+  if (!isFinite(num)) return 0;
+  var e = 1, p = 0;
+  while (Math.round(num * e) / e !== num) {
+    e *= 10;
+    p++;
+  }
+  return p;
 };
 
 
