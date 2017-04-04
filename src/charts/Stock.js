@@ -861,6 +861,15 @@ anychart.charts.Stock.prototype.getCurrentMinDistance = function() {
 anychart.charts.Stock.prototype.getCurrentScrollerMinDistance = function() {
   return this.dataController_.getCurrentScrollerMinDistance();
 };
+
+
+/**
+ * Returns plots count.
+ * @return {number} Number of plots.
+ */
+anychart.charts.Stock.prototype.getPlotsCount = function() {
+  return this.plots_.length;
+};
 //endregion
 
 
@@ -2070,4 +2079,5 @@ anychart.charts.Stock.prototype.toCsv = function(opt_chartDataExportMode, opt_cs
   proto['grouping'] = proto.grouping;
   proto['scrollerGrouping'] = proto.scrollerGrouping;
   proto['annotations'] = proto.annotations;
+  proto['getPlotsCount'] = proto.getPlotsCount;
 })();

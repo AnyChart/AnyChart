@@ -1191,8 +1191,8 @@ anychart.core.ChartWithSeries.prototype.disposeInternal = function() {
   this.removeAllSeries();
   this.resumeSignalsDispatching(false);
 
-  goog.dispose(this.hatchFillPalette_);
-  this.hatchFillPalette_ = null;
+  goog.disposeAll(this.palette_, this.markerPalette_, this.hatchFillPalette_);
+  this.palette_ = this.markerPalette_ = this.hatchFillPalette_ = null;
 
   goog.disposeAll(this.labels_, this.hoverLabels_, this.selectLabels_);
 

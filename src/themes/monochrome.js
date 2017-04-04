@@ -19,6 +19,15 @@ goog.provide('anychart.themes.monochrome');
    * @this {*}
    * @return {*}
    */
+  var returnSourceColor60 = function() {
+    return global['anychart']['color']['setOpacity'](this['sourceColor'], 0.6, true);
+  };
+
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
   var returnDarkenSourceColor = function() {
     return global['anychart']['color']['darken'](this['sourceColor']);
   };
@@ -101,7 +110,6 @@ goog.provide('anychart.themes.monochrome');
         },
         'lineLike': {
           'selectStroke': '3 #212121',
-          'markers': {'enabled': true},
           'selectMarkers': {
             'enabled': true,
             'fill': '#bdbdbd',
@@ -267,20 +275,19 @@ goog.provide('anychart.themes.monochrome');
         'outlineStroke': '#B9B9B9',
         'defaultSeriesSettings': {
           'base': {
-            'color': '#252525 0.6',
             'fill': stockScrollerUnselected,
             'stroke': stockScrollerUnselected,
-            'selectFill': returnSourceColor,
+            'selectFill': returnSourceColor60,
             'selectHatchFill': null,
-            'selectStroke': returnSourceColor
+            'selectStroke': returnSourceColor60
           },
           'lineLike': {
-            'selectStroke': returnSourceColor,
+            'selectStroke': returnSourceColor60,
             'fill': stockScrollerUnselected,
             'stroke': stockScrollerUnselected
           },
           'areaLike': {
-            'selectStroke': returnSourceColor,
+            'selectStroke': returnSourceColor60,
             'fill': stockScrollerUnselected,
             'stroke': stockScrollerUnselected
           },
@@ -289,16 +296,16 @@ goog.provide('anychart.themes.monochrome');
             'risingStroke': stockScrollerUnselected,
             'fallingFill': stockScrollerUnselected,
             'fallingStroke': stockScrollerUnselected,
-            'selectRisingStroke': returnSourceColor,
-            'selectFallingStroke': returnSourceColor,
-            'selectRisingFill': returnSourceColor,
-            'selectFallingFill': returnSourceColor
+            'selectRisingStroke': returnSourceColor60,
+            'selectFallingStroke': returnSourceColor60,
+            'selectRisingFill': returnSourceColor60,
+            'selectFallingFill': returnSourceColor60
           },
           'ohlc': {
             'risingStroke': stockScrollerUnselected,
             'fallingStroke': stockScrollerUnselected,
-            'selectRisingStroke': returnSourceColor,
-            'selectFallingStroke': returnSourceColor
+            'selectRisingStroke': returnSourceColor60,
+            'selectFallingStroke': returnSourceColor60
           }
         }
       }

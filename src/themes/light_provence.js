@@ -272,7 +272,6 @@ goog.provide('anychart.themes.light_provence');
         'outlineStroke': '#dacfd3',
         'defaultSeriesSettings': {
           'base': {
-            'color': '#aa8ab3',
             'selectStroke': returnSourceColor
           },
           'candlestick': {

@@ -19,6 +19,15 @@ goog.provide('anychart.themes.dark_earth');
    * @this {*}
    * @return {*}
    */
+  var returnSourceColor60 = function() {
+    return global['anychart']['color']['setOpacity'](this['sourceColor'], 0.6, true);
+  };
+
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
   var returnDarkenSourceColor = function() {
     return global['anychart']['color']['darken'](this['sourceColor']);
   };
@@ -288,29 +297,28 @@ goog.provide('anychart.themes.dark_earth');
         'outlineStroke': '#636363 0.6',
         'defaultSeriesSettings': {
           'base': {
-            'color': '#827717 0.6',
-            'selectStroke': returnSourceColor,
-            'selectFill': returnSourceColor
+            'selectStroke': returnSourceColor60,
+            'selectFill': returnSourceColor60
           },
           'lineLike': {
-            'selectStroke': returnSourceColor
+            'selectStroke': returnSourceColor60
           },
           'areaLike': {
-            'selectStroke': returnSourceColor,
-            'selectFill': returnSourceColor
+            'selectStroke': returnSourceColor60,
+            'selectFill': returnSourceColor60
           },
           'marker': {
-            'selectStroke': returnSourceColor
+            'selectStroke': returnSourceColor60
           },
           'candlestick': {
             'risingFill': stockScrollerUnselected,
             'risingStroke': stockScrollerUnselected,
             'fallingFill': stockScrollerUnselected,
             'fallingStroke': stockScrollerUnselected,
-            'selectRisingStroke': returnSourceColor,
-            'selectFallingStroke': returnSourceColor,
-            'selectRisingFill': returnSourceColor,
-            'selectFallingFill': returnSourceColor
+            'selectRisingStroke': returnSourceColor60,
+            'selectFallingStroke': returnSourceColor60,
+            'selectRisingFill': returnSourceColor60,
+            'selectFallingFill': returnSourceColor60
           },
           'ohlc': {
             'risingStroke': stockScrollerUnselected,

@@ -19,6 +19,15 @@ goog.provide('anychart.themes.light_turquoise');
    * @this {*}
    * @return {*}
    */
+  var returnSourceColor50 = function() {
+    return global['anychart']['color']['setOpacity'](this['sourceColor'], 0.5, true);
+  };
+
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
   var returnDarkenSourceColor = function() {
     return global['anychart']['color']['darken'](this['sourceColor']);
   };
@@ -298,25 +307,24 @@ goog.provide('anychart.themes.light_turquoise');
         'outlineStroke': '#bdbdbd',
         'defaultSeriesSettings': {
           'base': {
-            'color': '#00838f 0.5',
-            'selectFill': returnSourceColor,
-            'selectStroke': returnSourceColor
+            'selectFill': returnSourceColor50,
+            'selectStroke': returnSourceColor50
           },
           'candlestick': {
             'risingFill': stockScrollerUnselected,
             'risingStroke': stockScrollerUnselected,
             'fallingFill': stockScrollerUnselected,
             'fallingStroke': stockScrollerUnselected,
-            'selectRisingStroke': returnSourceColor,
-            'selectFallingStroke': returnSourceColor,
-            'selectRisingFill': returnSourceColor,
-            'selectFallingFill': returnSourceColor
+            'selectRisingStroke': returnSourceColor50,
+            'selectFallingStroke': returnSourceColor50,
+            'selectRisingFill': returnSourceColor50,
+            'selectFallingFill': returnSourceColor50
           },
           'ohlc': {
             'risingStroke': stockScrollerUnselected,
             'fallingStroke': stockScrollerUnselected,
-            'selectRisingStroke': returnSourceColor,
-            'selectFallingStroke': returnSourceColor
+            'selectRisingStroke': returnSourceColor50,
+            'selectFallingStroke': returnSourceColor50
           }
         }
       }

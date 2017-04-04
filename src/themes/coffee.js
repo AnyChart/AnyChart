@@ -1,18 +1,8 @@
 goog.provide('anychart.themes.coffee');
 
-
 (function() {
   var global = this;
   var stockScrollerUnselected = '#bcaaa4';
-
-
-  /**
-   * @this {*}
-   * @return {*}
-   */
-  var returnSourceColor = function() {
-    return this['sourceColor'];
-  };
 
 
   /**
@@ -30,6 +20,15 @@ goog.provide('anychart.themes.coffee');
    */
   var returnLightenSourceColor = function() {
     return global['anychart']['color']['lighten'](this['sourceColor']);
+  };
+
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
+  var returnSourceColor60 = function() {
+    return global['anychart']['color']['setOpacity'](this['sourceColor'], 0.6, true);
   };
 
 
@@ -350,19 +349,18 @@ goog.provide('anychart.themes.coffee');
         'outlineStroke': '#8d6e63',
         'defaultSeriesSettings': {
           'base': {
-            'color': '#482311 0.6',
             'fill': stockScrollerUnselected,
             'stroke': stockScrollerUnselected,
-            'selectFill': returnSourceColor,
-            'selectStroke': returnSourceColor
+            'selectFill': returnSourceColor60,
+            'selectStroke': returnSourceColor60
           },
           'lineLike': {
-            'selectStroke': returnSourceColor,
+            'selectStroke': returnSourceColor60,
             'fill': stockScrollerUnselected,
             'stroke': stockScrollerUnselected
           },
           'areaLike': {
-            'selectStroke': returnSourceColor,
+            'selectStroke': returnSourceColor60,
             'fill': stockScrollerUnselected,
             'stroke': stockScrollerUnselected
           },
@@ -371,16 +369,16 @@ goog.provide('anychart.themes.coffee');
             'risingStroke': stockScrollerUnselected,
             'fallingFill': stockScrollerUnselected,
             'fallingStroke': stockScrollerUnselected,
-            'selectRisingStroke': returnSourceColor,
-            'selectFallingStroke': returnSourceColor,
-            'selectRisingFill': returnSourceColor,
-            'selectFallingFill': returnSourceColor
+            'selectRisingStroke': returnSourceColor60,
+            'selectFallingStroke': returnSourceColor60,
+            'selectRisingFill': returnSourceColor60,
+            'selectFallingFill': returnSourceColor60
           },
           'ohlc': {
             'risingStroke': stockScrollerUnselected,
             'fallingStroke': stockScrollerUnselected,
-            'selectRisingStroke': returnSourceColor,
-            'selectFallingStroke': returnSourceColor
+            'selectRisingStroke': returnSourceColor60,
+            'selectFallingStroke': returnSourceColor60
           }
         }
       }

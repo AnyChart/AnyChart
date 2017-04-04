@@ -13,9 +13,13 @@ goog.require('anychart.color');
 anychart.themes.merging.compileTheme = function(theme, path, themeIndex) {
   var rootParts = path.split('.');
   var descriptor = anychart.themes.merging.mergingMapInverse_[rootParts[0]];
-  var needsCompilation = !!(descriptor && descriptor.mergedIn <= themeIndex);
+  if (!descriptor) {
+    anychart.themes.merging.mergingMapInverse_[rootParts[0]] = {requires: [], compiledIn: themeIndex, mergedIn: 0};
+    return true;
+  }
+  var needsCompilation = descriptor.compiledIn <= themeIndex;
   if (needsCompilation) {
-    descriptor.mergedIn = themeIndex + 1;
+    descriptor.compiledIn = themeIndex + 1;
     var requires = descriptor.requires;
     for (var i = 0; i < requires.length; i++) {
       var req = requires[i];
@@ -29,7 +33,21 @@ anychart.themes.merging.compileTheme = function(theme, path, themeIndex) {
       }
     }
   }
-  return needsCompilation;
+  return needsCompilation || descriptor.mergedIn < themeIndex;
+};
+
+
+/**
+ * @param {string} path
+ * @param {number} themeIndex
+ */
+anychart.themes.merging.markMergedDescriptor = function(path, themeIndex) {
+  var rootParts = path.split('.');
+  var descriptor = anychart.themes.merging.mergingMapInverse_[rootParts[0]];
+  if (!descriptor) {
+    anychart.themes.merging.mergingMapInverse_[rootParts[0]] = {requires: [], mergedIn: 0, compiledIn: 0};
+  }
+  descriptor.mergedIn = themeIndex;
 };
 
 
@@ -40,7 +58,8 @@ anychart.themes.merging.clearCache = function() {
   for (var i in anychart.themes.merging.mergingMapInverse_) {
     var descriptor = anychart.themes.merging.mergingMapInverse_[i];
     // we want to keep default theme cache
-    descriptor.mergedIn = Math.min(descriptor.mergedIn, 1);
+    descriptor.compiledIn = Math.min(descriptor.compiledIn, 1);
+    descriptor.mergedIn = 0;
   }
 };
 
@@ -141,9 +160,8 @@ anychart.themes.merging.deepClone_ = function(obj) {
  * @param {Array.<string|number>} path Path parts.
  * @param {*} value
  * @return {*} Theme with the result.
- * @private
  */
-anychart.themes.merging.setThemePart_ = function(theme, path, value) {
+anychart.themes.merging.setThemePart = function(theme, path, value) {
   if (goog.isDef(value)) {
     var curr = goog.isObject(theme) ? theme : {};
     var result = curr;
@@ -205,7 +223,7 @@ anychart.themes.merging.removeThemePart_ = function(theme, path) {
  * @private
  */
 anychart.themes.merging.mergeThemePart_ = function(theme, targetPath, defaultPath) {
-  return anychart.themes.merging.setThemePart_(
+  return anychart.themes.merging.setThemePart(
       theme, targetPath,
       anychart.themes.merging.merge(
           anychart.themes.merging.getThemePart_(theme, targetPath),
@@ -223,7 +241,7 @@ anychart.themes.merging.mergeThemePart_ = function(theme, targetPath, defaultPat
  */
 anychart.themes.merging.replaceThemePart_ = function(theme, targetPath, defaultPath) {
   if (!goog.isDef(anychart.themes.merging.getThemePart_(theme, targetPath)))
-    return anychart.themes.merging.setThemePart_(theme, targetPath,
+    return anychart.themes.merging.setThemePart(theme, targetPath,
         anychart.themes.merging.getThemePart_(theme, defaultPath));
   return theme;
 };
@@ -681,13 +699,15 @@ anychart.themes.merging.mergingMap_ = [
   {
     defaultObj: 'palette',
     targets: [
-      'chart.palette'
+      'chart.palette',
+      'stock.scroller.palette'
     ]
   },
   {
     defaultObj: 'hatchFillPalette',
     targets: [
-      'chart.hatchFillPalette'
+      'chart.hatchFillPalette',
+      'stock.scroller.hatchFillPalette'
     ]
   },
   {
@@ -1314,6 +1334,7 @@ anychart.themes.merging.mergingMap_ = [
  *        defaultObj:string,
  *        targets:Array.<string>
  *    }>,
+ *    compiledIn: number,
  *    mergedIn: number
  * }>>}
  * @private
@@ -1332,6 +1353,7 @@ anychart.themes.merging.mergingMapInverse_ = (function() {
       if (!obj) {
         res[root] = obj = {
           requires: [],
+          compiledIn: 0,
           mergedIn: 0
         };
       }
