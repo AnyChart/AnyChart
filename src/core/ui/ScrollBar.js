@@ -1582,7 +1582,7 @@ anychart.core.ui.ScrollBar.ScrollEvent.prototype['source'] = '';
   var proto = anychart.core.ui.ScrollBar.prototype;
   //goog.exportSymbol('anychart.core.ui.ScrollBar.SCROLL_PIXEL_STEP', anychart.core.ui.ScrollBar.SCROLL_PIXEL_STEP);
   //goog.exportSymbol('anychart.core.ui.ScrollBar.SCROLL_RATIO_STEP', anychart.core.ui.ScrollBar.SCROLL_RATIO_STEP);
-  goog.exportSymbol('anychart.core.ui.ScrollBar', anychart.core.ui.ScrollBar);
+  //goog.exportSymbol('anychart.core.ui.ScrollBar', anychart.core.ui.ScrollBar);
   proto['barSize'] = proto.barSize;
   //proto['layout'] = proto.layout;
   proto['backgroundStroke'] = proto.backgroundStroke;
