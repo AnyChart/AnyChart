@@ -152,7 +152,7 @@ anychart.data.buildMapping = function(dataSet, fromIndex, toIndex, names, opt_ke
 
 /**
  * @typedef {{
- *  caption: (string|undefined),
+ *  title: (string|undefined),
  *  header: (Array.<string>|undefined),
  *  rows: (Array|undefined)
  * }}

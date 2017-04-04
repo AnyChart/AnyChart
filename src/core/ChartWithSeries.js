@@ -886,7 +886,8 @@ anychart.core.ChartWithSeries.prototype.data = function(opt_value) {
     // handle HTML table data
     var seriesNames = null;
     if (opt_value) {
-      if (opt_value['caption']) this.title(opt_value['caption']);
+      var title = opt_value['title'] || opt_value['caption'];
+      if (title) this.title(title);
       if (opt_value['header'] && opt_value['header'].length) seriesNames = opt_value['header'];
       if (opt_value['rows']) this.rawData_ = opt_value['rows'];
       else this.rawData_ = opt_value;

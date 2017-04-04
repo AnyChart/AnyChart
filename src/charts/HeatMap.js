@@ -2107,7 +2107,8 @@ anychart.charts.HeatMap.prototype.data = function(opt_value, opt_csvSettings) {
   if (goog.isDef(opt_value)) {
     // handle HTML table data
     if (opt_value) {
-      if (opt_value['caption']) this.title(opt_value['caption']);
+      var title = opt_value['title'] || opt_value['caption'];
+      if (title) this.title(title);
       if (opt_value['rows']) opt_value = opt_value['rows'];
     }
     this.series_.data(opt_value, opt_csvSettings);

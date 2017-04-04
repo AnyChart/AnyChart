@@ -174,7 +174,7 @@ anychart.modules.data_adapter.parseHtmlTable = function(opt_tableSelector, opt_r
     if (captionElement) caption = opt_valueProcessor ?
           opt_valueProcessor.call(undefined, captionElement) :
           captionElement.innerText;
-    if (caption) result['caption'] = caption;
+    if (caption) result['title'] = caption;
 
     // parse table header
     var headersElements = table['querySelectorAll'](opt_headersSelector);
