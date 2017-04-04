@@ -39,3 +39,4 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.BAR] = anychart.bar;
 
 //exports
 goog.exportSymbol('anychart.bar', anychart.bar);
+goog.exportSymbol('anychart.vertical', anychart.bar);

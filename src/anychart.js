@@ -687,6 +687,10 @@ anychart.bar = anychart.bar || anychart.createNFIMError('Bar chart');
 
 
 /** @ignoreDoc */
+anychart.vertical = anychart.vertical || anychart.createNFIMError('Bar chart');
+
+
+/** @ignoreDoc */
 anychart.bar3d = anychart.bar3d || anychart.createNFIMError('3D Bar chart');
 
 
@@ -1093,6 +1097,7 @@ goog.exportSymbol('anychart.area', anychart.area);//linkedFromModule
 goog.exportSymbol('anychart.verticalArea', anychart.verticalArea);//linkedFromModule
 goog.exportSymbol('anychart.area3d', anychart.area3d);
 goog.exportSymbol('anychart.bar', anychart.bar);//linkedFromModule
+goog.exportSymbol('anychart.vertical', anychart.vertical);
 goog.exportSymbol('anychart.bar3d', anychart.bar3d);
 goog.exportSymbol('anychart.box', anychart.box);
 goog.exportSymbol('anychart.bubble', anychart.bubble);//linkedFromModule

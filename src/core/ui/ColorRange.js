@@ -850,7 +850,7 @@ anychart.core.ui.ColorRange.prototype.handleMouseClick = function(event) {
       var scaleMin = /** @type {number} */(scale.minimum());
       var scaleMax = /** @type {number} */(scale.maximum());
       while (iterator.advance()) {
-        pointValue = /** @type {number} */(iterator.get(series.drawer.valueFieldName));
+        pointValue = /** @type {number} */(iterator.get(series.drawer ? series.drawer.valueFieldName : series.referenceValueNames[1]));
         pointValue = goog.math.clamp(pointValue, scaleMin, scaleMax);
         var currLength = Math.abs(value - pointValue);
         if (minLength > currLength) {
@@ -864,7 +864,7 @@ anychart.core.ui.ColorRange.prototype.handleMouseClick = function(event) {
       value = targetValue;
 
       while (iterator.advance()) {
-        pointValue = /** @type {number} */(iterator.get(series.drawer.valueFieldName));
+        pointValue = /** @type {number} */(iterator.get(series.drawer ? series.drawer.valueFieldName : series.referenceValueNames[1]));
         pointValue = goog.math.clamp(pointValue, scaleMin, scaleMax);
         if (pointValue == value)
           points.push(iterator.getIndex());
@@ -939,7 +939,7 @@ anychart.core.ui.ColorRange.prototype.handleMouseOverAndMove = function(event) {
       var scaleMax = /** @type {number} */(scale.maximum());
 
       while (iterator.advance()) {
-        pointValue = /** @type {number} */(iterator.get(series.drawer.valueFieldName));
+        pointValue = /** @type {number} */(iterator.get(series.drawer ? series.drawer.valueFieldName : series.referenceValueNames[1]));
         pointValue = goog.math.clamp(pointValue, scaleMin, scaleMax);
         var currLength = Math.abs(value - pointValue);
         if (minLength > currLength) {
@@ -952,7 +952,7 @@ anychart.core.ui.ColorRange.prototype.handleMouseOverAndMove = function(event) {
       iterator = series.getResetIterator();
       value = targetValue;
       while (iterator.advance()) {
-        pointValue = /** @type {number} */(iterator.get(series.drawer.valueFieldName));
+        pointValue = /** @type {number} */(iterator.get(series.drawer ? series.drawer.valueFieldName : series.referenceValueNames[1]));
         pointValue = goog.math.clamp(pointValue, scaleMin, scaleMax);
         if (pointValue == value)
           points.push(iterator.getIndex());

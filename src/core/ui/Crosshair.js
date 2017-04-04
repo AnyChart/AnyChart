@@ -194,9 +194,9 @@ anychart.core.ui.Crosshair.prototype.yAxis = function(opt_value) {
       this.suspendSignalsDispatching();
       // set format
       if (!this.yLabel_.format() ||
-          (this.yAxis_ && this.yLabel_.format() == this.yAxis_.labels().format())) {
+          (this.yAxis_ && this.yLabel_.format() == this.yAxis_.labels()['format']())) {
 
-        this.yLabel_.format(/** @type {Function} */(opt_value.labels().format()));
+        this.yLabel_.format(/** @type {Function} */(opt_value.labels()['format']()));
       }
 
       // set anchor
