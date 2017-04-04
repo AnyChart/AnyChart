@@ -39,6 +39,7 @@
     "npm-debug.log",
     "libs",
     "out",
+    "src",
     "*.pyc",
     "*.swp",
     "node_modules",

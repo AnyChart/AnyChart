@@ -4,6 +4,7 @@
 *.pid
 libs
 out
+src
 *.swo
 *.pyc
 **/.*

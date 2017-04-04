@@ -1,6 +1,6 @@
 {
   "name": "anychart",
-  "version": "7.13.0",
+  "version": "7.13.1",
   "description": "Robust JavaScript/HTML5 Chart library for any project",
   "main": "index.js",
   "scripts": {

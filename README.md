@@ -1,4 +1,4 @@
-[<img src="https://cdn.anychart.com/images/logo-transparent-segoe.png?2" width="234px" alt="AnyChart - Robust JavaScript/HTML5 Chart library for any project">](http://www.anychart.com)
+[<img src="https://cdn.anychart.com/images/logo-transparent-segoe.png?2" width="234px" alt="AnyChart - Robust JavaScript/HTML5 Chart library for any project">](https://www.anychart.com)
 
 AnyChart Data Visualization Framework
 =========
@@ -9,9 +9,11 @@ AnyChart is a flexible JavaScript (HTML5, SVG, VML) charting framework that fits
 
 * [Download and install](#download-and-install)
 * [Getting started](#getting-started)
-* [Using AnyChart in Node.js](#using-anychart-in-nodejs)
-* [Build and debug](#build-and-debug)
+* [Plugins](#plugins)
+* [Using AnyChart with TypeScript](#using-anychart-with-typescript)
+* [Technical Integrations](#technical-integrations)
 * [Contribution guide](#contribution-guide)
+* [Build and debug](#build-and-debug)
 * [Package directory](#package-directory)
 * [Contacts](#contacts)
 * [Links](#links)
@@ -80,9 +82,82 @@ The fastest way to start with AnyChart is to include framework into a webpage an
 * [AnyMap Quick Start](http://docs.anychart.com/latest/Maps/Quick_Start)
 * [AnyGantt Quick Start](http://docs.anychart.com/latest/Gantt_Chart/Quick_Start)
 
-## Using AnyChart in Node.js
+## Plugins
 
-To use AnyChart in [Node.js](https://nodejs.org) please see [https://github.com/AnyChart/AnyChart-NodeJS](https://github.com/AnyChart/AnyChart-NodeJS)
+AnyChart provides wide variety of [plugins](https://www.anychart.com/plugins/) for different kind of technologies, which includes:
+
+* [AngularJS v1.x](https://www.anychart.com/plugins/angularjs-v1x-charts/)
+* [AngularJS v2.x](https://www.anychart.com/plugins/angularjs-v2x-charts/)
+* [React](https://www.anychart.com/plugins/react-charts/)
+* [Ember](https://www.anychart.com/plugins/ember-charts/)
+* [Meteor](https://www.anychart.com/plugins/meteor-charts/)
+* [NodeJS](https://www.anychart.com/plugins/nodejs-charts/)
+* [Qlik](https://www.anychart.com/plugins/qlik-charts/)
+* [jQuery](https://www.anychart.com/plugins/jquery-charts/)
+
+## Using AnyChart with TypeScript
+
+You can use AnyChart in your TypeScript projects - we have definition file for our library which you can find in [distribution folder](https://github.com/AnyChart/anychart/tree/master/dist/index.d.ts).
+
+## Technical Integrations
+
+AnyChart can run on any platform and with any database. [These samples](https://www.anychart.com/integrations/) were created to demonstrate how AnyChart can be easily integrated into your environment.
+All examples are distributed under an Apache 2.0 License and can be customized to your application. If you are interested in a particular integration not listed here, please [contact us](https://www.anychart.com/support/).
+<table>
+<tbody>
+<tr>
+  <td><a href="https://www.anychart.com/integrations/asp-net-c-sharp-mysql-charts/">ASP.NET, C# and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/asp-net-vb-mysql-charts/">ASP.NET, VB.NET and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/asp-net-signalr-mysql-charts/">ASP.NET, C#, SignalR and MySQL</a></td>
+</tr>
+<tr>
+  <td><a href="https://www.anychart.com/integrations/golang-revel-mysql-charts/">Go, Revel and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/golang-http-mysql-charts/">Go and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/java-jsp-jdbc-mysql-charts/">Java Servlets, Maven, JDBC, JSP and MySQL</a></td>
+</tr>
+<tr>
+  <td><a href="https://www.anychart.com/integrations/nodejs-socket-io-mongodb-charts/">NodeJS and MongoDB using socket.io</a></td>
+  <td><a href="https://www.anychart.com/integrations/java-spring-hibernate-mysql-charts/">Java Spring, Maven, Hibernate and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/julia-http-mysql-charts/">Julia and MySQL</a></td>
+</tr>
+<tr>
+  <td><a href="https://www.anychart.com/integrations/nodejs-express-mongodb-charts/">NodeJS Express, Jade and MongoDB</a></td>
+  <td><a href="https://www.anychart.com/integrations/php-symfony-mysql-charts/">PHP, Symfony and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/php-laravel-mysql-charts/">PHP, Laravel and MySQL</a></td>
+</tr>
+<tr>
+  <td><a href="https://www.anychart.com/integrations/php-slim-mysql-charts/">PHP, Slim and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/perl-catalyst-basic-charts/">Perl, Catalyst Web Framework and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/python-flask-mysql-charts/">Python, Flask and MySQL</a></td>
+</tr>
+<tr>
+  <td><a href="https://www.anychart.com/integrations/python-django-mysql-charts/">Python, Django and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/r-shiny-mysql-charts/">R, Shiny and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/ruby-sinatra-mysql-charts/">Ruby, Sinatra and MySQL</a></td>
+</tr>
+<tr>
+  <td><a href="https://www.anychart.com/integrations/ruby-rails-mysql-charts/">Ruby on Rails and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/scala-akka-http-mysql-charts/">Scala, Akka and MySQL</a></td>
+  <td><a href="https://www.anychart.com/integrations/scala-play-mysql-charts/">Scala, Play and MySQL</a></td>
+</tr>
+</tbody>
+</table>
+
+## Contribution guide
+
+To contribute to AnyChart project please:
+
+* Fork AnyChart repository.
+* Create a branch from the `develop` branch.
+* Make any changes you want to contribute.
+* Create a pull request against the `develop` branch.
+
+[GitHub documentation: Forking repositories](https://help.github.com/articles/fork-a-repo/).  
+[GitHub documentation: Collaborating using pull requests](https://help.github.com/categories/collaborating-with-issues-and-pull-requests/).
+
+Please, note:  
+1. AnyChart bears no responsibility for the code written by third-party developers until pull request is accepted.  
+2. After pull request is accepted the author of pull request sign over all rights to the code to AnyChart.  
 
 ## Build and debug
 
@@ -131,22 +206,6 @@ The `-df` option generates **property renaming report**, **variable renaming rep
 
 Source map maps minified code to source code. Read more about using [source maps in Chrome](https://developers.google.com/web/tools/chrome-devtools/javascript/source-maps) or [source maps in Firefox](https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map).
 
-## Contribution guide
-
-To contribute to AnyChart project please:
-
-* Fork AnyChart repository.
-* Create a branch from the `develop` branch.
-* Make any changes you want to contribute.
-* Create a pull request against the `develop` branch.
-
-[GitHub documentation: Forking repositories](https://help.github.com/articles/fork-a-repo/).  
-[GitHub documentation: Collaborating using pull requests](https://help.github.com/categories/collaborating-with-issues-and-pull-requests/).
-
-Please, note:  
-1. AnyChart bears no responsibility for the code written by third-party developers until pull request is accepted.  
-2. After pull request is accepted the author of pull request sign over all rights to the code to AnyChart.  
-
 ## Package directory
 
 ```
@@ -187,7 +246,7 @@ The `dist` folder contains binaries and JSON/XML Schemas.
 
 ## Contacts
 
-* Web: [www.anychart.com](www.anychart.com)
+* Web: [www.anychart.com](https://www.anychart.com)
 * Email: [contact@anychart.com](mailto:contact@anychart.com)
 * Twitter: [anychart](https://twitter.com/anychart)
 * Facebook: [AnyCharts](https://www.facebook.com/AnyCharts)
@@ -195,17 +254,17 @@ The `dist` folder contains binaries and JSON/XML Schemas.
 
 ## Links
 
-* [AnyChart Website](http://www.anychart.com)
-* [Download AnyChart](http://www.anychart.com/download/)
-* [AnyChart Licensing](http://www.anychart.com/buy/)
-* [AnyChart Support](http://www.anychart.com/support/)
-* [Report Issues](http://github.com/AnyChart/anychart/issues)
-* [AnyChart Playground](http://playground.anychart.com)
-* [AnyChart Documentation](http://docs.anychart.com)
-* [AnyChart API Reference](http://api.anychart.com)
-* [AnyChart Sample Solutions](http://www.anychart.com/solutions/)
-* [AnyChart Integrations](http://www.anychart.com/integrations/)
+* [AnyChart Website](https://www.anychart.com)
+* [Download AnyChart](https://www.anychart.com/download/)
+* [AnyChart Licensing](https://www.anychart.com/buy/)
+* [AnyChart Support](https://www.anychart.com/support/)
+* [Report Issues](https://github.com/AnyChart/anychart/issues)
+* [AnyChart Playground](https://playground.anychart.com)
+* [AnyChart Documentation](https://docs.anychart.com)
+* [AnyChart API Reference](https://api.anychart.com)
+* [AnyChart Sample Solutions](https://www.anychart.com/solutions/)
+* [AnyChart Integrations](https://www.anychart.com/integrations/)
 
 ## License
 
-[© AnyChart.com - JavaScript charts](http://www.anychart.com). All rights reserved.
+[© AnyChart.com - JavaScript charts](https://www.anychart.com). All rights reserved.
