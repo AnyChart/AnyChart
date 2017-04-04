@@ -98,7 +98,7 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnName = function() {
-    return this['name'] || this['getDataValue']('id');
+    return this['name'] || this['getData']('id');
   };
 
   var returnMilestoneName = function() {
@@ -115,7 +115,7 @@ goog.provide('anychart.themes.defaultTheme');
    * @return {*}
    */
   var returnNameWithValue = function() {
-    var name = this['name'] || this['getDataValue']('id');
+    var name = this['name'] || this['getData']('id');
     return name + '\n' + locNum(this['value']);
   };
 
@@ -2726,12 +2726,12 @@ goog.provide('anychart.themes.defaultTheme');
              * @return {*}
              */
             'format': function() {
-              if (this['getDataValue']('name')) {
-                return this['getDataValue']('name');
+              if (this['getData']('name')) {
+                return this['getData']('name');
               } else if (this['name']) {
                 return this['name'];
-              } else if (this['getDataValue']('id')) {
-                return this['getDataValue']('id');
+              } else if (this['getData']('id')) {
+                return this['getData']('id');
               } else {
                 return 'lat: ' + this['lat'] + '\nlong: ' + this['long'];
               }
@@ -2757,7 +2757,7 @@ goog.provide('anychart.themes.defaultTheme');
              * @return {*}
              */
             'titleFormat': function() {
-              return this['name'] || this['getDataValue']('name') || 'Tooltip title';
+              return this['name'] || this['getData']('name') || 'Tooltip title';
             },
             /**
              * @this {*}

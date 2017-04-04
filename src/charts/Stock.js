@@ -1471,10 +1471,10 @@ anychart.charts.Stock.prototype.highlightAtRatio_ = function(ratio, clientX, cli
     }
     var grouping = /** @type {anychart.core.stock.Grouping} */(this.grouping());
     tooltip.showForSeriesPoints(points, clientX, clientY, null, false, {
-      'hoveredDate': value,
-      'dataIntervalUnit': grouping.getCurrentDataInterval()['unit'],
-      'dataIntervalUnitCount': grouping.getCurrentDataInterval()['count'],
-      'isGrouped': grouping.isGrouped()
+      'hoveredDate': {value: value, type: anychart.enums.TokenType.DATE_TIME},
+      'dataIntervalUnit': {value: grouping.getCurrentDataInterval()['unit'], type: anychart.enums.TokenType.STRING},
+      'dataIntervalUnitCount': {value: grouping.getCurrentDataInterval()['count'], type: anychart.enums.TokenType.NUMBER},
+      'isGrouped': {value: grouping.isGrouped()}
     });
   }
   //}

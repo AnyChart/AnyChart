@@ -2,8 +2,8 @@ goog.provide('anychart.core.resource.Conflicts');
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.LabelsFactory');
-goog.require('anychart.core.utils.GenericContextProvider');
 goog.require('anychart.core.utils.TypedLayer');
+goog.require('anychart.format.Context');
 goog.require('anychart.math.Rect');
 
 
@@ -86,6 +86,12 @@ anychart.core.resource.Conflicts = function(chart) {
    * @private
    */
   this.conflicts_ = [];
+
+  /**
+   * @type {anychart.format.Context}
+   * @private
+   */
+  this.formatProvider_ = null;
 };
 goog.inherits(anychart.core.resource.Conflicts, anychart.core.VisualBase);
 
@@ -383,27 +389,24 @@ anychart.core.resource.Conflicts.prototype.labelsInvalidated_ = function(event) 
  * @return {Object}
  */
 anychart.core.resource.Conflicts.prototype.createFormatProvider = function(date, allocation, resource) {
+  if (!this.formatProvider_)
+    this.formatProvider_ = new anychart.format.Context();
+
   var minutes = allocation.allocated - allocation.vacant;
-  return new anychart.core.utils.GenericContextProvider({
-    'minutes': minutes,
-    'hours': minutes / 60,
-    'hoursRounded': Math.ceil(minutes / 30) / 2,
-    'percent': minutes / allocation.vacant * 100,
-    'allocated': allocation.allocated,
-    'vacant': allocation.vacant,
-    'activities': goog.array.map(allocation.activities, function(index) {
+  var values = {
+    'minutes': {value: minutes, type: anychart.enums.TokenType.NUMBER},
+    'hours': {value: minutes / 60, type: anychart.enums.TokenType.NUMBER},
+    'hoursRounded': {value: Math.ceil(minutes / 30) / 2, type: anychart.enums.TokenType.NUMBER},
+    'percent': {value: minutes / allocation.vacant * 100, type: anychart.enums.TokenType.NUMBER},
+    'allocated': {value: allocation.allocated, type: anychart.enums.TokenType.NUMBER},
+    'vacant': {value: allocation.vacant, type: anychart.enums.TokenType.NUMBER},
+    'activities': {value: goog.array.map(allocation.activities, function(index) {
       var activity = resource.getActivity(index);
       return activity ? activity.data : null;
-    })
-  }, {
-    'minutes': anychart.enums.TokenType.NUMBER,
-    'hours': anychart.enums.TokenType.NUMBER,
-    'hoursRounded': anychart.enums.TokenType.NUMBER,
-    'percent': anychart.enums.TokenType.NUMBER,
-    'allocated': anychart.enums.TokenType.NUMBER,
-    'vacant': anychart.enums.TokenType.NUMBER,
-    'activities': anychart.enums.TokenType.UNKNOWN
-  });
+    }), type: anychart.enums.TokenType.UNKNOWN}
+  };
+
+  return this.formatProvider_.propagate(values);
 };
 
 

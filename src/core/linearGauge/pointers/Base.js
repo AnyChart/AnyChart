@@ -1,11 +1,11 @@
 goog.provide('anychart.core.linearGauge.pointers.Base');
+
 goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.utils.IInteractiveSeries');
-goog.require('anychart.core.utils.LegendContextProvider');
 goog.require('anychart.core.utils.LegendItemSettings');
 goog.require('anychart.core.utils.LinearGaugeInteractivityState');
-goog.require('anychart.core.utils.LinearGaugePointerContextProvider');
+goog.require('anychart.format.Context');
 
 
 
@@ -1068,9 +1068,9 @@ anychart.core.linearGauge.pointers.Base.prototype.createLegendContextProvider = 
      * Legend context cache.
      * @type {Object}
      */
-    this.legendProvider = new anychart.core.utils.LegendContextProvider(this);
+    this.legendProvider = new anychart.format.Context(void 0, void 0, [this]);
   }
-  return this.legendProvider;
+  return this.legendProvider; //nothing to propagate().
 };
 
 
@@ -1448,11 +1448,23 @@ anychart.core.linearGauge.pointers.Base.prototype.makePointEvent = function(even
  */
 anychart.core.linearGauge.pointers.Base.prototype.createFormatProvider = function(opt_force) {
   this.getIterator().select(/** @type {number} */ (this.dataIndex()));
-  if (!this.pointProvider_ || opt_force)
-    this.pointProvider_ = new anychart.core.utils.LinearGaugePointerContextProvider(this, this.referenceValueNames);
-  this.pointProvider_.applyReferenceValues();
 
-  return this.pointProvider_;
+  if (!this.pointProvider_ || opt_force)
+    this.pointProvider_ = new anychart.format.Context();
+
+  var iterator = this.getIterator();
+  var values = {
+    'pointer': {value: this, type: anychart.enums.TokenType.UNKNOWN},
+    'index': {value: iterator.getIndex(), type: anychart.enums.TokenType.NUMBER},
+    'value': {value: iterator.get('value'), type: anychart.enums.TokenType.NUMBER},
+    'name': {value: this.name() || 'Pointer ' + this.autoIndex(), type: anychart.enums.TokenType.STRING},
+    'high': {value: iterator.get('high'), type: anychart.enums.TokenType.NUMBER},
+    'low': {value: iterator.get('low'), type: anychart.enums.TokenType.NUMBER}
+  };
+
+  this.pointProvider_.dataSource(iterator);
+
+  return this.pointProvider_.propagate(values);
 };
 
 

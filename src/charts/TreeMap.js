@@ -1,4 +1,5 @@
 goog.provide('anychart.charts.TreeMap');
+
 goog.require('anychart.core.SeparateChart');
 goog.require('anychart.core.TreeMapPoint');
 goog.require('anychart.core.reporting');
@@ -8,9 +9,9 @@ goog.require('anychart.core.ui.MarkersFactory');
 goog.require('anychart.core.utils.ArrayIterator');
 goog.require('anychart.core.utils.IInteractiveSeries');
 goog.require('anychart.core.utils.InteractivityState');
-goog.require('anychart.core.utils.TreeMapPointContextProvider');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.data.Tree');
+goog.require('anychart.format.Context');
 goog.require('anychart.utils');
 
 
@@ -1748,13 +1749,28 @@ anychart.charts.TreeMap.prototype.getBoundsForContent_ = function(bounds, header
 /**
  * Creates format provider for point.
  * @param {boolean=} opt_force Force creating of provider.
- * @return {anychart.core.utils.TreeMapPointContextProvider} Provider.
+ * @return {anychart.format.Context} Provider.
  */
 anychart.charts.TreeMap.prototype.createFormatProvider = function(opt_force) {
   if (!this.pointProvider_ || opt_force)
-    this.pointProvider_ = new anychart.core.utils.TreeMapPointContextProvider(this);
-  this.pointProvider_.applyReferenceValues();
-  return this.pointProvider_;
+    this.pointProvider_ = new anychart.format.Context();
+
+  var iterator = this.getIterator();
+  var dataItem = iterator.getItem();
+
+  var values = {
+    'chart': {value: this, type: anychart.enums.TokenType.UNKNOWN},
+    'index': {value: iterator.getIndex(), type: anychart.enums.TokenType.NUMBER},
+    'name': {value: dataItem.get('name'), type: anychart.enums.TokenType.STRING},
+    'value': {value: dataItem.meta('value'), type: anychart.enums.TokenType.NUMBER},
+    'size': {value: dataItem.meta('size'), type: anychart.enums.TokenType.NUMBER}
+  };
+
+  this.pointProvider_
+      .dataSource(dataItem)
+      .statisticsSources([this]);
+
+  return /** @type {anychart.format.Context} */ (this.pointProvider_.propagate(values));
 };
 
 

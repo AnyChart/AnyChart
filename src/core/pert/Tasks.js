@@ -160,7 +160,7 @@ anychart.core.pert.Tasks.prototype.dummyFill = function(opt_fillOrColorOrKeys, o
 
 /**
  * Gets final dummy fill.
- * @param {anychart.core.utils.PertPointContextProvider} provider - Context provider.
+ * @param {anychart.format.Context} provider - Context provider.
  * @return {!acgraph.vector.Fill} - Final fill.
  */
 anychart.core.pert.Tasks.prototype.getFinalDummyFill = function(provider) {
@@ -252,7 +252,7 @@ anychart.core.pert.Tasks.prototype.dummyStroke = function(opt_strokeOrFill, opt_
 
 /**
  * Gets final dummy stroke.
- * @param {anychart.core.utils.PertPointContextProvider} provider - Context provider.
+ * @param {anychart.format.Context} provider - Context provider.
  * @return {!acgraph.vector.Stroke} - Final fill.
  */
 anychart.core.pert.Tasks.prototype.getFinalDummyStroke = function(provider) {

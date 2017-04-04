@@ -5427,6 +5427,22 @@ anychart.enums.Statistics = {
 };
 
 
+/**
+ * Statistics enums lower case representation.
+ * NOTE: for internal usage only.
+ * @type {Object.<anychart.enums.Statistics>}
+ */
+anychart.enums.StatisticsLowerCase = {};
+
+
+(function() {
+  for (var key in anychart.enums.Statistics) {
+    if (anychart.enums.Statistics.hasOwnProperty(key))
+      anychart.enums.StatisticsLowerCase[key] = anychart.enums.Statistics[key].toLowerCase();
+  }
+}());
+
+
 //region General series related enums
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -6339,10 +6355,11 @@ goog.exportSymbol('anychart.enums.StepDirection.CENTER', anychart.enums.StepDire
 goog.exportSymbol('anychart.enums.StepDirection.FORWARD', anychart.enums.StepDirection.FORWARD);
 goog.exportSymbol('anychart.enums.StepDirection.BACKWARD', anychart.enums.StepDirection.BACKWARD);
 
-goog.exportSymbol('anychart.enums.TokenType.UNKNOWN', anychart.enums.TokenType.UNKNOWN);
-goog.exportSymbol('anychart.enums.TokenType.NUMBER', anychart.enums.TokenType.NUMBER);
-goog.exportSymbol('anychart.enums.TokenType.STRING', anychart.enums.TokenType.STRING);
-goog.exportSymbol('anychart.enums.TokenType.DATE_TIME', anychart.enums.TokenType.DATE_TIME);
+goog.exportSymbol('anychart.enums.TokenType.UNKNOWN', anychart.enums.TokenType.UNKNOWN); //@deprecated Since 7.13.1. Don't use it at all.
+goog.exportSymbol('anychart.enums.TokenType.NUMBER', anychart.enums.TokenType.NUMBER); //@deprecated Since 7.13.1. Don't use it at all.
+goog.exportSymbol('anychart.enums.TokenType.STRING', anychart.enums.TokenType.STRING); //@deprecated Since 7.13.1. Don't use it at all.
+goog.exportSymbol('anychart.enums.TokenType.DATE_TIME', anychart.enums.TokenType.DATE_TIME); //@deprecated Since 7.13.1. Don't use it at all.
+goog.exportSymbol('anychart.enums.TokenType.PERCENT', anychart.enums.TokenType.PERCENT); //@deprecated Since 7.13.1. Don't use it at all.
 
 //goog.exportSymbol('anychart.enums.StringToken.AXIS_AVERAGE', anychart.enums.StringToken.AXIS_AVERAGE);
 //goog.exportSymbol('anychart.enums.StringToken.AXIS_BUBBLE_SIZE_MAX', anychart.enums.StringToken.AXIS_BUBBLE_SIZE_MAX);

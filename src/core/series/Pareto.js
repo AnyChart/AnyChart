@@ -1,7 +1,8 @@
 goog.provide('anychart.core.series.Pareto');
+
 goog.require('anychart.core.series.Cartesian');
 goog.require('anychart.core.utils.IInteractiveSeries');
-goog.require('anychart.core.utils.ParetoSeriesPointContextProvider');
+goog.require('anychart.format.Context');
 goog.forwardDeclare('anychart.data.ParetoMapping');
 goog.forwardDeclare('anychart.data.ParetoSeriesMapping');
 
@@ -27,24 +28,26 @@ goog.inherits(anychart.core.series.Pareto, anychart.core.series.Cartesian);
 //region --- Overrides
 /** @inheritDoc */
 anychart.core.series.Pareto.prototype.createLabelsContextProvider = function() {
-  var provider = new anychart.core.utils.ParetoSeriesPointContextProvider(this, this.getYValueNames(), this.supportsError());
-  provider.applyReferenceValues();
-  return provider;
-};
+  var provider = this.updateContext(new anychart.format.Context());
 
-
-/** @inheritDoc */
-anychart.core.series.Pareto.prototype.createTooltipContextProvider = function() {
-  if (!this.tooltipContext) {
-    /**
-     * Tooltip context cache.
-     * @type {anychart.core.utils.ParetoSeriesPointContextProvider}
-     * @protected
-     */
-    this.tooltipContext = new anychart.core.utils.ParetoSeriesPointContextProvider(this, this.getYValueNames(), this.supportsError());
+  var values = provider.values();
+  if (goog.isDef(values['index']) && values['index'].value > -1) {
+    var data = this.data();
+    if (goog.isDef(data)) {
+      var index = values['index'].value;
+      var paretoMapping = /** @type {anychart.data.Mapping} */ (data.getRowMapping(index));
+      if ((paretoMapping instanceof anychart.data.ParetoMapping) || (paretoMapping instanceof anychart.data.ParetoSeriesMapping)) {
+        values['cf'] = {value: paretoMapping.getCumulativeFrequency(index), type: anychart.enums.TokenType.NUMBER};
+        values['rf'] = {value: paretoMapping.getRelativeFrequency(index), type: anychart.enums.TokenType.NUMBER};
+      }
+    }
   }
-  this.tooltipContext.applyReferenceValues();
-  return this.tooltipContext;
+
+  var tokenAliases = provider.tokenAliases();
+  tokenAliases[anychart.enums.StringToken.CUMULATIVE_FREQUENCY] = 'cf';
+  tokenAliases[anychart.enums.StringToken.RELATIVE_FREQUENCY] = 'rf';
+
+  return provider.propagate(values);
 };
 
 

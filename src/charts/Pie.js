@@ -11,10 +11,10 @@ goog.require('anychart.core.ui.CircularLabelsFactory');
 goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.core.utils.IInteractiveSeries');
 goog.require('anychart.core.utils.PieInteractivityState');
-goog.require('anychart.core.utils.PointContextProvider');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.data.Set');
 goog.require('anychart.enums');
+goog.require('anychart.format.Context');
 goog.require('anychart.math');
 goog.require('anychart.palettes');
 
@@ -35,7 +35,7 @@ anychart.charts.Pie = function(opt_data, opt_csvSettings) {
 
   /**
    * Pie point provider.
-   * @type {anychart.core.utils.PointContextProvider}
+   * @type {anychart.format.Context}
    * @private
    */
   this.pointProvider_;
@@ -1959,7 +1959,7 @@ anychart.charts.Pie.prototype.draw3DSlices_ = function(opt_sliceIndex, opt_updat
               -1 :
               anychart.math.round(Math.sin(goog.math.toRadians(this.getCenterAngle_(side.start, side.end))), 7));
           break;
-        // for start or end side
+          // for start or end side
         default:
           side.sortWeight = anychart.math.round(Math.sin(goog.math.toRadians(side.angle)), 7);
           break;
@@ -2131,8 +2131,7 @@ anychart.charts.Pie.prototype.colorize3DSlice_ = function(pointState) {
   for (i = 0; i < length; i++) {
     side = this.sides3D_[i];
     if (side.index == index) {
-      var uniqueValue = (side.type == anychart.charts.Pie.Side3DType.FRONT ||
-          side.type == anychart.charts.Pie.Side3DType.BACK) ? side.start : '';
+      var uniqueValue = (side.type == anychart.charts.Pie.Side3DType.FRONT || side.type == anychart.charts.Pie.Side3DType.BACK) ? side.start : '';
       this.colorize3DPath_(side.type + 'Path' + uniqueValue, pointState);
     }
   }
@@ -3277,9 +3276,9 @@ anychart.charts.Pie.prototype.getPoint = function(index) {
   if (iter.select(index) &&
       point.exists() && !this.isMissing_(value = /** @type {number} */(point.get('value')))) {
 
-    point.statistics[anychart.enums.Statistics.PERCENT_VALUE] =
-        point.statistics[anychart.enums.Statistics.Y_PERCENT_OF_TOTAL] =
-            value / /** @type {number} */(this.getStat(anychart.enums.Statistics.SUM)) * 100;
+    var val = value / /** @type {number} */(this.getStat(anychart.enums.Statistics.SUM)) * 100;
+    point.statistics(anychart.enums.Statistics.PERCENT_VALUE, val);
+    point.statistics(anychart.enums.Statistics.Y_PERCENT_OF_TOTAL, val);
   }
 
   return point;
@@ -3308,6 +3307,8 @@ anychart.charts.Pie.prototype.createLegendItemsProvider = function(sourceMode, i
     if (goog.isFunction(itemsFormat)) {
       var format = this.createFormatProvider();
       itemText = itemsFormat.call(format, format);
+      if (goog.isNumber(itemText))
+        itemText = String(itemText);
     }
     if (!goog.isString(itemText)) {
       var isGrouped = !!iterator.meta('groupedPoint');
@@ -3667,7 +3668,7 @@ anychart.charts.Pie.prototype.hideTooltip = function() {
  */
 anychart.charts.Pie.prototype.calculate = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.PIE_DATA)) {
-    this.statistics = {};
+    this.resetStatistics();
 
     var iterator = this.data().getIterator();
     var value;
@@ -3692,11 +3693,11 @@ anychart.charts.Pie.prototype.calculate = function() {
     var avg;
     if (!count) min = max = sum = avg = undefined;
     else avg = sum / count;
-    this.statistics[anychart.enums.Statistics.COUNT] = count;
-    this.statistics[anychart.enums.Statistics.MIN] = min;
-    this.statistics[anychart.enums.Statistics.MAX] = max;
-    this.statistics[anychart.enums.Statistics.SUM] = sum;
-    this.statistics[anychart.enums.Statistics.AVERAGE] = avg;
+    this.statistics(anychart.enums.Statistics.COUNT, count);
+    this.statistics(anychart.enums.Statistics.MIN, min);
+    this.statistics(anychart.enums.Statistics.MAX, max);
+    this.statistics(anychart.enums.Statistics.SUM, sum);
+    this.statistics(anychart.enums.Statistics.AVERAGE, avg);
 
     this.markConsistent(anychart.ConsistencyState.PIE_DATA);
   }
@@ -3710,11 +3711,31 @@ anychart.charts.Pie.prototype.calculate = function() {
  * @protected
  */
 anychart.charts.Pie.prototype.createFormatProvider = function(opt_force) {
+  var iterator = this.getIterator();
+
   if (!this.pointProvider_ || opt_force)
-    this.pointProvider_ = new anychart.core.utils.PointContextProvider(this, ['x', 'value', 'name']);
-  this.pointProvider_.pointInternal = this.getPoint(this.getIterator().getIndex());
-  this.pointProvider_.applyReferenceValues();
-  return this.pointProvider_;
+    this.pointProvider_ = new anychart.format.Context();
+
+  this.pointProvider_
+      .dataSource(iterator)
+      .statisticsSources([this.getPoint(iterator.getIndex()), this]);
+
+  var values = { //TODO (A.Kudryavtsev): Check types!!!
+    'x': {value: iterator.get('x'), type: anychart.enums.TokenType.STRING},
+    'value': {value: iterator.get('value'), type: anychart.enums.TokenType.NUMBER},
+    'name': {value: iterator.get('name'), type: anychart.enums.TokenType.STRING},
+    'index': {value: iterator.getIndex(), type: anychart.enums.TokenType.NUMBER},
+    'chart': {value: this, type: anychart.enums.TokenType.UNKNOWN}
+  };
+
+  if (iterator.meta('groupedPoint')) {
+    values['name'] = {value: 'Other points', type: anychart.enums.TokenType.STRING};
+    values['groupedPoint'] = {value: true, type: anychart.enums.TokenType.STRING};
+    values['names'] = {value: iterator.meta('names'), type: anychart.enums.TokenType.UNKNOWN};
+    values['values'] = {value: iterator.meta('values'), type: anychart.enums.TokenType.UNKNOWN};
+  }
+
+  return this.pointProvider_.propagate(values);
 };
 
 

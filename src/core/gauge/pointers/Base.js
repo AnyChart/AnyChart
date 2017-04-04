@@ -4,7 +4,7 @@ goog.require('anychart.core.VisualBase');
 goog.require('anychart.core.reporting');
 goog.require('anychart.core.utils.IInteractiveSeries');
 goog.require('anychart.core.utils.InteractivityState');
-goog.require('anychart.core.utils.SeriesPointContextProvider');
+goog.require('anychart.format.Context');
 
 
 
@@ -381,10 +381,21 @@ anychart.core.gauge.pointers.Base.prototype.draw = function() {
  */
 anychart.core.gauge.pointers.Base.prototype.createFormatProvider = function(opt_force) {
   if (!this.pointProvider_ || opt_force)
-    this.pointProvider_ = new anychart.core.utils.SeriesPointContextProvider(this, ['value'], false);
-  this.pointProvider_.applyReferenceValues();
+    this.pointProvider_ = new anychart.format.Context();
 
-  return this.pointProvider_;
+  var iterator = this.getIterator();
+
+  var values = {
+    'series': {value: this, type: anychart.enums.TokenType.UNKNOWN},
+    'index': {value: iterator.getIndex(), type: anychart.enums.TokenType.NUMBER},
+    'value': {value: iterator.get('value'), type: anychart.enums.TokenType.NUMBER}
+  };
+
+  this.pointProvider_
+      .dataSource(iterator)
+      .statisticsSources([this]);
+
+  return this.pointProvider_.propagate(values);
 };
 
 

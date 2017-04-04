@@ -8,7 +8,7 @@ goog.require('anychart.core.reporting');
 goog.require('anychart.core.ui.IInteractiveGrid');
 goog.require('anychart.core.ui.ScrollBar');
 goog.require('anychart.core.ui.Tooltip');
-goog.require('anychart.core.utils.GanttContextProvider');
+goog.require('anychart.format.Context');
 goog.require('anychart.math.Rect');
 goog.require('goog.events.KeyHandler');
 goog.require('goog.events.MouseWheelHandler');
@@ -392,7 +392,7 @@ anychart.core.ui.BaseGrid = function(opt_controller, opt_isResource) {
 
   /**
    * Context provider.
-   * @type {anychart.core.utils.GanttContextProvider}
+   * @type {anychart.format.Context}
    * @private
    */
   this.formatProvider_ = null;
@@ -562,12 +562,49 @@ anychart.core.ui.BaseGrid.isMilestone = function(treeDataItem) {
 /** @inheritDoc */
 anychart.core.ui.BaseGrid.prototype.createFormatProvider = function(item, opt_period, opt_periodIndex) {
   if (!this.formatProvider_)
-    this.formatProvider_ = new anychart.core.utils.GanttContextProvider(this.controller.isResources());
-  this.formatProvider_.currentItem = item;
-  this.formatProvider_.currentPeriod = opt_period;
-  this.formatProvider_.currentPeriodIndex = opt_periodIndex;
-  this.formatProvider_.applyReferenceValues();
-  return this.formatProvider_;
+    this.formatProvider_ = new anychart.format.Context();
+
+  var isResources = this.controller.isResources();
+  var values = {
+    'item': {value: item, type: anychart.enums.TokenType.UNKNOWN},
+    'name': {value: item.get(anychart.enums.GanttDataFields.NAME), type: anychart.enums.TokenType.STRING},
+    'id': {value: item.get(anychart.enums.GanttDataFields.ID), type: anychart.enums.TokenType.STRING},
+  };
+
+  if (isResources) {
+    values['minPeriodDate'] = {value: item.meta('minPeriodDate'), type: anychart.enums.TokenType.DATE_TIME};
+    values['maxPeriodDate'] = {value: item.meta('maxPeriodDate'), type: anychart.enums.TokenType.DATE_TIME};
+    values['period'] = {value: opt_period, type: anychart.enums.TokenType.UNKNOWN};
+    values['periodIndex'] = {
+      value: (goog.isDefAndNotNull(opt_periodIndex) && opt_periodIndex > 0) ? opt_periodIndex : void 0,
+      type: anychart.enums.TokenType.NUMBER
+    };
+    values['periodStart'] = {
+      value: opt_period ?
+          item.getMeta(anychart.enums.GanttDataFields.PERIODS, opt_periodIndex, anychart.enums.GanttDataFields.START) :
+          void 0, type: anychart.enums.TokenType.DATE_TIME
+    };
+    values['periodEnd'] = {
+      value: opt_period ?
+          item.getMeta(anychart.enums.GanttDataFields.PERIODS, opt_periodIndex, anychart.enums.GanttDataFields.END) :
+          void 0, type: anychart.enums.TokenType.DATE_TIME
+    };
+  } else {
+    values['actualStart'] = {value: item.meta(anychart.enums.GanttDataFields.ACTUAL_START), type: anychart.enums.TokenType.DATE_TIME};
+    values['actualEnd'] = {value: item.meta(anychart.enums.GanttDataFields.ACTUAL_END), type: anychart.enums.TokenType.DATE_TIME};
+    values['progressValue'] = {value: item.meta(anychart.enums.GanttDataFields.PROGRESS_VALUE), type: anychart.enums.TokenType.PERCENT};
+
+    var isParent = !!item.numChildren();
+    values['autoStart'] = {value: isParent ? item.meta('autoStart') : void 0, type: anychart.enums.TokenType.DATE_TIME};
+    values['autoEnd'] = {value: isParent ? item.meta('autoEnd') : void 0, type: anychart.enums.TokenType.DATE_TIME};
+    values['autoProgress'] = {value: isParent ? item.meta('autoProgress') : void 0, type: anychart.enums.TokenType.PERCENT};
+  }
+
+  this.formatProvider_
+      .values(values)
+      .dataSource(item);
+
+  return this.formatProvider_.propagate();
 };
 
 

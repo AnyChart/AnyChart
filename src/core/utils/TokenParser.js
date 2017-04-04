@@ -134,10 +134,10 @@ anychart.core.utils.TokenParser.parse = function(format) {
   }
 
   function tokenTerm(token, params, provider) {
-    var value = provider['getTokenValue'](token);
+    var value = provider.getTokenValueInternal(token);
     if (!goog.isDef(value))
       return '';
-    var type = provider['getTokenType'](token);
+    var type = provider.getTokenTypeInternal(token);
     switch (type) {
       case anychart.enums.TokenType.UNKNOWN:
         return '';

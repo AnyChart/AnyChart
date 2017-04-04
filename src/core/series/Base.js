@@ -18,13 +18,12 @@ goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.core.utils.Error');
 goog.require('anychart.core.utils.ISeriesWithError');
 goog.require('anychart.core.utils.InteractivityState');
-goog.require('anychart.core.utils.LegendContextProvider');
 goog.require('anychart.core.utils.LegendItemSettings');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.core.utils.SeriesA11y');
-goog.require('anychart.core.utils.SeriesPointContextProvider');
 goog.require('anychart.core.utils.TokenParser');
 goog.require('anychart.enums');
+goog.require('anychart.format.Context');
 goog.require('anychart.math.Rect');
 goog.require('anychart.scales.IXScale');
 goog.require('anychart.utils');
@@ -1128,6 +1127,14 @@ anychart.core.series.Base.prototype.getRootLayer = function() {
 anychart.core.series.Base.prototype.getChart = function() {
   return /** @type {anychart.core.SeparateChart} */(this.chart);
 };
+
+
+/**
+ * Gets wrapped point by index.
+ * @param {number} index Point index.
+ * @return {anychart.core.Point} Wrapped point.
+ */
+anychart.core.series.Base.prototype.getPoint = goog.abstractMethod;
 
 
 //endregion
@@ -2944,7 +2951,6 @@ anychart.core.series.Base.prototype.draw = function() {
   }
 
   if (this.hasInvalidationState(anychart.ConsistencyState.A11Y)) {
-    //SeriesPointContextProvider is pretty suitable in this case.
     this.a11y().applyA11y();
     this.markConsistent(anychart.ConsistencyState.A11Y);
   }
@@ -3488,32 +3494,98 @@ anychart.core.series.Base.prototype.makePointMeta = function(rowInfo, yNames, yC
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * Applies required data to format context.
+ * @param {anychart.format.Context} provider - Format context.
+ * @param {anychart.data.IRowInfo=} opt_rowInfo - Data source.
+ * @return {anychart.format.Context} - Updated format context.
+ */
+anychart.core.series.Base.prototype.updateContext = function(provider, opt_rowInfo) {
+  var rowInfo = opt_rowInfo || this.getIterator();
+  var scale = this.getXScale();
+  var values = {
+    'chart': {value: this.getChart(), type: anychart.enums.TokenType.UNKNOWN},
+    'series': {value: this, type: anychart.enums.TokenType.UNKNOWN},
+    'xScale': {value: scale, type: anychart.enums.TokenType.UNKNOWN},
+    'index': {value: rowInfo.getIndex(), type: anychart.enums.TokenType.NUMBER},
+    'x': {value: rowInfo.get('x'), type: anychart.enums.TokenType.STRING},
+    'seriesName': {value: this.name(), type: anychart.enums.TokenType.STRING},
+  };
+
+  if (scale && goog.isFunction(scale.getType))
+    values['xScaleType'] = {value: scale.getType(), type: anychart.enums.TokenType.STRING};
+
+  if (this.isSizeBased())
+    values['size'] = {value: rowInfo.get('size'), type: anychart.enums.TokenType.NUMBER};
+
+  if (this.supportsError()) {
+    /** @type {anychart.core.utils.ISeriesWithError} */
+    var series = /** @type {anychart.core.utils.ISeriesWithError} */(this);
+    /** @type {anychart.enums.ErrorMode} */
+    var mode = /** @type {anychart.enums.ErrorMode} */(series.error().mode());
+    var error;
+    if (mode == anychart.enums.ErrorMode.BOTH || mode == anychart.enums.ErrorMode.VALUE) {
+      error = series.getErrorValues(false);
+      values['valueLowerError'] = {value: error[0], type: anychart.enums.TokenType.NUMBER};
+      values['valueUpperError'] = {value: error[1], type: anychart.enums.TokenType.NUMBER};
+    }
+    if (mode == anychart.enums.ErrorMode.BOTH || mode == anychart.enums.ErrorMode.X) {
+      error = series.getErrorValues(true);
+      values['xLowerError'] = {value: error[0], type: anychart.enums.TokenType.NUMBER};
+      values['xUpperError'] = {value: error[1], type: anychart.enums.TokenType.NUMBER};
+    }
+  }
+
+  var refValueNames = this.getYValueNames();
+  for (var i = 0; i < refValueNames.length; i++) {
+    var refName = refValueNames[i];
+    values[refName] = {value: rowInfo.get(refName), type: anychart.enums.TokenType.NUMBER};
+  }
+
+  var tokenAliases = {};
+  tokenAliases[anychart.enums.StringToken.BUBBLE_SIZE] = 'size';
+  tokenAliases[anychart.enums.StringToken.RANGE_START] = 'low';
+  tokenAliases[anychart.enums.StringToken.RANGE_END] = 'high';
+  tokenAliases[anychart.enums.StringToken.X_VALUE] = 'x';
+
+  var tokenCustomValues = {};
+  var diff = /** @type {number} */ (rowInfo.get('high')) - /** @type {number} */ (rowInfo.get('low'));
+  tokenCustomValues[anychart.enums.StringToken.RANGE] = {value: diff, type: anychart.enums.TokenType.NUMBER};
+  tokenCustomValues[anychart.enums.StringToken.NAME] = {value: rowInfo.get('name'), type: anychart.enums.TokenType.STRING};
+
+  provider
+      .statisticsSources([this.getPoint(rowInfo.getIndex()), this, this.getChart()])
+      .dataSource(rowInfo)
+      .tokenAliases(tokenAliases)
+      .tokenCustomValues(tokenCustomValues);
+
+  return /** @type {anychart.format.Context} */ (provider.propagate(values));
+};
+
+
+/**
  * Creates labels format provider.
  * @return {Object} Object with info for labels formatting.
  * @protected
  */
 anychart.core.series.Base.prototype.createLabelsContextProvider = function() {
-  var provider = new anychart.core.utils.SeriesPointContextProvider(this, this.getYValueNames(), this.supportsError());
-  provider.applyReferenceValues();
-  return provider;
+  return this.updateContext(new anychart.format.Context());
 };
 
 
 /**
  * Creates tooltip context provider.
- * @return {!anychart.core.utils.SeriesPointContextProvider}
+ * @return {anychart.format.Context}
  */
 anychart.core.series.Base.prototype.createTooltipContextProvider = function() {
   if (!this.tooltipContext) {
     /**
      * Tooltip context cache.
-     * @type {anychart.core.utils.SeriesPointContextProvider}
+     * @type {anychart.format.Context}
      * @protected
      */
-    this.tooltipContext = new anychart.core.utils.SeriesPointContextProvider(this, this.getYValueNames(), this.supportsError());
+    this.tooltipContext = new anychart.format.Context();
   }
-  this.tooltipContext.applyReferenceValues();
-  return this.tooltipContext;
+  return this.updateContext(this.tooltipContext);
 };
 
 
@@ -3523,14 +3595,16 @@ anychart.core.series.Base.prototype.createTooltipContextProvider = function() {
  * @protected
  */
 anychart.core.series.Base.prototype.createLegendContextProvider = function() {
-  if (!this.legendProvider) {
-    /**
-     * Legend context cache.
-     * @type {Object}
-     */
-    this.legendProvider = new anychart.core.utils.LegendContextProvider(this);
-  }
-  return this.legendProvider;
+  if (!this.legendProvider_)
+    this.legendProvider_ = new anychart.format.Context(void 0, void 0, [this, this.chart]);
+
+  var values = {
+    'series': {value: this, type: anychart.enums.TokenType.UNKNOWN},
+    'chart': {value: this.getChart(), type: anychart.enums.TokenType.UNKNOWN}
+  };
+  this.legendProvider_.statisticsSources([this, this.chart]);
+
+  return this.legendProvider_.propagate(values);
 };
 
 
@@ -4175,10 +4249,10 @@ anychart.core.settings.populate(anychart.core.series.Base, anychart.core.series.
 anychart.core.series.Base.prototype.statistics = function(opt_name, opt_value) {
   if (goog.isDef(opt_name)) {
     if (goog.isDef(opt_value)) {
-      this.statistics_[opt_name] = opt_value;
+      this.statistics_[opt_name.toLowerCase()] = opt_value;
       return this;
     } else {
-      return this.statistics_[opt_name];
+      return this.statistics_[opt_name.toLowerCase()];
     }
   } else {
     return this.statistics_;
@@ -4199,7 +4273,7 @@ anychart.core.series.Base.prototype.calculateStatistics = goog.nullFunction;
  */
 anychart.core.series.Base.prototype.getStat = function(key) {
   this.chart.ensureStatisticsReady();
-  return this.statistics_[key];
+  return this.statistics(key);
 };
 
 

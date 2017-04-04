@@ -5,7 +5,7 @@ goog.require('anychart.core.axes.MapTicks');
 goog.require('anychart.core.settings');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.Title');
-goog.require('anychart.core.utils.MapAxisLabelsContextProvider');
+goog.require('anychart.format.Context');
 goog.require('anychart.math.Rect');
 //endregion
 
@@ -845,7 +845,55 @@ anychart.core.axes.Map.prototype.getOverlappedLabels_ = function() {
  * @protected
  */
 anychart.core.axes.Map.prototype.getLabelsFormatProvider = function(index, value) {
-  return new anychart.core.utils.MapAxisLabelsContextProvider(this, index, value);
+  var labelText, sideOfTheWorld;
+  value = parseFloat(value);
+
+  var grad, minutes, seconds;
+  var decimal = Math.abs(value) % 1;
+
+  grad = Math.floor(Math.abs(value));
+  minutes = Math.floor(60 * decimal);
+  seconds = Math.floor(60 * ((60 * decimal) % 1));
+
+  labelText = grad + '\u00B0';
+  if (seconds != 0 || (!seconds && minutes != 0)) {
+    minutes += '';
+    if (minutes.length == 1) minutes = '0' + minutes;
+    labelText += minutes + '\'';
+  }
+
+  if (this.isHorizontal()) {
+    sideOfTheWorld = value > 0 ? 'E' : 'W';
+  } else {
+    sideOfTheWorld = value > 0 ? 'N' : 'S';
+  }
+
+  labelText += sideOfTheWorld;
+  var scale = this.scale();
+
+  var values = {
+    'axis': {value: this, type: anychart.enums.TokenType.UNKNOWN},
+    'scale': {value: scale, type: anychart.enums.TokenType.UNKNOWN},
+    'index': {value: index, type: anychart.enums.TokenType.NUMBER},
+    'value': {value: labelText, type: anychart.enums.TokenType.STRING},
+    'tickValue': {value: value, type: anychart.enums.TokenType.NUMBER},
+    'max': {value: goog.isDef(scale.max) ? scale.max : null, type: anychart.enums.TokenType.NUMBER},
+    'min': {value: goog.isDef(scale.max) ? scale.max : null, type: anychart.enums.TokenType.NUMBER}
+  };
+
+  var tokenAliases = {};
+  tokenAliases[anychart.enums.StringToken.AXIS_SCALE_MAX] = 'max';
+  tokenAliases[anychart.enums.StringToken.AXIS_SCALE_MIN] = 'min';
+
+  var tokenCustomValues = {};
+  tokenCustomValues[anychart.enums.StringToken.AXIS_NAME] = {value: this.title().text(), type: anychart.enums.TokenType.STRING};
+
+  var context = new anychart.format.Context(values);
+  context
+      .tokenAliases(tokenAliases)
+      .tokenCustomValues(tokenCustomValues);
+
+  return context.propagate();
 };
 
 

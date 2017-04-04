@@ -5,10 +5,10 @@ goog.require('anychart.core.SeriesBase');
 goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.MarkersFactory');
 goog.require('anychart.core.utils.Padding');
-goog.require('anychart.core.utils.SeriesPointContextProvider');
 goog.require('anychart.core.utils.TypedLayer');
 goog.require('anychart.data');
 goog.require('anychart.enums');
+goog.require('anychart.format.Context');
 goog.require('anychart.utils');
 
 
@@ -28,7 +28,7 @@ anychart.core.heatMap.series.Base = function(opt_data, opt_csvSettings) {
   this.referenceValueMeanings = ['x', 'y', 'n'];
 
   /**
-   * @type {anychart.core.utils.SeriesPointContextProvider}
+   * @type {anychart.format.Context}
    * @private
    */
   this.pointProvider_;
@@ -901,31 +901,50 @@ anychart.core.heatMap.series.Base.prototype.applyAxesLinesSpace = function(value
  */
 anychart.core.heatMap.series.Base.prototype.createFormatProvider = function(opt_force) {
   if (!this.pointProvider_ || opt_force)
-    this.pointProvider_ = new anychart.core.utils.SeriesPointContextProvider(this, this.referenceValueNames, false);
-  this.pointProvider_.applyReferenceValues();
+    this.pointProvider_ = new anychart.format.Context();
+
+  var iterator = this.getIterator();
+
+  var values = {
+    'chart': {value: this.getChart(), type: anychart.enums.TokenType.UNKNOWN},
+    'series': {value: this, type: anychart.enums.TokenType.UNKNOWN},
+    'scale': {value: this.xScale(), type: anychart.enums.TokenType.UNKNOWN},
+    'index': {value: iterator.getIndex(), type: anychart.enums.TokenType.NUMBER},
+    'x': {value: iterator.get('x'), type: anychart.enums.TokenType.STRING},
+    'y': {value: iterator.get('y'), type: anychart.enums.TokenType.NUMBER},
+    'heat': {value: iterator.get('heat'), type: anychart.enums.TokenType.NUMBER},
+    'seriesName': {value: this.name(), type: anychart.enums.TokenType.STRING}
+  };
 
   var colorScale = this.getChart().colorScale();
-
   if (colorScale) {
-    var iterator = this.getIterator();
     var value = iterator.get('heat');
 
     if (colorScale instanceof anychart.scales.OrdinalColor) {
-      this.pointProvider_['color'] = colorScale.valueToColor(/** @type {number} */(value));
       var range = colorScale.getRangeByValue(/** @type {number} */(value));
       if (range) {
-        this.pointProvider_['colorRange'] = {
+        var colorRange = {
           'color': range.color,
           'end': range.end,
           'name': range.name,
           'start': range.start,
           'index': range.sourceIndex
         };
+        values['colorRange'] = {value: colorRange, type: anychart.enums.TokenType.UNKNOWN};
       }
+      values['color'] = {value: colorScale.valueToColor(/** @type {number} */(value)), type: anychart.enums.TokenType.UNKNOWN};
     }
   }
 
-  return this.pointProvider_;
+  var tokenAliases = {};
+  tokenAliases[anychart.enums.StringToken.X_VALUE] = 'x';
+
+  this.pointProvider_
+      .dataSource(iterator)
+      .statisticsSources([this, this.getChart()])
+      .tokenAliases(tokenAliases);
+
+  return this.pointProvider_.propagate(values);
 };
 
 

@@ -1056,7 +1056,8 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateStatistics = function
   if (this.hasInvalidationState(anychart.ConsistencyState.SCALE_CHART_STATISTICS)) {
     anychart.performance.start('Statistics calculation');
 
-    this.statistics = {};
+    this.resetStatistics();
+
     //category statistics calculation.
     var totalPointsCount = 0;
     var totalYSum = 0;
@@ -1324,34 +1325,34 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateStatistics = function
       anychart.performance.end('Statistics categorize cycle');
     }
 
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_SUM] = totalYSum;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_RANGE_SUM] = totalYSum;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_MAX] = totalYMax;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_RANGE_MAX] = totalYMax;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_MIN] = totalYMin;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_RANGE_MIN] = totalYMin;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_Y_AVERAGE] = totalPointsCount ? totalYSum / totalPointsCount : 0;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_SERIES_COUNT] = this.drawingPlans_.length;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_POINT_COUNT] = totalPointsCount;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_MAX_Y_VALUE_POINT_SERIES_NAME] = maxYSeriesName;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_MIN_Y_VALUE_POINT_SERIES_NAME] = minYSeriesName;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_MAX_Y_SUM_SERIES_NAME] = maxYSumSeriesName;
-    this.statistics[anychart.enums.Statistics.DATA_PLOT_MIN_Y_SUM_SERIES_NAME] = minYSumSeriesName;
+    this.statistics(anychart.enums.Statistics.DATA_PLOT_Y_SUM, totalYSum);
+    this.statistics(anychart.enums.Statistics.DATA_PLOT_Y_RANGE_SUM, totalYSum);
+    this.statistics(anychart.enums.Statistics.DATA_PLOT_Y_MAX, totalYMax);
+    this.statistics(anychart.enums.Statistics.DATA_PLOT_Y_RANGE_MAX, totalYMax);
+    this.statistics(anychart.enums.Statistics.DATA_PLOT_Y_MIN, totalYMin);
+    this.statistics(anychart.enums.Statistics.DATA_PLOT_Y_RANGE_MIN, totalYMin);
+    this.statistics(anychart.enums.Statistics.DATA_PLOT_Y_AVERAGE, totalPointsCount ? totalYSum / totalPointsCount : 0);
+    this.statistics(anychart.enums.Statistics.DATA_PLOT_SERIES_COUNT, this.drawingPlans_.length);
+    this.statistics(anychart.enums.Statistics.DATA_PLOT_POINT_COUNT, totalPointsCount);
+    this.statistics(anychart.enums.Statistics.DATA_PLOT_MAX_Y_VALUE_POINT_SERIES_NAME, maxYSeriesName);
+    this.statistics(anychart.enums.Statistics.DATA_PLOT_MIN_Y_VALUE_POINT_SERIES_NAME, minYSeriesName);
+    this.statistics(anychart.enums.Statistics.DATA_PLOT_MAX_Y_SUM_SERIES_NAME, maxYSumSeriesName);
+    this.statistics(anychart.enums.Statistics.DATA_PLOT_MIN_Y_SUM_SERIES_NAME, minYSumSeriesName);
     if (hasBubbleSeries) {
-      this.statistics[anychart.enums.Statistics.DATA_PLOT_BUBBLE_SIZE_SUM] = totalSizeSum;
-      this.statistics[anychart.enums.Statistics.DATA_PLOT_BUBBLE_MIN_SIZE] = totalSizeMin;
-      this.statistics[anychart.enums.Statistics.DATA_PLOT_BUBBLE_MAX_SIZE] = totalSizeMax;
-      this.statistics[anychart.enums.Statistics.DATA_PLOT_BUBBLE_SIZE_AVERAGE] = totalPointsCount ? totalSizeSum / totalPointsCount : 0;
+      this.statistics(anychart.enums.Statistics.DATA_PLOT_BUBBLE_SIZE_SUM, totalSizeSum);
+      this.statistics(anychart.enums.Statistics.DATA_PLOT_BUBBLE_MIN_SIZE, totalSizeMin);
+      this.statistics(anychart.enums.Statistics.DATA_PLOT_BUBBLE_MAX_SIZE, totalSizeMax);
+      this.statistics(anychart.enums.Statistics.DATA_PLOT_BUBBLE_SIZE_AVERAGE, totalPointsCount ? totalSizeSum / totalPointsCount : 0);
     }
     if (!this.categorizeData) {
-      this.statistics[anychart.enums.Statistics.DATA_PLOT_X_SUM] = totalXSum;
-      this.statistics[anychart.enums.Statistics.DATA_PLOT_X_MAX] = totalXMax;
-      this.statistics[anychart.enums.Statistics.DATA_PLOT_X_MIN] = totalXMin;
-      this.statistics[anychart.enums.Statistics.DATA_PLOT_X_AVERAGE] = totalPointsCount ? totalXSum / totalPointsCount : 0;
-      this.statistics[anychart.enums.Statistics.DATA_PLOT_MAX_X_VALUE_POINT_SERIES_NAME] = maxXSeriesName;
-      this.statistics[anychart.enums.Statistics.DATA_PLOT_MIN_X_VALUE_POINT_SERIES_NAME] = minXSeriesName;
-      this.statistics[anychart.enums.Statistics.DATA_PLOT_MAX_X_SUM_SERIES_NAME] = maxXSumSeriesName;
-      this.statistics[anychart.enums.Statistics.DATA_PLOT_MIN_X_SUM_SERIES_NAME] = minXSumSeriesName;
+      this.statistics(anychart.enums.Statistics.DATA_PLOT_X_SUM, totalXSum);
+      this.statistics(anychart.enums.Statistics.DATA_PLOT_X_MAX, totalXMax);
+      this.statistics(anychart.enums.Statistics.DATA_PLOT_X_MIN, totalXMin);
+      this.statistics(anychart.enums.Statistics.DATA_PLOT_X_AVERAGE, totalPointsCount ? totalXSum / totalPointsCount : 0);
+      this.statistics(anychart.enums.Statistics.DATA_PLOT_MAX_X_VALUE_POINT_SERIES_NAME, maxXSeriesName);
+      this.statistics(anychart.enums.Statistics.DATA_PLOT_MIN_X_VALUE_POINT_SERIES_NAME, minXSeriesName);
+      this.statistics(anychart.enums.Statistics.DATA_PLOT_MAX_X_SUM_SERIES_NAME, maxXSumSeriesName);
+      this.statistics(anychart.enums.Statistics.DATA_PLOT_MIN_X_SUM_SERIES_NAME, minXSumSeriesName);
     }
 
     this.markConsistent(anychart.ConsistencyState.SCALE_CHART_STATISTICS);

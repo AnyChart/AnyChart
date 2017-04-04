@@ -8,8 +8,8 @@ goog.require('anychart.core.ui.Background');
 goog.require('anychart.core.ui.Label');
 goog.require('anychart.core.ui.Separator');
 goog.require('anychart.core.ui.Title');
-goog.require('anychart.core.utils.GenericContextProvider');
 goog.require('anychart.core.utils.Padding');
+goog.require('anychart.format.Context');
 goog.require('anychart.math.Rect');
 
 goog.require('goog.async.Delay');
@@ -928,10 +928,10 @@ anychart.core.ui.Tooltip.prototype.showAsUnion_ = function(points, clientX, clie
       return;
 
     var unionContext = {
-      'clientX': clientX,
-      'clientY': clientY,
-      'formattedValues': [],
-      'points': []
+      'clientX': {value: clientX, type: anychart.enums.TokenType.NUMBER},
+      'clientY': {value: clientY, type: anychart.enums.TokenType.NUMBER},
+      'formattedValues': {value: [], type: anychart.enums.TokenType.UNKNOWN},
+      'points': {value: [], type: anychart.enums.TokenType.UNKNOWN}
     };
 
     var allPoints = [];
@@ -950,8 +950,10 @@ anychart.core.ui.Tooltip.prototype.showAsUnion_ = function(points, clientX, clie
         }
 
         var contextProvider = series.createTooltipContextProvider();
-        unionContext['formattedValues'].push(tooltip.getFormattedContent_(contextProvider));
-        unionContext['points'].push(contextProvider);
+        unionContext['formattedValues'].value.push(tooltip.getFormattedContent_(contextProvider));
+        unionContext['points'].value.push(contextProvider);
+        if (!i)
+          unionContext['x'] = {value: contextProvider.getData('x'), type: anychart.enums.TokenType.STRING};
 
         if (goog.isArray(point['points'])) {
           allPoints.push({
@@ -965,10 +967,11 @@ anychart.core.ui.Tooltip.prototype.showAsUnion_ = function(points, clientX, clie
       }
     }
 
-    if (allPoints.length == points.length)
-      unionContext['allPoints'] = allPoints;
+    if (allPoints.length == points.length) {
+      unionContext['allPoints'] = {value: allPoints, type: anychart.enums.TokenType.UNKNOWN};
+    }
 
-    if (!unionContext['formattedValues'].length) {
+    if (!unionContext['formattedValues'].value.length) {
       return;
     }
 
@@ -977,13 +980,18 @@ anychart.core.ui.Tooltip.prototype.showAsUnion_ = function(points, clientX, clie
 
     var chart = (hoveredSeries && hoveredSeries.getChart && hoveredSeries.getChart()) ||
         (points[0] && points[0]['series'] && points[0]['series'].getChart && points[0]['series'].getChart() || void 0);
-    var statisticsSource = this.tooltipInUse_.check(anychart.core.ui.Tooltip.Capabilities.CAN_CHANGE_DISPLAY_MODE) ? chart :
-        hoveredSeries || (points[0] && points[0]['series']) || void 0;
 
-    var unionContextProvider = new anychart.core.utils.GenericContextProvider(unionContext, {
-      'clientX': anychart.enums.TokenType.NUMBER,
-      'clientY': anychart.enums.TokenType.NUMBER
-    }, statisticsSource);
+    var statisticsSources = [];
+    if (!hoveredSeries && points[0] && points[0]['series'])
+      statisticsSources.push(points[0]['series']);
+    if (hoveredSeries)
+      statisticsSources.push(hoveredSeries);
+    if (chart)
+      statisticsSources.push(chart);
+
+    var unionContextProvider = new anychart.format.Context(unionContext);
+    unionContextProvider.statisticsSources(statisticsSources);
+    unionContextProvider.propagate();
 
     this.tooltipInUse_.contentInternal().text(this.getFormattedContent_(unionContextProvider, true));
     this.tooltipInUse_.title().autoText(this.getFormattedTitle(unionContextProvider));
@@ -1161,8 +1169,8 @@ anychart.core.ui.Tooltip.prototype.updatePosition = function(clientX, clientY) {
  * @return {string}
  */
 anychart.core.ui.Tooltip.prototype.getFormattedTitle = function(contextProvider) {
-  contextProvider = goog.object.clone(contextProvider);
-  contextProvider['titleText'] = this.title_.getOption('text');
+  contextProvider.values()['titleText'] = {value: this.title_.getOption('text'), type: anychart.enums.TokenType.STRING};
+  contextProvider.propagate();
   var formatter = this.getOption('titleFormat');
   if (goog.isString(formatter))
     formatter = anychart.core.utils.TokenParser.getInstance().getFormat(formatter);
@@ -1179,9 +1187,9 @@ anychart.core.ui.Tooltip.prototype.getFormattedTitle = function(contextProvider)
  * @private
  */
 anychart.core.ui.Tooltip.prototype.getFormattedContent_ = function(contextProvider, opt_useUnionFormatter) {
-  contextProvider = goog.object.clone(contextProvider);
-  contextProvider['valuePrefix'] = this.getOption('valuePrefix') || '';
-  contextProvider['valuePostfix'] = this.getOption('valuePostfix') || '';
+  contextProvider.values()['valuePrefix'] = {value: this.getOption('valuePrefix') || '', type: anychart.enums.TokenType.STRING};
+  contextProvider.values()['valuePostfix'] = {value: this.getOption('valuePostfix') || '', type: anychart.enums.TokenType.STRING};
+  contextProvider.propagate();
   var formatter = opt_useUnionFormatter ?
       this.getOption('unionFormat') :
       this.getOption('format');

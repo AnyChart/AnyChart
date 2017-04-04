@@ -11,9 +11,9 @@ goog.require('anychart.core.ui.LabelsFactory');
 goog.require('anychart.core.ui.MarkersFactory');
 goog.require('anychart.core.utils.IInteractiveSeries');
 goog.require('anychart.core.utils.InteractivityState');
-goog.require('anychart.core.utils.PointContextProvider');
 goog.require('anychart.data.Set');
 goog.require('anychart.enums');
+goog.require('anychart.format.Context');
 goog.require('anychart.scales');
 
 
@@ -270,8 +270,21 @@ anychart.charts.Sparkline.prototype.selectionMode = function() {
  */
 anychart.charts.Sparkline.prototype.createFormatProvider = function() {
   if (!this.pointProvider_)
-    this.pointProvider_ = new anychart.core.utils.PointContextProvider(this, ['x', 'value']);
-  this.pointProvider_.applyReferenceValues();
+    this.pointProvider_ = new anychart.format.Context();
+
+  var iterator = this.getIterator();
+  this.pointProvider_
+      .dataSource(iterator)
+      .statisticsSources([this]);
+
+  var values = {
+    'x': {value: iterator.get('x'), type: anychart.enums.TokenType.STRING},
+    'value': {value: iterator.get('value'), type: anychart.enums.TokenType.NUMBER},
+    'index': {value: iterator.getIndex(), type: anychart.enums.TokenType.NUMBER},
+    'chart': {value: this, type: anychart.enums.TokenType.UNKNOWN}
+  };
+
+  this.pointProvider_.propagate(values);
   return this.pointProvider_;
 };
 
@@ -2103,7 +2116,7 @@ anychart.charts.Sparkline.prototype.calculate = function() {
   var value;
 
   if (this.hasInvalidationState(anychart.ConsistencyState.SPARK_SCALES)) {
-    this.statistics = {};
+    this.resetStatistics();
     var x, y;
     var xScale = /** @type {anychart.scales.Base} */ (this.xScale());
     var yScale = /** @type {anychart.scales.Base} */ (this.yScale());
@@ -2150,11 +2163,11 @@ anychart.charts.Sparkline.prototype.calculate = function() {
     }
     var seriesAverage = seriesSum / seriesPointsCount;
 
-    this.statistics[anychart.enums.Statistics.MAX] = seriesMax;
-    this.statistics[anychart.enums.Statistics.MIN] = seriesMin;
-    this.statistics[anychart.enums.Statistics.SUM] = seriesSum;
-    this.statistics[anychart.enums.Statistics.AVERAGE] = seriesAverage;
-    this.statistics[anychart.enums.Statistics.POINTS_COUNT] = seriesPointsCount;
+    this.statistics(anychart.enums.Statistics.MAX, seriesMax);
+    this.statistics(anychart.enums.Statistics.MIN, seriesMin);
+    this.statistics(anychart.enums.Statistics.SUM, seriesSum);
+    this.statistics(anychart.enums.Statistics.AVERAGE, seriesAverage);
+    this.statistics(anychart.enums.Statistics.POINTS_COUNT, seriesPointsCount);
 
     this.markConsistent(anychart.ConsistencyState.SPARK_SCALES);
   }

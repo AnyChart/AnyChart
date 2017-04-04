@@ -2,6 +2,7 @@ goog.provide('anychart.data.Tree');
 
 goog.require('anychart.core.Base');
 goog.require('anychart.core.reporting');
+goog.require('anychart.data.ITreeDataInfo');
 goog.require('anychart.data.Traverser');
 goog.require('anychart.data.TreeView');
 goog.require('anychart.data.csv.Parser');
@@ -989,6 +990,7 @@ anychart.data.Tree.prototype.mapAs = function(opt_mapping) {
  * @param {anychart.data.Tree} parentTree - Tree that contains a data item. Used as signal dispatcher in this case.
  * @param {Object} rawData - Data object.
  * @constructor
+ * @implements {anychart.data.ITreeDataInfo}
  */
 anychart.data.Tree.DataItem = function(parentTree, rawData) {
 
@@ -1101,48 +1103,7 @@ anychart.data.Tree.DataItem.prototype.resumeSignals_ = function(doDispatchSuspen
 
 
 /**
- * Gets value from data by path specified.
- * @param {...*} var_args - Arguments.
- *
- * Note:
- * For example we have such a structure of object in item:
- *  <code>
- *    'a': {          //Object 'a' - root object in data of tree data item
- *      'b': {        //Object 'b' - Object item.get('a')['b']
- *        'c': [      //Array 'c' as field of object 'c'
- *          {         //0-element of array 'c'. Actually is an Object.
- *            'd': [  //field 'd' of parent Object. Actually is array ['v1', 'v2', 'v3']
- *              'v1',
- *              'v2',
- *              'v3'
- *            ]
- *          }
- *        ]
- *      }
- *    }
- *  </code>
- *
- *  1) Can take arguments like this:
- *    <code>
- *      item.get(['a', 'b', 'c', 0, 'd', 1]);
- *    </code>
- *
- *    It means that element with index 1 in destination array 'd' will be returned as value.
- *
- *  2) The same behaviour is for this case:
- *    <code>
- *      item.get('a', 'b', 'c', 0, 'd', 1);
- *    </code>
- *
- *  4) Note: If path contains some errors, nothing will happen.
- *  Sample of wrong data for the same sample object 'a':
- *    <code>
- *      item.get('a', 'b', 'e', 0, 'd', 1);    //Incorrect name 'e' in path.
- *      item.get('a', 'b', 'c', 2, 'd', 1);    //Incorrect index 2 in path.
- *      item.get(['a', true, 'c', 0, 'd', 1]); //Incorrect (boolean) value in path
- *      //... etc.
- *    </code>
- * @return {*} - Value or undefined if path is invalid.
+ * @inheritDoc
  */
 anychart.data.Tree.DataItem.prototype.get = function(var_args) {
   if (arguments.length) {
@@ -1483,8 +1444,7 @@ anychart.data.Tree.DataItem.prototype.meta = function(key, opt_value) {
 
 /**
  * Gets value from meta by path specified.
- * Works totally the same way as item.get().
- * TODO (A.Kudryavtsev): NOTE: Not exported for a while.
+ * Works totally the same way as get().
  * @param {...*} var_args - Arguments.
  * @return {*} - Value or undefined if path is invalid.
  */

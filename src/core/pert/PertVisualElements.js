@@ -236,7 +236,7 @@ anychart.core.pert.PertVisualElements.prototype.selectFill = function(opt_fillOr
 /**
  * Gets final fill.
  * @param {anychart.PointState|number} state - Current state.
- * @param {anychart.core.utils.PertPointContextProvider} provider - Context provider.
+ * @param {anychart.format.Context} provider - Context provider.
  * @return {!acgraph.vector.Fill} - Final fill.
  */
 anychart.core.pert.PertVisualElements.prototype.getFinalFill = function(state, provider) {
@@ -343,7 +343,7 @@ anychart.core.pert.PertVisualElements.prototype.selectStroke = function(opt_stro
 /**
  * Gets final stroke.
  * @param {anychart.PointState|number} state - Current state.
- * @param {anychart.core.utils.PertPointContextProvider} provider - Context provider.
+ * @param {anychart.format.Context} provider - Context provider.
  * @return {!acgraph.vector.Stroke} - Final stroke.
  */
 anychart.core.pert.PertVisualElements.prototype.getFinalStroke = function(state, provider) {

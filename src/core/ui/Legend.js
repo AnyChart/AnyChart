@@ -9,10 +9,10 @@ goog.require('anychart.core.ui.Paginator');
 goog.require('anychart.core.ui.Separator');
 goog.require('anychart.core.ui.Title');
 goog.require('anychart.core.ui.Tooltip');
-goog.require('anychart.core.utils.ITokenProvider');
 goog.require('anychart.core.utils.Margin');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.enums');
+goog.require('anychart.format.Context');
 goog.require('anychart.math.Rect');
 goog.require('anychart.utils');
 goog.require('goog.array');
@@ -24,7 +24,6 @@ goog.require('goog.object');
 /**
  * Legend element.
  * @constructor
- * @implements {anychart.core.utils.ITokenProvider}
  * @implements {anychart.core.IStandaloneBackend}
  * @extends {anychart.core.Text}
  */
@@ -747,36 +746,6 @@ anychart.core.ui.Legend.prototype.onTooltipSignal_ = function(event) {
 
 
 /**
- * TODO(AntonKagakin): need to rewrite legend tooltip provider!.
- * Stub.
- * @override
- */
-anychart.core.ui.Legend.prototype.getTokenType = function(name) {
-  switch (name) {
-    case anychart.enums.StringToken.VALUE:
-      return anychart.enums.TokenType.STRING;
-    default:
-      return anychart.enums.TokenType.UNKNOWN;
-  }
-};
-
-
-/**
- * TODO(AntonKagakin): need to rewrite legend tooltip provider!.
- * Stub.
- * @override
- */
-anychart.core.ui.Legend.prototype.getTokenValue = function(name) {
-  switch (name) {
-    case anychart.enums.StringToken.VALUE:
-      return this['value'];
-    default:
-      return void 0;
-  }
-};
-
-
-/**
  * Show data point tooltip.
  * @protected
  * @param {anychart.core.MouseEvent} event Event that initiates tooltip display.
@@ -786,23 +755,20 @@ anychart.core.ui.Legend.prototype.showTooltip = function(event) {
   if (tooltip.enabled()) {
     var index = event['itemIndex'];
     var item = this.items_[index];
-    if (item) {
-      var formatProvider = {
-        'value': item.text(),
-        'iconType': item.iconType(),
-        'iconStroke': item.iconStroke(),
-        'iconFill': item.iconFill(),
-        'iconHatchFill': item.iconHatchFill(),
-        'iconMarkerType': item.iconMarkerType(),
-        'iconMarkerStroke': item.iconMarkerStroke(),
-        'iconMarkerFill': item.iconMarkerFill(),
-        'meta': this.legendItemsMeta_[index],
-        'getTokenValue': this.getTokenValue,
-        'getTokenType': this.getTokenType
+    if (item && event) {
+      var values = {
+        'value': {value: item.text(), type: anychart.enums.TokenType.STRING},
+        'iconType': {value: item.iconType(), type: anychart.enums.TokenType.STRING},
+        'iconStroke': {value: item.iconStroke(), type: anychart.enums.TokenType.UNKNOWN},
+        'iconFill': {value: item.iconFill(), type: anychart.enums.TokenType.UNKNOWN},
+        'iconHatchFill': {value: item.iconHatchFill(), type: anychart.enums.TokenType.UNKNOWN},
+        'iconMarkerType': {value: item.iconMarkerType(), type: anychart.enums.TokenType.STRING},
+        'iconMarkerStroke': {value: item.iconMarkerStroke(), type: anychart.enums.TokenType.UNKNOWN},
+        'iconMarkerFill': {value: item.iconMarkerFill(), type: anychart.enums.TokenType.UNKNOWN},
+        'meta': {value: this.legendItemsMeta_[index], type: anychart.enums.TokenType.UNKNOWN}
       };
-      if (event) {
-        tooltip.showFloat(event['clientX'], event['clientY'], formatProvider);
-      }
+      var formatProvider = new anychart.format.Context(values);
+      tooltip.showFloat(event['clientX'], event['clientY'], formatProvider.propagate());
     }
   }
 };

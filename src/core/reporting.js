@@ -14,6 +14,14 @@ anychart.core.reporting.lastInfoCode_ = -1;
 
 
 /**
+ * Last warning code.
+ * @type {number}
+ * @private
+ */
+anychart.core.reporting.lastWarningCode_ = -1;
+
+
+/**
  * Log en error by code.
  * @param {anychart.enums.ErrorCode} code Error internal code,. @see anychart.enums.ErrorCode.
  * @param {*=} opt_exception Exception.
@@ -151,7 +159,8 @@ anychart.core.reporting.getInfoDescription_ = function(code, opt_arguments) {
  * @param {boolean=} opt_forceProd
  */
 anychart.core.reporting.warning = function(code, opt_exception, opt_descArgs, opt_forceProd) {
-  if (anychart.DEVELOP || opt_forceProd) {
+  if ((anychart.DEVELOP || opt_forceProd) && anychart.core.reporting.lastWarningCode_ != code) {
+    anychart.core.reporting.lastWarningCode_ = code;
     anychart.core.reporting.callLog_(
         'warn',
         ('Warning: ' + code + '\nDescription: ' + anychart.core.reporting.getWarningDescription_(code, opt_descArgs)),

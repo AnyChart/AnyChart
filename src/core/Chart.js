@@ -17,12 +17,12 @@ goog.require('anychart.core.ui.Title');
 goog.require('anychart.core.ui.Tooltip');
 goog.require('anychart.core.utils.Animation');
 goog.require('anychart.core.utils.ChartA11y');
-goog.require('anychart.core.utils.ChartContextProvider');
 goog.require('anychart.core.utils.Interactivity');
 goog.require('anychart.core.utils.InteractivityState');
 goog.require('anychart.core.utils.Margin');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.exports');
+goog.require('anychart.format.Context');
 goog.require('anychart.performance');
 goog.require('anychart.themes.merging');
 goog.require('anychart.utils');
@@ -108,7 +108,7 @@ anychart.core.Chart = function() {
 
   /**
    * Chart context provider.
-   * @type {anychart.core.utils.ChartContextProvider}
+   * @type {anychart.format.Context}
    * @private
    */
   this.chartContextProvider_ = null;
@@ -144,8 +144,9 @@ anychart.core.Chart = function() {
   /**
    * Statistics object.
    * @type {Object}
+   * @private
    */
-  this.statistics = {};
+  this.statistics_ = {};
 
   /**
    * @type {anychart.core.ui.ChartCredits}
@@ -538,13 +539,43 @@ anychart.core.Chart.prototype.ensureStatisticsReady = function() {
 
 
 /**
+ * Chart statistics getter/setter for internal usage. Turns names to lower case and asks values as lower case.
+ * @param {string=} opt_name Statistics parameter name.
+ * @param {*=} opt_value Statistics parameter value.
+ * @return {anychart.core.Chart|*}
+ */
+anychart.core.Chart.prototype.statistics = function(opt_name, opt_value) {
+  if (goog.isDef(opt_name)) {
+    if (goog.isDef(opt_value)) {
+      this.statistics_[opt_name.toLowerCase()] = opt_value;
+      return this;
+    } else {
+      return this.statistics_[opt_name.toLowerCase()];
+    }
+  } else {
+    return this.statistics_;
+  }
+};
+
+
+/**
+ * Resets statistics
+ * @return {anychart.core.Chart} - Itself.
+ */
+anychart.core.Chart.prototype.resetStatistics = function() {
+  this.statistics_ = {};
+  return this;
+};
+
+
+/**
  * Gets statistics value by key.
  * @param {string} key - Key.
  * @return {*} - Statistics value.
  */
 anychart.core.Chart.prototype.getStat = function(key) {
   this.ensureStatisticsReady();
-  return this.statistics[key];
+  return this.statistics(key);
 };
 
 
@@ -1168,13 +1199,21 @@ anychart.core.Chart.prototype.doAnimation = goog.nullFunction;
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Creates tooltip context provider.
- * @return {!anychart.core.utils.ChartContextProvider}
+ * @return {anychart.format.Context}
  */
 anychart.core.Chart.prototype.createChartContextProvider = function() {
   if (!this.chartContextProvider_) {
-    this.chartContextProvider_ = new anychart.core.utils.ChartContextProvider(this);
+    this.chartContextProvider_ = new anychart.format.Context();
   }
-  return this.chartContextProvider_;
+
+  var values = {
+    'chart': {value: this, type: anychart.enums.TokenType.UNKNOWN}
+  };
+
+  this.chartContextProvider_
+      .statisticsSources([this]);
+
+  return /** @type {anychart.format.Context} */ (this.chartContextProvider_.propagate(values));
 };
 
 

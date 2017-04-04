@@ -2,9 +2,9 @@ goog.provide('anychart.core.sparkline.series.Base');
 goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.VisualBaseWithBounds');
-goog.require('anychart.core.utils.SeriesPointContextProvider');
 goog.require('anychart.data');
 goog.require('anychart.enums');
+goog.require('anychart.format.Context');
 
 
 
@@ -23,7 +23,7 @@ goog.require('anychart.enums');
 anychart.core.sparkline.series.Base = function(chart) {
   this.suspendSignalsDispatching();
   /**
-   * @type {anychart.core.utils.SeriesPointContextProvider}
+   * @type {anychart.format.Context}
    * @private
    */
   this.pointProvider_;
@@ -339,9 +339,28 @@ anychart.core.sparkline.series.Base.prototype.finalizeDrawing = function() {
  */
 anychart.core.sparkline.series.Base.prototype.createFormatProvider = function(opt_force) {
   if (!this.pointProvider_ || opt_force)
-    this.pointProvider_ = new anychart.core.utils.SeriesPointContextProvider(this, ['x', 'value'], false);
-  this.pointProvider_.applyReferenceValues();
-  return this.pointProvider_;
+    this.pointProvider_ = new anychart.format.Context();
+
+  var iterator = this.getIterator();
+
+  var values = {
+    'chart': {value: this.getChart(), type: anychart.enums.TokenType.UNKNOWN},
+    'series': {value: this, type: anychart.enums.TokenType.UNKNOWN},
+    'index': {value: iterator.getIndex(), type: anychart.enums.TokenType.NUMBER},
+    'value': {value: iterator.get('value'), type: anychart.enums.TokenType.NUMBER},
+    'x': {value: iterator.get('x'), type: anychart.enums.TokenType.STRING},
+    'seriesName': {value: 'Series ' + iterator.getIndex(), type: anychart.enums.TokenType.STRING}
+  };
+
+  var tokenAliases = {};
+  tokenAliases[anychart.enums.StringToken.X_VALUE] = 'x';
+
+  this.pointProvider_
+      .dataSource(iterator)
+      .statisticsSources([this, this.getChart()])
+      .tokenAliases(tokenAliases);
+
+  return this.pointProvider_.propagate(values);
 };
 
 
