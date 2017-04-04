@@ -573,6 +573,15 @@ anychart.core.series.Map.prototype.calculateStatistics = function() {
 //endregion
 //region --- Interactivity
 /**
+ * Whether draw on zoom or move.
+ * @return {boolean}
+ */
+anychart.core.series.Map.prototype.needRedrawOnZoomOrMove = function() {
+  return !!(this.drawer.type == anychart.enums.SeriesDrawerTypes.CONNECTOR && (this.getOption('startSize') || this.getOption('endSize')));
+};
+
+
+/**
  * Update series elements on zoom or move map interactivity.
  * p.s. There is should be logic for series that does some manipulation with series elements. Now it is just series redrawing.
  * @return {anychart.core.series.Map}
@@ -601,12 +610,10 @@ anychart.core.series.Map.prototype.updateOnZoomOrMove = function() {
  * @param {number} pointState .
  */
 anychart.core.series.Map.prototype.applyZoomMoveTransformToLabel = function(label, pointState) {
-  var domElement, prevPos, newPos, trX, trY, selfTx;
-  var scale, dx, dy, prevTx, tx;
+  var prevPos, newPos, trX, trY, selfTx, scale, dx, dy, prevTx, tx;
 
+  var domElement = label.getDomElement();
   var iterator = this.getIterator();
-
-  domElement = label.getDomElement();
 
   var position = this.getLabelsPosition(pointState);
   var positionProvider = this.createPositionProvider(position);
@@ -631,10 +638,9 @@ anychart.core.series.Map.prototype.applyZoomMoveTransformToLabel = function(labe
 
   domElement.translate(trX, trY);
 
-
   var connectorElement = label.getConnectorElement();
   if (connectorElement && iterator.meta('positionMode') != anychart.enums.MapPointOutsidePositionMode.OFFSET) {
-    prevTx = this.chart.mapTx;
+    prevTx = this.mapTx;
     tx = this.chart.getMapLayer().getFullTransformation().clone();
 
     if (prevTx) {
@@ -658,7 +664,6 @@ anychart.core.series.Map.prototype.applyZoomMoveTransformToLabel = function(labe
     }
     connectorElement.setTransformationMatrix(scale, 0, 0, scale, dx, dy);
   }
-
 
   if (goog.isDef(labelRotation))
     domElement.rotateByAnchor(/** @type {number}*/(labelRotation), /** @type {anychart.enums.Anchor} */(labelAnchor));
@@ -697,8 +702,8 @@ anychart.core.series.Map.prototype.applyZoomMoveTransformToMarker = function(mar
 
   selfTx = domElement.getSelfTransformation();
 
-  trX = -selfTx.getTranslateX() + newPos['x'] - prevPos['x'];
-  trY = -selfTx.getTranslateY() + newPos['y'] - prevPos['y'];
+  trX = (selfTx ? -selfTx.getTranslateX() : 0) + newPos['x'] - prevPos['x'];
+  trY = (selfTx ? -selfTx.getTranslateY() : 0) + newPos['y'] - prevPos['y'];
 
   domElement.translate(trX, trY);
 
@@ -746,7 +751,7 @@ anychart.core.series.Map.prototype.applyZoomMoveTransform = function() {
         path.translate(trX, trY);
       });
     } else if (type == anychart.enums.SeriesDrawerTypes.CONNECTOR) {
-      prevTx = this.chart.mapTx;
+      prevTx = this.mapTx;
       tx = this.chart.getMapLayer().getFullTransformation().clone();
 
       if (prevTx) {
@@ -769,76 +774,48 @@ anychart.core.series.Map.prototype.applyZoomMoveTransform = function() {
     }
   }
 
-  var pointMarker = iterator.get('marker');
-  var hoverPointMarker = iterator.get('hoverMarker');
-  var selectPointMarker = iterator.get('selectMarker');
+  if (this.supportsMarkers()) {
+    var pointMarker = iterator.get('marker');
+    var hoverPointMarker = iterator.get('hoverMarker');
+    var selectPointMarker = iterator.get('selectMarker');
 
-  var marker = this.markers().getMarker(index);
+    var marker = this.markers().getMarker(index);
 
-  var markerEnabledState = pointMarker && goog.isDef(pointMarker['enabled']) ? pointMarker['enabled'] : null;
-  var markerHoverEnabledState = hoverPointMarker && goog.isDef(hoverPointMarker['enabled']) ? hoverPointMarker['enabled'] : null;
-  var markerSelectEnabledState = selectPointMarker && goog.isDef(selectPointMarker['enabled']) ? selectPointMarker['enabled'] : null;
+    var markerEnabledState = pointMarker && goog.isDef(pointMarker['enabled']) ? pointMarker['enabled'] : null;
+    var markerHoverEnabledState = hoverPointMarker && goog.isDef(hoverPointMarker['enabled']) ? hoverPointMarker['enabled'] : null;
+    var markerSelectEnabledState = selectPointMarker && goog.isDef(selectPointMarker['enabled']) ? selectPointMarker['enabled'] : null;
 
-  isDraw = hovered || selected ?
-      hovered ?
-          goog.isNull(markerHoverEnabledState) ?
-              this.hoverMarkers() && goog.isNull(this.hoverMarkers().enabled()) ?
-                  goog.isNull(markerEnabledState) ?
-                      this.markers().enabled() :
-                      markerEnabledState :
-                  this.hoverMarkers().enabled() :
-              markerHoverEnabledState :
-          goog.isNull(markerSelectEnabledState) ?
-              this.selectMarkers() && goog.isNull(this.selectMarkers().enabled()) ?
-                  goog.isNull(markerEnabledState) ?
-                      this.markers().enabled() :
-                      markerEnabledState :
-                  this.selectMarkers().enabled() :
-              markerSelectEnabledState :
-      goog.isNull(markerEnabledState) ?
-          this.markers().enabled() :
-          markerEnabledState;
+    isDraw = hovered || selected ?
+        hovered ?
+            goog.isNull(markerHoverEnabledState) ?
+                this.hoverMarkers() && goog.isNull(this.hoverMarkers().enabled()) ?
+                    goog.isNull(markerEnabledState) ?
+                        this.markers().enabled() :
+                        markerEnabledState :
+                    this.hoverMarkers().enabled() :
+                markerHoverEnabledState :
+            goog.isNull(markerSelectEnabledState) ?
+                this.selectMarkers() && goog.isNull(this.selectMarkers().enabled()) ?
+                    goog.isNull(markerEnabledState) ?
+                        this.markers().enabled() :
+                        markerEnabledState :
+                    this.selectMarkers().enabled() :
+                markerSelectEnabledState :
+        goog.isNull(markerEnabledState) ?
+            this.markers().enabled() :
+            markerEnabledState;
 
-  if (isDraw) {
-    if (marker && marker.getDomElement() && marker.positionProvider()) {
-      this.applyZoomMoveTransformToMarker(marker, pointState);
+    if (isDraw) {
+      if (marker && marker.getDomElement() && marker.positionProvider()) {
+        this.applyZoomMoveTransformToMarker(marker, pointState);
+      }
     }
   }
 
-  pointLabel = iterator.get('label');
-  labelEnabledState = pointLabel && goog.isDef(pointLabel['enabled']) ? pointLabel['enabled'] : null;
-  if (selected) {
-    stateLabel = iterator.get('selectLabel');
-    stateLabelEnabledState = stateLabel && goog.isDef(stateLabel['enabled']) ? stateLabel['enabled'] : null;
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.selectLabels());
-  } else if (hovered) {
-    stateLabel = iterator.get('hoverLabel');
-    stateLabelEnabledState = stateLabel && goog.isDef(stateLabel['enabled']) ? stateLabel['enabled'] : null;
-    labelsFactory = /** @type {anychart.core.ui.LabelsFactory} */(this.hoverLabels());
-  } else {
-    stateLabel = null;
-    labelsFactory = this.labels();
-  }
-
-  if (selected || hovered) {
-    isDraw = goog.isNull(stateLabelEnabledState) ?
-        goog.isNull(labelsFactory.enabled()) ?
-            goog.isNull(labelEnabledState) ?
-                this.labels().enabled() :
-                labelEnabledState :
-            labelsFactory.enabled() :
-        stateLabelEnabledState;
-  } else {
-    isDraw = goog.isNull(labelEnabledState) ?
-        this.labels().enabled() :
-        labelEnabledState;
-  }
-
+  var label = this.labels().getLabel(index);
+  isDraw = label && label.getDomElement() && label.positionProvider() && label.getFinalSettings('enabled');
   if (isDraw) {
-    var label = this.labels().getLabel(index);
-    if (label && label.getDomElement() && label.positionProvider()) {
-      this.applyZoomMoveTransformToLabel(label, pointState);
-    }
+    this.applyZoomMoveTransformToLabel(label, pointState);
   }
 };
 
@@ -976,6 +953,8 @@ anychart.core.series.Map.prototype.calculate = function() {
 anychart.core.series.Map.prototype.startDrawing = function() {
   this.calculate();
 
+  this.mapTx = this.chart.getMapLayer().getFullTransformation().clone();
+
   anychart.core.series.Map.base(this, 'startDrawing');
 };
 
@@ -996,14 +975,6 @@ anychart.core.series.Map.prototype.drawPoint = function(point, state) {
   }
 
   anychart.core.series.Map.base(this, 'drawPoint', point, state);
-};
-
-
-/** @inheritDoc */
-anychart.core.series.Map.prototype.finalizeDrawing = function() {
-  anychart.core.series.Map.base(this, 'finalizeDrawing');
-
-  this.updateOnZoomOrMove();
 };
 
 
@@ -1165,6 +1136,11 @@ anychart.core.series.Map.prototype.drawSingleFactoryElement = function(factory, 
   }
 
   element.draw();
+
+  //Needs for correct drawing of label connectors in zoomed map state.
+  if (this.drawer.type == anychart.enums.SeriesDrawerTypes.CHOROPLETH) {
+    this.mapTx = this.chart.getMapLayer().getFullTransformation().clone();
+  }
   return element;
 };
 
@@ -1346,8 +1322,8 @@ anychart.core.series.Map.prototype.createConnectorPositionProvider_ = function(i
       accumDist += currPathDist;
     }
 
-    if (this.chart.zoomingInProgress || this.chart.moving) {
-      var prevTx = this.chart.mapTx;
+    if (this.chart.zoomingInProgress || this.chart.moving || !this.needRedrawOnZoomOrMove()) {
+      var prevTx = this.mapTx;
       var tx = this.chart.getMapLayer().getFullTransformation().clone();
 
       if (prevTx) {
@@ -1357,6 +1333,7 @@ anychart.core.series.Map.prototype.createConnectorPositionProvider_ = function(i
       var scale = tx.getScaleX();
       var dx = tx.getTranslateX();
       var dy = tx.getTranslateY();
+
       return {'x': bx * scale + dx, 'y': by * scale + dy};
     } else {
       return {'x': bx, 'y': by};

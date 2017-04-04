@@ -67,12 +67,7 @@ anychart.animations.MapZoomAnimation.prototype.doZoom_ = function(zoom) {
   var tx = mapLayer.getSelfTransformation();
   this.map.scale().setMapZoom(tx.getScaleX());
   this.map.scale().setOffsetFocusPoint(tx.getTranslateX(), tx.getTranslateY());
-
-  if (this.map.isDesktop) {
-    this.map.updateSeriesOnZoomOrMove();
-  } else {
-    this.map.getDataLayer().scale(zoomMultiplier, zoomMultiplier, cx, cy);
-  }
+  this.map.updateSeriesOnZoomOrMove();
 };
 
 
@@ -138,12 +133,7 @@ anychart.animations.MapZoomAnimation.prototype.onFinish = function() {
 
         this.map.scale().setMapZoom(minZoom);
         this.map.scale().setOffsetFocusPoint(0, 0);
-
-        if (this.map.isDesktop) {
-          this.map.updateSeriesOnZoomOrMove();
-        } else {
-          this.map.getDataLayer().setTransformationMatrix(minZoom, 0, 0, minZoom, 0, 0);
-        }
+        this.map.updateSeriesOnZoomOrMove();
       } else {
         this.doZoom_(currZoom);
       }

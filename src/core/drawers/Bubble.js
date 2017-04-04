@@ -102,9 +102,14 @@ anychart.core.drawers.Bubble.prototype.drawPointInternal = function(point, shape
     y = tmp;
   }
 
-  for (var i in shapes)
-    shapes[i]
+  for (var i in shapes) {
+    var shape = shapes[i];
+    shape
         .centerX(x)
         .centerY(y)
         .radius(size);
+    var tx = shape.getSelfTransformation();
+    if (tx && !tx.isIdentity())
+      shape.setTransformationMatrix(1, 0, 0, 1, 0, 0);
+  }
 };
