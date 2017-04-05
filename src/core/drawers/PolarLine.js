@@ -47,6 +47,11 @@ anychart.core.drawers.PolarLine.prototype.startDrawing = function(shapeManager) 
    * @type {number}
    * @protected
    */
+  this.innerRadius = series.innerRadius;
+  /**
+   * @type {number}
+   * @protected
+   */
   this.zeroAngle = goog.math.toRadians(goog.math.modulo((/** @type {number} */(series.getOption('startAngle'))) - 90, 360));
   /**
    * @type {boolean}
@@ -108,7 +113,7 @@ anychart.core.drawers.PolarLine.prototype.lineTo_ = function(x, y, xRatio, yRati
   var shapes = this.shapesManager.getShapesGroup(this.seriesState);
   var path = /** @type {acgraph.vector.Path} */(shapes['stroke']);
   var params = anychart.math.getPolarLineParams(this.lastX, this.lastY, this.lastXRatio, this.lastYRatio,
-      x, y, xRatio, yRatio, this.cx, this.cy, this.radius, this.zeroAngle, this.counterClockwise);
+      x, y, xRatio, yRatio, this.cx, this.cy, this.radius, this.innerRadius, this.zeroAngle, this.counterClockwise);
   if (this.suppressNextNewPath_ && params.length)
     params[0] = 0;
   this.suppressNextNewPath_ = false;

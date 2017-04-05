@@ -41,7 +41,7 @@ anychart.charts.Polar.prototype.seriesConfig = (function() {
       anychart.core.series.Capabilities.SUPPORTS_MARKERS |
       anychart.core.series.Capabilities.SUPPORTS_LABELS |
       0);
-  res[anychart.enums.CartesianSeriesType.AREA] = {
+  res[anychart.enums.PolarSeriesType.AREA] = {
     drawerType: anychart.enums.SeriesDrawerTypes.POLAR_AREA,
     shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
     shapesConfig: [
@@ -55,7 +55,20 @@ anychart.charts.Polar.prototype.seriesConfig = (function() {
     anchoredPositionTop: 'value',
     anchoredPositionBottom: 'zero'
   };
-  res[anychart.enums.CartesianSeriesType.LINE] = {
+  res[anychart.enums.PolarSeriesType.COLUMN] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.POLAR_COLUMN,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'zero'
+  };
+  res[anychart.enums.PolarSeriesType.LINE] = {
     drawerType: anychart.enums.SeriesDrawerTypes.POLAR_LINE,
     shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
     shapesConfig: [
@@ -67,7 +80,46 @@ anychart.charts.Polar.prototype.seriesConfig = (function() {
     anchoredPositionTop: 'value',
     anchoredPositionBottom: 'value'
   };
-  res[anychart.enums.CartesianSeriesType.MARKER] = {
+  res[anychart.enums.PolarSeriesType.POLYGON] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.AREA,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillConfig,
+      anychart.core.shapeManagers.pathStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'zero'
+  };
+  res[anychart.enums.PolarSeriesType.POLYLINE] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.LINE,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_SERIES,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathStrokeConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: 'value',
+    anchoredPositionBottom: 'value'
+  };
+  res[anychart.enums.PolarSeriesType.RANGE_COLUMN] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.POLAR_RANGE_COLUMN,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathFillStrokeConfig,
+      anychart.core.shapeManagers.pathHatchConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: 'high',
+    anchoredPositionBottom: 'low'
+  };
+  res[anychart.enums.PolarSeriesType.MARKER] = {
     drawerType: anychart.enums.SeriesDrawerTypes.MARKER,
     shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
     shapesConfig: [
@@ -92,6 +144,32 @@ anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.charts.Polar, 
 
 
 //endregion
+//region --- Public methods
+//------------------------------------------------------------------------------
+//
+//  Public methods
+//
+//------------------------------------------------------------------------------
+/**
+ * If the points of series should be sorted by X before drawing.
+ * @param {boolean=} opt_value
+ * @return {boolean|anychart.charts.Polar}
+ */
+anychart.charts.Polar.prototype.sortPointsByX = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var val = !!opt_value;
+    if (this.categorizeData != val) {
+      this.categorizeData = val;
+      this.invalidate(anychart.ConsistencyState.SCALE_CHART_SCALES | anychart.ConsistencyState.SCALE_CHART_Y_SCALES);
+      this.invalidateSeriesOfScale(this.xScale());
+    }
+    return this;
+  }
+  return this.categorizeData;
+};
+
+
+//endregion
 //region --- Infrastructure overrides
 //------------------------------------------------------------------------------
 //
@@ -106,7 +184,7 @@ anychart.charts.Polar.prototype.getType = function() {
 
 /** @inheritDoc */
 anychart.charts.Polar.prototype.normalizeSeriesType = function(type) {
-  return anychart.enums.normalizeRadarSeriesType(type);
+  return anychart.enums.normalizePolarSeriesType(type);
 };
 
 
@@ -130,22 +208,44 @@ anychart.charts.Polar.prototype.allowLegendCategoriesMode = function() {
 
 /** @inheritDoc */
 anychart.charts.Polar.prototype.checkXScaleType = function(scale) {
-  var res = (scale instanceof anychart.scales.ScatterBase);
-  if (!res)
-    anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Polar chart scales', 'scatter', 'linear, log']);
-  return res;
+  return (scale instanceof anychart.scales.Base);
 };
 
 
 /** @inheritDoc */
 anychart.charts.Polar.prototype.createScaleByType = function(value, isXScale, returnNullOnError) {
-  return anychart.scales.ScatterBase.fromString(value, returnNullOnError);
+  return anychart.scales.Base.fromString(value, returnNullOnError);
 };
 
 
 /** @inheritDoc */
 anychart.charts.Polar.prototype.createSeriesInstance = function(type, config) {
   return new anychart.core.series.Polar(this, this, type, config, false);
+};
+
+
+//endregion
+//region --- Serialization / Deserialization
+//------------------------------------------------------------------------------
+//
+//  Serialization / Deserialization
+//
+//------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.charts.Polar.prototype.setupByJSONWithScales = function(config, scalesInstances, opt_default) {
+  anychart.charts.Polar.base(this, 'setupByJSONWithScales', config, scalesInstances, opt_default);
+  this.sortPointsByX(config['sortPointsByX']);
+  this.barGroupsPadding(config['barGroupsPadding']);
+  this.barsPadding(config['barsPadding']);
+};
+
+
+/** @inheritDoc */
+anychart.charts.Polar.prototype.serializeWithScales = function(json, scales, scaleIds) {
+  anychart.charts.Polar.base(this, 'serializeWithScales', json, scales, scaleIds);
+  json['sortPointsByX'] = this.sortPointsByX();
+  json['barGroupsPadding'] = this.barGroupsPadding();
+  json['barsPadding'] = this.barsPadding();
 };
 
 
@@ -160,5 +260,8 @@ anychart.charts.Polar.prototype.createSeriesInstance = function(type, config) {
 (function() {
   var proto = anychart.charts.Polar.prototype;
   proto['getType'] = proto.getType;
+  proto['sortPointsByX'] = proto.sortPointsByX;
+  proto['barsPadding'] = proto.barsPadding;
+  proto['barGroupsPadding'] = proto.barGroupsPadding;
 })();
 //endregion

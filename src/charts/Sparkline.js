@@ -238,7 +238,7 @@ anychart.charts.Sparkline.prototype.getSeriesStatus = function(event) {
   if (iterator.select(/** @type {number} */ (index))) {
     var pixX = /** @type {number} */(iterator.meta('x'));
     var pixY = /** @type {number} */(iterator.meta('value'));
-    var length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
+    var length = anychart.math.vectorLength(pixX, pixY, x, y);
 
     if (!isNaN(pixX) && !isNaN(pixY)) {
       points.push({

@@ -773,6 +773,8 @@
             "anyOf": [
               {"$ref": "#/definitions/anychart.core.polar.series.Area"},
               {"$ref": "#/definitions/anychart.core.polar.series.Line"},
+              {"$ref": "#/definitions/anychart.core.polar.series.Polygon"},
+              {"$ref": "#/definitions/anychart.core.polar.series.Polyline"},
               {"$ref": "#/definitions/anychart.core.polar.series.Marker"}
             ]
           }
@@ -883,6 +885,27 @@
           "type": [
             "number",
             "string"
+          ]
+        },
+        "sortPointsByX": {
+          "type": [
+            "boolean"
+          ]
+        },
+        "innerRadius": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "barGroupsPadding": {
+          "type": [
+            "number"
+          ]
+        },
+        "barsPadding": {
+          "type": [
+            "number"
           ]
         }
       },
@@ -1036,6 +1059,12 @@
           ]
         },
         "startAngle": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "innerRadius": {
           "type": [
             "number",
             "string"
@@ -2699,6 +2728,36 @@
       ],
       "properties": {
         "seriesType": {"enum": ["line"]}
+      }
+    },
+    "anychart.core.polar.series.Polygon": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/anychart.core.polar.series.ContinuousBase"
+        }
+      ],
+      "properties": {
+        "seriesType": {
+          "enum": [
+            "polygon"
+          ]
+        }
+      }
+    },
+    "anychart.core.polar.series.Polyline": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/anychart.core.polar.series.ContinuousBase"
+        }
+      ],
+      "properties": {
+        "seriesType": {
+          "enum": [
+            "polyline"
+          ]
+        }
       }
     },
     "anychart.core.polar.series.Marker": {

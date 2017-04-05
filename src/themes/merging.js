@@ -1068,19 +1068,29 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'polar.defaultSeriesSettings.areaLike',
       'polar.defaultSeriesSettings.lineLike',
-      'polar.defaultSeriesSettings.marker'
+      'polar.defaultSeriesSettings.marker',
+      'polar.defaultSeriesSettings.barLike'
     ]
   },
   {
     defaultObj: 'polar.defaultSeriesSettings.areaLike',
     targets: [
-      'polar.defaultSeriesSettings.area'
+      'polar.defaultSeriesSettings.area',
+      'polar.defaultSeriesSettings.polygon'
     ]
   },
   {
     defaultObj: 'polar.defaultSeriesSettings.lineLike',
     targets: [
-      'polar.defaultSeriesSettings.line'
+      'polar.defaultSeriesSettings.line',
+      'polar.defaultSeriesSettings.polyline'
+    ]
+  },
+  {
+    defaultObj: 'polar.defaultSeriesSettings.barLike',
+    targets: [
+      'polar.defaultSeriesSettings.column',
+      'polar.defaultSeriesSettings.rangeColumn'
     ]
   },
   {

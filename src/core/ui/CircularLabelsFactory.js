@@ -199,6 +199,67 @@ anychart.core.ui.CircularLabelsFactory.prototype.getDimensionInternal = function
 };
 
 
+/**
+ * Measures label in its coordinate system and returns bounds as an array of points in parent coordinate system.
+ * @param {*|anychart.core.ui.LabelsFactory.Label} formatProviderOrLabel Object that provides info for format function.
+ * @param {*=} opt_positionProvider Object that provides info for positionFormatter function.
+ * @param {Object=} opt_settings .
+ * @param {number=} opt_cacheIndex .
+ * @return {anychart.math.Rect} Label bounds.
+ */
+anychart.core.ui.CircularLabelsFactory.prototype.measureWithoutAutoRotate = function(formatProviderOrLabel, opt_positionProvider, opt_settings, opt_cacheIndex) {
+  var points = anychart.core.ui.LabelsFactory.prototype.measureWithTransform.call(this, formatProviderOrLabel, opt_positionProvider, opt_settings, opt_cacheIndex);
+  return anychart.math.Rect.fromCoordinateBox(points);
+};
+
+
+/**
+ * Measures label in its coordinate system and returns bounds as an array of points in parent coordinate system.
+ * @param {*|anychart.core.ui.LabelsFactory.Label} formatProviderOrLabel Object that provides info for format function.
+ * @param {*=} opt_positionProvider Object that provides info for positionFormatter function.
+ * @param {Object=} opt_settings .
+ * @param {number=} opt_cacheIndex .
+ * @return {Array.<number>} Label bounds.
+ */
+anychart.core.ui.CircularLabelsFactory.prototype.measureWithTransform = function(formatProviderOrLabel, opt_positionProvider, opt_settings, opt_cacheIndex) {
+  var rotation, anchor, angle;
+  if (formatProviderOrLabel instanceof anychart.core.ui.CircularLabelsFactory.Label) {
+    angle = (formatProviderOrLabel.positionProvider() ? formatProviderOrLabel.positionProvider()['value']['angle'] : 0) || 0;
+    rotation = formatProviderOrLabel.getRotation(angle);
+    anchor = formatProviderOrLabel.getFinalSettings('anchor');
+    if (anchor == anychart.enums.Anchor.AUTO)
+      anchor = formatProviderOrLabel.getFinalSettings('autoRotate') ?
+          anychart.enums.Anchor.CENTER :
+          anychart.utils.getAnchorForAngle(angle);
+    opt_cacheIndex = goog.isDef(opt_cacheIndex) ? opt_cacheIndex : formatProviderOrLabel.getIndex();
+  } else {
+    var currentRotation = (goog.isDef(opt_settings) && goog.isDef(opt_settings['rotation']) ? opt_settings['rotation'] : this.getOption('rotation')) || 0;
+    var autoRotate = (goog.isDef(opt_settings) && goog.isDef(opt_settings['autoRotate']) ? opt_settings['autoRotate'] : this.getOption('autoRotate')) || false;
+    angle = (opt_positionProvider ? opt_positionProvider['value']['angle'] : 0) || 0;
+    if (autoRotate) {
+      if (angle > 0 && angle < 180)
+        rotation = currentRotation + angle + 270;
+      else
+        rotation = currentRotation + angle + 90;
+    } else {
+      rotation = currentRotation;
+    }
+    anchor = goog.isDef(opt_settings) && opt_settings['anchor'] || this.getOption('anchor');
+  }
+
+  var bounds = this.getDimension(formatProviderOrLabel, opt_positionProvider, opt_settings, opt_cacheIndex);
+
+  var rotationAngle = /** @type {number} */(rotation);
+  var point = anychart.utils.getCoordinateByAnchor(bounds, /** @type {anychart.enums.Anchor} */(anchor));
+  var tx = goog.math.AffineTransform.getRotateInstance(goog.math.toRadians(rotationAngle), point.x, point.y);
+
+  var arr = bounds.toCoordinateBox() || [];
+  tx.transform(arr, 0, arr, 0, 4);
+
+  return arr;
+};
+
+
 //endregion
 //region --- Labels management
 /** @inheritDoc */
@@ -244,11 +305,10 @@ anychart.core.settings.populate(anychart.core.ui.CircularLabelsFactory.Label, an
  * Returns angle for labels.
  * @param {number} angle Label angle position.
  * @return {number} final rotation angle.
- * @private
  */
-anychart.core.ui.CircularLabelsFactory.Label.prototype.getRotation_ = function(angle) {
-  var currentRotation = this.mergedSettings['rotation'];
-  var autoRotate = this.mergedSettings['autoRotate'];
+anychart.core.ui.CircularLabelsFactory.Label.prototype.getRotation = function(angle) {
+  var currentRotation = /** @type {number} */(this.getFinalSettings('rotation'));
+  var autoRotate = this.getFinalSettings('autoRotate');
   if (autoRotate) {
     if (angle > 0 && angle < 180)
       return currentRotation + angle + 270;
@@ -319,7 +379,7 @@ anychart.core.ui.CircularLabelsFactory.Label.prototype.drawLabel = function(boun
   bounds.left = /** @type {number} */(x);
   bounds.top = /** @type {number} */(y);
 
-  this.mergedSettings['rotation'] = this.getRotation_(angle);
+  this.mergedSettings['rotation'] = this.getRotation(angle);
   this.textElement.x(/** @type {number} */(this.textX)).y(/** @type {number} */(this.textY));
 };
 

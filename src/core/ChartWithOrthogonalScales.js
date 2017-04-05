@@ -308,7 +308,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.yScaleInvalidated = function(e
 
 
 /**
- * Invalidates all series that use this scale.
+ * Invalidates all series that use this scale. Null for all series.
  * @param {*} scale
  * @protected
  */
@@ -316,7 +316,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.invalidateSeriesOfScale = func
   var foundOne = 0;
   for (var i = 0; i < this.seriesList.length; i++) {
     var series = this.seriesList[i];
-    if (series && series.enabled() && (series.getXScale() == scale || series.yScale() == scale)) {
+    if (series && series.enabled() && (!scale || series.getXScale() == scale || series.yScale() == scale)) {
       foundOne |= series.invalidate(anychart.ConsistencyState.SERIES_POINTS);
     }
   }
@@ -984,7 +984,11 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXYScales = function()
       if (!series || !series.enabled()) continue;
       xScale = /** @type {anychart.scales.Base} */(series.xScale());
       yScale = /** @type {anychart.scales.Base} */(series.yScale());
-      drawingPlan = series.getScatterDrawingPlan(false, xScale instanceof anychart.scales.DateTime);
+      if (xScale instanceof anychart.scales.Ordinal) {
+        drawingPlan = series.getOrdinalDrawingPlan({}, [], false, undefined, true);
+      } else {
+        drawingPlan = series.getScatterDrawingPlan(false, xScale instanceof anychart.scales.DateTime);
+      }
       series = /** @type {anychart.core.series.Cartesian} */(drawingPlan.series);
       var seriesExcludes = series.getExcludedIndexesInternal();
       if (seriesExcludes.length) {
@@ -1791,7 +1795,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.getSeriesStatus = function(eve
               for (var k = 0; k < names.length; k++) {
                 var pixY = /** @type {number} */(iterator.meta(names[k]));
 
-                var length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
+                var length = anychart.math.vectorLength(pixX, pixY, x, y);
                 pickValue = pickValue || length <= spotRadius;
                 if (length < minLength) {
                   minLength = length;
@@ -1837,7 +1841,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.getSeriesStatus = function(eve
               names = series.getYValueNames();
               for (k = 0; k < names.length; k++) {
                 pixY = /** @type {number} */(iterator.meta(names[k]));
-                length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
+                length = anychart.math.vectorLength(pixX, pixY, x, y);
                 if (length < minLength) {
                   minLength = length;
                   minLengthIndex = index[j];
@@ -1877,9 +1881,10 @@ anychart.core.ChartWithOrthogonalScales.prototype.onInteractivitySignal = functi
  * Setup with scale instances.
  * @param {!Object} config
  * @param {Object.<anychart.scales.Base>} scalesInstances
+ * @param {boolean=} opt_default
  * @protected
  */
-anychart.core.ChartWithOrthogonalScales.prototype.setupByJSONWithScales = function(config, scalesInstances) {
+anychart.core.ChartWithOrthogonalScales.prototype.setupByJSONWithScales = function(config, scalesInstances, opt_default) {
   this.defaultSeriesType(config['defaultSeriesType']);
   this.minBubbleSize(config['minBubbleSize']);
   this.maxBubbleSize(config['maxBubbleSize']);
@@ -1975,7 +1980,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.setupByJSON = function(config,
   if (scale)
     this.yScale(scale);
 
-  this.setupByJSONWithScales(config, scalesInstances);
+  this.setupByJSONWithScales(config, scalesInstances, opt_default);
 };
 
 

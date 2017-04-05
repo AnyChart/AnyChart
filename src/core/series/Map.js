@@ -1316,8 +1316,8 @@ anychart.core.series.Map.prototype.createConnectorPositionProvider_ = function(i
         var by = r1y + (r0y - r1y) * (1 - t);
 
 
-        var horizontal = Math.sqrt(Math.pow(r1x - r0x, 2));
-        var vertical = Math.sqrt(Math.pow(r1y - r0y, 2));
+        var horizontal = Math.abs(r1x - r0x);
+        var vertical = Math.abs(r1y - r0y);
         var anglePathNormal = anychart.math.round(goog.math.toDegrees(Math.atan(vertical / horizontal)), 7);
 
         if (r1x < r0x && r1y < r0y) {
@@ -1502,8 +1502,8 @@ anychart.core.series.Map.prototype.createChoroplethPositionProvider_ = function(
         y = midY + r * Math.sin(angle);
       }
 
-      var horizontal = Math.sqrt(Math.pow(midX - x, 2));
-      var vertical = Math.sqrt(Math.pow(midY - y, 2));
+      var horizontal = Math.abs(midX - x);
+      var vertical = Math.abs(midY - y);
       var connectorAngle = anychart.math.round(goog.math.toDegrees(Math.atan(vertical / horizontal)), 7);
 
       if (midX < x && midY < y) {

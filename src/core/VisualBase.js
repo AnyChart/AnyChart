@@ -307,8 +307,8 @@ anychart.core.VisualBase.prototype.container = function(opt_value) {
         } else {
           this.container_ = /** @type {acgraph.vector.ILayer} */(value);
         }
-        var newContainerBounds = this.container_ && this.container_.getStage() && this.container_.getStage().getBounds();
-        if (!goog.math.Rect.equals(prevContainerBounds, newContainerBounds))
+        if (!this.parentBounds_ &&
+            !goog.math.Rect.equals(prevContainerBounds, this.container_ && this.container_.getStage() && this.container_.getStage().getBounds()))
           state |= anychart.ConsistencyState.BOUNDS;
       } else {
         this.container_ = null;

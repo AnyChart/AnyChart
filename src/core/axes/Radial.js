@@ -10,6 +10,7 @@ goog.require('anychart.enums');
 goog.require('anychart.format.Context');
 goog.require('anychart.math.Rect');
 goog.require('anychart.scales');
+goog.require('anychart.utils');
 
 
 
@@ -437,6 +438,24 @@ anychart.core.axes.Radial.prototype.startAngle = function(opt_value) {
 
 
 /**
+ * Inner radius getter/setter.
+ * @param {(string|number)=} opt_value .
+ * @return {(string|number|anychart.core.axes.Radial)} .
+ */
+anychart.core.axes.Radial.prototype.innerRadius = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var value = anychart.utils.normalizeNumberOrPercent(opt_value, this.innerRadius_);
+    if (this.innerRadius_ != value) {
+      this.innerRadius_ = value;
+      this.invalidate(this.ALL_VISUAL_STATES_, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.innerRadius_;
+};
+
+
+/**
  * @private
  */
 anychart.core.axes.Radial.prototype.dropBoundsCache_ = function() {
@@ -654,6 +673,8 @@ anychart.core.axes.Radial.prototype.calcLabels_ = function(opt_bounds) {
 anychart.core.axes.Radial.prototype.calculateAxis_ = function() {
   var parentBounds = this.parentBounds();
   this.length_ = Math.min(parentBounds.width, parentBounds.height) / 2;
+  this.innerLength_ = anychart.utils.normalizeSize(this.innerRadius_, this.length_);
+  if (this.innerLength_ == this.length_) this.innerLength_--;
   this.cx_ = Math.round(parentBounds.left + parentBounds.width / 2);
   this.cy_ = Math.round(parentBounds.top + parentBounds.height / 2);
 };
@@ -689,7 +710,7 @@ anychart.core.axes.Radial.prototype.getLabelBounds_ = function(index, isMajor) {
     ratio = scale.transform(value, .5);
   }
 
-  var radius = this.length_ * ratio;
+  var radius = this.innerLength_ + (this.length_ - this.innerLength_) * ratio;
   var angle = goog.math.standardAngle(this.startAngle() - 90);
   var angleRad = goog.math.toRadians(angle);
 
@@ -871,20 +892,13 @@ anychart.core.axes.Radial.prototype.drawLine_ = function() {
     xPixelShift = lineThickness % 2 == 0 ? 0 : .5;
   }
 
-  var x, y;
-  x = this.cx_ + this.length_ * Math.cos(angleRad);
-  y = this.cy_ + this.length_ * Math.sin(angleRad);
-
-  //if (angle == 180) {
-  //  x = Math.floor(x);
-  //  y = Math.floor(y);
-  //} else {
-  x = Math.round(x);
-  y = Math.round(y);
-  //}
+  var x = Math.round(this.cx_ + this.length_ * Math.cos(angleRad));
+  var y = Math.round(this.cy_ + this.length_ * Math.sin(angleRad));
+  var zeroX = Math.round(this.cx_ + this.innerLength_ * Math.cos(angleRad));
+  var zeroY = Math.round(this.cy_ + this.innerLength_ * Math.sin(angleRad));
 
   this.line_
-      .moveTo(this.cx_ + xPixelShift, this.cy_ + yPixelShift)
+      .moveTo(zeroX + xPixelShift, zeroY + yPixelShift)
       .lineTo(x + xPixelShift, y + yPixelShift);
 };
 
@@ -922,7 +936,7 @@ anychart.core.axes.Radial.prototype.drawTick_ = function(ratio, isMajor) {
     yPixelShift *= -1;
   }
 
-  var radius = this.length_ * ratio;
+  var radius = this.innerLength_ + (this.length_ - this.innerLength_) * ratio;
 
   var x = this.cx_ + radius * Math.cos(angleRad);
   var y = this.cy_ + radius * Math.sin(angleRad);

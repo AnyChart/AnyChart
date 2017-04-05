@@ -366,12 +366,15 @@ anychart.utils.defaultDateFormatter = function(timestamp) {
  * Gets anchor coordinates by bounds.
  * @param {anychart.math.Rect} bounds Bounds rectangle.
  * @param {?(anychart.enums.Anchor|string)} anchor Anchor.
+ * @param {anychart.enums.Anchor=} opt_autoDefault
  * @return {{x: number, y: number}} Anchor coordinates as {x:number, y:number}.
  */
-anychart.utils.getCoordinateByAnchor = function(bounds, anchor) {
+anychart.utils.getCoordinateByAnchor = function(bounds, anchor, opt_autoDefault) {
   var x = bounds.left;
   var y = bounds.top;
   var anchorVal = anychart.enums.normalizeAnchor(anchor);
+  if (opt_autoDefault && anchorVal == anychart.enums.Anchor.AUTO)
+    anchorVal = opt_autoDefault;
   switch (anchorVal) {
     case anychart.enums.Anchor.LEFT_TOP:
       break;
@@ -405,6 +408,161 @@ anychart.utils.getCoordinateByAnchor = function(bounds, anchor) {
       break;
   }
   return {'x': x, 'y': y};
+};
+
+
+/**
+ * Returns anchor for angle.
+ * @param {number} angle .
+ * @return {anychart.enums.Anchor} .
+ */
+anychart.utils.getAnchorForAngle = function(angle) {
+  var result;
+  angle = goog.math.standardAngle(angle);
+
+  if (!angle) {
+    result = anychart.enums.Anchor.LEFT_CENTER;
+  } else if (angle > 0 && angle < 90) {
+    result = anychart.enums.Anchor.LEFT_TOP;
+  } else if (angle == 90) {
+    result = anychart.enums.Anchor.CENTER_TOP;
+  } else if (angle > 90 && angle < 180) {
+    result = anychart.enums.Anchor.RIGHT_TOP;
+  } else if (angle == 180) {
+    result = anychart.enums.Anchor.RIGHT_CENTER;
+  } else if (angle > 180 && angle < 270) {
+    result = anychart.enums.Anchor.RIGHT_BOTTOM;
+  } else if (angle == 270) {
+    result = anychart.enums.Anchor.CENTER_BOTTOM;
+  } else {
+    result = anychart.enums.Anchor.LEFT_BOTTOM;
+  }
+
+  return result;
+};
+
+
+/**
+ * Returns an anchor for the position to keep the element outside of the body.
+ * @param {anychart.enums.Position|anychart.enums.Anchor} anchor
+ * @return {anychart.enums.Anchor}
+ */
+anychart.utils.flipAnchor = function(anchor) {
+  switch (anchor) {
+    case anychart.enums.Anchor.LEFT_TOP:
+      return anychart.enums.Anchor.RIGHT_BOTTOM;
+    case anychart.enums.Anchor.LEFT_CENTER:
+      return anychart.enums.Anchor.RIGHT_CENTER;
+    case anychart.enums.Anchor.LEFT_BOTTOM:
+      return anychart.enums.Anchor.RIGHT_TOP;
+    case anychart.enums.Anchor.CENTER_TOP:
+      return anychart.enums.Anchor.CENTER_BOTTOM;
+    case anychart.enums.Anchor.CENTER_BOTTOM:
+      return anychart.enums.Anchor.CENTER_TOP;
+    case anychart.enums.Anchor.RIGHT_TOP:
+      return anychart.enums.Anchor.LEFT_BOTTOM;
+    case anychart.enums.Anchor.RIGHT_CENTER:
+      return anychart.enums.Anchor.LEFT_CENTER;
+    case anychart.enums.Anchor.RIGHT_BOTTOM:
+      return anychart.enums.Anchor.LEFT_TOP;
+  }
+  return /** @type {anychart.enums.Anchor} */(anchor);
+};
+
+
+/**
+ * Returns an anchor for the position to keep the element outside of the body.
+ * @param {anychart.enums.Position|anychart.enums.Anchor} anchor
+ * @return {anychart.enums.Anchor}
+ */
+anychart.utils.flipAnchorHorizontal = function(anchor) {
+  switch (anchor) {
+    case anychart.enums.Anchor.LEFT_TOP:
+      return anychart.enums.Anchor.RIGHT_TOP;
+    case anychart.enums.Anchor.LEFT_CENTER:
+      return anychart.enums.Anchor.RIGHT_CENTER;
+    case anychart.enums.Anchor.LEFT_BOTTOM:
+      return anychart.enums.Anchor.RIGHT_BOTTOM;
+    case anychart.enums.Anchor.RIGHT_TOP:
+      return anychart.enums.Anchor.LEFT_TOP;
+    case anychart.enums.Anchor.RIGHT_CENTER:
+      return anychart.enums.Anchor.LEFT_CENTER;
+    case anychart.enums.Anchor.RIGHT_BOTTOM:
+      return anychart.enums.Anchor.LEFT_BOTTOM;
+  }
+  return /** @type {anychart.enums.Anchor} */(anchor);
+};
+
+
+/**
+ * Returns an anchor for the position to keep the element outside of the body.
+ * @param {anychart.enums.Position|anychart.enums.Anchor} anchor
+ * @return {anychart.enums.Anchor}
+ */
+anychart.utils.flipAnchorVertical = function(anchor) {
+  switch (anchor) {
+    case anychart.enums.Anchor.LEFT_TOP:
+      return anychart.enums.Anchor.LEFT_BOTTOM;
+    case anychart.enums.Anchor.LEFT_BOTTOM:
+      return anychart.enums.Anchor.LEFT_TOP;
+    case anychart.enums.Anchor.CENTER_TOP:
+      return anychart.enums.Anchor.CENTER_BOTTOM;
+    case anychart.enums.Anchor.CENTER_BOTTOM:
+      return anychart.enums.Anchor.CENTER_TOP;
+    case anychart.enums.Anchor.RIGHT_TOP:
+      return anychart.enums.Anchor.RIGHT_BOTTOM;
+    case anychart.enums.Anchor.RIGHT_BOTTOM:
+      return anychart.enums.Anchor.RIGHT_TOP;
+  }
+  return /** @type {anychart.enums.Anchor} */(anchor);
+};
+
+
+/**
+ * Returns true if the anchor is one of three top anchors.
+ * @param {anychart.enums.Anchor} anchor
+ * @return {boolean}
+ */
+anychart.utils.isTopAnchor = function(anchor) {
+  return anchor == anychart.enums.Anchor.LEFT_TOP ||
+      anchor == anychart.enums.Anchor.CENTER_TOP ||
+      anchor == anychart.enums.Anchor.RIGHT_TOP;
+};
+
+
+/**
+ * Returns true if the anchor is one of three bottom anchors.
+ * @param {anychart.enums.Anchor} anchor
+ * @return {boolean}
+ */
+anychart.utils.isBottomAnchor = function(anchor) {
+  return anchor == anychart.enums.Anchor.LEFT_BOTTOM ||
+      anchor == anychart.enums.Anchor.CENTER_BOTTOM ||
+      anchor == anychart.enums.Anchor.RIGHT_BOTTOM;
+};
+
+
+/**
+ * Returns true if the anchor is one of three left anchors.
+ * @param {anychart.enums.Anchor} anchor
+ * @return {boolean}
+ */
+anychart.utils.isLeftAnchor = function(anchor) {
+  return anchor == anychart.enums.Anchor.LEFT_TOP ||
+      anchor == anychart.enums.Anchor.LEFT_CENTER ||
+      anchor == anychart.enums.Anchor.LEFT_BOTTOM;
+};
+
+
+/**
+ * Returns true if the anchor is one of three right anchors.
+ * @param {anychart.enums.Anchor} anchor
+ * @return {boolean}
+ */
+anychart.utils.isRightAnchor = function(anchor) {
+  return anchor == anychart.enums.Anchor.RIGHT_TOP ||
+      anchor == anychart.enums.Anchor.RIGHT_CENTER ||
+      anchor == anychart.enums.Anchor.RIGHT_BOTTOM;
 };
 
 

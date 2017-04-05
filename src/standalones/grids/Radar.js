@@ -46,4 +46,5 @@ anychart.grids.radar = function() {
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;
   proto['startAngle'] = proto.startAngle;
+  proto['innerRadius'] = proto.innerRadius;
 })();

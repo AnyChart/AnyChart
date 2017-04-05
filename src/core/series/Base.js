@@ -876,6 +876,16 @@ anychart.core.series.Base.prototype.hasOwnLayer = function() {
 };
 
 
+/**
+ * If the series zero line is complex (not a straight line or single point).
+ * Needed in Area and PolarArea drawers.
+ * @return {boolean}
+ */
+anychart.core.series.Base.prototype.hasComplexZero = function() {
+  return this.planIsStacked();
+};
+
+
 //endregion
 //region --- Infrastructure
 //----------------------------------------------------------------------------------------------------------------------
@@ -2081,82 +2091,76 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryG
 
 
 /**
- *
- * @param {?anychart.enums.Position} position
- * @param {boolean} positiveDirection
- * @param {boolean} isVertical
- * @return {anychart.enums.Anchor}
+ * Returns the angle of positive (or negative) direction vector. Result is in degrees, zero is to the right, grows clockwise.
+ * @param {boolean} positive
+ * @return {number}
  */
-anychart.core.series.Base.prototype.flipAnchor = function(position, positiveDirection, isVertical) {
-  if (position === null) {
-    if (positiveDirection) {
-      if (isVertical) {
-        return anychart.enums.Anchor.LEFT_CENTER;
-      } else {
-        return anychart.enums.Anchor.CENTER_BOTTOM;
-      }
-    } else {
-      if (isVertical) {
-        return anychart.enums.Anchor.RIGHT_CENTER;
-      } else {
-        return anychart.enums.Anchor.CENTER_TOP;
-      }
-    }
-  } else {
-    switch (position) {
-      case anychart.enums.Position.LEFT_TOP:
-        return anychart.enums.Anchor.RIGHT_BOTTOM;
+anychart.core.series.Base.prototype.getDirectionAngle = function(positive) {
+  var isVertical = /** @type {boolean} */ (this.getOption('isVertical'));
+  if (this.yScale().inverted())
+    positive = !positive;
+  return isVertical ?
+      (positive ? 0 : 180) :
+      (positive ? 270 : 90);
+};
 
-      case anychart.enums.Position.LEFT_CENTER:
-        return anychart.enums.Anchor.RIGHT_CENTER;
 
-      case anychart.enums.Position.LEFT_BOTTOM:
-        return anychart.enums.Anchor.RIGHT_TOP;
-
-      case anychart.enums.Position.CENTER_TOP:
-        return anychart.enums.Anchor.CENTER_BOTTOM;
-
-      case anychart.enums.Position.CENTER:
-        return anychart.enums.Anchor.CENTER;
-
-      case anychart.enums.Position.CENTER_BOTTOM:
-        return anychart.enums.Anchor.CENTER_TOP;
-
-      case anychart.enums.Position.RIGHT_TOP:
-        return anychart.enums.Anchor.LEFT_BOTTOM;
-
-      case anychart.enums.Position.RIGHT_CENTER:
-        return anychart.enums.Anchor.LEFT_CENTER;
-
-      case anychart.enums.Position.RIGHT_BOTTOM:
-        return anychart.enums.Anchor.LEFT_TOP;
-
-      default:
-        return anychart.enums.Anchor.CENTER;
-    }
-  }
+/**
+ * Returns if the direction should be positive for passed position.
+ * @param {string} position
+ * @return {boolean}
+ */
+anychart.core.series.Base.prototype.checkDirectionIsPositive = function(position) {
+  var result;
+  if (position == 'low' || position == 'lowest')
+    result = false;
+  else if (position == 'high' || position == 'highest')
+    result = true;
+  else
+    result = (Number(this.getIterator().get(position)) || 0) >= 0;
+  return result;
 };
 
 
 /**
  * Resolves anchor in auto mode.
  * @param {?anychart.enums.Position|string} position Position.
- * @param {anychart.core.ui.LabelsFactory.Label} element Label.
  * @return {anychart.enums.Anchor}
  */
-anychart.core.series.Base.prototype.resolveAutoAnchor = function(position, element) {
-  var iterator = this.getIterator();
-
+anychart.core.series.Base.prototype.resolveAutoAnchor = function(position) {
   var normalizedPosition = anychart.enums.normalizePosition(position, null);
-  var valueNames = this.getYValueNames();
-  var value = /** @type {string} */ (normalizedPosition == null ? position : valueNames[valueNames.length - 1]);
+  var result;
+  if (normalizedPosition) {
+    result = anychart.utils.flipAnchor(normalizedPosition);
+  } else {
+    var positive = this.checkDirectionIsPositive(/** @type {string} */(position));
+    var angle = this.getDirectionAngle(positive);
+    result = anychart.utils.getAnchorForAngle(angle);
+  }
+  return result;
+};
 
-  var isVertical = /** @type {boolean} */ (this.getOption('isVertical'));
-  var positiveDirection = (/** @type {number} */ (iterator.get(value)) || 0) >= 0;
-  var flippedAnchor = this.flipAnchor(normalizedPosition, positiveDirection, isVertical);
-  element.autoAnchor(flippedAnchor);
-  element.autoVertical(isVertical);
-  return flippedAnchor;
+
+/**
+ * Checks if label bounds intersect series bounds and flips autoAnchor if needed.
+ * @param {anychart.core.ui.LabelsFactory} factory
+ * @param {anychart.core.ui.LabelsFactory.Label} label
+ */
+anychart.core.series.Base.prototype.checkBoundsCollision = function(factory, label) {
+  // reserved for 7.14.0
+  // var bounds = factory.measure(label);
+  // var anchor = /** @type {anychart.enums.Anchor} */(label.autoAnchor());
+  // if (this.getOption('isVertical')) {
+  //   if (anychart.utils.isRightAnchor(anchor) && bounds.left < this.pixelBoundsCache.left ||
+  //       anychart.utils.isLeftAnchor(anchor) && (bounds.left + bounds.width > this.pixelBoundsCache.left + this.pixelBoundsCache.width)) {
+  //     label.autoAnchor(anychart.utils.flipAnchorHorizontal(anchor));
+  //   }
+  // } else {
+  //   if (anychart.utils.isBottomAnchor(anchor) && bounds.top < this.pixelBoundsCache.top ||
+  //       anychart.utils.isTopAnchor(anchor) && (bounds.top + bounds.height > this.pixelBoundsCache.top + this.pixelBoundsCache.height)) {
+  //     label.autoAnchor(anychart.utils.flipAnchorVertical(anchor));
+  //   }
+  // }
 };
 
 
@@ -2189,26 +2193,26 @@ anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factory,
   }
   element.resetSettings();
   if (formatProvider) {
-    element.state('pointState', goog.isDef(statePointOverride) ? statePointOverride : null);
-    element.state('seriesState', seriesStateFactory);
-    element.state('chartState', chartStateFactory);
-    element.state('pointNormal', goog.isDef(pointOverride) ? pointOverride : null);
-    element.state('seriesNormal', factory);
-    element.state('chartNormal', chartNormalFactory);
-    element.state('seriesStateTheme', seriesStateFactory ? seriesStateFactory.themeSettings : null);
-    element.state('chartStateTheme', chartStateFactory ? chartStateFactory.themeSettings : null);
-    element.state('auto', element.autoSettings);
-    element.state('seriesNormalTheme', factory.themeSettings);
-    element.state('chartNormalTheme', chartNormalFactory ? chartNormalFactory.themeSettings : null);
+    var label = /** @type {anychart.core.ui.LabelsFactory.Label} */(element);
+    label.state('pointState', goog.isObject(statePointOverride) ? statePointOverride : null);
+    label.state('seriesState', seriesStateFactory);
+    label.state('chartState', chartStateFactory);
+    label.state('pointNormal', goog.isObject(pointOverride) ? pointOverride : null);
+    label.state('seriesNormal', factory);
+    label.state('chartNormal', chartNormalFactory);
+    label.state('seriesStateTheme', seriesStateFactory ? seriesStateFactory.themeSettings : null);
+    label.state('chartStateTheme', chartStateFactory ? chartStateFactory.themeSettings : null);
+    label.state('auto', label.autoSettings);
+    label.state('seriesNormalTheme', factory.themeSettings);
+    label.state('chartNormalTheme', chartNormalFactory ? chartNormalFactory.themeSettings : null);
 
-    var anchor = element.getFinalSettings('anchor');
-    if (goog.isDef(opt_position) && formatProvider && anchor == anychart.enums.Anchor.AUTO) {
-      this.resolveAutoAnchor(opt_position, element);
+    var anchor = label.getFinalSettings('anchor');
+    label.autoVertical(/** @type {boolean} */ (this.getOption('isVertical')));
+    if (goog.isDef(opt_position) && anchor == anychart.enums.Anchor.AUTO) {
+      label.autoAnchor(this.resolveAutoAnchor(opt_position));
+      this.checkBoundsCollision(/** @type {anychart.core.ui.LabelsFactory} */(factory), label);
     }
   } else {
-    if (goog.isDef(opt_position) && formatProvider) {
-      this.resolveAutoAnchor(opt_position, element);
-    }
     element.currentMarkersFactory(seriesStateFactory || factory);
     element.setSettings(/** @type {Object} */(pointOverride), /** @type {Object} */(statePointOverride));
   }
@@ -2813,9 +2817,8 @@ anychart.core.series.Base.prototype.draw = function() {
 
   // preparing to draw different series parts
   if (this.hasInvalidationState(COMMON_STATES)) {
-    this.categoryWidthCache = this.getCategoryWidth();
-    this.pointWidthCache = this.getPixelPointWidth();
     this.prepareRootLayer();
+    this.prepareAdditional();
     // we do not mark any states consistent here - we do it later.
   }
 
@@ -3015,6 +3018,16 @@ anychart.core.series.Base.prototype.prepareRootLayer = function() {
     this.shapeManager.clearShapes();
 
   this.shapeManager.setContainer(this.rootLayer);
+};
+
+
+/**
+ * Prepares additional properties.
+ * @protected
+ */
+anychart.core.series.Base.prototype.prepareAdditional = function() {
+  this.categoryWidthCache = this.getCategoryWidth();
+  this.pointWidthCache = this.getPixelPointWidth();
 };
 
 
@@ -3609,60 +3622,86 @@ anychart.core.series.Base.prototype.createLegendContextProvider = function() {
 
 
 /**
+ * Creates position provider based on point geometry.
+ * @param {anychart.enums.Anchor} anchor
+ * @return {Object}
+ * @protected
+ */
+anychart.core.series.Base.prototype.createPositionProviderByGeometry = function(anchor) {
+  var iterator = this.getIterator();
+  var x = /** @type {number} */(iterator.meta('x'));
+  var top = /** @type {number} */(iterator.meta(this.config.anchoredPositionTop));
+  var bottom = /** @type {number} */(iterator.meta(this.config.anchoredPositionBottom));
+  var bounds = new anychart.math.Rect(x, Math.min(top, bottom), 0, Math.abs(bottom - top));
+  if (this.isWidthBased()) {
+    bounds.left -= this.pointWidthCache / 2;
+    bounds.width += this.pointWidthCache;
+  }
+  if (this.isSizeBased()) {
+    var size = /** @type {number} */(iterator.meta('size'));
+    bounds.left -= size;
+    bounds.top -= size;
+    bounds.width += size + size;
+    bounds.height += size + size;
+  }
+  if (/** @type {boolean} */(this.getOption('isVertical'))) {
+    var tmp = bounds.left;
+    bounds.left = bounds.top;
+    bounds.top = tmp;
+    tmp = bounds.height;
+    bounds.height = bounds.width;
+    bounds.width = tmp;
+  }
+  return anychart.utils.getCoordinateByAnchor(bounds, /** @type {anychart.enums.Anchor} */(anchor));
+};
+
+
+/**
+ * Creates position provider based on data value.
+ * @param {string} position
+ * @return {Object}
+ * @protected
+ */
+anychart.core.series.Base.prototype.createPositionProviderByData = function(position) {
+  var iterator = this.getIterator();
+  var x = iterator.meta('x');
+  var val = iterator.meta(position);
+  if (!goog.isDef(val)) {
+    val = iterator.get(position);
+    if (goog.isDef(val)) {
+      if (this.planIsStacked()) {
+        val += iterator.meta('stackedZero');
+      }
+      val = this.transformY(val);
+    } else {
+      val = NaN;
+    }
+  }
+  var point;
+  if (/** @type {boolean} */(this.getOption('isVertical')))
+    point = {'x': val, 'y': x};
+  else
+    point = {'x': x, 'y': val};
+  return point;
+};
+
+
+/**
  * Create series position provider.
  * @param {string} position Understands anychart.enums.Position and some additional values.
  * @param {boolean=} opt_shift3D If true, adds a 3D shift if possible.
  * @return {Object} Object with info for labels formatting.
  */
 anychart.core.series.Base.prototype.createPositionProvider = function(position, opt_shift3D) {
-  var iterator = this.getIterator();
   var point;
-  if (iterator.meta('missing')) {
+  if (this.getIterator().meta('missing')) {
     point = {'x': NaN, 'y': NaN};
   } else {
-    var x = /** @type {number} */(iterator.meta('x'));
-    var anchor = anychart.enums.normalizeAnchor(position, null);
+    var anchor = anychart.enums.normalizePosition(position, null);
     if (anchor) {
-      var top = /** @type {number} */(iterator.meta(this.config.anchoredPositionTop));
-      var bottom = /** @type {number} */(iterator.meta(this.config.anchoredPositionBottom));
-      var bounds = new anychart.math.Rect(x, Math.min(top, bottom), 0, Math.abs(bottom - top));
-      if (this.isWidthBased()) {
-        bounds.left -= this.pointWidthCache / 2;
-        bounds.width += this.pointWidthCache;
-      }
-      if (this.isSizeBased()) {
-        var size = /** @type {number} */(iterator.meta('size'));
-        bounds.left -= size;
-        bounds.top -= size;
-        bounds.width += size + size;
-        bounds.height += size + size;
-      }
-      if (/** @type {boolean} */(this.getOption('isVertical'))) {
-        var tmp = bounds.left;
-        bounds.left = bounds.top;
-        bounds.top = tmp;
-        tmp = bounds.height;
-        bounds.height = bounds.width;
-        bounds.width = tmp;
-      }
-      point = anychart.utils.getCoordinateByAnchor(bounds, /** @type {anychart.enums.Anchor} */(anchor));
+      point = this.createPositionProviderByGeometry(/** @type {anychart.enums.Anchor} */(anchor));
     } else {
-      var val = iterator.meta(position);
-      if (!goog.isDef(val)) {
-        val = iterator.get(position);
-        if (goog.isDef(val)) {
-          if (this.planIsStacked()) {
-            val += iterator.meta('stackedZero');
-          }
-          val = this.transformY(val);
-        } else {
-          val = NaN;
-        }
-      }
-      if (/** @type {boolean} */(this.getOption('isVertical')))
-        point = {'x': val, 'y': x};
-      else
-        point = {'x': x, 'y': val};
+      point = this.createPositionProviderByData(position);
     }
 
     if (opt_shift3D && this.check(anychart.core.drawers.Capabilities.IS_3D_BASED)) {

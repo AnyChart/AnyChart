@@ -1073,8 +1073,8 @@ anychart.core.ChartWithAxes.prototype.drawContent = function(bounds) {
 /**
  * @inheritDoc
  */
-anychart.core.ChartWithAxes.prototype.setupByJSONWithScales = function(config, scalesInstances) {
-  anychart.core.ChartWithAxes.base(this, 'setupByJSONWithScales', config, scalesInstances);
+anychart.core.ChartWithAxes.prototype.setupByJSONWithScales = function(config, scalesInstances, opt_default) {
+  anychart.core.ChartWithAxes.base(this, 'setupByJSONWithScales', config, scalesInstances, opt_default);
 
   // barChartMode is @deprecated Since 7.13.0.
   if ('barChartMode' in config) {

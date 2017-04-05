@@ -176,8 +176,8 @@ anychart.core.drawers.map.Connector.prototype.drawConnector_ = function(path, st
   var controlLength, direction, finalControlLength, controlDirection;
 
   //calc angle between control line (from end to control1 point) and horizontal line (normal).
-  horizontal = Math.sqrt(Math.pow(current_x - control1x, 2));
-  vertical = Math.sqrt(Math.pow(current_y - control1y, 2));
+  horizontal = Math.abs(current_x - control1x);
+  vertical = Math.abs(current_y - control1y);
   angle = anychart.math.round(goog.math.toDegrees(Math.atan(vertical / horizontal)), 7);
 
   //angle correction
@@ -202,8 +202,8 @@ anychart.core.drawers.map.Connector.prototype.drawConnector_ = function(path, st
 
 
   //calc angle between control line (from start to control2 point) and horizontal line (normal).
-  horizontal = Math.sqrt(Math.pow(start_x - control2x, 2));
-  vertical = Math.sqrt(Math.pow(start_y - control2y, 2));
+  horizontal = Math.abs(start_x - control2x);
+  vertical = Math.abs(start_y - control2y);
   angle = anychart.math.round(goog.math.toDegrees(Math.atan(vertical / horizontal)), 7);
 
   //angle correction
@@ -228,7 +228,7 @@ anychart.core.drawers.map.Connector.prototype.drawConnector_ = function(path, st
 
 
   //distance between start and end points.
-  var topDist = Math.sqrt(Math.pow(startCapLine1X - endCapLine1X, 2) + Math.pow(startCapLine1Y - endCapLine1Y, 2));
+  var topDist = anychart.math.vectorLength(startCapLine1X, startCapLine1Y, endCapLine1X, endCapLine1Y);
   //Current curve deflection (Maximum = dist / 2 with ratio = 1).
   var pixCurrTopCurveValue = (topDist / 2) * curvature;
 
@@ -259,7 +259,7 @@ anychart.core.drawers.map.Connector.prototype.drawConnector_ = function(path, st
 
 
   //distance between start and end points.
-  var bottomDist = Math.sqrt(Math.pow(startCapLine2X - endCapLine2X, 2) + Math.pow(startCapLine2Y - endCapLine2Y, 2));
+  var bottomDist = anychart.math.vectorLength(startCapLine2X, startCapLine2Y, endCapLine2X, endCapLine2Y);
   //Current curve deflection (Maximum = dist / 2 with ratio = 1).
   var pixCurrBottomCurveValue = (bottomDist / 2) * curvature;
 
@@ -379,7 +379,7 @@ anychart.core.drawers.map.Connector.prototype.drawPoint_ = function(point, shape
       if (i != 0) {
         var vertical, horizontal, angle, r;
         //distance between start and end points.
-        var dist = Math.sqrt(Math.pow(start_x - current_x, 2) + Math.pow(start_y - current_y, 2));
+        var dist = anychart.math.vectorLength(start_x, start_y, current_x, current_y);
         //Current curve deflection (Maximum = dist / 2 with ratio = 1).
         var pixCurrCurveValue = (dist / 2) * curvature;
 
@@ -388,8 +388,8 @@ anychart.core.drawers.map.Connector.prototype.drawPoint_ = function(point, shape
         var cy = (start_y + current_y) / 2;
 
         //calc angle between shortest path from start to end point and horizontal line (normal).
-        horizontal = Math.sqrt(Math.pow(start_x - current_x, 2));
-        vertical = Math.sqrt(Math.pow(start_y - current_y, 2));
+        horizontal = Math.abs(start_x - current_x);
+        vertical = Math.abs(start_y - current_y);
         var anglePathNormal = anychart.math.round(goog.math.toDegrees(Math.atan(vertical / horizontal)), 7);
 
         var directionRltAngle = 1;

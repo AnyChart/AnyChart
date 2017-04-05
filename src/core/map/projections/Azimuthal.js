@@ -41,7 +41,7 @@ anychart.core.map.projections.Azimuthal.prototype.forward = function(x, y) {
 
 /** @inheritDoc */
 anychart.core.map.projections.Azimuthal.prototype.invert = function(x, y) {
-  var ro = Math.sqrt(x * x + y * y);
+  var ro = anychart.math.vectorLength(0, 0, x, y);
   var c = this.angle(ro);
   var sinc = Math.sin(c);
   var cosc = Math.cos(c);

@@ -18,6 +18,7 @@ anychart.core.makeStandalone(anychart.standalones.axes.Radial, anychart.core.axe
 anychart.standalones.axes.Radial.prototype.setupByJSON = function(config, opt_default) {
   anychart.standalones.axes.Radial.base(this, 'setupByJSON', config, opt_default);
   this.startAngle(config['startAngle']);
+  this.innerRadius(config['innerRadius']);
 };
 
 
@@ -25,6 +26,7 @@ anychart.standalones.axes.Radial.prototype.setupByJSON = function(config, opt_de
 anychart.standalones.axes.Radial.prototype.serialize = function() {
   var json = anychart.standalones.axes.Radial.base(this, 'serialize');
   json['startAngle'] = this.startAngle();
+  json['innerRadius'] = this.innerRadius();
   return json;
 };
 
@@ -63,4 +65,5 @@ anychart.axes.radial = function() {
   proto['parentBounds'] = proto.parentBounds;
   proto['container'] = proto.container;
   proto['startAngle'] = proto.startAngle;
+  proto['innerRadius'] = proto.innerRadius;
 })();

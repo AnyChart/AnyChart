@@ -4789,9 +4789,9 @@ anychart.charts.Pie.PieOutsideLabelsDomain.prototype.calcDomain = function() {
     y1 = cy + dRY * Math.sin(angle);
 
     // get connector radius before overlap correction
-    var normalConnector = (Math.sqrt(Math.pow(x0 - x1, 2) + Math.pow(y0 - y1, 2))).toFixed(3);
+    var normalConnector = (anychart.math.vectorLength(x0, y0, x1, y1)).toFixed(3);
     // get connector radius after overlap correction
-    var txConnector = (Math.sqrt(Math.pow(x0 - x, 2) + Math.pow(y0 - y, 2))).toFixed(3);
+    var txConnector = (anychart.math.vectorLength(x0, y0, x, y)).toFixed(3);
     var dAngle = goog.math.toDegrees(Math.acos(normalConnector / txConnector));
 
     if (dAngle > this.maxAngle || isNaN(this.maxAngle) || leg < 0) {

@@ -90,7 +90,7 @@ anychart.core.drawers.PolarArea.prototype.drawSegmentContinuation_ = function(x,
   var fill = /** @type {acgraph.vector.Path} */(shapes['fill']);
   var hatch = /** @type {acgraph.vector.Path} */(shapes['hatchFill']);
   var params = anychart.math.getPolarLineParams(this.lastX, this.lastY, this.lastXRatio, this.lastYRatio,
-      x, y, xRatio, yRatio, this.cx, this.cy, this.radius, this.zeroAngle, this.counterClockwise);
+      x, y, xRatio, yRatio, this.cx, this.cy, this.radius, this.innerRadius, this.zeroAngle, this.counterClockwise);
   if (this.suppressNextNewPath_ && params.length)
     params[0] = 0;
   this.suppressNextNewPath_ = false;
@@ -150,6 +150,11 @@ anychart.core.drawers.PolarArea.prototype.startDrawing = function(shapeManager) 
    * @protected
    */
   this.radius = series.radius;
+  /**
+   * @type {number}
+   * @protected
+   */
+  this.innerRadius = series.innerRadius;
   /**
    * @type {number}
    * @protected

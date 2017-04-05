@@ -476,8 +476,8 @@ anychart.core.CartesianBase.prototype.drawElements = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.core.CartesianBase.prototype.setupByJSONWithScales = function(config, scalesInstances) {
-  anychart.core.CartesianBase.base(this, 'setupByJSONWithScales', config, scalesInstances);
+anychart.core.CartesianBase.prototype.setupByJSONWithScales = function(config, scalesInstances, opt_default) {
+  anychart.core.CartesianBase.base(this, 'setupByJSONWithScales', config, scalesInstances, opt_default);
 
   this.barGroupsPadding(config['barGroupsPadding']);
   this.barsPadding(config['barsPadding']);

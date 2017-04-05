@@ -161,6 +161,7 @@
         <xsd:attribute name="select_hatch_fill" type="simple.HatchFill" default="false"/>
         <!-- chart.Polar and charts.Radar common attrs -->
         <xsd:attribute name="start_angle" type="xsd:double" default="0"/>
+        <xsd:attribute name="sort_points_by_x" type="xsd:boolean" default="false"/>
         <!-- also for pie -->
         <xsd:attribute name="x_axis" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="y_axis" type="simple.BoolOrNull" default="true"/>
@@ -3111,6 +3112,8 @@
             <xsd:enumeration value="verticalStick"/>
             <xsd:enumeration value="choropleth"/>
             <xsd:enumeration value="connector"/>
+            <xsd:enumeration value="polygon"/>
+            <xsd:enumeration value="polyline"/>
         </xsd:restriction>
     </xsd:simpleType>
 

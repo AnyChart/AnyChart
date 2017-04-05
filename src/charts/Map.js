@@ -962,9 +962,7 @@ anychart.charts.Map.prototype.tapHandler = function(event) {
       var firsFinger = originalTouchEvent.touches[0];
       var secondFinger = originalTouchEvent.touches[1];
 
-      var dist = Math.sqrt(
-          (firsFinger.pageX - secondFinger.pageX) * (firsFinger.pageX - secondFinger.pageX) +
-          (firsFinger.pageY - secondFinger.pageY) * (firsFinger.pageY - secondFinger.pageY));
+      var dist = anychart.math.vectorLength(firsFinger.pageX, firsFinger.pageY, secondFinger.pageX, secondFinger.pageY);
 
       this.touchDist = dist;
       this.tap = false;
@@ -1195,9 +1193,7 @@ anychart.charts.Map.prototype.touchMoveHandler = function(e) {
   if (touchCount == 2) {
     var firsFinger = originalTouchEvent.touches[0];
     var secondFinger = originalTouchEvent.touches[1];
-    var dist = Math.sqrt(
-        (firsFinger.pageX - secondFinger.pageX) * (firsFinger.pageX - secondFinger.pageX) +
-        (firsFinger.pageY - secondFinger.pageY) * (firsFinger.pageY - secondFinger.pageY));
+    var dist = anychart.math.vectorLength(firsFinger.pageX, firsFinger.pageY, secondFinger.pageX, secondFinger.pageY);
 
     var minX = Math.min(firsFinger.pageX, secondFinger.pageX);
     var minY = Math.min(firsFinger.pageY, secondFinger.pageY);
@@ -1325,7 +1321,7 @@ anychart.charts.Map.prototype.getSeriesStatus = function(event) {
             var pixY = /** @type {number} */(iterator.meta('value'));
 
             index = iterator.getIndex();
-            var length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
+            var length = anychart.math.vectorLength(pixX, pixY, x, y);
             if (length <= spotRadius) {
               indexes.push(index);
               if (length < minLength) {

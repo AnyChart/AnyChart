@@ -393,6 +393,24 @@ anychart.core.grids.Polar.prototype.startAngle = function(opt_value) {
 
 
 /**
+ * Inner radius getter/setter.
+ * @param {(string|number)=} opt_value .
+ * @return {(string|number|anychart.core.grids.Polar)} .
+ */
+anychart.core.grids.Polar.prototype.innerRadius = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    var value = anychart.utils.normalizeNumberOrPercent(opt_value, this.innerRadius_);
+    if (this.innerRadius_ != value) {
+      this.innerRadius_ = value;
+      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+    }
+    return this;
+  }
+  return this.innerRadius_;
+};
+
+
+/**
  * Get/set grid stroke line.
  * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
  *    or stroke settings.
@@ -465,7 +483,7 @@ anychart.core.grids.Polar.prototype.isMinor = function(opt_value) {
  * @protected
  */
 anychart.core.grids.Polar.prototype.drawLineCircuit = function(ratio) {
-  var radius = this.radius_ * ratio;
+  var radius = this.iRadius_ + (this.radius_ - this.iRadius_) * ratio;
   this.lineElement_.circularArc(this.cx_, this.cy_, radius, radius, 0, 360);
 };
 
@@ -474,13 +492,15 @@ anychart.core.grids.Polar.prototype.drawLineCircuit = function(ratio) {
  * Draw vertical line.
  * @param {number} x .
  * @param {number} y .
+ * @param {number} cx .
+ * @param {number} cy .
  * @param {number} xPixelShift .
  * @param {number} yPixelShift .
  * @protected
  */
-anychart.core.grids.Polar.prototype.drawLineRadial = function(x, y, xPixelShift, yPixelShift) {
+anychart.core.grids.Polar.prototype.drawLineRadial = function(x, y, cx, cy, xPixelShift, yPixelShift) {
   this.lineElement_.moveTo(x + xPixelShift, y + yPixelShift);
-  this.lineElement_.lineTo(this.cx_ + xPixelShift, this.cy_ + yPixelShift);
+  this.lineElement_.lineTo(cx + xPixelShift, cy + yPixelShift);
 };
 
 
@@ -510,7 +530,7 @@ anychart.core.grids.Polar.prototype.drawInterlaceCircuit = function(ratio, prevR
     var x, y, angleRad, radius;
     var element = layer.genNextChild();
 
-    radius = this.radius_ * ratio;
+    radius = this.iRadius_ + (this.radius_ - this.iRadius_) * ratio;
     angleRad = goog.math.toRadians(0);
     x = Math.round(this.cx_ + radius * Math.cos(angleRad));
     y = Math.round(this.cy_ + radius * Math.sin(angleRad));
@@ -518,7 +538,7 @@ anychart.core.grids.Polar.prototype.drawInterlaceCircuit = function(ratio, prevR
 
     element.circularArc(this.cx_, this.cy_, radius, radius, 0, 360);
 
-    radius = this.radius_ * prevRatio;
+    radius = this.iRadius_ + (this.radius_ - this.iRadius_) * prevRatio;
     angleRad = goog.math.toRadians(360);
     x = Math.round(this.cx_ + radius * Math.cos(angleRad));
     y = Math.round(this.cy_ + radius * Math.sin(angleRad));
@@ -548,7 +568,12 @@ anychart.core.grids.Polar.prototype.drawInterlaceRadial = function(angle, sweep,
     var element = layer.genNextChild();
 
     element.circularArc(this.cx_, this.cy_, this.radius_, this.radius_, angle, -sweep);
-    element.lineTo(this.cx_, this.cy_);
+    if (this.iRadius_) {
+      element.lineTo(this.cx_ + this.iRadius_ * Math.cos(angle), this.cy_ + this.iRadius_ * Math.sin(angle));
+      element.circularArc(this.cx_, this.cy_, this.iRadius_, this.iRadius_, angle - sweep, sweep);
+    } else {
+      element.lineTo(this.cx_, this.cy_);
+    }
     element.close();
   }
 };
@@ -562,7 +587,7 @@ anychart.core.grids.Polar.prototype.drawInterlaceRadial = function(angle, sweep,
  * @return {anychart.core.grids.Polar} An instance of {@link anychart.core.grids.Polar} class for method chaining.
  */
 anychart.core.grids.Polar.prototype.draw = function() {
-  var xScale = /** @type {anychart.scales.ScatterBase} */(this.xScale());
+  var xScale = /** @type {anychart.scales.ScatterBase|anychart.scales.Ordinal} */(this.xScale());
   var yScale = /** @type {anychart.scales.ScatterBase|anychart.scales.Ordinal} */(this.yScale());
 
   if (!xScale) {
@@ -597,13 +622,6 @@ anychart.core.grids.Polar.prototype.draw = function() {
   if (this.hasInvalidationState(anychart.ConsistencyState.GRIDS_POSITION) ||
       this.hasInvalidationState(anychart.ConsistencyState.BOUNDS)) {
 
-    var layout;
-    if (this.isRadial()) {
-      layout = [this.drawLineRadial, this.drawInterlaceRadial];
-    } else {
-      layout = [this.drawLineCircuit, this.drawInterlaceCircuit];
-    }
-
     this.evenFillElement().clear();
     this.oddFillElement().clear();
     this.lineElement().clear();
@@ -614,6 +632,8 @@ anychart.core.grids.Polar.prototype.draw = function() {
 
     var parentBounds = /** @type {anychart.math.Rect} */(this.parentBounds());
     this.radius_ = Math.min(parentBounds.width, parentBounds.height) / 2;
+    this.iRadius_ = anychart.utils.normalizeSize(this.innerRadius_, this.radius_);
+    if (this.iRadius_ == this.radius_) this.iRadius_--;
     this.cx_ = Math.round(parentBounds.left + parentBounds.width / 2);
     this.cy_ = Math.round(parentBounds.top + parentBounds.height / 2);
 
@@ -622,14 +642,16 @@ anychart.core.grids.Polar.prototype.draw = function() {
     this.oddFillElement().clip(parentBounds);
     this.lineElement().clip(parentBounds);
 
-    var drawLine = layout[0];
-    var drawInterlace = layout[1];
-    var i;
+    var i, cx, cy;
 
     if (this.isRadial()) {
-      ticks = this.isMinor() ? xScale.minorTicks() : xScale.ticks();
+      isOrdinal = xScale instanceof anychart.scales.Ordinal;
+      ticks = (this.isMinor() && !isOrdinal) ? xScale.minorTicks() : xScale.ticks();
       ticksArray = ticks.get();
-      ticksArrLen = ticksArray.length - 1;
+      ticksArrLen = ticksArray.length;
+      if (!isOrdinal && xScale.transform(xScale.ticks().get()[0]) == 0 && xScale.transform(ticksArray[ticksArrLen - 1]) == 1) {
+        ticksArrLen--;
+      }
 
       var sweep = 360 / ticksArrLen;
       var angleRad, x, y, prevX = NaN, prevY = NaN, xRatio, angle;
@@ -655,13 +677,18 @@ anychart.core.grids.Polar.prototype.draw = function() {
 
         x = Math.round(this.cx_ + this.radius_ * Math.cos(angleRad));
         y = Math.round(this.cy_ + this.radius_ * Math.sin(angleRad));
+        if (this.iRadius_) {
+          cx = Math.round(this.cx_ + this.iRadius_ * Math.cos(angleRad));
+          cy = Math.round(this.cy_ + this.iRadius_ * Math.sin(angleRad));
+        } else {
+          cx = this.cx_;
+          cy = this.cy_;
+        }
         layer = i % 2 == 0 ? this.evenFillElement_ : this.oddFillElement_;
 
-        drawInterlace.call(this, angle, sweep, x, y, prevX, prevY, layer);
-        if (!i) {
-          if (this.drawLastLine_) drawLine.call(this, x, y, xPixelShift, yPixelShift);
-        } else
-          drawLine.call(this, x, y, xPixelShift, yPixelShift);
+        this.drawInterlaceRadial(angle, sweep, x, y, prevX, prevY, layer);
+        if (i || this.drawLastLine_)
+          this.drawLineRadial(x, y, cx, cy, xPixelShift, yPixelShift);
 
         prevX = x;
         prevY = y;
@@ -673,7 +700,7 @@ anychart.core.grids.Polar.prototype.draw = function() {
       angleRad = angle * Math.PI / 180;
       x = Math.round(this.cx_ + this.radius_ * Math.cos(angleRad));
       y = Math.round(this.cy_ + this.radius_ * Math.sin(angleRad));
-      drawInterlace.call(this, angle, sweep, x, y, prevX, prevY, layer);
+      this.drawInterlaceRadial(angle, sweep, x, y, prevX, prevY, layer);
     } else {
       isOrdinal = yScale instanceof anychart.scales.Ordinal;
       ticks = isOrdinal ? yScale.ticks() : this.isMinor() ? yScale.minorTicks() : yScale.ticks();
@@ -696,25 +723,20 @@ anychart.core.grids.Polar.prototype.draw = function() {
 
         if (i == ticksArrLen - 1) {
           if (isOrdinal) {
-            drawInterlace.call(this, ratio, prevRatio, layer);
+            this.drawInterlaceCircuit(ratio, prevRatio, layer);
             layer = i % 2 == 0 ? this.oddFillElement_ : this.evenFillElement_;
-            drawInterlace.call(this, yScale.transform(rightTick, 1), ratio, layer);
+            this.drawInterlaceCircuit(yScale.transform(rightTick, 1), ratio, layer);
+            this.drawLineCircuit(ratio);
+            if (this.drawLastLine_) this.drawLineCircuit(yScale.transform(rightTick, 1));
           } else {
-            drawInterlace.call(this, ratio, prevRatio, layer);
+            this.drawInterlaceCircuit(ratio, prevRatio, layer);
+            if (this.drawLastLine_) this.drawLineCircuit(ratio);
           }
         } else {
-          drawInterlace.call(this, ratio, prevRatio, layer);
-        }
-
-        if (i == ticksArrLen - 1) {
-          if (isOrdinal) {
-            drawLine.call(this, ratio);
-            if (this.drawLastLine_) drawLine.call(this, yScale.transform(rightTick, 1));
-          } else {
-            if (this.drawLastLine_) drawLine.call(this, ratio);
+          this.drawInterlaceCircuit(ratio, prevRatio, layer);
+          if (i || this.iRadius_) {
+            this.drawLineCircuit(ratio);
           }
-        } else if (i != 0) {
-          drawLine.call(this, ratio);
         }
         prevRatio = ratio;
       }

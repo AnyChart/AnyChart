@@ -379,7 +379,7 @@ anychart.math.checkForRectIsOutOfCircleBounds = function(cx, cy, radius, opt_rec
  * @return {boolean} if point out of circle bounds then returns true.
  */
 anychart.math.checkForPointIsOutOfCircleBounds = function(x1, y1, cx, cy, r) {
-  return Math.sqrt(Math.pow(cx - x1, 2) + Math.pow(cy - y1, 2)) > r;
+  return (cx - x1) * (cx - x1) + (cy - y1) * (cy - y1) > r * r;
 };
 
 
@@ -587,11 +587,12 @@ anychart.math.clipSegmentByRect = function(x1, y1, x2, y2, rect) {
  * @param {number} cx
  * @param {number} cy
  * @param {number} radius
+ * @param {number} innerRadius
  * @param {number} zeroAngle
  * @param {boolean} counterClockwise
  * @return {Array.<number>}
  */
-anychart.math.getPolarLineParams = function(fromX, fromY, fromXRatio, fromYRatio, toX, toY, toXRatio, toYRatio, cx, cy, radius, zeroAngle, counterClockwise) {
+anychart.math.getPolarLineParams = function(fromX, fromY, fromXRatio, fromYRatio, toX, toY, toXRatio, toYRatio, cx, cy, radius, innerRadius, zeroAngle, counterClockwise) {
   var quarterStep;
   if (counterClockwise) {
     if (fromXRatio < toXRatio) {
@@ -616,16 +617,69 @@ anychart.math.getPolarLineParams = function(fromX, fromY, fromXRatio, fromYRatio
   for (var ratio = startQuarter; (ratio - endQuarter) * quarterStep <= 0; ratio += quarterStep) {
     var angle = anychart.math.round(zeroAngle + ratio * Math.PI * 2, 4);
     var rRatio = (ratio - fromXRatio) / yRatioDivider + fromYRatio;
-    var r = radius * rRatio;
-    var x = cx + r * Math.cos(angle);
-    var y = cy + r * Math.sin(angle);
-    anychart.math.getPolarLineParams_(fromX, fromY, fromXRatio, fromYRatio, x, y, ratio, rRatio, cx, cy, radius, zeroAngle, result);
+    var r = innerRadius + (radius - innerRadius) * rRatio;
+    var x = anychart.math.angleDx(angle, r, cx);
+    var y = anychart.math.angleDy(angle, r, cy);
+    result.push(fromXRatio % 1 == 0 ? 1 : 0);
+    anychart.math.getPolarLineParams_(fromX, fromY, fromXRatio, fromYRatio, x, y, ratio, rRatio, cx, cy, radius, innerRadius, zeroAngle, result);
     fromX = x;
     fromY = y;
     fromXRatio = ratio;
     fromYRatio = rRatio;
   }
-  anychart.math.getPolarLineParams_(fromX, fromY, fromXRatio, fromYRatio, toX, toY, toXRatio, toYRatio, cx, cy, radius, zeroAngle, result);
+  result.push(fromXRatio % 1 == 0 ? 1 : 0);
+  anychart.math.getPolarLineParams_(fromX, fromY, fromXRatio, fromYRatio, toX, toY, toXRatio, toYRatio, cx, cy, radius, innerRadius, zeroAngle, result);
+  return result;
+};
+
+
+/**
+ * Calculates a set of params to draw a line in polar coords. Returns an array where each 6 elements
+ * represent one cubic curve by three XY coordinate pairs of two control point and an end point.
+ * @param {number} fromX
+ * @param {number} fromY
+ * @param {number} fromXRatio
+ * @param {number} fromYRatio
+ * @param {number} toX
+ * @param {number} toY
+ * @param {number} toXRatio
+ * @param {number} toYRatio
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} radius
+ * @param {number} innerRadius
+ * @param {number} zeroAngle
+ * @param {boolean} counterClockwise
+ * @return {Array.<number>}
+ */
+anychart.math.getPolarLineParamsSimple = function(fromX, fromY, fromXRatio, fromYRatio, toX, toY, toXRatio, toYRatio, cx, cy, radius, innerRadius, zeroAngle, counterClockwise) {
+  var quarterStep;
+  if (counterClockwise) {
+    if (fromXRatio < toXRatio) {
+      fromXRatio += 1;
+    }
+    quarterStep = -.25;
+  } else {
+    if (toXRatio < fromXRatio) {
+      toXRatio += 1;
+    }
+    quarterStep = .25;
+  }
+  var yRatioDivider = (toXRatio - fromXRatio) / (toYRatio - fromYRatio);
+  var result = [];
+  for (var ratio = fromXRatio + quarterStep; (ratio - toXRatio) * quarterStep < 0; ratio += quarterStep) {
+    var angle = anychart.math.round(zeroAngle + ratio * Math.PI * 2, 4);
+    var rRatio = (ratio - fromXRatio) / yRatioDivider + fromYRatio;
+    var r = innerRadius + (radius - innerRadius) * rRatio;
+    var x = anychart.math.angleDx(angle, r, cx);
+    var y = anychart.math.angleDy(angle, r, cy);
+    anychart.math.getPolarLineParams_(fromX, fromY, fromXRatio, fromYRatio, x, y, ratio, rRatio, cx, cy, radius, innerRadius, zeroAngle, result);
+    fromX = x;
+    fromY = y;
+    fromXRatio = ratio;
+    fromYRatio = rRatio;
+  }
+  anychart.math.getPolarLineParams_(fromX, fromY, fromXRatio, fromYRatio, toX, toY, toXRatio, toYRatio, cx, cy, radius, innerRadius, zeroAngle, result);
   return result;
 };
 
@@ -642,28 +696,111 @@ anychart.math.getPolarLineParams = function(fromX, fromY, fromXRatio, fromYRatio
  * @param {number} cx
  * @param {number} cy
  * @param {number} radius
+ * @param {number} innerRadius
  * @param {number} zeroAngle
  * @param {Array.<number>} result
  * @private
  */
-anychart.math.getPolarLineParams_ = function(aX, aY, aXRatio, aYRatio, dX, dY, dXRatio, dYRatio, cx, cy, radius, zeroAngle, result) {
+anychart.math.getPolarLineParams_ = function(aX, aY, aXRatio, aYRatio, dX, dY, dXRatio, dYRatio, cx, cy, radius, innerRadius, zeroAngle, result) {
   var aAngle = anychart.math.round(zeroAngle + aXRatio * Math.PI * 2, 4);
   var dAngle = anychart.math.round(zeroAngle + dXRatio * Math.PI * 2, 4);
   var stepAngle = (dAngle - aAngle) / 3;
   var bAngle = anychart.math.round(aAngle + stepAngle, 4);
   var cAngle = anychart.math.round(dAngle - stepAngle, 4);
   var stepYRatio = (dYRatio - aYRatio) / 3;
-  var bRadius = (aYRatio + stepYRatio) * radius;
-  var cRadius = (dYRatio - stepYRatio) * radius;
-  var bX = cx + bRadius * Math.cos(bAngle);
-  var bY = cy + bRadius * Math.sin(bAngle);
-  var cX = cx + cRadius * Math.cos(cAngle);
-  var cY = cy + cRadius * Math.sin(cAngle);
+  var bRadius = innerRadius + (aYRatio + stepYRatio) * (radius - innerRadius);
+  var cRadius = innerRadius + (dYRatio - stepYRatio) * (radius - innerRadius);
+  var bX = anychart.math.angleDx(bAngle, bRadius, cx);
+  var bY = anychart.math.angleDy(bAngle, bRadius, cy);
+  var cX = anychart.math.angleDx(cAngle, cRadius, cx);
+  var cY = anychart.math.angleDy(cAngle, cRadius, cy);
   var p2X = (-5 * aX + 18 * bX - 9 * cX + 2 * dX) / 6;
   var p2Y = (-5 * aY + 18 * bY - 9 * cY + 2 * dY) / 6;
   var p3X = (2 * aX - 9 * bX + 18 * cX - 5 * dX) / 6;
   var p3Y = (2 * aY - 9 * bY + 18 * cY - 5 * dY) / 6;
-  result.push(aXRatio % 1 == 0 ? 1 : 0, p2X, p2Y, p3X, p3Y, dX, dY);
+  result.push(p2X, p2Y, p3X, p3Y, dX, dY);
+};
+
+
+/**
+ * Projects an array of passed points on a line set by a a vector (vx, vy) and a point on the line (x0, y0).
+ * @param {Array.<number>} points
+ * @param {number} vx
+ * @param {number} vy
+ * @param {number} x0
+ * @param {number} y0
+ */
+anychart.math.projectToLine = function(points, vx, vy, x0, y0) {
+  var i, x, offset;
+  if (vx && vy) {
+    // real case
+    var x1 = x0 + vx;
+    var y1 = y0 + vy;
+    var nk = vx / vy;
+    var k = vy / vx;
+    var b = (y1 * x0 - y0 * x1) / vx;
+    for (i = 0; i < points.length; i += 2) {
+      var px = points[i];
+      var py = points[i + 1];
+      points[i] = x = (py + px * nk + b) / (nk + k);
+      points[i + 1] = x * k - b;
+    }
+  } else {
+    if (!vx) {
+      if (!vy) { // dead case
+        return;
+      }
+      // vertical vector - shortcutting
+      x = x0;
+      offset = 0;
+    } else {
+      // horizontal vector - shortcutting
+      x = y0;
+      offset = 1;
+    }
+    for (i = 0; i < points.length; i += 2) {
+      points[i + offset] = x;
+    }
+  }
+};
+
+
+/**
+ * Returns the length of the vector set by two coordinate pairs.
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} x2
+ * @param {number} y2
+ * @return {number}
+ */
+anychart.math.vectorLength = function(x1, y1, x2, y2) {
+  var dx = x2 - x1;
+  var dy = y2 - y1;
+  return Math.sqrt(dx * dx + dy * dy);
+};
+
+
+/**
+ * Returns an X coordinate of the point on a circle of radius r with center at cx.
+ * @param {number} radians
+ * @param {number} r
+ * @param {number=} opt_cx
+ * @return {number}
+ */
+anychart.math.angleDx = function(radians, r, opt_cx) {
+  return (opt_cx || 0) + r * anychart.math.round(Math.cos(radians), 8);
+};
+
+
+/**
+ * Returns an Y coordinate of the point on a circle of radius r with center at cy.
+ * @param {number} radians
+ * @param {number} r
+ * @param {number=} opt_cy
+ * @return {number}
+ */
+anychart.math.angleDy = function(radians, r, opt_cy) {
+  return (opt_cy || 0) + r * anychart.math.round(Math.sin(radians), 8);
 };
 
 

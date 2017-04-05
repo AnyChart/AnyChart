@@ -784,9 +784,9 @@ anychart.core.axes.Circular.prototype.getLabelBoundsWithoutTransform_ = function
   var positionProvider = {'value': {'angle': 0, 'radius': 0}};
 
   if (label)
-    boundsWTCache[index] = labels.measure(label);
+    boundsWTCache[index] = labels.measureWithoutAutoRotate(label);
   else
-    boundsWTCache[index] = labels.measure(formatProvider, positionProvider);
+    boundsWTCache[index] = labels.measureWithoutAutoRotate(formatProvider, positionProvider);
 
   return boundsWTCache[index];
 };

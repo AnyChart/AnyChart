@@ -977,7 +977,7 @@ anychart.charts.HeatMap.prototype.getSeriesStatus = function(event) {
           var pixX = /** @type {number} */(iterator.meta('x'));
           var pixY = /** @type {number} */(iterator.meta('y'));
 
-          var length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
+          var length = anychart.math.vectorLength(pixX, pixY, x, y);
           if (length <= spotRadius) {
             ind.push(index);
             if (length < minLength) {
@@ -1010,7 +1010,7 @@ anychart.charts.HeatMap.prototype.getSeriesStatus = function(event) {
           pixX = /** @type {number} */(iterator.meta('x'));
           pixY = /** @type {number} */(iterator.meta('y'));
 
-          length = Math.sqrt(Math.pow(pixX - x, 2) + Math.pow(pixY - y, 2));
+          length = anychart.math.vectorLength(pixX, pixY, x, y);
           if (length < minLength) {
             minLength = length;
             minLengthIndex = index[j];

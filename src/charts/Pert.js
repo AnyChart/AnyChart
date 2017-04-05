@@ -2844,7 +2844,7 @@ anychart.charts.Pert.prototype.drawContent = function(bounds) {
           var w = to.left - to.radius - from.left - from.radius;
           var h = to.top - from.top;
 
-          var hyp = Math.sqrt(Math.pow(w, 2) + Math.pow(h, 2));
+          var hyp = anychart.math.vectorLength(0, 0, w, h);
 
           var labelContextProvider = this.createFormatProvider(true, work, activity, void 0);
           var upperLabel = this.tasks().upperLabels().add(labelContextProvider, {
@@ -2935,8 +2935,7 @@ anychart.charts.Pert.prototype.getArrowRotation_ = function(x1, y1, x2, y2) {
   var angle = Math.atan((y2 - y1) / (x2 - x1));
   var arrowAngle = Math.atan(anychart.charts.Pert.ARROW_BOTTOM / anychart.charts.Pert.ARROW_HEIGHT);
 
-  var hypotenuse = Math.sqrt(anychart.charts.Pert.ARROW_BOTTOM * anychart.charts.Pert.ARROW_BOTTOM +
-      anychart.charts.Pert.ARROW_HEIGHT * anychart.charts.Pert.ARROW_HEIGHT);
+  var hypotenuse = anychart.math.vectorLength(0, 0, anychart.charts.Pert.ARROW_BOTTOM, anychart.charts.Pert.ARROW_HEIGHT);
 
   var angleDiff = angle - arrowAngle;
   var left1 = x2 - hypotenuse * Math.cos(angleDiff);

@@ -997,7 +997,7 @@ anychart.charts.CircularGauge.prototype.createFrame_ = function(path, cx, cy, ra
       var x_inters = (B1 * C2 - B2 * C1) / (A1 * B2 - A2 * B1);
       var y_inters = (C1 * A2 - C2 * A1) / (A1 * B2 - A2 * B1);
 
-      var intersectPointRadius = Math.sqrt(Math.pow(x_inters - cx, 2) + Math.pow(y_inters - cy, 2));
+      var intersectPointRadius = anychart.math.vectorLength(x_inters, y_inters, cx, cy);
 
       if (intersectPointRadius < radius) {
         path.circularArc(

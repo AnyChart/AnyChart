@@ -16,7 +16,7 @@ anychart.core.axes.RadialTicks = function() {
 
   /**
    * Ticks length.
-   * @type {number}
+   * @type {number|string}
    * @private
    */
   this.length_;
@@ -61,13 +61,14 @@ anychart.core.axes.RadialTicks.prototype.SUPPORTED_CONSISTENCY_STATES = anychart
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter/setter for length.
- * @param {number=} opt_value .
- * @return {(number|!anychart.core.axes.RadialTicks)} .
+ * @param {(number|string)=} opt_value .
+ * @return {(string|number|!anychart.core.axes.RadialTicks)} .
  */
 anychart.core.axes.RadialTicks.prototype.length = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    if (this.length_ != opt_value) {
-      this.length_ = opt_value;
+    var val = anychart.utils.normalizeNumberOrPercent(opt_value) || 0;
+    if (this.length_ != val) {
+      this.length_ = val;
       this.dispatchSignal(anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;

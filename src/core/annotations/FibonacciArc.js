@@ -44,7 +44,7 @@ anychart.core.annotations.FibonacciArc.prototype.drawLevel = function(levelIndex
   var ey = this.coords['secondValueAnchor'];
   var lx = ex + levelValue * (sx - ex);
   var ly = ey + levelValue * (sy - ey);
-  var r = Math.sqrt((lx - ex) * (lx - ex) + (ly - ey) * (ly - ey));
+  var r = anychart.math.vectorLength(lx, ly, ex, ey);
   if (ly < ey) {
     path.circularArc(ex, ey, r, r, 180, 180);
     hoverPath.circularArc(ex, ey, r, r, 180, 180);
@@ -78,7 +78,7 @@ anychart.core.annotations.FibonacciArc.prototype.checkVisible = function() {
     var maxLevel = Math.max.apply(Math, this.levelsInternal);
     var lx = ex + maxLevel * (sx - ex);
     var ly = ey + maxLevel * (sy - ey);
-    var r = Math.sqrt((lx - ex) * (lx - ex) + (ly - ey) * (ly - ey));
+    var r = anychart.math.vectorLength(lx, ly, ex, ey);
     res = !isNaN(r) && !((ex + r < this.pixelBoundsCache.left) || (ex - r > this.pixelBoundsCache.getRight()));
   }
   return res;

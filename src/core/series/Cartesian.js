@@ -777,9 +777,10 @@ anychart.core.series.Cartesian.prototype.getScatterDrawingPlan = function(sorted
  * @param {Array.<*>} xArray
  * @param {boolean} restrictX
  * @param {string=} opt_namesField
+ * @param {boolean=} opt_seriesIndependent
  * @return {anychart.core.series.Cartesian.DrawingPlan}
  */
-anychart.core.series.Cartesian.prototype.getOrdinalDrawingPlan = function(xHashMap, xArray, restrictX, opt_namesField) {
+anychart.core.series.Cartesian.prototype.getOrdinalDrawingPlan = function(xHashMap, xArray, restrictX, opt_namesField, opt_seriesIndependent) {
   var dataPusher;
   if (restrictX) {
     // dataPusher must return a point that was replaced by the point pushed (if any)
@@ -793,20 +794,27 @@ anychart.core.series.Cartesian.prototype.getOrdinalDrawingPlan = function(xHashM
       return result || null;
     };
   } else {
-    dataPusher = function(data, point) {
-      var result;
-      var xValue = point.data['x'];
-      var xHash = anychart.utils.hash(xValue);
-      if (xHash in xHashMap) {
-        result = data[xHashMap[xHash]];
-        data[xHashMap[xHash]] = point;
-      } else {
-        xHashMap[xHash] = xArray.length;
-        xArray.push(xValue);
+    if (opt_seriesIndependent) {
+      dataPusher = function(data, point) {
         data.push(point);
-      }
-      return result || null;
-    };
+        return null;
+      };
+    } else {
+      dataPusher = function(data, point) {
+        var result;
+        var xValue = point.data['x'];
+        var xHash = anychart.utils.hash(xValue);
+        if (xHash in xHashMap) {
+          result = data[xHashMap[xHash]];
+          data[xHashMap[xHash]] = point;
+        } else {
+          xHashMap[xHash] = xArray.length;
+          xArray.push(xValue);
+          data.push(point);
+        }
+        return result || null;
+      };
+    }
   }
   var xNormalizer = function(a) {
     return a;

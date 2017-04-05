@@ -901,26 +901,57 @@ anychart.core.ui.LabelsFactory.prototype.getDimension = function(formatProviderO
   var formatProvider;
   var positionProvider;
 
-  if (!this.measureCustomLabel_) {
-    this.measureCustomLabel_ = this.createLabel();
-    this.measureCustomLabel_.setFactory(this);
+  var measureLabel, textElement;
+  var padding, widthSettings, heightSettings, offsetY, offsetX, anchor, format, isHtml;
+  if (formatProviderOrLabel instanceof anychart.core.ui.LabelsFactory.Label && !opt_settings) {
+    measureLabel = formatProviderOrLabel;
+    textElement = measureLabel.getTextElement();
+    formatProvider = measureLabel.formatProvider();
+    positionProvider = opt_positionProvider || measureLabel.positionProvider() || {'value': {'x': 0, 'y': 0}};
+    var settings = measureLabel.getMergedSettings();
+    isHtml = settings['isHtml'];
+    widthSettings = settings['width'];
+    heightSettings = settings['height'];
+    offsetY = /** @type {number|string} */(settings['offsetY']);
+    offsetX = /** @type {number|string} */(settings['offsetX']);
+    anchor = /** @type {string} */(settings['anchor']);
+    format = /** @type {Function|string} */(settings['format']);
+    padding = settings['padding'];
+    if (!(padding instanceof anychart.core.utils.Padding))
+      padding = new anychart.core.utils.Padding(padding);
   } else {
-    this.measureCustomLabel_.clear();
-  }
+    if (!this.measureCustomLabel_) {
+      this.measureCustomLabel_ = this.createLabel();
+      this.measureCustomLabel_.setFactory(this);
+    } else {
+      this.measureCustomLabel_.clear();
+    }
+    if (!this.measureTextElement_) {
+      this.measureTextElement_ = acgraph.text();
+      this.measureTextElement_.attr('aria-hidden', 'true');
+    }
+    measureLabel = this.measureCustomLabel_;
+    textElement = this.measureTextElement_;
 
-  if (formatProviderOrLabel instanceof anychart.core.ui.LabelsFactory.Label) {
-    var label = (/** @type {anychart.core.ui.LabelsFactory.Label} */(formatProviderOrLabel));
-    this.measureCustomLabel_.setup(label.getMergedSettings());
-    formatProvider = label.formatProvider();
-    positionProvider = opt_positionProvider || label.positionProvider() || {'value' : {'x': 0, 'y': 0}};
-  } else {
-    formatProvider = formatProviderOrLabel;
-    positionProvider = opt_positionProvider || {'value' : {'x': 0, 'y': 0}};
+    if (formatProviderOrLabel instanceof anychart.core.ui.LabelsFactory.Label) {
+      var label = (/** @type {anychart.core.ui.LabelsFactory.Label} */(formatProviderOrLabel));
+      this.measureCustomLabel_.setup(label.getMergedSettings());
+      formatProvider = label.formatProvider();
+      positionProvider = opt_positionProvider || label.positionProvider() || {'value': {'x': 0, 'y': 0}};
+    } else {
+      formatProvider = formatProviderOrLabel;
+      positionProvider = opt_positionProvider || {'value': {'x': 0, 'y': 0}};
+    }
+    this.measureCustomLabel_.setup(opt_settings);
+    isHtml = goog.isDef(measureLabel.getOption('useHtml')) ? measureLabel.getOption('useHtml') : this.getOption('useHtml');
+    padding = measureLabel.getOption('padding') || this.getOption('padding') || null;
+    widthSettings = goog.isDef(measureLabel.getOption('width')) ? measureLabel.getOption('width') : this.getOption('width');
+    heightSettings = goog.isDef(measureLabel.getOption('height')) ? measureLabel.getOption('height') : this.getOption('height');
+    offsetY = /** @type {number|string} */(measureLabel.getOption('offsetY') || this.getOption('offsetY')) || 0;
+    offsetX = /** @type {number|string} */(measureLabel.getOption('offsetX') || this.getOption('offsetX')) || 0;
+    anchor = /** @type {string} */(measureLabel.getOption('anchor') || this.getOption('anchor'));
+    format = /** @type {Function|string} */(measureLabel.getOption('format') || this.getOption('format'));
   }
-  this.measureCustomLabel_.setup(opt_settings);
-
-  var isHtmlLabel = this.measureCustomLabel_.getOption('useHtml');
-  var isHtml = goog.isDef(isHtmlLabel) ? isHtmlLabel : this.getOption('useHtml');
 
   //we should ask text element about bounds only after text format and text settings are applied
 
@@ -931,40 +962,25 @@ anychart.core.ui.LabelsFactory.prototype.getDimension = function(formatProviderO
     parentHeight = parentBounds.height;
   }
 
-  var padding = this.measureCustomLabel_.getOption('padding') || this.getOption('padding') || null;
-  var widthSettings = goog.isDef(this.measureCustomLabel_.getOption('width')) ? this.measureCustomLabel_.getOption('width') : this.getOption('width');
-  var heightSettings = goog.isDef(this.measureCustomLabel_.getOption('height')) ? this.measureCustomLabel_.getOption('height') : this.getOption('height');
-  var offsetY = /** @type {number|string} */(this.measureCustomLabel_.getOption('offsetY') || this.getOption('offsetY'));
-  if (!goog.isDef(offsetY)) offsetY = 0;
-  var offsetX = /** @type {number|string} */(this.measureCustomLabel_.getOption('offsetX') || this.getOption('offsetX'));
-  if (!goog.isDef(offsetX)) offsetX = 0;
-  var anchor = /** @type {string} */(this.measureCustomLabel_.getOption('anchor') || this.getOption('anchor'));
-  var format = /** @type {Function|string} */(this.measureCustomLabel_.getOption('format') || this.getOption('format'));
-
-  if (!this.measureTextElement_) {
-    this.measureTextElement_ = acgraph.text();
-    this.measureTextElement_.attr('aria-hidden', 'true');
-  }
-
   text = this.callFormat(format, formatProvider, opt_cacheIndex);
-  this.measureTextElement_.width(null);
-  this.measureTextElement_.height(null);
+  textElement.width(null);
+  textElement.height(null);
   if (isHtml) {
-    this.measureTextElement_.htmlText(goog.isDefAndNotNull(text) ? String(text) : null);
+    textElement.htmlText(goog.isDefAndNotNull(text) ? String(text) : null);
   } else {
-    this.measureTextElement_.text(goog.isDefAndNotNull(text) ? String(text) : null);
+    textElement.text(goog.isDefAndNotNull(text) ? String(text) : null);
   }
 
-  this.measureCustomLabel_.applyTextSettings(this.measureTextElement_, true, this.themeSettings);
-  this.measureCustomLabel_.applyTextSettings.call(this, this.measureTextElement_);
-  this.measureCustomLabel_.applyTextSettings(this.measureTextElement_);
+  measureLabel.applyTextSettings(textElement, true, this.themeSettings);
+  measureLabel.applyTextSettings.call(this, textElement, false);
+  measureLabel.applyTextSettings(textElement, false);
 
 
   //define is width and height set from settings
   isWidthSet = !goog.isNull(widthSettings);
   isHeightSet = !goog.isNull(heightSettings);
 
-  textElementBounds = this.measureTextElement_.getBounds();
+  textElementBounds = textElement.getBounds();
 
   //calculate text width and outer width
   var width;
@@ -977,9 +993,9 @@ anychart.core.ui.LabelsFactory.prototype.getDimension = function(formatProviderO
     outerBounds.width = padding ? padding.widenWidth(width) : width;
   }
 
-  if (goog.isDef(textWidth)) this.measureTextElement_.width(textWidth);
+  if (goog.isDef(textWidth)) textElement.width(textWidth);
 
-  textElementBounds = this.measureTextElement_.getBounds();
+  textElementBounds = textElement.getBounds();
 
   //calculate text height and outer height
   var height;
@@ -992,7 +1008,7 @@ anychart.core.ui.LabelsFactory.prototype.getDimension = function(formatProviderO
     outerBounds.height = padding ? padding.widenHeight(height) : height;
   }
 
-  if (goog.isDef(textHeight)) this.measureTextElement_.height(textHeight);
+  if (goog.isDef(textHeight)) textElement.height(textHeight);
 
   var formattedPosition = goog.object.clone(this.getOption('positionFormatter').call(positionProvider, positionProvider));
 
@@ -2531,13 +2547,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
     this.backgroundElement_.draw();
 
 
-    if (!this.textElement) {
-      this.textElement = acgraph.text();
-      this.textElement.attr('aria-hidden', 'true');
-      this.textElement.zIndex(1);
-      this.textElement.parent(this.layer_);
-      this.textElement.disablePointerEvents(true);
-    }
+    this.getTextElement();
 
     //define parent bounds
     var parentWidth, parentHeight;
@@ -2740,6 +2750,23 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
 };
 
 
+/**
+ * Returns the textElement.
+ * @return {!acgraph.vector.Text}
+ */
+anychart.core.ui.LabelsFactory.Label.prototype.getTextElement = function() {
+  if (!this.textElement) {
+    this.textElement = acgraph.text();
+    this.textElement.attr('aria-hidden', 'true');
+    this.textElement.zIndex(1);
+    if (!this.layer_) this.layer_ = acgraph.layer();
+    this.textElement.parent(this.layer_);
+    this.textElement.disablePointerEvents(true);
+  }
+  return this.textElement;
+};
+
+
 //endregion
 //region --- Setup & Dispose
 /** @inheritDoc */
@@ -2817,6 +2844,8 @@ anychart.core.ui.LabelsFactory.Label.prototype.disposeInternal = function() {
   proto['background'] = proto.background;
   proto['padding'] = proto.padding;
   proto['enabled'] = proto.enabled;
+  proto['getLabel'] = proto.getLabel;
+  proto['getLabelsCount'] = proto.labelsCount;
   // proto['textFormatter'] = proto.textFormatter;
   // proto['positionFormatter'] = proto.positionFormatter;
   // proto['position'] = proto.position;

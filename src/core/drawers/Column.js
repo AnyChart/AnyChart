@@ -58,7 +58,7 @@ anychart.core.drawers.Column.prototype.requiredShapes = (function() {
 /** @inheritDoc */
 anychart.core.drawers.Column.prototype.drawSubsequentPoint = function(point, state) {
   var shapes = /** @type {Object.<acgraph.vector.Path>} */(this.shapesManager.getShapesGroup(state));
-  this.drawPoint_(point, shapes);
+  this.drawPointShape(point, shapes);
 };
 
 
@@ -68,7 +68,7 @@ anychart.core.drawers.Column.prototype.updatePointOnAnimate = function(point) {
   var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta('shapes'));
   for (var i in shapes)
     shapes[i].clear();
-  this.drawPoint_(point, shapes);
+  this.drawPointShape(point, shapes);
 };
 
 
@@ -76,9 +76,9 @@ anychart.core.drawers.Column.prototype.updatePointOnAnimate = function(point) {
  * Actually draws the point.
  * @param {anychart.data.IRowInfo} point
  * @param {Object.<acgraph.vector.Shape>} shapes
- * @private
+ * @protected
  */
-anychart.core.drawers.Column.prototype.drawPoint_ = function(point, shapes) {
+anychart.core.drawers.Column.prototype.drawPointShape = function(point, shapes) {
   var x = /** @type {number} */(point.meta('x'));
   var zero = /** @type {number} */(point.meta('zero'));
   var y = /** @type {number} */(point.meta('value'));

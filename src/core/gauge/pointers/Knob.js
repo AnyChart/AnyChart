@@ -218,9 +218,9 @@ anychart.core.gauge.pointers.Knob.prototype.drawVertexSide = function(path, asvs
   yo = (((xb - xa) * (xp - xo)) / (yb - ya)) + yp || 0;
 
   //OA length
-  loa = Math.sqrt(Math.pow(xa - xo, 2) + Math.pow(ya - yo, 2));
+  loa = anychart.math.vectorLength(xa, ya, xo, yo);
   //OP length
-  lop = Math.sqrt(Math.pow(xp - xo, 2) + Math.pow(yp - yo, 2));
+  lop = anychart.math.vectorLength(xp, yp, xo, yo);
 
   //Tilt angle of vertex side to the tangent in the start vertex point.
   vertexSideTiltAngle = goog.math.toDegrees(Math.atan(lop / loa));
