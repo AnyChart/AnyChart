@@ -1033,13 +1033,13 @@ anychart.core.axes.Radial.prototype.getLabelsFormatProvider_ = function(index, v
   };
 
   if (addRange) {
-    values['min'] = {value: goog.isDef(scale.max) ? scale.max : null, type: anychart.enums.TokenType.NUMBER};
-    values['max'] = {value: goog.isDef(scale.min) ? scale.min : null, type: anychart.enums.TokenType.NUMBER};
+    values['max'] = {value: goog.isDef(scale.max) ? scale.max : null, type: anychart.enums.TokenType.NUMBER};
+    values['min'] = {value: goog.isDef(scale.min) ? scale.min : null, type: anychart.enums.TokenType.NUMBER};
   }
 
   var aliases = {};
   aliases[anychart.enums.StringToken.AXIS_SCALE_MAX] = 'max';
-  aliases[anychart.enums.StringToken.AXIS_SCALE_MIN] = 'max';
+  aliases[anychart.enums.StringToken.AXIS_SCALE_MIN] = 'min';
 
   var context = new anychart.format.Context(values);
   context.tokenAliases(aliases);

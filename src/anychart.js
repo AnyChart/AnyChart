@@ -657,12 +657,13 @@ anychart.getFullTheme = function(root) {
   }
 
   for (i = Math.max(1, startMergeAt); i < anychart.mergedThemeClones_.length; i++) {
+    var rootParts = root.split('.');
     anychart.themes.merging.setThemePart(
         anychart.mergedThemeClones_[i],
-        root.split('.'),
+        [rootParts[0]],
         anychart.themes.merging.merge(
-            anychart.utils.recursiveClone(anychart.themes.merging.getThemePart(anychart.themeClones_[i], root)),
-            anychart.themes.merging.getThemePart(anychart.mergedThemeClones_[i - 1], root)));
+            anychart.utils.recursiveClone(anychart.themes.merging.getThemePart(anychart.themeClones_[i], rootParts[0])),
+            anychart.themes.merging.getThemePart(anychart.mergedThemeClones_[i - 1], rootParts[0])));
 
     anychart.themes.merging.markMergedDescriptor(root, i);
   }

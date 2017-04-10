@@ -44,7 +44,7 @@ anychart.core.series.Radar.prototype.cy;
 
 /** @inheritDoc */
 anychart.core.series.Radar.prototype.hasComplexZero = function() {
-  return !!this.innerRadius || this.planIsStacked();
+  return (this.isDiscreteBased() && !!this.innerRadius) || this.planIsStacked();
 };
 
 

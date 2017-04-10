@@ -880,14 +880,14 @@ anychart.core.axes.Circular.prototype.getLabelsFormatProvider_ = function(index,
     'index': {value: index, type: anychart.enums.TokenType.NUMBER},
     'value': {value: parseFloat(value), type: anychart.enums.TokenType.NUMBER},
     'tickValue': {value: parseFloat(value), type: anychart.enums.TokenType.NUMBER},
-    'min': {value: goog.isDef(scale.max) ? scale.max : null, type: anychart.enums.TokenType.NUMBER},
-    'max': {value: goog.isDef(scale.min) ? scale.min : null, type: anychart.enums.TokenType.NUMBER},
+    'max': {value: goog.isDef(scale.max) ? scale.max : null, type: anychart.enums.TokenType.NUMBER},
+    'min': {value: goog.isDef(scale.min) ? scale.min : null, type: anychart.enums.TokenType.NUMBER},
     'scale': {value: scale, type: anychart.enums.TokenType.UNKNOWN}
   };
 
   var aliases = {};
   aliases[anychart.enums.StringToken.AXIS_SCALE_MAX] = 'max';
-  aliases[anychart.enums.StringToken.AXIS_SCALE_MIN] = 'max';
+  aliases[anychart.enums.StringToken.AXIS_SCALE_MIN] = 'mix';
 
   var context = new anychart.format.Context(values);
   context.tokenAliases(aliases);

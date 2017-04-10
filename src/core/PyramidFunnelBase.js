@@ -1510,7 +1510,11 @@ anychart.core.PyramidFunnelBase.prototype.updatePointOnAnimate = function(point)
  * @param {boolean} isOutside Whether labels has outside position.
  */
 anychart.core.PyramidFunnelBase.prototype.updateLabelsOnAnimate = function(labelOpacity, connectorOpacity, isOutside) {
-  this.labels().suspendSignalsDispatching().fontOpacity(labelOpacity).draw().resumeSignalsDispatching(false);
+  var labels = this.labels();
+  labels.suspendSignalsDispatching();
+  labels['fontOpacity'](labelOpacity);
+  labels.draw();
+  labels.resumeSignalsDispatching(false);
   if (isOutside && this.drawnConnectors_) {
     for (var i in this.drawnConnectors_) {
       if (this.drawnConnectors_.hasOwnProperty(i))

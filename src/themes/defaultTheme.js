@@ -2864,7 +2864,15 @@ goog.provide('anychart.themes.defaultTheme');
              * @return {*}
              */
             'format': function() {
-              return 'Id: ' + this['id'] + '\nValue: ' + this['valuePrefix'] + locNum(this['size']) + this['valuePostfix'];
+              var result;
+              if (this['id']) {
+                result = 'Id: ' + this['id'];
+              } else {
+                result = 'lat: ' + this['lat'] + '\nlong: ' + this['long'];
+              }
+              if (this['size'])
+                result += '\nValue: ' + this['valuePrefix'] + locNum(this['size']) + this['valuePostfix'];
+              return result;
             }
           }
         },
@@ -2980,7 +2988,7 @@ goog.provide('anychart.themes.defaultTheme');
           for (var i = 0, len = seriesStatus.length; i < len; i++) {
             var status = seriesStatus[i];
             if (!status['points'].length) continue;
-            result += 'Series ' + status['series'].getIndex() + ':\n';
+            result += 'Series ' + status['series']['getIndex']() + ':\n';
             for (var j = 0, len_ = status['points'].length; j < len_; j++) {
               var point = status['points'][j];
               result += 'id: ' + point['id'] + ' index: ' + point['index'];

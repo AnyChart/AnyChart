@@ -145,7 +145,7 @@ anychart.core.BaseContext.prototype.tokenCustomValues = function(opt_value) {
  */
 anychart.core.BaseContext.prototype.getInValuesCaseInsensitive_ = function(lowerCaseName) {
   var key;
-  for (key in this.tokenCustomValues) {
+  for (key in this.storage_.tokenCustomValues) {
     if (this.storage_.tokenCustomValues.hasOwnProperty(key) && key.toLowerCase() == lowerCaseName)
       return this.storage_.tokenCustomValues[key].value;
   }
@@ -213,8 +213,8 @@ anychart.core.BaseContext.prototype.getStat = function(name) {
 anychart.core.BaseContext.prototype.propagate = function(opt_values) {
   var key;
   if (goog.isDef(opt_values)) {
-    for (key in this.storage_.values) {
-      if (this.hasOwnProperty(key) && !goog.isFunction(this[key])) {
+    for (key in this) {
+      if (this.hasOwnProperty(key) && !goog.isFunction(this[key]) && this[key] != this.storage_) {
         delete this[key];
       }
     }

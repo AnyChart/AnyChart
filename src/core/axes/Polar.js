@@ -188,7 +188,7 @@ anychart.core.axes.Polar.prototype.minorLabelsBounds_ = null;
  */
 anychart.core.axes.Polar.prototype.overlapMode = function(opt_value) {
   if (goog.isDef(opt_value)) {
-    var overlap = anychart.enums.normalizeLabelsOverlapMode(opt_value, this.overlapMode_);
+    var overlap = anychart.enums.normalizeLabelsOverlapMode(opt_value, this.overlapMode_, true);
     if (this.overlapMode_ != overlap) {
       this.overlapMode_ = overlap;
       this.dropBoundsCache_();
@@ -529,6 +529,11 @@ anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
       var radiusDelta = lineThickness / 2;
       var hasFill = this.fill_ != 'none';
       var boundsChecker = hasFill ? this.checkCrossesParentRadius_ : this.checkCrossesParentBounds_;
+      var overlapMode = this.overlapMode_ == anychart.enums.LabelsOverlapMode.AUTO_WIDTH && !isOrdinal ?
+          anychart.enums.LabelsOverlapMode.NO_OVERLAP :
+          this.overlapMode_;
+      var setAutoWidth = overlapMode == anychart.enums.LabelsOverlapMode.AUTO_WIDTH;
+      var autoWidth = null;
       while (!isNaN(majorRatio) || !isNaN(minorRatio)) {
         if (isNaN(minorRatio) || (majorRatio <= minorRatio)) {
           ratio = majorRatio;
@@ -542,6 +547,16 @@ anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
           labels = majorLabels;
           ticksAngles = majorTickAngles;
           ignoreTicks = ignoreMajorTicks;
+          if (setAutoWidth) {
+            var startAngle = goog.math.toRadians(this.startAngle_ - 90 + this.getRatio_(i, majorTicksArr, scale, 0) * 360);
+            var endAngle = goog.math.toRadians(this.startAngle_ - 90 + this.getRatio_(i, majorTicksArr, scale, 1) * 360);
+            autoWidth = anychart.math.vectorLength(
+                anychart.math.angleDx(startAngle, this.radius_),
+                anychart.math.angleDy(startAngle, this.radius_),
+                anychart.math.angleDx(endAngle, this.radius_),
+                anychart.math.angleDy(endAngle, this.radius_)
+            );
+          }
         } else {
           ratio = minorRatio;
           isMajor = false;
@@ -561,7 +576,7 @@ anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
         dx = anychart.math.angleDx(angleRad, 1);
         dy = anychart.math.angleDy(angleRad, 1);
         if (labelsEnabled) {
-          points = this.configureLabel_(labels, index, ticksArr[index], angle, this.radius_ + labelsOffset, boundsCache);
+          points = this.configureLabel_(labels, index, ticksArr[index], angle, this.radius_ + labelsOffset, boundsCache, autoWidth);
           radiusDelta = Math.max(boundsChecker.call(this, angle, dx, dy, points), radiusDelta);
           labelsOrder.push(isMajor ? index : ~index);
         }
@@ -636,7 +651,7 @@ anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
           // this.drawDebugPath_(points, '2 green');
         }
       }
-      if (this.overlapMode_ == anychart.enums.LabelsOverlapMode.NO_OVERLAP && labelsOrder.length) {
+      if (overlapMode == anychart.enums.LabelsOverlapMode.NO_OVERLAP && labelsOrder.length) {
         var newLabelsOrder = [labelsOrder[0]];
         var lastMajor = labelsOrder[0] < 0 ? NaN : 0;
         var firstMajor = lastMajor;
@@ -694,6 +709,10 @@ anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
           }
         }
       }
+    } else {
+      this.originalRadius_ = this.radius_;
+      this.majorTickAngles_ = [];
+      this.minorTickAngles_ = [];
     }
 
     this.markConsistent(anychart.ConsistencyState.BOUNDS);
@@ -812,10 +831,11 @@ anychart.core.axes.Polar.prototype.getRatio_ = function(i, ticksArr, scale, subR
  * @param {number} angle
  * @param {number} radius
  * @param {Array} cache
+ * @param {?number=} opt_width
  * @return {Array.<number>} Label coordinate box.
  * @private
  */
-anychart.core.axes.Polar.prototype.configureLabel_ = function(labels, index, value, angle, radius, cache) {
+anychart.core.axes.Polar.prototype.configureLabel_ = function(labels, index, value, angle, radius, cache, opt_width) {
   var formatProvider = this.getLabelsFormatProvider_(index, value);
   var positionProvider = {'value': {'angle': angle, 'radius': radius}};
   var label = labels.getLabel(index);
@@ -829,12 +849,16 @@ anychart.core.axes.Polar.prototype.configureLabel_ = function(labels, index, val
     label.suspendSignalsDispatching();
   }
   var autoRotate = label.getFinalSettings('autoRotate');
-  if (label.getFinalSettings('anchor') == anychart.enums.Anchor.AUTO)
+  if (autoRotate) {
+    label.state('seriesState', {'width': anychart.utils.isNaN(opt_width) ? null : opt_width});
+  }
+  if (label.getFinalSettings('anchor') == anychart.enums.Anchor.AUTO) {
     label.state('pointState', {
       'anchor': autoRotate ?
           anychart.enums.Anchor.CENTER :
           anychart.utils.getAnchorForAngle(angle - /** @type {number} */(label.getFinalSettings('rotation')))
     });
+  }
   var points = labels.measureWithTransform(label);
 
   // this.drawDebugPath_(points, '2 red');
@@ -937,7 +961,7 @@ anychart.core.axes.Polar.prototype.getLabelsFormatProvider_ = function(index, va
 
   var aliases = {};
   aliases[anychart.enums.StringToken.AXIS_SCALE_MAX] = 'max';
-  aliases[anychart.enums.StringToken.AXIS_SCALE_MIN] = 'max';
+  aliases[anychart.enums.StringToken.AXIS_SCALE_MIN] = 'min';
 
   var context = new anychart.format.Context(values);
   context.tokenAliases(aliases);

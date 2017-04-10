@@ -983,9 +983,9 @@ anychart.core.series.Cartesian.prototype.finalizePointAppearance = goog.nullFunc
  */
 anychart.core.series.Cartesian.prototype.applyAppearanceToSeries = function(pointState) {
   var iterator = this.getIterator();
+  this.drawer.updatePoint(iterator, pointState);
   this.shapeManager.updateColors(pointState,
       /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes')));
-  this.drawer.updatePoint(iterator, pointState);
   if (this.supportsOutliers()) {
     this.drawPointOutliers(iterator, pointState);
   }

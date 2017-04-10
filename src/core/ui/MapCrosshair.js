@@ -379,7 +379,7 @@ anychart.core.ui.MapCrosshair.prototype.getLabelsFormatProvider = function(axis,
     'value': {value: labelText, type: anychart.enums.TokenType.STRING},
     'tickValue': {value: value, type: anychart.enums.TokenType.NUMBER},
     'max': {value: goog.isDef(scale.max) ? scale.max : null, type: anychart.enums.TokenType.NUMBER},
-    'min': {value: goog.isDef(scale.max) ? scale.max : null, type: anychart.enums.TokenType.NUMBER}
+    'min': {value: goog.isDef(scale.min) ? scale.min : null, type: anychart.enums.TokenType.NUMBER}
   };
 
   var tokenAliases = {};

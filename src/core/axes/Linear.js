@@ -644,7 +644,7 @@ anychart.core.axes.Linear.prototype.getOverlappedLabels_ = function(opt_bounds) 
     if (this.overlapMode_ == anychart.enums.LabelsOverlapMode.ALLOW_OVERLAP) {
       return false;
     } else {
-      var scale = /** @type {anychart.scales.ScatterBase|anychart.scales.Ordinal} */(this.scale());
+      var scale = /** @type {anychart.scales.Linear|anychart.scales.DateTime|anychart.scales.Ordinal} */(this.scale());
       var labels = [];
       var minorLabels = [];
 
@@ -1659,13 +1659,13 @@ anychart.core.axes.Linear.prototype.getLabelsFormatProvider = function(index, va
   };
 
   if (addRange) {
-    values['min'] = {value: goog.isDef(scale.max) ? scale.max : null, type: anychart.enums.TokenType.NUMBER};
-    values['max'] = {value: goog.isDef(scale.min) ? scale.min : null, type: anychart.enums.TokenType.NUMBER};
+    values['max'] = {value: goog.isDef(scale.max) ? scale.max : null, type: anychart.enums.TokenType.NUMBER};
+    values['min'] = {value: goog.isDef(scale.min) ? scale.min : null, type: anychart.enums.TokenType.NUMBER};
   }
 
   var aliases = {};
   aliases[anychart.enums.StringToken.AXIS_SCALE_MAX] = 'max';
-  aliases[anychart.enums.StringToken.AXIS_SCALE_MIN] = 'max';
+  aliases[anychart.enums.StringToken.AXIS_SCALE_MIN] = 'min';
 
   var tokenCustomValues = {};
   tokenCustomValues[anychart.enums.StringToken.AXIS_NAME] = {value: this.title().text(), type: anychart.enums.TokenType.STRING};

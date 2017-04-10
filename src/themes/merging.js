@@ -1073,6 +1073,12 @@ anychart.themes.merging.mergingMap_ = [
     ]
   },
   {
+    defaultObj: 'polar.defaultSeriesSettings.rangeLike',
+    targets: [
+      'polar.defaultSeriesSettings.rangeColumn'
+    ]
+  },
+  {
     defaultObj: 'polar.defaultSeriesSettings.areaLike',
     targets: [
       'polar.defaultSeriesSettings.area',

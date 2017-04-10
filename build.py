@@ -344,10 +344,11 @@ def __compile_project_from_map(options):
                     options['theme'],
                     options['debug_files'],
                     options['gzip'],
-                    options['performance_monitoring'])
+                    options['performance_monitoring'],
+                    options['allow_compile_css'])
 
 
-def __build_project(develop, modules, sources, theme, debug, gzip, perf_monitoring):
+def __build_project(develop, modules, sources, theme, debug, gzip, perf_monitoring, allow_compile_css):
     args = locals()
     dev_postfix = '.dev' if develop else ''
     perf_postfix = '.perf' if perf_monitoring else ''
@@ -378,8 +379,11 @@ def __build_project(develop, modules, sources, theme, debug, gzip, perf_monitori
 
         # print build log
         __log_compilation(output_file, args)
-        if 'anychart_ui' in modules or 'anychart_bundle' or 'chart_editor' in modules:
-            __compile_css()
+        
+        # compile css
+        if allow_compile_css:
+            if 'anychart_ui' in modules or 'anychart_bundle' or 'chart_editor' in modules:
+                __compile_css(__should_gen_gzip())
 
         __call_console_commands(commands, module=modules[0])
 
@@ -427,8 +431,11 @@ def __build_project(develop, modules, sources, theme, debug, gzip, perf_monitori
 
         # print build log
         __log_compilation(output_file, args)
-        if 'anychart_ui' in modules or 'anychart_bundle' in modules:
-            __compile_css()
+
+        # compile css
+        if allow_compile_css:            
+            if 'anychart_ui' in modules or 'anychart_bundle' in modules:
+                __compile_css(__should_gen_gzip())
 
         # build binary file
         __call_console_commands(commands, module=modules[0])
@@ -727,9 +734,9 @@ def __build_release():
     print "Build release for version: %s" % full_version
 
     dev_options = {'develop': False, 'modules': None, 'sources': False, 'theme': 'defaultTheme', 'debug_files': False,
-                   'gzip': True, 'performance_monitoring': False}
+                   'gzip': True, 'performance_monitoring': False, 'allow_compile_css': False}
     prod_options = {'develop': True, 'modules': None, 'sources': False, 'theme': 'defaultTheme', 'debug_files': False,
-                    'gzip': True, 'performance_monitoring': False}
+                    'gzip': True, 'performance_monitoring': False, 'allow_compile_css': False}
     export_server_project_path = arguments['export_server_path']
 
     mods = ['anychart_bundle', 'anychart',
@@ -745,6 +752,9 @@ def __build_release():
     pool.map_async(__compile_project_from_map, args).get(99999)
     pool.close()
     pool.join()
+
+    print "Compile CSS"
+    __compile_css(True)
 
     print "Compile Themes"
     __build_themes()
@@ -794,25 +804,25 @@ def __build_release():
     shutil.rmtree(os.path.join(OUT_PATH, 'gallery_demos'))
 
     # export server
-    #print "Build export-server"
-    #if os.path.exists(export_server_project_path):
-    #    # define version
-    #    export_server_version, export_server_bundle_version = __get_export_server_version(export_server_project_path)
-    #
-    #    # build export server
-    #    shutil.copyfile(os.path.join(OUT_PATH, 'anychart-bundle.min.js'),
-    #                    os.path.join(export_server_project_path, 'resources', 'js', 'anychart-bundle.min.js'))
-    #    p = subprocess.Popen(['lein', 'uberjar'], cwd=export_server_project_path)
-    #    p.wait()
-    #
-    #    # copy to out
-    #    shutil.copyfile(os.path.join(export_server_project_path, 'target', 'export-server-standalone.jar'),
-    #                    os.path.join(OUT_PATH, 'export-server.jar'))
-    #    shutil.copyfile(os.path.join(export_server_project_path, 'target', 'export-server-standalone.jar'),
-    #                    os.path.join(OUT_PATH, 'export-server-%s-bundle-%s.jar' % (
-    #                    export_server_version, export_server_bundle_version)))
-    #else:
-    #    print "Error: Unable to build export server, there is no project at path: %s" % export_server_project_path
+    print "Build export-server"
+    if os.path.exists(export_server_project_path):
+        # define version
+        export_server_version, export_server_bundle_version = __get_export_server_version(export_server_project_path)
+
+        # build export server
+        shutil.copyfile(os.path.join(OUT_PATH, 'anychart-bundle.min.js'),
+                        os.path.join(export_server_project_path, 'resources', 'js', 'anychart-bundle.min.js'))
+        p = subprocess.Popen(['lein', 'uberjar'], cwd=export_server_project_path)
+        p.wait()
+
+        # copy to out
+        shutil.copyfile(os.path.join(export_server_project_path, 'target', 'export-server-standalone.jar'),
+                        os.path.join(OUT_PATH, 'export-server.jar'))
+        shutil.copyfile(os.path.join(export_server_project_path, 'target', 'export-server-standalone.jar'),
+                        os.path.join(OUT_PATH, 'export-server-%s-bundle-%s.jar' % (
+                        export_server_version, export_server_bundle_version)))
+    else:
+        print "Error: Unable to build export server, there is no project at path: %s" % export_server_project_path
 
     print "Release build complete! Build time: {:.3f} sec".format(time.time() - t)
 
@@ -1140,7 +1150,7 @@ def safe_index_of(string, substring):
 # =======================================================================================================================
 #                            Less css.
 # =======================================================================================================================
-def __compile_css():
+def __compile_css(gzip):
     try:
         import lesscpy
     except ImportError:
@@ -1163,7 +1173,7 @@ def __compile_css():
     f_min.write(lesscpy.compile(css_src_path, xminify=True))
     f_min.close()
 
-    if __should_gen_gzip():
+    if gzip:
         __gzip_file(css_out_path)
         __gzip_file(css_min_out_path)
 
@@ -1272,6 +1282,8 @@ def __exec_main_script():
     compile_parser.add_argument('-t', '--theme', action='store',
                                 help="Specify the default theme to compile with. By default - 'defaultTheme'",
                                 default='defaultTheme')
+    compile_parser.add_argument('-ac', '--allow_compile_css', action='store_true',
+                                help="Allow or reject build script to compile css for module")
 
     # create the parser for the "compile_each" command
     compile_each_parser = subparsers.add_parser('compile_each', help='Compile each project available module')
@@ -1373,7 +1385,7 @@ def __exec_main_script():
     elif command == 'gz_stat':
         __print_gz_stat()
     elif command == 'css':
-        __compile_css()
+        __compile_css(__should_gen_gzip())
 
     __print_warnings_list()
 

@@ -675,7 +675,7 @@ anychart.core.axes.Radar.prototype.getLabelsFormatProvider_ = function(index, va
 
   var aliases = {};
   aliases[anychart.enums.StringToken.AXIS_SCALE_MAX] = 'max';
-  aliases[anychart.enums.StringToken.AXIS_SCALE_MIN] = 'max';
+  aliases[anychart.enums.StringToken.AXIS_SCALE_MIN] = 'min';
 
   var context = new anychart.format.Context(values);
   context.tokenAliases(aliases);

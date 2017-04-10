@@ -927,7 +927,12 @@ anychart.format.dateTime = function(date, opt_format, opt_timeZone, opt_locale) 
  */
 anychart.format.number = function(number, opt_decimalsCountOrLocale, opt_decimalPoint, opt_groupsSeparator,
     opt_scale, opt_zeroFillDecimals, opt_scaleSuffixSeparator, opt_useBracketsForNegative) {
-  var obj = anychart.format.getNumberLocale(opt_decimalsCountOrLocale);
+  var obj;
+  if (goog.isString(opt_decimalsCountOrLocale)) {
+    obj = anychart.format.getNumberLocale(opt_decimalsCountOrLocale);
+  } else if (goog.isObject(opt_decimalsCountOrLocale)) {
+    obj = opt_decimalsCountOrLocale;
+  }
   var locale = anychart.format.getNumberLocale(anychart.format.outputLocale_) ||
       anychart.format.getNumberLocale('default');
 

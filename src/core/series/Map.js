@@ -577,7 +577,7 @@ anychart.core.series.Map.prototype.calculateStatistics = function() {
  * @return {boolean}
  */
 anychart.core.series.Map.prototype.needRedrawOnZoomOrMove = function() {
-  return !!(this.drawer.type == anychart.enums.SeriesDrawerTypes.CONNECTOR && (this.getOption('startSize') || this.getOption('endSize')));
+  return this.drawer.type == anychart.enums.SeriesDrawerTypes.CONNECTOR;
 };
 
 
@@ -1040,8 +1040,13 @@ anychart.core.series.Map.prototype.updateContext = function(provider, opt_rowInf
     'series': {value: this, type: anychart.enums.TokenType.UNKNOWN},
     'scale': {value: scale, type: anychart.enums.TokenType.UNKNOWN},
     'index': {value: rowInfo.getIndex(), type: anychart.enums.TokenType.NUMBER},
-    'seriesName': {value: this.name(), type: anychart.enums.TokenType.STRING}
+    'seriesName': {value: this.name(), type: anychart.enums.TokenType.STRING},
+    'id': {value: rowInfo.get('id'), type: anychart.enums.TokenType.STRING}
   };
+
+  var val = rowInfo.get('value');
+  if (goog.isDef(val))
+    values['value'] = {value: val, type: anychart.enums.TokenType.NUMBER};
 
   if (scale && goog.isFunction(scale.getType))
     values['xScaleType'] = {value: scale.getType(), type: anychart.enums.TokenType.STRING};
@@ -1050,7 +1055,8 @@ anychart.core.series.Map.prototype.updateContext = function(provider, opt_rowInf
   var refValueNames = this.getYValueNames();
   for (i = 0; i < refValueNames.length; i++) {
     var refName = refValueNames[i];
-    values[refName] = {value: rowInfo.get(refName), type: anychart.enums.TokenType.NUMBER};
+    if (!(refName in values))
+      values[refName] = {value: rowInfo.get(refName), type: anychart.enums.TokenType.NUMBER};
   }
 
   if (this.drawer.type == anychart.enums.SeriesDrawerTypes.CONNECTOR) {
@@ -1089,7 +1095,6 @@ anychart.core.series.Map.prototype.updateContext = function(provider, opt_rowInf
   }
 
   provider
-      .values(values)
       .dataSource(rowInfo)
       .statisticsSources([this, this.getChart()]);
 
@@ -1137,6 +1142,9 @@ anychart.core.series.Map.prototype.createFormatProvider = function(opt_force) {
 
 /** @inheritDoc */
 anychart.core.series.Map.prototype.drawSingleFactoryElement = function(factory, index, positionProvider, formatProvider, chartNormalFactory, seriesStateFactory, chartStateFactory, pointOverride, statePointOverride, opt_position) {
+  if (!positionProvider['value'])
+    return null;
+
   var element = formatProvider ? factory.getLabel(/** @type {number} */(index)) : factory.getMarker(/** @type {number} */(index));
   if (element) {
     if (formatProvider)
@@ -1442,7 +1450,7 @@ anychart.core.series.Map.prototype.createPositionProvider_ = function(iterator) 
 anychart.core.series.Map.prototype.createChoroplethPositionProvider_ = function(iterator) {
   var features = iterator.meta('features');
   var feature = features && features.length ? features[0] : null;
-  var middlePoint, midX, midY, txCoords;
+  var middlePoint, midX, midY, txCoords, labelPoint;
   if (feature) {
     middlePoint = this.getMiddlePoint();
 
@@ -1467,7 +1475,6 @@ anychart.core.series.Map.prototype.createChoroplethPositionProvider_ = function(
     var x = goog.isDef(dataLabelXPos) ? dataLabelXPos : geoLabelXPos;
     var y = goog.isDef(dataLabelYPos) ? dataLabelYPos : geoLabelYPos;
 
-    var labelPoint;
     if (goog.isDef(x) && goog.isDef(y)) {
       iterator.meta('positionMode', positionMode);
 
@@ -1526,7 +1533,7 @@ anychart.core.series.Map.prototype.createChoroplethPositionProvider_ = function(
       iterator.meta('markerAnchor', anychart.enums.Anchor.CENTER);
     }
   } else {
-    middlePoint = {'x': 0, 'y': 0};
+    middlePoint = null;
   }
 
   if (labelPoint) {
@@ -1553,7 +1560,7 @@ anychart.core.series.Map.prototype.createPositionProvider = function(position, o
       break;
     case anychart.enums.SeriesDrawerTypes.CHOROPLETH:
       point = this.createChoroplethPositionProvider_(iterator);
-      var connectorPoint = point['connectorPoint'];
+      var connectorPoint = point && point['connectorPoint'];
       if (connectorPoint) {
         delete point['connectorPoint'];
         return {
@@ -1590,7 +1597,7 @@ anychart.core.series.Map.prototype.getPositionByRegion = function() {
     var bounds = shape.getAbsoluteBounds();
     positionProvider = {'x': bounds.left + bounds.width * middleX, 'y': bounds.top + bounds.height * middleY};
   } else {
-    positionProvider = {'x': 0, 'y': 0};
+    positionProvider = null;
   }
   return positionProvider;
 };

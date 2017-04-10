@@ -878,7 +878,7 @@ anychart.core.axes.Map.prototype.getLabelsFormatProvider = function(index, value
     'value': {value: labelText, type: anychart.enums.TokenType.STRING},
     'tickValue': {value: value, type: anychart.enums.TokenType.NUMBER},
     'max': {value: goog.isDef(scale.max) ? scale.max : null, type: anychart.enums.TokenType.NUMBER},
-    'min': {value: goog.isDef(scale.max) ? scale.max : null, type: anychart.enums.TokenType.NUMBER}
+    'min': {value: goog.isDef(scale.min) ? scale.min : null, type: anychart.enums.TokenType.NUMBER}
   };
 
   var tokenAliases = {};
@@ -1815,7 +1815,6 @@ anychart.core.axes.Map.prototype.serialize = function() {
   json['ticks'] = this.ticks().serialize();
   json['minorTicks'] = this.minorTicks().serialize();
 
-  debugger;
   var labelsConfig = this.labels().getChangedSettings();
   if (!goog.object.isEmpty(labelsConfig))
     json['labels'] = labelsConfig;

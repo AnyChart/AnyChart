@@ -27,9 +27,8 @@ goog.inherits(anychart.core.series.Pareto, anychart.core.series.Cartesian);
 
 //region --- Overrides
 /** @inheritDoc */
-anychart.core.series.Pareto.prototype.createLabelsContextProvider = function() {
-  var provider = this.updateContext(new anychart.format.Context());
-
+anychart.core.series.Pareto.prototype.updateContext = function(provider, opt_rowInfo) {
+  provider = anychart.core.series.Pareto.base(this, 'updateContext', provider, opt_rowInfo);
   var values = provider.values();
   if (goog.isDef(values['index']) && values['index'].value > -1) {
     var data = this.data();
@@ -47,7 +46,7 @@ anychart.core.series.Pareto.prototype.createLabelsContextProvider = function() {
   tokenAliases[anychart.enums.StringToken.CUMULATIVE_FREQUENCY] = 'cf';
   tokenAliases[anychart.enums.StringToken.RELATIVE_FREQUENCY] = 'rf';
 
-  return provider.propagate(values);
+  return /** @type {anychart.format.Context} */ (provider.propagate(values));
 };
 
 

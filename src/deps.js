@@ -496,7 +496,6 @@ goog.addDependency('../../../../src/themes/monochrome.js', ['anychart.themes.mon
 goog.addDependency('../../../../src/themes/morning.js', ['anychart.themes.morning'], [], false);
 goog.addDependency('../../../../src/themes/pastel.js', ['anychart.themes.pastel'], [], false);
 goog.addDependency('../../../../src/themes/sea.js', ['anychart.themes.sea'], [], false);
-goog.addDependency('../../../../src/themes/v6.js', ['anychart.themes.v6'], [], false);
 goog.addDependency('../../../../src/themes/wines.js', ['anychart.themes.wines'], [], false);
 goog.addDependency('../../../../src/ui/ContextMenu.js', ['anychart.ui.ContextMenu', 'anychart.ui.ContextMenu.ActionContext', 'anychart.ui.ContextMenu.Item', 'anychart.ui.ContextMenu.PrepareItemsContext'], ['anychart.enums', 'anychart.ui.menu.Item', 'anychart.ui.menu.SubMenu', 'goog.dom.classlist', 'goog.ui.MenuSeparator', 'goog.ui.PopupMenu'], false);
 goog.addDependency('../../../../src/ui/GanttToolbar.js', ['anychart.ui.GanttToolbar'], ['anychart.core.reporting', 'anychart.enums', 'anychart.ui.menu.Item', 'anychart.ui.menu.Menu', 'anychart.ui.menu.SubMenu', 'anychart.ui.toolbar.MenuButton', 'anychart.ui.toolbar.Separator', 'anychart.ui.toolbar.Toolbar', 'goog.ui.MenuSeparator', 'goog.ui.ToolbarButton'], false);
