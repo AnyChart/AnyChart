@@ -8,7 +8,7 @@
     }
 
     function a() {
-        return this.sourceColor
+        return b.anychart.color.setOpacity(this.sourceColor, .6, !0)
     }
     var b = this;
     b.anychart = b.anychart || {};
@@ -361,7 +361,6 @@
                 outlineStroke: "#616161",
                 defaultSeriesSettings: {
                     base: {
-                        color: "#80deea 0.6",
                         selectStroke: a,
                         selectFill: a
                     },

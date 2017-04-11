@@ -1,5 +1,5 @@
 (function() {
-    function x(a) {
+    function w(a) {
         switch (a.xScaleType) {
             case "dateTime":
                 return window.anychart.format.date(a.x);
@@ -8,61 +8,91 @@
         }
     }
 
-    function u() {
-        for (var a = this.chart, d = m.call(this), c = a.getSeriesCount(), f = {}, l = 0; l < c; l++) {
-            var e = a.getSeriesAt(l).getType();
-            f.hasOwnProperty(e) ? f[e] += 1 : f[e] = 1
+    function x() {
+        for (var a = this.chart, f = m.call(this), c = a.getSeriesCount(), e = {}, l = 0; l < c; l++) {
+            var d = a.getSeriesAt(l).getType();
+            e.hasOwnProperty(d) ? e[d] += 1 : e[d] = 1
         }
-        var d = d + ", with ",
+        var f = f + ", with ",
             g;
-        for (g in f) d += f[g] + " " + g + " series, ";
-        d += ". ";
-        f = a.yScale();
+        for (g in e) f += e[g] + " " + g + " series, ";
+        f += ". ";
+        e = a.yScale();
         a = a.xScale();
         c = a.getType();
-        l = f.getType();
+        l = e.getType();
         if ("ordinal" == l) {
-            f = f.values();
-            d += "Y-scale with " + f.length + " categories: ";
-            for (l = 0; l < f.length; l++) d +=
-                f[l] + ", ";
-            d += ". "
-        } else d = "dateTime" == l ? d + ("Y-scale minimum value is " + b.anychart.format.dateTime(f.minimum()) + " , maximum value is " + b.anychart.format.dateTime(f.maximum()) + ". ") : d + ("Y-scale minimum value is " + f.minimum() + " , maximum value is " + f.maximum() + ". ");
+            e = e.values();
+            f += "Y-scale with " + e.length + " categories: ";
+            for (l = 0; l < e.length; l++) f +=
+                e[l] + ", ";
+            f += ". "
+        } else f = "dateTime" == l ? f + ("Y-scale minimum value is " + b.anychart.format.dateTime(e.minimum()) + " , maximum value is " + b.anychart.format.dateTime(e.maximum()) + ". ") : f + ("Y-scale minimum value is " + e.minimum() + " , maximum value is " + e.maximum() + ". ");
         if ("ordinal" == c) {
             a = a.values();
-            d += "X-scale with " + a.length + " categories: ";
-            for (c = 0; c < a.length; c++) d += a[c] + ", ";
-            d += ". "
-        } else d = "dateTime" == c ? d + ("X-scale minimum value is " + b.anychart.format.dateTime(a.minimum()) + " , maximum value is " + b.anychart.format.dateTime(a.maximum()) +
-            ". ") : d + ("X-scale minimum value is " + a.minimum() + " , maximum value is " + a.maximum() + ". ");
-        return d
+            f += "X-scale with " + a.length + " categories: ";
+            for (c = 0; c < a.length; c++) f += a[c] + ", ";
+            f += ". "
+        } else f = "dateTime" == c ? f + ("X-scale minimum value is " + b.anychart.format.dateTime(a.minimum()) + " , maximum value is " + b.anychart.format.dateTime(a.maximum()) +
+            ". ") : f + ("X-scale minimum value is " + a.minimum() + " , maximum value is " + a.maximum() + ". ");
+        return f
+    }
+
+    function y() {
+        for (var a = this.chart, f = m.call(this), c = a.getSeriesCount(), e = {}, d = 0; d < c; d++) {
+            var g = a.getSeriesAt(d).seriesType();
+            e.hasOwnProperty(g) ? e[g] += 1 : e[g] = 1
+        }
+        var f = f + ", with ",
+            h;
+        for (h in e) f += e[h] + " " + h + " series, ";
+        f += ". ";
+        e = a.yScale();
+        a = a.xScale();
+        c = a.getType();
+        d = e.getType();
+        if ("ordinal" == d) {
+            e = e.values();
+            f += "Y-scale with " + e.length + " categories: ";
+            for (d = 0; d < e.length; d++) f += e[d] + ", ";
+            f += ". "
+        } else f =
+            "dateTime" == d ? f + ("Y-scale minimum value is " + b.anychart.format.dateTime(e.minimum()) + " , maximum value is " + b.anychart.format.dateTime(e.maximum()) + ". ") : f + ("Y-scale minimum value is " + e.minimum() + " , maximum value is " + e.maximum() + ". ");
+        if ("ordinal" == c) {
+            a = a.values();
+            f += "X-scale with " + a.length + " categories: ";
+            for (c = 0; c < a.length; c++) f += a[c] + ", ";
+            f += ". "
+        } else f = "dateTime" == c ? f + ("X-scale minimum value is " + b.anychart.format.dateTime(a.minimum()) + " , maximum value is " + b.anychart.format.dateTime(a.maximum()) +
+            ". ") : f + ("X-scale minimum value is " + a.minimum() + " , maximum value is " + a.maximum() + ". ");
+        return f
     }
 
     function m() {
         var a = this.chart,
-            d = a.title(),
-            d = d && d.enabled() && d.text() ? d.text() : "";
-        return (a.getType() || "Anychart ") + " chart " + (d ? " entitled " + d : "")
-    }
-
-    function y() {
-        return b.anychart.color.setThickness(this.sourceColor, 1.5)
+            b = a.title(),
+            b = b && b.enabled() && b.text() ? b.text() : "";
+        return (a.getType() || "Anychart ") + " chart " + (b ? " entitled " + b : "")
     }
 
     function z() {
-        return this.seriesName + ":\n  Open: " + c(this.open) + "\n  High: " + c(this.high) + "\n  Low: " + c(this.low) + "\n  Close: " + c(this.close)
+        return b.anychart.color.setThickness(this.sourceColor, 1.5)
     }
 
     function A() {
+        return this.seriesName + ":\n  Open: " + c(this.open) + "\n  High: " + c(this.high) + "\n  Low: " + c(this.low) + "\n  Close: " + c(this.close)
+    }
+
+    function B() {
         return "Open: " + c(this.open) + "\nHigh: " +
             c(this.high) + "\nLow: " + c(this.low) + "\nClose: " + c(this.close)
     }
 
-    function B() {
+    function C() {
         return "High: " + c(this.high) + "\nLow: " + c(this.low)
     }
 
-    function C() {
+    function D() {
         return b.anychart.color.setThickness(this.sourceColor, 1.5)
     }
 
@@ -70,7 +100,7 @@
         return b.anychart.color.setThickness(b.anychart.color.lighten(this.sourceColor), 1.5)
     }
 
-    function v() {
+    function u() {
         return b.anychart.color.setThickness(this.sourceColor, 1)
     }
 
@@ -90,7 +120,7 @@
         return b.anychart.color.setOpacity(this.sourceColor, .85, !0)
     }
 
-    function D() {
+    function E() {
         return b.anychart.color.setOpacity(this.sourceColor, .5, !0)
     }
 
@@ -98,15 +128,15 @@
         return b.anychart.color.setOpacity(this.sourceColor, .65, !0)
     }
 
-    function w() {
+    function v() {
         return b.anychart.color.setOpacity(this.sourceColor, .7, !0)
     }
 
-    function e() {
+    function d() {
         return this.sourceColor
     }
 
-    function E() {
+    function F() {
         return b.anychart.format.date(this.tickValue)
     }
 
@@ -114,15 +144,15 @@
         return b.anychart.format.date(this.x)
     }
 
-    function F() {
+    function G() {
         return this.x
     }
 
-    function G() {
-        return this.name || this.getDataValue("id")
+    function H() {
+        return this.name || this.getData("id")
     }
 
-    function H() {
+    function I() {
         return c(this.value, 10)
     }
 
@@ -130,9 +160,9 @@
         return c(this.value)
     }
 
-    function c(a, d) {
+    function c(a, f) {
         var c = null === a || "boolean" == typeof a || "" == a ? NaN : +a;
-        return isNaN(c) ? a : b.anychart.format.number(c, d, void 0, void 0, void 0, void 0, void 0, void 0)
+        return isNaN(c) ? a : b.anychart.format.number(c, f, void 0, void 0, void 0, void 0, void 0, void 0)
     }
     var b = this;
     b.anychart = b.anychart || {};
@@ -151,13 +181,72 @@
         markerPalette: {
             items: "circle diamond square triangleDown triangleUp diagonalCross pentagon cross vline star5 star4 trapezium star7 star6 star10".split(" ")
         },
+        defaultScaleSettings: {
+            linear: {
+                maxTicksCount: 1E3,
+                inverted: !1,
+                maximum: null,
+                minimum: null,
+                minimumGap: .1,
+                maximumGap: .1,
+                softMinimum: null,
+                softMaximum: null,
+                ticks: {
+                    mode: "linear",
+                    base: 0,
+                    explicit: null,
+                    minCount: 4,
+                    maxCount: 6,
+                    interval: NaN
+                },
+                minorTicks: {
+                    mode: "linear",
+                    base: 0,
+                    explicit: null,
+                    count: 5,
+                    interval: NaN
+                },
+                stackMode: "none",
+                stickToZero: !0
+            },
+            ordinal: {
+                type: "ordinal",
+                inverted: !1,
+                names: [],
+                ticks: {
+                    maxCount: 100
+                }
+            },
+            log: {
+                type: "log",
+                logBase: 10,
+                ticks: {
+                    mode: "log"
+                },
+                minorTicks: {
+                    mode: "log"
+                }
+            },
+            dateTime: {
+                type: "dateTime",
+                ticks: {
+                    count: 4
+                },
+                minorTicks: {
+                    count: 4
+                }
+            }
+        },
         defaultOrdinalColorScale: {
             autoColors: function(a) {
                 return b.anychart.color.blendedHueProgression("#90caf9", "#01579b", a)
             }
         },
         defaultLinearColorScale: {
-            colors: ["#90caf9", "#01579b"]
+            maxTicksCount: 1E3,
+            colors: ["#90caf9", "#01579b"],
+            minimumGap: 0,
+            maximumGap: 0
         },
         defaultFontSettings: {
             fontSize: 13,
@@ -224,7 +313,7 @@
                 left: 4
             },
             rotation: 0,
-            textFormatter: h,
+            format: h,
             positionFormatter: h
         },
         defaultMarkerFactory: {
@@ -338,14 +427,17 @@
             position: "leftTop",
             anchor: "leftTop",
             hideDelay: 0,
-            titleFormatter: h,
-            textFormatter: function() {
+            titleFormat: h,
+            format: function() {
                 return this.valuePrefix + c(this.value) + this.valuePostfix
             },
-            unionTextFormatter: function() {
+            unionFormat: function() {
                 return this.formattedValues.join("\n")
             },
-            zIndex: 0
+            zIndex: 0,
+            allowLeaveChart: !0,
+            allowLeaveScreen: !1,
+            allowLeaveStage: !1
         },
         defaultAxis: {
             enabled: !0,
@@ -373,14 +465,14 @@
             },
             labels: {
                 enabled: !0,
-                textFormatter: H,
+                format: I,
                 positionFormatter: h,
                 zIndex: 35
             },
             minorLabels: {
                 enabled: !1,
                 fontSize: 9,
-                textFormatter: H,
+                format: I,
                 positionFormatter: h,
                 zIndex: 35
             },
@@ -464,8 +556,7 @@
             positionMode: "outside",
             itemsSpacing: 15,
             items: null,
-            itemsFormatter: null,
-            itemsTextFormatter: null,
+            itemsFormat: null,
             itemsSourceMode: "default",
             inverted: !1,
             hoverCursor: "pointer",
@@ -528,10 +619,10 @@
                     }
                 }
             },
-            titleFormatter: null,
+            titleFormat: null,
             tooltip: {
                 enabled: !1,
-                allowLeaveScreen: !1,
+                allowLeaveScreen: !0,
                 allowLeaveChart: !0,
                 title: {
                     enabled: !1
@@ -547,7 +638,7 @@
             y: 0,
             axisIndex: 0,
             anchor: null,
-            textFormatter: h,
+            format: h,
             enabled: !0,
             fontSize: 12,
             minFontSize: 8,
@@ -837,8 +928,6 @@
                 allowMultiSeriesSelection: !0
             },
             tooltip: {
-                allowLeaveScreen: !1,
-                allowLeaveChart: !0,
                 displayMode: "single",
                 positionMode: "float",
                 title: {
@@ -847,10 +936,10 @@
                 separator: {
                     enabled: !0
                 },
-                titleFormatter: function() {
-                    return x(this.points[0])
+                titleFormat: function() {
+                    return w(this.points[0])
                 },
-                textFormatter: function() {
+                format: function() {
                     return this.formattedValues.join("\n")
                 }
             },
@@ -875,10 +964,10 @@
                         enabled: !0
                     },
                     tooltip: {
-                        titleFormatter: function() {
-                            return x(this)
+                        titleFormat: function() {
+                            return w(this)
                         },
-                        textFormatter: function() {
+                        format: function() {
                             return this.seriesName + ": " + this.valuePrefix + c(this.value) + this.valuePostfix
                         },
                         zIndex: 0
@@ -887,6 +976,7 @@
                     hoverHatchFill: null,
                     selectHatchFill: null,
                     labels: {
+                        enabled: null,
                         anchor: "auto",
                         position: "value"
                     },
@@ -918,7 +1008,7 @@
                         iconType: "square"
                     },
                     fill: r,
-                    hoverFill: e,
+                    hoverFill: d,
                     selectFill: "#333 0.85",
                     stroke: q,
                     hoverStroke: p,
@@ -950,14 +1040,14 @@
                     connectMissingPoints: !1,
                     a11y: {
                         enabled: !1,
-                        titleFormatter: "Series named {%SeriesName} with {%SeriesPointsCount} points. Min value is {%SeriesYMin}, max value is {%SeriesYMax}"
+                        titleFormat: "Series named {%SeriesName} with {%SeriesPointsCount} points. Min value is {%SeriesYMin}, max value is {%SeriesYMax}"
                     }
                 },
                 marker: {
-                    fill: e,
-                    stroke: y,
+                    fill: d,
+                    stroke: z,
                     hoverFill: k,
-                    hoverStroke: y,
+                    hoverStroke: z,
                     selectFill: "#333 0.85",
                     selectStroke: "1.5 #212121",
                     size: 4,
@@ -971,8 +1061,8 @@
                     }
                 },
                 bubble: {
-                    fill: w,
-                    hoverFill: D,
+                    fill: v,
+                    hoverFill: E,
                     displayNegative: !1,
                     negativeFill: function() {
                         return b.anychart.color.darken(b.anychart.color.darken(b.anychart.color.darken(this.sourceColor)))
@@ -1034,7 +1124,7 @@
                 },
                 rangeLike: {
                     labels: {
-                        textFormatter: function() {
+                        format: function() {
                             return c(this.high)
                         },
                         position: "high"
@@ -1043,7 +1133,7 @@
                         position: "high"
                     },
                     tooltip: {
-                        textFormatter: B
+                        format: C
                     }
                 },
                 candlestick: {
@@ -1066,14 +1156,14 @@
                     selectRisingStroke: "#333 0.85",
                     selectFallingStroke: "#333 0.85",
                     tooltip: {
-                        textFormatter: A
+                        format: B
                     },
                     markers: {
                         position: "high"
                     },
                     labels: {
                         position: "high",
-                        textFormatter: F
+                        format: G
                     }
                 },
                 column: {
@@ -1090,18 +1180,18 @@
                     selectRisingStroke: "3 #333 0.85",
                     selectFallingStroke: "3 #333 0.85",
                     tooltip: {
-                        textFormatter: A
+                        format: B
                     },
                     markers: {
                         position: "high"
                     },
                     labels: {
                         position: "high",
-                        textFormatter: F
+                        format: G
                     }
                 },
                 stick: {
-                    stroke: v
+                    stroke: u
                 },
                 jumpLine: {
                     pointWidth: "100%"
@@ -1130,18 +1220,18 @@
             minBubbleSize: "5%",
             a11y: {
                 enabled: !0,
-                titleFormatter: m,
+                titleFormat: m,
                 mode: "chartElements"
             },
             defaultAnnotationSettings: {
                 base: {
                     enabled: !0,
-                    fill: D,
-                    stroke: e,
+                    fill: E,
+                    stroke: d,
                     hatchFill: null,
-                    hoverFill: w,
+                    hoverFill: v,
                     hoverStroke: g,
-                    selectFill: w,
+                    selectFill: v,
                     selectStroke: g,
                     markers: {
                         enabled: !1,
@@ -1160,7 +1250,7 @@
                         enabled: !0,
                         position: "centerTop",
                         anchor: "centerTop",
-                        textFormatter: function() {
+                        format: function() {
                             return this.level
                         }
                     },
@@ -1199,8 +1289,8 @@
                     }
                 },
                 fibonacciTimezones: {
-                    levels: [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610,
-                        987, 1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75025, 121393, 196418, 317811, 514229, 832040, 1346269, 2178309, 3524578, 5702887, 9227465, 14930352, 24157817, 39088169
+                    levels: [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711, 28657,
+                        46368, 75025, 121393, 196418, 317811, 514229, 832040, 1346269, 2178309, 3524578, 5702887, 9227465, 14930352, 24157817, 39088169
                     ]
                 },
                 marker: {
@@ -1211,13 +1301,22 @@
                     offsetY: 0
                 },
                 label: {}
+            },
+            labels: {
+                enabled: !1
+            },
+            hoverLabels: {
+                enabled: null
+            },
+            selectLabels: {
+                enabled: null
             }
         },
         cartesianBase: {
             defaultSeriesSettings: {
                 base: {
                     labels: {
-                        textFormatter: "{%Value}{decimalsCount:2}"
+                        format: "{%Value}{decimalsCount:2}"
                     }
                 },
                 bar: {
@@ -1249,10 +1348,10 @@
                 },
                 box: {
                     medianStroke: g,
-                    hoverMedianStroke: e,
+                    hoverMedianStroke: d,
                     selectMedianStroke: "#333 0.85",
                     stemStroke: g,
-                    hoverStemStroke: e,
+                    hoverStemStroke: d,
                     selectStemStroke: "#333 0.85",
                     whiskerStroke: g,
                     hoverWhiskerStroke: g,
@@ -1287,17 +1386,17 @@
                     },
                     labels: {
                         position: "highest",
-                        textFormatter: function() {
+                        format: function() {
                             return "Highest: " + c(this.highest) + "\nMedian: " + c(this.median) + "\nLowest: " + c(this.lowest)
                         }
                     },
                     tooltip: {
-                        titleFormatter: function() {
+                        titleFormat: function() {
                             return this.name || this.x
                         },
-                        textFormatter: function() {
-                            return "Lowest: " + this.valuePrefix + c(this.lowest) + this.valuePostfix + "\nQ1: " + this.valuePrefix + c(this.q1) + this.valuePostfix + "\nMedian: " + this.valuePrefix + c(this.median) +
-                                this.valuePostfix + "\nQ3: " + this.valuePrefix + c(this.q3) + this.valuePostfix + "\nHighest: " + this.valuePrefix + c(this.highest) + this.valuePostfix
+                        format: function() {
+                            return "Lowest: " + this.valuePrefix + c(this.lowest) + this.valuePostfix + "\nQ1: " + this.valuePrefix + c(this.q1) + this.valuePostfix + "\nMedian: " + this.valuePrefix + c(this.median) + this.valuePostfix +
+                                "\nQ3: " + this.valuePrefix + c(this.q3) + this.valuePostfix + "\nHighest: " + this.valuePrefix + c(this.highest) + this.valuePostfix
                         }
                     }
                 }
@@ -1314,7 +1413,7 @@
                     }
                 },
                 labels: {
-                    textFormatter: "{%Value}{decimalsCount:10}"
+                    format: "{%Value}{decimalsCount:10}"
                 },
                 scale: 0
             },
@@ -1330,7 +1429,7 @@
                     }
                 },
                 labels: {
-                    textFormatter: "{%Value}{decimalsCount:10}"
+                    format: "{%Value}{decimalsCount:10}"
                 },
                 scale: 1
             },
@@ -1355,35 +1454,9 @@
             minBubbleSize: "5%",
             isVertical: !1,
             scales: [{
-                type: "ordinal",
-                inverted: !1,
-                names: [],
-                ticks: {
-                    maxCount: 100
-                }
+                type: "ordinal"
             }, {
-                type: "linear",
-                maxTicksCount: 1E3,
-                inverted: !1,
-                maximum: null,
-                minimum: null,
-                minimumGap: .1,
-                maximumGap: .1,
-                softMinimum: null,
-                softMaximum: null,
-                ticks: {
-                    mode: "linear",
-                    base: 0,
-                    minCount: 4,
-                    maxCount: 6
-                },
-                minorTicks: {
-                    mode: "linear",
-                    base: 0,
-                    count: 5
-                },
-                stackMode: "none",
-                stickToZero: !0
+                type: "linear"
             }],
             crosshair: {
                 enabled: !1,
@@ -1398,34 +1471,7 @@
                 endRatio: 1
             },
             a11y: {
-                titleFormatter: function() {
-                    for (var a = this.chart, d = m.call(this), c = a.getSeriesCount(), f = {}, e = 0; e < c; e++) {
-                        var g = a.getSeriesAt(e).seriesType();
-                        f.hasOwnProperty(g) ? f[g] += 1 : f[g] = 1
-                    }
-                    var d = d + ", with ",
-                        h;
-                    for (h in f) d += f[h] + " " + h + " series, ";
-                    d += ". ";
-                    f = a.yScale();
-                    a = a.xScale();
-                    c = a.getType();
-                    e = f.getType();
-                    if ("ordinal" == e) {
-                        f = f.values();
-                        d += "Y-scale with " + f.length + " categories: ";
-                        for (e = 0; e < f.length; e++) d += f[e] + ", ";
-                        d += ". "
-                    } else d = "dateTime" == e ? d + ("Y-scale minimum value is " + b.anychart.format.dateTime(f.minimum()) + " , maximum value is " + b.anychart.format.dateTime(f.maximum()) + ". ") : d + ("Y-scale minimum value is " + f.minimum() + " , maximum value is " + f.maximum() + ". ");
-                    if ("ordinal" == c) {
-                        a = a.values();
-                        d += "X-scale with " + a.length + " categories: ";
-                        for (c = 0; c < a.length; c++) d += a[c] + ", ";
-                        d += ". "
-                    } else d =
-                        "dateTime" == c ? d + ("X-scale minimum value is " + b.anychart.format.dateTime(a.minimum()) + " , maximum value is " + b.anychart.format.dateTime(a.maximum()) + ". ") : d + ("X-scale minimum value is " + a.minimum() + " , maximum value is " + a.maximum() + ". ");
-                    return d
-                }
+                titleFormat: y
             }
         },
         cartesian: {
@@ -1454,34 +1500,9 @@
             },
             scales: [{
                 type: "ordinal",
-                inverted: !0,
-                names: [],
-                ticks: {
-                    maxCount: 100
-                }
+                inverted: !0
             }, {
-                type: "linear",
-                maxTicksCount: 1E3,
-                inverted: !1,
-                maximum: null,
-                minimum: null,
-                minimumGap: .1,
-                maximumGap: .1,
-                softMinimum: null,
-                softMaximum: null,
-                ticks: {
-                    mode: "linear",
-                    base: 0,
-                    minCount: 4,
-                    maxCount: 6
-                },
-                minorTicks: {
-                    mode: "linear",
-                    base: 0,
-                    count: 5
-                },
-                stackMode: "none",
-                stickToZero: !0
+                type: "linear"
             }],
             tooltip: {
                 displayMode: "single",
@@ -1519,68 +1540,33 @@
             defaultSeriesSettings: {
                 candlestick: {
                     tooltip: {
-                        titleFormatter: t
+                        titleFormat: t
                     },
                     labels: {
-                        textFormatter: t
+                        format: t
                     }
                 },
                 ohlc: {
                     tooltip: {
-                        titleFormatter: t
+                        titleFormat: t
                     },
                     labels: {
-                        textFormatter: t
+                        format: t
                     }
                 }
             },
             xAxes: [{
                 labels: {
-                    textFormatter: E
+                    format: F
                 },
                 minorLabels: {
-                    textFormatter: E
+                    format: F
                 }
             }],
             scales: [{
-                type: "dateTime",
-                maxTicksCount: 1E3,
-                inverted: !1,
-                maximum: null,
-                minimum: null,
-                minimumGap: .1,
-                maximumGap: .1,
-                softMinimum: null,
-                softMaximum: null,
-                ticks: {
-                    count: 4
-                },
-                minorTicks: {
-                    count: 4
-                }
+                type: "dateTime"
             }, {
-                type: "linear",
-                maxTicksCount: 1E3,
-                inverted: !1,
-                maximum: null,
-                minimum: null,
-                minimumGap: .1,
-                maximumGap: .1,
-                softMinimum: null,
-                softMaximum: null,
-                ticks: {
-                    mode: "linear",
-                    base: 0,
-                    minCount: 4,
-                    maxCount: 6
-                },
-                minorTicks: {
-                    mode: "linear",
-                    base: 0,
-                    count: 5
-                },
-                stackMode: "none",
-                stickToZero: !0
+                type: "linear"
             }]
         },
         verticalLine: {
@@ -1594,34 +1580,9 @@
             },
             scales: [{
                 type: "ordinal",
-                inverted: !0,
-                names: [],
-                ticks: {
-                    maxCount: 100
-                }
+                inverted: !0
             }, {
-                type: "linear",
-                maxTicksCount: 1E3,
-                inverted: !1,
-                maximum: null,
-                minimum: null,
-                minimumGap: .1,
-                maximumGap: .1,
-                softMinimum: null,
-                softMaximum: null,
-                ticks: {
-                    mode: "linear",
-                    base: 0,
-                    minCount: 4,
-                    maxCount: 6
-                },
-                minorTicks: {
-                    mode: "linear",
-                    base: 0,
-                    count: 5
-                },
-                stackMode: "none",
-                stickToZero: !0
+                type: "linear"
             }],
             tooltip: {
                 displayMode: "union"
@@ -1644,34 +1605,9 @@
             },
             scales: [{
                 type: "ordinal",
-                inverted: !0,
-                names: [],
-                ticks: {
-                    maxCount: 100
-                }
+                inverted: !0
             }, {
-                type: "linear",
-                maxTicksCount: 1E3,
-                inverted: !1,
-                maximum: null,
-                minimum: null,
-                minimumGap: .1,
-                maximumGap: .1,
-                softMinimum: null,
-                softMaximum: null,
-                ticks: {
-                    mode: "linear",
-                    base: 0,
-                    minCount: 4,
-                    maxCount: 6
-                },
-                minorTicks: {
-                    mode: "linear",
-                    base: 0,
-                    count: 5
-                },
-                stackMode: "none",
-                stickToZero: !0
+                type: "linear"
             }],
             tooltip: {
                 displayMode: "union"
@@ -1696,7 +1632,7 @@
             }, {
                 orientation: "right",
                 labels: {
-                    textFormatter: "{%Value}%"
+                    format: "{%Value}%"
                 }
             }]
         },
@@ -1709,10 +1645,10 @@
             defaultSeriesSettings: {
                 base: {
                     stroke: "none",
-                    fill: e,
-                    hoverStroke: e,
+                    fill: d,
+                    hoverStroke: d,
                     hoverFill: k,
-                    selectStroke: e,
+                    selectStroke: d,
                     selectFill: "#333",
                     tooltip: {
                         anchor: "leftTop",
@@ -1752,10 +1688,10 @@
             animation: {
                 duration: 500
             },
-            fill: e,
+            fill: d,
             stroke: "none",
             hoverFill: k,
-            hoverStroke: e,
+            hoverStroke: d,
             selectFill: "#333 0.85",
             selectStroke: "1.5 #212121",
             connectorStroke: "#CECECE",
@@ -1775,7 +1711,7 @@
                 height: null,
                 zIndex: 34,
                 positionFormatter: h,
-                textFormatter: function() {
+                format: function() {
                     return this.name ? this.name : this.x
                 }
             },
@@ -1823,10 +1759,10 @@
                 separator: {
                     enabled: !0
                 },
-                titleFormatter: function() {
+                titleFormat: function() {
                     return this.name || this.x
                 },
-                textFormatter: function() {
+                format: function() {
                     return "Value: " + c(this.value) + "\nPercent Value: " + (100 * this.value / this.getStat("sum")).toFixed(1) + "%"
                 }
             },
@@ -1851,14 +1787,14 @@
             outsideLabelsSpace: 30,
             insideLabelsOffset: "50%",
             labels: {
-                textFormatter: "{%PercentValue}{decimalsCount:1,zeroFillDecimals:true}%"
+                format: "{%PercentValue}{decimalsCount:1,zeroFillDecimals:true}%"
             },
             a11y: {
-                titleFormatter: function() {
+                titleFormat: function() {
                     var a = this.chart,
-                        d = m.apply(this),
-                        d = d + (", with " + a.getStat("count") + " points. ");
-                    return d += "Min value is " + a.getStat("min") + ", max value is " + a.getStat("max") + "."
+                        b = m.apply(this),
+                        b = b + (", with " + a.getStat("count") + " points. ");
+                    return b += "Min value is " + a.getStat("min") + ", max value is " + a.getStat("max") + "."
                 }
             }
         },
@@ -1905,10 +1841,10 @@
                     clip: !0,
                     color: null,
                     tooltip: {
-                        titleFormatter: function() {
+                        titleFormat: function() {
                             return this.seriesName
                         },
-                        textFormatter: function() {
+                        format: function() {
                             return "x: " + this.x + "\ny: " + this.valuePrefix + c(this.value) + this.valuePostfix
                         }
                     },
@@ -1916,7 +1852,7 @@
                     yScale: null,
                     a11y: {
                         enabled: !1,
-                        titleFormatter: "Series named {%SeriesName} with {%SeriesPointsCount} points. Min value is {%SeriesYMin}, max value is {%SeriesYMax}"
+                        titleFormat: "Series named {%SeriesName} with {%SeriesPointsCount} points. Min value is {%SeriesYMin}, max value is {%SeriesYMax}"
                     }
                 },
                 bubble: {
@@ -1932,7 +1868,7 @@
                     hoverNegativeHatchFill: void 0,
                     hatchFill: !1,
                     tooltip: {
-                        textFormatter: function() {
+                        format: function() {
                             return "X: " + this.x + "\nY: " + this.valuePrefix + c(this.value) + this.valuePostfix + "\nSize: " + c(this.size)
                         }
                     }
@@ -1970,51 +1906,9 @@
             rangeAxesMarkers: [],
             textAxesMarkers: [],
             scales: [{
-                type: "linear",
-                maxTicksCount: 1E3,
-                inverted: !1,
-                maximum: null,
-                minimum: null,
-                minimumGap: .1,
-                maximumGap: .1,
-                softMinimum: null,
-                softMaximum: null,
-                ticks: {
-                    mode: "linear",
-                    base: 0,
-                    minCount: 4,
-                    maxCount: 6
-                },
-                minorTicks: {
-                    mode: "linear",
-                    base: 0,
-                    count: 5
-                },
-                stackMode: "none",
-                stickToZero: !0
+                type: "linear"
             }, {
-                type: "linear",
-                maxTicksCount: 1E3,
-                inverted: !1,
-                maximum: null,
-                minimum: null,
-                minimumGap: .1,
-                maximumGap: .1,
-                softMinimum: null,
-                softMaximum: null,
-                ticks: {
-                    mode: "linear",
-                    base: 0,
-                    minCount: 4,
-                    maxCount: 6
-                },
-                minorTicks: {
-                    mode: "linear",
-                    base: 0,
-                    count: 5
-                },
-                stackMode: "none",
-                stickToZero: !0
+                type: "linear"
             }],
             xScale: 0,
             yScale: 1,
@@ -2028,7 +1922,7 @@
                 zIndex: 41
             },
             a11y: {
-                titleFormatter: u
+                titleFormat: x
             },
             annotations: {
                 annotationsList: [],
@@ -2041,12 +1935,7 @@
             defaultSeriesType: "line",
             defaultSeriesSettings: {
                 base: {
-                    enabled: !0,
-                    hatchFill: null,
-                    a11y: {
-                        enabled: !0,
-                        titleFormatter: "Series named {%SeriesName} with {%SeriesPointsCount} points. Min value is {%SeriesYMin}, max value is {%SeriesYMax}"
-                    }
+                    clip: !1
                 },
                 area: {},
                 line: {},
@@ -2054,122 +1943,93 @@
             },
             xAxis: {
                 scale: 0,
-                zIndex: 25
+                zIndex: 25,
+                labels: {
+                    zIndex: 25
+                },
+                minorLabels: {
+                    zIndex: 25
+                },
+                ticks: {
+                    zIndex: 25
+                },
+                minorTicks: {
+                    zIndex: 25
+                }
+            },
+            yAxis: {
+                scale: 1
             },
             startAngle: 0,
+            innerRadius: 0,
             grids: [{}, {
                 layout: "circuit"
             }],
             minorGrids: [],
             scales: [{
-                type: "ordinal",
-                inverted: !1,
-                names: [],
-                ticks: {
-                    maxCount: 100
-                }
+                type: "ordinal"
             }, {
-                type: "linear",
-                maxTicksCount: 1E3,
-                inverted: !1,
-                maximum: null,
-                minimum: null,
-                minimumGap: .1,
-                maximumGap: .1,
-                softMinimum: null,
-                softMaximum: null,
-                ticks: {
-                    mode: "linear",
-                    base: 0,
-                    minCount: 4,
-                    maxCount: 6
-                },
-                minorTicks: {
-                    mode: "linear",
-                    base: 0,
-                    count: 5
-                },
-                stackMode: "none",
-                stickToZero: !0
+                type: "linear"
             }],
             xScale: 0,
             yScale: 1,
             a11y: {
-                titleFormatter: u
+                titleFormat: y
             }
         },
         polar: {
             defaultSeriesType: "marker",
             defaultSeriesSettings: {
                 base: {
-                    enabled: !0,
-                    hatchFill: null,
-                    closed: !0
+                    closed: !0,
+                    clip: !1
                 },
                 area: {},
                 line: {},
-                marker: {}
+                marker: {},
+                column: {},
+                rangeColumn: {}
             },
             xAxis: {
                 scale: 0,
-                zIndex: 25
+                zIndex: 25,
+                fill: "none",
+                labels: {
+                    anchor: "auto",
+                    zIndex: 25
+                },
+                minorLabels: {
+                    anchor: "auto",
+                    zIndex: 25
+                },
+                ticks: {
+                    zIndex: 25
+                },
+                minorTicks: {
+                    zIndex: 25
+                }
+            },
+            yAxis: {
+                scale: 1
             },
             startAngle: 0,
+            innerRadius: 0,
+            sortPointsByX: !1,
             grids: [{}, {
                 layout: "circuit"
             }],
             minorGrids: [],
             scales: [{
-                type: "linear",
-                maxTicksCount: 1E3,
-                inverted: !1,
-                maximum: null,
-                minimum: null,
-                minimumGap: .1,
-                maximumGap: .1,
-                softMinimum: null,
-                softMaximum: null,
-                ticks: {
-                    mode: "linear",
-                    base: 0,
-                    minCount: 4,
-                    maxCount: 6
-                },
-                minorTicks: {
-                    mode: "linear",
-                    base: 0,
-                    count: 5
-                },
-                stackMode: "none",
-                stickToZero: !0
+                type: "linear"
             }, {
-                type: "linear",
-                maxTicksCount: 1E3,
-                inverted: !1,
-                maximum: null,
-                minimum: null,
-                minimumGap: .1,
-                maximumGap: .1,
-                softMinimum: null,
-                softMaximum: null,
-                ticks: {
-                    mode: "linear",
-                    base: 0,
-                    minCount: 4,
-                    maxCount: 6
-                },
-                minorTicks: {
-                    mode: "linear",
-                    base: 0,
-                    count: 5
-                },
-                stackMode: "none",
-                stickToZero: !0
+                type: "linear"
             }],
             xScale: 0,
             yScale: 1,
+            barsPadding: 0,
+            barGroupsPadding: 0,
             a11y: {
-                titleFormatter: u
+                titleFormat: x
             }
         },
         bullet: {
@@ -2251,34 +2111,17 @@
             },
             scale: {
                 type: "linear",
+                minimumGap: 0,
+                maximumGap: 0,
                 ticks: {
-                    mode: "linear",
-                    base: 0,
-                    explicit: null,
                     minCount: 2,
                     maxCount: 5,
                     interval: NaN
-                },
-                minorTicks: {
-                    mode: "linear",
-                    base: 0,
-                    explicit: null,
-                    count: 5,
-                    interval: NaN
-                },
-                stackMode: "none",
-                stickToZero: !0,
-                minimumGap: 0,
-                maximumGap: 0,
-                softMinimum: null,
-                softMaximum: null,
-                minimum: null,
-                maximum: null,
-                inverted: !1
+                }
             },
             ranges: [],
             a11y: {
-                titleFormatter: function() {
+                titleFormat: function() {
                     return m.apply(this) + ". "
                 }
             }
@@ -2361,35 +2204,9 @@
             rangeAxesMarkers: [],
             textAxesMarkers: [],
             scales: [{
-                type: "ordinal",
-                inverted: !1,
-                names: [],
-                ticks: {
-                    maxCount: 100
-                }
+                type: "ordinal"
             }, {
-                type: "linear",
-                maxTicksCount: 1E3,
-                inverted: !1,
-                maximum: null,
-                minimum: null,
-                minimumGap: .1,
-                maximumGap: .1,
-                softMinimum: null,
-                softMaximum: null,
-                ticks: {
-                    mode: "linear",
-                    base: 0,
-                    minCount: 4,
-                    maxCount: 6
-                },
-                minorTicks: {
-                    mode: "linear",
-                    base: 0,
-                    count: 5
-                },
-                stackMode: "none",
-                stickToZero: !0
+                type: "linear"
             }],
             xScale: 0,
             yScale: 1,
@@ -2400,13 +2217,13 @@
             tooltip: {
                 title: !1,
                 separator: !1,
-                titleFormatter: function() {
+                titleFormat: function() {
                     return this.x
                 },
-                textFormatter: function() {
-                    return "x: " + this.x +
-                        "\ny: " + c(this.value)
-                }
+                format: function() {
+                    return "x: " + this.x + "\ny: " + c(this.value)
+                },
+                allowLeaveChart: !0
             },
             defaultSeriesSettings: {
                 base: {
@@ -2509,13 +2326,13 @@
                     hatchFill: !1,
                     labels: {
                         anchor: "centerBottom",
-                        enabled: !1,
+                        enabled: null,
                         adjustFontSize: {
                             width: !0,
                             height: !0
                         },
-                        textFormatter: function() {
-                            return this.getDataValue("name") ? this.getDataValue("name") : this.name ? this.name : this.getDataValue("id") ? this.getDataValue("id") : "lat: " + this.lat + "\nlong: " + this["long"]
+                        format: function() {
+                            return this.getData("name") ? this.getData("name") : this.name ? this.name : this.getData("id") ? this.getData("id") : "lat: " + this.lat + "\nlong: " + this["long"]
                         }
                     },
                     hoverLabels: {
@@ -2536,23 +2353,24 @@
                     },
                     color: null,
                     tooltip: {
-                        titleFormatter: function() {
-                            return this.name || this.getDataValue("name") || "Tooltip title"
+                        titleFormat: function() {
+                            return this.name || this.getData("name") || "Tooltip title"
                         },
-                        textFormatter: function() {
+                        format: function() {
                             return "Id: " + this.id + "\nValue: " + this.valuePrefix + c(this.value) + this.valuePostfix
                         }
                     },
                     xScale: null,
                     yScale: null,
                     a11y: {
-                        titleFormatter: "Series named {%SeriesName}"
-                    }
+                        titleFormat: "Series named {%SeriesName}"
+                    },
+                    clip: !1
                 },
                 choropleth: {
                     labels: {
                         fontColor: "#212121",
-                        anchor: null
+                        anchor: "center"
                     },
                     markers: {
                         anchor: null
@@ -2563,7 +2381,13 @@
                     startSize: 0,
                     endSize: 0,
                     curvature: .3,
-                    stroke: e,
+                    stroke: function() {
+                        return {
+                            thickness: 2,
+                            color: this.sourceColor,
+                            lineJoin: "round"
+                        }
+                    },
                     hoverStroke: k,
                     selectStroke: "2 #333 0.85",
                     markers: {
@@ -2588,7 +2412,7 @@
                         enabled: !1,
                         position: "middle",
                         anchor: null,
-                        textFormatter: function() {
+                        format: function() {
                             return "from: " + this.startPoint.lat + "," + this.startPoint["long"] + "\nto: " + this.endPoint.lat + "," + this.endPoint["long"]
                         }
                     },
@@ -2599,20 +2423,29 @@
                         separator: {
                             enabled: !1
                         },
-                        textFormatter: function() {
+                        format: function() {
                             return "from: " + this.startPoint.lat + ", " + this.startPoint["long"] + "\nto: " + this.endPoint.lat + ", " + this.endPoint["long"]
                         }
                     }
                 },
                 bubble: {
+                    stroke: function() {
+                        return {
+                            thickness: 2,
+                            color: b.anychart.color.darken(this.sourceColor)
+                        }
+                    },
                     labels: {
                         anchor: "center"
                     },
                     hoverFill: "#757575",
                     selectFill: "#333 0.85",
                     tooltip: {
-                        textFormatter: function() {
-                            return "Id: " + this.id + "\nValue: " + this.valuePrefix + c(this.size) + this.valuePostfix
+                        format: function() {
+                            var a;
+                            a = this.id ? "Id: " + this.id : "lat: " + this.lat + "\nlong: " + this["long"];
+                            this.size && (a += "\nValue: " + this.valuePrefix + c(this.size) + this.valuePostfix);
+                            return a
                         }
                     }
                 },
@@ -2627,10 +2460,9 @@
                         fontWeight: "bold"
                     },
                     tooltip: {
-                        textFormatter: function() {
+                        format: function() {
                             var a;
-                            a = this.id ? "Id: " + this.id : "lat: " +
-                                this.lat + "\nlong: " + this["long"];
+                            a = this.id ? "Id: " + this.id : "lat: " + this.lat + "\nlong: " + this["long"];
                             this.value && (a += "\nValue: " + this.valuePrefix + c(this.value) + this.valuePostfix);
                             return a
                         }
@@ -2660,7 +2492,7 @@
                     padding: 2,
                     rotation: null,
                     fontSize: 10,
-                    anchor: null
+                    anchor: "auto"
                 },
                 minorLabels: {
                     enabled: !1,
@@ -2717,20 +2549,20 @@
             minBubbleSize: "5%",
             geoIdField: "id",
             interactivity: {
-                copyFormatter: function(a) {
+                copyFormat: function(a) {
                     a = a.seriesStatus;
-                    for (var d = "", b = 0, c = a.length; b < c; b++) {
-                        var e = a[b];
-                        if (e.points.length) {
-                            for (var d = d + ("Series " + e.series.index() + ":\n"), g = 0, h = e.points.length; g < h; g++) {
-                                var k = e.points[g],
-                                    d = d + ("id: " + k.id + " index: " + k.index);
-                                g != h - 1 && (d += "\n")
+                    for (var b = "", c = 0, e = a.length; c < e; c++) {
+                        var d = a[c];
+                        if (d.points.length) {
+                            for (var b = b + ("Series " + d.series.getIndex() + ":\n"), g = 0, h = d.points.length; g < h; g++) {
+                                var k = d.points[g],
+                                    b = b + ("id: " + k.id + " index: " + k.index);
+                                g != h - 1 && (b += "\n")
                             }
-                            b != c - 1 && (d += "\n")
+                            c != e - 1 && (b += "\n")
                         }
                     }
-                    return d || "no selected points"
+                    return b || "no selected points"
                 },
                 drag: !0,
                 zoomOnMouseWheel: !1,
@@ -2857,11 +2689,12 @@
                 separator: {
                     enabled: !1
                 },
-                titleFormatter: function() {
+                titleFormat: function() {
                     return this.index
                 },
-                textFormatter: function() {
-                    return "Value: " + c(this.value)
+                format: function() {
+                    return "Value: " +
+                        c(this.value)
                 }
             }
         },
@@ -2873,36 +2706,15 @@
             globalOffset: "0%",
             layout: "vertical",
             tooltip: {
-                titleFormatter: function() {
+                titleFormat: function() {
                     return this.name
                 },
-                textFormatter: function() {
-                    return this.high ? B.call(this) : "Value: " + c(this.value)
+                format: function() {
+                    return this.high ? C.call(this) : "Value: " + c(this.value)
                 }
             },
             scales: [{
-                type: "linear",
-                maxTicksCount: 1E3,
-                inverted: !1,
-                maximum: null,
-                minimum: null,
-                minimumGap: .1,
-                maximumGap: .1,
-                softMinimum: null,
-                softMaximum: null,
-                ticks: {
-                    mode: "linear",
-                    base: 0,
-                    minCount: 4,
-                    maxCount: 6
-                },
-                minorTicks: {
-                    mode: "linear",
-                    base: 0,
-                    count: 5
-                },
-                stackMode: "none",
-                stickToZero: !0
+                type: "linear"
             }],
             defaultAxisSettings: {
                 enabled: !0,
@@ -2956,14 +2768,14 @@
                     stroke: q,
                     hoverStroke: p,
                     selectStroke: g,
-                    fill: e,
+                    fill: d,
                     hoverFill: k,
                     selectFill: g
                 },
                 bar: {},
                 rangeBar: {
                     label: {
-                        textFormatter: function() {
+                        format: function() {
                             return c(this.high)
                         }
                     }
@@ -2973,22 +2785,22 @@
                 },
                 tank: {
                     emptyFill: "#fff 0.3",
-                    hoverEmptyFill: e,
-                    selectEmptyFill: e,
+                    hoverEmptyFill: d,
+                    selectEmptyFill: d,
                     emptyHatchFill: null
                 },
                 thermometer: {
                     fill: function() {
                         var a = this.sourceColor,
-                            d = b.anychart.color.darken(a);
+                            c = b.anychart.color.darken(a);
                         return {
                             angle: this.isVertical ? 0 : 90,
                             keys: [{
-                                color: d
+                                color: c
                             }, {
                                 color: a
                             }, {
-                                color: d
+                                color: c
                             }]
                         }
                     },
@@ -3019,19 +2831,10 @@
         bulletGauge: {},
         heatMap: {
             scales: [{
-                type: "ordinal",
-                inverted: !1,
-                names: [],
-                ticks: {
-                    maxCount: 100
-                }
+                type: "ordinal"
             }, {
                 type: "ordinal",
-                inverted: !0,
-                names: [],
-                ticks: {
-                    maxCount: 100
-                }
+                inverted: !0
             }, {
                 type: "ordinalColor"
             }],
@@ -3059,14 +2862,14 @@
                 separator: {
                     enabled: !0
                 },
-                titleFormatter: function() {
+                titleFormat: function() {
                     return this.name || this.x
                 },
-                textFormatter: function() {
+                format: function() {
                     if (void 0 === this.heat) {
-                        var a =
-                            "Value: " + this.valuePrefix + this.heat + this.valuePostfix;
-                        isNaN(+this.heat) || (a += "\nPercent Value: " + (100 * this.heat / this.getStat("sum")).toFixed(1) + "%");
+                        var a = "Value: " + this.valuePrefix + this.heat + this.valuePostfix;
+                        isNaN(+this.heat) || (a +=
+                            "\nPercent Value: " + (100 * this.heat / this.getStat("sum")).toFixed(1) + "%");
                         return a
                     }
                     return "x: " + this.x + "\ny: " + this.y
@@ -3100,8 +2903,8 @@
             },
             fill: function() {
                 var a;
-                this.colorScale ? (a = this.iterator.get("heat"),
-                    a = this.colorScale.valueToColor(a)) : a = b.anychart.color.setOpacity(this.sourceColor, .85, !0);
+                this.colorScale ? (a = this.iterator.get("heat"), a = this.colorScale.valueToColor(a)) : a = b.anychart.color.setOpacity(this.sourceColor,
+                    .85, !0);
                 return a
             },
             stroke: "1 #ffffff",
@@ -3140,7 +2943,7 @@
                 rotation: 0,
                 width: null,
                 height: null,
-                textFormatter: function() {
+                format: function() {
                     return c(this.heat)
                 },
                 positionFormatter: h
@@ -3194,7 +2997,7 @@
                 inverted: !0
             },
             a11y: {
-                titleFormatter: m
+                titleFormat: m
             }
         },
         treeMap: {
@@ -3209,8 +3012,8 @@
             },
             tooltip: {
                 enabled: !0,
-                titleFormatter: G,
-                textFormatter: h
+                titleFormat: H,
+                format: h
             },
             legend: {
                 itemsSourceMode: "categories"
@@ -3231,7 +3034,7 @@
                     fill: "#F7F7F7",
                     stroke: "#e0e0e0"
                 },
-                textFormatter: G
+                format: H
             },
             hoverHeaders: {
                 enabled: !0,
@@ -3249,8 +3052,8 @@
                 anchor: "leftTop",
                 rotation: 0,
                 fontColor: "#212121",
-                textFormatter: function() {
-                    return (this.name || this.getDataValue("id")) + "\n" + c(this.value)
+                format: function() {
+                    return (this.name || this.getData("id")) + "\n" + c(this.value)
                 }
             },
             hoverLabels: {
@@ -3349,7 +3152,7 @@
                 contentInternal: {
                     hAlign: "left"
                 },
-                textFormatter: function() {
+                format: function() {
                     var a = this.name;
                     return void 0 !== a ? a + "" : ""
                 }
@@ -3394,13 +3197,13 @@
                         enabled: !1
                     }
                 },
-                textFormatter: function() {
+                format: function() {
                     return ""
                 }
             },
             columns: [{
                 width: 50,
-                textFormatter: function() {
+                format: function() {
                     var a = this.item.meta("index");
                     return null != a ? a + 1 + "" : ""
                 },
@@ -3411,7 +3214,7 @@
                 width: 170,
                 collapseExpandButtons: !0,
                 depthPaddingMultiplier: 15,
-                textFormatter: function() {
+                format: function() {
                     var a = this.name;
                     return null != a ? a + "" : ""
                 },
@@ -3512,7 +3315,7 @@
                     hAlign: "left"
                 },
                 zIndex: 100,
-                allowLeaveChart: !0
+                allowLeaveChart: !1
             },
             labels: {
                 enabled: !0,
@@ -3648,7 +3451,7 @@
                 backgroundFill: "none",
                 tooltip: {
                     zIndex: 100,
-                    allowLeaveChart: !0
+                    allowLeaveChart: !1
                 }
             },
             timeline: {
@@ -3658,25 +3461,26 @@
         ganttResource: {
             dataGrid: {
                 tooltip: {
-                    titleFormatter: function() {
+                    titleFormat: function() {
                         return this.name || ""
                     },
-                    textFormatter: function() {
+                    format: function() {
                         var a = this.minPeriodDate,
-                            d = this.maxPeriodDate;
-                        return (a ? "Start Date: " + b.anychart.format.dateTime(a) : "") + (d ? "\nEnd Date: " + b.anychart.format.dateTime(d) : "")
+                            c = this.maxPeriodDate;
+                        return (a ? "Start Date: " + b.anychart.format.dateTime(a) : "") + (c ? "\nEnd Date: " + b.anychart.format.dateTime(c) : "")
                     }
                 }
             },
             timeline: {
                 tooltip: {
-                    titleFormatter: function() {
-                        return this.name || ""
+                    titleFormat: function() {
+                        return this.name ||
+                            ""
                     },
-                    textFormatter: function() {
+                    format: function() {
                         var a = this.periodStart || this.minPeriodDate,
-                            d = this.periodEnd || this.maxPeriodDate;
-                        return (a ? "Start Date: " + b.anychart.format.dateTime(a) : "") + (d ? "\nEnd Date: " + b.anychart.format.dateTime(d) : "")
+                            c = this.periodEnd || this.maxPeriodDate;
+                        return (a ? "Start Date: " + b.anychart.format.dateTime(a) : "") + (c ? "\nEnd Date: " + b.anychart.format.dateTime(c) : "")
                     }
                 }
             }
@@ -3684,31 +3488,30 @@
         ganttProject: {
             dataGrid: {
                 tooltip: {
-                    titleFormatter: function() {
+                    titleFormat: function() {
                         return this.name || ""
                     },
-                    textFormatter: function() {
-                        var a =
-                            this.actualStart || this.autoStart,
-                            d = this.actualEnd || this.autoEnd,
-                            c = this.progressValue;
-                        void 0 === c && (c = (Math.round(1E4 * this.autoProgress) / 100 || 0) + "%");
-                        return (a ? "Start Date: " + b.anychart.format.dateTime(a) : "") + (d ? "\nEnd Date: " + b.anychart.format.dateTime(d) : "") + (c ? "\nComplete: " + c : "")
+                    format: function() {
+                        var a = this.actualStart || this.autoStart,
+                            c = this.actualEnd || this.autoEnd,
+                            d = this.progressValue;
+                        void 0 === d && (d = (Math.round(1E4 * this.autoProgress) / 100 || 0) + "%");
+                        return (a ? "Start Date: " + b.anychart.format.dateTime(a) :
+                            "") + (c ? "\nEnd Date: " + b.anychart.format.dateTime(c) : "") + (d ? "\nComplete: " + d : "")
                     }
                 }
             },
             timeline: {
                 tooltip: {
-                    titleFormatter: function() {
+                    titleFormat: function() {
                         return this.name || ""
                     },
-                    textFormatter: function() {
+                    format: function() {
                         var a = this.actualStart || this.autoStart,
-                            d = this.actualEnd || this.autoEnd,
-                            c = this.progressValue;
-                        void 0 === c && (c = (Math.round(1E4 * this.autoProgress) /
-                            100 || 0) + "%");
-                        return (a ? "Start Date: " + b.anychart.format.dateTime(a) : "") + (d ? "\nEnd Date: " + b.anychart.format.dateTime(d) : "") + (c ? "\nComplete: " + c : "")
+                            c = this.actualEnd || this.autoEnd,
+                            d = this.progressValue;
+                        void 0 === d && (d = (Math.round(1E4 * this.autoProgress) / 100 || 0) + "%");
+                        return (a ? "Start Date: " + b.anychart.format.dateTime(a) : "") + (c ? "\nEnd Date: " + b.anychart.format.dateTime(c) : "") + (d ? "\nComplete: " + d : "")
                     }
                 }
             }
@@ -3844,7 +3647,7 @@
                     base: {
                         pointWidth: "75%",
                         tooltip: {
-                            textFormatter: function() {
+                            format: function() {
                                 var a = c(this.value);
                                 return this.seriesName + ": " + this.valuePrefix + a + this.valuePostfix
                             }
@@ -3871,14 +3674,14 @@
                     },
                     rangeLike: {
                         tooltip: {
-                            textFormatter: function() {
+                            format: function() {
                                 return this.seriesName + ":\n  High: " + c(this.high) + "\n  Low: " + c(this.low)
                             }
                         }
                     },
                     candlestick: {
                         tooltip: {
-                            textFormatter: z
+                            format: A
                         }
                     },
                     column: {
@@ -3889,7 +3692,7 @@
                     },
                     ohlc: {
                         tooltip: {
-                            textFormatter: z
+                            format: A
                         }
                     }
                 },
@@ -3954,7 +3757,7 @@
                             left: 5
                         },
                         anchor: "centerTop",
-                        textFormatter: function() {
+                        format: function() {
                             return b.anychart.format.dateTime(this.tickValue, b.anychart.format.getDateTimeFormat(b.anychart.format.getIntervalIdentifier(this.majorIntervalUnit)))
                         }
                     },
@@ -3968,8 +3771,9 @@
                             bottom: 5,
                             left: 0
                         },
-                        textFormatter: function() {
-                            return b.anychart.format.dateTime(this.tickValue, b.anychart.format.getDateTimeFormat(b.anychart.format.getIntervalIdentifier(this.minorIntervalUnit, this.majorIntervalUnit)))
+                        format: function() {
+                            return b.anychart.format.dateTime(this.tickValue, b.anychart.format.getDateTimeFormat(b.anychart.format.getIntervalIdentifier(this.minorIntervalUnit,
+                                this.majorIntervalUnit)))
                         }
                     }
                 },
@@ -3979,9 +3783,8 @@
                     vAlign: "bottom",
                     iconSize: 13,
                     position: "top",
-                    titleFormatter: function() {
-                        return b.anychart.format.dateTime(this.value, b.anychart.format.getDateTimeFormat(b.anychart.format.getIntervalIdentifier(this.dataIntervalUnit,
-                            null, "full")))
+                    titleFormat: function() {
+                        return b.anychart.format.dateTime(this.value, b.anychart.format.getDateTimeFormat(b.anychart.format.getIntervalIdentifier(this.dataIntervalUnit, null, "full")))
                     },
                     align: "left",
                     padding: {
@@ -4038,28 +3841,7 @@
                     }
                 },
                 scales: [{
-                    type: "linear",
-                    maxTicksCount: 1E3,
-                    inverted: !1,
-                    maximum: null,
-                    minimum: null,
-                    minimumGap: .1,
-                    maximumGap: .1,
-                    softMinimum: null,
-                    softMaximum: null,
-                    ticks: {
-                        mode: "linear",
-                        base: 0,
-                        minCount: 4,
-                        maxCount: 6
-                    },
-                    minorTicks: {
-                        mode: "linear",
-                        base: 0,
-                        count: 5
-                    },
-                    stackMode: "none",
-                    stickToZero: !0
+                    type: "linear"
                 }],
                 yScale: 0,
                 zIndex: 10,
@@ -4070,22 +3852,21 @@
             scroller: {
                 defaultSeriesSettings: {
                     base: {
-                        color: "#64b5f6",
                         fill: "#999 0.6",
-                        selectFill: e,
+                        selectFill: d,
                         stroke: "#999 0.6",
-                        selectStroke: e,
+                        selectStroke: d,
                         lowStroke: "#999 0.6",
-                        selectLowStroke: e,
+                        selectLowStroke: d,
                         highStroke: "#999 0.6",
-                        selectHighStroke: e,
+                        selectHighStroke: d,
                         pointWidth: "75%"
                     },
                     marker: {
                         fill: "#999 0.6",
                         stroke: "#999 0.6",
-                        selectFill: e,
-                        selectStroke: e
+                        selectFill: d,
+                        selectStroke: d
                     },
                     areaLike: {
                         fill: "#999 0.6"
@@ -4111,11 +3892,11 @@
                     },
                     stick: {
                         stroke: "#999 0.6",
-                        selectStroke: v
+                        selectStroke: u
                     },
                     jumpLine: {
                         stroke: "#999 0.6",
-                        selectStroke: v
+                        selectStroke: u
                     }
                 },
                 enabled: !0,
@@ -4144,7 +3925,7 @@
                             left: 5
                         },
                         anchor: "leftTop",
-                        textFormatter: function() {
+                        format: function() {
                             return b.anychart.format.dateTime(this.tickValue, b.anychart.format.getDateTimeFormat(b.anychart.format.getIntervalIdentifier(this.majorIntervalUnit)))
                         }
                     },
@@ -4158,7 +3939,7 @@
                             bottom: 5,
                             left: 5
                         },
-                        textFormatter: function() {
+                        format: function() {
                             return b.anychart.format.dateTime(this.tickValue, b.anychart.format.getDateTimeFormat(b.anychart.format.getIntervalIdentifier(this.minorIntervalUnit, this.majorIntervalUnit)))
                         }
                     },
@@ -4166,8 +3947,7 @@
                 }
             },
             tooltip: {
-                allowLeaveScreen: !1,
-                allowLeaveChart: !0,
+                allowLeaveScreen: !0,
                 displayMode: "union",
                 positionMode: "float",
                 title: {
@@ -4177,13 +3957,13 @@
                 separator: {
                     enabled: !0
                 },
-                titleFormatter: function() {
+                titleFormat: function() {
                     return b.anychart.format.dateTime(this.hoveredDate,
                         b.anychart.format.getDateTimeFormat(b.anychart.format.getIntervalIdentifier(this.dataIntervalUnit, null, "full")))
                 }
             },
             a11y: {
-                titleFormatter: m
+                titleFormat: m
             }
         },
         pert: {
@@ -4208,22 +3988,24 @@
                     hAlign: "center",
                     fontColor: "#fff",
                     disablePointerEvents: !0,
-                    textFormatter: function() {
+                    format: function() {
                         return this.creator ? this.index : this.isStart ? "S" : "F"
                     }
                 },
                 hoverLabels: {
+                    enabled: null,
                     fontColor: "#fff",
                     fontOpacity: 1
                 },
                 selectLabels: {
+                    enabled: null,
                     fontWeight: "bold"
                 },
                 color: "#64b5f6",
                 fill: n,
                 stroke: "none",
                 hoverFill: k,
-                hoverStroke: C,
+                hoverStroke: D,
                 selectFill: "#333 0.85",
                 selectStroke: "#333 0.85",
                 tooltip: {
@@ -4233,10 +4015,10 @@
                     separator: {
                         enabled: !0
                     },
-                    titleFormatter: function() {
+                    titleFormat: function() {
                         return this.creator ? "Milestone - " + this.index : "Milestone - " + (this.isStart ? "Start" : "Finish")
                     },
-                    textFormatter: function() {
+                    format: function() {
                         var a =
                             "",
                             b;
@@ -4256,7 +4038,7 @@
                 fill: n,
                 stroke: n,
                 hoverFill: k,
-                hoverStroke: C,
+                hoverStroke: D,
                 selectFill: "#333 0.85",
                 selectStroke: "#333 0.85",
                 dummyFill: n,
@@ -4280,7 +4062,7 @@
                         left: 10
                     },
                     textWrap: "noWrap",
-                    textFormatter: function() {
+                    format: function() {
                         return this.name
                     }
                 },
@@ -4305,9 +4087,8 @@
                         bottom: 1,
                         left: 5
                     },
-                    textFormatter: function() {
-                        return "t: " +
-                            c(this.duration)
+                    format: function() {
+                        return "t: " + c(this.duration)
                     }
                 },
                 hoverLowerLabels: {
@@ -4323,13 +4104,12 @@
                     separator: {
                         enabled: !0
                     },
-                    titleFormatter: function() {
+                    titleFormat: function() {
                         return this.name
                     },
-                    textFormatter: function() {
+                    format: function() {
                         var a = "Earliest start: " + c(this.earliestStart) + "\nEarliest finish: " + c(this.earliestFinish) + "\nLatest start: " + c(this.latestStart) + "\nLatest finish: " + c(this.latestFinish) + "\nDuration: " + c(this.duration) + "\nSlack: " + c(this.slack);
-                        isNaN(this.variance) || (a += "\nStandard deviation: " + Math.round(100 *
-                            this.variance) / 100);
+                        isNaN(this.variance) || (a += "\nStandard deviation: " + Math.round(100 * this.variance) / 100);
                         return a
                     }
                 }
@@ -4356,7 +4136,7 @@
                     fontSize: "8pt",
                     padding: 0,
                     fontColor: "#F4F4F4",
-                    textFormatter: "{%hours}h ({%percent}%)"
+                    format: "{%hours}h ({%percent}%)"
                 },
                 fill: "#dd2c00",
                 stroke: "none",
@@ -4372,7 +4152,7 @@
                     enabled: !0,
                     anchor: "leftTop",
                     fontColor: "#F4F4F4",
-                    textFormatter: "{%name} ({%hoursPerDayRounded}h)",
+                    format: "{%name} ({%hoursPerDayRounded}h)",
                     position: "leftTop"
                 },
                 hoverLabels: {
@@ -4385,8 +4165,8 @@
                 hoverFill: k,
                 selectFill: "#333",
                 stroke: null,
-                hoverStroke: e,
-                selectStroke: e,
+                hoverStroke: d,
+                selectStroke: d,
                 hatchFill: !1,
                 hoverHatchFill: null,
                 selectHatchFill: null
@@ -4561,7 +4341,7 @@
                     unit: "day",
                     count: 1,
                     formats: ["MMM\ndd  EEEE"],
-                    textFormatter: function() {
+                    format: function() {
                         return this.value.toUpperCase()
                     },
                     hAlign: "left",
@@ -4579,7 +4359,7 @@
                     hAlign: "left",
                     fill: "#fff",
                     fontColor: "#ABB6BC",
-                    textFormatter: function() {
+                    format: function() {
                         return this.value.toUpperCase()
                     },
                     height: 30
@@ -4588,7 +4368,7 @@
                     count: 1,
                     formats: ["w MMM"],
                     fill: "#F0F5F8",
-                    textFormatter: function() {
+                    format: function() {
                         return this.value.toUpperCase()
                     }
                 }],
@@ -4604,7 +4384,7 @@
                     hAlign: "center",
                     padding: [2, 5, 2, 5],
                     fill: "#fff",
-                    textFormatter: function() {
+                    format: function() {
                         return this.value.toUpperCase()
                     },
                     height: 30
@@ -4613,7 +4393,7 @@
                     count: 1,
                     formats: ["w MMM"],
                     fill: "#F0F5F8",
-                    textFormatter: function() {
+                    format: function() {
                         return this.value.toUpperCase()
                     }
                 }],
@@ -4626,7 +4406,9 @@
             margin: [20, 20, 20, 20],
             resourceListWidth: 260,
             timeLineHeight: 52,
-            cellPadding: [2, 2, 2, 2],
+            cellPadding: [2,
+                2, 2, 2
+            ],
             minRowHeight: 50,
             pixPerHour: 25,
             defaultMinutesPerDay: 60,
@@ -4648,11 +4430,10 @@
                 separator: {
                     enabled: !0
                 },
-                titleFormatter: "{%name}",
-                textFormatter: function() {
+                titleFormat: "{%name}",
+                format: function() {
                     var a = window.anychart.format.date;
-                    return "Starts: " + a(this.start) +
-                        "\nEnds: " + a(this.end)
+                    return "Starts: " + a(this.start) + "\nEnds: " + a(this.end)
                 }
             }
         },
@@ -4867,28 +4648,28 @@
             },
             projectTimeline: {
                 tooltip: {
-                    titleFormatter: function() {
+                    titleFormat: function() {
                         return this.name || ""
                     },
-                    textFormatter: function() {
+                    format: function() {
                         var a = this.actualStart || this.autoStart,
                             c = this.actualEnd || this.autoEnd,
-                            e = this.progressValue;
-                        void 0 === e && (e = (Math.round(1E4 * this.autoProgress) / 100 || 0) + "%");
-                        return (a ? "Start Date: " + b.anychart.format.dateTime(a) : "") + (c ? "\nEnd Date: " + b.anychart.format.dateTime(c) : "") + (e ? "\nComplete: " + e : "")
+                            d = this.progressValue;
+                        void 0 === d && (d = (Math.round(1E4 * this.autoProgress) / 100 || 0) + "%");
+                        return (a ? "Start Date: " + b.anychart.format.dateTime(a) :
+                            "") + (c ? "\nEnd Date: " + b.anychart.format.dateTime(c) : "") + (d ? "\nComplete: " + d : "")
                     }
                 }
             },
             resourceTimeline: {
                 tooltip: {
-                    titleFormatter: function() {
+                    titleFormat: function() {
                         return this.name || ""
                     },
-                    textFormatter: function() {
+                    format: function() {
                         var a = this.periodStart || this.minPeriodDate,
                             c = this.periodEnd || this.maxPeriodDate;
-                        return (a ? "Start Date: " + b.anychart.format.dateTime(a) : "") + (c ? "\nEnd Date: " + b.anychart.format.dateTime(c) :
-                            "")
+                        return (a ? "Start Date: " + b.anychart.format.dateTime(a) : "") + (c ? "\nEnd Date: " + b.anychart.format.dateTime(c) : "")
                     }
                 }
             }

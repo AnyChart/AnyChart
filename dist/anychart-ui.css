@@ -1986,6 +1986,7 @@
  width: 21px;
  min-width: 21px;
  padding: 0;
+ line-height: normal;
  display: block;
  margin: 5px 0;
 }

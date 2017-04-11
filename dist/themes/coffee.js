@@ -1,14 +1,14 @@
 (function() {
+    function a() {
+        return b.anychart.color.setOpacity(this.sourceColor, .6, !0)
+    }
+
     function d() {
         return b.anychart.color.lighten(this.sourceColor)
     }
 
     function c() {
         return b.anychart.color.darken(this.sourceColor)
-    }
-
-    function a() {
-        return this.sourceColor
     }
     var b = this;
     b.anychart = b.anychart || {};
@@ -377,7 +377,6 @@
                 outlineStroke: "#8d6e63",
                 defaultSeriesSettings: {
                     base: {
-                        color: "#482311 0.6",
                         fill: "#bcaaa4",
                         stroke: "#bcaaa4",
                         selectFill: a,
