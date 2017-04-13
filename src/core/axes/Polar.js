@@ -554,8 +554,7 @@ anychart.core.axes.Polar.prototype.calculateAxisBounds_ = function() {
                 anychart.math.angleDx(startAngle, this.radius_),
                 anychart.math.angleDy(startAngle, this.radius_),
                 anychart.math.angleDx(endAngle, this.radius_),
-                anychart.math.angleDy(endAngle, this.radius_)
-            );
+                anychart.math.angleDy(endAngle, this.radius_));
           }
         } else {
           ratio = minorRatio;

@@ -30,4 +30,4 @@ anychart.core.drawers.map.Marker.prototype.yValueNames = (['id', 'long', 'lat'])
 anychart.core.drawers.map.Marker.prototype.drawPointInternal = function(point, state, shapes) {
   anychart.core.drawers.map.Marker.base(this, 'drawPointInternal', point, state, shapes);
   this.shapesManager.updateZIndex(state, shapes);
-}
+};
