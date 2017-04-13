@@ -851,7 +851,9 @@ anychart.core.ChartWithSeries.prototype.calcBubbleSizes = function() {
 anychart.core.ChartWithSeries.seriesReferenceValues = {
   'bar': ['value'],
   'line': ['value'],
+  'polyline': ['value'],
   'area': ['value'],
+  'polygon': ['value'],
   'column': ['value'],
   'spline': ['value'],
   'marker': ['value'],
