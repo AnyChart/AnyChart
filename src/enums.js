@@ -3753,7 +3753,11 @@ anychart.enums.TextWrap = {
   /**
    Wrap by symbol.
    */
-  BY_LETTER: 'byLetter'
+  BY_LETTER: 'byLetter',
+  /**
+   Wrap by word.
+   */
+  BY_WORD: 'byWord'
 };
 
 
@@ -3769,6 +3773,8 @@ anychart.enums.normalizeTextWrap = function(value) {
     case 'no':
     case 'n':
       return anychart.enums.TextWrap.NO_WRAP;
+    case 'byword':
+      return anychart.enums.TextWrap.BY_WORD;
     default:
       return anychart.enums.TextWrap.BY_LETTER;
   }
@@ -6894,6 +6900,7 @@ goog.exportSymbol('anychart.enums.VAlign.BOTTOM', anychart.enums.VAlign.BOTTOM);
 
 goog.exportSymbol('anychart.enums.TextWrap.NO_WRAP', anychart.enums.TextWrap.NO_WRAP);
 goog.exportSymbol('anychart.enums.TextWrap.BY_LETTER', anychart.enums.TextWrap.BY_LETTER);
+goog.exportSymbol('anychart.enums.TextWrap.BY_WORD', anychart.enums.TextWrap.BY_WORD);
 
 
 

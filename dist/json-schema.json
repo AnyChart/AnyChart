@@ -4944,7 +4944,7 @@
         "textIndent": {"type": ["number", "null"]},
         "vAlign": {"enum": ["top", "middle", "bottom", "null"]},
         "hAlign": {"enum": ["left", "start", "center", "end", "right", "null"]},
-        "textWrap": {"enum": ["noWrap", "byLetter", "null"]},
+        "textWrap": {"enum": ["noWrap", "byLetter", "byWord", "null"]},
         "textOverflow": {"type": ["string", "null"]},
         "selectable": {"type": ["boolean", "null"]},
         "disablePointerEvents": {"type": ["boolean", "null"]},
@@ -5134,6 +5134,7 @@
           "enum": [
             "noWrap",
             "byLetter",
+            "byWord",
             "null"
           ]
         },

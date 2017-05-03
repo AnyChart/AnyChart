@@ -3219,6 +3219,7 @@
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="noWrap"/>
             <xsd:enumeration value="byLetter"/>
+            <xsd:enumeration value="byWord"/>
         </xsd:restriction>
     </xsd:simpleType>
 
