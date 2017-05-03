@@ -461,6 +461,15 @@ anychart.core.ChartWithAxes.prototype.getAxisByIndex = function(index) {
 };
 
 
+/**
+ * @param {anychart.core.axes.Linear} axis
+ * @protected
+ */
+anychart.core.ChartWithAxes.prototype.setYAxisScale = function(axis) {
+  axis.scale(/** @type {anychart.scales.Base} */(this.yScale()));
+};
+
+
 //endregion
 //region --- Axis markers
 //----------------------------------------------------------------------------------------------------------------------
@@ -1011,7 +1020,7 @@ anychart.core.ChartWithAxes.prototype.drawContent = function(bounds) {
         item.labels().dropCallsCache();
         item.minorLabels().dropCallsCache();
         if (item && !item.scale())
-          item.scale(/** @type {anychart.scales.Base} */(this.yScale()));
+          this.setYAxisScale(item);
       }
     }
   }
@@ -1112,8 +1121,8 @@ anychart.core.ChartWithAxes.prototype.serializeWithScales = function(json, scale
   json['isVertical'] = this.barChartMode;
 
   var axesIds = [];
-  this.serializeElementsWithScales(json, 'xAxes', this.xAxes_, this.serializeAxis_, scales, scaleIds, axesIds);
-  this.serializeElementsWithScales(json, 'yAxes', this.yAxes_, this.serializeAxis_, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'xAxes', this.xAxes_, this.serializeAxis, scales, scaleIds, axesIds);
+  this.serializeElementsWithScales(json, 'yAxes', this.yAxes_, this.serializeAxis, scales, scaleIds, axesIds);
 
   this.serializeElementsWithScales(json, 'grids', this.grids_, this.serializeGrid_, scales, scaleIds, axesIds);
   this.serializeElementsWithScales(json, 'minorGrids', this.minorGrids_, this.serializeGrid_, scales, scaleIds, axesIds);
@@ -1132,9 +1141,9 @@ anychart.core.ChartWithAxes.prototype.serializeWithScales = function(json, scale
  * @param {Object} scaleIds
  * @param {Array} axesIds
  * @return {Object}
- * @private
+ * @protected
  */
-anychart.core.ChartWithAxes.prototype.serializeAxis_ = function(item, scales, scaleIds, axesIds) {
+anychart.core.ChartWithAxes.prototype.serializeAxis = function(item, scales, scaleIds, axesIds) {
   var config = item.serialize();
   this.serializeScale(config, 'scale', /** @type {anychart.scales.Base} */(item.scale()), scales, scaleIds);
   axesIds.push(goog.getUid(item));

@@ -169,8 +169,14 @@ anychart.core.series.Cartesian.prototype.applyDefaultsToElements = function(defa
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.core.series.Cartesian.prototype.getCategoryWidth = function() {
-  return (this.xScale().getPointWidthRatio() || (this.xScale().getZoomFactor() / this.getIterator().getRowsCount())) *
+anychart.core.series.Cartesian.prototype.getCategoryWidth = function(opt_categoryIndex) {
+  var ratio;
+  if (goog.isDef(opt_categoryIndex) && this.xScale() instanceof anychart.scales.Ordinal) {
+    ratio = this.xScale().weightRatios()[opt_categoryIndex];
+  } else {
+    ratio = this.xScale().getPointWidthRatio();
+  }
+  return (ratio || (this.xScale().getZoomFactor() / this.getIterator().getRowsCount())) *
       (this.getOption('isVertical') ? this.pixelBoundsCache.height : this.pixelBoundsCache.width);
 };
 
@@ -263,7 +269,9 @@ anychart.core.series.Cartesian.prototype.getColorResolutionContext = function(op
     return {
       'index': iterator.getIndex(),
       'sourceColor': source,
-      'iterator': iterator
+      'iterator': iterator,
+      'series': this,
+      'chart': this.chart
     };
   }
   return {
@@ -280,7 +288,9 @@ anychart.core.series.Cartesian.prototype.getHatchFillResolutionContext = functio
     return {
       'index': iterator.getIndex(),
       'sourceHatchFill': source,
-      'iterator': iterator
+      'iterator': iterator,
+      'series': this,
+      'chart': this.chart
     };
   }
   return {
@@ -605,9 +615,9 @@ anychart.core.series.Cartesian.prototype.isPointVisible = function(point) {
  * @param {Function} xMissingChecker
  * @param {string=} opt_nameField
  * @return {anychart.core.series.Cartesian.DrawingPlan}
- * @private
+ * @protected
  */
-anychart.core.series.Cartesian.prototype.getDrawingData_ = function(data, dataPusher, xNormalizer, xMissingChecker, opt_nameField) {
+anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPusher, xNormalizer, xMissingChecker, opt_nameField) {
   // anychart.performance.start('Drawing plan calc');
   var dataSource = /** @type {anychart.data.IView} */(this.data());
   var iterator = dataSource.getIterator();
@@ -666,7 +676,7 @@ anychart.core.series.Cartesian.prototype.getDrawingData_ = function(data, dataPu
     var yValueNames = this.getYValueNames();
     for (i = 0, len = yValueNames.length; i < len; i++) {
       name = yValueNames[i];
-      val = iterator.get(name);
+      val = this.normalizeYValue(iterator.get(name));
       missing = missing || yScale.isMissing(val);
       pointData[name] = val;
     }
@@ -723,6 +733,16 @@ anychart.core.series.Cartesian.prototype.getDrawingData_ = function(data, dataPu
 
 
 /**
+ * @param {number} value
+ * @return {number}
+ * @protected
+ */
+anychart.core.series.Cartesian.prototype.normalizeYValue = function(value) {
+  return value;
+};
+
+
+/**
  * @param {boolean} sorted
  * @param {boolean} dateTimeMode
  * @return {anychart.core.series.Cartesian.DrawingPlan}
@@ -765,7 +785,7 @@ anychart.core.series.Cartesian.prototype.getScatterDrawingPlan = function(sorted
       };
   var xMissingChecker = isNaN;
 
-  var result = this.getDrawingData_([], dataPusher, xNormalizer, xMissingChecker);
+  var result = this.getDrawingData([], dataPusher, xNormalizer, xMissingChecker);
   if (needsSorting)
     goog.array.sort(result.data, anychart.core.series.Cartesian.comparePointsXNumericAsc);
   return result;
@@ -823,7 +843,7 @@ anychart.core.series.Cartesian.prototype.getOrdinalDrawingPlan = function(xHashM
     return a === undefined;
   };
 
-  var result = this.getDrawingData_(new Array(xArray.length), dataPusher, xNormalizer, xMissingChecker, opt_namesField);
+  var result = this.getDrawingData(new Array(xArray.length), dataPusher, xNormalizer, xMissingChecker, opt_namesField);
   var data = result.data;
   for (var i = 0; i < data.length; i++) {
     if (!data[i])
@@ -983,9 +1003,9 @@ anychart.core.series.Cartesian.prototype.finalizePointAppearance = goog.nullFunc
  */
 anychart.core.series.Cartesian.prototype.applyAppearanceToSeries = function(pointState) {
   var iterator = this.getIterator();
-  this.drawer.updatePoint(iterator, pointState);
   this.shapeManager.updateColors(pointState,
       /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes')));
+  this.drawer.updatePoint(iterator, pointState);
   if (this.supportsOutliers()) {
     this.drawPointOutliers(iterator, pointState);
   }

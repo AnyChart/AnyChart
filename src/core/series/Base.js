@@ -1055,8 +1055,8 @@ anychart.core.series.Base.prototype.getWhiskerWidth = function(point, pointState
 
 /**
  * Returns category width in pixels according to current X scale settings.
+ * @param {number=} opt_categoryIndex Category index (for series based on ordinal scale with weights).
  * @return {number} Category width in pixels.
- * @protected
  */
 anychart.core.series.Base.prototype.getCategoryWidth = goog.abstractMethod;
 
@@ -2312,7 +2312,7 @@ anychart.core.series.Base.prototype.labelsInvalidated_ = function(event) {
  * @protected
  */
 anychart.core.series.Base.prototype.drawLabel = function(point, pointState) {
-  if (this.check(anychart.core.series.Capabilities.SUPPORTS_LABELS))
+  if (this.supportsLabels())
     point.meta('label', this.drawFactoryElement(
         [this.labels, this.hoverLabels, this.selectLabels],
         [this.getChart().labels, this.getChart().hoverLabels, this.getChart().selectLabels],
@@ -2432,7 +2432,7 @@ anychart.core.series.Base.prototype.markersInvalidated_ = function(event) {
  * @protected
  */
 anychart.core.series.Base.prototype.drawMarker = function(point, pointState) {
-  if (this.check(anychart.core.series.Capabilities.SUPPORTS_MARKERS))
+  if (this.supportsMarkers())
     point.meta('marker', this.drawFactoryElement(
         [this.markers, this.hoverMarkers, this.selectMarkers],
         null,
@@ -2827,7 +2827,7 @@ anychart.core.series.Base.prototype.draw = function() {
     stateFactoriesEnabled = /** @type {boolean} */(this.hoverLabels().enabled() || this.selectLabels().enabled());
     if (this.prepareFactory(factory, stateFactoriesEnabled, this.planHasPointLabels(),
             anychart.core.series.Capabilities.SUPPORTS_LABELS, anychart.ConsistencyState.SERIES_LABELS)) {
-      factory.setAutoZIndex(/** @type {number} */(this.zIndex() + this.LABELS_ZINDEX));
+      factory.setAutoZIndex(/** @type {number} */(this.zIndex() + this.LABELS_ZINDEX + (this.planIsStacked() ? 1 : 0)));
       // see DVF-2259
       factory.invalidate(anychart.ConsistencyState.Z_INDEX);
       elementsDrawers.push(this.drawLabel);
@@ -2841,7 +2841,7 @@ anychart.core.series.Base.prototype.draw = function() {
     stateFactoriesEnabled = /** @type {boolean} */(this.hoverMarkers().enabled() || this.selectMarkers().enabled());
     if (this.prepareFactory(factory, stateFactoriesEnabled, this.planHasPointMarkers(),
             anychart.core.series.Capabilities.SUPPORTS_MARKERS, anychart.ConsistencyState.SERIES_MARKERS)) {
-      factory.setAutoZIndex(/** @type {number} */(this.zIndex() + anychart.core.shapeManagers.MARKERS_ZINDEX));
+      factory.setAutoZIndex(/** @type {number} */(this.zIndex() + anychart.core.shapeManagers.MARKERS_ZINDEX + (this.planIsStacked() ? 1 : 0)));
       elementsDrawers.push(this.drawMarker);
       factoriesToFinalize.push(factory);
     }

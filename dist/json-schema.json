@@ -22,7 +22,8 @@
         {"$ref": "#/definitions/anychart.charts.Sparkline"},
         {"$ref": "#/definitions/anychart.charts.HeatMap"},
         {"$ref": "#/definitions/anychart.charts.TreeMap"},
-        {"$ref": "#/definitions/anychart.charts.Pert"}
+        {"$ref": "#/definitions/anychart.charts.Pert"},
+        {"$ref": "#/definitions/anychart.charts.Mekko"}
       ],
       "properties": {
         "container": {
@@ -2369,6 +2370,180 @@
       "required": ["type"]
     },
 
+    "anychart.charts.Mekko": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.SeparateChart"}
+      ],
+      "properties": {
+        "type": {"enum": ["mekko", "mosaic", "barmekko"]},
+        "grids": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.grids.Linear"}
+            ]
+          }
+        },
+        "minorGrids": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.grids.Linear"}
+            ]
+          }
+        },
+        "xAxes": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.axes.Linear"}
+            ]
+          }
+        },
+        "yAxes": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.axes.Linear"}
+            ]
+          }
+        },
+        "textAxesMarkers": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.axisMarkers.Text"}
+            ]
+          }
+        },
+        "series": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.mekko.series.Mekko"}
+            ]
+          }
+        },
+        "pointsPadding": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "markerPalette": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/anychart.enums.MarkerType"}
+            }
+          },
+          "items": {"$ref": "#/definitions/anychart.enums.MarkerType"}
+        },
+        "hatchFillPalette": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/hatchFillSet"}
+            }
+          },
+          "items": {"$ref": "#/definitions/acgraph.vector.HatchFill.HatchFillType"}
+        },
+        "palette": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "distinct",
+                "range"
+              ]
+            },
+            "items": {
+              "type": ["array"],
+              "items": {"$ref": "#/definitions/fill"}
+            },
+            "count": {
+              "type": "number"
+            }
+          },
+          "items": {
+            "type": "string"
+          }
+        },
+        "scales": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "items": {
+            "anyOf": [
+              {"$ref": "#/definitions/anychart.scales.Linear"},
+              {"$ref": "#/definitions/anychart.scales.Ordinal"},
+              {"$ref": "#/definitions/anychart.scales.Logarithmic"},
+              {"$ref": "#/definitions/anychart.scales.DateTime"}
+            ]
+          },
+          "patternProperties": {
+            ".*": {
+              "anyOf": [
+                {"$ref": "#/definitions/anychart.scales.Linear"},
+                {"$ref": "#/definitions/anychart.scales.Ordinal"},
+                {"$ref": "#/definitions/anychart.scales.Logarithmic"},
+                {"$ref": "#/definitions/anychart.scales.DateTime"}
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "xScale": {
+          "anyOf": [
+            {
+              "type": [
+                "string",
+                "number"
+              ]
+            },
+            {"$ref": "#/definitions/anychart.scales.Linear"},
+            {"$ref": "#/definitions/anychart.scales.Ordinal"},
+            {"$ref": "#/definitions/anychart.scales.Logarithmic"},
+            {"$ref": "#/definitions/anychart.scales.DateTime"}
+          ]
+        },
+        "yScale": {
+          "anyOf": [
+            {
+              "type": [
+                "string",
+                "number"
+              ]
+            },
+            {"$ref": "#/definitions/anychart.scales.Linear"},
+            {"$ref": "#/definitions/anychart.scales.Ordinal"},
+            {"$ref": "#/definitions/anychart.scales.Logarithmic"},
+            {"$ref": "#/definitions/anychart.scales.DateTime"}
+          ]
+        }
+      },
+      "required": ["type"]
+    },
+
     "anychart.core.SeriesBase": {
       "type": "object",
       "allOf": [
@@ -2467,7 +2642,8 @@
             "stick",
             "verticalStick",
             "choropleth",
-            "connector"
+            "connector",
+            "mekko"
           ]
         },
         "id": {
@@ -2971,6 +3147,13 @@
           "type": "number"
         }
       }
+    },
+
+    "anychart.core.mekko.series.Mekko": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.series.Base"}
+      ]
     },
 
     "anychart.core.gauge.Cap": {
@@ -3954,6 +4137,18 @@
           "type": ["array", "string"]
         },
         "values": {
+          "type": [
+            "null",
+            "array"
+          ],
+          "items": {
+            "type": [
+              "string",
+              "number"
+            ]
+          }
+        },
+        "weights": {
           "type": [
             "null",
             "array"

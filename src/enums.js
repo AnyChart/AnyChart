@@ -50,7 +50,10 @@ anychart.enums.ChartTypes = {
   RESOURCE: 'resource',
   JUMP_LINE: 'jumpLine',
   STICK: 'stick',
-  PARETO: 'pareto'
+  PARETO: 'pareto',
+  MEKKO: 'mekko',
+  MOSAIC: 'mosaic',
+  BARMEKKO: 'barmekko'
 };
 
 
@@ -3019,6 +3022,36 @@ anychart.enums.normalizeHeatMapSeriesType = function(value, opt_default) {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  MekkoSeriesType
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all series types.
+ * @enum {string}
+ */
+anychart.enums.MekkoSeriesType = {
+  MEKKO: 'mekko'
+};
+
+
+/**
+ * Normalizes mekko series type.
+ * @param {*} value Series type to normalize.
+ * @param {anychart.enums.MekkoSeriesType=} opt_default Custom default value (defaults to LINE).
+ * @return {anychart.enums.MekkoSeriesType}
+ */
+anychart.enums.normalizeMekkoSeriesType = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'mekko':
+      return anychart.enums.MekkoSeriesType.MEKKO;
+  }
+  return opt_default || anychart.enums.MekkoSeriesType.MEKKO;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Scale types
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -5510,7 +5543,8 @@ anychart.enums.SeriesDrawerTypes = {
   POLAR_LINE: 25,
   POLAR_AREA: 26,
   POLAR_COLUMN: 27,
-  POLAR_RANGE_COLUMN: 28
+  POLAR_RANGE_COLUMN: 28,
+  MEKKO: 29
 };
 
 
@@ -6730,6 +6764,8 @@ goog.exportSymbol('anychart.enums.PolarSeriesType.POLYGON', anychart.enums.Polar
 goog.exportSymbol('anychart.enums.PolarSeriesType.POLYLINE', anychart.enums.PolarSeriesType.POLYLINE);
 goog.exportSymbol('anychart.enums.PolarSeriesType.COLUMN', anychart.enums.PolarSeriesType.COLUMN);
 goog.exportSymbol('anychart.enums.PolarSeriesType.RANGE_COLUMN', anychart.enums.PolarSeriesType.RANGE_COLUMN);
+
+goog.exportSymbol('anychart.enums.MekkoSeriesType.MEKKO', anychart.enums.MekkoSeriesType.MEKKO);
 
 goog.exportSymbol('anychart.enums.MilestoneShape.CIRCLE', anychart.enums.MilestoneShape.CIRCLE);
 goog.exportSymbol('anychart.enums.MilestoneShape.RHOMBUS', anychart.enums.MilestoneShape.RHOMBUS);

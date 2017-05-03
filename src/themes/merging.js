@@ -571,6 +571,7 @@ anychart.themes.merging.mergingMap_ = [
       'chart.defaultLabelSettings',
       'cartesianBase.defaultTextMarkerSettings',
       'scatter.defaultTextMarkerSettings',
+      'mekko.defaultTextMarkerSettings',
       'standalones.label',
       'standalones.table',
       'standalones.textAxisMarker',
@@ -639,6 +640,8 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'cartesianBase.crosshair.xLabel',
       'cartesianBase.crosshair.yLabel',
+      'mekko.crosshair.xLabel',
+      'mekko.crosshair.yLabel',
       'scatter.crosshair.xLabel',
       'scatter.crosshair.yLabel',
       'map.crosshair.xLabel',
@@ -753,6 +756,7 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'cartesianBase.defaultLineMarkerSettings',
       'scatter.defaultLineMarkerSettings',
+      'mekko.defaultLineMarkerSettings',
       'sparkline.defaultLineMarkerSettings',
       'standalones.lineAxisMarker',
       'defaultTimeline.defaultLineMarkerSettings'
@@ -763,6 +767,7 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'cartesianBase.defaultTextMarkerSettings',
       'scatter.defaultTextMarkerSettings',
+      'mekko.defaultTextMarkerSettings',
       'sparkline.defaultTextMarkerSettings',
       'standalones.textAxisMarker',
       'defaultTimeline.defaultTextMarkerSettings'
@@ -773,6 +778,7 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'cartesianBase.defaultRangeMarkerSettings',
       'scatter.defaultRangeMarkerSettings',
+      'mekko.defaultRangeMarkerSettings',
       'sparkline.defaultRangeMarkerSettings',
       'standalones.rangeAxisMarker',
       'defaultTimeline.defaultRangeMarkerSettings'
@@ -787,6 +793,8 @@ anychart.themes.merging.mergingMap_ = [
       'heatMap.defaultYAxisSettings',
       'scatter.defaultXAxisSettings',
       'scatter.defaultYAxisSettings',
+      'mekko.defaultXAxisSettings',
+      'mekko.defaultYAxisSettings',
       'bullet.axis',
       'radar.xAxis',
       'radar.yAxis',
@@ -849,7 +857,8 @@ anychart.themes.merging.mergingMap_ = [
       'treeMap',
       'linearGauge',
       'pert',
-      'resource'
+      'resource',
+      'mekko'
     ]
   },
   {
@@ -1000,6 +1009,14 @@ anychart.themes.merging.mergingMap_ = [
   {
     defaultObj: 'area',
     targets: ['area3d']
+  },
+  {
+    defaultObj: 'mekko.defaultSeriesSettings.base',
+    targets: [
+      'mekko.defaultSeriesSettings.mekko',
+      'mekko.defaultSeriesSettings.mosaic',
+      'mekko.defaultSeriesSettings.barmekko'
+    ]
   },
   {
     defaultObj: 'scatter.defaultAnnotationSettings.base',
@@ -1340,7 +1357,35 @@ anychart.themes.merging.mergingMap_ = [
       'resource.resourceList.descriptions',
       'resource.resourceList.tags'
     ]
-  }
+  },
+  {
+    defaultObj: 'mekko',
+    targets: [
+      'mosaic',
+      'barmekko'
+    ]
+  },
+  {
+    defaultObj: 'mekko.defaultAnnotationSettings.base',
+    targets: [
+      'mekko.defaultAnnotationSettings.ray',
+      'mekko.defaultAnnotationSettings.line',
+      'mekko.defaultAnnotationSettings.infiniteLine',
+      'mekko.defaultAnnotationSettings.verticalLine',
+      'mekko.defaultAnnotationSettings.horizontalLine',
+      'mekko.defaultAnnotationSettings.rectangle',
+      'mekko.defaultAnnotationSettings.ellipse',
+      'mekko.defaultAnnotationSettings.triangle',
+      'mekko.defaultAnnotationSettings.trendChannel',
+      'mekko.defaultAnnotationSettings.andrewsPitchfork',
+      'mekko.defaultAnnotationSettings.fibonacciFan',
+      'mekko.defaultAnnotationSettings.fibonacciArc',
+      'mekko.defaultAnnotationSettings.fibonacciRetracement',
+      'mekko.defaultAnnotationSettings.fibonacciTimezones',
+      'mekko.defaultAnnotationSettings.marker',
+      'mekko.defaultAnnotationSettings.label'
+    ]
+  },
 ];
 
 

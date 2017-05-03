@@ -22,6 +22,11 @@ anychart.core.SeparateChart = function() {
   if (this.supportsBaseHighlight)
     this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove, null, this.handleMouseDown);
 
+  /**
+   * @type {anychart.enums.ChartTypes|anychart.enums.GaugeTypes|anychart.enums.MapTypes}
+   * @private
+   */
+  this.type_;
 };
 goog.inherits(anychart.core.SeparateChart, anychart.core.Chart);
 
@@ -40,6 +45,24 @@ anychart.core.SeparateChart.prototype.SUPPORTED_SIGNALS = anychart.core.Chart.pr
 anychart.core.SeparateChart.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.CHART_LEGEND;
+
+
+/**
+ * Sets chart type. Needed for proper serialization.
+ * @param {anychart.enums.ChartTypes|anychart.enums.GaugeTypes|anychart.enums.MapTypes} value
+ */
+anychart.core.SeparateChart.prototype.setType = function(value) {
+  this.type_ = value;
+};
+
+
+/**
+ * @inheritDoc
+ *
+ */
+anychart.core.SeparateChart.prototype.getType = function() {
+  return this.type_;
+};
 
 
 //----------------------------------------------------------------------------------------------------------------------

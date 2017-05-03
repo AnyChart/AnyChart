@@ -188,25 +188,6 @@ anychart.core.CartesianBase.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.CARTESIAN_ZOOM;
 
 
-/**
- * Sets chart type. Needed for proper serialization.
- * @param {anychart.enums.ChartTypes} value
- */
-anychart.core.CartesianBase.prototype.setType = function(value) {
-  /**
-   * @type {anychart.enums.ChartTypes}
-   * @private
-   */
-  this.type_ = value;
-};
-
-
-/** @inheritDoc */
-anychart.core.CartesianBase.prototype.getType = function() {
-  return this.type_;
-};
-
-
 //endregion
 //region --- Zoom and scroller
 //----------------------------------------------------------------------------------------------------------------------
@@ -500,7 +481,7 @@ anychart.core.CartesianBase.prototype.setupByJSONWithScales = function(config, s
  */
 anychart.core.CartesianBase.prototype.serialize = function() {
   var json = anychart.core.CartesianBase.base(this, 'serialize');
-  json['type'] = this.type_;
+  json['type'] = this.getType();
   json['barGroupsPadding'] = this.barGroupsPadding();
   json['barsPadding'] = this.barsPadding();
   json['xScroller'] = this.xScroller().serialize();

@@ -142,16 +142,19 @@ anychart.core.drawers.Base.prototype.startDrawing = function(shapeManager) {
    * @type {anychart.PointState|number}
    */
   this.seriesState = this.series.getSeriesState();
+
   /**
    * Point width.
    * @type {number}
    */
   this.pointWidth = this.series.pointWidthCache;
+
   /**
    * If the series has vertical X.
    * @type {boolean}
    */
   this.isVertical = /** @type {boolean} */(this.series.getOption('isVertical'));
+
   /**
    * If crisp edges should be applied if possible.
    * @type {boolean}
@@ -160,6 +163,13 @@ anychart.core.drawers.Base.prototype.startDrawing = function(shapeManager) {
   this.crispEdges = (this.series.categoryWidthCache - this.pointWidth) > 2.5 && this.pointWidth > 10;
 
   this.series.rendering().callStart(this.series);
+
+  /**
+   * If each point has it's own width.
+   * @type {boolean}
+   * @private
+   */
+  this.individualPointWidths_ = this.series.getXScale() instanceof anychart.scales.Ordinal && this.series.getXScale().checkWeights();
 };
 
 
@@ -185,6 +195,9 @@ anychart.core.drawers.Base.prototype.drawPointInternal_ = function(point, state)
     this.drawMissingPoint(point, state | this.seriesState);
     this.prevPointDrawn = this.prevPointDrawn && this.connectMissing;
   } else {
+    if (this.individualPointWidths_)
+      this.pointWidth = this.series.getCategoryWidth(point.getIndex());
+
     if (this.prevPointDrawn)
       this.drawSubsequentPoint(point, state | this.seriesState);
     else

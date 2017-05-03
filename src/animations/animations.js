@@ -29,6 +29,7 @@ anychart.animations.AnimationBySeriesType['stepLine'] = anychart.animations.Clip
 anychart.animations.AnimationBySeriesType['column'] = anychart.animations.ColumnAnimation;
 anychart.animations.AnimationBySeriesType['jumpLine'] = anychart.animations.ColumnAnimation;
 anychart.animations.AnimationBySeriesType['stick'] = anychart.animations.ColumnAnimation;
+anychart.animations.AnimationBySeriesType['mekko'] = anychart.animations.ColumnAnimation;
 //anychart.animations.AnimationBySeriesType['box'] =
 //anychart.animations.AnimationBySeriesType['candlestick'] =
 //anychart.animations.AnimationBySeriesType['marker'] =

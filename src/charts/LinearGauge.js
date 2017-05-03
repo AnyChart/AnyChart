@@ -171,23 +171,6 @@ anychart.charts.LinearGauge.prototype.defaultScaleBarSettings = function(opt_val
 
 
 //region --- OWN/INHERITED API ---
-/**
- * Sets chart type. Needed for proper serialization.
- * @param {anychart.enums.GaugeTypes} value
- */
-anychart.charts.LinearGauge.prototype.setType = function(value) {
-  /**
-   * @type {anychart.enums.GaugeTypes}
-   * @private
-   */
-  this.type_ = value;
-};
-
-
-/** @inheritDoc */
-anychart.charts.LinearGauge.prototype.getType = function() {
-  return this.type_;
-};
 
 
 /**

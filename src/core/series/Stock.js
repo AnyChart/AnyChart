@@ -91,7 +91,7 @@ goog.inherits(anychart.core.series.Stock, anychart.core.series.Base);
 //
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
-anychart.core.series.Stock.prototype.getCategoryWidth = function() {
+anychart.core.series.Stock.prototype.getCategoryWidth = function(opt_categoryIndex) {
   var xScale = this.getXScale();
   if (xScale instanceof anychart.scales.StockOrdinalDateTime)
     return this.pixelBoundsCache.width / (xScale.getMaximumIndex() - xScale.getMinimumIndex());

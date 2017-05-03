@@ -50,7 +50,7 @@ anychart.ConsistencyState = {
   DATA_MASK: 1 << 0,
   //---------------------------------- CHART STATES (VB) ---------------------------------
   /**
-   * Chart title has changed.
+   * Chart background has changed.
    */
   CHART_BACKGROUND: 1 << 6,
   /**
@@ -58,7 +58,7 @@ anychart.ConsistencyState = {
    */
   CHART_TITLE: 1 << 7,
   /**
-   * Chart title has changed.
+   * Labels have changed.
    */
   CHART_LABELS: 1 << 8,
   // We also add SeparateChart states here to not to add prefix SEPARATE_CHART.
@@ -128,6 +128,8 @@ anychart.ConsistencyState = {
   HEATMAP_X_SCROLLER: 1 << 17,
   HEATMAP_Y_SCROLLER: 1 << 18,
   HEATMAP_ZOOM: 1 << 19,
+  //---------------------------------- MEKKO STATES (AXES_CHART) ---------------------------------
+  MEKKO_CATEGORY_SCALE: 1 << 25,
   //---------------------------------- SERIES STATES (VB) ---------------------------------
   // also combined, due to a very big prefix
   SERIES_HATCH_FILL: 1 << 6, //

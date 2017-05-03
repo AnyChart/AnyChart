@@ -27,6 +27,33 @@ anychart.scales.Ordinal = function() {
   this.names_ = [];
 
   /**
+   * Weights values as it come from user.
+   * @type {!(Array.<number>)}
+   * @private
+   */
+  this.weights_ = [];
+
+  /**
+   * Normalized weights values.
+   * @type {!(Array.<number>)}
+   * @private
+   */
+  this.resultWeights_ = [];
+
+  /**
+   * Weights as ratio values.
+   * @type {!(Array.<number>)}
+   * @private
+   */
+  this.weightRatios_ = [];
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.autoWeights_ = true;
+
+  /**
    * @type {!Object.<number>}
    * @private
    */
@@ -161,6 +188,125 @@ anychart.scales.Ordinal.prototype.names = function(opt_value) {
 
 
 /**
+ * Checks if weights array is valuable.
+ * @return {boolean}
+ */
+anychart.scales.Ordinal.prototype.checkWeights = function() {
+  if (!this.weights_.length) return false;
+
+  // If all values are equal
+  for (var i = 1; i < this.weights_.length; i++) {
+    if (this.weights_[i] != this.weights_[0])
+      break;
+  }
+
+  return i != this.weights_.length;
+};
+
+
+/**
+ * Getter/setter for weights.
+ * @param {Array.<number>=} opt_value Array of weights.
+ * @return {(Array.<number>|anychart.scales.Ordinal)} Scale weights or self for chaining.
+ */
+anychart.scales.Ordinal.prototype.weights = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.updateWeights_(opt_value);
+    this.autoWeights_ = !this.weights_.length;
+    return this;
+  }
+
+  if (this.resultWeights_.length != this.values_.length) {
+    this.resultWeights_.length = 0;
+    // validate weights values
+    var sum = 0;
+    var count = 0;
+    var length = Math.min(this.weights_.length, this.values_.length);
+    var badValue = false;
+    for (var i = 0; i < length; i++) {
+      var weight = anychart.utils.toNumber(this.weights_[i]);
+      if (weight >= 0) {
+        sum += weight;
+        count++;
+        this.resultWeights_.push(weight);
+      } else {
+        badValue = true;
+        this.resultWeights_.push(void 0);
+      }
+    }
+
+    if (length < this.values_.length || badValue) {
+      // add average weights values for undefined indexes
+      var avg = count > 0 ? (sum / count) : 1;
+      for (var j = 0; j < this.values_.length; j++)
+        if (!this.resultWeights_[j])
+          this.resultWeights_[j] = avg;
+    }
+  }
+
+  return this.resultWeights_;
+};
+
+
+/**
+ * Updates weights container.
+ * @param {Array.<number>} value Array of weights.
+ * @private
+ */
+anychart.scales.Ordinal.prototype.updateWeights_ = function(value) {
+  if (goog.isNull(value))
+    this.weights_.length = 0;
+  else if (goog.isArray(value))
+    this.weights_ = goog.array.clone(value);
+
+  if (!this.checkWeights())
+    this.weights_.length = 0;
+
+  this.resultWeights_.length = 0;
+  this.weightRatios_.length = 0;
+  this.ticks().markInvalid();
+  this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
+};
+
+
+/**
+ * Wrapper for weights() method. Sets weights as auto calculated and does not affect serialization.
+ * @param {Array.<number>} values Array of weights.
+ * @return {anychart.scales.Ordinal} Self for chaining.
+ */
+anychart.scales.Ordinal.prototype.setAutoWeights = function(values) {
+  if (this.autoWeights_)
+    this.updateWeights_(values);
+
+  return this;
+};
+
+
+/**
+ * Getter for weight ratios.
+ * @return {Array.<number>} Array of weight ratios. Each ratio is a value from 0 to 1.
+ */
+anychart.scales.Ordinal.prototype.weightRatios = function() {
+  if (!this.weightRatios_ || this.weightRatios_.length != this.values_.length) {
+    var weights = this.weights();
+    var sum = 0;
+    for (var i in weights) {
+      sum += weights[i];
+    }
+
+    this.weightRatios_ = weights.map(function(val) {
+      return val / sum;
+    });
+
+    this.weightRatiosSums_ = [0];
+    for (var j = 0; j < this.weightRatios_.length; j++)
+      this.weightRatiosSums_.push(this.weightRatios_[j] + this.weightRatiosSums_[j]);
+  }
+  return this.weightRatios_;
+};
+
+
+/**
  * Getter for scale names field name.
  * @return {?string} Field name for alias or null if names set explicit.
  */
@@ -221,6 +367,8 @@ anychart.scales.Ordinal.prototype.resetDataRange = function() {
   this.valuesMap_ = {};
   this.autoNames_ = null;
   this.resultNames_ = null;
+  this.resultWeights_.length = 0;
+  this.weightRatios_.length = 0;
   return this;
 };
 
@@ -299,9 +447,17 @@ anychart.scales.Ordinal.prototype.getPointWidthRatio = function() {
  */
 anychart.scales.Ordinal.prototype.transform = function(value, opt_subRangeRatio) {
   var index = this.getIndexByValue(value);
+  var k = index;
   if (isNaN(index)) return NaN;
-  var result = index / this.values_.length +
-      (opt_subRangeRatio || 0) / this.values_.length; // sub scale part
+
+  var result;
+  if (this.checkWeights()) {
+    result = (opt_subRangeRatio || 0) * this.weightRatios()[k] + this.weightRatiosSums_[k];
+
+  } else {
+    result = index / this.values_.length +
+        (opt_subRangeRatio || 0) / this.values_.length; // sub scale part
+  }
   return this.applyZoomAndInverse(result);
 };
 
@@ -326,8 +482,20 @@ anychart.scales.Ordinal.prototype.transform = function(value, opt_subRangeRatio)
  */
 anychart.scales.Ordinal.prototype.inverseTransform = function(ratio) {
   ratio = this.reverseZoomAndInverse(ratio);
-  //todo(Anton Saukh): needs improvement.
-  var index = goog.math.clamp(Math.ceil(ratio * this.values_.length) - 1, 0, this.values_.length - 1);
+  var index;
+  if (this.checkWeights()) {
+    // to be sure that this.weightRatiosSums_ is initialized
+    this.weightRatios();
+    for (var j = 1; j < this.weightRatiosSums_.length; j++) {
+      if (ratio <= this.weightRatiosSums_[j]) break;
+    }
+
+    index = j - 1;
+  } else {
+    //todo(Anton Saukh): needs improvement.
+    index = goog.math.clamp(Math.ceil(ratio * this.values_.length) - 1, 0, this.values_.length - 1);
+  }
+
   return this.values_[index];
 };
 
@@ -351,9 +519,15 @@ anychart.scales.Ordinal.prototype.serialize = function() {
   var json = anychart.scales.Ordinal.base(this, 'serialize');
   if (!this.autoDomain_)
     json['values'] = this.values();
-  if (this.names_)
-    json['names'] = this.names_;
+
   json['ticks'] = this.ticks().serialize();
+
+  if (this.names_.length)
+    json['names'] = this.names_;
+
+  if (!this.autoWeights_ && this.checkWeights())
+    json['weights'] = this.weights_;
+
   return json;
 };
 
@@ -364,6 +538,7 @@ anychart.scales.Ordinal.prototype.setupByJSON = function(config, opt_default) {
   this.values(config['values']);
   this.ticks(config['ticks']);
   this.names(config['names']);
+  this.weights(config['weights']);
 };
 
 
@@ -400,4 +575,5 @@ anychart.scales.ordinal = function() {
   proto['values'] = proto.values;//doc|ex
   proto['names'] = proto.names;//doc|ex
   proto['extendDataRange'] = proto.extendDataRange;//doc|need-ex
+  proto['weights'] = proto.weights;
 })();
