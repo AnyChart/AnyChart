@@ -20,7 +20,7 @@ anychart.core.makeStandalone(anychart.standalones.ColorRange, anychart.core.ui.C
  */
 anychart.standalones.colorRange = function() {
   var colorRange = new anychart.standalones.ColorRange();
-  colorRange.setupByVal(anychart.getFullTheme('standalones.colorRange'), true);
+  colorRange.setupInternal(true, anychart.getFullTheme('standalones.colorRange'));
   return colorRange;
 };
 

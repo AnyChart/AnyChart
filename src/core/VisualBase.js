@@ -1007,12 +1007,13 @@ anychart.core.VisualBase.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.VisualBase.prototype.specialSetupByVal = function(value) {
-  if (goog.isBoolean(value) || goog.isNull(value)) {
-    this.enabled(!!value);
+anychart.core.VisualBase.prototype.setupSpecial = function(isDefault, var_args) {
+  var arg0 = arguments[1];
+  if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
+    this.enabled(!!arg0);
     return true;
   }
-  return anychart.core.Base.prototype.specialSetupByVal.apply(this, arguments);
+  return false;
 };
 
 

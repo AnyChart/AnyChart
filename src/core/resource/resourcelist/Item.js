@@ -290,42 +290,48 @@ anychart.core.resource.resourceList.Item.prototype.getComplexOption = function(n
 anychart.core.resource.resourceList.Item.PROPERTY_DESCRIPTORS = (function() {
   var map = {};
 
-  map['width'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'width',
       anychart.core.settings.numberOrPercentNormalizer,
       0,
       0);
 
-  map['imageSrc'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'imageSrc',
       anychart.core.settings.stringNormalizer,
       0,
       0);
 
-  map['name'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'name',
       anychart.core.settings.stringNormalizer,
       0,
       0);
 
-  map['type'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'type',
       anychart.core.settings.stringNormalizer,
       0,
       0);
 
-  map['description'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'description',
       anychart.core.settings.stringNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['tags'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'tags',
       anychart.core.settings.arrayNormalizer,

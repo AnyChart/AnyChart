@@ -89,56 +89,64 @@ anychart.core.ui.Background.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.core.ui.Background.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map['fill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fill',
       anychart.core.settings.fillNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['stroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stroke',
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['topStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'topStroke',
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['rightStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'rightStroke',
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['bottomStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'bottomStroke',
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['leftStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'leftStroke',
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['disablePointerEvents'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'disablePointerEvents',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.BACKGROUND_POINTER_EVENTS,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['cornerType'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'cornerType',
       anychart.enums.normalizeBackgroundCornerType,
@@ -794,23 +802,24 @@ anychart.core.ui.Background.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.Background.prototype.specialSetupByVal = function(value, opt_default) {
-  if (goog.isString(value)) {
-    if (opt_default) {
-      this.themeSettings['fill'] = value;
+anychart.core.ui.Background.prototype.setupSpecial = function(isDefault, var_args) {
+  var arg0 = arguments[1];
+  if (goog.isString(arg0)) {
+    if (isDefault) {
+      this.themeSettings['fill'] = arg0;
       this.themeSettings['stroke'] = null;
       this.themeSettings['enabled'] = true;
     } else {
-      this['fill'](value);
+      this['fill'](arg0);
       this['stroke'](null);
       this.enabled(true);
     }
     return true;
-  } else if (goog.isBoolean(value) || goog.isNull(value)) {
-    if (opt_default)
-      this.themeSettings['enabled'] = !!value;
+  } else if (goog.isBoolean(arg0) || goog.isNull(arg0)) {
+    if (isDefault)
+      this.themeSettings['enabled'] = !!arg0;
     else
-      this.enabled(!!value);
+      this.enabled(!!arg0);
     return true;
   }
   return false;

@@ -1224,9 +1224,9 @@ anychart.core.ui.Callout.prototype.setupByJSON = function(config, opt_default) {
   if ('margin' in config)
     this.margin(config['margin']);
 
-  this.labels().setupByVal(config['labels'], opt_default);
-  this.hoverLabels().setupByVal(config['hoverLabels'], opt_default);
-  this.selectLabels().setupByVal(config['selectLabels'], opt_default);
+  this.labels().setupInternal(!!opt_default, config['labels']);
+  this.hoverLabels().setupInternal(!!opt_default, config['hoverLabels']);
+  this.selectLabels().setupInternal(!!opt_default, config['selectLabels']);
 
   this.width(config['width']);
   this.length(config['length']);

@@ -249,9 +249,6 @@ anychart.core.reporting.getWarningDescription_ = function(code, opt_arguments) {
     case anychart.enums.WarningCode.STOCK_WRONG_MAPPING:
       return 'Wrong mapping passed to ' + opt_arguments[0] + ' series - required "' + opt_arguments[1] + "' field is missing.";
 
-    case anychart.enums.WarningCode.SCALE_TYPE_NOT_SUPPORTED:
-      return 'Scale type "' + opt_arguments[0] + '" is not supported - only ' + opt_arguments[1] + ' is.';
-
     case anychart.enums.WarningCode.PARSE_DATETIME:
       return 'Could not parse date time value "' + opt_arguments[0] + '".' + (!!opt_arguments[1] ?
               ('Symbols parsed: ' + opt_arguments[1]) : '');

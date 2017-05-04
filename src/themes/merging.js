@@ -559,6 +559,18 @@ anychart.themes.merging.mergingMap_ = [
     ]
   },
   {
+    defaultObj: 'defaultOrdinalColorScale',
+    targets: [
+      'defaultScaleSettings.ordinalColor'
+    ]
+  },
+  {
+    defaultObj: 'defaultLinearColorScale',
+    targets: [
+      'defaultScaleSettings.linearColor'
+    ]
+  },
+  {
     defaultObj: 'defaultFontSettings',
     targets: [
       'defaultTitle',

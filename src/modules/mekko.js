@@ -21,7 +21,7 @@ anychart.mekko = function(var_args) {
   var chart = new anychart.charts.Mekko(false);
 
   chart.setType(anychart.enums.ChartTypes.MEKKO);
-  chart.setupByVal(anychart.getFullTheme('mekko'), true);
+  chart.setupInternal(true, anychart.getFullTheme('mekko'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['mekko'](arguments[i]);
@@ -41,7 +41,7 @@ anychart.mosaic = function(var_args) {
   var chart = new anychart.charts.Mekko(true);
 
   chart.setType(anychart.enums.ChartTypes.MOSAIC);
-  chart.setupByVal(anychart.getFullTheme('mosaic'), true);
+  chart.setupInternal(true, anychart.getFullTheme('mosaic'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['mekko'](arguments[i]);
@@ -61,7 +61,7 @@ anychart.barmekko = function(var_args) {
   var chart = new anychart.charts.Mekko(false, true);
 
   chart.setType(anychart.enums.ChartTypes.BARMEKKO);
-  chart.setupByVal(anychart.getFullTheme('barmekko'), true);
+  chart.setupInternal(true, anychart.getFullTheme('barmekko'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['mekko'](arguments[i]);

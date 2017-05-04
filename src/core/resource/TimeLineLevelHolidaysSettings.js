@@ -205,30 +205,31 @@ anychart.core.resource.TimeLineLevelHolidaysSettings.prototype.parentInvalidated
  * Text descriptors.
  * @type {!Object.<string, anychart.core.settings.PropertyDescriptor>}
  */
-anychart.core.resource.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS =
-    anychart.core.settings.createTextPropertiesDescriptors(
-        anychart.ConsistencyState.ONLY_DISPATCHING,
-        anychart.ConsistencyState.ONLY_DISPATCHING,
-        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
-        anychart.Signal.NEEDS_REDRAW
-    );
-anychart.core.resource.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS['format'] =
-    anychart.core.settings.createDescriptor(
-        anychart.enums.PropertyHandlerType.SINGLE_ARG,
-        'format',
-        anychart.core.settings.stringOrFunctionNormalizer,
-        anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
-        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
-//@deprecated Since 7.13.1. Use 'format' instead.
-anychart.core.resource.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS['textFormatter'] =
-    anychart.core.settings.createDescriptor(
-        anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED,
-        'format',
-        anychart.core.settings.stringOrFunctionNormalizer,
-        anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
-        anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
-        void 0,
-        'textFormatter');
+anychart.core.resource.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS = (function() {
+  var map = anychart.core.settings.createTextPropertiesDescriptors(
+      anychart.ConsistencyState.ONLY_DISPATCHING,
+      anychart.ConsistencyState.ONLY_DISPATCHING,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
+      anychart.Signal.NEEDS_REDRAW);
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG,
+      'format',
+      anychart.core.settings.stringOrFunctionNormalizer,
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
+  //@deprecated Since 7.13.1. Use 'format' instead.
+  anychart.core.settings.createDescriptor(
+      map,
+      anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED,
+      'format',
+      anychart.core.settings.stringOrFunctionNormalizer,
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
+      anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
+      void 0,
+      'textFormatter');
+  return map;
+})();
 anychart.core.settings.populate(anychart.core.resource.TimeLineLevelHolidaysSettings, anychart.core.resource.TimeLineLevelHolidaysSettings.TEXT_DESCRIPTORS);
 
 
@@ -240,7 +241,8 @@ anychart.core.resource.TimeLineLevelHolidaysSettings.DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  map['fill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fill',
       anychart.core.settings.fillNormalizer,
@@ -310,7 +312,7 @@ anychart.core.resource.TimeLineLevelHolidaysSettings.prototype.setupByJSON = fun
     anychart.core.settings.deserialize(this, anychart.core.resource.TimeLineLevelHolidaysSettings.DESCRIPTORS, config);
   }
 
-  this.padding().setupByVal(config['padding'], opt_default);
+  this.padding().setupInternal(!!opt_default, config['padding']);
 };
 
 

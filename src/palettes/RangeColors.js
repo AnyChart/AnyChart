@@ -309,19 +309,19 @@ anychart.palettes.RangeColors.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.palettes.RangeColors.prototype.setupSpecial = function(var_args) {
-  var args = arguments;
-  if (goog.isArray(args[0])) {
-    this.items(args[0]);
-    this.count(args[0].length);
+anychart.palettes.RangeColors.prototype.setupSpecial = function(isDefault, var_args) {
+  var arg0 = arguments[1];
+  if (goog.isArray(arg0)) {
+    this.items(arg0);
+    this.count(arg0.length);
     return true;
   }
-  if (args[0] instanceof anychart.palettes.RangeColors) {
-    this.items(args[0].items());
-    this.count(args[0].count());
+  if (arg0 instanceof anychart.palettes.RangeColors) {
+    this.items(/** @type {Array.<acgraph.vector.SolidFill>|acgraph.vector.LinearGradientFill|acgraph.vector.RadialGradientFill|Array.<acgraph.vector.GradientKey>|Array.<string>} */(arg0.items()));
+    this.count(/** @type {number} */(arg0.count()));
     return true;
   }
-  return anychart.core.Base.prototype.setupSpecial.apply(this, args);
+  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
 };
 
 

@@ -327,64 +327,74 @@ anychart.core.resource.Activities.prototype.drawLabels = function() {
 anychart.core.resource.Activities.DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map['color'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'color',
       anychart.core.settings.colorNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['fill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'fill',
       anychart.core.settings.fillOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  map['hoverFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverFill',
       anychart.core.settings.fillOrFunctionNormalizer,
       0,
       0);
-  map['selectFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectFill',
       anychart.core.settings.fillOrFunctionNormalizer,
       0,
       0);
 
-  map['stroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  map['hoverStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
       0,
       0);
-  map['selectStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectStroke',
       anychart.core.settings.strokeOrFunctionNormalizer,
       0,
       0);
 
-  map['hatchFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hatchFill',
       anychart.core.settings.hatchFillOrFunctionNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
-  map['hoverHatchFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'hoverHatchFill',
       anychart.core.settings.hatchFillOrFunctionNormalizer,
       0,
       0);
-  map['selectHatchFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'selectHatchFill',
       anychart.core.settings.hatchFillOrFunctionNormalizer,
@@ -695,7 +705,7 @@ anychart.core.resource.Activities.prototype.serialize = function() {
 anychart.core.resource.Activities.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.resource.Activities.base(this, 'setupByJSON', config);
   anychart.core.settings.deserialize(this, anychart.core.resource.Activities.DESCRIPTORS, config);
-  this.labels().setupByVal(config['labels'], opt_default);
+  this.labels().setupInternal(!!opt_default, config['labels']);
 };
 
 

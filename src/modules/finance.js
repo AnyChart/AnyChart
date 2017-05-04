@@ -32,7 +32,7 @@ anychart.financial = function(var_args) {
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.CANDLESTICK);
   chart.setType(anychart.enums.ChartTypes.FINANCIAL);
 
-  chart.setupByVal(anychart.getFullTheme('financial'), true);
+  chart.setupInternal(true, anychart.getFullTheme('financial'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['candlestick'](arguments[i]);

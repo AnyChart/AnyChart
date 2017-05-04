@@ -3931,9 +3931,9 @@ anychart.core.PyramidFunnelBase.prototype.setupByJSON = function(config, opt_def
   this.hoverHatchFill(config['hoverHatchFill']);
   this.selectHatchFill(config['selectHatchFill']);
 
-  this.labels().setupByVal(config['labels'], opt_default);
-  this.hoverLabels().setupByVal(config['hoverLabels'], opt_default);
-  this.selectLabels().setupByVal(config['selectLabels'], opt_default);
+  this.labels().setupInternal(!!opt_default, config['labels']);
+  this.hoverLabels().setupInternal(!!opt_default, config['hoverLabels']);
+  this.selectLabels().setupInternal(!!opt_default, config['selectLabels']);
 
   this.stroke(config['stroke']);
   this.hoverStroke(config['hoverStroke']);
@@ -3948,7 +3948,7 @@ anychart.core.PyramidFunnelBase.prototype.setupByJSON = function(config, opt_def
   this.pointsPadding(config['pointsPadding']);
 
   if ('tooltip' in config)
-    this.tooltip().setupByVal(config['tooltip'], opt_default);
+    this.tooltip().setupInternal(!!opt_default, config['tooltip']);
 };
 
 

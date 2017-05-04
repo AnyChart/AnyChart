@@ -24,6 +24,8 @@ goog.require('anychart.enums');
  */
 anychart.charts.Cartesian = function() {
   anychart.charts.Cartesian.base(this, 'constructor');
+
+  this.setType(anychart.enums.ChartTypes.CARTESIAN);
 };
 goog.inherits(anychart.charts.Cartesian, anychart.core.CartesianBase);
 
@@ -342,7 +344,7 @@ anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.charts.Cartesi
  */
 anychart.cartesian = function(opt_isVertical) {
   var chart = new anychart.charts.Cartesian();
-  chart.setupByVal(anychart.getFullTheme('cartesian'), true);
+  chart.setupInternal(true, anychart.getFullTheme('cartesian'));
   if (goog.isDef(opt_isVertical))
     chart.barChartMode = !!opt_isVertical;
   return chart;

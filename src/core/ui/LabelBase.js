@@ -1035,14 +1035,14 @@ anychart.core.ui.LabelBase.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.LabelBase.prototype.setupSpecial = function(var_args) {
-  var args = arguments;
-  if (goog.isString(args[0])) {
-    this.text(args[0]);
+anychart.core.ui.LabelBase.prototype.setupSpecial = function(isDefault, var_args) {
+  var arg0 = arguments[1];
+  if (goog.isString(arg0)) {
+    this.text(arg0);
     this.enabled(true);
     return true;
   }
-  return anychart.core.Text.prototype.setupSpecial.apply(this, args);
+  return anychart.core.Text.prototype.setupSpecial.apply(this, arguments);
 };
 
 

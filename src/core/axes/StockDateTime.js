@@ -755,8 +755,8 @@ anychart.core.axes.StockDateTime.prototype.serialize = function() {
 anychart.core.axes.StockDateTime.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.axes.StockDateTime.base(this, 'setupByJSON', config, opt_default);
   this.height(config['height']);
-  this.labels().setupByVal(config['labels'], opt_default);
-  this.minorLabels().setupByVal(config['minorLabels'], opt_default);
+  this.labels().setupInternal(!!opt_default, config['labels']);
+  this.minorLabels().setupInternal(!!opt_default, config['minorLabels']);
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
   this.background(config['background']);

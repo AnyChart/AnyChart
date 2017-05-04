@@ -555,13 +555,13 @@ anychart.scales.DateTimeTicks.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.scales.DateTimeTicks.prototype.setupSpecial = function(var_args) {
-  var args = arguments;
-  if (goog.isArray(args[0])) {
-    this.set(args[0]);
+anychart.scales.DateTimeTicks.prototype.setupSpecial = function(isDefault, var_args) {
+  var arg = arguments[1];
+  if (goog.isArray(arg)) {
+    this.set(arg);
     return true;
   }
-  return anychart.core.Base.prototype.setupSpecial.apply(this, args);
+  return anychart.core.Base.prototype.setupSpecial.apply(this, arguments);
 };
 
 

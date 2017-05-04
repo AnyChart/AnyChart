@@ -1697,7 +1697,7 @@ anychart.charts.Map.prototype.axes = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    this.axesSettings_.setupByVal(opt_value);
+    this.axesSettings_.setupInternal(false, opt_value);
     return this;
   }
   return this.axesSettings_;
@@ -1731,7 +1731,7 @@ anychart.charts.Map.prototype.grids = function(opt_value) {
   }
 
   if (goog.isDef(opt_value)) {
-    this.gridSettings_.setupByVal(opt_value);
+    this.gridSettings_.setupInternal(false, opt_value);
     return this;
   }
   return this.gridSettings_;
@@ -5079,7 +5079,7 @@ anychart.charts.Map.prototype.setupByJSON = function(config, opt_default) {
   if ('defaultCalloutSettings' in config)
     this.defaultCalloutSettings(config['defaultCalloutSettings']);
 
-  this.colorRange().setupByVal(config['colorRange'], opt_default);
+  this.colorRange().setupInternal(!!opt_default, config['colorRange']);
   this.unboundRegions(config['unboundRegions']);
   this.geoIdField(config['geoIdField']);
   this.overlapMode(config['overlapMode']);
@@ -5119,10 +5119,10 @@ anychart.charts.Map.prototype.setupByJSON = function(config, opt_default) {
   }
 
   if ('axesSettings' in config) {
-    this.axes().setupByVal(config['axesSettings'], opt_default);
+    this.axes().setupInternal(!!opt_default, config['axesSettings']);
   }
   if ('gridsSettings' in config) {
-    this.grids().setupByVal(config['gridsSettings'], opt_default);
+    this.grids().setupInternal(!!opt_default, config['gridsSettings']);
   }
 
   this.crosshair(config['crosshair']);

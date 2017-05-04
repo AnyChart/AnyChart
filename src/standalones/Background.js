@@ -20,7 +20,7 @@ anychart.core.makeStandalone(anychart.standalones.Background, anychart.core.ui.B
  */
 anychart.standalones.background = function() {
   var background = new anychart.standalones.Background();
-  background.setupByVal(anychart.getFullTheme('standalones.background'), true);
+  background.setupInternal(true, anychart.getFullTheme('standalones.background'));
   return background;
 };
 

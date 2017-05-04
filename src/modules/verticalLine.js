@@ -24,7 +24,7 @@ anychart.verticalLine = function(var_args) {
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.LINE);
   chart.setType(anychart.enums.ChartTypes.VERTICAL_LINE);
 
-  chart.setupByVal(anychart.getFullTheme('verticalLine'), true);
+  chart.setupInternal(true, anychart.getFullTheme('verticalLine'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart[anychart.enums.CartesianSeriesType.LINE](arguments[i]);

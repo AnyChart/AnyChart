@@ -581,10 +581,8 @@ anychart.ui.ContextMenu.prototype.serialize = function() {
 anychart.ui.ContextMenu.prototype.setup = function(var_args) {
   var arg0 = arguments[0];
   if (goog.isDef(arg0)) {
-    if (!this.setupSpecial.apply(this, arguments) && goog.isObject(arg0)) {
-      //if (arg0 instanceof anychart.core.Base)
-      //  throw 'Instance of object is passed to setter. You should use JSON instead';
-      this.setupByJSON(/** @type {!Object} */(arguments[0]));
+    if (!this.setupSpecial(arg0) && goog.isObject(arg0)) {
+      this.setupByJSON(arg0);
     }
   }
   return this;

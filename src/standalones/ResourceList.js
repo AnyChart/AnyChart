@@ -25,21 +25,24 @@ anychart.core.makeStandalone(anychart.standalones.ResourceList, anychart.core.re
 anychart.standalones.ResourceList.PROPERTY_DESCRIPTORS = (function() {
   var map = {};
 
-  map['rowHeight'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'rowHeight',
       anychart.core.settings.numberOrPercentNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['minRowHeight'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'minRowHeight',
       anychart.core.settings.numberOrPercentNormalizer,
       0,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['maxRowHeight'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'maxRowHeight',
       anychart.core.settings.numberOrPercentNormalizer,

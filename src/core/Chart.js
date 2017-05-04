@@ -1681,7 +1681,7 @@ anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
   this.animation(config['animation']);
 
   if ('tooltip' in config)
-    this.tooltip().setupByVal(config['tooltip'], opt_default);
+    this.tooltip().setupInternal(!!opt_default, config['tooltip']);
 
   this.a11y(config['a11y']);
 
@@ -1722,7 +1722,7 @@ anychart.core.Chart.prototype.legend = function(opt_value) {
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Internal public method. Returns all chart series.
- * @return {!Array.<anychart.core.series.Base|anychart.core.SeriesBase|anychart.core.linearGauge.pointers.Base>}
+ * @return {!Array.<anychart.core.series.Base|anychart.core.linearGauge.pointers.Base>}
  */
 anychart.core.Chart.prototype.getAllSeries = goog.abstractMethod;
 
@@ -1730,7 +1730,7 @@ anychart.core.Chart.prototype.getAllSeries = goog.abstractMethod;
 /**
  * Getter series by index.
  * @param {number} index .
- * @return {anychart.core.series.Base|anychart.core.SeriesBase}
+ * @return {anychart.core.series.Base}
  */
 anychart.core.Chart.prototype.getSeries = function(index) {
   return null;
@@ -1882,7 +1882,7 @@ anychart.core.Chart.prototype.makeCurrentPoint = function(seriesStatus, event, o
 anychart.core.Chart.prototype.makeInteractivityPointEvent = function(type, event, seriesStatus, opt_empty, opt_forbidTooltip) {
   var currentPoint = this.makeCurrentPoint(seriesStatus, type, opt_empty);
   var wrappedPoints = [];
-  /** @type {anychart.core.series.Base|anychart.core.SeriesBase} */
+  /** @type {anychart.core.series.Base} */
   var series;
   if (!opt_empty) {
     for (var i = 0; i < seriesStatus.length; i++) {
@@ -1921,7 +1921,7 @@ anychart.core.Chart.prototype.getPoint = goog.abstractMethod;
  * Returns points by event.
  * @param {anychart.core.MouseEvent} event
  * @return {?Array.<{
- *    series: (anychart.core.series.Base|anychart.core.SeriesBase|anychart.core.linearGauge.pointers.Base),
+ *    series: (anychart.core.series.Base|anychart.core.linearGauge.pointers.Base),
  *    points: Array.<number>,
  *    lastPoint: (number|undefined),
  *    nearestPointToCursor: (Object.<number>|undefined)
@@ -1933,7 +1933,7 @@ anychart.core.Chart.prototype.getSeriesStatus = goog.abstractMethod;
 /**
  * Some action on mouse over and move.
  * @param {Array.<number>|number} index Point index or indexes.
- * @param {anychart.core.series.Base|anychart.core.SeriesBase} series Series.
+ * @param {anychart.core.series.Base} series Series.
  */
 anychart.core.Chart.prototype.doAdditionActionsOnMouseOverAndMove = goog.nullFunction;
 
@@ -1998,7 +1998,7 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
           if (goog.isFunction(series.hoverPoint))
             series.hoverPoint(/** @type {number} */ (index), event);
 
-          this.doAdditionActionsOnMouseOverAndMove(/** @type {number|Array.<number>} */(index), /** @type {!anychart.core.series.Base|anychart.core.SeriesBase} */(series));
+          this.doAdditionActionsOnMouseOverAndMove(/** @type {number|Array.<number>} */(index), /** @type {!anychart.core.series.Base} */(series));
 
           var alreadyHoveredPoints = series.state.getIndexByPointState(anychart.PointState.HOVER);
           var eventSeriesStatus = [];
@@ -2450,7 +2450,7 @@ anychart.core.Chart.prototype.unselect = function(opt_indexOrIndexes) {
   var i, len;
   var series = this.getAllSeries();
   for (i = 0, len = series.length; i < len; i++) {
-    if (series[i]) series[i].unselect(opt_indexOrIndexes);
+    if (series[i]) series[i].unselect();
   }
 };
 
@@ -2463,7 +2463,7 @@ anychart.core.Chart.prototype.unhover = function(opt_indexOrIndexes) {
   var i, len;
   var series = this.getAllSeries();
   for (i = 0, len = series.length; i < len; i++) {
-    if (series[i]) series[i].unhover(opt_indexOrIndexes);
+    if (series[i]) series[i].unhover();
   }
 };
 
@@ -2520,7 +2520,7 @@ anychart.core.Chart.prototype.onInteractivitySignal = function() {
   var series = this.getAllSeries();
   for (var i = series.length; i--;) {
     if (series[i])
-      series[i].hoverMode(/** @type {string} */(this.interactivity().hoverMode()));
+      series[i].hoverMode(/** @type {anychart.enums.HoverMode} */(this.interactivity().hoverMode()));
   }
 };
 
@@ -2808,7 +2808,7 @@ anychart.core.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvS
   var dataSetsCount = 0;
 
   for (i = 0; i < seriesListLength; i++) {
-    series = /** @type {anychart.core.SeriesBase} */ (seriesList[i]);
+    series = /** @type {anychart.core.series.Base|anychart.core.Chart} */ (seriesList[i]);
     seriesData = /** @type {anychart.data.View} */ (series.data());
     seriesDataSets = seriesData.getDataSets();
     for (j = 0, len = seriesDataSets.length; j < len; j++) {

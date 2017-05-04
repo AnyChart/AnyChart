@@ -650,7 +650,7 @@ anychart.core.RadarPolarChart.prototype.setupByJSONWithScales = function(config,
   this.setupElementsWithScales(config['minorGrids'], this.minorGrid, scalesInstances);
 
   var json = config['xAxis'];
-  this.xAxis().setupByVal(json, opt_default);
+  this.xAxis().setupInternal(!!opt_default, json);
   if (goog.isObject(json) && 'scale' in json && json['scale'] > 1)
     this.xAxis().scale(scalesInstances[json['scale']]);
 

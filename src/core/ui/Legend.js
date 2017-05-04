@@ -2388,7 +2388,7 @@ anychart.core.ui.Legend.prototype.setupByJSON = function(config, opt_default) {
   this.titleSeparator(config['titleSeparator']);
   this.paginator(config['paginator']);
 
-  this.tooltip().setupByVal(config['tooltip'], opt_default);
+  this.tooltip().setupInternal(!!opt_default, config['tooltip']);
 
   this.itemsLayout(config['itemsLayout']);
   this.itemsSpacing(config['itemsSpacing']);

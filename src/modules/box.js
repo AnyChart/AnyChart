@@ -32,7 +32,7 @@ anychart.box = function(var_args) {
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.BOX);
   chart.setType(anychart.enums.ChartTypes.BOX);
 
-  chart.setupByVal(anychart.getFullTheme('box'), true);
+  chart.setupInternal(true, anychart.getFullTheme('box'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['box'](arguments[i]);

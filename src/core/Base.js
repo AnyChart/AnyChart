@@ -119,15 +119,9 @@ anychart.ConsistencyState = {
   MAP_AXES: 1 << 25,
   MAP_GRIDS: 1 << 26,
   MAP_CROSSHAIR: 1 << 27,
-  //---------------------------------- HEAT MAP STATES (CHART) ---------------------------------
-  HEATMAP_SCALES: 1 << 12,
-  HEATMAP_SERIES: 1 << 13,
-  HEATMAP_AXES: 1 << 14,
-  HEATMAP_GRIDS: 1 << 15,
-  HEATMAP_COLOR_SCALE: 1 << 16,
-  HEATMAP_X_SCROLLER: 1 << 17,
-  HEATMAP_Y_SCROLLER: 1 << 18,
-  HEATMAP_ZOOM: 1 << 19,
+  //---------------------------------- HEAT MAP STATES (CARTESIAN_BASE) ---------------------------------
+  HEATMAP_COLOR_SCALE: 1 << 27,
+  HEATMAP_Y_SCROLLER: 1 << 28,
   //---------------------------------- MEKKO STATES (AXES_CHART) ---------------------------------
   MEKKO_CATEGORY_SCALE: 1 << 25,
   //---------------------------------- SERIES STATES (VB) ---------------------------------
@@ -578,38 +572,36 @@ anychart.core.Base.prototype.serialize = function() {
  * it doesn't reset other properties to their defaults.
  * @param {...*} var_args Arguments to setup the instance.
  * @return {anychart.core.Base} Returns itself for chaining.
+ * @final
  */
 anychart.core.Base.prototype.setup = function(var_args) {
-  var arg0 = arguments[0];
-  if (goog.isDef(arg0)) {
-    this.suspendSignalsDispatching();
-    if (!this.setupSpecial.apply(this, arguments) && goog.isObject(arg0)) {
-      //if (arg0 instanceof anychart.core.Base)
-      //  throw 'Instance of object is passed to setter. You should use JSON instead';
-      this.setupByJSON(/** @type {!Object} */(arguments[0]));
-    }
-    this.resumeSignalsDispatching(true);
+  var args = [false];
+  for (var i = 0; i < arguments.length; i++) {
+    args.push(arguments[i]);
   }
-  return this;
+  return this.setupInternal.apply(this, args);
 };
 
 
 /**
- * Setups the element using passed configuration value. It can be a JSON object or a special value that setups
- * instances of descendant classes.
- * Note: this method only changes element properties if they are supposed to be changed by the config value -
- * it doesn't reset other properties to their defaults.
- * @param {*} value Arguments to setup the instance.
- * @param {boolean=} opt_default .
- * @return {anychart.core.Base} Returns itself for chaining.
+ * Setups the element using passed configuration. It can handle JSON objects or special values that setups
+ * instances in special ways. The first parameter states, whether the settings should be applied as obtained
+ * from the theme, or from the user.
+ * @param {boolean} isDefault
+ * @param {...*} var_args
+ * @return {anychart.core.Base}
+ * @final
  */
-anychart.core.Base.prototype.setupByVal = function(value, opt_default) {
-  if (goog.isDef(value)) {
+anychart.core.Base.prototype.setupInternal = function(isDefault, var_args) {
+  var mainArg = arguments[1];
+  if (goog.isDef(mainArg)) {
     this.suspendSignalsDispatching();
-    if (!this.specialSetupByVal(value, opt_default) && goog.isObject(value)) {
-      //if (arg0 instanceof anychart.core.Base)
-      //  throw 'Instance of object is passed to setter. You should use JSON instead';
-      this.setupByJSON(/** @type {!Object} */(value), opt_default);
+    var args = [];
+    for (var i = 0; i < arguments.length; i++) {
+      args.push(arguments[i]);
+    }
+    if (!this.setupSpecial.apply(this, args) && goog.isObject(mainArg)) {
+      this.setupByJSON(mainArg, isDefault);
     }
     this.resumeSignalsDispatching(true);
   }
@@ -628,23 +620,12 @@ anychart.core.Base.prototype.setupByJSON = function(json, opt_default) {
 
 /**
  * Special objects to setup current instance.
+ * @param {boolean} isDefault
  * @param {...(Object|Array|number|string|undefined|boolean|null)} var_args
  * @return {boolean} If passed values were recognized as special setup values.
  * @protected
  */
-anychart.core.Base.prototype.setupSpecial = function(var_args) {
-  return this.specialSetupByVal(arguments[0]);
-};
-
-
-/**
- * Setups current instance using passed JSON object.
- * @param {Object|Array|number|string|undefined|boolean|null} value .
- * @param {boolean=} opt_default .
- * @return {boolean} If passed values were recognized as special setup values.
- * @protected
- */
-anychart.core.Base.prototype.specialSetupByVal = function(value, opt_default) {
+anychart.core.Base.prototype.setupSpecial = function(isDefault, var_args) {
   return false;
 };
 

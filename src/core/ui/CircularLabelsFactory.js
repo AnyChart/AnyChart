@@ -128,7 +128,8 @@ anychart.core.ui.CircularLabelsFactory.prototype.SIMPLE_PROPS_DESCRIPTORS = (fun
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = goog.object.clone(anychart.core.ui.LabelsFactory.prototype.SIMPLE_PROPS_DESCRIPTORS);
 
-  map['autoRotate'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'autoRotate',
       anychart.core.settings.booleanNormalizer,
@@ -287,7 +288,8 @@ goog.inherits(anychart.core.ui.CircularLabelsFactory.Label, anychart.core.ui.Lab
 anychart.core.ui.CircularLabelsFactory.Label.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = goog.object.clone(anychart.core.ui.LabelsFactory.Label.prototype.SIMPLE_PROPS_DESCRIPTORS);
-  map['autoRotate'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'autoRotate',
       anychart.core.settings.booleanNormalizer,

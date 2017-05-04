@@ -11,6 +11,7 @@ goog.require('anychart.core.utils.Padding');
 goog.require('anychart.core.utils.TokenParser');
 goog.require('anychart.enums');
 goog.require('anychart.math.Rect');
+goog.require('goog.array');
 goog.require('goog.math.Coordinate');
 //endregion
 
@@ -194,7 +195,8 @@ anychart.core.settings.populate(anychart.core.ui.LabelsFactory, anychart.core.ui
 anychart.core.ui.LabelsFactory.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map['format'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'format',
       anychart.core.settings.stringOrFunctionNormalizer,
@@ -202,7 +204,8 @@ anychart.core.ui.LabelsFactory.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() 
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
   //@deprecated Since 7.13.1. Use 'format' instead.
-  map['textFormatter'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED,
       'format',
       anychart.core.settings.stringOrFunctionNormalizer,
@@ -211,70 +214,80 @@ anychart.core.ui.LabelsFactory.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() 
       void 0,
       'textFormatter');
 
-  map['positionFormatter'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'positionFormatter',
       anychart.core.settings.stringOrFunctionNormalizer,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['position'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'position',
       anychart.core.settings.asIsNormalizer,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['anchor'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'anchor',
       anychart.enums.normalizeAnchor,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['offsetX'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'offsetX',
       anychart.core.settings.asIsNormalizer,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['offsetY'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'offsetY',
       anychart.core.settings.asIsNormalizer,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['connectorStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'connectorStroke',
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.LABELS_FACTORY_CONNECTOR,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['rotation'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'rotation',
       anychart.core.settings.numberNormalizer,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['width'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'width',
       anychart.core.settings.numberOrPercentNormalizer,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['height'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'height',
       anychart.core.settings.numberOrPercentNormalizer,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['clip'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'clip',
       anychart.core.settings.asIsNormalizer,
@@ -455,10 +468,9 @@ anychart.core.ui.LabelsFactory.prototype.textSettings = function(opt_objectOrNam
 //----------------------------------------------------------------------------------------------------------------------
 /**
  * Helper method.
- * @private
  * @return {boolean} is adjustment enabled.
  */
-anychart.core.ui.LabelsFactory.prototype.adjustEnabled_ = function() {
+anychart.core.ui.LabelsFactory.prototype.adjustEnabled = function() {
   var adjustFontSize = this.getOption('adjustFontSize');
   return !!adjustFontSize && (adjustFontSize['width'] || adjustFontSize['height']);
 };
@@ -473,7 +485,7 @@ anychart.core.ui.LabelsFactory.prototype.adjustFontSizeMode = function(opt_value
     opt_value = anychart.enums.normalizeAdjustFontSizeMode(opt_value);
     if (this.adjustFontSizeMode_ != opt_value) {
       this.adjustFontSizeMode_ = opt_value;
-      if (this.adjustEnabled_())
+      if (this.adjustEnabled())
         this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
     }
     return this;
@@ -1232,10 +1244,10 @@ anychart.core.ui.LabelsFactory.prototype.setupByJSON = function(config, opt_defa
   }
 
   if ('background' in config)
-    this.background().setupByVal(config['background'], opt_default);
+    this.background().setupInternal(!!opt_default, config['background']);
 
   if ('padding' in config)
-    this.padding().setupByVal(config['padding'], opt_default);
+    this.padding().setupInternal(!!opt_default, config['padding']);
 };
 //endregion
 
@@ -1556,7 +1568,8 @@ anychart.core.ui.LabelsFactory.Label.prototype.SIMPLE_PROPS_DESCRIPTORS = (funct
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  map['format'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'format',
       anychart.core.settings.stringOrFunctionNormalizer,
@@ -1564,7 +1577,8 @@ anychart.core.ui.LabelsFactory.Label.prototype.SIMPLE_PROPS_DESCRIPTORS = (funct
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
   //@deprecated Since 7.13.1. Use 'format' instead.
-  map['textFormatter'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED,
       'format',
       anychart.core.settings.stringOrFunctionNormalizer,
@@ -1573,77 +1587,88 @@ anychart.core.ui.LabelsFactory.Label.prototype.SIMPLE_PROPS_DESCRIPTORS = (funct
       void 0,
       'textFormatter');
 
-  map['positionFormatter'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'positionFormatter',
       anychart.core.settings.stringOrFunctionNormalizer,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['position'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'position',
       anychart.core.settings.asIsNormalizer,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['anchor'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'anchor',
       anychart.enums.normalizeAnchor,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['offsetX'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'offsetX',
       anychart.core.settings.asIsNormalizer,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['offsetY'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'offsetY',
       anychart.core.settings.asIsNormalizer,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['connectorStroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'connectorStroke',
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.LABELS_FACTORY_CONNECTOR,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['rotation'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'rotation',
       anychart.core.settings.numberNormalizer,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['width'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'width',
       anychart.core.settings.numberOrPercentNormalizer,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['height'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'height',
       anychart.core.settings.numberOrPercentNormalizer,
       anychart.ConsistencyState.BOUNDS,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['clip'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'clip',
       anychart.core.settings.asIsNormalizer,
       anychart.ConsistencyState.LABELS_FACTORY_CLIP,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['enabled'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'enabled',
       anychart.core.settings.boolOrNullNormalizer,
@@ -1826,58 +1851,6 @@ anychart.core.ui.LabelsFactory.Label.prototype.autoVertical = function(opt_value
   } else {
     return this.autoSettings['vertical'];
   }
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Checkers.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Helper method.
- * @private
- * @return {boolean} is adjustment enabled.
- */
-anychart.core.ui.LabelsFactory.Label.prototype.adjustEnabled_ = function() {
-  var adjustFontSize = this.getOption('adjustFontSize');
-  return !!adjustFontSize && (adjustFontSize['width'] || adjustFontSize['height']);
-};
-
-
-/**
- * Check
- * @param {number} width
- * @param {number} height
- * @param {number} originWidth
- * @param {number} originHeight
- * @param {boolean} adjustByWidth
- * @param {boolean} adjustByHeight
- * @private
- * @return {number}
- */
-anychart.core.ui.LabelsFactory.Label.prototype.check_ = function(width, height, originWidth, originHeight, adjustByWidth, adjustByHeight) {
-  if (adjustByWidth && adjustByHeight) {
-    if (width > originWidth || height > originHeight) {
-      return 1;
-    } else if (width < originWidth || height < originHeight) {
-      return -1;
-    }
-  } else if (adjustByWidth) {
-    if (width < originWidth) {
-      return -1;
-    } else if (width > originWidth) {
-      return 1;
-    }
-  } else if (adjustByHeight) {
-    if (height < originHeight) {
-      return -1;
-    } else if (height > originHeight) {
-      return 1;
-    }
-  }
-
-  return 0;
 };
 
 
@@ -2231,63 +2204,28 @@ anychart.core.ui.LabelsFactory.Label.prototype.calculateFontSize = function(orig
   /** @type {acgraph.vector.Text} */
   var text = this.createSizeMeasureElement_();
 
-  /** @type {number} */
-  var fontSize = Math.round((maxFontSize + minFontSize) / 2);
-
-  /** @type {number} */
-  var from = minFontSize;
-
-  /** @type {number} */
-  var to = maxFontSize;
-
-  /** @type {number} */
-  var checked;
-
-  // check if the maximal value is ok
-  text.fontSize(maxFontSize);
-
-  if (this.check_(text.getBounds().width, text.getBounds().height, originWidth, originHeight, adjustByWidth, adjustByHeight) <= 0) {
-    return maxFontSize;
-  }
-  // set initial fontSize - that's half way between min and max
-  text.fontSize(fontSize);
-  // check sign
-  var sign = checked = this.check_(text.getBounds().width, text.getBounds().height, originWidth, originHeight, adjustByWidth, adjustByHeight);
-
-  // divide in half and iterate waiting for the sign to change
-  while (from != to) {
-    if (checked < 0) {
-      from = Math.min(fontSize + 1, to);
-      fontSize += Math.floor((to - fontSize) / 2);
-    } else if (checked > 0) {
-      to = Math.max(fontSize - 1, from);
-      fontSize -= Math.ceil((fontSize - from) / 2);
+  var evaluator = function(fontSize) {
+    text.fontSize(fontSize);
+    var bounds = text.getBounds();
+    var width = bounds.width;
+    var height = bounds.height;
+    var res;
+    if (adjustByWidth && (width > originWidth) || adjustByHeight && (height > originHeight)) {
+      res = -1;
+    } else if (adjustByWidth && (width == originWidth) || adjustByHeight && (height == originHeight)) {
+      res = 0;
     } else {
-      break;
+      res = 1;
     }
-    text.fontSize(fontSize);
-    checked = this.check_(text.getBounds().width, text.getBounds().height, originWidth, originHeight, adjustByWidth, adjustByHeight);
-    // sign chaneged if product is negative, 0 is an exit too
-    if (sign * checked <= 0) {
-      break;
-    }
+    return res;
+  };
+
+  var fonts = goog.array.range(minFontSize, maxFontSize + 1);
+  var res = goog.array.binarySelect(fonts, evaluator);
+  if (res < 0) {
+    res = ~res - 1;
   }
-
-  if (!checked) {
-    // size is exactly ok for the bounds set
-    return fontSize;
-  }
-
-  // iterate increase/decrease font size until sign changes again
-  do {
-    fontSize += sign;
-    text.fontSize(fontSize);
-    checked = this.check_(text.getBounds().width, text.getBounds().height, originWidth, originHeight, adjustByWidth, adjustByHeight);
-  } while (sign * checked < 0);
-
-  // decrease font size only if we've been increasing it - we are looking for size to fit in bounds
-  if (sign > 0) fontSize -= sign;
-  return fontSize;
+  return fonts[goog.math.clamp(res, 0, fonts.length)];
 };
 
 

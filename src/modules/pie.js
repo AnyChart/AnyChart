@@ -21,7 +21,7 @@ goog.require('anychart.modules.base');
  */
 anychart.pie = function(opt_data, opt_csvSettings) {
   var chart = new anychart.charts.Pie(opt_data, opt_csvSettings);
-  chart.setupByVal(anychart.getFullTheme('pie'), true);
+  chart.setupInternal(true, anychart.getFullTheme('pie'));
 
   return chart;
 };

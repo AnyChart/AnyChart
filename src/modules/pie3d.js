@@ -21,7 +21,7 @@ goog.require('anychart.modules.base');
  */
 anychart.pie3d = function(opt_data, opt_csvSettings) {
   var chart = new anychart.charts.Pie(opt_data, opt_csvSettings);
-  chart.setupByVal(anychart.getFullTheme('pie3d'), true);
+  chart.setupInternal(true, anychart.getFullTheme('pie3d'));
   chart.mode3d(true);
 
   return chart;

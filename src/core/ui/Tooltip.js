@@ -219,21 +219,24 @@ anychart.core.ui.Tooltip.prototype.TOOLTIP_SIMPLE_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  map['width'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'width',
       anychart.core.settings.numberOrPercentNormalizer,
       anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['height'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'height',
       anychart.core.settings.numberOrPercentNormalizer,
       anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
-  map['titleFormat'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'titleFormat',
       anychart.core.settings.stringOrFunctionNormalizer,
@@ -241,7 +244,8 @@ anychart.core.ui.Tooltip.prototype.TOOLTIP_SIMPLE_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW);
 
   //@deprecated Since 7.13.1. Use 'titleFormat' instead.
-  map['titleFormatter'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED,
       'titleFormat',
       anychart.core.settings.stringOrFunctionNormalizer,
@@ -250,7 +254,8 @@ anychart.core.ui.Tooltip.prototype.TOOLTIP_SIMPLE_DESCRIPTORS = (function() {
       void 0,
       'titleFormatter');
 
-  map['format'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'format',
       anychart.core.settings.stringOrFunctionNormalizer,
@@ -258,7 +263,8 @@ anychart.core.ui.Tooltip.prototype.TOOLTIP_SIMPLE_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW);
 
   //@deprecated Since 7.13.1. Use 'format' instead.
-  map['textFormatter'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED,
       'format',
       anychart.core.settings.stringOrFunctionNormalizer,
@@ -268,7 +274,8 @@ anychart.core.ui.Tooltip.prototype.TOOLTIP_SIMPLE_DESCRIPTORS = (function() {
       'textFormatter');
 
   //@deprecated Since 7.7.0. Use format() method instead.
-  map['contentFormatter'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED,
       'format',
       anychart.core.settings.stringOrFunctionNormalizer,
@@ -277,7 +284,8 @@ anychart.core.ui.Tooltip.prototype.TOOLTIP_SIMPLE_DESCRIPTORS = (function() {
       void 0,
       'contentFormatter');
 
-  map['unionFormat'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'unionFormat',
       anychart.core.settings.stringOrFunctionNormalizer,
@@ -285,7 +293,8 @@ anychart.core.ui.Tooltip.prototype.TOOLTIP_SIMPLE_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW);
 
   //@deprecated Since 7.7.0. Use unionFormat() method instead.
-  map['unionTextFormatter'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'unionFormat',
       anychart.core.settings.stringOrFunctionNormalizer,
@@ -294,56 +303,64 @@ anychart.core.ui.Tooltip.prototype.TOOLTIP_SIMPLE_DESCRIPTORS = (function() {
       void 0,
       'unionTextFormatter');
 
-  map['valuePrefix'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'valuePrefix',
       anychart.core.settings.stringNormalizer,
       anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['valuePostfix'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'valuePostfix',
       anychart.core.settings.stringNormalizer,
       anychart.core.ui.Tooltip.TOOLTIP_BOUNDS_STATE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['position'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'position',
       anychart.enums.normalizePosition,
       anychart.ConsistencyState.TOOLTIP_POSITION,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['anchor'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'anchor',
       anychart.enums.normalizeAnchor,
       anychart.ConsistencyState.TOOLTIP_POSITION,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['offsetX'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'offsetX',
       anychart.core.settings.numberNormalizer,
       anychart.ConsistencyState.TOOLTIP_POSITION,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['offsetY'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'offsetY',
       anychart.core.settings.numberNormalizer,
       anychart.ConsistencyState.TOOLTIP_POSITION,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['x'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'x',
       anychart.core.settings.numberNormalizer,
       anychart.ConsistencyState.TOOLTIP_POSITION,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['y'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'y',
       anychart.core.settings.numberNormalizer,
@@ -351,28 +368,32 @@ anychart.core.ui.Tooltip.prototype.TOOLTIP_SIMPLE_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW);
 
   //TODO (A.Kudryavtsev): Check consistency states and signals!!!
-  map['allowLeaveScreen'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'allowLeaveScreen',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.CONTAINER,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['allowLeaveChart'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'allowLeaveChart',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.CONTAINER,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['allowLeaveStage'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'allowLeaveStage',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.CONTAINER,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['displayMode'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'displayMode',
       anychart.enums.normalizeTooltipDisplayMode,
@@ -380,7 +401,8 @@ anychart.core.ui.Tooltip.prototype.TOOLTIP_SIMPLE_DESCRIPTORS = (function() {
       anychart.Signal.NEEDS_REDRAW,
       anychart.core.ui.Tooltip.Capabilities.CAN_CHANGE_DISPLAY_MODE);
 
-  map['positionMode'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'positionMode',
       anychart.enums.normalizeTooltipPositionMode,
@@ -939,7 +961,7 @@ anychart.core.ui.Tooltip.prototype.showAsUnion_ = function(points, clientX, clie
     for (var i = 0; i < points.length; i++) {
       var point = points[i];
       if (point) {
-        var series = /** @type {anychart.core.SeriesBase|anychart.core.series.Base} */ (point['series']);
+        var series = /** @type {anychart.core.series.Base} */ (point['series']);
         var tooltip = series.tooltip();
         if (!series.enabled() || !tooltip.enabled())
           break;
@@ -2292,10 +2314,10 @@ anychart.core.ui.Tooltip.prototype.setupByJSON = function(config, opt_default) {
     anychart.core.settings.deserialize(this, this.TOOLTIP_SIMPLE_DESCRIPTORS, config);
   }
 
-  this.title().setupByVal(config['title'], opt_default);
-  this.separator().setupByVal(config['separator'], opt_default);
-  this.background().setupByVal(config['background'], opt_default);
-  this.padding().setupByVal(config['padding'], opt_default);
+  this.title().setupInternal(!!opt_default, config['title']);
+  this.separator().setupInternal(!!opt_default, config['separator']);
+  this.background().setupInternal(!!opt_default, config['background']);
+  this.padding().setupInternal(!!opt_default, config['padding']);
   this.hideDelay(config['hideDelay']);
 
   /*

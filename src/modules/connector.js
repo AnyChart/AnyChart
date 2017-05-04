@@ -20,7 +20,7 @@ anychart.connector = function(var_args) {
   var map = new anychart.charts.Map();
   map.defaultSeriesType(anychart.enums.MapSeriesType.CONNECTOR);
 
-  map.setupByVal(anychart.getFullTheme('connector'), true);
+  map.setupInternal(true, anychart.getFullTheme('connector'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     map['connector'](arguments[i]);

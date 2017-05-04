@@ -4455,13 +4455,13 @@ anychart.charts.Pie.prototype.setupByJSON = function(config, opt_default) {
   anychart.charts.Pie.base(this, 'setupByJSON', config, opt_default);
   this.group(config['group']);
   this.data(config['data']);
-  this.labels().setupByVal(config['labels'], opt_default);
-  this.hoverLabels().setupByVal(config['hoverLabels'], opt_default);
+  this.labels().setupInternal(!!opt_default, config['labels']);
+  this.hoverLabels().setupInternal(!!opt_default, config['hoverLabels']);
   this.palette(config['palette']);
   this.hatchFillPalette(config['hatchFillPalette']);
 
   if ('tooltip' in config)
-    this.tooltip().setupByVal(config['tooltip'], opt_default);
+    this.tooltip().setupInternal(!!opt_default, config['tooltip']);
 
   this.sort(config['sort']);
   this.radius(config['radius']);

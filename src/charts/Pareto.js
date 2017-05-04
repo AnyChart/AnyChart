@@ -24,6 +24,8 @@ anychart.charts.Pareto = function() {
    */
   this.percentScale = anychart.scales.linear();
   this.percentScale.minimum(0).maximum(100);
+
+  this.setType(anychart.enums.ChartTypes.PARETO);
 };
 goog.inherits(anychart.charts.Pareto, anychart.core.CartesianBase);
 

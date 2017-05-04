@@ -214,8 +214,8 @@ anychart.core.ui.ChartCredits.prototype.serializeDiff = function() {
 
 
 /** @inheritDoc */
-anychart.core.ui.ChartCredits.prototype.setupSpecial = function(var_args) {
-  var arg0 = arguments[0];
+anychart.core.ui.ChartCredits.prototype.setupSpecial = function(isDefault, var_args) {
+  var arg0 = arguments[1];
   if (goog.isString(arg0)) {
     this.text(arg0);
     this.enabled(true);

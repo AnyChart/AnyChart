@@ -169,8 +169,8 @@ anychart.core.series.Radar.prototype.prepareAdditional = function() {
 
 
 /** @inheritDoc */
-anychart.core.series.Radar.prototype.prepareMetaMakers = function() {
-  anychart.core.series.Radar.base(this, 'prepareMetaMakers');
+anychart.core.series.Radar.prototype.prepareMetaMakers = function(yNames, yColumns) {
+  anychart.core.series.Radar.base(this, 'prepareMetaMakers', yNames, yColumns);
   if (this.needsZero() && !this.innerRadius) {
     var zero = this.ratiosToPixelPairs(0, [0]);
     this.zeroX = zero[0];

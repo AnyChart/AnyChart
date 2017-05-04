@@ -2039,11 +2039,11 @@ anychart.charts.Resource.prototype.setupByJSON = function(config, opt_default) {
   anychart.charts.Resource.base(this, 'setupByJSON', config);
   if ('cellPadding' in config)
     this.cellPadding_.setup(config['cellPadding']);
-  this.activities_.setupByVal(config['activities'], opt_default);
+  this.activities_.setupInternal(!!opt_default, config['activities']);
   this.data(config['data']);
-  this.logo_.setupByVal(config['logo'], opt_default);
-  this.overlay_.setupByVal(config['overlay'], opt_default);
-  this.timeLine_.setupByVal(config['timeLine'], opt_default);
+  this.logo_.setupInternal(!!opt_default, config['logo']);
+  this.overlay_.setupInternal(!!opt_default, config['overlay']);
+  this.timeLine_.setupInternal(!!opt_default, config['timeLine']);
   this.calendar_.setup(config['calendar']);
   this.xScale_.setup(config['xScale']);
   this.resourceList_.setup(config['resourceList']);

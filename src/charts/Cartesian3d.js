@@ -303,7 +303,7 @@ anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.charts.Cartesi
  */
 anychart.cartesian3d = function(opt_isVertical) {
   var chart = new anychart.charts.Cartesian3d();
-  chart.setupByVal(anychart.getFullTheme('cartesian3d'), true);
+  chart.setupInternal(true, anychart.getFullTheme('cartesian3d'));
   if (goog.isDef(opt_isVertical))
     chart.barChartMode = !!opt_isVertical;
 
@@ -689,15 +689,16 @@ anychart.charts.Cartesian3d.prototype.setupByJSON = function(config, opt_default
  */
 anychart.charts.Cartesian3d.prototype.serialize = function() {
   var json = anychart.charts.Cartesian3d.base(this, 'serialize');
+  var chart = json['chart'];
 
-  json['chart']['zAngle'] = this.zAngle();
+  chart['zAngle'] = this.zAngle();
   if (goog.isDefAndNotNull(this.zDepthInternal)) {
     // we should not place warning here on serialization.
-    json['chart']['zDepth'] = this.zDepthInternal;
+    chart['zDepth'] = this.zDepthInternal;
   }
-  json['chart']['zAspect'] = this.zAspect();
-  json['chart']['zDistribution'] = this.zDistribution();
-  json['chart']['zPadding'] = this.zPadding();
+  chart['zAspect'] = this.zAspect();
+  chart['zDistribution'] = this.zDistribution();
+  chart['zPadding'] = this.zPadding();
 
   return json;
 };

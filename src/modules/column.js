@@ -26,7 +26,7 @@ anychart.column = function(var_args) {
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.COLUMN);
   chart.setType(anychart.enums.ChartTypes.COLUMN);
 
-  chart.setupByVal(anychart.getFullTheme('column'), true);
+  chart.setupInternal(true, anychart.getFullTheme('column'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['column'](arguments[i]);

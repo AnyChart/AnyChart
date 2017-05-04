@@ -86,28 +86,32 @@ anychart.core.utils.Space.prototype.SUPPORTED_SIGNALS = anychart.Signal.NEEDS_RE
 anychart.core.utils.Space.SIMPLE_PROPS_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map['left'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'left',
       anychart.core.settings.numberOrZeroNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REAPPLICATION);
 
-  map['top'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'top',
       anychart.core.settings.numberOrZeroNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REAPPLICATION);
 
-  map['bottom'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'bottom',
       anychart.core.settings.numberOrZeroNormalizer,
       anychart.ConsistencyState.ONLY_DISPATCHING,
       anychart.Signal.NEEDS_REAPPLICATION);
 
-  map['right'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'right',
       anychart.core.settings.numberOrZeroNormalizer,
@@ -313,7 +317,7 @@ anychart.core.utils.Space.normalizeSpace = function(var_args) {
  * NOTE: set():
  *    all four spaces are 0
  *
- * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
+ * @param {(string|number|Array.<number|string>|{top:(number|string|undefined),left:(number|string|undefined),bottom:(number|string|undefined),right:(number|string|undefined)})=} opt_spaceOrTopOrTopAndBottom Space object or top or top and bottom
  *    space.
  * @param {(string|number)=} opt_rightOrRightAndLeft Right or right and left space.
  * @param {(string|number)=} opt_bottom Bottom space.
@@ -446,23 +450,16 @@ anychart.core.utils.Space.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.utils.Space.prototype.setupSpecial = function(var_args) {
-  if (goog.isDef(arguments[0])) {
-    this.set.apply(this, arguments);
-    return false;
-  }
-  return anychart.core.utils.Space.base(this, 'setupSpecial', arguments);
-};
-
-
-/** @inheritDoc */
-anychart.core.utils.Space.prototype.specialSetupByVal = function(value, opt_default) {
-  if (goog.isArray(value) || goog.isString(value) || goog.isNumber(value)) {
-    if (opt_default) {
-      this.setThemeSettings(anychart.core.utils.Space.normalizeSpace(value));
-    } else {
-      this.set(value);
-    }
+anychart.core.utils.Space.prototype.setupSpecial = function(isDefault, var_args) {
+  if (goog.isDef(arguments[1])) {
+    var args = [];
+    for (var i = 1; i < arguments.length; i++)
+      args.push(arguments[i]);
+    var settings = anychart.core.utils.Space.normalizeSpace.apply(null, args);
+    if (isDefault)
+      this.setThemeSettings(settings);
+    else
+      this.set(settings);
     return true;
   }
   return false;

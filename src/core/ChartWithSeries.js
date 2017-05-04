@@ -1156,10 +1156,10 @@ anychart.core.ChartWithSeries.prototype.setupByJSON = function(config, opt_defau
   this.palette(config['palette']);
   this.markerPalette(config['markerPalette']);
   this.hatchFillPalette(config['hatchFillPalette']);
-  this.defaultSeriesSettings(config['defaultSeriesSettings']);
-  this.labels().setupByVal(config['labels'], opt_default);
-  this.hoverLabels().setupByVal(config['hoverLabels'], opt_default);
-  this.selectLabels().setupByVal(config['selectLabels'], opt_default);
+
+  this.labels().setupInternal(!!opt_default, config['labels']);
+  this.hoverLabels().setupInternal(!!opt_default, config['hoverLabels']);
+  this.selectLabels().setupInternal(!!opt_default, config['selectLabels']);
 };
 
 

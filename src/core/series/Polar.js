@@ -33,7 +33,8 @@ goog.inherits(anychart.core.series.Polar, anychart.core.series.Radar);
 anychart.core.series.Polar.PROPERTY_DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
-  map['closed'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'closed',
       anychart.core.settings.booleanNormalizer,
@@ -105,8 +106,8 @@ anychart.core.series.Polar.prototype.makeXRatioMeta = function(rowInfo, yNames, 
 
 
 /** @inheritDoc */
-anychart.core.series.Polar.prototype.prepareMetaMakers = function() {
-  anychart.core.series.Polar.base(this, 'prepareMetaMakers');
+anychart.core.series.Polar.prototype.prepareMetaMakers = function(yNames, yColumns) {
+  anychart.core.series.Polar.base(this, 'prepareMetaMakers', yNames, yColumns);
   this.metaMakers.push(this.makeXRatioMeta);
 };
 

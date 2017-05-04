@@ -613,11 +613,10 @@ anychart.core.series.Cartesian.prototype.isPointVisible = function(point) {
  * @param {Function} dataPusher
  * @param {Function} xNormalizer
  * @param {Function} xMissingChecker
- * @param {string=} opt_nameField
  * @return {anychart.core.series.Cartesian.DrawingPlan}
  * @protected
  */
-anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPusher, xNormalizer, xMissingChecker, opt_nameField) {
+anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPusher, xNormalizer, xMissingChecker) {
   // anychart.performance.start('Drawing plan calc');
   var dataSource = /** @type {anychart.data.IView} */(this.data());
   var iterator = dataSource.getIterator();
@@ -625,10 +624,14 @@ anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPus
   var hasXErrors = false;
   var hasYErrors = false;
   var checkSize = this.isSizeBased();
+  var i, name;
 
   var additionalNames = [];
   if (checkSize) {
     additionalNames.push('size');
+  }
+  if (this.needsHeat()) {
+    additionalNames.push('heat');
   }
   if (this.supportsOutliers()) {
     additionalNames.push('outliers');
@@ -663,8 +666,17 @@ anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPus
       }
     }
   }
-  if (opt_nameField && dataSource.checkFieldExist(opt_nameField))
-    additionalNames.push(opt_nameField);
+  if (yScale instanceof anychart.scales.Ordinal) {
+    name = yScale.getNamesField();
+    if (name && dataSource.checkFieldExist(name))
+      additionalNames.push(name);
+  }
+  var xScale = /** @type {anychart.scales.Base} */ (this.xScale());
+  if (xScale instanceof anychart.scales.Ordinal) {
+    name = xScale.getNamesField();
+    if (name && dataSource.checkFieldExist(name))
+      additionalNames.push(name);
+  }
 
   while (iterator.advance()) {
     var xValue = xNormalizer(iterator.get('x'));
@@ -672,7 +684,7 @@ anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPus
       continue;
     var pointData = {};
     pointData['x'] = xValue;
-    var i, len, name, val, missing = false;
+    var len, val, missing = false;
     var yValueNames = this.getYValueNames();
     for (i = 0, len = yValueNames.length; i < len; i++) {
       name = yValueNames[i];
@@ -796,11 +808,10 @@ anychart.core.series.Cartesian.prototype.getScatterDrawingPlan = function(sorted
  * @param {Object.<string, number>} xHashMap
  * @param {Array.<*>} xArray
  * @param {boolean} restrictX
- * @param {string=} opt_namesField
  * @param {boolean=} opt_seriesIndependent
  * @return {anychart.core.series.Cartesian.DrawingPlan}
  */
-anychart.core.series.Cartesian.prototype.getOrdinalDrawingPlan = function(xHashMap, xArray, restrictX, opt_namesField, opt_seriesIndependent) {
+anychart.core.series.Cartesian.prototype.getOrdinalDrawingPlan = function(xHashMap, xArray, restrictX, opt_seriesIndependent) {
   var dataPusher;
   if (restrictX) {
     // dataPusher must return a point that was replaced by the point pushed (if any)
@@ -843,7 +854,7 @@ anychart.core.series.Cartesian.prototype.getOrdinalDrawingPlan = function(xHashM
     return a === undefined;
   };
 
-  var result = this.getDrawingData(new Array(xArray.length), dataPusher, xNormalizer, xMissingChecker, opt_namesField);
+  var result = this.getDrawingData(new Array(xArray.length), dataPusher, xNormalizer, xMissingChecker);
   var data = result.data;
   for (var i = 0; i < data.length; i++) {
     if (!data[i])
@@ -983,11 +994,13 @@ anychart.core.series.Cartesian.prototype.applyAppearanceToPoint = function(point
         /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes')));
   }
   if (this.supportsOutliers()) {
-    this.drawPointOutliers(iterator, pointState);
+    this.drawPointOutliers(iterator, pointState, true);
   }
   this.drawer.updatePoint(iterator, pointState);
-  this.drawMarker(iterator, pointState);
-  this.drawLabel(iterator, pointState);
+  if (this.check(anychart.core.series.Capabilities.SUPPORTS_MARKERS))
+    this.drawMarker(iterator, pointState, true);
+  if (this.check(anychart.core.series.Capabilities.SUPPORTS_LABELS))
+    this.drawLabel(iterator, pointState, true);
 };
 
 
@@ -1007,7 +1020,7 @@ anychart.core.series.Cartesian.prototype.applyAppearanceToSeries = function(poin
       /** @type {Object.<string, acgraph.vector.Shape>} */(iterator.meta('shapes')));
   this.drawer.updatePoint(iterator, pointState);
   if (this.supportsOutliers()) {
-    this.drawPointOutliers(iterator, pointState);
+    this.drawPointOutliers(iterator, pointState, true);
   }
 };
 

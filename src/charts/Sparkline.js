@@ -881,26 +881,6 @@ anychart.charts.Sparkline.prototype.dataInvalidated_ = function(e) {
 
 
 /**
- * DO NOT PUBLISH.
- */
-anychart.charts.Sparkline.prototype.resetCategorisation = function() {
-  if (this.data_ != this.parentView_)
-    goog.dispose(this.data_);
-  this.data_ = /** @type {!anychart.data.View} */(this.parentView_);
-};
-
-
-/**
- * DO NOT PUBLISH.
- * @param {!Array.<*>|boolean} categories If Array - ordinal scale, if false - scatter scale with numbers,
- *    true - datetime scale.
- */
-anychart.charts.Sparkline.prototype.categoriseData = function(categories) {
-  this.data_ = this.parentView_.prepare('x', categories);
-};
-
-
-/**
  * Returns current mapping iterator.
  * @return {!anychart.data.Iterator} Current series iterator.
  */
@@ -2417,12 +2397,12 @@ anychart.charts.Sparkline.prototype.setupByJSON = function(config, opt_default) 
   if (config['minMarkers']) this.minMarkers().setupByJSON(config['minMarkers']);
   if (config['negativeMarkers']) this.negativeMarkers().setupByJSON(config['negativeMarkers']);
   if (config['markers']) this.markers().setupByJSON(config['markers']);
-  if (config['firstLabels']) this.firstLabels().setupByVal(config['firstLabels'], opt_default);
-  if (config['lastLabels']) this.lastLabels().setupByVal(config['lastLabels'], opt_default);
-  if (config['maxLabels']) this.maxLabels().setupByVal(config['maxLabels'], opt_default);
-  if (config['minLabels']) this.minLabels().setupByVal(config['minLabels'], opt_default);
-  if (config['negativeLabels']) this.negativeLabels().setupByVal(config['negativeLabels'], opt_default);
-  if (config['labels']) this.labels().setupByVal(config['labels'], opt_default);
+  if (config['firstLabels']) this.firstLabels().setupInternal(!!opt_default, config['firstLabels']);
+  if (config['lastLabels']) this.lastLabels().setupInternal(!!opt_default, config['lastLabels']);
+  if (config['maxLabels']) this.maxLabels().setupInternal(!!opt_default, config['maxLabels']);
+  if (config['minLabels']) this.minLabels().setupInternal(!!opt_default, config['minLabels']);
+  if (config['negativeLabels']) this.negativeLabels().setupInternal(!!opt_default, config['negativeLabels']);
+  if (config['labels']) this.labels().setupInternal(!!opt_default, config['labels']);
 };
 
 

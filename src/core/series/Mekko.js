@@ -35,14 +35,14 @@ anychart.core.series.Mekko.prototype.normalizeYValue = function(value) {
 
 
 /** @inheritDoc */
-anychart.core.series.Mekko.prototype.drawMarker = function(point, pointState) {
+anychart.core.series.Mekko.prototype.drawMarker = function(point, pointState, pointStateChanged) {
   if (this.barmekkoMode_ || /** @type {number} */(point.get('value')) > 0)
-    anychart.core.series.Mekko.base(this, 'drawMarker', point, pointState);
+    anychart.core.series.Mekko.base(this, 'drawMarker', point, pointState, pointStateChanged);
 };
 
 
 /** @inheritDoc */
-anychart.core.series.Mekko.prototype.drawLabel = function(point, pointState) {
+anychart.core.series.Mekko.prototype.drawLabel = function(point, pointState, pointStateChanged) {
   if (this.barmekkoMode_ || /** @type {number} */(point.get('value')) > 0)
-    anychart.core.series.Mekko.base(this, 'drawLabel', point, pointState);
+    anychart.core.series.Mekko.base(this, 'drawLabel', point, pointState, pointStateChanged);
 };

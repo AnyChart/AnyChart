@@ -17,7 +17,7 @@ goog.require('anychart.modules.base');
  */
 anychart.resource = function(opt_data, opt_csvSettings) {
   var chart = new anychart.charts.Resource(opt_data, opt_csvSettings);
-  chart.setupByVal(anychart.getFullTheme('resource'), true);
+  chart.setupInternal(true, anychart.getFullTheme('resource'));
 
   return chart;
 };

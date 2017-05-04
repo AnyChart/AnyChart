@@ -20,7 +20,7 @@ anychart.choropleth = function(var_args) {
   var map = new anychart.charts.Map();
   map.defaultSeriesType(anychart.enums.MapSeriesType.CHOROPLETH);
 
-  map.setupByVal(anychart.getFullTheme('choropleth'), true);
+  map.setupInternal(true, anychart.getFullTheme('choropleth'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     map['choropleth'](arguments[i]);

@@ -642,6 +642,10 @@ goog.provide('anychart.themes.defaultTheme');
     },
 
     'defaultOrdinalColorScale': {
+      'inverted': false,
+      'ticks': {
+        'maxCount': 100
+      },
       'autoColors': function(rangesCount) {
         return global['anychart']['color']['blendedHueProgression']('#90caf9', '#01579b', rangesCount);
         //return global['anychart']['color']['blendedHueProgression']('#ffd54f', '#ef6c00', rangesCount); //todo: delete after final choice
@@ -3464,6 +3468,11 @@ goog.provide('anychart.themes.defaultTheme');
 
     // merge with chart
     'heatMap': {
+      'annotations': {
+        'annotationsList': [],
+        'zIndex': 2000
+      },
+      'isVertical': false,
       'scales': [
         {
           'type': 'ordinal'
@@ -3530,7 +3539,8 @@ goog.provide('anychart.themes.defaultTheme');
         'ticks': {'enabled': false},
         'title': {
           'text': 'X-Axis'
-        }
+        },
+        'scale': 0
       },
       'defaultYAxisSettings': {
         'enabled': true,
@@ -3538,7 +3548,8 @@ goog.provide('anychart.themes.defaultTheme');
         'ticks': {'enabled': false},
         'title': {
           'text': 'Y-Axis'
-        }
+        },
+        'scale': 1
       },
       /**
        * @this {*}
@@ -3555,7 +3566,7 @@ goog.provide('anychart.themes.defaultTheme');
         return color;
       },
       'stroke': '1 #ffffff',
-      'hoverStroke': '1.5 #ffffff',
+      'hoverStroke': '2 #ffffff',
       'hoverFill': defaultHoverColor,
       'selectStroke': '2 #ffffff',
       'selectFill': defaultSelectColor,
@@ -3618,7 +3629,8 @@ goog.provide('anychart.themes.defaultTheme');
         'size': 4,
         'positionFormatter': returnValue,
         'fill': '#dd2c00',
-        'type': 'circle'
+        'type': 'circle',
+        'stroke': 'none'
       },
       'hoverMarkers': {
         'enabled': null,
@@ -3632,6 +3644,8 @@ goog.provide('anychart.themes.defaultTheme');
       },
       'labelsDisplayMode': 'drop',
       'hatchFill': false,
+      'hoverHatchFill': null,
+      'selectHatchFill': null,
       'clip': true,
       'xZoom': {
         'continuous': true,

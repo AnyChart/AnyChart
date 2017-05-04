@@ -26,7 +26,7 @@ anychart.bar = function(var_args) {
   chart.defaultSeriesType(anychart.enums.CartesianSeriesType.BAR);
   chart.setType(anychart.enums.ChartTypes.BAR);
 
-  chart.setupByVal(anychart.getFullTheme('bar'), true);
+  chart.setupInternal(true, anychart.getFullTheme('bar'));
 
   for (var i = 0, count = arguments.length; i < count; i++) {
     chart['bar'](arguments[i]);

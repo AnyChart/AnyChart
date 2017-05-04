@@ -22,7 +22,7 @@ goog.require('anychart.modules.base');
  */
 anychart.bullet = function(opt_data, opt_csvSettings) {
   var chart = new anychart.charts.Bullet(opt_data, opt_csvSettings);
-  chart.setupByVal(anychart.getFullTheme('bullet'), true);
+  chart.setupInternal(true, anychart.getFullTheme('bullet'));
 
   return chart;
 };

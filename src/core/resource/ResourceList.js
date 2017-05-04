@@ -174,49 +174,56 @@ anychart.core.resource.ResourceList.DESCRIPTORS = (function() {
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  map['stroke'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'stroke',
       anychart.core.settings.strokeNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['oddFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'oddFill',
       anychart.core.settings.fillNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['evenFill'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'evenFill',
       anychart.core.settings.fillNormalizer,
       anychart.ConsistencyState.APPEARANCE,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['drawTopLine'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'drawTopLine',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.RESOURCE_LIST_ITEMS,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['drawRightLine'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'drawRightLine',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.RESOURCE_LIST_ITEMS,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['drawBottomLine'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'drawBottomLine',
       anychart.core.settings.booleanNormalizer,
       anychart.ConsistencyState.RESOURCE_LIST_ITEMS,
       anychart.Signal.NEEDS_REDRAW);
 
-  map['drawLeftLine'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'drawLeftLine',
       anychart.core.settings.booleanNormalizer,
@@ -1066,7 +1073,7 @@ anychart.core.resource.ResourceList.prototype.setupByJSON = function(config, opt
   this.types().setupByJSON(config['types'], opt_default);
   this.descriptions().setupByJSON(config['descriptions'], opt_default);
   this.tags().setupByJSON(config['tags'], opt_default);
-  this.overlay().setupByVal(config['overlay'], opt_default);
+  this.overlay().setupInternal(!!opt_default, config['overlay']);
 };
 
 

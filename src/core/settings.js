@@ -38,16 +38,16 @@ anychart.core.settings.PropertyDescriptor;
 //region Creating descriptors
 /**
  * Creates descriptor.
+ * @param {!Object.<string, anychart.core.settings.PropertyDescriptor>} map
  * @param {anychart.enums.PropertyHandlerType} handler - Handler type.
  * @param {string} propName - Property name.
  * @param {Function} normalizer - Normalizer function.
  * @param {number} consistency - Consistency to set.
  * @param {number} signal - Signal.
  * @param {number=} opt_check - Check function.
- * @param {string=} opt_deprecatedPropName - Deprecated prop name.
- * @return {anychart.core.settings.PropertyDescriptor} - Descriptor.
+ * @param {string=} opt_methodName - Deprecated prop name.
  */
-anychart.core.settings.createDescriptor = function(handler, propName, normalizer, consistency, signal, opt_check, opt_deprecatedPropName) {
+anychart.core.settings.createDescriptor = function(map, handler, propName, normalizer, consistency, signal, opt_check, opt_methodName) {
   /**
    * @type {anychart.core.settings.PropertyDescriptor}
    */
@@ -60,9 +60,11 @@ anychart.core.settings.createDescriptor = function(handler, propName, normalizer
   };
   if (goog.isDef(opt_check))
     descriptor.capabilityCheck = opt_check;
-  if (goog.isDef(opt_deprecatedPropName))
-    descriptor.deprecatedPropName = opt_deprecatedPropName;
-  return descriptor;
+  var methodName = propName;
+  if (goog.isDef(opt_methodName)) {
+    methodName = descriptor.deprecatedPropName = opt_methodName;
+  }
+  map[methodName] = descriptor;
 };
 
 
@@ -79,154 +81,176 @@ anychart.core.settings.createTextPropertiesDescriptors = function(invalidateBoun
   /** @type {!Object.<string, anychart.core.settings.PropertyDescriptor>} */
   var map = {};
 
-  map['minFontSize'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'minFontSize',
       anychart.core.settings.numberOrStringNormalizer,
       invalidateBoundsState,
       boundsChangedSignal);
 
-  map['maxFontSize'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'maxFontSize',
       anychart.core.settings.numberOrStringNormalizer,
       invalidateBoundsState,
       boundsChangedSignal);
 
-  map['adjustFontSize'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.MULTI_ARG,
       'adjustFontSize',
       anychart.core.settings.adjustFontSizeNormalizer,
       invalidateBoundsState,
       boundsChangedSignal);
 
-  map['fontSize'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontSize',
       anychart.core.settings.numberOrStringNormalizer,
       invalidateBoundsState,
       boundsChangedSignal);
 
-  map['fontFamily'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontFamily',
       anychart.core.settings.stringNormalizer,
       invalidateBoundsState,
       boundsChangedSignal);
 
-  map['fontColor'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontColor',
       anychart.core.settings.stringOrNullNormalizer,
       nonBoundsState,
       nonBoundsSignal);
 
-  map['fontOpacity'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontOpacity',
       anychart.core.settings.numberNormalizer,
       nonBoundsState,
       nonBoundsSignal);
 
-  map['fontDecoration'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontDecoration',
       anychart.enums.normalizeFontDecoration,
       invalidateBoundsState,
       boundsChangedSignal);
 
-  map['fontStyle'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontStyle',
       anychart.enums.normalizeFontStyle,
       invalidateBoundsState,
       boundsChangedSignal);
 
-  map['fontVariant'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontVariant',
       anychart.enums.normalizeFontVariant,
       invalidateBoundsState,
       boundsChangedSignal);
 
-  map['fontWeight'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'fontWeight',
       anychart.core.settings.numberOrStringNormalizer,
       invalidateBoundsState,
       boundsChangedSignal);
 
-  map['letterSpacing'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'letterSpacing',
       anychart.core.settings.numberOrStringNormalizer,
       invalidateBoundsState,
       boundsChangedSignal);
 
-  map['textDirection'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'textDirection',
       anychart.enums.normalizeTextDirection,
       invalidateBoundsState,
       boundsChangedSignal);
 
-  map['lineHeight'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'lineHeight',
       anychart.core.settings.numberOrStringNormalizer,
       invalidateBoundsState,
       boundsChangedSignal);
 
-  map['textIndent'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'textIndent',
       anychart.core.settings.numberNormalizer,
       invalidateBoundsState,
       boundsChangedSignal);
 
-  map['vAlign'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'vAlign',
       anychart.enums.normalizeVAlign,
       invalidateBoundsState,
       boundsChangedSignal);
 
-  map['hAlign'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'hAlign',
       anychart.enums.normalizeHAlign,
       invalidateBoundsState,
       boundsChangedSignal);
 
-  map['textWrap'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'textWrap',
       anychart.enums.normalizeTextWrap,
       invalidateBoundsState,
       boundsChangedSignal);
 
-  map['textOverflow'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'textOverflow',
       anychart.core.settings.stringNormalizer,
       invalidateBoundsState,
       boundsChangedSignal);
 
-  map['selectable'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'selectable',
       anychart.core.settings.booleanNormalizer,
       nonBoundsState,
       nonBoundsSignal);
 
-  map['disablePointerEvents'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'disablePointerEvents',
       anychart.core.settings.booleanNormalizer,
       nonBoundsState,
       nonBoundsSignal);
 
-  map['useHtml'] = anychart.core.settings.createDescriptor(
+  anychart.core.settings.createDescriptor(
+      map,
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'useHtml',
       anychart.core.settings.booleanNormalizer,
@@ -252,29 +276,14 @@ anychart.core.settings.createTextPropertiesDescriptors = function(invalidateBoun
 anychart.core.settings.populate = function(classConstructor, descriptors) {
   for (var i in descriptors) {
     var descriptor = descriptors[i];
-    if (descriptor.handler == anychart.enums.PropertyHandlerType.MULTI_ARG_DEPRECATED ||
-        descriptor.handler == anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED) {
-      classConstructor.prototype[i] = goog.partial(
-          descriptor.handler == anychart.enums.PropertyHandlerType.MULTI_ARG_DEPRECATED ?
-              anychart.core.settings.multiArgsDeprecatedHandler :
-              anychart.core.settings.simpleDeprecatedHandler,
-          descriptor.propName,
-          descriptor.deprecatedPropName,
-          descriptor.normalizer,
-          descriptor.capabilityCheck,
-          descriptor.consistency,
-          descriptor.signal);
-    } else {
-      classConstructor.prototype[i] = goog.partial(
-          descriptor.handler == anychart.enums.PropertyHandlerType.MULTI_ARG ?
-              anychart.core.settings.multiArgsHandler :
-              anychart.core.settings.simpleHandler,
-          descriptor.propName,
-          descriptor.normalizer,
-          descriptor.capabilityCheck,
-          descriptor.consistency,
-          descriptor.signal);
-    }
+    classConstructor.prototype[i] = goog.partial(
+        anychart.core.settings.handlersMap[descriptor.handler],
+        descriptor.propName,
+        descriptor.deprecatedPropName,
+        descriptor.normalizer,
+        descriptor.capabilityCheck,
+        descriptor.consistency,
+        descriptor.signal);
   }
 };
 
@@ -331,11 +340,8 @@ anychart.core.settings.serialize = function(target, descriptors, json, opt_warni
         val = anychart.color.serialize(descriptor.normalizer([val]));
       } else if (descriptor.normalizer == anychart.core.settings.colorNormalizer && !goog.isNull(val)) {
         val = anychart.color.serialize(descriptor.normalizer(val));
-      } else if ((descriptor.normalizer == anychart.core.settings.colorNormalizer ||
-          descriptor.normalizer == anychart.core.settings.strokeNormalizer) && !goog.isNull(val)) {
-        val = anychart.color.serialize(descriptor.normalizer([val]));
       } else if (descriptor.normalizer == anychart.core.settings.adjustFontSizeNormalizer) {
-        val = goog.isObject(val) ? goog.object.clone(val) : val;
+        val = descriptor.normalizer([val]);
       }
       json[name] = val;
     }
@@ -368,6 +374,7 @@ anychart.core.settings.copy = function(target, descriptors, config) {
 /**
  * Simple field handler, that is suitable for partial application to make real handlers.
  * @param {string} fieldName
+ * @param {string} deprecatedFieldName
  * @param {function(*):*} normalizer
  * @param {number} supportCheck - set to anychart.core.series.Capabilities.ANY to invalidate in any case.
  * @param {anychart.ConsistencyState|number} consistencyState
@@ -376,7 +383,7 @@ anychart.core.settings.copy = function(target, descriptors, config) {
  * @return {*|anychart.core.settings.IObjectWithSettings}
  * @this {anychart.core.settings.IObjectWithSettings}
  */
-anychart.core.settings.simpleHandler = function(fieldName, normalizer, supportCheck, consistencyState, signal, opt_value) {
+anychart.core.settings.simpleHandler = function(fieldName, deprecatedFieldName, normalizer, supportCheck, consistencyState, signal, opt_value) {
   if (goog.isDef(opt_value)) {
     opt_value = normalizer(opt_value);
     if (this.getOwnOption(fieldName) !== opt_value) {
@@ -409,7 +416,7 @@ anychart.core.settings.simpleHandler = function(fieldName, normalizer, supportCh
  */
 anychart.core.settings.simpleDeprecatedHandler = function(fieldName, deprecatedFieldName, normalizer, supportCheck, consistencyState, signal, opt_value) {
   anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, [deprecatedFieldName + '()', fieldName + '()'], true);
-  return anychart.core.settings.simpleHandler.call(this, fieldName, normalizer, supportCheck, consistencyState, signal, opt_value);
+  return anychart.core.settings.simpleHandler.call(this, fieldName, deprecatedFieldName, normalizer, supportCheck, consistencyState, signal, opt_value);
 };
 
 
@@ -417,6 +424,7 @@ anychart.core.settings.simpleDeprecatedHandler = function(fieldName, deprecatedF
  * Field handler, that is suitable for partial application to make real handlers. Unlike the simpleHandler it passes
  * all args starting to the normalizer instead of the first param only.
  * @param {string} fieldName
+ * @param {string} deprecatedFieldName
  * @param {function(Array):*} arrayNormalizer
  * @param {number} supportCheck - set to anychart.core.series.Capabilities.ANY to invalidate in any case.
  * @param {anychart.ConsistencyState|number} consistencyState
@@ -426,12 +434,12 @@ anychart.core.settings.simpleDeprecatedHandler = function(fieldName, deprecatedF
  * @return {*|anychart.core.settings.IObjectWithSettings}
  * @this {anychart.core.settings.IObjectWithSettings}
  */
-anychart.core.settings.multiArgsHandler = function(fieldName, arrayNormalizer, supportCheck, consistencyState, signal, opt_value, var_args) {
+anychart.core.settings.multiArgsHandler = function(fieldName, deprecatedFieldName, arrayNormalizer, supportCheck, consistencyState, signal, opt_value, var_args) {
   if (goog.isDef(opt_value)) {
     // Copying using loop to avoid deop due to passing arguments object to
     // function. This is faster in many JS engines as of late 2014.
     var args = [];
-    for (var i = 5; i < arguments.length; i++) {
+    for (var i = 6; i < arguments.length; i++) {
       args.push(arguments[i]);
     }
     opt_value = arrayNormalizer(args);
@@ -466,8 +474,22 @@ anychart.core.settings.multiArgsHandler = function(fieldName, arrayNormalizer, s
  */
 anychart.core.settings.multiArgsDeprecatedHandler = function(fieldName, deprecatedFieldName, arrayNormalizer, supportCheck, consistencyState, signal, opt_value, var_args) {
   anychart.core.reporting.warning(anychart.enums.WarningCode.DEPRECATED, null, [deprecatedFieldName + '()', fieldName + '()'], true);
-  return anychart.core.settings.multiArgsHandler(fieldName, arrayNormalizer, supportCheck, consistencyState, signal, opt_value, var_args);
+  return anychart.core.settings.multiArgsHandler(fieldName, deprecatedFieldName, arrayNormalizer, supportCheck, consistencyState, signal, opt_value, var_args);
 };
+
+
+/**
+ * Handlers map to avoid switching.
+ * @type {Array.<Function>}
+ */
+anychart.core.settings.handlersMap = (function() {
+  var map = [];
+  map[anychart.enums.PropertyHandlerType.SINGLE_ARG] = anychart.core.settings.simpleHandler;
+  map[anychart.enums.PropertyHandlerType.MULTI_ARG] = anychart.core.settings.multiArgsHandler;
+  map[anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED] = anychart.core.settings.simpleDeprecatedHandler;
+  map[anychart.enums.PropertyHandlerType.MULTI_ARG_DEPRECATED] = anychart.core.settings.multiArgsDeprecatedHandler;
+  return map;
+})();
 //endregion
 
 

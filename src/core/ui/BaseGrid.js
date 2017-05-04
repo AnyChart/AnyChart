@@ -2541,7 +2541,7 @@ anychart.core.ui.BaseGrid.prototype.setupByJSON = function(config, opt_default) 
   this.rowSelectedFill(config['rowSelectedFill']);
 
   if ('tooltip' in config)
-    this.tooltip().setupByVal(config['tooltip'], opt_default);
+    this.tooltip().setupInternal(!!opt_default, config['tooltip']);
 
   if (goog.isDef(config['titleHeight']))
     this.titleHeight(config['titleHeight']);

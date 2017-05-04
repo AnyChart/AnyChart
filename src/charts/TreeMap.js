@@ -757,7 +757,7 @@ anychart.charts.TreeMap.prototype.legendItemOver = function(item, event) {
 
   var sourceMode = this.legend().itemsSourceMode();
   if (sourceMode == anychart.enums.LegendItemsSourceMode.CATEGORIES) {
-    series = /** @type {anychart.core.SeriesBase} */(meta.series);
+    series = /** @type {anychart.charts.TreeMap} */(meta.series);
     var scale = meta.scale;
     if (scale && series) {
       var range = meta.range;
@@ -2858,9 +2858,9 @@ anychart.charts.TreeMap.prototype.setupByJSON = function(config, opt_default) {
   this.hoverHeaders().setup(config['hoverHeaders']);
   this.headersDisplayMode(config['headersDisplayMode']);
 
-  this.labels().setupByVal(config['labels'], opt_default);
-  this.hoverLabels().setupByVal(config['hoverLabels'], opt_default);
-  this.selectLabels().setupByVal(config['selectLabels'], opt_default);
+  this.labels().setupInternal(!!opt_default, config['labels']);
+  this.hoverLabels().setupInternal(!!opt_default, config['hoverLabels']);
+  this.selectLabels().setupInternal(!!opt_default, config['selectLabels']);
   this.labelsDisplayMode(config['labelsDisplayMode']);
 
   this.markers().setup(config['markers']);

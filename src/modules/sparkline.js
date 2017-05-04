@@ -25,7 +25,7 @@ goog.require('anychart.modules.base');
 anychart.sparkline = function(opt_data, opt_csvSettings) {
   var chart = new anychart.charts.Sparkline(opt_data, opt_csvSettings);
 
-  chart.setupByVal(anychart.getFullTheme('sparkline'), true);
+  chart.setupInternal(true, anychart.getFullTheme('sparkline'));
 
   return chart;
 };

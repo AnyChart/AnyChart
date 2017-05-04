@@ -1782,7 +1782,7 @@ anychart.charts.Stock.prototype.setupByJSON = function(config, opt_default) {
  */
 anychart.stock = function(opt_allowPointSettings) {
   var result = new anychart.charts.Stock(opt_allowPointSettings);
-  result.setupByVal(anychart.getFullTheme('stock'), true);
+  result.setupInternal(true, anychart.getFullTheme('stock'));
   return result;
 };
 

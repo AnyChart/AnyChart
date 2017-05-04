@@ -2044,8 +2044,8 @@ anychart.core.axes.Linear.prototype.setupByJSON = function(config, opt_default) 
   if ('title' in config)
     this.title(config['title']);
 
-  this.labels().setupByVal(config['labels'], opt_default);
-  this.minorLabels().setupByVal(config['minorLabels'], opt_default);
+  this.labels().setupInternal(!!opt_default, config['labels']);
+  this.minorLabels().setupInternal(!!opt_default, config['minorLabels']);
   this.ticks(config['ticks']);
   this.minorTicks(config['minorTicks']);
   this.staggerMode(config['staggerMode']);

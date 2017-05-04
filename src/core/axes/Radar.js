@@ -877,7 +877,7 @@ anychart.core.axes.Radar.prototype.serialize = function() {
 anychart.core.axes.Radar.prototype.setupByJSON = function(config, opt_default) {
   anychart.core.axes.Radar.base(this, 'setupByJSON', config, opt_default);
   //this.startAngle(config['startAngle']);
-  this.labels().setupByVal(config['labels'], opt_default);
+  this.labels().setupInternal(!!opt_default, config['labels']);
   this.ticks(config['ticks']);
   this.stroke(config['stroke']);
 };

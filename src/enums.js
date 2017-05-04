@@ -3256,8 +3256,6 @@ anychart.enums.WarningCode = {
   TOOLBAR_METHOD_IS_NOT_DEFINED: 14,
   TOOLBAR_CHART_IS_NOT_SET: 15,
 
-  SCALE_TYPE_NOT_SUPPORTED: 16,
-
   DATA_ITEM_SET_PATH: 17,
 
   TREEMAP_MANY_ROOTS: 18,
@@ -5550,7 +5548,8 @@ anychart.enums.SeriesDrawerTypes = {
   POLAR_AREA: 26,
   POLAR_COLUMN: 27,
   POLAR_RANGE_COLUMN: 28,
-  MEKKO: 29
+  MEKKO: 29,
+  HEAT_MAP: 30
 };
 
 

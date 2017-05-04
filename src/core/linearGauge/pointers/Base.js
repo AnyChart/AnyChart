@@ -1703,9 +1703,9 @@ anychart.core.linearGauge.pointers.Base.prototype.setupByJSON = function(config,
   this.width(config['width']);
   this.offset(config['offset']);
   this.dataIndex(config['dataIndex']);
-  this.label().setupByVal(config['label'], opt_default);
-  this.hoverLabel().setupByVal(config['hoverLabel'], opt_default);
-  this.selectLabel().setupByVal(config['selectLabel'], opt_default);
+  this.label().setupInternal(!!opt_default, config['label']);
+  this.hoverLabel().setupInternal(!!opt_default, config['hoverLabel']);
+  this.selectLabel().setupInternal(!!opt_default, config['selectLabel']);
   this.legendItem().setup(config['legendItem']);
 
   this.color(config['color']);

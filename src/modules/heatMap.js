@@ -19,7 +19,7 @@ goog.require('anychart.modules.base');
 anychart.heatMap = function(opt_data, opt_csvSettings) {
   var chart = new anychart.charts.HeatMap(opt_data, opt_csvSettings);
 
-  chart.setupByVal(anychart.getFullTheme('heatMap'), true);
+  chart.setupInternal(true, anychart.getFullTheme('heatMap'));
 
   return chart;
 };

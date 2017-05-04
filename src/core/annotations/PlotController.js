@@ -974,8 +974,8 @@ anychart.core.annotations.PlotController.prototype.serialize = function() {
 
 
 /** @inheritDoc */
-anychart.core.annotations.PlotController.prototype.setupSpecial = function(var_args) {
-  var arg0 = arguments[0];
+anychart.core.annotations.PlotController.prototype.setupSpecial = function(isDefault, var_args) {
+  var arg0 = arguments[1];
   if (goog.isArray(arg0)) {
     this.annotationsJson_(arg0);
     return true;

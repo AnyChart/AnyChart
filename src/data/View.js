@@ -99,21 +99,6 @@ anychart.data.View.prototype.ensureConsistent = function() {
 
 
 /**
- * Creates prepared derived view. Internal method. Should not be published!
- * @param {string} fieldName The name of the field to look at.
- * @param {Array|boolean} categories Categories set to use in case of ordinal scale.
- * @return {!anychart.data.View} The new derived view.
- */
-anychart.data.View.prototype.prepare = function(fieldName, categories) {
-  var result = goog.isArray(categories) ?
-      new anychart.data.OrdinalView(this, fieldName, /** @type {!Array} */(categories)) :
-      new anychart.data.ScatterView(this, fieldName, !!categories);
-  this.registerDisposable(result);
-  return result;
-};
-
-
-/**
  * Creates a pie-ready view.
  * @param {string} fieldName A field name to make filter by.
  * @param {function(*):boolean=} opt_func A filter function that should accept a field value and return true if the row
