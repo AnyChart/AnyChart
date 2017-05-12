@@ -580,7 +580,7 @@ anychart.themes.merging.mergingMap_ = [
       'defaultTooltip.contentInternal',
       'defaultLegend',
       'defaultLegend.paginator',
-      'chart.defaultLabelSettings',
+      'defaultLabelSettings',
       'cartesianBase.defaultTextMarkerSettings',
       'scatter.defaultTextMarkerSettings',
       'mekko.defaultTextMarkerSettings',
@@ -589,6 +589,13 @@ anychart.themes.merging.mergingMap_ = [
       'standalones.textAxisMarker',
       'standalones.resourceList.baseSettings',
       'resource.resourceList.baseSettings'
+    ]
+  },
+  {
+    defaultObj: 'defaultLabelSettings',
+    targets: [
+      'chart.defaultLabelSettings',
+      'chart.defaultQuarterSettings.defaultLabelSettings'
     ]
   },
   {
@@ -603,6 +610,8 @@ anychart.themes.merging.mergingMap_ = [
       'defaultLegend.background',
       'defaultLegend.paginator.background',
       'chart.defaultLabelSettings.background',
+      'chart.defaultQuarterSettings',
+      'chart.defaultQuarterSettings.defaultLabelSettings.background',
       'stock.defaultPlotSettings.xAxis.background',
       'stock.scroller.xAxis.background',
       'resource.grid.background',
@@ -682,7 +691,8 @@ anychart.themes.merging.mergingMap_ = [
       'defaultLegend.title',
       'defaultDataGrid.defaultColumnSettings.title',
       'standalones.title',
-      'map.axesSettings.title'
+      'map.axesSettings.title',
+      'chart.defaultQuarterSettings.title'
     ]
   },
   {
@@ -1069,7 +1079,8 @@ anychart.themes.merging.mergingMap_ = [
     defaultObj: 'scatter',
     targets: [
       'marker',
-      'bubble'
+      'bubble',
+      'quadrant'
     ]
   },
   {
@@ -1371,6 +1382,15 @@ anychart.themes.merging.mergingMap_ = [
     ]
   },
   {
+    defaultObj: 'chart.defaultQuarterSettings',
+    targets: [
+      'chart.quarters.rightTop',
+      'chart.quarters.leftTop',
+      'chart.quarters.leftBottom',
+      'chart.quarters.rightBottom'
+    ]
+  },
+  {
     defaultObj: 'mekko',
     targets: [
       'mosaic',
@@ -1614,7 +1634,12 @@ anychart.themes.merging.multipleEntities_ = {
   'gauge.ranges': 'gauge.defaultRangeSettings',
   'gauge.axes': 'gauge.defaultAxisSettings',
   'gauge.scaleBars': 'gauge.defaultScaleBarSettings',
-  'map.callouts': 'map.defaultCalloutSettings'
+  'map.callouts': 'map.defaultCalloutSettings',
+  // Quadrant chart
+  'chart.quarters.rightTop.labels': 'chart.defaultQuarterSettings.defaultLabelSettings',
+  'chart.quarters.leftTop.labels': 'chart.defaultQuarterSettings.defaultLabelSettings',
+  'chart.quarters.leftBottom.labels': 'chart.defaultQuarterSettings.defaultLabelSettings',
+  'chart.quarters.rightBottom.labels': 'chart.defaultQuarterSettings.defaultLabelSettings'
 };
 
 

@@ -264,8 +264,8 @@ anychart.core.Chart.prototype.createStage = function() {
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter/setter for axis default settings.
- * @param {Object=} opt_value Object with x-axis settings.
+ * Getter/setter for chart label default settings.
+ * @param {Object=} opt_value Object with label settings.
  * @return {Object}
  */
 anychart.core.Chart.prototype.defaultLabelSettings = function(opt_value) {
@@ -494,7 +494,7 @@ anychart.core.Chart.prototype.label = function(opt_indexOrValue, opt_value) {
 
 
 /**
- * Internal title invalidation handler.
+ * Internal label invalidation handler.
  * @param {anychart.SignalEvent} event Event object.
  * @private
  */
@@ -2781,7 +2781,9 @@ anychart.core.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvS
   opt_chartDataExportMode = anychart.enums.normalizeChartDataExportMode(opt_chartDataExportMode);
   var rawData = (opt_chartDataExportMode == anychart.enums.ChartDataExportMode.RAW);
   var type = this.getType();
-  var scatterPolar = (type == anychart.enums.ChartTypes.SCATTER || type == anychart.enums.ChartTypes.POLAR);
+  var scatterPolar = (type == anychart.enums.ChartTypes.SCATTER ||
+      type == anychart.enums.ChartTypes.POLAR ||
+      type == anychart.enums.ChartTypes.QUADRANT);
   var settings = goog.isObject(opt_csvSettings) ? opt_csvSettings : {};
   var rowsSeparator = settings['rowsSeparator'] || '\n';
   this.checkSeparator(rowsSeparator);

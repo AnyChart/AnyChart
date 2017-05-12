@@ -51,6 +51,7 @@ anychart.enums.ChartTypes = {
   JUMP_LINE: 'jumpLine',
   STICK: 'stick',
   PARETO: 'pareto',
+  QUADRANT: 'quadrant',
   MEKKO: 'mekko',
   MOSAIC: 'mosaic',
   BARMEKKO: 'barmekko'

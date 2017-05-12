@@ -76,12 +76,33 @@ anychart.bubble = function(var_args) {
 };
 
 
+/**
+ * Default quarant chart.<br/>
+ * <b>Note:</b> Contains predefined settings for quadrant chart.
+ * @param {...(anychart.data.View|anychart.data.Set|Array)} var_args Marker chart data.
+ * @return {anychart.charts.Scatter} Chart with defaults.
+ */
+anychart.quadrant = function(var_args) {
+  var chart = new anychart.charts.Scatter();
+  chart.setupInternal(true, anychart.getFullTheme('quadrant'));
+  chart.setType(anychart.enums.ChartTypes.QUADRANT);
+
+  for (var i = 0, count = arguments.length; i < count; i++) {
+    chart['marker'](arguments[i]);
+  }
+
+  return chart;
+};
+
+
 anychart.chartTypesMap[anychart.enums.ChartTypes.BUBBLE] = anychart.bubble;
 anychart.chartTypesMap[anychart.enums.ChartTypes.MARKER] = anychart.marker;
+anychart.chartTypesMap[anychart.enums.ChartTypes.QUADRANT] = anychart.quadrant;
 anychart.chartTypesMap[anychart.enums.ChartTypes.SCATTER] = anychart.scatter;
 
 //exports
 goog.exportSymbol('anychart.bubble', anychart.bubble);//doc|ex
 goog.exportSymbol('anychart.scatter', anychart.scatter);
 goog.exportSymbol('anychart.marker', anychart.marker);
+goog.exportSymbol('anychart.quadrant', anychart.quadrant);
 goog.exportSymbol('anychart.scatterChart', anychart.scatter);

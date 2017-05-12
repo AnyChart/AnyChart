@@ -117,6 +117,9 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="milestones" type="core.Milestones"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="tasks" type="core.Tasks"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="critical_path" type="core.CriticalPath"/>
+            <!-- chart.Quadrant elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="crossing" type="utils.Crossing"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="quarters" type="core.quadrant.Quarters_list"/>
         </xsd:all>
         <!-- core.Chart attrs -->
         <xsd:attributeGroup ref="attrs.VisualBase"/>
@@ -433,7 +436,7 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="legend_item" type="utils.LegendItemSettings"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="name" type="xsd:string"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="id" type="xsd:string"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="selectionMode" type="enums.SelectionMode"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="selection_mode" type="enums.SelectionMode"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="a11y" type="utils.A11y"/>
             <!-- BaseWithMarkers series -->
             <xsd:element minOccurs="0" maxOccurs="1" name="markers" type="core.MarkersFactory"/>
@@ -518,6 +521,7 @@
         <xsd:attribute name="x_scale" type="simple.ScaleRef"/>
         <xsd:attribute name="y_scale" type="simple.ScaleRef"/>
         <xsd:attribute name="a11y" type="simple.Bool"/>
+        <xsd:attribute name="selection_mode" type="enums.SelectionMode" />
         <!-- BaseWithMarkers series -->
         <xsd:attribute name="markers" type="simple.MarkerType"/>
         <xsd:attribute name="hover_markers" type="simple.MarkerType"/>
@@ -1047,10 +1051,18 @@
         <xsd:all>
             <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="top_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="right_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="bottom_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="left_stroke" type="Stroke"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="corners" type="utils.Corners"/>
         </xsd:all>
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="top_stroke" type="xsd:string"/>
+        <xsd:attribute name="right_stroke" type="xsd:string"/>
+        <xsd:attribute name="bottom_stroke" type="xsd:string"/>
+        <xsd:attribute name="left_stroke" type="xsd:string"/>
         <xsd:attribute name="disable_pointer_events" type="xsd:boolean"/>
         <xsd:attribute name="corner_type" type="enums.BackgroundCornerTypes" default="none"/>
         <xsd:attribute name="corners" type="xsd:double" default="0"/>
@@ -1730,6 +1742,13 @@
         <xsd:attribute name="enabled" type="xsd:boolean"/>
         <xsd:attribute name="mode" type="xsd:string"/>
         <xsd:attribute name="title_format" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="utils.Crossing">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+        </xsd:all>
+        <xsd:attribute name="stroke" type="xsd:string"/>
     </xsd:complexType>
 
     <!-- Colors -->
@@ -2505,6 +2524,44 @@
         </xsd:all>
     </xsd:complexType>
 
+    <xsd:complexType name="core.quadrant.Quarter">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="top_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="right_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="bottom_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="left_stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="title" type="core.Title" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="margin" type="utils.Space" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="padding" type="utils.Space" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="quarter_labels" type="core.Label_list"/>
+            <!-- core.Background -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="corners" type="utils.Corners"/>
+        </xsd:all>
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="true"/>
+        <!-- core.Background -->
+        <xsd:attribute name="top_stroke" type="xsd:string"/>
+        <xsd:attribute name="right_stroke" type="xsd:string"/>
+        <xsd:attribute name="bottom_stroke" type="xsd:string"/>
+        <xsd:attribute name="left_stroke" type="xsd:string"/>
+        <xsd:attribute name="disable_pointer_events" type="xsd:boolean"/>
+        <xsd:attribute name="corner_type" type="enums.BackgroundCornerTypes" default="none"/>
+        <xsd:attribute name="corners" type="xsd:double" default="0"/>
+        <xsd:attributeGroup ref="attrs.VisualBase"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="core.quadrant.Quarters_list">
+        <xsd:all>
+            <xsd:element minOccurs="0" maxOccurs="1" name="right_top" type="core.quadrant.Quarter"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="left_top" type="core.quadrant.Quarter"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="left_bottom" type="core.quadrant.Quarter"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="right_bottom" type="core.quadrant.Quarter"/>
+        </xsd:all>
+    </xsd:complexType>
+
     <xsd:complexType name="DrillToList">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="item" type="simple.UnsignedInteger"/>
@@ -2859,6 +2916,7 @@
             <xsd:enumeration value="jumpLine"/>
             <xsd:enumeration value="stick"/>
             <xsd:enumeration value="pareto"/>
+            <xsd:enumeration value="quadrant"/>
             <xsd:enumeration value="mekko"/>
             <xsd:enumeration value="mosaic"/>
             <xsd:enumeration value="barmekko"/>
@@ -3001,6 +3059,10 @@
             <xsd:enumeration value="trapezium"/>
             <xsd:enumeration value="pentagon"/>
             <xsd:enumeration value="arrowhead"/>
+            <xsd:enumeration value="arrowUp"/>
+            <xsd:enumeration value="arrowDown"/>
+            <xsd:enumeration value="arrowLeft"/>
+            <xsd:enumeration value="arrowRight"/>
         </xsd:restriction>
     </xsd:simpleType>
 

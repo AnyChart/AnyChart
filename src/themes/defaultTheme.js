@@ -1149,6 +1149,25 @@ goog.provide('anychart.themes.defaultTheme');
       'minPixPerPoint': NaN
     },
 
+    'defaultLabelSettings': {
+      'enabled': true,
+      'text': 'Chart label',
+      'width': null,
+      'height': null,
+      'anchor': 'leftTop',
+      'position': 'leftTop',
+      'offsetX': 0,
+      'offsetY': 0,
+      'minFontSize': 8,
+      'maxFontSize': 72,
+      'adjustFontSize': {
+        'width': false,
+        'height': false
+      },
+      'rotation': 0,
+      'zIndex': 50
+    },
+
     'stageCredits': {
       'text': 'AnyChart',
       'url': 'http://www.anychart.com/?utm_source=registered',
@@ -1503,24 +1522,6 @@ goog.provide('anychart.themes.defaultTheme');
           'pointWidth': '100%'
         }
       },
-      'defaultLabelSettings': {
-        'enabled': true,
-        'text': 'Chart label',
-        'width': null,
-        'height': null,
-        'anchor': 'leftTop',
-        'position': 'leftTop',
-        'offsetX': 0,
-        'offsetY': 0,
-        'minFontSize': 8,
-        'maxFontSize': 72,
-        'adjustFontSize': {
-          'width': false,
-          'height': false
-        },
-        'rotation': 0,
-        'zIndex': 50
-      },
       'chartLabels': [],
       'maxBubbleSize': '20%',
       'minBubbleSize': '5%',
@@ -1685,7 +1686,54 @@ goog.provide('anychart.themes.defaultTheme');
       },
       'labels': {'enabled': false},
       'hoverLabels': {'enabled': null},
-      'selectLabels': {'enabled': null}
+      'selectLabels': {'enabled': null},
+
+      'crossing': {
+        'stroke': 'none'
+      },
+
+      'defaultQuarterSettings': {
+        'enabled': false,
+        'zIndex': 1,
+        'fill': 'none',
+        'stroke': 'none',
+        'title': {
+          'enabled': false,
+          'padding': 5
+        },
+        'defaultLabelSettings': {
+          'text': 'Quarter label',
+          'anchor': 'center',
+          'position': 'center'
+        },
+        'margin': {},
+        'padding': {}
+      },
+
+      'quarters': {
+        'rightTop': {
+          'fill': '#e3f2fd',
+          'title': {
+            'orientation': 'top'
+          }
+        },
+        'leftTop': {
+          'title': {
+            'orientation': 'top'
+          }
+        },
+        'leftBottom': {
+          'fill': '#e3f2fd',
+          'title': {
+            'orientation': 'bottom'
+          }
+        },
+        'rightBottom': {
+          'title': {
+            'orientation': 'bottom'
+          }
+        }
+      }
     },
 
     'cartesianBase': {
@@ -2377,6 +2425,68 @@ goog.provide('anychart.themes.defaultTheme');
     // merge with scatter
     'marker': {},
     'bubble': {},
+
+    'quadrant': {
+      'scales': [
+        {
+          'type': 'linear',
+          'minimum': 0,
+          'maximum': 100
+        }, {
+          'type': 'linear',
+          'minimum': 0,
+          'maximum': 100
+        }],
+      'xScale': 0,
+      'yScale': 1,
+      'defaultXAxisSettings': {
+        'ticks': false,
+        'labels': false,
+        'title': {
+          'enabled': false,
+          'align': 'left'
+        },
+        'stroke': '3 #bbdefb'
+      },
+      'defaultYAxisSettings': {
+        'ticks': false,
+        'labels': false,
+        'title': {
+          'enabled': false,
+          'align': 'left'
+        },
+        'stroke': '3 #bbdefb'
+      },
+      'xAxes': [
+        {},
+        {
+          'orientation': 'top'
+        }
+      ],
+      'yAxes': [
+        {},
+        {
+          'orientation': 'right'
+        }
+      ],
+      'crossing': {
+        'stroke': '#bbdefb'
+      },
+      'quarters': {
+        'rightTop': {
+          'enabled': true
+        },
+        'leftTop': {
+          'enabled': true
+        },
+        'leftBottom': {
+          'enabled': true
+        },
+        'rightBottom': {
+          'enabled': true
+        }
+      }
+    },
 
     // merge with chart
     'mekko': {

@@ -1080,7 +1080,7 @@
         {"$ref": "#/definitions/anychart.core.SeparateChart"}
       ],
       "properties": {
-        "type": {"enum": ["scatter"]},
+        "type": {"enum": ["scatter", "quadrant"]},
         "grids": {
           "type": "array",
           "items": {
@@ -1266,6 +1266,16 @@
             "number",
             "string"
           ]
+        },
+        "crossing": {"$ref": "#/definitions/anychart.core.utils.Crossing"},
+        "quarters": {
+          "type": "object",
+          "properties": {
+            "rightTop": {"$ref": "#/definitions/anychart.core.quadrant.Quarter"},
+            "leftTop": {"$ref": "#/definitions/anychart.core.quadrant.Quarter"},
+            "leftBottom": {"$ref": "#/definitions/anychart.core.quadrant.Quarter"},
+            "rightBottom": {"$ref": "#/definitions/anychart.core.quadrant.Quarter"}
+          }
         }
       },
       "required": ["type"]
@@ -3156,6 +3166,33 @@
       ]
     },
 
+    "anychart.core.quadrant.Quarter": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.ui.Background"}
+      ],
+      "properties": {
+        "margin": {"$ref": "#/definitions/anychart.core.utils.Space"},
+        "padding": {"$ref": "#/definitions/anychart.core.utils.Space"},
+        "title": {
+          "oneOf": [
+            {"type": "string"},
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.Title"}
+          ]
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/definitions/disable"},
+              {"$ref": "#/definitions/anychart.core.ui.Label"}
+            ]
+          }
+        }
+      }
+    },
+
     "anychart.core.gauge.Cap": {
       "type": "object",
       "allOf": [
@@ -4506,6 +4543,10 @@
         {"$ref": "#/definitions/shape"}
       ],
       "properties": {
+        "topStroke": {"$ref": "#/definitions/stroke"},
+        "rightStroke": {"$ref": "#/definitions/stroke"},
+        "bottomStroke": {"$ref": "#/definitions/stroke"},
+        "leftStroke": {"$ref": "#/definitions/stroke"},
         "cornerType": {"$ref": "#/definitions/anychart.enums.BackgroundCornersType"},
         "corners": {
           "type": [
@@ -5575,7 +5616,11 @@
         "bar",
         "trapezoid",
         "arrow",
-        "arrowhead"
+        "arrowhead",
+        "arrowUp",
+        "arrowDown",
+        "arrowLeft",
+        "arrowRight"
       ]
     },
     "anychart.enums.Layout": {
@@ -5956,6 +6001,12 @@
         "drag": {
           "type": "boolean"
         }
+      }
+    },
+    "anychart.core.utils.Crossing" : {
+      "type": "object",
+      "properties": {
+        "stroke": {"$ref": "#/definitions/stroke"}
       }
     },
 

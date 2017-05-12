@@ -879,6 +879,10 @@ anychart.pareto = anychart.pareto || anychart.createNFIMError('Pareto chart');
 anychart.resource = anychart.resource || anychart.createNFIMError('Resource chart');
 
 
+/** @inheritDoc */
+anychart.quadrant = anychart.quadrant || anychart.createNFIMError('Quadrant chart');
+
+
 //region ------ Standalones
 /** @ignoreDoc */
 anychart.standalones.background = anychart.standalones.background || anychart.createNFIMError('anychart.standalones.Background');
@@ -1167,6 +1171,7 @@ goog.exportSymbol('anychart.gauges.led', anychart.gauges.led);
 goog.exportSymbol('anychart.ganttProject', anychart.ganttProject);
 goog.exportSymbol('anychart.ganttResource', anychart.ganttResource);
 goog.exportSymbol('anychart.stock', anychart.stock);
+goog.exportSymbol('anychart.quadrant', anychart.quadrant);
 goog.exportSymbol('anychart.theme', anychart.theme);
 goog.exportSymbol('anychart.appendTheme', anychart.appendTheme);
 goog.exportSymbol('anychart.toolbar', anychart.toolbar);
