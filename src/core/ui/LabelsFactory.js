@@ -87,7 +87,6 @@ anychart.core.ui.LabelsFactory = function() {
 
   this.adjustFontSizeMode('different');
 
-  this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
 };
 goog.inherits(anychart.core.ui.LabelsFactory, anychart.core.VisualBase);
@@ -1128,6 +1127,10 @@ anychart.core.ui.LabelsFactory.prototype.callFormat = function(formatter, provid
     this.formatCallsCache_ = {};
   if (goog.isDefAndNotNull(opt_cacheIndex)) {
     if (!goog.isDef(this.formatCallsCache_[opt_cacheIndex])) {
+      if (goog.isDef(provider) && provider['series']) {
+        var series = /** @type {{getIterator: Function}} */ (provider['series']);
+        series.getIterator().select(goog.isDef(provider['index']) ? provider['index'] : opt_cacheIndex);
+      }
       this.formatCallsCache_[opt_cacheIndex] = formatter.call(provider, provider);
     }
 
@@ -1342,6 +1345,8 @@ anychart.core.ui.LabelsFactory.Label = function() {
   this.drawingPlan_ = goog.array.slice(this.defaultDrawingPlan_, 0);
 
   this.resetSettings();
+
+  this.markConsistent(anychart.ConsistencyState.LABELS_FACTORY_CACHE);
 };
 goog.inherits(anychart.core.ui.LabelsFactory.Label, anychart.core.VisualBase);
 
@@ -1364,7 +1369,8 @@ anychart.core.ui.LabelsFactory.Label.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.LABELS_FACTORY_CLIP |
-    anychart.ConsistencyState.LABELS_FACTORY_CONNECTOR;
+    anychart.ConsistencyState.LABELS_FACTORY_CONNECTOR |
+    anychart.ConsistencyState.LABELS_FACTORY_CACHE;
 
 
 //endregion
@@ -1573,7 +1579,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.SIMPLE_PROPS_DESCRIPTORS = (funct
       anychart.enums.PropertyHandlerType.SINGLE_ARG,
       'format',
       anychart.core.settings.stringOrFunctionNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LABELS_FACTORY_CACHE,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED);
 
   //@deprecated Since 7.13.1. Use 'format' instead.
@@ -1582,7 +1588,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.SIMPLE_PROPS_DESCRIPTORS = (funct
       anychart.enums.PropertyHandlerType.SINGLE_ARG_DEPRECATED,
       'format',
       anychart.core.settings.stringOrFunctionNormalizer,
-      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS,
+      anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS | anychart.ConsistencyState.LABELS_FACTORY_CACHE,
       anychart.Signal.NEEDS_REDRAW | anychart.Signal.BOUNDS_CHANGED,
       void 0,
       'textFormatter');
@@ -2239,6 +2245,10 @@ anychart.core.ui.LabelsFactory.Label.prototype.createSizeMeasureElement_ = funct
 
   var isHtml = mergedSettings['useHtml'];
   var formatProvider = this.formatProvider();
+  if (this.hasInvalidationState(anychart.ConsistencyState.LABELS_FACTORY_CACHE)) {
+    this.factory_.dropCallsCache(this.getIndex());
+    this.markConsistent(anychart.ConsistencyState.LABELS_FACTORY_CACHE);
+  }
   var text = this.factory_.callFormat(mergedSettings['format'], formatProvider, this.getIndex());
 
   if (!this.fontSizeMeasureElement_) {
@@ -2456,16 +2466,17 @@ anychart.core.ui.LabelsFactory.Label.prototype.draw = function() {
     this.markConsistent(anychart.ConsistencyState.Z_INDEX);
   }
 
+  if (this.hasInvalidationState(anychart.ConsistencyState.LABELS_FACTORY_CACHE)) {
+    factory.dropCallsCache(this.getIndex());
+    this.markConsistent(anychart.ConsistencyState.LABELS_FACTORY_CACHE);
+  }
+
   if (this.checkInvalidationState(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.BOUNDS)) {
     this.dropMergedSettings();
     this.getMergedSettings();
     mergedSettings = this.mergedSettings;
 
     var formatProvider = this.formatProvider();
-    if (goog.isDef(formatProvider) && formatProvider['series'] && (!this.formatCallsCache_ || !goog.isDef(this.formatCallsCache_[this.getIndex()]))) {
-      var series = /** @type {{getIterator: Function}} */ (formatProvider['series']);
-      series.getIterator().select(goog.isDef(formatProvider['index']) ? formatProvider['index'] : this.getIndex());
-    }
     var text = factory.callFormat(mergedSettings['format'], formatProvider, this.getIndex());
 
     this.layer_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
