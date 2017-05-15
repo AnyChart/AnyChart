@@ -2492,6 +2492,9 @@ goog.provide('anychart.themes.defaultTheme');
     'mekko': {
       'defaultSeriesType': 'mekko',
       'isVertical': false,
+      'labels': {
+        'enabled': true
+      },
       'defaultSeriesSettings': {
         'base': {
           'fill': returnSourceColor85,
@@ -2504,7 +2507,8 @@ goog.provide('anychart.themes.defaultTheme');
             'format': VALUE_TOKEN_DECIMALS_COUNT_2,
             'position': 'center',
             'anchor': 'center',
-            'offsetY': 0
+            'offsetY': 0,
+            'fontColor': fontColorReversedNormal
           },
           'markers': {
             'position': 'center',
@@ -2536,7 +2540,7 @@ goog.provide('anychart.themes.defaultTheme');
           'padding': {'top': 0, 'right': 0, 'bottom': 5, 'left': 0}
         },
         'labels': {
-          'format': VALUE_TOKEN_DECIMALS_COUNT_10
+          'format': VALUE_TOKEN_DECIMALS_COUNT_10 + '%'
         },
         'scale': 1
       },
@@ -2586,7 +2590,10 @@ goog.provide('anychart.themes.defaultTheme');
       },
       'defaultYAxisSettings': {
         'stroke': 0,
-        'ticks': {'enabled': false}
+        'ticks': {'enabled': false},
+        'labels': {
+          'format': '{%Value}'
+        }
       }
     },
     // merge with mekko
@@ -2638,13 +2645,22 @@ goog.provide('anychart.themes.defaultTheme');
           'labels': {
             'format': VALUE_TOKEN_DECIMALS_COUNT_2,
             'anchor': 'auto',
-            'position': 'value'
+            'position': 'value',
+            'fontColor': fontColorNormal
           },
           'markers': {
             'position': 'value',
             'positionFormatter': returnValue
           }
         }
+      },
+      'defaultYAxisSettings': {
+        'labels': {
+          'format': VALUE_TOKEN_DECIMALS_COUNT_10
+        }
+      },
+      'labels': {
+        'enabled': false
       }
     },
 

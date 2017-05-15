@@ -169,7 +169,7 @@ anychart.core.drawers.Base.prototype.startDrawing = function(shapeManager) {
    * @type {boolean}
    * @private
    */
-  this.individualPointWidths_ = this.series.getXScale() instanceof anychart.scales.Ordinal && this.series.getXScale().checkWeights();
+  this.individualPointWidths_ = Boolean(this.series.getXScale()) && this.series.getXScale().checkWeights();
 };
 
 
@@ -195,8 +195,10 @@ anychart.core.drawers.Base.prototype.drawPointInternal_ = function(point, state)
     this.drawMissingPoint(point, state | this.seriesState);
     this.prevPointDrawn = this.prevPointDrawn && this.connectMissing;
   } else {
-    if (this.individualPointWidths_)
-      this.pointWidth = this.series.getCategoryWidth(point.getIndex());
+    if (this.individualPointWidths_) {
+      var i = goog.isDef(point.meta('category')) ? /** @type {number} */(point.meta('category')) : point.getIndex();
+      this.pointWidth = this.series.getCategoryWidth(i);
+    }
 
     if (this.prevPointDrawn)
       this.drawSubsequentPoint(point, state | this.seriesState);

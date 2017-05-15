@@ -57,6 +57,7 @@ anychart.core.drawers.Mekko.prototype.requiredShapes = (function() {
 
 /** @inheritDoc */
 anychart.core.drawers.Mekko.prototype.drawSubsequentPoint = function(point, state) {
+  if (point.meta('missing')) return;
   var shapes = /** @type {Object.<acgraph.vector.Path>} */(this.shapesManager.getShapesGroup(state));
   this.drawPoint_(point, shapes);
 };
@@ -130,6 +131,7 @@ anychart.core.drawers.Mekko.prototype.drawPoint_ = function(point, shapes, opt_u
 
 /** @inheritDoc */
 anychart.core.drawers.Mekko.prototype.updatePointInternal = function(point, state) {
+  if (point.meta('missing')) return;
   var shapes = /** @type {Object.<acgraph.vector.Path>} */(point.meta('shapes'));
   for (var i in shapes)
     shapes[i].clear();

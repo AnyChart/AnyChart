@@ -204,6 +204,12 @@ anychart.scales.Base.prototype.finishAutoCalc = function(opt_silently) {
 anychart.scales.Base.prototype.checkScaleChanged = goog.abstractMethod;
 
 
+/** @inheritDoc */
+anychart.scales.Base.prototype.checkWeights = function() {
+  return false;
+};
+
+
 //region --- Section Internal methods ---
 //----------------------------------------------------------------------------------------------------------------------
 //

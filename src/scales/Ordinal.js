@@ -187,10 +187,7 @@ anychart.scales.Ordinal.prototype.names = function(opt_value) {
 };
 
 
-/**
- * Checks if weights array is valuable.
- * @return {boolean}
- */
+/** @inheritDoc */
 anychart.scales.Ordinal.prototype.checkWeights = function() {
   if (!this.weights_.length) return false;
 

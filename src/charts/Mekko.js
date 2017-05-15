@@ -316,23 +316,40 @@ anychart.charts.Mekko.prototype.calculate = function() {
     var j;
     var seriesData;
     var weights = [];
+    var missings = [];
+    var numOfSeries = this.drawingPlans.length;
+
     for (i = 0; i < this.drawingPlans.length; i++) {
       seriesData = this.drawingPlans[i].data;
       for (j = 0; j < seriesData.length; j++) {
-        var value = anychart.utils.toNumber(seriesData[j].data['value']);
-        if (this.barmekkoMode_)
-          value = Math.abs(value);
-        else
-          value = value > 0 ? value : 0;
-
-        if (weights[j] == void 0) {
-          weights.push(value);
+        if (!goog.isDef(missings[j])) missings[j] = 0;
+        if (seriesData[j].meta['missing']) {
+          missings[j]++;
+          value = 0;
         } else {
-          weights[j] += value;
+          var value = anychart.utils.toNumber(seriesData[j].data['value']);
+          if (this.barmekkoMode_)
+            value = Math.abs(value);
+          else
+            value = value < 0 ? 0 : value;
         }
+        if (weights[j] == void 0)
+          weights.push(value);
+        else
+          weights[j] += value;
       }
     }
-
+    // update category indexes for excluded points processing
+    for (i = 0; i < this.drawingPlans.length; i++) {
+      seriesData = this.drawingPlans[i].data;
+      var category = 0;
+      for (j = 0; j < seriesData.length; j++) {
+        seriesData[j].meta['category'] = missings[j] < numOfSeries ? category++ : category;
+      }
+    }
+    weights = goog.array.filter(weights, function(el, index) {
+      return missings[index] < numOfSeries;
+    });
     this.xScale().setAutoWeights(weights);
   }
 
@@ -348,25 +365,31 @@ anychart.charts.Mekko.prototype.calculate = function() {
  */
 anychart.charts.Mekko.prototype.calculateCategoriesScales = function() {
   if (this.drawingPlans.length) {
-    var values = [];
+    var leftValues = [];
+    var rightValues = [];
     var leftWeights = [];
     var rightWeights = [];
     var rightIndex = this.drawingPlans[0].data.length - 1;
     for (var i = 0; i < this.drawingPlans.length; i++) {
-      values.push(this.drawingPlans[i].series.name());
-      leftWeights.push(this.drawingPlans[i].data[0].data['value']);
-      rightWeights.push(this.drawingPlans[i].data[rightIndex].data['value']);
+      if (!this.drawingPlans[i].data[0].meta['missing']) {
+        leftValues.push(this.drawingPlans[i].series.name());
+        leftWeights.push(this.drawingPlans[i].data[0].data['value']);
+      }
+      if (!this.drawingPlans[i].data[rightIndex].meta['missing']) {
+        rightValues.push(this.drawingPlans[i].series.name());
+        rightWeights.push(this.drawingPlans[i].data[rightIndex].data['value']);
+      }
     }
 
     var scale = this.firstCategoriesScale();
     scale.startAutoCalc();
-    scale.extendDataRange.apply(/** @type {anychart.scales.Ordinal} */(scale), values);
+    scale.extendDataRange.apply(/** @type {anychart.scales.Ordinal} */(scale), leftValues);
     scale.finishAutoCalc();
     scale.setAutoWeights(leftWeights);
 
     scale = this.lastCategoriesScale();
     scale.startAutoCalc();
-    scale.extendDataRange.apply(/** @type {anychart.scales.Ordinal} */(scale), values);
+    scale.extendDataRange.apply(/** @type {anychart.scales.Ordinal} */(scale), rightValues);
     scale.finishAutoCalc();
     scale.setAutoWeights(rightWeights);
   }
@@ -405,7 +428,7 @@ anychart.charts.Mekko.prototype.createSeriesInstance = function(type, config) {
 
 /** @inheritDoc */
 anychart.charts.Mekko.prototype.normalizeSeriesType = function(type) {
-  return anychart.enums.normalizeMekkoSeriesType(type);
+  return anychart.enums.MekkoSeriesType.MEKKO;
 };
 
 
