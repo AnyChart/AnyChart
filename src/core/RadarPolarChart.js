@@ -761,5 +761,7 @@ anychart.core.RadarPolarChart.prototype.serializeGrid_ = function(item, scales, 
   proto['removeSeriesAt'] = proto.removeSeriesAt;
   proto['removeAllSeries'] = proto.removeAllSeries;
   proto['getPlotBounds'] = proto.getPlotBounds;
+  proto['getXScales'] = proto.getXScales;
+  proto['getYScales'] = proto.getYScales;
 })();
 //endregion

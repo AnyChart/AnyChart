@@ -82,12 +82,13 @@ anychart.ConsistencyState = {
   SCALE_CHART_SCALE_MAPS: 1 << 17,
   SCALE_CHART_Y_SCALES: 1 << 18,
   SCALE_CHART_STATISTICS: 1 << 19,
+  SCALE_CHART_SCALES_STATISTICS: 1 << 20,
   //---------------------------------- CHART WITH AXES STATES (SCALE_CHART) -------------------------------
-  AXES_CHART_AXES: 1 << 20,
-  AXES_CHART_AXES_MARKERS: 1 << 21,
-  AXES_CHART_GRIDS: 1 << 22,
-  AXES_CHART_CROSSHAIR: 1 << 23,
-  AXES_CHART_ANNOTATIONS: 1 << 24,
+  AXES_CHART_AXES: 1 << 21,
+  AXES_CHART_AXES_MARKERS: 1 << 22,
+  AXES_CHART_GRIDS: 1 << 23,
+  AXES_CHART_CROSSHAIR: 1 << 24,
+  AXES_CHART_ANNOTATIONS: 1 << 25,
   AXES_CHART_QUARTER: 1 << 25,
   AXES_CHART_CROSSLINES: 1 << 26,
   //---------------------------------- CARTESIAN STATES (AXES_CHART) ---------------------------------
@@ -122,10 +123,10 @@ anychart.ConsistencyState = {
   MAP_GRIDS: 1 << 26,
   MAP_CROSSHAIR: 1 << 27,
   //---------------------------------- HEAT MAP STATES (CARTESIAN_BASE) ---------------------------------
-  HEATMAP_COLOR_SCALE: 1 << 27,
-  HEATMAP_Y_SCROLLER: 1 << 28,
+  HEATMAP_COLOR_SCALE: 1 << 28,
+  HEATMAP_Y_SCROLLER: 1 << 29,
   //---------------------------------- MEKKO STATES (AXES_CHART) ---------------------------------
-  MEKKO_CATEGORY_SCALE: 1 << 25,
+  MEKKO_CATEGORY_SCALE: 1 << 26,
   //---------------------------------- SERIES STATES (VB) ---------------------------------
   // also combined, due to a very big prefix
   SERIES_HATCH_FILL: 1 << 6, //

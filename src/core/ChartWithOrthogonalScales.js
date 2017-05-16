@@ -109,7 +109,8 @@ anychart.core.ChartWithOrthogonalScales.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.SCALE_CHART_SCALES |
     anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS |
     anychart.ConsistencyState.SCALE_CHART_Y_SCALES |
-    anychart.ConsistencyState.SCALE_CHART_STATISTICS;
+    anychart.ConsistencyState.SCALE_CHART_STATISTICS |
+    anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS;
 
 
 //endregion
@@ -341,7 +342,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.ensureStatisticsReady = functi
 
 /** @inheritDoc */
 anychart.core.ChartWithOrthogonalScales.prototype.drawInternal = function() {
-  if (!this.isConsistent(anychart.ConsistencyState.SCALE_CHART_STATISTICS))
+  if (!this.isConsistent(anychart.ConsistencyState.SCALE_CHART_STATISTICS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS))
     anychart.core.ChartWithOrthogonalScales.base(this, 'drawInternal');
 };
 
@@ -960,7 +961,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
     }
 
 
-    this.invalidate(anychart.ConsistencyState.SCALE_CHART_STATISTICS);
+    this.invalidate(anychart.ConsistencyState.SCALE_CHART_STATISTICS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS);
     this.markConsistent(anychart.ConsistencyState.SCALE_CHART_Y_SCALES);
     anychart.performance.end('Y scales calculation');
   }
@@ -1057,12 +1058,98 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateXYScales = function()
         yScale.finishAutoCalc();
     }
 
-    this.invalidate(anychart.ConsistencyState.SCALE_CHART_STATISTICS);
+    this.invalidate(anychart.ConsistencyState.SCALE_CHART_STATISTICS | anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS);
 
     anychart.core.Base.resumeSignalsDispatchingFalse(this.seriesList);
     this.markConsistent(anychart.ConsistencyState.SCALE_CHART_SCALES | anychart.ConsistencyState.SCALE_CHART_Y_SCALES);
     anychart.performance.end('X scales, drawing plans and Y scales calculation');
   }
+};
+
+
+/**
+ * Returns scales list as array.
+ * @param {Object} scales Scales map.
+ * @return {Array}
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.getScales = function(scales) {
+  var scalesList = [];
+  for (var uid in scales)
+    scalesList.push(scales[uid]);
+  return scalesList;
+};
+
+
+/**
+ * Returns chart x scales.
+ * @return {Array}
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.getXScales = function() {
+  this.calculate();
+  return this.getScales(this.xScales);
+};
+
+
+/**
+ * Returns chart y scales.
+ * @return {Array}
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.getYScales = function() {
+  this.calculate();
+  return this.getScales(this.yScales);
+};
+
+
+/**
+ * Calculates scales min and max and writes it to chart statistics.
+ * @param {Array} xScales
+ * @param {Array} yScales
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.calculateScalesMinMaxStatistics = function(xScales, yScales) {
+  var scale, i;
+
+  var xScaleMin;
+  var xScaleMax;
+  for (i = 0; i < xScales.length; i++) {
+    scale = xScales[i];
+    if (scale instanceof anychart.scales.ScatterBase) {
+      if (!goog.isDef(xScaleMin)) {
+        xScaleMin = scale.minimum();
+        xScaleMax = scale.maximum();
+        continue;
+      }
+      xScaleMin = Math.min(scale.minimum(), xScaleMin);
+      xScaleMax = Math.max(scale.maximum(), xScaleMax);
+    }
+  }
+
+  var yScaleMin;
+  var yScaleMax;
+  for (i = 0; i < yScales.length; i++) {
+    scale = yScales[i];
+    if (scale instanceof anychart.scales.ScatterBase) {
+      if (!goog.isDef(yScaleMin)) {
+        yScaleMin = scale.minimum();
+        yScaleMax = scale.maximum();
+        continue;
+      }
+      yScaleMin = Math.min(scale.minimum(), yScaleMin);
+      yScaleMax = Math.max(scale.maximum(), yScaleMax);
+    }
+  }
+
+  this.statistics(anychart.enums.Statistics.X_SCALES_MIN, xScaleMin);
+  this.statistics(anychart.enums.Statistics.X_SCALES_MAX, xScaleMax);
+  this.statistics(anychart.enums.Statistics.Y_SCALES_MIN, yScaleMin);
+  this.statistics(anychart.enums.Statistics.Y_SCALES_MAX, yScaleMax);
+};
+
+
+/**
+ * Calculates statistics for scales.
+ */
+anychart.core.ChartWithOrthogonalScales.prototype.calculateScalesStatistics = function() {
+  this.calculateScalesMinMaxStatistics(this.getXScales(), this.getYScales());
 };
 
 
@@ -1374,6 +1461,10 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateStatistics = function
 
     this.markConsistent(anychart.ConsistencyState.SCALE_CHART_STATISTICS);
     anychart.performance.end('Statistics calculation');
+  }
+  if (this.hasInvalidationState(anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS)) {
+    this.calculateScalesStatistics();
+    this.markConsistent(anychart.ConsistencyState.SCALE_CHART_SCALES_STATISTICS);
   }
 };
 

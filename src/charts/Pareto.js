@@ -607,4 +607,6 @@ anychart.charts.Pareto.prototype.setupByJSON = function(config, opt_default) {
   proto['xScroller'] = proto.xScroller;
   proto['getStat'] = proto.getStat;
   proto['annotations'] = proto.annotations;
+  proto['getXScales'] = proto.getXScales;
+  proto['getYScales'] = proto.getYScales;
 })();

@@ -5446,6 +5446,11 @@ anychart.enums.Statistics = {
    The y value of this point.*/
   Y_VALUE: 'yValue',
 
+  X_SCALES_MIN: 'xScalesMin',
+  X_SCALES_MAX: 'xScalesMax',
+  Y_SCALES_MIN: 'yScalesMin',
+  Y_SCALES_MAX: 'yScalesMax',
+
   //--------------------------------------------------------------------------------------------------------------------
   // Private values. Do not export.
   //--------------------------------------------------------------------------------------------------------------------
@@ -6683,6 +6688,10 @@ goog.exportSymbol('anychart.enums.Statistics.Y_PERCENT_OF_CATEGORY', anychart.en
 goog.exportSymbol('anychart.enums.Statistics.Y_PERCENT_OF_SERIES', anychart.enums.Statistics.Y_PERCENT_OF_SERIES);
 goog.exportSymbol('anychart.enums.Statistics.Y_PERCENT_OF_TOTAL', anychart.enums.Statistics.Y_PERCENT_OF_TOTAL);
 goog.exportSymbol('anychart.enums.Statistics.Y_VALUE', anychart.enums.Statistics.Y_VALUE);
+goog.exportSymbol('anychart.enums.Statistics.X_SCALES_MIN', anychart.enums.Statistics.X_SCALES_MIN);
+goog.exportSymbol('anychart.enums.Statistics.X_SCALES_MAX', anychart.enums.Statistics.X_SCALES_MAX);
+goog.exportSymbol('anychart.enums.Statistics.Y_SCALES_MIN', anychart.enums.Statistics.Y_SCALES_MIN);
+goog.exportSymbol('anychart.enums.Statistics.Y_SCALES_MAX', anychart.enums.Statistics.Y_SCALES_MAX);
 
 goog.exportSymbol('anychart.enums.ChartDataExportMode.RAW', anychart.enums.ChartDataExportMode.RAW);
 goog.exportSymbol('anychart.enums.ChartDataExportMode.SPECIFIC', anychart.enums.ChartDataExportMode.SPECIFIC);

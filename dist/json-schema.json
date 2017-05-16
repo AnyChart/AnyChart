@@ -776,7 +776,8 @@
               {"$ref": "#/definitions/anychart.core.polar.series.Line"},
               {"$ref": "#/definitions/anychart.core.polar.series.Polygon"},
               {"$ref": "#/definitions/anychart.core.polar.series.Polyline"},
-              {"$ref": "#/definitions/anychart.core.polar.series.Marker"}
+              {"$ref": "#/definitions/anychart.core.polar.series.Marker"},
+              {"$ref": "#/definitions/anychart.core.polar.series.Column"}
             ]
           }
         },
@@ -2905,6 +2906,15 @@
       ],
       "properties": {
         "seriesType": {"enum": ["area"]}
+      }
+    },
+    "anychart.core.polar.series.Column": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.series.Base"}
+      ],
+      "properties": {
+        "seriesType": {"enum": ["column", "rangeColumn"]}
       }
     },
     "anychart.core.polar.series.Line": {

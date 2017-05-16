@@ -746,4 +746,6 @@ anychart.charts.Cartesian3d.prototype.serialize = function() {
   proto['zPadding'] = proto.zPadding;
   proto['getStat'] = proto.getStat;
   proto['zDepth'] = proto.zDepth; // deprecated
+  proto['getXScales'] = proto.getXScales;
+  proto['getYScales'] = proto.getYScales;
 })();

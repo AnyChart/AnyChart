@@ -416,4 +416,6 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN] = anychart.cartesian
   proto['getStat'] = proto.getStat;
   proto['zDepth'] = proto.zDepth; // deprecated
   proto['annotations'] = proto.annotations;
+  proto['getXScales'] = proto.getXScales;
+  proto['getYScales'] = proto.getYScales;
 })();
