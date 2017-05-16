@@ -89,11 +89,11 @@ anychart.ConsistencyState = {
   AXES_CHART_GRIDS: 1 << 23,
   AXES_CHART_CROSSHAIR: 1 << 24,
   AXES_CHART_ANNOTATIONS: 1 << 25,
-  AXES_CHART_QUARTER: 1 << 25,
-  AXES_CHART_CROSSLINES: 1 << 26,
+  AXES_CHART_QUARTER: 1 << 26,
+  AXES_CHART_CROSSLINES: 1 << 27,
   //---------------------------------- CARTESIAN STATES (AXES_CHART) ---------------------------------
-  CARTESIAN_ZOOM: 1 << 27,
-  CARTESIAN_X_SCROLLER: 1 << 28,
+  CARTESIAN_ZOOM: 1 << 28,
+  CARTESIAN_X_SCROLLER: 1 << 29,
   //---------------------------------- PYRAMID/FUNNEL STATES (CHART) ---------------------------------
   PYRAMID_FUNNEL_LABELS: 1 << 12,
   PYRAMID_FUNNEL_MARKERS: 1 << 13,
@@ -123,10 +123,10 @@ anychart.ConsistencyState = {
   MAP_GRIDS: 1 << 26,
   MAP_CROSSHAIR: 1 << 27,
   //---------------------------------- HEAT MAP STATES (CARTESIAN_BASE) ---------------------------------
-  HEATMAP_COLOR_SCALE: 1 << 28,
-  HEATMAP_Y_SCROLLER: 1 << 29,
+  HEATMAP_COLOR_SCALE: 1 << 30,
+  HEATMAP_Y_SCROLLER: 1 << 31,
   //---------------------------------- MEKKO STATES (AXES_CHART) ---------------------------------
-  MEKKO_CATEGORY_SCALE: 1 << 26,
+  MEKKO_CATEGORY_SCALE: 1 << 28,
   //---------------------------------- SERIES STATES (VB) ---------------------------------
   // also combined, due to a very big prefix
   SERIES_HATCH_FILL: 1 << 6, //
