@@ -1150,6 +1150,7 @@ anychart.charts.Stock.prototype.finalizePercentStackCalc_ = function(aSeries, sc
   var iterator = /** @type {anychart.data.TableIterator} */(aSeries.getIterator());
   var stacks = stacksByScale[guid];
   scale.extendDataRange(0);
+  var stack;
   var point = aSeries.getSelectableData().getPreFirstRow();
   if (point) {
     stack = stacks[0];
@@ -1158,7 +1159,7 @@ anychart.charts.Stock.prototype.finalizePercentStackCalc_ = function(aSeries, sc
   var k = 1;
   iterator.reset();
   while (iterator.advance()) {
-    var stack = stacks[k++];
+    stack = stacks[k++];
     this.finalizePercentStack_(iterator, scale, stack);
   }
   point = aSeries.getSelectableData().getPostLastRow();

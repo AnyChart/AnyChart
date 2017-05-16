@@ -318,6 +318,7 @@ anychart.charts.Mekko.prototype.calculate = function() {
     var weights = [];
     var missings = [];
     var numOfSeries = this.drawingPlans.length;
+    var value;
 
     for (i = 0; i < this.drawingPlans.length; i++) {
       seriesData = this.drawingPlans[i].data;
@@ -327,7 +328,7 @@ anychart.charts.Mekko.prototype.calculate = function() {
           missings[j]++;
           value = 0;
         } else {
-          var value = anychart.utils.toNumber(seriesData[j].data['value']);
+          value = anychart.utils.toNumber(seriesData[j].data['value']);
           if (this.barmekkoMode_)
             value = Math.abs(value);
           else
