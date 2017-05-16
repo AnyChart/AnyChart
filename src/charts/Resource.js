@@ -1975,7 +1975,7 @@ anychart.charts.Resource.prototype.createTooltipContextProvider = function() {
     'intervals': {value: intervals, type: anychart.enums.TokenType.UNKNOWN},
     'start': {value: start, type: anychart.enums.TokenType.NUMBER},
     'end': {value: end, type: anychart.enums.TokenType.NUMBER},
-    'minutesPerDay': {value: (intervals.length == 1) ? intervals[0]['minutesPerDay'] : NaN, type: anychart.enums.TokenType.NUMBER},
+    'minutesPerDay': {value: (intervals.length == 1) ? intervals[0]['minutesPerDay'] : NaN, type: anychart.enums.TokenType.NUMBER}
   };
 
   var tokenCustomValues = {

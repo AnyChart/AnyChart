@@ -75,9 +75,7 @@ anychart.math.bbandsB.calculationFunction = function(row, context) {
     dequeuedValue = /** @type {number} */ (queue.enqueue(currValue));
 
   var result = 0;
-  var i;
-  var h;
-  var l;
+  var i, h, l, dist;
   if (missing || queue.getLength() < period) {
     // queue doesn't filled
     result = NaN;
@@ -110,7 +108,7 @@ anychart.math.bbandsB.calculationFunction = function(row, context) {
       context.prevResult = prevResult + result;
       result = prevDeviation * prevDeviation * period;
       var distPrev = dequeuedValue - prevResult;
-      var dist = /** @type {number} */ (queue.get(-1)) - context.prevResult;
+      dist = /** @type {number} */ (queue.get(-1)) - context.prevResult;
       var diff = prevResult - context.prevResult;
       result =
           result +

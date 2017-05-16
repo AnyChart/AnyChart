@@ -241,7 +241,7 @@ anychart.charts.Gantt.prototype.createFormatProvider = function(item, opt_period
   var values = {
     'item': {value: item, type: anychart.enums.TokenType.UNKNOWN},
     'name': {value: item.get(anychart.enums.GanttDataFields.NAME), type: anychart.enums.TokenType.STRING},
-    'id': {value: item.get(anychart.enums.GanttDataFields.ID), type: anychart.enums.TokenType.STRING},
+    'id': {value: item.get(anychart.enums.GanttDataFields.ID), type: anychart.enums.TokenType.STRING}
   };
 
   if (isResources) {

@@ -1215,13 +1215,14 @@ anychart.core.ui.Table.prototype.checkOverlap_ = function() {
  * @private
  */
 anychart.core.ui.Table.prototype.checkFills_ = function() {
+  var bounds;
   if (this.hasInvalidationState(anychart.ConsistencyState.TABLE_FILLS)) {
     this.resetFillPaths_();
     for (var row = 0; row < this.rowsCount_; row++) {
       for (var col = 0; col < this.colsCount_; col++) {
         var cell = this.cells_[row * this.colsCount_ + col];
         if (isNaN(cell.overlapper)) {
-          var bounds = this.getCellBounds(row, col,
+          bounds = this.getCellBounds(row, col,
               /** @type {number} */(cell.rowSpan()),
               /** @type {number} */(cell.colSpan()), bounds); // rect will be created one time and then reused
           var fill = this.getCellFill_(cell, row, col);
@@ -1502,7 +1503,7 @@ anychart.core.ui.Table.prototype.drawBorder_ = function(row, col, rowSpan, colSp
   if (stroke && stroke != 'none') {
     var lineThickness = stroke['thickness'] ? stroke['thickness'] : 1;
     var pixelShift = (lineThickness % 2) ? 0.5 : 0;
-    var bounds = this.getCellBounds(row, col, rowSpan, colSpan, bounds);
+    var bounds = this.getCellBounds(row, col, rowSpan, colSpan);
     var path = this.getBorderPath_(stroke);
     switch (side) {
       case 0: // top

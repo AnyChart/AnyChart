@@ -284,6 +284,8 @@ def __get_default_compiler_args(theme, modules):
         '--charset UTF-8',
         '--define "anychart.VERSION=\'%s\'"' % __get_version(True),
         '--dependency_mode=STRICT',
+        '--language_in ECMASCRIPT3',
+        '--language_out ECMASCRIPT3',
         # '--externs ' + EXTERNS_PATH,
         '--extra_annotation_name "includeDoc"',
         '--extra_annotation_name "illustration"',

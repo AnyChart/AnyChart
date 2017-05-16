@@ -1417,7 +1417,7 @@ anychart.themes.merging.mergingMap_ = [
       'mekko.defaultAnnotationSettings.marker',
       'mekko.defaultAnnotationSettings.label'
     ]
-  },
+  }
 ];
 
 

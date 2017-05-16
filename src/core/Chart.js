@@ -2183,7 +2183,7 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
   var isMarkersFactory = event['target'] instanceof anychart.core.ui.MarkersFactory;
   var isTargetLegendOrColorRange = isLegend || isColorRange;
 
-  var series, s, index;
+  var series, s, index, points;
   if (isTargetLegendOrColorRange) {
     if (tag) {
       points = tag.points_ || tag.points;
@@ -2379,7 +2379,6 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
           if (series.selectionMode() == anychart.enums.SelectionMode.NONE)
             continue;
 
-          var points;
           if (series.selectionMode() == anychart.enums.SelectionMode.SINGLE_SELECT) {
             points = [seriesStatus_.nearestPointToCursor.index];
           } else {

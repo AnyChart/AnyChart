@@ -3373,6 +3373,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
     this.invalidate(state);
   }
 
+  var viewSpacePath;
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_ZOOM)) {
     var srcZoom = this.getZoomLevel();
     var dstZoom = this.zoomInc * srcZoom;
@@ -3486,7 +3487,7 @@ anychart.charts.Map.prototype.drawContent = function(bounds) {
 
   if (this.hasInvalidationState(anychart.ConsistencyState.MAP_MOVE)) {
     if (this.getZoomLevel() != minZoomLevel && mapLayer) {
-      var viewSpacePath = this.scale().getViewSpace();
+      viewSpacePath = this.scale().getViewSpace();
       boundsWithoutTx = viewSpacePath.getBoundsWithoutTransform();
       boundsWithTx = viewSpacePath.getBoundsWithTransform(mapLayer.getFullTransformation());
 

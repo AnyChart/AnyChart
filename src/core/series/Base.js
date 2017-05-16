@@ -3561,7 +3561,7 @@ anychart.core.series.Base.prototype.updateContext = function(provider, opt_rowIn
     'xScale': {value: scale, type: anychart.enums.TokenType.UNKNOWN},
     'index': {value: rowInfo.getIndex(), type: anychart.enums.TokenType.NUMBER},
     'x': {value: rowInfo.get('x'), type: anychart.enums.TokenType.STRING},
-    'seriesName': {value: this.name(), type: anychart.enums.TokenType.STRING},
+    'seriesName': {value: this.name(), type: anychart.enums.TokenType.STRING}
   };
 
   if (scale && goog.isFunction(scale.getType))
