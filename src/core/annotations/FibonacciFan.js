@@ -79,9 +79,9 @@ anychart.core.annotations.FibonacciFan.prototype.timeLevels = function(opt_value
   }
   return goog.array.slice(this.timeLevels_, 0);
 };
+
+
 //endregion
-
-
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -265,9 +265,9 @@ anychart.core.annotations.FibonacciFan.prototype.resolveCustomPreDrawingStates =
   }
   anychart.core.annotations.FibonacciFan.base(this, 'resolveCustomPreDrawingStates');
 };
+
+
 //endregion
-
-
 //region Serialization / Deserialization / Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -310,9 +310,9 @@ anychart.core.annotations.FibonacciFan.prototype.disposeInternal = function() {
   this.gridPaths_ = null;
   delete this.gridResolver;
 };
+
+
 //endregion
-
-
 //export
 (function() {
   var proto = anychart.core.annotations.FibonacciFan.prototype;

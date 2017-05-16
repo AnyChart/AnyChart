@@ -30,9 +30,9 @@ anychart.core.linearGauge.pointers.Bar.prototype.getReferenceValues = function()
   rv.push(0);
   return rv;
 };
+
+
 //endregion
-
-
 //region --- DRAWING ---
 /** @inheritDoc */
 anychart.core.linearGauge.pointers.Bar.prototype.drawVertical = function() {

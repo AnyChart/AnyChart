@@ -55,9 +55,9 @@ goog.inherits(anychart.core.linearGauge.pointers.Led, anychart.core.linearGauge.
 anychart.core.linearGauge.pointers.Led.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.linearGauge.pointers.Base.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.GAUGE_COLOR_SCALE;
+
+
 //endregion
-
-
 //region --- DRAWING ---
 /** @inheritDoc */
 anychart.core.linearGauge.pointers.Led.prototype.createShapes = function() {
@@ -233,17 +233,17 @@ anychart.core.linearGauge.pointers.Led.prototype.colorizePointer = function(poin
   var hatch = this.getFinalHatchFill(true, pointerState);
   this.hatch.stroke('none').fill(hatch);
 };
+
+
 //endregion
-
-
 //region --- INHERITED API ---
 /** @inheritDoc */
 anychart.core.linearGauge.pointers.Led.prototype.getType = function() {
   return anychart.enums.LinearGaugePointerType.LED;
 };
+
+
 //endregion
-
-
 //region --- OWN/SPECIFIC API ---
 /**
  * Calculates ratio by given bound.
@@ -408,9 +408,9 @@ anychart.core.linearGauge.pointers.Led.prototype.colorScaleInvalidated_ = functi
     this.invalidate(anychart.ConsistencyState.APPEARANCE | anychart.ConsistencyState.GAUGE_COLOR_SCALE, anychart.Signal.NEEDS_REDRAW);
   }
 };
+
+
 //endregion
-
-
 //region --- SETUP/DISPOSE ---
 /** @inheritDoc */
 anychart.core.linearGauge.pointers.Led.prototype.serialize = function() {
@@ -477,9 +477,9 @@ anychart.core.linearGauge.pointers.Led.prototype.disposeInternal = function() {
   this.colorScale_ = null;
   anychart.core.linearGauge.pointers.Led.base(this, 'disposeInternal');
 };
+
+
 //endregion
-
-
 //exports
 (function() {
   var proto = anychart.core.linearGauge.pointers.Led.prototype;

@@ -26,9 +26,9 @@ anychart.core.annotations.AnnotationTypes[anychart.enums.AnnotationTypes.FIBONAC
 //----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.annotations.FibonacciArc.prototype.type = anychart.enums.AnnotationTypes.FIBONACCI_ARC;
+
+
 //endregion
-
-
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
 //

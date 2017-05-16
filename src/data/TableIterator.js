@@ -35,9 +35,7 @@ anychart.data.TableIterator = function(mapping, selection, metaObj, usesAggregat
    * @type {!anychart.data.TableRow}
    * @private
    */
-  this.preFirst_ = new anychart.data.TableRow(selection.firstIndex - 1, []);
-  // we do not use selection.preFirstRow here, since it can be null, while firstRow is not -
-  // when firstRow is the first element in storage. Also we store the first index in this.preFirst_.key
+  this.preFirst_ = new anychart.data.TableRow(isNaN(selection.preFirstIndex) ? -1 : selection.preFirstIndex, []);
   this.preFirst_.next = selection.firstRow;
 
   /**
@@ -48,11 +46,11 @@ anychart.data.TableIterator = function(mapping, selection, metaObj, usesAggregat
   this.stop_ = selection.postLastRow;
 
   /**
-   * Last index of the selection. Currently used to determine rows count.
+   * Rows count.
    * @type {number}
    * @private
    */
-  this.lastIndex_ = selection.lastIndex;
+  this.rowsCount_ = (selection.lastIndex - selection.firstIndex + 1) || 0;
 
   /**
    * CoIterator.
@@ -234,8 +232,7 @@ anychart.data.TableIterator.prototype.getIndex = function() {
  * @return {number}
  */
 anychart.data.TableIterator.prototype.getRowsCount = function() {
-  // no +1 because pre-first key is firstIndex - 1 already.
-  return this.lastIndex_ - this.preFirst_.key;
+  return this.rowsCount_;
 };
 
 

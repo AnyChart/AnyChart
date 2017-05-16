@@ -88,9 +88,9 @@ anychart.core.annotations.ChartController.prototype.deregisterPlotController = f
   if (this.plotControllers_)
     goog.array.remove(this.plotControllers_, plotController);
 };
+
+
 //endregion
-
-
 //region Annotations interactivity
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -216,9 +216,8 @@ anychart.core.annotations.ChartController.prototype.ready = function(opt_value) 
   return this.ready_;
 };
 
+
 //endregion
-
-
 //region Annotations removing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -250,9 +249,9 @@ anychart.core.annotations.ChartController.prototype.removeAnnotation = function(
   }
   return this;
 };
+
+
 //endregion
-
-
 //region Constructors
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -318,9 +317,9 @@ anychart.core.annotations.ChartController.prototype.createAnnotationByType = fun
   annotation.setup(config);
   return annotation;
 };
+
+
 //endregion
-
-
 //region Serialization / Deserialization / Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -334,9 +333,9 @@ anychart.core.annotations.ChartController.prototype.disposeInternal = function()
 
   anychart.core.annotations.ChartController.base(this, 'disposeInternal');
 };
+
+
 //endregion
-
-
 //exports
 (function() {
   var proto = anychart.core.annotations.ChartController.prototype;

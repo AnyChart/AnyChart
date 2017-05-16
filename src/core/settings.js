@@ -259,9 +259,9 @@ anychart.core.settings.createTextPropertiesDescriptors = function(invalidateBoun
 
   return map;
 };
+
+
 //endregion
-
-
 //region Functions to work with settings
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -362,9 +362,9 @@ anychart.core.settings.copy = function(target, descriptors, config) {
       target[name] = val;
   }
 };
+
+
 //endregion
-
-
 //region Handlers
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -490,9 +490,9 @@ anychart.core.settings.handlersMap = (function() {
   map[anychart.enums.PropertyHandlerType.MULTI_ARG_DEPRECATED] = anychart.core.settings.multiArgsDeprecatedHandler;
   return map;
 })();
+
+
 //endregion
-
-
 //region Normalizers
 //----------------------------------------------------------------------------------------------------------------------
 //

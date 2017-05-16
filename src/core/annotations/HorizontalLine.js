@@ -55,9 +55,9 @@ anychart.core.annotations.HorizontalLine.prototype.type = anychart.enums.Annotat
  * @type {anychart.core.annotations.AnchorSupport}
  */
 anychart.core.annotations.HorizontalLine.prototype.SUPPORTED_ANCHORS = anychart.core.annotations.AnchorSupport.VALUE;
+
+
 //endregion
-
-
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -99,9 +99,9 @@ anychart.core.annotations.HorizontalLine.prototype.colorize = function(state) {
       .fill(anychart.color.TRANSPARENT_HANDLER)
       .stroke(/** @type {acgraph.vector.SolidFill} */(anychart.color.TRANSPARENT_HANDLER), this['hoverGap']() * 2);
 };
+
+
 //endregion
-
-
 //region Serialization / Deserialization / Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //

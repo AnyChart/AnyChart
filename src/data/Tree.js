@@ -974,9 +974,9 @@ anychart.data.Tree.prototype.serializeWithoutMeta = function() {
 anychart.data.Tree.prototype.mapAs = function(opt_mapping) {
   return new anychart.data.TreeView(this, opt_mapping || {});
 };
+
+
 //endregion
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Tree data item.

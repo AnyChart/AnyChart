@@ -1175,9 +1175,9 @@ anychart.core.stock.Scroller.prototype.invalidateSeries_ = function() {
         anychart.ConsistencyState.SERIES_HATCH_FILL |
         anychart.ConsistencyState.BOUNDS);
 };
+
+
 //endregion
-
-
 //region Infrastructure
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1273,9 +1273,9 @@ anychart.core.stock.Scroller.prototype.grouping = function() {
 anychart.core.stock.Scroller.prototype.isVertical = function() {
   return false;
 };
+
+
 //endregion
-
-
 //region Public methods
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1290,22 +1290,57 @@ anychart.core.stock.Scroller.prototype.isVertical = function() {
 anychart.core.stock.Scroller.prototype.yScale = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (goog.isString(opt_value)) {
-      this.registerDisposable(opt_value = anychart.scales.ScatterBase.fromString(opt_value, false));
+      opt_value = anychart.scales.ScatterBase.fromString(opt_value, false);
     }
     if (!(opt_value instanceof anychart.scales.ScatterBase)) {
       anychart.core.reporting.error(anychart.enums.ErrorCode.INCORRECT_SCALE_TYPE, undefined, ['Scatter chart scales', 'scatter', 'linear, log']);
       return this;
     }
     if (this.yScale_ != opt_value) {
+      if (this.yScale_)
+        this.yScale_.unlistenSignals(this.yScaleInvalidated, this);
       this.yScale_ = opt_value;
+      if (this.yScale_)
+        this.yScale_.listenSignals(this.yScaleInvalidated, this);
+      for (var i = 0; i < this.series_.length; i++) {
+        var series = this.series_[i];
+        if (series && series.enabled() && series.yScale() == this.yScale_) {
+          series.invalidate(anychart.ConsistencyState.SERIES_POINTS);
+          this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_SERIES);
+        }
+      }
+      this.dispatchSignal(anychart.Signal.NEEDS_REDRAW);
     }
     return this;
   } else {
     if (!this.yScale_) {
       this.yScale_ = anychart.scales.linear();
-      this.registerDisposable(this.yScale_);
+      this.yScale_.listenSignals(this.yScaleInvalidated, this);
     }
     return this.yScale_;
+  }
+};
+
+
+/**
+ * Scale invalidation handler.
+ * @param {anychart.SignalEvent} e
+ * @protected
+ */
+anychart.core.stock.Scroller.prototype.yScaleInvalidated = function(e) {
+  var foundOne = 0;
+  for (var i = 0; i < this.series_.length; i++) {
+    var series = this.series_[i];
+    if (series && series.enabled() && series.yScale() == this.yScale_) {
+      foundOne |= series.invalidate(anychart.ConsistencyState.SERIES_POINTS);
+    }
+  }
+  if (foundOne) {
+    var signal = anychart.Signal.NEEDS_REDRAW;
+    if (e.hasSignal(anychart.Signal.NEEDS_RECALCULATION)) {
+      signal |= anychart.Signal.NEEDS_RECALCULATION;
+    }
+    this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_SERIES, signal);
   }
 };
 
@@ -1332,9 +1367,9 @@ anychart.core.stock.Scroller.prototype.xAxis = function(opt_value) {
     return this.xAxis_;
   }
 };
+
+
 //endregion
-
-
 //region Invalidation handlers
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1365,9 +1400,9 @@ anychart.core.stock.Scroller.prototype.invalidateScaleDependend = function() {
     this.xAxis_.invalidate(anychart.ConsistencyState.APPEARANCE);
   this.invalidate(anychart.ConsistencyState.STOCK_SCROLLER_SERIES | anychart.ConsistencyState.STOCK_SCROLLER_AXIS);
 };
+
+
 //endregion
-
-
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1423,10 +1458,10 @@ anychart.core.stock.Scroller.prototype.draw = function() {
 
   return this;
 };
+
+
 //endregion
-
-
-//region --- Palettes
+//region Palettes
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Palettes
@@ -1543,9 +1578,9 @@ anychart.core.stock.Scroller.prototype.getKeyByIndex = function(index) {
 anychart.core.stock.Scroller.prototype.getIndexByKey = function(key) {
   return this.chart_.getScrollerIndexByKey(key);
 };
+
+
 //endregion
-
-
 //region Events
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1563,9 +1598,9 @@ anychart.core.stock.Scroller.prototype.makeRangeChangeEvent = function(type, sta
     'source': source
   };
 };
+
+
 //endregion
-
-
 //region Serialization / Deserialization / Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1587,6 +1622,8 @@ anychart.core.stock.Scroller.prototype.disposeInternal = function() {
 
   goog.dispose(this.xAxis_);
   this.xAxis_ = null;
+
+  this.yScale_ = null;
 
   goog.dispose(this.xScale_);
   this.xScale_ = null;
@@ -1683,9 +1720,9 @@ anychart.core.stock.Scroller.prototype.setupByJSON = function(config, opt_defaul
   this.palette(config['palette']);
   this.hatchFillPalette(config['hatchFillPalette']);
 };
+
+
 //endregion
-
-
 //exports
 (function() {
   var proto = anychart.core.stock.Scroller.prototype;

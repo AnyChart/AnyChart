@@ -186,9 +186,9 @@ anychart.core.ui.Separator.prototype.SIMPLE_SEPARATOR_DESCRIPTORS = (function() 
   return map;
 })();
 anychart.core.settings.populate(anychart.core.ui.Separator, anychart.core.ui.Separator.prototype.SIMPLE_SEPARATOR_DESCRIPTORS);
+
+
 //endregion
-
-
 //region -- IObjectWithSettings implementation
 /** @inheritDoc */
 anychart.core.ui.Separator.prototype.getOwnOption = function(name) {
@@ -222,9 +222,9 @@ anychart.core.ui.Separator.prototype.setOption = function(name, value) {
 anychart.core.ui.Separator.prototype.check = function(flags) {
   return true;
 };
+
+
 //endregion
-
-
 //region -- IResolvable implementation
 /** @inheritDoc */
 anychart.core.ui.Separator.prototype.resolutionChainCache = function(opt_value) {
@@ -257,9 +257,9 @@ anychart.core.ui.Separator.prototype.getHighPriorityResolutionChain = function()
   }
   return sett;
 };
+
+
 //endregion
-
-
 //region -- Parental relations
 /**
  * Gets/sets new parent.
@@ -311,9 +311,9 @@ anychart.core.ui.Separator.prototype.parentInvalidated_ = function(e) {
 
   this.invalidate(state, signal);
 };
+
+
 //endregion
-
-
 /**
  * Whether needs force invalidation.
  * @return {boolean}

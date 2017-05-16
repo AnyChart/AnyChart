@@ -153,7 +153,7 @@ anychart.core.series.Stock.prototype.updateComparisonZero = function() {
   /** @type {?anychart.data.TableSelectable.RowProxy} */
   var row;
   var scale = this.yScale();
-  if (this.supportsComparison() && (scale instanceof anychart.scales.Linear)) {
+  if (this.supportsComparison() && !this.planIsStacked() && (scale instanceof anychart.scales.Linear)) {
     var mode = /** @type {anychart.enums.ScaleComparisonMode} */(scale.comparisonMode());
     if (mode != anychart.enums.ScaleComparisonMode.NONE) {
       var changesFrom = /** @type {anychart.enums.ScaleCompareWithMode|number} */(scale.compareWith());
@@ -171,9 +171,9 @@ anychart.core.series.Stock.prototype.updateComparisonZero = function() {
   // if anything went wrong - we get 0 value and fail to make a comparison, which is a good result
   this.comparisonZero = Number(row && row.get('value')) || 0;
 };
+
+
 //endregion
-
-
 //region Working with data
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -281,9 +281,9 @@ anychart.core.series.Stock.prototype.getDetachedIterator = function() {
 anychart.core.series.Stock.prototype.considerMetaEmpty = function() {
   return true;
 };
+
+
 //endregion
-
-
 //region Path manager interface methods
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -304,9 +304,9 @@ anychart.core.series.Stock.prototype.getHatchFillResolutionContext = function(op
     'sourceHatchFill': this.getAutoHatchFill()
   };
 };
+
+
 //endregion
-
-
 //region Drawing points
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -370,9 +370,15 @@ anychart.core.series.Stock.prototype.planHasPointMarkers = function() {
   var column = this.data_.getFieldColumn('marker');
   return (goog.isString(column) || !isNaN(column));
 };
+
+
+/** @inheritDoc */
+anychart.core.series.Stock.prototype.planIsStacked = function() {
+  return this.supportsStack() && this.yScale().stackMode() != anychart.enums.ScaleStackMode.NONE;
+};
+
+
 //endregion
-
-
 //region Interactivity
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -454,9 +460,9 @@ anychart.core.series.Stock.prototype.unhover = function() {
 anychart.core.series.Stock.prototype.getPointState = function(index) {
   return this.getSeriesState();
 };
+
+
 //endregion
-
-
 //region Format/position formatters generation
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -491,9 +497,9 @@ anychart.core.series.Stock.prototype.createLegendContextProvider = function() {
 anychart.core.series.Stock.prototype.getCurrentPoint = function() {
   return this.inHighlight_ ? this.highlightedRow_ : this.lastRow_;
 };
+
+
 //endregion
-
-
 //region Legend
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -582,9 +588,9 @@ anychart.core.series.Stock.prototype.getLegendItemText = function(context) {
   }
   return this.name() + (missing ? '' : result);
 };
+
+
 //endregion
-
-
 //region Serialization/Deserialization/Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -622,9 +628,9 @@ anychart.core.series.Stock.prototype.disposeInternal = function() {
 
   anychart.core.series.Stock.base(this, 'disposeInternal');
 };
+
+
 //endregion
-
-
 //exports
 (function() {
   var proto = anychart.core.series.Stock.prototype;

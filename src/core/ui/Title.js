@@ -218,9 +218,9 @@ anychart.core.ui.Title.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.TITLE_BACKGROUND;
+
+
 //endregion
-
-
 //region -- Optimized props descriptors
 /**
  * Text descriptors.
@@ -295,9 +295,9 @@ anychart.core.ui.Title.prototype.SIMPLE_PROPS_DESCRIPTORS = (function() {
   return map;
 })();
 anychart.core.settings.populate(anychart.core.ui.Title, anychart.core.ui.Title.prototype.SIMPLE_PROPS_DESCRIPTORS);
+
+
 //endregion
-
-
 //region -- IResolvable implementation
 /** @inheritDoc */
 anychart.core.ui.Title.prototype.resolutionChainCache = function(opt_value) {
@@ -353,9 +353,9 @@ anychart.core.ui.Title.prototype.getHighPriorityResolutionChain = function() {
   }
   return sett;
 };
+
+
 //endregion
-
-
 //region -- IObjectWithSettings implementation
 /** @inheritDoc */
 anychart.core.ui.Title.prototype.getOwnOption = function(name) {
@@ -389,9 +389,9 @@ anychart.core.ui.Title.prototype.setOption = function(name, value) {
 anychart.core.ui.Title.prototype.check = function(flags) {
   return true;
 };
+
+
 //endregion
-
-
 //region -- Parental relations
 /**
  * Gets/sets new parent title.
@@ -450,9 +450,9 @@ anychart.core.ui.Title.prototype.parentInvalidated_ = function(e) {
 
   this.invalidate(state, signal);
 };
+
+
 //endregion
-
-
 //region -- Other methods
 /**
  * Getter/setter for background.
@@ -644,9 +644,9 @@ anychart.core.ui.Title.prototype.invalidate = function(state, opt_signal) {
 anychart.core.ui.Title.prototype.needsForceInvalidation = function() {
   return this.forceInvalidate;
 };
+
+
 //endregion
-
-
 //region -- Draw, remove
 /**
  * Initializes DOM structure.
@@ -742,9 +742,9 @@ anychart.core.ui.Title.prototype.remove = function() {
     this.text_.parent(null);
   }
 };
+
+
 //endregion
-
-
 //region -- Util functions
 /**
  * Returns the remaining (after title placement) part of the container.
@@ -1099,9 +1099,9 @@ anychart.core.ui.Title.prototype.boundsInvalidated_ = function(event) {
 anychart.core.ui.Title.prototype.clear = function() {
   if (this.layer_) this.layer_.removeChildren();
 };
+
+
 //endregion
-
-
 //region -- Serialization
 /** @inheritDoc */
 anychart.core.ui.Title.prototype.enabled = function(opt_value) {

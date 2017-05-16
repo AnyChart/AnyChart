@@ -87,9 +87,9 @@ goog.inherits(anychart.core.linearGauge.pointers.Tank, anychart.core.linearGauge
  * @type {number}
  */
 anychart.core.linearGauge.pointers.Tank.MULTIPLIER = 0.14880952380;
+
+
 //endregion
-
-
 //region --- INHERITED API ----
 /** @inheritDoc */
 anychart.core.linearGauge.pointers.Tank.prototype.getType = function() {
@@ -111,9 +111,9 @@ anychart.core.linearGauge.pointers.Tank.prototype.getReservedBounds = function(p
 
   return [left, top, right, bottom];
 };
+
+
 //endregion
-
-
 //region --- BOUNDS ---
 /**
  * Calculate tank bounds.
@@ -170,9 +170,9 @@ anychart.core.linearGauge.pointers.Tank.prototype.getPointY = function(hRadius, 
   if (hRadius <= 0) return 0;
   return hRadius * Math.round(Math.sin(angle * Math.PI / 180) * 1e15) / 1e15;
 };
+
+
 //endregion
-
-
 //region --- DRAWERS ---
 /**
  * Draws main part.
@@ -267,9 +267,9 @@ anychart.core.linearGauge.pointers.Tank.prototype.drawTopBlur = function(path, b
     path.arcToByEndPoint(bounds.left + bounds.width - 1 + 0.1, bounds.top, xR, yR, true, false);
   }
 };
+
+
 //endregion
-
-
 //region --- DRAWING ---
 /** @inheritDoc */
 anychart.core.linearGauge.pointers.Tank.prototype.createShapes = function() {
@@ -709,9 +709,9 @@ anychart.core.linearGauge.pointers.Tank.prototype.colorizePointer = function(poi
   this.emptyHatch_.fill(hatch);
   this.emptyHatch_.stroke('none');
 };
+
+
 //endregion
-
-
 //region --- JSON/DISPOSING ---
 /** @inheritDoc */
 anychart.core.linearGauge.pointers.Tank.prototype.serialize = function() {

@@ -84,9 +84,9 @@ anychart.core.annotations.Marker.prototype.type = anychart.enums.AnnotationTypes
  * @type {anychart.core.annotations.AnchorSupport}
  */
 anychart.core.annotations.Marker.prototype.SUPPORTED_ANCHORS = anychart.core.annotations.AnchorSupport.ONE_POINT;
+
+
 //endregion
-
-
 //region Infrastructure
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -98,9 +98,9 @@ anychart.core.annotations.Marker.prototype.setState = function(state) {
   anychart.core.annotations.Marker.base(this, 'setState', state);
   this.invalidate(anychart.ConsistencyState.ANNOTATIONS_SHAPES);
 };
+
+
 //endregion
-
-
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -182,9 +182,9 @@ anychart.core.annotations.Marker.prototype.colorize = function(state) {
       .fill(anychart.color.TRANSPARENT_HANDLER)
       .stroke(/** @type {acgraph.vector.SolidFill} */(anychart.color.TRANSPARENT_HANDLER), this['hoverGap']() * 2);
 };
+
+
 //endregion
-
-
 //region Serialization / Deserialization / Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //

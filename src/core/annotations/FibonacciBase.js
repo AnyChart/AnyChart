@@ -120,9 +120,9 @@ anychart.core.annotations.FibonacciBase.prototype.levels = function(opt_values) 
   }
   return goog.array.slice(this.levelsInternal, 0);
 };
+
+
 //endregion
-
-
 //region Infrastructure
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -134,9 +134,9 @@ anychart.core.annotations.FibonacciBase.prototype.setState = function(state) {
   anychart.core.annotations.FibonacciBase.base(this, 'setState', state);
   this.invalidate(anychart.ConsistencyState.ANNOTATIONS_LABELS);
 };
+
+
 //endregion
-
-
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -312,9 +312,9 @@ anychart.core.annotations.FibonacciBase.prototype.getColorResolutionContext = fu
     res['level'] = this.levelsInternal[opt_level];
   return res;
 };
+
+
 //endregion
-
-
 //region Labels
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -434,9 +434,9 @@ anychart.core.annotations.FibonacciBase.prototype.drawLabel = function(index, ma
     mainFactory.clear(index);
   }
 };
+
+
 //endregion
-
-
 //region Serialization / Deserialization / Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -493,9 +493,9 @@ anychart.core.annotations.FibonacciBase.prototype.disposeInternal = function() {
   delete this.levelsStrokeResolver;
   delete this.trendResolver;
 };
+
+
 //endregion
-
-
 //export
 (function() {
   var proto = anychart.core.annotations.FibonacciBase.prototype;

@@ -210,9 +210,9 @@ anychart.core.annotations.Base.MARKERS_ZINDEX = 5;
  * @private
  */
 anychart.core.annotations.Base.colorResolversCache_ = {};
+
+
 //endregion
-
-
 //region Properties
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -241,9 +241,9 @@ anychart.core.annotations.Base.prototype.yScale_ = null;
  * @private
  */
 anychart.core.annotations.Base.prototype.xScale_ = null;
+
+
 //endregion
-
-
 //region Published methods
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -320,9 +320,9 @@ anychart.core.annotations.Base.prototype.xScale = function(opt_value) {
   return /** @type {anychart.scales.Base|anychart.scales.StockScatterDateTime} */(
       this.xScale_ || this.getChart().xScale());
 };
+
+
 //endregion
-
-
 //region Public methods
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -502,9 +502,9 @@ anychart.core.annotations.Base.prototype.setState = function(state) {
   this.state = state;
   this.invalidate(anychart.ConsistencyState.ANNOTATIONS_MARKERS | anychart.ConsistencyState.APPEARANCE);
 };
+
+
 //endregion
-
-
 //region Calculating points
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -671,9 +671,9 @@ anychart.core.annotations.Base.prototype.xRatioToPix = function(ratio) {
 anychart.core.annotations.Base.prototype.yRatioToPix = function(ratio) {
   return this.pixelBoundsCache.getBottom() - ratio * this.pixelBoundsCache.height;
 };
+
+
 //endregion
-
-
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -872,9 +872,9 @@ anychart.core.annotations.Base.prototype.drawThreePointsShape = function(firstX,
  * @protected
  */
 anychart.core.annotations.Base.prototype.colorize = function(state) {};
+
+
 //endregion
-
-
 //region Color resolution
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1001,9 +1001,9 @@ anychart.core.annotations.Base.prototype.getHatchFillResolutionContext = functio
 anychart.core.annotations.Base.prototype.getAutoHatchFill = function() {
   return /*this.autoHatchFill || */acgraph.vector.normalizeHatchFill(acgraph.vector.HatchFill.HatchFillType.DIAGONAL_BRICK);
 };
+
+
 //endregion
-
-
 //region Private methods
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1020,9 +1020,9 @@ anychart.core.annotations.Base.prototype.scaleSignalHandler_ = function(e) {
     this.invalidate(anychart.ConsistencyState.ANNOTATIONS_ANCHORS, anychart.Signal.NEEDS_REDRAW);
   }
 };
+
+
 //endregion
-
-
 //region Markers
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1180,9 +1180,9 @@ anychart.core.annotations.Base.prototype.createPositionProviders = function() {
   }
   return goog.array.map(res, function(item) { return {'value': item}; });
 };
+
+
 //endregion
-
-
 //region Select/deselect
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1203,9 +1203,9 @@ anychart.core.annotations.Base.prototype.select = function() {
 anychart.core.annotations.Base.prototype.unselect = function() {
   this.plotController_.getController().unselect();
 };
+
+
 //endregion
-
-
 //region IObjectWithSettings impl
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1270,9 +1270,9 @@ anychart.core.annotations.Base.prototype.setOption = function(name, value) {
 anychart.core.annotations.Base.prototype.check = function(flags) {
   return true;
 };
+
+
 //endregion
-
-
 //region Serialization / Deserialization / Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1331,9 +1331,9 @@ anychart.core.annotations.Base.prototype.disposeInternal = function() {
 
   anychart.core.annotations.Base.base(this, 'disposeInternal');
 };
+
+
 //endregion
-
-
 //exports
 (function() {
   var proto = anychart.core.annotations.Base.prototype;

@@ -58,9 +58,9 @@ anychart.core.annotations.AndrewsPitchfork.prototype.type = anychart.enums.Annot
  * @type {anychart.core.annotations.AnchorSupport}
  */
 anychart.core.annotations.AndrewsPitchfork.prototype.SUPPORTED_ANCHORS = anychart.core.annotations.AnchorSupport.THREE_POINTS;
+
+
 //endregion
-
-
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -174,9 +174,9 @@ anychart.core.annotations.AndrewsPitchfork.prototype.checkVisible = function() {
   }
   return res;
 };
+
+
 //endregion
-
-
 //region Serialization / Deserialization / Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //

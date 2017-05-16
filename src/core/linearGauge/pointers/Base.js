@@ -90,18 +90,18 @@ anychart.core.linearGauge.pointers.Base.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.APPEARANCE |
     anychart.ConsistencyState.GAUGE_POINTER_LABEL;
+
+
 //endregion
-
-
 //region --- PROPERTIES ---
 /**
  * Default hatch fill type.
  * @type {acgraph.vector.HatchFill.HatchFillType|string}
  */
 anychart.core.linearGauge.pointers.Base.DEFAULT_HATCH_FILL_TYPE = acgraph.vector.HatchFill.HatchFillType.DIAGONAL_BRICK;
+
+
 //endregion
-
-
 //region --- OWN API ---
 /**
  * Returns type of the pointer.
@@ -395,9 +395,9 @@ anychart.core.linearGauge.pointers.Base.prototype.onLabelSignal_ = function(e) {
 anychart.core.linearGauge.pointers.Base.prototype.createLabelContextProvider = function() {
   return this.createFormatProvider();
 };
+
+
 //endregion
-
-
 //region --- COLOR/HATCH ---
 /**
  * Getter/setter for current pointers color.
@@ -801,9 +801,9 @@ anychart.core.linearGauge.pointers.Base.prototype.normalizeHatchFill = function(
 anychart.core.linearGauge.pointers.Base.prototype.setAutoHatchFill = function(value) {
   this.autoHatchFill = /** @type {acgraph.vector.HatchFill} */(acgraph.vector.normalizeHatchFill(value));
 };
+
+
 //endregion
-
-
 //region --- POSITION/BOUNDS ---
 /**
  * Width for pointer.
@@ -996,9 +996,9 @@ anychart.core.linearGauge.pointers.Base.prototype.getLabelsPosition = function(p
           labelPosition :
           this.label().getOption('position'));
 };
+
+
 //endregion
-
-
 //region --- LEGEND ---
 /**
  * Creates legend item data.
@@ -1107,9 +1107,9 @@ anychart.core.linearGauge.pointers.Base.prototype.onLegendItemSignal = function(
   }
   this.dispatchSignal(signal, force);
 };
+
+
 //endregion
-
-
 //region --- DRAWING ---
 /** @inheritDoc */
 anychart.core.linearGauge.pointers.Base.prototype.remove = function() {
@@ -1295,9 +1295,9 @@ anychart.core.linearGauge.pointers.Base.prototype.draw = function() {
 
   return this;
 };
+
+
 //endregion
-
-
 //region --- IINTERACTIVESERIES IMPLEMENTATION ---
 /** @inheritDoc */
 anychart.core.linearGauge.pointers.Base.prototype.hoverMode = function(opt_value) {
@@ -1351,9 +1351,9 @@ anychart.core.linearGauge.pointers.Base.prototype.applyAppearanceToPoint = funct
 
 /** @inheritDoc */
 anychart.core.linearGauge.pointers.Base.prototype.finalizePointAppearance = goog.nullFunction;
+
+
 //endregion
-
-
 //region --- INTERACTIVITY ---
 /**
  * Is it series?
@@ -1577,9 +1577,9 @@ anychart.core.linearGauge.pointers.Base.prototype.selectSeries = function() {
 
   return this;
 };
+
+
 //endregion
-
-
 //region --- JSON/DISPOSING ---
 /** @inheritDoc */
 anychart.core.linearGauge.pointers.Base.prototype.serialize = function() {

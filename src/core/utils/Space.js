@@ -121,9 +121,9 @@ anychart.core.utils.Space.SIMPLE_PROPS_DESCRIPTORS = (function() {
   return map;
 })();
 anychart.core.settings.populate(anychart.core.utils.Space, anychart.core.utils.Space.SIMPLE_PROPS_DESCRIPTORS);
+
+
 //endregion
-
-
 //region -- IObjectWithSettings implementation
 /** @inheritDoc */
 anychart.core.utils.Space.prototype.getOwnOption = function(name) {
@@ -159,9 +159,9 @@ anychart.core.utils.Space.prototype.setOption = function(name, value) {
 anychart.core.utils.Space.prototype.check = function(flags) {
   return true;
 };
+
+
 //endregion
-
-
 //region -- IResolvable implementation
 /** @inheritDoc */
 anychart.core.utils.Space.prototype.resolutionChainCache = function(opt_value) {
@@ -194,9 +194,9 @@ anychart.core.utils.Space.prototype.getHighPriorityResolutionChain = function() 
   }
   return sett;
 };
+
+
 //endregion
-
-
 //region -- Parental relations
 /**
  * Gets/sets new parent.
@@ -232,9 +232,9 @@ anychart.core.utils.Space.prototype.parentInvalidated_ = function(e) {
   this.resolutionChainCache_ = null;
   this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
 };
+
+
 //endregion
-
-
 /**
  * Normalizes space.
  * @param {...(Object|Array|string|number)} var_args - Arguments.

@@ -401,8 +401,14 @@ anychart.core.axes.StockDateTime.prototype.draw = function() {
         bounds.top = bounds.top + bounds.height - this.height_;
         bounds.height = this.height_;
       }
-      if (this.labels_) this.labels_.clear();
-      if (this.minorLabels_) this.minorLabels_.clear();
+      if (this.labels_) {
+        this.labels_.clear();
+        this.labels_.dropCallsCache();
+      }
+      if (this.minorLabels_) {
+        this.minorLabels_.clear();
+        this.minorLabels_.dropCallsCache();
+      }
 
       if (this.ticks_) {
         this.ticks_.length(bounds.height);

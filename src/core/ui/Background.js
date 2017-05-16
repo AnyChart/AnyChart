@@ -873,9 +873,9 @@ anychart.core.ui.Background.prototype.disposeInternal = function() {
 
   anychart.core.ui.Background.base(this, 'disposeInternal');
 };
+
+
 //endregion
-
-
 //exports
 (function() {
   var proto = anychart.core.ui.Background.prototype;

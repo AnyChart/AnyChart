@@ -177,9 +177,9 @@ anychart.core.resource.resourceList.TextSettings.PROPERTY_DESCRIPTORS = (functio
   return map;
 })();
 anychart.core.settings.populate(anychart.core.resource.resourceList.TextSettings, anychart.core.resource.resourceList.TextSettings.PROPERTY_DESCRIPTORS);
+
+
 //endregion
-
-
 // region --- SETUP/DISPOSE ---
 /** @inheritDoc */
 anychart.core.resource.resourceList.TextSettings.prototype.setupByJSON = function(config, opt_default) {
@@ -195,9 +195,9 @@ anychart.core.resource.resourceList.TextSettings.prototype.serialize = function(
   anychart.core.settings.serialize(this, anychart.core.resource.resourceList.TextSettings.PROPERTY_DESCRIPTORS, json);
   return json;
 };
+
+
 //endregion
-
-
 //region --- EXPORTS ---
 //exports
 //proto['fontSize'] = proto.fontSize;

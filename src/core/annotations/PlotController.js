@@ -117,9 +117,9 @@ anychart.core.annotations.PlotController.prototype.SUPPORTED_CONSISTENCY_STATES 
     anychart.core.VisualBase.prototype.SUPPORTED_CONSISTENCY_STATES |
     anychart.ConsistencyState.ANNOTATIONS_CONTROLLER_ANNOTATIONS |
     anychart.ConsistencyState.ANNOTATIONS_CONTROLLER_DRAWING_MODE;
+
+
 //endregion
-
-
 //region Public methods
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -260,9 +260,9 @@ anychart.core.annotations.PlotController.prototype.initDragger_ = function(e) {
       this.dragger_.startDrag(e.getOriginalEvent());
   }
 };
+
+
 //endregion
-
-
 //region Annotations over/out
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -305,9 +305,9 @@ anychart.core.annotations.PlotController.prototype.handleAnnotationMouseOut_ = f
   e.preventDefault();
   this.controller_.unhover();
 };
+
+
 //endregion
-
-
 //region Drawing handlers
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -477,9 +477,9 @@ anychart.core.annotations.PlotController.prototype.updateLastCoords_ = function(
   this.lastX = e['clientX'] - stageReferencePoint.x;
   this.lastY = e['clientY'] - stageReferencePoint.y;
 };
+
+
 //endregion
-
-
 //region Drawing infrastructure
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -560,9 +560,9 @@ anychart.core.annotations.PlotController.prototype.preventHighlight = function(a
   else
     this.counterHighlighter_.remove();
 };
+
+
 //endregion
-
-
 //region Annotations manipulations
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -661,9 +661,9 @@ anychart.core.annotations.PlotController.prototype.removeAllAnnotations = functi
   }
   return this;
 };
+
+
 //endregion
-
-
 //region Constructors
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -936,9 +936,9 @@ anychart.core.annotations.PlotController.prototype.marker = function(opt_config)
 //   this.bindAnnotation(annotation, true);
 //   return annotation;
 // };
+
+
 //endregion
-
-
 //region Private methods
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -954,9 +954,9 @@ anychart.core.annotations.PlotController.prototype.annotationInvalidated_ = func
   if (e.hasSignal(anychart.Signal.NEEDS_REDRAW))
     this.invalidate(anychart.ConsistencyState.ANNOTATIONS_CONTROLLER_ANNOTATIONS, anychart.Signal.NEEDS_REDRAW);
 };
+
+
 //endregion
-
-
 //region Serialization / Deserialization / XML / JSON / Disposing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1224,9 +1224,9 @@ anychart.core.annotations.PlotController.AnchorDragger.prototype.handleDragEnd_ 
   this.anchorId_ = NaN;
   this.controller_.preventHighlight(false);
 };
+
+
 //endregion
-
-
 //exports
 (function() {
   var proto = anychart.core.annotations.PlotController.prototype;

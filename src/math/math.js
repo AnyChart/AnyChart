@@ -935,9 +935,9 @@ anychart.math.Rect.fromJSON = function(config) {
       +config['width'] || 0,
       +config['height'] || 0);
 };
+
+
 //endregion
-
-
 /**
  * Constructor function.
  * @param {number} x X-coordinate.

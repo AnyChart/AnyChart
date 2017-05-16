@@ -1036,9 +1036,9 @@ anychart.format.number = function(number, opt_decimalsCountOrLocale, opt_decimal
 };
 
 
+
+
 //endregion
-
-
 //exports
 goog.exportSymbol('anychart.format.inputLocale', anychart.format.inputLocale);
 goog.exportSymbol('anychart.format.inputBaseDate', anychart.format.inputBaseDate);

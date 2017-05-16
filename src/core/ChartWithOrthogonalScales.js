@@ -818,17 +818,17 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
                   stackVal.positive += val;
                   point.meta['stackedValue'] = stackVal.positive;
                   if (!yScalePercentStacked) {
-                    if (!stackVal.prevMissing) {
-                      point.meta['stackedZeroPrev'] = point.meta['stackedValuePrev'] = NaN;
-                    } else {
+                    if (stackVal.prevMissing) {
                       point.meta['stackedZeroPrev'] = stackVal.prevPositive;
                       point.meta['stackedValuePrev'] = stackVal.prevPositive + val;
-                    }
-                    if (!stackVal.nextMissing) {
-                      point.meta['stackedZeroNext'] = point.meta['stackedValueNext'] = NaN;
                     } else {
+                      point.meta['stackedZeroPrev'] = point.meta['stackedValuePrev'] = NaN;
+                    }
+                    if (stackVal.nextMissing) {
                       point.meta['stackedZeroNext'] = stackVal.nextPositive;
                       point.meta['stackedValueNext'] = stackVal.nextPositive + val;
+                    } else {
+                      point.meta['stackedZeroNext'] = point.meta['stackedValueNext'] = NaN;
                     }
                   }
                 } else {
@@ -836,17 +836,17 @@ anychart.core.ChartWithOrthogonalScales.prototype.calculateYScales = function() 
                   stackVal.negative += val;
                   point.meta['stackedValue'] = stackVal.negative;
                   if (!yScalePercentStacked) {
-                    if (!stackVal.prevMissing) {
-                      point.meta['stackedZeroPrev'] = point.meta['stackedValuePrev'] = NaN;
-                    } else {
+                    if (stackVal.prevMissing) {
                       point.meta['stackedZeroPrev'] = stackVal.prevNegative;
                       point.meta['stackedValuePrev'] = stackVal.prevNegative + val;
-                    }
-                    if (!stackVal.nextMissing) {
-                      point.meta['stackedZeroNext'] = point.meta['stackedValueNext'] = NaN;
                     } else {
+                      point.meta['stackedZeroPrev'] = point.meta['stackedValuePrev'] = NaN;
+                    }
+                    if (stackVal.nextMissing) {
                       point.meta['stackedZeroNext'] = stackVal.nextNegative;
                       point.meta['stackedValueNext'] = stackVal.nextNegative + val;
+                    } else {
+                      point.meta['stackedZeroNext'] = point.meta['stackedValueNext'] = NaN;
                     }
                   }
                 }

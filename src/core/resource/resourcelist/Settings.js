@@ -44,9 +44,9 @@ anychart.core.resource.resourceList.Settings.prototype.SUPPORTED_STATES = 0;
  */
 anychart.core.resource.resourceList.Settings.prototype.SUPPORTED_SIGNALS =
     anychart.Signal.NEEDS_REDRAW;
+
+
 //endregion
-
-
 //region --- OVERRIDES ---
 /** @inheritDoc */
 anychart.core.resource.resourceList.Settings.prototype.invalidate = function(state, opt_signal) {
@@ -61,9 +61,9 @@ anychart.core.resource.resourceList.Settings.prototype.setupByJSON = function(co
   if (!!opt_default)
     this.defaultSettings = config || {};
 };
+
+
 //endregion
-
-
 //region --- IObjectWithSettings implementation ---
 /** @inheritDoc */
 anychart.core.resource.resourceList.Settings.prototype.getOwnOption = function(name) {

@@ -363,9 +363,9 @@ anychart.core.ui.Table.prototype.defaultColMinWidth_ = null;
  * @private
  */
 anychart.core.ui.Table.prototype.defaultColMaxWidth_ = null;
+
+
 //endregion
-
-
 //region Table methods
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -729,9 +729,9 @@ anychart.core.ui.Table.prototype.draw = function() {
 anychart.core.ui.Table.prototype.remove = function() {
   if (this.layer_) this.layer_.parent(null);
 };
+
+
 //endregion
-
-
 //region Cell settings
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1096,9 +1096,9 @@ anychart.core.ui.Table.prototype.cellPadding = function(opt_spaceOrTopOrTopAndBo
   }
   return this.paddingProxy_ || (this.paddingProxy_ = new anychart.core.ui.table.Padding(this));
 };
+
+
 //endregion
-
-
 //region Drawing phases
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1479,9 +1479,9 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
 anychart.core.ui.Table.prototype.handleContentInvalidation_ = function(e) {
   if (goog.isFunction(e.target.draw)) e.target.draw();
 };
+
+
 //endregion
-
-
 //region Drawing routines
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1850,9 +1850,9 @@ anychart.core.ui.Table.prototype.getFillPath_ = function(fill) {
     return path;
   }
 };
+
+
 //endregion
-
-
 //region Other routines
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -2296,9 +2296,9 @@ anychart.core.ui.Table.prototype.getPaddingProp_ = function(propName, var_args) 
   }
   return 0;
 };
+
+
 //endregion
-
-
 /**
  * Creates cell content for text cells. Used by cells.
  * @param {*} value Text to be set for the label.

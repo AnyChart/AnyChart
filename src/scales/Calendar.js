@@ -970,8 +970,6 @@ anychart.scales.Calendar.prototype.disposeInternal = function() {
 
 
 //endregion
-
-
 /**
  * Creates new calendar.
  * @param {anychart.scales.Calendar=} opt_parentCalendar

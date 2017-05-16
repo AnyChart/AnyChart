@@ -65,9 +65,9 @@ anychart.core.resource.resourceList.ImageSettings.PROPERTY_DESCRIPTORS = (functi
   return map;
 })();
 anychart.core.settings.populate(anychart.core.resource.resourceList.ImageSettings, anychart.core.resource.resourceList.ImageSettings.PROPERTY_DESCRIPTORS);
+
+
 //endregion
-
-
 // region --- SETUP/DISPOSE ---
 /** @inheritDoc */
 anychart.core.resource.resourceList.ImageSettings.prototype.setupByJSON = function(config, opt_default) {
@@ -83,9 +83,9 @@ anychart.core.resource.resourceList.ImageSettings.prototype.serialize = function
   anychart.core.settings.serialize(this, anychart.core.resource.resourceList.ImageSettings.PROPERTY_DESCRIPTORS, json);
   return json;
 };
+
+
 //endregion
-
-
 //region --- EXPORTS ---
 //exports
 //proto['size'] = proto.size;

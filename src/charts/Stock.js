@@ -436,9 +436,9 @@ anychart.charts.Stock.prototype.getConfigByType = function(type) {
 anychart.charts.Stock.prototype.isVertical = function() {
   return false;
 };
+
+
 //endregion
-
-
 //region Public getter/setters and methods
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -745,9 +745,9 @@ anychart.charts.Stock.prototype.scrollerGrouping = function(opt_value) {
   }
   return /** @type {anychart.core.stock.Grouping} */(this.dataController_.scrollerGrouping());
 };
+
+
 //endregion
-
-
 //region Infrastructure methods
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -870,9 +870,9 @@ anychart.charts.Stock.prototype.getCurrentScrollerMinDistance = function() {
 anychart.charts.Stock.prototype.getPlotsCount = function() {
   return this.plots_.length;
 };
+
+
 //endregion
-
-
 //region Drawing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -953,42 +953,287 @@ anychart.charts.Stock.prototype.drawContent = function(bounds) {
 
 
 /**
+ * Applies value stacking to a point.
+ * @param {anychart.scales.Base} scale
+ * @param {anychart.data.IRowInfo} point
+ * @param {Object} stack
+ * @param {number} val
+ * @param {Object} prevStack
+ * @param {number} prevVal
+ * @private
+ */
+anychart.charts.Stock.prototype.valueStacking_ = function(scale, point, stack, val, prevStack, prevVal) {
+  this.percentStacking_(scale, point, stack, val, prevStack, prevVal);
+  var positive = val >= 0;
+  if (stack.prevMissing) {
+    if (positive) {
+      point.meta('stackedZeroPrev', stack.prevPositive);
+      point.meta('stackedValuePrev', stack.prevPositive + val);
+    } else {
+      point.meta('stackedZeroPrev', stack.prevNegative);
+      point.meta('stackedValuePrev', stack.prevNegative + val);
+    }
+  } else {
+    point.meta('stackedZeroPrev', NaN);
+    point.meta('stackedValuePrev', NaN);
+  }
+  if (stack.nextMissing) {
+    if (positive) {
+      point.meta('stackedZeroNext', stack.nextPositive);
+      point.meta('stackedValueNext', stack.nextPositive + val);
+    } else {
+      point.meta('stackedZeroNext', stack.nextNegative);
+      point.meta('stackedValueNext', stack.nextNegative + val);
+    }
+  } else {
+    point.meta('stackedZeroNext', NaN);
+    point.meta('stackedValueNext', NaN);
+  }
+  scale.extendDataRange(point.meta('stackedValuePrev'));
+  scale.extendDataRange(point.meta('stackedValue'));
+  scale.extendDataRange(point.meta('stackedValueNext'));
+  if (prevStack) {
+    if (prevStack.missing) {
+      stack.prevMissing = true;
+    } else {
+      if (positive) {
+        stack.prevPositive += val;
+      } else {
+        stack.prevNegative += val;
+      }
+    }
+    if (!isNaN(prevVal)) {
+      if (prevVal >= 0) {
+        prevStack.nextPositive += prevVal;
+      } else {
+        prevStack.nextNegative += prevVal;
+      }
+    }
+  }
+};
+
+
+/**
+ * Applies percent stacking to a point.
+ * @param {anychart.scales.Base} scale
+ * @param {anychart.data.IRowInfo} point
+ * @param {Object} stack
+ * @param {number} val
+ * @param {Object} prevStack
+ * @param {number} prevVal
+ * @private
+ */
+anychart.charts.Stock.prototype.percentStacking_ = function(scale, point, stack, val, prevStack, prevVal) {
+  if (val >= 0) {
+    point.meta('stackedZero', stack.positive);
+    stack.positive += val;
+    point.meta('stackedValue', stack.positive);
+  } else {
+    point.meta('stackedZero', stack.negative);
+    stack.negative += val;
+    point.meta('stackedValue', stack.negative);
+  }
+};
+
+
+/**
+ * Applies stacking to a series.
+ * @param {anychart.core.series.Stock} aSeries
+ * @param {Object} stacksByScale
+ * @return {boolean} - if the stacking is percent
+ * @private
+ */
+anychart.charts.Stock.prototype.calcStacking_ = function(aSeries, stacksByScale) {
+  var scale = /** @type {anychart.scales.Base} */(aSeries.yScale());
+  var guid = goog.getUid(scale);
+  var iterator = aSeries.getResetIterator();
+  var valueColumn = aSeries.getSelectableData().getFieldColumn('value');
+  var stacks = stacksByScale[guid];
+  var k;
+  if (!stacks) {
+    stacks = stacksByScale[guid] = [];
+    var len = iterator.getRowsCount();
+    for (k = 0; k < len + 2; k++)
+      stacks.push({
+        prevPositive: 0,
+        positive: 0,
+        nextPositive: 0,
+        prevNegative: 0,
+        negative: 0,
+        nextNegative: 0,
+        prevMissing: false,
+        nextMissing: false,
+        missing: false
+      });
+  }
+  var percent = scale.stackMode() == anychart.enums.ScaleStackMode.PERCENT;
+  var applyStacking = percent ? this.percentStacking_ : this.valueStacking_;
+  var stack = stacks[k = 0];
+  var prevVal, prevStack;
+  var val;
+  var point = aSeries.getSelectableData().getPreFirstRow();
+  if (point) {
+    point.meta('stackedMissing', stack.missing);
+    if (stack.missing = point.meta('missing')) {
+      prevVal = NaN;
+    } else {
+      val = Number(point.getColumn(valueColumn));
+      applyStacking.call(this, scale, point, stack, val, null, NaN);
+      prevVal = val;
+    }
+  } else {
+    prevVal = NaN;
+  }
+  iterator.reset();
+  while (iterator.advance()) {
+    prevStack = stack;
+    stack = stacks[++k];
+    iterator.meta('stackedMissing', stack.missing);
+    if (stack.missing = iterator.meta('missing')) {
+      prevStack.nextMissing = true;
+      prevVal = NaN;
+    } else {
+      val = Number(iterator.getColumn(valueColumn));
+      applyStacking.call(this, scale, iterator, stack, val, prevStack, prevVal);
+      prevVal = val;
+    }
+  }
+  point = aSeries.getSelectableData().getPostLastRow();
+  if (point) {
+    stack = stacks[++k];
+    point.meta('stackedMissing', stack.missing);
+    if (!(stack.missing = point.meta('missing'))) {
+      val = Number(point.getColumn(valueColumn));
+      applyStacking.call(this, scale, point, stack, val, prevStack, prevVal);
+    }
+  }
+  return percent;
+};
+
+
+/**
+ * Finalizes point percent stacking.
+ * @param {anychart.data.IRowInfo} point
+ * @param {anychart.scales.Base} scale
+ * @param {Object} stack
+ * @private
+ */
+anychart.charts.Stock.prototype.finalizePercentStack_ = function(point, scale, stack) {
+  if (point.meta('missing')) {
+    point.meta('stackedPositiveZero', (Number(point.meta('stackedPositiveZero')) / stack.positive * 100) || 0);
+    point.meta('stackedNegativeZero', (Number(point.meta('stackedNegativeZero')) / stack.negative * 100) || 0);
+  } else {
+    var val = Number(point.meta('stackedValue'));
+    var sum;
+    if (val >= 0) {
+      sum = stack.positive;
+      scale.extendDataRange(100);
+    } else {
+      sum = -stack.negative;
+      scale.extendDataRange(-100);
+    }
+    point.meta('stackedZero', (Number(point.meta('stackedZero')) / sum * 100) || 0);
+    point.meta('stackedValue', (Number(point.meta('stackedValue')) / sum * 100) || 0);
+  }
+};
+
+
+/**
+ * Finalizes series percent stacking.
+ * @param {anychart.core.series.Stock} aSeries
+ * @param {anychart.scales.Base} scale
+ * @param {Object} stacksByScale
+ * @private
+ */
+anychart.charts.Stock.prototype.finalizePercentStackCalc_ = function(aSeries, scale, stacksByScale) {
+  var guid = goog.getUid(scale);
+  var iterator = /** @type {anychart.data.TableIterator} */(aSeries.getIterator());
+  var stacks = stacksByScale[guid];
+  scale.extendDataRange(0);
+  var point = aSeries.getSelectableData().getPreFirstRow();
+  if (point) {
+    stack = stacks[0];
+    this.finalizePercentStack_(point, scale, stack);
+  }
+  var k = 1;
+  iterator.reset();
+  while (iterator.advance()) {
+    var stack = stacks[k++];
+    this.finalizePercentStack_(iterator, scale, stack);
+  }
+  point = aSeries.getSelectableData().getPostLastRow();
+  if (point) {
+    stack = stacks[k];
+    this.finalizePercentStack_(point, scale, stack);
+  }
+};
+
+
+/**
  * Calculates all Y scales.
  * @private
  */
 anychart.charts.Stock.prototype.calculateScales_ = function() {
   // we just iterate over all series and calculate them semi-independently
-  var i, j, series, aSeries, scale;
+  var i, j, seriesList, series, scale, stacksByScale, hasPercentStacks;
   var scales = [];
   for (i = 0; i < this.plots_.length; i++) {
-    var plot = this.plots_[i];
+    var plot = /** @type {anychart.core.stock.Plot} */(this.plots_[i]);
     if (plot && plot.enabled()) {
-      series = plot.getAllSeries();
-      for (j = 0; j < series.length; j++) {
-        aSeries = series[j];
-        aSeries.updateComparisonZero();
-        scale = /** @type {anychart.scales.Base} */(aSeries.yScale());
+      seriesList = plot.getAllSeries();
+      stacksByScale = {};
+      hasPercentStacks = false;
+      for (j = 0; j < seriesList.length; j++) {
+        series = seriesList[j];
+        series.updateComparisonZero();
+        scale = /** @type {anychart.scales.Base} */(series.yScale());
         if (scale.needsAutoCalc()) {
           scale.startAutoCalc();
-          if (aSeries.enabled())
-            scale.extendDataRange.apply(scale, aSeries.getScaleReferenceValues());
           scales.push(scale);
+        }
+        if (series.planIsStacked()) {
+          hasPercentStacks = this.calcStacking_(series, stacksByScale) || hasPercentStacks;
+        } else if (series.enabled()) {
+          scale.extendDataRange.apply(scale, series.getScaleReferenceValues());
+        }
+      }
+      if (hasPercentStacks) {
+        for (j = 0; j < seriesList.length; j++) {
+          series = seriesList[j];
+          scale = /** @type {anychart.scales.Base} */(series.yScale());
+          if (scale.stackMode() == anychart.enums.ScaleStackMode.PERCENT) {
+            this.finalizePercentStackCalc_(series, scale, stacksByScale);
+          }
         }
       }
     }
   }
 
   if (this.scroller_ && this.scroller_.isVisible()) {
-    series = this.scroller_.getAllSeries();
-    for (j = 0; j < series.length; j++) {
-      aSeries = series[j];
-      aSeries.updateComparisonZero();
-      scale = /** @type {anychart.scales.Base} */(aSeries.yScale());
+    seriesList = this.scroller_.getAllSeries();
+    stacksByScale = {};
+    hasPercentStacks = false;
+    for (j = 0; j < seriesList.length; j++) {
+      series = seriesList[j];
+      series.updateComparisonZero();
+      scale = /** @type {anychart.scales.Base} */(series.yScale());
       if (scale.needsAutoCalc()) {
         scale.startAutoCalc();
-        if (aSeries.enabled())
-          scale.extendDataRange.apply(scale, aSeries.getScaleReferenceValues());
         scales.push(scale);
+      }
+      if (series.planIsStacked()) {
+        hasPercentStacks = this.calcStacking_(series, stacksByScale) || hasPercentStacks;
+      } else if (series.enabled()) {
+        scale.extendDataRange.apply(scale, series.getScaleReferenceValues());
+      }
+    }
+    if (hasPercentStacks) {
+      for (j = 0; j < seriesList.length; j++) {
+        series = seriesList[j];
+        scale = /** @type {anychart.scales.Base} */(series.yScale());
+        if (scale.stackMode() == anychart.enums.ScaleStackMode.PERCENT) {
+          this.finalizePercentStackCalc_(series, scale, stacksByScale);
+        }
       }
     }
   }
@@ -1166,9 +1411,9 @@ anychart.charts.Stock.prototype.distributeBoundsLocal_ = function(boundsArray, t
     current += size;
   }
 };
+
+
 //endregion
-
-
 //region Signals handlers
 /**
  * Plot signals handler.
@@ -1232,9 +1477,9 @@ anychart.charts.Stock.prototype.invalidateRedrawable = function() {
       anychart.ConsistencyState.STOCK_SCROLLER,
       anychart.Signal.NEEDS_REDRAW);
 };
+
+
 //endregion
-
-
 //region Data
 /**
  * Registers selectable as a chart data source.
@@ -1267,9 +1512,9 @@ anychart.charts.Stock.prototype.deregisterSource = function(source) {
   if (!isUsed)
     this.dataController_.deregisterSource(source);
 };
+
+
 //endregion
-
-
 //region IKeyIndexTransformation
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1314,9 +1559,9 @@ anychart.charts.Stock.prototype.getKeyByScrollerIndex = function(index) {
 anychart.charts.Stock.prototype.getScrollerIndexByKey = function(key) {
   return this.dataController_.getScrollerIndexByKey(key);
 };
+
+
 //endregion
-
-
 //region Annotations
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1352,9 +1597,9 @@ anychart.charts.Stock.prototype.defaultAnnotationSettings = function(opt_value) 
   }
   return this.defaultAnnotationSettings_;
 };
+
+
 //endregion
-
-
 //region Interactivity
 /**
  * Highlights points on all charts by ratio of current selected range. Used by plots.
@@ -1494,9 +1739,9 @@ anychart.charts.Stock.prototype.unhighlight_ = function() {
     this.tooltip().hide();
   }
 };
+
+
 //endregion
-
-
 //region Scroller change
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1569,9 +1814,9 @@ anychart.charts.Stock.prototype.scrollerChangeFinishHandler_ = function(e) {
       this.transformScrollerSource_(e['source']));
   this.allowHighlight();
 };
+
+
 //endregion
-
-
 //region Drag
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1707,9 +1952,9 @@ anychart.charts.Stock.prototype.dragEnd = function() {
       anychart.enums.StockRangeChangeSource.PLOT_DRAG);
   this.allowHighlight();
 };
+
+
 //endregion
-
-
 //region Serialization / deserialization / disposing
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -1772,9 +2017,9 @@ anychart.charts.Stock.prototype.setupByJSON = function(config, opt_default) {
     this.selectRange(json['start'], json['end']);
   }
 };
+
+
 //endregion
-
-
 /**
  * Stock chart constructor function.
  * @param {boolean=} opt_allowPointSettings Allows to set point settings from data.

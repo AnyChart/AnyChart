@@ -390,9 +390,9 @@ goog.global['anychart']['fontFamily'] = "'Verdana', Helvetica, Arial, sans-serif
  *
  */
 goog.global['anychart']['textDirection'] = acgraph.vector.Text.Direction.LTR;
+
+
 //endregion
-
-
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  Document load event.
@@ -1109,10 +1109,10 @@ anychart.ui.rangePicker = anychart.ui.rangePicker || anychart.createNFIMError('R
 
 /** @ignoreDoc */
 anychart.ui.rangeSelector = anychart.ui.rangeSelector || anychart.createNFIMError('Range selector');
-//endregion
-//endregion
 
 
+//endregion
+//endregion
 if (COMPILED) {
   goog.dom.animationFrame.polyfill.install();
 } else {

@@ -1574,9 +1574,9 @@ anychart.core.ui.ScrollBar.ScrollEvent.prototype['visibleBounds'] = null;
  * @type {string}
  */
 anychart.core.ui.ScrollBar.ScrollEvent.prototype['source'] = '';
+
+
 //endregion
-
-
 //exports
 (function() {
   var proto = anychart.core.ui.ScrollBar.prototype;

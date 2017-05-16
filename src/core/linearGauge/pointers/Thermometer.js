@@ -67,9 +67,9 @@ anychart.core.linearGauge.pointers.Thermometer.prototype.drawHorizontal = functi
 
   this.hatch.deserialize(this.path.serialize());
 };
+
+
 //endregion
-
-
 //region --- INHERITED API ---
 /** @inheritDoc */
 anychart.core.linearGauge.pointers.Thermometer.prototype.getType = function() {
@@ -103,9 +103,9 @@ anychart.core.linearGauge.pointers.Thermometer.prototype.getReservedBounds = fun
   }
   return [left, top, right, bottom];
 };
+
+
 //endregion
-
-
 //region --- OWN/SPECIFIC API ---
 /**
  * Getter/setter for bulbRadius.
@@ -141,9 +141,9 @@ anychart.core.linearGauge.pointers.Thermometer.prototype.bulbPadding = function(
   }
   return this.bulbPadding_;
 };
+
+
 //endregion
-
-
 //region --- SETUP/DISPOSE ---
 /** @inheritDoc */
 anychart.core.linearGauge.pointers.Thermometer.prototype.setupByJSON = function(config, opt_default) {

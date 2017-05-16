@@ -968,9 +968,9 @@ anychart.core.VisualBase.prototype.getPdfBase64String = function(onSuccessOrOpti
     stage.getPdfBase64String(args['onSuccess'], args['onError'], args['paperSize'] || args['width'], args['landscape'] || args['height'], args['x'], args['y']);
   }
 };
+
+
 //endregion
-
-
 /**
  * Print all element on related stage.
  * @param {(acgraph.vector.PaperSize|Object)=} opt_paperSizeOrOptions Paper size or object with options/

@@ -263,19 +263,6 @@ anychart.scales.ScatterBase.prototype.maximumGap = function(opt_value) {
 };
 
 
-/** @inheritDoc */
-anychart.scales.ScatterBase.prototype.stackMode = function(opt_stackMode) {
-  this.suspendSignalsDispatching();
-  if (opt_stackMode == anychart.enums.ScaleStackMode.PERCENT) {
-    this.minimumGap(0);
-    this.maximumGap(0);
-  }
-  var result = anychart.scales.ScatterBase.base(this, 'stackMode', opt_stackMode);
-  this.resumeSignalsDispatching(true);
-  return result;
-};
-
-
 /**
  * Resets scale data range if it needs auto calculation.
  * @return {!anychart.scales.ScatterBase} Itself for chaining.
@@ -392,8 +379,11 @@ anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
 
   if (Math.abs(range) < 1e-4 && !this.minimumModeAuto && !this.maximumModeAuto) this.max += 1e-4;
 
+  var gap;
+  var applyGap = this.stackMode() != anychart.enums.ScaleStackMode.PERCENT;
   if (this.minimumModeAuto) {
-    this.min = this.dataRangeMin - range * this.minimumRangeBasedGap;
+    gap = applyGap ? this.minimumRangeBasedGap : 0;
+    this.min = this.dataRangeMin - range * gap;
     if (!isNaN(this.softMin)) {
       if (range > 0)
         this.min = Math.min(this.min, this.softMin);
@@ -405,7 +395,8 @@ anychart.scales.ScatterBase.prototype.determineScaleMinMax = function() {
   }
 
   if (this.maximumModeAuto) {
-    this.max = this.dataRangeMax + range * this.maximumRangeBasedGap;
+    gap = applyGap ? this.maximumRangeBasedGap : 0;
+    this.max = this.dataRangeMax + range * gap;
     if (!isNaN(this.softMax)) {
       if (range > 0)
         this.max = Math.max(this.max, this.softMax);

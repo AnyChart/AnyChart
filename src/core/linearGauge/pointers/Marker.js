@@ -45,17 +45,17 @@ anychart.core.linearGauge.pointers.Marker.prototype.drawVertical = function() {
 
 /** @inheritDoc */
 anychart.core.linearGauge.pointers.Marker.prototype.drawHorizontal = anychart.core.linearGauge.pointers.Marker.prototype.drawVertical;
+
+
 //endregion
-
-
 //region --- INHERITED API ---
 /** @inheritDoc */
 anychart.core.linearGauge.pointers.Marker.prototype.getType = function() {
   return anychart.enums.LinearGaugePointerType.MARKER;
 };
+
+
 //endregion
-
-
 //region --- SPECIFIC API ---
 /**
  * Getter/setter for marker type.
@@ -88,9 +88,9 @@ anychart.core.linearGauge.pointers.Marker.prototype.autoType = function(opt_valu
   }
   return this.autoType_;
 };
+
+
 //endregion
-
-
 //region --- SETUP/DISPOSING ---
 /** @inheritDoc */
 anychart.core.linearGauge.pointers.Marker.prototype.setupByJSON = function(config, opt_default) {
@@ -106,9 +106,9 @@ anychart.core.linearGauge.pointers.Marker.prototype.serialize = function() {
     json['type'] = this.type();
   return json;
 };
+
+
 //endregion
-
-
 //exports
 (function() {
   var proto = anychart.core.linearGauge.pointers.Marker.prototype;
