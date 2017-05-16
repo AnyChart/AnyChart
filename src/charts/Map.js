@@ -2952,6 +2952,18 @@ anychart.charts.Map.prototype.calculate = function() {
 
         this.mapTX[key] = tx_;
       }, this);
+
+      var geoScaleSettings = geoData['scale'];
+      if (geoScaleSettings) {
+        scale.setMapLimits(
+            'minLon' in geoScaleSettings ? geoScaleSettings['minLon'] : NaN,
+            'maxLon' in geoScaleSettings ? geoScaleSettings['maxLon'] : NaN,
+            'minLat' in geoScaleSettings ? geoScaleSettings['minLat'] : NaN,
+            'maxLat' in geoScaleSettings ? geoScaleSettings['maxLat'] : NaN
+        );
+      } else {
+        scale.setMapLimits(NaN, NaN, NaN, NaN);
+      }
     }
 
     if (!this.mapLayer_) {

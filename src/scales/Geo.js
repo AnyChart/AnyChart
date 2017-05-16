@@ -77,25 +77,21 @@ anychart.scales.Geo = function() {
 
   /**
    * @type {boolean}
-   * @protected
    */
   this.minimumLongModeAuto = true;
 
   /**
    * @type {boolean}
-   * @protected
    */
   this.minimumLatModeAuto = true;
 
   /**
    * @type {boolean}
-   * @protected
    */
   this.maximumLongModeAuto = true;
 
   /**
    * @type {boolean}
-   * @protected
    */
   this.maximumLatModeAuto = true;
 
@@ -128,6 +124,30 @@ anychart.scales.Geo = function() {
    * @protected
    */
   this.maxY = NaN;
+
+  /**
+   * @type {number}
+   * @protected
+   */
+  this.autoMaxLong = NaN;
+
+  /**
+   * @type {number}
+   * @protected
+   */
+  this.autoMinLong = NaN;
+
+  /**
+   * @type {number}
+   * @protected
+   */
+  this.autoMaxLat = NaN;
+
+  /**
+   * @type {number}
+   * @protected
+   */
+  this.autoMinLat = NaN;
 
   /**
    * @type {number}
@@ -255,6 +275,21 @@ anychart.scales.Geo.prototype.setTxMap = function(value) {
  */
 anychart.scales.Geo.prototype.setMapZoom = function(value) {
   this.zoom = value;
+};
+
+
+/**
+ * Auto limits.
+ * @param {number} minimumX .
+ * @param {number} maximumX .
+ * @param {number} minimumY .
+ * @param {number} maximumY .
+ */
+anychart.scales.Geo.prototype.setMapLimits = function(minimumX, maximumX, minimumY, maximumY) {
+  this.autoMinLong = minimumX;
+  this.autoMaxLong = maximumX;
+  this.autoMinLat = minimumY;
+  this.autoMaxLat = maximumY;
 };
 
 
@@ -577,7 +612,7 @@ anychart.scales.Geo.prototype.gap = function(opt_value) {
     opt_value = +opt_value || 0;
     if (this.rangeBasedGap != opt_value) {
       this.rangeBasedGap = opt_value;
-      if (this.maximumLongModeAuto || this.minimumLongModeAuto || this.maximumLatModeAuto || this.minimumLatModeAuto) {
+      if (this.needsAutoCalc()) {
         this.consistent = false;
         this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
       }
@@ -923,7 +958,10 @@ anychart.scales.Geo.prototype.resetDataRange = function() {
  * @return {boolean} Returns true if the scale needs input domain auto calculations.
  */
 anychart.scales.Geo.prototype.needsAutoCalc = function() {
-  return this.minimumLongModeAuto || this.minimumLatModeAuto || this.maximumLongModeAuto || this.maximumLatModeAuto;
+  return (this.minimumLongModeAuto && isNaN(this.autoMinLong)) ||
+      (this.minimumLatModeAuto && isNaN(this.autoMinLat)) ||
+      (this.maximumLongModeAuto && isNaN(this.autoMaxLong)) ||
+      (this.maximumLatModeAuto && isNaN(this.autoMaxLat));
 };
 
 
@@ -1152,31 +1190,31 @@ anychart.scales.Geo.prototype.getExtremesForDimension = function(dimensionValue,
  */
 anychart.scales.Geo.prototype.determineScaleMinMax = function() {
   var maxLong = this.maximumLongModeAuto ?
-      this.dataRangeMaxLong :
+      (isNaN(this.autoMaxLong) ? this.dataRangeMaxLong : this.autoMaxLong) :
       this.maxLong;
   var minLong = this.minimumLongModeAuto ?
-      this.dataRangeMinLong :
+      (isNaN(this.autoMinLong) ? this.dataRangeMinLong : this.autoMinLong) :
       this.minLong;
 
   var maxLat = this.maximumLatModeAuto ?
-      this.dataRangeMaxLat :
+      (isNaN(this.autoMaxLat) ? this.dataRangeMaxLat : this.autoMaxLat) :
       this.maxLat;
   var minLat = this.minimumLatModeAuto ?
-      this.dataRangeMinLat :
+      (isNaN(this.autoMinLat) ? this.dataRangeMinLat : this.autoMinLat) :
       this.minLat;
 
   var rangeLong = maxLong - minLong;
   var rangeLat = maxLat - minLat;
 
-  if (this.minimumLongModeAuto)
-    this.minLong = this.dataRangeMinLong - rangeLong * this.rangeBasedGap;
   if (this.maximumLongModeAuto)
-    this.maxLong = this.dataRangeMaxLong + rangeLong * this.rangeBasedGap;
+    this.maxLong = (isNaN(this.autoMaxLong) ? this.dataRangeMaxLong + rangeLong * this.rangeBasedGap : this.autoMaxLong);
+  if (this.minimumLongModeAuto)
+    this.minLong = (isNaN(this.autoMinLong) ? this.dataRangeMinLong - rangeLong * this.rangeBasedGap : this.autoMinLong);
 
-  if (this.minimumLatModeAuto)
-    this.minLat = this.dataRangeMinLat - rangeLat * this.rangeBasedGap;
   if (this.maximumLatModeAuto)
-    this.maxLat = this.dataRangeMaxLat + rangeLat * this.rangeBasedGap;
+    this.maxLat = (isNaN(this.autoMaxLat) ? this.dataRangeMaxLat + rangeLat * this.rangeBasedGap : this.autoMaxLat);
+  if (this.minimumLatModeAuto)
+    this.minLat = (isNaN(this.autoMinLat) ? this.dataRangeMinLat - rangeLat * this.rangeBasedGap : this.autoMinLat);
 
   this.minX = this.dataRangeMinX;
   this.minY = this.dataRangeMinY;
