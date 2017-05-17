@@ -392,7 +392,7 @@ anychart.charts.Pie.DEFAULT_HATCH_FILL_TYPE = 'none';
 
 /** @inheritDoc */
 anychart.charts.Pie.prototype.doAnimation = function() {
-  if (this.animation().enabled() && this.animation().duration() > 0) {
+  if (!this.mode3d_ && this.animation().enabled() && this.animation().duration() > 0) {
     if (this.animationQueue_ && this.animationQueue_.isPlaying()) {
       this.animationQueue_.update();
     } else if (this.hasInvalidationState(anychart.ConsistencyState.CHART_ANIMATION)) {
