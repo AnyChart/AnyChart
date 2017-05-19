@@ -167,6 +167,12 @@ anychart.core.Chart = function() {
    */
   this.lockOverlayRect_ = null;
 
+  /**
+   * @type {?string}
+   * @private
+   */
+  this.id_ = null;
+
   this.invalidate(anychart.ConsistencyState.ALL);
   this.resumeSignalsDispatching(false);
 };
@@ -1701,6 +1707,9 @@ anychart.core.Chart.prototype.disposeInternal = function() {
   this.animation_ = null;
   this.a11y_ = null;
   this.tooltip_ = null;
+
+  if (this.id_)
+    anychart.untrackChart(this, /** @type {string} */(this.id_));
 };
 
 
@@ -3273,6 +3282,33 @@ anychart.core.Chart.prototype.shareWithPinterest = function(opt_linkOrOptions, o
   this.shareAsPng(onSuccess, undefined, false, exportOptions['width'], exportOptions['height']);
 };
 
+
+//region ------- Charts tracking
+
+
+/**
+ * Getter/setter for chart id.
+ * @param {?string=} opt_value
+ * @return {(string|anychart.core.Chart)} Return chart id or chart itself for chaining.
+ */
+anychart.core.Chart.prototype.id = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.id_ != opt_value) {
+      if (goog.isNull(opt_value)) {
+        anychart.untrackChart(this, /** @type {string} */(this.id_));
+        this.id_ = opt_value;
+
+      } else if (anychart.trackChart(this, opt_value, /** @type {string} */(this.id_))) {
+        this.id_ = opt_value;
+      }
+    }
+    return this;
+  }
+  return this.id_;
+};
+
+
+//endregion
 //exports
 (function() {
   var proto = anychart.core.Chart.prototype;
@@ -3320,5 +3356,6 @@ anychart.core.Chart.prototype.shareWithPinterest = function(opt_linkOrOptions, o
   proto['shareWithTwitter'] = proto.shareWithTwitter;
   proto['shareWithLinkedIn'] = proto.shareWithLinkedIn;
   proto['shareWithPinterest'] = proto.shareWithPinterest;
+  proto['id'] = proto.id;
 })();
 

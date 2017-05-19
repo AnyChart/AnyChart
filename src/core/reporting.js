@@ -270,6 +270,9 @@ anychart.core.reporting.getWarningDescription_ = function(code, opt_arguments) {
       var count = /** @type {number} */(opt_arguments[0]) / interval;
       return 'Current scale ticks settings resulted in too many ticks: trying to generate about ' + count + ' ticks with interval ' + interval;
 
+    case anychart.enums.WarningCode.OBJECT_KEY_COLLISION:
+      return 'Data item with ID=\'' + opt_arguments[0] + '\' already exists. You should use another key.';
+
     default:
       return 'Unknown error. Please, contact support team at http://support.anychart.com/.\n' +
           'We will be very grateful for your report!';

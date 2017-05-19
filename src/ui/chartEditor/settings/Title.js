@@ -340,15 +340,23 @@ anychart.ui.chartEditor.settings.Title.prototype.createDom = function() {
   this.addChild(fontSizeSelect, true);
   goog.dom.classlist.add(fontSizeSelect.getElement(), goog.getCssName('anychart-chart-editor-settings-font-size'));
 
+  var buttonsWrapper = goog.dom.createDom(
+      goog.dom.TagName.DIV,
+      goog.getCssName('anychart-chart-editor-settings-control-right'));
+  goog.dom.appendChild(element, buttonsWrapper);
+
   var boldBtn = new anychart.ui.chartEditor.button.Bold();
   boldBtn.addClassName(goog.getCssName('anychart-chart-editor-settings-bold'));
   this.addChild(boldBtn, true);
+  goog.dom.appendChild(buttonsWrapper, boldBtn.getElement());
 
   var italicBtn = new anychart.ui.chartEditor.button.Italic();
   this.addChild(italicBtn, true);
+  goog.dom.appendChild(buttonsWrapper, italicBtn.getElement());
 
   var underlineBtn = new anychart.ui.chartEditor.button.Underline();
   this.addChild(underlineBtn, true);
+  goog.dom.appendChild(buttonsWrapper, underlineBtn.getElement());
 
   // The setCollapsed method needs to be called after the toolbar is rendered
   // for it to pick up the directionality of the toolbar.

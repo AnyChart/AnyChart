@@ -77,9 +77,9 @@ anychart.ui.chartEditor.group.Theme.parseThemes_ = function() {
     var name, theme;
     var ns = window['anychart']['themes'];
     for (var i in ns) {
-      if (i == 'merging') continue;
-      name = goog.string.toTitleCase(i.replace(/([A-Z])/g, ' $1').toLowerCase());
       theme = ns[i];
+      if (i == 'merging' || !theme['chart']) continue;
+      name = goog.string.toTitleCase(i.replace(/([A-Z])/g, ' $1').toLowerCase());
       anychart.ui.chartEditor.group.Theme.themes.push({name: name, value: theme});
     }
   }
@@ -110,7 +110,7 @@ anychart.ui.chartEditor.group.Theme.prototype.createDom = function() {
   anychart.ui.chartEditor.group.Theme.parseThemes_();
   anychart.ui.chartEditor.group.Theme.parsePalettes_();
 
-  var i, count, option, theme, palette;
+  var i, count, theme, palette;
   var themes = anychart.ui.chartEditor.group.Theme.themes;
   var palettes = anychart.ui.chartEditor.group.Theme.palettes;
   var contentElement = this.getContentElement();
@@ -199,6 +199,7 @@ anychart.ui.chartEditor.group.Theme.prototype.update = function() {
   var win = goog.dom.getWindow();
   var ac = win['anychart'];
   var appliedTheme = ac['theme']();
+  appliedTheme = appliedTheme[0] ? appliedTheme[0] : appliedTheme;
   var themeSelectedIndex = -1;
 
   for (i = 0, count = themes.length; i < count; i++) {

@@ -57,7 +57,6 @@ anychart.ui.chartEditor.steps.Data.prototype.createDom = function() {
 
   var element = /** @type {Element} */(this.getElement());
   var dom = this.getDomHelper();
-  var sharedModel = this.getSharedModel();
 
   var className = anychart.ui.chartEditor.steps.Data.CSS_CLASS;
   goog.dom.classlist.add(element, className);
@@ -110,7 +109,7 @@ anychart.ui.chartEditor.steps.Data.prototype.updateDataSets_ = function() {
     this.dataSetsEl_.appendChild(dataSetEl);
   }
 
-  this.selectDataSet_(0);
+  this.selectDataSet_(this.selectedDataSetIndex_);
 };
 
 
@@ -177,20 +176,21 @@ anychart.ui.chartEditor.steps.Data.prototype.getSelectedDataSet_ = function() {
  * @private
  */
 anychart.ui.chartEditor.steps.Data.prototype.selectDataSet_ = function(index) {
+  var sharedModel = this.getSharedModel();
+  if (!sharedModel.dataSets.length) return;
+
+  this.selectedDataSetIndex_ = index;
+
   var className = anychart.ui.chartEditor.steps.Data.CSS_CLASS;
   var activeClass = goog.getCssName('anychart-active');
 
   var activeDataSetEl = goog.dom.getElementByClass(activeClass, this.dataSetsEl_);
   if (activeDataSetEl) goog.dom.classlist.remove(activeDataSetEl, activeClass);
 
-  var sharedModel = this.getSharedModel();
-  if (!sharedModel.dataSets.length) return;
-
-  this.selectedDataSetIndex_ = index;
-
   var dataSetsElements = this.dataSetsEl_.getElementsByClassName(goog.getCssName(className, 'data-set'));
   var dataSetEl = dataSetsElements[index];
   goog.dom.classlist.add(dataSetEl, activeClass);
+
   this.updateDataPreview_(index);
   this.updateDataMappings_(index);
 };
@@ -240,9 +240,8 @@ anychart.ui.chartEditor.steps.Data.prototype.onChangeStep_ = function(e) {
   for (var i = 0, count = sharedModel.dataMappings.length; i < count; i++) {
     this.dispatchEvent({
       type: anychart.ui.chartEditor.events.EventType.ADD_SERIES,
-      id: ++sharedModel.lastSeriesId,
-      mapping: i,
       seriesType: null,
+      mapping: i,
       rebuild: false
     });
   }

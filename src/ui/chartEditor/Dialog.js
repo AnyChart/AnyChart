@@ -75,6 +75,7 @@ anychart.ui.chartEditor.Dialog = function(opt_class, opt_useIframeMask, opt_domH
     chartConstructor: 'column',
     seriesType: 'column'
   });
+  this.sharedModel_['anychart'] = this.sharedModel_.anychart;
 
   this.controller_ = new anychart.ui.chartEditor.Controller(this);
 
@@ -214,7 +215,7 @@ anychart.ui.chartEditor.Dialog = function(opt_class, opt_useIframeMask, opt_domH
           }
         },
         {
-          type: 'percent-stacked-column3d', caption: 'Percent Stacked Column Chart', image: 'percent-stacked-ccolumn3d-chart/thumb.png',
+          type: 'percent-stacked-column3d', caption: 'Percent Stacked Column Chart', image: 'percent-stacked-column3d-chart/thumb.png',
           ctor: 'column3d', seriesType: 'column', referenceNames: ['x', 'value'],
           settings: {
             'chart.yScale().stackMode()': 'percent'
@@ -337,7 +338,6 @@ anychart.ui.chartEditor.Dialog = function(opt_class, opt_useIframeMask, opt_domH
   this.imagesLoaded_ = false;
   var imageLoader = new goog.net.ImageLoader();
   this.registerDisposable(imageLoader);
-
   goog.events.listen(imageLoader, goog.net.EventType.COMPLETE, function() {
     this.imagesLoaded_ = true;
     this.preloader_.visible(false);
@@ -616,11 +616,15 @@ anychart.ui.chartEditor.Dialog.prototype.data = function(var_args) {
   this.resetSharedModel_();
 
   for (var i = 0; i < arguments.length; i++) {
-    if (goog.isArrayLike(arguments[i])) {
+    var dataSet = arguments[i];
+    if (goog.isArrayLike(dataSet))
+      dataSet = window['anychart']['data']['set'](dataSet);
+
+    if (dataSet['mapAs']) {
       this.sharedModel_.dataSets.push({
         index: i,
         name: 'Data Set ' + (i + 1),
-        instance: window['anychart']['data']['set'](arguments[i]),
+        instance: dataSet,
         rawMappings: [],
         mappings: []
       });

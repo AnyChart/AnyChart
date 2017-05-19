@@ -72,7 +72,7 @@ anychart.ui.chartEditor.group.Series.prototype.exitDocument = function() {
 
 
 /** @inheritDoc */
-anychart.ui.chartEditor.group.Series.prototype.update = function() {
+anychart.ui.chartEditor.group.Series.prototype.update = function(model) {
   var seriesCount = this.model.chart['getSeriesCount']();
   var count = Math.max(this.seriesContainer_.getChildCount(), seriesCount);
 
@@ -84,6 +84,7 @@ anychart.ui.chartEditor.group.Series.prototype.update = function() {
         this.seriesContainer_.addChildAt(child, i, true);
       }
       child.setSeriesId(this.model.chart['getSeriesAt'](i)['id']());
+      child.setSeriesTypeOptions({'some': 'options'});
       child.update(this.model);
       goog.style.setElementShown(child.getElement(), true);
     } else {
@@ -104,7 +105,7 @@ anychart.ui.chartEditor.group.Series.prototype.onAddSeriesAction_ = function(evt
   this.dispatchEvent({
     type: anychart.ui.chartEditor.events.EventType.ADD_SERIES,
     seriesType: null,
-    mapping: undefined,
+    mapping: void 0,
     rebuild: true
   });
 };

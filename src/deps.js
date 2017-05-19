@@ -404,6 +404,7 @@ goog.addDependency('../../../../src/modules/area.js', ['anychart.modules.area'],
 goog.addDependency('../../../../src/modules/area3d.js', ['anychart.modules.area3d'], ['anychart.charts.Cartesian3d', 'anychart.core.drawers.Area3d', 'anychart.modules.base'], false);
 goog.addDependency('../../../../src/modules/bar.js', ['anychart.modules.bar'], ['anychart.charts.Cartesian', 'anychart.core.drawers.Column', 'anychart.core.drawers.RangeColumn', 'anychart.modules.base'], false);
 goog.addDependency('../../../../src/modules/bar3d.js', ['anychart.modules.bar3d'], ['anychart.charts.Cartesian3d', 'anychart.core.drawers.Column3d', 'anychart.modules.base'], false);
+goog.addDependency('../../../../src/modules/binding.js', ['anychart.modules.binding'], ['anychart.ui.binding'], false);
 goog.addDependency('../../../../src/modules/box.js', ['anychart.modules.box'], ['anychart.charts.Cartesian', 'anychart.core.drawers.Box', 'anychart.modules.base'], false);
 goog.addDependency('../../../../src/modules/bubbleMap.js', ['anychart.modules.bubbleMap'], ['anychart.charts.Map', 'anychart.core.drawers.map.Bubble', 'anychart.modules.base'], false);
 goog.addDependency('../../../../src/modules/bullet.js', ['anychart.modules.bullet'], ['anychart.charts.Bullet', 'anychart.modules.base'], false);
@@ -519,6 +520,7 @@ goog.addDependency('../../../../src/ui/Preloader.js', ['anychart.ui.Preloader'],
 goog.addDependency('../../../../src/ui/RangePicker.js', ['anychart.ui.RangePicker'], ['anychart.enums', 'goog.dom.selection', 'goog.events.KeyHandler', 'goog.ui.Component', 'goog.ui.LabelInput'], false);
 goog.addDependency('../../../../src/ui/RangeSelector.js', ['anychart.ui.RangeSelector', 'anychart.ui.RangeSelector.Range'], ['anychart.enums', 'anychart.ui.button.Toggle', 'goog.ui.ButtonSide', 'goog.ui.Component', 'goog.ui.Component.EventType', 'goog.ui.SelectionModel'], false);
 goog.addDependency('../../../../src/ui/Zoom.js', ['anychart.ui.Zoom'], ['anychart.enums', 'anychart.ui.button.Base', 'goog.ui.Component', 'goog.ui.Component.EventType'], false);
+goog.addDependency('../../../../src/ui/binding.js', ['anychart.ui.binding'], ['goog.dom', 'goog.dom.classlist', 'goog.dom.forms', 'goog.events'], false);
 goog.addDependency('../../../../src/ui/button/Base.js', ['anychart.ui.button.Base'], ['goog.ui.Button'], false);
 goog.addDependency('../../../../src/ui/button/Primary.js', ['anychart.ui.button.Primary'], ['anychart.ui.button.Base'], false);
 goog.addDependency('../../../../src/ui/button/Secondary.js', ['anychart.ui.button.Secondary'], ['anychart.ui.button.Base'], false);
@@ -553,7 +555,7 @@ goog.addDependency('../../../../src/ui/chartEditor/select/Base.js', ['anychart.u
 goog.addDependency('../../../../src/ui/chartEditor/select/FontFamily.js', ['anychart.ui.chartEditor.select.FontFamily'], ['anychart.ui.chartEditor.select.Base'], false);
 goog.addDependency('../../../../src/ui/chartEditor/select/Renderer.js', ['anychart.ui.chartEditor.select.Renderer'], ['goog.ui.FlatMenuButtonRenderer', 'goog.ui.INLINE_BLOCK_CLASSNAME'], false);
 goog.addDependency('../../../../src/ui/chartEditor/settings/Axes.js', ['anychart.ui.chartEditor.settings.Axes'], ['anychart.ui.chartEditor.settings.Axis', 'goog.ui.Component'], false);
-goog.addDependency('../../../../src/ui/chartEditor/settings/Axis.js', ['anychart.ui.chartEditor.settings.Axis'], ['anychart.ui.chartEditor.select.Base', 'anychart.ui.chartEditor.settings.Title', 'goog.ui.Component'], false);
+goog.addDependency('../../../../src/ui/chartEditor/settings/Axis.js', ['anychart.ui.chartEditor.settings.Axis'], ['anychart.ui.chartEditor.checkbox.Base', 'anychart.ui.chartEditor.select.Base', 'anychart.ui.chartEditor.settings.Title', 'goog.ui.Component'], false);
 goog.addDependency('../../../../src/ui/chartEditor/settings/ChartType.js', ['anychart.ui.chartEditor.settings.ChartType'], ['goog.ui.Control'], false);
 goog.addDependency('../../../../src/ui/chartEditor/settings/Input.js', ['anychart.ui.chartEditor.settings.Input'], ['anychart.ui.chartEditor.events', 'goog.Timer', 'goog.events.KeyHandler', 'goog.ui.LabelInput'], false);
 goog.addDependency('../../../../src/ui/chartEditor/settings/MappingSelect.js', ['anychart.ui.chartEditor.settings.MappingSelect'], ['anychart.ui.chartEditor.select.Base'], false);

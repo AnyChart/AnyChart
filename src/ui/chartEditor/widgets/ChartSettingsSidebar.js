@@ -20,6 +20,10 @@ goog.require('goog.ui.Component');
 anychart.ui.chartEditor.ChartSettingsSideBar = function() {
   anychart.ui.chartEditor.ChartSettingsSideBar.base(this, 'constructor');
 
+  /**
+   * @type {Array.<goog.ui.Component>}
+   * @private
+   */
   this.instances_ = [];
 };
 goog.inherits(anychart.ui.chartEditor.ChartSettingsSideBar, goog.ui.Component);
@@ -29,16 +33,9 @@ goog.inherits(anychart.ui.chartEditor.ChartSettingsSideBar, goog.ui.Component);
 anychart.ui.chartEditor.ChartSettingsSideBar.CSS_CLASS = goog.getCssName('anychart-chart-editor-chartSettingsSidebar');
 
 
-/**
- * @type {Array.<goog.ui.Component>}
- * @private
- */
-anychart.ui.chartEditor.ChartSettingsSideBar.prototype.instances_ = null;
-
-
 /** @override */
 anychart.ui.chartEditor.ChartSettingsSideBar.prototype.disposeInternal = function() {
-  this.instances_ = null;
+  this.instances_.length = 0;
   anychart.ui.chartEditor.ChartSettingsSideBar.base(this, 'disposeInternal');
 };
 
@@ -74,7 +71,7 @@ anychart.ui.chartEditor.ChartSettingsSideBar.prototype.update = function(list, m
   var count = Math.max(itemsCount, this.getChildCount());
 
   for (var i = 0; i < count; i++) {
-    /** @type {goog.ui.Component} */
+    /** @type {(goog.ui.Component|anychart.ui.chartEditor.group.Base)} */
     var instance = this.instances_[i];
 
     if (i < itemsCount) {

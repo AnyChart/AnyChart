@@ -1,5 +1,6 @@
 goog.provide('anychart.ui.chartEditor.settings.Axis');
 
+goog.require('anychart.ui.chartEditor.checkbox.Base');
 goog.require('anychart.ui.chartEditor.select.Base');
 goog.require('anychart.ui.chartEditor.settings.Title');
 
@@ -114,11 +115,11 @@ anychart.ui.chartEditor.settings.Axis.prototype.setEnabled = function(enabled) {
         goog.getCssName('anychart-control-disabled'), !enabled);
   }
 
-  // if (this.invertedLabel_) {
-  //   goog.dom.classlist.enable(
-  //       goog.asserts.assert(this.invertedLabel_),
-  //       goog.getCssName('anychart-control-disabled'), !enabled);
-  // }
+  if (this.invertedLabel_) {
+    goog.dom.classlist.enable(
+        goog.asserts.assert(this.invertedLabel_),
+        goog.getCssName('anychart-control-disabled'), !enabled);
+  }
 };
 
 
@@ -133,7 +134,7 @@ anychart.ui.chartEditor.settings.Axis.prototype.isEnabled = function() {
 /** @override */
 anychart.ui.chartEditor.settings.Axis.prototype.disposeInternal = function() {
   this.orientation_ = null;
-  //this.inverted_ = null;
+  this.inverted_ = null;
   this.title_ = null;
   this.labels_ = null;
   anychart.ui.chartEditor.settings.Axis.base(this, 'disposeInternal');
@@ -184,26 +185,26 @@ anychart.ui.chartEditor.settings.Axis.prototype.createDom = function() {
   //endregion
 
   //region Inverted
-  // var invertedLabel = goog.dom.createDom(
-  //     goog.dom.TagName.LABEL,
-  //     [
-  //       goog.ui.INLINE_BLOCK_CLASSNAME,
-  //       goog.getCssName('anychart-chart-editor-settings-label')
-  //     ],
-  //     'Inverted');
-  // goog.dom.appendChild(element, invertedLabel);
-  //
-  // var invertedBtn = new anychart.ui.chartEditor.checkbox.Base();
-  // invertedBtn.addClassName(goog.getCssName('anychart-chart-editor-settings-control-right'));
-  // invertedBtn.addClassName(goog.getCssName('anychart-chart-editor-settings-enabled'));
-  // invertedBtn.setNormalValue(false);
-  // invertedBtn.setCheckedValue(true);
-  // invertedBtn.setLabel(invertedLabel);
-  // this.addChild(invertedBtn, true);
-  //
-  // goog.dom.appendChild(element, goog.dom.createDom(
-  //     goog.dom.TagName.DIV,
-  //     goog.getCssName('anychart-chart-editor-settings-item-gap-mini')));
+  var invertedLabel = goog.dom.createDom(
+      goog.dom.TagName.LABEL,
+      [
+        goog.ui.INLINE_BLOCK_CLASSNAME,
+        goog.getCssName('anychart-chart-editor-settings-label')
+      ],
+      'Inverted');
+  goog.dom.appendChild(element, invertedLabel);
+
+  var invertedBtn = new anychart.ui.chartEditor.checkbox.Base();
+  invertedBtn.addClassName(goog.getCssName('anychart-chart-editor-settings-control-right'));
+  invertedBtn.addClassName(goog.getCssName('anychart-chart-editor-settings-enabled'));
+  invertedBtn.setNormalValue(false);
+  invertedBtn.setCheckedValue(true);
+  invertedBtn.setLabel(invertedLabel);
+  this.addChild(invertedBtn, true);
+
+  goog.dom.appendChild(element, goog.dom.createDom(
+      goog.dom.TagName.DIV,
+      goog.getCssName('anychart-chart-editor-settings-item-gap-mini')));
   //endregion
 
   //region Title
@@ -226,13 +227,13 @@ anychart.ui.chartEditor.settings.Axis.prototype.createDom = function() {
   //endregion
 
   this.orientation_ = orientationSelect;
-  //this.inverted_ = invertedBtn;
+  this.inverted_ = invertedBtn;
   this.title_ = title;
   this.labels_ = labels;
 
   this.enabledHeader_ = enabledHeader;
   this.orientationLabel_ = orientationLabel;
-  //this.invertedLabel_ = invertedLabel;
+  this.invertedLabel_ = invertedLabel;
 
   this.updateKeys();
 };
@@ -243,7 +244,7 @@ anychart.ui.chartEditor.settings.Axis.prototype.createDom = function() {
  */
 anychart.ui.chartEditor.settings.Axis.prototype.updateKeys = function() {
   if (this.orientation_) this.orientation_.setKey(this.genKey('orientation()'));
-  //if (this.inverted_) this.inverted_.setKey(this.genKey('scale().inverted()'));
+  if (this.inverted_) this.inverted_.setKey('chart.' + (this.key_ == 'xAxis' ? 'xScale' : 'yScale') + '().inverted()');
   if (this.title_) {
     this.title_.setKey(this.genKey('title()'));
     this.title_.setOrientationKey(this.genKey('title().orientation()'));
@@ -258,7 +259,7 @@ anychart.ui.chartEditor.settings.Axis.prototype.updateKeys = function() {
  */
 anychart.ui.chartEditor.settings.Axis.prototype.update = function(model) {
   if (this.orientation_) this.orientation_.update(model);
-  //if (this.inverted_) this.inverted_.update(model);
+  if (this.inverted_) this.inverted_.update(model);
   if (this.title_) this.title_.update(model);
   if (this.labels_) this.labels_.update(model);
 };

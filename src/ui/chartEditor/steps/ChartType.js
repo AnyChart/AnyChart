@@ -33,16 +33,27 @@ anychart.ui.chartEditor.steps.ChartType.CssClass = {};
 
 
 /**
+ * @param {boolean=} opt_setDefaultPreset
  * @private
  */
-anychart.ui.chartEditor.steps.ChartType.prototype.checkDataMapping_ = function() {
+anychart.ui.chartEditor.steps.ChartType.prototype.checkDataMapping_ = function(opt_setDefaultPreset) {
   var model = this.getSharedModel();
+
+  var r = this.checkMappings(opt_setDefaultPreset);
+
+  if (opt_setDefaultPreset && r.type) {
+    this.dispatchEvent({
+      type: anychart.ui.chartEditor.events.EventType.SET_PRESET_TYPE,
+      category: r.category,
+      presetType: r.type
+    });
+  }
 
   goog.dom.classlist.enable(this.existDataMappingWarningEl_, goog.getCssName('anychart-hidden'), Boolean(model.dataMappings.length));
   this.enableNextStep(Boolean(model.dataMappings.length));
 
-  goog.dom.classlist.enable(this.fieldsDataMappingWarningEl_, goog.getCssName('anychart-hidden'), Boolean(this.getChartType()));
-  this.enableNextStep(Boolean(this.getChartType()));
+  goog.dom.classlist.enable(this.fieldsDataMappingWarningEl_, goog.getCssName('anychart-hidden'), r.isValid);
+  this.enableNextStep(r.isValid);
 };
 
 
@@ -51,7 +62,6 @@ anychart.ui.chartEditor.steps.ChartType.prototype.createDom = function() {
   anychart.ui.chartEditor.steps.ChartType.base(this, 'createDom');
   var element = /** @type {Element} */(this.getElement());
   var dom = this.getDomHelper();
-  var model = this.getSharedModel();
 
   var className = anychart.ui.chartEditor.steps.ChartType.CSS_CLASS;
   goog.dom.classlist.add(element, className);
@@ -94,7 +104,7 @@ anychart.ui.chartEditor.steps.ChartType.prototype.createDom = function() {
   goog.dom.appendChild(this.getContentElement(), this.fieldsDataMappingWarningEl_);
   this.chartTypeSidebar_ = chartTypeSidebar;
 
-  this.checkDataMapping_();
+  this.checkDataMapping_(true);
 };
 
 

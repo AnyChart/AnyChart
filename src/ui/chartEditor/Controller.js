@@ -1,6 +1,6 @@
 goog.provide('anychart.ui.chartEditor.Controller');
-goog.require('anychart.ui.chartEditor.events');
 
+goog.require('anychart.ui.chartEditor.events');
 goog.require('goog.ui.PopupBase.EventType');
 
 
@@ -106,13 +106,13 @@ anychart.ui.chartEditor.Controller.prototype.onChangeModel_ = function(evt) {
 anychart.ui.chartEditor.Controller.prototype.onAddSeries_ = function(evt) {
   var id = ++this.model_.lastSeriesId;
   var type = evt.seriesType;
-  var mapping = this.model_.dataMappings.length - 1;
 
+  var mapping;
   if (goog.isDef(evt.mapping)) {
     mapping = evt.mapping;
   } else {
     var unusedMapping = this.getUnusedMapping();
-    if (!isNaN(unusedMapping)) mapping = unusedMapping;
+    mapping = isNaN(unusedMapping) ? (this.model_.dataMappings.length - 1) : unusedMapping;
   }
 
   this.model_.seriesMappings[String(id)] = {type: type, mapping: mapping};
@@ -209,12 +209,25 @@ anychart.ui.chartEditor.Controller.prototype.onPresetChanged_ = function() {
  * @return {string}
  */
 anychart.ui.chartEditor.Controller.getset = function(model, key, opt_value, opt_dryRun) {
-  try {
-    var keyPath = key.split('.');
-    var target = model;
-    var name, matchResult, arg, useCall;
-    var success = false;
+  if (goog.isString(opt_value))
+    opt_value = opt_value.replace(/\\(r|n|t)/g, function(part, g1) {
+      switch (g1) {
+        case 'r':
+          return '\r';
+        case 'n':
+          return '\n';
+        case 't':
+          return '\t';
+      }
+      return part;
+    });
 
+  var keyPath = key.split('.');
+  var target = model;
+  var name, matchResult, arg, useCall;
+  var success = false;
+
+  try {
     for (var i = 0, count = keyPath.length; i < count; i++) {
       name = keyPath[i];
       matchResult = name.match(/(.+)\((.*)\)/);
@@ -241,8 +254,30 @@ anychart.ui.chartEditor.Controller.getset = function(model, key, opt_value, opt_
       }
     }
   } catch (e) {
-    console.log('Can\'t get/set by key: ', key, ' and value: ', opt_value);
+    var message = 'Could not apply key \'' + key + '\'';
+    if (arg) message += ' with argument [' + arg + ']';
+
+    var console = goog.global['console'];
+    if (console) {
+      var log = console['warn'] || console['log'];
+      if (typeof log != 'object') {
+        log.call(console, message);
+      }
+    }
   }
+
+  if (!goog.isDef(opt_value) && goog.isString(target))
+    target = target.replace(/(\r|\n|\t)/g, function(part, g1) {
+      switch (g1) {
+        case '\r':
+          return '\\r';
+        case '\n':
+          return '\\n';
+        case '\t':
+          return '\\t';
+      }
+      return part;
+    });
 
   return opt_dryRun ? success : target;
 };
@@ -274,13 +309,14 @@ anychart.ui.chartEditor.Controller.prototype.onBuildChart_ = function(opt_evt) {
       seriesData = this.model_.seriesMappings[id];
       series = chart['getSeries'](id);
       seriesType = seriesData.type || this.model_.seriesType;
+      var mapping = this.model_.dataMappings[seriesData.mapping];
       if (!series) {
-        series = chart[seriesType](this.model_.dataMappings[seriesData.mapping]);
+        series = chart[seriesType](mapping);
         series['id'](id);
       } else {
         series['id'](id);
         series['seriesType'](seriesType);
-        series['data'](this.model_.dataMappings[seriesData.mapping]);
+        series['data'](mapping);
       }
     }
 
@@ -326,7 +362,7 @@ anychart.ui.chartEditor.Controller.prototype.getBuildCode = function() {
   // function arguments and data sets
   for (i = 0, count = this.model_.dataSets.length; i < count; i++) {
     fArgs += subs('data%s,', i);
-    fDataSets += subs('var dataSet%s=anychart.data.set(data%s);', i, i);
+    fDataSets += subs('var dataSet%s=data%s[\'mapAs\'] ? data%s : anychart.data.set(data%s);', i, i, i, i);
   }
   fArgs = fArgs.substring(0, fArgs.length - 1); // remove last comma
 

@@ -70,6 +70,18 @@ anychart.ui.chartEditor.DataMapping = function(rawMapping, values) {
    * @private
    */
   this.values_ = values;
+
+  /**
+   * @type {string}
+   * @private
+   */
+  this.name_ = '';
+
+  /**
+   * @type {string}
+   * @private
+   */
+  this.dataSetName_ = '';
 };
 goog.inherits(anychart.ui.chartEditor.DataMapping, goog.ui.Component);
 
@@ -91,13 +103,14 @@ anychart.ui.chartEditor.DataMapping.prototype.createDom = function() {
   var element = /** @type {Element} */(this.getElement());
   var dom = this.getDomHelper();
 
+
   var className = anychart.ui.chartEditor.DataMapping.CSS_CLASS;
   goog.dom.classlist.add(element, className);
 
-  this.titleEl_ = dom.createDom(
-      goog.dom.TagName.DIV,
-      goog.getCssName(className, 'title'),
-      'Data Mapping ' + (this.getParent().indexOfChild(this) + 1));
+  this.name_ = 'Data Mapping ' + (this.getParent().indexOfChild(this) + 1);
+  this.dataSetName_ = this.getParent().getDataSet()['name'];
+
+  this.titleEl_ = dom.createDom(goog.dom.TagName.DIV, goog.getCssName(className, 'title'), this.name_);
   element.appendChild(this.titleEl_);
 
   this.removeMappingBtn_ = new anychart.ui.button.Base(null, anychart.ui.IconButtonRenderer.getInstance());
@@ -116,6 +129,12 @@ anychart.ui.chartEditor.DataMapping.prototype.createDom = function() {
   this.addFieldBtn_.render(element);
 
   this.updateFields_();
+};
+
+
+/** @return {string} */
+anychart.ui.chartEditor.DataMapping.prototype.getTitle = function() {
+  return (this.name_ + ' :: ' + this.dataSetName_).split('Data ').join('');
 };
 
 

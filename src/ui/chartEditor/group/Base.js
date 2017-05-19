@@ -179,11 +179,8 @@ anychart.ui.chartEditor.group.Base.prototype.setEnabled = function(enabled) {
  * @private
  */
 anychart.ui.chartEditor.group.Base.prototype.applyEnabled_ = function(enabled) {
-  this.enabled_ = true;
-
-  if (this.useEnabledButton_) {
+  if (this.useEnabledButton_)
     this.enabledBtn_.setEnabled(enabled);
-  }
 
   this.setContentEnabled(enabled);
 
@@ -245,6 +242,7 @@ anychart.ui.chartEditor.group.Base.prototype.createDom = function() {
     enabledBtn.setCheckedValue(true);
     enabledBtn.render(header);
     enabledBtn.setParent(this);
+    this.enabledBtn_ = enabledBtn;
   }
 
   goog.dom.appendChild(element, header);
@@ -257,7 +255,6 @@ anychart.ui.chartEditor.group.Base.prototype.createDom = function() {
   this.headerElement_ = header;
   this.contentElement_ = content;
   this.zippy_ = new goog.ui.AnimatedZippy(header, content, this.expanded_);
-  this.enabledBtn_ = enabledBtn;
 
   this.updateKeys();
 };

@@ -39,15 +39,10 @@ anychart.ui.chartEditor.steps.Settings.prototype.chartSettingsSidebar_ = null;
 anychart.ui.chartEditor.steps.Settings.prototype.createDom = function() {
   anychart.ui.chartEditor.steps.Settings.base(this, 'createDom');
   var element = /** @type {Element} */(this.getElement());
-  var dom = this.getDomHelper();
-  var sharedModel = this.getSharedModel();
-
   var className = anychart.ui.chartEditor.steps.Settings.CSS_CLASS;
   goog.dom.classlist.add(element, className);
 
   var asideEl = this.getAsideElement();
-  var contentEl = this.getContentElement();
-
   var chartSettingsSidebar = new anychart.ui.chartEditor.ChartSettingsSideBar();
   chartSettingsSidebar.render(asideEl);
   chartSettingsSidebar.setParentEventTarget(this);
