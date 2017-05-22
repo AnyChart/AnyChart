@@ -394,14 +394,14 @@ anychart.core.drawers.map.Connector.prototype.drawPoint_ = function(point, shape
 
         var directionRltAngle = 1;
         var curvatureBasePointAngle;
-        if (current_x < start_x && current_y < start_y) {
+        if (current_x <= start_x && current_y <= start_y) {
           curvatureBasePointAngle = anglePathNormal - 90;
-        } else if (current_x < start_x && current_y > start_y) {
+        } else if (current_x <= start_x && current_y >= start_y) {
           curvatureBasePointAngle = 270 - anglePathNormal;
-        } else if (current_x > start_x && current_y > start_y) {
+        } else if (current_x >= start_x && current_y >= start_y) {
           curvatureBasePointAngle = anglePathNormal - 90;
           directionRltAngle = -1;
-        } else if (current_x > start_x && current_y < start_y) {
+        } else if (current_x >= start_x && current_y <= start_y) {
           curvatureBasePointAngle = 180 - anglePathNormal + 90;
           directionRltAngle = -1;
         }
