@@ -351,6 +351,14 @@ anychart.core.axes.StockDateTime.prototype.labelsInvalidated_ = function(e) {
 };
 
 
+/** @inheritDoc */
+anychart.core.axes.StockDateTime.prototype.remove = function() {
+  if (this.rootLayer_)
+    this.rootLayer_.remove();
+};
+
+
+
 /**
  * Draws the axis.
  * @return {anychart.core.axes.StockDateTime}

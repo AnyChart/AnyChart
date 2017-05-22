@@ -1414,6 +1414,13 @@ anychart.core.stock.Plot.prototype.dateTimeHighlighter = function(opt_strokeOrFi
 //  Drawing
 //
 //----------------------------------------------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.core.stock.Plot.prototype.remove = function() {
+  if (this.rootLayer_)
+    this.rootLayer_.remove();
+};
+
+
 /**
  * Draws the plot.
  * @return {anychart.core.stock.Plot}
