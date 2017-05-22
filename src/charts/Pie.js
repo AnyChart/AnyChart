@@ -3852,9 +3852,41 @@ anychart.charts.Pie.prototype.domainDefragmentation = function(domain) {
 anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
   var iterator = this.getIterator();
   var label, x0, y0, dR0, isRightSide;
+  var connectorPath;
+
+  //-----------init connector element------------------------------------------------------------------------
 
   this.connectorAnchorCoords = [];
   var connector;
+
+  if (this.connectorsLayer_) {
+    this.connectorsLayer_.clear();
+    if (this.mode3d_) this.connectorsLowerLayer_.clear();
+  } else {
+    this.connectorsLayer_ = new anychart.core.utils.TypedLayer(function() {
+      return acgraph.path();
+    }, function(child) {
+      (/** @type {acgraph.vector.Path} */ (child)).clear();
+    });
+    this.connectorsLayer_.parent(this.rootElement);
+    this.connectorsLayer_.zIndex(anychart.charts.Pie.ZINDEX_LABEL);
+
+    if (this.mode3d_) {
+      this.connectorsLowerLayer_ = new anychart.core.utils.TypedLayer(function() {
+        return acgraph.path();
+      }, function(child) {
+        (/** @type {acgraph.vector.Path} */ (child)).clear();
+      });
+      this.connectorsLowerLayer_.parent(this.rootElement);
+      this.connectorsLowerLayer_.zIndex(anychart.charts.Pie.ZINDEX_CONNECTOR_LOWER_LAYER);
+    }
+  }
+  this.drawnConnectors_ = [];
+  if (!this.hoveredLabelConnectorPath_) {
+    // path for connector for label disabled by algorithm
+    this.hoveredLabelConnectorPath_ = this.rootElement.path();
+    this.hoveredLabelConnectorPath_.stroke(this.connectorStroke_);
+  }
 
   //--------calculate absolute labels position, sort labels, separation of the labels on the left and right side--------
 
@@ -3917,266 +3949,255 @@ anychart.charts.Pie.prototype.calculateOutsideLabels = function() {
     } else {
       switchToLeftSide ? leftSideLabels2.push(label) : leftSideLabels.push(label);
     }
+
+    if (this.insideLabelsOverlap_) {
+      if (label && label.enabled() != false) {
+        index = label.getIndex();
+
+        if (!this.drawnConnectors_[index]) {
+          y0 = this.connectorAnchorCoords[index * 2 + 1] - this.get3DHeight() / 2;
+          if (this.mode3d_ && y0 < this.cy_) {
+            connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLowerLayer_.genNextChild());
+          } else {
+            connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
+          }
+          this.drawnConnectors_[index] = connectorPath;
+          connectorPath.stroke(this.connectorStroke_);
+          this.drawConnectorLine(label, connectorPath);
+        }
+      }
+    }
   }
 
   rightSideLabels = rightSideLabels2 ? rightSideLabels2.concat(rightSideLabels) : rightSideLabels;
   leftSideLabels = leftSideLabels2 ? leftSideLabels2.concat(leftSideLabels) : leftSideLabels;
 
-  //------------------------------------ left domain calculation ------------------------------------------------------
+  if (!this.insideLabelsOverlap_) {
 
-  var i, len, bounds, droppedLabels, notIntersection, m, l;
-  var leftDomains = [], domain = null;
-  var domainBounds;
+    //------------------------------------ left domain calculation ------------------------------------------------------
 
-  for (i = 0, len = leftSideLabels.length; i < len; i++) {
-    label = leftSideLabels[i];
-    if (label) {
-      iterator.select(label.getIndex());
-      label.formatProvider(this.createFormatProvider());
-      bounds = this.getLabelBounds(label);
+    var i, len, bounds, droppedLabels, notIntersection, m, l;
+    var leftDomains = [], domain = null;
+    var domainBounds;
 
-      if (!domain || domain.isNotIntersect(bounds)) {
-        if (domain) leftDomains.push(domain);
-        isRightSide = label['anchor']() == anychart.enums.Position.LEFT_CENTER;
-        domain = new anychart.charts.Pie.PieOutsideLabelsDomain(isRightSide, this, leftDomains);
-        domain.addLabel(label);
-      } else {
-        domain.addLabel(label);
-      }
-    }
-  }
-  if (domain) leftDomains.push(domain);
-
-  for (i = 0, len = leftDomains.length; i < len; i++) {
-    domain = leftDomains[i];
-    if (domain && domain.droppedLabels) {
-      if (!droppedLabels) droppedLabels = [];
-      droppedLabels = goog.array.concat(droppedLabels, domain.droppedLabels);
-    }
-  }
-
-  domain = null;
-  if (droppedLabels) {
-    goog.array.sort(droppedLabels, function(a, b) {
-      return a.getIndex() > b.getIndex() ? 1 : a.getIndex() < b.getIndex() ? -1 : 0
-    });
-
-    for (i = 0, len = droppedLabels.length; i < len; i++) {
-      label = droppedLabels[i];
+    for (i = 0, len = leftSideLabels.length; i < len; i++) {
+      label = leftSideLabels[i];
       if (label) {
         iterator.select(label.getIndex());
         label.formatProvider(this.createFormatProvider());
         bounds = this.getLabelBounds(label);
 
-        notIntersection = true;
-        for (m = 0, l = leftDomains.length; m < l; m++) {
-          notIntersection = notIntersection && leftDomains[m].isNotIntersect(bounds);
+        if (!domain || (domain.isNotIntersect(bounds))) {
+          if (domain) leftDomains.push(domain);
+          isRightSide = label['anchor']() == anychart.enums.Position.LEFT_CENTER;
+          domain = new anychart.charts.Pie.PieOutsideLabelsDomain(isRightSide, this, leftDomains);
+          domain.addLabel(label);
+        } else {
+          domain.addLabel(label);
         }
+      }
+    }
+    if (domain) leftDomains.push(domain);
 
-        if (notIntersection) {
-          if (!domain) {
-            isRightSide = label['anchor']() == anychart.enums.Position.LEFT_CENTER;
-            domain = new anychart.charts.Pie.PieOutsideLabelsDomain(isRightSide, this, []);
-          }
-          domain.softAddLabel(label);
-          domainBounds = domain.getBounds();
+    for (i = 0, len = leftDomains.length; i < len; i++) {
+      domain = leftDomains[i];
+      if (domain && domain.droppedLabels) {
+        if (!droppedLabels) droppedLabels = [];
+        droppedLabels = goog.array.concat(droppedLabels, domain.droppedLabels);
+      }
+    }
+
+    domain = null;
+    if (droppedLabels) {
+      goog.array.sort(droppedLabels, function(a, b) {
+        return a.getIndex() > b.getIndex() ? 1 : a.getIndex() < b.getIndex() ? -1 : 0
+      });
+
+      for (i = 0, len = droppedLabels.length; i < len; i++) {
+        label = droppedLabels[i];
+        if (label) {
+          iterator.select(label.getIndex());
+          label.formatProvider(this.createFormatProvider());
+          bounds = this.getLabelBounds(label);
 
           notIntersection = true;
-          for (m = 0; m < l; m++) {
-            notIntersection = notIntersection && leftDomains[m].isNotIntersect(domainBounds);
+          for (m = 0, l = leftDomains.length; m < l; m++) {
+            notIntersection = notIntersection && leftDomains[m].isNotIntersect(bounds);
           }
 
-          if (domain.isCriticalAngle || !notIntersection) {
-            domain.labels.pop().enabled(false);
-            domain.calcDomain();
-            leftDomains.push(domain);
-            domain = null;
+          if (notIntersection) {
+            if (!domain) {
+              isRightSide = label['anchor']() == anychart.enums.Position.LEFT_CENTER;
+              domain = new anychart.charts.Pie.PieOutsideLabelsDomain(isRightSide, this, []);
+            }
+            domain.softAddLabel(label);
+            domainBounds = domain.getBounds();
+
+            notIntersection = true;
+            for (m = 0; m < l; m++) {
+              notIntersection = notIntersection && leftDomains[m].isNotIntersect(domainBounds);
+            }
+
+            if (domain.isCriticalAngle || !notIntersection) {
+              domain.labels.pop().enabled(false);
+              domain.calcDomain();
+              leftDomains.push(domain);
+              domain = null;
+            } else {
+              label.enabled(true);
+            }
           } else {
-            label.enabled(true);
-          }
-        } else {
-          if (domain) {
-            leftDomains.push(domain);
-            domain = null;
+            if (domain) {
+              leftDomains.push(domain);
+              domain = null;
+            }
           }
         }
+      }
+      if (domain) {
+        leftDomains.push(domain);
+        domain = null;
+      }
+    }
+
+    //------------------------------------ right domain calculation ------------------------------------------------------
+
+    var rightDomains = [];
+    domain = null;
+    for (i = rightSideLabels.length; i--;) {
+      label = rightSideLabels[i];
+      if (label) {
+        iterator.select(label.getIndex());
+        label.formatProvider(this.createFormatProvider());
+        bounds = this.getLabelBounds(label);
+
+        if (!domain || domain.isNotIntersect(bounds)) {
+          if (domain) rightDomains.push(domain);
+          isRightSide = label['anchor']() == anychart.enums.Position.LEFT_CENTER;
+          domain = new anychart.charts.Pie.PieOutsideLabelsDomain(isRightSide, this, rightDomains);
+          domain.addLabel(label);
+        } else {
+          domain.addLabel(label);
+        }
+      }
+    }
+    if (domain) rightDomains.push(domain);
+
+    if (droppedLabels) droppedLabels.length = 0;
+    for (i = 0, len = rightDomains.length; i < len; i++) {
+      domain = rightDomains[i];
+      if (domain && domain.droppedLabels) {
+        if (!droppedLabels) droppedLabels = [];
+        droppedLabels = goog.array.concat(droppedLabels, domain.droppedLabels);
+      }
+    }
+
+    domain = null;
+    if (droppedLabels) {
+      goog.array.sort(droppedLabels, function(a, b) {
+        return a.getIndex() > b.getIndex() ? 1 : a.getIndex() < b.getIndex() ? -1 : 0
+      });
+
+      for (i = droppedLabels.length; i--;) {
+        label = droppedLabels[i];
+        if (label) {
+          iterator.select(label.getIndex());
+          label.formatProvider(this.createFormatProvider());
+          bounds = this.getLabelBounds(label);
+
+          notIntersection = true;
+          for (m = 0, l = rightDomains.length; m < l; m++) {
+            notIntersection = notIntersection && rightDomains[m].isNotIntersect(bounds);
+          }
+
+          if (notIntersection) {
+            if (!domain) {
+              isRightSide = label['anchor']() == anychart.enums.Position.LEFT_CENTER;
+              domain = new anychart.charts.Pie.PieOutsideLabelsDomain(isRightSide, this, []);
+            }
+            domain.softAddLabel(label);
+            domainBounds = domain.getBounds();
+
+            notIntersection = true;
+            for (m = 0; m < l; m++) {
+              notIntersection = notIntersection && rightDomains[m].isNotIntersect(domainBounds);
+            }
+
+            if (domain.isCriticalAngle || !notIntersection) {
+              domain.labels.pop().enabled(false);
+              domain.calcDomain();
+              rightDomains.push(domain);
+              domain = null;
+            } else {
+              label.enabled(true);
+            }
+          } else {
+            if (domain) {
+              rightDomains.push(domain);
+              domain = null;
+            }
+          }
+        }
+
       }
     }
     if (domain) {
       leftDomains.push(domain);
       domain = null;
     }
-  }
 
-  //------------------------------------ right domain calculation ------------------------------------------------------
+    //-----------left domains connectors calculation, applying labels positions--------------------------------
 
-  var rightDomains = [];
-  domain = null;
-  for (i = rightSideLabels.length; i--;) {
-    label = rightSideLabels[i];
-    if (label) {
-      iterator.select(label.getIndex());
-      label.formatProvider(this.createFormatProvider());
-      bounds = this.getLabelBounds(label);
+    var k, labelsLen;
+    for (i = 0, len = leftDomains.length; i < len; i++) {
+      domain = leftDomains[i];
+      if (domain) {
+        domain.applyPositions();
 
-      if (!domain || domain.isNotIntersect(bounds)) {
-        if (domain) rightDomains.push(domain);
-        isRightSide = label['anchor']() == anychart.enums.Position.LEFT_CENTER;
-        domain = new anychart.charts.Pie.PieOutsideLabelsDomain(isRightSide, this, rightDomains);
-        domain.addLabel(label);
-      } else {
-        domain.addLabel(label);
-      }
-    }
-  }
-  if (domain) rightDomains.push(domain);
+        for (k = 0, labelsLen = domain.labels.length; k < labelsLen; k++) {
+          label = domain.labels[k];
+          if (label && label.enabled() != false) {
+            index = label.getIndex();
 
-  if (droppedLabels) droppedLabels.length = 0;
-  for (i = 0, len = rightDomains.length; i < len; i++) {
-    domain = rightDomains[i];
-    if (domain && domain.droppedLabels) {
-      if (!droppedLabels) droppedLabels = [];
-      droppedLabels = goog.array.concat(droppedLabels, domain.droppedLabels);
-    }
-  }
-
-  domain = null;
-  if (droppedLabels) {
-    goog.array.sort(droppedLabels, function(a, b) {
-      return a.getIndex() > b.getIndex() ? 1 : a.getIndex() < b.getIndex() ? -1 : 0
-    });
-
-    for (i = droppedLabels.length; i--;) {
-      label = droppedLabels[i];
-      if (label) {
-        iterator.select(label.getIndex());
-        label.formatProvider(this.createFormatProvider());
-        bounds = this.getLabelBounds(label);
-
-        notIntersection = true;
-        for (m = 0, l = rightDomains.length; m < l; m++) {
-          notIntersection = notIntersection && rightDomains[m].isNotIntersect(bounds);
-        }
-
-        if (notIntersection) {
-          if (!domain) {
-            isRightSide = label['anchor']() == anychart.enums.Position.LEFT_CENTER;
-            domain = new anychart.charts.Pie.PieOutsideLabelsDomain(isRightSide, this, []);
-          }
-          domain.softAddLabel(label);
-          domainBounds = domain.getBounds();
-
-          notIntersection = true;
-          for (m = 0; m < l; m++) {
-            notIntersection = notIntersection && rightDomains[m].isNotIntersect(domainBounds);
-          }
-
-          if (domain.isCriticalAngle || !notIntersection) {
-            domain.labels.pop().enabled(false);
-            domain.calcDomain();
-            rightDomains.push(domain);
-            domain = null;
-          } else {
-            label.enabled(true);
-          }
-        } else {
-          if (domain) {
-            rightDomains.push(domain);
-            domain = null;
-          }
-        }
-      }
-
-    }
-  }
-  if (domain) {
-    leftDomains.push(domain);
-    domain = null;
-  }
-
-  //-----------init connector element------------------------------------------------------------------------
-
-  if (this.connectorsLayer_) {
-    this.connectorsLayer_.clear();
-    if (this.mode3d_) this.connectorsLowerLayer_.clear();
-  } else {
-    this.connectorsLayer_ = new anychart.core.utils.TypedLayer(function() {
-      return acgraph.path();
-    }, function(child) {
-      (/** @type {acgraph.vector.Path} */ (child)).clear();
-    });
-    this.connectorsLayer_.parent(this.rootElement);
-    this.connectorsLayer_.zIndex(anychart.charts.Pie.ZINDEX_LABEL);
-
-    if (this.mode3d_) {
-      this.connectorsLowerLayer_ = new anychart.core.utils.TypedLayer(function() {
-        return acgraph.path();
-      }, function(child) {
-        (/** @type {acgraph.vector.Path} */ (child)).clear();
-      });
-      this.connectorsLowerLayer_.parent(this.rootElement);
-      this.connectorsLowerLayer_.zIndex(anychart.charts.Pie.ZINDEX_CONNECTOR_LOWER_LAYER);
-    }
-  }
-  this.drawnConnectors_ = [];
-  if (!this.hoveredLabelConnectorPath_) {
-    // path for connector for label disabled by algorithm
-    this.hoveredLabelConnectorPath_ = this.rootElement.path();
-    this.hoveredLabelConnectorPath_.stroke(this.connectorStroke_);
-  }
-
-  //-----------left domains connectors calculation, applying labels positions--------------------------------
-
-  var k, labelsLen;
-  var connectorPath;
-  for (i = 0, len = leftDomains.length; i < len; i++) {
-    domain = leftDomains[i];
-    if (domain) {
-      domain.applyPositions();
-
-      for (k = 0, labelsLen = domain.labels.length; k < labelsLen; k++) {
-        label = domain.labels[k];
-        if (label && label.enabled() != false) {
-          index = label.getIndex();
-
-          if (!this.drawnConnectors_[index]) {
-            y0 = this.connectorAnchorCoords[index * 2 + 1] - this.get3DHeight() / 2;
-            if (this.mode3d_ && y0 < this.cy_) {
-              connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLowerLayer_.genNextChild());
-            } else {
-              connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
+            if (!this.drawnConnectors_[index]) {
+              y0 = this.connectorAnchorCoords[index * 2 + 1] - this.get3DHeight() / 2;
+              if (this.mode3d_ && y0 < this.cy_) {
+                connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLowerLayer_.genNextChild());
+              } else {
+                connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
+              }
+              this.drawnConnectors_[index] = connectorPath;
+              connectorPath.stroke(this.connectorStroke_);
+              this.drawConnectorLine(label, connectorPath);
             }
-            this.drawnConnectors_[index] = connectorPath;
-            connectorPath.stroke(this.connectorStroke_);
-            this.drawConnectorLine(label, connectorPath);
           }
         }
       }
     }
-  }
 
-  //-----------right domains connectors calculation, applying labels positions--------------------------------
+    //-----------right domains connectors calculation, applying labels positions--------------------------------
 
-  for (i = 0, len = rightDomains.length; i < len; i++) {
-    domain = rightDomains[i];
-    if (domain) {
-      domain.applyPositions();
+    for (i = 0, len = rightDomains.length; i < len; i++) {
+      domain = rightDomains[i];
+      if (domain) {
+        domain.applyPositions();
 
-      for (k = 0, labelsLen = domain.labels.length; k < labelsLen; k++) {
-        label = domain.labels[k];
-        if (label && label.enabled() != false) {
-          index = label.getIndex();
+        for (k = 0, labelsLen = domain.labels.length; k < labelsLen; k++) {
+          label = domain.labels[k];
+          if (label && label.enabled() != false) {
+            index = label.getIndex();
 
-          if (!this.drawnConnectors_[index]) {
-            y0 = this.connectorAnchorCoords[index * 2 + 1] - this.get3DHeight() / 2;
-            if (this.mode3d_ && y0 < this.cy_) {
-              connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLowerLayer_.genNextChild());
-            } else {
-              connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
+            if (!this.drawnConnectors_[index]) {
+              y0 = this.connectorAnchorCoords[index * 2 + 1] - this.get3DHeight() / 2;
+              if (this.mode3d_ && y0 < this.cy_) {
+                connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLowerLayer_.genNextChild());
+              } else {
+                connectorPath = /** @type {acgraph.vector.Path} */(this.connectorsLayer_.genNextChild());
+              }
+              this.drawnConnectors_[index] = connectorPath;
+              connectorPath.stroke(this.connectorStroke_);
+              this.drawConnectorLine(label, connectorPath);
             }
-            this.drawnConnectors_[index] = connectorPath;
-            connectorPath.stroke(this.connectorStroke_);
-            this.drawConnectorLine(label, connectorPath);
           }
         }
       }
