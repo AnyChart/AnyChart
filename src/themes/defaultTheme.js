@@ -2506,7 +2506,6 @@ goog.provide('anychart.themes.defaultTheme');
           'labels': {
             'format': VALUE_TOKEN_DECIMALS_COUNT_2,
             'position': 'center',
-            'anchor': 'center',
             'offsetY': 0,
             'fontColor': fontColorReversedNormal
           },

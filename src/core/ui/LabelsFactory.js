@@ -1092,6 +1092,9 @@ anychart.core.ui.LabelsFactory.prototype.measureWithTransform = function(formatP
     var labelRotation = formatProviderOrLabel.getOption('rotation');
     rotation = goog.isDef(labelRotation) ? labelRotation : this.getOption('rotation') || 0;
     anchor = formatProviderOrLabel.getOption('anchor') || this.getOption('anchor');
+    if (anchor == anychart.enums.Anchor.AUTO && opt_settings && opt_settings['anchor']) {
+      anchor = opt_settings['anchor'];
+    }
     opt_cacheIndex = goog.isDef(opt_cacheIndex) ? opt_cacheIndex : formatProviderOrLabel.getIndex();
   } else {
     rotation = goog.isDef(opt_settings) && goog.isDef(opt_settings['rotation']) ? opt_settings['rotation'] : this.getOption('rotation') || 0;

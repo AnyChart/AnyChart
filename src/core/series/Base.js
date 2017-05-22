@@ -2135,9 +2135,10 @@ anychart.core.series.Base.prototype.checkDirectionIsPositive = function(position
 /**
  * Resolves anchor in auto mode.
  * @param {?anychart.enums.Position|string} position Position.
+ * @param {number} rotation Label rotation angle.
  * @return {anychart.enums.Anchor}
  */
-anychart.core.series.Base.prototype.resolveAutoAnchor = function(position) {
+anychart.core.series.Base.prototype.resolveAutoAnchor = function(position, rotation) {
   var normalizedPosition = anychart.enums.normalizePosition(position, null);
   var result;
   if (normalizedPosition) {
@@ -2147,7 +2148,7 @@ anychart.core.series.Base.prototype.resolveAutoAnchor = function(position) {
     var angle = this.getDirectionAngle(positive);
     result = anychart.utils.getAnchorForAngle(angle);
   }
-  return result;
+  return anychart.utils.rotateAnchor(result, rotation);
 };
 
 
@@ -2157,20 +2158,20 @@ anychart.core.series.Base.prototype.resolveAutoAnchor = function(position) {
  * @param {anychart.core.ui.LabelsFactory.Label} label
  */
 anychart.core.series.Base.prototype.checkBoundsCollision = function(factory, label) {
-  // reserved for 7.14.0
-  // var bounds = factory.measure(label);
-  // var anchor = /** @type {anychart.enums.Anchor} */(label.autoAnchor());
-  // if (this.getOption('isVertical')) {
-  //   if (anychart.utils.isRightAnchor(anchor) && bounds.left < this.pixelBoundsCache.left ||
-  //       anychart.utils.isLeftAnchor(anchor) && (bounds.left + bounds.width > this.pixelBoundsCache.left + this.pixelBoundsCache.width)) {
-  //     label.autoAnchor(anychart.utils.flipAnchorHorizontal(anchor));
-  //   }
-  // } else {
-  //   if (anychart.utils.isBottomAnchor(anchor) && bounds.top < this.pixelBoundsCache.top ||
-  //       anychart.utils.isTopAnchor(anchor) && (bounds.top + bounds.height > this.pixelBoundsCache.top + this.pixelBoundsCache.height)) {
-  //     label.autoAnchor(anychart.utils.flipAnchorVertical(anchor));
-  //   }
-  // }
+  var bounds = anychart.math.Rect.fromCoordinateBox(factory.measureWithTransform(label, undefined, {'anchor': label.autoAnchor()}));
+  var anchor = /** @type {anychart.enums.Anchor} */(label.autoAnchor());
+  var rotation = /** @type {number} */(label.getFinalSettings('rotation'));
+  anchor = anychart.utils.rotateAnchor(anchor, -rotation);
+  if (anychart.utils.isRightAnchor(anchor) && bounds.left < this.pixelBoundsCache.left ||
+      anychart.utils.isLeftAnchor(anchor) && (bounds.left + bounds.width > this.pixelBoundsCache.left + this.pixelBoundsCache.width)) {
+    anchor = anychart.utils.flipAnchorHorizontal(anchor);
+  }
+  if (anychart.utils.isBottomAnchor(anchor) && bounds.top < this.pixelBoundsCache.top ||
+      anychart.utils.isTopAnchor(anchor) && (bounds.top + bounds.height > this.pixelBoundsCache.top + this.pixelBoundsCache.height)) {
+    anchor = anychart.utils.flipAnchorVertical(anchor);
+  }
+  anchor = anychart.utils.rotateAnchor(anchor, rotation);
+  label.autoAnchor(anchor);
 };
 
 
@@ -2243,7 +2244,7 @@ anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factory,
     var anchor = label.getFinalSettings('anchor');
     label.autoVertical(/** @type {boolean} */ (this.getOption('isVertical')));
     if (goog.isDef(opt_position) && anchor == anychart.enums.Anchor.AUTO) {
-      label.autoAnchor(this.resolveAutoAnchor(opt_position));
+      label.autoAnchor(this.resolveAutoAnchor(opt_position, Number(label.getFinalSettings('rotation')) || 0));
       this.checkBoundsCollision(/** @type {anychart.core.ui.LabelsFactory} */(factory), label);
     }
   } else {

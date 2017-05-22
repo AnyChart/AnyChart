@@ -443,28 +443,48 @@ anychart.utils.getAnchorForAngle = function(angle) {
 
 
 /**
+ * Anchors set for anchors rotation.
+ * @type {Array.<anychart.enums.Anchor>}
+ */
+anychart.utils.ANCHORS_SET = ([
+  anychart.enums.Anchor.CENTER_TOP,
+  anychart.enums.Anchor.RIGHT_TOP,
+  anychart.enums.Anchor.RIGHT_CENTER,
+  anychart.enums.Anchor.RIGHT_BOTTOM,
+  anychart.enums.Anchor.CENTER_BOTTOM,
+  anychart.enums.Anchor.LEFT_BOTTOM,
+  anychart.enums.Anchor.LEFT_CENTER,
+  anychart.enums.Anchor.LEFT_TOP
+]);
+
+
+/**
  * Returns an anchor for the position to keep the element outside of the body.
  * @param {anychart.enums.Position|anychart.enums.Anchor} anchor
  * @return {anychart.enums.Anchor}
  */
 anychart.utils.flipAnchor = function(anchor) {
-  switch (anchor) {
-    case anychart.enums.Anchor.LEFT_TOP:
-      return anychart.enums.Anchor.RIGHT_BOTTOM;
-    case anychart.enums.Anchor.LEFT_CENTER:
-      return anychart.enums.Anchor.RIGHT_CENTER;
-    case anychart.enums.Anchor.LEFT_BOTTOM:
-      return anychart.enums.Anchor.RIGHT_TOP;
-    case anychart.enums.Anchor.CENTER_TOP:
-      return anychart.enums.Anchor.CENTER_BOTTOM;
-    case anychart.enums.Anchor.CENTER_BOTTOM:
-      return anychart.enums.Anchor.CENTER_TOP;
-    case anychart.enums.Anchor.RIGHT_TOP:
-      return anychart.enums.Anchor.LEFT_BOTTOM;
-    case anychart.enums.Anchor.RIGHT_CENTER:
-      return anychart.enums.Anchor.LEFT_CENTER;
-    case anychart.enums.Anchor.RIGHT_BOTTOM:
-      return anychart.enums.Anchor.LEFT_TOP;
+  return anychart.utils.rotateAnchor(anchor, 180);
+};
+
+
+/**
+ * Rotates anchor by the angle.
+ * @param {anychart.enums.Position|anychart.enums.Anchor} anchor
+ * @param {number} angle
+ * @return {anychart.enums.Anchor}
+ */
+anychart.utils.rotateAnchor = function(anchor, angle) {
+  var turn = goog.math.standardAngle(-angle) / 90;
+  if (turn) {
+    var index = goog.array.indexOf(anychart.utils.ANCHORS_SET, anchor);
+    if (index >= 0) {
+      if (turn != ~~turn) {
+        turn = Math.round(turn - 0.5) + 0.5;
+      }
+      index += turn + turn;
+      anchor = anychart.utils.ANCHORS_SET[index % anychart.utils.ANCHORS_SET.length];
+    }
   }
   return /** @type {anychart.enums.Anchor} */(anchor);
 };
@@ -476,19 +496,10 @@ anychart.utils.flipAnchor = function(anchor) {
  * @return {anychart.enums.Anchor}
  */
 anychart.utils.flipAnchorHorizontal = function(anchor) {
-  switch (anchor) {
-    case anychart.enums.Anchor.LEFT_TOP:
-      return anychart.enums.Anchor.RIGHT_TOP;
-    case anychart.enums.Anchor.LEFT_CENTER:
-      return anychart.enums.Anchor.RIGHT_CENTER;
-    case anychart.enums.Anchor.LEFT_BOTTOM:
-      return anychart.enums.Anchor.RIGHT_BOTTOM;
-    case anychart.enums.Anchor.RIGHT_TOP:
-      return anychart.enums.Anchor.LEFT_TOP;
-    case anychart.enums.Anchor.RIGHT_CENTER:
-      return anychart.enums.Anchor.LEFT_CENTER;
-    case anychart.enums.Anchor.RIGHT_BOTTOM:
-      return anychart.enums.Anchor.LEFT_BOTTOM;
+  var index = goog.array.indexOf(anychart.utils.ANCHORS_SET, anchor);
+  if (index >= 0) {
+    var len = anychart.utils.ANCHORS_SET.length;
+    anchor = anychart.utils.ANCHORS_SET[(len - index) % len];
   }
   return /** @type {anychart.enums.Anchor} */(anchor);
 };
@@ -500,19 +511,10 @@ anychart.utils.flipAnchorHorizontal = function(anchor) {
  * @return {anychart.enums.Anchor}
  */
 anychart.utils.flipAnchorVertical = function(anchor) {
-  switch (anchor) {
-    case anychart.enums.Anchor.LEFT_TOP:
-      return anychart.enums.Anchor.LEFT_BOTTOM;
-    case anychart.enums.Anchor.LEFT_BOTTOM:
-      return anychart.enums.Anchor.LEFT_TOP;
-    case anychart.enums.Anchor.CENTER_TOP:
-      return anychart.enums.Anchor.CENTER_BOTTOM;
-    case anychart.enums.Anchor.CENTER_BOTTOM:
-      return anychart.enums.Anchor.CENTER_TOP;
-    case anychart.enums.Anchor.RIGHT_TOP:
-      return anychart.enums.Anchor.RIGHT_BOTTOM;
-    case anychart.enums.Anchor.RIGHT_BOTTOM:
-      return anychart.enums.Anchor.RIGHT_TOP;
+  var index = goog.array.indexOf(anychart.utils.ANCHORS_SET, anchor);
+  if (index >= 0) {
+    var len = anychart.utils.ANCHORS_SET.length;
+    anchor = anychart.utils.ANCHORS_SET[(len - index + 4) % len];
   }
   return /** @type {anychart.enums.Anchor} */(anchor);
 };
