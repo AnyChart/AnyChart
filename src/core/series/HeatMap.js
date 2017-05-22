@@ -422,7 +422,7 @@ anychart.core.series.HeatMap.prototype.updateContext = function(provider, opt_ro
     'scale': {value: this.xScale(), type: anychart.enums.TokenType.UNKNOWN},
     'index': {value: rowInfo.getIndex(), type: anychart.enums.TokenType.NUMBER},
     'x': {value: rowInfo.get('x'), type: anychart.enums.TokenType.STRING},
-    'y': {value: rowInfo.get('y'), type: anychart.enums.TokenType.NUMBER},
+    'y': {value: rowInfo.get('y'), type: anychart.enums.TokenType.STRING},
     'heat': {value: rowInfo.get('heat'), type: anychart.enums.TokenType.NUMBER},
     'seriesName': {value: this.name(), type: anychart.enums.TokenType.STRING}
   };
