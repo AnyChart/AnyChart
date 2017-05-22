@@ -1515,10 +1515,10 @@ anychart.core.ui.LabelsFactory.Label.prototype.state = function(name, opt_value,
       opt_priority = anychart.utils.toNumber(opt_priority);
     }
     var drawingPlan = this.getDrawingPlan();
-    if (this.states_[name] != opt_value || drawingPlan.indexOf(name) != opt_priority) {
+    if (this.states_[name] != opt_value || goog.array.indexOf(drawingPlan, name) != opt_priority) {
       this.states_[name] = opt_value;
 
-      if (drawingPlan.indexOf(name) == -1 && !goog.isDef(opt_priority))
+      if (goog.array.indexOf(drawingPlan, name) == -1 && !goog.isDef(opt_priority))
         opt_priority = drawingPlan.length;
 
       if (!isNaN(opt_priority))
@@ -1546,7 +1546,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.stateOrder = function(nameOrSet, 
   var drawingPlan = this.getDrawingPlan();
   if (goog.isDef(opt_value) && goog.isString(nameOrSet)) {
     opt_value = anychart.utils.toNumber(opt_value);
-    var index = drawingPlan.indexOf(/** @type {string} */(nameOrSet));
+    var index = goog.array.indexOf(drawingPlan, /** @type {string} */(nameOrSet));
 
     if (index == opt_value)
       return this;
@@ -1571,7 +1571,7 @@ anychart.core.ui.LabelsFactory.Label.prototype.stateOrder = function(nameOrSet, 
         anychart.Signal.BOUNDS_CHANGED | anychart.Signal.NEEDS_REDRAW);
   }
 
-  return drawingPlan.indexOf(/** @type {string} */(nameOrSet));
+  return goog.array.indexOf(drawingPlan, /** @type {string} */(nameOrSet));
 };
 
 
