@@ -190,6 +190,7 @@ anychart.ConsistencyState = {
   LABELS_FACTORY_CLIP: 1 << 8,
   LABELS_FACTORY_CONNECTOR: 1 << 9,
   LABELS_FACTORY_CACHE: 1 << 10,
+  LABELS_FACTORY_POSITION: 1 << 11,
   //---------------------------------- LEGEND STATES (VB) ---------------------------------
   LEGEND_BACKGROUND: 1 << 6,
   LEGEND_TITLE: 1 << 7,
