@@ -358,7 +358,6 @@ anychart.core.axes.StockDateTime.prototype.remove = function() {
 };
 
 
-
 /**
  * Draws the axis.
  * @return {anychart.core.axes.StockDateTime}
