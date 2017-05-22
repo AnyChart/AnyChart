@@ -315,7 +315,9 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN_3D] = anychart.cartes
 
 
 /** @inheritDoc */
-anychart.charts.Cartesian3d.prototype.isMode3d = true;
+anychart.charts.Cartesian3d.prototype.isMode3d = function() {
+  return true;
+};
 
 
 /**

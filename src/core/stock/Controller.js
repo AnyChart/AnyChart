@@ -643,6 +643,24 @@ anychart.core.stock.Controller.prototype.getLastKey = function() {
 
 
 /**
+ * Returns the first index in the main registry.
+ * @return {number}
+ */
+anychart.core.stock.Controller.prototype.getFirstIndex = function() {
+  return this.currentRegistry_.getFirstIndex();
+};
+
+
+/**
+ * Returns the last index in the main registry.
+ * @return {number}
+ */
+anychart.core.stock.Controller.prototype.getLastIndex = function() {
+  return this.currentRegistry_.getLastIndex();
+};
+
+
+/**
  * Returns first selected key.
  * @return {number}
  */

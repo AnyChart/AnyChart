@@ -2798,7 +2798,10 @@ anychart.charts.TreeMap.prototype.specificContextMenuItems = function(items, con
   if (specificItems.length)
     specificItems.push(null);
 
-  return specificItems.concat(items);
+  return /** @type {Array.<anychart.ui.ContextMenu.Item>} */(goog.array.concat(
+      specificItems,
+      anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap.selectMarquee),
+      items));
 };
 
 

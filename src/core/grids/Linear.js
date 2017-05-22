@@ -601,7 +601,8 @@ anychart.core.grids.Linear.prototype.draw = function() {
     this.lineElement().clear();
 
     var bounds = this.parentBounds() || anychart.math.rect(0, 0, 0, 0);
-    if (this.getChart() && this.getChart().isMode3d) {
+    var mode3d = this.chart_ && this.chart_.isMode3d();
+    if (mode3d) {
       this.x3dShift = this.getChart().x3dShift;
       this.y3dShift = this.getChart().y3dShift;
 
@@ -623,7 +624,7 @@ anychart.core.grids.Linear.prototype.draw = function() {
     var pixelShift = -this.lineElement().strokeThickness() % 2 / 2;
 
     // zeroTick
-    if (this.getChart() && this.getChart().isMode3d && this.isHorizontal()) {
+    if (mode3d && this.isHorizontal()) {
       drawLine.call(this, 0, pixelShift);
     }
 

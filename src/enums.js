@@ -2067,7 +2067,11 @@ anychart.enums.EventType = {
 
   // UI events
   CLOSE: 'close',
-  COMPLETE: 'complete'
+  COMPLETE: 'complete',
+
+  SELECT_MARQUEE_START: 'selectmarqueestart',
+  SELECT_MARQUEE_CHANGE: 'selectmarqueechange',
+  SELECT_MARQUEE_FINISH: 'selectmarqueefinish'
 };
 
 
@@ -4000,7 +4004,9 @@ anychart.enums.StockRangeChangeSource = {
   SCROLLER_CLICK: 'scrollerClick',
   PLOT_DRAG: 'plotDrag',
   DATA_CHANGE: 'dataUpdate',
-  SELECT_RANGE: 'selectRange'
+  SELECT_RANGE: 'selectRange',
+  MARQUEE: 'marquee',
+  MOUSE_WHEEL: 'mouseWheel'
 };
 
 

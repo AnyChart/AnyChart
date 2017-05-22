@@ -247,7 +247,7 @@ goog.inherits(anychart.core.utils.ChartA11y, anychart.core.utils.A11y);
 
 /** @inheritDoc */
 anychart.core.utils.ChartA11y.prototype.createTextInfo = function() {
-  return this.chart.createChartContextProvider();
+  return this.chart.createA11yContextProvider();
 };
 
 

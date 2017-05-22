@@ -19,7 +19,7 @@ anychart.core.SeparateChart = function() {
 
   anychart.core.SeparateChart.base(this, 'constructor');
 
-  if (this.supportsBaseHighlight)
+  if (this.supportsBaseHighlight())
     this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove, null, this.handleMouseDown);
 
   /**

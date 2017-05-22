@@ -498,20 +498,6 @@ anychart.charts.Sparkline.prototype.defaultMarkerSettings = function(opt_value) 
 
 
 /**
- * Getter/setter for label default settings.
- * @param {Object=} opt_value Object with default series settings.
- * @return {Object}
- */
-anychart.charts.Sparkline.prototype.defaultLabelSettings = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    this.defaultLabelSettings_ = opt_value;
-    return this;
-  }
-  return this.defaultLabelSettings_ || {};
-};
-
-
-/**
  * Getter/setter for series default settings.
  * @param {Object=} opt_value Object with default series settings.
  * @return {Object}

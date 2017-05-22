@@ -3586,24 +3586,13 @@ anychart.charts.Pie.prototype.applyAppearanceToSeries = function(pointState) {
 //  Tooltip.
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter/setter for tooltip.
- * @param {(Object|boolean|null)=} opt_value Tooltip settings.
- * @return {!(anychart.charts.Pie|anychart.core.ui.Tooltip)} Tooltip instance or self for method chaining.
- */
-anychart.charts.Pie.prototype.tooltip = function(opt_value) {
-  if (!this.tooltip_) {
-    this.tooltip_ = new anychart.core.ui.Tooltip(0);
-    this.tooltip_.chart(this);
-    this.registerDisposable(this.tooltip_);
-    this.tooltip_.listenSignals(this.onTooltipSignal_, this);
-  }
-  if (goog.isDef(opt_value)) {
-    this.tooltip_.setup(opt_value);
-    return this;
-  } else {
-    return this.tooltip_;
-  }
+/** @inheritDoc */
+anychart.charts.Pie.prototype.createTooltip = function() {
+  var tooltip = new anychart.core.ui.Tooltip(0);
+  this.registerDisposable(tooltip);
+  tooltip.chart(this);
+  tooltip.listenSignals(this.onTooltipSignal_, this);
+  return tooltip;
 };
 
 

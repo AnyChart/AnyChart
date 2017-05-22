@@ -190,7 +190,10 @@
             {"$ref": "#/definitions/disable"},
             {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
           ]
-        }
+        },
+
+        "selectMarqueeFill": {"$ref": "#/definitions/fill"},
+        "selectMarqueeStroke": {"$ref": "#/definitions/stroke"}
       }
     },
     "anychart.core.SeparateChart": {
@@ -4953,6 +4956,7 @@
             {"$ref": "#/definitions/anychart.core.ui.Title"}
           ]
         },
+        "titleFormat": {"type": ["string"]},
         "format": {"type": ["string"]},
         "content": {
           "oneOf": [

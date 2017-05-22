@@ -89,8 +89,7 @@ anychart.charts.CircularGauge = function(opt_data, opt_csvSettings) {
 
   this.data(opt_data || null, opt_csvSettings);
 
-  if (this.supportsBaseHighlight)
-    this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove, null, this.handleMouseDown);
+  this.bindHandlersToComponent(this, this.handleMouseOverAndMove, this.handleMouseOut, null, this.handleMouseOverAndMove, null, this.handleMouseDown);
 
   this.resumeSignalsDispatching(true);
 };

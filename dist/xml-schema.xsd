@@ -31,6 +31,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="animation" type="utils.Animation"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="interactivity" type="utils.Interactivity"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="context_menu" type="utils.ContextMenu"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="select_marquee_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="select_marquee_stroke" type="Stroke"/>
             <!-- Common elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="data" type="Data"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="tree_data" type="TreeData"/>
@@ -131,6 +133,8 @@
         <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>
         <xsd:attribute name="animation" type="simple.Bool" default="false"/>
         <xsd:attribute name="context_menu" type="simple.Bool" default="true"/>
+        <xsd:attribute name="select_marquee_fill" type="xsd:string"/>
+        <xsd:attribute name="select_marquee_stroke" type="xsd:string"/>
         <!-- charts.Bullet attrs -->
         <xsd:attribute name="layout" type="enums.Layout" default="horizontal"/>
         <xsd:attribute name="scale" type="simple.ChartScaleRef" default="linear"/>
@@ -255,6 +259,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="animation" type="utils.Animation"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="interactivity" type="utils.Interactivity"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="context_menu" type="utils.ContextMenu"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="select_marquee_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="select_marquee_stroke" type="Stroke"/>
             <!-- Common elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="data" type="Data"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="axes" type="core.axes.Gauge_list"/>
@@ -287,6 +293,8 @@
         <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="animation" type="simple.Bool" default="false"/>
         <xsd:attribute name="context_menu" type="simple.Bool" default="true"/>
+        <xsd:attribute name="select_marquee_fill" type="xsd:string"/>
+        <xsd:attribute name="select_marquee_stroke" type="xsd:string"/>
         <!-- anychart.charts.CircularGauge common attrs -->
         <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
@@ -316,6 +324,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="chart_labels" type="core.Label_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="interactivity" type="utils.Interactivity"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="context_menu" type="utils.ContextMenu"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="select_marquee_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="select_marquee_stroke" type="Stroke"/>
             <!-- Gantt elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="controller" type="core.gantt.Controller"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="data_grid" type="core.DataGrid"/>
@@ -335,6 +345,8 @@
         <xsd:attribute name="animation" type="simple.Bool" default="false"/>
         <xsd:attribute name="context_menu" type="simple.Bool" default="true"/>
         <xsd:attribute name="editing" type="simple.Bool" default="false"/>
+        <xsd:attribute name="select_marquee_fill" type="xsd:string"/>
+        <xsd:attribute name="select_marquee_stroke" type="xsd:string"/>
         <!-- Gantt attributes -->
 
         <xsd:attribute name="header_height" type="xsd:double"/>
@@ -364,6 +376,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="labels" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="hover_labels" type="core.LabelsFactory"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="select_labels" type="core.LabelsFactory"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="select_marquee_fill" type="Fill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="select_marquee_stroke" type="Stroke"/>
             <!-- Common elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="data" type="Data"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="palette" type="palettes.Colors"/>
@@ -398,6 +412,8 @@
         <xsd:attribute name="labels" type="simple.BoolOrNull"/>
         <xsd:attribute name="hover_labels" type="simple.BoolOrNull"/>
         <xsd:attribute name="select_labels" type="simple.BoolOrNull"/>
+        <xsd:attribute name="select_marquee_fill" type="xsd:string"/>
+        <xsd:attribute name="select_marquee_stroke" type="xsd:string"/>
         <!-- Map attrs -->
         <xsd:attribute name="unbound_regions" type="xsd:string"/>
         <xsd:attribute name="min_bubble_size" type="simple.NumberOrPercent" default="5%"/>
@@ -1333,6 +1349,7 @@
         <xsd:attribute name="allow_leave_stage" type="simple.Bool" default="false"/>
         <xsd:attribute name="allow_leave_screen" type="simple.Bool" default="false"/>
         <xsd:attribute name="title" type="simple.StringOrBoolOrNull" default="false"/>
+        <xsd:attribute name="title_format" type="xsd:string"/>
         <xsd:attribute name="format" type="xsd:string"/>
         <xsd:attribute name="separator" type="simple.BoolOrNull" default="false"/>
         <xsd:attribute name="background" type="simple.StringOrBoolOrNull" default="false"/>

@@ -1733,7 +1733,9 @@ goog.provide('anychart.themes.defaultTheme');
             'orientation': 'bottom'
           }
         }
-      }
+      },
+      'selectMarqueeFill': '#d3d3d3 0.4',
+      'selectMarqueeStroke': '#d3d3d3'
     },
 
     'cartesianBase': {
@@ -4820,6 +4822,12 @@ goog.provide('anychart.themes.defaultTheme');
       },
       'a11y': {
         'titleFormat': chartA11yTitleFormatter
+      },
+      'zoomMarqueeFill': '#d3d3d3 0.4',
+      'zoomMarqueeStroke': '#d3d3d3',
+      'interactivity': {
+        'zoomOnMouseWheel': true,
+        'scrollOnMouseWheel': true
       }
     },
 

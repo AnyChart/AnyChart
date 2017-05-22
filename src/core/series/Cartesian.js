@@ -10,6 +10,7 @@ goog.require('anychart.data');
 goog.require('anychart.enums');
 goog.require('anychart.utils');
 goog.require('goog.array');
+goog.require('goog.math.Rect');
 
 
 
@@ -976,6 +977,65 @@ anychart.core.series.Cartesian.prototype.findInRangeByX = function(minValue, max
 };
 
 
+/**
+ * @param {number} left
+ * @param {number} top
+ * @param {number} width
+ * @param {number} height
+ * @return {Array<number>}
+ */
+anychart.core.series.Cartesian.prototype.getPointsInRect = function(left, top, width, height) {
+  var iter = this.getIterator();
+  iter.reset();
+  var res = [];
+  while (iter.advance()) {
+    if (this.pointIsInRect(iter, left, top, width, height)) {
+      res.push(iter.getIndex());
+    }
+  }
+  return res;
+};
+
+
+/**
+ * Checks whether the point intersects the rect in any point.
+ * @param {anychart.data.IRowInfo} point
+ * @param {number} left
+ * @param {number} top
+ * @param {number} width
+ * @param {number} height
+ * @return {boolean}
+ * @protected
+ */
+anychart.core.series.Cartesian.prototype.pointIsInRect = function(point, left, top, width, height) {
+  var shapes;
+  var result = false;
+  if (this.shapeManager instanceof anychart.core.shapeManagers.PerPoint &&
+      (shapes = /** @type {Object.<acgraph.vector.Element>} */(point.meta(this.shapeManager.shapesFieldName)))) {
+    result = this.drawer.checkShapesInRect(shapes, left, top, width, height);
+  } else {
+    var x1 = /** @type {number} */(point.meta(this.config.anchoredPositionBottom + 'X'));
+    var y1 = /** @type {number} */(point.meta(this.config.anchoredPositionBottom));
+    if (this.config.anchoredPositionBottom == this.config.anchoredPositionTop) {
+      result = (left <= x1 && x1 <= left + width && top <= y1 && y1 <= top + height);
+    } else {
+      var x2 = /** @type {number} */(point.meta(this.config.anchoredPositionTop + 'X'));
+      var y2 = /** @type {number} */(point.meta(this.config.anchoredPositionTop));
+      result = anychart.math.checkRectIntersection([x1, y1, x2, y2], [
+        left, top,
+        left + width, top,
+        left + width, top + height,
+        left, top + height
+      ]);
+    }
+  }
+  if (!result && (shapes = /** @type {anychart.core.ui.MarkersFactory.Marker} */(point.meta('marker')))) {
+    result = shapes.getDomElement().getBounds().intersects(new goog.math.Rect(left, top, width, height));
+  }
+  return result;
+};
+
+
 //endregion
 //region --- Interactivity
 //----------------------------------------------------------------------------------------------------------------------
@@ -1173,18 +1233,26 @@ anychart.core.series.Cartesian.prototype.unselect = function(opt_indexOrIndexes)
  * @return {!anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
  */
 anychart.core.series.Cartesian.prototype.selectPoint = function(indexOrIndexes, opt_event) {
+  return this.selectPointInternal(indexOrIndexes, !!(opt_event && opt_event.shiftKey));
+};
+
+
+/**
+ * Selects a point of the series by its index. Internal, because other selectPoint methods has other signature.
+ * @param {number|Array<number>} indexOrIndexes Index of the point to select.
+ * @param {boolean} appendSelect If the shift or meta key is pressed.
+ * @return {!anychart.core.series.Cartesian} {@link anychart.core.series.Cartesian} instance for method chaining.
+ */
+anychart.core.series.Cartesian.prototype.selectPointInternal = function(indexOrIndexes, appendSelect) {
   if (!this.enabled())
     return this;
 
-  var unselect = !(opt_event && opt_event.shiftKey);
-
   if (goog.isArray(indexOrIndexes)) {
-    if (!opt_event)
+    if (!appendSelect)
       this.unselect();
-
-    this.state.setPointState(anychart.PointState.SELECT, indexOrIndexes, unselect ? anychart.PointState.HOVER : undefined);
+    this.state.setPointState(anychart.PointState.SELECT, indexOrIndexes, appendSelect ? undefined : anychart.PointState.HOVER);
   } else if (goog.isNumber(indexOrIndexes)) {
-    this.state.setPointState(anychart.PointState.SELECT, indexOrIndexes, unselect ? anychart.PointState.HOVER : undefined);
+    this.state.setPointState(anychart.PointState.SELECT, indexOrIndexes, appendSelect ? undefined : anychart.PointState.HOVER);
   }
 
   return this;

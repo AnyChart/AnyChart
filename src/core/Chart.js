@@ -6,6 +6,7 @@
 goog.provide('anychart.core.Chart');
 
 goog.require('acgraph');
+goog.require('acgraph.events.BrowserEvent');
 goog.require('anychart.compatibility');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.reporting');
@@ -23,11 +24,14 @@ goog.require('anychart.core.utils.Margin');
 goog.require('anychart.core.utils.Padding');
 goog.require('anychart.exports');
 goog.require('anychart.format.Context');
+goog.require('anychart.math.Rect');
 goog.require('anychart.performance');
 goog.require('anychart.themes.merging');
 goog.require('anychart.utils');
 goog.require('goog.dom');
 goog.require('goog.dom.classlist');
+goog.require('goog.events.EventHandler');
+goog.require('goog.fx.Dragger');
 goog.require('goog.json.hybrid');
 
 goog.forwardDeclare('anychart.ui.ContextMenu');
@@ -161,11 +165,31 @@ anychart.core.Chart = function() {
   this.allowCreditsDisabling = false;
 
   /**
+   * Interactive rect drawing bounds.
+   * @type {?Array.<?anychart.math.Rect>}
+   * @private
+   */
+  this.irDrawingBounds_ = null;
+
+  /**
    * Rect that serves as an overlay for ignore mouse events mode.
    * @type {acgraph.vector.Rect}
    * @private
    */
-  this.lockOverlayRect_ = null;
+  this.overlayRect_ = null;
+
+  /**
+   * Interactivity rect.
+   * @type {acgraph.vector.Rect}
+   * @protected
+   */
+  this.interactivityRect = null;
+
+  /**
+   * If the mouse down interactivity should be prevented.
+   * @type {boolean}
+   */
+  this.preventMouseDownInteractivity = false;
 
   /**
    * @type {?string}
@@ -201,26 +225,37 @@ anychart.core.Chart.prototype.SUPPORTED_CONSISTENCY_STATES =
 
 
 /**
- * A temporary crutch to suppress base interactivity support in Stock.
- * @protected
- * @type {boolean}
- */
-anychart.core.Chart.prototype.supportsBaseHighlight = true;
-
-
-/**
- * 3D mode flag.
- * @type {boolean}
- */
-anychart.core.Chart.prototype.isMode3d = false;
-
-
-/**
  * Chart content bounds.
  * @type {anychart.math.Rect}
  * @protected
  */
 anychart.core.Chart.prototype.contentBounds;
+
+
+//region --- Testers
+//------------------------------------------------------------------------------
+//
+//  Testers
+//
+//------------------------------------------------------------------------------
+/**
+ * A temporary crutch to suppress base interactivity support in Stock.
+ * @return {boolean}
+ * @protected
+ */
+anychart.core.Chart.prototype.supportsBaseHighlight = function() {
+  return true;
+};
+
+
+/**
+ * 3D mode flag.
+ * @return {boolean}
+ * @protected
+ */
+anychart.core.Chart.prototype.isMode3d = function() {
+  return false;
+};
 
 
 /**
@@ -241,6 +276,59 @@ anychart.core.Chart.prototype.supportsTooltip = function() {
 };
 
 
+/**
+ * @ignoreDoc
+ * @param {(Object|boolean|null)=} opt_value Legend settings.
+ * @return {anychart.core.Chart|anychart.core.ui.Legend} Chart legend instance of itself for chaining call.
+ */
+anychart.core.Chart.prototype.legend = function(opt_value) {
+  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_LEGEND_IN_CHART);
+  return goog.isDef(opt_value) ? this : null;
+};
+
+
+/**
+ * Internal public method. Returns all chart series.
+ * @return {!Array.<anychart.core.series.Base|anychart.core.linearGauge.pointers.Base>}
+ */
+anychart.core.Chart.prototype.getAllSeries = goog.abstractMethod;
+
+
+/**
+ * Getter series by index.
+ * @param {number} index .
+ * @return {anychart.core.series.Base}
+ */
+anychart.core.Chart.prototype.getSeries = function(index) {
+  return null;
+};
+
+
+/**
+ * Tester if it is series.
+ * @return {boolean}
+ */
+anychart.core.Chart.prototype.isSeries = function() {
+  return false;
+};
+
+
+/**
+ * Tester if it is chart.
+ * @return {boolean}
+ */
+anychart.core.Chart.prototype.isChart = function() {
+  return true;
+};
+
+
+//endregion
+//region --- Infrastructure
+//------------------------------------------------------------------------------
+//
+//  Infrastructure
+//
+//------------------------------------------------------------------------------
 /**
  * Gets root layer.
  * @return {acgraph.vector.Layer}
@@ -264,33 +352,26 @@ anychart.core.Chart.prototype.createStage = function() {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Methods to set defaults for multiple entities.
-//
-//----------------------------------------------------------------------------------------------------------------------
 /**
- * Getter/setter for chart label default settings.
- * @param {Object=} opt_value Object with label settings.
- * @return {Object}
+ * Returns chart or gauge type. Published in charts.
+ * @return {anychart.enums.ChartTypes|anychart.enums.GaugeTypes|anychart.enums.MapTypes}
  */
-anychart.core.Chart.prototype.defaultLabelSettings = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (!this.defaultLabelSettings_)
-      this.defaultLabelSettings_ = goog.object.clone(opt_value);
-    else
-      goog.object.extend(this.defaultLabelSettings_, opt_value);
-    return this;
-  }
-  return this.defaultLabelSettings_ || {};
-};
+anychart.core.Chart.prototype.getType = goog.abstractMethod;
 
 
-//----------------------------------------------------------------------------------------------------------------------
+/**
+ * @typedef {{chart: anychart.core.Chart}}
+ */
+anychart.core.Chart.DrawEvent;
+
+
+//endregion
+//region --- Margin
+//------------------------------------------------------------------------------
 //
-//  Margin.
+//  Margin
 //
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /**
  * Getter/setter for margin.
  * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
@@ -329,11 +410,13 @@ anychart.core.Chart.prototype.marginInvalidated_ = function(event) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region --- Padding
+//------------------------------------------------------------------------------
 //
-//  Padding.
+//  Padding
 //
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /**
  * Getter/setter for padding.
  * @param {(string|number|Array.<number|string>|{top:(number|string),left:(number|string),bottom:(number|string),right:(number|string)})=} opt_spaceOrTopOrTopAndBottom .
@@ -372,11 +455,13 @@ anychart.core.Chart.prototype.paddingInvalidated_ = function(event) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region --- Background
+//------------------------------------------------------------------------------
 //
-//  Background.
+//  Background
 //
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /**
  * Getter/setter for background.
  * @param {(string|Object|null|boolean)=} opt_value .
@@ -411,11 +496,13 @@ anychart.core.Chart.prototype.backgroundInvalidated_ = function(event) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region --- Title
+//------------------------------------------------------------------------------
 //
-//  Title.
+//  Title
 //
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /**
  * Getter/setter for title.
  * @param {(null|boolean|Object|string)=} opt_value .
@@ -459,11 +546,13 @@ anychart.core.Chart.prototype.onTitleSignal_ = function(event) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region --- Chart labels
+//------------------------------------------------------------------------------
 //
-//  Labels.
+//  Chart labels
 //
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /**
  * Getter/setter for label.
  * @param {(null|boolean|Object|string|number)=} opt_indexOrValue Chart label instance to add.
@@ -510,6 +599,20 @@ anychart.core.Chart.prototype.onLabelSignal_ = function(event) {
 
 
 /**
+ * Getter/setter for axis default settings.
+ * @param {Object=} opt_value Object with x-axis settings.
+ * @return {Object}
+ */
+anychart.core.Chart.prototype.defaultLabelSettings = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.defaultLabelSettings_ = opt_value;
+    return this;
+  }
+  return this.defaultLabelSettings_ || {};
+};
+
+
+/**
  * Creates chart label.
  * @return {anychart.core.ui.Label} Label instance.
  * @protected
@@ -519,11 +622,24 @@ anychart.core.Chart.prototype.createChartLabel = function() {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Sets chart label settings.
+ * @param {anychart.core.ui.Label} label Label for tuning.
+ * @param {anychart.math.Rect} bounds Label parent bounds.
+ * @protected
+ */
+anychart.core.Chart.prototype.setLabelSettings = function(label, bounds) {
+  label.parentBounds(bounds);
+};
+
+
+//endregion
+//region --- Calculations and statistics
+//------------------------------------------------------------------------------
 //
-//  Statistics.
+//  Calculations and statistics
 //
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /**
  * Developers note:
  * This method:
@@ -585,11 +701,13 @@ anychart.core.Chart.prototype.getStat = function(key) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region --- Tooltip
+//------------------------------------------------------------------------------
 //
-//  Tooltip.
+//  Tooltip
 //
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /**
  * Creates chart tooltip.
  * @param {(Object|boolean|null)=} opt_value
@@ -619,7 +737,8 @@ anychart.core.Chart.prototype.createTooltip = function() {
   this.registerDisposable(tooltip);
   tooltip.chart(this);
 
-  this.listen(anychart.enums.EventType.POINTS_HOVER, this.showTooltip_, true);
+  if (this.supportsBaseHighlight())
+    this.listen(anychart.enums.EventType.POINTS_HOVER, this.showTooltip_, true);
   return tooltip;
 };
 
@@ -733,15 +852,6 @@ anychart.core.Chart.prototype.showTooltip_ = function(event) {
 
 
 /**
- * Used in sparklines.
- * @return {boolean}
- */
-anychart.core.Chart.prototype.useUnionTooltipAsSingle = function() {
-  return false;
-};
-
-
-/**
  * Update tooltip position. (for float)
  * @param {anychart.core.MouseEvent} event
  * @protected
@@ -751,11 +861,22 @@ anychart.core.Chart.prototype.updateTooltip = function(event) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Used in sparklines.
+ * @return {boolean}
+ */
+anychart.core.Chart.prototype.useUnionTooltipAsSingle = function() {
+  return false;
+};
+
+
+//endregion
+//region --- Context menu
+//------------------------------------------------------------------------------
 //
-//  ContextMenu.
+//  Context menu
 //
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 /**
  * Creates context menu for chart.
  * @param {(Object|boolean|null)=} opt_value
@@ -837,7 +958,7 @@ anychart.core.Chart.prototype.contextMenuItemsProvider = function(context) {
  * @protected
  */
 anychart.core.Chart.prototype.specificContextMenuItems = function(items, context, isPointContext) {
-  return items;
+  return /** @type {Array.<anychart.ui.ContextMenu.Item>} */(goog.array.concat(anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap.selectMarquee), items));
 };
 
 
@@ -989,6 +1110,15 @@ anychart.core.Chart.contextMenuItems = {
     }
   },
 
+  // Item 'Print Chart'.
+  startSelectMarquee: {
+    'text': 'Start selection marquee',
+    'eventType': 'anychart.startSelectMarquee',
+    'action': function(context) {
+      context['chart'].startSelectMarquee(false);
+    }
+  },
+
   // Item-link to version history.
   versionHistory: {
     'text': 'Version History',
@@ -1026,15 +1156,163 @@ anychart.core.Chart.contextMenuMap = {
     anychart.core.Chart.contextMenuItems.printChart,
     null,
     anychart.core.Chart.contextMenuItems.about
+  ],
+  selectMarquee: [
+    anychart.core.Chart.contextMenuItems.startSelectMarquee,
+    null
   ]
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region --- Credits
+//------------------------------------------------------------------------------
 //
-//  Drawing.
+//  Credits
 //
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+/**
+ * Getter/setter for credits.
+ * @param {(Object|boolean|null)=} opt_value
+ * @return {!(anychart.core.Chart|anychart.core.ui.ChartCredits)} Chart credits or itself for chaining call.
+ */
+anychart.core.Chart.prototype.credits = function(opt_value) {
+  if (!this.credits_) {
+    this.credits_ = new anychart.core.ui.ChartCredits(this);
+    this.registerDisposable(this.credits_);
+    this.credits_.listenSignals(this.onCreditsSignal_, this);
+  }
+
+  if (goog.isDef(opt_value)) {
+    this.credits_.setup(opt_value);
+    return this;
+  } else {
+    return this.credits_;
+  }
+};
+
+
+/**
+ * Internal title invalidation handler.
+ * @param {anychart.SignalEvent} event Event object.
+ * @private
+ */
+anychart.core.Chart.prototype.onCreditsSignal_ = function(event) {
+  var state = 0;
+  var signal = anychart.Signal.NEEDS_REDRAW;
+  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
+    state |= anychart.ConsistencyState.CHART_CREDITS;
+  }
+  // If there are no signals - !state and nothing will happen.
+  this.invalidate(state, signal);
+};
+
+
+//endregion
+//region --- Animation
+//------------------------------------------------------------------------------
+//
+//  Animation
+//
+//------------------------------------------------------------------------------
+/**
+ * Setter/getter for animation setting.
+ * @param {(boolean|Object)=} opt_enabledOrJson Whether to enable animation.
+ * @param {number=} opt_duration A Duration in milliseconds.
+ * @return {anychart.core.utils.Animation|anychart.core.Chart} Animations settings object or self for chaining.
+ */
+anychart.core.Chart.prototype.animation = function(opt_enabledOrJson, opt_duration) {
+  if (!this.animation_) {
+    this.animation_ = new anychart.core.utils.Animation();
+    this.animation_.listenSignals(this.onAnimationSignal_, this);
+  }
+  if (goog.isDef(opt_enabledOrJson)) {
+    this.animation_.setup.apply(this.animation_, arguments);
+    return this;
+  } else {
+    return this.animation_;
+  }
+};
+
+
+/**
+ * Animation enabled change handler.
+ * @private
+ */
+anychart.core.Chart.prototype.onAnimationSignal_ = function() {
+  this.invalidate(anychart.ConsistencyState.CHART_ANIMATION, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+/**
+ * Animate chart.
+ */
+anychart.core.Chart.prototype.doAnimation = goog.nullFunction;
+
+
+//endregion
+//region --- A11y
+//------------------------------------------------------------------------------
+//
+//  A11y
+//
+//------------------------------------------------------------------------------
+/**
+ * Creates tooltip context provider.
+ * @return {anychart.format.Context}
+ */
+anychart.core.Chart.prototype.createA11yContextProvider = function() {
+  if (!this.chartContextProvider_) {
+    this.chartContextProvider_ = new anychart.format.Context();
+  }
+
+  var values = {
+    'chart': {value: this, type: anychart.enums.TokenType.UNKNOWN}
+  };
+
+  this.chartContextProvider_
+      .statisticsSources([this]);
+
+  return /** @type {anychart.format.Context} */ (this.chartContextProvider_.propagate(values));
+};
+
+
+/**
+ * Setter/getter for accessibility setting.
+ * @param {(boolean|Object)=} opt_enabledOrJson - Whether to enable accessibility.
+ * @return {anychart.core.utils.ChartA11y|anychart.core.Chart} - Accessibility settings object or self for chaining.
+ */
+anychart.core.Chart.prototype.a11y = function(opt_enabledOrJson) {
+  if (!this.a11y_) {
+    this.a11y_ = new anychart.core.utils.ChartA11y(this);
+    this.registerDisposable(this.a11y_);
+    this.a11y_.listenSignals(this.onA11ySignal_, this);
+  }
+  if (goog.isDef(opt_enabledOrJson)) {
+    this.a11y_.setup.apply(this.a11y_, arguments);
+    return this;
+  } else {
+    return this.a11y_;
+  }
+};
+
+
+/**
+ * A11y change handler.
+ * @private
+ */
+anychart.core.Chart.prototype.onA11ySignal_ = function() {
+  this.invalidate(anychart.ConsistencyState.A11Y, anychart.Signal.NEEDS_REDRAW);
+};
+
+
+//endregion
+//region --- Bounds and drawing
+//------------------------------------------------------------------------------
+//
+//  Bounds and drawing
+//
+//------------------------------------------------------------------------------
 /**
  * Calculate chart content bounds.
  * @param {!anychart.math.Rect} totalBounds Total chart area bounds, do not override, it can be useful later.
@@ -1085,59 +1363,6 @@ anychart.core.Chart.prototype.calculateContentAreaSpace = function(totalBounds) 
 
 
 /**
- * Sets chart label settings.
- * @param {anychart.core.ui.Label} label Label for tuning.
- * @param {anychart.math.Rect} bounds Label parent bounds.
- * @protected
- */
-anychart.core.Chart.prototype.setLabelSettings = function(label, bounds) {
-  label.parentBounds(bounds);
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Credits.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Getter/setter for credits.
- * @param {(Object|boolean|null)=} opt_value
- * @return {!(anychart.core.Chart|anychart.core.ui.ChartCredits)} Chart credits or itself for chaining call.
- */
-anychart.core.Chart.prototype.credits = function(opt_value) {
-  if (!this.credits_) {
-    this.credits_ = new anychart.core.ui.ChartCredits(this);
-    this.registerDisposable(this.credits_);
-    this.credits_.listenSignals(this.onCreditsSignal_, this);
-  }
-
-  if (goog.isDef(opt_value)) {
-    this.credits_.setup(opt_value);
-    return this;
-  } else {
-    return this.credits_;
-  }
-};
-
-
-/**
- * Internal title invalidation handler.
- * @param {anychart.SignalEvent} event Event object.
- * @private
- */
-anychart.core.Chart.prototype.onCreditsSignal_ = function(event) {
-  var state = 0;
-  var signal = anychart.Signal.NEEDS_REDRAW;
-  if (event.hasSignal(anychart.Signal.NEEDS_REAPPLICATION)) {
-    state |= anychart.ConsistencyState.CHART_CREDITS;
-  }
-  // If there are no signals - !state and nothing will happen.
-  this.invalidate(state, signal);
-};
-
-
-/**
  * Draw credits.
  * @param {anychart.math.Rect} parentBounds Parent bounds.
  * @return {!anychart.math.Rect} Bounds without credits bounds.
@@ -1155,100 +1380,6 @@ anychart.core.Chart.prototype.drawCredits = function(parentBounds) {
 
   this.markConsistent(anychart.ConsistencyState.CHART_CREDITS);
   return /** @type {!anychart.math.Rect} */(parentBounds);
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Animations.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Setter/getter for animation setting.
- * @param {(boolean|Object)=} opt_enabledOrJson Whether to enable animation.
- * @param {number=} opt_duration A Duration in milliseconds.
- * @return {anychart.core.utils.Animation|anychart.core.Chart} Animations settings object or self for chaining.
- */
-anychart.core.Chart.prototype.animation = function(opt_enabledOrJson, opt_duration) {
-  if (!this.animation_) {
-    this.animation_ = new anychart.core.utils.Animation();
-    this.animation_.listenSignals(this.onAnimationSignal_, this);
-  }
-  if (goog.isDef(opt_enabledOrJson)) {
-    this.animation_.setup.apply(this.animation_, arguments);
-    return this;
-  } else {
-    return this.animation_;
-  }
-};
-
-
-/**
- * Animation enabled change handler.
- * @private
- */
-anychart.core.Chart.prototype.onAnimationSignal_ = function() {
-  this.invalidate(anychart.ConsistencyState.CHART_ANIMATION, anychart.Signal.NEEDS_REDRAW);
-};
-
-
-/**
- * Animate chart.
- */
-anychart.core.Chart.prototype.doAnimation = goog.nullFunction;
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Accessibility.
-//
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Creates tooltip context provider.
- * @return {anychart.format.Context}
- */
-anychart.core.Chart.prototype.createChartContextProvider = function() {
-  if (!this.chartContextProvider_) {
-    this.chartContextProvider_ = new anychart.format.Context();
-  }
-
-  var values = {
-    'chart': {value: this, type: anychart.enums.TokenType.UNKNOWN}
-  };
-
-  this.chartContextProvider_
-      .statisticsSources([this]);
-
-  return /** @type {anychart.format.Context} */ (this.chartContextProvider_.propagate(values));
-};
-
-
-/**
- * Setter/getter for accessibility setting.
- * @param {(boolean|Object)=} opt_enabledOrJson - Whether to enable accessibility.
- * @return {anychart.core.utils.ChartA11y|anychart.core.Chart} - Accessibility settings object or self for chaining.
- */
-anychart.core.Chart.prototype.a11y = function(opt_enabledOrJson) {
-  if (!this.a11y_) {
-    this.a11y_ = new anychart.core.utils.ChartA11y(this);
-    this.registerDisposable(this.a11y_);
-    this.a11y_.listenSignals(this.onA11ySignal_, this);
-  }
-  if (goog.isDef(opt_enabledOrJson)) {
-    this.a11y_.setup.apply(this.a11y_, arguments);
-    return this;
-  } else {
-    return this.a11y_;
-  }
-};
-
-
-/**
- * A11y change handler.
- * @private
- */
-anychart.core.Chart.prototype.onA11ySignal_ = function() {
-  this.invalidate(anychart.ConsistencyState.A11Y, anychart.Signal.NEEDS_REDRAW);
 };
 
 
@@ -1394,7 +1525,7 @@ anychart.core.Chart.prototype.drawInternal = function() {
     anychart.core.reporting.info(msg);
   }
 
-  if (this.supportsBaseHighlight)
+  if (this.supportsBaseHighlight())
     this.onInteractivitySignal();
 
   anychart.performance.end('Chart.draw()');
@@ -1438,11 +1569,6 @@ anychart.core.Chart.prototype.drawContent = function(bounds) {};
 anychart.core.Chart.prototype.specialDraw = function(bounds) {};
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Resize.
-//
-//----------------------------------------------------------------------------------------------------------------------
 /**
  * Define auto resize settings.
  * @param {boolean=} opt_value
@@ -1475,11 +1601,6 @@ anychart.core.Chart.prototype.resizeHandler = function(evt) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Bounds/coordinates.
-//
-//----------------------------------------------------------------------------------------------------------------------
 /**
  * Getter for plot bounds of the chart.
  * @return {anychart.math.Rect}
@@ -1496,7 +1617,10 @@ anychart.core.Chart.prototype.getPlotBounds = function() {
  * @return {Object.<string, number>} .
  */
 anychart.core.Chart.prototype.localToGlobal = function(xCoord, yCoord) {
-  var result = {'x': xCoord, 'y': yCoord};
+  var result = {
+    'x': xCoord,
+    'y': yCoord
+  };
   if (this.container() && this.container().getStage()) {
     var containerPosition = this.container().getStage().getClientPosition();
     result['x'] += containerPosition.x;
@@ -1513,7 +1637,10 @@ anychart.core.Chart.prototype.localToGlobal = function(xCoord, yCoord) {
  * @return {Object.<string, number>} .
  */
 anychart.core.Chart.prototype.globalToLocal = function(xCoord, yCoord) {
-  var result = {'x': xCoord, 'y': yCoord};
+  var result = {
+    'x': xCoord,
+    'y': yCoord
+  };
   if (this.container() && this.container().getStage()) {
     var containerPosition = this.container().getStage().getClientPosition();
     result['x'] -= containerPosition.x;
@@ -1523,11 +1650,6 @@ anychart.core.Chart.prototype.globalToLocal = function(xCoord, yCoord) {
 };
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//  Remove/Restore.
-//
-//----------------------------------------------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.Chart.prototype.remove = function() {
   if (this.rootElement) this.rootElement.parent(null);
@@ -1543,12 +1665,15 @@ anychart.core.Chart.prototype.remove = function() {
 anychart.core.Chart.prototype.invalidateHandler_ = function(event) {
   anychart.globalLock.onUnlock(this.draw, this);
 };
-//end mess
 
 
-//----------------------------------------------------------------------------------------------------------------------
-//  JSON/XML.
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region --- Ser/Deser/Json/XML/Dispose
+//------------------------------------------------------------------------------
+//
+//  Ser/Deser/Json/XML/Dispose
+//
+//------------------------------------------------------------------------------
 /**
  * Return chart configuration as JSON object or string.
  * Note for documentation writers!: Google compiler thinks that "Object" has "toJSON" method that must accept string and return *.
@@ -1642,6 +1767,9 @@ anychart.core.Chart.prototype.serialize = function() {
   }
 
   json['credits'] = this.credits().serialize();
+
+  json['selectMarqueeFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.selectMarqueeFill()));
+  json['selectMarqueeStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.selectMarqueeStroke()));
   return json;
 };
 
@@ -1695,6 +1823,9 @@ anychart.core.Chart.prototype.setupByJSON = function(config, opt_default) {
     this.contextMenu(config['contextMenu']);
 
   this.credits(config['credits']);
+
+  this.selectMarqueeFill(config['selectMarqueeFill']);
+  this.selectMarqueeStroke(config['selectMarqueeStroke']);
 };
 
 
@@ -1713,57 +1844,13 @@ anychart.core.Chart.prototype.disposeInternal = function() {
 };
 
 
-/**
- * @ignoreDoc
- * @param {(Object|boolean|null)=} opt_value Legend settings.
- * @return {anychart.core.Chart|anychart.core.ui.Legend} Chart legend instance of itself for chaining call.
- */
-anychart.core.Chart.prototype.legend = function(opt_value) {
-  anychart.core.reporting.error(anychart.enums.ErrorCode.NO_LEGEND_IN_CHART);
-  return goog.isDef(opt_value) ? this : null;
-};
-
-
-//----------------------------------------------------------------------------------------------------------------------
+//endregion
+//region --- Interactivity
+//------------------------------------------------------------------------------
 //
-//  Events.
+//  Interactivity
 //
-//----------------------------------------------------------------------------------------------------------------------
-/**
- * Internal public method. Returns all chart series.
- * @return {!Array.<anychart.core.series.Base|anychart.core.linearGauge.pointers.Base>}
- */
-anychart.core.Chart.prototype.getAllSeries = goog.abstractMethod;
-
-
-/**
- * Getter series by index.
- * @param {number} index .
- * @return {anychart.core.series.Base}
- */
-anychart.core.Chart.prototype.getSeries = function(index) {
-  return null;
-};
-
-
-/**
- * Tester if it is series.
- * @return {boolean}
- */
-anychart.core.Chart.prototype.isSeries = function() {
-  return false;
-};
-
-
-/**
- * Tester if it is chart.
- * @return {boolean}
- */
-anychart.core.Chart.prototype.isChart = function() {
-  return true;
-};
-
-
+//------------------------------------------------------------------------------
 /** @inheritDoc */
 anychart.core.Chart.prototype.handleMouseEvent = function(event) {
   var series;
@@ -2178,6 +2265,8 @@ anychart.core.Chart.prototype.handleMouseDown = function(event) {
  * @param {anychart.core.MouseEvent} event Event object.
  */
 anychart.core.Chart.prototype.onMouseDown = function(event) {
+  if (this.preventMouseDownInteractivity)
+    return;
   var interactivity = this.interactivity();
 
   var seriesStatus, eventSeriesStatus, allSeries, alreadySelectedPoints, i;
@@ -2481,19 +2570,19 @@ anychart.core.Chart.prototype.unhover = function(opt_indexOrIndexes) {
  * @param {boolean} ignore Set 'true' to ignore
  */
 anychart.core.Chart.prototype.ignoreMouseEvents = function(ignore) {
-  if (!this.lockOverlayRect_) {
-    this.lockOverlayRect_ = acgraph.rect(0, 0, 0, 0);
-    this.lockOverlayRect_.cursor(acgraph.vector.Cursor.WAIT);
-    this.lockOverlayRect_.fill(anychart.color.TRANSPARENT_HANDLER);
-    this.lockOverlayRect_.stroke(null);
-  }
-
   if (ignore) {
-    this.lockOverlayRect_.setBounds(/** @type {anychart.math.Rect} */(this.getPixelBounds()));
-    this.lockOverlayRect_.zIndex(10000);
-    this.lockOverlayRect_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
-  } else {
-    this.lockOverlayRect_.remove();
+    if (!this.overlayRect_) {
+      this.overlayRect_ = acgraph.rect(0, 0, 0, 0);
+      this.overlayRect_.zIndex(10000);
+    }
+    this.overlayRect_.disablePointerEvents(false);
+    this.overlayRect_.cursor(acgraph.vector.Cursor.WAIT);
+    this.overlayRect_.fill(anychart.color.TRANSPARENT_HANDLER);
+    this.overlayRect_.stroke(null);
+    this.overlayRect_.setBounds(/** @type {anychart.math.Rect} */(this.getPixelBounds()));
+    this.overlayRect_.parent(/** @type {acgraph.vector.ILayer} */(this.container()));
+  } else if (this.overlayRect_) {
+    this.overlayRect_.remove();
   }
 };
 
@@ -2505,7 +2594,7 @@ anychart.core.Chart.prototype.ignoreMouseEvents = function(ignore) {
  */
 anychart.core.Chart.prototype.interactivity = function(opt_value) {
   if (!this.interactivity_) {
-    this.interactivity_ = new anychart.core.utils.Interactivity(this);
+    this.interactivity_ = this.createInteractivitySettings();
     this.interactivity_.listenSignals(this.onInteractivitySignal, this);
   }
 
@@ -2517,6 +2606,16 @@ anychart.core.Chart.prototype.interactivity = function(opt_value) {
     return this;
   }
   return this.interactivity_;
+};
+
+
+/**
+ * Creates an instance of interactivity settings object.
+ * @return {anychart.core.utils.Interactivity}
+ * @protected
+ */
+anychart.core.Chart.prototype.createInteractivitySettings = function() {
+  return new anychart.core.utils.Interactivity(this);
 };
 
 
@@ -2533,19 +2632,467 @@ anychart.core.Chart.prototype.onInteractivitySignal = function() {
 };
 
 
+//endregion
+//region --- Interactive rect drawing
+//------------------------------------------------------------------------------
+//
+//  Interactive rect drawing
+//
+//------------------------------------------------------------------------------
 /**
- * Returns chart or gauge type. Published in charts.
- * @return {anychart.enums.ChartTypes|anychart.enums.GaugeTypes|anychart.enums.MapTypes}
+ * @param {?function(number,number,number,number,number,acgraph.events.BrowserEvent):(boolean|undefined)=} opt_onStart
+ * @param {?function(number,number,number,number,number,acgraph.events.BrowserEvent):(boolean|undefined)=} opt_onChange
+ * @param {?function(number,number,number,number,number,acgraph.events.BrowserEvent):(boolean|undefined)=} opt_onFinish
+ * @param {?(anychart.math.Rect|Array.<?anychart.math.Rect>)=} opt_bounds
+ * @param {boolean=} opt_blockPropagation
+ * @param {acgraph.vector.Cursor=} opt_cursor
+ * @param {boolean=} opt_repeat
+ * @param {acgraph.vector.Stroke=} opt_stroke
+ * @param {acgraph.vector.Fill=} opt_fill
+ * @param {boolean=} opt_fullHeight
+ * @return {boolean}
  */
-anychart.core.Chart.prototype.getType = goog.abstractMethod;
+anychart.core.Chart.prototype.startIRDrawing = function(opt_onStart, opt_onChange, opt_onFinish, opt_bounds, opt_blockPropagation, opt_cursor, opt_repeat, opt_stroke, opt_fill, opt_fullHeight) {
+  if (!this.rootElement)
+    return false;
+  this.finishIRDrawing();
+  this.irDrawingFullHeight_ = !!opt_fullHeight;
+  this.irDrawingActive_ = false;
+  this.irDrawingBounds_ = opt_bounds ? goog.array.concat(opt_bounds) : [this.getPlotBounds()];
+  this.irBlocksPropagation_ = opt_blockPropagation;
+  this.irOnStart_ = opt_onStart;
+  this.irOnChange_ = opt_onChange;
+  this.irOnFinish_ = opt_onFinish;
+  this.irRepeat_ = !!opt_repeat;
+  if (!this.interactivityRect) {
+    this.interactivityRect = acgraph.rect(0, 0, 0, 0);
+    this.interactivityRect.zIndex(10001);
+    this.interactivityRect.disablePointerEvents(true);
+  }
+  this.interactivityRect.stroke(opt_stroke || '3 red');
+  this.interactivityRect.fill(opt_fill || 'red 0.5');
+  var target;
+  if (opt_blockPropagation) {
+    this.ignoreMouseEvents(true);
+    this.overlayRect_.cursor(null);
+    target = this.overlayRect_;
+  } else {
+    target = this.rootElement;
+  }
+  this.irDrawingTarget_ = target;
+  this.irDrawingCursor_ = opt_cursor || null;
+  this.irEventHandler_ = new goog.events.EventHandler(this);
+  if (this.irDrawingCursor_) {
+    this.irEventHandler_.listen(target, acgraph.events.EventType.MOUSEOVER, this.irDrawingMouseHoverHandler_, true);
+    this.irEventHandler_.listen(document, acgraph.events.EventType.MOUSEMOVE, this.irDrawingMouseHoverHandler_, true);
+    this.irEventHandler_.listen(document, acgraph.events.EventType.TOUCHMOVE, this.irDrawingMouseHoverHandler_, true);
+    this.irEventHandler_.listen(target, acgraph.events.EventType.MOUSEOUT, this.irDrawingMouseHoverHandler_, true);
+  }
+  this.irEventHandler_.listen(target, acgraph.events.EventType.TOUCHSTART, this.irDrawingMouseDownHandler_, true);
+  this.irEventHandler_.listen(target, acgraph.events.EventType.MOUSEDOWN, this.irDrawingMouseDownHandler_, true);
+  return true;
+};
 
 
 /**
- * @typedef {{chart: anychart.core.Chart}}
+ * Cleanup after IR drawing.
  */
-anychart.core.Chart.DrawEvent;
+anychart.core.Chart.prototype.finishIRDrawing = function() {
+  if (this.irDrawingBounds_) {
+    this.irDrawingFullHeight_ = false;
+    this.irRepeat_ = false;
+    this.irDrawingActive_ = false;
+    if (this.irBlocksPropagation_)
+      this.ignoreMouseEvents(false);
+    this.irBlocksPropagation_ = false;
+    this.irOnStart_ = this.irOnChange_ = this.irOnFinish_ = null;
+    if (this.interactivityRect) {
+      this.interactivityRect.parent(null);
+    }
+    this.irDrawingCursor_ = null;
+    goog.disposeAll(this.irDragger_, this.irEventHandler_);
+    this.irDrawingBounds_ = this.irDragger_ = this.irEventHandler_ = null;
+    this.irDrawingTarget_.cursor(null);
+    this.irDrawingTarget_ = null;
+  }
+};
 
 
+/**
+ * Checks whether the point is in any interactive rect drawing bounds rect.
+ * @param {number} x
+ * @param {number} y
+ * @return {number} Returns the index of the first rect the point belongs to plus one or zero if no rect contains the point.
+ * @private
+ */
+anychart.core.Chart.prototype.getIRDrawingBoundsIndex_ = function(x, y) {
+  if (this.irDrawingBounds_ && this.container()) {
+    var cp = this.container().getStage().getClientPosition();
+    x -= cp.x;
+    y -= cp.y;
+    for (var i = 0; i < this.irDrawingBounds_.length; i++) {
+      var rect = this.irDrawingBounds_[i];
+      if (rect &&
+          rect.left < x && x < rect.left + rect.width &&
+          rect.top < y && y < rect.top + rect.height) {
+        return i + 1;
+      }
+    }
+  }
+  return 0;
+};
+
+
+/**
+ * Mouse over handler for interactive rect drawing process.
+ * @param {acgraph.events.BrowserEvent} e
+ * @private
+ */
+anychart.core.Chart.prototype.irDrawingMouseHoverHandler_ = function(e) {
+  if (this.irDrawingBounds_)
+    this.irDrawingTarget_.cursor(
+        (this.irDrawingActive_ || this.getIRDrawingBoundsIndex_(e['clientX'], e['clientY'])) ?
+            this.irDrawingCursor_ :
+            null);
+};
+
+
+/**
+ * Mouse down handler for interactive rect drawing process.
+ * @param {acgraph.events.BrowserEvent} e
+ * @private
+ */
+anychart.core.Chart.prototype.irDrawingMouseDownHandler_ = function(e) {
+  var rect, rectIndex;
+  var container = /** @type {acgraph.vector.ILayer} */(this.container());
+  var cp = container.getStage().getClientPosition();
+  var startX = e.clientX - cp.x;
+  var startY = e.clientY - cp.y;
+  if ((e.type != acgraph.events.EventType.MOUSEDOWN || e.getOriginalEvent().isMouseActionButton()) &&
+      (rectIndex = this.getIRDrawingBoundsIndex_(e['clientX'], e['clientY'])) &&
+      (!this.irOnStart_ || this.irOnStart_(rectIndex - 1, startX, startY, 0, 0, e) !== false)) {
+    this.irDrawingBoundsIndex_ = rectIndex - 1;
+    rect = this.irDrawingBounds_[this.irDrawingBoundsIndex_];
+
+    this.irStartX_ = startX;
+    this.irStartY_ = startY;
+    var irBounds;
+    if (this.irDrawingFullHeight_) {
+      irBounds = new anychart.math.Rect(this.irStartX_, rect.top, 0, rect.height);
+    } else {
+      irBounds = new anychart.math.Rect(this.irStartX_, this.irStartY_, 0, 0);
+    }
+    this.interactivityRect.setBounds(irBounds);
+    this.interactivityRect.parent(container);
+
+    if (!this.irDragger_)
+      this.irDragger_ = new anychart.core.Chart.IRDragger(this.interactivityRect);
+    this.irDragger_.setScrollTarget(window);
+
+    rect = rect.clone();
+    rect.left -= this.irStartX_;
+    rect.top -= this.irStartY_;
+    this.irDragger_.setLimits(rect);
+
+    this.irEventHandler_.listen(this.irDragger_, goog.fx.Dragger.EventType.DRAG, this.irDrawingDragHandler_);
+    this.irEventHandler_.listen(this.irDragger_, goog.fx.Dragger.EventType.END, this.irDrawingDragEndHandler_);
+
+    this.irDrawingActive_ = true;
+    this.irDragger_.startDrag(e.getOriginalEvent());
+    e.preventDefault();
+    e.stopPropagation();
+  }
+};
+
+
+/**
+ * Drag progress handler.
+ * @param {goog.fx.DragEvent} e
+ * @private
+ */
+anychart.core.Chart.prototype.irDrawingDragHandler_ = function(e) {
+  var irBounds;
+  if (this.irDrawingFullHeight_) {
+    var rect = this.irDrawingBounds_[this.irDrawingBoundsIndex_];
+    irBounds = new anychart.math.Rect(this.irStartX_, rect.top, e.left, rect.height);
+  } else {
+    irBounds = new anychart.math.Rect(this.irStartX_, this.irStartY_, e.left, e.top);
+  }
+  this.interactivityRect.setBounds(irBounds);
+  if (this.irOnChange_) {
+    this.irOnChange_(this.irDrawingBoundsIndex_, this.irStartX_, this.irStartY_, e.left, e.top, new acgraph.events.BrowserEvent(e.browserEvent, this.container().getStage()));
+  }
+};
+
+
+/**
+ * Drag end handler.
+ * @param {goog.fx.DragEvent} e
+ * @private
+ */
+anychart.core.Chart.prototype.irDrawingDragEndHandler_ = function(e) {
+  var irBounds;
+  if (this.irDrawingFullHeight_) {
+    var rect = this.irDrawingBounds_[this.irDrawingBoundsIndex_];
+    irBounds = new anychart.math.Rect(this.irStartX_, rect.top, e.left, rect.height);
+  } else {
+    irBounds = new anychart.math.Rect(this.irStartX_, this.irStartY_, e.left, e.top);
+  }
+  this.interactivityRect.setBounds(irBounds);
+  var repeat = false;
+  if (this.irOnFinish_) {
+    repeat = this.irOnFinish_(this.irDrawingBoundsIndex_, this.irStartX_, this.irStartY_, e.left, e.top, new acgraph.events.BrowserEvent(e.browserEvent, this.container().getStage())) === false;
+  }
+  if (repeat || this.irRepeat_) {
+    this.interactivityRect.parent(null);
+  } else {
+    this.finishIRDrawing();
+  }
+};
+
+
+
+/**
+ * IR drawing dragger.
+ * @param {acgraph.vector.Rect} iRect
+ * @constructor
+ * @extends {goog.fx.Dragger}
+ */
+anychart.core.Chart.IRDragger = function(iRect) {
+  anychart.core.Chart.IRDragger.base(this, 'constructor', iRect.domElement());
+
+  // we don't need these handlers here
+  goog.events.unlisten(
+      this.handle,
+      [goog.events.EventType.TOUCHSTART, goog.events.EventType.MOUSEDOWN],
+      this.startDrag, false, this);
+};
+goog.inherits(anychart.core.Chart.IRDragger, goog.fx.Dragger);
+
+
+/** @inheritDoc */
+anychart.core.Chart.IRDragger.prototype.computeInitialPosition = function() {
+  this.deltaX = this.deltaY = 0;
+};
+
+
+/** @inheritDoc */
+anychart.core.Chart.IRDragger.prototype.defaultAction = function(x, y) {};
+
+
+//endregion
+//region --- Selection marquee
+//------------------------------------------------------------------------------
+//
+//  Selection marquee
+//
+//------------------------------------------------------------------------------
+/**
+ * Starts select marquee drawing.
+ * @param {boolean=} opt_repeat
+ * @return {anychart.core.Chart}
+ */
+anychart.core.Chart.prototype.startSelectMarquee = function(opt_repeat) {
+  this.preventMouseDownInteractivity =
+      this.startIRDrawing(this.onSelectMarqueeStart, this.onSelectMarqueeChange, this.onSelectMarqueeFinish, this.getSelectMarqueeBounds(),
+          false, undefined, opt_repeat, this.selectMarqueeStroke_, this.selectMarqueeFill_);
+  return this;
+};
+
+
+/**
+ * Getter/setter for select marquee fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.core.Chart} .
+ */
+anychart.core.Chart.prototype.selectMarqueeFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    var fill = acgraph.vector.normalizeFill.apply(null, arguments);
+    if (fill != this.selectMarqueeFill_) {
+      this.selectMarqueeFill_ = fill;
+      if (this.inMarquee()) {
+        this.interactivityRect.fill(this.selectMarqueeFill_);
+      }
+    }
+    return this;
+  }
+  return this.selectMarqueeFill_;
+};
+
+
+/**
+ * Getter/setter for select marquee stroke.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.core.Chart|acgraph.vector.Stroke} .
+ */
+anychart.core.Chart.prototype.selectMarqueeStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    var stroke = acgraph.vector.normalizeStroke.apply(null, arguments);
+    if (stroke != this.selectMarqueeStroke_) {
+      this.selectMarqueeStroke_ = stroke;
+      if (this.inMarquee()) {
+        this.interactivityRect.stroke(this.selectMarqueeStroke_);
+      }
+    }
+    return this;
+  }
+  return this.selectMarqueeStroke_;
+};
+
+
+/**
+ * Returns true if there is a marquee process running.
+ * @return {boolean}
+ */
+anychart.core.Chart.prototype.inMarquee = function() {
+  return !!this.irDrawingBounds_;
+};
+
+
+/**
+ * Stops current marquee action if any.
+ * @return {anychart.core.Chart}
+ */
+anychart.core.Chart.prototype.cancelMarquee = function() {
+  this.finishIRDrawing();
+  return this;
+};
+
+
+/**
+ * Returns select marquee bounds.
+ * @return {?Array.<?anychart.math.Rect>}
+ * @protected
+ */
+anychart.core.Chart.prototype.getSelectMarqueeBounds = function() {
+  return null;
+};
+
+
+/**
+ * Creates select marquee event object.
+ * @param {string} eventType
+ * @param {number} plotIndex
+ * @param {number} startX
+ * @param {number} startY
+ * @param {number} width
+ * @param {number} height
+ * @param {acgraph.events.BrowserEvent} browserEvent
+ * @return {goog.events.EventLike}
+ * @protected
+ */
+anychart.core.Chart.prototype.createSelectMarqueeEvent = function(eventType, plotIndex, startX, startY, width, height, browserEvent) {
+  var cp = this.container().getStage().getClientPosition();
+  var left = width < 0 ? startX + width : startX;
+  var top = height < 0 ? startY + height : startY;
+  return {
+    type: eventType, // dispatch expects it to be an obfuscated property
+    'offsetX': browserEvent['offsetX'],
+    'offsetY': browserEvent['offsetY'],
+    'clientX': browserEvent['clientX'],
+    'clientY': browserEvent['clientY'],
+    'screenX': browserEvent['screenX'],
+    'screenY': browserEvent['screenY'],
+    'button': browserEvent['button'],
+    'actionButton': browserEvent['actionButton'],
+    'keyCode': browserEvent['keyCode'],
+    'charCode': browserEvent['charCode'],
+    'ctrlKey': browserEvent['ctrlKey'],
+    'altKey': browserEvent['altKey'],
+    'shiftKey': browserEvent['shiftKey'],
+    'metaKey': browserEvent['metaKey'],
+    'platformModifierKey': browserEvent['platformModifierKey'],
+    'clientStartX': startX + cp.x,
+    'clientStartY': startY + cp.y,
+    'clientLeft': left + cp.x,
+    'clientTop': top + cp.y,
+    'startX': startX,
+    'startY': startY,
+    'left': left,
+    'top': top,
+    'width': Math.abs(width),
+    'height': Math.abs(height)
+  };
+};
+
+
+/**
+ * @param {number} plotIndex
+ * @param {number} startX
+ * @param {number} startY
+ * @param {number} width
+ * @param {number} height
+ * @param {acgraph.events.BrowserEvent} browserEvent
+ * @return {boolean}
+ * @protected
+ */
+anychart.core.Chart.prototype.onSelectMarqueeStart = function(plotIndex, startX, startY, width, height, browserEvent) {
+  return this.dispatchEvent(this.createSelectMarqueeEvent(anychart.enums.EventType.SELECT_MARQUEE_START, plotIndex, startX, startY, width, height, browserEvent));
+};
+
+
+/**
+ * @param {number} plotIndex
+ * @param {number} startX
+ * @param {number} startY
+ * @param {number} width
+ * @param {number} height
+ * @param {acgraph.events.BrowserEvent} browserEvent
+ * @return {boolean}
+ * @protected
+ */
+anychart.core.Chart.prototype.onSelectMarqueeChange = function(plotIndex, startX, startY, width, height, browserEvent) {
+  return this.dispatchEvent(this.createSelectMarqueeEvent(anychart.enums.EventType.SELECT_MARQUEE_CHANGE, plotIndex, startX, startY, width, height, browserEvent));
+};
+
+
+/**
+ * @param {number} plotIndex
+ * @param {number} startX
+ * @param {number} startY
+ * @param {number} width
+ * @param {number} height
+ * @param {acgraph.events.BrowserEvent} browserEvent
+ * @return {boolean}
+ * @protected
+ */
+anychart.core.Chart.prototype.onSelectMarqueeFinish = function(plotIndex, startX, startY, width, height, browserEvent) {
+  var e = this.createSelectMarqueeEvent(anychart.enums.EventType.SELECT_MARQUEE_FINISH, plotIndex, startX, startY, width, height, browserEvent);
+  var rv = this.dispatchEvent(e);
+  if (rv) {
+    this.selectByRect(e);
+  }
+  this.preventMouseDownInteractivity = false;
+  return rv;
+};
+
+
+/**
+ * @param {goog.events.EventLike} marqueeFinishEvent
+ * @protected
+ */
+anychart.core.Chart.prototype.selectByRect = function(marqueeFinishEvent) {
+};
+
+
+//endregion
+//region --- Exporting/Sharing/Data serialization
+//------------------------------------------------------------------------------
+//
+//  Exporting/Sharing/Data serialization
+//
+//------------------------------------------------------------------------------
 /**
  * Extract headers from chart data set or stock storage.
  * @param {anychart.data.Set|anychart.data.TableStorage} dataSet
@@ -3283,6 +3830,7 @@ anychart.core.Chart.prototype.shareWithPinterest = function(opt_linkOrOptions, o
 };
 
 
+//endregion
 //region ------- Charts tracking
 
 
@@ -3356,6 +3904,11 @@ anychart.core.Chart.prototype.id = function(opt_value) {
   proto['shareWithTwitter'] = proto.shareWithTwitter;
   proto['shareWithLinkedIn'] = proto.shareWithLinkedIn;
   proto['shareWithPinterest'] = proto.shareWithPinterest;
+  proto['startSelectMarquee'] = proto.startSelectMarquee;
+  proto['selectMarqueeFill'] = proto.selectMarqueeFill;
+  proto['selectMarqueeStroke'] = proto.selectMarqueeStroke;
+  proto['inMarquee'] = proto.inMarquee;
+  proto['cancelMarquee'] = proto.cancelMarquee;
   proto['id'] = proto.id;
 })();
 

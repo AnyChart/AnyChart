@@ -21,7 +21,6 @@ anychart.core.shapeManagers.Base = function(series, config, interactive, opt_sha
   /**
    * A name of a series meta field where the shape manager should write
    * @type {string}
-   * @protected
    */
   this.shapesFieldName = opt_shapesFieldName || 'shapes';
 

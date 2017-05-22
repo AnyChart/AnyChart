@@ -1124,6 +1124,16 @@ anychart.core.stock.Plot.prototype.getDrawingWidth = function() {
 };
 
 
+/**
+ * Returns series drawing bounds.
+ * @return {!anychart.math.Rect}
+ */
+anychart.core.stock.Plot.prototype.getPlotBounds = function() {
+  this.ensureBoundsDistributed_();
+  return this.seriesBounds_;
+};
+
+
 //endregion
 //region Public getters, setters and methods
 //----------------------------------------------------------------------------------------------------------------------

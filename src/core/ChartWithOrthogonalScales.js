@@ -1661,11 +1661,14 @@ anychart.core.ChartWithOrthogonalScales.prototype.doAnimation = function() {
 //  Context menu
 //
 //----------------------------------------------------------------------------------------------------------------------
-/** @override */
+/** @inheritDoc */
 anychart.core.ChartWithOrthogonalScales.prototype.specificContextMenuItems = function(items, context, isPointContext) {
-  var newItems = isPointContext ?
-      anychart.core.ChartWithOrthogonalScales.contextMenuMap.chartWithSeriesPoint.concat(items) :
-      anychart.core.ChartWithOrthogonalScales.contextMenuMap.chartWithSeriesDefault.concat(items);
+  var newItems = /** @type {Array.<anychart.ui.ContextMenu.Item>} */(goog.array.concat(
+      anychart.utils.recursiveClone(isPointContext ?
+          anychart.core.ChartWithOrthogonalScales.contextMenuMap.chartWithSeriesPoint :
+          anychart.core.ChartWithOrthogonalScales.contextMenuMap.chartWithSeriesDefault),
+      anychart.utils.recursiveClone(anychart.core.Chart.contextMenuMap.selectMarquee),
+      items));
 
   var excludedPoints = this.getExcludedPoints();
   var excludedPointsItem = isPointContext ? newItems[1] : newItems[0];
@@ -1716,7 +1719,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.specificContextMenuItems = fun
     excludedPointsItem['enabled'] = true;
   }
 
-  return /** @type {Array.<anychart.ui.ContextMenu.Item>} */ (anychart.utils.recursiveClone(newItems));
+  return newItems;
 };
 
 
@@ -1980,6 +1983,55 @@ anychart.core.ChartWithOrthogonalScales.prototype.getValueFieldToSearchInData = 
 
 /** @inheritDoc */
 anychart.core.ChartWithOrthogonalScales.prototype.onInteractivitySignal = function() {
+};
+
+
+//endregion
+//region --- Select by rect
+//------------------------------------------------------------------------------
+//
+//  Select by rect
+//
+//------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.core.ChartWithOrthogonalScales.prototype.createSelectMarqueeEvent = function(eventType, plotIndex, left, top, width, height, browserEvent) {
+  var res = anychart.core.ChartWithOrthogonalScales.base(this, 'createSelectMarqueeEvent', eventType, plotIndex, left, top, width, height, browserEvent);
+  var i, series, points;
+  var allSelected = true;
+  var pointsForSeries = [];
+  for (i = 0; i < this.seriesList.length; i++) {
+    series = this.seriesList[i];
+    points = series.enabled() ? series.getPointsInRect(res['left'], res['top'], res['width'], res['height']) : [];
+    var seriesAllSelected = goog.array.every(points, function(index) {
+      return series.state.getPointStateByIndex(index) >= anychart.PointState.SELECT;
+    });
+    allSelected = allSelected && seriesAllSelected;
+    pointsForSeries.push({
+      'series': series,
+      'pointsInRect': points,
+      'allPointsAreSelected': seriesAllSelected
+    });
+  }
+  res['seriesStatus'] = pointsForSeries;
+  res['allPointsAreSelected'] = allSelected;
+  return res;
+};
+
+
+/** @inheritDoc */
+anychart.core.ChartWithOrthogonalScales.prototype.selectByRect = function(marqueeFinishEvent) {
+  var append = marqueeFinishEvent['shiftKey'] || marqueeFinishEvent['ctrlKey'] || marqueeFinishEvent['metaKey'];
+  var pointsForSeries = marqueeFinishEvent['seriesStatus'];
+  var i;
+  if (append && marqueeFinishEvent['allPointsAreSelected']) {
+    for (i = 0; i < pointsForSeries.length; i++) {
+      pointsForSeries[i]['series'].unselect(pointsForSeries[i]['pointsInRect']);
+    }
+  } else {
+    for (i = 0; i < pointsForSeries.length; i++) {
+      pointsForSeries[i]['series'].selectPointInternal(pointsForSeries[i]['pointsInRect'], append);
+    }
+  }
 };
 
 

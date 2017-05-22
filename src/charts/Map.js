@@ -247,8 +247,7 @@ anychart.charts.Map = function() {
   this.unboundRegions(true);
   this.defaultSeriesType(anychart.enums.MapSeriesType.CHOROPLETH);
 
-  if (this.supportsBaseHighlight)
-    this.eventsHandler.listen(this, [goog.events.EventType.POINTERDOWN, acgraph.events.EventType.TOUCHSTART], this.tapHandler);
+  this.eventsHandler.listen(this, [goog.events.EventType.POINTERDOWN, acgraph.events.EventType.TOUCHSTART], this.tapHandler);
 };
 goog.inherits(anychart.charts.Map, anychart.core.ChartWithSeries);
 
@@ -839,7 +838,7 @@ anychart.charts.Map.prototype.controlsInteractivity_ = function() {
     goog.events.listen(this.legend(), [anychart.enums.EventType.DRAG, anychart.enums.EventType.DRAG_START], function(e) {
       this.legendDragInProcess = true;
     }, false, this);
-    goog.events.listen(this.legend(), [anychart.enums.EventType.DRAG_END], function(e) {
+    goog.events.listen(this.legend(), anychart.enums.EventType.DRAG_END, function(e) {
       this.legendDragInProcess = false;
     }, false, this);
 
@@ -962,9 +961,7 @@ anychart.charts.Map.prototype.tapHandler = function(event) {
       var firsFinger = originalTouchEvent.touches[0];
       var secondFinger = originalTouchEvent.touches[1];
 
-      var dist = anychart.math.vectorLength(firsFinger.pageX, firsFinger.pageY, secondFinger.pageX, secondFinger.pageY);
-
-      this.touchDist = dist;
+      this.touchDist = anychart.math.vectorLength(firsFinger.pageX, firsFinger.pageY, secondFinger.pageX, secondFinger.pageY);
       this.tap = false;
     } else if (touchCount == 1) {
       this.tap = true;
@@ -1449,20 +1446,8 @@ anychart.charts.Map.prototype.resizeHandler = function(evt) {
 
 
 /** @inheritDoc */
-anychart.charts.Map.prototype.interactivity = function(opt_value) {
-  if (!this.interactivity_) {
-    this.interactivity_ = new anychart.core.utils.MapInteractivity(this);
-    this.interactivity_.listenSignals(this.onInteractivitySignal, this);
-  }
-
-  if (goog.isDef(opt_value)) {
-    if (goog.isObject(opt_value))
-      this.interactivity_.setup(opt_value);
-    else
-      this.interactivity_.hoverMode(/** @type {anychart.enums.HoverMode} */(opt_value));
-    return this;
-  }
-  return this.interactivity_;
+anychart.charts.Map.prototype.createInteractivitySettings = function() {
+  return new anychart.core.utils.MapInteractivity(this);
 };
 
 
@@ -5360,7 +5345,6 @@ anychart.charts.Map.prototype.disposeInternal = function() {
   //bounds
   proto['getPlotBounds'] = proto.getPlotBounds;
   //interactivity
-  proto['interactivity'] = proto.interactivity;
   proto['allowPointsSelect'] = proto.allowPointsSelect;
   proto['crsAnimation'] = proto.crsAnimation;
   //feature manipulation

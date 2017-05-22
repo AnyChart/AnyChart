@@ -10,10 +10,12 @@ goog.require('anychart.core.stock.IKeyIndexTransformer');
 goog.require('anychart.core.stock.Plot');
 goog.require('anychart.core.stock.Scroller');
 goog.require('anychart.core.ui.Tooltip');
+goog.require('anychart.core.utils.StockInteractivity');
 goog.require('anychart.enums');
 goog.require('anychart.scales.StockOrdinalDateTime');
 goog.require('anychart.scales.StockScatterDateTime');
 goog.require('anychart.utils');
+goog.require('goog.events.MouseWheelHandler');
 
 
 
@@ -28,9 +30,6 @@ goog.require('anychart.utils');
  * @param {boolean=} opt_allowPointSettings Allows to set point settings from data.
  */
 anychart.charts.Stock = function(opt_allowPointSettings) {
-  // See SeparateChart
-  this.supportsBaseHighlight = false;
-
   anychart.charts.Stock.base(this, 'constructor');
 
   /**
@@ -119,6 +118,13 @@ anychart.charts.Stock = function(opt_allowPointSettings) {
   this.defaultAnnotationSettings_ = {};
 
   /**
+   * Mouse wheel handler.
+   * @type {goog.events.MouseWheelHandler}
+   * @private
+   */
+  this.mouseWheelHandler_ = null;
+
+  /**
    * Series config.
    * @type {Object.<string, anychart.core.series.TypeConfig>}
    */
@@ -144,6 +150,40 @@ anychart.charts.Stock.prototype.SUPPORTED_CONSISTENCY_STATES =
     anychart.ConsistencyState.STOCK_SCROLLER |
     anychart.ConsistencyState.STOCK_DATA |
     anychart.ConsistencyState.STOCK_SCALES;
+
+
+/**
+ * Minimal ratio between marked range and the full range.
+ * @const {number}
+ */
+anychart.charts.Stock.MINIMAL_MARQUEE_ZOOM_RANGE_RATIO = 0.05;
+
+
+/**
+ * Minimal marquee pixel width to make a selection.
+ * @const {number}
+ */
+anychart.charts.Stock.MINIMAL_MARQUEE_ZOOM_PIXEL_WIDTH = 5;
+
+
+/**
+ * Zoom factor per 1 mouse wheel line.
+ * @const {number}
+ */
+anychart.charts.Stock.ZOOM_FACTOR_PER_WHEEL_STEP = 0.05 / 4;
+
+
+/**
+ * Scroll factor per 1 mouse wheel line.
+ * @const {number}
+ */
+anychart.charts.Stock.SCROLL_FACTOR_PER_WHEEL_STEP = 0.1 / 4;
+
+
+/** @inheritDoc */
+anychart.charts.Stock.prototype.supportsBaseHighlight = function() {
+  return false;
+};
 
 
 //region Chart type and series types
@@ -835,16 +875,6 @@ anychart.charts.Stock.prototype.resizeHandler = function(e) {
 };
 
 
-/** @inheritDoc */
-anychart.charts.Stock.prototype.createTooltip = function() {
-  var tooltip = new anychart.core.ui.Tooltip(anychart.core.ui.Tooltip.Capabilities.ANY);
-  this.registerDisposable(tooltip);
-  tooltip.chart(this);
-
-  return tooltip;
-};
-
-
 /**
  * Returns current selection min distance (from selectable sources).
  * @return {number}
@@ -947,6 +977,13 @@ anychart.charts.Stock.prototype.drawContent = function(bounds) {
   }
 
   this.refreshHighlight_();
+
+  if (!this.mouseWheelHandler_) {
+    this.mouseWheelHandler_ = new goog.events.MouseWheelHandler(
+        this.container().getStage().getDomWrapper(), false);
+
+    this.mouseWheelHandler_.listen('mousewheel', this.handleMouseWheel_, false, this);
+  }
 
   // anychart.core.Base.resumeSignalsDispatchingFalse(this.plots_, this.scroller_);
 };
@@ -1742,6 +1779,378 @@ anychart.charts.Stock.prototype.unhighlight_ = function() {
 };
 
 
+/** @inheritDoc */
+anychart.charts.Stock.prototype.createInteractivitySettings = function() {
+  return new anychart.core.utils.StockInteractivity(this);
+};
+
+
+//endregion
+//region Selection Marquee
+//------------------------------------------------------------------------------
+//
+//  Selection Marquee
+//
+//------------------------------------------------------------------------------
+/** @inheritDoc */
+anychart.charts.Stock.prototype.getSelectMarqueeBounds = function() {
+  var bounds = [];
+  for (var i = 0; i < this.plots_.length; i++) {
+    /** @type {anychart.core.stock.Plot} */
+    var plot = this.plots_[i];
+    bounds.push(plot && plot.enabled() ? plot.getPlotBounds() : null);
+  }
+  return bounds;
+};
+
+
+/** @inheritDoc */
+anychart.charts.Stock.prototype.createSelectMarqueeEvent = function(eventType, plotIndex, left, top, width, height, browserEvent) {
+  var res = anychart.charts.Stock.base(this, 'createSelectMarqueeEvent', eventType, plotIndex, left, top, width, height, browserEvent);
+  var plot = /** @type {anychart.core.stock.Plot} */(this.plots_[plotIndex]);
+  var plotBounds = plot.getPlotBounds();
+  var leftRatio = (res['left'] - plotBounds.left) / plotBounds.width;
+  var rightRatio = (res['left'] + res['width'] - plotBounds.left) / plotBounds.width;
+  var topRatio = (res['top'] - plotBounds.top) / plotBounds.height;
+  var bottomRatio = (res['top'] + res['height'] - plotBounds.top) / plotBounds.height;
+  var xScale = this.xScale();
+  var yScale = plot.yScale();
+  res['plot'] = plot;
+  res['plotIndex'] = plotIndex;
+  res['plotBounds'] = {
+    'left': plotBounds.left,
+    'top': plotBounds.top,
+    'width': plotBounds.width,
+    'height': plotBounds.height
+  };
+  res['leftX'] = xScale.inverseTransform(leftRatio);
+  res['rightX'] = xScale.inverseTransform(rightRatio);
+  res['maxValue'] = yScale.inverseTransform(topRatio);
+  res['minValue'] = yScale.inverseTransform(bottomRatio);
+  if (yScale.inverted()) {
+    var tmp = res['minValue'];
+    res['minValue'] = res['maxValue'];
+    res['maxValue'] = tmp;
+  }
+  return res;
+};
+
+
+//endregion
+//region Zoom Marquee
+//------------------------------------------------------------------------------
+//
+//  Zoom Marquee
+//
+//------------------------------------------------------------------------------
+/**
+ * Starts zoom marquee.
+ * @param {boolean=} opt_repeat
+ * @param {boolean=} opt_asRect
+ * @return {anychart.charts.Stock}
+ */
+anychart.charts.Stock.prototype.startZoomMarquee = function(opt_repeat, opt_asRect) {
+  this.startIRDrawing(this.onZoomMarqueeStart_, null, this.onZoomMarqueeFinish_, this.getSelectMarqueeBounds(),
+      false, acgraph.vector.Cursor.CROSSHAIR, opt_repeat, this.zoomMarqueeStroke_, this.zoomMarqueeFill_, !opt_asRect);
+  return this;
+};
+
+
+/**
+ * Getter/setter for select marquee fill.
+ * @param {(!acgraph.vector.Fill|!Array.<(acgraph.vector.GradientKey|string)>|null)=} opt_fillOrColorOrKeys .
+ * @param {number=} opt_opacityOrAngleOrCx .
+ * @param {(number|boolean|!anychart.math.Rect|!{left:number,top:number,width:number,height:number})=} opt_modeOrCy .
+ * @param {(number|!anychart.math.Rect|!{left:number,top:number,width:number,height:number}|null)=} opt_opacityOrMode .
+ * @param {number=} opt_opacity .
+ * @param {number=} opt_fx .
+ * @param {number=} opt_fy .
+ * @return {acgraph.vector.Fill|anychart.charts.Stock} .
+ */
+anychart.charts.Stock.prototype.zoomMarqueeFill = function(opt_fillOrColorOrKeys, opt_opacityOrAngleOrCx, opt_modeOrCy, opt_opacityOrMode, opt_opacity, opt_fx, opt_fy) {
+  if (goog.isDef(opt_fillOrColorOrKeys)) {
+    this.zoomMarqueeFill_ = acgraph.vector.normalizeFill.apply(null, arguments);
+    return this;
+  }
+  return this.zoomMarqueeFill_;
+};
+
+
+/**
+ * Getter/setter for select marquee stroke.
+ * @param {(acgraph.vector.Stroke|acgraph.vector.ColoredFill|string|null)=} opt_strokeOrFill Fill settings
+ *    or stroke settings.
+ * @param {number=} opt_thickness [1] Line thickness.
+ * @param {string=} opt_dashpattern Controls the pattern of dashes and gaps used to stroke paths.
+ * @param {acgraph.vector.StrokeLineJoin=} opt_lineJoin Line joint style.
+ * @param {acgraph.vector.StrokeLineCap=} opt_lineCap Line cap style.
+ * @return {anychart.charts.Stock|acgraph.vector.Stroke} .
+ */
+anychart.charts.Stock.prototype.zoomMarqueeStroke = function(opt_strokeOrFill, opt_thickness, opt_dashpattern, opt_lineJoin, opt_lineCap) {
+  if (goog.isDef(opt_strokeOrFill)) {
+    this.zoomMarqueeStroke_ = acgraph.vector.normalizeStroke.apply(null, arguments);
+    return this;
+  }
+  return this.zoomMarqueeStroke_;
+};
+
+
+/**
+ *
+ * @param {number} plotIndex
+ * @param {number} left
+ * @param {number} top
+ * @param {number} width
+ * @param {number} height
+ * @param {acgraph.events.BrowserEvent} browserEvent
+ * @return {boolean}
+ * @private
+ */
+anychart.charts.Stock.prototype.onZoomMarqueeStart_ = function(plotIndex, left, top, width, height, browserEvent) {
+  this.preventHighlight();
+  return true;
+};
+
+
+/**
+ *
+ * @param {number} plotIndex
+ * @param {number} left
+ * @param {number} top
+ * @param {number} width
+ * @param {number} height
+ * @param {acgraph.events.BrowserEvent} browserEvent
+ * @return {boolean}
+ * @private
+ */
+anychart.charts.Stock.prototype.onZoomMarqueeFinish_ = function(plotIndex, left, top, width, height, browserEvent) {
+  if (Math.abs(width) > anychart.charts.Stock.MINIMAL_MARQUEE_ZOOM_PIXEL_WIDTH) {
+    var plotBounds = this.plots_[plotIndex].getPlotBounds();
+    var scale = /** @type {anychart.scales.StockScatterDateTime} */(this.xScale());
+    var startRatio = (left - plotBounds.left) / plotBounds.width;
+    var endRatio = (left + width - plotBounds.left) / plotBounds.width;
+    if (startRatio > endRatio) {
+      var tmp = startRatio;
+      startRatio = endRatio;
+      endRatio = tmp;
+    }
+    if (endRatio - startRatio < anychart.charts.Stock.MINIMAL_MARQUEE_ZOOM_RANGE_RATIO) {
+      var centerRatio = (startRatio + endRatio) / 2;
+      startRatio = centerRatio - anychart.charts.Stock.MINIMAL_MARQUEE_ZOOM_RANGE_RATIO / 2;
+      endRatio = centerRatio + anychart.charts.Stock.MINIMAL_MARQUEE_ZOOM_RANGE_RATIO / 2;
+    }
+    var start = scale.inverseTransform(startRatio);
+    var end = scale.inverseTransform(endRatio);
+    var startIndex = this.dataController_.getIndexByKey(start);
+    var endIndex = this.dataController_.getIndexByKey(end);
+    if (endIndex - startIndex < 1) { // can't zoom in less than 2 points
+      start = this.dataController_.getKeyByIndex(Math.floor(startIndex));
+      end = this.dataController_.getKeyByIndex(Math.ceil(endIndex));
+    }
+    if ((!isNaN(start) && !isNaN(end)) &&
+        (start != this.dataController_.getFirstSelectedKey() || end != this.dataController_.getLastSelectedKey()) &&
+        this.dispatchRangeChange_(anychart.enums.EventType.SELECTED_RANGE_CHANGE_START, anychart.enums.StockRangeChangeSource.MARQUEE) &&
+        this.dispatchRangeChange_(anychart.enums.EventType.SELECTED_RANGE_BEFORE_CHANGE, anychart.enums.StockRangeChangeSource.MARQUEE, start, end)) {
+      this.selectRangeInternal_(start, end);
+      this.dispatchRangeChange_(
+          anychart.enums.EventType.SELECTED_RANGE_CHANGE,
+          anychart.enums.StockRangeChangeSource.MARQUEE);
+      this.dispatchRangeChange_(
+          anychart.enums.EventType.SELECTED_RANGE_CHANGE_FINISH,
+          anychart.enums.StockRangeChangeSource.MARQUEE);
+    }
+  }
+  this.allowHighlight();
+  return true;
+};
+
+
+//endregion
+//region Mouse wheel interactivity
+//------------------------------------------------------------------------------
+//
+//  Mouse wheel interactivity
+//
+//------------------------------------------------------------------------------
+/**
+ * Mouse wheel handler.
+ * @param {goog.events.MouseWheelEvent} e
+ * @private
+ */
+anychart.charts.Stock.prototype.handleMouseWheel_ = function(e) {
+  var bounds = this.getSelectMarqueeBounds();
+  var cp = this.container().getStage().getClientPosition();
+  var x = e['clientX'] - cp.x;
+  var y = e['clientY'] - cp.y;
+  var boundsItem;
+  var inBounds = false;
+  if (bounds && bounds.length) {
+    for (var i = 0; i < bounds.length; i++) {
+      boundsItem = /** @type {anychart.math.Rect} */(bounds[i]);
+      if (boundsItem &&
+          boundsItem.left <= x && x <= boundsItem.left + boundsItem.width &&
+          boundsItem.top <= y && y <= boundsItem.top + boundsItem.height) {
+        inBounds = true;
+        break;
+      }
+    }
+  }
+  if (!inBounds && this.scroller_ && this.scroller_.isVisible()) {
+    boundsItem = this.scroller_.getPixelBounds();
+    inBounds = (boundsItem &&
+        boundsItem.left <= x && x <= boundsItem.left + boundsItem.width &&
+        boundsItem.top <= y && y <= boundsItem.top + boundsItem.height);
+  }
+  if (inBounds) {
+    var doZoom,
+        delta;
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+      doZoom = !(e.shiftKey || e.ctrlKey || e.metaKey);
+      delta = e.deltaY;
+    } else {
+      doZoom = false;
+      delta = e.deltaX;
+    }
+    var interactivity = /** @type {anychart.core.utils.StockInteractivity} */(this.interactivity());
+    if (doZoom) {
+      if (interactivity.zoomOnMouseWheel()) {
+        var first,
+            last,
+            start,
+            end;
+        var ordinal = this.xScale() instanceof anychart.scales.StockOrdinalDateTime;
+        first = this.dataController_.getFirstKey();
+        last = this.dataController_.getLastKey();
+        if (ordinal) {
+          first = this.dataController_.getIndexByKey(first);
+          last = this.dataController_.getIndexByKey(last);
+          start = this.dataController_.getFirstSelectedIndex();
+          end = this.dataController_.getLastSelectedIndex();
+        } else {
+          start = this.dataController_.getFirstSelectedKey();
+          end = this.dataController_.getLastSelectedKey();
+        }
+        if (isNaN(start) || isNaN(end))
+          return;
+        var factor = (-delta * anychart.charts.Stock.ZOOM_FACTOR_PER_WHEEL_STEP) * (end - start);
+        start -= factor;
+        end += factor;
+        if (end - start > last - first) {
+          start = first;
+          end = last;
+        } else {
+          if (start < first) {
+            end += first - start;
+            start = first;
+          }
+          if (end > last) {
+            start += last - end;
+            end = last;
+          }
+        }
+        if (ordinal) {
+          if (end - start < 1) {
+            start = Math.round(start);
+            end = start + 1;
+          }
+          start = this.dataController_.getKeyByIndex(start);
+          end = this.dataController_.getKeyByIndex(end);
+        } else {
+          var startIndex = this.dataController_.getIndexByKey(start);
+          var endIndex = this.dataController_.getIndexByKey(end);
+          if (endIndex - startIndex < 1) {
+            startIndex = Math.round(startIndex);
+            endIndex = startIndex + 1;
+            start = this.dataController_.getKeyByIndex(startIndex);
+            end = this.dataController_.getKeyByIndex(endIndex);
+          }
+        }
+        if ((start != this.dataController_.getFirstSelectedKey() ||
+            end != this.dataController_.getLastSelectedKey())) {
+          e.preventDefault();
+          if (this.dispatchRangeChange_(
+                  anychart.enums.EventType.SELECTED_RANGE_CHANGE_START,
+                  anychart.enums.StockRangeChangeSource.MOUSE_WHEEL) &&
+              this.dispatchRangeChange_(
+                  anychart.enums.EventType.SELECTED_RANGE_BEFORE_CHANGE,
+                  anychart.enums.StockRangeChangeSource.MOUSE_WHEEL,
+                  start, end)) {
+            this.selectRangeInternal_(start, end);
+            this.dispatchRangeChange_(
+                anychart.enums.EventType.SELECTED_RANGE_CHANGE,
+                anychart.enums.StockRangeChangeSource.MOUSE_WHEEL);
+            this.dispatchRangeChange_(
+                anychart.enums.EventType.SELECTED_RANGE_CHANGE_FINISH,
+                anychart.enums.StockRangeChangeSource.MOUSE_WHEEL);
+          }
+        }
+      }
+    } else {
+      if (interactivity.scrollOnMouseWheel()) {
+        var anchor = this.getDragAnchor();
+        if (isNaN(anchor.firstIndex) || isNaN(anchor.lastIndex))
+          return;
+        var ratio = this.limitDragRatio(-delta * anychart.charts.Stock.SCROLL_FACTOR_PER_WHEEL_STEP, anchor);
+        if (ratio) {
+          e.preventDefault();
+          if (this.dispatchRangeChange_(
+                  anychart.enums.EventType.SELECTED_RANGE_CHANGE_START,
+                  anychart.enums.StockRangeChangeSource.MOUSE_WHEEL)) {
+            this.dragToRatio(ratio, anchor, anychart.enums.StockRangeChangeSource.MOUSE_WHEEL);
+            this.dispatchRangeChange_(
+                anychart.enums.EventType.SELECTED_RANGE_CHANGE_FINISH,
+                anychart.enums.StockRangeChangeSource.MOUSE_WHEEL);
+          }
+        }
+      }
+    }
+  }
+};
+
+
+//endregion
+//region Context menu
+//------------------------------------------------------------------------------
+//
+//  Context menu
+//
+//------------------------------------------------------------------------------
+/**
+ * Items map.
+ * @type {Object.<string, anychart.ui.ContextMenu.Item>}
+ */
+anychart.charts.Stock.contextMenuItems = {
+  // Item 'Keep Only'.
+  startZoomMarquee: {
+    'text': 'Start zoom marquee',
+    'eventType': 'anychart.startZoomMarquee',
+    'action': function(context) {
+      context['chart'].startZoomMarquee(false);
+    }
+  }
+};
+
+
+/**
+ * Menu map.
+ * @type {Object.<string, Array.<anychart.ui.ContextMenu.Item>>}
+ */
+anychart.charts.Stock.contextMenuMap = {
+  // Stock 'Default menu'. (will be added to 'main')
+  stock: [
+    anychart.charts.Stock.contextMenuItems.startZoomMarquee,
+    anychart.core.Chart.contextMenuItems.startSelectMarquee,
+    null
+  ]
+};
+
+
+/** @inheritDoc */
+anychart.charts.Stock.prototype.specificContextMenuItems = function(items, context, isPointContext) {
+  return /** @type {Array.<anychart.ui.ContextMenu.Item>} */(goog.array.concat(anychart.utils.recursiveClone(anychart.charts.Stock.contextMenuMap.stock), items));
+};
+
+
 //endregion
 //region Scroller change
 //----------------------------------------------------------------------------------------------------------------------
@@ -1867,11 +2276,12 @@ anychart.charts.Stock.prototype.getDragAnchor = function() {
 
 
 /**
- * Drags the chart to passed position.
+ * Drags the chart to passed position. If opt_source passed - dispatches with that source instead of plot drag.
  * @param {number} ratio
  * @param {anychart.charts.Stock.DragAnchor} anchor
+ * @param {anychart.enums.StockRangeChangeSource=} opt_source
  */
-anychart.charts.Stock.prototype.dragToRatio = function(ratio, anchor) {
+anychart.charts.Stock.prototype.dragToRatio = function(ratio, anchor, opt_source) {
   var scale = this.xScale();
   var valueDiff, range, start, end;
   if (scale instanceof anychart.scales.StockOrdinalDateTime) {
@@ -1889,7 +2299,7 @@ anychart.charts.Stock.prototype.dragToRatio = function(ratio, anchor) {
       end != this.dataController_.getLastSelectedKey()) &&
       this.dispatchRangeChange_(
           anychart.enums.EventType.SELECTED_RANGE_BEFORE_CHANGE,
-          anychart.enums.StockRangeChangeSource.PLOT_DRAG,
+          opt_source || anychart.enums.StockRangeChangeSource.PLOT_DRAG,
           Math.min(start, end), Math.max(start, end))) {
     this.selectRangeInternal_(start, end);
     anchor.firstIndex = this.getIndexByKey(anchor.firstKey);
@@ -1900,7 +2310,7 @@ anychart.charts.Stock.prototype.dragToRatio = function(ratio, anchor) {
     // anchor.maxKey = this.dataController_.getLastKey();
     this.dispatchRangeChange_(
         anychart.enums.EventType.SELECTED_RANGE_CHANGE,
-        anychart.enums.StockRangeChangeSource.PLOT_DRAG);
+        opt_source || anychart.enums.StockRangeChangeSource.PLOT_DRAG);
   }
 };
 
@@ -1932,7 +2342,7 @@ anychart.charts.Stock.prototype.limitDragRatio = function(ratio, anchor) {
  * @return {boolean}
  */
 anychart.charts.Stock.prototype.askDragStart = function() {
-  var res = this.dispatchRangeChange_(
+  var res = !this.inMarquee() && this.dispatchRangeChange_(
       anychart.enums.EventType.SELECTED_RANGE_CHANGE_START,
       anychart.enums.StockRangeChangeSource.PLOT_DRAG);
   if (res) {
@@ -1965,10 +2375,11 @@ anychart.charts.Stock.prototype.dragEnd = function() {
 /** @inheritDoc */
 anychart.charts.Stock.prototype.disposeInternal = function() {
   // plot annotations should be disposed before chart annotations
-  goog.disposeAll(this.plots_, this.scroller_, this.dataController_, this.annotations_);
+  goog.disposeAll(this.plots_, this.scroller_, this.dataController_, this.annotations_, this.mouseWheelHandler_);
   this.plots_ = null;
   this.scroller_ = null;
   this.annotations_ = null;
+  this.mouseWheelHandler_ = null;
   delete this.dataController_;
   delete this.defaultAnnotationSettings_;
 
@@ -1984,6 +2395,11 @@ anychart.charts.Stock.prototype.serialize = function() {
   json['xScale'] = this.xScale().serialize();
   json['scroller'] = this.scroller().serialize();
   json['plots'] = goog.array.map(this.plots_, function(element) { return element ? element.serialize() : null; });
+
+  json['selectMarqueeFill'] = anychart.color.serialize(/** @type {acgraph.vector.Fill} */(this.selectMarqueeFill()));
+  json['selectMarqueeStroke'] = anychart.color.serialize(/** @type {acgraph.vector.Stroke} */(this.selectMarqueeStroke()));
+
+  json['interactivity'] = this.interactivity().serialize();
   return json;
 };
 
@@ -2017,6 +2433,10 @@ anychart.charts.Stock.prototype.setupByJSON = function(config, opt_default) {
   if (goog.isObject(json)) {
     this.selectRange(json['start'], json['end']);
   }
+
+  this.zoomMarqueeFill(config['zoomMarqueeFill']);
+  this.zoomMarqueeStroke(config['zoomMarqueeStroke']);
+  this.interactivity(config['interactivity']);
 };
 
 
@@ -2326,4 +2746,8 @@ anychart.charts.Stock.prototype.toCsv = function(opt_chartDataExportMode, opt_cs
   proto['scrollerGrouping'] = proto.scrollerGrouping;
   proto['annotations'] = proto.annotations;
   proto['getPlotsCount'] = proto.getPlotsCount;
+  proto['startZoomMarquee'] = proto.startZoomMarquee;
+  proto['zoomMarqueeFill'] = proto.zoomMarqueeFill;
+  proto['zoomMarqueeStroke'] = proto.zoomMarqueeStroke;
+  proto['interactivity'] = proto.interactivity;
 })();

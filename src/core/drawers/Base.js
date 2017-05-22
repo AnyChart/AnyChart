@@ -103,6 +103,30 @@ anychart.core.drawers.Base.prototype.getYValueNames = function() {
 
 
 /**
+ * Checks if any shape of the passed object intersects the rect.
+ * @param {Object.<acgraph.vector.Element>} shapes
+ * @param {number} left
+ * @param {number} top
+ * @param {number} width
+ * @param {number} height
+ * @return {boolean}
+ */
+anychart.core.drawers.Base.prototype.checkShapesInRect = function(shapes, left, top, width, height) {
+  for (var shapeName in shapes) {
+    var shape = /** @type {acgraph.vector.Element} */(shapes[shapeName]);
+    if (shape instanceof acgraph.vector.Element) {
+      var bounds = shape.getBounds();
+      if (bounds.left <= left + width && left <= bounds.left + bounds.width &&
+          bounds.top <= top + height && top <= bounds.top + bounds.height) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
+
+/**
  * This function is invoked before the drawing process starts.
  * @param {anychart.core.shapeManagers.Base} shapeManager
  */
