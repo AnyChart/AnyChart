@@ -1151,10 +1151,11 @@ anychart.core.ui.Callout.prototype.draw = function() {
     this.labels().draw();
     for (var i = 0, len = this.labels().labelsCount(); i < len; i++) {
       var label = this.labels().getLabel(i);
-      var connector = label.getConnectorElement();
       label.parentLabelsFactory().dropCallsCache();
-      if (connector)
-        connector.clip(this.chart.getPlotBounds());
+      //todo (blackart) don't remove
+      // var connector = label.getConnectorElement();
+      // if (connector)
+      //   connector.clip(this.chart.getPlotBounds());
     }
     this.markConsistent(anychart.ConsistencyState.CALLOUT_LABELS);
   }
