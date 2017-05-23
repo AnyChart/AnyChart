@@ -2,7 +2,6 @@ goog.provide('anychart.utils');
 
 goog.require('acgraph.vector.primitives');
 goog.require('anychart.core.reporting');
-goog.require('anychart.core.utils.TooltipsContainer');
 goog.require('anychart.data.csv.Parser');
 goog.require('anychart.enums');
 goog.require('anychart.math');
@@ -1613,6 +1612,13 @@ anychart.utils.formatDateTime = function(date, pattern) {
  * @type {Object.<anychart.core.ui.Tooltip>}
  */
 anychart.utils.tooltipsRegistry = {};
+
+
+/**
+ * Tooltip local containers registry.
+ * @type {Object.<anychart.core.utils.LocalTooltipContainer>}
+ */
+anychart.utils.tooltipContainersRegistry = {};
 
 
 /**

@@ -1073,18 +1073,13 @@ anychart.core.series.Map.prototype.updateContext = function(provider, opt_rowInf
     if (regionId)
       values['id'] = {value: regionId, type: anychart.enums.TokenType.STRING};
 
-    provider.values(values);
-
     var features = rowInfo.meta('features');
     var pointGeoProp = features && features.length ? features[0]['properties'] : null;
     if (pointGeoProp) {
       values['regionProperties'] = {value: pointGeoProp, type: anychart.enums.TokenType.UNKNOWN};
       for (var key in pointGeoProp) {
-        if (pointGeoProp.hasOwnProperty(key)) {
-          var providerTokenValue = provider.getTokenValueInternal(key);
-          if (!goog.isDef(providerTokenValue)) {
-            values[key] = {value: pointGeoProp[key]};
-          }
+        if (pointGeoProp.hasOwnProperty(key) && !(key in values)) {
+          values[key] = {value: pointGeoProp[key]};
         }
       }
     }
