@@ -34,8 +34,7 @@ anychart.fromXmlFile = function(url, opt_onSuccessOrContainer, opt_onError, opt_
       opt_onSuccessOrContainer,
       opt_onError,
       opt_context,
-      method
-  );
+      method);
   goog.net.XhrIo.send(
       url,
       callback,
@@ -70,7 +69,7 @@ anychart.fromJsonFile = function(url, opt_onSuccessOrContainer, opt_onError, opt
       opt_onError,
       opt_context,
       method
-  );
+      );
   goog.net.XhrIo.send(
       url,
       callback,
@@ -169,8 +168,8 @@ anychart.modules.data_adapter.parseHtmlTable = function(opt_tableSelector, opt_r
     var caption;
     var captionElement = table['querySelector'](opt_captionSelector);
     if (captionElement) caption = opt_valueProcessor ?
-        opt_valueProcessor.call(undefined, captionElement) :
-        captionElement.innerText;
+          opt_valueProcessor.call(undefined, captionElement) :
+          captionElement.innerText;
     if (caption) result['title'] = caption;
 
     // parse table header
@@ -238,7 +237,7 @@ anychart.modules.data_adapter.loadJsonFile = function(url, onSuccess, opt_onErro
       onSuccess,
       opt_onError,
       opt_context
-  );
+      );
 
   goog.net.XhrIo.send(
       url,
@@ -271,7 +270,7 @@ anychart.modules.data_adapter.loadXmlFile = function(url, onSuccess, opt_onError
       onSuccess,
       opt_onError,
       opt_context
-  );
+      );
 
   goog.net.XhrIo.send(
       url,
@@ -304,7 +303,7 @@ anychart.modules.data_adapter.loadCsvFile = function(url, onSuccess, opt_onError
       onSuccess,
       opt_onError,
       opt_context
-  );
+      );
 
   goog.net.XhrIo.send(
       url,
@@ -333,7 +332,7 @@ anychart.modules.data_adapter.loadGoogleSpreadsheet = function(key, onSuccess, o
       onSuccess,
       opt_onError,
       opt_context
-  );
+      );
 
   var gsKey, gsSheet;
   if (goog.isString(key)) {
@@ -344,7 +343,7 @@ anychart.modules.data_adapter.loadGoogleSpreadsheet = function(key, onSuccess, o
     gsSheet = goog.isDef(key['sheet']) ? key['sheet'] : 'od6';
   }
 
-  var url = "https://spreadsheets.google.com/feeds/cells/" + gsKey + "/" + gsSheet + "/public/values";
+  var url = 'https://spreadsheets.google.com/feeds/cells/' + gsKey + '/' + gsSheet + '/public/values';
   var uri = new goog.Uri(url);
   uri.setParameterValue('alt', 'json');
   uri.makeUnique();
