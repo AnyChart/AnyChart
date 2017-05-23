@@ -223,7 +223,10 @@ anychart.data.Mapping.DEFAULT_ARRAY_MAPPING = {
 
   // heat map
   'y': [1],
-  'heat': [2]
+  'heat': [2],
+
+  // tag cloud
+  'category': [2]
 };
 
 

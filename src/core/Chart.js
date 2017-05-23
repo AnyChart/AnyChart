@@ -2054,7 +2054,10 @@ anychart.core.Chart.prototype.handleMouseOverAndMove = function(event) {
   var isTargetLegendOrColorRange = event['target'] instanceof anychart.core.ui.Legend || this.checkIfColorRange(event['target']);
 
   if (isTargetLegendOrColorRange) {
-    if (tag) {
+    if (goog.isDef(tag)) {
+      if (goog.isNumber(tag)) {
+        tag = event['target'].getParentEventTarget();
+      }
       if (tag.points_) {
         series = tag.points_.series;
         index = tag.points_.points;
@@ -2309,7 +2312,7 @@ anychart.core.Chart.prototype.onMouseDown = function(event) {
   if (series && !series.isDisposed() && series.enabled() && goog.isFunction(series.makePointEvent)) {
     var evt = series.makePointEvent(event);
     if (evt && ((anychart.utils.checkIfParent(/** @type {!goog.events.EventTarget} */(series), event['relatedTarget'])) || series.dispatchEvent(evt))) {
-      if (!isColorRange)
+      if (!isTargetLegendOrColorRange)
         index = evt['pointIndex'];
       if (interactivity.hoverMode() == anychart.enums.HoverMode.SINGLE) {
         if (interactivity.selectionMode() == anychart.enums.SelectionMode.NONE || series.selectionMode() == anychart.enums.SelectionMode.NONE)

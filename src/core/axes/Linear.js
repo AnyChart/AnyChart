@@ -2070,6 +2070,7 @@ anychart.core.axes.Linear.prototype.draw = function() {
 
     } else {
       var labelsStates = this.calcLabels_();
+
       needDrawLabels = goog.isObject(labelsStates) ? labelsStates.labels : !labelsStates;
       pixelShift = tickThickness % 2 == 0 ? 0 : -.5;
 

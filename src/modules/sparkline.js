@@ -19,7 +19,7 @@ goog.require('anychart.modules.base');
  * anychart.sparkline([1.3, 2, 1.4, 4, 2.3, 6])
  *   .container(stage).draw();
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {anychart.charts.Sparkline} Chart with defaults for marker series.
  */
 anychart.sparkline = function(opt_data, opt_csvSettings) {

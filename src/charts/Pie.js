@@ -24,7 +24,7 @@ goog.require('anychart.palettes');
  * Pie (Donut) Chart Class.<br/>
  * <b>Note:</b> Use method {@link anychart.pie} to get an instance of this class:
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @extends {anychart.core.SeparateChart}
  * @implements {anychart.core.utils.IInteractiveSeries}
  * @constructor
@@ -466,8 +466,8 @@ anychart.charts.Pie.prototype.isSeries = function() {
 
 /**
  * Getter/setter for data.
- * @param {(anychart.data.View|anychart.data.Set|anychart.data.TableData|Array|string)=} opt_value .
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.data.View|anychart.data.Set|anychart.data.DataSettings|Array|string)=} opt_value .
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {(anychart.data.View|anychart.charts.Pie)} .
  */
 anychart.charts.Pie.prototype.data = function(opt_value, opt_csvSettings) {

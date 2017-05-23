@@ -21,7 +21,7 @@ goog.require('anychart.scales');
 /**
  * Sparkline chart class.<br/>
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @extends {anychart.core.Chart}
  * @implements {anychart.core.utils.IInteractiveSeries}
  * @constructor
@@ -806,7 +806,7 @@ anychart.charts.Sparkline.prototype.onMarkersSignal_ = function(event) {
 /**
  * Getter/setter for data.
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {(!anychart.charts.Sparkline|!anychart.data.View)} Returns itself if used as a setter or the mapping if used as a getter.
  */
 anychart.charts.Sparkline.prototype.data = function(opt_value, opt_csvSettings) {

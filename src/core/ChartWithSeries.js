@@ -105,7 +105,7 @@ anychart.core.ChartWithSeries.generateSeriesConstructors = function(chartConstru
   for (var i in configs) {
     /**
      * @param {!(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
-     * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+     * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
      *    here as a hash map.
      * @return {anychart.core.series.Cartesian}
      * @this {anychart.core.ChartWithSeries}
@@ -269,7 +269,7 @@ anychart.core.ChartWithSeries.prototype.setupSeries = function(series) {
 /**
  * @param {string} type Series type.
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)} data Data for the series.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings
  *    here as a hash map.
  * @protected
  * @return {anychart.core.series.Cartesian}
@@ -882,7 +882,7 @@ anychart.core.ChartWithSeries.seriesReferenceValues = {
 
 
 /**
- * @param {(anychart.data.Set|anychart.data.TableData|Array)=} opt_value
+ * @param {(anychart.data.Set|anychart.data.DataSettings|Array)=} opt_value
  * @return {anychart.data.View|anychart.core.ChartWithSeries}
  */
 anychart.core.ChartWithSeries.prototype.data = function(opt_value) {

@@ -102,6 +102,13 @@ anychart.ConsistencyState = {
   GANTT_DATA: 1 << 12,
   GANTT_POSITION: 1 << 13,
   GANTT_SPLITTER_POSITION: 1 << 14,
+  //---------------------------------- TAG CLOUD STATES (CHART) ---------------------------------
+  TAG_CLOUD_DATA: 1 << 12,
+  TAG_CLOUD_ANGLES: 1 << 13,
+  TAG_CLOUD_TAGS: 1 << 14,
+  TAG_CLOUD_COLOR_RANGE: 1 << 15,
+  TAG_CLOUD_COLOR_SCALE: 1 << 16,
+  TAG_CLOUD_SCALE: 1 << 17,
   //---------------------------------- PIE STATES (CHART) ---------------------------------
   PIE_LABELS: 1 << 12,
   PIE_DATA: 1 << 13,

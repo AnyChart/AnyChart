@@ -23,7 +23,8 @@
         {"$ref": "#/definitions/anychart.charts.HeatMap"},
         {"$ref": "#/definitions/anychart.charts.TreeMap"},
         {"$ref": "#/definitions/anychart.charts.Pert"},
-        {"$ref": "#/definitions/anychart.charts.Mekko"}
+        {"$ref": "#/definitions/anychart.charts.Mekko"},
+        {"$ref": "#/definitions/anychart.charts.TagCloud"}
       ],
       "properties": {
         "container": {
@@ -1957,6 +1958,75 @@
             {"$ref": "#/definitions/anychart.scales.LinearColor"}
           ]
         }
+      },
+      "required": ["type"]
+    },
+    "anychart.charts.TagCloud": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.SeparateChart"}
+      ],
+      "properties": {
+        "type": {"enum": ["tagCloud"]},
+        "data": {"$ref": "#/definitions/data"},
+        "mode": {"enum": ["rect", "spiral"]},
+        "fromAngle": {"type": "number"},
+        "toAngle": {"type": "number"},
+        "anglesCount": {"type": "number"},
+        "textSpacing": {"type": "number"},
+        "angles": {
+          "type": ["array", "null"],
+          "items": {
+            "type": ["number", "string"]
+          }
+        },
+        "scale": {
+          "anyOf": [
+            {"type": "string"},
+            {"$ref": "#/definitions/anychart.scales.Linear"},
+            {"$ref": "#/definitions/anychart.scales.Logarithmic"}
+          ]
+        },
+        "colorScale": {
+          "anyOf": [
+            {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            {"$ref": "#/definitions/anychart.scales.LinearColor"},
+            {"$ref": "#/definitions/anychart.scales.OrdinalColor"}
+          ]
+        },
+        "colorRange": {"$ref": "#/definitions/anychart.core.ui.ColorRange"},
+        "palette": {
+          "type": [
+            "object",
+            "array"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "distinct",
+                "range"
+              ]
+            },
+            "items": {
+              "type": ["array"],
+              "items": {"$ref": "#/definitions/fill"}
+            },
+            "count": {
+              "type": "number"
+            }
+          },
+          "items": {
+            "type": "string"
+          }
+        },
+        "normal": {"$ref": "#/definitions/anychart.core.TagCloudStateSettings"},
+        "hovered": {"$ref": "#/definitions/anychart.core.TagCloudStateSettings"},
+        "selected": {"$ref": "#/definitions/anychart.core.TagCloudStateSettings"}
       },
       "required": ["type"]
     },
@@ -5228,56 +5298,49 @@
             "number",
             "null"
           ]
-        },
-        "letterSpacing": {
+        }
+      }
+    },
+    "anychart.core.TagCloudStateSettings": {
+      "type": "object",
+      "properties": {
+        "fontSize": {
           "type": [
             "string",
-            "number",
+            "number"
+          ]
+        },
+        "fill": {
+          "type": [
+            "string",
             "null"
           ]
         },
-        "decoration": {
+        "fontFamily": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fontStyle": {
           "enum": [
-            "blink",
-            "line-through",
-            "overline",
-            "underline",
-            "none",
+            "normal",
+            "italic",
+            "oblique",
             "null"
           ]
         },
-        "vAlign": {
+        "fontVariant": {
           "enum": [
-            "top",
-            "middle",
-            "bottom",
+            "normal",
+            "small-caps",
             "null"
           ]
         },
-        "opacity": {
-          "type": [
-            "number",
-            "null"
-          ],
-          "minimum": 0,
-          "maximum": 1
-        },
-        "textIndent": {
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "lineHeight": {
+        "fontWeight": {
           "type": [
             "string",
             "number",
-            "null"
-          ]
-        },
-        "textOverflow": {
-          "type": [
-            "string",
             "null"
           ]
         }

@@ -20,4 +20,5 @@ goog.require('anychart.modules.pyramid');
 goog.require('anychart.modules.radar');
 goog.require('anychart.modules.scatter');
 goog.require('anychart.modules.sparkline');
+goog.require('anychart.modules.tagCloud');
 goog.require('anychart.modules.treeMap');

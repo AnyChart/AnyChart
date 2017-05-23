@@ -692,6 +692,16 @@ anychart.core.settings.stringOrFunctionNormalizer = function(val) {
 
 
 /**
+ * Single arg normalizer for string or function params.
+ * @param {*} val
+ * @return {number|string|Function}
+ */
+anychart.core.settings.numberOrPercentOrNullOrFunctionNormalizer = function(val) {
+  return /** @type {Function|number|string} */((goog.isNull(val) || goog.isFunction(val) || anychart.utils.isPercent(val)) ? val : parseFloat(val));
+};
+
+
+/**
  * Single arg normalizer for natural (or zero) params. Defaults to NaN.
  * @param {*} val
  * @return {number}

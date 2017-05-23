@@ -12,7 +12,7 @@ goog.require('anychart.modules.base');
 /**
  * Default circular gauge.<br/>
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser
  * settings here as a hash map.
  * @return {anychart.charts.CircularGauge} Circular gauge with defaults.
  */
@@ -28,7 +28,7 @@ anychart.gaugeTypesMap[anychart.enums.GaugeTypes.CIRCULAR] = anychart.gauges.cir
 /**
  * Default circular gauge.<br/>
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser
  * settings here as a hash map.
  * @return {anychart.charts.CircularGauge} Circular gauge with defaults.
  * @deprecated Since 7.11.0. Use anychart.gauges.circular instead.

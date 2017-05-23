@@ -46,6 +46,11 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="y_scale" type="Scale"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="series_list" type="Series_list"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="a11y" type="utils.A11y"/>
+            <!-- charts.TagCloud elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="angles" type="Angle_list"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="normal" type="anychart.core.TagCloudStateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hovered" type="anychart.core.TagCloudStateSettings"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="selected" type="anychart.core.TagCloudStateSettings"/>
             <!-- charts.Bullet elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="range_palette" type="palettes.Colors"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="scale" type="Scale"/>
@@ -135,6 +140,12 @@
         <xsd:attribute name="context_menu" type="simple.Bool" default="true"/>
         <xsd:attribute name="select_marquee_fill" type="xsd:string"/>
         <xsd:attribute name="select_marquee_stroke" type="xsd:string"/>
+        <!-- charts.TagCloud elements -->
+        <xsd:attribute name="mode" type="xsd:string"/>
+        <xsd:attribute name="angles_count" type="xsd:double"/>
+        <xsd:attribute name="from_angle" type="xsd:double"/>
+        <xsd:attribute name="to_angle" type="xsd:double"/>
+        <xsd:attribute name="text_spacing" type="xsd:double"/>
         <!-- charts.Bullet attrs -->
         <xsd:attribute name="layout" type="enums.Layout" default="horizontal"/>
         <xsd:attribute name="scale" type="simple.ChartScaleRef" default="linear"/>
@@ -969,6 +980,15 @@
         <xsd:attributeGroup ref="attrs.VisualBase"/>
     </xsd:complexType>
 
+    <xsd:complexType name="anychart.core.TagCloudStateSettings">
+        <xsd:attribute name="font_size" type="xsd:string"/>
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="font_family" type="xsd:string"/>
+        <xsd:attribute name="font_style" type="enums.FontStyle"/>
+        <xsd:attribute name="font_variant" type="enums.FontVariant"/>
+        <xsd:attribute name="font_weight" type="xsd:string"/>
+    </xsd:complexType>
+
     <xsd:complexType name="core.axisMarkers.Text_list">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="text_axes_marker" type="core.axisMarkers.Text"/>
@@ -1635,6 +1655,12 @@
     </xsd:simpleType>
 
     <!-- utils complex types -->
+
+    <xsd:complexType name="Angle_list">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="angle" type="xsd:double"/>
+        </xsd:sequence>
+    </xsd:complexType>
 
     <xsd:complexType name="utils.Bounds">
         <xsd:attributeGroup ref="attrs.Bounds"/>
@@ -2900,6 +2926,7 @@
 
     <xsd:simpleType name="enums.ChartTypes">
         <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="tagCloud"/>
             <xsd:enumeration value="area"/>
             <xsd:enumeration value="verticalArea"/>
             <xsd:enumeration value="area3d"/>

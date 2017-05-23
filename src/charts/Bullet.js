@@ -22,7 +22,7 @@ goog.require('anychart.utils');
  *  </ul>
  * @constructor
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Bullet Chart data.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @extends {anychart.core.Chart}
  */
 anychart.charts.Bullet = function(opt_data, opt_csvSettings) {
@@ -115,7 +115,7 @@ anychart.charts.Bullet.prototype.getType = function() {
 /**
  * Getter/setter for bullet data.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {!(anychart.charts.Bullet|anychart.data.View)} Returns itself if used as a setter or the mapping if used as a getter.
  */
 anychart.charts.Bullet.prototype.data = function(opt_value, opt_csvSettings) {

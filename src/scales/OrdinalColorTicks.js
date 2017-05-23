@@ -54,8 +54,10 @@ anychart.scales.OrdinalColorTicks.prototype.makeValues = function(indexes) {
     } else {
       next--;
     }
-    var currValue = (values[curr].start + values[curr].end) / 2;
-    var nextValue = (values[next].start + values[next].end) / 2;
+
+    var currValue = goog.isDef(values[curr].equal) ? values[curr].equal : (values[curr].start + values[curr].end) / 2;
+    var nextValue = goog.isDef(values[next].equal) ? values[next].equal : (values[next].start + values[next].end) / 2;
+
     result.push(curr == next ? currValue : [currValue, nextValue]);
   }
   return result;

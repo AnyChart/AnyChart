@@ -82,7 +82,7 @@ anychart.standalones.ResourceList.prototype.data_;
 /**
  * Getter/setter for chart data.
  * @param {?(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {(!anychart.standalones.ResourceList|!anychart.data.View)} Returns itself if used as a setter or the mapping if used as a getter.
  */
 anychart.standalones.ResourceList.prototype.data = function(opt_value, opt_csvSettings) {

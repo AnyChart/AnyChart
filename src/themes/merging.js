@@ -839,7 +839,8 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'map.colorRange',
       'treeMap.colorRange',
-      'standalones.colorRange'
+      'standalones.colorRange',
+      'tagCloud.colorRange'
     ]
   },
   {
@@ -865,6 +866,7 @@ anychart.themes.merging.mergingMap_ = [
     targets: [
       'cartesianBase',
       'pieFunnelPyramidBase',
+      'tagCloud',
       'scatter',
       'radar',
       'polar',

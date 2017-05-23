@@ -901,6 +901,10 @@ anychart.resource = anychart.getFeatureOrError('anychart.resource', 'Resource ch
 anychart.quadrant = anychart.quadrant || anychart.createNFIMError('Quadrant chart');
 
 
+/** @inheritDoc */
+anychart.tagCloud = anychart.tagCloud || anychart.createNFIMError('TagCloud chart');
+
+
 //region ------ Standalones
 /** @ignoreDoc */
 anychart.standalones.background = anychart.getFeatureOrError('anychart.standalones.background', 'anychart.standalones.Background');
@@ -1261,6 +1265,7 @@ goog.exportSymbol('anychart.resource', anychart.resource);
 goog.exportSymbol('anychart.mekko', anychart.mekko);
 goog.exportSymbol('anychart.mosaic', anychart.mosaic);
 goog.exportSymbol('anychart.barmekko', anychart.barmekko);
+goog.exportSymbol('anychart.tagCloud', anychart.tagCloud);
 goog.exportSymbol('anychart.standalones.background', anychart.standalones.background);
 goog.exportSymbol('anychart.ui.background', anychart.ui.background);
 goog.exportSymbol('anychart.standalones.colorRange', anychart.standalones.colorRange);

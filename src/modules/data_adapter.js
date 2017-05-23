@@ -149,11 +149,7 @@ anychart.fromXmlFile.onConfigFileLoadingComplete_ = function(onSuccessOrContaine
  * @param {string=} opt_headersSelector
  * @param {string=} opt_captionSelector
  * @param {Function=} opt_valueProcessor
- * @return {?{
- *  caption: (string|undefined),
- *  header: (Array.<string>|undefined),
- *  rows: (Array|undefined)
- * }}
+ * @return {?anychart.data.DataSettings}
  */
 anychart.modules.data_adapter.parseHtmlTable = function(opt_tableSelector, opt_rowsSelector, opt_cellsSelector, opt_headersSelector, opt_captionSelector, opt_valueProcessor) {
   // find table

@@ -53,6 +53,12 @@ anychart.scales.OrdinalColor = function() {
    * @private
    */
   this.data_ = [];
+
+  /**
+   * @private
+   * @type {boolean}
+   */
+  this.manualAutoColor_ = false;
 };
 goog.inherits(anychart.scales.OrdinalColor, anychart.scales.Base);
 
@@ -123,6 +129,8 @@ anychart.scales.OrdinalColor.prototype.colors = function(opt_value) {
  */
 anychart.scales.OrdinalColor.prototype.setAutoColors = function(value) {
   this.autoColors_ = value;
+  this.manualAutoColor_ = !!value;
+  this.reset();
 };
 
 
@@ -202,7 +210,8 @@ anychart.scales.OrdinalColor.prototype.ranges = function(opt_value) {
   if (goog.isDef(opt_value)) {
     if (this.ranges_ != opt_value) {
       this.ranges_ = opt_value;
-      this.autoColors_ = (/** @type {Function} */(anychart.getFullTheme('defaultOrdinalColorScale.autoColors')))(this.ranges_.length);
+      if (!this.manualAutoColor_)
+        this.autoColors_ = (/** @type {Function} */(anychart.getFullTheme('defaultOrdinalColorScale.autoColors')))(this.ranges_.length);
       this.resetDataRange();
       this.ticks().markInvalid();
       this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
@@ -246,7 +255,7 @@ anychart.scales.OrdinalColor.prototype.getProcessedRanges = function() {
 
 /**
  * Returns range for passed value.
- * @param {number} value Value to search its range.
+ * @param {string|number} value Value to search its range.
  * @return {Object} Searched range or null.
  */
 anychart.scales.OrdinalColor.prototype.getRangeByValue = function(value) {
@@ -270,7 +279,7 @@ anychart.scales.OrdinalColor.prototype.getRangeByValue = function(value) {
 
 /**
  * Returns color relative to passed value.
- * @param {number} value .
+ * @param {string|number} value .
  * @return {(string|acgraph.vector.Fill|acgraph.vector.Stroke)}
  */
 anychart.scales.OrdinalColor.prototype.valueToColor = function(value) {
@@ -323,7 +332,7 @@ anychart.scales.OrdinalColor.prototype.colorToValue = function(value) {
 
 /**
  * Returns range index relative passed value.
- * @param {number} value Value to search index.
+ * @param {string|number} value Value to search index.
  * @return {number} Range index.
  */
 anychart.scales.OrdinalColor.prototype.getIndexByValue = function(value) {
@@ -400,7 +409,7 @@ anychart.scales.OrdinalColor.prototype.inverseTransform = function(ratio) {
   var index = goog.math.clamp(Math.ceil(ratio * this.internalRanges_.length) - 1, 0, this.internalRanges_.length - 1);
   var range = this.internalRanges_[index];
 
-  return (range.start + range.end) / 2;
+  return goog.isDef(range.equal) ? range.equal : (range.start + range.end) / 2;
 };
 
 
@@ -422,12 +431,21 @@ anychart.scales.OrdinalColor.prototype.checkScaleChanged = function(silently) {
 /**
  * @return {!anychart.scales.OrdinalColor} Resets auto values.
  */
-anychart.scales.OrdinalColor.prototype.resetDataRange = function() {
+anychart.scales.OrdinalColor.prototype.reset = function() {
   this.internalRanges_ = null;
   this.resultColors_ = null;
   this.autoNames_ = null;
   this.autoRanges_ = null;
   this.resultNames_ = null;
+  return this;
+};
+
+
+/**
+ * @return {!anychart.scales.OrdinalColor} Resets auto values.
+ */
+anychart.scales.OrdinalColor.prototype.resetDataRange = function() {
+  this.reset();
   this.data_.length = 0;
   return this;
 };
@@ -494,7 +512,8 @@ anychart.scales.OrdinalColor.prototype.calculate = function() {
       }
 
       this.autoRanges_ = this.autoRanges_.concat(eqRanges);
-      this.autoColors_ = (/** @type {Function} */(anychart.getFullTheme('defaultOrdinalColorScale.autoColors')))(this.autoRanges_.length);
+      if (!this.manualAutoColor_)
+        this.autoColors_ = (/** @type {Function} */(anychart.getFullTheme('defaultOrdinalColorScale.autoColors')))(this.autoRanges_.length);
     }
 
     var ranges = this.ranges_.length ? this.ranges_ : this.autoRanges_;
@@ -514,7 +533,7 @@ anychart.scales.OrdinalColor.prototype.calculate = function() {
       var less = anychart.utils.toNumber(range['less']);
       var greater = anychart.utils.toNumber(range['greater']);
 
-      var start, end, eq = undefined;
+      var start = NaN, end = NaN, eq = undefined;
       if (goog.isDef(equal)) {
         var equal_ = anychart.utils.toNumber(equal);
         if (!isNaN(equal_)) {

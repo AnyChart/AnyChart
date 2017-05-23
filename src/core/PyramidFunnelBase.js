@@ -25,7 +25,7 @@ goog.require('anychart.utils');
 /**
  * Pyramid/Funnel Base Chart Class.<br/>
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @extends {anychart.core.SeparateChart}
  * @implements {anychart.core.utils.IInteractiveSeries}
  * @constructor
@@ -374,7 +374,7 @@ anychart.core.PyramidFunnelBase.prototype.isSeries = function() {
 /**
  * Getter/setter for data.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_value Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {(!anychart.data.View|!anychart.core.PyramidFunnelBase)} Returns itself if used as a setter or the mapping if used as a getter.
  */
 anychart.core.PyramidFunnelBase.prototype.data = function(opt_value, opt_csvSettings) {

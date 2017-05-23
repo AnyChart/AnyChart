@@ -54,7 +54,8 @@ anychart.enums.ChartTypes = {
   QUADRANT: 'quadrant',
   MEKKO: 'mekko',
   MOSAIC: 'mosaic',
-  BARMEKKO: 'barmekko'
+  BARMEKKO: 'barmekko',
+  TAG_CLOUD: 'tagCloud'
 };
 
 
@@ -1461,6 +1462,34 @@ anychart.enums.normalizeStockLabelsOverlapMode = function(value, opt_default) {
       return anychart.enums.StockLabelsOverlapMode.ALLOW_OVERLAP;
   }
   return opt_default || anychart.enums.StockLabelsOverlapMode.NO_OVERLAP;
+};
+
+
+/**
+ * Tag cloud mode.
+ * @enum {string}
+ */
+anychart.enums.TagCloudMode = {
+  SPIRAL: 'spiral',
+  RECT: 'rect'
+};
+
+
+/**
+ * Tag cloud mode normalizer.
+ * @param {*} value .
+ * @param {anychart.enums.TagCloudMode=} opt_default .
+ * @return {anychart.enums.TagCloudMode}
+ */
+anychart.enums.normalizeTagCloudMode = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'spiral':
+      return anychart.enums.TagCloudMode.SPIRAL;
+    case 'rect':
+      return anychart.enums.TagCloudMode.RECT;
+  }
+  return opt_default || anychart.enums.TagCloudMode.SPIRAL;
 };
 
 
@@ -3441,6 +3470,40 @@ anychart.enums.normalizeErrorMode = function(value, opt_default) {
       return anychart.enums.ErrorMode.BOTH;
   }
   return opt_default || anychart.enums.ErrorMode.BOTH;
+};
+
+
+/**
+ * Text parsing mode.
+ * @enum {string}
+ */
+anychart.enums.TextParsingMode = {
+  CSV: 'csv',
+  BY_WORD: 'byWord',
+  BY_CHAR: 'byChar'
+};
+
+
+/**
+ * Normalizes text parsing mode
+ * @param {*} value Value to normalize.
+ * @param {anychart.enums.TextParsingMode=} opt_default Custom default value (defaults to CSV).
+ * @return {anychart.enums.TextParsingMode}
+ */
+anychart.enums.normalizeTextParsingMode = function(value, opt_default) {
+  if (goog.isObject(value))
+    value = value['mode'];
+
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'csv':
+      return anychart.enums.TextParsingMode.CSV;
+    case 'byword':
+      return anychart.enums.TextParsingMode.BY_WORD;
+    case 'bychar':
+      return anychart.enums.TextParsingMode.BY_CHAR;
+  }
+  return opt_default || anychart.enums.TextParsingMode.CSV;
 };
 
 
@@ -6889,6 +6952,10 @@ goog.exportSymbol('anychart.enums.FontStyle.OBLIQUE', anychart.enums.FontStyle.O
 goog.exportSymbol('anychart.enums.FontVariant.NORMAL', anychart.enums.FontVariant.NORMAL);
 goog.exportSymbol('anychart.enums.FontVariant.SMALL_CAP', anychart.enums.FontVariant.SMALL_CAP);
 
+goog.exportSymbol('anychart.enums.TextParsingMode.CSV', anychart.enums.TextParsingMode.CSV);
+goog.exportSymbol('anychart.enums.TextParsingMode.BY_WORD', anychart.enums.TextParsingMode.BY_WORD);
+goog.exportSymbol('anychart.enums.TextParsingMode.BY_CHAR', anychart.enums.TextParsingMode.BY_CHAR);
+
 goog.exportSymbol('anychart.enums.HAlign.LEFT', anychart.enums.HAlign.LEFT);
 goog.exportSymbol('anychart.enums.HAlign.START', anychart.enums.HAlign.START);
 goog.exportSymbol('anychart.enums.HAlign.CENTER', anychart.enums.HAlign.CENTER);
@@ -6902,6 +6969,9 @@ goog.exportSymbol('anychart.enums.VAlign.BOTTOM', anychart.enums.VAlign.BOTTOM);
 goog.exportSymbol('anychart.enums.TextWrap.NO_WRAP', anychart.enums.TextWrap.NO_WRAP);
 goog.exportSymbol('anychart.enums.TextWrap.BY_LETTER', anychart.enums.TextWrap.BY_LETTER);
 goog.exportSymbol('anychart.enums.TextWrap.BY_WORD', anychart.enums.TextWrap.BY_WORD);
+
+goog.exportSymbol('anychart.enums.TagCloudMode.SPIRAL', anychart.enums.TagCloudMode.SPIRAL);
+goog.exportSymbol('anychart.enums.TagCloudMode.RECT', anychart.enums.TagCloudMode.RECT);
 
 
 

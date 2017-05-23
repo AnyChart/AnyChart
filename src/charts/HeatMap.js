@@ -19,7 +19,7 @@ goog.require('anychart.themes.merging');
 /**
  * AnyChart Hea tMap class.
  * @param {(anychart.data.View|anychart.data.Set|Array|string)=} opt_data Data for the chart.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @implements {anychart.core.utils.IZoomableChart}
  * @extends {anychart.core.CartesianBase}
  * @constructor
@@ -677,8 +677,8 @@ anychart.charts.HeatMap.prototype.calculateXYScales = function() {
 
 /**
  * Getter/setter for mapping.
- * @param {?(anychart.data.View|anychart.data.Set|anychart.data.TableData|Array|string)=} opt_value Value to set.
- * @param {Object.<string, (string|boolean)>=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
+ * @param {?(anychart.data.View|anychart.data.Set|anychart.data.DataSettings|Array|string)=} opt_value Value to set.
+ * @param {(anychart.enums.TextParsingMode|anychart.data.TextParsingSettings)=} opt_csvSettings If CSV string is passed, you can pass CSV parser settings here as a hash map.
  * @return {(!anychart.charts.HeatMap|!anychart.data.View)} Returns itself if used as a setter or the mapping if used as a getter.
  */
 anychart.charts.HeatMap.prototype.data = function(opt_value, opt_csvSettings) {
