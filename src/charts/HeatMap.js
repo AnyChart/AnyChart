@@ -527,12 +527,6 @@ anychart.charts.HeatMap.prototype.getPoint = function(index) {
 
 
 /** @inheritDoc */
-anychart.charts.HeatMap.prototype.getValueFieldToSearchInData = function() {
-  return 'heat';
-};
-
-
-/** @inheritDoc */
 anychart.charts.HeatMap.prototype.useUnionTooltipAsSingle = function() {
   return true;
 };

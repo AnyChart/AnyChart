@@ -2984,7 +2984,7 @@
     "anychart.core.polar.series.Column": {
       "type": "object",
       "allOf": [
-        {"$ref": "#/definitions/anychart.core.series.Base"}
+        {"$ref": "#/definitions/anychart.core.polar.series.Base"}
       ],
       "properties": {
         "seriesType": {"enum": ["column", "rangeColumn"]}
@@ -3759,6 +3759,7 @@
       ],
       "properties": {
         "stroke": {"$ref": "#/definitions/stroke"},
+        "fill": {"$ref": "#/definitions/fill"},
         "overlapMode": {"$ref": "#/definitions/anychart.enums.LabelsOverlapMode"},
         "labels": {
           "oneOf": [

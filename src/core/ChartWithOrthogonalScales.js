@@ -1886,7 +1886,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.getSeriesStatus = function(eve
 
         var indexes = this.categorizeData ?
             series.findInRangeByX(minValue, maxValue) :
-            series.data().findInRangeByX(minValue, maxValue, series.xScale() instanceof anychart.scales.Ordinal);
+            series.data().findInRangeByX(minValue, maxValue);
 
         iterator = series.getResetIterator();
         var ind = [];
@@ -1935,15 +1935,15 @@ anychart.core.ChartWithOrthogonalScales.prototype.getSeriesStatus = function(eve
         value = series.xScale().inverseTransform(ratio);
         if (this.categorizeData) {
           var tmp = series.findX(value);
-          index = tmp >= 0 ? [tmp] : [];
+          indexes = tmp >= 0 ? [tmp] : [];
         } else {
-          index = series.data().findInUnsortedDataByX(anychart.utils.toNumber(value), 'x', this.getValueFieldToSearchInData());
+          indexes = series.data().findClosestByX(value, series.xScale() instanceof anychart.scales.Ordinal);
         }
         iterator = series.getIterator();
         minLength = Infinity;
-        if (index.length) {
-          for (j = 0; j < index.length; j++) {
-            if (iterator.select(index[j])) {
+        if (indexes.length) {
+          for (j = 0; j < indexes.length; j++) {
+            if (iterator.select(indexes[j])) {
               pixX = /** @type {number} */(iterator.meta('x'));
               names = series.getYValueNames();
               for (k = 0; k < names.length; k++) {
@@ -1951,7 +1951,7 @@ anychart.core.ChartWithOrthogonalScales.prototype.getSeriesStatus = function(eve
                 length = anychart.math.vectorLength(pixX, pixY, x, y);
                 if (length < minLength) {
                   minLength = length;
-                  minLengthIndex = index[j];
+                  minLengthIndex = indexes[j];
                 }
               }
             }
@@ -1959,8 +1959,8 @@ anychart.core.ChartWithOrthogonalScales.prototype.getSeriesStatus = function(eve
 
           points.push({
             series: series,
-            points: index,
-            lastPoint: index[index.length - 1],
+            points: indexes,
+            lastPoint: indexes[indexes.length - 1],
             nearestPointToCursor: {index: minLengthIndex, distance: minLength}
           });
         }
@@ -1969,15 +1969,6 @@ anychart.core.ChartWithOrthogonalScales.prototype.getSeriesStatus = function(eve
   }
 
   return /** @type {Array.<Object>} */(points);
-};
-
-
-/**
- * This method should be refactored.
- * @return {string}
- */
-anychart.core.ChartWithOrthogonalScales.prototype.getValueFieldToSearchInData = function() {
-  return 'value';
 };
 
 

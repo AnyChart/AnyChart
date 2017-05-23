@@ -402,56 +402,45 @@ anychart.data.View.prototype.find = function(fieldName, fieldValue) {
 
 /**
  * Search on unsorted data by passed x field name [default 'x']. Returns array of indexes of found points.
- * @param {number} fieldValue Value to find.
- * @param {string=} opt_fieldName Field name.
- * @param {string=} opt_valueFieldName Value field name.
+ * @param {*} fieldValue Value to find.
+ * @param {boolean} isOrdinal
  * @return {Array.<number>} Point indexes.
  */
-anychart.data.View.prototype.findInUnsortedDataByX = function(fieldValue, opt_fieldName, opt_valueFieldName) {
+anychart.data.View.prototype.findClosestByX = function(fieldValue, isOrdinal) {
   this.ensureConsistent();
-
-  if (!this.cachedScatterValues) this.cachedScatterValues = {};
-  if (this.cachedScatterValues[fieldValue])
-    return /** @type {Array.<number>}*/(this.cachedScatterValues[fieldValue]);
-
   var indexes = [];
 
   if (goog.isDef(fieldValue)) {
     var iterator = this.getIterator();
     var index = -1;
     var length = Infinity;
-    var x, value, minValue, length_;
-
-    var lastNotNaNValueIndex = -1;
-    var lastNotNaNValueX = -Infinity;
-
-    var fieldName = opt_fieldName || 'x';
-    var valueFieldName = opt_valueFieldName || 'value';
+    var x, minValue, length_;
+    if (!isOrdinal)
+      fieldValue = anychart.utils.toNumber(fieldValue);
 
     iterator.reset();
     while (iterator.advance()) {
       index = iterator.getIndex();
-
-      x = /** @type {number}*/(iterator.get(fieldName));
-      value = iterator.get(valueFieldName);
-
-      if (!goog.isDef(this.cachedScatterValues.lastNotNaNValueIndex) && !isNaN(value) && x > lastNotNaNValueX)
-        lastNotNaNValueIndex = index;
-
-      length_ = Math.abs(x - fieldValue);
-      if (length_ < length && !isNaN(value)) {
-        length = length_;
-        minValue = x;
-        indexes.length = 0;
-      }
-      if (x == minValue) {
-        indexes.push(index);
+      x = iterator.get('x');
+      if (isOrdinal) {
+        if (x == fieldValue) {
+          indexes.push(index);
+        }
+      } else {
+        x = anychart.utils.toNumber(x);
+        if (!isNaN(x)) {
+          length_ = Math.abs(x - fieldValue);
+          if (length_ < length) {
+            length = length_;
+            minValue = x;
+            indexes.length = 0;
+          }
+          if (x == minValue) {
+            indexes.push(index);
+          }
+        }
       }
     }
-    if (!goog.isDef(this.cachedScatterValues.lastNotNaNValueIndex))
-      this.cachedScatterValues.lastNotNaNValueIndex = lastNotNaNValueIndex;
-
-    this.cachedScatterValues[minValue] = indexes;
   }
 
   return /** @type {Array.<number>}*/(indexes);
@@ -595,7 +584,6 @@ anychart.data.View.prototype.buildMask = function() {
  */
 anychart.data.View.prototype.parentViewChangedHandler = function(event) {
   this.cachedValues = null;
-  this.cachedScatterValues = null;
   this.cachedRanges = null;
   if (event.hasSignal(anychart.Signal.DATA_CHANGED))
     this.invalidate(anychart.ConsistencyState.DATA_MASK, anychart.Signal.DATA_CHANGED);

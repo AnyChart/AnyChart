@@ -233,6 +233,50 @@ anychart.core.series.Radar.prototype.getXPointPosition = function() {
 
 
 /**
+ * Returns if the chart is sorted mode.
+ * @return {boolean}
+ */
+anychart.core.series.Radar.prototype.sortedMode = function() {
+  return true;
+};
+
+
+/** @inheritDoc */
+anychart.core.series.Radar.prototype.makeBrowserEvent = function(e) {
+  //this method is invoked only for events from data layer
+  var res = anychart.core.VisualBase.prototype.makeBrowserEvent.call(this, e);
+  if (this.isDiscreteBased()) {
+    res['pointIndex'] = anychart.utils.toNumber(anychart.utils.extractTag(res['domTarget']).index);
+  } else if (this.sortedMode()) {
+    var clientX = e['clientX'];
+    var clientY = e['clientY'];
+
+    var containerOffset = this.container().getStage().getClientPosition();
+
+    var x = clientX - containerOffset.x;
+    var y = clientY - containerOffset.y;
+
+    var cx = Math.round(this.pixelBoundsCache.left + this.pixelBoundsCache.width / 2);
+    var cy = Math.round(this.pixelBoundsCache.top + this.pixelBoundsCache.height / 2);
+
+    var dx = x - cx;
+    var dy = y - cy;
+    var angle = Math.PI / 2 + Math.atan2(dy, -dx) + goog.math.toRadians(/** @type {number} */(this.getOption('startAngle')));
+    angle = goog.math.modulo(angle, Math.PI * 2);
+
+    var ratio = 1 - (angle / (Math.PI * 2));
+    var value = this.xScale().inverseTransform(ratio);
+    var index = this.findX(value);
+    if (index < 0) index = NaN;
+
+    res['pointIndex'] = /** @type {number} */(index);
+  }
+
+  return res;
+};
+
+
+/**
  * Transforms values to pix coords.
  * @param {*} xVal
  * @param {*} yVal

@@ -47,8 +47,14 @@ anychart.core.settings.populate(anychart.core.series.Polar, anychart.core.series
 
 
 /** @inheritDoc */
-anychart.core.series.Polar.prototype.getCategoryWidth = function() {
-  return (this.xScale().getPointWidthRatio() || (this.xScale().getZoomFactor() / this.getIterator().getRowsCount())) *
+anychart.core.series.Polar.prototype.getCategoryWidth = function(opt_categoryIndex) {
+  var ratio;
+  if (goog.isDef(opt_categoryIndex) && this.xScale() instanceof anychart.scales.Ordinal) {
+    ratio = this.xScale().weightRatios()[opt_categoryIndex];
+  } else {
+    ratio = this.xScale().getPointWidthRatio();
+  }
+  return (ratio || (this.xScale().getZoomFactor() / this.getIterator().getRowsCount())) *
       360;
 };
 
@@ -109,6 +115,15 @@ anychart.core.series.Polar.prototype.makeXRatioMeta = function(rowInfo, yNames, 
 anychart.core.series.Polar.prototype.prepareMetaMakers = function(yNames, yColumns) {
   anychart.core.series.Polar.base(this, 'prepareMetaMakers', yNames, yColumns);
   this.metaMakers.push(this.makeXRatioMeta);
+};
+
+
+/**
+ * Returns if the chart is sorted mode.
+ * @return {boolean}
+ */
+anychart.core.series.Polar.prototype.sortedMode = function() {
+  return /** @type {boolean} */(this.chart.sortPointsByX());
 };
 
 

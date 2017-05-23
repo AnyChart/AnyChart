@@ -230,7 +230,7 @@ anychart.charts.Sparkline.prototype.getSeriesStatus = function(event) {
 
   var ratio = (x - minX) / rangeX;
   value = this.xScale().inverseTransform(ratio);
-  var indexes = this.data().findInUnsortedDataByX(anychart.utils.toNumber(value));
+  var indexes = this.data().findClosestByX(value, this.xScale() instanceof anychart.scales.Ordinal);
   index = indexes.length ? indexes[0] : NaN;
 
   var iterator = this.getIterator();

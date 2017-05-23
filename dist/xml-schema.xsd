@@ -821,12 +821,14 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="ticks" type="core.axes.RadialTicks"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="minor_ticks" type="core.axes.RadialTicks"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="stroke" type="Stroke"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="fill" type="Fill"/>
         </xsd:all>
         <xsd:attribute name="labels" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="minor_labels" type="simple.BoolOrNull"/>
         <xsd:attribute name="ticks" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="minor_ticks" type="simple.BoolOrNull" default="true"/>
         <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="fill" type="xsd:string"/>
         <xsd:attribute name="overlap_mode" type="enums.LabelsOverlapMode" default="noOverlap"/>
         <xsd:attribute name="scale" type="simple.ScaleRef"/>
         <xsd:attributeGroup ref="attrs.VisualBase"/>
