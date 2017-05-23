@@ -732,7 +732,8 @@ anychart.core.ui.BaseGrid.prototype.handleDblMouseClick_ = function(event) {
   var evt = this.getInteractivityEvent(event);
   this.addMouseDblClick(evt);
   if (this.interactive) {
-    this.interactivityHandler.rowDblClick(evt);
+    if (evt && this.interactivityHandler.dispatchEvent(evt))
+      this.interactivityHandler.rowDblClick(evt);
   } else {
     this.interactive = true;
   }
