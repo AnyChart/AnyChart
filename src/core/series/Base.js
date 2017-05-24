@@ -2021,13 +2021,24 @@ anychart.core.series.Base.prototype.getDirectionAngle = function(positive) {
  */
 anychart.core.series.Base.prototype.checkDirectionIsPositive = function(position) {
   var result;
+  var inverted = /** @type {boolean} */(this.yScale().inverted());
   if (position == 'low' || position == 'lowest')
-    result = false;
+    result = inverted;
   else if (position == 'high' || position == 'highest')
-    result = true;
+    result = !inverted;
   else
-    result = (Number(this.getIterator().get(position)) || 0) >= 0;
+    result = !!(inverted ^ ((Number(this.getIterator().get(position)) || 0) >= 0));
   return result;
+};
+
+
+/**
+ * Resolves auto anchor for fixed geometrical position.
+ * @param {anychart.enums.Position} position
+ * @return {anychart.enums.Anchor}
+ */
+anychart.core.series.Base.prototype.resolveAutoAnchorForPosition = function(position) {
+  return anychart.utils.flipAnchor(position);
 };
 
 
@@ -2041,7 +2052,7 @@ anychart.core.series.Base.prototype.resolveAutoAnchor = function(position, rotat
   var normalizedPosition = anychart.enums.normalizePosition(position, null);
   var result;
   if (normalizedPosition) {
-    result = anychart.utils.flipAnchor(normalizedPosition);
+    result = this.resolveAutoAnchorForPosition(normalizedPosition);
   } else {
     var positive = this.checkDirectionIsPositive(/** @type {string} */(position));
     var angle = this.getDirectionAngle(positive);

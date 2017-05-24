@@ -60,6 +60,26 @@ anychart.core.series.Polar.prototype.getCategoryWidth = function(opt_categoryInd
 
 
 /** @inheritDoc */
+anychart.core.series.Polar.prototype.resolveAutoAnchorForPosition = function(position) {
+  if (position == anychart.enums.Position.CENTER)
+    return anychart.enums.Anchor.CENTER;
+  var startAngle = /** @type {number} */(this.getOption('startAngle'));
+  var x = /** @type {number} */(this.getIterator().meta('xRatio'));
+  var angle = startAngle - 90 + 360 * x;
+  if (this.isWidthBased()) {
+    if (anychart.utils.isLeftAnchor(/** @type {anychart.enums.Anchor} */(position))) {
+      angle -= this.pointWidthCache / 2;
+    } else if (anychart.utils.isRightAnchor(/** @type {anychart.enums.Anchor} */(position))) {
+      angle += this.pointWidthCache / 2;
+    }
+  }
+  var anchor = anychart.utils.getAnchorForAngle(angle);
+  anchor = anychart.utils.rotateAnchorByPosition(anchor, position);
+  return anchor;
+};
+
+
+/** @inheritDoc */
 anychart.core.series.Polar.prototype.createPositionProviderByGeometry = function(anchor) {
   var iterator = this.getIterator();
   var topY, topX, bottomY, bottomX;
@@ -73,13 +93,11 @@ anychart.core.series.Polar.prototype.createPositionProviderByGeometry = function
     bottomY = /** @type {number} */(iterator.meta(this.config.anchoredPositionBottom));
     bottomX = /** @type {number} */(iterator.meta(this.config.anchoredPositionBottom + 'X'));
   } else {
-    var diff = this.pointWidthCache / (Math.PI * 4);
+    var diff = this.pointWidthCache / 720;
     var x = /** @type {number} */(iterator.meta('xRatio'));
     var top = /** @type {number} */(iterator.meta(this.config.anchoredPositionTop + 'Ratio'));
     var bottom = /** @type {number} */(iterator.meta(this.config.anchoredPositionBottom + 'Ratio'));
-    if (anchor == anychart.enums.Anchor.LEFT_TOP ||
-        anchor == anychart.enums.Anchor.LEFT_CENTER ||
-        anchor == anychart.enums.Anchor.LEFT_BOTTOM) {
+    if (anychart.utils.isLeftAnchor(anchor)) {
       x -= diff;
     } else { // RIGHT_*
       x += diff;

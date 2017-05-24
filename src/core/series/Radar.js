@@ -55,21 +55,9 @@ anychart.core.series.Radar.prototype.getDirectionAngle = function(positive) {
   var angle = startAngle - 90 + 360 * x;
   if (!positive)
     angle += 180;
-  return angle;
-};
-
-
-/** @inheritDoc */
-anychart.core.series.Radar.prototype.checkDirectionIsPositive = function(position) {
-  var result;
-  var inverted = /** @type {boolean} */(this.yScale().inverted());
-  if (position == 'low' || position == 'lowest')
-    result = inverted;
-  else if (position == 'high' || position == 'highest')
-    result = !inverted;
-  else
-    result = true;
-  return result;
+  if (this.yScale().inverted())
+    angle += 180;
+  return goog.math.standardAngle(angle);
 };
 
 

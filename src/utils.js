@@ -411,37 +411,6 @@ anychart.utils.getCoordinateByAnchor = function(bounds, anchor, opt_autoDefault)
 
 
 /**
- * Returns anchor for angle.
- * @param {number} angle .
- * @return {anychart.enums.Anchor} .
- */
-anychart.utils.getAnchorForAngle = function(angle) {
-  var result;
-  angle = goog.math.standardAngle(angle);
-
-  if (!angle) {
-    result = anychart.enums.Anchor.LEFT_CENTER;
-  } else if (angle > 0 && angle < 90) {
-    result = anychart.enums.Anchor.LEFT_TOP;
-  } else if (angle == 90) {
-    result = anychart.enums.Anchor.CENTER_TOP;
-  } else if (angle > 90 && angle < 180) {
-    result = anychart.enums.Anchor.RIGHT_TOP;
-  } else if (angle == 180) {
-    result = anychart.enums.Anchor.RIGHT_CENTER;
-  } else if (angle > 180 && angle < 270) {
-    result = anychart.enums.Anchor.RIGHT_BOTTOM;
-  } else if (angle == 270) {
-    result = anychart.enums.Anchor.CENTER_BOTTOM;
-  } else {
-    result = anychart.enums.Anchor.LEFT_BOTTOM;
-  }
-
-  return result;
-};
-
-
-/**
  * Anchors set for anchors rotation.
  * @type {Array.<anychart.enums.Anchor>}
  */
@@ -455,6 +424,41 @@ anychart.utils.ANCHORS_SET = ([
   anychart.enums.Anchor.LEFT_CENTER,
   anychart.enums.Anchor.LEFT_TOP
 ]);
+
+
+/**
+ * Returns anchor for angle.
+ * @param {number} angle .
+ * @return {anychart.enums.Anchor} .
+ */
+anychart.utils.getAnchorForAngle = function(angle) {
+  angle = goog.math.standardAngle(angle);
+  var turn = angle / 90;
+  if (turn != ~~turn) {
+    turn = Math.round(turn - 0.5) + 0.5;
+  }
+  turn = (turn + turn + 6) % 8;
+  return anychart.utils.ANCHORS_SET[turn];
+};
+
+
+/**
+ * Rotates anchor by position. CENTER_TOP position is 0 angle, clockwise.
+ * @param {anychart.enums.Anchor} anchor
+ * @param {anychart.enums.Position} position
+ * @return {anychart.enums.Anchor} .
+ */
+anychart.utils.rotateAnchorByPosition = function(anchor, position) {
+  var anchorIndex = goog.array.indexOf(anychart.utils.ANCHORS_SET, anchor);
+  if (anchorIndex >= 0) {
+    var positionIndex = goog.array.indexOf(anychart.utils.ANCHORS_SET, position);
+    if (positionIndex >= 0) {
+      anchorIndex = (anchorIndex + positionIndex) % 8;
+      anchor = anychart.utils.ANCHORS_SET[anchorIndex];
+    }
+  }
+  return anchor;
+};
 
 
 /**
