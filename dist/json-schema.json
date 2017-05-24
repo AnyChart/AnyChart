@@ -5202,7 +5202,8 @@
         "mouseOverOpacity": {"type": "number"},
         "mouseOutOpacity": {"type": "number"},
         "buttonsVisible": {"type": "boolean"},
-        "barSize": {"type": "number"}
+        "barSize": {"type": "number"},
+        "cornersRadius": {"type": "number"}
       }
     },
 

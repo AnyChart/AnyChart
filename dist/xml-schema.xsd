@@ -1412,6 +1412,7 @@
         <xsd:attribute name="mouse_out_opacity" type="simple.Ratio" />
         <xsd:attribute name="buttons_visible" type="simple.Bool" />
         <xsd:attribute name="bar_size" type="xsd:double" />
+        <xsd:attribute name="corners_radius" type="xsd:double" />
     </xsd:complexType>
 
     <xsd:complexType name="core.DataGrid">

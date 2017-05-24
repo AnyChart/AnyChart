@@ -3918,7 +3918,8 @@ goog.provide('anychart.themes.defaultTheme');
       'handlePositionChange': true,
       'startRatio': '0',
       'endRatio': '1',
-      'buttonsVisible': false
+      'buttonsVisible': false,
+      'cornersRadius': 5
     },
 
     'defaultDataGrid': {

@@ -185,6 +185,14 @@ anychart.core.ui.ScrollBar = function() {
    */
   this.handlePositionChange_ = true;
 
+
+  /**
+   * Corners radius.
+   * @type {number}
+   * @private
+   */
+  this.cornersRadius_ = 5;
+
 };
 goog.inherits(anychart.core.ui.ScrollBar, anychart.core.VisualBaseWithBounds);
 
@@ -218,13 +226,6 @@ anychart.core.ui.ScrollBar.SCROLL_PIXEL_STEP = 40;
  * @type {number}
  */
 anychart.core.ui.ScrollBar.SCROLL_RATIO_STEP = .05;
-
-
-/**
- * Maximal value that can be set to rect.round() as visual improvement.
- * @type {number}
- */
-anychart.core.ui.ScrollBar.MAX_ROUND = 5;
 
 
 /**
@@ -377,6 +378,24 @@ anychart.core.ui.ScrollBar.prototype.barSize = function(opt_value) {
     return this;
   }
   return this.barSize_;
+};
+
+
+/**
+ * Getter/setter for corners radius. Note: radius can't exceed the half of the smallest scroll bar side.
+ * @param {number=} opt_value - Value to set.
+ * @return {number|anychart.core.ui.ScrollBar} - Current value or itself for chaining.
+ */
+anychart.core.ui.ScrollBar.prototype.cornersRadius = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    opt_value = anychart.utils.toNumber(opt_value);
+    if (this.cornersRadius_ != opt_value) {
+      this.cornersRadius_ = opt_value;
+      this.invalidate(anychart.ConsistencyState.APPEARANCE, anychart.Signal.NEEDS_REDRAW);
+    }
+    return this;
+  }
+  return this.cornersRadius_;
 };
 
 
@@ -1293,10 +1312,7 @@ anychart.core.ui.ScrollBar.prototype.drawInternal_ = function() {
   var isVertical = this.isVertical_();
   var b = this.pixelBoundsCache_;
 
-  var width = Math.min(b.width, b.height);
-  var round = Math.min(anychart.core.ui.ScrollBar.MAX_ROUND, width / 2);
-
-  this.bg_.setBounds(b).round(round);
+  this.bg_.setBounds(b);
   var sliderLeft, sliderTop;
   var drag, dragLeft, dragTop, dragWidth, dragHeight;
 
@@ -1340,7 +1356,6 @@ anychart.core.ui.ScrollBar.prototype.drawInternal_ = function() {
       .setY(this.halfPixel(sliderTop))
       .setWidth(Math.round(sliderWidth))
       .setHeight(Math.round(sliderHeight))
-      .round(round)
       .drag(drag);
 
   this.slider_.setTransformationMatrix(1, 0, 0, 1, 0, 0);
@@ -1383,13 +1398,18 @@ anychart.core.ui.ScrollBar.prototype.draw = function() {
     }
 
     if (this.hasInvalidationState(anychart.ConsistencyState.APPEARANCE)) {
+      var width = Math.min(this.pixelBoundsCache_.width, this.pixelBoundsCache_.height);
+      var round = Math.min(this.cornersRadius_, width / 2);
+
       this.bg_
           .fill(this.bgFill_)
-          .stroke(this.bgStroke_);
+          .stroke(this.bgStroke_)
+          .round(round);
 
       this.slider_
           .fill(this.sliderFill_)
-          .stroke(this.sliderStroke_);
+          .stroke(this.sliderStroke_)
+          .round(round);
 
       this.markConsistent(anychart.ConsistencyState.APPEARANCE);
     }
@@ -1512,6 +1532,7 @@ anychart.core.ui.ScrollBar.prototype.serialize = function() {
 
   json['buttonsVisible'] = this.buttonsVisible();
   json['barSize'] = this.barSize();
+  json['cornersRadius'] = this.cornersRadius();
 
   return json;
 };
@@ -1530,6 +1551,7 @@ anychart.core.ui.ScrollBar.prototype.setupByJSON = function(config, opt_default)
 
   this.buttonsVisible(config['buttonsVisible']);
   this.barSize(config['barSize']);
+  this.cornersRadius(config['cornersRadius']);
 };
 //endregion
 
@@ -1592,6 +1614,7 @@ anychart.core.ui.ScrollBar.ScrollEvent.prototype['source'] = '';
   proto['sliderFill'] = proto.sliderFill;
   proto['mouseOutOpacity'] = proto.mouseOutOpacity;
   proto['mouseOverOpacity'] = proto.mouseOverOpacity;
+  proto['cornersRadius'] = proto.cornersRadius;
   //proto['contentBounds'] = proto.contentBounds;
   //proto['visibleBounds'] = proto.visibleBounds;
   //proto['startRatio'] = proto.startRatio;
