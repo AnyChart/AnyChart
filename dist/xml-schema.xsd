@@ -1392,7 +1392,6 @@
         <xsd:attribute name="width" type="simple.NumberOrPercentOrNull" default="null"/>
         <xsd:attribute name="height" type="simple.NumberOrPercentOrNull" default="null"/>
         <xsd:attribute name="z_index" type="simple.NumberOrNull" default="null"/>
-        <xsd:attribute name="title_format" type="xsd:string"/>
         <xsd:attributeGroup ref="attrs.TextSettings"/>
     </xsd:complexType>
 
