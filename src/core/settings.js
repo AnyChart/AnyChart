@@ -1,4 +1,5 @@
 goog.provide('anychart.core.settings');
+goog.provide('anychart.core.settings.IObjectWithSettings');
 
 goog.require('acgraph.vector');
 goog.require('anychart.core.reporting');

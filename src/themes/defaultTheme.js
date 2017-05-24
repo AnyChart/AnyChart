@@ -223,6 +223,15 @@ goog.provide('anychart.themes.defaultTheme');
    * @this {*}
    * @return {*}
    */
+  var returnLightenSourceColor50 = function() {
+    return global['anychart']['color']['setOpacity'](global['anychart']['color']['lighten'](this['sourceColor']), 0.5, true);
+  };
+
+
+  /**
+   * @this {*}
+   * @return {*}
+   */
   var returnStrokeSourceColor = function() {
     return global['anychart']['color']['setThickness'](this['sourceColor'], 1.5);
   };
@@ -769,8 +778,8 @@ goog.provide('anychart.themes.defaultTheme');
         'fontColor': fontColorReversedNormal,
         'hAlign': 'left',
         'text': 'Tooltip Text',
-        'width': null,
-        'height': null,
+        'width': '100%',
+        'height': '100%',
         'anchor': 'leftTop',
         'offsetX': 0,
         'offsetY': 0,
@@ -5415,6 +5424,105 @@ goog.provide('anychart.themes.defaultTheme');
             }
           }
         }
+      }
+    },
+
+    'venn': {
+      'dataSeparator': '&',
+      'background': {
+        'zIndex': 0
+      },
+      'padding': {
+        'top': 15,
+        'right': 5,
+        'bottom': 15,
+        'left': 5
+      },
+      'a11y': {
+        'enabled': true,
+        'titleFormat': chartA11yTitleFormatter,
+        'mode': 'chartElements'
+      },
+      'color': '#64b5f6',
+      'fill': returnSourceColor50,
+      'hoverFill': returnLightenSourceColor50,
+      'selectFill': defaultSelectColor,
+      'tooltip': {
+        'titleFormat': '{%Name}',
+        'format': 'Value: {%Value}'
+      },
+      'stroke': 'none',
+      'hoverStroke': 'none',
+      'hatchFill': false,
+      'hoverHatchFill': false,
+      'selectHatchFill': false,
+      'selectStroke': 'none',
+      'labels': {
+        'fontColor': '#f4f4f4',
+        'format': '{%Name}',
+        'anchor': 'center',
+        'enabled': true,
+        'disablePointerEvents': true,
+        'zIndex': 100,
+        'fontWeight': 'bold'
+      },
+      'hoverLabels': {
+        'enabled': null
+      },
+      'selectLabels': {
+        'enabled': null
+      },
+      'markers': {
+        'enabled': false,
+        'zIndex': 99,
+        'disablePointerEvents': true,
+        'stroke': 'none'
+      },
+      'hoverMarkers': {
+        'enabled': null
+      },
+      'selectMarkers': {
+        'enabled': null
+      },
+      'intersections': {
+        'fill': '#fff 0.00001',
+        'hoverFill': '#fff 0.5',
+        'selectFill': defaultSelectColor,
+        'stroke': 'none',
+        'hoverStroke': 'none',
+        'selectStroke': 'none',
+        'labels': {
+          'fontWeight': 'normal',
+          'format': '{%Value}',
+          'enabled': null
+        },
+        'hoverLabels': {
+          'enabled': null
+        },
+        'selectLabels': {
+          'enabled': null
+        },
+        'markers': {
+          'enabled': null
+        },
+        'hoverMarkers': {
+          'enabled': null
+        },
+        'selectMarkers': {
+          'enabled': null
+        },
+        'tooltip': {
+          'titleFormat': '{%Name}'
+        }
+      },
+      'legend': {
+        'enabled': true,
+        'zIndex': 0,
+        'tooltip': {
+          'enabled': false
+        },
+        'padding': {'top': 10, 'right': 10, 'bottom': 0, 'left': 10},
+        'position': 'bottom'
       }
     },
 

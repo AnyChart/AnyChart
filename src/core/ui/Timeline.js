@@ -1645,7 +1645,6 @@ anychart.core.ui.Timeline.prototype.getSeparationPath_ = function() {
     this.separationPath_ = /** @type {acgraph.vector.Path} */ (this.getClipLayer().path());
     this.separationPath_.zIndex(6);
     this.separationPath_.stroke(this.columnStroke_);
-    this.separationPath_.attr('hui', 12345);
     this.registerDisposable(this.separationPath_);
   }
   return this.separationPath_;

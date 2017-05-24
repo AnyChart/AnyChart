@@ -647,7 +647,8 @@ anychart.themes.merging.mergingMap_ = [
       'defaultTimeline.header.midLevel.labels',
       'defaultTimeline.header.lowLevel.labels',
       'resource.activities.labels',
-      'resource.conflicts.labels'
+      'resource.conflicts.labels',
+      'venn.labels'
     ]
   },
   {
@@ -679,7 +680,8 @@ anychart.themes.merging.mergingMap_ = [
       'standalones.markersFactory',
       'heatMap.markers',
       'map.defaultSeriesSettings.base.markers',
-      'treeMap.markers'
+      'treeMap.markers',
+      'venn.markers'
     ]
   },
   {
@@ -882,7 +884,8 @@ anychart.themes.merging.mergingMap_ = [
       'linearGauge',
       'pert',
       'resource',
-      'mekko'
+      'mekko',
+      'venn'
     ]
   },
   {

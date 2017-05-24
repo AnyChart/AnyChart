@@ -22,3 +22,4 @@ goog.require('anychart.modules.scatter');
 goog.require('anychart.modules.sparkline');
 goog.require('anychart.modules.tagCloud');
 goog.require('anychart.modules.treeMap');
+goog.require('anychart.modules.venn');

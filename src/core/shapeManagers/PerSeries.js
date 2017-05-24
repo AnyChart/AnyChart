@@ -5,11 +5,11 @@ goog.require('anychart.core.shapeManagers.Base');
 
 /**
  * Series paths manager.
- * @param {anychart.core.series.Base} series
+ * @param {anychart.core.IShapeManagerUser} series
  * @param {!Array.<anychart.core.shapeManagers.ShapeConfig>} config
  * @param {boolean} interactive
  * @param {?string=} opt_shapesFieldName
- * @param {?function(anychart.core.series.Base, Object.<string, acgraph.vector.Shape>, number)=} opt_postProcessor
+ * @param {?function(anychart.core.IShapeManagerUser, Object.<string, acgraph.vector.Shape>, number)=} opt_postProcessor
  * @constructor
  * @extends {anychart.core.shapeManagers.Base}
  */

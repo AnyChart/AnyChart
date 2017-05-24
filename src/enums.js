@@ -55,7 +55,8 @@ anychart.enums.ChartTypes = {
   MEKKO: 'mekko',
   MOSAIC: 'mosaic',
   BARMEKKO: 'barmekko',
-  TAG_CLOUD: 'tagCloud'
+  TAG_CLOUD: 'tagCloud',
+  VENN: 'venn'
 };
 
 

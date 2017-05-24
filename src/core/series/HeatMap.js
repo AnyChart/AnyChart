@@ -33,7 +33,7 @@ anychart.core.series.HeatMap = function(chart, plot, type, config, sortedMode) {
    * @private
    */
   this.strokeResolver_ = /** @type {function(anychart.core.series.Base, number, boolean=, boolean=):acgraph.vector.Stroke} */(
-      anychart.core.series.Base.getColorResolver(
+      anychart.color.getColorResolver(
       ['stroke', 'hoverStroke', 'selectStroke'], anychart.enums.ColorType.STROKE));
 };
 goog.inherits(anychart.core.series.HeatMap, anychart.core.series.Cartesian);

@@ -127,6 +127,9 @@
             <!-- chart.Quadrant elements -->
             <xsd:element minOccurs="0" maxOccurs="1" name="crossing" type="utils.Crossing"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="quarters" type="core.quadrant.Quarters_list"/>
+            <!-- chart.Venn elements -->
+            <xsd:element minOccurs="0" maxOccurs="1" name="data_separator" type="xsd:string"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="intersections" type="core.Intersections"/>
         </xsd:all>
         <!-- core.Chart attrs -->
         <xsd:attributeGroup ref="attrs.VisualBase"/>
@@ -252,6 +255,8 @@
         <!-- Pert attributes -->
         <xsd:attribute name="vertical_spacing" type="simple.NumberOrPercent"/>
         <xsd:attribute name="horizontal_spacing" type="simple.NumberOrPercent"/>
+        <!-- Venn attributes -->
+        <xsd:attribute name="data_separator" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:complexType name="Gauge">
@@ -1358,7 +1363,8 @@
             <xsd:element minOccurs="0" maxOccurs="1" name="value_prefix" type="simple.Text"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="value_postfix" type="simple.Text"/>
             <xsd:element minOccurs="0" maxOccurs="1" name="content" type="core.Label"/>
-            <xsd:element minOccurs="0" maxOccurs="1" name="text_formatter" type="simple.Text"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="format" type="simple.Text"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="title_format" type="simple.Text"/>
         </xsd:all>
         <xsd:attribute name="display_mode" type="enums.TooltipDisplayMode" default="single"/>
         <xsd:attribute name="position" type="enums.AnchorAndPosition" default="leftTop"/>
@@ -1386,7 +1392,7 @@
         <xsd:attribute name="width" type="simple.NumberOrPercentOrNull" default="null"/>
         <xsd:attribute name="height" type="simple.NumberOrPercentOrNull" default="null"/>
         <xsd:attribute name="z_index" type="simple.NumberOrNull" default="null"/>
-        <xsd:attribute name="text_formatter" type="xsd:string"/>
+        <xsd:attribute name="title_format" type="xsd:string"/>
         <xsd:attributeGroup ref="attrs.TextSettings"/>
     </xsd:complexType>
 
@@ -2562,6 +2568,54 @@
         <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
     </xsd:complexType>
 
+
+    <xsd:complexType name="core.Intersections">
+        <xsd:all>
+            <xsd:element name="fill" type="Fill" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="hover_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="select_fill" type="Fill" minOccurs="0" maxOccurs="1"/>
+
+            <xsd:element name="stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="hover_stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="select_stroke" type="Stroke" minOccurs="0" maxOccurs="1"/>
+
+            <xsd:element minOccurs="0" maxOccurs="1" name="hatch_fill" type="HatchFill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="hover_hatch_fill" type="HatchFill"/>
+            <xsd:element minOccurs="0" maxOccurs="1" name="select_hatch_fill" type="HatchFill"/>
+
+            <xsd:element name="labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="hover_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="select_labels" type="core.LabelsFactory" minOccurs="0" maxOccurs="1"/>
+
+            <xsd:element name="markers" type="core.MarkersFactory" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="hover_markers" type="core.MarkersFactory" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="select_markers" type="core.MarkersFactory" minOccurs="0" maxOccurs="1"/>
+
+            <xsd:element name="tooltip" type="core.Tooltip" minOccurs="0" maxOccurs="1"/>
+        </xsd:all>
+        <xsd:attribute name="enabled" type="simple.BoolOrNull"/>
+        <xsd:attribute name="fill" type="xsd:string"/>
+        <xsd:attribute name="hover_fill" type="xsd:string"/>
+        <xsd:attribute name="select_fill" type="xsd:string"/>
+
+        <xsd:attribute name="stroke" type="xsd:string"/>
+        <xsd:attribute name="hover_stroke" type="xsd:string"/>
+        <xsd:attribute name="select_stroke" type="xsd:string"/>
+
+        <xsd:attribute name="hatch_fill" type="xsd:string"/>
+        <xsd:attribute name="hover_hatch_fill" type="xsd:string"/>
+        <xsd:attribute name="select_hatch_fill" type="xsd:string"/>
+
+        <xsd:attribute name="labels" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="hover_labels" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="select_labels" type="simple.BoolOrNull" default="true"/>
+
+        <xsd:attribute name="markers" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="hover_markers" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="select_markers" type="simple.BoolOrNull" default="true"/>
+        <xsd:attribute name="tooltip" type="simple.BoolOrNull" default="true"/>
+    </xsd:complexType>
+
     <xsd:complexType name="core.CriticalPath">
         <xsd:all>
             <xsd:element name="tasks" type="core.Tasks" minOccurs="0" maxOccurs="1"/>
@@ -2966,6 +3020,7 @@
             <xsd:enumeration value="mekko"/>
             <xsd:enumeration value="mosaic"/>
             <xsd:enumeration value="barmekko"/>
+            <xsd:enumeration value="venn"/>
         </xsd:restriction>
     </xsd:simpleType>
 

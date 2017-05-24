@@ -898,7 +898,11 @@ anychart.resource = anychart.getFeatureOrError('anychart.resource', 'Resource ch
 
 
 /** @inheritDoc */
-anychart.quadrant = anychart.quadrant || anychart.createNFIMError('Quadrant chart');
+anychart.quadrant = anychart.getFeatureOrError('anychart.quadrant', 'Quadrant chart');
+
+
+/** @inheritDoc */
+anychart.venn = anychart.getFeatureOrError('anychart.venn', 'Venn chart');
 
 
 /** @inheritDoc */
@@ -1255,6 +1259,7 @@ goog.exportSymbol('anychart.ganttProject', anychart.ganttProject);
 goog.exportSymbol('anychart.ganttResource', anychart.ganttResource);
 goog.exportSymbol('anychart.stock', anychart.stock);
 goog.exportSymbol('anychart.quadrant', anychart.quadrant);
+goog.exportSymbol('anychart.venn', anychart.venn);
 goog.exportSymbol('anychart.theme', anychart.theme);
 goog.exportSymbol('anychart.appendTheme', anychart.appendTheme);
 goog.exportSymbol('anychart.toolbar', anychart.toolbar);

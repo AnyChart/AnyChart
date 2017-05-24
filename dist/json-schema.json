@@ -24,7 +24,8 @@
         {"$ref": "#/definitions/anychart.charts.TreeMap"},
         {"$ref": "#/definitions/anychart.charts.Pert"},
         {"$ref": "#/definitions/anychart.charts.Mekko"},
-        {"$ref": "#/definitions/anychart.charts.TagCloud"}
+        {"$ref": "#/definitions/anychart.charts.TagCloud"},
+        {"$ref": "#/definitions/anychart.charts.Venn"}
       ],
       "properties": {
         "container": {
@@ -2056,6 +2057,19 @@
             "string"
           ]
         }
+      },
+      "required": ["type"]
+    },
+
+    "anychart.charts.Venn": {
+      "type": "object",
+      "allOf": [
+        {"$ref": "#/definitions/anychart.core.Chart"}
+      ],
+      "properties": {
+        "type": {"enum": ["venn"]},
+        "dataSeparator": {"type": "string"},
+        "intersections": {"$ref": "#/definitions/intersections"}
       },
       "required": ["type"]
     },
@@ -6214,6 +6228,64 @@
       "properties": {
         "tasks": {"$ref": "#/definitions/tasks"},
         "milestones": {"$ref": "#/definitions/milestones"}
+      }
+    },
+
+
+    "intersections": {
+      "type": "object",
+      "properties": {
+        "fill": {"$ref": "#/definitions/fill"},
+        "hoverFill": {"$ref": "#/definitions/fill"},
+        "selectFill": {"$ref": "#/definitions/fill"},
+        "stroke": {"$ref": "#/definitions/stroke"},
+        "hoverStroke": {"$ref": "#/definitions/stroke"},
+        "selectStroke": {"$ref": "#/definitions/stroke"},
+        "hatchFill": {"$ref": "#/definitions/hatchFill"},
+        "hoverHatchFill": {"$ref": "#/definitions/hatchFill"},
+        "selectHatchFill": {"$ref": "#/definitions/hatchFill"},
+        "labels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "hoverLabels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "selectLabels": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.LabelsFactory"}
+          ]
+        },
+        "markers": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
+          ]
+        },
+        "hoverMarkers": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
+          ]
+        },
+        "selectMarkers": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.MarkersFactory"}
+          ]
+        },
+        "tooltip": {
+          "oneOf": [
+            {"$ref": "#/definitions/disable"},
+            {"$ref": "#/definitions/anychart.core.ui.Tooltip"}
+          ]
+        }
       }
     },
 

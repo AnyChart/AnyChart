@@ -3,6 +3,7 @@ goog.require('acgraph');
 goog.require('anychart.color');
 goog.require('anychart.core.IChart');
 goog.require('anychart.core.IPlot');
+goog.require('anychart.core.IShapeManagerUser');
 goog.require('anychart.core.VisualBaseWithBounds');
 goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
@@ -40,7 +41,7 @@ goog.require('goog.math');
  * @constructor
  * @extends {anychart.core.VisualBaseWithBounds}
  * @implements {anychart.core.utils.ISeriesWithError}
- * @implements {anychart.core.settings.IObjectWithSettings}
+ * @implements {anychart.core.IShapeManagerUser}
  */
 anychart.core.series.Base = function(chart, plot, type, config) {
   anychart.core.series.Base.base(this, 'constructor');
@@ -1624,7 +1625,7 @@ anychart.core.series.Base.prototype.getLegendIconColor = function(legendItemJson
         name = 'fill';
       }
     }
-    var resolver = anychart.core.series.Base.getColorResolver([name], colorType);
+    var resolver = anychart.color.getColorResolver([name], colorType);
     legendItemJson = resolver(this, anychart.PointState.NORMAL, true);
   }
   return legendItemJson;
@@ -1679,108 +1680,6 @@ anychart.core.series.Base.prototype.tooltip = function(opt_value) {
 //  Color resolution
 //
 //----------------------------------------------------------------------------------------------------------------------
-/**
- * Returns a color resolver for passed color names and type.
- * @param {(Array.<string>|null|boolean)} colorNames
- * @param {anychart.enums.ColorType} colorType
- * @return {function(anychart.core.series.Base, number, boolean=, boolean=):acgraph.vector.AnyColor}
- */
-anychart.core.series.Base.getColorResolver = function(colorNames, colorType) {
-  var result;
-  if (!colorNames) return anychart.core.series.Base.getNullColor_;
-  if (goog.isArray(colorNames)) {
-    var hash = colorType + '|' + colorNames.join('|');
-    result = anychart.core.series.Base.colorResolversCache_[hash];
-    if (!result) {
-      /** @type {!Function} */
-      var normalizerFunc;
-      switch (colorType) {
-        case anychart.enums.ColorType.STROKE:
-          normalizerFunc = anychart.core.settings.strokeOrFunctionSimpleNormalizer;
-          break;
-        case anychart.enums.ColorType.HATCH_FILL:
-          normalizerFunc = anychart.core.settings.hatchFillOrFunctionSimpleNormalizer;
-          break;
-        default:
-        case anychart.enums.ColorType.FILL:
-          normalizerFunc = anychart.core.settings.fillOrFunctionSimpleNormalizer;
-          break;
-      }
-      anychart.core.series.Base.colorResolversCache_[hash] = result = goog.partial(anychart.core.series.Base.getColor_,
-          colorNames, normalizerFunc, colorType == anychart.enums.ColorType.HATCH_FILL);
-    }
-  } else {
-    result = anychart.core.series.Base.colorResolversCache_['transparent'];
-    if (!result)
-      result = anychart.core.series.Base.colorResolversCache_['transparent'] = function() {return anychart.color.TRANSPARENT_HANDLER};
-  }
-  return result;
-};
-
-
-/**
- * Returns final color or hatch fill for passed params.
- * @param {Array.<string>} colorNames
- * @param {!Function} normalizer
- * @param {boolean} isHatchFill
- * @param {anychart.core.series.Base} series
- * @param {number} state
- * @param {boolean=} opt_ignorePointSettings
- * @param {boolean=} opt_ignoreColorScale
- * @return {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill}
- * @private
- */
-anychart.core.series.Base.getColor_ = function(colorNames, normalizer, isHatchFill, series, state, opt_ignorePointSettings, opt_ignoreColorScale) {
-  var stateColor, context;
-  state = anychart.core.utils.InteractivityState.clarifyState(state);
-  if (state != anychart.PointState.NORMAL && colorNames.length > 1) {
-    stateColor = opt_ignorePointSettings ?
-        series.getOption(colorNames[state]) :
-        series.resolveOption(colorNames[state], series.getIterator(), normalizer);
-    if (isHatchFill && stateColor === true)
-      stateColor = normalizer(series.getAutoHatchFill());
-    if (goog.isDef(stateColor)) {
-      if (!goog.isFunction(stateColor))
-        return /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(stateColor);
-      else if (isHatchFill) { // hatch fills set as function some why cannot nest by initial implementation
-        context = series.getHatchFillResolutionContext(opt_ignorePointSettings);
-        return /** @type {acgraph.vector.PatternFill} */(normalizer(stateColor.call(context, context)));
-      }
-    }
-  }
-  // we can get here only if state color is undefined or is a function
-  var color = opt_ignorePointSettings ?
-      series.getOption(colorNames[0]) :
-      series.resolveOption(colorNames[0], series.getIterator(), normalizer);
-  if (isHatchFill && color === true)
-    color = normalizer(series.getAutoHatchFill());
-  if (goog.isFunction(color)) {
-    context = isHatchFill ?
-        series.getHatchFillResolutionContext(opt_ignorePointSettings) :
-        series.getColorResolutionContext(void 0, opt_ignorePointSettings, opt_ignoreColorScale);
-    color = /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(normalizer(color.call(context, context)));
-  }
-  if (stateColor) { // it is a function and not a hatch fill here
-    context = series.getColorResolutionContext(
-        /** @type {acgraph.vector.Fill|acgraph.vector.Stroke} */(color),
-        opt_ignorePointSettings,
-        opt_ignoreColorScale);
-    color = normalizer(stateColor.call(context, context));
-  }
-  return /** @type {acgraph.vector.Fill|acgraph.vector.Stroke|acgraph.vector.PatternFill} */(color);
-};
-
-
-/**
- * Returns normalized null stroke or fill.
- * @return {string}
- * @private
- */
-anychart.core.series.Base.getNullColor_ = function() {
-  return 'none';
-};
-
-
 /**
  * Returns color resolution context.
  * This context is used to resolve a fill or stroke set as a function for current point.
@@ -2480,7 +2379,7 @@ anychart.core.series.Base.prototype.drawMarker = function(point, pointState, poi
  * @protected
  */
 anychart.core.series.Base.prototype.getMarkerFill = function() {
-  var fillGetter = anychart.core.series.Base.getColorResolver(
+  var fillGetter = anychart.color.getColorResolver(
       [this.check(anychart.core.drawers.Capabilities.USES_STROKE_AS_FILL) ? 'stroke' : 'fill'],
       anychart.enums.ColorType.FILL);
   var fill = /** @type {acgraph.vector.Fill} */(fillGetter(this, anychart.PointState.NORMAL, true, true));
@@ -2611,7 +2510,7 @@ anychart.core.series.Base.prototype.drawPointOutliers = function(iterator, point
  * @protected
  */
 anychart.core.series.Base.prototype.getOutliersFill = function() {
-  var fillGetter = anychart.core.series.Base.getColorResolver(['fill'], anychart.enums.ColorType.FILL);
+  var fillGetter = anychart.color.getColorResolver(['fill'], anychart.enums.ColorType.FILL);
   return /** @type {acgraph.vector.Fill} */(fillGetter(this, anychart.PointState.NORMAL, true));
 };
 
