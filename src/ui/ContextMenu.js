@@ -278,8 +278,12 @@ anychart.ui.ContextMenu.prototype.handleContextMenu_ = function(e) {
 
   if (this.chart_ && goog.isFunction(this.chart_['getSelectedPoints'])) {
     // Check anychart-ui.css attached.
-    var stage = this.chart_['container']() ? this.chart_['container']()['getStage']() : null;
-    if (goog.isNull(stage) || goog.style.getComputedStyle(stage['domElement'](), 'border-style') == 'none') return;
+    var stage = goog.isFunction(this.chart_['container']) ?
+        this.chart_['container']() ?
+            this.chart_['container']()['getStage']() :
+            null :
+        null;
+    if (goog.isNull(stage) || !goog.isFunction(stage['domElement']) || goog.style.getComputedStyle(stage['domElement'](), 'border-style') == 'none') return;
 
     prepareItemsContext['chart'] = this.chart_;
     prepareItemsContext['selectedPoints'] = this.chart_['getSelectedPoints']() || [];
@@ -293,7 +297,7 @@ anychart.ui.ContextMenu.prototype.handleContextMenu_ = function(e) {
   if (!goog.isArray(this.items()) || !this.items().length) return;
   goog.isFunction(e['getOriginalEvent']) ? e['getOriginalEvent']().preventDefault() : e.preventDefault();
 
-  if (this.chart_['getType']() == anychart.enums.MapTypes.MAP) {
+  if (this.chart_ && goog.isFunction(this.chart_['getType']) && this.chart_['getType']() == anychart.enums.MapTypes.MAP) {
     //because Map has async interactivity model
     setTimeout(this.acyncShow, 0, e['clientX'], e['clientY']);
   } else {
@@ -322,7 +326,7 @@ anychart.ui.ContextMenu.prototype.render = function(opt_parentElement) {
  * @suppress {checkTypes}
  */
 anychart.ui.ContextMenu.prototype.attach = function(target, opt_capture) {
-  if (!this.attached_ && !this.isInDocument()) {
+  if (target && !this.attached_) {
     this.attached_ = true;
     if (goog.isObject(target) && goog.isFunction(target['listen'])) {
       this.chart_ = target;
@@ -344,12 +348,14 @@ anychart.ui.ContextMenu.prototype.attach = function(target, opt_capture) {
  */
 anychart.ui.ContextMenu.prototype.detach = function(opt_target, opt_capture) {
   if (this.attached_) {
-    this.attached_ = false;
     if (goog.isDefAndNotNull(this.chart_) && goog.isFunction(this.chart_['unlisten'])) {
-      this.chart_['unlisten'](goog.events.EventType.CONTEXTMENU, this.handleContextMenu_, opt_capture, this);
-    } else {
+      this.attached_ = !this.chart_['unlisten'](goog.events.EventType.CONTEXTMENU, this.handleContextMenu_, opt_capture, this);
+
+    } else if (goog.events.getListener(opt_target, goog.events.EventType.CONTEXTMENU, this.handleContextMenu_, opt_capture, this)) {
       this.getHandler().unlisten(opt_target, goog.events.EventType.CONTEXTMENU, this.handleContextMenu_, opt_capture);
+      this.attached_ = false;
     }
+    if (!this.attached_) this.hide();
   }
   return this;
 };
