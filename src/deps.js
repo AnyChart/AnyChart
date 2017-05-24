@@ -136,6 +136,7 @@ goog.addDependency('../../../../src/core/drawers/RangeArea.js', ['anychart.core.
 goog.addDependency('../../../../src/core/drawers/RangeColumn.js', ['anychart.core.drawers.RangeColumn'], ['anychart.core.drawers', 'anychart.core.drawers.Base', 'anychart.enums'], false);
 goog.addDependency('../../../../src/core/drawers/RangeSplineArea.js', ['anychart.core.drawers.RangeSplineArea'], ['anychart.core.drawers', 'anychart.core.drawers.Base', 'anychart.core.drawers.SplineDrawer', 'anychart.enums'], false);
 goog.addDependency('../../../../src/core/drawers/RangeStepArea.js', ['anychart.core.drawers.RangeStepArea'], ['anychart.core.drawers', 'anychart.core.drawers.Base', 'anychart.enums'], false);
+goog.addDependency('../../../../src/core/drawers/RangeStick.js', ['anychart.core.drawers.RangeStick'], ['anychart.core.drawers', 'anychart.core.drawers.Base', 'anychart.enums'], false);
 goog.addDependency('../../../../src/core/drawers/Spline.js', ['anychart.core.drawers.Spline'], ['anychart.core.drawers', 'anychart.core.drawers.Base', 'anychart.core.drawers.SplineDrawer', 'anychart.enums'], false);
 goog.addDependency('../../../../src/core/drawers/SplineArea.js', ['anychart.core.drawers.SplineArea'], ['anychart.core.drawers', 'anychart.core.drawers.Base', 'anychart.core.drawers.SplineDrawer', 'anychart.enums'], false);
 goog.addDependency('../../../../src/core/drawers/SplineDrawer.js', ['anychart.core.drawers.SplineDrawer'], [], false);
@@ -421,7 +422,7 @@ goog.addDependency('../../../../src/modules/cartesian3d.js', ['anychart.modules.
 goog.addDependency('../../../../src/modules/chart_editor.js', ['anychart.modules.chart_editor'], ['anychart.modules.base', 'anychart.ui.chartEditor.Dialog'], false);
 goog.addDependency('../../../../src/modules/choropleth.js', ['anychart.modules.choropleth'], ['anychart.charts.Map', 'anychart.core.drawers.map.Choropleth', 'anychart.modules.base'], false);
 goog.addDependency('../../../../src/modules/circularGauge.js', ['anychart.modules.circularGauge'], ['anychart.charts.CircularGauge', 'anychart.modules.base'], false);
-goog.addDependency('../../../../src/modules/column.js', ['anychart.modules.column'], ['anychart.charts.Cartesian', 'anychart.core.drawers.Column', 'anychart.core.drawers.RangeColumn', 'anychart.core.drawers.Stick', 'anychart.modules.base'], false);
+goog.addDependency('../../../../src/modules/column.js', ['anychart.modules.column'], ['anychart.charts.Cartesian', 'anychart.core.drawers.Column', 'anychart.core.drawers.RangeColumn', 'anychart.core.drawers.RangeStick', 'anychart.core.drawers.Stick', 'anychart.modules.base'], false);
 goog.addDependency('../../../../src/modules/column3d.js', ['anychart.modules.column3d'], ['anychart.charts.Cartesian3d', 'anychart.core.drawers.Column3d', 'anychart.modules.base'], false);
 goog.addDependency('../../../../src/modules/connector.js', ['anychart.modules.connector'], ['anychart.charts.Map', 'anychart.core.drawers.map.Connector', 'anychart.modules.base'], false);
 goog.addDependency('../../../../src/modules/data_adapter.js', ['anychart.modules.data_adapter'], ['anychart.base', 'goog.Uri', 'goog.dom', 'goog.net.XhrIo'], false);

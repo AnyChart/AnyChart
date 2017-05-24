@@ -3021,6 +3021,7 @@
             <xsd:enumeration value="mosaic"/>
             <xsd:enumeration value="barmekko"/>
             <xsd:enumeration value="venn"/>
+            <xsd:enumeration value="hilo"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -3287,6 +3288,7 @@
             <xsd:enumeration value="polygon"/>
             <xsd:enumeration value="polyline"/>
             <xsd:enumeration value="mekko"/>
+            <xsd:enumeration value="hilo"/>
         </xsd:restriction>
     </xsd:simpleType>
 

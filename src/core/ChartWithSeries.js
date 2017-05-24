@@ -877,7 +877,8 @@ anychart.core.ChartWithSeries.seriesReferenceValues = {
   'connector': ['points'],
   'choropleth': ['id', 'value'],
   'markerMap': ['id', 'long', 'lat'],
-  'bubbleMap': ['id', 'long', 'lat', 'size']
+  'bubbleMap': ['id', 'long', 'lat', 'size'],
+  'hilo': ['high', 'low']
 };
 
 

@@ -940,7 +940,8 @@ anychart.themes.merging.mergingMap_ = [
       'cartesianBase.defaultSeriesSettings.rangeBar',
       'cartesianBase.defaultSeriesSettings.rangeColumn',
       'cartesianBase.defaultSeriesSettings.rangeSplineArea',
-      'cartesianBase.defaultSeriesSettings.rangeStepArea'
+      'cartesianBase.defaultSeriesSettings.rangeStepArea',
+      'cartesianBase.defaultSeriesSettings.hilo'
     ]
   },
   {
@@ -984,7 +985,8 @@ anychart.themes.merging.mergingMap_ = [
       'cartesianBase.defaultSeriesSettings.stepLine',
       'cartesianBase.defaultSeriesSettings.ohlc',
       'cartesianBase.defaultSeriesSettings.jumpLine',
-      'cartesianBase.defaultSeriesSettings.stick'
+      'cartesianBase.defaultSeriesSettings.stick',
+      'cartesianBase.defaultSeriesSettings.hilo'
     ]
   },
   {

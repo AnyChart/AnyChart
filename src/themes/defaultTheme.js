@@ -1529,6 +1529,9 @@ goog.provide('anychart.themes.defaultTheme');
         },
         'jumpLine': {
           'pointWidth': '100%'
+        },
+        'hilo': {
+          'pointWidth': 1
         }
       },
       'chartLabels': [],

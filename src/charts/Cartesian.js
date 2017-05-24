@@ -320,6 +320,18 @@ anychart.charts.Cartesian.prototype.seriesConfig = (function() {
     anchoredPositionTop: 'value',
     anchoredPositionBottom: 'zero'
   };
+  res[anychart.enums.CartesianSeriesType.HILO] = {
+    drawerType: anychart.enums.SeriesDrawerTypes.RANGE_STICK,
+    shapeManagerType: anychart.enums.ShapeManagerTypes.PER_POINT,
+    shapesConfig: [
+      anychart.core.shapeManagers.pathStrokeConfig
+    ],
+    secondaryShapesConfig: null,
+    postProcessor: null,
+    capabilities: capabilities,
+    anchoredPositionTop: 'high',
+    anchoredPositionBottom: 'low'
+  };
   return res;
 })();
 anychart.core.ChartWithSeries.generateSeriesConstructors(anychart.charts.Cartesian, anychart.charts.Cartesian.prototype.seriesConfig);
@@ -392,6 +404,7 @@ anychart.chartTypesMap[anychart.enums.ChartTypes.CARTESIAN] = anychart.cartesian
   // proto['stepArea'] = proto.stepArea;
   // proto['stick'] = proto.stick;
   // proto['jumpLine'] = proto.jumpLine;
+  // proto['hilo'] = proto.hilo;
   proto['lineMarker'] = proto.lineMarker;
   proto['rangeMarker'] = proto.rangeMarker;
   proto['textMarker'] = proto.textMarker;
