@@ -6,7 +6,7 @@ goog.require('goog.ui.PopupBase.EventType');
 
 
 /**
- * @param {anychart.ui.chartEditor.Dialog} editor
+ * @param {anychart.ui.Editor} editor
  * @constructor
  */
 anychart.ui.chartEditor.Controller = function(editor) {
@@ -17,7 +17,7 @@ anychart.ui.chartEditor.Controller = function(editor) {
   this.model_ = null;
 
   /**
-   * @type {anychart.ui.chartEditor.Dialog}
+   * @type {anychart.ui.Editor}
    * @private
    */
   this.editor_ = editor;
@@ -39,9 +39,6 @@ anychart.ui.chartEditor.Controller = function(editor) {
   goog.events.listen(editor, anychart.ui.chartEditor.events.EventType.CHANGE_MODEL, this.onChangeModel_, false, this);
   goog.events.listen(editor, anychart.ui.chartEditor.events.EventType.BUILD_CHART, this.onBuildChart_, false, this);
   goog.events.listen(editor, anychart.ui.chartEditor.events.EventType.UPDATE_EDITOR, this.onEditorUpdate_, false, this);
-
-  // public events
-  goog.events.listen(editor, anychart.enums.EventType.COMPLETE, this.onComplete_, false, this);
 };
 
 
@@ -72,12 +69,6 @@ anychart.ui.chartEditor.Controller.prototype.onHide_ = function(evt) {
   if (evt.target == this.editor_) {
     this.editor_.dispatchEvent(anychart.enums.EventType.CLOSE);
   }
-};
-
-
-/** @private */
-anychart.ui.chartEditor.Controller.prototype.onComplete_ = function() {
-  this.editor_.setVisible(false);
 };
 
 
@@ -257,11 +248,11 @@ anychart.ui.chartEditor.Controller.getset = function(model, key, opt_value, opt_
     var message = 'Could not apply key \'' + key + '\'';
     if (arg) message += ' with argument [' + arg + ']';
 
-    var console = goog.global['console'];
-    if (console) {
-      var log = console['warn'] || console['log'];
+    var logger = goog.global['console'];
+    if (logger) {
+      var log = logger['warn'] || logger['log'];
       if (typeof log != 'object') {
-        log.call(console, message);
+        log.call(logger, message);
       }
     }
   }

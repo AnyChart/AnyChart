@@ -719,7 +719,9 @@ anychart.charts.Cartesian3d.prototype.serialize = function() {
   proto['grid'] = proto.grid;
   proto['minorGrid'] = proto.minorGrid;
   proto['xAxis'] = proto.xAxis;
+  proto['getXAxesCount'] = proto.getXAxesCount;
   proto['yAxis'] = proto.yAxis;
+  proto['getYAxesCount'] = proto.getYAxesCount;
   proto['getSeries'] = proto.getSeries;
   // generated automatically
   // proto['area'] = proto.area;
