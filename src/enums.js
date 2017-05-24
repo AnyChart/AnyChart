@@ -2412,7 +2412,8 @@ anychart.enums.CartesianSeriesType = {
   SPLINE_AREA: 'splineArea',
   STEP_AREA: 'stepArea',
   STEP_LINE: 'stepLine',
-  STICK: 'stick'
+  STICK: 'stick',
+  HILO: 'hilo'
 };
 
 
@@ -2465,6 +2466,8 @@ anychart.enums.normalizeCartesianSeriesType = function(value, opt_default) {
       return anychart.enums.CartesianSeriesType.STEP_AREA;
     case 'stepline':
       return anychart.enums.CartesianSeriesType.STEP_LINE;
+    case 'hilo':
+      return anychart.enums.CartesianSeriesType.HILO;
   }
   return opt_default || anychart.enums.CartesianSeriesType.LINE;
 };
@@ -5612,7 +5615,8 @@ anychart.enums.SeriesDrawerTypes = {
   POLAR_COLUMN: 27,
   POLAR_RANGE_COLUMN: 28,
   MEKKO: 29,
-  HEAT_MAP: 30
+  HEAT_MAP: 30,
+  RANGE_STICK: 31
 };
 
 
