@@ -148,7 +148,24 @@ anychart.fromXmlFile.onConfigFileLoadingComplete_ = function(onSuccessOrContaine
  * @param {string=} opt_headersSelector
  * @param {string=} opt_captionSelector
  * @param {Function=} opt_valueProcessor
- * @return {?anychart.data.DataSettings}
+ * @return {?{
+ *  caption: (string|undefined),
+ *  header: (Array.<string>|undefined),
+ *  rows: (Array|undefined),
+ *  text: (string|undefined),
+ *  textSettings: (string|undefined|{
+ *      mode: (string|undefined),
+ *      rowsSeparator: (string|undefined),
+ *      columnsSeparator: (string|undefined),
+ *      ignoreTrailingSpaces: (boolean|undefined),
+ *      ignoreFirstRow: (boolean|undefined),
+ *      minLength: (number|undefined),
+ *      maxLength: (number|undefined),
+ *      cutLength: (number|undefined),
+ *      ignoreItems: (Array.<string>|undefined),
+ *      maxItems: (number|undefined)
+ *   })
+ * }} This is a ?anychart.data.DataSettings, but due to modules it should be like this here.
  */
 anychart.modules.data_adapter.parseHtmlTable = function(opt_tableSelector, opt_rowsSelector, opt_cellsSelector, opt_headersSelector, opt_captionSelector, opt_valueProcessor) {
   // find table

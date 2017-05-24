@@ -576,7 +576,8 @@ anychart.color.getNullColor = function() {
  */
 anychart.color.getColor = function(colorNames, normalizer, isHatchFill, series, state, opt_ignorePointSettings, opt_ignoreColorScale) {
   var stateColor, context;
-  state = anychart.core.utils.InteractivityState.clarifyState(state);
+  state = Math.min(state & (anychart.PointState.HOVER | anychart.PointState.SELECT),
+      anychart.PointState.SELECT);
   if (state != anychart.PointState.NORMAL && colorNames.length > 1) {
     stateColor = opt_ignorePointSettings ?
         series.getOption(colorNames[state]) :
