@@ -1968,23 +1968,52 @@ anychart.core.series.Base.prototype.drawFactoryElement = function(seriesFactoryG
         }
       }
     } else {
-      var statePointOverridePos = statePointOverride && goog.isDef(statePointOverride['position']) ? statePointOverride['position'] : void 0;
-      var seriesStateFactoryPos = seriesStateFactory && goog.isDef(seriesStateFactory['position']()) ? seriesStateFactory['position']() : void 0;
-      var chartStateFactoryPos = chartStateFactory && goog.isDef(chartStateFactory['position']()) ? chartStateFactory['position']() : void 0;
-      var pointOverridePos = pointOverride && goog.isDef(pointOverride['position']) ? pointOverride['position'] : void 0;
-      var seriesNormalFactoryPos = mainFactory && goog.isDef(mainFactory['position']()) ? mainFactory['position']() : void 0;
+      var statePointOverridePos, seriesStateFactoryPos, chartStateFactoryPos, pointOverridePos, seriesNormalFactoryPos,
+          chartNormalFactoryPos, seriesStateThemeFactoryPos, chartStateThemeFactoryPos, seriesNormalThemeFactoryPos,
+          chartNormalThemeFactoryPos, position;
+      if (isLabel) {
+        statePointOverridePos = statePointOverride && goog.isDef(statePointOverride['position']) ? statePointOverride['position'] : void 0;
+        seriesStateFactoryPos = seriesStateFactory && goog.isDef(seriesStateFactory.getOwnOption('position')) ? seriesStateFactory.getOwnOption('position') : void 0;
+        chartStateFactoryPos = chartStateFactory && goog.isDef(chartStateFactory.getOwnOption('position')) ? chartStateFactory.getOwnOption('position') : void 0;
+        pointOverridePos = pointOverride && goog.isDef(pointOverride['position']) ? pointOverride['position'] : void 0;
+        seriesNormalFactoryPos = mainFactory && goog.isDef(mainFactory.getOwnOption('position')) ? mainFactory.getOwnOption('position') : void 0;
+        chartNormalFactoryPos = chartNormalFactory && goog.isDef(chartNormalFactory.getOwnOption('position')) ? chartNormalFactory.getOwnOption('position') : void 0;
+        seriesStateThemeFactoryPos = seriesStateFactory && goog.isDef(seriesStateFactory.getThemeOption('position')) ? seriesStateFactory.getThemeOption('position') : void 0;
+        chartStateThemeFactoryPos = chartStateFactory && goog.isDef(chartStateFactory.getThemeOption('position')) ? chartStateFactory.getThemeOption('position') : void 0;
+        seriesNormalThemeFactoryPos = mainFactory && goog.isDef(mainFactory.getThemeOption('position')) ? mainFactory.getThemeOption('position') : void 0;
+        chartNormalThemeFactoryPos = chartNormalFactory && goog.isDef(chartNormalFactory.getThemeOption('position')) ? chartNormalFactory.getThemeOption('position') : void 0;
 
-      var position = goog.isDef(statePointOverridePos) ? statePointOverridePos :
-          goog.isDef(seriesStateFactoryPos) ? seriesStateFactoryPos :
-              goog.isDef(chartStateFactoryPos) ? chartStateFactoryPos :
-                  goog.isDef(pointOverridePos) ? pointOverridePos :
-                      goog.isDef(mainFactory) ? seriesNormalFactoryPos :
-                          goog.isDef(chartNormalFactory) ? chartNormalFactory['position']() :
-                              'auto';
+        position = anychart.utils.getFirstDefinedValue(
+            statePointOverridePos,
+            seriesStateFactoryPos,
+            chartStateFactoryPos,
+            pointOverridePos,
+            seriesNormalFactoryPos,
+            chartNormalFactoryPos,
+            seriesStateThemeFactoryPos,
+            chartStateThemeFactoryPos,
+            seriesNormalThemeFactoryPos,
+            chartNormalThemeFactoryPos,
+            'auto');
+      } else {
+        statePointOverridePos = statePointOverride && goog.isDef(statePointOverride['position']) ? statePointOverride['position'] : void 0;
+        seriesStateFactoryPos = seriesStateFactory && goog.isDef(seriesStateFactory['position']()) ? seriesStateFactory['position']() : void 0;
+        chartStateFactoryPos = chartStateFactory && goog.isDef(chartStateFactory['position']()) ? chartStateFactory['position']() : void 0;
+        pointOverridePos = pointOverride && goog.isDef(pointOverride['position']) ? pointOverride['position'] : void 0;
+        seriesNormalFactoryPos = mainFactory && goog.isDef(mainFactory['position']()) ? mainFactory['position']() : void 0;
+
+        position = anychart.utils.getFirstDefinedValue(
+            statePointOverridePos,
+            seriesStateFactoryPos,
+            chartStateFactoryPos,
+            pointOverridePos,
+            seriesNormalFactoryPos,
+            'auto');
+      }
 
       positionProvider = this.createPositionProvider(/** @type {anychart.enums.Position|string} */(position), true);
       return this.drawSingleFactoryElement(mainFactory, index, positionProvider, formatProvider,
-          chartNormalFactory, seriesStateFactory, chartStateFactory, pointOverride, statePointOverride, callDraw, position);
+          chartNormalFactory, seriesStateFactory, chartStateFactory, pointOverride, statePointOverride, callDraw, /** @type {string} */(position));
     }
   } else {
     if (positionYs) {

@@ -858,6 +858,19 @@ anychart.utils.applyOffsetByAnchor = function(position, anchor, offsetX, offsetY
 
 
 /**
+ * Returns first defined argument.
+ * @param {...*} var_args .
+ * @return {*}
+ */
+anychart.utils.getFirstDefinedValue = function(var_args) {
+  for (var i = 0, len = arguments.length; i < len; i++) {
+    var a = arguments[i];
+    if (goog.isDef(a)) return a;
+  }
+};
+
+
+/**
  * Does a recursive clone of an object.
  *
  * @param {*} obj Object to clone.
