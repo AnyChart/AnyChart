@@ -2235,4 +2235,5 @@ anychart.core.axes.Linear.prototype.disposeInternal = function() {
   proto['overlapMode'] = proto.overlapMode;
   proto['isHorizontal'] = proto.isHorizontal;
   proto['padding'] = proto.padding;
+  proto['getPixelBounds'] = proto.getPixelBounds;
 })();

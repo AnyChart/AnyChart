@@ -2461,7 +2461,8 @@ anychart.core.ui.Legend.prototype.disposeInternal = function() {
   proto['position'] = proto.position;
   proto['positionMode'] = proto.positionMode;
   proto['align'] = proto.align;
-  proto['getRemainingBounds'] = proto.getRemainingBounds;
   proto['drag'] = proto.drag;
+  proto['getRemainingBounds'] = proto.getRemainingBounds;
+  proto['getPixelBounds'] = proto.getPixelBounds;
 })();
 //endregion
