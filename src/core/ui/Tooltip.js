@@ -2454,8 +2454,12 @@ anychart.core.ui.Tooltip.prototype.disposeInternal = function() {
   delete this.ownSettings;
   delete this.themeSettings;
 
-  if (this.parent_)
+
+  if (this.parent_) {
+    var uid = String(goog.getUid(this));
     this.parent_.unlistenSignals(this.parentInvalidated_, this);
+    delete this.parent_.childTooltipsMap[uid];
+  }
 
   for (var key in this.childTooltipsMap) {
     var childTooltip = this.childTooltipsMap[key];
