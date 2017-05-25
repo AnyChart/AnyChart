@@ -63,6 +63,19 @@ anychart.core.drawers.Area3d.prototype.requiredShapes = (function() {
 
 
 /** @inheritDoc */
+anychart.core.drawers.Area3d.prototype.updateZIndex = function(point) {
+  var iterator = this.series.getDetachedIterator();
+  while (iterator.advance()) {
+    var shapes = /** @type {Object.<acgraph.vector.Shape>} */(iterator.meta('shapes'));
+    if (shapes) {
+      var zIndex = /** @type {number} */(iterator.meta('zIndex'));
+      this.shapesManager.updateZIndex(zIndex + iterator.getIndex() * 1e-8, shapes);
+    }
+  }
+};
+
+
+/** @inheritDoc */
 anychart.core.drawers.Area3d.prototype.startDrawing = function(shapeManager) {
   anychart.core.drawers.Area3d.base(this, 'startDrawing', shapeManager);
   /**

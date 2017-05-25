@@ -3015,16 +3015,7 @@ anychart.core.series.Base.prototype.prepareAdditional = function() {
 anychart.core.series.Base.prototype.applyZIndex = function() {
   var zIndex = /** @type {number} */(this.zIndex());
   if (this.check(anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT)) {
-    if (this.shapeManager instanceof anychart.core.shapeManagers.PerPoint) {
-      var iterator = this.getDetachedIterator();
-      while (iterator.advance()) {
-        var shapes = /** @type {Object.<acgraph.vector.Shape>} */(iterator.meta('shapes'));
-        if (shapes)
-          this.shapeManager.updateZIndex(zIndex, shapes);
-      }
-    } else {
-      this.shapeManager.updateZIndex(zIndex);
-    }
+    this.drawer.updateZIndex(zIndex);
   } else {
     this.rootLayer.zIndex(zIndex);
   }

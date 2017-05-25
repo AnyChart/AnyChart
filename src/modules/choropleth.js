@@ -6,7 +6,7 @@
 goog.provide('anychart.modules.choropleth');
 
 goog.require('anychart.charts.Map');
-goog.require('anychart.core.drawers.map.Choropleth');
+goog.require('anychart.core.drawers.MapChoropleth');
 goog.require('anychart.modules.base');
 
 

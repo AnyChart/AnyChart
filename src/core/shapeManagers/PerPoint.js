@@ -21,8 +21,20 @@ goog.inherits(anychart.core.shapeManagers.PerPoint, anychart.core.shapeManagers.
 
 /** @inheritDoc */
 anychart.core.shapeManagers.PerPoint.prototype.getShapesGroup = function(state, opt_only, opt_baseZIndex, opt_shape) {
-  var res = anychart.core.shapeManagers.PerPoint.base(this, 'getShapesGroup', state, opt_only, opt_baseZIndex, opt_shape);
-  if (this.series.isDiscreteBased())
-    this.series.getIterator().meta(this.shapesFieldName, res);
+  var iterator = this.series.getIterator();
+  var zIndex = opt_baseZIndex || 0;
+  if (this.series.isDiscreteBased() && this.series.supportsPointSettings()) {
+    zIndex += Number(iterator.get('zIndex')) || 0;
+  }
+  var res = anychart.core.shapeManagers.PerPoint.base(this, 'getShapesGroup', state, opt_only, zIndex, opt_shape);
+  iterator.meta(this.shapesFieldName, res);
   return res;
+};
+
+
+/** @inheritDoc */
+anychart.core.shapeManagers.PerPoint.prototype.updateZIndex = function(newBaseZIndex, opt_shapesGroup) {
+  var iterator = this.series.getIterator();
+  newBaseZIndex += this.series.supportsPointSettings() && Number(iterator.get('zIndex')) || 0;
+  anychart.core.shapeManagers.PerPoint.base(this, 'updateZIndex', newBaseZIndex, opt_shapesGroup);
 };

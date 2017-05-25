@@ -6,7 +6,7 @@
 goog.provide('anychart.modules.markerMap');
 
 goog.require('anychart.charts.Map');
-goog.require('anychart.core.drawers.map.Marker');
+goog.require('anychart.core.drawers.MapMarker');
 goog.require('anychart.modules.base');
 
 

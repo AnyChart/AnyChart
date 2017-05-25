@@ -628,6 +628,9 @@ anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPus
   var i, name;
 
   var additionalNames = [];
+  if (this.isDiscreteBased() && this.supportsPointSettings()) {
+    additionalNames.push('zIndex');
+  }
   if (checkSize) {
     additionalNames.push('size');
   }

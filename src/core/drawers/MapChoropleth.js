@@ -1,4 +1,4 @@
-goog.provide('anychart.core.drawers.map.Choropleth');
+goog.provide('anychart.core.drawers.MapChoropleth');
 goog.require('anychart.core.drawers');
 goog.require('anychart.core.drawers.Base');
 goog.require('anychart.enums');
@@ -11,19 +11,19 @@ goog.require('anychart.enums');
  * @constructor
  * @extends {anychart.core.drawers.Base}
  */
-anychart.core.drawers.map.Choropleth = function(series) {
-  anychart.core.drawers.map.Choropleth.base(this, 'constructor', series);
+anychart.core.drawers.MapChoropleth = function(series) {
+  anychart.core.drawers.MapChoropleth.base(this, 'constructor', series);
 };
-goog.inherits(anychart.core.drawers.map.Choropleth, anychart.core.drawers.Base);
-anychart.core.drawers.AvailableDrawers[anychart.enums.SeriesDrawerTypes.CHOROPLETH] = anychart.core.drawers.map.Choropleth;
+goog.inherits(anychart.core.drawers.MapChoropleth, anychart.core.drawers.Base);
+anychart.core.drawers.AvailableDrawers[anychart.enums.SeriesDrawerTypes.CHOROPLETH] = anychart.core.drawers.MapChoropleth;
 
 
 /** @inheritDoc */
-anychart.core.drawers.map.Choropleth.prototype.type = anychart.enums.SeriesDrawerTypes.CHOROPLETH;
+anychart.core.drawers.MapChoropleth.prototype.type = anychart.enums.SeriesDrawerTypes.CHOROPLETH;
 
 
 /** @inheritDoc */
-anychart.core.drawers.map.Choropleth.prototype.flags = (
+anychart.core.drawers.MapChoropleth.prototype.flags = (
     // anychart.core.drawers.Capabilities.NEEDS_ZERO |
     // anychart.core.drawers.Capabilities.NEEDS_SIZE_SCALE |
     anychart.core.drawers.Capabilities.USES_CONTAINER_AS_ROOT |
@@ -51,11 +51,11 @@ anychart.core.drawers.map.Choropleth.prototype.flags = (
  * Y values list that are required by this drawer.
  * @type {Array.<string>}
  */
-anychart.core.drawers.map.Choropleth.prototype.yValueNames = (['id', 'value']);
+anychart.core.drawers.MapChoropleth.prototype.yValueNames = (['id', 'value']);
 
 
 /** @inheritDoc */
-anychart.core.drawers.map.Choropleth.prototype.requiredShapes = (function() {
+anychart.core.drawers.MapChoropleth.prototype.requiredShapes = (function() {
   var res = {};
   res['foreignFill'] = anychart.enums.ShapeType.NONE;
   res['hatchFill'] = anychart.enums.ShapeType.PATH;
@@ -64,7 +64,7 @@ anychart.core.drawers.map.Choropleth.prototype.requiredShapes = (function() {
 
 
 /** @inheritDoc */
-anychart.core.drawers.map.Choropleth.prototype.drawSubsequentPoint = function(point, state) {
+anychart.core.drawers.MapChoropleth.prototype.drawSubsequentPoint = function(point, state) {
   var features = point.meta('features');
   if (!features)
     return;

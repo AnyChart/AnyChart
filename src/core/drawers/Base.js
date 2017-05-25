@@ -311,6 +311,13 @@ anychart.core.drawers.Base.prototype.updatePointCustom_ = function(point, state)
 anychart.core.drawers.Base.prototype.updatePointOnAnimate = function(point) {};
 
 
+/**
+ * Updates all zIndexes.
+ * @param {number} zIndex - new series zIndex
+ */
+anychart.core.drawers.Base.prototype.updateZIndex = function(zIndex) {};
+
+
 /** @inheritDoc */
 anychart.core.drawers.Base.prototype.disposeInternal = function() {
   this.series = null;

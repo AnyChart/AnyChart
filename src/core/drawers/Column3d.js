@@ -97,8 +97,21 @@ anychart.core.drawers.Column3d.prototype.startDrawing = function(shapeManager) {
 
 
 /** @inheritDoc */
+anychart.core.drawers.Column3d.prototype.updateZIndex = function(zIndex) {
+  var iterator = this.series.getDetachedIterator();
+  while (iterator.advance()) {
+    var shapes = /** @type {Object.<acgraph.vector.Shape>} */(iterator.meta('shapes'));
+    if (shapes) {
+      zIndex = /** @type {number} */(iterator.meta('zIndex'));
+      this.shapesManager.updateZIndex(zIndex + iterator.getIndex() * 1e-8, shapes);
+    }
+  }
+};
+
+
+/** @inheritDoc */
 anychart.core.drawers.Column3d.prototype.drawSubsequentPoint = function(point, state) {
-  var zIndex = /** @type {number} */(this.series.getIterator().meta('zIndex'));
+  var zIndex = /** @type {number} */(point.meta('zIndex'));
   var shapes = this.shapesManager.getShapesGroup(state, null, zIndex + point.getIndex() * 1e-8);
   this.drawPoint_(point, /** @type {Object.<acgraph.vector.Path>} */(shapes));
 };
