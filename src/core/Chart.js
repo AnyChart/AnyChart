@@ -923,9 +923,9 @@ anychart.core.Chart.prototype.getVersionHistoryLink = function() {
  */
 anychart.core.Chart.prototype.contextMenuItemsProvider = function(context) {
   // For fired on MarkersFactory or LabelsFactory
-  var parentEventTarget = context['event']['target'].getParentEventTarget();
+  var parentEventTarget = context['event'] ? context['event']['target'].getParentEventTarget() : null;
   // For fired on series point (context['event']['target'] == chart)
-  var meta = anychart.utils.extractTag(context['event']['domTarget']);
+  var meta = context['event'] ? anychart.utils.extractTag(context['event']['domTarget']) : null;
   var isSeries = goog.isObject(meta) && goog.isDef(meta.series) &&
       meta.series['seriesType'] && goog.isDef(meta.index);
   var isPointContext = isSeries || (parentEventTarget && parentEventTarget['seriesType']);

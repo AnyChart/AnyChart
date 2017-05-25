@@ -48,7 +48,7 @@
   cursor: pointer;
   list-style: none;
   margin: 0;
-  padding: 6px 3em 6px 30px;
+  padding: 6px 1em 6px 30px;
   white-space: nowrap;
 }
 
@@ -74,10 +74,6 @@
  */
 .anychart-menu-noaccel .anychart-menuitem {
   padding-right: 20px;
-}
-
-.anychart-menuitem-content {
-  /*overflow: hidden;*/ /* for anychart-menuitem-link a {width: 100%;} */
 }
 
 /* State: disabled. */
@@ -219,20 +215,31 @@
   -o-transition: all 0.218s;
   transition: all 0.218s;
 
-  font-size: 70%;
+  //font-size: 70%;
   left: auto;
   right: 10px;
   margin-top: 2px;
-  position: absolute;
+
+  //position: absolute;
   text-align: right;
   opacity: .5;
   filter: alpha(opacity=50);
+
+  //width: 0;
+  //height: 0;
+  //border-top: 5px solid transparent;
+  //border-bottom: 5px solid transparent;
+  //border-left: 5px solid black;
 
   width: 0;
   height: 0;
   border-top: 5px solid transparent;
   border-bottom: 5px solid transparent;
-  border-left: 5px solid black;
+  border-left: 5px solid #000;
+  font-size: 0;
+  line-height: 0;
+  display: block;
+  float: right;
 
 }
 

@@ -53,6 +53,12 @@ anychart.ui.ContextMenu = function() {
    */
   this.extraClassNames_ = null;
 
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.itemsReady_ = false;
+
 
   /**
    * Items formatter.
@@ -79,14 +85,6 @@ anychart.ui.ContextMenu = function() {
   this.itemsProvider_ = function(context) {
     return [];
   };
-
-
-  /**
-   * Menu model is dirty flag.
-   * @type {boolean}
-   * @private
-   */
-  this.isDirty_ = true;
 
 
   // Set default empty menu.
@@ -215,13 +213,35 @@ anychart.ui.ContextMenu.prototype.removeClassName = function(className) {
  * @return {(Array.<anychart.ui.ContextMenu.Item>|anychart.ui.ContextMenu)} Context menu items or self for chaining.
  */
 anychart.ui.ContextMenu.prototype.items = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    // To compare arrays, we need a deep comparison.
+  if (goog.isArray(opt_value)) {
+    this.itemsProvider(function() {
+      return /** @type {Array<anychart.ui.ContextMenu.Item>} */ (opt_value);
+    });
+    if (!opt_value.length) this.hide();
     this.setModel(opt_value);
-    this.isDirty_ = true;
     return this;
   }
   return /** @type {Array.<anychart.ui.ContextMenu.Item>} */ (this.getModel());
+};
+
+
+/**
+ * Getter/setter for items provider.
+ * Items provider called before items formatter.
+ * @param {function(this:anychart.ui.ContextMenu.PrepareItemsContext,
+ *     anychart.ui.ContextMenu.PrepareItemsContext):Array.<anychart.ui.ContextMenu.Item>=} opt_value Formatter function.
+ * @return {(function(this:anychart.ui.ContextMenu.PrepareItemsContext,
+ *     anychart.ui.ContextMenu.PrepareItemsContext):Array.<anychart.ui.ContextMenu.Item>|anychart.ui.ContextMenu)} Formatter function or self for chaining.
+ */
+anychart.ui.ContextMenu.prototype.itemsProvider = function(opt_value) {
+  if (goog.isFunction(opt_value)) {
+    if (this.itemsProvider_ != opt_value) {
+      this.itemsProvider_ = opt_value;
+      this.itemsReady_ = false;
+    }
+    return this;
+  }
+  return this.itemsProvider_;
 };
 
 
@@ -244,25 +264,6 @@ anychart.ui.ContextMenu.prototype.itemsFormatter = function(opt_value) {
 
 
 /**
- * Getter/setter for items provider.
- * Items provider called before items formatter.
- * @param {function(this:anychart.ui.ContextMenu.PrepareItemsContext,
- *     anychart.ui.ContextMenu.PrepareItemsContext):Array.<anychart.ui.ContextMenu.Item>=} opt_value Formatter function.
- * @return {(function(this:anychart.ui.ContextMenu.PrepareItemsContext,
- *     anychart.ui.ContextMenu.PrepareItemsContext):Array.<anychart.ui.ContextMenu.Item>|anychart.ui.ContextMenu)} Formatter function or self for chaining.
- */
-anychart.ui.ContextMenu.prototype.itemsProvider = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    if (this.itemsProvider_ != opt_value) {
-      this.itemsProvider_ = opt_value;
-    }
-    return this;
-  }
-  return this.itemsProvider_;
-};
-
-
-/**
  * Handler browser's contextmenu event.
  * @param {goog.events.Event|anychart.core.MouseEvent} e
  * @private
@@ -270,29 +271,7 @@ anychart.ui.ContextMenu.prototype.itemsProvider = function(opt_value) {
 anychart.ui.ContextMenu.prototype.handleContextMenu_ = function(e) {
   if (!this.enabledInternal_) return;
   this.contextTarget_ = e['target'];
-  var prepareItemsContext = {
-    'event': e,
-    'target': this.contextTarget_,
-    'menu': this
-  };
-
-  if (this.chart_ && goog.isFunction(this.chart_['getSelectedPoints'])) {
-    // Check anychart-ui.css attached.
-    var stage = goog.isFunction(this.chart_['container']) ?
-        this.chart_['container']() ?
-            this.chart_['container']()['getStage']() :
-            null :
-        null;
-    if (goog.isNull(stage) || !goog.isFunction(stage['domElement']) || goog.style.getComputedStyle(stage['domElement'](), 'border-style') == 'none') return;
-
-    prepareItemsContext['chart'] = this.chart_;
-    prepareItemsContext['selectedPoints'] = this.chart_['getSelectedPoints']() || [];
-  }
-
-  // Flow: itemsProvider -> itemsFormatter -> items -> render
-  var providedItems = goog.array.clone(this.itemsProvider_.call(prepareItemsContext, prepareItemsContext));
-  var formattedItems = this.itemsFormatter_.call(providedItems, providedItems, prepareItemsContext);
-  this.items(formattedItems);
+  this.prepareItems_(e, this.contextTarget_);
 
   if (!goog.isArray(this.items()) || !this.items().length) return;
   goog.isFunction(e['getOriginalEvent']) ? e['getOriginalEvent']().preventDefault() : e.preventDefault();
@@ -303,6 +282,38 @@ anychart.ui.ContextMenu.prototype.handleContextMenu_ = function(e) {
   } else {
     this.show(e['clientX'], e['clientY']);
   }
+};
+
+
+/**
+ *
+ * @param {?(goog.events.Event|anychart.core.MouseEvent)} event
+ * @param {Element|anychart.core.VisualBase} target
+ * @return {boolean} true if items successfully prepared and it's more than 0
+ * @private
+ */
+anychart.ui.ContextMenu.prototype.prepareItems_ = function(event, target) {
+  var context = {
+    'event': event,
+    'target': target,
+    'menu': this
+  };
+
+  if (this.chart_ && goog.isFunction(this.chart_['getSelectedPoints'])) {
+    var stage = this.chart_['container']() ? this.chart_['container']()['getStage']() : null;
+    if (goog.isNull(stage) || goog.style.getComputedStyle(stage['domElement'](), 'border-style') == 'none') return false;
+    context['chart'] = this.chart_;
+    context['selectedPoints'] = this.chart_['getSelectedPoints']() || [];
+  }
+
+  // Flow: itemsProvider -> itemsFormatter -> items -> render
+  var providedItems = goog.array.clone(this.itemsProvider_.call(context, context));
+  var formattedItems = this.itemsFormatter_.call(providedItems, providedItems, context);
+  this.setModel(formattedItems);
+
+  this.itemsReady_ = true;
+
+  return !!formattedItems.length;
 };
 
 
@@ -368,11 +379,13 @@ anychart.ui.ContextMenu.prototype.detach = function(opt_target, opt_capture) {
  * @param {number} y The client-Y associated with the show event.
  */
 anychart.ui.ContextMenu.prototype.show = function(x, y) {
-  if (!this.isInDocument()) {
-    this.render();
+  if ((this.itemsReady_ && this.items().length) || this.prepareItems_(null, this.chart_)) {
+    if (!this.isInDocument()) {
+      this.render();
+    }
+    this.makeMenu_();
+    this.showMenu({}, x, y);
   }
-  this.makeMenu_();
-  this.showMenu({}, x, y);
 };
 
 
@@ -381,10 +394,8 @@ anychart.ui.ContextMenu.prototype.show = function(x, y) {
  * @private
  */
 anychart.ui.ContextMenu.prototype.makeMenu_ = function() {
-  if (!this.isDirty_) return;
   this.clear_();
   this.makeLevel_(this, /** @type {Array.<anychart.ui.ContextMenu.Item>} */ (this.items()));
-  this.isDirty_ = false;
 };
 
 
