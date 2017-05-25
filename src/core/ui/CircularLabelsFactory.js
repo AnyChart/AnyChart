@@ -325,7 +325,7 @@ anychart.core.ui.CircularLabelsFactory.Label.prototype.getRotation = function(an
 /** @inheritDoc */
 anychart.core.ui.CircularLabelsFactory.Label.prototype.drawLabel = function(bounds, parentBounds) {
   var positionFormatter = this.mergedSettings['positionFormatter'];
-  var anchor = this.mergedSettings['anchor'];
+  var anchor = anychart.core.ui.LabelsFactory.anchorNoAutoNormalizer(this.mergedSettings['anchor']) || anychart.enums.Anchor.LEFT_TOP;
   var offsetX = this.mergedSettings['offsetX'] || 0;
   var offsetY = this.mergedSettings['offsetY'] || 0;
 
