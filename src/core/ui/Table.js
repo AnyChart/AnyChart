@@ -239,7 +239,7 @@ anychart.core.ui.Table.prototype.pathsPool_ = null;
 
 
 /**
- * @type {Array.<anychart.core.VisualBase>}
+ * @type {Array.<acgraph.vector.Element|anychart.core.VisualBase>}
  * @private
  */
 anychart.core.ui.Table.prototype.contentToClear_ = null;
@@ -1339,26 +1339,30 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
     if (this.contentToClear_) {
       while (this.contentToClear_.length) {
         content = this.contentToClear_.pop();
-        content.suspendSignalsDispatching();
-        if (content instanceof anychart.core.ui.LabelsFactory.Label) {
-          label = /** @type {anychart.core.ui.LabelsFactory.Label} */(content);
-          if (label.parentLabelsFactory())
-            label.parentLabelsFactory().clear(label.getIndex());
-        } else if (content instanceof anychart.core.ui.MarkersFactory.Marker) {
-          marker = /** @type {anychart.core.ui.MarkersFactory.Marker} */(content);
-          if (marker.parentMarkersFactory())
-            marker.parentMarkersFactory().clear(marker.getIndex());
-        } else if (content instanceof anychart.core.VisualBase) {
-          if (content.isChart && content.isChart()) {
-            chart = /** @type {anychart.core.Chart} */(content);
-            chart.autoRedraw(chart.originalAutoRedraw);
-          }
-          content.container(null);
+        if (content instanceof acgraph.vector.Element) {
           content.remove();
-          // no draw here to avoid drawing in to a null container
+        } else {
+          content.suspendSignalsDispatching();
+          if (content instanceof anychart.core.ui.LabelsFactory.Label) {
+            label = /** @type {anychart.core.ui.LabelsFactory.Label} */(content);
+            if (label.parentLabelsFactory())
+              label.parentLabelsFactory().clear(label.getIndex());
+          } else if (content instanceof anychart.core.ui.MarkersFactory.Marker) {
+            marker = /** @type {anychart.core.ui.MarkersFactory.Marker} */(content);
+            if (marker.parentMarkersFactory())
+              marker.parentMarkersFactory().clear(marker.getIndex());
+          } else if (content instanceof anychart.core.VisualBase) {
+            if (content.isChart && content.isChart()) {
+              chart = /** @type {anychart.core.Chart} */(content);
+              chart.autoRedraw(chart.originalAutoRedraw);
+            }
+            content.container(null);
+            content.remove();
+            // no draw here to avoid drawing in to a null container
+          }
+          content.unlistenSignals(this.handleContentInvalidation_);
+          content.resumeSignalsDispatching(false);
         }
-        content.unlistenSignals(this.handleContentInvalidation_);
-        content.resumeSignalsDispatching(false);
       }
     }
 
@@ -1366,19 +1370,25 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
     for (var i = 0; i < cellsCount; i++) {
       cell = this.cells_[i];
       if (!isNaN(cell.overlapper) && (content = cell.realContent)) {
-        content.suspendSignalsDispatching();
-        content.unlistenSignals(this.handleContentInvalidation_);
-        if (content instanceof anychart.core.ui.LabelsFactory.Label ||
-            content instanceof anychart.core.ui.MarkersFactory.Marker) {
-          content.enabled(false);
-        } else if (content.isChart && content.isChart()) {
-          chart = /** @type {anychart.core.Chart} */(content);
-          chart.autoRedraw(chart.originalAutoRedraw);
+        if (content instanceof acgraph.vector.Layer) {
+          content.removeChildren();
+          goog.dispose(content);
+        } else {
+          content.suspendSignalsDispatching();
+          content.unlistenSignals(this.handleContentInvalidation_);
+          if (content instanceof anychart.core.ui.LabelsFactory.Label ||
+              content instanceof anychart.core.ui.MarkersFactory.Marker) {
+            content.enabled(false);
+          } else if (content.isChart && content.isChart()) {
+            chart = /** @type {anychart.core.Chart} */(content);
+            chart.autoRedraw(chart.originalAutoRedraw);
+          }
+
+          content.container(null);
+          content.remove();
+          // no draw here to avoid drawing in to a null container
+          content.resumeSignalsDispatching(false);
         }
-        content.container(null);
-        content.remove();
-        // no draw here to avoid drawing in to a null container
-        content.resumeSignalsDispatching(false);
       }
     }
 
@@ -1390,10 +1400,12 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
       for (var col = 0; col < this.colsCount_; col++) {
         cell = this.cells_[row * this.colsCount_ + col];
         content = cell.realContent;
+        var contentIsGraphicsElement = content instanceof acgraph.vector.Element;
         if (content) {
           var rowObj = this.rows_ && this.rows_[row];
           var colObj = this.cols_ && this.cols_[col];
-          content.suspendSignalsDispatching();
+          if (!contentIsGraphicsElement)
+            content.suspendSignalsDispatching();
           if (isNaN(cell.overlapper)) {
             bounds = this.getCellBounds(row, col,
                 /** @type {number} */(cell.rowSpan()), /** @type {number} */(cell.colSpan()), bounds);
@@ -1402,58 +1414,108 @@ anychart.core.ui.Table.prototype.checkContent_ = function() {
             padding['bottom'](this.getPaddingProp_('bottomPadding', cell, rowObj, colObj, this));
             padding['left'](this.getPaddingProp_('leftPadding', cell, rowObj, colObj, this));
             bounds = padding.tightenBounds(bounds);
-            content.container(this.contentLayer_);
-            if (content instanceof anychart.core.ui.LabelsFactory.Label) {
-              label = /** @type {anychart.core.ui.LabelsFactory.Label} */(content);
-              label.positionProvider({'value': {'x': bounds.left, 'y': bounds.top}});
-              // if the label is not created by table label factory than we do not modify it's settings - only position
-              // it properly due to cell bounds.
-              if (label.parentLabelsFactory() == this.labelsFactory_) {
-                label['anchor'](anychart.enums.Anchor.LEFT_TOP);
-                label['width'](bounds.width);
-                label['height'](bounds.height);
-                // we apply custom label settings in the next order: table < col < row < cell
-                // keeping in mind, that table-wide settings are already applied to the factory
-                // also we use direct settingsObj reference to avoid unnecessary objects creation
-                var settings = colObj && colObj.settingsObj;
-                if (settings) label.setup(settings);
-                settings = rowObj && rowObj.settingsObj;
-                if (settings) label.setup(settings);
-                settings = cell.settingsObj;
-                if (settings) label.setup(settings);
-                label.resumeSignalsDispatching(false);
-                continue; // we don't want to listen labels of table labelsFactory_.
-              } else {
-                position = /** @type {string} */(label.getOption('position') ||
-                    (label.currentLabelsFactory() && label.currentLabelsFactory().getOption('position')) ||
-                    (label.parentLabelsFactory() && label.parentLabelsFactory().getOption('position')));
+            var settings;
+            if (contentIsGraphicsElement) {
+              content.parent(this.contentLayer_);
+              var realContent = (/** @type {acgraph.vector.Layer} */(content)).getChildAt(0);
+              var hAlign = this.resolveFullProperty_('hAlign', cell, rowObj, colObj, anychart.enums.HAlign.START);
+              var vAlign = this.resolveFullProperty_('vAlign', cell, rowObj, colObj, anychart.enums.VAlign.TOP);
+              if (hAlign == anychart.enums.HAlign.START) {
+                hAlign = this.resolveFullProperty_('textDirection', cell, rowObj, colObj, anychart.enums.TextDirection.RTL) == anychart.enums.TextDirection.RTL ?
+                    anychart.enums.HAlign.RIGHT :
+                    anychart.enums.HAlign.LEFT;
+              } else if (hAlign == anychart.enums.HAlign.END) {
+                hAlign = this.resolveFullProperty_('textDirection', cell, rowObj, colObj, anychart.enums.TextDirection.RTL) == anychart.enums.TextDirection.RTL ?
+                    anychart.enums.HAlign.LEFT :
+                    anychart.enums.HAlign.RIGHT;
+              }
+              var left, top;
+              switch (hAlign) {
+                case anychart.enums.HAlign.RIGHT:
+                  left = bounds.left + bounds.width - realContent.getAbsoluteWidth();
+                  break;
+                case anychart.enums.HAlign.CENTER:
+                  left = bounds.left + (bounds.width - realContent.getAbsoluteWidth()) / 2;
+                  break;
+                // case anychart.enums.HAlign.LEFT:
+                default:
+                  left = bounds.left;
+                  break;
+              }
+              switch (vAlign) {
+                case anychart.enums.VAlign.BOTTOM:
+                  top = bounds.top + bounds.height - realContent.getAbsoluteHeight();
+                  break;
+                case anychart.enums.VAlign.MIDDLE:
+                  top = bounds.top + (bounds.height - realContent.getAbsoluteHeight()) / 2;
+                  break;
+                  // case anychart.enums.VAlign.TOP:
+                default:
+                  top = bounds.top;
+                  break;
+              }
+              realContent.setPosition(left, top);
+              content.clip(bounds);
+            } else {
+              content.container(this.contentLayer_);
+              if (content instanceof anychart.core.ui.LabelsFactory.Label) {
+                label = /** @type {anychart.core.ui.LabelsFactory.Label} */(content);
+                label.positionProvider({
+                  'value': {
+                    'x': bounds.left,
+                    'y': bounds.top
+                  }
+                });
+                // if the label is not created by table label factory than we do not modify it's settings - only position
+                // it properly due to cell bounds.
+                if (label.parentLabelsFactory() == this.labelsFactory_) {
+                  label['anchor'](anychart.enums.Anchor.LEFT_TOP);
+                  label['width'](bounds.width);
+                  label['height'](bounds.height);
+                  // we apply custom label settings in the next order: table < col < row < cell
+                  // keeping in mind, that table-wide settings are already applied to the factory
+                  // also we use direct settingsObj reference to avoid unnecessary objects creation
+                  settings = colObj && colObj.settingsObj;
+                  if (settings) label.setup(settings);
+                  settings = rowObj && rowObj.settingsObj;
+                  if (settings) label.setup(settings);
+                  settings = cell.settingsObj;
+                  if (settings) label.setup(settings);
+                  label.resumeSignalsDispatching(false);
+                  continue; // we don't want to listen labels of table labelsFactory_.
+                } else {
+                  position = /** @type {string} */(label.getOption('position') ||
+                      (label.currentLabelsFactory() && label.currentLabelsFactory().getOption('position')) ||
+                      (label.parentLabelsFactory() && label.parentLabelsFactory().getOption('position')));
+                  positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
+                  label.positionProvider(positionProvider);
+                  label.draw();
+                }
+              } else if (content instanceof anychart.core.ui.MarkersFactory.Marker) {
+                marker = /** @type {anychart.core.ui.MarkersFactory.Marker} */(content);
+                position = /** @type {string} */(
+                    marker.position() ||
+                    (marker.currentMarkersFactory() && marker.currentMarkersFactory().position()) ||
+                    (marker.parentMarkersFactory() && marker.parentMarkersFactory().position()));
                 positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
-                label.positionProvider(positionProvider);
-                label.draw();
+                marker.positionProvider(positionProvider);
+                marker.draw();
+              } else if (content instanceof anychart.core.VisualBase) {
+                if (content.isChart && content.isChart()) {
+                  chart = /** @type {anychart.core.Chart} */(content);
+                  chart.originalAutoRedraw = /** @type {boolean} */(chart.autoRedraw());
+                  chart.autoRedraw(false);
+                }
+                var element = /** @type {anychart.core.VisualBase} */(content);
+                element.parentBounds(bounds);
+                if (element.draw)
+                  element.draw();
               }
-            } else if (content instanceof anychart.core.ui.MarkersFactory.Marker) {
-              marker = /** @type {anychart.core.ui.MarkersFactory.Marker} */(content);
-              position = /** @type {string} */(
-                  marker.position() ||
-                  (marker.currentMarkersFactory() && marker.currentMarkersFactory().position()) ||
-                  (marker.parentMarkersFactory() && marker.parentMarkersFactory().position()));
-              positionProvider = {'value': anychart.utils.getCoordinateByAnchor(bounds, position)};
-              marker.positionProvider(positionProvider);
-              marker.draw();
-            } else if (content instanceof anychart.core.VisualBase) {
-              if (content.isChart && content.isChart()) {
-                chart = /** @type {anychart.core.Chart} */(content);
-                chart.originalAutoRedraw = /** @type {boolean} */(chart.autoRedraw());
-                chart.autoRedraw(false);
-              }
-              var element = /** @type {anychart.core.VisualBase} */(content);
-              element.parentBounds(bounds);
-              if (element.draw)
-                element.draw();
+              content.listenSignals(this.handleContentInvalidation_);
             }
-            content.listenSignals(this.handleContentInvalidation_);
           } // we suppose that we have fixed overlapped content above.
-          content.resumeSignalsDispatching(false);
+          if (!contentIsGraphicsElement)
+            content.resumeSignalsDispatching(false);
         }
       }
     }
@@ -2081,7 +2143,7 @@ anychart.core.ui.Table.prototype.getCellBounds = function(row, col, rowSpan, col
 
 /**
  * Marks content to be cleared. Used by cells.
- * @param {anychart.core.VisualBase} content
+ * @param {acgraph.vector.Element|anychart.core.VisualBase} content
  */
 anychart.core.ui.Table.prototype.clearContent = function(content) {
   this.contentToClear_ = this.contentToClear_ || [];
@@ -2296,6 +2358,26 @@ anychart.core.ui.Table.prototype.getPaddingProp_ = function(propName, var_args) 
     }
   }
   return 0;
+};
+
+
+/**
+ * Resolves the property.
+ * @param {string} name
+ * @param {anychart.core.ui.table.Cell} cell
+ * @param {anychart.core.ui.table.Row} row
+ * @param {anychart.core.ui.table.Column} col
+ * @param {T} defVal
+ * @return {T}
+ * @template T
+ * @private
+ */
+anychart.core.ui.Table.prototype.resolveFullProperty_ = function(name, cell, row, col, defVal) {
+  return cell.settingsObj && cell.settingsObj[name] ||
+      row && row.settingsObj && row.settingsObj[name] ||
+      col && col.settingsObj && col.settingsObj[name] ||
+      this.settingsObj && this.settingsObj[name] ||
+      defVal;
 };
 
 
