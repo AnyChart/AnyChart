@@ -2485,9 +2485,9 @@ anychart.charts.Stock.prototype.toCsv = function(opt_chartDataExportMode, opt_cs
   var groupedData = (opt_chartDataExportMode == anychart.enums.ChartDataExportMode.GROUPED);
   var settings = goog.isObject(opt_csvSettings) ? opt_csvSettings : {};
   var rowsSeparator = settings['rowsSeparator'] || '\n';
-  this.checkSeparator(rowsSeparator);
+  anychart.utils.checkSeparator(rowsSeparator);
   var columnsSeparator = settings['columnsSeparator'] || ',';
-  this.checkSeparator(columnsSeparator);
+  anychart.utils.checkSeparator(columnsSeparator);
   var ignoreFirstRow = settings['ignoreFirstRow'] || false;
 
   var plot;

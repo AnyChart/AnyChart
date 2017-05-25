@@ -971,6 +971,19 @@ anychart.utils.trim = function(str) {
 };
 
 
+/**
+ * Checks whether separator is valid.
+ * Throws an error if invalid.
+ * @param {string} separator
+ */
+anychart.utils.checkSeparator = function(separator) {
+  if (separator.indexOf('\"') != -1) {
+    anychart.core.reporting.error(anychart.enums.ErrorCode.CSV_DOUBLE_QUOTE_IN_SEPARATOR);
+    throw new Error('Double quotes in separator are not allowed');
+  }
+};
+
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //  XML <-> JSON

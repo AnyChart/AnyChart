@@ -3126,19 +3126,6 @@ anychart.core.Chart.prototype.extractHeaders = function(dataSet, headers, header
 
 
 /**
- * Checks whether separator is valid.
- * Throws an error if invalid.
- * @param {string} separator
- */
-anychart.core.Chart.prototype.checkSeparator = function(separator) {
-  if (separator.indexOf('\"') != -1) {
-    anychart.core.reporting.error(anychart.enums.ErrorCode.CSV_DOUBLE_QUOTE_IN_SEPARATOR);
-    throw new Error('Double quotes in separator are not allowed');
-  }
-};
-
-
-/**
  * Escapes values.
  * @param {Array} row Array of values.
  * @param {string} colSep Columns separator.
@@ -3205,9 +3192,9 @@ anychart.core.Chart.prototype.makeObject_ = function(node, rawData, headers, hea
 anychart.core.Chart.prototype.toTreeDataCsv_ = function(opt_csvSettings) {
   var settings = goog.isObject(opt_csvSettings) ? opt_csvSettings : {};
   var rowsSeparator = settings['rowsSeparator'] || '\n';
-  this.checkSeparator(rowsSeparator);
+  anychart.utils.checkSeparator(rowsSeparator);
   var columnsSeparator = settings['columnsSeparator'] || ',';
-  this.checkSeparator(columnsSeparator);
+  anychart.utils.checkSeparator(columnsSeparator);
   var ignoreFirstRow = settings['ignoreFirstRow'] || false;
 
   var data = (/** @type {{data:Function}} */(this)).data();
@@ -3344,9 +3331,9 @@ anychart.core.Chart.prototype.toCsv = function(opt_chartDataExportMode, opt_csvS
       type == anychart.enums.ChartTypes.QUADRANT);
   var settings = goog.isObject(opt_csvSettings) ? opt_csvSettings : {};
   var rowsSeparator = settings['rowsSeparator'] || '\n';
-  this.checkSeparator(rowsSeparator);
+  anychart.utils.checkSeparator(rowsSeparator);
   var columnsSeparator = settings['columnsSeparator'] || ',';
-  this.checkSeparator(columnsSeparator);
+  anychart.utils.checkSeparator(columnsSeparator);
   var ignoreFirstRow = settings['ignoreFirstRow'] || false;
 
   var isGauge =
