@@ -909,6 +909,22 @@ anychart.venn = anychart.getFeatureOrError('anychart.venn', 'Venn chart');
 anychart.tagCloud = anychart.tagCloud || anychart.createNFIMError('TagCloud chart');
 
 
+/** @ignoreDoc */
+anychart.mekko = anychart.mekko || anychart.createNFIMError('Mekko chart');
+
+
+/** @ignoreDoc */
+anychart.mosaic = anychart.mosaic || anychart.createNFIMError('Mosaic chart');
+
+
+/** @ignoreDoc */
+anychart.barmekko = anychart.barmekko || anychart.createNFIMError('Barmekko chart');
+
+
+/** @inheritDoc */
+anychart.waterfall = anychart.waterfall || anychart.createNFIMError('Waterfall chart');
+
+
 //region ------ Standalones
 /** @ignoreDoc */
 anychart.standalones.background = anychart.getFeatureOrError('anychart.standalones.background', 'anychart.standalones.Background');
@@ -1098,18 +1114,6 @@ anychart.standalones.grids.polar = anychart.getFeatureOrError('anychart.standalo
 anychart.standalones.grids.radar = anychart.getFeatureOrError('anychart.standalones.grids.radar', 'anychart.standalones.grids.Radar');
 
 
-/** @ignoreDoc */
-anychart.mekko = anychart.mekko || anychart.createNFIMError('Mekko chart');
-
-
-/** @ignoreDoc */
-anychart.mosaic = anychart.mosaic || anychart.createNFIMError('Mosaic chart');
-
-
-/** @ignoreDoc */
-anychart.barmekko = anychart.barmekko || anychart.createNFIMError('Barmekko chart');
-
-
 //endregion
 //region ------ UI
 /** @ignoreDoc */
@@ -1271,6 +1275,7 @@ goog.exportSymbol('anychart.mekko', anychart.mekko);
 goog.exportSymbol('anychart.mosaic', anychart.mosaic);
 goog.exportSymbol('anychart.barmekko', anychart.barmekko);
 goog.exportSymbol('anychart.tagCloud', anychart.tagCloud);
+goog.exportSymbol('anychart.waterfall', anychart.waterfall);
 goog.exportSymbol('anychart.standalones.background', anychart.standalones.background);
 goog.exportSymbol('anychart.ui.background', anychart.ui.background);
 goog.exportSymbol('anychart.standalones.colorRange', anychart.standalones.colorRange);

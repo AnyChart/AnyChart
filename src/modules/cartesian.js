@@ -18,3 +18,4 @@ goog.require('anychart.modules.line');
 goog.require('anychart.modules.pareto');
 goog.require('anychart.modules.verticalArea');
 goog.require('anychart.modules.verticalLine');
+goog.require('anychart.modules.waterfall');

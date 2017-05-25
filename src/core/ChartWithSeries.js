@@ -183,7 +183,8 @@ anychart.core.ChartWithSeries.prototype.normalizeSeriesType = function(type) {
  *    anychart.enums.RadarSeriesType |
  *    anychart.enums.PolarSeriesType |
  *    anychart.enums.MapSeriesType |
- *    anychart.enums.MekkoSeriesType
+ *    anychart.enums.MekkoSeriesType |
+ *    anychart.enums.WaterfallSeriesType
  * )=} opt_value Default series type.
  * @return {
  *    anychart.core.ChartWithSeries |
@@ -192,7 +193,8 @@ anychart.core.ChartWithSeries.prototype.normalizeSeriesType = function(type) {
  *    anychart.enums.RadarSeriesType |
  *    anychart.enums.PolarSeriesType |
  *    anychart.enums.MapSeriesType |
- *    anychart.enums.MekkoSeriesType
+ *    anychart.enums.MekkoSeriesType |
+ *    anychart.enums.WaterfallSeriesType
  * } Default series type or self for chaining.
  */
 anychart.core.ChartWithSeries.prototype.defaultSeriesType = function(opt_value) {
@@ -884,7 +886,8 @@ anychart.core.ChartWithSeries.seriesReferenceValues = {
   'choropleth': ['id', 'value'],
   'markerMap': ['id', 'long', 'lat'],
   'bubbleMap': ['id', 'long', 'lat', 'size'],
-  'hilo': ['high', 'low']
+  'hilo': ['high', 'low'],
+  'waterfall': ['value']
 };
 
 
@@ -1050,6 +1053,13 @@ anychart.core.ChartWithSeries.prototype.beforeSeriesDraw = function() {
 
 
 /**
+ * A hook right after series were drawn.
+ */
+anychart.core.ChartWithSeries.prototype.afterSeriesDraw = function() {
+};
+
+
+/**
  * Draws series.
  * @param {number=} opt_topAxisPadding
  * @param {number=} opt_rightAxisPadding
@@ -1072,6 +1082,7 @@ anychart.core.ChartWithSeries.prototype.drawSeries = function(opt_topAxisPadding
     for (i = 0; i < this.seriesList.length; i++) {
       this.seriesList[i].draw();
     }
+    this.afterSeriesDraw();
 
     this.markConsistent(anychart.ConsistencyState.SERIES_CHART_SERIES);
     anychart.core.Base.resumeSignalsDispatchingFalse(this.seriesList);

@@ -1003,7 +1003,14 @@ anychart.themes.merging.mergingMap_ = [
       'verticalLine',
       'jumpLine',
       'stick',
-      'pareto'
+      'pareto',
+      'waterfall'
+    ]
+  },
+  {
+    defaultObj: 'waterfall.defaultSeriesSettings.barLike',
+    targets: [
+      'waterfall.defaultSeriesSettings.waterfall'
     ]
   },
   {

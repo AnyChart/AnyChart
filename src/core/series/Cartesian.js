@@ -682,6 +682,8 @@ anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPus
       additionalNames.push(name);
   }
 
+  var postProcessingMeta = this.initPostProcessingMeta();
+
   while (iterator.advance()) {
     var xValue = xNormalizer(iterator.get('x'));
     if (xMissingChecker(xValue)) // we do not add missings for points that have undefined X
@@ -714,6 +716,9 @@ anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPus
       data: pointData,
       meta: meta
     };
+
+    this.postProcessPoint(iterator, point, postProcessingMeta);
+
     dataPusher(data, point);
   }
 
@@ -745,6 +750,25 @@ anychart.core.series.Cartesian.prototype.getDrawingData = function(data, dataPus
     hasPointYErrors: hasYErrors,
     hasPointErrors: hasXErrors || hasYErrors
   };
+};
+
+
+/**
+ * Creates a meta object used in point post-processing.
+ * @return {?Object}
+ */
+anychart.core.series.Cartesian.prototype.initPostProcessingMeta = function() {
+  return null;
+};
+
+
+/**
+ * Modifies the point info, if needed.
+ * @param {anychart.data.IRowInfo} iterator
+ * @param {{data: Object, meta: Object}} point
+ * @param {?Object} processingMeta
+ */
+anychart.core.series.Cartesian.prototype.postProcessPoint = function(iterator, point, processingMeta) {
 };
 
 

@@ -25,7 +25,8 @@
         {"$ref": "#/definitions/anychart.charts.Pert"},
         {"$ref": "#/definitions/anychart.charts.Mekko"},
         {"$ref": "#/definitions/anychart.charts.TagCloud"},
-        {"$ref": "#/definitions/anychart.charts.Venn"}
+        {"$ref": "#/definitions/anychart.charts.Venn"},
+        {"$ref": "#/definitions/anychart.charts.Waterfall"}
       ],
       "properties": {
         "container": {
@@ -216,7 +217,7 @@
       }
     },
 
-    "anychart.charts.Cartesian": {
+    "anychart.core.CartesianBase": {
       "type": "object",
       "allOf": [
         {"$ref": "#/definitions/anychart.core.SeparateChart"}
@@ -447,6 +448,65 @@
         "zDistribution": {"type": ["boolean"]}
       },
       "required": ["type"]
+    },
+    "anychart.charts.Cartesian": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/anychart.core.CartesianBase"
+        }
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "cartesian",
+            "cartesian3d",
+            "area",
+            "verticalArea",
+            "area3d",
+            "bar",
+            "bar3d",
+            "box",
+            "bubble",
+            "column",
+            "column3d",
+            "financial",
+            "line",
+            "verticalLine",
+            "marker",
+            "jumpLine",
+            "stick",
+            "pareto"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "anychart.charts.Waterfall": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/anychart.core.CartesianBase"
+        }
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "waterfall"
+          ]
+        },
+        "dataMode": {
+          "$ref": "#/definitions/anychart.enums.WaterfallDataMode"
+        },
+        "connectorStroke": {
+          "$ref": "#/definitions/stroke"
+        }
+      },
+      "required": [
+        "type"
+      ]
     },
     "anychart.charts.Funnel": {
       "type": "object",
@@ -2742,7 +2802,8 @@
             "choropleth",
             "connector",
             "mekko",
-            "hilo"
+            "hilo",
+            "waterfall"
           ]
         },
         "id": {
@@ -5809,6 +5870,12 @@
     },
     "anychart.enums.CrosshairDisplayMode": {
       "enum": ["float", "sticky"]
+    },
+    "anychart.enums.WaterfallDataMode": {
+      "enum": [
+        "diff",
+        "absolute"
+      ]
     },
 
     "acgraph.vector.HatchFill.HatchFillType": {

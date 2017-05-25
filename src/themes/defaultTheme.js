@@ -37,6 +37,13 @@ goog.provide('anychart.themes.defaultTheme');
   var risingColor = '#64b5f6';
   var fallingColor = '#ef6c00';
 
+  var waterfallTotalFill = '#96a6a6';
+  var waterfallRisingFill = '#64b5f6';
+  var waterfallFallingFill = '#ef6c00';
+  var waterfallTotalStroke = '#697474';
+  var waterfallRisingStroke = '#467fac';
+  var waterfallFallingStroke = '#a74c00';
+
 
   /**
    * @const {string}
@@ -2104,6 +2111,61 @@ goog.provide('anychart.themes.defaultTheme');
           }
         }
       ]
+    },
+    'waterfall': {
+      'dataMode': 'diff',
+      'connectorStroke': waterfallTotalStroke,
+      'defaultSeriesType': 'waterfall',
+      'defaultSeriesSettings': {
+        'waterfall': {
+          'fill': waterfallTotalFill,
+          // 'hoverFill': returnSourceColor65,
+          // 'selectFill': defaultSelectColor,
+          'stroke': waterfallTotalStroke,
+          // 'hoverStroke': returnLightenStrokeSourceColor,
+          // 'selectStroke': defaultSelectColor,
+
+          'risingFill': waterfallRisingFill,
+          'fallingFill': waterfallFallingFill,
+          'hoverRisingFill': returnSourceColor65,
+          'hoverFallingFill': returnSourceColor65,
+          'risingStroke': waterfallRisingStroke,
+          'fallingStroke': waterfallFallingStroke,
+          'hoverRisingStroke': returnLightenStrokeSourceColor,
+          'hoverFallingStroke': returnLightenStrokeSourceColor,
+
+          'risingHatchFill': false,
+          'hoverRisingHatchFill': null,
+          'selectRisingHatchFill': null,
+          'fallingHatchFill': false,
+          'hoverFallingHatchFill': null,
+          'selectFallingHatchFill': null,
+          'selectFallingFill': defaultSelectColor,
+          'selectRisingFill': defaultSelectColor,
+          'selectRisingStroke': defaultSelectColor,
+          'selectFallingStroke': defaultSelectColor,
+
+          'labels': {
+            'enabled': true,
+            'format': function() {
+              return locNum(this['isTotal'] ? this['absolute'] : this['diff']);
+            }
+          },
+          'tooltip': {
+            'format': function() {
+              if (this['isTotal']) {
+                return 'Absolute: ' + locNum(this['absolute']);
+              } else {
+                return 'Absolute: ' + locNum(this['absolute']) + '\nDifference: ' + locNum(this['diff']);
+              }
+            }
+          }
+        }
+      },
+      'legend': {
+        'enabled': true,
+        'itemsSourceMode': 'categories'
+      }
     },
 
     // merges with nothing

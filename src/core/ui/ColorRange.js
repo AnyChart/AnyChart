@@ -685,7 +685,7 @@ anychart.core.ui.ColorRange.prototype.showMarker = function(value) {
 
   var scale = this.scale();
   var target = /** @type {anychart.core.series.Map|anychart.charts.TagCloud} */(this.target_);
-  var targetScale = target.colorScale() || target.getColorScale();
+  var targetScale = target.colorScale() || (target.getColorScale ? target.getColorScale() : void 0);
   var isMarker = this.marker_ && this.marker_.enabled();
   var isTarget = target && target.enabled() && targetScale == scale;
 

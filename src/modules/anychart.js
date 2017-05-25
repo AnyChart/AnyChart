@@ -23,3 +23,4 @@ goog.require('anychart.modules.sparkline');
 goog.require('anychart.modules.tagCloud');
 goog.require('anychart.modules.treeMap');
 goog.require('anychart.modules.venn');
+goog.require('anychart.modules.waterfall');

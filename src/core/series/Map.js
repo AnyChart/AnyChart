@@ -64,6 +64,13 @@ anychart.core.series.Map.prototype.SUPPORTED_CONSISTENCY_STATES =
 anychart.core.series.Map.prototype.LABELS_ZINDEX = anychart.core.shapeManagers.LABELS_OVER_MARKERS_ZINDEX;
 
 
+/**
+ * Token aliases list.
+ * @type {Object.<string, string>}
+ */
+anychart.core.series.Map.prototype.TOKEN_ALIASES = ({});
+
+
 //endregion
 //region --- Infrastructure
 /** @inheritDoc */
@@ -1027,9 +1034,19 @@ anychart.core.series.Map.prototype.getLegendItemData = function(itemsFormat) {
 //endregion
 //region --- Position and Formating
 /** @inheritDoc */
-anychart.core.series.Map.prototype.updateContext = function(provider, opt_rowInfo) {
-  var rowInfo = opt_rowInfo || this.getIterator();
+anychart.core.series.Map.prototype.createStatisticsSource = function(rowInfo) {
+  return [this, this.getChart()];
+};
 
+
+/** @inheritDoc */
+anychart.core.series.Map.prototype.getCustomTokenValues = function(rowInfo) {
+  return {};
+};
+
+
+/** @inheritDoc */
+anychart.core.series.Map.prototype.getContextProviderValues = function(provider, rowInfo) {
   var scale = this.getXScale();
   var values = {
     'chart': {value: this.getChart(), type: anychart.enums.TokenType.UNKNOWN},
@@ -1085,11 +1102,7 @@ anychart.core.series.Map.prototype.updateContext = function(provider, opt_rowInf
     }
   }
 
-  provider
-      .dataSource(rowInfo)
-      .statisticsSources([this, this.getChart()]);
-
-  return /** @type {anychart.format.Context} */ (provider.propagate(values));
+  return values;
 };
 
 

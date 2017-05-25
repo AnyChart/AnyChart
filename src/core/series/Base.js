@@ -189,6 +189,20 @@ anychart.core.series.Base.prototype.SUPPORTED_SIGNALS =
 anychart.core.series.Base.prototype.LABELS_ZINDEX = anychart.core.shapeManagers.LABELS_ZINDEX;
 
 
+/**
+ * Token aliases list.
+ * @type {Object.<string, string>}
+ */
+anychart.core.series.Base.prototype.TOKEN_ALIASES = (function() {
+  var tokenAliases = {};
+  tokenAliases[anychart.enums.StringToken.BUBBLE_SIZE] = 'size';
+  tokenAliases[anychart.enums.StringToken.RANGE_START] = 'low';
+  tokenAliases[anychart.enums.StringToken.RANGE_END] = 'high';
+  tokenAliases[anychart.enums.StringToken.X_VALUE] = 'x';
+  return tokenAliases;
+})();
+
+
 //endregion
 //region --- Properties
 //----------------------------------------------------------------------------------------------------------------------
@@ -2050,13 +2064,12 @@ anychart.core.series.Base.prototype.getDirectionAngle = function(positive) {
  */
 anychart.core.series.Base.prototype.checkDirectionIsPositive = function(position) {
   var result;
-  var inverted = /** @type {boolean} */(this.yScale().inverted());
   if (position == 'low' || position == 'lowest')
-    result = inverted;
+    result = false;
   else if (position == 'high' || position == 'highest')
-    result = !inverted;
+    result = true;
   else
-    result = !!(inverted ^ ((Number(this.getIterator().get(position)) || 0) >= 0));
+    result = (Number(this.getIterator().get(position)) || 0) >= 0;
   return result;
 };
 
@@ -3478,28 +3491,84 @@ anychart.core.series.Base.prototype.makePointMeta = function(rowInfo, yNames, yC
 //
 //----------------------------------------------------------------------------------------------------------------------
 /**
- * Applies required data to format context.
- * @param {anychart.format.Context} provider - Format context.
- * @param {anychart.data.IRowInfo=} opt_rowInfo - Data source.
- * @return {anychart.format.Context} - Updated format context.
+ * Creates statistics source to update the context.
+ * @param {anychart.data.IRowInfo} rowInfo
+ * @return {Array.<anychart.core.BaseContext.StatisticsSource>}
+ * @protected
  */
-anychart.core.series.Base.prototype.updateContext = function(provider, opt_rowInfo) {
-  var rowInfo = opt_rowInfo || this.getIterator();
+anychart.core.series.Base.prototype.createStatisticsSource = function(rowInfo) {
+  return [this.getPoint(rowInfo.getIndex()), this, this.getChart()];
+};
+
+
+/**
+ * Returns custom token values list.
+ * @param {anychart.data.IRowInfo} rowInfo
+ * @return {Object.<string, anychart.core.BaseContext.TypedValue>}
+ * @protected
+ */
+anychart.core.series.Base.prototype.getCustomTokenValues = function(rowInfo) {
+  var tokenCustomValues = {};
+  var diff = /** @type {number} */ (rowInfo.get('high')) - /** @type {number} */ (rowInfo.get('low'));
+  tokenCustomValues[anychart.enums.StringToken.RANGE] = {
+    value: diff,
+    type: anychart.enums.TokenType.NUMBER
+  };
+  tokenCustomValues[anychart.enums.StringToken.NAME] = {
+    value: rowInfo.get('name'),
+    type: anychart.enums.TokenType.STRING
+  };
+  return tokenCustomValues;
+};
+
+
+/**
+ * Returns context provider values to propagate to it.
+ * @param {anychart.format.Context} provider - Format context.
+ * @param {anychart.data.IRowInfo} rowInfo
+ * @return {Object.<string, anychart.core.BaseContext.TypedValue>}
+ * @protected
+ */
+anychart.core.series.Base.prototype.getContextProviderValues = function(provider, rowInfo) {
   var scale = this.getXScale();
   var values = {
-    'chart': {value: this.getChart(), type: anychart.enums.TokenType.UNKNOWN},
-    'series': {value: this, type: anychart.enums.TokenType.UNKNOWN},
-    'xScale': {value: scale, type: anychart.enums.TokenType.UNKNOWN},
-    'index': {value: rowInfo.getIndex(), type: anychart.enums.TokenType.NUMBER},
-    'x': {value: rowInfo.get('x'), type: anychart.enums.TokenType.STRING},
-    'seriesName': {value: this.name(), type: anychart.enums.TokenType.STRING}
+    'chart': {
+      value: this.getChart(),
+      type: anychart.enums.TokenType.UNKNOWN
+    },
+    'series': {
+      value: this,
+      type: anychart.enums.TokenType.UNKNOWN
+    },
+    'xScale': {
+      value: scale,
+      type: anychart.enums.TokenType.UNKNOWN
+    },
+    'index': {
+      value: rowInfo.getIndex(),
+      type: anychart.enums.TokenType.NUMBER
+    },
+    'x': {
+      value: rowInfo.get('x'),
+      type: anychart.enums.TokenType.STRING
+    },
+    'seriesName': {
+      value: this.name(),
+      type: anychart.enums.TokenType.STRING
+    }
   };
 
   if (scale && goog.isFunction(scale.getType))
-    values['xScaleType'] = {value: scale.getType(), type: anychart.enums.TokenType.STRING};
+    values['xScaleType'] = {
+      value: scale.getType(),
+      type: anychart.enums.TokenType.STRING
+    };
 
   if (this.isSizeBased())
-    values['size'] = {value: rowInfo.get('size'), type: anychart.enums.TokenType.NUMBER};
+    values['size'] = {
+      value: rowInfo.get('size'),
+      type: anychart.enums.TokenType.NUMBER
+    };
 
   if (this.supportsError()) {
     /** @type {anychart.core.utils.ISeriesWithError} */
@@ -3509,40 +3578,56 @@ anychart.core.series.Base.prototype.updateContext = function(provider, opt_rowIn
     var error;
     if (mode == anychart.enums.ErrorMode.BOTH || mode == anychart.enums.ErrorMode.VALUE) {
       error = series.getErrorValues(false);
-      values['valueLowerError'] = {value: error[0], type: anychart.enums.TokenType.NUMBER};
-      values['valueUpperError'] = {value: error[1], type: anychart.enums.TokenType.NUMBER};
+      values['valueLowerError'] = {
+        value: error[0],
+        type: anychart.enums.TokenType.NUMBER
+      };
+      values['valueUpperError'] = {
+        value: error[1],
+        type: anychart.enums.TokenType.NUMBER
+      };
     }
     if (mode == anychart.enums.ErrorMode.BOTH || mode == anychart.enums.ErrorMode.X) {
       error = series.getErrorValues(true);
-      values['xLowerError'] = {value: error[0], type: anychart.enums.TokenType.NUMBER};
-      values['xUpperError'] = {value: error[1], type: anychart.enums.TokenType.NUMBER};
+      values['xLowerError'] = {
+        value: error[0],
+        type: anychart.enums.TokenType.NUMBER
+      };
+      values['xUpperError'] = {
+        value: error[1],
+        type: anychart.enums.TokenType.NUMBER
+      };
     }
   }
 
   var refValueNames = this.getYValueNames();
   for (var i = 0; i < refValueNames.length; i++) {
     var refName = refValueNames[i];
-    values[refName] = {value: rowInfo.get(refName), type: anychart.enums.TokenType.NUMBER};
+    values[refName] = {
+      value: rowInfo.get(refName),
+      type: anychart.enums.TokenType.NUMBER
+    };
   }
+  return values;
+};
 
-  var tokenAliases = {};
-  tokenAliases[anychart.enums.StringToken.BUBBLE_SIZE] = 'size';
-  tokenAliases[anychart.enums.StringToken.RANGE_START] = 'low';
-  tokenAliases[anychart.enums.StringToken.RANGE_END] = 'high';
-  tokenAliases[anychart.enums.StringToken.X_VALUE] = 'x';
 
-  var tokenCustomValues = {};
-  var diff = /** @type {number} */ (rowInfo.get('high')) - /** @type {number} */ (rowInfo.get('low'));
-  tokenCustomValues[anychart.enums.StringToken.RANGE] = {value: diff, type: anychart.enums.TokenType.NUMBER};
-  tokenCustomValues[anychart.enums.StringToken.NAME] = {value: rowInfo.get('name'), type: anychart.enums.TokenType.STRING};
+/**
+ * Applies required data to format context.
+ * @param {anychart.format.Context} provider - Format context.
+ * @param {anychart.data.IRowInfo=} opt_rowInfo - Data source.
+ * @return {anychart.format.Context} - Updated format context.
+ */
+anychart.core.series.Base.prototype.updateContext = function(provider, opt_rowInfo) {
+  var rowInfo = opt_rowInfo || this.getIterator();
 
   provider
-      .statisticsSources([this.getPoint(rowInfo.getIndex()), this, this.getChart()])
+      .statisticsSources(this.createStatisticsSource(rowInfo))
       .dataSource(rowInfo)
-      .tokenAliases(tokenAliases)
-      .tokenCustomValues(tokenCustomValues);
+      .tokenAliases(this.TOKEN_ALIASES)
+      .tokenCustomValues(this.getCustomTokenValues(rowInfo));
 
-  return /** @type {anychart.format.Context} */ (provider.propagate(values));
+  return /** @type {anychart.format.Context} */ (provider.propagate(this.getContextProviderValues(provider, rowInfo)));
 };
 
 

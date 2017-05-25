@@ -57,7 +57,8 @@ anychart.enums.ChartTypes = {
   BARMEKKO: 'barmekko',
   TAG_CLOUD: 'tagCloud',
   VENN: 'venn',
-  HILO: 'hilo'
+  HILO: 'hilo',
+  WATERFALL: 'waterfall'
 };
 
 
@@ -3075,6 +3076,48 @@ anychart.enums.MekkoSeriesType = {
 
 //----------------------------------------------------------------------------------------------------------------------
 //
+//  WaterfallSeriesType
+//
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * List of all series types.
+ * @enum {string}
+ */
+anychart.enums.WaterfallSeriesType = {
+  WATERFALL: 'waterfall'
+};
+
+
+/**
+ * List of waterfall chart data modes.
+ * @enum {string}
+ */
+anychart.enums.WaterfallDataMode = {
+  ABSOLUTE: 'absolute',
+  DIFF: 'diff'
+};
+
+
+/**
+ * Normalizes waterfall datamode. Defaults to ABSOLUTE.
+ * @param {*} value Value to normalize.
+ * @param {anychart.enums.WaterfallDataMode=} opt_default Default value.
+ * @return {anychart.enums.WaterfallDataMode}
+ */
+anychart.enums.normalizeWaterfallDataMode = function(value, opt_default) {
+  value = (String(value)).toLowerCase();
+  switch (value) {
+    case 'diff':
+      return anychart.enums.WaterfallDataMode.DIFF;
+    case 'absolute':
+      return anychart.enums.WaterfallDataMode.ABSOLUTE;
+  }
+  return opt_default || anychart.enums.WaterfallDataMode.ABSOLUTE;
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
 //  Scale types
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -4907,6 +4950,21 @@ anychart.enums.StringToken = {
   RELATIVE_FREQUENCY: '%RF',
 
   /**
+   * Point value relative to the previous point. Used in Waterfall series.
+   */
+  DIFF: '%Diff',
+
+  /**
+   * Absolute point value. Used in Waterfall series.
+   */
+  ABSOLUTE: '%Absolute',
+
+  /**
+   * If the point is a total point. Used in Waterfall series.
+   */
+  IS_TOTAL: '%IsTotal',
+
+  /**
    * Resource index that holds the activity. Used in Resource charts.
    */
   RESOURCE_INDEX: 'resourceIndex',
@@ -5616,7 +5674,8 @@ anychart.enums.SeriesDrawerTypes = {
   POLAR_RANGE_COLUMN: 28,
   MEKKO: 29,
   HEAT_MAP: 30,
-  RANGE_STICK: 31
+  RANGE_STICK: 31,
+  WATERFALL: 32
 };
 
 
@@ -6979,7 +7038,5 @@ goog.exportSymbol('anychart.enums.TextWrap.BY_WORD', anychart.enums.TextWrap.BY_
 goog.exportSymbol('anychart.enums.TagCloudMode.SPIRAL', anychart.enums.TagCloudMode.SPIRAL);
 goog.exportSymbol('anychart.enums.TagCloudMode.RECT', anychart.enums.TagCloudMode.RECT);
 
-
-
-
-
+goog.exportSymbol('anychart.enums.WaterfallDataMode.ABSOLUTE', anychart.enums.WaterfallDataMode.ABSOLUTE);
+goog.exportSymbol('anychart.enums.WaterfallDataMode.DIFF', anychart.enums.WaterfallDataMode.DIFF);

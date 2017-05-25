@@ -226,7 +226,10 @@ anychart.data.Mapping.DEFAULT_ARRAY_MAPPING = {
   'heat': [2],
 
   // tag cloud
-  'category': [2]
+  'category': [2],
+
+  // water fall
+  'isTotal': [2]
 };
 
 

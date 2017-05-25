@@ -257,6 +257,8 @@
         <xsd:attribute name="horizontal_spacing" type="simple.NumberOrPercent"/>
         <!-- Venn attributes -->
         <xsd:attribute name="data_separator" type="xsd:string"/>
+        <!-- Waterfall attributes -->
+        <xsd:attribute name="data_mode" type="enums.WaterfallDataMode"/>
     </xsd:complexType>
 
     <xsd:complexType name="Gauge">
@@ -1662,6 +1664,13 @@
         </xsd:restriction>
     </xsd:simpleType>
 
+    <xsd:simpleType name="enums.WaterfallDataMode">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="absolute"/>
+            <xsd:enumeration value="diff"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
     <!-- utils complex types -->
 
     <xsd:complexType name="Angle_list">
@@ -3022,6 +3031,7 @@
             <xsd:enumeration value="barmekko"/>
             <xsd:enumeration value="venn"/>
             <xsd:enumeration value="hilo"/>
+            <xsd:enumeration value="waterfall"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -3289,6 +3299,7 @@
             <xsd:enumeration value="polyline"/>
             <xsd:enumeration value="mekko"/>
             <xsd:enumeration value="hilo"/>
+            <xsd:enumeration value="waterfall"/>
         </xsd:restriction>
     </xsd:simpleType>
 
