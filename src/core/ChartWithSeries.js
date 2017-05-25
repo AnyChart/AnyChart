@@ -421,6 +421,12 @@ anychart.core.ChartWithSeries.prototype.removeAllSeries = function() {
         anychart.ConsistencyState.SCALE_CHART_SCALE_MAPS,
         anychart.Signal.NEEDS_REDRAW);
     this.resumeSignalsDispatching(true);
+    // When we deleting ALL series, we should clear this statuses, cause they are loss the actuality
+    // Also we should unlisten tooltip update, cause after removing series it can be fired on disposed series
+    // See DVF-3020
+    this.prevHoverSeriesStatus = null;
+    this.prevSelectSeriesStatus = null;
+    this.unlisten(goog.events.EventType.MOUSEMOVE, this.updateTooltip);
     anychart.globalLock.unlock();
   }
   return this;
