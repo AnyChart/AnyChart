@@ -1229,18 +1229,22 @@ anychart.charts.Stock.prototype.calculateScales_ = function() {
           scale.startAutoCalc();
           scales.push(scale);
         }
-        if (series.planIsStacked()) {
-          hasPercentStacks = this.calcStacking_(series, stacksByScale) || hasPercentStacks;
-        } else if (series.enabled()) {
-          scale.extendDataRange.apply(scale, series.getScaleReferenceValues());
+        if (series.enabled()) {
+          if (series.planIsStacked()) {
+            hasPercentStacks = this.calcStacking_(series, stacksByScale) || hasPercentStacks;
+          } else if (series.enabled()) {
+            scale.extendDataRange.apply(scale, series.getScaleReferenceValues());
+          }
         }
       }
       if (hasPercentStacks) {
         for (j = 0; j < seriesList.length; j++) {
           series = seriesList[j];
-          scale = /** @type {anychart.scales.Base} */(series.yScale());
-          if (scale.stackMode() == anychart.enums.ScaleStackMode.PERCENT) {
-            this.finalizePercentStackCalc_(series, scale, stacksByScale);
+          if (series.enabled()) {
+            scale = /** @type {anychart.scales.Base} */(series.yScale());
+            if (scale.stackMode() == anychart.enums.ScaleStackMode.PERCENT) {
+              this.finalizePercentStackCalc_(series, scale, stacksByScale);
+            }
           }
         }
       }
@@ -1259,18 +1263,22 @@ anychart.charts.Stock.prototype.calculateScales_ = function() {
         scale.startAutoCalc();
         scales.push(scale);
       }
-      if (series.planIsStacked()) {
-        hasPercentStacks = this.calcStacking_(series, stacksByScale) || hasPercentStacks;
-      } else if (series.enabled()) {
-        scale.extendDataRange.apply(scale, series.getScaleReferenceValues());
+      if (series.enabled()) {
+        if (series.planIsStacked()) {
+          hasPercentStacks = this.calcStacking_(series, stacksByScale) || hasPercentStacks;
+        } else if (series.enabled()) {
+          scale.extendDataRange.apply(scale, series.getScaleReferenceValues());
+        }
       }
     }
     if (hasPercentStacks) {
       for (j = 0; j < seriesList.length; j++) {
         series = seriesList[j];
-        scale = /** @type {anychart.scales.Base} */(series.yScale());
-        if (scale.stackMode() == anychart.enums.ScaleStackMode.PERCENT) {
-          this.finalizePercentStackCalc_(series, scale, stacksByScale);
+        if (series.enabled()) {
+          scale = /** @type {anychart.scales.Base} */(series.yScale());
+          if (scale.stackMode() == anychart.enums.ScaleStackMode.PERCENT) {
+            this.finalizePercentStackCalc_(series, scale, stacksByScale);
+          }
         }
       }
     }
