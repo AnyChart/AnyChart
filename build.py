@@ -314,7 +314,8 @@ def __compile_project_each():
     t = time.time()
     global arguments
     arguments['sources'] = False
-    modules = __get_modules_list()
+    modules = ['anychart_bundle', 'anychart', 'anygantt', 'anymap', 'anystock']
+    print modules
     args = []
     for module in modules:
         arguments['modules'] = [module]
