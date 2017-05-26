@@ -1883,14 +1883,15 @@ anychart.core.ui.Tooltip.prototype.setContainerToTooltip_ = function(tooltip) {
       tooltip.getRootLayer_().parent(/** @type {acgraph.vector.ILayer} */ (tooltip.container()));
       tooltip.markConsistent(anychart.ConsistencyState.CONTAINER);
     } else {
-      var stageUid = tooltip.getCurrentStageUid_();
-      tc = anychart.utils.tooltipContainersRegistry[stageUid];
-      if (!tc) {
-        tc = new anychart.core.utils.LocalTooltipContainer();
-        anychart.utils.tooltipContainersRegistry[stageUid] = tc;
-      }
       var container = this.getContainer_(tooltip);
       if (container) {
+        var stageUid = tooltip.getCurrentStageUid_();
+        tc = anychart.utils.tooltipContainersRegistry[stageUid];
+        if (!tc) {
+          tc = new anychart.core.utils.LocalTooltipContainer();
+          anychart.utils.tooltipContainersRegistry[stageUid] = tc;
+        }
+
         tooltip.tooltipContainer_ = tc;
         tooltip.getRootLayer_().parent(/** @type {acgraph.vector.ILayer} */ (tooltip.container()));
         var stage = container.getStage();
@@ -2098,7 +2099,7 @@ anychart.core.ui.Tooltip.prototype.hideSelectable_ = function(event) {
 anychart.core.ui.Tooltip.prototype.getCurrentStageUid_ = function() {
   var cont = this.getContainer_(this);
   var stage = cont.getStage();
-  return String(goog.getUid(stage));
+  return 'stg' + goog.getUid(stage);
 };
 
 
@@ -2479,7 +2480,9 @@ anychart.core.ui.Tooltip.prototype.disposeInternal = function() {
   delete this.padding_;
   delete this.delay_;
 
-  if (this.tooltipContainer_ && this.tooltipContainer_.isLocal()) {
+  if (this.tooltipContainer_ && this.tooltipContainer_.isLocal() && this.getContainer_(this)) {
+    var stageUid = this.getCurrentStageUid_();
+    delete anychart.utils.tooltipContainersRegistry[stageUid];
     goog.dispose(this.tooltipContainer_);
   }
 

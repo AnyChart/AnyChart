@@ -2152,25 +2152,28 @@ anychart.core.ui.BaseGrid.prototype.initMouseFeatures = function() {
  */
 anychart.core.ui.BaseGrid.prototype.docMouseMoveListener_ = function(e) {
   var l = anychart.core.ui.BaseGrid.SCROLL_MOUSE_OUT_INSIDE_LENGTH;
-  var containerPosition = this.container().getStage().getClientPosition();
-  var top = this.pixelBoundsCache.top + containerPosition.y + this.headerHeight_ + l;
-  var bottom = containerPosition.y + this.pixelBoundsCache.height - l - l;
-  var left = containerPosition.x + this.pixelBoundsCache.left + l;
-  var right = left + this.pixelBoundsCache.width - l - l;
+  var container = this.container();
+  if (container) {
+    var containerPosition = container.getStage().getClientPosition();
+    var top = this.pixelBoundsCache.top + containerPosition.y + this.headerHeight_ + l;
+    var bottom = containerPosition.y + this.pixelBoundsCache.height - l - l;
+    var left = containerPosition.x + this.pixelBoundsCache.left + l;
+    var right = left + this.pixelBoundsCache.width - l - l;
 
-  var mouseX = e.clientX;
-  var mouseY = e.clientY;
+    var mouseX = e.clientX;
+    var mouseY = e.clientY;
 
-  this.scrollOffsetX = 0;
-  this.scrollOffsetY = 0;
-  if (mouseX < left || mouseX > right) this.scrollOffsetX = mouseX - left;
-  if (mouseY < top || mouseY > bottom) this.scrollOffsetY = mouseY - top;
+    this.scrollOffsetX = 0;
+    this.scrollOffsetY = 0;
+    if (mouseX < left || mouseX > right) this.scrollOffsetX = mouseX - left;
+    if (mouseY < top || mouseY > bottom) this.scrollOffsetY = mouseY - top;
 
-  var ths = this;
-  if (this.dragging && !this.scrollInterval) {
-    this.scrollInterval = setInterval(function() {
-      ths.mouseOutMove(e);
-    }, anychart.core.ui.BaseGrid.TIMER_STEP);
+    var ths = this;
+    if (this.dragging && !this.scrollInterval) {
+      this.scrollInterval = setInterval(function() {
+        ths.mouseOutMove(e);
+      }, anychart.core.ui.BaseGrid.TIMER_STEP);
+    }
   }
 
 };

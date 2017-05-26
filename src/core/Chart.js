@@ -1398,9 +1398,6 @@ anychart.core.Chart.prototype.drawInternal = function() {
   if (!this.checkDrawingNeeded())
     return;
 
-  if (anychart.compatibility.IS_PHANTOM_JS && this.container() && this.container().getStage())
-    this.container().getStage().getTooltipLayer();
-
   anychart.performance.start('Chart.draw()');
   var startTime;
   if (anychart.DEVELOP) {

@@ -55,14 +55,6 @@ acgraph.vector.Stage.prototype.allowCreditsDisabling = false;
 
 
 /**
- * Tooltip container layer.
- * @type {acgraph.vector.Layer}
- * @private
- */
-acgraph.vector.Stage.prototype.tooltipLayer_ = null;
-
-
-/**
  * Stage credits.
  * @param {(Object|boolean|null)=} opt_value .
  * @return {!(acgraph.vector.Stage|anychart.core.ui.StageCredits)}
@@ -77,19 +69,6 @@ acgraph.vector.Stage.prototype.credits = function(opt_value) {
     return this;
   }
   return this.credits_;
-};
-
-
-/**
- * Getter for tooltip layer. Must be to highest layer to display the tooltip in top of all.
- * @return {!acgraph.vector.Layer}
- */
-acgraph.vector.Stage.prototype.getTooltipLayer = function() {
-  if (!this.tooltipLayer_) {
-    this.tooltipLayer_ = this.layer();
-    this.tooltipLayer_.zIndex(1e10);
-  }
-  return this.tooltipLayer_;
 };
 
 
