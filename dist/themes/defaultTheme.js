@@ -1,5 +1,5 @@
 (function() {
-    function w(a) {
+    function x(a) {
         switch (a.xScaleType) {
             case "dateTime":
                 return window.anychart.format.date(a.x);
@@ -8,7 +8,7 @@
         }
     }
 
-    function x() {
+    function y() {
         for (var a = this.chart, f = m.call(this), c = a.getSeriesCount(), e = {}, l = 0; l < c; l++) {
             var d = a.getSeriesAt(l).getType();
             e.hasOwnProperty(d) ? e[d] += 1 : e[d] = 1
@@ -38,7 +38,7 @@
         return f
     }
 
-    function y() {
+    function z() {
         for (var a = this.chart, f = m.call(this), c = a.getSeriesCount(), e = {}, d = 0; d < c; d++) {
             var g = a.getSeriesAt(d).seriesType();
             e.hasOwnProperty(g) ? e[g] += 1 : e[g] = 1
@@ -75,24 +75,24 @@
         return (a.getType() || "Anychart ") + " chart " + (b ? " entitled " + b : "")
     }
 
-    function z() {
+    function A() {
         return b.anychart.color.setThickness(this.sourceColor, 1.5)
     }
 
-    function A() {
+    function B() {
         return this.seriesName + ":\n  Open: " + c(this.open) + "\n  High: " + c(this.high) + "\n  Low: " + c(this.low) + "\n  Close: " + c(this.close)
     }
 
-    function B() {
+    function C() {
         return "Open: " + c(this.open) + "\nHigh: " +
             c(this.high) + "\nLow: " + c(this.low) + "\nClose: " + c(this.close)
     }
 
-    function C() {
+    function D() {
         return "High: " + c(this.high) + "\nLow: " + c(this.low)
     }
 
-    function D() {
+    function E() {
         return b.anychart.color.setThickness(this.sourceColor, 1.5)
     }
 
@@ -100,11 +100,11 @@
         return b.anychart.color.setThickness(b.anychart.color.lighten(this.sourceColor), 1.5)
     }
 
-    function u() {
+    function r() {
         return b.anychart.color.setThickness(this.sourceColor, 1)
     }
 
-    function q() {
+    function t() {
         return b.anychart.color.setThickness(this.sourceColor, 1.5)
     }
 
@@ -116,19 +116,19 @@
         return b.anychart.color.darken(this.sourceColor)
     }
 
-    function n() {
+    function q() {
         return b.anychart.color.setOpacity(this.sourceColor, .85, !0)
     }
 
-    function E() {
+    function v() {
         return b.anychart.color.setOpacity(this.sourceColor, .5, !0)
     }
 
-    function r() {
+    function n() {
         return b.anychart.color.setOpacity(this.sourceColor, .65, !0)
     }
 
-    function v() {
+    function w() {
         return b.anychart.color.setOpacity(this.sourceColor, .7, !0)
     }
 
@@ -140,7 +140,7 @@
         return b.anychart.format.date(this.tickValue)
     }
 
-    function t() {
+    function u() {
         return b.anychart.format.date(this.x)
     }
 
@@ -238,6 +238,10 @@
             }
         },
         defaultOrdinalColorScale: {
+            inverted: !1,
+            ticks: {
+                maxCount: 100
+            },
             autoColors: function(a) {
                 return b.anychart.color.blendedHueProgression("#90caf9", "#01579b", a)
             }
@@ -372,8 +376,8 @@
                 fontColor: "#ffffff",
                 hAlign: "left",
                 text: "Tooltip Text",
-                width: null,
-                height: null,
+                width: "100%",
+                height: "100%",
                 anchor: "leftTop",
                 offsetX: 0,
                 offsetY: 0,
@@ -875,9 +879,27 @@
             maxVisiblePoints: 500,
             minPixPerPoint: NaN
         },
+        defaultLabelSettings: {
+            enabled: !0,
+            text: "Chart label",
+            width: null,
+            height: null,
+            anchor: "leftTop",
+            position: "leftTop",
+            offsetX: 0,
+            offsetY: 0,
+            minFontSize: 8,
+            maxFontSize: 72,
+            adjustFontSize: {
+                width: !1,
+                height: !1
+            },
+            rotation: 0,
+            zIndex: 50
+        },
         stageCredits: {
             text: "AnyChart",
-            url: "http://www.anychart.com/?utm_source=registered",
+            url: "https://www.anychart.com/?utm_source=registered",
             alt: "AnyChart - JavaScript Charts designed to be embedded and integrated",
             imgAlt: "AnyChart - JavaScript Charts",
             logoSrc: "https://static.anychart.com/logo.png"
@@ -937,7 +959,7 @@
                     enabled: !0
                 },
                 titleFormat: function() {
-                    return w(this.points[0])
+                    return x(this.points[0])
                 },
                 format: function() {
                     return this.formattedValues.join("\n")
@@ -965,7 +987,7 @@
                     },
                     tooltip: {
                         titleFormat: function() {
-                            return w(this)
+                            return x(this)
                         },
                         format: function() {
                             return this.seriesName + ": " + this.valuePrefix + c(this.value) + this.valuePostfix
@@ -1007,16 +1029,16 @@
                         enabled: !0,
                         iconType: "square"
                     },
-                    fill: r,
+                    fill: n,
                     hoverFill: d,
                     selectFill: "#333 0.85",
-                    stroke: q,
+                    stroke: t,
                     hoverStroke: p,
                     selectStroke: "#333 0.85",
-                    lowStroke: q,
+                    lowStroke: t,
                     hoverLowStroke: p,
                     selectLowStroke: "#333 0.85",
-                    highStroke: q,
+                    highStroke: t,
                     hoverHighStroke: p,
                     selectHighStroke: "#333 0.85",
                     clip: !0,
@@ -1045,9 +1067,9 @@
                 },
                 marker: {
                     fill: d,
-                    stroke: z,
+                    stroke: A,
                     hoverFill: k,
-                    hoverStroke: z,
+                    hoverStroke: A,
                     selectFill: "#333 0.85",
                     selectStroke: "1.5 #212121",
                     size: 4,
@@ -1061,8 +1083,8 @@
                     }
                 },
                 bubble: {
-                    fill: v,
-                    hoverFill: E,
+                    fill: w,
+                    hoverFill: v,
                     displayNegative: !1,
                     negativeFill: function() {
                         return b.anychart.color.darken(b.anychart.color.darken(b.anychart.color.darken(this.sourceColor)))
@@ -1093,8 +1115,8 @@
                     }
                 },
                 areaLike: {
-                    fill: r,
-                    hoverFill: r,
+                    fill: n,
+                    hoverFill: n,
                     hoverMarkers: {
                         enabled: !0
                     },
@@ -1107,8 +1129,8 @@
                     stepDirection: "center"
                 },
                 barLike: {
-                    fill: n,
-                    hoverFill: r,
+                    fill: q,
+                    hoverFill: n,
                     legendItem: {
                         iconStroke: "none"
                     }
@@ -1133,7 +1155,7 @@
                         position: "high"
                     },
                     tooltip: {
-                        format: C
+                        format: D
                     }
                 },
                 candlestick: {
@@ -1156,7 +1178,7 @@
                     selectRisingStroke: "#333 0.85",
                     selectFallingStroke: "#333 0.85",
                     tooltip: {
-                        format: B
+                        format: C
                     },
                     markers: {
                         position: "high"
@@ -1180,7 +1202,7 @@
                     selectRisingStroke: "3 #333 0.85",
                     selectFallingStroke: "3 #333 0.85",
                     tooltip: {
-                        format: B
+                        format: C
                     },
                     markers: {
                         position: "high"
@@ -1191,29 +1213,14 @@
                     }
                 },
                 stick: {
-                    stroke: u
+                    stroke: r
                 },
                 jumpLine: {
                     pointWidth: "100%"
-                }
-            },
-            defaultLabelSettings: {
-                enabled: !0,
-                text: "Chart label",
-                width: null,
-                height: null,
-                anchor: "leftTop",
-                position: "leftTop",
-                offsetX: 0,
-                offsetY: 0,
-                minFontSize: 8,
-                maxFontSize: 72,
-                adjustFontSize: {
-                    width: !1,
-                    height: !1
                 },
-                rotation: 0,
-                zIndex: 50
+                hilo: {
+                    pointWidth: 1
+                }
             },
             chartLabels: [],
             maxBubbleSize: "20%",
@@ -1226,12 +1233,12 @@
             defaultAnnotationSettings: {
                 base: {
                     enabled: !0,
-                    fill: E,
+                    fill: v,
                     stroke: d,
                     hatchFill: null,
-                    hoverFill: v,
+                    hoverFill: w,
                     hoverStroke: g,
-                    selectFill: v,
+                    selectFill: w,
                     selectStroke: g,
                     markers: {
                         enabled: !1,
@@ -1289,8 +1296,8 @@
                     }
                 },
                 fibonacciTimezones: {
-                    levels: [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711, 28657,
-                        46368, 75025, 121393, 196418, 317811, 514229, 832040, 1346269, 2178309, 3524578, 5702887, 9227465, 14930352, 24157817, 39088169
+                    levels: [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75025, 121393, 196418, 317811, 514229, 832040, 1346269, 2178309, 3524578, 5702887, 9227465,
+                        14930352, 24157817, 39088169
                     ]
                 },
                 marker: {
@@ -1310,7 +1317,53 @@
             },
             selectLabels: {
                 enabled: null
-            }
+            },
+            crossing: {
+                stroke: "none"
+            },
+            defaultQuarterSettings: {
+                enabled: !1,
+                zIndex: 1,
+                fill: "none",
+                stroke: "none",
+                title: {
+                    enabled: !1,
+                    padding: 5
+                },
+                defaultLabelSettings: {
+                    text: "Quarter label",
+                    anchor: "center",
+                    position: "center"
+                },
+                margin: {},
+                padding: {}
+            },
+            quarters: {
+                rightTop: {
+                    fill: "#e3f2fd",
+                    title: {
+                        orientation: "top"
+                    }
+                },
+                leftTop: {
+                    title: {
+                        orientation: "top"
+                    }
+                },
+                leftBottom: {
+                    fill: "#e3f2fd",
+                    title: {
+                        orientation: "bottom"
+                    }
+                },
+                rightBottom: {
+                    title: {
+                        orientation: "bottom"
+                    }
+                }
+            },
+            selectMarqueeFill: "#d3d3d3 0.4",
+            selectMarqueeStroke: "#d3d3d3"
         },
         cartesianBase: {
             defaultSeriesSettings: {
@@ -1395,8 +1448,8 @@
                             return this.name || this.x
                         },
                         format: function() {
-                            return "Lowest: " + this.valuePrefix + c(this.lowest) + this.valuePostfix + "\nQ1: " + this.valuePrefix + c(this.q1) + this.valuePostfix + "\nMedian: " + this.valuePrefix + c(this.median) + this.valuePostfix +
-                                "\nQ3: " + this.valuePrefix + c(this.q3) + this.valuePostfix + "\nHighest: " + this.valuePrefix + c(this.highest) + this.valuePostfix
+                            return "Lowest: " + this.valuePrefix + c(this.lowest) + this.valuePostfix + "\nQ1: " + this.valuePrefix + c(this.q1) + this.valuePostfix + "\nMedian: " + this.valuePrefix + c(this.median) + this.valuePostfix + "\nQ3: " + this.valuePrefix + c(this.q3) + this.valuePostfix + "\nHighest: " + this.valuePrefix +
+                                c(this.highest) + this.valuePostfix
                         }
                     }
                 }
@@ -1471,7 +1524,7 @@
                 endRatio: 1
             },
             a11y: {
-                titleFormat: y
+                titleFormat: z
             }
         },
         cartesian: {
@@ -1540,18 +1593,18 @@
             defaultSeriesSettings: {
                 candlestick: {
                     tooltip: {
-                        titleFormat: t
+                        titleFormat: u
                     },
                     labels: {
-                        format: t
+                        format: u
                     }
                 },
                 ohlc: {
                     tooltip: {
-                        titleFormat: t
+                        titleFormat: u
                     },
                     labels: {
-                        format: t
+                        format: u
                     }
                 }
             },
@@ -1635,6 +1688,50 @@
                     format: "{%Value}%"
                 }
             }]
+        },
+        waterfall: {
+            dataMode: "diff",
+            connectorStroke: "#697474",
+            defaultSeriesType: "waterfall",
+            defaultSeriesSettings: {
+                waterfall: {
+                    fill: "#96a6a6",
+                    stroke: "#697474",
+                    risingFill: "#64b5f6",
+                    fallingFill: "#ef6c00",
+                    hoverRisingFill: n,
+                    hoverFallingFill: n,
+                    risingStroke: "#467fac",
+                    fallingStroke: "#a74c00",
+                    hoverRisingStroke: p,
+                    hoverFallingStroke: p,
+                    risingHatchFill: !1,
+                    hoverRisingHatchFill: null,
+                    selectRisingHatchFill: null,
+                    fallingHatchFill: !1,
+                    hoverFallingHatchFill: null,
+                    selectFallingHatchFill: null,
+                    selectFallingFill: "#333 0.85",
+                    selectRisingFill: "#333 0.85",
+                    selectRisingStroke: "#333 0.85",
+                    selectFallingStroke: "#333 0.85",
+                    labels: {
+                        enabled: !0,
+                        format: function() {
+                            return c(this.isTotal ? this.absolute : this.diff)
+                        }
+                    },
+                    tooltip: {
+                        format: function() {
+                            return this.isTotal ? "Absolute: " + c(this.absolute) : "Absolute: " + c(this.absolute) + "\nDifference: " + c(this.diff)
+                        }
+                    }
+                }
+            },
+            legend: {
+                enabled: !0,
+                itemsSourceMode: "categories"
+            }
         },
         cartesian3dBase: {
             defaultSeriesType: "column",
@@ -1845,7 +1942,8 @@
                             return this.seriesName
                         },
                         format: function() {
-                            return "x: " + this.x + "\ny: " + this.valuePrefix + c(this.value) + this.valuePostfix
+                            return "x: " +
+                                this.x + "\ny: " + this.valuePrefix + c(this.value) + this.valuePostfix
                         }
                     },
                     xScale: null,
@@ -1869,7 +1967,8 @@
                     hatchFill: !1,
                     tooltip: {
                         format: function() {
-                            return "X: " + this.x + "\nY: " + this.valuePrefix + c(this.value) + this.valuePostfix + "\nSize: " + c(this.size)
+                            return "X: " + this.x + "\nY: " + this.valuePrefix +
+                                c(this.value) + this.valuePostfix + "\nSize: " + c(this.size)
                         }
                     }
                 },
@@ -1922,7 +2021,7 @@
                 zIndex: 41
             },
             a11y: {
-                titleFormat: x
+                titleFormat: y
             },
             annotations: {
                 annotationsList: [],
@@ -1931,6 +2030,227 @@
         },
         marker: {},
         bubble: {},
+        quadrant: {
+            scales: [{
+                type: "linear",
+                minimum: 0,
+                maximum: 100
+            }, {
+                type: "linear",
+                minimum: 0,
+                maximum: 100
+            }],
+            xScale: 0,
+            yScale: 1,
+            defaultXAxisSettings: {
+                ticks: !1,
+                labels: !1,
+                title: {
+                    enabled: !1,
+                    align: "left"
+                },
+                stroke: "3 #bbdefb"
+            },
+            defaultYAxisSettings: {
+                ticks: !1,
+                labels: !1,
+                title: {
+                    enabled: !1,
+                    align: "left"
+                },
+                stroke: "3 #bbdefb"
+            },
+            xAxes: [{}, {
+                orientation: "top"
+            }],
+            yAxes: [{}, {
+                orientation: "right"
+            }],
+            crossing: {
+                stroke: "#bbdefb"
+            },
+            quarters: {
+                rightTop: {
+                    enabled: !0
+                },
+                leftTop: {
+                    enabled: !0
+                },
+                leftBottom: {
+                    enabled: !0
+                },
+                rightBottom: {
+                    enabled: !0
+                }
+            }
+        },
+        mekko: {
+            defaultSeriesType: "mekko",
+            isVertical: !1,
+            labels: {
+                enabled: !0
+            },
+            defaultSeriesSettings: {
+                base: {
+                    fill: q,
+                    hoverFill: n,
+                    legendItem: {
+                        iconStroke: "none"
+                    },
+                    isVertical: !1,
+                    labels: {
+                        format: "{%Value}{decimalsCount:2}",
+                        position: "center",
+                        offsetY: 0,
+                        fontColor: "#ffffff"
+                    },
+                    markers: {
+                        position: "center",
+                        anchor: "center"
+                    },
+                    tooltip: {
+                        anchor: "leftTop"
+                    },
+                    stroke: r,
+                    hoverStroke: function() {
+                        return b.anychart.color.setThickness(b.anychart.color.lighten(this.sourceColor),
+                            1)
+                    }
+                },
+                mekko: {}
+            },
+            defaultXAxisSettings: {
+                orientation: "bottom",
+                title: {
+                    text: "X-Axis",
+                    padding: {
+                        top: 5,
+                        right: 0,
+                        bottom: 0,
+                        left: 0
+                    }
+                },
+                labels: {
+                    format: "{%Value}{decimalsCount:10}"
+                },
+                scale: 0
+            },
+            defaultYAxisSettings: {
+                orientation: "left",
+                title: {
+                    text: "Y-Axis",
+                    padding: {
+                        top: 0,
+                        right: 0,
+                        bottom: 5,
+                        left: 0
+                    }
+                },
+                labels: {
+                    format: "{%Value}{decimalsCount:10}%"
+                },
+                scale: 1
+            },
+            xAxes: [{}],
+            yAxes: [{}],
+            scales: [{
+                type: "ordinal"
+            }, {
+                type: "linear",
+                stackMode: "percent",
+                minimumGap: 0,
+                maximumGap: 0
+            }, {
+                type: "ordinal"
+            }, {
+                type: "ordinal"
+            }],
+            crosshair: {
+                enabled: !1,
+                displayMode: "float",
+                xStroke: "#969EA5",
+                yStroke: "#969EA5",
+                zIndex: 41
+            },
+            xScale: 0,
+            yScale: 1,
+            firstCategoriesScale: 2,
+            lastCategoriesScale: 3,
+            defaultAnnotationSettings: {},
+            annotations: {
+                annotationsList: [],
+                zIndex: 2E3
+            },
+            pointsPadding: 0
+        },
+        mosaic: {
+            pointsPadding: 5,
+            defaultXAxisSettings: {
+                stroke: 0,
+                ticks: {
+                    enabled: !1
+                }
+            },
+            defaultYAxisSettings: {
+                stroke: 0,
+                ticks: {
+                    enabled: !1
+                },
+                labels: {
+                    format: "{%Value}"
+                }
+            }
+        },
+        barmekko: {
+            scales: [{
+                type: "ordinal"
+            }, {
+                type: "linear",
+                stackMode: "value"
+            }, {
+                type: "ordinal"
+            }, {
+                type: "ordinal"
+            }],
+            defaultSeriesSettings: {
+                mekko: {
+                    fill: function() {
+                        var a =
+                            1 < this.chart.getSeriesCount() ? this.sourceColor : this.chart.c().b(this.iterator.a),
+                            a = a ? a : this.sourceColor;
+                        return b.anychart.color.setOpacity(a, .85, !0)
+                    },
+                    hoverFill: function() {
+                        var a = 1 < this.chart.getSeriesCount() ? this.sourceColor : this.chart.c().b(this.iterator.a),
+                            a = a ? a : this.sourceColor;
+                        return b.anychart.color.setOpacity(a, .65, !0)
+                    },
+                    stroke: function() {
+                        var a = 1 < this.chart.getSeriesCount() ? this.sourceColor : this.chart.c().b(this.iterator.a),
+                            a = a ? a : this.sourceColor;
+                        return b.anychart.color.setThickness(a, 1)
+                    },
+                    labels: {
+                        format: "{%Value}{decimalsCount:2}",
+                        anchor: "auto",
+                        position: "value",
+                        fontColor: "#7c868e"
+                    },
+                    markers: {
+                        position: "value",
+                        positionFormatter: h
+                    }
+                }
+            },
+            defaultYAxisSettings: {
+                labels: {
+                    format: "{%Value}{decimalsCount:10}"
+                }
+            },
+            labels: {
+                enabled: !1
+            }
+        },
         radar: {
             defaultSeriesType: "line",
             defaultSeriesSettings: {
@@ -1974,7 +2294,7 @@
             xScale: 0,
             yScale: 1,
             a11y: {
-                titleFormat: y
+                titleFormat: z
             }
         },
         polar: {
@@ -2029,7 +2349,7 @@
             barsPadding: 0,
             barGroupsPadding: 0,
             a11y: {
-                titleFormat: x
+                titleFormat: y
             }
         },
         bullet: {
@@ -2309,8 +2629,7 @@
             defaultSeriesSettings: {
                 base: {
                     fill: function() {
-                        return this.scaledColor ||
-                            this.sourceColor
+                        return this.scaledColor || this.sourceColor
                     },
                     hoverFill: "#757575",
                     selectFill: "#333 0.85",
@@ -2354,7 +2673,8 @@
                     color: null,
                     tooltip: {
                         titleFormat: function() {
-                            return this.name || this.getData("name") || "Tooltip title"
+                            return this.name || this.getData("name") ||
+                                "Tooltip title"
                         },
                         format: function() {
                             return "Id: " + this.id + "\nValue: " + this.valuePrefix + c(this.value) + this.valuePostfix
@@ -2424,7 +2744,8 @@
                             enabled: !1
                         },
                         format: function() {
-                            return "from: " + this.startPoint.lat + ", " + this.startPoint["long"] + "\nto: " + this.endPoint.lat + ", " + this.endPoint["long"]
+                            return "from: " + this.startPoint.lat + ", " + this.startPoint["long"] + "\nto: " + this.endPoint.lat +
+                                ", " + this.endPoint["long"]
                         }
                     }
                 },
@@ -2693,8 +3014,7 @@
                     return this.index
                 },
                 format: function() {
-                    return "Value: " +
-                        c(this.value)
+                    return "Value: " + c(this.value)
                 }
             }
         },
@@ -2710,7 +3030,7 @@
                     return this.name
                 },
                 format: function() {
-                    return this.high ? C.call(this) : "Value: " + c(this.value)
+                    return this.high ? D.call(this) : "Value: " + c(this.value)
                 }
             },
             scales: [{
@@ -2765,7 +3085,7 @@
                     selectLabel: {
                         enabled: null
                     },
-                    stroke: q,
+                    stroke: t,
                     hoverStroke: p,
                     selectStroke: g,
                     fill: d,
@@ -2794,7 +3114,8 @@
                         var a = this.sourceColor,
                             c = b.anychart.color.darken(a);
                         return {
-                            angle: this.isVertical ? 0 : 90,
+                            angle: this.isVertical ?
+                                0 : 90,
                             keys: [{
                                 color: c
                             }, {
@@ -2830,6 +3151,11 @@
         ledGauge: {},
         bulletGauge: {},
         heatMap: {
+            annotations: {
+                annotationsList: [],
+                zIndex: 2E3
+            },
+            isVertical: !1,
             scales: [{
                 type: "ordinal"
             }, {
@@ -2868,8 +3194,7 @@
                 format: function() {
                     if (void 0 === this.heat) {
                         var a = "Value: " + this.valuePrefix + this.heat + this.valuePostfix;
-                        isNaN(+this.heat) || (a +=
-                            "\nPercent Value: " + (100 * this.heat / this.getStat("sum")).toFixed(1) + "%");
+                        isNaN(+this.heat) || (a += "\nPercent Value: " + (100 * this.heat / this.getStat("sum")).toFixed(1) + "%");
                         return a
                     }
                     return "x: " + this.x + "\ny: " + this.y
@@ -2889,7 +3214,8 @@
                 },
                 title: {
                     text: "X-Axis"
-                }
+                },
+                scale: 0
             },
             defaultYAxisSettings: {
                 enabled: !0,
@@ -2899,16 +3225,16 @@
                 },
                 title: {
                     text: "Y-Axis"
-                }
+                },
+                scale: 1
             },
             fill: function() {
                 var a;
-                this.colorScale ? (a = this.iterator.get("heat"), a = this.colorScale.valueToColor(a)) : a = b.anychart.color.setOpacity(this.sourceColor,
-                    .85, !0);
+                this.colorScale ? (a = this.iterator.get("heat"), a = this.colorScale.valueToColor(a)) : a = b.anychart.color.setOpacity(this.sourceColor, .85, !0);
                 return a
             },
             stroke: "1 #ffffff",
-            hoverStroke: "1.5 #ffffff",
+            hoverStroke: "2 #ffffff",
             hoverFill: "#757575",
             selectStroke: "2 #ffffff",
             selectFill: "#333 0.85",
@@ -2967,7 +3293,8 @@
                 size: 4,
                 positionFormatter: h,
                 fill: "#dd2c00",
-                type: "circle"
+                type: "circle",
+                stroke: "none"
             },
             hoverMarkers: {
                 enabled: null,
@@ -2981,6 +3308,8 @@
             },
             labelsDisplayMode: "drop",
             hatchFill: !1,
+            hoverHatchFill: null,
+            selectHatchFill: null,
             clip: !0,
             xZoom: {
                 continuous: !0,
@@ -3082,7 +3411,8 @@
                 stroke: "1.5 #212121"
             },
             fill: function() {
-                return this.colorScale ? this.colorScale.valueToColor(this.value) : b.anychart.color.setOpacity(this.sourceColor, .85, !0)
+                return this.colorScale ?
+                    this.colorScale.valueToColor(this.value) : b.anychart.color.setOpacity(this.sourceColor, .85, !0)
             },
             stroke: "#e0e0e0",
             hoverFill: k,
@@ -3104,7 +3434,8 @@
             handlePositionChange: !0,
             startRatio: "0",
             endRatio: "1",
-            buttonsVisible: !1
+            buttonsVisible: !1,
+            cornersRadius: 5
         },
         defaultDataGrid: {
             isStandalone: !0,
@@ -3474,8 +3805,7 @@
             timeline: {
                 tooltip: {
                     titleFormat: function() {
-                        return this.name ||
-                            ""
+                        return this.name || ""
                     },
                     format: function() {
                         var a = this.periodStart || this.minPeriodDate,
@@ -3496,8 +3826,7 @@
                             c = this.actualEnd || this.autoEnd,
                             d = this.progressValue;
                         void 0 === d && (d = (Math.round(1E4 * this.autoProgress) / 100 || 0) + "%");
-                        return (a ? "Start Date: " + b.anychart.format.dateTime(a) :
-                            "") + (c ? "\nEnd Date: " + b.anychart.format.dateTime(c) : "") + (d ? "\nComplete: " + d : "")
+                        return (a ? "Start Date: " + b.anychart.format.dateTime(a) : "") + (c ? "\nEnd Date: " + b.anychart.format.dateTime(c) : "") + (d ? "\nComplete: " + d : "")
                     }
                 }
             },
@@ -3681,7 +4010,7 @@
                     },
                     candlestick: {
                         tooltip: {
-                            format: A
+                            format: B
                         }
                     },
                     column: {
@@ -3692,7 +4021,7 @@
                     },
                     ohlc: {
                         tooltip: {
-                            format: A
+                            format: B
                         }
                     }
                 },
@@ -3772,8 +4101,7 @@
                             left: 0
                         },
                         format: function() {
-                            return b.anychart.format.dateTime(this.tickValue, b.anychart.format.getDateTimeFormat(b.anychart.format.getIntervalIdentifier(this.minorIntervalUnit,
-                                this.majorIntervalUnit)))
+                            return b.anychart.format.dateTime(this.tickValue, b.anychart.format.getDateTimeFormat(b.anychart.format.getIntervalIdentifier(this.minorIntervalUnit, this.majorIntervalUnit)))
                         }
                     }
                 },
@@ -3892,11 +4220,11 @@
                     },
                     stick: {
                         stroke: "#999 0.6",
-                        selectStroke: u
+                        selectStroke: r
                     },
                     jumpLine: {
                         stroke: "#999 0.6",
-                        selectStroke: u
+                        selectStroke: r
                     }
                 },
                 enabled: !0,
@@ -3964,6 +4292,12 @@
             },
             a11y: {
                 titleFormat: m
+            },
+            zoomMarqueeFill: "#d3d3d3 0.4",
+            zoomMarqueeStroke: "#d3d3d3",
+            interactivity: {
+                zoomOnMouseWheel: !0,
+                scrollOnMouseWheel: !0
             }
         },
         pert: {
@@ -4002,10 +4336,10 @@
                     fontWeight: "bold"
                 },
                 color: "#64b5f6",
-                fill: n,
+                fill: q,
                 stroke: "none",
                 hoverFill: k,
-                hoverStroke: D,
+                hoverStroke: E,
                 selectFill: "#333 0.85",
                 selectStroke: "#333 0.85",
                 tooltip: {
@@ -4016,11 +4350,11 @@
                         enabled: !0
                     },
                     titleFormat: function() {
-                        return this.creator ? "Milestone - " + this.index : "Milestone - " + (this.isStart ? "Start" : "Finish")
+                        return this.creator ?
+                            "Milestone - " + this.index : "Milestone - " + (this.isStart ? "Start" : "Finish")
                     },
                     format: function() {
-                        var a =
-                            "",
+                        var a = "",
                             b;
                         if (this.successors && this.successors.length) {
                             a += "Successors:";
@@ -4035,13 +4369,13 @@
             },
             tasks: {
                 color: "#64b5f6",
-                fill: n,
-                stroke: n,
+                fill: q,
+                stroke: q,
                 hoverFill: k,
-                hoverStroke: D,
+                hoverStroke: E,
                 selectFill: "#333 0.85",
                 selectStroke: "#333 0.85",
-                dummyFill: n,
+                dummyFill: q,
                 dummyStroke: function() {
                     return {
                         color: this.sourceColor,
@@ -4108,7 +4442,8 @@
                         return this.name
                     },
                     format: function() {
-                        var a = "Earliest start: " + c(this.earliestStart) + "\nEarliest finish: " + c(this.earliestFinish) + "\nLatest start: " + c(this.latestStart) + "\nLatest finish: " + c(this.latestFinish) + "\nDuration: " + c(this.duration) + "\nSlack: " + c(this.slack);
+                        var a = "Earliest start: " + c(this.earliestStart) + "\nEarliest finish: " + c(this.earliestFinish) + "\nLatest start: " + c(this.latestStart) + "\nLatest finish: " + c(this.latestFinish) + "\nDuration: " +
+                            c(this.duration) + "\nSlack: " + c(this.slack);
                         isNaN(this.variance) || (a += "\nStandard deviation: " + Math.round(100 * this.variance) / 100);
                         return a
                     }
@@ -4406,9 +4741,7 @@
             margin: [20, 20, 20, 20],
             resourceListWidth: 260,
             timeLineHeight: 52,
-            cellPadding: [2,
-                2, 2, 2
-            ],
+            cellPadding: [2, 2, 2, 2],
             minRowHeight: 50,
             pixPerHour: 25,
             defaultMinutesPerDay: 60,
@@ -4435,6 +4768,167 @@
                     var a = window.anychart.format.date;
                     return "Starts: " + a(this.start) + "\nEnds: " + a(this.end)
                 }
+            }
+        },
+        tagCloud: {
+            anglesCount: 7,
+            fromAngle: -90,
+            toAngle: 90,
+            mode: "spiral",
+            textSpacing: 1,
+            scale: {
+                type: "linear"
+            },
+            colorRange: {},
+            colorScale: null,
+            normal: {
+                fontFamily: "Verdana, Helvetica, Arial, sans-serif",
+                fontOpacity: 1,
+                fontDecoration: "none",
+                fontStyle: "normal",
+                fontVariant: "normal",
+                fontWeight: "normal",
+                fill: function() {
+                    return b.anychart.color.setOpacity(this.scaledColor || this.sourceColor, .85, !0)
+                }
+            },
+            hovered: {
+                fill: n
+            },
+            selected: {
+                fill: "#333 0.85"
+            },
+            tooltip: {
+                enabled: !0,
+                title: {
+                    enabled: !0
+                },
+                separator: {
+                    enabled: !0
+                },
+                titleFormat: function() {
+                    return this.name || this.x
+                },
+                format: function() {
+                    return "Frequency: " + c(this.value) + "\nPercent of total: " + (100 * this.value / this.getStat("sum")).toFixed(1) + "%"
+                }
+            },
+            legend: {
+                enabled: !1,
+                itemsSourceMode: "categories",
+                tooltip: {
+                    contentInternal: {
+                        background: {
+                            disablePointerEvents: !1
+                        }
+                    }
+                }
+            }
+        },
+        venn: {
+            dataSeparator: "&",
+            background: {
+                zIndex: 0
+            },
+            padding: {
+                top: 15,
+                right: 5,
+                bottom: 15,
+                left: 5
+            },
+            a11y: {
+                enabled: !0,
+                titleFormat: m,
+                mode: "chartElements"
+            },
+            color: "#64b5f6",
+            fill: v,
+            hoverFill: function() {
+                return b.anychart.color.setOpacity(b.anychart.color.lighten(this.sourceColor),
+                    .5, !0)
+            },
+            selectFill: "#333 0.85",
+            tooltip: {
+                titleFormat: "{%Name}",
+                format: "Value: {%Value}"
+            },
+            stroke: "none",
+            hoverStroke: "none",
+            hatchFill: !1,
+            hoverHatchFill: !1,
+            selectHatchFill: !1,
+            selectStroke: "none",
+            labels: {
+                fontColor: "#f4f4f4",
+                format: "{%Name}",
+                anchor: "center",
+                enabled: !0,
+                disablePointerEvents: !0,
+                zIndex: 100,
+                fontWeight: "bold"
+            },
+            hoverLabels: {
+                enabled: null
+            },
+            selectLabels: {
+                enabled: null
+            },
+            markers: {
+                enabled: !1,
+                zIndex: 99,
+                disablePointerEvents: !0,
+                stroke: "none"
+            },
+            hoverMarkers: {
+                enabled: null
+            },
+            selectMarkers: {
+                enabled: null
+            },
+            intersections: {
+                fill: "#fff 0.00001",
+                hoverFill: "#fff 0.5",
+                selectFill: "#333 0.85",
+                stroke: "none",
+                hoverStroke: "none",
+                selectStroke: "none",
+                labels: {
+                    fontWeight: "normal",
+                    format: "{%Value}",
+                    enabled: null
+                },
+                hoverLabels: {
+                    enabled: null
+                },
+                selectLabels: {
+                    enabled: null
+                },
+                markers: {
+                    enabled: null
+                },
+                hoverMarkers: {
+                    enabled: null
+                },
+                selectMarkers: {
+                    enabled: null
+                },
+                tooltip: {
+                    titleFormat: "{%Name}"
+                }
+            },
+            legend: {
+                enabled: !0,
+                zIndex: 0,
+                tooltip: {
+                    enabled: !1
+                },
+                padding: {
+                    top: 10,
+                    right: 10,
+                    bottom: 0,
+                    left: 10
+                },
+                position: "bottom"
             }
         },
         standalones: {
@@ -4655,9 +5149,9 @@
                         var a = this.actualStart || this.autoStart,
                             c = this.actualEnd || this.autoEnd,
                             d = this.progressValue;
-                        void 0 === d && (d = (Math.round(1E4 * this.autoProgress) / 100 || 0) + "%");
-                        return (a ? "Start Date: " + b.anychart.format.dateTime(a) :
-                            "") + (c ? "\nEnd Date: " + b.anychart.format.dateTime(c) : "") + (d ? "\nComplete: " + d : "")
+                        void 0 === d && (d = (Math.round(1E4 * this.autoProgress) /
+                            100 || 0) + "%");
+                        return (a ? "Start Date: " + b.anychart.format.dateTime(a) : "") + (c ? "\nEnd Date: " + b.anychart.format.dateTime(c) : "") + (d ? "\nComplete: " + d : "")
                     }
                 }
             },

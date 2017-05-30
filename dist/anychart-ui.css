@@ -581,7 +581,7 @@
  cursor: pointer;
  list-style: none;
  margin: 0;
- padding: 6px 3em 6px 30px;
+ padding: 6px 1em 6px 30px;
  white-space: nowrap;
 }
 .anychart-menuitem.anychart-menuitem-rtl {
@@ -693,11 +693,9 @@
  -moz-transition: all 0.218s;
  -o-transition: all 0.218s;
  transition: all 0.218s;
- font-size: 70%;
  left: auto;
  right: 10px;
  margin-top: 2px;
- position: absolute;
  text-align: right;
  opacity: .5;
  filter: alpha(opacity=50);
@@ -705,7 +703,11 @@
  height: 0;
  border-top: 5px solid transparent;
  border-bottom: 5px solid transparent;
- border-left: 5px solid black;
+ border-left: 5px solid #000000;
+ font-size: 0;
+ line-height: 0;
+ display: block;
+ float: right;
 }
 .anychart-menuitem-highlight .anychart-submenu-arrow,
 .anychart-menuitem-hover .anychart-submenu-arrow {
@@ -947,7 +949,6 @@
  -webkit-box-sizing: border-box;
  -moz-box-sizing: border-box;
  box-sizing: border-box;
- vertical-align: top;
  white-space: nowrap;
  padding-right: 20px;
  text-overflow: ellipsis;
@@ -969,6 +970,9 @@
 .anychart-flat-menu-button-selected .anychart-flat-menu-button-dropdown,
 .anychart-flat-menu-button-hover .anychart-flat-menu-button-dropdown {
  border-color: #595959 transparent;
+}
+.anychart-chart-editor-settings-font-size {
+ margin-top: -4px;
 }
 .anychart-combobox {
  background: 0;
@@ -1463,17 +1467,26 @@
  border-color: #bfcbdf;
 }
 .anychart-chart-editor {
+ position: relative;
  background: white;
- border: 1px solid #acacac;
  color: #000000;
- position: absolute;
- width: 80%;
- height: 80%;
- min-width: 780px;
- min-height: 400px;
  font-family: Arial, sans-serif;
  font-size: 13px;
+ width: 100%;
+ height: 100%;
+}
+.anychart-chart-editor-dialog {
+ background: white;
+ border: 1px solid #acacac;
+ position: absolute;
+ width: 90%;
+ height: 90%;
+ min-width: 780px;
+ min-height: 400px;
  box-shadow: 0 4px 16px rgba(0,0,0,.2);
+ color: #000000;
+ font-family: Arial, sans-serif;
+ font-size: 13px;
 }
 .anychart-chart-editor a,
 .anychart-chart-editor a:link,
@@ -1550,14 +1563,13 @@
 .anychart-flat-menu-button-caption .ac-position-center-right {
  margin-top: -4px;
 }
-.anychart-chart-editor-bg {
+.anychart-chart-editor-dialog-bg {
  background: #666666;
  left: 0;
  position: absolute;
  top: 0;
 }
-.anychart-chart-editor-title {
- color: #000000;
+.anychart-chart-editor-dialog-title {
  font-weight: bold;
  height: 48px;
  position: absolute;
@@ -1567,7 +1579,7 @@
  padding: 12px 14px;
  _zoom: 1;
 }
-.anychart-chart-editor-title-logo {
+.anychart-chart-editor-dialog-title-logo {
  display: inline-block;
  background: white url("https://cdn.anychart.com/images/anychart-logo-medium.png") no-repeat;
  background-size: 36px 36px;
@@ -1576,7 +1588,7 @@
  position: relative;
  top: 6px;
 }
-.anychart-chart-editor-title-text {
+.anychart-chart-editor-dialog-title-text {
  font-size: 18px;
  line-height: 36px;
  position: relative;
@@ -1584,7 +1596,7 @@
  left: 7px;
  cursor: default;
 }
-.anychart-chart-editor-title-close {
+.anychart-chart-editor-dialog-title-close {
  float: right;
  margin-top: 15px;
  margin-right: 10px;
@@ -1595,11 +1607,11 @@
  cursor: pointer;
  opacity: 0.5;
 }
-.anychart-chart-editor-buttons,
-.anychart-chart-editor-content {
+.anychart-chart-editor-dialog-buttons,
+.anychart-chart-editor-dialog-content {
  background-color: #ffffff;
 }
-.anychart-chart-editor-content {
+.anychart-chart-editor-dialog-content {
  position: absolute;
  overflow: hidden;
  top: 72px;
@@ -1611,13 +1623,15 @@
  width: 100%;
  height: 100%;
  position: absolute;
+ top: 0;
+ left: 0;
 }
 .anychart-chart-editor-step-aside {
  -webkit-box-sizing: content-box;
  -moz-box-sizing: content-box;
  box-sizing: content-box;
  position: absolute;
- width: 238px;
+ width: 240px;
  top: 0;
  bottom: 0;
  left: 0;
@@ -1627,7 +1641,7 @@
 }
 .anychart-chart-editor-step-content-wrapper {
  position: absolute;
- left: 266px;
+ left: 264px;
  top: 0;
  bottom: 0;
  right: 0;
@@ -1894,7 +1908,7 @@
  width: 72px;
 }
 .anychart-chart-editor-settings-control-select-image {
- width: 38px;
+ width: 42px;
 }
 .anychart-chart-editor-settings-enabled {
  padding: 4px 7px;
